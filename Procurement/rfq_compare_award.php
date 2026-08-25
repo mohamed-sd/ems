@@ -37,8 +37,8 @@ $__pc = ems_post_contract($conn, array(
     'validate' => function (array $in) {
         $qid = intval($in['award_quote'] ?? 0);
         $why = trim($in['award_reason'] ?? '');
-        if ($qid <= 0) { return array('ok' => false, 'msg' => 'عرضٌ غيرُ صالح (422)'); }
-        if ($why === '') { return array('ok' => false, 'msg' => 'سببُ الترسية إلزامي — لا ترسيةَ صامتة (422)'); }
+        if ($qid <= 0) { return array('ok' => false, 'msg' => 'عرض غير صالح (422)'); }
+        if ($why === '') { return array('ok' => false, 'msg' => 'سبب الترسية إلزامي — لا ترسية صامتة (422)'); }
         return array('ok' => true, 'data' => array('qid' => $qid, 'why' => $why));
     },
 ));
@@ -74,8 +74,8 @@ if ($__pc['run'] && $__pc['ok']) {
         $__po = \App\Services\Workflow\ChainLinkService::orderFromAward(
             $conn, ems_tenant_db(), (int) $company_id, (int) $res['award_id'], (int) $uid);
         $msg .= ' · ' . ($__po['ok']
-            ? ('أمرُ الشراءِ المسودةُ #' . (int) $__po['order_id'] . ($__po['existing'] ? ' (قائمٌ سلفًا)' : ''))
-            : ('⚠ لم يُولَّد أمرُ الشراء: ' . $__po['reason']));
+            ? ('أمر الشراء المسودة #' . (int) $__po['order_id'] . ($__po['existing'] ? ' (قائم سلفا)' : ''))
+            : ('⚠ لم يولد أمر الشراء: ' . $__po['reason']));
     }
 }
 
@@ -125,18 +125,18 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 /* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
    شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
 $header_icon = 'fa fa-balance-scale';
-$header_title_html = htmlspecialchars('مقارنةُ العروض والترسية', ENT_QUOTES, 'UTF-8');
+$header_title_html = htmlspecialchars('مقارنة العروض والترسية', ENT_QUOTES, 'UTF-8');
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-echo ems_states_bundle('لا عروضَ مقدَّمةً لطلبِ العروضِ المختار',
-    'اختر طلبَ عروضٍ آخرَ من القائمةِ أعلاه، أو انتظر ورودَ عروضِ الموردين قبل الترسية');
+echo ems_states_bundle('لا عروض مقدمة لطلب العروض المختار',
+    'اختر طلب عروض آخر من القائمة أعلاه، أو انتظر ورود عروض الموردين قبل الترسية');
 ?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
   <form method="get" class="ems-form proc-rfq-filter">
-    <select name="rfq" aria-label="طلبُ العروضِ المرادُ مقارنةُ عروضِه" class="form-control proc-rfq-select" onchange="this.form.submit()">
-      <option value="">— اختر طلبَ عروض —</option>
+    <select name="rfq" aria-label="طلب العروض المراد مقارنة عروضه" class="form-control proc-rfq-select" onchange="this.form.submit()">
+      <option value="">— اختر طلب عروض —</option>
       <?php foreach ($rfqs as $f): ?>
         <option value="<?= intval($f['id']) ?>" <?= $f['id'] == $rfq ? 'selected' : '' ?>>
           <?= htmlspecialchars(($f['rfq_no'] ?: '#' . $f['id']) . ' — ' . $f['title'] . ' (' . $f['state'] . ')', ENT_QUOTES, 'UTF-8') ?></option>
@@ -145,7 +145,7 @@ echo ems_states_bundle('لا عروضَ مقدَّمةً لطلبِ العروض
   </form>
   <?php if ($rfq > 0): ?>
   <table class="table table-striped" data-no-dt>
-    <thead><tr><th>المورد</th><th>سعرُ الوحدة</th><th>الكمية</th><th>جاهزية (يوم)</th><th>تقييمُ السجل</th><th>ملاحظة</th><th>ترسية</th>
+    <thead><tr><th>المورد</th><th>سعر الوحدة</th><th>الكمية</th><th>جاهزية (يوم)</th><th>تقييم السجل</th><th>ملاحظة</th><th>ترسية</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">رقم الطلب</th>
               <th class="ems-fn-th" data-fn="1">تاريخ الإرسال</th>
@@ -160,11 +160,11 @@ echo ems_states_bundle('لا عروضَ مقدَّمةً لطلبِ العروض
               <th class="ems-fn-th" data-fn="1">الترتيب</th>
               <th class="ems-fn-th" data-fn="1">القرار</th>
               <th class="ems-fn-th" data-fn="1">مبرر الاختيار</th>
-              <th class="ems-fn-th" data-fn="1">أعدّه</th>
+              <th class="ems-fn-th" data-fn="1">أعده</th>
               <th class="ems-fn-th" data-fn="1">اعتمده</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th none" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
@@ -174,7 +174,7 @@ echo ems_states_bundle('لا عروضَ مقدَّمةً لطلبِ العروض
               <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
               </tr></thead>
     <tbody>
-    <?php if (empty($quotes)): ?><tr><td colspan="7" class="text-center text-muted">لا عروضَ مقدَّمةً لهذا الطلب</td></tr><?php endif; ?>
+    <?php if (empty($quotes)): ?><tr><td colspan="7" class="text-center text-muted">لا عروض مقدمة لهذا الطلب</td></tr><?php endif; ?>
     <?php
     /* ═══════════════════════════════════════════════════════════════════════
      * INJ-0341 — «الأدنى» تُحسب على **المعادلِ الموحَّدِ** لا على السعرِ الخام
@@ -218,13 +218,13 @@ echo ems_states_bundle('لا عروضَ مقدَّمةً لطلبِ العروض
             <?php if ((string) $q['currency'] !== (string) $baseCur): ?>
               <?php if ($eqOk): ?>
               <div class="ems-eq-base proc-rfq-eq"
-                   title="المعادلُ بعملةِ الدفاترِ — وعليه تُحسب «الأدنى»">
+                   title="المعادل بعملة الدفاتر — وعليه تحسب «الأدنى»">
                 ≈ <?= number_format($eq, 2) ?> <?= htmlspecialchars((string) $baseCur, ENT_QUOTES, 'UTF-8') ?>
               </div>
               <?php else: ?>
               <div class="ems-eq-none proc-rfq-eq-warn"
-                   title="لا سعرَ صرفٍ مسجَّلٌ لهذه العملةِ في تاريخِ اليوم — فالمقارنةُ على السعرِ الخامّ">
-                ⚠ بلا سعرِ صرف — قُورن خامًّا
+                   title="لا سعر صرف مسجل لهذه العملة في تاريخ اليوم — فالمقارنة على السعر الخام">
+                ⚠ بلا سعر صرف — قورن خاما
               </div>
               <?php endif; ?>
             <?php endif; ?>
@@ -238,8 +238,8 @@ echo ems_states_bundle('لا عروضَ مقدَّمةً لطلبِ العروض
         <?= csrf_field() ?>
             <input type="hidden" name="rfq" value="<?= $rfq ?>">
             <input type="hidden" name="award_quote" value="<?= intval($q['id']) ?>">
-            <input type="text" name="award_reason" class="form-control form-control-sm proc-rfq-reason" placeholder="سببُ الترسية" required aria-label="سببُ الترسية">
-            <button class="action-btn" type="submit">رسِّ</button>
+            <input type="text" name="award_reason" class="form-control form-control-sm proc-rfq-reason" placeholder="سبب الترسية" required aria-label="سبب الترسية">
+            <button class="action-btn" type="submit">رس</button>
           </form>
         </td>
       </tr>

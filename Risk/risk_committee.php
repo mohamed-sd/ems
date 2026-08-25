@@ -28,7 +28,7 @@ $isCeo = $is_super_admin || $RISK_AUTHORITY === 'ceo';
 $flash = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cmt_do'])) {
     if (function_exists('verify_csrf_token') && !verify_csrf_token($_POST['csrf_token'] ?? '')) {
-        $flash = '✘ RSK-CSRF: رمز الجلسة غير صالح — حدّث الصفحة';
+        $flash = '✘ RSK-CSRF: رمز الجلسة غير صالح — حدث الصفحة';
     } elseif ($_POST['cmt_do'] === 'create' && $canAdd) {
         // CS-05 / AC-F6 — الكتابةُ في الخدمة، والسطحُ يجمع المدخلَ ويعرض النتيجة.
         require_once __DIR__ . '/../app/Services/Risk/RiskService.php';
@@ -41,17 +41,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cmt_do'])) {
             'risks_reviewed' => $_POST['risks_reviewed'] ?? 0,
         ), $uid);
         $flash = ($code !== null)
-            ? '✔ أُنشئ المحضر ' . $code . ' مسوَّدةً — والاعتمادُ للرئيس التنفيذي'
-            : '✘ RSK-500: تعذّر إنشاءُ المحضر';
+            ? '✔ أنشئ المحضر ' . $code . ' مسودة — والاعتماد للرئيس التنفيذي'
+            : '✘ RSK-500: تعذر إنشاء المحضر';
     } elseif ($_POST['cmt_do'] === 'approve') {
         if (!$isCeo) {
-            $flash = '✘ RSK-403: اعتمادُ محضرِ اللجنةِ للرئيسِ التنفيذيِّ حصرًا (المرحلة ٨)';
+            $flash = '✘ RSK-403: اعتماد محضر اللجنة للرئيس التنفيذي حصرا (المرحلة ٨)';
         } else {
             $mid = (int) $_POST['minute_id'];
             require_once __DIR__ . '/../app/Services/Risk/RiskService.php';
             $flash = \App\Services\Risk\RiskService::approveCommitteeMinute($conn, $company_id, $mid, $uid)
-                ? '✔ اعتُمد المحضر — والمعتمدُ لا يُعدَّل بعدها'
-                : '✘ RSK-409: المعتمدُ لا يُعتمد مرتين';
+                ? '✔ اعتمد المحضر — والمعتمد لا يعدل بعدها'
+                : '✘ RSK-409: المعتمد لا يعتمد مرتين';
         }
     } else {
         $flash = '✘ RSK-403: لا صلاحية';
@@ -89,17 +89,17 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         'المقام' => 'محاضر اللجنة (المرحلة ٨)',
         'المحاضر' => count($rows),
         'مسوَّدات بانتظار الاعتماد' => $draft,
-        'صفتك' => $isCeo ? 'الرئيس التنفيذي — تعتمد' : 'قراءة وإنشاء مسوَّدة',
+        'صفتك' => $isCeo ? 'الرئيس التنفيذي — تعتمد' : 'قراءة وإنشاء مسودة',
     );
     include('../includes/page_header.php');
     ems_screen_about(
-        'محضرُ اللجنةِ مخرَجُ المرحلةِ الثامنة — يحمل الحاضرينَ بصفاتهم وجدولَ الأعمالِ والقرارات. '
-        . 'ويعتمده الرئيسُ التنفيذيُّ، والمعتمدُ لا يُعدَّل ولا يُحذف.',
-        array('التصحيحُ محضرٌ جديدٌ يشير إلى الأصلِ بالمرجعِ الأب — لا تعديلٌ للمعتمد',
-              'الشهيةُ المعتمدةُ في المحضرِ تُغيّر حدودَ التصعيدِ في المجالاتِ كلِّها'));
-    echo ems_next_step($isCeo ? 'اعتمادُك للمسوَّداتِ — والمعتمدُ لا يُعدَّل بعدها'
-        : 'اعتمادُ الرئيسِ التنفيذيِّ للمسوَّدةِ — التصحيحُ بعدها محضرٌ جديدٌ بالمرجعِ الأب');
-    echo ems_states_bundle('لا محاضرَ لجنةٍ بعد', 'المرحلةُ الثامنةُ لا تكتمل بلا محضرٍ ومعتمِدٍ يشهد');
+        'محضر اللجنة مخرج المرحلة الثامنة — يحمل الحاضرين بصفاتهم وجدول الأعمال والقرارات. '
+        . 'ويعتمده الرئيس التنفيذي، والمعتمد لا يعدل ولا يحذف.',
+        array('التصحيح محضر جديد يشير إلى الأصل بالمرجع الأب — لا تعديل للمعتمد',
+              'الشهية المعتمدة في المحضر تغير حدود التصعيد في المجالات كلها'));
+    echo ems_next_step($isCeo ? 'اعتمادك للمسودات — والمعتمد لا يعدل بعدها'
+        : 'اعتماد الرئيس التنفيذي للمسودة — التصحيح بعدها محضر جديد بالمرجع الأب');
+    echo ems_states_bundle('لا محاضر لجنة بعد', 'المرحلة الثامنة لا تكتمل بلا محضر ومعتمد يشهد');
     if ($flash !== '') {
         echo '<div class="ems-card rsk-flash">' . htmlspecialchars($flash) . '</div>';
     }
@@ -110,7 +110,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     <div class="ems-card" id="cmtEmpty"></div>
     <script>document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('cmtEmpty').appendChild(EmsUI.emptyState({
-            reason: 'لا محاضر لجنة بعد — والمرحلةُ الثامنةُ لا تكتمل بلا محضرٍ ومعتمِدٍ يشهد'
+            reason: 'لا محاضر لجنة بعد — والمرحلة الثامنة لا تكتمل بلا محضر ومعتمد يشهد'
         }));
     });</script>
     <?php else: ?>
@@ -119,7 +119,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
             <thead><tr>
                 <th>الرمز</th><th>تاريخ الاجتماع</th><th>الدورية</th><th>الحاضرون</th>
                 <th>مخاطر روجعت</th><th>البنود</th><th>القرارات</th>
-                <th>المُنشئ</th><th>تاريخ الإنشاء</th><th>المعتمِد</th><th>تاريخ الاعتماد</th>
+                <th>المنشئ</th><th>تاريخ الإنشاء</th><th>المعتمد</th><th>تاريخ الاعتماد</th>
                 <th>مرجع التفويض</th><th>المرجع الأب</th><th>الحالة</th>
                 <?php if ($isCeo): ?><th>الفعل</th><?php endif; ?>
             </tr></thead>
@@ -140,7 +140,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <td class="rsk-fs74"><?php echo htmlspecialchars((string) $x['authority_ref'] ?: '—'); ?></td>
                     <td class="rsk-fs74"><?php echo htmlspecialchars((string) $x['parent_ref'] ?: '—'); ?></td>
                     <td><span class="badge <?php echo $x['state'] === 'approved' ? 'badge-success' : 'badge-warning'; ?>">
-                        <?php echo $x['state'] === 'approved' ? 'معتمد' : 'مسوَّدة'; ?></span></td>
+                        <?php echo $x['state'] === 'approved' ? 'معتمد' : 'مسودة'; ?></span></td>
                     <?php if ($isCeo): ?>
                     <td><?php if ($x['state'] === 'draft'): ?>
                         <form method="post" class="ems-inline-form">
@@ -160,7 +160,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
 
     <?php if ($canAdd): ?>
     <div class="card rsk-new-card is-hidden" id="cmtNewCard"><div class="card-body">
-        <h5>محضر لجنة جديد (مسوَّدة)</h5>
+        <h5>محضر لجنة جديد (مسودة)</h5>
         <form method="post" class="allforms">
         <?= csrf_field() ?>
             <input type="hidden" name="cmt_do" value="create">
@@ -174,8 +174,8 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                 <div class="col-md-6"><label>جدول الأعمال<textarea name="agenda_ar" class="form-control" aria-label="جدول أعمال الاجتماع" rows="3"></textarea></label></div>
                 <div class="col-md-6"><label>القرارات<textarea name="resolutions_ar" class="form-control" aria-label="قرارات اللجنة" rows="3"></textarea></label></div>
             </div>
-            <button type="submit" class="ems-btn-primary">إنشاء المسوَّدة</button>
-            <span class="rsk-hint-inline">الاعتمادُ للرئيسِ التنفيذيِّ حصرًا</span>
+            <button type="submit" class="ems-btn-primary">إنشاء المسودة</button>
+            <span class="rsk-hint-inline">الاعتماد للرئيس التنفيذي حصرا</span>
         </form>
     </div></div>
     <script>

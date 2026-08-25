@@ -38,38 +38,38 @@ class SupplierAdvanceService
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'advance_id' => null);
 
         $sup = isset($args['supplier_id']) ? (int) $args['supplier_id'] : 0;
-        if ($sup <= 0) { $out['code'] = 422; $out['reason'] = 'الموردُ إلزامي'; return $out; }
+        if ($sup <= 0) { $out['code'] = 422; $out['reason'] = 'المورد إلزامي'; return $out; }
 
         $type = isset($args['advance_type']) ? trim((string) $args['advance_type']) : 'cash';
         if (!in_array($type, self::TYPES, true)) {
             $out['code'] = 422; $out['reason'] = 'نوعُ صرفٍ خارج الثلاثة (نقدًا · نيابةً · عهدةً)'; return $out;
         }
         $amount = isset($args['amount']) ? round((float) $args['amount'], 2) : 0.0;
-        if ($amount <= 0) { $out['code'] = 422; $out['reason'] = 'مبلغُ السلفة موجب'; return $out; }
+        if ($amount <= 0) { $out['code'] = 422; $out['reason'] = 'مبلغ السلفة موجب'; return $out; }
 
         $doc = isset($args['doc_ref']) ? trim((string) $args['doc_ref']) : '';
         if ($doc === '') {
             $out['code'] = 422;
-            $out['reason'] = 'سندُ الصرف إلزامي — «**وما لا مستندَ له لا يُحمَّل**» (ENT-02 §3)';
+            $out['reason'] = 'سند الصرف إلزامي — «**وما لا مستند له لا يحمل**» (ENT-02 §3)';
             return $out;
         }
         $issued = isset($args['issued_date']) ? trim((string) $args['issued_date']) : '';
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $issued)) {
-            $out['code'] = 422; $out['reason'] = 'تاريخُ الصرف إلزامي'; return $out;
+            $out['code'] = 422; $out['reason'] = 'تاريخ الصرف إلزامي'; return $out;
         }
         $count = isset($args['installments_count']) ? (int) $args['installments_count'] : 1;
-        if ($count < 1) { $out['code'] = 422; $out['reason'] = 'عددُ الأقساط واحدٌ فأكثر'; return $out; }
+        if ($count < 1) { $out['code'] = 422; $out['reason'] = 'عدد الأقساط واحد فأكثر'; return $out; }
         $inst = (isset($args['installment_amount']) && trim((string) $args['installment_amount']) !== '')
                 ? round((float) $args['installment_amount'], 2)
                 : round($amount / $count, 2);
         if ($inst <= 0 || $inst > $amount) {
-            $out['code'] = 422; $out['reason'] = 'قسطُ الاسترداد موجبٌ ولا يتجاوز الأصل'; return $out;
+            $out['code'] = 422; $out['reason'] = 'قسط الاسترداد موجب ولا يتجاوز الأصل'; return $out;
         }
 
         $s = null;
         try { $s = $gate->selectOne('suppliers', array('columns' => array('id'), 'where' => array('id' => $sup))); }
-        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $s'); $s = null; }
-        if (!$s) { $out['code'] = 422; $out['reason'] = 'الموردُ غيرُ موجودٍ في نطاقك'; return $out; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $s'); $s = null; }
+        if (!$s) { $out['code'] = 422; $out['reason'] = 'المورد غير موجود في نطاقك'; return $out; }
 
         try {
             // ⚠ `balance` مولَّد — لا يُكتب (كتابتُه ترفض الصفَّ كلَّه)
@@ -91,7 +91,7 @@ class SupplierAdvanceService
                 'created_by' => (int) $actor ?: null,
             ));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الفتح: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الفتح: ' . $t->getMessage(); return $out;
         }
 
         self::audit($conn, $companyId, $actor, 'open', (int) $out['advance_id'],
@@ -105,19 +105,19 @@ class SupplierAdvanceService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '');
         $a = self::advanceOf($gate, $advanceId);
-        if (!$a) { $out['code'] = 404; $out['reason'] = 'السلفةُ غيرُ موجودةٍ في نطاقك'; return $out; }
+        if (!$a) { $out['code'] = 404; $out['reason'] = 'السلفة غير موجودة في نطاقك'; return $out; }
         if ((string) $a['state'] !== 'draft') {
-            $out['code'] = 422; $out['reason'] = 'السلفةُ «' . $a['state'] . '» — الاعتمادُ للمسودة'; return $out;
+            $out['code'] = 422; $out['reason'] = 'السلفة «' . $a['state'] . '» — الاعتماد للمسودة'; return $out;
         }
         if ((int) $a['created_by'] > 0 && (int) $a['created_by'] === (int) $actor) {
-            $out['code'] = 403; $out['reason'] = 'لا يعتمد المرءُ ما أعدّ (فصلُ اليدين)'; return $out;
+            $out['code'] = 403; $out['reason'] = 'لا يعتمد المرء ما أعد (فصل اليدين)'; return $out;
         }
         try {
             $gate->update('supplier_advance_requests', array(
                 'state' => 'active', 'approved_by' => (int) $actor ?: null,
                 'approved_at' => date('Y-m-d H:i:s')), array('id' => (int) $advanceId));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الاعتماد: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الاعتماد: ' . $t->getMessage(); return $out;
         }
         self::audit($conn, $companyId, $actor, 'approve', (int) $advanceId,
             array('state' => 'draft'), array('state' => 'active'));
@@ -148,9 +148,9 @@ class SupplierAdvanceService
                 'charge_type' => 'advance',
                 'source_kind' => 'supplier_advance',
                 'source_ref'  => (string) $a['id'],
-                'description' => 'قسطُ سلفةٍ (' . (isset(self::TYPE_LABELS[$a['advance_type']])
+                'description' => 'قسط سلفة (' . (isset(self::TYPE_LABELS[$a['advance_type']])
                                   ? self::TYPE_LABELS[$a['advance_type']] : $a['advance_type'])
-                                 . ') — سند ' . $a['doc_ref'] . ' · الرصيدُ قبلَه ' . $balance,
+                                 . ') — سند ' . $a['doc_ref'] . ' · الرصيد قبله ' . $balance,
                 'work_date'   => (string) $to,
                 'amount'      => $take,
                 'currency'    => ($a['currency'] !== null && $a['currency'] !== '')
@@ -198,10 +198,10 @@ class SupplierAdvanceService
                 $gate->insert('supplier_advance_recoveries', array(
                     'advance_id' => $advId, 'settlement_id' => (int) $settlementId,
                     'amount' => $take, 'doc_ref' => mb_substr((string) $a['doc_ref'], 0, 120),
-                    'note' => 'استردادٌ باعتماد التسوية #' . (int) $settlementId,
+                    'note' => 'استرداد باعتماد التسوية #' . (int) $settlementId,
                     'created_by' => (int) $actor ?: null,
                 ));
-            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'UQ: استُرد بهذه التسوية سلفًا — لا ضجيج');
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'UQ: استرد بهذه التسوية سلفا — لا ضجيج');
                 continue;   // UQ: استُرد بهذه التسوية سلفًا — لا ضجيج
             }
 

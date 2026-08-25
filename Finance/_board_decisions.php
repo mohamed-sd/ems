@@ -20,18 +20,18 @@ $finCard = function ($label) use ($dash_board) {
 };
 
 $finRows = array(
-    array('ماذا نصرف اليوم؟', 'المسوّى الجاهز (' . $finCard('المسوّى الجاهز للصرف') . ') مقابل النقد (' . $finCard('النقد المتاح (البنوك)') . ')', '../Finance/payments_fin.php', 'المدفوعات'),
-    array('ماذا نحصّل اليوم؟', 'الذمم المتأخرة (' . $finCard('الذمم المتأخرة') . ')', '../Finance/dues_fin.php', 'الذمم'),
-    array('هل نحتاج تمويلًا؟', 'صافي الأسبوع (' . $finCard('صافي الأسبوع المتوقّع') . ') وأقساط 7 أيام (' . $finCard('أقساط تمويل خلال 7 أيام') . ')', '../Finance/cash_forecast_fin.php', 'السيولة'),
+    array('ماذا نصرف اليوم؟', 'المسوى الجاهز (' . $finCard('المسوى الجاهز للصرف') . ') مقابل النقد (' . $finCard('النقد المتاح (البنوك)') . ')', '../Finance/payments_fin.php', 'المدفوعات'),
+    array('ماذا نحصل اليوم؟', 'الذمم المتأخرة (' . $finCard('الذمم المتأخرة') . ')', '../Finance/dues_fin.php', 'الذمم'),
+    array('هل نحتاج تمويلا؟', 'صافي الأسبوع (' . $finCard('صافي الأسبوع المتوقع') . ') وأقساط 7 أيام (' . $finCard('أقساط تمويل خلال 7 أيام') . ')', '../Finance/cash_forecast_fin.php', 'السيولة'),
     array('هل التشغيل يربح؟', 'هامش الوحدة الجاري (' . $finCard('هامش الوحدة الجاري') . ')', '../Finance/unit_records_fin.php', 'كشف الوحدات'),
-    array('أين نتدخّل؟', 'انحرافات فوق الحد (' . $finCard('انحرافات فوق 10%') . ')', '../Finance/budget_form_fin.php', 'الميزانيات'),
+    array('أين نتدخل؟', 'انحرافات فوق الحد (' . $finCard('انحرافات فوق 10%') . ')', '../Finance/budget_form_fin.php', 'الميزانيات'),
 );
 ?>
 <div class="shot-ops-box shot-ops-wide">
   <h4 class="shot-ops-box-title"><i class="fas fa-clipboard-check"></i> جدول القرار اليومي</h4>
   <div class="table-container">
     <table class="alltables" data-no-dt="hard">
-      <thead><tr><th>القرار</th><th>المؤشر</th><th>أين يُتّخذ</th></tr></thead>
+      <thead><tr><th>القرار</th><th>المؤشر</th><th>أين يتخذ</th></tr></thead>
       <tbody>
         <?php foreach ($finRows as $r): ?>
         <tr>

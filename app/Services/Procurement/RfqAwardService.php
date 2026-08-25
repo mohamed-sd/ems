@@ -31,8 +31,8 @@ class RfqAwardService
      */
     public function award(int $companyId, int $quoteId, string $reason, int $actorId): array
     {
-        if ($quoteId <= 0)        { return array('ok' => false, 'msg' => 'عرضٌ غيرُ صالح (422)', 'award_id' => 0); }
-        if (trim($reason) === '') { return array('ok' => false, 'msg' => 'سببُ الترسية إلزامي — لا ترسيةَ صامتة (422)', 'award_id' => 0); }
+        if ($quoteId <= 0)        { return array('ok' => false, 'msg' => 'عرض غير صالح (422)', 'award_id' => 0); }
+        if (trim($reason) === '') { return array('ok' => false, 'msg' => 'سبب الترسية إلزامي — لا ترسية صامتة (422)', 'award_id' => 0); }
 
         /* ══ INJ-0031 · **التفويضُ لا الكتابةُ الموازية** ═══════════════════════════
              كان هذا المسارُ يكتب `rfq_awards` بنفسِه — فمحرّكانِ يكتبان الجدولَ
@@ -90,7 +90,7 @@ class RfqAwardService
             $st->close();
             if (!$q) {
                 $this->conn->rollback();
-                return array('ok' => false, 'msg' => 'عرضٌ غيرُ موجود (404)', 'award_id' => 0);
+                return array('ok' => false, 'msg' => 'عرض غير موجود (404)', 'award_id' => 0);
             }
 
             // بندٌ مُرسًى سلفًا ⇒ 409 بمرجعِ الترسيةِ القائمة (لا ترسيةَ ثانية).
@@ -108,7 +108,7 @@ class RfqAwardService
             if ($dup) {
                 $this->conn->rollback();
                 return array('ok' => false, 'award_id' => (int) $dup['id'],
-                    'msg' => 'البندُ مُرسًى من قبل بالترسية #' . (int) $dup['id'] . ' — 409');
+                    'msg' => 'البند مرسى من قبل بالترسية #' . (int) $dup['id'] . ' — 409');
             }
 
             $ins = $this->conn->prepare(
@@ -153,11 +153,11 @@ class RfqAwardService
                 }
             } catch (\Throwable $ae) { error_log('rfq award audit: ' . $ae->getMessage()); }
             return array('ok' => true, 'award_id' => $awardId,
-                'msg' => 'رُسّي العرضُ #' . $quoteId . ' بسببٍ موثَّق — الترسية #' . $awardId);
+                'msg' => 'رسي العرض #' . $quoteId . ' بسبب موثق — الترسية #' . $awardId);
         } catch (\Throwable $e) {
             $this->conn->rollback();
             error_log('RfqAwardService::award: ' . $e->getMessage());
-            return array('ok' => false, 'msg' => 'فشلت الترسيةُ فأُلغيت بالكامل (ERR-PRC-1047)', 'award_id' => 0);
+            return array('ok' => false, 'msg' => 'فشلت الترسية فألغيت بالكامل (ERR-PRC-1047)', 'award_id' => 0);
         }
     }
 
@@ -170,7 +170,7 @@ class RfqAwardService
     public function reverse(int $companyId, int $awardId, string $reason, int $actorId): array
     {
         if (trim($reason) === '') {
-            return array('ok' => false, 'msg' => 'سببُ العكس إلزامي (422)', 'reversal_id' => 0);
+            return array('ok' => false, 'msg' => 'سبب العكس إلزامي (422)', 'reversal_id' => 0);
         }
         $this->conn->begin_transaction();
         try {
@@ -182,7 +182,7 @@ class RfqAwardService
             $st->close();
             if (!$a) {
                 $this->conn->rollback();
-                return array('ok' => false, 'msg' => 'ترسيةٌ غيرُ موجودة (404)', 'reversal_id' => 0);
+                return array('ok' => false, 'msg' => 'ترسية غير موجودة (404)', 'reversal_id' => 0);
             }
 
             $ins = $this->conn->prepare(
@@ -198,7 +198,7 @@ class RfqAwardService
             $qty      = -1 * (float) $a['qty_awarded'];   // ◆ العكسُ بالإشارةِ لا بالمحو
             $price    = (float) $a['unit_price'];
             $cur      = (string) $a['currency'];
-            $note     = 'عكسُ الترسية #' . $awardId . ' — ' . $reason;
+            $note     = 'عكس الترسية #' . $awardId . ' — ' . $reason;
             $ins->bind_param('iiiiiddssi',
                 $companyId, $rfqId, $lineId, $supplier, $quoteId, $qty, $price, $cur, $note, $actorId);
             if (!$ins->execute()) { throw new \RuntimeException('reverse insert: ' . $ins->error); }
@@ -214,11 +214,11 @@ class RfqAwardService
 
             $this->conn->commit();
             return array('ok' => true, 'reversal_id' => $revId,
-                'msg' => 'عُكست الترسية #' . $awardId . ' بحركةٍ عاكسةٍ #' . $revId . ' — والأصلُ باقٍ');
+                'msg' => 'عكست الترسية #' . $awardId . ' بحركة عاكسة #' . $revId . ' — والأصل باق');
         } catch (\Throwable $e) {
             $this->conn->rollback();
             error_log('RfqAwardService::reverse: ' . $e->getMessage());
-            return array('ok' => false, 'msg' => 'تعذّر العكس — لم يُكتب شيء (ERR-PRC-1048)', 'reversal_id' => 0);
+            return array('ok' => false, 'msg' => 'تعذر العكس — لم يكتب شيء (ERR-PRC-1048)', 'reversal_id' => 0);
         }
     }
 }

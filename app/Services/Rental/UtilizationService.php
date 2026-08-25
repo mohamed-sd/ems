@@ -118,7 +118,7 @@ class UtilizationService
                 'equipment_id'  => $eid,
                 'code'          => $e['code'],
                 'name'          => $e['name'],
-                'type_name'     => ($e['type_name'] !== null && $e['type_name'] !== '') ? $e['type_name'] : 'غير مصنَّفة',
+                'type_name'     => ($e['type_name'] !== null && $e['type_name'] !== '') ? $e['type_name'] : 'غير مصنفة',
                 'rented_days'   => $rd,
                 'span_days'     => $spanDays,
                 'util_pct'      => $spanDays > 0 ? round(100.0 * $rd / $spanDays, 1) : 0.0,

@@ -150,7 +150,7 @@ ob_start(); ?><a href="settings.php" class="back-btn">
 $header_back = array('raw' => trim((string) ob_get_clean()));
 include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-echo ems_states_bundle('لا أدوارَ وظيفيةً معرَّفةً بعدُ', 'أضف أولَ دورٍ بزرِّ «إضافة صلاحية جديدة» في رأسِ الشاشة');
+echo ems_states_bundle('لا أدوار وظيفية معرفة بعد', 'أضف أول دور بزر «إضافة صلاحية جديدة» في رأس الشاشة');
 ?>
 
     <?php if (!empty($_GET['msg'])):
@@ -251,13 +251,13 @@ echo ems_states_bundle('لا أدوارَ وظيفيةً معرَّفةً بعد
                             <th class="ems-fn-th" data-fn="1">عدد حامليه</th>
                             <th class="ems-fn-th" data-fn="1">تعارض واجبات مع</th>
                             <th class="ems-fn-th" data-fn="1">تاريخ التعريف</th>
-                            <th class="ems-fn-th" data-fn="1">عرّفه</th>
+                            <th class="ems-fn-th" data-fn="1">عرفه</th>
                             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                             <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                             <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-                            <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+                            <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
                             <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                             <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
                             </tr>

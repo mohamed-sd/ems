@@ -62,7 +62,7 @@ if (!function_exists('ems_catch_ignored')) {
     {
         if (!($e instanceof \Throwable)) { return; }
         $why = trim((string) $why);
-        if ($why === '') { $why = '⚠ بلا سببٍ معلَن — يحتاج مراجعة'; }
+        if ($why === '') { $why = '⚠ بلا سبب معلن — يحتاج مراجعة'; }
         error_log('[CS12-IGNORED] ' . ($where !== '' ? $where . ' — ' : '')
                 . $why . ' :: ' . get_class($e) . ': ' . $e->getMessage());
     }

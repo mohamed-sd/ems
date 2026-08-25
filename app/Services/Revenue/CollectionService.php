@@ -40,26 +40,26 @@ class CollectionService
                      'allocations' => array(), 'claims_touched' => array());
 
         $clientId = isset($args['client_id']) ? (int) $args['client_id'] : 0;
-        if ($clientId <= 0) { $out['code'] = 422; $out['reason'] = 'العميلُ إلزامي'; return $out; }
+        if ($clientId <= 0) { $out['code'] = 422; $out['reason'] = 'العميل إلزامي'; return $out; }
 
         $amount = isset($args['amount']) ? round((float) $args['amount'], 2) : 0.0;
-        if ($amount <= 0) { $out['code'] = 422; $out['reason'] = 'المبلغُ موجبٌ إلزامًا'; return $out; }
+        if ($amount <= 0) { $out['code'] = 422; $out['reason'] = 'المبلغ موجب إلزاما'; return $out; }
 
         // ── ① لا قبضَ بلا مرجع ─────────────────────────────────────────────
         $ref = isset($args['bank_ref']) ? trim((string) $args['bank_ref']) : '';
         if ($ref === '') {
             $out['code'] = 422;
-            $out['reason'] = '**المرجعُ البنكيُّ (أو السند) إلزامي** — «قبضٌ بمرجعٍ بنكيٍّ أو سند» (ENT-03 §4)';
+            $out['reason'] = '**المرجع البنكي (أو السند) إلزامي** — «قبض بمرجع بنكي أو سند» (ENT-03 §4)';
             return $out;
         }
         if ($ref === self::LEGACY_REF) {
             $out['code'] = 422;
-            $out['reason'] = '«' . self::LEGACY_REF . '» **وسمُ الموروث** يُعلَن ولا يُكتب لقبضٍ جديد';
+            $out['reason'] = '«' . self::LEGACY_REF . '» **وسم الموروث** يعلن ولا يكتب لقبض جديد';
             return $out;
         }
         $on = isset($args['received_on']) ? trim((string) $args['received_on']) : '';
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $on)) {
-            $out['code'] = 422; $out['reason'] = 'تاريخُ القبض إلزاميٌّ بصيغة Y-m-d'; return $out;
+            $out['code'] = 422; $out['reason'] = 'تاريخ القبض إلزامي بصيغة Y-m-d'; return $out;
         }
 
         // ── ② ولا يُقبض مرتين ──────────────────────────────────────────────
@@ -69,11 +69,11 @@ class CollectionService
                 'columns'  => array('id', 'payment_no'),
                 'whereRaw' => "direction = 'collection' AND bank_ref = ? AND amount = ? AND received_on = ?",
                 'params'   => array($ref, $amount, $on)));
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $dup'); $dup = null; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $dup'); $dup = null; }
         if ($dup) {
             $out['code'] = 409; $out['payment_id'] = (int) $dup['id'];
-            $out['reason'] = 'قبضٌ بالمرجع نفسِه والمبلغ نفسِه في اليوم نفسِه مسجَّلٌ سلفًا: '
-                           . $dup['payment_no'] . ' — **ولا يُقبض مرتين**';
+            $out['reason'] = 'قبض بالمرجع نفسه والمبلغ نفسه في اليوم نفسه مسجل سلفا: '
+                           . $dup['payment_no'] . ' — **ولا يقبض مرتين**';
             return $out;
         }
 
@@ -83,8 +83,8 @@ class CollectionService
         if (!$targets) {
             $out['code'] = 422;
             $out['reason'] = $explicit > 0
-                ? 'الذمّةُ المحددةُ غيرُ مفتوحةٍ لهذا العميل'
-                : 'لا ذمّةَ مفتوحةً لهذا العميل — **ولا يُخصَّص قبضٌ لعدم**';
+                ? 'الذمة المحددة غير مفتوحة لهذا العميل'
+                : 'لا ذمة مفتوحة لهذا العميل — **ولا يخصص قبض لعدم**';
             return $out;
         }
 
@@ -151,9 +151,9 @@ class CollectionService
             }, 'تسجيل تحصيل ' . $ref);
         } catch (\Throwable $t) {
             if (strpos($t->getMessage(), 'Duplicate') !== false) {
-                $out['code'] = 409; $out['reason'] = 'قبضٌ مكرر (المرجع × المبلغ × اليوم)'; return $out;
+                $out['code'] = 409; $out['reason'] = 'قبض مكرر (المرجع × المبلغ × اليوم)'; return $out;
             }
-            $out['code'] = 422; $out['reason'] = 'تعذّر التسجيل: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر التسجيل: ' . $t->getMessage(); return $out;
         }
 
         // ── «Invoiced → PartiallyCollected → Collected» (§4) ───────────────
@@ -170,8 +170,8 @@ class CollectionService
         $out['claims_touched'] = $touched;
         if ($out['unallocated'] > 0.004) {
             // ④ الفائضُ يُعلَن ولا يُبتلع
-            $out['reason'] = '⚠ خُصّص ' . $out['allocated'] . ' و**بقي ' . $out['unallocated']
-                           . ' بلا ذمّةٍ يُخصَّص لها** — يُعلَن ويُسوّى بقرار';
+            $out['reason'] = '⚠ خصص ' . $out['allocated'] . ' و**بقي ' . $out['unallocated']
+                           . ' بلا ذمة يخصص لها** — يعلن ويسوى بقرار';
         }
         return $out;
     }
@@ -197,7 +197,7 @@ class CollectionService
                   ORDER BY c.id DESC LIMIT 1",
                 array((int) $receivableId, (string) $recv['doc_ref']));
             $claim = $rows ? $rows[0] : null;
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $claim'); $claim = null; }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $claim'); $claim = null; }
         if (!$claim) { return null; }
 
         $collected = round((float) $recv['collected'], 2);
@@ -249,13 +249,13 @@ class CollectionService
                      'unallocated' => 0.0, 'rows' => array());
         $p = null;
         try { $p = $gate->selectOne('fin_payments', array('where' => array('id' => (int) $paymentId))); }
-        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $p'); $p = null; }
-        if (!$p) { $out['code'] = 404; $out['reason'] = 'السندُ غيرُ موجودٍ في نطاقك'; return $out; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $p'); $p = null; }
+        if (!$p) { $out['code'] = 404; $out['reason'] = 'السند غير موجود في نطاقك'; return $out; }
         if ((string) $p['direction'] !== 'collection') {
             $out['code'] = 422;
-            $out['reason'] = '**التخصيصُ للقبض لا للصرف** — والسندُ ' . $p['direction']; return $out;
+            $out['reason'] = '**التخصيص للقبض لا للصرف** — والسند ' . $p['direction']; return $out;
         }
-        if (!$targets) { $out['code'] = 422; $out['reason'] = 'لا أهدافَ في الطلب'; return $out; }
+        if (!$targets) { $out['code'] = 422; $out['reason'] = 'لا أهداف في الطلب'; return $out; }
 
         $amount = round((float) $p['amount'], 2);
         $already = round((float) $p['allocated_amount'], 2);
@@ -266,22 +266,22 @@ class CollectionService
         foreach ($targets as $t) {
             $kind = (string) (isset($t['target_kind']) ? $t['target_kind'] : '');
             if (!in_array($kind, self::TARGET_KINDS, true)) {
-                $out['code'] = 422; $out['reason'] = 'هدفٌ غيرُ معروف: ' . $kind; return $out;
+                $out['code'] = 422; $out['reason'] = 'هدف غير معروف: ' . $kind; return $out;
             }
             $ref = (int) (isset($t['target_ref']) ? $t['target_ref'] : 0);
             if ($ref <= 0) {
                 $out['code'] = 422;
-                $out['reason'] = '**مرجعُ الهدف إلزامي** — ولا يُخصَّص قبضٌ لمجهول'; return $out;
+                $out['reason'] = '**مرجع الهدف إلزامي** — ولا يخصص قبض لمجهول'; return $out;
             }
             $amt = round((float) (isset($t['amount']) ? $t['amount'] : 0), 2);
             if ($amt <= 0) {
-                $out['code'] = 422; $out['reason'] = 'مبلغُ التخصيص موجبٌ إلزامًا'; return $out;
+                $out['code'] = 422; $out['reason'] = 'مبلغ التخصيص موجب إلزاما'; return $out;
             }
             $key = $kind . ':' . $ref;
             if (isset($clean[$key])) {
                 $out['code'] = 409;
-                $out['reason'] = 'الهدفُ «' . self::TARGET_AR[$kind] . ' #' . $ref
-                               . '» مكرَّرٌ في الطلب — **ولا سطران لهدفٍ واحدٍ من سندٍ واحد**';
+                $out['reason'] = 'الهدف «' . self::TARGET_AR[$kind] . ' #' . $ref
+                               . '» مكرر في الطلب — **ولا سطران لهدف واحد من سند واحد**';
                 return $out;
             }
             // الهدفُ **موجودٌ ومفتوح** — لا يُخصَّص قبضٌ لعدم
@@ -298,9 +298,9 @@ class CollectionService
         // **Σ لا يتجاوز السند أبدًا** — والرسالةُ تسمّي الفائض
         if ($sum > $free + 0.0001) {
             $out['code'] = 409;
-            $out['reason'] = '**Σ التخصيصات ' . $sum . ' تتجاوز المتاحَ من السند ' . $free
-                . '** (المبلغُ ' . $amount . ' · المخصَّصُ سلفًا ' . $already . ') — '
-                . 'والفائضُ ' . round($sum - $free, 2) . ' **يُعلَن ولا يُبتلع**';
+            $out['reason'] = '**Σ التخصيصات ' . $sum . ' تتجاوز المتاح من السند ' . $free
+                . '** (المبلغ ' . $amount . ' · المخصص سلفا ' . $already . ') — '
+                . 'والفائض ' . round($sum - $free, 2) . ' **يعلن ولا يبتلع**';
             $out['allocated'] = $already; $out['unallocated'] = $free;
             return $out;
         }
@@ -375,10 +375,10 @@ class CollectionService
         } catch (\Throwable $t) {
             if (strpos($t->getMessage(), 'Duplicate') !== false) {
                 $out['code'] = 409;
-                $out['reason'] = '**الهدفُ مخصَّصٌ سلفًا من هذا السند** — والتعديلُ بسطرٍ جديدٍ لهدفٍ آخر';
+                $out['reason'] = '**الهدف مخصص سلفا من هذا السند** — والتعديل بسطر جديد لهدف آخر';
                 return $out;
             }
-            $out['code'] = 422; $out['reason'] = 'تعذّر التخصيص: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر التخصيص: ' . $t->getMessage(); return $out;
         }
 
         // ارتدادُ حالة المستخلص لكل فاتورةٍ مسّها التخصيص
@@ -395,7 +395,7 @@ class CollectionService
                 'from_currency' => $f['from'], 'amount' => $f['diff'],
                 'rate_from' => $f['rate_from'], 'rate_to' => $f['rate_to'],
                 'occurred_on' => $payOn,
-                'note' => 'فرقُ صرفٍ محقَّقٌ عند تخصيص السند ' . (int) $paymentId,
+                'note' => 'فرق صرف محقق عند تخصيص السند ' . (int) $paymentId,
             ), $actor);
         }
         self::audit($conn, $companyId, $actor, 'allocate_targets', (int) $paymentId,
@@ -410,13 +410,13 @@ class CollectionService
             if ((string) $r['target_currency'] !== $payCur) { $crossed++; }
         }
         $out['fx_diff'] = $fxTotal;
-        $out['reason'] = 'خُصّص ' . $sum . ' ' . $payCur . ' على ' . count($rows) . ' هدفًا · '
-            . 'المخصَّصُ ' . $out['allocated'] . ' من ' . $amount
-            . ($crossed > 0 ? (' · **' . $crossed . ' هدفًا بعملةٍ أخرى أُطفئ بالمعادل**') : '')
+        $out['reason'] = 'خصص ' . $sum . ' ' . $payCur . ' على ' . count($rows) . ' هدفا · '
+            . 'المخصص ' . $out['allocated'] . ' من ' . $amount
+            . ($crossed > 0 ? (' · **' . $crossed . ' هدفا بعملة أخرى أطفئ بالمعادل**') : '')
             . (abs($fxTotal) >= 0.005
-               ? (' · **وفرقُ صرفٍ ' . $fxTotal . ' بسطره في العملة الوظيفية**') : '')
+               ? (' · **وفرق صرف ' . $fxTotal . ' بسطره في العملة الوظيفية**') : '')
             . ($out['unallocated'] > 0.004
-               ? (' · **وبقي ' . $out['unallocated'] . ' رصيدًا غيرَ مخصَّصٍ ظاهرًا**')
+               ? (' · **وبقي ' . $out['unallocated'] . ' رصيدا غير مخصص ظاهرا**')
                : ' · **Σ التخصيصات = السند**');
         return $out;
     }
@@ -432,22 +432,22 @@ class CollectionService
         if ($kind === 'invoice') {
             $r = null;
             try { $r = $gate->selectOne('fin_receivables', array('where' => array('id' => (int) $ref))); }
-            catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $r'); $r = null; }
-            if (!$r) { $o['code'] = 404; $o['reason'] = 'الذمّةُ #' . $ref . ' غيرُ موجودة'; return $o; }
+            catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $r'); $r = null; }
+            if (!$r) { $o['code'] = 404; $o['reason'] = 'الذمة #' . $ref . ' غير موجودة'; return $o; }
             $outst = round((float) $r['outstanding'], 2);
             if ($outst <= 0.004) {
                 $o['code'] = 409;
-                $o['reason'] = 'الذمّةُ #' . $ref . ' **مسدَّدةٌ كاملًا** — ولا يُخصَّص قبضٌ لمسدَّد';
+                $o['reason'] = 'الذمة #' . $ref . ' **مسددة كاملا** — ولا يخصص قبض لمسدد';
                 return $o;
             }
             $fx = self::fxOf($amount, $payCur, (string) $r['currency'], $payDate);
             if (!$fx['ok']) { $o['code'] = 422; $o['reason'] = $fx['reason']; return $o; }
             if ($fx['amount_target'] > $outst + 0.0001) {
                 $o['code'] = 409;
-                $o['reason'] = 'المبلغُ ' . $amount . ' ' . $payCur
+                $o['reason'] = 'المبلغ ' . $amount . ' ' . $payCur
                              . ($fx['crossed'] ? (' (= ' . $fx['amount_target'] . ' ' . $r['currency'] . ')') : '')
-                             . ' **يتجاوز متبقّي الذمّة ' . $outst . ' ' . $r['currency'] . '** — '
-                             . 'والزيادةُ **رصيدٌ دائنٌ للعميل لا إيراد**';
+                             . ' **يتجاوز متبقي الذمة ' . $outst . ' ' . $r['currency'] . '** — '
+                             . 'والزيادة **رصيد دائن للعميل لا إيراد**';
                 return $o;
             }
             $o['ok'] = true; $o['code'] = 200; $o['recv'] = $r; $o['fx'] = $fx; return $o;
@@ -455,32 +455,32 @@ class CollectionService
         // الأهدافُ الأربعةُ الأخرى **أسطرُ خطةِ الدفع** (P-05) — لا جدولَ ثالث
         $r = null;
         try { $r = $gate->selectOne('contract_payment_schedule', array('where' => array('id' => (int) $ref))); }
-        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $r'); $r = null; }
-        if (!$r) { $o['code'] = 404; $o['reason'] = 'سطرُ خطة الدفع #' . $ref . ' غيرُ موجود'; return $o; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $r'); $r = null; }
+        if (!$r) { $o['code'] = 404; $o['reason'] = 'سطر خطة الدفع #' . $ref . ' غير موجود'; return $o; }
         if ($r['effective_to'] !== null) {
             $o['code'] = 423;
-            $o['reason'] = 'السطرُ #' . $ref . ' **من نسخةٍ مختومة** — والتخصيصُ على النافذة'; return $o;
+            $o['reason'] = 'السطر #' . $ref . ' **من نسخة مختومة** — والتخصيص على النافذة'; return $o;
         }
         $want = self::SCHEDULE_KIND_OF[$kind];
         if ((string) $r['payment_kind'] !== $want) {
             $o['code'] = 422;
-            $o['reason'] = '**الهدفُ «' . self::TARGET_AR[$kind] . '» لا يطابق نوعَ السطر «'
-                . $r['payment_kind'] . '»** — ولا يُخصَّص مقدمٌ على معلَمٍ ولا العكس';
+            $o['reason'] = '**الهدف «' . self::TARGET_AR[$kind] . '» لا يطابق نوع السطر «'
+                . $r['payment_kind'] . '»** — ولا يخصص مقدم على معلم ولا العكس';
             return $o;
         }
         $left = round((float) $r['amount_expected'] - (float) $r['received_amount'], 2);
         if ($left <= 0.004) {
             $o['code'] = 409;
-            $o['reason'] = 'السطرُ #' . $ref . ' **مستلَمٌ كاملًا** — ولا يُخصَّص قبضٌ لمكتمل'; return $o;
+            $o['reason'] = 'السطر #' . $ref . ' **مستلم كاملا** — ولا يخصص قبض لمكتمل'; return $o;
         }
         $fx = self::fxOf($amount, $payCur, (string) $r['currency'], $payDate);
         if (!$fx['ok']) { $o['code'] = 422; $o['reason'] = $fx['reason']; return $o; }
         if ($fx['amount_target'] > $left + 0.0001) {
             $o['code'] = 409;
-            $o['reason'] = 'المبلغُ ' . $amount . ' ' . $payCur
+            $o['reason'] = 'المبلغ ' . $amount . ' ' . $payCur
                          . ($fx['crossed'] ? (' (= ' . $fx['amount_target'] . ' ' . $r['currency'] . ')') : '')
-                         . ' **يتجاوز متبقّي السطر ' . $left . ' ' . $r['currency'] . '** — '
-                         . 'والزيادةُ **رصيدٌ دائنٌ للعميل لا إيراد**';
+                         . ' **يتجاوز متبقي السطر ' . $left . ' ' . $r['currency'] . '** — '
+                         . 'والزيادة **رصيد دائن للعميل لا إيراد**';
             return $o;
         }
         $o['ok'] = true; $o['code'] = 200; $o['recv'] = $r; $o['fx'] = $fx; return $o;
@@ -504,7 +504,7 @@ class CollectionService
         if ($targetCur === '') {
             // ذمّةٌ بلا عملةٍ — وهو ما كانت عليه البنيةُ قبل P-08
             $o['ok'] = false;
-            $o['reason'] = '**الهدفُ بلا عملةٍ مسجَّلة** — ولا يُخصَّص قبضٌ لمبلغٍ لا يُعرف بأيِّ عملةٍ هو';
+            $o['reason'] = '**الهدف بلا عملة مسجلة** — ولا يخصص قبض لمبلغ لا يعرف بأي عملة هو';
             return $o;
         }
         $r = \App\Services\Finance\FxSettlementService::convert($amount, $payCur, $targetCur, $payDate);
@@ -614,7 +614,7 @@ class CollectionService
                 "SELECT COUNT(*) AS n FROM fin_payments p
                   WHERE {TENANT_SCOPE} AND p.payment_no LIKE ?", array('RCT-' . $year . '-%'));
             $n = $rows ? ((int) $rows[0]['n'] + 1) : 1;
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'تعذّر عدُّ الإيصالاتِ فيبدأ الترقيمُ من ١ — والتفرُّدُ محروسٌ بقيدِ القاعدةِ لا بالعدّ'); $n = 1; }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'تعذر عد الإيصالات فيبدأ الترقيم من ١ — والتفرد محروس بقيد القاعدة لا بالعد'); $n = 1; }
         return 'RCT-' . $year . '-' . str_pad((string) $n, 4, '0', STR_PAD_LEFT);
     }
 }

@@ -64,11 +64,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'match
         $current_user_id
     );
     if ($res['status'] === 'matched') {
-        $msg = 'طوبقت الفاتورةُ وفُتح استحقاقُ المورد ✅';
+        $msg = 'طوبقت الفاتورة وفتح استحقاق المورد ✅';
     } elseif ($res['status'] === 'var_pending') {
-        $msg = 'فرقٌ فوق السماح — وقفت المطابقة بلا استحقاق: ' . $res['reason'] . ' ⚠️';
+        $msg = 'فرق فوق السماح — وقفت المطابقة بلا استحقاق: ' . $res['reason'] . ' ⚠️';
     } else {
-        $msg = 'تعذّرت المطابقة: ' . ($res['reason'] !== '' ? $res['reason'] : 'خطأٌ داخلي') . ' ❌';
+        $msg = 'تعذرت المطابقة: ' . ($res['reason'] !== '' ? $res['reason'] : 'خطأ داخلي') . ' ❌';
     }
     ems_gov_redirect("Location: orders_proc.php?edit_id=" . $mid . "&msg=" . urlencode($msg)); exit();
 }
@@ -88,13 +88,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add_l
     if (!in_array($cost_type, array('شحن', 'جمارك', 'تخليص', 'نقل داخلي', 'أخرى'), true)) { $cost_type = 'أخرى'; }
     if ($lc_fx <= 0) { $lc_fx = 1; }
     if ($lo_id <= 0 || $doc_no === '' || $amount <= 0) {
-        ems_gov_redirect("Location: orders_proc.php?edit_id=$lo_id&msg=مستندُ+المصروف+ورقمُه+وقيمتُه+إلزامية+❌"); exit();
+        ems_gov_redirect("Location: orders_proc.php?edit_id=$lo_id&msg=مستند+المصروف+ورقمه+وقيمته+إلزامية+❌"); exit();
     }
     $lo = proc_gate(false)->selectOne('proc_order', array('where' => array('id' => $lo_id)));
-    if (!$lo) { ems_gov_flash_redirect('orders_proc.php', 'الأمرُ غير موجود ❌', 'GOV-REF-404', ''); exit(); }
+    if (!$lo) { ems_gov_flash_redirect('orders_proc.php', 'الأمر غير موجود ❌', 'GOV-REF-404', ''); exit(); }
     // لا ترسملَ قبل وصول البضاعة — المصاريفُ تُعرف عند الوصول (نفسُ بوابة المصروف)
     if (!in_array((string)$lo['state'], proc_order_expense_states(), true)) {
-        ems_gov_redirect("Location: orders_proc.php?edit_id=$lo_id&msg=لا+تكلفةَ+وصوليةً+قبل+الاستلام+النهائي+❌"); exit();
+        ems_gov_redirect("Location: orders_proc.php?edit_id=$lo_id&msg=لا+تكلفة+وصولية+قبل+الاستلام+النهائي+❌"); exit();
     }
     try {
         $landed_id = proc_gate(false)->runInTransaction(function ($g) use ($lo_id, $doc_no, $cost_type, $amount, $lc_currency, $lc_fx, $lc_supplier, $current_user_id) {
@@ -110,10 +110,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add_l
         }, 'landed cost add PO#' . $lo_id);
     } catch (\Throwable $e) {
         error_log('landed cost add refused: ' . $e->getMessage());
-        ems_gov_redirect("Location: orders_proc.php?edit_id=$lo_id&msg=تعذّرت+إضافة+التكلفة+الوصولية+❌"); exit();
+        ems_gov_redirect("Location: orders_proc.php?edit_id=$lo_id&msg=تعذرت+إضافة+التكلفة+الوصولية+❌"); exit();
     }
     proc_publish_landed_cost($conn, intval($landed_id), $current_user_id);
-    ems_gov_redirect("Location: orders_proc.php?edit_id=$lo_id&msg=رُسملت+التكلفة+الوصولية+على+الاستلام+✅"); exit();
+    ems_gov_redirect("Location: orders_proc.php?edit_id=$lo_id&msg=رسملت+التكلفة+الوصولية+على+الاستلام+✅"); exit();
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'archive_landed_cost') {
     if (!$can_edit) { ems_gov_flash_redirect('orders_proc.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
@@ -126,7 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'archi
             \App\Services\Procurement\ProcCostingService::repriceOrderReceipts($g, $lo_id);   // نصيبُها يخرج من التكلفة
         }, 'landed cost archive#' . $lid);
     } catch (\Throwable $e) { error_log('landed archive refused: ' . $e->getMessage()); }
-    ems_gov_redirect("Location: orders_proc.php?edit_id=$lo_id&msg=أُرشفت+التكلفة+وأُعيد+الاحتساب+✅"); exit();
+    ems_gov_redirect("Location: orders_proc.php?edit_id=$lo_id&msg=أرشفت+التكلفة+وأعيد+الاحتساب+✅"); exit();
 }
 
 // ── حفظ (إضافة/تعديل) ──
@@ -149,8 +149,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['currency'])) {
          `trg_po_request_required` — فالكاتبُ الثاني لا يلتفُّ عليه. */
     if ($request_id === null || $request_id <= 0) {
         ems_gov_flash_redirect('orders_proc.php',
-            'PO-REQ-422: لا أمرَ شراءٍ بلا طلبٍ مرتبط — اختر طلبَ الشراءِ المعتمد ❌',
-            'GOV-FAIL-422', 'الأمرُ أثرُ احتياجٍ اعتُمد لا قرارٌ منفرد');
+            'PO-REQ-422: لا أمر شراء بلا طلب مرتبط — اختر طلب الشراء المعتمد ❌',
+            'GOV-FAIL-422', 'الأمر أثر احتياج اعتمد لا قرار منفرد');
         exit();
     }
     $__pr = null;
@@ -159,14 +159,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['currency'])) {
     require_once __DIR__ . '/../app/Services/Workflow/ChainLinkService.php';
     if (!$__pr) {
         ems_gov_flash_redirect('orders_proc.php',
-            'PO-REQ-404: الطلبُ غيرُ موجودٍ في نطاقك ❌', 'GOV-REF-404', '');
+            'PO-REQ-404: الطلب غير موجود في نطاقك ❌', 'GOV-REF-404', '');
         exit();
     }
     if (!\App\Services\Workflow\ChainLinkService::requestApproved($__pr)) {
         ems_gov_flash_redirect('orders_proc.php',
-            'PO-REQ-422: الطلبُ #' . $request_id . ' «' . (string) $__pr['state']
-            . '» — ولا أمرَ شراءٍ إلا على طلبٍ معتمد ❌',
-            'GOV-FAIL-422', 'الاعتمادُ يسبق الشراءَ لا يتبعه');
+            'PO-REQ-422: الطلب #' . $request_id . ' «' . (string) $__pr['state']
+            . '» — ولا أمر شراء إلا على طلب معتمد ❌',
+            'GOV-FAIL-422', 'الاعتماد يسبق الشراء لا يتبعه');
         exit();
     }
     $fin_approval_ref = trim($_POST['fin_approval_ref'] ?? '');
@@ -239,7 +239,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['currency'])) {
         $g->replaceChildren('proc_order', $order_id, 'proc_order_line', 'order_id', $line_rows, 'order lines rewrite');
     } catch (\Throwable $e) {
         error_log('orders_proc save refused: ' . $e->getMessage());
-        ems_gov_flash_redirect('orders_proc.php', 'تعذّر الحفظ ❌', 'GOV-FAIL-409', ''); exit();
+        ems_gov_flash_redirect('orders_proc.php', 'تعذر الحفظ ❌', 'GOV-FAIL-409', ''); exit();
     }
     ems_gov_redirect("Location: orders_proc.php?msg=" . ($is_editing ? 'تم+تعديل+الأمر+بنجاح+✅' : 'تمت+إضافة+الأمر+بنجاح+✅')); exit();
 }
@@ -317,8 +317,8 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا أوامرَ شراءٍ مطابقةً للفلاترِ الحالية',
-        'أصدر أمرًا جديدًا من رأسِ الشاشة بمرجعِ طلبٍ معتمدٍ ومرجعِ اعتمادٍ ماليّ');
+    echo ems_states_bundle('لا أوامر شراء مطابقة للفلاتر الحالية',
+        'أصدر أمرا جديدا من رأس الشاشة بمرجع طلب معتمد ومرجع اعتماد مالي');
     ?>
 
     <?php proc_msg_banner(); ?>
@@ -329,16 +329,16 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
         $__tol    = round(proc_match_tolerance((float)$edit['total_amount']), 2);
         /* UXW-01 ①: نبرةُ الحالةِ صنفٌ لا لونٌ مثبَّتٌ في الوسم */
         $__tone   = ($__ms === 'matched') ? 'proc-ord-tone-ok' : (($__ms === 'var_pending') ? 'proc-ord-tone-bad' : 'proc-ord-tone-mute');
-        $__label  = array('unmatched' => 'لم تُطابَق', 'matched' => 'مطابَقة', 'var_pending' => 'فرقٌ ينتظر قرارًا', 'rejected' => 'مرفوضة');
+        $__label  = array('unmatched' => 'لم تطابق', 'matched' => 'مطابقة', 'var_pending' => 'فرق ينتظر قرارا', 'rejected' => 'مرفوضة');
     ?>
     <div class="card proc-ord-block">
         <div class="card-header"><h5><i class="fas fa-file-invoice"></i> فاتورة المورد والمطابقة الثلاثية</h5></div>
         <div class="card-body">
             <p class="text-muted proc-ord-lead">
-                تُقارن الفاتورةُ بأمر الشراء (السعر المتفق) وبسند الاستلام (ما وصل فعلًا).
+                تقارن الفاتورة بأمر الشراء (السعر المتفق) وبسند الاستلام (ما وصل فعلا).
                 ضمن السماح <strong><?php echo number_format($__tol, 2); ?></strong>
-                <?php echo htmlspecialchars((string)$edit['currency']); ?> (±2٪ أو 100 أيُّهما أصغر)
-                يُفتح استحقاقُ المورد — وفوقه تقف بفرقها حتى قرارٍ موثَّق.
+                <?php echo htmlspecialchars((string)$edit['currency']); ?> (±2٪ أو 100 أيهما أصغر)
+                يفتح استحقاق المورد — وفوقه تقف بفرقها حتى قرار موثق.
             </p>
             <div class="proc-ord-status">
                 <strong>الحالة:</strong>
@@ -354,7 +354,7 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
             </div>
             <?php if (!$__gated): ?>
                 <div class="alert alert-info proc-ord-note">
-                    لا مطابقةَ قبل الاستلام النهائي — حالةُ الأمر الآن:
+                    لا مطابقة قبل الاستلام النهائي — حالة الأمر الآن:
                     <strong><?php echo htmlspecialchars((string)$edit['state']); ?></strong>.
                 </div>
             <?php elseif ($can_edit): ?>
@@ -371,7 +371,7 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
                     <div class="form-group"><label for="emsf_402_52f9c">قيمتها</label>
                         <input type="number" step="0.01" name="invoice_amount" id="emsf_402_52f9c" required
                                value="<?php echo htmlspecialchars((string)($edit['invoice_amount'] ?? $edit['total_amount'])); ?>"></div>
-                    <button type="submit" class="btn-primary"><i class="fas fa-scale-balanced"></i> طابِق</button>
+                    <button type="submit" class="btn-primary"><i class="fas fa-scale-balanced"></i> طابق</button>
                 </form>
             <?php endif; ?>
         </div>
@@ -387,16 +387,16 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
     ?>
     <div class="card proc-ord-block">
         <div class="card-header"><h5><i class="fas fa-ship"></i> التكلفة الوصولية (Landed Cost)
-            <?php if ($__landed_sum > 0): ?> — الإجمالي المرسمَل <strong><?php echo number_format($__landed_sum, 2); ?></strong> (معادل)<?php endif; ?></h5></div>
+            <?php if ($__landed_sum > 0): ?> — الإجمالي المرسمل <strong><?php echo number_format($__landed_sum, 2); ?></strong> (معادل)<?php endif; ?></h5></div>
         <div class="card-body">
             <p class="text-muted proc-ord-lead">
-                شحنٌ وجمارك وتخليصٌ تُرسمَل على تكلفة استلام هذا الأمر توزيعًا بقيمة بنوده —
-                فيصير متوسطُ تكلفة القطعة سعرَها **الحقيقي** لا سعرَ فاتورتها فقط.
+                شحن وجمارك وتخليص ترسمل على تكلفة استلام هذا الأمر توزيعا بقيمة بنوده —
+                فيصير متوسط تكلفة القطعة سعرها **الحقيقي** لا سعر فاتورتها فقط.
             </p>
             <?php if ($__landed): ?>
             <div class="table-container proc-ord-tablewrap">
                 <table class="alltables display proc-ord-table" data-no-dt="1">
-                    <thead><tr><th>المستند</th><th>النوع</th><th>المبلغ</th><th>المعادل</th><th>أُدخلت</th><th></th></tr></thead>
+                    <thead><tr><th>المستند</th><th>النوع</th><th>المبلغ</th><th>المعادل</th><th>أدخلت</th><th></th></tr></thead>
                     <tbody>
                     <?php foreach ($__landed as $__l): ?>
                         <tr>
@@ -410,13 +410,13 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
                             <td><?php echo number_format((float)$__l['amount'], 2) . ' ' . htmlspecialchars((string)$__l['currency']); ?></td>
                             <td><?php echo number_format((float)$__l['base_amount'], 2); ?></td>
                             <?php else: ?>
-                            <td class="ems-field-withheld" title="محجوبٌ — يحتاج منحةً فردية">—</td>
+                            <td class="ems-field-withheld" title="محجوب — يحتاج منحة فردية">—</td>
                             <td class="ems-field-withheld">—</td>
                             <?php endif; ?>
                             <td><small><?php echo htmlspecialchars((string)$__l['created_at']); ?></small></td>
                             <td>
                                 <?php if ($can_edit): ?>
-                                <form method="post" class="proc-ord-inline" onsubmit="return confirm('أرشفةُ المصروف وإخراجُ نصيبه من التكلفة؟')">
+                                <form method="post" class="proc-ord-inline" onsubmit="return confirm('أرشفة المصروف وإخراج نصيبه من التكلفة؟')">
         <?= csrf_field() ?>
                                     <input type="hidden" name="action" value="archive_landed_cost">
                                     <input type="hidden" name="id" value="<?php echo intval($edit['id']); ?>">
@@ -451,7 +451,7 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
                 <button type="submit" class="btn-primary"><i class="fas fa-ship"></i> رسملة</button>
             </form>
             <?php elseif (!$__gated): ?>
-                <div class="alert alert-info proc-ord-note">تُرسمَل بعد بلوغ الأمر الاستلامَ النهائي — المصاريفُ تُعرف عند الوصول.</div>
+                <div class="alert alert-info proc-ord-note">ترسمل بعد بلوغ الأمر الاستلام النهائي — المصاريف تعرف عند الوصول.</div>
             <?php endif; ?>
         </div>
     </div>
@@ -470,7 +470,7 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
                     </div>
                     <div class="form-group">
                         <label for="emsf_410_7f092">مرجع طلب الشراء</label>
-                        <select name="request_id" id="emsf_410_7f092"><?php echo proc_options_from_rows($request_option_rows, $edit ? intval($edit['request_id']) : 0, '— اختر طلبًا معتمدًا —'); ?></select>
+                        <select name="request_id" id="emsf_410_7f092"><?php echo proc_options_from_rows($request_option_rows, $edit ? intval($edit['request_id']) : 0, '— اختر طلبا معتمدا —'); ?></select>
                     </div>
                     <div class="form-group">
                         <label for="emsf_411_ccb3f">مرجع الاعتماد المالي <span class="required">*</span> <small>(شرط الإصدار)</small></label>
@@ -559,7 +559,7 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
                    data-scroll-x="1" data-state-save="false">
                 <thead><tr>
                     <th>الإجراءات</th><th>الكود</th><th>المورد</th><th>التصنيف</th><th>العملة</th>
-                    <th>الإجمالي</th><th>الحالة</th><th>الاستلام/التأخر</th><th>مرجع الاعتماد المالي</th><th>أُنشئ</th>
+                    <th>الإجمالي</th><th>الحالة</th><th>الاستلام/التأخر</th><th>مرجع الاعتماد المالي</th><th>أنشئ</th>
                     <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
                     <th class="ems-fn-th" data-fn="1">رقم الأمر</th>
                     <th class="ems-fn-th" data-fn="1">تاريخ الإصدار</th>
@@ -578,14 +578,14 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
                     <th class="ems-fn-th none" data-fn="1">تاريخ التوريد المتفق</th>
                     <th class="ems-fn-th none" data-fn="1">أصدره</th>
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                    <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                    <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                    <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                     <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                     <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                     <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-                    <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+                    <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
                     <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
-                    <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
+                    <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
                     <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                     <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                     <th class="ems-gov-th none" data-gov="fx_rate" data-slice="3" title="سعر التحويل لعملة الدفاتر">سعر الصرف</th>
@@ -635,14 +635,14 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
                         $pct = $row['received_pct'] !== null ? (float)$row['received_pct'] : null;
                         $isFinal = ($row['final_receipt_at'] !== null || (string)$row['state'] === 'استلام نهائي');
                         if (!$isFinal && $pct !== null && $pct > 0 && $pct < 100) {
-                            $e18[] = "<span class='badge badge-warning' title='PartialReceived'>استلامٌ جزئي — متبقٍ "
+                            $e18[] = "<span class='badge badge-warning' title='PartialReceived'>استلام جزئي — متبق "
                                    . htmlspecialchars(number_format(100 - $pct, 1)) . "٪</span>";
                         }
                         if (!$isFinal && !empty($row['expected_delivery_date'])
                             && $row['expected_delivery_date'] < date('Y-m-d')) {
                             $lateDays = (int) floor((time() - strtotime((string)$row['expected_delivery_date'])) / 86400);
-                            $e18[] = "<span class='badge badge-danger' title='Late'>متأخرٌ "
-                                   . $lateDays . " يومًا</span>";
+                            $e18[] = "<span class='badge badge-danger' title='Late'>متأخر "
+                                   . $lateDays . " يوما</span>";
                         }
                         echo "<td>" . ($e18 ? implode(' ', $e18) : "<span class='text-muted'>—</span>") . "</td>";
                         echo "<td>" . htmlspecialchars((string)($row['fin_approval_ref'] ?? '')) . "</td>";

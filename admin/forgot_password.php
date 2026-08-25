@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = trim(isset($_POST['email']) ? $_POST['email'] : '');
 
         if (!validate_email($email) || !validate_length($email, 5, 150)) {
-            $error = 'أدخل بريداً إلكترونياً صحيحاً.';
+            $error = 'أدخل بريدا إلكترونيا صحيحا.';
         } else {
             $stmt = mysqli_prepare($conn, 'SELECT id, name, email FROM super_admins WHERE email = ? AND is_active = 1 LIMIT 1');
 
@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
-            $message = 'إذا كان البريد الإلكتروني مسجلاً ونشطاً فسيتم إرسال رابط إعادة التعيين إليه.';
+            $message = 'إذا كان البريد الإلكتروني مسجلا ونشطا فسيتم إرسال رابط إعادة التعيين إليه.';
         }
     }
 }

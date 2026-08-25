@@ -29,7 +29,7 @@ class AttendanceService
             if (!isset($a[$f]) || $a[$f] === '') { $out['code'] = 422; $out['reason'] = 'حقل إلزامي: ' . $f; return $out; }
         }
         if (empty($a['operator_person_id'])) {
-            $out['code'] = 422; $out['reason'] = 'فترة بلا مشغّل تُرفض — مشغّل واحد لكل فترة إلزامًا';
+            $out['code'] = 422; $out['reason'] = 'فترة بلا مشغل ترفض — مشغل واحد لكل فترة إلزاما';
             return $out;
         }
         $run = (int) (isset($a['run_minutes']) ? $a['run_minutes'] : 0);
@@ -40,7 +40,7 @@ class AttendanceService
             return $out;
         }
         if ($stop > 0 && empty($a['stop_reason_code'])) {
-            $out['code'] = 422; $out['reason'] = 'توقف بلا سبب يُرفض — السبب من القائمة المحكومة (N-12)';
+            $out['code'] = 422; $out['reason'] = 'توقف بلا سبب يرفض — السبب من القائمة المحكومة (N-12)';
             return $out;
         }
         // DEC-01 ⑨: مزامنة تجاوز تأخيرها يومًا من تاريخ العمل تُعلَّم «مزامَن
@@ -78,8 +78,8 @@ class AttendanceService
         $out['periods_logged'] = (int) $n[0]['c'];
         $out['synced_late'] = $syncedLate;
         $out['ok'] = true; $out['code'] = 201;
-        $out['reason'] = 'سُجّلت الفترة ' . $a['period_no'] . ' بمشغّلها #' . $a['operator_person_id']
-            . ($syncedLate ? ' — معلَّمةً «مزامَن متأخر» (تجاوز يومًا · DEC-01 ⑨)' : '');
+        $out['reason'] = 'سجلت الفترة ' . $a['period_no'] . ' بمشغلها #' . $a['operator_person_id']
+            . ($syncedLate ? ' — معلمة «مزامن متأخر» (تجاوز يوما · DEC-01 ⑨)' : '');
         return $out;
     }
 
@@ -101,7 +101,7 @@ class AttendanceService
             }
         }
         return array('ok' => false, 'code' => 422, 'policy' => null,
-            'reason' => 'لا سياسةَ حضورٍ مطابقةً لمحددات (' . $scope . ') — ولا يُفترض شيء');
+            'reason' => 'لا سياسة حضور مطابقة لمحددات (' . $scope . ') — ولا يفترض شيء');
     }
 
     // ═════════════════ ③ الأثر الخماسي ═════════════════
@@ -118,7 +118,7 @@ class AttendanceService
             array((string) $statusCode));
         if (!$rows) {
             return array('ok' => false, 'code' => 422,
-                'reason' => 'حالة حضور خارج الرموز المعتمدة: «' . $statusCode . '» — لا تُحتسب حالة ليست في القاموس');
+                'reason' => 'حالة حضور خارج الرموز المعتمدة: «' . $statusCode . '» — لا تحتسب حالة ليست في القاموس');
         }
         $t = $rows[0];
         $billable = ((string) $t['billable'] === 'yes');
@@ -129,7 +129,7 @@ class AttendanceService
             $bearer = isset($ctx['bearer_party']) ? (string) $ctx['bearer_party'] : '';
             if ($bearer === '') {
                 return array('ok' => false, 'code' => 422,
-                    'reason' => 'حالة ST تقرأ الإسناد — مرّر bearer_party من بند الالتزام (N-12) ولا يُفترض');
+                    'reason' => 'حالة ST تقرأ الإسناد — مرر bearer_party من بند الالتزام (N-12) ولا يفترض');
             }
             $billable = ($bearer === 'client');
             $supplierDue = ($bearer === 'client');
@@ -142,7 +142,7 @@ class AttendanceService
         if ((string) $statusCode === 'A1' && array_key_exists('leave_balance_days', $ctx)
             && (float) $ctx['leave_balance_days'] <= 0) {
             $pay = 'stops_accrual';
-            $balanceNote = ' · نفد رصيد الإجازة → يُعامل «بلا أجر» لهذا اليوم (DEC-01 ④) — لا خصم عقوبة';
+            $balanceNote = ' · نفد رصيد الإجازة → يعامل «بلا أجر» لهذا اليوم (DEC-01 ④) — لا خصم عقوبة';
         }
         return array(
             'ok' => true, 'code' => 200,
@@ -172,11 +172,11 @@ class AttendanceService
             ));
         } catch (\Throwable $t) {
             if (strpos($t->getMessage(), 'Duplicate') !== false) {
-                return array('ok' => false, 'code' => 409, 'reason' => 'اليوم مصنَّف سلفًا — التغيير بمسار تغيير الحالة (GOV-01 §6) لا بالكتابة فوقه');
+                return array('ok' => false, 'code' => 409, 'reason' => 'اليوم مصنف سلفا — التغيير بمسار تغيير الحالة (GOV-01 §6) لا بالكتابة فوقه');
             }
             throw $t;
         }
-        return array('ok' => true, 'code' => 201, 'att_id' => $id, 'reason' => 'صُنّف ' . $date . ' برمز ' . $statusCode);
+        return array('ok' => true, 'code' => 201, 'att_id' => $id, 'reason' => 'صنف ' . $date . ' برمز ' . $statusCode);
     }
 
     /**
@@ -209,7 +209,7 @@ class AttendanceService
                 $stmt->close();
                 $conn->query("INSERT INTO fin_notifications (company_id, target_level, title, link)
                               VALUES ({$companyIdInt}, 'dept_manager',
-                              'غياب الموظف #{$personId} يوم {$date} لم يُصنَّف خلال 48 ساعة — مهلة 24 ساعة ثم يصير غيابًا غير مبرَّر (A2)', 'Employees/attendance.php')");
+                              'غياب الموظف #{$personId} يوم {$date} لم يصنف خلال 48 ساعة — مهلة 24 ساعة ثم يصير غيابا غير مبرر (A2)', 'Employees/attendance.php')");
                 $notified++;
                 continue;
             }
@@ -249,14 +249,14 @@ class AttendanceService
             }
             if (time() <= $deadline + 86399) { continue; }
             $attId = (int) $r['att_id'];
-            $ref = trim((string) $r['reference_doc'] . ' · EM-timeout→A1 (DEC-01 ④: لا قرار خلال 5 أيام عمل — مبرَّر احتياطًا)', ' ·');
+            $ref = trim((string) $r['reference_doc'] . ' · EM-timeout→A1 (DEC-01 ④: لا قرار خلال 5 أيام عمل — مبرر احتياطا)', ' ·');
             $gate->update('attendance_days', array(
                 'status_code' => 'A1', 'auto_reclassified' => 1,
                 'reference_doc' => mb_substr($ref, 0, 120),
             ), array('att_id' => $attId));
             $conn->query("INSERT INTO fin_notifications (company_id, target_level, title, link)
                           VALUES ({$companyIdInt}, 'dept_manager',
-                          'حالة طارئة للموظف #" . (int) $r['person_id'] . " يوم " . $r['att_date'] . " بلا قرار خلال 5 أيام عمل — صُنّفت A1 احتياطًا (DEC-01 ④)', 'Employees/attendance.php')");
+                          'حالة طارئة للموظف #" . (int) $r['person_id'] . " يوم " . $r['att_date'] . " بلا قرار خلال 5 أيام عمل — صنفت A1 احتياطا (DEC-01 ④)', 'Employees/attendance.php')");
             $done++;
         }
         return $done;
@@ -292,7 +292,7 @@ class AttendanceService
             throw $t;
         }
         return array('ok' => true, 'code' => 201, 'ded_id' => $id, 'state' => 'Proposed',
-            'reason' => 'خصم مقترح — ولا ترحيل قبل سلّم GOV-01');
+            'reason' => 'خصم مقترح — ولا ترحيل قبل سلم GOV-01');
     }
 
     /* ═══════════════════════════════════════════════════════════════════════
@@ -334,7 +334,7 @@ class AttendanceService
         $byUser = (int) $byUser;
         if ($byUser <= 0) {
             $out['code'] = 422;
-            $out['reason'] = 'يدٌ مجهولةٌ لا تنقل حالةً — معرّفُ المستخدمِ إلزاميٌّ للأثرِ التدقيقي';
+            $out['reason'] = 'يد مجهولة لا تنقل حالة — معرف المستخدم إلزامي للأثر التدقيقي';
             return $out;
         }
         $rows = $gate->scopedQuery(array('scope' => array('d' => 'deduction_proposals')),
@@ -344,11 +344,11 @@ class AttendanceService
         $from = (string) $d['state'];
         $out['state'] = $from;
 
-        if ($from === $to) { $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'الحالُ هي هي — فعلٌ عاطل'; return $out; }
+        if ($from === $to) { $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'الحال هي هي — فعل عاطل'; return $out; }
         if (!isset(self::$DED_ALLOWED[$from]) || !in_array($to, self::$DED_ALLOWED[$from], true)) {
             $out['code'] = 409;
-            $out['reason'] = 'انتقالٌ غيرُ مسموح: ' . $from . ' ← ' . $to
-                . ' (المسموحُ من «' . $from . '»: ' . (implode('، ', self::$DED_ALLOWED[$from] ?: array('لا شيء'))) . ')';
+            $out['reason'] = 'انتقال غير مسموح: ' . $from . ' ← ' . $to
+                . ' (المسموح من «' . $from . '»: ' . (implode('، ', self::$DED_ALLOWED[$from] ?: array('لا شيء'))) . ')';
             return $out;
         }
 
@@ -359,12 +359,12 @@ class AttendanceService
         if ($d['reviewed_by'] !== null) { $prior['المراجع'] = (int) $d['reviewed_by']; }
         if ($to === 'Approved' && isset($prior['المراجع']) && $prior['المراجع'] === $byUser) {
             $out['code'] = 403;
-            $out['reason'] = '**من راجع لا يعتمد** — راجعتَ هذا المقترحَ بنفسِك، والاعتمادُ يدٌ ثالثة (UI-01 §8)';
+            $out['reason'] = '**من راجع لا يعتمد** — راجعت هذا المقترح بنفسك، والاعتماد يد ثالثة (UI-01 §8)';
             return $out;
         }
         if (isset($prior['المقترح']) && $prior['المقترح'] === $byUser && $to !== 'Waived') {
             $out['code'] = 403;
-            $out['reason'] = '**من أنشأ لا يعتمد** — أنت مقترحُ هذا الخصم؛ نقلُ حالتِه يدٌ أخرى (UI-01 §8)';
+            $out['reason'] = '**من أنشأ لا يعتمد** — أنت مقترح هذا الخصم؛ نقل حالته يد أخرى (UI-01 §8)';
             return $out;
         }
 
@@ -373,7 +373,7 @@ class AttendanceService
         if ($to === 'Approved') {
             if (!isset($extra['approvals_ref']) || trim((string) $extra['approvals_ref']) === '') {
                 $out['code'] = 422;
-                $out['reason'] = 'مرجعُ سلّمِ الموافقاتِ إلزاميٌّ للاعتماد — لا اعتمادَ بلا سندِ سلّمِه';
+                $out['reason'] = 'مرجع سلم الموافقات إلزامي للاعتماد — لا اعتماد بلا سند سلمه';
                 return $out;
             }
             $set['approvals_ref'] = (string) $extra['approvals_ref'];
@@ -381,7 +381,7 @@ class AttendanceService
         }
         if ($to === 'Waived') {
             if (!isset($extra['waiver_ref']) || (int) $extra['waiver_ref'] <= 0) {
-                $out['code'] = 422; $out['reason'] = 'مرجعُ الإعفاءِ إلزاميٌّ — لا إعفاءَ بلا قرارِه';
+                $out['code'] = 422; $out['reason'] = 'مرجع الإعفاء إلزامي — لا إعفاء بلا قراره';
                 return $out;
             }
             $set['waiver_ref'] = (int) $extra['waiver_ref'];
@@ -389,7 +389,7 @@ class AttendanceService
         $gate->update('deduction_proposals', $set, array('ded_id' => $dedId));
 
         $out['ok'] = true; $out['code'] = 200; $out['state'] = $to;
-        $out['reason'] = 'انتقل ' . $from . ' ← ' . $to . ' بيدِ المستخدم #' . $byUser;
+        $out['reason'] = 'انتقل ' . $from . ' ← ' . $to . ' بيد المستخدم #' . $byUser;
         return $out;
     }
 
@@ -425,14 +425,14 @@ class AttendanceService
             "SELECT d.* FROM deduction_proposals d WHERE {TENANT_SCOPE} AND d.ded_id = ?", array($dedId));
         if (!$rows) { $out['code'] = 404; $out['reason'] = 'المقترح غير موجود'; return $out; }
         $d = $rows[0];
-        if ((string) $d['state'] === 'Posted') { $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'مرحَّل سلفًا — عاطل'; return $out; }
+        if ((string) $d['state'] === 'Posted') { $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'مرحل سلفا — عاطل'; return $out; }
         if (!in_array((string) $d['state'], array('Approved',), true)) {
             $out['code'] = 403;
-            $out['reason'] = 'لا ترحيلَ إلا من Approved — الحال «' . $d['state'] . '»؛ والاعتماد بسلّم GOV-01 (ثلاث موافقات)';
+            $out['reason'] = 'لا ترحيل إلا من Approved — الحال «' . $d['state'] . '»؛ والاعتماد بسلم GOV-01 (ثلاث موافقات)';
             return $out;
         }
         if ($approvalsRef === null || $approvalsRef === '') {
-            $out['code'] = 403; $out['reason'] = 'مرجع سلّم الموافقات إلزامي للترحيل (CHECK بنيوي)';
+            $out['code'] = 403; $out['reason'] = 'مرجع سلم الموافقات إلزامي للترحيل (CHECK بنيوي)';
             return $out;
         }
 
@@ -441,7 +441,7 @@ class AttendanceService
         if ($override !== null) {
             if (empty($override['gm_ref']) || empty($override['worker_request_ref'])) {
                 $out['code'] = 422;
-                $out['reason'] = 'تجاوز حدي الحماية بقرار الإدارة العامة **وبطلب مكتوب من العامل نفسه** — كلاهما إلزامي ولا يُفرض عليه (DEC-01 ⑤)';
+                $out['reason'] = 'تجاوز حدي الحماية بقرار الإدارة العامة **وبطلب مكتوب من العامل نفسه** — كلاهما إلزامي ولا يفرض عليه (DEC-01 ⑤)';
                 return $out;
             }
             $bypass = true;
@@ -463,9 +463,9 @@ class AttendanceService
                 $room = round(min($capVol - $postedVol, $capAll - $postedAll), 2);
                 if ($room <= 0) {
                     self::notifyWorker($gate, (int) $d['person_id'],
-                        'أُعيدت جدولة استقطاع اختياري (' . $amount . ') للفترة ' . $d['period'] . ' — بلغ الحد (ثلث الصافي ' . $capVol . ' أو نصفه ' . $capAll . ')، ويُمدَّد الاسترداد للفترة القادمة');
+                        'أعيدت جدولة استقطاع اختياري (' . $amount . ') للفترة ' . $d['period'] . ' — بلغ الحد (ثلث الصافي ' . $capVol . ' أو نصفه ' . $capAll . ')، ويمدد الاسترداد للفترة القادمة');
                     $out['code'] = 409;
-                    $out['reason'] = 'حدا حماية الصافي: الاختيارية ' . $postedVol . '/' . $capVol . ' والمجموع ' . $postedAll . '/' . $capAll . ' — يُعاد جدولة الاختياري ويُمدَّد الاسترداد بإشعار العامل (DEC-01 ⑤)';
+                    $out['reason'] = 'حدا حماية الصافي: الاختيارية ' . $postedVol . '/' . $capVol . ' والمجموع ' . $postedAll . '/' . $capAll . ' — يعاد جدولة الاختياري ويمدد الاسترداد بإشعار العامل (DEC-01 ⑤)';
                     return $out;
                 }
                 if ($amount > $room) { $amount = $room; $rescheduled = true; }
@@ -480,10 +480,10 @@ class AttendanceService
         ), array('ded_id' => $dedId));
         if ($rescheduled) {
             self::notifyWorker($gate, (int) $d['person_id'],
-                'قُصّ استقطاعك الاختياري للفترة ' . $d['period'] . ' إلى ' . $amount . ' (حد حماية الصافي) — والباقي مجدولٌ للفترة القادمة');
+                'قص استقطاعك الاختياري للفترة ' . $d['period'] . ' إلى ' . $amount . ' (حد حماية الصافي) — والباقي مجدول للفترة القادمة');
         }
         $out['ok'] = true; $out['code'] = 200; $out['posted_amount'] = $amount;
-        $out['reason'] = 'رُحّل ' . $amount . ' بمرجع سلّمه ' . $approvalsRef
+        $out['reason'] = 'رحل ' . $amount . ' بمرجع سلمه ' . $approvalsRef
             . ($bypass ? ' — بتجاوز الحدين بقرار الإدارة العامة (' . $override['gm_ref'] . ') وطلب العامل (' . $override['worker_request_ref'] . ')' : '')
             . ($rescheduled ? ' — والباقي أعيدت جدولته بإشعار العامل' : '');
         return $out;

@@ -118,7 +118,7 @@ require_once __DIR__ . '/includes/layout_head.php';
 <div class="phead">
     <div>
         <h2><i class="fas fa-chart-pie" style="color:var(--blue);margin-left:8px;"></i>صلاحيات التقارير</h2>
-        <p class="sub">تحكم في التقارير التي يمكن لكل دور رؤيتها — <?php echo $totalReports; ?> تقرير إجمالاً</p>
+        <p class="sub">تحكم في التقارير التي يمكن لكل دور رؤيتها — <?php echo $totalReports; ?> تقرير إجمالا</p>
     </div>
 </div>
 
@@ -127,7 +127,7 @@ require_once __DIR__ . '/includes/layout_head.php';
     <div class="card-body">
         <div class="empty-state">
             <i class="fas fa-users-slash"></i>
-            <p>لا توجد أدوار في النظام. يرجى إضافة الأدوار أولاً.</p>
+            <p>لا توجد أدوار في النظام. يرجى إضافة الأدوار أولا.</p>
         </div>
     </div>
 </div>
@@ -168,7 +168,7 @@ require_once __DIR__ . '/includes/layout_head.php';
             <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
                 <span class="rp-count-badge" id="cnt-<?php echo $role['id']; ?>">
                     <i class="fas fa-check" style="color:var(--green);"></i>
-                    <span id="cnt-val-<?php echo $role['id']; ?>"><?php echo $grantedCount; ?></span> / <?php echo $totalReports; ?> تقرير مفعّل
+                    <span id="cnt-val-<?php echo $role['id']; ?>"><?php echo $grantedCount; ?></span> / <?php echo $totalReports; ?> تقرير مفعل
                 </span>
                 <button class="btn btn-sm btn-primary" onclick="selectAll(<?php echo $role['id']; ?>)" type="button">
                     <i class="fas fa-check-double"></i> تحديد الكل
@@ -255,7 +255,7 @@ require_once __DIR__ . '/includes/layout_head.php';
     window.selectAll = function (roleId) {
         var pane  = document.getElementById('rp-pane-' + roleId);
         var items = pane.querySelectorAll('.rp-item:not(.enabled):not(.saving)');
-        if (!items.length) { toast('جميع التقارير مفعّلة بالفعل', true); return; }
+        if (!items.length) { toast('جميع التقارير مفعلة بالفعل', true); return; }
         var done = 0;
         items.forEach(function (el) {
             el.classList.add('saving');

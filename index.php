@@ -895,7 +895,7 @@ ul{list-style:none}
         </h1>
 
         <p class="hero-sub">
-          إنجاز مصممة خصيصاً لشركات التعدين في السودان — تربط المشاريع والمعدات الثقيلة والعقود وساعات التشغيل في منظومة واحدة تواكب ضخامة العمليات الميدانية.
+          إنجاز مصممة خصيصا لشركات التعدين في السودان — تربط المشاريع والمعدات الثقيلة والعقود وساعات التشغيل في منظومة واحدة تواكب ضخامة العمليات الميدانية.
         </p>
 
         <div class="hero-cta">
@@ -1007,7 +1007,7 @@ ul{list-style:none}
     <div class="rv">
       <div class="ey ey-au">المزايا</div>
       <h2 class="sec-h">مبنية لضخامة عمليات التعدين</h2>
-      <p class="sec-sub">كل ميزة صُممت لتواكب تحديات التعدين الفعلية — من المنجم حتى العقد حتى التقرير.</p>
+      <p class="sec-sub">كل ميزة صممت لتواكب تحديات التعدين الفعلية — من المنجم حتى العقد حتى التقرير.</p>
     </div>
     <div class="bento">
 
@@ -1022,7 +1022,7 @@ ul{list-style:none}
           <ul class="fbul">
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> دعم متعدد المناجم والمواقع المتزامنة</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> تتبع إنتاج المنجم وحالته التشغيلية لحظة بلحظة</li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> ربط العملاء والموردين بالمشاريع تلقائياً</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> ربط العملاء والموردين بالمشاريع تلقائيا</li>
           </ul>
         </div>
         <div class="f-vis">
@@ -1089,7 +1089,7 @@ ul{list-style:none}
       <div>
         <div class="ey ey-fe">كيف تعمل</div>
         <h2 class="sec-h">ثلاث خطوات للانطلاق</h2>
-        <p class="sec-sub" style="max-width:480px">من لحظة تسجيل شركتك حتى إدارة أول منجم كاملاً — في وقت قياسي بدون تعقيد أو أيام انتظار.</p>
+        <p class="sec-sub" style="max-width:480px">من لحظة تسجيل شركتك حتى إدارة أول منجم كاملا — في وقت قياسي بدون تعقيد أو أيام انتظار.</p>
       </div>
       <a class="btn-primary" href="<?php echo e(landing_url('company/register.php')); ?>" style="align-self:center">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
@@ -1130,7 +1130,7 @@ ul{list-style:none}
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
             </div>
             <h4>رفع المناجم والمعدات والعقود</h4>
-            <p>أضف مناجمك وأرقام معداتك الثقيلة ومشغليها، وادخل عقود التشغيل مع مواعيدها وشروطها — كل شيء مرتبط ببعض تلقائياً.</p>
+            <p>أضف مناجمك وأرقام معداتك الثقيلة ومشغليها، وادخل عقود التشغيل مع مواعيدها وشروطها — كل شيء مرتبط ببعض تلقائيا.</p>
           </div>
         </article>
 
@@ -1192,7 +1192,7 @@ ul{list-style:none}
         </div>
         <div class="trb">
           <strong>تحديثات مستمرة بدون توقف</strong>
-          <p>تطوير دوري بمزايا تعكس احتياجات قطاع التعدين المتطورة تصل تلقائياً.</p>
+          <p>تطوير دوري بمزايا تعكس احتياجات قطاع التعدين المتطورة تصل تلقائيا.</p>
         </div>
       </div>
     </div>
@@ -1221,9 +1221,9 @@ ul{list-style:none}
             <tr><td>إدارة المناجم ومشاريع التعدين</td><td><span class="ty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>مبنية داخل النظام</span></td><td><span class="tn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>تخصيص مكلف</span></td></tr>
             <tr><td>تشغيل المعدات الثقيلة ومشغليها</td><td><span class="ty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>تدفق واحد مترابط</span></td><td><span class="tn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>أدوات منفصلة</span></td></tr>
             <tr><td>دورة حياة العقود (تجديد/إيقاف/دمج)</td><td><span class="ty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>مدعومة بالكامل</span></td><td><span class="tn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>جزئية</span></td></tr>
-            <tr><td>واجهة عربية RTL أصيلة</td><td><span class="ty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>مدمجة افتراضياً</span></td><td><span class="tn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>ناقصة</span></td></tr>
+            <tr><td>واجهة عربية RTL أصيلة</td><td><span class="ty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>مدمجة افتراضيا</span></td><td><span class="tn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>ناقصة</span></td></tr>
             <tr><td>ملاءمة بيئة التعدين السوداني</td><td><span class="ty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>مصممة لها</span></td><td><span class="tn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>غير متاح</span></td></tr>
-            <tr><td>تكلفة الإعداد والتخصيص</td><td><span class="ty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>صفر — جاهز فوراً</span></td><td><span class="tn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>عالية جداً</span></td></tr>
+            <tr><td>تكلفة الإعداد والتخصيص</td><td><span class="ty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>صفر — جاهز فورا</span></td><td><span class="tn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>عالية جدا</span></td></tr>
           </tbody>
         </table>
       </div>

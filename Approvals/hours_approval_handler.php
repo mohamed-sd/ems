@@ -133,7 +133,7 @@ if ($action === 'approve') {
            شهادةُ الإنجازِ التي تُبنى عليها الفاتورة. **يُتخطّى الصفُّ ولا
            تُوقَف الدفعةُ كلُّها** — فالباقي مشروعٌ اعتمادُه. */
         $__sa = ems_assert_not_self_approval($conn, 'timesheet', 'id', $ts_id,
-            'صفُّ تايم شيت #' . $ts_id, $company_id);
+            'صف تايم شيت #' . $ts_id, $company_id);
         if ($__sa !== null) { $skipped++; $selfBlocked[] = $ts_id; continue; }
 
         // §5.2: المستوى الأول لا يعتمد صفًّا معلَّمًا غيرَ مخلَّص
@@ -236,7 +236,7 @@ if ($action === 'approve') {
     $__msg = "تم اعتماد $approved سجل" . ($skipped ? " (تم تخطي $skipped)" : '');
     // INJ-0024: سببُ التخطي يُعلَن لا يُبلَع — «من أدخل لا يعتمد» حكمٌ يُقرأ لا رقمٌ.
     if (!empty($selfBlocked)) {
-        $__msg .= ' — منها ' . count($selfBlocked) . ' لم تُعتمد لأنك مُدخِلُها:'
+        $__msg .= ' — منها ' . count($selfBlocked) . ' لم تعتمد لأنك مدخلها:'
                 . ' #' . implode('، #', array_slice($selfBlocked, 0, 8))
                 . ' (من أدخل لا يعتمد · UI-01 §8)';
     }
@@ -261,15 +261,15 @@ if ($action === 'approve') {
             $__byKind[$__k]++;
         }
         $__kindAr = array(
-            'capacity' => 'بتجاوز طاقةٍ يلزمه تخليصٌ قبل اعتماد الموقع',
-            'document' => 'بوثيقةِ أهليةٍ منتهيةٍ يومَ العمل — تُجدَّد من شاشة وثائق المعدات والمشغّلين',
-            'other'    => 'بسببٍ يمنع اعتماد الموقع',
+            'capacity' => 'بتجاوز طاقة يلزمه تخليص قبل اعتماد الموقع',
+            'document' => 'بوثيقة أهلية منتهية يوم العمل — تجدد من شاشة وثائق المعدات والمشغلين',
+            'other'    => 'بسبب يمنع اعتماد الموقع',
         );
         $__parts = array();
         foreach ($__byKind as $__k => $__n) {
             $__parts[] = $__n . ' ' . (isset($__kindAr[$__k]) ? $__kindAr[$__k] : $__kindAr['other']);
         }
-        $__msg .= ' — ⚠ موقوفٌ: ' . implode(' · ', $__parts);
+        $__msg .= ' — ⚠ موقوف: ' . implode(' · ', $__parts);
     }
 
     echo json_encode([
@@ -289,16 +289,16 @@ if ($action === 'approve') {
 // ─────────────────────────────────────────────────────────────
 if ($action === 'clear_capacity') {
     if (!function_exists('ems_env') || ems_env('EMS_APPROVAL_BOX', 'off') !== 'on') {
-        die(json_encode(['success' => false, 'message' => 'الميزة غير مفعّلة'], JSON_UNESCAPED_UNICODE));
+        die(json_encode(['success' => false, 'message' => 'الميزة غير مفعلة'], JSON_UNESCAPED_UNICODE));
     }
     if (!isset($role_level_map[$role]) || $role_level_map[$role] !== 1) {
-        die(json_encode(['success' => false, 'message' => 'تخليصُ التجاوز صلاحيةُ معتمِد الموقع (المستوى الأول)'], JSON_UNESCAPED_UNICODE));
+        die(json_encode(['success' => false, 'message' => 'تخليص التجاوز صلاحية معتمد الموقع (المستوى الأول)'], JSON_UNESCAPED_UNICODE));
     }
     $ts_id  = intval($_POST['timesheet_id'] ?? 0);
     $cause  = trim((string) ($_POST['cause_note'] ?? ''));
     $second = isset($_POST['second_operator']) ? (int) (bool) intval($_POST['second_operator']) : null;
     if ($ts_id <= 0 || $cause === '' || $second === null) {
-        die(json_encode(['success' => false, 'message' => 'السببُ وإعلانُ المشغّل الثاني إلزاميان — لا تخليصَ بلا إفصاح'], JSON_UNESCAPED_UNICODE));
+        die(json_encode(['success' => false, 'message' => 'السبب وإعلان المشغل الثاني إلزاميان — لا تخليص بلا إفصاح'], JSON_UNESCAPED_UNICODE));
     }
     require_once __DIR__ . '/../app/Services/Unit/CapacityGuard.php';
     try {
@@ -308,7 +308,7 @@ if ($action === 'clear_capacity') {
         $cc->execute();
         $cc_e = $cc->get_result()->fetch_assoc();
         $cc->close();
-        if (!$cc_e) { die(json_encode(['success' => false, 'message' => 'لا مرآةَ لهذا الصف'], JSON_UNESCAPED_UNICODE)); }
+        if (!$cc_e) { die(json_encode(['success' => false, 'message' => 'لا مرآة لهذا الصف'], JSON_UNESCAPED_UNICODE)); }
 
         // كلُّ المحاور المفتوحة على الواقعة (معدة · مشغّل) تُخلَّص بالإعلان نفسه
         $cf = $conn->prepare("SELECT DISTINCT subject FROM unit_capacity_flags
@@ -318,7 +318,7 @@ if ($action === 'clear_capacity') {
         $cf->execute();
         $subjects = $cf->get_result()->fetch_all(MYSQLI_ASSOC);
         $cf->close();
-        if (empty($subjects)) { die(json_encode(['success' => false, 'message' => 'لا علمَ مفتوحًا على هذه الواقعة'], JSON_UNESCAPED_UNICODE)); }
+        if (empty($subjects)) { die(json_encode(['success' => false, 'message' => 'لا علم مفتوحا على هذه الواقعة'], JSON_UNESCAPED_UNICODE)); }
 
         $cleared = 0;
         foreach ($subjects as $sj) {
@@ -326,7 +326,7 @@ if ($action === 'clear_capacity') {
                     $sj['subject'], $cause, $second, $user_id)) { $cleared++; }
         }
         echo json_encode(['success' => $cleared > 0,
-            'message' => $cleared > 0 ? "خُلِّص {$cleared} محورًا باسمك — يمكن الاعتماد الآن" : 'تعذّر التخليص',
+            'message' => $cleared > 0 ? "خلص {$cleared} محورا باسمك — يمكن الاعتماد الآن" : 'تعذر التخليص',
             'cleared' => $cleared], JSON_UNESCAPED_UNICODE);
     } catch (\Throwable $t) {
         error_log('clear_capacity ts#' . $ts_id . ': ' . $t->getMessage());
@@ -343,7 +343,7 @@ if ($action === 'clear_capacity') {
 // ─────────────────────────────────────────────────────────────
 if ($action === 'return_to_site') {
     if (!function_exists('ems_env') || ems_env('EMS_APPROVAL_BOX', 'off') !== 'on') {
-        die(json_encode(['success' => false, 'message' => 'الميزة غير مفعّلة'], JSON_UNESCAPED_UNICODE));
+        die(json_encode(['success' => false, 'message' => 'الميزة غير مفعلة'], JSON_UNESCAPED_UNICODE));
     }
     if (!isset($role_level_map[$role])) {
         die(json_encode(['success' => false, 'message' => 'الأدمن لا يعيد مباشرة'], JSON_UNESCAPED_UNICODE));
@@ -352,7 +352,7 @@ if ($action === 'return_to_site') {
     $ts_id  = intval($_POST['timesheet_id'] ?? 0);
     $reason = trim((string) ($_POST['reason'] ?? ''));
     if ($ts_id <= 0 || $reason === '') {
-        die(json_encode(['success' => false, 'message' => 'سببُ الإعادة إلزامي — «إعادةٌ بسبب» نصًّا'], JSON_UNESCAPED_UNICODE));
+        die(json_encode(['success' => false, 'message' => 'سبب الإعادة إلزامي — «إعادة بسبب» نصا'], JSON_UNESCAPED_UNICODE));
     }
     require_once __DIR__ . '/../app/Services/Unit/TimesheetEntryService.php';
     try {
@@ -362,7 +362,7 @@ if ($action === 'return_to_site') {
         $rt->execute();
         $rt_e = $rt->get_result()->fetch_assoc();
         $rt->close();
-        if (!$rt_e) { die(json_encode(['success' => false, 'message' => 'لا مرآةَ لهذا الصف'], JSON_UNESCAPED_UNICODE)); }
+        if (!$rt_e) { die(json_encode(['success' => false, 'message' => 'لا مرآة لهذا الصف'], JSON_UNESCAPED_UNICODE)); }
 
         $stage = \App\Services\Unit\TimesheetEntryService::LEGACY_LEVEL_STAGE[$rt_level] ?? 'site';
         $rtRes = \App\Services\Unit\TimesheetEntryService::returnToSite(
@@ -370,7 +370,7 @@ if ($action === 'return_to_site') {
             array('publish_events' => false));
         if (empty($rtRes['ok'])) {
             die(json_encode(['success' => false,
-                'message' => 'تعذّرت الإعادة: ' . ($rtRes['skipped'] ?? ($rtRes['code'] ?? '؟'))], JSON_UNESCAPED_UNICODE));
+                'message' => 'تعذرت الإعادة: ' . ($rtRes['skipped'] ?? ($rtRes['code'] ?? '؟'))], JSON_UNESCAPED_UNICODE));
         }
         // ملاحظةُ الإعادة تُسجَّل ليراها المُدخِل (القناة القائمة نفسها)
         try {
@@ -384,7 +384,7 @@ if ($action === 'return_to_site') {
         } catch (\Throwable $nT) { error_log('return note ts#' . $ts_id . ': ' . $nT->getMessage()); }
 
         echo json_encode(['success' => true,
-            'message' => 'أُعيدت للاستكمال بالرقم نفسه (' . $rt_e['entry_no'] . ') — جولةٌ جديدةٌ وتعديلُها مفتوح',
+            'message' => 'أعيدت للاستكمال بالرقم نفسه (' . $rt_e['entry_no'] . ') — جولة جديدة وتعديلها مفتوح',
             'entry_no' => $rt_e['entry_no']], JSON_UNESCAPED_UNICODE);
     } catch (\Throwable $t) {
         error_log('return_to_site ts#' . $ts_id . ': ' . $t->getMessage());
@@ -486,7 +486,7 @@ if ($action === 'reject') {
     $reason = trim($_POST['reason'] ?? '');
 
     if ($ts_id <= 0) {
-        die(json_encode(['success' => false, 'message' => 'معرّف السجل غير صحيح'], JSON_UNESCAPED_UNICODE));
+        die(json_encode(['success' => false, 'message' => 'معرف السجل غير صحيح'], JSON_UNESCAPED_UNICODE));
     }
     if ($reason === '') {
         die(json_encode(['success' => false, 'message' => 'يجب كتابة سبب الرفض'], JSON_UNESCAPED_UNICODE));

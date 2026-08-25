@@ -68,9 +68,9 @@ class FinancingModelService
         $code = trim((string) ($in['model_code'] ?? ''));
         $name = trim((string) ($in['name_ar'] ?? ''));
         if ($code === '' || !preg_match('/^[a-z0-9_]{2,32}$/', $code)) {
-            return array('ok' => false, 'code' => '', 'msg' => 'رمزُ النموذجِ إلزاميٌّ بأحرفٍ لاتينيةٍ صغيرةٍ وأرقامٍ وشرطةٍ سفلية (422)');
+            return array('ok' => false, 'code' => '', 'msg' => 'رمز النموذج إلزامي بأحرف لاتينية صغيرة وأرقام وشرطة سفلية (422)');
         }
-        if ($name === '') { return array('ok' => false, 'code' => $code, 'msg' => 'اسمُ النموذجِ إلزامي (422)'); }
+        if ($name === '') { return array('ok' => false, 'code' => $code, 'msg' => 'اسم النموذج إلزامي (422)'); }
 
         // ◆ القيمُ المحكومة: الخارجُ عن القائمةِ **يُرفض** ولا يُكتب فارغًا.
         $enums = array(
@@ -83,16 +83,16 @@ class FinancingModelService
             $v = trim((string) ($in[$col] ?? ''));
             if (!isset($allowed[$v])) {
                 return array('ok' => false, 'code' => $code,
-                    'msg' => "قيمةُ «{$col}» خارجَ القائمةِ المحكومة — اختر من: " . implode('، ', array_values($allowed)) . ' (422)');
+                    'msg' => "قيمة «{$col}» خارج القائمة المحكومة — اختر من: " . implode('، ', array_values($allowed)) . ' (422)');
             }
             $vals[$col] = $v;
         }
 
         $bearer = trim((string) ($in['depreciation_bearer'] ?? ''));
-        if ($bearer === '') { return array('ok' => false, 'code' => $code, 'msg' => 'حاملُ الإهلاك إلزامي (422)'); }
+        if ($bearer === '') { return array('ok' => false, 'code' => $code, 'msg' => 'حامل الإهلاك إلزامي (422)'); }
         $holder = trim((string) ($in['security_interest_holder'] ?? ''));
         $policy = trim((string) ($in['policy_doc_ref'] ?? ''));
-        if ($policy === '') { return array('ok' => false, 'code' => $code, 'msg' => 'المرجعُ المحاسبيُّ إلزامي — لا نموذجَ بلا سندِ سياسة (422)'); }
+        if ($policy === '') { return array('ok' => false, 'code' => $code, 'msg' => 'المرجع المحاسبي إلزامي — لا نموذج بلا سند سياسة (422)'); }
         $active = !empty($in['active']) ? 1 : 0;
 
         $this->conn->begin_transaction();
@@ -130,18 +130,18 @@ class FinancingModelService
             $chk->close();
             foreach ($vals as $col => $want) {
                 if (!$row || (string) $row[$col] !== $want) {
-                    throw new \RuntimeException("ابتلعت القاعدةُ قيمةَ {$col} — المطلوب «{$want}» والمكتوب «"
+                    throw new \RuntimeException("ابتلعت القاعدة قيمة {$col} — المطلوب «{$want}» والمكتوب «"
                         . (string) ($row[$col] ?? '') . '»');
                 }
             }
 
             $this->conn->commit();
             return array('ok' => true, 'code' => $code,
-                'msg' => 'حُفظ النموذجُ «' . $name . '» (' . $code . ') في جدولِ المجال — ويظهر فورًا في إنشاءِ العملية ✅');
+                'msg' => 'حفظ النموذج «' . $name . '» (' . $code . ') في جدول المجال — ويظهر فورا في إنشاء العملية ✅');
         } catch (\Throwable $e) {
             $this->conn->rollback();
             error_log('FinancingModelService::upsert: ' . $e->getMessage());
-            return array('ok' => false, 'code' => $code, 'msg' => 'تعذّر الحفظ — لم يُكتب شيء (ERR-FIN-1050): ' . $e->getMessage());
+            return array('ok' => false, 'code' => $code, 'msg' => 'تعذر الحفظ — لم يكتب شيء (ERR-FIN-1050): ' . $e->getMessage());
         }
     }
 
@@ -152,13 +152,13 @@ class FinancingModelService
     public function deactivate(string $code, int $actorId): array
     {
         $st = $this->conn->prepare("UPDATE financing_models SET active = 0 WHERE model_code = ?");
-        if (!$st) { return array('ok' => false, 'msg' => 'تعذّر التعطيل (500)'); }
+        if (!$st) { return array('ok' => false, 'msg' => 'تعذر التعطيل (500)'); }
         $st->bind_param('s', $code);
         $ok = $st->execute();
         $n = $st->affected_rows;
         $st->close();
-        if (!$ok)    { return array('ok' => false, 'msg' => 'تعذّر التعطيل (500)'); }
-        if ($n <= 0) { return array('ok' => false, 'msg' => 'نموذجٌ غيرُ موجودٍ أو معطَّلٌ سلفًا (404)'); }
-        return array('ok' => true, 'msg' => 'عُطِّل النموذجُ ' . $code . ' — والسجلُّ باقٍ (لا حذف)');
+        if (!$ok)    { return array('ok' => false, 'msg' => 'تعذر التعطيل (500)'); }
+        if ($n <= 0) { return array('ok' => false, 'msg' => 'نموذج غير موجود أو معطل سلفا (404)'); }
+        return array('ok' => true, 'msg' => 'عطل النموذج ' . $code . ' — والسجل باق (لا حذف)');
     }
 }

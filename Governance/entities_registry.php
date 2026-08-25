@@ -28,10 +28,10 @@ $role = strval($_SESSION['user']['role'] ?? '');
 // قراءةً فقط (FIN-26: ملكية الشاشة للحوكمة والدور 26 يطالعها — DEC-01 ②)
 $gov_write = ($role === '-1' || in_array($role, array('1', '19'), true));
 if (!$gov_write && $role !== EMS_ROLE_FINANCING_MGR) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'باب الحوكمة خلف صلاحيته ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
+    ems_gov_flash_redirect('../main/dashboard.php', 'باب الحوكمة خلف صلاحيته ❌', 'GOV-PERM-403', 'اطلب المنحة من مدير الصلاحيات إن كانت ضمن عملك');
 }
 if (!$gov_write && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    ems_gov_flash_redirect('../main/dashboard.php', 'الدور قارئ هنا: الكتابة لملّاك الشاشة (1 · 19) ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
+    ems_gov_flash_redirect('../main/dashboard.php', 'الدور قارئ هنا: الكتابة لملاك الشاشة (1 · 19) ❌', 'GOV-PERM-403', 'اطلب المنحة من مدير الصلاحيات إن كانت ضمن عملك');
 }
 
 $msg = ''; $err = '';
@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['op'] ?? '') === 'create') 
     $cur = trim(strval($_POST['base_currency'] ?? 'SDG'));
     $roleCode = strval($_POST['entity_role'] ?? '');
     if ($name === '' || $country === '' || $authority === '' || $reg === '') {
-        $err = 'الاسم القانوني والبلد وجهة التسجيل ورقم السجل إلزامية — الفرادة بالثلاثة معًا';
+        $err = 'الاسم القانوني والبلد وجهة التسجيل ورقم السجل إلزامية — الفرادة بالثلاثة معا';
     } elseif (!in_array($roleCode, array('holding', 'operating', 'project', 'client', 'supplier', 'financier', 'government'), true)) {
         $err = 'صفة الكيان من القائمة المحكومة';
     } else {
@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['op'] ?? '') === 'create') 
         if (!$st->execute()) {
             $err = (strpos($st->error, 'Duplicate') !== false)
                 ? 'كيان قائم بالثلاثية نفسها (البلد × الجهة × الرقم) — سجل واحد لا يتكرر'
-                : 'تعذّر الإنشاء: ' . $st->error;
+                : 'تعذر الإنشاء: ' . $st->error;
             $st->close();
         } else {
             $eid = intval($st->insert_id);
@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['op'] ?? '') === 'create') 
             $st->bind_param('is', $eid, $roleCode);
             $st->execute();
             $st->close();
-            $msg = 'أُنشئ الكيان #' . $eid . ' بصفة «' . $roleCode . '» — والصفات جدول علاقة مؤرَّخ لا حقل نصي';
+            $msg = 'أنشئ الكيان #' . $eid . ' بصفة «' . $roleCode . '» — والصفات جدول علاقة مؤرخ لا حقل نصي';
         }
     }
 }
@@ -96,9 +96,9 @@ include '../insidebar.php';
     $header_actions = array();
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا كياناتٍ قانونيةً مسجَّلةً بهذا المرشِّح', 'بدِّلْ مرشِّحَ «الكل» أعلى الجدولِ أو أنشئْ كيانًا جديدًا بثلاثيتِه أسفلَ الشاشة');
+    echo ems_states_bundle('لا كيانات قانونية مسجلة بهذا المرشح', 'بدل مرشح «الكل» أعلى الجدول أو أنشئ كيانا جديدا بثلاثيته أسفل الشاشة');
     ems_screen_about('كل كيان قانوني بسجله وصفاته وتراخيصه — سجل واحد لا يتكرر (الفرادة: البلد × جهة '
-        . 'التسجيل × رقم السجل)، والعقد بلا كيان معرَّف ورقة لا حجة فيها. الكيان ليس مستأجرًا '
+        . 'التسجيل × رقم السجل)، والعقد بلا كيان معرف ورقة لا حجة فيها. الكيان ليس مستأجرا '
         . 'بالضرورة: is_tenant لكيانات المجموعة وحدها.',
         array('ابحث قبل أي إنشاء', 'الترخيص المنتهي بشارة'));
     if ($msg !== '') { echo '<div class="alert alert-success">' . htmlspecialchars($msg) . '</div>'; }
@@ -118,19 +118,19 @@ include '../insidebar.php';
               <th class="ems-fn-th" data-fn="1">جهة التسجيل</th>
               <th class="ems-fn-th" data-fn="1">رقم السجل</th>
               <th class="ems-fn-th" data-fn="1">الرقم الضريبي</th>
-              <th class="ems-fn-th" data-fn="1">العنوان المسجَّل</th>
+              <th class="ems-fn-th" data-fn="1">العنوان المسجل</th>
               <th class="ems-fn-th" data-fn="1">تاريخ التأسيس</th>
               <th class="ems-fn-th" data-fn="1">كيان مجموعة؟</th>
               <th class="ems-fn-th" data-fn="1">اكتمال الملكية</th>
-              <th class="ems-fn-th" data-fn="1">سجّله</th>
+              <th class="ems-fn-th" data-fn="1">سجله</th>
               <th class="ems-fn-th" data-fn="1">تاريخ التسجيل</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-              <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطّلاع</th>
+              <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطلاع</th>
               <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               </tr></thead><tbody>
         <?php foreach ($rows as $e):
@@ -154,7 +154,7 @@ include '../insidebar.php';
 
     <?php if ($gov_write): // القارئ (26) لا يُصيَّر له نموذج الإنشاء أصلًا — منع بنيوي لا زر معطَّل ?>
     <div class="card"><div class="card-body">
-        <h4>كيان جديد — ابحث بالثلاثية أولًا فالسجل واحد لا يتكرر</h4>
+        <h4>كيان جديد — ابحث بالثلاثية أولا فالسجل واحد لا يتكرر</h4>
         <form method="post" class="ems-form gov-ent-grid">
         <?= csrf_field() ?>
             <input type="hidden" name="op" value="create">
@@ -165,7 +165,7 @@ include '../insidebar.php';
             <input type="text" name="commercial_reg" placeholder="رقم السجل التجاري *" required aria-label="رقم السجل التجاري">
             <input type="text" name="tax_no" placeholder="الرقم الضريبي" aria-label="الرقم الضريبي">
             <input type="text" name="base_currency" placeholder="العملة الأساسية" value="SDG" aria-label="العملة الأساسية">
-            <select name="entity_role" aria-label="صفةُ الكيان: عميلٌ أو موردٌ أو ممولٌ أو غيرُها" required>
+            <select name="entity_role" aria-label="صفة الكيان: عميل أو مورد أو ممول أو غيرها" required>
                 <option value="">— الصفة *</option>
                 <option value="client">عميل</option><option value="supplier">مورد</option>
                 <option value="financier">ممول</option><option value="operating">تشغيلية</option>

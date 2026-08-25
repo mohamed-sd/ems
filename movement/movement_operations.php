@@ -89,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             try {
                 $op_id = intval($_POST['op_id'] ?? 0);
                 if ($op_id <= 0) {
-                    throw new Exception('معرّف التشغيل غير صحيح');
+                    throw new Exception('معرف التشغيل غير صحيح');
                 }
 
                 // اقرأ القيم الحالية قبل التحديث (لتسجيل التغيّر الفعلي ومعرفة المعدة).
@@ -199,7 +199,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             try {
                 $rel_id = intval($_POST['rel_id'] ?? 0);
                 if ($rel_id <= 0) {
-                    throw new Exception('معرّف السائق غير صحيح');
+                    throw new Exception('معرف السائق غير صحيح');
                 }
 
                 $shift_type = isset($_POST['shift_type']) ? trim((string)$_POST['shift_type']) : 'B';
@@ -401,7 +401,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     ));
                 } catch (\Throwable $t) { $eq_check = null; }
                 if (!$eq_check) {
-                    throw new Exception('المعدة المختارة غير مشغّلة في مشروع ساري');
+                    throw new Exception('المعدة المختارة غير مشغلة في مشروع ساري');
                 }
 
                 // ORG-13 · حارس الأذونات: دخول مشغّل (ORG-01 §5-⑦)
@@ -457,7 +457,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             try {
                 $equipment_id = intval($_POST['equipment_id'] ?? 0);
                 if ($equipment_id <= 0) {
-                    throw new Exception('معرّف المعدة غير صحيح');
+                    throw new Exception('معرف المعدة غير صحيح');
                 }
                 // التأكد أن المعدة مرتبطة بتشغيل في هذا المشروع (العزل عبر البوابة)
                 try {
@@ -526,7 +526,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                             if ($company_id > 0) { $log_opts['company_id'] = $company_id; }
                             log_equipment_event($conn, $equipment_id, 'إسناد للصيانة', $log_opts);
                         }
-                    }, 'إسناد آلية للصيانة مع أمرٍ تلقائي');
+                    }, 'إسناد آلية للصيانة مع أمر تلقائي');
                 } catch (\Throwable $txEx) {
                     throw new Exception($txEx->getMessage());
                 }
@@ -554,12 +554,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             try {
                 $op_id = intval($_POST['op_id'] ?? 0);
                 if ($op_id <= 0) {
-                    throw new Exception('معرّف التشغيل غير صحيح');
+                    throw new Exception('معرف التشغيل غير صحيح');
                 }
                 $new_state = (isset($_POST['op_state']) && in_array($_POST['op_state'], ['تعمل', 'جاهزة'], true))
                     ? $_POST['op_state'] : null;
                 if ($new_state === null) {
-                    throw new Exception('حالة غير صالحة (يُسمح بـ «تعمل» أو «جاهزة» فقط)');
+                    throw new Exception('حالة غير صالحة (يسمح ب «تعمل» أو «جاهزة» فقط)');
                 }
                 // اقرأ الحالة الحالية والمعدة قبل التحديث (لتسجيل التغيّر الفعلي).
                 $old_op_state = null; $sos_equipment = 0;
@@ -590,7 +590,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                         array('id' => $op_id, 'project_id' => $selected_project_id),
                         'status = 1');
                 } catch (\Throwable $t) {
-                    throw new Exception('تعذّر تجهيز الاستعلام');
+                    throw new Exception('تعذر تجهيز الاستعلام');
                 }
 
                 // سجل «تغيير حالة» عند التغيّر الفعلي فقط.
@@ -1307,7 +1307,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => '../main/dashboard.php', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include(__DIR__ . '/../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا معدّاتٍ موزَّعةً على ورديّاتِ هذا المشروعِ بعدُ', 'أضفْ أولَ تشغيلِ آليةٍ من شاشةِ «إدارة التشغيل» ثم عُدْ لمتابعةِ الوردياتِ هنا');
+    echo ems_states_bundle('لا معدات موزعة على ورديات هذا المشروع بعد', 'أضف أول تشغيل آلية من شاشة «إدارة التشغيل» ثم عد لمتابعة الورديات هنا');
     // TKT-15 · زر الإبلاغ السياقي الغني — التايم شيت والتشغيل اليومي (§2-①)
     require_once __DIR__ . '/../includes/report_button.php';
     require_once __DIR__ . '/../includes/permit_gate.php'; // لدالة موقع المشروع الافتراضي
@@ -1381,8 +1381,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <th>الحالة</th>
                                 <th>إجراء</th>
                                                 <!-- U10-B12: النواة الحاكمة (الخلايا يحشوها ui-unification.js) -->
-                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ السجل وبأي صفة">المُنشئ — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ السجل وبأي صفة">المنشئ — الاسم والصفة</th>
                     <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء">تاريخ الإنشاء</th>
                     <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="السجل الذي تولد عنه">المرجع الأب</th>
 </tr>
@@ -1410,7 +1410,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                     <td><?php echo htmlspecialchars($op['equipment_type_name'] ?? '-'); ?></td>
                                     <td>
                                         <?php if ($is_running && $can_edit): ?>
-                                            <select class="op_shift" aria-label="نظامُ ورديةِ الآلية" data-op="<?php echo $op_id; ?>">
+                                            <select class="op_shift" aria-label="نظام وردية الآلية" data-op="<?php echo $op_id; ?>">
                                                 <option value="D" <?php echo $shift === 'D' ? 'selected' : ''; ?>>نهاري</option>
                                                 <option value="N" <?php echo $shift === 'N' ? 'selected' : ''; ?>>ليلي</option>
                                                 <option value="B" <?php echo $shift === 'B' ? 'selected' : ''; ?>>نهاري + ليلي</option>
@@ -1647,18 +1647,18 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                           + '<td>' + actCell + '</td></tr>';
                 });
             }
-            /* ◆ `data-no-dt="hard"` هو **بابُ الخروجِ الصريح** الذي تعترف به
-                 `ui-unification.js`؛ و`no-datatable` وحدَه صار **استشاريًّا**
-                 (لا يمنع إلا مع تهيئةٍ يدويةٍ في الصفحة). ولولا التصريحُ
-                 لهُيِّئت DataTables على كلِّ جدولِ سائقين — بحثٌ وترقيمٌ وغلافٌ
-                 لجدولٍ من صفٍّ أو صفّين، وهو أصلُ الجمودِ حين كانت ٤٣٢ جدولًا. */
+            /* ◆ `data-no-dt="hard"` هو **باب الخروج الصريح** الذي تعترف به
+                 `ui-unification.js`؛ و`no-datatable` وحده صار **استشاريا**
+                 (لا يمنع إلا مع تهيئة يدوية في الصفحة). ولولا التصريح
+                 لهيئت DataTables على كل جدول سائقين — بحث وترقيم وغلاف
+                 لجدول من صف أو صفين، وهو أصل الجمود حين كانت ٤٣٢ جدولا. */
             slot.innerHTML = '<table class="sub-drivers-table no-datatable" data-no-dt="hard" data-ems-empty="off">'
                 + '<thead><tr><th>#</th><th>السائق</th><th>الهاتف</th><th>الوردية</th><th>الحالة</th><th>إجراء</th></tr></thead>'
                 + '<tbody>' + body + '</tbody></table>';
         });
     }
 
-    /** بناءُ نموذجِ «إضافةِ سائق» في مَربطِه — مرّةً واحدةً لكلِّ آلية عند أوّلِ فتح. */
+    /** بناء نموذج «إضافة سائق» في مربطه — مرة واحدة لكل آلية عند أول فتح. */
     function mvunBuildAddDriver(scope) {
         var tplEl = document.getElementById('mvunAddDriverTpl');
         if (!tplEl || !scope) { return; }
@@ -1670,8 +1670,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             var eq  = parseInt(slot.getAttribute('data-mvun-eq') || '0', 10);
             slot.innerHTML = raw.split('__FID__').join(fid);
             var form = slot.querySelector('form.add-driver-form');
-            /* الحدثُ يُربط في JS لا في `onsubmit`: النموذجُ نصٌّ في قالبٍ واحد،
-               ومعرِّفُ الآليةِ يأتي من المَربطِ لا من طباعةِ الخادمِ في كلِّ صفّ. */
+            /* الحدث يربط في JS لا في `onsubmit`: النموذج نص في قالب واحد،
+               ومعرف الآلية يأتي من المربط لا من طباعة الخادم في كل صف. */
             if (form) {
                 form.addEventListener('submit', function (e) { submitAddDriver(e, form, eq); });
             }
@@ -1683,7 +1683,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         var btn    = document.getElementById('toggle_btn_' + tableKey + '_' + opId);
         if (!subRow) return;
         var isOpen = !subRow.classList.contains('is-hidden');
-        if (!isOpen) {                       /* قبلَ الإظهارِ لا بعدَه */
+        if (!isOpen) {                       /* قبل الإظهار لا بعده */
             mvunBuildDriversTable(subRow);
             mvunBuildAddDriver(subRow);
             mvunFillDriverPicker(subRow);
@@ -1720,7 +1720,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     function setMaintenance(equipmentId, triggerBtn) {
-        if (!confirm('هل تريد تحويل هذه المعدة إلى وضع الصيانة؟ ستصبح «معطلة» ويُفتح أمر صيانة تلقائي.')) return;
+        if (!confirm('هل تريد تحويل هذه المعدة إلى وضع الصيانة؟ ستصبح «معطلة» ويفتح أمر صيانة تلقائي.')) return;
         if (triggerBtn) triggerBtn.disabled = true;
         var formData = new FormData();
         formData.append('action', 'set_equipment_maintenance');

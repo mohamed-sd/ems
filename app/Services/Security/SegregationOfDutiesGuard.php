@@ -47,7 +47,7 @@ class SegregationOfDutiesGuard
                     if ($c['compensating_control'] === null) { $blocked[] = $c; }
                 }
                 if (!$blocked) {
-                    $out['reason'] = 'تعارضٌ مسموحٌ استثناءً بموافقة التنفيذي ورقابةٍ تعويضيةٍ معلنة — ولا يُمنح صامتًا';
+                    $out['reason'] = 'تعارض مسموح استثناء بموافقة التنفيذي ورقابة تعويضية معلنة — ولا يمنح صامتا';
                     return $out; // ok=true مع عرض التعارضات للتوثيق
                 }
                 $out['conflicts'] = $blocked;
@@ -56,7 +56,7 @@ class SegregationOfDutiesGuard
             $out['code'] = 409;
             $names = array();
             foreach ($out['conflicts'] as $c) { $names[] = $c['name_ar']; }
-            $out['reason'] = '409 تعارض واجبات — ' . implode(' · ', $names) . ' — يُعرض ولا يُطبَّق';
+            $out['reason'] = '409 تعارض واجبات — ' . implode(' · ', $names) . ' — يعرض ولا يطبق';
         }
         return $out;
     }

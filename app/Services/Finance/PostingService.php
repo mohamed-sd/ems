@@ -102,7 +102,7 @@ class PostingService
             if (!empty($r['ok'])) { $out['moved']++; }
             else {
                 $out['failed']++;
-                $why = implode(' · ', (array) ($r['reasons'] ?? array('سببٌ غيرُ معلوم')));
+                $why = implode(' · ', (array) ($r['reasons'] ?? array('سبب غير معلوم')));
                 $out['reasons'][$why] = ($out['reasons'][$why] ?? 0) + 1;
             }
         }
@@ -141,7 +141,7 @@ class PostingService
                               WHERE id = " . (int) $e['id']);
             } else {
                 $out['failed']++;
-                $why = implode(' · ', (array) ($r['reasons'] ?? array('سببٌ غيرُ معلوم')));
+                $why = implode(' · ', (array) ($r['reasons'] ?? array('سبب غير معلوم')));
                 $out['reasons'][$why] = ($out['reasons'][$why] ?? 0) + 1;
             }
         }
@@ -196,29 +196,29 @@ class PostingService
 
         while ($e = $rs->fetch_assoc()) {
             /* عطالة: قيدٌ قائمٌ ⇒ لا يُكرَّر */
-            if (!empty($e['journal_entry_id'])) { $out['skipped']++; $note($out, 'له قيدٌ سلفًا'); continue; }
+            if (!empty($e['journal_entry_id'])) { $out['skipped']++; $note($out, 'له قيد سلفا'); continue; }
 
             $amount = (float) $e['amount'];
-            if ($amount <= 0) { $out['skipped']++; $note($out, 'مبلغٌ صفريٌّ أو سالب'); continue; }
+            if ($amount <= 0) { $out['skipped']++; $note($out, 'مبلغ صفري أو سالب'); continue; }
 
             $key = self::mapKey($e['event_type'], $e['unit'], $e['source_module']);
             if ($key === null) {
                 self::fail($gate, $conn, (int) $e['id'], $actor);
                 $out['failed']++;
-                $note($out, 'لا قاعدةَ ترحيلٍ لـ' . $e['event_type'] . '|' . ($e['unit'] ?: $e['source_module'] ?: '—'));
+                $note($out, 'لا قاعدة ترحيل ل' . $e['event_type'] . '|' . ($e['unit'] ?: $e['source_module'] ?: '—'));
                 continue;
             }
             $map = self::ACCOUNT_MAP[$key];
 
             $date = substr((string) $e['occurred_at'], 0, 10);
             if (!self::periodOpen($conn, $companyId, $date)) {
-                $out['skipped']++; $note($out, 'فترةٌ مغلقةٌ للترحيل'); continue;
+                $out['skipped']++; $note($out, 'فترة مغلقة للترحيل'); continue;
             }
             $dr = self::accountId($conn, $companyId, $map['debit']);
             $cr = self::accountId($conn, $companyId, $map['credit']);
             if (!$dr || !$cr) {
                 self::fail($gate, $conn, (int) $e['id'], $actor);
-                $out['failed']++; $note($out, 'حسابٌ غيرُ قابلٍ للترحيلِ أو غيرُ موجود');
+                $out['failed']++; $note($out, 'حساب غير قابل للترحيل أو غير موجود');
                 continue;
             }
 
@@ -235,13 +235,13 @@ class PostingService
                     'base_amount'  => $e['base_amount'] !== null ? (float) $e['base_amount'] : null,
                     'total_debit'  => $amt,
                     'total_credit' => $amt,
-                    'memo'         => 'ترحيلٌ آليٌّ من الواقعة ' . $e['event_no'],
+                    'memo'         => 'ترحيل آلي من الواقعة ' . $e['event_no'],
                     'state'        => 'posted',
                     'posted_by'    => (int) $actor ?: null,
                     'posted_at'    => date('Y-m-d H:i:s'),
                     'created_by'   => (int) $actor ?: null,
                 ));
-                if ($entryId <= 0) { throw new \RuntimeException('PostingService: فشل إدراجُ القيد'); }
+                if ($entryId <= 0) { throw new \RuntimeException('PostingService: فشل إدراج القيد'); }
                 $g->update('fin_journal_entries',
                     array('entry_no' => 'JV-' . str_pad((string) $entryId, 6, '0', STR_PAD_LEFT)),
                     array('id' => $entryId));
@@ -251,7 +251,7 @@ class PostingService
                               'contract_id' => $e['contract_id'] ?: null,
                               'counterparty_type' => 'client',
                               'counterparty_id' => $e['customer_entity_id'] ?: null,
-                              'memo' => 'ترحيلٌ آليٌّ من الواقعة ' . $e['event_no']);
+                              'memo' => 'ترحيل آلي من الواقعة ' . $e['event_no']);
                 $g->insert('fin_journal_lines', $base + array('account_id' => $dr, 'debit' => $amt, 'credit' => 0));
                 $g->insert('fin_journal_lines', $base + array('account_id' => $cr, 'debit' => 0, 'credit' => $amt));
             });
@@ -259,7 +259,7 @@ class PostingService
             $t = EventStateMachine::transition($gate, $conn, (int) $e['id'], 'Posted', $actor);
             if (empty($t['ok'])) {
                 $out['failed']++;
-                $note($out, 'القيدُ كُتب والحالةُ لم تنتقل: ' . implode(' · ', (array) ($t['reasons'] ?? array())));
+                $note($out, 'القيد كتب والحالة لم تنتقل: ' . implode(' · ', (array) ($t['reasons'] ?? array())));
                 continue;
             }
             $conn->query("UPDATE fin_financial_events
@@ -294,10 +294,10 @@ class PostingService
         if (!$rs) { return $out; }
         while ($e = $rs->fetch_assoc()) {
             $why = null;
-            if ((float) $e['amount'] <= 0)                                        { $why = 'مبلغٌ صفريٌّ أو سالب'; }
-            elseif (empty($e['occurred_at']))                                     { $why = 'بلا تاريخِ وقوعٍ — لا فترةَ لها'; }
-            elseif (self::mapKey($e['event_type'], $e['unit'], $e['source_module']) === null) { $why = 'ما زال بلا خريطةِ حساب'; }
-            elseif (!self::periodOpen($conn, $companyId, substr((string) $e['occurred_at'], 0, 10))) { $why = 'فترتُها ما زالت مغلقة'; }
+            if ((float) $e['amount'] <= 0)                                        { $why = 'مبلغ صفري أو سالب'; }
+            elseif (empty($e['occurred_at']))                                     { $why = 'بلا تاريخ وقوع — لا فترة لها'; }
+            elseif (self::mapKey($e['event_type'], $e['unit'], $e['source_module']) === null) { $why = 'ما زال بلا خريطة حساب'; }
+            elseif (!self::periodOpen($conn, $companyId, substr((string) $e['occurred_at'], 0, 10))) { $why = 'فترتها ما زالت مغلقة'; }
 
             if ($why !== null) {
                 $out['still_blocked']++;
@@ -308,7 +308,7 @@ class PostingService
             if (!empty($r['ok'])) { $out['requeued']++; }
             else {
                 $out['still_blocked']++;
-                $k = 'تعذّر الانتقال: ' . implode(' · ', (array) ($r['reasons'] ?? array()));
+                $k = 'تعذر الانتقال: ' . implode(' · ', (array) ($r['reasons'] ?? array()));
                 $out['reasons'][$k] = ($out['reasons'][$k] ?? 0) + 1;
             }
         }
@@ -337,7 +337,7 @@ class PostingService
         $eventId   = (int) $eventId;
         $reason    = trim((string) $reason);
         if ($reason === '') {
-            return array('ok' => false, 'code' => 422, 'reasons' => array('سببُ العكسِ إلزاميّ — لا عكسَ بلا سببٍ مكتوب'));
+            return array('ok' => false, 'code' => 422, 'reasons' => array('سبب العكس إلزامي — لا عكس بلا سبب مكتوب'));
         }
 
         $st = $conn->prepare("SELECT * FROM fin_financial_events WHERE id=? AND company_id=? LIMIT 1");
@@ -345,13 +345,13 @@ class PostingService
         $st->execute();
         $orig = $st->get_result()->fetch_assoc();
         $st->close();
-        if (!$orig) { return array('ok' => false, 'code' => 404, 'reasons' => array('الواقعةُ غيرُ موجودةٍ في كيانِك')); }
+        if (!$orig) { return array('ok' => false, 'code' => 404, 'reasons' => array('الواقعة غير موجودة في كيانك')); }
         if ((string) $orig['fes_status'] !== 'Posted') {
             return array('ok' => false, 'code' => 409,
-                         'reasons' => array('الواقعةُ في حالة «' . $orig['fes_status'] . '» — العكسُ الدفتريُّ للمُرحَّلِ وحدَه'));
+                         'reasons' => array('الواقعة في حالة «' . $orig['fes_status'] . '» — العكس الدفتري للمرحل وحده'));
         }
         if (empty($orig['journal_entry_id'])) {
-            return array('ok' => false, 'code' => 409, 'reasons' => array('واقعةٌ Posted بلا قيد — حالةٌ لا تُعكس بل تُصحَّح'));
+            return array('ok' => false, 'code' => 409, 'reasons' => array('واقعة Posted بلا قيد — حالة لا تعكس بل تصحح'));
         }
         /* ◆ ولا يُعكس عاكس: الواقعةُ المعوِّضةُ تُصيَّر Posted كي يصحَّ قيدُها،
            فتبدو صالحةً للعكس — وعكسُها يُنشئ سلسلةً بلا معنى (عكسُ عكسٍ لعكس)
@@ -360,13 +360,13 @@ class PostingService
            فمن أراد إلغاءَ عكسٍ فذاك تصحيحُ قيدٍ لا عكسٌ ثانٍ. */
         if (!empty($orig['reverses_event_id'])) {
             return array('ok' => false, 'code' => 409,
-                         'reasons' => array('هذه واقعةٌ معوِّضةٌ (تعكس #' . (int) $orig['reverses_event_id']
-                                          . ') — ولا يُعكس عاكس'));
+                         'reasons' => array('هذه واقعة معوضة (تعكس #' . (int) $orig['reverses_event_id']
+                                          . ') — ولا يعكس عاكس'));
         }
         $date = substr((string) $orig['occurred_at'], 0, 10);
         if (!self::periodOpen($conn, $companyId, $date)) {
             return array('ok' => false, 'code' => 409,
-                         'reasons' => array('فترةُ الأصلِ مغلقةٌ — العكسُ في فترةٍ مغلقةٍ قرارُ إقفالٍ لا قرارُ شاشة'));
+                         'reasons' => array('فترة الأصل مغلقة — العكس في فترة مغلقة قرار إقفال لا قرار شاشة'));
         }
 
         /* سطرا الأصلِ — منهما يُبنى العاكسُ بالتبادل */
@@ -374,17 +374,17 @@ class PostingService
                             WHERE entry_id = " . (int) $orig['journal_entry_id']);
         $lines = array();
         while ($rs && ($l = $rs->fetch_assoc())) { $lines[] = $l; }
-        if (count($lines) < 2) { return array('ok' => false, 'code' => 409, 'reasons' => array('قيدُ الأصلِ بأقلَّ من سطرين')); }
+        if (count($lines) < 2) { return array('ok' => false, 'code' => 409, 'reasons' => array('قيد الأصل بأقل من سطرين')); }
 
         /* ① الواقعةُ المعوِّضةُ — بالخدمةِ القائمةِ لا ببناءٍ جديد */
         require_once dirname(__DIR__) . '/CompensationService.php';
         try {
             $cmp = \App\Services\CompensationService::reverseEvent($conn, $eventId, $reason, (int) $actor);
         } catch (\Throwable $e) {
-            return array('ok' => false, 'code' => 500, 'reasons' => array('تعذّر إنشاءُ الواقعةِ المعوِّضة: ' . $e->getMessage()));
+            return array('ok' => false, 'code' => 500, 'reasons' => array('تعذر إنشاء الواقعة المعوضة: ' . $e->getMessage()));
         }
         $revEventId = (int) ($cmp['reversal_id'] ?? 0);
-        if ($revEventId <= 0) { return array('ok' => false, 'code' => 500, 'reasons' => array('الواقعةُ المعوِّضةُ لم تُنشأ')); }
+        if ($revEventId <= 0) { return array('ok' => false, 'code' => 500, 'reasons' => array('الواقعة المعوضة لم تنشأ')); }
         if (!empty($cmp['duplicate'])) {
             $q = $conn->query("SELECT journal_entry_id FROM fin_financial_events WHERE id=$revEventId");
             $j = $q ? (int) ($q->fetch_row()[0] ?? 0) : 0;
@@ -408,13 +408,13 @@ class PostingService
                 'currency'     => (string) $orig['currency'],
                 'total_debit'  => $amt,
                 'total_credit' => $amt,
-                'memo'         => 'عكسُ القيد #' . $orig['journal_entry_id'] . ' — ' . mb_substr($reason, 0, 120),
+                'memo'         => 'عكس القيد #' . $orig['journal_entry_id'] . ' — ' . mb_substr($reason, 0, 120),
                 'state'        => 'posted',
                 'posted_by'    => (int) $actor ?: null,
                 'posted_at'    => date('Y-m-d H:i:s'),
                 'created_by'   => (int) $actor ?: null,
             ));
-            if ($revEntryId <= 0) { throw new \RuntimeException('reversePosted: فشل إدراجُ القيدِ العاكس'); }
+            if ($revEntryId <= 0) { throw new \RuntimeException('reversePosted: فشل إدراج القيد العاكس'); }
             $g->update('fin_journal_entries',
                 array('entry_no' => 'RJV-' . str_pad((string) $revEntryId, 6, '0', STR_PAD_LEFT)),
                 array('id' => $revEntryId));
@@ -425,7 +425,7 @@ class PostingService
                     'account_id' => (int) $l['account_id'],
                     'debit'      => round((float) $l['credit'], 2),   // التبادل
                     'credit'     => round((float) $l['debit'], 2),
-                    'memo'       => 'عكسٌ آليٌّ للقيد #' . $orig['journal_entry_id'],
+                    'memo'       => 'عكس آلي للقيد #' . $orig['journal_entry_id'],
                 ));
             }
         });
@@ -438,7 +438,7 @@ class PostingService
         $t = EventStateMachine::transition($gate, $conn, $eventId, 'Reversed', $actor);
         if (empty($t['ok'])) {
             return array('ok' => false, 'code' => 500,
-                         'reasons' => array('القيدُ العاكسُ كُتب والأصلُ لم ينتقل: ' . implode(' · ', (array) ($t['reasons'] ?? array()))),
+                         'reasons' => array('القيد العاكس كتب والأصل لم ينتقل: ' . implode(' · ', (array) ($t['reasons'] ?? array()))),
                          'reversal_event_id' => $revEventId, 'reversal_entry_id' => $revEntryId);
         }
 

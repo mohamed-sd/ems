@@ -38,9 +38,9 @@ $__pcNew = ems_post_contract($conn, array(
         $o = intval($in['opportunity_id'] ?? 0);
         $s = trim((string) ($in['service_type'] ?? ''));
         $q = (float) ($in['qty'] ?? 0);
-        if ($o <= 0) { return array('ok' => false, 'msg' => 'لا احتياجَ بلا فرصةٍ أمّ (422)'); }
-        if (mb_strlen($s) < 3) { return array('ok' => false, 'msg' => 'نوعُ الخدمةِ إلزاميّ (422)'); }
-        if ($q <= 0) { return array('ok' => false, 'msg' => 'الكميةُ يجب أن تكون موجبة (422)'); }
+        if ($o <= 0) { return array('ok' => false, 'msg' => 'لا احتياج بلا فرصة أم (422)'); }
+        if (mb_strlen($s) < 3) { return array('ok' => false, 'msg' => 'نوع الخدمة إلزامي (422)'); }
+        if ($q <= 0) { return array('ok' => false, 'msg' => 'الكمية يجب أن تكون موجبة (422)'); }
         return array('ok' => true, 'data' => array(
             'opportunity_id' => $o, 'service_type' => $s, 'qty' => $q,
             'unit_type' => (string) ($in['unit_type'] ?? 'hour'),
@@ -66,7 +66,7 @@ $__pcSub = ems_post_contract($conn, array(
     'idem'    => array('id' => intval($_POST['submit_need'] ?? 0)),
     'validate' => function (array $in) {
         $id = intval($in['submit_need'] ?? 0);
-        if ($id <= 0) { return array('ok' => false, 'msg' => 'احتياجٌ غيرُ صالح (422)'); }
+        if ($id <= 0) { return array('ok' => false, 'msg' => 'احتياج غير صالح (422)'); }
         return array('ok' => true, 'data' => array('id' => $id));
     },
 ));
@@ -86,7 +86,7 @@ try {
         'columns' => array('id', 'opp_code', 'title', 'stage'),
         'whereRaw' => "`stage` NOT IN ('فوز','خسارة','مستبعدة')",
         'orderBy' => '`id` DESC', 'limit' => 100));
-} catch (\Throwable $e) { $queueFail = 'تعذّر قراءةُ السجل: ' . $e->getMessage(); }
+} catch (\Throwable $e) { $queueFail = 'تعذر قراءة السجل: ' . $e->getMessage(); }
 
 $page_title = 'احتياج العميل وطلب العرض';
 require_once __DIR__ . '/../includes/screen_contract.php';
@@ -103,15 +103,15 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
   <?php
   $header_icon = 'fa fa-clipboard-list';
   $header_title_html = htmlspecialchars('احتياج العميل وطلب العرض', ENT_QUOTES, 'UTF-8');
-  ob_start(); ?><span class="badge"><?= $queueFail === '' ? count($rows) : '—' ?> احتياجًا</span><?php
+  ob_start(); ?><span class="badge"><?= $queueFail === '' ? count($rows) : '—' ?> احتياجا</span><?php
   $header_actions = array(array('raw' => trim((string) ob_get_clean())));
   $header_back = false;
   include __DIR__ . '/../includes/page_header.php';
-  echo ems_states_bundle('لا احتياجَ مسجَّلٌ بعد',
-      'الاحتياجُ يُسجَّل على فرصةٍ مفتوحةٍ ثم يُرفع — وبه وحدَه يُتاح إصدارُ العرض');
+  echo ems_states_bundle('لا احتياج مسجل بعد',
+      'الاحتياج يسجل على فرصة مفتوحة ثم يرفع — وبه وحده يتاح إصدار العرض');
   ?>
-  <p class="text-muted">الورقة ٠٦ · سجلٌّ تابعٌ للفرصة —
-     <strong>لا يُصدَر عرضٌ قبلَ رفعِ الاحتياج</strong>؛ ووجودُ الأبِ لا يكفي.</p>
+  <p class="text-muted">الورقة ٠٦ · سجل تابع للفرصة —
+     <strong>لا يصدر عرض قبل رفع الاحتياج</strong>؛ ووجود الأب لا يكفي.</p>
   <?php if ($msg !== ''): ?>
     <div class="alert <?= (mb_strpos($msg, '✅') !== false ? 'alert-success' : 'alert-danger') ?>">
       <?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div>
@@ -124,7 +124,7 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
     <?php echo csrf_field(); ?>
     <div class="col-auto"><label class="form-label" for="cn_opp">الفرصة</label>
       <select class="form-control form-control-sm" name="opportunity_id" id="cn_opp" required>
-        <option value="">— فرصةٌ مفتوحة —</option>
+        <option value="">— فرصة مفتوحة —</option>
         <?php foreach ($opps as $o): ?>
           <option value="<?= (int) $o['id'] ?>"><?= htmlspecialchars((string) $o['opp_code'] . ' · ' . mb_substr((string) $o['title'], 0, 40), ENT_QUOTES, 'UTF-8') ?></option>
         <?php endforeach; ?>
@@ -137,9 +137,9 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
       <select class="form-control form-control-sm" name="unit_type" id="cn_unit">
         <option value="hour">ساعة</option><option value="ton">طن</option>
         <option value="meter">متر</option><option value="trip">رحلة</option></select></div>
-    <div class="col-auto"><label class="form-label" for="cn_dur">المدة (شهرًا)</label>
+    <div class="col-auto"><label class="form-label" for="cn_dur">المدة (شهرا)</label>
       <input class="form-control form-control-sm" type="number" min="0" name="duration_months" id="cn_dur"></div>
-    <div class="col-auto"><label class="form-label" for="cn_from">مطلوبٌ من</label>
+    <div class="col-auto"><label class="form-label" for="cn_from">مطلوب من</label>
       <input class="form-control form-control-sm" type="date" name="required_from" id="cn_from"></div>
     <div class="col-auto align-self-end">
       <button class="action-btn" type="submit" name="open_need" value="1"><i class="fa fa-plus"></i> تسجيل احتياج</button></div>
@@ -148,14 +148,14 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
   <table class="table table-striped" data-no-dt>
     <thead><tr>
       <th>الإجراء</th><th>رقم الاحتياج</th><th>الفرصة</th><th>نوع الخدمة</th><th>الكمية</th>
-      <th>المدة</th><th>مطلوبٌ من</th><th>الحالة</th><th>سجّله</th>
+      <th>المدة</th><th>مطلوب من</th><th>الحالة</th><th>سجله</th>
       <th class="ems-gov-th none" data-gov="entity" data-slice="1">الكيان</th>
       <th class="ems-gov-th none" data-gov="created_at" data-slice="1">تاريخ الإنشاء</th>
       <th class="ems-gov-th none" data-gov="idem_key" data-slice="2">مفتاح منع التكرار</th>
     </tr></thead>
     <tbody>
     <?php if (empty($rows)): ?>
-      <tr><td colspan="9" class="text-center text-muted">لا احتياجَ مسجَّلٌ بعد</td></tr>
+      <tr><td colspan="9" class="text-center text-muted">لا احتياج مسجل بعد</td></tr>
     <?php endif; ?>
     <?php foreach ($rows as $r): $id = (int) $r['id']; ?>
       <tr>

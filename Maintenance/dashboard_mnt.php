@@ -63,7 +63,7 @@ $cards = array(
     array('fa-screwdriver-wrench',    $orders_open,               'أوامر صيانة مفتوحة',       'or',                            '../Maintenance/orders.php'),
     array('fa-hourglass-end',         $orders_overdue,            'مفتوحة فوق 7 أيام',        $orders_overdue > 0 ? 'err' : 'ok', '../Maintenance/orders.php'),
     array('fa-calendar-check',        $pm_week,                   'وقائية مستحقة هذا الأسبوع', $pm_week > 0 ? 'or' : 'ok',     '../Maintenance/preventive_plans.php'),
-    array('fa-rotate-left',           $repeat_faults,             'أعطال متكررة (90 يومًا)',   $repeat_faults > 0 ? 'err' : 'ok', '../Maintenance/orders.php'),
+    array('fa-rotate-left',           $repeat_faults,             'أعطال متكررة (90 يوما)',   $repeat_faults > 0 ? 'err' : 'ok', '../Maintenance/orders.php'),
     array('fa-coins',                 number_format($cost_month, 0), 'تكلفة صيانة الشهر',      'or',                            '../Maintenance/orders.php'),
     array('fa-clipboard-list',        $insp_week,                 'فحوص آخر 7 أيام',          'ok',                            '../Maintenance/inspections.php'),
 );
@@ -86,8 +86,8 @@ for ($d = 6; $d >= 0; $d--) {
     $rb_pulse['out'][] = roleBoardScalar($rb_gate, array('scope' => array('o' => 'mnt_order')),
         "SELECT COUNT(*) FROM mnt_order o WHERE {TENANT_SCOPE} AND COALESCE(o.is_deleted,0)=0 AND o.state='إغلاق' AND DATE(o.closed_at)=?", array($day));
 }
-$rb_pulse_title  = 'نبض الأداء — أوامرُ أُنشئت مقابل أُغلقت (7 أيام)';
-$rb_pulse_series = array('أُنشئت', 'أُغلقت');
+$rb_pulse_title  = 'نبض الأداء — أوامر أنشئت مقابل أغلقت (7 أيام)';
+$rb_pulse_series = array('أنشئت', 'أغلقت');
 
 $page_title = 'إيكوبيشن | لوحة إدارة الصيانة';
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
@@ -104,9 +104,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => '../Maintenance/orders.php', 'class' => '', 'icon' => 'fas fa-screwdriver-wrench', 'label' => 'أوامر الصيانة');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا مؤشراتِ صيانةٍ لهذا اليوم في نطاقك', 'افتح أوامرَ الصيانةِ أو الخططَ الوقائيةَ لتسجيلِ أولِ حركةٍ تظهر هنا');
+    echo ems_states_bundle('لا مؤشرات صيانة لهذا اليوم في نطاقك', 'افتح أوامر الصيانة أو الخطط الوقائية لتسجيل أول حركة تظهر هنا');
     ?>
-    <p class="text-muted mnt-bd-intro"><i class="fas fa-mug-hot"></i> أسئلة أول اليوم: أي معدةٍ متوقفة؟ ما المفتوح فوق مدته؟ ما الوقائية المستحقة؟ — اضغط أي رقمٍ لفتح مصدره. (<?php echo $today; ?>)</p>
+    <p class="text-muted mnt-bd-intro"><i class="fas fa-mug-hot"></i> أسئلة أول اليوم: أي معدة متوقفة؟ ما المفتوح فوق مدته؟ ما الوقائية المستحقة؟ — اضغط أي رقم لفتح مصدره. (<?php echo $today; ?>)</p>
 
     <!-- ① مؤشرات اليوم -->
     <div class="mnt-bd-kpis">

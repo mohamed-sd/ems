@@ -47,10 +47,10 @@ if (isset($_GET['stop_doc'])) {
     if (!$can_edit) { ems_gov_flash_redirect('equipment_documents.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
     try {
         $doc_gate->softDelete('equipment_documents', intval($_GET['stop_doc']));
-        ems_gov_flash_redirect('equipment_documents.php', 'أُلغيت الوثيقة ✅', 'GOV-OK-200', '');
+        ems_gov_flash_redirect('equipment_documents.php', 'ألغيت الوثيقة ✅', 'GOV-OK-200', '');
     } catch (\Throwable $t) {
         error_log('equipment_documents stop: ' . $t->getMessage());
-        ems_gov_flash_redirect('equipment_documents.php', 'تعذّر الإلغاء ❌', 'GOV-FAIL-409', '');
+        ems_gov_flash_redirect('equipment_documents.php', 'تعذر الإلغاء ❌', 'GOV-FAIL-409', '');
     }
     exit();
 }
@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_doc'])) {
     $alertDays = max(0, min(365, intval($_POST['alert_days'] ?? 30)));
 
     $err = null;
-    if ($subjectId <= 0)  { $err = 'اختر المعدة أو المشغّل'; }
+    if ($subjectId <= 0)  { $err = 'اختر المعدة أو المشغل'; }
     elseif ($docType === '') { $err = 'اختر نوع الوثيقة'; }
     elseif ($expiry !== '' && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $expiry)) { $err = 'تاريخ الانتهاء غير صحيح'; }
     if ($err !== null) { ems_gov_flash_redirect('equipment_documents.php', "{$err} ❌", 'GOV-FAIL-409', ''); exit(); }
@@ -85,11 +85,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_doc'])) {
     );
     try {
         $doc_gate->insert('equipment_documents', $row);
-        ems_gov_flash_redirect('equipment_documents.php', 'أُضيفت الوثيقة ✅', 'GOV-OK-200', '');
+        ems_gov_flash_redirect('equipment_documents.php', 'أضيفت الوثيقة ✅', 'GOV-OK-200', '');
     } catch (\Throwable $t) {
         error_log('equipment_documents add: ' . $t->getMessage());
         $dup = (strpos($t->getMessage(), 'Duplicate') !== false);
-        ems_gov_flash_redirect('equipment_documents.php', $dup ? 'وثيقةٌ مكررة (نفس الصاحب والنوع والرقم) ❌' : 'تعذّرت الإضافة ❌', 'GOV-FAIL-409', '');
+        ems_gov_flash_redirect('equipment_documents.php', $dup ? 'وثيقة مكررة (نفس الصاحب والنوع والرقم) ❌' : 'تعذرت الإضافة ❌', 'GOV-FAIL-409', '');
     }
     exit();
 }
@@ -131,28 +131,28 @@ try {
         "SELECT em.id, em.name FROM employees em WHERE {TENANT_SCOPE} AND em.status = 1 ORDER BY em.name");
 } catch (\Throwable $t) { /* المصدر العام */ }
 
-$page_title = 'إيكوبيشن | وثائق المعدات والمشغّلين';
+$page_title = 'إيكوبيشن | وثائق المعدات والمشغلين';
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
 require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
-require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('equipment', 'الوثائقُ وصلاحيتُها');
+require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('equipment', 'الوثائق وصلاحيتها');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
 <div class="main eq-docs-main ems-unified-page-shell">
     <?php
-    $header_title = 'وثائق المعدات والمشغّلين';
+    $header_title = 'وثائق المعدات والمشغلين';
     $header_icon  = 'fa fa-file-shield';
     $header_actions = array();
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     if (function_exists('ems_states_bundle')) {
-        echo ems_states_bundle('لا وثيقةَ معدةٍ أو مشغّلٍ مسجَّلةً بعدُ',
-                               'أضف أولَ وثيقةٍ من بطاقةِ «وثيقة جديدة / تجديد» أعلاه بتاريخِ انتهائها ومهلةِ التنبيه');
+        echo ems_states_bundle('لا وثيقة معدة أو مشغل مسجلة بعد',
+                               'أضف أول وثيقة من بطاقة «وثيقة جديدة / تجديد» أعلاه بتاريخ انتهائها ومهلة التنبيه');
     }
     ?>
 
@@ -165,9 +165,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-body">
         <p class="eqdoc-lede">
             <i class="fas fa-circle-info"></i>
-            ملفُّ وثائقَ لكل معدةٍ ومشغّل — <strong>الانتهاءُ يُحسب من التاريخ لا من الحالة</strong>،
-            والتنبيهُ قبل الانتهاء بمهلة كلِّ وثيقة (alert_days). التجديدُ بإضافة وثيقةٍ جديدةٍ
-            بتاريخها الجديد — والقديمةُ تبقى تاريخًا.
+            ملف وثائق لكل معدة ومشغل — <strong>الانتهاء يحسب من التاريخ لا من الحالة</strong>،
+            والتنبيه قبل الانتهاء بمهلة كل وثيقة (alert_days). التجديد بإضافة وثيقة جديدة
+            بتاريخها الجديد — والقديمة تبقى تاريخا.
         </p>
         <div class="eqdoc-counts">
             <span class="badge badge-danger eqdoc-count">
@@ -204,8 +204,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             echo "<option value='" . intval($e['id']) . "'>" . htmlspecialchars(trim($e['code'] . ' ' . $e['name'])) . "</option>";
                         } ?>
                     </select>
-                    <select name="subject_id_operator" id="docSubjectOp" aria-label="اختيارُ المشغّلِ صاحبِ الوثيقة" class="is-hidden" disabled>
-                        <option value="">— اختر المشغّل —</option>
+                    <select name="subject_id_operator" id="docSubjectOp" aria-label="اختيار المشغل صاحب الوثيقة" class="is-hidden" disabled>
+                        <option value="">— اختر المشغل —</option>
                         <?php foreach ($operators as $o) {
                             echo "<option value='" . intval($o['id']) . "'>" . htmlspecialchars($o['name']) . "</option>";
                         } ?>
@@ -249,11 +249,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <table id="docsTable" class="display nowrap alltables eqdoc-table"
                    data-scroll-x="1" data-state-save="false" data-page-length="25" data-order='[]'>
                 <thead><tr>
-                    <th>الصاحب</th><th>نوع الوثيقة</th><th>رقم الوثيقة</th><th>الجهة المصدِرة</th>
+                    <th>الصاحب</th><th>نوع الوثيقة</th><th>رقم الوثيقة</th><th>الجهة المصدرة</th>
                     <th>تاريخ الانتهاء</th><th>الوضع الفعلي</th><th>الحالة</th>
                     <?php if ($can_edit) echo '<th>إجراء</th>'; ?>
                     <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
-                    <th class="ems-fn-th" data-fn="1">كود المعدة أو المشغّل</th>
+                    <th class="ems-fn-th" data-fn="1">كود المعدة أو المشغل</th>
                     <th class="ems-fn-th" data-fn="1">الرقم أو المرجع</th>
                     <th class="ems-fn-th" data-fn="1">تاريخ الإصدار</th>
                     <th class="ems-fn-th" data-fn="1">المدة المتبقية بالأيام</th>
@@ -262,12 +262,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <th class="ems-fn-th" data-fn="1">التنبيه قبل بالأيام</th>
                     <th class="ems-fn-th" data-fn="1">المسؤول</th>
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                     <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                     <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
                     <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                     </tr></thead>
                 <tbody>
@@ -302,7 +302,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </table>
         </div>
         <?php if (empty($docs)): ?>
-            <p class="eqdoc-empty"><i class="fas fa-circle-info"></i> لا وثائقَ بعد.</p>
+            <p class="eqdoc-empty"><i class="fas fa-circle-info"></i> لا وثائق بعد.</p>
         <?php endif; ?>
     </div></div>
 </div>

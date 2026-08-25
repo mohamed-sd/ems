@@ -18,7 +18,7 @@ if (isset($_GET['security']) && $_GET['security'] === '1') {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (super_admin_login_locked_out()) {
-        $error = 'تم قفل تسجيل الدخول مؤقتاً. حاول بعد 15 دقيقة.';
+        $error = 'تم قفل تسجيل الدخول مؤقتا. حاول بعد 15 دقيقة.';
         log_security_event('SUPER_ADMIN_LOGIN_LOCKED', 'Too many login attempts for admin portal');
     } elseif (!verify_csrf_token(isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '')) {
         $error = 'رمز الحماية غير صالح. أعد تحميل الصفحة.';
@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = mysqli_prepare($conn, 'SELECT id, name, email, password, is_active, last_login_at FROM super_admins WHERE email = ? LIMIT 1');
 
             if (!$stmt) {
-                $error = 'تعذر تنفيذ عملية تسجيل الدخول حالياً.';
+                $error = 'تعذر تنفيذ عملية تسجيل الدخول حاليا.';
             } else {
                 mysqli_stmt_bind_param($stmt, 's', $email);
                 mysqli_stmt_execute($stmt);
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $error = super_admin_login_error();
                     log_security_event('SUPER_ADMIN_LOGIN_FAIL', 'Failed login for admin email: ' . substr($email, 0, 80));
                 } elseif (intval($admin['is_active']) !== 1) {
-                    $error = 'هذا الحساب موقوف حالياً.';
+                    $error = 'هذا الحساب موقوف حاليا.';
                     log_security_event('SUPER_ADMIN_LOGIN_DISABLED', 'Disabled admin tried to login: ' . substr($email, 0, 80));
                 } else {
                     // [مُستثنى بنيويًا — مصادقة قبل-الجلسة] ختم آخر دخولٍ يجري لحظةَ نجاح

@@ -96,7 +96,7 @@ class EventStateMachine
         $eventId = intval($eventId);
         if (!in_array($to, self::STATES, true)) {
             return array('ok' => false, 'code' => 422, 'from' => '', 'to' => $to, 'version' => 0,
-                'reasons' => array('حالةٌ خارج قائمة FES الأربعَ عشرة: ' . $to));
+                'reasons' => array('حالة خارج قائمة FES الأربع عشرة: ' . $to));
         }
         $row = $gate->selectOne('fin_financial_events', array(
             'columns' => array('id', 'fes_status', 'event_version'),
@@ -110,7 +110,7 @@ class EventStateMachine
 
         if (!self::canTransition($from, $to)) {
             return array('ok' => false, 'code' => 409, 'from' => $from, 'to' => $to, 'version' => $ver,
-                'reasons' => array("الانتقالُ {$from} → {$to} خارجَ قائمة السماح (FES §7.2)"));
+                'reasons' => array("الانتقال {$from} → {$to} خارج قائمة السماح (FES §7.2)"));
         }
 
         $fields = array(
@@ -139,7 +139,7 @@ class EventStateMachine
 
         if (intval($affected) < 1) {
             return array('ok' => false, 'code' => 409, 'from' => $from, 'to' => $to, 'version' => $ver,
-                'reasons' => array('تعارضُ تزامن: نسخةُ الحدث تغيّرت تحت يدك — أعد القراءة ثم أعد المحاولة'));
+                'reasons' => array('تعارض تزامن: نسخة الحدث تغيرت تحت يدك — أعد القراءة ثم أعد المحاولة'));
         }
         return array('ok' => true, 'code' => 200, 'from' => $from, 'to' => $to,
             'version' => $ver + 1, 'reasons' => array());
@@ -156,7 +156,7 @@ class EventStateMachine
     {
         if (!isset(self::FROM_LEGACY[$legacyState])) {
             return array('ok' => false, 'code' => 422, 'from' => '', 'to' => '', 'version' => 0,
-                'reasons' => array('حالةٌ قديمةٌ لا مقابلَ لها: ' . $legacyState));
+                'reasons' => array('حالة قديمة لا مقابل لها: ' . $legacyState));
         }
         return self::syncTo($gate, $conn, $eventId, self::FROM_LEGACY[$legacyState], $actor);
     }
@@ -207,7 +207,7 @@ class EventStateMachine
         $steps = isset($paths[$target][$cur]) ? $paths[$target][$cur] : null;
         if ($steps === null) {
             return array('ok' => false, 'code' => 409, 'from' => $cur, 'to' => $target, 'version' => 0,
-                'reasons' => array("لا طريقَ مزامنةٍ من {$cur} إلى {$target}"));
+                'reasons' => array("لا طريق مزامنة من {$cur} إلى {$target}"));
         }
         $last = array('ok' => true, 'code' => 200, 'from' => $cur, 'to' => $target, 'version' => 0, 'reasons' => array());
         foreach ($steps as $step) {

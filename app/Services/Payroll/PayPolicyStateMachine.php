@@ -108,16 +108,16 @@ class PayPolicyStateMachine
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'superseded' => array());
         $p = self::policyOf($gate, (int) $policyId);
-        if (!$p) { $out['code'] = 404; $out['reason'] = 'السياسةُ غيرُ موجودةٍ في نطاقك'; return $out; }
+        if (!$p) { $out['code'] = 404; $out['reason'] = 'السياسة غير موجودة في نطاقك'; return $out; }
 
         $from = (string) $p['policy_state'];
         if ($from === self::ACTIVE) {
-            $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'السياسةُ نافذةٌ سلفًا'; return $out;
+            $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'السياسة نافذة سلفا'; return $out;
         }
         if (!self::canTransition($from, self::ACTIVE)) {
             $out['code'] = ($from === self::EXPIRED) ? 423 : 422;
-            $out['reason'] = 'لا تفعيلَ من «' . self::labelAr($from) . '»'
-                . ($from === self::EXPIRED ? ' — نهائيةٌ بلا رجوع؛ **سياسةٌ جديدةٌ بسريانٍ جديد**' : '');
+            $out['reason'] = 'لا تفعيل من «' . self::labelAr($from) . '»'
+                . ($from === self::EXPIRED ? ' — نهائية بلا رجوع؛ **سياسة جديدة بسريان جديد**' : '');
             return $out;
         }
 
@@ -125,32 +125,32 @@ class PayPolicyStateMachine
         $from_ = $p['effective_from'] !== null ? (string) $p['effective_from'] : '';
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $from_)) {
             $out['code'] = 422;
-            $out['reason'] = '**تاريخُ السريان إلزاميٌّ للتفعيل** — «Active بسريانٍ UQ» (§8.2): '
-                           . 'وبلا تاريخٍ لا يُعرف أيُّ ماضٍ تحكمه ولا ما تُخلِفه';
+            $out['reason'] = '**تاريخ السريان إلزامي للتفعيل** — «Active بسريان UQ» (§8.2): '
+                           . 'وبلا تاريخ لا يعرف أي ماض تحكمه ولا ما تخلفه';
             return $out;
         }
         if ($p['effective_to'] !== null && (string) $p['effective_to'] < $from_) {
-            $out['code'] = 422; $out['reason'] = 'نهايةُ السريان قبل بدايته'; return $out;
+            $out['code'] = 422; $out['reason'] = 'نهاية السريان قبل بدايته'; return $out;
         }
         // صفُّ سياسة الأجر يلزمه معدلٌ وعملة — وصفُّ حكم الساعة يحكمه `ruling`
         if ((string) $p['party_scope'] === 'operator') {
             if ($p['rate'] === null || (float) $p['rate'] <= 0) {
                 $out['code'] = 422;
-                $out['reason'] = '**معدلُ الاستحقاق موجبٌ إلزامي** — سياسةٌ بلا معدلٍ لا تسعّر شيئًا';
+                $out['reason'] = '**معدل الاستحقاق موجب إلزامي** — سياسة بلا معدل لا تسعر شيئا';
                 return $out;
             }
             if ($p['currency'] === null || trim((string) $p['currency']) === '') {
-                $out['code'] = 422; $out['reason'] = '**العملةُ إلزامية** — ولا جمعَ عملتين'; return $out;
+                $out['code'] = 422; $out['reason'] = '**العملة إلزامية** — ولا جمع عملتين'; return $out;
             }
             if (!in_array((string) $p['pay_basis'], self::BASES, true)) {
                 $out['code'] = 422;
-                $out['reason'] = 'أساسُ الاستحقاق خارج السبعة (§8.2): ' . (string) $p['pay_basis'];
+                $out['reason'] = 'أساس الاستحقاق خارج السبعة (§8.2): ' . (string) $p['pay_basis'];
                 return $out;
             }
         }
         if ($p['min_amount'] !== null && $p['max_amount'] !== null
             && (float) $p['min_amount'] > (float) $p['max_amount']) {
-            $out['code'] = 422; $out['reason'] = 'الحدُّ الأدنى يتجاوز الأقصى'; return $out;
+            $out['code'] = 422; $out['reason'] = 'الحد الأدنى يتجاوز الأقصى'; return $out;
         }
 
         // ── من تُخلِفهم: النافذاتُ بالمفتاح نفسِه المتداخلُ سريانُها ────────
@@ -158,8 +158,8 @@ class PayPolicyStateMachine
         foreach ($peers as $q) {
             if ((string) $q['effective_from'] === $from_) {
                 $out['code'] = 409;
-                $out['reason'] = 'سياسةٌ نافذةٌ #' . (int) $q['id'] . ' **بالسريان نفسِه** — '
-                               . 'الجديدُ بسريانٍ جديدٍ لا بسريانٍ مكرر';
+                $out['reason'] = 'سياسة نافذة #' . (int) $q['id'] . ' **بالسريان نفسه** — '
+                               . 'الجديد بسريان جديد لا بسريان مكرر';
                 return $out;
             }
         }
@@ -177,7 +177,7 @@ class PayPolicyStateMachine
                         'superseded_by'    => (int) $p['id'],
                         'state_changed_at' => date('Y-m-d H:i:s'),
                         'state_changed_by' => (int) $actor ?: null,
-                        'state_note'       => mb_substr('أخلفتها السياسةُ #' . (int) $p['id']
+                        'state_note'       => mb_substr('أخلفتها السياسة #' . (int) $p['id']
                                               . ' بسريان ' . $from_, 0, 200),
                     );
                     // الإغلاقُ عند **سريان الجديدة − يوم**: ما قبله يبقى بحكمها
@@ -192,13 +192,13 @@ class PayPolicyStateMachine
                     'state_changed_at' => date('Y-m-d H:i:s'),
                     'state_changed_by' => (int) $actor ?: null,
                     'state_note'       => mb_substr(trim((string) $note) !== '' ? (string) $note
-                                          : 'تفعيلٌ بسريان ' . $from_, 0, 200),
+                                          : 'تفعيل بسريان ' . $from_, 0, 200),
                     'approved_at'      => date('Y-m-d H:i:s'),
                     'approved_by'      => (int) $actor ?: null,
                 ), array('id' => (int) $p['id']));
             }, 'تفعيل سياسة أجر ' . (int) $p['id']);
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر التفعيل: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر التفعيل: ' . $t->getMessage(); return $out;
         }
 
         self::audit($conn, $companyId, $actor, 'activate', (int) $p['id'],
@@ -217,21 +217,21 @@ class PayPolicyStateMachine
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '');
         $p = self::policyOf($gate, (int) $policyId);
-        if (!$p) { $out['code'] = 404; $out['reason'] = 'السياسةُ غيرُ موجودةٍ في نطاقك'; return $out; }
+        if (!$p) { $out['code'] = 404; $out['reason'] = 'السياسة غير موجودة في نطاقك'; return $out; }
 
         $from = (string) $p['policy_state'];
         if ($from === self::EXPIRED) {
-            $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'منتهيةٌ سلفًا'; return $out;
+            $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'منتهية سلفا'; return $out;
         }
         if (!self::canTransition($from, self::EXPIRED)) {
             $out['code'] = 422;
-            $out['reason'] = 'لا إنهاءَ من «' . self::labelAr($from) . '» — والمسودةُ لم تحيَ لتنتهي';
+            $out['reason'] = 'لا إنهاء من «' . self::labelAr($from) . '» — والمسودة لم تحي لتنتهي';
             return $out;
         }
         $why = trim((string) $reason);
         if ($why === '') {
             $out['code'] = 422;
-            $out['reason'] = '**سببُ الإنهاء إلزامي** — وإنهاءٌ بلا سببٍ يترك حسابًا لا يُفسَّر';
+            $out['reason'] = '**سبب الإنهاء إلزامي** — وإنهاء بلا سبب يترك حسابا لا يفسر';
             return $out;
         }
         $day = ($asOf !== null && preg_match('/^\d{4}-\d{2}-\d{2}$/', (string) $asOf))
@@ -253,7 +253,7 @@ class PayPolicyStateMachine
         try {
             $gate->update('contract_hour_policies', $upd, array('id' => (int) $policyId));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الإنهاء: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الإنهاء: ' . $t->getMessage(); return $out;
         }
         self::audit($conn, $companyId, $actor, 'expire', (int) $policyId,
             array('policy_state' => $from), array('policy_state' => self::EXPIRED, 'reason' => $why));
@@ -282,8 +282,8 @@ class PayPolicyStateMachine
                 $gate->update('contract_hour_policies', array(
                     'policy_state'     => self::EXPIRED,
                     'state_changed_at' => date('Y-m-d H:i:s'),
-                    'state_note'       => 'انقضى سريانُها في ' . (string) $r['effective_to']
-                                          . ' — تصريحٌ بما وقع لا قرارٌ جديد',
+                    'state_note'       => 'انقضى سريانها في ' . (string) $r['effective_to']
+                                          . ' — تصريح بما وقع لا قرار جديد',
                 ), array('id' => (int) $r['id']));
                 $n++;
             } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'E-24 sweepExpired #'); error_log('E-24 sweepExpired #' . $r['id'] . ': ' . $t->getMessage()); }
@@ -295,11 +295,11 @@ class PayPolicyStateMachine
     public static function guardEdit($gate, $policyId)
     {
         $p = self::policyOf($gate, (int) $policyId);
-        if (!$p) { return array('ok' => false, 'code' => 404, 'reason' => 'السياسةُ غيرُ موجودة'); }
+        if (!$p) { return array('ok' => false, 'code' => 404, 'reason' => 'السياسة غير موجودة'); }
         if (!self::isEditable((string) $p['policy_state'])) {
             return array('ok' => false, 'code' => 423,
-                'reason' => 'السياسةُ «' . self::labelAr((string) $p['policy_state'])
-                    . '» — **لا تعديلَ رجعيًّا** (§8.2): أنشئ سياسةً جديدةً بسريانٍ جديدٍ تُخلِفها');
+                'reason' => 'السياسة «' . self::labelAr((string) $p['policy_state'])
+                    . '» — **لا تعديل رجعيا** (§8.2): أنشئ سياسة جديدة بسريان جديد تخلفها');
         }
         return array('ok' => true, 'code' => 200, 'reason' => '');
     }

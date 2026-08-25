@@ -82,7 +82,7 @@ if (isset($_GET['delete_id'])) {
         trs_gate(false)->softDelete('trs_locations', $delete_id);
     } catch (\App\Core\TenantGateException $e) {
         error_log('trs_locations softDelete refused: ' . $e->getMessage());
-        ems_gov_flash_redirect('trs_locations_config.php', 'تعذّر الحذف ❌', 'GOV-FAIL-409', ''); exit();
+        ems_gov_flash_redirect('trs_locations_config.php', 'تعذر الحذف ❌', 'GOV-FAIL-409', ''); exit();
     }
     ems_gov_flash_redirect('trs_locations_config.php', 'تم حذف الموقع بنجاح ✅', 'GOV-OK-200', ''); exit();
 }
@@ -113,7 +113,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا مواقعَ ترحيلٍ معرَّفةً بعدُ', 'عرِّف أولَ موقعٍ بزرِّ «إضافة موقع» في رأسِ الشاشة');
+    echo ems_states_bundle('لا مواقع ترحيل معرفة بعد', 'عرف أول موقع بزر «إضافة موقع» في رأس الشاشة');
     ?>
 
     <?php trs_msg_banner(); ?>
@@ -145,8 +145,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>مفعّل؟</label>
-                        <label class="switch-inline"><input type="checkbox" name="active" id="l_active" aria-label="تفعيلُ الموقع" value="1" checked> نعم، مفعّل</label>
+                        <label>مفعل؟</label>
+                        <label class="switch-inline"><input type="checkbox" name="active" id="l_active" aria-label="تفعيل الموقع" value="1" checked> نعم، مفعل</label>
                     </div>
                 </div>
             </div>
@@ -166,7 +166,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="filter-body">
             <div class="filter-field">
                 <label><i class="fa fa-map"></i> نوع الموقع</label>
-                <select id="filterType" aria-label="تصفيةُ المواقعِ بالنوع" class="form-control">
+                <select id="filterType" aria-label="تصفية المواقع بالنوع" class="form-control">
                     <option value="">-- كل الأنواع --</option>
                 </select>
             </div>
@@ -183,10 +183,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <thead><tr>
                     <th>الإجراءات</th><th>الكود</th><th>الاسم</th><th>النوع</th><th>المشروع</th><th>الحالة</th>
                     <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                     <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                     <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                     <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -234,7 +234,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         echo "<td>" . htmlspecialchars((string)$row['name']) . "</td>";
                         echo "<td>" . htmlspecialchars($type_ar) . "</td>";
                         echo "<td>" . htmlspecialchars((string)($row['project_name'] ?? '—')) . "</td>";
-                        echo "<td>" . ((int)$row['active'] === 1 ? "<span class='action-btn trs-lc-on'>مفعّل</span>" : "<span class='action-btn trs-lc-off'>معطّل</span>") . "</td>";
+                        echo "<td>" . ((int)$row['active'] === 1 ? "<span class='action-btn trs-lc-on'>مفعل</span>" : "<span class='action-btn trs-lc-off'>معطل</span>") . "</td>";
                         echo "</tr>";
                     } }
                     ?>

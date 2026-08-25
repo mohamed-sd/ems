@@ -42,13 +42,13 @@ class TransferTariffService
         $day = ($onDate !== null && preg_match('/^\d{4}-\d{2}-\d{2}$/', (string) $onDate))
                ? (string) $onDate : self::deliveredOn($order);
         if ($day === '') {
-            $out['code'] = 422; $out['reason'] = 'لا تاريخَ تسليمٍ للأمر — والتعرفةُ تُقرأ بتاريخها'; return $out;
+            $out['code'] = 422; $out['reason'] = 'لا تاريخ تسليم للأمر — والتعرفة تقرأ بتاريخها'; return $out;
         }
         $supplier = isset($order['charge_supplier_id']) && $order['charge_supplier_id'] !== null
                     ? (int) $order['charge_supplier_id'] : 0;
         if ($supplier <= 0) {
             $out['code'] = 422;
-            $out['reason'] = 'الأمرُ بلا موردٍ محمَّل — «على من يُحمَّل» يُكتب قبل التسعير';
+            $out['reason'] = 'الأمر بلا مورد محمل — «على من يحمل» يكتب قبل التسعير';
             return $out;
         }
 
@@ -68,15 +68,15 @@ class TransferTariffService
                       (int) $order['transfer_type_id'],
                       (int) $order['from_location_id'], (int) $order['to_location_id']));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّرت قراءةُ التعرفات: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذرت قراءة التعرفات: ' . $t->getMessage(); return $out;
         }
         $out['candidates'] = count($rows);
         if (!$rows) {
             $out['code'] = 422;
-            $out['reason'] = '**لا تعرفةَ مكتوبةً منطبقة** على هذا الأمر في ' . $day
+            $out['reason'] = '**لا تعرفة مكتوبة منطبقة** على هذا الأمر في ' . $day
                 . ' (مورد ' . $supplier . ' · نوع ' . (int) $order['transfer_type_id']
                 . ' · مسار ' . (int) $order['from_location_id'] . '←' . (int) $order['to_location_id']
-                . ') — ولا يُخترع سعر';
+                . ') — ولا يخترع سعر';
             return $out;
         }
 
@@ -115,8 +115,8 @@ class TransferTariffService
             case 'per_km':
                 if ($order['distance_km'] === null || (float) $order['distance_km'] <= 0) {
                     $out['code'] = 422;
-                    $out['reason'] = 'تعرفةٌ **بالكيلومتر** وأمرٌ **بلا مسافةٍ مكتوبة** — '
-                                   . 'اكتب `distance_km` أو اختر تعرفةً أخرى؛ ولا تُقدَّر مسافة';
+                    $out['reason'] = 'تعرفة **بالكيلومتر** وأمر **بلا مسافة مكتوبة** — '
+                                   . 'اكتب `distance_km` أو اختر تعرفة أخرى؛ ولا تقدر مسافة';
                     return $out;
                 }
                 $qty = round((float) $order['distance_km'], 2);
@@ -125,7 +125,7 @@ class TransferTariffService
                 $qty = self::qtyOfLines($gate, (int) $order['id'], 'material');
                 if ($qty <= 0) {
                     $out['code'] = 422;
-                    $out['reason'] = 'تعرفةٌ **بالطن** والأمرُ بلا بنودِ موادَّ بكمياتها — لا كميةَ تُسعَّر';
+                    $out['reason'] = 'تعرفة **بالطن** والأمر بلا بنود مواد بكمياتها — لا كمية تسعر';
                     return $out;
                 }
                 break;
@@ -133,12 +133,12 @@ class TransferTariffService
                 $qty = self::qtyOfLines($gate, (int) $order['id'], 'equipment');
                 if ($qty <= 0) {
                     $out['code'] = 422;
-                    $out['reason'] = 'تعرفةٌ **بالمعدة** والأمرُ بلا بندِ معدةٍ واحد';
+                    $out['reason'] = 'تعرفة **بالمعدة** والأمر بلا بند معدة واحد';
                     return $out;
                 }
                 break;
             default:
-                $out['code'] = 422; $out['reason'] = 'نموذجُ تسعيرٍ غير معروف: ' . $model; return $out;
+                $out['code'] = 422; $out['reason'] = 'نموذج تسعير غير معروف: ' . $model; return $out;
         }
 
         $amount = round($qty * (float) $tariff['rate'], 2);
@@ -154,7 +154,7 @@ class TransferTariffService
               . ': ' . $qty . ' × ' . rtrim(rtrim(number_format((float) $tariff['rate'], 4, '.', ''), '0'), '.')
               . ' = ' . $raw;
         if ($out['clamped'] !== null) {
-            $note .= ' · **قُصّ بالحدّ ال' . ($out['clamped'] === 'min' ? 'أدنى' : 'أقصى')
+            $note .= ' · **قص بالحد ال' . ($out['clamped'] === 'min' ? 'أدنى' : 'أقصى')
                    . '** إلى ' . $amount;
         }
         $out['ok'] = true; $out['code'] = 200; $out['amount'] = $amount;
@@ -171,13 +171,13 @@ class TransferTariffService
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'amount' => 0.0,
                      'tariff_id' => null, 'note' => '');
         $o = self::orderOf($gate, (int) $orderId);
-        if (!$o) { $out['code'] = 404; $out['reason'] = 'أمرُ الترحيل غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!$o) { $out['code'] = 404; $out['reason'] = 'أمر الترحيل غير موجود في نطاقك'; return $out; }
 
         // ② المسلَّمُ وحدَه يُسعَّر
         if (!in_array((string) $o['stage'], self::DELIVERED_STAGES, true)) {
             $out['code'] = 423;
-            $out['reason'] = 'الأمرُ في مرحلة «' . $o['stage'] . '» — و«أمرُ الترحيل **المسلَّم**» '
-                           . '(ENT-02 §3-④): وأمرٌ لم يصل ليس مستندَ تحميل';
+            $out['reason'] = 'الأمر في مرحلة «' . $o['stage'] . '» — و«أمر الترحيل **المسلم**» '
+                           . '(ENT-02 §3-④): وأمر لم يصل ليس مستند تحميل';
             return $out;
         }
         // ④ ولا يُسعَّر مرتين
@@ -186,8 +186,8 @@ class TransferTariffService
             $out['code'] = 409;
             $out['amount'] = round((float) $o['tariff_amount'], 2);
             $out['tariff_id'] = $o['tariff_id'] !== null ? (int) $o['tariff_id'] : null;
-            $out['reason'] = 'الأمرُ مسعَّرٌ سلفًا بـ' . $out['amount'] . ' ' . (string) $o['tariff_currency']
-                           . ' (تعرفة #' . (int) $o['tariff_id'] . ') — وإعادةُ التسعير تلزمها **حجّةٌ مكتوبة**';
+            $out['reason'] = 'الأمر مسعر سلفا ب' . $out['amount'] . ' ' . (string) $o['tariff_currency']
+                           . ' (تعرفة #' . (int) $o['tariff_id'] . ') — وإعادة التسعير تلزمها **حجة مكتوبة**';
             return $out;
         }
 
@@ -197,7 +197,7 @@ class TransferTariffService
         if (!$calc['ok']) { return array_merge($out, array('code' => $calc['code'], 'reason' => $calc['reason'])); }
 
         $note = $calc['note'];
-        if ($reason !== '') { $note .= ' · **أُعيد التسعيرُ**: ' . mb_substr($reason, 0, 90); }
+        if ($reason !== '') { $note .= ' · **أعيد التسعير**: ' . mb_substr($reason, 0, 90); }
 
         try {
             $gate->update('transfer_orders', array(
@@ -209,7 +209,7 @@ class TransferTariffService
                 'priced_by'       => (int) $actor ?: null,
             ), array('id' => (int) $orderId));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر التسعير: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر التسعير: ' . $t->getMessage(); return $out;
         }
 
         self::audit($conn, $companyId, $actor, 'price', (int) $orderId,

@@ -6,7 +6,7 @@
 require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user']) || intval($_SESSION['user']['role']) !== -1) {
-    die('<p style="font-family:Arial;color:red">هذا الملف للمديرين فقط (Super Admin). سجّل دخولك كمدير أولاً.</p>');
+    die('<p style="font-family:Arial;color:red">هذا الملف للمديرين فقط (Super Admin). سجل دخولك كمدير أولا.</p>');
 }
 require_once '../config.php';
 
@@ -34,7 +34,7 @@ $createSQL = "CREATE TABLE IF NOT EXISTS `report_role_permissions` (
 
 $r = ems_runtime_ddl($conn, $createSQL, 'emsreports/setup_permissions.php');
 $msgs = [];
-$msgs[] = $r ? '✅ الجدول جاهز (أُنشئ أو كان موجوداً)' : '❌ خطأ في إنشاء الجدول: ' . mysqli_error($conn);
+$msgs[] = $r ? '✅ الجدول جاهز (أنشئ أو كان موجودا)' : '❌ خطأ في إنشاء الجدول: ' . mysqli_error($conn);
 
 // البذر عبر البوابة العابرة (السكربت محروسٌ بالسوبر أعلاه؛ الجدول مرجعيٌّ عالمي T_GLOBAL —
 // كتابته مسموحة للسوبر/العابرة بعقد هـ-0). INSERT IGNORE تُكافَأ بفحصٍ-ثم-إدراج.
@@ -68,7 +68,7 @@ h2{color:#0c1c3e;margin-top:0}li{padding:6px 0;font-size:.95rem}
     <ul>
     <?php foreach ($msgs as $m) echo "<li>$m</li>"; ?>
     </ul>
-    <p style="color:#64748b;font-size:.85rem">تم منح جميع الأدوار وصولاً كاملاً لكل التقارير. يمكنك تعديل ذلك لاحقاً من صفحة إدارة الصلاحيات.</p>
+    <p style="color:#64748b;font-size:.85rem">تم منح جميع الأدوار وصولا كاملا لكل التقارير. يمكنك تعديل ذلك لاحقا من صفحة إدارة الصلاحيات.</p>
     <a class="back" href="index.php">← العودة لقائمة التقارير</a>
 </div>
 </body></html>

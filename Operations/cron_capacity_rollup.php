@@ -32,12 +32,12 @@ if (isset($args['dry-run'])) {
           AND EXISTS (SELECT 1 FROM op_containers x WHERE x.parent_id = p.id AND x.is_deleted = 0)
         GROUP BY p.id, p.allocated_qty
         HAVING ABS(p.allocated_qty - COALESCE(SUM(c.cap_qty), 0)) >= 0.005) d");
-    echo 'آباءٌ منحرفون: ' . ($r ? $r->fetch_row()[0] : '?') . " (قياسٌ بلا كتابة)\n";
+    echo 'آباء منحرفون: ' . ($r ? $r->fetch_row()[0] : '?') . " (قياس بلا كتابة)\n";
     exit(0);
 }
 
 $res = CR::recompute($conn, $co);
 printf("[capacity-rollup %s] measured=%d drifted=%d fixed=%d blocked=%d\n",
     date('Y-m-d H:i:s'), $res['measured'], $res['drifted'], $res['fixed'], count($res['blocked']));
-foreach ($res['blocked'] as $b) { echo "  ⚠ يتجاوز السعةَ فلم يُشتق: $b\n"; }
+foreach ($res['blocked'] as $b) { echo "  ⚠ يتجاوز السعة فلم يشتق: $b\n"; }
 exit(count($res['blocked']) ? 1 : 0);

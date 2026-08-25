@@ -537,12 +537,12 @@ $fmtH = function ($h) { return rtrim(rtrim(number_format((float) $h, 1, '.', '')
 //   نسبة الإنجاز (المنفّذ التراكمي ÷ المتفق عليه) بشريط تقدّم ملوّن.
 //   ملاحظة: النسبة تقارن المنفّذ بإجمالي العقد، لذا تُحسب على الإجمالي التراكمي بصرف النظر عن فلتر الفترة.
 $contractBadge = function ($contracted, $doneHours) use ($fmtH) {
-    if ($contracted <= 0) return '<span class="b hrs" title="لا توجد ساعات تعاقدية مسجّلة"><i class="fas fa-file-contract"></i> العقد —</span>';
+    if ($contracted <= 0) return '<span class="b hrs" title="لا توجد ساعات تعاقدية مسجلة"><i class="fas fa-file-contract"></i> العقد —</span>';
     $pct  = ($doneHours / $contracted) * 100;
     $color = $pct >= 90 ? 'var(--c-15803d, #15803d)' : ($pct >= 60 ? 'var(--c-b45309, #b45309)' : 'var(--c-b91c1c, #b91c1c)');
     $bg    = $pct >= 90 ? 'var(--c-dcfce7, #dcfce7)' : ($pct >= 60 ? 'var(--c-fef3c7, #fef3c7)' : 'var(--c-fee2e2, #fee2e2)');
     return '<span class="b hrs" title="إجمالي ساعات العقد المتفق عليها"><i class="fas fa-clock"></i> العقد ' . $fmtH($contracted) . ' س</span>'
-        . '<span class="b" data-allow-style style="color:' . $color . ';background:' . $bg . ';font-weight:700" title="نسبة الإنجاز من العقد = المنفّذ التراكمي ÷ المتفق عليه">' . number_format($pct, 0) . '%</span>';
+        . '<span class="b" data-allow-style style="color:' . $color . ';background:' . $bg . ';font-weight:700" title="نسبة الإنجاز من العقد = المنفذ التراكمي ÷ المتفق عليه">' . number_format($pct, 0) . '%</span>';
 };
 // شريط نسبة الإنجاز من العقد — يُوضع كعنصر مباشر في .cnode-row ليمتد بعرض الكارد كاملاً (من أوّله لآخره)
 $contractBar = function ($contracted, $doneHours) {
@@ -553,12 +553,12 @@ $contractBar = function ($contracted, $doneHours) {
 };
 // شارة الهدف الشهري للآلية: الهدف اليومي × 30 + نسبة الإنجاز (المنفّذ ÷ الهدف الشهري) — بنفس تصميم شارة العقد
 $monthlyBadge = function ($monthlyTarget, $doneHours) use ($fmtH) {
-    if ($monthlyTarget <= 0) return '<span class="b" title="لا يوجد هدف شهري محدّد للآلية"><i class="fas fa-bullseye"></i> الهدف الشهري —</span>';
+    if ($monthlyTarget <= 0) return '<span class="b" title="لا يوجد هدف شهري محدد للآلية"><i class="fas fa-bullseye"></i> الهدف الشهري —</span>';
     $pct = ($doneHours / $monthlyTarget) * 100;
     $color = $pct >= 90 ? 'var(--c-15803d, #15803d)' : ($pct >= 60 ? 'var(--c-b45309, #b45309)' : 'var(--c-b91c1c, #b91c1c)');
     $bg    = $pct >= 90 ? 'var(--c-dcfce7, #dcfce7)' : ($pct >= 60 ? 'var(--c-fef3c7, #fef3c7)' : 'var(--c-fee2e2, #fee2e2)');
     return '<span class="b hrs" title="الهدف الشهري للآلية = الهدف اليومي × 30"><i class="fas fa-bullseye"></i> الهدف الشهري ' . $fmtH($monthlyTarget) . ' س</span>'
-        . '<span class="b" data-allow-style style="color:' . $color . ';background:' . $bg . ';font-weight:700" title="نسبة الإنجاز الشهري = المنفّذ ÷ الهدف الشهري">' . number_format($pct, 0) . '%</span>';
+        . '<span class="b" data-allow-style style="color:' . $color . ';background:' . $bg . ';font-weight:700" title="نسبة الإنجاز الشهري = المنفذ ÷ الهدف الشهري">' . number_format($pct, 0) . '%</span>';
 };
 // شريط الإنجاز مقابل الهدف الشهري — يمتد بعرض الكارد كاملاً (عنصر مباشر في .cnode-row / .cleaf)
 $monthlyBar = function ($monthlyTarget, $doneHours) {
@@ -569,12 +569,12 @@ $monthlyBar = function ($monthlyTarget, $doneHours) {
 };
 // شارة هدف المشغّل: حصّته من الهدف الشهري للمعدّة (÷ عدد المشغّلين) + نسبة إنجازه — بنفس تصميم باقي الشارات
 $operatorBadge = function ($opTarget, $doneHours) use ($fmtH) {
-    if ($opTarget <= 0) return '<span class="b" title="لا يوجد هدف محدّد للمشغّل"><i class="fas fa-bullseye"></i> الهدف —</span>';
+    if ($opTarget <= 0) return '<span class="b" title="لا يوجد هدف محدد للمشغل"><i class="fas fa-bullseye"></i> الهدف —</span>';
     $pct = ($doneHours / $opTarget) * 100;
     $color = $pct >= 90 ? 'var(--c-15803d, #15803d)' : ($pct >= 60 ? 'var(--c-b45309, #b45309)' : 'var(--c-b91c1c, #b91c1c)');
     $bg    = $pct >= 90 ? 'var(--c-dcfce7, #dcfce7)' : ($pct >= 60 ? 'var(--c-fef3c7, #fef3c7)' : 'var(--c-fee2e2, #fee2e2)');
-    return '<span class="b hrs" title="هدف المشغّل = الهدف الشهري للمعدّة ÷ عدد المشغّلين"><i class="fas fa-bullseye"></i> هدف ' . $fmtH($opTarget) . ' س</span>'
-        . '<span class="b" data-allow-style style="color:' . $color . ';background:' . $bg . ';font-weight:700" title="نسبة إنجاز المشغّل = المنفّذ ÷ هدفه">' . number_format($pct, 0) . '%</span>';
+    return '<span class="b hrs" title="هدف المشغل = الهدف الشهري للمعدة ÷ عدد المشغلين"><i class="fas fa-bullseye"></i> هدف ' . $fmtH($opTarget) . ' س</span>'
+        . '<span class="b" data-allow-style style="color:' . $color . ';background:' . $bg . ';font-weight:700" title="نسبة إنجاز المشغل = المنفذ ÷ هدفه">' . number_format($pct, 0) . '%</span>';
 };
 $shiftIcon = function ($s) {
     $s = (string) $s;
@@ -603,20 +603,20 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back    = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا عملاءَ ضمنَ نطاقِك بعدُ', 'اختر عميلًا من فلترِ العملاء أو راجعْ نطاقَ مشروعِك مع مسؤولِ النظام');
+    echo ems_states_bundle('لا عملاء ضمن نطاقك بعد', 'اختر عميلا من فلتر العملاء أو راجع نطاق مشروعك مع مسؤول النظام');
     ?>
 
     <!-- شريط الأدوات: بحث + فتح/طيّ الكل (فلتر الفترة محذوف؛ الافتراضي «هذا الشهر») -->
     <div class="ctree-toolbar">
         <div class="ctree-tool ctree-search-wrap">
             <label for="ctreeSearch"><i class="fas fa-search"></i> بحث</label>
-            <input type="text" id="ctreeSearch" placeholder="ابحث باسم/كود العميل أو المشروع أو المعدّة أو المشغّل..." autocomplete="off">
+            <input type="text" id="ctreeSearch" placeholder="ابحث باسم/كود العميل أو المشروع أو المعدة أو المشغل..." autocomplete="off">
         </div>
         <div class="ctree-tool">
             <label>&nbsp;</label>
             <div class="ctree-btns">
                 <button type="button" class="btn btn-sm" onclick="ctreeAll(true)"><i class="fas fa-plus-square"></i> فتح الكل</button>
-                <button type="button" class="btn btn-sm" onclick="ctreeAll(false)"><i class="fas fa-minus-square"></i> طيّ الكل</button>
+                <button type="button" class="btn btn-sm" onclick="ctreeAll(false)"><i class="fas fa-minus-square"></i> طي الكل</button>
             </div>
         </div>
     </div>
@@ -626,9 +626,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <span><i class="fas fa-users"></i> عملاء: <b><?= (int) $grand['clients']; ?></b></span>
         <span><i class="fas fa-project-diagram"></i> مشاريع: <b><?= (int) $grand['projects']; ?></b></span>
         <span><i class="fas fa-truck-loading"></i> موردون: <b><?= (int) $grand['suppliers']; ?></b></span>
-        <span><i class="fas fa-truck-monster"></i> معدّات: <b><?= (int) $grand['equip']; ?></b></span>
-        <span><i class="fas fa-user-hard-hat"></i> مشغّلون: <b><?= (int) $grand['operators']; ?></b></span>
-        <span class="hrs"><i class="fas fa-stopwatch"></i> ساعات منفّذة: <b><?= $fmtH($grand['hours']); ?></b></span>
+        <span><i class="fas fa-truck-monster"></i> معدات: <b><?= (int) $grand['equip']; ?></b></span>
+        <span><i class="fas fa-user-hard-hat"></i> مشغلون: <b><?= (int) $grand['operators']; ?></b></span>
+        <span class="hrs"><i class="fas fa-stopwatch"></i> ساعات منفذة: <b><?= $fmtH($grand['hours']); ?></b></span>
         <span class="hrs"><i class="fas fa-bullseye"></i> مستهدفة: <b><?= $fmtH($grand['target']); ?></b><?php if ($grand['target'] > 0): ?> · إنجاز <b><?= number_format($grand['hours'] / $grand['target'] * 100, 0); ?>%</b><?php endif; ?></span>
         <span class="hrs"><i class="fas fa-clock"></i> ساعات العقد: <b><?= $fmtH($grand['contracted']); ?></b><?php if ($grand['contracted'] > 0): ?> · منجز <b><?= number_format($grand['done_all'] / $grand['contracted'] * 100, 0); ?>%</b><?php endif; ?></span>
     </div>
@@ -647,8 +647,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <span class="cnode-badges">
                         <span class="b">مشاريع <?= (int) $cl['agg']['projects']; ?></span>
                         <span class="b">موردون <?= (int) $cl['agg']['suppliers']; ?></span>
-                        <span class="b">معدّات <?= (int) $cl['agg']['equip']; ?></span>
-                        <span class="b">مشغّلون <?= (int) $cl['agg']['operators']; ?></span>
+                        <span class="b">معدات <?= (int) $cl['agg']['equip']; ?></span>
+                        <span class="b">مشغلون <?= (int) $cl['agg']['operators']; ?></span>
                         <?php /* كارد العميل يعتمد على المجاميع التراكمية لعقود المشاريع فقط (لا هدف/إنجاز للفترة) */ ?>
                         <?= $contractBadge($cl['agg']['contracted'], $cl['agg']['done_all']); ?>
                     </span>
@@ -669,8 +669,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <?php if ($pr['location']): ?><span class="cnode-loc"><i class="fas fa-map-marker-alt"></i> <?= $e($pr['location']); ?></span><?php endif; ?>
                                 <span class="cnode-badges">
                                     <span class="b">موردون <?= (int) $pr['agg']['suppliers']; ?></span>
-                                    <span class="b">معدّات <?= (int) $pr['agg']['equip']; ?></span>
-                                    <span class="b">مشغّلون <?= (int) $pr['agg']['operators']; ?></span>
+                                    <span class="b">معدات <?= (int) $pr['agg']['equip']; ?></span>
+                                    <span class="b">مشغلون <?= (int) $pr['agg']['operators']; ?></span>
                                     <span class="b hrs"><?= $fmtH($pHours); ?> س</span>
                                     <?= $contractBadge($pr['agg']['contracted'], $pr['agg']['done_all']); ?>
                                 </span>
@@ -678,7 +678,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             </div>
                             <div class="cnode-children">
                                 <?php if (empty($pr['suppliers'])): ?>
-                                    <div class="ctree-empty sm">لا موردون/معدّات في هذا المشروع.</div>
+                                    <div class="ctree-empty sm">لا موردون/معدات في هذا المشروع.</div>
                                 <?php else:
                                     // ترتيب الموردين تنازلياً حسب الساعات لإبراز توزيع الحصص
                                     uasort($pr['suppliers'], function ($a, $b) { return ($b['agg']['hours'] <=> $a['agg']['hours']); });
@@ -692,8 +692,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                             <span class="cnode-title"><?= $e($sup['name']); ?></span>
                                             <?php if (!empty($sup['code'])): ?><span class="cnode-code"><?= $e($sup['code']); ?></span><?php endif; ?>
                                             <span class="cnode-badges">
-                                                <span class="b">معدّات <?= (int) $sup['agg']['equip']; ?></span>
-                                                <span class="b">مشغّلون <?= (int) $sup['agg']['operators']; ?></span>
+                                                <span class="b">معدات <?= (int) $sup['agg']['equip']; ?></span>
+                                                <span class="b">مشغلون <?= (int) $sup['agg']['operators']; ?></span>
                                                 <span class="b hrs"><?= $fmtH($sHours); ?> س</span>
                                                 <?= $contractBadge($sup['agg']['contracted'], $sup['agg']['done_all']); ?>
                                             </span>
@@ -708,7 +708,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                                         <a class="cnode-title link" href="../Equipments/equipment_profile.php?id=<?= (int) $op['eq_id']; ?>" onclick="event.stopPropagation();"><?= $e($op['eq_code']); ?></a>
                                                         <span class="cnode-code"><?= $e($op['type_name'] ?: '—'); ?></span>
                                                         <span class="cnode-badges">
-                                                            <span class="b">مشغّلون <?= count($op['operators']); ?></span>
+                                                            <span class="b">مشغلون <?= count($op['operators']); ?></span>
                                                             <span class="b hrs"><?= $fmtH($op['hours']); ?> س<?= ($op['hours_today'] > 0) ? ' · اليوم ' . $fmtH($op['hours_today']) : ''; ?></span>
                                                             <?php $eqMonthlyTarget = (float) ($op['target_daily'] ?? 0) * 30; ?>
                                                             <?= $monthlyBadge($eqMonthlyTarget, $op['hours']); ?>
@@ -717,7 +717,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                                     </div>
                                                     <div class="cnode-children">
                                                         <?php if (empty($op['operators'])): ?>
-                                                            <div class="cleaf none"><i class="fas fa-user-slash"></i> لا مشغّل</div>
+                                                            <div class="cleaf none"><i class="fas fa-user-slash"></i> لا مشغل</div>
                                                         <?php else:
                                                             $opCount   = count($op['operators']);
                                                             $drvTarget = $opCount > 0 ? ($eqMonthlyTarget / $opCount) : 0.0; // هدف المشغّل = الهدف الشهري للمعدّة ÷ عدد المشغّلين
@@ -729,7 +729,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                                                 <?php if (!empty($drv['employee_code'])): ?><span class="cleaf-code"><?= $e($drv['employee_code']); ?></span><?php endif; ?>
                                                                 <?php if (!empty($drv['phone'])): ?><span class="cleaf-phone"><i class="fas fa-phone"></i> <?= $e($drv['phone']); ?></span><?php endif; ?>
                                                                 <span class="cnode-badges">
-                                                                    <span class="b hrs" title="ساعات عمل المشغّل من التايم شيت (operator_hours) للفترة المختارة"><i class="fas fa-user-clock"></i> <?= $fmtH($drvDone); ?> س</span>
+                                                                    <span class="b hrs" title="ساعات عمل المشغل من التايم شيت (operator_hours) للفترة المختارة"><i class="fas fa-user-clock"></i> <?= $fmtH($drvDone); ?> س</span>
                                                                     <?= $operatorBadge($drvTarget, $drvDone); ?>
                                                                 </span>
                                                                 <?= $monthlyBar($drvTarget, $drvDone); ?>

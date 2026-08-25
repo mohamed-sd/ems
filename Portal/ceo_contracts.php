@@ -44,7 +44,7 @@ if (!$is_super_admin && empty($__pp['can_view'])) {
     exit();
 }
 if (!$is_super_admin && $_SERVER['REQUEST_METHOD'] === 'POST' && empty($__pp['can_add']) && empty($__pp['can_edit'])) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'غير مصرح بالكتابة في هذه الشاشة ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
+    ems_gov_flash_redirect('../main/dashboard.php', 'غير مصرح بالكتابة في هذه الشاشة ❌', 'GOV-PERM-403', 'اطلب المنحة من مدير الصلاحيات إن كانت ضمن عملك');
 }
 $COLS   = array (
   0 => 'الكيان',
@@ -62,16 +62,16 @@ $COLS   = array (
   12 => 'قيمة الكفالة',
   13 => 'مراجعة قانونية',
   14 => 'مراجعة مالية',
-  15 => 'الموقّع عنّا',
+  15 => 'الموقع عنا',
   16 => 'صفته',
   17 => 'مرجع سلطته',
   18 => 'تاريخ التوقيع',
-  19 => 'الموقّع عن الطرف الآخر',
+  19 => 'الموقع عن الطرف الآخر',
   20 => 'صفته',
   21 => 'مستند تخويله',
   22 => 'سُجّل في السجل الموحَّد؟',
-  23 => 'المُنشئ — الاسم والصفة',
-  24 => 'المعتمِد — الاسم والصفة',
+  23 => 'المنشئ — الاسم والصفة',
+  24 => 'المعتمد — الاسم والصفة',
   25 => 'مرجع التفويض',
   26 => 'تاريخ الاعتماد',
   27 => 'تاريخ الإنشاء',
@@ -106,8 +106,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     if ($in['signing_date'] !== '' && $in['contract_no'] !== '') {
         $blockNote = m00_review_block($conn, $company_id, $in['contract_no']);
         if ($blockNote !== null) {
-            ems_gov_flash_redirect(basename(__FILE__), 'BR-CEO-02: التوقيع محجوبٌ — ملاحظةٌ حرجةٌ مفتوحة (' . $blockNote
-                . ') على العقد ' . $in['contract_no'] . ' · تُقفل بمستند معالجةٍ أولًا ولا تُرفع شفهيًّا ❌', 'GOV-FAIL-409', '');
+            ems_gov_flash_redirect(basename(__FILE__), 'BR-CEO-02: التوقيع محجوب — ملاحظة حرجة مفتوحة (' . $blockNote
+                . ') على العقد ' . $in['contract_no'] . ' · تقفل بمستند معالجة أولا ولا ترفع شفهيا ❌', 'GOV-FAIL-409', '');
             exit();
         }
     }
@@ -149,14 +149,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
             $__q->execute();
             $__rs = $__q->get_result();
             if ($__rs && ($__row = $__rs->fetch_assoc())) {
-                $__ref = ' — الصفُّ القائم #' . (int) $__row['id'] . ' (' . $__row['status'] . ')';
+                $__ref = ' — الصف القائم #' . (int) $__row['id'] . ' (' . $__row['status'] . ')';
             }
             $__q->close();
         }
     }
     ems_gov_flash_redirect(basename(__FILE__),
-        $ok ? 'حُفظ الصف ✅'
-            : ($__dup ? ('رقمُ العقد «' . $in['contract_no'] . '» مسجَّلٌ سلفًا — لم يُنشأ صفٌّ ثانٍ' . $__ref . ' ❌')
+        $ok ? 'حفظ الصف ✅'
+            : ($__dup ? ('رقم العقد «' . $in['contract_no'] . '» مسجل سلفا — لم ينشأ صف ثان' . $__ref . ' ❌')
                       : 'تعذر الحفظ ❌'),
         $ok ? 'GOV-OK-200' : ($__dup ? 'GOV-FAIL-409' : 'GOV-OK-200'), '');
     exit();
@@ -171,12 +171,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     $goBack = function ($m) { ems_gov_flash_redirect(basename(__FILE__), $m, 'GOV-INFO-200', ''); exit(); };
     $actorRole = strval($_SESSION['user']['role'] ?? '');
     if (!$is_super_admin && $actorRole !== '9') {
-        ems_gov_flash_redirect('../main/dashboard.php', 'التوقيعُ على العقود قرارُ الإدارة التنفيذية وحدها — BR-CEO-01 ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
+        ems_gov_flash_redirect('../main/dashboard.php', 'التوقيع على العقود قرار الإدارة التنفيذية وحدها — BR-CEO-01 ❌', 'GOV-PERM-403', 'اطلب المنحة من مدير الصلاحيات إن كانت ضمن عملك');
     }
     $rowId = intval($_POST['row'] ?? 0);
     $authorityRef = trim((string) ($_POST['authority_ref'] ?? ''));
     $linkContract = intval($_POST['link_contract'] ?? 0);
-    if ($rowId <= 0) { $goBack('اختر صفًّا للتوقيع ❌'); }
+    if ($rowId <= 0) { $goBack('اختر صفا للتوقيع ❌'); }
     if ($authorityRef === '') { $authorityRef = 'سلطة أصلية'; }
 
     $st = $conn->prepare("SELECT * FROM exec_contract_signings WHERE id = ?"
@@ -186,9 +186,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     $st->execute();
     $row = $st->get_result()->fetch_assoc();
     $st->close();
-    if (!$row) { $goBack('الصفُّ غير موجودٍ في نطاقك ❌'); }
+    if (!$row) { $goBack('الصف غير موجود في نطاقك ❌'); }
     if ($row['signing_date'] !== null) {
-        $goBack('العقدُ موقَّعٌ سلفًا (' . $row['signing_date'] . ') — BR-CEO-08: لا توقيعَ على توقيع ❌');
+        $goBack('العقد موقع سلفا (' . $row['signing_date'] . ') — BR-CEO-08: لا توقيع على توقيع ❌');
     }
 
     // BR-CEO-02: الملاحظة الحاجبة المفتوحة — من سجل المراجعة ومن حقل المراجعة نفسه
@@ -196,9 +196,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     $selfOpen = mb_strpos((string) $row['legal_review'], 'حرجة') !== false
              && mb_strpos((string) $row['legal_review'], 'مفتوحة') !== false;
     if ($blockNote !== null || $selfOpen) {
-        $goBack('BR-CEO-02: التوقيع محجوبٌ — ملاحظةٌ حرجةٌ مفتوحة'
+        $goBack('BR-CEO-02: التوقيع محجوب — ملاحظة حرجة مفتوحة'
             . ($blockNote !== null ? ' (' . $blockNote . ')' : ' (المراجعة القانونية)')
-            . ' على العقد ' . $row['contract_no'] . ' · تُقفل بمستند معالجةٍ أولًا ❌');
+            . ' على العقد ' . $row['contract_no'] . ' · تقفل بمستند معالجة أولا ❌');
     }
 
     /* ══ INJ-0014 · سقفُ التفويضِ والتصعيدُ التلقائيّ ══════════════════════════
@@ -236,7 +236,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
             if ($__esc) {
                 $__rq  = 'ESC-' . $rowId . '-' . date('ymdHis');
                 $__doc = 'عقد ' . (string) ($row['contract_no'] ?? ('#' . $rowId));
-                $__why = 'تجاوزُ سقفِ التفويض — ' . $__sig['reason'];
+                $__why = 'تجاوز سقف التفويض — ' . $__sig['reason'];
                 $__cur = (string) ($row['currency'] ?? '');
                 $__nm  = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
                 $__amtS = (string) ($row['amount'] ?? '');
@@ -246,7 +246,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
                 $__esc->execute();
                 $__esc->close();
             }
-            $goBack('SIGN-CAP-409: ' . $__sig['reason'] . ' — **رُفع الطلبُ إلى صندوقِ اعتمادِ الرئيس** ⤴');
+            $goBack('SIGN-CAP-409: ' . $__sig['reason'] . ' — **رفع الطلب إلى صندوق اعتماد الرئيس** ⤴');
         }
         $goBack('SIGN-AUTH-' . $__sig['code'] . ': ' . $__sig['reason'] . ' ❌');
     }
@@ -261,7 +261,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
         $r = \App\Services\Contract\ContractStateMachine::transition(
             $conn, $gate, $company_id, $linkContract,
             \App\Services\Contract\ContractStateMachine::SIGNED,
-            'توقيعٌ من شاشة توقيع العقود والالتزامات (EXCS-' . $rowId . ')', $uid,
+            'توقيع من شاشة توقيع العقود والالتزامات (EXCS-' . $rowId . ')', $uid,
             array('authority_ref' => $authorityRef,
                   'amount' => (string) ($row['amount'] ?? ''), 'currency' => (string) ($row['currency'] ?? '')));
         if (!$r['ok']) {
@@ -300,7 +300,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
                 'occurred_at'     => gmdate('Y-m-d H:i:s'),
                 'created_by'      => $uid ?: 1,
                 'idempotency_key' => 'exec_signing:EXCS-' . $rowId,
-                'notes'           => 'توقيعُ ' . ((string) $row['contract_kind'] ?: 'عقد') . ' ' . (string) $row['contract_no']
+                'notes'           => 'توقيع ' . ((string) $row['contract_kind'] ?: 'عقد') . ' ' . (string) $row['contract_no']
                                      . ' — ' . (string) ($row['other_party'] ?? ''),
                 'payload'         => array(
                     'signing_ref'   => 'EXCS-' . $rowId,
@@ -315,8 +315,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
             ));
         } catch (\Throwable $t) { error_log('ceo_contracts sign fact #' . $rowId . ': ' . $t->getMessage()); }
     }
-    $goBack('وُقّع العقد ' . $row['contract_no'] . ' بمرجع «' . $authorityRef . '» ✅'
-        . ($linkContract > 0 ? ' — والأثرُ الرباعي وقع على العقد #' . $linkContract : ''));
+    $goBack('وقع العقد ' . $row['contract_no'] . ' بمرجع «' . $authorityRef . '» ✅'
+        . ($linkContract > 0 ? ' — والأثر الرباعي وقع على العقد #' . $linkContract : ''));
 }
 
 /* ── القراءة: صفوف الكيان من الجدول الأصلي ──────────────────────────────── */
@@ -374,7 +374,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     );
     $header_back = false;
     include '../includes/page_header.php';
-    echo ems_states_bundle('لا عقودَ معروضةً للتوقيعِ الأعلى بعدُ', 'أضف سجلَّ توقيعٍ بزر «إضافة» أو تحقق من توفرِ السجلات');
+    echo ems_states_bundle('لا عقود معروضة للتوقيع الأعلى بعد', 'أضف سجل توقيع بزر «إضافة» أو تحقق من توفر السجلات');
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
@@ -454,7 +454,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <?= csrf_field() ?>
         <input type="hidden" name="cmp03_action" value="sign">
         <div class="card"><div class="card-header">
-            <h5><i class="fa fa-pen-fancy"></i> التوقيع — بالسلطة الأصلية أو تفويض موثَّق (BR-CEO-01)</h5>
+            <h5><i class="fa fa-pen-fancy"></i> التوقيع — بالسلطة الأصلية أو تفويض موثق (BR-CEO-01)</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
                 <div class="form-group"><label for="emsf_1129_59cbc">العقد المعروض للتوقيع</label>
@@ -469,7 +469,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </select></div>
                 <div class="form-group"><label for="emsf_1130_5a477">مرجع السلطة (فارغ = سلطة أصلية)</label>
                     <input type="text" name="authority_ref" maxlength="120" placeholder="سلطة أصلية" id="emsf_1130_5a477"></div>
-                <div class="form-group"><label for="emsf_1131_9f40b">ربط عقد حقيقي (اختياري — يوقَّع عبر آلة الحالة بأثره الرباعي)</label>
+                <div class="form-group"><label for="emsf_1131_9f40b">ربط عقد حقيقي (اختياري — يوقع عبر آلة الحالة بأثره الرباعي)</label>
                     <select name="link_contract" id="emsf_1131_9f40b">
                         <option value="0">— بلا ربط</option>
                         <?php foreach ($signableContracts as $rc):
@@ -523,7 +523,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="30" class="text-center text-muted">لا بياناتَ بعدُ — أضف أول صفٍّ بزر «إضافة»</td></tr>
+                <tr><td colspan="30" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
                     <?php foreach (array_keys($COLS) as $i): $v = m00_cell_at($i, $r, $entityName, $COLDB); ?>

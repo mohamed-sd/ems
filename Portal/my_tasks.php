@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'wi_tr
     } else {
         $r = WI::transition($conn, $itemId, $to, $uid, $reason);
     }
-    $msg = $r['ok'] ? 'نُفِّذ ✅' : ($r['reason'] . ' ❌');
+    $msg = $r['ok'] ? 'نفذ ✅' : ($r['reason'] . ' ❌');
     ems_gov_redirect('Location: my_tasks.php?view=' . urlencode($VIEW) . '&msg=' . urlencode($msg));
     exit();
 }
@@ -98,10 +98,10 @@ $views = array(
     'late'           => array('المتأخرة', "{$mine} AND (wi.status = 'overdue' OR (wi.due_at < NOW() AND wi.status IN ('assigned','accepted','in_progress')))"),
     'upcoming'       => array('القادمة', "{$mine} AND wi.status IN ('assigned','accepted','scheduled') AND wi.due_at >= DATE_ADD(CURDATE(), INTERVAL 1 DAY)"),
     'blocked'        => array('المعطلة', "{$mine} AND wi.status = 'blocked'"),
-    'returned'       => array('المعادة إليّ', "{$mine} AND wi.status IN ('returned','reopened')"),
-    'delegated'      => array('المفوَّضة إليّ', "{$mine} AND wi.delegation_ref IS NOT NULL"),
+    'returned'       => array('المعادة إلي', "{$mine} AND wi.status IN ('returned','reopened')"),
+    'delegated'      => array('المفوضة إلي', "{$mine} AND wi.delegation_ref IS NOT NULL"),
     'assignments'    => array('تكليفاتي', "{$mine} AND wi.item_type = 'assignment' AND wi.status NOT IN ('closed_accepted','cancelled')"),
-    'assigned_by_me' => array('التي كلّفتُ بها', "(wi.created_by = {$uid} OR wi.owner_user_id = {$uid}) AND wi.assigned_user_id <> {$uid} AND wi.status NOT IN ('closed_accepted','cancelled')"),
+    'assigned_by_me' => array('التي كلفت بها', "(wi.created_by = {$uid} OR wi.owner_user_id = {$uid}) AND wi.assigned_user_id <> {$uid} AND wi.status NOT IN ('closed_accepted','cancelled')"),
     'verify'         => array('تنتظر تحققي', "wi.verifier_user_id = {$uid} AND wi.status = 'done_pending_verify'"),
     'team'           => array('فريقي', ''),
 );
@@ -172,8 +172,8 @@ include '../insidebar.php';
     $header_back = false;
     include '../includes/page_header.php';
     require_once __DIR__ . '/../includes/screen_contract.php';
-    ems_screen_about('كلُّ ما ينتظر تنفيذي أنا — بعروضه العشرة، وكلُّ عنصرٍ يرجع لأصله بضغطةٍ ويشرح «لماذا أراه» بسلسلته الخماسية.');
-    echo ems_states_bundle('لا عناصرَ في هذا العرض', 'بدّل العرضَ أو تحقق من مصادرِ التكليف');
+    ems_screen_about('كل ما ينتظر تنفيذي أنا — بعروضه العشرة، وكل عنصر يرجع لأصله بضغطة ويشرح «لماذا أراه» بسلسلته الخماسية.');
+    echo ems_states_bundle('لا عناصر في هذا العرض', 'بدل العرض أو تحقق من مصادر التكليف');
 
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
@@ -190,7 +190,7 @@ include '../insidebar.php';
                     <strong><?php echo htmlspecialchars($s['q']); ?></strong> — <?php echo htmlspecialchars($s['a']); ?></div>
             <?php endforeach; ?>
             <?php if (!$explain['complete']): ?>
-                <div class="alert alert-warning ems-wi-chain-warn">سلسلةٌ ناقصة — والحجبُ أسلمُ من الظهور بلا تفسير (AC-WFM-13)</div>
+                <div class="alert alert-warning ems-wi-chain-warn">سلسلة ناقصة — والحجب أسلم من الظهور بلا تفسير (AC-WFM-13)</div>
             <?php endif; ?>
         </div>
     </div>
@@ -217,10 +217,10 @@ include '../insidebar.php';
                          'delegate_approval' => 'تفويض اعتماد', 'reassign' => 'إعادة إسناد', 'workload_move' => 'نقل عبء');
     ?>
     <div class="card ems-wi-accent-card">
-        <div class="card-header"><strong><i class="fas fa-user-shield"></i> تفويضاتٌ وإناباتٌ نافذةٌ إليّ</strong>
+        <div class="card-header"><strong><i class="fas fa-user-shield"></i> تفويضات وإنابات نافذة إلي</strong>
             <span class="badge bg-secondary"><?php echo count($dels); ?></span></div>
         <div class="card-body ems-wi-dels-body">
-            <?php if (!$dels): ?><span class="text-muted">لا تفويضَ نافذًا إليك الآن — «انتهاءُ التفويض يوقف التوليدَ في اللحظة» (WF-08)</span>
+            <?php if (!$dels): ?><span class="text-muted">لا تفويض نافذا إليك الآن — «انتهاء التفويض يوقف التوليد في اللحظة» (WF-08)</span>
             <?php else: foreach ($dels as $d): ?>
                 <div class="ems-wi-line">· <strong><?php echo htmlspecialchars($KIND_AR[$d['kind']] ?? $d['kind']); ?></strong>
                     من <?php echo htmlspecialchars((string) ($d['from_name'] ?: '—')); ?>
@@ -234,10 +234,10 @@ include '../insidebar.php';
     <?php if ($truncated > 0): ?>
     <div class="alert alert-warning" role="status">
         <i class="fa fa-scissors" aria-hidden="true"></i>
-        هذا العرضُ فيه <strong><?php echo intval($counts[$VIEW]); ?></strong> عنصرًا،
-        والمعروضُ هنا <strong><?php echo count($rows); ?></strong> فقط (سقفُ الصفحة <?php echo $ROW_CAP; ?>)
+        هذا العرض فيه <strong><?php echo intval($counts[$VIEW]); ?></strong> عنصرا،
+        والمعروض هنا <strong><?php echo count($rows); ?></strong> فقط (سقف الصفحة <?php echo $ROW_CAP; ?>)
         — <strong><?php echo $truncated; ?></strong> لا تظهر.
-        ضيِّقِ العرضَ بتابٍ أدقَّ حتى لا تُبنى قراءةٌ على قائمةٍ ناقصة.
+        ضيق العرض بتاب أدق حتى لا تبنى قراءة على قائمة ناقصة.
     </div>
     <?php endif; ?>
 
@@ -245,14 +245,14 @@ include '../insidebar.php';
         <div class="table-responsive">
         <table class="alltables display" id="my_tasksTable">
             <thead><tr>
-                <th>رقم المهمة</th><th>العنوان والمخرَج</th><th>المصدر</th><th>المستند المرتبط</th>
-                <th>النطاق</th><th>مُسنِدها</th><th>المنفِّذ</th><th>المهلة</th><th>المتبقي</th>
+                <th>رقم المهمة</th><th>العنوان والمخرج</th><th>المصدر</th><th>المستند المرتبط</th>
+                <th>النطاق</th><th>مسندها</th><th>المنفذ</th><th>المهلة</th><th>المتبقي</th>
                 <th>الأولوية</th><th>الحالة</th><th>الإجراء</th>
                 <th class="ems-gov-th" data-gov="entity" data-slice="1">الكيان</th>
             </tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="13" class="text-center text-muted">لا عناصرَ في هذا العرض — والعناصر تأتي من مصادرها لا من هنا (WF-01)</td></tr>
+                <tr><td colspan="13" class="text-center text-muted">لا عناصر في هذا العرض — والعناصر تأتي من مصادرها لا من هنا (WF-01)</td></tr>
             <?php else: foreach ($rows as $t):
                 $id = intval($t['id']);
                 $isExec = ($uid === intval($t['assigned_user_id']));
@@ -271,7 +271,7 @@ include '../insidebar.php';
                         <a href="my_tasks.php?view=<?php echo $VIEW; ?>&explain=<?php echo $id; ?>" title="لماذا أرى هذا؟"
                            class="ems-wi-whylink"><i class="fas fa-circle-question"></i> لماذا؟</a></td>
                     <td class="ems-wi-title-cell"><strong><?php echo htmlspecialchars((string) $t['title']); ?></strong>
-                        <div class="text-muted ems-wi-sub">المخرَج: <?php echo htmlspecialchars((string) $t['deliverable']); ?></div>
+                        <div class="text-muted ems-wi-sub">المخرج: <?php echo htmlspecialchars((string) $t['deliverable']); ?></div>
                         <?php if ($t['status_reason']): ?><div class="ems-wi-reason"><?php echo htmlspecialchars((string) $t['status_reason']); ?></div><?php endif; ?></td>
                     <td><span class="badge bg-secondary" title="<?php echo htmlspecialchars((string) $t['source_type']); ?>"><?php echo htmlspecialchars($SRC_AR[$t['source_type']] ?? $t['source_type']); ?></span></td>
                     <td><?php if ($t['source_screen']): ?>
@@ -301,7 +301,7 @@ include '../insidebar.php';
                             <details class="ems-wi-inline-block"><summary class="btn btn-sm btn-secondary ems-wi-inline-block">توقف</summary>
                                 <form method="post" class="ems-wi-dropform">
         <?= csrf_field() ?><input type="hidden" name="action" value="wi_transition"><input type="hidden" name="item_id" value="<?php echo $id; ?>"><input type="hidden" name="to" value="blocked">
-                                    <select name="reason" class="form-control form-control-sm ems-wi-field-gap" aria-label="سببُ التوقف">
+                                    <select name="reason" class="form-control form-control-sm ems-wi-field-gap" aria-label="سبب التوقف">
                                         <option value="awaiting_part">انتظار قطعة</option><option value="awaiting_client">قرار عميل</option>
                                         <option value="awaiting_higher_approval">اعتماد أعلى</option><option value="awaiting_external">طرف خارجي</option>
                                         <option value="force_majeure">قوة قاهرة</option></select>
@@ -309,7 +309,7 @@ include '../insidebar.php';
                             <details class="ems-wi-inline-block"><summary class="btn btn-sm btn-primary ems-wi-inline-block">إكمال</summary>
                                 <form method="post" class="ems-wi-dropform">
         <?= csrf_field() ?><input type="hidden" name="action" value="wi_transition"><input type="hidden" name="item_id" value="<?php echo $id; ?>"><input type="hidden" name="to" value="done_pending_verify">
-                                    <input name="evidence" class="form-control form-control-sm ems-wi-field-gap" placeholder="دليل الإنجاز (إلزامي منطقًا: <?php echo htmlspecialchars((string) $t['evidence_required']); ?>)" required aria-label="دليل الإنجاز (إلزامي منطقًا: )">
+                                    <input name="evidence" class="form-control form-control-sm ems-wi-field-gap" placeholder="دليل الإنجاز (إلزامي منطقا: <?php echo htmlspecialchars((string) $t['evidence_required']); ?>)" required aria-label="دليل الإنجاز (إلزامي منطقا: )">
                                     <button class="btn btn-sm btn-primary">تقديم للتحقق</button></form></details>
                         <?php endif; ?>
                         <?php if ($isVerifier && $s === 'done_pending_verify'): ?>
@@ -320,14 +320,14 @@ include '../insidebar.php';
                                 <form method="post" class="ems-wi-dropform">
         <?= csrf_field() ?><input type="hidden" name="action" value="wi_transition"><input type="hidden" name="item_id" value="<?php echo $id; ?>"><input type="hidden" name="to" value="returned">
                                     <input name="reason" class="form-control form-control-sm ems-wi-field-gap" placeholder="سبب الإعادة (إلزامي)" required aria-label="سبب الإعادة (إلزامي)">
-                                    <button class="btn btn-sm btn-danger">إعادة للمنفِّذ</button></form></details>
+                                    <button class="btn btn-sm btn-danger">إعادة للمنفذ</button></form></details>
                         <?php endif; ?>
                         <?php if ($isOwner && in_array($s, array('assigned', 'accepted', 'in_progress', 'blocked', 'overdue'), true)): ?>
                             <details class="ems-wi-inline-block"><summary class="btn btn-sm btn-secondary ems-wi-inline-block">نقل</summary>
                                 <form method="post" class="ems-wi-dropform">
         <?= csrf_field() ?><input type="hidden" name="action" value="wi_transition"><input type="hidden" name="item_id" value="<?php echo $id; ?>"><input type="hidden" name="to" value="reassign">
-                                    <input name="to_user" class="form-control form-control-sm ems-wi-field-gap" placeholder="معرّف المنفِّذ الجديد" required aria-label="معرّف المنفِّذ الجديد">
-                                    <input name="reason" class="form-control form-control-sm ems-wi-field-gap" placeholder="السبب (إلزامي — العدُّ يستمر)" required aria-label="السبب (إلزامي — العدُّ يستمر)">
+                                    <input name="to_user" class="form-control form-control-sm ems-wi-field-gap" placeholder="معرف المنفذ الجديد" required aria-label="معرف المنفذ الجديد">
+                                    <input name="reason" class="form-control form-control-sm ems-wi-field-gap" placeholder="السبب (إلزامي — العد يستمر)" required aria-label="السبب (إلزامي — العد يستمر)">
                                     <button class="btn btn-sm btn-secondary">نقل</button></form></details>
                         <?php endif; ?>
                     </td>

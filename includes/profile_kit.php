@@ -151,7 +151,7 @@ if (!function_exists('ems_profile_tones')) {
     function ems_profile_hero(array $o)
     {
         $name = isset($o['name']) ? trim((string) $o['name']) : '';
-        if ($name === '') { $name = 'بلا اسمٍ مسجَّل'; }
+        if ($name === '') { $name = 'بلا اسم مسجل'; }
 
         /* ── الوسيط: صورةٌ إن وُجدت، وإلا أيقونةُ الكِيان ── */
         if (!empty($o['photo'])) {
@@ -269,7 +269,7 @@ if (!function_exists('ems_profile_tones')) {
 
             if (!empty($it['href'])) {
                 $html .= '<a class="' . $cls . '" href="' . ems_profile_e($it['href'])
-                       . '" title="تعمّق: ' . ems_profile_e($it['label']) . '">' . $body . '</a>';
+                       . '" title="تعمق: ' . ems_profile_e($it['label']) . '">' . $body . '</a>';
             } else {
                 $html .= '<div class="' . $cls . '">' . $body . '</div>';
             }

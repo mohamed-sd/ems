@@ -34,8 +34,8 @@ class GovernanceWatchConsumer
                         && (float) ($e['amount'] ?? 0) > 0
                         && !empty($e['equipment_id']);
                 },
-                'text'  => 'إهلاكٌ مسجَّلٌ على معدة #%s بمبلغ %s — تحقّقْ من ملكيتِها قبلَ الاعتماد '
-                         . '(معدةُ الموردِ لا تُهلَك عندنا · CK-18)',
+                'text'  => 'إهلاك مسجل على معدة #%s بمبلغ %s — تحقق من ملكيتها قبل الاعتماد '
+                         . '(معدة المورد لا تهلك عندنا · CK-18)',
                 'args'  => array('equipment_id', 'amount'),
             ),
             array(
@@ -45,7 +45,7 @@ class GovernanceWatchConsumer
                     return ($e['event_status'] ?? '') === 'reversed'
                         || !empty($e['reverses_event_id']);
                 },
-                'text'  => 'حركةٌ عاكسةٌ على الواقعة #%s (%s) — تُراجَع ضمن دورةِ التدقيق',
+                'text'  => 'حركة عاكسة على الواقعة #%s (%s) — تراجع ضمن دورة التدقيق',
                 'args'  => array('reverses_event_id', 'event_key'),
             ),
             array(
@@ -56,7 +56,7 @@ class GovernanceWatchConsumer
                         && ($e['currency'] ?? 'SDG') !== 'SDG'
                         && ($e['base_amount'] ?? null) === null;
                 },
-                'text'  => 'واقعةٌ بعملةٍ %s ومبلغٍ %s بلا معادلٍ بعملةِ الأساس — سعرُ الفترةِ مفقود',
+                'text'  => 'واقعة بعملة %s ومبلغ %s بلا معادل بعملة الأساس — سعر الفترة مفقود',
                 'args'  => array('currency', 'amount'),
             ),
         );

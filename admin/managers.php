@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $exists = $mg_pg->selectOne('super_admins', array('columns' => array('id'), 'where' => array('email' => $email)));
             } catch (\Throwable $t) {
                 error_log('admin/managers email check: ' . $t->getMessage());
-                super_admin_set_flash('error', 'تعذر التحقق من البريد الإلكتروني حالياً.');
+                super_admin_set_flash('error', 'تعذر التحقق من البريد الإلكتروني حاليا.');
                 super_admin_redirect('managers');
             }
 
@@ -129,7 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'where' => array('email' => $email), 'whereRaw' => 'id <> ' . intval($targetId)));
             } catch (\Throwable $t) {
                 error_log('admin/managers dup check: ' . $t->getMessage());
-                super_admin_set_flash('error', 'تعذر التحقق من البريد الإلكتروني حالياً.');
+                super_admin_set_flash('error', 'تعذر التحقق من البريد الإلكتروني حاليا.');
                 super_admin_redirect('managers');
             }
 
@@ -190,7 +190,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 super_admin_write_audit($actorId, 'delete', 'مدير أعلى', 'حذف حساب مدير أعلى: ' . $targetEmail, $targetId);
                 super_admin_set_flash('success', 'تم حذف الحساب بنجاح.');
             } else {
-                super_admin_set_flash('error', 'تعذر حذف الحساب حالياً.');
+                super_admin_set_flash('error', 'تعذر حذف الحساب حاليا.');
             }
         }
 
@@ -282,7 +282,7 @@ require_once __DIR__ . '/includes/layout_head.php';
                 </div>
                 <div class="form-group">
                     <label style="display:flex;align-items:center;gap:8px;font-weight:700;cursor:pointer;" for="editName">
-                        <input type="checkbox" name="is_active" value="1" checked style="width:auto;"> تفعيل الحساب فوراً
+                        <input type="checkbox" name="is_active" value="1" checked style="width:auto;"> تفعيل الحساب فورا
                     </label>
                 </div>
                 <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> إنشاء الحساب</button>
@@ -297,7 +297,7 @@ require_once __DIR__ . '/includes/layout_head.php';
         <div class="card-body">
             <div class="alert alert-info" style="margin-bottom:10px;">
                 <i class="fas fa-lock"></i>
-                <div>كل عمليات الإدارة محمية بـ CSRF + جلسة موثقة ببصمة المستخدم.</div>
+                <div>كل عمليات الإدارة محمية ب CSRF + جلسة موثقة ببصمة المستخدم.</div>
             </div>
             <div class="alert alert-warning" style="margin-bottom:10px;">
                 <i class="fas fa-user-shield"></i>
@@ -305,7 +305,7 @@ require_once __DIR__ . '/includes/layout_head.php';
             </div>
             <div class="alert alert-success" style="margin-bottom:0;">
                 <i class="fas fa-scroll"></i>
-                <div>كل العمليات (إضافة/تعديل/حذف) تُسجّل في سجل المراجعة الإداري.</div>
+                <div>كل العمليات (إضافة/تعديل/حذف) تسجل في سجل المراجعة الإداري.</div>
             </div>
         </div>
     </div>
@@ -430,7 +430,7 @@ require_once __DIR__ . '/includes/layout_head.php';
         <div class="card-body">
             <div class="alert alert-info" style="margin-bottom:10px;">
                 <i class="fas fa-lock"></i>
-                <div>كل عمليات الإدارة محمية بـ CSRF + جلسة موثقة ببصمة المستخدم.</div>
+                <div>كل عمليات الإدارة محمية ب CSRF + جلسة موثقة ببصمة المستخدم.</div>
             </div>
             <div class="alert alert-warning" style="margin-bottom:10px;">
                 <i class="fas fa-user-shield"></i>
@@ -438,7 +438,7 @@ require_once __DIR__ . '/includes/layout_head.php';
             </div>
             <div class="alert alert-success" style="margin-bottom:0;">
                 <i class="fas fa-scroll"></i>
-                <div>كل العمليات (إضافة/تعديل/حذف) تُسجّل في سجل المراجعة الإداري.</div>
+                <div>كل العمليات (إضافة/تعديل/حذف) تسجل في سجل المراجعة الإداري.</div>
             </div>
         </div>
     </div>
@@ -559,7 +559,7 @@ require_once __DIR__ . '/includes/layout_head.php';
             <div class="form-group">
                 <label class="form-label" for="editPassword">كلمة مرور جديدة (اختياري)</label>
                 <input class="form-ctrl" name="new_password" id="editPassword" type="password" maxlength="255" autocomplete="new-password">
-                <p class="form-hint">اتركه فارغاً إذا لا تريد تغيير كلمة المرور.</p>
+                <p class="form-hint">اتركه فارغا إذا لا تريد تغيير كلمة المرور.</p>
             </div>
             <div class="form-group">
                 <label style="display:flex;align-items:center;gap:8px;font-weight:700;cursor:pointer;">

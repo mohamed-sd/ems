@@ -29,7 +29,7 @@ $company_id = intval($_SESSION['user']['company_id'] ?? 0);
 $role = strval($_SESSION['user']['role'] ?? '');
 // FIN-26: إدارة التمويل (26) تطالع المؤشر عرضًا — الشاشة قراءة كلها فلا حجب POST يلزم
 if ($role !== '-1' && !in_array($role, array('1', '17', '19', EMS_ROLE_FINANCING_MGR), true)) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'المؤشر لمدير الحركة والإدارة العليا والمالية والتمويل ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
+    ems_gov_flash_redirect('../main/dashboard.php', 'المؤشر لمدير الحركة والإدارة العليا والمالية والتمويل ❌', 'GOV-PERM-403', 'اطلب المنحة من مدير الصلاحيات إن كانت ضمن عملك');
 }
 $co = ems_scope_company($conn);
 
@@ -54,7 +54,7 @@ $weekRate = $weekTotal > 0 ? round($weekApproved * 100.0 / $weekTotal, 1) : 100.
 
 // التصعيد: الأقدم > 7 أيام → إشعار الإدارة العامة (مرة يوميًّا — بمفتاح العنوان)
 if ($oldest > 7) {
-    $title = 'DEC-01 ⑦: أقدم وحدة غير معتمدة بلغت ' . $oldest . ' يومًا (المستهدف: صفر فوق 7) — ' . date('Y-m-d');
+    $title = 'DEC-01 ⑦: أقدم وحدة غير معتمدة بلغت ' . $oldest . ' يوما (المستهدف: صفر فوق 7) — ' . date('Y-m-d');
     $dup = $conn->query("SELECT id FROM fin_notifications WHERE title = '" . $conn->real_escape_string($title) . "' LIMIT 1");
     if (!$dup || $dup->num_rows === 0) {
         $st = $conn->prepare("INSERT INTO fin_notifications (company_id, target_level, title, link) VALUES (?, 'general_management', ?, 'Reports/approval_lag_report.php')");
@@ -133,11 +133,11 @@ include '../insidebar.php';
     include('../includes/page_header.php');
     ems_screen_about('مؤشرا القرارين ⑦ و⑧: عدد الوحدات غير المعتمدة وأقدمها بالأيام (مالكه مدير الحركة · '
         . 'تصعيد فوق 7 أيام · مستهدف الاعتماد 95٪) — وعدد الوثائق المنتهية (ينخفض لا يثبت · '
-        . 'وصفر منتهية بلا استثناء نافذ). المحرك الصحيح ببيانات غير معتمدة يُخرج أصفارًا.',
-        array('راجع الأقدم أولًا', 'كل رقم ينقر لمصدره'));
+        . 'وصفر منتهية بلا استثناء نافذ). المحرك الصحيح ببيانات غير معتمدة يخرج أصفارا.',
+        array('راجع الأقدم أولا', 'كل رقم ينقر لمصدره'));
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا وحداتٍ معلَّقةً ولا وثائقَ منتهيةً في هذه الفترة',
-        'وسّع الفترةَ أو تحقق من ترحيلِ سجلاتِ الورديات وتواريخِ انتهاءِ الوثائق');
+    echo ems_states_bundle('لا وحدات معلقة ولا وثائق منتهية في هذه الفترة',
+        'وسع الفترة أو تحقق من ترحيل سجلات الورديات وتواريخ انتهاء الوثائق');
     ?>
     <div class="stats-section">
         <div class="stats-grid">
@@ -145,13 +145,13 @@ include '../insidebar.php';
                 <div class="stats-icon"><i class="fas fa-clipboard-check"></i></div>
                 <div class="stats-value"><?php echo $pending; ?></div>
                 <div class="stats-title">وحدة غير معتمدة</div>
-                <div class="ems-statcard__meta">فتراتٌ بلا توقيعِ سلسلة (unit_chain)</div>
+                <div class="ems-statcard__meta">فترات بلا توقيع سلسلة (unit_chain)</div>
             </div>
             <div class="stats-card">
                 <div class="stats-icon"><i class="fas <?php echo $oldest > 7 ? 'fa-hourglass-end' : 'fa-hourglass-half'; ?>"></i></div>
                 <div class="stats-value"><?php echo $oldest; ?></div>
                 <div class="stats-title">أقدمها بالأيام</div>
-                <div class="ems-statcard__meta"><?php echo $oldest > 7 ? 'تجاوز 7: صُعّد للإدارة العامة' : 'ضمن المستهدف (≤7)'; ?></div>
+                <div class="ems-statcard__meta"><?php echo $oldest > 7 ? 'تجاوز 7: صعد للإدارة العامة' : 'ضمن المستهدف (≤7)'; ?></div>
             </div>
             <div class="stats-card">
                 <div class="stats-icon"><i class="fas fa-percentage"></i></div>
@@ -169,9 +169,9 @@ include '../insidebar.php';
     </div>
 
     <div class="card"><div class="card-body">
-        <h4>أقدم الوحدات المعلَّقة (⑦ — يبدأ التأخير عند مدير الحركة غالبًا)</h4>
+        <h4>أقدم الوحدات المعلقة (⑦ — يبدأ التأخير عند مدير الحركة غالبا)</h4>
         <div class="table-container"><table class="alltables display rpt-lag-table" data-no-dt="1">
-        <thead><tr><th>#</th><th>تاريخ العمل</th><th>العمر (يوم)</th><th>المعدة</th><th>وردية/فترة</th><th>مزامَن متأخر؟</th></tr></thead><tbody>
+        <thead><tr><th>#</th><th>تاريخ العمل</th><th>العمر (يوم)</th><th>المعدة</th><th>وردية/فترة</th><th>مزامن متأخر؟</th></tr></thead><tbody>
         <?php foreach ($oldestRows as $r): ?>
         <tr>
             <td><a href="../Reports/units_daily_report.php?log_id=<?php echo intval($r['log_id']); ?>"><?php echo intval($r['log_id']); ?></a></td>
@@ -182,13 +182,13 @@ include '../insidebar.php';
             <td><?php echo intval($r['synced_late']) === 1 ? 'نعم (DEC-01 ⑨)' : '—'; ?></td>
         </tr>
         <?php endforeach; if (empty($oldestRows)): ?>
-        <tr><td colspan="6">لا وحدات معلَّقة — المستهدف متحقق</td></tr>
+        <tr><td colspan="6">لا وحدات معلقة — المستهدف متحقق</td></tr>
         <?php endif; ?>
         </tbody></table></div>
     </div></div>
 
     <div class="card"><div class="card-body">
-        <h4>اتجاه الوثائق المنتهية أسبوعيًّا (⑧ — يجب أن ينخفض لا أن يثبت)</h4>
+        <h4>اتجاه الوثائق المنتهية أسبوعيا (⑧ — يجب أن ينخفض لا أن يثبت)</h4>
         <ul>
         <?php foreach ($trend as $t): ?>
             <li><?php echo htmlspecialchars($t['title']); ?></li>

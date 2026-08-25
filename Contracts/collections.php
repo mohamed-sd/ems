@@ -66,13 +66,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && strval($_POST['col_action'] ?? '') 
         'memo'          => $_POST['memo'] ?? '',
     ), $uid);
     if ($r['ok']) {
-        $msg = 'سُجّل القبضُ وخُصّص ' . $r['allocated']
-             . ' على ' . count($r['allocations']) . ' ذمّة';
+        $msg = 'سجل القبض وخصص ' . $r['allocated']
+             . ' على ' . count($r['allocations']) . ' ذمة';
         if ($r['unallocated'] > 0) { $msg .= ' · ' . $r['reason']; }
         if ($r['claims_touched']) {
             $st = array();
             foreach ($r['claims_touched'] as $c) { $st[] = '#' . $c['claim_id'] . '→' . $c['state']; }
-            $msg .= ' · ارتدَّت حالةُ: ' . implode(' · ', $st);
+            $msg .= ' · ارتدت حالة: ' . implode(' · ', $st);
         }
         $redirect($msg . ' ✅');
     }
@@ -144,19 +144,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>';
     }
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا ذممَ مستحقةً ولا مقبوضاتٍ مسجَّلةً في النطاقِ المختار',
-                           'سجّل أولَ قبضٍ بمرجعٍ بنكيٍّ من نموذجِ «تسجيلُ قبض» أعلاه');
+    echo ems_states_bundle('لا ذمم مستحقة ولا مقبوضات مسجلة في النطاق المختار',
+                           'سجل أول قبض بمرجع بنكي من نموذج «تسجيل قبض» أعلاه');
     ?>
 
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <?php if ($can_add): ?>
-    <div class="card"><div class="card-header"><h5><i class="fa fa-money-check-dollar"></i> تسجيلُ قبض</h5></div>
+    <div class="card"><div class="card-header"><h5><i class="fa fa-money-check-dollar"></i> تسجيل قبض</h5></div>
     <div class="card-body">
         <p class="col-note-muted">
-            <strong>المرجعُ البنكيُّ إلزامي</strong> («قبضٌ بمرجعٍ بنكيٍّ أو سند» §4)، و<strong>لا يُقبض
-            المرجعُ نفسُه بالمبلغ نفسِه في اليوم نفسِه مرتين</strong>. والتخصيصُ
-            <strong>لأقدم فاتورةٍ أولًا</strong> ما لم تُحدَّد ذمّةٌ بعينها — <strong>وكلُّ تخصيصٍ سطرٌ يُرى</strong>.
+            <strong>المرجع البنكي إلزامي</strong> («قبض بمرجع بنكي أو سند» §4)، و<strong>لا يقبض
+            المرجع نفسه بالمبلغ نفسه في اليوم نفسه مرتين</strong>. والتخصيص
+            <strong>لأقدم فاتورة أولا</strong> ما لم تحدد ذمة بعينها — <strong>وكل تخصيص سطر يرى</strong>.
         </p>
         <form method="post" class="ems-form">
         <?php echo csrf_field(); ?>
@@ -175,28 +175,28 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="bank_ref" maxlength="120" required id="emsf_25_6ef1f"></div>
                 <div class="form-group"><label for="emsf_26_c982c">تاريخ القبض <span class="col-req">*</span></label>
                     <input type="date" name="received_on" required id="emsf_26_c982c"></div>
-                <div class="form-group"><label for="emsf_27_b0555">ذمّةٌ بعينها <small>— فارغٌ = أقدمُ فاتورةٍ أولًا</small></label>
+                <div class="form-group"><label for="emsf_27_b0555">ذمة بعينها <small>— فارغ = أقدم فاتورة أولا</small></label>
                     <select name="receivable_id" id="emsf_27_b0555">
-                        <option value="0">— أقدمُ فاتورةٍ أولًا —</option>
+                        <option value="0">— أقدم فاتورة أولا —</option>
                         <?php foreach ($ageing as $r): if ((float)$r['outstanding'] <= 0) { continue; } ?>
                             <option value="<?php echo intval($r['id']); ?>">
                                 <?php echo htmlspecialchars((string)$r['doc_ref']); ?>
-                                — متبقٍّ <?php echo htmlspecialchars((string)$r['outstanding']); ?></option>
+                                — متبق <?php echo htmlspecialchars((string)$r['outstanding']); ?></option>
                         <?php endforeach; ?>
                     </select></div>
                 <div class="form-group"><label for="emsf_28_b6d68">العملة</label><input type="text" name="currency" value="USD" maxlength="8" id="emsf_28_b6d68"></div>
                 <div class="form-group"><label for="emsf_29_eff92">الطريقة</label><input type="text" name="method" value="bank" maxlength="30" id="emsf_29_eff92"></div>
                 <div class="form-group"><label for="emsf_30_6854a">بيان</label><input type="text" name="memo" maxlength="200" id="emsf_30_6854a"></div>
             </div>
-            <div class="col-actions"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> سجّل القبض</button></div>
+            <div class="col-actions"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> سجل القبض</button></div>
         </form>
     </div></div>
     <?php endif; ?>
 
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clock"></i> الذممُ بأعمارها</h5></div>
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clock"></i> الذمم بأعمارها</h5></div>
     <div class="card-body">
         <form method="get" class="col-filter-form">
-            <label for="emsf_31_90b71">ترشيحٌ بعميل:</label>
+            <label for="emsf_31_90b71">ترشيح بعميل:</label>
             <select name="client_id" onchange="this.form.submit()" id="emsf_31_90b71">
                 <option value="0">— الكل —</option>
                 <?php foreach ($clients as $c): ?>
@@ -207,14 +207,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </form>
         <div class="table-container">
         <table class="alltables display nowrap col-table">
-            <thead><tr><th>مرجع التفويض</th><th>المبلغ</th><th>المحصَّل</th><th>المتبقي</th>
+            <thead><tr><th>مرجع التفويض</th><th>المبلغ</th><th>المحصل</th><th>المتبقي</th>
                 <th>العمر (يوم)</th><th>الحالة</th>
                 <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
                 <th class="ems-fn-th" data-fn="1">العميل</th>
                 <th class="ems-fn-th" data-fn="1">العقد</th>
                 <th class="ems-fn-th" data-fn="1">قيمة الفاتورة</th>
                 <th class="ems-fn-th" data-fn="1">الرصيد</th>
-                <th class="ems-fn-th" data-fn="1">العملة المقبوضة فعلًا</th>
+                <th class="ems-fn-th" data-fn="1">العملة المقبوضة فعلا</th>
                 <th class="ems-fn-th" data-fn="1">سعر الصرف عند القبض</th>
                 <th class="ems-fn-th" data-fn="1">المعادل بعملة الدفاتر</th>
                 <th class="ems-fn-th" data-fn="1">إتاحة النقد للاستخدام</th>
@@ -225,12 +225,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <th class="ems-fn-th" data-fn="1">خطة التحصيل</th>
                 <th class="ems-fn-th" data-fn="1">المسؤول</th>
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
                 <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                 <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                 <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-                <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+                <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
                 <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                 <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                 <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
@@ -257,7 +257,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
     </div></div>
 
-    <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> آخرُ المقبوضات وتخصيصُها</h5></div>
+    <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> آخر المقبوضات وتخصيصها</h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap col-table">
             <thead><tr><th>رقم الفاتورة</th><th>المرجع البنكي</th><th>تاريخ الفاتورة</th><th>المبلغ</th>
@@ -267,19 +267,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <tr>
                     <td><?php echo htmlspecialchars((string)$p['payment_no']); ?></td>
                     <td><?php echo (string)$p['bank_ref'] === 'legacy_no_ref'
-                        ? '<span class="badge badge-warning">موروثٌ بلا مرجع</span>'
+                        ? '<span class="badge badge-warning">موروث بلا مرجع</span>'
                         : htmlspecialchars((string)$p['bank_ref']); ?></td>
                     <td><?php echo htmlspecialchars((string)($p['received_on'] ?? '—')); ?></td>
                     <td><?php echo htmlspecialchars((string)$p['amount']); ?>
                         <?php echo htmlspecialchars((string)$p['currency']); ?></td>
                     <td><?php echo htmlspecialchars((string)$p['state']); ?></td>
                     <td><?php if (!$alloc): ?>
-                            <span class="badge badge-warning">بلا تخصيصٍ مسجَّل</span>
+                            <span class="badge badge-warning">بلا تخصيص مسجل</span>
                         <?php else: foreach ($alloc as $a): ?>
                             <div><?php echo htmlspecialchars((string)$a['doc_ref']); ?>:
                                 <strong><?php echo htmlspecialchars((string)$a['amount']); ?></strong>
                                 <small>(<?php echo (string)$a['basis'] === 'explicit'
-                                    ? 'مرجعٌ صريح' : 'أقدمُ فاتورةٍ أولًا'; ?>)</small></div>
+                                    ? 'مرجع صريح' : 'أقدم فاتورة أولا'; ?>)</small></div>
                         <?php endforeach; endif; ?></td>
                 </tr>
             <?php endforeach; ?>
@@ -309,27 +309,27 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <small>عند السداد — بالعملة الوظيفية</small>
             </div>
             <div class="col-fx-card">
-                <div class="col-fx-label">③ فرقُ صرفٍ <strong>غيرُ محقَّق</strong></div>
+                <div class="col-fx-label">③ فرق صرف <strong>غير محقق</strong></div>
                 <div class="col-fx-value"><?php
                     echo $four['unrealized'] . ' ' . htmlspecialchars((string)$four['functional']); ?></div>
-                <small><strong>تقديرٌ لا يُقفل ذمّةً ولا يمسّ رصيدًا</strong></small>
+                <small><strong>تقدير لا يقفل ذمة ولا يمس رصيدا</strong></small>
             </div>
             <div class="col-fx-card">
-                <div class="col-fx-label">④ زيادةُ سداد</div>
+                <div class="col-fx-label">④ زيادة سداد</div>
                 <div class="col-fx-value"><?php echo $four['overpayment']; ?></div>
-                <small><strong>رصيدٌ دائنٌ للعميل لا إيراد</strong></small>
+                <small><strong>رصيد دائن للعميل لا إيراد</strong></small>
             </div>
         </div>
         <?php if ($fxRows): ?>
         <div class="table-container col-mt12">
             <table class="alltables display nowrap no-datatable col-table" data-no-dt="1">
                 <thead><tr><th>النوع</th><th>المصدر</th><th>عملة الفاتورة</th><th>المبلغ</th>
-                    <th>سعرُ الاعتراف</th><th>سعرُ السداد</th><th>تاريخ الاستحقاق</th><th>البيان</th></tr></thead>
+                    <th>سعر الاعتراف</th><th>سعر السداد</th><th>تاريخ الاستحقاق</th><th>البيان</th></tr></thead>
                 <tbody>
                 <?php foreach ($fxRows as $d): ?>
                     <tr><td><span class="badge <?php echo (string)$d['kind'] === 'realized'
                             ? 'badge-info' : 'badge-secondary'; ?>">
-                            <?php echo (string)$d['kind'] === 'realized' ? 'محقَّق' : 'غيرُ محقَّق'; ?></span></td>
+                            <?php echo (string)$d['kind'] === 'realized' ? 'محقَّق' : 'غير محقق'; ?></span></td>
                         <td><?php echo htmlspecialchars((string)$d['source_kind']); ?>
                             #<?php echo intval($d['source_ref']); ?></td>
                         <td><?php echo htmlspecialchars((string)$d['from_currency']); ?></td>
@@ -349,21 +349,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <!-- ═══ P-07: أهدافُ التخصيص الخمسة والرصيدُ غيرُ المخصَّص ═══ -->
     <div class="card"><div class="card-header"><h5><i class="fa fa-scale-balanced"></i>
-        تخصيصٌ على أهدافٍ متعددة — <strong>والرصيدُ غيرُ المخصَّص ظاهرٌ لا يختفي</strong></h5></div>
+        تخصيص على أهداف متعددة — <strong>والرصيد غير المخصص ظاهر لا يختفي</strong></h5></div>
     <div class="card-body">
         <p class="col-note">
             <i class="fas fa-circle-info"></i>
-            السندُ الواحدُ يُخصَّص على <strong>خمسةِ أنواعٍ من الأهداف</strong>:
-            مقدَّمٌ · فاتورةٌ · معلَمٌ · محتجَزٌ · ختامية.
-            و<strong>Σ التخصيصات لا تتجاوز السند أبدًا</strong>،
-            و<strong>ما بقي رصيدٌ دائنٌ للعميل لا إيراد</strong> — يُعلَن ويُسوّى بقرار.
+            السند الواحد يخصص على <strong>خمسة أنواع من الأهداف</strong>:
+            مقدم · فاتورة · معلم · محتجز · ختامية.
+            و<strong>Σ التخصيصات لا تتجاوز السند أبدا</strong>،
+            و<strong>ما بقي رصيد دائن للعميل لا إيراد</strong> — يعلن ويسوى بقرار.
         </p>
 
         <?php if ($unallocated): ?>
         <div class="table-container col-mb14">
             <table class="alltables display nowrap no-datatable col-table" data-no-dt="1">
                 <thead><tr><th>السند</th><th>المرجع</th><th>التاريخ</th><th>المبلغ</th>
-                    <th>المخصص المكوَّن</th><th><strong>غيرُ المخصَّص</strong></th><th></th></tr></thead>
+                    <th>المخصص المكون</th><th><strong>غير المخصص</strong></th><th></th></tr></thead>
                 <tbody>
                 <?php foreach ($unallocated as $p): ?>
                     <tr class="col-row-unalloc">
@@ -376,24 +376,24 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <td><span class="badge badge-warning">
                             <?php echo htmlspecialchars((string)$p['unallocated_amount']); ?></span></td>
                         <td><a class="action-btn" href="?payment_id=<?php echo intval($p['id']); ?>">
-                            <i class="fa fa-scale-balanced"></i> خصّص</a></td></tr>
+                            <i class="fa fa-scale-balanced"></i> خصص</a></td></tr>
                 <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
         <?php else: ?>
-            <p><em>لا سندَ فيه رصيدٌ غيرُ مخصَّص — <strong>وΣ التخصيصات = السند في كلٍّ</strong>.</em></p>
+            <p><em>لا سند فيه رصيد غير مخصص — <strong>وΣ التخصيصات = السند في كل</strong>.</em></p>
         <?php endif; ?>
 
         <?php if ($payInfo !== null): ?>
         <div class="col-badges">
-            <span class="badge badge-secondary col-badge-pad">مبلغُ السند
+            <span class="badge badge-secondary col-badge-pad">مبلغ السند
                 <?php echo $payInfo['amount'] . ' ' . htmlspecialchars((string)$payInfo['currency']); ?></span>
-            <span class="badge badge-info col-badge-pad">المخصَّص
+            <span class="badge badge-info col-badge-pad">المخصص
                 <?php echo $payInfo['allocated']; ?></span>
             <span class="badge col-badge-pad <?php echo $payInfo['unallocated'] > 0.004
                 ? 'badge-warning' : 'badge-success'; ?>">
-                غيرُ المخصَّص <?php echo $payInfo['unallocated']; ?></span>
+                غير المخصص <?php echo $payInfo['unallocated']; ?></span>
         </div>
         <?php if ($payAllocs): ?>
         <div class="table-container col-mb10">
@@ -408,7 +408,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 ? (' — ' . htmlspecialchars((string)$a['doc_ref'])) : ''; ?></td>
                         <td><?php echo htmlspecialchars((string)$a['amount']); ?></td>
                         <td><?php echo (string)$a['basis'] === 'explicit'
-                            ? 'مرجعٌ صريح' : 'أقدمُ فاتورةٍ أولًا'; ?></td>
+                            ? 'مرجع صريح' : 'أقدم فاتورة أولا'; ?></td>
                         <td class="col-wrap"><?php
                             echo htmlspecialchars((string)($a['note'] ?? '—')); ?></td></tr>
                 <?php endforeach; ?>
@@ -425,23 +425,23 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <?php for ($i = 0; $i < 3; $i++): ?>
             <div class="col-alloc-row">
                 <div class="form-group"><label>الهدف <?php echo $i + 1; ?></label>
-                    <select aria-label="نوعُ هدفِ التخصيص" name="t_kind[<?php echo $i; ?>]">
+                    <select aria-label="نوع هدف التخصيص" name="t_kind[<?php echo $i; ?>]">
                         <?php foreach ($TARGET_AR as $k => $v): ?>
                             <option value="<?php echo $k; ?>"
                                 <?php echo $k === 'invoice' ? 'selected' : ''; ?>>
                                 <?php echo htmlspecialchars($v); ?></option>
                         <?php endforeach; ?></select></div>
-                <div class="form-group"><label for="emsf_32_b6d12">مرجعُه</label>
-                    <input type="number" class="col-w120" aria-label="مرجعُ هدفِ التخصيص" name="t_ref[<?php echo $i; ?>]"
-                           placeholder="رقمُ الذمّة أو سطرِ الخطة" id="emsf_32_b6d12"></div>
+                <div class="form-group"><label for="emsf_32_b6d12">مرجعه</label>
+                    <input type="number" class="col-w120" aria-label="مرجع هدف التخصيص" name="t_ref[<?php echo $i; ?>]"
+                           placeholder="رقم الذمة أو سطر الخطة" id="emsf_32_b6d12"></div>
                 <div class="form-group"><label for="emsf_33_60a7d">المبلغ</label>
-                    <input type="number" step="0.01" class="col-w120" aria-label="مبلغُ التخصيصِ على هذا الهدف" name="t_amount[<?php echo $i; ?>]" id="emsf_33_60a7d"></div>
+                    <input type="number" step="0.01" class="col-w120" aria-label="مبلغ التخصيص على هذا الهدف" name="t_amount[<?php echo $i; ?>]" id="emsf_33_60a7d"></div>
                 <div class="form-group col-mw200"><label for="emsf_34_03ed0">ملاحظة</label>
-                    <input type="text" aria-label="ملاحظةٌ على سطرِ التخصيص" name="t_note[<?php echo $i; ?>]" maxlength="255" id="emsf_34_03ed0"></div>
+                    <input type="text" aria-label="ملاحظة على سطر التخصيص" name="t_note[<?php echo $i; ?>]" maxlength="255" id="emsf_34_03ed0"></div>
             </div>
             <?php endfor; ?>
             <button type="submit" class="btn-primary"><i class="fa fa-scale-balanced"></i>
-                خصّص — <strong>وΣ لا تتجاوز السند</strong></button>
+                خصص — <strong>وΣ لا تتجاوز السند</strong></button>
         </form>
         <?php endif; ?>
         <?php endif; ?>

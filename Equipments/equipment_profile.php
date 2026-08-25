@@ -126,8 +126,8 @@ $can_edit_card = !empty($can_edit);
 // قوائم ثابتة
 $DOC_TYPES        = ['تأمين', 'رخصة', 'شهادة فحص', 'شهادة سلامة', 'شهادة رفع', 'شهادة معايرة', 'أخرى'];
 $PROTECTION_TYPES = ['تنجيد مقاعد', 'شبك حماية زجاج', 'حمايات معدنية', 'نظام إطفاء', 'نظام تتبّع', 'تجهيزات سلامة', 'حماية تشغيل', 'تأمين شامل', 'تأمين هندسي', 'أخرى'];
-$PROTECTION_STATES = ['فعّال', 'يحتاج تجديداً', 'منتهٍ/مفكوك'];
-$COMPONENT_TYPES  = ['محرك', 'هيدروليك', 'جيربوكس', 'دفرنس', 'مولّد', 'أخرى'];
+$PROTECTION_STATES = ['فعال', 'يحتاج تجديداً', 'منتهٍ/مفكوك'];
+$COMPONENT_TYPES  = ['محرك', 'هيدروليك', 'جيربوكس', 'دفرنس', 'مولد', 'أخرى'];
 $EVENT_TYPES      = ['دخول', 'تشغيل بمشروع', 'خروج', 'ترحيل', 'صيانة', 'عطل', 'حادث/ضرر', 'تفتيش', 'إيقاف', 'إعادة تشغيل', 'تغيير مصدر', 'خروج/بيع'];
 
 // جلب السطور — عبر البوابة (العزل بالحقن، وسم is_deleted يبقى شرطًا صريحًا كسلوك الأصل)
@@ -157,7 +157,7 @@ if (true) {
         function ems_duration_ar($sec)
         {
             $sec = max(0, (int) $sec);
-            $units = [['أيام', 'يوم', 86400], ['ساعات', 'ساعة', 3600], ['دقائق', 'دقيقة', 60], ['ثوانٍ', 'ثانية', 1]];
+            $units = [['أيام', 'يوم', 86400], ['ساعات', 'ساعة', 3600], ['دقائق', 'دقيقة', 60], ['ثوان', 'ثانية', 1]];
             $parts = [];
             $rem = $sec;
             foreach ($units as $u) {
@@ -491,9 +491,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => 'equipments.php', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا سجلَّ لهذه المعدةِ في هذا القسمِ بعدُ', 'سجِّلْ أولَ وثيقةٍ أو تجهيزٍ أو حدثٍ من أزرارِ الإضافةِ في لوحةِ «الوثائق والسجل»');
+    echo ems_states_bundle('لا سجل لهذه المعدة في هذا القسم بعد', 'سجل أول وثيقة أو تجهيز أو حدث من أزرار الإضافة في لوحة «الوثائق والسجل»');
     ?>
-<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('equipment', 'نظرةٌ عامة'); ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('equipment', 'نظرة عامة'); ?>
 
     <?php
     // حالة الكرت (حوكمة خفيفة) + الحالة التشغيلية
@@ -536,7 +536,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php if (!$card_is_active && !empty($can_edit)): ?>
         <?php /* الاعتمادُ فعلٌ كاتبٌ بـPOST — فيبقى نموذجًا بزرِّه المعتمَد،
                  ولا يُقحَم في شريطِ أفعالِ الرأسِ الذي بنيتُه روابط. */ ?>
-        <?php echo ems_profile_note('كرتُ هذه المعدةِ ما يزال مسودةً — لا يُعتمد عليه حتى يُعتمد.'); ?>
+        <?php echo ems_profile_note('كرت هذه المعدة ما يزال مسودة — لا يعتمد عليه حتى يعتمد.'); ?>
         <form method="post" action="approve_card.php" class="ep-approve-card" onsubmit="return confirm('اعتماد كرت هذه المعدة؟');">
             <?= csrf_field() ?>
             <input type="hidden" name="equipment_id" value="<?php echo intval($equipment_id); ?>">
@@ -581,7 +581,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     /* إحدى عشرةَ حقيقةً كانت `profile-card` بـ`label` وقيمةٍ — شبكةُ حقائقَ
        مبنيةٌ يدويًّا. والغيابُ فيها كان «—» **نصًّا** لا يُميَّز من قيمةٍ
        حقيقية؛ وشبكةُ المكوّنِ تُعلنه بصنفِ غيابٍ ظاهر. */
-    echo ems_profile_section_open(array('title' => 'الهوية والمصدر والعدّاد', 'icon' => 'fas fa-id-badge'));
+    echo ems_profile_section_open(array('title' => 'الهوية والمصدر والعداد', 'icon' => 'fas fa-id-badge'));
     echo ems_profile_facts(array(
         array('label' => 'الفئة التشغيلية', 'value' => $equipment['operating_category']),
         array('label' => 'بلد الصنع',       'value' => $equipment['origin_country']),
@@ -592,8 +592,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         array('label' => 'نوع المصدر',      'value' => $equipment['source_type']),
         array('label' => 'تاريخ الدخول',    'value' => $equipment['entry_date']),
         array('label' => 'تكلفة الشراء',    'value' => $acq_val),
-        array('label' => 'العدّاد الافتتاحي', 'value' => $meter_val),
-        array('label' => 'مصدر العدّاد',    'value' => $equipment['meter_source']),
+        array('label' => 'العداد الافتتاحي', 'value' => $meter_val),
+        array('label' => 'مصدر العداد',    'value' => $equipment['meter_source']),
     ), true);
     echo ems_profile_section_close();
 
@@ -663,7 +663,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         array('value' => intval($mnt_total),  'label' => 'إجمالي أوامر الصيانة'),
         array('value' => intval($mnt_open),   'label' => 'أوامر مفتوحة', 'tone' => $mnt_open > 0 ? 'warn' : 'muted'),
         array('value' => intval($mnt_failures), 'label' => 'أعطال (من بلاغ)', 'tone' => $mnt_failures > 0 ? 'danger' : 'muted'),
-        array('value' => number_format($mnt_downtime, 1), 'label' => 'ساعات التوقّف', 'unit' => 'ساعة'),
+        array('value' => number_format($mnt_downtime, 1), 'label' => 'ساعات التوقف', 'unit' => 'ساعة'),
         array('value' => number_format($mnt_cost, 0),     'label' => 'إجمالي تكلفة الصيانة', 'variant' => 'money'),
         array('value' => $mnt_last !== null && $mnt_last !== '' ? $mnt_last : '', 'label' => 'آخر صيانة', 'variant' => 'date'),
         array('value' => $mnt_mtbf !== null ? number_format($mnt_mtbf, 1) : '', 'label' => 'MTBF (ساعة/عطل)'),
@@ -675,7 +675,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
             <div class="table-container ep-mt12">
                 <table class="display ep-w100">
-                    <thead><tr><th>المرجع</th><th>المصدر</th><th>النوع</th><th>الحالة</th><th>التوقّف (ساعة)</th><th>التكلفة</th><th>الإغلاق</th></tr></thead>
+                    <thead><tr><th>المرجع</th><th>المصدر</th><th>النوع</th><th>الحالة</th><th>التوقف (ساعة)</th><th>التكلفة</th><th>الإغلاق</th></tr></thead>
                     <tbody>
                         <?php if (empty($mnt_orders)): ?>
                             <tr><td colspan="7" class="ep-empty-cell">لا توجد أوامر صيانة لهذه المعدة</td></tr>
@@ -717,10 +717,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <table class="display ep-ins-table ep-w100">
                     <thead><tr><th>المرجع</th><th>النوع</th><th>الفاحص</th><th>التاريخ</th><th>الدرجة</th><th>الجاهزية</th><th>الملاحظات</th><th>الحالة</th><th>عرض</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -816,7 +816,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php if ($critical_expired > 0): ?>
         <div class="success-message is-error ep-critical-alert">
             <i class="fa-solid fa-triangle-exclamation"></i>
-            تحذير حرج: توجد <?= (int) $critical_expired; ?> وثيقة حرجة منتهية الصلاحية لهذه المعدة. (سيُربط لاحقاً بمنع التشغيل/التخصيص)
+            تحذير حرج: توجد <?= (int) $critical_expired; ?> وثيقة حرجة منتهية الصلاحية لهذه المعدة. (سيربط لاحقا بمنع التشغيل/التخصيص)
         </div>
     <?php endif; ?>
 
@@ -856,7 +856,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <thead><tr><th>النوع</th><th>المرجع</th><th>الإصدار</th><th>الانتهاء</th><th>حرجة</th><th>الحالة</th><th>مرفق</th><?php if ($can_edit_card): ?><th></th><?php endif; ?></tr></thead>
                     <tbody>
                         <?php if (empty($compliance_rows)): ?>
-                            <tr><td colspan="<?= $can_edit_card ? 8 : 7; ?>" class="ep-empty-cell">لا توجد وثائق مُسجّلة</td></tr>
+                            <tr><td colspan="<?= $can_edit_card ? 8 : 7; ?>" class="ep-empty-cell">لا توجد وثائق مسجلة</td></tr>
                         <?php else: foreach ($compliance_rows as $cr): $st = ems_doc_status($cr['expiry_date'] ?? null, $today_ts, $DOC_ALERT_DAYS); ?>
                             <tr>
                                 <td><?= $ee($cr['doc_type']); ?></td>
@@ -893,7 +893,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <div><label for="emsf_105_2422f">التكلفة</label><input type="number" step="0.01" name="cost" id="emsf_105_2422f"></div>
                     <div><label for="emsf_106_132b7">الحالة</label><select name="state" id="emsf_106_132b7"><option value="">-- اختر --</option><?php foreach ($PROTECTION_STATES as $o) echo '<option>' . $ee($o) . '</option>'; ?></select></div>
                     <div><label for="emsf_107_788c4">تاريخ التجديد</label><input type="date" name="renewal_date" id="emsf_107_788c4"></div>
-                    <div><label for="emsf_108_fcdfc">المنفّذ/المورد</label><input type="text" name="partner_name" autocomplete="off" placeholder="اكتب اسم المنفّذ/المورد (إدخال يدوي)" id="emsf_108_fcdfc"></div>
+                    <div><label for="emsf_108_fcdfc">المنفذ/المورد</label><input type="text" name="partner_name" autocomplete="off" placeholder="اكتب اسم المنفذ/المورد (إدخال يدوي)" id="emsf_108_fcdfc"></div>
                     <div><label for="emsf_109_d5915">مرتبط بوثيقة (للتأمين)</label><select name="compliance_id" id="emsf_109_d5915"><option value="">-- بدون --</option><?php foreach ($compliance_rows as $cr) echo '<option value="' . (int) $cr['id'] . '">' . $ee($cr['doc_type'] . ($cr['reference'] ? ' — ' . $cr['reference'] : '')) . '</option>'; ?></select></div>
                     <div><label for="emsf_110_ee635">مرفق</label><input type="file" name="attachment" accept="image/*,application/pdf" id="emsf_110_ee635"></div>
                 </div>
@@ -902,10 +902,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <?php endif; ?>
             <div class="table-container">
                 <table class="display ep-w100">
-                    <thead><tr><th>النوع</th><th>الوصف</th><th>البدء</th><th>التكلفة</th><th>الحالة</th><th>التجديد</th><th>المنفّذ</th><th>مرفق</th><?php if ($can_edit_card): ?><th></th><?php endif; ?></tr></thead>
+                    <thead><tr><th>النوع</th><th>الوصف</th><th>البدء</th><th>التكلفة</th><th>الحالة</th><th>التجديد</th><th>المنفذ</th><th>مرفق</th><?php if ($can_edit_card): ?><th></th><?php endif; ?></tr></thead>
                     <tbody>
                         <?php if (empty($protection_rows)): ?>
-                            <tr><td colspan="<?= $can_edit_card ? 9 : 8; ?>" class="ep-empty-cell">لا توجد تجهيزات مُسجّلة</td></tr>
+                            <tr><td colspan="<?= $can_edit_card ? 9 : 8; ?>" class="ep-empty-cell">لا توجد تجهيزات مسجلة</td></tr>
                         <?php else: foreach ($protection_rows as $pr): $needs = ($pr['state'] ?? '') === 'يحتاج تجديداً'; ?>
                             <tr>
                                 <td><?= $ee($pr['protection_type']); ?></td>
@@ -928,39 +928,39 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <!-- (3) المكوّنات الكبرى -->
     <?php echo ems_profile_section_open(array(
         'id'      => 'sec-components',
-        'title'   => 'المكوّنات الكبرى',
+        'title'   => 'المكونات الكبرى',
         'icon'    => 'fas fa-gears',
-        'actions' => $can_edit_card ? '<button type="button" class="btn btn-primary btn-sm" onclick="emsToggle(\'add-comp\')"><i class="fas fa-plus"></i> إضافة مكوّن</button>' : '',
+        'actions' => $can_edit_card ? '<button type="button" class="btn btn-primary btn-sm" onclick="emsToggle(\'add-comp\')"><i class="fas fa-plus"></i> إضافة مكون</button>' : '',
     )); ?>
             <?php if ($can_edit_card): ?>
             <form id="add-comp" class="child-add-form ems-form ep-mb14 is-hidden" method="post" action="equipment_child_save.php">
         <?= csrf_field() ?>
                 <input type="hidden" name="entity" value="component"><input type="hidden" name="action" value="add"><input type="hidden" name="equipment_id" value="<?= (int) $equipment_id; ?>">
                 <div class="form-grid">
-                    <div><label for="emsf_111_0499d">نوع المكوّن *</label><select name="component_type" required id="emsf_111_0499d"><option value="">-- اختر --</option><?php foreach ($COMPONENT_TYPES as $o) echo '<option>' . $ee($o) . '</option>'; ?></select></div>
+                    <div><label for="emsf_111_0499d">نوع المكون *</label><select name="component_type" required id="emsf_111_0499d"><option value="">-- اختر --</option><?php foreach ($COMPONENT_TYPES as $o) echo '<option>' . $ee($o) . '</option>'; ?></select></div>
                     <div><label for="emsf_112_4aed5">الرقم التسلسلي</label><input type="text" name="serial_no" id="emsf_112_4aed5"></div>
                     <div><label for="emsf_113_11c52">تاريخ التركيب</label><input type="date" name="install_date" id="emsf_113_11c52"></div>
-                    <div class="ep-check-row"><input type="checkbox" name="is_current" id="comp_cur" value="1" checked><label for="comp_cur" class="ep-m0">مُركَّب حالياً</label></div>
+                    <div class="ep-check-row"><input type="checkbox" name="is_current" id="comp_cur" value="1" checked><label for="comp_cur" class="ep-m0">مركب حاليا</label></div>
                 </div>
                 <button type="submit" class="btn btn-primary btn-sm ep-mt10"><i class="fa-solid fa-save"></i> حفظ</button>
             </form>
             <?php endif; ?>
             <div class="table-container">
                 <table class="display ep-w100">
-                    <thead><tr><th>النوع</th><th>الرقم التسلسلي</th><th>التركيب</th><th>حالي؟</th><th>الاستبدال</th><th>ساعات المكوّن</th><th>مرّات الاستبدال</th><?php if ($can_edit_card): ?><th></th><?php endif; ?></tr></thead>
+                    <thead><tr><th>النوع</th><th>الرقم التسلسلي</th><th>التركيب</th><th>حالي؟</th><th>الاستبدال</th><th>ساعات المكون</th><th>مرات الاستبدال</th><?php if ($can_edit_card): ?><th></th><?php endif; ?></tr></thead>
                     <tbody>
                         <?php if (empty($component_rows)): ?>
-                            <tr><td colspan="<?= $can_edit_card ? 8 : 7; ?>" class="ep-empty-cell">لا توجد مكوّنات مُسجّلة</td></tr>
+                            <tr><td colspan="<?= $can_edit_card ? 8 : 7; ?>" class="ep-empty-cell">لا توجد مكونات مسجلة</td></tr>
                         <?php else: foreach ($component_rows as $cm): ?>
                             <tr>
                                 <td><?= $ee($cm['component_type']); ?></td>
                                 <td><?= $ee($cm['serial_no'] ?: '—'); ?></td>
                                 <td><?= $ee($cm['install_date'] ?: '—'); ?></td>
                                 <td><?= !empty($cm['is_current']) ? '<span class="status-active">نعم</span>' : 'لا'; ?></td>
-                                <td class="ep-later">لاحقاً</td>
-                                <td class="ep-later">لاحقاً</td>
-                                <td class="ep-later">لاحقاً</td>
-                                <?php if ($can_edit_card): ?><td><form method="post" action="equipment_child_save.php" onsubmit="return confirm('حذف هذا المكوّن؟');" class="ep-m0">
+                                <td class="ep-later">لاحقا</td>
+                                <td class="ep-later">لاحقا</td>
+                                <td class="ep-later">لاحقا</td>
+                                <?php if ($can_edit_card): ?><td><form method="post" action="equipment_child_save.php" onsubmit="return confirm('حذف هذا المكون؟');" class="ep-m0">
         <?= csrf_field() ?><input type="hidden" name="entity" value="component"><input type="hidden" name="action" value="delete"><input type="hidden" name="row_id" value="<?= (int) $cm['id']; ?>"><input type="hidden" name="equipment_id" value="<?= (int) $equipment_id; ?>"><button class="action-btn delete" title="حذف"><i class="fa-solid fa-trash"></i></button></form></td><?php endif; ?>
                             </tr>
                         <?php endforeach; endif; ?>
@@ -991,7 +991,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </form>
             <?php endif; ?>
             <?php if (empty($history_rows)): ?>
-                <div class="ep-empty-note">لا توجد أحداث مُسجّلة</div>
+                <div class="ep-empty-note">لا توجد أحداث مسجلة</div>
             <?php else: ?>
                 <ul class="ems-timeline">
                     <?php foreach ($history_rows as $h): ?>
@@ -1022,7 +1022,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="ep-tab-panel" id="tab-movements">
         <?php echo ems_profile_section_open(array('title' => 'تحركات الآلية', 'icon' => 'fas fa-timeline')); ?>
                 <?php if (empty($history_rows)): ?>
-                    <p class="ep-empty-note">لا توجد تحركات مسجّلة بعد.</p>
+                    <p class="ep-empty-note">لا توجد تحركات مسجلة بعد.</p>
                 <?php else: ?>
                     <div class="ep-xscroll">
                         <table id="equipmentMovementsTable" class="ep-movements-table no-datatable ep-w100" data-order='[[0,"desc"]]' data-page-length="25" data-state-save="false">
@@ -1235,7 +1235,7 @@ $(function () {
                 { label: 'ملاحظات', value: d.notes, icon: 'fas fa-note-sticky', size: 'full' }
             ],
             sections: [
-                { title: 'ملخّص الفحص', icon: 'fas fa-chart-pie',
+                { title: 'ملخص الفحص', icon: 'fas fa-chart-pie',
                   pills: [
                       { label: 'سليم', value: good },
                       { label: 'ملاحظة', value: note },

@@ -284,7 +284,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     } catch (\Throwable $t) { error_log('project_users.php dup check: ' . $t->getMessage()); }
 
     if ($pu_dup !== null) {
-        ems_gov_flash_redirect('project_users.php', 'اسم المستخدم موجود مسبقاً ❌', 'GOV-FAIL-409', '');
+        ems_gov_flash_redirect('project_users.php', 'اسم المستخدم موجود مسبقا ❌', 'GOV-FAIL-409', '');
         exit;
     }
 
@@ -369,7 +369,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name']) && (!isset($
     } catch (\Throwable $t) { error_log('project_users.php add dup check: ' . $t->getMessage()); }
 
     if ($pu_dup !== null) {
-        ems_gov_flash_redirect('project_users.php', 'اسم المستخدم موجود مسبقاً ❌', 'GOV-FAIL-409', '');
+        ems_gov_flash_redirect('project_users.php', 'اسم المستخدم موجود مسبقا ❌', 'GOV-FAIL-409', '');
         exit;
     }
 
@@ -441,14 +441,14 @@ include('../insidebar.php');
    والموضعُ والسلوكُ يتولاهما `assets/js/ems-screen-about.js` — فلا نسخةَ
    ثانيةٌ من المكوِّن في هذا الملف. */
 ems_screen_about(
-    'من هنا تبني فريقَ إدارتك: حسابٌ لكلِّ معاونٍ أو مشرفٍ تابعٍ لك، بدورٍ محدَّدٍ '
-  . 'يرسم ما يراه وما يستطيع فعلَه، ومربوطٌ بموظفٍ في سجلِّ الموارد البشرية.',
+    'من هنا تبني فريق إدارتك: حساب لكل معاون أو مشرف تابع لك، بدور محدد '
+  . 'يرسم ما يراه وما يستطيع فعله، ومربوط بموظف في سجل الموارد البشرية.',
     array(
-        'اختر الموظف — لا حسابَ يعمل بلا موظفٍ مُسنَد، فتُملأ بياناتُه تلقائيًّا.',
-        'اختر الدور — واقرأ لوحةَ «ما يفتحه هذا الدور» التي تظهر تحته قبلَ الحفظ.',
-        'سلّم بيانات الدخول — ثم تابع من الجدول: أيُّهم دخل، وأيُّهم لم يدخل بعد.',
+        'اختر الموظف — لا حساب يعمل بلا موظف مسند، فتملأ بياناته تلقائيا.',
+        'اختر الدور — واقرأ لوحة «ما يفتحه هذا الدور» التي تظهر تحته قبل الحفظ.',
+        'سلم بيانات الدخول — ثم تابع من الجدول: أيهم دخل، وأيهم لم يدخل بعد.',
     ),
-    'لا تُسنَد إلا الأدوارُ التابعةُ لدورك — والمنعُ يقع عند الحفظ في الخادم، لا بإخفاء الخيار.'
+    'لا تسند إلا الأدوار التابعة لدورك — والمنع يقع عند الحفظ في الخادم، لا بإخفاء الخيار.'
 );
 ?>
 
@@ -499,7 +499,7 @@ ems_screen_about(
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا معاونين مسجَّلين تحت إدارتك بعدُ', 'أضف أولَ معاونٍ بزرِّ الإضافةِ في رأسِ الشاشة');
+    echo ems_states_bundle('لا معاونين مسجلين تحت إدارتك بعد', 'أضف أول معاون بزر الإضافة في رأس الشاشة');
     ?>
 
     <?php if (!empty($_GET['msg'])):
@@ -517,10 +517,10 @@ ems_screen_about(
         <div class="pu-notice pu-notice--warn">
             <i class="fas fa-triangle-exclamation"></i>
             <div>
-                <b>لا توجد أدوارٌ تابعةٌ لإدارتك بعد.</b>
-                يمكنك عرضُ من يتبعك ومتابعتُهم، ولا يمكن إضافةُ معاونٍ جديد حتى يُنشأ دورٌ تابعٌ لدورك
+                <b>لا توجد أدوار تابعة لإدارتك بعد.</b>
+                يمكنك عرض من يتبعك ومتابعتهم، ولا يمكن إضافة معاون جديد حتى ينشأ دور تابع لدورك
                 <?= (!empty($roleName) ? '«' . htmlspecialchars($roleName, ENT_QUOTES, 'UTF-8') . '»' : '') ?>
-                من <b>إدارة الصلاحيات</b> — فالخادمُ يرفض إسنادَ أيِّ دورٍ ليس ابنًا لدورك.
+                من <b>إدارة الصلاحيات</b> — فالخادم يرفض إسناد أي دور ليس ابنا لدورك.
             </div>
         </div>
     <?php endif; ?>
@@ -535,22 +535,22 @@ ems_screen_about(
         <div class="pu-kpi" data-tone="ok">
             <span class="pu-kpi__ico"><i class="fas fa-circle-check"></i></span>
             <span class="pu-kpi__val"><?= $kpi_active ?></span>
-            <span class="pu-kpi__lbl">حساباتٌ نشطة</span>
+            <span class="pu-kpi__lbl">حسابات نشطة</span>
         </div>
         <div class="pu-kpi" data-tone="info">
             <span class="pu-kpi__ico"><i class="fas fa-shield-halved"></i></span>
             <span class="pu-kpi__val"><?= count($kpi_roles) ?></span>
-            <span class="pu-kpi__lbl">أدوارٌ مستعملة</span>
+            <span class="pu-kpi__lbl">أدوار مستعملة</span>
         </div>
         <div class="pu-kpi" data-tone="<?= ($kpi_total > 0 && $kpi_linked < $kpi_total) ? 'warn' : 'ok' ?>">
             <span class="pu-kpi__ico"><i class="fas fa-id-card-alt"></i></span>
             <span class="pu-kpi__val"><?= $kpi_linked ?>/<?= $kpi_total ?></span>
-            <span class="pu-kpi__lbl">مربوطٌ بموظف</span>
+            <span class="pu-kpi__lbl">مربوط بموظف</span>
         </div>
         <div class="pu-kpi" data-tone="<?= $kpi_never > 0 ? 'warn' : 'ok' ?>">
             <span class="pu-kpi__ico"><i class="fas fa-hourglass-half"></i></span>
             <span class="pu-kpi__val"><?= $kpi_never ?></span>
-            <span class="pu-kpi__lbl">لم يسجّل دخولًا بعد</span>
+            <span class="pu-kpi__lbl">لم يسجل دخولا بعد</span>
         </div>
     </div>
 
@@ -577,7 +577,7 @@ ems_screen_about(
                     <div>
                         <label for="password"><i class="fas fa-lock"></i> كلمة المرور <span id="passwordRequired">*</span></label>
                         <input type="password" name="password" id="password" placeholder="أدخل كلمة المرور" value="" />
-                        <small id="passwordHint" class="pu-password-hint pu-hidden">اتركه فارغاً للاحتفاظ بكلمة المرور
+                        <small id="passwordHint" class="pu-password-hint pu-hidden">اتركه فارغا للاحتفاظ بكلمة المرور
                             الحالية</small>
                     </div>
                     <div>
@@ -600,11 +600,11 @@ ems_screen_about(
                             }
                             ?>
                         </select>
-                        <small class="pu-password-hint">اختر الدور لتظهر لك الشاشاتُ التي سيفتحها هذا المعاون.</small>
+                        <small class="pu-password-hint">اختر الدور لتظهر لك الشاشات التي سيفتحها هذا المعاون.</small>
                     </div>
                     <?php if ($users_has_employee_id): ?>
                     <div>
-                        <label for="employee_id_link"><i class="fas fa-id-card-alt"></i> الموظف المُسنَد *</label>
+                        <label for="employee_id_link"><i class="fas fa-id-card-alt"></i> الموظف المسند *</label>
                         <select name="employee_id" id="employee_id_link" required>
                             <option value="">— اختر الموظف —</option>
                             <?php foreach ($employees_for_link as $emp): ?>
@@ -616,7 +616,7 @@ ems_screen_about(
                                 </option>
                             <?php endforeach; ?>
                         </select>
-                        <small class="pu-password-hint">إلزامي — لا حساب يعمل بلا موظف مُسنَد. تُعبّأ بيانات الموظف تلقائياً عند الاختيار.</small>
+                        <small class="pu-password-hint">إلزامي — لا حساب يعمل بلا موظف مسند. تعبأ بيانات الموظف تلقائيا عند الاختيار.</small>
                     </div>
                     <?php endif; ?>
                 </div>
@@ -662,10 +662,10 @@ ems_screen_about(
                         <th>آخر دخول</th>
                         <th>تاريخ الإنشاء</th>
                         <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                        <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                        <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                        <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                        <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                        <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                        <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                        <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                        <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                         <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                         <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                         <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
@@ -840,8 +840,8 @@ ems_screen_about(
         function rsRender(data) {
             rsName.textContent = data.role.name;
             var writeTxt = data.write > 0
-                ? '<span class="pu-chip pu-chip--write"><i class="fas fa-pen"></i> ' + data.write + ' شاشةَ تعديل</span>'
-                : '<span class="pu-chip pu-chip--read"><i class="fas fa-eye"></i> قراءةٌ فقط</span>';
+                ? '<span class="pu-chip pu-chip--write"><i class="fas fa-pen"></i> ' + data.write + ' شاشة تعديل</span>'
+                : '<span class="pu-chip pu-chip--read"><i class="fas fa-eye"></i> قراءة فقط</span>';
             rsPills.innerHTML =
                 '<span class="pu-chip"><i class="fas fa-window-restore"></i> ' + data.screens.length + ' شاشة</span>' +
                 writeTxt +
@@ -849,14 +849,14 @@ ems_screen_about(
 
             if (!data.screens.length) {
                 rsBody.innerHTML = '<div class="pu-rolescope__empty">'
-                    + '<i class="fas fa-inbox"></i> لا شاشاتٍ مسنَدةً لهذا الدور بعد — المعاونُ عليه لن يرى قائمةً.'
-                    + ' تُسنَد الشاشاتُ من <b>إدارة الصلاحيات</b>.</div>';
+                    + '<i class="fas fa-inbox"></i> لا شاشات مسندة لهذا الدور بعد — المعاون عليه لن يرى قائمة.'
+                    + ' تسند الشاشات من <b>إدارة الصلاحيات</b>.</div>';
                 return;
             }
-            // تجميعٌ بالمرحلة/المجموعة كما تظهر في القائمة — لا قائمةً مسطَّحة
+            // تجميع بالمرحلة/المجموعة كما تظهر في القائمة — لا قائمة مسطحة
             var groups = {}, order = [];
             data.screens.forEach(function (s) {
-                var g = s.group || 'غير مُصنَّف';
+                var g = s.group || 'غير مصنف';
                 if (!groups[g]) { groups[g] = []; order.push(g); }
                 groups[g].push(s);
             });
@@ -885,9 +885,9 @@ ems_screen_about(
 
             rsName.textContent = '…';
             rsPills.innerHTML = '';
-            rsBody.innerHTML = '<div class="pu-rolescope__empty"><i class="fas fa-spinner fa-spin"></i> جارٍ قراءة نطاق الدور…</div>';
+            rsBody.innerHTML = '<div class="pu-rolescope__empty"><i class="fas fa-spinner fa-spin"></i> جار قراءة نطاق الدور…</div>';
 
-            var mySeq = ++rsSeq;   // تجاهلُ ردٍّ متأخِّرٍ لاختيارٍ سابق
+            var mySeq = ++rsSeq;   // تجاهل رد متأخر لاختيار سابق
             fetch('project_users.php?ajax=role_scope&role_id=' + encodeURIComponent(roleId), {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin'
             })
@@ -897,7 +897,7 @@ ems_screen_about(
                     if (!d || !d.ok) {
                         rsBody.innerHTML = '<div class="pu-rolescope__empty pu-rolescope__empty--err">'
                             + '<i class="fas fa-triangle-exclamation"></i> '
-                            + rsEsc((d && d.message) || 'تعذّرت قراءة نطاق الدور') + '</div>';
+                            + rsEsc((d && d.message) || 'تعذرت قراءة نطاق الدور') + '</div>';
                         return;
                     }
                     rsCache[roleId] = d;
@@ -906,14 +906,14 @@ ems_screen_about(
                 .catch(function () {
                     if (mySeq !== rsSeq) { return; }
                     rsBody.innerHTML = '<div class="pu-rolescope__empty pu-rolescope__empty--err">'
-                        + '<i class="fas fa-triangle-exclamation"></i> تعذّر الاتصال — أعد المحاولة</div>';
+                        + '<i class="fas fa-triangle-exclamation"></i> تعذر الاتصال — أعد المحاولة</div>';
                 });
         }
 
         if (roleSelect) { roleSelect.addEventListener('change', function () { rsLoad(this.value); }); }
         if (rsClose)    { rsClose.addEventListener('click', function () { rsBox.hidden = true; }); }
 
-        // ═══ نافذةُ تفاصيل المعاون — النظامُ الموحَّد نفسُه (EmsDetailsModal) ═══
+        // ═══ نافذة تفاصيل المعاون — النظام الموحد نفسه (EmsDetailsModal) ═══
         $(document).on('click', '.puViewBtn', function () {
             var d = this.dataset;
             var tone = (d.statuskey === 'active') ? 'active' : 'inactive';
@@ -942,18 +942,18 @@ ems_screen_about(
                     { label: 'الاسم', value: d.name, icon: 'fas fa-user', size: 'lg' },
                     { label: 'اسم المستخدم', value: d.username, icon: 'fas fa-at' },
                     { label: 'رقم الهاتف', value: d.phone, icon: 'fas fa-phone' },
-                    { label: 'الدور المسنَد', value: d.rolename, icon: 'fas fa-shield-halved', size: 'lg' },
+                    { label: 'الدور المسند', value: d.rolename, icon: 'fas fa-shield-halved', size: 'lg' },
                     { label: 'الموظف المرتبط', value: empVal, icon: 'fas fa-id-card-alt', type: 'html', size: 'lg' },
                     { label: 'حالة الحساب', value: d.status, icon: 'fas fa-toggle-on', type: 'status', tone: tone },
-                    { label: 'آخر دخول', value: d.lastlogin || 'لم يسجّل دخولًا بعد', icon: 'fas fa-right-to-bracket' },
+                    { label: 'آخر دخول', value: d.lastlogin || 'لم يسجل دخولا بعد', icon: 'fas fa-right-to-bracket' },
                     { label: 'تاريخ الإنشاء', value: d.created, icon: 'fas fa-calendar-plus' }
                 ],
                 actions: actions
             });
         });
 
-        // زرُّ التعديل صار بالبيانات لا بنصٍّ مُقحَمٍ في onclick
-        // (اسمٌ فيه علامةُ اقتباسٍ كان يكسر السطرَ المولَّد ويقتل الزر).
+        // زر التعديل صار بالبيانات لا بنص مقحم في onclick
+        // (اسم فيه علامة اقتباس كان يكسر السطر المولد ويقتل الزر).
         $(document).on('click', '.puEditBtn', function () {
             var d = this.dataset;
             window.editUser(d.id, d.name, d.username, d.phone, d.role, d.empid);
@@ -1036,7 +1036,7 @@ ems_screen_about(
                 employeeSelect.value = (employeeId && parseInt(employeeId, 10) > 0) ? String(employeeId) : '';
             }
 
-            // لوحةُ نطاق الدور تتبع القيمةَ المحمَّلة (لا تبقى على دورٍ سابق)
+            // لوحة نطاق الدور تتبع القيمة المحملة (لا تبقى على دور سابق)
             rsLoad(document.getElementById('role').value);
 
             // تغيير نص الفورم والزر ليدل على التعديل

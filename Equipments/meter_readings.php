@@ -51,7 +51,7 @@ if ($is_super_admin) {
     $st->close();
 }
 if (!$can_view) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض قراءات العدّادات ❌', 'GOV-PERM-403', '');
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض قراءات العدادات ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -79,13 +79,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'source'       => $_POST['source'] ?? 'manual',
             'note'         => $_POST['note'] ?? '',
         ), $uid);
-        $redirect($r['ok'] ? ('سُجّلت القراءة ✅' . ($r['delta'] !== null ? (' — الفارق ' . $r['delta']) : ''))
+        $redirect($r['ok'] ? ('سجلت القراءة ✅' . ($r['delta'] !== null ? (' — الفارق ' . $r['delta']) : ''))
                            : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $eid, $mt);
     }
 
     if ($action === 'reset') {
         // التصفيرُ قرارٌ — صلاحيةُ التعديل لا الإضافة (الصيانةُ تسجّل ولا تصفّر)
-        if (!$can_edit) { $redirect('التصفيرُ قرارٌ يخصُّ مالكَ السجل ❌', $eid, $mt); }
+        if (!$can_edit) { $redirect('التصفير قرار يخص مالك السجل ❌', $eid, $mt); }
         $r = MRS::reset($conn, $gate, $company_id, $eid, array(
             'meter_type'    => $mt,
             'reading_date'  => $_POST['reading_date'] ?? '',
@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'reset_reason'  => $_POST['reset_reason'] ?? '',
             'reset_doc_ref' => $_POST['reset_doc_ref'] ?? '',
         ), $uid);
-        $redirect($r['ok'] ? ('صُفّر العدّاد — فُتحت السلسلة ' . intval($r['chain_no']) . ' ✅')
+        $redirect($r['ok'] ? ('صفر العداد — فتحت السلسلة ' . intval($r['chain_no']) . ' ✅')
                            : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $eid, $mt);
     }
 }
@@ -115,7 +115,7 @@ $meter   = $selected > 0 ? MRS::currentMeter($conn, $gate, $company_id, $selecte
 $chain   = $selected > 0 ? MRS::chainOf($gate, $selected, $mtype) : array();
 $stale   = MRS::staleMeters($gate, 14);
 
-$page_title = 'إيكوبيشن | قراءات العدّادات';
+$page_title = 'إيكوبيشن | قراءات العدادات';
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
 require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(null);
@@ -126,14 +126,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main ems-unified-page-shell">
     <?php
-    $header_title = 'قراءات العدّادات'; $header_icon = 'fa fa-gauge-high';
+    $header_title = 'قراءات العدادات'; $header_icon = 'fa fa-gauge-high';
     $header_actions = array();
     $header_back = array('href' => 'equipments.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'المعدات');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     if (function_exists('ems_states_bundle')) {
-        echo ems_states_bundle('لا قراءةَ عدّادٍ مسجَّلةً لهذه المعدةِ بعدُ',
-                               'سجِّل أولَ قراءةٍ من بطاقةِ «تسجيلُ قراءة» أعلاه، أو بدِّل المعدةَ من قائمةِ الاختيار');
+        echo ems_states_bundle('لا قراءة عداد مسجلة لهذه المعدة بعد',
+                               'سجل أول قراءة من بطاقة «تسجيل قراءة» أعلاه، أو بدل المعدة من قائمة الاختيار');
     }
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>';
@@ -147,7 +147,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="filter-body">
         <form method="get" class="mrd-filter">
             <strong>المعدة:</strong>
-            <select name="equipment_id" aria-label="اختيارُ المعدةِ المعروضةِ قراءاتُها" onchange="this.form.submit()" class="mrd-eq-select">
+            <select name="equipment_id" aria-label="اختيار المعدة المعروضة قراءاتها" onchange="this.form.submit()" class="mrd-eq-select">
                 <?php foreach ($equipments as $e): ?>
                     <option value="<?php echo intval($e['id']); ?>" <?php echo $selected === intval($e['id']) ? 'selected' : ''; ?>>
                         #<?php echo intval($e['id']); ?> — <?php echo htmlspecialchars((string)($e['name'] ?? '')); ?>
@@ -155,8 +155,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </option>
                 <?php endforeach; ?>
             </select>
-            <strong>العدّاد:</strong>
-            <select name="meter_type" aria-label="نوعُ العدّاد — ساعاتٌ أو كيلومترات" onchange="this.form.submit()">
+            <strong>العداد:</strong>
+            <select name="meter_type" aria-label="نوع العداد — ساعات أو كيلومترات" onchange="this.form.submit()">
                 <?php foreach ($TYPE_LABELS as $k => $lbl): ?>
                     <option value="<?php echo $k; ?>" <?php echo $mtype === $k ? 'selected' : ''; ?>><?php echo $lbl; ?></option>
                 <?php endforeach; ?>
@@ -166,21 +166,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
 
         <div class="mrd-now">
-            <strong>العدّادُ الحالي:</strong>
+            <strong>العداد الحالي:</strong>
             <span class="mrd-now-value"><?php echo htmlspecialchars((string)$meter['value']); ?></span>
             <?php echo htmlspecialchars($TYPE_LABELS[$mtype]); ?>
             <?php if ($meter['is_reading']): ?>
-                <span class="badge badge-success">قراءةٌ مسجَّلة</span>
+                <span class="badge badge-success">قراءة مسجلة</span>
                 <?php if ($meter['as_of']): ?><small>بتاريخ <?php echo htmlspecialchars((string)$meter['as_of']); ?></small><?php endif; ?>
             <?php else: ?>
-                <span class="badge badge-warning">ليس قراءةَ عدّاد</span>
+                <span class="badge badge-warning">ليس قراءة عداد</span>
             <?php endif; ?>
             <div class="mrd-now-note"><?php echo htmlspecialchars((string)$meter['note']); ?></div>
         </div>
     </div></div>
 
     <?php if ($can_add): ?>
-    <div class="card"><div class="card-header"><h5><i class="fa fa-plus"></i> تسجيلُ قراءة</h5></div>
+    <div class="card"><div class="card-header"><h5><i class="fa fa-plus"></i> تسجيل قراءة</h5></div>
     <div class="card-body">
         <form method="post" class="ems-form">
         <?= csrf_field() ?>
@@ -191,7 +191,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="form-group"><label for="emsf_157_8f657">تاريخ القراءة <span class="mrd-req">*</span></label>
                     <input type="date" name="reading_date" required id="emsf_157_8f657" value="<?php echo date('Y-m-d'); ?>"></div>
                 <div class="form-group"><label for="emsf_158_d1eb7">القيمة <span class="mrd-req">*</span>
-                        <small>— لا تقلّ عن آخرِ قراءة</small></label>
+                        <small>— لا تقل عن آخر قراءة</small></label>
                     <input type="number" step="0.01" min="0" name="value" required id="emsf_158_d1eb7"></div>
                 <div class="form-group">
                     <label for="emsf_159_8f981">المصدر</label>
@@ -207,7 +207,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div></div>
     <?php endif; ?>
 
-    <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> سلسلةُ القراءات</h5></div>
+    <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> سلسلة القراءات</h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap mrd-table">
             <thead><tr>
@@ -217,24 +217,24 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <th class="ems-fn-th" data-fn="1">رقم القراءة</th>
                 <th class="ems-fn-th" data-fn="1">القراءة السابقة</th>
                 <th class="ems-fn-th" data-fn="1">الفرق</th>
-                <th class="ems-fn-th" data-fn="1">الساعات المسجَّلة في التايم شيت</th>
+                <th class="ems-fn-th" data-fn="1">الساعات المسجلة في التايم شيت</th>
                 <th class="ems-fn-th" data-fn="1">فرق المطابقة</th>
                 <th class="ems-fn-th" data-fn="1">سبب الفرق</th>
                 <th class="ems-fn-th" data-fn="1">الاستحقاق الوقائي التالي</th>
                 <th class="ems-fn-th" data-fn="1">الساعات المتبقية للوقائية</th>
-                <th class="ems-fn-th" data-fn="1">سجّلها</th>
-                <th class="ems-fn-th" data-fn="1">صحّحها</th>
+                <th class="ems-fn-th" data-fn="1">سجلها</th>
+                <th class="ems-fn-th" data-fn="1">صححها</th>
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
                 <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                 <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                 <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
                 <th class="ems-gov-th none" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
                 <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-                <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+                <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
                 <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
-                <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
+                <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
                 <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                 <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                 <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
@@ -260,13 +260,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <?php if ($can_edit): ?>
     <div class="card"><div class="card-header">
-        <h5><i class="fa fa-rotate-left"></i> تصفيرُ العدّاد — <strong>بقرارٍ موثَّق</strong></h5></div>
+        <h5><i class="fa fa-rotate-left"></i> تصفير العداد — <strong>بقرار موثق</strong></h5></div>
     <div class="card-body">
         <p class="mrd-caution">
-            التصفيرُ لا يمحو ماضيًا: يفتح <strong>سلسلةً جديدة</strong> وتبقى السابقةُ كاملةً للقراءة
-            (UX-10 §8). والسببُ ومرجعُ المستند <strong>إلزاميان</strong>.
+            التصفير لا يمحو ماضيا: يفتح <strong>سلسلة جديدة</strong> وتبقى السابقة كاملة للقراءة
+            (UX-10 §8). والسبب ومرجع المستند <strong>إلزاميان</strong>.
         </p>
-        <form method="post" class="ems-form" onsubmit="return confirm('تأكيدُ التصفير — يفتح سلسلةً جديدة؟');">
+        <form method="post" class="ems-form" onsubmit="return confirm('تأكيد التصفير — يفتح سلسلة جديدة؟');">
         <?= csrf_field() ?>
             <input type="hidden" name="mr_action" value="reset">
             <input type="hidden" name="equipment_id" value="<?php echo $selected; ?>">
@@ -274,14 +274,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="form-grid">
                 <div class="form-group"><label for="emsf_161_b922e">تاريخ التصفير <span class="mrd-req">*</span></label>
                     <input type="date" name="reading_date" required id="emsf_161_b922e"></div>
-                <div class="form-group"><label for="emsf_162_1d017">قيمةُ بداية السلسلة <span class="mrd-req">*</span></label>
+                <div class="form-group"><label for="emsf_162_1d017">قيمة بداية السلسلة <span class="mrd-req">*</span></label>
                     <input type="number" step="0.01" min="0" name="value" required value="0" id="emsf_162_1d017"></div>
                 <div class="form-group"><label for="emsf_163_87043">السبب <span class="mrd-req">*</span></label>
                     <input type="text" name="reset_reason" required maxlength="255"
-                           placeholder="استبدالُ عدّادٍ معطوب" id="emsf_163_87043"></div>
+                           placeholder="استبدال عداد معطوب" id="emsf_163_87043"></div>
                 <div class="form-group"><label for="emsf_164_59aff">مرجع المستند <span class="mrd-req">*</span></label>
                     <input type="text" name="reset_doc_ref" required maxlength="120"
-                           placeholder="محضرُ ورشة 2026/114" id="emsf_164_59aff"></div>
+                           placeholder="محضر ورشة 2026/114" id="emsf_164_59aff"></div>
             </div>
             <div class="mrd-actions"><button type="submit" class="btn-primary"><i class="fa fa-rotate-left"></i> تصفير</button></div>
         </form>
@@ -289,7 +289,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php endif; ?>
 
     <div class="card"><div class="card-header">
-        <h5><i class="fa fa-triangle-exclamation"></i> عدّاداتٌ لم تُحدَّث منذ 14 يومًا
+        <h5><i class="fa fa-triangle-exclamation"></i> عدادات لم تحدث منذ 14 يوما
             (<?php echo count($stale); ?>)</h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap mrd-table">
@@ -300,7 +300,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <td>#<?php echo intval($s['id']); ?> — <?php echo htmlspecialchars((string)($s['name'] ?? '')); ?></td>
                     <td><?php echo $s['last_reading'] !== null
                         ? htmlspecialchars((string)$s['last_reading'])
-                        : "<span class='badge badge-danger'>بلا قراءةٍ قط</span>"; ?></td>
+                        : "<span class='badge badge-danger'>بلا قراءة قط</span>"; ?></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>

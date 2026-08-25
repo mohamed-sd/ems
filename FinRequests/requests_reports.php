@@ -112,7 +112,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back    = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا طلباتٍ ماليةً مسجَّلةً بعدُ لتُبنى منها التقارير', 'سيِّرْ طلبًا من «بوابة المالية» في رأسِ الشاشةِ ليظهرَ في التجميعِ والأعمارِ والسجل');
+    echo ems_states_bundle('لا طلبات مالية مسجلة بعد لتبنى منها التقارير', 'سير طلبا من «بوابة المالية» في رأس الشاشة ليظهر في التجميع والأعمار والسجل');
     ?>
     <style>
     .frr-mb14        { margin-bottom: 14px; }
@@ -180,18 +180,18 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="stats-grid frr-mb12">
                 <div class="stat-card"><div class="stat-label">0-2 يوم</div><div class="stat-value"><?php echo $ages['0-2']; ?></div></div>
                 <div class="stat-card"><div class="stat-label">3-7 أيام</div><div class="stat-value"><?php echo $ages['3-7']; ?></div></div>
-                <div class="stat-card"><div class="stat-label">8-30 يومًا</div><div class="stat-value<?php echo $ages["8-30"] > 0 ? " frr-warn" : ""; ?>"><?php echo $ages['8-30']; ?></div></div>
+                <div class="stat-card"><div class="stat-label">8-30 يوما</div><div class="stat-value<?php echo $ages["8-30"] > 0 ? " frr-warn" : ""; ?>"><?php echo $ages['8-30']; ?></div></div>
                 <div class="stat-card"><div class="stat-label">أكثر من 30</div><div class="stat-value<?php echo $ages["31+"] > 0 ? " frr-danger" : ""; ?>"><?php echo $ages['31+']; ?></div></div>
             </div>
             <?php if ($oldest): ?>
-            <h6>الأقدم عمرًا (أعلى 10)</h6>
+            <h6>الأقدم عمرا (أعلى 10)</h6>
             <table class="table table-striped no-datatable" data-no-dt="1">
                 <thead><tr><th>الطلب</th><th>الإدارة</th><th>الحالة</th><th>العمر (يوم)</th><th>المبلغ</th><th></th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -215,7 +215,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="card-header"><h5><i class="fa fa-rotate-left"></i> ③ المعاد والمرفوض بأسبابه</h5></div>
         <div class="card-body frr-cols">
             <div class="frr-col-wide">
-                <h6>المرفوض (<?php echo count($rejected); ?>) — نهايةٌ موثقةٌ لا حذف</h6>
+                <h6>المرفوض (<?php echo count($rejected); ?>) — نهاية موثقة لا حذف</h6>
                 <?php foreach ($rejected as $rj): ?>
                     <div class="frr-row">
                         ⛔ <strong><?php echo htmlspecialchars($rj['request_no']); ?></strong>
@@ -226,7 +226,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <?php endforeach; if (!$rejected): ?><div>لا مرفوضات</div><?php endif; ?>
             </div>
             <div class="frr-col-wide">
-                <h6>المعاد للاستكمال (<?php echo count($returned); ?>) — يعود لمنشئه بالسبب كاملًا</h6>
+                <h6>المعاد للاستكمال (<?php echo count($returned); ?>) — يعود لمنشئه بالسبب كاملا</h6>
                 <?php foreach ($returned as $rt): ?>
                     <div class="frr-row">
                         ↩️ <strong><?php echo htmlspecialchars($rt['request_no']); ?></strong>
@@ -234,13 +234,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         · <?php echo number_format(floatval($rt['amount']), 0); ?>
                         <div class="frr-reason">السبب: <?php echo htmlspecialchars(rr_last_reason($gate, $rt['id'], array('return'))); ?></div>
                     </div>
-                <?php endforeach; if (!$returned): ?><div>لا مُعادات</div><?php endif; ?>
+                <?php endforeach; if (!$returned): ?><div>لا معادات</div><?php endif; ?>
             </div>
         </div>
     </div>
 
     <div class="card">
-        <div class="card-header"><h5><i class="fa fa-magnifying-glass"></i> ④ سجلّ طلبٍ كامل — إعادة بناء القصة (§8.6)</h5></div>
+        <div class="card-header"><h5><i class="fa fa-magnifying-glass"></i> ④ سجل طلب كامل — إعادة بناء القصة (§8.6)</h5></div>
         <div class="card-body">
             <form method="get" class="allforms allforms-visible frr-search-form">
                 <div class="frr-field">
@@ -269,7 +269,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <tr>
                             <td><?php echo $i++; ?></td>
                             <td><code><?php echo htmlspecialchars($ev['event_type']); ?></code></td>
-                            <td><?php echo $ev['actor_user_id'] !== null ? intval($ev['actor_user_id']) : 'النظام'; ?><?php echo $ev['on_behalf_of'] ? ' (نيابةً عن ' . intval($ev['on_behalf_of']) . ')' : ''; ?></td>
+                            <td><?php echo $ev['actor_user_id'] !== null ? intval($ev['actor_user_id']) : 'النظام'; ?><?php echo $ev['on_behalf_of'] ? ' (نيابة عن ' . intval($ev['on_behalf_of']) . ')' : ''; ?></td>
                             <td><?php echo htmlspecialchars($ev['body'] ?? ''); ?></td>
                             <td><?php echo htmlspecialchars(($ev['old_value'] !== null || $ev['new_value'] !== null) ? (($ev['old_value'] ?? '—') . ' → ' . ($ev['new_value'] ?? '—')) : ''); ?></td>
                             <td><?php echo htmlspecialchars($ev['created_at']); ?></td>

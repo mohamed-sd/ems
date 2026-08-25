@@ -65,34 +65,34 @@ class SupplierContractService
         $end        = isset($args['end_date']) ? trim((string) $args['end_date']) : '';
         $currency   = isset($args['currency']) ? strtoupper(trim((string) $args['currency'])) : '';
 
-        if ($supplierId <= 0) { $out['code'] = 422; $out['reason'] = 'الموردُ إلزامي'; return $out; }
+        if ($supplierId <= 0) { $out['code'] = 422; $out['reason'] = 'المورد إلزامي'; return $out; }
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $start)) {
-            $out['code'] = 422; $out['reason'] = 'تاريخُ البدء إلزامي (المفتاحُ الفريد يحمله)'; return $out;
+            $out['code'] = 422; $out['reason'] = 'تاريخ البدء إلزامي (المفتاح الفريد يحمله)'; return $out;
         }
         if ($end !== '' && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $end)) {
-            $out['code'] = 422; $out['reason'] = 'تاريخُ الانتهاء غيرُ صالح'; return $out;
+            $out['code'] = 422; $out['reason'] = 'تاريخ الانتهاء غير صالح'; return $out;
         }
         if ($end !== '' && $end < $start) {
-            $out['code'] = 422; $out['reason'] = 'الانتهاءُ قبل البدء'; return $out;
+            $out['code'] = 422; $out['reason'] = 'الانتهاء قبل البدء'; return $out;
         }
         if ($currency !== '' && !in_array($currency, self::CURRENCIES, true)) {
             $out['code'] = 422;
-            $out['reason'] = 'عملةٌ غيرُ معروفةٍ لمحرّك الفوترة: ' . $currency . ' — المعروف: ' . implode('·', self::CURRENCIES);
+            $out['reason'] = 'عملة غير معروفة لمحرك الفوترة: ' . $currency . ' — المعروف: ' . implode('·', self::CURRENCIES);
             return $out;
         }
 
         // الموردُ من النطاق
         $sup = null;
         try { $sup = $gate->selectOne('suppliers', array('columns' => array('id'), 'where' => array('id' => $supplierId))); }
-        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $sup'); $sup = null; }
-        if (!$sup) { $out['code'] = 422; $out['reason'] = 'الموردُ غيرُ موجودٍ في نطاقك'; return $out; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $sup'); $sup = null; }
+        if (!$sup) { $out['code'] = 422; $out['reason'] = 'المورد غير موجود في نطاقك'; return $out; }
 
         // وصلةُ L1 — عقدُ العميل الذي تُقتطع منه الحصة
         if ($clientRef !== null) {
             $cc = null;
             try { $cc = $gate->selectOne('contracts', array('columns' => array('id'), 'where' => array('id' => $clientRef))); }
-            catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $cc'); $cc = null; }
-            if (!$cc) { $out['code'] = 422; $out['reason'] = 'عقدُ العميل (L1) غيرُ موجودٍ في نطاقك'; return $out; }
+            catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $cc'); $cc = null; }
+            if (!$cc) { $out['code'] = 422; $out['reason'] = 'عقد العميل (L1) غير موجود في نطاقك'; return $out; }
         }
 
         $newId = null;
@@ -112,10 +112,10 @@ class SupplierContractService
         } catch (\Throwable $t) {
             if (self::isDuplicate($t)) {
                 $out['code'] = 409;
-                $out['reason'] = 'للمورد عقدٌ على عقد العميل نفسِه بتاريخ البدء نفسِه (UQ) — عدّل التاريخ أو حرّر القائم';
+                $out['reason'] = 'للمورد عقد على عقد العميل نفسه بتاريخ البدء نفسه (UQ) — عدل التاريخ أو حرر القائم';
                 return $out;
             }
-            $out['code'] = 422; $out['reason'] = 'تعذّر الإنشاء: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الإنشاء: ' . $t->getMessage(); return $out;
         }
 
         self::audit($conn, $companyId, $actor, 'supplier_contracts', 'create', $newId,
@@ -135,22 +135,22 @@ class SupplierContractService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'state' => null);
         $head = self::head($gate, (int) $contractId);
-        if (!$head) { $out['code'] = 404; $out['reason'] = 'عقدُ المورد غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!$head) { $out['code'] = 404; $out['reason'] = 'عقد المورد غير موجود في نطاقك'; return $out; }
         if (trim((string) $head['source_table']) !== '') {
             $out['code'] = 423;
-            $out['reason'] = 'عقدٌ مرحَّلٌ من ' . $head['source_table'] . '#' . $head['source_id']
-                           . ' — حالتُه مرآةُ مصدره ولا تُقاد من هنا';
+            $out['reason'] = 'عقد مرحل من ' . $head['source_table'] . '#' . $head['source_id']
+                           . ' — حالته مرآة مصدره ولا تقاد من هنا';
             return $out;
         }
         $from = (string) $head['state'];
         if (!ContractStateMachine::canTransition($from, (string) $to)) {
             $out['code'] = 422;
-            $out['reason'] = 'انتقالٌ غيرُ مشروعٍ من «' . $from . '» إلى «' . $to . '» — المسموح: '
+            $out['reason'] = 'انتقال غير مشروع من «' . $from . '» إلى «' . $to . '» — المسموح: '
                            . (implode(' · ', ContractStateMachine::allowedFrom($from)) ?: 'لا شيء');
             return $out;
         }
         if ((int) $version > 0 && (int) $version !== (int) $head['version']) {
-            $out['code'] = 409; $out['reason'] = 'تغيّر العقدُ من طرفٍ آخر (قفلٌ تفاؤلي) — أعد التحميل'; return $out;
+            $out['code'] = 409; $out['reason'] = 'تغير العقد من طرف آخر (قفل تفاؤلي) — أعد التحميل'; return $out;
         }
 
         // ── M-17 · «**ونتيجتُه شرطٌ في التجديد**» (CON-03 §4-التقييم) ───────
@@ -181,7 +181,7 @@ class SupplierContractService
                 array('state' => (string) $to, 'version' => (int) $head['version'] + 1),
                 array('id' => (int) $contractId, 'version' => (int) $head['version']));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الانتقال: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الانتقال: ' . $t->getMessage(); return $out;
         }
         self::audit($conn, $companyId, $actor, 'supplier_contracts', 'transition', (int) $contractId,
             array('state' => $from), array('state' => (string) $to));
@@ -225,7 +225,7 @@ class SupplierContractService
                   WHERE company_id = ? AND supplier_id = ? AND state <> 'مقفلة'
                     AND COALESCE(is_deleted,0) = 0");
             if ($st) {
-                $why = 'إقفالٌ تبعًا لعقدِ المورد #' . (int) $contractId . ' (' . (string) $to . ')';
+                $why = 'إقفال تبعا لعقد المورد #' . (int) $contractId . ' (' . (string) $to . ')';
                 $cid2 = (int) $companyId; $sup = (int) $head['supplier_id'];
                 $st->bind_param('sii', $why, $cid2, $sup);
                 if ($st->execute()) { $closed = (int) $conn->affected_rows; }
@@ -268,13 +268,13 @@ class SupplierContractService
         $contractId = (int) $contractId;
         $why = trim((string) $why);
         if ($why === '') {
-            $out['code'] = 422; $out['reason'] = 'SCT-422: نقضُ الإنهاءِ يلزمه سببٌ مكتوب'; return $out;
+            $out['code'] = 422; $out['reason'] = 'SCT-422: نقض الإنهاء يلزمه سبب مكتوب'; return $out;
         }
         $head = self::head($gate, $contractId);
-        if (!$head) { $out['code'] = 404; $out['reason'] = 'عقدُ المورد غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!$head) { $out['code'] = 404; $out['reason'] = 'عقد المورد غير موجود في نطاقك'; return $out; }
         if ((string) $head['state'] !== ContractStateMachine::ENDED) {
             $out['code'] = 422;
-            $out['reason'] = 'SCT-422: النقضُ للمنتهي وحدَه — والعقدُ الآن «' . $head['state'] . '»';
+            $out['reason'] = 'SCT-422: النقض للمنتهي وحده — والعقد الآن «' . $head['state'] . '»';
             return $out;
         }
 
@@ -302,12 +302,12 @@ class SupplierContractService
         }
         if ($prev === '' || !in_array($prev, ContractStateMachine::ALL, true)) {
             $out['code'] = 409;
-            $out['reason'] = 'SCT-409: لا أثرَ تدقيقٍ يحمل الحالةَ السابقة — فلا يُخمَّن إلى أين يُردّ';
+            $out['reason'] = 'SCT-409: لا أثر تدقيق يحمل الحالة السابقة — فلا يخمن إلى أين يرد';
             return $out;
         }
         if ($whenTs > 0 && (time() - $whenTs) > (7 * 86400)) {
             $out['code'] = 423;
-            $out['reason'] = 'SCT-423: مضى أكثرُ من سبعةِ أيامٍ على الإنهاء — يُعالَج بعقدٍ جديدٍ لا بنقض';
+            $out['reason'] = 'SCT-423: مضى أكثر من سبعة أيام على الإنهاء — يعالج بعقد جديد لا بنقض';
             return $out;
         }
 
@@ -316,7 +316,7 @@ class SupplierContractService
                 array('state' => $prev, 'version' => (int) $head['version'] + 1),
                 array('id' => $contractId, 'version' => (int) $head['version']));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر النقض: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر النقض: ' . $t->getMessage(); return $out;
         }
 
         /* ④ الحاوياتُ التي أُقفلت بهذا الإنهاءِ وحدَها */
@@ -325,7 +325,7 @@ class SupplierContractService
             "UPDATE op_containers SET state = 'نشطة', close_reason = NULL, updated_at = NOW()
               WHERE company_id = ? AND state = 'مقفلة' AND close_reason LIKE ?");
         if ($st2) {
-            $like = 'إقفالٌ تبعًا لعقدِ المورد #' . $contractId . '%';
+            $like = 'إقفال تبعا لعقد المورد #' . $contractId . '%';
             $cid2 = (int) $companyId;
             $st2->bind_param('is', $cid2, $like);
             if ($st2->execute()) { $reopened = (int) $conn->affected_rows; }
@@ -356,8 +356,8 @@ class SupplierContractService
 
         $out['ok'] = true; $out['code'] = 200; $out['state'] = $prev;
         $out['containers_reopened'] = $reopened;
-        $out['reason'] = 'نُقض الإنهاءُ — عاد العقدُ إلى «' . $prev . '»'
-                       . ($reopened > 0 ? (' وأُعيد فتحُ ' . $reopened . ' حاوية') : '');
+        $out['reason'] = 'نقض الإنهاء — عاد العقد إلى «' . $prev . '»'
+                       . ($reopened > 0 ? (' وأعيد فتح ' . $reopened . ' حاوية') : '');
         return $out;
     }
 
@@ -376,7 +376,7 @@ class SupplierContractService
         $lineId = isset($args['line_id']) && (int) $args['line_id'] > 0 ? (int) $args['line_id'] : 0;
 
         $head = self::head($gate, $contractId);
-        if (!$head) { $out['code'] = 404; $out['reason'] = 'عقدُ المورد غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!$head) { $out['code'] = 404; $out['reason'] = 'عقد المورد غير موجود في نطاقك'; return $out; }
 
         // ── حارسا الشريحة: النافذُ بملحقٍ · والمرحَّلُ بمصدره ──────────────
         $blocked = self::assertEditable($head);
@@ -386,48 +386,48 @@ class SupplierContractService
         $model = isset($args['work_model']) ? trim((string) $args['work_model']) : '';
         if (!in_array($model, self::WORK_MODELS, true)) {
             $out['code'] = 422;
-            $out['reason'] = 'نموذجُ تشغيلٍ خارج قائمة §2-② الأربعة: ' . implode('·', self::WORK_MODELS);
+            $out['reason'] = 'نموذج تشغيل خارج قائمة §2-② الأربعة: ' . implode('·', self::WORK_MODELS);
             return $out;
         }
         $unit = isset($args['unit']) ? trim((string) $args['unit']) : '';
         if (!in_array($unit, self::UNIT_LABELS[$model], true)) {
             $out['code'] = 422;
-            $out['reason'] = 'وحدةٌ لا يعرفها محرّكُ الفوترة لنموذج «' . $model . '» — المقبول: '
-                           . implode(' · ', self::UNIT_LABELS[$model]) . ' (بندٌ بوحدةٍ مجهولةٍ سعرٌ لا يصل إلى مال)';
+            $out['reason'] = 'وحدة لا يعرفها محرك الفوترة لنموذج «' . $model . '» — المقبول: '
+                           . implode(' · ', self::UNIT_LABELS[$model]) . ' (بند بوحدة مجهولة سعر لا يصل إلى مال)';
             return $out;
         }
 
         $price = isset($args['unit_price']) ? round((float) $args['unit_price'], 2) : 0.0;
         if ($price <= 0) {
-            $out['code'] = 422; $out['reason'] = 'سعرُ الوحدة إلزاميٌّ وموجب — «صفرُ بندٍ بلا سعرٍ مكتوب» (§7-القبول)';
+            $out['code'] = 422; $out['reason'] = 'سعر الوحدة إلزامي وموجب — «صفر بند بلا سعر مكتوب» (§7-القبول)';
             return $out;
         }
 
         $currency = isset($args['currency']) ? strtoupper(trim((string) $args['currency'])) : '';
         if ($currency !== '' && !in_array($currency, self::CURRENCIES, true)) {
-            $out['code'] = 422; $out['reason'] = 'عملةُ بندٍ غيرُ معروفة: ' . $currency; return $out;
+            $out['code'] = 422; $out['reason'] = 'عملة بند غير معروفة: ' . $currency; return $out;
         }
 
         // ── أساسُ الاستعداد — «إن استُحق» (§2-④) ───────────────────────────
         $basis = isset($args['standby_basis']) ? trim((string) $args['standby_basis']) : 'none';
         if (!in_array($basis, self::STANDBY_BASES, true)) {
             $out['code'] = 422;
-            $out['reason'] = 'أساسُ استعدادٍ خارج الثلاثة: ' . implode('·', self::STANDBY_BASES);
+            $out['reason'] = 'أساس استعداد خارج الثلاثة: ' . implode('·', self::STANDBY_BASES);
             return $out;
         }
         $rateRaw = isset($args['standby_rate']) && $args['standby_rate'] !== '' ? (float) $args['standby_rate'] : null;
         if ($basis === 'none' && $rateRaw !== null) {
             $out['code'] = 422;
-            $out['reason'] = 'معدلُ استعدادٍ بلا أساسٍ مشترط — إمّا أساسٌ بمعدله أو لا استعداد';
+            $out['reason'] = 'معدل استعداد بلا أساس مشترط — إما أساس بمعدله أو لا استعداد';
             return $out;
         }
         if ($basis !== 'none' && ($rateRaw === null || $rateRaw <= 0)) {
             $out['code'] = 422;
-            $out['reason'] = 'أساسُ الاستعداد «' . $basis . '» بلا معدلٍ موجب — «قاعدةٌ بلا سعرٍ مكتوب» مرفوضة (§6-Validation)';
+            $out['reason'] = 'أساس الاستعداد «' . $basis . '» بلا معدل موجب — «قاعدة بلا سعر مكتوب» مرفوضة (§6-Validation)';
             return $out;
         }
         if ($basis === 'percent' && $rateRaw > 100) {
-            $out['code'] = 422; $out['reason'] = 'نسبةُ الاستعداد تتجاوز 100٪ من سعر الوحدة'; return $out;
+            $out['code'] = 422; $out['reason'] = 'نسبة الاستعداد تتجاوز 100٪ من سعر الوحدة'; return $out;
         }
 
         // ── CAP-01 §8.2: بندُ نوع المعدة والاحتياطي في عقد المورد ──────────
@@ -444,7 +444,7 @@ class SupplierContractService
                   ? (int) $args['contract_obligation_ref'] : null;
         if ($oblRef === null) {
             $out['code'] = 422;
-            $out['reason'] = 'لا حصةَ بلا التزام — مرجعُ التزامِ نوعِ المعدةِ في عقدِ العميلِ مطلوبٌ ولا يُترك فارغًا (CAP-01 §8.2)';
+            $out['reason'] = 'لا حصة بلا التزام — مرجع التزام نوع المعدة في عقد العميل مطلوب ولا يترك فارغا (CAP-01 §8.2)';
             return $out;
         }
         {
@@ -455,13 +455,13 @@ class SupplierContractService
                 array($oblRef));
             if (!$obl) {
                 $out['code'] = 422;
-                $out['reason'] = 'لا حصةَ بلا التزامٍ — مرجعُ التزام نوع المعدة غيرُ موجودٍ في عقد عميلٍ نافذ';
+                $out['reason'] = 'لا حصة بلا التزام — مرجع التزام نوع المعدة غير موجود في عقد عميل نافذ';
                 return $out;
             }
         }
         $etype = isset($args['equipment_type_code']) ? trim((string) $args['equipment_type_code']) : '';
         if ($etype !== '' && !preg_match('/^[A-Za-z0-9_-]{1,40}$/', $etype)) {
-            $out['code'] = 422; $out['reason'] = 'رمزُ نوع المعدة غيرُ صالح'; return $out;
+            $out['code'] = 422; $out['reason'] = 'رمز نوع المعدة غير صالح'; return $out;
         }
         $capInt = function ($key) use ($args) {
             if (!isset($args[$key]) || trim((string) $args[$key]) === '') return null;
@@ -472,12 +472,12 @@ class SupplierContractService
         $sbRequired = $capInt('standby_units_required');
         $sbAllowed = $capInt('standby_units_allowed');
         if ($primaryCommitted === false || $sbRequired === false || $sbAllowed === false) {
-            $out['code'] = 422; $out['reason'] = 'أعدادُ الوحدات الملتزَم بها أرقامٌ غيرُ سالبة'; return $out;
+            $out['code'] = 422; $out['reason'] = 'أعداد الوحدات الملتزم بها أرقام غير سالبة'; return $out;
         }
         $slaRaw = isset($args['replacement_sla_hours']) && trim((string) $args['replacement_sla_hours']) !== ''
                   ? (float) $args['replacement_sla_hours'] : null;
         if ($slaRaw !== null && $slaRaw < 0) {
-            $out['code'] = 422; $out['reason'] = 'مهلةُ الإحلال بالساعات لا تكون سالبة'; return $out;
+            $out['code'] = 422; $out['reason'] = 'مهلة الإحلال بالساعات لا تكون سالبة'; return $out;
         }
         // مقابلُ الاحتياطي لا يُفترض — الفارغُ NULL صراحةً (DEC-CAP-A)
         $sbActTerms = isset($args['standby_activation_terms']) && trim((string) $args['standby_activation_terms']) !== ''
@@ -511,12 +511,12 @@ class SupplierContractService
             if ($lineId > 0) {
                 $cur = $gate->selectOne('supplier_contract_lines', array('where' => array('id' => $lineId)));
                 if (!$cur || (int) $cur['contract_id'] !== $contractId) {
-                    $out['code'] = 404; $out['reason'] = 'البندُ غيرُ موجودٍ في هذا العقد'; return $out;
+                    $out['code'] = 404; $out['reason'] = 'البند غير موجود في هذا العقد'; return $out;
                 }
                 if (trim((string) $cur['source_table']) !== '') {
                     $out['code'] = 423;
-                    $out['reason'] = 'بندٌ مرحَّلٌ من ' . $cur['source_table'] . '#' . $cur['source_id']
-                                   . ' — الكتابةُ تبقى في مصدره حتى تكتمل المطابقة (N-04 مرحلة ①)';
+                    $out['reason'] = 'بند مرحل من ' . $cur['source_table'] . '#' . $cur['source_id']
+                                   . ' — الكتابة تبقى في مصدره حتى تكتمل المطابقة (N-04 مرحلة ①)';
                     return $out;
                 }
                 // C12 (CAP-25): حصةٌ استُهلك منها في شهرٍ مقفلٍ لا تُعدَّل كمياتُها —
@@ -540,14 +540,14 @@ class SupplierContractService
         } catch (\Throwable $t) {
             if (self::isDuplicate($t)) {
                 $out['code'] = 409;
-                $out['reason'] = 'للعقد بندٌ بالنموذج والوحدة نفسِهما (UQ عقد×نموذج×وحدة) — حرّر القائمَ ولا تكرره';
+                $out['reason'] = 'للعقد بند بالنموذج والوحدة نفسهما (UQ عقد×نموذج×وحدة) — حرر القائم ولا تكرره';
                 return $out;
             }
             if (strpos($t->getMessage(), 'ck_sup_line_standby') !== false) {
-                $out['code'] = 422; $out['reason'] = 'قيدُ الاستعداد البنيوي رفض الصف — أساسٌ بلا معدلٍ أو معدلٌ بلا أساس';
+                $out['code'] = 422; $out['reason'] = 'قيد الاستعداد البنيوي رفض الصف — أساس بلا معدل أو معدل بلا أساس';
                 return $out;
             }
-            $out['code'] = 422; $out['reason'] = 'تعذّر الحفظ: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الحفظ: ' . $t->getMessage(); return $out;
         }
 
         self::audit($conn, $companyId, $actor, 'supplier_contract_lines',
@@ -562,26 +562,26 @@ class SupplierContractService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '');
         $head = self::head($gate, (int) $contractId);
-        if (!$head) { $out['code'] = 404; $out['reason'] = 'عقدُ المورد غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!$head) { $out['code'] = 404; $out['reason'] = 'عقد المورد غير موجود في نطاقك'; return $out; }
         $blocked = self::assertEditable($head);
         if ($blocked !== null) { return array_merge($out, $blocked); }
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', (string) $endDate)) {
-            $out['code'] = 422; $out['reason'] = 'تاريخُ الإنهاء إلزامي'; return $out;
+            $out['code'] = 422; $out['reason'] = 'تاريخ الإنهاء إلزامي'; return $out;
         }
         $cur = null;
         try { $cur = $gate->selectOne('supplier_contract_lines', array('where' => array('id' => (int) $lineId))); }
-        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $cur'); $cur = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $cur'); $cur = null; }
         if (!$cur || (int) $cur['contract_id'] !== (int) $contractId) {
-            $out['code'] = 404; $out['reason'] = 'البندُ غيرُ موجودٍ في هذا العقد'; return $out;
+            $out['code'] = 404; $out['reason'] = 'البند غير موجود في هذا العقد'; return $out;
         }
         if ((string) $cur['state'] === 'ended') {
-            $out['code'] = 422; $out['reason'] = 'البندُ منتهٍ سلفًا'; return $out;
+            $out['code'] = 422; $out['reason'] = 'البند منته سلفا'; return $out;
         }
         try {
             $gate->update('supplier_contract_lines',
                 array('state' => 'ended', 'valid_to' => (string) $endDate), array('id' => (int) $lineId));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الإنهاء: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الإنهاء: ' . $t->getMessage(); return $out;
         }
         self::audit($conn, $companyId, $actor, 'supplier_contract_lines', 'end', (int) $lineId,
             array('state' => $cur['state'], 'valid_to' => $cur['valid_to']),
@@ -611,11 +611,11 @@ class SupplierContractService
     public static function standbyBasisFor(\mysqli $conn, $companyId, $supplierId, $clientContractId, $workModel, $date)
     {
         if (!in_array((string) $workModel, self::WORK_MODELS, true)) {
-            return self::emptyBasis('نموذجُ تشغيلٍ غيرُ صالح');
+            return self::emptyBasis('نموذج تشغيل غير صالح');
         }
         $map = self::standbyBasisMap($conn, $companyId, $supplierId, $clientContractId, $date);
         return isset($map[(string) $workModel]) ? $map[(string) $workModel]
-             : self::emptyBasis('لا بندَ بهذا النموذج');
+             : self::emptyBasis('لا بند بهذا النموذج');
     }
 
     /**
@@ -633,7 +633,7 @@ class SupplierContractService
 
         $companyId = (int) $companyId; $supplierId = (int) $supplierId;
         if ($companyId <= 0 || $supplierId <= 0) {
-            foreach ($map as $m => $_) { $map[$m] = self::emptyBasis('لا موردَ على الواقعة'); }
+            foreach ($map as $m => $_) { $map[$m] = self::emptyBasis('لا مورد على الواقعة'); }
             return $map;
         }
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', (string) $date)) { $date = date('Y-m-d'); }
@@ -665,7 +665,7 @@ class SupplierContractService
 
         $st = $conn->prepare($sql);
         if (!$st) {
-            foreach ($map as $m => $_) { $map[$m] = self::emptyBasis('تعذّرت القراءة: ' . $conn->error); }
+            foreach ($map as $m => $_) { $map[$m] = self::emptyBasis('تعذرت القراءة: ' . $conn->error); }
             return $map;
         }
         $st->bind_param($types, ...$params);
@@ -680,8 +680,8 @@ class SupplierContractService
 
         foreach (self::WORK_MODELS as $m) {
             if (empty($byModel[$m])) {
-                $map[$m] = self::emptyBasis('لا بندَ عقدِ موردٍ نافذًا بنموذج «' . $m
-                                            . '» — الاستعدادُ يبقى معلَنًا بلا سعرٍ مقرَّر');
+                $map[$m] = self::emptyBasis('لا بند عقد مورد نافذا بنموذج «' . $m
+                                            . '» — الاستعداد يبقى معلنا بلا سعر مقرر');
                 continue;
             }
             $cands = $byModel[$m];
@@ -689,9 +689,9 @@ class SupplierContractService
             foreach ($cands as $r) { if ((int) $r['in_force'] === 1) { $inForce[] = $r; } }
             $pick = null;
             if (count($inForce) === 1)   { $pick = $inForce[0]; }
-            elseif (count($inForce) > 1) { $map[$m] = self::emptyBasis('أكثرُ من عقد موردٍ سارٍ بتاريخ العمل — يلزم حسمٌ يدوي'); continue; }
+            elseif (count($inForce) > 1) { $map[$m] = self::emptyBasis('أكثر من عقد مورد سار بتاريخ العمل — يلزم حسم يدوي'); continue; }
             elseif (count($cands) === 1) { $pick = $cands[0]; }
-            else { $map[$m] = self::emptyBasis('عقودُ موردٍ متعددةٌ ولا ساريَ بتاريخ العمل — لا يُخمَّن أساس'); continue; }
+            else { $map[$m] = self::emptyBasis('عقود مورد متعددة ولا ساري بتاريخ العمل — لا يخمن أساس'); continue; }
 
             $info = self::emptyBasis('');
             $info['contract_id'] = (int) $pick['contract_id'];
@@ -701,7 +701,7 @@ class SupplierContractService
                                    ? (string) $pick['line_currency'] : $pick['head_currency'];
             $info['basis']       = (string) $pick['standby_basis'];
             if ($info['basis'] === 'none') {
-                $info['reason'] = 'بندُ عقد المورد لا يشترط استعدادًا — لا يُخترع له سعر';
+                $info['reason'] = 'بند عقد المورد لا يشترط استعدادا — لا يخترع له سعر';
             } else {
                 $info['ok'] = true;
                 $info['rate'] = (float) $pick['standby_rate'];
@@ -727,19 +727,19 @@ class SupplierContractService
     public static function standbyAmount(array $basisInfo, $hours)
     {
         $hours = round((float) $hours, 2);
-        if ($hours <= 0) { return array('amount' => 0.0, 'note' => 'لا ساعاتِ استعدادٍ مفوترة'); }
+        if ($hours <= 0) { return array('amount' => 0.0, 'note' => 'لا ساعات استعداد مفوترة'); }
         if (empty($basisInfo['ok'])) {
             return array('amount' => null,
-                         'note' => 'استعدادٌ مفوترٌ بلا سعرٍ مقرَّر: ' . (string) $basisInfo['reason']);
+                         'note' => 'استعداد مفوتر بلا سعر مقرر: ' . (string) $basisInfo['reason']);
         }
         $rate = (float) $basisInfo['rate'];
         if ($basisInfo['basis'] === 'rate') {
             return array('amount' => round($hours * $rate, 2),
-                         'note' => 'استعدادٌ بمعدل ساعةٍ مقرَّرٍ في بند عقد المورد #' . (int) $basisInfo['line_id']);
+                         'note' => 'استعداد بمعدل ساعة مقرر في بند عقد المورد #' . (int) $basisInfo['line_id']);
         }
         $amount = round($hours * (float) $basisInfo['unit_price'] * ($rate / 100.0), 2);
         return array('amount' => $amount,
-                     'note' => 'استعدادٌ بنسبة ' . $rate . '٪ من سعر الوحدة في بند عقد المورد #' . (int) $basisInfo['line_id']);
+                     'note' => 'استعداد بنسبة ' . $rate . '٪ من سعر الوحدة في بند عقد المورد #' . (int) $basisInfo['line_id']);
     }
 
     // ═════════════════════════════════════════════════════════════════════
@@ -774,12 +774,12 @@ class SupplierContractService
     {
         if (trim((string) $head['source_table']) !== '') {
             return array('code' => 423,
-                'reason' => 'عقدٌ مرحَّلٌ قراءةً من ' . $head['source_table'] . '#' . $head['source_id']
-                          . ' — الكتابةُ تبقى في مصدره حتى تكتمل مطابقةُ فترةٍ بصفر فرق (N-04 مرحلة ①)');
+                'reason' => 'عقد مرحل قراءة من ' . $head['source_table'] . '#' . $head['source_id']
+                          . ' — الكتابة تبقى في مصدره حتى تكتمل مطابقة فترة بصفر فرق (N-04 مرحلة ①)');
         }
         if (in_array((string) $head['state'], ContractStateMachine::EFFECTIVE_STATES, true)) {
             return array('code' => 423,
-                'reason' => 'العقدُ «' . $head['state'] . '» — لا تعديلَ مباشرًا على نافذ: **التغيير بملحق** (CON-03 §4)');
+                'reason' => 'العقد «' . $head['state'] . '» — لا تعديل مباشرا على نافذ: **التغيير بملحق** (CON-03 §4)');
         }
         return null;
     }

@@ -33,9 +33,9 @@ class StockMoveService
      */
     public function adjustCount(int $companyId, int $itemId, int $warehouseId, float $diff, string $reason, int $actorId): array
     {
-        if (trim($reason) === '')   { return array('ok' => false, 'msg' => 'سببُ التسوية إلزامي (422)', 'move_id' => 0); }
-        if (abs($diff) < 0.001)     { return array('ok' => false, 'msg' => 'لا فرقَ — لا تسويةَ تُكتب', 'move_id' => 0); }
-        if ($itemId <= 0)           { return array('ok' => false, 'msg' => 'صنفٌ غيرُ صالح (422)', 'move_id' => 0); }
+        if (trim($reason) === '')   { return array('ok' => false, 'msg' => 'سبب التسوية إلزامي (422)', 'move_id' => 0); }
+        if (abs($diff) < 0.001)     { return array('ok' => false, 'msg' => 'لا فرق — لا تسوية تكتب', 'move_id' => 0); }
+        if ($itemId <= 0)           { return array('ok' => false, 'msg' => 'صنف غير صالح (422)', 'move_id' => 0); }
 
         /* ══ INJ-0100 · من صرف الصنفَ لا يُسوّي فرقَه ═══════════════════════════
              نصُّ القبول: «من نفّذ حركةَ صرفٍ **لا يستطيع تسويةَ فرقِ الصنفِ نفسِه**
@@ -60,11 +60,11 @@ class StockMoveService
                     $st0->close();
                     if (function_exists('ems_log_denial')) {
                         @ems_log_denial('STK-403-SELFADJ', 'item:' . $itemId . '@wh:' . $warehouseId,
-                            'من صرف الصنفَ حاول تسويةَ فرقِه');
+                            'من صرف الصنف حاول تسوية فرقه');
                     }
                     return array('ok' => false, 'move_id' => 0,
-                        'msg' => 'STK-403-SELFADJ: صرفتَ هذا الصنفَ من هذا المخزنِ خلال ٣٠ يومًا ('
-                               . $mine . ' حركة) — تسويةُ فرقِه تحتاج يدًا ثانيةً باعتمادِ مدير المخازن');
+                        'msg' => 'STK-403-SELFADJ: صرفت هذا الصنف من هذا المخزن خلال ٣٠ يوما ('
+                               . $mine . ' حركة) — تسوية فرقه تحتاج يدا ثانية باعتماد مدير المخازن');
                 }
             }
             $st0->close();
@@ -86,11 +86,11 @@ class StockMoveService
             $st->close();
             $this->conn->commit();
             return array('ok' => true, 'move_id' => $id,
-                'msg' => 'سُوّي الفرق (' . ($diff > 0 ? '+' : '−') . $qty . ") بحركة «{$type}»");
+                'msg' => 'سوي الفرق (' . ($diff > 0 ? '+' : '−') . $qty . ") بحركة «{$type}»");
         } catch (\Throwable $e) {
             $this->conn->rollback();
             error_log('StockMoveService::adjustCount: ' . $e->getMessage());
-            return array('ok' => false, 'msg' => 'تعذّرت التسوية — لم يُكتب شيء (ERR-STK-1042)', 'move_id' => 0);
+            return array('ok' => false, 'msg' => 'تعذرت التسوية — لم يكتب شيء (ERR-STK-1042)', 'move_id' => 0);
         }
     }
 
@@ -105,9 +105,9 @@ class StockMoveService
     public function transfer(int $companyId, int $itemId, int $fromWh, int $toWh, float $qty, string $refSuffix, int $actorId): array
     {
         if ($itemId <= 0 || $fromWh <= 0 || $toWh <= 0 || $qty <= 0) {
-            return array('ok' => false, 'msg' => 'الصنفُ والمخزنان والكميةُ إلزامية (422)', 'ref' => '');
+            return array('ok' => false, 'msg' => 'الصنف والمخزنان والكمية إلزامية (422)', 'ref' => '');
         }
-        if ($fromWh === $toWh) { return array('ok' => false, 'msg' => 'المصدرُ والوجهةُ مخزنٌ واحد (422)', 'ref' => ''); }
+        if ($fromWh === $toWh) { return array('ok' => false, 'msg' => 'المصدر والوجهة مخزن واحد (422)', 'ref' => ''); }
 
         $this->conn->begin_transaction();
         try {
@@ -125,7 +125,7 @@ class StockMoveService
             if ($bal < $qty) {
                 $this->conn->rollback();
                 return array('ok' => false, 'ref' => '',
-                    'msg' => "الرصيدُ المتاحُ في المصدر {$bal} فقط — والتحويلُ يُرفض 409");
+                    'msg' => "الرصيد المتاح في المصدر {$bal} فقط — والتحويل يرفض 409");
             }
 
             $ref = 'TRF-' . date('ymd-His') . ($refSuffix !== '' ? '-' . substr($refSuffix, 0, 6) : '');
@@ -141,11 +141,11 @@ class StockMoveService
             }
             $ins->close();
             $this->conn->commit();
-            return array('ok' => true, 'ref' => $ref, 'msg' => "حُوّل {$qty} بمرجع {$ref} — حركتان ذريّتان");
+            return array('ok' => true, 'ref' => $ref, 'msg' => "حول {$qty} بمرجع {$ref} — حركتان ذريتان");
         } catch (\Throwable $e) {
             $this->conn->rollback();
             error_log('StockMoveService::transfer: ' . $e->getMessage());
-            return array('ok' => false, 'msg' => 'فشلت المعاملةُ فأُلغيت الحركتان معًا (ERR-STK-1043)', 'ref' => '');
+            return array('ok' => false, 'msg' => 'فشلت المعاملة فألغيت الحركتان معا (ERR-STK-1043)', 'ref' => '');
         }
     }
 }

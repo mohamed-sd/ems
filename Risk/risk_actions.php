@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 if (function_exists('verify_csrf_token') && !verify_csrf_token($_POST['csrf_token'] ?? '')) {
     http_response_code(403);
-    exit(json_encode(array('ok' => false, 'code' => 'RSK-CSRF', 'msg' => 'رمز الجلسة غير صالح — حدّث الصفحة')));
+    exit(json_encode(array('ok' => false, 'code' => 'RSK-CSRF', 'msg' => 'رمز الجلسة غير صالح — حدث الصفحة')));
 }
 
 // صلاحية الكتابة: من سجل الشاشات (أي شاشة مخاطر يملك الفاعل كتابتها تكفي
@@ -252,7 +252,7 @@ try {
             break;
 
         case 'control_fail': // risk.control.fail — فعلٌ مستقلٌّ لا فرعُ تحقق (§7-1)
-            if (!$canWrite) { throw new \RuntimeException('RSK-403: تسجيلُ الفشلِ للمتحقق أو إدارة المخاطر'); }
+            if (!$canWrite) { throw new \RuntimeException('RSK-403: تسجيل الفشل للمتحقق أو إدارة المخاطر'); }
             $out = array('ok' => true) + RiskService::failCriticalControl($conn, $company_id,
                 (int) $_POST['control_id'], trim((string) ($_POST['reason'] ?? '')), $uid);
             break;
@@ -299,8 +299,8 @@ try {
                     'title' => 'معالجة خطر ' . $pref . ' — ' . mb_substr($plan, 0, 120),
                     'details' => 'الخطر: ' . (string) ($rk['title'] ?? '') . ' · نوع المعالجة: ' . $tt,
                     'due_at' => $due . ' 23:59:59',
-                    'deliverable' => 'دليلُ إنجازٍ يقبله المتحقِّق — والإغلاقُ بقبوله لا بالتنفيذ',
-                    'evidence_required' => 'دليلُ تنفيذٍ مكتوبٌ في إجراءِ المعالجة',
+                    'deliverable' => 'دليل إنجاز يقبله المتحقق — والإغلاق بقبوله لا بالتنفيذ',
+                    'evidence_required' => 'دليل تنفيذ مكتوب في إجراء المعالجة',
                     'created_by' => $uid,
                 ));
             } catch (\Throwable $wx) {
@@ -324,7 +324,7 @@ try {
             $t = $st->get_result()->fetch_assoc(); $st->close();
             if (!$t) { throw new \RuntimeException('RSK-404'); }
             if (!$canWrite && (int) $t['action_owner_user_id'] !== $uid) {
-                throw new \RuntimeException('RSK-403: التنفيذ لمسؤول المعالجة المسنَد');
+                throw new \RuntimeException('RSK-403: التنفيذ لمسؤول المعالجة المسند');
             }
             $newState = (string) $_POST['state'];
             if (!in_array($newState, array('in_progress', 'done'), true)) { throw new \RuntimeException('RSK-422'); }
@@ -343,8 +343,8 @@ try {
                 $meaningful = (mb_strlen($txt) >= 10 && $letters >= 6);
                 $documented = ($att !== '' && $ref !== '');
                 if (!$meaningful && !$documented) {
-                    throw new \RuntimeException('RSK-EVID-422: الإنجاز بدليلٍ مقروءٍ '
-                        . '(عشرةُ محارفَ فأكثر) أو بمرفقٍ ومرجع — والإغلاق بقبول المتحقق');
+                    throw new \RuntimeException('RSK-EVID-422: الإنجاز بدليل مقروء '
+                        . '(عشرة محارف فأكثر) أو بمرفق ومرجع — والإغلاق بقبول المتحقق');
                 }
             }
             $st = $conn->prepare('UPDATE risk_treatments
@@ -373,7 +373,7 @@ try {
             $tv = $st->get_result()->fetch_assoc(); $st->close();
             if (!$tv) { throw new \RuntimeException('RSK-404: الإجراء غير موجود'); }
             if ((int) $tv['action_owner_user_id'] === $uid && !$is_super) {
-                throw new \RuntimeException('RSK-403: المتحقِّقُ لا المنفِّذ — من نفّذ لا يقبل دليلَ نفسِه (§9-3)');
+                throw new \RuntimeException('RSK-403: المتحقق لا المنفذ — من نفذ لا يقبل دليل نفسه (§9-3)');
             }
             $st = $conn->prepare("UPDATE risk_treatments SET state = 'verified', verified_by = ?, verified_at = NOW()
                                    WHERE id = ? AND company_id = ? AND state = 'done' AND done_evidence IS NOT NULL");
@@ -399,7 +399,7 @@ try {
              `withdrawn_by/at` يُقرآن ويُصيَّران في الشاشةِ ولا سطرَ يكتبهما.
              والسحبُ **حركةٌ لا محو**: صفُّ القبولِ يبقى مختومًا بمن سحبه ومتى. */
         case 'risk_accept_withdraw':
-            if ($authority === '') { throw new \RuntimeException('RSK-403: لا سلطة سحبٍ لدورك'); }
+            if ($authority === '') { throw new \RuntimeException('RSK-403: لا سلطة سحب لدورك'); }
             $__w = RiskService::withdrawAcceptance($conn, $company_id,
                 (int) ($_POST['acceptance_id'] ?? 0), (string) ($_POST['note'] ?? ''), $uid);
             if (empty($__w['ok'])) { throw new \RuntimeException($__w['reason']); }
@@ -420,7 +420,7 @@ try {
             break;
 
         case 'risk_review': // risk.review — المراجعةُ الدوريةُ (المرحلة ١٣)
-            if (!$canWrite) { throw new \RuntimeException('RSK-403: المراجعةُ لمحلل/مدير المخاطر'); }
+            if (!$canWrite) { throw new \RuntimeException('RSK-403: المراجعة لمحلل/مدير المخاطر'); }
             $out = array('ok' => true) + RiskService::reviewRisk($conn, $company_id,
                 (int) $_POST['risk_id'], (string) ($_POST['decision'] ?? ''),
                 trim((string) ($_POST['findings'] ?? '')), $uid,
@@ -428,7 +428,7 @@ try {
             break;
 
         case 'incident_log': // risk.incident.log — حقُّ الموقعِ ومركزِ البلاغات
-            if (!$canSignal) { throw new \RuntimeException('RSK-403: تسجيلُ الواقعةِ يحتاج نطاقَ إدارتك'); }
+            if (!$canSignal) { throw new \RuntimeException('RSK-403: تسجيل الواقعة يحتاج نطاق إدارتك'); }
             $out = array('ok' => true) + RiskService::logIncident($conn, $company_id, array(
                 'itype' => $_POST['itype'] ?? 'واقعة',
                 'ru_id' => $_POST['ru_id'] ?? null,
@@ -458,7 +458,7 @@ try {
             break;
 
         case 'taxonomy_define': // risk.taxonomy.define — مديرُ المخاطر
-            if (!$canWrite) { throw new \RuntimeException('RSK-403: التصنيفُ منهجٌ تملكه إدارةُ المخاطر'); }
+            if (!$canWrite) { throw new \RuntimeException('RSK-403: التصنيف منهج تملكه إدارة المخاطر'); }
             RiskService::defineTaxonomy($conn, $company_id, (int) $_POST['ru_id'], array(
                 'name_ar' => $_POST['name_ar'] ?? null,
                 'coverage' => $_POST['coverage'] ?? null,
@@ -470,7 +470,7 @@ try {
             break;
 
         case 'kri_threshold': // risk.kri.threshold — ضبطُ الحدِّ لا قراءتُه
-            if (!$canWrite) { throw new \RuntimeException('RSK-403: الحدودُ تملكها إدارةُ المخاطر'); }
+            if (!$canWrite) { throw new \RuntimeException('RSK-403: الحدود تملكها إدارة المخاطر'); }
             RiskService::setKriThreshold($conn, $company_id, (int) $_POST['kri_id'],
                 $_POST['warn_num'] ?? null, $_POST['critical_num'] ?? null,
                 (string) ($_POST['direction'] ?? 'تصاعدي'), $uid);
@@ -478,7 +478,7 @@ try {
             break;
 
         case 'report_export': // risk.report.export — يكتب سجلًّا بتسعةِ بنود
-            if (empty($__pp_any_view)) { throw new \RuntimeException('RSK-403: لا صلاحيةَ تصدير'); }
+            if (empty($__pp_any_view)) { throw new \RuntimeException('RSK-403: لا صلاحية تصدير'); }
             $out = array('ok' => true) + RiskService::logExport($conn, $company_id, array(
                 'screen_code' => $_POST['screen_code'] ?? '',
                 'actor_capacity' => $actorCapacity,
@@ -494,13 +494,13 @@ try {
         case 'field_sync': // risk.field.sync — دفعةُ المعلَّقِ بمفاتيحها
             if (!$canSignal) { throw new \RuntimeException('RSK-403'); }
             $batch = json_decode((string) ($_POST['items'] ?? '[]'), true);
-            if (!is_array($batch)) { throw new \RuntimeException('RSK-422: دفعةُ المزامنةِ JSON صحيحٌ'); }
-            if (count($batch) > 200) { throw new \RuntimeException('RSK-422: الدفعةُ ٢٠٠ عنصرٍ حدًّا أقصى'); }
+            if (!is_array($batch)) { throw new \RuntimeException('RSK-422: دفعة المزامنة JSON صحيح'); }
+            if (count($batch) > 200) { throw new \RuntimeException('RSK-422: الدفعة ٢٠٠ عنصر حدا أقصى'); }
             $out = array('ok' => true) + RiskService::syncFieldSignals($conn, $company_id, $batch, $uid);
             break;
 
         case 'gov_attest': // gov.rsk.attest — يشهد ولا يمنح
-            if (!$canWrite) { throw new \RuntimeException('RSK-403: التصديقُ لمديرِ الإدارة'); }
+            if (!$canWrite) { throw new \RuntimeException('RSK-403: التصديق لمدير الإدارة'); }
             $out = array('ok' => true) + RiskService::attestAccessReview($conn, $company_id,
                 (string) ($_POST['scope_code'] ?? ''), (int) ($_POST['headcount'] ?? 0),
                 (string) ($_POST['note'] ?? ''), $uid);
@@ -562,8 +562,8 @@ try {
             $__need = isset($__rank[$__toAuth]) ? $__rank[$__toAuth] : 0;
             $__have = isset($__rank[$authority]) ? $__rank[$authority] : 0;
             if ($__need > 0 && $__have < $__need) {
-                throw new \RuntimeException('RSK-403-ACKAUTH: التصعيدُ مرفوعٌ إلى «' . $__toAuth
-                    . '» — ولا يُقرُّه من دونَه، فالإنذارُ لا يُطفأ قبل أن يبلغ صاحبَه');
+                throw new \RuntimeException('RSK-403-ACKAUTH: التصعيد مرفوع إلى «' . $__toAuth
+                    . '» — ولا يقره من دونه، فالإنذار لا يطفأ قبل أن يبلغ صاحبه');
             }
             $st = $conn->prepare('UPDATE risk_escalations SET acknowledged_by = ?, acknowledged_at = NOW() WHERE id = ? AND company_id = ? AND acknowledged_at IS NULL');
             $st->bind_param('iii', $uid, $eid, $company_id);

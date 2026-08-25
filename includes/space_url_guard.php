@@ -99,8 +99,8 @@ if (!function_exists('ems_space_url_guard')) {
             }
             echo '<!doctype html><meta charset="utf-8">'
                . '<div style="font-family:system-ui;padding:2rem;text-align:center">'
-               . '<h2>هذه الشاشةُ تخصُّ مساحةَ عملٍ أخرى</h2>'
-               . '<p>بدِّلِ المساحةَ للوصولِ إليها.</p></div>';
+               . '<h2>هذه الشاشة تخص مساحة عمل أخرى</h2>'
+               . '<p>بدل المساحة للوصول إليها.</p></div>';
             exit;
         }
         return $mode;

@@ -56,18 +56,18 @@ class SupplierEvaluationService
         $ind = isset($args['indicator']) ? trim((string) $args['indicator']) : '';
         if (!in_array($ind, self::INDICATORS, true)) {
             $out['code'] = 422;
-            $out['reason'] = 'مؤشرٌ خارج الخمسة (§4-التقييم): ' . implode(' · ', self::INDICATORS);
+            $out['reason'] = 'مؤشر خارج الخمسة (§4-التقييم): ' . implode(' · ', self::INDICATORS);
             return $out;
         }
         $w = (isset($args['weight']) && trim((string) $args['weight']) !== '')
              ? round((float) $args['weight'], 2) : 0.0;
         if ($w <= 0 || $w > 100) {
-            $out['code'] = 422; $out['reason'] = 'الوزنُ في (0، 100]'; return $out;
+            $out['code'] = 422; $out['reason'] = 'الوزن في (0، 100]'; return $out;
         }
         $scale = (isset($args['scale_max']) && trim((string) $args['scale_max']) !== '')
                  ? round((float) $args['scale_max'], 2) : null;
         if ($scale !== null && $scale <= 0) {
-            $out['code'] = 422; $out['reason'] = 'المقياسُ موجبٌ أو غيرُ مكتوب'; return $out;
+            $out['code'] = 422; $out['reason'] = 'المقياس موجب أو غير مكتوب'; return $out;
         }
 
         $row = self::weightRow($gate, $ind);
@@ -88,7 +88,7 @@ class SupplierEvaluationService
                 ));
             }
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الحفظ: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الحفظ: ' . $t->getMessage(); return $out;
         }
 
         self::audit($conn, $companyId, $actor, 'supplier_evaluation_weights',
@@ -128,20 +128,20 @@ class SupplierEvaluationService
 
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', (string) $from)
             || !preg_match('/^\d{4}-\d{2}-\d{2}$/', (string) $to) || $from > $to) {
-            $out['code'] = 422; $out['reason'] = 'فترةٌ غير صالحة'; return $out;
+            $out['code'] = 422; $out['reason'] = 'فترة غير صالحة'; return $out;
         }
 
         // ── «لا نتيجةَ بلا وزنٍ مكتوب» ─────────────────────────────────────
         $weights = self::weights($gate);
         if (!$weights) {
             $out['code'] = 422;
-            $out['reason'] = 'لا أوزانَ مكتوبةً للتقييم — **والنتيجةُ بلا وزنٍ انطباعٌ برقم** (§4)';
+            $out['reason'] = 'لا أوزان مكتوبة للتقييم — **والنتيجة بلا وزن انطباع برقم** (§4)';
             return $out;
         }
         $sum = self::weightsSum($gate);
         if (abs($sum - 100.0) > 0.005) {
             $out['code'] = 422;
-            $out['reason'] = 'Σ أوزان المؤشرات = ' . $sum . ' والواجبُ **100** — اضبطها قبل التقييم';
+            $out['reason'] = 'Σ أوزان المؤشرات = ' . $sum . ' والواجب **100** — اضبطها قبل التقييم';
             return $out;
         }
 
@@ -151,10 +151,10 @@ class SupplierEvaluationService
             $ex = $gate->selectOne('supplier_evaluations', array(
                 'whereRaw' => 'supplier_id = ? AND period_from = ? AND period_to = ?',
                 'params'   => array($supplierId, (string) $from, (string) $to)));
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $ex'); $ex = null; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $ex'); $ex = null; }
         if ($ex && (string) $ex['state'] === 'decided') {
             $out['code'] = 423;
-            $out['reason'] = 'تقييمُ هذه الفترة **معتمَدٌ** — لا يُعاد توليدُه (التصحيحُ بتقييمِ فترةٍ تالية)';
+            $out['reason'] = 'تقييم هذه الفترة **معتمد** — لا يعاد توليده (التصحيح بتقييم فترة تالية)';
             $out['evaluation_id'] = (int) $ex['id'];
             return $out;
         }
@@ -209,7 +209,7 @@ class SupplierEvaluationService
                 }
             }, 'تقييم مورد ' . $supplierId . ' ' . $from);
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر التوليد: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر التوليد: ' . $t->getMessage(); return $out;
         }
 
         self::audit($conn, $companyId, $actor, 'supplier_evaluations', $ex ? 'update' : 'create',
@@ -249,46 +249,46 @@ class SupplierEvaluationService
                 if ($m['readiness'] !== null) {
                     $measurable = true; $value = (float) $m['readiness']; $basis = 100.0;
                     $ratio = $value / 100.0;
-                    $note = 'جاهزيةُ الفترة ' . $value . '٪ من `unit_time_log` عبر بطاقات الطاقة (M-16)';
+                    $note = 'جاهزية الفترة ' . $value . '٪ من `unit_time_log` عبر بطاقات الطاقة (M-16)';
                 } else {
-                    $note = '⚠ لا قياسَ جاهزيةٍ في الفترة — **يُعلَن ولا يُقدَّر**';
+                    $note = '⚠ لا قياس جاهزية في الفترة — **يعلن ولا يقدر**';
                 }
             } elseif ($ind === 'coverage') {
                 if ($planned > 0) {
                     $measurable = true; $value = (float) $m['coverage_hours']; $basis = $planned;
                     $ratio = max(0.0, 1.0 - ($value / $planned));
-                    $note = 'ساعاتُ عجزِ التغطية ' . $value . ' من ' . $planned
+                    $note = 'ساعات عجز التغطية ' . $value . ' من ' . $planned
                           . ' مخططة — **بتجاوز مهلة الإحلال** (M-16)';
                 } else {
-                    $note = '⚠ لا زمنَ مخططًا — لا التزامَ تغطيةٍ يُقاس';
+                    $note = '⚠ لا زمن مخططا — لا التزام تغطية يقاس';
                 }
             } elseif ($ind === 'attributed_stops') {
                 if ($planned > 0) {
                     $measurable = true; $value = (float) $stops['supplier']; $basis = $planned;
                     $ratio = max(0.0, 1.0 - ($value / $planned));
-                    $note = 'توقفاتٌ مسندةٌ إليه ' . $value . ' ساعةً من ' . $planned
+                    $note = 'توقفات مسندة إليه ' . $value . ' ساعة من ' . $planned
                           . ' — `unit_time_log.resp_party = supplier`';
                 } else {
-                    $note = '⚠ لا زمنَ مخططًا — لا نسبةَ توقفاتٍ تُقاس';
+                    $note = '⚠ لا زمن مخططا — لا نسبة توقفات تقاس';
                 }
             } elseif ($ind === 'operator_quality') {
                 if ($planned > 0) {
                     $measurable = true; $value = (float) $stops['operator']; $basis = $planned;
                     $ratio = max(0.0, 1.0 - ($value / $planned));
-                    $note = 'توقفُ مشغّلٍ ' . $value . ' ساعةً من ' . $planned
+                    $note = 'توقف مشغل ' . $value . ' ساعة من ' . $planned
                           . ' — `unit_time_log.ops_state = operator_stop`';
                 } else {
-                    $note = '⚠ لا زمنَ مخططًا — لا جودةَ مشغّلين تُقاس';
+                    $note = '⚠ لا زمن مخططا — لا جودة مشغلين تقاس';
                 }
             } else {   // incidents
                 if ($scale === null) {
-                    $note = '⚠ **بلا مقياسٍ مكتوب** لعدد الحوادث — عددٌ بلا مقياسٍ لا يصير نسبةً (يُعلَن)';
+                    $note = '⚠ **بلا مقياس مكتوب** لعدد الحوادث — عدد بلا مقياس لا يصير نسبة (يعلن)';
                 } elseif (!$eqIds) {
-                    $note = '⚠ لا معداتٍ مخصَّصةً في الفترة — لا وعاءَ للحوادث';
+                    $note = '⚠ لا معدات مخصصة في الفترة — لا وعاء للحوادث';
                 } else {
                     $measurable = true; $value = (float) $incidents; $basis = $scale;
                     $ratio = max(0.0, 1.0 - min(1.0, $value / $scale));
-                    $note = $incidents . ' بلاغَ سلامةٍ على معداته (`tickets` نوع '
+                    $note = $incidents . ' بلاغ سلامة على معداته (`tickets` نوع '
                           . self::INCIDENT_TYPE_CODE . ') بمقياس ' . $scale;
                 }
             }
@@ -314,26 +314,26 @@ class SupplierEvaluationService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '');
         $ev = self::head($gate, (int) $evaluationId);
-        if (!$ev) { $out['code'] = 404; $out['reason'] = 'التقييمُ غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!$ev) { $out['code'] = 404; $out['reason'] = 'التقييم غير موجود في نطاقك'; return $out; }
         if ((string) $ev['state'] !== 'draft') {
-            $out['code'] = 409; $out['reason'] = 'التقييمُ معتمَدٌ سلفًا — ولا يُعاد قرارُه'; return $out;
+            $out['code'] = 409; $out['reason'] = 'التقييم معتمد سلفا — ولا يعاد قراره'; return $out;
         }
         $flag = trim((string) $flag);
         if (!in_array($flag, self::RENEWAL_FLAGS, true)) {
-            $out['code'] = 422; $out['reason'] = 'قرارُ التجديد خارج الثلاثة'; return $out;
+            $out['code'] = 422; $out['reason'] = 'قرار التجديد خارج الثلاثة'; return $out;
         }
         $note = trim((string) $note);
         if ($flag === 'not_eligible' && $note === '') {
             $out['code'] = 422;
-            $out['reason'] = 'منعُ التجديد **يلزمه سببٌ مكتوب** — قرارٌ يقطع تعاقدًا لا يكون صامتًا';
+            $out['reason'] = 'منع التجديد **يلزمه سبب مكتوب** — قرار يقطع تعاقدا لا يكون صامتا';
             return $out;
         }
 
         // ── «نصفُ وزنٍ بلا مصدرٍ ليس تقييمًا» ──────────────────────────────
         if ((float) $ev['weight_measured'] < self::MIN_COVERAGE) {
             $out['code'] = 422;
-            $out['reason'] = 'التغطيةُ المقيسة ' . $ev['weight_measured'] . '٪ دون الحد '
-                           . self::MIN_COVERAGE . '٪ — **تقييمٌ أكثرُ من نصف وزنه بلا مصدرٍ لا يُعتمد**';
+            $out['reason'] = 'التغطية المقيسة ' . $ev['weight_measured'] . '٪ دون الحد '
+                           . self::MIN_COVERAGE . '٪ — **تقييم أكثر من نصف وزنه بلا مصدر لا يعتمد**';
             return $out;
         }
 
@@ -344,7 +344,7 @@ class SupplierEvaluationService
                 'decided_by' => (int) $actor ?: null, 'decided_at' => date('Y-m-d H:i:s'),
             ), array('id' => (int) $evaluationId));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الاعتماد: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الاعتماد: ' . $t->getMessage(); return $out;
         }
 
         self::audit($conn, $companyId, $actor, 'supplier_evaluations', 'decide', (int) $evaluationId,
@@ -364,21 +364,21 @@ class SupplierEvaluationService
                      'score' => null, 'flag' => null);
         $ev = self::latestDecided($gate, $supplierId, $asOf);
         if (!$ev) {
-            $out['reason'] = 'لا تقييمَ دوريًّا معتمَدًا لهذا المورد — و«**نتيجتُه شرطٌ في التجديد**» (CON-03 §4): '
-                           . 'قيّمه بفترةٍ ثم جدّد';
+            $out['reason'] = 'لا تقييم دوريا معتمدا لهذا المورد — و«**نتيجته شرط في التجديد**» (CON-03 §4): '
+                           . 'قيمه بفترة ثم جدد';
             return $out;
         }
         $out['evaluation_id'] = (int) $ev['id'];
         $out['score'] = ($ev['score'] !== null) ? (float) $ev['score'] : null;
         $out['flag']  = (string) $ev['renewal_flag'];
         if ((string) $ev['renewal_flag'] === 'not_eligible') {
-            $out['reason'] = 'آخرُ تقييمٍ معتمَدٍ (' . $ev['period_from'] . ' → ' . $ev['period_to']
+            $out['reason'] = 'آخر تقييم معتمد (' . $ev['period_from'] . ' → ' . $ev['period_to']
                            . ' · نتيجة ' . $ev['score'] . ') يقضي بأنه **غيرُ مؤهَّلٍ للتجديد**: '
                            . (string) $ev['decision_note'];
             return $out;
         }
         $out['ok'] = true;
-        $out['reason'] = 'تقييمٌ معتمَدٌ (' . $ev['period_to'] . ' · نتيجة ' . $ev['score'] . ' · '
+        $out['reason'] = 'تقييم معتمد (' . $ev['period_to'] . ' · نتيجة ' . $ev['score'] . ' · '
                        . (self::RENEWAL_LABELS[(string) $ev['renewal_flag']] ?? '') . ')';
         return $out;
     }
@@ -453,7 +453,7 @@ class SupplierEvaluationService
                 $out['supplier'] = round((float) $rows[0]['sup'], 2);
                 $out['operator'] = round((float) $rows[0]['opr'], 2);
             }
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'يُعلَن صفرًا لا يُختلق'); /* يُعلَن صفرًا لا يُختلق */ }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'يعلن صفرا لا يختلق'); /* يُعلَن صفرًا لا يُختلق */ }
         return $out;
     }
 

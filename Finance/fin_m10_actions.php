@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 if (function_exists('verify_csrf_token') && !verify_csrf_token($_POST['csrf_token'] ?? '')) {
     http_response_code(403);
-    exit(json_encode(array('ok' => false, 'code' => 'FIN-CSRF', 'msg' => 'رمز الجلسة غير صالح — حدّث الصفحة')));
+    exit(json_encode(array('ok' => false, 'code' => 'FIN-CSRF', 'msg' => 'رمز الجلسة غير صالح — حدث الصفحة')));
 }
 
 /* صلاحيةُ الكتابة من سجل الشاشات — أيُّ شاشةِ ماليةٍ كاتبةٍ تكفي للأفعال
@@ -80,13 +80,13 @@ $out = array('ok' => false);
 try {
     switch ($action) {
         case 'gate_pass': // gate.pass — البوابةُ الرباعية: فحصٌ ومحضرٌ بسببٍ محكوم
-            if (!$canWrite) { throw new \RuntimeException('FIN-403: البوابةُ للمالية'); }
+            if (!$canWrite) { throw new \RuntimeException('FIN-403: البوابة للمالية'); }
             $r = M10::gatePass($conn, $company_id, (int) $_POST['unit_id'], $uid);
             $out = array('ok' => true) + $r;
             break;
 
         case 'entitle_generate': // fin.entitle — التوليدُ عبر المروحة القائمة
-            if (!$canWrite) { throw new \RuntimeException('FIN-403: التوليدُ للمدير المالي'); }
+            if (!$canWrite) { throw new \RuntimeException('FIN-403: التوليد للمدير المالي'); }
             $unitId = (int) $_POST['unit_id'];
             $res = null;
             // الذرّية: المروحةُ داخل معاملة TenantDb (نمط cron_events المثبت)
@@ -97,7 +97,7 @@ try {
             break;
 
         case 'budget_commit': // budget.commit — المتاحُ ينخفض قبل الصرف
-            if (!$canWrite) { throw new \RuntimeException('FIN-403: الحجزُ للمالية'); }
+            if (!$canWrite) { throw new \RuntimeException('FIN-403: الحجز للمالية'); }
             $lineId = !empty($_POST['budget_line_id']) ? (int) $_POST['budget_line_id'] : null;
             $r = M10::budgetCommit($conn, $company_id, (int) $_POST['budget_id'], $lineId,
                 (string) ($_POST['source_kind'] ?? 'other'), trim((string) $_POST['source_ref']),
@@ -106,16 +106,16 @@ try {
             break;
 
         case 'budget_release': // عكسُ الحجز — تحريرٌ بسببه
-            if (!$canWrite) { throw new \RuntimeException('FIN-403: التحريرُ للمالية'); }
+            if (!$canWrite) { throw new \RuntimeException('FIN-403: التحرير للمالية'); }
             $r = M10::budgetRelease($conn, $company_id, (int) $_POST['commit_id'],
                 trim((string) $_POST['reason']), $uid);
             $out = array('ok' => true) + $r;
             break;
 
         case 'budget_approve': // budget.approve — بفصل الواجبات
-            if (!$canWrite) { throw new \RuntimeException('FIN-403: الاعتمادُ للمخوَّل'); }
+            if (!$canWrite) { throw new \RuntimeException('FIN-403: الاعتماد للمخول'); }
             $r = M10::budgetApprove($conn, $company_id, (int) $_POST['budget_id'], $uid,
-                $actorCapacity, 'اعتمادُ الموازنة ضمن سقف الدور — M-10 §7-1');
+                $actorCapacity, 'اعتماد الموازنة ضمن سقف الدور — M-10 §7-1');
             $out = array('ok' => true) + $r;
             break;
 
@@ -135,27 +135,27 @@ try {
             break;
 
         case 'stmt_client_issue': // stmt.client.issue — تثبيتُ الرصيد التراكمي
-            if (!$canWrite) { throw new \RuntimeException('FIN-403: الإصدارُ للمالية'); }
+            if (!$canWrite) { throw new \RuntimeException('FIN-403: الإصدار للمالية'); }
             $r = M10::issueClientStatement($conn, $gate, $company_id, (int) $_POST['client_id'],
                 (string) $_POST['from'], (string) $_POST['to'], $uid, $actorCapacity);
             $out = array('ok' => true) + $r;
             break;
 
         case 'margin_compute': // margin.compute — من الاعترافات الثلاثة
-            if (!$canWrite) { throw new \RuntimeException('FIN-403: الاحتسابُ للمالية'); }
+            if (!$canWrite) { throw new \RuntimeException('FIN-403: الاحتساب للمالية'); }
             $cid = !empty($_POST['contract_id']) ? (int) $_POST['contract_id'] : null;
             $r = M10::computeMargin($conn, $company_id, (string) $_POST['period'], $cid, $uid);
             $out = array('ok' => true) + $r;
             break;
 
         case 'cycle_measure': // cycle.measure — مواضعُ الاختناق بالحلقة
-            if (!$canWrite) { throw new \RuntimeException('FIN-403: القياسُ للمالية'); }
+            if (!$canWrite) { throw new \RuntimeException('FIN-403: القياس للمالية'); }
             $r = M10::measureCycleTime($conn, $company_id, (string) $_POST['period'], $uid);
             $out = array('ok' => true) + $r;
             break;
 
         case 'gov_attest': // gov.fin.attest — يشهد ولا يمنح (إعادةُ استخدام M-16)
-            if (!$canView) { throw new \RuntimeException('FIN-403: التصديقُ لمدير الإدارة'); }
+            if (!$canView) { throw new \RuntimeException('FIN-403: التصديق لمدير الإدارة'); }
             $r = RiskService::attestAccessReview($conn, $company_id,
                 'gov_dept_fin:' . gmdate('Y-m'), (int) ($_POST['headcount'] ?? 0),
                 trim((string) ($_POST['note'] ?? '')) . ' — بصفة: ' . $actorCapacity, $uid);
@@ -164,7 +164,7 @@ try {
 
         default:
             http_response_code(400);
-            $out = array('ok' => false, 'code' => 'FIN-400', 'msg' => 'فعلٌ غيرُ معرَّف — لا زرَّ بلا عقد');
+            $out = array('ok' => false, 'code' => 'FIN-400', 'msg' => 'فعل غير معرف — لا زر بلا عقد');
     }
 } catch (\Throwable $e) {
     $msg = $e->getMessage();

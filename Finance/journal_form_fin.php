@@ -38,7 +38,7 @@ $company_scope_sql = fin_scope('company_id', $is_super_admin, $company_id);
 if (isset($_GET['post_id'])) {
     if (!$can_edit) { ems_gov_flash_redirect('journal_form_fin.php', 'لا توجد صلاحية الترحيل ❌', 'GOV-PERM-403', ''); exit(); }
     if (!fin_verify_action_token()) { ems_gov_flash_redirect('journal_form_fin.php', 'رمز الحماية غير صالح ❌', 'GOV-FAIL-409', ''); exit(); } // إصلاح #2
-    if (!fin_can_perform($conn, $ctx['role'], 'finance_manager')) { ems_gov_flash_redirect('journal_form_fin.php', 'الترحيل يخصّ المدير المالي فقط ❌', 'GOV-FAIL-409', ''); exit(); } // فصل الواجبات
+    if (!fin_can_perform($conn, $ctx['role'], 'finance_manager')) { ems_gov_flash_redirect('journal_form_fin.php', 'الترحيل يخص المدير المالي فقط ❌', 'GOV-FAIL-409', ''); exit(); } // فصل الواجبات
     $pid = intval($_GET['post_id']);
     $gate = ems_tenant_db(); // الترحيل شركة الجلسة دومًا (كالأصل company_id=$company_id)
 
@@ -67,10 +67,10 @@ if (isset($_GET['post_id'])) {
        إنفاذِه الخدمةُ لا الحارس. */
     require_once __DIR__ . '/../includes/self_approval_guard.php';
     $__sa = ems_assert_not_self_approval($conn, 'fin_journal_entries', 'id', $pid,
-        'قيدٌ يوميٌّ #' . $pid, $company_id);
+        'قيد يومي #' . $pid, $company_id);
     if ($__sa !== null) {
         ems_gov_flash_redirect('journal_form_fin.php', $__sa['reason'], 'GOV-PERM-403',
-            'الترحيلُ يدٌ ثانيةٌ غيرُ يدِ الإعداد');
+            'الترحيل يد ثانية غير يد الإعداد');
         exit();
     }
 
@@ -97,7 +97,7 @@ if (isset($_GET['post_id'])) {
         }, 'post journal entry + advance linked event');
     } catch (\App\Core\TenantGateException $e) {
         error_log('journal post refused: ' . $e->getMessage());
-        ems_gov_flash_redirect('journal_form_fin.php', 'لا يجوز ترحيل قيدٍ مرتبطٍ بحدثٍ منشورٍ على الناقل ❌', 'GOV-FAIL-409', ''); exit();
+        ems_gov_flash_redirect('journal_form_fin.php', 'لا يجوز ترحيل قيد مرتبط بحدث منشور على الناقل ❌', 'GOV-FAIL-409', ''); exit();
     }
     // §9.3: حقيقة finance.posted على الجذر — القيد رُحِّل لحدثِ طلبٍ (إن كان)
     $eidFact = $entryRow ? intval($entryRow['event_id']) : 0;
@@ -118,7 +118,7 @@ if (isset($_GET['post_id'])) {
 
     // (فجوة 3) الانحراف المستمر: تغذية «الفعلي» في الموازنة من القيود المرحّلة فورًا
     $fed = fin_recalc_budget_actuals($conn, $company_id);
-    ems_gov_flash_redirect('journal_form_fin.php', "تم ترحيل القيد وتحدّث فعلي الموازنة ($fed بند) ✅", 'GOV-OK-200', ''); exit();
+    ems_gov_flash_redirect('journal_form_fin.php', "تم ترحيل القيد وتحدث فعلي الموازنة ($fed بند) ✅", 'GOV-OK-200', ''); exit();
 }
 
 // ── حذف ناعم (مسودة فقط) ──
@@ -182,7 +182,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['posting_date'])) {
         }
         if ($source_doc_ref === '') {
             ems_gov_flash_redirect('journal_form_fin.php',
-                'المستند المصدر إلزامي للقيد اليدوي — ولا قيدَ بلا مستند ❌', 'GOV-FAIL-409', ''); exit();
+                'المستند المصدر إلزامي للقيد اليدوي — ولا قيد بلا مستند ❌', 'GOV-FAIL-409', ''); exit();
         }
         if ($manual_kind === 'عكس' && $reversal_link <= 0) {
             ems_gov_flash_redirect('journal_form_fin.php',
@@ -192,7 +192,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['posting_date'])) {
     // M-38: العملة من الدليل المسجَّل حصرًا
     require_once __DIR__ . '/../includes/fx.php';
     $jr_code = ems_fx_code($jr_currency !== '' ? $jr_currency : 'SDG');
-    if ($jr_code === null) { ems_gov_flash_redirect('journal_form_fin.php', 'عملة غير مسجَّلة ❌', 'GOV-FAIL-409', ''); exit(); }
+    if ($jr_code === null) { ems_gov_flash_redirect('journal_form_fin.php', 'عملة غير مسجلة ❌', 'GOV-FAIL-409', ''); exit(); }
 
     // اجمع السطور الصالحة
     $lines = array(); $tot_d = 0; $tot_c = 0;
@@ -278,7 +278,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضيًا
-    echo ems_states_bundle('لا قيودَ يوميةً مسجّلةً بعدُ', 'أنشئْ قيدًا متوازنًا (مدين = دائن) بزرِّ «إنشاء قيد» في رأسِ الشاشة');
+    echo ems_states_bundle('لا قيود يومية مسجلة بعد', 'أنشئ قيدا متوازنا (مدين = دائن) بزر «إنشاء قيد» في رأس الشاشة');
     ?>
 
     <?php fin_msg_banner(); ?>
@@ -340,7 +340,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </div>
                     <div class="form-group">
                         <label for="j_rev">رابط العكس</label>
-                        <input type="number" name="reversal_link" id="j_rev" placeholder="رقم القيد المعكوس (إن كان عكسًا)">
+                        <input type="number" name="reversal_link" id="j_rev" placeholder="رقم القيد المعكوس (إن كان عكسا)">
                     </div>
                     <div class="form-group fin-jrn-span-all">
                         <label for="j_memo">بيان القيد</label>
@@ -391,22 +391,22 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <th class="ems-fn-th" data-fn="1">المعادل مدين</th>
                     <th class="ems-fn-th" data-fn="1">المعادل دائن</th>
                     <th class="ems-fn-th" data-fn="1">الوصف</th>
-                    <th class="ems-fn-th none" data-fn="1">أعدّه</th>
+                    <th class="ems-fn-th none" data-fn="1">أعده</th>
                     <th class="ems-fn-th none" data-fn="1">راجعه</th>
                     <th class="ems-fn-th none" data-fn="1">نشره</th>
                     <th class="ems-fn-th none" data-fn="1">تاريخ النشر</th>
                     <th class="ems-fn-th none" data-fn="1">نسخة القاعدة المستعملة</th>
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                    <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                    <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                    <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                     <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                     <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-                    <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+                    <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
                     <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-                    <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+                    <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
                     <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
-                    <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
-                    <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطّلاع</th>
+                    <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
+                    <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطلاع</th>
                     <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                     <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
                     <th class="ems-gov-th none" data-gov="fx_rate" data-slice="3" title="سعر التحويل لعملة الدفاتر">سعر الصرف</th>
@@ -417,12 +417,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     foreach ($entries as $row) {
                         $balanced = (round((float)$row['total_debit'], 2) === round((float)$row['total_credit'], 2));
                         $st = (string)$row['state'];
-                        $st_label = $st === 'posted' ? 'مرحَّل' : ($st === 'reversed' ? 'معكوس' : 'مسودة');
+                        $st_label = $st === 'posted' ? 'مرحل' : ($st === 'reversed' ? 'معكوس' : 'مسودة');
                         $st_tone  = $st === 'posted' ? 'success' : ($st === 'reversed' ? 'dark' : 'secondary');
                         echo "<tr>";
                         echo "<td><div class='action-btns'>";
                         if ($can_edit && $st === 'draft') {
-                            echo "<a href='?post_id=" . intval($row['id']) . "&_t=" . fin_action_token() . "' class='action-btn edit' title='ترحيل' onclick='return confirm(\"ترحيل القيد؟ لا يُرحَّل غير المتوازن.\")'><i class='fas fa-check-double'></i></a>";
+                            echo "<a href='?post_id=" . intval($row['id']) . "&_t=" . fin_action_token() . "' class='action-btn edit' title='ترحيل' onclick='return confirm(\"ترحيل القيد؟ لا يرحل غير المتوازن.\")'><i class='fas fa-check-double'></i></a>";
                         }
                         if ($can_delete && $st === 'draft') {
                             echo "<a href='?delete_id=" . intval($row['id']) . "' class='action-btn delete' onclick='return confirm(\"هل أنت متأكد من الحذف؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>";
@@ -446,11 +446,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 <template id="j_line_tpl">
     <tr class="j-line">
-        <td><select name="account_id[]" aria-label="رقمُ حسابِ السطر" class="j-acc"><?php echo fin_postable_account_options($conn, $is_super_admin, $company_id); ?></select></td>
-        <td><select name="cost_center_id[]" aria-label="مركزُ تكلفةِ السطر" class="j-cc"><?php echo fin_cost_center_options($conn, $is_super_admin, $company_id); ?></select></td>
-        <td><input type="number" step="0.01" min="0" name="debit[]" aria-label="المبلغُ المدين" class="j-debit" value="0"></td>
-        <td><input type="number" step="0.01" min="0" name="credit[]" aria-label="المبلغُ الدائن" class="j-credit" value="0"></td>
-        <td><input type="text" name="line_memo[]" aria-label="بيانُ السطر" class="j-memo"></td>
+        <td><select name="account_id[]" aria-label="رقم حساب السطر" class="j-acc"><?php echo fin_postable_account_options($conn, $is_super_admin, $company_id); ?></select></td>
+        <td><select name="cost_center_id[]" aria-label="مركز تكلفة السطر" class="j-cc"><?php echo fin_cost_center_options($conn, $is_super_admin, $company_id); ?></select></td>
+        <td><input type="number" step="0.01" min="0" name="debit[]" aria-label="المبلغ المدين" class="j-debit" value="0"></td>
+        <td><input type="number" step="0.01" min="0" name="credit[]" aria-label="المبلغ الدائن" class="j-credit" value="0"></td>
+        <td><input type="text" name="line_memo[]" aria-label="بيان السطر" class="j-memo"></td>
         <td><a href="javascript:void(0)" class="action-btn delete j-del" title="حذف السطر"><i class="fas fa-times"></i></a></td>
     </tr>
 </template>

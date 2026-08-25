@@ -105,13 +105,13 @@ class EventDeliveryWorker
         $event = $this->loadEvent((int) $d['outbox_id']);
         if (!$event) {
             return $this->markFailed($deliveryId, $d, 'NO_EVENT',
-                'صفُّ الصادر #' . $d['outbox_id'] . ' غيرُ موجود');
+                'صف الصادر #' . $d['outbox_id'] . ' غير موجود');
         }
 
         $sub = $this->loadSubscription((string) $event['event_key'], (string) $d['consumer_key']);
         if (!$sub) {
             return $this->markFailed($deliveryId, $d, 'NO_SUB',
-                'لا اشتراكَ نشطًا للمستهلك «' . $d['consumer_key'] . '» على «' . $event['event_key'] . '»');
+                'لا اشتراك نشطا للمستهلك «' . $d['consumer_key'] . '» على «' . $event['event_key'] . '»');
         }
 
         // processing — الحالةُ تُعلن أن التنفيذَ جارٍ (CK-12 يرصد العالقَ فوقَ ساعة)
@@ -122,7 +122,7 @@ class EventDeliveryWorker
             if ($resultRef === null || $resultRef === '') {
                 // «◆ نجاحٌ بلا مرجعٍ مرفوض» — chk_result يرفضه في القاعدةِ أيضًا
                 return $this->markFailed($deliveryId, $d, 'NO_RESULT_REF',
-                    'المستهلك أعاد نجاحًا بلا مرجع — والقيدُ chk_result يرفضه');
+                    'المستهلك أعاد نجاحا بلا مرجع — والقيد chk_result يرفضه');
             }
             return $this->markProcessed($deliveryId, (int) $d['outbox_id'], (string) $resultRef);
         } catch (\Throwable $t) {
@@ -152,11 +152,11 @@ class EventDeliveryWorker
             }
         }
         if (!class_exists($class)) {
-            throw new \RuntimeException('صنفُ المستهلك «' . $class . '» غيرُ محمَّل — سجّلْه أو صحّحْ اسمَه');
+            throw new \RuntimeException('صنف المستهلك «' . $class . '» غير محمل — سجله أو صحح اسمه');
         }
         $obj = new $class();
         if (!method_exists($obj, $method)) {
-            throw new \RuntimeException('الطريقة «' . $method . '» غيرُ موجودةٍ في ' . $class);
+            throw new \RuntimeException('الطريقة «' . $method . '» غير موجودة في ' . $class);
         }
         return $obj->$method($event, $this->conn);
     }
@@ -230,7 +230,7 @@ class EventDeliveryWorker
     {
         try {
             $title = mb_substr(
-                'صندوقُ الموتى: تسليم #' . $d['id'] . ' للمستهلك «' . $d['consumer_key']
+                'صندوق الموتى: تسليم #' . $d['id'] . ' للمستهلك «' . $d['consumer_key']
                 . '» بعد ' . ((int) $d['attempt_no'] + 1) . ' محاولات — ' . $code . ': ' . $text, 0, 195);
             $st = $this->conn->prepare(
                 "INSERT INTO `fin_notifications` (`company_id`,`target_level`,`title`,`link`)
@@ -271,10 +271,10 @@ class EventDeliveryWorker
     {
         $deliveryId = (int) $deliveryId;
         if (!in_array($decision, array('requeue', 'close'), true)) {
-            return array('ok' => false, 'reason' => 'قرارٌ غيرُ معروف — requeue أو close');
+            return array('ok' => false, 'reason' => 'قرار غير معروف — requeue أو close');
         }
         if (trim((string) $reason) === '') {
-            return array('ok' => false, 'reason' => 'سببُ القرارِ إلزاميّ — ولا قرارَ بلا سبب');
+            return array('ok' => false, 'reason' => 'سبب القرار إلزامي — ولا قرار بلا سبب');
         }
 
         if ($decision === 'requeue') {
@@ -301,7 +301,7 @@ class EventDeliveryWorker
         $n = $this->conn->affected_rows;
         $u->close();
         return array('ok' => $n === 1, 'affected' => $n,
-            'reason' => $n === 1 ? 'سُجّل القرار' : 'الصفُّ ليس في صندوقِ الموتى أو لا تغيير');
+            'reason' => $n === 1 ? 'سجل القرار' : 'الصف ليس في صندوق الموتى أو لا تغيير');
     }
 
     /** F-16 نظيرُه للتسليم: تحريرُ ما عَلِق فوقَ مهلتِه (CK-12). */

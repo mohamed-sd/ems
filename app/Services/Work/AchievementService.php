@@ -22,10 +22,10 @@ class AchievementService
     public static function derive(\mysqli $conn, array $a)
     {
         if (!in_array((string) ($a['source_kind'] ?? ''), self::SOURCES, true)) {
-            return array('ok' => false, 'code' => 422, 'reason' => 'مصدرٌ خارج الثمانية: ' . ($a['source_kind'] ?? '—'));
+            return array('ok' => false, 'code' => 422, 'reason' => 'مصدر خارج الثمانية: ' . ($a['source_kind'] ?? '—'));
         }
         if (trim((string) ($a['evidence_ref'] ?? '')) === '') {
-            return array('ok' => false, 'code' => 422, 'reason' => 'صفرُ إنجازٍ بلا دليل (AC-WFM-05)');
+            return array('ok' => false, 'code' => 422, 'reason' => 'صفر إنجاز بلا دليل (AC-WFM-05)');
         }
         if (empty($a['person_user_id']) || empty($a['company_id'])) {
             return array('ok' => false, 'code' => 422, 'reason' => 'الشخص والكيان إلزاميان');
@@ -50,7 +50,7 @@ class AchievementService
         if (!$st->execute()) { $e = $st->error; $st->close(); return array('ok' => false, 'code' => 422, 'reason' => $e); }
         $id = $st->insert_id;
         $st->close();
-        WorkItemService::notifyUser($conn, $co, $pu, 'أُضيف إنجازٌ لسجلك', $ti,
+        WorkItemService::notifyUser($conn, $co, $pu, 'أضيف إنجاز لسجلك', $ti,
             'Portal/my_achievement.php', false, $by);
         return array('ok' => true, 'code' => 200, 'id' => $id);
     }
@@ -65,7 +65,7 @@ class AchievementService
         $co = intval($item['company_id']);
         $ref = (string) intval($item['id']);
         $evidence = trim((string) ($item['evidence_ref'] ?? ''));
-        if ($evidence === '') { $evidence = 'قبول المتحقِّق — سجل التدقيق #' . $ref; }
+        if ($evidence === '') { $evidence = 'قبول المتحقق — سجل التدقيق #' . $ref; }
         $out = array();
         $executor = intval($item['assigned_user_id']);
         if ($executor > 0) {
@@ -128,7 +128,7 @@ class AchievementService
             $rs = $r->get_result();
             while ($x = $rs->fetch_assoc()) {
                 WorkItemService::notifyUser($conn, $co, intval($x['person_user_id']),
-                    'عُكس إنجازٌ من سجلك بسبب: ' . $reason, $sk . ' ' . $sr, 'Portal/my_achievement.php', false, intval($actor));
+                    'عكس إنجاز من سجلك بسبب: ' . $reason, $sk . ' ' . $sr, 'Portal/my_achievement.php', false, intval($actor));
             }
             $r->close();
         }

@@ -51,7 +51,7 @@ if (!$can_view) {
 // ── تسجيلُ الفاتورة والمطابقة (المحرك الواحد proc_match_invoice) ──
 /* AC-F2: حارسُ الكتابةِ المركزيُّ **قبلَ** أولِ عبارةِ كتابة — fail-closed.
    ويبقى فحصُ $can_edit داخلَ كلِّ فرعٍ: ذاك يميّز الفعلَ وهذا يحرس البوابة. */
-ems_require_action($conn, 'Procurement/po_match.php', 'write', array('deny_msg' => 'مطابقةُ الفواتيرِ تحتاج صلاحيةَ تحرير'));
+ems_require_action($conn, 'Procurement/po_match.php', 'write', array('deny_msg' => 'مطابقة الفواتير تحتاج صلاحية تحرير'));
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'match_invoice') {
     if (!$can_edit) { ems_gov_flash_redirect('po_match.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
     $mid = intval($_POST['order_id'] ?? 0);
@@ -64,11 +64,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'match
         $_POST['invoice_tax'] ?? 0
     );
     if ($res['status'] === 'matched') {
-        $msg = 'طوبقت الفاتورةُ وفُتح استحقاقُ المورد' . ($res['due_id'] ? ' (ذمة #' . $res['due_id'] . ')' : '') . ' ✅';
+        $msg = 'طوبقت الفاتورة وفتح استحقاق المورد' . ($res['due_id'] ? ' (ذمة #' . $res['due_id'] . ')' : '') . ' ✅';
     } elseif ($res['status'] === 'var_pending') {
-        $msg = 'فرقٌ فوق السماح — وقفت المطابقة بلا استحقاق: ' . $res['reason'] . ' — احسمه من زر «حسم الفرق» ⚠️';
+        $msg = 'فرق فوق السماح — وقفت المطابقة بلا استحقاق: ' . $res['reason'] . ' — احسمه من زر «حسم الفرق» ⚠️';
     } else {
-        $msg = 'تعذّرت المطابقة: ' . ($res['reason'] !== '' ? $res['reason'] : 'خطأٌ داخلي') . ' ❌';
+        $msg = 'تعذرت المطابقة: ' . ($res['reason'] !== '' ? $res['reason'] : 'خطأ داخلي') . ' ❌';
     }
     ems_gov_flash_redirect('po_match.php', $msg, 'GOV-INFO-200', ''); exit();
 }
@@ -93,10 +93,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'resol
         if ($__x) { $__matcher = (int) $__x[0]; }
     }
     $__sod = ems_no_self_approval($conn, $__matcher, (int) $current_user_id,
-        'حسمُ فرقِ مطابقةِ الأمر #' . $rid, (int) $company_id);
+        'حسم فرق مطابقة الأمر #' . $rid, (int) $company_id);
     if ($__sod !== null) {
         ems_gov_flash_redirect('po_match.php', $__sod['reason'], 'SOD-403',
-            'يلزم شخصٌ آخرُ غيرُ من سجّل الفاتورة');
+            'يلزم شخص آخر غير من سجل الفاتورة');
         exit();
     }
     /* ══ INJ-0093 ② · والفرقُ فوق السقفِ يحتاج صاحبَ سقفٍ أعلى ═══════════════
@@ -126,7 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'resol
             'document_type' => 'po_variance',
             'document_id'   => $rid,
             'amount'        => $__var,
-            'reason'        => 'حسمُ فرقِ مطابقةٍ على الأمر #' . $rid,
+            'reason'        => 'حسم فرق مطابقة على الأمر #' . $rid,
         ));
         if (empty($__sig['ok']) && (int) $__sig['code'] === 409) {
             /* ◆ **والرفضُ الصامتُ يُضيّع الطلبَ**: من رُدَّ فوقَ سقفِه يحتاج بابًا
@@ -144,7 +144,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'resol
                 $__doc = 'PO#' . $rid;
                 $__rn  = 'ESC-POV-' . $rid . '-' . (int) $current_user_id;
                 $__stt = 'pending';
-                $__nt  = 'تصعيدٌ آليٌّ: فرقُ مطابقةٍ فوقَ سقفِ المُرسِل — ' . $__sig['reason'];
+                $__nt  = 'تصعيد آلي: فرق مطابقة فوق سقف المرسل — ' . $__sig['reason'];
                 $__cid = (int) $company_id; $__uid2 = (int) $current_user_id;
                 $__eq->bind_param('issssdsi', $__cid, $__rn, $__dt, $__doc, $__nt, $__var, $__stt, $__uid2);
                 if ($__eq->execute()) { $__esc = (int) $conn->insert_id; }
@@ -154,19 +154,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'resol
                 array('actor_cap' => 'below'), array('amount' => $__var, 'escalation_id' => $__esc),
                 array('company_id' => (int) $company_id, 'user_id' => (int) $current_user_id));
             ems_gov_flash_redirect('po_match.php',
-                'PO-CAP-409: الفرقُ (' . number_format($__var, 2) . ') فوقَ سقفِ تفويضك — '
-                . ($__esc > 0 ? 'وصُعِّد آليًّا إلى صاحبِ سقفٍ أعلى (طلب #' . $__esc . ')'
-                              : 'ويلزم صاحبُ سقفٍ أعلى'),
-                'GOV-FAIL-409', 'الرفضُ يُصعَّد ولا يُنسى');
+                'PO-CAP-409: الفرق (' . number_format($__var, 2) . ') فوق سقف تفويضك — '
+                . ($__esc > 0 ? 'وصعد آليا إلى صاحب سقف أعلى (طلب #' . $__esc . ')'
+                              : 'ويلزم صاحب سقف أعلى'),
+                'GOV-FAIL-409', 'الرفض يصعد ولا ينسى');
             exit();
         }
     }
 
     $res = proc_match_resolve($conn, $rid, $_POST['decision'] ?? '', $_POST['reason'] ?? '', $current_user_id);
     if ($res['status'] === 'resolved') {
-        $msg = 'حُسم الفرقُ (' . ($_POST['decision'] ?? '') . ')' . ($res['due_id'] ? ' — ذمة #' . $res['due_id'] : '') . ' ✅';
+        $msg = 'حسم الفرق (' . ($_POST['decision'] ?? '') . ')' . ($res['due_id'] ? ' — ذمة #' . $res['due_id'] : '') . ' ✅';
     } else {
-        $msg = 'تعذّر الحسم: ' . ($res['reason'] !== '' ? $res['reason'] : 'خطأٌ داخلي') . ' ❌';
+        $msg = 'تعذر الحسم: ' . ($res['reason'] !== '' ? $res['reason'] : 'خطأ داخلي') . ' ❌';
     }
     ems_gov_flash_redirect('po_match.php', $msg, 'GOV-INFO-200', ''); exit();
 }
@@ -233,9 +233,9 @@ if (isset($_GET['match_id']) && $can_edit) {
 $badge = function ($state) {
     switch ($state) {
         case 'matched':     return '<span class="pom-badge-ok">مطابَق ✔</span>';
-        case 'var_pending': return '<span class="pom-badge-warn">فرقٌ معلَّق ⚠</span>';
-        case 'rejected':    return '<span class="pom-badge-danger">فاتورةٌ مرفوضة ✖</span>';
-        default:            return '<span class="pom-badge-muted">لم تُسجَّل فاتورة</span>';
+        case 'var_pending': return '<span class="pom-badge-warn">فرق معلق ⚠</span>';
+        case 'rejected':    return '<span class="pom-badge-danger">فاتورة مرفوضة ✖</span>';
+        default:            return '<span class="pom-badge-muted">لم تسجل فاتورة</span>';
     }
 };
 
@@ -263,10 +263,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     /* الدورةُ المستندية (بوابة ١٢): الخطوةُ التاليةُ بعد الاستلام — المطابقةُ ثم حسمُ الفرقِ إن ظهر */
-    echo ems_next_step('تسجيلُ فاتورةِ الموردِ ومطابقتُها — وحسمُ الفرقِ إن ظهر');
+    echo ems_next_step('تسجيل فاتورة المورد ومطابقتها — وحسم الفرق إن ظهر');
     /* حزمةُ الحالاتِ الدنيا (بوابة ٩): تحميلٌ وفراغٌ وخطأٌ — مخفيةٌ افتراضًا */
-    echo ems_states_bundle('لا أوامرَ شراءٍ بلغت طورَ المطابقة',
-        'يظهر الأمرُ هنا بعد تسجيلِ الاستلام — سجِّلِ الاستلامَ ثم طابِقْ فاتورةَ المورد');
+    echo ems_states_bundle('لا أوامر شراء بلغت طور المطابقة',
+        'يظهر الأمر هنا بعد تسجيل الاستلام — سجل الاستلام ثم طابق فاتورة المورد');
     ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
@@ -290,10 +290,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <p class="pom-meta">
                     المورد: <strong><?php echo htmlspecialchars(isset($sup_map[intval($match_order['supplier_id'])]) ? $sup_map[intval($match_order['supplier_id'])] : '—'); ?></strong>
                     · الكمية بالأمر <strong><?php echo number_format($oQty, 2); ?></strong>
-                    · المستلَمة <strong><?php echo number_format($rQty, 2); ?></strong>
+                    · المستلمة <strong><?php echo number_format($rQty, 2); ?></strong>
                     · قيمة الأمر <strong><?php echo number_format($oAmt, 2) . ' ' . htmlspecialchars((string) $match_order['currency']); ?></strong>
-                    · حدُّ السماح ±<strong><?php echo number_format($tol, 2); ?></strong>
-                    <small>(الكميةُ بلا سماحٍ إطلاقًا)</small>
+                    · حد السماح ±<strong><?php echo number_format($tol, 2); ?></strong>
+                    <small>(الكمية بلا سماح إطلاقا)</small>
                 </p>
                 <div class="form-grid">
                     <div class="form-group">
@@ -312,7 +312,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                value="<?php echo htmlspecialchars((string) ($match_order['invoice_amount'] ?? '')); ?>">
                     </div>
                     <div class="form-group">
-                        <label for="emsf_422_1bb58">الضريبة ضمن القيمة <small>(تُفصل — المطابقة على الصافي)</small></label>
+                        <label for="emsf_422_1bb58">الضريبة ضمن القيمة <small>(تفصل — المطابقة على الصافي)</small></label>
                         <input type="number" step="0.01" min="0" name="invoice_tax" id="emsf_422_1bb58"
                                value="<?php echo htmlspecialchars((string) ($match_order['tax_amount'] ?? '0')); ?>">
                     </div>
@@ -334,7 +334,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <form action="po_match.php" method="post" class="allforms allforms-visible">
         <?= csrf_field() ?>
         <div class="card-header"><h5><i class="fas fa-gavel"></i>
-            حسم الفرق المعلَّق — أمر <?php echo htmlspecialchars((string) $resolve_order['code']); ?></h5></div>
+            حسم الفرق المعلق — أمر <?php echo htmlspecialchars((string) $resolve_order['code']); ?></h5></div>
         <div class="card"><div class="card-body">
             <input type="hidden" name="action" value="resolve_variance">
             <input type="hidden" name="order_id" value="<?php echo $rid; ?>">
@@ -342,20 +342,20 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <p class="pom-meta">
                     فاتورة <strong><?php echo htmlspecialchars((string) $resolve_order['invoice_no']); ?></strong>
                     بقيمة <strong><?php echo number_format($rInv, 2); ?></strong>
-                    مقابل أمرٍ بقيمة <strong><?php echo number_format($rAmt, 2); ?></strong>
+                    مقابل أمر بقيمة <strong><?php echo number_format($rAmt, 2); ?></strong>
                     — الفرق <strong class="pom-var-amount"><?php echo number_format($rInv - $rAmt, 2); ?></strong>
                 </p>
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="emsf_423_e84a9">القرار <span class="required">*</span></label>
                         <select name="decision" required id="emsf_423_e84a9">
-                            <option value="قبول الفرق">قبول الفرق — الذمّة بقيمة الفاتورة كاملة</option>
-                            <option value="إشعار دائن">إشعار دائن — الذمّة بقيمة الأمر والفرق يُنتظر له إشعار المورد</option>
-                            <option value="رفض الفاتورة">رفض الفاتورة — لا ذمّة، وتسجيل فاتورة بديلة متاح</option>
+                            <option value="قبول الفرق">قبول الفرق — الذمة بقيمة الفاتورة كاملة</option>
+                            <option value="إشعار دائن">إشعار دائن — الذمة بقيمة الأمر والفرق ينتظر له إشعار المورد</option>
+                            <option value="رفض الفاتورة">رفض الفاتورة — لا ذمة، وتسجيل فاتورة بديلة متاح</option>
                         </select>
                     </div>
                     <div class="form-group pom-span-full">
-                        <label for="emsf_424_beb57">تفسير القرار <span class="required">*</span> <small>(لا حسمَ بلا تفسير — يُختم باسمك ولحظته)</small></label>
+                        <label for="emsf_424_beb57">تفسير القرار <span class="required">*</span> <small>(لا حسم بلا تفسير — يختم باسمك ولحظته)</small></label>
                         <input type="text" name="reason" required maxlength="255" id="emsf_424_beb57">
                     </div>
                 </div>
@@ -379,7 +379,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <th>رقم فاتورة المورد</th>
                     <th>تاريخ الفاتورة</th>
                     <th>الكمية بالأمر</th>
-                    <th>الكمية المستلَمة</th>
+                    <th>الكمية المستلمة</th>
                     <th>فرق الكمية</th>
                     <th>قيمة الأمر</th>
                     <th>قيمة الفاتورة</th>
@@ -392,9 +392,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <th>الاستحقاق</th>
                     <th>الكيان</th>
                     <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                     <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                     <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                     <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>

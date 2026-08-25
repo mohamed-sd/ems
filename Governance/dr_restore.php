@@ -40,14 +40,14 @@ if (!$is_super_admin && empty($__pp['can_view'])) {
 $__canWrite = $is_super_admin || !empty($__pp['can_add']) || !empty($__pp['can_edit']);
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$__canWrite) {
     http_response_code(403);
-    exit('غير مصرَّحٍ بالكتابة في هذه الشاشة — اطلبِ المنحةَ من مدير الصلاحيات');
+    exit('غير مصرح بالكتابة في هذه الشاشة — اطلب المنحة من مدير الصلاحيات');
 }
 
 // ═══ ⑤ رمزُ الحماية — قبلَ أيِّ معالجةٍ لا بعدَها ═══
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!function_exists('verify_csrf_token') || !verify_csrf_token($_POST['csrf_token'] ?? '')) {
         http_response_code(403);
-        exit('رمزُ الحمايةِ غيرُ صالح — أعدْ تحميلَ الصفحة');
+        exit('رمز الحماية غير صالح — أعد تحميل الصفحة');
     }
 }
 
@@ -74,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'actor'                    => $uid,
             'actor_role'               => $role_id,
         ));
-        $flash = $r['ok'] ? ('سُجّل المحضر ' . $r['drill_no']) : $r['reason'];
+        $flash = $r['ok'] ? ('سجل المحضر ' . $r['drill_no']) : $r['reason'];
         $flashKind = $r['ok'] ? 'success' : 'error';
     }
 }
@@ -92,11 +92,11 @@ $ret = $conn->query("SELECT @@binlog_expire_logs_seconds/86400")->fetch_row()[0]
 $days = \App\Services\Dr\RestoreDrillService::daysSinceLastPass($conn, $company_id ?: 1);
 $PAGE_TITLE = 'الاستعادة ومحضرها';
 $TILES = array(
-    array('سجلُّ الثنائيات (CK-16)', $logBin ? $logBin['Value'] : '—'),
-    array('مدةُ الاحتفاظ (يومًا)', round((float) $ret, 1)),
-    array('أيامٌ منذ آخر تجربةٍ ناجحة', $days === null ? 'لم تُجرَّب' : $days),
+    array('سجل الثنائيات (CK-16)', $logBin ? $logBin['Value'] : '—'),
+    array('مدة الاحتفاظ (يوما)', round((float) $ret, 1)),
+    array('أيام منذ آخر تجربة ناجحة', $days === null ? 'لم تجرب' : $days),
 );
-$COLS = array('رقم المحضر','النوع','البدء','الانتهاء','نقطة الاستعادة','هدف RPO (د)','RPO المقيس (د)','RTO (ث)','صفوف قبل','يجب ألا تعود','عادت فعلًا','الحكم','المحضر');
-$EMPTY_TITLE = 'لا محاضرَ استعادةٍ مسجَّلةً بعدُ';
-$EMPTY_HINT  = 'يُسجَّل المحضرُ من هذه الشاشةِ بعدَ تنفيذِ تجربةِ الاستعادةِ وفقَ دليلِ التشغيل';
+$COLS = array('رقم المحضر','النوع','البدء','الانتهاء','نقطة الاستعادة','هدف RPO (د)','RPO المقيس (د)','RTO (ث)','صفوف قبل','يجب ألا تعود','عادت فعلا','الحكم','المحضر');
+$EMPTY_TITLE = 'لا محاضر استعادة مسجلة بعد';
+$EMPTY_HINT  = 'يسجل المحضر من هذه الشاشة بعد تنفيذ تجربة الاستعادة وفق دليل التشغيل';
 include __DIR__ . '/../includes/eng01_screen_view.php';

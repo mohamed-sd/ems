@@ -72,7 +72,7 @@ if ($driver !== null) {
     );
 
     $ged_allowed = false;
-    $ged_reason  = 'حارسُ الرؤيةِ غيرُ متاح — حجبٌ افتراضيّ (فشلٌ مغلق)';
+    $ged_reason  = 'حارس الرؤية غير متاح — حجب افتراضي (فشل مغلق)';
     try {
         if (class_exists('\\App\\Services\\Portal\\VisibilityGuard')) {
             $ged_viewer = array(

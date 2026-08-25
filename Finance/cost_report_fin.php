@@ -27,7 +27,7 @@ if (isset($_GET['delete_id'])) {
     if (!$can_delete) { ems_gov_flash_redirect('cost_report_fin.php', 'لا توجد صلاحية حذف ❌', 'GOV-PERM-403', ''); exit(); }
     $d = intval($_GET['delete_id']);
     fin_gate($is_super_admin)->softDelete('fin_cost_records', $d);
-    ems_gov_flash_redirect('cost_report_fin.php', 'تم حذف سجلّ التكلفة ✅', 'GOV-OK-200', ''); exit();
+    ems_gov_flash_redirect('cost_report_fin.php', 'تم حذف سجل التكلفة ✅', 'GOV-OK-200', ''); exit();
 }
 
 // ── حفظ سجلّ تكلفة ──
@@ -52,8 +52,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cost_type'])) {
     $source_event = intval($_POST['event_id'] ?? 0);
     if ($source_event <= 0) {
         ems_gov_flash_redirect('cost_report_fin.php',
-            '422 لا سجلَّ تكلفةٍ بلا حدثٍ مصدرٍ — اختر الحدثَ الماليَّ الذي نشأت عنه',
-            'GOV-REF-422', 'التكلفةُ أثرُ واقعةٍ لا رقمٌ يُدخَل');
+            '422 لا سجل تكلفة بلا حدث مصدر — اختر الحدث المالي الذي نشأت عنه',
+            'GOV-REF-422', 'التكلفة أثر واقعة لا رقم يدخل');
         exit();
     }
     $__ev = $conn->prepare('SELECT id FROM fin_financial_events WHERE id = ? AND company_id = ? LIMIT 1');
@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cost_type'])) {
     }
     if (!$__evOk) {
         ems_gov_flash_redirect('cost_report_fin.php',
-            '422 الحدثُ #' . $source_event . ' غيرُ موجودٍ في نطاقِ شركتك',
+            '422 الحدث #' . $source_event . ' غير موجود في نطاق شركتك',
             'GOV-REF-422', '');
         exit();
     }
@@ -99,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cost_type'])) {
         'total_cost' => $total_cost, 'revenue' => $revenue, 'event_id' => $source_event,
         'created_by' => $current_user_id,
     ));
-    ems_gov_flash_redirect('cost_report_fin.php', 'تمت إضافة سجلّ التكلفة ✅', 'GOV-OK-200', ''); exit();
+    ems_gov_flash_redirect('cost_report_fin.php', 'تمت إضافة سجل التكلفة ✅', 'GOV-OK-200', ''); exit();
 }
 
 $page_title = 'إيكوبيشن | التكاليف والربحية';
@@ -115,17 +115,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php
     $header_title = 'التكاليف والربحية'; $header_icon = 'fa fa-coins';
     $header_actions = array();
-    if ($can_add) { $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'سجلّ تكلفة'); }
+    if ($can_add) { $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'سجل تكلفة'); }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا سجلَّاتِ تكلفةٍ ضمنَ نطاقِ التصفيةِ الحالي', 'أضفْ سجلَّ تكلفةٍ بزرِّ «سجلّ تكلفة» في رأسِ الشاشة أو وسّعْ نطاقَ التصفية');
+    echo ems_states_bundle('لا سجلات تكلفة ضمن نطاق التصفية الحالي', 'أضف سجل تكلفة بزر «سجل تكلفة» في رأس الشاشة أو وسع نطاق التصفية');
     ?>
     <?php fin_msg_banner(); ?>
 
     <form id="finForm" action="" method="post" class="allforms">
         <?php echo csrf_field(); ?>
-        <div class="card-header"><h5><i class="fas fa-edit"></i> سجلّ تكلفة</h5></div>
+        <div class="card-header"><h5><i class="fas fa-edit"></i> سجل تكلفة</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
             <div class="form-group"><label for="emsf_359_17864">نوع التكلفة <span class="required">*</span></label>
                 <select name="cost_type" id="emsf_359_17864"><?php foreach ($cost_types as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
@@ -157,7 +157,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
             <?php /* والإيرادُ **يُقرأ من مصدرِه** — لا حقلَ إدخالٍ له في هذه الشاشة */ ?>
             <div class="form-group"><label>الإيراد المقابل</label>
-                <div class="ems-readonly-value"><small class="text-muted">يُقرأ من الحدثِ المصدرِ عند الحفظ — لا يُدخَل هنا</small></div>
+                <div class="ems-readonly-value"><small class="text-muted">يقرأ من الحدث المصدر عند الحفظ — لا يدخل هنا</small></div>
             </div>
         </div></div>
         <div class="form-actions"><button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
@@ -174,7 +174,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="ems-fn-th" data-fn="1">الفترة</th>
               <th class="ems-fn-th" data-fn="1">العقد</th>
               <th class="ems-fn-th" data-fn="1">المعدة</th>
-              <th class="ems-fn-th" data-fn="1">تكلفة مباشرة — مشغّلون</th>
+              <th class="ems-fn-th" data-fn="1">تكلفة مباشرة — مشغلون</th>
               <th class="ems-fn-th" data-fn="1">وقود</th>
               <th class="ems-fn-th" data-fn="1">صيانة</th>
               <th class="ems-fn-th" data-fn="1">مخزون</th>
@@ -184,7 +184,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="ems-fn-th" data-fn="1">إهلاك</th>
               <th class="ems-fn-th" data-fn="1">نسبة الهامش</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
               <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
               <th class="ems-gov-th" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
@@ -228,7 +228,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </table>
         </div>
 
-        <h5 class="fin-cost-h5-next"><i class="fas fa-coins"></i> سجلّ التكاليف</h5>
+        <h5 class="fin-cost-h5-next"><i class="fas fa-coins"></i> سجل التكاليف</h5>
         <div class="table-container">
             <table id="finTable" class="display nowrap alltables fin-cost-tbl" data-scroll-x="1" data-state-save="false">
                 <thead><tr><th>الإجراءات</th><th>النوع</th><th>المشروع</th><th>الكمية</th><th>تكلفة الوحدة</th><th>إجمالي التكلفة</th><th>الإيراد المنسوب</th><th>الربحية</th></tr></thead>

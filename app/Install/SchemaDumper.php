@@ -134,10 +134,10 @@ class SchemaDumper
         }
 
         $out = array();
-        $out[] = $this->banner('EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)', array(
+        $out[] = $this->banner('EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)', array(
             'الجداول: ' . count($tables) . ' · المناظير: ' . count($views),
-            'يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل',
-            'الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.',
+            'يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل',
+            'الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.',
         ));
         // COLLATE صريحٌ إلزامًا: `SET NAMES utf8mb4` وحدَه يُصفّر collation_connection
         // إلى افتراض الخادم (utf8mb4_0900_ai_ci في MySQL 8)، فتُولَد أعمدةُ
@@ -265,10 +265,10 @@ class SchemaDumper
 
         $out = array();
         $out[] = $this->banner('EMS — البذرة المرجعية (طبقتان)', array(
-            '① عالمية: بنيةٌ متنكّرةٌ في هيئة بيانات — بدونها لا تنقّلَ ولا صلاحيات.',
-            '② مستأجَرة: مرجعيةٌ تحمل company_id — القيمةُ علامةٌ نائبةٌ يحقنها المُثبِّت:',
+            '① عالمية: بنية متنكرة في هيئة بيانات — بدونها لا تنقل ولا صلاحيات.',
+            '② مستأجرة: مرجعية تحمل company_id — القيمة علامة نائبة يحقنها المثبت:',
             '   ' . self::COMPANY_PLACEHOLDER,
-            'ليست بذرةً بالتصميم: admin_companies · users · employees (بيانات مُثبِّت).',
+            'ليست بذرة بالتصميم: admin_companies · users · employees (بيانات مثبت).',
         ));
         // COLLATE صريحٌ إلزامًا: `SET NAMES utf8mb4` وحدَه يُصفّر collation_connection
         // إلى افتراض الخادم (utf8mb4_0900_ai_ci في MySQL 8)، فتُولَد أعمدةُ
@@ -288,7 +288,7 @@ class SchemaDumper
             $out[] = $sql;
         }
 
-        $out[] = '-- ═══ ② البذرة المستأجَرة — company_id مُستبدَلٌ بالعلامة النائبة ═══';
+        $out[] = '-- ═══ ② البذرة المستأجرة — company_id مستبدل بالعلامة النائبة ═══';
         $out[] = '';
         foreach (self::SEED_TENANT as $t) {
             $cid = $this->templateCompanyId($t);
@@ -321,7 +321,7 @@ class SchemaDumper
         if (!$this->tableExists($table)) {
             // جدولٌ في القائمة وغيرُ موجودٍ في المصدر: يُعلَن ولا يُبتلع صامتًا.
             return array(
-                "-- ⚠ تخطّي {$table}: غير موجود في قاعدة المصدر.\n",
+                "-- ⚠ تخطي {$table}: غير موجود في قاعدة المصدر.\n",
                 '',
                 0
             );
@@ -329,7 +329,7 @@ class SchemaDumper
 
         $cols = $this->columnsOf($table);
         if (empty($cols)) {
-            return array('', "تعذّرت قراءة أعمدة {$table}", 0);
+            return array('', "تعذرت قراءة أعمدة {$table}", 0);
         }
 
         $where = '';
@@ -348,7 +348,7 @@ class SchemaDumper
         $colList = implode(', ', $colList);
 
         $lines = array();
-        $lines[] = '-- ── ' . $table . ($companyId !== null ? ' (قالبُ شركة ' . (int) $companyId . ') ──' : ' ──');
+        $lines[] = '-- ── ' . $table . ($companyId !== null ? ' (قالب شركة ' . (int) $companyId . ') ──' : ' ──');
         $lines[] = 'DELETE FROM ' . $this->qi($table) . ';';
 
         $batch = array();
@@ -540,7 +540,7 @@ class SchemaDumper
         foreach ($notes as $n) {
             $out[] = '-- ' . $n;
         }
-        $out[] = '-- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.';
+        $out[] = '-- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.';
         $out[] = '-- ' . $line;
         return implode("\n", $out);
     }

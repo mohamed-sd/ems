@@ -38,13 +38,13 @@ if (!$is_super_admin && $company_id <= 0) {
 $perms = fin_page_perms($conn, 'Finance/operator_pay_policies_fin.php', $is_super_admin);
 $can_view = $perms['can_view']; $can_edit = $perms['can_edit'];
 if (!$can_view) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض سياسات المشغّلين ❌', 'GOV-PERM-403', '');
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض سياسات المشغلين ❌', 'GOV-PERM-403', '');
     exit();
 }
 
 $MODELS = array('hour' => 'ساعة', 'ton' => 'طن', 'trip' => 'نقلة', 'meter' => 'متر');
 $BASES  = array('actual' => 'تشغيل فعلي', 'standby' => 'استعداد', 'attendance' => 'حضور',
-                'ton' => 'طن', 'trip' => 'نقلة', 'meter' => 'متر', 'composite' => 'مركّب');
+                'ton' => 'طن', 'trip' => 'نقلة', 'meter' => 'متر', 'composite' => 'مركب');
 
 // ── إيقاف سياسة (soft — تبقى في السجل التاريخي) ──
 if (isset($_GET['stop_policy'])) {
@@ -52,10 +52,10 @@ if (isset($_GET['stop_policy'])) {
     $pid = intval($_GET['stop_policy']);
     try {
         fin_gate($is_super_admin)->softDelete('contract_hour_policies', $pid);
-        ems_gov_flash_redirect('operator_pay_policies_fin.php', 'أُوقفت السياسة ✅', 'GOV-OK-200', '');
+        ems_gov_flash_redirect('operator_pay_policies_fin.php', 'أوقفت السياسة ✅', 'GOV-OK-200', '');
     } catch (\Throwable $t) {
         error_log('operator_pay_policies stop: ' . $t->getMessage());
-        ems_gov_flash_redirect('operator_pay_policies_fin.php', 'تعذّر الإيقاف ❌', 'GOV-FAIL-409', '');
+        ems_gov_flash_redirect('operator_pay_policies_fin.php', 'تعذر الإيقاف ❌', 'GOV-FAIL-409', '');
     }
     exit();
 }
@@ -66,8 +66,8 @@ if (isset($_GET['activate_policy'])) {
     $r = PPS::activate($conn, fin_gate($is_super_admin), $company_id,
                        intval($_GET['activate_policy']), $current_user_id);
     $m = $r['ok']
-        ? ('فُعّلت السياسة ✅' . (count($r['superseded']) > 0
-            ? (' · أُخلفت ' . count($r['superseded']) . ' سياسةً سابقةً بسريانها') : ''))
+        ? ('فعلت السياسة ✅' . (count($r['superseded']) > 0
+            ? (' · أخلفت ' . count($r['superseded']) . ' سياسة سابقة بسريانها') : ''))
         : ($r['code'] . ' — ' . $r['reason'] . ' ❌');
     ems_gov_flash_redirect('operator_pay_policies_fin.php', $m, 'GOV-INFO-200', '');
     exit();
@@ -79,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['expire_policy'])) {
     $r = PPS::expire($conn, fin_gate($is_super_admin), $company_id,
                      intval($_POST['policy_id'] ?? 0), strval($_POST['expire_reason'] ?? ''),
                      $current_user_id);
-    ems_gov_flash_redirect('operator_pay_policies_fin.php', $r['ok'] ? 'أُنهيت السياسةُ بسببها المكتوب ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), 'GOV-OK-200', '');
+    ems_gov_flash_redirect('operator_pay_policies_fin.php', $r['ok'] ? 'أنهيت السياسة بسببها المكتوب ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), 'GOV-OK-200', '');
     exit();
 }
 
@@ -94,10 +94,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_policy'])) {
     $cur   = trim(strval($_POST['currency'] ?? 'SDG'));
 
     $err = null;
-    if ($emp <= 0)                        { $err = 'اختر المشغّل'; }
+    if ($emp <= 0)                        { $err = 'اختر المشغل'; }
     elseif (!isset($MODELS[$model]))      { $err = 'اختر نموذج العمل'; }
     elseif (!isset($BASES[$basis]))       { $err = 'اختر أساس الاستحقاق'; }
-    elseif ($rateRaw === '' || !is_numeric($rateRaw) || (float) $rateRaw <= 0) { $err = 'المعدّل رقمٌ موجبٌ إلزامي'; }
+    elseif ($rateRaw === '' || !is_numeric($rateRaw) || (float) $rateRaw <= 0) { $err = 'المعدل رقم موجب إلزامي'; }
     elseif ($cur === '')                  { $err = 'العملة إلزامية'; }
     if ($err !== null) { ems_gov_flash_redirect('operator_pay_policies_fin.php', "{$err} ❌", 'GOV-FAIL-409', ''); exit(); }
 
@@ -138,10 +138,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_policy'])) {
     );
     try {
         fin_gate($is_super_admin)->insert('contract_hour_policies', $row);
-        ems_gov_flash_redirect('operator_pay_policies_fin.php', 'حُفظت مسودةُ السياسة — فعّلها لتسري ✅', 'GOV-OK-200', '');
+        ems_gov_flash_redirect('operator_pay_policies_fin.php', 'حفظت مسودة السياسة — فعلها لتسري ✅', 'GOV-OK-200', '');
     } catch (\Throwable $t) {
         error_log('operator_pay_policies add: ' . $t->getMessage());
-        ems_gov_flash_redirect('operator_pay_policies_fin.php', 'تعذّرت الإضافة ❌', 'GOV-FAIL-409', '');
+        ems_gov_flash_redirect('operator_pay_policies_fin.php', 'تعذرت الإضافة ❌', 'GOV-FAIL-409', '');
     }
     exit();
 }
@@ -193,7 +193,7 @@ foreach ($policies as $p) {
     }
 }
 
-$page_title = 'إيكوبيشن | سياسات مستحقات المشغّلين';
+$page_title = 'إيكوبيشن | سياسات مستحقات المشغلين';
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
 require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(isset($perms) ? $perms : null);
@@ -204,13 +204,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 <div class="main fin-oppol-main ems-unified-page-shell">
     <?php
-    $header_title = 'سياسات مستحقات المشغّلين';
+    $header_title = 'سياسات مستحقات المشغلين';
     $header_icon  = 'fa fa-scale-balanced';
     $header_actions = array();
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا سياساتِ استحقاقٍ للمشغّلين بعدُ', 'أضف أولى السياساتِ من نموذجِ «سياسة جديدة» أعلاه ثم فعّلها لتسري');
+    echo ems_states_bundle('لا سياسات استحقاق للمشغلين بعد', 'أضف أولى السياسات من نموذج «سياسة جديدة» أعلاه ثم فعلها لتسري');
     ?>
     <style>
         /* UXW-01 ②: أصنافُ الصفحةِ بدلَ الأنماطِ الموضعية — ألوانُها رموزٌ حصرًا */
@@ -238,17 +238,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-body">
         <p class="fin-oppol-intro">
             <i class="fas fa-circle-info"></i>
-            لكل مشغّلٍ <strong>سياسةُ استحقاقٍ</strong> بنموذج عمله (ساعة/طن/نقلة/متر) وأساسه
-            (تشغيل فعلي · استعداد · حضور · إنتاج) ومعدله وحدَّيه ونطاقه —
-            والمستحق = <code>Σ كمية الأساس × معدله</code> مقصوصًا بالحدين، والأخصُّ نطاقًا يغلب.
-            <strong>السياسةُ تغلب</strong>؛ ومن لا سياسةَ له يُقرأ من
-            <a href="operator_pay_fin.php">الوضع القديم (بالراتب/بالمستحق)</a> مؤقتًا.
+            لكل مشغل <strong>سياسة استحقاق</strong> بنموذج عمله (ساعة/طن/نقلة/متر) وأساسه
+            (تشغيل فعلي · استعداد · حضور · إنتاج) ومعدله وحديه ونطاقه —
+            والمستحق = <code>Σ كمية الأساس × معدله</code> مقصوصا بالحدين، والأخص نطاقا يغلب.
+            <strong>السياسة تغلب</strong>؛ ومن لا سياسة له يقرأ من
+            <a href="operator_pay_fin.php">الوضع القديم (بالراتب/بالمستحق)</a> مؤقتا.
         </p>
         <div class="fin-oppol-badges">
             <span class="badge badge-success fin-oppol-badge"><?php echo $liveN; ?> سياسة نافذة</span>
             <?php if ($draftN > 0): ?>
             <span class="badge badge-secondary fin-oppol-badge">
-                <i class="fas fa-pen"></i> <?php echo $draftN; ?> مسودة — <strong>لا تسعّر شيئًا حتى تُفعَّل</strong>
+                <i class="fas fa-pen"></i> <?php echo $draftN; ?> مسودة — <strong>لا تسعر شيئا حتى تفعل</strong>
             </span>
             <?php endif; ?>
             <?php if ($supN > 0): ?>
@@ -258,7 +258,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <?php endif; ?>
             <?php if ($trialN > 0): ?>
             <span class="badge badge-warning fin-oppol-badge">
-                <i class="fas fa-flask"></i> <?php echo $trialN; ?> تجريبية — استبدل قيمَها قبل الاستعمال الحقيقي
+                <i class="fas fa-flask"></i> <?php echo $trialN; ?> تجريبية — استبدل قيمها قبل الاستعمال الحقيقي
             </span>
             <?php endif; ?>
         </div>
@@ -272,7 +272,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <input type="hidden" name="add_policy" value="1">
             <div class="form-section"><div class="form-grid">
                 <div class="form-group">
-                    <label for="oppol_employee_id">المشغّل *</label>
+                    <label for="oppol_employee_id">المشغل *</label>
                     <select id="oppol_employee_id" name="employee_id" required>
                         <option value="">— اختر —</option>
                         <?php foreach ($operators as $op) {
@@ -292,18 +292,18 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <label for="oppol_basis">أساس الاستحقاق *</label>
                     <select id="oppol_basis" name="basis" required>
                         <?php foreach ($BASES as $k => $v) {
-                            $note = ($k === 'composite') ? ' (بلا صيغةٍ بعد — لا يُحسب)' : '';
+                            $note = ($k === 'composite') ? ' (بلا صيغة بعد — لا يحسب)' : '';
                             echo "<option value='{$k}'>{$v}{$note}</option>";
                         } ?>
                     </select>
                 </div>
-                <div class="form-group"><label>المعدّل *</label>
+                <div class="form-group"><label>المعدل *</label>
                     <input type="number" name="rate" step="0.0001" min="0.0001" required placeholder="لوحدة الأساس"></div>
                 <div class="form-group"><label for="oppol_currency">العملة *</label>
                     <input type="text" id="oppol_currency" name="currency" value="SDG" required maxlength="10"></div>
-                <div class="form-group"><label>حدٌّ أدنى يومي</label>
+                <div class="form-group"><label>حد أدنى يومي</label>
                     <input type="number" name="min_amount" step="0.01" min="0" placeholder="اختياري"></div>
-                <div class="form-group"><label>حدٌّ أقصى يومي</label>
+                <div class="form-group"><label>حد أقصى يومي</label>
                     <input type="number" name="max_amount" step="0.01" min="0" placeholder="اختياري"></div>
                 <div class="form-group"><label for="oppol_effective_from">سريان من</label>
                     <input type="date" id="oppol_effective_from" name="effective_from"></div>
@@ -334,7 +334,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="form-group"><label for="oppol_note">ملاحظة</label>
                     <input type="text" id="oppol_note" name="note" maxlength="200"></div>
                 <div class="form-group"><label class="fin-oppol-check-label" for="oppol_is_trial">
-                    <input type="checkbox" id="oppol_is_trial" name="is_trial" value="1" class="fin-oppol-check"> سياسةٌ تجريبية (توسم ولا تُعتمد للأجر الحقيقي)</label></div>
+                    <input type="checkbox" id="oppol_is_trial" name="is_trial" value="1" class="fin-oppol-check"> سياسة تجريبية (توسم ولا تعتمد للأجر الحقيقي)</label></div>
             </div></div>
             <div class="form-actions">
                 <button type="submit" class="btn-primary"><i class="fas fa-save"></i> إضافة السياسة</button>
@@ -348,14 +348,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="table-container">
             <table id="polTable" class="display nowrap alltables fin-oppol-tbl" data-page-length="25" data-order='[]' data-state-save="false">
                 <thead><tr>
-                    <th>المشغّل</th><th>النموذج</th><th>الأساس</th><th>المعدّل</th>
+                    <th>المشغل</th><th>النموذج</th><th>الأساس</th><th>المعدل</th>
                     <th>الحدود</th><th>العملة</th><th>النطاق</th><th>السريان</th>
                     <th>الحالة</th><?php if ($can_edit) echo '<th>إجراء</th>'; ?>
                     <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                     <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                     <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                     <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -404,13 +404,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     if ($can_edit) {
                         $act = '—';
                         if ($ps === 'draft') {
-                            $act = "<a href='?activate_policy=" . intval($p['id']) . "' class='badge badge-success fin-oppol-act' onclick=\"return confirm('تفعيلُ السياسة؟ ما يُخلِفه سريانُها من سياساتٍ نافذةٍ يُغلق عند يومٍ قبله.');\"><i class='fas fa-play'></i> فعّل</a>";
+                            $act = "<a href='?activate_policy=" . intval($p['id']) . "' class='badge badge-success fin-oppol-act' onclick=\"return confirm('تفعيل السياسة؟ ما يخلفه سريانها من سياسات نافذة يغلق عند يوم قبله.');\"><i class='fas fa-play'></i> فعل</a>";
                         } elseif ($ps === 'active' || $ps === 'superseded') {
                             $act = "<form method='post' class='fin-oppol-inline-form'>" . csrf_field()
                                  . "<input type='hidden' name='expire_policy' value='1'>"
                                  . "<input type='hidden' name='policy_id' value='" . intval($p['id']) . "'>"
-                                 . "<input type='text' name='expire_reason' maxlength='200' required placeholder='سببُ الإنهاء' class='fin-oppol-reason'>"
-                                 . "<button type='submit' class='badge badge-danger fin-oppol-stopbtn'><i class='fas fa-stop'></i> أنهِ</button></form>";
+                                 . "<input type='text' name='expire_reason' maxlength='200' required placeholder='سبب الإنهاء' class='fin-oppol-reason'>"
+                                 . "<button type='submit' class='badge badge-danger fin-oppol-stopbtn'><i class='fas fa-stop'></i> أنه</button></form>";
                         }
                         echo "<td>" . $act . "</td>";
                     }
@@ -420,7 +420,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </table>
         </div>
         <?php if (empty($policies)): ?>
-            <p class="fin-oppol-emptynote"><i class="fas fa-circle-info"></i> لا سياساتٍ بعد — أضف أولى السياسات من النموذج أعلاه.</p>
+            <p class="fin-oppol-emptynote"><i class="fas fa-circle-info"></i> لا سياسات بعد — أضف أولى السياسات من النموذج أعلاه.</p>
         <?php endif; ?>
     </div></div>
 </div>

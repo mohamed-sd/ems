@@ -34,17 +34,17 @@ function finreq_catalog()
         ),
         'advance' => array(
             'label' => 'طلب سلفة', 'icon' => 'fa fa-hand-holding-dollar', 'active' => true,
-            'docs' => array('statement'), 'docs_label' => 'إقرار سلفةٍ وجدولة خصم',
+            'docs' => array('statement'), 'docs_label' => 'إقرار سلفة وجدولة خصم',
             'legacy_event_type' => 'payable', 'has_lines' => false,
         ),
         'supplier_payment' => array(
             'label' => 'طلب دفعة مورد', 'icon' => 'fa fa-truck-fast', 'active' => true,
-            'docs' => array('statement'), 'docs_label' => 'كشف حسابٍ مسوًّى',
+            'docs' => array('statement'), 'docs_label' => 'كشف حساب مسوى',
             'legacy_event_type' => 'payable', 'has_lines' => false,
         ),
         'employee_payment' => array(
             'label' => 'طلب دفعة موظف', 'icon' => 'fa fa-user-check', 'active' => true,
-            'docs' => array('statement'), 'docs_label' => 'كشف مستحقاتٍ معتمَد',
+            'docs' => array('statement'), 'docs_label' => 'كشف مستحقات معتمد',
             'legacy_event_type' => 'payroll', 'has_lines' => false,
         ),
         'transfer' => array(
@@ -74,7 +74,7 @@ function finreq_catalog()
         ),
         'other' => array(
             'label' => 'طلب آخر', 'icon' => 'fa fa-file-lines', 'active' => true,
-            'docs' => array(), 'docs_label' => 'مستندٌ مؤيّدٌ واحدٌ على الأقل',
+            'docs' => array(), 'docs_label' => 'مستند مؤيد واحد على الأقل',
             'legacy_event_type' => 'enterprise', 'has_lines' => false,
         ),
     );
@@ -97,7 +97,7 @@ function finreq_states()
         'archived'         => array('label' => 'مؤرشف',             'badge' => 'dark'),
         'withdrawn'        => array('label' => 'مسحوب',             'badge' => 'secondary'),
         'cancelled'        => array('label' => 'ملغى',              'badge' => 'danger'),
-        'suspended'        => array('label' => 'معلّق',             'badge' => 'warning'),
+        'suspended'        => array('label' => 'معلق',             'badge' => 'warning'),
         'expired'          => array('label' => 'منتهٍ',             'badge' => 'secondary'),
         'merged'           => array('label' => 'مدموج',             'badge' => 'secondary'),
     );
@@ -119,7 +119,7 @@ function finreq_rejection_classes()
     return array(
         'incomplete_docs' => 'مستندات ناقصة', 'no_budget' => 'خارج الميزانية',
         'policy_violation' => 'مخالفة سياسة', 'duplicate' => 'طلب مكرر',
-        'not_justified' => 'بلا مبرر كافٍ', 'other' => 'سبب آخر',
+        'not_justified' => 'بلا مبرر كاف', 'other' => 'سبب آخر',
     );
 }
 
@@ -458,8 +458,8 @@ function finreq_upload($field, &$err = null)
         $clen = (int)($_SERVER['CONTENT_LENGTH'] ?? 0);
         $pmax = finreq_ini_bytes(ini_get('post_max_size'));
         $err = ($clen > 0 && $pmax > 0 && $clen > $pmax)
-            ? 'حجم الإرسال (' . round($clen / 1048576, 1) . 'م) تجاوز حدَّ الخادم (' . round($pmax / 1048576, 1) . 'م) — الملف كبيرٌ جدًّا'
-            : 'لم يصل أيُّ ملفٍ إلى الخادم';
+            ? 'حجم الإرسال (' . round($clen / 1048576, 1) . 'م) تجاوز حد الخادم (' . round($pmax / 1048576, 1) . 'م) — الملف كبير جدا'
+            : 'لم يصل أي ملف إلى الخادم';
         return null;
     }
     $e = intval($_FILES[$field]['error']);
@@ -467,21 +467,21 @@ function finreq_upload($field, &$err = null)
         switch ($e) {
             case UPLOAD_ERR_INI_SIZE:
             case UPLOAD_ERR_FORM_SIZE:
-                $err = 'حجم الملف أكبر من حدِّ الخادم (' . finreq_upload_limit_mb()
-                    . ' ميغابايت) — اضغط الصورة/الـPDF أو صوّرها بجودةٍ أقلّ ثم أعد المحاولة';
+                $err = 'حجم الملف أكبر من حد الخادم (' . finreq_upload_limit_mb()
+                    . ' ميغابايت) — اضغط الصورة/الPDF أو صورها بجودة أقل ثم أعد المحاولة';
                 break;
             case UPLOAD_ERR_NO_FILE:
-                $err = 'لم تُختَر صورةٌ أو مستندٌ للرفع';
+                $err = 'لم تختر صورة أو مستند للرفع';
                 break;
             case UPLOAD_ERR_PARTIAL:
                 $err = 'انقطع رفع الملف قبل اكتماله — أعد المحاولة';
                 break;
             case UPLOAD_ERR_NO_TMP_DIR:
             case UPLOAD_ERR_CANT_WRITE:
-                $err = 'تعذّر على الخادم حفظ الملف المؤقت (إعداد المجلد المؤقت)';
+                $err = 'تعذر على الخادم حفظ الملف المؤقت (إعداد المجلد المؤقت)';
                 break;
             default:
-                $err = 'تعذّر رفع الملف (رمز خطأٍ ' . $e . ')';
+                $err = 'تعذر رفع الملف (رمز خطأ ' . $e . ')';
         }
         return null;
     }
@@ -492,7 +492,7 @@ function finreq_upload($field, &$err = null)
         if (empty($check['valid'])) {
             $err = !empty($check['errors'])
                 ? implode(' · ', $check['errors'])
-                : 'صيغةٌ غير مدعومة — المسموح: صور JPG/PNG/WEBP أو PDF بحدّ 5 ميغابايت';
+                : 'صيغة غير مدعومة — المسموح: صور JPG/PNG/WEBP أو PDF بحد 5 ميغابايت';
             return null;
         }
     }
@@ -502,7 +502,7 @@ function finreq_upload($field, &$err = null)
     if (@move_uploaded_file($_FILES[$field]['tmp_name'], $dir . $name)) {
         return 'storage/finreq/' . $name;
     }
-    $err = 'تعذّر حفظ الملف على الخادم — راجع صلاحيات مجلد التخزين';
+    $err = 'تعذر حفظ الملف على الخادم — راجع صلاحيات مجلد التخزين';
     return null;
 }
 
@@ -689,11 +689,11 @@ function finreq_state_groups()
 {
     return array(
         'draft'    => array('label' => 'مسودات',           'icon' => 'fa fa-pen-ruler',           'tone' => 'stats-slate',   'states' => array('draft')),
-        'cycle'    => array('label' => 'قيدَ الدورة',       'icon' => 'fa fa-hourglass-half',      'tone' => 'stats-orange',  'states' => array('under_review', 'pending_approval', 'suspended')),
-        'returned' => array('label' => 'معادةٌ للاستكمال',  'icon' => 'fa fa-rotate-left',         'tone' => 'stats-danger',  'states' => array('returned')),
-        'approved' => array('label' => 'معتمدةٌ أو مقيَّدة', 'icon' => 'fa fa-circle-check',        'tone' => 'stats-primary', 'states' => array('approved', 'posted')),
-        'settled'  => array('label' => 'مدفوعةٌ أو مُغلقة', 'icon' => 'fa fa-hand-holding-dollar', 'tone' => 'stats-success', 'states' => array('paid', 'collected', 'closed', 'archived')),
-        'refused'  => array('label' => 'مرفوضةٌ أو مسحوبة', 'icon' => 'fa fa-circle-xmark',        'tone' => 'stats-purple',  'states' => array('rejected', 'cancelled', 'withdrawn', 'expired', 'merged')),
+        'cycle'    => array('label' => 'قيد الدورة',       'icon' => 'fa fa-hourglass-half',      'tone' => 'stats-orange',  'states' => array('under_review', 'pending_approval', 'suspended')),
+        'returned' => array('label' => 'معادة للاستكمال',  'icon' => 'fa fa-rotate-left',         'tone' => 'stats-danger',  'states' => array('returned')),
+        'approved' => array('label' => 'معتمدة أو مقيدة', 'icon' => 'fa fa-circle-check',        'tone' => 'stats-primary', 'states' => array('approved', 'posted')),
+        'settled'  => array('label' => 'مدفوعة أو مغلقة', 'icon' => 'fa fa-hand-holding-dollar', 'tone' => 'stats-success', 'states' => array('paid', 'collected', 'closed', 'archived')),
+        'refused'  => array('label' => 'مرفوضة أو مسحوبة', 'icon' => 'fa fa-circle-xmark',        'tone' => 'stats-purple',  'states' => array('rejected', 'cancelled', 'withdrawn', 'expired', 'merged')),
     );
 }
 
@@ -812,7 +812,7 @@ function finreq_journey($gate, array $req, array $timeline = array(), $routing =
     $ownerMgr  = ($mgrName !== '') ? $mgrName : ($deptLabel !== '' ? ('مدير ' . $deptLabel) : '');
 
     $defs = array(
-        1 => array('label' => 'الإنشاء والإرسال', 'owner' => 'مقدّم الطلب'),
+        1 => array('label' => 'الإنشاء والإرسال', 'owner' => 'مقدم الطلب'),
         2 => array('label' => 'اعتماد الإدارة',   'owner' => $ownerMgr),
         3 => array('label' => 'مكتب المحاسب',     'owner' => finreq_role_name($gate, 18)),
         4 => array('label' => 'الاعتماد المالي',  'owner' => finreq_role_name($gate, 17)),
@@ -860,7 +860,7 @@ function finreq_journey($gate, array $req, array $timeline = array(), $routing =
     if ($state === 'returned') {
         $j['banner'] = array(
             'kind'  => 'return',
-            'title' => 'أُعيد إليك لاستكمال:',
+            'title' => 'أعيد إليك لاستكمال:',
             'text'  => $lastReturn ? strval($lastReturn['body']) : 'راجع الحقول الناقصة وأعد الإرسال.',
             'meta'  => ($lastReturn ? (ems_journey_ago($lastReturn['created_at']) . ' · ') : '')
                        . 'بالرقم نفسه ' . strval($req['request_no']),
@@ -873,12 +873,12 @@ function finreq_journey($gate, array $req, array $timeline = array(), $routing =
                        ? ('تصنيف الرفض: ' . strval($req['rejection_class'])) : '',
         );
     } elseif ($state === 'suspended') {
-        $j['banner'] = array('kind' => 'stop', 'title' => 'الطلب معلَّق',
-            'text' => 'الرحلة متوقفةٌ مؤقتًا بقرار الإدارة المالية حتى الاستئناف.');
+        $j['banner'] = array('kind' => 'stop', 'title' => 'الطلب معلق',
+            'text' => 'الرحلة متوقفة مؤقتا بقرار الإدارة المالية حتى الاستئناف.');
     } elseif ($state === 'closed' || $state === 'archived') {
         $j['banner'] = array(
             'kind'  => 'done',
-            'title' => ($state === 'closed') ? 'اكتملت الرحلة وأُغلق الطلب.' : 'اكتملت الرحلة وأُرشف الطلب.',
+            'title' => ($state === 'closed') ? 'اكتملت الرحلة وأغلق الطلب.' : 'اكتملت الرحلة وأرشف الطلب.',
             'meta'  => isset($at[7]) ? ems_journey_ago($at[7]) : '',
         );
     }
@@ -964,14 +964,14 @@ function finreq_gm_escalate(mysqli $conn, $gate, array $req)
         }
 
         if (!$deptCapHit && $usd === null && $monthlyRef === null) {
-            error_log('finreq_gm_escalate: ' . $req['request_no'] . ' لا سقفَ معلنًا ولا سعر ولا مرجع شهري — لم يُقَس (معلَن)');
+            error_log('finreq_gm_escalate: ' . $req['request_no'] . ' لا سقف معلنا ولا سعر ولا مرجع شهري — لم يقس (معلن)');
             return null;
         }
 
         if ($deptCapHit) {
             $assess = array('needs_gm' => true, 'reason' =>
-                'BR-CEO-05: تجاوزُ سقف ' . $deptAr . ' المعلن ('
-                . number_format($deptCap, 2) . ' ' . $cur . ') — رفعٌ آليٌّ لا اختياري');
+                'BR-CEO-05: تجاوز سقف ' . $deptAr . ' المعلن ('
+                . number_format($deptCap, 2) . ' ' . $cur . ') — رفع آلي لا اختياري');
         } else {
             $assess = \App\Services\Governance\UnitStateChangeService::assessGmNeed(
                 $amount, $monthlyRef, ($usd !== null ? $usd : 0.0), '');
@@ -1030,7 +1030,7 @@ function finreq_gm_escalate(mysqli $conn, $gate, array $req)
             $w9 = $r9 ? $r9->fetch_assoc() : null;
             if ($w9) {
                 \App\Services\Work\WorkItemService::notifyUser($conn, $co, intval($w9['id']),
-                    'تجاوزُ سقفٍ رفع آليًّا للاعتماد الأعلى: ' . $no,
+                    'تجاوز سقف رفع آليا للاعتماد الأعلى: ' . $no,
                     $assess['reason'], 'Portal/ceo_approvals.php', true, $uid ?: 1);
             }
         } catch (\Throwable $t) { error_log('finreq_gm_escalate notify: ' . $t->getMessage()); }

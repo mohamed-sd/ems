@@ -132,12 +132,12 @@ if (!function_exists('cmp03_bridge_attendance')) {
         $out = array('ok' => false, 'id' => 0, 'code' => 'ATT-422', 'msg' => '');
         $person = cmp03_bridge_person($conn, $companyId, cmp03_bridge_pick($payload, array('كود الموظف', 'الموظف')));
         if ($person <= 0) {
-            $out['msg'] = 'ATT-422: كودُ الموظفِ لا يقابله موظفٌ في كيانك — ولا يُكتب حضورٌ بمرجعٍ مخترَع';
+            $out['msg'] = 'ATT-422: كود الموظف لا يقابله موظف في كيانك — ولا يكتب حضور بمرجع مخترع';
             return $out;
         }
         $date = cmp03_bridge_pick($payload, array('التاريخ', 'تاريخ اليوم', 'تاريخ الحضور'));
         if (!preg_match('~^\d{4}-\d{2}-\d{2}$~', $date)) {
-            $out['msg'] = 'ATT-422: تاريخُ اليومِ إلزاميٌّ بصيغة YYYY-MM-DD';
+            $out['msg'] = 'ATT-422: تاريخ اليوم إلزامي بصيغة YYYY-MM-DD';
             return $out;
         }
         /* الرمزُ المحكومُ من حالةِ الشاشة — والافتراضُ حضورٌ لا غياب */
@@ -159,15 +159,15 @@ if (!function_exists('cmp03_bridge_attendance')) {
         if (!$ok) {
             if ($errno === 1062) {
                 $out['code'] = 'ATT-409';
-                $out['msg']  = 'ATT-409: لهذا الموظفِ يومٌ مسجَّلٌ سلفًا في ' . $date
-                             . ' — يومٌ واحدٌ لكلِّ موظفٍ (قيدُ القاعدة)';
+                $out['msg']  = 'ATT-409: لهذا الموظف يوم مسجل سلفا في ' . $date
+                             . ' — يوم واحد لكل موظف (قيد القاعدة)';
                 return $out;
             }
-            $out['code'] = 'ATT-500'; $out['msg'] = 'ATT-500: تعذّر التسجيل (' . $errno . ')';
+            $out['code'] = 'ATT-500'; $out['msg'] = 'ATT-500: تعذر التسجيل (' . $errno . ')';
             return $out;
         }
         $out['ok'] = true; $out['id'] = (int) $conn->insert_id; $out['code'] = 'ATT-201';
-        $out['msg'] = 'سُجّل اليومُ في مدخلاتِ الزمنِ (' . $code . ') — يقرؤه المسيّرُ مباشرةً';
+        $out['msg'] = 'سجل اليوم في مدخلات الزمن (' . $code . ') — يقرؤه المسير مباشرة';
         return $out;
     }
 }
@@ -185,12 +185,12 @@ if (!function_exists('cmp03_bridge_deduction')) {
         $out = array('ok' => false, 'id' => 0, 'code' => 'DED-422', 'msg' => '');
         $person = cmp03_bridge_person($conn, $companyId, cmp03_bridge_pick($payload, array('كود الموظف', 'الموظف')));
         if ($person <= 0) {
-            $out['msg'] = 'DED-422: كودُ الموظفِ لا يقابله موظفٌ في كيانك';
+            $out['msg'] = 'DED-422: كود الموظف لا يقابله موظف في كيانك';
             return $out;
         }
         $period = cmp03_bridge_pick($payload, array('الشهر', 'الشهر المرجعي', 'الفترة'));
         if (!preg_match('~^\d{4}-\d{2}~', $period)) {
-            $out['msg'] = 'DED-422: الشهرُ المرجعيُّ إلزاميٌّ بصيغة YYYY-MM';
+            $out['msg'] = 'DED-422: الشهر المرجعي إلزامي بصيغة YYYY-MM';
             return $out;
         }
         $month = substr($period, 0, 7) . '-01';
@@ -208,17 +208,17 @@ if (!function_exists('cmp03_bridge_deduction')) {
         }
         if ($run <= 0) {
             $out['code'] = 'DED-409';
-            $out['msg']  = 'DED-409: لا جولةَ مسيّرٍ تغطّي ' . substr($period, 0, 7)
-                         . ' — والخصمُ لا يُعلَّق في الهواء. أنشئ جولةَ الفترةِ أولًا';
+            $out['msg']  = 'DED-409: لا جولة مسير تغطي ' . substr($period, 0, 7)
+                         . ' — والخصم لا يعلق في الهواء. أنشئ جولة الفترة أولا';
             return $out;
         }
         $doc = cmp03_bridge_pick($payload, array('رقم القرار', 'المستند المؤيد'));
         if ($doc === '') {
-            $out['msg'] = 'DED-422: رقمُ القرارِ إلزاميٌّ — لا خصمَ بلا مستند (CHECK في القاعدة)';
+            $out['msg'] = 'DED-422: رقم القرار إلزامي — لا خصم بلا مستند (CHECK في القاعدة)';
             return $out;
         }
         $amount = (float) str_replace(array(',', ' '), '', cmp03_bridge_pick($payload, array('قيمة الخصم', 'القيمة')));
-        if ($amount <= 0) { $out['msg'] = 'DED-422: قيمةُ الخصمِ يجب أن تكون موجبة'; return $out; }
+        if ($amount <= 0) { $out['msg'] = 'DED-422: قيمة الخصم يجب أن تكون موجبة'; return $out; }
         /* نوعُ المصدرِ من تعدادِ الجدولِ الحيّ — والافتراضُ `other` لا اختراع */
         $kind = cmp03_bridge_pick($payload, array('نوع الخصم', 'النوع'));
         $src = 'other';
@@ -233,7 +233,7 @@ if (!function_exists('cmp03_bridge_deduction')) {
                 (company_id, run_id, person_id, source_type, source_id, amount, doc_ref, note, created_at)
               VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())');
         if (!$st) { $out['code'] = 'DED-500'; $out['msg'] = 'DED-500: ' . $conn->error; return $out; }
-        $note = 'قرارُ الموارد البشرية · ' . mb_substr(cmp03_bridge_pick($payload, array('سبب الخصم', 'السبب')), 0, 180);
+        $note = 'قرار الموارد البشرية · ' . mb_substr(cmp03_bridge_pick($payload, array('سبب الخصم', 'السبب')), 0, 180);
         $st->bind_param('iiisidss', $companyId, $run, $person, $src, $srcId, $amount, $doc, $note);
         $ok = $st->execute();
         $errno = (int) $st->errno;
@@ -241,15 +241,15 @@ if (!function_exists('cmp03_bridge_deduction')) {
         if (!$ok) {
             if ($errno === 1062) {
                 $out['code'] = 'DED-409';
-                $out['msg']  = 'DED-409: خصمٌ بهذا النوعِ مسجَّلٌ سلفًا لهذا الموظفِ في جولةِ '
-                             . $run . ' — لا يتكرر (قيدُ القاعدة)';
+                $out['msg']  = 'DED-409: خصم بهذا النوع مسجل سلفا لهذا الموظف في جولة '
+                             . $run . ' — لا يتكرر (قيد القاعدة)';
                 return $out;
             }
-            $out['code'] = 'DED-500'; $out['msg'] = 'DED-500: تعذّر التسجيل (' . $errno . ')';
+            $out['code'] = 'DED-500'; $out['msg'] = 'DED-500: تعذر التسجيل (' . $errno . ')';
             return $out;
         }
         $out['ok'] = true; $out['id'] = (int) $conn->insert_id; $out['code'] = 'DED-201';
-        $out['msg'] = 'سُجّل الخصمُ في مقاصّاتِ جولةِ المسيّرِ #' . $run . ' — يخفض الصافيَ بمقداره';
+        $out['msg'] = 'سجل الخصم في مقاصات جولة المسير #' . $run . ' — يخفض الصافي بمقداره';
         return $out;
     }
 }
@@ -283,8 +283,8 @@ if (!function_exists('cmp03_bridge_site_gate')) {
             }
         }
         if ($eq <= 0) {
-            $out['msg'] = 'SGE-422: كودُ المعدةِ لا يقابله صفٌّ في سجلِّ المعدات — '
-                        . 'ولا يُصدَر إذنٌ لمعدةٍ مجهولة';
+            $out['msg'] = 'SGE-422: كود المعدة لا يقابله صف في سجل المعدات — '
+                        . 'ولا يصدر إذن لمعدة مجهولة';
             return $out;
         }
         $siteName = cmp03_bridge_pick($payload, array('الموقع', 'اسم الموقع'));
@@ -302,7 +302,7 @@ if (!function_exists('cmp03_bridge_site_gate')) {
             }
         }
         if ($site <= 0) {
-            $out['msg'] = 'SGE-422: الموقعُ «' . $siteName . '» لا يقابله موقعٌ في سجلِّ المواقع';
+            $out['msg'] = 'SGE-422: الموقع «' . $siteName . '» لا يقابله موقع في سجل المواقع';
             return $out;
         }
         /* المعتمِدُ من الجلسةِ — والحقلُ النصيُّ يُهمَل إن كُتب */
@@ -329,7 +329,7 @@ if (!function_exists('cmp03_bridge_site_gate')) {
         $v = array(
             $g('رقم الإذن'), $g('نوع الإذن'), $siteName, $eqCode, $g('نوع المعدة'),
             $g('مصدر المعدة'), $g('الجهة المرافقة'), $g('سبب الحركة'), $g('المستند المرجعي'),
-            $g('تاريخ الحركة المخطط'), $g('تاريخ الحركة الفعلي'), $g('قراءة العدّاد عند الحركة'),
+            $g('تاريخ الحركة المخطط'), $g('تاريخ الحركة الفعلي'), $g('قراءة العداد عند الحركة'),
             $g('رحلة الترحيل'), $g('حالة الجاهزية'), $g('حالة الوثائق'),
             $approver, $approver, date('Y-m-d'), $g('مرجع التفويض'),
         );
@@ -345,13 +345,13 @@ if (!function_exists('cmp03_bridge_site_gate')) {
         $st->close();
         if (!$ok) {
             $out['code'] = 'SGE-500';
-            $out['msg']  = 'SGE-500: تعذّر إصدارُ الإذن — ' . mb_substr($err, 0, 110);
+            $out['msg']  = 'SGE-500: تعذر إصدار الإذن — ' . mb_substr($err, 0, 110);
             return $out;
         }
         $out['ok'] = true; $out['id'] = (int) $conn->insert_id; $out['code'] = 'SGE-201';
-        $out['msg'] = 'صدر الإذنُ مرتبطًا بالمعدةِ #' . $eq . ' والموقعِ #' . $site
-                    . ' — والمعتمِدُ «' . ($approver !== '' ? $approver : ('حساب #' . $uid))
-                    . '» من حسابِك لا من الكتابة';
+        $out['msg'] = 'صدر الإذن مرتبطا بالمعدة #' . $eq . ' والموقع #' . $site
+                    . ' — والمعتمد «' . ($approver !== '' ? $approver : ('حساب #' . $uid))
+                    . '» من حسابك لا من الكتابة';
         return $out;
     }
 }
@@ -382,10 +382,10 @@ if (!function_exists('cmp03_bridge_fin_asset')) {
             }
         }
         if ($asset <= 0) {
-            $out['msg'] = 'FAS-422: كودُ الأصلِ لا يقابله أصلٌ في سجلِّ المعدات — ولا تُربط عينٌ مخترَعة';
+            $out['msg'] = 'FAS-422: كود الأصل لا يقابله أصل في سجل المعدات — ولا تربط عين مخترعة';
             return $out;
         }
-        $finName = cmp03_bridge_pick($payload, array('الممول', 'اسم الممول', 'المموِّل'));
+        $finName = cmp03_bridge_pick($payload, array('الممول', 'اسم الممول', 'الممول'));
         $ent = 0;
         if ($finName !== '') {
             $st = $conn->prepare('SELECT entity_id FROM legal_entities WHERE legal_name = ? LIMIT 1');
@@ -398,7 +398,7 @@ if (!function_exists('cmp03_bridge_fin_asset')) {
             }
         }
         if ($ent <= 0) {
-            $out['msg'] = 'FAS-422: اسمُ المموِّلِ لا يقابله كيانٌ قانونيٌّ مسجَّل';
+            $out['msg'] = 'FAS-422: اسم الممول لا يقابله كيان قانوني مسجل';
             return $out;
         }
         /* عمليةُ التمويلِ اختياريةٌ — وإن ذُكرت وجب أن توجد */
@@ -413,14 +413,14 @@ if (!function_exists('cmp03_bridge_fin_asset')) {
                 $r = $st->get_result()->fetch_row();
                 $st->close();
                 if (!$r) {
-                    $out['msg'] = 'FAS-422: عمليةُ التمويلِ «' . $opCode . '» غيرُ موجودة';
+                    $out['msg'] = 'FAS-422: عملية التمويل «' . $opCode . '» غير موجودة';
                     return $out;
                 }
                 $op = (int) $r[0];
             }
         }
         $value = (float) str_replace(array(',', ' '), '', cmp03_bridge_pick($payload, array('قيمة الشراء', 'القيمة')));
-        $cap   = (float) str_replace(array(',', ' '), '', cmp03_bridge_pick($payload, array('رأس المال المموَّل', 'رأس مال الممول')));
+        $cap   = (float) str_replace(array(',', ' '), '', cmp03_bridge_pick($payload, array('رأس المال الممول', 'رأس مال الممول')));
         $pct   = ($value > 0 && $cap > 0) ? round(min(100, $cap / $value * 100), 2) : 100.00;
         $from  = cmp03_bridge_pick($payload, array('تاريخ الربط', 'التاريخ'));
         if (!preg_match('~^\d{4}-\d{2}-\d{2}$~', $from)) { $from = date('Y-m-d'); }
@@ -438,12 +438,12 @@ if (!function_exists('cmp03_bridge_fin_asset')) {
         $st->close();
         if (!$ok) {
             $out['code'] = 'FAS-409';
-            $out['msg']  = 'FAS-409: تعذّر ربطُ الحصة — ' . mb_substr($err, 0, 120);
+            $out['msg']  = 'FAS-409: تعذر ربط الحصة — ' . mb_substr($err, 0, 120);
             return $out;
         }
         $out['ok'] = true; $out['id'] = (int) $conn->insert_id; $out['code'] = 'FAS-201';
-        $out['msg'] = 'رُبطت العينُ بحصةِ ' . $pct . '٪ للمموِّلِ #' . $ent
-                    . ($op ? (' في العمليةِ #' . $op) : '') . ' — تظهر في حصصِ الملكيةِ فورًا';
+        $out['msg'] = 'ربطت العين بحصة ' . $pct . '٪ للممول #' . $ent
+                    . ($op ? (' في العملية #' . $op) : '') . ' — تظهر في حصص الملكية فورا';
         return $out;
     }
 }
@@ -467,7 +467,7 @@ if (!function_exists('cmp03_bridge_site_gate_person')) {
         $companyId = (int) $companyId; $uid = (int) $uid;
 
         /* ── الشخصُ من سجلِّ الموظفين: بالرمزِ أو بالاسم ── */
-        $opCode = cmp03_bridge_pick($payload, array('كود المشغل', 'كود المشغّل', 'المشغل'));
+        $opCode = cmp03_bridge_pick($payload, array('كود المشغل', 'كود المشغل', 'المشغل'));
         $opName = cmp03_bridge_pick($payload, array('الاسم', 'اسم المشغل'));
         $emp = 0;
         if ($opCode !== '' || $opName !== '') {
@@ -486,7 +486,7 @@ if (!function_exists('cmp03_bridge_site_gate_person')) {
         }
         if ($emp <= 0) {
             $out['msg'] = 'SGP-422: «' . ($opCode !== '' ? $opCode : $opName)
-                        . '» لا يقابله صفٌّ في سجلِّ الموظفين — ولا يُصدَر إذنٌ لشخصٍ مجهول';
+                        . '» لا يقابله صف في سجل الموظفين — ولا يصدر إذن لشخص مجهول';
             return $out;
         }
 
@@ -506,12 +506,12 @@ if (!function_exists('cmp03_bridge_site_gate_person')) {
             }
         }
         if ($site <= 0) {
-            $out['msg'] = 'SGP-422: الموقعُ «' . $siteName . '» لا يقابله موقعٌ في سجلِّ المواقع';
+            $out['msg'] = 'SGP-422: الموقع «' . $siteName . '» لا يقابله موقع في سجل المواقع';
             return $out;
         }
 
         /* ── المورِّدُ وصفٌ لا شرط: يُحلُّ إن ذُكر ويبقى NULL إن لم يُذكر ── */
-        $supName = cmp03_bridge_pick($payload, array('المورد التابع له', 'المورد', 'المورّد'));
+        $supName = cmp03_bridge_pick($payload, array('المورد التابع له', 'المورد', 'المورد'));
         $sup = null;
         if ($supName !== '') {
             $st = $conn->prepare('SELECT id FROM suppliers
@@ -568,14 +568,14 @@ if (!function_exists('cmp03_bridge_site_gate_person')) {
         $st->close();
         if (!$ok) {
             $out['code'] = 'SGP-500';
-            $out['msg']  = 'SGP-500: تعذّر إصدارُ الإذن — ' . mb_substr($err, 0, 110);
+            $out['msg']  = 'SGP-500: تعذر إصدار الإذن — ' . mb_substr($err, 0, 110);
             return $out;
         }
         $out['ok'] = true; $out['id'] = (int) $conn->insert_id; $out['code'] = 'SGP-201';
-        $out['msg'] = 'صدر الإذنُ مرتبطًا بالشخصِ #' . $emp . ' والموقعِ #' . $site
-                    . ($sup ? ' والمورِّدِ #' . $sup : ' (بلا مورِّدٍ — تبعيةٌ داخلية)')
-                    . ' — والمعتمِدُ «' . ($approver !== '' ? $approver : ('حساب #' . $uid))
-                    . '» من حسابِك لا من الكتابة';
+        $out['msg'] = 'صدر الإذن مرتبطا بالشخص #' . $emp . ' والموقع #' . $site
+                    . ($sup ? ' والمورد #' . $sup : ' (بلا مورد — تبعية داخلية)')
+                    . ' — والمعتمد «' . ($approver !== '' ? $approver : ('حساب #' . $uid))
+                    . '» من حسابك لا من الكتابة';
         return $out;
     }
 }

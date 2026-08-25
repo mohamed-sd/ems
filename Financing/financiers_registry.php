@@ -39,7 +39,7 @@ if (!$granted) {
     }
 }
 if (!$granted) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'باب التمويل خلف بوابة المجال المقيَّد: الرؤية بمنحة فردية لا بالعضوية في إدارة (FIN-01 §1.1) ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
+    ems_gov_flash_redirect('../main/dashboard.php', 'باب التمويل خلف بوابة المجال المقيد: الرؤية بمنحة فردية لا بالعضوية في إدارة (FIN-01 §1.1) ❌', 'GOV-PERM-403', 'اطلب المنحة من مدير الصلاحيات إن كانت ضمن عملك');
 }
 $canTerms = ($role === '-1') || OwnershipDomainGuard::hasGrant($conn, $co, $uid, OwnershipDomainGuard::PERM_TERMS);
 
@@ -84,12 +84,12 @@ include '../insidebar.php';
     $header_title = 'سجل الممولين'; $header_icon = 'fa fa-hand-holding-dollar';
     $header_actions = array();
     include('../includes/page_header.php');
-    ems_screen_about('الممول كيان في سجل الكيانات بصفة «ممول» — لا سجل موازٍ؛ وهذه الشاشة عرضه بعملياته '
-        . 'وأعيانه ومدة علاقته واستحقاقه القائم بكل عملة. الشاشة خلف بوابة المجال المقيَّد: الرؤية '
-        . 'بمنحة فردية، وكل فتح بسطر اطّلاع — فالتسرّب يقع بالاطّلاع لا بالتغيير.',
-        array('الاستحقاق لمن يملك رؤية الشروط', 'الممول الجديد يُنشأ كيانًا في الحوكمة'));
+    ems_screen_about('الممول كيان في سجل الكيانات بصفة «ممول» — لا سجل مواز؛ وهذه الشاشة عرضه بعملياته '
+        . 'وأعيانه ومدة علاقته واستحقاقه القائم بكل عملة. الشاشة خلف بوابة المجال المقيد: الرؤية '
+        . 'بمنحة فردية، وكل فتح بسطر اطلاع — فالتسرب يقع بالاطلاع لا بالتغيير.',
+        array('الاستحقاق لمن يملك رؤية الشروط', 'الممول الجديد ينشأ كيانا في الحوكمة'));
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا كياناتٍ مسجَّلةً بصفةِ «مموِّل»', 'أنشئ الكيانَ في سجلِّ الكياناتِ ثم امنحه صفةَ «مموِّل» ليظهرَ هنا');
+    echo ems_states_bundle('لا كيانات مسجلة بصفة «ممول»', 'أنشئ الكيان في سجل الكيانات ثم امنحه صفة «ممول» ليظهر هنا');
     ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
     <div class="card"><div class="card-body">
@@ -108,14 +108,14 @@ include '../insidebar.php';
               <th class="ems-fn-th" data-fn="1">آخر نشاط</th>
               <th class="ems-fn-th" data-fn="1">درجة السرية</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-              <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطّلاع</th>
+              <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطلاع</th>
               <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
               <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
@@ -139,10 +139,10 @@ include '../insidebar.php';
             <td><span class="badge badge-<?php echo $f['state'] === 'active' ? 'success' : 'danger'; ?>"><?php echo htmlspecialchars($f['state']); ?></span></td>
         </tr>
         <?php endforeach; if (empty($rows)): ?>
-        <tr><td colspan="6">لا كيانات بصفة «ممول» — تُنشأ في <a href="../Governance/entities_registry.php">سجل الكيانات</a> بصفتها</td></tr>
+        <tr><td colspan="6">لا كيانات بصفة «ممول» — تنشأ في <a href="../Governance/entities_registry.php">سجل الكيانات</a> بصفتها</td></tr>
         <?php endif; ?>
         </tbody></table></div>
-        <p class="fin-fr-cta"><a href="financing_operation_new.php" class="btn-primary">+ إنشاء عملية تمويل (النموذج أولًا)</a></p>
+        <p class="fin-fr-cta"><a href="financing_operation_new.php" class="btn-primary">+ إنشاء عملية تمويل (النموذج أولا)</a></p>
     </div></div>
 </div>
 <script src="../includes/js/jquery-3.7.1.main.js"></script>

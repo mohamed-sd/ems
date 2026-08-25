@@ -51,8 +51,8 @@ while ($res && ($r = $res->fetch_assoc())) {
     if ($cid > 0 && ($onlyCo <= 0 || $cid === $onlyCo)) { $cos[] = $cid; }
 }
 
-fwrite(STDOUT, "══ كرونُ الإهلاك (M-30) — " . date('Y-m-d H:i:s') . " ══\n");
-if (!$cos) { fwrite(STDOUT, "لا شركةَ لها أصول.\n"); exit(0); }
+fwrite(STDOUT, "══ كرون الإهلاك (M-30) — " . date('Y-m-d H:i:s') . " ══\n");
+if (!$cos) { fwrite(STDOUT, "لا شركة لها أصول.\n"); exit(0); }
 
 // ⚠ گوتشا مثبَتة: بيئةُ `config.php` تبتلع الأخطاءَ غيرَ الملتقَطة في CLI —
 // فالحلقةُ كلُّها ملفوفةٌ ويُطبع سببُ أي تعثُّرٍ صراحةً بدل صمتٍ يُظنّ نجاحًا.
@@ -64,7 +64,7 @@ foreach ($cos as $cid) {
         $ctx  = \App\Core\TenantContext::forSystem($cid, $ACTOR, 'cron depreciation', true);
         $gate = new \App\Core\TenantDb($conn, $ctx);
     } catch (\Throwable $t) {
-        fwrite(STDERR, "── شركة {$cid}: تعذّر فتحُ سياق النظام — " . $t->getMessage() . "\n");
+        fwrite(STDERR, "── شركة {$cid}: تعذر فتح سياق النظام — " . $t->getMessage() . "\n");
         $errors++;
         continue;
     }
@@ -81,27 +81,27 @@ foreach ($cos as $cid) {
         }
         // ⚠ المجموعُ تقديريٌّ: كلُّ قسطٍ يُحسب على **المجمّع الحالي** لا المتراكم
         // خلال الاستدراك — فالرقمُ سقفٌ أعلى لا نتيجةٌ حرفية، ويُعلَن كذلك.
-        fwrite(STDOUT, "── شركة {$cid} [قياسٌ بلا كتابة]: ~{$n} قسطًا · ~{$sum} "
-                     . "(سقفٌ تقديريٌّ — المجمّعُ لا يتراكم في القياس)\n");
+        fwrite(STDOUT, "── شركة {$cid} [قياس بلا كتابة]: ~{$n} قسطا · ~{$sum} "
+                     . "(سقف تقديري — المجمع لا يتراكم في القياس)\n");
         continue;
     }
     $r = DEP::catchUp($conn, $gate, $cid, $ACTOR, $upTo, 'cron');
     fwrite(STDOUT, "── شركة {$cid}: " . $r['reason'] . "\n");
     foreach ($r['periods'] as $p) {
         if ((int) $p['posted'] > 0) {
-            fwrite(STDOUT, "     {$p['period']}: {$p['posted']} قسطًا · {$p['total']}\n");
+            fwrite(STDOUT, "     {$p['period']}: {$p['posted']} قسطا · {$p['total']}\n");
         } elseif ((int) $p['code'] === 423) {
-            fwrite(STDOUT, "     {$p['period']}: ⏭ فترةٌ مقفلة — تُتخطّى ولا تُكسر\n");
+            fwrite(STDOUT, "     {$p['period']}: ⏭ فترة مقفلة — تتخطى ولا تكسر\n");
             $errors++;
         }
     }
     $grandPosted += (int) $r['posted'];
     $grandTotal = round($grandTotal + (float) $r['total'], 2);
   } catch (\Throwable $t) {
-      fwrite(STDOUT, "── شركة {$cid}: ✘ تعثّر — " . get_class($t) . ': ' . $t->getMessage() . "\n");
+      fwrite(STDOUT, "── شركة {$cid}: ✘ تعثر — " . get_class($t) . ': ' . $t->getMessage() . "\n");
       $errors++;
   }
 }
 
-fwrite(STDOUT, "══ المجموع: {$grandPosted} قسطًا · {$grandTotal} · فتراتٌ مقفلةٌ متخطّاة: {$errors} ══\n");
+fwrite(STDOUT, "══ المجموع: {$grandPosted} قسطا · {$grandTotal} · فترات مقفلة متخطاة: {$errors} ══\n");
 exit(0);

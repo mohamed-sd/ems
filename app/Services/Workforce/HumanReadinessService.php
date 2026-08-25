@@ -40,7 +40,7 @@ if (!function_exists('ems_worker_readiness')) {
 
         // 2) اعتمادٌ حرجٌ منتهٍ (محرّك الاعتمادات)
         if (function_exists('ems_worker_has_critical_expired') && ems_worker_has_critical_expired($conn, $worker_id)) {
-            $reasons[] = 'يوجد اعتمادٌ حرجٌ منتهٍ (رخصة/سلامة/فحص طبي)';
+            $reasons[] = 'يوجد اعتماد حرج منته (رخصة/سلامة/فحص طبي)';
         }
 
         return ['ready' => empty($reasons), 'reasons' => $reasons];

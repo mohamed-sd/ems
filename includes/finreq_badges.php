@@ -58,7 +58,7 @@ if (!function_exists('ems_finreq_nav_links')) {
                 $out['FinRequests/cycle_time_board.php'] = array('label' => 'زمن دورة الطلبات', 'icon' => 'fa fa-stopwatch');
                 $out['FinRequests/requests_reports.php'] = array('label' => 'تقارير الطلبات المالية', 'icon' => 'fa fa-chart-column');
             }
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'القائمة الجانبية لا تتعطل بأي فشلٍ هنا');
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'القائمة الجانبية لا تتعطل بأي فشل هنا');
             // القائمة الجانبية لا تتعطل بأي فشلٍ هنا
         }
         return $out;
@@ -101,7 +101,7 @@ if (!function_exists('ems_finance_nav_links')) {
                 $out[strval($m['code'])] = array('label' => strval($m['name']), 'icon' => strval($m['icon']));
             }
             $q->close();
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'القائمة الجانبية لا تتعطل بأي فشلٍ هنا');
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'القائمة الجانبية لا تتعطل بأي فشل هنا');
             // القائمة الجانبية لا تتعطل بأي فشلٍ هنا
         }
         return $out;
@@ -150,7 +150,7 @@ if (!function_exists('ems_finreq_nav_badges')) {
             )));
             // الشارةُ تتبع الشاشةَ الباقيةَ بعدَ الدمج — والمعادُ يُستكمل فيها نفسِها
             if ($n > 0) { $out['FinRequests/request_form.php'] = $n; }
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'شاراتٌ فقط — الواجهة لا تتأثر بأي فشل');
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'شارات فقط — الواجهة لا تتأثر بأي فشل');
             // شاراتٌ فقط — الواجهة لا تتأثر بأي فشل
         }
         return $out;
@@ -278,14 +278,14 @@ if (!function_exists('ems_nav_counter_badges')) {
                     // الصريح. والدوالُّ التي لا تعلنه تتجاهله (PHP يقبل الزائد).
                     try { $memo[$key] = (int) call_user_func($dict[$key], $g, intval($role)); }
                     catch (\Throwable $t) {
-                        ems_catch_ignored($t, __METHOD__, 'شارةٌ واحدةٌ تسقط ولا تُسقط الشجرة');
+                        ems_catch_ignored($t, __METHOD__, 'شارة واحدة تسقط ولا تسقط الشجرة');
                         $memo[$key] = 0;
                     }
                 }
                 if ($memo[$key] > 0) { $out[$route] = $memo[$key]; }
             }
         } catch (\Throwable $t) {
-            ems_catch_ignored($t, __METHOD__, 'شاراتٌ فقط — الواجهة لا تتأثر بأي فشل');
+            ems_catch_ignored($t, __METHOD__, 'شارات فقط — الواجهة لا تتأثر بأي فشل');
         }
         return $out;
     }

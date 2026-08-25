@@ -32,7 +32,7 @@ else {
     if ($row = $st->get_result()->fetch_assoc()) { $can_view = intval($row['can_view']) === 1; }
     $st->close();
 }
-if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا صلاحيةَ عرضٍ للسجل ❌', 'GOV-PERM-403', ''); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا صلاحية عرض للسجل ❌', 'GOV-PERM-403', ''); exit(); }
 
 $gate = $is_super_admin ? ems_tenant_db()->forAllTenants('visibility audit super') : ems_tenant_db();
 $log = VPS::auditLog($gate, 300);
@@ -51,7 +51,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array();
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا أحداثَ تدقيقِ ظهورٍ مسجَّلةً بعدُ', 'يُكتَب السجلُّ آليًّا عند أولِ تغييرِ ظهورٍ من شاشةِ مفاتيحِ الظهور');
+    echo ems_states_bundle('لا أحداث تدقيق ظهور مسجلة بعد', 'يكتب السجل آليا عند أول تغيير ظهور من شاشة مفاتيح الظهور');
     ?>
 
     <style>
@@ -60,21 +60,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </style>
 
     <div class="card"><div class="card-body"><p class="vaud-note">
-        <strong>لا تغييرَ صامتٌ على خصوصية أحد</strong> — كلُّ فتحٍ وإغلاقٍ حدثٌ موثَّقٌ
-        بفاعله وسببه ومدته وعدد المتأثرين به. السجلُّ <strong>Insert-only</strong>:
-        لا زرَّ تعديلٍ ولا حذفٍ في هذه الشاشة ولا في غيرها.
+        <strong>لا تغيير صامت على خصوصية أحد</strong> — كل فتح وإغلاق حدث موثق
+        بفاعله وسببه ومدته وعدد المتأثرين به. السجل <strong>Insert-only</strong>:
+        لا زر تعديل ولا حذف في هذه الشاشة ولا في غيرها.
     </p></div></div>
 
-    <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> آخرُ 300 حدث</h5></div>
+    <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> آخر 300 حدث</h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap vaud-table">
             <thead><tr><th>#</th><th>الوقت</th><th>العنصر</th><th>النطاق</th>
                 <th>من → إلى</th><th>الفاعل</th><th>السبب</th><th>المدة</th><th>المتأثرون</th>
                 <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                 <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                 <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                 <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -89,9 +89,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <td><?php echo htmlspecialchars($l['scope_type'] . ' × ' . $l['scope_id']); ?></td>
                     <td><?php echo htmlspecialchars(((string)($l['from_mode'] ?? '—')) . ' → ' . $l['to_mode']); ?>
                         <?php if ((string)$l['to_mode'] === 'denied_self'): ?>
-                            <span class="badge badge-danger">منحُ ذاتٍ مرفوض</span>
+                            <span class="badge badge-danger">منح ذات مرفوض</span>
                         <?php elseif ((string)$l['to_mode'] === 'grant_expired'): ?>
-                            <span class="badge badge-secondary">انتهاءٌ آلي</span>
+                            <span class="badge badge-secondary">انتهاء آلي</span>
                         <?php endif; ?></td>
                     <td>#<?php echo intval($l['actor']); ?></td>
                     <td><small><?php echo htmlspecialchars((string)($l['reason'] ?? '')); ?></small></td>

@@ -35,7 +35,7 @@ class ContractSignedEffects
 
         $c = null;
         try { $c = $gate->selectOne('contracts', array('where' => array('id' => $contractId))); }
-        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $c'); $c = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $c'); $c = null; }
         if (!$c) { return $out; }
 
         /* ── ③ الحاوية الرئيسية — عطالة بوحدانية (company · contract · رئيسية) ── */
@@ -57,8 +57,8 @@ class ContractSignedEffects
                     (company_id, container_no, level, contract_id, unit_type, work_model,
                      cap_qty, state, origin, origin_note, created_by)
                     VALUES (?, ?, 'رئيسية', ?, 'hour', NULL, ?, 'نشطة', 'عقد', ?, ?)");
-                $note = 'وُلّدت آليًّا بتوقيع العقد (M-00 ④-٣) — السعة من ساعات العقد'
-                      . ($capQty <= 0 ? ' (صفرٌ معلَن: لا ساعات مثبتة في العقد)' : '');
+                $note = 'ولدت آليا بتوقيع العقد (M-00 ④-٣) — السعة من ساعات العقد'
+                      . ($capQty <= 0 ? ' (صفر معلن: لا ساعات مثبتة في العقد)' : '');
                 $actor = (int) ($ctx['actor'] ?? 0);
                 mysqli_stmt_bind_param($st, 'isidsi', $companyId, $no, $contractId, $capQty, $note, $actor);
                 if (mysqli_stmt_execute($st)) { $out['container_id'] = (int) mysqli_insert_id($conn); }

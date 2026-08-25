@@ -46,8 +46,8 @@ while ($res && ($r = $res->fetch_assoc())) {
     if ($cid > 0 && ($onlyCo <= 0 || $cid === $onlyCo)) { $cos[] = $cid; }
 }
 
-fwrite(STDOUT, "══ كرونُ الدوريات (M-41) — الفترة {$period} — " . date('Y-m-d H:i:s') . " ══\n");
-if (!$cos) { fwrite(STDOUT, "لا شركةَ فعّالة.\n"); exit(0); }
+fwrite(STDOUT, "══ كرون الدوريات (M-41) — الفترة {$period} — " . date('Y-m-d H:i:s') . " ══\n");
+if (!$cos) { fwrite(STDOUT, "لا شركة فعالة.\n"); exit(0); }
 
 foreach ($cos as $cid) {
     try {
@@ -62,9 +62,9 @@ foreach ($cos as $cid) {
             $rets = PES::returnsOf($gate, 5);
             $filed = false;
             foreach ($rets as $t) { if ((string) $t['period_ref'] === $period) { $filed = true; } }
-            fwrite(STDOUT, "── شركة {$cid} [قياسٌ بلا كتابة]: مخصصاتٌ قائمة " . count($prov)
-                . " · أقساطٌ مستحقةٌ بلا اعتراف {$unaccrued} · إقرارُ الفترة "
-                . ($filed ? 'مقدَّم' : '**غيرُ مقدَّم**') . "\n");
+            fwrite(STDOUT, "── شركة {$cid} [قياس بلا كتابة]: مخصصات قائمة " . count($prov)
+                . " · أقساط مستحقة بلا اعتراف {$unaccrued} · إقرار الفترة "
+                . ($filed ? 'مقدَّم' : '**غير مقدم**') . "\n");
             continue;
         }
 
@@ -77,7 +77,7 @@ foreach ($cos as $cid) {
         $t = PES::fileTaxReturn($conn, $gate, $cid, $period, $ACTOR);
         fwrite(STDOUT, "── شركة {$cid} · ③ " . ($t['ok'] ? $t['reason'] : ($t['code'] . ' — ' . $t['reason'])) . "\n");
     } catch (\Throwable $e) {
-        fwrite(STDOUT, "── شركة {$cid}: ✘ تعثّر — " . get_class($e) . ': ' . $e->getMessage() . "\n");
+        fwrite(STDOUT, "── شركة {$cid}: ✘ تعثر — " . get_class($e) . ': ' . $e->getMessage() . "\n");
     }
 }
 

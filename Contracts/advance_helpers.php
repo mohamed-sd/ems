@@ -133,12 +133,12 @@ if (!function_exists('advance_recovery_due')) {
         if ($balance <= 0) {
             return array('due' => 0.0, 'balance' => $balance, 'by_pct' => $byPct, 'capped' => true,
                 'reason' => ($bal['received'] <= 0)
-                    ? 'لا دفعةَ مقدَّمةً مقبوضةً مسجَّلةً على هذا العقد — فلا استرداد'
-                    : 'الدفعةُ المقدَّمة استُردّت بالكامل — فلا استرداد');
+                    ? 'لا دفعة مقدمة مقبوضة مسجلة على هذا العقد — فلا استرداد'
+                    : 'الدفعة المقدمة استردت بالكامل — فلا استرداد');
         }
         if ($byPct > $balance) {
             return array('due' => $balance, 'balance' => $balance, 'by_pct' => $byPct, 'capped' => true,
-                'reason' => 'الاستقطاعُ مقصوصٌ عند الرصيد المتبقي (' . number_format($balance, 2) . ')');
+                'reason' => 'الاستقطاع مقصوص عند الرصيد المتبقي (' . number_format($balance, 2) . ')');
         }
         return array('due' => $byPct, 'balance' => $balance, 'by_pct' => $byPct, 'capped' => false, 'reason' => '');
     }
@@ -164,25 +164,25 @@ if (!function_exists('advance_record')) {
         $received_date = trim((string) $received_date);
 
         if ($amount <= 0) {
-            $out['code'] = 422; $out['reason'] = 'مبلغُ الدفعة موجبٌ — ولا يُشتق من نسبةٍ ولا يُقدَّر'; return $out;
+            $out['code'] = 422; $out['reason'] = 'مبلغ الدفعة موجب — ولا يشتق من نسبة ولا يقدر'; return $out;
         }
         if ($doc_ref === '') {
-            $out['code'] = 422; $out['reason'] = 'مرجعُ سند القبض إلزامي — لا سلفةَ بلا مستند'; return $out;
+            $out['code'] = 422; $out['reason'] = 'مرجع سند القبض إلزامي — لا سلفة بلا مستند'; return $out;
         }
         if (!preg_match('~^\d{4}-\d{2}-\d{2}$~', $received_date)) {
-            $out['code'] = 422; $out['reason'] = 'تاريخُ القبض غير صالح'; return $out;
+            $out['code'] = 422; $out['reason'] = 'تاريخ القبض غير صالح'; return $out;
         }
 
         try { $c = $gate->selectOne('contracts', array('where' => array('id' => $contract_id))); }
         catch (\Throwable $t) { $c = null; }
-        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقدُ غير موجود'; return $out; }
+        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقد غير موجود'; return $out; }
 
         // العملةُ من العقد — مطبَّعةٌ عند الحدّ كما في المستخلص (لا اسمٌ عربيٌّ خام)
         require_once dirname(__DIR__) . '/includes/fx.php';
         $currency = ems_fx_code($c['price_currency_contract'] ?? null);
         if ($currency === null) {
             $out['code'] = 422;
-            $out['reason'] = 'عملةُ العقد غير مسجَّلةٍ في سجل العملات — لا تُقبض دفعةٌ بعملةٍ لا يعرفها الدفتر';
+            $out['reason'] = 'عملة العقد غير مسجلة في سجل العملات — لا تقبض دفعة بعملة لا يعرفها الدفتر';
             return $out;
         }
 
@@ -195,7 +195,7 @@ if (!function_exists('advance_record')) {
         if ($ex) {
             $out['ok'] = true; $out['code'] = 200; $out['existing'] = true;
             $out['advance_id'] = intval($ex['id']); $out['advance_no'] = (string) $ex['advance_no'];
-            $out['reason'] = 'سندُ القبض مسجَّلٌ سلفًا: ' . $ex['advance_no'];
+            $out['reason'] = 'سند القبض مسجل سلفا: ' . $ex['advance_no'];
             return $out;
         }
 
@@ -217,7 +217,7 @@ if (!function_exists('advance_record')) {
             )));
         } catch (\Throwable $t) {
             error_log('advance_record insert: ' . $t->getMessage());
-            $out['code'] = 500; $out['reason'] = 'تعذّر تسجيلُ القبض'; return $out;
+            $out['code'] = 500; $out['reason'] = 'تعذر تسجيل القبض'; return $out;
         }
 
         // ── الحقيقةُ في الجذر — **بلا إسقاطٍ في الدفتر** ────────────────────
@@ -239,7 +239,7 @@ if (!function_exists('advance_record')) {
                 'currency'        => $currency,
                 'source_ref'      => $no,
                 'contract_id'     => $contract_id,
-                'notes'           => 'قبضُ دفعةٍ مقدَّمة ' . $no . ' — سند ' . $doc_ref,
+                'notes'           => 'قبض دفعة مقدمة ' . $no . ' — سند ' . $doc_ref,
                 'payload'         => array(
                     'advance_id'    => $id,
                     'advance_no'    => $no,
@@ -248,7 +248,7 @@ if (!function_exists('advance_record')) {
                     'received_date' => $received_date,
                     'doc_ref'       => $doc_ref,
                     'recognition'   => 'none',
-                    'note'          => 'سلفةٌ تُستردّ لا إيرادٌ يُعترف به — لا قيدَ في الدفتر',
+                    'note'          => 'سلفة تسترد لا إيراد يعترف به — لا قيد في الدفتر',
                 ),
             ));
             $evId = (is_array($pub) && isset($pub['id'])) ? intval($pub['id']) : null;
@@ -272,17 +272,17 @@ if (!function_exists('advance_cancel')) {
         $out = array('ok' => false, 'code' => 0, 'reason' => '');
         try { $a = $gate->selectOne('contract_advances', array('where' => array('id' => intval($advance_id)))); }
         catch (\Throwable $t) { $a = null; }
-        if (!$a) { $out['code'] = 404; $out['reason'] = 'سندُ القبض غير موجود'; return $out; }
+        if (!$a) { $out['code'] = 404; $out['reason'] = 'سند القبض غير موجود'; return $out; }
         if ((string) $a['state'] === 'cancelled') {
-            $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'ملغًى سلفًا'; return $out;
+            $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'ملغى سلفا'; return $out;
         }
         // ⚠️ لا يُلغى قبضٌ استُهلك منه: إلغاؤه يجعل الرصيدَ سالبًا ويُظهر
         // استردادًا بلا سلفة — وهو الخللُ الأصليُّ بعينه مقلوبًا.
         $bal = advance_balance($gate, intval($a['contract_id']));
         if ($bal['recovered'] > 0) {
             $out['code'] = 409;
-            $out['reason'] = 'استُهلك من هذه الدفعة ' . number_format($bal['recovered'], 2)
-                           . ' — لا تُلغى بعد الاستهلاك، ويُصحَّح الفرقُ بإشعارٍ موثَّق';
+            $out['reason'] = 'استهلك من هذه الدفعة ' . number_format($bal['recovered'], 2)
+                           . ' — لا تلغى بعد الاستهلاك، ويصحح الفرق بإشعار موثق';
             return $out;
         }
         $gate->update('contract_advances', array('state' => 'cancelled'), array('id' => intval($advance_id)));
@@ -358,8 +358,8 @@ if (!function_exists('advance_reconciliation')) {
                 'gap'         => round($recovered - $received, 2),
                 'kind'        => ($received <= 0) ? 'no_receipt' : 'over_recovered',
                 'label'       => ($received <= 0)
-                    ? 'استردادٌ بلا قبضٍ مسجَّل — ينتظر قرار المالك'
-                    : 'استُردّ أكثرُ ممّا قُبض — ينتظر قرار المالك',
+                    ? 'استرداد بلا قبض مسجل — ينتظر قرار المالك'
+                    : 'استرد أكثر مما قبض — ينتظر قرار المالك',
             );
         }
         return $out;

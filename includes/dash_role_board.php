@@ -40,7 +40,7 @@ $dash_ops_cols = ($dash_ops_n <= 1) ? 2 : (($dash_ops_n <= 5) ? $dash_ops_n : 4)
     </h3>
     <span class="shot-ops-note">
       <i class="fas fa-mug-hot"></i>
-      أسئلةُ أولِ اليوم لدورك — اضغط أيَّ رقمٍ لفتحِ مصدره (<?= htmlspecialchars($dash_ops_today, ENT_QUOTES, 'UTF-8') ?>)
+      أسئلة أول اليوم لدورك — اضغط أي رقم لفتح مصدره (<?= htmlspecialchars($dash_ops_today, ENT_QUOTES, 'UTF-8') ?>)
     </span>
   </div>
 
@@ -68,7 +68,7 @@ $dash_ops_cols = ($dash_ops_n <= 1) ? 2 : (($dash_ops_n <= 5) ? $dash_ops_n : 4)
     <div class="shot-ops-box">
       <h4 class="shot-ops-box-title"><i class="fas fa-list-check"></i> مهامي</h4>
       <?php if (empty($dash_board['tasks'])): ?>
-        <p class="shot-ops-empty">لا مهامَّ عاجلةً الآن ✔</p>
+        <p class="shot-ops-empty">لا مهام عاجلة الآن ✔</p>
       <?php else: foreach ($dash_board['tasks'] as $t): ?>
         <a class="shot-ops-row" href="<?= htmlspecialchars($t['href'], ENT_QUOTES, 'UTF-8') ?>" title="<?= htmlspecialchars($t['label'], ENT_QUOTES, 'UTF-8') ?>">
           <span class="shot-ops-row-text">
@@ -84,7 +84,7 @@ $dash_ops_cols = ($dash_ops_n <= 1) ? 2 : (($dash_ops_n <= 5) ? $dash_ops_n : 4)
     <div class="shot-ops-box">
       <h4 class="shot-ops-box-title"><i class="fas fa-inbox"></i> موافقاتي</h4>
       <?php if (empty($dash_board['approvals'])): ?>
-        <p class="shot-ops-empty">لا شيءَ ينتظر اعتمادك ✔</p>
+        <p class="shot-ops-empty">لا شيء ينتظر اعتمادك ✔</p>
       <?php else: foreach ($dash_board['approvals'] as $a): ?>
         <a class="shot-ops-row" href="<?= htmlspecialchars($a['href'], ENT_QUOTES, 'UTF-8') ?>" title="<?= htmlspecialchars($a['label'], ENT_QUOTES, 'UTF-8') ?>">
           <span class="shot-ops-row-text">
@@ -100,7 +100,7 @@ $dash_ops_cols = ($dash_ops_n <= 1) ? 2 : (($dash_ops_n <= 5) ? $dash_ops_n : 4)
     <div class="shot-ops-box">
       <h4 class="shot-ops-box-title"><i class="fas fa-bell"></i> التنبيهات</h4>
       <?php if (empty($dash_board['alerts'])): ?>
-        <p class="shot-ops-empty">لا متأخرَ ولا حرجَ الآن ✔</p>
+        <p class="shot-ops-empty">لا متأخر ولا حرج الآن ✔</p>
       <?php else: foreach ($dash_board['alerts'] as $al):
         $alCls = ($al['tone'] === 'err') ? 'is-err' : 'is-warn'; ?>
         <a class="shot-ops-row" href="<?= htmlspecialchars($al['href'], ENT_QUOTES, 'UTF-8') ?>" title="<?= htmlspecialchars($al['label'], ENT_QUOTES, 'UTF-8') ?>">
@@ -117,7 +117,7 @@ $dash_ops_cols = ($dash_ops_n <= 1) ? 2 : (($dash_ops_n <= 5) ? $dash_ops_n : 4)
     <div class="shot-ops-box">
       <h4 class="shot-ops-box-title"><i class="fas fa-bolt"></i> إنشاء سريع</h4>
       <?php if (empty($dash_board['quick'])): ?>
-        <p class="shot-ops-empty">لا عملياتٍ يوميةً مسجَّلةً لدورك بعد</p>
+        <p class="shot-ops-empty">لا عمليات يومية مسجلة لدورك بعد</p>
       <?php else: foreach ($dash_board['quick'] as $qk): ?>
         <a class="shot-ops-act" href="../<?= htmlspecialchars($qk['route'], ENT_QUOTES, 'UTF-8') ?>">
           <i class="<?= htmlspecialchars(!empty($qk['icon']) ? $qk['icon'] : 'fa fa-link', ENT_QUOTES, 'UTF-8') ?>"></i>

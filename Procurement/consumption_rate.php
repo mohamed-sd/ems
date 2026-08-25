@@ -46,12 +46,12 @@ $COLS   = array (
   14 => 'نسبة الانحراف',
   15 => 'حد الشذوذ',
   16 => 'حالة الشذوذ',
-  17 => 'السبب المرجَّح',
+  17 => 'السبب المرجح',
   18 => 'البلاغ المفتوح',
   19 => 'تكلفة الاستهلاك',
   20 => 'العملة',
   21 => 'مركز التكلفة',
-  22 => 'المُنشئ — الاسم والصفة',
+  22 => 'المنشئ — الاسم والصفة',
   23 => 'تاريخ الإنشاء',
   24 => 'الحالة',
 );
@@ -72,7 +72,7 @@ $FIELDS = array (
   13 => 'نسبة الانحراف',
   14 => 'حد الشذوذ',
   15 => 'حالة الشذوذ',
-  16 => 'السبب المرجَّح',
+  16 => 'السبب المرجح',
   17 => 'البلاغ المفتوح',
   18 => 'تكلفة الاستهلاك',
   19 => 'العملة',
@@ -95,10 +95,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
          فرقمٌ يُقرَّر عليه بالتوريدِ مصدرُه أصابعُ موظفٍ لا دفترُ حركة.
        ◆ فالكتابةُ اليدويةُ **تُردُّ برمزٍ محكوم**، والشاشةُ صارت قارئةً حاسبة. */
     ems_gov_flash_redirect(basename(__FILE__),
-        'معدلُ الاستهلاكِ **محسوبٌ من حركاتِ المخزن** ولا يُكتب بيد — '
-        . 'سجّلِ الصرفَ في «حركات المخزون» (استلام/صرف) ويُحتسب المعدلُ آليًّا ❌',
+        'معدل الاستهلاك **محسوب من حركات المخزن** ولا يكتب بيد — '
+        . 'سجل الصرف في «حركات المخزون» (استلام/صرف) ويحتسب المعدل آليا ❌',
         'GOV-FAIL-409',
-        'افتحْ «حركات المخزون» (استلام/صرف) وسجّلِ الصرفَ — والمعدلُ يظهر هنا فورًا');
+        'افتح «حركات المخزون» (استلام/صرف) وسجل الصرف — والمعدل يظهر هنا فورا');
     exit();
 }
 
@@ -112,7 +112,7 @@ $computed = array();
 $__items = $conn->query('SELECT id, name, unit FROM proc_item
                           WHERE company_id = ' . (int) $company_id . ' ORDER BY name LIMIT 200');
 if ($__items === false) {
-    $computeErr = 'PRC-500 · تعذّرت قراءةُ الأصناف — ' . $conn->error;
+    $computeErr = 'PRC-500 · تعذرت قراءة الأصناف — ' . $conn->error;
 } else {
     while ($it = $__items->fetch_assoc()) {
         $c = \App\Services\Procurement\ProcReorderService::consumption(
@@ -141,7 +141,7 @@ $entityName = $govCtx['values']['entity'] ?? '—';
 function cmp03_cell($col, $row, $entityName) {
     $n = cmp03_screen_norm($col);
     if ($n === cmp03_screen_norm('الكيان')) { return $entityName; }
-    if ($n === cmp03_screen_norm('المُنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المُنشئة')) {
+    if ($n === cmp03_screen_norm('المنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المنشئة')) {
         return $row['created_by_name'] ?: '—';
     }
     if ($n === cmp03_screen_norm('تاريخ الإنشاء')) { return $row['created_at']; }
@@ -156,7 +156,7 @@ function cmp03_screen_norm($s) {
     $s = str_replace(array('أ','إ','آ'), 'ا', $s);
     $s = str_replace('ة', 'ه', $s);
     $s = str_replace('ى', 'ي', $s);
-    return preg_replace('/[ًٌٍَُِّْ]/u', '', $s);
+    return preg_replace('/[]/u', '', $s);
 }
 
 $page_title = 'إيكوبيشن | استهلاك المعدة ومعدله';
@@ -175,7 +175,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     /* INJ-0356: لا زرَّ إضافةٍ — الشاشةُ قارئةٌ حاسبة، والصرفُ يُسجَّل في بابه */
     $header_actions = array(
         array('tag' => 'a', 'href' => 'wh_receipt.php', 'class' => '', 'icon' => 'fa fa-right-left',
-              'label' => 'حركات المخزون', 'title' => 'سجّلِ الصرفَ هناك — والمعدلُ يُحتسب هنا آليًّا'),
+              'label' => 'حركات المخزون', 'title' => 'سجل الصرف هناك — والمعدل يحتسب هنا آليا'),
     );
     $header_back = false;
     include '../includes/page_header.php';
@@ -183,8 +183,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
     /* حزمةُ الحالاتِ الدنيا (بوابة ٩): تحميلٌ وفراغٌ وخطأٌ — مخفيةٌ افتراضًا */
-    echo ems_states_bundle('لا معدلَ استهلاكٍ محسوبًا في المدة',
-        'المعدلُ يُحتسب من حركاتِ الصرف — سجِّلِ الصرفَ في «حركات المخزون» أو وسِّعِ المدة');
+    echo ems_states_bundle('لا معدل استهلاك محسوبا في المدة',
+        'المعدل يحتسب من حركات الصرف — سجل الصرف في «حركات المخزون» أو وسع المدة');
     ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
@@ -192,22 +192,22 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
              فورمُ الإدخالِ المسطَّحُ ذو الخمسةِ والعشرين حقلًا رُفع كلُّه:
              المعدلُ محسوبٌ من حركاتِ المخزن، وما يُحسب لا يُكتب بيد. */ ?>
     <div class="card"><div class="card-header">
-        <h5><i class="fa fa-calculator"></i> معدلُ الاستهلاك — محسوبًا من الحركات (آخر <?php echo (int) $WINDOW; ?> يومًا)</h5>
+        <h5><i class="fa fa-calculator"></i> معدل الاستهلاك — محسوبا من الحركات (آخر <?php echo (int) $WINDOW; ?> يوما)</h5>
     </div><div class="card-body">
         <?php if (isset($computeErr)): ?>
             <div class="alert alert-danger"><?php echo htmlspecialchars($computeErr, ENT_QUOTES, 'UTF-8'); ?></div>
         <?php endif; ?>
         <p class="text-muted cr-src-note">
-            المصدرُ <code>proc_stock_move</code> — حركاتُ الصرفِ وحدَها. ولا يُعرض صنفٌ بلا حركةٍ في المدة.
+            المصدر <code>proc_stock_move</code> — حركات الصرف وحدها. ولا يعرض صنف بلا حركة في المدة.
         </p>
         <div class="table-responsive">
         <table class="alltables display" id="consumptionComputedTable">
             <thead><tr>
-                <th>الصنف</th><th>الوحدة</th><th>المدة (يومًا)</th><th>المنصرف</th>
-                <th>المعدل اليومي</th><th>مهلة التوريد</th><th>مخزون الأمان</th><th>حدُّ الطلب المقترح</th>
+                <th>الصنف</th><th>الوحدة</th><th>المدة (يوما)</th><th>المنصرف</th>
+                <th>المعدل اليومي</th><th>مهلة التوريد</th><th>مخزون الأمان</th><th>حد الطلب المقترح</th>
             </tr></thead><tbody>
             <?php if (!$computed): ?>
-                <tr><td colspan="8" class="text-center text-muted">لا حركةَ صرفٍ في المدة — فلا معدلَ يُحسب (ولا يُخترع)</td></tr>
+                <tr><td colspan="8" class="text-center text-muted">لا حركة صرف في المدة — فلا معدل يحسب (ولا يخترع)</td></tr>
             <?php else: foreach ($computed as $c): ?>
                 <tr>
                     <td><?php echo htmlspecialchars($c['item'], ENT_QUOTES, 'UTF-8'); ?></td>
@@ -226,8 +226,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <?php if ($rows): ?>
     <div class="alert alert-warning cr-legacy-note">
-        <strong>سجلٌّ سابقٌ للربط.</strong> الصفوفُ أدناه أُدخلت يدويًّا قبلَ ربطِ الشاشةِ
-        بحركاتِ المخزن — تبقى للقراءةِ التاريخيةِ ولا يُكتب فيها بعد (لم يُحذف صفٌّ).
+        <strong>سجل سابق للربط.</strong> الصفوف أدناه أدخلت يدويا قبل ربط الشاشة
+        بحركات المخزن — تبقى للقراءة التاريخية ولا يكتب فيها بعد (لم يحذف صف).
     </div>
     <?php endif; ?>
 
@@ -235,7 +235,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="table-responsive">
         <table class="alltables display" id="consumption_rateTable">
             <thead><tr>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
             <th>رقم السجل</th>
             <th>الفترة</th>
             <th>كود المعدة</th>
@@ -252,18 +252,18 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th>نسبة الانحراف</th>
             <th>حد الشذوذ</th>
             <th>حالة الشذوذ</th>
-            <th>السبب المرجَّح</th>
+            <th>السبب المرجح</th>
             <th>البلاغ المفتوح</th>
             <th>تكلفة الاستهلاك</th>
             <th class="ems-gov-th" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
             <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
-            <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+            <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
             <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
             <th class="ems-gov-th none" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
             </tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="25" class="text-center text-muted">لا بياناتَ بعدُ — أضف أول صفٍّ بزر «إضافة»</td></tr>
+                <tr><td colspan="25" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
                     <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>

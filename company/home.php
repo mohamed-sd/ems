@@ -35,7 +35,7 @@ ems_public_head('بوابة الشركة | EMS'); ?>
 <div class="wrap">
     <div class="top">
         <div class="title">
-            <h1>مرحباً <?php echo e($user['name']); ?></h1>
+            <h1>مرحبا <?php echo e($user['name']); ?></h1>
             <p>شركة: <?php echo e($companyName); ?> | الباقة: <?php echo e($planName); ?></p>
         </div>
         <div class="links">

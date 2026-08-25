@@ -28,17 +28,17 @@ class PeriodicityService
         $pricing = (string) $contractPricing;
         if (in_array($pricing, array('hourly', 'readiness_billed'), true)) {
             return array('periodicity' => 'daily', 'forced' => true,
-                'reason' => 'يومية إلزاميًّا — عقد ساعة/استعداد مفوتر: إثبات الاستعداد يتعذر بعد أيام (DEC-01 ⑥)');
+                'reason' => 'يومية إلزاميا — عقد ساعة/استعداد مفوتر: إثبات الاستعداد يتعذر بعد أيام (DEC-01 ⑥)');
         }
         $requested = (string) $requested;
         if ($requested === '' || $requested === null) {
             return array('periodicity' => 'weekly', 'forced' => false,
-                'reason' => 'أسبوعية — الافتراض المعلن لما لم يُنص عليه (DEC-01 ⑥)');
+                'reason' => 'أسبوعية — الافتراض المعلن لما لم ينص عليه (DEC-01 ⑥)');
         }
         if ($requested === 'monthly') {
             // الشهرية لا تُحسم هنا — طريقها requestMonthly بشرطها المقيس
             return array('periodicity' => 'weekly', 'forced' => false,
-                'reason' => 'الشهرية بقرار لا تلقائيًّا — تُطلب عبر requestMonthly بإثبات ثلاثة أشهر نظيفة');
+                'reason' => 'الشهرية بقرار لا تلقائيا — تطلب عبر requestMonthly بإثبات ثلاثة أشهر نظيفة');
         }
         return array('periodicity' => $requested, 'forced' => false, 'reason' => 'دورية السياسة المعلنة');
     }
@@ -60,7 +60,7 @@ class PeriodicityService
         $stmt->close();
         if ($c > 0) {
             return array('ok' => false, 'code' => 422,
-                'reason' => 'شرط الشهرية ثلاثة أشهر متتالية بصفر اعتراض — المرصود ' . $c . ' اعتراضًا في التسعين يومًا الأخيرة (DEC-01 ⑥)');
+                'reason' => 'شرط الشهرية ثلاثة أشهر متتالية بصفر اعتراض — المرصود ' . $c . ' اعتراضا في التسعين يوما الأخيرة (DEC-01 ⑥)');
         }
         $stmt = $conn->prepare("UPDATE approval_chains SET periodicity = 'monthly' WHERE policy_id = ?");
         $stmt->bind_param('i', $policyId);
@@ -68,7 +68,7 @@ class PeriodicityService
         $n = $stmt->affected_rows;
         $stmt->close();
         return array('ok' => true, 'code' => 200,
-            'reason' => 'رُقّيت السياسة #' . $policyId . ' إلى الشهرية بقرار (' . $n . ' حلقة) — والرجوع لليومية آلي عند اعتراضين في شهر');
+            'reason' => 'رقيت السياسة #' . $policyId . ' إلى الشهرية بقرار (' . $n . ' حلقة) — والرجوع لليومية آلي عند اعتراضين في شهر');
     }
 
     /**
@@ -87,7 +87,7 @@ class PeriodicityService
              HAVING c >= 2"
         )->fetch_all(MYSQLI_ASSOC);
         $targets = array();
-        foreach ($rows as $r) { $targets[intval($r['policy_id'])] = array(intval($r['company_id']), intval($r['c']) . ' اعتراضًا في 30 يومًا'); }
+        foreach ($rows as $r) { $targets[intval($r['policy_id'])] = array(intval($r['company_id']), intval($r['c']) . ' اعتراضا في 30 يوما'); }
         foreach ($disputePolicyIds as $pid) { $targets[intval($pid)] = array(0, 'نزاع مع عميل أو مورد'); }
 
         foreach ($targets as $pid => $info) {
@@ -101,7 +101,7 @@ class PeriodicityService
                 $co = $info[0] ?: 4;
                 $conn->query("INSERT INTO fin_notifications (company_id, target_level, title, link)
                               VALUES ({$co}, 'dept_manager',
-                              'دورية سياسة الاعتماد #{$pid} عادت إلى اليومية آليًّا — السبب: " . $conn->real_escape_string($info[1]) . " (DEC-01 ⑥)', 'admin/bus_monitor.php')");
+                              'دورية سياسة الاعتماد #{$pid} عادت إلى اليومية آليا — السبب: " . $conn->real_escape_string($info[1]) . " (DEC-01 ⑥)', 'admin/bus_monitor.php')");
             }
         }
         return $reverted;

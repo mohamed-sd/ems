@@ -36,9 +36,9 @@ while ($r && ($x = $r->fetch_assoc())) {
          بلا عمودِ عطالة — فيُحفَظ المفتاحُ في `link` المحكومِ لا في العنوانِ الحرّ. */
     $idemKey = 'doc:' . intval($x['doc_id']) . ':stage:7d';
     $link    = 'Equipments/equipments.php?doc=' . intval($x['doc_id']) . '&esc=' . rawurlencode($idemKey);
-    $title = mb_substr('⚠ تصعيدٌ E-11: وثيقة #' . intval($x['doc_id']) . ' (' . $x['doc_type']
+    $title = mb_substr('⚠ تصعيد E-11: وثيقة #' . intval($x['doc_id']) . ' (' . $x['doc_type']
            . ' ' . $x['doc_no'] . ') تنتهي خلال ' . intval($x['days_left'])
-           . ' أيام — مرحلةُ 7d', 0, 200);
+           . ' أيام — مرحلة 7d', 0, 200);
     $dup = $conn->query("SELECT id FROM fin_notifications
                           WHERE company_id = " . intval($x['company_id']) . "
                             AND link = '" . $conn->real_escape_string($link) . "' LIMIT 1");
@@ -52,5 +52,5 @@ while ($r && ($x = $r->fetch_assoc())) {
         $st->close();
     }
 }
-fwrite(STDOUT, "E-11 escalation: {$n_escalated} إشعارَ تصعيدٍ جديدًا (مرحلة 7 أيام)\n");
+fwrite(STDOUT, "E-11 escalation: {$n_escalated} إشعار تصعيد جديدا (مرحلة 7 أيام)\n");
 exit(0);

@@ -44,8 +44,8 @@ $sa = $conn->query("SELECT id FROM users WHERE employee_id=" . $eid . " AND comp
 if ($sa && ($sx = $sa->fetch_assoc())) { $subjectAccount = intval($sx['id']); }
 $subject = array('account_id' => $subjectAccount ?: $uid);
 
-$TABS = array('1' => 'البيانات', '2' => 'عقدُه وسجلُّه', '3' => 'صفاتُه (H-15)',
-              '4' => 'إنتاجُه', '5' => 'راتبُه وسلفُه', '6' => 'عهدُه', '7' => 'تقييمُه ونشاطُه');
+$TABS = array('1' => 'البيانات', '2' => 'عقده وسجله', '3' => 'صفاته (H-15)',
+              '4' => 'إنتاجه', '5' => 'راتبه وسلفه', '6' => 'عهده', '7' => 'تقييمه ونشاطه');
 
 $page_title = 'إيكوبيشن | بطاقة الموظف';
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
@@ -77,13 +77,13 @@ include '../insidebar.php';
     $header_back = array('href' => 'employees.php', 'class' => '',
                          'icon' => 'fas fa-arrow-right', 'label' => 'الموظفون');
     include('../includes/page_header.php');
-    ems_screen_about('بطاقةُ الموظف بتبويباتها السبعة — قراءةٌ من مالكيها؛ والحساسُ (راتبٌ وسلف) '
-        . 'يمرّ بحارس الظهور الثلاثي: صفةُ المشاهد ثم علاقتُه بالمعروض ثم مفتاحُ HR.', array());
+    ems_screen_about('بطاقة الموظف بتبويباتها السبعة — قراءة من مالكيها؛ والحساس (راتب وسلف) '
+        . 'يمر بحارس الظهور الثلاثي: صفة المشاهد ثم علاقته بالمعروض ثم مفتاح HR.', array());
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا بياناتِ بطاقةٍ لهذا الموظف', 'اختر موظفًا من سجلِّ الموظفين لتفتحَ بطاقتَه بتبويباتها السبعة');
+    echo ems_states_bundle('لا بيانات بطاقة لهذا الموظف', 'اختر موظفا من سجل الموظفين لتفتح بطاقته بتبويباتها السبعة');
     ?>
 
-    <?php if (!$emp): ems_state_empty('اختر موظفًا', 'إلى الموظفين', 'employees.php'); ?>
+    <?php if (!$emp): ems_state_empty('اختر موظفا', 'إلى الموظفين', 'employees.php'); ?>
     <?php else: ?>
     <div class="card"><div class="card-body ecard-idbar">
         <strong class="ecard-name"><?php echo htmlspecialchars((string)$emp['name']); ?></strong>
@@ -109,7 +109,7 @@ include '../insidebar.php';
                 }
             }
             echo '</tbody></table></div>'
-               . '<p><a class="btn-primary" href="employee_profile.php?id=' . $eid . '">الملفُّ الكامل ▸</a></p>';
+               . '<p><a class="btn-primary" href="employee_profile.php?id=' . $eid . '">الملف الكامل ▸</a></p>';
             break;
         case '2':
             $rows = array();
@@ -118,14 +118,14 @@ include '../insidebar.php';
                                 WHERE company_id={$co} AND employee_id={$eid}
                                   AND COALESCE(is_deleted,0)=0 ORDER BY start_date DESC");
             while ($r && ($x = $r->fetch_assoc())) { $rows[] = $x; }
-            if (!$rows) { ems_state_empty('لا عقودَ في السجل الموحّد (H-08)', 'إلى السجل', '../Workforce/contract_registry.php'); break; }
+            if (!$rows) { ems_state_empty('لا عقود في السجل الموحد (H-08)', 'إلى السجل', '../Workforce/contract_registry.php'); break; }
             echo '<div class="table-container"><table class="alltables display ecard-table" data-no-dt="1">'
                . '<thead><tr><th>#</th><th>الفئة</th><th>العلاقة</th><th>المدة</th><th>الحال</th><th>نسخة</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -148,7 +148,7 @@ include '../insidebar.php';
                                  FROM user_capacities
                                 WHERE company_id={$co} AND person_id={$eid} ORDER BY id");
             while ($r && ($x = $r->fetch_assoc())) { $rows[] = $x; }
-            if (!$rows) { ems_state_empty('لا صفاتٍ مشتقةً — الاشتقاقُ في شاشة 182', 'إليها', '../user_capacities.php'); break; }
+            if (!$rows) { ems_state_empty('لا صفات مشتقة — الاشتقاق في شاشة 182', 'إليها', '../user_capacities.php'); break; }
             echo '<div class="table-container"><table class="alltables display ecard-table" data-no-dt="1">'
                . '<thead><tr><th>الصفة</th><th>الدور</th><th>النطاق</th><th>السريان</th><th>الحال</th></tr></thead><tbody>';
             foreach ($rows as $x) {
@@ -158,7 +158,7 @@ include '../insidebar.php';
                    . '<td>' . htmlspecialchars($x['valid_from'] . ' → ' . ($x['valid_to'] ?: 'مفتوح')) . '</td>'
                    . '<td>' . ((string)$x['state'] === 'active'
                         ? "<span class='badge badge-success'>نشطة</span>"
-                        : ("<span class='badge badge-secondary' title='" . htmlspecialchars((string)$x['state_reason']) . "'>مجمَّدة</span>")) . '</td></tr>';
+                        : ("<span class='badge badge-secondary' title='" . htmlspecialchars((string)$x['state_reason']) . "'>مجمدة</span>")) . '</td></tr>';
             }
             echo '</tbody></table></div>';
             break;
@@ -172,10 +172,10 @@ include '../insidebar.php';
             while ($r && ($x = $r->fetch_assoc())) {
                 $any = true;
                 echo '<div class="badge badge-secondary ecard-chip">'
-                   . htmlspecialchars($x['award_unit_type'] . ': ' . $x['q'] . ' (' . $x['n'] . ' حكمًا)') . '</div>';
+                   . htmlspecialchars($x['award_unit_type'] . ': ' . $x['q'] . ' (' . $x['n'] . ' حكما)') . '</div>';
             }
             echo '</div>';
-            if (!$any) { ems_state_empty('لا أحكامَ إنتاجٍ لهذا الموظف — «لا ينطبق» يُعلَن لا صفرًا'); }
+            if (!$any) { ems_state_empty('لا أحكام إنتاج لهذا الموظف — «لا ينطبق» يعلن لا صفرا'); }
             break;
         case '5':
             // الحساسُ خلف الحارس الثلاثي — «لا يرى رواتبَهم إلا بمنحٍ صريح» (USR-01 §4)
@@ -183,8 +183,8 @@ include '../insidebar.php';
             if ($v['decision'] === 'deny') { ems_state_error('403 — ' . $v['reason']); break; }
             if ($v['decision'] !== 'allow') {
                 echo '<div class="alert alert-warning"><i class="fa fa-lock"></i> '
-                   . 'قسمُ الراتب والسلف **محجوبٌ بقرارٍ موثَّق**: ' . htmlspecialchars($v['reason'])
-                   . ' — فتحُه بمنحٍ مؤقتٍ من لوحة الظهور (ADM-01)</div>';
+                   . 'قسم الراتب والسلف **محجوب بقرار موثق**: ' . htmlspecialchars($v['reason'])
+                   . ' — فتحه بمنح مؤقت من لوحة الظهور (ADM-01)</div>';
                 break;
             }
             // M-14 BR-GOV-07: القراءةُ على السرِّ فعلٌ يُسجَّل — بعد السماح لا قبله
@@ -199,7 +199,7 @@ include '../insidebar.php';
             while ($pr && ($x = $pr->fetch_assoc())) {
                 $any = true;
                 echo '<div class="alert alert-info">' . htmlspecialchars($x['period_from'] . ' → '
-                   . $x['period_to'] . ' — إجمالي المكوّنات ' . $x['total']) . '</div>';
+                   . $x['period_to'] . ' — إجمالي المكونات ' . $x['total']) . '</div>';
             }
             $ad = $conn->query("SELECT COUNT(*) n, ROUND(COALESCE(SUM(amount),0),2) v
                                  FROM employee_advances
@@ -209,7 +209,7 @@ include '../insidebar.php';
                 echo '<div class="alert alert-info">السلف: ' . intval($ad['n']) . ' بمجموع '
                    . htmlspecialchars((string)$ad['v']) . ' — <a href="../Workforce/employee_advances.php">شاشتها ▸</a></div>';
             }
-            if (!$any) { ems_state_empty('لا كشوفَ ولا سلفَ بعدُ'); }
+            if (!$any) { ems_state_empty('لا كشوف ولا سلف بعد'); }
             break;
         case '6':
             $rows = array();
@@ -219,9 +219,9 @@ include '../insidebar.php';
                                 . $conn->real_escape_string((string)$emp['name']) . "'
                                 ORDER BY id DESC LIMIT 50");
             while ($r && ($x = $r->fetch_assoc())) { $rows[] = $x; }
-            if (!$rows) { ems_state_empty('لا عهدَ مسلَّمةً باسمه'); break; }
+            if (!$rows) { ems_state_empty('لا عهد مسلمة باسمه'); break; }
             echo '<div class="table-container"><table class="alltables display ecard-table" data-no-dt="1">'
-               . '<thead><tr><th>الصنف</th><th>مصروف</th><th>مُرجَع</th><th>الحال</th><th>التاريخ</th></tr></thead><tbody>';
+               . '<thead><tr><th>الصنف</th><th>مصروف</th><th>مرجع</th><th>الحال</th><th>التاريخ</th></tr></thead><tbody>';
             foreach ($rows as $x) {
                 echo '<tr><td>' . htmlspecialchars((string)$x['item_name']) . '</td>'
                    . '<td>' . htmlspecialchars((string)$x['qty_issued']) . '</td>'
@@ -239,7 +239,7 @@ include '../insidebar.php';
             $any = false;
             while ($ev && ($x = $ev->fetch_assoc())) {
                 $any = true;
-                echo '<div class="alert alert-info">تقييمُ ' . htmlspecialchars($x['period_from'] . ' → '
+                echo '<div class="alert alert-info">تقييم ' . htmlspecialchars($x['period_from'] . ' → '
                    . $x['period_to'] . ' — ' . $x['state']
                    . ($x['final_score'] !== null ? (' · الدرجة ' . $x['final_score']) : '')) . '</div>';
             }
@@ -248,11 +248,11 @@ include '../insidebar.php';
                                      WHERE company_id={$co} AND account_id={$subjectAccount}")->fetch_assoc();
                 if ($ac && intval($ac['n']) > 0) {
                     $any = true;
-                    echo '<div class="alert alert-info">نشاطُ بوابته: ' . intval($ac['n'])
-                       . ' حدثًا · آخرُه ' . htmlspecialchars((string)$ac['last_at']) . '</div>';
+                    echo '<div class="alert alert-info">نشاط بوابته: ' . intval($ac['n'])
+                       . ' حدثا · آخره ' . htmlspecialchars((string)$ac['last_at']) . '</div>';
                 }
             }
-            if (!$any) { ems_state_empty('لا تقييماتٍ ولا نشاطَ بوابةٍ بعدُ'); }
+            if (!$any) { ems_state_empty('لا تقييمات ولا نشاط بوابة بعد'); }
             break;
     }
     ?>

@@ -28,31 +28,31 @@ if (!function_exists('ems_client_match_can_override')) {
     function ems_client_match_can_override(mysqli $conn, $entryId, $companyId = 0)
     {
         $entryId = (int) $entryId;
-        if ($entryId <= 0) { return array('code' => 422, 'reason' => 'مدخلٌ غيرُ محدَّد'); }
+        if ($entryId <= 0) { return array('code' => 422, 'reason' => 'مدخل غير محدد'); }
         $sql = 'SELECT client_match_state, client_decision, state FROM unit_entries WHERE id = ?';
         $st = $conn->prepare($sql);
         if (!$st) {
             error_log('ems_client_match_can_override: prepare — ' . $conn->error);
-            return array('code' => 500, 'reason' => 'تعذّرت قراءةُ المدخل — لا يُقرأ الفشلُ إذنًا');
+            return array('code' => 500, 'reason' => 'تعذرت قراءة المدخل — لا يقرأ الفشل إذنا');
         }
         $st->bind_param('i', $entryId);
         $st->execute();
         $row = $st->get_result()->fetch_assoc();
         $st->close();
-        if (!$row) { return array('code' => 404, 'reason' => 'مدخلٌ غيرُ موجود'); }
+        if (!$row) { return array('code' => 404, 'reason' => 'مدخل غير موجود'); }
 
         if ((string) $row['client_decision'] === 'disputed') {
             return array('code' => 403,
-                'reason' => '**لا تجاوزَ فوقَ رفضٍ صريح** — العميلُ رفض هذا المدخلَ فانفتح نزاعٌ، '
-                          . 'والرفضُ الصريحُ لا يُعامَل معاملةَ غيابِ ردٍّ (TS-05-ج)');
+                'reason' => '**لا تجاوز فوق رفض صريح** — العميل رفض هذا المدخل فانفتح نزاع، '
+                          . 'والرفض الصريح لا يعامل معاملة غياب رد (TS-05-ج)');
         }
         if ((string) $row['client_match_state'] === 'matched') {
             return array('code' => 409,
-                'reason' => 'المطابقةُ مكتملةٌ — يُعتمد الناتجُ ولا يُتجاوز ما طابق (TS-05-أ ①)');
+                'reason' => 'المطابقة مكتملة — يعتمد الناتج ولا يتجاوز ما طابق (TS-05-أ ①)');
         }
         if ((string) $row['client_match_state'] === 'pending') {
             return array('code' => 409,
-                'reason' => 'المطابقةُ لم تُحسم بعد — لا تجاوزَ قبل محاولةٍ ونتيجة (TS-04)');
+                'reason' => 'المطابقة لم تحسم بعد — لا تجاوز قبل محاولة ونتيجة (TS-04)');
         }
         return null;
     }
@@ -71,35 +71,35 @@ if (!function_exists('ems_client_match_can_sales_approve')) {
         $st = $conn->prepare('SELECT client_match_state, client_decision FROM unit_entries WHERE id = ?');
         if (!$st) {
             error_log('ems_client_match_can_sales_approve: prepare — ' . $conn->error);
-            return array('code' => 500, 'reason' => 'تعذّرت قراءةُ المدخل');
+            return array('code' => 500, 'reason' => 'تعذرت قراءة المدخل');
         }
         $st->bind_param('i', $entryId);
         $st->execute();
         $row = $st->get_result()->fetch_assoc();
         $st->close();
-        if (!$row) { return array('code' => 404, 'reason' => 'مدخلٌ غيرُ موجود'); }
+        if (!$row) { return array('code' => 404, 'reason' => 'مدخل غير موجود'); }
 
         if ((string) $row['client_decision'] === 'disputed') {
             return array('code' => 403,
-                'reason' => 'مدخلٌ متنازعٌ عليه — لا يتقدم إلى أثرٍ نهائيٍّ حتى تُسوَّى (TS-16)');
+                'reason' => 'مدخل متنازع عليه — لا يتقدم إلى أثر نهائي حتى تسوى (TS-16)');
         }
         if ((string) $row['client_match_state'] === 'matched') { return null; }
 
         /* غيرُ مطابقٍ ⇒ يلزمه قرارُ تجاوزٍ مسجَّل، وبالسعةِ المطلوبة */
         $st = $conn->prepare('SELECT allows FROM unit_match_overrides WHERE entry_id = ? ORDER BY id DESC LIMIT 1');
-        if (!$st) { return array('code' => 500, 'reason' => 'تعذّرت قراءةُ قراراتِ التجاوز'); }
+        if (!$st) { return array('code' => 500, 'reason' => 'تعذرت قراءة قرارات التجاوز'); }
         $st->bind_param('i', $entryId);
         $st->execute();
         $ov = $st->get_result()->fetch_assoc();
         $st->close();
         if (!$ov) {
             return array('code' => 403,
-                'reason' => 'المطابقةُ «' . $row['client_match_state'] . '» ولا قرارَ تجاوزٍ مسجَّل — '
-                          . 'وبوابةُ المبيعاتِ قرارٌ مسجَّلٌ لا مرورٌ صامت (TS-05-أ)');
+                'reason' => 'المطابقة «' . $row['client_match_state'] . '» ولا قرار تجاوز مسجل — '
+                          . 'وبوابة المبيعات قرار مسجل لا مرور صامت (TS-05-أ)');
         }
         if ($forBilling && (string) $ov['allows'] !== 'billing') {
             return array('code' => 403,
-                'reason' => 'قرارُ التجاوزِ يسمح بالأثرِ الأوليِّ فقط — والفوترةُ تحتاج قرارًا يسمح بها صراحةً (TS-05-ب ⑥)');
+                'reason' => 'قرار التجاوز يسمح بالأثر الأولي فقط — والفوترة تحتاج قرارا يسمح بها صراحة (TS-05-ب ⑥)');
         }
         return null;
     }

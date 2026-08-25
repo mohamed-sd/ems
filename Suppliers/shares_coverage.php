@@ -48,7 +48,7 @@ require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
-require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('supplier_contract', 'الحصصُ والتغطية');
+require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('supplier_contract', 'الحصص والتغطية');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main" dir="rtl">
@@ -56,38 +56,38 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 /* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
    شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
 $header_icon = 'fa fa-chart-pie';
-$header_title_html = htmlspecialchars('حصصُ الموردين والتغطية', ENT_QUOTES, 'UTF-8');
+$header_title_html = htmlspecialchars('حصص الموردين والتغطية', ENT_QUOTES, 'UTF-8');
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-echo ems_states_bundle('لا حصةَ موردٍ عليها التزامٌ أو استهلاكٌ في دفترِ القدرات', 'سجِّل التزامَ الحصةِ في عقدِ المورد ثم أعِد فتحَ هذه الشاشة');
+echo ems_states_bundle('لا حصة مورد عليها التزام أو استهلاك في دفتر القدرات', 'سجل التزام الحصة في عقد المورد ثم أعد فتح هذه الشاشة');
 ?>
   <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
-  <p class="text-muted sup-shc-note">المستهلَكُ محسوبٌ من دفتر القدرات لا من عمودٍ مخزَّن — والتغطيةُ الاستثنائيةُ بندٌ لا يرفع الحصة (CAP-01 §7).</p>
+  <p class="text-muted sup-shc-note">المستهلك محسوب من دفتر القدرات لا من عمود مخزن — والتغطية الاستثنائية بند لا يرفع الحصة (CAP-01 §7).</p>
   <table class="table table-striped" data-no-dt>
-    <thead><tr><th>المورد</th><th>نسبة الحصة من الالتزام</th><th>المستهلَك (الدفتر)</th><th>التنفيذ ٪</th><th>تغطيةٌ أعطاها</th><th>الفجوة</th>
+    <thead><tr><th>المورد</th><th>نسبة الحصة من الالتزام</th><th>المستهلك (الدفتر)</th><th>التنفيذ ٪</th><th>تغطية أعطاها</th><th>الفجوة</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">رقم الحصة</th>
               <th class="ems-fn-th" data-fn="1">العقد</th>
               <th class="ems-fn-th" data-fn="1">نموذج العمل</th>
               <th class="ems-fn-th" data-fn="1">وحدة العمل</th>
               <th class="ems-fn-th" data-fn="1">نوع المعدة</th>
-              <th class="ems-fn-th" data-fn="1">الحصة المخصَّصة (وحدات)</th>
+              <th class="ems-fn-th" data-fn="1">الحصة المخصصة (وحدات)</th>
               <th class="ems-fn-th" data-fn="1">حصة المبيعات لهذا النوع</th>
               <th class="ems-fn-th" data-fn="1">مجموع حصص الموردين لهذا النوع</th>
               <th class="ems-fn-th" data-fn="1">المتبقي من حصة المبيعات</th>
               <th class="ems-fn-th" data-fn="1">معدات أساسية</th>
               <th class="ems-fn-th" data-fn="1">معدات احتياطية</th>
-              <th class="ems-fn-th" data-fn="1">الموزَّع على المعدات</th>
-              <th class="ems-fn-th" data-fn="1">غير الموزَّع</th>
+              <th class="ems-fn-th" data-fn="1">الموزع على المعدات</th>
+              <th class="ems-fn-th" data-fn="1">غير الموزع</th>
               <th class="ems-fn-th" data-fn="1">الساعات المشتقة من عقد العميل (محسوبة)</th>
               <th class="ems-fn-th" data-fn="1">تاريخ السريان</th>
               <th class="ems-fn-th" data-fn="1">تاريخ الانتهاء</th>
               <th class="ems-fn-th none" data-fn="1">حالة الحصة</th>
               <th class="ems-fn-th none" data-fn="1">مرجع العقد أو الملحق</th>
               <th class="ems-fn-th none" data-fn="1">مرجع الترسية</th>
-              <th class="ems-fn-th none" data-fn="1">خصّصها</th>
+              <th class="ems-fn-th none" data-fn="1">خصصها</th>
               <th class="ems-fn-th none" data-fn="1">نسخة القاعدة المستعملة</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th none" data-fn="1">رقم السطر</th>
@@ -101,22 +101,22 @@ echo ems_states_bundle('لا حصةَ موردٍ عليها التزامٌ أو 
               <th class="ems-fn-th none" data-fn="1">الرصيد بعد</th>
               <th class="ems-fn-th none" data-fn="1">المستند المصدر</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-              <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
               <th class="ems-gov-th none" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
               <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-              <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+              <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
               <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
-              <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
-              <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطّلاع</th>
+              <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
+              <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطلاع</th>
               <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               </tr></thead>
     <tbody>
-    <?php if (empty($rows)): ?><tr><td colspan="6" class="text-center text-muted">لا حصصَ موزَّعة</td></tr><?php endif; ?>
+    <?php if (empty($rows)): ?><tr><td colspan="6" class="text-center text-muted">لا حصص موزعة</td></tr><?php endif; ?>
     <?php foreach ($rows as $s):
         $pct = floatval($s['committed']) > 0 ? round(floatval($s['consumed']) / floatval($s['committed']) * 100, 1) : 0;
         $gap = floatval($s['committed']) - floatval($s['consumed']); ?>
@@ -125,7 +125,7 @@ echo ems_states_bundle('لا حصةَ موردٍ عليها التزامٌ أو 
         <td><?= number_format(floatval($s['committed']), 1) ?></td>
         <td><?= number_format(floatval($s['consumed']), 1) ?></td>
         <td><span class="badge" data-allow-style style="background:<?= $pct >= 90 ? 'var(--c-198754, #198754)' : ($pct >= 60 ? 'var(--c-fd7e14, #fd7e14)' : 'var(--c-dc3545, #dc3545)') ?>"><?= $pct ?>٪</span></td>
-        <td><?= number_format(floatval($s['coverage_given']), 1) ?> <span class="text-muted">(بندٌ مستقل)</span></td>
+        <td><?= number_format(floatval($s['coverage_given']), 1) ?> <span class="text-muted">(بند مستقل)</span></td>
         <td><?= number_format($gap, 1) ?></td>
       </tr>
     <?php endforeach; ?>

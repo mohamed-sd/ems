@@ -50,7 +50,7 @@ class TicketNumber
             . 'ON DUPLICATE KEY UPDATE `next_val` = LAST_INSERT_ID(GREATEST(`next_val`, ?) + 1)'
         );
         if (!$stmt) {
-            throw new \RuntimeException('TicketNumber: تعذّر تحضير عبارة التخصيص: ' . $conn->error);
+            throw new \RuntimeException('TicketNumber: تعذر تحضير عبارة التخصيص: ' . $conn->error);
         }
         $seed = $floor + 1;
         $stmt->bind_param('sii', $scope, $seed, $floor);
@@ -63,7 +63,7 @@ class TicketNumber
 
         $val = intval($conn->insert_id);
         if ($val < 1) {
-            throw new \RuntimeException('TicketNumber: قيمة تخصيصٍ غير صالحة للنطاق ' . $scope);
+            throw new \RuntimeException('TicketNumber: قيمة تخصيص غير صالحة للنطاق ' . $scope);
         }
 
         return $yy . '-' . $mm . '-' . str_pad((string) $val, 4, '0', STR_PAD_LEFT);
@@ -91,7 +91,7 @@ class TicketNumber
                 return $no;
             }
         }
-        throw new \RuntimeException('TicketNumber: تعذّر إيجاد رقمٍ شاغرٍ بعد ' . self::MAX_ATTEMPTS . ' محاولات');
+        throw new \RuntimeException('TicketNumber: تعذر إيجاد رقم شاغر بعد ' . self::MAX_ATTEMPTS . ' محاولات');
     }
 
     /** أعلى تسلسلٍ مستعملٍ في (شركة × سنة) — قياسٌ من الصفوف لا من العدّاد. */

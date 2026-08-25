@@ -32,7 +32,7 @@ if (!$is_super_admin && $company_id <= 0) {
 $perms = fin_page_perms($conn, 'Finance/maintenance_provision_fin.php', $is_super_admin);
 $can_view = $perms['can_view']; $can_edit = $perms['can_edit'];
 if (!$can_view) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض مخصّص الصيانة ❌', 'GOV-PERM-403', '');
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض مخصص الصيانة ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rate'])) {
     if ($raw === '') {
         $rate = 0.0;
     } elseif (!is_numeric($raw) || (float)$raw < 0) {
-        ems_gov_flash_redirect('maintenance_provision_fin.php', 'المعدّل يجب أن يكون رقماً غير سالب ❌', 'GOV-FAIL-409', ''); exit();
+        ems_gov_flash_redirect('maintenance_provision_fin.php', 'المعدل يجب أن يكون رقما غير سالب ❌', 'GOV-FAIL-409', ''); exit();
     } else {
         $rate = round((float)$raw, 4);
     }
@@ -54,8 +54,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rate'])) {
     ), array('effect_type' => 'metric_update'));
 
     $msg = $rate > 0
-        ? 'تم ضبط معدّل مخصّص الصيانة وتفعيله (' . rtrim(rtrim(number_format($rate, 4, '.', ''), '0'), '.') . '/ساعة)+✅'
-        : 'تم إفراغ المعدّل — مخصّص الصيانة معطّل الآن ✅';
+        ? 'تم ضبط معدل مخصص الصيانة وتفعيله (' . rtrim(rtrim(number_format($rate, 4, '.', ''), '0'), '.') . '/ساعة)+✅'
+        : 'تم إفراغ المعدل — مخصص الصيانة معطل الآن ✅';
     ems_gov_flash_redirect('maintenance_provision_fin.php', "$msg", 'GOV-INFO-200', ''); exit();
 }
 
@@ -90,7 +90,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضيًا
-    echo ems_states_bundle('لا آثارَ مخصّصِ صيانةٍ مولّدةً بعدُ', 'اكتبِ معدّلَ المخصّصِ لكلِّ ساعةِ تشغيلٍ ليبدأَ توليدُ الآثارِ من سجلِّ الساعات');
+    echo ems_states_bundle('لا آثار مخصص صيانة مولدة بعد', 'اكتب معدل المخصص لكل ساعة تشغيل ليبدأ توليد الآثار من سجل الساعات');
     ?>
 
     <?php fin_msg_banner(); ?>
@@ -99,17 +99,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="fin-mprov-chips">
             <span class="badge badge-<?php echo $cur_active ? 'success' : 'secondary'; ?> fin-mprov-chip-lg">
                 <i class="fas fa-<?php echo $cur_active ? 'circle-check' : 'circle-pause'; ?>"></i>
-                <?php echo $cur_active ? 'مفعّل' : 'غير مفعّل (الحقل فارغ)'; ?>
+                <?php echo $cur_active ? 'مفعل' : 'غير مفعل (الحقل فارغ)'; ?>
             </span>
             <?php if ($cur_active): ?>
-                <span class="fin-mprov-rate">المعدّل الحالي: <strong><?php echo htmlspecialchars($cur_rate_display); ?></strong> لكل ساعة تشغيل</span>
+                <span class="fin-mprov-rate">المعدل الحالي: <strong><?php echo htmlspecialchars($cur_rate_display); ?></strong> لكل ساعة تشغيل</span>
             <?php endif; ?>
         </div>
         <p class="fin-mprov-lead">
             <i class="fas fa-circle-info"></i>
-            هذا المعدّل يُحمِّل على كل معدةٍ <strong>مخصّص صيانة</strong> ضمن مروحة يوم الدوام، محسوبًا على
-            <strong>ساعات التشغيل الفعلية</strong>: <code>المخصّص = ساعات التشغيل × المعدّل</code> (بعملة الأساس SDG).
-            اترك الحقل فارغًا ليبقى المخصّص معطّلًا — لا يُحتسب رقمٌ حتى تضبط المعدّل بنفسك.
+            هذا المعدل يحمل على كل معدة <strong>مخصص صيانة</strong> ضمن مروحة يوم الدوام، محسوبا على
+            <strong>ساعات التشغيل الفعلية</strong>: <code>المخصص = ساعات التشغيل × المعدل</code> (بعملة الأساس SDG).
+            اترك الحقل فارغا ليبقى المخصص معطلا — لا يحتسب رقم حتى تضبط المعدل بنفسك.
         </p>
 
         <?php if ($can_edit): ?>
@@ -118,29 +118,29 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="form-section">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="emsf_238_562ad">معدّل مخصّص الصيانة لكل ساعة تشغيل (SDG)</label>
-                        <input type="number" name="rate" step="0.0001" min="0" aria-label="معدّلُ مخصّصِ الصيانةِ لكلِّ ساعةِ تشغيل" value="<?php echo htmlspecialchars($cur_rate_display); ?>" placeholder="فارغ = معطّل — اكتب المعدّل لتفعيله" id="emsf_238_562ad">
+                        <label for="emsf_238_562ad">معدل مخصص الصيانة لكل ساعة تشغيل (SDG)</label>
+                        <input type="number" name="rate" step="0.0001" min="0" aria-label="معدل مخصص الصيانة لكل ساعة تشغيل" value="<?php echo htmlspecialchars($cur_rate_display); ?>" placeholder="فارغ = معطل — اكتب المعدل لتفعيله" id="emsf_238_562ad">
                     </div>
                 </div>
             </div>
             <div class="form-actions">
-                <button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ المعدّل</button>
+                <button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ المعدل</button>
                 <?php if ($cur_active): ?>
-                <button type="submit" name="rate" value="" class="btn-secondary" onclick="return confirm('إفراغ المعدّل يوقف احتساب مخصّص الصيانة. متابعة؟')"><i class="fas fa-eraser"></i> إفراغ (تعطيل)</button>
+                <button type="submit" name="rate" value="" class="btn-secondary" onclick="return confirm('إفراغ المعدل يوقف احتساب مخصص الصيانة. متابعة؟')"><i class="fas fa-eraser"></i> إفراغ (تعطيل)</button>
                 <?php endif; ?>
             </div>
         </form>
         <?php else: ?>
-            <p class="fin-mprov-locked"><i class="fas fa-lock"></i> العرض فقط — ضبط المعدّل من صلاحية المدير المالي.</p>
+            <p class="fin-mprov-locked"><i class="fas fa-lock"></i> العرض فقط — ضبط المعدل من صلاحية المدير المالي.</p>
         <?php endif; ?>
     </div></div>
 
     <div class="card"><div class="card-body">
-        <h5 class="fin-mprov-h5"><i class="fas fa-diagram-project"></i> الآثار المالية المولَّدة وحالتها (للاطّلاع)</h5>
+        <h5 class="fin-mprov-h5"><i class="fas fa-diagram-project"></i> الآثار المالية المولدة وحالتها (للاطلاع)</h5>
         <div class="table-container">
             <table id="effTable" class="display nowrap alltables fin-mprov-table">
                 <thead><tr>
-                    <th>المصدر</th><th>درجة الأثر</th><th>الحالة</th><th>المعدّل</th><th>السبب/الملاحظة</th>
+                    <th>المصدر</th><th>درجة الأثر</th><th>الحالة</th><th>المعدل</th><th>السبب/الملاحظة</th>
                     <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
                     <th class="ems-fn-th" data-fn="1">رقم المخصص</th>
                     <th class="ems-fn-th" data-fn="1">الفترة</th>
@@ -148,9 +148,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <th class="ems-fn-th" data-fn="1">نوع المخصص</th>
                     <th class="ems-fn-th" data-fn="1">أساس التكوين</th>
                     <th class="ems-fn-th" data-fn="1">معادلة الاحتساب</th>
-                    <th class="ems-fn-th" data-fn="1">المكوَّن للفترة</th>
+                    <th class="ems-fn-th" data-fn="1">المكون للفترة</th>
                     <th class="ems-fn-th" data-fn="1">الرصيد المتراكم</th>
-                    <th class="ems-fn-th" data-fn="1">المستخدَم للفترة</th>
+                    <th class="ems-fn-th" data-fn="1">المستخدم للفترة</th>
                     <th class="ems-fn-th" data-fn="1">الرصيد المتاح</th>
                     <th class="ems-fn-th" data-fn="1">رقم القيد</th>
                     <th class="ems-fn-th" data-fn="1">مبرر التكوين</th>
@@ -158,13 +158,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <th class="ems-fn-th" data-fn="1">المرجع المحاسبي</th>
                     <th class="ems-fn-th" data-fn="1">نسخة القاعدة المستعملة</th>
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                     <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                     <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-                    <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+                    <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
                     <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-                    <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+                    <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
                     <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
                     <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                     <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
@@ -181,7 +181,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         echo "<tr>";
                         echo "<td>" . htmlspecialchars($src_ar[$e['source_kind']] ?? $e['source_kind']) . "</td>";
                         echo "<td>" . htmlspecialchars((string)$e['effect_label']) . "</td>";
-                        echo "<td><span class='badge badge-" . ($act ? 'success' : 'secondary') . "'>" . ($act ? 'مفعّل' : 'معطّل') . "</span></td>";
+                        echo "<td><span class='badge badge-" . ($act ? 'success' : 'secondary') . "'>" . ($act ? 'مفعل' : 'معطل') . "</span></td>";
                         echo "<td>" . $pv . "</td>";
                         echo "<td class='fin-mprov-reason'>" . htmlspecialchars((string)($e['unavailable_reason'] ?? '')) . "</td>";
                         echo "</tr>";

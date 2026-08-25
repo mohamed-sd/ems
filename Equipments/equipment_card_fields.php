@@ -2,7 +2,7 @@
 // EMS_DIRECT_ACCESS_FORBIDDEN: تضمينٌ مشتركٌ لا صفحة — النداء المباشر يُرفض
 if (basename((string) ($_SERVER['SCRIPT_NAME'] ?? '')) === basename(__FILE__)) {
     http_response_code(403);
-    exit('تضمينٌ مشتركٌ — لا يُفتح مباشرة');
+    exit('تضمين مشترك — لا يفتح مباشرة');
 }
 /**
  * كرت المعدة — حقول الهوية الأساسية (مشترك بين equipments.php و equipments_fleet.php)
@@ -21,7 +21,7 @@ if (!function_exists('ems_equipment_card_static_lists')) {
     function ems_equipment_card_static_lists()
     {
         return [
-            'source_type'          => ['ملك', 'مموَّل', 'حق استخدام', 'خدمة'],
+            'source_type'          => ['ملك', 'ممول', 'حق استخدام', 'خدمة'],
             'meter_uom'            => ['ساعات', 'كيلومترات'],
             'meter_source'         => ['عداد المعدة', 'GPS', 'السجل اليومي', 'تقديري'],
             'capacity_uom'         => ['م³', 'طن', 'كيلوواط', 'حصان', 'لتر', 'متر', 'كجم'],
@@ -118,7 +118,7 @@ if (!function_exists('ems_render_equipment_card_fields')) {
 
         <div>
             <label for="operating_category"><i class="fas fa-layer-group"></i> الفئة التشغيلية
-                <span class="ems-inherit-hint" style="font-size:11px;color:#16a34a;font-weight:700" title="تُملأ تلقائياً من الموديل وقابلة للتعديل">(موروثة من الموديل)</span>
+                <span class="ems-inherit-hint" style="font-size:11px;color:#16a34a;font-weight:700" title="تملأ تلقائيا من الموديل وقابلة للتعديل">(موروثة من الموديل)</span>
             </label>
             <input type="text" name="operating_category" id="operating_category"
                    placeholder="مثال: حفر، تحميل، نقل" value="<?= $g('operating_category'); ?>" />
@@ -141,7 +141,7 @@ if (!function_exists('ems_render_equipment_card_fields')) {
 
         <div>
             <label for="capacity"><i class="fas fa-weight-hanging"></i> السعة / القدرة / الحمولة
-                <span class="ems-inherit-hint" style="font-size:11px;color:#16a34a;font-weight:700" title="تُملأ تلقائياً من الموديل وقابلة للتعديل">(موروثة)</span>
+                <span class="ems-inherit-hint" style="font-size:11px;color:#16a34a;font-weight:700" title="تملأ تلقائيا من الموديل وقابلة للتعديل">(موروثة)</span>
             </label>
             <input type="number" step="0.01" name="capacity" id="capacity" value="<?= $g('capacity'); ?>" />
         </div>
@@ -187,16 +187,16 @@ if (!function_exists('ems_render_equipment_card_fields')) {
 
         <!-- ============ قسم: العدّاد ============ -->
         <div class="<?= $sc; ?>">
-            <h6><i class="fas fa-gauge-high"></i> العدّاد</h6>
+            <h6><i class="fas fa-gauge-high"></i> العداد</h6>
         </div>
 
         <div>
-            <label for="opening_meter"><i class="fas fa-gauge"></i> العدّاد الافتتاحي</label>
+            <label for="opening_meter"><i class="fas fa-gauge"></i> العداد الافتتاحي</label>
             <input type="number" step="0.01" name="opening_meter" id="opening_meter" value="<?= $g('opening_meter'); ?>" />
         </div>
 
         <div>
-            <label for="meter_source"><i class="fas fa-ruler-horizontal"></i> وحدة العدّاد</label>
+            <label for="meter_source"><i class="fas fa-ruler-horizontal"></i> وحدة العداد</label>
             <?php $mu = $g('meter_uom'); if ($mu === '') $mu = 'ساعات'; ?>
             <select name="meter_uom" id="meter_uom">
                 <?php foreach ($lists['meter_uom'] as $o) echo $opt($o, $mu); ?>
@@ -204,7 +204,7 @@ if (!function_exists('ems_render_equipment_card_fields')) {
         </div>
 
         <div>
-            <label><i class="fas fa-satellite-dish"></i> مصدر العدّاد</label>
+            <label><i class="fas fa-satellite-dish"></i> مصدر العداد</label>
             <?php $mu = $g('meter_uom'); if ($mu === '') $mu = 'ساعات'; ?>
             <select name="meter_uom" id="meter_uom">
                 <?php foreach ($lists['meter_uom'] as $o) echo $opt($o, $mu); ?>
@@ -212,7 +212,7 @@ if (!function_exists('ems_render_equipment_card_fields')) {
         </div>
 
         <div>
-            <label><i class="fas fa-satellite-dish"></i> مصدر العدّاد</label>
+            <label><i class="fas fa-satellite-dish"></i> مصدر العداد</label>
             <select name="meter_source" id="meter_source">
                 <option value="">-- اختر --</option>
                 <?php foreach ($lists['meter_source'] as $o) echo $opt($o, $g('meter_source')); ?>

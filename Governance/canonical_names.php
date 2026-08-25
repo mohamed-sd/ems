@@ -40,7 +40,7 @@ if (!$is_super_admin && empty($__pp['can_view'])) {
     exit();
 }
 if (!$is_super_admin && $_SERVER['REQUEST_METHOD'] === 'POST' && empty($__pp['can_add']) && empty($__pp['can_edit'])) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'غير مصرح بالكتابة في هذه الشاشة ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
+    ems_gov_flash_redirect('../main/dashboard.php', 'غير مصرح بالكتابة في هذه الشاشة ❌', 'GOV-PERM-403', 'اطلب المنحة من مدير الصلاحيات إن كانت ضمن عملك');
 }
 $COLS   = array (
   0 => 'الكيان',
@@ -48,18 +48,18 @@ $COLS   = array (
   2 => 'نوع الكيان',
   3 => 'الاسم المعتمد',
   4 => 'الاسم القانوني الكامل',
-  5 => 'المرادفات المسجَّلة',
+  5 => 'المرادفات المسجلة',
   6 => 'عدد المرادفات',
   7 => 'الاسم في السجل التجاري',
   8 => 'الرقم الضريبي',
-  9 => 'كود الكيان الموحَّد',
+  9 => 'كود الكيان الموحد',
   10 => 'حالة الفحص',
   11 => 'تكرار مكتشف',
   12 => 'قرار الدمج',
-  13 => 'السجلات المحوَّلة',
+  13 => 'السجلات المحولة',
   14 => 'تاريخ الدمج',
-  15 => 'المُنشئ — الاسم والصفة',
-  16 => 'المعتمِد — الاسم والصفة',
+  15 => 'المنشئ — الاسم والصفة',
+  16 => 'المعتمد — الاسم والصفة',
   17 => 'تاريخ الاعتماد',
   18 => 'الحالة',
 );
@@ -68,17 +68,17 @@ $FIELDS = array (
   1 => 'نوع الكيان',
   2 => 'الاسم المعتمد',
   3 => 'الاسم القانوني الكامل',
-  4 => 'المرادفات المسجَّلة',
+  4 => 'المرادفات المسجلة',
   5 => 'عدد المرادفات',
   6 => 'الاسم في السجل التجاري',
   7 => 'الرقم الضريبي',
-  8 => 'كود الكيان الموحَّد',
+  8 => 'كود الكيان الموحد',
   9 => 'حالة الفحص',
   10 => 'تكرار مكتشف',
   11 => 'قرار الدمج',
-  12 => 'السجلات المحوَّلة',
+  12 => 'السجلات المحولة',
   13 => 'تاريخ الدمج',
-  14 => 'المعتمِد — الاسم والصفة',
+  14 => 'المعتمد — الاسم والصفة',
   15 => 'تاريخ الاعتماد',
   16 => 'الحالة',
 );
@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     $creator = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
     // الموجة ٢: الحفظ في الجدول الأصلي للشاشة (الفارغ NULL — لا مخزن بينيًّا)
     $ok = cmp03_store_insert($conn, $company_id, $CANONICAL, $payload, $status, $uid, $creator);
-    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
+    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
     exit();
 }
 
@@ -109,7 +109,7 @@ $entityName = $govCtx['values']['entity'] ?? '—';
 function cmp03_cell($col, $row, $entityName) {
     $n = cmp03_screen_norm($col);
     if ($n === cmp03_screen_norm('الكيان')) { return $entityName; }
-    if ($n === cmp03_screen_norm('المُنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المُنشئة')) {
+    if ($n === cmp03_screen_norm('المنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المنشئة')) {
         return $row['created_by_name'] ?: '—';
     }
     if ($n === cmp03_screen_norm('تاريخ الإنشاء')) { return $row['created_at']; }
@@ -124,7 +124,7 @@ function cmp03_screen_norm($s) {
     $s = str_replace(array('أ','إ','آ'), 'ا', $s);
     $s = str_replace('ة', 'ه', $s);
     $s = str_replace('ى', 'ي', $s);
-    return preg_replace('/[ًٌٍَُِّْ]/u', '', $s);
+    return preg_replace('/[]/u', '', $s);
 }
 
 $page_title = 'إيكوبيشن | سجل الأسماء المعتمدة';
@@ -148,7 +148,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
-    echo ems_states_bundle('لا أسماءَ معياريةً مسجَّلةً بعد', 'سجِّل الاسمَ المعتمدَ ومرادفاتِه بزرِّ «إضافة» أعلى الشاشة');
+    echo ems_states_bundle('لا أسماء معيارية مسجلة بعد', 'سجل الاسم المعتمد ومرادفاته بزر «إضافة» أعلى الشاشة');
     ?>
 
     <!-- فورم الإضافة الموحد (ems-forms) — مطويٌّ حتى زرِّ الرأس -->
@@ -167,7 +167,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="f2" maxlength="190" id="emsf_545_54b64"></div>
                 <div class="form-group"><label for="emsf_546_150b2">الاسم القانوني الكامل</label>
                     <input type="text" name="f3" maxlength="190" id="emsf_546_150b2"></div>
-                <div class="form-group"><label for="emsf_547_22598">المرادفات المسجَّلة</label>
+                <div class="form-group"><label for="emsf_547_22598">المرادفات المسجلة</label>
                     <input type="text" name="f4" maxlength="190" id="emsf_547_22598"></div>
                 <div class="form-group"><label for="emsf_548_70bdf">عدد المرادفات</label>
                     <input type="text" inputmode="decimal" name="f5" placeholder="0" id="emsf_548_70bdf"></div>
@@ -175,7 +175,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="f6" maxlength="190" id="emsf_549_fc4ee"></div>
                 <div class="form-group"><label for="emsf_550_23e01">الرقم الضريبي</label>
                     <input type="text" name="f7" maxlength="190" id="emsf_550_23e01"></div>
-                <div class="form-group"><label for="emsf_551_3b0ae">كود الكيان الموحَّد</label>
+                <div class="form-group"><label for="emsf_551_3b0ae">كود الكيان الموحد</label>
                     <input type="text" name="f8" maxlength="190" id="emsf_551_3b0ae"></div>
                 <div class="form-group"><label for="emsf_552_54334">حالة الفحص</label>
                     <input type="text" name="f9" maxlength="190" id="emsf_552_54334"></div>
@@ -183,11 +183,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="f10" maxlength="190" id="emsf_553_3301a"></div>
                 <div class="form-group"><label for="emsf_554_59684">قرار الدمج</label>
                     <input type="text" name="f11" maxlength="190" id="emsf_554_59684"></div>
-                <div class="form-group"><label for="emsf_555_e0d4d">السجلات المحوَّلة</label>
+                <div class="form-group"><label for="emsf_555_e0d4d">السجلات المحولة</label>
                     <input type="text" name="f12" maxlength="190" id="emsf_555_e0d4d"></div>
                 <div class="form-group"><label for="emsf_556_8e6bb">تاريخ الدمج</label>
                     <input type="date" name="f13" id="emsf_556_8e6bb"></div>
-                <div class="form-group"><label for="emsf_557_3da1c">المعتمِد — الاسم والصفة</label>
+                <div class="form-group"><label for="emsf_557_3da1c">المعتمد — الاسم والصفة</label>
                     <input type="text" name="f14" maxlength="190" id="emsf_557_3da1c"></div>
                 <div class="form-group"><label for="emsf_558_051eb">تاريخ الاعتماد</label>
                     <input type="date" name="f15" id="emsf_558_051eb"></div>
@@ -205,29 +205,29 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="table-responsive">
         <table class="alltables display" id="canonical_namesTable">
             <thead><tr>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
             <th>رقم السجل</th>
             <th>نوع الكيان</th>
             <th>الاسم المعتمد</th>
             <th>الاسم القانوني الكامل</th>
-            <th>المرادفات المسجَّلة</th>
+            <th>المرادفات المسجلة</th>
             <th>عدد المرادفات</th>
             <th>الاسم في السجل التجاري</th>
             <th>الرقم الضريبي</th>
-            <th>كود الكيان الموحَّد</th>
+            <th>كود الكيان الموحد</th>
             <th>حالة الفحص</th>
             <th>تكرار مكتشف</th>
             <th>قرار الدمج</th>
-            <th>السجلات المحوَّلة</th>
+            <th>السجلات المحولة</th>
             <th>تاريخ الدمج</th>
-            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
             <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
             <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
             </tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="19" class="text-center text-muted">لا بياناتَ بعدُ — أضف أول صفٍّ بزر «إضافة»</td></tr>
+                <tr><td colspan="19" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
                     <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>

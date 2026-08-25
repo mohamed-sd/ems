@@ -45,18 +45,18 @@ class ContractSiteService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'scope_id' => null);
         $c = self::contractOf($gate, (int) $contractId);
-        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقدُ غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقد غير موجود في نطاقك'; return $out; }
 
         $siteId = (int) (isset($args['site_id']) ? $args['site_id'] : 0);
-        if ($siteId <= 0) { $out['code'] = 422; $out['reason'] = 'الموقعُ إلزامي'; return $out; }
+        if ($siteId <= 0) { $out['code'] = 422; $out['reason'] = 'الموقع إلزامي'; return $out; }
         $site = null;
         try { $site = $gate->selectOne('sites', array('where' => array('id' => $siteId))); }
-        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $site'); $site = null; }
-        if (!$site) { $out['code'] = 422; $out['reason'] = 'الموقعُ غيرُ موجودٍ في نطاقك'; return $out; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $site'); $site = null; }
+        if (!$site) { $out['code'] = 422; $out['reason'] = 'الموقع غير موجود في نطاقك'; return $out; }
 
         $name = trim((string) (isset($args['scope_name']) ? $args['scope_name'] : ''));
         if ($name === '') { $name = (string) $site['name']; }
-        if ($name === '') { $out['code'] = 422; $out['reason'] = 'اسمُ النطاق إلزامي'; return $out; }
+        if ($name === '') { $out['code'] = 422; $out['reason'] = 'اسم النطاق إلزامي'; return $out; }
 
         $from = self::dateOrNull(isset($args['start_date']) ? $args['start_date'] : null);
         $to   = self::dateOrNull(isset($args['end_date']) ? $args['end_date'] : null);
@@ -69,18 +69,18 @@ class ContractSiteService
             $ex = $gate->selectOne('contract_operational_sites', array(
                 'whereRaw' => 'contract_id = ? AND site_id = ?',
                 'params' => array((int) $contractId, $siteId)));
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $ex'); $ex = null; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $ex'); $ex = null; }
         if ($ex) {
             $out['code'] = 409; $out['scope_id'] = (int) $ex['id'];
-            $out['reason'] = 'للموقع نطاقٌ قائمٌ في هذا العقد #' . (int) $ex['id']
-                           . ' — «الموقعُ مرةً واحدةً في العقد»';
+            $out['reason'] = 'للموقع نطاق قائم في هذا العقد #' . (int) $ex['id']
+                           . ' — «الموقع مرة واحدة في العقد»';
             return $out;
         }
 
         $state = (string) (isset($args['state']) ? $args['state'] : 'active');
         if (!in_array($state, self::STATES, true)) { $state = 'active'; }
         if ($state === 'closed') {
-            $out['code'] = 422; $out['reason'] = 'لا يُنشأ نطاقٌ مقفلًا — يُنشأ ثم يُقفل بسببه'; return $out;
+            $out['code'] = 422; $out['reason'] = 'لا ينشأ نطاق مقفلا — ينشأ ثم يقفل بسببه'; return $out;
         }
         $primary = !empty($args['is_primary']) ? 1 : 0;
 
@@ -98,10 +98,10 @@ class ContractSiteService
                     'note' => isset($args['note']) ? mb_substr((string) $args['note'], 0, 255) : null,
                     'created_by' => (int) $actor ?: null,
                 ));
-                if ($sid <= 0) { throw new \RuntimeException('تعذّر الإدراج'); }
+                if ($sid <= 0) { throw new \RuntimeException('تعذر الإدراج'); }
             }, 'إضافة نطاق للعقد ' . $contractId);
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّرت الإضافة: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذرت الإضافة: ' . $t->getMessage(); return $out;
         }
 
         self::audit($conn, $companyId, $actor, 'add_scope', (int) $sid, array(),
@@ -115,12 +115,12 @@ class ContractSiteService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '');
         $s = self::scopeOf($gate, (int) $scopeId);
-        if (!$s) { $out['code'] = 404; $out['reason' ] = 'النطاقُ غيرُ موجود'; return $out; }
+        if (!$s) { $out['code'] = 404; $out['reason' ] = 'النطاق غير موجود'; return $out; }
         if ((int) $s['is_primary'] === 1) {
-            $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'رئيسٌ سلفًا'; return $out;
+            $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'رئيس سلفا'; return $out;
         }
         if ((string) $s['state'] === 'closed') {
-            $out['code'] = 422; $out['reason'] = 'لا يُرأَّس نطاقٌ مقفل'; return $out;
+            $out['code'] = 422; $out['reason'] = 'لا يرأس نطاق مقفل'; return $out;
         }
         try {
             $gate->runInTransaction(function ($g) use ($s, $scopeId) {
@@ -129,7 +129,7 @@ class ContractSiteService
                     array('id' => (int) $scopeId));
             }, 'نقل رئاسة النطاق ' . $scopeId);
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر النقل: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر النقل: ' . $t->getMessage(); return $out;
         }
         self::audit($conn, $companyId, $actor, 'set_primary', (int) $scopeId,
             array('is_primary' => 0), array('is_primary' => 1));
@@ -142,14 +142,14 @@ class ContractSiteService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '');
         $s = self::scopeOf($gate, (int) $scopeId);
-        if (!$s) { $out['code'] = 404; $out['reason'] = 'النطاقُ غيرُ موجود'; return $out; }
+        if (!$s) { $out['code'] = 404; $out['reason'] = 'النطاق غير موجود'; return $out; }
         if ((string) $s['state'] === 'closed') {
-            $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'مقفلٌ سلفًا'; return $out;
+            $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'مقفل سلفا'; return $out;
         }
         $why = trim((string) $reason);
         if ($why === '') {
             $out['code'] = 422;
-            $out['reason'] = '**سببُ الإقفال إلزامي** — ونطاقٌ يُقفل بلا سببٍ يترك عملًا لا يُفسَّر';
+            $out['reason'] = '**سبب الإقفال إلزامي** — ونطاق يقفل بلا سبب يترك عملا لا يفسر';
             return $out;
         }
         try {
@@ -157,7 +157,7 @@ class ContractSiteService
                 array('state' => 'closed', 'close_reason' => mb_substr($why, 0, 255)),
                 array('id' => (int) $scopeId));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الإقفال: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الإقفال: ' . $t->getMessage(); return $out;
         }
         self::audit($conn, $companyId, $actor, 'close_scope', (int) $scopeId,
             array('state' => (string) $s['state']), array('state' => 'closed', 'reason' => $why));
@@ -243,16 +243,16 @@ class ContractSiteService
         $ce = ($c['actual_end'] !== null && (string) $c['actual_end'] !== '0000-00-00')
               ? substr((string) $c['actual_end'], 0, 10) : null;
         if ($from !== null && $to !== null && $to < $from) {
-            return array('code' => 422, 'reason' => 'نهايةُ النطاق قبل بدايته');
+            return array('code' => 422, 'reason' => 'نهاية النطاق قبل بدايته');
         }
         if ($cs !== null && $from !== null && $from < $cs) {
             return array('code' => 422,
-                'reason' => 'بدايةُ النطاق ' . $from . ' **قبل بداية العقد** ' . $cs
-                          . ' — «نطاقٌ خارج عقده لا معنى له»');
+                'reason' => 'بداية النطاق ' . $from . ' **قبل بداية العقد** ' . $cs
+                          . ' — «نطاق خارج عقده لا معنى له»');
         }
         if ($ce !== null && $to !== null && $to > $ce) {
             return array('code' => 422,
-                'reason' => 'نهايةُ النطاق ' . $to . ' **بعد نهاية العقد** ' . $ce);
+                'reason' => 'نهاية النطاق ' . $to . ' **بعد نهاية العقد** ' . $ce);
         }
         return null;
     }
@@ -263,7 +263,7 @@ class ContractSiteService
         try {
             $cur = $g->selectOne('contract_operational_sites', array(
                 'whereRaw' => 'contract_id = ? AND is_primary = 1', 'params' => array((int) $contractId)));
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $cur'); $cur = null; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $cur'); $cur = null; }
         if ($cur) {
             $g->update('contract_operational_sites', array('is_primary' => 0),
                 array('id' => (int) $cur['id']));

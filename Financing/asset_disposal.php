@@ -28,7 +28,7 @@ if (!$granted) {
     $g = mysqli_query($conn, "SELECT 1 FROM ownership_access_grants WHERE person_id = $uid AND state = 'active' LIMIT 1");
     $granted = $g && mysqli_num_rows($g) > 0;
 }
-if (!$granted) { ems_gov_flash_redirect('../main/dashboard.php', 'المجالُ المقيَّد (FIN-01 §1.1) ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك'); }
+if (!$granted) { ems_gov_flash_redirect('../main/dashboard.php', 'المجال المقيد (FIN-01 §1.1) ❌', 'GOV-PERM-403', 'اطلب المنحة من مدير الصلاحيات إن كانت ضمن عملك'); }
 $msg = '';
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
@@ -37,13 +37,13 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     $pct   = floatval($_POST['percent'] ?? 0);
     $doc   = trim($_POST['doc_ref'] ?? '');
     if ($share <= 0 || $toEnt <= 0 || $pct <= 0 || $pct > 100 || $doc === '') {
-        $msg = 'الحصةُ والمستلمُ والنسبةُ (0-100] ومرجعُ القرار إلزامية (422)';
+        $msg = 'الحصة والمستلم والنسبة (0-100] ومرجع القرار إلزامية (422)';
     } else {
         $r = mysqli_query($conn, "SELECT * FROM asset_ownership_shares WHERE share_id = $share
                                   AND company_id = $company_id AND (valid_to IS NULL OR valid_to >= CURDATE())");
         if ($r && ($s = mysqli_fetch_assoc($r))) {
             $cur = floatval($s['approved_percent'] ?: $s['percent']);
-            if ($pct > $cur) { $msg = "النسبةُ المنقولة ($pct) تتجاوز الحصةَ القائمة ($cur) — 409"; }
+            if ($pct > $cur) { $msg = "النسبة المنقولة ($pct) تتجاوز الحصة القائمة ($cur) — 409"; }
             else {
                 mysqli_begin_transaction($conn);
                 /* ══ INJ-0045 · «حصةُ البائع تُنهى وحصةُ المشتري تُفتح بالتاريخ نفسِه»
@@ -83,11 +83,11 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
                     mysqli_commit($conn);
                     mysqli_query($conn, "INSERT INTO action_execution_log (company_id, action_code, person_id, subject_ref, result)
                                          VALUES ($company_id, 'asset.share.transfer', $uid, 'share:$share→ent:$toEnt:$pct%', 'allowed')");
-                    $msg = "نُقلت $pct٪ بمرجع $doc — القديمةُ أُغلقت أمسِ والجديدةُ تسري اليومَ"
-                         . ' (لا فجوةَ ولا تراكب · Σ = ١٠٠ في اليومين)';
-                } else { mysqli_rollback($conn); $msg = 'فشلت المعاملةُ فأُلغيت الثلاث: ' . mysqli_error($conn); }
+                    $msg = "نقلت $pct٪ بمرجع $doc — القديمة أغلقت أمس والجديدة تسري اليوم"
+                         . ' (لا فجوة ولا تراكب · Σ = ١٠٠ في اليومين)';
+                } else { mysqli_rollback($conn); $msg = 'فشلت المعاملة فألغيت الثلاث: ' . mysqli_error($conn); }
             }
-        } else { $msg = 'حصةٌ غيرُ ساريةٍ (404)'; }
+        } else { $msg = 'حصة غير سارية (404)'; }
     }
 }
 
@@ -116,12 +116,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 /* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
    شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
 $header_icon = 'fa fa-exchange-alt';
-$header_title_html = htmlspecialchars('التصرفُ في الأصل — نقلُ حصة', ENT_QUOTES, 'UTF-8');
+$header_title_html = htmlspecialchars('التصرف في الأصل — نقل حصة', ENT_QUOTES, 'UTF-8');
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-echo ems_states_bundle('لا حصصَ ملكيةٍ ساريةً قابلةً للنقل', 'سجِّلْ حصةَ ملكيةٍ ساريةً للعينِ أولًا ثم عُدْ لنقلِها بمرجعِ قرار');
+echo ems_states_bundle('لا حصص ملكية سارية قابلة للنقل', 'سجل حصة ملكية سارية للعين أولا ثم عد لنقلها بمرجع قرار');
 ?>
   <style>
     .fin-ad-form { display: flex; gap: 10px; align-items: end; flex-wrap: wrap; max-width: 900px; }
@@ -131,7 +131,7 @@ echo ems_states_bundle('لا حصصَ ملكيةٍ ساريةً قابلةً ل�
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
   <form method="post" class="ems-form fin-ad-form">
         <?= csrf_field() ?>
-    <div><label for="emsf_443_7b91c">الحصةُ السارية</label>
+    <div><label for="emsf_443_7b91c">الحصة السارية</label>
       <select name="share_id" class="form-control" required id="emsf_443_7b91c"><option value="">—</option>
         <?php foreach ($shares as $s): ?>
           <option value="<?= intval($s['share_id']) ?>">
@@ -140,9 +140,9 @@ echo ems_states_bundle('لا حصصَ ملكيةٍ ساريةً قابلةً ل�
     <div><label for="emsf_444_3e542">إلى الكيان</label>
       <select name="to_entity" class="form-control" required id="emsf_444_3e542"><option value="">—</option>
         <?php foreach ($ents as $e2): ?><option value="<?= intval($e2['entity_id']) ?>"><?= htmlspecialchars($e2['legal_name'], ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select></div>
-    <div><label for="emsf_445_45aeb">النسبةُ المنقولة ٪</label><input type="number" step="0.01" min="0.01" max="100" name="percent" class="form-control fin-ad-pct" required id="emsf_445_45aeb"></div>
-    <div><label for="emsf_446_1045d">مرجعُ القرار — إلزامي</label><input type="text" name="doc_ref" class="form-control" required id="emsf_446_1045d"></div>
+    <div><label for="emsf_445_45aeb">النسبة المنقولة ٪</label><input type="number" step="0.01" min="0.01" max="100" name="percent" class="form-control fin-ad-pct" required id="emsf_445_45aeb"></div>
+    <div><label for="emsf_446_1045d">مرجع القرار — إلزامي</label><input type="text" name="doc_ref" class="form-control" required id="emsf_446_1045d"></div>
     <button class="btn btn-primary">انقل الحصة</button>
   </form>
-  <p class="text-muted fin-ad-note">القديمةُ تُغلق بتاريخٍ والجديدةُ صفٌّ — لا تعديلَ بأثرٍ رجعيٍّ وΣ لكل أصلٍ محفوظٌ في كل لحظة.</p>
+  <p class="text-muted fin-ad-note">القديمة تغلق بتاريخ والجديدة صف — لا تعديل بأثر رجعي وΣ لكل أصل محفوظ في كل لحظة.</p>
 </div>

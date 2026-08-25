@@ -95,7 +95,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back    = array('href' => 'users.php', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا مشروعَ مكلَّفًا بهذا المستخدم', 'كلِّفه بمشروعٍ من شاشةِ المستخدمين ثم عُدْ إلى بطاقته');
+    echo ems_states_bundle('لا مشروع مكلفا بهذا المستخدم', 'كلفه بمشروع من شاشة المستخدمين ثم عد إلى بطاقته');
     ?>
 
     <?php
@@ -117,8 +117,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         ),
         'facts'  => array(
             array('label' => 'الهاتف',         'value' => $user_data['phone']),
-            array('label' => 'آخرُ دخول',      'value' => ($last_login === '-') ? '' : $last_login),
-            array('label' => 'تاريخُ الإنشاء', 'value' => $user_data['created_at']),
+            array('label' => 'آخر دخول',      'value' => ($last_login === '-') ? '' : $last_login),
+            array('label' => 'تاريخ الإنشاء', 'value' => $user_data['created_at']),
         ),
     ));
 
@@ -126,24 +126,24 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
          الثنائيُّ في شريطِ مؤشراتٍ يُقرأ عددًا لا حالة. صارا شارتَي نعم/لا
          بنغمةٍ، وبقي العدُّ الحقيقيُّ (ثلاثةُ أعدادِ إنشاء) في الشريط. */
     echo ems_profile_stats(array(
-        array('value' => $projects_created,  'label' => 'مشاريعُ أنشأها'),
-        array('value' => $clients_created,   'label' => 'عملاءُ أضافهم'),
+        array('value' => $projects_created,  'label' => 'مشاريع أنشأها'),
+        array('value' => $clients_created,   'label' => 'عملاء أضافهم'),
         array('value' => $suppliers_created, 'label' => 'موردون أضافهم'),
     ));
 
     echo ems_profile_section_open(array(
-        'title' => 'المشروع المكلّف به',
+        'title' => 'المشروع المكلف به',
         'icon'  => 'fas fa-diagram-project',
-        'meta'  => (!empty($user_data['contract_id']) ? 'وله عقدٌ مكلَّفٌ به' : 'بلا عقدٍ مكلَّف'),
+        'meta'  => (!empty($user_data['contract_id']) ? 'وله عقد مكلف به' : 'بلا عقد مكلف'),
     ));
     ?>
             <table id="userProjectTable" class="display profile-table">
                 <thead><tr><th>اسم المشروع</th><th>كود المشروع</th><th>الحالة</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -156,7 +156,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <td><?php echo intval($p['status']) === 1 ? 'نشط' : 'غير نشط'; ?></td>
                         </tr>
                     <?php else: ?>
-                        <tr><td colspan="3">لا يوجد مشروع مكلّف به</td></tr>
+                        <tr><td colspan="3">لا يوجد مشروع مكلف به</td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>

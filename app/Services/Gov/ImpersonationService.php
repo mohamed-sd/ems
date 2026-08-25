@@ -54,19 +54,19 @@ class ImpersonationService
         $actorRole = (int) ($actor['role'] ?? 0);
         $reason = trim($reason);
         $hours = max(1, min(self::MAX_HOURS, $hours));
-        if ($actorId <= 0 || $targetUserId <= 0) { return array('ok' => false, 'reason' => 'أطرافٌ ناقصة'); }
-        if ($reason === '') { return array('ok' => false, 'reason' => 'لا جلسةَ بسببٍ فارغ (chk_imp_reason)'); }
+        if ($actorId <= 0 || $targetUserId <= 0) { return array('ok' => false, 'reason' => 'أطراف ناقصة'); }
+        if ($reason === '') { return array('ok' => false, 'reason' => 'لا جلسة بسبب فارغ (chk_imp_reason)'); }
 
         $r = $conn->query("SELECT id, role, username, company_id FROM users WHERE id = " . (int) $targetUserId . " AND status = 1");
         $target = $r ? $r->fetch_assoc() : null;
-        if ($target === null) { return array('ok' => false, 'reason' => 'الهدفُ غيرُ موجودٍ أو غيرُ نشط'); }
+        if ($target === null) { return array('ok' => false, 'reason' => 'الهدف غير موجود أو غير نشط'); }
         if (!self::mayImpersonate($conn, $actorRole, (int) $target['role'])) {
-            return array('ok' => false, 'reason' => 'خارجَ خطِّك الإداري — التصعيدُ الرأسيُّ لا يبلغ هذا الموضع');
+            return array('ok' => false, 'reason' => 'خارج خطك الإداري — التصعيد الرأسي لا يبلغ هذا الموضع');
         }
         $open = $conn->query("SELECT COUNT(*) FROM impersonation_sessions
                                WHERE actor_user = {$actorId} AND closed_at IS NULL AND valid_to > NOW()");
         if ($open && (int) $open->fetch_row()[0] > 0) {
-            return array('ok' => false, 'reason' => 'لك جلسةٌ جاريةٌ — تُغلق قبلَ فتحِ غيرِها');
+            return array('ok' => false, 'reason' => 'لك جلسة جارية — تغلق قبل فتح غيرها');
         }
 
         $st = $conn->prepare(
@@ -88,7 +88,7 @@ class ImpersonationService
         $rs = $conn->real_escape_string(mb_substr($reason, 0, 120));
         $conn->query("INSERT INTO fin_notifications (company_id, target_level, target_user_id, title, link, is_read, created_at)
                       VALUES ({$co}, 'user', {$targetUserId},
-                              'فُتحت جلسةُ نيابةٍ في موضعِك: {$an} — بسببِ: {$rs}',
+                              'فتحت جلسة نيابة في موضعك: {$an} — بسبب: {$rs}',
                               'Governance/impersonations.php', 0, NOW())");
 
         $_SESSION['imp_session'] = array(

@@ -89,7 +89,7 @@ class Importer
     {
         $rows = self::retrieve($def->key, $companyId, $userId, $token);
         if ($rows === null) {
-            throw new \RuntimeException('انتهت صلاحية المعاينة أو لم تُعثر عليها. يرجى رفع الملف من جديد.');
+            throw new \RuntimeException('انتهت صلاحية المعاينة أو لم تعثر عليها. يرجى رفع الملف من جديد.');
         }
         if (empty($rows)) {
             throw new \RuntimeException('لا توجد صفوف صحيحة للاستيراد.');
@@ -197,7 +197,7 @@ class Importer
             'added'   => $added,
             'failed'  => $failed,
             'errors'  => $failErrors,
-            'message' => "تم استيراد {$added} سجلاً بنجاح" . ($failed > 0 ? "، وفشل {$failed}." : '.'),
+            'message' => "تم استيراد {$added} سجلا بنجاح" . ($failed > 0 ? "، وفشل {$failed}." : '.'),
         ];
     }
 

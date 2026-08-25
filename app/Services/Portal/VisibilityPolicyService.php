@@ -56,19 +56,19 @@ class VisibilityPolicyService
         $el = self::element($conn, $code);
         if (!$el || !(int) $el['active']) {
             $out['code'] = 422;
-            $out['reason'] = 'العنصرُ «' . $code . '» خارجَ القاموس أو موقوف — '
-                           . '**وما ليس في القاموس لا يُصيَّر أصلًا** (ADM-01 §2)';
+            $out['reason'] = 'العنصر «' . $code . '» خارج القاموس أو موقوف — '
+                           . '**وما ليس في القاموس لا يصير أصلا** (ADM-01 §2)';
             return $out;
         }
         if (!in_array($scopeType, self::SCOPES, true) || $scopeId === '') {
-            $out['code'] = 422; $out['reason'] = 'نطاقٌ ناقص — النوعُ من الستة ومعرّفُه إلزامي'; return $out;
+            $out['code'] = 422; $out['reason'] = 'نطاق ناقص — النوع من الستة ومعرفه إلزامي'; return $out;
         }
         if (!in_array($mode, array('open', 'closed', 'inherit'), true)) {
-            $out['code'] = 422; $out['reason'] = 'الوضعُ: open · closed · inherit'; return $out;
+            $out['code'] = 422; $out['reason'] = 'الوضع: open · closed · inherit'; return $out;
         }
         if ($mode !== 'inherit' && $reason === '') {
             $out['code'] = 422;
-            $out['reason'] = '**سببٌ إلزاميٌّ لكل تغييرٍ** — «لا تغييرَ صامتٌ على خصوصية أحد» (ADM-01)';
+            $out['reason'] = '**سبب إلزامي لكل تغيير** — «لا تغيير صامت على خصوصية أحد» (ADM-01)';
             return $out;
         }
 
@@ -76,31 +76,31 @@ class VisibilityPolicyService
         if ((string) $el['sensitivity'] === 'sensitive' && $mode === 'open') {
             if ($expires === '' || strtotime($expires) === false) {
                 $out['code'] = 422;
-                $out['reason'] = '**الحساسُ يتطلب مدةً وسببًا** — منحٌ مؤقتٌ ينتهي آليًّا لا فتحٌ دائم (D2)';
+                $out['reason'] = '**الحساس يتطلب مدة وسببا** — منح مؤقت ينتهي آليا لا فتح دائم (D2)';
                 return $out;
             }
             if (strtotime($expires) <= time()) {
-                $out['code'] = 422; $out['reason'] = 'مدةُ المنح في الماضي — لا منحَ ميتًا'; return $out;
+                $out['code'] = 422; $out['reason'] = 'مدة المنح في الماضي — لا منح ميتا'; return $out;
             }
         }
 
         // D4: منعُ منح الذات — بنيويًّا ومسجَّلًا
         if ($scopeType === 'account' && (int) $scopeId === (int) $actor && $mode === 'open') {
             self::logRow($conn, $companyId, $code, $scopeType, $scopeId, null, 'denied_self',
-                $actor, 'محاولةُ منح الذات — مرفوضةٌ بنيويًّا (D4)', null, 0);
+                $actor, 'محاولة منح الذات — مرفوضة بنيويا (D4)', null, 0);
             $out['code'] = 403;
-            $out['reason'] = '**لا يمنح الفاعلُ نفسَه ظهورًا** — 403 مسجَّلةٌ (ADM-01 D4)';
+            $out['reason'] = '**لا يمنح الفاعل نفسه ظهورا** — 403 مسجلة (ADM-01 D4)';
             return $out;
         }
 
         // نطاقُ الحساب يلزم وجودُه (404) — والفئةُ من قاموس H-15
         if ($scopeType === 'account') {
             $r = $conn->query("SELECT id FROM users WHERE id = " . (int) $scopeId . " LIMIT 1");
-            if (!$r || !$r->fetch_assoc()) { $out['code'] = 404; $out['reason'] = 'الحسابُ غيرُ موجود'; return $out; }
+            if (!$r || !$r->fetch_assoc()) { $out['code'] = 404; $out['reason'] = 'الحساب غير موجود'; return $out; }
         }
         if ($scopeType === 'capacity_type'
             && !in_array($scopeId, CapacityService::CAPACITY_TYPES, true)) {
-            $out['code'] = 404; $out['reason'] = 'فئةُ صفةٍ مجهولة — القاموسُ في H-15'; return $out;
+            $out['code'] = 404; $out['reason'] = 'فئة صفة مجهولة — القاموس في H-15'; return $out;
         }
 
         // القراءةُ قبل الكتابة — للسجل from_mode
@@ -108,7 +108,7 @@ class VisibilityPolicyService
         try {
             $old = $gate->selectOne('visibility_keys', array('where' => array(
                 'element_code' => $code, 'scope_type' => $scopeType, 'scope_id' => $scopeId)));
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $old'); $old = null; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $old'); $old = null; }
 
         try {
             if ($old) {
@@ -127,7 +127,7 @@ class VisibilityPolicyService
                 ));
             }
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الضبط: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الضبط: ' . $t->getMessage(); return $out;
         }
 
         // «معاينةُ الأثر»: عددُ الحسابات المتأثرة بالنطاق — يُسجَّل مع الحدث
@@ -187,7 +187,7 @@ class VisibilityPolicyService
         // ① ما ليس في القاموس لا يُصيَّر أصلًا
         if (!$el || !(int) $el['active']) {
             return array('visible' => false, 'mode' => 'closed',
-                'source' => 'not_in_dictionary', 'reason' => 'خارجَ القاموس — لا يُصيَّر');
+                'source' => 'not_in_dictionary', 'reason' => 'خارج القاموس — لا يصير');
         }
 
         // نطاقاتُ السياق ⇒ مفاتيحُها المضبوطة
@@ -206,7 +206,7 @@ class VisibilityPolicyService
                 $k = $gate->selectOne('visibility_keys', array('where' => array(
                     'element_code' => (string) $elementCode,
                     'scope_type' => $w[0], 'scope_id' => $w[1])));
-            } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $k'); $k = null; }
+            } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $k'); $k = null; }
             if (!$k || (string) $k['mode'] === 'inherit') { continue; }
 
             // D5: الانتهاءُ الكسول — المنتهي مغلقٌ فورًا ويُقيَّد
@@ -215,12 +215,12 @@ class VisibilityPolicyService
                 try {
                     $gate->update('visibility_keys',
                         array('mode' => 'closed',
-                              'reason' => 'انتهت مدةُ المنح — أُغلق آليًّا (GrantExpired)'),
+                              'reason' => 'انتهت مدة المنح — أغلق آليا (GrantExpired)'),
                         array('id' => (int) $k['id']));
                     self::logRow($conn, $companyId, (string) $elementCode, $w[0], $w[1],
                         'open', 'grant_expired', 0,
-                        'انتهاءُ مدةِ منحٍ — إغلاقٌ آليٌّ بلا تدخل (D5)', null, 0);
-                } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'الإغلاقُ المنطقي ماضٍ ولو تعذّر القيد'); /* الإغلاقُ المنطقي ماضٍ ولو تعذّر القيد */ }
+                        'انتهاء مدة منح — إغلاق آلي بلا تدخل (D5)', null, 0);
+                } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'الإغلاق المنطقي ماض ولو تعذر القيد'); /* الإغلاقُ المنطقي ماضٍ ولو تعذّر القيد */ }
                 $k['mode'] = 'closed';
             }
 
@@ -262,7 +262,7 @@ class VisibilityPolicyService
             $caps = $gate->scopedQuery(array('scope' => array('c' => 'user_capacities')),
                 "SELECT c.account_id, c.capacity_type, c.scope_type, c.scope_id
                    FROM user_capacities c WHERE {TENANT_SCOPE} AND c.state = 'active'");
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $caps'); $caps = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $caps'); $caps = array(); }
         foreach ($caps as $c) {
             $ctx = array('account_id' => (int) $c['account_id'],
                          'capacity_type' => (string) $c['capacity_type']);

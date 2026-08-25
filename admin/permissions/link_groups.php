@@ -82,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $dup = $mp_pg->selectOne('link_groups', array('columns' => array('id'),
                 'whereRaw' => '`name` = ? AND `owner_role_id` <=> ?', 'params' => array($name, $owner_role_id)));
             if ($dup !== null) {
-                $error_msg = 'توجد مجموعة بهذا الاسم لنفس الدور مسبقاً ❌';
+                $error_msg = 'توجد مجموعة بهذا الاسم لنفس الدور مسبقا ❌';
             } else {
                 $mp_pg->insert('link_groups', array(
                     'name' => $name, 'owner_role_id' => $owner_role_id, 'icon' => $icon,
@@ -227,13 +227,13 @@ input[type="radio"], input[type="checkbox"] { cursor: pointer; }
 
     <div class="hint-box">
         <strong><i class="fas fa-circle-info"></i> كيف تعمل المجموعات؟</strong><br>
-        المجموعة تظهر في الشريط الجانبي كاسمٍ واحد، وروابطها تحته في قائمة قابلة للطيّ.
-        تُنشئ المجموعة هنا، ثم تُسنِد إليها الروابط من شاشة <a href="modules.php" style="color:var(--blue); font-weight:700;">الصفحات والمديولات</a> عبر حقل «المجموعة».
+        المجموعة تظهر في الشريط الجانبي كاسم واحد، وروابطها تحته في قائمة قابلة للطي.
+        تنشئ المجموعة هنا، ثم تسند إليها الروابط من شاشة <a href="modules.php" style="color:var(--blue); font-weight:700;">الصفحات والمديولات</a> عبر حقل «المجموعة».
         <br>
-        لكل دورٍ مجموعاته الخاصة: أنشئ المجموعة باسم الدور المسؤول نفسه الذي تملكه روابطُه.
-        والرابط بلا مجموعة يظل ظاهراً في المستوى الأعلى كما هو اليوم — فلا شيء ينكسر.
+        لكل دور مجموعاته الخاصة: أنشئ المجموعة باسم الدور المسؤول نفسه الذي تملكه روابطه.
+        والرابط بلا مجموعة يظل ظاهرا في المستوى الأعلى كما هو اليوم — فلا شيء ينكسر.
         <br>
-        بلاطات «الوصول السريع» في لوحة التحكم تعرض روابط المجموعة المختارة، وتتبدّل بنقر رأس أي مجموعة في الشريط الجانبي.
+        بلاطات «الوصول السريع» في لوحة التحكم تعرض روابط المجموعة المختارة، وتتبدل بنقر رأس أي مجموعة في الشريط الجانبي.
     </div>
 
     <?php if (!empty($_GET['msg'])):
@@ -288,7 +288,7 @@ input[type="radio"], input[type="checkbox"] { cursor: pointer; }
                         <input type="number" name="display_order" id="display_order" placeholder="0" min="0" step="1"
                                value="<?= htmlspecialchars($editData['display_order'] ?? '0', ENT_QUOTES, 'UTF-8'); ?>" />
                         <small style="color:#666; display:block; margin-top:5px;">
-                            <i class="fas fa-info-circle"></i> الرقم الأصغر يظهر أولاً — ويُقارَن بترتيب الروابط المفردة أيضاً
+                            <i class="fas fa-info-circle"></i> الرقم الأصغر يظهر أولا — ويقارن بترتيب الروابط المفردة أيضا
                         </small>
                     </div>
 
@@ -296,7 +296,7 @@ input[type="radio"], input[type="checkbox"] { cursor: pointer; }
                         <input type="checkbox" name="is_active" id="is_active" value="1"
                                <?= (empty($editData) || (int) ($editData['is_active'] ?? 1) === 1) ? 'checked' : ''; ?> />
                         <label for="is_active" style="margin:0; margin-right:8px; cursor:pointer;">
-                            <i class="fas fa-toggle-on"></i> مفعّلة
+                            <i class="fas fa-toggle-on"></i> مفعلة
                         </label>
                     </div>
 
@@ -411,7 +411,7 @@ input[type="radio"], input[type="checkbox"] { cursor: pointer; }
                                 <td class="text-center">
                                     <a href="?edit_id=<?= $gid; ?>&action=edit" class="btn btn-sm btn-primary" title="تعديل"><i class="fas fa-edit"></i></a>
                                     <a href="?delete_id=<?= $gid; ?>"
-                                       onclick="return confirm('حذف المجموعة سيُعيد روابطها إلى المستوى الأعلى في الشريط الجانبي (لن تُحذف أي شاشة). متابعة؟');"
+                                       onclick="return confirm('حذف المجموعة سيعيد روابطها إلى المستوى الأعلى في الشريط الجانبي (لن تحذف أي شاشة). متابعة؟');"
                                        class="btn btn-sm btn-danger" title="حذف"><i class="fas fa-trash"></i></a>
                                 </td>
                                 <td class="text-center">
@@ -441,9 +441,9 @@ input[type="radio"], input[type="checkbox"] { cursor: pointer; }
                                 </td>
                                 <td class="text-center">
                                     <?php if ((int) $row['is_active'] === 1): ?>
-                                        <span style="display:inline-block; background:var(--teal-soft); color:var(--teal); padding:4px 8px; border-radius:4px; font-weight:600;">✔ مفعّلة</span>
+                                        <span style="display:inline-block; background:var(--teal-soft); color:var(--teal); padding:4px 8px; border-radius:4px; font-weight:600;">✔ مفعلة</span>
                                     <?php else: ?>
-                                        <span style="display:inline-block; background:#f0f0f0; color:#999; padding:4px 8px; border-radius:4px; font-weight:600;">✖ معطّلة</span>
+                                        <span style="display:inline-block; background:#f0f0f0; color:#999; padding:4px 8px; border-radius:4px; font-weight:600;">✖ معطلة</span>
                                     <?php endif; ?>
                                 </td>
                             </tr>

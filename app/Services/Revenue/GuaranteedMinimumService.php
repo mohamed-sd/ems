@@ -34,7 +34,7 @@ class GuaranteedMinimumService
         $claim = $claims[0];
         if (!in_array((string) $claim['state'], array('draft', 'review'), true)) {
             $out['code'] = 423;
-            $out['reason'] = 'المستخلص «' . $claim['state'] . '» — لا يُعدَّل بعد الاعتماد؛ التصحيح بإشعار';
+            $out['reason'] = 'المستخلص «' . $claim['state'] . '» — لا يعدل بعد الاعتماد؛ التصحيح بإشعار';
             return $out;
         }
 
@@ -45,7 +45,7 @@ class GuaranteedMinimumService
         $monthly = $ct ? (float) $ct[0]['hours_monthly_target'] : 0.0;
         if ($monthly <= 0) {
             $out['ok'] = true; $out['code'] = 200;
-            $out['reason'] = 'لا حدَّ أدنى مضمونًا في العقد — لا بند (الغياب ليس صفر عجز مفترضًا)';
+            $out['reason'] = 'لا حد أدنى مضمونا في العقد — لا بند (الغياب ليس صفر عجز مفترضا)';
             return $out;
         }
         $months = max(1, (int) round(
@@ -69,7 +69,7 @@ class GuaranteedMinimumService
 
         if ($shortfall <= 0.005) {
             $out['ok'] = true; $out['code'] = 200;
-            $out['reason'] = 'المنفَّذ (' . $billed . ') بلغ المضمون (' . $guaranteed . ') — لا بند (لا بند بصفر)';
+            $out['reason'] = 'المنفذ (' . $billed . ') بلغ المضمون (' . $guaranteed . ') — لا بند (لا بند بصفر)';
             return $out;
         }
         if ($price <= 0) {
@@ -81,7 +81,7 @@ class GuaranteedMinimumService
             $price = $ln ? (float) $ln[0]['unit_price'] : 0.0;
         }
         if ($price <= 0) {
-            $out['code'] = 422; $out['reason'] = 'لا سعرَ ساعةٍ معتمدًا للعقد — لا يُخترع رقم (قاعدة عدم التلفيق)';
+            $out['code'] = 422; $out['reason'] = 'لا سعر ساعة معتمدا للعقد — لا يخترع رقم (قاعدة عدم التلفيق)';
             return $out;
         }
 
@@ -111,8 +111,8 @@ class GuaranteedMinimumService
         ), array('id' => $claimId));
 
         $out['ok'] = true; $out['code'] = 201; $out['line_id'] = $lineId; $out['amount'] = $amount;
-        $out['reason'] = 'بند «الحد الأدنى المضمون» مستقلًّا: عجز ' . $shortfall . ' ساعة × ' . $price
-            . ' = ' . $amount . ' — باسمه لا مدسوسًا في الكميات';
+        $out['reason'] = 'بند «الحد الأدنى المضمون» مستقلا: عجز ' . $shortfall . ' ساعة × ' . $price
+            . ' = ' . $amount . ' — باسمه لا مدسوسا في الكميات';
         return $out;
     }
 }

@@ -57,30 +57,30 @@ class ObligationEngine
         $by    = intval($c['decided_by'] ?? 0);
         $value = (float) ($c['contract_value'] ?? 0);
         if ($co <= 0 || $kind === '' || $ref === '' || $by <= 0) {
-            return self::fail(422, 'اختبارُ التجنبِ يحتاج الكيانَ والعقدَ ومن يقرر');
+            return self::fail(422, 'اختبار التجنب يحتاج الكيان والعقد ومن يقرر');
         }
 
         $steps = array();
 
         /* AV-1 — أالعقدُ قابلٌ للإلغاءِ من طرفنا بلا تكلفةٍ جوهرية؟ */
         $cancellable = !empty($c['cancellable']);
-        $steps['AV-1'] = $cancellable ? 'نعم → ارتباطٌ يُفصح عنه فقط' : 'لا → يُنتقل للثاني';
+        $steps['AV-1'] = $cancellable ? 'نعم → ارتباط يفصح عنه فقط' : 'لا → ينتقل للثاني';
 
         /* AV-2 — ما مقدارُ المبلغِ غيرِ القابلِ للتجنب؟ «أعلاها». */
         $penalty   = (float) ($c['cancel_cost'] ?? 0);
         $termCost  = (float) ($c['termination_cost'] ?? 0);
         $minGuar   = (float) ($c['min_guarantee'] ?? 0);
         $unavoid   = $cancellable ? 0.0 : max($penalty, $termCost, $minGuar);
-        $steps['AV-2'] = 'غيرُ القابلِ للتجنب = ' . number_format($unavoid, 2)
+        $steps['AV-2'] = 'غير القابل للتجنب = ' . number_format($unavoid, 2)
                        . ' (أعلى: جزاء ' . number_format($penalty, 2)
                        . ' · إنهاء ' . number_format($termCost, 2)
-                       . ' · حدٌّ أدنى ' . number_format($minGuar, 2) . ')';
+                       . ' · حد أدنى ' . number_format($minGuar, 2) . ')';
 
         /* AV-3 — أنسبتُه من قيمةِ العقدِ تبلغ حدًّا جوهريًّا؟ */
         $pct = $value > 0 ? round($unavoid / $value * 100, 3) : 0.0;
         $candidate = ($pct >= self::MATERIALITY_PCT);
         $steps['AV-3'] = 'النسبة ' . $pct . '٪ ' . ($candidate ? '≥' : '<') . ' ' . self::MATERIALITY_PCT
-                       . '٪ → ' . ($candidate ? 'مرشَّحٌ للاعتراف' : 'ارتباطٌ يُفصح عنه والجزاءُ منفصلًا');
+                       . '٪ → ' . ($candidate ? 'مرشح للاعتراف' : 'ارتباط يفصح عنه والجزاء منفصلا');
 
         /* AV-4 — أيوجد معيارٌ خاصٌّ يوجب الاعترافَ بلا استثناء؟
            ◆ والمعيارُ الخاصُّ **يحدّد قادحَه** ولا يوجب الاعترافَ لحظةَ التوقيع:
@@ -94,15 +94,15 @@ class ObligationEngine
                  /* بلا إفادةٍ صريحة: القابلُ للإلغاءِ لم يُسحب ولم يبدأ سريانُه بعدُ. */
                  : !$cancellable;
         $specialDue = ($special !== '' && $trigger);
-        $steps['AV-4'] = $special === '' ? 'لا معيارَ خاصَّ موجِب'
-                       : ('معيارٌ خاصّ: ' . $special . ' — قادحُه '
-                          . ($trigger ? 'وقع → يوجب الاعتراف' : 'لم يقع → ارتباطٌ يُفصح عنه'));
+        $steps['AV-4'] = $special === '' ? 'لا معيار خاص موجب'
+                       : ('معيار خاص: ' . $special . ' — قادحه '
+                          . ($trigger ? 'وقع → يوجب الاعتراف' : 'لم يقع → ارتباط يفصح عنه'));
 
         /* AV-5 — أتفوق التكاليفُ غيرُ القابلةِ للتجنبِ المنافعَ المتوقعة؟ */
         $benefit = isset($c['expected_benefit']) && $c['expected_benefit'] !== '' ? (float) $c['expected_benefit'] : null;
         $onerous = ($benefit !== null && $unavoid > $benefit);
-        $steps['AV-5'] = $benefit === null ? 'لا منافعَ مقدَّرةٌ فلا حكمَ بالإثقال'
-                       : ($onerous ? 'مُثقِلٌ → مخصَّصٌ فورًا' : 'غيرُ مُثقِل');
+        $steps['AV-5'] = $benefit === null ? 'لا منافع مقدرة فلا حكم بالإثقال'
+                       : ($onerous ? 'مثقل → مخصص فورا' : 'غير مثقل');
 
         /* الحكم — بترتيبِ الأسبقية: الإثقالُ ثم المعيارُ الخاصُّ ثم الجوهرية. */
         if ($onerous)         { $verdict = 'onerous'; }
@@ -132,7 +132,7 @@ class ObligationEngine
                   decided_by=VALUES(decided_by), decided_at=NOW(),
                   next_review_at=VALUES(next_review_at), steps_json=VALUES(steps_json)";
         $st = $conn->prepare($sql);
-        if (!$st) { return self::fail(500, 'تعذّر تسجيلُ نتيجةِ الاختبار: ' . $conn->error); }
+        if (!$st) { return self::fail(500, 'تعذر تسجيل نتيجة الاختبار: ' . $conn->error); }
         $cur   = (string) ($c['currency'] ?? 'USD');
         $canc  = $cancellable ? 1 : 0;
         $cand  = $candidate ? 1 : 0;
@@ -144,7 +144,7 @@ class ObligationEngine
         $types = 'i' . 'ss' . 'd' . 's' . 'i' . 'ddd' . 'i' . 'dd' . 's' . 'i' . 'd' . 's' . 'i' . 'ss';
         self::assertArity($types, $vals, 'fin_obl_avoidance');
         $st->bind_param($types, ...$vals);
-        if (!$st->execute()) { $e = $st->error; $st->close(); return self::fail(500, 'تعذّر التسجيل: ' . $e); }
+        if (!$st->execute()) { $e = $st->error; $st->close(); return self::fail(500, 'تعذر التسجيل: ' . $e); }
         $st->close();
 
         return array('ok' => true, 'code' => 200, 'verdict' => $verdict,
@@ -157,9 +157,9 @@ class ObligationEngine
     public static function specialStandardFor($kind)
     {
         switch ($kind) {
-            case 'lease':     return 'معيارُ الإيجارات — يُعترف عند بدءِ السريان';
-            case 'financing': return 'معيارُ الأدواتِ المالية — يُعترف عند السحب';
-            case 'employee':  return 'معيارُ منافعِ العاملين — يُعترف عند أداءِ الخدمة';
+            case 'lease':     return 'معيار الإيجارات — يعترف عند بدء السريان';
+            case 'financing': return 'معيار الأدوات المالية — يعترف عند السحب';
+            case 'employee':  return 'معيار منافع العاملين — يعترف عند أداء الخدمة';
             default:          return '';
         }
     }
@@ -188,16 +188,16 @@ class ObligationEngine
         $value = (float) ($c['total_value'] ?? 0);
         $by    = intval($c['generated_by'] ?? 0);
         if ($co <= 0 || $type === '' || $ref === '' || $start === '' || $end === '') {
-            return self::fail(422, 'توليدُ الجدولِ يحتاج الكيانَ والنوعَ والعقدَ ومدتَه');
+            return self::fail(422, 'توليد الجدول يحتاج الكيان والنوع والعقد ومدته');
         }
         if (strtotime($end) < strtotime($start)) {
-            return self::fail(422, 'تاريخُ الانتهاءِ قبلَ البدء');
+            return self::fail(422, 'تاريخ الانتهاء قبل البدء');
         }
 
         /* ◆ OBL-0200: «ولا يُترك عقدٌ بلا نتيجةِ اختبارٍ مسجَّلة» — والجدولُ لا
              يُولَّد قبلَ الاختبار، فالتصنيفُ يسبق التوليد. */
         if (!self::hasAvoidanceVerdict($conn, $co, $kind, $ref)) {
-            return self::fail(409, 'لا يُولَّد جدولٌ لعقدٍ بلا نتيجةِ اختبارِ تجنبٍ مسجَّلة (OBL-0200)');
+            return self::fail(409, 'لا يولد جدول لعقد بلا نتيجة اختبار تجنب مسجلة (OBL-0200)');
         }
 
         $periods = self::buildPeriods($start, $end);
@@ -229,7 +229,7 @@ class ObligationEngine
                        dims_json, state, supersedes_id, amendment_ref, generated_at, generated_by)
                     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,'active',?,?,NOW(),?)";
             $st = $conn->prepare($sql);
-            if (!$st) { throw new \RuntimeException('تعذّر إنشاءُ الالتزام: ' . $conn->error); }
+            if (!$st) { throw new \RuntimeException('تعذر إنشاء الالتزام: ' . $conn->error); }
             $side  = in_array((string) ($c['side'] ?? 'payable'), array('payable', 'receivable'), true) ? (string) $c['side'] : 'payable';
             $party = mb_substr((string) ($c['counterparty'] ?? ''), 0, 200);
             $cur   = (string) ($c['currency'] ?? 'USD');
@@ -248,7 +248,7 @@ class ObligationEngine
             $types = 'i' . 'ssssss' . 's' . 'd' . 'ss' . 'ii' . 's' . 'iii' . 'ss' . 'i' . 's' . 'i' . 's' . 'i';
             self::assertArity($types, $vals, 'fin_obl_register');
             $st->bind_param($types, ...$vals);
-            if (!$st->execute()) { $e = $st->error; $st->close(); throw new \RuntimeException('تعذّر إنشاءُ الالتزام: ' . $e); }
+            if (!$st->execute()) { $e = $st->error; $st->close(); throw new \RuntimeException('تعذر إنشاء الالتزام: ' . $e); }
             $oblId = $st->insert_id;
             $st->close();
 
@@ -263,7 +263,7 @@ class ObligationEngine
                     l1_commitment, l1_remaining, l2_recognized, l2_cumulative,
                     l3_open, settled, gap_l1_l2, recognition_rule, term_class, state)
                  VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,0,?,?,?,'scheduled')");
-            if (!$ins) { throw new \RuntimeException('تعذّر إنشاءُ الجدول: ' . $conn->error); }
+            if (!$ins) { throw new \RuntimeException('تعذر إنشاء الجدول: ' . $conn->error); }
 
             foreach ($periods as $i => $p) {
                 /* SY-04: الكسرُ بالتناسبِ اليوميّ — أيامُ الكسرِ ÷ أيامِ الشهرِ × الحصة. */
@@ -296,7 +296,7 @@ class ObligationEngine
                 $t = 'ii' . 'i' . 'sss' . 'i' . 'ii' . 's' . 'dddd' . 'd' . 'ss';
                 self::assertArity($t, $vals, 'fin_obl_schedule');
                 $ins->bind_param($t, ...$vals);
-                if (!$ins->execute()) { $e = $ins->error; $ins->close(); throw new \RuntimeException('تعذّر صفُّ الجدول: ' . $e); }
+                if (!$ins->execute()) { $e = $ins->error; $ins->close(); throw new \RuntimeException('تعذر صف الجدول: ' . $e); }
             }
             $ins->close();
             $conn->commit();
@@ -308,7 +308,7 @@ class ObligationEngine
         return array('ok' => true, 'code' => 200, 'obligation_id' => $oblId, 'obligation_no' => $no,
                      'accounting_periods' => $acct, 'contract_periods' => $contr,
                      'monthly' => $monthly, 'superseded' => $prev !== null ? $prev['obligation_no'] : null,
-                     'reason' => sprintf('وُلِّد جدولٌ بـ%d فترةً محاسبيةً و%d فترةً تعاقدية', $acct, $contr));
+                     'reason' => sprintf('ولد جدول ب%d فترة محاسبية و%d فترة تعاقدية', $acct, $contr));
     }
 
     /**
@@ -374,7 +374,7 @@ class ObligationEngine
             $st->close();
         }
         return array('ok' => true, 'code' => 200, 'moved_to_short' => max(0, $moved),
-                     'reason' => 'رُحِّل إلى القصيرِ ما دخل نطاقَ السنة: ' . max(0, $moved) . ' استحقاقًا');
+                     'reason' => 'رحل إلى القصير ما دخل نطاق السنة: ' . max(0, $moved) . ' استحقاقا');
     }
 
     /** OR-05: المستحقُّ الذي مرَّ تاريخُه بلا سدادٍ يُرحَّل إلى الذممِ الدائنة. */
@@ -401,14 +401,14 @@ class ObligationEngine
             $st->close();
         }
         return array('ok' => true, 'code' => 200, 'moved' => max(0, $n),
-                     'reason' => 'رُحِّل إلى الذممِ الدائنة: ' . max(0, $n) . ' استحقاقًا');
+                     'reason' => 'رحل إلى الذمم الدائنة: ' . max(0, $n) . ' استحقاقا');
     }
 
     /** OR-08: إنهاءُ العقدِ يُغلق ما لم يستحقَّ — والمستحقُّ قبلَه يبقى. */
     public static function terminate(\mysqli $conn, $co, $kind, $ref, $onDate, $why)
     {
         $obl = self::activeObligation($conn, $co, $kind, $ref);
-        if ($obl === null) { return self::fail(404, 'لا التزامَ نشطٌ لهذا العقد'); }
+        if ($obl === null) { return self::fail(404, 'لا التزام نشط لهذا العقد'); }
         $kept = 0; $closed = 0;
 
         $st = $conn->prepare(
@@ -430,7 +430,7 @@ class ObligationEngine
                    'si', array($onDate, $obl['id']));
 
         return array('ok' => true, 'code' => 200, 'closed_future' => $closed, 'kept_accrued' => $kept,
-                     'reason' => "أُغلق $closed استحقاقًا لم يستحقَّ بعدُ · وبقي $kept مستحقًّا حتى يُسدَّد");
+                     'reason' => "أغلق $closed استحقاقا لم يستحق بعد · وبقي $kept مستحقا حتى يسدد");
     }
 
     /** OR-12: ثلاثةُ آفاقٍ زمنية — ثلاثون يومًا · سنةٌ · وما بعدها. */
@@ -482,14 +482,14 @@ class ObligationEngine
     public static function assertContractFields(\mysqli $conn, $co, $contractId)
     {
         $co = (int) $co; $contractId = (int) $contractId;
-        if ($co <= 0 || $contractId <= 0) { return self::fail(422, 'الفحصُ يحتاج الكيانَ والعقد'); }
+        if ($co <= 0 || $contractId <= 0) { return self::fail(422, 'الفحص يحتاج الكيان والعقد'); }
 
         $q = $conn->query("SELECT field_code, title, obligation, home_table, home_column, resolve_state
                              FROM fin_contract_fields
                             WHERE active = 1 AND obligation = 'always' ORDER BY seq");
-        if ($q === false) { return self::fail(500, 'تعذّر قراءةُ مصفوفةِ الحقول: ' . $conn->error); }
+        if ($q === false) { return self::fail(500, 'تعذر قراءة مصفوفة الحقول: ' . $conn->error); }
         $fields = $q->fetch_all(MYSQLI_ASSOC);
-        if (!$fields) { return self::fail(500, 'مصفوفةُ الحقولِ فارغة — شغّل u13_contract_fields_seed'); }
+        if (!$fields) { return self::fail(500, 'مصفوفة الحقول فارغة — شغل u13_contract_fields_seed'); }
 
         /* الأعمدةُ التي تعيش في `contracts` تُقرأ بصفٍّ واحد — والباقي بوجودِ صفٍّ
            مرتبطٍ في جدولِه. */
@@ -501,9 +501,9 @@ class ObligationEngine
         if ($own) {
             $sel = '`' . implode('`,`', array_unique($own)) . '`';
             $r = $conn->query("SELECT $sel FROM contracts WHERE id = $contractId LIMIT 1");
-            if ($r === false) { return self::fail(500, 'تعذّرت قراءةُ العقد: ' . $conn->error); }
+            if ($r === false) { return self::fail(500, 'تعذرت قراءة العقد: ' . $conn->error); }
             $row = $r->fetch_assoc() ?: array();
-            if (!$row) { return self::fail(404, 'عقدٌ غيرُ موجود: ' . $contractId); }
+            if (!$row) { return self::fail(404, 'عقد غير موجود: ' . $contractId); }
         }
 
         $missing = array(); $gaps = array(); $checked = 0;
@@ -521,9 +521,9 @@ class ObligationEngine
         return array('ok' => !$missing, 'code' => $missing ? 409 : 200,
                      'checked' => $checked, 'missing' => $missing, 'gaps' => $gaps,
                      'reason' => $missing
-                        ? 'حقولٌ حاكمةٌ إلزاميةٌ ناقصة: ' . implode(' · ', array_slice($missing, 0, 4))
-                        : "فُحص $checked حقلًا حاكمًا إلزاميًّا ولا نقص"
-                          . ($gaps ? ' · و' . count($gaps) . ' حقلًا إلزاميًّا بلا موضعٍ في القاعدة' : ''));
+                        ? 'حقول حاكمة إلزامية ناقصة: ' . implode(' · ', array_slice($missing, 0, 4))
+                        : "فحص $checked حقلا حاكما إلزاميا ولا نقص"
+                          . ($gaps ? ' · و' . count($gaps) . ' حقلا إلزاميا بلا موضع في القاعدة' : ''));
     }
 
     /* ── مساعدات ─────────────────────────────────────────────────────────── */
@@ -557,9 +557,9 @@ class ObligationEngine
 
     private static function recognitionRuleFor(\mysqli $conn, $kind)
     {
-        $map = array('client' => 'عقدُ عميلٍ بنموذجِ عمل', 'supplier' => 'عقدُ موردِ خدمةٍ أو معدةٍ بالوحدة',
-                     'lease' => 'عقدُ إيجارِ مبنًى أو مرفق', 'employee' => 'عقدُ موظف',
-                     'financing' => 'عقدُ تمويلٍ أو قرض', 'po' => 'أمرُ شراءٍ تشغيليٍّ أو رأسمالي');
+        $map = array('client' => 'عقد عميل بنموذج عمل', 'supplier' => 'عقد مورد خدمة أو معدة بالوحدة',
+                     'lease' => 'عقد إيجار مبنى أو مرفق', 'employee' => 'عقد موظف',
+                     'financing' => 'عقد تمويل أو قرض', 'po' => 'أمر شراء تشغيلي أو رأسمالي');
         $needle = isset($map[$kind]) ? $map[$kind] : $kind;
         $st = $conn->prepare("SELECT standard, trigger_text FROM fin_obl_recognition
                                WHERE contract_kind LIKE CONCAT('%', ?, '%') AND active=1 LIMIT 1");
@@ -595,7 +595,7 @@ class ObligationEngine
     {
         if (strlen($types) !== count($vals)) {
             throw new \LengthException(sprintf(
-                'انزياحُ وسائطٍ في %s — أنواع %d · قيم %d', $label, strlen($types), count($vals)));
+                'انزياح وسائط في %s — أنواع %d · قيم %d', $label, strlen($types), count($vals)));
         }
     }
 

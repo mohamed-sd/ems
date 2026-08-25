@@ -38,10 +38,10 @@ class CommercialBoardService
     const GAP_OWNERS = array(
         'execution' => array('label' => 'فجوةُ التنفيذ', 'owner' => 'التشغيل',
                              'role' => '1', 'question' => 'لماذا نفَّذنا خلافَ ما خُطِّط؟'),
-        'billing'   => array('label' => 'فجوةُ الفوترة', 'owner' => 'المبيعات',
-                             'role' => '12', 'question' => 'لماذا لم يُفوتر ما نُفِّذ؟'),
-        'collection' => array('label' => 'فجوةُ التحصيل', 'owner' => 'المالية',
-                              'role' => '17', 'question' => 'لماذا لم يُحصَّل ما فُوتر؟'),
+        'billing'   => array('label' => 'فجوة الفوترة', 'owner' => 'المبيعات',
+                             'role' => '12', 'question' => 'لماذا لم يفوتر ما نفذ؟'),
+        'collection' => array('label' => 'فجوة التحصيل', 'owner' => 'المالية',
+                              'role' => '17', 'question' => 'لماذا لم يحصل ما فوتر؟'),
     );
 
     /**
@@ -75,8 +75,8 @@ class CommercialBoardService
         }
         // **ولا تُجمع عملتان في رقم** — قاعدةٌ سارية في كل اللوحات
         if (count($curs) > 1) {
-            $o['note'] = '**العقدُ بعملتين أو أكثر (' . implode(' · ', array_keys($curs))
-                       . ') — ولا تُجمع عملتان في رقم**';
+            $o['note'] = '**العقد بعملتين أو أكثر (' . implode(' · ', array_keys($curs))
+                       . ') — ولا تجمع عملتان في رقم**';
             $o['currency'] = implode('/', array_keys($curs));
             $o['credible'] = false;
             return $o;
@@ -97,7 +97,7 @@ class CommercialBoardService
                 $o['billed'] = round((float) $r[0]['billed'], 2);
                 $o['collected'] = round((float) $r[0]['collected'], 2);
             }
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'لا مستخلصَ = صفر'); /* لا مستخلصَ = صفر */ }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'لا مستخلص = صفر'); /* لا مستخلصَ = صفر */ }
 
         // ── الفجواتُ الثلاثُ **بمالكيها** ───────────────────────────────────
         $o['gaps'] = array(
@@ -120,15 +120,15 @@ class CommercialBoardService
         $o['baseline'] = $b ? (string) $b['state'] : null;
 
         $o['ok'] = true;
-        $o['note'] = 'مخطَّطٌ ' . $o['planned'] . ' · منفَّذٌ ' . $o['executed']
-            . ' · مفوتَرٌ ' . $o['billed'] . ' · محصَّلٌ ' . $o['collected']
+        $o['note'] = 'مخطط ' . $o['planned'] . ' · منفذ ' . $o['executed']
+            . ' · مفوتر ' . $o['billed'] . ' · محصل ' . $o['collected']
             . ($o['currency'] !== '' ? (' ' . $o['currency']) : '')
             . ($unlinked > 0
-               ? (' · ⚠ **' . $unlinked . ' وحدةً غيرَ موصولةٍ — والمنفَّذُ ناقصٌ يبدو تامًّا**')
-               : ' · **التغطيةُ كاملة**')
-            . ' · خطُّ الأساس: '
+               ? (' · ⚠ **' . $unlinked . ' وحدة غير موصولة — والمنفذ ناقص يبدو تاما**')
+               : ' · **التغطية كاملة**')
+            . ' · خط الأساس: '
             . ($o['baseline'] !== null
-               ? ContractBaselineService::STATE_AR[$o['baseline']] : '**غيرُ مفتوح**');
+               ? ContractBaselineService::STATE_AR[$o['baseline']] : '**غير مفتوح**');
         return $o;
     }
 
@@ -144,7 +144,7 @@ class CommercialBoardService
                    FROM contracts c
                   WHERE {TENANT_SCOPE} AND COALESCE(c.is_deleted,0)=0" . $w . "
                   ORDER BY c.id DESC LIMIT " . (int) $limit);
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $contracts'); $contracts = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $contracts'); $contracts = array(); }
         foreach ($contracts as $c) {
             $r = self::row($gate, (int) $c['id']);
             $r['second_party'] = (string) $c['second_party'];
@@ -181,9 +181,9 @@ class CommercialBoardService
         }
         $o['ok'] = count($o['pilots']) > 0;
         $o['reason'] = $o['ok']
-            ? '**' . count($o['pilots']) . ' عقدًا** تُعرض أرقامُه الأربعةُ **وكلُّ فجوةٍ بمالكها** '
-              . '— وهو **دليلُ أن خطَّ الأساس صار حيًّا لا وثيقة** (§4)'
-            : '**لا عقدَ تُعرض أرقامُه الأربعة** — والموجةُ لا تُغلق بلوحةٍ فارغة';
+            ? '**' . count($o['pilots']) . ' عقدا** تعرض أرقامه الأربعة **وكل فجوة بمالكها** '
+              . '— وهو **دليل أن خط الأساس صار حيا لا وثيقة** (§4)'
+            : '**لا عقد تعرض أرقامه الأربعة** — والموجة لا تغلق بلوحة فارغة';
         return $o;
     }
 

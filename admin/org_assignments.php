@@ -146,18 +146,18 @@ include '../insidebar.php';
     include('../includes/page_header.php');
 
     ems_screen_about(
-        'التكليف سجل تنظيمي بنطاق ومدة ومصدر قرار ونائب — لا تعديل صلاحية يدويًّا. '
-        . 'انتهاء المدة يُسقط الصلاحية آليًّا، والموقعي له خطّا تبعية (تشغيلي وفني)، '
+        'التكليف سجل تنظيمي بنطاق ومدة ومصدر قرار ونائب — لا تعديل صلاحية يدويا. '
+        . 'انتهاء المدة يسقط الصلاحية آليا، والموقعي له خطا تبعية (تشغيلي وفني)، '
         . 'ومدير حركة واحد نشط لكل موقع.',
         array('أنشئ التكليف بمدة ونطاق إلزاميين',
-              'الموقعي يحتاج الخطين معًا وإلا رُفض 422',
-              'الإنهاء قرار موثَّق يسقط بصلاحيته فورًا — والسجل لا يُمحى'));
+              'الموقعي يحتاج الخطين معا وإلا رفض 422',
+              'الإنهاء قرار موثق يسقط بصلاحيته فورا — والسجل لا يمحى'));
 
     if ($msg !== '') { echo '<div class="alert alert-info">' . htmlspecialchars($msg) . '</div>'; }
 
     /* UXW-01 ⑨: حزمةُ الحالاتِ الدنيا — مخفيةٌ افتراضًا ويُظهرها منطقُ الشاشةِ عند حالِها */
-    echo ems_states_bundle('لا تكليفاتٍ تنظيميةً مسجَّلةً بعدُ',
-        'أنشئ تكليفًا بمدةٍ ونطاقٍ إلزاميَّين من زرِّ «تكليف جديد»');
+    echo ems_states_bundle('لا تكليفات تنظيمية مسجلة بعد',
+        'أنشئ تكليفا بمدة ونطاق إلزاميين من زر «تكليف جديد»');
     ?>
 
     <?php if ($can_edit): ?>
@@ -195,11 +195,11 @@ include '../insidebar.php';
                     <?php foreach ($usersList as $u) { echo '<option value="' . intval($u['id']) . '">' . htmlspecialchars($u['name']) . '</option>'; } ?>
                 </select></div>
             <div class="form-group"><label for="emsf_1975_1a648">الخط التشغيلي (للموقعي *)</label>
-                <select name="line_operational" id="emsf_1975_1a648"><option value="">— اختر تكليفًا —</option>
+                <select name="line_operational" id="emsf_1975_1a648"><option value="">— اختر تكليفا —</option>
                     <?php foreach ($activeAsg as $a) { echo '<option value="' . intval($a['asg_id']) . '">#' . intval($a['asg_id']) . ' ' . htmlspecialchars($a['name_ar'] . ' — ' . ($a['person'] ?: '')) . '</option>'; } ?>
                 </select></div>
             <div class="form-group"><label for="emsf_1976_2e11c">الخط الفني (للموقعي *)</label>
-                <select name="line_functional" id="emsf_1976_2e11c"><option value="">— اختر تكليفًا —</option>
+                <select name="line_functional" id="emsf_1976_2e11c"><option value="">— اختر تكليفا —</option>
                     <?php foreach ($activeAsg as $a) { echo '<option value="' . intval($a['asg_id']) . '">#' . intval($a['asg_id']) . ' ' . htmlspecialchars($a['name_ar'] . ' — ' . ($a['person'] ?: '')) . '</option>'; } ?>
                 </select></div>
         </div>
@@ -210,7 +210,7 @@ include '../insidebar.php';
     <div class="card"><div class="card-body">
         <div class="table-container">
         <table class="alltables display nowrap orgasg-w100">
-            <thead><tr><th>إجراءات</th> <th>#</th><th>الشخص</th><th>نوع التكليف</th><th>الوحدة المكلَّف بها</th><th>النطاق</th>
+            <thead><tr><th>إجراءات</th> <th>#</th><th>الشخص</th><th>نوع التكليف</th><th>الوحدة المكلف بها</th><th>النطاق</th>
                 <th>من تاريخ</th><th>إلى تاريخ</th><th>النائب</th><th>الحالة</th>
                 <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
                 <th class="ems-fn-th" data-fn="1">رقم التكليف</th>
@@ -222,8 +222,8 @@ include '../insidebar.php';
                 <th class="ems-fn-th" data-fn="1">أصدره</th>
                 <th class="ems-fn-th" data-fn="1">مرجع القرار</th>
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                 <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                 <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                 <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
@@ -235,7 +235,7 @@ include '../insidebar.php';
                     <td>
                         <a class="action-btn" href="?audit=<?php echo intval($x['asg_id']); ?>" title="السجل"><i class="fas fa-history"></i></a>
                         <?php if ($can_edit && $x['state'] !== 'ended'): ?>
-                        <form method="post" class="orgasg-inline" onsubmit="return confirm('إنهاء التكليف؟ قرار موثَّق يسقط بالصلاحية فورًا');">
+                        <form method="post" class="orgasg-inline" onsubmit="return confirm('إنهاء التكليف؟ قرار موثق يسقط بالصلاحية فورا');">
                             <input type="hidden" name="org_action" value="end">
                             <input type="hidden" name="asg_id" value="<?php echo intval($x['asg_id']); ?>">
                             <input type="hidden" name="reason" value="إنهاء من الشاشة">

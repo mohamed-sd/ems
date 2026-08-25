@@ -166,7 +166,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['readiness_code'])) {
     // الكود
     $rdl_code_raw = isset($_POST['readiness_code']) ? trim($_POST['readiness_code']) : '';
     if ($rdl_code_raw === '' || !preg_match('/^[A-Za-z0-9_\-]+$/', $rdl_code_raw)) {
-        rdl_redirect_with_msg('كود البند غير صالح. استخدم أحرفًا وأرقامًا و - أو _ فقط ❌');
+        rdl_redirect_with_msg('كود البند غير صالح. استخدم أحرفا وأرقاما و - أو _ فقط ❌');
     }
 
     // ENUM — القوائم البيضاء
@@ -219,7 +219,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['readiness_code'])) {
                 array($rdl_code_raw, $rdl_id));
         } catch (\Throwable $t) { $dup = array(); }
         if (!empty($dup)) {
-            rdl_redirect_with_msg('كود البند موجود مسبقاً داخل شركتك ❌');
+            rdl_redirect_with_msg('كود البند موجود مسبقا داخل شركتك ❌');
         }
 
         try {
@@ -255,7 +255,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['readiness_code'])) {
                 array($rdl_code_raw));
         } catch (\Throwable $t) { $dup = array(); }
         if (!empty($dup)) {
-            rdl_redirect_with_msg('كود البند موجود مسبقاً داخل شركتك ❌');
+            rdl_redirect_with_msg('كود البند موجود مسبقا داخل شركتك ❌');
         }
 
         try {
@@ -402,7 +402,7 @@ $sft_family = 'opportunity'; $sft_active = 'readiness';
 include __DIR__ . '/../includes/sales_family_tabs.php';
 include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا بنودَ جاهزيةٍ مسجَّلةً بعدُ', 'أضف أولَ بندِ جاهزيةٍ بزرِّ «إضافة» في رأسِ الشاشة');
+    echo ems_states_bundle('لا بنود جاهزية مسجلة بعد', 'أضف أول بند جاهزية بزر «إضافة» في رأس الشاشة');
     ?>
 
     <?php if (!empty($_GET['msg'])):
@@ -496,15 +496,15 @@ include('../includes/page_header.php');
                     </div>
                     <div>
                         <label for="required"><i class="fas fa-clipboard"></i> المطلوب (من بنود العقد)</label>
-                        <input type="text" name="required" id="required" maxlength="255" placeholder="مثال: 6 حفّارات جاهزة" />
+                        <input type="text" name="required" id="required" maxlength="255" placeholder="مثال: 6 حفارات جاهزة" />
                     </div>
                     <div>
                         <label for="available"><i class="fas fa-boxes-packing"></i> المتاح (من نظام الإدارة)</label>
-                        <input type="text" name="available" id="available" maxlength="255" placeholder="مثال: 5 حفّارات متاحة" />
+                        <input type="text" name="available" id="available" maxlength="255" placeholder="مثال: 5 حفارات متاحة" />
                     </div>
                     <div class="rdl-col-full">
                         <label for="gap_note"><i class="fas fa-comment-dots"></i> وصف الفجوة وخطة التغطية</label>
-                        <textarea name="gap_note" id="gap_note" rows="2" placeholder="وصف الفجوة وخطة معالجتها إن وُجدت"></textarea>
+                        <textarea name="gap_note" id="gap_note" rows="2" placeholder="وصف الفجوة وخطة معالجتها إن وجدت"></textarea>
                     </div>
                 </div>
                 <div class="pu-form-actions">
@@ -554,10 +554,10 @@ include('../includes/page_header.php');
                             <th>الحالة</th>
                             <th>المرجع</th>
                             <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                             <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                             <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                             <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -678,13 +678,13 @@ include('../includes/page_header.php');
     const statsSection = $('#rdlStatsSection');
 
     /**
-     * إظهارُ حقلِ الكودِ المولَّد وإخفاؤه.
+     * إظهار حقل الكود المولد وإخفاؤه.
      *
      * ⚠️ **لا تستعمل `jQuery.hide()` هنا** — `assets/css/ems-forms.css` يحمل:
      *     :is(.allforms, .ems-form) .form-grid > div { display: block !important }
-     * والغلافُ ابنٌ مباشرٌ لـ`.form-grid`، فـ`!important` من ورقةِ الأنماطِ تهزم
-     * الإخفاءَ السطريَّ **بلا أولوية**: السمةُ تُكتب فعلًا والحقلُ يبقى ظاهرًا، بلا
-     * خطأٍ في وحدةِ التحكم ولا سطرٍ في أيِّ سجل. (نظيرُ شاشتَي العملاءِ والمشاريع.)
+     * والغلاف ابن مباشر ل`.form-grid`، ف`!important` من ورقة الأنماط تهزم
+     * الإخفاء السطري **بلا أولوية**: السمة تكتب فعلا والحقل يبقى ظاهرا، بلا
+     * خطأ في وحدة التحكم ولا سطر في أي سجل. (نظير شاشتي العملاء والمشاريع.)
      */
     function setGeneratedCodeShown(shown) {
         var el = generatedCodeWrapper[0];
@@ -695,9 +695,9 @@ include('../includes/page_header.php');
     function setAddMode() {
         formTitle.text('إضافة بند جاهزية'); submitBtnText.text('حفظ البند');
         setGeneratedCodeShown(true);
-        // الكودُ المولَّدُ يعود إلى خانتِه كلَّما دخلنا وضعَ الإضافة — ومصدرُه حقلُ
-        // العرضِ نفسُه لا نسخةٌ ثانيةٌ منه (مصدرُ حقيقةٍ واحد). و`reset()` يكفي
-        // للإلغاء، لكنَّ الانتقالَ من «تعديل» إلى «إضافة» قد يقع بلا reset.
+        // الكود المولد يعود إلى خانته كلما دخلنا وضع الإضافة — ومصدره حقل
+        // العرض نفسه لا نسخة ثانية منه (مصدر حقيقة واحد). و`reset()` يكفي
+        // للإلغاء، لكن الانتقال من «تعديل» إلى «إضافة» قد يقع بلا reset.
         var genCode = $('#generated_rdl_code').val();
         if (genCode) { $('#readiness_code').val(genCode); }
     }
@@ -748,7 +748,7 @@ include('../includes/page_header.php');
         }
     });
 
-    // اقتراح المرجع تلقائيًّا من البند
+    // اقتراح المرجع تلقائيا من البند
     const RDL_SRC = <?php echo json_encode($RDL_SOURCE_HINT, JSON_UNESCAPED_UNICODE); ?>;
     $('#name').on('change', function () {
         const src = $('#source_ref');
@@ -783,7 +783,7 @@ include('../includes/page_header.php');
         });
     });
 
-    // ── عرض التفاصيل عبر EmsDetailsModal الموحّد ──
+    // ── عرض التفاصيل عبر EmsDetailsModal الموحد ──
     $(document).on('click', '.viewRdlBtn', function () {
         const d = $(this).data();
         const fields = [

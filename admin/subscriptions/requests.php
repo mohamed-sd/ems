@@ -146,7 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['action'])) {
                 mysqli_query($conn, 'ROLLBACK');
                 if (isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
                     header('Content-Type: application/json; charset=utf-8');
-                    echo json_encode(['success' => false, 'message' => 'الطلب غير موجود أو تمت مراجعته مسبقاً']);
+                    echo json_encode(['success' => false, 'message' => 'الطلب غير موجود أو تمت مراجعته مسبقا']);
                     exit;
                 }
                 header('Location: ' . super_admin_url('subscriptions/requests'));
@@ -711,7 +711,7 @@ function confirmReview() {
     var note = document.getElementById('reviewNote').value;
     var btn  = document.getElementById('reviewConfirmBtn');
     btn.disabled = true;
-    btn.textContent = 'جارٍ المعالجة...';
+    btn.textContent = 'جار المعالجة...';
 
     var fd = new FormData();
     fd.append('action', _reviewAction);

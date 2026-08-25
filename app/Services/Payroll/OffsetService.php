@@ -49,41 +49,41 @@ class OffsetService
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'advance_id' => null);
 
         $person = isset($args['person_id']) ? (int) $args['person_id'] : 0;
-        if ($person <= 0) { $out['code'] = 422; $out['reason'] = 'المستفيدُ إلزامي'; return $out; }
+        if ($person <= 0) { $out['code'] = 422; $out['reason'] = 'المستفيد إلزامي'; return $out; }
 
         $type = isset($args['advance_type']) ? trim((string) $args['advance_type']) : 'cash';
         if (!in_array($type, self::ADVANCE_TYPES, true)) {
-            $out['code'] = 422; $out['reason'] = 'نوعُ صرفٍ خارج الثلاثة (نقديةٌ · نيابةً · محمَّل)'; return $out;
+            $out['code'] = 422; $out['reason'] = 'نوع صرف خارج الثلاثة (نقدية · نيابة · محمل)'; return $out;
         }
         $amount = isset($args['amount']) ? round((float) $args['amount'], 2) : 0.0;
-        if ($amount <= 0) { $out['code'] = 422; $out['reason'] = 'مبلغُ السلفة موجب'; return $out; }
+        if ($amount <= 0) { $out['code'] = 422; $out['reason'] = 'مبلغ السلفة موجب'; return $out; }
 
         // ── «لا خصمَ بلا مستند» يبدأ من هنا: لا سلفةَ بلا سند ──────────────
         $doc = isset($args['doc_ref']) ? trim((string) $args['doc_ref']) : '';
         if ($doc === '') {
             $out['code'] = 422;
-            $out['reason'] = 'مستندُ الصرف إلزامي — «كلٌّ بمستنده» (§4)، ومالٌ يخرج بلا سندٍ لا يُخصم لاحقًا';
+            $out['reason'] = 'مستند الصرف إلزامي — «كل بمستنده» (§4)، ومال يخرج بلا سند لا يخصم لاحقا';
             return $out;
         }
         $issued = isset($args['issued_date']) ? trim((string) $args['issued_date']) : '';
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $issued)) {
-            $out['code'] = 422; $out['reason'] = 'تاريخُ الصرف إلزامي'; return $out;
+            $out['code'] = 422; $out['reason'] = 'تاريخ الصرف إلزامي'; return $out;
         }
         $count = isset($args['installments_count']) ? (int) $args['installments_count'] : 1;
-        if ($count < 1) { $out['code'] = 422; $out['reason'] = 'عددُ الأقساط واحدٌ فأكثر'; return $out; }
+        if ($count < 1) { $out['code'] = 422; $out['reason'] = 'عدد الأقساط واحد فأكثر'; return $out; }
 
         // جدولُ الاسترداد يُقترح آليًّا (§7-بوابة السلفيات) ويُعدَّل بالمرسل
         $inst = (isset($args['installment_amount']) && trim((string) $args['installment_amount']) !== '')
                 ? round((float) $args['installment_amount'], 2)
                 : round($amount / $count, 2);
-        if ($inst <= 0) { $out['code'] = 422; $out['reason'] = 'قسطُ الاسترداد موجب'; return $out; }
-        if ($inst > $amount) { $out['code'] = 422; $out['reason'] = 'القسطُ يتجاوز أصلَ السلفة'; return $out; }
+        if ($inst <= 0) { $out['code'] = 422; $out['reason'] = 'قسط الاسترداد موجب'; return $out; }
+        if ($inst > $amount) { $out['code'] = 422; $out['reason'] = 'القسط يتجاوز أصل السلفة'; return $out; }
 
         // المستفيدُ من النطاق
         $emp = null;
         try { $emp = $gate->selectOne('employees', array('columns' => array('id'), 'where' => array('id' => $person))); }
-        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $emp'); $emp = null; }
-        if (!$emp) { $out['code'] = 422; $out['reason'] = 'المستفيدُ غيرُ موجودٍ في نطاقك'; return $out; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $emp'); $emp = null; }
+        if (!$emp) { $out['code'] = 422; $out['reason'] = 'المستفيد غير موجود في نطاقك'; return $out; }
 
         try {
             // ⚠ `balance` عمودٌ مولَّد — لا يُكتب (كتابتُه ترفض الصفَّ كلَّه)
@@ -103,7 +103,7 @@ class OffsetService
                 'created_by' => (int) $actor ?: null,
             ));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الفتح: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الفتح: ' . $t->getMessage(); return $out;
         }
 
         self::audit($conn, $companyId, $actor, 'employee_advances', 'open', (int) $out['advance_id'],
@@ -117,19 +117,19 @@ class OffsetService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '');
         $a = self::advanceOf($gate, $advanceId);
-        if (!$a) { $out['code'] = 404; $out['reason'] = 'السلفةُ غيرُ موجودةٍ في نطاقك'; return $out; }
+        if (!$a) { $out['code'] = 404; $out['reason'] = 'السلفة غير موجودة في نطاقك'; return $out; }
         if ((string) $a['state'] !== 'draft') {
-            $out['code'] = 422; $out['reason'] = 'السلفةُ «' . $a['state'] . '» — الاعتمادُ للمسودة'; return $out;
+            $out['code'] = 422; $out['reason'] = 'السلفة «' . $a['state'] . '» — الاعتماد للمسودة'; return $out;
         }
         if ((int) $a['created_by'] > 0 && (int) $a['created_by'] === (int) $actor) {
-            $out['code'] = 403; $out['reason'] = 'من أنشأ لا يعتمد — الفصلُ بنيويٌّ لا اختياري'; return $out;
+            $out['code'] = 403; $out['reason'] = 'من أنشأ لا يعتمد — الفصل بنيوي لا اختياري'; return $out;
         }
         try {
             $gate->update('employee_advances', array(
                 'state' => 'active', 'approved_by' => (int) $actor ?: null,
                 'approved_at' => date('Y-m-d H:i:s')), array('id' => (int) $advanceId));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الاعتماد: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الاعتماد: ' . $t->getMessage(); return $out;
         }
         self::audit($conn, $companyId, $actor, 'employee_advances', 'approve', (int) $advanceId,
             array('state' => 'draft'), array('state' => 'active'));
@@ -153,10 +153,10 @@ class OffsetService
                      'deducted' => 0, 'rescheduled' => 0, 'total' => 0.0, 'protection' => null);
         $runId = (int) $runId;
         $run = PayrollRunService::runOf($gate, $runId);
-        if (!$run) { $out['code'] = 404; $out['reason'] = 'الدورةُ غير موجودةٍ في نطاقك'; return $out; }
+        if (!$run) { $out['code'] = 404; $out['reason'] = 'الدورة غير موجودة في نطاقك'; return $out; }
         if (!in_array((string) $run['state'], array('Calculated', 'Blocked'), true)) {
             $out['code'] = 423;
-            $out['reason'] = 'المقاصّةُ تعمل بعد الاحتساب — الدورةُ «' . $run['state'] . '»';
+            $out['reason'] = 'المقاصة تعمل بعد الاحتساب — الدورة «' . $run['state'] . '»';
             return $out;
         }
         $pTo = (string) $run['period_to'];
@@ -176,10 +176,10 @@ class OffsetService
                   WHERE {TENANT_SCOPE} AND l.run_id = ?
                   GROUP BY l.person_id", array($runId));
             foreach ($rows as $r) { $totals[(int) $r['person_id']] = (float) $r['gross']; }
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $totals'); $totals = array(); }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $totals'); $totals = array(); }
         if (!$totals) {
             $out['ok'] = true; $out['code'] = 200;
-            $out['reason'] = 'لا أسطرَ محتسَبةً — لا مقاصّة';
+            $out['reason'] = 'لا أسطر محتسبة — لا مقاصة';
             return $out;
         }
 
@@ -207,8 +207,8 @@ class OffsetService
                 if ($take <= 0) {
                     // لا مساحةَ في هذه الفترة — يُرحَّل كاملًا بسببه المكتوب
                     self::writeDeduction($gate, $runId, $personId, $adv, 0.0, $requested, 1,
-                        'حدُّ الحماية (' . $protection . '٪ من ' . $gross . ') لا يسع قسطًا هذه الفترة — '
-                        . 'يُرحَّل كاملًا والرصيدُ باقٍ ' . $balance);
+                        'حد الحماية (' . $protection . '٪ من ' . $gross . ') لا يسع قسطا هذه الفترة — '
+                        . 'يرحل كاملا والرصيد باق ' . $balance);
                     $rescheduled++;
                     continue;
                 }
@@ -216,9 +216,9 @@ class OffsetService
                 $okWrite = self::writeDeduction($gate, $runId, $personId, $adv, $take, $requested,
                     $wasCut ? 1 : 0,
                     $wasCut
-                        ? ('قُصّ بحدِّ الحماية: المستحقُّ ' . $requested . ' والمسموحُ ' . $take
-                           . ' — الباقي ' . round($requested - $take, 2) . ' يُرحَّل للفترة التالية')
-                        : ('قسطُ سلفةٍ بمستندها ' . $adv['doc_ref']));
+                        ? ('قص بحد الحماية: المستحق ' . $requested . ' والمسموح ' . $take
+                           . ' — الباقي ' . round($requested - $take, 2) . ' يرحل للفترة التالية')
+                        : ('قسط سلفة بمستندها ' . $adv['doc_ref']));
                 if (!$okWrite) { continue; }
 
                 self::applyRecovery($gate, (int) $adv['id'], $take);
@@ -238,10 +238,10 @@ class OffsetService
         $out['ok'] = true; $out['code'] = 200;
         $out['deducted'] = $deducted; $out['rescheduled'] = $rescheduled;
         $out['total'] = round($total, 2);
-        $out['reason'] = 'المقاصّة: ' . $deducted . ' خصمًا بمجموع ' . round($total, 2)
-                       . ' · ' . $rescheduled . ' مُرحَّلًا بحدِّ الحماية'
-                       . ($protection === null ? ' · **لا حدَّ حمايةٍ مقرَّرًا** (يُعلَن ولا يُفترض)'
-                                               : (' · الحدُّ ' . $protection . '٪'));
+        $out['reason'] = 'المقاصة: ' . $deducted . ' خصما بمجموع ' . round($total, 2)
+                       . ' · ' . $rescheduled . ' مرحلا بحد الحماية'
+                       . ($protection === null ? ' · **لا حد حماية مقررا** (يعلن ولا يفترض)'
+                                               : (' · الحد ' . $protection . '٪'));
         return $out;
     }
 
@@ -255,14 +255,14 @@ class OffsetService
                   WHERE {TENANT_SCOPE} AND l.run_id = ? AND l.person_id = ?",
                 array((int) $runId, (int) $personId));
             $gross = $r ? (float) $r[0]['g'] : 0.0;
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل بقيمةِ 0.0 — $gross'); $gross = 0.0; }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل بقيمة 0.0 — $gross'); $gross = 0.0; }
         try {
             $r = $gate->scopedQuery(array('scope' => array('d' => 'payroll_deductions')),
                 "SELECT ROUND(SUM(d.amount),2) s FROM payroll_deductions d
                   WHERE {TENANT_SCOPE} AND d.run_id = ? AND d.person_id = ?",
                 array((int) $runId, (int) $personId));
             $ded = $r && $r[0]['s'] !== null ? (float) $r[0]['s'] : 0.0;
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل بقيمةِ 0.0 — $ded'); $ded = 0.0; }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل بقيمة 0.0 — $ded'); $ded = 0.0; }
         return round($gross - $ded, 2);
     }
 
@@ -277,7 +277,7 @@ class OffsetService
             $rows = $gate->scopedQuery(array('scope' => array('s' => 'payroll_settings')),
                 "SELECT s.protection_percent p FROM payroll_settings s WHERE {TENANT_SCOPE} LIMIT 1");
             if ($rows && $rows[0]['p'] !== null) { return round((float) $rows[0]['p'], 2); }
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'لا حدَّ مقروءًا'); /* لا حدَّ مقروءًا */ }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'لا حد مقروءا'); /* لا حدَّ مقروءًا */ }
         return null;
     }
 
@@ -373,7 +373,7 @@ class OffsetService
                 $gate->update('employee_advances',
                     array('recovered' => $rec, 'state' => $rec >= (float) $a['amount'] ? 'settled' : 'active'),
                     array('id' => (int) $a['id']));
-            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'أفضلُ جهد'); /* أفضلُ جهد */ }
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'أفضل جهد'); /* أفضلُ جهد */ }
         }
         try { $conn->query("DELETE FROM payroll_deductions WHERE run_id = " . (int) $runId); }
         catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'لا يوقف'); /* لا يوقف */ }

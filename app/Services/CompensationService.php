@@ -35,7 +35,7 @@ class CompensationService
         $eventId = intval($eventId);
         $reason = trim((string) $reason);
         if ($reason === '') {
-            throw new \InvalidArgumentException('CompensationService: لا عكسَ بلا سببٍ مكتوب');
+            throw new \InvalidArgumentException('CompensationService: لا عكس بلا سبب مكتوب');
         }
 
         $stmt = $conn->prepare('SELECT * FROM `fin_financial_events` WHERE id = ? LIMIT 1');

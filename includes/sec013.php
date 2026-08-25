@@ -61,7 +61,7 @@ if (!function_exists('ems_sec013_allowed')) {
     {
         $out = array('allowed' => false, 'reason' => '', 'cap' => null, 'doc_type' => null);
         $vers = ems_sec013_role_versions($conn, $roleId);
-        if (!$vers) { $out['reason'] = 'لا قوالبَ منشورةً لتركيبة الدور'; return $out; }
+        if (!$vers) { $out['reason'] = 'لا قوالب منشورة لتركيبة الدور'; return $out; }
         $in = implode(',', $vers);
         $st = $conn->prepare(
             "SELECT d.effect, d.scope_code, d.amount_cap, d.doc_type, s.narrowness
@@ -83,7 +83,7 @@ if (!function_exists('ems_sec013_allowed')) {
             // بند deny يغلب فورًا
             if ($row['effect'] === 'deny') {
                 $st->close();
-                $out['reason'] = 'بند منعٍ صريح';
+                $out['reason'] = 'بند منع صريح';
                 return $out;
             }
             // بند grant يجيز إن كان نطاقه أوسع من نطاق الطلب أو مساويًا له
@@ -96,7 +96,7 @@ if (!function_exists('ems_sec013_allowed')) {
         }
         $st->close();
         $out['allowed'] = $granted;
-        $out['reason'] = $granted ? 'بند منحٍ نافذ بنطاقه' : 'لا بندَ يجيز هذا الفعل بهذا النطاق (fail-closed)';
+        $out['reason'] = $granted ? 'بند منح نافذ بنطاقه' : 'لا بند يجيز هذا الفعل بهذا النطاق (fail-closed)';
         return $out;
     }
 }

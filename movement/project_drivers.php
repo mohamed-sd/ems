@@ -525,7 +525,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                               )
                             LIMIT 1", array($employee_id, $selected_project_id));
                         if (!empty($active_check)) {
-                            throw new \Exception('السائق يعمل حالياً على آلية أخرى داخل المشروع');
+                            throw new \Exception('السائق يعمل حاليا على آلية أخرى داخل المشروع');
                         }
 
                         $existing_shift_type = isset($rel_row['shift_type']) ? strval($rel_row['shift_type']) : 'B';
@@ -664,7 +664,7 @@ if (!function_exists('get_shift_type_label')) {
     }
 }
 
-$page_title = "توزيع المشغّلين";
+$page_title = "توزيع المشغلين";
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
 require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(null);
@@ -801,7 +801,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include(__DIR__ . '/../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا سائقين مسنَدين لآلياتِ هذا المشروعِ بعدُ', 'أضفْ أولَ تشغيلِ سائقٍ بزرِّ «إضافة تشغيل سائق» في رأسِ الشاشة');
+    echo ems_states_bundle('لا سائقين مسندين لآليات هذا المشروع بعد', 'أضف أول تشغيل سائق بزر «إضافة تشغيل سائق» في رأس الشاشة');
     ?>
 
     <div class="ems-content">
@@ -870,7 +870,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <div class="driver-form-check-row">
                                 <input type="checkbox" id="auto_replace" name="auto_replace" value="1" checked>
                                 <label for="auto_replace" class="driver-form-check-label">إيقاف أي تشغيل نشط لنفس السائق
-                                    داخل المشروع تلقائيًا</label>
+                                    داخل المشروع تلقائيا</label>
                             </div>
 
                             <div class="driver-form-actions">
@@ -897,8 +897,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <th>عدد السائقين</th>
                                 <th>السائقون</th>
                                                 <!-- U10-B12: النواة الحاكمة (الخلايا يحشوها ui-unification.js) -->
-                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ السجل وبأي صفة">المُنشئ — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ السجل وبأي صفة">المنشئ — الاسم والصفة</th>
                     <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء">تاريخ الإنشاء</th>
                     <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="السجل الذي تولد عنه">المرجع الأب</th>
 </tr>
@@ -978,7 +978,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <div class="row g-3 mb-3">
                                 <div class="col-md-4">
                                     <label class="form-label">تاريخ التطبيق</label>
-                                    <input type="date" class="form-control" name="effective_date" aria-label="تاريخُ تطبيقِ تغييرِ السائقين" required value="<?php echo date('Y-m-d'); ?>">
+                                    <input type="date" class="form-control" name="effective_date" aria-label="تاريخ تطبيق تغيير السائقين" required value="<?php echo date('Y-m-d'); ?>">
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label" for="emsf_746_ab2a1">وردية السائقين المضافين</label>
@@ -1015,12 +1015,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             </div>
 
                             <h6 class="mb-2">إضافة سائقين جدد لنفس الآلية</h6>
-                            <select name="add_driver_ids[]" class="form-control" aria-label="سائقون جددٌ يُضافون لهذه الآلية" multiple size="8">
+                            <select name="add_driver_ids[]" class="form-control" aria-label="سائقون جدد يضافون لهذه الآلية" multiple size="8">
                                 <?php foreach ($all_project_drivers as $drv): ?>
                                     <option value="<?php echo intval($drv['id']); ?>"><?php echo htmlspecialchars($drv['name'] . ' - ' . $drv['phone'], ENT_QUOTES, 'UTF-8'); ?></option>
                                 <?php endforeach; ?>
                             </select>
-                            <small class="text-muted">يمكن اختيار أكثر من سائق. سيتم تجاهل السائقين غير المتاحين تلقائيًا.</small>
+                            <small class="text-muted">يمكن اختيار أكثر من سائق. سيتم تجاهل السائقين غير المتاحين تلقائيا.</small>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
@@ -1100,17 +1100,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     row += '<td><a href="../Employees/employee_profile.php?id=' + driverId + '" target="_blank" rel="noopener">' + $('<div>').text(driverName).html() + '</a></td>';
                     row += '<td>' + $('<div>').text(driverPhone).html() + '</td>';
                     row += '<td>' + shiftLabel + '</td>';
-                    row += '<td><input type="date" class="form-control form-control-sm" aria-label="تاريخُ بدايةِ تشغيلِ السائق" name="existing_start_date[' + relationId + ']" value="' + startDate + '"></td>';
-                    row += '<td><input type="date" class="form-control form-control-sm" aria-label="تاريخُ نهايةِ تشغيلِ السائق" name="existing_end_date[' + relationId + ']" value="' + endDate + '"></td>';
+                    row += '<td><input type="date" class="form-control form-control-sm" aria-label="تاريخ بداية تشغيل السائق" name="existing_start_date[' + relationId + ']" value="' + startDate + '"></td>';
+                    row += '<td><input type="date" class="form-control form-control-sm" aria-label="تاريخ نهاية تشغيل السائق" name="existing_end_date[' + relationId + ']" value="' + endDate + '"></td>';
                     row += '<td>';
-                    row += '<select class="form-control form-control-sm existing-action" aria-label="الإجراءُ على تشغيلِ السائق: إبقاءٌ أو حذفٌ أو نقل" name="existing_action[' + relationId + ']" data-relation-id="' + relationId + '">';
+                    row += '<select class="form-control form-control-sm existing-action" aria-label="الإجراء على تشغيل السائق: إبقاء أو حذف أو نقل" name="existing_action[' + relationId + ']" data-relation-id="' + relationId + '">';
                     row += '<option value="keep" selected>إبقاء</option>';
                     row += '<option value="remove">حذف من الآلية</option>';
                     row += '<option value="move">نقل إلى آلية أخرى</option>';
                     row += '</select>';
                     row += '</td>';
                     row += '<td>';
-                    row += '<select class="form-control form-control-sm move-target" aria-label="الآليةُ التي يُنقل إليها السائق" name="move_to_equipment[' + relationId + ']" disabled>' + moveOptions + '</select>';
+                    row += '<select class="form-control form-control-sm move-target" aria-label="الآلية التي ينقل إليها السائق" name="move_to_equipment[' + relationId + ']" disabled>' + moveOptions + '</select>';
                     row += '</td>';
                     row += '</tr>';
 

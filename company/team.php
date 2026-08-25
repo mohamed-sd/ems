@@ -172,7 +172,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif (!validate_length($password, 8, 255)) {
             $error = 'كلمة المرور يجب أن تكون 8 أحرف على الأقل.';
         } elseif ($roleId <= 0 || !isset($roleMap[strval($roleId)])) {
-            $error = 'اختر دوراً صحيحاً من الأدوار المسجلة.';
+            $error = 'اختر دورا صحيحا من الأدوار المسجلة.';
         } else {
             $existsStmt = mysqli_prepare($conn, 'SELECT id FROM users WHERE email = ? LIMIT 1');
             if (!$existsStmt) {

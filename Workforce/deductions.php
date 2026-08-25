@@ -69,7 +69,7 @@ $COLS   = array (
   14 => 'اعتماد الإدارة',
   15 => 'الاعتماد المالي',
   16 => 'اعتماد الإدارة العامة',
-  17 => 'المسيّر',
+  17 => 'المسير',
   18 => 'الحالة',
   19 => 'الكيان',
   20 => 'تاريخ الإنشاء',
@@ -77,7 +77,7 @@ $COLS   = array (
   22 => 'مرجع التفويض',
   23 => 'مفتاح منع التكرار',
   24 => 'درجة الأثر',
-  25 => 'معكوس بـ',
+  25 => 'معكوس ب',
   26 => 'عكس عن',
   27 => 'مركز التكلفة',
   28 => 'سعر الصرف ومصدره',
@@ -101,7 +101,7 @@ $FIELDS = array (
   14 => 'اعتماد الإدارة',
   15 => 'الاعتماد المالي',
   16 => 'اعتماد الإدارة العامة',
-  17 => 'المسيّر',
+  17 => 'المسير',
   18 => 'الحالة',
   19 => 'تاريخ الاعتماد',
   20 => 'مرجع التفويض',
@@ -124,7 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     $ok = cmp03_store_insert($conn, $company_id, $CANONICAL, $payload, $status, $uid, $creator);
     /* INJ-0219: الطبقةُ تحطُّ الحالةَ النهائيةَ وتُعلن السبب — يُنقل نصًّا لا يُبتلع */
     $notice = cmp03_store_notice();
-    inj0219_flash($ok, $ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌', $notice);
+    inj0219_flash($ok, $ok ? 'حفظ الصف ✅' : 'تعذر الحفظ ❌', $notice);
     exit();
 }
 
@@ -136,13 +136,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     $row = $rowId > 0 ? cmp03_store_row($conn, $CANONICAL, $company_id, $rowId) : null;
 
     if (!$row) {
-        $msg = 'صفٌّ غيرُ موجودٍ في كيانك (404)';
+        $msg = 'صف غير موجود في كيانك (404)';
     } elseif (cmp03_status_is_terminal($row['status'])) {
-        $msg = 'الصفُّ معتمدٌ سلفًا — لا سلّمَ لما تمَّ (409)';
+        $msg = 'الصف معتمد سلفا — لا سلم لما تم (409)';
     } elseif ($proposal <= 0) {
         /* «لا خصمَ بلا مستند» (M-11): المقترحُ هو مستندُ هذا القرار، فلا يُطلب
            اعتمادُ خصمٍ لا يشير إلى ما تولَّد عنه. */
-        $msg = 'مقترحُ الخصمِ إلزاميٌّ — لا اعتمادَ لخصمٍ بلا مقترحه (422)';
+        $msg = 'مقترح الخصم إلزامي — لا اعتماد لخصم بلا مقترحه (422)';
     } else {
         /* المقترحُ من كيانِ المستخدمِ نفسِه — عزلُ الشركاتِ لا يُخترق بمعرّفٍ مُرسَل */
         $st = $conn->prepare('SELECT ded_id, state, proposed_amount FROM deduction_proposals
@@ -152,7 +152,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
         $ded = $st->get_result()->fetch_assoc();
         $st->close();
         if (!$ded) {
-            $msg = 'مقترحٌ غيرُ موجودٍ في كيانك (404)';
+            $msg = 'مقترح غير موجود في كيانك (404)';
         } else {
             /* الحمولةُ: ما سيكتبه **منفّذُ السلّمِ** عند الاكتمال لا الشاشة.
                والرموزُ يملؤها المحرّكُ لحظتَها (رقمُ الطلبِ · المعتمِدُ الأخيرُ ·
@@ -194,12 +194,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     $msg = '';
     $row = $rowId > 0 ? cmp03_store_row($conn, $CANONICAL, $company_id, $rowId) : null;
     if (!$row || $reqId <= 0) {
-        $msg = '❌ صفٌّ أو طلبٌ غيرُ موجودٍ في كيانك (404)';
+        $msg = '❌ صف أو طلب غير موجود في كيانك (404)';
     } else {
         /* «من أنشأ لا يعتمد» بنيويًّا في الخادم (UI-01 §8) — والمنعُ 403 مسجَّلٌ.
            والحارسُ يقرأ المنشئَ من الصفِّ نفسِه فلا يُمرَّر خطأً. */
         $deny = ems_assert_not_self_approval($conn, 'scr_deductions', 'id', $rowId,
-            'قرارُ خصمٍ #' . $rowId . ' (' . (string) ($row['no_decision'] ?? '') . ')', $company_id);
+            'قرار خصم #' . $rowId . ' (' . (string) ($row['no_decision'] ?? '') . ')', $company_id);
         if ($deny !== null) {
             $msg = '❌ ' . $deny['reason'];
         } else {
@@ -302,7 +302,7 @@ function inj0219_signer($chain, $stepOrder) {
 function cmp03_cell($col, $row, $entityName, $spine = null, $chain = null) {
     $n = cmp03_screen_norm($col);
     if ($n === cmp03_screen_norm('الكيان')) { return $entityName; }
-    if ($n === cmp03_screen_norm('المُنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المُنشئة')) {
+    if ($n === cmp03_screen_norm('المنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المنشئة')) {
         return $row['created_by_name'] ?: '—';
     }
     if ($n === cmp03_screen_norm('تاريخ الإنشاء')) { return $row['created_at']; }
@@ -321,14 +321,14 @@ function cmp03_cell($col, $row, $entityName, $spine = null, $chain = null) {
     if ($n === cmp03_screen_norm('اعتماد الإدارة'))        { return inj0219_signer($chain, 2); }
     if ($n === cmp03_screen_norm('الاعتماد المالي'))       { return inj0219_signer($chain, 3); }
     if ($n === cmp03_screen_norm('اعتماد الإدارة العامة')) {
-        return ($chain && $chain['status'] === 'approved') ? 'سلّمٌ مكتملٌ #' . $chain['id'] : '—';
+        return ($chain && $chain['status'] === 'approved') ? 'سلم مكتمل #' . $chain['id'] : '—';
     }
     if ($n === cmp03_screen_norm('مرجع التفويض')) {
         return ($spine && $spine['approval_request_ref'])
-            ? ('طلبُ سلّمٍ #' . (int) $spine['approval_request_ref']) : '—';
+            ? ('طلب سلم #' . (int) $spine['approval_request_ref']) : '—';
     }
     if ($n === cmp03_screen_norm('المستند المؤيد')) {
-        if ($spine && $spine['proposal_ref']) { return 'مقترحُ خصمٍ #' . (int) $spine['proposal_ref']; }
+        if ($spine && $spine['proposal_ref']) { return 'مقترح خصم #' . (int) $spine['proposal_ref']; }
         return (isset($row['payload'][$col]) && $row['payload'][$col] !== '') ? $row['payload'][$col] : '—';
     }
     if ($n === cmp03_screen_norm('تاريخ الاعتماد')) {
@@ -357,7 +357,7 @@ function cmp03_screen_norm($s) {
     $s = str_replace(array('أ','إ','آ'), 'ا', $s);
     $s = str_replace('ة', 'ه', $s);
     $s = str_replace('ى', 'ي', $s);
-    return preg_replace('/[ًٌٍَُِّْ]/u', '', $s);
+    return preg_replace('/[]/u', '', $s);
 }
 
 $page_title = 'إيكوبيشن | الخصومات والجزاءات';
@@ -381,7 +381,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
-    echo ems_states_bundle('لا قراراتِ خصوماتٍ أو جزاءاتٍ مسجَّلةً بعدُ', 'أضف أولَ قرارٍ بزرِّ «إضافة» في رأسِ الشاشة');
+    echo ems_states_bundle('لا قرارات خصومات أو جزاءات مسجلة بعد', 'أضف أول قرار بزر «إضافة» في رأس الشاشة');
     ?>
 <?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('operator', 'الخصومات'); ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
@@ -428,7 +428,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="f15" maxlength="190" id="emsf_1665_64451"></div>
                 <div class="form-group"><label for="emsf_1666_15b60">اعتماد الإدارة العامة</label>
                     <input type="text" name="f16" maxlength="190" id="emsf_1666_15b60"></div>
-                <div class="form-group"><label for="emsf_1667_ab63c">المسيّر</label>
+                <div class="form-group"><label for="emsf_1667_ab63c">المسير</label>
                     <input type="text" name="f17" maxlength="190" id="emsf_1667_ab63c"></div>
                 <div class="form-group"><label for="emsf_1668_33208">الحالة</label>
                     <?php /* INJ-0219: «معتمد» مرفوعةٌ من منتقي الإنشاء — لا تُنال بمنتقٍ
@@ -436,7 +436,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                               أيَّ حالةٍ نهائيةٍ مُرسَلةٍ يدويًّا، فالمنعُ في الخادمِ
                               والرفعُ من القائمةِ إعلانٌ له لا اكتفاءٌ به. */ ?>
                     <select name="f18" id="emsf_1668_33208" aria-describedby="inj0219_status_hint"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select>
-                    <small id="inj0219_status_hint" class="text-muted">«معتمد» لا تُختار — تُكتسب بسلّمِ الموافقاتِ بيدين مختلفتين.</small></div>
+                    <small id="inj0219_status_hint" class="text-muted">«معتمد» لا تختار — تكتسب بسلم الموافقات بيدين مختلفتين.</small></div>
                 <div class="form-group"><label for="emsf_1669_842f5">تاريخ الاعتماد</label>
                     <input type="date" name="f19" id="emsf_1669_842f5"></div>
                 <div class="form-group"><label for="emsf_1670_a4f09">مرجع التفويض</label>
@@ -478,15 +478,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th>اعتماد الإدارة</th>
             <th>الاعتماد المالي</th>
             <th>اعتماد الإدارة العامة</th>
-            <th>المسيّر</th>
+            <th>المسير</th>
             <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
             <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
             <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-            <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+            <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
             <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-            <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
-            <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+            <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
+            <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
             <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
             <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
             <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
@@ -494,7 +494,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="30" class="text-center text-muted">لا بياناتَ بعدُ — أضف أول صفٍّ بزر «إضافة»</td></tr>
+                <tr><td colspan="30" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): $rid = (int) $r['id'];
                     $sp = isset($SPINE[$rid]) ? $SPINE[$rid] : null;
                     $ch = isset($CHAIN[$rid]) ? $CHAIN[$rid] : null; ?>
@@ -516,8 +516,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
        ◆ ولا يُخفى زرٌّ اكتفاءً بالإخفاء: الخادمُ هو من يفصل (الحارسُ + قاعدةُ
          «لا يدَ تمشي خطوتين» + قيدُ القاعدة) — والإخفاءُ زينةٌ فوق منعٍ قائم. */ ?>
     <div class="card ems-doc-cycle"><div class="card-header">
-        <h5><i class="fa fa-list-check"></i> سلّمُ اعتمادِ قراراتِ الخصم
-            <small class="text-muted ded-hint-thin">— ثلاثُ خطواتٍ بثلاثِ أيدٍ: مراجعةُ الموارد ← اعتمادُ الإدارة ← الاعتمادُ المالي</small></h5>
+        <h5><i class="fa fa-list-check"></i> سلم اعتماد قرارات الخصم
+            <small class="text-muted ded-hint-thin">— ثلاث خطوات بثلاث أيد: مراجعة الموارد ← اعتماد الإدارة ← الاعتماد المالي</small></h5>
     </div><div class="card-body">
         <?php
         $pending = array();
@@ -527,10 +527,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             $pending[] = $r;
         }
         if (!$pending): ?>
-            <p class="text-muted">لا قرارَ خصمٍ ينتظر سلّمًا — كلُّ ما في السجلِّ إما معتمدٌ بسندِه أو ملغى.</p>
+            <p class="text-muted">لا قرار خصم ينتظر سلما — كل ما في السجل إما معتمد بسنده أو ملغى.</p>
         <?php else: ?>
         <table class="table table-sm" data-no-dt>
-            <thead><tr><th>#</th><th>رقم القرار</th><th>الحالة</th><th>سندُ القرار</th><th>الفعل</th></tr></thead>
+            <thead><tr><th>#</th><th>رقم القرار</th><th>الحالة</th><th>سند القرار</th><th>الفعل</th></tr></thead>
             <tbody>
             <?php foreach ($pending as $r): $rid = (int) $r['id'];
                     $sp = isset($SPINE[$rid]) ? $SPINE[$rid] : null;
@@ -542,15 +542,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?php echo htmlspecialchars((string) $r['status'], ENT_QUOTES, 'UTF-8'); ?></td>
                 <td class="ded-spine-cell">
                     <?php if ($sp && $sp['proposal_ref']): ?>
-                        مقترحٌ #<?php echo (int) $sp['proposal_ref']; ?>
+                        مقترح #<?php echo (int) $sp['proposal_ref']; ?>
                     <?php elseif ($ch && !empty($ch['payload_proposal'])): ?>
-                        مقترحٌ #<?php echo (int) $ch['payload_proposal']; ?>
-                        <span class="text-muted">(مختارٌ في الطلب — يُثبَّت عند اكتمالِ السلّم)</span>
+                        مقترح #<?php echo (int) $ch['payload_proposal']; ?>
+                        <span class="text-muted">(مختار في الطلب — يثبت عند اكتمال السلم)</span>
                     <?php else: ?>
                         <span class="text-muted">بلا مقترح</span>
                     <?php endif; ?>
                     <?php if ($ch): ?>
-                        · طلبٌ #<?php echo (int) $ch['id']; ?> (<?php echo htmlspecialchars($ch['status'], ENT_QUOTES, 'UTF-8'); ?>)
+                        · طلب #<?php echo (int) $ch['id']; ?> (<?php echo htmlspecialchars($ch['status'], ENT_QUOTES, 'UTF-8'); ?>)
                         <?php foreach ($ch['steps'] as $so => $s): ?>
                             <br><span class="ded-step-line">خطوة <?php echo (int) $so; ?>: <?php echo htmlspecialchars(inj0219_signer($ch, (int) $so), ENT_QUOTES, 'UTF-8'); ?></span>
                         <?php endforeach; ?>
@@ -558,9 +558,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <?php /* بوابة ١٢: الخطوةُ التاليةُ من حالِ السلّمِ الحيِّ — لا نصٌّ ثابت */
                     if ($ch && $ch['status'] === 'pending') {
                         $inj_nx = inj0219_pending_step($ch);
-                        if ($inj_nx) { echo '<br>' . ems_next_step('الخطوةُ ' . (int) $inj_nx['order'] . ' بيدِ الدورِ ' . $inj_nx['role']); }
+                        if ($inj_nx) { echo '<br>' . ems_next_step('الخطوة ' . (int) $inj_nx['order'] . ' بيد الدور ' . $inj_nx['role']); }
                     } elseif (!$ch || $ch['status'] === 'rejected') {
-                        echo '<br>' . ems_next_step('فتحُ سلّمِ الاعتمادِ بربطِ مقترحِ الخصم');
+                        echo '<br>' . ems_next_step('فتح سلم الاعتماد بربط مقترح الخصم');
                     } ?>
                 </td>
                 <td>
@@ -570,7 +570,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <input type="hidden" name="cmp03_action" value="request_approval">
                         <input type="hidden" name="row_id" value="<?php echo $rid; ?>">
                         <select name="proposal_ref" aria-label="مقترح الخصم المرتبط بالقرار" required class="ded-proposal-select">
-                            <option value="">— اختر مقترحَ الخصم (إلزامي) —</option>
+                            <option value="">— اختر مقترح الخصم (إلزامي) —</option>
                             <?php foreach ($OPEN_PROPOSALS as $p): ?>
                             <option value="<?php echo (int) $p['ded_id']; ?>">#<?php echo (int) $p['ded_id']; ?>
                                 · <?php echo htmlspecialchars((string) $p['person_name'], ENT_QUOTES, 'UTF-8'); ?>
@@ -579,10 +579,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 · <?php echo htmlspecialchars((string) $p['state'], ENT_QUOTES, 'UTF-8'); ?></option>
                             <?php endforeach; ?>
                         </select>
-                        <button type="submit" class="btn-primary"><i class="fa fa-paper-plane"></i> طلبُ الاعتماد</button>
+                        <button type="submit" class="btn-primary"><i class="fa fa-paper-plane"></i> طلب الاعتماد</button>
                     </form>
                     <?php if (!$OPEN_PROPOSALS): ?>
-                        <small class="text-muted">لا مقترحَ خصمٍ مفتوحًا في كيانك — يُنشأ من مصدرِه (الحضورُ · السلف) لا من هنا.</small>
+                        <small class="text-muted">لا مقترح خصم مفتوحا في كيانك — ينشأ من مصدره (الحضور · السلف) لا من هنا.</small>
                     <?php endif; ?>
                 <?php elseif ($ch['status'] === 'pending'):
                         /* لا يُعرض زرٌّ لمن لا تنتظره الخطوة. الخادمُ يفصل على أيِّ حال
@@ -595,22 +595,22 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                           array_map('trim', explode(',', $ps['role'])), true));
                         $walked = inj0219_already_walked($ch, $uid); ?>
                     <?php if ($isMine): ?>
-                        <span class="text-muted">أنشأتَ هذا القرارَ — الاعتمادُ يدٌ ثانية (UI-01 §8)</span>
+                        <span class="text-muted">أنشأت هذا القرار — الاعتماد يد ثانية (UI-01 §8)</span>
                     <?php elseif ($walked): ?>
-                        <span class="text-muted">مشيتَ خطوةً في هذا السلّمِ — الباقيةُ ليدٍ أخرى</span>
+                        <span class="text-muted">مشيت خطوة في هذا السلم — الباقية ليد أخرى</span>
                     <?php elseif (!$roleOk): ?>
-                        <span class="text-muted">الخطوةُ <?php echo $ps ? (int) $ps['order'] : '؟'; ?>
-                            تنتظر الدورَ <?php echo $ps ? htmlspecialchars($ps['role'], ENT_QUOTES, 'UTF-8') : '؟'; ?>
-                            — لا يدَك</span>
+                        <span class="text-muted">الخطوة <?php echo $ps ? (int) $ps['order'] : '؟'; ?>
+                            تنتظر الدور <?php echo $ps ? htmlspecialchars($ps['role'], ENT_QUOTES, 'UTF-8') : '؟'; ?>
+                            — لا يدك</span>
                     <?php else: ?>
                     <form method="post" action="" class="ded-inline-flex">
         <?= csrf_field() ?>
                         <input type="hidden" name="cmp03_action" value="approve_step">
                         <input type="hidden" name="row_id" value="<?php echo $rid; ?>">
                         <input type="hidden" name="request_id" value="<?php echo (int) $ch['id']; ?>">
-                        <input type="text" name="note" maxlength="190" placeholder="ملاحظةُ الاعتماد">
+                        <input type="text" name="note" maxlength="190" placeholder="ملاحظة الاعتماد">
                         <button type="submit" class="btn-primary"><i class="fa fa-check"></i>
-                            اعتمادُ خطوتي (<?php echo (int) $ps['order']; ?>)</button>
+                            اعتماد خطوتي (<?php echo (int) $ps['order']; ?>)</button>
                     </form>
                     <?php endif; ?>
                 <?php else: ?>

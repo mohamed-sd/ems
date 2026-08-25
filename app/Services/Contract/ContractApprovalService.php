@@ -41,23 +41,23 @@ class ContractApprovalService
         $st = $this->conn->prepare(
             "SELECT total_contract_permonth, contract_duration_months, paid_contract, price_currency_contract
                FROM contracts WHERE id = ? LIMIT 1");
-        if (!$st) { return array('value' => 0.0, 'currency' => '', 'source' => 'تعذّر الاستعلام'); }
+        if (!$st) { return array('value' => 0.0, 'currency' => '', 'source' => 'تعذر الاستعلام'); }
         $st->bind_param('i', $contractId);
         $st->execute();
         $c = $st->get_result()->fetch_assoc();
         $st->close();
-        if (!$c) { return array('value' => 0.0, 'currency' => '', 'source' => 'عقدٌ غيرُ موجود'); }
+        if (!$c) { return array('value' => 0.0, 'currency' => '', 'source' => 'عقد غير موجود'); }
 
         $cur = (string) ($c['price_currency_contract'] ?? '');
         $per = (float) ($c['total_contract_permonth'] ?? 0);
         $mon = (float) ($c['contract_duration_months'] ?? 0);
         if ($per > 0 && $mon > 0) {
             return array('value' => round($per * $mon, 2), 'currency' => $cur,
-                'source' => 'شهريٌّ ' . $per . ' × ' . $mon . ' شهرًا');
+                'source' => 'شهري ' . $per . ' × ' . $mon . ' شهرا');
         }
         $paid = (float) ($c['paid_contract'] ?? 0);
-        if ($paid > 0) { return array('value' => $paid, 'currency' => $cur, 'source' => 'المدفوعُ التعاقديّ'); }
-        return array('value' => 0.0, 'currency' => $cur, 'source' => 'لا قيمةَ معلَنةٌ في العقد');
+        if ($paid > 0) { return array('value' => $paid, 'currency' => $cur, 'source' => 'المدفوع التعاقدي'); }
+        return array('value' => 0.0, 'currency' => $cur, 'source' => 'لا قيمة معلنة في العقد');
     }
 
     /**
@@ -96,7 +96,7 @@ class ContractApprovalService
         $r = ContractStateMachine::transition(
             $this->conn, $gate, $companyId, $contractId,
             ContractStateMachine::NEGOTIATION,
-            ($note !== '' ? $note : 'رُفع للتفاوضِ من شاشةِ عقودِ العملاء'), $actorId);
+            ($note !== '' ? $note : 'رفع للتفاوض من شاشة عقود العملاء'), $actorId);
         return array('ok' => !empty($r['ok']), 'code' => (int) ($r['code'] ?? 0),
             'reason' => (string) ($r['reason'] ?? ''));
     }
@@ -116,27 +116,27 @@ class ContractApprovalService
         // ◆ فشلٌ مغلق: لا سقفَ معرَّفٌ ⇒ سلطةٌ غيرُ معرَّفةٍ ⇒ تصعيدٌ لا اعتماد.
         if ($cap === null) {
             return array('ok' => false, 'code' => 403, 'escalated' => true,
-                'reason' => 'لا سقفَ اعتمادٍ نافذٌ معرَّفٌ لدورِك (' . $actorRole . ') — '
-                    . 'والاعتمادُ يُصعَّد للرئيسِ التنفيذيِّ حتى يُعرَّف السقف. '
-                    . 'قيمةُ العقد ' . $val['value'] . ' ' . $val['currency'] . ' (' . $val['source'] . ')');
+                'reason' => 'لا سقف اعتماد نافذ معرف لدورك (' . $actorRole . ') — '
+                    . 'والاعتماد يصعد للرئيس التنفيذي حتى يعرف السقف. '
+                    . 'قيمة العقد ' . $val['value'] . ' ' . $val['currency'] . ' (' . $val['source'] . ')');
         }
         if ($val['currency'] !== '' && $cap['currency'] !== '' && $val['currency'] !== $cap['currency']) {
             // ◆ لا تُجمع عملتان في رقمٍ ولا تُقارَنان بلا تحويلٍ معلَن.
             return array('ok' => false, 'code' => 409, 'escalated' => true,
-                'reason' => 'عملةُ العقد (' . $val['currency'] . ') تخالف عملةَ السقف (' . $cap['currency']
-                    . ') — لا مقارنةَ بلا تحويلٍ معلَن، والاعتمادُ يُصعَّد');
+                'reason' => 'عملة العقد (' . $val['currency'] . ') تخالف عملة السقف (' . $cap['currency']
+                    . ') — لا مقارنة بلا تحويل معلن، والاعتماد يصعد');
         }
         if ($val['value'] > $cap['max']) {
             return array('ok' => false, 'code' => 403, 'escalated' => true,
-                'reason' => 'قيمةُ العقد ' . $val['value'] . ' ' . $val['currency']
-                    . ' تتجاوز سقفَك ' . $cap['max'] . ' ' . $cap['currency']
-                    . ' (' . $cap['ref'] . ') — يُصعَّد إلى الدور ' . $cap['escalates_to']);
+                'reason' => 'قيمة العقد ' . $val['value'] . ' ' . $val['currency']
+                    . ' تتجاوز سقفك ' . $cap['max'] . ' ' . $cap['currency']
+                    . ' (' . $cap['ref'] . ') — يصعد إلى الدور ' . $cap['escalates_to']);
         }
 
         $r = ContractStateMachine::transition(
             $this->conn, $gate, $companyId, $contractId,
             ContractStateMachine::APPROVED,
-            ($note !== '' ? $note : 'اعتُمد ضمنَ السقف ' . $cap['max'] . ' ' . $cap['currency'] . ' — ' . $cap['ref']),
+            ($note !== '' ? $note : 'اعتمد ضمن السقف ' . $cap['max'] . ' ' . $cap['currency'] . ' — ' . $cap['ref']),
             $actorId);
         return array('ok' => !empty($r['ok']), 'code' => (int) ($r['code'] ?? 0), 'escalated' => false,
             'reason' => (string) ($r['reason'] ?? ''));

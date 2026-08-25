@@ -64,24 +64,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($action === 'open') {
         $r = SCL::open($conn, $gate, $company_id, intval($_POST['contract_id'] ?? 0), $uid);
-        $redirect($r['ok'] ? 'فُتحت تصفيةُ الإنهاء ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'));
+        $redirect($r['ok'] ? 'فتحت تصفية الإنهاء ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'));
     }
     if ($action === 'quota') {
         $r = SCL::closeQuota($conn, $gate, $company_id, $cid, strval($_POST['reason'] ?? ''), $uid);
-        $redirect($r['ok'] ? ('أُقفلت ' . $r['closed'] . ' حاوية ✅') : ($r['code'] . ' — ' . $r['reason'] . ' ❌'));
+        $redirect($r['ok'] ? ('أقفلت ' . $r['closed'] . ' حاوية ✅') : ($r['code'] . ' — ' . $r['reason'] . ' ❌'));
     }
     if ($action === 'advances') {
         $r = SCL::settleAdvances($conn, $gate, $company_id, $cid, $uid);
-        $redirect($r['ok'] ? 'العهدُ والسلفُ مسوّاة ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'));
+        $redirect($r['ok'] ? 'العهد والسلف مسواة ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'));
     }
     if ($action === 'guarantee') {
         $r = SCL::releaseGuarantee($conn, $gate, $company_id, $cid, date('Y-m-d'), $uid);
-        $redirect($r['ok'] ? ('رُدَّ الضمانُ بذمّةٍ دائنة #' . $r['due_id'] . ' ✅')
+        $redirect($r['ok'] ? ('رد الضمان بذمة دائنة #' . $r['due_id'] . ' ✅')
                            : ($r['code'] . ' — ' . $r['reason'] . ' ❌'));
     }
     if ($action === 'close') {
         $r = SCL::close($conn, $gate, $company_id, $cid, strval($_POST['clearance_doc'] ?? ''), $uid);
-        $redirect($r['ok'] ? 'أُقفلت التصفيةُ بشهادة الإخلاء ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'));
+        $redirect($r['ok'] ? 'أقفلت التصفية بشهادة الإخلاء ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'));
     }
 }
 
@@ -127,27 +127,27 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     }
     ?>
 
-    <?= ems_states_bundle('لا تصفياتِ إنهاءٍ ضمنَ هذا النطاق', 'التصفيةُ تُفتح لعقدٍ منتهٍ من قائمةِ «عقودٌ منتهيةٌ بلا تصفية»') ?>
+    <?= ems_states_bundle('لا تصفيات إنهاء ضمن هذا النطاق', 'التصفية تفتح لعقد منته من قائمة «عقود منتهية بلا تصفية»') ?>
 
     <div class="card"><div class="card-body">
         <p class="scl-note">
-            «عند الإنهاء: <strong>إقفالُ الحصة</strong> · <strong>تسويةُ العهد والسلف</strong> ·
-            <strong>ردُّ الضمان بعد مهلته</strong> · و<strong>شهادةُ إخلاءٍ موثَّقة</strong>» (ENT-02 §4)
-            — والخطواتُ <strong>بترتيبها لا بالنيّة</strong>: لا إخلاءَ وحاويةٌ مفتوحةٌ أو سلفةٌ برصيد،
-            ولا ردَّ ضمانٍ قبل مهلته. و<strong>تصفيةٌ واحدةٌ للعقد</strong>.
+            «عند الإنهاء: <strong>إقفال الحصة</strong> · <strong>تسوية العهد والسلف</strong> ·
+            <strong>رد الضمان بعد مهلته</strong> · و<strong>شهادة إخلاء موثقة</strong>» (ENT-02 §4)
+            — والخطوات <strong>بترتيبها لا بالنية</strong>: لا إخلاء وحاوية مفتوحة أو سلفة برصيد،
+            ولا رد ضمان قبل مهلته. و<strong>تصفية واحدة للعقد</strong>.
         </p>
     </div></div>
 
     <?php if ($can_add): ?>
-    <div class="card"><div class="card-header"><h5><i class="fa fa-folder-open"></i> عقودٌ منتهيةٌ بلا تصفية</h5></div>
+    <div class="card"><div class="card-header"><h5><i class="fa fa-folder-open"></i> عقود منتهية بلا تصفية</h5></div>
     <div class="card-body">
         <?php if (!$endedContracts): ?>
-            <p class="scl-note">لا عقدَ منتهيًا ينتظر تصفيةً — <strong>والتصفيةُ عند الإنهاء لا قبله</strong>.</p>
+            <p class="scl-note">لا عقد منتهيا ينتظر تصفية — <strong>والتصفية عند الإنهاء لا قبله</strong>.</p>
         <?php else: ?>
         <div class="table-container">
         <table class="alltables display nowrap scl-table-full">
             <thead><tr><th>العقد</th><th>المورد</th><th>الحالة</th><th>ينتهي</th>
-                <th>ضمان الأداء</th><th>مهلة الردّ</th><th></th>
+                <th>ضمان الأداء</th><th>مهلة الرد</th><th></th>
                 <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
                 <th class="ems-fn-th" data-fn="1">رقم المحضر</th>
                 <th class="ems-fn-th" data-fn="1">تاريخ الإنهاء</th>
@@ -156,25 +156,25 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                 <th class="ems-fn-th" data-fn="1">التحميلات علينا</th>
                 <th class="ems-fn-th" data-fn="1">التحميلات على المورد</th>
                 <th class="ems-fn-th" data-fn="1">الجزاءات</th>
-                <th class="ems-fn-th" data-fn="1">السلف غير المسدَّدة</th>
+                <th class="ems-fn-th" data-fn="1">السلف غير المسددة</th>
                 <th class="ems-fn-th" data-fn="1">الصافي المستحق</th>
                 <th class="ems-fn-th" data-fn="1">حالة الكفالة</th>
-                <th class="ems-fn-th" data-fn="1">المعدات المُخرَجة</th>
+                <th class="ems-fn-th" data-fn="1">المعدات المخرجة</th>
                 <th class="ems-fn-th" data-fn="1">تاريخ إخلاء المعدات</th>
                 <th class="ems-fn-th" data-fn="1">اعتماد الموردين</th>
                 <th class="ems-fn-th" data-fn="1">الاعتماد المالي</th>
                 <th class="ems-fn-th" data-fn="1">تاريخ السداد النهائي</th>
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                 <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                 <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                 <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-                <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+                <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
                 <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-                <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+                <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
                 <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
-                <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
+                <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
                 <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                 <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                 <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
@@ -189,9 +189,9 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     <td><?php echo htmlspecialchars((string)($c['end_date'] ?? 'مفتوح')); ?></td>
                     <td><?php echo $c['performance_guarantee'] !== null
                         ? htmlspecialchars((string)$c['performance_guarantee'] . ' ' . $c['currency'])
-                        : '<span class="badge badge-secondary">لم يُشترط</span>'; ?></td>
+                        : '<span class="badge badge-secondary">لم يشترط</span>'; ?></td>
                     <td><?php echo $c['guarantee_retention_days'] !== null
-                        ? htmlspecialchars((string)$c['guarantee_retention_days']) . ' يومًا' : '—'; ?></td>
+                        ? htmlspecialchars((string)$c['guarantee_retention_days']) . ' يوما' : '—'; ?></td>
                     <td>
                         <form method="post" class="scl-form-inline">
         <?= csrf_field() ?>
@@ -223,7 +223,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     </h5></div>
     <div class="card-body">
         <?php if ($missing): ?>
-            <div class="alert alert-warning">الناقصُ لإتمام الإخلاء:
+            <div class="alert alert-warning">الناقص لإتمام الإخلاء:
                 <strong><?php echo htmlspecialchars(implode(' · ', $missing)); ?></strong></div>
         <?php endif; ?>
 
@@ -232,10 +232,10 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             <thead><tr><th>الخطوة</th><th>القياس ومصدره</th><th>الحال</th><th>الفعل</th></tr></thead>
             <tbody>
             <tr>
-                <td>① إقفالُ الحصة</td>
-                <td><?php echo count($openQ); ?> حاويةً مفتوحةً الآن (<code>op_containers</code> بمورده)</td>
+                <td>① إقفال الحصة</td>
+                <td><?php echo count($openQ); ?> حاوية مفتوحة الآن (<code>op_containers</code> بمورده)</td>
                 <td><?php echo $cl['quota_closed_at'] !== null
-                    ? '<span class="badge badge-success">أُقفلت</span>' : '<span class="badge badge-warning">مفتوحة</span>'; ?>
+                    ? '<span class="badge badge-success">أقفلت</span>' : '<span class="badge badge-warning">مفتوحة</span>'; ?>
                     <?php if ($cl['quota_close_reason'] !== null): ?>
                         <br><small><?php echo htmlspecialchars((string)$cl['quota_close_reason']); ?></small>
                     <?php endif; ?></td>
@@ -244,34 +244,34 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
         <?= csrf_field() ?>
                         <input type="hidden" name="cl_action" value="quota">
                         <input type="hidden" name="closure_id" value="<?php echo intval($cl['id']); ?>">
-                        <input type="text" name="reason" maxlength="255" placeholder="سببُ إقفال ما لم يُستهلك" aria-label="سببُ إقفال ما لم يُستهلك">
-                        <button type="submit" class="btn-primary">أقفِل الحصة</button>
+                        <input type="text" name="reason" maxlength="255" placeholder="سبب إقفال ما لم يستهلك" aria-label="سبب إقفال ما لم يستهلك">
+                        <button type="submit" class="btn-primary">أقفل الحصة</button>
                     </form>
                 <?php endif; ?></td>
             </tr>
             <tr>
-                <td>② تسويةُ العهد والسلف</td>
-                <td>رصيدٌ مفتوحٌ <?php echo htmlspecialchars((string)$cl['advances_balance']); ?>
+                <td>② تسوية العهد والسلف</td>
+                <td>رصيد مفتوح <?php echo htmlspecialchars((string)$cl['advances_balance']); ?>
                     (<code>supplier_advance_requests</code>)</td>
                 <td><?php echo $cl['advances_settled_at'] !== null
-                    ? '<span class="badge badge-success">مسوّاة</span>' : '<span class="badge badge-warning">قائمة</span>'; ?></td>
+                    ? '<span class="badge badge-success">مسواة</span>' : '<span class="badge badge-warning">قائمة</span>'; ?></td>
                 <td><?php if ($can_edit && $cl['advances_settled_at'] === null && (string)$cl['state'] !== 'closed'): ?>
                     <form method="post" class="scl-form-inline">
         <?= csrf_field() ?>
                         <input type="hidden" name="cl_action" value="advances">
                         <input type="hidden" name="closure_id" value="<?php echo intval($cl['id']); ?>">
-                        <button type="submit" class="btn-primary">تحقّق وسوِّ</button>
+                        <button type="submit" class="btn-primary">تحقق وسو</button>
                     </form>
                 <?php endif; ?></td>
             </tr>
             <tr>
-                <td>③ ردُّ الضمان بعد مهلته</td>
+                <td>③ رد الضمان بعد مهلته</td>
                 <td><?php echo $cl['guarantee_amount'] !== null
                     ? htmlspecialchars((string)$cl['guarantee_amount'] . ' ' . (string)$cl['guarantee_currency']
-                        . ' · يُردُّ في ' . (string)$cl['guarantee_due_date'])
-                    : '<span class="badge badge-secondary">لا ضمانَ مكتوب — ولا يُردُّ ما لم يُؤخذ</span>'; ?></td>
+                        . ' · يرد في ' . (string)$cl['guarantee_due_date'])
+                    : '<span class="badge badge-secondary">لا ضمان مكتوب — ولا يرد ما لم يؤخذ</span>'; ?></td>
                 <td><?php echo $cl['guarantee_released_at'] !== null
-                    ? ('<span class="badge badge-success">رُدَّ بذمّة #' . intval($cl['guarantee_due_ref']) . '</span>')
+                    ? ('<span class="badge badge-success">رد بذمة #' . intval($cl['guarantee_due_ref']) . '</span>')
                     : '<span class="badge badge-warning">محتجز</span>'; ?></td>
                 <td><?php if ($can_edit && $cl['guarantee_amount'] !== null
                             && $cl['guarantee_released_at'] === null && (string)$cl['state'] !== 'closed'): ?>
@@ -279,23 +279,23 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
         <?= csrf_field() ?>
                         <input type="hidden" name="cl_action" value="guarantee">
                         <input type="hidden" name="closure_id" value="<?php echo intval($cl['id']); ?>">
-                        <button type="submit" class="btn-primary">ردَّ الضمان</button>
+                        <button type="submit" class="btn-primary">رد الضمان</button>
                     </form>
                 <?php endif; ?></td>
             </tr>
             <tr>
-                <td>④ شهادةُ الإخلاء</td>
+                <td>④ شهادة الإخلاء</td>
                 <td><?php echo $cl['clearance_doc'] !== null
-                    ? htmlspecialchars((string)$cl['clearance_doc']) : 'مستندٌ إلزاميٌّ للإقفال'; ?></td>
+                    ? htmlspecialchars((string)$cl['clearance_doc']) : 'مستند إلزامي للإقفال'; ?></td>
                 <td><?php echo (string)$cl['state'] === 'closed'
-                    ? '<span class="badge badge-success">أُخلي</span>' : '<span class="badge badge-warning">قيد التصفية</span>'; ?></td>
+                    ? '<span class="badge badge-success">أخلي</span>' : '<span class="badge badge-warning">قيد التصفية</span>'; ?></td>
                 <td><?php if ($can_edit && (string)$cl['state'] !== 'closed'): ?>
                     <form method="post" class="scl-form-flex">
         <?= csrf_field() ?>
                         <input type="hidden" name="cl_action" value="close">
                         <input type="hidden" name="closure_id" value="<?php echo intval($cl['id']); ?>">
-                        <input type="text" name="clearance_doc" maxlength="120" placeholder="مرجعُ شهادة الإخلاء" required aria-label="مرجعُ شهادة الإخلاء">
-                        <button type="submit" class="btn-primary">أقفِل بالشهادة</button>
+                        <input type="text" name="clearance_doc" maxlength="120" placeholder="مرجع شهادة الإخلاء" required aria-label="مرجع شهادة الإخلاء">
+                        <button type="submit" class="btn-primary">أقفل بالشهادة</button>
                     </form>
                 <?php endif; ?></td>
             </tr>

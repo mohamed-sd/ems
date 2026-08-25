@@ -154,7 +154,7 @@ function risk_view_bar($screen, $view, array $carry = array())
     if (isset($defs['all'])) {
         $cls = ($view === 'all') ? 'ux-chip' : 'ems-btn-secondary';
         printf('<a class="%s" style="font-size:.78rem;padding:4px 10px" href="%s" '
-             . 'title="نموذج البيانات لا يُختزل — والعلاج مناظر لا حذف"><i class="fa fa-table-columns"></i> %s</a>',
+             . 'title="نموذج البيانات لا يختزل — والعلاج مناظر لا حذف"><i class="fa fa-table-columns"></i> %s</a>',
             $cls, htmlspecialchars($qs('all')), htmlspecialchars($defs['all']['label']));
     }
     echo '</div>';

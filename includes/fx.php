@@ -209,19 +209,19 @@ if (!function_exists('ems_fx_to_base')) {
 
         $code = ems_fx_code($label);
         if ($code === null) {
-            $out['reason'] = 'عملةٌ غير مسجَّلة: ' . trim((string) $label);
+            $out['reason'] = 'عملة غير مسجلة: ' . trim((string) $label);
             return $out;
         }
         $out['code'] = $code;
 
         if ($amount === null || $amount === '') {
-            $out['reason'] = 'لا مبلغَ يُعادَل';
+            $out['reason'] = 'لا مبلغ يعادل';
             return $out;
         }
 
         $rate = ems_fx_rate($code, $date);
         if ($rate === null) {
-            $out['reason'] = 'لا سعرَ صرفٍ لـ' . $code . ' في ' .
+            $out['reason'] = 'لا سعر صرف ل' . $code . ' في ' .
                              (($date === null || $date === '') ? 'تاريخ اليوم' : substr((string) $date, 0, 10));
             return $out;
         }
@@ -262,7 +262,7 @@ if (!function_exists('ems_fx_revalue_open_dues')) {
         $brow = $bq->get_result()->fetch_assoc();
         $bq->close();
         $base = $brow ? (string) $brow['code'] : null;
-        if ($base === null) { $out['reason'] = 'لا عملةَ أساسٍ مسجَّلة'; return $out; }
+        if ($base === null) { $out['reason'] = 'لا عملة أساس مسجلة'; return $out; }
         $rateAt = function ($code, $date) use ($conn, $companyId) {
             $rq = $conn->prepare("SELECT rate_to_base FROM fin_fx_rates
                 WHERE company_id = ? AND currency_code = ? AND COALESCE(is_deleted,0) = 0
@@ -307,8 +307,8 @@ if (!function_exists('ems_fx_revalue_open_dues')) {
         }
         $totalDiff = round($totalDiff, 2);
         $out['total_diff'] = $totalDiff;
-        if (empty($out['diffs'])) { $out['status'] = 'noop'; $out['reason'] = 'لا فرقَ تقييمٍ — الأسعارُ كما ثُبّتت'; return $out; }
-        if (abs($totalDiff) < 0.01) { $out['status'] = 'zero_net'; $out['reason'] = 'الفروقُ تتصافر'; return $out; }
+        if (empty($out['diffs'])) { $out['status'] = 'noop'; $out['reason'] = 'لا فرق تقييم — الأسعار كما ثبتت'; return $out; }
+        if (abs($totalDiff) < 0.01) { $out['status'] = 'zero_net'; $out['reason'] = 'الفروق تتصافر'; return $out; }
 
         // قيدُ الفرق: حسابُ «فروق عملة» (5900) مقابل حساب الذمم — بلا مساس الأصل
         require_once dirname(__DIR__) . '/Finance/fin_helpers.php';
@@ -317,20 +317,20 @@ if (!function_exists('ems_fx_revalue_open_dues')) {
             $row = fin_gate(false)->selectOne('fin_chart_of_accounts', array(
                 'columns' => array('id'), 'where' => array('code' => '5900', 'is_postable' => 1)));
             $fxAcc = $row ? intval($row['id']) : null;
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $fxAcc'); $fxAcc = null; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $fxAcc'); $fxAcc = null; }
         if ($fxAcc === null) {
             $out['status'] = 'skipped_no_account';
-            $out['reason'] = 'لا حسابَ «فروق عملة» (5900) في الدليل — أضِفه ثم أعد التقييم (لا يُخترع حساب)';
+            $out['reason'] = 'لا حساب «فروق عملة» (5900) في الدليل — أضفه ثم أعد التقييم (لا يخترع حساب)';
             return $out;
         }
         $apAcc = fin_account_by_code($conn, $companyId, '2100', 'liability');
-        if (!$apAcc) { $out['status'] = 'skipped_no_account'; $out['reason'] = 'لا حسابَ ذممٍ (2100)'; return $out; }
+        if (!$apAcc) { $out['status'] = 'skipped_no_account'; $out['reason'] = 'لا حساب ذمم (2100)'; return $out; }
 
         $absDiff = abs($totalDiff);
         // خسارةُ تقييم (الالتزامُ زاد): مدين فروق عملة / دائن ذمم — والربحُ عكسُه
         $debitAcc  = ($totalDiff > 0) ? $fxAcc : $apAcc;
         $creditAcc = ($totalDiff > 0) ? $apAcc : $fxAcc;
-        $memo = 'إعادةُ تقييمٍ دورية ' . $asOf . ' — ' . count($out['diffs']) . ' رصيدًا مفتوحًا (FES §3.3)';
+        $memo = 'إعادة تقييم دورية ' . $asOf . ' — ' . count($out['diffs']) . ' رصيدا مفتوحا (FES §3.3)';
         $entryNo = fin_gen_code($conn, 'fin_journal_entries', 'FIN-JV', $companyId);
         $jid = null;
         try {
@@ -349,11 +349,11 @@ if (!function_exists('ems_fx_revalue_open_dues')) {
             }, 'fx revaluation diff entry');
         } catch (\Throwable $t) {
             error_log('fx revalue journal: ' . $t->getMessage());
-            $out['status'] = 'failed'; $out['reason'] = 'تعذّر قيدُ الفرق'; return $out;
+            $out['status'] = 'failed'; $out['reason'] = 'تعذر قيد الفرق'; return $out;
         }
         $out['status'] = 'entry_created';
         $out['journal_id'] = intval($jid);
-        $out['reason'] = 'قيدُ فرقٍ مسودة ' . $entryNo . ' بقيمة ' . $absDiff . ' ' . $base . ' — الأصلُ لم يُمسّ';
+        $out['reason'] = 'قيد فرق مسودة ' . $entryNo . ' بقيمة ' . $absDiff . ' ' . $base . ' — الأصل لم يمس';
         return $out;
     }
 }

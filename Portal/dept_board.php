@@ -113,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'dept_
     $deliv = trim((string) ($_POST['deliverable'] ?? ''));
     $dueD  = trim((string) ($_POST['due_date'] ?? ''));
     if (!in_array($to, $members0, true)) {
-        $msg = 'المكلَّف ليس من أعضاء إدارتك ❌';
+        $msg = 'المكلف ليس من أعضاء إدارتك ❌';
     } else {
         $res = \App\Services\Work\WorkItemService::create($conn, array(
             'company_id' => $company_id, 'source_type' => 'SRC-01',
@@ -124,12 +124,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'dept_
             'verifier_user_id' => \App\Services\Work\WorkItemService::resolveVerifier($conn, $company_id, $to, $uid),
             'org_unit_id' => $unit0, 'title' => $title,
             'deliverable' => $deliv !== '' ? $deliv : 'إنجاز التكليف بدليله',
-            'evidence_required' => 'ما يُثبت إنجازَ المخرَج المطلوب',
+            'evidence_required' => 'ما يثبت إنجاز المخرج المطلوب',
             'priority' => in_array($_POST['priority'] ?? '', array('P0','P1','P2','P3','P4'), true) ? $_POST['priority'] : 'P3',
             'due_at' => preg_match('/^\d{4}-\d{2}-\d{2}$/', $dueD) ? $dueD . ' 17:00:00' : date('Y-m-d H:i:s', time() + 86400 * 3),
             'created_by' => $uid,
         ));
-        $msg = !empty($res['ok']) ? ('كُلّف وأُخطر ✅ #' . $res['id']) : (($res['reason'] ?? 'تعذر') . ' ❌');
+        $msg = !empty($res['ok']) ? ('كلف وأخطر ✅ #' . $res['id']) : (($res['reason'] ?? 'تعذر') . ' ❌');
     }
     ems_gov_flash_redirect('dept_board.php', $msg, 'GOV-INFO-200', '');
     exit();
@@ -186,9 +186,9 @@ $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-echo ems_states_bundle('لا إدارةَ في خريطةِ السبعَ عشرةَ لها أرقامٌ بعدُ', 'تُشتقُّ أرقامُ كلِّ إدارةٍ من المحرّك حالَ إسنادِ أولِ مهمةٍ أو طلبٍ لأحدِ أعضائها');
+echo ems_states_bundle('لا إدارة في خريطة السبع عشرة لها أرقام بعد', 'تشتق أرقام كل إدارة من المحرك حال إسناد أول مهمة أو طلب لأحد أعضائها');
 ?>
-  <p class="dpb-note">كل صفٍّ إدارةٌ من خريطة الـ17 — أرقامها حيةٌ من المحرّك (مهام · طلبات · إنجاز 30ي). تعمّق بنقرة الاسم.</p>
+  <p class="dpb-note">كل صف إدارة من خريطة ال17 — أرقامها حية من المحرك (مهام · طلبات · إنجاز 30ي). تعمق بنقرة الاسم.</p>
   <table class="table table-striped">
     <thead><tr>
       <th>الإدارة</th><th>الأعضاء</th><th>مهام مفتوحة</th><th>متأخرات</th>
@@ -227,7 +227,7 @@ $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 ?>
-  <div class="alert alert-warning">دورك الحالي غير مربوطٍ بإدارةٍ في خريطة الـ17 — ورقة الإدارة تخص أدوار الإدارات التشغيلية، وللأدوار الجامعة لوحة الإدارات.</div>
+  <div class="alert alert-warning">دورك الحالي غير مربوط بإدارة في خريطة ال17 — ورقة الإدارة تخص أدوار الإدارات التشغيلية، وللأدوار الجامعة لوحة الإدارات.</div>
 </div>
 <?php exit(); endif;
 
@@ -308,8 +308,8 @@ $stLabel = function ($s) {
         'in_progress' => 'جارية', 'blocked' => 'معطلة', 'done_pending_verify' => 'تنتظر التحقق',
         'closed_accepted' => 'مغلقة', 'returned' => 'معادة', 'reopened' => 'أعيد فتحها',
         'overdue' => 'متأخرة', 'scheduled' => 'مجدولة', 'cancelled' => 'ملغاة',
-        'submitted' => 'مقدَّم', 'routed' => 'موجَّه', 'in_approval' => 'في الاعتماد',
-        'approved' => 'معتمد', 'executing' => 'قيد التنفيذ', 'executed' => 'نُفِّذ', 'closed' => 'مغلق');
+        'submitted' => 'مقدَّم', 'routed' => 'موجه', 'in_approval' => 'في الاعتماد',
+        'approved' => 'معتمد', 'executing' => 'قيد التنفيذ', 'executed' => 'نفذ', 'closed' => 'مغلق');
     return isset($m[$s]) ? $m[$s] : $s;
 };
 $attrLabel = function ($a) {
@@ -326,14 +326,14 @@ $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-echo ems_states_bundle('لا مهامَ ولا طلباتٍ ولا إنجازاتٍ لهذه الإدارةِ في المدى', 'كلِّف عضوًا من نموذجِ «تكليف عضوٍ من إدارتي» أعلاه — أو انتظر أولَ طلبٍ يصل الإدارة');
+echo ems_states_bundle('لا مهام ولا طلبات ولا إنجازات لهذه الإدارة في المدى', 'كلف عضوا من نموذج «تكليف عضو من إدارتي» أعلاه — أو انتظر أول طلب يصل الإدارة');
 ?>
   <?php if ($isUmbrella): ?>
     <p><a href="dept_board.php" class="btn btn-sm btn-secondary">↩ لوحة الإدارات كلها</a></p>
   <?php endif; ?>
   <p class="dpb-note" title="لماذا أرى هذا؟">
-    العضوية من الهيكل لا من قوائم: أدوار الوحدة «<?= htmlspecialchars($deptOwner) ?>» في خريطة الـ17
-    + نطاقك الإداري من الهرم (<?= count($members) ?> عضوًا).
+    العضوية من الهيكل لا من قوائم: أدوار الوحدة «<?= htmlspecialchars($deptOwner) ?>» في خريطة ال17
+    + نطاقك الإداري من الهرم (<?= count($members) ?> عضوا).
   </p>
   <?php if (isset($_GET['msg'])): ?>
     <div class="alert alert-info"><?= htmlspecialchars((string) $_GET['msg']) ?></div>
@@ -343,11 +343,11 @@ echo ems_states_bundle('لا مهامَ ولا طلباتٍ ولا إنجازا�
   $iAmManager = (count(ems_manager_scope_user_ids($conn, $uid, 1)) > 0) && ($unit === $myUnit);
   if ($iAmManager && $members): ?>
   <details class="dpb-assign"><summary class="dpb-assign-sum">
-    <i class="fa fa-user-plus"></i> تكليف عضوٍ من إدارتي (SRC-01)</summary>
+    <i class="fa fa-user-plus"></i> تكليف عضو من إدارتي (SRC-01)</summary>
     <form method="post" class="ems-form dpb-assign-form">
         <?= csrf_field() ?>
       <input type="hidden" name="action" value="dept_assign">
-      <div><label for="emsf_1170_47df2">المكلَّف</label>
+      <div><label for="emsf_1170_47df2">المكلف</label>
         <select name="to_user" class="form-control" required id="emsf_1170_47df2">
           <?php $r = mysqli_query($conn, 'SELECT id, name FROM users WHERE id IN (' . implode(',', array_map('intval', $members)) . ') ORDER BY name');
           while ($r && ($u = mysqli_fetch_assoc($r))): if (intval($u['id']) === $uid) { continue; } ?>
@@ -363,7 +363,7 @@ echo ems_states_bundle('لا مهامَ ولا طلباتٍ ولا إنجازا�
         <select name="priority" class="form-control" id="emsf_1174_bb9ed">
           <option>P3</option><option>P2</option><option>P1</option><option>P0</option><option>P4</option>
         </select></div>
-      <button class="btn btn-primary">كلِّف</button>
+      <button class="btn btn-primary">كلف</button>
     </form>
   </details>
   <?php endif; ?>
@@ -375,7 +375,7 @@ echo ems_states_bundle('لا مهامَ ولا طلباتٍ ولا إنجازا�
         array('مهام متأخرة', $kpi['overdue_tasks'], $kpi['overdue_tasks'] > 0 ? 'dpb-alert' : ''),
         array('طلبات بيد الإدارة', $kpi['live_requests'], ''),
         array('طلبات كسرت مهلتها', $kpi['late_requests'], $kpi['late_requests'] > 0 ? 'dpb-alert' : ''),
-        array('إنجازات 30 يومًا', $kpi['ach_30d'], ''),
+        array('إنجازات 30 يوما', $kpi['ach_30d'], ''),
     );
     foreach ($tiles as $t): ?>
       <div class="dpb-tile">
@@ -389,10 +389,10 @@ echo ems_states_bundle('لا مهامَ ولا طلباتٍ ولا إنجازا�
   <table class="table table-striped">
     <thead><tr><th>#</th><th>العنوان</th><th>المنفذ</th><th>المالك</th><th>المصدر</th><th>الأولوية</th><th>الحالة</th><th>المهلة</th><th>تاريخ الإنشاء</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               </tr></thead>
@@ -433,7 +433,7 @@ echo ems_states_bundle('لا مهامَ ولا طلباتٍ ولا إنجازا�
 
   <h5 class="dpb-sec"><i class="fa fa-envelope-open-text"></i> طلبات بيد الإدارة (<?= count($reqs) ?>)</h5>
   <table class="table table-striped">
-    <thead><tr><th>الرقم</th><th>النوع</th><th>العنوان</th><th>مقدِّمه</th><th>بيد من الآن</th><th>الحالة</th><th>مهلة الرد</th><th>قُدِّم في</th></tr></thead>
+    <thead><tr><th>الرقم</th><th>النوع</th><th>العنوان</th><th>مقدمه</th><th>بيد من الآن</th><th>الحالة</th><th>مهلة الرد</th><th>قدم في</th></tr></thead>
     <tbody>
     <?php foreach ($reqs as $rq): ?>
       <tr>
@@ -450,7 +450,7 @@ echo ems_states_bundle('لا مهامَ ولا طلباتٍ ولا إنجازا�
     </tbody>
   </table>
 
-  <h5 class="dpb-sec"><i class="fa fa-medal"></i> إنجازات الإدارة — 30 يومًا (<?= count($achs) ?>)</h5>
+  <h5 class="dpb-sec"><i class="fa fa-medal"></i> إنجازات الإدارة — 30 يوما (<?= count($achs) ?>)</h5>
   <table class="table table-striped">
     <thead><tr><th>#</th><th>العنوان</th><th>صاحبه</th><th>الصفة</th><th>الوزن ٪</th><th>المصدر</th><th>تاريخ الاعتراف</th></tr></thead>
     <tbody>

@@ -46,24 +46,24 @@ class CapacityEvents
     public static function financialEffectAllowed($eventKey, array $contractRow = array())
     {
         if (in_array((string) $eventKey, self::FINANCIAL_BY_DEFAULT, true)) {
-            return array('allowed' => true, 'reason' => 'حدثٌ ماليُّ الأثر بطبيعته (§14-①→④)');
+            return array('allowed' => true, 'reason' => 'حدث مالي الأثر بطبيعته (§14-①→④)');
         }
         if ((string) $eventKey === self::STANDBY_ACTIVATED) {
             $comp = isset($contractRow['standby_compensation_type']) ? (string) $contractRow['standby_compensation_type'] : '';
             if ($comp !== '' && $comp !== 'none') {
-                return array('allowed' => true, 'reason' => 'العقدُ ينصّ على مقابلِ جاهزية: ' . $comp);
+                return array('allowed' => true, 'reason' => 'العقد ينص على مقابل جاهزية: ' . $comp);
             }
             return array('allowed' => false,
-                'reason' => 'StandbyActivated تشغيليٌّ — لا أثرَ ماليًّا بلا نصِّ مقابلٍ في العقد (DEC-CAP-A)');
+                'reason' => 'StandbyActivated تشغيلي — لا أثر ماليا بلا نص مقابل في العقد (DEC-CAP-A)');
         }
         if ((string) $eventKey === self::GAP_OPENED) {
             $penalty = isset($contractRow['shortfall_rule']) ? (string) $contractRow['shortfall_rule'] : '';
             if ($penalty === 'penalty') {
-                return array('allowed' => true, 'reason' => 'قاعدةُ العقد تولّد الجزاء (shortfall_rule=penalty)');
+                return array('allowed' => true, 'reason' => 'قاعدة العقد تولد الجزاء (shortfall_rule=penalty)');
             }
             return array('allowed' => false,
-                'reason' => 'CoverageGapOpened نطاقيٌّ — الجزاءُ يُولَّد من قاعدة العقد لا من الحدث نفسِه');
+                'reason' => 'CoverageGapOpened نطاقي — الجزاء يولد من قاعدة العقد لا من الحدث نفسه');
         }
-        return array('allowed' => false, 'reason' => 'حدثٌ خارج قاموس مجال القدرات الستة');
+        return array('allowed' => false, 'reason' => 'حدث خارج قاموس مجال القدرات الستة');
     }
 }

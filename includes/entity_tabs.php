@@ -22,7 +22,7 @@ if (!function_exists('ems_entity_tabs')) {
                والجاهزية · التقييمُ والمخاطر». و«الحاوياتُ والتوزيع» سقطت — لفظٌ
                متقاعدٌ كُنس نظيرُه في XC-02. */
             'supplier' => array(
-                'label' => 'ملفُّ المورد',
+                'label' => 'ملف المورد',
                 'tabs' => array(
                     'البيانات' => 'Suppliers/suppliers.php',
                     'جهاتُ الاتصالِ والمفوضون' => 'Suppliers/supplier_contacts.php',
@@ -35,7 +35,7 @@ if (!function_exists('ems_entity_tabs')) {
             /* SAL-07: «أربعةُ تبويبات: بيانات العرض · بنوده · سجلُّ التفاوض ·
                مراجعةُ ما قبل التعاقد» — كيانٌ لم يكن مسجَّلًا البتة. */
             'quotation' => array(
-                'label' => 'ملفُّ العرض',
+                'label' => 'ملف العرض',
                 'tabs' => array(
                     'بيانات العرض' => 'Clients/quotations.php',
                     'بنودُ العرض' => 'Clients/quotation_lines.php',
@@ -46,7 +46,7 @@ if (!function_exists('ems_entity_tabs')) {
             /* SUP-08: «خمسةُ تبويبات» — ونصُّ المتطلبِ هو الحاكمُ على ملاحظةِ
                `gov_target_nav` التي تقول أربعة، لأنَّ معيارَ القبولِ معلَّقٌ به. */
             'supplier_contract' => array(
-                'label' => 'ملفُّ عقدِ المورد',
+                'label' => 'ملف عقد المورد',
                 'tabs' => array(
                     'بياناتُ العقد' => 'Suppliers/supplierscontracts.php',
                     'بنودُ العقد' => 'Suppliers/supplier_contract_lines.php',
@@ -59,7 +59,7 @@ if (!function_exists('ems_entity_tabs')) {
                (SUP-18) والسلفُ (SUP-17) والمخالفاتُ (SUP-23) وحالةُ الصرفِ
                (SUP-20) أبناؤه. وحالةُ الصرفِ **إسقاطٌ من المالية** لا سطحٌ هنا. */
             'settlement' => array(
-                'label' => 'ملفُّ التسوية',
+                'label' => 'ملف التسوية',
                 'tabs' => array(
                     'التسوياتُ وكشفُ الحساب' => 'Suppliers/settlements.php',
                     'الاستحقاقات' => 'Suppliers/supplier_entitlements.php',
@@ -71,7 +71,7 @@ if (!function_exists('ems_entity_tabs')) {
             /* SAL-01: «خمسةُ تبويبات: البيانات الأساسية · جهات الاتصال ·
                المشاريع · العقود · المركز المالي إسقاطًا مقيَّدًا». */
             'client' => array(
-                'label' => 'ملفُّ العميل',
+                'label' => 'ملف العميل',
                 'tabs' => array(
                     'البيانات الأساسية' => 'Clients/clients.php',
                     'جهات الاتصال' => 'Clients/client_contacts.php',
@@ -81,7 +81,7 @@ if (!function_exists('ems_entity_tabs')) {
                 ),
             ),
             'equipment' => array(
-                'label' => 'رحلةُ المعدة',
+                'label' => 'رحلة المعدة',
                 'tabs' => array(
                     'نظرةٌ عامة' => 'Equipments/equipments.php',
                     'الملكيةُ والتمويل' => 'Equipments/equipment_sourcing.php',
@@ -95,7 +95,7 @@ if (!function_exists('ems_entity_tabs')) {
                 ),
             ),
             'ticket' => array(
-                'label' => 'رحلةُ البلاغ',
+                'label' => 'رحلة البلاغ',
                 'tabs' => array(
                     'نظرةٌ عامة' => 'Tickets/tickets_list.php',
                     'السياقُ والمصدر' => 'Tickets/ticket_form.php',
@@ -107,7 +107,7 @@ if (!function_exists('ems_entity_tabs')) {
                 ),
             ),
             'operator' => array(
-                'label' => 'رحلةُ المشغّل',
+                'label' => 'رحلة المشغل',
                 'tabs' => array(
                     'نظرةٌ عامة' => 'Oprators/oprators.php',
                     'التأهيلُ والرخص' => 'Workforce/op_qual.php',
@@ -119,7 +119,7 @@ if (!function_exists('ems_entity_tabs')) {
                 ),
             ),
             'risk' => array(
-                'label' => 'رحلةُ الخطر',
+                'label' => 'رحلة الخطر',
                 'tabs' => array(
                     'نظرةٌ عامة' => 'Risk/risk_register.php',
                     'التصنيفُ والمالك' => '',
@@ -131,7 +131,7 @@ if (!function_exists('ems_entity_tabs')) {
                 ),
             ),
             'financing' => array(
-                'label' => 'رحلةُ عمليةِ التمويل',
+                'label' => 'رحلة عملية التمويل',
                 'tabs' => array(
                     'نظرةٌ عامة' => 'Financing/operation_profile.php',
                     'الممولُ والشروط' => 'Financing/fin_models.php',
@@ -143,7 +143,7 @@ if (!function_exists('ems_entity_tabs')) {
                 ),
             ),
             'project' => array(
-                'label' => 'رحلةُ المشروع',
+                'label' => 'رحلة المشروع',
                 'tabs' => array(
                     'نظرةٌ عامة' => 'Projects/projects.php',
                     'المواقع' => 'Operations/sites_board.php',
@@ -156,7 +156,7 @@ if (!function_exists('ems_entity_tabs')) {
                 ),
             ),
             'contract' => array(
-                'label' => 'رحلةُ العقد',
+                'label' => 'رحلة العقد',
                 'tabs' => array(
                     'نظرةٌ عامة' => 'Contracts/contracts.php',
                     'الأطراف' => '',
@@ -172,7 +172,7 @@ if (!function_exists('ems_entity_tabs')) {
                 ),
             ),
             'employee' => array(
-                'label' => 'رحلةُ الموظف',
+                'label' => 'رحلة الموظف',
                 'tabs' => array(
                     'نظرةٌ عامة' => 'Employees/employees.php',
                     'العقود' => 'Workforce/contract_registry.php',
@@ -186,7 +186,7 @@ if (!function_exists('ems_entity_tabs')) {
                 ),
             ),
             'mnt_order' => array(
-                'label' => 'رحلةُ أمرِ الصيانة',
+                'label' => 'رحلة أمر الصيانة',
                 'tabs' => array(
                     'نظرةٌ عامة' => 'Maintenance/orders.php',
                     'البلاغُ الأصل' => 'Tickets/tickets_list.php',
@@ -216,7 +216,7 @@ if (!function_exists('ems_entity_tabs')) {
             $cls = 'ems-entity-tab' . ($isActive ? ' is-active' : '') . ($route === '' ? ' is-unbuilt' : '');
             $nameH = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
             if ($route === '') {
-                $h .= '<span class="' . $cls . '" title="غيرُ مبنيةٍ بعدُ — هدفٌ معلَنٌ في الدفتر">' . $nameH . '</span>';
+                $h .= '<span class="' . $cls . '" title="غير مبنية بعد — هدف معلن في الدفتر">' . $nameH . '</span>';
             } elseif ($isActive) {
                 $h .= '<span class="' . $cls . '" aria-current="page">' . $nameH . '</span>';
             } else {

@@ -32,11 +32,11 @@ include '../inheader.php'; include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main">
-    <?php $header_title='سجل الأحداث التشغيلية المجمَّع'; $header_icon='fas fa-clock-rotate-left'; $header_actions=array();
+    <?php $header_title='سجل الأحداث التشغيلية المجمع'; $header_icon='fas fa-clock-rotate-left'; $header_actions=array();
     $header_back=array('href'=>'worker_register.php','class'=>'','icon'=>'fas fa-arrow-right','label'=>'سجل العامل');
     include('../includes/page_header.php'); ?>
     <?php // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا سجلَّ أحداثٍ تشغيليةً مجمَّعةً للعاملين بعدُ', 'سجّلِ العاملين في «سجل العامل» وارصدْ عملياتِهم لتظهرَ حصيلتُهم هنا'); ?>
+    echo ems_states_bundle('لا سجل أحداث تشغيلية مجمعة للعاملين بعد', 'سجل العاملين في «سجل العامل» وارصد عملياتهم لتظهر حصيلتهم هنا'); ?>
     <style>
         .wl-kpi-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--space-3); margin: 14px 0; }
         .wl-kpi-card { padding: 14px; text-align: center; }
@@ -69,17 +69,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     ?>
     <div class="wl-kpi-grid">
         <div class="allforms wl-kpi-card"><div class="wl-kpi-num"><?= $kpi['workers'] ?></div><div>الموظفون</div></div>
-        <div class="allforms wl-kpi-card"><div class="wl-kpi-num"><?= $kpi['allocated'] ?></div><div>مخصَّصون (نشط)</div></div>
+        <div class="allforms wl-kpi-card"><div class="wl-kpi-num"><?= $kpi['allocated'] ?></div><div>مخصصون (نشط)</div></div>
         <div class="allforms wl-kpi-card"><div class="wl-kpi-num"><?= $kpi['on_leave'] ?></div><div>في إجازة/غياب</div></div>
-        <div class="allforms wl-kpi-card"><div class="wl-kpi-num is-critical"><?= $kpi['expired_critical'] ?></div><div>اعتماد حرج منتهٍ</div></div>
+        <div class="allforms wl-kpi-card"><div class="wl-kpi-num is-critical"><?= $kpi['expired_critical'] ?></div><div>اعتماد حرج منته</div></div>
         <div class="allforms wl-kpi-card"><div class="wl-kpi-num is-due"><?= count($rotation_due) ?></div><div>اقترب تدويرهم (14 يوم)</div></div>
     </div>
 
     <?php if (!empty($rotation_due)): ?>
     <div class="allforms wl-rotation-card">
-        <div class="card-header"><h5><i class="fas fa-rotate"></i> عقودٌ اقترب موعد تدويرها (محرّك التناوب)</h5></div>
+        <div class="card-header"><h5><i class="fas fa-rotate"></i> عقود اقترب موعد تدويرها (محرك التناوب)</h5></div>
         <table class="data-table wl-table-full">
-            <thead><tr><th>العامل</th><th>كود العقد</th><th>النمط</th><th>الاستحقاق القادم</th><th>المتبقّي (يوم)</th></tr></thead><tbody>
+            <thead><tr><th>العامل</th><th>كود العقد</th><th>النمط</th><th>الاستحقاق القادم</th><th>المتبقي (يوم)</th></tr></thead><tbody>
             <?php foreach ($rotation_due as $rd): $dl = intval($rd['days_left']); ?>
                 <tr><td><strong><?= htmlspecialchars($rd['worker_name'] ?: '-') ?></strong></td>
                     <td><code><?= htmlspecialchars($rd['code'] ?: ('C-'.$rd['contract_id'])) ?></code></td>
@@ -93,12 +93,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php endif; ?>
 
     <div class="table-wrap"><table class="data-table wl-table-full">
-        <thead><tr><th>عرض</th><th>#</th><th>الموظف</th><th>الفئة</th><th>الحالة</th><th>الحالة الميدانية</th><th>العمليات</th><th>ساعات مؤهَّلة</th><th>إجازات/غياب</th><th>تحرّكات</th><th>تقييمات</th><th>حوافز (معتمدة)</th><th>جزاءات (معتمدة)</th>
+        <thead><tr><th>عرض</th><th>#</th><th>الموظف</th><th>الفئة</th><th>الحالة</th><th>الحالة الميدانية</th><th>العمليات</th><th>ساعات مؤهلة</th><th>إجازات/غياب</th><th>تحركات</th><th>تقييمات</th><th>حوافز (معتمدة)</th><th>جزاءات (معتمدة)</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -119,15 +119,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         $i=1; $WF_VIEW = [];
         if($list){ foreach($list as $r):
             $ev0 = $events_map[intval($r['employee_id'])] ?? ['incentive'=>0,'penalty'=>0];
-            $WF_VIEW[$r['employee_id']] = ems_wf_view_payload('سجل الموظف التشغيلي المجمّع', 'fas fa-clock-rotate-left', [
+            $WF_VIEW[$r['employee_id']] = ems_wf_view_payload('سجل الموظف التشغيلي المجمع', 'fas fa-clock-rotate-left', [
                 ems_wf_field('الموظف', $r['worker_name'] ?: '-', 'fas fa-user', ['size' => 'lg']),
                 ems_wf_field('الفئة', $r['worker_category'] ?: '-', 'fas fa-layer-group'),
                 ems_wf_field('الحالة', $r['worker_state'] ?: '-', 'fas fa-diagram-project', ['type' => 'status']),
                 ems_wf_field('الحالة الميدانية', $r['presence_state'] ?: '-', 'fas fa-location-dot'),
                 ems_wf_field('عدد العمليات', intval($r['operations_count']), 'fas fa-gears'),
-                ems_wf_field('ساعات مؤهَّلة', number_format(floatval($r['total_billable_hours']), 1), 'fas fa-clock'),
+                ems_wf_field('ساعات مؤهلة', number_format(floatval($r['total_billable_hours']), 1), 'fas fa-clock'),
                 ems_wf_field('إجازات/غياب', intval($r['leave_absence_count']), 'fas fa-plane-departure'),
-                ems_wf_field('تحرّكات', intval($r['movement_count']), 'fas fa-route'),
+                ems_wf_field('تحركات', intval($r['movement_count']), 'fas fa-route'),
                 ems_wf_field('تقييمات', intval($r['evaluation_count']), 'fas fa-star-half-stroke'),
                 ems_wf_field('حوافز (معتمدة)', number_format(floatval($ev0['incentive']), 2), 'fas fa-gift'),
                 ems_wf_field('جزاءات (معتمدة)', number_format(floatval($ev0['penalty']), 2), 'fas fa-gavel'),
@@ -142,7 +142,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             $ev = $events_map[intval($r['employee_id'])] ?? ['incentive'=>0,'penalty'=>0]; ?>
             <td><?= intval($r['evaluation_count']) ?></td><td><?= number_format(floatval($ev['incentive']),2) ?></td>
             <td><?= number_format(floatval($ev['penalty']),2) ?></td></tr>
-        <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="13" class="wl-empty-cell">لا توجد بياناتٌ بعد (طبّق التهجيرات وأضف موظفين).</td></tr><?php endif; ?>
+        <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="13" class="wl-empty-cell">لا توجد بيانات بعد (طبق التهجيرات وأضف موظفين).</td></tr><?php endif; ?>
         </tbody></table></div>
 </div>
 <?php ems_wf_view_modal($WF_VIEW); ?>

@@ -31,7 +31,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   $header_back     = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
   include('../includes/page_header.php');
   // UXW-01 (9): حالاتُ الشاشةِ الدنيا (تحميل / فراغ / خطأ) — مخفيةٌ افتراضيًّا
-  echo ems_states_bundle('لا تصنيفاتِ آلياتٍ متاحةً لإدخالِ الساعات', 'اختر تصنيفَ الآليةِ من البطاقاتِ أعلاه لبدءِ إدخالِ ساعاتِ التشغيل');
+  echo ems_states_bundle('لا تصنيفات آليات متاحة لإدخال الساعات', 'اختر تصنيف الآلية من البطاقات أعلاه لبدء إدخال ساعات التشغيل');
   ?>
 
 
@@ -84,14 +84,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
       <span class="tst-step-num">1</span>
       <div class="tst-step-txt">
         <b>اختر نوع الآلية</b>
-        <span>حدّد التصنيف من البطاقات أعلاه</span>
+        <span>حدد التصنيف من البطاقات أعلاه</span>
       </div>
     </div>
     <div class="tst-step">
       <span class="tst-step-num">2</span>
       <div class="tst-step-txt">
         <b>أدخل ساعات العمل</b>
-        <span>سجّل ساعات التشغيل والتعطل</span>
+        <span>سجل ساعات التشغيل والتعطل</span>
       </div>
     </div>
     <div class="tst-step">

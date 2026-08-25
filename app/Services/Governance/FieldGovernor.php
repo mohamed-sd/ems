@@ -57,14 +57,14 @@ class FieldGovernor
         $field  = trim((string) ($ctx['child_field'] ?? ''));
         $inh    = self::inheritanceOf($conn, $entity, $field);
         if ($inh === null || (int) $inh['readonly'] !== 1) {
-            return array('ok' => true, 'code' => 200, 'reason' => 'حقلٌ غيرُ موروثٍ فيُحرَّر بحسبِ صنفِه');
+            return array('ok' => true, 'code' => 200, 'reason' => 'حقل غير موروث فيحرر بحسب صنفه');
         }
 
         $source = $inh['parent_entity'] . '.' . $inh['parent_field'];
         self::logDenial($conn, $ctx, $source);
         return array('ok' => false, 'code' => 409, 'source' => $source,
-            'reason' => 'حقلٌ موروثٌ للقراءةِ فقط — مصدرُه ' . $source
-                      . ' « ' . $inh['label_ar'] . ' » · ولا يُدخَل حقلٌ مرتين (IN-01)');
+            'reason' => 'حقل موروث للقراءة فقط — مصدره ' . $source
+                      . ' « ' . $inh['label_ar'] . ' » · ولا يدخل حقل مرتين (IN-01)');
     }
 
     /**
@@ -119,12 +119,12 @@ class FieldGovernor
     public static function assertClassified(\mysqli $conn, $screen, $field)
     {
         if (!self::isGoverning($conn, $screen)) {
-            return array('ok' => true, 'code' => 200, 'reason' => 'شاشةٌ غيرُ حاكمةٍ فلا يلزمها التصنيف');
+            return array('ok' => true, 'code' => 200, 'reason' => 'شاشة غير حاكمة فلا يلزمها التصنيف');
         }
         $c = self::classOf($conn, $screen, $field);
         if ($c === null) {
             return array('ok' => false, 'code' => 409,
-                'reason' => 'حقلٌ بلا صنفٍ لا يُدرَج في شاشةٍ حاكمة: ' . $screen . '.' . $field . ' (OBL-0052)');
+                'reason' => 'حقل بلا صنف لا يدرج في شاشة حاكمة: ' . $screen . '.' . $field . ' (OBL-0052)');
         }
         return array('ok' => true, 'code' => 200, 'dc' => $c['dc_code'], 'reason' => $c['title']);
     }
@@ -146,39 +146,39 @@ class FieldGovernor
             self::logDenial($conn, $ctx + array('child_entity' => $entity, 'child_field' => $field),
                             $inh['parent_entity'] . '.' . $inh['parent_field']);
             return array('ok' => false, 'code' => 409,
-                'reason' => 'حقلٌ موروثٌ — مصدرُه ' . $inh['parent_entity'] . '.' . $inh['parent_field'] . ' (IN-01)');
+                'reason' => 'حقل موروث — مصدره ' . $inh['parent_entity'] . '.' . $inh['parent_field'] . ' (IN-01)');
         }
 
         /* ② الصنفُ — والحقلُ بلا صنفٍ في شاشةٍ حاكمةٍ لا يُدرَج أصلًا. */
         $g = self::assertClassified($conn, $screen, $field);
         if (empty($g['ok'])) { return $g; }
         $c = self::classOf($conn, $screen, $field);
-        if ($c === null) { return array('ok' => true, 'code' => 200, 'reason' => 'شاشةٌ غيرُ حاكمة'); }
+        if ($c === null) { return array('ok' => true, 'code' => 200, 'reason' => 'شاشة غير حاكمة'); }
 
         /* ③ طريقةُ التعديلِ التي يفرضها الصنف. */
         switch ($c['edit_mode']) {
             case 'amendment_only':
                 return array('ok' => false, 'code' => 403, 'dc' => $c['dc_code'],
-                    'reason' => $c['title'] . ' — التعديلُ بملحقٍ موقَّعٍ لا بتحريرِ حقل (DC-3)');
+                    'reason' => $c['title'] . ' — التعديل بملحق موقع لا بتحرير حقل (DC-3)');
             case 'decision_only':
                 if (!self::roleAllowed($roleId, $c['edit_roles'])) {
                     return array('ok' => false, 'code' => 403, 'dc' => $c['dc_code'],
-                        'reason' => $c['title'] . ' — لا يُعدَّل إلا بقرارٍ ماليٍّ معتمدٍ من ' . $c['owner_label'] . ' (DC-4)');
+                        'reason' => $c['title'] . ' — لا يعدل إلا بقرار مالي معتمد من ' . $c['owner_label'] . ' (DC-4)');
                 }
                 break;
             case 'proposal':
                 if (!self::roleAllowed($roleId, $c['edit_roles'])) {
                     return array('ok' => false, 'code' => 403, 'dc' => $c['dc_code'],
-                        'reason' => $c['title'] . ' — الإدارةُ تقترحه والماليةُ تحسمه · مالكُه ' . $c['owner_label'] . ' (DC-2)');
+                        'reason' => $c['title'] . ' — الإدارة تقترحه والمالية تحسمه · مالكه ' . $c['owner_label'] . ' (DC-2)');
                 }
                 break;
             default: /* direct */
                 if (trim((string) $c['edit_roles']) !== '' && !self::roleAllowed($roleId, $c['edit_roles'])) {
                     return array('ok' => false, 'code' => 403, 'dc' => $c['dc_code'],
-                        'reason' => $c['title'] . ' — مالكُه ' . $c['owner_label']);
+                        'reason' => $c['title'] . ' — مالكه ' . $c['owner_label']);
                 }
         }
-        return array('ok' => true, 'code' => 200, 'dc' => $c['dc_code'], 'reason' => 'مسموحٌ بصنفِه ' . $c['title']);
+        return array('ok' => true, 'code' => 200, 'dc' => $c['dc_code'], 'reason' => 'مسموح بصنفه ' . $c['title']);
     }
 
     /* ═══════════════════════════════════════════════════════════════════════
@@ -296,7 +296,7 @@ class FieldGovernor
                 $out[$fld] = array(
                     'exportable' => false,   // لا إعلانَ ⇒ لا يُبَتُّ بالسماح
                     'logged'     => true,    // ويُسجَّل الاطّلاعُ احتياطًا
-                    'label'      => 'سياسةُ حقلٍ حساسة',
+                    'label'      => 'سياسة حقل حساسة',
                     'declared'   => false,
                 );
             }

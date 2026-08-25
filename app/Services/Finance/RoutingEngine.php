@@ -69,14 +69,14 @@ class RoutingEngine
         $ref = trim((string) ($ctx['source_ref'] ?? ''));
         $kind = trim((string) ($ctx['source_kind'] ?? ''));
         if ($co <= 0 || $ref === '' || $kind === '') {
-            return self::fail(422, 'التوجيهُ يحتاج الكيانَ ونوعَ المستندِ ومرجعَه');
+            return self::fail(422, 'التوجيه يحتاج الكيان ونوع المستند ومرجعه');
         }
 
         /* ① المسار: بالرمزِ الصريحِ أو بمفتاحِ الحدثِ — ثم الاحتياطيةُ RT-17. */
         $route = self::resolveRoute($conn, $ctx);
         if ($route === null) {
             /* OBL-0307: الثغرةُ تُسجَّل عيبًا لا تُهمَل. */
-            return self::fail(404, 'لا مُطلِقَ معرَّفٌ لهذه الواقعة — ثغرةٌ تُسجَّل عيبًا (OBL-0307)');
+            return self::fail(404, 'لا مطلق معرف لهذه الواقعة — ثغرة تسجل عيبا (OBL-0307)');
         }
 
         /* ② التخصص: من المسار · أو بالإدارةِ ونوعِ الواقعةِ في الاحتياطية. */
@@ -86,7 +86,7 @@ class RoutingEngine
             $spec = self::specForDepartment($conn, $co, (string) ($ctx['source_dept'] ?? $route['source_dept']));
             $via  = 'fallback';
             if ($spec === '') {
-                return self::fail(404, 'الحكمُ الجامعُ لا يجد تخصصًا مسنَدًا لهذه الإدارة (RT-17)');
+                return self::fail(404, 'الحكم الجامع لا يجد تخصصا مسندا لهذه الإدارة (RT-17)');
             }
         }
 
@@ -117,7 +117,7 @@ class RoutingEngine
              فالمهمةُ القائمةُ لهذا المستندِ والمسارِ تُعاد ولا تُخلق ثانيةً. */
         $priorWi = self::existingWorkItem($conn, $co, $kind, $ref, $route['code']);
         if ($priorWi > 0) {
-            return array('ok' => true, 'code' => 200, 'reason' => 'موجَّهٌ سلفًا — أُعيدت مهمتُه ولم تُكرَّر',
+            return array('ok' => true, 'code' => 200, 'reason' => 'موجه سلفا — أعيدت مهمته ولم تكرر',
                 'route' => $route, 'spec' => $spec, 'escalated' => $escalated,
                 'accountant_id' => $accountantId, 'to_role_id' => $toRoleId,
                 'work_item_id' => $priorWi, 'log_id' => self::logIdFor($conn, $co, $kind, $ref, $route['code']),
@@ -131,13 +131,13 @@ class RoutingEngine
         $ownerId    = intval($ctx['owner_user_id'] ?? 0);
         if ($ownerId <= 0) { $ownerId = $accountantId > 0 ? $accountantId : intval($ctx['created_by'] ?? 0); }
         if (($accountantId > 0 || $toRoleId !== null) && $ownerId > 0) {
-            $title = (string) ($ctx['title'] ?? ('مراجعةٌ محاسبية: ' . $route['trigger_ar']));
+            $title = (string) ($ctx['title'] ?? ('مراجعة محاسبية: ' . $route['trigger_ar']));
             $res = WorkItemService::create($conn, array(
                 'company_id'       => $co,
                 'item_type'        => 'task',
                 'title'            => mb_substr($title, 0, 300),
                 'details'          => 'المسار ' . $route['code'] . ' · التخصص ' . $spec
-                                    . ' · شرطُ الإطلاق: ' . $route['launch_cond']
+                                    . ' · شرط الإطلاق: ' . $route['launch_cond']
                                     . ' · السلسلة: ' . $route['chain'],
                 'source_type'      => self::WORK_SOURCE,
                 'source_ref'       => $kind . ':' . $ref,
@@ -151,11 +151,11 @@ class RoutingEngine
                 'assigned_role_id' => $toRoleId,
                 'owner_user_id'    => $ownerId,
                 'due_at'           => date('Y-m-d H:i:s', time() + self::TASK_SLA_HOURS * 3600),
-                'deliverable'      => 'مراجعةٌ مستنديةٌ ومحاسبيةٌ وموازنيةٌ ثم رفعٌ لرئيسِ الحسابات',
-                'evidence_required' => 'قرارُ المحاسبِ في سجلِّ المعاملةِ ومرتجَعٌ إلى مصدرِها',
+                'deliverable'      => 'مراجعة مستندية ومحاسبية وموازنية ثم رفع لرئيس الحسابات',
+                'evidence_required' => 'قرار المحاسب في سجل المعاملة ومرتجع إلى مصدرها',
                 'priority'         => self::TASK_PRIORITY,
                 'created_by'       => intval($ctx['created_by'] ?? 0),
-                'created_capacity' => 'محرّكُ التوجيهِ المالي',
+                'created_capacity' => 'محرك التوجيه المالي',
             ));
             if (!empty($res['ok'])) { $workItemId = intval($res['id'] ?? 0) ?: null; }
         }
@@ -167,16 +167,16 @@ class RoutingEngine
             /* لا مهمةَ تولَّدت — فالواقعةُ بلا مستلِم. ولا يُبتلع هذا صمتًا:
                يُرجَع خللًا بشاهدٍ مكتوبٍ في سجلِّ التوجيه (BR-01). */
             return array('ok' => false, 'code' => 409,
-                'reason' => 'التخصص ' . $spec . ' لم تبلغه الواقعةُ ولا بلغت رئاسةَ الحسابات — '
-                          . 'ولا يُترك الطلبُ صامتًا (BR-01)',
+                'reason' => 'التخصص ' . $spec . ' لم تبلغه الواقعة ولا بلغت رئاسة الحسابات — '
+                          . 'ولا يترك الطلب صامتا (BR-01)',
                 'route' => $route, 'spec' => $spec, 'log_id' => $logId);
         }
 
         return array(
             'ok' => true, 'code' => 200,
             'reason' => $escalated
-                ? 'التخصص ' . $spec . ' بلا حاملٍ — فصُعِّد إلى رئاسةِ الحسابات'
-                : 'وُجِّه إلى ' . $spec . ' وظهر في مهامِّ محاسبِه',
+                ? 'التخصص ' . $spec . ' بلا حامل — فصعد إلى رئاسة الحسابات'
+                : 'وجه إلى ' . $spec . ' وظهر في مهام محاسبه',
             'route' => $route, 'spec' => $spec, 'escalated' => $escalated,
             'accountant_id' => $accountantId, 'to_role_id' => $toRoleId,
             'work_item_id' => $workItemId, 'log_id' => $logId,
@@ -369,22 +369,22 @@ class RoutingEngine
         $ref  = trim((string) ($ctx['source_ref'] ?? ''));
         if ($co <= 0 || $code === '' || $kind === '' || $ref === '') {
             /* BR-04: المرتجَعُ يحمل مرجعَ الطلبِ الأصليِّ ولا ينشأ منفصلًا. */
-            return self::fail(422, 'المرتجَعُ لا ينشأ بلا مرجعِ طلبِه الأصلي (BR-04)');
+            return self::fail(422, 'المرتجع لا ينشأ بلا مرجع طلبه الأصلي (BR-04)');
         }
 
         $notice = self::fetchNotice($conn, $code);
-        if ($notice === null) { return self::fail(404, "مرتجَعٌ غيرُ معرَّف: $code"); }
+        if ($notice === null) { return self::fail(404, "مرتجع غير معرف: $code"); }
 
         /* BR-03: الرفضُ برمزِ سببٍ محكومٍ لا بنصٍّ حر. */
         $reason = trim((string) ($ctx['reason_code'] ?? ''));
         if (self::noticeNeedsReason($code)) {
             if ($reason === '') {
-                return self::fail(422, 'رفضٌ بلا رمزِ سببٍ محكوم — والنصُّ الحرُّ لا يُصنَّف ولا يُقاس (BR-03)');
+                return self::fail(422, 'رفض بلا رمز سبب محكوم — والنص الحر لا يصنف ولا يقاس (BR-03)');
             }
             if (!self::reasonExists($conn, $reason)) {
                 /* ◆ گوتشا: `«$reason»` — المحرفُ `»` يُبتلع في اسمِ المتغيّرِ
                      فيصير `$reason»` غيرَ معرَّف. القوسان المعقوفان إلزامٌ هنا. */
-                return self::fail(422, "رمزُ السبب «{$reason}» غيرُ معرَّفٍ في القاموسِ المحكوم (BR-03)");
+                return self::fail(422, "رمز السبب «{$reason}» غير معرف في القاموس المحكوم (BR-03)");
             }
         }
 
@@ -410,11 +410,11 @@ class RoutingEngine
                 'assigned_user_id' => $toUser,
                 'owner_user_id'    => $toUser,
                 'due_at'           => date('Y-m-d H:i:s', time() + self::TASK_SLA_HOURS * 3600),
-                'deliverable'      => 'تصحيحُ ما نُبِّه عليه وإعادةُ الطلبِ إلى دورته',
-                'evidence_required' => 'أثرُ التصحيحِ في سجلِّ الطلبِ الأصلي',
+                'deliverable'      => 'تصحيح ما نبه عليه وإعادة الطلب إلى دورته',
+                'evidence_required' => 'أثر التصحيح في سجل الطلب الأصلي',
                 'priority'         => self::TASK_PRIORITY,
                 'created_by'       => intval($ctx['created_by'] ?? 0),
-                'created_capacity' => 'مرتجَعُ الماليةِ إلى الإدارات',
+                'created_capacity' => 'مرتجع المالية إلى الإدارات',
             ));
             if (!empty($res['ok'])) { $wiId = intval($res['id'] ?? 0) ?: null; }
         } elseif ($toUser > 0) {
@@ -427,7 +427,7 @@ class RoutingEngine
                    to_role_id, to_label, reason_code, reason_note, work_item_id, state, fired_at, created_by)
                 VALUES (?,?,?,?,?,?,?,?,?,?,?,'open',NOW(),?)";
         $st = $conn->prepare($sql);
-        if (!$st) { return self::fail(500, 'تعذّر تسجيلُ المرتجَع: ' . $conn->error); }
+        if (!$st) { return self::fail(500, 'تعذر تسجيل المرتجع: ' . $conn->error); }
         $stage = mb_substr((string) ($ctx['source_stage'] ?? ''), 0, 80);
         $note  = mb_substr((string) ($ctx['reason_note'] ?? ''), 0, 400);
         $tu = $toUser > 0 ? $toUser : null;
@@ -438,11 +438,11 @@ class RoutingEngine
         $types = 'i' . 'ssss' . 'ii' . 'sss' . 'ii';
         self::assertArity($types, $vals, 'fin_backflow_log');
         $st->bind_param($types, ...$vals);
-        if (!$st->execute()) { $e = $st->error; $st->close(); return self::fail(500, 'تعذّر تسجيلُ المرتجَع: ' . $e); }
+        if (!$st->execute()) { $e = $st->error; $st->close(); return self::fail(500, 'تعذر تسجيل المرتجع: ' . $e); }
         $id = $st->insert_id;
         $st->close();
 
-        return array('ok' => true, 'code' => 200, 'reason' => 'أُطلق المرتجَع ' . $code,
+        return array('ok' => true, 'code' => 200, 'reason' => 'أطلق المرتجع ' . $code,
                      'backflow_id' => $id, 'work_item_id' => $wiId);
     }
 
@@ -476,21 +476,21 @@ class RoutingEngine
         $id  = intval($ctx['backflow_id'] ?? 0);
         $by  = intval($ctx['closed_by'] ?? 0);
         $why = trim((string) ($ctx['close_reason'] ?? ''));
-        if ($co <= 0 || $id <= 0) { return self::fail(422, 'الإغلاقُ يحتاج رقمَ المرتجَع'); }
+        if ($co <= 0 || $id <= 0) { return self::fail(422, 'الإغلاق يحتاج رقم المرتجع'); }
         /* BR-06: «والإغلاقُ بسببٍ مسجَّل» — فالسببُ شرطٌ لا زينة. */
-        if ($why === '') { return self::fail(422, 'لا يُغلق مرتجَعٌ بلا سببٍ مسجَّل (BR-06)'); }
+        if ($why === '') { return self::fail(422, 'لا يغلق مرتجع بلا سبب مسجل (BR-06)'); }
 
         $st = $conn->prepare(
             "UPDATE fin_backflow_log
                 SET state = 'closed_done', close_reason = ?, closed_at = NOW()
               WHERE id = ? AND company_id = ? AND state IN ('open','acted')");
-        if (!$st) { return self::fail(500, 'تعذّر الإغلاق: ' . $conn->error); }
+        if (!$st) { return self::fail(500, 'تعذر الإغلاق: ' . $conn->error); }
         $why = mb_substr($why, 0, 300);
         $st->bind_param('sii', $why, $id, $co);
         $st->execute();
         $n = $st->affected_rows;
         $st->close();
-        if ($n <= 0) { return self::fail(409, 'لا مرتجَعَ مفتوحٌ بهذا الرقم — أو أُغلق سلفًا'); }
+        if ($n <= 0) { return self::fail(409, 'لا مرتجع مفتوح بهذا الرقم — أو أغلق سلفا'); }
 
         /* ◆ المهمةُ المولَّدةُ معه **لا تُمسُّ من هنا**: لها آلةُ حالٍ في
              WorkItemService، ودفعُها بـUPDATE مباشرٍ يلتفُّ على انتقالاتِها.
@@ -501,8 +501,8 @@ class RoutingEngine
           . "   AND wi.status NOT IN ('closed_accepted','cancelled','rejected')");
 
         return array('ok' => true, 'code' => 200, 'closed_by' => $by, 'task_still_open' => $pending,
-                     'reason' => 'أُغلق المرتجَعُ بسببٍ مسجَّل — ولم يُحذف (BR-06)'
-                               . ($pending > 0 ? ' · ومهمتُه لا تزال مفتوحةً يُغلقها منفِّذُها' : ''));
+                     'reason' => 'أغلق المرتجع بسبب مسجل — ولم يحذف (BR-06)'
+                               . ($pending > 0 ? ' · ومهمته لا تزال مفتوحة يغلقها منفذها' : ''));
     }
 
     /* ═══════════════════════════════════════════════════════════════════════
@@ -518,15 +518,15 @@ class RoutingEngine
         $st = $conn->prepare(
             "SELECT target_spec FROM fin_routing_log
               WHERE company_id = ? AND source_kind = ? AND source_ref = ? LIMIT 1");
-        if (!$st) { return self::fail(500, 'تعذّر فحصُ التوجيه'); }
+        if (!$st) { return self::fail(500, 'تعذر فحص التوجيه'); }
         $st->bind_param('iss', $co, $kind, $ref);
         $st->execute();
         $row = $st->get_result()->fetch_assoc();
         $st->close();
         if (!$row) {
-            return self::fail(409, 'لا تصل الخزينةَ واقعةٌ لم تمرَّ بمحاسبِ تخصصِها (OBL-0001)');
+            return self::fail(409, 'لا تصل الخزينة واقعة لم تمر بمحاسب تخصصها (OBL-0001)');
         }
-        return array('ok' => true, 'code' => 200, 'reason' => 'مرَّت بـ' . $row['target_spec'], 'spec' => $row['target_spec']);
+        return array('ok' => true, 'code' => 200, 'reason' => 'مرت ب' . $row['target_spec'], 'spec' => $row['target_spec']);
     }
 
     /* ── مساعدات ─────────────────────────────────────────────────────────── */
@@ -566,7 +566,7 @@ class RoutingEngine
     private static function scalarInt(\mysqli $conn, $sql)
     {
         $r = $conn->query($sql);
-        if ($r === false) { throw new \RuntimeException('استعلامٌ فاشل: ' . $conn->error); }
+        if ($r === false) { throw new \RuntimeException('استعلام فاشل: ' . $conn->error); }
         $row = $r->fetch_row();
         $r->free();
         return $row ? (int) $row[0] : 0;
@@ -586,7 +586,7 @@ class RoutingEngine
     {
         if (strlen($types) !== count($vals)) {
             throw new \LengthException(sprintf(
-                'انزياحُ وسائطٍ في %s — أنواع %d · قيم %d', $label, strlen($types), count($vals)));
+                'انزياح وسائط في %s — أنواع %d · قيم %d', $label, strlen($types), count($vals)));
         }
     }
 }

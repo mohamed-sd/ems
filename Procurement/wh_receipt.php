@@ -82,10 +82,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     /* الدورةُ المستندية (بوابة ١٢): الاستلامُ المؤقتُ خطوتُه التاليةُ التسليمُ للوجهة */
-    echo ems_next_step('تسليمُ العهدةِ للوجهة — يُسجَّل من شاشةِ العهدة', 'receipt_custody_proc.php');
+    echo ems_next_step('تسليم العهدة للوجهة — يسجل من شاشة العهدة', 'receipt_custody_proc.php');
     /* حزمةُ الحالاتِ الدنيا (بوابة ٩): تحميلٌ وفراغٌ وخطأٌ — مخفيةٌ افتراضًا */
-    echo ems_states_bundle('لا عُهَدَ استلامٍ مؤقتٍ بانتظارِ الوجهة',
-        'كلُّ استلامٍ لم يبلغ وجهتَه يظهر هنا بعمرِه — والتسليمُ يُسجَّل من شاشةِ العهدة فيغادر الصفُّ القائمة');
+    echo ems_states_bundle('لا عهد استلام مؤقت بانتظار الوجهة',
+        'كل استلام لم يبلغ وجهته يظهر هنا بعمره — والتسليم يسجل من شاشة العهدة فيغادر الصف القائمة');
     ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
@@ -112,14 +112,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <th>إجمالي الكمية</th>
                     <th>الحالة</th>
                     <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                     <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                     <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                     <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-                    <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي — عهدة الاستلام لا تُعتمد بدونه">المرفق</th>
+                    <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي — عهدة الاستلام لا تعتمد بدونه">المرفق</th>
                     </tr></thead>
                 <tbody>
                 <?php foreach ($rows as $rc):

@@ -135,7 +135,7 @@ include '../insidebar.php';
 <div class="main chat-main-page">
 <?php
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-echo ems_states_bundle('لا مراسلاتٍ بعد', 'اختر زميلًا من قائمةِ جهاتِ الاتصالِ على اليمينِ لبدءِ محادثة');
+echo ems_states_bundle('لا مراسلات بعد', 'اختر زميلا من قائمة جهات الاتصال على اليمين لبدء محادثة');
 ?>
 <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="chat-wrapper">
@@ -227,7 +227,7 @@ echo ems_states_bundle('لا مراسلاتٍ بعد', 'اختر زميلًا م
         <!-- Empty State -->
         <div class="chat-empty" id="chatEmpty">
             <i class="fas fa-comment-dots"></i>
-            <p>اختر شخصاً لبدء المراسلة</p>
+            <p>اختر شخصا لبدء المراسلة</p>
             <small>اختر أحد الأشخاص من القائمة لبدء محادثة معه</small>
         </div>
 
@@ -309,7 +309,7 @@ echo ems_states_bundle('لا مراسلاتٍ بعد', 'اختر زميلًا م
                 <div id="recipientsContainer">
                     <?php foreach ($contacts as $contact): ?>
                         <div class="recipient-item" data-name="<?php echo htmlspecialchars($contact['name']); ?>" data-role="<?php echo htmlspecialchars($contact['role_name']); ?>" onclick="toggleRecipient(<?php echo $contact['id']; ?>)">
-                            <input type="checkbox" aria-label="تحديدُ هذا المستلمِ للرسالةِ الجماعية" value="<?php echo $contact['id']; ?>" class="recipient-checkbox" onclick="event.stopPropagation();">
+                            <input type="checkbox" aria-label="تحديد هذا المستلم للرسالة الجماعية" value="<?php echo $contact['id']; ?>" class="recipient-checkbox" onclick="event.stopPropagation();">
                             <div class="recipient-avatar <?php echo htmlspecialchars($contact['role_color_class']); ?>">
                                 <?php echo htmlspecialchars($contact['avatar']); ?>
                             </div>
@@ -852,7 +852,7 @@ echo ems_states_bundle('لا مراسلاتٍ بعد', 'اختر زميلًا م
         });
     });
 
-    // تحديث العداد عند تغيير الـ checkboxes
+    // تحديث العداد عند تغيير ال checkboxes
     document.querySelectorAll('.recipient-checkbox').forEach(function(cb) {
         cb.addEventListener('change', updateSelectedCount);
     });
@@ -862,7 +862,7 @@ echo ems_states_bundle('لا مراسلاتٍ بعد', 'اختر زميلًا م
         var textarea = document.getElementById('broadcastMessage');
         var msg = textarea.value.trim();
         if (!msg) {
-            simpleToast('الرجاء كتابة رسالة أولاً', 'fas fa-exclamation-circle');
+            simpleToast('الرجاء كتابة رسالة أولا', 'fas fa-exclamation-circle');
             return;
         }
 

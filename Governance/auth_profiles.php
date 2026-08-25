@@ -28,7 +28,7 @@ if (!$is_super_admin && empty($__pp['can_view'])) {
     header('Location: ../main/dashboard.php?denied=' . rawurlencode($SCREEN));
     exit();
 }
-if ($_SERVER['REQUEST_METHOD'] === 'POST') { http_response_code(405); exit('شاشةُ عرضٍ لا تكتب — التعديلُ إصدارٌ جديدٌ بمسارِ الحوكمة'); }
+if ($_SERVER['REQUEST_METHOD'] === 'POST') { http_response_code(405); exit('شاشة عرض لا تكتب — التعديل إصدار جديد بمسار الحوكمة'); }
 
 // ═══ ④ العرض ═══
 $g = $conn->query(
@@ -52,7 +52,7 @@ include __DIR__ . '/../insidebar.php';
   <?php
   $header_title = $PAGE_TITLE;
   $header_icon = 'fa fa-id-card';
-  $header_desc = 'تسعُ درجاتٍ في كلِّ إدارةٍ — رؤوسُها من ورقةِ الدفترِ حرفًا وبنودُها المزروعةُ من الصلاحياتِ الحية. كلُّها بحالةِ مسودةٍ حتى اعتمادِ تقريرِ الفروق — والتعديلُ إصدارٌ جديدٌ لا مساسٌ بالنافذ.';
+  $header_desc = 'تسع درجات في كل إدارة — رؤوسها من ورقة الدفتر حرفا وبنودها المزروعة من الصلاحيات الحية. كلها بحالة مسودة حتى اعتماد تقرير الفروق — والتعديل إصدار جديد لا مساس بالنافذ.';
   $header_back = false;
   include __DIR__ . '/../includes/page_header.php';
   ?>
@@ -61,17 +61,17 @@ include __DIR__ . '/../insidebar.php';
     <div class="col"><div class="kpi-card"><div>القوالب</div><strong><?php echo (int) $g['total']; ?></strong></div></div>
     <div class="col"><div class="kpi-card"><div>مسودة</div><strong><?php echo (int) $g['drafts']; ?></strong></div></div>
     <div class="col"><div class="kpi-card"><div>نافذة</div><strong><?php echo (int) $g['actives']; ?></strong></div></div>
-    <div class="col"><div class="kpi-card"><div>مبذورةُ البنود</div><strong><?php echo (int) $g['seeded']; ?></strong></div></div>
+    <div class="col"><div class="kpi-card"><div>مبذورة البنود</div><strong><?php echo (int) $g['seeded']; ?></strong></div></div>
   </div>
 
-  <?php echo ems_states_bundle('لا قوالبَ مبذورة', 'شغِّل هجرةَ GOV-AUTH-01 لبذرِ الورقة'); ?>
+  <?php echo ems_states_bundle('لا قوالب مبذورة', 'شغل هجرة GOV-AUTH-01 لبذر الورقة'); ?>
 
   <?php if ($rows !== false && $rows->num_rows > 0): ?>
   <div class="table-responsive">
     <table class="table" id="authProfilesTable">
       <thead><tr>
-        <th>الرمز</th><th>الإدارة</th><th>الدرجة</th><th>المسمَّى</th>
-        <th>شاشاتُ الهدف</th><th>البنودُ المزروعة</th><th>سقفُ الاعتماد</th><th>الإصدار</th><th>الحالة</th>
+        <th>الرمز</th><th>الإدارة</th><th>الدرجة</th><th>المسمى</th>
+        <th>شاشات الهدف</th><th>البنود المزروعة</th><th>سقف الاعتماد</th><th>الإصدار</th><th>الحالة</th>
       </tr></thead>
       <tbody>
         <?php while ($r = $rows->fetch_assoc()): ?>
@@ -85,7 +85,7 @@ include __DIR__ . '/../insidebar.php';
           <td><?php echo htmlspecialchars($r['approval_cap_label'], ENT_QUOTES, 'UTF-8'); ?></td>
           <td>v<?php echo (int) $r['version']; ?></td>
           <td><span class="status-badge <?php echo $r['state'] === 'active' ? 'status-active' : 'status-pending'; ?>">
-            <?php echo $r['state'] === 'active' ? 'نافذ' : ($r['state'] === 'retired' ? 'متقاعد' : 'مسودةٌ — بانتظارِ اعتمادِ الفروق'); ?>
+            <?php echo $r['state'] === 'active' ? 'نافذ' : ($r['state'] === 'retired' ? 'متقاعد' : 'مسودة — بانتظار اعتماد الفروق'); ?>
           </span></td>
         </tr>
         <?php endwhile; ?>
@@ -93,6 +93,6 @@ include __DIR__ . '/../insidebar.php';
     </table>
   </div>
   <?php else: ?>
-    <?php echo ems_state('empty', 'لا قوالبَ مبذورة', 'شغِّل هجرةَ GOV-AUTH-01 لبذرِ الورقة'); ?>
+    <?php echo ems_state('empty', 'لا قوالب مبذورة', 'شغل هجرة GOV-AUTH-01 لبذر الورقة'); ?>
   <?php endif; ?>
 </div>

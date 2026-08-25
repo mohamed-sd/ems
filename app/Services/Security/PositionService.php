@@ -44,7 +44,7 @@ class PositionService
             if (empty($d[$k])) { $out['code'] = 422; $out['reason'] = "الطبقة {$k} إلزامية — سبع طبقات لا حقل واحد"; return $out; }
         }
         if (empty($d['scope_type']) || !isset($d['scope_id'])) {
-            $out['code'] = 422; $out['reason'] = 'لا مركز بلا نطاق — الصلاحية بلا نطاق مرفوضة بنيويًّا';
+            $out['code'] = 422; $out['reason'] = 'لا مركز بلا نطاق — الصلاحية بلا نطاق مرفوضة بنيويا';
             return $out;
         }
         $pid = intval($d['person_id']); $co = intval($d['company_id']);
@@ -63,7 +63,7 @@ class PositionService
         $stmt->close();
         if ($overlap) {
             $out['code'] = 409;
-            $out['reason'] = 'تداخل فترتين للمسمّى نفسه في النطاق نفسه — المركز #' . $overlap['p_id'];
+            $out['reason'] = 'تداخل فترتين للمسمى نفسه في النطاق نفسه — المركز #' . $overlap['p_id'];
             return $out;
         }
 
@@ -75,7 +75,7 @@ class PositionService
             $prim = $r ? $r->fetch_assoc() : null;
             if ($prim && empty($d['end_previous_p_id'])) {
                 $out['code'] = 422;
-                $out['reason'] = 'نقل بلا إنهاء القديم — المركز الأولي #' . $prim['p_id'] . ' نشط: مرّر end_previous_p_id (S6: القديمة تسقط فورًا)';
+                $out['reason'] = 'نقل بلا إنهاء القديم — المركز الأولي #' . $prim['p_id'] . ' نشط: مرر end_previous_p_id (S6: القديمة تسقط فورا)';
                 return $out;
             }
         }
@@ -143,7 +143,7 @@ class PositionService
             }
             $conn->commit();
             $out['ok'] = true; $out['code'] = 201; $out['p_id'] = $pId; $out['req_id'] = $reqId;
-            $out['reason'] = 'أُرسل للموافقة (' . count($steps) . ' خطوات بدرجة المخاطرة) — ولا تفعيل قبل اكتمالها';
+            $out['reason'] = 'أرسل للموافقة (' . count($steps) . ' خطوات بدرجة المخاطرة) — ولا تفعيل قبل اكتمالها';
             return $out;
         } catch (\Throwable $e) {
             $conn->rollback();
@@ -205,7 +205,7 @@ class PositionService
         }
         // إعادة بناء المشتق — عند أي تغيير في مصدر
         PermissionResolver::rebuild($conn, intval($req['person_id']), intval($req['company_id']));
-        $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'فُعِّل المركز وأُعيد بناء المشتق';
+        $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'فعل المركز وأعيد بناء المشتق';
         return $out;
     }
 
@@ -230,7 +230,7 @@ class PositionService
         require_once __DIR__ . '/PermissionResolver.php';
         PermissionResolver::rebuild($conn, $personId, $companyId);
         return array('ok' => true, 'code' => 200, 'positions' => $positions, 'exceptions' => $exceptions,
-            'reason' => 'عُلِّق فورًا (' . $positions . ' مركزًا · ' . $exceptions . ' استثناءً) — والمشتق أُعيد بناؤه');
+            'reason' => 'علق فورا (' . $positions . ' مركزا · ' . $exceptions . ' استثناء) — والمشتق أعيد بناؤه');
     }
 
     /** سطر سجل تغيير الصلاحيات المستقل (Insert-only). */

@@ -38,7 +38,7 @@ if (!$is_super_admin && empty($__pp['can_view'])) {
     exit();
 }
 if (!$is_super_admin && $_SERVER['REQUEST_METHOD'] === 'POST' && empty($__pp['can_add']) && empty($__pp['can_edit'])) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'غير مصرح بالكتابة في هذه الشاشة ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
+    ems_gov_flash_redirect('../main/dashboard.php', 'غير مصرح بالكتابة في هذه الشاشة ❌', 'GOV-PERM-403', 'اطلب المنحة من مدير الصلاحيات إن كانت ضمن عملك');
 }
 $COLS   = array (
   0 => 'الكيان',
@@ -47,12 +47,12 @@ $COLS   = array (
   3 => 'سبب الفتح',
   4 => 'النطاق المسموح',
   5 => 'الجداول المتأثرة',
-  6 => 'المدة المصرَّح بها',
+  6 => 'المدة المصرح بها',
   7 => 'تاريخ الإغلاق المخطط',
   8 => 'تاريخ الإغلاق الفعلي',
-  9 => 'عدد السجلات المُدخَلة',
+  9 => 'عدد السجلات المدخلة',
   10 => 'وسم السجلات',
-  11 => 'المُدخِلون',
+  11 => 'المدخلون',
   12 => 'الموافق على الفتح',
   13 => 'الموافق على الإغلاق',
   14 => 'تقرير المراجعة بعد الإغلاق',
@@ -64,12 +64,12 @@ $FIELDS = array (
   2 => 'سبب الفتح',
   3 => 'النطاق المسموح',
   4 => 'الجداول المتأثرة',
-  5 => 'المدة المصرَّح بها',
+  5 => 'المدة المصرح بها',
   6 => 'تاريخ الإغلاق المخطط',
   7 => 'تاريخ الإغلاق الفعلي',
-  8 => 'عدد السجلات المُدخَلة',
+  8 => 'عدد السجلات المدخلة',
   9 => 'وسم السجلات',
-  10 => 'المُدخِلون',
+  10 => 'المدخلون',
   11 => 'الموافق على الفتح',
   12 => 'الموافق على الإغلاق',
   13 => 'تقرير المراجعة بعد الإغلاق',
@@ -87,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     $creator = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
     // الموجة ٢: الحفظ في الجدول الأصلي للشاشة (الفارغ NULL — لا مخزن بينيًّا)
     $ok = cmp03_store_insert($conn, $company_id, $CANONICAL, $payload, $status, $uid, $creator);
-    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
+    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
     exit();
 }
 
@@ -102,7 +102,7 @@ $entityName = $govCtx['values']['entity'] ?? '—';
 function cmp03_cell($col, $row, $entityName) {
     $n = cmp03_screen_norm($col);
     if ($n === cmp03_screen_norm('الكيان')) { return $entityName; }
-    if ($n === cmp03_screen_norm('المُنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المُنشئة')) {
+    if ($n === cmp03_screen_norm('المنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المنشئة')) {
         return $row['created_by_name'] ?: '—';
     }
     if ($n === cmp03_screen_norm('تاريخ الإنشاء')) { return $row['created_at']; }
@@ -117,7 +117,7 @@ function cmp03_screen_norm($s) {
     $s = str_replace(array('أ','إ','آ'), 'ا', $s);
     $s = str_replace('ة', 'ه', $s);
     $s = str_replace('ى', 'ي', $s);
-    return preg_replace('/[ًٌٍَُِّْ]/u', '', $s);
+    return preg_replace('/[]/u', '', $s);
 }
 
 $page_title = 'إيكوبيشن | وضع التأسيس وإغلاقه';
@@ -139,7 +139,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     );
     $header_back = false;
     include '../includes/page_header.php';
-    echo ems_states_bundle('لا أوضاعَ تأسيسٍ مسجَّلةً بعدُ لهذا الكيان', 'أضف وضعًا بزر «إضافة» أو تحقق من توفرِ السجلات');
+    echo ems_states_bundle('لا أوضاع تأسيس مسجلة بعد لهذا الكيان', 'أضف وضعا بزر «إضافة» أو تحقق من توفر السجلات');
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
@@ -163,17 +163,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="f3" maxlength="190" id="emsf_1178_39c1d"></div>
                 <div class="form-group"><label for="emsf_1179_8c86e">الجداول المتأثرة</label>
                     <input type="text" name="f4" maxlength="190" id="emsf_1179_8c86e"></div>
-                <div class="form-group"><label for="emsf_1180_0a2d0">المدة المصرَّح بها</label>
+                <div class="form-group"><label for="emsf_1180_0a2d0">المدة المصرح بها</label>
                     <input type="text" inputmode="decimal" name="f5" placeholder="0" id="emsf_1180_0a2d0"></div>
                 <div class="form-group"><label for="emsf_1181_93e14">تاريخ الإغلاق المخطط</label>
                     <input type="date" name="f6" id="emsf_1181_93e14"></div>
                 <div class="form-group"><label for="emsf_1182_a0439">تاريخ الإغلاق الفعلي</label>
                     <input type="date" name="f7" id="emsf_1182_a0439"></div>
-                <div class="form-group"><label for="emsf_1183_44c6e">عدد السجلات المُدخَلة</label>
+                <div class="form-group"><label for="emsf_1183_44c6e">عدد السجلات المدخلة</label>
                     <input type="text" inputmode="decimal" name="f8" placeholder="0" id="emsf_1183_44c6e"></div>
                 <div class="form-group"><label for="emsf_1184_d9722">وسم السجلات</label>
                     <input type="text" name="f9" maxlength="190" id="emsf_1184_d9722"></div>
-                <div class="form-group"><label for="emsf_1185_f1bd5">المُدخِلون</label>
+                <div class="form-group"><label for="emsf_1185_f1bd5">المدخلون</label>
                     <input type="text" name="f10" maxlength="190" id="emsf_1185_f1bd5"></div>
                 <div class="form-group"><label for="emsf_1186_36236">الموافق على الفتح</label>
                     <input type="text" name="f11" maxlength="190" id="emsf_1186_36236"></div>
@@ -195,18 +195,18 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="table-responsive">
         <table class="alltables display" id="founding_modeTable">
             <thead><tr>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
             <th>رقم الوضع</th>
             <th>تاريخ الفتح</th>
             <th>سبب الفتح</th>
             <th>النطاق المسموح</th>
             <th>الجداول المتأثرة</th>
-            <th>المدة المصرَّح بها</th>
+            <th>المدة المصرح بها</th>
             <th>تاريخ الإغلاق المخطط</th>
             <th>تاريخ الإغلاق الفعلي</th>
-            <th>عدد السجلات المُدخَلة</th>
+            <th>عدد السجلات المدخلة</th>
             <th>وسم السجلات</th>
-            <th>المُدخِلون</th>
+            <th>المدخلون</th>
             <th>الموافق على الفتح</th>
             <th>الموافق على الإغلاق</th>
             <th>تقرير المراجعة بعد الإغلاق</th>
@@ -214,7 +214,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="16" class="text-center text-muted">لا بياناتَ بعدُ — أضف أول صفٍّ بزر «إضافة»</td></tr>
+                <tr><td colspan="16" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
                     <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>

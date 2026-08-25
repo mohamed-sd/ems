@@ -40,11 +40,11 @@ $__pc = ems_post_contract($conn, array(
         $qty  = floatval($in['qty'] ?? 0);
         $why  = trim($in['reason'] ?? '');
         if ($line === '' || $qty <= 0 || $why === '') {
-            return array('ok' => false, 'msg' => 'سندُ الصرف والكميةُ والسببُ إلزامية (422)');
+            return array('ok' => false, 'msg' => 'سند الصرف والكمية والسبب إلزامية (422)');
         }
         $p = explode(':', $line);
         if (count($p) !== 2 || (int) $p[0] <= 0 || (int) $p[1] <= 0) {
-            return array('ok' => false, 'msg' => 'مرجعُ سطرِ الصرف غيرُ صالح (422)');
+            return array('ok' => false, 'msg' => 'مرجع سطر الصرف غير صالح (422)');
         }
         return array('ok' => true, 'data' => array(
             'issue' => (int) $p[0], 'item' => (int) $p[1], 'qty' => $qty, 'why' => $why,
@@ -109,33 +109,33 @@ $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-echo ems_states_bundle('لا مرتجعَ مسجَّلًا بعدُ',
-                       'اختر سطرَ سندِ صرفٍ من القائمةِ أعلاه وسجّلْ كميةَ الإرجاعِ وسببَها');
+echo ems_states_bundle('لا مرتجع مسجلا بعد',
+                       'اختر سطر سند صرف من القائمة أعلاه وسجل كمية الإرجاع وسببها');
 ?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
   <form method="post" class="ems-form proc-wr-form">
         <?= csrf_field() ?>
-    <div><label for="wr_issue_line">سطرُ سندِ الصرف الأصلي</label>
+    <div><label for="wr_issue_line">سطر سند الصرف الأصلي</label>
       <select id="wr_issue_line" name="issue_line" class="form-control" required><option value="">—</option>
       <?php foreach ($issues as $i): if ($i['available'] <= 0) { continue; } ?>
         <option value="<?= intval($i['id']) ?>:<?= intval($i['item_id']) ?>"><?= htmlspecialchars(
             ($i['issue_no'] ?: '#' . $i['id']) . ' — ' . $i['item']
             . ' · مصروف ' . (float) $i['issued']
-            . ' · أُرجع ' . (float) $i['returned']
+            . ' · أرجع ' . (float) $i['returned']
             . ' · المتاح ' . (float) $i['available'], ENT_QUOTES, 'UTF-8') ?></option>
       <?php endforeach; ?></select></div>
-    <div><label for="wr_qty">الكميةُ المرتجعة</label><input id="wr_qty" type="number" step="0.01" min="0.01" name="qty" class="form-control proc-wr-qty" required></div>
+    <div><label for="wr_qty">الكمية المرتجعة</label><input id="wr_qty" type="number" step="0.01" min="0.01" name="qty" class="form-control proc-wr-qty" required></div>
     <div><label for="wr_reason">السبب</label><input id="wr_reason" type="text" name="reason" class="form-control" required></div>
     <button class="btn btn-primary">أرجع</button>
   </form>
-  <h6>آخرُ المرتجعات</h6>
+  <h6>آخر المرتجعات</h6>
   <table class="table table-sm" data-no-dt>
-    <thead><tr><th>الوقت</th><th>الصنف</th><th>الكمية</th><th>مرجعُ الصرف</th><th>السبب</th>
+    <thead><tr><th>الوقت</th><th>الصنف</th><th>الكمية</th><th>مرجع الصرف</th><th>السبب</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>

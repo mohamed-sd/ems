@@ -68,13 +68,13 @@ include '../insidebar.php';
     $header_title = 'هامش الواقعة والعقد'; $header_icon = 'fa fa-percent';
     $header_actions = array();
     include('../includes/page_header.php');
-    ems_screen_about('الهامشُ من الاعترافات الثلاثة للواقعة الواحدة (حكمُ العميل − حكمُ المورد − '
-        . 'حكمُ المشغّل) مجمَّعًا بالعقد والعملة — كلُّ رقمٍ من سجل الأحكام لا من تقدير. '
-        . 'وعقدٌ بعملتين يظهر سطرين معلَنين لا رقمًا ملفَّقًا.',
-        array('حدّد الفترة', 'اقرأ الهامشَ السالبَ أولًا — هو القرار'));
+    ems_screen_about('الهامش من الاعترافات الثلاثة للواقعة الواحدة (حكم العميل − حكم المورد − '
+        . 'حكم المشغل) مجمعا بالعقد والعملة — كل رقم من سجل الأحكام لا من تقدير. '
+        . 'وعقد بعملتين يظهر سطرين معلنين لا رقما ملفقا.',
+        array('حدد الفترة', 'اقرأ الهامش السالب أولا — هو القرار'));
     // UXW-01 ⑨: حالتا التحميلِ والخطأِ (حالةُ الفراغِ قائمةٌ أسفلُ) — مخفيتانِ افتراضًا
-    echo ems_state('loading', 'جارٍ حسابُ الهامشِ من أحكامِ الوقائع', '', '', true);
-    echo ems_state('error', 'تعذّر عرضُ تقريرِ الهامش', 'أعد المحاولةَ — وإن استمر الخللُ أبلغ عن مشكلةٍ من هذه الشاشة', '', true);
+    echo ems_state('loading', 'جار حساب الهامش من أحكام الوقائع', '', '', true);
+    echo ems_state('error', 'تعذر عرض تقرير الهامش', 'أعد المحاولة — وإن استمر الخلل أبلغ عن مشكلة من هذه الشاشة', '', true);
     ?>
 
     <div class="card"><div class="card-body">
@@ -92,18 +92,18 @@ include '../insidebar.php';
     </div></div>
 
     <div class="card"><div class="card-body">
-        <?php if (!$rows): ems_state_empty('لا اعترافاتٍ في الفترة — الأحكامُ تولَد مع اعتماد الوحدات',
-            'وسّع المدة', '?from=' . date('Y-01-01', strtotime('-1 year')) . '&to=' . $to); else: ?>
+        <?php if (!$rows): ems_state_empty('لا اعترافات في الفترة — الأحكام تولد مع اعتماد الوحدات',
+            'وسع المدة', '?from=' . date('Y-01-01', strtotime('-1 year')) . '&to=' . $to); else: ?>
         <div class="table-container"><table class="alltables display nowrap rpt-mrg-table">
             <thead><tr><th>العقد</th><th>العملة</th><th>الوقائع</th>
-                <th>إيراد العميل</th><th>تكلفة المورد</th><th>استحقاق المشغّل</th>
+                <th>إيراد العميل</th><th>تكلفة المورد</th><th>استحقاق المشغل</th>
                 <th>الهامش</th><th>الهامش٪</th>
                 <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
                 <th class="ems-fn-th" data-fn="1">الفترة</th>
                 <th class="ems-fn-th" data-fn="1">المشروع</th>
                 <th class="ems-fn-th" data-fn="1">الوحدة</th>
-                <th class="ems-fn-th" data-fn="1">الإيراد المعترَف به</th>
-                <th class="ems-fn-th" data-fn="1">تكلفة المشغّلين</th>
+                <th class="ems-fn-th" data-fn="1">الإيراد المعترف به</th>
+                <th class="ems-fn-th" data-fn="1">تكلفة المشغلين</th>
                 <th class="ems-fn-th" data-fn="1">تكلفة الوقود</th>
                 <th class="ems-fn-th" data-fn="1">تكلفة الصيانة</th>
                 <th class="ems-fn-th" data-fn="1">تكلفة المخزون</th>
@@ -113,7 +113,7 @@ include '../insidebar.php';
                 <th class="ems-fn-th" data-fn="1">إجمالي التكلفة</th>
                 <th class="ems-fn-th" data-fn="1">نسبة الهامش</th>
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
                 <th class="ems-gov-th none" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
                 <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                 <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
@@ -124,7 +124,7 @@ include '../insidebar.php';
                     <td><a href="../Contracts/contract_card.php?id=<?php echo intval($cid); ?>">عقد #<?php
                         echo htmlspecialchars($cid); ?> ▸</a>
                         <?php if (isset($multiCurrency[$cid])): ?>
-                            <span class="badge badge-warning" title="عقدٌ بعملتين — سطران لا رقم">⚠ عملات</span>
+                            <span class="badge badge-warning" title="عقد بعملتين — سطران لا رقم">⚠ عملات</span>
                         <?php endif; ?></td>
                     <td><?php echo htmlspecialchars((string)$x['currency']); ?></td>
                     <td><?php echo intval($x['events_n']); ?></td>
@@ -142,7 +142,7 @@ include '../insidebar.php';
                     <td><?php echo $x['margin_pct'] !== null
                         ? htmlspecialchars($x['margin_pct'] . '٪') : '—'; ?></td>
                     <?php else: ?>
-                    <td class="ems-field-withheld" title="محجوبٌ — يحتاج منحةً فردية">—</td>
+                    <td class="ems-field-withheld" title="محجوب — يحتاج منحة فردية">—</td>
                     <td class="ems-field-withheld">—</td>
                     <td class="ems-field-withheld">—</td>
                     <td class="ems-field-withheld">—</td>
@@ -151,8 +151,8 @@ include '../insidebar.php';
                 </tr>
             <?php endforeach; ?>
             </tbody></table></div>
-        <p class="rpt-mrg-note">استحقاقُ المشغّل هنا من أحكام الوقائع (M-24) —
-            وعقودُ الاستعداد المقطوعة ليست فيه (لا سعرَ ساعةٍ لها) فهامشُها يقرؤه كشفُ الرواتب.</p>
+        <p class="rpt-mrg-note">استحقاق المشغل هنا من أحكام الوقائع (M-24) —
+            وعقود الاستعداد المقطوعة ليست فيه (لا سعر ساعة لها) فهامشها يقرؤه كشف الرواتب.</p>
         <?php endif; ?>
     </div></div>
 </div>

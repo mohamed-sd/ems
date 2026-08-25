@@ -61,7 +61,7 @@ class RoutingConsumer
                 'source_kind'  => 'financial_event',
                 'source_ref'   => $ref,
                 'source_dept'  => self::deptOf((string) ($event['source_module'] ?? '')),
-                'title'        => 'مراجعةٌ محاسبية: ' . self::labelOf($event),
+                'title'        => 'مراجعة محاسبية: ' . self::labelOf($event),
                 'event_ref'    => (string) ($event['correlation_id'] ?? ''),
                 'org_unit_id'  => self::orgUnitFor($conn, $co),
                 'project_id'   => !empty($event['project_id']) ? intval($event['project_id']) : null,
@@ -121,14 +121,14 @@ class RoutingConsumer
     public static function deptOf($module)
     {
         static $m = array(
-            'sales' => 'المبيعاتُ والعقود', 'suppliers' => 'إدارةُ الموردين',
-            'workforce' => 'الموارد البشرية', 'procurement' => 'المشترياتُ التشغيلية',
-            'warehouse' => 'إدارةُ المخازن', 'maintenance' => 'إدارةُ الصيانة',
-            'projects' => 'إدارةُ التشغيل', 'revenue' => 'المبيعاتُ والعقود',
-            'assets' => 'إدارةُ الأسطول', 'treasury' => 'الخزينةُ والبنوك',
-            'movement' => 'إدارةُ التشغيل', 'finance' => 'المالية',
-            'transport' => 'النقلُ والترحيل', 'sites' => 'إدارةُ الموقع',
-            'tickets' => 'مركزُ البلاغات', 'admin' => 'الشؤونُ الإدارية',
+            'sales' => 'المبيعات والعقود', 'suppliers' => 'إدارة الموردين',
+            'workforce' => 'الموارد البشرية', 'procurement' => 'المشتريات التشغيلية',
+            'warehouse' => 'إدارة المخازن', 'maintenance' => 'إدارة الصيانة',
+            'projects' => 'إدارة التشغيل', 'revenue' => 'المبيعات والعقود',
+            'assets' => 'إدارة الأسطول', 'treasury' => 'الخزينة والبنوك',
+            'movement' => 'إدارة التشغيل', 'finance' => 'المالية',
+            'transport' => 'النقل والترحيل', 'sites' => 'إدارة الموقع',
+            'tickets' => 'مركز البلاغات', 'admin' => 'الشؤون الإدارية',
             'system' => 'المالية',
         );
         return isset($m[$module]) ? $m[$module] : (string) $module;
@@ -139,7 +139,7 @@ class RoutingConsumer
     {
         $k = (string) ($e['event_key'] ?? '');
         $n = (string) ($e['event_no'] ?? '');
-        return trim(($k !== '' ? $k : 'واقعةٌ مالية') . ($n !== '' ? ' · ' . $n : ''));
+        return trim(($k !== '' ? $k : 'واقعة مالية') . ($n !== '' ? ' · ' . $n : ''));
     }
 
     /** وحدةٌ تنظيميةٌ للنطاق — `work_items` يرفض عنصرًا بلا نطاق (WF-02). */

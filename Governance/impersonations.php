@@ -48,12 +48,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 array(), array('target_user' => (int) $_POST['target_user'], 'reason' => (string) $_POST['reason']));
         }
         $_SESSION['imp_flash'] = array('ok' => $res['ok'],
-            'msg' => $res['ok'] ? 'فُتحت الجلسةُ وأُخطر صاحبُ الموضعِ فورًا' : $res['reason']);
+            'msg' => $res['ok'] ? 'فتحت الجلسة وأخطر صاحب الموضع فورا' : $res['reason']);
     } elseif ($act === 'close') {
         // التدوينُ قبلَ الإغلاقِ — فالنسبةُ المزدوجةُ تُختم ما دامت الجلسةُ نشطةً لحظةَ الكتابة
         ems_audit_change($conn, 'governance', $SCREEN, 'imp.close', 0, array(), array('closed' => 1));
         \App\Services\Gov\ImpersonationService::close($conn, (int) $_SESSION['user']['id']);
-        $_SESSION['imp_flash'] = array('ok' => true, 'msg' => 'أُغلقت جلستُك الجارية');
+        $_SESSION['imp_flash'] = array('ok' => true, 'msg' => 'أغلقت جلستك الجارية');
     }
     // PRG — يقطع إعادةَ الإرسالِ وأيَّ معالجةِ عرضٍ لاحقةٍ للطلبِ الكاتب
     header('Location: impersonations.php');
@@ -83,18 +83,18 @@ include __DIR__ . '/../insidebar.php';
   <?php
   $header_title = $PAGE_TITLE;
   $header_icon = 'fa fa-user-shield';
-  $header_desc = 'لا دخولَ بحسابِ الغير: جلسةٌ موسومةٌ بالفاعلِ الحقيقيِّ والمُنابِ عنه والسببِ والمدةِ — وكلُّ فعلٍ فيها مزدوجُ النسبةِ في دفترِ الأفعال. والمراجعُ يراها لحظةَ جريانِها.';
+  $header_desc = 'لا دخول بحساب الغير: جلسة موسومة بالفاعل الحقيقي والمناب عنه والسبب والمدة — وكل فعل فيها مزدوج النسبة في دفتر الأفعال. والمراجع يراها لحظة جريانها.';
   $header_back = false;
   include __DIR__ . '/../includes/page_header.php';
   ?>
 
   <div class="row">
-    <div class="col"><div class="kpi-card"><div>الجلساتُ كلُّها</div><strong><?php echo (int) $g['total']; ?></strong></div></div>
-    <div class="col"><div class="kpi-card"><div>جاريةٌ الآن</div><strong><?php echo (int) $g['open_n']; ?></strong></div></div>
-    <div class="col"><div class="kpi-card"><div>مغلقةٌ بلا إخطار</div><strong><?php echo (int) $g['unnotified']; ?></strong></div></div>
+    <div class="col"><div class="kpi-card"><div>الجلسات كلها</div><strong><?php echo (int) $g['total']; ?></strong></div></div>
+    <div class="col"><div class="kpi-card"><div>جارية الآن</div><strong><?php echo (int) $g['open_n']; ?></strong></div></div>
+    <div class="col"><div class="kpi-card"><div>مغلقة بلا إخطار</div><strong><?php echo (int) $g['unnotified']; ?></strong></div></div>
   </div>
 
-  <?php echo ems_states_bundle('لا جلساتِ نيابةٍ مسجَّلة', 'تُفتح الجلسةُ من النموذجِ أدناه بسببٍ ومدةٍ — وتظهر هنا لحظةَ فتحِها'); ?>
+  <?php echo ems_states_bundle('لا جلسات نيابة مسجلة', 'تفتح الجلسة من النموذج أدناه بسبب ومدة — وتظهر هنا لحظة فتحها'); ?>
 
   <?php if ($FLASH['ok'] !== null): ?>
     <div class="<?php echo $FLASH['ok'] ? 'ems-state-readonly' : 'ems-state-noperm'; ?> ems-state" role="status">
@@ -108,16 +108,16 @@ include __DIR__ . '/../insidebar.php';
       <form method="post" class="imp-open-form">
         <?php echo csrf_field(); ?>
         <input type="hidden" name="imp_action" value="close">
-        <span>جلستُك الجاريةُ موضعَ <b><?php echo htmlspecialchars($__mine['target_name'], ENT_QUOTES, 'UTF-8'); ?></b>
+        <span>جلستك الجارية موضع <b><?php echo htmlspecialchars($__mine['target_name'], ENT_QUOTES, 'UTF-8'); ?></b>
               — تنتهي في <?php echo htmlspecialchars($__mine['valid_to'], ENT_QUOTES, 'UTF-8'); ?></span>
-        <button type="submit" class="btn btn-secondary btn-sm">إنهاءُ الجلسة</button>
+        <button type="submit" class="btn btn-secondary btn-sm">إنهاء الجلسة</button>
       </form>
     <?php else: ?>
       <form method="post" class="imp-open-form">
         <?php echo csrf_field(); ?>
         <input type="hidden" name="imp_action" value="open">
-        <label for="impTarget">فتحُ جلسةِ نيابةٍ موضعَ</label>
-        <select id="impTarget" name="target_user" required aria-label="صاحبُ الموضعِ المُنابُ عنه">
+        <label for="impTarget">فتح جلسة نيابة موضع</label>
+        <select id="impTarget" name="target_user" required aria-label="صاحب الموضع المناب عنه">
           <option value="">— اختر الموظف —</option>
           <?php
           $__us = $conn->query("SELECT id, username FROM users
@@ -129,14 +129,14 @@ include __DIR__ . '/../insidebar.php';
           ?>
         </select>
         <input type="text" id="impReason" name="reason" required maxlength="255"
-               aria-label="سببُ الجلسةِ — إلزامي" placeholder="السبب — لا جلسةَ بسببٍ فارغ">
-        <select id="impHours" name="hours" aria-label="مدةُ الجلسةِ بالساعات">
+               aria-label="سبب الجلسة — إلزامي" placeholder="السبب — لا جلسة بسبب فارغ">
+        <select id="impHours" name="hours" aria-label="مدة الجلسة بالساعات">
           <option value="1">ساعة</option><option value="4" selected>4 ساعات</option>
           <option value="8">8 ساعات</option><option value="24">24 ساعة</option>
         </select>
-        <button type="submit" class="btn btn-primary btn-sm">فتحُ الجلسة</button>
+        <button type="submit" class="btn btn-primary btn-sm">فتح الجلسة</button>
       </form>
-      <div class="imp-open-note">لا ترفع الجلسةُ صلاحيتَك — تعمل بسلطتِك على خطِّك الإداريِّ وحدَه، وكلُّ فعلٍ مزدوجُ النسبةِ ويُخطَر صاحبُ الموضعِ فورًا. ولا نيابةَ على الرقابيّين.</div>
+      <div class="imp-open-note">لا ترفع الجلسة صلاحيتك — تعمل بسلطتك على خطك الإداري وحده، وكل فعل مزدوج النسبة ويخطر صاحب الموضع فورا. ولا نيابة على الرقابيين.</div>
     <?php endif; ?>
   </div></div>
   <style>
@@ -149,8 +149,8 @@ include __DIR__ . '/../insidebar.php';
   <div class="table-responsive">
     <table class="table" id="impersonationsTable">
       <thead><tr>
-        <th>الفاعلُ الحقيقي</th><th>موضعَ من</th><th>السبب</th>
-        <th>فُتحت</th><th>تنتهي</th><th>الحالة</th><th>الإخطار</th>
+        <th>الفاعل الحقيقي</th><th>موضع من</th><th>السبب</th>
+        <th>فتحت</th><th>تنتهي</th><th>الحالة</th><th>الإخطار</th>
       </tr></thead>
       <tbody>
         <?php while ($r = $rows->fetch_assoc()): ?>
@@ -161,14 +161,14 @@ include __DIR__ . '/../insidebar.php';
           <td><?php echo htmlspecialchars((string) $r['opened_at'], ENT_QUOTES, 'UTF-8'); ?></td>
           <td><?php echo htmlspecialchars((string) $r['valid_to'], ENT_QUOTES, 'UTF-8'); ?></td>
           <td><span class="status-badge <?php echo $r['closed_at'] === null ? 'status-pending' : 'status-active'; ?>">
-            <?php echo $r['closed_at'] === null ? 'جاريةٌ الآن' : 'مغلقة'; ?></span></td>
-          <td><?php echo $r['notified_at'] !== null ? 'أُخطر صاحبُ الموضع' : '—'; ?></td>
+            <?php echo $r['closed_at'] === null ? 'جارية الآن' : 'مغلقة'; ?></span></td>
+          <td><?php echo $r['notified_at'] !== null ? 'أخطر صاحب الموضع' : '—'; ?></td>
         </tr>
         <?php endwhile; ?>
       </tbody>
     </table>
   </div>
   <?php else: ?>
-    <?php echo ems_state('empty', 'لا جلساتِ نيابةٍ مسجَّلة', 'مسارُ النيابةِ يُفعَّل مع التبديلِ — وستظهر هنا لحظةَ فتحِها'); ?>
+    <?php echo ems_state('empty', 'لا جلسات نيابة مسجلة', 'مسار النيابة يفعل مع التبديل — وستظهر هنا لحظة فتحها'); ?>
   <?php endif; ?>
 </div>

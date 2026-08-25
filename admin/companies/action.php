@@ -133,7 +133,7 @@ if ($action === 'create' || $action === 'update') {
         try { $planRow = $ca_pg->selectOne('admin_subscription_plans', array('columns' => array('id'), 'where' => array('id' => $planId))); }
         catch (\Throwable $t) {
             error_log('admin/companies/action plan: ' . $t->getMessage());
-            companies_redirect_with_msg($redirectTo, 'error', 'تعذر التحقق من خطة الاشتراك حالياً.');
+            companies_redirect_with_msg($redirectTo, 'error', 'تعذر التحقق من خطة الاشتراك حاليا.');
         }
         if (!$planRow) {
             companies_redirect_with_msg($redirectTo, 'error', 'خطة الاشتراك المختارة غير موجودة.');
@@ -147,7 +147,7 @@ if ($action === 'create' || $action === 'update') {
                 'whereRaw' => ($action === 'update' ? 'id <> ' . intval($id) : '1=1')));
         } catch (\Throwable $t) { $dupReg = null; error_log('admin/companies/action reg dup: ' . $t->getMessage()); }
         if ($dupReg) {
-            companies_redirect_with_msg($redirectTo, 'error', 'رقم السجل التجاري مستخدم مسبقاً.');
+            companies_redirect_with_msg($redirectTo, 'error', 'رقم السجل التجاري مستخدم مسبقا.');
         }
     }
 
@@ -156,7 +156,7 @@ if ($action === 'create' || $action === 'update') {
             $dupRow = $ca_pg->selectOne('admin_companies', array('columns' => array('id'), 'where' => array('email' => $email)));
         } catch (\Throwable $t) {
             error_log('admin/companies/action email dup: ' . $t->getMessage());
-            companies_redirect_with_msg($redirectTo, 'error', 'تعذر التحقق من البريد الإلكتروني حالياً.');
+            companies_redirect_with_msg($redirectTo, 'error', 'تعذر التحقق من البريد الإلكتروني حاليا.');
         }
 
         if ($dupRow) {
@@ -181,7 +181,7 @@ if ($action === 'create' || $action === 'update') {
         $dupUserRow = $dupUserRes ? mysqli_fetch_assoc($dupUserRes) : null;
         mysqli_stmt_close($dupUserStmt);
         if ($dupUserRow) {
-            companies_redirect_with_msg($redirectTo, 'error', 'بريد المدير العام مستخدم مسبقاً.');
+            companies_redirect_with_msg($redirectTo, 'error', 'بريد المدير العام مستخدم مسبقا.');
         }
 
         $companyEsc = mysqli_real_escape_string($conn, $companyName);
@@ -372,7 +372,7 @@ if ($action === 'create' || $action === 'update') {
             'where' => array('email' => $email), 'whereRaw' => 'id <> ' . intval($id)));
     } catch (\Throwable $t) {
         error_log('admin/companies/action update dup: ' . $t->getMessage());
-        companies_redirect_with_msg($redirectTo, 'error', 'تعذر التحقق من البريد الإلكتروني حالياً.');
+        companies_redirect_with_msg($redirectTo, 'error', 'تعذر التحقق من البريد الإلكتروني حاليا.');
     }
 
     if ($dupRow) {
@@ -520,7 +520,7 @@ if ($action === 'update_company_user_password') {
     $userCheckSql = 'SELECT id, username FROM users WHERE id = ? AND company_id = ? LIMIT 1';
     $userCheckStmt = mysqli_prepare($conn, $userCheckSql);
     if (!$userCheckStmt) {
-        companies_redirect_with_msg($redirectTo, 'error', 'تعذر التحقق من المستخدم حالياً.');
+        companies_redirect_with_msg($redirectTo, 'error', 'تعذر التحقق من المستخدم حاليا.');
     }
 
     mysqli_stmt_bind_param($userCheckStmt, 'ii', $userId, $id);
@@ -573,7 +573,7 @@ if ($action === 'activate' || $action === 'suspend') {
         $ok = true;
     } catch (\Throwable $t) {
         error_log('admin/companies/action status: ' . $t->getMessage());
-        companies_redirect_with_msg($redirectTo, 'error', 'تعذر تغيير حالة الشركة حالياً.');
+        companies_redirect_with_msg($redirectTo, 'error', 'تعذر تغيير حالة الشركة حاليا.');
     }
 
     if ($ok) {
@@ -593,14 +593,14 @@ if ($action === 'delete') {
     catch (\Throwable $t) { error_log('admin/companies/action users count: ' . $t->getMessage()); }
 
     if ($usersCount > 0) {
-        companies_redirect_with_msg($redirectTo, 'error', 'لا يمكن حذف شركة مرتبطة بمستخدمين. قم بنقل/حذف المستخدمين أولاً.');
+        companies_redirect_with_msg($redirectTo, 'error', 'لا يمكن حذف شركة مرتبطة بمستخدمين. قم بنقل/حذف المستخدمين أولا.');
     }
 
     // [مُستثنى موثَّق — حذف صف منصّي] deleteRow حكرٌ تعاقديًا على جداول المستأجر؛ حذف
     // الشركة يبقى خامًا بهوية الكونسول (بعد حارس صفر-مستخدمين أعلاه) حتى قناة حذفٍ منصّية.
     $deleteStmt = mysqli_prepare($conn, 'DELETE FROM admin_companies WHERE id = ? LIMIT 1');
     if (!$deleteStmt) {
-        companies_redirect_with_msg($redirectTo, 'error', 'تعذر حذف الشركة حالياً.');
+        companies_redirect_with_msg($redirectTo, 'error', 'تعذر حذف الشركة حاليا.');
     }
 
     mysqli_stmt_bind_param($deleteStmt, 'i', $id);

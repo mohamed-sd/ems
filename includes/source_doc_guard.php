@@ -43,36 +43,36 @@ if (!function_exists('ems_source_doc_registry')) {
     {
         return array(
             'journal_entry' => array(
-                'label'  => 'قيدٌ يدويّ',
+                'label'  => 'قيد يدوي',
                 'guard'  => 'FIN-SRC-JV',
                 'any_of' => array(
                     'event_id' => array('table' => 'fin_financial_events', 'pk' => 'id',
-                                        'label' => 'حدثٌ ماليٌّ مرتبط'),
+                                        'label' => 'حدث مالي مرتبط'),
                 ),
             ),
             'payment' => array(
-                'label'  => 'حركةُ صرفٍ أو تحصيل',
+                'label'  => 'حركة صرف أو تحصيل',
                 'guard'  => 'FIN-SRC-PAY',
                 'any_of' => array(
                     'event_id'      => array('table' => 'fin_financial_events', 'pk' => 'id',
-                                             'label' => 'حدثٌ ماليّ'),
+                                             'label' => 'حدث مالي'),
                     'due_id'        => array('table' => 'fin_dues', 'pk' => 'id',
-                                             'label' => 'مستندُ التزام'),
+                                             'label' => 'مستند التزام'),
                     'receivable_id' => array('table' => 'fin_receivables', 'pk' => 'id',
-                                             'label' => 'ذمّةٌ معتمدة'),
+                                             'label' => 'ذمة معتمدة'),
                 ),
             ),
             'closing_item' => array(
-                'label'   => 'بندُ إقفالٍ منجَز',
+                'label'   => 'بند إقفال منجز',
                 'guard'   => 'FIN-SRC-CLOSE',
-                'text_of' => array('note' => 'مرجعُ الدليل'),
+                'text_of' => array('note' => 'مرجع الدليل'),
             ),
             'cost_record' => array(
-                'label'  => 'سجلُّ تكلفة',
+                'label'  => 'سجل تكلفة',
                 'guard'  => 'FIN-SRC-COST',
                 'any_of' => array(
                     'event_id' => array('table' => 'fin_financial_events', 'pk' => 'id',
-                                        'label' => 'حدثٌ مصدر'),
+                                        'label' => 'حدث مصدر'),
                 ),
             ),
         );
@@ -141,7 +141,7 @@ if (!function_exists('ems_require_source_doc')) {
         if (!isset($reg[$kind])) {
             /* نوعٌ غيرُ مُعلَن: **يُرفض ولا يُخمَّن** — فالسكوتُ يفتح بابًا لا يُغلق */
             return array('ok' => false, 'code' => 422, 'via' => '',
-                         'reason' => 'FIN-SRC-422: نوعُ كتابةٍ غيرُ مُعلَنٍ في سجلِّ المصادر — لا تمرُّ');
+                         'reason' => 'FIN-SRC-422: نوع كتابة غير معلن في سجل المصادر — لا تمر');
         }
         $spec = $reg[$kind];
 
@@ -181,8 +181,8 @@ if (!function_exists('ems_require_source_doc')) {
             ems_source_doc_use_exception($conn, (int) $exc['req_id'], (int) $actorId,
                 ($opRef !== '' ? $opRef : $kind));
             return array('ok' => true, 'code' => 200, 'via' => 'exception',
-                         'reason' => 'استثناءٌ نافذٌ #' . (int) $exc['req_id']
-                                   . ' — استعمالٌ محسوبٌ حتى ' . (string) $exc['valid_to']);
+                         'reason' => 'استثناء نافذ #' . (int) $exc['req_id']
+                                   . ' — استعمال محسوب حتى ' . (string) $exc['valid_to']);
         }
 
         /* ④ ولا شيء: 422 يسمّي المطلوب */
@@ -190,7 +190,7 @@ if (!function_exists('ems_require_source_doc')) {
         if (!empty($spec['any_of'])) { foreach ($spec['any_of'] as $s) { $need[] = $s['label']; } }
         if (!empty($spec['text_of'])) { foreach ($spec['text_of'] as $l) { $need[] = $l; } }
         return array('ok' => false, 'code' => 422, 'via' => '',
-                     'reason' => 'FIN-SRC-422: ' . $spec['label'] . ' بلا مستندِ مصدر — المطلوبُ أحدُ: '
-                               . implode(' أو ', $need) . ' (أو استثناءٌ معتمدٌ نافذ)');
+                     'reason' => 'FIN-SRC-422: ' . $spec['label'] . ' بلا مستند مصدر — المطلوب أحد: '
+                               . implode(' أو ', $need) . ' (أو استثناء معتمد نافذ)');
     }
 }

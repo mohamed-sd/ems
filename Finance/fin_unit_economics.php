@@ -10,9 +10,9 @@ $FA_SCREEN = array(
     'file' => 'fin_unit_economics.php',
     'title' => 'ربحية المعدة الواحدة',
     'icon' => 'fas fa-truck-monster',
-    'about' => 'إيرادُ المعدةِ وتكلفتُها وهامشُها وتكلفةُ ساعتِها — بالبُعد D5 المعدة. والمعدةُ بهامشٍ سالبٍ ثلاثةَ أشهرٍ تُنشر إشارةً للأسطولِ والتشغيل.',
+    'about' => 'إيراد المعدة وتكلفتها وهامشها وتكلفة ساعتها — بالبعد D5 المعدة. والمعدة بهامش سالب ثلاثة أشهر تنشر إشارة للأسطول والتشغيل.',
     'notes' => array (
-  0 => 'الهامشُ محسوبٌ من الاعترافاتِ لا من تقديرٍ يدوي',
+  0 => 'الهامش محسوب من الاعترافات لا من تقدير يدوي',
 ),
     'context' => array(),
     'filters' => '',
@@ -36,10 +36,10 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
     }
 ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
-    <?php echo ems_states_bundle('لا توجد بياناتٌ لهذه الفترة', 'غيّر الفترةَ أو تحقق من توفرِ السجلات'); ?>
+    <?php echo ems_states_bundle('لا توجد بيانات لهذه الفترة', 'غير الفترة أو تحقق من توفر السجلات'); ?>
     <div class="card"><div class="card-body table-responsive">
         <?php if (!$rows): ?>
-            <?php ems_state_empty('لا معداتٍ لها قيودٌ في هذه الفترة — الربحيةُ تُقاس بعد أولِ قيدٍ بالبُعد D5'); ?>
+            <?php ems_state_empty('لا معدات لها قيود في هذه الفترة — الربحية تقاس بعد أول قيد بالبعد D5'); ?>
         <?php else: ?>
         <table class="alltables display nowrap fa-table-full">
             <thead><tr><th>المعدة</th><th>الكود</th><th>الإيراد الصافي M1</th><th>الهامش الإجمالي M2</th>

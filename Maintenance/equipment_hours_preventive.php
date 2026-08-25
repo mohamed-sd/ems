@@ -42,7 +42,7 @@ $sql = "SELECT mp.id, mp.name AS plan_name, mp.interval_value, mp.tolerance,
 $res = mysqli_query($conn, $sql);
 if ($res) { while ($x = mysqli_fetch_assoc($res)) $rows[] = $x; }
 
-$page_title = 'ساعاتُ المعدة والوقائية';
+$page_title = 'ساعات المعدة والوقائية';
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
 require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(null);
@@ -55,31 +55,31 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 /* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
    شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
 $header_icon = 'fa fa-stopwatch';
-$header_title_html = htmlspecialchars('ساعاتُ المعدة مقابل جدول الغيار', ENT_QUOTES, 'UTF-8');
+$header_title_html = htmlspecialchars('ساعات المعدة مقابل جدول الغيار', ENT_QUOTES, 'UTF-8');
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-echo ems_states_bundle('لا خططَ وقائيةً بأساس عدّادِ الساعات', 'اربطِ الخطةَ الوقائيةَ بمعدةٍ واجعل أساسَ تكرارِها ساعاتٍ من شاشةِ الصيانةِ الوقائية');
+echo ems_states_bundle('لا خطط وقائية بأساس عداد الساعات', 'اربط الخطة الوقائية بمعدة واجعل أساس تكرارها ساعات من شاشة الصيانة الوقائية');
 ?>
-  <p class="text-muted mnt-eh-note">زاويةُ الصيانة للتايم شيت: المتراكمُ منذ آخر إنجازٍ مقابل الفترة — لا «من عمل اليوم».</p>
+  <p class="text-muted mnt-eh-note">زاوية الصيانة للتايم شيت: المتراكم منذ آخر إنجاز مقابل الفترة — لا «من عمل اليوم».</p>
 
   <table class="table table-striped" data-no-dt>
     <thead><tr>
       <th>المعدة</th><th>الخطة</th><th>الفترة (ساعة)</th>
-      <th>المتراكمُ منذ آخر غيار</th><th>المتبقي</th><th>الحالة</th>
+      <th>المتراكم منذ آخر غيار</th><th>المتبقي</th><th>الحالة</th>
       <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-      <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-      <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-      <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-      <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+      <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+      <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+      <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+      <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
       <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
       <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
       <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
       </tr></thead>
     <tbody>
     <?php if (empty($rows)): ?>
-      <tr><td colspan="6" class="text-center text-muted">لا خططَ وقائيةً بأساس العدّاد</td></tr>
+      <tr><td colspan="6" class="text-center text-muted">لا خطط وقائية بأساس العداد</td></tr>
     <?php endif; ?>
     <?php foreach ($rows as $r):
         $interval = floatval($r['interval_value']);
@@ -88,7 +88,7 @@ echo ems_states_bundle('لا خططَ وقائيةً بأساس عدّادِ ا�
         $tol      = floatval($r['tolerance']);
         // UXW-01 ①: نبرةُ الشارةِ صنفٌ مُعلَنٌ في كتلةِ أنماطِ الشاشةِ لا لونٌ مثبَّتٌ في الوسم
         if ($left < 0)          { $badge = array('mnt-eh-badge--over', 'متجاوزة'); }
-        elseif ($left <= $tol)  { $badge = array('mnt-eh-badge--due', 'مستحقةٌ الآن'); }
+        elseif ($left <= $tol)  { $badge = array('mnt-eh-badge--due', 'مستحقة الآن'); }
         elseif ($left <= $interval * 0.15) { $badge = array('mnt-eh-badge--near', 'تقترب'); }
         else                    { $badge = array('mnt-eh-badge--ok', 'ضمن الفترة'); }
     ?>

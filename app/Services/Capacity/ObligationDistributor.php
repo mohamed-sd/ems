@@ -33,27 +33,27 @@ class ObligationDistributor
         // حصةٌ بلا التزامٍ → 422 — قبل أي حساب
         $oblId = isset($a['contract_obligation_ref']) ? (int) $a['contract_obligation_ref'] : 0;
         if ($oblId <= 0) {
-            $out['code'] = 422; $out['reason'] = 'حصةٌ بلا التزامٍ — مرجعُ التزام نوع المعدة إلزامي (§2-①)';
+            $out['code'] = 422; $out['reason'] = 'حصة بلا التزام — مرجع التزام نوع المعدة إلزامي (§2-①)';
             return $out;
         }
         $obls = $gate->scopedQuery(array('scope' => array('c' => 'contract_commitments')),
             "SELECT c.* FROM contract_commitments c WHERE {TENANT_SCOPE} AND c.id = ? AND c.is_deleted = 0",
             array($oblId));
-        if (!$obls) { $out['code'] = 422; $out['reason'] = 'حصةٌ بلا التزامٍ حي — 422'; return $out; }
+        if (!$obls) { $out['code'] = 422; $out['reason'] = 'حصة بلا التزام حي — 422'; return $out; }
         $obl = $obls[0];
 
         // لا إدخالَ يدويٍّ للكميات المشتقة — من أدخلها أدخل مصدرَ حقيقةٍ ثانيًا
         foreach (array('supplier_share_hours_month', 'supplier_share_hours_total', 'hours_month', 'hours_total') as $k) {
             if (isset($a[$k]) && $a[$k] !== '' && $a[$k] !== null) {
                 $out['code'] = 422;
-                $out['reason'] = 'الكمياتُ المشتقةُ لا تُدخل يدويًّا (' . $k . ') — تُحسب من الالتزام وخطته (§5-⑦)';
+                $out['reason'] = 'الكميات المشتقة لا تدخل يدويا (' . $k . ') — تحسب من الالتزام وخطته (§5-⑦)';
                 return $out;
             }
         }
 
         $primary = isset($a['primary_units_committed']) ? (int) $a['primary_units_committed'] : 0;
         if ($primary <= 0) {
-            $out['code'] = 422; $out['reason'] = 'عددُ الأساسية الملتزَم بها إلزاميٌّ موجب';
+            $out['code'] = 422; $out['reason'] = 'عدد الأساسية الملتزم بها إلزامي موجب';
             return $out;
         }
 
@@ -68,22 +68,22 @@ class ObligationDistributor
         $sigma = $sigmaOthers + $primary;
         $target = $obl['primary_units_contracted'] !== null ? (int) $obl['primary_units_contracted'] : null;
         if ($target === null) {
-            $out['code'] = 422; $out['reason'] = 'الالتزامُ بلا عددٍ متعاقد — لا توزيعَ بلا مستهدف';
+            $out['code'] = 422; $out['reason'] = 'الالتزام بلا عدد متعاقد — لا توزيع بلا مستهدف';
             return $out;
         }
         $out['sigma'] = $sigma; $out['target'] = $target; $out['gap'] = $target - $sigma;
         $state = (string) $obl['plan_state'];
         if ($sigma > $target) {
             $out['code'] = 409;
-            $out['reason'] = 'Σ الأساسي (' . $sigma . ') يتجاوز المتعاقدَ (' . $target . ') بفارق '
+            $out['reason'] = 'Σ الأساسي (' . $sigma . ') يتجاوز المتعاقد (' . $target . ') بفارق '
                            . ($sigma - $target) . ' — 409 (C1)';
             return $out;
         }
         if (($state === 'submitted' || $state === 'approved') && $sigma < $target
             && trim((string) $obl['sigma_exception_ref']) === '') {
             $out['code'] = 409;
-            $out['reason'] = 'الخطةُ معتمدةٌ وΣ (' . $sigma . ') دون المتعاقد (' . $target
-                           . ') — أعدها مسودةً أو أرفق قرارَ استثناءٍ موقَّعًا (C16)';
+            $out['reason'] = 'الخطة معتمدة وΣ (' . $sigma . ') دون المتعاقد (' . $target
+                           . ') — أعدها مسودة أو أرفق قرار استثناء موقعا (C16)';
             return $out;
         }
 
@@ -102,10 +102,10 @@ class ObligationDistributor
         )), $actor);
         if (!$r['ok']) { return array_merge($out, array('code' => $r['code'], 'reason' => $r['reason'])); }
         $out['ok'] = true; $out['code'] = 200; $out['line_id'] = (int) $r['line_id'];
-        $out['reason'] = 'حصةٌ ' . $primary . ' أساسيةً حُفظت — Σ ' . $sigma . '/' . $target
-                       . ($out['gap'] > 0 ? ' والفجوةُ ' . $out['gap'] . ' ظاهرة (C15)' : ' بالضبط')
+        $out['reason'] = 'حصة ' . $primary . ' أساسية حفظت — Σ ' . $sigma . '/' . $target
+                       . ($out['gap'] > 0 ? ' والفجوة ' . $out['gap'] . ' ظاهرة (C15)' : ' بالضبط')
                        . ($derived['share_qty_month'] !== null
-                          ? ' · الحصةُ الشهريةُ المشتقة ' . $derived['share_qty_month'] . ' ' . $derived['measure_code'] : '');
+                          ? ' · الحصة الشهرية المشتقة ' . $derived['share_qty_month'] . ' ' . $derived['measure_code'] : '');
         return $out;
     }
 }

@@ -182,7 +182,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['event_type'])) {
     $__es = ems_fin_event_resolve_source($conn, (int) $company_id, $source_module, $source_ref);
     if (empty($__es['ok'])) {
         ems_gov_flash_redirect('events_list_fin.php', $__es['reason'], 'GOV-REF-422',
-            'اختر مرجعًا يقابله صفٌّ في إدارةِ المصدر');
+            'اختر مرجعا يقابله صف في إدارة المصدر');
         exit();
     }
 
@@ -191,7 +191,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['event_type'])) {
     $__pd = ems_period_check($conn, (int) $company_id, date('Y-m-d'));
     if (empty($__pd['ok'])) {
         ems_gov_flash_redirect('events_list_fin.php', $__pd['reason'], 'GOV-PERIOD-423',
-            'تُفتح الفترةُ استثنائيًّا من شاشة إقفال الفترات بقرارٍ موثَّق');
+            'تفتح الفترة استثنائيا من شاشة إقفال الفترات بقرار موثق');
         exit();
     }
 
@@ -208,7 +208,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['event_type'])) {
             ), array('id' => $id), 'COALESCE(is_deleted,0)=0');
         } catch (\App\Core\TenantGateException $e) {
             error_log('events_list edit refused: ' . $e->getMessage());
-            ems_gov_flash_redirect('events_list_fin.php', 'لا يجوز تعديل حدثٍ منشورٍ على الناقل ❌', 'GOV-FAIL-409', ''); exit();
+            ems_gov_flash_redirect('events_list_fin.php', 'لا يجوز تعديل حدث منشور على الناقل ❌', 'GOV-FAIL-409', ''); exit();
         }
         ems_gov_flash_redirect('events_list_fin.php', 'تم تعديل الحدث المالي بنجاح ✅', 'GOV-OK-200', ''); exit();
     } else {
@@ -233,7 +233,7 @@ if (isset($_GET['delete_id'])) {
         $gate->softDelete('fin_financial_events', $delete_id);
     } catch (\App\Core\TenantGateException $e) {
         error_log('events_list delete refused: ' . $e->getMessage());
-        ems_gov_flash_redirect('events_list_fin.php', 'لا يجوز حذف حدثٍ منشورٍ على الناقل ❌', 'GOV-FAIL-409', ''); exit();
+        ems_gov_flash_redirect('events_list_fin.php', 'لا يجوز حذف حدث منشور على الناقل ❌', 'GOV-FAIL-409', ''); exit();
     }
     ems_gov_flash_redirect('events_list_fin.php', 'تم حذف الحدث المالي بنجاح ✅', 'GOV-OK-200', ''); exit();
 }
@@ -253,7 +253,7 @@ if (isset($_GET['advance_id'])) {
         list($next, $lbl, $level) = $flow[$cur];
         // فصل الواجبات: هذا الانتقال يخصّ مستواه فقط
         if (!fin_can_perform($conn, $ctx['role'], $level)) {
-            ems_gov_flash_redirect(ems_flash_to('events_list_fin.php', urlencode($lbl) . ")+يخصّ+" . urlencode(fin_level_owner_label($level)) . "+❌"), 'هذا الإجراء (', 'GOV-INFO-200', ''); exit();
+            ems_gov_flash_redirect(ems_flash_to('events_list_fin.php', urlencode($lbl) . ")+يخص+" . urlencode(fin_level_owner_label($level)) . "+❌"), 'هذا الإجراء (', 'GOV-INFO-200', ''); exit();
         }
 
         /* ══ INJ-0039 (P1) — «من أنشأ الحدثَ يعتمده في خطوةِ مستواه» ══════════
@@ -261,10 +261,10 @@ if (isset($_GET['advance_id'])) {
            كان في مستوى الاعتمادِ اعتمد ما أنشأ. والحارسُ مبنيٌّ ولم يُنادَ هنا. */
         require_once __DIR__ . '/../includes/self_approval_guard.php';
         $__sa = ems_assert_not_self_approval($conn, 'fin_financial_events', 'id', $aid,
-            'حدثٌ ماليٌّ ' . (string) ($event['event_no'] ?? ('#' . $aid)), $company_id);
+            'حدث مالي ' . (string) ($event['event_no'] ?? ('#' . $aid)), $company_id);
         if ($__sa !== null) {
             ems_gov_flash_redirect('events_list_fin.php', $__sa['reason'], 'GOV-PERM-403',
-                'الاعتمادُ يدٌ ثانيةٌ غيرُ يدِ الإنشاء');
+                'الاعتماد يد ثانية غير يد الإنشاء');
             exit();
         }
 
@@ -311,7 +311,7 @@ if (isset($_GET['advance_id'])) {
             if ($jid > 0) {
                 $jrow = ems_tenant_db()->selectOne('fin_journal_entries', array('columns' => array('entry_no'), 'where' => array('id' => $jid)));
                 $jno = $jrow ? $jrow['entry_no'] : ('#' . $jid);
-                $auto_msg = ' وتولّد القيد ' . $jno . ' آليًا';
+                $auto_msg = ' وتولد القيد ' . $jno . ' آليا';
                 fin_notify($conn, $company_id, 'finance_manager', 'قيد آلي ' . $jno . ' جاهز للترحيل (من ' . $event['event_no'] . ')', 'journal_form_fin.php');
             }
         }
@@ -336,7 +336,7 @@ if (isset($_GET['reject_id'])) {
         $fesSync = \App\Services\Finance\EventStateMachine::syncTo(
             ems_tenant_db(), $conn, $rid, 'ReturnedToSource', $current_user_id);
         if (!$fesSync['ok']) { error_log('events_list fes reject sync #' . $rid . ': ' . implode(' · ', $fesSync['reasons'])); }
-        fin_notify($conn, $company_id, 'dept_accountant', 'حدث مرفوض أُعيد إليك للتصحيح', 'events_list_fin.php?fstate=rejected');
+        fin_notify($conn, $company_id, 'dept_accountant', 'حدث مرفوض أعيد إليك للتصحيح', 'events_list_fin.php?fstate=rejected');
         ems_gov_flash_redirect('events_list_fin.php', 'تم رفض الحدث ✅', 'GOV-OK-200', ''); exit();
     }
     ems_gov_flash_redirect('events_list_fin.php', 'لا يمكن رفض هذه الحالة ❌', 'GOV-FAIL-409', ''); exit();
@@ -391,7 +391,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا أحداثَ ماليةً ضمنَ التصفيةِ المختارة', 'أنشئْ حدثًا بزرِّ «إضافة حدث مالي» أو اضغطْ «الكل» في شريطِ التصفيةِ لرفعِ القيد');
+    echo ems_states_bundle('لا أحداث مالية ضمن التصفية المختارة', 'أنشئ حدثا بزر «إضافة حدث مالي» أو اضغط «الكل» في شريط التصفية لرفع القيد');
     ?>
 
     <?php fin_msg_banner(); ?>
@@ -438,7 +438,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <input type="number" step="0.000001" min="0" name="fx_rate" id="f_fx_rate" placeholder="اختياري">
                     </div>
                     <div class="form-group">
-                        <label for="f_project_id">المشروع (بُعد تكلفة)</label>
+                        <label for="f_project_id">المشروع (بعد تكلفة)</label>
                         <select name="project_id" id="f_project_id"><?php echo fin_project_options($conn, $is_super_admin, $company_id); ?></select>
                     </div>
                     <div class="form-group">
@@ -446,7 +446,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <select name="supplier_entity_id" id="f_supplier_id"><?php echo fin_supplier_options($conn, $is_super_admin, $company_id); ?></select>
                     </div>
                     <div class="form-group">
-                        <label for="f_equipment_id">المعدة (بُعد تكلفة)</label>
+                        <label for="f_equipment_id">المعدة (بعد تكلفة)</label>
                         <select name="equipment_id" id="f_equipment_id"><?php echo fin_equipment_options($conn, $is_super_admin, $company_id); ?></select>
                     </div>
                     <div class="form-group fin-ev-wide">
@@ -491,8 +491,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <th>الإجراءات</th><th>رقم الحدث</th><th>النوع</th><th>المصدر</th><th>المرجع</th>
                     <th>المبلغ</th><th>المشروع/المورد</th><th>الحالة</th>
                                     <!-- U10-B12: النواة الحاكمة (الخلايا يحشوها ui-unification.js) -->
-                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ السجل وبأي صفة">المُنشئ — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ السجل وبأي صفة">المنشئ — الاسم والصفة</th>
                     <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء">تاريخ الإنشاء</th>
                     <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="السجل الذي تولد عنه">المرجع الأب</th>
 </tr></thead>

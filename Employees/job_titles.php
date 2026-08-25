@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ems_gov_flash_redirect('job_titles.php', '✅ تم حفظ المسمى الوظيفي بنجاح', 'GOV-OK-200', ''); exit();
         } catch (\Throwable $e) {
             $dup = (strpos($e->getMessage(), 'Duplicate') !== false);
-            $error_msg = $dup ? 'هذا المسمى موجودٌ مسبقاً ❌' : ('حدث خطأ: ' . htmlspecialchars($e->getMessage()) . ' ❌');
+            $error_msg = $dup ? 'هذا المسمى موجود مسبقا ❌' : ('حدث خطأ: ' . htmlspecialchars($e->getMessage()) . ' ❌');
         }
     }
 }
@@ -72,9 +72,9 @@ if (isset($_GET['delete_id'])) {
         }
     } catch (\Throwable $e) { /* غير مملوك/سياق ناقص → تعذّر */ }
     if ($used > 0) {
-        ems_gov_flash_redirect('job_titles.php', "لا يمكن حذف مسمى مستخدمٍ من قِبل $used موظف ❌", 'GOV-FAIL-409', '');
+        ems_gov_flash_redirect('job_titles.php', "لا يمكن حذف مسمى مستخدم من قبل $used موظف ❌", 'GOV-FAIL-409', '');
     } else {
-        ems_gov_flash_redirect('job_titles.php', $ok ? 'تم حذف المسمى الوظيفي ✅' : 'تعذّر الحذف (خارج نطاق شركتك) ❌', $ok ? 'GOV-OK-200' : 'GOV-SCOPE-403', '');
+        ems_gov_flash_redirect('job_titles.php', $ok ? 'تم حذف المسمى الوظيفي ✅' : 'تعذر الحذف (خارج نطاق شركتك) ❌', $ok ? 'GOV-OK-200' : 'GOV-SCOPE-403', '');
     }
     exit();
 }
@@ -122,7 +122,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => 'employees.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'سجل الموظفين');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا مسمّياتِ وظيفيةً مسجَّلةً بعدُ', 'أضف أولَ مسمًّى وظيفيٍّ بزرِّ «إضافة مسمى وظيفي» في رأسِ الشاشة');
+    echo ems_states_bundle('لا مسميات وظيفية مسجلة بعد', 'أضف أول مسمى وظيفي بزر «إضافة مسمى وظيفي» في رأس الشاشة');
     ?>
 
     <?php if (!empty($_GET['msg'])): $isSuccess = strpos($_GET['msg'], '✅') !== false; ?>
@@ -175,12 +175,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="table-wrap jt-table-wrap">
         <table class="data-table jt-table-full" id="jtTable">
             <thead>
-                <tr><th>إجراءات</th><th>المسمى</th><th>الوصف</th><th>مشغّل؟</th><th>الموظفون</th><th>النطاق</th><th>الحالة</th>
+                <tr><th>إجراءات</th><th>المسمى</th><th>الوصف</th><th>مشغل؟</th><th>الموظفون</th><th>النطاق</th><th>الحالة</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -208,18 +208,18 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <a href="javascript:void(0);" class="action-btn delete" title="حذف"
                                onclick="confirmDel(<?= intval($row['id']) ?>, '<?= htmlspecialchars($row['name'], ENT_QUOTES) ?>', <?= intval($row['used_count']) ?>)"><i class="fas fa-trash"></i></a>
                         <?php endif; ?>
-                        <?php if (!$can_manage): ?><span class="badge jt-badge-muted">عامّ</span><?php endif; ?>
+                        <?php if (!$can_manage): ?><span class="badge jt-badge-muted">عام</span><?php endif; ?>
                     </div></td>
                     <td><strong><?= htmlspecialchars($row['name']) ?></strong></td>
                     <td><?= htmlspecialchars($row['description'] ?: '-') ?></td>
                     <td><?= intval($row['is_operator']) ? '<span class="badge badge-info">مشغّل</span>' : '—' ?></td>
                     <td><span class="badge badge-info"><?= intval($row['used_count']) ?></span></td>
-                    <td><?= $is_global ? '<span class="status-pill status-warning">عامّ</span>' : '<span class="status-pill status-active">الشركة</span>' ?></td>
+                    <td><?= $is_global ? '<span class="status-pill status-warning">عام</span>' : '<span class="status-pill status-active">الشركة</span>' ?></td>
                     <td><?= intval($row['status']) ? '<span class="status-pill status-active">نشط</span>' : '<span class="status-pill status-inactive">غير نشط</span>' ?></td>
                 </tr>
             <?php endforeach; }
             if (empty($jt_rows)): ?>
-                <tr><td colspan="7" class="jt-empty-cell">لا توجد مسمّيات بعد.</td></tr>
+                <tr><td colspan="7" class="jt-empty-cell">لا توجد مسميات بعد.</td></tr>
             <?php endif; ?>
             </tbody>
         </table>
@@ -242,7 +242,7 @@ function editJT(d){
     window.scrollTo({ top: f.offsetTop - 90, behavior: 'smooth' });
 }
 function confirmDel(id, name, used){
-    if (used > 0) { alert('لا يمكن حذف "' + name + '" لأنه مستخدمٌ من قِبل ' + used + ' موظف.'); return; }
+    if (used > 0) { alert('لا يمكن حذف "' + name + '" لأنه مستخدم من قبل ' + used + ' موظف.'); return; }
     if (confirm('حذف المسمى "' + name + '"؟')) window.location.href = 'job_titles.php?delete_id=' + id;
 }
 </script>

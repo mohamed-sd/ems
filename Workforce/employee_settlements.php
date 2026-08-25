@@ -89,10 +89,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate'])) {
     // — فالطلبُ المكرر يفتح التسويةَ نفسَها ولا يولّد ثانيةً ولا يخصم مرتين.
     $res = SVC::generate($gate, $conn, 'employee', $party, $from, $to, $uid);
     if ($res['ok']) {
-        $m = 'تولّدت+التسوية+—+' . intval($res['entitlements']) . '+استحقاقًا+و' .
-             intval($res['charges']) . '+تحميلًا';
+        $m = 'تولدت+التسوية+—+' . intval($res['entitlements']) . '+استحقاقا+و' .
+             intval($res['charges']) . '+تحميلا';
         if (intval($res['unpriced']) > 0) {
-            $m .= '+·+' . intval($res['unpriced']) . '+بندًا+بلا+سعرِ+صرف';
+            $m .= '+·+' . intval($res['unpriced']) . '+بندا+بلا+سعر+صرف';
         }
         ems_gov_redirect("Location: employee_settlements.php?msg={$m}+✅&open=" . intval($res['settlement_id']));
     } else {
@@ -105,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $act = strval($_POST['action']);
     $sid = intval($_POST['sid'] ?? 0);
-    $res = array('ok' => false, 'reason' => 'إجراءٌ غير معروف');
+    $res = array('ok' => false, 'reason' => 'إجراء غير معروف');
 
     // ⚠️ التسويةُ المفتوحةُ يجب أن تكون **تسويةَ موظف**: بلا هذا الفحص يصير
     // معرّفٌ مُلفَّقٌ في `sid` بابًا خلفيًّا يعتمد به موظفُ الموارد البشرية
@@ -120,7 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
 
     if (!$owned) {
-        $res['reason'] = 'التسويةُ غير موجودةٍ أو ليست تسويةَ موظف';
+        $res['reason'] = 'التسوية غير موجودة أو ليست تسوية موظف';
     } elseif ($act === 'submit' && $can_edit) {
         $res = SVC::submit($gate, $sid, $uid);
     } elseif ($act === 'object' && $can_edit) {
@@ -131,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     } elseif ($act === 'approve' && $can_approve) {
         $res = SVC::approve($gate, $conn, $sid, $uid);
         if ($res['ok'] && $res['net_direction'] === 'receivable') {
-            $res['reason'] = 'اعتُمدت — والصافي سالبٌ ففُتحت ذمّةٌ مدينةٌ على الموظف';
+            $res['reason'] = 'اعتمدت — والصافي سالب ففتحت ذمة مدينة على الموظف';
         }
     } else {
         $res['reason'] = 'لا توجد صلاحية لهذا الإجراء';
@@ -205,7 +205,7 @@ if ($open > 0) {
 
 $STATE_AR = array(
     'draft' => 'مسودة', 'review' => 'قيد المراجعة', 'approved' => 'معتمدة',
-    'payment_requested' => 'طُلب الدفع', 'paid' => 'مدفوعة', 'cancelled' => 'ملغاة',
+    'payment_requested' => 'طلب الدفع', 'paid' => 'مدفوعة', 'cancelled' => 'ملغاة',
 );
 $CHARGE_AR = array(
     'fuel' => 'وقود', 'parts' => 'قطع غيار', 'maintenance' => 'صيانة',
@@ -229,7 +229,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا تسوياتِ موظفين مولَّدةً بعدُ', 'اختر الموظفَ والفترةَ في «تسويةٌ جديدة» ثم اضغطْ «ولّد التسوية»');
+    echo ems_states_bundle('لا تسويات موظفين مولدة بعد', 'اختر الموظف والفترة في «تسوية جديدة» ثم اضغط «ولد التسوية»');
     ?>
     <style>
         .es-msg-body { padding: var(--space-3) var(--space-4); }
@@ -264,33 +264,33 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-body">
         <p class="es-note-text">
             <i class="fas fa-circle-info"></i>
-            اختر الموظفَ والفترة، والنظامُ <strong>يجلب البنودَ من مصادرها</strong> —
-            استحقاقُه وتحميلاتُه من دفتر ذممه، كلٌّ برابط أصله. لا تُدخل مبلغًا واحدًا بيدك.
-            وحين تفوق التحميلاتُ استحقاقَه يصير الصافي سالبًا فتُفتح <strong>ذمّةٌ مدينةٌ عليه</strong>.
+            اختر الموظف والفترة، والنظام <strong>يجلب البنود من مصادرها</strong> —
+            استحقاقه وتحميلاته من دفتر ذممه، كل برابط أصله. لا تدخل مبلغا واحدا بيدك.
+            وحين تفوق التحميلات استحقاقه يصير الصافي سالبا فتفتح <strong>ذمة مدينة عليه</strong>.
             <br>
-            <strong>مَن يُعدّ لا يُجيز:</strong> الموارد البشرية تُعدّ وتراجع، ومديرُ الإدارة المالية يُجيز.
+            <strong>من يعد لا يجيز:</strong> الموارد البشرية تعد وتراجع، ومدير الإدارة المالية يجيز.
         </p>
     </div></div>
 
     <div class="card"><div class="card-body es-warn-body">
         <p class="es-warn-text">
             <i class="fas fa-triangle-exclamation"></i>
-            <strong>حدٌّ معلَن — خصومُ السلف والجزاءات:</strong>
-            هذه الشاشةُ تجلب للموظف ما في <strong>دفتر ذممه</strong> فقط. ولا مصدرَ
-            مستنديًّا بعدُ لسلفةِ موظفٍ ولا لجزائه — فحتى يُبنى مصدراهما، تُدخَل
-            هذه الخصومُ في دفتر الذمم يدويًّا ثم تظهر هنا تحميلًا.
-            <strong>ما لا يُدخَل هناك لا يُخصَم هنا</strong> — والشاشةُ لا تخترع خصمًا لا أصلَ له.
+            <strong>حد معلن — خصوم السلف والجزاءات:</strong>
+            هذه الشاشة تجلب للموظف ما في <strong>دفتر ذممه</strong> فقط. ولا مصدر
+            مستنديا بعد لسلفة موظف ولا لجزائه — فحتى يبنى مصدراهما، تدخل
+            هذه الخصوم في دفتر الذمم يدويا ثم تظهر هنا تحميلا.
+            <strong>ما لا يدخل هناك لا يخصم هنا</strong> — والشاشة لا تخترع خصما لا أصل له.
         </p>
     </div></div>
 
     <?php if ($can_edit): ?>
     <div class="card"><div class="card-body">
-        <h5 class="es-section-title"><i class="fas fa-plus"></i> تسويةٌ جديدة</h5>
+        <h5 class="es-section-title"><i class="fas fa-plus"></i> تسوية جديدة</h5>
         <?php if (!$employees): ?>
             <p class="es-muted-text">
                 <i class="fas fa-circle-info"></i>
-                لا موظفَ له حكمٌ في دفتر الذمم بعد — فلا تسويةَ تُولَّد.
-                «لا تسويةَ من عدم»: يظهر الموظفُ هنا حالما يُسجَّل له استحقاقٌ أو تحميل.
+                لا موظف له حكم في دفتر الذمم بعد — فلا تسوية تولد.
+                «لا تسوية من عدم»: يظهر الموظف هنا حالما يسجل له استحقاق أو تحميل.
             </p>
         <?php else: ?>
         <form action="" method="post" class="allforms allforms-visible es-bare-form">
@@ -306,7 +306,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                   ? (string) $e['name'] : ('موظف #' . intval($e['id']));
                             echo "<option value='" . intval($e['id']) . "'>"
                                . htmlspecialchars($nm)
-                               . ' — ' . intval($e['open_rows']) . ' بندًا مفتوحًا'
+                               . ' — ' . intval($e['open_rows']) . ' بندا مفتوحا'
                                . "</option>";
                         } ?>
                     </select>
@@ -317,7 +317,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="date" name="period_to" required id="emsf_1687_5f1c3"></div>
             </div></div>
             <div class="es-submit-row">
-                <button type="submit" class="btn btn-primary"><i class="fas fa-wand-magic-sparkles"></i> ولّد التسوية</button>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-wand-magic-sparkles"></i> ولد التسوية</button>
             </div>
         </form>
         <?php endif; ?>
@@ -333,10 +333,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <th>الأولي</th><th>التحميلات</th><th>الصافي</th>
                 <th>الحالة</th><th>طلب الدفع</th><th>اعتراضات</th><th></th>
                 <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                 <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                 <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                 <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -344,7 +344,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <tbody>
             <?php if (!$settlements): ?>
                 <tr><td colspan="10" class="es-empty-cell">
-                    لا تسويةَ بعد — ابدأ بتوليد واحدةٍ من النموذج أعلاه.
+                    لا تسوية بعد — ابدأ بتوليد واحدة من النموذج أعلاه.
                 </td></tr>
             <?php endif; ?>
             <?php foreach ($settlements as $s):
@@ -362,7 +362,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <?php echo number_format($net, 2) . ' ' . htmlspecialchars((string) $s['currency']); ?>
                         </strong>
                         <?php if ($isRecv): ?>
-                            <br><small class="es-debt-note">دَينٌ على الموظف</small>
+                            <br><small class="es-debt-note">دين على الموظف</small>
                         <?php endif; ?>
                     </td>
                     <td><span class="badge badge-secondary">
@@ -373,11 +373,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             $rq = isset($reqMap[intval($s['payment_request_id'])])
                                   ? $reqMap[intval($s['payment_request_id'])] : null; ?>
                             <a href="../FinRequests/request_form.php?id=<?php echo intval($s['payment_request_id']); ?>"
-                               title="افتح طلبَ الدفع ورحلتَه">
+                               title="افتح طلب الدفع ورحلته">
                                 <?php echo htmlspecialchars($rq !== null ? $rq : ('#' . intval($s['payment_request_id']))); ?> ↗
                             </a>
                         <?php elseif ($isRecv): ?>
-                            <small class="es-no-pay-note">لا دفعَ — دَينٌ عليه</small>
+                            <small class="es-no-pay-note">لا دفع — دين عليه</small>
                         <?php else: ?>—<?php endif; ?>
                     </td>
                     <td>
@@ -413,7 +413,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <?php if ($open > 0): ?>
     <div class="card"><div class="card-body">
-        <h5 class="es-section-title"><i class="fas fa-list-ul"></i> بنودُ التسوية #<?php echo $open; ?></h5>
+        <h5 class="es-section-title"><i class="fas fa-list-ul"></i> بنود التسوية #<?php echo $open; ?></h5>
         <div class="es-scroll-x">
         <table class="table table-striped es-table-full">
             <thead><tr>

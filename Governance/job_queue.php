@@ -41,14 +41,14 @@ if (!$is_super_admin && empty($__pp['can_view'])) {
 $__canWrite = $is_super_admin || !empty($__pp['can_add']) || !empty($__pp['can_edit']);
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$__canWrite) {
     http_response_code(403);
-    exit('غير مصرَّحٍ بالكتابة في هذه الشاشة — اطلبِ المنحةَ من مدير الصلاحيات');
+    exit('غير مصرح بالكتابة في هذه الشاشة — اطلب المنحة من مدير الصلاحيات');
 }
 
 // ═══ ⑤ رمزُ الحماية — قبلَ أيِّ معالجةٍ لا بعدَها ═══
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!function_exists('verify_csrf_token') || !verify_csrf_token($_POST['csrf_token'] ?? '')) {
         http_response_code(403);
-        exit('رمزُ الحمايةِ غيرُ صالح — أعدْ تحميلَ الصفحة');
+        exit('رمز الحماية غير صالح — أعد تحميل الصفحة');
     }
 }
 
@@ -58,10 +58,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $__action = (string) ($_POST['action'] ?? '');
     if ($__action === 'release_locks') {
         $n = \App\Services\Queue\JobQueueService::releaseExpiredLocks($conn);
-        $flash = 'حُرّر ' . $n . ' قفلًا منقضيًا'; $flashKind = 'success';
+        $flash = 'حرر ' . $n . ' قفلا منقضيا'; $flashKind = 'success';
     } elseif ($__action === 'materialize') {
         $r = \App\Services\Queue\JobScheduleService::materialize($conn);
-        $flash = 'أُدرج ' . $r['enqueued'] . ' وتُخطّي ' . $r['skipped'];
+        $flash = 'أدرج ' . $r['enqueued'] . ' وتخطي ' . $r['skipped'];
         $flashKind = 'success';
     }
 }
@@ -86,12 +86,12 @@ $stats = $conn->query(
 )->fetch_assoc();
 $PAGE_TITLE = 'طابور المهام';
 $TILES = array(
-    array('في الطابور', (int) $stats['queued']), array('ملتقَطة', (int) $stats['claimed']),
-    array('قيد التنفيذ', (int) $stats['running']), array('تمّت', (int) $stats['done']),
+    array('في الطابور', (int) $stats['queued']), array('ملتقطة', (int) $stats['claimed']),
+    array('قيد التنفيذ', (int) $stats['running']), array('تمت', (int) $stats['done']),
     array('فاشلة أو معزولة', (int) $stats['failed']),
-    array('مقفولةٌ منتهيةُ المهلة (CK-14)', (int) $stats['stuck']),
+    array('مقفولة منتهية المهلة (CK-14)', (int) $stats['stuck']),
 );
-$COLS = array('#','النوع','الحالة','المصدر','مرجع المصدر','العامل','وقت الالتقاط','انتهاء القفل','محاولات','الحد','رمز الفشل','آخر خطأ','أُنشئت','وسم البذر');
-$EMPTY_TITLE = 'لا مهامَّ في الطابورِ بعدُ';
-$EMPTY_HINT  = 'تُدرَج المهامُّ آليًّا من الجدولةِ الدوريةِ أو من الخدماتِ الناشرة';
+$COLS = array('#','النوع','الحالة','المصدر','مرجع المصدر','العامل','وقت الالتقاط','انتهاء القفل','محاولات','الحد','رمز الفشل','آخر خطأ','أنشئت','وسم البذر');
+$EMPTY_TITLE = 'لا مهام في الطابور بعد';
+$EMPTY_HINT  = 'تدرج المهام آليا من الجدولة الدورية أو من الخدمات الناشرة';
 include __DIR__ . '/../includes/eng01_screen_view.php';

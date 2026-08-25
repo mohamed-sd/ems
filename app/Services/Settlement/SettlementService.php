@@ -72,11 +72,11 @@ class SettlementService
         $partyType = (string) $partyType;
         $partyRef  = intval($partyRef);
         if (!in_array($partyType, array('supplier', 'employee'), true) || $partyRef <= 0) {
-            $out['reason'] = 'طرفٌ غير صالح'; $out['code'] = 422; return $out;
+            $out['reason'] = 'طرف غير صالح'; $out['code'] = 422; return $out;
         }
         if (!preg_match('~^\d{4}-\d{2}-\d{2}$~', (string) $from) ||
             !preg_match('~^\d{4}-\d{2}-\d{2}$~', (string) $to) || $from > $to) {
-            $out['reason'] = 'فترةٌ غير صالحة'; $out['code'] = 422; return $out;
+            $out['reason'] = 'فترة غير صالحة'; $out['code'] = 422; return $out;
         }
 
         // ── العطالة: تسويةٌ واحدةٌ لكل (طرف × فترة) — 409 بمرجع القائم (§15.4)
@@ -87,7 +87,7 @@ class SettlementService
         ));
         if ($ex) {
             $out['settlement_id'] = intval($ex['id']);
-            $out['reason'] = 'لهذه الفترة تسويةٌ قائمة: ' . $ex['settlement_no'];
+            $out['reason'] = 'لهذه الفترة تسوية قائمة: ' . $ex['settlement_no'];
             $out['code']   = 409;
             return $out;
         }
@@ -108,7 +108,7 @@ class SettlementService
 
         // 422: طرفٌ بلا أحكامٍ بالفترة (§15.4) — لا تسويةَ من عدم
         if ($entitlements === 0 && $charges === 0) {
-            $out['reason'] = 'لا استحقاقَ ولا تحميلَ لهذا الطرف في الفترة';
+            $out['reason'] = 'لا استحقاق ولا تحميل لهذا الطرف في الفترة';
             $out['code']   = 422;
             return $out;
         }
@@ -116,7 +116,7 @@ class SettlementService
         require_once dirname(dirname(__DIR__)) . '/../includes/fx.php';
         $base = ems_fx_base_currency();
         if ($base === null) {
-            $out['reason'] = 'لا عملةَ أساسٍ مسجَّلة'; $out['code'] = 422; return $out;
+            $out['reason'] = 'لا عملة أساس مسجلة'; $out['code'] = 422; return $out;
         }
 
         // ── التقييمُ بعملة الأساس، كلُّ بندٍ بسعر تاريخه ─────────────────────
@@ -273,7 +273,7 @@ class SettlementService
                         'charge_type' => 'advance',
                         'source_kind' => 'payroll_deduction',
                         'source_ref'  => (string) $x['id'],
-                        'description' => 'قسطُ سلفةٍ من المسيّر — سند ' . $x['doc_ref']
+                        'description' => 'قسط سلفة من المسير — سند ' . $x['doc_ref']
                                          . ' (سلفة #' . (int) $x['source_id'] . ')',
                         'work_date'   => (string) $x['d_date'],
                         'amount'      => (float) $x['amount'],
@@ -336,7 +336,7 @@ class SettlementService
                     'charge_type' => 'parts',
                     'source_kind' => 'parts',
                     'source_ref'  => (string) $x['id'],
-                    'description' => 'قطعُ غيار — صرف #' . $x['id'] . ' · ' . $priced['note'],
+                    'description' => 'قطع غيار — صرف #' . $x['id'] . ' · ' . $priced['note'],
                     'work_date'   => (string) $x['d_date'],
                     'amount'      => (float) $priced['amount'],
                     'currency'    => ($x['currency'] !== null && $x['currency'] !== '')
@@ -462,18 +462,18 @@ class SettlementService
             $parts = explode(':', $msg, 3);
             $comp  = isset($parts[1]) ? trim($parts[1]) : '';
             $NAMES = array(
-                'settlement employee advances' => 'أقساطُ سلفِ العامل',
-                'settlement supplier advances' => 'أقساطُ سلفِ المورّد',
-                'settlement parts'             => 'قطعُ الغيار',
-                'settlement maintenance'       => 'أوامرُ الصيانة',
-                'settlement transport'         => 'أوامرُ الترحيل',
-                'settlement capacity penalty'  => 'جزاءُ الجاهزيةِ والتغطية',
+                'settlement employee advances' => 'أقساط سلف العامل',
+                'settlement supplier advances' => 'أقساط سلف المورد',
+                'settlement parts'             => 'قطع الغيار',
+                'settlement maintenance'       => 'أوامر الصيانة',
+                'settlement transport'         => 'أوامر الترحيل',
+                'settlement capacity penalty'  => 'جزاء الجاهزية والتغطية',
             );
             $ar = isset($NAMES[$comp]) ? $NAMES[$comp] : $comp;
-            return 'أُرجعت التسويةُ كاملةً — تعذّر بناءُ مكوِّنِ «' . $ar
-                 . '»، ولا تُعلَن تسويةٌ ناقصةُ تحميل';
+            return 'أرجعت التسوية كاملة — تعذر بناء مكون «' . $ar
+                 . '»، ولا تعلن تسوية ناقصة تحميل';
         }
-        return 'أُرجعت التسويةُ كاملةً — تعذّر توليدُها';
+        return 'أرجعت التسوية كاملة — تعذر توليدها';
     }
 
     private static function sourceLabel($type, $id)
@@ -486,8 +486,8 @@ class SettlementService
             'penalty_assessment' => 'احتساب جزاء',
             'settlement'         => 'تسوية',
         );
-        if ($type === 'legacy_no_ref')  { return ' · ⚠ موروثٌ بلا مرجع'; }
-        if ($type === 'pending_source') { return ' · ⚠ بلا مصدرٍ مستنديٍّ بعد'; }
+        if ($type === 'legacy_no_ref')  { return ' · ⚠ موروث بلا مرجع'; }
+        if ($type === 'pending_source') { return ' · ⚠ بلا مصدر مستندي بعد'; }
         $lbl = isset($map[$type]) ? $map[$type] : $type;
         return ' · ' . $lbl . (intval($id) > 0 ? (' #' . intval($id)) : '');
     }
@@ -504,15 +504,15 @@ class SettlementService
     {
         $out = array('ok' => false, 'reason' => '', 'code' => 0);
         $note = trim((string) $note);
-        if ($note === '') { $out['reason'] = 'سببُ الاعتراض إلزامي'; $out['code'] = 422; return $out; }
+        if ($note === '') { $out['reason'] = 'سبب الاعتراض إلزامي'; $out['code'] = 422; return $out; }
 
         $line = $gate->selectOne('settlement_lines', array('where' => array('id' => intval($lineId))));
-        if (!$line) { $out['reason'] = 'البندُ غير موجود'; $out['code'] = 404; return $out; }
+        if (!$line) { $out['reason'] = 'البند غير موجود'; $out['code'] = 404; return $out; }
 
         $st = $gate->selectOne('settlements', array('where' => array('id' => intval($line['settlement_id']))));
-        if (!$st) { $out['reason'] = 'التسويةُ غير موجودة'; $out['code'] = 404; return $out; }
+        if (!$st) { $out['reason'] = 'التسوية غير موجودة'; $out['code'] = 404; return $out; }
         if (!in_array((string) $st['state'], array(self::ST_DRAFT, self::ST_REVIEW), true)) {
-            $out['reason'] = 'لا اعتراضَ بعد الاعتماد'; $out['code'] = 423; return $out;
+            $out['reason'] = 'لا اعتراض بعد الاعتماد'; $out['code'] = 423; return $out;
         }
         if (intval($line['objected']) === 1) { $out['ok'] = true; return $out; }   // عطالة
 
@@ -530,7 +530,7 @@ class SettlementService
             }, 'اعتراض بند تسوية');
         } catch (\Throwable $t) {
             error_log('settlement object: ' . $t->getMessage());
-            $out['reason'] = 'تعذّر تسجيلُ الاعتراض'; return $out;
+            $out['reason'] = 'تعذر تسجيل الاعتراض'; return $out;
         }
         $out['ok'] = true;
         return $out;
@@ -541,9 +541,9 @@ class SettlementService
     {
         $out = array('ok' => false, 'reason' => '');
         $line = $gate->selectOne('settlement_lines', array('where' => array('id' => intval($lineId))));
-        if (!$line || intval($line['objected']) !== 1) { $out['reason'] = 'لا اعتراضَ مفتوح'; return $out; }
+        if (!$line || intval($line['objected']) !== 1) { $out['reason'] = 'لا اعتراض مفتوح'; return $out; }
         $st = $gate->selectOne('settlements', array('where' => array('id' => intval($line['settlement_id']))));
-        if (!$st) { $out['reason'] = 'التسويةُ غير موجودة'; return $out; }
+        if (!$st) { $out['reason'] = 'التسوية غير موجودة'; return $out; }
 
         try {
             $gate->runInTransaction(function ($g) use ($line, $st) {
@@ -556,7 +556,7 @@ class SettlementService
             }, 'حسم اعتراض');
         } catch (\Throwable $t) {
             error_log('settlement resolve: ' . $t->getMessage());
-            $out['reason'] = 'تعذّر الحسم'; return $out;
+            $out['reason'] = 'تعذر الحسم'; return $out;
         }
         $out['ok'] = true;
         return $out;
@@ -569,14 +569,14 @@ class SettlementService
         $st = $gate->selectOne('settlements', array('where' => array('id' => intval($settlementId))));
         if (!$st) { $out['reason'] = 'غير موجودة'; $out['code'] = 404; return $out; }
         if ((string) $st['state'] !== self::ST_DRAFT) {
-            $out['reason'] = 'لا تُرفع إلا من مسودة'; $out['code'] = 409; return $out;
+            $out['reason'] = 'لا ترفع إلا من مسودة'; $out['code'] = 409; return $out;
         }
         try {
             $gate->update('settlements', array('state' => self::ST_REVIEW),
                           array('id' => intval($settlementId)));
         } catch (\Throwable $t) {
             error_log('settlement submit: ' . $t->getMessage());
-            $out['reason'] = 'تعذّر الرفع'; return $out;
+            $out['reason'] = 'تعذر الرفع'; return $out;
         }
         // N-02: تدقيقُ التغيير بقيم قبل/بعد
         if (isset($GLOBALS['conn']) && $GLOBALS['conn'] instanceof \mysqli) {
@@ -602,15 +602,15 @@ class SettlementService
         $st = $gate->selectOne('settlements', array('where' => array('id' => $sid)));
         if (!$st) { $out['reason'] = 'غير موجودة'; $out['code'] = 404; return $out; }
         if ((string) $st['state'] !== self::ST_REVIEW) {
-            $out['reason'] = 'لا تُعتمد إلا من مراجعة'; $out['code'] = 409; return $out;
+            $out['reason'] = 'لا تعتمد إلا من مراجعة'; $out['code'] = 409; return $out;
         }
         // §15.4 — لا اعتمادَ ذاتٍ، بنيويًّا لا بفحصٍ لاحق
         if (intval($st['prepared_by']) === intval($userId)) {
-            $out['reason'] = 'لا يعتمد المرءُ ما أعدّ (فصلُ اليدين)'; $out['code'] = 403; return $out;
+            $out['reason'] = 'لا يعتمد المرء ما أعد (فصل اليدين)'; $out['code'] = 403; return $out;
         }
         // §15.4 — اعتمادٌ وبندٌ معترَضٌ مفتوح → 423
         if (intval($st['open_objections']) > 0) {
-            $out['reason'] = 'يوجد ' . intval($st['open_objections']) . ' بندًا معترَضًا لم يُحسم';
+            $out['reason'] = 'يوجد ' . intval($st['open_objections']) . ' بندا معترضا لم يحسم';
             $out['code']   = 423; return $out;
         }
         // بندٌ بلا معادلٍ موحّد ⇒ الصافي ناقص — لا يُعتمد رقمٌ غيرُ مكتمل
@@ -621,8 +621,8 @@ class SettlementService
             array($sid)
         );
         if ($un && intval($un[0]['c']) > 0) {
-            $out['reason'] = 'بنودٌ بلا سعرِ صرفٍ لتاريخها (' . intval($un[0]['c']) .
-                             ') — أدخِل السعرَ ثم أعد التوليد';
+            $out['reason'] = 'بنود بلا سعر صرف لتاريخها (' . intval($un[0]['c']) .
+                             ') — أدخل السعر ثم أعد التوليد';
             $out['code']   = 422; return $out;
         }
 
@@ -637,7 +637,7 @@ class SettlementService
                 $gate, (int) $st['party_ref']);
             if ($docGate['reasons']) {
                 if ($docGate['blocked']) {
-                    $out['reason'] = 'مستنداتُ المورد ناقصةٌ أو منتهية: '
+                    $out['reason'] = 'مستندات المورد ناقصة أو منتهية: '
                                    . implode(' · ', $docGate['reasons']);
                     $out['code'] = 422;
                     return $out;
@@ -696,7 +696,7 @@ class SettlementService
                 /* ◆ `config` يضبط mysqli على عدمِ الرمي، فلا يكفي انتظارُ استثناء:
                      يُفحَص المُرجَعُ نفسُه — ومعرِّفٌ غيرُ موجبٍ فشلٌ صريح. */
                 if ((int) $recvId <= 0) {
-                    throw new \RuntimeException('fin_dues لم يُرجع معرِّفًا موجبًا للذمّة المدينة');
+                    throw new \RuntimeException('fin_dues لم يرجع معرفا موجبا للذمة المدينة');
                 }
             }
 
@@ -735,7 +735,7 @@ class SettlementService
                                         ? intval($st['party_ref']) : null,
                 'operator_employee_id' => ((string) $st['party_type'] === 'employee')
                                         ? intval($st['party_ref']) : null,
-                'notes'             => 'تسويةُ ' . $st['party_name'] . ' — ' . $no,
+                'notes'             => 'تسوية ' . $st['party_name'] . ' — ' . $no,
                 'payload'           => array(
                     'settlement_no' => $no,
                     'party_type'    => (string) $st['party_type'],
@@ -765,7 +765,7 @@ class SettlementService
                  المُنادي نصًّا لا يُبتلع في سجلٍّ لا يقرؤه أحد. */
             $conn->rollback();
             error_log('settlement approve #' . $sid . ' rolled back: ' . $t->getMessage());
-            $out['reason'] = 'تعذّر اعتمادُ التسوية — أُرجعت المعاملةُ كاملةً: ' . $t->getMessage();
+            $out['reason'] = 'تعذر اعتماد التسوية — أرجعت المعاملة كاملة: ' . $t->getMessage();
             return $out;
         }
 
@@ -813,30 +813,30 @@ class SettlementService
         $sid = intval($settlementId);
 
         $st = $gate->selectOne('settlements', array('where' => array('id' => $sid)));
-        if (!$st) { $out['code'] = 404; $out['reason'] = 'التسويةُ غيرُ موجودة'; return $out; }
+        if (!$st) { $out['code'] = 404; $out['reason'] = 'التسوية غير موجودة'; return $out; }
         if ((string) $st['party_type'] !== 'supplier') {
             $out['code'] = 422;
-            $out['reason'] = 'فاتورةُ المورد لتسويات الموردين — والعاملُ لا يُصدر فاتورة';
+            $out['reason'] = 'فاتورة المورد لتسويات الموردين — والعامل لا يصدر فاتورة';
             return $out;
         }
         if (!in_array((string) $st['state'], self::INVOICEABLE_STATES, true)) {
             $out['code'] = 409;
-            $out['reason'] = 'الفاتورةُ تُستقبل على المعتمَدة أو المطلوبِ دفعُها — الحالةُ «'
+            $out['reason'] = 'الفاتورة تستقبل على المعتمدة أو المطلوب دفعها — الحالة «'
                            . $st['state'] . '»';
             return $out;
         }
 
         $no = isset($args['invoice_no']) ? trim((string) $args['invoice_no']) : '';
-        if ($no === '') { $out['code'] = 422; $out['reason'] = 'رقمُ الفاتورة إلزامي'; return $out; }
+        if ($no === '') { $out['code'] = 422; $out['reason'] = 'رقم الفاتورة إلزامي'; return $out; }
         $date = isset($args['invoice_date']) ? trim((string) $args['invoice_date']) : '';
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
-            $out['code'] = 422; $out['reason'] = 'تاريخُ الفاتورة إلزامي'; return $out;
+            $out['code'] = 422; $out['reason'] = 'تاريخ الفاتورة إلزامي'; return $out;
         }
         if (!isset($args['invoice_amount']) || trim((string) $args['invoice_amount']) === '') {
-            $out['code'] = 422; $out['reason'] = 'مبلغُ الفاتورة إلزامي — به تُطابَق'; return $out;
+            $out['code'] = 422; $out['reason'] = 'مبلغ الفاتورة إلزامي — به تطابق'; return $out;
         }
         $amount = round((float) $args['invoice_amount'], 2);
-        if ($amount < 0) { $out['code'] = 422; $out['reason'] = 'مبلغُ الفاتورة لا يكون سالبًا'; return $out; }
+        if ($amount < 0) { $out['code'] = 422; $out['reason'] = 'مبلغ الفاتورة لا يكون سالبا'; return $out; }
 
         // ── المطابقة: الفاتورة مقابل **الصافي المعتمد** ────────────────────
         $net = round((float) $st['net_amount'], 2);
@@ -847,8 +847,8 @@ class SettlementService
         $docRef = isset($args['diff_doc_ref']) ? trim((string) $args['diff_doc_ref']) : '';
         if (!$matched && ($reason === '' || $docRef === '')) {
             $out['code'] = 422;
-            $out['reason'] = 'فرقٌ قدرُه ' . $diff . ' بين الفاتورة (' . $amount . ') والصافي المعتمد ('
-                           . $net . ') — **يلزمه سببٌ ومستند**: «فرقٌ بقرارٍ لا تعديلًا صامتًا» (§4)';
+            $out['reason'] = 'فرق قدره ' . $diff . ' بين الفاتورة (' . $amount . ') والصافي المعتمد ('
+                           . $net . ') — **يلزمه سبب ومستند**: «فرق بقرار لا تعديلا صامتا» (§4)';
             $out['diff'] = $diff; $out['matched'] = false;
             return $out;
         }
@@ -870,7 +870,7 @@ class SettlementService
                 'invoiced_at'          => date('Y-m-d H:i:s'),
             ), array('id' => $sid));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر التسجيل: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر التسجيل: ' . $t->getMessage(); return $out;
         }
 
         require_once dirname(__DIR__, 3) . '/includes/audit_trail.php';
@@ -883,8 +883,8 @@ class SettlementService
         $out['ok'] = true; $out['code'] = 200;
         $out['matched'] = $matched; $out['diff'] = $diff;
         $out['reason'] = $matched
-            ? 'الفاتورةُ مطابقةٌ للصافي المعتمد'
-            : ('فرقٌ موثَّقٌ قدرُه ' . $diff . ' — **والصافي لم يُمسّ**: الاعترافُ من التسوية لا من الفاتورة (§5)');
+            ? 'الفاتورة مطابقة للصافي المعتمد'
+            : ('فرق موثق قدره ' . $diff . ' — **والصافي لم يمس**: الاعتراف من التسوية لا من الفاتورة (§5)');
         return $out;
     }
 
@@ -900,16 +900,16 @@ class SettlementService
         $sid = intval($settlementId);
 
         $st = $gate->selectOne('settlements', array('where' => array('id' => $sid)));
-        if (!$st) { $out['code'] = 404; $out['reason'] = 'التسويةُ غيرُ موجودة'; return $out; }
+        if (!$st) { $out['code'] = 404; $out['reason'] = 'التسوية غير موجودة'; return $out; }
         if ((string) $st['state'] !== self::ST_PAID) {
             $out['code'] = 409;
-            $out['reason'] = 'الإقفالُ للمدفوعة وحدَها — الحالةُ «' . $st['state'] . '»';
+            $out['reason'] = 'الإقفال للمدفوعة وحدها — الحالة «' . $st['state'] . '»';
             return $out;
         }
         // «لا بندَ معلَّقًا»
         if (intval($st['open_objections']) > 0) {
             $out['code'] = 423;
-            $out['reason'] = 'لا يُقفل وفيه ' . intval($st['open_objections']) . ' بندًا معترَضًا لم يُحسم';
+            $out['reason'] = 'لا يقفل وفيه ' . intval($st['open_objections']) . ' بندا معترضا لم يحسم';
             return $out;
         }
 
@@ -920,7 +920,7 @@ class SettlementService
                 'closed_at' => date('Y-m-d H:i:s'),
             ), array('id' => $sid));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الإقفال: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الإقفال: ' . $t->getMessage(); return $out;
         }
 
         require_once dirname(__DIR__, 3) . '/includes/audit_trail.php';
@@ -929,7 +929,7 @@ class SettlementService
             array('company_id' => intval($st['company_id']), 'user_id' => intval($userId)));
 
         $out['ok'] = true; $out['code'] = 200;
-        $out['reason'] = 'أُقفلت — والتصحيحُ بعدها **بعكسٍ موثَّقٍ لا بتعديل** (§4)';
+        $out['reason'] = 'أقفلت — والتصحيح بعدها **بعكس موثق لا بتعديل** (§4)';
         return $out;
     }
 
@@ -968,7 +968,7 @@ class SettlementService
                 'amount'           => $net,
                 'currency'         => (string) $st['currency'],
                 'statement'        => 'صافي تسوية ' . $st['settlement_no'] . ' — ' . $st['party_name'],
-                'justification'    => 'مولَّدٌ آليًّا من التسوية المعتمدة للفترة '
+                'justification'    => 'مولد آليا من التسوية المعتمدة للفترة '
                                       . $st['period_from'] . ' → ' . $st['period_to'],
                 'state'            => 'approved',   // قرارُ المالك: جاهزٌ للصرف
                 'created_by'       => $userId,
@@ -976,7 +976,7 @@ class SettlementService
 
             $out['id'] = intval($id);
             $out['no'] = $no;
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'التعذّرُ يُسجَّل ولا يُسقط اعتمادَ التسوية — الحدثُ نُشر والذمّةُ قُيّدت،');
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'التعذر يسجل ولا يسقط اعتماد التسوية — الحدث نشر والذمة قيدت،');
             // التعذّرُ يُسجَّل ولا يُسقط اعتمادَ التسوية — الحدثُ نُشر والذمّةُ قُيّدت،
             // ويبقى توليدُ الطلب قابلًا للإعادة من الشاشة.
             error_log('settlement payment request #' . $st['id'] . ': ' . $t->getMessage());

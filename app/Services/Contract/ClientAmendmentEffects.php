@@ -42,22 +42,22 @@ class ClientAmendmentEffects
         $reason  = isset($args['reason']) ? trim((string) $args['reason']) : '';
 
         if (!in_array($otype, self::OBLIGATION_TYPES, true)) {
-            $out['code'] = 422; $out['reason'] = 'بندُ التزامٍ من خارج قائمة §4'; return $out;
+            $out['code'] = 422; $out['reason'] = 'بند التزام من خارج قائمة §4'; return $out;
         }
         if (!in_array($obligor, self::OBLIGORS, true)) {
-            $out['code'] = 422; $out['reason'] = 'طرفٌ ملتزمٌ من خارج القائمة المحكومة'; return $out;
+            $out['code'] = 422; $out['reason'] = 'طرف ملتزم من خارج القائمة المحكومة'; return $out;
         }
         if (!in_array($effect, self::EFFECTS, true)) {
-            $out['code'] = 422; $out['reason'] = 'أثرُ إخلالٍ من خارج الثلاثة'; return $out;
+            $out['code'] = 422; $out['reason'] = 'أثر إخلال من خارج الثلاثة'; return $out;
         }
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $eff)) {
-            $out['code'] = 422; $out['reason'] = 'تاريخُ السريان إلزامي — «ملحقٌ بسريان» (§6)'; return $out;
+            $out['code'] = 422; $out['reason'] = 'تاريخ السريان إلزامي — «ملحق بسريان» (§6)'; return $out;
         }
 
         $contract = null;
         try { $contract = $gate->selectOne('contracts', array('where' => array('id' => $contractId))); }
-        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $contract'); $contract = null; }
-        if (!$contract) { $out['code'] = 404; $out['reason'] = 'العقدُ غير موجودٍ في نطاقك'; return $out; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $contract'); $contract = null; }
+        if (!$contract) { $out['code'] = 404; $out['reason'] = 'العقد غير موجود في نطاقك'; return $out; }
 
         // الملتزمُ النافذُ الحالي للبند — «قبل» الصادق في الملحق
         $current = null;
@@ -68,9 +68,9 @@ class ClientAmendmentEffects
                    AND o.approval_state = 'approved' AND COALESCE(o.is_deleted,0)=0
                  ORDER BY o.valid_from DESC LIMIT 1", array($contractId, $otype));
             $current = $rows ? (string) $rows[0]['obligor'] : null;
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $current'); $current = null; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $current'); $current = null; }
         if ($current !== null && $current === $obligor) {
-            $out['code'] = 422; $out['reason'] = 'الملتزمُ الجديد هو النافذُ نفسُه — لا ملحقَ بلا تغيير'; return $out;
+            $out['code'] = 422; $out['reason'] = 'الملتزم الجديد هو النافذ نفسه — لا ملحق بلا تغيير'; return $out;
         }
 
         $newAmd = 0; $newObl = 0;
@@ -88,7 +88,7 @@ class ClientAmendmentEffects
                     'reason'         => $reason !== '' ? $reason : null,
                     'old_value'      => $current !== null ? $current : 'غير معبأ',
                     'new_value'      => $obligor,
-                    'effect_summary' => 'تغييرُ ملتزم «' . $otype . '» إلى «' . $obligor . '» بسريان ' . $eff,
+                    'effect_summary' => 'تغيير ملتزم «' . $otype . '» إلى «' . $obligor . '» بسريان ' . $eff,
                     'created_by'     => (int) $actor ?: null,
                 ));
                 // صفُّ الالتزام مسودةً — الإجازةُ بيد المالية في شاشتها (ق-18)
@@ -107,10 +107,10 @@ class ClientAmendmentEffects
             if (strpos($t->getMessage(), 'uq_obligation_contract_type_from') !== false
                 || strpos($t->getMessage(), 'Duplicate') !== false) {
                 $out['code'] = 409;
-                $out['reason'] = 'للبند صفٌّ بتاريخ السريان نفسِه (UQ) — غيّر التاريخ';
+                $out['reason'] = 'للبند صف بتاريخ السريان نفسه (UQ) — غير التاريخ';
                 return $out;
             }
-            $out['code'] = 422; $out['reason'] = 'تعذّر التوليد الذري: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر التوليد الذري: ' . $t->getMessage(); return $out;
         }
 
         require_once dirname(__DIR__, 3) . '/includes/audit_trail.php';
@@ -145,7 +145,7 @@ class ClientAmendmentEffects
                    AND o.valid_from < ?
                    AND (o.valid_to IS NULL OR o.valid_to >= ?)",
                 array($cid, $otype, $oid, $from, $from));
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $rows'); $rows = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $rows'); $rows = array(); }
         $n = 0;
         foreach ($rows as $r) {
             try {
@@ -178,15 +178,15 @@ class ClientAmendmentEffects
                    AND c.unit_type = 'hour' AND c.origin = 'عقد'
                    AND c.state <> 'مقفلة' AND COALESCE(c.is_deleted,0)=0
                  ORDER BY c.id", array((int) $contract['id']));
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $roots'); $roots = array(); }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $roots'); $roots = array(); }
 
         if (!$roots) {
-            $out['note'] = 'لا جذرَ حاويةٍ ساعيًّا لهذا العقد — لا موازنةَ (مُعلَن)';
+            $out['note'] = 'لا جذر حاوية ساعيا لهذا العقد — لا موازنة (معلن)';
             return $out;
         }
         if (count($roots) > 1) {
             // لا اجتهادَ في توزيع الكمية على جذورٍ متعددة — تلفيقُ تخصيص
-            $out['note'] = 'للعقد ' . count($roots) . ' جذورٍ ساعية — الموازنةُ يدويةٌ على شاشة الحاويات (CON-02 §6 + عقيدة ⑦)';
+            $out['note'] = 'للعقد ' . count($roots) . ' جذور ساعية — الموازنة يدوية على شاشة الحاويات (CON-02 §6 + عقيدة ⑦)';
             return $out;
         }
         $root = $roots[0];
@@ -194,8 +194,8 @@ class ClientAmendmentEffects
         $floor = max((float) $root['allocated_qty'], (float) $root['consumed_qty']);
         if ($newCap < $floor) {
             $out['ok'] = false;
-            $out['reason'] = 'التخفيضُ يهبط بسعة الحاوية #' . (int) $root['id'] . ' إلى ' . $newCap
-                . ' دون المخصَّص/المستهلَك (' . $floor . ') — Σ حصصُ الموردين ≤ الملتزم (UX-05 §8.2)';
+            $out['reason'] = 'التخفيض يهبط بسعة الحاوية #' . (int) $root['id'] . ' إلى ' . $newCap
+                . ' دون المخصص/المستهلك (' . $floor . ') — Σ حصص الموردين ≤ الملتزم (UX-05 §8.2)';
             return $out;
         }
         $out['ops'][] = array(
@@ -204,7 +204,7 @@ class ClientAmendmentEffects
             'where' => array('id' => (int) $root['id']),
             'data' => array('cap_qty' => $newCap),
         );
-        $out['note'] = 'موازنةُ الجذر #' . (int) $root['id'] . ': ' . $root['cap_qty'] . ' ← ' . $newCap;
+        $out['note'] = 'موازنة الجذر #' . (int) $root['id'] . ': ' . $root['cap_qty'] . ' ← ' . $newCap;
         return $out;
     }
 

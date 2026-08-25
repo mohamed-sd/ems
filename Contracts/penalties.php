@@ -82,31 +82,31 @@ $from = (isset($_GET['from']) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $_GET['from
 $to   = (isset($_GET['to'])   && preg_match('/^\d{4}-\d{2}-\d{2}$/', $_GET['to']))   ? $_GET['to']   : date('Y-m-t');
 
 /* AC-F2: حارسُ الكتابةِ المركزيُّ **قبلَ** أولِ عبارةِ كتابة — fail-closed. */
-ems_require_action($conn, $MODULE_CODE, 'write', array('deny_msg' => 'تسجيلُ الجزاءاتِ يحتاج صلاحيةَ تحرير'));
+ems_require_action($conn, $MODULE_CODE, 'write', array('deny_msg' => 'تسجيل الجزاءات يحتاج صلاحية تحرير'));
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['pen_action'])) {
     $act = strval($_POST['pen_action']);
     $c = intval($_POST['contract'] ?? 0);
     $f = strval($_POST['from'] ?? $from); $t = strval($_POST['to'] ?? $to);
 
     if ($act === 'assess') {
-        if (!$can_assess) { pen_back('الاحتسابُ صلاحيةُ المبيعات ❌', $c, $f, $t); }
+        if (!$can_assess) { pen_back('الاحتساب صلاحية المبيعات ❌', $c, $f, $t); }
         $r = PEN::assess($conn, $gate, $company_id, $c, $f, $t, $uid);
-        $m = $r['ok'] ? ('احتُسب ' . $r['computed'] . ' بندًا') : 'تعذّر الاحتساب';
-        if (!empty($r['skipped'])) { $m .= ' · تُرك: ' . count($r['skipped']) . ' (انظر التعليل أدناه)'; }
+        $m = $r['ok'] ? ('احتسب ' . $r['computed'] . ' بندا') : 'تعذر الاحتساب';
+        if (!empty($r['skipped'])) { $m .= ' · ترك: ' . count($r['skipped']) . ' (انظر التعليل أدناه)'; }
         pen_back($m . ($r['ok'] ? ' ✅' : ' ❌'), $c, $f, $t);
 
     } elseif ($act === 'review') {
-        if (!$can_assess) { pen_back('المراجعةُ صلاحيةُ المبيعات ❌', $c, $f, $t); }
+        if (!$can_assess) { pen_back('المراجعة صلاحية المبيعات ❌', $c, $f, $t); }
         $r = PEN::review($gate, $company_id, intval($_POST['aid'] ?? 0), $uid);
         pen_back($r['reason'] . ($r['ok'] ? ' ✅' : ' ❌'), $c, $f, $t);
 
     } elseif ($act === 'approve') {
-        if (!$can_approve) { pen_back('الإجازةُ صلاحيةُ مدير الإدارة المالية (ق-13) ❌', $c, $f, $t); }
+        if (!$can_approve) { pen_back('الإجازة صلاحية مدير الإدارة المالية (ق-13) ❌', $c, $f, $t); }
         $r = PEN::approve($conn, $gate, $company_id, intval($_POST['aid'] ?? 0), $uid);
         pen_back($r['reason'] . ($r['ok'] ? ' ✅' : ' ❌'), $c, $f, $t);
 
     } elseif ($act === 'waive') {
-        if (!$can_approve) { pen_back('الإعفاءُ صلاحيةُ مدير الإدارة المالية (ق-13) ❌', $c, $f, $t); }
+        if (!$can_approve) { pen_back('الإعفاء صلاحية مدير الإدارة المالية (ق-13) ❌', $c, $f, $t); }
         /* ══ INJ-0028 · «إعفاءٌ فوق السقف يُرفض ويُصعَّد» ══════════════════════════
              الإعفاءُ **يُسقط استحقاقًا قائمًا** — فهو قرارٌ ماليٌّ بقيمةِ الغرامة،
              ويخضع لسقفِ تفويضِ من يوقّعه كما يخضع الصرفُ. وكان يمرُّ بمجرّدِ
@@ -139,16 +139,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['pen_action'])) {
                             ?, ?, 'USD', 'قيد المراجعة', 'escalation', ?, ?)");
                 if ($__esc) {
                     $__rq = 'ESC-PEN-' . $__aid . '-' . date('ymdHis');
-                    $__doc = 'إعفاءُ غرامةٍ #' . $__aid;
-                    $__why = 'تجاوزُ سقفِ التفويضِ للإعفاء — ' . $__sig['reason'];
+                    $__doc = 'إعفاء غرامة #' . $__aid;
+                    $__why = 'تجاوز سقف التفويض للإعفاء — ' . $__sig['reason'];
                     $__amtS = (string) $__amt;
-                    $__nm = 'طالبُ الإعفاء #' . (int) $uid;
+                    $__nm = 'طالب الإعفاء #' . (int) $uid;
                     $__uidI = (int) $uid;
                     $__esc->bind_param('sssssis', $__rq, $__doc, $__why, $__amtS, $__uidI, $__nm);
                     $__esc->execute();
                     $__esc->close();
                 }
-                pen_back('PEN-CAP-409: ' . $__sig['reason'] . ' — **رُفع الإعفاءُ لصندوقِ الاعتمادِ الأعلى** ⤴',
+                pen_back('PEN-CAP-409: ' . $__sig['reason'] . ' — **رفع الإعفاء لصندوق الاعتماد الأعلى** ⤴',
                     $c, $f, $t);
             }
         }
@@ -159,11 +159,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['pen_action'])) {
     } elseif ($act === 'release_retention') {
         // ق-20: قرارٌ يدويٌّ من الدور 19 بعد انتهاء العقد. والحارسُ في الخدمة
         // أيضًا (دورًا وتاريخًا ورصيدًا وعطالة) — فالمنحةُ هنا بابٌ لا سياج.
-        if (!$can_approve) { pen_back('ردُّ الضمان صلاحيةُ مدير الإدارة المالية (ق-20) ❌', $c, $f, $t); }
+        if (!$can_approve) { pen_back('رد الضمان صلاحية مدير الإدارة المالية (ق-20) ❌', $c, $f, $t); }
         $r = claim_retention_release($conn, $c, $uid, $current_role);
         pen_back($r['reason'] . ($r['status'] === 'released' ? ' ✅' : ' ❌'), $c, $f, $t);
     }
-    pen_back('إجراءٌ غير معروف ❌', $c, $f, $t);
+    pen_back('إجراء غير معروف ❌', $c, $f, $t);
 }
 
 $contracts = array();
@@ -228,12 +228,12 @@ if ($sel > 0) {
     try { $badges = contract_capacity_badges($gate, $sel); } catch (\Throwable $t2) { }
 }
 
-$KIND = array('penalty' => 'غرامة', 'incentive' => 'حافز', 'min_guarantee' => 'حدٌّ أدنى مضمون');
-$RK = array('shortfall_pct' => 'غرامةُ العجز', 'readiness_min' => 'غرامةُ الجاهزية',
-            'bonus_qty_pct' => 'حافزُ تجاوز الكمية', 'bonus_fixed' => 'حافزٌ مقطوع (جودة/سلامة)',
-            'min_guaranteed' => 'فارقُ الحد الأدنى');
-$STATE = array('computed' => 'محتسَب', 'reviewed' => 'روجِع', 'approved' => 'مُجاز',
-               'waived' => 'مُعفًى', 'posted' => 'منشورٌ في الدفتر');
+$KIND = array('penalty' => 'غرامة', 'incentive' => 'حافز', 'min_guarantee' => 'حد أدنى مضمون');
+$RK = array('shortfall_pct' => 'غرامة العجز', 'readiness_min' => 'غرامة الجاهزية',
+            'bonus_qty_pct' => 'حافز تجاوز الكمية', 'bonus_fixed' => 'حافز مقطوع (جودة/سلامة)',
+            'min_guaranteed' => 'فارق الحد الأدنى');
+$STATE = array('computed' => 'محتسب', 'reviewed' => 'روجع', 'approved' => 'مجاز',
+               'waived' => 'معفى', 'posted' => 'منشور في الدفتر');
 function pen_n($v) { return ($v === null) ? '—' : number_format((float) $v, 2); }
 
 $page_title = 'احتساب الجزاءات والحوافز';
@@ -255,7 +255,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fa-solid fa-share', 'label' => '');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا احتساباتِ جزاءاتٍ أو حوافزَ في هذه الفترة', 'اختر عقدًا وفترةً ثم اضغط «احتسِب الفترة» — ولا احتسابَ بلا قواعدَ مسجَّلةٍ على العقد');
+    echo ems_states_bundle('لا احتسابات جزاءات أو حوافز في هذه الفترة', 'اختر عقدا وفترة ثم اضغط «احتسب الفترة» — ولا احتساب بلا قواعد مسجلة على العقد');
     ?>
 <?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('contract', ''); ?>
 
@@ -268,16 +268,16 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     <div class="pen-rule">
         <i class="fas fa-scale-balanced"></i>
         <div>
-            <strong>النظامُ يحتسب · المبيعاتُ تراجع · المالية تُجيز.</strong>
-            والإعفاءُ بيد المالية <em>بسببٍ إلزاميٍّ موثَّق</em>. ولا خصمٌ صامت: كلُّ بندٍ يظهر
-            بأساسه ومعدَّله وسقفه — والمبلغِ قبل السقف وبعده.
-            <br><strong>والغرامةُ اتجاهٌ واحد:</strong> تُحتسب حين نكون <em>نحن</em> المقصّرين؛
-            وتقصيرُ العميل تعالجه مصفوفةُ الالتزامات فيصير استعدادًا مفوترًا.
+            <strong>النظام يحتسب · المبيعات تراجع · المالية تجيز.</strong>
+            والإعفاء بيد المالية <em>بسبب إلزامي موثق</em>. ولا خصم صامت: كل بند يظهر
+            بأساسه ومعدله وسقفه — والمبلغ قبل السقف وبعده.
+            <br><strong>والغرامة اتجاه واحد:</strong> تحتسب حين نكون <em>نحن</em> المقصرين؛
+            وتقصير العميل تعالجه مصفوفة الالتزامات فيصير استعدادا مفوترا.
         </div>
     </div>
 
     <div class="filter">
-        <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> العقدُ والفترة</div>
+        <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> العقد والفترة</div>
         <div class="filter-body">
             <form method="get" action="" class="pen-filter">
                 <div class="filter-field">
@@ -305,25 +305,25 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         <?php endif; ?>
 
         <div class="pen-summary">
-            <div><i class="fas fa-scroll"></i> <strong><?php echo count($rules); ?></strong> قاعدةً مسجَّلةً على العقد</div>
-            <div><i class="fas fa-list-check"></i> <strong><?php echo count($rows); ?></strong> احتسابًا في الفترة</div>
-            <div><i class="fas fa-vault"></i> ضمانُ حسن التنفيذ المحتجَز تراكميًّا:
+            <div><i class="fas fa-scroll"></i> <strong><?php echo count($rules); ?></strong> قاعدة مسجلة على العقد</div>
+            <div><i class="fas fa-list-check"></i> <strong><?php echo count($rows); ?></strong> احتسابا في الفترة</div>
+            <div><i class="fas fa-vault"></i> ضمان حسن التنفيذ المحتجز تراكميا:
                 <strong><?php echo pen_n($held); ?></strong>
                 <?php if ($ret_released): ?>
-                    <span class="pen-ret-note is-done"><i class="fas fa-check"></i> رُدَّ سلفًا</span>
+                    <span class="pen-ret-note is-done"><i class="fas fa-check"></i> رد سلفا</span>
                 <?php elseif ($held > 0 && !$ret_ended && $ret_end !== ''): ?>
-                    <span class="pen-ret-note">يُردُّ بعد <?php echo pen_e($ret_end); ?> (ق-20)</span>
+                    <span class="pen-ret-note">يرد بعد <?php echo pen_e($ret_end); ?> (ق-20)</span>
                 <?php endif; ?>
             </div>
             <?php if ($can_approve && $held > 0 && $ret_ended && !$ret_released): ?>
                 <form method="post" action="" class="pen-inline"
-                      onsubmit="return confirm('ردُّ ضمان حسن التنفيذ كاملًا (<?php echo pen_n($held); ?>)؟\n\nيُنشأ مستخلصٌ ختاميٌّ مسودةٌ ببندٍ موجب، ولا يصير مالًا حتى تُجيزه يدٌ ثانية.\nولا خصمَ للغرامات المعلّقة — خُصمت في مستخلصاتها.')">
+                      onsubmit="return confirm('رد ضمان حسن التنفيذ كاملا (<?php echo pen_n($held); ?>)؟\n\nينشأ مستخلص ختامي مسودة ببند موجب، ولا يصير مالا حتى تجيزه يد ثانية.\nولا خصم للغرامات المعلقة — خصمت في مستخلصاتها.')">
                     <?php echo csrf_field(); ?>
                     <input type="hidden" name="pen_action" value="release_retention">
                     <input type="hidden" name="contract" value="<?php echo $sel; ?>">
                     <input type="hidden" name="from" value="<?php echo pen_e($from); ?>">
                     <input type="hidden" name="to" value="<?php echo pen_e($to); ?>">
-                    <button type="submit" class="btn-primary pen-release"><i class="fas fa-unlock"></i> ردُّ الضمان</button>
+                    <button type="submit" class="btn-primary pen-release"><i class="fas fa-unlock"></i> رد الضمان</button>
                 </form>
             <?php endif; ?>
             <?php if ($can_assess): ?>
@@ -333,15 +333,15 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     <input type="hidden" name="contract" value="<?php echo $sel; ?>">
                     <input type="hidden" name="from" value="<?php echo pen_e($from); ?>">
                     <input type="hidden" name="to" value="<?php echo pen_e($to); ?>">
-                    <button type="submit" class="btn-primary"><i class="fas fa-calculator"></i> احتسِب الفترة</button>
+                    <button type="submit" class="btn-primary"><i class="fas fa-calculator"></i> احتسب الفترة</button>
                 </form>
             <?php endif; ?>
         </div>
 
         <?php if (empty($rules)): ?>
             <div class="pen-note"><i class="fas fa-circle-info"></i>
-                لا قواعدَ جزاءٍ مسجَّلةٌ على هذا العقد — فلا شيءَ يُحتسب. القواعدُ نصُّ عقدٍ تُسجَّل
-                في <code>contract_penalty_rules</code> بنوعٍ من الأربعة المنصوصة (ق-9).</div>
+                لا قواعد جزاء مسجلة على هذا العقد — فلا شيء يحتسب. القواعد نص عقد تسجل
+                في <code>contract_penalty_rules</code> بنوع من الأربعة المنصوصة (ق-9).</div>
         <?php endif; ?>
 
         <div class="card"><div class="card-body">
@@ -350,7 +350,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     <thead><tr>
                         <th>إجراءات</th>
                         <th>نوع البند</th><th>نسخة القاعدة المستعملة</th><th>الفترة</th>
-                        <th>الملتزَم</th><th>المنفَّذ</th><th>الفارق</th>
+                        <th>الملتزم</th><th>المنفذ</th><th>الفارق</th>
                         <th>الأساس المحتسب</th><th>قبل السقف</th><th>السقف</th><th>المبلغ</th>
                         <th>الحالة</th>
                         <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
@@ -365,17 +365,17 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         <th class="ems-fn-th" data-fn="1">مرجع تسوية المورد</th>
                         <th class="ems-fn-th" data-fn="1">احتسبه</th>
                         <th class="ems-fn-th none" data-fn="1">اعتمده</th>
-                        <th class="ems-fn-th none" data-fn="1">المستخلص المدرَج فيه</th>
+                        <th class="ems-fn-th none" data-fn="1">المستخلص المدرج فيه</th>
                         <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                        <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                        <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                        <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                        <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                         <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                         <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-                        <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+                        <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
                         <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-                        <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+                        <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
                         <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
-                        <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
+                        <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
                         <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                         <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                         <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
@@ -383,7 +383,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         </tr></thead>
                     <tbody>
                     <?php if (empty($rows)): ?>
-                        <tr><td colspan="12" class="pen-empty">لا احتساباتٍ في هذه الفترة — اضغط «احتسِب الفترة».</td></tr>
+                        <tr><td colspan="12" class="pen-empty">لا احتسابات في هذه الفترة — اضغط «احتسب الفترة».</td></tr>
                     <?php else: foreach ($rows as $a):
                         $isPen = ($a['kind'] === 'penalty'); ?>
                         <tr class="pen-row-<?php echo pen_e($a['state']); ?>">
@@ -401,7 +401,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                                 <?php endif; ?>
                                 <?php if ($can_approve && $a['state'] === 'reviewed'): ?>
                                     <form method="post" action="" class="pen-inline"
-                                          onsubmit="return confirm('إجازةُ هذا البند؟ سيُنشر قيدُه في الدفتر ويظهر في المستخلص.')">
+                                          onsubmit="return confirm('إجازة هذا البند؟ سينشر قيده في الدفتر ويظهر في المستخلص.')">
         <?php echo csrf_field(); ?>
                                         <input type="hidden" name="pen_action" value="approve">
                                         <input type="hidden" name="aid" value="<?php echo intval($a['id']); ?>">
@@ -433,7 +433,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                             <td class="pen-num"><?php echo pen_n($a['raw_amount']); ?></td>
                             <td class="pen-num"><?php echo pen_n($a['cap_amount']); ?>
                                 <?php if ($a['cap_amount'] !== null && (float) $a['raw_amount'] > (float) $a['cap_amount']): ?>
-                                    <br><span class="pen-capped">قُصّ بالسقف</span>
+                                    <br><span class="pen-capped">قص بالسقف</span>
                                 <?php endif; ?></td>
                             <td class="pen-num pen-amount <?php echo $isPen ? 'is-neg' : 'is-pos'; ?>">
                                 <?php echo ($isPen ? '−' : '+') . pen_n($a['amount']); ?>
@@ -443,7 +443,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                                     <?php echo pen_e($STATE[$a['state']] ?? $a['state']); ?></span>
                                 <?php if ($a['state'] === 'waived' && $a['waive_reason']): ?>
                                     <br><span class="pen-muted" title="<?php echo pen_e($a['waive_reason']); ?>">
-                                        سببُ الإعفاء مسجَّل</span>
+                                        سبب الإعفاء مسجل</span>
                                 <?php endif; ?>
                                 <?php if ($a['reviewer']): ?><br><span class="pen-muted">راجع: <?php echo pen_e($a['reviewer']); ?></span><?php endif; ?>
                                 <?php if ($a['approver']): ?><br><span class="pen-muted">أجاز: <?php echo pen_e($a['approver']); ?></span><?php endif; ?>
@@ -455,7 +455,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             </div>
         </div></div>
     <?php else: ?>
-        <div class="card"><div class="card-body pen-empty">اختر عقدًا وفترةً.</div></div>
+        <div class="card"><div class="card-body pen-empty">اختر عقدا وفترة.</div></div>
     <?php endif; ?>
 
     <div id="penWaive" class="pen-modal" hidden>
@@ -466,12 +466,12 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <input type="hidden" name="contract" value="<?php echo $sel; ?>">
             <input type="hidden" name="from" value="<?php echo pen_e($from); ?>">
             <input type="hidden" name="to" value="<?php echo pen_e($to); ?>">
-            <h5><i class="fas fa-ban"></i> إعفاءٌ من الجزاء</h5>
-            <p class="pen-muted">الإعفاءُ قرارٌ ماليٌّ موثَّق — والسببُ إلزاميٌّ يبقى في السجل (ق-13).</p>
-            <label for="emsf_80_5121b">سببُ الإعفاء *</label>
-            <textarea name="reason" rows="3" maxlength="255" required placeholder="لماذا يُعفى هذا البند؟" id="emsf_80_5121b"></textarea>
+            <h5><i class="fas fa-ban"></i> إعفاء من الجزاء</h5>
+            <p class="pen-muted">الإعفاء قرار مالي موثق — والسبب إلزامي يبقى في السجل (ق-13).</p>
+            <label for="emsf_80_5121b">سبب الإعفاء *</label>
+            <textarea name="reason" rows="3" maxlength="255" required placeholder="لماذا يعفى هذا البند؟" id="emsf_80_5121b"></textarea>
             <div class="pen-modal-actions">
-                <button type="submit" class="btn-primary"><i class="fas fa-check"></i> تأكيدُ الإعفاء</button>
+                <button type="submit" class="btn-primary"><i class="fas fa-check"></i> تأكيد الإعفاء</button>
                 <button type="button" class="btn-secondary" id="penWaiveCancel"><i class="fas fa-times"></i> إلغاء</button>
             </div>
         </form>

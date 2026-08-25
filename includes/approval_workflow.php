@@ -251,7 +251,7 @@ if (!function_exists('approval_record_rule_gap')) {
                  تسجيلِ الدَّينِ لا يجوز أن يمنع سلّمَ اعتماد)، فيُعلَن بالقناةِ
                  المسجَّلةِ لذلك لا بتعليقٍ حرّ. */
             ems_catch_ignored($e, __FUNCTION__,
-                'CS-12: تسجيلُ دَينِ «سلّمٌ بلا قاعدة» تابعٌ لا شرط — لا يُوقف مسارَ الاعتماد.');
+                'CS-12: تسجيل دين «سلم بلا قاعدة» تابع لا شرط — لا يوقف مسار الاعتماد.');
         }
         mysqli_report($prev);
     }
@@ -502,7 +502,7 @@ if (!function_exists('approval_execute_payload')) {
             if (!empty($missing)) {
                 /* fail-closed: رمزٌ لم يُحَلَّ يعني كتابةً ناقصةَ السند — تُرفض
                    ولا تُكتب بقيمةٍ مخترعة، والقيدُ البنيويُّ كان سيرفضها لاحقًا. */
-                return approval_response(false, 'سندٌ ناقصٌ لا يُخمَّن: ' . implode('، ', array_unique($missing)));
+                return approval_response(false, 'سند ناقص لا يخمن: ' . implode('، ', array_unique($missing)));
             }
             $result = approval_execute_db_operation($operation, $conn);
             if (empty($result['success'])) {
@@ -531,7 +531,7 @@ if (!function_exists('approval_finalize_if_completed')) {
             $cnt = approval_steps_count($request_id, $conn);
             if ($cnt === 0) {
                 return approval_response(false,
-                    'طلبٌ بلا أيِّ خطوةِ سلّمٍ — لا يُعتمد ولا يُنفَّذ (سلّمٌ غيرُ مبنيٍّ لا سلّمٌ مكتمل)');
+                    'طلب بلا أي خطوة سلم — لا يعتمد ولا ينفذ (سلم غير مبني لا سلم مكتمل)');
             }
             $next = approval_get_next_pending_step($request_id, $conn);
             $next_order = $next ? intval($next['step_order']) : null;
@@ -597,7 +597,7 @@ if (!function_exists('approval_create_request')) {
             if ($dupResult && mysqli_num_rows($dupResult) > 0) {
                 $dupRow = mysqli_fetch_assoc($dupResult);
                 approval_db_rollback($conn);
-                return approval_response(false, 'يوجد طلب موافقة معلق مسبقاً لنفس العملية', [
+                return approval_response(false, 'يوجد طلب موافقة معلق مسبقا لنفس العملية', [
                     'request_id' => intval($dupRow['id'])
                 ]);
             }
@@ -714,13 +714,13 @@ if (!function_exists('approval_approve_request')) {
                            AND approved_by = $approved_by LIMIT 1";
             $priorRes = mysqli_query($conn, $priorSql);
             if ($priorRes === false) {
-                throw new Exception('تعذّر فحصُ أيدي السلّم: ' . mysqli_error($conn));
+                throw new Exception('تعذر فحص أيدي السلم: ' . mysqli_error($conn));
             }
             $prior = mysqli_fetch_assoc($priorRes);
             if ($prior) {
-                throw new Exception('يدٌ واحدةٌ لا تمشي خطوتين في سلّمٍ واحد — اعتمدتَ الخطوةَ '
-                    . intval($prior['step_order']) . ' من هذا الطلب، والخطوةُ '
-                    . intval($step['step_order']) . ' ليدٍ أخرى (403)');
+                throw new Exception('يد واحدة لا تمشي خطوتين في سلم واحد — اعتمدت الخطوة '
+                    . intval($prior['step_order']) . ' من هذا الطلب، والخطوة '
+                    . intval($step['step_order']) . ' ليد أخرى (403)');
             }
 
             $step_id = intval($step['id']);

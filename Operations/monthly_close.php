@@ -39,11 +39,11 @@ $COLS   = array (
   7 => 'الساعات المعتمدة من العميل',
   8 => 'الفرق',
   9 => 'سبب الفرق',
-  10 => 'الكمية المنفَّذة',
+  10 => 'الكمية المنفذة',
   11 => 'الكمية المعتمدة',
   12 => 'قيمة الاستحقاق',
   13 => 'العملة',
-  14 => 'أعدّه',
+  14 => 'أعده',
   15 => 'اعتمده التشغيل',
   16 => 'اعتمدته المالية',
   17 => 'تاريخ الإقفال',
@@ -56,7 +56,7 @@ $COLS   = array (
   24 => 'المرفق',
   25 => 'مفتاح منع التكرار',
   26 => 'درجة الأثر',
-  27 => 'معكوس بـ',
+  27 => 'معكوس ب',
   28 => 'عكس عن',
   29 => 'مركز التكلفة',
   30 => 'سعر الصرف ومصدره',
@@ -72,11 +72,11 @@ $FIELDS = array (
   7 => 'الساعات المعتمدة من العميل',
   8 => 'الفرق',
   9 => 'سبب الفرق',
-  10 => 'الكمية المنفَّذة',
+  10 => 'الكمية المنفذة',
   11 => 'الكمية المعتمدة',
   12 => 'قيمة الاستحقاق',
   13 => 'العملة',
-  14 => 'أعدّه',
+  14 => 'أعده',
   15 => 'اعتمده التشغيل',
   16 => 'اعتمدته المالية',
   17 => 'تاريخ الإقفال',
@@ -101,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     $creator = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
     // الموجة ٢: الحفظ في الجدول الأصلي للشاشة (الفارغ NULL — لا مخزن بينيًّا)
     $ok = cmp03_store_insert($conn, $company_id, $CANONICAL, $payload, $status, $uid, $creator);
-    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
+    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
     exit();
 }
 
@@ -116,7 +116,7 @@ $entityName = $govCtx['values']['entity'] ?? '—';
 function cmp03_cell($col, $row, $entityName) {
     $n = cmp03_screen_norm($col);
     if ($n === cmp03_screen_norm('الكيان')) { return $entityName; }
-    if ($n === cmp03_screen_norm('المُنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المُنشئة')) {
+    if ($n === cmp03_screen_norm('المنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المنشئة')) {
         return $row['created_by_name'] ?: '—';
     }
     if ($n === cmp03_screen_norm('تاريخ الإنشاء')) { return $row['created_at']; }
@@ -131,7 +131,7 @@ function cmp03_screen_norm($s) {
     $s = str_replace(array('أ','إ','آ'), 'ا', $s);
     $s = str_replace('ة', 'ه', $s);
     $s = str_replace('ى', 'ي', $s);
-    return preg_replace('/[ًٌٍَُِّْ]/u', '', $s);
+    return preg_replace('/[]/u', '', $s);
 }
 
 $page_title = 'إيكوبيشن | الإقفال الشهري للوحدة';
@@ -156,9 +156,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
-    echo ems_states_bundle('لا محاضرَ إقفالٍ شهريٍّ بعدُ', 'أضف أولَ محضرٍ بزرِّ «إضافة» في رأسِ الشاشة');
+    echo ems_states_bundle('لا محاضر إقفال شهري بعد', 'أضف أول محضر بزر «إضافة» في رأس الشاشة');
     /* بوابة ١٢: الإقفالُ الشهريُّ دورةٌ مستندية — خطوتُها التاليةُ معلَنة */
-    echo ems_next_step('اعتمادُ التشغيلِ ثم اعتمادُ الماليةِ لمحضرِ الإقفال');
+    echo ems_next_step('اعتماد التشغيل ثم اعتماد المالية لمحضر الإقفال');
     ?>
 
     <!-- فورم الإضافة الموحد (ems-forms) — مطويٌّ حتى زرِّ الرأس -->
@@ -189,7 +189,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="f8" maxlength="190" id="emsf_856_421b4"></div>
                 <div class="form-group"><label for="emsf_857_945ad">سبب الفرق</label>
                     <input type="text" name="f9" maxlength="190" id="emsf_857_945ad"></div>
-                <div class="form-group"><label for="emsf_858_f638c">الكمية المنفَّذة</label>
+                <div class="form-group"><label for="emsf_858_f638c">الكمية المنفذة</label>
                     <input type="text" inputmode="decimal" name="f10" placeholder="0" id="emsf_858_f638c"></div>
                 <div class="form-group"><label for="emsf_859_e0ebd">الكمية المعتمدة</label>
                     <input type="text" inputmode="decimal" name="f11" placeholder="0" id="emsf_859_e0ebd"></div>
@@ -197,7 +197,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" inputmode="decimal" name="f12" placeholder="0" id="emsf_860_8f998"></div>
                 <div class="form-group"><label for="emsf_861_ab6d1">العملة</label>
                     <input type="text" name="f13" maxlength="190" id="emsf_861_ab6d1"></div>
-                <div class="form-group"><label for="emsf_862_94110">أعدّه</label>
+                <div class="form-group"><label for="emsf_862_94110">أعده</label>
                     <input type="text" name="f14" maxlength="190" id="emsf_862_94110"></div>
                 <div class="form-group"><label for="emsf_863_1d451">اعتمده التشغيل</label>
                     <input type="text" name="f15" maxlength="190" id="emsf_863_1d451"></div>
@@ -243,31 +243,31 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th>الساعات المعتمدة من العميل</th>
             <th>الفرق</th>
             <th>سبب الفرق</th>
-            <th>الكمية المنفَّذة</th>
+            <th>الكمية المنفذة</th>
             <th>الكمية المعتمدة</th>
             <th>قيمة الاستحقاق</th>
             <th class="ems-gov-th" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
-            <th>أعدّه</th>
+            <th>أعده</th>
             <th>اعتمده التشغيل</th>
             <th>اعتمدته المالية</th>
             <th>تاريخ الإقفال</th>
             <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
             <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
             <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-            <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+            <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
             <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
             <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
             <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-            <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
-            <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+            <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
+            <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
             <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
             <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
             <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
             </tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="31" class="text-center text-muted">لا بياناتَ بعدُ — أضف أول صفٍّ بزر «إضافة»</td></tr>
+                <tr><td colspan="31" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
                     <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>

@@ -301,7 +301,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         ems_gov_log('ROLE_ESCALATION_BLOCKED',
             'screen=main/users.php actor_role=' . (isset($_SESSION['user']['role']) ? $_SESSION['user']['role'] : '?')
             . ' target_role=' . $role . ' actor_uid=' . (isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0));
-        ems_gov_flash_redirect('users.php', '❌ لا يمكنك إسناد دورٍ خارج نطاق دورك', 'GOV-SCOPE-403', '');
+        ems_gov_flash_redirect('users.php', '❌ لا يمكنك إسناد دور خارج نطاق دورك', 'GOV-SCOPE-403', '');
         exit;
     }
 
@@ -339,9 +339,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     }
 
     if ($users_has_employee_id && $employee_link_id <= 0) {
-        echo "<script>alert('⚠️ يجب إسناد موظف لهذا الحساب — لا يوجد حساب يعمل بلا موظف مُسنَد له');</script>";
+        echo "<script>alert('⚠️ يجب إسناد موظف لهذا الحساب — لا يوجد حساب يعمل بلا موظف مسند له');</script>";
     } elseif (strval($role) === '8' && $supplier_link_id <= 0) {
-        echo "<script>alert('⚠️ حساب مشرف الموردين يجب ربطه بمورد — بلا ربطٍ لا يرى الحساب شيئًا');</script>";
+        echo "<script>alert('⚠️ حساب مشرف الموردين يجب ربطه بمورد — بلا ربط لا يرى الحساب شيئا');</script>";
     } elseif ($supplier_link_id > 0 && !$supplier_link_valid) {
         echo "<script>alert('⚠️ المورد المحدد غير صالح أو خارج نطاق الشركة');</script>";
     } elseif ($requires_project_context && ($project <= 0 || $contract <= 0)) {
@@ -359,7 +359,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         if (!$check) {
             echo "<script>alert('❌ حدث خطأ: " . mysqli_error($conn) . "');</script>";
         } elseif (mysqli_num_rows($check) > 0) {
-            echo "<script>alert('⚠️ اسم المستخدم موجود مسبقاً!');</script>";
+            echo "<script>alert('⚠️ اسم المستخدم موجود مسبقا!');</script>";
         } else {
             // (كان الأصل يعيد كتابة company_id بقيمة الجلسة نفسها — الصف معزول عبر البوابة
             // أصلًا فالإعادة لغو، وتمريرها في بيانات التحديث محظور تعاقديًا)
@@ -391,7 +391,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         if (!$check) {
             echo "<script>alert('❌ حدث خطأ: " . mysqli_error($conn) . "');</script>";
         } elseif (mysqli_num_rows($check) > 0) {
-            echo "<script>alert('⚠️ اسم المستخدم موجود مسبقاً!');</script>";
+            echo "<script>alert('⚠️ اسم المستخدم موجود مسبقا!');</script>";
         } else {
             if ($passwordRaw === '') {
                 echo "<script>alert('⚠️ كلمة المرور مطلوبة عند إضافة مستخدم جديد');</script>";
@@ -437,8 +437,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     include('../includes/page_header.php');
 
     /* UXW-01 ⑨: حزمةُ الحالاتِ الدنيا — مخفيةٌ افتراضًا ويُظهرها منطقُ الشاشةِ عند حالِها */
-    echo ems_states_bundle('لا مستخدمين مسجَّلين ضمن نطاقك بعدُ',
-        'أضف مستخدمًا جديدًا من زرِّ «إضافة مستخدم جديد» — ولا حسابَ يعمل بلا موظفٍ مُسنَد');
+    echo ems_states_bundle('لا مستخدمين مسجلين ضمن نطاقك بعد',
+        'أضف مستخدما جديدا من زر «إضافة مستخدم جديد» — ولا حساب يعمل بلا موظف مسند');
     ?>
 
     <?php
@@ -470,7 +470,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                         <label for="password"><i class="fas fa-lock"></i> كلمة المرور</label>
                         <input type="password" name="password" id="password" placeholder="كلمة المرور"
                             value="12345678" />
-                        <small class="text-muted"><i class="fas fa-info-circle"></i> اتركه فارغاً إذا لا تريد تغييره
+                        <small class="text-muted"><i class="fas fa-info-circle"></i> اتركه فارغا إذا لا تريد تغييره
                             عند التعديل</small>
                     </div>
                     <div>
@@ -500,7 +500,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
 
                     <?php if ($users_has_employee_id): ?>
                     <div>
-                        <label for="employee_id_link"><i class="fas fa-id-card-alt"></i> الموظف المُسنَد <span class="pu-required-star">*</span></label>
+                        <label for="employee_id_link"><i class="fas fa-id-card-alt"></i> الموظف المسند <span class="pu-required-star">*</span></label>
                         <select name="employee_id" id="employee_id_link" class="form-control" required>
                             <option value="">— اختر الموظف —</option>
                             <?php foreach ($employees_for_link as $emp): ?>
@@ -512,7 +512,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                                 </option>
                             <?php endforeach; ?>
                         </select>
-                        <small class="text-muted"><i class="fas fa-info-circle"></i> إلزامي — لا يوجد حساب يعمل بلا موظف مُسنَد. تُعبّأ بيانات الموظف تلقائياً عند الاختيار.</small>
+                        <small class="text-muted"><i class="fas fa-info-circle"></i> إلزامي — لا يوجد حساب يعمل بلا موظف مسند. تعبأ بيانات الموظف تلقائيا عند الاختيار.</small>
                     </div>
                     <?php endif; ?>
 
@@ -526,7 +526,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                                 </option>
                             <?php endforeach; ?>
                         </select>
-                        <small class="text-muted"><i class="fas fa-info-circle"></i> إلزامي لدور «مشرف موردين» — الحسابُ يرى موردَه هذا حصرًا (H-20)، وبلا ربطٍ لا يرى شيئًا.</small>
+                        <small class="text-muted"><i class="fas fa-info-circle"></i> إلزامي لدور «مشرف موردين» — الحساب يرى مورده هذا حصرا (H-20)، وبلا ربط لا يرى شيئا.</small>
                     </div>
 
                     <div id="projectDiv" class="pu-hidden">
@@ -632,12 +632,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                             <th class="ems-fn-th" data-fn="1">حالة الحساب</th>
                             <th class="ems-fn-th" data-fn="1">أنشأه</th>
                             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                             <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                             <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                             <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-                            <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطّلاع</th>
+                            <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطلاع</th>
                             <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                             <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
                             </tr>
@@ -974,7 +974,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             const $btn = $('.editBtn[data-id="' + prefillEditUid + '"]');
             if ($btn.length) { $btn.first().trigger('click'); }
         } else if (prefillEmployeeId > 0 && employeeSelect) {
-            // لا حساب: افتح نموذج إضافة مهيّأً بهذا الموظف
+            // لا حساب: افتح نموذج إضافة مهيأ بهذا الموظف
             form.reset();
             document.getElementById("uid").value = 0;
             refreshEmployeeOptions(0);
@@ -1060,7 +1060,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             const username = this.value.trim();
             const uid = document.getElementById("uid").value;
 
-            // إعادة تعيين الحالة إذا كان المدخل فارغاً
+            // إعادة تعيين الحالة إذا كان المدخل فارغا
             if (username === "") {
                 usernameFeedback.innerHTML = "";
                 usernameInput.classList.remove("pu-input-warn", "pu-input-success", "pu-input-error");

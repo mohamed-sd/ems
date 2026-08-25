@@ -103,7 +103,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا بنودَ لهذا الموردِ في الفترةِ المختارة', 'بدّل الشهرَ أو اختر موردًا آخرَ من قائمةِ الأعلى');
+    echo ems_states_bundle('لا بنود لهذا المورد في الفترة المختارة', 'بدل الشهر أو اختر موردا آخر من قائمة الأعلى');
     ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
@@ -114,7 +114,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             <div class="filter-body">
         <form method="get" class="fin-sup-filter">
             <strong><i class="fas fa-truck-field"></i> المورد:</strong>
-            <select name="sup" aria-label="المورد المعروض كشفُ حسابه" class="fin-sup-select" onchange="this.form.submit()"><?php
+            <select name="sup" aria-label="المورد المعروض كشف حسابه" class="fin-sup-select" onchange="this.form.submit()"><?php
                 // H-20: المقيَّدُ يرى خيارَ موردِه وحده — لا تسريبَ لأسماء بقية الموردين
                 if ($spg_scope !== null) {
                     echo '<option value="' . intval($spg_scope) . '" selected>' . htmlspecialchars($sup_name !== '' ? $sup_name : ('#' . intval($spg_scope))) . '</option>';
@@ -123,7 +123,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                 }
             ?></select>
             <strong>الفترة:</strong>
-            <input type="month" name="period" aria-label="شهرُ كشفِ الحساب" onchange="this.form.submit()" value="<?php echo htmlspecialchars($sel_period); ?>">
+            <input type="month" name="period" aria-label="شهر كشف الحساب" onchange="this.form.submit()" value="<?php echo htmlspecialchars($sel_period); ?>">
         </form>
             </div>
         </div>
@@ -142,15 +142,15 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
 
         <?php // ── M-14 · الطبقاتُ الخمسُ بروابط مصادرها ─────────────────── ?>
         <h5 class="fin-sup-h5-mid"><i class="fas fa-layer-group"></i>
-            الكشفُ بطبقاته — <small class="fin-sup-hint">كلُّ رقمٍ ينقر إلى مصدره</small>
+            الكشف بطبقاته — <small class="fin-sup-hint">كل رقم ينقر إلى مصدره</small>
             <?php if ($adv_balance > 0): ?>
                 <span class="badge badge-warning fin-sup-badge-gap"
-                      title="رصيدُ السلف المفتوح — ظاهرٌ في بطاقته دائمًا (ENT-02 §3)">
-                    رصيدُ سلفٍ مفتوح: <?php echo number_format($adv_balance, 2); ?></span>
+                      title="رصيد السلف المفتوح — ظاهر في بطاقته دائما (ENT-02 §3)">
+                    رصيد سلف مفتوح: <?php echo number_format($adv_balance, 2); ?></span>
             <?php endif; ?>
             <?php if (intval($stmt['orphans']) > 0): ?>
                 <span class="badge badge-danger fin-sup-badge-gap">
-                    <?php echo intval($stmt['orphans']); ?> سطرًا بلا مصدرٍ — يُعلَن ولا يُخفى</span>
+                    <?php echo intval($stmt['orphans']); ?> سطرا بلا مصدر — يعلن ولا يخفى</span>
             <?php endif; ?>
         </h5>
         <?php foreach ($stmt['layers'] as $lkey => $layer):
@@ -167,7 +167,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                             <td><?php echo htmlspecialchars((string) $row['date']); ?></td>
                             <td><?php echo htmlspecialchars((string) $row['description']); ?>
                                 <?php if (!empty($row['objected'])): ?>
-                                    <span class="badge badge-danger">معترَض</span>
+                                    <span class="badge badge-danger">معترض</span>
                                 <?php endif; ?></td>
                             <td class="fin-sup-amt<?php echo ((float) $row['amount'] < 0) ? ' fin-sup-neg' : ''; ?>">
                                 <?php echo ((float) $row['amount'] == 0.0 && $lkey === 'advances')
@@ -175,7 +175,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                                 <small><?php echo htmlspecialchars((string) $row['currency']); ?></small></td>
                             <td>
                                 <?php if ($row['orphan']): ?>
-                                    <span class="badge badge-danger" title="رقمٌ بلا مصدرٍ — يُعلَن ليُصلَح">بلا مصدر</span>
+                                    <span class="badge badge-danger" title="رقم بلا مصدر — يعلن ليصلح">بلا مصدر</span>
                                 <?php elseif ($row['link'] !== null): ?>
                                     <a href="<?php echo htmlspecialchars($row['link']); ?>">
                                         <?php echo htmlspecialchars($row['source_kind'] . '#' . $row['source_ref']); ?></a>
@@ -193,7 +193,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
         <?php endforeach; ?>
         <?php if (!empty($stmt['totals'])): ?>
         <p class="fin-sup-net">
-            صافي الفترة (استحقاقٌ − تحميلاتٌ − جزاءاتٌ):
+            صافي الفترة (استحقاق − تحميلات − جزاءات):
             <strong><?php echo number_format((float) $stmt['totals']['net'], 2); ?></strong>
             · بعد السداد:
             <strong><?php echo number_format((float) $stmt['totals']['balance'], 2); ?></strong>
@@ -201,7 +201,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
         <?php endif; ?>
 
         <?php // ── «تبويبُ اللقطة يعرض الأسعارَ التي احتُسب بها» (§6) ────── ?>
-        <h5 class="fin-sup-h5-sec"><i class="fas fa-tags"></i> اللقطةُ — الأسعارُ التي احتُسب بها</h5>
+        <h5 class="fin-sup-h5-sec"><i class="fas fa-tags"></i> اللقطة — الأسعار التي احتسب بها</h5>
         <div class="table-container">
             <table class="alltables no-datatable fin-sup-tbl" data-no-dt="hard">
                 <thead><tr><th>العقد</th><th>النموذج</th><th>الوحدة</th><th>سعر الوحدة</th>
@@ -209,8 +209,8 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                 <tbody>
                 <?php if (!$price_snapshot): ?>
                     <tr><td colspan="6" class="fin-sup-empty-cell">
-                        لا عقدَ موردٍ نافذًا بتاريخ <?php echo htmlspecialchars($stmt_to); ?> —
-                        <strong>يُعلَن ولا تُخترع أسعار</strong>.</td></tr>
+                        لا عقد مورد نافذا بتاريخ <?php echo htmlspecialchars($stmt_to); ?> —
+                        <strong>يعلن ولا تخترع أسعار</strong>.</td></tr>
                 <?php endif; ?>
                 <?php foreach ($price_snapshot as $ps): ?>
                     <tr>
@@ -280,13 +280,13 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
               <th class="ems-fn-th" data-fn="1">أصدره</th>
               <th class="ems-fn-th" data-fn="1">اعتمده</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th none" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-              <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطّلاع</th>
+              <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطلاع</th>
               <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
               <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
@@ -316,7 +316,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
         </div>
     </div></div>
     <?php else: ?>
-    <div class="card"><div class="card-body"><p class="text-muted fin-sup-pick"><i class="fas fa-arrow-up"></i> اختر موردًا لعرض كشفه.</p></div></div>
+    <div class="card"><div class="card-body"><p class="text-muted fin-sup-pick"><i class="fas fa-arrow-up"></i> اختر موردا لعرض كشفه.</p></div></div>
     <?php endif; ?>
 </div>
 

@@ -32,7 +32,7 @@ function sv_out($ok, $data = null, $msg = '', $code = 200)
     exit;
 }
 
-if (!isset($_SESSION['user'])) { sv_out(false, null, 'الجلسةُ منتهية', 401); }
+if (!isset($_SESSION['user'])) { sv_out(false, null, 'الجلسة منتهية', 401); }
 $uid  = (int) ($_SESSION['user']['id'] ?? 0);
 $role = (int) ($_SESSION['user']['role'] ?? 0);
 $co   = (int) ($_SESSION['user']['company_id'] ?? 0);
@@ -42,7 +42,7 @@ $screen = trim((string) ($_REQUEST['screen'] ?? ''));
 $screen = ltrim(str_replace('\\', '/', $screen), '/');
 if ($screen === '' || strpos($screen, '..') !== false
     || !preg_match('#^[A-Za-z0-9_./-]+\.php$#', $screen)) {
-    sv_out(false, null, 'مسارُ شاشةٍ غيرُ صالح', 422);
+    sv_out(false, null, 'مسار شاشة غير صالح', 422);
 }
 
 /* ◆ صلاحيةُ عرضِ الشاشةِ المعنيّة شرطٌ للقراءةِ والكتابةِ معًا. */
@@ -57,7 +57,7 @@ if (!$allowed) {
         $st->close();
     }
 }
-if (!$allowed) { sv_out(false, null, 'لا صلاحيةَ عرضٍ لهذه الشاشة', 403); }
+if (!$allowed) { sv_out(false, null, 'لا صلاحية عرض لهذه الشاشة', 403); }
 
 $action = (string) ($_REQUEST['do'] ?? 'list');
 
@@ -69,7 +69,7 @@ if ($action === 'list') {
           WHERE company_id = ? AND screen = ? AND active = 1
             AND ((owner_kind = 'user' AND owner_id = ?) OR (owner_kind = 'role' AND owner_id = ?))
           ORDER BY owner_kind DESC, is_default DESC, view_name");
-    if (!$st) { sv_out(false, null, 'تعذّرت القراءة', 500); }
+    if (!$st) { sv_out(false, null, 'تعذرت القراءة', 500); }
     $st->bind_param('isii', $co, $screen, $uid, $role);
     $st->execute();
     $rs = $st->get_result();
@@ -90,17 +90,17 @@ if ($action === 'list') {
 /* ── الحفظ — كتابةٌ فتلزمها بقيةُ العقد ───────────────────────────────── */
 if ($action === 'save') {
     if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
-        sv_out(false, null, 'الحفظُ بـPOST حصرًا', 405);
+        sv_out(false, null, 'الحفظ بPOST حصرا', 405);
     }
     if (function_exists('verify_csrf_token') && !verify_csrf_token($_POST['csrf_token'] ?? '')) {
-        sv_out(false, null, 'رمزُ الحمايةِ غيرُ صالح', 403);
+        sv_out(false, null, 'رمز الحماية غير صالح', 403);
     }
     $name = trim((string) ($_POST['name'] ?? ''));
-    if ($name === '' || mb_strlen($name) > 80) { sv_out(false, null, 'اسمُ المنظرِ إلزاميٌّ وقصير', 422); }
+    if ($name === '' || mb_strlen($name) > 80) { sv_out(false, null, 'اسم المنظر إلزامي وقصير', 422); }
 
     $cols = $_POST['columns'] ?? '';
     $arr  = is_string($cols) ? json_decode($cols, true) : $cols;
-    if (!is_array($arr)) { sv_out(false, null, 'قائمةُ الأعمدةِ غيرُ صالحة', 422); }
+    if (!is_array($arr)) { sv_out(false, null, 'قائمة الأعمدة غير صالحة', 422); }
     $arr = array_values(array_unique(array_map('intval', $arr)));
     sort($arr);
     $json = json_encode($arr);
@@ -110,11 +110,11 @@ if ($action === 'save') {
             (company_id, screen, view_name, owner_kind, owner_id, columns_json, is_default, active, created_by)
          VALUES (?, ?, ?, 'user', ?, ?, 0, 1, ?)
          ON DUPLICATE KEY UPDATE columns_json = VALUES(columns_json), active = 1, updated_at = NOW()");
-    if (!$st) { sv_out(false, null, 'تعذّر الحفظ', 500); }
+    if (!$st) { sv_out(false, null, 'تعذر الحفظ', 500); }
     $st->bind_param('issisi', $co, $screen, $name, $uid, $json, $uid);
     $ok = $st->execute();
     $st->close();
-    sv_out((bool) $ok, null, $ok ? 'حُفظ المنظر' : 'تعذّر الحفظ', $ok ? 200 : 500);
+    sv_out((bool) $ok, null, $ok ? 'حفظ المنظر' : 'تعذر الحفظ', $ok ? 200 : 500);
 }
 
-sv_out(false, null, 'فعلٌ غيرُ معروف', 400);
+sv_out(false, null, 'فعل غير معروف', 400);

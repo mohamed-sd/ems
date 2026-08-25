@@ -28,7 +28,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 /* حذف النوع معطل (Backend) */
 if (isset($_GET['delete_id'])) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'Deletion is temporarily disabled. ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
+    ems_gov_flash_redirect('../main/dashboard.php', 'Deletion is temporarily disabled. ❌', 'GOV-PERM-403', 'اطلب المنحة من مدير الصلاحيات إن كانت ضمن عملك');
 }
 
 /* جلب بيانات التعديل */
@@ -75,14 +75,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     if (function_exists('ems_states_bundle')) {
-        echo ems_states_bundle('لا نوعَ معداتٍ مسجَّلًا في الدليلِ بعدُ',
-                               'أضف أولَ نوعٍ بزرِّ «إضافة نوع جديد» في رأسِ الشاشة، أو استورده من ملفِّ إكسل');
+        echo ems_states_bundle('لا نوع معدات مسجلا في الدليل بعد',
+                               'أضف أول نوع بزر «إضافة نوع جديد» في رأس الشاشة، أو استورده من ملف إكسل');
     }
     ?>
     <!-- تنبيه الحذف (معطل) -->
     <div id="deleteAlert" class="alert alert-warning text-center equipments-types-alert-hidden">
         <i class="fa-solid fa-circle-info"></i>
-        لا يمكن حذف نوع المعدات حاليًا، فقط يمكن تعطيله
+        لا يمكن حذف نوع المعدات حاليا، فقط يمكن تعطيله
     </div>
 
     <!-- نموذج إضافة / تعديل -->
@@ -165,17 +165,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <th>الحالة</th>
                             <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
                             <th class="ems-fn-th" data-fn="1">اسم النوع</th>
-                            <th class="ems-fn-th" data-fn="1">وحدة العدّاد</th>
+                            <th class="ems-fn-th" data-fn="1">وحدة العداد</th>
                             <th class="ems-fn-th" data-fn="1">وحدة الإنتاج</th>
-                            <th class="ems-fn-th" data-fn="1">يحتاج مشغّلًا؟</th>
-                            <th class="ems-fn-th" data-fn="1">يحتاج تأهيلًا؟</th>
+                            <th class="ems-fn-th" data-fn="1">يحتاج مشغلا؟</th>
+                            <th class="ems-fn-th" data-fn="1">يحتاج تأهيلا؟</th>
                             <th class="ems-fn-th" data-fn="1">فئة الرخصة المطلوبة</th>
                             <th class="ems-fn-th" data-fn="1">العمر الإنتاجي القياسي</th>
                             <th class="ems-fn-th" data-fn="1">دورية الوقائية القياسية</th>
-                            <th class="ems-fn-th" data-fn="1">يُستعمل في بنود العقد؟</th>
-                            <th class="ems-fn-th" data-fn="1">عرّفه</th>
+                            <th class="ems-fn-th" data-fn="1">يستعمل في بنود العقد؟</th>
+                            <th class="ems-fn-th" data-fn="1">عرفه</th>
                             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
                             </tr>
                     </thead>
                     <tbody>

@@ -59,7 +59,7 @@ $CMT_TYPE = array(
     'equipment_count'          => 'عدد المعدات',
     'daily_availability_hours' => 'ساعات الإتاحة اليومية',
     'period_hours'             => 'ساعات المدة',
-    'min_guaranteed'           => 'حدٌّ أدنى مضمون',
+    'min_guaranteed'           => 'حد أدنى مضمون',
     'period_qty'               => 'كمية دورية',
     'total_qty'                => 'إجمالي الكمية (السقف)',
     'capacity_support'         => 'طاقة مساندة',
@@ -84,7 +84,7 @@ $CMT_OBLIGED = array(
     'supplier' => 'المورد',
 );
 $CMT_SHORTFALL = array(
-    'invoice_actual' => 'فوترة المنجَز',
+    'invoice_actual' => 'فوترة المنجز',
     'penalty'        => 'غرامة',
     'carry_over'     => 'ترحيل',
     'extend_term'    => 'تمديد المدة',
@@ -101,13 +101,13 @@ $CMT_SURPLUS = array(
 // CAP-01 §8.1 — مقابلُ الاحتياطي: لا قيمةَ افتراضيةً (DEC-CAP-A: بلا نصٍّ فهي التزامُ موردٍ لا بندُ إيراد)
 $CMT_STANDBY_COMP = array(
     'none'                 => 'بلا مقابل',
-    'fixed_allowance'      => 'بدلٌ ثابت',
-    'readiness_allowance'  => 'بدلُ جاهزية',
-    'billed_on_activation' => 'يُفوتر عند التفعيل فقط',
+    'fixed_allowance'      => 'بدل ثابت',
+    'readiness_allowance'  => 'بدل جاهزية',
+    'billed_on_activation' => 'يفوتر عند التفعيل فقط',
 );
 $CMT_STANDBY_TREAT = array(
     'within_obligation' => 'ضمن التزام النوع',
-    'separate_line'     => 'بندٌ مستقل',
+    'separate_line'     => 'بند مستقل',
 );
 $CMT_MEASURE = array(
     'hour'  => 'ساعة',
@@ -199,13 +199,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['commitment_code'])) {
     // الكود
     $cmt_code_raw = isset($_POST['commitment_code']) ? trim($_POST['commitment_code']) : '';
     if ($cmt_code_raw === '' || !preg_match('/^[A-Za-z0-9_\-]+$/', $cmt_code_raw)) {
-        cmt_redirect_with_msg('كود الالتزام غير صالح. استخدم أحرفًا وأرقامًا و - أو _ فقط ❌');
+        cmt_redirect_with_msg('كود الالتزام غير صالح. استخدم أحرفا وأرقاما و - أو _ فقط ❌');
     }
 
     // التحقق من قيم ENUM مقابل القوائم البيضاء
     $party_scope_raw = isset($_POST['party_scope']) ? trim($_POST['party_scope']) : '';
     if (!isset($CMT_PARTY_SCOPE[$party_scope_raw])) {
-        cmt_redirect_with_msg('الطرف الملتزَم غير صالح ❌');
+        cmt_redirect_with_msg('الطرف الملتزم غير صالح ❌');
     }
     $commitment_type_raw = isset($_POST['commitment_type']) ? trim($_POST['commitment_type']) : '';
     if (!isset($CMT_TYPE[$commitment_type_raw])) {
@@ -260,7 +260,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['commitment_code'])) {
     // ENUM يبتلع '' صامتًا — الفارغُ يُمرَّر NULL صراحةً، ومقابلُ الاحتياطي لا يُفترض (DEC-CAP-A)
     $etype_raw = isset($_POST['equipment_type_code']) ? trim($_POST['equipment_type_code']) : '';
     if ($etype_raw !== '' && !preg_match('/^[A-Za-z0-9_-]{1,40}$/', $etype_raw)) {
-        cmt_redirect_with_msg('رمز نوع المعدة غير صالح — أحرفٌ وأرقامٌ و - أو _ فقط ❌');
+        cmt_redirect_with_msg('رمز نوع المعدة غير صالح — أحرف وأرقام و - أو _ فقط ❌');
     }
     $etype_val = $etype_raw === '' ? null : $etype_raw;
     $cap_int = function ($key) {
@@ -273,12 +273,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['commitment_code'])) {
     $standby_req   = $cap_int('standby_units_required');
     $standby_alw   = $cap_int('standby_units_allowed');
     if ($primary_units === false || $standby_req === false || $standby_alw === false) {
-        cmt_redirect_with_msg('أعدادُ الوحدات الأساسية والاحتياطية أرقامٌ صحيحةٌ غيرُ سالبة ❌');
+        cmt_redirect_with_msg('أعداد الوحدات الأساسية والاحتياطية أرقام صحيحة غير سالبة ❌');
     }
     $qty_month_raw = isset($_POST['qty_per_primary_unit_month']) ? trim($_POST['qty_per_primary_unit_month']) : '';
     $qty_month_val = $qty_month_raw === '' ? null : (float) $qty_month_raw;
     if ($qty_month_val !== null && $qty_month_val < 0) {
-        cmt_redirect_with_msg('كميةُ الوحدة الأساسية شهريًّا لا تكون سالبة ❌');
+        cmt_redirect_with_msg('كمية الوحدة الأساسية شهريا لا تكون سالبة ❌');
     }
     $measure_raw = isset($_POST['measure_code']) ? trim($_POST['measure_code']) : '';
     $measure_val = ($measure_raw !== '' && isset($CMT_MEASURE[$measure_raw])) ? $measure_raw : null;
@@ -324,7 +324,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['commitment_code'])) {
                 array($cmt_code_raw, $cmt_id));
         } catch (\Throwable $t) { $dup = array(); }
         if (!empty($dup)) {
-            cmt_redirect_with_msg('كود الالتزام موجود مسبقاً داخل شركتك ❌');
+            cmt_redirect_with_msg('كود الالتزام موجود مسبقا داخل شركتك ❌');
         }
 
         try {
@@ -347,7 +347,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['commitment_code'])) {
             cmt_redirect_with_msg('تم تعديل الالتزام بنجاح ✅');
         } catch (\Throwable $t) {
             if (strpos($t->getMessage(), 'uq_obl_type_from') !== false) {
-                cmt_redirect_with_msg('التزامُ هذا النوع بهذا السريان قائمٌ في العقد — التعديلُ فترةٌ جديدةٌ بسريانٍ مختلف ❌');
+                cmt_redirect_with_msg('التزام هذا النوع بهذا السريان قائم في العقد — التعديل فترة جديدة بسريان مختلف ❌');
             }
             error_log('contract_commitments.php update failed: ' . $t->getMessage());
             cmt_redirect_with_msg('حدث خطأ أثناء التعديل ❌');
@@ -361,7 +361,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['commitment_code'])) {
                 array($cmt_code_raw));
         } catch (\Throwable $t) { $dup = array(); }
         if (!empty($dup)) {
-            cmt_redirect_with_msg('كود الالتزام موجود مسبقاً داخل شركتك ❌');
+            cmt_redirect_with_msg('كود الالتزام موجود مسبقا داخل شركتك ❌');
         }
 
         try {
@@ -385,7 +385,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['commitment_code'])) {
             cmt_redirect_with_msg('تم إضافة الالتزام بنجاح ✅');
         } catch (\Throwable $t) {
             if (strpos($t->getMessage(), 'uq_obl_type_from') !== false) {
-                cmt_redirect_with_msg('التزامُ هذا النوع بهذا السريان قائمٌ في العقد — التعديلُ فترةٌ جديدةٌ بسريانٍ مختلف ❌');
+                cmt_redirect_with_msg('التزام هذا النوع بهذا السريان قائم في العقد — التعديل فترة جديدة بسريان مختلف ❌');
             }
             error_log('contract_commitments.php insert failed: ' . $t->getMessage());
             cmt_redirect_with_msg('حدث خطأ أثناء الإضافة ❌');
@@ -505,7 +505,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fa-solid fa-share', 'label' => '');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا التزاماتِ تعاقديةً مسجَّلةً بعدُ', 'أضف أولَ التزامٍ تعاقديٍّ بزرِّ «إضافة» في رأسِ الشاشة');
+    echo ems_states_bundle('لا التزامات تعاقدية مسجلة بعد', 'أضف أول التزام تعاقدي بزر «إضافة» في رأس الشاشة');
     ?>
 
     <?php if (!empty($_GET['msg'])):
@@ -536,7 +536,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <div class="stats-card">
                 <div class="stats-icon"><i class="fas fa-shield-halved"></i></div>
                 <div class="stats-value"><?php echo $stat_min_guar; ?></div>
-                <div class="stats-title">حدٌّ أدنى مضمون</div>
+                <div class="stats-title">حد أدنى مضمون</div>
             </div>
         </div>
     </div>
@@ -578,7 +578,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         </select>
                     </div>
                     <div>
-                        <label for="party_scope"><i class="fas fa-user-group"></i> الطرف الملتزَم له</label>
+                        <label for="party_scope"><i class="fas fa-user-group"></i> الطرف الملتزم له</label>
                         <select name="party_scope" id="party_scope">
                             <?php foreach ($CMT_PARTY_SCOPE as $k => $v): ?>
                                 <option value="<?php echo cmt_e($k); ?>"><?php echo cmt_e($v); ?></option>
@@ -615,7 +615,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         </select>
                     </div>
                     <div>
-                        <label for="obliged_party"><i class="fas fa-user-shield"></i> الجهة الملتزِمة</label>
+                        <label for="obliged_party"><i class="fas fa-user-shield"></i> الجهة الملتزمة</label>
                         <select name="obliged_party" id="obliged_party">
                             <?php foreach ($CMT_OBLIGED as $k => $v): ?>
                                 <option value="<?php echo cmt_e($k); ?>"><?php echo cmt_e($v); ?></option>
@@ -639,7 +639,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         </select>
                     </div>
                     <div class="cmt-col-full cmt-section-title">
-                        <i class="fas fa-shield-halved"></i> التغطية والاحتياطي — بند نوع المعدة (يُملأ لالتزامات أنواع المعدات)
+                        <i class="fas fa-shield-halved"></i> التغطية والاحتياطي — بند نوع المعدة (يملأ لالتزامات أنواع المعدات)
                     </div>
                     <div>
                         <label for="equipment_type_code"><i class="fas fa-truck-monster"></i> رمز نوع المعدة</label>
@@ -658,7 +658,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         <input type="number" step="1" min="0" name="standby_units_allowed" id="standby_units_allowed" placeholder="—" />
                     </div>
                     <div>
-                        <label for="qty_per_primary_unit_month"><i class="fas fa-gauge-high"></i> كمية الوحدة الأساسية شهريًّا</label>
+                        <label for="qty_per_primary_unit_month"><i class="fas fa-gauge-high"></i> كمية الوحدة الأساسية شهريا</label>
                         <input type="number" step="0.01" min="0" name="qty_per_primary_unit_month" id="qty_per_primary_unit_month" placeholder="—" />
                     </div>
                     <div>
@@ -671,18 +671,18 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         </select>
                     </div>
                     <div>
-                        <label for="standby_compensation_type"><i class="fas fa-hand-holding-dollar"></i> مقابل الاحتياطي (لا يُفترض)</label>
+                        <label for="standby_compensation_type"><i class="fas fa-hand-holding-dollar"></i> مقابل الاحتياطي (لا يفترض)</label>
                         <select name="standby_compensation_type" id="standby_compensation_type">
-                            <option value="">— لم يُنَصَّ في العقد —</option>
+                            <option value="">— لم ينص في العقد —</option>
                             <?php foreach ($CMT_STANDBY_COMP as $k => $v): ?>
                                 <option value="<?php echo cmt_e($k); ?>"><?php echo cmt_e($v); ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
                     <div>
-                        <label for="standby_hours_treatment"><i class="fas fa-hourglass-half"></i> معالجة ساعات الاحتياطي المفعَّل</label>
+                        <label for="standby_hours_treatment"><i class="fas fa-hourglass-half"></i> معالجة ساعات الاحتياطي المفعل</label>
                         <select name="standby_hours_treatment" id="standby_hours_treatment">
-                            <option value="">— لم تُحدَّد —</option>
+                            <option value="">— لم تحدد —</option>
                             <?php foreach ($CMT_STANDBY_TREAT as $k => $v): ?>
                                 <option value="<?php echo cmt_e($k); ?>"><?php echo cmt_e($v); ?></option>
                             <?php endforeach; ?>
@@ -690,7 +690,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     </div>
                     <div class="cmt-col-full">
                         <label for="standby_activation_rule"><i class="fas fa-bolt"></i> قاعدة تفعيل الاحتياطي (متى وبإذن من ولأي مدة)</label>
-                        <input type="text" name="standby_activation_rule" id="standby_activation_rule" maxlength="255" placeholder="نصُّ العقد — مثال: عند تعطل أساسية بإذن مدير الحركة لمدة لا تتجاوز مهلة الإحلال" />
+                        <input type="text" name="standby_activation_rule" id="standby_activation_rule" maxlength="255" placeholder="نص العقد — مثال: عند تعطل أساسية بإذن مدير الحركة لمدة لا تتجاوز مهلة الإحلال" />
                     </div>
                     <div>
                         <label for="valid_from"><i class="fas fa-calendar-day"></i> سريان الالتزام من</label>
@@ -702,7 +702,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     </div>
                     <div class="cmt-col-full">
                         <label for="note"><i class="fas fa-note-sticky"></i> ملاحظة (بند العقد / سبب الحكم)</label>
-                        <textarea name="note" id="note" rows="2" maxlength="160" placeholder="بندُ العقد أو سببُ الحكم (حتى 160 حرفًا)"></textarea>
+                        <textarea name="note" id="note" rows="2" maxlength="160" placeholder="بند العقد أو سبب الحكم (حتى 160 حرفا)"></textarea>
                     </div>
                 </div>
                 <div class="pu-form-actions">
@@ -753,10 +753,10 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                             <th>الكمية</th>
                             <th>الدورية</th>
                             <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                             <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                             <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                             <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -798,7 +798,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                                             $sb_summary = '';
                                             if ($row['equipment_type_code'] !== null && $row['equipment_type_code'] !== '') {
                                                 $comp_lbl = ($row['standby_compensation_type'] !== null && isset($CMT_STANDBY_COMP[$row['standby_compensation_type']]))
-                                                    ? $CMT_STANDBY_COMP[$row['standby_compensation_type']] : 'لم يُنَصَّ — التزامُ موردٍ لا بندُ إيراد';
+                                                    ? $CMT_STANDBY_COMP[$row['standby_compensation_type']] : 'لم ينص — التزام مورد لا بند إيراد';
                                                 $sb_summary = 'النوع: ' . $row['equipment_type_code']
                                                     . ' · الأساسية: ' . ($row['primary_units_contracted'] ?? '—')
                                                     . ' · الاحتياطي المطلوب: ' . ($row['standby_units_required'] ?? '—')
@@ -913,13 +913,13 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     const statsSection = $('#cmtStatsSection');
 
     /**
-     * إظهارُ حقلِ الكودِ المولَّد وإخفاؤه.
+     * إظهار حقل الكود المولد وإخفاؤه.
      *
      * ⚠️ **لا تستعمل `jQuery.hide()` هنا** — `assets/css/ems-forms.css` يحمل:
      *     :is(.allforms, .ems-form) .form-grid > div { display: block !important }
-     * والغلافُ ابنٌ مباشرٌ لـ`.form-grid`، فـ`!important` من ورقةِ الأنماطِ تهزم
-     * الإخفاءَ السطريَّ **بلا أولوية**: السمةُ تُكتب فعلًا والحقلُ يبقى ظاهرًا، بلا
-     * خطأٍ في وحدةِ التحكم ولا سطرٍ في أيِّ سجل. (نظيرُ شاشتَي العملاءِ والمشاريع.)
+     * والغلاف ابن مباشر ل`.form-grid`، ف`!important` من ورقة الأنماط تهزم
+     * الإخفاء السطري **بلا أولوية**: السمة تكتب فعلا والحقل يبقى ظاهرا، بلا
+     * خطأ في وحدة التحكم ولا سطر في أي سجل. (نظير شاشتي العملاء والمشاريع.)
      */
     function setGeneratedCodeShown(shown) {
         var el = generatedCodeWrapper[0];
@@ -930,9 +930,9 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     function setAddMode() {
         formTitle.text('إضافة التزام جديد'); submitBtnText.text('حفظ الالتزام');
         setGeneratedCodeShown(true);
-        // الكودُ المولَّدُ يعود إلى خانتِه كلَّما دخلنا وضعَ الإضافة — ومصدرُه حقلُ
-        // العرضِ نفسُه لا نسخةٌ ثانيةٌ منه (مصدرُ حقيقةٍ واحد). و`reset()` يكفي
-        // للإلغاء، لكنَّ الانتقالَ من «تعديل» إلى «إضافة» قد يقع بلا reset.
+        // الكود المولد يعود إلى خانته كلما دخلنا وضع الإضافة — ومصدره حقل
+        // العرض نفسه لا نسخة ثانية منه (مصدر حقيقة واحد). و`reset()` يكفي
+        // للإلغاء، لكن الانتقال من «تعديل» إلى «إضافة» قد يقع بلا reset.
         var genCode = $('#generated_cmt_code').val();
         if (genCode) { $('#commitment_code').val(genCode); }
     }
@@ -997,7 +997,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         $('#shortfall_rule').val(d.shortfall || 'invoice_actual');
         $('#surplus_rule').val(d.surplus || 'same_price');
         $('#note').val(d.note || '');
-        // CAP-01 §8.1 — الفارغُ يبقى فارغًا: مقابلُ الاحتياطي لا يُفترض (DEC-CAP-A)
+        // CAP-01 §8.1 — الفارغ يبقى فارغا: مقابل الاحتياطي لا يفترض (DEC-CAP-A)
         $('#equipment_type_code').val(d.etype || '');
         $('#primary_units_contracted').val(d.primary !== undefined && d.primary !== '' ? d.primary : '');
         $('#standby_units_required').val(d.sbreq !== undefined && d.sbreq !== '' ? d.sbreq : '');
@@ -1031,7 +1031,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         });
     });
 
-    // ── عرض التفاصيل عبر EmsDetailsModal الموحّد ──
+    // ── عرض التفاصيل عبر EmsDetailsModal الموحد ──
     $(document).on('click', '.viewCmtBtn', function () {
         const d = $(this).data();
         const fields = [

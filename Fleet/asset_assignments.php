@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'assig
         'decision_ref' => trim($_POST['decision_ref'] ?? ''),
         'assigned_by'  => $uid,
     ));
-    $msg = $r['ok'] ? '✅ تمَّ الإسناد' : ('❌ ' . $r['reason'] . ($r['reason_code'] !== '' ? ' [' . $r['reason_code'] . ']' : ''));
+    $msg = $r['ok'] ? '✅ تم الإسناد' : ('❌ ' . $r['reason'] . ($r['reason_code'] !== '' ? ' [' . $r['reason_code'] . ']' : ''));
     ems_gov_flash_redirect('asset_assignments.php', $msg, 'GOV-OK-200', ''); exit();
 }
 
@@ -67,7 +67,7 @@ include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main ems-unified-page-shell">
-    <?php $header_title = 'إسناد الأصل وحركته — لا أصلَ جديدٌ عند الانتقال'; $header_icon = 'fa fa-map-location-dot'; $header_actions = array();
+    <?php $header_title = 'إسناد الأصل وحركته — لا أصل جديد عند الانتقال'; $header_icon = 'fa fa-map-location-dot'; $header_actions = array();
     if ($can_add) { $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'إسناد'); }
     $header_back = array('href' => 'asset_use_rights.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'حق الاستخدام');
     include('../includes/page_header.php'); ?>
@@ -75,7 +75,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="success-message <?= $ok ? 'is-success' : 'is-error' ?>"><i class="fas <?= $ok ? 'fa-check-circle' : 'fa-exclamation-circle' ?>"></i> <?= htmlspecialchars($_GET['msg']) ?></div>
     <?php endif; ?>
     <?php require_once __DIR__ . '/../includes/ux_components.php';
-    echo ems_states_bundle('لا إسناداتِ أصولٍ مسجَّلةً بعدُ', 'أسنِدْ أوّلَ أصلٍ بزرِّ «إسناد» في رأسِ الشاشة'); ?>
+    echo ems_states_bundle('لا إسنادات أصول مسجلة بعد', 'أسند أول أصل بزر «إسناد» في رأس الشاشة'); ?>
 
     <form id="aForm" action="" method="post" class="allforms">
         <?= csrf_field() ?>
@@ -119,11 +119,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= htmlspecialchars((string) $r['decision_ref']) ?></td>
             </tr>
         <?php endforeach; else: ?>
-            <tr><td colspan="10">لا إسناداتِ أصولٍ بعدُ.</td></tr>
+            <tr><td colspan="10">لا إسنادات أصول بعد.</td></tr>
         <?php endif; ?>
         </tbody></table></div>
 
-    <div class="card-header"><h5><i class="fas fa-clock-rotate-left"></i> سجلُّ حركةِ الأصولِ الحيّ — قراءةٌ لا كتابة</h5></div>
+    <div class="card-header"><h5><i class="fas fa-clock-rotate-left"></i> سجل حركة الأصول الحي — قراءة لا كتابة</h5></div>
     <div class="table-wrap"><table class="data-table">
         <thead><tr><th>#</th><th>الأصل</th><th>التاريخ</th><th>نوع الواقعة</th><th>من</th><th>إلى</th><th>ساعات العمل</th><th>ساعات التوقف</th><th>ملاحظة</th></tr></thead>
         <tbody>
@@ -138,7 +138,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= htmlspecialchars((string) ($h['down_hours'] ?? '0')) ?></td>
                 <td><?= htmlspecialchars((string) ($h['note'] ?? '')) ?></td></tr>
         <?php endforeach; else: ?>
-            <tr><td colspan="9">لا وقائعَ حركةٍ مسجَّلةً.</td></tr>
+            <tr><td colspan="9">لا وقائع حركة مسجلة.</td></tr>
         <?php endif; ?>
         </tbody></table></div>
 </div>

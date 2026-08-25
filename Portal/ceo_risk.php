@@ -43,7 +43,7 @@ if (!$is_super_admin && empty($__pp['can_view'])) {
     exit();
 }
 if (!$is_super_admin && $_SERVER['REQUEST_METHOD'] === 'POST' && empty($__pp['can_add']) && empty($__pp['can_edit'])) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'غير مصرح بالكتابة في هذه الشاشة ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
+    ems_gov_flash_redirect('../main/dashboard.php', 'غير مصرح بالكتابة في هذه الشاشة ❌', 'GOV-PERM-403', 'اطلب المنحة من مدير الصلاحيات إن كانت ضمن عملك');
 }
 $COLS   = array (
   0 => 'الكيان',
@@ -52,15 +52,15 @@ $COLS   = array (
   3 => 'الجهة الرافعة',
   4 => 'نوع القضية',
   5 => 'وصف القضية',
-  6 => 'الأثر المقدَّر',
+  6 => 'الأثر المقدر',
   7 => 'العملة',
   8 => 'الخيارات المطروحة',
   9 => 'الخيار المختار',
   10 => 'مبرر الاختيار',
-  11 => 'الجهة المكلَّفة بالتنفيذ',
+  11 => 'الجهة المكلفة بالتنفيذ',
   12 => 'مهلة التنفيذ',
   13 => 'تاريخ المتابعة',
-  14 => 'المعتمِد — الاسم والصفة',
+  14 => 'المعتمد — الاسم والصفة',
   15 => 'تاريخ القرار',
   16 => 'مرجع التفويض',
   17 => 'المرجع الأب',
@@ -102,8 +102,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
             array(), array('attempted_status' => $status, 'role' => strval($_SESSION['user']['role'] ?? '')),
             array('company_id' => (int) $company_id, 'user_id' => (int) $uid));
         ems_gov_flash_redirect(basename(__FILE__),
-            'GOV-DECIDE-403: حسمُ القرارِ للإدارةِ التنفيذيةِ وحدَها — حُفظ طلبُك «مسودةً» ولم يُحسم ❌',
-            'GOV-PERM-403', 'ارفعه للإدارةِ التنفيذيةِ لتحسمه');
+            'GOV-DECIDE-403: حسم القرار للإدارة التنفيذية وحدها — حفظ طلبك «مسودة» ولم يحسم ❌',
+            'GOV-PERM-403', 'ارفعه للإدارة التنفيذية لتحسمه');
         exit();
     }
 
@@ -113,10 +113,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
         || in_array($status, array('محسوم', 'معتمد', 'نافذ', 'قيد التنفيذ', 'مقفل'), true);
     if ($decisive) {
         $missing = array();
-        if ($in['assigned_dept'] === '') { $missing[] = 'الجهة المكلَّفة بالتنفيذ'; }
+        if ($in['assigned_dept'] === '') { $missing[] = 'الجهة المكلفة بالتنفيذ'; }
         if ($in['exec_deadline'] === '') { $missing[] = 'مهلة التنفيذ'; }
         if ($missing) {
-            ems_gov_flash_redirect(basename(__FILE__), 'BR-CEO-04: قرارٌ محسومٌ بلا ' . implode(' و', $missing) . ' — أكمل الحقلين ثم احفظ ❌', 'GOV-FAIL-409', '');
+            ems_gov_flash_redirect(basename(__FILE__), 'BR-CEO-04: قرار محسوم بلا ' . implode(' و', $missing) . ' — أكمل الحقلين ثم احفظ ❌', 'GOV-FAIL-409', '');
             exit();
         }
     }
@@ -159,7 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
                 'occurred_at'     => gmdate('Y-m-d H:i:s'),
                 'created_by'      => $uid ?: 1,
                 'idempotency_key' => 'exec_decision:EXDC-' . $newId,
-                'notes'           => 'قرارٌ تنفيذي: ' . mb_substr($in['issue_desc'] !== '' ? $in['issue_desc'] : $in['decision_no'], 0, 120),
+                'notes'           => 'قرار تنفيذي: ' . mb_substr($in['issue_desc'] !== '' ? $in['issue_desc'] : $in['decision_no'], 0, 120),
                 'payload'         => array(
                     'decision_ref' => 'EXDC-' . $newId,
                     'decision_no'  => $in['decision_no'],
@@ -182,9 +182,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
                 'owner_user_id' => $uid, 'assigned_user_id' => $uid,
                 'verifier_user_id' => \App\Services\Work\WorkItemService::resolveVerifier($conn, $company_id, $uid),
                 'org_unit_id' => 1, 'project_id' => 0, 'site_id' => 0,
-                'title' => 'متابعة قرارٍ تنفيذي — ' . ($in['decision_no'] !== '' ? $in['decision_no'] : ('EXDC-' . $newId)),
-                'deliverable' => 'إفادةُ تنفيذ الجهة المكلَّفة: ' . $in['assigned_dept'],
-                'evidence_required' => 'ما يُثبت التنفيذ ضمن المهلة: ' . $in['exec_deadline'],
+                'title' => 'متابعة قرار تنفيذي — ' . ($in['decision_no'] !== '' ? $in['decision_no'] : ('EXDC-' . $newId)),
+                'deliverable' => 'إفادة تنفيذ الجهة المكلفة: ' . $in['assigned_dept'],
+                'evidence_required' => 'ما يثبت التنفيذ ضمن المهلة: ' . $in['exec_deadline'],
                 'due_at' => date('Y-m-d H:i:s', $fu),
                 'priority' => 'P2', 'created_by' => $uid, 'parent_ref' => 'EXDC-' . $newId,
             ));
@@ -205,14 +205,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
             $__q->execute();
             $__rs = $__q->get_result();
             if ($__rs && ($__row = $__rs->fetch_assoc())) {
-                $__ref = ' — الصفُّ القائم #' . (int) $__row['id'] . ' (' . $__row['status'] . ')';
+                $__ref = ' — الصف القائم #' . (int) $__row['id'] . ' (' . $__row['status'] . ')';
             }
             $__q->close();
         }
     }
     ems_gov_flash_redirect(basename(__FILE__),
-        $ok ? 'حُفظ الصف ✅'
-            : ($__dup ? ('رقمُ القرار «' . $in['decision_no'] . '» مسجَّلٌ سلفًا — لم يُنشأ صفٌّ ثانٍ' . $__ref . ' ❌')
+        $ok ? 'حفظ الصف ✅'
+            : ($__dup ? ('رقم القرار «' . $in['decision_no'] . '» مسجل سلفا — لم ينشأ صف ثان' . $__ref . ' ❌')
                       : 'تعذر الحفظ ❌'),
         $ok ? 'GOV-OK-200' : ($__dup ? 'GOV-FAIL-409' : 'GOV-OK-200'), '');
     exit();
@@ -262,7 +262,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     );
     $header_back = false;
     include '../includes/page_header.php';
-    echo ems_states_bundle('لا قراراتٍ عليا مسجَّلةً بعدُ لهذا الكيان', 'أضف قرارًا بزر «إضافة» أو تحقق من توفرِ السجلات');
+    echo ems_states_bundle('لا قرارات عليا مسجلة بعد لهذا الكيان', 'أضف قرارا بزر «إضافة» أو تحقق من توفر السجلات');
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
@@ -290,7 +290,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="f3" maxlength="190" id="emsf_1135_82468"></div>
                 <div class="form-group"><label for="emsf_1136_922be">وصف القضية</label>
                     <input type="text" name="f4" maxlength="190" id="emsf_1136_922be"></div>
-                <div class="form-group"><label for="emsf_1137_a4955">الأثر المقدَّر</label>
+                <div class="form-group"><label for="emsf_1137_a4955">الأثر المقدر</label>
                     <input type="text" name="f5" maxlength="190" id="emsf_1137_a4955"></div>
                 <div class="form-group"><label for="emsf_1138_ba77d">العملة</label>
                     <input type="text" name="f6" maxlength="190" id="emsf_1138_ba77d"></div>
@@ -300,13 +300,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="f8" maxlength="190" id="emsf_1140_e1634"></div>
                 <div class="form-group"><label for="emsf_1141_13b95">مبرر الاختيار</label>
                     <input type="text" name="f9" maxlength="190" id="emsf_1141_13b95"></div>
-                <div class="form-group"><label for="emsf_1142_a1d06">الجهة المكلَّفة بالتنفيذ</label>
+                <div class="form-group"><label for="emsf_1142_a1d06">الجهة المكلفة بالتنفيذ</label>
                     <input type="text" name="f10" maxlength="190" id="emsf_1142_a1d06"></div>
                 <div class="form-group"><label for="emsf_1143_037e7">مهلة التنفيذ</label>
                     <input type="text" name="f11" maxlength="190" id="emsf_1143_037e7"></div>
                 <div class="form-group"><label for="emsf_1144_9332f">تاريخ المتابعة</label>
                     <input type="date" name="f12" id="emsf_1144_9332f"></div>
-                <div class="form-group"><label for="emsf_1145_f28fd">المعتمِد — الاسم والصفة</label>
+                <div class="form-group"><label for="emsf_1145_f28fd">المعتمد — الاسم والصفة</label>
                     <input type="text" name="f13" maxlength="190" id="emsf_1145_f28fd"></div>
                 <div class="form-group"><label for="emsf_1146_e5e79">تاريخ القرار</label>
                     <input type="date" name="f14" id="emsf_1146_e5e79"></div>
@@ -324,29 +324,29 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="table-responsive">
         <table class="alltables display" id="ceo_riskTable">
             <thead><tr>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
             <th>رقم القرار</th>
             <th>تاريخ الرفع</th>
             <th>الجهة الرافعة</th>
             <th>نوع القضية</th>
             <th>وصف القضية</th>
-            <th>الأثر المقدَّر</th>
+            <th>الأثر المقدر</th>
             <th class="ems-gov-th" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
             <th>الخيارات المطروحة</th>
             <th>الخيار المختار</th>
             <th>مبرر الاختيار</th>
-            <th>الجهة المكلَّفة بالتنفيذ</th>
+            <th>الجهة المكلفة بالتنفيذ</th>
             <th>مهلة التنفيذ</th>
             <th>تاريخ المتابعة</th>
-            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
             <th>تاريخ القرار</th>
-            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
-            <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولَّد عنه — خيط التتبع">المرجع الأب</th>
+            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+            <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
             <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
             </tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="19" class="text-center text-muted">لا بياناتَ بعدُ — أضف أول صفٍّ بزر «إضافة»</td></tr>
+                <tr><td colspan="19" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
                     <?php foreach (array_keys($COLS) as $i): $v = m00_cell_at($i, $r, $entityName, $COLDB); ?>

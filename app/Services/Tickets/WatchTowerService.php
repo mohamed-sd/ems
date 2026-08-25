@@ -89,10 +89,10 @@ class WatchTowerService
     {
         $co = intval($companyId);
         $rows = self::latenessReport($conn, $co);
-        $summary = 'تقرير المركز الدوري: ' . count($rows) . ' مكلفًا بين متأخر وغير مستجيب';
+        $summary = 'تقرير المركز الدوري: ' . count($rows) . ' مكلفا بين متأخر وغير مستجيب';
         $stmt = $conn->prepare("INSERT INTO fin_notifications (company_id, target_level, title, link)
                                 VALUES (?, 'all', ?, 'Tickets/watchtower.php')");
-        $title = $summary . ' — يُرفع لمدير التشغيل والإدارة العامة';
+        $title = $summary . ' — يرفع لمدير التشغيل والإدارة العامة';
         $stmt->bind_param('is', $co, $title);
         $stmt->execute();
         $stmt->close();

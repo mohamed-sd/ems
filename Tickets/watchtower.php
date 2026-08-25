@@ -35,7 +35,7 @@ if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا صلاح
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['issue_report'])) {
     $r = WT::issuePeriodicReport($conn, $company_id, intval($_SESSION['user']['id'] ?? 0));
-    ems_gov_flash_redirect('watchtower.php', $r['summary'] . ' — أُصدر ✅', 'GOV-OK-200', '');
+    ems_gov_flash_redirect('watchtower.php', $r['summary'] . ' — أصدر ✅', 'GOV-OK-200', '');
     exit();
 }
 
@@ -68,25 +68,25 @@ include '../insidebar.php';
     include('../includes/page_header.php');
     ems_screen_about(
         'المؤشرات الثمانية (TKT-01 §11) وتقرير «من يتأخر ومن لا يستجيب» بالاسم والإدارة — '
-        . 'المركز يرصد ويتواصل ويسجّل، ولا يوجّه ولا يصعّد (النظام يفعل ذلك آليًّا).',
-        array('التقرير الدوري يُرفع لمدير التشغيل والإدارة العامة',
+        . 'المركز يرصد ويتواصل ويسجل، ولا يوجه ولا يصعد (النظام يفعل ذلك آليا).',
+        array('التقرير الدوري يرفع لمدير التشغيل والإدارة العامة',
               'عدم الاستجابة مؤشر إهمال لا تأخير — مستهدفه صفر'));
     if ($msg !== '') { echo '<div class="alert alert-info">' . htmlspecialchars($msg) . '</div>'; }
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا مؤشراتِ مراقبةٍ في النافذةِ المقيسة', 'وسّع نافذةَ القياسِ أو تحقق من تسجيلِ مساراتِ البلاغات');
+    echo ems_states_bundle('لا مؤشرات مراقبة في النافذة المقيسة', 'وسع نافذة القياس أو تحقق من تسجيل مسارات البلاغات');
     ?>
 
-    <div class="card"><div class="card-header"><h5>المؤشرات الثمانية — نافذة <?php echo intval($ind['window_days']); ?> يومًا
-        (<?php echo intval($ind['workstreams_measured']); ?> مسارًا)</h5></div>
+    <div class="card"><div class="card-header"><h5>المؤشرات الثمانية — نافذة <?php echo intval($ind['window_days']); ?> يوما
+        (<?php echo intval($ind['workstreams_measured']); ?> مسارا)</h5></div>
     <div class="card-body tkt-wt-tiles">
         <?php
         $tiles = array(
             array('① الاستجابة داخل المهلة', $ind['①_response_compliance_pct'] . '%', $ind['①_target']),
             array('② الإنجاز داخل المهلة', $ind['②_resolve_compliance_pct'] . '%', $ind['②_target']),
-            array('③ لم يُستجب له إطلاقًا', $ind['③_never_responded'], $ind['③_target']),
+            array('③ لم يستجب له إطلاقا', $ind['③_never_responded'], $ind['③_target']),
             array('④ متوسط زمن التعليق', $ind['④_avg_hold_minutes'] . ' دقيقة', 'ارتفاعه مخبأ للتأخير'),
             array('⑤ المعاد فتحها', $ind['⑤_reopen_pct'] . '%', $ind['⑤_target']),
-            array('⑥ بلاغات التكرار', $ind['⑥_recurrence_tickets'], 'تُرفع مشكلة لا حوادث'),
+            array('⑥ بلاغات التكرار', $ind['⑥_recurrence_tickets'], 'ترفع مشكلة لا حوادث'),
             array('⑦ مغلق بلا أثر', $ind['⑦_closed_without_effect'], $ind['⑦_target']),
             array('⑧ المتأخرون بالاسم', count($late), 'أساس التقرير الدوري'),
         );
@@ -105,12 +105,12 @@ include '../insidebar.php';
     <div class="card-body">
         <?php if (!$late) { ems_state_empty('لا متأخر ولا غير مستجيب في النافذة — نظيف ✨'); } else { ?>
         <div class="table-container"><table class="alltables display nowrap tkt-wt-table" data-no-dt="1">
-            <thead><tr><th>المكلف</th><th>الإدارة</th><th>مسند إليه</th><th>لم يستجب</th><th>استجاب متأخرًا</th><th>متوسط التأخير (دقيقة)</th>
+            <thead><tr><th>المكلف</th><th>الإدارة</th><th>مسند إليه</th><th>لم يستجب</th><th>استجاب متأخرا</th><th>متوسط التأخير (دقيقة)</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>

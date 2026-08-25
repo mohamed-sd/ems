@@ -98,7 +98,7 @@ if ($detailId > 0) {
 }
 
 $stateLabels = array('draft' => 'مسودة', 'pending' => 'بانتظار الموافقات', 'approved' => 'ساري',
-    'rejected' => 'مرفوض', 'expired' => 'منتهي المدة', 'used' => 'مستعمَل');
+    'rejected' => 'مرفوض', 'expired' => 'منتهي المدة', 'used' => 'مستعمل');
 
 $page_title = 'إيكوبيشن | أذونات المواقع';
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
@@ -118,16 +118,16 @@ include '../insidebar.php';
 
     ems_screen_about(
         'كل دخول أو خروج أو تفعيل أو إيقاف له إذن بموافقين محددين بالترتيب (ORG-01 §5) — '
-        . 'يمرّ بصندوق الاعتماد الجامع بندًا واحدًا، وما نُفّذ منفردًا وهو يتطلب مشتركًا يُرفض بنيويًّا.',
+        . 'يمر بصندوق الاعتماد الجامع بندا واحدا، وما نفذ منفردا وهو يتطلب مشتركا يرفض بنيويا.',
         array('اطلب الإذن قبل الفعل — الحارس يفحصه عند التنفيذ',
-              'الموافقات بترتيبها: خطوة قبل سابقتها تُرفض 409',
-              'الإذن الساري يُستهلك مرة واحدة، والمنتهي يُطلب تجديده (423)'));
+              'الموافقات بترتيبها: خطوة قبل سابقتها ترفض 409',
+              'الإذن الساري يستهلك مرة واحدة، والمنتهي يطلب تجديده (423)'));
 
     if ($msg !== '') { echo '<div class="alert alert-info">' . htmlspecialchars($msg) . '</div>'; }
 
     /* UXW-01 ⑨: حزمةُ الحالاتِ الدنيا — مخفيةٌ افتراضًا ويُظهرها منطقُ الشاشةِ عند حالِها */
-    echo ems_states_bundle('لا طلباتِ أذوناتٍ مسجَّلةً بعدُ',
-        'اطلب إذنًا جديدًا من زرِّ «طلب إذن» — والإذنُ يسبق الفعلَ دائمًا');
+    echo ems_states_bundle('لا طلبات أذونات مسجلة بعد',
+        'اطلب إذنا جديدا من زر «طلب إذن» — والإذن يسبق الفعل دائما');
     ?>
 
     <?php if ($can_add): ?>
@@ -195,7 +195,7 @@ include '../insidebar.php';
     <div class="card"><div class="card-body"><div class="table-container">
         <table class="alltables display nowrap orgprm-w100">
             <thead><tr><th>#</th><th>نوع الإذن</th><th>الموضوع</th><th>الموقع</th><th>الطالب</th>
-                <th>الحالة</th><th>ساري حتى</th><th>أُنشئ</th><th></th>
+                <th>الحالة</th><th>ساري حتى</th><th>أنشئ</th><th></th>
                 <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
                 <th class="ems-fn-th" data-fn="1">رقم الإذن</th>
                 <th class="ems-fn-th" data-fn="1">المستفيد</th>
@@ -210,12 +210,12 @@ include '../insidebar.php';
                 <th class="ems-fn-th" data-fn="1">المصادقة الأمنية</th>
                 <th class="ems-fn-th" data-fn="1">أصدره</th>
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                 <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                 <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                 <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-                <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+                <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
                 <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                 </tr></thead>
             <tbody>

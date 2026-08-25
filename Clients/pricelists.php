@@ -142,7 +142,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     // الكود
     $pl_code_raw = isset($_POST['pricelist_code']) ? trim($_POST['pricelist_code']) : '';
     if ($pl_code_raw === '' || !preg_match('/^[A-Za-z0-9_\-]+$/', $pl_code_raw)) {
-        pl_redirect_with_msg('كود قائمة الأسعار غير صالح. استخدم أحرفًا وأرقامًا و - أو _ فقط ❌');
+        pl_redirect_with_msg('كود قائمة الأسعار غير صالح. استخدم أحرفا وأرقاما و - أو _ فقط ❌');
     }
 
     // الاسم
@@ -197,7 +197,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                 array($pl_code_raw, $pl_id));
         } catch (\Throwable $t) { $dup = array(); }
         if (!empty($dup)) {
-            pl_redirect_with_msg('كود قائمة الأسعار موجود مسبقاً داخل شركتك ❌');
+            pl_redirect_with_msg('كود قائمة الأسعار موجود مسبقا داخل شركتك ❌');
         }
 
         try {
@@ -230,7 +230,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                 array($pl_code_raw));
         } catch (\Throwable $t) { $dup = array(); }
         if (!empty($dup)) {
-            pl_redirect_with_msg('كود قائمة الأسعار موجود مسبقاً داخل شركتك ❌');
+            pl_redirect_with_msg('كود قائمة الأسعار موجود مسبقا داخل شركتك ❌');
         }
 
         try {
@@ -365,7 +365,7 @@ include('../includes/page_header.php');
         </div>
     <?php endif; ?>
 
-    <?php echo ems_states_bundle('لا قوائمَ أسعارٍ مسجَّلةً ضمن هذا الترشيح', 'أضف قائمةَ أسعارٍ جديدةً أو غيّر المرشِّحات'); ?>
+    <?php echo ems_states_bundle('لا قوائم أسعار مسجلة ضمن هذا الترشيح', 'أضف قائمة أسعار جديدة أو غير المرشحات'); ?>
 
     <div class="stats-section pl-hidden" id="plStatsSection">
         <div class="stats-grid">
@@ -521,7 +521,7 @@ include('../includes/page_header.php');
                             <th class="ems-fn-th" data-fn="1">إلى تاريخ</th>
                             <th class="ems-fn-th" data-fn="1">اعتمدها</th>
                             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
                             <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                             <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
                             <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
@@ -622,7 +622,7 @@ include('../includes/page_header.php');
         });
         }
 
-        // الربطُ بعد تهيئةِ المكوّنِ المركزي للجدول (أو فورًا إن سبقنا)
+        // الربط بعد تهيئة المكون المركزي للجدول (أو فورا إن سبقنا)
         if ($.fn.dataTable && $.fn.dataTable.isDataTable('#plTable')) {
             bindPlFilters();
         } else {
@@ -641,13 +641,13 @@ include('../includes/page_header.php');
     const statsSection = $('#plStatsSection');
 
     /**
-     * إظهارُ حقلِ الكودِ المولَّد وإخفاؤه.
+     * إظهار حقل الكود المولد وإخفاؤه.
      *
      * ⚠️ **لا تستعمل `jQuery.hide()` هنا** — `assets/css/ems-forms.css` يحمل:
      *     :is(.allforms, .ems-form) .form-grid > div { display: block !important }
-     * والغلافُ ابنٌ مباشرٌ لـ`.form-grid`، فـ`!important` من ورقةِ الأنماطِ تهزم
-     * الإخفاءَ السطريَّ **بلا أولوية**: السمةُ تُكتب فعلًا والحقلُ يبقى ظاهرًا، بلا
-     * خطأٍ في وحدةِ التحكم ولا سطرٍ في أيِّ سجل. (نظيرُ شاشتَي العملاءِ والمشاريع.)
+     * والغلاف ابن مباشر ل`.form-grid`، ف`!important` من ورقة الأنماط تهزم
+     * الإخفاء السطري **بلا أولوية**: السمة تكتب فعلا والحقل يبقى ظاهرا، بلا
+     * خطأ في وحدة التحكم ولا سطر في أي سجل. (نظير شاشتي العملاء والمشاريع.)
      */
     function setGeneratedCodeShown(shown) {
         var el = generatedCodeWrapper[0];
@@ -658,9 +658,9 @@ include('../includes/page_header.php');
     function setAddMode() {
         formTitle.text('إضافة قائمة أسعار جديدة'); submitBtnText.text('حفظ القائمة');
         setGeneratedCodeShown(true);
-        // الكودُ المولَّدُ يعود إلى خانتِه كلَّما دخلنا وضعَ الإضافة — ومصدرُه حقلُ
-        // العرضِ نفسُه لا نسخةٌ ثانيةٌ منه (مصدرُ حقيقةٍ واحد). و`reset()` يكفي
-        // للإلغاء، لكنَّ الانتقالَ من «تعديل» إلى «إضافة» قد يقع بلا reset.
+        // الكود المولد يعود إلى خانته كلما دخلنا وضع الإضافة — ومصدره حقل
+        // العرض نفسه لا نسخة ثانية منه (مصدر حقيقة واحد). و`reset()` يكفي
+        // للإلغاء، لكن الانتقال من «تعديل» إلى «إضافة» قد يقع بلا reset.
         var genCode = $('#generated_pl_code').val();
         if (genCode) { $('#pricelist_code').val(genCode); }
     }
@@ -742,7 +742,7 @@ include('../includes/page_header.php');
         });
     });
 
-    // ── عرض التفاصيل عبر EmsDetailsModal الموحّد ──
+    // ── عرض التفاصيل عبر EmsDetailsModal الموحد ──
     $(document).on('click', '.viewPlBtn', function () {
         const d = $(this).data();
         const cur = d.currency || '';

@@ -64,7 +64,7 @@ $SELF = 'daily_pricing_fin.php';
 /* ══ ① تسجيلُ سعرِ اليومِ — عبر الخدمةِ حصرًا ════════════════════════════════ */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['record_price'])) {
     if (!$can_add) {
-        ems_gov_flash_redirect($SELF, 'لا توجد صلاحية تسجيل سعرٍ ❌', 'GOV-PERM-403', ''); exit();
+        ems_gov_flash_redirect($SELF, 'لا توجد صلاحية تسجيل سعر ❌', 'GOV-PERM-403', ''); exit();
     }
     $res = PAS::recordIndexReading($conn, $gate, $CO, array(
         'index_code'   => isset($_POST['index_code']) ? $_POST['index_code'] : '',
@@ -74,10 +74,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['record_price'])) {
         'note'         => isset($_POST['note']) ? $_POST['note'] : '',
     ), $current_user_id);
     if (!empty($res['ok'])) {
-        ems_gov_flash_redirect($SELF, 'سُجّل سعرُ اليومِ ✅ — ولّد مراجعتَه لتسري على معاملاتِ يومِه',
+        ems_gov_flash_redirect($SELF, 'سجل سعر اليوم ✅ — ولد مراجعته لتسري على معاملات يومه',
                                'GOV-OK-200', '');
     } else {
-        ems_gov_flash_redirect($SELF, (isset($res['reason']) ? $res['reason'] : 'تعذّر التسجيل') . ' ❌',
+        ems_gov_flash_redirect($SELF, (isset($res['reason']) ? $res['reason'] : 'تعذر التسجيل') . ' ❌',
                                'GOV-FAIL-' . (isset($res['code']) ? $res['code'] : '409'), '');
     }
     exit();
@@ -91,16 +91,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['run_day'])) {
     $cid = intval(isset($_POST['contract_id']) ? $_POST['contract_id'] : 0);
     $day = isset($_POST['day']) ? trim((string) $_POST['day']) : '';
     if ($cid <= 0 || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $day)) {
-        ems_gov_flash_redirect($SELF, 'العقدُ والتاريخُ إلزاميان ❌', 'GOV-FAIL-422', ''); exit();
+        ems_gov_flash_redirect($SELF, 'العقد والتاريخ إلزاميان ❌', 'GOV-FAIL-422', ''); exit();
     }
     $r = PAS::applyDue($conn, $gate, $CO, $cid, $day, $current_user_id, 'user');
     if (!empty($r['ok'])) {
         $made = isset($r['created']) ? (int) $r['created'] : 0;
         $skip = isset($r['skipped']) ? (int) $r['skipped'] : 0;
-        ems_gov_flash_redirect($SELF, "وُلّد {$made} مراجعةً · وتُخطّي {$skip} — والاعتمادُ لغيرِ من ولَّد ⏳",
+        ems_gov_flash_redirect($SELF, "ولد {$made} مراجعة · وتخطي {$skip} — والاعتماد لغير من ولد ⏳",
                                'GOV-OK-200', '');
     } else {
-        ems_gov_flash_redirect($SELF, (isset($r['reason']) ? $r['reason'] : 'تعذّر التوليد') . ' ❌',
+        ems_gov_flash_redirect($SELF, (isset($r['reason']) ? $r['reason'] : 'تعذر التوليد') . ' ❌',
                                'GOV-FAIL-' . (isset($r['code']) ? $r['code'] : '422'), '');
     }
     exit();
@@ -114,9 +114,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approve_rev'])) {
     $rid = intval(isset($_POST['revision_id']) ? $_POST['revision_id'] : 0);
     $a = PAS::approve($conn, $gate, $CO, $rid, $current_user_id);
     if (!empty($a['ok'])) {
-        ems_gov_flash_redirect($SELF, 'اعتُمدت المراجعةُ — سعرُها يسري على معاملاتِ يومِها ✅', 'GOV-OK-200', '');
+        ems_gov_flash_redirect($SELF, 'اعتمدت المراجعة — سعرها يسري على معاملات يومها ✅', 'GOV-OK-200', '');
     } else {
-        ems_gov_flash_redirect($SELF, (isset($a['reason']) ? $a['reason'] : 'تعذّر الاعتماد') . ' ❌',
+        ems_gov_flash_redirect($SELF, (isset($a['reason']) ? $a['reason'] : 'تعذر الاعتماد') . ' ❌',
                                'GOV-FAIL-' . (isset($a['code']) ? $a['code'] : '409'), '');
     }
     exit();
@@ -153,7 +153,7 @@ $rowsT = $fetch("SELECT t.id, t.contract_id, t.contract_item_id, t.index_code, t
                      JOIN contracts c ON c.id = t.contract_id
                      LEFT JOIN contractequipments ce ON ce.id = t.contract_item_id
                     WHERE t.company_id = {$CO} AND t.periodicity = 'daily'
-                    ORDER BY t.contract_id, t.id", 'بنودُ التسعيرِ اليومي');
+                    ORDER BY t.contract_id, t.id", 'بنود التسعير اليومي');
 foreach ($rowsT as $x) {
     $x['price_today'] = null;
     if ((int) $x['contract_item_id'] > 0 && $x['equip_price'] !== null) {
@@ -171,7 +171,7 @@ $readings = $fetch("SELECT r.id, r.index_code, r.reading_date, r.value, r.source
                      LEFT JOIN users u ON u.id = r.created_by
                     WHERE EXISTS (SELECT 1 FROM contract_price_terms t
                                    WHERE t.company_id = {$CO} AND t.index_code = r.index_code)
-                    ORDER BY r.reading_date DESC, r.id DESC LIMIT 60", 'أسعارُ الأيامِ المسجَّلة');
+                    ORDER BY r.reading_date DESC, r.id DESC LIMIT 60", 'أسعار الأيام المسجلة');
 
 /* مراجعاتٌ تنتظر اعتمادًا — ويُبيَّن من ولَّدها ليُعرَف أنه لا يعتمدها */
 $pending = $fetch("SELECT r.id, r.period_key, r.effective_from, r.old_price, r.new_price,
@@ -183,7 +183,7 @@ $pending = $fetch("SELECT r.id, r.period_key, r.effective_from, r.old_price, r.n
                      LEFT JOIN users u ON u.id = r.created_by
                     WHERE r.company_id = {$CO} AND r.approved_at IS NULL
                       AND t.periodicity = 'daily'
-                    ORDER BY r.effective_from DESC, r.id DESC LIMIT 60", 'مراجعاتٌ تنتظر الاعتماد');
+                    ORDER BY r.effective_from DESC, r.id DESC LIMIT 60", 'مراجعات تنتظر الاعتماد');
 
 /* رموزُ المؤشرِ المتاحةُ للتسجيل — من بنودٍ قائمةٍ فقط، فلا يُخترع رمز */
 $codes = array();
@@ -218,7 +218,7 @@ include '../insidebar.php';
     include '../includes/page_header.php';
     if (isset($conn)) { ems_screen_about_auto($conn); }
     // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضيًا
-    echo ems_states_bundle('لا أسعارَ أيامٍ مسجّلةً بعدُ', 'سجّلْ سعرَ اليومِ بمرجعِ قرارِه من نموذجِ «تسجيلُ سعرِ يومٍ» أعلاه');
+    echo ems_states_bundle('لا أسعار أيام مسجلة بعد', 'سجل سعر اليوم بمرجع قراره من نموذج «تسجيل سعر يوم» أعلاه');
     ?>
 
     <?php if ($qErrors): ?>
@@ -227,7 +227,7 @@ include '../insidebar.php';
     <div class="card"><div class="card-body fin-dp-errcard">
         <h6 class="fin-dp-errtitle">
             <i class="fas fa-triangle-exclamation"></i>
-            استعلامُ عرضٍ فشل — الجدولُ الفارغُ أدناه <strong>خطأٌ لا غيابُ بيانات</strong>
+            استعلام عرض فشل — الجدول الفارغ أدناه <strong>خطأ لا غياب بيانات</strong>
         </h6>
         <ul class="fin-dp-errlist">
             <?php foreach ($qErrors as $e): ?>
@@ -240,21 +240,21 @@ include '../insidebar.php';
     <div class="card"><div class="card-body">
         <p class="text-muted fin-dp-flat">
             <i class="fas fa-info-circle"></i>
-            <strong>سعرُ اليومِ يسري على معاملاتِ يومِه</strong> — وواقعةُ الأمسِ تبقى بسعرِ أمسِها
-            (لا رجعية). والسعرُ الأساسيُّ في العقدِ لا يُمَسّ: المراجعةُ طبقةٌ بتاريخها فوقَه.
+            <strong>سعر اليوم يسري على معاملات يومه</strong> — وواقعة الأمس تبقى بسعر أمسها
+            (لا رجعية). والسعر الأساسي في العقد لا يمس: المراجعة طبقة بتاريخها فوقه.
             <br>
             <i class="fas fa-user-shield"></i>
-            <strong>من سجّل السعرَ لا يعتمد مراجعتَه</strong> — الفصلُ بنيويٌّ في الخدمةِ لا اختياريٌّ هنا.
+            <strong>من سجل السعر لا يعتمد مراجعته</strong> — الفصل بنيوي في الخدمة لا اختياري هنا.
         </p>
     </div></div>
 
     <?php if ($can_add): ?>
     <div class="card"><div class="card-body">
-        <h6 class="fin-dp-h6"><i class="fas fa-plus-circle"></i> تسجيلُ سعرِ يومٍ</h6>
+        <h6 class="fin-dp-h6"><i class="fas fa-plus-circle"></i> تسجيل سعر يوم</h6>
         <?php if (!$codes): ?>
             <p class="text-muted fin-dp-flat">
-                لا بندَ تسعيرٍ <strong>يوميٍّ</strong> في الشركة بعد — يُنشئه مالكُ العقودِ في
-                «شروط تعديل السعر» بدوريةٍ «يومي»، ثم تُسعّر الماليةُ هنا.
+                لا بند تسعير <strong>يومي</strong> في الشركة بعد — ينشئه مالك العقود في
+                «شروط تعديل السعر» بدورية «يومي»، ثم تسعر المالية هنا.
             </p>
         <?php else: ?>
         <form action="" method="post" class="allforms allforms-visible fin-dp-form">
@@ -262,7 +262,7 @@ include '../insidebar.php';
             <input type="hidden" name="record_price" value="1">
             <div class="form-section"><div class="form-grid">
                 <div class="form-group">
-                    <label for="dp_code">رمزُ المؤشر *</label>
+                    <label for="dp_code">رمز المؤشر *</label>
                     <select id="dp_code" name="index_code" required>
                         <?php foreach ($codes as $c): ?>
                         <option value="<?php echo htmlspecialchars($c); ?>"><?php echo htmlspecialchars($c); ?></option>
@@ -270,25 +270,25 @@ include '../insidebar.php';
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="dp_date">تاريخُ السعر *</label>
+                    <label for="dp_date">تاريخ السعر *</label>
                     <input type="date" id="dp_date" name="reading_date" value="<?php echo $TODAY; ?>" required>
                 </div>
                 <div class="form-group">
-                    <label for="dp_val">قيمةُ السعر *</label>
+                    <label for="dp_val">قيمة السعر *</label>
                     <input type="number" step="0.00000001" min="0.00000001" id="dp_val" name="value" required>
                 </div>
                 <div class="form-group">
-                    <label for="dp_ref">مرجعُ قرارِ التسعير *</label>
+                    <label for="dp_ref">مرجع قرار التسعير *</label>
                     <input type="text" id="dp_ref" name="source_ref" maxlength="160" required
-                           placeholder="رقمُ محضرٍ أو تعميمٍ ماليٍّ — لا رقمَ بلا مرجع">
+                           placeholder="رقم محضر أو تعميم مالي — لا رقم بلا مرجع">
                 </div>
                 <div class="form-group fin-dp-span-all">
                     <label for="dp_note">ملاحظة</label>
                     <input type="text" id="dp_note" name="note" maxlength="255"
-                           placeholder="سببُ التغيير — ارتفاعُ وقودٍ · تغيُّرُ صرفٍ …">
+                           placeholder="سبب التغيير — ارتفاع وقود · تغير صرف …">
                 </div>
             </div></div>
-            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> سجّل سعرَ اليوم</button>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> سجل سعر اليوم</button>
         </form>
         <?php endif; ?>
     </div></div>
@@ -296,21 +296,21 @@ include '../insidebar.php';
 
     <div class="card"><div class="card-body">
         <h6 class="fin-dp-h6">
-            <i class="fas fa-list"></i> بنودُ التسعيرِ اليوميِّ وسعرُ اليومِ لكلٍّ
+            <i class="fas fa-list"></i> بنود التسعير اليومي وسعر اليوم لكل
             <span class="badge bg-secondary"><?php echo count($terms); ?></span>
         </h6>
         <div class="table-responsive">
         <table class="alltables display" id="dpTermsTable">
             <thead><tr>
-                <th>العقد</th><th>البند</th><th>رمزُ المؤشر</th><th>المحفِّز</th>
+                <th>العقد</th><th>البند</th><th>رمز المؤشر</th><th>المحفز</th>
                 <th>المرجع</th><th>العتبة٪</th><th>التمرير٪</th><th>السقف٪</th>
-                <th>الأساس</th><th>سعرُ اليوم</th><th>السريان</th><th>توليدُ مراجعةِ اليوم</th>
+                <th>الأساس</th><th>سعر اليوم</th><th>السريان</th><th>توليد مراجعة اليوم</th>
             </tr></thead>
             <tbody>
             <?php foreach ($terms as $t): ?>
                 <tr>
                     <td>#<?php echo (int) $t['contract_id']; ?> — <?php echo htmlspecialchars(mb_substr((string) $t['second_party'], 0, 28)); ?></td>
-                    <td><?php echo (int) $t['contract_item_id'] === 0 ? 'كلُّ البنود' : intval($t['contract_item_id']); ?></td>
+                    <td><?php echo (int) $t['contract_item_id'] === 0 ? 'كل البنود' : intval($t['contract_item_id']); ?></td>
                     <td><?php echo htmlspecialchars((string) $t['index_code']); ?></td>
                     <td><?php echo htmlspecialchars((string) $t['trigger_kind']); ?></td>
                     <td><?php echo htmlspecialchars((string) $t['base_index']); ?></td>
@@ -330,9 +330,9 @@ include '../insidebar.php';
                                      تخطيطِ الصف — فيُوسَم وصفيًّا، وهو ما يقبله المعيارُ نصًّا
                                      («بعنوانٍ أو وسمٍ وصفيّ»). وكان الحقلَ الوحيدَ الناقصَ في
                                      الشجرةِ كلِّها: 3859 من 3860. */ ?>
-                            <input type="date" name="day" aria-label="يومُ توليدِ سعرِ العقد" title="يومُ توليدِ سعرِ العقد"
+                            <input type="date" name="day" aria-label="يوم توليد سعر العقد" title="يوم توليد سعر العقد"
                                    class="fin-dp-day" value="<?php echo $TODAY; ?>">
-                            <button type="submit" class="btn btn-sm btn-outline-primary">ولّد</button>
+                            <button type="submit" class="btn btn-sm btn-outline-primary">ولد</button>
                         </form>
                         <?php else: ?>—<?php endif; ?>
                     </td>
@@ -345,17 +345,17 @@ include '../insidebar.php';
 
     <div class="card"><div class="card-body">
         <h6 class="fin-dp-h6">
-            <i class="fas fa-hourglass-half"></i> مراجعاتٌ تنتظر الاعتماد
+            <i class="fas fa-hourglass-half"></i> مراجعات تنتظر الاعتماد
             <span class="badge bg-warning"><?php echo count($pending); ?></span>
         </h6>
         <p class="text-muted fin-dp-note">
-            من ولَّد المراجعةَ لا يعتمدها — فإن كنتَ مولِّدَها فسيُردُّ فعلُك 403، وهذا مقصود.
+            من ولد المراجعة لا يعتمدها — فإن كنت مولدها فسيرد فعلك 403، وهذا مقصود.
         </p>
         <div class="table-responsive">
         <table class="alltables display" id="dpPendingTable">
             <thead><tr>
-                <th>العقد</th><th>رمزُ المؤشر</th><th>مفتاحُ اليوم</th><th>السريان</th>
-                <th>قبل</th><th>بعد</th><th>النتيجة</th><th>ولَّدها</th><th>الاعتماد</th>
+                <th>العقد</th><th>رمز المؤشر</th><th>مفتاح اليوم</th><th>السريان</th>
+                <th>قبل</th><th>بعد</th><th>النتيجة</th><th>ولدها</th><th>الاعتماد</th>
             </tr></thead>
             <tbody>
             <?php foreach ($pending as $p): ?>
@@ -369,7 +369,7 @@ include '../insidebar.php';
                     <td><?php echo htmlspecialchars((string) $p['outcome']); ?></td>
                     <td><?php
                         echo (string) $p['created_origin'] === 'system'
-                             ? 'الكرون (آليًّا)'
+                             ? 'الكرون (آليا)'
                              : htmlspecialchars((string) ($p['by_name'] !== null ? $p['by_name'] : $p['created_by']));
                     ?></td>
                     <td>
@@ -391,14 +391,14 @@ include '../insidebar.php';
 
     <div class="card"><div class="card-body">
         <h6 class="fin-dp-h6">
-            <i class="fas fa-history"></i> أسعارُ الأيامِ المسجَّلةُ ومن سجّلها
+            <i class="fas fa-history"></i> أسعار الأيام المسجلة ومن سجلها
             <span class="badge bg-secondary"><?php echo count($readings); ?></span>
         </h6>
         <div class="table-responsive">
         <table class="alltables display" id="dpReadingsTable">
             <thead><tr>
-                <th>التاريخ</th><th>رمزُ المؤشر</th><th>القيمة</th>
-                <th>مرجعُ القرار</th><th>الملاحظة</th><th>سجّلها</th>
+                <th>التاريخ</th><th>رمز المؤشر</th><th>القيمة</th>
+                <th>مرجع القرار</th><th>الملاحظة</th><th>سجلها</th>
             </tr></thead>
             <tbody>
             <?php foreach ($readings as $r): ?>

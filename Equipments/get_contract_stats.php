@@ -18,7 +18,7 @@ $is_super_admin = ($current_role === '-1');
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    echo json_encode(['success' => false, 'message' => 'معرّف الشركة غير متوفر']);
+    echo json_encode(['success' => false, 'message' => 'معرف الشركة غير متوفر']);
     exit;
 }
 

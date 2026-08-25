@@ -33,7 +33,7 @@ try {
 } catch (\Throwable $t) { error_log('get_mine_contracts: ' . $t->getMessage()); }
 
 if ($result === null) {
-    die(json_encode(['success' => false, 'message' => 'خطأ في الاستعلام: تعذّر الجلب']));
+    die(json_encode(['success' => false, 'message' => 'خطأ في الاستعلام: تعذر الجلب']));
 }
 
 $contracts = [];

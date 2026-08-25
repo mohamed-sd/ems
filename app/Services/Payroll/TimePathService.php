@@ -44,17 +44,17 @@ class TimePathService
                      'prorated' => 0, 'deductions' => 0, 'overtime' => 0, 'declared' => 0);
         $runId = (int) $runId;
         $run = PayrollRunService::runOf($gate, $runId);
-        if (!$run) { $out['code'] = 404; $out['reason'] = 'الدورةُ غير موجودةٍ في نطاقك'; return $out; }
+        if (!$run) { $out['code'] = 404; $out['reason'] = 'الدورة غير موجودة في نطاقك'; return $out; }
         if (!in_array((string) $run['state'], array('Calculated', 'Blocked'), true)) {
             $out['code'] = 423;
-            $out['reason'] = 'المسارُ الزمنيُّ يعمل بعد ربط اللقطات — الدورةُ «' . $run['state'] . '»';
+            $out['reason'] = 'المسار الزمني يعمل بعد ربط اللقطات — الدورة «' . $run['state'] . '»';
             return $out;
         }
 
         $pFrom = (string) $run['period_from'];
         $pTo   = (string) $run['period_to'];
         $periodDays = self::daysBetween($pFrom, $pTo);
-        if ($periodDays <= 0) { $out['code'] = 422; $out['reason'] = 'مدةُ الدورة صفرية'; return $out; }
+        if ($periodDays <= 0) { $out['code'] = 422; $out['reason'] = 'مدة الدورة صفرية'; return $out; }
 
         // أسطرُ المكوّنات المؤسسية وحدَها (المشروعيُّ للشريحة ③)
         $lines = array();
@@ -64,10 +64,10 @@ class TimePathService
                   WHERE {TENANT_SCOPE} AND l.run_id = ? AND l.path = 'institutional'
                     AND l.line_kind = 'component'
                   ORDER BY l.person_id, l.id", array($runId));
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $lines'); $lines = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $lines'); $lines = array(); }
         if (!$lines) {
             $out['ok'] = true; $out['code'] = 200;
-            $out['reason'] = 'لا أسطرَ مؤسسيةً في هذه الدورة — لا شيءَ للمسار الزمني';
+            $out['reason'] = 'لا أسطر مؤسسية في هذه الدورة — لا شيء للمسار الزمني';
             return $out;
         }
 
@@ -117,7 +117,7 @@ class TimePathService
                     self::stamp($gate, (int) $l['id'], array(
                         'entitled_days' => $entitled, 'period_days' => $periodDays,
                         'calc_state' => 'pending_slice',
-                        'note' => 'طريقةُ «' . $pc['calc_method'] . '» تحتاج مدخلًا لا مصدرَ له بعد — تُعلَن ولا تُخترع'));
+                        'note' => 'طريقة «' . $pc['calc_method'] . '» تحتاج مدخلا لا مصدر له بعد — تعلن ولا تخترع'));
                     $declared++;
                     continue;
                 }
@@ -133,8 +133,8 @@ class TimePathService
                     'amount' => $amount, 'entitled_days' => $entitled, 'period_days' => $periodDays,
                     'calc_state' => 'computed',
                     'note' => $entitled < $periodDays
-                        ? ('تناسبٌ: ' . $entitled . ' من ' . $periodDays . ' يومًا — ' . $win['why'])
-                        : 'شهرٌ كاملٌ من اللقطة'));
+                        ? ('تناسب: ' . $entitled . ' من ' . $periodDays . ' يوما — ' . $win['why'])
+                        : 'شهر كامل من اللقطة'));
             }
 
             // ── ② الغيابُ — خصمٌ **سطرٌ ظاهرٌ** بمرجعه ────────────────────
@@ -150,7 +150,7 @@ class TimePathService
                 $amount = -1 * round($dailyRate * $abs['days'] * ($abs['percent'] / 100.0), 2);
                 self::addLine($gate, $runId, $personId, $contractId, $snapshotId, 'absence_deduction',
                     'absence:unpaid', $abs['days'], round($dailyRate, 4), $periodDays, $amount,
-                    'computed', 'غيابٌ غيرُ مدفوعٍ ' . $abs['days'] . ' يومًا × ' . round($dailyRate, 2)
+                    'computed', 'غياب غير مدفوع ' . $abs['days'] . ' يوما × ' . round($dailyRate, 2)
                               . ' (' . $abs['percent'] . '٪) — ' . $abs['refs']);
                 $deductions++;
             }
@@ -163,14 +163,14 @@ class TimePathService
                     self::addLine($gate, $runId, $personId, $contractId, $snapshotId, 'overtime',
                         'overtime:hours', (float) $ot['qty'], null, $periodDays, null,
                         'pending_slice',
-                        'ساعاتُ إضافيٍّ ' . $ot['qty'] . ' بمرجع ' . $ot['doc_ref']
-                        . ' — **ولا معدلَ ساعةٍ في العقد**: لا يُحوَّل إلى مالٍ باجتهاد (§4)');
+                        'ساعات إضافي ' . $ot['qty'] . ' بمرجع ' . $ot['doc_ref']
+                        . ' — **ولا معدل ساعة في العقد**: لا يحول إلى مال باجتهاد (§4)');
                     $declared++;
                 } else {
                     $amount = round((float) $ot['qty'] * $rate, 2);
                     self::addLine($gate, $runId, $personId, $contractId, $snapshotId, 'overtime',
                         'overtime:hours', (float) $ot['qty'], $rate, $periodDays, $amount,
-                        'computed', 'إضافيٌّ بمعدل العقد ' . $rate . ' — مرجع ' . $ot['doc_ref']);
+                        'computed', 'إضافي بمعدل العقد ' . $rate . ' — مرجع ' . $ot['doc_ref']);
                     $overtime++;
                 }
             }
@@ -182,8 +182,8 @@ class TimePathService
         $out['persons'] = count($byPerson);
         $out['prorated'] = $prorated; $out['deductions'] = $deductions;
         $out['overtime'] = $overtime; $out['declared'] = $declared;
-        $out['reason'] = 'المسارُ الزمني: ' . $prorated . ' سطرًا متناسبًا · ' . $deductions
-                       . ' خصمَ غيابٍ · ' . $overtime . ' إضافيًّا · ' . $declared . ' معلَنًا بلا مصدر';
+        $out['reason'] = 'المسار الزمني: ' . $prorated . ' سطرا متناسبا · ' . $deductions
+                       . ' خصم غياب · ' . $overtime . ' إضافيا · ' . $declared . ' معلنا بلا مصدر';
         return $out;
     }
 
@@ -201,17 +201,17 @@ class TimePathService
 
         $cs = isset($head['start_date']) ? $head['start_date'] : null;
         $ce = isset($head['end_date']) ? $head['end_date'] : null;
-        if ($cs !== null && $cs > $from) { $from = $cs; $why[] = 'بدءُ العقد ' . $cs; }
-        if ($ce !== null && $ce < $to)   { $to = $ce;   $why[] = 'نهايةُ العقد ' . $ce; }
+        if ($cs !== null && $cs > $from) { $from = $cs; $why[] = 'بدء العقد ' . $cs; }
+        if ($ce !== null && $ce < $to)   { $to = $ce;   $why[] = 'نهاية العقد ' . $ce; }
 
         $vf = isset($pc['valid_from']) ? $pc['valid_from'] : null;
         $vt = isset($pc['valid_to']) ? $pc['valid_to'] : null;
-        if ($vf !== null && $vf > $from) { $from = $vf; $why[] = 'سريانُ المكوّن ' . $vf; }
-        if ($vt !== null && $vt < $to)   { $to = $vt;   $why[] = 'انتهاءُ المكوّن ' . $vt; }
+        if ($vf !== null && $vf > $from) { $from = $vf; $why[] = 'سريان المكون ' . $vf; }
+        if ($vt !== null && $vt < $to)   { $to = $vt;   $why[] = 'انتهاء المكون ' . $vt; }
 
-        if ($to < $from) { return array('days' => 0.0, 'why' => 'لا تقاطعَ مع مدة الدورة'); }
+        if ($to < $from) { return array('days' => 0.0, 'why' => 'لا تقاطع مع مدة الدورة'); }
         return array('days' => (float) self::daysBetween($from, $to),
-                     'why' => $why ? implode(' · ', $why) : 'مدةٌ كاملة');
+                     'why' => $why ? implode(' · ', $why) : 'مدة كاملة');
     }
 
     /** المبلغُ الكاملُ لمكوّنٍ قبل التناسب — من اللقطة حصرًا. */
@@ -260,7 +260,7 @@ class TimePathService
                   WHERE {TENANT_SCOPE} AND w.employee_id = ?
                     AND w.date_from <= ? AND w.date_to >= ?
                   ORDER BY w.id", array((int) $personId, (string) $pTo, (string) $pFrom));
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $rows'); $rows = array(); }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $rows'); $rows = array(); }
         if (!$rows) { return $out; }
 
         $refs = array(); $pct = null;
@@ -272,12 +272,12 @@ class TimePathService
                     "SELECT a.deducts, a.deduct_percent FROM payroll_absence_types a
                       WHERE {TENANT_SCOPE} AND a.event_type = ? AND a.active = 1 LIMIT 1", array($type));
                 $cat = $cats ? $cats[0] : null;
-            } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $cat'); $cat = null; }
+            } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $cat'); $cat = null; }
 
             if ($cat === null) {
                 $out['declared'][] = array('event_id' => (int) $w['id'],
-                    'reason' => 'غيابٌ من نوع «' . $type . '» **غيرُ مصنَّفٍ في كتالوج الخصم** — '
-                              . 'لا يُخصم تخمينًا وينتظر قرارَ التصنيف');
+                    'reason' => 'غياب من نوع «' . $type . '» **غير مصنف في كتالوج الخصم** — '
+                              . 'لا يخصم تخمينا وينتظر قرار التصنيف');
                 continue;
             }
             if ((int) $cat['deducts'] !== 1) { continue; }   // إجازةٌ مدفوعة
@@ -313,18 +313,18 @@ class TimePathService
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'id' => null);
         $kind = isset($args['kind']) ? trim((string) $args['kind']) : '';
         if (!in_array($kind, array('overtime_hours', 'unpaid_days', 'night_shifts'), true)) {
-            $out['code'] = 422; $out['reason'] = 'نوعُ مدخلٍ غيرُ معروف'; return $out;
+            $out['code'] = 422; $out['reason'] = 'نوع مدخل غير معروف'; return $out;
         }
         $qty = isset($args['qty']) ? round((float) $args['qty'], 2) : 0.0;
-        if ($qty <= 0) { $out['code'] = 422; $out['reason'] = 'الكميةُ موجبة'; return $out; }
+        if ($qty <= 0) { $out['code'] = 422; $out['reason'] = 'الكمية موجبة'; return $out; }
         $doc = isset($args['doc_ref']) ? trim((string) $args['doc_ref']) : '';
         if ($doc === '') {
             $out['code'] = 422;
-            $out['reason'] = 'مرجعُ المستند إلزامي — «ولا خصمَ بلا مستند» (ENT-01 §4)، والزيادةُ مثلُه';
+            $out['reason'] = 'مرجع المستند إلزامي — «ولا خصم بلا مستند» (ENT-01 §4)، والزيادة مثله';
             return $out;
         }
         $person = isset($args['person_id']) ? (int) $args['person_id'] : 0;
-        if ($person <= 0) { $out['code'] = 422; $out['reason'] = 'الشخصُ إلزامي'; return $out; }
+        if ($person <= 0) { $out['code'] = 422; $out['reason'] = 'الشخص إلزامي'; return $out; }
 
         try {
             $out['id'] = (int) $gate->insert('payroll_time_inputs', array(
@@ -336,9 +336,9 @@ class TimePathService
             ));
         } catch (\Throwable $t) {
             if (strpos($t->getMessage(), 'Duplicate') !== false) {
-                $out['code'] = 409; $out['reason'] = 'للشخص مدخلٌ بهذا النوع في الدورة سلفًا'; return $out;
+                $out['code'] = 409; $out['reason'] = 'للشخص مدخل بهذا النوع في الدورة سلفا'; return $out;
             }
-            $out['code'] = 422; $out['reason'] = 'تعذّر التسجيل: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر التسجيل: ' . $t->getMessage(); return $out;
         }
         $out['ok'] = true; $out['code'] = 200;
         return $out;
@@ -384,7 +384,7 @@ class TimePathService
     {
         $s = null;
         try { $s = $gate->selectOne('contract_snapshots', array('where' => array('id' => (int) $snapshotId))); }
-        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $s'); $s = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $s'); $s = null; }
         if (!$s) { return null; }
         $p = json_decode((string) $s['snapshot_json'], true);
         return is_array($p) ? $p : null;

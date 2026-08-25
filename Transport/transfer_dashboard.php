@@ -171,7 +171,7 @@ $stage_colors = array(
     );
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا رحلاتِ ترحيلٍ مسجَّلةً في هذه البيئةِ بعدُ', 'أنشئ أولَ أمرِ ترحيلٍ من زرِّ «أوامر الترحيل» في رأسِ اللوحة');
+    echo ems_states_bundle('لا رحلات ترحيل مسجلة في هذه البيئة بعد', 'أنشئ أول أمر ترحيل من زر «أوامر الترحيل» في رأس اللوحة');
     ?>
     <?php trs_msg_banner(); ?>
 
@@ -182,10 +182,10 @@ $stage_colors = array(
             array('إجمالي الأوامر', $total_orders, 'fa-truck-fast', 'var(--c-0d6efd, #0d6efd)'),
             array('أوامر مفتوحة', $open_orders, 'fa-folder-open', 'var(--c-fd7e14, #fd7e14)'),
             array('قيد الرحلة', $in_transit, 'fa-route', 'var(--c-0dcaf0, #0dcaf0)'),
-            array('رحلات متأخّرة', $delayed, 'fa-triangle-exclamation', 'var(--c-dc3545, #dc3545)'),
+            array('رحلات متأخرة', $delayed, 'fa-triangle-exclamation', 'var(--c-dc3545, #dc3545)'),
             array('الوصول في الموعد', ($ontime_pct === null ? '—' : $ontime_pct . '%'), 'fa-clock', 'var(--c-198754, #198754)'),
             array('إجمالي التكلفة (USD)', number_format($total_cost_usd, 0), 'fa-hand-holding-dollar', 'var(--c-6f42c1, #6f42c1)'),
-            array('متوسّط زمن الترحيل (س)', ($avg_hours === null ? '—' : $avg_hours), 'fa-stopwatch', 'var(--c-20c997, #20c997)'),
+            array('متوسط زمن الترحيل (س)', ($avg_hours === null ? '—' : $avg_hours), 'fa-stopwatch', 'var(--c-20c997, #20c997)'),
         );
         foreach ($kpis as $k):
         ?>
@@ -226,7 +226,7 @@ $stage_colors = array(
         </div></div>
 
         <div class="card"><div class="card-body">
-            <div class="card-header trs-db-ch"><h5><i class="fa fa-hand-holding-dollar"></i> التكلفة حسب المتحمِّل</h5></div>
+            <div class="card-header trs-db-ch"><h5><i class="fa fa-hand-holding-dollar"></i> التكلفة حسب المتحمل</h5></div>
             <?php
             $bearer_colors = array('client' => 'var(--c-0d6efd, #0d6efd)', 'company' => 'var(--c-dc3545, #dc3545)', 'new_client' => 'var(--c-198754, #198754)');
             foreach ($by_bearer as $bk => $bc):

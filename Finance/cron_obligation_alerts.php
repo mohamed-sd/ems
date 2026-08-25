@@ -50,7 +50,7 @@ $ALERTS = array();
 $r = $conn->query("SELECT code, title, fires_when, destination, risk_if_ignored, lead_days
                      FROM fin_obl_alerts WHERE active = 1");
 while ($r && $x = $r->fetch_assoc()) { $ALERTS[$x['code']] = $x; }
-if (!$ALERTS) { echo "[obl-alerts] لا تنبيهاتٍ معرَّفة — شغّل u13_seed أولًا\n"; exit(0); }
+if (!$ALERTS) { echo "[obl-alerts] لا تنبيهات معرفة — شغل u13_seed أولا\n"; exit(0); }
 
 /** الكياناتُ التي لها جدولُ التزاماتٍ حيّ. */
 $COMPANIES = array();
@@ -110,7 +110,7 @@ function obl_fire($conn, $co, $code, $alert, $subjectRef, $title, $oblId, $sched
         'item_type'        => 'task',
         'title'            => mb_substr($alert['title'] . ' — ' . $title, 0, 300),
         'details'          => $alert['fires_when'] . ' · الوجهة: ' . $alert['destination']
-                            . ' · الخطرُ عند الإهمال: ' . $alert['risk_if_ignored'],
+                            . ' · الخطر عند الإهمال: ' . $alert['risk_if_ignored'],
         'source_type'      => 'SRC-07',
         'source_ref'       => 'obl_alert:' . $code . ':' . $subjectRef,
         'action_code'      => 'fin.alert.' . strtolower(str_replace('-', '', $code)),
@@ -118,11 +118,11 @@ function obl_fire($conn, $co, $code, $alert, $subjectRef, $title, $oblId, $sched
         'assigned_user_id' => $to,
         'owner_user_id'    => $to,
         'due_at'           => $dueAt ?: date('Y-m-d H:i:s', strtotime('+3 days')),
-        'deliverable'      => 'معالجةُ ما نبَّه عليه التنبيهُ قبلَ مهلته',
-        'evidence_required' => 'أثرُ المعالجةِ في جدولِ الاستحقاقِ أو الذمم',
+        'deliverable'      => 'معالجة ما نبه عليه التنبيه قبل مهلته',
+        'evidence_required' => 'أثر المعالجة في جدول الاستحقاق أو الذمم',
         'priority'         => 'P2',
         'created_by'       => 0,
-        'created_capacity' => 'كرونُ تنبيهاتِ الالتزامات',
+        'created_capacity' => 'كرون تنبيهات الالتزامات',
     ));
     if (!empty($res['ok']) && $logId > 0) {
         $u = $conn->prepare("UPDATE fin_obl_alert_log SET work_item_id = ? WHERE id = ?");
@@ -161,7 +161,7 @@ foreach ($COMPANIES as $co) {
                 AND s.due_date < '{$today}' AND s.settled < s.l1_commitment");
         while ($q && $x = $q->fetch_assoc()) {
             if (obl_fire($conn, $co, $code, $ALERTS[$code], 'SCH-' . $x['id'],
-                    $x['contract_ref'] . ' · تأخَّر منذ ' . $x['due_date'],
+                    $x['contract_ref'] . ' · تأخر منذ ' . $x['due_date'],
                     (int) $x['obligation_id'], (int) $x['id'], $now)) { $fired++; }
         }
     }
@@ -182,7 +182,7 @@ foreach ($COMPANIES as $co) {
                 AND o.generated_at >= DATE_SUB(NOW(), INTERVAL 2 DAY)");
         while ($q && $x = $q->fetch_assoc()) {
             if (obl_fire($conn, $co, 'AL-10', $ALERTS['AL-10'], 'SCH-' . $x['id'],
-                    $x['contract_ref'] . ' · كسرٌ ' . $x['period_start'] . '→' . $x['period_end'],
+                    $x['contract_ref'] . ' · كسر ' . $x['period_start'] . '→' . $x['period_end'],
                     (int) $x['obligation_id'], (int) $x['id'], $now)) { $fired++; }
         }
     }
@@ -196,11 +196,11 @@ foreach ($COMPANIES as $co) {
         $conn->query("UPDATE fin_obl_alert_log SET state='escalated', escalated_at=NOW() WHERE id=" . (int) $x['id']);
         if (function_exists('log_security_event')) {
             log_security_event('OBL_ALERT_ESCALATED',
-                $x['alert_code'] . ' · ' . $x['subject_ref'] . ' — تنبيهٌ مُهمَلٌ بعد مهلتِه (OBL-0125)');
+                $x['alert_code'] . ' · ' . $x['subject_ref'] . ' — تنبيه مهمل بعد مهلته (OBL-0125)');
         }
         $escalated++;
     }
 }
 
-echo sprintf("[obl-alerts %s] كيانات=%d أُطلق=%d صُعِّد=%d رُحِّل للذمم=%d أُعيد تصنيفُه=%d\n",
+echo sprintf("[obl-alerts %s] كيانات=%d أطلق=%d صعد=%d رحل للذمم=%d أعيد تصنيفه=%d\n",
     date('Y-m-d H:i:s'), count($COMPANIES), $fired, $escalated, $moved, $reclassified);

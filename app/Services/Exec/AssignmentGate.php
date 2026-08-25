@@ -48,7 +48,7 @@ class AssignmentGate
     {
         $kind = self::kindOfRole($roleId);
         if (!in_array($kind, self::NEEDS_APPROVAL, true)) {
-            return array('ok' => true, 'code' => 200, 'reason' => 'مسمًّى لا يحتاج موافقةَ الرئيس', 'kind' => $kind);
+            return array('ok' => true, 'code' => 200, 'reason' => 'مسمى لا يحتاج موافقة الرئيس', 'kind' => $kind);
         }
         $st = $conn->prepare(
             "SELECT assignment_no, decided_at, authority_ref FROM exec_assignments
@@ -57,17 +57,17 @@ class AssignmentGate
                 AND (effective_from IS NULL OR effective_from <= CURDATE())
                 AND (effective_to   IS NULL OR effective_to   >= CURDATE())
               ORDER BY decided_at DESC LIMIT 1");
-        if (!$st) { return self::fail(500, 'تعذّر فحصُ سريانِ التكليف'); }
+        if (!$st) { return self::fail(500, 'تعذر فحص سريان التكليف'); }
         $co = (int) $co; $userId = (int) $userId; $roleId = (int) $roleId;
         $st->bind_param('iii', $co, $userId, $roleId);
         $st->execute();
         $row = $st->get_result()->fetch_assoc();
         $st->close();
         if (!$row) {
-            return self::fail(403, 'تكليفٌ بلا موافقةِ الرئيسِ لا يمنح صلاحيةً واحدة (CEO-Y0121)');
+            return self::fail(403, 'تكليف بلا موافقة الرئيس لا يمنح صلاحية واحدة (CEO-Y0121)');
         }
         return array('ok' => true, 'code' => 200, 'kind' => $kind,
-                     'reason' => 'سارٍ بموافقةِ الرئيس ' . $row['assignment_no'],
+                     'reason' => 'سار بموافقة الرئيس ' . $row['assignment_no'],
                      'assignment_no' => $row['assignment_no'], 'decided_at' => $row['decided_at']);
     }
 
@@ -96,7 +96,7 @@ class AssignmentGate
         $role = intval($ctx['role_id'] ?? 0);
         $by   = intval($ctx['requested_by'] ?? 0);
         if ($co <= 0 || $subj <= 0 || $role <= 0 || $by <= 0) {
-            return self::fail(422, 'طلبُ التكليفِ يحتاج الكيانَ والمكلَّفَ والمسمّى وطالبَه');
+            return self::fail(422, 'طلب التكليف يحتاج الكيان والمكلف والمسمى وطالبه');
         }
 
         $kind = self::kindOfRole($role);
@@ -110,7 +110,7 @@ class AssignmentGate
                    conflict_state, conflict_detail, checked_at, state, effective_from, effective_to)
                 VALUES (?,?,?,?,?,?,?,?,?,NOW(),?,?,NOW(),?,?,?)";
         $st = $conn->prepare($sql);
-        if (!$st) { return self::fail(500, 'تعذّر تسجيلُ الطلب: ' . $conn->error); }
+        if (!$st) { return self::fail(500, 'تعذر تسجيل الطلب: ' . $conn->error); }
         $sname = mb_substr((string) ($ctx['subject_name'] ?? self::userName($conn, $subj)), 0, 160);
         $rname = mb_substr((string) ($ctx['role_name'] ?? self::roleName($conn, $role)), 0, 120);
         $scope = mb_substr((string) ($ctx['scope_note'] ?? ''), 0, 300);
@@ -121,12 +121,12 @@ class AssignmentGate
         $vals  = array($co, $no, $subj, $sname, $role, $rname, $kind, $scope, $by, $cs, $cd, $state, $from, $to);
         $types = 'i' . 'ss' . 'i' . 'ss' . 'ss' . 'i' . 'ss' . 'sss';
         if (strlen($types) !== count($vals)) {
-            return self::fail(500, sprintf('انزياحُ وسائط: أنواع %d · قيم %d', strlen($types), count($vals)));
+            return self::fail(500, sprintf('انزياح وسائط: أنواع %d · قيم %d', strlen($types), count($vals)));
         }
         $st->bind_param($types, ...$vals);
         if (!$st->execute()) {
             $e = $st->errno; $m = $st->error; $st->close();
-            return self::fail($e === 1062 ? 409 : 500, 'تعذّر تسجيلُ الطلب: ' . $m);
+            return self::fail($e === 1062 ? 409 : 500, 'تعذر تسجيل الطلب: ' . $m);
         }
         $id = $st->insert_id;
         $st->close();
@@ -134,8 +134,8 @@ class AssignmentGate
         return array('ok' => true, 'code' => 200, 'id' => $id, 'assignment_no' => $no,
                      'state' => $state, 'kind' => $kind, 'conflict' => !$chk['clean'],
                      'reason' => $chk['clean']
-                        ? 'الطلبُ نظيفٌ وعُرض على الرئيس'
-                        : 'طلبٌ يُنشئ تعارضًا فلا يُعرض حتى يُحسم (CEO-Y0122): ' . $chk['detail']);
+                        ? 'الطلب نظيف وعرض على الرئيس'
+                        : 'طلب ينشئ تعارضا فلا يعرض حتى يحسم (CEO-Y0122): ' . $chk['detail']);
     }
 
     /**
@@ -168,7 +168,7 @@ class AssignmentGate
            فلا يُجمع مع أيِّ دورٍ تنفيذيٍّ أو اعتماديٍّ مهما كان. */
         $auditor = 33;
         if (in_array($auditor, $all, true) && count($all) > 1) {
-            $hits[] = 'IAF-0006 المراجعُ الداخليُّ لا يُجمع مع أيِّ دورٍ تنفيذيٍّ أو اعتماديّ';
+            $hits[] = 'IAF-0006 المراجع الداخلي لا يجمع مع أي دور تنفيذي أو اعتمادي';
         }
 
         return array('clean' => !$hits, 'detail' => implode(' · ', $hits), 'roles' => $all);
@@ -186,20 +186,20 @@ class AssignmentGate
         $by  = intval($ctx['decided_by'] ?? 0);
         $dec = (string) ($ctx['decision'] ?? '');
         if ($co <= 0 || $no === '' || $by <= 0 || !in_array($dec, array('approved', 'rejected'), true)) {
-            return self::fail(422, 'القرارُ يحتاج الكيانَ ورقمَ التكليفِ وقرارًا وفاعلًا');
+            return self::fail(422, 'القرار يحتاج الكيان ورقم التكليف وقرارا وفاعلا');
         }
         /* CEO-Y0121: «الرئيسُ حصرًا» — ولا نائبَ ولا مديرَ ماليّ. */
         if (self::roleOfUser($conn, $by) !== self::ROLE_CEO) {
-            return self::fail(403, 'موافقةُ التكليفِ للرئيسِ التنفيذيِّ حصرًا (CEO-Y0121)');
+            return self::fail(403, 'موافقة التكليف للرئيس التنفيذي حصرا (CEO-Y0121)');
         }
 
         $row = self::fetch($conn, $co, $no);
-        if ($row === null) { return self::fail(404, 'تكليفٌ غيرُ موجود: ' . $no); }
+        if ($row === null) { return self::fail(404, 'تكليف غير موجود: ' . $no); }
         if ($row['state'] === 'blocked' || $row['conflict_state'] === 'conflict') {
-            return self::fail(409, 'طلبٌ يُنشئ تعارضًا لا يُعرض ولا يُقرَّر حتى يُحسم (CEO-Y0122)');
+            return self::fail(409, 'طلب ينشئ تعارضا لا يعرض ولا يقرر حتى يحسم (CEO-Y0122)');
         }
         if (in_array($row['state'], array('approved', 'rejected'), true)) {
-            return self::fail(409, 'التكليفُ مقرَّرٌ سلفًا: ' . $row['state']);
+            return self::fail(409, 'التكليف مقرر سلفا: ' . $row['state']);
         }
 
         $st = $conn->prepare(
@@ -207,17 +207,17 @@ class AssignmentGate
                 SET state = ?, decided_by = ?, decided_at = NOW(),
                     decision_reason = ?, authority_ref = ?
               WHERE company_id = ? AND assignment_no = ? AND state IN ('presented','draft')");
-        if (!$st) { return self::fail(500, 'تعذّر حفظُ القرار'); }
+        if (!$st) { return self::fail(500, 'تعذر حفظ القرار'); }
         $reason = mb_substr((string) ($ctx['decision_reason'] ?? ''), 0, 400);
-        $auth   = mb_substr((string) ($ctx['authority_ref'] ?? ('قرارُ الرئيسِ ' . date('Y-m-d'))), 0, 120);
+        $auth   = mb_substr((string) ($ctx['authority_ref'] ?? ('قرار الرئيس ' . date('Y-m-d'))), 0, 120);
         $st->bind_param('sissis', $dec, $by, $reason, $auth, $co, $no);
         $st->execute();
         $n = $st->affected_rows;
         $st->close();
-        if ($n < 1) { return self::fail(409, 'لم يتغير شيءٌ — راجع حالةَ التكليف'); }
+        if ($n < 1) { return self::fail(409, 'لم يتغير شيء — راجع حالة التكليف'); }
 
         return array('ok' => true, 'code' => 200,
-                     'reason' => $dec === 'approved' ? 'سرى التكليفُ بموافقةِ الرئيس' : 'رُفض التكليف');
+                     'reason' => $dec === 'approved' ? 'سرى التكليف بموافقة الرئيس' : 'رفض التكليف');
     }
 
     /* ── مساعدات ─────────────────────────────────────────────────────────── */

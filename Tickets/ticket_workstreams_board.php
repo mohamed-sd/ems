@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ws_action']) && $can_
     $act = strval($_POST['ws_action']);
     $wsId = intval($_POST['ws_id'] ?? 0);
     $r = array('ok' => false, 'reason' => 'فعل غير معرف');
-    if ($act === 'receive') { $r = TS::receive($conn, $wsId, $uid); $r['reason'] = 'استُلم — مهلة الإنجاز تقاس من الآن'; }
+    if ($act === 'receive') { $r = TS::receive($conn, $wsId, $uid); $r['reason'] = 'استلم — مهلة الإنجاز تقاس من الآن'; }
     elseif ($act === 'start') { $r = TS::startWork($conn, $wsId); $r['reason'] = 'قيد المعالجة'; }
     elseif ($act === 'hold') { $r = TS::hold($conn, $wsId, strval($_POST['reason_code'] ?? ''), strval($_POST['expected_until'] ?? '')); }
     elseif ($act === 'effect') { $r = TE::recordLightEffect($conn, $wsId, strval($_POST['effect_type'] ?? 'reply'), $uid, strval($_POST['body'] ?? '')); $r['reason'] = 'أثر مسجل'; }
@@ -72,9 +72,9 @@ $r = $conn->query(
       ORDER BY t.id DESC, w.ws_id LIMIT 400");
 while ($r && ($x = $r->fetch_assoc())) { $rows[intval($x['tk'])][] = $x; }
 
-$stateLabels = array('new' => 'جديد', 'received' => 'مستلَم', 'in_progress' => 'قيد المعالجة',
-    'on_hold' => 'معلَّق بسبب', 'done_pending' => 'منجَز بانتظار التأكيد', 'closed' => 'مغلق',
-    'reopened' => 'أعيد فتحه', 'admin_closed' => 'مغلق إداريًّا');
+$stateLabels = array('new' => 'جديد', 'received' => 'مستلم', 'in_progress' => 'قيد المعالجة',
+    'on_hold' => 'معلق بسبب', 'done_pending' => 'منجز بانتظار التأكيد', 'closed' => 'مغلق',
+    'reopened' => 'أعيد فتحه', 'admin_closed' => 'مغلق إداريا');
 
 $page_title = 'إيكوبيشن | لوحة مسارات البلاغات';
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
@@ -86,17 +86,17 @@ include '../insidebar.php';
 <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main ems-unified-page-shell">
     <?php
-    $header_title = 'المسارات المتوازية — رأس واحد وخمس أيادٍ'; $header_icon = 'fa fa-code-branch';
+    $header_title = 'المسارات المتوازية — رأس واحد وخمس أياد'; $header_icon = 'fa fa-code-branch';
     $header_actions = array();
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا رأسَ بلاغٍ مفتوحًا ولا مسارَ قائمًا الآن',
-                           'افتحْ بلاغًا من صندوقِ الإدارة أو أزلْ مرشِّحَ رقمِ البلاغِ من الرابط');
+    echo ems_states_bundle('لا رأس بلاغ مفتوحا ولا مسار قائما الآن',
+                           'افتح بلاغا من صندوق الإدارة أو أزل مرشح رقم البلاغ من الرابط');
     ems_screen_about(
         'الواقعة واحدة ورقمها واحد وقد تعنيها خمس إدارات — لكل مسار مكلفه ومهلته ومانعه، '
-        . 'وتأخر المشتريات لا يبرئ الصيانة، ولا يُغلق الرأس قبل الإلزامية كلها.',
+        . 'وتأخر المشتريات لا يبرئ الصيانة، ولا يغلق الرأس قبل الإلزامية كلها.',
         array('الاستلام يبدأ مهلة الإنجاز — وهي أهم مقياس',
-              'التعليق بسبب محكوم ومدة متوقعة — وتجاوزها يصعّد التعليق نفسه',
+              'التعليق بسبب محكوم ومدة متوقعة — وتجاوزها يصعد التعليق نفسه',
               'لا إغلاق بلا أثر ولا يغلق المكلف بلاغه بنفسه'));
     if ($msg !== '') { echo '<div class="alert alert-info">' . htmlspecialchars($msg) . '</div>'; }
     ?>
@@ -124,12 +124,12 @@ include '../insidebar.php';
                 <th class="ems-fn-th" data-fn="1">سبب التعليق</th>
                 <th class="ems-fn-th" data-fn="1">مدة التعليق</th>
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                 <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                 <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-                <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+                <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
                 <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                 </tr></thead>
             <tbody>
@@ -157,10 +157,10 @@ include '../insidebar.php';
                             <?php elseif (in_array($w['ws_state'], array('received', 'reopened'), true)): ?>
                                 <button name="ws_action" value="start" class="btn-primary">أبدأ</button>
                             <?php elseif ($w['ws_state'] === 'in_progress'): ?>
-                                <button name="ws_action" value="effect" class="btn-primary" title="أثر reply">سجّل أثرًا</button>
+                                <button name="ws_action" value="effect" class="btn-primary" title="أثر reply">سجل أثرا</button>
                                 <button name="ws_action" value="done" class="btn-primary">أنجزت</button>
                             <?php elseif ($w['ws_state'] === 'done_pending'): ?>
-                                <button name="ws_action" value="close" class="btn-primary">أؤكد الإغلاق (مبلّغًا)</button>
+                                <button name="ws_action" value="close" class="btn-primary">أؤكد الإغلاق (مبلغا)</button>
                                 <button name="ws_action" value="reopen" class="action-btn delete">أعد فتحه</button>
                             <?php endif; ?>
                         </form>

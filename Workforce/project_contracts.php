@@ -32,7 +32,7 @@ $COLS   = array (
   0 => 'الكيان',
   1 => 'رقم العقد',
   2 => 'فئة العقد',
-  3 => 'المتعاقَد معه',
+  3 => 'المتعاقد معه',
   4 => 'التبعية',
   5 => 'المورد المرتبط',
   6 => 'عقد المورد',
@@ -44,16 +44,16 @@ $COLS   = array (
   12 => 'العملة',
   13 => 'تاريخ البدء',
   14 => 'تاريخ الانتهاء المخطط',
-  15 => 'محفّز الانتهاء 1',
-  16 => 'محفّز الانتهاء 2',
-  17 => 'محفّز الانتهاء 3',
-  18 => 'المحفّز الواقع',
+  15 => 'محفز الانتهاء 1',
+  16 => 'محفز الانتهاء 2',
+  17 => 'محفز الانتهاء 3',
+  18 => 'المحفز الواقع',
   19 => 'تاريخ الانتهاء الفعلي',
   20 => 'مهلة التنبيه قبل الانتهاء',
   21 => 'حالة التصفية',
   22 => 'إذن الخروج',
-  23 => 'المُنشئ — الاسم والصفة',
-  24 => 'المعتمِد — الاسم والصفة',
+  23 => 'المنشئ — الاسم والصفة',
+  24 => 'المعتمد — الاسم والصفة',
   25 => 'تاريخ الاعتماد',
   26 => 'مرجع التفويض',
   27 => 'الحالة',
@@ -61,7 +61,7 @@ $COLS   = array (
 $FIELDS = array (
   0 => 'رقم العقد',
   1 => 'فئة العقد',
-  2 => 'المتعاقَد معه',
+  2 => 'المتعاقد معه',
   3 => 'التبعية',
   4 => 'المورد المرتبط',
   5 => 'عقد المورد',
@@ -73,15 +73,15 @@ $FIELDS = array (
   11 => 'العملة',
   12 => 'تاريخ البدء',
   13 => 'تاريخ الانتهاء المخطط',
-  14 => 'محفّز الانتهاء 1',
-  15 => 'محفّز الانتهاء 2',
-  16 => 'محفّز الانتهاء 3',
-  17 => 'المحفّز الواقع',
+  14 => 'محفز الانتهاء 1',
+  15 => 'محفز الانتهاء 2',
+  16 => 'محفز الانتهاء 3',
+  17 => 'المحفز الواقع',
   18 => 'تاريخ الانتهاء الفعلي',
   19 => 'مهلة التنبيه قبل الانتهاء',
   20 => 'حالة التصفية',
   21 => 'إذن الخروج',
-  22 => 'المعتمِد — الاسم والصفة',
+  22 => 'المعتمد — الاسم والصفة',
   23 => 'تاريخ الاعتماد',
   24 => 'مرجع التفويض',
   25 => 'الحالة',
@@ -98,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     $creator = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
     // الموجة ٢: الحفظ في الجدول الأصلي للشاشة (الفارغ NULL — لا مخزن بينيًّا)
     $ok = cmp03_store_insert($conn, $company_id, $CANONICAL, $payload, $status, $uid, $creator);
-    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
+    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
     exit();
 }
 
@@ -113,7 +113,7 @@ $entityName = $govCtx['values']['entity'] ?? '—';
 function cmp03_cell($col, $row, $entityName) {
     $n = cmp03_screen_norm($col);
     if ($n === cmp03_screen_norm('الكيان')) { return $entityName; }
-    if ($n === cmp03_screen_norm('المُنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المُنشئة')) {
+    if ($n === cmp03_screen_norm('المنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المنشئة')) {
         return $row['created_by_name'] ?: '—';
     }
     if ($n === cmp03_screen_norm('تاريخ الإنشاء')) { return $row['created_at']; }
@@ -128,7 +128,7 @@ function cmp03_screen_norm($s) {
     $s = str_replace(array('أ','إ','آ'), 'ا', $s);
     $s = str_replace('ة', 'ه', $s);
     $s = str_replace('ى', 'ي', $s);
-    return preg_replace('/[ًٌٍَُِّْ]/u', '', $s);
+    return preg_replace('/[]/u', '', $s);
 }
 
 $page_title = 'إيكوبيشن | عقود المشاريع المؤقتة';
@@ -152,7 +152,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
-    echo ems_states_bundle('لا عقودَ مشاريعَ مؤقتةً مسجَّلةً بعدُ', 'أضف أولَ عقدٍ بزرِّ «إضافة» في رأسِ الشاشة');
+    echo ems_states_bundle('لا عقود مشاريع مؤقتة مسجلة بعد', 'أضف أول عقد بزر «إضافة» في رأس الشاشة');
     ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
@@ -168,7 +168,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="f0" required maxlength="190" id="emsf_1759_36dca"></div>
                 <div class="form-group"><label for="emsf_1760_9fc4a">فئة العقد</label>
                     <input type="text" name="f1" maxlength="190" id="emsf_1760_9fc4a"></div>
-                <div class="form-group"><label for="emsf_1761_e5144">المتعاقَد معه</label>
+                <div class="form-group"><label for="emsf_1761_e5144">المتعاقد معه</label>
                     <input type="text" name="f2" maxlength="190" id="emsf_1761_e5144"></div>
                 <div class="form-group"><label for="emsf_1762_0bc3d">التبعية</label>
                     <input type="text" name="f3" maxlength="190" id="emsf_1762_0bc3d"></div>
@@ -192,13 +192,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="date" name="f12" id="emsf_1771_bd057"></div>
                 <div class="form-group"><label for="emsf_1772_b9ac5">تاريخ الانتهاء المخطط</label>
                     <input type="date" name="f13" id="emsf_1772_b9ac5"></div>
-                <div class="form-group"><label for="emsf_1773_96024">محفّز الانتهاء 1</label>
+                <div class="form-group"><label for="emsf_1773_96024">محفز الانتهاء 1</label>
                     <input type="text" name="f14" maxlength="190" id="emsf_1773_96024"></div>
-                <div class="form-group"><label for="emsf_1774_95a37">محفّز الانتهاء 2</label>
+                <div class="form-group"><label for="emsf_1774_95a37">محفز الانتهاء 2</label>
                     <input type="text" name="f15" maxlength="190" id="emsf_1774_95a37"></div>
-                <div class="form-group"><label for="emsf_1775_d873b">محفّز الانتهاء 3</label>
+                <div class="form-group"><label for="emsf_1775_d873b">محفز الانتهاء 3</label>
                     <input type="text" name="f16" maxlength="190" id="emsf_1775_d873b"></div>
-                <div class="form-group"><label for="emsf_1776_0ddfe">المحفّز الواقع</label>
+                <div class="form-group"><label for="emsf_1776_0ddfe">المحفز الواقع</label>
                     <input type="text" name="f17" maxlength="190" id="emsf_1776_0ddfe"></div>
                 <div class="form-group"><label for="emsf_1777_6b423">تاريخ الانتهاء الفعلي</label>
                     <input type="date" name="f18" id="emsf_1777_6b423"></div>
@@ -208,7 +208,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="f20" maxlength="190" id="emsf_1779_2a0cb"></div>
                 <div class="form-group"><label for="emsf_1780_a810e">إذن الخروج</label>
                     <input type="text" name="f21" maxlength="190" id="emsf_1780_a810e"></div>
-                <div class="form-group"><label for="emsf_1781_98975">المعتمِد — الاسم والصفة</label>
+                <div class="form-group"><label for="emsf_1781_98975">المعتمد — الاسم والصفة</label>
                     <input type="text" name="f22" maxlength="190" id="emsf_1781_98975"></div>
                 <div class="form-group"><label for="emsf_1782_451b2">تاريخ الاعتماد</label>
                     <input type="date" name="f23" id="emsf_1782_451b2"></div>
@@ -228,10 +228,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="table-responsive">
         <table class="alltables display" id="project_contractsTable">
             <thead><tr>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
             <th>رقم العقد</th>
             <th>فئة العقد</th>
-            <th>المتعاقَد معه</th>
+            <th>المتعاقد معه</th>
             <th>التبعية</th>
             <th>المورد المرتبط</th>
             <th>عقد المورد</th>
@@ -243,23 +243,23 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th class="ems-gov-th" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
             <th>تاريخ البدء</th>
             <th>تاريخ الانتهاء المخطط</th>
-            <th>محفّز الانتهاء 1</th>
-            <th>محفّز الانتهاء 2</th>
-            <th>محفّز الانتهاء 3</th>
-            <th>المحفّز الواقع</th>
+            <th>محفز الانتهاء 1</th>
+            <th>محفز الانتهاء 2</th>
+            <th>محفز الانتهاء 3</th>
+            <th>المحفز الواقع</th>
             <th>تاريخ الانتهاء الفعلي</th>
             <th>مهلة التنبيه قبل الانتهاء</th>
             <th>حالة التصفية</th>
             <th class="ems-fn-th none" data-fn="1">إذن الخروج</th>
-            <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-            <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+            <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+            <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
             <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-            <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+            <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
             <th class="ems-gov-th none" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
             </tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="28" class="text-center text-muted">لا بياناتَ بعدُ — أضف أول صفٍّ بزر «إضافة»</td></tr>
+                <tr><td colspan="28" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
                     <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>

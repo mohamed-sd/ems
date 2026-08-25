@@ -50,7 +50,7 @@ $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-echo ems_states_bundle('لا بياناتِ عقدِ سائقٍ بهذا الرقم', 'عُدْ إلى قائمةِ عقودِ السائقين واختر عقدًا مسجَّلًا');
+echo ems_states_bundle('لا بيانات عقد سائق بهذا الرقم', 'عد إلى قائمة عقود السائقين واختر عقدا مسجلا');
 ?>
         </div>
         <a href="javascript:history.back()" class="back-btn">
@@ -125,10 +125,10 @@ if ($sce_row !== null) { foreach (array($sce_row) as $row) {
             <div class="col-lg-2 col-5">عدد المعدات</div>
             <div class="col-lg-4 col-7"><?php echo $row['equip_count']; ?></div>
 
-            <div class="col-lg-2 col-5">هدف المعدات شهريًا</div>
+            <div class="col-lg-2 col-5">هدف المعدات شهريا</div>
             <div class="col-lg-4 col-7"><?php echo $row['equip_target_per_month']; ?></div>
 
-            <div class="col-lg-2 col-5">إجمالي المعدات شهريًا</div>
+            <div class="col-lg-2 col-5">إجمالي المعدات شهريا</div>
             <div class="col-lg-4 col-7"><?php echo $row['equip_total_month']; ?></div>
 
             <div class="col-lg-2 col-5">إجمالي العقد للمعدات</div>
@@ -143,10 +143,10 @@ if ($sce_row !== null) { foreach (array($sce_row) as $row) {
             <div class="col-lg-2 col-5">عدد الآليات</div>
             <div class="col-lg-4 col-7"><?php echo $row['mach_count']; ?></div>
 
-            <div class="col-lg-2 col-5">هدف الآليات شهريًا</div>
+            <div class="col-lg-2 col-5">هدف الآليات شهريا</div>
             <div class="col-lg-4 col-7"><?php echo $row['mach_target_per_month']; ?></div>
 
-            <div class="col-lg-2 col-5">إجمالي الآليات شهريًا</div>
+            <div class="col-lg-2 col-5">إجمالي الآليات شهريا</div>
             <div class="col-lg-4 col-7"><?php echo $row['mach_total_month']; ?></div>
 
             <div class="col-lg-2 col-5">إجمالي العقد للآليات</div>

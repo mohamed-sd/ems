@@ -53,7 +53,7 @@ require_once __DIR__ . '/includes/layout_head.php';
 <!-- ── Welcome header ──────────────────────────────────────────────────── -->
 <div class="phead">
     <div>
-        <h2>مرحبًا، <?php echo e($admin['name']); ?> 👋</h2>
+        <h2>مرحبا، <?php echo e($admin['name']); ?> 👋</h2>
         <p class="sub">نظرة عامة على المنصة — <?php echo date('l، j F Y'); ?></p>
     </div>
     <div class="phead-right">

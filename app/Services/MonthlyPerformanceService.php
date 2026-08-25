@@ -25,12 +25,12 @@ class MonthlyPerformanceService
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'perf_id' => 0, 'executed_hours' => 0.0);
         $containerId = (int) $containerId;
         if (!preg_match('/^\d{4}-\d{2}$/', (string) $period)) {
-            $out['code'] = 422; $out['reason'] = 'الفترة بصيغة YYYY-MM حصرًا'; return $out;
+            $out['code'] = 422; $out['reason'] = 'الفترة بصيغة YYYY-MM حصرا'; return $out;
         }
         $seat = $gate->scopedQuery(array('scope' => array('c' => 'op_containers')),
             "SELECT c.id, c.contract_id, c.seat_no, c.contract_hours_monthly FROM op_containers c
               WHERE {TENANT_SCOPE} AND c.id = ? AND c.seat_no IS NOT NULL", array($containerId));
-        if (!$seat) { $out['code'] = 404; $out['reason'] = 'ليست حاويةَ مقعدٍ معرَّف'; return $out; }
+        if (!$seat) { $out['code'] = 404; $out['reason'] = 'ليست حاوية مقعد معرف'; return $out; }
         $s = $seat[0];
 
         // ① المنفَّذ يُجمع من دفتر الاستهلاك — لا يُدخل يدويًّا (مصدر واحد)
@@ -59,7 +59,7 @@ class MonthlyPerformanceService
         );
         if ($existing) {
             if ((string) $existing[0]['state'] === 'closed') {
-                $out['code'] = 423; $out['reason'] = 'الشهر مقفل — التصحيح بعكسٍ موثَّق لا بتعديل'; return $out;
+                $out['code'] = 423; $out['reason'] = 'الشهر مقفل — التصحيح بعكس موثق لا بتعديل'; return $out;
             }
             $gate->update('monthly_performance', $data, array('id' => (int) $existing[0]['id']));
             $out['perf_id'] = (int) $existing[0]['id'];
@@ -71,7 +71,7 @@ class MonthlyPerformanceService
             $out['perf_id'] = (int) $gate->insert('monthly_performance', $data);
         }
         $out['ok'] = true; $out['code'] = 200; $out['executed_hours'] = $executed;
-        $out['reason'] = 'سجل ' . $period . ' للمقعد #' . $s['seat_no'] . ' — المنفَّذ ' . $executed . ' ساعة (مجمَّع من دفتر الاستهلاك)';
+        $out['reason'] = 'سجل ' . $period . ' للمقعد #' . $s['seat_no'] . ' — المنفذ ' . $executed . ' ساعة (مجمع من دفتر الاستهلاك)';
         return $out;
     }
 
@@ -83,7 +83,7 @@ class MonthlyPerformanceService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'bearer' => '');
         $perfId = (int) $perfId; $hours = (float) $hours;
-        if ($hours <= 0) { $out['code'] = 422; $out['reason'] = 'الساعات موجبة حصرًا'; return $out; }
+        if ($hours <= 0) { $out['code'] = 422; $out['reason'] = 'الساعات موجبة حصرا'; return $out; }
 
         // ② السبب من القائمة المحكومة حصرًا — لا نص حر؛ يُقرأ القاموس العالمي
         //    بضمّه لاستعلام السجل (T_GLOBAL لا يحتاج إعلانًا ولا عزلًا)
@@ -104,7 +104,7 @@ class MonthlyPerformanceService
             // سبب «أخرى» يُلزم ببند صريح — لا افتراض صامتًا
             $obType = isset($opt['obligation_type']) ? (string) $opt['obligation_type'] : '';
             if ($obType === '') {
-                $out['code'] = 422; $out['reason'] = 'سبب «أخرى» يُلزم ببند التزامٍ صريح — لا افتراضَ صامتًا'; return $out;
+                $out['code'] = 422; $out['reason'] = 'سبب «أخرى» يلزم ببند التزام صريح — لا افتراض صامتا'; return $out;
             }
         }
 
@@ -119,8 +119,8 @@ class MonthlyPerformanceService
             array((int) $perf[0]['contract_id'], $obType, $onDate, $onDate));
         if (!$ob) {
             $out['code'] = 422;
-            $out['reason'] = 'سببٌ بلا بندٍ مقابلٍ لا يُقبل — لا التزامَ مُجازًا من نوع «' . $obType
-                . '» نافذًا في ' . $perf[0]['period'] . ' لهذا العقد';
+            $out['reason'] = 'سبب بلا بند مقابل لا يقبل — لا التزام مجازا من نوع «' . $obType
+                . '» نافذا في ' . $perf[0]['period'] . ' لهذا العقد';
             return $out;
         }
         $bearer = (string) $ob[0]['obligor'];
@@ -138,12 +138,12 @@ class MonthlyPerformanceService
             ));
         } catch (\Throwable $t) {
             if (strpos($t->getMessage(), 'Duplicate') !== false) {
-                $out['code'] = 409; $out['reason'] = 'السبب مسجَّل لهذا الشهر — عدّل صفه لا تكرره'; return $out;
+                $out['code'] = 409; $out['reason'] = 'السبب مسجل لهذا الشهر — عدل صفه لا تكرره'; return $out;
             }
             throw $t;
         }
         $out['ok'] = true; $out['code'] = 201; $out['bearer'] = $bearer;
-        $out['reason'] = $hours . ' ساعة «' . $reason['code'] . '» — الطرف المتحمل: ' . $bearer . ' (مُشتق من البند #' . $ob[0]['id'] . ')';
+        $out['reason'] = $hours . ' ساعة «' . $reason['code'] . '» — الطرف المتحمل: ' . $bearer . ' (مشتق من البند #' . $ob[0]['id'] . ')';
         return $out;
     }
 
@@ -159,7 +159,7 @@ class MonthlyPerformanceService
             "SELECT m.* FROM monthly_performance m WHERE {TENANT_SCOPE} AND m.id = ?", array($perfId));
         if (!$perf) { $out['code'] = 404; $out['reason'] = 'سجل الأداء غير موجود'; return $out; }
         $p = $perf[0];
-        if ((string) $p['state'] === 'closed') { $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'مقفل سلفًا — فعل عاطل'; return $out; }
+        if ((string) $p['state'] === 'closed') { $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'مقفل سلفا — فعل عاطل'; return $out; }
 
         // ③ العجز عن التعاقد لا بد أن يفسّره التعطل المسنَد — ساعة تعطل بلا طرف لا وجود
         // لها بنيويًّا (bearer_party NOT NULL)، فيبقى فحص التغطية: العجز > Σ المسنَد → رفض.
@@ -170,15 +170,15 @@ class MonthlyPerformanceService
         $shortfall = (float) $p['shortfall_hours'];
         if ($shortfall > 0.005 && $attributed + 0.005 < $shortfall) {
             $out['code'] = 422;
-            $out['reason'] = 'لا يُقفل شهرٌ وفيه ساعاتُ عجزٍ بلا طرفٍ متحمل: العجز ' . $shortfall
-                . ' والمُسنَد ' . $attributed . ' — أسنِد الفرق (' . round($shortfall - $attributed, 2) . ') بسببه وبنده';
+            $out['reason'] = 'لا يقفل شهر وفيه ساعات عجز بلا طرف متحمل: العجز ' . $shortfall
+                . ' والمسند ' . $attributed . ' — أسند الفرق (' . round($shortfall - $attributed, 2) . ') بسببه وبنده';
             return $out;
         }
         $gate->update('monthly_performance', array(
             'state' => 'closed', 'closed_by' => (int) $actor ?: null, 'closed_at' => date('Y-m-d H:i:s'),
         ), array('id' => $perfId));
         $out['ok'] = true; $out['code'] = 200;
-        $out['reason'] = 'أُقفل شهر ' . $p['period'] . ' — كل ساعة تعطلٍ بطرفها المتحمل';
+        $out['reason'] = 'أقفل شهر ' . $p['period'] . ' — كل ساعة تعطل بطرفها المتحمل';
         return $out;
     }
 

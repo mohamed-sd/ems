@@ -19,7 +19,7 @@ $scopeSql = risk_scope_sql($RISK_FULL, $RISK_ORG_UNIT, 'rr');
 
 $fRisk = isset($_GET['risk']) ? (int) $_GET['risk'] : 0;
 $fType = isset($_GET['atype']) ? (string) $_GET['atype'] : '';
-$TYPE_AR = array('inherent' => 'متأصل', 'residual' => 'متبقٍّ', 'target' => 'مستهدف');
+$TYPE_AR = array('inherent' => 'متأصل', 'residual' => 'متبق', 'target' => 'مستهدف');
 
 $w = " WHERE a.company_id = {$company_id} {$scopeSql}";
 if ($fRisk > 0) { $w .= ' AND a.risk_id = ' . $fRisk; }
@@ -49,7 +49,7 @@ foreach ($rows as $x) {
 $page_title = 'إيكوبيشن | تقييم الخطر ونسخه التاريخية';
 include '../inheader.php';
 include '../insidebar.php';
-require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('risk', 'التقييمُ والقياس');
+require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('risk', 'التقييم والقياس');
 if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main ems-unified-page-shell">
@@ -67,14 +67,14 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     );
     include('../includes/page_header.php');
     ems_screen_about(
-        'سجلٌّ تاريخيٌّ لا يُكتب فوقه (RK-03): كلُّ تقييمٍ نسخةٌ مؤرَّخةٌ بمُقيِّمِها ومرجعِها الأب. '
-        . 'التقييمُ يُتحدَّى قبل اعتماده — والمتبقي وحدَه يُبنى عليه قرارُ القبول.',
-        array('الأبعادُ الثمانيةُ لا تُدمج في رقمٍ واحد — والسلامةُ لا تُقايَض بالمال (§12-2)',
-              'درجةُ الثقةِ تُعلَن ولا تُخفى (§12-3)',
-              'التسجيلُ من ملفِّ الخطرِ — وهذه الشاشةُ للقراءةِ والمقارنةِ التاريخية'));
+        'سجل تاريخي لا يكتب فوقه (RK-03): كل تقييم نسخة مؤرخة بمقيمها ومرجعها الأب. '
+        . 'التقييم يتحدى قبل اعتماده — والمتبقي وحده يبنى عليه قرار القبول.',
+        array('الأبعاد الثمانية لا تدمج في رقم واحد — والسلامة لا تقايض بالمال (§12-2)',
+              'درجة الثقة تعلن ولا تخفى (§12-3)',
+              'التسجيل من ملف الخطر — وهذه الشاشة للقراءة والمقارنة التاريخية'));
     risk_view_bar('risk_assessment', $view, array_filter(array(
         'risk' => $fRisk ?: null, 'atype' => $fType ?: null)));
-    echo ems_states_bundle('لا نسخَ تقييمٍ ضمن هذا الترشيح', 'وسّع الترشيحَ — والتقييمُ يُسجَّل من ملفِّ الخطر');
+    echo ems_states_bundle('لا نسخ تقييم ضمن هذا الترشيح', 'وسع الترشيح — والتقييم يسجل من ملف الخطر');
     ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
@@ -102,7 +102,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     <div class="ems-card" id="asEmpty"></div>
     <script>document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('asEmpty').appendChild(EmsUI.emptyState({
-            reason: 'لا تقييمات في نطاقك بعد — التقييمُ يُسجَّل من ملفِّ الخطرِ بأبعادِه الثمانية',
+            reason: 'لا تقييمات في نطاقك بعد — التقييم يسجل من ملف الخطر بأبعاده الثمانية',
             createHref: 'risk_register.php', createLabel: 'إلى السجل المركزي'
         }));
     });</script>
@@ -120,8 +120,8 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                 <?php if (risk_col_visible('risk_assessment', $view, 'level')): ?><th>المستوى</th><?php endif; ?>
                 <?php if (risk_col_visible('risk_assessment', $view, 'confidence')): ?><th>الثقة</th><?php endif; ?>
                 <?php if (risk_col_visible('risk_assessment', $view, 'technique')): ?><th>التقنية</th><?php endif; ?>
-                <?php if (risk_col_visible('risk_assessment', $view, 'assessor')): ?><th>المُقيِّم</th><?php endif; ?>
-                <?php if (risk_col_visible('risk_assessment', $view, 'challenger')): ?><th>المتحدِّي</th><?php endif; ?>
+                <?php if (risk_col_visible('risk_assessment', $view, 'assessor')): ?><th>المقيم</th><?php endif; ?>
+                <?php if (risk_col_visible('risk_assessment', $view, 'challenger')): ?><th>المتحدي</th><?php endif; ?>
                 <?php if (risk_col_visible('risk_assessment', $view, 'approved_at')): ?><th>الاعتماد</th><?php endif; ?>
                 <?php if (risk_col_visible('risk_assessment', $view, 'authority_ref')): ?><th>مرجع التفويض</th><?php endif; ?>
                 <?php if (risk_col_visible('risk_assessment', $view, 'assessed_at')): ?><th>تاريخ التقييم</th><?php endif; ?>

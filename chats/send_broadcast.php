@@ -31,7 +31,7 @@ if (empty($message)) {
 }
 if (mb_strlen($message) > 2000) {
     while (ob_get_level()) ob_end_clean();
-    die(json_encode(['success' => false, 'message' => 'الرسالة طويلة جداً (الحد الأقصى 2000 حرف)'], JSON_UNESCAPED_UNICODE));
+    die(json_encode(['success' => false, 'message' => 'الرسالة طويلة جدا (الحد الأقصى 2000 حرف)'], JSON_UNESCAPED_UNICODE));
 }
 
 $safe_company  = intval($company_id);
@@ -142,7 +142,7 @@ if ($inserted_count > 0) {
 if ($inserted_count > 0) {
     $message_text = $inserted_count === 1
         ? "تم إرسال الرسالة بنجاح لمستخدم واحد"
-        : "تم إرسال الرسالة بنجاح لـ {$inserted_count} مستخدم";
+        : "تم إرسال الرسالة بنجاح ل {$inserted_count} مستخدم";
 
     // سجل إرسال واحد فقط باسم "إرسال" للبث الجماعي.
     \App\Services\ActivityLogService::logAction('send', 'chats', 'send_broadcast', [

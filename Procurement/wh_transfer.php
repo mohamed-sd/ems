@@ -35,9 +35,9 @@ $__pc = ems_post_contract($conn, array(
         $item = intval($in['item_id'] ?? 0); $from = intval($in['from_wh'] ?? 0);
         $to   = intval($in['to_wh'] ?? 0);   $qty  = floatval($in['qty'] ?? 0);
         if ($item <= 0 || $from <= 0 || $to <= 0 || $qty <= 0) {
-            return array('ok' => false, 'msg' => 'الصنفُ والمخزنان والكميةُ إلزامية (422)');
+            return array('ok' => false, 'msg' => 'الصنف والمخزنان والكمية إلزامية (422)');
         }
-        if ($from === $to) { return array('ok' => false, 'msg' => 'المصدرُ والوجهةُ مخزنٌ واحد (422)'); }
+        if ($from === $to) { return array('ok' => false, 'msg' => 'المصدر والوجهة مخزن واحد (422)'); }
         return array('ok' => true, 'data' => compact('item', 'from', 'to', 'qty'));
     },
 ));
@@ -76,13 +76,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 /* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
    شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
 $header_icon = 'fa fa-random';
-$header_title_html = htmlspecialchars('التحويلُ بين المخازن', ENT_QUOTES, 'UTF-8');
+$header_title_html = htmlspecialchars('التحويل بين المخازن', ENT_QUOTES, 'UTF-8');
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 /* حزمةُ الحالاتِ الدنيا (بوابة ٩): تحميلٌ وفراغٌ وخطأٌ — مخفيةٌ افتراضًا */
-echo ems_states_bundle('لا تحويلاتٍ بين المخازن بعد',
-    'سجِّلِ التحويلَ من النموذج أعلاه — حركتان ذريّتان بمرجعٍ واحدٍ فلا يظهر الصنفُ في مخزنين');
+echo ems_states_bundle('لا تحويلات بين المخازن بعد',
+    'سجل التحويل من النموذج أعلاه — حركتان ذريتان بمرجع واحد فلا يظهر الصنف في مخزنين');
 ?>
   <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
@@ -95,9 +95,9 @@ echo ems_states_bundle('لا تحويلاتٍ بين المخازن بعد',
     <div><label for="emsf_1352_887b9">إلى مخزن</label><select name="to_wh" class="form-control" required id="emsf_1352_887b9"><option value="">—</option>
       <?php foreach ($whs as $w): ?><option value="<?= intval($w['id']) ?>"><?= htmlspecialchars($w['name'], ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select></div>
     <div><label for="emsf_1353_4bc3c">الكمية</label><input type="number" step="0.01" name="qty" class="form-control wht-qty-input" required id="emsf_1353_4bc3c"></div>
-    <button class="btn btn-primary">حوّل</button>
+    <button class="btn btn-primary">حول</button>
   </form>
-  <h6>آخرُ التحويلات</h6>
+  <h6>آخر التحويلات</h6>
   <table class="table table-sm" data-no-dt>
     <thead><tr><th>الوقت</th><th>رقم الصنف</th><th>من مخزن</th><th>الحركة</th><th>الكمية</th><th>مرجع التفويض</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
@@ -111,19 +111,19 @@ echo ems_states_bundle('لا تحويلاتٍ بين المخازن بعد',
               <th class="ems-fn-th" data-fn="1">أمر الترحيل المرتبط</th>
               <th class="ems-fn-th" data-fn="1">تاريخ الخروج</th>
               <th class="ems-fn-th" data-fn="1">تاريخ الاستلام</th>
-              <th class="ems-fn-th" data-fn="1">المستلِم</th>
+              <th class="ems-fn-th" data-fn="1">المستلم</th>
               <th class="ems-fn-th" data-fn="1">أصدره</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-              <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
               <th class="ems-gov-th none" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
               <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-              <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+              <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
               <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
-              <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
+              <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
               <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
               <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>

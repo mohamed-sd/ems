@@ -63,15 +63,15 @@ class AssetLifecycleService
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'intake_id' => 0, 'state' => '', 'created' => false);
         $no = isset($d['intake_no']) ? trim((string) $d['intake_no']) : '';
         $actor = isset($d['requested_by']) ? (int) $d['requested_by'] : 0;
-        if ($no === '')    { $out['code'] = 422; $out['reason'] = 'لا طلبَ بلا رقمٍ يعرّفه'; return $out; }
-        if ($actor <= 0)   { $out['code'] = 422; $out['reason'] = 'لا طلبَ بلا طالبٍ معروف'; return $out; }
+        if ($no === '')    { $out['code'] = 422; $out['reason'] = 'لا طلب بلا رقم يعرفه'; return $out; }
+        if ($actor <= 0)   { $out['code'] = 422; $out['reason'] = 'لا طلب بلا طالب معروف'; return $out; }
         $dept = isset($d['requested_dept']) ? (string) $d['requested_dept'] : '';
-        if ($dept === '')  { $out['code'] = 422; $out['reason'] = 'لا طلبَ بلا إدارةٍ طالبةٍ برمزِها المعياريّ'; return $out; }
+        if ($dept === '')  { $out['code'] = 422; $out['reason'] = 'لا طلب بلا إدارة طالبة برمزها المعياري'; return $out; }
 
         $ex = $gate->selectOne('asset_intake', array('where' => array('intake_no' => $no)));
         if ($ex) {
             $out['ok'] = true; $out['code'] = 200; $out['intake_id'] = (int) $ex['id'];
-            $out['state'] = $ex['state']; $out['reason'] = 'الطلبُ قائمٌ سلفًا — عطالةٌ بالمفتاح';
+            $out['state'] = $ex['state']; $out['reason'] = 'الطلب قائم سلفا — عطالة بالمفتاح';
             return $out;
         }
         $row = array(
@@ -90,8 +90,8 @@ class AssetLifecycleService
         try { $id = (int) $gate->insert('asset_intake', $row); } catch (\Throwable $t) { $id = 0; }
         if ($id <= 0) {
             $again = $gate->selectOne('asset_intake', array('where' => array('intake_no' => $no)));
-            if ($again) { $out['ok'] = true; $out['code'] = 200; $out['intake_id'] = (int) $again['id']; $out['state'] = $again['state']; $out['reason'] = 'عطالةٌ بالمفتاح'; return $out; }
-            $out['code'] = 500; $out['reason'] = 'تعذّر فتحُ طلبِ الإدخال'; return $out;
+            if ($again) { $out['ok'] = true; $out['code'] = 200; $out['intake_id'] = (int) $again['id']; $out['state'] = $again['state']; $out['reason'] = 'عطالة بالمفتاح'; return $out; }
+            $out['code'] = 500; $out['reason'] = 'تعذر فتح طلب الإدخال'; return $out;
         }
         $out['ok'] = true; $out['code'] = 201; $out['intake_id'] = $id; $out['state'] = 'submitted'; $out['created'] = true;
         self::emit($gate, 'fleet.asset.intake_requested', 'asset_intake', $id,
@@ -106,22 +106,22 @@ class AssetLifecycleService
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'check_id' => 0, 'result' => '', 'created' => false);
         $intakeId = (int) $intakeId;
         $intake = $gate->selectOne('asset_intake', array('where' => array('id' => $intakeId)));
-        if (!$intake) { $out['code'] = 404; $out['reason'] = 'طلبُ الإدخالِ غيرُ موجود'; return $out; }
+        if (!$intake) { $out['code'] = 404; $out['reason'] = 'طلب الإدخال غير موجود'; return $out; }
         $result = (isset($d['verify_result']) && $d['verify_result'] === 'failed') ? 'failed' : 'passed';
         $docRef = isset($d['doc_ref']) ? (string) $d['doc_ref'] : '';
         $fail   = isset($d['fail_reason']) ? (string) $d['fail_reason'] : '';
         if ($result === 'passed' && $docRef === '') {
-            $out['code'] = 422; $out['reason'] = 'لا اجتيازَ بلا مستندٍ مرجعُه مكتوب'; return $out;
+            $out['code'] = 422; $out['reason'] = 'لا اجتياز بلا مستند مرجعه مكتوب'; return $out;
         }
         if ($result === 'failed' && $fail === '') {
-            $out['code'] = 422; $out['reason'] = 'لا إخفاقَ بلا سببٍ مكتوب'; return $out;
+            $out['code'] = 422; $out['reason'] = 'لا إخفاق بلا سبب مكتوب'; return $out;
         }
         $seq = (int) $gate->count('asset_source_check', array('where' => array('intake_id' => $intakeId))) + 1;
         $ex = $gate->selectOne('asset_source_check', array(
             'where' => array('intake_id' => $intakeId, 'check_seq' => $seq)));
         if ($ex) {
             $out['ok'] = true; $out['code'] = 200; $out['check_id'] = (int) $ex['id'];
-            $out['result'] = $ex['verify_result']; $out['reason'] = 'عطالةٌ بالمفتاح'; return $out;
+            $out['result'] = $ex['verify_result']; $out['reason'] = 'عطالة بالمفتاح'; return $out;
         }
         $id = 0;
         try {
@@ -139,7 +139,7 @@ class AssetLifecycleService
                 'verified_at'    => self::now(),
             ));
         } catch (\Throwable $t) { $id = 0; }
-        if ($id <= 0) { $out['code'] = 500; $out['reason'] = 'تعذّر تسجيلُ واقعةِ التحقُّق'; return $out; }
+        if ($id <= 0) { $out['code'] = 500; $out['reason'] = 'تعذر تسجيل واقعة التحقق'; return $out; }
 
         if ($result === 'passed') {
             $gate->update('asset_intake', array('state' => 'source_verified', 'state_rule' => 'W5_SOURCE_VERIFIED_BY_DOC'),
@@ -163,27 +163,27 @@ class AssetLifecycleService
         $why = isset($d['reason']) ? (string) $d['reason'] : '';
         $intakeId = (isset($d['intake_id']) && (int) $d['intake_id'] > 0) ? (int) $d['intake_id'] : 0;
         $equipId  = (isset($d['equipment_id']) && (int) $d['equipment_id'] > 0) ? (int) $d['equipment_id'] : 0;
-        if ($no === '') { $out['code'] = 422; $out['reason'] = 'لا أمرَ بلا رقمٍ يعرّفه'; return $out; }
+        if ($no === '') { $out['code'] = 422; $out['reason'] = 'لا أمر بلا رقم يعرفه'; return $out; }
         if (!\in_array($why, self::INSPECTION_REASONS, true)) {
-            $out['code'] = 422; $out['reason'] = 'سببُ التفتيشِ خارجَ الأسبابِ الخمسةِ المعياريّة'; return $out;
+            $out['code'] = 422; $out['reason'] = 'سبب التفتيش خارج الأسباب الخمسة المعيارية'; return $out;
         }
         if ($intakeId <= 0 && $equipId <= 0) {
-            $out['code'] = 422; $out['reason'] = 'لا أمرَ تفتيشٍ بلا هدفٍ — طلبُ إدخالٍ أو أصلٌ قائم'; return $out;
+            $out['code'] = 422; $out['reason'] = 'لا أمر تفتيش بلا هدف — طلب إدخال أو أصل قائم'; return $out;
         }
         /* ⚠ التفتيشُ عند الدخولِ لا يسبق التحقُّقَ من المصدر: أمرٌ على طلبٍ لم
              يجتزْ تحقُّقَه يُردُّ 409 — والدورةُ ترتيبٌ لا مجموعةُ أفعال. */
         if ($intakeId > 0 && $why === 'intake') {
             $intake = $gate->selectOne('asset_intake', array('where' => array('id' => $intakeId)));
-            if (!$intake) { $out['code'] = 404; $out['reason'] = 'طلبُ الإدخالِ غيرُ موجود'; return $out; }
+            if (!$intake) { $out['code'] = 404; $out['reason'] = 'طلب الإدخال غير موجود'; return $out; }
             if (!\in_array($intake['state'], array('source_verified', 'inspection_ordered', 'inspected'), true)) {
                 $out['code'] = 409; $out['reason_code'] = 'SOURCE_NOT_VERIFIED';
-                $out['reason'] = 'لا أمرَ تفتيشِ دخولٍ قبل اجتيازِ التحقُّقِ من المصدر'; return $out;
+                $out['reason'] = 'لا أمر تفتيش دخول قبل اجتياز التحقق من المصدر'; return $out;
             }
         }
         $ex = $gate->selectOne('asset_inspection_order', array('where' => array('order_no' => $no)));
         if ($ex) {
             $out['ok'] = true; $out['code'] = 200; $out['order_id'] = (int) $ex['id'];
-            $out['reason'] = 'الأمرُ قائمٌ سلفًا — عطالةٌ بالمفتاح'; return $out;
+            $out['reason'] = 'الأمر قائم سلفا — عطالة بالمفتاح'; return $out;
         }
         $id = 0;
         try {
@@ -199,7 +199,7 @@ class AssetLifecycleService
                 'state'        => 'issued',
             ));
         } catch (\Throwable $t) { $id = 0; }
-        if ($id <= 0) { $out['code'] = 500; $out['reason'] = 'تعذّر إصدارُ أمرِ التفتيش'; return $out; }
+        if ($id <= 0) { $out['code'] = 500; $out['reason'] = 'تعذر إصدار أمر التفتيش'; return $out; }
         if ($intakeId > 0) {
             $gate->update('asset_intake', array('state' => 'inspection_ordered', 'state_rule' => 'W5_INSPECTION_ORDERED'),
                           array('id' => $intakeId));
@@ -217,10 +217,10 @@ class AssetLifecycleService
         $out = array('ok' => false, 'code' => 0, 'reason' => '');
         $orderId = (int) $orderId; $inspectionId = (int) $inspectionId;
         $o = $gate->selectOne('asset_inspection_order', array('where' => array('id' => $orderId)));
-        if (!$o) { $out['code'] = 404; $out['reason'] = 'أمرُ التفتيشِ غيرُ موجود'; return $out; }
-        if ($inspectionId <= 0) { $out['code'] = 422; $out['reason'] = 'لا تنفيذَ بلا بطاقةِ تفتيشٍ محفوظة'; return $out; }
-        if ($o['state'] === 'executed') { $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'مُنفَّذٌ سلفًا — عطالةٌ بالحالة'; return $out; }
-        if ($o['state'] === 'cancelled') { $out['code'] = 409; $out['reason'] = 'أمرٌ ملغًى لا يُنفَّذ'; return $out; }
+        if (!$o) { $out['code'] = 404; $out['reason'] = 'أمر التفتيش غير موجود'; return $out; }
+        if ($inspectionId <= 0) { $out['code'] = 422; $out['reason'] = 'لا تنفيذ بلا بطاقة تفتيش محفوظة'; return $out; }
+        if ($o['state'] === 'executed') { $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'منفذ سلفا — عطالة بالحالة'; return $out; }
+        if ($o['state'] === 'cancelled') { $out['code'] = 409; $out['reason'] = 'أمر ملغى لا ينفذ'; return $out; }
         $gate->update('asset_inspection_order',
             array('state' => 'executed', 'inspection_id' => $inspectionId, 'result' => (string) $result),
             array('id' => $orderId));
@@ -243,19 +243,19 @@ class AssetLifecycleService
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'reason_code' => '', 'equipment_id' => 0);
         $intakeId = (int) $intakeId; $equipmentId = (int) $equipmentId; $actorId = (int) $actorId;
         $intake = $gate->selectOne('asset_intake', array('where' => array('id' => $intakeId)));
-        if (!$intake) { $out['code'] = 404; $out['reason'] = 'طلبُ الإدخالِ غيرُ موجود'; return $out; }
-        if ($equipmentId <= 0) { $out['code'] = 422; $out['reason'] = 'لا كرتَ بلا أصلٍ يحمله'; return $out; }
+        if (!$intake) { $out['code'] = 404; $out['reason'] = 'طلب الإدخال غير موجود'; return $out; }
+        if ($equipmentId <= 0) { $out['code'] = 422; $out['reason'] = 'لا كرت بلا أصل يحمله'; return $out; }
 
         $passed = (int) $gate->count('asset_source_check', array(
             'where' => array('intake_id' => $intakeId, 'verify_result' => 'passed')));
         if ($passed === 0) {
             $out['code'] = 409; $out['reason_code'] = 'SOURCE_NOT_VERIFIED';
-            $out['reason'] = 'لا يُنشأ كرتُ أصلٍ قبل اجتيازِ التحقُّقِ من المصدر (FLEET-04)';
+            $out['reason'] = 'لا ينشأ كرت أصل قبل اجتياز التحقق من المصدر (FLEET-04)';
             return $out;
         }
         if (\in_array($intake['state'], array('card_issued', 'activated'), true)) {
             $out['ok'] = true; $out['code'] = 200; $out['equipment_id'] = (int) $intake['equipment_id'];
-            $out['reason'] = 'الكرتُ صادرٌ سلفًا — عطالةٌ بالحالة'; return $out;
+            $out['reason'] = 'الكرت صادر سلفا — عطالة بالحالة'; return $out;
         }
         $gate->update('asset_intake',
             array('state' => 'card_issued', 'state_rule' => 'W5_CARD_ISSUED_AFTER_SOURCE_AND_INSPECTION',
@@ -277,14 +277,14 @@ class AssetLifecycleService
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'equipment_id' => 0);
         $intakeId = (int) $intakeId;
         $intake = $gate->selectOne('asset_intake', array('where' => array('id' => $intakeId)));
-        if (!$intake) { $out['code'] = 404; $out['reason'] = 'طلبُ الإدخالِ غيرُ موجود'; return $out; }
+        if (!$intake) { $out['code'] = 404; $out['reason'] = 'طلب الإدخال غير موجود'; return $out; }
         if ($intake['state'] === 'activated') {
             $out['ok'] = true; $out['code'] = 200; $out['equipment_id'] = (int) $intake['equipment_id'];
-            $out['reason'] = 'مُفعَّلٌ سلفًا — عطالةٌ بالحالة'; return $out;
+            $out['reason'] = 'مفعل سلفا — عطالة بالحالة'; return $out;
         }
         if ($intake['state'] !== 'card_issued') {
             $out['code'] = 409; $out['reason_code'] = 'CARD_NOT_ISSUED';
-            $out['reason'] = 'لا تفعيلَ قبل إصدارِ الكرت'; return $out;
+            $out['reason'] = 'لا تفعيل قبل إصدار الكرت'; return $out;
         }
         $eq = (int) $intake['equipment_id'];
         $gate->update('asset_intake', array('state' => 'activated', 'state_rule' => 'W5_ACTIVATED_AFTER_CARD',
@@ -323,9 +323,9 @@ class AssetLifecycleService
         $from = isset($d['valid_from']) ? (string) $d['valid_from'] : '';
         $pct = isset($d['percent']) ? (float) $d['percent'] : 100.0;
         $kind = isset($d['holder_kind']) ? (string) $d['holder_kind'] : 'company';
-        if ($eq <= 0)          { $out['code'] = 422; $out['reason'] = 'لا حقَّ استخدامٍ بلا أصل'; return $out; }
-        if (!self::isDate($from)) { $out['code'] = 422; $out['reason'] = 'بدايةُ الفترةِ إلزاميّةٌ بصيغةِ YYYY-MM-DD'; return $out; }
-        if ($pct <= 0 || $pct > 100) { $out['code'] = 422; $out['reason'] = 'الحصّةُ خارجَ المدى (0 < حصّة ≤ 100)'; return $out; }
+        if ($eq <= 0)          { $out['code'] = 422; $out['reason'] = 'لا حق استخدام بلا أصل'; return $out; }
+        if (!self::isDate($from)) { $out['code'] = 422; $out['reason'] = 'بداية الفترة إلزامية بصيغة YYYY-MM-DD'; return $out; }
+        if ($pct <= 0 || $pct > 100) { $out['code'] = 422; $out['reason'] = 'الحصة خارج المدى (0 < حصة ≤ 100)'; return $out; }
         $to = (isset($d['valid_to']) && self::isDate($d['valid_to'])) ? (string) $d['valid_to'] : null;
         $key = self::holderKey($kind, isset($d['holder_ref_id']) ? $d['holder_ref_id'] : 0,
                                isset($d['holder_name']) ? $d['holder_name'] : '');
@@ -347,7 +347,7 @@ class AssetLifecycleService
             ), array('id' => (int) $ex['id']));
             $out['ok'] = true; $out['code'] = 200; $out['right_id'] = (int) $ex['id'];
             $out['concurrency_pct'] = $total; $out['rule'] = $rule;
-            $out['reason'] = 'الحقُّ قائمٌ سلفًا — عطالةٌ بالمفتاح'; return $out;
+            $out['reason'] = 'الحق قائم سلفا — عطالة بالمفتاح'; return $out;
         }
         $id = 0;
         try {
@@ -370,7 +370,7 @@ class AssetLifecycleService
                 'granted_at'       => self::now(),
             ));
         } catch (\Throwable $t) { $id = 0; }
-        if ($id <= 0) { $out['code'] = 500; $out['reason'] = 'تعذّر منحُ حقِّ الاستخدام'; return $out; }
+        if ($id <= 0) { $out['code'] = 500; $out['reason'] = 'تعذر منح حق الاستخدام'; return $out; }
         $out['ok'] = true; $out['code'] = 201; $out['right_id'] = $id; $out['created'] = true;
         $out['concurrency_pct'] = $total; $out['rule'] = $rule;
         self::emit($gate, 'fleet.asset.use_right_granted', 'asset_use_right', $id,
@@ -407,9 +407,9 @@ class AssetLifecycleService
         $from = isset($d['valid_from']) ? (string) $d['valid_from'] : '';
         $site = (isset($d['site_id']) && (int) $d['site_id'] > 0) ? (int) $d['site_id'] : 0;
         $proj = (isset($d['project_id']) && (int) $d['project_id'] > 0) ? (int) $d['project_id'] : 0;
-        if ($eq <= 0) { $out['code'] = 422; $out['reason'] = 'لا إسنادَ بلا أصل'; return $out; }
-        if (!self::isDate($from)) { $out['code'] = 422; $out['reason'] = 'تاريخُ الإسنادِ إلزاميّ'; return $out; }
-        if ($site <= 0 && $proj <= 0) { $out['code'] = 422; $out['reason'] = 'لا إسنادَ بلا موقعٍ ولا مشروع'; return $out; }
+        if ($eq <= 0) { $out['code'] = 422; $out['reason'] = 'لا إسناد بلا أصل'; return $out; }
+        if (!self::isDate($from)) { $out['code'] = 422; $out['reason'] = 'تاريخ الإسناد إلزامي'; return $out; }
+        if ($site <= 0 && $proj <= 0) { $out['code'] = 422; $out['reason'] = 'لا إسناد بلا موقع ولا مشروع'; return $out; }
 
         /* ⚠ **الأصلُ الخارجُ دائمًا لا يُسنَد** — والمحاولةُ تُردُّ لا تُتجاهَل */
         $gone = $gate->selectOne('asset_exit', array(
@@ -417,20 +417,20 @@ class AssetLifecycleService
             'where'   => array('equipment_id' => $eq, 'exit_kind' => 'permanent')));
         if ($gone && (string) $gone['exit_date'] <= $from) {
             $out['code'] = 409; $out['reason_code'] = 'ASSET_PERMANENTLY_EXITED';
-            $out['reason'] = 'أصلٌ خرج خروجًا دائمًا لا يُسنَد'; return $out;
+            $out['reason'] = 'أصل خرج خروجا دائما لا يسند'; return $out;
         }
         /* ⚠ **ولا إسنادَ لأصلٍ لم يُفعَّل** حين يكون له طلبُ إدخالٍ يحكمه */
         $card = $gate->selectOne('equipments', array('columns' => array('lifecycle_state', 'intake_id'),
                                                      'where' => array('id' => $eq)));
         if ($card && (int) $card['intake_id'] > 0 && $card['lifecycle_state'] !== 'active') {
             $out['code'] = 409; $out['reason_code'] = 'ASSET_NOT_ACTIVE';
-            $out['reason'] = 'أصلٌ لم يُفعَّل لا يُسنَد — التفعيلُ يسبق الإسناد'; return $out;
+            $out['reason'] = 'أصل لم يفعل لا يسند — التفعيل يسبق الإسناد'; return $out;
         }
 
         $ex = $gate->selectOne('asset_assignment', array('where' => array('equipment_id' => $eq, 'valid_from' => $from)));
         if ($ex) {
             $out['ok'] = true; $out['code'] = 200; $out['assign_id'] = (int) $ex['id'];
-            $out['reason'] = 'الإسنادُ قائمٌ سلفًا — عطالةٌ بالمفتاح'; return $out;
+            $out['reason'] = 'الإسناد قائم سلفا — عطالة بالمفتاح'; return $out;
         }
         /* السابقُ النشِطُ يُنهى بسببِه — لا موقعانِ لأصلٍ في اليومِ نفسِه */
         $prev = $gate->select('asset_assignment', array(
@@ -440,7 +440,7 @@ class AssetLifecycleService
             if ((string) $p['valid_from'] >= $from) { continue; }
             $gate->update('asset_assignment',
                 array('state' => 'ended', 'valid_to' => \date('Y-m-d', \strtotime($from . ' -1 day')),
-                      'end_reason' => 'أنهاه إسنادٌ لاحقٌ في ' . $from),
+                      'end_reason' => 'أنهاه إسناد لاحق في ' . $from),
                 array('id' => (int) $p['id']));
         }
         $id = 0;
@@ -458,7 +458,7 @@ class AssetLifecycleService
                 'decision_ref' => isset($d['decision_ref']) ? (string) $d['decision_ref'] : '',
             ));
         } catch (\Throwable $t) { $id = 0; }
-        if ($id <= 0) { $out['code'] = 500; $out['reason'] = 'تعذّر الإسناد'; return $out; }
+        if ($id <= 0) { $out['code'] = 500; $out['reason'] = 'تعذر الإسناد'; return $out; }
         $out['ok'] = true; $out['code'] = 201; $out['assign_id'] = $id; $out['created'] = true;
         self::emit($gate, 'fleet.asset.assigned', 'asset_assignment', $id,
                    array('equipment_id' => $eq, 'site_id' => $site, 'project_id' => $proj, 'valid_from' => $from),
@@ -474,23 +474,23 @@ class AssetLifecycleService
         $kind = (isset($d['exit_kind']) && $d['exit_kind'] === 'permanent') ? 'permanent' : 'temporary';
         $date = isset($d['exit_date']) ? (string) $d['exit_date'] : '';
         $reason = isset($d['reason_code']) ? (string) $d['reason_code'] : '';
-        if ($eq <= 0)   { $out['code'] = 422; $out['reason'] = 'لا خروجَ بلا أصل'; return $out; }
-        if (!self::isDate($date)) { $out['code'] = 422; $out['reason'] = 'تاريخُ الخروجِ إلزاميّ'; return $out; }
-        if ($reason === '') { $out['code'] = 422; $out['reason'] = 'لا خروجَ بلا سببٍ مُرمَّز'; return $out; }
+        if ($eq <= 0)   { $out['code'] = 422; $out['reason'] = 'لا خروج بلا أصل'; return $out; }
+        if (!self::isDate($date)) { $out['code'] = 422; $out['reason'] = 'تاريخ الخروج إلزامي'; return $out; }
+        if ($reason === '') { $out['code'] = 422; $out['reason'] = 'لا خروج بلا سبب مرمز'; return $out; }
         $expected = (isset($d['expected_return']) && self::isDate($d['expected_return'])) ? (string) $d['expected_return'] : null;
         $fin = isset($d['finance_ref']) ? (string) $d['finance_ref'] : '';
         if ($kind === 'temporary' && $expected === null) {
-            $out['code'] = 422; $out['reason'] = 'الخروجُ المؤقّتُ بلا عودةٍ متوقَّعةٍ خروجٌ دائمٌ باسمٍ آخر'; return $out;
+            $out['code'] = 422; $out['reason'] = 'الخروج المؤقت بلا عودة متوقعة خروج دائم باسم آخر'; return $out;
         }
         if ($kind === 'permanent') {
             $expected = null;
-            if ($fin === '') { $out['code'] = 422; $out['reason'] = 'الخروجُ الدائمُ بلا مرجعٍ ماليٍّ من المالية لا يُسجَّل'; return $out; }
+            if ($fin === '') { $out['code'] = 422; $out['reason'] = 'الخروج الدائم بلا مرجع مالي من المالية لا يسجل'; return $out; }
         }
         $ex = $gate->selectOne('asset_exit', array(
             'where' => array('equipment_id' => $eq, 'exit_kind' => $kind, 'exit_date' => $date)));
         if ($ex) {
             $out['ok'] = true; $out['code'] = 200; $out['exit_id'] = (int) $ex['id'];
-            $out['reason'] = 'الخروجُ مسجَّلٌ سلفًا — عطالةٌ بالمفتاح'; return $out;
+            $out['reason'] = 'الخروج مسجل سلفا — عطالة بالمفتاح'; return $out;
         }
         $id = 0;
         try {
@@ -508,13 +508,13 @@ class AssetLifecycleService
                 'doc_ref'         => isset($d['doc_ref']) ? (string) $d['doc_ref'] : '',
             ));
         } catch (\Throwable $t) { $id = 0; }
-        if ($id <= 0) { $out['code'] = 500; $out['reason'] = 'تعذّر تسجيلُ الخروج'; return $out; }
+        if ($id <= 0) { $out['code'] = 500; $out['reason'] = 'تعذر تسجيل الخروج'; return $out; }
         /* الإسنادُ النشِطُ يُنهى بالخروج — لا أصلَ في موقعٍ وهو خارجٌ منه */
         foreach ($gate->select('asset_assignment', array('columns' => array('id', 'valid_from'),
                  'where' => array('equipment_id' => $eq, 'state' => 'active'))) as $p) {
             if ((string) $p['valid_from'] > $date) { continue; }
             $gate->update('asset_assignment',
-                array('state' => 'ended', 'valid_to' => $date, 'end_reason' => 'خروجُ الأصلِ ' . $kind . ' بسبب ' . $reason),
+                array('state' => 'ended', 'valid_to' => $date, 'end_reason' => 'خروج الأصل ' . $kind . ' بسبب ' . $reason),
                 array('id' => (int) $p['id']));
         }
         $gate->update('equipments',
@@ -534,13 +534,13 @@ class AssetLifecycleService
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'reason_code' => '');
         $exitId = (int) $exitId;
         $e = $gate->selectOne('asset_exit', array('where' => array('id' => $exitId)));
-        if (!$e) { $out['code'] = 404; $out['reason'] = 'واقعةُ الخروجِ غيرُ موجودة'; return $out; }
+        if (!$e) { $out['code'] = 404; $out['reason'] = 'واقعة الخروج غير موجودة'; return $out; }
         if ($e['exit_kind'] !== 'temporary') {
             $out['code'] = 409; $out['reason_code'] = 'PERMANENT_EXIT_NO_RETURN';
-            $out['reason'] = 'الخروجُ الدائمُ لا عودةَ منه — والعودةُ كرتٌ جديدٌ بطلبِ إدخالٍ جديد'; return $out;
+            $out['reason'] = 'الخروج الدائم لا عودة منه — والعودة كرت جديد بطلب إدخال جديد'; return $out;
         }
-        if ($e['state'] === 'returned') { $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'عادَ سلفًا — عطالةٌ بالحالة'; return $out; }
-        if (!self::isDate($returnDate)) { $out['code'] = 422; $out['reason'] = 'تاريخُ العودةِ إلزاميّ'; return $out; }
+        if ($e['state'] === 'returned') { $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'عاد سلفا — عطالة بالحالة'; return $out; }
+        if (!self::isDate($returnDate)) { $out['code'] = 422; $out['reason'] = 'تاريخ العودة إلزامي'; return $out; }
         $gate->update('asset_exit',
             array('state' => 'returned', 'actual_return' => (string) $returnDate,
                   'decided_by' => (int) $actorId, 'decided_at' => self::now()),

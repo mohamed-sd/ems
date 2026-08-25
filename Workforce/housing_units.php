@@ -74,7 +74,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="success-message <?= $ok?'is-success':'is-error' ?>"><i class="fas <?= $ok?'fa-check-circle':'fa-exclamation-circle' ?>"></i> <?= htmlspecialchars($_GET['msg']) ?></div>
     <?php endif; ?>
     <?php require_once __DIR__ . '/../includes/ux_components.php';
-    echo ems_states_bundle('لا وحداتِ سكنٍ مسجَّلةً بعدُ', 'أضف أولَ وحدةٍ بزرِّ «وحدة سكن» في رأسِ الشاشة'); ?>
+    echo ems_states_bundle('لا وحدات سكن مسجلة بعد', 'أضف أول وحدة بزر «وحدة سكن» في رأس الشاشة'); ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
     <form id="hForm" action="" method="post" class="allforms">
         <?= csrf_field() ?>
@@ -90,7 +90,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="hu-form-actions"><button type="submit" class="add-btn"><i class="fas fa-save"></i> حفظ</button></div>
     </form>
     <div class="table-wrap hu-table-wrap"><table class="data-table hu-table-full">
-        <thead><tr><th>إجراءات</th><th>المُنشئ — الاسم والصفة</th><th>المشروع</th><th>السعة</th><th>الموقع</th>
+        <thead><tr><th>إجراءات</th><th>المنشئ — الاسم والصفة</th><th>المشروع</th><th>السعة</th><th>الموقع</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">كود الوحدة</th>
               <th class="ems-fn-th" data-fn="1">المعسكر</th>
@@ -103,12 +103,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="ems-fn-th" data-fn="1">الجهة المتحملة</th>
               <th class="ems-fn-th" data-fn="1">المسؤول</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
               <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
               <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>

@@ -18,7 +18,7 @@ enforce_current_page_view_permission($conn, '../main/dashboard.php');
    و<head> وقائمةِ أنماطٍ خاصة. صار `inheader.php` مصدرَ القشرةِ، فيصل
    هذه الشاشةَ كلُّ تحسينٍ فيها (كاسرُ الذاكرةِ · الرموزُ · الأزرار).
    وما تنفرد به من أنماطٍ منقولٌ أدناه ولم يُنزع. */
-$page_title = 'إيكوبيشن | تقرير وحدات المشغّلين';
+$page_title = 'إيكوبيشن | تقرير وحدات المشغلين';
 include __DIR__ . '/../inheader.php';
 ?>
 <!-- أنماطٌ تنفرد بها هذه الشاشة (لا يحمّلها inheader) -->
@@ -117,7 +117,7 @@ $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-echo ems_states_bundle('لا ساعاتِ عملِ سائقين مطابقةً لهذه الفلاتر', 'وسّع مدى التاريخِ أو اختر «الكل» في المشروعِ والسائقِ ثمّ اضغط بحث');
+echo ems_states_bundle('لا ساعات عمل سائقين مطابقة لهذه الفلاتر', 'وسع مدى التاريخ أو اختر «الكل» في المشروع والسائق ثم اضغط بحث');
 ?>
         <div class="rpt-dsc-actions">
             <a href="reports.php" class="back-btn">

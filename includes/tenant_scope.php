@@ -87,11 +87,11 @@ if (!function_exists('ems_require_company')) {
         if ($co > 0) { return $co; }
         require_once __DIR__ . '/permissions_helper.php';
         ems_gov_flash_redirect($redirect,
-            'لا كيانَ في سياقِ جلستك — ولا تُكتب بيانةٌ بكيانٍ مفترَض ❌',
+            'لا كيان في سياق جلستك — ولا تكتب بيانة بكيان مفترض ❌',
             'GOV-TENANT-409',
             ems_scope_is_super()
-                ? 'اختر الكيانَ صراحةً من منتقي الكياناتِ ثم أعِدِ المحاولة'
-                : 'راجعْ مديرَ الصلاحيات: حسابُك بلا كيانٍ مالك');
+                ? 'اختر الكيان صراحة من منتقي الكيانات ثم أعد المحاولة'
+                : 'راجع مدير الصلاحيات: حسابك بلا كيان مالك');
         exit();
     }
 }
@@ -112,8 +112,8 @@ if (!function_exists('ems_company_picker')) {
         while ($r && ($x = $r->fetch_assoc())) { $rows[] = $x; }
         $self = htmlspecialchars(strtok((string) ($_SERVER['REQUEST_URI'] ?? ''), '?'), ENT_QUOTES, 'UTF-8');
         $h  = '<div class="alert alert-warning" style="max-width:640px">';
-        $h .= '<strong>اختر الكيانَ أولًا.</strong> حسابُك بلا كيانٍ مالك، ';
-        $h .= 'ولا تُعرض أرقامُ كيانٍ لم تختره — فرقمٌ بلا كيانٍ مُعلَنٍ يُقرأ خطأً.';
+        $h .= '<strong>اختر الكيان أولا.</strong> حسابك بلا كيان مالك، ';
+        $h .= 'ولا تعرض أرقام كيان لم تختره — فرقم بلا كيان معلن يقرأ خطأ.';
         $h .= '<form method="get" action="' . $self . '" style="margin-top:10px;display:flex;gap:8px;align-items:center">';
         $h .= '<label for="ems_co_pick">الكيان</label>';
         $h .= '<select id="ems_co_pick" name="co" class="form-control" style="max-width:280px" required>';

@@ -76,10 +76,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate'])) {
 
     $res = SVC::generate($gate, $conn, 'supplier', $party, $from, $to, $uid);
     if ($res['ok']) {
-        $m = 'تولّدت+التسوية+—+' . intval($res['entitlements']) . '+استحقاقًا+و' .
-             intval($res['charges']) . '+تحميلًا';
+        $m = 'تولدت+التسوية+—+' . intval($res['entitlements']) . '+استحقاقا+و' .
+             intval($res['charges']) . '+تحميلا';
         if (intval($res['unpriced']) > 0) {
-            $m .= '+·+' . intval($res['unpriced']) . '+بندًا+بلا+سعرِ+صرف';
+            $m .= '+·+' . intval($res['unpriced']) . '+بندا+بلا+سعر+صرف';
         }
         ems_gov_redirect("Location: settlements.php?msg={$m}+✅&open=" . intval($res['settlement_id']));
     } else {
@@ -92,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $act = strval($_POST['action']);
     $sid = intval($_POST['sid'] ?? 0);
-    $res = array('ok' => false, 'reason' => 'إجراءٌ غير معروف');
+    $res = array('ok' => false, 'reason' => 'إجراء غير معروف');
 
     if ($act === 'submit' && $can_edit) {
         $res = SVC::submit($gate, $sid, $uid);
@@ -116,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         } else {
         $res = SVC::approve($gate, $conn, $sid, $uid);
         if ($res['ok'] && $res['net_direction'] === 'receivable') {
-            $res['reason'] = 'اعتُمدت — والصافي سالبٌ ففُتحت ذمّةٌ مدينةٌ على المورد';
+            $res['reason'] = 'اعتمدت — والصافي سالب ففتحت ذمة مدينة على المورد';
         }
         }
     } elseif ($act === 'invoice' && $can_edit) {
@@ -190,7 +190,7 @@ if ($open > 0) {
 
 $STATE_AR = array(
     'draft' => 'مسودة', 'review' => 'قيد المراجعة', 'approved' => 'معتمدة',
-    'payment_requested' => 'طُلب الدفع', 'invoiced' => 'مفوترة', 'paid' => 'مدفوعة',
+    'payment_requested' => 'طلب الدفع', 'invoiced' => 'مفوترة', 'paid' => 'مدفوعة',
     'closed' => 'مقفلة', 'cancelled' => 'ملغاة',
 );
 $CHARGE_AR = array(
@@ -219,7 +219,7 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا تسويةَ مورّدٍ مولَّدةً بعدُ', 'اختر المورّدَ والفترةَ من نموذجِ «تسويةٌ جديدة» واضغط «ولّد التسوية» — البنودُ تُجلب من مصادرها');
+    echo ems_states_bundle('لا تسوية مورد مولدة بعد', 'اختر المورد والفترة من نموذج «تسوية جديدة» واضغط «ولد التسوية» — البنود تجلب من مصادرها');
     ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
@@ -232,24 +232,24 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
     <div class="card"><div class="card-body">
         <p class="sup-set-lead">
             <i class="fas fa-circle-info"></i>
-            اختر المورّدَ والفترة، والنظامُ <strong>يجلب البنودَ من مصادرها</strong> —
-            استحقاقُه من دفتر ذممه، وتحميلاتُه (وقود · قطع · صيانة · نقل · سلف · جزاءات)
-            كلٌّ برابط أصله. لا تُدخل مبلغًا واحدًا بيدك.
-            وحين تفوق التحميلاتُ استحقاقَه يصير الصافي سالبًا فتُفتح <strong>ذمّةٌ مدينةٌ عليه</strong>.
+            اختر المورد والفترة، والنظام <strong>يجلب البنود من مصادرها</strong> —
+            استحقاقه من دفتر ذممه، وتحميلاته (وقود · قطع · صيانة · نقل · سلف · جزاءات)
+            كل برابط أصله. لا تدخل مبلغا واحدا بيدك.
+            وحين تفوق التحميلات استحقاقه يصير الصافي سالبا فتفتح <strong>ذمة مدينة عليه</strong>.
             <br>
-            <strong>مَن يُعدّ لا يُجيز:</strong> إدارةُ الموردين تُعدّ وتراجع، ومديرُ الإدارة المالية يُجيز.
+            <strong>من يعد لا يجيز:</strong> إدارة الموردين تعد وتراجع، ومدير الإدارة المالية يجيز.
         </p>
     </div></div>
 
     <?php if ($can_edit): ?>
     <div class="card"><div class="card-body">
-        <h5 class="sup-set-h5"><i class="fas fa-plus"></i> تسويةٌ جديدة</h5>
+        <h5 class="sup-set-h5"><i class="fas fa-plus"></i> تسوية جديدة</h5>
         <form action="" method="post" class="allforms allforms-visible sup-set-gen-form">
         <?= csrf_field() ?>
             <input type="hidden" name="generate" value="1">
             <div class="form-section"><div class="form-grid">
                 <div class="form-group">
-                    <label for="emsf_470_fe909">المورّد *</label>
+                    <label for="emsf_470_fe909">المورد *</label>
                     <select name="party_ref" required id="emsf_470_fe909">
                         <option value="">— اختر —</option>
                         <?php foreach ($suppliers as $s) {
@@ -264,7 +264,7 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
                     <input type="date" name="period_to" required id="emsf_472_bb57c"></div>
             </div></div>
             <div class="sup-set-actions-sm">
-                <button type="submit" class="btn btn-primary"><i class="fas fa-wand-magic-sparkles"></i> ولّد التسوية</button>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-wand-magic-sparkles"></i> ولد التسوية</button>
             </div>
         </form>
     </div></div>
@@ -275,16 +275,16 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
         <div class="sup-set-scroll">
         <table class="table table-striped sup-set-table">
             <thead><tr>
-                <th>رقم التسوية</th><th>المورّد</th><th>الفترة</th>
+                <th>رقم التسوية</th><th>المورد</th><th>الفترة</th>
                 <th>الأولي</th><th>تحميلات علينا</th><th>صافي الساعات المستحقة</th>
                 <th>الحالة</th><th>طلب الدفع</th><th>اعتراضات المورد</th><th></th>
                 <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
                 <th class="ems-fn-th" data-fn="1">العقد</th>
                 <th class="ems-fn-th" data-fn="1">الوحدة</th>
                 <th class="ems-fn-th" data-fn="1">الساعات المتعاقدة</th>
-                <th class="ems-fn-th" data-fn="1">الساعات المنفَّذة</th>
+                <th class="ems-fn-th" data-fn="1">الساعات المنفذة</th>
                 <th class="ems-fn-th" data-fn="1">العجز</th>
-                <th class="ems-fn-th" data-fn="1">التعطل المحمَّل على المورد</th>
+                <th class="ems-fn-th" data-fn="1">التعطل المحمل على المورد</th>
                 <th class="ems-fn-th" data-fn="1">ساعات مخصومة بالتسوية</th>
                 <th class="ems-fn-th" data-fn="1">سعر الساعة</th>
                 <th class="ems-fn-th" data-fn="1">الاستحقاق قبل التسويات</th>
@@ -292,18 +292,18 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
                 <th class="ems-fn-th" data-fn="1">جزاءات</th>
                 <th class="ems-fn-th" data-fn="1">حوافز</th>
                 <th class="ems-fn-th none" data-fn="1">صافي المستحق</th>
-                <th class="ems-fn-th none" data-fn="1">أعدّها</th>
+                <th class="ems-fn-th none" data-fn="1">أعدها</th>
                 <th class="ems-fn-th none" data-fn="1">اعتمدها</th>
                 <th class="ems-fn-th none" data-fn="1">نسخة القاعدة المستعملة</th>
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                 <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                 <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                 <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-                <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+                <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
                 <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
-                <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
+                <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
                 <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                 <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                 <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
@@ -312,7 +312,7 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
             <tbody>
             <?php if (!$settlements): ?>
                 <tr><td colspan="9" class="sup-set-empty-cell">
-                    لا تسويةَ بعد — ابدأ بتوليد واحدةٍ من النموذج أعلاه.
+                    لا تسوية بعد — ابدأ بتوليد واحدة من النموذج أعلاه.
                 </td></tr>
             <?php endif; ?>
             <?php foreach ($settlements as $s):
@@ -330,7 +330,7 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
                             <?php echo number_format($net, 2) . ' ' . htmlspecialchars((string) $s['currency']); ?>
                         </strong>
                         <?php if ($isRecv): ?>
-                            <br><small class="sup-set-danger-note">دَينٌ على المورد</small>
+                            <br><small class="sup-set-danger-note">دين على المورد</small>
                         <?php endif; ?>
                     </td>
                     <td><span class="badge badge-secondary">
@@ -341,11 +341,11 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
                             $rq = isset($reqMap[intval($s['payment_request_id'])])
                                   ? $reqMap[intval($s['payment_request_id'])] : null; ?>
                             <a href="../FinRequests/request_form.php?id=<?php echo intval($s['payment_request_id']); ?>"
-                               title="افتح طلبَ الدفع ورحلتَه">
+                               title="افتح طلب الدفع ورحلته">
                                 <?php echo htmlspecialchars($rq !== null ? $rq : ('#' . intval($s['payment_request_id']))); ?> ↗
                             </a>
                         <?php elseif ($isRecv): ?>
-                            <small class="sup-set-muted">لا دفعَ — دَينٌ عليه</small>
+                            <small class="sup-set-muted">لا دفع — دين عليه</small>
                         <?php else: ?>—<?php endif; ?>
                     </td>
                     <td>
@@ -378,7 +378,7 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
                         <?php endif; ?>
                         <?php if ($can_approve && (string) $s['state'] === 'paid'): ?>
                         <form action="" method="post" class="sup-set-inline-form"
-                              onsubmit="return confirm('الإقفال نهائيّ — والتصحيحُ بعده بعكسٍ موثَّقٍ لا بتعديل. متابعة؟');">
+                              onsubmit="return confirm('الإقفال نهائي — والتصحيح بعده بعكس موثق لا بتعديل. متابعة؟');">
         <?= csrf_field() ?>
                             <input type="hidden" name="action" value="close">
                             <input type="hidden" name="sid" value="<?php echo intval($s['id']); ?>">
@@ -404,12 +404,12 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
         && in_array((string) $openRow['state'], array('approved', 'payment_requested'), true)): ?>
     <div class="card"><div class="card-body">
         <h5 class="sup-set-h5"><i class="fas fa-file-invoice-dollar"></i>
-            فاتورةُ المورد للتسوية #<?php echo $open; ?></h5>
+            فاتورة المورد للتسوية #<?php echo $open; ?></h5>
         <p class="sup-set-muted">
             الصافي المعتمد: <strong><?php echo number_format((float) $openRow['net_amount'], 2); ?></strong>
             <?php echo htmlspecialchars((string) $openRow['currency']); ?> —
-            والفاتورةُ <strong>مستندٌ ضريبيٌّ يُطابَق به لا مصدرُ اعتراف</strong>:
-            الصافي لا يتغير، و<strong>الاختلافُ يفتح فرقًا بقرارٍ لا تعديلًا صامتًا</strong> (ENT-02 §4/§5).
+            والفاتورة <strong>مستند ضريبي يطابق به لا مصدر اعتراف</strong>:
+            الصافي لا يتغير، و<strong>الاختلاف يفتح فرقا بقرار لا تعديلا صامتا</strong> (ENT-02 §4/§5).
         </p>
         <form action="" method="post">
         <?= csrf_field() ?>
@@ -425,13 +425,13 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
                 <div class="form-group"><label for="emsf_476_5bec7">العملة</label>
                     <input type="text" name="invoice_currency" id="emsf_476_5bec7" maxlength="8"
                            value="<?php echo htmlspecialchars((string) $openRow['currency']); ?>"></div>
-                <div class="form-group"><label for="emsf_477_7d79c">سبب الفرق <small>— إلزاميٌّ متى اختلفت</small></label>
+                <div class="form-group"><label for="emsf_477_7d79c">سبب الفرق <small>— إلزامي متى اختلفت</small></label>
                     <input type="text" name="diff_reason" maxlength="255" id="emsf_477_7d79c"></div>
-                <div class="form-group"><label for="emsf_478_9a61b">مستند الفرق <small>— إلزاميٌّ متى اختلفت</small></label>
+                <div class="form-group"><label for="emsf_478_9a61b">مستند الفرق <small>— إلزامي متى اختلفت</small></label>
                     <input type="text" name="diff_doc_ref" maxlength="120" id="emsf_478_9a61b"></div>
             </div>
             <div class="sup-set-actions">
-                <button class="btn btn-sm btn-secondary" type="submit">تسجيلُ الفاتورة ومطابقتُها</button>
+                <button class="btn btn-sm btn-secondary" type="submit">تسجيل الفاتورة ومطابقتها</button>
             </div>
         </form>
     </div></div>
@@ -439,17 +439,17 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
 
     <?php if ($openRow !== null && $openRow['invoice_no'] !== null): ?>
     <div class="card"><div class="card-body">
-        <h5 class="sup-set-h5"><i class="fas fa-file-invoice"></i> الفاتورةُ والمطابقة</h5>
+        <h5 class="sup-set-h5"><i class="fas fa-file-invoice"></i> الفاتورة والمطابقة</h5>
         <p>
-            رقمُها <strong><?php echo htmlspecialchars((string) $openRow['invoice_no']); ?></strong>
+            رقمها <strong><?php echo htmlspecialchars((string) $openRow['invoice_no']); ?></strong>
             بتاريخ <?php echo htmlspecialchars((string) $openRow['invoice_date']); ?>
-            · مبلغُها <strong><?php echo number_format((float) $openRow['invoice_amount'], 2); ?></strong>
+            · مبلغها <strong><?php echo number_format((float) $openRow['invoice_amount'], 2); ?></strong>
             · الصافي المعتمد <strong><?php echo number_format((float) $openRow['net_amount'], 2); ?></strong>
             ·
             <?php if (abs((float) $openRow['invoice_diff']) < 0.005): ?>
-                <span class="badge badge-success">مطابِقة</span>
+                <span class="badge badge-success">مطابقة</span>
             <?php else: ?>
-                <span class="badge badge-warning">فرقٌ <?php echo number_format((float) $openRow['invoice_diff'], 2); ?></span>
+                <span class="badge badge-warning">فرق <?php echo number_format((float) $openRow['invoice_diff'], 2); ?></span>
                 <br><small>السبب: <?php echo htmlspecialchars((string) $openRow['invoice_diff_reason']); ?>
                     · المستند: <?php echo htmlspecialchars((string) $openRow['invoice_diff_doc_ref']); ?></small>
             <?php endif; ?>
@@ -459,7 +459,7 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
 
     <?php if ($open > 0): ?>
     <div class="card"><div class="card-body">
-        <h5 class="sup-set-h5"><i class="fas fa-list-ul"></i> بنودُ التسوية #<?php echo $open; ?></h5>
+        <h5 class="sup-set-h5"><i class="fas fa-list-ul"></i> بنود التسوية #<?php echo $open; ?></h5>
         <div class="sup-set-scroll">
         <table class="table table-striped sup-set-table">
             <thead><tr>

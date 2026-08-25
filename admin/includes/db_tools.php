@@ -40,13 +40,13 @@ if (!function_exists('ems_dbtool_bin_dir')) {
     {
         $dir = ems_dbtool_bin_dir();
         if ($dir === '') {
-            return 'تعذّر اكتشافُ مجلد أدوات MySQL على هذا الجهاز. اضبط MYSQL_BIN_DIR '
+            return 'تعذر اكتشاف مجلد أدوات MySQL على هذا الجهاز. اضبط MYSQL_BIN_DIR '
                 . 'في ملف .env على مجلد bin الخاص بخادم قاعدتك — مثال: '
-                . 'MYSQL_BIN_DIR=C:/…/mysql/bin  (شخِّص بـ: php tools/doctor.php)';
+                . 'MYSQL_BIN_DIR=C:/…/mysql/bin  (شخص ب: php tools/doctor.php)';
         }
 
         return 'أداة ' . $tool . ' غير موجودة في: ' . $dir
-            . ' — صحِّح MYSQL_BIN_DIR في .env (شخِّص بـ: php tools/doctor.php)';
+            . ' — صحح MYSQL_BIN_DIR في .env (شخص ب: php tools/doctor.php)';
     }
 
     /** مجلد تخزين النسخ (storage/backups — محجوب عن الويب عبر storage/.htaccess). */
@@ -141,7 +141,7 @@ if (!function_exists('ems_dbtool_bin_dir')) {
         $pipes = array();
         $proc = @proc_open($args, $desc, $pipes);
         if (!is_resource($proc)) {
-            $stderr = 'تعذّر تشغيل الأداة (proc_open).';
+            $stderr = 'تعذر تشغيل الأداة (proc_open).';
             return 1;
         }
         if (isset($pipes[0]) && is_resource($pipes[0])) {
@@ -182,7 +182,7 @@ if (!function_exists('ems_dbtool_bin_dir')) {
         }
         $cnf = ems_dbtool_write_cnf();
         if ($cnf === null) {
-            $err = 'تعذّر تجهيز ملف الاعتمادات المؤقّت.';
+            $err = 'تعذر تجهيز ملف الاعتمادات المؤقت.';
             return null;
         }
         $safePrefix = preg_replace('/[^a-z0-9_]/i', '', $prefix);
@@ -223,7 +223,7 @@ if (!function_exists('ems_dbtool_bin_dir')) {
         $db = strtolower(ems_dbtool_db_name());
         $fh = @fopen($sqlFile, 'r');
         if (!$fh) {
-            $reason = 'تعذّر قراءة الملف للفحص.';
+            $reason = 'تعذر قراءة الملف للفحص.';
             return false;
         }
         // الأنماط مثبَّتة على بداية السطر (^): mysqldump يكتب كل عبارةٍ عليا من العمود 0،
@@ -254,7 +254,7 @@ if (!function_exists('ems_dbtool_bin_dir')) {
             // USE مسموح فقط لقاعدة EMS نفسها (مثبَّت على بداية السطر)
             if (preg_match('/^\s*use\s+`?([a-z0-9_]+)`?/i', $line, $m)) {
                 if (strtolower($m[1]) !== $db) {
-                    $reason = 'الملف يبدّل إلى قاعدة أخرى: USE ' . $m[1] . ' (سطر ' . $lineNo . ')';
+                    $reason = 'الملف يبدل إلى قاعدة أخرى: USE ' . $m[1] . ' (سطر ' . $lineNo . ')';
                     fclose($fh);
                     return false;
                 }
@@ -303,14 +303,14 @@ if (!function_exists('ems_dbtool_bin_dir')) {
         $bkErr = '';
         $autobackup = ems_dbtool_backup($bkErr, 'ems_autobackup_before_import');
         if ($autobackup === null) {
-            $err = 'أُوقِف الاستيراد: تعذّرت النسخة الوقائية قبل الاستبدال (' . $bkErr . ').';
+            $err = 'أوقف الاستيراد: تعذرت النسخة الوقائية قبل الاستبدال (' . $bkErr . ').';
             return false;
         }
 
         // 2) الاستيراد — الهدف قاعدة EMS حصرًا (يُمرَّر منّا لا من الملف)
         $cnf = ems_dbtool_write_cnf();
         if ($cnf === null) {
-            $err = 'تعذّر تجهيز ملف الاعتمادات المؤقّت.';
+            $err = 'تعذر تجهيز ملف الاعتمادات المؤقت.';
             return false;
         }
         $args = array(
@@ -494,10 +494,10 @@ if (!function_exists('ems_dbtool_bin_dir')) {
             $cfg = ems_dbtool_schedule_get();
         }
         if (empty($cfg['enabled'])) {
-            return 'متوقّفة';
+            return 'متوقفة';
         }
         if (empty($cfg['last_run_at'])) {
-            return 'عند أقرب تشغيلٍ مجدول';
+            return 'عند أقرب تشغيل مجدول';
         }
         $next = strtotime((string) $cfg['last_run_at']) + max(1, intval($cfg['interval_days'])) * 86400;
         return date('Y/m/d H:i', $next);
@@ -531,7 +531,7 @@ if (!function_exists('ems_dbtool_bin_dir')) {
         $err = '';
         $cfg = ems_dbtool_schedule_get();
         if (!$force && empty($cfg['enabled'])) {
-            return array('ok' => false, 'skipped' => true, 'message' => 'الجدولة معطّلة.');
+            return array('ok' => false, 'skipped' => true, 'message' => 'الجدولة معطلة.');
         }
         if (!$force && !ems_dbtool_schedule_due($cfg)) {
             return array('ok' => false, 'skipped' => true, 'message' => 'لم يحن موعد النسخة بعد.');
@@ -551,7 +551,7 @@ if (!function_exists('ems_dbtool_bin_dir')) {
             $pruned = ems_dbtool_prune_scheduled($cfg['retention']);
             $cfg['last_status']  = 'success';
             $cfg['last_message'] = 'تم — ' . basename($path) . ' (' . ems_dbtool_human_size(filesize($path)) . ')'
-                                 . ($pruned ? " — حُذفت {$pruned} نسخة قديمة" : '');
+                                 . ($pruned ? " — حذفت {$pruned} نسخة قديمة" : '');
             $cfg['last_file']    = basename($path);
             ems_dbtool_schedule_save($cfg);
             @unlink($lock);

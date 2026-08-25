@@ -45,8 +45,8 @@ class CapacityContextResolver
               ORDER BY s.id DESC LIMIT 1",
             array($equipmentId, $date, $date, $contractId, $contractId));
         if (!$asg) {
-            $missing[] = 'لا تخصيصَ فعّالًا للمعدة #' . $equipmentId . ' في مقعدٍ تعاقديٍّ يوم ' . $date;
-            $links[] = 'Contracts/contract_containers.php?contract_id=' . $contractId . ' — خصّص المعدةَ لمقعدها أولًا';
+            $missing[] = 'لا تخصيص فعالا للمعدة #' . $equipmentId . ' في مقعد تعاقدي يوم ' . $date;
+            $links[] = 'Contracts/contract_containers.php?contract_id=' . $contractId . ' — خصص المعدة لمقعدها أولا';
         } else {
             $a = $asg[0];
             $keys['cap_assignment_id'] = (int) $a['asg_id'];
@@ -54,8 +54,8 @@ class CapacityContextResolver
             // §12.1-⑥: الدورُ لحظةَ الواقعة — والاحتياطيُّ غيرُ المفعَّل لا يعمل أصلًا
             if ((string) $a['assignment_role'] === 'احتياطي') {
                 if ((string) $a['activation_state'] !== 'active') {
-                    $missing[] = 'المعدةُ احتياطيةٌ غيرُ مفعَّلة — لا تُسجَّل لها ساعاتُ عقدٍ قبل التفعيل (§4-④)';
-                    $links[] = 'Operations/containers.php — فعِّل الاحتياطيَّ بحدثٍ له سببٌ ومعتمِد';
+                    $missing[] = 'المعدة احتياطية غير مفعلة — لا تسجل لها ساعات عقد قبل التفعيل (§4-④)';
+                    $links[] = 'Operations/containers.php — فعل الاحتياطي بحدث له سبب ومعتمد';
                 } else {
                     $keys['cap_role_snapshot'] = 'standby';
                 }
@@ -89,8 +89,8 @@ class CapacityContextResolver
             }
         }
         if ($keys['cap_obligation_id'] === null) {
-            $missing[] = 'لا التزامَ نوعِ معدةٍ مربوطًا بالمقعد أو ببند المورد (§12.1-①)';
-            $links[] = 'Clients/contract_commitments.php — عرِّف التزامَ النوع واربطه بالشجرة';
+            $missing[] = 'لا التزام نوع معدة مربوطا بالمقعد أو ببند المورد (§12.1-①)';
+            $links[] = 'Clients/contract_commitments.php — عرف التزام النوع واربطه بالشجرة';
         }
 
         // ⑦ تغطيةٌ بديلةٌ فعّالةٌ على المقعد يومَ الواقعة
@@ -117,8 +117,8 @@ class CapacityContextResolver
             $keys['cap_measure_code'] = $unitType;
         }
         if ($keys['cap_measure_code'] === null) {
-            $missing[] = 'مقياسُ القدرة غيرُ محدَّد — الوحدةُ «' . $unitType . '» خارج مقاييس §16 الأربعة';
-            $links[] = 'Clients/contract_commitments.php — حدِّد measure_code في التزام النوع';
+            $missing[] = 'مقياس القدرة غير محدد — الوحدة «' . $unitType . '» خارج مقاييس §16 الأربعة';
+            $links[] = 'Clients/contract_commitments.php — حدد measure_code في التزام النوع';
         }
 
         return array('keys' => $keys, 'missing' => $missing, 'links' => $links,
@@ -149,10 +149,10 @@ class CapacityContextResolver
         $rows = $gate->scopedQuery(array('scope' => array('e' => 'unit_entries')),
             "SELECT e.cap_context_state FROM unit_entries e WHERE {TENANT_SCOPE} AND e.id = ?",
             array((int) $entryId));
-        if (!$rows) { return array('ok' => false, 'code' => 404, 'reason' => 'الواقعةُ غيرُ موجودةٍ في نطاقك'); }
+        if (!$rows) { return array('ok' => false, 'code' => 404, 'reason' => 'الواقعة غير موجودة في نطاقك'); }
         if ((string) $rows[0]['cap_context_state'] === 'locked') {
             return array('ok' => false, 'code' => 423,
-                'reason' => 'اللقطةُ مثبَّتةٌ عند الاعتماد — لا تُحلّ المراجعُ ثانيةً أبدًا (C29)');
+                'reason' => 'اللقطة مثبتة عند الاعتماد — لا تحل المراجع ثانية أبدا (C29)');
         }
         $upd = array('cap_context_state' => in_array((string) $state, array('proposed', 'confirmed'), true) ? $state : 'proposed');
         foreach (array('cap_obligation_id', 'cap_supplier_share_id', 'cap_seat_id', 'cap_assignment_id',
@@ -160,7 +160,7 @@ class CapacityContextResolver
             if (array_key_exists($k, $keys)) { $upd[$k] = $keys[$k]; }
         }
         $gate->update('unit_entries', $upd, array('id' => (int) $entryId));
-        return array('ok' => true, 'code' => 200, 'reason' => 'خُتمت المفاتيحُ (' . $upd['cap_context_state'] . ') — تُعرض للتأكيد لا للإدخال');
+        return array('ok' => true, 'code' => 200, 'reason' => 'ختمت المفاتيح (' . $upd['cap_context_state'] . ') — تعرض للتأكيد لا للإدخال');
     }
 
     /**
@@ -170,6 +170,6 @@ class CapacityContextResolver
     public static function lockSnapshot($g, $entryId)
     {
         $g->update('unit_entries', array('cap_context_state' => 'locked'), array('id' => (int) $entryId));
-        return array('ok' => true, 'code' => 200, 'reason' => 'ثُبّتت اللقطةُ — لا تُحلّ ثانيةً (C29)');
+        return array('ok' => true, 'code' => 200, 'reason' => 'ثبتت اللقطة — لا تحل ثانية (C29)');
     }
 }

@@ -39,7 +39,7 @@ $COLS   = array (
   7 => 'ساعات التوقف — عميل',
   8 => 'ساعات التوقف — مورد',
   9 => 'ساعات التوقف — نحن',
-  10 => 'فاقد غير منفَّذ',
+  10 => 'فاقد غير منفذ',
   11 => 'توقف صيانة',
   12 => 'توقف موارد بشرية',
   13 => 'توقف تسويات',
@@ -55,7 +55,7 @@ $COLS   = array (
   23 => 'الكيان',
   24 => 'مفتاح منع التكرار',
   25 => 'درجة الأثر',
-  26 => 'معكوس بـ',
+  26 => 'معكوس ب',
   27 => 'عكس عن',
   28 => 'مركز التكلفة',
   29 => 'سعر الصرف ومصدره',
@@ -72,7 +72,7 @@ $FIELDS = array (
   7 => 'ساعات التوقف — عميل',
   8 => 'ساعات التوقف — مورد',
   9 => 'ساعات التوقف — نحن',
-  10 => 'فاقد غير منفَّذ',
+  10 => 'فاقد غير منفذ',
   11 => 'توقف صيانة',
   12 => 'توقف موارد بشرية',
   13 => 'توقف تسويات',
@@ -102,7 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     $creator = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
     // الموجة ٢: الحفظ في الجدول الأصلي للشاشة (الفارغ NULL — لا مخزن بينيًّا)
     $ok = cmp03_store_insert($conn, $company_id, $CANONICAL, $payload, $status, $uid, $creator);
-    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
+    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
     exit();
 }
 
@@ -117,7 +117,7 @@ $entityName = $govCtx['values']['entity'] ?? '—';
 function cmp03_cell($col, $row, $entityName) {
     $n = cmp03_screen_norm($col);
     if ($n === cmp03_screen_norm('الكيان')) { return $entityName; }
-    if ($n === cmp03_screen_norm('المُنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المُنشئة')) {
+    if ($n === cmp03_screen_norm('المنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المنشئة')) {
         return $row['created_by_name'] ?: '—';
     }
     if ($n === cmp03_screen_norm('تاريخ الإنشاء')) { return $row['created_at']; }
@@ -125,7 +125,7 @@ function cmp03_cell($col, $row, $entityName) {
     if ($n === cmp03_screen_norm('مفتاح منع التكرار')) { return 'CMP03-' . intval($row['id']); }
     /* عمودا العكس — مصدرُهما نصُّ الحالةِ الذي يكتبه cmp03_store_reverse
        (لا عمودَ لهما في scr_*، والوصلُ مكتوبٌ هناك). */
-    if ($n === cmp03_screen_norm('معكوس بـ')) {
+    if ($n === cmp03_screen_norm('معكوس ب')) {
         return cmp03_reversal_ref($row['status'], 'reversed_by') ?: '—';
     }
     if ($n === cmp03_screen_norm('عكس عن')) {
@@ -140,7 +140,7 @@ function cmp03_screen_norm($s) {
     $s = str_replace(array('أ','إ','آ'), 'ا', $s);
     $s = str_replace('ة', 'ه', $s);
     $s = str_replace('ى', 'ي', $s);
-    return preg_replace('/[ًٌٍَُِّْ]/u', '', $s);
+    return preg_replace('/[]/u', '', $s);
 }
 
 $page_title = 'إيكوبيشن | الأداء الشهري للوحدة';
@@ -164,7 +164,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
-    echo ems_states_bundle('لا سجلاتِ أداءٍ شهريٍّ للوحداتِ مسجَّلةً بعدُ', 'أضف أولَ صفٍّ بزرِّ «إضافة» في رأسِ الشاشة');
+    echo ems_states_bundle('لا سجلات أداء شهري للوحدات مسجلة بعد', 'أضف أول صف بزر «إضافة» في رأس الشاشة');
     ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
@@ -196,7 +196,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" inputmode="decimal" name="f8" placeholder="0" id="emsf_1034_75a73"></div>
                 <div class="form-group"><label for="emsf_1035_58ee3">ساعات التوقف — نحن</label>
                     <input type="text" inputmode="decimal" name="f9" placeholder="0" id="emsf_1035_58ee3"></div>
-                <div class="form-group"><label for="emsf_1036_d0d34">فاقد غير منفَّذ</label>
+                <div class="form-group"><label for="emsf_1036_d0d34">فاقد غير منفذ</label>
                     <input type="text" name="f10" maxlength="190" id="emsf_1036_d0d34"></div>
                 <div class="form-group"><label for="emsf_1037_5f649">توقف صيانة</label>
                     <input type="text" name="f11" maxlength="190" id="emsf_1037_5f649"></div>
@@ -252,7 +252,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th>ساعات التوقف — عميل</th>
             <th>ساعات التوقف — مورد</th>
             <th>ساعات التوقف — نحن</th>
-            <th>فاقد غير منفَّذ</th>
+            <th>فاقد غير منفذ</th>
             <th>توقف صيانة</th>
             <th>توقف موارد بشرية</th>
             <th>توقف تسويات</th>
@@ -265,10 +265,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th>بند الجزاء</th>
             <th>قيمة الجزاء</th>
             <th class="ems-gov-th none" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-            <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+            <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
             <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-            <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
-            <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+            <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
+            <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
             <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
             <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
             <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
@@ -276,7 +276,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="31" class="text-center text-muted">لا بياناتَ بعدُ — أضف أول صفٍّ بزر «إضافة»</td></tr>
+                <tr><td colspan="31" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
                     <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>

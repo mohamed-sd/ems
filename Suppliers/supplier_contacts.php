@@ -20,7 +20,7 @@ include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/party_contacts_kit.php';
 require_once __DIR__ . '/../includes/party_contacts_view.php';
 require_once __DIR__ . '/../includes/entity_tabs.php';
-echo ems_entity_tabs('supplier', 'جهاتُ الاتصالِ والمفوضون');
+echo ems_entity_tabs('supplier', 'جهات الاتصال والمفوضون');
 
 /* حارسُ الشاشةِ **فوقَ** المعالجِ الذي يكتب — لا بعدَه */
 if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
@@ -63,10 +63,10 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main ems-unified-page-shell">
     <?php
-    $header_title   = 'جهاتُ الاتصالِ والمفوَّضون';
+    $header_title   = 'جهات الاتصال والمفوضون';
     $header_icon    = 'fa fa-address-book';
     $header_actions = array();
-    $header_back    = array('href' => 'suppliers.php', 'class' => '', 'label' => 'سجلُّ الموردين');
+    $header_back    = array('href' => 'suppliers.php', 'class' => '', 'label' => 'سجل الموردين');
     include __DIR__ . '/../includes/page_header.php';
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
@@ -76,9 +76,9 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         /* ◆ **ولا يُصيَّر نموذجٌ بلا طرف**: صفٌّ بلا موردٍ مرجعيٍّ يُكتَب ثم لا
              يُعرَف صاحبُه — فيُمنع الإدخالُ ويُشرَح السبب. */
         echo '<div class="card"><div class="card-body"><p class="pc-note">'
-           . '<strong>افتح هذا التبويبَ من ملفِّ موردٍ بعينه</strong> — '
-           . 'جهةُ الاتصالِ تابعةٌ لمورد، ولا تُسجَّل بلا طرفٍ مرجعيّ.'
-           . ' <a href="suppliers.php">سجلُّ الموردين</a></p></div></div>';
+           . '<strong>افتح هذا التبويب من ملف مورد بعينه</strong> — '
+           . 'جهة الاتصال تابعة لمورد، ولا تسجل بلا طرف مرجعي.'
+           . ' <a href="suppliers.php">سجل الموردين</a></p></div></div>';
     } else {
         $label = (string) (isset($supplier['name']) && $supplier['name'] !== ''
             ? $supplier['name'] : ('#' . $SID));

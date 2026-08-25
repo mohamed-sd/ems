@@ -79,7 +79,7 @@ if (!function_exists('ems_proc_may_finance_approve')) {
 // (القناةُ الدورية cron_proc_replenish.php؛ والزرُّ لمن لا ينتظر الساعة)
 /* AC-F2: حارسُ الكتابةِ المركزيُّ **قبلَ** أولِ عبارةِ كتابة — fail-closed.
    وفحوصُ $can_add/$can_edit تبقى داخلَ فروعِها: تلك تميّز الفعلَ وهذا يحرس البوابة. */
-ems_require_action($conn, 'Procurement/requests_proc.php', 'write', array('deny_msg' => 'طلباتُ الشراءِ تحتاج صلاحيةَ تحرير'));
+ems_require_action($conn, 'Procurement/requests_proc.php', 'write', array('deny_msg' => 'طلبات الشراء تحتاج صلاحية تحرير'));
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'generate_needs') {
     if (!$can_add) { ems_gov_flash_redirect('requests_proc.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
     require_once __DIR__ . '/../app/Services/Procurement/ProcReorderService.php';
@@ -90,9 +90,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'gener
     $n = count($b['generated']) + count($r2['generated']);
     $sk = count($b['skipped']) + count($r2['skipped']);
     ems_gov_redirect("Location: requests_proc.php?msg=" . urlencode(
-        $n > 0 ? "وُلّد $n طلبًا (صيانة: " . count($b['generated']) . " · حد الطلب: " . count($r2['generated']) . ")"
-               . ($sk ? " — وتُخطي $sk بعطالته" : '') . " ✅"
-               : "لا احتياجَ جديدًا — كلُّ المفتوح مغطًّى بطلبه" . ($sk ? " ($sk بعطالته)" : '') . " ✅"
+        $n > 0 ? "ولد $n طلبا (صيانة: " . count($b['generated']) . " · حد الطلب: " . count($r2['generated']) . ")"
+               . ($sk ? " — وتخطي $sk بعطالته" : '') . " ✅"
+               : "لا احتياج جديدا — كل المفتوح مغطى بطلبه" . ($sk ? " ($sk بعطالته)" : '') . " ✅"
     )); exit();
 }
 
@@ -176,7 +176,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['need_source'])) {
         $g->replaceChildren('proc_request', $req_id, 'proc_request_line', 'request_id', $line_rows, 'request lines rewrite');
     } catch (\Throwable $e) {
         error_log('requests_proc save refused: ' . $e->getMessage());
-        ems_gov_flash_redirect('requests_proc.php', 'تعذّر الحفظ ❌', 'GOV-FAIL-409', ''); exit();
+        ems_gov_flash_redirect('requests_proc.php', 'تعذر الحفظ ❌', 'GOV-FAIL-409', ''); exit();
     }
     ems_gov_redirect("Location: requests_proc.php?msg=" . ($is_editing ? 'تم+تعديل+الطلب+بنجاح+✅' : 'تمت+إضافة+الطلب+بنجاح+✅')); exit();
 }
@@ -211,7 +211,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'e21_d
         if ($blocked !== null) { ems_gov_flash_redirect('requests_proc.php', $blocked['reason'] . ' ❌', 'GOV-FAIL-409', ''); exit(); }
     }
     if (in_array($decision, array('return', 'reject'), true) && $reason === '') {
-        ems_gov_flash_redirect('requests_proc.php', 'الإعادةُ والرفضُ بسببٍ مكتوبٍ إلزامًا ❌', 'GOV-FAIL-409', ''); exit();
+        ems_gov_flash_redirect('requests_proc.php', 'الإعادة والرفض بسبب مكتوب إلزاما ❌', 'GOV-FAIL-409', ''); exit();
     }
     /* ══ INJ-0089 · «فوقَ سقفِ المشترياتِ لا يُعتمد داخلَ الإدارة» ══════════════
          نصُّ القبول: «طلبُ شراءٍ بقيمةٍ فوق سقفِ المشتريات **لا يمكن اعتمادُه
@@ -252,18 +252,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'e21_d
                             ?, ?, 'USD', 'قيد المراجعة', 'escalation', ?, ?)");
                 if ($__esc) {
                     $__rq = 'ESC-PR-' . $rid . '-' . date('ymdHis');
-                    $__doc = 'طلبُ شراءٍ ' . (string) ($req['code'] ?? ('#' . $rid));
-                    $__why = 'تجاوزُ سقفِ المشتريات — ' . $__sig['reason'];
+                    $__doc = 'طلب شراء ' . (string) ($req['code'] ?? ('#' . $rid));
+                    $__why = 'تجاوز سقف المشتريات — ' . $__sig['reason'];
                     $__amt = (string) $__total;
-                    $__nm  = 'معتمِدُ المشتريات #' . (int) $current_user_id;
+                    $__nm  = 'معتمد المشتريات #' . (int) $current_user_id;
                     $__uidI = (int) $current_user_id;
                     $__esc->bind_param('sssssis', $__rq, $__doc, $__why, $__amt, $__uidI, $__nm);
                     $__esc->execute();
                     $__esc->close();
                 }
                 ems_gov_flash_redirect('requests_proc.php',
-                    'PROC-CAP-409: ' . $__sig['reason'] . ' — **رُفع الطلبُ إلى صندوقِ اعتمادِ نائبِ المالية** ⤴',
-                    'GOV-FAIL-409', 'الاعتمادُ داخلَ الإدارةِ لا يتجاوز سقفَها');
+                    'PROC-CAP-409: ' . $__sig['reason'] . ' — **رفع الطلب إلى صندوق اعتماد نائب المالية** ⤴',
+                    'GOV-FAIL-409', 'الاعتماد داخل الإدارة لا يتجاوز سقفها');
                 exit();
             }
         }
@@ -277,7 +277,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'e21_d
     ems_audit_change($conn, 'procurement', 'proc_request', 'e21_' . $decision, $rid,
         array('state' => 'مقدَّم'), array('state' => $to, 'reason' => $reason),
         array('company_id' => intval($company_id), 'user_id' => intval($current_user_id)));
-    ems_gov_flash_redirect('requests_proc.php', 'قرارٌ بالثلاثية: ' . $to . ' ✅', 'GOV-OK-200', ''); exit();
+    ems_gov_flash_redirect('requests_proc.php', 'قرار بالثلاثية: ' . $to . ' ✅', 'GOV-OK-200', ''); exit();
 }
 
 if (isset($_GET['delete_id'])) {
@@ -326,11 +326,11 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
         $clsopts .= '<option value="' . htmlspecialchars($c) . '"' . $sel . '>' . htmlspecialchars($c) . '</option>';
     }
     return '<div class="proc-line form-grid proc-req-line">'
-        . '<div class="form-group"><label>الصنف (كتالوج)</label><select name="line_item_id[]" class="line-item" aria-label="الصنفُ من كتالوج الأصناف">' . $opts . '</select></div>'
-        . '<div class="form-group"><label>اسم الصنف <span class="required">*</span></label><input type="text" name="line_item_name[]" class="line-name" aria-label="اسمُ الصنفِ المطلوب" value="' . $iname . '" required></div>'
-        . '<div class="form-group"><label>الكمية</label><input type="number" step="0.01" name="line_qty[]" aria-label="الكميةُ المطلوبةُ من الصنف" value="' . $qty . '"></div>'
-        . '<div class="form-group"><label>تصنيف السطر</label><select name="line_class[]" aria-label="التصنيفُ التشغيليُّ لسطرِ الطلب">' . $clsopts . '</select></div>'
-        . '<div class="form-group"><label>ملاحظة</label><input type="text" name="line_note[]" aria-label="ملاحظةُ سطرِ الطلب" value="' . $note . '"></div>'
+        . '<div class="form-group"><label>الصنف (كتالوج)</label><select name="line_item_id[]" class="line-item" aria-label="الصنف من كتالوج الأصناف">' . $opts . '</select></div>'
+        . '<div class="form-group"><label>اسم الصنف <span class="required">*</span></label><input type="text" name="line_item_name[]" class="line-name" aria-label="اسم الصنف المطلوب" value="' . $iname . '" required></div>'
+        . '<div class="form-group"><label>الكمية</label><input type="number" step="0.01" name="line_qty[]" aria-label="الكمية المطلوبة من الصنف" value="' . $qty . '"></div>'
+        . '<div class="form-group"><label>تصنيف السطر</label><select name="line_class[]" aria-label="التصنيف التشغيلي لسطر الطلب">' . $clsopts . '</select></div>'
+        . '<div class="form-group"><label>ملاحظة</label><input type="text" name="line_note[]" aria-label="ملاحظة سطر الطلب" value="' . $note . '"></div>'
         . '<div class="form-group"><button type="button" class="btn-secondary removeLine"><i class="fas fa-times"></i></button></div>'
         . '</div>';
 }
@@ -347,8 +347,8 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا طلباتِ شراءٍ مطابقةً للفلاترِ الحالية',
-        'أضف طلبًا جديدًا من رأسِ الشاشة، أو ولّد الاحتياجَ آليًّا من الصيانةِ وحدودِ إعادة الطلب');
+    echo ems_states_bundle('لا طلبات شراء مطابقة للفلاتر الحالية',
+        'أضف طلبا جديدا من رأس الشاشة، أو ولد الاحتياج آليا من الصيانة وحدود إعادة الطلب');
     ?>
 
     <?php proc_msg_banner(); ?>
@@ -370,7 +370,7 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
     if ($__rqDept !== '' && !in_array($__rqDept, $__rqDepts, true)) { $__rqDept = ''; }
     ?>
     <form method="get" class="filter" data-ems-period="1">
-        <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-calendar-days"></i></span> فترةُ الإنشاءِ والإدارةُ الطالبة</div>
+        <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-calendar-days"></i></span> فترة الإنشاء والإدارة الطالبة</div>
         <div class="filter-body">
             <div class="filter-field"><label for="rqFrom">من تاريخ</label>
                 <input type="date" id="rqFrom" name="from" class="form-control" value="<?php echo htmlspecialchars($__rqFrom, ENT_QUOTES, 'UTF-8'); ?>"></div>
@@ -378,7 +378,7 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
                 <input type="date" id="rqTo" name="to" class="form-control" value="<?php echo htmlspecialchars($__rqTo, ENT_QUOTES, 'UTF-8'); ?>"></div>
             <div class="filter-field"><label for="rqDept">الإدارة الطالبة</label>
                 <select id="rqDept" name="dept" class="form-control">
-                    <option value="">— كلُّ الإدارات —</option>
+                    <option value="">— كل الإدارات —</option>
                     <?php foreach ($__rqDepts as $__d): ?>
                     <option value="<?php echo htmlspecialchars($__d, ENT_QUOTES, 'UTF-8'); ?>"<?php
                         echo ($__d === $__rqDept ? ' selected' : ''); ?>><?php
@@ -406,11 +406,11 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
             'where' => array('id' => intval($_GET['prefill_item']))));
     ?>
     <div class="alert alert-info">
-        <i class="fa fa-cart-plus"></i> طلبُ شراءٍ من زرِّ النقص —
+        <i class="fa fa-cart-plus"></i> طلب شراء من زر النقص —
         الصنف: <strong><?php echo htmlspecialchars((string)($pfItem['name'] ?? ('#' . intval($_GET['prefill_item'])))); ?></strong>
         · المصدر: <strong><?php echo htmlspecialchars((string)($_GET['need_source'] ?? '')); ?></strong>
-        · مرجعُ الأمر: <strong><?php echo htmlspecialchars((string)($_GET['source_ref'] ?? '')); ?></strong>
-        — عبّئ النموذجَ بها.
+        · مرجع الأمر: <strong><?php echo htmlspecialchars((string)($_GET['source_ref'] ?? '')); ?></strong>
+        — عبئ النموذج بها.
     </div>
     <?php endif; ?>
 
@@ -485,7 +485,7 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
                         <label>حالة الاعتماد المالي</label>
                         <div class="ems-readonly-value">
                             <?php echo htmlspecialchars($edit ? (string) $edit['fin_approval_state'] : 'بانتظار'); ?>
-                            <small class="text-muted">— يضبطها الاعتمادُ الماليُّ لا مُقدِّمُ الطلب</small>
+                            <small class="text-muted">— يضبطها الاعتماد المالي لا مقدم الطلب</small>
                         </div>
                     </div>
                     <?php endif; ?>
@@ -527,7 +527,7 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
                    data-scroll-x="1" data-state-save="false">
                 <thead><tr>
                     <th>الإجراءات</th><th>الكود</th><th>مصدر الاحتياج</th><th>التصنيف التشغيلي</th><th>الأولوية</th>
-                    <th>الحالة</th><th>الاعتماد المالي</th><th>عدد الأصناف</th><th>أُنشئ</th>
+                    <th>الحالة</th><th>الاعتماد المالي</th><th>عدد الأصناف</th><th>أنشئ</th>
                     <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
                     <th class="ems-fn-th" data-fn="1">رقم الطلب</th>
                     <th class="ems-fn-th" data-fn="1">تاريخ الطلب</th>
@@ -541,11 +541,11 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
                     <th class="ems-fn-th" data-fn="1">القيمة التقديرية</th>
                     <th class="ems-fn-th" data-fn="1">بند الموازنة</th>
                     <th class="ems-fn-th" data-fn="1">المتاح في الموازنة</th>
-                    <th class="ems-fn-th" data-fn="1">قدّمه</th>
+                    <th class="ems-fn-th" data-fn="1">قدمه</th>
                     <th class="ems-fn-th none" data-fn="1">اعتماد الإدارة</th>
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                    <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                    <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                    <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                     <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                     <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                     <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
@@ -617,14 +617,14 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
                                . "<input type='hidden' name='action' value='e21_decide'>"
                                . "<input type='hidden' name='request_id' value='{$rid}'>"
                                . "<input type='hidden' name='decision' value='return'>"
-                               . "<input type='text' name='reason' placeholder='سببُ الإعادة *' required class='proc-req-reason'>"
-                               . "<button type='submit' class='btn-primary' title='إعادةٌ للاستكمال'>↩</button></form>"
+                               . "<input type='text' name='reason' placeholder='سبب الإعادة *' required class='proc-req-reason'>"
+                               . "<button type='submit' class='btn-primary' title='إعادة للاستكمال'>↩</button></form>"
                                . "<form method='post' class='proc-req-decide-form proc-req-decide-reason'>"
                                . csrf_field()
                                . "<input type='hidden' name='action' value='e21_decide'>"
                                . "<input type='hidden' name='request_id' value='{$rid}'>"
                                . "<input type='hidden' name='decision' value='reject'>"
-                               . "<input type='text' name='reason' placeholder='سببُ الرفض *' required class='proc-req-reason'>"
+                               . "<input type='text' name='reason' placeholder='سبب الرفض *' required class='proc-req-reason'>"
                                . "<button type='submit' class='btn-primary' title='رفض'>✗</button></form></div>";
                         }
                         echo "</td>";

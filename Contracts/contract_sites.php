@@ -63,18 +63,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && strval($_POST['cs_action'] ?? '') !
             'is_primary' => isset($_POST['is_primary']) ? 1 : 0,
             'note' => strval($_POST['note'] ?? ''),
         ), $uid);
-        $redirect($r['ok'] ? 'أُضيف النطاق ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $cid);
+        $redirect($r['ok'] ? 'أضيف النطاق ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $cid);
     }
     if ($act === 'primary') {
         if (!$can_edit) { $redirect('لا توجد صلاحية ❌', $cid); }
         $r = CSS::setPrimary($conn, $gate, $company_id, intval($_POST['scope_id'] ?? 0), $uid);
-        $redirect($r['ok'] ? 'نُقلت الرئاسة ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $cid);
+        $redirect($r['ok'] ? 'نقلت الرئاسة ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $cid);
     }
     if ($act === 'close') {
         if (!$can_edit) { $redirect('لا توجد صلاحية ❌', $cid); }
         $r = CSS::close($conn, $gate, $company_id, intval($_POST['scope_id'] ?? 0),
                         strval($_POST['close_reason'] ?? ''), $uid);
-        $redirect($r['ok'] ? 'أُقفل النطاقُ بسببه ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $cid);
+        $redirect($r['ok'] ? 'أقفل النطاق بسببه ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $cid);
     }
 }
 
@@ -105,8 +105,8 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     include('../includes/page_header.php');
     if (isset($_GET['msg'])) { echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>'; }
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا
-    echo ems_states_bundle('لا نطاقاتٍ تشغيليةً مسجَّلةً على العقدِ المختار',
-                           'اختر عقدًا من جدولِ العقودِ أعلاه ثمّ أضف نطاقًا بنموذجِ «إضافةُ نطاق»');
+    echo ems_states_bundle('لا نطاقات تشغيلية مسجلة على العقد المختار',
+                           'اختر عقدا من جدول العقود أعلاه ثم أضف نطاقا بنموذج «إضافة نطاق»');
     ?>
 
     <style>
@@ -130,32 +130,32 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     <div class="card"><div class="card-body">
         <p class="cs-note">
             <i class="fas fa-circle-info"></i>
-            <strong>نطاقُ العقد التشغيلي</strong> مفهومٌ بأربعة أبعاد (اسمٌ · مدةٌ · موقعٌ · بنود) —
-            وكان مختزَلًا في عمودٍ واحدٍ يشير إلى موقعٍ واحد، فعقدٌ يعمل في موقعين
-            <strong>لا يمكن تمثيلُه أصلًا</strong>. والقواعد:
-            <strong>النطاقُ داخل مدة عقده</strong> · <strong>والموقعُ مرةً واحدة</strong> ·
-            <strong>ورئيسٌ واحدٌ على الأكثر</strong> · <strong>والإقفالُ بسببٍ مكتوب</strong>.
+            <strong>نطاق العقد التشغيلي</strong> مفهوم بأربعة أبعاد (اسم · مدة · موقع · بنود) —
+            وكان مختزلا في عمود واحد يشير إلى موقع واحد، فعقد يعمل في موقعين
+            <strong>لا يمكن تمثيله أصلا</strong>. والقواعد:
+            <strong>النطاق داخل مدة عقده</strong> · <strong>والموقع مرة واحدة</strong> ·
+            <strong>ورئيس واحد على الأكثر</strong> · <strong>والإقفال بسبب مكتوب</strong>.
         </p>
         <?php if ($noScope): ?>
             <span class="badge badge-danger cs-badge-pad">
                 <i class="fas fa-triangle-exclamation"></i>
-                <?php echo count($noScope); ?> عقدًا <strong>بلا نطاقٍ تشغيلي</strong></span>
+                <?php echo count($noScope); ?> عقدا <strong>بلا نطاق تشغيلي</strong></span>
         <?php else: ?>
             <span class="badge badge-success cs-badge-pad">
-                <i class="fas fa-check"></i> صفرُ عقدٍ بلا نطاق</span>
+                <i class="fas fa-check"></i> صفر عقد بلا نطاق</span>
         <?php endif; ?>
     </div></div>
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-file-contract"></i> العقود</h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap no-datatable cs-table" data-no-dt="1">
-            <thead><tr><th>#</th><th>المشروع</th><th>الطرفُ الثاني</th><th>المدة</th>
+            <thead><tr><th>#</th><th>المشروع</th><th>الطرف الثاني</th><th>المدة</th>
                 <th>الحال</th><th>النطاقات</th><th></th>
                 <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                 <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                 <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                 <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -180,7 +180,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
 
     <?php if ($head): ?>
     <div class="card"><div class="card-header"><h5><i class="fa fa-map-location-dot"></i>
-        نطاقاتُ العقد #<?php echo $sel; ?></h5></div>
+        نطاقات العقد #<?php echo $sel; ?></h5></div>
     <div class="card-body">
         <div class="table-container">
         <table class="alltables display nowrap no-datatable cs-table" data-no-dt="1">
@@ -210,7 +210,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                                 <input type="hidden" name="cs_action" value="primary">
                                 <input type="hidden" name="contract_id" value="<?php echo $sel; ?>">
                                 <input type="hidden" name="scope_id" value="<?php echo intval($s['id']); ?>">
-                                <button type="submit" class="badge badge-info cs-chip-btn">اجعله رئيسيًّا</button>
+                                <button type="submit" class="badge badge-info cs-chip-btn">اجعله رئيسيا</button>
                             </form>
                         <?php endif; ?>
                         <?php if ((string)$s['state'] !== 'closed'): ?>
@@ -220,7 +220,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                                 <input type="hidden" name="contract_id" value="<?php echo $sel; ?>">
                                 <input type="hidden" name="scope_id" value="<?php echo intval($s['id']); ?>">
                                 <input type="text" name="close_reason" required maxlength="200"
-                                       placeholder="سببُ الإقفال" class="cs-w130" aria-label="سببُ الإقفال">
+                                       placeholder="سبب الإقفال" class="cs-w130" aria-label="سبب الإقفال">
                                 <button type="submit" class="badge badge-danger cs-chip-btn">أقفل</button>
                             </form>
                         <?php endif; ?>
@@ -228,7 +228,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     <?php endif; ?>
                 </tr>
             <?php endforeach; ?>
-            <?php if (!$scopes): ?><tr><td colspan="7"><em>لا نطاقاتٍ — والعقدُ بلا نطاقٍ لا يُسند إليه عمل</em></td></tr><?php endif; ?>
+            <?php if (!$scopes): ?><tr><td colspan="7"><em>لا نطاقات — والعقد بلا نطاق لا يسند إليه عمل</em></td></tr><?php endif; ?>
             </tbody>
         </table>
         </div>
@@ -246,7 +246,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                                 <?php echo htmlspecialchars((string)$s['name']); ?>
                                 (<?php echo (string)$s['site_kind'] === 'mine' ? 'منجم' : 'موقع'; ?>)</option>
                         <?php endforeach; ?></select></div>
-                <div class="form-group"><label for="emsf_105_4b108">اسمُ النطاق <small>— فارغٌ = اسمُ الموقع</small></label>
+                <div class="form-group"><label for="emsf_105_4b108">اسم النطاق <small>— فارغ = اسم الموقع</small></label>
                     <input type="text" name="scope_name" maxlength="190" id="emsf_105_4b108"></div>
                 <div class="form-group"><label for="emsf_106_1593e">من تاريخ</label><input type="date" name="start_date" id="emsf_106_1593e"></div>
                 <div class="form-group"><label for="emsf_107_66d13">إلى تاريخ</label><input type="date" name="end_date" id="emsf_107_66d13"></div>
@@ -254,12 +254,12 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     <select name="state" id="emsf_108_4d681"><option value="active">نافذ</option>
                         <option value="planned">مخطط</option><option value="paused">موقوف</option></select></div>
                 <div class="form-group"><label class="cs-check-label" for="emsf_109_b3899">
-                    <input type="checkbox" name="is_primary" aria-label="اجعله النطاقَ الرئيسيَّ للعقد" value="1" class="cs-check"> نطاقٌ رئيسي</label></div>
+                    <input type="checkbox" name="is_primary" aria-label="اجعله النطاق الرئيسي للعقد" value="1" class="cs-check"> نطاق رئيسي</label></div>
                 <div class="form-group"><label>ملاحظة</label></div>
                 <div class="form-group"><label>ملاحظة</label><input type="text" name="note" maxlength="200" id="emsf_109_b3899"></div>
             </div>
             <div class="cs-actions"><button type="submit" class="btn-primary">
-                <i class="fa fa-plus"></i> أضف نطاقًا</button></div>
+                <i class="fa fa-plus"></i> أضف نطاقا</button></div>
         </form>
         <?php endif; ?>
     </div></div>

@@ -95,7 +95,7 @@ while ($r = $res->fetch_assoc()) {
             }
             if ($level === 3) {
                 cronreq_notify($conn, intval($r['company_id']), 'finance_manager',
-                    'تصعيدٌ للمستوى الثالث: ' . $r['request_no'] . ' تجاوز ضعف مدة مرحلته — يتصدر لوحة الاختناق',
+                    'تصعيد للمستوى الثالث: ' . $r['request_no'] . ' تجاوز ضعف مدة مرحلته — يتصدر لوحة الاختناق',
                     'FinRequests/cycle_time_board.php');
             }
             if ($level === 1) { $reminded++; } else { $escalated++; }
@@ -124,7 +124,7 @@ foreach ($expiry_rules as $rule) {
     );
     while ($p = $pre->fetch_assoc()) {
         cronreq_log($conn, intval($p['company_id']), intval($p['id']), 'note',
-            'إنذار انتهاء: الطلب راكدٌ وسينتهي آليًّا خلال ثلاثة أيامٍ ما لم يُستكمل');
+            'إنذار انتهاء: الطلب راكد وسينتهي آليا خلال ثلاثة أيام ما لم يستكمل');
         $prenoticed++;
     }
     // الانتهاء الفعلي — انتقالٌ آليٌّ محروسٌ بالحالة (هوية النظام، خارج أدوار المحرّك)
@@ -141,7 +141,7 @@ foreach ($expiry_rules as $rule) {
         $upd->close();
         if ($done === 1) {
             cronreq_log($conn, intval($e['company_id']), intval($e['id']), 'expire',
-                'انتهاءٌ آليٌّ: ركودٌ تجاوز ' . $rule['days'] . ' يومًا', $e['state'], 'expired');
+                'انتهاء آلي: ركود تجاوز ' . $rule['days'] . ' يوما', $e['state'], 'expired');
             $expired++;
         }
     }
@@ -217,9 +217,9 @@ while ($x = $exq->fetch_assoc()) {
         $upd->close();
     }
     cronreq_log($conn, intval($x['company_id']), intval($x['id']), 'exception_overdue',
-        'خرق مهلة الطارئ: 72 ساعةً انقضت منذ الاعتماد والدورة لم تُستكمل رجعيًّا — مساءلةٌ إلزامية (§8.3)');
+        'خرق مهلة الطارئ: 72 ساعة انقضت منذ الاعتماد والدورة لم تستكمل رجعيا — مساءلة إلزامية (§8.3)');
     cronreq_notify($conn, intval($x['company_id']), 'finance_manager',
-        'خرق مهلة الطارئ: ' . $x['request_no'] . ' لم تُستكمل دورته خلال 72 ساعة',
+        'خرق مهلة الطارئ: ' . $x['request_no'] . ' لم تستكمل دورته خلال 72 ساعة',
         'FinRequests/cycle_time_board.php');
     $exc_overdue++;
 }
@@ -242,8 +242,8 @@ while ($a = $arq->fetch_assoc()) {
     $upd->close();
     if ($done === 1) {
         cronreq_log($conn, intval($a['company_id']), intval($a['id']), 'archive',
-            'أرشفةٌ آلية (المرحلة ⑬): انقضت الدورة وركد ' . $ARCHIVE_AFTER_DAYS
-            . ' يومًا — سجلٌّ محفوظٌ للاطلاع والتدقيق لا يُحذف', $a['state'], 'archived');
+            'أرشفة آلية (المرحلة ⑬): انقضت الدورة وركد ' . $ARCHIVE_AFTER_DAYS
+            . ' يوما — سجل محفوظ للاطلاع والتدقيق لا يحذف', $a['state'], 'archived');
         $archived_count++;
     }
 }

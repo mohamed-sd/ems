@@ -24,7 +24,7 @@ $company_id = intval($_SESSION['user']['company_id'] ?? 0);
 $uid = intval($_SESSION['user']['id'] ?? 0);
 $msg = '';
 
-$PARTY = array('supplier' => 'مورّد', 'employee' => 'موظف', 'client' => 'عميل', 'other' => 'أخرى');
+$PARTY = array('supplier' => 'مورد', 'employee' => 'موظف', 'client' => 'عميل', 'other' => 'أخرى');
 
 $__pcNew = ems_post_contract($conn, array(
     'action'  => 'chain.beneficiary.create',
@@ -39,11 +39,11 @@ $__pcNew = ems_post_contract($conn, array(
         $c = trim((string) ($in['currency'] ?? ''));
         $a = trim((string) ($in['account_no'] ?? ''));
         $i = trim((string) ($in['iban'] ?? ''));
-        if (!isset($PARTY[$t])) { return array('ok' => false, 'msg' => 'نوعُ الطرفِ محكومٌ من قائمةٍ مغلقة (422)'); }
-        if ($r <= 0) { return array('ok' => false, 'msg' => 'مرجعُ الطرفِ إلزاميّ (422)'); }
-        if (mb_strlen($n) < 3) { return array('ok' => false, 'msg' => 'اسمُ المستفيدِ إلزاميّ (422)'); }
-        if (mb_strlen($c) < 3) { return array('ok' => false, 'msg' => 'لا حسابَ بلا عملة (422)'); }
-        if ($a === '' && $i === '') { return array('ok' => false, 'msg' => 'لا مستفيدَ بلا رقمِ حسابٍ أو آيبان (422)'); }
+        if (!isset($PARTY[$t])) { return array('ok' => false, 'msg' => 'نوع الطرف محكوم من قائمة مغلقة (422)'); }
+        if ($r <= 0) { return array('ok' => false, 'msg' => 'مرجع الطرف إلزامي (422)'); }
+        if (mb_strlen($n) < 3) { return array('ok' => false, 'msg' => 'اسم المستفيد إلزامي (422)'); }
+        if (mb_strlen($c) < 3) { return array('ok' => false, 'msg' => 'لا حساب بلا عملة (422)'); }
+        if ($a === '' && $i === '') { return array('ok' => false, 'msg' => 'لا مستفيد بلا رقم حساب أو آيبان (422)'); }
         return array('ok' => true, 'data' => array('party_type' => $t, 'party_ref' => $r,
             'beneficiary_ar' => $n, 'currency' => $c, 'account_no' => $a, 'iban' => $i,
             'bank_name' => trim((string) ($in['bank_name'] ?? ''))));
@@ -64,12 +64,12 @@ if ($__pcNew['run'] && $__pcNew['ok']) {
             'currency'       => $d['currency'],
             'created_by'     => $uid,
         ));
-        $msg = '✅ سُجِّل المستفيد — ويبقى غيرَ متحقَّقٍ حتى يعتمده غيرُ مُنشئِه (201)';
+        $msg = '✅ سجل المستفيد — ويبقى غير متحقق حتى يعتمده غير منشئه (201)';
         ems_pc_idem_mark($conn, $__pcNew['idem'], $__pcNew['code'], 'tre_beneficiaries#' . (int) $newId);
     } catch (\Throwable $e) {
         $msg = (stripos($e->getMessage(), 'duplicate') !== false)
-             ? '❌ مسجَّلٌ سلفًا بالحسابِ نفسِه — عطالة (200)'
-             : '❌ تعذّر التسجيل: ' . $e->getMessage();
+             ? '❌ مسجل سلفا بالحساب نفسه — عطالة (200)'
+             : '❌ تعذر التسجيل: ' . $e->getMessage();
     }
 }
 
@@ -80,7 +80,7 @@ $__pcVer = ems_post_contract($conn, array(
     'idem'    => array('id' => intval($_POST['verify_ben'] ?? 0)),
     'validate' => function (array $in) {
         $id = intval($in['verify_ben'] ?? 0);
-        if ($id <= 0) { return array('ok' => false, 'msg' => 'مستفيدٌ غيرُ صالح (422)'); }
+        if ($id <= 0) { return array('ok' => false, 'msg' => 'مستفيد غير صالح (422)'); }
         return array('ok' => true, 'data' => array('id' => $id));
     },
 ));
@@ -90,17 +90,17 @@ if ($__pcVer['run'] && $__pcVer['ok']) {
     $id = (int) $__pcVer['data']['id'];
     $row = $gate->selectOne('tre_beneficiaries', array(
         'columns' => array('created_by', 'verified_at'), 'where' => array('id' => $id)));
-    if (!$row)                                    { $msg = '❌ المستفيدُ غيرُ موجود (404)'; }
-    elseif ($row['verified_at'] !== null)         { $msg = '❌ متحقَّقٌ سلفًا — عطالة (200)'; }
-    elseif ((int) $row['created_by'] === $uid)    { $msg = '❌ **مَن يُنشئ لا يتحقّق** — فصلُ الواجباتِ لا يُختصر (403)'; }
+    if (!$row)                                    { $msg = '❌ المستفيد غير موجود (404)'; }
+    elseif ($row['verified_at'] !== null)         { $msg = '❌ متحقق سلفا — عطالة (200)'; }
+    elseif ((int) $row['created_by'] === $uid)    { $msg = '❌ **من ينشئ لا يتحقق** — فصل الواجبات لا يختصر (403)'; }
     else {
         $n = $gate->update('tre_beneficiaries',
             array('verified_by' => $uid, 'verified_at' => date('Y-m-d H:i:s')),
             array('id' => $id), '`verified_at` IS NULL');
         if ((int) $n > 0) {
-            $msg = '✅ تُحقِّق من الحساب — وصار صالحًا للصرفِ إليه (200)';
+            $msg = '✅ تحقق من الحساب — وصار صالحا للصرف إليه (200)';
             ems_pc_idem_mark($conn, $__pcVer['idem'], $__pcVer['code'], 'tre_beneficiaries#' . $id);
-        } else { $msg = '❌ تعذّر التحقُّق — تغيّرت الحالةُ بين القراءةِ والكتابة (409)'; }
+        } else { $msg = '❌ تعذر التحقق — تغيرت الحالة بين القراءة والكتابة (409)'; }
     }
 }
 
@@ -108,7 +108,7 @@ $rows = array(); $queueFail = '';
 try {
     $rows = $gate->select('tre_beneficiaries', array(
         'orderBy' => '`verified_at` IS NULL DESC, `id` DESC', 'limit' => 300));
-} catch (\Throwable $e) { $queueFail = 'تعذّر قراءةُ السجل: ' . $e->getMessage(); }
+} catch (\Throwable $e) { $queueFail = 'تعذر قراءة السجل: ' . $e->getMessage(); }
 
 $page_title = 'سجل المستفيدين والحسابات البنكية';
 require_once __DIR__ . '/../includes/screen_contract.php';
@@ -121,15 +121,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   <?php
   $header_icon = 'fa fa-address-book';
   $header_title_html = htmlspecialchars('سجل المستفيدين والحسابات البنكية', ENT_QUOTES, 'UTF-8');
-  ob_start(); ?><span class="badge"><?= $queueFail === '' ? count($rows) : '—' ?> مستفيدًا</span><?php
+  ob_start(); ?><span class="badge"><?= $queueFail === '' ? count($rows) : '—' ?> مستفيدا</span><?php
   $header_actions = array(array('raw' => trim((string) ob_get_clean())));
   $header_back = false;
   include __DIR__ . '/../includes/page_header.php';
-  echo ems_states_bundle('لا مستفيدَ مسجَّلٌ بعد',
-      'الحسابُ يُسجَّل ثم يتحقّق منه غيرُ مُنشئِه — ولا صرفَ إلى حسابٍ غيرِ متحقَّق');
+  echo ems_states_bundle('لا مستفيد مسجل بعد',
+      'الحساب يسجل ثم يتحقق منه غير منشئه — ولا صرف إلى حساب غير متحقق');
   ?>
-  <p class="text-muted">شرطٌ سابقٌ للموجةِ السابعة — <strong>مَن يُنشئ لا يتحقّق</strong>،
-     وقيدٌ في القاعدةِ يمنع اجتماعَ اليدَين.</p>
+  <p class="text-muted">شرط سابق للموجة السابعة — <strong>من ينشئ لا يتحقق</strong>،
+     وقيد في القاعدة يمنع اجتماع اليدين.</p>
   <?php if ($msg !== ''): ?>
     <div class="alert <?= (mb_strpos($msg, '✅') !== false ? 'alert-success' : 'alert-danger') ?>">
       <?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div>
@@ -163,22 +163,22 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   <table class="table table-striped" data-no-dt>
     <thead><tr>
       <th>الإجراء</th><th>الطرف</th><th>المستفيد</th><th>البنك</th><th>الآيبان</th>
-      <th>رقم الحساب</th><th>العملة</th><th>سجّله</th><th>تحقَّق منه</th>
+      <th>رقم الحساب</th><th>العملة</th><th>سجله</th><th>تحقق منه</th>
       <th class="ems-gov-th none" data-gov="entity" data-slice="1">الكيان</th>
-      <th class="ems-gov-th none" data-gov="creator" data-slice="1">المُنشئ</th>
+      <th class="ems-gov-th none" data-gov="creator" data-slice="1">المنشئ</th>
       <th class="ems-gov-th none" data-gov="currency" data-slice="3">العملة</th>
     </tr></thead>
     <tbody>
     <?php if (empty($rows)): ?>
-      <tr><td colspan="9" class="text-center text-muted">لا مستفيدَ مسجَّلٌ بعد</td></tr>
+      <tr><td colspan="9" class="text-center text-muted">لا مستفيد مسجل بعد</td></tr>
     <?php endif; ?>
     <?php foreach ($rows as $r): $id = (int) $r['id']; ?>
       <tr>
         <td><?php if ($r['verified_at'] === null): ?>
           <form method="post"><?php echo csrf_field(); ?>
             <input type="hidden" name="verify_ben" value="<?= $id ?>">
-            <button class="action-btn" type="submit"><i class="fa fa-shield-halved"></i> تحقُّق</button></form>
-        <?php else: ?><span class="badge">متحقَّق</span><?php endif; ?></td>
+            <button class="action-btn" type="submit"><i class="fa fa-shield-halved"></i> تحقق</button></form>
+        <?php else: ?><span class="badge">متحقق</span><?php endif; ?></td>
         <td><?= htmlspecialchars(($PARTY[$r['party_type']] ?? (string) $r['party_type']) . ' #' . (int) $r['party_ref'], ENT_QUOTES, 'UTF-8') ?></td>
         <td><?= htmlspecialchars((string) $r['beneficiary_ar'], ENT_QUOTES, 'UTF-8') ?></td>
         <td><?= htmlspecialchars((string) $r['bank_name'], ENT_QUOTES, 'UTF-8') ?></td>

@@ -62,7 +62,7 @@ if (!function_exists('ems_kpi_card')) {
             'unit'   => 'الوحدة',
             'period' => 'الفترة',
             'status' => 'الحالة',
-            'drill'  => 'التعمّق',
+            'drill'  => 'التعمق',
         );
         $missing = array();
         foreach ($need as $f => $label) {
@@ -71,17 +71,17 @@ if (!function_exists('ems_kpi_card')) {
 
         $tones = ems_kpi_tones();
         if (!$missing && !isset($tones[(string) $k['status']])) {
-            $missing[] = 'الحالة (نغمةٌ غيرُ معلنة: ' . $k['status'] . ')';
+            $missing[] = 'الحالة (نغمة غير معلنة: ' . $k['status'] . ')';
         }
 
         if ($missing) {
             /* لا يُصيَّر رقمٌ ناقصُ العقد: رقمٌ بلا مقامِه ومصدرِه يُقرَّر عليه
                خطأً — والبطاقةُ تقول ما ينقصها بدل أن تصمت. */
             return '<div class="ems-kpi-card ems-kpi-err" role="alert">'
-                 . '<div class="ems-kpi-title">بطاقةُ مؤشرٍ ناقصةُ العقد</div>'
-                 . '<div class="ems-kpi-value"><small>الحقولُ الغائبة: '
+                 . '<div class="ems-kpi-title">بطاقة مؤشر ناقصة العقد</div>'
+                 . '<div class="ems-kpi-value"><small>الحقول الغائبة: '
                  . $E(implode('، ', $missing)) . '</small></div>'
-                 . '<div class="ems-kpi-meta"><span>SH-09</span><span>املأِ السبعةَ كاملةً</span></div>'
+                 . '<div class="ems-kpi-meta"><span>SH-09</span><span>املأ السبعة كاملة</span></div>'
                  . '</div>';
         }
 
@@ -95,7 +95,7 @@ if (!function_exists('ems_kpi_card')) {
 
         /* الحالةُ نصًّا لا لونًا فقط: اللونُ وحدَه إشارةٌ لا يراها كلُّ قارئ. */
         $html  = '<a class="' . $E(trim($cls)) . '" href="' . $E($k['drill'])
-               . '" title="تعمّق: ' . $E($k['title']) . '">';
+               . '" title="تعمق: ' . $E($k['title']) . '">';
         $html .= '<div class="ems-kpi-title">' . $ico . $E($k['title']) . '</div>';
         /* ◆ **الوحدةُ أختٌ للقيمةِ لا ابنةٌ لها.** `ems-statcards.js` يجمع
              أجزاءَ البطاقةِ بأوراقِ شجرتِها: أيُّ عنصرٍ له ابنٌ عنصريٌّ يُنزَل

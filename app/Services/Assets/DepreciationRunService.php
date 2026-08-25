@@ -25,7 +25,7 @@ class DepreciationRunService
     {
         $co = (int) $companyId;
         if (!preg_match('/^\d{4}-\d{2}$/', (string) $period)) {
-            return array('ok' => false, 'summary' => 'الفترةُ بصيغةِ YYYY-MM',
+            return array('ok' => false, 'summary' => 'الفترة بصيغة YYYY-MM',
                 'posted' => 0, 'skipped_supplier' => 0, 'skipped_no_rate' => 0);
         }
 
@@ -68,8 +68,8 @@ class DepreciationRunService
         return array(
             'ok' => true, 'posted' => $posted,
             'skipped_supplier' => $skipSup, 'skipped_no_rate' => $skipRate,
-            'summary' => "احتُسب=$posted · معداتُ موردٍ متروكة=$skipSup · "
-                . "بلا معدَّلِ ساعةٍ أو طريقةٍ مقرَّرة=$skipRate · محتسَبٌ سلفًا=$already",
+            'summary' => "احتسب=$posted · معدات مورد متروكة=$skipSup · "
+                . "بلا معدل ساعة أو طريقة مقررة=$skipRate · محتسب سلفا=$already",
         );
     }
 
@@ -84,16 +84,16 @@ class DepreciationRunService
         $recId  = (int) ($in['rec_id'] ?? 0);
         $reason = trim((string) ($in['reason'] ?? ''));
         $actor  = (int) ($in['actor'] ?? 0);
-        if ($recId <= 0) { return array('ok' => false, 'reason' => 'رقمُ السطرِ إلزامي'); }
-        if ($reason === '') { return array('ok' => false, 'reason' => 'سببُ العكسِ إلزاميّ — ولا عكسَ بلا سبب'); }
+        if ($recId <= 0) { return array('ok' => false, 'reason' => 'رقم السطر إلزامي'); }
+        if ($reason === '') { return array('ok' => false, 'reason' => 'سبب العكس إلزامي — ولا عكس بلا سبب'); }
 
         $q = $conn->prepare(
             "SELECT `depreciation_amount` FROM `asset_hour_reconciliations` WHERE `rec_id`=? LIMIT 1");
         $q->bind_param('i', $recId); $q->execute();
         $row = $q->get_result()->fetch_assoc(); $q->close();
-        if (!$row) { return array('ok' => false, 'reason' => 'سطرٌ غيرُ موجود'); }
+        if (!$row) { return array('ok' => false, 'reason' => 'سطر غير موجود'); }
         if ($row['depreciation_amount'] === null) {
-            return array('ok' => false, 'reason' => 'لا إهلاكَ على هذا السطرِ ليُعكس');
+            return array('ok' => false, 'reason' => 'لا إهلاك على هذا السطر ليعكس');
         }
 
         $amount = (float) $row['depreciation_amount'];
@@ -116,8 +116,8 @@ class DepreciationRunService
         $n = $conn->affected_rows;
         $err = $u->error;
         $u->close();
-        if ($n !== 1) { return array('ok' => false, 'reason' => $err !== '' ? $err : 'لم يتغيّر شيء'); }
+        if ($n !== 1) { return array('ok' => false, 'reason' => $err !== '' ? $err : 'لم يتغير شيء'); }
 
-        return array('ok' => true, 'reason' => 'عُكس بمرجعِه', 'reversed' => $amount, 'ref' => $ref);
+        return array('ok' => true, 'reason' => 'عكس بمرجعه', 'reversed' => $amount, 'ref' => $ref);
     }
 }

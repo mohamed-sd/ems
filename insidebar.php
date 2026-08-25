@@ -103,7 +103,7 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
   })();
 </script>
 
-<!-- الهيدر/التوببار المشترك (مكوّن واحد لكل الصفحات التي بها Sidebar) -->
+<!-- الهيدر/التوببار المشترك (مكون واحد لكل الصفحات التي بها Sidebar) -->
 <?php require_once __DIR__ . '/includes/topbar.php'; ?>
 
 <!-- زرُّ القائمة في الموبايل: انتقل إلى داخل الشريط العلويّ (includes/topbar.php)
@@ -116,7 +116,7 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
 <?php /* الوصولُ الرقميُّ (WCAG 2.2 AA · 1.3.6 المعالم): الشريطُ الجانبيُّ معلَمُ
          تنقلٍ معلَن — وقياسٌ حيٌّ أظهر صفرَ معلَمِ تنقلٍ في الصفحة. والدورُ
          يُضاف على الغلافِ القائمِ بلا تغييرِ وسمٍ ولا صنفٍ (صفرُ أثرٍ بصريّ). */ ?>
-<div class="sidebar closed" id="sidebar" role="navigation" aria-label="التنقلُ الرئيسيّ">
+<div class="sidebar closed" id="sidebar" role="navigation" aria-label="التنقل الرئيسي">
   <?php
   /* رأسُ اللوح على الجوّال (NAV — واجهة الجوّال): هويّةٌ + مَن أنت + إغلاقٌ صريح.
      مخفيٌّ افتراضًا (display:none في ems.main.all.style.css؟ لا — هنا صراحةً)،
@@ -266,7 +266,7 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
              placeholder="ابحث في القائمة…" aria-label="ابحث في قائمة التنقل"
              aria-controls="sidebarNavList">
       <button type="button" class="nav-filter-clear" id="navFilterClear" aria-label="مسح البحث">✕</button>
-      <div class="nav-filter-empty" role="status" aria-live="polite">لا رابطَ يطابق بحثك.</div>
+      <div class="nav-filter-empty" role="status" aria-live="polite">لا رابط يطابق بحثك.</div>
     </div>
     <?php endif; ?>
 

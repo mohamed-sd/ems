@@ -193,26 +193,26 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if (!$is_record) {
         $header_actions[] = array('id' => 'toggleStats', 'class' => 'btn', 'title' => 'إظهار أو إخفاء الإحصائيات', 'icon' => 'fas fa-eye', 'label' => 'إظهار الإحصائيات', 'label_class' => 'frq-toggle-stats-text');
     } else {
-        $header_actions[] = array('href' => 'request_form.php', 'class' => 'add-btn', 'icon' => 'fa fa-list-check', 'label' => 'كلُّ طلباتي');
+        $header_actions[] = array('href' => 'request_form.php', 'class' => 'add-btn', 'icon' => 'fa fa-list-check', 'label' => 'كل طلباتي');
     }
     $header_back    = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑫: شاشةُ دورةٍ مستندية — الخطوةُ التاليةُ من حالةِ الطلبِ الحيّةِ إن وُجدت،
     // وإلا سلّمُ الدورةِ الثابت.
     if ($is_record && $req['state'] === 'draft') {
-        $fr_next_step = 'الإرسالُ للمراجعةِ الإدارية';
+        $fr_next_step = 'الإرسال للمراجعة الإدارية';
     } elseif ($is_record && $req['state'] === 'returned') {
-        $fr_next_step = 'إعادةُ الإرسالِ بالرقمِ نفسِه بعد استيفاءِ سببِ الإعادة';
+        $fr_next_step = 'إعادة الإرسال بالرقم نفسه بعد استيفاء سبب الإعادة';
     } elseif ($is_record) {
-        $fr_next_step = 'سلّمُ الاعتمادِ الماليّ';
+        $fr_next_step = 'سلم الاعتماد المالي';
     } else {
-        $fr_next_step = 'إنشاءُ طلبٍ أو متابعةُ المعادِ إليك للاستكمال';
+        $fr_next_step = 'إنشاء طلب أو متابعة المعاد إليك للاستكمال';
     }
     echo ems_next_step($fr_next_step);
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ)
     echo ems_states_bundle(
-        $is_record ? 'لا بياناتِ طلبٍ ماليٍّ للعرض' : 'لا طلباتٍ ضمن هذا الترشيح',
-        $is_record ? 'افتحْ طلبًا قائمًا من قائمةِ طلباتك' : 'أنشئ طلبَك الأول من زرِّ «إنشاء طلب مالي» أعلى الشاشة أو غيّر المرشِّحات'
+        $is_record ? 'لا بيانات طلب مالي للعرض' : 'لا طلبات ضمن هذا الترشيح',
+        $is_record ? 'افتح طلبا قائما من قائمة طلباتك' : 'أنشئ طلبك الأول من زر «إنشاء طلب مالي» أعلى الشاشة أو غير المرشحات'
     );
     ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
@@ -220,7 +220,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php if ($not_found): ?>
         <div class="alert alert-warning fr-alert">
             <i class="fa fa-circle-question"></i>
-            لا طلبَ بالرقمِ <strong>#<?php echo intval($rid); ?></strong> ضمنَ نطاقِك — وهذه قائمةُ طلباتك.
+            لا طلب بالرقم <strong>#<?php echo intval($rid); ?></strong> ضمن نطاقك — وهذه قائمة طلباتك.
         </div>
     <?php endif; ?>
 
@@ -228,8 +228,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
           // ممنوح الصلاحية (المحاسب والمالية يفتحان أي طلبٍ من صناديقهما) ?>
     <?php if (!$my_departments && !$is_record && !$my_rows): ?>
         <div class="card"><div class="card-body">
-            <h5>⛔ لا إدارة مفعّلةً لدورك في بوابة الطلبات المالية بعد</h5>
-            <p>الإنشاء متاحٌ لأدوار الإدارات المفعّلة في جدول التوجيه — راجع الإدارة المالية.</p>
+            <h5>⛔ لا إدارة مفعلة لدورك في بوابة الطلبات المالية بعد</h5>
+            <p>الإنشاء متاح لأدوار الإدارات المفعلة في جدول التوجيه — راجع الإدارة المالية.</p>
         </div></div>
     <?php else: ?>
 
@@ -247,12 +247,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div><strong>النوع:</strong> <?php echo htmlspecialchars($catalog[$req['request_type']]['label'] ?? $req['request_type']); ?></div>
                 <div><strong>الإدارة:</strong> <?php $rt = finreq_routing_row($gate, $req['source_module']); echo htmlspecialchars($rt ? $rt['module_label'] : $req['source_module']); ?></div>
                 <?php if (intval($req['duplicate_flag']) === 1): ?><div><span class="badge bg-warning">⚠️ تحذير تكرار</span></div><?php endif; ?>
-                <?php if (intval($req['is_exception']) === 1): ?><div><span class="badge bg-danger">🚨 استثناء طارئ معتمد — الدورة تُستكمل خلال 72 ساعة</span></div><?php endif; ?>
+                <?php if (intval($req['is_exception']) === 1): ?><div><span class="badge bg-danger">🚨 استثناء طارئ معتمد — الدورة تستكمل خلال 72 ساعة</span></div><?php endif; ?>
                 <?php if (!empty($req['event_id'])): ?><div><strong>الحدث المالي:</strong> #<?php echo intval($req['event_id']); ?></div><?php endif; ?>
                 <?php if (!empty($req['parent_request_id'])):
                     $__parent = $gate->selectOne('fin_requests', array('columns' => array('request_no'), 'where' => array('id' => intval($req['parent_request_id']))));
                 ?>
-                    <div><span class="badge bg-info">🌿 فرعٌ من
+                    <div><span class="badge bg-info">🌿 فرع من
                         <a href="request_form.php?id=<?php echo intval($req['parent_request_id']); ?>" class="fr-link-inherit">
                             <?php echo htmlspecialchars($__parent ? $__parent['request_no'] : ('#' . intval($req['parent_request_id']))); ?></a></span></div>
                 <?php endif; ?>
@@ -265,13 +265,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 ?>
                 <?php if ($can_ask_exception): ?>
                     <form action="request_actions.php" method="post" class="fr-form-inline"
-                          onsubmit="var x=prompt('مبرّر التنفيذ الطارئ (يقرؤه المدير المالي):');if(!x)return false;this.reason.value=x;">
+                          onsubmit="var x=prompt('مبرر التنفيذ الطارئ (يقرؤه المدير المالي):');if(!x)return false;this.reason.value=x;">
         <?php echo csrf_field(); ?>
                         <input type="hidden" name="action" value="exception_request">
                         <input type="hidden" name="id" value="<?php echo intval($req['id']); ?>">
                         <input type="hidden" name="back" value="request_form.php">
                         <input type="hidden" name="reason" value="">
-                        <button type="submit" class="btn btn-sm btn-danger"><i class="fa fa-bolt"></i> طلب تنفيذٍ طارئ (§8.3)</button>
+                        <button type="submit" class="btn btn-sm btn-danger"><i class="fa fa-bolt"></i> طلب تنفيذ طارئ (§8.3)</button>
                     </form>
                 <?php endif; ?>
             </div>
@@ -287,7 +287,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         if ($__kids || $__can_split):
     ?>
         <div class="card fr-split-card">
-            <div class="card-header"><h5><i class="fa fa-code-branch"></i> المسار المركّب — فروع الطلب (§6.2)</h5></div>
+            <div class="card-header"><h5><i class="fa fa-code-branch"></i> المسار المركب — فروع الطلب (§6.2)</h5></div>
             <div class="card-body">
                 <?php if ($__kids): $__ksum = 0.0; ?>
                     <?php foreach ($__kids as $kk): $__ksum += in_array($kk['state'], array('rejected','withdrawn','cancelled','expired','merged'), true) ? 0 : floatval($kk['amount']); ?>
@@ -299,7 +299,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <span class="fr-note-ink"><?php echo htmlspecialchars($kk['justification'] ?? ''); ?></span>
                         </div>
                     <?php endforeach; ?>
-                    <div class="fr-sum">مجموع الفروع الحيّة: <?php echo number_format($__ksum, 2); ?> من أصل <?php echo number_format(floatval($req['amount']), 2); ?></div>
+                    <div class="fr-sum">مجموع الفروع الحية: <?php echo number_format($__ksum, 2); ?> من أصل <?php echo number_format(floatval($req['amount']), 2); ?></div>
                 <?php endif; ?>
                 <?php if ($__can_split): ?>
                     <form action="request_actions.php" method="post" class="fr-split-form">
@@ -307,11 +307,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <input type="hidden" name="action" value="split_request">
                         <input type="hidden" name="id" value="<?php echo intval($req['id']); ?>">
                         <input type="hidden" name="back" value="request_form.php">
-                        <div><label for="emsf_171_b0863">وصف الفرع *</label><input type="text" name="child_label" placeholder="دفعة مقدّمة 30%" required class="fr-w200" id="emsf_171_b0863"></div>
+                        <div><label for="emsf_171_b0863">وصف الفرع *</label><input type="text" name="child_label" placeholder="دفعة مقدمة 30%" required class="fr-w200" id="emsf_171_b0863"></div>
                         <div><label for="emsf_172_3f743">مبلغ الفرع *</label><input type="number" step="0.01" min="0.01" name="child_amount" required class="fr-w140" id="emsf_172_3f743"></div>
                         <button type="submit" class="btn btn-primary"><i class="fa fa-code-branch"></i> تفريع دفعة</button>
                     </form>
-                    <p class="fr-hint">💡 الفرع يرث مستندات أصله وبواباته الإدارية، ويولد لدى محاسب الإدارة — ولا يُغلق الأصل وفروعه معلّقة.</p>
+                    <p class="fr-hint">💡 الفرع يرث مستندات أصله وبواباته الإدارية، ويولد لدى محاسب الإدارة — ولا يغلق الأصل وفروعه معلقة.</p>
                 <?php endif; ?>
             </div>
         </div>
@@ -325,7 +325,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="stats-section" id="frqStatsSection">
             <div class="stats-grid ems-statgrid ems-statgrid--fill" data-cols="4">
                 <a class="stats-card stats-primary<?php echo $f_state === '' ? ' frq-stat-on' : ''; ?>"
-                   href="request_form.php<?php echo finreq_qs(array('state' => '')); ?>" title="رفعُ ترشيحِ الحالة">
+                   href="request_form.php<?php echo finreq_qs(array('state' => '')); ?>" title="رفع ترشيح الحالة">
                     <div class="stats-icon"><i class="fa fa-layer-group"></i></div>
                     <div class="stats-value"><?php echo $g_total; ?></div>
                     <div class="stats-title">إجمالي طلباتي</div>
@@ -333,7 +333,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <?php foreach ($groups as $gk => $gv): ?>
                     <a class="stats-card <?php echo $gv['tone']; ?><?php echo $f_state === $gk ? ' frq-stat-on' : ''; ?>"
                        href="request_form.php<?php echo finreq_qs(array('state' => $gk)); ?>"
-                       title="ترشيحُ الجدولِ على «<?php echo htmlspecialchars($gv['label']); ?>»">
+                       title="ترشيح الجدول على «<?php echo htmlspecialchars($gv['label']); ?>»">
                         <div class="stats-icon"><i class="<?php echo $gv['icon']; ?>"></i></div>
                         <div class="stats-value"><?php echo intval($g_count[$gk]); ?></div>
                         <div class="stats-title"><?php echo htmlspecialchars($gv['label']); ?></div>
@@ -361,9 +361,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             echo implode(' · ', $parts);
                             ?>
                         </div>
-                        <div class="ems-statcard__meta">مجموعٌ لكلِّ عملةٍ على حدة</div>
+                        <div class="ems-statcard__meta">مجموع لكل عملة على حدة</div>
                     <?php endif; ?>
-                    <div class="stats-title">قيمةُ الطلباتِ الحيّة</div>
+                    <div class="stats-title">قيمة الطلبات الحية</div>
                 </div>
             </div>
         </div>
@@ -376,7 +376,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
              في وضعِ السجل — ولم يتغيّر موضعُها هناك لأن ① و③ لا يُصيَّران.) ═════ */ ?>
     <?php if (!$is_record && !$can_add): ?>
         <div class="card"><div class="card-body">
-            <h5>⛔ لا تملك صلاحية إنشاء طلبٍ مالي</h5>
+            <h5>⛔ لا تملك صلاحية إنشاء طلب مالي</h5>
             <p>تستطيع متابعة طلباتك القائمة من الجدول أدناه.</p>
         </div></div>
     <?php endif; ?>
@@ -402,9 +402,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <?php elseif ($can_add): ?>
         <div class="alert alert-warning fr-alert" id="finreqNoDept">
             <i class="fa fa-circle-info"></i>
-            لديك صلاحيةُ إنشاءِ طلبٍ ماليّ، <strong>ولا إدارةَ مسنَدةٌ إليك</strong> — والطلبُ
-            يُنشأ باسمِ إدارة. راجعْ مسؤولَ الصلاحياتِ لإسنادِ إدارتِك، وتستطيع
-            الآن متابعةَ طلباتِك في الجدولِ أدناه.
+            لديك صلاحية إنشاء طلب مالي، <strong>ولا إدارة مسندة إليك</strong> — والطلب
+            ينشأ باسم إدارة. راجع مسؤول الصلاحيات لإسناد إدارتك، وتستطيع
+            الآن متابعة طلباتك في الجدول أدناه.
         </div>
         <?php endif; ?>
     <?php endif; ?>
@@ -415,7 +415,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="card">
             <?php /* ف١١-٢: عنوانُ القسمِ اسمٌ مؤسسيٌّ فقط — بلا رقمِ إصدارٍ ولا
                      مرجعِ فقرةٍ ولا رمزِ وثيقة. والشرحُ في التلميحِ لا في الاسم. */ ?>
-            <div class="card-header"><h5 title="تُراجَع دواعي الطلبِ ومبرراتُه قبل إنشائِه"><i class="fa fa-scale-balanced"></i> مبررات الطلب</h5></div>
+            <div class="card-header"><h5 title="تراجع دواعي الطلب ومبرراته قبل إنشائه"><i class="fa fa-scale-balanced"></i> مبررات الطلب</h5></div>
             <div class="card-body"><div class="form-grid">
                 <div>
                     <label for="emsf_173_c599f">الإدارة صاحبة الاحتياج *</label>
@@ -438,8 +438,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <?php if ($is_record): ?><input type="hidden" name="request_type" value="<?php echo htmlspecialchars($req['request_type']); ?>"><?php endif; ?>
                 </div>
                 <div>
-                    <label for="emsf_175_3421b">لماذا نحتاج هذا الآن؟ (المبرّر) *</label>
-                    <input type="text" name="justification" aria-label="مبرّر الاحتياج" maxlength="255" required value="<?php echo htmlspecialchars($req['justification'] ?? ''); ?>" placeholder="لا طلب بلا لماذا" id="emsf_175_3421b">
+                    <label for="emsf_175_3421b">لماذا نحتاج هذا الآن؟ (المبرر) *</label>
+                    <input type="text" name="justification" aria-label="مبرر الاحتياج" maxlength="255" required value="<?php echo htmlspecialchars($req['justification'] ?? ''); ?>" placeholder="لا طلب بلا لماذا" id="emsf_175_3421b">
                 </div>
                 <div>
                     <label for="emsf_176_1cbe3">تصنيف الحاجة *</label>
@@ -454,12 +454,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="source_ref" aria-label="المرجع المصدري (أمر شراء/بلاغ/عقد)" maxlength="60" value="<?php echo htmlspecialchars($req['source_ref'] ?? ''); ?>" id="emsf_177_2393b">
                 </div>
                 <div>
-                    <label for="emsf_178_6febc">البديل المدروس إن وُجد (ملاحظات)</label>
+                    <label for="emsf_178_6febc">البديل المدروس إن وجد (ملاحظات)</label>
                     <input type="text" name="notes" aria-label="البديل المدروس (ملاحظات)" maxlength="255" value="<?php echo htmlspecialchars($req['notes'] ?? ''); ?>" id="emsf_178_6febc">
                 </div>
                 <?php if (!$is_record && $company_users): ?>
                 <div>
-                    <label for="emsf_179_5d929" title="يُسجَّل صاحبُ الطلبِ والمُدخِلُ معًا في سجلِّ الطلب">الإدخال نيابةً عن (اختياري)</label>
+                    <label for="emsf_179_5d929" title="يسجل صاحب الطلب والمدخل معا في سجل الطلب">الإدخال نيابة عن (اختياري)</label>
                     <select name="requester_id" id="emsf_179_5d929">
                         <option value="">— أنا صاحب الطلب —</option>
                         <?php foreach ($company_users as $cu): if (intval($cu['id']) === $user_id) { continue; } ?>
@@ -487,8 +487,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="beneficiary_name" aria-label="اسم الجهة المستفيدة" maxlength="160" value="<?php echo htmlspecialchars($req['beneficiary_name'] ?? ''); ?>" id="emsf_181_cf074">
                 </div>
                 <div>
-                    <label for="emsf_182_c391e">مرجع المستفيد (معرّف المورد/الموظف)</label>
-                    <input type="number" name="beneficiary_ref" aria-label="مرجع المستفيد (معرّف المورد/الموظف)" min="1" value="<?php echo htmlspecialchars($req['beneficiary_ref'] ?? ''); ?>" id="emsf_182_c391e">
+                    <label for="emsf_182_c391e">مرجع المستفيد (معرف المورد/الموظف)</label>
+                    <input type="number" name="beneficiary_ref" aria-label="مرجع المستفيد (معرف المورد/الموظف)" min="1" value="<?php echo htmlspecialchars($req['beneficiary_ref'] ?? ''); ?>" id="emsf_182_c391e">
                 </div>
                 <div>
                     <label for="emsf_183_6701d">المبلغ *</label>
@@ -501,7 +501,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div>
                     <label for="emsf_185_c942d">طريقة الدفع المقترحة</label>
                     <select name="payment_method" id="emsf_185_c942d">
-                        <option value="">— تقرّرها الخزينة —</option>
+                        <option value="">— تقررها الخزينة —</option>
                         <?php foreach (array('cash' => 'نقدًا', 'bank' => 'بنكي', 'transfer' => 'تحويل', 'cheque' => 'شيك') as $k => $v): ?>
                             <option value="<?php echo $k; ?>" <?php echo ($is_record && ($req['payment_method'] ?? '') === $k) ? 'selected' : ''; ?>><?php echo $v; ?></option>
                         <?php endforeach; ?>
@@ -537,7 +537,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </div>
             </div>
             <div class="fr-mt14">
-                <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> <?php echo $is_record ? 'تحديث البيانات' : 'حفظ مسودة برقمٍ خادمي'; ?></button>
+                <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> <?php echo $is_record ? 'تحديث البيانات' : 'حفظ مسودة برقم خادمي'; ?></button>
             </div>
             </div>
         </div>
@@ -554,13 +554,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <label for="frq_f_state"><i class="fa fa-flag"></i> الحالة</label>
                         <select name="state" id="frq_f_state" class="form-control">
                             <option value="">— كل الحالات —</option>
-                            <optgroup label="مجموعاتُ الحالة">
+                            <optgroup label="مجموعات الحالة">
                                 <?php foreach ($groups as $gk => $gv): ?>
                                     <option value="<?php echo $gk; ?>" <?php echo $f_state === $gk ? 'selected' : ''; ?>>
                                         <?php echo htmlspecialchars($gv['label']); ?> (<?php echo intval($g_count[$gk]); ?>)</option>
                                 <?php endforeach; ?>
                             </optgroup>
-                            <optgroup label="حالةٌ مفردة">
+                            <optgroup label="حالة مفردة">
                                 <?php foreach ($state_defs as $sk => $sv): ?>
                                     <option value="<?php echo $sk; ?>" <?php echo $f_state === $sk ? 'selected' : ''; ?>><?php echo htmlspecialchars($sv['label']); ?></option>
                                 <?php endforeach; ?>
@@ -577,10 +577,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </select>
                     </div>
                     <div class="filter-field">
-                        <label for="frq_f_q"><i class="fa fa-magnifying-glass"></i> بحثٌ نصّي</label>
+                        <label for="frq_f_q"><i class="fa fa-magnifying-glass"></i> بحث نصي</label>
                         <input type="text" name="q" id="frq_f_q" class="form-control" maxlength="80"
                                value="<?php echo htmlspecialchars($f_q); ?>"
-                               placeholder="رقم الطلب · المبرّر · المستفيد · المرجع">
+                               placeholder="رقم الطلب · المبرر · المستفيد · المرجع">
                     </div>
                     <div class="filter-field">
                         <label for="frq_f_from"><i class="fa fa-calendar"></i> من تاريخ</label>
@@ -613,24 +613,24 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <table class="display frq-table">
                     <thead>
                         <tr>
-                            <th>رقم الطلب</th><th>نوع الطلب</th><th>المبرّر</th><th>المستفيد</th>
-                            <th>المبلغ</th><th>الحالة</th><th>الحدث</th><th>أُنشئ</th><th></th>
+                            <th>رقم الطلب</th><th>نوع الطلب</th><th>المبرر</th><th>المستفيد</th>
+                            <th>المبلغ</th><th>الحالة</th><th>الحدث</th><th>أنشئ</th><th></th>
                             <?php /* CMP-03 ⑤ الأعمدة الوظيفية — وصِلت بمصدرِها الصفّيِّ (XF-01)
                                       عبر `data-fn-src` + `data-xf` على الصف، فصارت بياناتٍ لا شرَطات */ ?>
                             <th class="ems-fn-th" data-fn="1" data-fn-src="req_date">تاريخ الطلب</th>
-                            <th class="ems-fn-th" data-fn="1" data-fn-src="requester">مقدّم الطلب</th>
+                            <th class="ems-fn-th" data-fn="1" data-fn-src="requester">مقدم الطلب</th>
                             <th class="ems-fn-th" data-fn="1" data-fn-src="dept">الإدارة</th>
                             <th class="ems-fn-th" data-fn="1" data-fn-src="descr">الوصف</th>
                             <th class="ems-fn-th" data-fn="1" data-fn-src="party">الجهة المعنية</th>
                             <th class="ems-fn-th" data-fn="1" data-fn-src="reject">سبب الرفض</th>
                             <?php /* CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js */ ?>
-                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                             <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                             <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                             <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-                            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                            <th class="ems-gov-th" data-gov="required_approver" data-slice="1" title="من يلزم اعتماده بحسب سلسلة الاعتماد">المعتمِد المطلوب</th>
+                            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                            <th class="ems-gov-th" data-gov="required_approver" data-slice="1" title="من يلزم اعتماده بحسب سلسلة الاعتماد">المعتمد المطلوب</th>
                             <th class="ems-gov-th none" data-gov="attachments" data-slice="3" title="مرفقات الإثبات">المرفقات</th>
                             </tr>
                     </thead>
@@ -724,10 +724,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <table class="table table-bordered no-datatable" data-no-dt="1">
                     <thead><tr><th>#</th><th>البند</th><th>الكمية</th><th>الوحدة</th><th>سعر الوحدة</th><th>الإجمالي</th><th></th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -800,7 +800,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <?php endif; ?>
 
         <div class="card">
-            <div class="card-header"><h5><i class="fa fa-timeline"></i> سجل الطلب الإلحاقي (§8.6 — لا يُمحى)</h5></div>
+            <div class="card-header"><h5><i class="fa fa-timeline"></i> سجل الطلب الإلحاقي (§8.6 — لا يمحى)</h5></div>
             <div class="card-body">
                 <table class="table table-striped no-datatable" data-no-dt="1">
                     <thead><tr><th>#</th><th>الحدث</th><th>الفاعل</th><th>البيان</th><th>قبل → بعد</th><th>التوقيت</th></tr></thead>
@@ -809,7 +809,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <tr>
                             <td><?php echo $i++; ?></td>
                             <td><code><?php echo htmlspecialchars($ev['event_type']); ?></code></td>
-                            <td><?php echo intval($ev['actor_user_id']); ?><?php echo $ev['on_behalf_of'] ? ' (نيابةً عن ' . intval($ev['on_behalf_of']) . ')' : ''; ?></td>
+                            <td><?php echo intval($ev['actor_user_id']); ?><?php echo $ev['on_behalf_of'] ? ' (نيابة عن ' . intval($ev['on_behalf_of']) . ')' : ''; ?></td>
                             <td><?php echo htmlspecialchars($ev['body'] ?? ''); ?></td>
                             <td><?php echo htmlspecialchars(($ev['old_value'] !== null || $ev['new_value'] !== null) ? (($ev['old_value'] ?? '—') . ' → ' . ($ev['new_value'] ?? '—')) : ''); ?></td>
                             <td><?php echo htmlspecialchars($ev['created_at']); ?></td>

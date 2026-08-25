@@ -39,14 +39,14 @@ if (!$is_super_admin && empty($__pp['can_view'])) {
 $__canWrite = $is_super_admin || !empty($__pp['can_add']) || !empty($__pp['can_edit']);
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$__canWrite) {
     http_response_code(403);
-    exit('غير مصرَّحٍ بالكتابة في هذه الشاشة — اطلبِ المنحةَ من مدير الصلاحيات');
+    exit('غير مصرح بالكتابة في هذه الشاشة — اطلب المنحة من مدير الصلاحيات');
 }
 
 // ═══ ⑤ رمزُ الحماية — قبلَ أيِّ معالجةٍ لا بعدَها ═══
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!function_exists('verify_csrf_token') || !verify_csrf_token($_POST['csrf_token'] ?? '')) {
         http_response_code(403);
-        exit('رمزُ الحمايةِ غيرُ صالح — أعدْ تحميلَ الصفحة');
+        exit('رمز الحماية غير صالح — أعد تحميل الصفحة');
     }
 }
 
@@ -55,7 +55,7 @@ $flash = null; $flashKind = 'info';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $__action = (string) ($_POST['action'] ?? '');
     // شاشةُ قراءةٍ فقط — لا فعلَ كتابةٍ مسجَّلٌ لها (Read Only)
-    $flash = 'هذه شاشةُ عرضٍ لا تكتب'; $flashKind = 'info';
+    $flash = 'هذه شاشة عرض لا تكتب'; $flashKind = 'info';
 }
 
 // ═══ ⑦ العرض ═══
@@ -81,13 +81,13 @@ $g = $conn->query(
 )->fetch_assoc();
 $PAGE_TITLE = 'لوحة الناقل';
 $TILES = array(
-    array('وقائعُ الجذر', (int) $g['facts']),
-    array('تسليماتٌ حقيقية', (int) $g['deliveries']),
-    array('سُلّمت بنجاح', (int) $g['processed']),
+    array('وقائع الجذر', (int) $g['facts']),
+    array('تسليمات حقيقية', (int) $g['deliveries']),
+    array('سلمت بنجاح', (int) $g['processed']),
     array('صندوق الموتى', (int) $g['dlq']),
-    array('أنواعٌ لها مشتركون', (int) $g['subs']),
+    array('أنواع لها مشتركون', (int) $g['subs']),
 );
 $COLS = null; // أعمدةُ الاستعلامِ بأسمائِها
-$EMPTY_TITLE = 'لا وقائعَ منشورةً على الناقلِ بعدُ';
-$EMPTY_HINT  = 'تُنشَر الوقائعُ آليًّا عند اعتمادِ المستنداتِ وحركاتِ النظام';
+$EMPTY_TITLE = 'لا وقائع منشورة على الناقل بعد';
+$EMPTY_HINT  = 'تنشر الوقائع آليا عند اعتماد المستندات وحركات النظام';
 include __DIR__ . '/../includes/eng01_screen_view.php';

@@ -75,7 +75,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     $header_actions = array();
     $header_back = array();
     $header_context = array(
-        'المقام' => 'سجلُّ المنع الحي',
+        'المقام' => 'سجل المنع الحي',
         'محاولاتٌ مرصودة' => $stats['total'],
         'رُوجعت' => $stats['reviewed'],
         'تنتظر المراجعة' => $stats['open'],
@@ -83,16 +83,16 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     );
     include('../includes/page_header.php');
     ems_screen_about(
-        'كلُّ محاولةٍ رفضها حارسٌ تُرصد هنا ولا تُترك صامتة. والمراجعةُ تصنّفها: حاجةٌ لاستثناءٍ '
-        . 'أو خطأُ تصنيفِ حمايةٍ أو محاولةُ تجاوزٍ أو عابرٌ — وما يحتاج أثرًا يفتح مرجعَه.',
-        array('المنعُ المتكرر على الحارس نفسِه إنذارٌ: راجع تصنيفَ الحماية قبل اتهام المحاوِل',
-              'المراجعةُ واحدةٌ للمحاولة وتكرارُها يرجع الأولى — والسجلُّ لا يُحذف'));
-    echo ems_states_bundle('لا محاولاتٍ ممنوعةً في سجلِّ الرفض', 'الحرّاسُ لم يرفضوا محاولةً في نطاقِ شركتِك بعد');
+        'كل محاولة رفضها حارس ترصد هنا ولا تترك صامتة. والمراجعة تصنفها: حاجة لاستثناء '
+        . 'أو خطأ تصنيف حماية أو محاولة تجاوز أو عابر — وما يحتاج أثرا يفتح مرجعه.',
+        array('المنع المتكرر على الحارس نفسه إنذار: راجع تصنيف الحماية قبل اتهام المحاول',
+              'المراجعة واحدة للمحاولة وتكرارها يرجع الأولى — والسجل لا يحذف'));
+    echo ems_states_bundle('لا محاولات ممنوعة في سجل الرفض', 'الحراس لم يرفضوا محاولة في نطاق شركتك بعد');
     ?>
 
     <?php if ($repeats): ?>
     <div class="ems-card dnr-repeat-card">
-        <strong class="dnr-repeat-title">منعٌ متكرر (3+) — يكشف حاجةً أو خطأً أو تجاوزًا</strong>
+        <strong class="dnr-repeat-title">منع متكرر (3+) — يكشف حاجة أو خطأ أو تجاوزا</strong>
         <div class="dnr-repeat-list">
             <?php foreach ($repeats as $x): ?>
             <span class="badge badge-warning dnr-fs-8">
@@ -103,21 +103,21 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     <?php endif; ?>
 
     <div class="card"><div class="card-body table-responsive">
-        <h6>سجلُّ المحاولات (<?php echo count($denials); ?>)</h6>
+        <h6>سجل المحاولات (<?php echo count($denials); ?>)</h6>
         <?php if (!$denials): ?>
-            <?php if (function_exists('ems_state_empty')) { ems_state_empty('لا محاولاتٍ ممنوعةً مرصودة — الحرّاسُ هادئون ✨'); } else { echo '<p class="dnr-muted">لا محاولات.</p>'; } ?>
+            <?php if (function_exists('ems_state_empty')) { ems_state_empty('لا محاولات ممنوعة مرصودة — الحراس هادئون ✨'); } else { echo '<p class="dnr-muted">لا محاولات.</p>'; } ?>
         <?php else: ?>
         <div class="table-container">
         <table class="alltables display nowrap dnr-table-full">
             <thead><tr>
-                <th>#</th><th>رمز الحارس</th><th>المحاوِل</th><th>المرجع المحاوَل</th>
+                <th>#</th><th>رمز الحارس</th><th>المحاول</th><th>المرجع المحاول</th>
                 <th>رمز السبب</th><th>الوقت</th>
                 <th>المراجعة</th><th>التصنيف</th><th>قرار المراجعة</th><th>تاريخ المراجعة</th>
                 <?php /* الأعمدةُ الحاكمةُ التي يطلبها تصميمُ الشاشة (CMP-03) — بنمطِ السجلِّ
                          المركزي `ems_gov_registry()`: الحالةُ مشتقةٌ من وجودِ المراجعة،
                          والكيانُ من عمودِ العزلِ نفسِه لا من الجلسة. */ ?>
                 <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
                 <th></th>
             </tr></thead>
             <tbody>
@@ -136,7 +136,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <td><small><?php echo htmlspecialchars((string) ($d['review_at'] ?: '—')); ?></small></td>
                     <td><?php echo empty($d['review_code'])
                         ? '<span class="badge badge-warning">تنتظر المراجعة</span>'
-                        : '<span class="badge badge-success">مُراجَعة</span>'; ?></td>
+                        : '<span class="badge badge-success">مراجعة</span>'; ?></td>
                     <td><?php echo (int) $d['company_id']; ?></td>
                     <td>
                         <?php if ($canReview && empty($d['review_code'])): ?>
@@ -152,9 +152,9 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     </div></div>
 
     <div class="card dnr-card-gap"><div class="card-body table-responsive">
-        <h6>رفضُ الحارس المركزي (action_execution_log · denied) — <?php echo count($centralDenied); ?></h6>
+        <h6>رفض الحارس المركزي (action_execution_log · denied) — <?php echo count($centralDenied); ?></h6>
         <table class="table table-sm table-striped dnr-table-full" data-no-dt="1">
-            <thead><tr><th>الفعل</th><th>المحاوِل</th><th>الموضوع</th><th>رمز المنع</th><th>الوقت</th></tr></thead>
+            <thead><tr><th>الفعل</th><th>المحاول</th><th>الموضوع</th><th>رمز المنع</th><th>الوقت</th></tr></thead>
             <tbody>
             <?php foreach (array_slice($centralDenied, 0, 50) as $x): ?>
                 <tr>
@@ -165,7 +165,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <td><small><?php echo htmlspecialchars((string) $x['at']); ?></small></td>
                 </tr>
             <?php endforeach; ?>
-            <?php if (!$centralDenied): ?><tr><td colspan="5" class="dnr-muted">لا رفضَ مركزيًّا مسجَّلًا.</td></tr><?php endif; ?>
+            <?php if (!$centralDenied): ?><tr><td colspan="5" class="dnr-muted">لا رفض مركزيا مسجلا.</td></tr><?php endif; ?>
             </tbody>
         </table>
     </div></div>
@@ -217,7 +217,7 @@ function dnrSubmit() {
         .then(function (r) { return r.json(); })
         .then(function (j) {
             if (!j.ok) { alert((j.code || 'GOV-500') + ': ' + (j.msg || '')); return; }
-            alert(j.idempotent ? 'مراجعةٌ سابقة ' + j.review_code + ' — التكرارُ يرجع الأولى' : 'سُجّلت المراجعة ' + j.review_code + ' ✔');
+            alert(j.idempotent ? 'مراجعة سابقة ' + j.review_code + ' — التكرارُ يرجع الأولى' : 'سجلت المراجعة ' + j.review_code + ' ✔');
             location.reload();
         })
         .catch(function () { alert('تعذر الاتصال — أعد المحاولة'); });

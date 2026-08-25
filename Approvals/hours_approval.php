@@ -272,7 +272,7 @@ if ($box_on && !empty($pending_rows)) {
                 foreach ($bx_flags as $bf) {
                     $bts = $bx_entry_ids[(int) $bf['entry_id']] ?? 0;
                     if ($bts && isset($box_map[$bts])) {
-                        $box_map[$bts]['flags'][] = ($bf['subject'] === 'equipment' ? 'المعدة' : 'المشغّل')
+                        $box_map[$bts]['flags'][] = ($bf['subject'] === 'equipment' ? 'المعدة' : 'المشغل')
                             . ' #' . $bf['subject_ref'] . ': ' . $bf['measured_hours'] . '/' . $bf['capacity_hours'] . ' س';
                     }
                 }
@@ -461,20 +461,20 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   require_once __DIR__ . '/../includes/report_button.php';
   ems_report_button(array('screen' => 'approvals'));
   // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-  echo ems_states_bundle('لا سجلَّ ساعاتٍ في نطاقِ اعتمادِك الآن', 'وسِّعْ فلترَ نوعِ المعدة، أو انتظرْ اعتمادَ المستوى السابقِ في السلسلة');
+  echo ems_states_bundle('لا سجل ساعات في نطاق اعتمادك الآن', 'وسع فلتر نوع المعدة، أو انتظر اعتماد المستوى السابق في السلسلة');
   ?>
 
   <?php /* E-08-أ: موضعُ الأسباب المفصَّلة للصفوف الموقوفة — يملؤه renderBlocked()
            من `blocked[].reasons`. يبقى فارغًا حتى يقع حجبٌ فعليّ. */ ?>
   <div id="blocked-panel" class="alert alert-warning d-none ha-mb16" role="alert">
     <div class="d-flex justify-content-between align-items-start">
-      <h6 class="fw-bold mb-2"><i class="fa fa-ban me-1"></i> صفوفٌ لم تُعتمد — والسببُ لكلٍّ منها:</h6>
+      <h6 class="fw-bold mb-2"><i class="fa fa-ban me-1"></i> صفوف لم تعتمد — والسبب لكل منها:</h6>
       <button type="button" class="btn-close" aria-label="إغلاق"
               onclick="document.getElementById('blocked-panel').classList.add('d-none');"></button>
     </div>
     <ul id="blocked-list" class="mb-2 ps-3"></ul>
     <button type="button" class="btn btn-sm btn-secondary"
-            onclick="location.reload();"><i class="fa fa-rotate me-1"></i> حدِّث الجدول</button>
+            onclick="location.reload();"><i class="fa fa-rotate me-1"></i> حدث الجدول</button>
   </div>
 
   <div class="mb-4">
@@ -524,7 +524,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="stat-icon"><i class="fa fa-check-circle"></i></div>
         <div>
           <div class="stat-val"><?= count($approved_rows) ?></div>
-          <div class="stat-label">معتمد نهائياً (آخر 100)</div>
+          <div class="stat-label">معتمد نهائيا (آخر 100)</div>
         </div>
       </div>
     </div>
@@ -664,9 +664,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <h5>سجلات التايمشيت — قيد الاعتماد</h5>
         <small class="text-muted">
           <?php if ($is_admin): ?>
-            الأدمن يرى جميع السجلات غير المعتمدة نهائياً
+            الأدمن يرى جميع السجلات غير المعتمدة نهائيا
           <?php elseif ($my_level === 1): ?>
-            السجلات التي لم تحظَ بعد باعتمادك (المستوى 1)
+            السجلات التي لم تحظ بعد باعتمادك (المستوى 1)
           <?php else: ?>
             السجلات المعتمدة من المستوى <?= $prev_level ?> وبانتظار اعتمادك (المستوى <?= $my_level ?>)
           <?php endif; ?>
@@ -698,7 +698,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
           <tr>
             <?php if (!$is_admin && !$is_site_manager): ?>
             <th class="nosort ha-w36">
-              <input type="checkbox" id="chk-all-pending" aria-label="تحديدُ كلِّ السجلاتِ المعروضةِ للاعتماد" onchange="toggleAllPending(this)">
+              <input type="checkbox" id="chk-all-pending" aria-label="تحديد كل السجلات المعروضة للاعتماد" onchange="toggleAllPending(this)">
             </th>
             <?php endif; ?>
             <th>#</th>
@@ -731,10 +731,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th class="nosort">ملاحظات</th>
             <th class="nosort ha-nw">الاعتماد والتفاصيل</th>
             <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-            <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-            <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-            <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-            <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+            <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+            <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+            <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+            <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
             <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
             <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
             <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -764,7 +764,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               data-equip="<?= htmlspecialchars($_prow_equip) ?>">
             <?php if (!$is_admin && !$is_site_manager): ?>
             <td>
-              <input type="checkbox" class="row-chk" aria-label="تحديدُ هذا السجلِّ للاعتماد" value="<?= $row['id'] ?>"
+              <input type="checkbox" class="row-chk" aria-label="تحديد هذا السجل للاعتماد" value="<?= $row['id'] ?>"
                      onchange="updateSelCount()">
             </td>
             <?php endif; ?>
@@ -794,16 +794,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <span class="ha-t-sep">·</span>
                 <span title="توقف" class="ha-t-stop"><?= $_t['stop'] ?></span>
               <?php else: ?>
-                <span class="text-muted" title="صفٌّ سابقٌ للسجل القانوني — لا سطورَ له">—</span>
+                <span class="text-muted" title="صف سابق للسجل القانوني — لا سطور له">—</span>
               <?php endif; ?>
             </td>
             <td class="ha-tc">
               <?php if ($_bx && $_bx['flagged'] && !empty($_bx['flags'])): ?>
                 <span class="badge bx-flag ha-flag-badge" data-ts-id="<?= intval($row['id']) ?>"
                       data-flags="<?= htmlspecialchars(implode(' · ', $_bx['flags'])) ?>"
-                      title="<?= htmlspecialchars(implode(' · ', $_bx['flags'])) ?> — لا يُعتمد قبل التخليص (انقر للتخليص)">⚠</span>
+                      title="<?= htmlspecialchars(implode(' · ', $_bx['flags'])) ?> — لا يعتمد قبل التخليص (انقر للتخليص)">⚠</span>
               <?php elseif ($_bx && $_bx['flagged']): ?>
-                <span class="badge bg-success" title="كان معلَّمًا وخُلِّص — التفصيل في سجل الأعلام">✓</span>
+                <span class="badge bg-success" title="كان معلما وخلص — التفصيل في سجل الأعلام">✓</span>
               <?php endif; ?>
             </td>
             <?php endif; ?>
@@ -924,7 +924,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card-header-custom">
       <div class="ch-icon ha-ico-approved"><i class="fa fa-shield-check"></i></div>
       <div>
-        <h5>التايمشيت المعتمد نهائياً</h5>
+        <h5>التايمشيت المعتمد نهائيا</h5>
         <small class="text-muted">آخر 100 سجل حصلوا على اعتماد المستوى الرابع (مدير المشغلين)</small>
       </div>
       <span class="badge-count badge ha-badge-approved"><?= count($approved_rows) ?> سجل</span>
@@ -1118,7 +1118,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <!-- قائمة الملاحظات الموجودة -->
         <div id="notes-list" class="mb-3">
           <div class="text-center text-muted py-3">
-            <i class="fa fa-spinner fa-spin me-1"></i> جارٍ التحميل...
+            <i class="fa fa-spinner fa-spin me-1"></i> جار التحميل...
           </div>
         </div>
 
@@ -1338,7 +1338,7 @@ $(function () {
     if (pendingApproveIds.length === 0) return;
     var btn = this;
     btn.disabled = true;
-    btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i> جارٍ الاعتماد...';
+    btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i> جار الاعتماد...';
 
     $.ajax({
       url      : 'hours_approval_handler.php',
@@ -1427,7 +1427,7 @@ $(function() {
     }
     var btn = this;
     btn.disabled = true;
-    btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i> جارٍ الرفض...';
+    btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i> جار الرفض...';
 
     $.ajax({
       url      : 'hours_approval_handler.php',
@@ -1484,7 +1484,7 @@ function updateSelCount() {
 function openNotes(tsId) {
   currentTsId = tsId;
   $('#modal-ts-id').text(tsId);
-  $('#notes-list').html('<div class="text-center text-muted py-3"><i class="fa fa-spinner fa-spin me-1"></i> جارٍ التحميل...</div>');
+  $('#notes-list').html('<div class="text-center text-muted py-3"><i class="fa fa-spinner fa-spin me-1"></i> جار التحميل...</div>');
   $('#note-col-select').val('');
   $('#note-text-input').val('');
 
@@ -1610,7 +1610,7 @@ function renderBlocked(blocked) {
       ? '<ul class="mb-0">' + reasons.map(function (r) {
           return '<li>' + escHtml(r) + '</li>';
         }).join('') + '</ul>'
-      : '<span class="text-muted">لم يُرسَل سببٌ مفصَّل — راجع سجلّ النظام.</span>';
+      : '<span class="text-muted">لم يرسل سبب مفصل — راجع سجل النظام.</span>';
     html += '<li class="mb-2"><strong>السجل #' + escHtml(b.id) + '</strong>'
           + (b.kind === 'document' ? ' <span class="badge bg-danger">وثيقة منتهية</span>'
              : (b.kind === 'capacity' ? ' <span class="badge bg-warning text-dark">تجاوز طاقة</span>' : ''))
@@ -1661,7 +1661,7 @@ $(document).on('click', '.btn-ghost', function() {
 });
 
 // ── الفلاتر ──────────────────────────────────────────────────
-// دالة مخصصة لـ DataTables تفلتر بناءً على data attributes في <tr>
+// دالة مخصصة ل DataTables تفلتر بناء على data attributes في <tr>
 $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
   var tblId = settings.nTable.id;
   if (tblId !== 'tbl-pending' && tblId !== 'tbl-approved') return true;
@@ -1734,29 +1734,29 @@ function applyEquipTypeFilter() {
   <div class="modal-dialog"><div class="modal-content">
     <div class="modal-header ha-mh-warn">
       <h6 class="modal-title"><i class="fa fa-triangle-exclamation ha-ico-warn"></i>
-        تخليصُ تجاوز الطاقة — السجل <strong id="bx-clear-id"></strong></h6>
+        تخليص تجاوز الطاقة — السجل <strong id="bx-clear-id"></strong></h6>
       <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
     </div>
     <div class="modal-body">
       <div class="alert alert-warning py-2 ha-fs-85" id="bx-clear-flags"></div>
       <p class="ha-note-p">
-        نصّ §5.2: «صفُّ تجاوزِ طاقةٍ لا يُعتمد قبل: السبب · فحصُ التداخل ·
-        تحديدُ المشغّل الثاني» — الفحصُ يجري آليًّا، والاثنان الباقيان إفصاحُك أنت.
+        نص §5.2: «صف تجاوز طاقة لا يعتمد قبل: السبب · فحص التداخل ·
+        تحديد المشغل الثاني» — الفحص يجري آليا، والاثنان الباقيان إفصاحك أنت.
       </p>
-      <label class="form-label fw-bold" for="bx-clear-cause">سببُ التجاوز *</label>
+      <label class="form-label fw-bold" for="bx-clear-cause">سبب التجاوز *</label>
       <textarea id="bx-clear-cause" class="form-control" rows="2"
-                placeholder="مثال: ورديةٌ مزدوجةٌ طارئةٌ بطلب العميل — تسليمُ شحنة"></textarea>
-      <label class="form-label fw-bold mt-3" for="bx-return-reason">هل عمل مشغّلٌ ثانٍ؟ *</label>
+                placeholder="مثال: وردية مزدوجة طارئة بطلب العميل — تسليم شحنة"></textarea>
+      <label class="form-label fw-bold mt-3" for="bx-return-reason">هل عمل مشغل ثان؟ *</label>
       <div>
-        <label class="me-3"><input type="radio" name="bx-second" value="1" aria-label="نعم — عمل مشغّلٌ ثانٍ في الوردية"> نعم — مشغّلان تناوبا</label>
-        <label><input type="radio" name="bx-second" value="0" aria-label="لا — مشغّلٌ واحدٌ في الوردية"> لا — مشغّلٌ واحد</label>
+        <label class="me-3"><input type="radio" name="bx-second" value="1" aria-label="نعم — عمل مشغل ثان في الوردية"> نعم — مشغلان تناوبا</label>
+        <label><input type="radio" name="bx-second" value="0" aria-label="لا — مشغل واحد في الوردية"> لا — مشغل واحد</label>
       </div>
       <div id="bx-clear-err" class="text-danger mt-2 ha-fs-85 ha-hidden"></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">إلغاء</button>
       <button class="btn btn-secondary btn-sm fw-bold" id="bx-clear-go">
-        <i class="fa fa-unlock"></i> خلِّص باسمي</button>
+        <i class="fa fa-unlock"></i> خلص باسمي</button>
     </div>
   </div></div>
 </div>
@@ -1765,25 +1765,25 @@ function applyEquipTypeFilter() {
   <div class="modal-dialog"><div class="modal-content">
     <div class="modal-header ha-mh-info">
       <h6 class="modal-title"><i class="fa fa-rotate-left"></i>
-        إعادةٌ للاستكمال — السجل <strong id="bx-return-id"></strong></h6>
+        إعادة للاستكمال — السجل <strong id="bx-return-id"></strong></h6>
       <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
     </div>
     <div class="modal-body">
       <p class="ha-note-p">
-        تعود الواقعةُ لمُدخِلها <strong>بالرقم نفسه</strong> في جولةٍ جديدة —
-        يعدّلها ويعيد إرسالها، وتاريخُ الجولات كلِّه محفوظ (§8.2).
+        تعود الواقعة لمدخلها <strong>بالرقم نفسه</strong> في جولة جديدة —
+        يعدلها ويعيد إرسالها، وتاريخ الجولات كله محفوظ (§8.2).
       </p>
-      <label class="form-label fw-bold">سببُ الإعادة *</label>
+      <label class="form-label fw-bold">سبب الإعادة *</label>
       <div>
-        <label class="me-3"><input type="radio" name="bx-second" value="1" aria-label="نعم — عمل مشغّلٌ ثانٍ في الوردية"> نعم — مشغّلان تناوبا</label>
-        <label><input type="radio" name="bx-second" value="0" aria-label="لا — مشغّلٌ واحدٌ في الوردية"> لا — مشغّلٌ واحد</label>
+        <label class="me-3"><input type="radio" name="bx-second" value="1" aria-label="نعم — عمل مشغل ثان في الوردية"> نعم — مشغلان تناوبا</label>
+        <label><input type="radio" name="bx-second" value="0" aria-label="لا — مشغل واحد في الوردية"> لا — مشغل واحد</label>
       </div>
       <div id="bx-clear-err" class="text-danger mt-2 ha-fs-85 ha-hidden"></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">إلغاء</button>
       <button class="btn btn-secondary btn-sm fw-bold" id="bx-clear-go">
-        <i class="fa fa-unlock"></i> خلِّص باسمي</button>
+        <i class="fa fa-unlock"></i> خلص باسمي</button>
     </div>
   </div></div>
 </div>
@@ -1792,23 +1792,23 @@ function applyEquipTypeFilter() {
   <div class="modal-dialog"><div class="modal-content">
     <div class="modal-header ha-mh-info">
       <h6 class="modal-title"><i class="fa fa-rotate-left"></i>
-        إعادةٌ للاستكمال — السجل <strong id="bx-return-id"></strong></h6>
+        إعادة للاستكمال — السجل <strong id="bx-return-id"></strong></h6>
       <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
     </div>
     <div class="modal-body">
       <p class="ha-note-p">
-        تعود الواقعةُ لمُدخِلها <strong>بالرقم نفسه</strong> في جولةٍ جديدة —
-        يعدّلها ويعيد إرسالها، وتاريخُ الجولات كلِّه محفوظ (§8.2).
+        تعود الواقعة لمدخلها <strong>بالرقم نفسه</strong> في جولة جديدة —
+        يعدلها ويعيد إرسالها، وتاريخ الجولات كله محفوظ (§8.2).
       </p>
-      <label class="form-label fw-bold">سببُ الإعادة *</label>
+      <label class="form-label fw-bold">سبب الإعادة *</label>
       <textarea id="bx-return-reason" class="form-control" rows="2"
-                placeholder="مثال: توزيعُ الزمن ناقص — ساعتا التوقف بلا مسؤولٍ ومرجع"></textarea>
+                placeholder="مثال: توزيع الزمن ناقص — ساعتا التوقف بلا مسؤول ومرجع"></textarea>
       <div id="bx-return-err" class="text-danger mt-2 ha-fs-85 ha-hidden"></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">إلغاء</button>
       <button class="btn btn-primary btn-sm fw-bold" id="bx-return-go">
-        <i class="fa fa-rotate-left"></i> أعِد للاستكمال</button>
+        <i class="fa fa-rotate-left"></i> أعد للاستكمال</button>
     </div>
   </div></div>
 </div>
@@ -1832,7 +1832,7 @@ $('#bx-clear-go').on('click', function () {
   var cause = $.trim($('#bx-clear-cause').val());
   var second = $('input[name="bx-second"]:checked').val();
   if (!cause || second === undefined) {
-    $('#bx-clear-err').text('السببُ وإعلانُ المشغّل الثاني إلزاميان.').show();
+    $('#bx-clear-err').text('السبب وإعلان المشغل الثاني إلزاميان.').show();
     return;
   }
   var btn = this; btn.disabled = true;
@@ -1856,7 +1856,7 @@ function returnSingle(id) {
 
 $('#bx-return-go').on('click', function () {
   var reason = $.trim($('#bx-return-reason').val());
-  if (!reason) { $('#bx-return-err').text('سببُ الإعادة إلزامي — «إعادةٌ بسبب» نصًّا.').show(); return; }
+  if (!reason) { $('#bx-return-err').text('سبب الإعادة إلزامي — «إعادة بسبب» نصا.').show(); return; }
   var btn = this; btn.disabled = true;
   $.post('hours_approval_handler.php',
     { action: 'return_to_site', timesheet_id: bxReturnTsId, reason: reason,

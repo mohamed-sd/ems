@@ -127,14 +127,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     if (empty($__eff['ok'])) { $__unapproved[] = $__uid; }
                 }
                 if ($__unapproved) {
-                    $__msg = 'الدورُ ' . $__kind . ' وحاملوه بلا موافقةِ تكليفٍ سارية: #'
+                    $__msg = 'الدور ' . $__kind . ' وحاملوه بلا موافقة تكليف سارية: #'
                            . implode(' · #', array_slice($__unapproved, 0, 5));
                     if (function_exists('log_security_event')) {
                         log_security_event('U13_ASSIGNMENT_NOT_EFFECTIVE',
                             'role=' . $__rid . ' module=' . intval($module_id) . ' — ' . $__msg . ' [' . $__u13AsgMode . ']');
                     }
                     if ($__u13AsgMode === 'enforce') {
-                        $error_msg = 'لا تُمنح صلاحية: تكليفٌ بلا موافقةِ الرئيسِ لا يمنح صلاحيةً واحدة (CEO-Y0121) — ' . $__msg;
+                        $error_msg = 'لا تمنح صلاحية: تكليف بلا موافقة الرئيس لا يمنح صلاحية واحدة (CEO-Y0121) — ' . $__msg;
                     }
                 }
             }
@@ -163,7 +163,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             if (!empty($sod['warnings'])) {
                 $wNames = array();
                 foreach ($sod['warnings'] as $w) { $wNames[] = $w['name']; }
-                $success_msg .= ' — تنبيه فصل واجبات (تقريبي · مسجَّل): ' . implode(' · ', $wNames) . ' ⚠️';
+                $success_msg .= ' — تنبيه فصل واجبات (تقريبي · مسجل): ' . implode(' · ', $wNames) . ' ⚠️';
             }
             // N-02: تدقيقُ تغيير الصلاحية بقيم قبل/بعد (من غيّر ماذا ومتى)
             require_once __DIR__ . '/../includes/audit_trail.php';
@@ -707,7 +707,7 @@ $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-echo ems_states_bundle('لا صلاحياتٍ مسجَّلةً لهذا الدورِ بعدُ', 'اختر الدورَ من القائمةِ ثم امنحْ صلاحياتِ شاشاتِه واحفظْ');
+echo ems_states_bundle('لا صلاحيات مسجلة لهذا الدور بعد', 'اختر الدور من القائمة ثم امنح صلاحيات شاشاته واحفظ');
 ?>
 
     <!-- الرأس -->
@@ -847,7 +847,7 @@ echo ems_states_bundle('لا صلاحياتٍ مسجَّلةً لهذا الدو
 
                                             <div class="permission-checkbox">
                                                 <label>
-                                                    <input type="checkbox" name="can_view" aria-label="صلاحيةُ عرضِ هذه الشاشة"
+                                                    <input type="checkbox" name="can_view" aria-label="صلاحية عرض هذه الشاشة"
                                                         <?php echo ($perm && $perm['can_view']) ? 'checked' : ''; ?>>
                                                     ðŸ‘️ عرض
                                                 </label>
@@ -855,7 +855,7 @@ echo ems_states_bundle('لا صلاحياتٍ مسجَّلةً لهذا الدو
 
                                             <div class="permission-checkbox">
                                                 <label>
-                                                    <input type="checkbox" name="can_add" aria-label="صلاحيةُ الإضافةِ في هذه الشاشة"
+                                                    <input type="checkbox" name="can_add" aria-label="صلاحية الإضافة في هذه الشاشة"
                                                         <?php echo ($perm && $perm['can_add']) ? 'checked' : ''; ?>>
                                                     ➕ إضافة
                                                 </label>
@@ -863,7 +863,7 @@ echo ems_states_bundle('لا صلاحياتٍ مسجَّلةً لهذا الدو
 
                                             <div class="permission-checkbox">
                                                 <label>
-                                                    <input type="checkbox" name="can_edit" aria-label="صلاحيةُ التعديلِ في هذه الشاشة"
+                                                    <input type="checkbox" name="can_edit" aria-label="صلاحية التعديل في هذه الشاشة"
                                                         <?php echo ($perm && $perm['can_edit']) ? 'checked' : ''; ?>>
                                                     ✏️ تعديل
                                                 </label>
@@ -871,7 +871,7 @@ echo ems_states_bundle('لا صلاحياتٍ مسجَّلةً لهذا الدو
 
                                             <div class="permission-checkbox">
                                                 <label>
-                                                    <input type="checkbox" name="can_delete" aria-label="صلاحيةُ الحذفِ في هذه الشاشة"
+                                                    <input type="checkbox" name="can_delete" aria-label="صلاحية الحذف في هذه الشاشة"
                                                         <?php echo ($perm && $perm['can_delete']) ? 'checked' : ''; ?>>
                                                     🗑 
                                                 </label>
@@ -891,7 +891,7 @@ echo ems_states_bundle('لا صلاحياتٍ مسجَّلةً لهذا الدو
                         <?php endif; ?>
                     <?php else: ?>
                         <div class="empty-state alert-custom alert-info">
-                            <i class="fas fa-arrow-left"></i> اختر دوراً من القائمة لعرض الشاشات والصلاحيات
+                            <i class="fas fa-arrow-left"></i> اختر دورا من القائمة لعرض الشاشات والصلاحيات
                         </div>
                     <?php endif; ?>
                 </div>
@@ -917,10 +917,10 @@ echo ems_states_bundle('لا صلاحياتٍ مسجَّلةً لهذا الدو
                                     <th>🗑 </th>
                                     <th>الإجراء</th>
                                     <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                                     <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                                     <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                                     <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>

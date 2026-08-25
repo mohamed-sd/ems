@@ -48,7 +48,7 @@ $types = array();
 $r = @mysqli_query($conn, "SELECT id, type FROM equipments_types ORDER BY type");
 while ($r && ($x = mysqli_fetch_assoc($r))) { $types[] = $x; }
 
-$page_title = 'إيكوبيشن | استغلالُ الأسطول ومردوده';
+$page_title = 'إيكوبيشن | استغلال الأسطول ومردوده';
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
 require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(null);
@@ -73,21 +73,21 @@ include '../insidebar.php';
 </style>
 <div class="main ems-unified-page-shell">
 <?php
-$header_title = 'استغلالُ الأسطول ومردودُه';
+$header_title = 'استغلال الأسطول ومردوده';
 $header_icon = 'fa fa-gauge-high';
 $header_actions = array();
 $header_back = array('href' => '../main/role_board.php', 'class' => '', 'icon' => 'fa-solid fa-share', 'label' => '');
 include('../includes/page_header.php');
 if (function_exists('ems_screen_about')) {
     ems_screen_about(
-        'التأجيرُ يدير رأسَ مالٍ لا مخزونًا — فالسؤالُ: أيُّ معدةٍ تُطعم وأيُّها تُعطَّل؟ '
-        . 'الاستغلالُ المادّي أيامُ التأجير ÷ أيام المدة، والهامشُ إيرادُ العميل − تكلفةُ المورد. '
-        . 'ومردودُ رأس المال يظهر حيث توفّرت تكلفةُ الاقتناء ويُعلَن غيابُه حيث لم تتوفر.',
-        array('حدّد المدة', 'اقرأ الأدنى استغلالًا أولًا', 'قارن الفئات — لا الآلات وحدها')
+        'التأجير يدير رأس مال لا مخزونا — فالسؤال: أي معدة تطعم وأيها تعطل؟ '
+        . 'الاستغلال المادي أيام التأجير ÷ أيام المدة، والهامش إيراد العميل − تكلفة المورد. '
+        . 'ومردود رأس المال يظهر حيث توفرت تكلفة الاقتناء ويعلن غيابه حيث لم تتوفر.',
+        array('حدد المدة', 'اقرأ الأدنى استغلالا أولا', 'قارن الفئات — لا الآلات وحدها')
     );
 }
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضيًا
-echo ems_states_bundle('لا معداتِ أسطولٍ بوقائعَ في هذه المدة', 'وسّعِ المدةَ أو أزِلْ مرشِّحَ الفئةِ ثمَّ اضغط «اقِس»');
+echo ems_states_bundle('لا معدات أسطول بوقائع في هذه المدة', 'وسع المدة أو أزل مرشح الفئة ثم اضغط «اقس»');
 ?>
   <div class="card"><div class="card-body">
         <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
@@ -105,7 +105,7 @@ echo ems_states_bundle('لا معداتِ أسطولٍ بوقائعَ في هذ�
               <?php echo fu_e($t['type']); ?></option>
           <?php endforeach; ?>
         </select></div>
-      <div><button type="submit" class="btn btn-primary"><i class="fa fa-chart-line"></i> اقِس</button></div>
+      <div><button type="submit" class="btn btn-primary"><i class="fa fa-chart-line"></i> اقس</button></div>
     </form>
         </div>
     </div>
@@ -115,16 +115,16 @@ echo ems_states_bundle('لا معداتِ أسطولٍ بوقائعَ في هذ�
   <div class="fu-kpis">
     <div class="card"><div class="card-body fu-kpi-body">
       <div class="fu-kpi-num"><?php echo (int) $summary['fleet']; ?></div>
-      <div class="text-muted">معدةً في الأسطول</div></div></div>
+      <div class="text-muted">معدة في الأسطول</div></div></div>
     <div class="card"><div class="card-body fu-kpi-body">
       <div class="fu-kpi-num fu-ok"><?php echo (int) $summary['rented']; ?></div>
       <div class="text-muted">عملت في المدة</div></div></div>
     <div class="card"><div class="card-body fu-kpi-body">
       <div class="fu-kpi-num fu-warn"><?php echo (int) $summary['idle']; ?></div>
-      <div class="text-muted">لم تعمل إطلاقًا</div></div></div>
+      <div class="text-muted">لم تعمل إطلاقا</div></div></div>
     <div class="card"><div class="card-body fu-kpi-body">
       <div class="fu-kpi-num"><?php echo fu_n($summary['avg_util'], 1); ?>٪</div>
-      <div class="text-muted">متوسطُ الاستغلال</div></div></div>
+      <div class="text-muted">متوسط الاستغلال</div></div></div>
     <div class="card"><div class="card-body fu-kpi-body">
       <div class="fu-kpi-num-sm fu-ok"><?php echo fu_n($summary['margin']); ?></div>
       <div class="text-muted">الهامش<?php echo $summary['margin_pct'] !== null ? ' (' . fu_n($summary['margin_pct'], 1) . '٪)' : ''; ?></div></div></div>
@@ -133,24 +133,24 @@ echo ems_states_bundle('لا معداتِ أسطولٍ بوقائعَ في هذ�
   <?php if ($summary['mixed_currency'] > 0 || $summary['with_oec'] < $summary['fleet']): ?>
   <div class="alert alert-warning fu-alert">
     <?php if ($summary['with_oec'] < $summary['fleet']): ?>
-      <div><i class="fa fa-circle-info"></i> مردودُ رأس المال محسوبٌ لـ<b><?php echo (int) $summary['with_oec']; ?></b>
-        معدةً فقط من <?php echo (int) $summary['fleet']; ?> — الباقي بلا تكلفةِ اقتناءٍ مسجَّلة.
-        <b>الغيابُ مُعلَنٌ لا مصفَّر.</b></div>
+      <div><i class="fa fa-circle-info"></i> مردود رأس المال محسوب ل<b><?php echo (int) $summary['with_oec']; ?></b>
+        معدة فقط من <?php echo (int) $summary['fleet']; ?> — الباقي بلا تكلفة اقتناء مسجلة.
+        <b>الغياب معلن لا مصفر.</b></div>
     <?php endif; ?>
     <?php if ($summary['mixed_currency'] > 0): ?>
       <div><i class="fa fa-triangle-exclamation"></i> <b><?php echo (int) $summary['mixed_currency']; ?></b>
-        معدةً بوقائعَ بعملتين — أرقامُها مجموعةٌ خامًا فاقرأها بحذر (لا تُجمع عملتان في رقم).</div>
+        معدة بوقائع بعملتين — أرقامها مجموعة خاما فاقرأها بحذر (لا تجمع عملتان في رقم).</div>
     <?php endif; ?>
     <?php if ($summary['negative_margin'] > 0): ?>
       <div><i class="fa fa-arrow-trend-down"></i> <b><?php echo (int) $summary['negative_margin']; ?></b>
-        معدةً بهامشٍ سالب — اقرأها أولًا.</div>
+        معدة بهامش سالب — اقرأها أولا.</div>
     <?php endif; ?>
   </div>
   <?php endif; ?>
 
   <!-- بالفئة -->
   <div class="card fu-card"><div class="card-body">
-    <h5 class="fu-tight"><i class="fa fa-layer-group"></i> بالفئة — أيُّ فئةٍ تُطعم؟</h5>
+    <h5 class="fu-tight"><i class="fa fa-layer-group"></i> بالفئة — أي فئة تطعم؟</h5>
     <div class="table-responsive"><table class="table table-sm" data-no-dt="hard">
       <thead><tr><th>الفئة</th><th>الأسطول</th><th>عملت</th><th>الاستغلال</th><th>الإيراد</th><th>التكلفة</th><th>الهامش</th><th>نسبة الهامش</th></tr></thead>
       <tbody>
@@ -175,17 +175,17 @@ echo ems_states_bundle('لا معداتِ أسطولٍ بوقائعَ في هذ�
 
   <!-- لكل معدة -->
   <div class="card fu-card"><div class="card-body">
-    <h5 class="fu-tight"><i class="fa fa-truck"></i> لكل معدة — الأدنى استغلالًا أولًا</h5>
+    <h5 class="fu-tight"><i class="fa fa-truck"></i> لكل معدة — الأدنى استغلالا أولا</h5>
     <div class="table-responsive"><table class="table display" id="fuTable" data-order='[]' data-page-length="25" data-state-save="false">
       <thead><tr>
-        <th>الكود</th><th>المعدة</th><th>الفئة</th><th>أيامُ التأجير</th><th>الاستغلال</th>
-        <th>الإيراد</th><th>تكلفةُ المورد</th><th>الهامش</th><th>نسبةُ الهامش</th>
-        <th>تكلفةُ الاقتناء</th><th>مردودُ رأس المال</th>
+        <th>الكود</th><th>المعدة</th><th>الفئة</th><th>أيام التأجير</th><th>الاستغلال</th>
+        <th>الإيراد</th><th>تكلفة المورد</th><th>الهامش</th><th>نسبة الهامش</th>
+        <th>تكلفة الاقتناء</th><th>مردود رأس المال</th>
         <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-        <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-        <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-        <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-        <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+        <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+        <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+        <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+        <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
         <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
         <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
         <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -205,7 +205,7 @@ echo ems_states_bundle('لا معداتِ أسطولٍ بوقائعَ في هذ�
           <td class="fu-strong <?php echo $r['margin'] < 0 ? 'fu-warn' : 'fu-ok'; ?>">
               <?php echo fu_n($r['margin']); ?></td>
           <td><?php echo $r['margin_pct'] === null ? '—' : fu_n($r['margin_pct'], 1) . '٪'; ?></td>
-          <td><?php echo $r['oec'] === null ? '<span class="text-muted">غير مسجَّلة</span>' : fu_n($r['oec']); ?></td>
+          <td><?php echo $r['oec'] === null ? '<span class="text-muted">غير مسجلة</span>' : fu_n($r['oec']); ?></td>
           <td><?php echo $r['oec_yield_pct'] === null
                 ? '<span class="text-muted">—</span>' : fu_n($r['oec_yield_pct'], 1) . '٪'; ?></td>
         </tr>
@@ -213,8 +213,8 @@ echo ems_states_bundle('لا معداتِ أسطولٍ بوقائعَ في هذ�
       </tbody>
     </table></div>
     <p class="text-muted fu-note">
-      الهامشُ هنا من الوقائع المالية المنسوبة للمعدة (<code>equipment_id</code>) — وهو المقياسُ الصادق لأسطولٍ
-      جُلُّه مورَّدٌ لا مملوك. ومردودُ رأس المال مقياسُ الأسطول المملوك، فيظهر حيث تُسجَّل تكلفةُ الاقتناء.
+      الهامش هنا من الوقائع المالية المنسوبة للمعدة (<code>equipment_id</code>) — وهو المقياس الصادق لأسطول
+      جله مورد لا مملوك. ومردود رأس المال مقياس الأسطول المملوك، فيظهر حيث تسجل تكلفة الاقتناء.
     </p>
   </div></div>
 </div>

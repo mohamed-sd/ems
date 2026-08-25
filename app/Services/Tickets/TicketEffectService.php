@@ -63,10 +63,10 @@ class TicketEffectService
             /* ◆ والرفضُ **يُسجَّل**: منعٌ صامتٌ يُقرأ عطلًا فيُلتَفُّ عليه */
             if (function_exists('ems_log_denial')) {
                 @ems_log_denial('TKT-403-SELFCAUSE', 'ticket_workstreams:' . $mws,
-                    'مكلَّفُ المسارِ حاول اعتمادَ سببِه الفنيِّ بنفسِه');
+                    'مكلف المسار حاول اعتماد سببه الفني بنفسه');
             }
             return array('ok' => false, 'code' => 403,
-                'reason' => 'TKT-403-SELFCAUSE: لا يعتمد مكلَّفُ المسارِ سببَه الفنيَّ — يدٌ ثانيةٌ لازمة');
+                'reason' => 'TKT-403-SELFCAUSE: لا يعتمد مكلف المسار سببه الفني — يد ثانية لازمة');
         }
         $woRef = 'WO-TK' . $tkId;
         $stmt = $conn->prepare(
@@ -76,12 +76,12 @@ class TicketEffectService
         $stmt->close();
         $stmt = $conn->prepare("INSERT INTO ticket_responses (tk_id, ws_id, person_id, response_type, body) VALUES (?, ?, ?, 'reply', ?)");
         $p = intval($approverPersonId);
-        $body = 'اعتماد السبب الفني (الخطوة ③): ' . $causeNote . ' — فُتح ' . $woRef;
+        $body = 'اعتماد السبب الفني (الخطوة ③): ' . $causeNote . ' — فتح ' . $woRef;
         $stmt->bind_param('iiis', $tkId, $mws, $p, $body);
         $stmt->execute();
         $stmt->close();
         return array('ok' => true, 'code' => 200, 'work_order' => $woRef,
-            'reason' => 'السبب الفني معتمد وأمر العمل مفتوح — والإسناد ما زال مبدئيًّا حتى اعتماد مدير الحركة');
+            'reason' => 'السبب الفني معتمد وأمر العمل مفتوح — والإسناد ما زال مبدئيا حتى اعتماد مدير الحركة');
     }
 
     /**
@@ -98,7 +98,7 @@ class TicketEffectService
               WHERE w.tk_id = {$tkId} AND e.effect_type = 'work_order'")->fetch_assoc()['c']);
         if ($wo === 0) {
             return array('ok' => false, 'code' => 409,
-                'reason' => 'لا إسناد نهائيًّا قبل اعتماد الصيانة للسبب الفني — الخطوات الأربع بترتيبها');
+                'reason' => 'لا إسناد نهائيا قبل اعتماد الصيانة للسبب الفني — الخطوات الأربع بترتيبها');
         }
         $conn->query("UPDATE ticket_effects e JOIN ticket_workstreams w ON w.ws_id = e.ws_id
                         SET e.is_provisional = 0
@@ -111,7 +111,7 @@ class TicketEffectService
         $stmt->execute();
         $stmt->close();
         return array('ok' => true, 'code' => 200, 'finalized' => $changed,
-            'reason' => 'الإسناد نهائي بعد الاعتمادين — الطرف المتحمل لم يعد مبدئيًّا');
+            'reason' => 'الإسناد نهائي بعد الاعتمادين — الطرف المتحمل لم يعد مبدئيا');
     }
 
     /** أثر يناسب الطبيعة (T18): رد موثق أو إقرار استلام أو قرار عدم إجراء. */

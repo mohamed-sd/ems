@@ -24,17 +24,17 @@ $U13 = array(
     'icon'       => 'fa fa-flag',
     'nature'     => 'document',
     'doc'        => 'IAF-01 §4-3 · IAF-0025',
-    'intro'      => 'كلُّ ملاحظةٍ بخطورتِها ومهلةِ ردِّها وخطةِ معالجتها',
-    'rule'       => 'لا تُغلق ملاحظةٌ بلا دليلٍ يقبله المراجعُ — ولا تُغلق من الإدارةِ نفسِها',
-    'empty_hint' => 'لا ملاحظاتٍ مفتوحة',
+    'intro'      => 'كل ملاحظة بخطورتها ومهلة ردها وخطة معالجتها',
+    'rule'       => 'لا تغلق ملاحظة بلا دليل يقبله المراجع — ولا تغلق من الإدارة نفسها',
+    'empty_hint' => 'لا ملاحظات مفتوحة',
     'order'       => 'raised_at DESC',
 
     'actions'    => array(
         'raise' => array(
             'code'  => 'iaf.finding.raise',
-            'label' => 'رفعُ ملاحظة',
-            'rule'  => 'IAF-0025: رفعُ الملاحظةِ للمراجعِ الداخليِّ حصرًا — ولا ملاحظةَ بلا مهمة',
-            'fields' => array('engagement_no' => 'رقمُ المهمة', 'title' => 'عنوانُ الملاحظة', 'severity' => 'الخطورة', 'auditee_dept' => 'الإدارةُ المُلاحَظة'),
+            'label' => 'رفع ملاحظة',
+            'rule'  => 'IAF-0025: رفع الملاحظة للمراجع الداخلي حصرا — ولا ملاحظة بلا مهمة',
+            'fields' => array('engagement_no' => 'رقم المهمة', 'title' => 'عنوان الملاحظة', 'severity' => 'الخطورة', 'auditee_dept' => 'الإدارة الملاحظة'),
             'run' => function ($conn, $co, $uid, $in) {
                 require_once __DIR__ . '/../app/Services/Audit/InternalAuditService.php';
                 return \App\Services\Audit\InternalAuditService::raiseFinding($conn, array(
@@ -44,9 +44,9 @@ $U13 = array(
             }),
         'accept_evidence' => array(
             'code'  => 'iaf.evidence.accept',
-            'label' => 'قبولُ دليلٍ على ملاحظة',
-            'rule'  => 'الدليلُ يقبله المراجعُ — وقبولُه شرطُ الإغلاق',
-            'fields' => array('finding_no' => 'رقمُ الملاحظة', 'evidence_ref' => 'مرجعُ الدليل'),
+            'label' => 'قبول دليل على ملاحظة',
+            'rule'  => 'الدليل يقبله المراجع — وقبوله شرط الإغلاق',
+            'fields' => array('finding_no' => 'رقم الملاحظة', 'evidence_ref' => 'مرجع الدليل'),
             'run' => function ($conn, $co, $uid, $in) {
                 require_once __DIR__ . '/../app/Services/Audit/InternalAuditService.php';
                 return \App\Services\Audit\InternalAuditService::acceptEvidence($conn, array(
@@ -55,9 +55,9 @@ $U13 = array(
             }),
         'close' => array(
             'code'  => 'iaf.finding.close',
-            'label' => 'إغلاقُ ملاحظة',
-            'rule'  => 'CEO-Y0125: ولا يملك الرئيسُ إغلاقَها بلا دليل · ولا تُغلق من الإدارةِ نفسِها',
-            'fields' => array('finding_no' => 'رقمُ الملاحظة'),
+            'label' => 'إغلاق ملاحظة',
+            'rule'  => 'CEO-Y0125: ولا يملك الرئيس إغلاقها بلا دليل · ولا تغلق من الإدارة نفسها',
+            'fields' => array('finding_no' => 'رقم الملاحظة'),
             'run' => function ($conn, $co, $uid, $in) {
                 require_once __DIR__ . '/../app/Services/Audit/InternalAuditService.php';
                 return \App\Services\Audit\InternalAuditService::closeFinding($conn, array(
@@ -70,6 +70,6 @@ require __DIR__ . '/../includes/u13_screen_kit.php';
 /* حزمةُ الحالاتِ الدنيا (UXW-01 بوابة ٩): تحميلٌ وفراغٌ وخطأٌ — مخفيةٌ افتراضًا
    ويُظهرها منطقُ الشاشةِ عند حالِها. الدالةُ من ux_components التي تُحمِّلها القشرة. */
 if (function_exists('ems_states_bundle')) {
-    echo ems_states_bundle('لا ملاحظاتِ مراجعةٍ مفتوحة',
-                           'تُرفع الملاحظةُ من مهمةِ مراجعةٍ قائمةٍ بخطورتِها ومهلةِ ردِّها (IAF-0025)');
+    echo ems_states_bundle('لا ملاحظات مراجعة مفتوحة',
+                           'ترفع الملاحظة من مهمة مراجعة قائمة بخطورتها ومهلة ردها (IAF-0025)');
 }

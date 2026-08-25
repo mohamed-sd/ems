@@ -40,22 +40,22 @@ $COLS   = array (
   8 => 'كود المعدة',
   9 => 'دور المعدة',
   10 => 'حصة المورد الكلية',
-  11 => 'الحصة المخصَّصة للمعدة',
+  11 => 'الحصة المخصصة للمعدة',
   12 => 'عدد الورديات',
   13 => 'وحدات الوردية',
   14 => 'الوحدات الشهرية للمعدة',
   15 => 'مجموع حصص معدات المورد',
   16 => 'المتبقي من حصة المورد',
-  17 => 'المنفَّذ فعليًّا',
+  17 => 'المنفذ فعليا',
   18 => 'الفارق',
   19 => 'سبب الفارق',
   20 => 'تاريخ السريان',
   21 => 'تاريخ الانتهاء',
   22 => 'مفتاح منع التكرار',
-  23 => 'المُنشئ — الاسم والصفة',
-  24 => 'المعتمِد — الاسم والصفة',
+  23 => 'المنشئ — الاسم والصفة',
+  24 => 'المعتمد — الاسم والصفة',
   25 => 'تاريخ الاعتماد',
-  26 => 'معكوس بـ',
+  26 => 'معكوس ب',
   27 => 'الحالة',
 );
 $FIELDS = array (
@@ -69,18 +69,18 @@ $FIELDS = array (
   7 => 'كود المعدة',
   8 => 'دور المعدة',
   9 => 'حصة المورد الكلية',
-  10 => 'الحصة المخصَّصة للمعدة',
+  10 => 'الحصة المخصصة للمعدة',
   11 => 'عدد الورديات',
   12 => 'وحدات الوردية',
   13 => 'الوحدات الشهرية للمعدة',
   14 => 'مجموع حصص معدات المورد',
   15 => 'المتبقي من حصة المورد',
-  16 => 'المنفَّذ فعليًّا',
+  16 => 'المنفذ فعليا',
   17 => 'الفارق',
   18 => 'سبب الفارق',
   19 => 'تاريخ السريان',
   20 => 'تاريخ الانتهاء',
-  21 => 'المعتمِد — الاسم والصفة',
+  21 => 'المعتمد — الاسم والصفة',
   22 => 'تاريخ الاعتماد',
   23 => 'الحالة',
 );
@@ -96,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     $creator = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
     // الموجة ٢: الحفظ في الجدول الأصلي للشاشة (الفارغ NULL — لا مخزن بينيًّا)
     $ok = cmp03_store_insert($conn, $company_id, $CANONICAL, $payload, $status, $uid, $creator);
-    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
+    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
     exit();
 }
 
@@ -111,7 +111,7 @@ $entityName = $govCtx['values']['entity'] ?? '—';
 function cmp03_cell($col, $row, $entityName) {
     $n = cmp03_screen_norm($col);
     if ($n === cmp03_screen_norm('الكيان')) { return $entityName; }
-    if ($n === cmp03_screen_norm('المُنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المُنشئة')) {
+    if ($n === cmp03_screen_norm('المنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المنشئة')) {
         return $row['created_by_name'] ?: '—';
     }
     if ($n === cmp03_screen_norm('تاريخ الإنشاء')) { return $row['created_at']; }
@@ -126,7 +126,7 @@ function cmp03_screen_norm($s) {
     $s = str_replace(array('أ','إ','آ'), 'ا', $s);
     $s = str_replace('ة', 'ه', $s);
     $s = str_replace('ى', 'ي', $s);
-    return preg_replace('/[ًٌٍَُِّْ]/u', '', $s);
+    return preg_replace('/[]/u', '', $s);
 }
 
 $page_title = 'إيكوبيشن | توزيع وحدات المورد على معداته';
@@ -151,9 +151,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
-    echo ems_states_bundle('لا توزيعاتِ حصصٍ مسجَّلةً بعدُ', 'أضف أولَ صفٍّ بزرِّ «إضافة» في رأسِ الشاشة');
+    echo ems_states_bundle('لا توزيعات حصص مسجلة بعد', 'أضف أول صف بزر «إضافة» في رأس الشاشة');
     ?>
-<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('supplier', 'المعداتُ والمشغّلون'); ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('supplier', 'المعدات والمشغلون'); ?>
 
     <!-- فورم الإضافة الموحد (ems-forms) — مطويٌّ حتى زرِّ الرأس -->
     <form method="post" action="" class="allforms" id="cmp03AddForm">
@@ -183,7 +183,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="f8" maxlength="190" id="emsf_817_c4750"></div>
                 <div class="form-group"><label for="emsf_818_015a4">حصة المورد الكلية</label>
                     <input type="text" name="f9" maxlength="190" id="emsf_818_015a4"></div>
-                <div class="form-group"><label for="emsf_819_4dbe7">الحصة المخصَّصة للمعدة</label>
+                <div class="form-group"><label for="emsf_819_4dbe7">الحصة المخصصة للمعدة</label>
                     <input type="text" name="f10" maxlength="190" id="emsf_819_4dbe7"></div>
                 <div class="form-group"><label for="emsf_820_1bbbd">عدد الورديات</label>
                     <input type="text" inputmode="decimal" name="f11" placeholder="0" id="emsf_820_1bbbd"></div>
@@ -195,7 +195,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="f14" maxlength="190" id="emsf_823_41d11"></div>
                 <div class="form-group"><label for="emsf_824_2e0dd">المتبقي من حصة المورد</label>
                     <input type="text" name="f15" maxlength="190" id="emsf_824_2e0dd"></div>
-                <div class="form-group"><label for="emsf_825_3d32b">المنفَّذ فعليًّا</label>
+                <div class="form-group"><label for="emsf_825_3d32b">المنفذ فعليا</label>
                     <input type="text" name="f16" maxlength="190" id="emsf_825_3d32b"></div>
                 <div class="form-group"><label for="emsf_826_99c99">الفارق</label>
                     <input type="text" name="f17" maxlength="190" id="emsf_826_99c99"></div>
@@ -205,7 +205,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="date" name="f19" id="emsf_828_04740"></div>
                 <div class="form-group"><label for="emsf_829_e527f">تاريخ الانتهاء</label>
                     <input type="date" name="f20" id="emsf_829_e527f"></div>
-                <div class="form-group"><label for="emsf_830_cd476">المعتمِد — الاسم والصفة</label>
+                <div class="form-group"><label for="emsf_830_cd476">المعتمد — الاسم والصفة</label>
                     <input type="text" name="f21" maxlength="190" id="emsf_830_cd476"></div>
                 <div class="form-group"><label for="emsf_831_968a9">تاريخ الاعتماد</label>
                     <input type="date" name="f22" id="emsf_831_968a9"></div>
@@ -223,7 +223,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="table-responsive">
         <table class="alltables display" id="equipment_quotaTable">
             <thead><tr>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
             <th>رقم الحاوية</th>
             <th>المورد</th>
             <th>العقد العميل</th>
@@ -234,27 +234,27 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th>كود المعدة</th>
             <th>دور المعدة</th>
             <th>حصة المورد الكلية</th>
-            <th>الحصة المخصَّصة للمعدة</th>
+            <th>الحصة المخصصة للمعدة</th>
             <th>عدد الورديات</th>
             <th>وحدات الوردية</th>
             <th>الوحدات الشهرية للمعدة</th>
             <th>مجموع حصص معدات المورد</th>
             <th>المتبقي من حصة المورد</th>
-            <th>المنفَّذ فعليًّا</th>
+            <th>المنفذ فعليا</th>
             <th>الفارق</th>
             <th>سبب الفارق</th>
             <th>تاريخ السريان</th>
             <th>تاريخ الانتهاء</th>
             <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-            <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-            <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+            <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+            <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
             <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-            <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+            <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
             <th class="ems-gov-th none" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
             </tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="28" class="text-center text-muted">لا بياناتَ بعدُ — أضف أول صفٍّ بزر «إضافة»</td></tr>
+                <tr><td colspan="28" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
                     <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>

@@ -59,16 +59,16 @@ if ($is_super_admin) {
     $st->close();
 }
 if (!$can_view) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض مسيّر الرواتب ❌', 'GOV-PERM-403', '');
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض مسير الرواتب ❌', 'GOV-PERM-403', '');
     exit();
 }
 
 $gate = $is_super_admin ? ems_tenant_db()->forAllTenants('payroll runs super') : ems_tenant_db();
 
 $CAT_LABELS = array('all' => 'الكل', 'permanent' => 'دائم', 'project' => 'مشروعي',
-                    'operator' => 'مشغّل', 'supplier_worker' => 'عاملُ مورد');
+                    'operator' => 'مشغّل', 'supplier_worker' => 'عامل مورد');
 $STATE_LABELS = array('Open' => 'مفتوحة', 'Calculated' => 'محتسَبة', 'Blocked' => 'موقوفة',
-                      'Review' => 'مراجعة', 'Approved' => 'معتمَدة', 'Paid' => 'مدفوعة', 'Closed' => 'مقفلة');
+                      'Review' => 'مراجعة', 'Approved' => 'معتمدة', 'Paid' => 'مدفوعة', 'Closed' => 'مقفلة');
 
 $selected = intval($_GET['run_id'] ?? 0);
 $redirect = function ($msg, $rid) { ems_gov_redirect("Location: payroll_runs.php?run_id=" . intval($rid)
@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'period_to'       => $_POST['period_to'] ?? '',
             'category_filter' => $_POST['category_filter'] ?? 'all',
         ), $uid);
-        $redirect($r['ok'] ? 'فُتحت الدورة ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'),
+        $redirect($r['ok'] ? 'فتحت الدورة ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'),
                   $r['run_id'] ? $r['run_id'] : 0);
     }
 
@@ -92,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $rid2 = intval($_POST['run_id'] ?? 0);
         if (!$can_edit) { $redirect('لا توجد صلاحية لهذا الإجراء ❌', $rid2); }
         $r = PRS::bindSnapshots($conn, $gate, $company_id, $rid2, $uid);
-        $redirect($r['ok'] ? ('ربطُ اللقطات: ' . $r['lines'] . ' سطرًا · ' . $r['reason'] . ' ✅')
+        $redirect($r['ok'] ? ('ربط اللقطات: ' . $r['lines'] . ' سطرا · ' . $r['reason'] . ' ✅')
                            : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $rid2);
     }
 
@@ -122,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$can_edit) { $redirect('لا توجد صلاحية لهذا الإجراء ❌', $rid2); }
         $r = PSM::transition($conn, $gate, $company_id, $rid2, strval($_POST['to_state'] ?? ''), $uid,
             array('payment_ref' => $_POST['payment_ref'] ?? ''));
-        $redirect($r['ok'] ? ('الدورةُ صارت «' . PSM::labelAr($r['state']) . '» ✅')
+        $redirect($r['ok'] ? ('الدورة صارت «' . PSM::labelAr($r['state']) . '» ✅')
                            : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $rid2);
     }
 
@@ -136,7 +136,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'doc_ref'   => $_POST['doc_ref'] ?? '',
             'note'      => $_POST['input_note'] ?? '',
         ), $uid);
-        $redirect($r['ok'] ? 'سُجّل مدخلُ الزمن بمستنده ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $rid2);
+        $redirect($r['ok'] ? 'سجل مدخل الزمن بمستنده ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $rid2);
     }
 }
 
@@ -160,7 +160,7 @@ foreach ($lines as $l) {
     if ((string) $l['calc_state'] === 'pending_slice') { $pending++; }
 }
 
-$page_title = 'إيكوبيشن | مسيّر الرواتب';
+$page_title = 'إيكوبيشن | مسير الرواتب';
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
 require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(null);
@@ -186,13 +186,13 @@ $__maySeePay = ems_may_see_field($conn, 'payroll.amount',
 /** يُرجع المبلغَ لمن يملك، و«محجوب» لمن لا يملك — ولا يطبع الرقمَ إطلاقًا. */
 $__money = function ($v, $fmt = true) use ($__maySeePay) {
     if (!$__maySeePay) { return 'محجوب'; }
-    if ($v === null) { return 'لم يُحتسب'; }
+    if ($v === null) { return 'لم يحتسب'; }
     return $fmt ? number_format((float) $v, 2) : (string) $v;
 };
 ?>
 <div class="main ems-unified-page-shell">
     <?php
-    $header_title = 'مسيّر الرواتب — بوابةُ اللقطة'; $header_icon = 'fa fa-money-check-dollar';
+    $header_title = 'مسير الرواتب — بوابة اللقطة'; $header_icon = 'fa fa-money-check-dollar';
     $header_actions = array();
     if ($can_add) {
         $header_actions[] = array('href' => 'javascript:void(0)', 'id' => 'toggleRunForm',
@@ -202,7 +202,7 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
                          'icon' => 'fas fa-arrow-right', 'label' => 'سجل العقود');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا دوراتِ مسيّرِ رواتبَ مفتوحةً بعدُ', 'افتحْ أولَ دورةٍ بزرِّ «دورة جديدة» في رأسِ الشاشة');
+    echo ems_states_bundle('لا دورات مسير رواتب مفتوحة بعد', 'افتح أول دورة بزر «دورة جديدة» في رأس الشاشة');
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>';
     }
@@ -211,17 +211,17 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
 
     <div class="alert alert-warning pr-notice">
         <i class="fa fa-circle-info"></i>
-        <strong>الشريحة ① — بوابةُ اللقطة.</strong>
-        يُحتسب هنا ما لا يحتاج زمنًا ولا إنتاجًا (مبلغٌ ثابتٌ · نسبةٌ من الأساسي).
-        وما عداه يظهر سطرًا بحالة <strong>«ينتظر الشريحة»</strong> بلا مبلغ —
-        <em>لا احتسابَ ناقصٌ صامت</em> (ENT-01 §5).
+        <strong>الشريحة ① — بوابة اللقطة.</strong>
+        يحتسب هنا ما لا يحتاج زمنا ولا إنتاجا (مبلغ ثابت · نسبة من الأساسي).
+        وما عداه يظهر سطرا بحالة <strong>«ينتظر الشريحة»</strong> بلا مبلغ —
+        <em>لا احتساب ناقص صامت</em> (ENT-01 §5).
     </div>
 
     <?php if ($can_add): ?>
     <form method="post" class="allforms" id="runForm">
         <?= csrf_field() ?>
         <input type="hidden" name="pr_action" value="open_run">
-        <div class="card"><div class="card-header"><h5><i class="fa fa-calendar"></i> دورةُ مسيّرٍ جديدة</h5></div>
+        <div class="card"><div class="card-header"><h5><i class="fa fa-calendar"></i> دورة مسير جديدة</h5></div>
         <div class="card-body"><div class="form-grid">
             <div class="form-group"><label for="emsf_1751_f3df5">من <span class="pr-required-mark">*</span></label>
                 <input type="date" name="period_from" required id="emsf_1751_f3df5"></div>
@@ -244,7 +244,7 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
     <div class="card"><div class="card-body">
         <form method="get" class="pr-filter-form">
             <strong>الدورة:</strong>
-            <select name="run_id" aria-label="اختيارُ دورةِ المسيّر" onchange="this.form.submit()" class="pr-run-select">
+            <select name="run_id" aria-label="اختيار دورة المسير" onchange="this.form.submit()" class="pr-run-select">
                 <?php foreach ($runs as $r): ?>
                     <option value="<?php echo intval($r['id']); ?>" <?php echo $selected === intval($r['id']) ? 'selected' : ''; ?>>
                         #<?php echo intval($r['id']); ?> — <?php echo htmlspecialchars((string)$r['period_from']); ?>
@@ -270,19 +270,19 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
         <?= csrf_field() ?>
                     <input type="hidden" name="pr_action" value="time_path">
                     <input type="hidden" name="run_id" value="<?php echo $selected; ?>">
-                    <button type="submit" class="btn-primary"><i class="fa fa-clock"></i> المسارُ الزمني</button>
+                    <button type="submit" class="btn-primary"><i class="fa fa-clock"></i> المسار الزمني</button>
                 </form>
                 <form method="post" class="pr-inline-form">
         <?= csrf_field() ?>
                     <input type="hidden" name="pr_action" value="production_path">
                     <input type="hidden" name="run_id" value="<?php echo $selected; ?>">
-                    <button type="submit" class="btn-primary"><i class="fa fa-cubes"></i> المسارُ الإنتاجي</button>
+                    <button type="submit" class="btn-primary"><i class="fa fa-cubes"></i> المسار الإنتاجي</button>
                 </form>
                 <form method="post" class="pr-inline-form">
         <?= csrf_field() ?>
                     <input type="hidden" name="pr_action" value="offsets">
                     <input type="hidden" name="run_id" value="<?php echo $selected; ?>">
-                    <button type="submit" class="btn-primary"><i class="fa fa-scale-balanced"></i> المقاصّة</button>
+                    <button type="submit" class="btn-primary"><i class="fa fa-scale-balanced"></i> المقاصة</button>
                 </form>
             <?php endif; ?>
 
@@ -305,12 +305,12 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
                     <button type="submit" class="btn-primary">→ <?php echo htmlspecialchars(PSM::labelAr($to)); ?></button>
                 </form>
             <?php endforeach; ?>
-            <?php if (!$allowed): ?><span class="pr-muted">حالةٌ نهائية — التصحيحُ بحدثٍ عاكسٍ لا بتعديل</span><?php endif; ?>
+            <?php if (!$allowed): ?><span class="pr-muted">حالة نهائية — التصحيح بحدث عاكس لا بتعديل</span><?php endif; ?>
         </div>
         <?php if (!$red['ok']): ?>
             <div class="alert alert-danger pr-alert-gap">
                 <i class="fa fa-circle-exclamation"></i>
-                <strong>صفوفٌ حمراءُ تمنع الاعتماد:</strong>
+                <strong>صفوف حمراء تمنع الاعتماد:</strong>
                 <?php echo htmlspecialchars(implode(' · ', $red['reasons'])); ?>
             </div>
         <?php endif; ?>
@@ -323,10 +323,10 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
             · أشخاص: <strong><?php echo intval($run['persons_count']); ?></strong>
             · أسطر: <strong><?php echo intval($run['lines_count']); ?></strong>
             · موانع: <strong><?php echo intval($run['blocked_count']); ?></strong>
-            · <span title="مجموعُ ما اكتمل احتسابُه في هذه الشريحة">محتسَبٌ الآن:
+            · <span title="مجموع ما اكتمل احتسابه في هذه الشريحة">محتسب الآن:
                 <strong><?php echo number_format($computed, 2); ?></strong></span>
             <?php if ($pending > 0): ?>
-                · <span class="badge badge-warning"><?php echo $pending; ?> سطرًا ينتظر الشريحتين ②③</span>
+                · <span class="badge badge-warning"><?php echo $pending; ?> سطرا ينتظر الشريحتين ②③</span>
             <?php endif; ?>
         </div>
         <?php endif; ?>
@@ -334,7 +334,7 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
 
     <?php if ($blocks): ?>
     <div class="card"><div class="card-header">
-        <h5><i class="fa fa-ban"></i> قائمةُ الموانع والمستبعَدين (<?php echo count($blocks); ?>)</h5></div>
+        <h5><i class="fa fa-ban"></i> قائمة الموانع والمستبعدين (<?php echo count($blocks); ?>)</h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap pr-table-full">
             <thead><tr><th>النوع</th><th>العقد</th><th>الشخص</th><th>الرمز</th><th>السبب</th></tr></thead>
@@ -342,7 +342,7 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
             <?php foreach ($blocks as $b): ?>
                 <tr>
                     <td><?php echo (string)$b['kind'] === 'excluded'
-                        ? "<span class='badge badge-secondary'>مستبعَد</span>"
+                        ? "<span class='badge badge-secondary'>مستبعد</span>"
                         : "<span class='badge badge-danger'>مانع</span>"; ?></td>
                     <td>#<?php echo intval($b['contract_id']); ?></td>
                     <td><?php echo $b['person_id'] ? ('#' . intval($b['person_id'])) : '—'; ?></td>
@@ -358,11 +358,11 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
 
     <?php if ($run !== null && $can_edit): ?>
     <div class="card"><div class="card-header">
-        <h5><i class="fa fa-keyboard"></i> مدخلاتُ الزمن — <strong>بمستندها إلزامًا</strong></h5></div>
+        <h5><i class="fa fa-keyboard"></i> مدخلات الزمن — <strong>بمستندها إلزاما</strong></h5></div>
     <div class="card-body">
         <p class="pr-hint">
-            «ولا خصمَ بلا مستند» (ENT-01 §4) — والزيادةُ مثلُه: ساعةُ إضافيٍّ بلا مرجعٍ
-            رقمٌ يزيد أجرًا بلا سند. ولا مصدرَ آليًّا لهذه المدخلات في النظام اليوم.
+            «ولا خصم بلا مستند» (ENT-01 §4) — والزيادة مثله: ساعة إضافي بلا مرجع
+            رقم يزيد أجرا بلا سند. ولا مصدر آليا لهذه المدخلات في النظام اليوم.
         </p>
         <form method="post" class="ems-form">
         <?= csrf_field() ?>
@@ -374,16 +374,16 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
                 <div class="form-group">
                     <label for="emsf_1755_df58c">النوع <span class="pr-required-mark">*</span></label>
                     <select name="kind" required id="emsf_1755_df58c">
-                        <option value="overtime_hours">ساعاتُ إضافي</option>
-                        <option value="night_shifts">ورديّاتٌ ليلية</option>
-                        <option value="unpaid_days">أيامٌ غيرُ مدفوعة</option>
+                        <option value="overtime_hours">ساعات إضافي</option>
+                        <option value="night_shifts">ورديات ليلية</option>
+                        <option value="unpaid_days">أيام غير مدفوعة</option>
                     </select>
                 </div>
                 <div class="form-group"><label for="emsf_1756_dd6a7">الكمية <span class="pr-required-mark">*</span></label>
                     <input type="number" step="0.01" min="0.01" name="qty" required id="emsf_1756_dd6a7"></div>
                 <div class="form-group"><label for="emsf_1757_ed8d0">مرجع المستند <span class="pr-required-mark">*</span></label>
                     <input type="text" name="doc_ref" required maxlength="120"
-                           placeholder="إذنُ عملٍ إضافي 2047/114" id="emsf_1757_ed8d0"></div>
+                           placeholder="إذن عمل إضافي 2047/114" id="emsf_1757_ed8d0"></div>
                 <div class="form-group"><label for="emsf_1758_457e2">ملاحظة</label><input type="text" name="input_note" maxlength="255" id="emsf_1758_457e2"></div>
             </div>
             <div class="pr-submit-row"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> تسجيل</button></div>
@@ -393,14 +393,14 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
 
     <?php $register = $selected > 0 ? PSM::register($gate, $selected) : array(); if ($register): ?>
     <div class="card"><div class="card-header">
-        <h5><i class="fa fa-table-list"></i> سجلُّ المراجعة — صفٌّ لكل شخص</h5></div>
+        <h5><i class="fa fa-table-list"></i> سجل المراجعة — صف لكل شخص</h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap pr-table-full">
             <thead><tr>
-                <th>الشخص</th><th>أجرٌ وإنتاج</th><th>حوافز</th><th>إضافي</th>
+                <th>الشخص</th><th>أجر وإنتاج</th><th>حوافز</th><th>إضافي</th>
                 <th>خصم الغياب</th><th>إجمالي الخصومات</th><th>صافي المستحق</th>
                 <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
-                <th class="ems-fn-th" data-fn="1">رقم المسيّر</th>
+                <th class="ems-fn-th" data-fn="1">رقم المسير</th>
                 <th class="ems-fn-th" data-fn="1">الشهر</th>
                 <th class="ems-fn-th" data-fn="1">كود الموظف</th>
                 <th class="ems-fn-th" data-fn="1">الاسم</th>
@@ -413,21 +413,21 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
                 <th class="ems-fn-th" data-fn="1">قسط سلفة</th>
                 <th class="ems-fn-th" data-fn="1">تأمينات</th>
                 <th class="ems-fn-th" data-fn="1">الحساب البنكي</th>
-                <th class="ems-fn-th" data-fn="1">أعدّه</th>
+                <th class="ems-fn-th" data-fn="1">أعده</th>
                 <th class="ems-fn-th" data-fn="1">راجعه</th>
                 <th class="ems-fn-th none" data-fn="1">اعتمده</th>
                 <th class="ems-fn-th none" data-fn="1">رقم أمر الدفع</th>
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                 <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                 <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                 <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                 <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-                <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+                <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
                 <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
-                <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
-                <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطّلاع</th>
+                <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
+                <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطلاع</th>
                 <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                 <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                 <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
@@ -439,10 +439,10 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
                     <td>#<?php echo intval($rr['person_id']); ?>
                         <?php if (intval($rr['red_rows']) > 0): ?>
                             <span class="badge badge-danger"
-                                  title="صفٌّ بلا احتسابٍ تامٍّ — لا يُعتمد (ENT-01 §7)">أحمر</span>
+                                  title="صف بلا احتساب تام — لا يعتمد (ENT-01 §7)">أحمر</span>
                         <?php endif; ?>
                         <a href="?run_id=<?php echo $selected; ?>&slip=<?php echo intval($rr['person_id']); ?>"
-                           title="كشفُ الفرد بطبقاته"><i class="fas fa-file-invoice"></i></a></td>
+                           title="كشف الفرد بطبقاته"><i class="fas fa-file-invoice"></i></a></td>
                     <td><?php echo htmlspecialchars($__money($rr['pay'])); ?></td>
                     <td><?php echo htmlspecialchars($__money($rr['incentive'])); ?></td>
                     <td><?php echo htmlspecialchars($__money($rr['overtime'])); ?></td>
@@ -453,7 +453,7 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
             <?php endforeach; ?>
             </tbody>
             <tfoot><tr>
-                <th colspan="6">المجموع (تذييلٌ ثابت — §7)</th>
+                <th colspan="6">المجموع (تذييل ثابت — §7)</th>
                 <th><?php echo number_format($tNet, 2); ?></th>
             </tr></tfoot>
         </table>
@@ -466,7 +466,7 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
         $slip = PSM::payslip($gate, $selected, $slipPerson);
     ?>
     <div class="card"><div class="card-header">
-        <h5><i class="fa fa-file-invoice"></i> كشفُ الفرد #<?php echo $slipPerson; ?> — بطبقاته</h5></div>
+        <h5><i class="fa fa-file-invoice"></i> كشف الفرد #<?php echo $slipPerson; ?> — بطبقاته</h5></div>
     <div class="card-body">
         <?php foreach ($slip['layers'] as $layerName => $layer): ?>
             <h6 class="pr-layer-title"><strong><?php echo htmlspecialchars($layerName); ?></strong>
@@ -492,11 +492,11 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
         <p>الإجمالي <strong><?php echo htmlspecialchars($__money($slip['gross'])); ?></strong>
            · الخصومات <strong><?php echo number_format($slip['deductions'], 2); ?></strong>
            · <span class="pr-net-emph">الصافي <strong><?php echo htmlspecialchars($__money($slip['net'])); ?></strong></span></p>
-        <p class="pr-muted">اللقطاتُ المستنَدُ إليها:
+        <p class="pr-muted">اللقطات المستند إليها:
             <?php foreach ($slip['snapshot_ids'] as $sid): ?>
                 <span class="badge badge-secondary">لقطة #<?php echo intval($sid); ?></span>
             <?php endforeach; ?>
-            — «تعديلُ العقد لاحقًا لا يمسّ ما احتُسب».</p>
+            — «تعديل العقد لاحقا لا يمس ما احتسب».</p>
     </div></div>
     <?php endif; ?>
 
@@ -507,7 +507,7 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
         foreach ($deductions as $d) { $dedTotal += (float) $d['amount']; }
     ?>
     <div class="card"><div class="card-header">
-        <h5><i class="fa fa-scale-balanced"></i> المقاصّة — خصومٌ بمراجعها
+        <h5><i class="fa fa-scale-balanced"></i> المقاصة — خصوم بمراجعها
             (<?php echo count($deductions); ?> · <?php echo number_format($dedTotal, 2); ?>)</h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap pr-table-full">
@@ -525,8 +525,8 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
                     <td><strong><?php echo htmlspecialchars($__money($d['amount'], false)); ?></strong></td>
                     <td><small><?php echo htmlspecialchars((string)$d['doc_ref']); ?></small></td>
                     <td><?php echo intval($d['rescheduled']) === 1
-                        ? "<span class='badge badge-warning'>مُرحَّلٌ بحدِّ الحماية</span>"
-                        : "<span class='badge badge-success'>كاملًا</span>"; ?></td>
+                        ? "<span class='badge badge-warning'>مرحل بحد الحماية</span>"
+                        : "<span class='badge badge-success'>كاملا</span>"; ?></td>
                     <td><small><?php echo htmlspecialchars((string)$d['note']); ?></small></td>
                 </tr>
             <?php endforeach; ?>
@@ -535,11 +535,11 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
     </div></div></div>
     <?php endif; ?>
 
-    <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> أسطرُ الاحتساب بلقطاتها</h5></div>
+    <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> أسطر الاحتساب بلقطاتها</h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap pr-table-full">
             <thead><tr>
-                <th>الشخص</th><th>النوع</th><th>المسار</th><th>المكوّن</th><th>الطريقة</th>
+                <th>الشخص</th><th>النوع</th><th>المسار</th><th>المكون</th><th>الطريقة</th>
                 <th>المعدل</th><th>الأيام</th><th>الجهة</th><th>٪</th><th>المبلغ</th><th>الحالة</th><th>اللقطة</th>
             </tr></thead>
             <tbody>
@@ -549,12 +549,12 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
                     <td><?php
                         $k = (string) $l['line_kind'];
                         $kindLabels = array(
-                            'absence_deduction' => "<span class='badge badge-danger'>خصمُ غياب</span>",
+                            'absence_deduction' => "<span class='badge badge-danger'>خصم غياب</span>",
                             'overtime'   => "<span class='badge badge-info'>إضافي</span>",
                             'production' => "<span class='badge badge-success'>إنتاج</span>",
                             'incentive'  => "<span class='badge badge-success'>حافز</span>",
                         );
-                        echo isset($kindLabels[$k]) ? $kindLabels[$k] : 'مكوّن';
+                        echo isset($kindLabels[$k]) ? $kindLabels[$k] : 'مكون';
                     ?></td>
                     <td><?php echo (string)$l['path'] === 'project' ? 'مشروعي' : 'مؤسسي'; ?></td>
                     <td><?php echo htmlspecialchars((string)($l['component_type'] ?? $l['component_ref'])); ?></td>
@@ -570,12 +570,12 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
                             <strong><?php echo htmlspecialchars($__money($l['amount'], false)); ?></strong>
                         <?php else: ?>
                             <span class="badge badge-warning" title="<?php echo htmlspecialchars((string)$l['note']); ?>">
-                                لم يُحتسب بعد</span>
+                                لم يحتسب بعد</span>
                         <?php endif; ?></td>
                     <td><?php echo (string)$l['calc_state'] === 'computed'
                         ? "<span class='badge badge-success'>محسوب</span>"
                         : "<span class='badge badge-warning'>ينتظر الشريحة</span>"; ?></td>
-                    <td><small title="كلُّ سطرٍ يحمل لقطتَه — تعديلُ العقد لاحقًا لا يمسّه">
+                    <td><small title="كل سطر يحمل لقطته — تعديل العقد لاحقا لا يمسه">
                         لقطة #<?php echo intval($l['snapshot_id']); ?></small></td>
                 </tr>
             <?php endforeach; ?>

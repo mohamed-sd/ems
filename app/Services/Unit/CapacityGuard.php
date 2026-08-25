@@ -258,22 +258,22 @@ class CapacityGuard
         $st->close();
 
         foreach ($flags as $f) {
-            $label = ($f['subject'] === 'equipment' ? 'المعدة' : 'المشغّل') . ' #' . $f['subject_ref'];
-            $head = "تجاوزُ طاقة {$label}: {$f['measured_hours']} من {$f['capacity_hours']} ساعة";
+            $label = ($f['subject'] === 'equipment' ? 'المعدة' : 'المشغل') . ' #' . $f['subject_ref'];
+            $head = "تجاوز طاقة {$label}: {$f['measured_hours']} من {$f['capacity_hours']} ساعة";
 
             if ($f['cleared_at'] !== null && $f['cleared_by'] !== null) { continue; }
 
             $missing = array();
             if ($f['cause_note'] === null || trim($f['cause_note']) === '') {
-                $missing[] = 'السبب غير مُدخَل';
+                $missing[] = 'السبب غير مدخل';
             }
             if ($f['overlap_found'] === null || $f['duplicate_found'] === null) {
-                $missing[] = 'فحصُ تداخل الورديات والتكرار لم يُجرَ';
+                $missing[] = 'فحص تداخل الورديات والتكرار لم يجر';
             }
             if ($f['second_operator_present'] === null) {
-                $missing[] = 'وجودُ مشغّلٍ ثانٍ لم يُحدَّد';
+                $missing[] = 'وجود مشغل ثان لم يحدد';
             }
-            $missing[] = 'اعتمادُ المسؤول لم يقع';
+            $missing[] = 'اعتماد المسؤول لم يقع';
 
             $reasons[] = $head . ' — ' . implode(' · ', $missing);
         }

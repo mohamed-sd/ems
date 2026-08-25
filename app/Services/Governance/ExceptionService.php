@@ -56,13 +56,13 @@ class ExceptionService
             }
         }
         $r = self::riskOf($conn, $a['guard_code'], isset($a['risk_level']) ? $a['risk_level'] : null);
-        if ($r === null) { $out['code'] = 422; $out['reason'] = 'حماية غير مصنَّفة — لا استثناء قبل التصنيف'; return $out; }
+        if ($r === null) { $out['code'] = 422; $out['reason'] = 'حماية غير مصنفة — لا استثناء قبل التصنيف'; return $out; }
         if ($r['guard_class'] === 'absolute') {
-            $out['code'] = 422; $out['reason'] = 'لا استثناءَ لهذه الحماية — صنفها منعٌ مطلق';
+            $out['code'] = 422; $out['reason'] = 'لا استثناء لهذه الحماية — صنفها منع مطلق';
             return $out;
         }
         if ($r['risk'] === 'legal_forbidden') {
-            $out['code'] = 422; $out['reason'] = 'محظور قانونًا — يُمنع ويُحال إلى المستشار القانوني، وسُجّل الطلب والرفض';
+            $out['code'] = 422; $out['reason'] = 'محظور قانونا — يمنع ويحال إلى المستشار القانوني، وسجل الطلب والرفض';
             $stmt = $conn->prepare('INSERT INTO guard_denials (company_id, guard_code, person_id, attempted_ref, reason_code) VALUES (?, ?, ?, ?, ?)');
             $companyId2 = intval($companyId); $gc = (string) $a['guard_code']; $p = intval($a['requester_person_id']);
             $ref = 'exception_request'; $rc = 'legal_forbidden_referred';
@@ -82,7 +82,7 @@ class ExceptionService
             'INSERT INTO exception_requests (company_id, guard_code, requester_person_id, reason, risk_level, scope_type, scope_id, valid_from, valid_to, one_time, documents_json, expected_impact)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
         $stmt->bind_param('isissssssiss', $companyId, $gc, $req, $reason, $risk, $st, $sid, $vf, $vt, $ot, $docs, $imp);
-        if (!$stmt->execute()) { $out['code'] = 422; $out['reason'] = 'تعذّر الإنشاء: ' . $stmt->error; $stmt->close(); return $out; }
+        if (!$stmt->execute()) { $out['code'] = 422; $out['reason'] = 'تعذر الإنشاء: ' . $stmt->error; $stmt->close(); return $out; }
         $out['req_id'] = intval($stmt->insert_id);
         $stmt->close();
         $out['ok'] = true; $out['code'] = 201; $out['risk_level'] = $risk;
@@ -106,10 +106,10 @@ class ExceptionService
         $stmt->close();
         if (!$req) { $out['code'] = 404; $out['reason'] = 'الطلب غير موجود'; return $out; }
         if (!in_array((string) $req['state'], array('Pending'), true)) {
-            $out['code'] = 409; $out['reason'] = 'الطلب ليس معلَّقًا — حاله ' . $req['state']; return $out;
+            $out['code'] = 409; $out['reason'] = 'الطلب ليس معلقا — حاله ' . $req['state']; return $out;
         }
         if (intval($req['requester_person_id']) === $personId) {
-            $out['code'] = 403; $out['reason'] = 'الطالب لا يوافق على طلبه — بنيويًّا'; return $out;
+            $out['code'] = 403; $out['reason'] = 'الطالب لا يوافق على طلبه — بنيويا'; return $out;
         }
         $stmt = $conn->prepare('SELECT approver_person_id, approver_role FROM exception_approvals WHERE req_id = ?');
         $stmt->bind_param('i', $reqId);
@@ -142,7 +142,7 @@ class ExceptionService
         if ($decision === 'reject') {
             $conn->query("UPDATE exception_requests SET state = 'Rejected', closed_reason = 'رفض " . $conn->real_escape_string($role) . "' WHERE req_id = {$reqId}");
             $out['ok'] = true; $out['code'] = 200; $out['state'] = 'Rejected';
-            $out['reason'] = 'رُفض الطلب — رفض أي موافق يغلقه بسببه';
+            $out['reason'] = 'رفض الطلب — رفض أي موافق يغلقه بسببه';
             return $out;
         }
         $required = isset(self::REQUIRED_BY_RISK[(string) $req['risk_level']])

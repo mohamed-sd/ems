@@ -52,18 +52,18 @@ if (!function_exists('ems_manual_run_retired')) {
 
         echo $nl;
         echo "═══════════════════════════════════════════════════════════════" . $nl;
-        echo " هذا الأمرُ أُلغي تشغيلُه يدويًّا — وصار مهمةً مجدولة" . $nl;
+        echo " هذا الأمر ألغي تشغيله يدويا — وصار مهمة مجدولة" . $nl;
         echo "═══════════════════════════════════════════════════════════════" . $nl;
-        echo " الأمرُ القديم : {$oldPath}" . $nl;
-        echo " نوعُ المهمة   : {$jobType}" . $nl;
-        echo " جدولتُها      : {$sched}" . $nl;
-        echo " مالكُها (دور) : {$owner}" . $nl;
-        echo " آخرُ نجاح     : {$last}" . $nl;
+        echo " الأمر القديم : {$oldPath}" . $nl;
+        echo " نوع المهمة   : {$jobType}" . $nl;
+        echo " جدولتها      : {$sched}" . $nl;
+        echo " مالكها (دور) : {$owner}" . $nl;
+        echo " آخر نجاح     : {$last}" . $nl;
         echo $nl;
-        echo " والتشغيلُ الآن بالعاملِ الخلفيِّ وحدَه:" . $nl;
+        echo " والتشغيل الآن بالعامل الخلفي وحده:" . $nl;
         echo "   php cron_jobs.php" . $nl;
         echo $nl;
-        echo " ولمتابعتِها من الشاشة: Governance/job_queue.php · Governance/job_schedule.php" . $nl;
+        echo " ولمتابعتها من الشاشة: Governance/job_queue.php · Governance/job_schedule.php" . $nl;
         echo "═══════════════════════════════════════════════════════════════" . $nl;
 
         exit(3); // 3 = مُحال إلى الطابور — ليس فشلًا وليس نجاحًا

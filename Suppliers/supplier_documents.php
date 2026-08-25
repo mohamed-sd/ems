@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'file_ref'    => $_POST['file_ref'] ?? '',
             'note'        => $_POST['dnote'] ?? '',
         ), $uid);
-        $redirect($r['ok'] ? 'حُفظت الوثيقة ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $sid);
+        $redirect($r['ok'] ? 'حفظت الوثيقة ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $sid);
     }
 
     if ($action === 'bank') {
@@ -87,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'bank_iban'       => $_POST['bank_iban'] ?? '',
             'bank_doc_ref'    => $_POST['bank_doc_ref'] ?? '',
         ), $uid);
-        $redirect($r['ok'] ? 'وُثِّق الحسابُ البنكي ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $sid);
+        $redirect($r['ok'] ? 'وثق الحساب البنكي ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $sid);
     }
 }
 
@@ -117,7 +117,7 @@ require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
-require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('supplier', 'التأهيلُ والوثائقُ والحساب');
+require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('supplier', 'التأهيل والوثائق والحساب');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 // NAV-01 §8 (update0006-b): الشاشةُ قسمٌ من ملف المورد الأم
 $sf_supplier_id = intval($_GET['supplier_id'] ?? $_GET['id'] ?? 0); $sf_active = 'documents';
@@ -134,7 +134,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>';
     }
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا وثيقةَ نظاميةً مسجَّلةً لهذا المورد', 'سجِّل السجلَّ التجاريَّ والشهادةَ الضريبيةَ بتواريخِ صلاحيتها من نموذجِ «وثيقةٌ نظامية»');
+    echo ems_states_bundle('لا وثيقة نظامية مسجلة لهذا المورد', 'سجل السجل التجاري والشهادة الضريبية بتواريخ صلاحيتها من نموذج «وثيقة نظامية»');
     ?>
     <style>
         .sup-doc-filter-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
@@ -159,9 +159,9 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             </select>
         </form>
         <div class="sup-doc-gate alert <?php echo $gateInfo['reasons'] ? 'alert-warning' : 'alert-success'; ?>">
-            <strong>بوابةُ المستندات (<?php echo htmlspecialchars($gateInfo['mode']); ?>):</strong>
+            <strong>بوابة المستندات (<?php echo htmlspecialchars($gateInfo['mode']); ?>):</strong>
             <?php if (!$gateInfo['reasons']): ?>
-                لا مانعَ — الوثائقُ النظاميةُ حاضرةٌ ساريةٌ والحسابُ موثَّق.
+                لا مانع — الوثائق النظامية حاضرة سارية والحساب موثق.
             <?php else: ?>
                 <ul class="sup-doc-reasons">
                 <?php foreach ($gateInfo['reasons'] as $rr): ?>
@@ -169,25 +169,25 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                 <?php endforeach; ?>
                 </ul>
                 <small><?php echo $gateInfo['blocked']
-                    ? 'الوضعُ enforce: اعتمادُ تسويته يُرفض حتى تُستكمل.'
-                    : 'الوضعُ monitor: يُقاس ويُعلَن ويمرّ — ولا يُقلب إلى enforce إلا بعد أسبوعِ رصدٍ نظيف.'; ?></small>
+                    ? 'الوضع enforce: اعتماد تسويته يرفض حتى تستكمل.'
+                    : 'الوضع monitor: يقاس ويعلن ويمر — ولا يقلب إلى enforce إلا بعد أسبوع رصد نظيف.'; ?></small>
             <?php endif; ?>
         </div>
     </div></div>
 
-    <div class="card"><div class="card-header"><h5><i class="fa fa-building-columns"></i> الحسابُ البنكيُّ الموثَّق</h5></div>
+    <div class="card"><div class="card-header"><h5><i class="fa fa-building-columns"></i> الحساب البنكي الموثق</h5></div>
     <div class="card-body">
-        <p class="sup-doc-hint"><strong>توثيقٌ بلا مستندٍ دعوى</strong> — رقمُ الحساب والمستندُ إلزاميان معًا،
+        <p class="sup-doc-hint"><strong>توثيق بلا مستند دعوى</strong> — رقم الحساب والمستند إلزاميان معا،
             ويحرسهما <code>CHECK</code> فوق حارس الخدمة.</p>
         <?php if ($sup !== null): ?>
         <p>
             الحالة:
             <?php if ($sup['bank_verified_at'] !== null): ?>
-                <span class="badge badge-success">موثَّق في <?php echo htmlspecialchars((string)$sup['bank_verified_at']); ?></span>
+                <span class="badge badge-success">موثق في <?php echo htmlspecialchars((string)$sup['bank_verified_at']); ?></span>
                 · مستند <?php echo htmlspecialchars((string)$sup['bank_doc_ref']); ?>
                 · حساب <?php echo htmlspecialchars((string)$sup['bank_account_no']); ?>
             <?php else: ?>
-                <span class="badge badge-danger">غيرُ موثَّق</span>
+                <span class="badge badge-danger">غير موثق</span>
             <?php endif; ?>
         </p>
         <?php endif; ?>
@@ -208,19 +208,19 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                            value="<?php echo htmlspecialchars((string)($sup['bank_iban'] ?? '')); ?>"></div>
                 <div class="form-group"><label for="emsf_492_c50a7">مستند التوثيق <span class="sup-doc-req">*</span></label>
                     <input type="text" name="bank_doc_ref" maxlength="120" required
-                           placeholder="شهادةٌ بنكيةٌ أو شيكٌ ملغًى" id="emsf_492_c50a7"></div>
+                           placeholder="شهادة بنكية أو شيك ملغى" id="emsf_492_c50a7"></div>
             </div>
-            <div class="sup-doc-actions"><button type="submit" class="btn-primary"><i class="fa fa-shield-halved"></i> وثِّق الحساب</button></div>
+            <div class="sup-doc-actions"><button type="submit" class="btn-primary"><i class="fa fa-shield-halved"></i> وثق الحساب</button></div>
         </form>
         <?php endif; ?>
     </div></div>
 
     <?php if ($can_add): ?>
-    <div class="card"><div class="card-header"><h5><i class="fa fa-file-lines"></i> وثيقةٌ نظامية</h5></div>
+    <div class="card"><div class="card-header"><h5><i class="fa fa-file-lines"></i> وثيقة نظامية</h5></div>
     <div class="card-body">
-        <p class="sup-doc-hint">«الوثائقُ <strong>بتواريخ صلاحيتها</strong> — تنبيهٌ آليٌّ قبل الانتهاء»:
-            و<strong>السجلُّ التجاري والشهادةُ الضريبية يلزمهما تاريخُ صلاحية</strong>،
-            فتنبيهٌ بلا تاريخٍ وعدٌ لا يُنفَّذ.</p>
+        <p class="sup-doc-hint">«الوثائق <strong>بتواريخ صلاحيتها</strong> — تنبيه آلي قبل الانتهاء»:
+            و<strong>السجل التجاري والشهادة الضريبية يلزمهما تاريخ صلاحية</strong>،
+            فتنبيه بلا تاريخ وعد لا ينفذ.</p>
         <form method="post" class="ems-form">
         <?= csrf_field() ?>
             <input type="hidden" name="sd_action" value="document">
@@ -248,12 +248,12 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     <?php endif; ?>
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-bell"></i>
-        وثائقُ المورد — منتهية <?php echo count($state['expired']); ?>
-        · تُوشك <?php echo count($state['expiring']); ?>
+        وثائق المورد — منتهية <?php echo count($state['expired']); ?>
+        · توشك <?php echo count($state['expiring']); ?>
         · ناقصة <?php echo count($state['missing']); ?></h5></div>
     <div class="card-body">
         <?php if ($state['missing']): ?>
-            <div class="alert alert-danger">وثائقُ نظاميةٌ ناقصة:
+            <div class="alert alert-danger">وثائق نظامية ناقصة:
                 <strong><?php echo htmlspecialchars(implode(' · ', $state['missing'])); ?></strong></div>
         <?php endif; ?>
         <div class="table-container">
@@ -261,10 +261,10 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             <thead><tr><th>النوع</th><th>الرقم</th><th>الجهة</th><th>الإصدار</th>
                 <th>الانتهاء</th><th>التنبيه</th><th>الحال</th>
                 <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                 <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                 <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                 <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -278,7 +278,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                 elseif ((string)$exp < $state['as_of']) { $cls = 'badge-danger'; $lbl = 'منتهية'; }
                 else {
                     $alertFrom = date('Y-m-d', strtotime((string)$exp . ' -' . intval($d['alert_days']) . ' days'));
-                    if ($state['as_of'] >= $alertFrom) { $cls = 'badge-warning'; $lbl = 'تُوشك'; }
+                    if ($state['as_of'] >= $alertFrom) { $cls = 'badge-warning'; $lbl = 'توشك'; }
                 }
             ?>
                 <tr>
@@ -287,7 +287,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     <td><?php echo htmlspecialchars((string)($d['issuer'] ?? '—')); ?></td>
                     <td><?php echo htmlspecialchars((string)($d['issue_date'] ?? '—')); ?></td>
                     <td><?php echo htmlspecialchars((string)($exp ?? '—')); ?></td>
-                    <td><?php echo intval($d['alert_days']); ?> يومًا</td>
+                    <td><?php echo intval($d['alert_days']); ?> يوما</td>
                     <td><span class="badge <?php echo $cls; ?>"><?php echo $lbl; ?></span></td>
                 </tr>
             <?php endforeach; ?>
@@ -297,7 +297,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     </div></div>
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-clock-rotate-left"></i>
-        سجلُّ تدقيق المورد <small>— قراءةٌ على <code>activity_logs</code>، لا سجلٌّ ثانٍ</small></h5></div>
+        سجل تدقيق المورد <small>— قراءة على <code>activity_logs</code>، لا سجل ثان</small></h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap sup-doc-table">
             <thead><tr><th>متى</th><th>أين</th><th>ماذا</th><th>قبل</th><th>بعد</th><th>من</th></tr></thead>

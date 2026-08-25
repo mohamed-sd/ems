@@ -44,11 +44,11 @@ class ContractSeatService
         if (!$rows) { $out['code'] = 404; $out['reason'] = 'الحاوية غير موجودة في نطاقك'; return $out; }
         $c = $rows[0];
         if ((string) $c['level'] !== 'معدة') {
-            $out['code'] = 422; $out['reason'] = 'المقعد توسعة لمستوى «معدة» حصرًا — المستوى الحالي: ' . $c['level'];
+            $out['code'] = 422; $out['reason'] = 'المقعد توسعة لمستوى «معدة» حصرا — المستوى الحالي: ' . $c['level'];
             return $out;
         }
         $seatNo = (int) (isset($a['seat_no']) ? $a['seat_no'] : 0);
-        if ($seatNo <= 0) { $out['code'] = 422; $out['reason'] = 'seat_no رقمٌ موجبٌ إلزامي'; return $out; }
+        if ($seatNo <= 0) { $out['code'] = 422; $out['reason'] = 'seat_no رقم موجب إلزامي'; return $out; }
         $kind = self::deriveSeatKind(isset($a['pricing_model']) ? $a['pricing_model'] : 'hour',
                                      !empty($a['is_supplier_allocation']));
         try {
@@ -62,13 +62,13 @@ class ContractSeatService
             ), array('id' => (int) $containerId));
         } catch (\Throwable $t) {
             if (strpos($t->getMessage(), 'uq_seat_no') !== false || strpos($t->getMessage(), 'Duplicate') !== false) {
-                $out['code'] = 409; $out['reason'] = 'seat_no ' . $seatNo . ' مأخوذٌ في هذا العقد — الفرادة بنيوية';
+                $out['code'] = 409; $out['reason'] = 'seat_no ' . $seatNo . ' مأخوذ في هذا العقد — الفرادة بنيوية';
                 return $out;
             }
             throw $t;
         }
         $out['ok'] = true; $out['code'] = 200;
-        $out['reason'] = 'مقعد #' . $seatNo . ' (' . $kind . ') عُرّف على الحاوية ' . $c['container_no'];
+        $out['reason'] = 'مقعد #' . $seatNo . ' (' . $kind . ') عرف على الحاوية ' . $c['container_no'];
         return $out;
     }
 
@@ -85,7 +85,7 @@ class ContractSeatService
         $seat = $gate->scopedQuery(array('scope' => array('c' => 'op_containers')),
             "SELECT c.id, c.seat_no FROM op_containers c WHERE {TENANT_SCOPE} AND c.id = ? AND c.seat_no IS NOT NULL",
             array($containerId));
-        if (!$seat) { $out['code'] = 404; $out['reason'] = 'ليست حاويةَ مقعدٍ معرَّف'; return $out; }
+        if (!$seat) { $out['code'] = 404; $out['reason'] = 'ليست حاوية مقعد معرف'; return $out; }
 
         // قيد عدم التداخل: فترةٌ مفتوحة (date_to NULL) تُعد ممتدةً بلا نهاية.
         $overlap = $gate->scopedQuery(array('scope' => array('a' => 'seat_assignments')),
@@ -97,9 +97,9 @@ class ContractSeatService
         if ($overlap) {
             $o = $overlap[0];
             $out['code'] = 409;
-            $out['reason'] = 'تداخلُ فترتين في المقعد الواحد مرفوض — المعدة #' . $o['equipment_id']
-                . ' جالسةٌ من ' . $o['date_from'] . ' إلى ' . ($o['date_to'] !== null ? $o['date_to'] : 'مفتوح')
-                . '؛ أنهِ إسنادها أولًا بسبب استبدالٍ مكتوب';
+            $out['reason'] = 'تداخل فترتين في المقعد الواحد مرفوض — المعدة #' . $o['equipment_id']
+                . ' جالسة من ' . $o['date_from'] . ' إلى ' . ($o['date_to'] !== null ? $o['date_to'] : 'مفتوح')
+                . '؛ أنه إسنادها أولا بسبب استبدال مكتوب';
             return $out;
         }
 
@@ -110,7 +110,7 @@ class ContractSeatService
         $isFirst = ((int) $prior[0]['n'] === 0);
         $reason = isset($opt['replace_reason']) ? trim((string) $opt['replace_reason']) : '';
         if (!$isFirst && $reason === '') {
-            $out['code'] = 422; $out['reason'] = 'سببُ الاستبدال إلزاميٌّ لكل تعاقبٍ بعد الأول'; return $out;
+            $out['code'] = 422; $out['reason'] = 'سبب الاستبدال إلزامي لكل تعاقب بعد الأول'; return $out;
         }
 
         $drivers = isset($opt['drivers']) && is_array($opt['drivers']) ? array_values(array_map('intval', $opt['drivers'])) : array();
@@ -127,7 +127,7 @@ class ContractSeatService
             'created_by' => (int) $actor ?: null,
         ));
         $out['ok'] = true; $out['code'] = 201; $out['assignment_id'] = $id;
-        $out['reason'] = 'أُسندت المعدة #' . $equipmentId . ' للمقعد من ' . $dateFrom . ' إلى ' . ($dateTo !== null ? $dateTo : 'مفتوح');
+        $out['reason'] = 'أسندت المعدة #' . $equipmentId . ' للمقعد من ' . $dateFrom . ' إلى ' . ($dateTo !== null ? $dateTo : 'مفتوح');
         return $out;
     }
 
@@ -137,7 +137,7 @@ class ContractSeatService
         $gate->update('seat_assignments',
             array('date_to' => (string) $endDate, 'state' => 'ended'),
             array('id' => (int) $assignmentId));
-        return array('ok' => true, 'code' => 200, 'reason' => 'أُنهي الإسناد بتاريخ ' . $endDate);
+        return array('ok' => true, 'code' => 200, 'reason' => 'أنهي الإسناد بتاريخ ' . $endDate);
     }
 
     /**
@@ -168,7 +168,7 @@ class ContractSeatService
                     'seat_no' => (int) $s['seat_no'],
                     'seat_kind' => (string) $s['seat_kind'],
                     'implication' => ((string) $s['seat_kind'] === 'contractual_seat')
-                        ? 'بند مطالبة أو غرامة محتمل — بنص العقد لا تلقائيًّا'
+                        ? 'بند مطالبة أو غرامة محتمل — بنص العقد لا تلقائيا'
                         : 'مؤشر تغطية داخلي — لا حق للعميل',
                 );
             }

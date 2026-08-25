@@ -90,41 +90,41 @@ class ContractLifecycleService
             'settle_and_new' => 'يُصفَّى مع القديم ويبدأ مقدمٌ جديدٌ ما لم يُنص على النقل',
             'pause_recovery' => 'يتوقف استهلاكُه بمدة التعليق',
             'consume_then_refund' => 'يُستهلك المتبقي من المستخلص الختامي وما فاض يُرد نقدًا',
-            'refund_all_after_offset' => '**يُرد المتبقي كاملًا** بعد المقاصّة',
-            'refund_after_dues' => 'يُرد المتبقي بعد خصم ما استُحق',
-            'refund_full' => '**يُرد كاملًا** إن لم يبدأ التنفيذ',
-            'freeze' => '**تُوقف المقاصّةُ ويُثبَّت الرصيد**'),
+            'refund_all_after_offset' => '**يرد المتبقي كاملا** بعد المقاصة',
+            'refund_after_dues' => 'يرد المتبقي بعد خصم ما استحق',
+            'refund_full' => '**يرد كاملا** إن لم يبدأ التنفيذ',
+            'freeze' => '**توقف المقاصة ويثبت الرصيد**'),
         'retention' => array(
-            'hold' => 'يبقى محتجزًا',
-            'release_after_grace' => 'يُرد بعد مهلته إن لم توجد مطالبات',
-            'release' => '**يُرد**',
-            'may_forfeit' => '**قد يُصادر كليًّا أو جزئيًّا** بنص العقد'),
+            'hold' => 'يبقى محتجزا',
+            'release_after_grace' => 'يرد بعد مهلته إن لم توجد مطالبات',
+            'release' => '**يرد**',
+            'may_forfeit' => '**قد يصادر كليا أو جزئيا** بنص العقد'),
         'unbilled' => array(
-            'bill_cycle' => 'يُفوتر بدورته',
-            'final_claim_old' => 'يُفوتر بمستخلصٍ ختاميٍّ للقديم',
-            'bill_before_pause' => 'يُفوتر ما نُفّذ قبل التعليق',
-            'final_claim' => 'يُفوتر بمستخلصٍ ختامي',
-            'bill_all' => '**يُفوتر المنفَّذ كاملًا**',
-            'bill_accepted_only' => 'يُفوتر **المنفَّذ المقبول فقط**',
+            'bill_cycle' => 'يفوتر بدورته',
+            'final_claim_old' => 'يفوتر بمستخلص ختامي للقديم',
+            'bill_before_pause' => 'يفوتر ما نفذ قبل التعليق',
+            'final_claim' => 'يفوتر بمستخلص ختامي',
+            'bill_all' => '**يفوتر المنفذ كاملا**',
+            'bill_accepted_only' => 'يفوتر **المنفذ المقبول فقط**',
             'none' => 'لا شيء',
-            'freeze_disputed_bill_rest' => 'يُجمَّد المتنازَعُ عليه ويُفوتر الباقي'),
+            'freeze_disputed_bill_rest' => 'يجمد المتنازع عليه ويفوتر الباقي'),
         'penalty' => array(
-            'continue' => 'تستمر قواعدُها',
-            'close_old_start_new' => 'تُقفل قواعدُ القديم وتبدأ الجديدة',
-            'pause_time_not_performance' => 'تتوقف الغراماتُ الزمنيةُ لا الأدائية',
-            'accrue_to_effect_date' => 'تُحتسب المستحقةُ حتى تاريخ الأثر',
-            'company_claims_compensation' => '**تُطالَب الشركةُ بتعويض** بنود العقد (تعبئةٌ وإخلاءٌ وتوقف)',
-            'breach_penalties_capped' => '**تُحتسب غراماتُ الإخلال بسقوفها**',
-            'mobilization_cost_if_article' => 'تُحتسب كلفةُ التعبئة والإخلاء **إن نصّ العقدُ عليها**',
-            'suspend_until_resolution' => 'تُعلَّق حتى الحسم'),
+            'continue' => 'تستمر قواعدها',
+            'close_old_start_new' => 'تقفل قواعد القديم وتبدأ الجديدة',
+            'pause_time_not_performance' => 'تتوقف الغرامات الزمنية لا الأدائية',
+            'accrue_to_effect_date' => 'تحتسب المستحقة حتى تاريخ الأثر',
+            'company_claims_compensation' => '**تطالب الشركة بتعويض** بنود العقد (تعبئة وإخلاء وتوقف)',
+            'breach_penalties_capped' => '**تحتسب غرامات الإخلال بسقوفها**',
+            'mobilization_cost_if_article' => 'تحتسب كلفة التعبئة والإخلاء **إن نص العقد عليها**',
+            'suspend_until_resolution' => 'تعلق حتى الحسم'),
         'container' => array(
-            'extend' => '**الحاويةُ نفسُها يمتد أجلُها ورصيدُها كما هو**',
-            'new_tree' => '**حاويةٌ جديدةٌ ولا تُخلط الأرصدة**',
-            'suspend' => 'تُعلَّق الحاويات',
-            'close_readonly' => '**تُقفل للتسجيل وتبقى للقراءة**',
-            'close_with_ref' => 'تُقفل بمرجع القرار',
-            'close' => 'تُقفل الحاويات',
-            'cancel' => '**تُلغى شجرةُ الحاويات ولا تُقفل** (لم تُستهلك)'),
+            'extend' => '**الحاوية نفسها يمتد أجلها ورصيدها كما هو**',
+            'new_tree' => '**حاوية جديدة ولا تخلط الأرصدة**',
+            'suspend' => 'تعلق الحاويات',
+            'close_readonly' => '**تقفل للتسجيل وتبقى للقراءة**',
+            'close_with_ref' => 'تقفل بمرجع القرار',
+            'close' => 'تقفل الحاويات',
+            'cancel' => '**تلغى شجرة الحاويات ولا تقفل** (لم تستهلك)'),
     );
 
     const TERMINAL = array('natural_end', 'client_fault_end', 'our_fault_end', 'pre_start_cancel');
@@ -149,24 +149,24 @@ class ContractLifecycleService
         $state = (string) (isset($a['state']) ? $a['state'] : '');
         if (!in_array($state, self::STATES, true)) {
             $out['code'] = 422;
-            $out['reason'] = '**حالةٌ خارج الثماني** — وجدولُ §6 ثمانيةٌ لا تاسعَ لها'; return $out;
+            $out['reason'] = '**حالة خارج الثماني** — وجدول §6 ثمانية لا تاسع لها'; return $out;
         }
         $c = null;
         try { $c = $gate->selectOne('contracts', array('where' => array('id' => (int) $contractId))); }
-        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $c'); $c = null; }
-        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقدُ غيرُ موجودٍ في نطاقك'; return $out; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $c'); $c = null; }
+        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقد غير موجود في نطاقك'; return $out; }
 
         // ④ **ولا أثرَ رجعي** — والتاريخُ إلزامي
         $day = trim((string) (isset($a['effect_date']) ? $a['effect_date'] : ''));
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $day)) {
             $out['code'] = 422;
-            $out['reason'] = '**تاريخُ الأثر إلزامي** — «وما قبله بحكمه القديم وما بعده بالجديد» (§6.1-⑤)';
+            $out['reason'] = '**تاريخ الأثر إلزامي** — «وما قبله بحكمه القديم وما بعده بالجديد» (§6.1-⑤)';
             return $out;
         }
         $ref = trim((string) (isset($a['decision_ref']) ? $a['decision_ref'] : ''));
         if (in_array($state, self::TERMINAL, true) && $ref === '') {
             $out['code'] = 422;
-            $out['reason'] = '**مرجعُ القرار إلزاميٌّ للإنهاء والإلغاء** — ولا يخرج عقدٌ صامتًا';
+            $out['reason'] = '**مرجع القرار إلزامي للإنهاء والإلغاء** — ولا يخرج عقد صامتا';
             return $out;
         }
 
@@ -175,8 +175,8 @@ class ContractLifecycleService
             $done = self::executedQty($gate, (int) $contractId);
             if ($done > 0.004) {
                 $out['code'] = 409;
-                $out['reason'] = '**التنفيذُ بدأ فعلًا** (' . $done . ' وحدةً مسجَّلة) — '
-                    . 'ولا يُلغى «قبل البدء» ما بدأ؛ والحالُ المناسبُ إنهاءٌ لا إلغاء';
+                $out['reason'] = '**التنفيذ بدأ فعلا** (' . $done . ' وحدة مسجلة) — '
+                    . 'ولا يلغى «قبل البدء» ما بدأ؛ والحال المناسب إنهاء لا إلغاء';
                 return $out;
             }
         }
@@ -191,11 +191,11 @@ class ContractLifecycleService
             if (abs($amt) < 0.005) { $amt = null; }
             elseif ($article === '' || $doc === '') {
                 $out['code'] = 422;
-                $out['reason'] = '**لا خصمَ ولا تعويضَ إلا بمادةٍ من العقد وحسابٍ موثَّقٍ بمستنداته** '
-                    . '(§6.1-④) — «وإلا فهي **مطالبةٌ تفاوضيةٌ لا خصمٌ نظامي**»';
+                $out['reason'] = '**لا خصم ولا تعويض إلا بمادة من العقد وحساب موثق بمستنداته** '
+                    . '(§6.1-④) — «وإلا فهي **مطالبة تفاوضية لا خصم نظامي**»';
                 return $out;
             } elseif ($cur === '') {
-                $out['code'] = 422; $out['reason'] = '**عملةُ المطالبة إلزامية**'; return $out;
+                $out['code'] = 422; $out['reason'] = '**عملة المطالبة إلزامية**'; return $out;
             }
         }
 
@@ -217,14 +217,14 @@ class ContractLifecycleService
         catch (\Throwable $t) {
             if (strpos($t->getMessage(), 'Duplicate') !== false) {
                 $out['ok'] = true; $out['code'] = 200; $out['effects'] = $e;
-                $out['reason'] = 'الواقعةُ مسجَّلةٌ سلفًا بهذا التاريخ — **فعلٌ عاطل**'; return $out;
+                $out['reason'] = 'الواقعة مسجلة سلفا بهذا التاريخ — **فعل عاطل**'; return $out;
             }
-            $out['code'] = 422; $out['reason'] = 'تعذّر التسجيل: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر التسجيل: ' . $t->getMessage(); return $out;
         }
         self::audit($conn, $companyId, $actor, 'lifecycle_event', $id, array(), $row);
         $out['ok'] = true; $out['code'] = 200; $out['id'] = $id; $out['effects'] = $e;
-        $out['reason'] = 'سُجّلت «' . self::STATE_AR[$state] . '» بتاريخِ أثرٍ ' . $day
-            . ' — **وأثرُها الخماسيُّ مكتوبٌ من جدول §6 لا من الطلب**';
+        $out['reason'] = 'سجلت «' . self::STATE_AR[$state] . '» بتاريخ أثر ' . $day
+            . ' — **وأثرها الخماسي مكتوب من جدول §6 لا من الطلب**';
         return $out;
     }
 
@@ -243,7 +243,7 @@ class ContractLifecycleService
         $o = array('ok' => false, 'code' => 0, 'state' => (string) $state,
                    'actions' => array(), 'figures' => array(), 'note' => '');
         if (!in_array((string) $state, self::STATES, true)) {
-            $o['code'] = 422; $o['note'] = 'حالةٌ خارج الثماني'; return $o;
+            $o['code'] = 422; $o['note'] = 'حالة خارج الثماني'; return $o;
         }
         $e = self::MATRIX[(string) $state];
 
@@ -263,37 +263,37 @@ class ContractLifecycleService
             'unbilled' => $unbilled,
         );
 
-        $o['actions'][] = array('area' => 'المقدَّم', 'rule' => self::EFFECT_AR['advance'][$e['advance']],
+        $o['actions'][] = array('area' => 'المقدم', 'rule' => self::EFFECT_AR['advance'][$e['advance']],
             'figure' => $o['figures']['advance_balance'], 'home' => 'M-01 · contract_advances');
-        $o['actions'][] = array('area' => 'الضمان/المحتجَز', 'rule' => self::EFFECT_AR['retention'][$e['retention']],
+        $o['actions'][] = array('area' => 'الضمان/المحتجز', 'rule' => self::EFFECT_AR['retention'][$e['retention']],
             'figure' => $o['figures']['retention_balance'], 'home' => 'P-06 · claims/claim_lines');
-        $o['actions'][] = array('area' => 'المنفَّذُ غيرُ المفوتر',
+        $o['actions'][] = array('area' => 'المنفذ غير المفوتر',
             'rule' => self::EFFECT_AR['unbilled'][$e['unbilled']],
             'figure' => $unbilled, 'home' => 'ENT-03 · المستخلص الختامي');
         $o['actions'][] = array('area' => 'الغرامات/التعويض', 'rule' => self::EFFECT_AR['penalty'][$e['penalty']],
             'figure' => null, 'home' => 'CON-02 §6 · بسقوفها');
         $o['actions'][] = array('area' => 'الحاويات', 'rule' => self::EFFECT_AR['container'][$e['container']],
-            'figure' => null, 'home' => 'H-01 · شجرةُ الحاويات');
+            'figure' => null, 'home' => 'H-01 · شجرة الحاويات');
 
         // ② **والمنفَّذُ غيرُ المفوتر لا يسقط بالإنهاء** — تحذيرٌ صريحٌ لكلِّ إنهاء
         if ($unbilled > 0.004 && in_array((string) $state, self::TERMINAL, true)
             && $e['unbilled'] !== 'none') {
-            $o['actions'][] = array('area' => '⚠ حقٌّ مكتسب',
-                'rule' => '**المنفَّذُ غيرُ المفوتر لا يسقط بالإنهاء** — يُفوتر بمستخلصٍ ختاميٍّ '
-                        . '**مهما كان سببُ الإنهاء** (§6.1-③)',
+            $o['actions'][] = array('area' => '⚠ حق مكتسب',
+                'rule' => '**المنفذ غير المفوتر لا يسقط بالإنهاء** — يفوتر بمستخلص ختامي '
+                        . '**مهما كان سبب الإنهاء** (§6.1-③)',
                 'figure' => $unbilled, 'home' => 'ENT-03');
         }
         if ((string) $state === 'pre_start_cancel' && $unbilled > 0.004) {
             $o['actions'][] = array('area' => '⚠ تناقض',
-                'rule' => '**«لا شيء» في المنفَّذ لا تستقيم مع تنفيذٍ مسجَّل** — والحالُ إنهاءٌ لا إلغاء',
+                'rule' => '**«لا شيء» في المنفذ لا تستقيم مع تنفيذ مسجل** — والحال إنهاء لا إلغاء',
                 'figure' => $unbilled, 'home' => 'P-11');
         }
 
         $o['ok'] = true; $o['code'] = 200;
-        $o['note'] = self::STATE_AR[(string) $state] . ' — مقدَّمٌ ' . $o['figures']['advance_balance']
-            . ' · محتجَزٌ ' . $o['figures']['retention_balance']
-            . ' · منفَّذٌ غيرُ مفوترٍ ' . $unbilled
-            . ' · **والخدمةُ تُقرّر ولا تُنفّذ**: لكلِّ فعلٍ بيتُه';
+        $o['note'] = self::STATE_AR[(string) $state] . ' — مقدم ' . $o['figures']['advance_balance']
+            . ' · محتجز ' . $o['figures']['retention_balance']
+            . ' · منفذ غير مفوتر ' . $unbilled
+            . ' · **والخدمة تقرر ولا تنفذ**: لكل فعل بيته';
         return $o;
     }
 

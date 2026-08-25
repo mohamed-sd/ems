@@ -48,7 +48,7 @@ $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-echo ems_states_bundle('لا تفاصيلَ لهذا العقدِ — العقدُ غيرُ موجودٍ أو خارجَ نطاقِ شركتك', 'ارجِع إلى سجلِّ عقودِ الموردين واختر عقدًا قائمًا');
+echo ems_states_bundle('لا تفاصيل لهذا العقد — العقد غير موجود أو خارج نطاق شركتك', 'ارجع إلى سجل عقود الموردين واختر عقدا قائما');
 ?>
         </div>
         <a href="javascript:history.back()" class="back-btn">
@@ -121,9 +121,9 @@ foreach ($scs_rows as $row) {
             <div class="col-lg-4 col-7"><?php echo $row['equip_size']; ?></div>
             <div class="col-lg-2 col-5">عدد المعدات</div>
             <div class="col-lg-4 col-7"><?php echo $row['equip_count']; ?></div>
-            <div class="col-lg-2 col-5">هدف المعدات شهريًا</div>
+            <div class="col-lg-2 col-5">هدف المعدات شهريا</div>
             <div class="col-lg-4 col-7"><?php echo $row['equip_target_per_month']; ?></div>
-            <div class="col-lg-2 col-5">إجمالي المعدات شهريًا</div>
+            <div class="col-lg-2 col-5">إجمالي المعدات شهريا</div>
             <div class="col-lg-4 col-7"><?php echo $row['equip_total_month']; ?></div>
             <div class="col-lg-2 col-5">إجمالي العقد للمعدات</div>
             <div class="col-lg-4 col-7"><?php echo $row['equip_total_contract']; ?></div>
@@ -133,9 +133,9 @@ foreach ($scs_rows as $row) {
             <div class="col-lg-4 col-7"><?php echo $row['mach_size']; ?></div>
             <div class="col-lg-2 col-5">عدد الآليات</div>
             <div class="col-lg-4 col-7"><?php echo $row['mach_count']; ?></div>
-            <div class="col-lg-2 col-5">هدف الآليات شهريًا</div>
+            <div class="col-lg-2 col-5">هدف الآليات شهريا</div>
             <div class="col-lg-4 col-7"><?php echo $row['mach_target_per_month']; ?></div>
-            <div class="col-lg-2 col-5">إجمالي الآليات شهريًا</div>
+            <div class="col-lg-2 col-5">إجمالي الآليات شهريا</div>
             <div class="col-lg-4 col-7"><?php echo $row['mach_total_month']; ?></div>
             <div class="col-lg-2 col-5">إجمالي العقد للآليات</div>
             <div class="col-lg-4 col-7"><?php echo $row['mach_total_contract']; ?></div>

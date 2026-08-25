@@ -196,7 +196,7 @@ function getReportsCatalog() {
             'name_ar'     => 'مؤشرات الصيانة',
             'icon'        => 'fa-wrench',
             'category'    => 'maintenance',
-            'description' => 'مؤشرات الصيانة لكل معدة: الأوامر، التوقّف، التكلفة، MTBF، MTTR، نسبة الجاهزية',
+            'description' => 'مؤشرات الصيانة لكل معدة: الأوامر، التوقف، التكلفة، MTBF، MTTR، نسبة الجاهزية',
             'url'         => 'reports/maintenance_summary.php',
         ],
 

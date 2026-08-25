@@ -55,7 +55,7 @@ class BalanceCalculator
         $allowed = array('contract_obligation_id', 'supplier_share_id',
                          'supplier_contract_line_id', 'operator_assignment_id');
         if (!in_array((string) $refCol, $allowed, true)) {
-            throw new \InvalidArgumentException('مرجعُ رصيدٍ غيرُ معروف: ' . $refCol);
+            throw new \InvalidArgumentException('مرجع رصيد غير معروف: ' . $refCol);
         }
         $params = array((int) $refId);
         $periodCond = '';

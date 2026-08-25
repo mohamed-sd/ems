@@ -41,11 +41,11 @@ $__pcAdd = ems_post_contract($conn, array(
         $qty = (float) ($in['qty'] ?? 0);
         $pr = (float) ($in['unit_price'] ?? 0);
         $cu = trim((string) ($in['currency'] ?? ''));
-        if ($q <= 0) { return array('ok' => false, 'msg' => 'لا بندَ بلا رأسِ عرض (422)'); }
-        if (mb_strlen($d) < 3) { return array('ok' => false, 'msg' => 'وصفُ البندِ إلزاميّ (422)'); }
-        if ($qty <= 0) { return array('ok' => false, 'msg' => 'الكميةُ يجب أن تكون موجبة (422)'); }
-        if ($pr < 0) { return array('ok' => false, 'msg' => 'السعرُ لا يكون سالبًا (422)'); }
-        if (mb_strlen($cu) < 3) { return array('ok' => false, 'msg' => 'لا مبلغَ بلا عملة (422)'); }
+        if ($q <= 0) { return array('ok' => false, 'msg' => 'لا بند بلا رأس عرض (422)'); }
+        if (mb_strlen($d) < 3) { return array('ok' => false, 'msg' => 'وصف البند إلزامي (422)'); }
+        if ($qty <= 0) { return array('ok' => false, 'msg' => 'الكمية يجب أن تكون موجبة (422)'); }
+        if ($pr < 0) { return array('ok' => false, 'msg' => 'السعر لا يكون سالبا (422)'); }
+        if (mb_strlen($cu) < 3) { return array('ok' => false, 'msg' => 'لا مبلغ بلا عملة (422)'); }
         return array('ok' => true, 'data' => array(
             'quotation_id' => $q, 'description' => $d, 'qty' => $qty, 'unit_price' => $pr,
             'currency' => $cu, 'unit_type' => (string) ($in['unit_type'] ?? 'hour'),
@@ -72,7 +72,7 @@ try {
         'orderBy' => '`id` DESC', 'limit' => 120));
     $products = $gate->select('products', array('columns' => array('id'),
         'orderBy' => '`id` DESC', 'limit' => 200));
-} catch (\Throwable $e) { $queueFail = 'تعذّر قراءةُ البنود: ' . $e->getMessage(); }
+} catch (\Throwable $e) { $queueFail = 'تعذر قراءة البنود: ' . $e->getMessage(); }
 
 $page_title = 'بنود العروض';
 require_once __DIR__ . '/../includes/screen_contract.php';
@@ -89,15 +89,15 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
   <?php
   $header_icon = 'fa fa-list-ol';
   $header_title_html = htmlspecialchars('بنود العروض', ENT_QUOTES, 'UTF-8');
-  ob_start(); ?><span class="badge"><?= $queueFail === '' ? count($rows) : '—' ?> بندًا · الإجمالي <?= number_format($sum, 2) ?> <?= htmlspecialchars($cur, ENT_QUOTES, 'UTF-8') ?></span><?php
+  ob_start(); ?><span class="badge"><?= $queueFail === '' ? count($rows) : '—' ?> بندا · الإجمالي <?= number_format($sum, 2) ?> <?= htmlspecialchars($cur, ENT_QUOTES, 'UTF-8') ?></span><?php
   $header_actions = array(array('raw' => trim((string) ob_get_clean())));
   $header_back = false;
   include __DIR__ . '/../includes/page_header.php';
-  echo ems_states_bundle('لا بندَ مسجَّلٌ بعد',
-      'البندُ يُضاف إلى رأسِ عرضٍ قائم — والإجماليُّ يُحسب في الخدمةِ ويُعرض ولا يُدخَل');
+  echo ems_states_bundle('لا بند مسجل بعد',
+      'البند يضاف إلى رأس عرض قائم — والإجمالي يحسب في الخدمة ويعرض ولا يدخل');
   ?>
-  <p class="text-muted">الورقة ٠٨ · بنودُ العرضِ تابعةٌ لرأسِه —
-     <strong>الحسابُ في طبقةِ الخدمةِ لا في الشاشة</strong>.</p>
+  <p class="text-muted">الورقة ٠٨ · بنود العرض تابعة لرأسه —
+     <strong>الحساب في طبقة الخدمة لا في الشاشة</strong>.</p>
   <?php if ($msg !== ''): ?>
     <div class="alert <?= (mb_strpos($msg, '✅') !== false ? 'alert-success' : 'alert-danger') ?>">
       <?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div>
@@ -110,14 +110,14 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
     <?php echo csrf_field(); ?>
     <div class="col-auto"><label class="form-label" for="ql_q">العرض</label>
       <select class="form-control form-control-sm" name="quotation_id" id="ql_q" required>
-        <option value="">— رأسُ العرض —</option>
+        <option value="">— رأس العرض —</option>
         <?php foreach ($quotes as $q): ?>
           <option value="<?= (int) $q['id'] ?>"<?= ($qid === (int) $q['id'] ? ' selected' : '') ?>>#<?= (int) $q['id'] ?></option>
         <?php endforeach; ?>
       </select></div>
     <div class="col-auto"><label class="form-label" for="ql_p">من الكتالوج</label>
       <select class="form-control form-control-sm" name="product_id" id="ql_p">
-        <option value="">— اختياريّ —</option>
+        <option value="">— اختياري —</option>
         <?php foreach ($products as $pr): ?><option value="<?= (int) $pr['id'] ?>">#<?= (int) $pr['id'] ?></option><?php endforeach; ?>
       </select></div>
     <div class="col-auto"><label class="form-label" for="ql_d">الوصف</label>
@@ -147,7 +147,7 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
     </tr></thead>
     <tbody>
     <?php if (empty($rows)): ?>
-      <tr><td colspan="9" class="text-center text-muted">لا بندَ مسجَّلٌ بعد</td></tr>
+      <tr><td colspan="9" class="text-center text-muted">لا بند مسجل بعد</td></tr>
     <?php endif; ?>
     <?php foreach ($rows as $r): ?>
       <tr>

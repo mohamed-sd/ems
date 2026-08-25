@@ -18,35 +18,35 @@ $cf_pre = (strpos($_SERVER['SCRIPT_NAME'] ?? '', '/Contracts/') !== false
 
 /* الستةُ العليا (NAV-01 §9.3) — وما بداخل كلٍّ أقسامٌ (روابطُ ثانوية) لا تبويباتٌ عليا */
 $cf_tabs = array(
-    'summary' => array('الملخصُ والخطُّ التجاري', array(
+    'summary' => array('الملخص والخط التجاري', array(
         'summary'   => array('الملخص', 'Contracts/contracts_details.php?id=%d'),
-        'baseline'  => array('خطُّ الأساس', 'Contracts/contract_baseline.php?contract=%d'),
-        'price'     => array('شروطُ السعر', 'Contracts/price_terms.php?contract=%d'),
+        'baseline'  => array('خط الأساس', 'Contracts/contract_baseline.php?contract=%d'),
+        'price'     => array('شروط السعر', 'Contracts/price_terms.php?contract=%d'),
     )),
-    'obligations' => array('الالتزاماتُ ونطاقاتُ التنفيذ', array(
+    'obligations' => array('الالتزامات ونطاقات التنفيذ', array(
         'obligations' => array('الالتزامات', 'Contracts/contract_obligations.php?contract=%d'),
         'commitments' => array('التعهدات', 'Clients/contract_commitments.php?contract=%d'),
-        'sites'       => array('نطاقاتُ التنفيذ', 'Contracts/contract_sites.php?contract=%d'),
+        'sites'       => array('نطاقات التنفيذ', 'Contracts/contract_sites.php?contract=%d'),
         'lines'       => array('البنود', 'Contracts/contract_lines.php?contract=%d'),
     )),
-    'plans' => array('الخططُ والموارد', array(
-        'monthly'  => array('الخطةُ الشهرية', 'Contracts/contract_monthly_plan.php?contract=%d'),
+    'plans' => array('الخطط والموارد', array(
+        'monthly'  => array('الخطة الشهرية', 'Contracts/contract_monthly_plan.php?contract=%d'),
         'resource' => array('خطةُ الموارد', 'Contracts/contract_resource_plan.php?contract=%d'),
         'payment'  => array('خطةُ الدفع', 'Contracts/contract_payment_schedule.php?contract=%d'),
-        'actual'   => array('المخططُ والمنفَّذ', 'Contracts/plan_actual_link.php?contract=%d'),
+        'actual'   => array('المخطط والمنفذ', 'Contracts/plan_actual_link.php?contract=%d'),
     )),
-    'coverage' => array('التغطيةُ والتنفيذ', array(
-        'coverage' => array('التغطيةُ التعاقدية', 'Contracts/contracts_details.php?id=%d#coverage'),
+    'coverage' => array('التغطية والتنفيذ', array(
+        'coverage' => array('التغطية التعاقدية', 'Contracts/contracts_details.php?id=%d#coverage'),
         'penalties'=> array('الجزاءات', 'Contracts/penalties.php?contract=%d'),
-        'lifecycle'=> array('اقتصادُ دورة الحياة', 'Contracts/contract_lifecycle.php?contract=%d'),
+        'lifecycle'=> array('اقتصاد دورة الحياة', 'Contracts/contract_lifecycle.php?contract=%d'),
     )),
-    'billing' => array('المستخلصُ والفاتورةُ والتحصيل', array(
+    'billing' => array('المستخلص والفاتورة والتحصيل', array(
         'claims' => array('المستخلصات', 'Contracts/claims.php?contract=%d'),
     )),
-    'annex' => array('الملاحقُ والمستنداتُ والسجل', array(
+    'annex' => array('الملاحق والمستندات والسجل', array(
         'amendments' => array('الملاحق', 'Clients/contract_amendments.php?contract=%d'),
         'guarantees' => array('الضمانات', 'Contracts/contract_guarantees.php?contract=%d'),
-        'events'     => array('السجلُّ الزمني', 'Clients/contract_events.php?contract=%d'),
+        'events'     => array('السجل الزمني', 'Clients/contract_events.php?contract=%d'),
     )),
 );
 /* أيُّ تبويبٍ علويٍّ نشطٌ؟ — من القسم النشط */
@@ -65,7 +65,7 @@ foreach ($cf_tabs[$cf_top_active][1] as $sk => $sv) {
 }
 
 ems_file_tabs(array(
-    'label' => 'ملفُّ العقد',
+    'label' => 'ملف العقد',
     'tabs'  => $cf_items,
     'subs'  => $cf_subItems,
 ));

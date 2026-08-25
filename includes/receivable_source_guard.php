@@ -24,7 +24,7 @@ if (!function_exists('ems_receivable_source_registry')) {
             'invoice' => array(
                 'table' => 'tax_invoices', 'ref_col' => 'serial_no',
                 'state_col' => 'state', 'state_ok' => array('issued'),
-                'label' => 'فاتورةٌ ضريبيةٌ صادرة',
+                'label' => 'فاتورة ضريبية صادرة',
                 /* البابُ **مقيسٌ لا مخترَع**: `Contracts/tax_invoices.php` يقرأ
                    `?open=<id>` (السطر 67) ⇒ النقرةُ تفتح الفاتورةَ بعينها. */
                 'open'  => '/ems/Contracts/tax_invoices.php?open=',
@@ -32,7 +32,7 @@ if (!function_exists('ems_receivable_source_registry')) {
             'statement' => array(
                 'table' => 'fin_client_statements', 'ref_col' => 'stmt_code',
                 'state_col' => 'state', 'state_ok' => array('issued'),
-                'label' => 'كشفُ حسابِ عميلٍ صادر',
+                'label' => 'كشف حساب عميل صادر',
                 /* ◆ **لا شاشةَ لكشوفِ العملاء اليوم**: `fin_client_statements`
                      لا يمسُّه إلا خدمةٌ وأداةٌ، ولا ملفَّ عرضٍ في `Finance/`.
                      فالبابُ `null` **إعلانًا** — ورابطٌ مخترَعٌ يقود إلى 404
@@ -59,15 +59,15 @@ if (!function_exists('ems_receivable_resolve_source')) {
 
         $reg = ems_receivable_source_registry();
         if (!isset($reg[$docType])) {
-            $out['reason'] = 'نوعُ مستندٍ غيرُ معروف — والذمّةُ لا تُفتح على نوعٍ لا سجلَّ له';
+            $out['reason'] = 'نوع مستند غير معروف — والذمة لا تفتح على نوع لا سجل له';
             return $out;
         }
         if ($docRef === '') {
-            $out['reason'] = 'مرجعُ المستند إلزامي — لا ذمّةَ بلا مستندٍ يقابلها (INJ-0036)';
+            $out['reason'] = 'مرجع المستند إلزامي — لا ذمة بلا مستند يقابلها (INJ-0036)';
             return $out;
         }
         if ($companyId <= 0) {
-            $out['reason'] = 'شركةُ الذمّةِ غيرُ محدَّدة — ولا يُقرأ الغيابُ إذنًا';
+            $out['reason'] = 'شركة الذمة غير محددة — ولا يقرأ الغياب إذنا';
             return $out;
         }
 
@@ -79,7 +79,7 @@ if (!function_exists('ems_receivable_resolve_source')) {
         if (!$st) {
             error_log('ems_receivable_resolve_source: prepare — ' . $conn->error);
             return array('ok' => false, 'code' => 500, 'source_doc_id' => null, 'label' => '',
-                         'reason' => 'تعذّرت قراءةُ سجلِّ المستندات — ولا يُقرأ الفشلُ إذنًا');
+                         'reason' => 'تعذرت قراءة سجل المستندات — ولا يقرأ الفشل إذنا');
         }
         $st->bind_param('si', $docRef, $companyId);
         $st->execute();
@@ -87,13 +87,13 @@ if (!function_exists('ems_receivable_resolve_source')) {
         $st->close();
 
         if (!$row) {
-            $out['reason'] = 'لا يقابل هذا المرجعَ (' . $m['label'] . ') أيُّ مستندٍ في هذه الشركة — '
-                           . 'والذمّةُ أثرٌ لواقعةٍ لا مصدرٌ لها (INJ-0036 · 422)';
+            $out['reason'] = 'لا يقابل هذا المرجع (' . $m['label'] . ') أي مستند في هذه الشركة — '
+                           . 'والذمة أثر لواقعة لا مصدر لها (INJ-0036 · 422)';
             return $out;
         }
         if (!in_array((string) $row['st'], $m['state_ok'], true)) {
-            $out['reason'] = 'المستندُ موجودٌ لكن حالتَه «' . $row['st'] . '» — ولا تُفتح ذمّةٌ '
-                           . 'إلا على مستندٍ اجتاز سلسلةَ اعتماده (INJ-0036 · 422)';
+            $out['reason'] = 'المستند موجود لكن حالته «' . $row['st'] . '» — ولا تفتح ذمة '
+                           . 'إلا على مستند اجتاز سلسلة اعتماده (INJ-0036 · 422)';
             return $out;
         }
 

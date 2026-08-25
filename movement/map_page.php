@@ -57,8 +57,8 @@ if ($selected_project_id > 0) {
 /* UI-13: كان الحكمُ يُقال في نافذةِ alert من المتصفحِ ثم يقفز بالمستخدمِ —
    لا رمزَ ولا أثرَ ولا طريقَ رجوعٍ يختاره. صار رسالةً محكومةً داخلَ اللوحة. */
 if (!$selected_project) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'لا يوجد مشروعٌ مرتبطٌ بهذه الجلسة ❌',
-        'GOV-SCOPE-403', 'اختر مشروعًا من شاشةِ اختيار المشروع ثم أعد فتح الخريطة');
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا يوجد مشروع مرتبط بهذه الجلسة ❌',
+        'GOV-SCOPE-403', 'اختر مشروعا من شاشة اختيار المشروع ثم أعد فتح الخريطة');
 }
 
 // ============================================================
@@ -277,7 +277,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   $header_back = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fa-solid fa-house', 'label' => 'الرئيسية');
   include(__DIR__ . '/../includes/page_header.php');
   // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-  echo ems_states_bundle('لا مورّدين ولا آلياتٍ منشورةً في هذا المشروعِ بعدُ', 'أضفْ أولَ تشغيلٍ بزرِّ «إدارة التشغيل» في رأسِ الشاشة');
+  echo ems_states_bundle('لا موردين ولا آليات منشورة في هذا المشروع بعد', 'أضف أول تشغيل بزر «إدارة التشغيل» في رأس الشاشة');
   ?>
 
   <div class="movement-content-wrapper">
@@ -313,11 +313,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="legend-item"><div class="ldot red"></div> آلية متوقفة</div>
     <div class="legend-item">
         <div class="op-av active legend-op-avatar"><i class="fas fa-user legend-op-avatar-icon"></i></div>
-        مشغّل أساسي
+        مشغل أساسي
     </div>
     <div class="legend-item">
         <div class="op-av reserve legend-op-avatar"><i class="fas fa-user legend-op-avatar-icon"></i></div>
-        احتياطي (قريباً)
+        احتياطي (قريبا)
     </div>
 </div>
 
@@ -325,7 +325,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <!-- حالة لا معدات -->
 <div class="zero-state">
     <i class="fas fa-truck-monster"></i>
-    <h3>لا توجد آليات مسجّلة في هذا المشروع</h3>
+    <h3>لا توجد آليات مسجلة في هذا المشروع</h3>
     <p>يمكنك إضافة عمليات التشغيل من صفحة إدارة التشغيل</p>
 </div>
 <?php else: ?>
@@ -373,7 +373,7 @@ foreach ($suppliers_data as $sup_id => $sup):
         <div class="mss-item"><span class="mss-n"><?php echo $sup_total; ?></span>إجمالي</div>
         <div class="mss-item"><span class="mss-n green"><?php echo $sup_working; ?></span>عاملة</div>
         <div class="mss-item"><span class="mss-n red"><?php echo $sup_stopped; ?></span>متوقفة</div>
-        <div class="mss-item"><span class="mss-n blue"><?php echo $sup_ops; ?></span>مشغّلون</div>
+        <div class="mss-item"><span class="mss-n blue"><?php echo $sup_ops; ?></span>مشغلون</div>
     </div>
 
     <!-- جسم المورد -->
@@ -418,7 +418,7 @@ foreach ($suppliers_data as $sup_id => $sup):
                     <!-- صف المشغلين -->
                     <div class="op-row">
                         <?php if ($drv_count === 0): ?>
-                        <span class="no-op-label"><i class="fas fa-user-slash no-op-icon"></i> لا مشغّل</span>
+                        <span class="no-op-label"><i class="fas fa-user-slash no-op-icon"></i> لا مشغل</span>
                         <?php else:
                             foreach ($op['drivers'] as $drv):
                                 $dn = htmlspecialchars($drv['driver_name']);
@@ -500,7 +500,7 @@ foreach ($suppliers_data as $sup_id => $sup):
                     <!-- صف المشغلين — نفس هيكل العاملة تماماً -->
                     <div class="op-row">
                         <?php if ($drv_count === 0): ?>
-                        <span class="no-op-label"><i class="fas fa-user-slash no-op-icon"></i> لا مشغّل</span>
+                        <span class="no-op-label"><i class="fas fa-user-slash no-op-icon"></i> لا مشغل</span>
                         <?php else:
                             foreach ($op['drivers'] as $drv):
                                 $dn = htmlspecialchars($drv['driver_name']);

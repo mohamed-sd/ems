@@ -119,7 +119,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back=array('href'=>'worker_register.php','class'=>'','icon'=>'fas fa-arrow-right','label'=>'سجل العامل');
     include('../includes/page_header.php'); ?>
     <?php // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا تسوياتِ عاملين مسجَّلةً في هذا السجلِّ العرضيّ', 'أعِدَّ التسويةَ من شاشةِ «تسويات الموظفين» الموحّدةِ لتظهرَ هنا'); ?>
+    echo ems_states_bundle('لا تسويات عاملين مسجلة في هذا السجل العرضي', 'أعد التسوية من شاشة «تسويات الموظفين» الموحدة لتظهر هنا'); ?>
     <style>
         .ws-notice-body { border-right: 4px solid var(--c-f59e0b, #f59e0b); }
         .ws-notice-text { color: var(--c-note-ink); margin: 0; line-height: var(--leading-loose); }
@@ -144,10 +144,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-body ws-notice-body">
         <p class="ws-notice-text">
             <i class="fas fa-triangle-exclamation"></i>
-            <strong>هذه الشاشةُ صارت للعرض فقط.</strong>
-            تسويةُ الموظف تُعدّ الآن من الشاشة الموحّدة التي <strong>تجلب البنودَ من
-            مصادرها</strong> — استحقاقُه وتحميلاتُه من دفتر ذممه بروابط أصولها،
-            بلا إدخال مبلغٍ باليد، وبفصلِ يدين: مَن يُعدّ لا يُجيز.
+            <strong>هذه الشاشة صارت للعرض فقط.</strong>
+            تسوية الموظف تعد الآن من الشاشة الموحدة التي <strong>تجلب البنود من
+            مصادرها</strong> — استحقاقه وتحميلاته من دفتر ذممه بروابط أصولها،
+            بلا إدخال مبلغ باليد، وبفصل يدين: من يعد لا يجيز.
             <br>
             <a class="btn btn-sm btn-primary ws-notice-link"
                href="employee_settlements.php">
@@ -162,15 +162,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <input type="hidden" name="action" value="save"><input type="hidden" name="id" value="<?= $edit?intval($edit['id']):0 ?>">
         <div class="card-header"><h5><i class="fas fa-edit"></i> <?= $edit?'تعديل تسوية':'تسوية جديدة' ?></h5></div>
         <div class="ws-form-grid">
-            <div class="field"><label for="ws_worker">الموظف</label><?php if($edit): ?><input type="text" id="ws_worker" aria-label="اسمُ الموظفِ صاحبِ التسوية" value="<?= htmlspecialchars($edit['wname'] ?: ('#'.$edit['employee_id'])) ?>" disabled><?php else: ?><select name="worker_id" id="ws_worker" required><option value="">—</option><?php foreach($workers as $wid=>$wn): ?><option value="<?= intval($wid) ?>"><?= htmlspecialchars($wn) ?></option><?php endforeach; ?></select><?php endif; ?></div>
+            <div class="field"><label for="ws_worker">الموظف</label><?php if($edit): ?><input type="text" id="ws_worker" aria-label="اسم الموظف صاحب التسوية" value="<?= htmlspecialchars($edit['wname'] ?: ('#'.$edit['employee_id'])) ?>" disabled><?php else: ?><select name="worker_id" id="ws_worker" required><option value="">—</option><?php foreach($workers as $wid=>$wn): ?><option value="<?= intval($wid) ?>"><?= htmlspecialchars($wn) ?></option><?php endforeach; ?></select><?php endif; ?></div>
             <div class="field"><label for="ws_source_type">المصدر</label><select name="source_type" id="ws_source_type"><option value="">—</option><?php foreach(['شركة','مورد','مقاول'] as $s): ?><option value="<?= $s ?>" <?= (($edit['source_type']??'')===$s)?'selected':'' ?>><?= $s ?></option><?php endforeach; ?></select></div>
             <div class="field"><label for="emsf_624_8d8b1">أساس التسوية</label><select name="settlement_basis" id="emsf_624_8d8b1"><option value="">—</option><?php foreach(['عمالة شركة','فاتورة مورد','مستخلص مقاول'] as $b): ?><option value="<?= $b ?>" <?= (($edit['settlement_basis']??'')===$b)?'selected':'' ?>><?= $b ?></option><?php endforeach; ?></select></div>
             <div class="field"><label for="emsf_625_12a01">الحالة</label><select name="state" id="emsf_625_12a01"><?php foreach($STATES as $s): ?><option value="<?= $s ?>" <?= (($edit['state']??'محتسب')===$s)?'selected':'' ?>><?= $s ?></option><?php endforeach; ?></select></div>
-            <div class="field"><label for="emsf_626_d9937">جهة التسوية</label><input type="text" name="settlement_party" id="emsf_626_d9937" aria-label="جهةُ التسوية" value="<?= htmlspecialchars($edit['settlement_party'] ?? '') ?>"></div>
-            <div class="field"><label for="emsf_627_607ef">عقد مرتبط (#)</label><input type="number" name="worker_contract_id" id="emsf_627_607ef" aria-label="رقمُ العقدِ المرتبط" value="<?= htmlspecialchars($edit['worker_contract_id'] ?? '') ?>"></div>
+            <div class="field"><label for="emsf_626_d9937">جهة التسوية</label><input type="text" name="settlement_party" id="emsf_626_d9937" aria-label="جهة التسوية" value="<?= htmlspecialchars($edit['settlement_party'] ?? '') ?>"></div>
+            <div class="field"><label for="emsf_627_607ef">عقد مرتبط (#)</label><input type="number" name="worker_contract_id" id="emsf_627_607ef" aria-label="رقم العقد المرتبط" value="<?= htmlspecialchars($edit['worker_contract_id'] ?? '') ?>"></div>
             <div class="field"><label for="emsf_628_39c52">الصافي (مالي — يدوي)</label><input type="number" step="0.01" name="net_amount" id="emsf_628_39c52" aria-label="صافي التسوية" value="<?= htmlspecialchars($edit['net_amount'] ?? '') ?>"></div>
-            <div class="field"><label for="emsf_629_386b4">تعليق مالي</label><input type="text" name="net_finance_note" id="emsf_629_386b4" aria-label="تعليقُ الماليةِ على الصافي" value="<?= htmlspecialchars($edit['net_finance_note'] ?? '') ?>"></div>
-            <div class="field ws-span-full"><label for="emsf_630_ac9d5">ملاحظات</label><input type="text" name="notes" id="emsf_630_ac9d5" aria-label="ملاحظاتٌ على التسوية" value="<?= htmlspecialchars($edit['notes'] ?? '') ?>"></div>
+            <div class="field"><label for="emsf_629_386b4">تعليق مالي</label><input type="text" name="net_finance_note" id="emsf_629_386b4" aria-label="تعليق المالية على الصافي" value="<?= htmlspecialchars($edit['net_finance_note'] ?? '') ?>"></div>
+            <div class="field ws-span-full"><label for="emsf_630_ac9d5">ملاحظات</label><input type="text" name="notes" id="emsf_630_ac9d5" aria-label="ملاحظات على التسوية" value="<?= htmlspecialchars($edit['notes'] ?? '') ?>"></div>
         </div>
         <div class="ws-form-actions"><button type="submit" class="add-btn"><i class="fas fa-save"></i> حفظ</button><a href="worker_settlement.php" class="add-btn ws-cancel-btn"><i class="fas fa-times"></i> إلغاء</a></div>
     </form>
@@ -198,10 +198,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="table-wrap ws-table-wrap"><table class="data-table ws-table-full">
         <thead><tr><th>إجراءات</th><th>#</th><th>الموظف</th><th>المصدر</th><th>الأساس</th><th>الصافي</th><th>الحالة</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -232,7 +232,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <td><?= htmlspecialchars($r['source_type'] ?: '-') ?></td><td><?= htmlspecialchars($r['settlement_basis'] ?: '-') ?></td>
             <td><?= htmlspecialchars($r['net_amount'] ?: '-') ?></td>
             <td><span class="status-pill <?= $sc ?>"><?= htmlspecialchars($r['state']) ?></span></td></tr>
-        <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="7" class="ws-empty-cell">لا توجد تسوياتٌ بعد.</td></tr><?php endif; ?>
+        <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="7" class="ws-empty-cell">لا توجد تسويات بعد.</td></tr><?php endif; ?>
         </tbody></table></div>
 </div>
 <?php ems_wf_view_modal($WF_VIEW); ?>

@@ -40,14 +40,14 @@ if (!$is_super_admin && empty($__pp['can_view'])) {
 $__canWrite = $is_super_admin || !empty($__pp['can_add']) || !empty($__pp['can_edit']);
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$__canWrite) {
     http_response_code(403);
-    exit('غير مصرَّحٍ بالكتابة في هذه الشاشة — اطلبِ المنحةَ من مدير الصلاحيات');
+    exit('غير مصرح بالكتابة في هذه الشاشة — اطلب المنحة من مدير الصلاحيات');
 }
 
 // ═══ ⑤ رمزُ الحماية — قبلَ أيِّ معالجةٍ لا بعدَها ═══
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!function_exists('verify_csrf_token') || !verify_csrf_token($_POST['csrf_token'] ?? '')) {
         http_response_code(403);
-        exit('رمزُ الحمايةِ غيرُ صالح — أعدْ تحميلَ الصفحة');
+        exit('رمز الحماية غير صالح — أعد تحميل الصفحة');
     }
 }
 
@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $w = new \App\Services\Bus\EventDeliveryWorker($conn, 'ui-' . $uid);
     if ($__action === 'deliver') {
         $r = $w->deliverOne((int) ($_POST['delivery_id'] ?? 0));
-        $flash = $r === null ? 'لم يُلتقط — سبقه عاملٌ آخر' : ('نتيجةُ التسليم: ' . $r);
+        $flash = $r === null ? 'لم يلتقط — سبقه عامل آخر' : ('نتيجة التسليم: ' . $r);
         $flashKind = ($r === 'processed') ? 'success' : ($r === null ? 'info' : 'error');
     } elseif ($__action === 'dlq_decide') {
         $r = $w->decideDlq((int) ($_POST['delivery_id'] ?? 0), (string) ($_POST['decision'] ?? ''),
@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $flash = $r['reason']; $flashKind = $r['ok'] ? 'success' : 'error';
     } elseif ($__action === 'release_stale') {
         $n = $w->releaseStale(3600);
-        $flash = 'حُرّر ' . $n . ' تسليمًا عالقًا'; $flashKind = 'success';
+        $flash = 'حرر ' . $n . ' تسليما عالقا'; $flashKind = 'success';
     }
 }
 
@@ -90,11 +90,11 @@ $stats = $conn->query(
 )->fetch_assoc();
 $PAGE_TITLE = 'تسليمات الأحداث وحالاتها';
 $TILES = array(
-    array('منشور', (int) $stats['published']), array('ملتقَط', (int) $stats['claimed']),
+    array('منشور', (int) $stats['published']), array('ملتقط', (int) $stats['claimed']),
     array('قيد التنفيذ', (int) $stats['processing']), array('نجح', (int) $stats['processed']),
     array('فشل', (int) $stats['failed']), array('صندوق الموتى', (int) $stats['dlq']),
 );
 $COLS = array('#','رمز الحدث','المستهلك','الحالة','المحاولة','الإعادة القادمة','وقت النجاح','مرجع الأثر','رمز الفشل','سبب الفشل','وسم البذر');
-$EMPTY_TITLE = 'لا تسليماتٍ مسجَّلةً بعدُ';
-$EMPTY_HINT  = 'تظهر التسليماتُ عند نشرِ وقائعَ لأحداثٍ لها مشتركون معلَنون';
+$EMPTY_TITLE = 'لا تسليمات مسجلة بعد';
+$EMPTY_HINT  = 'تظهر التسليمات عند نشر وقائع لأحداث لها مشتركون معلنون';
 include __DIR__ . '/../includes/eng01_screen_view.php';

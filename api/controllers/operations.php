@@ -292,7 +292,7 @@ function operations_update(int $opId): void
         api_fail('لا توجد صلاحية للتعديل', 403);
     }
     if ($opId <= 0) {
-        api_fail('معرّف التشغيل غير صحيح', 400);
+        api_fail('معرف التشغيل غير صحيح', 400);
     }
 
     $scope = operations_scope($ctx, $projectId);

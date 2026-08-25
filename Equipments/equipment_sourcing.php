@@ -48,9 +48,9 @@ $COLS   = array (
   16 => 'الالتزام القائم',
   17 => 'المعالجة المحاسبية',
   18 => 'درجة السرية',
-  19 => 'سجل الاطّلاع',
-  20 => 'المُنشئ — الاسم والصفة',
-  21 => 'المعتمِد — الاسم والصفة',
+  19 => 'سجل الاطلاع',
+  20 => 'المنشئ — الاسم والصفة',
+  21 => 'المعتمد — الاسم والصفة',
   22 => 'تاريخ الاعتماد',
   23 => 'الحالة',
 );
@@ -73,7 +73,7 @@ $FIELDS = array (
   15 => 'الالتزام القائم',
   16 => 'المعالجة المحاسبية',
   17 => 'درجة السرية',
-  18 => 'المعتمِد — الاسم والصفة',
+  18 => 'المعتمد — الاسم والصفة',
   19 => 'تاريخ الاعتماد',
   20 => 'الحالة',
 );
@@ -89,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     $creator = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
     // الموجة ٢: الحفظ في الجدول الأصلي للشاشة (الفارغ NULL — لا مخزن بينيًّا)
     $ok = cmp03_store_insert($conn, $company_id, $CANONICAL, $payload, $status, $uid, $creator);
-    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
+    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
     exit();
 }
 
@@ -104,7 +104,7 @@ $entityName = $govCtx['values']['entity'] ?? '—';
 function cmp03_cell($col, $row, $entityName) {
     $n = cmp03_screen_norm($col);
     if ($n === cmp03_screen_norm('الكيان')) { return $entityName; }
-    if ($n === cmp03_screen_norm('المُنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المُنشئة')) {
+    if ($n === cmp03_screen_norm('المنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المنشئة')) {
         return $row['created_by_name'] ?: '—';
     }
     if ($n === cmp03_screen_norm('تاريخ الإنشاء')) { return $row['created_at']; }
@@ -119,21 +119,21 @@ function cmp03_screen_norm($s) {
     $s = str_replace(array('أ','إ','آ'), 'ا', $s);
     $s = str_replace('ة', 'ه', $s);
     $s = str_replace('ى', 'ي', $s);
-    return preg_replace('/[ًٌٍَُِّْ]/u', '', $s);
+    return preg_replace('/[]/u', '', $s);
 }
 
-$page_title = 'إيكوبيشن | مصدر المعدة ونمط تملّكها';
+$page_title = 'إيكوبيشن | مصدر المعدة ونمط تملكها';
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
 require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
-require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('equipment', 'الملكيةُ والتمويل');
+require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('equipment', 'الملكية والتمويل');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main ems-unified-page-shell" dir="rtl">
     <?php
-    $header_title = 'مصدر المعدة ونمط تملّكها';
+    $header_title = 'مصدر المعدة ونمط تملكها';
     $header_icon = 'fa fa-arrows-down-to-people';
     $header_actions = array(
         array('tag' => 'button', 'id' => 'cmp03AddBtn', 'class' => '', 'icon' => 'fa fa-plus',
@@ -147,8 +147,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     /* UXW-01 بوابة ٩: حزمةُ الحالاتِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ
        افتراضًا ويُظهرها منطقُ الشاشةِ عند حالِها. الدالةُ من ux_components
        التي تُحمِّلها القشرة. */
-    echo ems_states_bundle('لا بياناتِ مصدرٍ أو نمطِ تملّكٍ للمعداتِ بعدُ',
-                           'أضف أولَ سجلِّ توريدٍ بزرِّ «إضافة» أو تحقق من توفرِ السجلات');
+    echo ems_states_bundle('لا بيانات مصدر أو نمط تملك للمعدات بعد',
+                           'أضف أول سجل توريد بزر «إضافة» أو تحقق من توفر السجلات');
     ?>
 
     <!-- فورم الإضافة الموحد (ems-forms) — مطويٌّ حتى زرِّ الرأس -->
@@ -156,7 +156,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <?= csrf_field() ?>
         <input type="hidden" name="cmp03_action" value="add">
         <div class="card"><div class="card-header">
-            <h5><i class="fa fa-plus"></i> إضافة — مصدر المعدة ونمط تملّكها</h5>
+            <h5><i class="fa fa-plus"></i> إضافة — مصدر المعدة ونمط تملكها</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
                 <div class="form-group"><label for="emsf_193_b80d2">كود المعدة</label>
@@ -195,7 +195,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="f16" maxlength="190" id="emsf_209_800bc"></div>
                 <div class="form-group"><label for="emsf_210_a044b">درجة السرية</label>
                     <input type="text" name="f17" maxlength="190" id="emsf_210_a044b"></div>
-                <div class="form-group"><label for="emsf_211_3fe8c">المعتمِد — الاسم والصفة</label>
+                <div class="form-group"><label for="emsf_211_3fe8c">المعتمد — الاسم والصفة</label>
                     <input type="text" name="f18" maxlength="190" id="emsf_211_3fe8c"></div>
                 <div class="form-group"><label for="emsf_212_b455d">تاريخ الاعتماد</label>
                     <input type="date" name="f19" id="emsf_212_b455d"></div>
@@ -214,7 +214,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="table-responsive">
         <table class="alltables display" id="equipment_sourcingTable">
             <thead><tr>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
             <th>كود المعدة</th>
             <th>نمط المصدر</th>
             <th>المورد أو الممول</th>
@@ -233,15 +233,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th>الالتزام القائم</th>
             <th>المعالجة المحاسبية</th>
             <th>درجة السرية</th>
-            <th class="ems-gov-th" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطّلاع</th>
-            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+            <th class="ems-gov-th" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطلاع</th>
+            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
             <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
             <th class="ems-gov-th none" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
             </tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="24" class="text-center text-muted">لا بياناتَ بعدُ — أضف أول صفٍّ بزر «إضافة»</td></tr>
+                <tr><td colspan="24" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
                     <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>

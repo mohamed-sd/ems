@@ -30,7 +30,7 @@ require_once __DIR__ . '/../includes/cmp03_local_store.php'; // الموجة ٢ 
 $CANONICAL = 'op_monthly.php';
 $COLS   = array (
   0 => 'الشهر',
-  1 => 'كود المشغّل',
+  1 => 'كود المشغل',
   2 => 'المعدة',
   3 => 'الموقع',
   4 => 'أيام العمل',
@@ -49,7 +49,7 @@ $COLS   = array (
   17 => 'الكيان',
   18 => 'مفتاح منع التكرار',
   19 => 'درجة الأثر',
-  20 => 'معكوس بـ',
+  20 => 'معكوس ب',
   21 => 'عكس عن',
   22 => 'مركز التكلفة',
   23 => 'سعر الصرف ومصدره',
@@ -57,7 +57,7 @@ $COLS   = array (
 );
 $FIELDS = array (
   0 => 'الشهر',
-  1 => 'كود المشغّل',
+  1 => 'كود المشغل',
   2 => 'المعدة',
   3 => 'الموقع',
   4 => 'أيام العمل',
@@ -90,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     $creator = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
     // الموجة ٢: الحفظ في الجدول الأصلي للشاشة (الفارغ NULL — لا مخزن بينيًّا)
     $ok = cmp03_store_insert($conn, $company_id, $CANONICAL, $payload, $status, $uid, $creator);
-    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
+    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
     exit();
 }
 
@@ -105,7 +105,7 @@ $entityName = $govCtx['values']['entity'] ?? '—';
 function cmp03_cell($col, $row, $entityName) {
     $n = cmp03_screen_norm($col);
     if ($n === cmp03_screen_norm('الكيان')) { return $entityName; }
-    if ($n === cmp03_screen_norm('المُنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المُنشئة')) {
+    if ($n === cmp03_screen_norm('المنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المنشئة')) {
         return $row['created_by_name'] ?: '—';
     }
     if ($n === cmp03_screen_norm('تاريخ الإنشاء')) { return $row['created_at']; }
@@ -120,10 +120,10 @@ function cmp03_screen_norm($s) {
     $s = str_replace(array('أ','إ','آ'), 'ا', $s);
     $s = str_replace('ة', 'ه', $s);
     $s = str_replace('ى', 'ي', $s);
-    return preg_replace('/[ًٌٍَُِّْ]/u', '', $s);
+    return preg_replace('/[]/u', '', $s);
 }
 
-$page_title = 'إيكوبيشن | الأداء الشهري للمشغّل';
+$page_title = 'إيكوبيشن | الأداء الشهري للمشغل';
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
 require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(null);
@@ -133,7 +133,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 ?>
 <div class="main ems-unified-page-shell" dir="rtl">
     <?php
-    $header_title = 'الأداء الشهري للمشغّل';
+    $header_title = 'الأداء الشهري للمشغل';
     $header_icon = 'fa fa-chart-simple';
     $header_actions = array(
         array('tag' => 'button', 'id' => 'cmp03AddBtn', 'class' => '', 'icon' => 'fa fa-plus',
@@ -144,7 +144,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
-    echo ems_states_bundle('لا قيودَ أداءٍ شهريٍّ للمشغّلين مسجَّلةً بعدُ', 'أضف أولَ قيدٍ شهريٍّ بزرِّ «إضافة» في رأسِ الشاشة');
+    echo ems_states_bundle('لا قيود أداء شهري للمشغلين مسجلة بعد', 'أضف أول قيد شهري بزر «إضافة» في رأس الشاشة');
     ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
@@ -153,12 +153,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <?= csrf_field() ?>
         <input type="hidden" name="cmp03_action" value="add">
         <div class="card"><div class="card-header">
-            <h5><i class="fa fa-plus"></i> إضافة — الأداء الشهري للمشغّل</h5>
+            <h5><i class="fa fa-plus"></i> إضافة — الأداء الشهري للمشغل</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
                 <div class="form-group"><label for="emsf_1712_ee536">الشهر</label>
                     <input type="text" name="f0" required maxlength="190" id="emsf_1712_ee536"></div>
-                <div class="form-group"><label for="emsf_1713_4aa48">كود المشغّل</label>
+                <div class="form-group"><label for="emsf_1713_4aa48">كود المشغل</label>
                     <input type="text" name="f1" maxlength="190" id="emsf_1713_4aa48"></div>
                 <div class="form-group"><label for="emsf_1714_01193">المعدة</label>
                     <input type="text" name="f2" maxlength="190" id="emsf_1714_01193"></div>
@@ -211,7 +211,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <table class="alltables display" id="op_monthlyTable">
             <thead><tr>
             <th>الشهر</th>
-            <th>كود المشغّل</th>
+            <th>كود المشغل</th>
             <th>المعدة</th>
             <th>الموقع</th>
             <th>أيام العمل</th>
@@ -227,10 +227,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th class="ems-gov-th" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
             <th>اعتمده</th>
             <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
             <th class="ems-gov-th" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-            <th class="ems-gov-th" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
-            <th class="ems-gov-th" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+            <th class="ems-gov-th" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
+            <th class="ems-gov-th" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
             <th class="ems-gov-th" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
             <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
             <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
@@ -238,7 +238,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="25" class="text-center text-muted">لا بياناتَ بعدُ — أضف أول صفٍّ بزر «إضافة»</td></tr>
+                <tr><td colspan="25" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
                     <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>

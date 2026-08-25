@@ -64,7 +64,7 @@ class AssignmentService
         // ③ نوع التكليف والخطان
         $type = self::typeOf($conn, (string) $d['assignment_type_code']);
         if (!$type) {
-            $out['code'] = 422; $out['reason'] = 'نوع تكليف غير معرَّف — يُضاف صفًّا في org_assignment_types لا كودًا';
+            $out['code'] = 422; $out['reason'] = 'نوع تكليف غير معرف — يضاف صفا في org_assignment_types لا كودا';
             return $out;
         }
         $lines = isset($d['reporting_lines']) && is_array($d['reporting_lines']) ? $d['reporting_lines'] : array();
@@ -73,7 +73,7 @@ class AssignmentService
             foreach ($lines as $l) { $kinds[(string) $l['line_type']] = true; }
             if (!isset($kinds['operational']) || !isset($kinds['functional'])) {
                 $out['code'] = 422;
-                $out['reason'] = 'التكليف الموقعي بخط تبعية واحد مرفوض — لا بد من التشغيلي والفني معًا (§2⑦)';
+                $out['reason'] = 'التكليف الموقعي بخط تبعية واحد مرفوض — لا بد من التشغيلي والفني معا (§2⑦)';
                 return $out;
             }
         }
@@ -162,7 +162,7 @@ class AssignmentService
                       'valid' => $d['valid_from'] . '→' . $d['valid_to']), $dec);
             $conn->commit();
             $out['ok'] = true; $out['code'] = 201; $out['asg_id'] = $asgId;
-            $out['reason'] = 'أُنشئ التكليف #' . $asgId;
+            $out['reason'] = 'أنشئ التكليف #' . $asgId;
             return $out;
         } catch (\Throwable $e) {
             $conn->rollback();
@@ -183,14 +183,14 @@ class AssignmentService
         $asgId = intval($asgId);
         $row = self::fetch($conn, $asgId);
         if (!$row) { $out['code'] = 404; $out['reason'] = 'تكليف غير موجود'; return $out; }
-        if ($row['state'] === 'ended') { $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'منتهٍ أصلًا — فعل عاطل'; return $out; }
+        if ($row['state'] === 'ended') { $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'منته أصلا — فعل عاطل'; return $out; }
 
         if (!self::deciderAuthorized($conn, $byPersonId)) {
             // طلب إنهاء من المدير الفني — يُرفع ولا يُنفَّذ (O6-و)
-            self::audit($conn, $asgId, 'amended', 'طلب إنهاء تكليف — يُرفع لمصدر القرار ولا يُنفَّذ',
+            self::audit($conn, $asgId, 'amended', 'طلب إنهاء تكليف — يرفع لمصدر القرار ولا ينفذ',
                 array('state' => $row['state']), array('requested_end_by' => intval($byPersonId), 'note' => $reason), intval($byPersonId));
             $out['ok'] = true; $out['code'] = 202; $out['requested'] = true;
-            $out['reason'] = 'طلب الإنهاء سُجِّل — والاعتماد النهائي لمصدر القرار وحده (§2⑦)';
+            $out['reason'] = 'طلب الإنهاء سجل — والاعتماد النهائي لمصدر القرار وحده (§2⑦)';
             return $out;
         }
 
@@ -205,7 +205,7 @@ class AssignmentService
                 array('state' => 'ended'), intval($byPersonId));
             $conn->commit();
             $out['ok'] = true; $out['code'] = 200;
-            $out['reason'] = 'أُنهي التكليف #' . $asgId . ' — والصلاحية سقطت في اللحظة نفسها';
+            $out['reason'] = 'أنهي التكليف #' . $asgId . ' — والصلاحية سقطت في اللحظة نفسها';
             return $out;
         } catch (\Throwable $e) {
             $conn->rollback();

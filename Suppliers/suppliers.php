@@ -109,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         } catch (\Throwable $t) { $duplicate_rows = array(); }
         if (!empty($duplicate_rows)) {
             $error_msg = ($id > 0)
-                ? "كود+المورد+موجود+مسبقاً+داخل+الشركة+❌"
+                ? "كود+المورد+موجود+مسبقا+داخل+الشركة+❌"
                 : "لا+يمكن+إضافة+مورد+بنفس+الكود+داخل+الشركة+❌";
             ems_gov_flash_redirect('suppliers.php', "$error_msg", 'GOV-INFO-200', '');
             exit();
@@ -296,7 +296,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
     <?php endif; ?>
 
-    <?= ems_states_bundle('لا موردين ضمنَ هذا الترشيح', 'وسّع الترشيحَ أو سجِّل موردًا جديدًا') ?>
+    <?= ems_states_bundle('لا موردين ضمن هذا الترشيح', 'وسع الترشيح أو سجل موردا جديدا') ?>
 
     <div class="stats-section suppliers-hidden" id="suppliersStatsSection">
         <div class="stats-grid">
@@ -484,7 +484,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <label for="financial_registration_status">حالة التسجيل المالي</label>
                             <select name="financial_registration_status" id="financial_registration_status">
                                 <option value="">-- اختر --</option>
-                                <option value="مسجل رسمياً">مسجل رسمياً</option>
+                                <option value="مسجل رسميا">مسجل رسميا</option>
                                 <option value="غير مسجل">غير مسجل</option>
                                 <option value="تحت التسجيل">تحت التسجيل</option>
                                 <option value="معفى من التسجيل">معفى من التسجيل</option>
@@ -542,7 +542,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <th class="ems-fn-th" data-fn="1">الرقم الضريبي</th>
                             <th class="ems-fn-th" data-fn="1">المالك الحقيقي للمعدات</th>
                             <th class="ems-fn-th" data-fn="1">هاتف المالك</th>
-                            <th class="ems-fn-th" data-fn="1">الشخص المفوَّض بالتوقيع</th>
+                            <th class="ems-fn-th" data-fn="1">الشخص المفوض بالتوقيع</th>
                             <th class="ems-fn-th" data-fn="1">هاتفه</th>
                             <th class="ems-fn-th" data-fn="1">مستند تفويضه</th>
                             <th class="ems-fn-th" data-fn="1">علاقة المورد بالمالك</th>
@@ -552,15 +552,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <th class="ems-fn-th none" data-fn="1">تاريخ انتهاء أقدم وثيقة</th>
                             <th class="ems-fn-th none" data-fn="1">الحساب البنكي</th>
                             <th class="ems-fn-th none" data-fn="1">حالة التحقق من الحساب</th>
-                            <th class="ems-fn-th none" data-fn="1">سجّله</th>
+                            <th class="ems-fn-th none" data-fn="1">سجله</th>
                             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                            <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                            <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                            <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                            <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                             <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                             <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                             <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-                            <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                            <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطّلاع</th>
+                            <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                            <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطلاع</th>
                             <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                             </tr>
                     </thead>

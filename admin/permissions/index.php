@@ -28,7 +28,7 @@ if (is_file($__fm)) {
         $founding_banner = \App\Services\Security\FoundingModeService::activeBanner($conn ?? ($GLOBALS['conn'] ?? null));
     } catch (\Throwable $__fe) {
         ems_catch_ignored($__fe, 'admin/permissions/index',
-            'لافتةُ وضعِ التأسيسِ تعذّرت — تُخفى ولا تُسقط مركزَ الصلاحيات');
+            'لافتة وضع التأسيس تعذرت — تخفى ولا تسقط مركز الصلاحيات');
     }
 }
 
@@ -295,7 +295,7 @@ require_once __DIR__ . '/../includes/layout_head.php';
             </div>
             <div class="permission-card-body">
                 <p class="permission-card-desc">
-                    أنشئ وعدّل أدواراً جديدة مثل مدير المشاريع أو مدير المستخدمين وحدد الهرمية بينها.
+                    أنشئ وعدل أدوارا جديدة مثل مدير المشاريع أو مدير المستخدمين وحدد الهرمية بينها.
                 </p>
                 <ul class="permission-card-features">
                     <li>إنشاء أدوار جديدة</li>
@@ -353,7 +353,7 @@ require_once __DIR__ . '/../includes/layout_head.php';
             </div>
             <div class="permission-card-body">
                 <p class="permission-card-desc">
-                    حرّر النصَّ الذي يقرؤه المستخدمُ في بطاقة «عن الشاشة» عند فتحِ أيِّ شاشة — دليلٌ ثابتٌ لكلِّ العملاء.
+                    حرر النص الذي يقرؤه المستخدم في بطاقة «عن الشاشة» عند فتح أي شاشة — دليل ثابت لكل العملاء.
                 </p>
                 <ul class="permission-card-features">
                     <li>تحرير تعريف كل شاشة</li>
@@ -382,7 +382,7 @@ require_once __DIR__ . '/../includes/layout_head.php';
             </div>
             <div class="permission-card-body">
                 <p class="permission-card-desc">
-                    اجمع روابط كل دور تحت أسماء مجموعات تظهر في الشريط الجانبي كقوائم قابلة للطيّ، ولكل دور مجموعاته الخاصة.
+                    اجمع روابط كل دور تحت أسماء مجموعات تظهر في الشريط الجانبي كقوائم قابلة للطي، ولكل دور مجموعاته الخاصة.
                 </p>
                 <ul class="permission-card-features">
                     <li>إنشاء مجموعات لكل دور</li>
@@ -405,18 +405,18 @@ require_once __DIR__ . '/../includes/layout_head.php';
                     <i class="fas fa-sitemap"></i>
                 </div>
                 <div>
-                    <div class="permission-card-title">قوائم التنقل الموحّدة</div>
+                    <div class="permission-card-title">قوائم التنقل الموحدة</div>
                     <div class="permission-card-subtitle">الأبواب الستة لكل دور</div>
                 </div>
             </div>
             <div class="permission-card-body">
                 <p class="permission-card-desc">
-                    المصدر الواحد لسايدبار كل دور: العنصر التابع للدور يظهر لمن يملك صلاحية العرض — تفعيلٌ وتعطيلٌ فردي وتوزيعٌ على الأبواب.
+                    المصدر الواحد لسايدبار كل دور: العنصر التابع للدور يظهر لمن يملك صلاحية العرض — تفعيل وتعطيل فردي وتوزيع على الأبواب.
                 </p>
                 <ul class="permission-card-features">
                     <li>الأبواب الستة الثابتة لكل دور</li>
-                    <li>تفعيل وتعطيل كل رابطٍ فرديًّا</li>
-                    <li>الحالة الفعلية: يظهر / محجوب صلاحيةً</li>
+                    <li>تفعيل وتعطيل كل رابط فرديا</li>
+                    <li>الحالة الفعلية: يظهر / محجوب صلاحية</li>
                     <li>فحص أسماء العرض من المحظور المعماري</li>
                 </ul>
                 <div class="permission-card-footer">

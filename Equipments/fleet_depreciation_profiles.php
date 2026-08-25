@@ -98,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approve_id'])) {
     if ($old && $old['state'] !== 'approved') {
         require_once __DIR__ . '/../includes/self_approval_guard.php';
         $__sa = ems_no_self_approval($conn, intval($old['created_by'] ?? 0), intval($user_id),
-            'ملفُّ إهلاكٍ #' . $app_id, intval($old['company_id'] ?? 0));
+            'ملف إهلاك #' . $app_id, intval($old['company_id'] ?? 0));
         if ($__sa !== null) {
             ems_gov_flash_redirect('fleet_depreciation_profiles.php', $__sa['reason'], 'GOV-PERM-403', '');
             exit();
@@ -113,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approve_id'])) {
         ems_gov_flash_redirect('fleet_depreciation_profiles.php', '✅ تم اعتماد الملف', 'GOV-OK-200', '');
         exit();
     }
-    ems_gov_flash_redirect('fleet_depreciation_profiles.php', 'الملف معتمد مسبقاً', 'GOV-INFO-200', '');
+    ems_gov_flash_redirect('fleet_depreciation_profiles.php', 'الملف معتمد مسبقا', 'GOV-INFO-200', '');
     exit();
 }
 
@@ -137,10 +137,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($errors) && $edit_id > 0) {
         $old_row = dep_fetch($conn, $edit_id, $company_scope);
         if (!$old_row) {
-            $errors[] = 'الملف غير موجود أو لا يخصّ شركتك';
+            $errors[] = 'الملف غير موجود أو لا يخص شركتك';
         } elseif ($old_row['state'] === 'approved' && !$can_approve) {
             // تعديل قيم ملف معتمد يتطلّب صلاحية الاعتماد (مستوى الإدارة)
-            $errors[] = 'تعديل ملف معتمد يتطلّب صلاحية الاعتماد';
+            $errors[] = 'تعديل ملف معتمد يتطلب صلاحية الاعتماد';
         }
     }
 
@@ -152,7 +152,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ), array('id' => $edit_id), "is_deleted = 0");
             $new_row = dep_fetch($conn, $edit_id, $company_scope);
             // أثر تدقيقي بأثر مستقبلي: لا حذف صامت للقيمة القديمة
-            dep_audit($conn, $edit_id, $company_val, 'updated', $old_row, $new_row, $user_id, 'تعديل يسري مستقبلاً فقط');
+            dep_audit($conn, $edit_id, $company_val, 'updated', $old_row, $new_row, $user_id, 'تعديل يسري مستقبلا فقط');
             ems_gov_flash_redirect('fleet_depreciation_profiles.php', '✅ تم تحديث الملف (يسري على الحساب اللاحق فقط)', 'GOV-OK-200', '');
             exit();
         } else {
@@ -210,7 +210,7 @@ $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : '
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا ملفَّ إهلاكٍ مسجَّلًا بعدُ', 'أضف أولَ ملفِّ إهلاكٍ بزرِّ «إضافة ملف جديد» في رأسِ الشاشة');
+    echo ems_states_bundle('لا ملف إهلاك مسجلا بعد', 'أضف أول ملف إهلاك بزر «إضافة ملف جديد» في رأس الشاشة');
     ?>
 
     <?php if (!empty($flash)): ?>
@@ -224,7 +224,7 @@ $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : '
 
     <div class="alert alert-info fdp-note">
         <i class="fa-solid fa-circle-info"></i>
-        الملف ملك الإدارة المالية واعتماده لمستوى الإدارة. تعديل الافتراض <b>يسري على الحساب اللاحق فقط</b> ولا يُعدّل الإهلاك المُرحَّل، وكل تعديل يُسجَّل في الأثر التدقيقي.
+        الملف ملك الإدارة المالية واعتماده لمستوى الإدارة. تعديل الافتراض <b>يسري على الحساب اللاحق فقط</b> ولا يعدل الإهلاك المرحل، وكل تعديل يسجل في الأثر التدقيقي.
     </div>
 
     <!-- نموذج إضافة / تعديل -->
@@ -254,14 +254,14 @@ $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : '
                     <?php else: ?>
                     <div>
                         <label for="emsf_122_6d615">كود الملف</label>
-                        <input type="text" value="(يُولّد تلقائياً)" readonly class="fdp-ro-muted" id="emsf_122_6d615">
+                        <input type="text" value="(يولد تلقائيا)" readonly class="fdp-ro-muted" id="emsf_122_6d615">
                     </div>
                     <?php endif; ?>
 
                     <div>
                         <label for="emsf_123_c0aa3">فئة الأصل <span class="fdp-req">*</span></label>
                         <input type="text" name="asset_category" required
-                               placeholder="مثال: حفّار 22ط جديد"
+                               placeholder="مثال: حفار 22ط جديد"
                                value="<?= $e($editData['asset_category'] ?? ''); ?>" id="emsf_123_c0aa3">
                     </div>
 
@@ -349,16 +349,16 @@ $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : '
                             <th class="ems-fn-th" data-fn="1">المرجع المحاسبي</th>
                             <th class="ems-fn-th" data-fn="1">نسخة القاعدة المستعملة</th>
                             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                            <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                            <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                             <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                             <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-                            <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+                            <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
                             <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-                            <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+                            <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
                             <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
-                            <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
-                            <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطّلاع</th>
+                            <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
+                            <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطلاع</th>
                             <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                             <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                             <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
@@ -387,7 +387,7 @@ $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : '
                                             </a>
                                         <?php endif; ?>
                                         <?php if ($can_approve && $row['state'] === 'draft'): ?>
-                                            <form method="post" class="d-inline" onsubmit="return confirm('اعتماد هذا الملف؟ سيصبح متاحاً للربط بالموديلات.');">
+                                            <form method="post" class="d-inline" onsubmit="return confirm('اعتماد هذا الملف؟ سيصبح متاحا للربط بالموديلات.');">
         <?= csrf_field() ?>
                                                 <input type="hidden" name="approve_id" value="<?= (int) $row['id']; ?>">
                                                 <button type="submit" class="action-btn fdp-approve" title="اعتماد">

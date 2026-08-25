@@ -26,7 +26,7 @@ if (!$is_super_admin && $company_id <= 0) { header('Location: ../login.php'); ex
 
 $__pp = check_page_permissions($conn, 'Tickets/ticket_kpi.php');
 if (!$is_super_admin && empty($__pp['can_view'])) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'لا تملك صلاحية عرض هذه الشاشة', 'GOV-PERM-403', 'الصلاحياتُ يمنحها مدير الصلاحيات');
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا تملك صلاحية عرض هذه الشاشة', 'GOV-PERM-403', 'الصلاحيات يمنحها مدير الصلاحيات');
 }
 ems_shell_axes($__pp);
 
@@ -43,7 +43,7 @@ else {
     $st->close();
 }
 
-$page_title = 'مؤشراتُ البلاغات';
+$page_title = 'مؤشرات البلاغات';
 include '../inheader.php';
 include '../insidebar.php';
 if (isset($conn)) { ems_screen_about_auto($conn); }
@@ -51,38 +51,38 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
 <div class="main" dir="rtl">
 <?php
 $header_icon = 'fa fa-chart-simple';
-$header_title_html = htmlspecialchars('مؤشراتُ البلاغات', ENT_QUOTES, 'UTF-8');
+$header_title_html = htmlspecialchars('مؤشرات البلاغات', ENT_QUOTES, 'UTF-8');
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
-echo ems_states_bundle('لا بلاغاتِ ضمن نطاقِك بعدُ', 'المؤشراتُ تُحسب على البلاغاتِ الحيّةِ لحظةَ تسجيلِها من شاشةِ البلاغات');
+echo ems_states_bundle('لا بلاغات ضمن نطاقك بعد', 'المؤشرات تحسب على البلاغات الحية لحظة تسجيلها من شاشة البلاغات');
 ?>
 <?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('ticket', ''); ?>
   <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
   <?php if ($failed): ?>
   <div class="alert alert-danger tkpi-alert-gap">
-    <strong>تعذّرت قراءةُ البيانات.</strong>
-    فرقٌ بين «لا صفَّ» و«تعذّر السؤال» — وهذه الثانية.
+    <strong>تعذرت قراءة البيانات.</strong>
+    فرق بين «لا صف» و«تعذر السؤال» — وهذه الثانية.
   </div>
   <?php else: ?>
   <div class="ems-card tkpi-stat-card">
-    <div class="tkpi-stat-label">صفوفٌ معروضة</div>
+    <div class="tkpi-stat-label">صفوف معروضة</div>
     <div class="tkpi-stat-value"><?php echo number_format(count($rows)); ?></div>
   </div>
   <div class="card"><div class="card-body table-responsive">
     <table class="table table-sm table-striped tkpi-w100">
       <thead><tr>
-        <th>رقمُ البلاغ</th>
+        <th>رقم البلاغ</th>
         <th>المرحلة</th>
         <th>الأولوية</th>
-        <th>الأثرُ التشغيلي</th>
-        <th>تاريخُ البلاغ</th>
+        <th>الأثر التشغيلي</th>
+        <th>تاريخ البلاغ</th>
         <th>المهلة</th>
-        <th>أُغلق</th>
+        <th>أغلق</th>
       </tr></thead>
       <tbody>
       <?php if (!$rows): ?>
-        <tr><td colspan="99" class="tkpi-empty-cell">لا صفَّ مسجَّلٌ بعد.</td></tr>
+        <tr><td colspan="99" class="tkpi-empty-cell">لا صف مسجل بعد.</td></tr>
       <?php else: foreach ($rows as $x): ?>
         <tr>
           <td><?php echo htmlspecialchars((string) $x['ticket_no'], ENT_QUOTES, 'UTF-8'); ?></td>
@@ -97,7 +97,7 @@ echo ems_states_bundle('لا بلاغاتِ ضمن نطاقِك بعدُ', 'ال
       </tbody>
     </table>
     <p class="text-muted tkpi-footnote">
-      قراءةٌ محضة — المؤشراتُ تُحسب على البلاغاتِ الحيّةِ لا على جدولٍ موازٍ — فرقمانِ لشيءٍ واحدٍ يتفرّقان. وأحدثُ 500 صفٍّ.
+      قراءة محضة — المؤشرات تحسب على البلاغات الحية لا على جدول مواز — فرقمان لشيء واحد يتفرقان. وأحدث 500 صف.
     </p>
   </div></div>
   <?php endif; ?>

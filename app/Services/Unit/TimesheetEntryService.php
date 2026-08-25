@@ -148,7 +148,7 @@ class TimesheetEntryService
                                  WHERE ce.equipment_id = " . intval($equipmentId));
             $asg = $rq ? $rq->fetch_assoc() : null;
             if (!$asg || intval($asg['c']) === 0) {
-                $quadWarn[] = 'assignment: المعدة بلا تكليفٍ تعاقديٍّ قائم';
+                $quadWarn[] = 'assignment: المعدة بلا تكليف تعاقدي قائم';
             }
             if ($quadWarn && $quadMode === 'enforce') {
                 return array('ok' => false, 'code' => 422, 'missing' => $quadWarn, 'warnings' => array());
@@ -234,7 +234,7 @@ class TimesheetEntryService
                              'blocked' => array_map(null, $capCtx['missing'], $capCtx['links']),
                              'links' => $capCtx['links'], 'warnings' => array());
             }
-            error_log('CAP-32 monitor: تخصيصاتٌ ناقصةٌ لواقعة معدة#' . $equipmentId . ' يوم ' . $date
+            error_log('CAP-32 monitor: تخصيصات ناقصة لواقعة معدة#' . $equipmentId . ' يوم ' . $date
                 . ' — ' . implode(' | ', $capCtx['missing']));
         }
 
@@ -422,7 +422,7 @@ class TimesheetEntryService
                 return array('ok' => false, 'code' => 409, 'reasons' => array("اعتماد المبيعات يتطلب parties_approved — الحالية: {$state}"));
             }
         } else {
-            return array('ok' => false, 'code' => 422, 'reasons' => array("مرحلةٌ غير معروفة: {$stage}"));
+            return array('ok' => false, 'code' => 422, 'reasons' => array("مرحلة غير معروفة: {$stage}"));
         }
 
         /* ══ وصلُ السلّم — INJ-CHAIN-CLOSE-01 · GAP-01 ═══════════════════════
@@ -511,7 +511,7 @@ class TimesheetEntryService
                     \App\Services\Capacity\CapacityContextResolver::lockSnapshot($gate, $entryId);
                     \App\Services\Operations\ContainerGate::consumeForEntry($conn, $gate, $companyId, $fresh);
                 }
-            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'الخصمُ أثرٌ تابعٌ لا شرطُ صحةٍ للاعتماد — يُسجَّل ولا يُسقطه');
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'الخصم أثر تابع لا شرط صحة للاعتماد — يسجل ولا يسقطه');
                 // الخصمُ أثرٌ تابعٌ لا شرطُ صحةٍ للاعتماد — يُسجَّل ولا يُسقطه
                 error_log('capacity consume on chain completion #' . $entryId . ': ' . $t->getMessage());
             }
@@ -539,12 +539,12 @@ class TimesheetEntryService
         $entryId = (int) $entryId;
         $reason = trim((string) $reason);
         if ($reason === '') {
-            return array('ok' => false, 'code' => 422, 'reasons' => array('الإعادة بلا سببٍ لا تقع (§8.2)'));
+            return array('ok' => false, 'code' => 422, 'reasons' => array('الإعادة بلا سبب لا تقع (§8.2)'));
         }
         $entry = self::rawEntry($conn, $companyId, $entryId);
         if (!$entry) { return array('ok' => false, 'code' => 404, 'reasons' => array('الواقعة غير موجودة')); }
         if (in_array($entry['state'], array('draft', 'returned'), true)) {
-            return array('ok' => false, 'code' => 409, 'reasons' => array("لا إعادةَ من حالة {$entry['state']}"));
+            return array('ok' => false, 'code' => 409, 'reasons' => array("لا إعادة من حالة {$entry['state']}"));
         }
 
         $round = (int) $entry['current_round'];
@@ -644,7 +644,7 @@ class TimesheetEntryService
         $st->close();
         if (!$t) { return array('ok' => false, 'code' => 404, 'skipped' => 'صف الدوام غير موجود'); }
         if (empty($t['eq_id'])) {
-            return array('ok' => false, 'code' => 422, 'skipped' => 'لا معدةَ قابلةً للاشتقاق (operations)');
+            return array('ok' => false, 'code' => 422, 'skipped' => 'لا معدة قابلة للاشتقاق (operations)');
         }
 
         // وحدة العقد: المسجَّلُ غيرُ الساعيّ أولى — فهو وحدةُ الفوترة الفعلية
@@ -669,7 +669,7 @@ class TimesheetEntryService
             'operation_id' => (int) $t['op_id'],
             'operator_employee_id' => (int) $t['employee_id'] ?: null,
             'sync_uuid'    => 'ts:' . $tsId,     // عطالةُ المرآة البنيوية
-            'note'         => 'مرآةُ الكتابة المزدوجة عن سجل الدوام الحي',
+            'note'         => 'مرآة الكتابة المزدوجة عن سجل الدوام الحي',
             'publish_events' => false,           // الناشر القديم يمثّل الواقعة سلفًا
         );
         // ── M-25 · التقاطُ قراءة العدّاد من نهاية الوردية (UX-10 §8) ─────────
@@ -720,7 +720,7 @@ class TimesheetEntryService
         $st->execute();
         $e = $st->get_result()->fetch_assoc();
         $st->close();
-        if (!$e) { return array('ok' => false, 'code' => 404, 'skipped' => 'لا مرآةَ لهذا الصف بعد'); }
+        if (!$e) { return array('ok' => false, 'code' => 404, 'skipped' => 'لا مرآة لهذا الصف بعد'); }
 
         // كل المستويات المعتمدة في المسار الحي، بترتيبها — لا المستوى الوارد وحده
         $st = $conn->prepare(
@@ -739,7 +739,7 @@ class TimesheetEntryService
             $last = self::approve($conn, $gate, (int) $e['company_id'], (int) $e['id'],
                 self::LEGACY_LEVEL_STAGE[$l], $who,
                 array('enforce_capacity' => false, 'publish_events' => false, 'skip_ladder' => true,
-                      'note' => 'مرآةُ اعتماد المسار الحي L' . $l));
+                      'note' => 'مرآة اعتماد المسار الحي L' . $l));
         }
         return $last;
     }
@@ -842,10 +842,10 @@ class TimesheetEntryService
         $companyId = (int) $companyId;
         $entryId = (int) $entryId;
         $e = self::rawEntry($conn, $companyId, $entryId);
-        if (!$e) { return array('ok' => false, 'code' => 404, 'skipped' => 'واقعةٌ غير موجودة'); }
+        if (!$e) { return array('ok' => false, 'code' => 404, 'skipped' => 'واقعة غير موجودة'); }
         if (!in_array($e['state'], self::REFRESHABLE_STATES, true)) {
             return array('ok' => false, 'code' => 423,
-                'skipped' => 'قفلُ نسخة: اعتُمد موقعُها (' . $e['state'] . ') — التعديلُ بالإعادة الرسمية بسببٍ وبالرقم نفسه');
+                'skipped' => 'قفل نسخة: اعتمد موقعها (' . $e['state'] . ') — التعديل بالإعادة الرسمية بسبب وبالرقم نفسه');
         }
 
         $timeLines = (isset($input['time_lines']) && is_array($input['time_lines'])) ? $input['time_lines'] : array();
@@ -923,22 +923,22 @@ class TimesheetEntryService
         $reason    = trim((string) $reason);
         if ($reason === '') {
             return array('ok' => false, 'code' => 422, 'void_entry_id' => null,
-                         'reasons' => array('سببُ الإلغاءِ إلزاميّ — اكتبْ لماذا يُلغى هذا القيد'));
+                         'reasons' => array('سبب الإلغاء إلزامي — اكتب لماذا يلغى هذا القيد'));
         }
 
         $orig = self::rawEntry($conn, $companyId, $entryId);
         if (!$orig) {
             return array('ok' => false, 'code' => 404, 'void_entry_id' => null,
-                         'reasons' => array('القيدُ غيرُ موجودٍ في كيانِك'));
+                         'reasons' => array('القيد غير موجود في كيانك'));
         }
         $terminal = array('reversed', 'cancelled', 'superseded');
         if (in_array((string) $orig['state'], $terminal, true)) {
             return array('ok' => false, 'code' => 409, 'void_entry_id' => null,
-                         'reasons' => array('القيدُ في حالة «' . $orig['state'] . '» — لا يُعكس مرتين'));
+                         'reasons' => array('القيد في حالة «' . $orig['state'] . '» — لا يعكس مرتين'));
         }
         if (!empty($orig['event_id'])) {
             return array('ok' => false, 'code' => 409, 'void_entry_id' => null,
-                         'reasons' => array('للقيدِ واقعةٌ ماليةٌ منشورة — العكسُ الماليُّ بابُه محرّكُ العكسيات لا هذه الشاشة'));
+                         'reasons' => array('للقيد واقعة مالية منشورة — العكس المالي بابه محرك العكسيات لا هذه الشاشة'));
         }
 
         $voidId = 0;
@@ -956,7 +956,7 @@ class TimesheetEntryService
                 'record_basis'         => $orig['record_basis'],
                 'shift'                => $orig['shift'],
                 'source_ref'           => (string) $orig['source_ref'],
-                'note'                 => mb_substr('عكسُ القيد #' . $entryId . ' — ' . $reason, 0, 200),
+                'note'                 => mb_substr('عكس القيد #' . $entryId . ' — ' . $reason, 0, 200),
                 'state'                => 'reversed',
                 'revises_entry_id'     => $entryId,
                 'revision_kind'        => 'reversal',
@@ -965,7 +965,7 @@ class TimesheetEntryService
                 'container_key'        => isset($orig['container_key']) ? $orig['container_key'] : null,
             );
             $voidId = (int) $g->insert('unit_entries', $row);
-            if ($voidId <= 0) { throw new \RuntimeException('voidEntry: فشل إدراجُ الصفِّ العاكس'); }
+            if ($voidId <= 0) { throw new \RuntimeException('voidEntry: فشل إدراج الصف العاكس'); }
             $g->update('unit_entries',
                 array('entry_no' => 'REV-' . str_pad((string) $voidId, 6, '0', STR_PAD_LEFT)),
                 array('id' => $voidId));
@@ -1017,15 +1017,15 @@ class TimesheetEntryService
         };
         $lines = array(
             $mk($t['executed_hours'], 'actual_work', 'none', null),
-            $mk($t['standby_hours'], 'standby', 'client', 'استعدادٌ بسبب العميل'),
+            $mk($t['standby_hours'], 'standby', 'client', 'استعداد بسبب العميل'),
             $mk((float) $t['dependence_hours'] + (float) $t['approval_fault'], 'standby', 'company', 'تبعية/انتظار اعتماد'),
             $mk($t['maintenance_fault'], 'tech_breakdown', 'company', null),
             $mk($t['hr_fault'], 'operator_stop', 'operator', null),
-            $mk($t['marketing_fault'], 'client_stop', 'client', 'توقفٌ سببه العميل (عطل تسويق)'),
+            $mk($t['marketing_fault'], 'client_stop', 'client', 'توقف سببه العميل (عطل تسويق)'),
             $mk($t['ts_supplier_stop_hours'], 'supplier_stop', 'supplier', null),
             $mk($t['ts_planned_stop_hours'], 'planned_stop', 'planned', null),
             $mk($t['ts_force_majeure_hours'], 'force_majeure', 'force_majeure', null),
-            $mk($t['other_fault_hours'], 'unlogged', 'none', 'أعطالٌ أخرى غير مصنّفة'),
+            $mk($t['other_fault_hours'], 'unlogged', 'none', 'أعطال أخرى غير مصنفة'),
         );
         $out = array();
         foreach ($lines as $l) { if ($l['hours'] > 0) { $out[] = $l; } }
@@ -1199,9 +1199,9 @@ class TimesheetEntryService
             ? strtolower((string) ems_env('EMS_RESP_PARTY_STRICT', 'monitor')) : 'monitor';
         if ($mode === 'enforce') {
             throw new \InvalidArgumentException(
-                'E-07: فترةُ توقف (' . $state . ') بلا مسؤولٍ — يُختار من مصفوفة الالتزامات (422)');
+                'E-07: فترة توقف (' . $state . ') بلا مسؤول — يختار من مصفوفة الالتزامات (422)');
         }
-        error_log('[resp_party] E-07 would-reject: توقف ' . $state . ' بمسؤول none — رصدٌ قبل الإلزام');
+        error_log('[resp_party] E-07 would-reject: توقف ' . $state . ' بمسؤول none — رصد قبل الإلزام');
     }
 
     private static function safeRespParty($v)
@@ -1214,10 +1214,10 @@ class TimesheetEntryService
         $shown = ($v === null) ? 'NULL' : ('«' . (string) $v . '»');
         if ($mode === 'enforce') {
             throw new \InvalidArgumentException(
-                'جهةٌ مسؤولةٌ غيرُ معروفة: ' . $shown . ' — الإسنادُ لا يُبتلع صامتًا (CON-02 §5)');
+                'جهة مسؤولة غير معروفة: ' . $shown . ' — الإسناد لا يبتلع صامتا (CON-02 §5)');
         }
-        error_log('[resp_party] قيمةٌ غيرُ معروفةٍ ابتُلعت إلى none: ' . $shown
-                  . ' — رصدٌ قبل الإلزام (EMS_RESP_PARTY_STRICT)');
+        error_log('[resp_party] قيمة غير معروفة ابتلعت إلى none: ' . $shown
+                  . ' — رصد قبل الإلزام (EMS_RESP_PARTY_STRICT)');
         return 'none';
     }
 
@@ -1236,7 +1236,7 @@ class TimesheetEntryService
                 'idempotency_key' => $eventKey . ':unit_entry:' . $entryId . ':r' . (isset($payload['round']) ? $payload['round'] : 1),
                 'payload' => $payload,
             ));
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'الحدثُ إشهارٌ لا شرطُ صحة — فشلُه يُسجَّل ولا يُسقط العملية');
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'الحدث إشهار لا شرط صحة — فشله يسجل ولا يسقط العملية');
             // الحدثُ إشهارٌ لا شرطُ صحة — فشلُه يُسجَّل ولا يُسقط العملية
             error_log('TimesheetEntryService publish ' . $eventKey . ': ' . $t->getMessage());
         }

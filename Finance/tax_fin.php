@@ -109,7 +109,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضيًا
-    echo ems_states_bundle('لا حركاتِ ضريبيةً في هذه الفترة', 'سجّلْ حركةً بزرِّ «حركة ضريبية» في رأسِ الشاشة، أو غيّرِ الفترةَ أعلاه');
+    echo ems_states_bundle('لا حركات ضريبية في هذه الفترة', 'سجل حركة بزر «حركة ضريبية» في رأس الشاشة، أو غير الفترة أعلاه');
     ?>
     <?php fin_msg_banner(); ?>
 
@@ -117,7 +117,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-body">
         <form method="get" class="fin-tax-periodbar">
             <strong><i class="fas fa-file-invoice"></i> إقرار الضريبة للفترة:</strong>
-            <input type="month" name="period" aria-label="فترةُ إقرارِ الضريبة" value="<?php echo htmlspecialchars($sel_period); ?>" onchange="this.form.submit()">
+            <input type="month" name="period" aria-label="فترة إقرار الضريبة" value="<?php echo htmlspecialchars($sel_period); ?>" onchange="this.form.submit()">
         </form>
         <div class="form-grid">
             <div class="card fin-tax-card"><div class="card-body">
@@ -166,7 +166,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="form-group"><label for="emsf_269_687c2">الوعاء الضريبي <span class="required">*</span></label><input type="number" step="0.01" min="0" name="base_amount" required id="emsf_269_687c2"></div>
             <div class="form-group"><label for="tx_rate">النسبة %</label><input type="number" step="0.01" name="tax_rate" id="tx_rate" value="15"></div>
             <div class="form-group"><label for="emsf_270_84ddc">المرجع</label><input type="text" name="source_ref" placeholder="فاتورة/أمر" id="emsf_270_84ddc"></div>
-            <div class="form-group"><label for="emsf_271_8602e">الفترة</label><input type="month" name="period_ref" aria-label="فترةُ الحركةِ الضريبية" value="<?php echo date('Y-m'); ?>" id="emsf_271_8602e"></div>
+            <div class="form-group"><label for="emsf_271_8602e">الفترة</label><input type="month" name="period_ref" aria-label="فترة الحركة الضريبية" value="<?php echo date('Y-m'); ?>" id="emsf_271_8602e"></div>
         </div></div>
         <div class="form-actions"><button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
             <button type="button" class="btn-secondary" onclick="$('#txForm').removeClass('allforms-visible')">إلغاء</button></div>
@@ -179,10 +179,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <table id="finTable" class="display nowrap alltables fin-tax-table">
                 <thead><tr><th>الإجراءات</th><th>النوع</th><th>الرمز</th><th>الوعاء</th><th>النسبة</th><th>الضريبة</th><th>المرجع</th><th>الفترة</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>

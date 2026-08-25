@@ -36,7 +36,7 @@ if (!function_exists('ems_guard_handler')) {
             while (ob_get_level()) { ob_end_clean(); }
             http_response_code(403);
             die(json_encode(array('success' => false,
-                'error' => 'لا صلاحيةَ ' . ($need === 'view' ? 'عرضٍ' : 'كتابةٍ') . ' على شاشة هذا المعالج'),
+                'error' => 'لا صلاحية ' . ($need === 'view' ? 'عرض' : 'كتابة') . ' على شاشة هذا المعالج'),
                 JSON_UNESCAPED_UNICODE));
         }
         return true;

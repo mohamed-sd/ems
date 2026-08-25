@@ -10,7 +10,7 @@ $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user'][
 /* UI-13: كلُّ منعٍ يقول ما حدث ويعطي طريقَ رجوعٍ — لا صفحةَ نصٍّ عارية. */
 if (!$is_super_admin && $company_id <= 0) {
     ems_gov_flash_redirect('../login.php', 'لا توجد بيئة شركة صالحة لحسابك ❌',
-        'GOV-SCOPE-403', 'ادخل بحسابٍ مرتبطٍ بشركة');
+        'GOV-SCOPE-403', 'ادخل بحساب مرتبط بشركة');
 }
 
 $type = isset($_GET['type']) ? $_GET['type'] : null;
@@ -21,8 +21,8 @@ if ($type == "1") {
 } elseif ($type == "2") {
     $typetext = "رفض ساعات العمل";
 } else {
-    ems_gov_flash_redirect('view_timesheet.php', 'طلبُ الاعتمادِ بلا نوعٍ صالح (تأكيد أو رفض) ❌',
-        'GOV-REF-404', 'افتح الاعتمادَ من سجلِّ الوحداتِ اليومية');
+    ems_gov_flash_redirect('view_timesheet.php', 'طلب الاعتماد بلا نوع صالح (تأكيد أو رفض) ❌',
+        'GOV-REF-404', 'افتح الاعتماد من سجل الوحدات اليومية');
 }
 
 // عند إرسال الفورم
@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $vl->close();
             if ($vl_row && !in_array($vl_row['state'],
                     \App\Services\Unit\TimesheetEntryService::REFRESHABLE_STATES, true)) {
-                ems_gov_flash_redirect("timesheet.php?type=$t", "🔒 قفلُ نسخة: اعتُمد موقعُ هذا اليوم (" . $vl_row['state'] . ") — التعديلُ بالإعادة الرسمية بسببٍ وبالرقم نفسه لا بطلب تعديل", 'GOV-SCOPE-403', '');
+                ems_gov_flash_redirect("timesheet.php?type=$t", "🔒 قفل نسخة: اعتمد موقع هذا اليوم (" . $vl_row['state'] . ") — التعديل بالإعادة الرسمية بسبب وبالرقم نفسه لا بطلب تعديل", 'GOV-SCOPE-403', '');
                 exit();
             }
         } catch (\Throwable $vlT) { error_log('aprovment version lock: ' . $vlT->getMessage()); }
@@ -110,7 +110,7 @@ $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 // UXW-01 (9): حالاتُ الشاشةِ الدنيا (تحميل / فراغ / خطأ) — مخفيةٌ افتراضيًّا
-echo ems_states_bundle('لا طلبَ اعتمادٍ مفتوحٌ لهذه الوحدةِ اليومية', 'افتحِ الاعتمادَ من سجلِّ الوحداتِ اليوميةِ بزرِّ «تأكيد» أو «رفض»');
+echo ems_states_bundle('لا طلب اعتماد مفتوح لهذه الوحدة اليومية', 'افتح الاعتماد من سجل الوحدات اليومية بزر «تأكيد» أو «رفض»');
 ?>
 
 <style>
@@ -128,7 +128,7 @@ echo ems_states_bundle('لا طلبَ اعتمادٍ مفتوحٌ لهذه ال�
         <?= csrf_field() ?>
         <div>
             <input name="t" type="hidden" value="<?= $_GET['t']; ?>"/>
-            <textarea name="time_notes" required placeholder="أدخل ملاحظاتك هنا" aria-label="ملاحظاتُ قرارِ الاعتماد" class="tsapv-notes"></textarea>
+            <textarea name="time_notes" required placeholder="أدخل ملاحظاتك هنا" aria-label="ملاحظات قرار الاعتماد" class="tsapv-notes"></textarea>
         </div>
         <div class="tsapv-actions">
             <button type="submit" class="tsapv-submit">

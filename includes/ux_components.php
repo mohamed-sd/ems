@@ -37,12 +37,12 @@ if (!function_exists('ems_states_bundle')) {
      * الحزمةُ الدنيا الإلزاميةُ لكلِّ شاشة (بوابةُ المنعِ ٩): تحميلٌ وفراغٌ وخطأٌ —
      * مخفيةٌ افتراضًا ويُظهرها منطقُ الشاشةِ عند حالِها.
      */
-    function ems_states_bundle(string $emptyTitle = 'لا توجد بياناتٌ لهذه الفترة',
-                               string $emptyHint  = 'غيّر الفترةَ أو تحقق من توفرِ السجلات'): string
+    function ems_states_bundle(string $emptyTitle = 'لا توجد بيانات لهذه الفترة',
+                               string $emptyHint  = 'غير الفترة أو تحقق من توفر السجلات'): string
     {
-        return ems_state('loading', 'جارٍ تحميلُ البيانات', '', '', true)
+        return ems_state('loading', 'جار تحميل البيانات', '', '', true)
              . ems_state('empty', $emptyTitle, $emptyHint, '', true)
-             . ems_state('error', 'تعذّر عرضُ البيانات', 'أعد المحاولةَ — وإن استمر الخللُ أبلغ عن مشكلةٍ من هذه الشاشة', '', true);
+             . ems_state('error', 'تعذر عرض البيانات', 'أعد المحاولة — وإن استمر الخلل أبلغ عن مشكلة من هذه الشاشة', '', true);
     }
 }
 
@@ -50,7 +50,10 @@ if (!function_exists('ems_next_step')) {
     /** الخطوةُ التاليةُ في الدورةِ المستندية (بوابةُ المنعِ ١٢) — تظهر في ترويسةِ شاشاتِ الدورة */
     function ems_next_step(string $label, string $href = ''): string
     {
-        $inner = '<span class="ems-next-step-label">الخطوةُ التالية</span>'
+        /* «الخطوةُ التالية» ⇐ «الخطوة التالية» — نقاءُ لغةِ الواجهة (‏W06 §٤-٥):
+           السطرُ يُصيَّر في ترويسةِ كلِّ شاشةٍ لها دورة، فتشكيلُ لافتتِه أكثرُ
+           نصٍّ مشكولٍ يقع عليه بصرُ المستخدمِ في اليوم. */
+        $inner = '<span class="ems-next-step-label">الخطوة التالية</span>'
                . '<span class="ems-next-step-value">' . htmlspecialchars($label, ENT_QUOTES, 'UTF-8') . '</span>';
         if ($href !== '') {
             return '<a class="ems-next-step" href="' . htmlspecialchars($href, ENT_QUOTES, 'UTF-8') . '">' . $inner . '</a>';
@@ -64,8 +67,8 @@ if (!function_exists('ems_cap_hold_card')) {
     function ems_cap_hold_card(string $what = 'هذه المعاملة'): string
     {
         return '<div class="ems-cap-hold" role="status">'
-             . '<div><div class="ems-cap-hold-title">بانتظارِ اعتمادِ السقف</div>'
+             . '<div><div class="ems-cap-hold-title">بانتظار اعتماد السقف</div>'
              . '<div>' . htmlspecialchars($what, ENT_QUOTES, 'UTF-8')
-             . ' موقوفةٌ لأن سقفَها لم يُعتمد رسميًّا — الطلبُ محفوظٌ ويستأنف حين يُعتمد.</div></div></div>';
+             . ' موقوفة لأن سقفها لم يعتمد رسميا — الطلب محفوظ ويستأنف حين يعتمد.</div></div></div>';
     }
 }

@@ -45,19 +45,19 @@ class AssetHoursService
         $rate   = isset($in['rate_per_hour']) && $in['rate_per_hour'] !== '' ? (float) $in['rate_per_hour'] : null;
         $by     = (int) ($in['actor'] ?? 0);
 
-        if ($co <= 0 || $eqId <= 0) { return array('ok' => false, 'reason' => 'الكيانُ والمعدةُ إلزاميان'); }
+        if ($co <= 0 || $eqId <= 0) { return array('ok' => false, 'reason' => 'الكيان والمعدة إلزاميان'); }
         if (!preg_match('/^\d{4}-\d{2}$/', $period)) {
-            return array('ok' => false, 'reason' => 'الفترةُ بصيغةِ YYYY-MM');
+            return array('ok' => false, 'reason' => 'الفترة بصيغة YYYY-MM');
         }
         if ($method !== null && !in_array($method, array('straight_line', 'usage_hours', 'units_produced'), true)) {
-            return array('ok' => false, 'reason' => 'طريقةُ إهلاكٍ غيرُ معروفة');
+            return array('ok' => false, 'reason' => 'طريقة إهلاك غير معروفة');
         }
 
         // ◆ الملكيةُ من الحيِّ لا من الشاشة — «معدةُ الموردِ لا تُهلَك عندنا»
         $eq = $conn->prepare("SELECT `code`, `suppliers` FROM `equipments` WHERE `id`=? LIMIT 1");
         $eq->bind_param('i', $eqId); $eq->execute();
         $eqRow = $eq->get_result()->fetch_assoc(); $eq->close();
-        if (!$eqRow) { return array('ok' => false, 'reason' => 'معدةٌ غيرُ موجودة'); }
+        if (!$eqRow) { return array('ok' => false, 'reason' => 'معدة غير موجودة'); }
         $machineCode = (string) $eqRow['code'];
         $ownerType = (trim((string) $eqRow['suppliers']) === '' || (string) $eqRow['suppliers'] === '0')
             ? 'company' : 'supplier';
@@ -105,7 +105,7 @@ class AssetHoursService
         $rec->bind_param('iis', $co, $eqId, $period); $rec->execute();
         $recId = (int) ($rec->get_result()->fetch_row()[0] ?? 0); $rec->close();
 
-        return array('ok' => true, 'reason' => 'رُبط الأصلُ بساعاتِه', 'rec_id' => $recId,
+        return array('ok' => true, 'reason' => 'ربط الأصل بساعاته', 'rec_id' => $recId,
             'hours' => $hours, 'owner_type' => $ownerType, 'machine_code' => $machineCode);
     }
 

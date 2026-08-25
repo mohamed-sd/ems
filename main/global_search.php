@@ -201,18 +201,18 @@ include '../insidebar.php';
 ?>
 <div class="main ems-unified-page-shell gs-page" dir="rtl">
 <?php
-$header_title = 'البحثُ الموحَّد';
+$header_title = 'البحث الموحد';
 $header_icon = 'fas fa-magnifying-glass';
 $header_actions = array();
 $header_back = array();
 include '../includes/page_header.php';
 ems_screen_about(
-    'بحثٌ واحدٌ يجد الكيانَ أيًّا كان نوعُه — بالكود أو الاسم — في تسعة كيانات، '
-    . 'ويصل كلَّ نتيجةٍ بملفّها مباشرةً فلا يُسأل أحدٌ عن الشاشة.',
-    array('اكتب حرفين فأكثر: اسمًا أو كودًا (معدة · موظف · عقد · بلاغ · وحدة …)',
-          'انقر أيَّ نتيجةٍ تفتح ملفَّ الكيان نفسِه'));
+    'بحث واحد يجد الكيان أيا كان نوعه — بالكود أو الاسم — في تسعة كيانات، '
+    . 'ويصل كل نتيجة بملفها مباشرة فلا يسأل أحد عن الشاشة.',
+    array('اكتب حرفين فأكثر: اسما أو كودا (معدة · موظف · عقد · بلاغ · وحدة …)',
+          'انقر أي نتيجة تفتح ملف الكيان نفسه'));
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-echo ems_states_bundle('لا كيانَ يطابق ما بحثتَ عنه', 'اكتب حرفين فأكثر — كودًا أو اسمًا — ثم اضغط «ابحث»');
+echo ems_states_bundle('لا كيان يطابق ما بحثت عنه', 'اكتب حرفين فأكثر — كودا أو اسما — ثم اضغط «ابحث»');
 ?>
 <style>
 /* ═══ البحث الموحّد — أنماطٌ خاصةٌ بالشاشة (الهوية من design-tokens) ═══ */
@@ -470,8 +470,8 @@ body.ems-site .main.gs-page .gs-btn {
         <div class="gs-input-box">
           <i class="fas fa-magnifying-glass"></i>
           <input type="text" name="q" class="gs-input"
-                 placeholder="اكتب اسمًا أو كودًا… معدةٌ · موظفٌ · عقدٌ · بلاغٌ · وحدة"
-                 value="<?= htmlspecialchars($q, ENT_QUOTES, 'UTF-8') ?>" autofocus aria-label="اكتب اسمًا أو كودًا… معدةٌ · موظفٌ · عقدٌ · بلاغٌ · وحدة">
+                 placeholder="اكتب اسما أو كودا… معدة · موظف · عقد · بلاغ · وحدة"
+                 value="<?= htmlspecialchars($q, ENT_QUOTES, 'UTF-8') ?>" autofocus aria-label="اكتب اسما أو كودا… معدة · موظف · عقد · بلاغ · وحدة">
         </div>
         <button type="submit" class="search-btn gs-btn"><i class="fas fa-magnifying-glass"></i> ابحث</button>
       </div>
@@ -482,7 +482,7 @@ body.ems-site .main.gs-page .gs-btn {
       <?php endforeach; ?>
     </div>
     <?php if (!$has_query): ?>
-      <div class="gs-hint"><i class="fas fa-circle-info"></i> اكتب حرفين على الأقل ثم اضغط «ابحث» — البحث يشمل الكيانات التسعة أعلاه دفعةً واحدة.</div>
+      <div class="gs-hint"><i class="fas fa-circle-info"></i> اكتب حرفين على الأقل ثم اضغط «ابحث» — البحث يشمل الكيانات التسعة أعلاه دفعة واحدة.</div>
     <?php endif; ?>
   </div>
 
@@ -490,22 +490,22 @@ body.ems-site .main.gs-page .gs-btn {
     <!-- لا نتائج -->
     <div class="gs-empty">
       <div class="gs-empty-ico"><i class="fas fa-box-open"></i></div>
-      <h5>لا نتيجةَ لـ«<?= htmlspecialchars($q, ENT_QUOTES, 'UTF-8') ?>»</h5>
-      <p>بحثنا في <?= count($entities) - intval($hidden_sections) ?> من الكيانات الـ<?= count($entities) ?> فلم نجد مطابقًا<?php
+      <h5>لا نتيجة ل«<?= htmlspecialchars($q, ENT_QUOTES, 'UTF-8') ?>»</h5>
+      <p>بحثنا في <?= count($entities) - intval($hidden_sections) ?> من الكيانات ال<?= count($entities) ?> فلم نجد مطابقا<?php
           if ($hidden_sections > 0) { echo ' — و' . intval($hidden_sections) . ' منها خارج صلاحيتك'; } ?>.</p>
-      <p>جرّب جزءًا أقصر من الاسم، أو الكودَ كما هو مدوَّن في الملف.</p>
+      <p>جرب جزءا أقصر من الاسم، أو الكود كما هو مدون في الملف.</p>
     </div>
   <?php elseif ($has_query): ?>
     <!-- ملخّص النتائج -->
     <div class="gs-summary">
       <i class="fas fa-list-check"></i>
-      <span>وُجدت <b><?= intval($total_hits) ?></b> نتيجة في <b><?= count($sections) ?></b>
+      <span>وجدت <b><?= intval($total_hits) ?></b> نتيجة في <b><?= count($sections) ?></b>
         <?= count($sections) >= 3 && count($sections) <= 10 ? 'أقسام' : 'قسم' ?>
-        لـ«<b><?= htmlspecialchars($q, ENT_QUOTES, 'UTF-8') ?></b>» — انقر أيَّ نتيجةٍ تفتح ملفَّها.</span>
+        ل«<b><?= htmlspecialchars($q, ENT_QUOTES, 'UTF-8') ?></b>» — انقر أي نتيجة تفتح ملفها.</span>
     </div>
     <?php if ($hidden_sections > 0): ?>
       <div class="gs-note"><i class="fas fa-lock"></i>
-        <?= intval($hidden_sections) ?> من الكيانات الـ<?= count($entities) ?> خارج صلاحيتك فلم يُبحث فيها.</div>
+        <?= intval($hidden_sections) ?> من الكيانات ال<?= count($entities) ?> خارج صلاحيتك فلم يبحث فيها.</div>
     <?php endif; ?>
 
     <!-- بطاقات الأقسام -->
@@ -520,7 +520,7 @@ body.ems-site .main.gs-page .gs-btn {
           <?php if ($rows === false): ?>
             <div class="gs-card-foot gs-card-foot-error">
               <i class="fas fa-triangle-exclamation"></i>
-              تعذّر البحثُ في هذا الكيان (خطأُ استعلام) — لا تعتبره «بلا نتيجة».
+              تعذر البحث في هذا الكيان (خطأ استعلام) — لا تعتبره «بلا نتيجة».
             </div>
           <?php endif; ?>
           <?php foreach (($rows ?: array()) as $x): ?>
@@ -534,7 +534,7 @@ body.ems-site .main.gs-page .gs-btn {
             </a>
           <?php endforeach; ?>
           <?php if ($rows !== false && count($rows) === 8): ?>
-            <div class="gs-card-foot"><i class="fas fa-circle-info"></i> تُعرض أول 8 نتائج — ضيّق البحث لمزيدٍ من الدقة.</div>
+            <div class="gs-card-foot"><i class="fas fa-circle-info"></i> تعرض أول 8 نتائج — ضيق البحث لمزيد من الدقة.</div>
           <?php endif; ?>
         </div>
       <?php endforeach; ?>

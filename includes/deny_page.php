@@ -73,7 +73,7 @@ if (!function_exists('ems_deny_page')) {
            . ($hint !== '' ? '<p style="color:var(--dp-mut);font-size:.9rem">' . $esc($hint) . '</p>' : '')
            . '<p><span class="dp-code">' . $esc($code) . '</span></p>'
            . ($exitUrl !== '' ? '<a class="dp-exit" href="' . $esc($exitUrl) . '">' . $esc($exitLbl) . '</a>' : '')
-           . '<div class="dp-meta">المسارُ المطلوب: <span class="dp-path">' . $esc($path) . '</span></div>'
+           . '<div class="dp-meta">المسار المطلوب: <span class="dp-path">' . $esc($path) . '</span></div>'
            . '</div></body></html>';
     }
 }

@@ -55,7 +55,7 @@ if (!function_exists('ems_excel_header_actions')) {
         $items[] = [
             'href'  => $base . '?entity=' . $e . '&action=export',
             'class' => 'btn',
-            'title' => 'تصدير البيانات إلى ملف Excel منسّق',
+            'title' => 'تصدير البيانات إلى ملف Excel منسق',
             'icon'  => 'fas fa-file-export',
             'label' => 'تصدير Excel',
         ];
@@ -121,7 +121,7 @@ if (!function_exists('ems_excel_render')) {
         <div class="ems-xl-filename" id="emsXlFilename"></div>
         <div class="ems-xl-tip">
           <i class="fas fa-lightbulb"></i>
-          لم تجهّز ملفك بعد؟ حمّل
+          لم تجهز ملفك بعد؟ حمل
           <a href="#" data-tpl-link target="_blank">النموذج الجاهز</a>
           ثم املأه وارفعه. سيتم عرض معاينة كاملة قبل الحفظ.
         </div>
@@ -138,7 +138,7 @@ if (!function_exists('ems_excel_render')) {
       </div>
     </div>
     <div class="ems-xl-foot" id="emsXlFoot">
-      <button type="button" class="ems-xl-btn primary" id="emsXlPreviewBtn" disabled><i class="fas fa-search"></i> معاينة وتحقّق</button>
+      <button type="button" class="ems-xl-btn primary" id="emsXlPreviewBtn" disabled><i class="fas fa-search"></i> معاينة وتحقق</button>
       <button type="button" class="ems-xl-btn ghost" data-ems-xl-close>إلغاء</button>
     </div>
   </div>

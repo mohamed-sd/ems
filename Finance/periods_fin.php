@@ -37,16 +37,16 @@ if (isset($_GET['action']) && isset($_GET['pid'])) {
     if (in_array($act, array('close', 'lock', 'reopen'), true)) {
         if (function_exists('fin_can_perform') && !fin_can_perform($conn, $ctx['role'], 'finance_manager')) {
             ems_gov_flash_redirect('periods_fin.php',
-                'إقفالُ الفترةِ وفتحُها وقفلُها للقيادةِ الماليةِ حصرًا — لا يكفي إذنُ التعديل ❌',
-                'GOV-PERM-403', 'اطلبْه من المدير المالي');
+                'إقفال الفترة وفتحها وقفلها للقيادة المالية حصرا — لا يكفي إذن التعديل ❌',
+                'GOV-PERM-403', 'اطلبه من المدير المالي');
             exit();
         }
         require_once __DIR__ . '/../includes/self_approval_guard.php';
         $__sa = ems_assert_not_self_approval($conn, 'fin_financial_periods', 'id', $pid,
-            'فترةٌ محاسبيةٌ #' . $pid, $company_id);
+            'فترة محاسبية #' . $pid, $company_id);
         if ($__sa !== null) {
             ems_gov_flash_redirect('periods_fin.php', $__sa['reason'], 'GOV-PERM-403',
-                'الإقفالُ يدٌ ثانيةٌ غيرُ يدِ الإنشاء');
+                'الإقفال يد ثانية غير يد الإنشاء');
             exit();
         }
     }
@@ -63,7 +63,7 @@ if (isset($_GET['action']) && isset($_GET['pid'])) {
     } elseif ($act === 'close') {
         // قاعدة الإقفال: كل البنود الإلزامية يجب أن تكون منجَزة
         $n = $g->count('fin_closing_items', array('where'=>array('period_id'=>$pid,'required'=>1,'item_state'=>'pending')));
-        if ($n > 0) { ems_gov_redirect("Location: periods_fin.php?pid=$pid&msg=لا+إقفال:+بنود+إلزامية+غير+منجَزة+($n)+❌"); exit(); }
+        if ($n > 0) { ems_gov_redirect("Location: periods_fin.php?pid=$pid&msg=لا+إقفال:+بنود+إلزامية+غير+منجزة+($n)+❌"); exit(); }
         // M-39 (SPEC-01 #14): «زرُّ الإقفال يمنع حين يوجد غيرُ مرحَّلٍ أو فرقٌ
         // مفتوح — بقائمة الموانع» — الفحصُ قبل Close لا بعده.
         require_once __DIR__ . '/../includes/period_guard.php';
@@ -83,7 +83,7 @@ if (isset($_GET['action']) && isset($_GET['pid'])) {
         // إلزامٌ مكتوبٌ لا نصٌّ ثابت، وفاعلُه مختوم (reopened_by).
         $reason = trim((string) ($_GET['reason'] ?? ''));
         if ($reason === '') {
-            ems_gov_redirect("Location: periods_fin.php?pid=$pid&msg=" . urlencode('الفتحُ الاستثنائي يلزمه سببٌ موثَّق — اكتبه في نافذة التأكيد') . "+❌"); exit();
+            ems_gov_redirect("Location: periods_fin.php?pid=$pid&msg=" . urlencode('الفتح الاستثنائي يلزمه سبب موثق — اكتبه في نافذة التأكيد') . "+❌"); exit();
         }
         $g->update('fin_financial_periods', array('state'=>'reopened','posting_allowed'=>1,'reopen_reason'=>mb_substr($reason,0,200),'reopened_by'=>$current_user_id), array('id'=>$pid), "state IN('closed','soft_closed')");
         // N-02: قرارُ الفتح الاستثنائي يدخل سجلَّ التدقيق بسببه
@@ -126,8 +126,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['done_item'])) {
      الرابطَ يعرف لماذا لم يعد يعمل. */
 if (isset($_GET['done_item'])) {
     ems_gov_flash_redirect('periods_fin.php?pid=' . intval($_GET['pid'] ?? 0),
-        'إنجازُ بندِ الإقفالِ صار يحتاج مرجعَ دليلٍ — استعمل زرَّ الإنجاز في الجدول ❌',
-        'GOV-FAIL-422', 'الإقفالُ أثقلُ من أن يقع بنقرةِ رابط');
+        'إنجاز بند الإقفال صار يحتاج مرجع دليل — استعمل زر الإنجاز في الجدول ❌',
+        'GOV-FAIL-422', 'الإقفال أثقل من أن يقع بنقرة رابط');
     exit();
 }
 
@@ -165,7 +165,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['fiscal_year'])) {
         }, 'periods: create period + seed closing items');
     } catch (\App\Core\TenantGateException $e) {
         if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
-            ems_gov_flash_redirect('periods_fin.php', 'الفترة موجودة مسبقاً ❌', 'GOV-FAIL-409', ''); exit();
+            ems_gov_flash_redirect('periods_fin.php', 'الفترة موجودة مسبقا ❌', 'GOV-FAIL-409', ''); exit();
         }
         throw $e;
     }
@@ -192,7 +192,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضيًا
-    echo ems_states_bundle('لا فتراتِ ماليةً منشأةً بعدُ', 'أنشئْ فترةً بزرِّ «إنشاء فترة» في رأسِ الشاشة ثم استوفِ قائمةَ إقفالها');
+    echo ems_states_bundle('لا فترات مالية منشأة بعد', 'أنشئ فترة بزر «إنشاء فترة» في رأس الشاشة ثم استوف قائمة إقفالها');
     ?>
     <?php fin_msg_banner(); ?>
 
@@ -200,7 +200,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <?php echo csrf_field(); ?>
         <div class="card-header"><h5><i class="fas fa-edit"></i> إنشاء فترة مالية</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
-            <div class="form-group"><label for="emsf_262_63abd">السنة المالية <span class="required">*</span></label><input type="number" name="fiscal_year" required aria-label="السنةُ الماليةُ للفترة" value="<?php echo date('Y'); ?>" id="emsf_262_63abd"></div>
+            <div class="form-group"><label for="emsf_262_63abd">السنة المالية <span class="required">*</span></label><input type="number" name="fiscal_year" required aria-label="السنة المالية للفترة" value="<?php echo date('Y'); ?>" id="emsf_262_63abd"></div>
             <div class="form-group"><label for="pt">النوع</label><select name="period_type" id="pt"><option value="month">شهر</option><option value="year">سنة</option></select></div>
             <div class="form-group" id="pnowrap"><label for="emsf_263_737be">رقم الشهر</label><input type="number" name="period_no" min="1" max="12" value="1" id="emsf_263_737be"></div>
         </div></div>
@@ -219,24 +219,24 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="ems-fn-th" data-fn="1">الفترة</th>
               <th class="ems-fn-th" data-fn="1">تاريخ الإقفال</th>
               <th class="ems-fn-th" data-fn="1">الوحدات المعتمدة</th>
-              <th class="ems-fn-th" data-fn="1">الوحدات المعلَّقة</th>
-              <th class="ems-fn-th" data-fn="1">المستخلصات المُصدَرة</th>
-              <th class="ems-fn-th" data-fn="1">الفواتير المُصدَرة</th>
-              <th class="ems-fn-th" data-fn="1">المسيّرات المعتمدة</th>
+              <th class="ems-fn-th" data-fn="1">الوحدات المعلقة</th>
+              <th class="ems-fn-th" data-fn="1">المستخلصات المصدرة</th>
+              <th class="ems-fn-th" data-fn="1">الفواتير المصدرة</th>
+              <th class="ems-fn-th" data-fn="1">المسيرات المعتمدة</th>
               <th class="ems-fn-th" data-fn="1">تسويات الموردين</th>
               <th class="ems-fn-th" data-fn="1">المطابقات البنكية</th>
-              <th class="ems-fn-th" data-fn="1">بنود لم تُحسم</th>
+              <th class="ems-fn-th" data-fn="1">بنود لم تحسم</th>
               <th class="ems-fn-th" data-fn="1">شرط الإقفال</th>
               <th class="ems-fn-th" data-fn="1">أقفله</th>
               <th class="ems-fn-th" data-fn="1">اعتمده</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-              <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطّلاع</th>
+              <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطلاع</th>
               <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               </tr></thead>
                 <tbody>
@@ -272,7 +272,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <h5 class="fin-prd-h5-list"><i class="fas fa-list-check"></i> قائمة إقفال الفترة #<?php echo $sel_pid; ?></h5>
         <div class="table-container">
             <table class="alltables fin-prd-table">
-                <thead><tr><th>البند</th><th>إلزامي</th><th>الحالة</th><th>الدليل</th><th>مَن أنجزه ومتى</th><th>الإجراء</th></tr></thead>
+                <thead><tr><th>البند</th><th>إلزامي</th><th>الحالة</th><th>الدليل</th><th>من أنجزه ومتى</th><th>الإجراء</th></tr></thead>
                 <tbody>
                 <?php
                 $done = 0; $total = 0;
@@ -280,7 +280,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 foreach ($closing_rows as $it) {
                     $total++; if ($it['item_state'] === 'done') $done++;
                     $tone = $it['item_state'] === 'done' ? 'success' : ($it['item_state'] === 'na' ? 'secondary' : 'warn');
-                    $lbl = array('pending' => 'معلّق', 'done' => 'منجَز', 'na' => 'لا ينطبق');
+                    $lbl = array('pending' => 'معلق', 'done' => 'منجز', 'na' => 'لا ينطبق');
                     echo "<tr>";
                     echo "<td>" . htmlspecialchars($closing_steps[$it['step']] ?? $it['step']) . "</td>";
                     echo "<td>" . ($it['required'] ? '✔' : '—') . "</td>";
@@ -316,7 +316,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                            . "<input type='hidden' name='done_item' value='" . intval($it['id']) . "'>"
                            . "<input type='hidden' name='pid' value='" . intval($sel_pid) . "'>"
                            . "<input type='text' name='evidence_ref' required minlength='3' class='fin-prd-evidence'"
-                           . " placeholder='مرجعُ الدليل' title='مرجعُ الدليل — إلزاميّ'>"
+                           . " placeholder='مرجع الدليل' title='مرجع الدليل — إلزامي'>"
                            . "<button type='submit' class='action-btn edit' title='إنجاز'>"
                            . "<i class='fas fa-check'></i></button></form>";
                     }
@@ -348,10 +348,10 @@ $(document).ready(function () {
 });
 // M-39: الفتحُ الاستثنائي قرارٌ موثَّق — السببُ إلزامٌ قبل الإرسال
 window.emsReopenPeriod = function (pid) {
-    var reason = window.prompt('الفتحُ الاستثنائي لفترةٍ مقفلةٍ قرارٌ موثَّق.\nاكتب سببَ الفتح:');
+    var reason = window.prompt('الفتح الاستثنائي لفترة مقفلة قرار موثق.\nاكتب سبب الفتح:');
     if (reason === null) { return; }
     reason = reason.trim();
-    if (reason === '') { alert('السببُ إلزامي — لا فتحَ بلا سببٍ مكتوب'); return; }
+    if (reason === '') { alert('السبب إلزامي — لا فتح بلا سبب مكتوب'); return; }
     window.location = '?action=reopen&pid=' + pid + '&reason=' + encodeURIComponent(reason);
 };
 </script>

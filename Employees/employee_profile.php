@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['account_action'] ?? '') ==
     if ($revoked > 0) {
         ems_gov_redirect("Location: employee_profile.php?id=$employee_id&msg=" . urlencode('✅ تم سحب الحساب من الموظف وتعطيله'));
     } else {
-        ems_gov_redirect("Location: employee_profile.php?id=$employee_id&msg=" . urlencode('❌ تعذّر سحب الحساب أو لا توجد صلاحية'));
+        ems_gov_redirect("Location: employee_profile.php?id=$employee_id&msg=" . urlencode('❌ تعذر سحب الحساب أو لا توجد صلاحية'));
     }
     exit();
 }
@@ -292,7 +292,7 @@ require_once __DIR__ . '/../includes/profile_kit.php';
     $header_back = array('href' => 'employees.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا وردياتٍ ولا ساعاتِ تشغيلٍ مسجَّلةً لهذا السائق', 'سجِّلْ ورديةً في كشفِ الدوامِ لتظهرَ إحصاءاتُه ورسومُه هنا');
+    echo ems_states_bundle('لا ورديات ولا ساعات تشغيل مسجلة لهذا السائق', 'سجل وردية في كشف الدوام لتظهر إحصاءاته ورسومه هنا');
     ?>
 
     <?php if (isset($_GET['msg']) && trim($_GET['msg']) !== ''): ?>
@@ -391,7 +391,7 @@ require_once __DIR__ . '/../includes/profile_kit.php';
                     </div>
                 <?php endif; ?>
             <?php else: ?>
-                <div class="alert alert-warning mb-0">لا يملك هذا الموظف حساب دخول للنظام حالياً.</div>
+                <div class="alert alert-warning mb-0">لا يملك هذا الموظف حساب دخول للنظام حاليا.</div>
                 <?php if ($can_manage_accounts): ?>
                     <div class="ems-profile__actions">
                         <a href="../main/users.php?employee_id=<?php echo intval($employee_id); ?>" class="add-btn">
@@ -453,7 +453,7 @@ require_once __DIR__ . '/../includes/profile_kit.php';
                     </div>
                 </div>
             <?php else: ?>
-                <div class="alert alert-warning mb-0">لا توجد بيانات تشغيل كافية لاستخراج أفضل آلية حالياً.</div>
+                <div class="alert alert-warning mb-0">لا توجد بيانات تشغيل كافية لاستخراج أفضل آلية حاليا.</div>
             <?php endif; ?>
         </div>
     </section>
@@ -562,7 +562,7 @@ require_once __DIR__ . '/../includes/profile_kit.php';
                     <?php if (!empty($driver['employee_photo'])): ?>
                         <img src="<?php echo htmlspecialchars($driver['employee_photo']); ?>" alt="صورة السائق">
                     <?php else: ?>
-                        <div class="ems-profile__doc-empty"><i class="fas fa-camera"></i>صورة السائق<br>قيد التفعيل حالياً</div>
+                        <div class="ems-profile__doc-empty"><i class="fas fa-camera"></i>صورة السائق<br>قيد التفعيل حاليا</div>
                     <?php endif; ?>
                     <span class="ems-profile__doc-caption">صورة السائق</span>
                 </div>
@@ -570,7 +570,7 @@ require_once __DIR__ . '/../includes/profile_kit.php';
                     <?php if (!empty($driver['identity_photo'])): ?>
                         <img src="<?php echo htmlspecialchars($driver['identity_photo']); ?>" alt="صورة هوية السائق">
                     <?php else: ?>
-                        <div class="ems-profile__doc-empty"><i class="fas fa-id-card"></i>صورة الهوية<br>قيد التفعيل حالياً</div>
+                        <div class="ems-profile__doc-empty"><i class="fas fa-id-card"></i>صورة الهوية<br>قيد التفعيل حاليا</div>
                     <?php endif; ?>
                     <span class="ems-profile__doc-caption">صورة الهوية</span>
                 </div>
@@ -641,10 +641,10 @@ require_once __DIR__ . '/../includes/profile_kit.php';
                         <th>إلى تاريخ</th>
                         <th>الحالة</th>
                         <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                        <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                        <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                        <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                        <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                        <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                        <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                        <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                        <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                         <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                         <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                         <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -662,7 +662,7 @@ require_once __DIR__ . '/../includes/profile_kit.php';
                                 <td><?php echo htmlspecialchars(ems_format_open_end($as['end_date'])); ?></td>
                                 <td>
                                     <span class="ems-profile__pill ems-profile__pill--<?php echo $is_active_assignment ? 'ok' : 'neutral'; ?>">
-                                        <?php echo $is_active_assignment ? 'يعمل حالياً' : 'سابق'; ?>
+                                        <?php echo $is_active_assignment ? 'يعمل حاليا' : 'سابق'; ?>
                                     </span>
                                 </td>
                             </tr>
@@ -750,7 +750,7 @@ require_once __DIR__ . '/../includes/profile_kit.php';
                 responsive: true,
                 plugins: {
                     legend: { position: 'bottom' },
-                    title: { display: true, text: 'تطور ساعات العمل شهرياً' }
+                    title: { display: true, text: 'تطور ساعات العمل شهريا' }
                 },
                 scales: {
                     y: { beginAtZero: true }

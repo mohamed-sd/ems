@@ -39,10 +39,10 @@ $__pcPrep = ems_post_contract($conn, array(
         $p = (string) ($in['period'] ?? '');
         $a = (float) ($in['amount'] ?? 0);
         $cur = trim((string) ($in['currency'] ?? ''));
-        if ($c <= 0) { return array('ok' => false, 'msg' => 'لا استحقاقَ بلا عقدٍ مرجعيّ (422)'); }
-        if (!preg_match('/^\d{4}-\d{2}$/', $p)) { return array('ok' => false, 'msg' => 'الفترةُ بصيغةِ YYYY-MM (422)'); }
-        if ($a <= 0) { return array('ok' => false, 'msg' => 'المبلغُ يجب أن يكون موجبًا (422)'); }
-        if (mb_strlen($cur) < 3) { return array('ok' => false, 'msg' => 'لا مبلغَ بلا عملة (422)'); }
+        if ($c <= 0) { return array('ok' => false, 'msg' => 'لا استحقاق بلا عقد مرجعي (422)'); }
+        if (!preg_match('/^\d{4}-\d{2}$/', $p)) { return array('ok' => false, 'msg' => 'الفترة بصيغة YYYY-MM (422)'); }
+        if ($a <= 0) { return array('ok' => false, 'msg' => 'المبلغ يجب أن يكون موجبا (422)'); }
+        if (mb_strlen($cur) < 3) { return array('ok' => false, 'msg' => 'لا مبلغ بلا عملة (422)'); }
         return array('ok' => true, 'data' => array('contract_id' => $c, 'period' => $p,
             'claim_id' => intval($in['claim_id'] ?? 0), 'amount' => $a, 'currency' => $cur,
             'fx_rate' => (float) ($in['fx_rate'] ?? 1)));
@@ -64,7 +64,7 @@ $__pcCtrl = ems_post_contract($conn, array(
     'idem'    => array('id' => intval($_POST['control_accrual'] ?? 0)),
     'validate' => function (array $in) {
         $id = intval($in['control_accrual'] ?? 0);
-        if ($id <= 0) { return array('ok' => false, 'msg' => 'استحقاقٌ غيرُ صالح (422)'); }
+        if ($id <= 0) { return array('ok' => false, 'msg' => 'استحقاق غير صالح (422)'); }
         return array('ok' => true, 'data' => array('id' => $id));
     },
 ));
@@ -82,7 +82,7 @@ $rows = array(); $queueFail = '';
 try {
     $rows = $gate->select('ar_accruals', array(
         'orderBy' => "`state` = 'prepared' DESC, `id` DESC", 'limit' => 200));
-} catch (\Throwable $e) { $queueFail = 'تعذّر قراءةُ الطابور: ' . $e->getMessage(); }
+} catch (\Throwable $e) { $queueFail = 'تعذر قراءة الطابور: ' . $e->getMessage(); }
 
 $page_title = 'توليد استحقاقات عقد العميل';
 require_once __DIR__ . '/../includes/screen_contract.php';
@@ -95,15 +95,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   <?php
   $header_icon = 'fa fa-file-invoice-dollar';
   $header_title_html = htmlspecialchars('توليد استحقاقات عقد العميل', ENT_QUOTES, 'UTF-8');
-  ob_start(); ?><span class="badge"><?= $queueFail === '' ? count($rows) : '—' ?> استحقاقًا</span><?php
+  ob_start(); ?><span class="badge"><?= $queueFail === '' ? count($rows) : '—' ?> استحقاقا</span><?php
   $header_actions = array(array('raw' => trim((string) ob_get_clean())));
   $header_back = false;
   include __DIR__ . '/../includes/page_header.php';
-  echo ems_states_bundle('لا استحقاقَ مُعَدٌّ بعد',
-      'الاستحقاقُ يُعَدُّ من المطالبةِ المعتمدةِ ثم يُجيزه رئيسُ الحسابات — والترحيلُ لمحرّكِه');
+  echo ems_states_bundle('لا استحقاق معد بعد',
+      'الاستحقاق يعد من المطالبة المعتمدة ثم يجيزه رئيس الحسابات — والترحيل لمحركه');
   ?>
-  <p class="text-muted">العقدة ١٦ في سلسلةِ الأثر · سلطةُ الاعتماد <code>RESOLVE_FROM_POLICY:ar_accrual</code> —
-     المحاسبُ المنتدبُ يُعِدُّ ولا يُجيز، ولا كاتبَ بشريٌّ إلى دفترِ الأستاذ.</p>
+  <p class="text-muted">العقدة ١٦ في سلسلة الأثر · سلطة الاعتماد <code>RESOLVE_FROM_POLICY:ar_accrual</code> —
+     المحاسب المنتدب يعد ولا يجيز، ولا كاتب بشري إلى دفتر الأستاذ.</p>
   <?php if ($msg !== ''): ?>
     <div class="alert <?= (mb_strpos($msg, '✅') !== false ? 'alert-success' : 'alert-danger') ?>">
       <?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div>
@@ -133,7 +133,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   <table class="table table-striped" data-no-dt>
     <thead><tr>
       <th>الإجراء</th><th>رقم الاستحقاق</th><th>الفترة</th><th>العقد</th><th>المطالبة</th>
-      <th>المبلغ</th><th>بالعملة الأساس</th><th>الحالة</th><th>أعدَّه</th><th>أجازه</th><th>رقم القيد</th>
+      <th>المبلغ</th><th>بالعملة الأساس</th><th>الحالة</th><th>أعده</th><th>أجازه</th><th>رقم القيد</th>
       <th class="ems-gov-th none" data-gov="entity" data-slice="1">الكيان</th>
       <th class="ems-gov-th none" data-gov="created_at" data-slice="1">تاريخ الإنشاء</th>
       <th class="ems-gov-th none" data-gov="idem_key" data-slice="2">مفتاح منع التكرار</th>
@@ -142,7 +142,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </tr></thead>
     <tbody>
     <?php if (empty($rows)): ?>
-      <tr><td colspan="11" class="text-center text-muted">لا استحقاقَ مُعَدٌّ بعد</td></tr>
+      <tr><td colspan="11" class="text-center text-muted">لا استحقاق معد بعد</td></tr>
     <?php endif; ?>
     <?php foreach ($rows as $r): ?>
       <tr>

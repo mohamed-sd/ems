@@ -214,7 +214,7 @@ function ems_uc_ladder_check(mysqli $conn, $companyId, $entryId, $round, $stage,
     $steps = ems_uc_ladder_steps($conn, $ladder);
     if (!$steps) {
         $res['ok'] = false;
-        $res['reasons'][] = "السلّمُ {$ladder} بلا خطواتٍ مسجَّلة — ولا يُخترَع سلّمٌ عند التنفيذ";
+        $res['reasons'][] = "السلم {$ladder} بلا خطوات مسجلة — ولا يخترع سلم عند التنفيذ";
         return $res;
     }
 
@@ -223,7 +223,7 @@ function ems_uc_ladder_check(mysqli $conn, $companyId, $entryId, $round, $stage,
     foreach ($steps as $s) { if ((int) $s['may_approve'] === 1) { $approveStep = $s; } }
     if ($approveStep === null) {
         $res['ok'] = false;
-        $res['reasons'][] = "السلّمُ {$ladder} بلا خطوةِ اعتمادٍ مميَّزة (may_approve)";
+        $res['reasons'][] = "السلم {$ladder} بلا خطوة اعتماد مميزة (may_approve)";
         return $res;
     }
     $res['step'] = (int) $approveStep['step_no'];
@@ -235,7 +235,7 @@ function ems_uc_ladder_check(mysqli $conn, $companyId, $entryId, $round, $stage,
     $roles = $approveStep['roles'];
     if ($roles && $actorRole !== null && !in_array((int) $actorRole, $roles, true)) {
         $res['ok'] = false;
-        $res['reasons'][] = "الدورُ {$actorRole} ليس صاحبَ خطوةِ الاعتمادِ في {$ladder}"
+        $res['reasons'][] = "الدور {$actorRole} ليس صاحب خطوة الاعتماد في {$ladder}"
                           . " (`{$approveStep['actor_code']}` ⇐ " . implode('،', $roles) . ')';
     }
 
@@ -248,7 +248,7 @@ function ems_uc_ladder_check(mysqli $conn, $companyId, $entryId, $round, $stage,
         $st->execute(); $st->bind_result($prev); $st->fetch(); $st->close();
         if ($prev !== null && $prev !== '') {
             $res['ok'] = false;
-            $res['reasons'][] = "**لا يدَ تمشي خطوتَين**: هذا الفاعلُ قرّر سلفًا ({$prev}) في الجولةِ نفسِها";
+            $res['reasons'][] = "**لا يد تمشي خطوتين**: هذا الفاعل قرر سلفا ({$prev}) في الجولة نفسها";
         }
     }
 
@@ -350,14 +350,14 @@ if (!function_exists('ems_ladder_check')) {
         $steps = ems_uc_ladder_steps($conn, $ladder);
         if (!$steps) {
             $res['ok'] = false;
-            $res['reasons'][] = "السلّمُ {$ladder} بلا خطواتٍ مسجَّلة — ولا يُخترَع سلّمٌ عند التنفيذ";
+            $res['reasons'][] = "السلم {$ladder} بلا خطوات مسجلة — ولا يخترع سلم عند التنفيذ";
             return $res;
         }
         $ap = null;
         foreach ($steps as $s) { if ((int) $s['may_approve'] === 1) { $ap = $s; } }
         if ($ap === null) {
             $res['ok'] = false;
-            $res['reasons'][] = "السلّمُ {$ladder} بلا خطوةِ اعتمادٍ مميَّزة (may_approve)";
+            $res['reasons'][] = "السلم {$ladder} بلا خطوة اعتماد مميزة (may_approve)";
             return $res;
         }
         $res['step'] = (int) $ap['step_no'];
@@ -374,10 +374,10 @@ if (!function_exists('ems_ladder_check')) {
          *   ← رفض» — ومَن لا يُعرف دورُه ليس صاحبَها يقينًا. */
         if ($roles && $actorRole === null) {
             $res['ok'] = false;
-            $res['reasons'][] = "تعذّر حلُّ دورِ الفاعلِ {$actorId} — ولا يُعَدُّ صاحبَ اليدِ بالشكّ";
+            $res['reasons'][] = "تعذر حل دور الفاعل {$actorId} — ولا يعد صاحب اليد بالشك";
         } elseif ($roles && !in_array((int) $actorRole, $roles, true)) {
             $res['ok'] = false;
-            $res['reasons'][] = "الدورُ {$actorRole} ليس صاحبَ خطوةِ الاعتمادِ في {$ladder}"
+            $res['reasons'][] = "الدور {$actorRole} ليس صاحب خطوة الاعتماد في {$ladder}"
                               . " (`{$ap['actor_code']}` ⇐ " . implode('،', $roles) . ')';
         }
 
@@ -392,7 +392,7 @@ if (!function_exists('ems_ladder_check')) {
             $st->execute(); $st->bind_result($prev); $st->fetch(); $st->close();
             if ($prev !== null && $prev !== '') {
                 $res['ok'] = false;
-                $res['reasons'][] = "**لا يدَ تمشي خطوتَين**: هذا الفاعلُ قرّر الخطوةَ ({$prev}) في نسخةِ السلّمِ نفسِها";
+                $res['reasons'][] = "**لا يد تمشي خطوتين**: هذا الفاعل قرر الخطوة ({$prev}) في نسخة السلم نفسها";
             }
         }
         return $res;

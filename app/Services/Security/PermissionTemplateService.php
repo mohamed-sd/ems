@@ -20,7 +20,7 @@ class PermissionTemplateService
         $stmt->execute();
         $tpl = $stmt->get_result()->fetch_assoc();
         $stmt->close();
-        if (!$tpl) { $out['code'] = 404; $out['reason'] = 'قالب غير معرَّف — يُضاف صفًّا'; return $out; }
+        if (!$tpl) { $out['code'] = 404; $out['reason'] = 'قالب غير معرف — يضاف صفا'; return $out; }
         $tid = intval($tpl['tpl_id']);
         $v = intval($conn->query("SELECT COALESCE(MAX(version),0)+1 v FROM permission_template_versions WHERE tpl_id={$tid}")->fetch_assoc()['v']);
         $conn->begin_transaction();
@@ -64,7 +64,7 @@ class PermissionTemplateService
         if (!$v) { return array('ok' => false, 'code' => 404, 'reason' => 'إصدار غير موجود'); }
         if ($v['state'] === 'published' || $v['state'] === 'superseded') {
             return array('ok' => false, 'code' => 423,
-                'reason' => 'لا يُعدَّل إصدار نافذ بأثر رجعي (423) — أنشئ إصدارًا جديدًا بسريان مستقبلي');
+                'reason' => 'لا يعدل إصدار نافذ بأثر رجعي (423) — أنشئ إصدارا جديدا بسريان مستقبلي');
         }
         $conn->query("DELETE FROM template_permissions WHERE template_version_id = {$verId}");
         foreach ($permissions as $p) {
@@ -80,7 +80,7 @@ class PermissionTemplateService
             $stmt->execute();
             $stmt->close();
         }
-        return array('ok' => true, 'code' => 200, 'reason' => 'عُدِّلت المسودة');
+        return array('ok' => true, 'code' => 200, 'reason' => 'عدلت المسودة');
     }
 
     /**
@@ -131,12 +131,12 @@ class PermissionTemplateService
         $fm = $conn->query("SELECT enabled FROM founding_mode WHERE mode = 'permission_test' AND enabled = 1")->fetch_assoc();
         if (!$fm) {
             return array('ok' => false, 'code' => 409,
-                'reason' => 'لا وسم «مختبَر» ووضعُ اختبار الصلاحيات مطفأ — الاختبار بحسابات ممثلة شرط (§4⑥)');
+                'reason' => 'لا وسم «مختبر» ووضع اختبار الصلاحيات مطفأ — الاختبار بحسابات ممثلة شرط (§4⑥)');
         }
         $conn->query("UPDATE permission_template_versions SET state = 'tested',
                       approval_ref = CONCAT(COALESCE(approval_ref,''), ' tested:', '" . $conn->real_escape_string($testRef) . "')
                       WHERE ver_id = {$verId} AND state = 'draft'");
-        return array('ok' => $conn->affected_rows > 0, 'code' => 200, 'reason' => 'وُسم مختبَرًا');
+        return array('ok' => $conn->affected_rows > 0, 'code' => 200, 'reason' => 'وسم مختبرا');
     }
 
     /**
@@ -154,7 +154,7 @@ class PermissionTemplateService
             return $out;
         }
         if ($v['impact_preview_json'] === null) {
-            $out['code'] = 409; $out['reason'] = 'يُعرض أثر التغيير قبل النشر — احسب impactPreview أولًا';
+            $out['code'] = 409; $out['reason'] = 'يعرض أثر التغيير قبل النشر — احسب impactPreview أولا';
             return $out;
         }
         $conn->begin_transaction();
@@ -169,7 +169,7 @@ class PermissionTemplateService
             $stmt->execute();
             $stmt->close();
             $conn->commit();
-            $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'نُشر — والسابق superseded بلا أثر رجعي';
+            $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'نشر — والسابق superseded بلا أثر رجعي';
             return $out;
         } catch (\Throwable $e) {
             $conn->rollback();

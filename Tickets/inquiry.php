@@ -49,12 +49,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 /* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
    شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
 $header_icon = 'fa fa-search';
-$header_title_html = htmlspecialchars('الاستفسارُ عن بلاغٍ متعثر — جهةٌ واحدةٌ تُسأل', ENT_QUOTES, 'UTF-8');
+$header_title_html = htmlspecialchars('الاستفسار عن بلاغ متعثر — جهة واحدة تسأل', ENT_QUOTES, 'UTF-8');
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-echo ems_states_bundle('لا بلاغَ يطابق رقمَ البحث', 'اكتب رقمَ البلاغِ كاملًا (TK-…) أو رقمَه المتسلسلَ في حقلِ البحثِ أعلاه');
+echo ems_states_bundle('لا بلاغ يطابق رقم البحث', 'اكتب رقم البلاغ كاملا (TK-…) أو رقمه المتسلسل في حقل البحث أعلاه');
 ?>
   <style>
   /* UXW-01 ②: أنماطُ شاشةِ الاستفسارِ الثابتةُ — بادئةُ الشاشة tkt-inq- */
@@ -64,43 +64,43 @@ echo ems_states_bundle('لا بلاغَ يطابق رقمَ البحث', 'اكت
   .tkt-inq-late   { background: var(--c-fff3f3, #fff3f3); }
   </style>
   <form method="get" class="ems-form tkt-inq-search">
-    <input type="text" name="q" class="form-control" placeholder="رقمُ البلاغ (TK-… أو #)" value="<?= htmlspecialchars($q, ENT_QUOTES, 'UTF-8') ?>" required aria-label="رقمُ البلاغ (TK-… أو #)">
+    <input type="text" name="q" class="form-control" placeholder="رقم البلاغ (TK-… أو #)" value="<?= htmlspecialchars($q, ENT_QUOTES, 'UTF-8') ?>" required aria-label="رقم البلاغ (TK-… أو #)">
     <button class="btn btn-primary">أين وقف؟</button>
   </form>
 
   <?php if ($q !== '' && !$ticket): ?>
-    <div class="alert alert-warning">لا بلاغَ بهذا الرقم</div>
+    <div class="alert alert-warning">لا بلاغ بهذا الرقم</div>
   <?php elseif ($ticket): ?>
     <div class="tkt-inq-card">
       <h5><?= htmlspecialchars($ticket['ticket_no'], ENT_QUOTES, 'UTF-8') ?>
           <span class="badge tkt-inq-stage"><?= htmlspecialchars($ticket['stage'], ENT_QUOTES, 'UTF-8') ?></span></h5>
       <p><?= htmlspecialchars($ticket['complaint'], ENT_QUOTES, 'UTF-8') ?></p>
-      <p class="text-muted">المبلِّغ: <?= htmlspecialchars($ticket['reporter'] !== null ? $ticket['reporter'] : $ticket['reporting_person'], ENT_QUOTES, 'UTF-8') ?>
+      <p class="text-muted">المبلغ: <?= htmlspecialchars($ticket['reporter'] !== null ? $ticket['reporter'] : $ticket['reporting_person'], ENT_QUOTES, 'UTF-8') ?>
          · منذ <?= htmlspecialchars(substr($ticket['created_at'], 0, 16), ENT_QUOTES, 'UTF-8') ?></p>
-      <h6>أين وقف — مساراتُه:</h6>
+      <h6>أين وقف — مساراته:</h6>
       <table class="table table-sm" data-no-dt>
-        <thead><tr><th>المسار</th><th>الإدارة</th><th>المكلَّف</th><th>الحالة</th><th>مهلتُه</th><th>المانع</th>
+        <thead><tr><th>المسار</th><th>الإدارة</th><th>المكلف</th><th>الحالة</th><th>مهلته</th><th>المانع</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               </tr></thead>
         <tbody>
-        <?php if (empty($streams)): ?><tr><td colspan="6" class="text-muted">بلاغٌ موروثٌ بلا مساراتٍ مفصَّلة — حالتُه أعلاه</td></tr><?php endif; ?>
+        <?php if (empty($streams)): ?><tr><td colspan="6" class="text-muted">بلاغ موروث بلا مسارات مفصلة — حالته أعلاه</td></tr><?php endif; ?>
         <?php foreach ($streams as $s):
             $open = !in_array($s['state'], array('closed', 'admin_closed'), true);
             $late = $open && $s['resolve_due_at'] !== null && strtotime($s['resolve_due_at']) < time(); ?>
           <tr<?= $late ? ' class="tkt-inq-late"' : '' ?>>
             <td><?= htmlspecialchars($s['workstream_type'], ENT_QUOTES, 'UTF-8') ?></td>
             <td><?= htmlspecialchars($s['unit_name'] !== null ? $s['unit_name'] : '—', ENT_QUOTES, 'UTF-8') ?></td>
-            <td><?= htmlspecialchars($s['assignee'] !== null ? $s['assignee'] : 'بلا مكلَّف', ENT_QUOTES, 'UTF-8') ?></td>
+            <td><?= htmlspecialchars($s['assignee'] !== null ? $s['assignee'] : 'بلا مكلف', ENT_QUOTES, 'UTF-8') ?></td>
             <td><?= htmlspecialchars($s['state'], ENT_QUOTES, 'UTF-8') ?></td>
             <td><?= htmlspecialchars($s['resolve_due_at'] !== null ? $s['resolve_due_at'] : '—', ENT_QUOTES, 'UTF-8') ?><?= $late ? ' ⚠' : '' ?></td>
-            <td><?= $s['state'] === 'on_hold' ? 'معلَّقٌ بسبب' : ($late ? 'متجاوزُ المهلة' : '—') ?></td>
+            <td><?= $s['state'] === 'on_hold' ? 'معلق بسبب' : ($late ? 'متجاوز المهلة' : '—') ?></td>
           </tr>
         <?php endforeach; ?>
         </tbody>

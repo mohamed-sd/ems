@@ -59,7 +59,7 @@ class TicketStateService
     {
         $allowed = array('awaiting_part', 'awaiting_approval', 'awaiting_technician', 'awaiting_reporter', 'awaiting_external');
         if (!in_array((string) $reasonCode, $allowed, true)) {
-            return array('ok' => false, 'code' => 422, 'reason' => 'تعليق بسبب حر → 422 — القائمة محكومة وإلا صار بابًا للتهرب');
+            return array('ok' => false, 'code' => 422, 'reason' => 'تعليق بسبب حر → 422 — القائمة محكومة وإلا صار بابا للتهرب');
         }
         if ($expectedUntil === null || $expectedUntil === '') {
             return array('ok' => false, 'code' => 422, 'reason' => 'لا تعليق بلا مدة متوقعة → 422');
@@ -71,7 +71,7 @@ class TicketStateService
         $stmt->close();
         $conn->query("UPDATE ticket_workstreams SET state = 'on_hold' WHERE ws_id = {$wsId}");
         self::auditState($conn, $wsId, 'in_progress', 'on_hold', array('reason' => (string) $reasonCode));
-        return array('ok' => true, 'code' => 200, 'reason' => 'عُلِّق — والمهلة واقفة ما دام السبب قائمًا');
+        return array('ok' => true, 'code' => 200, 'reason' => 'علق — والمهلة واقفة ما دام السبب قائما');
     }
 
     /** إنجاز المسار — أثر مسجَّل إلزامي (T7) ولا يغلق المكلف بنفسه (T6). */
@@ -81,12 +81,12 @@ class TicketStateService
         $eff = intval($conn->query("SELECT COUNT(*) c FROM ticket_effects WHERE ws_id = {$wsId}")->fetch_assoc()['c']);
         if ($eff === 0) {
             return array('ok' => false, 'code' => 422,
-                'reason' => 'إغلاق بلا أثر مسجَّل → 422 — أثر يناسب الطبيعة: أمر عمل أو رد موثق أو قرار عدم إجراء بسببه');
+                'reason' => 'إغلاق بلا أثر مسجل → 422 — أثر يناسب الطبيعة: أمر عمل أو رد موثق أو قرار عدم إجراء بسببه');
         }
         $conn->query("UPDATE ticket_workstreams SET state = 'done_pending', resolved_at = NOW()
                       WHERE ws_id = {$wsId} AND state IN ('in_progress','received','reopened','on_hold')");
         return array('ok' => $conn->affected_rows === 1, 'code' => 200,
-            'reason' => 'منجَز بانتظار التأكيد — ولا يغلق المكلف بلاغًا بنفسه');
+            'reason' => 'منجز بانتظار التأكيد — ولا يغلق المكلف بلاغا بنفسه');
     }
 
     /**
@@ -123,12 +123,12 @@ class TicketStateService
         }
         $eff = intval($conn->query("SELECT COUNT(*) c FROM ticket_effects WHERE ws_id = {$wsId}")->fetch_assoc()['c']);
         if ($eff === 0 && $mode !== 'admin') {
-            return array('ok' => false, 'code' => 422, 'reason' => 'لا إغلاق بلا أثر مسجَّل (عدا الإداري بسببه)');
+            return array('ok' => false, 'code' => 422, 'reason' => 'لا إغلاق بلا أثر مسجل (عدا الإداري بسببه)');
         }
         $newState = $mode === 'admin' ? 'admin_closed' : 'closed';
         $conn->query("UPDATE ticket_workstreams SET state = '{$newState}', closed_at = NOW() WHERE ws_id = {$wsId}");
         self::recomputeHead($conn, intval($w['tk_id']));
-        return array('ok' => true, 'code' => 200, 'reason' => 'أُغلق المسار وأُعيد حساب الرأس');
+        return array('ok' => true, 'code' => 200, 'reason' => 'أغلق المسار وأعيد حساب الرأس');
     }
 
     /** إعادة الفتح — عداد ظاهر وثالثة ترفع للمركز آليًّا (T8). */
@@ -148,7 +148,7 @@ class TicketStateService
             $stmt->close();
             $co = intval($conn->query("SELECT company_id FROM tickets WHERE id = " . intval($w['tk_id']))->fetch_assoc()['company_id']);
             $stmt = $conn->prepare("INSERT INTO fin_notifications (company_id, target_level, title, link) VALUES (?, 'all', ?, 'Tickets/tickets_list.php')");
-            $title = 'إعادة فتح ثالثة: بلاغ #' . intval($w['tk_id']) . ' — رُفع لمركز البلاغات آليًّا';
+            $title = 'إعادة فتح ثالثة: بلاغ #' . intval($w['tk_id']) . ' — رفع لمركز البلاغات آليا';
             $stmt->bind_param('is', $co, $title);
             $stmt->execute();
             $stmt->close();
@@ -190,7 +190,7 @@ class TicketStateService
         $open = self::recomputeHead($conn, intval($tkId));
         if ($open > 0) {
             return array('ok' => false, 'code' => 423,
-                'reason' => 'لا يُغلق الرأس و' . $open . ' مسارًا إلزاميًّا مفتوحًا → 423');
+                'reason' => 'لا يغلق الرأس و' . $open . ' مسارا إلزاميا مفتوحا → 423');
         }
         return array('ok' => true, 'code' => 200, 'reason' => 'الرأس مغلق — كل الإلزامية مغلقة');
     }

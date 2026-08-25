@@ -60,7 +60,7 @@ class ExcelRegistry
             'moduleCode'   => 'clients',
             'instructions' => [
                 'احذف صفوف الأمثلة قبل رفع الملف.',
-                'كود العميل يجب أن يكون فريداً — أي كود مكرر سيُستبعد.',
+                'كود العميل يجب أن يكون فريدا — أي كود مكرر سيستبعد.',
                 'الحقول المطلوبة: كود العميل + اسم العميل.',
             ],
         ]);
@@ -102,7 +102,7 @@ class ExcelRegistry
             new Column('supplier_id', 'المورد (اسم أو كود)', [
                 'width'      => 24,
                 'example'    => 'مؤسسة المعدات الحديثة',
-                'hint'       => 'اختياري: المورد الذي يعمل معه المشغّل — أدخل اسمه أو كوده (مثل SUP-0001).',
+                'hint'       => 'اختياري: المورد الذي يعمل معه المشغل — أدخل اسمه أو كوده (مثل SUP-0001).',
                 'lookup'     => [
                     'table'      => 'suppliers',
                     'idColumn'   => 'id',
@@ -137,7 +137,7 @@ class ExcelRegistry
             'createdByColumn'  => null,
             'instructions'    => [
                 'الحقول المطلوبة: اسم السائق + رقم الهاتف.',
-                'المورد والمشروع اختياريان — إن أدخلتهما (اسماً أو كوداً) يُربط المشغّل تلقائياً، وإن لم يوجد أيٌّ منهما يُرفض الصف.',
+                'المورد والمشروع اختياريان — إن أدخلتهما (اسما أو كودا) يربط المشغل تلقائيا، وإن لم يوجد أي منهما يرفض الصف.',
             ],
         ]);
 
@@ -149,7 +149,7 @@ class ExcelRegistry
                 'required'   => true,
                 'width'      => 22,
                 'example'    => 'مؤسسة المعدات الحديثة',
-                'hint'       => 'أدخل اسم المورد كما هو مسجّل أو كوده (مثل SUP-0001).',
+                'hint'       => 'أدخل اسم المورد كما هو مسجل أو كوده (مثل SUP-0001).',
                 // بحث/Lookup: يحوّل اسم/كود المورد إلى معرفه ويخزّنه في عمود suppliers.
                 'lookup'     => [
                     'table'      => 'suppliers',
@@ -166,7 +166,7 @@ class ExcelRegistry
                 'required'   => true,
                 'width'      => 18,
                 'example'    => 'حفار',
-                'hint'       => 'أدخل اسم النوع كما هو مسجّل في أنواع المعدات (مثل: حفار) أو رمز الشكل.',
+                'hint'       => 'أدخل اسم النوع كما هو مسجل في أنواع المعدات (مثل: حفار) أو رمز الشكل.',
                 // بحث/Lookup: يحوّل اسم النوع إلى معرفه في equipments_types ويخزّنه في عمود type.
                 'lookup'     => [
                     'table'      => 'equipments_types',
@@ -210,9 +210,9 @@ class ExcelRegistry
             'createdByColumn'  => null,
             'instructions'     => [
                 'الحقول المطلوبة: كود المعدة + المورد + نوع المعدة + اسم المعدة.',
-                'المورد: أدخل اسم المورد كما هو مسجّل أو كوده — سيُربط تلقائياً، وإن لم يوجد يُرفض الصف.',
-                'نوع المعدة: أدخل اسم النوع كما هو مسجّل في «أنواع المعدات» (مثل: حفار).',
-                'كود المعدة يجب أن يكون فريداً. الحالة: 1=نشط، 0=غير نشط.',
+                'المورد: أدخل اسم المورد كما هو مسجل أو كوده — سيربط تلقائيا، وإن لم يوجد يرفض الصف.',
+                'نوع المعدة: أدخل اسم النوع كما هو مسجل في «أنواع المعدات» (مثل: حفار).',
+                'كود المعدة يجب أن يكون فريدا. الحالة: 1=نشط، 0=غير نشط.',
                 'احذف صفوف الأمثلة قبل رفع الملف.',
             ],
         ]);
@@ -225,7 +225,7 @@ class ExcelRegistry
                 'required'   => true,
                 'width'      => 28,
                 'example'    => 'شركة بايناتس',
-                'hint'       => 'أدخل اسم العميل كما هو مسجّل أو كود العميل (مثل C001).',
+                'hint'       => 'أدخل اسم العميل كما هو مسجل أو كود العميل (مثل C001).',
                 // بحث/Lookup: يحوّل الاسم/الكود إلى client_id ويربط المشروع بالعميل.
                 'lookup'     => [
                     'table'      => 'clients',
@@ -248,8 +248,8 @@ class ExcelRegistry
             'moduleCode'   => 'projects',
             'instructions' => [
                 'الحقول المطلوبة: اسم المشروع + العميل + الموقع + القيمة الإجمالية.',
-                'العميل: أدخل اسم العميل كما هو مسجّل في النظام أو كوده (مثل C001). سيُربط المشروع تلقائياً بالعميل.',
-                'إن لم يكن العميل موجوداً مسبقاً في شاشة العملاء، سيُرفض الصف — أضِف العميل أولاً.',
+                'العميل: أدخل اسم العميل كما هو مسجل في النظام أو كوده (مثل C001). سيربط المشروع تلقائيا بالعميل.',
+                'إن لم يكن العميل موجودا مسبقا في شاشة العملاء، سيرفض الصف — أضف العميل أولا.',
             ],
         ]);
 
@@ -276,7 +276,7 @@ class ExcelRegistry
             new Column('equipment_type_id', 'نوع المعدة (اسم أو كود)', [
                 'width'      => 18,
                 'example'    => 'حفار',
-                'hint'       => 'أدخل اسم النوع كما هو مسجّل في أنواع المعدات (مثل: حفار).',
+                'hint'       => 'أدخل اسم النوع كما هو مسجل في أنواع المعدات (مثل: حفار).',
                 'lookup'     => [
                     'table'      => 'equipments_types',
                     'idColumn'   => 'id',
@@ -307,15 +307,15 @@ class ExcelRegistry
             'createdByColumn'  => 'created_by',
             'instructions'     => [
                 'الحقول المطلوبة: كود الموديل + اسم/رقم الموديل.',
-                'نوع المعدة: أدخل اسم النوع كما هو مسجّل في أنواع المعدات.',
-                'المورد الافتراضي اختياري — إن أدخلته (اسماً أو كوداً) يُربط تلقائياً.',
+                'نوع المعدة: أدخل اسم النوع كما هو مسجل في أنواع المعدات.',
+                'المورد الافتراضي اختياري — إن أدخلته (اسما أو كودا) يربط تلقائيا.',
             ],
         ]);
 
         // ─────────────────────────── ملف الافتراضات المالية والإهلاك (Depreciation Profile) ───────────────────────────
         $defs['fleet_depreciation_profiles'] = new EntityDefinition('fleet_depreciation_profiles', 'ملف الإهلاك المالي', 'fleet_depreciation_profile', [
             new Column('code', 'الكود', ['width' => 14, 'importable' => false, 'example' => 'DEP-001']),
-            new Column('asset_category', 'فئة الأصل', ['required' => true, 'width' => 24, 'example' => 'حفّار 22ط جديد']),
+            new Column('asset_category', 'فئة الأصل', ['required' => true, 'width' => 24, 'example' => 'حفار 22ط جديد']),
             new Column('brand', 'الماركة', ['width' => 18]),
             new Column('method', 'الطريقة', ['type' => Column::TYPE_ENUM, 'enum' => ['uop', 'sl'], 'default' => 'uop', 'width' => 12, 'hint' => 'uop=بالساعة · sl=بالسنوات']),
             new Column('useful_life', 'العمر الإنتاجي', ['type' => Column::TYPE_FLOAT, 'required' => true, 'width' => 16, 'example' => '15000']),
@@ -331,7 +331,7 @@ class ExcelRegistry
             'instructions'     => [
                 'الحقول المطلوبة: فئة الأصل + العمر الإنتاجي + نسبة التخريد.',
                 'الطريقة: uop (بالساعة التشغيلية) أو sl (زمني بالسنوات).',
-                'نسبة التخريد بين 0 و 1 (مثل 0.08). الكود والحالة تُدار من الشاشة.',
+                'نسبة التخريد بين 0 و 1 (مثل 0.08). الكود والحالة تدار من الشاشة.',
             ],
         ]);
 
@@ -351,7 +351,7 @@ class ExcelRegistry
             'companyScoped'    => false,
             'softDeleteColumn' => null,
             'createdByColumn'  => null,
-            'instructions'     => ['نوع المعدة كود رقمي (1=حفار، 2=قلاب، 3=خرامة).', 'الكود الكامل يجب أن يكون فريداً.'],
+            'instructions'     => ['نوع المعدة كود رقمي (1=حفار، 2=قلاب، 3=خرامة).', 'الكود الكامل يجب أن يكون فريدا.'],
         ]);
 
         // ─────────────────────────── التشغيل/الحركات (Operations) ───────────────────────────
@@ -360,7 +360,7 @@ class ExcelRegistry
                 'required'   => true,
                 'width'      => 24,
                 'example'    => 'EQP-0001',
-                'hint'       => 'أدخل كود المعدة أو اسمها كما هو مسجّل في شاشة المعدات.',
+                'hint'       => 'أدخل كود المعدة أو اسمها كما هو مسجل في شاشة المعدات.',
                 // بحث/Lookup: يحوّل كود/اسم المعدة إلى معرفها ويخزّنه في نفس العمود (equipment يخزّن المعرف).
                 'lookup'     => [
                     'table'     => 'equipments',
@@ -378,7 +378,7 @@ class ExcelRegistry
                 'required'   => true,
                 'width'      => 24,
                 'example'    => 'مشروع طريق الإنقاذ الغربي',
-                'hint'       => 'أدخل اسم المشروع كما هو مسجّل أو كوده (مثل PRJ-0001).',
+                'hint'       => 'أدخل اسم المشروع كما هو مسجل أو كوده (مثل PRJ-0001).',
                 'lookup'     => [
                     'table'     => 'project',
                     'idColumn'  => 'id',
@@ -395,7 +395,7 @@ class ExcelRegistry
                 'required'   => true,
                 'width'      => 24,
                 'example'    => 'مؤسسة المعدات الحديثة',
-                'hint'       => 'أدخل اسم المورد كما هو مسجّل أو كوده (مثل SUP-0001).',
+                'hint'       => 'أدخل اسم المورد كما هو مسجل أو كوده (مثل SUP-0001).',
                 'lookup'     => [
                     'table'     => 'suppliers',
                     'idColumn'  => 'id',
@@ -419,7 +419,7 @@ class ExcelRegistry
             'softDeleteColumn' => null,
             'createdByColumn'  => null,
             'instructions'     => [
-                'المعدة/المشروع/المورد: أدخل الكود أو الاسم المقروء — سيُربط تلقائياً بالسجل الصحيح، وإن لم يوجد يُرفض الصف.',
+                'المعدة/المشروع/المورد: أدخل الكود أو الاسم المقروء — سيربط تلقائيا بالسجل الصحيح، وإن لم يوجد يرفض الصف.',
                 'رقم العقد: أدخل رقم العقد كما يظهر في شاشة العقود (لا يوجد له كود/اسم مقروء بعد).',
                 'الحقول المطلوبة: المعدة + فئة المعدة + المشروع/العقد/المورد + بداية ونهاية التشغيل + البيان + الأيام.',
             ],
@@ -427,12 +427,12 @@ class ExcelRegistry
 
         // ─────────────────────────── ساعات العمل (Timesheet) ───────────────────────────
         $defs['timesheet'] = new EntityDefinition('timesheet', 'ساعات العمل', 'timesheet', [
-            new Column('operator', 'المشغّل', ['required' => true, 'width' => 22, 'example' => 'محمد علي']),
+            new Column('operator', 'المشغل', ['required' => true, 'width' => 22, 'example' => 'محمد علي']),
             new Column('employee_id', 'السائق (اسم أو كود)', [
                 'required'   => true,
                 'width'      => 22,
                 'example'    => 'محمد أحمد علي',
-                'hint'       => 'أدخل اسم السائق كما هو مسجّل أو كوده (مثل DRV-0001).',
+                'hint'       => 'أدخل اسم السائق كما هو مسجل أو كوده (مثل DRV-0001).',
                 // بحث/Lookup: يحوّل اسم/كود السائق إلى معرفه ويخزّنه في نفس العمود (driver يخزّن معرف السائق).
                 'lookup'     => [
                     'table'     => 'employees',
@@ -455,9 +455,9 @@ class ExcelRegistry
             'softDeleteColumn' => null,
             'createdByColumn'  => 'user_id',
             'instructions'     => [
-                'السائق: أدخل اسم السائق كما هو مسجّل أو كوده — سيُربط تلقائياً بمعرف السائق، وإن لم يوجد يُرفض الصف.',
-                'المشغّل: أدخل رقم حركة التشغيل المرتبطة (لا يوجد له اسم/كود مقروء بعد).',
-                'الحقول المطلوبة: المشغّل + السائق + الوردية + التاريخ + نوع الكشف.',
+                'السائق: أدخل اسم السائق كما هو مسجل أو كوده — سيربط تلقائيا بمعرف السائق، وإن لم يوجد يرفض الصف.',
+                'المشغل: أدخل رقم حركة التشغيل المرتبطة (لا يوجد له اسم/كود مقروء بعد).',
+                'الحقول المطلوبة: المشغل + السائق + الوردية + التاريخ + نوع الكشف.',
                 'الورديات: D (نهار) / N (ليل).',
             ],
         ]);
@@ -468,7 +468,7 @@ class ExcelRegistry
                 'required'   => true,
                 'width'      => 24,
                 'example'    => 'مشروع طريق الإنقاذ الغربي',
-                'hint'       => 'أدخل اسم المشروع كما هو مسجّل أو كوده (مثل PRJ-0001).',
+                'hint'       => 'أدخل اسم المشروع كما هو مسجل أو كوده (مثل PRJ-0001).',
                 'lookup'     => [
                     'table'     => 'project',
                     'idColumn'  => 'id',
@@ -492,7 +492,7 @@ class ExcelRegistry
             'moduleCode'   => 'Contracts/contracts.php',
             'instructions' => [
                 'الحقول المطلوبة: المشروع + تاريخ توقيع العقد.',
-                'المشروع: أدخل اسم المشروع كما هو مسجّل أو كوده — سيُربط العقد تلقائياً بالمشروع، وإن لم يوجد يُرفض الصف.',
+                'المشروع: أدخل اسم المشروع كما هو مسجل أو كوده — سيربط العقد تلقائيا بالمشروع، وإن لم يوجد يرفض الصف.',
             ],
         ]);
 
@@ -502,7 +502,7 @@ class ExcelRegistry
                 'required'   => true,
                 'width'      => 24,
                 'example'    => 'مؤسسة المعدات الحديثة',
-                'hint'       => 'أدخل اسم المورد كما هو مسجّل أو كوده (مثل SUP-0001).',
+                'hint'       => 'أدخل اسم المورد كما هو مسجل أو كوده (مثل SUP-0001).',
                 'lookup'     => [
                     'table'     => 'suppliers',
                     'idColumn'  => 'id',
@@ -518,7 +518,7 @@ class ExcelRegistry
                 'required'   => true,
                 'width'      => 24,
                 'example'    => 'مشروع طريق الإنقاذ الغربي',
-                'hint'       => 'أدخل اسم المشروع كما هو مسجّل أو كوده (مثل PRJ-0001).',
+                'hint'       => 'أدخل اسم المشروع كما هو مسجل أو كوده (مثل PRJ-0001).',
                 'lookup'     => [
                     'table'     => 'project',
                     'idColumn'  => 'id',
@@ -541,7 +541,7 @@ class ExcelRegistry
             'createdByColumn'  => null,
             'instructions'     => [
                 'الحقول المطلوبة: المورد + المشروع + تاريخ توقيع العقد.',
-                'المورد والمشروع: أدخل الاسم أو الكود المقروء — سيُربط العقد تلقائياً، وإن لم يوجد أيٌّ منهما يُرفض الصف.',
+                'المورد والمشروع: أدخل الاسم أو الكود المقروء — سيربط العقد تلقائيا، وإن لم يوجد أي منهما يرفض الصف.',
             ],
         ]);
 
@@ -551,7 +551,7 @@ class ExcelRegistry
                 'required'   => true,
                 'width'      => 24,
                 'example'    => 'محمد أحمد علي',
-                'hint'       => 'أدخل اسم السائق كما هو مسجّل أو كوده (مثل DRV-0001).',
+                'hint'       => 'أدخل اسم السائق كما هو مسجل أو كوده (مثل DRV-0001).',
                 'lookup'     => [
                     'table'     => 'employees',
                     'idColumn'  => 'id',
@@ -566,7 +566,7 @@ class ExcelRegistry
                 'required'   => true,
                 'width'      => 24,
                 'example'    => 'مشروع طريق الإنقاذ الغربي',
-                'hint'       => 'أدخل اسم المشروع كما هو مسجّل أو كوده (مثل PRJ-0001).',
+                'hint'       => 'أدخل اسم المشروع كما هو مسجل أو كوده (مثل PRJ-0001).',
                 'lookup'     => [
                     'table'     => 'project',
                     'idColumn'  => 'id',
@@ -588,7 +588,7 @@ class ExcelRegistry
             'createdByColumn'  => null,
             'instructions'     => [
                 'الحقول المطلوبة: السائق + المشروع + تاريخ توقيع العقد.',
-                'السائق والمشروع: أدخل الاسم أو الكود المقروء — سيُربط العقد تلقائياً، وإن لم يوجد أيٌّ منهما يُرفض الصف.',
+                'السائق والمشروع: أدخل الاسم أو الكود المقروء — سيربط العقد تلقائيا، وإن لم يوجد أي منهما يرفض الصف.',
             ],
         ]);
 
@@ -601,11 +601,11 @@ class ExcelRegistry
         $defs['tickets'] = new EntityDefinition('tickets', 'البلاغات', 'tickets', [
             new Column('ticket_no', 'رقم التذكرة', [
                 'unique' => true, 'width' => 16, 'example' => '26-07-1001',
-                'hint'   => 'اتركه فارغًا ليولّده النظام تلقائيًّا، أو أدخل الرقم التاريخي كما هو.',
+                'hint'   => 'اتركه فارغا ليولده النظام تلقائيا، أو أدخل الرقم التاريخي كما هو.',
             ]),
             new Column('ticket_type', 'نوع البلاغ', [
                 'required' => true, 'width' => 26, 'example' => 'بلاغ عطل / طلب صيانة',
-                'hint'     => 'اسم النوع كما هو في شاشة «أنواع البلاغات والتوجيه» — يُسنِد الإدارة المالكة تلقائيًّا.',
+                'hint'     => 'اسم النوع كما هو في شاشة «أنواع البلاغات والتوجيه» — يسند الإدارة المالكة تلقائيا.',
                 'lookup'   => [
                     'table' => 'ticket_types', 'idColumn' => 'id', 'storeIdIn' => 'ticket_type_id',
                     'matchBy' => ['code', 'name'], 'nameColumn' => 'name',
@@ -613,7 +613,7 @@ class ExcelRegistry
                 ],
                 'exportExpr' => "(SELECT tt.name FROM ticket_types tt WHERE tt.id = tickets.ticket_type_id)",
             ]),
-            new Column('category', 'التصنيف الفنّي', [
+            new Column('category', 'التصنيف الفني', [
                 'width' => 20, 'example' => 'المحرك',
                 'lookup' => [
                     'table' => 'ticket_categories', 'idColumn' => 'id', 'storeIdIn' => 'category_id',
@@ -641,7 +641,7 @@ class ExcelRegistry
             ]),
             new Column('owner_role', 'الإدارة المالكة', [
                 'width' => 22, 'example' => 'ادارة الصيانة',
-                'hint'   => 'اتركه فارغًا ليأخذ الإدارة المالكة من نوع البلاغ.',
+                'hint'   => 'اتركه فارغا ليأخذ الإدارة المالكة من نوع البلاغ.',
                 'lookup' => [
                     'table' => 'roles', 'idColumn' => 'id', 'storeIdIn' => 'owner_role_id',
                     'matchBy' => ['name'], 'nameColumn' => 'name',
@@ -649,8 +649,8 @@ class ExcelRegistry
                 ],
                 'exportExpr' => "(SELECT r.name FROM roles r WHERE r.id = tickets.owner_role_id)",
             ]),
-            new Column('reporting_person', 'المُبلِّغ', ['required' => true, 'width' => 24, 'example' => 'علي حمدان']),
-            new Column('reporter_contact', 'رقم المُبلِّغ', ['type' => Column::TYPE_PHONE, 'width' => 18, 'example' => '0920001001']),
+            new Column('reporting_person', 'المبلغ', ['required' => true, 'width' => 24, 'example' => 'علي حمدان']),
+            new Column('reporter_contact', 'رقم المبلغ', ['type' => Column::TYPE_PHONE, 'width' => 18, 'example' => '0920001001']),
             new Column('call_date', 'تاريخ البلاغ', ['type' => Column::TYPE_DATE, 'required' => true, 'width' => 16, 'example' => '2026-07-16']),
             new Column('call_time', 'وقت البلاغ', ['width' => 12, 'example' => '07:45']),
             new Column('equipment', 'كود المعدة', [
@@ -746,10 +746,10 @@ class ExcelRegistry
             },
             'instructions'     => [
                 'احذف صفوف الأمثلة قبل رفع الملف.',
-                'الحقول المطلوبة: نوع البلاغ + المُبلِّغ + تاريخ البلاغ + وصف المشكلة.',
-                'نوع البلاغ: أدخل اسمه كما في شاشة «أنواع البلاغات والتوجيه» — وهو يُسنِد الإدارة المالكة تلقائيًّا إن تركت خانة الإدارة فارغة.',
-                'رقم التذكرة: اتركه فارغًا ليولّده النظام، أو أدخل رقمًا تاريخيًّا (فريدًا) لاستيراد كشوف سابقة.',
-                'المعدة والمشروع: أدخل الكود أو الاسم المسجَّل — الصف يُقبل حتى لو تُركا فارغين.',
+                'الحقول المطلوبة: نوع البلاغ + المبلغ + تاريخ البلاغ + وصف المشكلة.',
+                'نوع البلاغ: أدخل اسمه كما في شاشة «أنواع البلاغات والتوجيه» — وهو يسند الإدارة المالكة تلقائيا إن تركت خانة الإدارة فارغة.',
+                'رقم التذكرة: اتركه فارغا ليولده النظام، أو أدخل رقما تاريخيا (فريدا) لاستيراد كشوف سابقة.',
+                'المعدة والمشروع: أدخل الكود أو الاسم المسجل — الصف يقبل حتى لو تركا فارغين.',
             ],
         ]);
 
@@ -764,7 +764,7 @@ class ExcelRegistry
                 'exportExpr' => "(SELECT r.name FROM roles r WHERE r.id = ticket_transfers.from_role_id)"]),
             new Column('to_role', 'إلى إدارة', ['importable' => false, 'width' => 22,
                 'exportExpr' => "(SELECT r.name FROM roles r WHERE r.id = ticket_transfers.to_role_id)"]),
-            new Column('transferred_by_name', 'نفّذ التحويل', ['importable' => false, 'width' => 22,
+            new Column('transferred_by_name', 'نفذ التحويل', ['importable' => false, 'width' => 22,
                 'exportExpr' => "(SELECT u.name FROM users u WHERE u.id = ticket_transfers.transferred_by)"]),
             new Column('reason', 'سبب التحويل', ['importable' => false, 'width' => 45]),
             new Column('notes', 'ملاحظات', ['importable' => false, 'width' => 30]),
@@ -832,9 +832,9 @@ class ExcelRegistry
             'moduleCode'   => 'Opportunities/opportunities.php',
             'instructions' => [
                 'احذف صفوف الأمثلة قبل رفع الملف.',
-                'كود الفرصة فريدٌ داخل شركتك — أحرفٌ وأرقامٌ و - أو _ فقط.',
+                'كود الفرصة فريد داخل شركتك — أحرف وأرقام و - أو _ فقط.',
                 'المرحلة «فوز» تستلزم سبب فوز، و«خسارة»/«مستبعدة» تستلزم سبب خسارة.',
-                'الإيراد المتوقع لا يكون سالبًا.',
+                'الإيراد المتوقع لا يكون سالبا.',
             ],
         ]);
 
@@ -858,7 +858,7 @@ class ExcelRegistry
             new Column('created_at', 'تاريخ الإضافة', ['type' => Column::TYPE_DATE, 'importable' => false, 'exportExpr' => "DATE_FORMAT(created_at, '%Y-%m-%d')"]),
         ], [
             'moduleCode'   => 'Clients/quotations.php',
-            'instructions' => ['كود العرض فريدٌ داخل شركتك.', 'الفرصة والعميل يُطابقان بالكود أو الاسم.'],
+            'instructions' => ['كود العرض فريد داخل شركتك.', 'الفرصة والعميل يطابقان بالكود أو الاسم.'],
         ]);
 
         // ─────────────────────────── المناقصات ───────────────────────────
@@ -881,7 +881,7 @@ class ExcelRegistry
             new Column('created_at', 'تاريخ الإضافة', ['type' => Column::TYPE_DATE, 'importable' => false, 'exportExpr' => "DATE_FORMAT(created_at, '%Y-%m-%d')"]),
         ], [
             'moduleCode'   => 'Clients/tenders.php',
-            'instructions' => ['كود المناقصة فريدٌ داخل شركتك.', 'الجهة عميلٌ مسجَّلٌ في سجل العملاء.'],
+            'instructions' => ['كود المناقصة فريد داخل شركتك.', 'الجهة عميل مسجل في سجل العملاء.'],
         ]);
 
         // ─────────────────────────── كتالوج الخدمات ───────────────────────────
@@ -915,7 +915,7 @@ class ExcelRegistry
             new Column('created_at', 'تاريخ الإضافة', ['type' => Column::TYPE_DATE, 'importable' => false, 'exportExpr' => "DATE_FORMAT(created_at, '%Y-%m-%d')"]),
         ], [
             'moduleCode'   => 'Clients/pricelists.php',
-            'instructions' => ['كود القائمة فريدٌ داخل شركتك.', 'المعاملات نسبٌ — 1.0 تعني بلا تعديل.'],
+            'instructions' => ['كود القائمة فريد داخل شركتك.', 'المعاملات نسب — 1.0 تعني بلا تعديل.'],
         ]);
 
         // ─────────────────────────── المخاطر التجارية ───────────────────────────
@@ -923,7 +923,7 @@ class ExcelRegistry
             new Column('risk_code', 'كود المخاطرة', ['required' => true, 'unique' => true, 'width' => 18, 'example' => 'RSK-0001']),
             new Column('name', 'اسم المخاطرة', ['required' => true, 'width' => 32, 'example' => 'تأخر تحصيل عميل']),
             new Column('risk_type', 'النوع', ['type' => Column::TYPE_ENUM, 'enum' => ['عميل', 'موقع', 'تمويل', 'تحصيل', 'تشغيل', 'موردون'], 'width' => 14]),
-            new Column('severity', 'الشدّة', ['type' => Column::TYPE_ENUM, 'enum' => ['منخفضة', 'متوسطة', 'عالية'], 'width' => 12]),
+            new Column('severity', 'الشدة', ['type' => Column::TYPE_ENUM, 'enum' => ['منخفضة', 'متوسطة', 'عالية'], 'width' => 12]),
             new Column('state', 'الحالة', ['type' => Column::TYPE_ENUM, 'enum' => ['مفتوح', 'تحت المعالجة', 'مغلق'], 'default' => 'مفتوح', 'width' => 16]),
             new Column('mitigation', 'إجراء التخفيف', ['width' => 32]),
             new Column('notes', 'ملاحظات', ['width' => 30]),
@@ -944,7 +944,7 @@ class ExcelRegistry
             new Column('created_at', 'تاريخ الإضافة', ['type' => Column::TYPE_DATE, 'importable' => false, 'exportExpr' => "DATE_FORMAT(created_at, '%Y-%m-%d')"]),
         ], [
             'moduleCode'   => 'Clients/activities.php',
-            'instructions' => ['كود النشاط فريدٌ داخل شركتك.', 'الربطُ بالفرصة/العميل يُدار من الشاشة لا من الملف.'],
+            'instructions' => ['كود النشاط فريد داخل شركتك.', 'الربط بالفرصة/العميل يدار من الشاشة لا من الملف.'],
         ]);
 
         return $defs;

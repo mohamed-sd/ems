@@ -42,7 +42,7 @@ if (!$is_super_admin && empty($__pp['can_view'])) {
     exit();
 }
 if (!$is_super_admin && $_SERVER['REQUEST_METHOD'] === 'POST' && empty($__pp['can_add']) && empty($__pp['can_edit'])) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'غير مصرح بالكتابة في هذه الشاشة ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
+    ems_gov_flash_redirect('../main/dashboard.php', 'غير مصرح بالكتابة في هذه الشاشة ❌', 'GOV-PERM-403', 'اطلب المنحة من مدير الصلاحيات إن كانت ضمن عملك');
 }
 $COLS   = array (
   0 => 'الكيان',
@@ -59,7 +59,7 @@ $COLS   = array (
   11 => 'الوحدات المعتمدة',
   12 => 'الهامش',
   13 => 'المخاطر المفتوحة',
-  14 => 'الاعتمادات المعلَّقة',
+  14 => 'الاعتمادات المعلقة',
   15 => 'آخر تحديث',
 );
 /* أعمدة الجدول الأصلي بترتيب حقول الفورم f0..f14 */
@@ -102,9 +102,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
             array(), array('fields' => implode(',', $__typed)),
             array('company_id' => (int) $company_id, 'user_id' => (int) $uid));
         ems_gov_flash_redirect(basename(__FILE__),
-            'GOV-KPI-409: مؤشراتُ اللوحةِ تُشتقُّ من مصادرِها ولا تُكتب يدويًّا — '
+            'GOV-KPI-409: مؤشرات اللوحة تشتق من مصادرها ولا تكتب يدويا — '
             . 'المرفوض: ' . implode(' · ', $__typed) . ' ❌',
-            'GOV-FAIL-409', 'افتحِ الرقمَ من مصدرِه: الإيرادُ من الدفتر والتحصيلُ من المقبوضات');
+            'GOV-FAIL-409', 'افتح الرقم من مصدره: الإيراد من الدفتر والتحصيل من المقبوضات');
         exit();
     }
 
@@ -126,7 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     $ok = $st->execute();
     $dup = !$ok && $conn->errno === 1062;
     $st->close();
-    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حُفظت اللقطة ✅' : ($dup ? 'لقطة هذه الفترة موجودة — الفترة الواحدة لقطة واحدة ❌' : 'تعذر الحفظ ❌'), 'GOV-OK-200', '');
+    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حفظت اللقطة ✅' : ($dup ? 'لقطة هذه الفترة موجودة — الفترة الواحدة لقطة واحدة ❌' : 'تعذر الحفظ ❌'), 'GOV-OK-200', '');
     exit();
 }
 
@@ -196,7 +196,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     );
     $header_back = false;
     include '../includes/page_header.php';
-    echo ems_states_bundle('لا لقطاتَ محفوظةً لهذه الفترة', 'أضف لقطةً بزر «إضافة» أو تحقق من توفرِ السجلات');
+    echo ems_states_bundle('لا لقطات محفوظة لهذه الفترة', 'أضف لقطة بزر «إضافة» أو تحقق من توفر السجلات');
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
@@ -223,7 +223,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $bdCards = array(
         array('العقود', $bdContracts, 'fa-file-contract'),
         array('المشاريع', $bdProjects, 'fa-diagram-project'),
-        array('معلَّق أمام القمة', $bdPending, 'fa-hourglass-half'),
+        array('معلق أمام القمة', $bdPending, 'fa-hourglass-half'),
         array('قضايا بلا حسم', $bdOpenDec, 'fa-triangle-exclamation'),
         array('متابعات مفتوحة', $bdFollow, 'fa-bell'),
         array('وقائع §11', $bdFacts, 'fa-bolt'),
@@ -239,7 +239,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <?php endforeach; ?>
         </div>
         <div class="text-muted ems-ceo-kpi-note">
-            مؤشراتٌ حيةٌ من المصادر (لا من لقطات هذا الجدول) — التفصيل في
+            مؤشرات حية من المصادر (لا من لقطات هذا الجدول) — التفصيل في
             <a href="ceo_reports.php">تقارير الإدارة التنفيذية الثمانية</a>
         </div>
     </div></div>
@@ -280,11 +280,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                      مشتقّان**: يُقرآن من `risk_register` و`exec_approvals` عند العرض،
                      فلا حقلَ `f12` ولا `f13` في هذه الصفحة. -->
                 <div class="form-group"><label>المخاطر المفتوحة</label>
-                    <input type="text" value="مشتقٌّ من سجل المخاطر — لا يُكتب" disabled
-                           class="form-control" aria-readonly="true" aria-label="المخاطر المفتوحة — مؤشرٌ مشتقٌّ من سجل المخاطر"></div>
-                <div class="form-group"><label>الاعتمادات المعلَّقة</label>
-                    <input type="text" value="مشتقٌّ من صندوق الاعتماد — لا يُكتب" disabled
-                           class="form-control" aria-readonly="true" aria-label="الاعتمادات المعلَّقة — مؤشرٌ مشتقٌّ من صندوق الاعتماد"></div>
+                    <input type="text" value="مشتق من سجل المخاطر — لا يكتب" disabled
+                           class="form-control" aria-readonly="true" aria-label="المخاطر المفتوحة — مؤشر مشتق من سجل المخاطر"></div>
+                <div class="form-group"><label>الاعتمادات المعلقة</label>
+                    <input type="text" value="مشتق من صندوق الاعتماد — لا يكتب" disabled
+                           class="form-control" aria-readonly="true" aria-label="الاعتمادات المعلقة — مؤشر مشتق من صندوق الاعتماد"></div>
                 <div class="form-group"><label for="emsf_1105_88267">آخر تحديث</label>
                     <input type="text" name="f14" maxlength="190" id="emsf_1105_88267"></div>
             </div></div>
@@ -299,7 +299,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="table-responsive">
         <table class="alltables display" id="ceo_boardTable">
             <thead><tr>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
             <th>الفترة</th>
             <th>العقود النافذة</th>
             <th>قيمة المحفظة</th>
@@ -313,12 +313,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th>الوحدات المعتمدة</th>
             <th>الهامش</th>
             <th>المخاطر المفتوحة</th>
-            <th>الاعتمادات المعلَّقة</th>
+            <th>الاعتمادات المعلقة</th>
             <th>آخر تحديث</th>
             </tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="16" class="text-center text-muted">لا بياناتَ بعدُ — أضف أول صفٍّ بزر «إضافة»</td></tr>
+                <tr><td colspan="16" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
                     <?php foreach (array_keys($COLS) as $i): $v = m00_cell_at($i, $r, $entityName, $COLDB, $DERIVED_KPI); ?>

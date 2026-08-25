@@ -673,12 +673,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا تشغيلاتِ معدّاتٍ مسجَّلةً في هذا المشروع', 'أضفْ أولَ تشغيلٍ بزرِّ «إضافة تشغيل جديد» في رأسِ الشاشة');
+    echo ems_states_bundle('لا تشغيلات معدات مسجلة في هذا المشروع', 'أضف أول تشغيل بزر «إضافة تشغيل جديد» في رأس الشاشة');
     // TKT-15 · زر الإبلاغ السياقي — المشغلون والقوى (§2-⑤)
     require_once __DIR__ . '/../includes/report_button.php';
     ems_report_button(array('screen' => 'operators', 'project_id' => $selected_project_id ?? null));
     ?>
-<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('operator', 'نظرةٌ عامة'); ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('operator', 'نظرة عامة'); ?>
 
     <div class="ems-content">
         <?php if (!empty($_GET['msg'])):

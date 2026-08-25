@@ -64,65 +64,65 @@ ems_shell_axes($__pp);
    ═══════════════════════════════════════════════════════════════════════════ */
 $SEC_EVENT_MAP = array(
     /* ── مخالفات ─────────────────────────────────────────────────────────── */
-    'tenant_gate_violation'      => array('violation', 'حارسُ الكيانِ رفض العمليةَ ومنعها'),
-    'tenant_gate_cross_tenant'   => array('violation', 'محاولةُ وصولٍ لبياناتِ كيانٍ آخر'),
-    'csrf_violation'             => array('violation', 'طلبٌ بلا رمزِ حمايةٍ صالح'),
-    'action_permission_violation' => array('violation', 'محاولةُ فعلٍ بلا صلاحية'),
-    'WRITE_WITHOUT_PERMISSION_DENY' => array('violation', 'محاولةُ كتابةٍ بلا صلاحية — مُنعت'),
-    'RUNTIME_DDL_BLOCKED'        => array('violation', 'محاولةُ تعديلِ بنيةِ القاعدةِ أثناءَ التشغيل — مُنعت'),
-    'UNREGISTERED_SCREEN_DENY'   => array('violation', 'شاشةٌ غيرُ مسجَّلةٍ — مُنع الدخولُ إليها'),
-    'PERM_DENY_UNREGISTERED'     => array('violation', 'مُنع لغيابِ تسجيلِ الشاشةِ في الموديولات'),
-    'GOVERNANCE_SCREEN_DENY'     => array('violation', 'شاشةُ حوكمةٍ — مُنع الدخولُ إليها'),
-    'GOVERNANCE_SCREEN_DENY_UNREGISTERED' => array('violation', 'شاشةُ حوكمةٍ غيرُ مسجَّلةٍ — مُنع الدخول'),
-    'AUDITOR_WRITE_DENY'         => array('violation', 'مراجعٌ حاول الكتابةَ — مُنع'),
-    'ROLE_ESCALATION_BLOCKED'    => array('violation', 'محاولةُ رفعِ دورٍ — مُنعت'),
-    'SUPER_ADMIN_LOGIN_FAIL'     => array('violation', 'فشلُ دخولِ المديرِ الأعلى'),
-    'SUPER_ADMIN_LOGIN_CSRF_FAIL' => array('violation', 'دخولُ المديرِ الأعلى بلا رمزِ حمايةٍ صالح'),
-    'U13_ACTION_CSRF_FAIL'       => array('violation', 'فعلٌ رُدَّ لغيابِ رمزِ الحماية'),
-    'rfq_cross_supplier_read'    => array('violation', 'اطّلاعُ موردٍ على عرضِ مورّدٍ غيرِه'),
+    'tenant_gate_violation'      => array('violation', 'حارس الكيان رفض العملية ومنعها'),
+    'tenant_gate_cross_tenant'   => array('violation', 'محاولة وصول لبيانات كيان آخر'),
+    'csrf_violation'             => array('violation', 'طلب بلا رمز حماية صالح'),
+    'action_permission_violation' => array('violation', 'محاولة فعل بلا صلاحية'),
+    'WRITE_WITHOUT_PERMISSION_DENY' => array('violation', 'محاولة كتابة بلا صلاحية — منعت'),
+    'RUNTIME_DDL_BLOCKED'        => array('violation', 'محاولة تعديل بنية القاعدة أثناء التشغيل — منعت'),
+    'UNREGISTERED_SCREEN_DENY'   => array('violation', 'شاشة غير مسجلة — منع الدخول إليها'),
+    'PERM_DENY_UNREGISTERED'     => array('violation', 'منع لغياب تسجيل الشاشة في الموديولات'),
+    'GOVERNANCE_SCREEN_DENY'     => array('violation', 'شاشة حوكمة — منع الدخول إليها'),
+    'GOVERNANCE_SCREEN_DENY_UNREGISTERED' => array('violation', 'شاشة حوكمة غير مسجلة — منع الدخول'),
+    'AUDITOR_WRITE_DENY'         => array('violation', 'مراجع حاول الكتابة — منع'),
+    'ROLE_ESCALATION_BLOCKED'    => array('violation', 'محاولة رفع دور — منعت'),
+    'SUPER_ADMIN_LOGIN_FAIL'     => array('violation', 'فشل دخول المدير الأعلى'),
+    'SUPER_ADMIN_LOGIN_CSRF_FAIL' => array('violation', 'دخول المدير الأعلى بلا رمز حماية صالح'),
+    'U13_ACTION_CSRF_FAIL'       => array('violation', 'فعل رد لغياب رمز الحماية'),
+    'rfq_cross_supplier_read'    => array('violation', 'اطلاع مورد على عرض مورد غيره'),
 
     /* ── تحذيرات ─────────────────────────────────────────────────────────── */
-    'role_constant_mismatch'     => array('warning', 'انحرافُ ثابتِ الدورِ عن مرجعِه المعتمد'),
-    'UNREGISTERED_SCREEN_WOULD_DENY' => array('warning', 'شاشةٌ غيرُ مسجَّلةٍ — كانت ستُمنع'),
-    'tenant_gate_would_deny'     => array('warning', 'حارسُ الكيانِ كان سيمنع — وهو في وضعِ المراقبة'),
-    'container_gate_would_block' => array('warning', 'حارسُ الحاوياتِ كان سيحجب — وهو في وضعِ المراقبة'),
-    'SENSITIVE_READ'             => array('warning', 'اطّلاعٌ على حقلٍ حسّاس'),
-    'tenant_gate_delete_row'     => array('warning', 'حذفُ سجلٍّ عبرَ حارسِ الكيان'),
-    'tenant_gate_delete_child'   => array('warning', 'حذفُ سجلٍّ تابعٍ عبرَ حارسِ الكيان'),
-    'FANOUT_LEGAL_PARTIAL'       => array('warning', 'مروحةُ الأثرِ اكتملت جزئيًّا — أثرٌ ناقص'),
-    'FANOUT_TS_DEFERRED'         => array('warning', 'أثرُ ساعاتٍ مؤجَّلٌ لم يقع بعد'),
-    'OBL_ALERT_ESCALATED'        => array('warning', 'إنذارُ التزامٍ صُعِّد لجهةٍ أعلى'),
-    'EVENT_ORPHANED_ALERT'       => array('warning', 'واقعةٌ بلا مرجعٍ أبٍ — إنذار'),
-    'CONVERT_QUEUE_FAILED'       => array('warning', 'فشلُ طابورِ التحويل'),
-    'REF_RESOLUTION_MISS'        => array('warning', 'مرجعٌ لم يُحَلَّ إلى سجلٍّ قائم'),
-    'U13_CFIELD_MISSING'         => array('warning', 'حقلٌ حاكمٌ غائبٌ عن الطلب'),
-    'CEO_CEILING_ESCALATED'      => array('warning', 'تجاوزُ سقفِ الاعتمادِ — صُعِّد للرئيس'),
-    'RUNTIME_DDL_EXECUTED'       => array('warning', 'نُفِّذ تعديلُ بنيةٍ أثناءَ التشغيل'),
+    'role_constant_mismatch'     => array('warning', 'انحراف ثابت الدور عن مرجعه المعتمد'),
+    'UNREGISTERED_SCREEN_WOULD_DENY' => array('warning', 'شاشة غير مسجلة — كانت ستمنع'),
+    'tenant_gate_would_deny'     => array('warning', 'حارس الكيان كان سيمنع — وهو في وضع المراقبة'),
+    'container_gate_would_block' => array('warning', 'حارس الحاويات كان سيحجب — وهو في وضع المراقبة'),
+    'SENSITIVE_READ'             => array('warning', 'اطلاع على حقل حساس'),
+    'tenant_gate_delete_row'     => array('warning', 'حذف سجل عبر حارس الكيان'),
+    'tenant_gate_delete_child'   => array('warning', 'حذف سجل تابع عبر حارس الكيان'),
+    'FANOUT_LEGAL_PARTIAL'       => array('warning', 'مروحة الأثر اكتملت جزئيا — أثر ناقص'),
+    'FANOUT_TS_DEFERRED'         => array('warning', 'أثر ساعات مؤجل لم يقع بعد'),
+    'OBL_ALERT_ESCALATED'        => array('warning', 'إنذار التزام صعد لجهة أعلى'),
+    'EVENT_ORPHANED_ALERT'       => array('warning', 'واقعة بلا مرجع أب — إنذار'),
+    'CONVERT_QUEUE_FAILED'       => array('warning', 'فشل طابور التحويل'),
+    'REF_RESOLUTION_MISS'        => array('warning', 'مرجع لم يحل إلى سجل قائم'),
+    'U13_CFIELD_MISSING'         => array('warning', 'حقل حاكم غائب عن الطلب'),
+    'CEO_CEILING_ESCALATED'      => array('warning', 'تجاوز سقف الاعتماد — صعد للرئيس'),
+    'RUNTIME_DDL_EXECUTED'       => array('warning', 'نفذ تعديل بنية أثناء التشغيل'),
 
     /* ── أحداثٌ روتينية ───────────────────────────────────────────────────── */
-    'tenant_gate_transaction'    => array('routine', 'معاملةٌ مرّت عبرَ حارسِ الكيان'),
-    'tenant_gate_system_context' => array('routine', 'عملٌ بسياقِ النظامِ عبرَ حارسِ الكيان'),
-    'tenant_gate_replace_children' => array('routine', 'استبدالُ سجلاتٍ تابعةٍ عبرَ حارسِ الكيان'),
-    'tenant_gate_platform_context' => array('routine', 'عملٌ بسياقِ المنصّةِ عبرَ حارسِ الكيان'),
-    'UNIT_CONVERTED'             => array('routine', 'تحويلُ وحدةِ قياس'),
-    'U13_ACTION'                 => array('routine', 'فعلٌ مسجَّلٌ في الحارسِ المركزي'),
-    'EVENT_HOOK_PUBLISHED'       => array('routine', 'واقعةُ عملٍ نُشرت في السجلِّ المحايد'),
-    'EVENT_HOOK_MONITOR'         => array('routine', 'خطّافُ الوقائعِ في وضعِ المراقبة'),
-    'FANOUT_TS'                  => array('routine', 'مروحةُ أثرِ ساعاتٍ وقعت'),
-    'tickets_cron_run'           => array('routine', 'تشغيلُ مهمّةِ البلاغاتِ المجدولة'),
-    'PROJECT_CREATED'            => array('routine', 'أُنشئ مشروع'),
-    'PROJECT_UPDATED'            => array('routine', 'عُدِّل مشروع'),
-    'PROJECT_UPDATE_REQUESTED'   => array('routine', 'طُلب تعديلُ مشروع'),
-    'PROJECT_DELETE_REQUESTED'   => array('routine', 'طُلب حذفُ مشروع'),
-    'PROJECT_SOFT_DELETED'       => array('routine', 'أُرشف مشروع'),
-    'CEO_APPROVAL_DECIDED'       => array('routine', 'بتَّ الرئيسُ في اعتماد'),
-    'CEO_CONTRACT_SIGNED'        => array('routine', 'وقّع الرئيسُ عقدًا'),
+    'tenant_gate_transaction'    => array('routine', 'معاملة مرت عبر حارس الكيان'),
+    'tenant_gate_system_context' => array('routine', 'عمل بسياق النظام عبر حارس الكيان'),
+    'tenant_gate_replace_children' => array('routine', 'استبدال سجلات تابعة عبر حارس الكيان'),
+    'tenant_gate_platform_context' => array('routine', 'عمل بسياق المنصة عبر حارس الكيان'),
+    'UNIT_CONVERTED'             => array('routine', 'تحويل وحدة قياس'),
+    'U13_ACTION'                 => array('routine', 'فعل مسجل في الحارس المركزي'),
+    'EVENT_HOOK_PUBLISHED'       => array('routine', 'واقعة عمل نشرت في السجل المحايد'),
+    'EVENT_HOOK_MONITOR'         => array('routine', 'خطاف الوقائع في وضع المراقبة'),
+    'FANOUT_TS'                  => array('routine', 'مروحة أثر ساعات وقعت'),
+    'tickets_cron_run'           => array('routine', 'تشغيل مهمة البلاغات المجدولة'),
+    'PROJECT_CREATED'            => array('routine', 'أنشئ مشروع'),
+    'PROJECT_UPDATED'            => array('routine', 'عدل مشروع'),
+    'PROJECT_UPDATE_REQUESTED'   => array('routine', 'طلب تعديل مشروع'),
+    'PROJECT_DELETE_REQUESTED'   => array('routine', 'طلب حذف مشروع'),
+    'PROJECT_SOFT_DELETED'       => array('routine', 'أرشف مشروع'),
+    'CEO_APPROVAL_DECIDED'       => array('routine', 'بت الرئيس في اعتماد'),
+    'CEO_CONTRACT_SIGNED'        => array('routine', 'وقع الرئيس عقدا'),
 );
 
 $SEC_GRADES = array(
     'violation' => array('مخالفة',      'badge-danger'),
     'warning'   => array('تحذير',       'badge-warning'),
-    'routine'   => array('حدثٌ روتيني', 'badge-secondary'),
+    'routine'   => array('حدث روتيني', 'badge-secondary'),
 );
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -374,79 +374,79 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     $header_actions = array();
     $header_back    = array();
     $header_context = array(
-        'المقام'  => 'logs/security.log — قراءةٌ فقط',
-        'المقروء' => $readCount ? ('آخر ' . number_format($readCount) . ' حدثًا') : 'لا شيء',
+        'المقام'  => 'logs/security.log — قراءة فقط',
+        'المقروء' => $readCount ? ('آخر ' . number_format($readCount) . ' حدثا') : 'لا شيء',
         'من'      => $readFrom !== '' ? $readFrom : '—',
         'إلى'     => $readTo !== '' ? $readTo : '—',
     );
     include('../includes/page_header.php');
     // UXW-01 ⑨: تكملةُ حالاتِ الشاشةِ الدنيا — الفراغُ قائمٌ سلفًا (ems_state_empty
     // أسفلَ الجدول) فيُضاف التحميلُ والخطأُ وحدَهما مخفيَّين، بلا تكرارِ الفراغ
-    echo ems_state('loading', 'جارٍ قراءةُ نافذةِ سجلِّ الأمان', '', '', true);
-    echo ems_state('error', 'تعذّر قراءةُ سجلِّ الأمان', 'راجِعْ صلاحياتِ الوصولِ إلى logs/security.log ثم أعد المحاولة', '', true);
+    echo ems_state('loading', 'جار قراءة نافذة سجل الأمان', '', '', true);
+    echo ems_state('error', 'تعذر قراءة سجل الأمان', 'راجع صلاحيات الوصول إلى logs/security.log ثم أعد المحاولة', '', true);
     ems_screen_about(
-        'سجلُّ الأمانِ الخامُّ كما يكتبه الحرّاسُ في الملفِّ — لا في القاعدة. يعرض ما رفضه '
-        . 'حارسُ الكيانِ وحارسُ رموزِ الحماية وفاحصُ ثوابتِ الأدوارِ وحاجبُ تعديلِ البنية، '
-        . 'مترجَمًا إلى جملٍ عربيةٍ ومصنَّفًا ثلاثَ درجات.',
+        'سجل الأمان الخام كما يكتبه الحراس في الملف — لا في القاعدة. يعرض ما رفضه '
+        . 'حارس الكيان وحارس رموز الحماية وفاحص ثوابت الأدوار وحاجب تعديل البنية، '
+        . 'مترجما إلى جمل عربية ومصنفا ثلاث درجات.',
         array(
-            'الملفُّ يتجاوز ستين ميجابايتًا: يُقرأ من نهايته بنافذةٍ محدودة — فالمعروضُ آخرُ الأحداثِ لا كلُّها',
-            'أكثرُ من نصفِ السجلِّ تسجيلٌ روتينيٌّ لا مخالفة — ولذلك يُخفى بالافتراضِ ويُظهره زرٌّ صريح',
-            'أسطرُ أدواتِ الاختبار (زائرٌ · عنوانٌ مجهول · curl) مستبعَدةٌ بالافتراض — القرارُ على المتصفحاتِ الحقيقيةِ وحدَها',
+            'الملف يتجاوز ستين ميجابايتا: يقرأ من نهايته بنافذة محدودة — فالمعروض آخر الأحداث لا كلها',
+            'أكثر من نصف السجل تسجيل روتيني لا مخالفة — ولذلك يخفى بالافتراض ويظهره زر صريح',
+            'أسطر أدوات الاختبار (زائر · عنوان مجهول · curl) مستبعدة بالافتراض — القرار على المتصفحات الحقيقية وحدها',
         ));
     ?>
 
     <?php if ($logErr === 'missing'): ?>
         <div class="alert alert-warning">
-            <strong>لا ملفَّ سجلٍّ بعد.</strong>
-            المسارُ <code>logs/security.log</code> غيرُ موجود — ولم يُكتب فيه حدثٌ أمنيٌّ حتى الآن.
-            هذه حالةٌ طبيعيةٌ قبلَ أولِ حدث، وليست عطبًا.
+            <strong>لا ملف سجل بعد.</strong>
+            المسار <code>logs/security.log</code> غير موجود — ولم يكتب فيه حدث أمني حتى الآن.
+            هذه حالة طبيعية قبل أول حدث، وليست عطبا.
         </div>
     <?php elseif ($logErr === 'unreadable'): ?>
         <div class="alert alert-danger">
-            <strong>تعذّرت قراءةُ ملفِّ السجل.</strong>
-            المسارُ <code>logs/security.log</code> موجودٌ ولكنْ **لم يُفتح** — راجعْ أذوناتِ الملفِّ
-            على الخادم. <em>ولا يُعرض جدولٌ هنا: جدولٌ فارغٌ في هذه الحالةِ يكذب «لا أحداثَ»
-            بينما الأحداثُ قائمةٌ ولم تُقرأ.</em>
+            <strong>تعذرت قراءة ملف السجل.</strong>
+            المسار <code>logs/security.log</code> موجود ولكن **لم يفتح** — راجع أذونات الملف
+            على الخادم. <em>ولا يعرض جدول هنا: جدول فارغ في هذه الحالة يكذب «لا أحداث»
+            بينما الأحداث قائمة ولم تقرأ.</em>
         </div>
     <?php else: ?>
 
     <?php
     /* ── بطاقاتُ المؤشرات — كلُّها قابلةٌ للنقرِ تطبّق فلترَها ─────────────── */
     require_once __DIR__ . '/../includes/kpi_card.php';
-    $periodLabel = 'النافذةُ المقروءة (' . ($readFrom !== '' ? $readFrom : '—') . ' ← ' . ($readTo !== '' ? $readTo : '—') . ')';
+    $periodLabel = 'النافذة المقروءة (' . ($readFrom !== '' ? $readFrom : '—') . ' ← ' . ($readTo !== '' ? $readTo : '—') . ')';
     ?>
     <div class="ems-grid">
         <?php
         echo ems_kpi_card(array(
             'title' => 'إجمالي المعروض', 'value' => number_format(count($rows)), 'unit' => 'حدث',
             'period' => $periodLabel, 'status' => 'neutral', 'drill' => sec_url(array('grade' => 'all')),
-            'comparison' => 'من ' . number_format($readCount) . ' حدثًا مقروءًا',
-            'scope' => 'انقر: أظهرِ الروتينيَّ أيضًا', 'icon' => 'fa-list', 'class' => 'ems-col-4'));
+            'comparison' => 'من ' . number_format($readCount) . ' حدثا مقروءا',
+            'scope' => 'انقر: أظهر الروتيني أيضا', 'icon' => 'fa-list', 'class' => 'ems-col-4'));
 
         echo ems_kpi_card(array(
             'title' => 'مخالفات', 'value' => number_format($cViolation), 'unit' => 'حدث',
             'period' => $periodLabel, 'status' => $cViolation > 0 ? 'err' : 'ok',
             'drill' => sec_url(array('grade' => 'violation')),
-            'scope' => 'انقر: اقصرِ العرضَ عليها', 'icon' => 'fa-ban', 'class' => 'ems-col-4'));
+            'scope' => 'انقر: اقصر العرض عليها', 'icon' => 'fa-ban', 'class' => 'ems-col-4'));
 
         echo ems_kpi_card(array(
             'title' => 'تحذيرات', 'value' => number_format($cWarning), 'unit' => 'حدث',
             'period' => $periodLabel, 'status' => $cWarning > 0 ? 'warn' : 'ok',
             'drill' => sec_url(array('grade' => 'warning')),
-            'scope' => 'انقر: اقصرِ العرضَ عليها', 'icon' => 'fa-triangle-exclamation', 'class' => 'ems-col-4'));
+            'scope' => 'انقر: اقصر العرض عليها', 'icon' => 'fa-triangle-exclamation', 'class' => 'ems-col-4'));
 
         echo ems_kpi_card(array(
-            'title' => 'أكثرُ نوعٍ تكرارًا', 'value' => $topType === null ? '0' : number_format($topTypeN),
+            'title' => 'أكثر نوع تكرارا', 'value' => $topType === null ? '0' : number_format($topTypeN),
             'unit' => 'حدث', 'period' => $periodLabel, 'status' => $topType === null ? 'ok' : 'warn',
             'drill' => $topType === null ? sec_url(array()) : sec_url(array('type' => $topType, 'grade' => 'all')),
-            'scope' => $topType === null ? 'لا نوعَ في المعروض' : sec_classify($topType, $SEC_EVENT_MAP)[1],
+            'scope' => $topType === null ? 'لا نوع في المعروض' : sec_classify($topType, $SEC_EVENT_MAP)[1],
             'icon' => 'fa-layer-group', 'class' => 'ems-col-4'));
 
         echo ems_kpi_card(array(
-            'title' => 'أكثرُ مستخدمٍ ظهورًا', 'value' => $topUser === null ? '0' : number_format($topUserN),
+            'title' => 'أكثر مستخدم ظهورا', 'value' => $topUser === null ? '0' : number_format($topUserN),
             'unit' => 'حدث', 'period' => $periodLabel, 'status' => 'neutral',
             'drill' => $topUser === null ? sec_url(array()) : sec_url(array('user' => $topUser, 'grade' => 'all')),
-            'scope' => $topUser === null ? 'لا مستخدمَ في المعروض'
+            'scope' => $topUser === null ? 'لا مستخدم في المعروض'
                      : ($topUserName !== '' ? $topUserName : 'بلا اسم') . ' (' . $topUser . ')',
             'icon' => 'fa-user', 'class' => 'ems-col-4'));
         ?>
@@ -460,37 +460,37 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     <form method="get" action="security_log.php" class="ems-card">
         <div class="ems-grid">
             <div class="ems-col-3">
-                <label for="secWin">حجمُ النافذةِ المقروءة</label>
+                <label for="secWin">حجم النافذة المقروءة</label>
                 <select id="secWin" name="win" class="form-control form-control-sm">
                     <?php foreach ($WIN_CHOICES as $w): ?>
                     <option value="<?php echo $w; ?>" <?php echo $win === $w ? 'selected' : ''; ?>>
-                        آخر <?php echo number_format($w); ?> حدثًا</option>
+                        آخر <?php echo number_format($w); ?> حدثا</option>
                     <?php endforeach; ?>
                 </select>
             </div>
             <div class="ems-col-3">
                 <label for="secGrade">الدرجة</label>
                 <select id="secGrade" name="grade" class="form-control form-control-sm">
-                    <option value="flagged"   <?php echo $grade === 'flagged'   ? 'selected' : ''; ?>>مخالفاتٌ وتحذيراتٌ (الافتراضي)</option>
-                    <option value="violation" <?php echo $grade === 'violation' ? 'selected' : ''; ?>>مخالفاتٌ فقط</option>
-                    <option value="warning"   <?php echo $grade === 'warning'   ? 'selected' : ''; ?>>تحذيراتٌ فقط</option>
-                    <option value="routine"   <?php echo $grade === 'routine'   ? 'selected' : ''; ?>>الأحداثُ الروتينيةُ فقط</option>
-                    <option value="all"       <?php echo $grade === 'all'       ? 'selected' : ''; ?>>الكلُّ بما فيه الروتيني</option>
+                    <option value="flagged"   <?php echo $grade === 'flagged'   ? 'selected' : ''; ?>>مخالفات وتحذيرات (الافتراضي)</option>
+                    <option value="violation" <?php echo $grade === 'violation' ? 'selected' : ''; ?>>مخالفات فقط</option>
+                    <option value="warning"   <?php echo $grade === 'warning'   ? 'selected' : ''; ?>>تحذيرات فقط</option>
+                    <option value="routine"   <?php echo $grade === 'routine'   ? 'selected' : ''; ?>>الأحداث الروتينية فقط</option>
+                    <option value="all"       <?php echo $grade === 'all'       ? 'selected' : ''; ?>>الكل بما فيه الروتيني</option>
                 </select>
             </div>
             <div class="ems-col-3">
                 <label for="secPeriod">الفترة</label>
                 <select id="secPeriod" name="period" class="form-control form-control-sm">
-                    <option value="all"   <?php echo $period === 'all'   ? 'selected' : ''; ?>>كلُّ النافذةِ المقروءة</option>
+                    <option value="all"   <?php echo $period === 'all'   ? 'selected' : ''; ?>>كل النافذة المقروءة</option>
                     <option value="today" <?php echo $period === 'today' ? 'selected' : ''; ?>>اليوم</option>
                     <option value="7"     <?php echo $period === '7'     ? 'selected' : ''; ?>>آخر ٧ أيام</option>
-                    <option value="30"    <?php echo $period === '30'    ? 'selected' : ''; ?>>آخر ٣٠ يومًا</option>
+                    <option value="30"    <?php echo $period === '30'    ? 'selected' : ''; ?>>آخر ٣٠ يوما</option>
                 </select>
             </div>
             <div class="ems-col-3">
-                <label for="secType">نوعُ الحدث</label>
+                <label for="secType">نوع الحدث</label>
                 <select id="secType" name="type" class="form-control form-control-sm">
-                    <option value="">كلُّ الأنواع</option>
+                    <option value="">كل الأنواع</option>
                     <?php foreach ($typesInWin as $t => $n):
                         $cl = sec_classify($t, $SEC_EVENT_MAP); ?>
                     <option value="<?php echo htmlspecialchars($t); ?>" <?php echo $fType === $t ? 'selected' : ''; ?>>
@@ -501,7 +501,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
             <div class="ems-col-3">
                 <label for="secUser">المستخدم</label>
                 <select id="secUser" name="user" class="form-control form-control-sm">
-                    <option value="">كلُّ المستخدمين</option>
+                    <option value="">كل المستخدمين</option>
                     <?php foreach ($usersInWin as $uid => $u): ?>
                     <option value="<?php echo htmlspecialchars((string) $uid); ?>" <?php echo $fUser === (string) $uid ? 'selected' : ''; ?>>
                         <?php echo htmlspecialchars($u['name'] !== '' ? $u['name'] : 'بلا اسم'); ?>
@@ -510,23 +510,23 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                 </select>
             </div>
             <div class="ems-col-3">
-                <label for="secQ">بحثٌ في التفاصيل</label>
+                <label for="secQ">بحث في التفاصيل</label>
                 <input type="text" id="secQ" name="q" class="form-control form-control-sm"
-                       value="<?php echo htmlspecialchars($q); ?>" placeholder="نصٌّ داخل Details">
+                       value="<?php echo htmlspecialchars($q); ?>" placeholder="نص داخل Details">
             </div>
             <div class="ems-col-3">
-                <label for="secNoise">ضجيجُ أدواتِ الاختبار</label>
+                <label for="secNoise">ضجيج أدوات الاختبار</label>
                 <div>
                     <input type="checkbox" id="secNoise" name="noise" value="1" <?php echo $noise ? 'checked' : ''; ?>>
-                    <span class="text-muted">أظهرْ أسطرَ الزائرِ وcurl والعنوانِ المجهول</span>
+                    <span class="text-muted">أظهر أسطر الزائر وcurl والعنوان المجهول</span>
                 </div>
             </div>
             <div class="ems-col-3">
-                <button type="submit" class="btn-primary">تطبيقُ الترشيح</button>
+                <button type="submit" class="btn-primary">تطبيق الترشيح</button>
                 <?php if ($grade === 'flagged'): ?>
-                <a class="btn-secondary" href="<?php echo htmlspecialchars(sec_url(array('grade' => 'all'))); ?>">إظهارُ الأحداثِ الروتينية</a>
+                <a class="btn-secondary" href="<?php echo htmlspecialchars(sec_url(array('grade' => 'all'))); ?>">إظهار الأحداث الروتينية</a>
                 <?php else: ?>
-                <a class="btn-secondary" href="<?php echo htmlspecialchars(sec_url(array('grade' => 'flagged'))); ?>">إخفاءُ الأحداثِ الروتينية</a>
+                <a class="btn-secondary" href="<?php echo htmlspecialchars(sec_url(array('grade' => 'flagged'))); ?>">إخفاء الأحداث الروتينية</a>
                 <?php endif; ?>
             </div>
         </div>
@@ -537,22 +537,22 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     <div class="card"><div class="card-body table-responsive">
         <h6>الأحداث (<?php echo number_format(count($rows)); ?>)
             <small class="text-muted">
-                — مقروءٌ من نهايةِ الملفِّ: <?php echo number_format($readCount); ?> حدثًا
+                — مقروء من نهاية الملف: <?php echo number_format($readCount); ?> حدثا
                 <?php if (!empty($GLOBALS['SEC_WINDOW_TRUNCATED'])): ?>
-                    من أصلِ ملفٍّ حجمُه <?php echo number_format(round(($GLOBALS['SEC_FILE_SIZE'] ?? 0) / 1048576, 1), 1); ?> ميجابايت
+                    من أصل ملف حجمه <?php echo number_format(round(($GLOBALS['SEC_FILE_SIZE'] ?? 0) / 1048576, 1), 1); ?> ميجابايت
                 <?php endif; ?>
                 <?php if (!$noise && $cHarnessHidden > 0): ?>
-                    · أُخفي <?php echo number_format($cHarnessHidden); ?> سطرَ أدواتِ اختبار
+                    · أخفي <?php echo number_format($cHarnessHidden); ?> سطر أدوات اختبار
                 <?php endif; ?>
             </small>
         </h6>
 
         <?php if (!$rows): ?>
             <?php if ($filtersActive) {
-                ems_state_empty('لا نتائجَ لهذا الترشيح — والنافذةُ المقروءةُ فيها '
-                    . number_format($readCount) . ' حدثًا. وسّعِ الفترةَ أو الدرجةَ، أو فرّغِ الفلاترَ من رأسِ الشريط.');
+                ems_state_empty('لا نتائج لهذا الترشيح — والنافذة المقروءة فيها '
+                    . number_format($readCount) . ' حدثا. وسع الفترة أو الدرجة، أو فرغ الفلاتر من رأس الشريط.');
             } else {
-                ems_state_empty('لا أحداثَ أمنيةٍ في النافذةِ المقروءة — الحرّاسُ هادئون ✨');
+                ems_state_empty('لا أحداث أمنية في النافذة المقروءة — الحراس هادئون ✨');
             } ?>
         <?php else: ?>
         <div class="table-container">
@@ -576,7 +576,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     </td>
                     <td>
                         <?php if ($ev['harness']): ?>
-                            <span class="badge badge-secondary">زائرٌ/أداة</span>
+                            <span class="badge badge-secondary">زائر/أداة</span>
                             <small class="text-muted"><?php echo htmlspecialchars($ev['user_name'] !== '' ? $ev['user_name'] : '—'); ?></small>
                         <?php else: ?>
                             <?php echo htmlspecialchars($ev['user_name'] !== '' ? $ev['user_name'] : 'بلا اسم'); ?>
@@ -586,7 +586,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <td>
                         <?php echo htmlspecialchars($ev['sentence']); ?>
                         <?php if ($ev['unmapped']): ?>
-                            <span class="badge badge-info">نوعٌ غيرُ مصنَّف</span>
+                            <span class="badge badge-info">نوع غير مصنف</span>
                         <?php endif; ?>
                     </td>
                     <td><span class="badge <?php echo $g[1]; ?>"><?php echo htmlspecialchars($g[0]); ?></span></td>
@@ -594,7 +594,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <td><?php echo htmlspecialchars($ev['ip'] !== '' ? $ev['ip'] : '—'); ?></td>
                     <td>
                         <details>
-                            <summary>السطرُ الخام</summary>
+                            <summary>السطر الخام</summary>
                             <pre><?php echo htmlspecialchars($ev['raw']); ?></pre>
                         </details>
                     </td>

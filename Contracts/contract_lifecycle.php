@@ -102,8 +102,8 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     include('../includes/page_header.php');
     if (isset($_GET['msg'])) { echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>'; }
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا وقائعَ دورةِ حياةٍ مسجَّلةً على هذا العقد بعدُ',
-                           'اختر عقدًا من جدولِ العقود ثم سجّل الواقعةَ بتاريخِ أثرِها ومرجعِ قرارِها');
+    echo ems_states_bundle('لا وقائع دورة حياة مسجلة على هذا العقد بعد',
+                           'اختر عقدا من جدول العقود ثم سجل الواقعة بتاريخ أثرها ومرجع قرارها');
     ?>
 
     <style>
@@ -128,27 +128,27 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     <div class="card"><div class="card-body">
         <p class="lc-note">
             <i class="fas fa-circle-info"></i>
-            لكلِّ حالةٍ <strong>أثرٌ ماليٌّ محدد</strong> على خمسة عناصر — و<strong>الأثرُ محكومٌ بالحالة لا يُختار</strong>:
-            من أراد أثرًا مخالفًا <strong>يلزمه تغييرُ الحالة</strong>.
-            و<strong>المنفَّذُ غيرُ المفوتر لا يسقط بالإنهاء</strong> مهما كان سببُه —
-            <strong>والعملُ المنفَّذ حقٌّ مكتسب</strong>.
-            و<strong>لا خصمَ ولا تعويضَ إلا بمادةٍ من العقد وحسابٍ موثَّق</strong> — وإلا فهي مطالبةٌ تفاوضيةٌ لا خصمٌ نظامي.
-            و<strong>لا أثرَ رجعي</strong>: لكلِّ حالةٍ تاريخُ أثرٍ محدد.
-            <br><strong>وهذه الشاشةُ تُقرّر ولا تُنفّذ</strong> — الردُّ والفوترةُ وإقفالُ الحاويات لكلٍّ بيتُه.
+            لكل حالة <strong>أثر مالي محدد</strong> على خمسة عناصر — و<strong>الأثر محكوم بالحالة لا يختار</strong>:
+            من أراد أثرا مخالفا <strong>يلزمه تغيير الحالة</strong>.
+            و<strong>المنفذ غير المفوتر لا يسقط بالإنهاء</strong> مهما كان سببه —
+            <strong>والعمل المنفذ حق مكتسب</strong>.
+            و<strong>لا خصم ولا تعويض إلا بمادة من العقد وحساب موثق</strong> — وإلا فهي مطالبة تفاوضية لا خصم نظامي.
+            و<strong>لا أثر رجعي</strong>: لكل حالة تاريخ أثر محدد.
+            <br><strong>وهذه الشاشة تقرر ولا تنفذ</strong> — الرد والفوترة وإقفال الحاويات لكل بيته.
         </p>
     </div></div>
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-table"></i>
-        جدولُ §6 — <strong>الحالاتُ الثماني بأثرها الخماسي</strong></h5></div>
+        جدول §6 — <strong>الحالات الثماني بأثرها الخماسي</strong></h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap no-datatable lc-table" data-no-dt="1">
-            <thead><tr><th>الحالة</th><th>المقدَّم</th><th>الضمان</th>
-                <th>المنفَّذُ غيرُ المفوتر</th><th>الغرامات</th><th>الحاويات</th>
+            <thead><tr><th>الحالة</th><th>المقدم</th><th>الضمان</th>
+                <th>المنفذ غير المفوتر</th><th>الغرامات</th><th>الحاويات</th>
                 <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                 <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                 <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                 <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -169,7 +169,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     <div class="card"><div class="card-header"><h5><i class="fa fa-file-contract"></i> العقود</h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap no-datatable lc-table" data-no-dt="1">
-            <thead><tr><th>#</th><th>العميل</th><th>المدة</th><th>حالُ العقد</th><th></th></tr></thead>
+            <thead><tr><th>#</th><th>العميل</th><th>المدة</th><th>حال العقد</th><th></th></tr></thead>
             <tbody>
             <?php foreach ($contracts as $c): ?>
                 <tr><td>#<?php echo intval($c['id']); ?></td>
@@ -177,7 +177,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     <td><?php echo htmlspecialchars((string)$c['actual_start'] . ' → ' . (string)$c['actual_end']); ?></td>
                     <td><?php echo htmlspecialchars((string)$c['contract_status']); ?></td>
                     <td><a class="action-btn" href="?contract=<?php echo intval($c['id']); ?>">
-                        <i class="fa fa-scale-unbalanced"></i> دورةُ الحياة</a></td></tr>
+                        <i class="fa fa-scale-unbalanced"></i> دورة الحياة</a></td></tr>
             <?php endforeach; ?>
             </tbody>
         </table>
@@ -185,7 +185,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
 
     <?php if ($CID > 0): ?>
     <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i>
-        خطةُ العمل بأرقام العقد #<?php echo $CID; ?> الحيّة</h5></div>
+        خطة العمل بأرقام العقد #<?php echo $CID; ?> الحية</h5></div>
     <div class="card-body">
         <form method="get" class="lc-filter-form">
             <input type="hidden" name="contract" value="<?php echo $CID; ?>">
@@ -200,21 +200,21 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
 
         <?php if ($plan !== null && $plan['ok']): ?>
         <div class="lc-badges">
-            <span class="badge badge-secondary lc-badge-pad">رصيدُ المقدَّم
+            <span class="badge badge-secondary lc-badge-pad">رصيد المقدم
                 <?php echo $plan['figures']['advance_balance']; ?></span>
-            <span class="badge badge-secondary lc-badge-pad">المحتجَز
+            <span class="badge badge-secondary lc-badge-pad">المحتجز
                 <?php echo $plan['figures']['retention_balance']; ?></span>
-            <span class="badge badge-info lc-badge-pad">منفَّذ
+            <span class="badge badge-info lc-badge-pad">منفذ
                 <?php echo $plan['figures']['executed']; ?></span>
-            <span class="badge badge-success lc-badge-pad">مفوتَر
+            <span class="badge badge-success lc-badge-pad">مفوتر
                 <?php echo $plan['figures']['billed']; ?></span>
             <span class="badge lc-badge-pad <?php echo $plan['figures']['unbilled'] > 0.004
                 ? 'badge-warning' : 'badge-secondary'; ?>">
-                منفَّذٌ غيرُ مفوتر <?php echo $plan['figures']['unbilled']; ?></span>
+                منفذ غير مفوتر <?php echo $plan['figures']['unbilled']; ?></span>
         </div>
         <div class="table-container">
         <table class="alltables display nowrap no-datatable lc-table" data-no-dt="1">
-            <thead><tr><th>المجال</th><th>القاعدة</th><th>الرقمُ الحيّ</th><th>بيتُ التنفيذ</th></tr></thead>
+            <thead><tr><th>المجال</th><th>القاعدة</th><th>الرقم الحي</th><th>بيت التنفيذ</th></tr></thead>
             <tbody>
             <?php foreach ($plan['actions'] as $a): ?>
                 <tr<?php echo mb_strpos((string)$a['area'], '⚠') !== false ? ' class="lc-row-warn"' : ''; ?>>
@@ -233,40 +233,40 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         <?php echo csrf_field(); ?>
             <input type="hidden" name="lc_action" value="record">
             <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
-            <h6><i class="fa fa-plus"></i> سجّل واقعةً — <strong>وأثرُها يُكتب من الجدول لا من الطلب</strong></h6>
+            <h6><i class="fa fa-plus"></i> سجل واقعة — <strong>وأثرها يكتب من الجدول لا من الطلب</strong></h6>
             <div class="lc-grid-8">
                 <div class="form-group"><label for="emsf_64_c388f">الحالة</label>
                     <select name="state" id="emsf_64_c388f">
                         <?php foreach ($STATE_AR as $k => $v): ?>
                             <option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option>
                         <?php endforeach; ?></select></div>
-                <div class="form-group"><label for="emsf_65_20b95">تاريخُ الأثر <span class="lc-req">*</span></label>
+                <div class="form-group"><label for="emsf_65_20b95">تاريخ الأثر <span class="lc-req">*</span></label>
                     <input type="date" name="effect_date" required id="emsf_65_20b95"></div>
-                <div class="form-group"><label for="emsf_66_8f235">مرجعُ القرار <small>(إلزاميٌّ للإنهاء والإلغاء)</small></label>
+                <div class="form-group"><label for="emsf_66_8f235">مرجع القرار <small>(إلزامي للإنهاء والإلغاء)</small></label>
                     <input type="text" name="decision_ref" maxlength="120" class="lc-w170" id="emsf_66_8f235"></div>
                 <div class="form-group"><label for="emsf_67_6fd1a">تعويض/غرامة</label>
                     <input type="number" step="0.01" name="claim_amount" class="lc-w130" id="emsf_67_6fd1a"></div>
                 <div class="form-group"><label for="emsf_68_a0e1a">العملة</label>
                     <input type="text" name="claim_currency" maxlength="8" class="lc-w80" id="emsf_68_a0e1a"></div>
-                <div class="form-group lc-mw280"><label for="emsf_69_47131">مادةُ العقد الحاكمة
-                    <small>(إلزاميةٌ مع أيِّ مبلغ)</small></label>
+                <div class="form-group lc-mw280"><label for="emsf_69_47131">مادة العقد الحاكمة
+                    <small>(إلزامية مع أي مبلغ)</small></label>
                     <input type="text" name="contract_article" maxlength="200" id="emsf_69_47131"></div>
-                <div class="form-group"><label for="emsf_70_c95a7">مستندُ الحساب</label>
+                <div class="form-group"><label for="emsf_70_c95a7">مستند الحساب</label>
                     <input type="text" name="claim_doc_ref" maxlength="120" class="lc-w150" id="emsf_70_c95a7"></div>
                 <div class="form-group lc-mw220"><label for="emsf_71_96ae0">ملاحظة</label>
                     <input type="text" name="note" maxlength="255" id="emsf_71_96ae0"></div>
             </div>
-            <button type="submit" class="btn-primary"><i class="fa fa-save"></i> سجّل الواقعة</button>
+            <button type="submit" class="btn-primary"><i class="fa fa-save"></i> سجل الواقعة</button>
         </form>
         <?php endif; ?>
     </div></div>
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-clock-rotate-left"></i>
-        وقائعُ العقد — <?php echo count($events); ?></h5></div>
+        وقائع العقد — <?php echo count($events); ?></h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap no-datatable lc-table" data-no-dt="1">
-            <thead><tr><th>الحالة</th><th>تاريخُ الأثر</th><th>مرجعُ القرار</th>
-                <th>الأثرُ الخماسي</th><th>المطالبة</th><th>المادة</th></tr></thead>
+            <thead><tr><th>الحالة</th><th>تاريخ الأثر</th><th>مرجع القرار</th>
+                <th>الأثر الخماسي</th><th>المطالبة</th><th>المادة</th></tr></thead>
             <tbody>
             <?php foreach ($events as $e): ?>
                 <tr><td><strong><?php echo htmlspecialchars($STATE_AR[(string)$e['state']]); ?></strong></td>

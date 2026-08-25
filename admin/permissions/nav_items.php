@@ -3,7 +3,7 @@ require_once __DIR__ . '/../includes/auth.php';
 super_admin_require_login();
 
 $admin        = super_admin_current();
-$page_title   = 'إدارة قوائم التنقل الموحّدة';
+$page_title   = 'إدارة قوائم التنقل الموحدة';
 $current_page = 'permissions';
 
 include '../config.php';
@@ -25,7 +25,7 @@ $NAV_DOORS = array(
 // المحظور المعماري في الواجهات (UX-00 §4.4) — يُفحص عند حفظ أي اسم عرض.
 $NAV_FORBIDDEN_TERMS = array(
     'المروحة', 'المعالجة الذرية', 'تفريع الأثر', 'الحدث الجذري',
-    'المحرّك', 'المحرك', 'الناشر', 'المطابقة الثلاثية', 'idempotent', 'الجذر المحايد',
+    'المحرك', 'المحرك', 'الناشر', 'المطابقة الثلاثية', 'idempotent', 'الجذر المحايد',
 );
 
 /**
@@ -37,11 +37,11 @@ function nav_label_violation($label, array $doors, array $forbidden)
 {
     $t = trim($label);
     foreach ($doors as $doorName) {
-        if ($t === $doorName) { return 'الاسم يطابق اسم بابٍ («' . $doorName . '») — المجموعات والأبواب ليست شاشات ❌'; }
+        if ($t === $doorName) { return 'الاسم يطابق اسم باب («' . $doorName . '») — المجموعات والأبواب ليست شاشات ❌'; }
     }
     foreach ($forbidden as $term) {
         if ($term !== '' && mb_stripos($t, $term) !== false) {
-            return 'الاسم يحمل مصطلحًا معماريًّا محظورًا في الواجهات («' . $term . '») — UX-00 §4.4 ❌';
+            return 'الاسم يحمل مصطلحا معماريا محظورا في الواجهات («' . $term . '») — UX-00 §4.4 ❌';
         }
     }
     return null;
@@ -56,7 +56,7 @@ if (isset($_GET['toggle_id'])) {
         $row = $mp_nav->selectOne('nav_items', array('columns' => array('id', 'role_id', 'active'), 'where' => array('id' => $id)));
         if ($row) {
             $mp_nav->update('nav_items', array('active' => intval($row['active']) === 1 ? 0 : 1), array('id' => $id));
-            ems_flash_set(intval($row['active']) === 1 ? 'عُطّل العنصر — لن يظهر في القائمة ✔' : 'فُعّل العنصر — يظهر لمن يملك صلاحية العرض ✔');
+            ems_flash_set(intval($row['active']) === 1 ? 'عطل العنصر — لن يظهر في القائمة ✔' : 'فعل العنصر — يظهر لمن يملك صلاحية العرض ✔');
             header('Location: nav_items.php?role_id=' . intval($row['role_id']));
             exit;
         }
@@ -77,7 +77,7 @@ if (isset($_GET['delete_id'])) {
         $stmt = $conn->prepare('DELETE FROM `nav_items` WHERE `id` = ?');
         $stmt->bind_param('i', $id);
         $stmt->execute();
-        ems_flash_set('حُذف العنصر من قائمة الدور ✔');
+        ems_flash_set('حذف العنصر من قائمة الدور ✔');
         header('Location: nav_items.php?role_id=' . $rid);
     } catch (\Throwable $t) {
         error_log('admin nav delete: ' . $t->getMessage());
@@ -137,17 +137,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             if (!empty($_POST['edit_id'])) {
                 $mp_nav->update('nav_items', $data, array('id' => (int) $_POST['edit_id']));
-                ems_flash_set('حُفظ العنصر ✔');
+                ems_flash_set('حفظ العنصر ✔');
                 header('Location: nav_items.php?role_id=' . $role_id);
                 exit;
             }
             $dup = $mp_nav->selectOne('nav_items', array('columns' => array('id'),
                 'where' => array('role_id' => $role_id, 'route' => $route)));
             if ($dup !== null) {
-                $error_msg = 'هذا المسار موجودٌ في قائمة الدور مسبقًا — لا تكرار ❌';
+                $error_msg = 'هذا المسار موجود في قائمة الدور مسبقا — لا تكرار ❌';
             } else {
                 $mp_nav->insert('nav_items', $data);
-                ems_flash_set('أُضيف العنصر لقائمة الدور ✔');
+                ems_flash_set('أضيف العنصر لقائمة الدور ✔');
                 header('Location: nav_items.php?role_id=' . $role_id);
                 exit;
             }
@@ -245,11 +245,11 @@ table.navtbl tr:hover td { background:#f8fafc; }
 
 <div class="page-shell">
     <div class="page-header">
-        <h2><i class="fa fa-sitemap"></i> قوائم التنقل الموحّدة (الأبواب الستة)</h2>
+        <h2><i class="fa fa-sitemap"></i> قوائم التنقل الموحدة (الأبواب الستة)</h2>
         <p class="page-sub">
-            الظهور للمستخدم = عنصرٌ <strong>تابعٌ للدور</strong> هنا (نشط) <strong>و</strong>عنده
-            <strong>صلاحية عرض</strong> على شاشته — العنصر المعطَّل لا يظهر ولو مُنحت صلاحيته،
-            والفاقد للصلاحية لا يظهر ولو كان نشطًا.
+            الظهور للمستخدم = عنصر <strong>تابع للدور</strong> هنا (نشط) <strong>و</strong>عنده
+            <strong>صلاحية عرض</strong> على شاشته — العنصر المعطل لا يظهر ولو منحت صلاحيته،
+            والفاقد للصلاحية لا يظهر ولو كان نشطا.
             <a href="link_groups.php?role_id=<?php echo $selected_role_id; ?>">إدارة المجموعات ↗</a>
         </p>
     </div>
@@ -274,10 +274,10 @@ table.navtbl tr:hover td { background:#f8fafc; }
                 </select>
             </div>
             <div class="stats" style="margin-bottom:0;">
-                <div class="stat"><b><?php echo $stats['total']; ?></b> عنصرًا</div>
-                <div class="stat" style="color:#059669;"><b><?php echo $stats['shown']; ?></b> يظهر فعلًا</div>
-                <div class="stat" style="color:#b45309;"><b><?php echo $stats['perm_hidden']; ?></b> محجوب صلاحيةً</div>
-                <div class="stat" style="color:#475569;"><b><?php echo $stats['inactive']; ?></b> معطَّل (غير تابع)</div>
+                <div class="stat"><b><?php echo $stats['total']; ?></b> عنصرا</div>
+                <div class="stat" style="color:#059669;"><b><?php echo $stats['shown']; ?></b> يظهر فعلا</div>
+                <div class="stat" style="color:#b45309;"><b><?php echo $stats['perm_hidden']; ?></b> محجوب صلاحية</div>
+                <div class="stat" style="color:#475569;"><b><?php echo $stats['inactive']; ?></b> معطل (غير تابع)</div>
             </div>
         </div>
     </div>
@@ -285,7 +285,7 @@ table.navtbl tr:hover td { background:#f8fafc; }
     <div class="card">
         <div class="card-header">
             <span><i class="fa <?php echo $editData ? 'fa-pen' : 'fa-plus'; ?>"></i>
-                <?php echo $editData ? 'تعديل عنصر' : 'إضافة عنصرٍ لقائمة الدور'; ?></span>
+                <?php echo $editData ? 'تعديل عنصر' : 'إضافة عنصر لقائمة الدور'; ?></span>
             <?php if ($editData): ?><a class="btn back-btn" href="nav_items.php?role_id=<?php echo $selected_role_id; ?>">إلغاء التعديل</a><?php endif; ?>
         </div>
         <div class="card-body">
@@ -302,7 +302,7 @@ table.navtbl tr:hover td { background:#f8fafc; }
                         </select>
                     </div>
                     <div>
-                        <label for="emsf_689_b5688">المجموعة (فاصلٌ داخل الباب)</label>
+                        <label for="emsf_689_b5688">المجموعة (فاصل داخل الباب)</label>
                         <select name="group_id" id="emsf_689_b5688">
                             <option value="">— بلا مجموعة —</option>
                             <?php foreach ($role_groups as $g): ?>
@@ -314,7 +314,7 @@ table.navtbl tr:hover td { background:#f8fafc; }
                     </div>
                     <div>
                         <label for="emsf_690_8d38d">اسم العرض *</label>
-                        <input type="text" name="label_ar" required value="<?php echo htmlspecialchars($editData['label_ar'] ?? ''); ?>" placeholder="بلغة المهمة — لا مصطلحَ معماريًّا" id="emsf_690_8d38d">
+                        <input type="text" name="label_ar" required value="<?php echo htmlspecialchars($editData['label_ar'] ?? ''); ?>" placeholder="بلغة المهمة — لا مصطلح معماريا" id="emsf_690_8d38d">
                     </div>
                     <div>
                         <label for="emsf_691_02116">المسار *</label>
@@ -334,14 +334,14 @@ table.navtbl tr:hover td { background:#f8fafc; }
                         <input type="number" name="sort_order" value="<?php echo intval($editData['sort_order'] ?? 0); ?>" id="emsf_693_c424f">
                     </div>
                     <div>
-                        <label for="emsf_694_43bc6">مصدر العدّاد (اختياري)</label>
+                        <label for="emsf_694_43bc6">مصدر العداد (اختياري)</label>
                         <input type="text" name="counter_source" dir="ltr" value="<?php echo htmlspecialchars($editData['counter_source'] ?? ''); ?>" placeholder="hours_approval" id="emsf_694_43bc6">
                     </div>
                     <div>
                         <label for="emsf_695_dac58">الحالة</label>
                         <select name="active" id="emsf_695_dac58">
-                            <option value="1" <?php echo (!$editData || intval($editData['active']) === 1) ? 'selected' : ''; ?>>نشط (تابعٌ للدور)</option>
-                            <option value="0" <?php echo ($editData && intval($editData['active']) === 0) ? 'selected' : ''; ?>>معطَّل</option>
+                            <option value="1" <?php echo (!$editData || intval($editData['active']) === 1) ? 'selected' : ''; ?>>نشط (تابع للدور)</option>
+                            <option value="0" <?php echo ($editData && intval($editData['active']) === 0) ? 'selected' : ''; ?>>معطل</option>
                         </select>
                     </div>
                 </div>
@@ -359,7 +359,7 @@ table.navtbl tr:hover td { background:#f8fafc; }
                 <thead><tr>
                     <th>إجراءات</th>
                     <th>الاسم</th><th>المسار</th><th>المجموعة</th><th>الترتيب</th>
-                    <th>العدّاد</th><th>الحالة الفعلية</th>
+                    <th>العداد</th><th>الحالة الفعلية</th>
                 </tr></thead>
                 <tbody>
                 <?php
@@ -373,7 +373,7 @@ table.navtbl tr:hover td { background:#f8fafc; }
                         ? '<span class="badge badge-shown">يظهر</span>'
                         : (intval($it['active']) === 1
                             ? '<span class="badge badge-perm">محجوب — بلا صلاحية عرض</span>'
-                            : '<span class="badge badge-off">معطَّل — غير تابع</span>');
+                            : '<span class="badge badge-off">معطل — غير تابع</span>');
                     echo '<tr>';
                     echo '<td style="white-space:nowrap;">';
                     echo '<a class="btn ' . (intval($it['active']) === 1 ? 'btn-danger' : 'btn-primary') . '" href="?toggle_id=' . intval($it['id']) . '&role_id=' . $selected_role_id . '">'
@@ -389,7 +389,7 @@ table.navtbl tr:hover td { background:#f8fafc; }
                     echo '</tr>';
                 }
                 if (empty($items)) {
-                    echo '<tr><td colspan="7" style="text-align:center;color:#64748b;padding:2rem;">لا عناصرَ لهذا الدور بعد — هذا الدور ما زال على مصادره القديمة حتى يُبذر ويُفعَّل في العلم.</td></tr>';
+                    echo '<tr><td colspan="7" style="text-align:center;color:#64748b;padding:2rem;">لا عناصر لهذا الدور بعد — هذا الدور ما زال على مصادره القديمة حتى يبذر ويفعل في العلم.</td></tr>';
                 }
                 ?>
                 </tbody>

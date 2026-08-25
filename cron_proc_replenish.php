@@ -58,12 +58,12 @@ foreach ($companies as $cid) {
     $reorder = \App\Services\Procurement\ProcReorderService::run($conn, $gate, $cid, 0, $DRY);
     foreach ($reorder['generated'] as $g2) {
         $o("[co$cid] حد الطلب: {$g2['item']} (رصيد {$g2['balance']} ≤ حد {$g2['trigger']}) → "
-            . (isset($g2['request_id']) ? 'طلب #' . $g2['request_id'] : 'سيولَّد') . " بكمية {$g2['qty']}");
+            . (isset($g2['request_id']) ? 'طلب #' . $g2['request_id'] : 'سيولد') . " بكمية {$g2['qty']}");
     }
     foreach ($reorder['skipped'] as $s2) { $o("[co$cid] حد ⏭ {$s2['item']}: {$s2['reason']}"); }
 
     if (!$bridge['generated'] && !$reorder['generated'] && !$bridge['skipped'] && !$reorder['skipped']) {
-        $o("[co$cid] لا احتياجَ جديدًا");
+        $o("[co$cid] لا احتياج جديدا");
     }
 }
 $o('══ اكتمل ══');

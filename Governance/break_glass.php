@@ -38,13 +38,13 @@ $COLS   = array (
   4 => 'الصلاحية المطلوبة',
   5 => 'الشاشة أو الفعل',
   6 => 'سبب الطوارئ',
-  7 => 'الأثر المتوقع لو لم تُمنح',
+  7 => 'الأثر المتوقع لو لم تمنح',
   8 => 'الموافق الأول',
   9 => 'الموافق الثاني',
   10 => 'وقت المنح',
   11 => 'مدة الصلاحية',
   12 => 'وقت الانتهاء',
-  13 => 'عدد الأفعال المنفَّذة تحتها',
+  13 => 'عدد الأفعال المنفذة تحتها',
   14 => 'تقرير المراجعة',
   15 => 'تاريخ المراجعة',
   16 => 'نتيجة المراجعة',
@@ -57,13 +57,13 @@ $FIELDS = array (
   3 => 'الصلاحية المطلوبة',
   4 => 'الشاشة أو الفعل',
   5 => 'سبب الطوارئ',
-  6 => 'الأثر المتوقع لو لم تُمنح',
+  6 => 'الأثر المتوقع لو لم تمنح',
   7 => 'الموافق الأول',
   8 => 'الموافق الثاني',
   9 => 'وقت المنح',
   10 => 'مدة الصلاحية',
   11 => 'وقت الانتهاء',
-  12 => 'عدد الأفعال المنفَّذة تحتها',
+  12 => 'عدد الأفعال المنفذة تحتها',
   13 => 'تقرير المراجعة',
   14 => 'تاريخ المراجعة',
   15 => 'نتيجة المراجعة',
@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     $creator = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
     // الموجة ٢: الحفظ في الجدول الأصلي للشاشة (الفارغ NULL — لا مخزن بينيًّا)
     $ok = cmp03_store_insert($conn, $company_id, $CANONICAL, $payload, $status, $uid, $creator);
-    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
+    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
     exit();
 }
 
@@ -96,7 +96,7 @@ $entityName = $govCtx['values']['entity'] ?? '—';
 function cmp03_cell($col, $row, $entityName) {
     $n = cmp03_screen_norm($col);
     if ($n === cmp03_screen_norm('الكيان')) { return $entityName; }
-    if ($n === cmp03_screen_norm('المُنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المُنشئة')) {
+    if ($n === cmp03_screen_norm('المنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المنشئة')) {
         return $row['created_by_name'] ?: '—';
     }
     if ($n === cmp03_screen_norm('تاريخ الإنشاء')) { return $row['created_at']; }
@@ -111,7 +111,7 @@ function cmp03_screen_norm($s) {
     $s = str_replace(array('أ','إ','آ'), 'ا', $s);
     $s = str_replace('ة', 'ه', $s);
     $s = str_replace('ى', 'ي', $s);
-    return preg_replace('/[ًٌٍَُِّْ]/u', '', $s);
+    return preg_replace('/[]/u', '', $s);
 }
 
 $page_title = 'إيكوبيشن | صلاحية الطوارئ اللحظية (كسر الزجاج)';
@@ -132,11 +132,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     );
     $header_back = false;
     include '../includes/page_header.php';
-    echo ems_next_step('اعتمادُ الموافقَين ثم مراجعةٌ بعديةٌ لكلِّ استعمالٍ للصلاحيةِ الطارئة');
+    echo ems_next_step('اعتماد الموافقين ثم مراجعة بعدية لكل استعمال للصلاحية الطارئة');
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
-    echo ems_states_bundle('لا طلباتِ كسرِ زجاجٍ مسجَّلة', 'صلاحياتُ الطوارئ تُطلب هنا لحظةَ الحاجةِ وتُوثَّق بموافقَيها');
+    echo ems_states_bundle('لا طلبات كسر زجاج مسجلة', 'صلاحيات الطوارئ تطلب هنا لحظة الحاجة وتوثق بموافقيها');
     ?>
 
     <!-- فورم الإضافة الموحد (ems-forms) — مطويٌّ حتى زرِّ الرأس -->
@@ -159,7 +159,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="f4" maxlength="190" id="emsf_530_fb1cd"></div>
                 <div class="form-group"><label for="emsf_531_dbe36">سبب الطوارئ</label>
                     <input type="text" name="f5" maxlength="190" id="emsf_531_dbe36"></div>
-                <div class="form-group"><label for="emsf_532_f45ef">الأثر المتوقع لو لم تُمنح</label>
+                <div class="form-group"><label for="emsf_532_f45ef">الأثر المتوقع لو لم تمنح</label>
                     <input type="text" name="f6" maxlength="190" id="emsf_532_f45ef"></div>
                 <div class="form-group"><label for="emsf_533_0ac55">الموافق الأول</label>
                     <input type="text" name="f7" maxlength="190" id="emsf_533_0ac55"></div>
@@ -171,7 +171,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" inputmode="decimal" name="f10" placeholder="0" id="emsf_536_eed79"></div>
                 <div class="form-group"><label for="emsf_537_bb268">وقت الانتهاء</label>
                     <input type="text" name="f11" maxlength="190" id="emsf_537_bb268"></div>
-                <div class="form-group"><label for="emsf_538_d25e0">عدد الأفعال المنفَّذة تحتها</label>
+                <div class="form-group"><label for="emsf_538_d25e0">عدد الأفعال المنفذة تحتها</label>
                     <input type="text" inputmode="decimal" name="f12" placeholder="0" id="emsf_538_d25e0"></div>
                 <div class="form-group"><label for="emsf_539_169eb">تقرير المراجعة</label>
                     <input type="text" name="f13" maxlength="190" id="emsf_539_169eb"></div>
@@ -193,20 +193,20 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="table-responsive">
         <table class="alltables display" id="break_glassTable">
             <thead><tr>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
             <th>رقم الطلب</th>
             <th>التاريخ والوقت</th>
             <th>الطالب — الاسم والصفة</th>
             <th>الصلاحية المطلوبة</th>
             <th>الشاشة أو الفعل</th>
             <th>سبب الطوارئ</th>
-            <th>الأثر المتوقع لو لم تُمنح</th>
+            <th>الأثر المتوقع لو لم تمنح</th>
             <th>الموافق الأول</th>
             <th>الموافق الثاني</th>
             <th>وقت المنح</th>
             <th>مدة الصلاحية</th>
             <th>وقت الانتهاء</th>
-            <th>عدد الأفعال المنفَّذة تحتها</th>
+            <th>عدد الأفعال المنفذة تحتها</th>
             <th>تقرير المراجعة</th>
             <th>تاريخ المراجعة</th>
             <th>نتيجة المراجعة</th>
@@ -214,7 +214,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="18" class="text-center text-muted">لا بياناتَ بعدُ — أضف أول صفٍّ بزر «إضافة»</td></tr>
+                <tr><td colspan="18" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
                     <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>

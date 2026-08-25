@@ -35,8 +35,8 @@ if (!empty($ENTITY_KEY)) {
    (كما تفعل عُدّةُ u13_screen_kit) — والشاشةُ تخصِّص نصَّها بـ$EMPTY_TITLE/$EMPTY_HINT */
 if (function_exists('ems_states_bundle')) {
     echo ems_states_bundle(
-        isset($EMPTY_TITLE) ? $EMPTY_TITLE : 'لا توجد بياناتٌ لهذه الفترة',
-        isset($EMPTY_HINT)  ? $EMPTY_HINT  : 'غيّر الفترةَ أو تحقق من توفرِ السجلات'
+        isset($EMPTY_TITLE) ? $EMPTY_TITLE : 'لا توجد بيانات لهذه الفترة',
+        isset($EMPTY_HINT)  ? $EMPTY_HINT  : 'غير الفترة أو تحقق من توفر السجلات'
     );
 }
 ?>
@@ -113,7 +113,7 @@ foreach ($headers as $h) {
       <tbody>
 <?php if (!$data): ?>
         <tr><td colspan="<?= max(1, count($headers)) ?>" class="text-center text-muted py-4">
-          لا صفوفَ لعرضِها بعد
+          لا صفوف لعرضها بعد
         </td></tr>
 <?php else: foreach ($data as $r): ?>
         <tr>
@@ -128,8 +128,8 @@ foreach ($headers as $h) {
   </div>
 
   <p class="small text-muted mt-2">
-    ◆ هذه الشاشةُ لا تكتب في جدولٍ مباشرةً — تنادي خدمةً والخدمةُ تكتب.
-    وترتيبُ الحرّاسِ فيها: جلسة ← إعداد ← حارسُ شاشة ← حارسُ فعل ← رمزُ حماية ← معالجُ POST ← عرض.
+    ◆ هذه الشاشة لا تكتب في جدول مباشرة — تنادي خدمة والخدمة تكتب.
+    وترتيب الحراس فيها: جلسة ← إعداد ← حارس شاشة ← حارس فعل ← رمز حماية ← معالج POST ← عرض.
   </p>
 </div>
 </div><!-- .main.ems-unified-page-shell — تُغلَق هنا لا في الشاشة، فالغلافُ

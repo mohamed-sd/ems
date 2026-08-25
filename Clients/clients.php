@@ -260,7 +260,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['client_name'])) {
     // التحقق من صحة كود العميل
     $client_code_raw = isset($_POST['client_code']) ? trim($_POST['client_code']) : '';
     if ($client_code_raw === '' || !preg_match('/^[A-Za-z0-9_\-]+$/', $client_code_raw)) {
-        clients_redirect_with_msg('كود العميل غير صالح. استخدم أحرفًا وأرقامًا و - أو _ فقط ❌');
+        clients_redirect_with_msg('كود العميل غير صالح. استخدم أحرفا وأرقاما و - أو _ فقط ❌');
     }
 
     // التحقق من صحة حالة العميل
@@ -307,7 +307,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['client_name'])) {
                 array($client_code_raw, $client_id));
         } catch (\Throwable $t) { $dup = array(); }
         if (!empty($dup)) {
-            clients_redirect_with_msg('كود العميل موجود مسبقاً داخل شركتك ❌');
+            clients_redirect_with_msg('كود العميل موجود مسبقا داخل شركتك ❌');
         }
 
         // (إعادة ختم company_id في الأصل كانت لا-عمل بنفس القيمة — البوابة تمنع
@@ -348,7 +348,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['client_name'])) {
                 array($client_code_raw));
         } catch (\Throwable $t) { $dup = array(); }
         if (!empty($dup)) {
-            clients_redirect_with_msg('كود العميل موجود مسبقاً داخل شركتك ❌');
+            clients_redirect_with_msg('كود العميل موجود مسبقا داخل شركتك ❌');
         }
 
         try {
@@ -665,7 +665,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
     <?php endif; ?>
 
-    <?php echo ems_states_bundle('لا عملاءَ مسجَّلين ضمن هذا الترشيح', 'أضف عميلًا جديدًا أو غيّر المرشِّحات'); ?>
+    <?php echo ems_states_bundle('لا عملاء مسجلين ضمن هذا الترشيح', 'أضف عميلا جديدا أو غير المرشحات'); ?>
 
     <div class="stats-section clients-hidden" id="clientsStatsSection">
         <div class="stats-grid">
@@ -888,7 +888,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="card-body">
             <?php if (!empty($clients_load_error)): ?>
                 <div class="alert alert-danger clients-table-empty-error cl-1">
-                    ⚠ تعذّر تحميل بيانات العملاء — قد يكون هناك خللٌ مؤقت. يرجى إعادة تحميل الصفحة.
+                    ⚠ تعذر تحميل بيانات العملاء — قد يكون هناك خلل مؤقت. يرجى إعادة تحميل الصفحة.
                 </div>
             <?php endif; ?>
             <div class="table-container">
@@ -916,13 +916,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <th class="ems-fn-th" data-fn="1"<?php echo ems_xf_th_attrs($XF_SCREEN, 'registration_country'); ?>>بلد التسجيل</th>
                             <th class="ems-fn-th" data-fn="1"<?php echo ems_xf_th_attrs($XF_SCREEN, 'commercial_reg_no'); ?>>رقم السجل التجاري</th>
                             <th class="ems-fn-th" data-fn="1"<?php echo ems_xf_th_attrs($XF_SCREEN, 'tax_id'); ?>>الرقم الضريبي</th>
-                            <th class="ems-fn-th" data-fn="1"<?php echo ems_xf_th_attrs($XF_SCREEN, 'registered_address'); ?>>العنوان المسجَّل</th>
+                            <th class="ems-fn-th" data-fn="1"<?php echo ems_xf_th_attrs($XF_SCREEN, 'registered_address'); ?>>العنوان المسجل</th>
                             <th class="ems-fn-th" data-fn="1"<?php echo ems_xf_th_attrs($XF_SCREEN, 'contact_person'); ?>>جهة الاتصال</th>
                             <th class="ems-fn-th" data-fn="1"<?php echo ems_xf_th_attrs($XF_SCREEN, 'contact_title'); ?>>المنصب</th>
                             <th class="ems-fn-th" data-fn="1"<?php echo ems_xf_th_attrs($XF_SCREEN, 'email'); ?>>البريد</th>
                             <th class="ems-fn-th" data-fn="1"<?php echo ems_xf_th_attrs($XF_SCREEN, 'client_classification'); ?>>تصنيف العميل</th>
                             <th class="ems-fn-th" data-fn="1"<?php echo ems_xf_th_attrs($XF_SCREEN, 'importance_tier'); ?>>شريحة الأهمية</th>
-                            <th class="ems-fn-th" data-fn="1"<?php echo ems_xf_th_attrs($XF_SCREEN, 'created_by'); ?>>سجّله</th>
+                            <th class="ems-fn-th" data-fn="1"<?php echo ems_xf_th_attrs($XF_SCREEN, 'created_by'); ?>>سجله</th>
                             <th class="ems-fn-th" data-fn="1"<?php echo ems_xf_th_attrs($XF_SCREEN, 'created_at'); ?>>تاريخ التسجيل</th>
                             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                             <th class="ems-gov-th" data-gov="base_currency" data-slice="3" title="عملة دفاتر الكيان">العملة الأساسية</th>
@@ -963,7 +963,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                     <a href='../movement/client_tree.php?client_id=" . urlencode($row['id']) . "'
                                        class='action-btn view clientTreeBtn'
                                        target='_blank' rel='noopener'
-                                       title='شجرة العميل (مشاريعه ومورّدوه ومعدّاته ومشغّلوه)'>
+                                       title='شجرة العميل (مشاريعه وموردوه ومعداته ومشغلوه)'>
                                         <i class='fas fa-sitemap'></i>
                                     </a>";
 
@@ -1100,8 +1100,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         });
         }
 
-        // الربطُ بعد تهيئةِ المكوّنِ المركزي: إن كان الجدولُ مهيَّأً ربطنا فورًا،
-        // وإلا انتظرنا حدثَ init.dt الذي يطلقه DataTables عند التهيئة.
+        // الربط بعد تهيئة المكون المركزي: إن كان الجدول مهيأ ربطنا فورا،
+        // وإلا انتظرنا حدث init.dt الذي يطلقه DataTables عند التهيئة.
         if ($.fn.dataTable && $.fn.dataTable.isDataTable('#clientsTable')) {
             bindClientsFilters();
         } else {
@@ -1120,15 +1120,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     const statsSection = $('#clientsStatsSection');
 
     /**
-     * إظهارُ حقل «كود العميل المولد» وإخفاؤه.
+     * إظهار حقل «كود العميل المولد» وإخفاؤه.
      *
      * ⚠️ **لا تستعمل `jQuery.hide()` هنا** — `assets/css/ems-forms.css` يحمل:
      *     :is(.allforms, .ems-form) .form-grid > div { display: block !important }
-     * والحقلُ ابنٌ مباشرٌ لـ`.form-grid`، فـ`!important` من ورقة الأنماط تهزم
-     * `display:none` التي يكتبها jQuery **سطريًّا بلا أولوية**. النتيجةُ أن
-     * `hide()` «تنجح» (السمةُ تُكتب فعلًا) والحقلُ يبقى ظاهرًا — عطبٌ صامتٌ
-     * لا يظهر في أي سجلّ. والعلاجُ: أولويةٌ سطريةٌ تغلب أولويةَ الورقة.
-     * (وهي گوتشا المشروع المسجَّلة: «ems-forms.css يهزم jQuery.hide()».)
+     * والحقل ابن مباشر ل`.form-grid`، ف`!important` من ورقة الأنماط تهزم
+     * `display:none` التي يكتبها jQuery **سطريا بلا أولوية**. النتيجة أن
+     * `hide()` «تنجح» (السمة تكتب فعلا) والحقل يبقى ظاهرا — عطب صامت
+     * لا يظهر في أي سجل. والعلاج: أولوية سطرية تغلب أولوية الورقة.
+     * (وهي گوتشا المشروع المسجلة: «ems-forms.css يهزم jQuery.hide()».)
      */
     function setGeneratedCodeShown(shown) {
         var el = generatedCodeWrapper[0];
@@ -1141,10 +1141,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         formTitle.text('إضافة عميل جديد');
         submitBtnText.text('حفظ العميل');
         setGeneratedCodeShown(true);
-        // الكودُ المولَّدُ يعود إلى خانته كلَّما دخلنا وضعَ الإضافة — ومصدرُه حقلُ
-        // العرض نفسُه لا نسخةٌ ثانيةٌ منه (مصدرُ حقيقةٍ واحد). و`reset()` يكفي
-        // للخروج من الإلغاء، لكن الانتقالَ من «تعديل» إلى «إضافة» قد يقع بلا
-        // reset فيبقى كودُ العميل المعدَّل ظاهرًا — وهذا السطرُ يسدّ تلك الحالة.
+        // الكود المولد يعود إلى خانته كلما دخلنا وضع الإضافة — ومصدره حقل
+        // العرض نفسه لا نسخة ثانية منه (مصدر حقيقة واحد). و`reset()` يكفي
+        // للخروج من الإلغاء، لكن الانتقال من «تعديل» إلى «إضافة» قد يقع بلا
+        // reset فيبقى كود العميل المعدل ظاهرا — وهذا السطر يسد تلك الحالة.
         var genCode = $('#generated_client_code').val();
         if (genCode) { $('#client_code').val(genCode); }
     }
@@ -1167,11 +1167,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     /* ══════════════════════════════════════════════════════════════════════
-     * XF-01 · البياناتُ الإضافية — جسرُ الواجهة
+     * XF-01 · البيانات الإضافية — جسر الواجهة
      * ──────────────────────────────────────────────────────────────────────
-     * الخريطةُ تُبثُّ من السجلِّ المركزيِّ (`includes/extra_fields.php`) ولا تُكتب
-     * هنا: تسميةٌ واحدةٌ للحقلِ في الجدولِ والفورمِ ونافذةِ التفاصيل. فإن أُضيف
-     * حقلٌ أو غُيّرت تسميتُه، تغيّر الثلاثةُ معًا بلا تعديلٍ في هذا الملفّ.
+     * الخريطة تبث من السجل المركزي (`includes/extra_fields.php`) ولا تكتب
+     * هنا: تسمية واحدة للحقل في الجدول والفورم ونافذة التفاصيل. فإن أضيف
+     * حقل أو غيرت تسميته، تغير الثلاثة معا بلا تعديل في هذا الملف.
      * ══════════════════════════════════════════════════════════════════════ */
     const EMS_XF_MAP  = <?php echo json_encode(ems_xf_js_map($XF_SCREEN), JSON_UNESCAPED_UNICODE); ?>;
     const EMS_XF_OWN  = <?php
@@ -1180,10 +1180,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         echo json_encode($__own, JSON_UNESCAPED_UNICODE);
     ?>;
 
-    /** `legal_name` ⇒ `legal-name` — jQuery `.data()` يُطبّع الشرطاتِ لا الشُّرَط السفلية. */
+    /** `legal_name` ⇒ `legal-name` — jQuery `.data()` يطبع الشرطات لا الشرط السفلية. */
     function emsXfDataKey(k) { return String(k).replace(/_/g, '-'); }
 
-    /** قراءةُ كلِّ قيمِ `data-xf-*` من زرٍّ إلى كائنٍ بمفاتيحِ السجلّ. */
+    /** قراءة كل قيم `data-xf-*` من زر إلى كائن بمفاتيح السجل. */
     function emsXfRead($btn) {
         const o = {};
         Object.keys(EMS_XF_MAP).forEach(function (k) {
@@ -1193,16 +1193,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         return o;
     }
 
-    /** طيُّ قسمِ «المزيد» — `reset()` يمسح الحقولَ ولا يطوي `<details>`. */
+    /** طي قسم «المزيد» — `reset()` يمسح الحقول ولا يطوي `<details>`. */
     function emsXfCollapse() {
         const d = document.getElementById('emsXfMore');
         if (d) { d.open = false; }
     }
 
     /**
-     * ملءُ حقولِ «المزيد» عند التعديل — **وفتحُ القسمِ إن كان فيه بيان**.
-     * فلو بقي مطويًّا على بياناتٍ موجودةٍ ظنَّ المستخدمُ أنها ضاعت، ولو فُتح
-     * دائمًا أطال النموذجَ على من لا يستعمله. فالفتحُ تابعٌ للمحتوى لا للحالة.
+     * ملء حقول «المزيد» عند التعديل — **وفتح القسم إن كان فيه بيان**.
+     * فلو بقي مطويا على بيانات موجودة ظن المستخدم أنها ضاعت، ولو فتح
+     * دائما أطال النموذج على من لا يستعمله. فالفتح تابع للمحتوى لا للحالة.
      */
     function emsXfFill(o) {
         let any = false;
@@ -1218,16 +1218,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     /**
-     * قسمُ «البيانات الإضافية» في نافذةِ التفاصيل.
+     * قسم «البيانات الإضافية» في نافذة التفاصيل.
      *
-     * ◆ **يُبنى بأصنافِ النافذةِ نفسِها لا بأصنافٍ خاصّةٍ به**: `ems-dmodal__grid`
-     *   و`ems-dcard` و`ems-dcard__head` و`ems-dcard__value` هي البطاقةُ المعتمدةُ
-     *   لكلِّ حقلٍ في هذه النافذة. فيطابق القسمُ بقيةَ البطاقاتِ **تلقائيًّا**،
-     *   وأيُّ تغييرٍ في سمةِ النافذةِ لاحقًا يسري عليه بلا لمسِه. وقاعدةٌ خاصةٌ به
-     *   كانت ستفرّقه عنها عند أوّلِ تعديل.
-     * ◆ ويُبنى **فقط** مما له قيمة — وبطاقةٌ قيمتُها شرطةٌ ليست بيانًا يُعرض.
-     *   وإن خلا كلُّه أُعلن ذلك سطرًا صريحًا لا فراغًا يُقرأ عطلًا.
-     * ◆ والعرضُ تابعٌ لطولِ القيمة (`--w-lg` للعناوين) — وهو منطقُ النافذةِ نفسِه.
+     * ◆ **يبنى بأصناف النافذة نفسها لا بأصناف خاصة به**: `ems-dmodal__grid`
+     *   و`ems-dcard` و`ems-dcard__head` و`ems-dcard__value` هي البطاقة المعتمدة
+     *   لكل حقل في هذه النافذة. فيطابق القسم بقية البطاقات **تلقائيا**،
+     *   وأي تغيير في سمة النافذة لاحقا يسري عليه بلا لمسه. وقاعدة خاصة به
+     *   كانت ستفرقه عنها عند أول تعديل.
+     * ◆ ويبنى **فقط** مما له قيمة — وبطاقة قيمتها شرطة ليست بيانا يعرض.
+     *   وإن خلا كله أعلن ذلك سطرا صريحا لا فراغا يقرأ عطلا.
+     * ◆ والعرض تابع لطول القيمة (`--w-lg` للعناوين) — وهو منطق النافذة نفسه.
      */
     function emsXfSection(o) {
         const cards = [];
@@ -1258,8 +1258,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
         formToggleBtn.toggleClass('is-active', isOpen);
         formToggleBtn.attr('aria-expanded', isOpen ? 'true' : 'false');
-        // زر الإضافة موحّد: أيقونة fa-solid fa-plus دائماً وبدون نص — لا نبدّل
-        // الأيقونة ولا نحقن نصاً عند الفتح/الإغلاق.
+        // زر الإضافة موحد: أيقونة fa-solid fa-plus دائما وبدون نص — لا نبدل
+        // الأيقونة ولا نحقن نصا عند الفتح/الإغلاق.
     }
 
     function updateStatsToggleState(isVisible) {
@@ -1379,7 +1379,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     });
 
     // ════════════════════════════════════════════════
-    // عرض تفاصيل العميل — عبر النظام الموحّد EmsDetailsModal
+    // عرض تفاصيل العميل — عبر النظام الموحد EmsDetailsModal
     // ════════════════════════════════════════════════
     function clientIsActiveStatus(statusValue) {
         const normalized = String(statusValue === null || typeof statusValue === 'undefined' ? '' : statusValue)

@@ -177,7 +177,7 @@ if (!function_exists('tkt_stages')) {
     {
         return array(
             'new'         => 'جديدة',
-            'classified'  => 'مصنّفة',
+            'classified'  => 'مصنفة',
             'routed'      => 'محالة',
             'in_progress' => 'قيد التنفيذ',
             'waiting'     => 'بانتظار جهة أخرى',
@@ -224,7 +224,7 @@ if (!function_exists('tkt_stage_step')) {
         $stage  = strval($stage);
         $map    = array('new' => 1, 'classified' => 1, 'routed' => 2,
                         'in_progress' => 3, 'done' => 4, 'closed' => 5);
-        $labels = array(1 => 'سُجّل', 2 => 'وُجّه', 3 => 'قيد التنفيذ', 4 => 'أُنجز', 5 => 'أُغلق');
+        $labels = array(1 => 'سجل', 2 => 'وجه', 3 => 'قيد التنفيذ', 4 => 'أنجز', 5 => 'أغلق');
 
         $paused  = ($stage === 'waiting' || $stage === 'follow_up');
         $stopped = ($stage === 'cancelled');
@@ -264,8 +264,8 @@ if (!function_exists('tkt_stage_mini')) {
         $s = tkt_stage_step($stage);
         $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); };
 
-        $now  = $s['stopped'] ? 'أُلغي — توقفت الرحلة'
-              : ($s['paused'] ? tkt_label(tkt_stages(), $stage) . ' (وقفةٌ داخل «قيد التنفيذ»)'
+        $now  = $s['stopped'] ? 'ألغي — توقفت الرحلة'
+              : ($s['paused'] ? tkt_label(tkt_stages(), $stage) . ' (وقفة داخل «قيد التنفيذ»)'
                               : $s['label']);
         $tip  = 'المرحلة: ' . $now . ' — ' . min($s['index'], $s['total']) . ' من ' . $s['total'];
 
@@ -552,7 +552,7 @@ if (!function_exists('tkt_overdue_badge')) {
         if (!tkt_is_overdue($t)) { return '—'; }
         $late = time() - strtotime($t['resolution_due_at']);
         $h = max(1, (int)floor($late / 3600));
-        return "<span class='action-btn' style='color:#fff;background:#c0392b;border-radius:12px;padding:2px 10px'>متأخّر " . $h . "س</span>";
+        return "<span class='action-btn' style='color:#fff;background:#c0392b;border-radius:12px;padding:2px 10px'>متأخر " . $h . "س</span>";
     }
 }
 
@@ -643,7 +643,7 @@ if (!function_exists('tkt_transitions')) {
             'route'    => array('from' => array('new', 'classified'), 'to' => 'routed', 'need' => 'edit', 'reason' => false, 'label' => 'توجيه للإدارة المختصة', 'icon' => 'fa-share',   'color' => '#0d6efd'),
             'start'    => array('from' => 'routed',      'to' => 'in_progress', 'need' => 'edit',   'reason' => false, 'label' => 'بدء التنفيذ',            'icon' => 'fa-play',           'color' => '#fd7e14'),
             'wait'     => array('from' => 'in_progress', 'to' => 'waiting',     'need' => 'edit',   'reason' => true,  'label' => 'تعليق (بانتظار جهة)',    'icon' => 'fa-hourglass-half', 'color' => '#b58900'),
-            'follow'   => array('from' => 'waiting',     'to' => 'follow_up',   'need' => 'edit',   'reason' => false, 'label' => 'رفع المُعَوِّق (متابعة)', 'icon' => 'fa-rotate',         'color' => '#0dcaf0'),
+            'follow'   => array('from' => 'waiting',     'to' => 'follow_up',   'need' => 'edit',   'reason' => false, 'label' => 'رفع المعوق (متابعة)', 'icon' => 'fa-rotate',         'color' => '#0dcaf0'),
             'resume'   => array('from' => 'follow_up',   'to' => 'in_progress', 'need' => 'edit',   'reason' => false, 'label' => 'استئناف التنفيذ',        'icon' => 'fa-play',           'color' => '#fd7e14'),
             'complete' => array('from' => 'in_progress', 'to' => 'done',        'need' => 'edit',   'reason' => false, 'label' => 'إنجاز العمل',            'icon' => 'fa-check',          'color' => '#198754'),
             'rework'   => array('from' => 'done',        'to' => 'in_progress', 'need' => 'edit',   'reason' => true,  'label' => 'إعادة للاستكمال',        'icon' => 'fa-rotate-left',    'color' => '#6f42c1'),
@@ -808,8 +808,8 @@ if (!function_exists('tkt_active_badge')) {
     function tkt_active_badge($active)
     {
         return ((int)$active === 1)
-            ? "<span class='action-btn' style='color:#1e7e34'>مفعّل</span>"
-            : "<span class='action-btn' style='color:#c0392b'>معطّل</span>";
+            ? "<span class='action-btn' style='color:#1e7e34'>مفعل</span>"
+            : "<span class='action-btn' style='color:#c0392b'>معطل</span>";
     }
 }
 
@@ -886,7 +886,7 @@ if (!function_exists('tkt_journey')) {
         $doer = ($assignee !== '') ? $assignee : $ownerRole;
 
         // الأسماءُ من المصدرِ الواحد، وأصحابُها وحدَهم يُحسبون هنا.
-        $owners = array(1 => 'المبلِّغ', 2 => $ownerRole, 3 => $doer, 4 => $doer, 5 => $ownerRole);
+        $owners = array(1 => 'المبلغ', 2 => $ownerRole, 3 => $doer, 4 => $doer, 5 => $ownerRole);
         $defs = array();
         foreach ($step['labels'] as $k => $lbl) {
             $defs[$k] = array('label' => $lbl, 'owner' => isset($owners[$k]) ? $owners[$k] : '');
@@ -931,23 +931,23 @@ if (!function_exists('tkt_journey')) {
         if ($paused) {
             $j['banner'] = array(
                 'kind'  => 'return',
-                'title' => ($stage === 'waiting') ? 'موقوفٌ بانتظار جهةٍ أخرى:' : 'رُفع المعوّق — قيد المتابعة:',
-                'text'  => ($pauseReason !== null && $pauseReason !== '') ? $pauseReason : 'بلا سببٍ مسجَّل',
+                'title' => ($stage === 'waiting') ? 'موقوف بانتظار جهة أخرى:' : 'رفع المعوق — قيد المتابعة:',
+                'text'  => ($pauseReason !== null && $pauseReason !== '') ? $pauseReason : 'بلا سبب مسجل',
                 'meta'  => $pauseAt ? ems_journey_ago($pauseAt) : '',
             );
         } elseif ($isStopped) {
-            $j['banner'] = array('kind' => 'stop', 'title' => 'أُلغي البلاغ — توقفت الرحلة.');
+            $j['banner'] = array('kind' => 'stop', 'title' => 'ألغي البلاغ — توقفت الرحلة.');
         } elseif ($stage === 'closed') {
-            $j['banner'] = array('kind' => 'done', 'title' => 'أُغلق البلاغ واكتملت رحلته.',
+            $j['banner'] = array('kind' => 'done', 'title' => 'أغلق البلاغ واكتملت رحلته.',
                 'meta' => isset($at[5]) ? ems_journey_ago($at[5]) : '');
         } elseif ($overdueResp) {
             $j['banner'] = array('kind' => 'stop', 'title' => 'انكسرت مهلة الاستجابة',
-                'text' => 'لم يبدأ أحدٌ العملَ عليه بعد.');
+                'text' => 'لم يبدأ أحد العمل عليه بعد.');
         }
 
         // التصعيداتُ المسجَّلة تُذكر عددًا — لا تُخترع درجة
         if ($escalations > 0 && isset($j['next'])) {
-            $j['next']['label'] .= ' · صُعّد ' . ems_journey_plural($escalations, 'مرة', 'مرتين', 'مرات', 'مرةً');
+            $j['next']['label'] .= ' · صعد ' . ems_journey_plural($escalations, 'مرة', 'مرتين', 'مرات', 'مرة');
         }
 
         return $j;

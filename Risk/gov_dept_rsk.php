@@ -108,10 +108,10 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     );
     include('../includes/page_header.php');
     ems_screen_about(
-        'قراءةٌ لا كتابة: الحساباتُ التابعةُ وصلاحياتُها وفصلُ الواجباتِ وسجلاتُ التدقيق. '
-        . 'وفعلُها الوحيدُ الكاتبُ تصديقُ مراجعةِ الوصول — والتصديقُ يشهد ولا يمنح.',
-        array('الحوكمةُ والالتزامُ تملك الصلاحيةَ التقنيةَ — ومديرُ المخاطرِ لا يمنحها ولا يمنعها',
-              'خرقُ فصلِ الواجباتِ يُقاس على الحساباتِ الحيةِ لا يُوصف نصًّا'));
+        'قراءة لا كتابة: الحسابات التابعة وصلاحياتها وفصل الواجبات وسجلات التدقيق. '
+        . 'وفعلها الوحيد الكاتب تصديق مراجعة الوصول — والتصديق يشهد ولا يمنح.',
+        array('الحوكمة والالتزام تملك الصلاحية التقنية — ومدير المخاطر لا يمنحها ولا يمنعها',
+              'خرق فصل الواجبات يقاس على الحسابات الحية لا يوصف نصا'));
     ?>
 
     <?php if ($sodTotal > 0): ?>
@@ -124,14 +124,14 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
             <?php endforeach; ?>
             <?php foreach ($sodTreat as $x): ?>
             <li>معالجة الخطر <strong><?php echo htmlspecialchars($x['risk_code']); ?></strong>
-                — قَبِلَ دليلَ إنجازِه منفِّذُه (<?php echo htmlspecialchars((string) $x['person']); ?>) · §9-3</li>
+                — قبل دليل إنجازه منفذه (<?php echo htmlspecialchars((string) $x['person']); ?>) · §9-3</li>
             <?php endforeach; ?>
         </ul>
     </div>
     <?php else: ?>
     <div class="ems-card rskg-alert-ok">
         <strong class="rskg-text-ok">✔ صفر خرق لفصل الواجبات</strong>
-        <span class="rskg-soft"> — لا متحققٌ يتحقق من ضابطِ نفسِه، ولا منفِّذٌ يقبل دليلَ إنجازِه.</span>
+        <span class="rskg-soft"> — لا متحقق يتحقق من ضابط نفسه، ولا منفذ يقبل دليل إنجازه.</span>
     </div>
     <?php endif; ?>
 
@@ -158,7 +158,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     </div></div>
 
     <div class="card rskg-mt"><div class="card-body table-responsive">
-        <h6>صلاحيات شاشات المخاطر بالدور — من محرّك الصلاحيات</h6>
+        <h6>صلاحيات شاشات المخاطر بالدور — من محرك الصلاحيات</h6>
         <table class="table table-sm table-striped rskg-wfull">
             <thead><tr><th>الشاشة</th>
                 <th>28 إدارة المخاطر</th><th>29 محلل المخاطر</th><th>30 مشرف المخاطر</th></tr></thead>
@@ -184,7 +184,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
             </tbody>
         </table>
         <p class="rskg-note">
-            الدور 30 قراءةٌ خالصةٌ على العشرين — ولا حذفَ لأيِّ دورٍ في هذه الإدارة (لا حذفَ إطلاقًا).</p>
+            الدور 30 قراءة خالصة على العشرين — ولا حذف لأي دور في هذه الإدارة (لا حذف إطلاقا).</p>
     </div></div>
 
     <div class="row rskg-mt">
@@ -198,16 +198,16 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                 <?php endforeach; ?>
                 </tbody>
             </table>
-            <p class="rskg-hint">تُكتب من الطبقةِ المشتركةِ لا من كودِ الشاشة — بنيويًّا ولا يُتجاوز.</p>
+            <p class="rskg-hint">تكتب من الطبقة المشتركة لا من كود الشاشة — بنيويا ولا يتجاوز.</p>
         </div></div></div>
         <div class="col-md-7"><div class="card"><div class="card-body table-responsive">
-            <h6>الحقول الحساسة المسجَّلة (AC-06)</h6>
+            <h6>الحقول الحساسة المسجلة (AC-06)</h6>
             <?php if (empty($sensFields)): ?>
-            <p class="rskg-missing">لا حقول حساسة مسجَّلة — AC-06 راسبة حتى تُسجَّل.</p>
+            <p class="rskg-missing">لا حقول حساسة مسجلة — AC-06 راسبة حتى تسجل.</p>
             <?php else: ?>
             <table class="table table-sm table-striped">
                 <thead><tr><th>السياسة</th><th>الحقل</th><th>التصنيف</th>
-                    <th>يظهر لـ</th><th>يُسجَّل الاطّلاع</th><th>يُصدَّر</th></tr></thead>
+                    <th>يظهر ل</th><th>يسجل الاطلاع</th><th>يصدر</th></tr></thead>
                 <tbody>
                 <?php foreach ($sensFields as $x): ?>
                     <tr>
@@ -229,7 +229,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     <div class="card rskg-mt"><div class="card-body">
         <h6>تصديق مراجعة الوصول (GOV-RSK-ATTEST)</h6>
         <p class="rskg-desc">
-            تشهد بصحةِ قائمةِ فريقك وصلاحياتِهم — ولا يمنح التصديقُ صلاحيةً ولا يسلبها.</p>
+            تشهد بصحة قائمة فريقك وصلاحياتهم — ولا يمنح التصديق صلاحية ولا يسلبها.</p>
         <form id="attForm" class="allforms">
             <div class="row">
                 <div class="col-md-4"><label>نطاق التصديق *
@@ -252,7 +252,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
             fetch('risk_actions.php', { method: 'POST', body: fd }).then(function (r) { return r.json(); })
             .then(function (j) {
                 var m = document.getElementById('attMsg');
-                if (j.ok) { m.textContent = '✔ صُدِّق — حدث #' + (j.event || 0) + ' (يشهد ولا يمنح)'; }
+                if (j.ok) { m.textContent = '✔ صدق — حدث #' + (j.event || 0) + ' (يشهد ولا يمنح)'; }
                 else { m.textContent = '✘ ' + (j.code || '') + ' ' + (j.msg || ''); }
             });
         });
@@ -263,8 +263,8 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     /* حزمةُ الحالاتِ الدنيا (بوابة ٩): تحميلٌ وفراغٌ وخطأٌ — مخفيةٌ افتراضًا
        ويُظهرها منطقُ الشاشةِ عند حالِها. الدالةُ من ux_components التي تُحمِّلها القشرة. */
     if (function_exists('ems_states_bundle')) {
-        echo ems_states_bundle('لا بياناتِ حوكمةٍ لهذه الإدارةِ بعد',
-                               'تُقاس الحساباتُ وفصلُ الواجباتِ على السجلاتِ الحيةِ فتظهر هنا');
+        echo ems_states_bundle('لا بيانات حوكمة لهذه الإدارة بعد',
+                               'تقاس الحسابات وفصل الواجبات على السجلات الحية فتظهر هنا');
     }
     ?>
 </div>

@@ -66,13 +66,13 @@ register_shutdown_function(static function (): void {
     $err = error_get_last();
     if ($err && in_array($err['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR], true)) {
         ems_excel_log_error('FATAL', $err['message'] . ' @ ' . $err['file'] . ':' . $err['line']);
-        ems_excel_emit_error(500, 'تعذّر إكمال عملية Excel بسبب خطأ في النظام. تم تسجيل المشكلة، يرجى إبلاغ الدعم الفني.');
+        ems_excel_emit_error(500, 'تعذر إكمال عملية Excel بسبب خطأ في النظام. تم تسجيل المشكلة، يرجى إبلاغ الدعم الفني.');
     }
 });
 
 try {
     if (!isset($_SESSION['user'])) {
-        ems_excel_emit_error(401, 'غير مصرّح — يرجى تسجيل الدخول');
+        ems_excel_emit_error(401, 'غير مصرح — يرجى تسجيل الدخول');
         exit;
     }
 
@@ -115,7 +115,7 @@ try {
                     header('Content-Type: application/json; charset=utf-8');
                     echo json_encode(array(
                         'ok' => false, 'code' => 'SCOPE-403',
-                        'message' => 'هذا التصديرُ يخصُّ مساحةَ عملٍ أخرى — بدِّلِ المساحةَ لتنفيذِه.',
+                        'message' => 'هذا التصدير يخص مساحة عمل أخرى — بدل المساحة لتنفيذه.',
                         'route' => $__hit[0],
                     ), JSON_UNESCAPED_UNICODE);
                     exit;
@@ -168,6 +168,6 @@ try {
 } catch (\Throwable $e) {
     // ExcelService::fail() يستدعي exit، فلا يصل هنا إلا الأخطاء غير المتوقّعة.
     ems_excel_log_error('EXCEPTION', $e->getMessage() . ' @ ' . $e->getFile() . ':' . $e->getLine());
-    ems_excel_emit_error(500, 'تعذّر إكمال عملية Excel: خطأ غير متوقّع. تم تسجيل المشكلة للمراجعة.');
+    ems_excel_emit_error(500, 'تعذر إكمال عملية Excel: خطأ غير متوقع. تم تسجيل المشكلة للمراجعة.');
     exit;
 }

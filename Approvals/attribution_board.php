@@ -82,47 +82,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['atb_action'])) {
     $entryId = intval($_POST['entry_id'] ?? 0);
 
     if ($act === 'decide') {
-        if (!$can_decide) { atb_back('الإسنادُ صلاحيةُ إدارة التشغيل ❌', $day); }
+        if (!$can_decide) { atb_back('الإسناد صلاحية إدارة التشغيل ❌', $day); }
         $assign = array();
         foreach (($_POST['oblig'] ?? array()) as $lineId => $ob) {
             $assign[intval($lineId)] = ($ob === '' ? null : strval($ob));
         }
         $res = ATT::decide($conn, $gate, $company_id, $entryId, $assign, $uid);
         atb_back($res['ok']
-            ? ('اعتُمد إسنادُ ' . $res['decided'] . ' سطرًا — والأحكامُ الثلاثةُ مخزَّنةٌ لقطةً ✅')
+            ? ('اعتمد إسناد ' . $res['decided'] . ' سطرا — والأحكام الثلاثة مخزنة لقطة ✅')
             : (implode(' · ', $res['reasons']) . ' ❌'), $day);
 
     } elseif ($act === 'object') {
         if (!$can_decide) { atb_back('لا توجد صلاحية الاعتراض ❌', $day); }
         $res = ATT::object($conn, $gate, $company_id, intval($_POST['line_id'] ?? 0),
                            strval($_POST['reason'] ?? ''), strval($_POST['ref'] ?? ''), $uid);
-        atb_back($res['ok'] ? 'سُجّل الاعتراضُ — والبكتاتُ الأخرى تمضي ✅'
+        atb_back($res['ok'] ? 'سجل الاعتراض — والبكتات الأخرى تمضي ✅'
                             : (implode(' · ', $res['reasons']) . ' ❌'), $day);
 
     } elseif ($act === 'rule_qty') {
         // M-24 ①: حكمُ **الكمية** لا الزمن — «إعادةُ التنفيذ لعيبٍ لا تُفوتر».
         // صلاحيةُ الإسناد نفسُها: مَن يسند الزمنَ يحكم الكمية (كلاهما قرارُ
         // تشغيلٍ على الواقعة نفسِها، وفصلُهما يخلق يدًا ثالثةً بلا داعٍ).
-        if (!$can_decide) { atb_back('حكمُ الكمية صلاحيةُ إدارة التشغيل ❌', $day); }
+        if (!$can_decide) { atb_back('حكم الكمية صلاحية إدارة التشغيل ❌', $day); }
         $qb  = strval($_POST['qty_billable'] ?? '');
         $qbV = ($qb === '') ? null : intval($qb);
         $res = ATT::ruleQty($conn, $gate, $company_id, $entryId, $qbV,
                             strval($_POST['qty_note'] ?? ''), $uid);
         if (!$res['ok']) { atb_back(implode(' · ', $res['reasons']) . ' ❌', $day); }
         atb_back(empty($res['changed'])
-            ? 'الحكمُ كما هو — لا تغيير ✅'
-            : ($qbV === 0 ? 'حُكم بعدم فوترة الكمية بسببها المكتوب ✅'
-                          : ($qbV === 1 ? 'حُكم بفوترة الكمية صراحةً ✅' : 'رُفع حكمُ الكمية ✅')), $day);
+            ? 'الحكم كما هو — لا تغيير ✅'
+            : ($qbV === 0 ? 'حكم بعدم فوترة الكمية بسببها المكتوب ✅'
+                          : ($qbV === 1 ? 'حكم بفوترة الكمية صراحة ✅' : 'رفع حكم الكمية ✅')), $day);
 
     } elseif ($act === 'resolve') {
-        if (!$can_resolve) { atb_back('حسمُ الاعتراض صلاحيةُ مدير الإدارة المالية (ق-25) ❌', $day); }
+        if (!$can_resolve) { atb_back('حسم الاعتراض صلاحية مدير الإدارة المالية (ق-25) ❌', $day); }
         $res = ATT::resolve($conn, $gate, $company_id, intval($_POST['line_id'] ?? 0),
                             strval($_POST['new_oblig'] ?? ''), $uid);
         atb_back($res['ok']
-            ? (!empty($res['overridden']) ? 'حُسم الاعتراضُ بتغيير البند — تجاوزٌ مسجَّل ✅' : 'حُسم الاعتراض ✅')
+            ? (!empty($res['overridden']) ? 'حسم الاعتراض بتغيير البند — تجاوز مسجل ✅' : 'حسم الاعتراض ✅')
             : (implode(' · ', $res['reasons']) . ' ❌'), $day);
     }
-    atb_back('إجراءٌ غير معروف ❌', $day);
+    atb_back('إجراء غير معروف ❌', $day);
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -179,12 +179,12 @@ if (!empty($entries)) {
 }
 
 $OPS_LABELS = array(
-    'actual_work' => 'تشغيلٌ فعلي', 'standby' => 'استعداد', 'tech_breakdown' => 'عطلٌ فني',
-    'supplier_stop' => 'توقفٌ على المورد', 'operator_stop' => 'توقفٌ على المشغّل',
-    'client_stop' => 'توقفٌ على العميل', 'fuel_logistics_stop' => 'وقود/لوجستيات',
-    'planned_stop' => 'توقفٌ مخطط', 'force_majeure' => 'قوةٌ قاهرة', 'unlogged' => 'غيرُ مصنّف',
+    'actual_work' => 'تشغيل فعلي', 'standby' => 'استعداد', 'tech_breakdown' => 'عطل فني',
+    'supplier_stop' => 'توقف على المورد', 'operator_stop' => 'توقف على المشغل',
+    'client_stop' => 'توقف على العميل', 'fuel_logistics_stop' => 'وقود/لوجستيات',
+    'planned_stop' => 'توقف مخطط', 'force_majeure' => 'قوة قاهرة', 'unlogged' => 'غير مصنف',
 );
-$RESP_LABELS = array('company' => 'الشركة', 'supplier' => 'المورد', 'operator' => 'المشغّل',
+$RESP_LABELS = array('company' => 'الشركة', 'supplier' => 'المورد', 'operator' => 'المشغل',
                      'client' => 'العميل', 'planned' => 'مخطط', 'force_majeure' => 'قاهرة', 'none' => '—');
 
 function atb_flag($v) {
@@ -209,7 +209,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fa-solid fa-share', 'label' => '');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا وقائعَ تشغيلٍ مسجَّلةً في هذا اليوم', 'اختر يومًا آخرَ من حقلِ التاريخ، أو أدخِلْ وقائعَ اليومِ من شاشةِ الدوام');
+    echo ems_states_bundle('لا وقائع تشغيل مسجلة في هذا اليوم', 'اختر يوما آخر من حقل التاريخ، أو أدخل وقائع اليوم من شاشة الدوام');
     ?>
 
     <?php if (!empty($_GET['msg'])):
@@ -244,23 +244,23 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="atb-summary <?php echo $blocked > 0 ? 'is-blocked' : 'is-clear'; ?>">
         <div><i class="fas <?php echo $blocked > 0 ? 'fa-ban' : 'fa-circle-check'; ?>"></i>
-            <strong><?php echo count($entries); ?></strong> واقعةً في <?php echo atb_e($day); ?>
+            <strong><?php echo count($entries); ?></strong> واقعة في <?php echo atb_e($day); ?>
         </div>
         <?php if ($blocked > 0): ?>
-            <span class="atb-chip atb-chip-red"><?php echo $blocked; ?> فترةَ توقفٍ بلا بندٍ مُسنَد — تمنع الإقفال</span>
+            <span class="atb-chip atb-chip-red"><?php echo $blocked; ?> فترة توقف بلا بند مسند — تمنع الإقفال</span>
         <?php else: ?>
-            <span class="atb-chip atb-chip-green">لا زمنَ توقفٍ بلا مسؤول</span>
+            <span class="atb-chip atb-chip-green">لا زمن توقف بلا مسؤول</span>
         <?php endif; ?>
         <?php if ($objected > 0): ?>
-            <span class="atb-chip atb-chip-amber"><?php echo $objected; ?> اعتراضًا مفتوحًا — يحسمه مديرُ المالية</span>
+            <span class="atb-chip atb-chip-amber"><?php echo $objected; ?> اعتراضا مفتوحا — يحسمه مدير المالية</span>
         <?php endif; ?>
         <span class="atb-chip <?php echo ATT::enforced() ? 'atb-chip-green' : 'atb-chip-grey'; ?>">
-            الحارس: <?php echo ATT::enforced() ? 'مُفعَّل (422/423)' : 'رصدٌ فقط — لم يُقلب العَلَم بعد'; ?>
+            الحارس: <?php echo ATT::enforced() ? 'مفعل (422/423)' : 'رصد فقط — لم يقلب العلم بعد'; ?>
         </span>
     </div>
 
     <?php if (empty($entries)): ?>
-        <div class="card"><div class="card-body atb-empty">لا وقائعَ في هذا اليوم.</div></div>
+        <div class="card"><div class="card-body atb-empty">لا وقائع في هذا اليوم.</div></div>
     <?php endif; ?>
 
     <?php foreach ($entries as $e):
@@ -281,13 +281,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <?php if ($noMatrix): ?>
                     <div class="atb-423">
                         <i class="fas fa-lock"></i>
-                        <strong>عقدٌ بلا مصفوفةٍ مُجازة (423).</strong>
+                        <strong>عقد بلا مصفوفة مجازة (423).</strong>
                         <?php if ($cid > 0): ?>
-                            العقد #<?php echo $cid; ?> لا مصفوفةَ نافذةً له بتاريخ <?php echo atb_e($day); ?>.
-                            تُملأ من <a href="../Contracts/contract_obligations.php?contract=<?php echo $cid; ?>">شاشة مصفوفة الالتزامات</a>
-                            وتُجيزها المالية — ولا ارتدادَ للسياسة الافتراضية (ق-2).
+                            العقد #<?php echo $cid; ?> لا مصفوفة نافذة له بتاريخ <?php echo atb_e($day); ?>.
+                            تملأ من <a href="../Contracts/contract_obligations.php?contract=<?php echo $cid; ?>">شاشة مصفوفة الالتزامات</a>
+                            وتجيزها المالية — ولا ارتداد للسياسة الافتراضية (ق-2).
                         <?php else: ?>
-                            الواقعةُ بلا عقدٍ مرتبط، فلا مصفوفةَ تُقرأ منها المسؤولية.
+                            الواقعة بلا عقد مرتبط، فلا مصفوفة تقرأ منها المسؤولية.
                         <?php endif; ?>
                     </div>
                 <?php endif; ?>
@@ -304,21 +304,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="atb-qty-rule">
                     <div class="atb-qty-head">
                         <i class="fas fa-cubes"></i>
-                        <strong>كميةُ الواقعة:</strong>
+                        <strong>كمية الواقعة:</strong>
                         <?php echo atb_e(rtrim(rtrim((string) $e['qty'], '0'), '.')); ?>
                         <?php echo atb_e($e['unit_type']); ?>
                         <?php if ($qb === '0'): ?>
-                            <span class="atb-chip atb-chip-red">غيرُ مفوترة</span>
+                            <span class="atb-chip atb-chip-red">غير مفوترة</span>
                         <?php elseif ($qb === '1'): ?>
-                            <span class="atb-chip atb-chip-green">مفوترةٌ صراحةً</span>
+                            <span class="atb-chip atb-chip-green">مفوترة صراحة</span>
                         <?php else: ?>
-                            <span class="atb-chip atb-chip-grey">مفوترة (لم يُحكم)</span>
+                            <span class="atb-chip atb-chip-grey">مفوترة (لم يحكم)</span>
                         <?php endif; ?>
                     </div>
                     <p class="atb-small atb-qty-note">
-                        سؤالان مستقلّان: هذا عن <strong>الكمية نفسِها</strong>
-                        (إعادةُ تنفيذٍ لعيبٍ لا تُفوتر)، والجدولُ أدناه عن
-                        <strong>زمن التوقف</strong>. حكمُ أحدهما لا يغني عن الآخر.
+                        سؤالان مستقلان: هذا عن <strong>الكمية نفسها</strong>
+                        (إعادة تنفيذ لعيب لا تفوتر)، والجدول أدناه عن
+                        <strong>زمن التوقف</strong>. حكم أحدهما لا يغني عن الآخر.
                         <?php if ($e['qty_ruling_note'] !== null && $e['qty_ruling_note'] !== ''): ?>
                             <br><i class="fas fa-quote-right"></i>
                             <em><?php echo atb_e($e['qty_ruling_note']); ?></em>
@@ -329,14 +329,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <?php echo csrf_field(); ?>
                         <input type="hidden" name="atb_action" value="rule_qty">
                         <input type="hidden" name="entry_id" value="<?php echo $eid; ?>">
-                        <select name="qty_billable" aria-label="حكمُ فوترةِ كميةِ الواقعة" class="atb-qty-select">
-                            <option value=""  <?php echo $qb === ''  ? 'selected' : ''; ?>>لم يُحكم — تُفوتر</option>
-                            <option value="1" <?php echo $qb === '1' ? 'selected' : ''; ?>>تُفوتر صراحةً</option>
-                            <option value="0" <?php echo $qb === '0' ? 'selected' : ''; ?>>لا تُفوتر (إعادةُ تنفيذٍ لعيب)</option>
+                        <select name="qty_billable" aria-label="حكم فوترة كمية الواقعة" class="atb-qty-select">
+                            <option value=""  <?php echo $qb === ''  ? 'selected' : ''; ?>>لم يحكم — تفوتر</option>
+                            <option value="1" <?php echo $qb === '1' ? 'selected' : ''; ?>>تفوتر صراحة</option>
+                            <option value="0" <?php echo $qb === '0' ? 'selected' : ''; ?>>لا تفوتر (إعادة تنفيذ لعيب)</option>
                         </select>
                         <input type="text" name="qty_note" maxlength="200"
-                               placeholder="السبب — إلزامٌ عند المنع"
-                               value="<?php echo atb_e((string) $e['qty_ruling_note']); ?>" aria-label="السبب — إلزامٌ عند المنع">
+                               placeholder="السبب — إلزام عند المنع"
+                               value="<?php echo atb_e((string) $e['qty_ruling_note']); ?>" aria-label="السبب — إلزام عند المنع">
                         <button type="submit" class="btn btn-sm btn-primary">احكم على الكمية</button>
                     </form>
                     <?php endif; ?>
@@ -354,18 +354,18 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                     <th>الفترة</th>
                                     <th>الحالة</th>
                                     <th>الساعات</th>
-                                    <th>المسؤولُ المقترح</th>
-                                    <th>بندُ الالتزام (من العقد)</th>
+                                    <th>المسؤول المقترح</th>
+                                    <th>بند الالتزام (من العقد)</th>
                                     <th>الملتزم</th>
-                                    <th>يُفوتر</th>
+                                    <th>يفوتر</th>
                                     <th>للمورد</th>
-                                    <th>للمشغّل</th>
+                                    <th>للمشغل</th>
                                     <th>الاعتراض</th>
                                     <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                                     <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                                     <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                                     <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -385,9 +385,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                     <td class="atb-small atb-muted"><?php echo atb_e($RESP_LABELS[$l['resp_party']] ?? $l['resp_party']); ?></td>
                                     <td>
                                         <?php if ($isWork): ?>
-                                            <span class="atb-muted">— لا بندَ للتشغيل الفعلي</span>
+                                            <span class="atb-muted">— لا بند للتشغيل الفعلي</span>
                                         <?php elseif ($can_decide && !$noMatrix): ?>
-                                            <select aria-label="بندُ التزامِ هذه الفترةِ من مصفوفةِ العقد" name="oblig[<?php echo $lid; ?>]" class="atb-select <?php echo $needs ? 'is-missing' : ''; ?>">
+                                            <select aria-label="بند التزام هذه الفترة من مصفوفة العقد" name="oblig[<?php echo $lid; ?>]" class="atb-select <?php echo $needs ? 'is-missing' : ''; ?>">
                                                 <option value="">— اختر البند —</option>
                                                 <?php foreach ($mx as $k => $m): ?>
                                                     <option value="<?php echo atb_e($k); ?>" <?php echo $k === $ob ? 'selected' : ''; ?>>
@@ -396,7 +396,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                                 <?php endforeach; ?>
                                             </select>
                                         <?php else: ?>
-                                            <?php echo $ob ? atb_e($OBL_TYPES[$ob] ?? $ob) : '<span class="atb-missing">بلا بندٍ مُسنَد</span>'; ?>
+                                            <?php echo $ob ? atb_e($OBL_TYPES[$ob] ?? $ob) : '<span class="atb-missing">بلا بند مسند</span>'; ?>
                                         <?php endif; ?>
                                     </td>
                                     <td><?php echo $obligor ? atb_e($OBL_OBLIGORS[$obligor] ?? $obligor) : '<span class="atb-muted">—</span>'; ?></td>
@@ -406,7 +406,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                     <td class="atb-small">
                                         <?php if ($l['objection_state'] === 'objected'): ?>
                                             <span class="atb-chip atb-chip-amber" title="<?php echo atb_e($l['objection_reason']); ?>">
-                                                معترَضٌ عليه</span>
+                                                معترض عليه</span>
                                             <?php if ($can_resolve): ?>
                                                 <button type="button" class="atb-link atb-resolve"
                                                         data-line="<?php echo $lid; ?>"
@@ -414,7 +414,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                                         data-ref="<?php echo atb_e($l['objection_ref']); ?>">حسم</button>
                                             <?php endif; ?>
                                         <?php elseif ($l['objection_state'] === 'resolved'): ?>
-                                            <span class="atb-muted">حُسم</span>
+                                            <span class="atb-muted">حسم</span>
                                         <?php elseif ($can_decide && !$isWork && $ob): ?>
                                             <button type="button" class="atb-link atb-object" data-line="<?php echo $lid; ?>">اعتراض</button>
                                         <?php else: ?>
@@ -442,16 +442,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <?php echo csrf_field(); ?>
             <input type="hidden" name="atb_action" id="atbAct" value="object">
             <input type="hidden" name="line_id" id="atbLine" value="">
-            <h5 id="atbTitle"><i class="fas fa-flag"></i> اعتراضٌ على الإسناد</h5>
+            <h5 id="atbTitle"><i class="fas fa-flag"></i> اعتراض على الإسناد</h5>
             <div id="atbObjFields">
-                <label for="atbReason">سببُ الاعتراض *</label>
+                <label for="atbReason">سبب الاعتراض *</label>
                 <textarea name="reason" id="atbReason" rows="3" maxlength="255" placeholder="لماذا تعترض على هذا الإسناد؟"></textarea>
                 <label for="atbRef">المرجع (محضر / مستند)</label>
                 <input type="text" name="ref" id="atbRef" maxlength="60" placeholder="مثال: محضر-2026-07-15">
             </div>
             <div id="atbResFields" hidden>
                 <div class="atb-res-note"></div>
-                <label for="atbNewOblig">البندُ بعد الحسم (اتركه كما هو للإبقاء عليه)</label>
+                <label for="atbNewOblig">البند بعد الحسم (اتركه كما هو للإبقاء عليه)</label>
                 <?php
                 // ⚠️ الخياراتُ من **مصفوفات عقود اليوم** لا من البنود التسعة كلِّها:
                 //    قائمةٌ تعرض بندًا خارجَ العقد تدعو إلى 422 لا لزومَ له. والخدمةُ
@@ -482,11 +482,11 @@ $(function () {
         $('#atbLine').val(lineId);
         $('#atbAct').val(mode);
         if (mode === 'object') {
-            $('#atbTitle').html('<i class="fas fa-flag"></i> اعتراضٌ على الإسناد');
+            $('#atbTitle').html('<i class="fas fa-flag"></i> اعتراض على الإسناد');
             $('#atbObjFields').prop('hidden', false); $('#atbResFields').prop('hidden', true);
             $('#atbReason').val('').prop('required', true); $('#atbRef').val('');
         } else {
-            $('#atbTitle').html('<i class="fas fa-gavel"></i> حسمُ الاعتراض');
+            $('#atbTitle').html('<i class="fas fa-gavel"></i> حسم الاعتراض');
             $('#atbObjFields').prop('hidden', true); $('#atbResFields').prop('hidden', false);
             $('#atbReason').prop('required', false);
             $('.atb-res-note').text('الاعتراض: ' + (reason || '—') + (ref ? ' · المرجع: ' + ref : ''));

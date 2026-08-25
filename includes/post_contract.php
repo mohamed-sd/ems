@@ -60,7 +60,7 @@ if (!function_exists('ems_post_contract')) {
         if ($code === '') { return false; }
         $st = $conn->prepare("SELECT 1 FROM nav09_action_map WHERE canonical_code = ? LIMIT 1");
         if (!$st) {
-            error_log('EMS post_contract: تعذّر سؤالُ قاموسِ الأفعال — ' . $conn->error);
+            error_log('EMS post_contract: تعذر سؤال قاموس الأفعال — ' . $conn->error);
             return null;
         }
         $st->bind_param('s', $code);
@@ -112,7 +112,7 @@ if (!function_exists('ems_post_contract')) {
         //   البترَ صامتًا** — فمفتاحٌ أطولُ يُكتب مبتورًا ثم لا يجده البحثُ بالمفتاحِ
         //   الكامل، فتنكسر العطالةُ بلا أيِّ خطأٍ ظاهر. الطولُ يُتحقق منه صراحةً.
         if (strlen((string) $key) !== 40) {
-            error_log('EMS post_contract: مفتاحُ عطالةٍ بطولٍ غيرِ 40 — يُرفض بدل أن يُبتر: ' . strlen((string) $key));
+            error_log('EMS post_contract: مفتاح عطالة بطول غير 40 — يرفض بدل أن يبتر: ' . strlen((string) $key));
             return false;
         }
         $prev = mysqli_report(MYSQLI_REPORT_OFF);
@@ -151,7 +151,7 @@ if (!function_exists('ems_post_contract')) {
 
         // ② رمزُ الحماية
         if (!ems_pc_csrf_ok()) {
-            $out['msg'] = 'رمزُ الحماية غير صالح — حدِّث الصفحةَ وأعد المحاولة (CSRF-403)';
+            $out['msg'] = 'رمز الحماية غير صالح — حدث الصفحة وأعد المحاولة (CSRF-403)';
             return $out;
         }
 
@@ -159,8 +159,8 @@ if (!function_exists('ems_post_contract')) {
         $registered = ems_pc_action_registered($conn, $action);
         if ($registered !== true) {
             $out['msg'] = ($registered === null)
-                ? 'تعذّر سؤالُ قاموسِ الأفعال — الفعلُ محجوبٌ حتى يُتاح القاموس (ACT-500)'
-                : 'فعلٌ غيرُ مسجَّلٍ في قاموسِ الأفعال — محجوب (ACT-403)';
+                ? 'تعذر سؤال قاموس الأفعال — الفعل محجوب حتى يتاح القاموس (ACT-500)'
+                : 'فعل غير مسجل في قاموس الأفعال — محجوب (ACT-403)';
             if (function_exists('log_security_event')) {
                 log_security_event($registered === null ? 'ACTION_MAP_UNAVAILABLE' : 'UNREGISTERED_ACTION_DENY',
                     'code=' . $action . ' path=' . ($_SERVER['SCRIPT_NAME'] ?? '') . ' role='
@@ -172,7 +172,7 @@ if (!function_exists('ems_post_contract')) {
         // ④ الصلاحية
         $perm = isset($spec['perm']) ? (string) $spec['perm'] : 'can_edit';
         if (!ems_pc_permission_ok($conn, $perm)) {
-            $out['msg'] = 'لا تملك صلاحيةَ تنفيذِ هذا الفعل (GOV-PERM-403)';
+            $out['msg'] = 'لا تملك صلاحية تنفيذ هذا الفعل (GOV-PERM-403)';
             return $out;
         }
 
@@ -182,7 +182,7 @@ if (!function_exists('ems_post_contract')) {
         if (ems_pc_idem_seen($conn, $key)) {
             $out['replay'] = true;
             $out['ok'] = true;   // ◆ التكرارُ ليس خطأً: يُرجع مرجعَ الأثرِ الأولِ ولا يولّد ثانيًا
-            $out['msg'] = 'نُفِّذ هذا الطلبُ سلفًا — لم يُكرَّر الأثر';
+            $out['msg'] = 'نفذ هذا الطلب سلفا — لم يكرر الأثر';
             $out['run'] = false;
             return $out;
         }
@@ -191,7 +191,7 @@ if (!function_exists('ems_post_contract')) {
         if (isset($spec['validate']) && is_callable($spec['validate'])) {
             $v = call_user_func($spec['validate'], $_POST);
             if (empty($v['ok'])) {
-                $out['msg'] = (string) ($v['msg'] ?? 'مدخلاتٌ غيرُ صالحة (422)');
+                $out['msg'] = (string) ($v['msg'] ?? 'مدخلات غير صالحة (422)');
                 return $out;
             }
             $out['data'] = isset($v['data']) && is_array($v['data']) ? $v['data'] : array();

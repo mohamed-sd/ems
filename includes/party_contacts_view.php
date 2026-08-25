@@ -36,29 +36,29 @@ if (!function_exists('ems_pc_render')) {
         <div class="card"><div class="card-body">
             <p class="pc-note">
                 <i class="fas fa-circle-info"></i>
-                <strong>جهاتُ الاتصالِ والمفوَّضون لـ<?php echo ems_pc_e($partyLabel); ?></strong> —
-                <strong>تبويبٌ في الملفِّ لا شاشةٌ مستقلة</strong>، فلا بندَ تنقّلٍ له.
+                <strong>جهات الاتصال والمفوضون ل<?php echo ems_pc_e($partyLabel); ?></strong> —
+                <strong>تبويب في الملف لا شاشة مستقلة</strong>، فلا بند تنقل له.
                 <br>
-                و<strong>التفويضُ حجّيةٌ بمداه لا خانةُ تأشير</strong>: من يُوسَم مفوَّضًا بالتوقيع
-                <strong>يلزمه صفةٌ ومدًى ومستندٌ مرجعيّ</strong> — والقاعدةُ ترفض ما دونَ ذلك،
-                فلا يبقى في السجلِّ <strong>تفويضٌ مفتوح</strong>.
+                و<strong>التفويض حجية بمداه لا خانة تأشير</strong>: من يوسم مفوضا بالتوقيع
+                <strong>يلزمه صفة ومدى ومستند مرجعي</strong> — والقاعدة ترفض ما دون ذلك،
+                فلا يبقى في السجل <strong>تفويض مفتوح</strong>.
             </p>
         </div></div>
 
         <div class="card"><div class="card-header"><h5><i class="fa fa-address-book"></i>
-            جهاتُ الاتصال — <?php echo count($rows); ?></h5></div>
+            جهات الاتصال — <?php echo count($rows); ?></h5></div>
         <div class="card-body"><div class="table-container">
             <table class="alltables display nowrap pc-table">
                 <thead><tr>
                     <?php if ($canEdit): ?><th class="pc-actions-th">إجراءات</th><?php endif; ?>
                     <th>الاسم</th><th>الصفة</th><th>الهاتف</th><th>البريد</th>
-                    <th>رئيسية</th><th>مفوَّضٌ بالتوقيع</th><th>صفةُ التفويض</th>
+                    <th>رئيسية</th><th>مفوض بالتوقيع</th><th>صفة التفويض</th>
                     <th>مدى التفويض</th><th>المستند</th><th>من</th><th>إلى</th><th>الحالة</th>
                 </tr></thead>
                 <tbody>
                 <?php if (!$rows): ?>
                     <tr><td colspan="<?php echo $canEdit ? 13 : 12; ?>" class="pc-empty">
-                        لا جهةَ اتصالٍ مسجَّلةٌ بعد</td></tr>
+                        لا جهة اتصال مسجلة بعد</td></tr>
                 <?php endif; ?>
                 <?php foreach ($rows as $r): ?>
                     <tr>
@@ -67,7 +67,7 @@ if (!function_exists('ems_pc_render')) {
                             <a class="btn btn-sm btn-outline-secondary"
                                href="?<?php echo ems_pc_e($baseQs); ?>&amp;pc_edit=<?php echo (int) $r['id']; ?>">تعديل</a>
                             <form method="post" class="pc-inline"
-                                  onsubmit="return confirm('إزالةُ جهةِ الاتصال؟ (حذفٌ ناعمٌ يُبقي الأثر)');">
+                                  onsubmit="return confirm('إزالة جهة الاتصال؟ (حذف ناعم يبقي الأثر)');">
                                 <input type="hidden" name="csrf_token" value="<?php echo ems_pc_e($tok); ?>">
                                 <input type="hidden" name="pc_action" value="delete">
                                 <input type="hidden" name="pc_id" value="<?php echo (int) $r['id']; ?>">
@@ -83,7 +83,7 @@ if (!function_exists('ems_pc_render')) {
                         <td><?php echo ((int) $r['is_primary'] === 1)
                             ? '<span class="badge badge-success">رئيسية</span>' : ''; ?></td>
                         <td><?php echo ((int) $r['is_signatory'] === 1)
-                            ? '<span class="badge badge-success">مفوَّض</span>' : ''; ?></td>
+                            ? '<span class="badge badge-success">مفوض</span>' : ''; ?></td>
                         <td><?php echo ems_pc_e($r['authority_kind']); ?></td>
                         <td class="pc-wrap"><?php echo ems_pc_e($r['authority_scope']); ?></td>
                         <td><?php echo ems_pc_e($r['authority_doc_ref']); ?></td>
@@ -98,7 +98,7 @@ if (!function_exists('ems_pc_render')) {
 
         <?php if ($canEdit): ?>
         <div class="card"><div class="card-header"><h5><i class="fa fa-plus"></i>
-            <?php echo $cur ? 'تعديلُ جهةِ اتصال' : 'إضافةُ جهةِ اتصال'; ?></h5></div>
+            <?php echo $cur ? 'تعديل جهة اتصال' : 'إضافة جهة اتصال'; ?></h5></div>
         <div class="card-body">
             <form method="post" class="ems-form pc-form">
                 <input type="hidden" name="csrf_token" value="<?php echo ems_pc_e($tok); ?>">
@@ -110,13 +110,13 @@ if (!function_exists('ems_pc_render')) {
                     <div><label for="pc_name">الاسم *</label>
                         <input id="pc_name" class="form-control" type="text" name="contact_name"
                                maxlength="190" required value="<?php echo $v('contact_name'); ?>"></div>
-                    <div><label for="pc_job">الصفةُ الوظيفية</label>
+                    <div><label for="pc_job">الصفة الوظيفية</label>
                         <input id="pc_job" class="form-control" type="text" name="job_title"
                                maxlength="120" value="<?php echo $v('job_title'); ?>"></div>
                     <div><label for="pc_ph">الهاتف</label>
                         <input id="pc_ph" class="form-control" type="text" name="phone"
                                maxlength="40" value="<?php echo $v('phone'); ?>"></div>
-                    <div><label for="pc_ph2">هاتفٌ بديل</label>
+                    <div><label for="pc_ph2">هاتف بديل</label>
                         <input id="pc_ph2" class="form-control" type="text" name="phone_alt"
                                maxlength="40" value="<?php echo $v('phone_alt'); ?>"></div>
                     <div><label for="pc_em">البريد</label>
@@ -133,16 +133,16 @@ if (!function_exists('ems_pc_render')) {
                     <div class="pc-check">
                         <input id="pc_pri" type="checkbox" name="is_primary" value="1"<?php
                             echo ($cur && (int) $cur['is_primary'] === 1) ? ' checked' : ''; ?>>
-                        <label for="pc_pri">جهةُ الاتصالِ الرئيسية</label></div>
+                        <label for="pc_pri">جهة الاتصال الرئيسية</label></div>
                     <div class="pc-check">
                         <input id="pc_sig" type="checkbox" name="is_signatory" value="1"<?php
                             echo ($cur && (int) $cur['is_signatory'] === 1) ? ' checked' : ''; ?>>
-                        <label for="pc_sig">مفوَّضٌ بالتوقيع</label></div>
+                        <label for="pc_sig">مفوض بالتوقيع</label></div>
                 </div>
                 <fieldset class="pc-auth">
-                    <legend>حجّيةُ التفويضِ ومداه — تلزم كلَّ مفوَّضٍ بالتوقيع</legend>
+                    <legend>حجية التفويض ومداه — تلزم كل مفوض بالتوقيع</legend>
                     <div class="pc-grid">
-                        <div><label for="pc_ak">صفةُ التفويض</label>
+                        <div><label for="pc_ak">صفة التفويض</label>
                             <select id="pc_ak" class="form-control" name="authority_kind">
                                 <?php foreach ($kinds as $o): ?>
                                 <option value="<?php echo ems_pc_e($o); ?>"<?php
@@ -150,18 +150,18 @@ if (!function_exists('ems_pc_render')) {
                                     echo ems_pc_e($o); ?></option>
                                 <?php endforeach; ?>
                             </select></div>
-                        <div><label for="pc_ad">المستندُ المرجعيّ</label>
+                        <div><label for="pc_ad">المستند المرجعي</label>
                             <input id="pc_ad" class="form-control" type="text" name="authority_doc_ref"
                                    maxlength="120" value="<?php echo $v('authority_doc_ref'); ?>"></div>
-                        <div><label for="pc_af">سارٍ من</label>
+                        <div><label for="pc_af">سار من</label>
                             <input id="pc_af" class="form-control" type="date" name="authority_from"
                                    value="<?php echo $v('authority_from'); ?>"></div>
-                        <div><label for="pc_at">سارٍ إلى</label>
+                        <div><label for="pc_at">سار إلى</label>
                             <input id="pc_at" class="form-control" type="date" name="authority_to"
                                    value="<?php echo $v('authority_to'); ?>"></div>
                         <div class="pc-span2"><label for="pc_as">مدى التفويض</label>
                             <input id="pc_as" class="form-control" type="text" name="authority_scope"
-                                   maxlength="300" placeholder="ما الذي يملك التوقيعَ عليه وبأيِّ حد"
+                                   maxlength="300" placeholder="ما الذي يملك التوقيع عليه وبأي حد"
                                    value="<?php echo $v('authority_scope'); ?>"></div>
                     </div>
                 </fieldset>
@@ -170,7 +170,7 @@ if (!function_exists('ems_pc_render')) {
                            maxlength="300" value="<?php echo $v('note'); ?>"></div>
                 <div class="pc-submit">
                     <button type="submit" class="btn btn-primary"><?php
-                        echo $cur ? 'حفظُ التعديل' : 'إضافة'; ?></button>
+                        echo $cur ? 'حفظ التعديل' : 'إضافة'; ?></button>
                 </div>
             </form>
         </div></div>

@@ -82,7 +82,7 @@ class ClientStatementService
                     AND COALESCE(c.is_deleted,0)=0", array($clientId)) as $x) {
                 if ((int) $x['contract_id'] > 0) { $contractIds[] = (int) $x['contract_id']; }
             }
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $contractIds'); $contractIds = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $contractIds'); $contractIds = array(); }
 
         // ── ⓪ المخطَّط — مواءمةُ PLAN-03 §5: من `contract_monthly_plan` × سعرِ
         //     بندِه (نمطُ اللوحة التجارية P-12 نفسُه) — **مقارِنٌ لا ذمة**،
@@ -117,7 +117,7 @@ class ClientStatementService
                     round($a['qty'] * $price, 2),
                     isset($curOf[$lid]) ? $curOf[$lid] : '',
                     'monthly_plan', (string) $cid,
-                    'كمية ' . $a['qty'] . ' × سعر ' . $price . ' · ' . $a['months'] . ' شهرًا'));
+                    'كمية ' . $a['qty'] . ' × سعر ' . $price . ' · ' . $a['months'] . ' شهرا'));
             }
         }
 
@@ -132,7 +132,7 @@ class ClientStatementService
                     AND c.period_to BETWEEN ? AND ?
                   ORDER BY c.period_from, c.id",
                 array($clientId, (string) $from, (string) $to));
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $claims'); $claims = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $claims'); $claims = array(); }
 
         $claimIds = array();
         foreach ($claims as $c) {
@@ -146,9 +146,9 @@ class ClientStatementService
             // ── ④ المحتجز — طبقةٌ مستقلةٌ لا تُخلط بالذمة الجارية (§4) ──────
             if ((float) $c['retention_amount'] > 0) {
                 self::push($out, 'retention', self::row(
-                    'محتجزُ حسن التنفيذ من مستخلص ' . $c['claim_no'],
+                    'محتجز حسن التنفيذ من مستخلص ' . $c['claim_no'],
                     (string) $c['period_to'], (float) $c['retention_amount'], (string) $c['currency'],
-                    'claim', (string) $c['id'], 'يُردُّ بمهلته العقدية'));
+                    'claim', (string) $c['id'], 'يرد بمهلته العقدية'));
             }
         }
 
@@ -165,17 +165,17 @@ class ClientStatementService
                        LEFT JOIN claims c ON c.id = t.claim_id
                       WHERE {TENANT_SCOPE} AND t.claim_id IN ({$in})
                       ORDER BY t.id");
-            } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $invoices'); $invoices = array(); }
+            } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $invoices'); $invoices = array(); }
         }
         foreach ($invoices as $i) {
             $cancelled = ((string) $i['state'] === 'cancelled');
             self::push($out, 'invoices', self::row(
-                'فاتورة ' . $i['serial_no'] . ($cancelled ? ' — **ملغاةٌ ضريبيًّا**' : '')
+                'فاتورة ' . $i['serial_no'] . ($cancelled ? ' — **ملغاة ضريبيا**' : '')
                 . ' (مستخلص ' . $i['claim_no'] . ')',
                 substr((string) $i['issued_at'], 0, 10),
                 $cancelled ? 0.0 : (float) $i['total_amount'], (string) $i['currency'],
                 'tax_invoice', (string) $i['id'],
-                'صافٍ ' . $i['net_amount'] . ' + ضريبة ' . $i['tax_amount']));
+                'صاف ' . $i['net_amount'] . ' + ضريبة ' . $i['tax_amount']));
         }
 
         // ── ③ التحصيلات — «والتخصيصُ ظاهرٌ في الكشف لا صامتًا» (§4) ─────────
@@ -192,12 +192,12 @@ class ClientStatementService
                     AND DATE(p.created_at) BETWEEN ? AND ?
                   ORDER BY p.id",
                 array($clientId, (string) $from, (string) $to));
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $collections'); $collections = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $collections'); $collections = array(); }
         foreach ($collections as $p) {
             self::push($out, 'collections', self::row(
                 'تحصيل ' . $p['payment_no'] . ' (' . $p['state'] . ')'
-                . ' — خُصّص لـ' . ($p['doc_ref'] !== null && $p['doc_ref'] !== ''
-                                    ? $p['doc_ref'] : '⚠ بلا ذمّةٍ مخصَّصة'),
+                . ' — خصص ل' . ($p['doc_ref'] !== null && $p['doc_ref'] !== ''
+                                    ? $p['doc_ref'] : '⚠ بلا ذمة مخصصة'),
                 (string) $p['p_date'], -1 * (float) $p['amount'], (string) $p['currency'],
                 'collection', (string) $p['id'], (string) $p['method']));
         }
@@ -214,16 +214,16 @@ class ClientStatementService
                       WHERE {TENANT_SCOPE} AND a.contract_id IN ({$cin})
                         AND COALESCE(a.is_deleted,0)=0
                       ORDER BY a.id");
-            } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $advances'); $advances = array(); }
+            } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $advances'); $advances = array(); }
         } else {
-            $out['notes'][] = 'ℹ لا عقدَ مربوطًا بمستخلصات هذا العميل — **فطبقةُ الدفعة المقدمة تُقرأ فارغةً وتُعلَن** '
-                            . '(`contracts` بلا عمود عميل، والرابطُ الموثوقُ `claims.contract_id`)';
+            $out['notes'][] = 'ℹ لا عقد مربوطا بمستخلصات هذا العميل — **فطبقة الدفعة المقدمة تقرأ فارغة وتعلن** '
+                            . '(`contracts` بلا عمود عميل، والرابط الموثوق `claims.contract_id`)';
         }
         foreach ($advances as $a) {
             self::push($out, 'advance', self::row(
-                'دفعةٌ مقدمة ' . $a['advance_no'] . ' (' . $a['state'] . ') — سند ' . $a['doc_ref'],
+                'دفعة مقدمة ' . $a['advance_no'] . ' (' . $a['state'] . ') — سند ' . $a['doc_ref'],
                 (string) $a['received_date'], (float) $a['amount'], (string) $a['currency'],
-                'advance', (string) $a['id'], 'تُستهلك بجدولها من كل مستخلص'));
+                'advance', (string) $a['id'], 'تستهلك بجدولها من كل مستخلص'));
         }
         // مواءمةُ PLAN-03 §5: **رصيدُ المقدم المتبقي ظاهرٌ دائمًا** — من دفتر
         // M-01 نفسِه (`advance_balance`) لا من حسابٍ ثانٍ للرقم الواحد.
@@ -232,11 +232,11 @@ class ClientStatementService
                 require_once dirname(__DIR__, 3) . '/Contracts/advance_helpers.php';
                 $ab = advance_balance($gate, $cid);
                 if ((float) $ab['received'] > 0) {
-                    $out['notes'][] = 'ℹ عقد #' . $cid . ': المقدمُ المقبوض ' . $ab['received']
-                        . ' — المستقطَع ' . $ab['recovered']
-                        . ' — **الرصيدُ المتبقي ' . $ab['balance'] . '**';
+                    $out['notes'][] = 'ℹ عقد #' . $cid . ': المقدم المقبوض ' . $ab['received']
+                        . ' — المستقطع ' . $ab['recovered']
+                        . ' — **الرصيد المتبقي ' . $ab['balance'] . '**';
                 }
-            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'لا مقدمَ = لا سطر'); /* لا مقدمَ = لا سطر */ }
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'لا مقدم = لا سطر'); /* لا مقدمَ = لا سطر */ }
         }
 
         // مواءمةُ PLAN-03 §5: المحتجزُ **بتاريخ ردّه** من سجل الضمانات (P-06) —
@@ -254,20 +254,20 @@ class ClientStatementService
                       WHERE {TENANT_SCOPE} AND g.contract_id IN ({$cin})
                         AND COALESCE(g.is_deleted,0)=0 AND g.state IN ('active','expired')
                       ORDER BY g.contract_id, g.id");
-            } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $guarantees'); $guarantees = array(); }
+            } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $guarantees'); $guarantees = array(); }
             foreach ($guarantees as $g) {
                 if ((string) $g['kind'] === 'cash_retention') {
-                    $out['notes'][] = 'ℹ محتجزُ عقد #' . (int) $g['contract_id']
-                        . ' (' . $g['amount'] . ' ' . $g['currency'] . ') — **تاريخُ ردّه '
+                    $out['notes'][] = 'ℹ محتجز عقد #' . (int) $g['contract_id']
+                        . ' (' . $g['amount'] . ' ' . $g['currency'] . ') — **تاريخ رده '
                         . ((string) $g['due_release_date'] !== '' && $g['due_release_date'] !== null
                             ? (string) $g['due_release_date']
-                            : 'غيرُ محدَّدٍ — يُعلَن ولا يُخمَّن')
+                            : 'غير محدد — يعلن ولا يخمن')
                         . '**' . ((string) $g['release_condition'] !== ''
-                            ? ' · شرطُه: ' . $g['release_condition'] : '');
+                            ? ' · شرطه: ' . $g['release_condition'] : '');
                 } elseif ((string) $g['nature'] === 'off_balance') {
-                    $out['notes'][] = 'ℹ خطابُ ضمانٍ (' . $g['kind'] . ') قائمٌ على عقد #'
-                        . (int) $g['contract_id'] . ' — **التزامٌ خارج الميزانية: لا يُخصم من '
-                        . 'مستخلصٍ ولا يظهر رقمًا في الرصيد** (P-06)';
+                    $out['notes'][] = 'ℹ خطاب ضمان (' . $g['kind'] . ') قائم على عقد #'
+                        . (int) $g['contract_id'] . ' — **التزام خارج الميزانية: لا يخصم من '
+                        . 'مستخلص ولا يظهر رقما في الرصيد** (P-06)';
                 }
             }
         }
@@ -279,20 +279,20 @@ class ClientStatementService
         // ② الرصيدُ من **الفواتير** لا من المستخلصات — وإلا احتُسب الدَّينُ مرتين
         $out['totals']['balance'] = round($out['totals']['invoices'] + $out['totals']['collections'], 2);
         if ($out['totals']['planned'] != 0.0 || $out['layers']['planned']['rows']) {
-            $out['notes'][] = 'ℹ طبقةُ المخطَّط **مقارِنةٌ من خط الأساس التجاري (P-03)** — '
-                            . 'خطةٌ لا ذمة، **ولا تدخل الرصيد الجاري**';
+            $out['notes'][] = 'ℹ طبقة المخطط **مقارنة من خط الأساس التجاري (P-03)** — '
+                            . 'خطة لا ذمة، **ولا تدخل الرصيد الجاري**';
         }
 
         if (count($out['currencies']) > 1) {
-            $out['notes'][] = '⚠ الكشفُ يحمل أكثرَ من عملة (' . implode(' · ', array_keys($out['currencies']))
-                            . ') — **والمجاميعُ لا تجمع عملتين في رقم**: اقرأ كلَّ سطرٍ بعملته';
+            $out['notes'][] = '⚠ الكشف يحمل أكثر من عملة (' . implode(' · ', array_keys($out['currencies']))
+                            . ') — **والمجاميع لا تجمع عملتين في رقم**: اقرأ كل سطر بعملته';
         }
         if ($out['orphans'] > 0) {
-            $out['notes'][] = '⚠ ' . $out['orphans'] . ' صفًّا **بلا مصدرٍ يُنقر إليه** — يُعلَن ولا يُخفى';
+            $out['notes'][] = '⚠ ' . $out['orphans'] . ' صفا **بلا مصدر ينقر إليه** — يعلن ولا يخفى';
         }
         if ($out['totals']['retention'] > 0) {
-            $out['notes'][] = 'ℹ المحتجزُ ' . $out['totals']['retention']
-                            . ' **رصيدٌ محتجزٌ في طبقته** — لا يُنسى ولا يُخلط بالذمة الجارية (§4)';
+            $out['notes'][] = 'ℹ المحتجز ' . $out['totals']['retention']
+                            . ' **رصيد محتجز في طبقته** — لا ينسى ولا يخلط بالذمة الجارية (§4)';
         }
         return $out;
     }

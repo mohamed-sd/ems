@@ -22,6 +22,12 @@
 
 namespace App\Services\Work;
 
+/* سجلُّ المسمّياتِ المركزيُّ ونواةُ النقاء (‏REPAIR01 · W06 §٤-٣ و§٤-٤).
+   ◆ **بمسارِهما لا بالمحمِّلِ وحدَه**: هذا المحرِّكُ يُستدعى من مسارَي كرونٍ
+     وواجهةٍ يُضمَّن فيهما بـ`require_once` مباشرةً قبل إقلاعِ المحمِّل. */
+require_once dirname(__DIR__) . '/Ui/UiPurity.php';
+require_once dirname(__DIR__) . '/Ui/UiLabelRegistry.php';
+
 class WorkItemService
 {
     /** الحالات الخمس عشرة (الورقة 02) */
@@ -109,7 +115,7 @@ class WorkItemService
         $need = array(
             'company_id' => 'الكيان', 'source_type' => 'المصدر', 'source_ref' => 'مرجع المصدر',
             'owner_user_id' => 'المالك', 'title' => 'العنوان',
-            'due_at' => 'الموعد', 'deliverable' => 'المخرَج المطلوب',
+            'due_at' => 'الموعد', 'deliverable' => 'المخرج المطلوب',
         );
         foreach ($need as $k => $label) {
             if (!isset($a[$k]) || trim((string) $a[$k]) === '' || (is_numeric($a[$k]) && intval($a[$k]) === 0 && in_array($k, array('company_id', 'owner_user_id'), true))) {
@@ -117,10 +123,10 @@ class WorkItemService
             }
         }
         // المنفِّذ: شخصٌ أو دورٌ مستقبِل — أحدهما (AC-WFM-02)
-        if (empty($a['assigned_user_id']) && empty($a['assigned_role_id'])) { $missing[] = 'المنفِّذ أو الدور المستقبِل'; }
+        if (empty($a['assigned_user_id']) && empty($a['assigned_role_id'])) { $missing[] = 'المنفذ أو الدور المستقبل'; }
         // النطاق: إدارةٌ أو مشروعٌ أو موقع — أحدها
         if (empty($a['org_unit_id']) && empty($a['project_id']) && empty($a['site_id'])) { $missing[] = 'النطاق (إدارة/مشروع/موقع)'; }
-        if (!in_array((string) ($a['source_type'] ?? ''), self::SOURCES, true)) { $missing[] = 'مصدرٌ من الأربعة عشر'; }
+        if (!in_array((string) ($a['source_type'] ?? ''), self::SOURCES, true)) { $missing[] = 'مصدر من الأربعة عشر'; }
 
         /* ══ INJ-0486 · الحارسُ السباعيُّ كان خمسةً ونصفًا ═══════════════════════
              نصُّ القبول: «إنشاءُ عنصرِ عملٍ **بلا `evidence_required` أو بلا
@@ -133,19 +139,19 @@ class WorkItemService
            ◆ **والمتحقِّقُ غيرُ المنفِّذ**: من ينفّذ لا يشهد على نفسِه. وهذا
              الشرطُ لا يُقاس بحقلٍ بل بمقارنةِ اثنين. */
         if (!isset($a['evidence_required']) || trim((string) $a['evidence_required']) === '') {
-            $missing[] = 'الدليلُ المطلوب (evidence_required)';
+            $missing[] = 'الدليل المطلوب (evidence_required)';
         }
         if (empty($a['verifier_user_id']) || (int) $a['verifier_user_id'] <= 0) {
-            $missing[] = 'المتحقِّق (verifier_user_id)';
+            $missing[] = 'المتحقق (verifier_user_id)';
         }
         if ($missing) {
             return array('ok' => false, 'code' => 422,
-                'reason' => 'لا عنصرَ بلا سبعة (WF-02) — الناقص: ' . implode(' · ', $missing));
+                'reason' => 'لا عنصر بلا سبعة (WF-02) — الناقص: ' . implode(' · ', $missing));
         }
         $__exec = !empty($a['assigned_user_id']) ? (int) $a['assigned_user_id'] : 0;
         if ($__exec > 0 && (int) $a['verifier_user_id'] === $__exec) {
             return array('ok' => false, 'code' => 422,
-                'reason' => 'WF-422-SELFVERIFY: المتحقِّقُ هو المنفِّذُ نفسُه — ولا يشهد أحدٌ على عملِه');
+                'reason' => 'WF-422-SELFVERIFY: المتحقق هو المنفذ نفسه — ولا يشهد أحد على عمله');
         }
 
         // WF-08: تكليفٌ منتهٍ لا يولّد — إن جاء العنصر بمرجع تفويض يُفحص سريانه
@@ -209,7 +215,7 @@ class WorkItemService
             // `no_notify`: العنصرُ المولَّدُ **عن تنبيهٍ** لا يُخطِر مرتين —
             // الإخطارُ وقع سلفًا وهذه المهمةُ أثرُه لا حدثٌ جديد.
             if (empty($a['no_notify'])) {
-                self::notifyUser($conn, $co, $assignee, 'مهمةٌ مسنَدةٌ إليك', $title,
+                self::notifyUser($conn, $co, $assignee, 'مهمة مسندة إليك', $title,
                     'Portal/my_tasks.php?item=' . $id, false, $by);
             }
         }
@@ -226,7 +232,7 @@ class WorkItemService
     {
         $itemId = intval($itemId);
         $actor = intval($actorUserId);
-        if (!isset(self::TRANSITIONS[$to])) { return array('ok' => false, 'code' => 422, 'reason' => 'انتقالٌ غير معرَّف: ' . $to); }
+        if (!isset(self::TRANSITIONS[$to])) { return array('ok' => false, 'code' => 422, 'reason' => 'انتقال غير معرف: ' . $to); }
         $t = self::TRANSITIONS[$to];
 
         $it = self::fetch($conn, $itemId);
@@ -234,10 +240,10 @@ class WorkItemService
         $fromEff = ($it['status'] === 'overdue' && !in_array('overdue', $t['from'], true) && isset($opts['pre_overdue']))
                  ? (string) $opts['pre_overdue'] : $it['status'];
         if (!in_array($fromEff, $t['from'], true) && !in_array($it['status'], $t['from'], true)) {
-            return array('ok' => false, 'code' => 409, 'reason' => 'لا انتقالَ من ' . $it['status'] . ' إلى ' . $to);
+            return array('ok' => false, 'code' => 409, 'reason' => 'لا انتقال من ' . $it['status'] . ' إلى ' . $to);
         }
         if ($t['reason'] && trim($reason) === '') {
-            return array('ok' => false, 'code' => 422, 'reason' => 'السبب إلزاميٌّ لهذا الانتقال');
+            return array('ok' => false, 'code' => 422, 'reason' => 'السبب إلزامي لهذا الانتقال');
         }
 
         // المخوَّل (الورقة 02) — والحارس هنا خادميٌّ لا زينة واجهة
@@ -258,7 +264,7 @@ class WorkItemService
             case 'governance': $authorized = !empty($opts['governance_ok']) || $actor === $owner; break;
         }
         if (!$authorized && empty($opts['system'])) {
-            return array('ok' => false, 'code' => 403, 'reason' => 'غير مخوَّلٍ بهذا الانتقال (' . $t['by'] . ')');
+            return array('ok' => false, 'code' => 403, 'reason' => 'غير مخول بهذا الانتقال (' . $t['by'] . ')');
         }
         if ($to === 'blocked' && !in_array($reason, self::PAUSE_REASONS, true) && empty($opts['reason_listed'])) {
             // سببٌ خارج القائمة: يُسجَّل ولا يوقف العدّ (الورقة 05)
@@ -301,32 +307,32 @@ class WorkItemService
 
         switch ($to) {
             case 'accepted':
-                self::notifyUser($conn, $co, $owner, 'تمَّ الاستلام', $title, $link, false, $actor); break;
+                self::notifyUser($conn, $co, $owner, 'تم الاستلام', $title, $link, false, $actor); break;
             case 'blocked':
-                self::notifyUser($conn, $co, $owner, 'مهمةٌ متعطلةٌ تحتاج تدخلًا', $title . ' — ' . $reason, $link, true, $actor); break;
+                self::notifyUser($conn, $co, $owner, 'مهمة متعطلة تحتاج تدخلا', $title . ' — ' . $reason, $link, true, $actor); break;
             case 'done_pending_verify':
                 $target = $verifier ?: $owner;
                 if ($target && $target !== $executor) {
-                    self::notifyUser($conn, $co, $target, 'مهمةٌ تنتظر تحققَك', $title, $link, true, $actor);
+                    self::notifyUser($conn, $co, $target, 'مهمة تنتظر تحققك', $title, $link, true, $actor);
                 }
                 break;
             case 'closed_accepted':
-                self::notifyUser($conn, $co, $executor, 'اكتملت المهمةُ ونُسب الإنجاز', $title, $link, false, $actor);
+                self::notifyUser($conn, $co, $executor, 'اكتملت المهمة ونسب الإنجاز', $title, $link, false, $actor);
                 require_once __DIR__ . '/AchievementService.php';
                 AchievementService::deriveFromTask($conn, $it, $actor);
                 break;
             case 'returned':
-                self::notifyUser($conn, $co, $executor, 'مهمةٌ أُعيدت إليك بسبب: ' . $reason, $title, $link, true, $actor); break;
+                self::notifyUser($conn, $co, $executor, 'مهمة أعيدت إليك بسبب: ' . $reason, $title, $link, true, $actor); break;
             case 'rejected':
-                self::notifyUser($conn, $co, $owner, 'رفض المنفِّذُ المهمةَ: ' . $reason, $title, $link, true, $actor); break;
+                self::notifyUser($conn, $co, $owner, 'رفض المنفذ المهمة: ' . $reason, $title, $link, true, $actor); break;
             case 'cancelled':
-                if ($executor) { self::notifyUser($conn, $co, $executor, 'أُلغيت المهمة: ' . $reason, $title, $link, false, $actor); }
+                if ($executor) { self::notifyUser($conn, $co, $executor, 'ألغيت المهمة: ' . $reason, $title, $link, false, $actor); }
                 break;
             case 'reopened':
                 require_once __DIR__ . '/AchievementService.php';
-                AchievementService::reverseForSource($conn, $co, 'task', (string) $id, 'أُعيد فتح المهمة: ' . $reason, $actor);
-                self::notifyUser($conn, $co, $executor, 'أُعيد فتح المهمة', $title, $link, true, $actor);
-                if ($owner !== $executor) { self::notifyUser($conn, $co, $owner, 'أُعيد فتح المهمة', $title, $link, false, $actor); }
+                AchievementService::reverseForSource($conn, $co, 'task', (string) $id, 'أعيد فتح المهمة: ' . $reason, $actor);
+                self::notifyUser($conn, $co, $executor, 'أعيد فتح المهمة', $title, $link, true, $actor);
+                if ($owner !== $executor) { self::notifyUser($conn, $co, $owner, 'أعيد فتح المهمة', $title, $link, false, $actor); }
                 break;
         }
     }
@@ -340,7 +346,7 @@ class WorkItemService
         if (trim($reason) === '') { return array('ok' => false, 'code' => 422, 'reason' => 'سبب إعادة الإسناد إلزامي'); }
         $actor = intval($actor);
         if ($actor !== intval($it['owner_user_id']) && $actor !== intval($it['created_by'])) {
-            return array('ok' => false, 'code' => 403, 'reason' => 'إعادة الإسناد للمكلِّف أو المالك');
+            return array('ok' => false, 'code' => 403, 'reason' => 'إعادة الإسناد للمكلف أو المالك');
         }
         $to = intval($toUserId);
         $from = intval($it['assigned_user_id']);
@@ -352,8 +358,8 @@ class WorkItemService
         $st->close();
         self::logAssignment($conn, intval($it['company_id']), $iid, 'reassign', $from, $to, $reason, $actor);
         // العدُّ يستمر ولا يُصفَّر (الورقة 02) — لا مساس بأعمدة العدّ
-        self::notifyUser($conn, intval($it['company_id']), $to, 'نقلُ مهمةٍ إليك', (string) $it['title'], 'Portal/my_tasks.php?item=' . $iid, true, $actor);
-        if ($from) { self::notifyUser($conn, intval($it['company_id']), $from, 'نُقلت مهمةٌ منك', (string) $it['title'], 'Portal/my_tasks.php?item=' . $iid, false, $actor); }
+        self::notifyUser($conn, intval($it['company_id']), $to, 'نقل مهمة إليك', (string) $it['title'], 'Portal/my_tasks.php?item=' . $iid, true, $actor);
+        if ($from) { self::notifyUser($conn, intval($it['company_id']), $from, 'نقلت مهمة منك', (string) $it['title'], 'Portal/my_tasks.php?item=' . $iid, false, $actor); }
         return array('ok' => true, 'code' => 200);
     }
 
@@ -414,7 +420,7 @@ class WorkItemService
             $st->execute();
             $st->close();
             mysqli_query($conn, "UPDATE work_items SET escalation_level = {$lvl} WHERE id = {$id}");
-            self::notifyUser($conn, $co, $target, 'تجاوزٌ يحتاج تصعيدًا', (string) $it['title'],
+            self::notifyUser($conn, $co, $target, 'تجاوز يحتاج تصعيدا', (string) $it['title'],
                 'Portal/my_tasks.php?item=' . $id, true, 0);
             $out['escalated']++;
         }
@@ -438,8 +444,8 @@ class WorkItemService
         $src = (string) $it['source_type'];
         $screen = (string) ($it['source_screen'] ?: '—');
         $ok1 = in_array($src, self::SOURCES, true) && (string) $it['source_ref'] !== '';
-        $steps[] = array('q' => 'ما أصلُ هذا العنصر؟',
-            'a' => $ok1 ? "نشأ من المصدر {$src} (مرجع {$it['source_ref']}) في شاشة «{$screen}»" : 'بلا مصدرٍ — يُحجب ويُبلَّغ',
+        $steps[] = array('q' => 'ما أصل هذا العنصر؟',
+            'a' => $ok1 ? "نشأ من المصدر {$src} (مرجع {$it['source_ref']}) في شاشة «{$screen}»" : 'بلا مصدر — يحجب ويبلغ',
             'ok' => $ok1);
         $complete = $complete && $ok1;
 
@@ -452,8 +458,8 @@ class WorkItemService
         $rr = $st->get_result()->fetch_assoc();
         $st->close();
         if ($rr) { $rule = (string) $rr['rule_text']; }
-        $steps[] = array('q' => 'بأي قاعدةٍ وُجِّه إليّ؟',
-            'a' => $rule !== null ? 'وُجِّه بقاعدة: ' . $rule : 'توجيهٌ يدويٌّ مسجَّلٌ بمبرِّره (استثناء WF-07)',
+        $steps[] = array('q' => 'بأي قاعدة وجه إلي؟',
+            'a' => $rule !== null ? 'وجه بقاعدة: ' . $rule : 'توجيه يدوي مسجل بمبرره (استثناء WF-07)',
             'ok' => true);
 
         // ③ الدور
@@ -464,8 +470,8 @@ class WorkItemService
         $u = $st->get_result()->fetch_assoc();
         $st->close();
         $ok3 = (bool) $u;
-        $steps[] = array('q' => 'بأي دورٍ أستقبله؟',
-            'a' => $ok3 ? 'لأنك تحمل دور «' . ($u['role_name'] ?: $u['role']) . '»' : 'لا دورَ مطابقًا — يُحجب ويُراجَع', 'ok' => $ok3);
+        $steps[] = array('q' => 'بأي دور أستقبله؟',
+            'a' => $ok3 ? 'لأنك تحمل دور «' . ($u['role_name'] ?: $u['role']) . '»' : 'لا دور مطابقا — يحجب ويراجع', 'ok' => $ok3);
         $complete = $complete && $ok3;
 
         // ④ النطاق
@@ -476,18 +482,18 @@ class WorkItemService
         $inScope = ($uid === intval($it['assigned_user_id']) || $uid === intval($it['owner_user_id'])
                  || $uid === intval($it['verifier_user_id']) || $uid === intval($it['created_by']));
         $steps[] = array('q' => 'ما نطاقي فيه؟',
-            'a' => $inScope ? ('نطاقُك: ' . ($scope ? implode(' · ', $scope) : 'شخصي — أنت طرفُه')) : 'خارجَ النطاق — يُحجب فورًا',
+            'a' => $inScope ? ('نطاقك: ' . ($scope ? implode(' · ', $scope) : 'شخصي — أنت طرفه')) : 'خارج النطاق — يحجب فورا',
             'ok' => $inScope);
         $complete = $complete && $inScope;
 
         // ⑤ التفويض
         $dref = (string) ($it['delegation_ref'] ?? '');
         if ($dref === '') {
-            $steps[] = array('q' => 'أهو بتفويضٍ أم أصالة؟', 'a' => 'أصالةً', 'ok' => true);
+            $steps[] = array('q' => 'أهو بتفويض أم أصالة؟', 'a' => 'أصالة', 'ok' => true);
         } else {
             $live = self::isDelegationLive($conn, $dref);
-            $steps[] = array('q' => 'أهو بتفويضٍ أم أصالة؟',
-                'a' => $live ? 'بتفويضٍ نافذٍ (' . $dref . ')' : 'تفويضٌ منتهٍ — يُعاد للأصل ويُنبَّه', 'ok' => $live);
+            $steps[] = array('q' => 'أهو بتفويض أم أصالة؟',
+                'a' => $live ? 'بتفويض نافذ (' . $dref . ')' : 'تفويض منته — يعاد للأصل وينبه', 'ok' => $live);
             $complete = $complete && $live;
         }
         return array('complete' => $complete, 'steps' => $steps);
@@ -532,7 +538,7 @@ class WorkItemService
         $st->close();
         if (!$act) {
             return array('ok' => false, 'code' => 422,
-                'reason' => 'فعلٌ خارج خريطة NAV-09: ' . $actionCode . ' — لا يُخترع عنصر (WF-10)');
+                'reason' => 'فعل خارج خريطة NAV-09: ' . $actionCode . ' — لا يخترع عنصر (WF-10)');
         }
         $cls = self::classifyAction((string) $act['label_ar']);
         // عطالة الاشتقاق: العنصر القائم لنفس الفعل والمرجع يُعاد مرجعُه
@@ -546,11 +552,23 @@ class WorkItemService
         $stq->close();
         if ($ex) { return array('ok' => true, 'code' => 200, 'id' => intval($ex['id']), 'duplicate' => true); }
 
+        /* ══ نقاءُ لغةِ الواجهة (‏REPAIR01 · W06 §٤-٤) ═══════════════════════
+           كان العنوانُ يُركَّب `label_ar . ' — ' . screen_title` — **فكلُّ فعلٍ
+           في النظامِ يولّد نصًّا مخالفًا** بشرطةِ ربطٍ من مصدرٍ مشكول، ويُقاس
+           الدَّينُ في ١٧٦٤ عنوانًا مولَّدًا سلفًا. ورُفعت الشرطةُ ورُفع الضمُّ:
+           **الشاشةُ تُحفَظ في `source_screen`** حيث كانت تُحفَظ، فلا تُفقَد
+           معلومةٌ — والاسمُ يُقرأ من **السجلِّ المركزيِّ** لا من الجدولِ رأسًا،
+           فلا يظهر المصطلحُ بصيغتين في شاشتين. والغائبُ عن السجلِّ يُقيَّد
+           رفضُه ويُعاد مُنقّى — فلا تنكسر شاشةٌ ولا يمرُّ اسمٌ بلا أثر. */
+        $titleAr = \App\Services\Ui\UiLabelRegistry::label(
+            $conn, 'action:' . $actionCode, (string) $act['label_ar']);
+        if ($titleAr === '') { $titleAr = \App\Services\Ui\UiPurity::purifyGenerated((string) $act['label_ar']); }
+
         return self::create($conn, array_merge($a, array(
             'source_type' => $a['source_type'] ?? 'SRC-03',
             'source_screen' => (string) $act['canonical_file'],
             'action_code' => $actionCode,
-            'title' => $a['title'] ?? ($act['label_ar'] . ' — ' . $act['screen_title']),
+            'title' => $a['title'] ?? $titleAr,
             'priority' => $a['priority'] ?? $cls['priority'],
             'evidence_required' => $a['evidence_required'] ?? 'أثر الفعل في سجل التدقيق (WFM-116)',
         )));
@@ -664,8 +682,8 @@ class WorkItemService
             'org_unit_id' => 1,
             'title' => mb_substr((string) $title, 0, 200),
             'details' => mb_substr((string) $body, 0, 600),
-            'deliverable' => mb_substr('تنفيذُ ما يطلبه الإخطار: ' . (string) $title, 0, 300),
-            'evidence_required' => 'أثرُ الفعلِ المطلوبِ في سجلِّ التدقيق',
+            'deliverable' => mb_substr('تنفيذ ما يطلبه الإخطار: ' . (string) $title, 0, 300),
+            'evidence_required' => 'أثر الفعل المطلوب في سجل التدقيق',
             'priority' => 'P3',
             'due_at' => date('Y-m-d H:i:s', time() + 172800),
             'created_by' => (int) $by, 'no_notify' => true,

@@ -45,7 +45,7 @@ else {
     if ($row = $st->get_result()->fetch_assoc()) { $can_view = intval($row['can_view']) === 1; }
     $st->close();
 }
-if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا صلاحيةَ عرضٍ للصندوق الموحد ❌', 'GOV-PERM-403', ''); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا صلاحية عرض للصندوق الموحد ❌', 'GOV-PERM-403', ''); exit(); }
 
 /* INJ-0202: القارئُ يُمرَّر — فلا يعرض له الصندوقُ ما أنشأه هو */
 $__viewer = intval($_SESSION['user']['id'] ?? 0);
@@ -66,14 +66,14 @@ include '../insidebar.php';
 
     // M-44: «ما هذه الشاشة؟» — المكوّنُ الموحّد
     ems_screen_about(
-        'صندوقٌ واحدٌ يجمع كلَّ ما ينتظر قرارًا ماليًّا من الصناديق الأربعة: '
-        . 'الطلباتُ المالية · تسوياتُ الموردين · القيودُ اليدوية · إقفالُ الفترات. '
-        . 'القرارُ لا يُنفَّذ هنا — كلُّ سطرٍ يقفز بك إلى شاشة مالكه حيث الحرّاسُ كاملة.',
-        array('افتح الصندوقَ صباحًا واقرأ العدّادات',
-              'انقر السطرَ فيفتح موضعَ الفعل في شاشة مالكه',
-              'اتخذ القرارَ هناك — يدان لا يدٌ واحدة، ومن أنشأ لا يعتمد'));
-    echo ems_next_step('قرارُك: اعتمادٌ أو رفضٌ مسبَّب');
-    echo ems_states_bundle('لا اعتماداتٍ تنتظر دورَك', 'ما يستجدُّ من الصناديق الأربعة يظهر هنا فورَ وروده');
+        'صندوق واحد يجمع كل ما ينتظر قرارا ماليا من الصناديق الأربعة: '
+        . 'الطلبات المالية · تسويات الموردين · القيود اليدوية · إقفال الفترات. '
+        . 'القرار لا ينفذ هنا — كل سطر يقفز بك إلى شاشة مالكه حيث الحراس كاملة.',
+        array('افتح الصندوق صباحا واقرأ العدادات',
+              'انقر السطر فيفتح موضع الفعل في شاشة مالكه',
+              'اتخذ القرار هناك — يدان لا يد واحدة، ومن أنشأ لا يعتمد'));
+    echo ems_next_step('قرارك: اعتماد أو رفض مسبب');
+    echo ems_states_bundle('لا اعتمادات تنتظر دورك', 'ما يستجد من الصناديق الأربعة يظهر هنا فور وروده');
     ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
@@ -90,11 +90,11 @@ include '../insidebar.php';
     <?php foreach ($inbox['boxes'] as $b): ?>
     <div class="card"><div class="card-header"><h2 class="h5"><i class="fa fa-folder-open" aria-hidden="true"></i>
         <?php echo htmlspecialchars($b['title']); ?> (<?php echo intval($b['count']); ?>)
-        <small class="fin-inbox-owner">— القرارُ في <?php echo htmlspecialchars($b['owner']); ?></small></h2></div>
+        <small class="fin-inbox-owner">— القرار في <?php echo htmlspecialchars($b['owner']); ?></small></h2></div>
     <div class="card-body">
         <?php if (!$b['rows']):
             // M-44: الحالةُ الفارغة الموحّدة — لا نصَّ DataTables العام
-            ems_state_empty('لا شيءَ ينتظر قرارًا في هذا الصندوق — نظيف ✨');
+            ems_state_empty('لا شيء ينتظر قرارا في هذا الصندوق — نظيف ✨');
         else: ?>
         <div class="table-container">
         <table class="alltables display nowrap fin-w100" data-no-dt="1">
@@ -115,14 +115,14 @@ include '../insidebar.php';
               <th class="ems-fn-th" data-fn="1">تاريخ القرار</th>
               <th class="ems-fn-th" data-fn="1">مرجع تفويضي</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
               <th class="ems-gov-th none" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-              <th class="ems-gov-th none" data-gov="creating_entity" data-slice="1" title="الجهة التي أنشأت المستند">الجهة المُنشئة</th>
+              <th class="ems-gov-th none" data-gov="creating_entity" data-slice="1" title="الجهة التي أنشأت المستند">الجهة المنشئة</th>
               <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
               <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>

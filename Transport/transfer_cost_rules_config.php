@@ -28,7 +28,7 @@ $perms = trs_page_perms($conn, 'Transport/transfer_cost_rules_config.php', $is_s
 $can_view = $perms['can_view']; $can_add = $perms['can_add'];
 $can_edit = $perms['can_edit']; $can_delete = $perms['can_delete'];
 if (!$can_view) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض قواعد المتحمِّل ❌', 'GOV-PERM-403', '');
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض قواعد المتحمل ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -83,7 +83,7 @@ if (isset($_GET['delete_id'])) {
         trs_gate(false)->softDelete('transfer_cost_rules', $delete_id);
     } catch (\App\Core\TenantGateException $e) {
         error_log('cost_rules softDelete refused: ' . $e->getMessage());
-        ems_gov_flash_redirect('transfer_cost_rules_config.php', 'تعذّر الحذف ❌', 'GOV-FAIL-409', ''); exit();
+        ems_gov_flash_redirect('transfer_cost_rules_config.php', 'تعذر الحذف ❌', 'GOV-FAIL-409', ''); exit();
     }
     ems_gov_flash_redirect('transfer_cost_rules_config.php', 'تم حذف القاعدة بنجاح ✅', 'GOV-OK-200', ''); exit();
 }
@@ -116,19 +116,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا قواعدَ تحميلِ تكلفةٍ مسجَّلةً بعدُ', 'أضف أولَ قاعدةٍ بزرِّ «إضافة قاعدة» في رأسِ الشاشة');
+    echo ems_states_bundle('لا قواعد تحميل تكلفة مسجلة بعد', 'أضف أول قاعدة بزر «إضافة قاعدة» في رأس الشاشة');
     ?>
 
     <?php trs_msg_banner(); ?>
 
     <div class="success-message is-success trs-cr-note">
         <i class="fas fa-circle-info"></i>
-        قاعدة الستين يوماً: عودة (demob) لمشروع <b>أقل من 60 يوماً ← العميل</b>، و<b>≥ 60 يوماً ← الشركة</b>. يحسب المحرّك مدة المشروع تلقائياً ويختار الصف الصحيح.
+        قاعدة الستين يوما: عودة (demob) لمشروع <b>أقل من 60 يوما ← العميل</b>، و<b>≥ 60 يوما ← الشركة</b>. يحسب المحرك مدة المشروع تلقائيا ويختار الصف الصحيح.
     </div>
 
     <form id="trsForm" action="" method="post" class="allforms">
         <?= csrf_field() ?>
-        <div class="card-header"><h5><i class="fas fa-edit"></i> إضافة / تعديل قاعدة متحمِّل</h5></div>
+        <div class="card-header"><h5><i class="fas fa-edit"></i> إضافة / تعديل قاعدة متحمل</h5></div>
         <div class="card"><div class="card-body">
             <input type="hidden" name="id" id="r_id" value="">
             <div class="form-section">
@@ -154,7 +154,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <input type="number" name="duration_threshold_days" id="r_threshold" value="" placeholder="مثال: 60">
                     </div>
                     <div class="form-group">
-                        <label for="r_bearer">المتحمِّل <span class="required">*</span></label>
+                        <label for="r_bearer">المتحمل <span class="required">*</span></label>
                         <select name="default_bearer" id="r_bearer" required>
                             <?php foreach ($bearers as $k => $v): ?>
                                 <option value="<?php echo htmlspecialchars($k); ?>"><?php echo htmlspecialchars($v); ?></option>
@@ -166,8 +166,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <input type="text" name="basis_note" id="r_basis" placeholder="تعاقدي / قاعدة الستين / داخلي ...">
                     </div>
                     <div class="form-group">
-                        <label>مفعّلة؟</label>
-                        <label class="switch-inline"><input type="checkbox" name="active" id="r_active" aria-label="تفعيلُ القاعدة" value="1" checked> نعم، مفعّلة</label>
+                        <label>مفعلة؟</label>
+                        <label class="switch-inline"><input type="checkbox" name="active" id="r_active" aria-label="تفعيل القاعدة" value="1" checked> نعم، مفعلة</label>
                     </div>
                 </div>
             </div>
@@ -182,12 +182,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="table-container">
             <table id="trsTable" class="display nowrap alltables trs-cr-tbl" data-state-save="false" data-scroll-x="true">
                 <thead><tr>
-                    <th>الإجراءات</th><th>نوع الحركة</th><th>عامل المدة</th><th>العتبة (يوم)</th><th>المتحمِّل</th><th>الأساس</th><th>الحالة</th>
+                    <th>الإجراءات</th><th>نوع الحركة</th><th>عامل المدة</th><th>العتبة (يوم)</th><th>المتحمل</th><th>الأساس</th><th>الحالة</th>
                     <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                     <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                     <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                     <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -225,7 +225,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         echo "<td>" . htmlspecialchars((string)$thr) . "</td>";
                         echo "<td>" . htmlspecialchars($bearer_ar) . "</td>";
                         echo "<td>" . htmlspecialchars((string)($row['basis_note'] ?? '—')) . "</td>";
-                        echo "<td>" . ((int)$row['active'] === 1 ? "<span class='action-btn trs-cr-on'>مفعّلة</span>" : "<span class='action-btn trs-cr-off'>معطّلة</span>") . "</td>";
+                        echo "<td>" . ((int)$row['active'] === 1 ? "<span class='action-btn trs-cr-on'>مفعلة</span>" : "<span class='action-btn trs-cr-off'>معطلة</span>") . "</td>";
                         echo "</tr>";
                     } }
                     ?>

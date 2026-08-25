@@ -62,8 +62,8 @@ if (!$can_view) {
 $gate = $is_super_admin ? ems_tenant_db()->forAllTenants('supplier contract lines super') : ems_tenant_db();
 
 $MODEL_LABELS  = array('hour' => 'ساعة', 'ton' => 'طن', 'trip' => 'نقلة', 'meter' => 'متر');
-$BASIS_LABELS  = array('none' => 'لا استعداد', 'rate' => 'معدلُ ساعة', 'percent' => 'نسبةٌ من سعر الوحدة');
-$LINE_STATES   = array('active' => 'نافذ', 'replaced' => 'مستبدَل', 'ended' => 'منتهٍ');
+$BASIS_LABELS  = array('none' => 'لا استعداد', 'rate' => 'معدل ساعة', 'percent' => 'نسبة من سعر الوحدة');
+$LINE_STATES   = array('active' => 'نافذ', 'replaced' => 'مستبدل', 'ended' => 'منتهٍ');
 
 $selected = intval($_GET['contract_id'] ?? 0);
 $redirect = function ($msg, $cid) { ems_gov_redirect("Location: supplier_contract_lines.php?contract_id=" . intval($cid)
@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'currency'           => $_POST['currency'] ?? '',
             'notes'              => $_POST['notes'] ?? '',
         ), $uid);
-        $redirect($r['ok'] ? 'أُنشئ عقدُ المورد (مسودة) ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'),
+        $redirect($r['ok'] ? 'أنشئ عقد المورد (مسودة) ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'),
                   $r['ok'] ? $r['contract_id'] : 0);
     }
 
@@ -95,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // نظيرٌ خادميٌّ لسمة pattern في النموذج — الواجهةُ وحدَها لا تحرس (الحقل اختياري)
         $etype_raw = trim((string) ($_POST['equipment_type_code'] ?? ''));
         if ($etype_raw !== '' && !preg_match('/^[A-Za-z0-9_\-]+$/', $etype_raw)) {
-            $redirect('رمز نوع المعدة غير صالح. استخدم أحرفًا وأرقامًا و - أو _ فقط ❌', $cid);
+            $redirect('رمز نوع المعدة غير صالح. استخدم أحرفا وأرقاما و - أو _ فقط ❌', $cid);
         }
         $r = SCS::saveLine($conn, $gate, $company_id, $cid, array(
             'line_id'       => $_POST['line_id'] ?? 0,
@@ -117,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'standby_activation_terms' => $_POST['standby_activation_terms'] ?? '',
             'standby_payment_terms'    => $_POST['standby_payment_terms'] ?? '',
         ), $uid);
-        $redirect($r['ok'] ? 'حُفظ البند ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $cid);
+        $redirect($r['ok'] ? 'حفظ البند ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $cid);
     }
 
     if ($action === 'end_line') {
@@ -125,7 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$can_edit) { $redirect('لا توجد صلاحية لهذا الإجراء ❌', $cid); }
         $r = SCS::endLine($conn, $gate, $company_id, $cid,
             intval($_POST['line_id'] ?? 0), strval($_POST['end_date'] ?? ''), $uid);
-        $redirect($r['ok'] ? 'أُنهي البند بسريانه ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $cid);
+        $redirect($r['ok'] ? 'أنهي البند بسريانه ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $cid);
     }
 
     /* ══ INJ-0152 · دورةُ حياةِ عقدِ المورد — بابُها في شاشتِها المالكة ═══════════
@@ -178,7 +178,7 @@ foreach ($heads as $h) { if (intval($h['id']) === $selected) { $head = $h; } }
 if ($head === null && $heads) { $head = $heads[0]; $selected = intval($head['id']); }
 
 $lines = $selected > 0 ? SCS::linesOf($gate, $selected) : array();
-$blocked = $head !== null ? SCS::assertEditable($head) : array('code' => 0, 'reason' => 'لا عقدَ مختارًا');
+$blocked = $head !== null ? SCS::assertEditable($head) : array('code' => 0, 'reason' => 'لا عقد مختارا');
 
 $suppliers_options = array();
 try {
@@ -233,7 +233,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>';
     }
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا بندَ تسعيرٍ مسجَّلًا في هذا العقد', 'أضِف أولَ بندٍ بنموذجِ «بندٌ جديد / تعديل» أسفلَ الجدول — نموذجُ التشغيلِ والوحدةُ والسعرُ إلزامية');
+    echo ems_states_bundle('لا بند تسعير مسجلا في هذا العقد', 'أضف أول بند بنموذج «بند جديد / تعديل» أسفل الجدول — نموذج التشغيل والوحدة والسعر إلزامية');
     ?>
     <style>
         .sup-scl-req           { color: var(--c-state-danger-strong, #c00); }
@@ -256,7 +256,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     <form method="post" class="allforms" id="contractForm">
         <?= csrf_field() ?>
         <input type="hidden" name="sc_action" value="create_contract">
-        <div class="card"><div class="card-header"><h5><i class="fa fa-handshake"></i> عقدُ مورد جديد (يُنشأ مسودةً)</h5></div>
+        <div class="card"><div class="card-header"><h5><i class="fa fa-handshake"></i> عقد مورد جديد (ينشأ مسودة)</h5></div>
         <div class="card-body"><div class="form-grid">
             <div class="form-group">
                 <label for="emsf_1437_0825d">المورد <span class="sup-scl-req">*</span></label>
@@ -268,7 +268,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                 </select>
             </div>
             <div class="form-group">
-                <label for="emsf_1438_c7d1e">عقد العميل (L1) <small>— الحصةُ تُقتطع منه</small></label>
+                <label for="emsf_1438_c7d1e">عقد العميل (L1) <small>— الحصة تقتطع منه</small></label>
                 <select name="client_contract_id" id="emsf_1438_c7d1e">
                     <option value="">— بلا —</option>
                     <?php foreach ($client_contracts as $c): ?>
@@ -301,7 +301,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     <div class="card"><div class="card-body">
         <form method="get" class="sup-scl-filter-row">
             <strong>عقد المورد:</strong>
-            <select name="contract_id" aria-label="عقدُ المورد" onchange="this.form.submit()" class="sup-scl-picker">
+            <select name="contract_id" aria-label="عقد المورد" onchange="this.form.submit()" class="sup-scl-picker">
                 <?php foreach ($heads as $h): ?>
                     <option value="<?php echo intval($h['id']); ?>" <?php echo $selected === intval($h['id']) ? 'selected' : ''; ?>>
                         #<?php echo intval($h['id']); ?> — <?php echo htmlspecialchars((string)($h['supplier_name'] ?? '—')); ?>
@@ -320,12 +320,12 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
               → <?php echo htmlspecialchars((string)($head['end_date'] ?? 'مفتوح')); ?>
             · العملة: <?php echo htmlspecialchars((string)($head['currency'] ?? '—')); ?>
             <?php if ($head['client_contract_id']): ?>
-                · عقدُ العميل L1: #<?php echo intval($head['client_contract_id']); ?>
+                · عقد العميل L1: #<?php echo intval($head['client_contract_id']); ?>
             <?php endif; ?>
             <?php if (trim((string)$head['source_table']) !== ''): ?>
                 <span class="badge badge-secondary"
-                      title="الكتابةُ تبقى في المصدر حتى تكتمل مطابقةُ فترةٍ بصفر فرق (N-04 مرحلة ①)">
-                    مرحَّلٌ قراءةً من <?php echo htmlspecialchars((string)$head['source_table']); ?>#<?php echo intval($head['source_id']); ?>
+                      title="الكتابة تبقى في المصدر حتى تكتمل مطابقة فترة بصفر فرق (N-04 مرحلة ①)">
+                    مرحل قراءة من <?php echo htmlspecialchars((string)$head['source_table']); ?>#<?php echo intval($head['source_id']); ?>
                 </span>
             <?php endif; ?>
         </div>
@@ -340,7 +340,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             $__isEnded = ((string) $head['state'] === \App\Services\Contract\ContractStateMachine::ENDED);
             if ($__scActs || $__isEnded) { ?>
             <div class="sup-scl-lifecycle">
-                <strong>دورةُ الحياة:</strong>
+                <strong>دورة الحياة:</strong>
                 <?php foreach ($__scActs as $__c => $__a):
                     $__rv = \App\Services\Contract\ContractLifecycleActions::reverseOf('supplier', $__c); ?>
                     <form method="post" class="sup-scl-inline-form">
@@ -351,8 +351,8 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                         <input type="hidden" name="sc_version" value="<?php echo intval($head['version']); ?>">
                         <button class="action-btn" type="submit"
                                 title="<?php echo htmlspecialchars($__a['label'] . ' — '
-                                    . ($__rv['has'] ? ('له عكسٌ: ' . $__rv['label'])
-                                                    : ('لا عكسَ له: ' . (string) $__rv['why'])), ENT_QUOTES, 'UTF-8'); ?>">
+                                    . ($__rv['has'] ? ('له عكس: ' . $__rv['label'])
+                                                    : ('لا عكس له: ' . (string) $__rv['why'])), ENT_QUOTES, 'UTF-8'); ?>">
                             <?php echo htmlspecialchars($__a['label'], ENT_QUOTES, 'UTF-8'); ?>
                             <?php if (!$__rv['has']): ?><small>⛒</small><?php endif; ?>
                         </button>
@@ -364,10 +364,10 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                         <input type="hidden" name="action" value="sc_revoke_end">
                         <input type="hidden" name="contract_id" value="<?php echo intval($head['id']); ?>">
                         <input type="text" name="sc_note" required minlength="3" class="sup-scl-note-input"
-                               placeholder="سببُ النقض">
+                               placeholder="سبب النقض">
                         <button class="action-btn" type="submit"
-                                title="نقضُ الإنهاء — حركةٌ معوِّضةٌ داخلَ سبعةِ أيامٍ تُعيد الحالةَ السابقةَ وتفتح حاوياتِها">
-                            نقضُ الإنهاء
+                                title="نقض الإنهاء — حركة معوضة داخل سبعة أيام تعيد الحالة السابقة وتفتح حاوياتها">
+                            نقض الإنهاء
                         </button>
                     </form>
                 <?php endif; ?>
@@ -388,10 +388,10 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     <th>الإجراءات</th><th>النموذج</th><th>الوحدة</th><th>سعر الوحدة</th>
                     <th>العملة</th><th>أساس الاستعداد</th><th>المعدل</th><th>السريان</th><th>الحالة</th>
                     <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                     <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                     <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                     <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -421,7 +421,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                                data-sbpay="<?php echo htmlspecialchars((string)($l['standby_payment_terms'] ?? ''), ENT_QUOTES); ?>"
                                title="تعديل"><i class="fas fa-edit"></i></a>
                             <?php elseif (trim((string)$l['source_table']) !== ''): ?>
-                                <span class="badge badge-secondary" title="مرحَّلٌ قراءةً — الكتابةُ في مصدره">مرحَّل</span>
+                                <span class="badge badge-secondary" title="مرحل قراءة — الكتابة في مصدره">مرحل</span>
                             <?php endif; ?>
                         </td>
                         <td><?php echo htmlspecialchars($MODEL_LABELS[$l['work_model']] ?? $l['work_model']); ?></td>
@@ -431,7 +431,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                         <td>
                             <?php $b = (string)$l['standby_basis']; ?>
                             <?php if ($b === 'none'): ?>
-                                <span class="badge badge-secondary" title="لا استعدادَ مشترطًا — ولا يُخترع له سعر">لا استعداد</span>
+                                <span class="badge badge-secondary" title="لا استعداد مشترطا — ولا يخترع له سعر">لا استعداد</span>
                             <?php else: ?>
                                 <span class="badge badge-success"><?php echo htmlspecialchars($BASIS_LABELS[$b] ?? $b); ?></span>
                             <?php endif; ?>
@@ -454,7 +454,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             <input type="hidden" name="sc_action" value="save_line">
             <input type="hidden" name="contract_id" value="<?php echo $selected; ?>">
             <input type="hidden" name="line_id" id="f_line_id" value="">
-            <div class="card"><div class="card-header"><h5><i class="fa fa-plus"></i> بندٌ جديد / تعديل</h5></div>
+            <div class="card"><div class="card-header"><h5><i class="fa fa-plus"></i> بند جديد / تعديل</h5></div>
             <div class="card-body"><div class="form-grid">
                 <div class="form-group">
                     <label for="f_model">نموذج التشغيل <span class="sup-scl-req">*</span></label>
@@ -465,7 +465,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="f_unit">الوحدة <span class="sup-scl-req">*</span> <small>— كما يقرؤها محرّكُ الفوترة</small></label>
+                    <label for="f_unit">الوحدة <span class="sup-scl-req">*</span> <small>— كما يقرؤها محرك الفوترة</small></label>
                     <select name="unit" id="f_unit" required></select>
                 </div>
                 <div class="form-group"><label for="f_price">سعر الوحدة <span class="sup-scl-req">*</span></label>
@@ -488,7 +488,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="f_rate">معدل الاستعداد <small>— إلزاميٌّ متى أُعلن أساس</small></label>
+                    <label for="f_rate">معدل الاستعداد <small>— إلزامي متى أعلن أساس</small></label>
                     <input type="number" step="0.0001" min="0" name="standby_rate" id="f_rate">
                 </div>
                 <div class="form-group"><label for="f_from">سريان من</label><input type="date" name="valid_from" id="f_from"></div>
@@ -497,7 +497,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     <strong><i class="fa fa-shield-halved"></i> التغطية والاحتياطي — بند نوع المعدة (CAP-01 §8.2)</strong>
                 </div>
                 <div class="form-group">
-                    <label for="f_obl">التزام نوع المعدة في عقد العميل <small>— لا حصةَ بلا التزام</small></label>
+                    <label for="f_obl">التزام نوع المعدة في عقد العميل <small>— لا حصة بلا التزام</small></label>
                     <?php /* ◆ **الملصقُ كان يقول القاعدةَ والحقلُ ينقضها** (البند ٢-١):
                              «— غير مرتبط —» كان **الخيارَ الأول** وبلا `required`،
                              فالقيمةُ الافتراضيةُ للحقلِ كانت نقضَ القاعدةِ المكتوبةِ فوقه.
@@ -506,7 +506,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                              صدفةً). والخادمُ يردُّ ٤٢٢ على الغيابِ أيًّا كانت الواجهة —
                              فهذا تيسيرٌ لا حراسة. */ ?>
                     <select name="contract_obligation_ref" id="f_obl" required>
-                        <option value="" disabled selected>— اختر التزامَ نوعِ المعدة —</option>
+                        <option value="" disabled selected>— اختر التزام نوع المعدة —</option>
                         <?php foreach ($obligation_options as $ob): ?>
                             <option value="<?php echo intval($ob['id']); ?>">
                                 <?php echo htmlspecialchars($ob['commitment_code'] . ' · ' . $ob['equipment_type_code']
@@ -518,7 +518,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                 </div>
                 <div class="form-group"><label for="f_etype">رمز نوع المعدة</label>
                     <input type="text" name="equipment_type_code" id="f_etype" pattern="[A-Za-z0-9_\-]+" placeholder="EXCAVATOR"></div>
-                <div class="form-group"><label for="f_pcommit">الأساسية الملتزَم بها</label>
+                <div class="form-group"><label for="f_pcommit">الأساسية الملتزم بها</label>
                     <input type="number" step="1" min="0" name="primary_units_committed" id="f_pcommit"></div>
                 <div class="form-group"><label for="f_sbreq">الاحتياطي المطلوب منه</label>
                     <input type="number" step="1" min="0" name="standby_units_required" id="f_sbreq"></div>
@@ -526,9 +526,9 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     <input type="number" step="1" min="0" name="standby_units_allowed" id="f_sbalw"></div>
                 <div class="form-group"><label for="f_sla">مهلة الإحلال (ساعات)</label>
                     <input type="number" step="0.5" min="0" name="replacement_sla_hours" id="f_sla"></div>
-                <div class="form-group"><label for="f_sbact">شروط تفعيل احتياطيّه</label>
+                <div class="form-group"><label for="f_sbact">شروط تفعيل احتياطيه</label>
                     <input type="text" name="standby_activation_terms" id="f_sbact" maxlength="255"></div>
-                <div class="form-group"><label for="f_sbpay">مقابل احتياطيّه <small>— فارغٌ = لم يُنَصَّ ولا يُفترض</small></label>
+                <div class="form-group"><label for="f_sbpay">مقابل احتياطيه <small>— فارغ = لم ينص ولا يفترض</small></label>
                     <input type="text" name="standby_payment_terms" id="f_sbpay" maxlength="255"></div>
             </div>
             <div class="sup-scl-actions"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ البند</button></div>

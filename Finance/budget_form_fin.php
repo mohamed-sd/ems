@@ -55,12 +55,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($_POST['bg_action'] ?? '',
     $res = fin_budget_transition($conn, intval($_POST['id'] ?? 0), $act,
         $ctx['role'], $current_user_id, $is_super_admin, $_POST['reason'] ?? '');
     if ($res['status'] === 'ok') {
-        $done = array('submit' => 'رُفعت الموازنة للمالية ✅',
-                      'approve' => 'أُجيزت الموازنة — صارت مرجعًا حاكمًا ✅',
-                      'return'  => 'أُعيدت الموازنة لإدارتها بسببها ✅');
+        $done = array('submit' => 'رفعت الموازنة للمالية ✅',
+                      'approve' => 'أجيزت الموازنة — صارت مرجعا حاكما ✅',
+                      'return'  => 'أعيدت الموازنة لإدارتها بسببها ✅');
         ems_gov_flash_redirect('budget_form_fin.php', $done[$act], 'GOV-INFO-200', ''); exit();
     }
-    ems_gov_flash_redirect('budget_form_fin.php', ($res['reason'] !== '' ? $res['reason'] : 'تعذّر الإجراء') . ' ❌', 'GOV-FAIL-409', ''); exit();
+    ems_gov_flash_redirect('budget_form_fin.php', ($res['reason'] !== '' ? $res['reason'] : 'تعذر الإجراء') . ' ❌', 'GOV-FAIL-409', ''); exit();
 }
 
 // ── حذف ناعم (مسودة فقط) ──
@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dept_module'])) {
     // النطاقُ الصفّي: الصلاحيةُ على الشاشة لا تكفي — الإدارةُ تنشئ موازنةَ قسمها
     // وحده، وإلا لأنشأ مديرُ الصيانة موازنةَ الموارد البشرية.
     if (!in_array($dept, $allowed_depts, true)) {
-        ems_gov_flash_redirect('budget_form_fin.php', 'لا تُنشئ موازنةً لقسمٍ لا تديره ❌', 'GOV-FAIL-409', ''); exit();
+        ems_gov_flash_redirect('budget_form_fin.php', 'لا تنشئ موازنة لقسم لا تديره ❌', 'GOV-FAIL-409', ''); exit();
     }
 
     $lines = array(); $t_rev = 0; $t_exp = 0;
@@ -106,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dept_module'])) {
         $lines[] = array('k' => $kind, 'c' => $cat, 'p' => $amt);
         if ($kind === 'revenue') { $t_rev += $amt; } else { $t_exp += $amt; }
     }
-    if (count($lines) < 1) { ems_gov_flash_redirect('budget_form_fin.php', 'الميزانية تحتاج بنداً واحداً فأكثر ❌', 'GOV-FAIL-409', ''); exit(); }
+    if (count($lines) < 1) { ems_gov_flash_redirect('budget_form_fin.php', 'الميزانية تحتاج بندا واحدا فأكثر ❌', 'GOV-FAIL-409', ''); exit(); }
 
     $budget_no = fin_gen_code($conn, 'fin_budgets', 'FIN-BG', $company_id);
     // الرأس + البنود زوجٌ مترابط ذرّيًا (رأسٌ بلا بنود = ميزانية مكسورة) — معاملة
@@ -125,7 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dept_module'])) {
             }
         }, 'budget_form save head+lines');
     } catch (\App\Core\TenantGateException $e) {
-        if (strpos($e->getMessage(), 'Duplicate entry') !== false) { ems_gov_flash_redirect('budget_form_fin.php', 'ميزانية هذه الفترة موجودة مسبقاً ❌', 'GOV-FAIL-409', ''); exit(); }
+        if (strpos($e->getMessage(), 'Duplicate entry') !== false) { ems_gov_flash_redirect('budget_form_fin.php', 'ميزانية هذه الفترة موجودة مسبقا ❌', 'GOV-FAIL-409', ''); exit(); }
         error_log('budget save refused: ' . $e->getMessage());
         ems_gov_flash_redirect('budget_form_fin.php', 'حدث خطأ أثناء الحفظ ❌', 'GOV-FAIL-409', ''); exit();
     }
@@ -171,7 +171,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا موازناتٍ مسجَّلةً لقسمك بعدُ', 'أنشئ موازنةً بزرِّ «إنشاء ميزانية» في رأسِ الشاشة ثم ارفعها للمالية');
+    echo ems_states_bundle('لا موازنات مسجلة لقسمك بعد', 'أنشئ موازنة بزر «إنشاء ميزانية» في رأس الشاشة ثم ارفعها للمالية');
     ?>
 
     <?php fin_msg_banner(); ?>
@@ -219,7 +219,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <!-- جدولُ بنودٍ ديناميكيٌّ لا جدولَ عرض: لا يُهيَّأ DataTable البتّة،
                      وإلا محا إعادةُ الرسم صفوفَ البنود التي يضيفها bAddLine. -->
                 <table class="alltables no-datatable ems-no-enhance fin-bud-table" data-no-dt="hard" id="b_lines">
-                    <thead><tr><th>النوع</th><th>الفئة</th><th>المبلغ المخطّط</th><th></th></tr></thead>
+                    <thead><tr><th>النوع</th><th>الفئة</th><th>المبلغ المخطط</th><th></th></tr></thead>
                     <tbody id="b_lines_body"></tbody>
                 </table>
                 <button type="button" class="btn-secondary" onclick="bAddLine()"><i class="fas fa-plus"></i> إضافة بند</button>
@@ -246,19 +246,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         // أعمدة الترويسة، فيرمي DataTables استثناءً يُجهض بقيةَ مُعالج ready —
         // ومنه ربطُ زرِّ فتح الفورم. الجدولُ الفارغُ يعرض رسالةَ ar.json بنفسه.
         if (!$budget_rows) {
-            echo "<p class='text-muted fin-bud-note'>لا موازناتٍ لقسمك بعد — ابدأ بإنشاء موازنةٍ ثم ارفعها للمالية.</p>";
+            echo "<p class='text-muted fin-bud-note'>لا موازنات لقسمك بعد — ابدأ بإنشاء موازنة ثم ارفعها للمالية.</p>";
         }
         ?>
         <div class="table-container">
             <table id="finTable" class="display nowrap alltables fin-bud-table">
                 <thead><tr>
                     <th>الإجراءات</th><th>الرقم</th><th>الإدارة</th><th>الفترة</th><th>السنة</th>
-                    <th>مخطّط إيراد</th><th>مخطّط مصروف</th><th>الحالة</th>
+                    <th>مخطط إيراد</th><th>مخطط مصروف</th><th>الحالة</th>
                     <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                     <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                     <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                     <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -278,24 +278,24 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         ob_start();
                         // ① رفعٌ من الإدارة — مسودةً كانت أو معادة
                         if ($can_edit && $mine && !$is_approver && in_array($st, fin_budget_editable_states(), true)) {
-                            echo "<form method='post' class='fin-bud-inline-form' onsubmit='return confirm(\"رفعُ الموازنة للمالية؟ لن تستطيع تعديلَ بنودها بعده.\")'>" . csrf_field()
+                            echo "<form method='post' class='fin-bud-inline-form' onsubmit='return confirm(\"رفع الموازنة للمالية؟ لن تستطيع تعديل بنودها بعده.\")'>" . csrf_field()
                                . "<input type='hidden' name='bg_action' value='submit'>"
                                . "<input type='hidden' name='id' value='" . intval($row['id']) . "'>"
-                               . "<button type='submit' class='action-btn edit' title='رفعٌ للمالية'><i class='fas fa-paper-plane'></i></button></form>";
+                               . "<button type='submit' class='action-btn edit' title='رفع للمالية'><i class='fas fa-paper-plane'></i></button></form>";
                         }
                         // ② إجازةٌ أو إعادةٌ — للإدارة المالية (رئيسِها ومعاونيه) على
                         //    المرفوعة وحدها، وبشرط ألّا يكون القسمُ قسمَه هو.
                         $self_owned = fin_budget_self_owned($ctx['role'], strval($row['dept_module']), $is_super_admin);
                         if ($is_approver && $st === 'submitted' && $can_edit && !$self_owned) {
-                            echo "<form method='post' class='fin-bud-inline-form' onsubmit='return confirm(\"إجازةُ الموازنة كمرجعٍ حاكم؟\")'>" . csrf_field()
+                            echo "<form method='post' class='fin-bud-inline-form' onsubmit='return confirm(\"إجازة الموازنة كمرجع حاكم؟\")'>" . csrf_field()
                                . "<input type='hidden' name='bg_action' value='approve'>"
                                . "<input type='hidden' name='id' value='" . intval($row['id']) . "'>"
                                . "<button type='submit' class='action-btn edit' title='إجازة'><i class='fas fa-gavel'></i></button></form>";
-                            echo "<form method='post' class='fin-bud-inline-form' onsubmit='var r=prompt(\"سببُ الإعادة (تقرؤه الإدارة):\");if(!r)return false;this.reason.value=r;'>" . csrf_field()
+                            echo "<form method='post' class='fin-bud-inline-form' onsubmit='var r=prompt(\"سبب الإعادة (تقرؤه الإدارة):\");if(!r)return false;this.reason.value=r;'>" . csrf_field()
                                . "<input type='hidden' name='bg_action' value='return'>"
                                . "<input type='hidden' name='id' value='" . intval($row['id']) . "'>"
                                . "<input type='hidden' name='reason' value=''>"
-                               . "<button type='submit' class='action-btn delete' title='إعادةٌ بسبب'><i class='fas fa-rotate-left'></i></button></form>";
+                               . "<button type='submit' class='action-btn delete' title='إعادة بسبب'><i class='fas fa-rotate-left'></i></button></form>";
                         }
                         if ($can_delete && $mine && $st === 'draft') {
                             echo "<a href='?delete_id=" . intval($row['id']) . "' class='action-btn delete' onclick='return confirm(\"هل أنت متأكد من الحذف؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>";
@@ -307,19 +307,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         // فلا ينحرف عن الشروط أعلاه.
                         if ($btns === '') {
                             if ($is_approver && $st === 'submitted' && $can_edit && $self_owned) {
-                                $why = "<i class='fas fa-user-lock'></i> قسمُك — يُجيزه مديرُ الإدارة المالية";
+                                $why = "<i class='fas fa-user-lock'></i> قسمك — يجيزه مدير الإدارة المالية";
                             } elseif (in_array($st, array('approved', 'active'), true)) {
-                                $why = "<i class='fas fa-check'></i> معتمدة — لا إجراءَ مطلوب";
+                                $why = "<i class='fas fa-check'></i> معتمدة — لا إجراء مطلوب";
                             } elseif ($st === 'closed') {
                                 $why = "<i class='fas fa-lock'></i> مقفلة";
                             } elseif ($st === 'submitted') {
                                 $why = $is_approver
-                                    ? "<i class='fas fa-eye'></i> للاطّلاع — الإجازةُ لمن له تعديل"
+                                    ? "<i class='fas fa-eye'></i> للاطلاع — الإجازة لمن له تعديل"
                                     : "<i class='fas fa-hourglass-half'></i> عند المالية — تنتظر الإجازة";
                             } elseif (in_array($st, fin_budget_editable_states(), true)) {
                                 $why = $mine
-                                    ? "<i class='fas fa-eye'></i> للاطّلاع — الرفعُ يحتاج صلاحيةَ تعديل"
-                                    : "<i class='fas fa-building'></i> قسمُ إدارةٍ أخرى — ترفعها بنفسها";
+                                    ? "<i class='fas fa-eye'></i> للاطلاع — الرفع يحتاج صلاحية تعديل"
+                                    : "<i class='fas fa-building'></i> قسم إدارة أخرى — ترفعها بنفسها";
                             } else {
                                 $why = '—';
                             }
@@ -336,7 +336,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         echo "<td><span class='badge badge-" . $st_tone . "'>" . htmlspecialchars($budget_states[$st] ?? $st) . "</span>";
                         // سببُ الإعادة بارزٌ فوق كل شيءٍ للإدارة (الدستور §4.3)
                         if ($st === 'returned' && !empty($row['return_reason'])) {
-                            echo "<div class='fin-bud-returned'><i class='fas fa-rotate-left'></i> أُعيدت لاستكمال: "
+                            echo "<div class='fin-bud-returned'><i class='fas fa-rotate-left'></i> أعيدت لاستكمال: "
                                . htmlspecialchars((string)$row['return_reason']) . "</div>";
                         }
                         echo "</td>";
@@ -388,9 +388,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 <template id="b_line_tpl">
     <tr class="b-line">
-        <td><select name="line_kind[]" aria-label="نوعُ البند — إيرادٌ أو مصروف" class="b-kind"><option value="expense">مصروف</option><option value="revenue">إيراد</option></select></td>
-        <td><select name="category[]" aria-label="فئةُ البند" class="b-cat"><?php foreach ($categories as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></td>
-        <td><input type="number" step="0.01" min="0" name="planned[]" aria-label="المبلغُ المخطّطُ للبند" class="b-planned" value="0"></td>
+        <td><select name="line_kind[]" aria-label="نوع البند — إيراد أو مصروف" class="b-kind"><option value="expense">مصروف</option><option value="revenue">إيراد</option></select></td>
+        <td><select name="category[]" aria-label="فئة البند" class="b-cat"><?php foreach ($categories as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></td>
+        <td><input type="number" step="0.01" min="0" name="planned[]" aria-label="المبلغ المخطط للبند" class="b-planned" value="0"></td>
         <td><a href="javascript:void(0)" class="action-btn delete b-del" title="حذف"><i class="fas fa-times"></i></a></td>
     </tr>
 </template>

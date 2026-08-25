@@ -73,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['code'])) {
                 ems_gov_flash_redirect('accounts_fin.php', 'رقم الحساب مكرر في الشركة ❌', 'GOV-FAIL-409', ''); exit();
             }
             error_log('accounts_fin insert refused: ' . $e->getMessage());
-            ems_gov_flash_redirect('accounts_fin.php', 'تعذّرت الإضافة ❌', 'GOV-FAIL-409', ''); exit();
+            ems_gov_flash_redirect('accounts_fin.php', 'تعذرت الإضافة ❌', 'GOV-FAIL-409', ''); exit();
         }
         ems_gov_flash_redirect('accounts_fin.php', 'تمت إضافة الحساب بنجاح ✅', 'GOV-OK-200', ''); exit();
     }
@@ -109,7 +109,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا حساباتٍ في دليلِ الحساباتِ بعدُ', 'أضفْ أوّلَ حسابٍ بزرِّ «إضافة حساب» في رأسِ الشاشة ثمّ اربطْه بحسابٍ أبٍ لبناءِ الشجرة');
+    echo ems_states_bundle('لا حسابات في دليل الحسابات بعد', 'أضف أول حساب بزر «إضافة حساب» في رأس الشاشة ثم اربطه بحساب أب لبناء الشجرة');
     ?>
 
     <?php fin_msg_banner(); ?>
@@ -142,7 +142,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </div>
                     <div class="form-group">
                         <label>يقبل القيد المباشر</label>
-                        <label class="switch-inline"><input type="checkbox" name="is_postable" aria-label="يقبلُ الحسابُ القيدَ المباشر" id="a_postable" value="1" checked> نعم</label>
+                        <label class="switch-inline"><input type="checkbox" name="is_postable" aria-label="يقبل الحساب القيد المباشر" id="a_postable" value="1" checked> نعم</label>
                     </div>
                 </div>
             </div>
@@ -173,17 +173,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <th class="ems-fn-th" data-fn="1">رقم القيد</th>
                     <th class="ems-fn-th" data-fn="1">نسخة القاعدة المستعملة</th>
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                     <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                     <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-                    <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                    <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+                    <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                    <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
                     <th class="ems-gov-th none" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
                     <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-                    <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+                    <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
                     <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
-                    <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
+                    <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
                     <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                     <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                     <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>

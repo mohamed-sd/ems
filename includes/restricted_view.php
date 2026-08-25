@@ -76,7 +76,7 @@ if (!function_exists('rv_fetch')) {
         if (!$conn) { $out['code'] = 'RV-500'; $out['msg'] = 'لا اتصال'; return $out; }
 
         $d = rv_definition($viewKey);
-        if (!$d) { $out['msg'] = 'منظرٌ غيرُ مسجَّلٍ أو معطَّل: ' . $viewKey; return $out; }
+        if (!$d) { $out['msg'] = 'منظر غير مسجل أو معطل: ' . $viewKey; return $out; }
 
         /* أعمدةُ المصدرِ الحقيقيةُ — فلا يُبنى استعلامٌ باسمِ عمودٍ لا وجودَ له */
         $real = array();
@@ -89,24 +89,24 @@ if (!function_exists('rv_fetch')) {
             while ($r && ($x = mysqli_fetch_row($r))) { $real[mb_strtolower($x[0])] = $x[0]; }
             mysqli_stmt_close($st);
         }
-        if (!$real) { $out['code'] = 'RV-500'; $out['msg'] = 'جدولُ المصدرِ مجهول'; return $out; }
+        if (!$real) { $out['code'] = 'RV-500'; $out['msg'] = 'جدول المصدر مجهول'; return $out; }
 
         /* ① قائمةُ الحقولِ — ثم **الحاجزُ البنيويُّ فوقَها** */
         $want = array_filter(array_map('trim', explode(',', (string) $d['field_allowlist'])));
         $fields = array();
         foreach ($want as $f) {
             $k = mb_strtolower($f);
-            if (!isset($real[$k])) { $out['dropped'][] = $f . ' (لا وجودَ له)'; continue; }
-            if (rv_is_sensitive($k)) { $out['dropped'][] = $f . ' (**محجوبٌ بنيويًّا**)'; continue; }
+            if (!isset($real[$k])) { $out['dropped'][] = $f . ' (لا وجود له)'; continue; }
+            if (rv_is_sensitive($k)) { $out['dropped'][] = $f . ' (**محجوب بنيويا**)'; continue; }
             $fields[] = $real[$k];
         }
-        if (!$fields) { $out['code'] = 'RV-422'; $out['msg'] = 'لا حقلَ مسموحًا بعدَ الحجبِ البنيوي'; return $out; }
+        if (!$fields) { $out['code'] = 'RV-422'; $out['msg'] = 'لا حقل مسموحا بعد الحجب البنيوي'; return $out; }
 
         /* ② نطاقُ الصفِّ **في شرطِ الاستعلام** — ولا منظرَ بلا نطاقِ صفّ */
         $scopeCol = mb_strtolower(trim((string) $d['row_scope_col']));
         if ($scopeCol === '' || !isset($real[$scopeCol])) {
             $out['code'] = 'RV-422';
-            $out['msg'] = 'لا نطاقَ صفٍّ صالحٌ — **وتقييدُ الحقلِ بلا تقييدِ الصفِّ انكشافٌ بثوبٍ آخر**';
+            $out['msg'] = 'لا نطاق صف صالح — **وتقييد الحقل بلا تقييد الصف انكشاف بثوب آخر**';
             return $out;
         }
         $co = isset($_SESSION['user']['company_id']) ? (int) $_SESSION['user']['company_id'] : 0;
@@ -127,7 +127,7 @@ if (!function_exists('rv_fetch')) {
 
         $out['ok'] = true; $out['code'] = 'RV-200';
         $out['fields'] = $fields;
-        $out['msg'] = 'منظرٌ مقيَّدٌ: ' . count($fields) . ' حقلًا · ' . count($out['rows']) . ' صفًّا في النطاق';
+        $out['msg'] = 'منظر مقيد: ' . count($fields) . ' حقلا · ' . count($out['rows']) . ' صفا في النطاق';
         return $out;
     }
 }
@@ -142,7 +142,7 @@ if (!function_exists('rv_export')) {
         if (!$d) { return array('ok' => false, 'code' => 'RV-404', 'csv' => ''); }
         if ((int) $d['allow_export'] !== 1) {
             return array('ok' => false, 'code' => 'RV-403',
-                         'msg' => 'التصديرُ غيرُ مسموحٍ لهذا المنظر', 'csv' => '');
+                         'msg' => 'التصدير غير مسموح لهذا المنظر', 'csv' => '');
         }
         $r = rv_fetch($viewKey, $scopeValue, $limit);
         if (!$r['ok']) { return array('ok' => false, 'code' => $r['code'], 'msg' => $r['msg'], 'csv' => ''); }

@@ -47,9 +47,9 @@ class ContractPaymentScheduleService
         'partial_advance' => 'مقدمٌ جزئي',
         'advance_installments' => 'مقدمٌ على دفعات',
         'milestone_payments' => 'دفعاتٌ عند معالمَ',
-        'monthly_claim' => 'مستخلصٌ شهري',
-        'final_payment' => 'دفعةٌ ختامية',
-        'retention_release' => 'ردُّ محتجز الضمان',
+        'monthly_claim' => 'مستخلص شهري',
+        'final_payment' => 'دفعة ختامية',
+        'retention_release' => 'رد محتجز الضمان',
     );
 
     const KINDS = array('advance', 'monthly_settlement', 'milestone', 'final',
@@ -108,38 +108,38 @@ class ContractPaymentScheduleService
                      'rows' => 0, 'expected' => 0.0, 'currency' => '');
 
         $c = self::contractOf($gate, (int) $contractId);
-        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقدُ غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقد غير موجود في نطاقك'; return $out; }
 
         if (self::liveRows($gate, (int) $contractId)) {
             $out['code'] = 409;
-            $out['reason'] = '**للعقد خطةُ دفعٍ نافذة** — والتغييرُ **بنسخةٍ جديدة** (`newVersion`) '
-                           . 'لا بتوليدٍ فوقها؛ فالقديمةُ محفوظة';
+            $out['reason'] = '**للعقد خطة دفع نافذة** — والتغيير **بنسخة جديدة** (`newVersion`) '
+                           . 'لا بتوليد فوقها؛ فالقديمة محفوظة';
             return $out;
         }
 
         $pattern = (string) (isset($opt['pattern']) ? $opt['pattern'] : 'monthly_claim');
         if (!in_array($pattern, self::PATTERNS, true)) {
-            $out['code'] = 422; $out['reason'] = 'نمطُ دفعٍ غيرُ معروف: ' . $pattern; return $out;
+            $out['code'] = 422; $out['reason'] = 'نمط دفع غير معروف: ' . $pattern; return $out;
         }
 
         $from = substr((string) $c['actual_start'], 0, 7);
         $to   = substr((string) $c['actual_end'], 0, 7);
         if (!preg_match('/^\d{4}-\d{2}$/', $from) || !preg_match('/^\d{4}-\d{2}$/', $to)) {
             $out['code'] = 422;
-            $out['reason'] = '**مدةُ العقد غيرُ محدَّدة** — ولا جدولَ دفعٍ بلا بدايةٍ ونهاية'; return $out;
+            $out['reason'] = '**مدة العقد غير محددة** — ولا جدول دفع بلا بداية ونهاية'; return $out;
         }
 
         // ── الجدولُ الشهري (P-03) هو مصدرُ التسويات — لا تقديرَ ولا قسمةٌ ────
         $pv = ContractMonthlyPlanService::periodValue($gate, (int) $contractId, $from, $to);
         if (count($pv['by_currency']) > 1) {
             $out['code'] = 422;
-            $out['reason'] = '**العقدُ بعملتين أو أكثر** (' . implode(' · ', array_keys($pv['by_currency']))
-                . ') — ولا تُجمع عملتان في سطرِ دفع';
+            $out['reason'] = '**العقد بعملتين أو أكثر** (' . implode(' · ', array_keys($pv['by_currency']))
+                . ') — ولا تجمع عملتان في سطر دفع';
             return $out;
         }
         if (!$pv['months']) {
             $out['code'] = 422;
-            $out['reason'] = '**لا جدولَ شهريًّا نافذًا للعقد** — و`P-05` تُولَّد منه لا من التخمين';
+            $out['reason'] = '**لا جدول شهريا نافذا للعقد** — و`P-05` تولد منه لا من التخمين';
             return $out;
         }
         $cur = (string) array_keys($pv['by_currency'])[0];
@@ -168,7 +168,7 @@ class ContractPaymentScheduleService
                 'seq' => ++$seq, 'pattern' => $pattern, 'payment_kind' => 'monthly_settlement',
                 'amount_basis' => 'fixed', 'amount_expected' => $amt, 'currency' => $cur,
                 'due_date' => $due, 'period_month' => $mm, 'source' => 'generated',
-                'note' => 'تسويةُ ' . $mm . ' — مهلةُ ' . $payDays . ' يومًا بعد انقضاء الشهر',
+                'note' => 'تسوية ' . $mm . ' — مهلة ' . $payDays . ' يوما بعد انقضاء الشهر',
             );
         }
 
@@ -177,17 +177,17 @@ class ContractPaymentScheduleService
         if ($retPct > 0) {
             $cond = trim((string) (isset($opt['retention']['condition'])
                         ? $opt['retention']['condition'] : ''));
-            if ($cond === '') { $cond = 'بعد انقضاء فترة الضمان وقبولِ الأعمال نهائيًّا'; }
+            if ($cond === '') { $cond = 'بعد انقضاء فترة الضمان وقبول الأعمال نهائيا'; }
             $rows[] = array(
                 'seq' => ++$seq, 'pattern' => $pattern, 'payment_kind' => 'retention_release',
                 'amount_basis' => 'percent', 'percent_value' => $retPct,
                 'amount_expected' => round($total * $retPct / 100, 2), 'currency' => $cur,
                 'due_date' => null, 'due_condition' => $cond, 'source' => 'generated',
-                'note' => 'ردُّ محتجزٍ ' . $retPct . '% — **شرطٌ لا تاريخ**',
+                'note' => 'رد محتجز ' . $retPct . '% — **شرط لا تاريخ**',
             );
         }
 
-        if (!$rows) { $out['code'] = 422; $out['reason'] = 'لم يُنتج التوليدُ سطرًا واحدًا'; return $out; }
+        if (!$rows) { $out['code'] = 422; $out['reason'] = 'لم ينتج التوليد سطرا واحدا'; return $out; }
 
         $eff = self::dateOrNull(isset($opt['effective_from']) ? $opt['effective_from'] : null);
         if ($eff === null) { $eff = (string) $c['actual_start']; }
@@ -203,7 +203,7 @@ class ContractPaymentScheduleService
                 }
             }, 'توليد خطة دفع للعقد ' . $contractId);
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر التوليد: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر التوليد: ' . $t->getMessage(); return $out;
         }
 
         self::audit($conn, $companyId, $actor, 'generate_schedule', (int) $contractId, array(),
@@ -213,9 +213,9 @@ class ContractPaymentScheduleService
         foreach ($rows as $r) { $exp = round($exp + (float) $r['amount_expected'], 2); }
         $out['ok'] = true; $out['code'] = 200; $out['version'] = 1;
         $out['rows'] = count($rows); $out['expected'] = $exp; $out['currency'] = $cur;
-        $out['reason'] = 'وُلّدت خطةُ «' . self::PATTERN_AR[$pattern] . '»: ' . count($rows)
-            . ' سطرًا بمتوقَّعٍ ' . $exp . ' ' . $cur
-            . ' · **وΣ الخطة ليست قيمةَ العقد**: المقدمُ يُستهلك من المستخلصات فلا يُجمع معها';
+        $out['reason'] = 'ولدت خطة «' . self::PATTERN_AR[$pattern] . '»: ' . count($rows)
+            . ' سطرا بمتوقع ' . $exp . ' ' . $cur
+            . ' · **وΣ الخطة ليست قيمة العقد**: المقدم يستهلك من المستخلصات فلا يجمع معها';
         return $out;
     }
 
@@ -225,7 +225,7 @@ class ContractPaymentScheduleService
         $type = (string) (isset($adv['type']) ? $adv['type'] : '');
         if (!in_array($type, self::ADVANCE_TYPES, true)) {
             return array('ok' => false, 'code' => 422,
-                'reason' => '**نوعُ المقدم إلزاميٌّ وواحدٌ من الأربعة** — ولا مقدمَ بلا نوع');
+                'reason' => '**نوع المقدم إلزامي وواحد من الأربعة** — ولا مقدم بلا نوع');
         }
         $fixed = self::TREATMENT_OF[$type];
         $treatment = (string) (isset($adv['treatment']) ? $adv['treatment'] : '');
@@ -235,8 +235,8 @@ class ContractPaymentScheduleService
             // ثلاثةُ أنواعٍ تحسمها المحاسبةُ لا الاختيار
             if ($treatment !== '' && $treatment !== $fixed) {
                 return array('ok' => false, 'code' => 422,
-                    'reason' => '**«' . self::ADVANCE_AR[$type] . '» معالجتُه ' . $fixed
-                        . ' حتمًا** — ولا يُقلَب بالاختيار (PLAN-03 §6)');
+                    'reason' => '**«' . self::ADVANCE_AR[$type] . '» معالجته ' . $fixed
+                        . ' حتما** — ولا يقلب بالاختيار (PLAN-03 §6)');
             }
             $treatment = $fixed;
             $basis = ($basis === '') ? null : mb_substr($basis, 0, 255);
@@ -244,13 +244,13 @@ class ContractPaymentScheduleService
             // التعبئةُ وحدَها **بنص العقد** — فتُعلَن ولا تُفترض
             if ($treatment !== 'liability' && $treatment !== 'revenue') {
                 return array('ok' => false, 'code' => 422,
-                    'reason' => '**رسومُ التعبئة قد تكون دَينًا أو إيرادًا بحسب نص العقد** — '
-                        . 'فالمعالجةُ تُعلَن صراحةً (`liability` أو `revenue`) ولا تُفترض');
+                    'reason' => '**رسوم التعبئة قد تكون دينا أو إيرادا بحسب نص العقد** — '
+                        . 'فالمعالجة تعلن صراحة (`liability` أو `revenue`) ولا تفترض');
             }
             if ($basis === '') {
                 return array('ok' => false, 'code' => 422,
-                    'reason' => '**نصُّ العقد الذي حكم معالجةَ التعبئة إلزامي** — '
-                        . 'ولا معالجةَ بلا سندٍ من العقد');
+                    'reason' => '**نص العقد الذي حكم معالجة التعبئة إلزامي** — '
+                        . 'ولا معالجة بلا سند من العقد');
             }
             $basis = mb_substr($basis, 0, 255);
         }
@@ -261,14 +261,14 @@ class ContractPaymentScheduleService
             $pct = round((float) (isset($adv['percent']) ? $adv['percent'] : 0), 3);
             if ($pct <= 0 || $pct > 100) {
                 return array('ok' => false, 'code' => 422,
-                    'reason' => 'نسبةُ المقدم في (0,100] — والمقروءُ ' . $pct);
+                    'reason' => 'نسبة المقدم في (0,100] — والمقروء ' . $pct);
             }
             $amount = round($total * $pct / 100, 2);
         } else {
             $basisKind = 'fixed';
             $amount = round((float) (isset($adv['amount']) ? $adv['amount'] : 0), 2);
             if ($amount <= 0) {
-                return array('ok' => false, 'code' => 422, 'reason' => 'مبلغُ المقدم موجب');
+                return array('ok' => false, 'code' => 422, 'reason' => 'مبلغ المقدم موجب');
             }
         }
 
@@ -283,7 +283,7 @@ class ContractPaymentScheduleService
             'amount_expected' => $amount, 'currency' => $cur,
             'due_date' => $due, 'due_condition' => ($cond === '' ? null : mb_substr($cond, 0, 200)),
             'source' => 'generated',
-            'note' => self::ADVANCE_AR[$type] . ' — والمعالجةُ ' . $treatment,
+            'note' => self::ADVANCE_AR[$type] . ' — والمعالجة ' . $treatment,
         ));
     }
 
@@ -295,16 +295,16 @@ class ContractPaymentScheduleService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'row_id' => 0);
         $c = self::contractOf($gate, (int) $contractId);
-        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقدُ غيرُ موجود'; return $out; }
+        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقد غير موجود'; return $out; }
 
         $kind = (string) (isset($a['payment_kind']) ? $a['payment_kind'] : '');
         if (!in_array($kind, self::KINDS, true)) {
-            $out['code'] = 422; $out['reason'] = 'نوعُ دفعةٍ غيرُ معروف: ' . $kind; return $out;
+            $out['code'] = 422; $out['reason'] = 'نوع دفعة غير معروف: ' . $kind; return $out;
         }
         if ($kind === 'monthly_settlement') {
             $out['code'] = 422;
-            $out['reason'] = '**التسويةُ الشهرية تُولَّد من الجدول لا تُدخل يدويًّا** — '
-                . 'وإدخالُها يدويًّا يفتح مصدرًا ثانيًا للرقم نفسِه';
+            $out['reason'] = '**التسوية الشهرية تولد من الجدول لا تدخل يدويا** — '
+                . 'وإدخالها يدويا يفتح مصدرا ثانيا للرقم نفسه';
             return $out;
         }
         $live = self::liveRows($gate, (int) $contractId);
@@ -341,19 +341,19 @@ class ContractPaymentScheduleService
             }
         }
         if ($row['amount_expected'] <= 0) {
-            $out['code'] = 422; $out['reason'] = 'مبلغُ السطر موجب'; return $out;
+            $out['code'] = 422; $out['reason'] = 'مبلغ السطر موجب'; return $out;
         }
         if ($row['due_date'] === null && $row['due_condition'] === null) {
             $out['code'] = 422;
-            $out['reason'] = '**تاريخُ الاستحقاق أو شرطُه إلزامي** — ولا سطرَ بلا استحقاق'; return $out;
+            $out['reason'] = '**تاريخ الاستحقاق أو شرطه إلزامي** — ولا سطر بلا استحقاق'; return $out;
         }
         try { $id = (int) $gate->insert('contract_payment_schedule', $row); }
         catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّرت الإضافة: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذرت الإضافة: ' . $t->getMessage(); return $out;
         }
         self::audit($conn, $companyId, $actor, 'add_payment_row', $id, array(), $row);
         $out['ok'] = true; $out['code'] = 200; $out['row_id'] = $id;
-        $out['reason'] = 'أُضيف سطرُ «' . self::KIND_AR[$kind] . '» بمبلغ ' . $row['amount_expected'];
+        $out['reason'] = 'أضيف سطر «' . self::KIND_AR[$kind] . '» بمبلغ ' . $row['amount_expected'];
         return $out;
     }
 
@@ -375,19 +375,19 @@ class ContractPaymentScheduleService
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'state' => '',
                      'received' => 0.0, 'remaining' => 0.0);
         $r = self::rowOf($gate, (int) $rowId);
-        if (!$r) { $out['code'] = 404; $out['reason'] = 'سطرُ الخطة غيرُ موجود'; return $out; }
+        if (!$r) { $out['code'] = 404; $out['reason'] = 'سطر الخطة غير موجود'; return $out; }
         if ($r['effective_to'] !== null) {
             $out['code'] = 423;
-            $out['reason'] = '**السطرُ من نسخةٍ مختومة** — والقبضُ على النسخة النافذة'; return $out;
+            $out['reason'] = '**السطر من نسخة مختومة** — والقبض على النسخة النافذة'; return $out;
         }
         $amount = round((float) $amount, 2);
-        if ($amount <= 0) { $out['code'] = 422; $out['reason'] = 'مبلغُ القبض موجب'; return $out; }
+        if ($amount <= 0) { $out['code'] = 422; $out['reason'] = 'مبلغ القبض موجب'; return $out; }
         $docRef = trim((string) $docRef);
         if ($docRef === '') {
-            $out['code'] = 422; $out['reason'] = '**مرجعُ سند القبض إلزامي** — لا قبضَ بلا مستند'; return $out;
+            $out['code'] = 422; $out['reason'] = '**مرجع سند القبض إلزامي** — لا قبض بلا مستند'; return $out;
         }
         $receivedDate = self::dateOrNull($receivedDate);
-        if ($receivedDate === null) { $out['code'] = 422; $out['reason'] = 'تاريخُ القبض غير صالح'; return $out; }
+        if ($receivedDate === null) { $out['code'] = 422; $out['reason'] = 'تاريخ القبض غير صالح'; return $out; }
 
         $expected = round((float) $r['amount_expected'], 2);
         $already = round((float) $r['received_amount'], 2);
@@ -396,9 +396,9 @@ class ContractPaymentScheduleService
         // ③ **الزائدُ يُعلَن ولا يُبتلع**
         if ($after > $expected + 0.0001) {
             $out['code'] = 409;
-            $out['reason'] = '**المقبوضُ ' . $after . ' يتجاوز المتوقَّع ' . $expected . '** — '
-                . 'والفائضُ ' . round($after - $expected, 2)
-                . ' **رصيدٌ دائنٌ للعميل لا إيراد**: بيتُه قناةُ التخصيص (P-07) لا سطرُ الخطة';
+            $out['reason'] = '**المقبوض ' . $after . ' يتجاوز المتوقع ' . $expected . '** — '
+                . 'والفائض ' . round($after - $expected, 2)
+                . ' **رصيد دائن للعميل لا إيراد**: بيته قناة التخصيص (P-07) لا سطر الخطة';
             $out['received'] = $already; $out['remaining'] = round($expected - $already, 2);
             return $out;
         }
@@ -412,10 +412,10 @@ class ContractPaymentScheduleService
                 require_once dirname(__DIR__, 3) . '/Contracts/advance_helpers.php';
                 $ar = advance_record($conn, $gate, (int) $r['contract_id'], $amount,
                                      $receivedDate, $docRef,
-                                     'قبضٌ على سطر خطة الدفع #' . (int) $rowId, (int) $actor);
+                                     'قبض على سطر خطة الدفع #' . (int) $rowId, (int) $actor);
                 if (!$ar['ok']) {
                     $out['code'] = (int) $ar['code'] ?: 422;
-                    $out['reason'] = 'تعذّر قبضُ المقدم: ' . $ar['reason']; return $out;
+                    $out['reason'] = 'تعذر قبض المقدم: ' . $ar['reason']; return $out;
                 }
                 $advId = (int) $ar['advance_id'];
             }
@@ -426,7 +426,7 @@ class ContractPaymentScheduleService
                 'advance_id' => $advId,
             ), array('id' => (int) $rowId));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason' ] = 'تعذّر تسجيلُ القبض: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason' ] = 'تعذر تسجيل القبض: ' . $t->getMessage(); return $out;
         }
 
         self::audit($conn, $companyId, $actor, 'payment_received', (int) $rowId,
@@ -435,11 +435,11 @@ class ContractPaymentScheduleService
         $out['ok'] = true; $out['code'] = 200; $out['received'] = $after;
         $out['remaining'] = round($expected - $after, 2);
         $out['state'] = self::stateFor($after, $expected, (string) $r['due_date']);
-        $out['reason'] = 'قُبض ' . $amount . ' · المستلمُ ' . $after . ' من ' . $expected
+        $out['reason'] = 'قبض ' . $amount . ' · المستلم ' . $after . ' من ' . $expected
             . ' · الحال: ' . self::STATE_AR[$out['state']]
             . ($isLiability
-               ? ' · **دخل دفترَ السلف فيُستهلك من المستخلصات**'
-               : ' · **إيرادٌ لا يدخل دفترَ السلف** فلا يُستقطع من مستخلص');
+               ? ' · **دخل دفتر السلف فيستهلك من المستخلصات**'
+               : ' · **إيراد لا يدخل دفتر السلف** فلا يستقطع من مستخلص');
         return $out;
     }
 
@@ -453,15 +453,15 @@ class ContractPaymentScheduleService
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'version' => 0, 'rows' => 0);
         $live = self::liveRows($gate, (int) $contractId);
         if (!$live) {
-            $out['code'] = 404; $out['reason'] = 'لا خطةَ نافذةً تُنسخ — ولّدها أولًا'; return $out;
+            $out['code'] = 404; $out['reason'] = 'لا خطة نافذة تنسخ — ولدها أولا'; return $out;
         }
         $eff = self::dateOrNull($effectiveFrom);
-        if ($eff === null) { $out['code'] = 422; $out['reason'] = '**تاريخُ سريان النسخة إلزامي**'; return $out; }
+        if ($eff === null) { $out['code'] = 422; $out['reason'] = '**تاريخ سريان النسخة إلزامي**'; return $out; }
         $old = (int) $live[0]['version'];
         if ($eff < (string) $live[0]['effective_from']) {
             $out['code'] = 422;
-            $out['reason'] = '**سريانُ النسخة الجديدة قبل سريان القديمة** ('
-                . $live[0]['effective_from'] . ') — والزمنُ لا يرجع';
+            $out['reason'] = '**سريان النسخة الجديدة قبل سريان القديمة** ('
+                . $live[0]['effective_from'] . ') — والزمن لا يرجع';
             return $out;
         }
         $closeAt = date('Y-m-d', strtotime($eff . ' -1 day'));
@@ -497,13 +497,13 @@ class ContractPaymentScheduleService
                 }
             }, 'نسخة خطة دفع للعقد ' . $contractId);
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّرت النسخة: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذرت النسخة: ' . $t->getMessage(); return $out;
         }
         self::audit($conn, $companyId, $actor, 'new_schedule_version', (int) $contractId,
             array('version' => $old), array('version' => $old + 1, 'amendment_id' => $amendmentId));
         $out['ok'] = true; $out['code'] = 200; $out['version'] = $old + 1; $out['rows'] = count($live);
-        $out['reason'] = 'فُتحت النسخة ' . ($old + 1) . ' من ' . $eff . ' بـ' . count($live)
-            . ' سطرًا · **والنسخة ' . $old . ' مختومةٌ في ' . $closeAt . ' وباقية**';
+        $out['reason'] = 'فتحت النسخة ' . ($old + 1) . ' من ' . $eff . ' ب' . count($live)
+            . ' سطرا · **والنسخة ' . $old . ' مختومة في ' . $closeAt . ' وباقية**';
         return $out;
     }
 
@@ -521,7 +521,7 @@ class ContractPaymentScheduleService
                     $gate->update('contract_payment_schedule', array('state' => $st),
                         array('id' => (int) $r['id']));
                     $n++;
-                } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'حالةٌ لا تُكتب لا تُسقط الباقي'); /* حالةٌ لا تُكتب لا تُسقط الباقي */ }
+                } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'حالة لا تكتب لا تسقط الباقي'); /* حالةٌ لا تُكتب لا تُسقط الباقي */ }
             }
         }
         return $n;
@@ -561,11 +561,11 @@ class ContractPaymentScheduleService
         }
         $o['rows'] = count($rows);
         $o['remaining'] = round($o['expected'] - $o['received'], 2);
-        $o['note'] = $o['rows'] . ' سطرًا · متوقَّعٌ ' . $o['expected'] . ' ' . $o['currency']
-            . ' · مستلمٌ ' . $o['received'] . ' · متبقٍّ ' . $o['remaining']
+        $o['note'] = $o['rows'] . ' سطرا · متوقع ' . $o['expected'] . ' ' . $o['currency']
+            . ' · مستلم ' . $o['received'] . ' · متبق ' . $o['remaining']
             . ($o['overdue_rows'] > 0
-               ? (' · **متأخرٌ ' . $o['overdue'] . ' في ' . $o['overdue_rows'] . ' سطرًا**') : '')
-            . ' · **وΣ الخطة ليست قيمةَ العقد**';
+               ? (' · **متأخر ' . $o['overdue'] . ' في ' . $o['overdue_rows'] . ' سطرا**') : '')
+            . ' · **وΣ الخطة ليست قيمة العقد**';
         return $o;
     }
 

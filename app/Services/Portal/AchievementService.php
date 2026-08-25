@@ -31,19 +31,19 @@ class AchievementService
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'metrics' => null, 'snap_id' => null);
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', (string) $from)
             || !preg_match('/^\d{4}-\d{2}-\d{2}$/', (string) $to) || $to < $from) {
-            $out['code'] = 422; $out['reason'] = 'مدةٌ غيرُ صالحة (من/إلى)'; return $out;
+            $out['code'] = 422; $out['reason'] = 'مدة غير صالحة (من/إلى)'; return $out;
         }
         // «مدةٌ تتجاوز سنتين → تُقسَّم» (§9.2)
         if (strtotime($to) - strtotime($from) > 2 * 366 * 86400) {
             $out['code'] = 422;
-            $out['reason'] = 'المدةُ تتجاوز سنتين — **قسّمها** (USR-01 §9.2: تُقسَّم لا تُحسب جملةً)';
+            $out['reason'] = 'المدة تتجاوز سنتين — **قسمها** (USR-01 §9.2: تقسم لا تحسب جملة)';
             return $out;
         }
 
         $cap = null;
         try { $cap = $gate->selectOne('user_capacities', array('where' => array('id' => (int) $capacityId))); }
-        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $cap'); $cap = null; }
-        if (!$cap) { $out['code'] = 404; $out['reason'] = 'الصفةُ غيرُ موجودةٍ في نطاقك'; return $out; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $cap'); $cap = null; }
+        if (!$cap) { $out['code'] = 404; $out['reason'] = 'الصفة غير موجودة في نطاقك'; return $out; }
 
         $accountId = (int) $cap['account_id'];
         $personId  = $cap['person_id'] !== null ? (int) $cap['person_id'] : 0;
@@ -113,7 +113,7 @@ class AchievementService
 
         // ── ⑥ الانضباط — لا حضورَ مركزيًّا في النظام اليوم: يُعلَن لا يُخترع ──
         $m['discipline'] = array('not_applicable' => true,
-            'note' => 'لا ينطبق — لا سجلَّ حضورٍ مركزيًّا بعد (يُعلَن ولا يُخترع رقم)');
+            'note' => 'لا ينطبق — لا سجل حضور مركزيا بعد (يعلن ولا يخترع رقم)');
 
         // ── ⑦ الجودةُ والسلامة — بلاغاتُه المرفوعة والمغلقة ──────────────────
         $row = self::one($conn, "SELECT COUNT(*) raised,
@@ -151,7 +151,7 @@ class AchievementService
                         'metrics_json' => $json, 'source_fingerprint' => $fp,
                     ));
                 }
-            } catch (\Throwable $e) { ems_catch_ignored($e, __METHOD__, 'اللقطةُ اختيارية — والحسابُ صحيحٌ بذاته'); /* اللقطةُ اختيارية — والحسابُ صحيحٌ بذاته */ }
+            } catch (\Throwable $e) { ems_catch_ignored($e, __METHOD__, 'اللقطة اختيارية — والحساب صحيح بذاته'); /* اللقطةُ اختيارية — والحسابُ صحيحٌ بذاته */ }
         }
         return $out;
     }

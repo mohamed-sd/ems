@@ -61,12 +61,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'open') {
     $r = FS::open($conn, $gate, $company_id, intval($_POST['contract_id'] ?? 0),
                   strval($_POST['effective_date'] ?? ''), $uid);
     $redirect($r['ok']
-        ? ('فُتحت التصفيةُ #' . $r['settlement_id'] . ' بصافٍ ' . $r['net'] . ' ✅')
+        ? ('فتحت التصفية #' . $r['settlement_id'] . ' بصاف ' . $r['net'] . ' ✅')
         : ($r['code'] . ' — ' . $r['reason'] . ' ❌'));
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'approve') {
-    if (!$can_edit) { $redirect('الاعتمادُ ليد الإجازة — لا صلاحية ❌'); }
+    if (!$can_edit) { $redirect('الاعتماد ليد الإجازة — لا صلاحية ❌'); }
     // ORG-13 · حارس الأذونات: خروج عامل نهائيًّا — الحركة + الموارد البشرية (ORG-01 §5-⑨)
     require_once dirname(__DIR__) . '/includes/permit_gate.php';
     $pg = ems_permit_gate($conn, $company_id, 'worker_final_exit',
@@ -75,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'approve') {
     $r = FS::approve($conn, $gate, $company_id, intval($_POST['settlement_id'] ?? 0),
                      strval($_POST['clearance_doc'] ?? ''), $uid);
     $redirect($r['ok']
-        ? ('اعتُمدت التصفية · ذمّةٌ #' . ($r['due_id'] ?? '—') . ' · استُرد ' . $r['recovered'] . ' ✅')
+        ? ('اعتمدت التصفية · ذمة #' . ($r['due_id'] ?? '—') . ' · استرد ' . $r['recovered'] . ' ✅')
         : ($r['code'] . ' — ' . $r['reason'] . ' ❌'));
 }
 
@@ -83,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'cancel') {
     if (!$can_add) { $redirect('لا توجد صلاحية ❌'); }
     $r = FS::cancel($conn, $gate, $company_id, intval($_POST['settlement_id'] ?? 0),
                     strval($_POST['cancel_reason'] ?? ''), $uid);
-    $redirect($r['ok'] ? 'أُلغيت التصفيةُ بسببها المكتوب ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'));
+    $redirect($r['ok'] ? 'ألغيت التصفية بسببها المكتوب ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'));
 }
 
 $candidates  = FS::settleableContracts($gate);
@@ -97,8 +97,8 @@ if ($previewFor > 0) {
     $preview = FS::compute($conn, $gate, $company_id, $previewFor, $previewOn, $uid);
 }
 
-$LINE_LABEL = array('dues' => 'المستحقُّ حتى تاريخ الأثر', 'leave' => 'رصيدُ الإجازات',
-                    'eos' => 'نهايةُ الخدمة', 'advance_offset' => 'مقاصّةُ السلف والعهد');
+$LINE_LABEL = array('dues' => 'المستحق حتى تاريخ الأثر', 'leave' => 'رصيد الإجازات',
+                    'eos' => 'نهاية الخدمة', 'advance_offset' => 'مقاصة السلف والعهد');
 $ST_LABEL   = array('draft' => 'مسودة', 'approved' => 'معتمدة', 'cancelled' => 'ملغاة');
 
 $page_title = 'إيكوبيشن | تصفية إنهاء خدمة الموظف';
@@ -107,7 +107,7 @@ require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
-require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('employee', 'إنهاءُ الخدمة');
+require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('employee', 'إنهاء الخدمة');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 // M-14 BR-GOV-07: التصفية كشفُ مستحقاتٍ حساس — القراءةُ تُسجَّل (عطالة يومية)
 require_once __DIR__ . '/../includes/sensitive_read_log.php';
@@ -124,25 +124,25 @@ ems_log_sensitive_read($conn, 'final_settlement', 'screen:list', 'Workforce/fina
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>';
     }
     require_once __DIR__ . '/../includes/ux_components.php';
-    echo ems_states_bundle('لا تصفياتِ إنهاءِ خدمةٍ ضمن هذا النطاق', 'التصفيةُ يفتحها إنهاءُ العقد — راجع سجلَّ عقودِ الموظفين');
+    echo ems_states_bundle('لا تصفيات إنهاء خدمة ضمن هذا النطاق', 'التصفية يفتحها إنهاء العقد — راجع سجل عقود الموظفين');
     ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-list-check"></i>
-        عقودٌ منتهيةٌ تنتظر التصفية</h5></div>
+        عقود منتهية تنتظر التصفية</h5></div>
     <div class="card-body">
         <p class="fs-note-muted">
-            <strong>التصفيةُ يفتحها الإنهاء</strong> (ENT-01 §5) — ولكل عقدٍ تصفيةٌ واحدةٌ لا تتكرر.
-            والبنودُ <strong>محسوبةٌ من اللقطة</strong>: ما لا قاعدةَ مكتوبةً له يظهر
-            <strong>معلَنًا بسببه</strong> ولا يُقدَّر بصفرٍ صامت.
+            <strong>التصفية يفتحها الإنهاء</strong> (ENT-01 §5) — ولكل عقد تصفية واحدة لا تتكرر.
+            والبنود <strong>محسوبة من اللقطة</strong>: ما لا قاعدة مكتوبة له يظهر
+            <strong>معلنا بسببه</strong> ولا يقدر بصفر صامت.
         </p>
         <?php if (!$candidates): ?>
             <div class="alert alert-warning">لا عقدَ في «منتهٍ · منهًى · مقفل» — فلا تصفيةَ ممكنة.</div>
         <?php else: ?>
         <div class="table-container">
         <table class="alltables display nowrap fs-table-full">
-            <thead><tr><th>العقد</th><th>كود الموظف</th><th>الحالة</th><th>المُنشئ — الاسم والصفة</th><th>إجمالي المستحقات</th>
-                <th>مكافأة نهاية الخدمة</th><th>قاعدةُ الإجازة</th><th>التصفية</th><th></th>
+            <thead><tr><th>العقد</th><th>كود الموظف</th><th>الحالة</th><th>المنشئ — الاسم والصفة</th><th>إجمالي المستحقات</th>
+                <th>مكافأة نهاية الخدمة</th><th>قاعدة الإجازة</th><th>التصفية</th><th></th>
                 <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
                 <th class="ems-fn-th" data-fn="1">رقم المحضر</th>
                 <th class="ems-fn-th" data-fn="1">تاريخ الالتحاق</th>
@@ -153,7 +153,7 @@ ems_log_sensitive_read($conn, 'final_settlement', 'screen:list', 'Workforce/fina
                 <th class="ems-fn-th" data-fn="1">رصيد الإجازات</th>
                 <th class="ems-fn-th" data-fn="1">بدل الإجازات</th>
                 <th class="ems-fn-th" data-fn="1">مستحقات أخرى</th>
-                <th class="ems-fn-th" data-fn="1">السلف غير المسدَّدة</th>
+                <th class="ems-fn-th" data-fn="1">السلف غير المسددة</th>
                 <th class="ems-fn-th" data-fn="1">خصومات</th>
                 <th class="ems-fn-th" data-fn="1">العهد غير المخلاة</th>
                 <th class="ems-fn-th" data-fn="1">إجمالي الخصومات</th>
@@ -166,16 +166,16 @@ ems_log_sensitive_read($conn, 'final_settlement', 'screen:list', 'Workforce/fina
                 <th class="ems-fn-th none" data-fn="1">الاعتماد المالي</th>
                 <th class="ems-fn-th none" data-fn="1">تاريخ السداد</th>
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                 <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                 <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                 <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                 <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-                <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+                <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
                 <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
-                <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
-                <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطّلاع</th>
+                <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
+                <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطلاع</th>
                 <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                 <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                 <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
@@ -191,17 +191,17 @@ ems_log_sensitive_read($conn, 'final_settlement', 'screen:list', 'Workforce/fina
                     <td><?php echo htmlspecialchars((string)($c['end_date'] ?? '—')); ?></td>
                     <td><?php echo $c['eos_days_per_year'] !== null
                         ? htmlspecialchars((string)$c['eos_days_per_year']) . ' يوم/سنة'
-                        : '<span class="badge badge-warning">لم تُكتب</span>'; ?></td>
+                        : '<span class="badge badge-warning">لم تكتب</span>'; ?></td>
                     <td><?php echo $c['leave_days_per_year'] !== null
                         ? htmlspecialchars((string)$c['leave_days_per_year']) . ' يوم/سنة'
-                        : '<span class="badge badge-warning">لم تُكتب</span>'; ?></td>
+                        : '<span class="badge badge-warning">لم تكتب</span>'; ?></td>
                     <td><?php echo $c['settlement_id'] !== null
                         ? ('#' . intval($c['settlement_id']) . ' — '
                            . htmlspecialchars($ST_LABEL[(string)$c['settlement_state']] ?? (string)$c['settlement_state']))
-                        : '<span class="badge badge-secondary">لم تُفتح</span>'; ?></td>
+                        : '<span class="badge badge-secondary">لم تفتح</span>'; ?></td>
                     <td><?php if ($c['settlement_id'] === null): ?>
                         <a class="action-btn" href="final_settlement.php?preview=<?php echo intval($c['id']); ?>&as_of=<?php echo htmlspecialchars($previewOn); ?>">
-                            <i class="fa fa-calculator"></i> عايِن</a>
+                            <i class="fa fa-calculator"></i> عاين</a>
                     <?php endif; ?></td>
                 </tr>
             <?php endforeach; ?>
@@ -213,13 +213,13 @@ ems_log_sensitive_read($conn, 'final_settlement', 'screen:list', 'Workforce/fina
 
     <?php if ($preview !== null): ?>
     <div class="card"><div class="card-header"><h5><i class="fa fa-calculator"></i>
-        معاينةُ تصفية العقد #<?php echo $previewFor; ?></h5></div>
+        معاينة تصفية العقد #<?php echo $previewFor; ?></h5></div>
     <div class="card-body">
         <form method="get" class="fs-preview-form">
             <input type="hidden" name="preview" value="<?php echo $previewFor; ?>">
-            <label for="emsf_569_22ab0">تاريخُ الأثر:</label>
+            <label for="emsf_569_22ab0">تاريخ الأثر:</label>
             <input type="date" name="as_of" aria-label="تاريخ الأثر" value="<?php echo htmlspecialchars($previewOn); ?>" id="emsf_569_22ab0">
-            <button type="submit" class="btn-primary"><i class="fa fa-rotate"></i> أعِد الاحتساب</button>
+            <button type="submit" class="btn-primary"><i class="fa fa-rotate"></i> أعد الاحتساب</button>
         </form>
 
         <?php if (!$preview['ok']): ?>
@@ -228,20 +228,20 @@ ems_log_sensitive_read($conn, 'final_settlement', 'screen:list', 'Workforce/fina
             </div>
         <?php else: ?>
             <p class="fs-note-muted">
-                اللقطةُ <strong>#<?php echo intval($preview['snapshot_id']); ?></strong>
+                اللقطة <strong>#<?php echo intval($preview['snapshot_id']); ?></strong>
                 ببصمة <code><?php echo htmlspecialchars(substr((string)$preview['fingerprint'], 0, 12)); ?>…</code>
-                · سنواتُ الخدمة <strong><?php echo htmlspecialchars((string)$preview['basis']['service_years']); ?></strong>
-                · أساسُ نهاية الخدمة <strong><?php echo htmlspecialchars((string)$preview['basis']['eos_monthly_base']); ?></strong>
-                · أساسُ الإجازة <strong><?php echo htmlspecialchars((string)$preview['basis']['leave_monthly_base']); ?></strong>
+                · سنوات الخدمة <strong><?php echo htmlspecialchars((string)$preview['basis']['service_years']); ?></strong>
+                · أساس نهاية الخدمة <strong><?php echo htmlspecialchars((string)$preview['basis']['eos_monthly_base']); ?></strong>
+                · أساس الإجازة <strong><?php echo htmlspecialchars((string)$preview['basis']['leave_monthly_base']); ?></strong>
             </p>
             <?php if (!empty($preview['basis']['unreadable_components'])): ?>
                 <div class="alert alert-warning">
-                    <strong>مكوّناتٌ بطريقةِ حسابٍ لا يحملها أساسٌ شهريٌّ ثابت — تُعلَن ولا تُقدَّر:</strong>
+                    <strong>مكونات بطريقة حساب لا يحملها أساس شهري ثابت — تعلن ولا تقدر:</strong>
                     <?php foreach ($preview['basis']['unreadable_components'] as $u): ?>
                         <div>#<?php echo intval($u['component_id']); ?>
                             — <?php echo htmlspecialchars((string)$u['component_type']); ?>
                             (<?php echo htmlspecialchars((string)$u['calc_method']); ?>)
-                            · العلَم <?php echo htmlspecialchars((string)$u['flag']); ?></div>
+                            · العلم <?php echo htmlspecialchars((string)$u['flag']); ?></div>
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
@@ -267,7 +267,7 @@ ems_log_sensitive_read($conn, 'final_settlement', 'screen:list', 'Workforce/fina
                     <th colspan="3">الصافي</th>
                     <th><?php echo htmlspecialchars((string)$preview['totals']['net']); ?></th>
                     <th><?php echo $preview['totals']['advances_remaining'] > 0
-                        ? ('رصيدُ سلفٍ مفتوحٌ باقٍ: ' . htmlspecialchars((string)$preview['totals']['advances_remaining']))
+                        ? ('رصيد سلف مفتوح باق: ' . htmlspecialchars((string)$preview['totals']['advances_remaining']))
                         : ''; ?></th>
                 </tr></tfoot>
             </table>
@@ -280,7 +280,7 @@ ems_log_sensitive_read($conn, 'final_settlement', 'screen:list', 'Workforce/fina
                 <input type="hidden" name="contract_id" value="<?php echo $previewFor; ?>">
                 <input type="hidden" name="effective_date" value="<?php echo htmlspecialchars($previewOn); ?>">
                 <button type="submit" class="btn-primary"><i class="fa fa-file-signature"></i>
-                    افتح التصفيةَ بهذه الأرقام</button>
+                    افتح التصفية بهذه الأرقام</button>
             </form>
             <?php endif; ?>
         <?php endif; ?>
@@ -288,10 +288,10 @@ ems_log_sensitive_read($conn, 'final_settlement', 'screen:list', 'Workforce/fina
     <?php endif; ?>
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-folder-open"></i>
-        التصفياتُ المفتوحة والمعتمدة</h5></div>
+        التصفيات المفتوحة والمعتمدة</h5></div>
     <div class="card-body">
         <?php if (!$settlements): ?>
-            <div class="alert alert-info">لا تصفيةَ بعد.</div>
+            <div class="alert alert-info">لا تصفية بعد.</div>
         <?php else: foreach ($settlements as $s): $lines = FS::linesOf($gate, intval($s['id'])); ?>
             <div class="card fs-card-item ems-doc-cycle">
             <div class="card-header"><h5>
@@ -302,24 +302,24 @@ ems_log_sensitive_read($conn, 'final_settlement', 'screen:list', 'Workforce/fina
                     <?php echo htmlspecialchars($ST_LABEL[(string)$s['state']] ?? (string)$s['state']); ?></span>
                 <?php /* بوابة ١٢: الخطوةُ التاليةُ من حالِ المستندِ الحي — يدُ الإعدادِ غيرُ يدِ الاعتماد */
                 if ((string)$s['state'] === 'draft') {
-                    echo ems_next_step('اعتمادُ التصفيةِ بيدِ الإجازةِ الماليةِ — بمرفقِ الإخلاء');
+                    echo ems_next_step('اعتماد التصفية بيد الإجازة المالية — بمرفق الإخلاء');
                 } elseif ((string)$s['state'] === 'approved') {
-                    echo ems_next_step('صرفُ الذمّةِ الصافيةِ عبر دورةِ المدفوعات');
+                    echo ems_next_step('صرف الذمة الصافية عبر دورة المدفوعات');
                 } ?>
             </h5></div>
             <div class="card-body">
                 <div class="fs-meta-row">
-                    <div>تاريخُ الأثر: <strong><?php echo htmlspecialchars((string)$s['effective_date']); ?></strong></div>
-                    <div>سنواتُ الخدمة: <strong><?php echo htmlspecialchars((string)$s['service_years']); ?></strong></div>
+                    <div>تاريخ الأثر: <strong><?php echo htmlspecialchars((string)$s['effective_date']); ?></strong></div>
+                    <div>سنوات الخدمة: <strong><?php echo htmlspecialchars((string)$s['service_years']); ?></strong></div>
                     <div>الصافي: <strong><?php echo htmlspecialchars((string)$s['net_amount']); ?>
                         <?php echo htmlspecialchars((string)$s['currency']); ?></strong></div>
-                    <div>المعترَفُ به جديدًا: <strong><?php echo htmlspecialchars((string)$s['recognized_amount']); ?></strong></div>
+                    <div>المعترف به جديدا: <strong><?php echo htmlspecialchars((string)$s['recognized_amount']); ?></strong></div>
                     <div>اللقطة: <strong>#<?php echo intval($s['snapshot_id']); ?></strong></div>
                     <?php if ($s['net_due_ref'] !== null): ?>
-                        <div>الذمّة: <strong>#<?php echo intval($s['net_due_ref']); ?></strong></div>
+                        <div>الذمة: <strong>#<?php echo intval($s['net_due_ref']); ?></strong></div>
                     <?php endif; ?>
                     <?php if ((float)$s['advances_remaining'] > 0): ?>
-                        <div><span class="badge badge-warning">رصيدُ سلفٍ باقٍ
+                        <div><span class="badge badge-warning">رصيد سلف باق
                             <?php echo htmlspecialchars((string)$s['advances_remaining']); ?></span></div>
                     <?php endif; ?>
                 </div>
@@ -350,14 +350,14 @@ ems_log_sensitive_read($conn, 'final_settlement', 'screen:list', 'Workforce/fina
                         <input type="hidden" name="fs_action" value="approve">
                         <input type="hidden" name="settlement_id" value="<?php echo intval($s['id']); ?>">
                         <div class="form-grid">
-                            <div class="form-group"><label for="emsf_570_4f3bf">مرفقُ الإخلاء <span class="fs-required">*</span></label>
+                            <div class="form-group"><label for="emsf_570_4f3bf">مرفق الإخلاء <span class="fs-required">*</span></label>
                                 <input type="text" name="clearance_doc" maxlength="120" required
-                                       placeholder="مرجعُ محضر الإخلاء" id="emsf_570_4f3bf"></div>
+                                       placeholder="مرجع محضر الإخلاء" id="emsf_570_4f3bf"></div>
                         </div>
                         <button type="submit" class="btn-primary"><i class="fa fa-check"></i>
                             اعتمد التصفية</button>
-                        <small class="fs-note-muted">— والاعتمادُ يولّد <strong>الحدثَ الماليَّ الواحد</strong>
-                            ويسترد السلفَ فعليًّا.</small>
+                        <small class="fs-note-muted">— والاعتماد يولد <strong>الحدث المالي الواحد</strong>
+                            ويسترد السلف فعليا.</small>
                     </form>
                     <?php endif; ?>
                     <?php if ($can_add): ?>
@@ -366,21 +366,21 @@ ems_log_sensitive_read($conn, 'final_settlement', 'screen:list', 'Workforce/fina
                         <input type="hidden" name="fs_action" value="cancel">
                         <input type="hidden" name="settlement_id" value="<?php echo intval($s['id']); ?>">
                         <div class="form-grid">
-                            <div class="form-group"><label for="emsf_571_348a7">سببُ الإلغاء <span class="fs-required">*</span></label>
+                            <div class="form-group"><label for="emsf_571_348a7">سبب الإلغاء <span class="fs-required">*</span></label>
                                 <input type="text" name="cancel_reason" maxlength="255" required id="emsf_571_348a7"></div>
                         </div>
-                        <button type="submit" class="btn-secondary"><i class="fa fa-ban"></i> ألغِ المسودة</button>
+                        <button type="submit" class="btn-secondary"><i class="fa fa-ban"></i> ألغ المسودة</button>
                     </form>
                     <?php endif; ?>
                 <?php elseif ((string)$s['state'] === 'approved'): ?>
                     <div class="alert alert-success fs-alert-gap">
-                        اعتُمدت بمرفق الإخلاء
+                        اعتمدت بمرفق الإخلاء
                         <strong><?php echo htmlspecialchars((string)$s['clearance_doc']); ?></strong>
-                        — والتصحيحُ بعدها <strong>بحركةٍ عاكسةٍ لا بمحو</strong>.
+                        — والتصحيح بعدها <strong>بحركة عاكسة لا بمحو</strong>.
                     </div>
                 <?php elseif ((string)$s['state'] === 'cancelled'): ?>
                     <div class="alert alert-warning fs-alert-gap">
-                        أُلغيت: <?php echo htmlspecialchars((string)$s['cancel_reason']); ?>
+                        ألغيت: <?php echo htmlspecialchars((string)$s['cancel_reason']); ?>
                     </div>
                 <?php endif; ?>
             </div></div>

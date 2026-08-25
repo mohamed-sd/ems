@@ -229,8 +229,8 @@ $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
 if (function_exists('ems_states_bundle')) {
-    echo ems_states_bundle('لا مشروعَ نشطًا متاحًا لإدارةِ معداتِه',
-                           'فعِّل مشروعًا من شاشةِ المشاريع أو راجع صلاحيةَ إسنادِك للمشاريع');
+    echo ems_states_bundle('لا مشروع نشطا متاحا لإدارة معداته',
+                           'فعل مشروعا من شاشة المشاريع أو راجع صلاحية إسنادك للمشاريع');
 }
 ?>
 
@@ -301,7 +301,7 @@ if (function_exists('ems_states_bundle')) {
             ?>
             <div class="no-projects">
                 <i class="fas fa-folder-open"></i>
-                <p>لا توجد مشاريع متاحة حالياً</p>
+                <p>لا توجد مشاريع متاحة حاليا</p>
             </div>
             <?php
         }

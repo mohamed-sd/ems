@@ -128,8 +128,8 @@ class RateBookService
     public static function tierLabel($from, $to)
     {
         $from = (int) $from;
-        if ($to === null || $to === '') { return $from . ' يومًا فأكثر'; }
-        return $from . ' – ' . (int) $to . ' يومًا';
+        if ($to === null || $to === '') { return $from . ' يوما فأكثر'; }
+        return $from . ' – ' . (int) $to . ' يوما';
     }
 
     /** رقمُ دفترٍ تالٍ. */

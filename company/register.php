@@ -72,7 +72,7 @@ function company_default_plan_catalog() {
             'sort_order' => 1,
             'is_active' => 1,
             'accent' => 'slate',
-            'tagline' => 'ابدأ فوراً بدون انتظار موافقة وبحدود مناسبة للتجربة'
+            'tagline' => 'ابدأ فورا بدون انتظار موافقة وبحدود مناسبة للتجربة'
         ),
         array(
             'id' => 2,
@@ -288,7 +288,7 @@ function company_get_plan_index_by_id($plans) {
 
 $bootstrapError = ensure_saas_subscription_tables($conn);
 if ($bootstrapError !== '' && $error === '') {
-    $error = 'تعذر تهيئة جداول الاشتراكات تلقائياً: ' . $bootstrapError;
+    $error = 'تعذر تهيئة جداول الاشتراكات تلقائيا: ' . $bootstrapError;
 }
 
 $plans = company_get_plan_options($conn);
@@ -309,13 +309,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verify_csrf_token(isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '')) {
         $error = 'رمز الحماية غير صالح. أعد تحميل الصفحة.';
     } elseif ($bootstrapError !== '') {
-        $error = 'تعذر تجهيز بيئة الاشتراكات حالياً. ' . $bootstrapError;
+        $error = 'تعذر تجهيز بيئة الاشتراكات حاليا. ' . $bootstrapError;
     } elseif (empty($plansById)) {
         $error = 'الشركة لم تضف خطط دفع بعد.';
     } elseif (!register_table_exists('admin_subscription_requests')) {
-        $error = 'تعذر إنشاء جدول طلبات الاشتراك تلقائياً.';
+        $error = 'تعذر إنشاء جدول طلبات الاشتراك تلقائيا.';
     } elseif (!register_table_exists('admin_companies')) {
-        $error = 'تعذر إنشاء جدول الشركات تلقائياً.';
+        $error = 'تعذر إنشاء جدول الشركات تلقائيا.';
     } else {
         $companyName = trim(isset($_POST['company_name']) ? $_POST['company_name'] : '');
         $companyNameEn = trim(isset($_POST['company_name_en']) ? $_POST['company_name_en'] : '');
@@ -374,7 +374,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $checkRequest = mysqli_prepare($conn, 'SELECT id FROM admin_subscription_requests WHERE email = ? AND status = "pending" LIMIT 1');
 
             if (!$checkCompany || !$checkRequest) {
-                $error = 'تعذر التحقق من البيانات حالياً.';
+                $error = 'تعذر التحقق من البيانات حاليا.';
             } else {
                 mysqli_stmt_bind_param($checkCompany, 'ss', $companyEmail, $commercialRegistration);
                 mysqli_stmt_execute($checkCompany);
@@ -401,9 +401,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
 
                 if ($companyExistsRow) {
-                    $error = 'البريد الرسمي للشركة أو رقم السجل التجاري مسجل مسبقاً.';
+                    $error = 'البريد الرسمي للشركة أو رقم السجل التجاري مسجل مسبقا.';
                 } elseif ($managerDupRow) {
-                    $error = 'بريد المدير العام مستخدم مسبقاً.';
+                    $error = 'بريد المدير العام مستخدم مسبقا.';
                 } elseif (!$isFreemium && $requestExistsRow) {
                     $error = 'يوجد طلب اشتراك معلق بنفس البريد الإلكتروني.';
                 } elseif ($isFreemium) {
@@ -625,7 +625,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     );
 
                     if (!$insertReq) {
-                        $error = 'تعذر إرسال الطلب حالياً. ' . mysqli_error($conn);
+                        $error = 'تعذر إرسال الطلب حاليا. ' . mysqli_error($conn);
                     } else {
                         mysqli_stmt_bind_param($insertReq, 'sssis', $companyName, $companyEmail, $phone, $selectedPlanId, $messageJson);
                         $ok = mysqli_stmt_execute($insertReq);
@@ -886,7 +886,7 @@ html,body { height:100%; font-family:var(--font); color:var(--txt); }
 .plan-card:hover { transform:translateY(-2px); box-shadow:0 12px 30px rgba(12,28,62,.1); }
 .plan-card.selected { border-color:var(--gold); box-shadow:0 0 0 3px rgba(232,184,0,.18), 0 12px 30px rgba(232,184,0,.14); background:linear-gradient(160deg,#fffef7,#fff9e0); }
 .plan-card.recommended::before {
-    content:'الأكثر شيوعاً'; position:absolute; top:-10px; right:14px;
+    content:'الأكثر شيوعا'; position:absolute; top:-10px; right:14px;
     background:linear-gradient(135deg,var(--navy),var(--navy-l)); color:var(--gold);
     font-size:.65rem; padding:4px 10px; border-radius:999px; font-weight:800;
 }
@@ -1000,7 +1000,7 @@ html,body { height:100%; font-family:var(--font); color:var(--txt); }
         <div class="features">
             <div class="feat">
                 <div class="fi-ico"><i class="fas fa-layer-group"></i></div>
-                <div class="fi-txt"><h4>إدارة الأسطول والمعدات</h4><p>تتبع شامل لجميع الآليات لحظةً بلحظة</p></div>
+                <div class="fi-txt"><h4>إدارة الأسطول والمعدات</h4><p>تتبع شامل لجميع الآليات لحظة بلحظة</p></div>
             </div>
             <div class="feat">
                 <div class="fi-ico"><i class="fas fa-file-contract"></i></div>
@@ -1020,7 +1020,7 @@ html,body { height:100%; font-family:var(--font); color:var(--txt); }
         <div class="p-stats">
             <div class="stat-item">
                 <div class="stat-num">+500</div>
-                <div class="stat-lbl">معدة مُدارة</div>
+                <div class="stat-lbl">معدة مدارة</div>
             </div>
             <div class="stat-sep"></div>
             <div class="stat-item">
@@ -1338,7 +1338,7 @@ html,body { height:100%; font-family:var(--font); color:var(--txt); }
 
                     <div class="note-box">
                         <i class="fas fa-shield-alt"></i>
-                        <p><strong>Freemium:</strong> عند اختيار الباقة المجانية (1 مشروع، 1 معدة، 3 مستخدمين) يتم التفعيل فوراً والدخول مباشرة. <strong>الباقات المدفوعة:</strong> تُرسل كطلب مراجعة لفريق الإدارة.</p>
+                        <p><strong>Freemium:</strong> عند اختيار الباقة المجانية (1 مشروع، 1 معدة، 3 مستخدمين) يتم التفعيل فورا والدخول مباشرة. <strong>الباقات المدفوعة:</strong> ترسل كطلب مراجعة لفريق الإدارة.</p>
                     </div>
 
                     <!-- Hidden limits fields -->

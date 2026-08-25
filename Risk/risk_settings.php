@@ -22,25 +22,25 @@ use App\Services\Risk\RiskService;
 use App\Services\Risk\RiskSignalEngine;
 use App\Services\Risk\RiskEvents;
 
-$AUTH_AR = array('risk_owner' => 'مالك الخطر نفسُه', 'owner_with_analyst' => 'المالك بمراجعة محلل المخاطر',
-    'deputy' => 'النائب المختص', 'ceo' => 'الرئيس التنفيذي حصرًا');
+$AUTH_AR = array('risk_owner' => 'مالك الخطر نفسه', 'owner_with_analyst' => 'المالك بمراجعة محلل المخاطر',
+    'deputy' => 'النائب المختص', 'ceo' => 'الرئيس التنفيذي حصرا');
 $ESC_AR = array('منخفض' => 'لا تصعيد', 'متوسط' => 'إشعار مدير المخاطر',
     'مرتفع' => 'تصعيد لمدير المخاطر والنائب', 'حرج' => 'تصعيد فوري للرئيس في اليوم نفسه');
 
 /* قواعدُ الإشارات: أيُّها منفَّذٌ فعلًا؟ تُقرأ من المحرّكِ لا تُكتب يدويًّا */
 $engineMethods = get_class_methods('App\Services\Risk\RiskSignalEngine');
 $SG_RULES = array(
-    'SG-01' => 'عطل متكرر لمعدة واحدة — ثلاثة أعطال في تسعين يومًا',
+    'SG-01' => 'عطل متكرر لمعدة واحدة — ثلاثة أعطال في تسعين يوما',
     'SG-02' => 'توقف فوق الحد في وردية',
     'SG-03' => 'صيانة وقائية متأخرة — تجاوز الموعد بعشرة أيام',
-    'SG-04' => 'رخصة أو وثيقة منتهية أو تنتهي — ثلاثون يومًا',
+    'SG-04' => 'رخصة أو وثيقة منتهية أو تنتهي — ثلاثون يوما',
     'SG-05' => 'تأخر المورد في الإحلال — تجاوز المهلة',
-    'SG-06' => 'ذمة تجاوزت الحد — متأخرة فوق ثلاثين يومًا',
-    'SG-07' => 'عقد يقترب من الانتهاء بلا تجديد — تسعون يومًا',
+    'SG-06' => 'ذمة تجاوزت الحد — متأخرة فوق ثلاثين يوما',
+    'SG-07' => 'عقد يقترب من الانتهاء بلا تجديد — تسعون يوما',
     'SG-08' => 'انحراف كبير في سعر الصرف — تجاوز نطاق التحمل',
     'SG-09' => 'مخزون حرج تحت الحد — بلوغ حد إعادة الطلب',
     'SG-10' => 'فشل ضابط حرج — تصعيد فوري (لحظية من فعلها)',
-    'SG-11' => 'تكرار بلاغ من النوع نفسه — ثلاثة في ثلاثين يومًا',
+    'SG-11' => 'تكرار بلاغ من النوع نفسه — ثلاثة في ثلاثين يوما',
     'SG-12' => 'مخالفة حوكمة أو تجاوز حارس — رفض متكرر',
     'SG-13' => 'محاولة وصول غير معتادة — تجاوز المتوسط بضعفين',
     'SG-14' => 'واقعة كادت تقع (لحظية من فعلها)',
@@ -91,16 +91,16 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     );
     include('../includes/page_header.php');
     ems_screen_about(
-        'الإطارُ الحاكمُ معروضًا: مصفوفةُ السلطة ودورياتُ المراجعةِ وأبعادُ الأثرِ وعناصرُ القياسِ '
-        . 'وتقنياتُ التقييمِ وقواعدُ الإشاراتِ ونوافذُ منعِ التكرار.',
-        array('كلُّ رقمٍ هنا يُقرأ من مصدرِه الحيِّ — فلا يُكتب حكمٌ مرتين فيختلفا',
-              'تعديلُ التصنيفِ ونوافذِه من شاشةِ وحداتِ المخاطر — والتعديلُ بترحيلٍ لا بحذف'));
-    echo ems_states_bundle('لا إعداداتِ تصنيفٍ مبذورةً لهذا الكيان', 'الإطارُ الحاكمُ يُقرأ من مصادرِه الحيةِ — والبذرةُ المرجعيةُ شرطُ التشغيل');
+        'الإطار الحاكم معروضا: مصفوفة السلطة ودوريات المراجعة وأبعاد الأثر وعناصر القياس '
+        . 'وتقنيات التقييم وقواعد الإشارات ونوافذ منع التكرار.',
+        array('كل رقم هنا يقرأ من مصدره الحي — فلا يكتب حكم مرتين فيختلفا',
+              'تعديل التصنيف ونوافذه من شاشة وحدات المخاطر — والتعديل بترحيل لا بحذف'));
+    echo ems_states_bundle('لا إعدادات تصنيف مبذورة لهذا الكيان', 'الإطار الحاكم يقرأ من مصادره الحية — والبذرة المرجعية شرط التشغيل');
     ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <div class="card"><div class="card-body table-responsive">
-        <h6>مصفوفة الاعتماد والتصعيد (§14-2) — تُقرأ من ثابت RiskService</h6>
+        <h6>مصفوفة الاعتماد والتصعيد (§14-2) — تقرأ من ثابت RiskService</h6>
         <table class="table table-sm table-striped rsk-w100">
             <thead><tr><th>الدرجة</th><th>من يقبل</th><th>دورية المراجعة</th><th>التصعيد</th></tr></thead>
             <tbody>
@@ -108,13 +108,13 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                 <tr>
                     <td><strong><?php echo htmlspecialchars($lv); ?></strong></td>
                     <td><?php echo htmlspecialchars($AUTH_AR[$auth] ?? $auth); ?></td>
-                    <td><?php echo (int) (RiskService::REVIEW_DAYS[$lv] ?? 0); ?> يومًا</td>
+                    <td><?php echo (int) (RiskService::REVIEW_DAYS[$lv] ?? 0); ?> يوما</td>
                     <td><?php echo htmlspecialchars($ESC_AR[$lv] ?? '—'); ?></td>
                 </tr>
             <?php endforeach; ?>
                 <tr class="rsk-forbidden-row">
                     <td><strong>محظور</strong></td>
-                    <td><strong>لا يُقبل بحال</strong> — غائبٌ من المصفوفة عمدًا (RK-04)</td>
+                    <td><strong>لا يقبل بحال</strong> — غائب من المصفوفة عمدا (RK-04)</td>
                     <td>—</td>
                     <td>تصعيد فوري وإيقاف النشاط</td>
                 </tr>
@@ -124,11 +124,11 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
 
     <div class="row rsk-mt12">
         <div class="col-md-6"><div class="card"><div class="card-body">
-            <h6>أبعاد الأثر الثمانية (§12-2) — لا تُدمج في رقم واحد</h6>
+            <h6>أبعاد الأثر الثمانية (§12-2) — لا تدمج في رقم واحد</h6>
             <ol class="rsk-list">
                 <?php foreach ($RISK_IMPACT_DIMS as $k => $v): ?>
                 <li><?php echo htmlspecialchars($v); ?>
-                    <?php if ($k === 'safety'): ?><span class="rsk-danger-text">— لا يُقايَض بالمال</span><?php endif; ?></li>
+                    <?php if ($k === 'safety'): ?><span class="rsk-danger-text">— لا يقايض بالمال</span><?php endif; ?></li>
                 <?php endforeach; ?>
             </ol>
         </div></div></div>
@@ -137,11 +137,11 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
             <ol class="rsk-list">
                 <li>الخطر المتأصل — قبل أي ضابط</li>
                 <li>فعالية الضوابط — بدليل تحقق لا بادعاء</li>
-                <li>الخطر المتبقي — عليه يُبنى قرار القبول</li>
-                <li>الخطر المستهدف — يُقاس عند الإغلاق</li>
-                <li>سرعة التحقق — تُغيّر الأولوية لا الدرجة</li>
-                <li>الأفق الزمني — للتخطيط والتحوّط</li>
-                <li>درجة الثقة — تُعلَن ولا تُخفى</li>
+                <li>الخطر المتبقي — عليه يبنى قرار القبول</li>
+                <li>الخطر المستهدف — يقاس عند الإغلاق</li>
+                <li>سرعة التحقق — تغير الأولوية لا الدرجة</li>
+                <li>الأفق الزمني — للتخطيط والتحوط</li>
+                <li>درجة الثقة — تعلن ولا تخفى</li>
             </ol>
         </div></div></div>
     </div>
@@ -149,7 +149,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     <div class="card rsk-mt12"><div class="card-body table-responsive">
         <h6>قواعد إشارات الخطر الست عشرة (§13-5) — وحالة تنفيذ كل قاعدة</h6>
         <table class="table table-sm table-striped rsk-w100">
-            <thead><tr><th>الرمز</th><th>القاعدة</th><th>الوحدة</th><th>المنفِّذ</th><th>الحالة</th></tr></thead>
+            <thead><tr><th>الرمز</th><th>القاعدة</th><th>الوحدة</th><th>المنفذ</th><th>الحالة</th></tr></thead>
             <tbody>
             <?php foreach ($SG_RULES as $code => $desc):
                 $method = 'sg' . substr($code, 3);
@@ -162,8 +162,8 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <td><?php echo htmlspecialchars(RiskSignalEngine::RULE_UNIT[$code] ?? '—'); ?></td>
                     <td class="rsk-mono74"><?php echo htmlspecialchars($impl); ?></td>
                     <td><?php if ($periodic || $instant): ?>
-                        <span class="badge badge-success">منفَّذة<?php echo $instant && !$periodic ? ' (لحظية)' : ' (دورية)'; ?></span>
-                        <?php else: ?><span class="badge badge-secondary">غير منفَّذة</span><?php endif; ?></td>
+                        <span class="badge badge-success">منفذة<?php echo $instant && !$periodic ? ' (لحظية)' : ' (دورية)'; ?></span>
+                        <?php else: ?><span class="badge badge-secondary">غير منفذة</span><?php endif; ?></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>
@@ -171,9 +171,9 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     </div></div>
 
     <div class="card rsk-mt12"><div class="card-body table-responsive">
-        <h6>المؤشرات الآلية ومفاتيح قراءتها (المرحلة ١٢) — «تُقرأ من النظام آليًّا»</h6>
+        <h6>المؤشرات الآلية ومفاتيح قراءتها (المرحلة ١٢) — «تقرأ من النظام آليا»</h6>
         <?php if (empty($autoKris)): ?>
-        <p class="rsk-empty-note">لا مؤشرات آلية — والمرحلةُ الثانيةَ عشرةَ تلزم قراءةً آليةً لا يدوية.</p>
+        <p class="rsk-empty-note">لا مؤشرات آلية — والمرحلة الثانية عشرة تلزم قراءة آلية لا يدوية.</p>
         <?php else: ?>
         <table class="table table-sm table-striped rsk-w100">
             <thead><tr><th>المؤشر</th><th>مفتاح القارئ</th><th>الاتجاه</th>
@@ -190,13 +190,13 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <td><?php $s = (string) $x['kri_state'];
                         $cls = $s === 'critical' ? 'badge-danger' : ($s === 'warn' ? 'badge-warning' : 'badge-success'); ?>
                         <span class="badge <?php echo $cls; ?>"><?php echo htmlspecialchars($s); ?></span></td>
-                    <td><?php echo htmlspecialchars((string) $x['last_read_at'] ?: 'لم تُقرأ بعد'); ?></td>
+                    <td><?php echo htmlspecialchars((string) $x['last_read_at'] ?: 'لم تقرأ بعد'); ?></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>
         </table>
         <p class="rsk-footnote">
-            القراءةُ من نبضةِ <code>tools/m16_risk_cron.php</code> — والمؤشرُ اليدويُّ يُعلَن يدويًّا ولا يُدَّعى آليًّا.</p>
+            القراءة من نبضة <code>tools/m16_risk_cron.php</code> — والمؤشر اليدوي يعلن يدويا ولا يدعى آليا.</p>
         <?php endif; ?>
     </div></div>
 
@@ -209,8 +209,8 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                 <tr>
                     <td><strong><?php echo htmlspecialchars($x['ru_code']); ?></strong></td>
                     <td><?php echo htmlspecialchars($x['name_ar']); ?></td>
-                    <td><?php echo (int) $x['dedup_window_days']; ?> يومًا</td>
-                    <td><?php echo (int) $x['active'] === 1 ? 'نشطة' : 'معطَّلة'; ?></td>
+                    <td><?php echo (int) $x['dedup_window_days']; ?> يوما</td>
+                    <td><?php echo (int) $x['active'] === 1 ? 'نشطة' : 'معطلة'; ?></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>

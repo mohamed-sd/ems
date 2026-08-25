@@ -62,9 +62,9 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     $header_context = array('المعروض' => count($rows) . ' إجراء', 'متأخرة' => $overdueN, 'تنتظر قبول المتحقق' => $doneN);
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا إجراءاتِ معالجةٍ مسندةً إليك أو إلى نطاقِك', 'أسنِدْ معالجةً من ملفِّ الخطرِ في «سجل المخاطر» ثمّ عُدْ إلى هذه الشاشة');
+    echo ems_states_bundle('لا إجراءات معالجة مسندة إليك أو إلى نطاقك', 'أسند معالجة من ملف الخطر في «سجل المخاطر» ثم عد إلى هذه الشاشة');
     ems_screen_about('المعالجة تقع في الإدارة المالكة وبمواردها — وإدارة المخاطر تتحقق ولا تنفذ (RK-02).',
-        array('الإجراء المتأخر يظهر في مهام المسؤول ويُصعَّد لمديره'));
+        array('الإجراء المتأخر يظهر في مهام المسؤول ويصعد لمديره'));
     ?>
     <div class="card"><div class="card-body table-responsive">
         <table class="table table-striped rtr-table">
@@ -107,22 +107,22 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
 
 <?php /* INJ-0576: موضعُ إدخالِ دليلِ الإنجاز — عنوانٌ وثلاثةُ حقولٍ وردٌّ في موضعِه */ ?>
 <dialog id="treatDoneDlg" class="rtr-dialog">
-    <h3 class="rtr-dialog-title">إنجازُ المعالجةِ بدليل</h3>
+    <h3 class="rtr-dialog-title">إنجاز المعالجة بدليل</h3>
     <p class="text-muted rtr-dialog-lead">
-        الإغلاقُ بقبولِ المتحقِّق لا بالتنفيذ. أدخل دليلًا مقروءًا (عشرةُ محارفَ فأكثر)
-        أو مرفقًا ومرجعًا يدلّان على المستند.</p>
-    <label class="rtr-field-label">دليلُ التنفيذ
+        الإغلاق بقبول المتحقق لا بالتنفيذ. أدخل دليلا مقروءا (عشرة محارف فأكثر)
+        أو مرفقا ومرجعا يدلان على المستند.</p>
+    <label class="rtr-field-label">دليل التنفيذ
         <textarea name="done_evidence" class="form-control" rows="3"
-                  placeholder="ما الذي نُفِّذ ومتى وأين"></textarea></label>
-    <label class="rtr-field-label">رابطُ المرفق
+                  placeholder="ما الذي نفذ ومتى وأين"></textarea></label>
+    <label class="rtr-field-label">رابط المرفق
         <input type="text" name="done_attachment" class="form-control"
-               placeholder="../uploads/… أو رابطُ مستند"></label>
+               placeholder="../uploads/… أو رابط مستند"></label>
     <label class="rtr-field-label">المرجع
         <input type="text" name="done_ref" class="form-control"
-               placeholder="رقمُ مستندٍ أو أمرِ عمل"></label>
+               placeholder="رقم مستند أو أمر عمل"></label>
     <div id="treatDoneErr" class="rtr-dialog-err"></div>
     <div class="rtr-dialog-actions">
-        <button type="button" id="treatDoneSend" class="btn btn-primary">حفظُ الدليل</button>
+        <button type="button" id="treatDoneSend" class="btn btn-primary">حفظ الدليل</button>
         <button type="button" id="treatDoneCancel" class="btn btn-secondary">إلغاء</button>
     </div>
 </dialog>
@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 done_ref:        dlg.querySelector('[name=done_ref]').value
             }, function (j) {
                 if (j.ok) { location.reload(); }
-                else { dlgErr.textContent = (j.code ? j.code + ' — ' : '') + (j.msg || 'تعذَّر الحفظ'); }
+                else { dlgErr.textContent = (j.code ? j.code + ' — ' : '') + (j.msg || 'تعذر الحفظ'); }
             });
         });
     }

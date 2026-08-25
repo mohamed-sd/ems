@@ -35,9 +35,9 @@ class ClaimDisputeService
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'open_count' => 0,
                      'contract_line_id' => null);
         $line = self::line($gate, (int) $lineId);
-        if (!$line) { $out['code'] = 404; $out['reason'] = 'البندُ غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!$line) { $out['code'] = 404; $out['reason'] = 'البند غير موجود في نطاقك'; return $out; }
         if ((string) $line['dispute_state'] === 'open') {
-            $out['code'] = 409; $out['reason'] = 'البندُ متنازَعٌ عليه سلفًا — والحسمُ قرارٌ لا رفعٌ ثانٍ'; return $out;
+            $out['code'] = 409; $out['reason'] = 'البند متنازع عليه سلفا — والحسم قرار لا رفع ثان'; return $out;
         }
 
         $block = self::assertDisputable($gate, (int) $line['claim_id']);
@@ -47,12 +47,12 @@ class ClaimDisputeService
         $doc    = isset($args['doc_ref']) ? trim((string) $args['doc_ref']) : '';
         if ($reason === '' || $doc === '') {
             $out['code'] = 422;
-            $out['reason'] = '**الاعتراضُ بسببٍ ومستندٍ معًا** — «بندٌ محددٌ بسببٍ ومستند» (ENT-03 §3-⑤)؛ '
-                           . 'واعتراضٌ بلا بيّنةٍ رأيٌ لا نزاع';
+            $out['reason'] = '**الاعتراض بسبب ومستند معا** — «بند محدد بسبب ومستند» (ENT-03 §3-⑤)؛ '
+                           . 'واعتراض بلا بينة رأي لا نزاع';
             return $out;
         }
         if ($doc === self::LEGACY_REF || $reason === self::LEGACY_REF) {
-            $out['code'] = 422; $out['reason'] = '«' . self::LEGACY_REF . '» وسمُ الموروث لا يُكتب لجديد'; return $out;
+            $out['code'] = 422; $out['reason'] = '«' . self::LEGACY_REF . '» وسم الموروث لا يكتب لجديد'; return $out;
         }
 
         try {
@@ -69,7 +69,7 @@ class ClaimDisputeService
                 'resolved_at'     => null,
             ), array('id' => (int) $lineId));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الرفع: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الرفع: ' . $t->getMessage(); return $out;
         }
 
         self::recalc($gate, (int) $line['claim_id']);
@@ -81,7 +81,7 @@ class ClaimDisputeService
         self::audit($conn, $companyId, $actor, 'dispute_raise', (int) $lineId,
             array('dispute_state' => (string) $line['dispute_state']),
             array('dispute_state' => 'open', 'reason' => $reason, 'doc' => $doc,
-                  'contract_line_id' => $saleLineId !== null ? $saleLineId : 'غيرُ موصولٍ ببند بيع'));
+                  'contract_line_id' => $saleLineId !== null ? $saleLineId : 'غير موصول ببند بيع'));
 
         $out['ok'] = true; $out['code'] = 200;
         $out['contract_line_id'] = $saleLineId;
@@ -98,10 +98,10 @@ class ClaimDisputeService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'open_count' => 0, 'net' => 0.0);
         $line = self::line($gate, (int) $lineId);
-        if (!$line) { $out['code'] = 404; $out['reason'] = 'البندُ غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!$line) { $out['code'] = 404; $out['reason'] = 'البند غير موجود في نطاقك'; return $out; }
         if ((string) $line['dispute_state'] !== 'open') {
             $out['code'] = 409;
-            $out['reason'] = 'لا نزاعَ مفتوحًا على هذا البند (حالُه: ' . $line['dispute_state'] . ')';
+            $out['reason'] = 'لا نزاع مفتوحا على هذا البند (حاله: ' . $line['dispute_state'] . ')';
             return $out;
         }
 
@@ -110,12 +110,12 @@ class ClaimDisputeService
 
         $resolution = trim((string) $resolution);
         if (!in_array($resolution, self::RESOLUTIONS, true)) {
-            $out['code'] = 422; $out['reason'] = 'قرارُ الحسم: upheld أو rejected'; return $out;
+            $out['code'] = 422; $out['reason'] = 'قرار الحسم: upheld أو rejected'; return $out;
         }
         $note = trim((string) $note);
         if ($note === '') {
             $out['code'] = 422;
-            $out['reason'] = '**الحسمُ يلزمه سببٌ مكتوب** — قرارٌ يُسقط بندًا أو يعيده لا يكون صامتًا';
+            $out['reason'] = '**الحسم يلزمه سبب مكتوب** — قرار يسقط بندا أو يعيده لا يكون صامتا';
             return $out;
         }
 
@@ -130,7 +130,7 @@ class ClaimDisputeService
                 'dispute_flag'    => ($resolution === 'upheld') ? 1 : 0,
             ), array('id' => (int) $lineId));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الحسم: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الحسم: ' . $t->getMessage(); return $out;
         }
 
         $net = self::recalc($gate, (int) $line['claim_id']);
@@ -157,8 +157,8 @@ class ClaimDisputeService
         $blocked = TaxInvoiceService::assertEditable($gate, (int) $claimId);
         if ($blocked !== null) {
             return array('code' => 423,
-                'reason' => 'صدرت فاتورةُ هذا المستخلص — و**النزاعُ بابُ ما قبلَ المستند**؛ '
-                          . 'التصحيحُ بعده **بإشعارٍ دائنٍ أو مدين** (ENT-03 §3-⑥)');
+                'reason' => 'صدرت فاتورة هذا المستخلص — و**النزاع باب ما قبل المستند**؛ '
+                          . 'التصحيح بعده **بإشعار دائن أو مدين** (ENT-03 §3-⑥)');
         }
         return null;
     }

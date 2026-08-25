@@ -39,13 +39,13 @@ include '../insidebar.php';
     $header_title = 'لوحة الجاهزية — الشبكة الحية'; $header_icon = 'fa fa-heart-pulse';
     $header_actions = array();
     include('../includes/page_header.php');
-    ems_screen_about('الأسطولُ شبكةَ خلايا حية: كلُّ معدةٍ بلونها الآن، والجاهزيةُ٪ محسوبةٌ '
-        . 'من مصادرها (وحداتُ اليوم · البلاغاتُ المفتوحة · حالُ الإتاحة) لا حقولًا محلية. '
-        . 'كلُّ خليةٍ تنقر إلى بطاقة معدتها — لا طريقَ مسدودًا.',
-        array('رشّح بالمشروع أو النوع', 'انقر الخليةَ لبطاقتها'));
+    ems_screen_about('الأسطول شبكة خلايا حية: كل معدة بلونها الآن، والجاهزية٪ محسوبة '
+        . 'من مصادرها (وحدات اليوم · البلاغات المفتوحة · حال الإتاحة) لا حقولا محلية. '
+        . 'كل خلية تنقر إلى بطاقة معدتها — لا طريق مسدودا.',
+        array('رشح بالمشروع أو النوع', 'انقر الخلية لبطاقتها'));
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا معدةَ في شبكةِ الجاهزيةِ بهذا الترشيح',
-        'وسّعِ الترشيحَ بحقلَي المشروعِ والنوعِ أعلاه أو اتركهما فارغَين لإظهارِ الكل');
+    echo ems_states_bundle('لا معدة في شبكة الجاهزية بهذا الترشيح',
+        'وسع الترشيح بحقلي المشروع والنوع أعلاه أو اتركهما فارغين لإظهار الكل');
     ?>
 
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
@@ -56,16 +56,16 @@ include '../insidebar.php';
             <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
             <div class="filter-body">
         <form method="get" class="fl-rb-filter">
-            <label for="emsf_276_15f26">المشروع</label><input type="number" name="project_id" min="0" class="fl-rb-w90" id="emsf_276_15f26" placeholder="الكل" aria-label="رقمُ المشروعِ للترشيح"
+            <label for="emsf_276_15f26">المشروع</label><input type="number" name="project_id" min="0" class="fl-rb-w90" id="emsf_276_15f26" placeholder="الكل" aria-label="رقم المشروع للترشيح"
                 value="<?php echo $prj ?: ''; ?>">
-            <label for="emsf_277_43fd1">النوع</label><input type="text" name="type" class="fl-rb-w120" id="emsf_277_43fd1" placeholder="الكل" aria-label="نوعُ المعدةِ للترشيح"
+            <label for="emsf_277_43fd1">النوع</label><input type="text" name="type" class="fl-rb-w120" id="emsf_277_43fd1" placeholder="الكل" aria-label="نوع المعدة للترشيح"
                 value="<?php echo htmlspecialchars($type); ?>">
-            <button type="submit" class="btn-primary">رشّح</button>
+            <button type="submit" class="btn-primary">رشح</button>
         </form>
             </div>
         </div>
         <div class="fl-rb-pct badge <?php echo ($grid['readiness_pct'] ?? 0) >= 70 ? 'badge-success' : 'badge-danger'; ?>">
-            جاهزيةُ الآن: <strong><?php echo $grid['readiness_pct'] !== null
+            جاهزية الآن: <strong><?php echo $grid['readiness_pct'] !== null
                 ? ($grid['readiness_pct'] . '٪') : '—'; ?></strong>
             (<?php echo intval($grid['total']); ?> معدة)</div>
         <span class="fl-rb-legend">
@@ -76,7 +76,7 @@ include '../insidebar.php';
     </div></div>
 
     <div class="card"><div class="card-body">
-        <?php if (!$grid['cells']): ems_state_empty('لا معداتٍ بهذا الترشيح', 'أظهر الكل', 'readiness_board.php'); else: ?>
+        <?php if (!$grid['cells']): ems_state_empty('لا معدات بهذا الترشيح', 'أظهر الكل', 'readiness_board.php'); else: ?>
         <div class="fl-rb-grid">
             <?php foreach ($grid['cells'] as $c): ?>
                 <a href="../<?php echo htmlspecialchars($c['link']); ?>" class="fl-rb-cell"
@@ -92,14 +92,14 @@ include '../insidebar.php';
                          و«لا شهادةَ بعد» تُقال صراحةً — فالسكوتُ يُقرأ سلامةً. */ ?>
                 <div class="ems-readiness-cert fl-rb-cert">
                     <?php if ($c['cert_ref'] !== '' && $c['cert_link'] !== ''): ?>
-                        شهادةُ جاهزية:
+                        شهادة جاهزية:
                         <a href="../<?php echo htmlspecialchars($c['cert_link'], ENT_QUOTES, 'UTF-8'); ?>"
-                           title="افتحْ أمرَ الصيانةِ الذي أصدرها"><?php
+                           title="افتح أمر الصيانة الذي أصدرها"><?php
                             echo htmlspecialchars(mb_substr($c['cert_ref'], 0, 40), ENT_QUOTES, 'UTF-8'); ?></a>
                         · <?php echo htmlspecialchars(substr($c['cert_at'], 0, 10), ENT_QUOTES, 'UTF-8'); ?>
                         · <?php echo htmlspecialchars($c['cert_by'] !== '' ? $c['cert_by'] : '—', ENT_QUOTES, 'UTF-8'); ?>
                     <?php else: ?>
-                        <span class="ems-gov-empty">لا شهادةَ جاهزيةٍ مسجَّلةٌ بعد</span>
+                        <span class="ems-gov-empty">لا شهادة جاهزية مسجلة بعد</span>
                     <?php endif; ?>
                 </div>
             <?php endforeach; ?>

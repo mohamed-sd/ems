@@ -20,7 +20,7 @@ $uid = intval($_SESSION['user']['id'] ?? 0);
 $act = ($_POST['jact'] ?? '') === 'escalate' ? 'journey.escalate' : 'journey.remind';
 $subject = mb_substr(trim($_POST['subject'] ?? ''), 0, 120);
 $back = $_POST['back'] ?? '';
-if ($subject === '') { http_response_code(422); die('مرجعُ المعاملة إلزامي'); }
+if ($subject === '') { http_response_code(422); die('مرجع المعاملة إلزامي'); }
 
 $es = mysqli_real_escape_string($conn, $subject);
 $ea = mysqli_real_escape_string($conn, $act);

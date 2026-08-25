@@ -36,18 +36,18 @@ $COLS   = array (
   4 => 'وقت الفتح',
   5 => 'وقت الإقفال',
   6 => 'عدد المعدات',
-  7 => 'عدد المشغّلين الحاضرين',
+  7 => 'عدد المشغلين الحاضرين',
   8 => 'الغياب',
-  9 => 'قراءة العدّاد عند الفتح',
-  10 => 'قراءة العدّاد عند الإقفال',
+  9 => 'قراءة العداد عند الفتح',
+  10 => 'قراءة العداد عند الإقفال',
   11 => 'الملاحظات',
-  12 => 'المسلِّم',
-  13 => 'المستلِم',
+  12 => 'المسلم',
+  13 => 'المستلم',
   14 => 'حالة السجل',
   15 => 'الكيان',
-  16 => 'المُنشئ — الاسم والصفة',
+  16 => 'المنشئ — الاسم والصفة',
   17 => 'تاريخ الإنشاء',
-  18 => 'المعتمِد — الاسم والصفة',
+  18 => 'المعتمد — الاسم والصفة',
   19 => 'تاريخ الاعتماد',
   20 => 'مرجع التفويض',
   21 => 'المرجع الأب',
@@ -61,15 +61,15 @@ $FIELDS = array (
   4 => 'وقت الفتح',
   5 => 'وقت الإقفال',
   6 => 'عدد المعدات',
-  7 => 'عدد المشغّلين الحاضرين',
+  7 => 'عدد المشغلين الحاضرين',
   8 => 'الغياب',
-  9 => 'قراءة العدّاد عند الفتح',
-  10 => 'قراءة العدّاد عند الإقفال',
+  9 => 'قراءة العداد عند الفتح',
+  10 => 'قراءة العداد عند الإقفال',
   11 => 'الملاحظات',
-  12 => 'المسلِّم',
-  13 => 'المستلِم',
+  12 => 'المسلم',
+  13 => 'المستلم',
   14 => 'حالة السجل',
-  15 => 'المعتمِد — الاسم والصفة',
+  15 => 'المعتمد — الاسم والصفة',
   16 => 'تاريخ الاعتماد',
   17 => 'مرجع التفويض',
   18 => 'المرجع الأب',
@@ -87,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     $creator = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
     // الموجة ٢: الحفظ في الجدول الأصلي للشاشة (الفارغ NULL — لا مخزن بينيًّا)
     $ok = cmp03_store_insert($conn, $company_id, $CANONICAL, $payload, $status, $uid, $creator);
-    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
+    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
     exit();
 }
 
@@ -102,7 +102,7 @@ $entityName = $govCtx['values']['entity'] ?? '—';
 function cmp03_cell($col, $row, $entityName) {
     $n = cmp03_screen_norm($col);
     if ($n === cmp03_screen_norm('الكيان')) { return $entityName; }
-    if ($n === cmp03_screen_norm('المُنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المُنشئة')) {
+    if ($n === cmp03_screen_norm('المنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المنشئة')) {
         return $row['created_by_name'] ?: '—';
     }
     if ($n === cmp03_screen_norm('تاريخ الإنشاء')) { return $row['created_at']; }
@@ -117,7 +117,7 @@ function cmp03_screen_norm($s) {
     $s = str_replace(array('أ','إ','آ'), 'ا', $s);
     $s = str_replace('ة', 'ه', $s);
     $s = str_replace('ى', 'ي', $s);
-    return preg_replace('/[ًٌٍَُِّْ]/u', '', $s);
+    return preg_replace('/[]/u', '', $s);
 }
 
 $page_title = 'إيكوبيشن | سجل الوردية';
@@ -141,7 +141,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
-    echo ems_states_bundle('لا سجلاتِ ورديّاتٍ مسجَّلةً بعدُ', 'أضف أولَ صفٍّ بزرِّ «إضافة» في رأسِ الشاشة');
+    echo ems_states_bundle('لا سجلات ورديات مسجلة بعد', 'أضف أول صف بزر «إضافة» في رأس الشاشة');
     ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
@@ -167,23 +167,23 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="f5" maxlength="190" id="emsf_903_a244e"></div>
                 <div class="form-group"><label for="emsf_904_a70e5">عدد المعدات</label>
                     <input type="text" inputmode="decimal" name="f6" placeholder="0" id="emsf_904_a70e5"></div>
-                <div class="form-group"><label for="emsf_905_268a8">عدد المشغّلين الحاضرين</label>
+                <div class="form-group"><label for="emsf_905_268a8">عدد المشغلين الحاضرين</label>
                     <input type="text" inputmode="decimal" name="f7" placeholder="0" id="emsf_905_268a8"></div>
                 <div class="form-group"><label for="emsf_906_51116">الغياب</label>
                     <input type="text" name="f8" maxlength="190" id="emsf_906_51116"></div>
-                <div class="form-group"><label for="emsf_907_93e18">قراءة العدّاد عند الفتح</label>
+                <div class="form-group"><label for="emsf_907_93e18">قراءة العداد عند الفتح</label>
                     <input type="text" name="f9" maxlength="190" id="emsf_907_93e18"></div>
-                <div class="form-group"><label for="emsf_908_ea674">قراءة العدّاد عند الإقفال</label>
+                <div class="form-group"><label for="emsf_908_ea674">قراءة العداد عند الإقفال</label>
                     <input type="text" name="f10" maxlength="190" id="emsf_908_ea674"></div>
                 <div class="form-group"><label for="emsf_909_89e75">الملاحظات</label>
                     <input type="text" name="f11" maxlength="190" id="emsf_909_89e75"></div>
-                <div class="form-group"><label for="emsf_910_56346">المسلِّم</label>
+                <div class="form-group"><label for="emsf_910_56346">المسلم</label>
                     <input type="text" name="f12" maxlength="190" id="emsf_910_56346"></div>
-                <div class="form-group"><label for="emsf_911_3f9ba">المستلِم</label>
+                <div class="form-group"><label for="emsf_911_3f9ba">المستلم</label>
                     <input type="text" name="f13" maxlength="190" id="emsf_911_3f9ba"></div>
                 <div class="form-group"><label for="emsf_912_fb4eb">حالة السجل</label>
                     <input type="text" name="f14" maxlength="190" id="emsf_912_fb4eb"></div>
-                <div class="form-group"><label for="emsf_913_41329">المعتمِد — الاسم والصفة</label>
+                <div class="form-group"><label for="emsf_913_41329">المعتمد — الاسم والصفة</label>
                     <input type="text" name="f15" maxlength="190" id="emsf_913_41329"></div>
                 <div class="form-group"><label for="emsf_914_407e7">تاريخ الاعتماد</label>
                     <input type="date" name="f16" id="emsf_914_407e7"></div>
@@ -212,26 +212,26 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th>وقت الفتح</th>
             <th>وقت الإقفال</th>
             <th>عدد المعدات</th>
-            <th>عدد المشغّلين الحاضرين</th>
+            <th>عدد المشغلين الحاضرين</th>
             <th>الغياب</th>
-            <th>قراءة العدّاد عند الفتح</th>
-            <th>قراءة العدّاد عند الإقفال</th>
+            <th>قراءة العداد عند الفتح</th>
+            <th>قراءة العداد عند الإقفال</th>
             <th>الملاحظات</th>
-            <th>المسلِّم</th>
-            <th>المستلِم</th>
+            <th>المسلم</th>
+            <th>المستلم</th>
             <th>حالة السجل</th>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
             <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
             <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
             <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
             <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
             </tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="23" class="text-center text-muted">لا بياناتَ بعدُ — أضف أول صفٍّ بزر «إضافة»</td></tr>
+                <tr><td colspan="23" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
                     <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>

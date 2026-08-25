@@ -54,17 +54,17 @@ class SupplierCapacityService
         $contractId = (int) $contractId;
 
         $head = self::contractOf($gate, $contractId);
-        if (!$head) { $out['code'] = 404; $out['reason'] = 'عقدُ المورد غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!$head) { $out['code'] = 404; $out['reason'] = 'عقد المورد غير موجود في نطاقك'; return $out; }
 
         $equipmentId = isset($args['equipment_id']) ? (int) $args['equipment_id'] : 0;
         if ($equipmentId <= 0 || !self::equipmentOf($gate, $equipmentId)) {
-            $out['code'] = 422; $out['reason'] = 'معدةٌ غيرُ موجودةٍ في نطاقك — والطاقةُ لمعدةٍ بعينها'; return $out;
+            $out['code'] = 422; $out['reason'] = 'معدة غير موجودة في نطاقك — والطاقة لمعدة بعينها'; return $out;
         }
 
         $model = isset($args['work_model']) ? trim((string) $args['work_model']) : 'hour';
         if (!in_array($model, self::WORK_MODELS, true)) {
             $out['code'] = 422;
-            $out['reason'] = 'نموذجُ تشغيلٍ خارج الأربعة (§2-②): ' . implode(' · ', self::WORK_MODELS);
+            $out['reason'] = 'نموذج تشغيل خارج الأربعة (§2-②): ' . implode(' · ', self::WORK_MODELS);
             return $out;
         }
 
@@ -73,25 +73,25 @@ class SupplierCapacityService
                  ? round((float) $args['theoretical_daily'], 2) : 0.0;
         if ($daily <= 0) {
             $out['code'] = 422;
-            $out['reason'] = 'الطاقةُ النظريةُ اليوميةُ موجبةٌ إلزامًا — «**ومنها يُقاس أداءُ المورد**» (§3)';
+            $out['reason'] = 'الطاقة النظرية اليومية موجبة إلزاما — «**ومنها يقاس أداء المورد**» (§3)';
             return $out;
         }
 
         $minReady = (isset($args['min_readiness_percent']) && trim((string) $args['min_readiness_percent']) !== '')
                     ? round((float) $args['min_readiness_percent'], 2) : null;
         if ($minReady !== null && ($minReady <= 0 || $minReady > 100)) {
-            $out['code'] = 422; $out['reason'] = 'نسبةُ الجاهزية الدنيا في (0، 100] — أو تُترك فارغةً «لم يُشترط»'; return $out;
+            $out['code'] = 422; $out['reason'] = 'نسبة الجاهزية الدنيا في (0، 100] — أو تترك فارغة «لم يشترط»'; return $out;
         }
 
         $replace = (isset($args['replace_hours']) && trim((string) $args['replace_hours']) !== '')
                    ? (int) $args['replace_hours'] : null;
         if ($replace !== null && $replace <= 0) {
-            $out['code'] = 422; $out['reason'] = 'مهلةُ الإحلال ساعاتٌ موجبة — أو تُترك فارغةً'; return $out;
+            $out['code'] = 422; $out['reason'] = 'مهلة الإحلال ساعات موجبة — أو تترك فارغة'; return $out;
         }
 
         $from = isset($args['valid_from']) ? trim((string) $args['valid_from']) : '';
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $from)) {
-            $out['code'] = 422; $out['reason'] = 'سريانُ البطاقة إلزامي'; return $out;
+            $out['code'] = 422; $out['reason'] = 'سريان البطاقة إلزامي'; return $out;
         }
 
         try {
@@ -113,9 +113,9 @@ class SupplierCapacityService
             ));
         } catch (\Throwable $t) {
             if (strpos($t->getMessage(), 'Duplicate') !== false) {
-                $out['code'] = 409; $out['reason'] = 'للعقد بطاقةُ طاقةٍ لهذه المعدة بهذا السريان (UQ)'; return $out;
+                $out['code'] = 409; $out['reason'] = 'للعقد بطاقة طاقة لهذه المعدة بهذا السريان (UQ)'; return $out;
             }
-            $out['code'] = 422; $out['reason'] = 'تعذّر الحفظ: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الحفظ: ' . $t->getMessage(); return $out;
         }
 
         self::audit($conn, $companyId, $actor, 'supplier_capacity', 'create', (int) $out['capacity_id'],
@@ -144,7 +144,7 @@ class SupplierCapacityService
 
         $cards = self::activeCapacities($gate, $supplierId, $from, $to);
         if (!$cards) {
-            $out['notes'][] = '⚠ لا بطاقةَ طاقةٍ ساريةً لهذا المورد في الفترة — **لا قياسَ ولا جزاءَ جاهزية** (§3 يوجب تثبيتَها في العقد)';
+            $out['notes'][] = '⚠ لا بطاقة طاقة سارية لهذا المورد في الفترة — **لا قياس ولا جزاء جاهزية** (§3 يوجب تثبيتها في العقد)';
             return $out;
         }
 
@@ -182,21 +182,21 @@ class SupplierCapacityService
             $out['readiness'] = round(($out['planned_hours'] - $out['unfit_hours'])
                                       / $out['planned_hours'] * 100, 2);
         } else {
-            $out['notes'][] = '⚠ لا زمنَ مخططًا في الفترة — **لا قياس** (ورقمٌ من قسمةٍ على صفرٍ أسوأُ من لا رقم)';
+            $out['notes'][] = '⚠ لا زمن مخططا في الفترة — **لا قياس** (ورقم من قسمة على صفر أسوأ من لا رقم)';
         }
         if ($minWeight > 0) { $out['contract_min'] = round($minWeighted / $minWeight, 2); }
         else {
-            $out['notes'][] = '⚠ لا حدَّ جاهزيةٍ مكتوبًا في أي بطاقةِ طاقة — **لا جزاءَ جاهزية**: «نقصُها عن **الحد التعاقدي** يفعّل الجزاء» (§3)، ولا حدَّ فلا نقص';
+            $out['notes'][] = '⚠ لا حد جاهزية مكتوبا في أي بطاقة طاقة — **لا جزاء جاهزية**: «نقصها عن **الحد التعاقدي** يفعل الجزاء» (§3)، ولا حد فلا نقص';
         }
         if ($out['unlogged_hours'] > 0) {
-            $out['notes'][] = 'ℹ ' . $out['unlogged_hours'] . ' ساعةً **غيرَ مسجَّلةٍ** أُخرجت من المقام — تُعلَن ولا تُطرح صامتًا';
+            $out['notes'][] = 'ℹ ' . $out['unlogged_hours'] . ' ساعة **غير مسجلة** أخرجت من المقام — تعلن ولا تطرح صامتا';
         }
         if ($out['coverage_hours'] > 0) {
-            $out['notes'][] = '⚠ ' . $out['coverage_hours'] . ' ساعةً **نُقلت** من الجاهزية إلى **عجز التغطية** '
-                            . 'بتجاوز مهلة الإحلال — «وتجاوزُها **يحوّل** التوقفَ إلى عجزِ تغطيةٍ بجزائه الأشد» (§3)';
+            $out['notes'][] = '⚠ ' . $out['coverage_hours'] . ' ساعة **نقلت** من الجاهزية إلى **عجز التغطية** '
+                            . 'بتجاوز مهلة الإحلال — «وتجاوزها **يحول** التوقف إلى عجز تغطية بجزائه الأشد» (§3)';
         }
-        $out['notes'][] = 'ℹ «إخلالُ المورد **بإحضار** معدةٍ أو مشغّل» لا سطرَ له في سجل الزمن — '
-                        . '**لا يُقاس اليوم ويُعلَن**، والمقيسُ مسارُ الإحلال وحدَه';
+        $out['notes'][] = 'ℹ «إخلال المورد **بإحضار** معدة أو مشغل» لا سطر له في سجل الزمن — '
+                        . '**لا يقاس اليوم ويعلن**، والمقيس مسار الإحلال وحده';
         return $out;
     }
 
@@ -283,13 +283,13 @@ class SupplierCapacityService
             $a = \App\Services\Settlement\SupplierRuleService::assessPenalty(
                 $gate, $supplierId, 'readiness', $m['readiness'], (float) $baseAmount, (string) $to);
             if ($a['triggered'] && $a['amount'] > 0) {
-                $desc = 'جزاءُ جاهزية — القياس ' . $m['readiness'] . '٪ والحدُّ التعاقديُّ '
-                      . $m['contract_min'] . '٪ (' . $m['planned_hours'] . ' ساعةً مخططةً · '
-                      . $m['unfit_hours'] . ' غيرَ صالحة) · ' . $a['note'];
+                $desc = 'جزاء جاهزية — القياس ' . $m['readiness'] . '٪ والحد التعاقدي '
+                      . $m['contract_min'] . '٪ (' . $m['planned_hours'] . ' ساعة مخططة · '
+                      . $m['unfit_hours'] . ' غير صالحة) · ' . $a['note'];
                 $ruleThreshold = self::penaltyThreshold($gate, $supplierId, 'readiness', $to);
                 if ($ruleThreshold !== null && abs($ruleThreshold - (float) $m['contract_min']) > 0.005) {
-                    $desc .= ' · ⚠ الحدُّ مكتوبٌ في موضعين ويختلفان (بطاقةُ الطاقة '
-                           . $m['contract_min'] . '٪ · قاعدةُ الجزاء ' . $ruleThreshold . '٪) — والمالُ بقاعدة الجزاء';
+                    $desc .= ' · ⚠ الحد مكتوب في موضعين ويختلفان (بطاقة الطاقة '
+                           . $m['contract_min'] . '٪ · قاعدة الجزاء ' . $ruleThreshold . '٪) — والمال بقاعدة الجزاء';
                 }
                 $lines[] = array(
                     'line_kind'   => 'charge',
@@ -314,8 +314,8 @@ class SupplierCapacityService
                     'charge_type' => 'penalty',
                     'source_kind' => 'capacity',
                     'source_ref'  => 'coverage:' . (int) $supplierId . ':' . (string) $from,
-                    'description' => mb_substr('جزاءُ تغطية — ' . $m['coverage_hours']
-                                    . ' ساعةً **نُقلت** من الجاهزية بتجاوز مهلة الإحلال · ' . $a['note'], 0, 255),
+                    'description' => mb_substr('جزاء تغطية — ' . $m['coverage_hours']
+                                    . ' ساعة **نقلت** من الجاهزية بتجاوز مهلة الإحلال · ' . $a['note'], 0, 255),
                     'work_date'   => (string) $to,
                     'amount'      => (float) $a['amount'],
                     'currency'    => (string) $baseCurrency,

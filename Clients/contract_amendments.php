@@ -121,7 +121,7 @@ if (!$can_view) {
 // كتابةَ يدويّة — أي POST أو حذفٍ يُرفض هنا (دفاعٌ خادميّ فوق إخفاء الواجهة).
 // ══════════════════════════════════════════════════════════════════════════════
 if ($_SERVER['REQUEST_METHOD'] === 'POST' || isset($_GET['delete_id'])) {
-    amd_redirect_with_msg('سجلّ الملاحق للقراءة فقط — يُغذّى تلقائيًّا من إجراءات العقد ℹ️');
+    amd_redirect_with_msg('سجل الملاحق للقراءة فقط — يغذى تلقائيا من إجراءات العقد ℹ️');
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -145,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['amendment_code'])) {
     // الكود
     $amd_code_raw = isset($_POST['amendment_code']) ? trim($_POST['amendment_code']) : '';
     if ($amd_code_raw === '' || !preg_match('/^[A-Za-z0-9_\-]+$/', $amd_code_raw)) {
-        amd_redirect_with_msg('كود الملحق غير صالح. استخدم أحرفًا وأرقامًا و - أو _ فقط ❌');
+        amd_redirect_with_msg('كود الملحق غير صالح. استخدم أحرفا وأرقاما و - أو _ فقط ❌');
     }
 
     // التحقق من نوع التعديل (ENUM)
@@ -217,7 +217,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['amendment_code'])) {
                 array($amd_code_raw, $amd_id));
         } catch (\Throwable $t) { $dup = array(); }
         if (!empty($dup)) {
-            amd_redirect_with_msg('كود الملحق موجود مسبقاً داخل شركتك ❌');
+            amd_redirect_with_msg('كود الملحق موجود مسبقا داخل شركتك ❌');
         }
 
         try {
@@ -252,7 +252,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['amendment_code'])) {
                 array($amd_code_raw));
         } catch (\Throwable $t) { $dup = array(); }
         if (!empty($dup)) {
-            amd_redirect_with_msg('كود الملحق موجود مسبقاً داخل شركتك ❌');
+            amd_redirect_with_msg('كود الملحق موجود مسبقا داخل شركتك ❌');
         }
 
         try {
@@ -405,7 +405,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fa-solid fa-share', 'label' => '');
     include('../includes/page_header.php');
     ?>
-<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('contract', 'سجلُّ التغييرات'); ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('contract', 'سجل التغييرات'); ?>
 
     <?php if (!empty($_GET['msg'])):
         $isSuccess = strpos($_GET['msg'], '✅') !== false; ?>
@@ -415,7 +415,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         </div>
     <?php endif; ?>
 
-    <?php echo ems_states_bundle('لا ملاحقَ مسجَّلةً ضمن هذا الترشيح', 'الملاحقُ تُغذَّى تلقائيًّا من إجراءات العقد — أو غيّر المرشِّحات'); ?>
+    <?php echo ems_states_bundle('لا ملاحق مسجلة ضمن هذا الترشيح', 'الملاحق تغذى تلقائيا من إجراءات العقد — أو غير المرشحات'); ?>
 
     <div class="stats-section amd-hidden" id="amdStatsSection">
         <div class="stats-grid">
@@ -572,25 +572,25 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                             <th class="ems-fn-th" data-fn="1">رقم الملحق</th>
                             <th class="ems-fn-th" data-fn="1">رقم النسخة</th>
                             <th class="ems-fn-th" data-fn="1">تاريخ السريان</th>
-                            <th class="ems-fn-th" data-fn="1">البند المعدَّل</th>
+                            <th class="ems-fn-th" data-fn="1">البند المعدل</th>
                             <th class="ems-fn-th" data-fn="1">القيمة قبل</th>
                             <th class="ems-fn-th" data-fn="1">القيمة بعد</th>
                             <th class="ems-fn-th" data-fn="1">الفرق</th>
                             <th class="ems-fn-th" data-fn="1">مبرر التعديل</th>
-                            <th class="ems-fn-th" data-fn="1">وقّعه عنّا</th>
-                            <th class="ems-fn-th" data-fn="1">وقّعه العميل</th>
+                            <th class="ems-fn-th" data-fn="1">وقعه عنا</th>
+                            <th class="ems-fn-th" data-fn="1">وقعه العميل</th>
                             <th class="ems-fn-th" data-fn="1">اعتمدته المالية</th>
                             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                             <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                             <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-                            <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+                            <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
                             <th class="ems-gov-th none" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
                             <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-                            <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+                            <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
                             <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
-                            <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
+                            <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
                             <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                             <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
                             <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
@@ -672,7 +672,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         });
         }
 
-        // الربطُ بعد تهيئةِ المكوّنِ المركزي للجدول (أو فورًا إن سبقنا)
+        // الربط بعد تهيئة المكون المركزي للجدول (أو فورا إن سبقنا)
         if ($.fn.dataTable && $.fn.dataTable.isDataTable('#amdTable')) {
             bindAmdFilters();
         } else {
@@ -691,13 +691,13 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     const statsSection = $('#amdStatsSection');
 
     /**
-     * إظهارُ حقلِ الكودِ المولَّد وإخفاؤه.
+     * إظهار حقل الكود المولد وإخفاؤه.
      *
      * ⚠️ **لا تستعمل `jQuery.hide()` هنا** — `assets/css/ems-forms.css` يحمل:
      *     :is(.allforms, .ems-form) .form-grid > div { display: block !important }
-     * والغلافُ ابنٌ مباشرٌ لـ`.form-grid`، فـ`!important` من ورقةِ الأنماطِ تهزم
-     * الإخفاءَ السطريَّ **بلا أولوية**: السمةُ تُكتب فعلًا والحقلُ يبقى ظاهرًا، بلا
-     * خطأٍ في وحدةِ التحكم ولا سطرٍ في أيِّ سجل. (نظيرُ شاشتَي العملاءِ والمشاريع.)
+     * والغلاف ابن مباشر ل`.form-grid`، ف`!important` من ورقة الأنماط تهزم
+     * الإخفاء السطري **بلا أولوية**: السمة تكتب فعلا والحقل يبقى ظاهرا، بلا
+     * خطأ في وحدة التحكم ولا سطر في أي سجل. (نظير شاشتي العملاء والمشاريع.)
      */
     function setGeneratedCodeShown(shown) {
         var el = generatedCodeWrapper[0];
@@ -708,9 +708,9 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     function setAddMode() {
         formTitle.text('إضافة ملحق جديد'); submitBtnText.text('حفظ الملحق');
         setGeneratedCodeShown(true);
-        // الكودُ المولَّدُ يعود إلى خانتِه كلَّما دخلنا وضعَ الإضافة — ومصدرُه حقلُ
-        // العرضِ نفسُه لا نسخةٌ ثانيةٌ منه (مصدرُ حقيقةٍ واحد). و`reset()` يكفي
-        // للإلغاء، لكنَّ الانتقالَ من «تعديل» إلى «إضافة» قد يقع بلا reset.
+        // الكود المولد يعود إلى خانته كلما دخلنا وضع الإضافة — ومصدره حقل
+        // العرض نفسه لا نسخة ثانية منه (مصدر حقيقة واحد). و`reset()` يكفي
+        // للإلغاء، لكن الانتقال من «تعديل» إلى «إضافة» قد يقع بلا reset.
         var genCode = $('#generated_amd_code').val();
         if (genCode) { $('#amendment_code').val(genCode); }
     }
@@ -796,7 +796,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         });
     });
 
-    // ── عرض التفاصيل عبر EmsDetailsModal الموحّد ──
+    // ── عرض التفاصيل عبر EmsDetailsModal الموحد ──
     $(document).on('click', '.viewAmdBtn', function () {
         const d = $(this).data();
         const fields = [

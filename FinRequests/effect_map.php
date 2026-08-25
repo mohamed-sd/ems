@@ -117,7 +117,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back    = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ)
-    echo ems_states_bundle('لا خيطَ معروضًا بعد', 'أدخل رقمَ الطلب أو الحدث أو كشفِ الوحدة ثم تتبّع الخيط');
+    echo ems_states_bundle('لا خيط معروضا بعد', 'أدخل رقم الطلب أو الحدث أو كشف الوحدة ثم تتبع الخيط');
     ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
@@ -128,7 +128,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <label for="emsf_170_531d9">رقم الطلب (FR-…) · الحدث (#N) · أو كشف الوحدة (FIN-UR-…)</label>
                     <input type="text" name="q" id="emsf_170_531d9" placeholder="FR-2026-0001 · #11 · FIN-UR-0001" aria-label="رقم الطلب أو الحدث أو كشف الوحدة" value="<?php echo htmlspecialchars($q); ?>">
                 </div>
-                <button type="submit" class="btn btn-primary"><i class="fa fa-magnifying-glass"></i> تتبّع الخيط</button>
+                <button type="submit" class="btn btn-primary"><i class="fa fa-magnifying-glass"></i> تتبع الخيط</button>
             </form>
         </div>
     </div>
@@ -140,11 +140,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php if ($tsCtx): ?>
         <?php $u_lbl = array('hour' => 'ساعة', 'ton' => 'طن', 'meter' => 'متر'); ?>
         <div class="card fem-card">
-            <div class="card-header"><h5><i class="fa fa-calendar-day"></i> المصدر: يوم الدوام المعتمد (سجلّ الوحدات — D02)</h5></div>
+            <div class="card-header"><h5><i class="fa fa-calendar-day"></i> المصدر: يوم الدوام المعتمد (سجل الوحدات — D02)</h5></div>
             <div class="card-body fem-facts">
                 <div><strong><?php echo htmlspecialchars($tsCtx['source_ref']); ?></strong></div>
                 <div><?php echo htmlspecialchars($tsCtx['work_date']); ?></div>
-                <div><span class="badge bg-info"><?php echo $tsCtx['unit'] === null ? 'لا كميةَ مسجّلة'
+                <div><span class="badge bg-info"><?php echo $tsCtx['unit'] === null ? 'لا كمية مسجلة'
                     : number_format((float)$tsCtx['qty'], 2) . ' ' . ($u_lbl[$tsCtx['unit']] ?? $tsCtx['unit']); ?></span></div>
                 <div><strong>سعر العميل:</strong> <?php echo $tsCtx['client']['ok']
                     ? number_format((float)$tsCtx['client']['price'], 2) . ' ' . htmlspecialchars($tsCtx['client']['currency'])
@@ -180,7 +180,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="card">
             <div class="card-header"><h5><i class="fa fa-sitemap"></i> مروحة الأثر — الحدث الواحد والآثار المتعددة (§6.1)</h5></div>
             <div class="card-body">
-                <p class="fem-note">كل أثرٍ مربوطٌ بأبيه في <code>fin_event_links</code>؛ وغيرُ المتاح مُعلَنٌ بسببه لا صامت.</p>
+                <p class="fem-note">كل أثر مربوط بأبيه في <code>fin_event_links</code>؛ وغير المتاح معلن بسببه لا صامت.</p>
                 <div class="fanout-tree fem-fanout">
                 <?php foreach ($fanMap as $etype => $meta):
                     $gen = isset($fanEffects[$etype]) ? $fanEffects[$etype] : null;
@@ -197,7 +197,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <span class="fem-branch-icon"><?php echo $icon[$etype] ?? '•'; ?></span>
                         <strong class="fem-branch-label"><?php echo htmlspecialchars($meta['effect_label']); ?></strong>
                         <?php if ($gen): ?>
-                            <span class="badge bg-success">مولَّد</span>
+                            <span class="badge bg-success">مولد</span>
                             <code><?php echo htmlspecialchars($gen['link']['target_table']); ?> #<?php echo intval($gen['link']['target_id']); ?></code>
                             <?php if ($amount !== null): ?><strong class="fem-amount-ok"><?php echo number_format((float)$amount, 2); ?></strong><?php endif; ?>
                         <?php elseif (intval($meta['is_active']) !== 1): ?>
@@ -212,11 +212,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             }
                         ?>
                             <?php if ($blocked !== ''): ?>
-                                <span class="badge bg-secondary">متعذّر</span>
+                                <span class="badge bg-secondary">متعذر</span>
                                 <span class="fem-reason-sm"><?php echo htmlspecialchars($blocked); ?></span>
                             <?php else: ?>
                                 <span class="badge bg-warning">بانتظار التوليد</span>
-                                <span class="fem-pending-note">يُفرَّع عند الاعتماد الرابع أو بكنس المصالِح</span>
+                                <span class="fem-pending-note">يفرع عند الاعتماد الرابع أو بكنس المصالح</span>
                             <?php endif; ?>
                         <?php endif; ?>
                     </div>
@@ -228,13 +228,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <?php if ($req): ?>
         <div class="card fem-card">
-            <div class="card-header"><h5><i class="fa fa-file-lines"></i> ① المصدر: الطلب الموحّد</h5></div>
+            <div class="card-header"><h5><i class="fa fa-file-lines"></i> ① المصدر: الطلب الموحد</h5></div>
             <div class="card-body fem-facts">
                 <div><strong><?php echo htmlspecialchars($req['request_no']); ?></strong></div>
                 <div><?php echo htmlspecialchars($catalog[$req['request_type']]['label'] ?? $req['request_type']); ?></div>
                 <div><?php echo finreq_state_badge($req['state']); ?></div>
                 <div><strong>المبلغ:</strong> <?php echo number_format(floatval($req['amount']), 2) . ' ' . htmlspecialchars($req['currency']); ?></div>
-                <div><strong>المبرّر:</strong> <?php echo htmlspecialchars($req['justification'] ?? ''); ?></div>
+                <div><strong>المبرر:</strong> <?php echo htmlspecialchars($req['justification'] ?? ''); ?></div>
                 <div><a href="request_form.php?id=<?php echo intval($req['id']); ?>">فتح الطلب وسجله ↗</a></div>
             </div>
         </div>
@@ -254,7 +254,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
 
         <div class="card fem-card">
-            <div class="card-header"><h5><i class="fa fa-book"></i> ③ القيود المتولّدة (<?php echo count($journals); ?>)</h5></div>
+            <div class="card-header"><h5><i class="fa fa-book"></i> ③ القيود المتولدة (<?php echo count($journals); ?>)</h5></div>
             <div class="card-body">
                 <?php if ($journals): ?>
                 <table class="table table-bordered no-datatable" data-no-dt="1">
@@ -273,7 +273,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="ems-fn-th" data-fn="1">الحساب الدائن</th>
               <th class="ems-fn-th" data-fn="1">الفترة</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
               <th class="ems-gov-th" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
               <th class="ems-gov-th" data-gov="fx_rate" data-slice="3" title="سعر التحويل لعملة الدفاتر">سعر الصرف</th>
@@ -289,7 +289,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <?php endforeach; ?>
                     </tbody>
                 </table>
-                <?php else: ?>لا قيود بعد — تُولَد في دورة D04 بعد الاعتماد المالي<?php endif; ?>
+                <?php else: ?>لا قيود بعد — تولد في دورة D04 بعد الاعتماد المالي<?php endif; ?>
             </div>
         </div>
 

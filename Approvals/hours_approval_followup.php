@@ -365,14 +365,14 @@ include('../inheader.php');
   $header_back = array();
   include('../includes/page_header.php');
   // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-  echo ems_states_bundle('لا سجلَّ اعتمادٍ منقولًا إلى مستواك بعدُ', 'تابِعْ من شاشةِ الاعتمادِ حتى يعتمدَ المستوى السابقُ سجلَّه فيظهرَ هنا');
+  echo ems_states_bundle('لا سجل اعتماد منقولا إلى مستواك بعد', 'تابع من شاشة الاعتماد حتى يعتمد المستوى السابق سجله فيظهر هنا');
   ?>
 
   <div class="mb-3 text-muted haf-fs-85">
     <?php if ($is_admin): ?>
       عرض إداري للسجلات المنقولة بين المستويات ولم تصل للاعتماد النهائي بعد
     <?php elseif ($my_level >= 1 && $my_level <= 3): ?>
-      تعرض السجلات التي اعتمدتها شخصياً وما زالت بانتظار اعتماد مستوى: <?= htmlspecialchars($level_role_name[$next_level]['label']) ?>
+      تعرض السجلات التي اعتمدتها شخصيا وما زالت بانتظار اعتماد مستوى: <?= htmlspecialchars($level_role_name[$next_level]['label']) ?>
     <?php elseif ($my_level === 4): ?>
       لا توجد مستويات أدنى بعد مستواك، ستجد فقط سجلات الاعتماد النهائي بالأسفل
     <?php else: ?>
@@ -407,7 +407,7 @@ include('../inheader.php');
       <div class="value"><?= count($followup_rows) ?></div>
     </div>
     <div class="quick-stat">
-      <div class="label">معتمدة نهائياً</div>
+      <div class="label">معتمدة نهائيا</div>
       <div class="value"><?= count($final_rows) ?></div>
     </div>
     <div class="quick-stat">

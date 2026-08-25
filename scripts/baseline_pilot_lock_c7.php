@@ -72,9 +72,9 @@ if ($lines[0]['plan_sealed_version'] === null) {
 $hasPay = $conn->query("SELECT COUNT(*) c FROM contract_payment_schedule WHERE contract_id={$CID} AND effective_to IS NULL")->fetch_assoc();
 if ((int) $hasPay['c'] === 0) {
     CPS::generate($conn, $gate, $CO, $CID, array('pattern' => 'monthly_claim', 'due_days' => 30), $REVIEWER);
-    say('✔ خطة دفع مولَّدة — مستخلص شهري');
+    say('✔ خطة دفع مولدة — مستخلص شهري');
 } else {
-    say('✔ خطة دفع نافذة قائمة (' . $hasPay['c'] . ' سطرًا)');
+    say('✔ خطة دفع نافذة قائمة (' . $hasPay['c'] . ' سطرا)');
 }
 
 // ④ الجاهزية ثم الدورة: draft → reviewed → approved → locked (يدان)

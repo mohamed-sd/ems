@@ -68,7 +68,7 @@ $myMsgs = $q1("SELECT COUNT(*) FROM personal_notifications WHERE company_id = {$
      داخلَ المجموعتين هو ترتيبُ NAV-01 §3 نفسُه بلا إزاحة. */
 $tiles = array(
     array('group' => 'wait', 'ord' => '①', 'title' => 'موافقاتي',
-          'desc' => 'صندوق الاعتماد الموحد: طلباتٌ وخطواتٌ وحلقاتُ سلسلةٍ — كلٌّ يقفز لموضع فعله',
+          'desc' => 'صندوق الاعتماد الموحد: طلبات وخطوات وحلقات سلسلة — كل يقفز لموضع فعله',
           'icon' => 'fa fa-check-double', 'href' => '../Portal/approvals_inbox.php', 'count' => $myApprovals),
     array('group' => 'wait', 'ord' => '②', 'title' => 'مهامي',
           'desc' => 'كل ما ينتظر تنفيذي — لا ما ينتظر قراري',
@@ -77,17 +77,17 @@ $tiles = array(
           'desc' => 'رفع بلاغ · المفتوحة · ما ينتظر ردي — فالبلاغ يخص الشخص لا الإدارة',
           'icon' => 'fa fa-bullhorn', 'href' => '../Tickets/ticket_contextual_open.php', 'count' => $myTickets),
     array('group' => 'wait', 'ord' => '④', 'title' => 'طلباتي',
-          'desc' => 'من قاموس الأنواع الـ62 — وكلُّ طلبٍ يُعرف عند مَن توقف',
+          'desc' => 'من قاموس الأنواع ال62 — وكل طلب يعرف عند من توقف',
           'icon' => 'fa fa-paper-plane', 'href' => '../Portal/my_requests.php', 'count' => $myRequests),
     // INJ-0581: الماليةُ بلاطتُها وشاشتُها — فلا تُجمع في رقمٍ لا شاشةَ له ولا تُخفى
     array('group' => 'wait', 'ord' => '④-ب', 'title' => 'طلباتي المالية',
-          'desc' => 'بوابةُ الطلبات المالية — عدُّها من شاشتها لا من غيرها',
+          'desc' => 'بوابة الطلبات المالية — عدها من شاشتها لا من غيرها',
           'icon' => 'fa fa-file-invoice-dollar', 'href' => '../FinRequests/request_form.php', 'count' => $myFinRequests),
     array('group' => 'wait', 'ord' => '⑤', 'title' => 'المراسلات والتنبيهات',
-          'desc' => 'تنبيهاتي (وذو الفعل يتحول مهمةً) والمراسلات من الشريط',
+          'desc' => 'تنبيهاتي (وذو الفعل يتحول مهمة) والمراسلات من الشريط',
           'icon' => 'fa fa-bell', 'href' => '../Portal/notifications.php', 'count' => $myMsgs),
     array('group' => 'door', 'ord' => '⑥', 'title' => 'طلب جديد',
-          'desc' => 'تقديمٌ من القاموس الحاكم — والمالي عبر بوابته',
+          'desc' => 'تقديم من القاموس الحاكم — والمالي عبر بوابته',
           'icon' => 'fa fa-plus-circle', 'href' => '../Portal/my_requests.php', 'count' => null),
     array('group' => 'door', 'ord' => '⑦', 'title' => 'لوحة دوري',
           'desc' => 'ما ينتظرني اليوم بترتيب الإلحاح',
@@ -97,10 +97,10 @@ $tiles = array(
           'icon' => 'fa fa-id-card', 'href' => '../Portal/my_portal.php', 'count' => null),
     // NAV-01 v6 §7 (update0007 S-03/S-04): عنصران إلزاميان لكل حسابٍ بلا استثناء
     array('group' => 'door', 'ord' => '⑨', 'title' => 'إنجازي',
-          'desc' => 'ما أنجزتُه أمسِ والأسبوعَ والشهرَ — وبمدةٍ أحددها بتاريخين · بلغة عملي',
+          'desc' => 'ما أنجزته أمس والأسبوع والشهر — وبمدة أحددها بتاريخين · بلغة عملي',
           'icon' => 'fa fa-trophy', 'href' => '../Portal/my_achievement.php', 'count' => null),
     array('group' => 'door', 'ord' => '⑩', 'title' => 'بوابتي',
-          'desc' => 'ما يخصّني ومحيطي المباشر: معدتي · ورديتي · موقعي — بحسب دوري',
+          'desc' => 'ما يخصني ومحيطي المباشر: معدتي · ورديتي · موقعي — بحسب دوري',
           'icon' => 'fa fa-door-open', 'href' => '../Portal/my_portal.php?view=gateway', 'count' => null),
 );
 
@@ -123,11 +123,11 @@ include '../insidebar.php';
     $header_actions = array();
     include('../includes/page_header.php');
     ems_screen_about(
-        'ما يخصك أنت لا إدارتك: ثمانية عناصر تُفتح من أي موضع وتحل عشر روابط مكررة '
+        'ما يخصك أنت لا إدارتك: ثمانية عناصر تفتح من أي موضع وتحل عشر روابط مكررة '
         . 'في أربع عشرة قائمة (NAV-01 §3) — حاوية تنقل تقفز بك إلى موضع الفعل.',
         array('البلاغ والموافقة والطلب تخص الشخص — فمكانها هنا لا في قائمة كل إدارة'));
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا بلاطاتِ مساحةِ عملٍ معروضةً لهذا الحساب', 'اختر كيانَ العملِ أولًا — ثم تظهر موافقاتُك ومهامُّك وطلباتُك');
+    echo ems_states_bundle('لا بلاطات مساحة عمل معروضة لهذا الحساب', 'اختر كيان العمل أولا — ثم تظهر موافقاتك ومهامك وطلباتك');
     ?>
     <?php if ($__needsPick): ?>
         <!-- INJ-0425 · «السوبر بلا كيانٍ يرى منتقيَ كيانٍ **لا أرقامًا**»:

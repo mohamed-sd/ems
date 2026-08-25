@@ -185,7 +185,7 @@ class EventDispatcher
     private function alertDeadLetter($consumer, $eventId, $companyId, $lastError)
     {
         try {
-            $title = mb_substr('إنذار الناقل: حدث #' . $eventId . ' عُزل في الرسائل الميتة (المستهلك ' . $consumer . ') — ' . $lastError, 0, 200);
+            $title = mb_substr('إنذار الناقل: حدث #' . $eventId . ' عزل في الرسائل الميتة (المستهلك ' . $consumer . ') — ' . $lastError, 0, 200);
             $link = 'admin/bus_monitor.php';
             $this->exec(
                 "INSERT INTO `fin_notifications` (`company_id`, `target_level`, `title`, `link`) VALUES (?, 'finance_manager', ?, ?)",
@@ -309,12 +309,12 @@ class EventDispatcher
             if ($dupe && (int) $dupe->fetch_row()[0] > 0) { continue; }
 
             $why = $s['kind'] === 'orphan'
-                ? 'صفٌّ مُفعَّلٌ بلا معالجٍ مسجَّل — لن يتقدّم مهما مضى الزمن'
-                : 'لم يتقدّم منذ ' . $this->humanSeconds((int) $s['idle_seconds']);
+                ? 'صف مفعل بلا معالج مسجل — لن يتقدم مهما مضى الزمن'
+                : 'لم يتقدم منذ ' . $this->humanSeconds((int) $s['idle_seconds']);
             $title = mb_substr(
                 $tag . ' المستهلك «' . $s['consumer'] . '» — ' . $why
-                . ' · متأخرٌ ' . $s['lag'] . ' واقعةً عند المؤشر ' . $s['cursor']
-                . '. وصمتُ المستهلكِ أخطرُ من فشلِه.', 0, 195);
+                . ' · متأخر ' . $s['lag'] . ' واقعة عند المؤشر ' . $s['cursor']
+                . '. وصمت المستهلك أخطر من فشله.', 0, 195);
 
             $st = $this->conn->prepare(
                 "INSERT INTO `fin_notifications` (`company_id`,`target_level`,`title`,`link`)
@@ -389,9 +389,9 @@ class EventDispatcher
             if ($dupe && (int) $dupe->fetch_row()[0] > 0) { continue; }
 
             $title = mb_substr(
-                $tag . ' اشتراكٌ نشطٌ بلا معالجٍ مسجَّل — ' . $info['n'] . ' نوعَ حدثٍ '
-                . 'يقودُ إلى «' . $info['handler'] . '» ولا يُنفَّذ. '
-                . 'المُعلَنُ ليس المُنفَّذ.', 0, 195);
+                $tag . ' اشتراك نشط بلا معالج مسجل — ' . $info['n'] . ' نوع حدث '
+                . 'يقود إلى «' . $info['handler'] . '» ولا ينفذ. '
+                . 'المعلن ليس المنفذ.', 0, 195);
 
             $st = $this->conn->prepare(
                 "INSERT INTO `fin_notifications` (`company_id`,`target_level`,`title`,`link`)
@@ -409,7 +409,7 @@ class EventDispatcher
         if ($sec < 60)    { return $sec . ' ثانية'; }
         if ($sec < 3600)  { return intval($sec / 60) . ' دقيقة'; }
         if ($sec < 86400) { return intval($sec / 3600) . ' ساعة'; }
-        return intval($sec / 86400) . ' يومًا';
+        return intval($sec / 86400) . ' يوما';
     }
 
     /** تقدّم رتيب (monotonic): لا يعود الـCursor للخلف أبدًا. */

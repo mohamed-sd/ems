@@ -60,12 +60,12 @@ class UnitJourneyService
         for ($i = 0; $i < $pos; $i++) {
             if (!in_array($links[$i], $done, true)) {
                 $out['code'] = 409;
-                $out['reason'] = 'لا تُفتح حلقةٌ قبل اكتمال ما قبلها — «' . $links[$i] . '» لم تعتمد بعد';
+                $out['reason'] = 'لا تفتح حلقة قبل اكتمال ما قبلها — «' . $links[$i] . '» لم تعتمد بعد';
                 return $out;
             }
         }
         if (in_array($role, $done, true)) {
-            $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'حلقة موقَّعة سلفًا — فعل عاطل';
+            $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'حلقة موقعة سلفا — فعل عاطل';
             $out['completed_links'] = count($done);
             return $out;
         }
@@ -84,10 +84,10 @@ class UnitJourneyService
         $remaining = array_values(array_diff($links, $done));
         if (empty($remaining)) {
             $out['chain_state'] = 'completed';
-            $out['reason'] = 'اكتملت السلسلة — يُطبَّق الأثر الأولي التشغيلي فورًا (لا مالي)';
+            $out['reason'] = 'اكتملت السلسلة — يطبق الأثر الأولي التشغيلي فورا (لا مالي)';
         } else {
             $out['next_link'] = $remaining[0];
-            $out['reason'] = 'اعتُمدت حلقة «' . $role . '» — التالية: ' . $remaining[0];
+            $out['reason'] = 'اعتمدت حلقة «' . $role . '» — التالية: ' . $remaining[0];
         }
         return $out;
     }
@@ -106,7 +106,7 @@ class UnitJourneyService
         $r = $stmt->get_result()->fetch_assoc();
         $stmt->close();
         if (!$r) {
-            return array('ok' => false, 'code' => 422, 'reason' => 'سببٌ نصيٌّ حرٌّ أو خارج القائمة المحكومة — يُرفض، والسبب من decision_reasons حصرًا');
+            return array('ok' => false, 'code' => 422, 'reason' => 'سبب نصي حر أو خارج القائمة المحكومة — يرفض، والسبب من decision_reasons حصرا');
         }
         // الرصد (Insert-only) — مقياس الرجوع الآلي لليومية، وفشله لا يعطّل الاعتراض
         try {
@@ -124,7 +124,7 @@ class UnitJourneyService
             error_log('[UnitJourneyService] objection log failed: ' . $t->getMessage());
         }
         return array('ok' => true, 'code' => 200,
-            'reason' => 'اعتُرض على البند ' . $lineRef . ' بسبب «' . $reasonCode . '» — **البند معلَّق والبقية تمضي** ولا تتجمد سلسلة الموقع');
+            'reason' => 'اعترض على البند ' . $lineRef . ' بسبب «' . $reasonCode . '» — **البند معلق والبقية تمضي** ولا تتجمد سلسلة الموقع');
     }
 
     private static function signedLinks(\mysqli $conn, $companyId, $unitId)
@@ -163,7 +163,7 @@ class UnitJourneyService
         }
         return array('ok' => true, 'code' => 200, 'primary_effects' => $applied,
                      'financial_effects' => array(), 'ledger_entries' => 0,
-                     'reason' => 'أثر أولي في ' . count($applied) . ' إدارة — القياس فوري والمال مؤجَّل');
+                     'reason' => 'أثر أولي في ' . count($applied) . ' إدارة — القياس فوري والمال مؤجل');
     }
 
     // ═════════════════════════ ④ بوابة الاستحقاق ═════════════════════════
@@ -230,14 +230,14 @@ class UnitJourneyService
         if ($r === false) {
             /* ◆ الرسوبُ يُعلَن برمزٍ ولا يُترجَم إلى «لا شيء ينتظر» */
             $out['code']  = 500;
-            $out['error'] = 'FIN-500 · تعذّرت قراءةُ طابورِ البوابة — ' . $conn->error;
+            $out['error'] = 'FIN-500 · تعذرت قراءة طابور البوابة — ' . $conn->error;
             return $out;
         }
         while ($x = $r->fetch_assoc()) {
             $pe = intval($x['pe_id']);
             $x['pe_id']   = $pe ?: 0;
             $x['blocked'] = $pe > 0 ? ''
-                : 'لا أثرَ ماليًّا مقترحًا موصولًا بهذا الاستحقاق — الاعتمادُ يقع على الأثرِ لا على الاستحقاق';
+                : 'لا أثر ماليا مقترحا موصولا بهذا الاستحقاق — الاعتماد يقع على الأثر لا على الاستحقاق';
             if ($pe > 0) { $out['actionable']++; }
             $out['rows'][] = $x;
         }
@@ -261,12 +261,12 @@ class UnitJourneyService
         $stmt->execute();
         $pe = $stmt->get_result()->fetch_assoc();
         $stmt->close();
-        if (!$pe) { $out['code'] = 404; $out['reason'] = 'لا أثر ماليًّا مقترحًا بهذا المعرف'; return $out; }
-        if ((string) $pe['state'] === 'Posted') { $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'مقيَّد سلفًا — عاطل'; return $out; }
+        if (!$pe) { $out['code'] = 404; $out['reason'] = 'لا أثر ماليا مقترحا بهذا المعرف'; return $out; }
+        if ((string) $pe['state'] === 'Posted') { $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'مقيد سلفا — عاطل'; return $out; }
 
         if (!$deptManagerId || !$financeManagerId) {
             $out['code'] = 403;
-            $out['reason'] = '403 بنيويًّا — لا استحقاق مالي بلا اعتماد **مدير الإدارة والمالية معًا**، ولا يظهر في تسوية ولا مستخلص ولا مسيّر';
+            $out['reason'] = '403 بنيويا — لا استحقاق مالي بلا اعتماد **مدير الإدارة والمالية معا**، ولا يظهر في تسوية ولا مستخلص ولا مسير';
             return $out;
         }
         // اعتمادان مستقلان موقَّعان
@@ -298,7 +298,7 @@ class UnitJourneyService
             'payload' => array('domain' => $pe['domain'], 'effect_kind' => $pe['effect_kind'], 'period' => $pe['period']),
         ));
         $ref = $fact ? intval($fact['id']) : null;
-        if ($ref === null) { $out['code'] = 500; $out['reason'] = 'تعذّر نشر حدث FES'; return $out; }
+        if ($ref === null) { $out['code'] = 500; $out['reason'] = 'تعذر نشر حدث FES'; return $out; }
         $stmt = $conn->prepare("UPDATE unit_effects SET state = 'Posted', approved_by = ?, approved_at = NOW(), fin_event_ref = ? WHERE pe_id = ? AND stage = 'financial'");
         $dm = intval($deptManagerId);
         $stmt->bind_param('iii', $dm, $ref, $peId);
@@ -322,29 +322,29 @@ class UnitJourneyService
         $companyId = intval($companyId); $peId = intval($peId);
         $stmt = $conn->prepare("SELECT state FROM unit_effects
                                  WHERE company_id = ? AND pe_id = ? AND stage = 'financial' LIMIT 1");
-        if (!$stmt) { return array('ok' => false, 'code' => 500, 'reason' => 'تعذّر الاستعلام'); }
+        if (!$stmt) { return array('ok' => false, 'code' => 500, 'reason' => 'تعذر الاستعلام'); }
         $stmt->bind_param('ii', $companyId, $peId);
         $stmt->execute();
         $pe = $stmt->get_result()->fetch_assoc();
         $stmt->close();
-        if (!$pe) { return array('ok' => false, 'code' => 404, 'reason' => 'لا أثر ماليًّا مقترحًا بهذا المعرف'); }
+        if (!$pe) { return array('ok' => false, 'code' => 404, 'reason' => 'لا أثر ماليا مقترحا بهذا المعرف'); }
         if ((string) $pe['state'] === 'Posted') {
             return array('ok' => false, 'code' => 409,
-                'reason' => 'مقيَّدٌ سلفًا — لا يُردّ بأثرٍ رجعيّ، والتصحيحُ حركةٌ عاكسة (CS-08)');
+                'reason' => 'مقيد سلفا — لا يرد بأثر رجعي، والتصحيح حركة عاكسة (CS-08)');
         }
         if ((string) $pe['state'] === 'Rejected') {
-            return array('ok' => true, 'code' => 200, 'reason' => 'مردودٌ سلفًا — عاطل');
+            return array('ok' => true, 'code' => 200, 'reason' => 'مردود سلفا — عاطل');
         }
 
         $note = 'مردود: ' . (string) $reasonCode . ' — ' . (string) $reasonText;
         $stmt = $conn->prepare("UPDATE unit_effects SET state = 'Rejected', approved_by = ?, approved_at = NOW()
                                  WHERE company_id = ? AND pe_id = ? AND stage = 'financial'");
-        if (!$stmt) { return array('ok' => false, 'code' => 500, 'reason' => 'تعذّر التحديث'); }
+        if (!$stmt) { return array('ok' => false, 'code' => 500, 'reason' => 'تعذر التحديث'); }
         $a = intval($actor);
         $stmt->bind_param('iii', $a, $companyId, $peId);
         $ok = $stmt->execute();
         $stmt->close();
-        if (!$ok) { return array('ok' => false, 'code' => 500, 'reason' => 'تعذّر تسجيلُ الرد'); }
+        if (!$ok) { return array('ok' => false, 'code' => 500, 'reason' => 'تعذر تسجيل الرد'); }
 
         EventPublisher::publishFact($conn, array(
             'event_key' => 'policy.entitlement.rejected',
@@ -373,6 +373,6 @@ class UnitJourneyService
         $created = ($stmt->affected_rows === 1);
         $stmt->close();
         return array('ok' => true, 'state' => 'Proposed', 'created' => $created,
-                     'reason' => 'خصم Proposed حصرًا — ولا Posted إلا بسلّم GOV-01، كخصم الموظف تمامًا');
+                     'reason' => 'خصم Proposed حصرا — ولا Posted إلا بسلم GOV-01، كخصم الموظف تماما');
     }
 }

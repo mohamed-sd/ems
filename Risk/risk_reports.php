@@ -75,11 +75,11 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     );
     include('../includes/page_header.php');
     ems_screen_about(
-        'تقاريرُ الحصيلةِ بالوحدةِ والمستوى وفعاليةِ الضوابط. والتصديرُ ليس قارئًا لا يكتب: '
-        . 'كلُّ ملفٍّ يخرج يسجّل تسعةَ بنودٍ في سجلِّ التصدير (§9-4).',
-        array('الحقولُ الحساسةُ محجوبةٌ من الخادمِ لغيرِ المخوَّلِ — والمستبعَدُ يُعلَن في السجل',
-              'المقامُ معلَنٌ في كلِّ رقمٍ — ولا رقمَ بلا مقامٍ يُفسِّره'));
-    echo ems_states_bundle('لا حصيلةَ مخاطرَ في نطاقك بعد', 'الحصيلةُ تُبنى من السجلِّ المفتوحِ غيرِ المدموجِ — وتتّسع باتساعِ نطاقِك');
+        'تقارير الحصيلة بالوحدة والمستوى وفعالية الضوابط. والتصدير ليس قارئا لا يكتب: '
+        . 'كل ملف يخرج يسجل تسعة بنود في سجل التصدير (§9-4).',
+        array('الحقول الحساسة محجوبة من الخادم لغير المخول — والمستبعد يعلن في السجل',
+              'المقام معلن في كل رقم — ولا رقم بلا مقام يفسره'));
+    echo ems_states_bundle('لا حصيلة مخاطر في نطاقك بعد', 'الحصيلة تبنى من السجل المفتوح غير المدموج — وتتسع باتساع نطاقك');
     ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
@@ -97,7 +97,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     <div class="card"><div class="card-body table-responsive">
         <h6>الحصيلة بوحدة المخاطر</h6>
         <?php if (empty($byUnit)): ?>
-        <p class="rsk-empty-note">لا مخاطر في نطاقك — لا حصيلةَ تُعرض.</p>
+        <p class="rsk-empty-note">لا مخاطر في نطاقك — لا حصيلة تعرض.</p>
         <?php else: ?>
         <table class="table table-sm table-striped rsk-w100">
             <thead><tr><th>الوحدة</th><th>الاسم</th><th>الإجمالي</th><th>مفتوح</th>
@@ -120,7 +120,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     </div></div>
 
     <div class="card rsk-mt12"><div class="card-body">
-        <h6>فعالية الضوابط — «لا يُحتسب إلا بإثبات فعاليته» (RK-07)</h6>
+        <h6>فعالية الضوابط — «لا يحتسب إلا بإثبات فعاليته» (RK-07)</h6>
         <table class="table table-sm rsk-maxw520">
             <tbody>
             <?php foreach (array('فعال', 'فعال جزئيا', 'غير فعال', 'غير مثبت') as $ef): ?>
@@ -138,11 +138,11 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     <div class="card rsk-mt12"><div class="card-body table-responsive">
         <h6>سجل التصدير — تسعة بنود لكل ملف يخرج (§9-4)</h6>
         <?php if (empty($exports)): ?>
-        <p class="rsk-empty-note">لا تصدير بعد — والسجلُّ يُكتب بأولِ تصدير.</p>
+        <p class="rsk-empty-note">لا تصدير بعد — والسجل يكتب بأول تصدير.</p>
         <?php else: ?>
         <table class="table table-sm table-striped rsk-w100">
-            <thead><tr><th>المصدِّر</th><th>بصفته</th><th>الشاشة</th><th>المنظر</th>
-                <th>الأعمدة</th><th>الفلاتر</th><th>المستبعَد بالصلاحية</th><th>الصفوف</th><th>الوقت</th></tr></thead>
+            <thead><tr><th>المصدر</th><th>بصفته</th><th>الشاشة</th><th>المنظر</th>
+                <th>الأعمدة</th><th>الفلاتر</th><th>المستبعد بالصلاحية</th><th>الصفوف</th><th>الوقت</th></tr></thead>
             <tbody>
             <?php foreach ($exports as $x): ?>
                 <tr>
@@ -179,7 +179,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
             fetch('risk_actions.php', { method: 'POST', body: fd }).then(function (r) { return r.json(); })
             .then(function (j) {
                 var m = document.getElementById('expMsg');
-                if (j.ok) { m.textContent = '✔ سُجل التصدير #' + j.id + ' بتسعة بنود'; setTimeout(function () { location.reload(); }, 900); }
+                if (j.ok) { m.textContent = '✔ سجل التصدير #' + j.id + ' بتسعة بنود'; setTimeout(function () { location.reload(); }, 900); }
                 else { m.textContent = '✘ ' + (j.code || '') + ' ' + (j.msg || ''); }
             });
         });

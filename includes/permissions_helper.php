@@ -837,9 +837,9 @@ function enforce_current_page_view_permission($conn, $redirect_path = '../main/d
         //   tools/fix_rf01_surfaces.php يرسب فوقَ صفرٍ فلا تعود.
         ems_gov_flash_redirect(
             $redirect_path,
-            'شاشةٌ غيرُ مسجَّلةٍ في سجلِّ الوحدات — الوصولُ ممنوع',
+            'شاشة غير مسجلة في سجل الوحدات — الوصول ممنوع',
             'GOV-PERM-404-MODULE',
-            'أبلغْ مديرَ الصلاحيات لتسجيلِ الشاشةِ ومنحِ دورِها'
+            'أبلغ مدير الصلاحيات لتسجيل الشاشة ومنح دورها'
         );
     }
 
@@ -887,7 +887,7 @@ function ems_log_auditor_access($conn, $relative_script) {
             'auditor_id' => $uid,
             'scope_kind' => 'screen',
             'scope_ref'  => $rel,
-            'purpose'    => 'اطّلاعٌ رقابيٌّ ضمنَ مهامِّ المراجعةِ الداخلية',
+            'purpose'    => 'اطلاع رقابي ضمن مهام المراجعة الداخلية',
         ));
     } catch (\Throwable $e) { ems_catch_ignored($e, __METHOD__, 'ems_log_auditor_access');
         error_log('ems_log_auditor_access: ' . $e->getMessage());
@@ -947,7 +947,7 @@ function ems_enforce_write_permission($conn, array $current, $redirect_path = '.
                 log_security_event('AUDITOR_WRITE_DENY', 'path=' . $__rel . ' — ' . (string) $__ro['reason']);
             }
             ems_gov_flash_redirect($redirect_path, (string) $__ro['reason'], 'GOV-PERM-403-AUDIT',
-                'استقلالُ المراجعةِ يمنعها من الكتابةِ خارجَ سجلِّها');
+                'استقلال المراجعة يمنعها من الكتابة خارج سجلها');
         }
     }
 
@@ -994,8 +994,8 @@ function ems_enforce_write_permission($conn, array $current, $redirect_path = '.
             $__d = is_array($__verdict) ? (string) ($__verdict['decision'] ?? '') : '';
             if ($__d === 'deny') {
                 ems_gov_flash_redirect($redirect_path,
-                    (string) ($__verdict['reason'] ?? 'حمايةٌ مطلقةٌ تمنع الكتابةَ في هذه الشاشة'),
-                    'GOV-GUARD-403', 'صنفُ الحمايةِ مطلقٌ — ولا مسارَ استثناءٍ له');
+                    (string) ($__verdict['reason'] ?? 'حماية مطلقة تمنع الكتابة في هذه الشاشة'),
+                    'GOV-GUARD-403', 'صنف الحماية مطلق — ولا مسار استثناء له');
             }
             // استثناءٌ نافذٌ يعبر بمن لا منحةَ له — وقد سُجِّل استعمالُه في الخدمة
             if ($__d === 'allow_by_exception') { return; }
@@ -1003,7 +1003,7 @@ function ems_enforce_write_permission($conn, array $current, $redirect_path = '.
             // فشلُ المُحكِّم لا يفتح البابَ: يُسجَّل ويستمرُّ الفحصُ بالمنحةِ وحدَها.
             require_once __DIR__ . '/catch_log.php';
             ems_catch_ignored($__ge, __FUNCTION__,
-                'تعذّر تحكيمُ صنفِ الحماية — يستمرُّ الفحصُ بالمنحةِ وحدَها ولا يُفتح الباب');
+                'تعذر تحكيم صنف الحماية — يستمر الفحص بالمنحة وحدها ولا يفتح الباب');
         }
         __guardDone:
     }
@@ -1019,9 +1019,9 @@ function ems_enforce_write_permission($conn, array $current, $redirect_path = '.
     }
     ems_gov_flash_redirect(
         $redirect_path,
-        'لا تملك صلاحية الكتابة في هذه الشاشة — صلاحيةُ العرضِ لا تكفي لتغيير البيانات',
+        'لا تملك صلاحية الكتابة في هذه الشاشة — صلاحية العرض لا تكفي لتغيير البيانات',
         'GOV-PERM-403-WRITE',
-        'اطلب منحةَ الإضافةِ أو التعديلِ من مدير الصلاحيات إن كانت ضمن عملك'
+        'اطلب منحة الإضافة أو التعديل من مدير الصلاحيات إن كانت ضمن عملك'
     );
 }
 
@@ -1260,7 +1260,7 @@ if (!function_exists('ems_require_action')) {
 
         $role  = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
         $super = defined('EMS_ROLE_SUPER_ADMIN') ? EMS_ROLE_SUPER_ADMIN : '-1';
-        $deny  = isset($opts['deny_msg']) ? $opts['deny_msg'] : 'لا صلاحيةَ لهذا الفعلِ على هذه الشاشة';
+        $deny  = isset($opts['deny_msg']) ? $opts['deny_msg'] : 'لا صلاحية لهذا الفعل على هذه الشاشة';
 
         /* ◆ صيغةُ الردِّ تتبع صيغةَ الطلب: سطحٌ يردُّ JSON لا يُكسَر بنصٍّ خام.
              (وإلا صار الحارسُ نفسُه عطلًا في شاشةٍ تعمل بـAJAX.) */
@@ -1284,7 +1284,7 @@ if (!function_exists('ems_require_action')) {
         /* ① جلسة */
         if (!isset($_SESSION['user'])) {
             ems_require_action_log($screen, $verb, 'no_session');
-            $bail('انتهت الجلسةُ — أعدْ تسجيلَ الدخول');
+            $bail('انتهت الجلسة — أعد تسجيل الدخول');
         }
 
         /* ② رمزُ الحماية — قبلَ فحصِ الصلاحية: رمزٌ فاسدٌ يعني طلبًا مزوَّرًا أصلًا */
@@ -1293,7 +1293,7 @@ if (!function_exists('ems_require_action')) {
             $tok = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
             if (!function_exists('verify_csrf_token') || !verify_csrf_token($tok)) {
                 ems_require_action_log($screen, $verb, 'csrf_failed');
-                $bail('رمزُ الحمايةِ غيرُ صالح — أعدْ تحميلَ الصفحة');
+                $bail('رمز الحماية غير صالح — أعد تحميل الصفحة');
             }
         }
 

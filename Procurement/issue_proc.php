@@ -71,9 +71,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['holder_name'])) {
     $notes = trim($_POST['notes'] ?? '');
 
     // قاعدة §15.8: لا صرف بلا مستلِم وبُعد تحميلٍ واحدٍ على الأقل
-    if ($holder_name === '') { ems_gov_flash_redirect('issue_proc.php', 'المستلِم إلزامي ❌', 'GOV-FAIL-409', ''); exit(); }
+    if ($holder_name === '') { ems_gov_flash_redirect('issue_proc.php', 'المستلم إلزامي ❌', 'GOV-FAIL-409', ''); exit(); }
     if ($equipment_id === null && $project_id === null && $maintenance_order_id === null) {
-        ems_gov_flash_redirect('issue_proc.php', 'لا صرف بلا بُعد تحميل (معدة/مشروع/أمر) ❌', 'GOV-FAIL-409', ''); exit();
+        ems_gov_flash_redirect('issue_proc.php', 'لا صرف بلا بعد تحميل (معدة/مشروع/أمر) ❌', 'GOV-FAIL-409', ''); exit();
     }
     if ($maint_type !== '' && !in_array($maint_type, $maint_types, true)) { $maint_type = ''; }
     if (!in_array($state, $states, true)) { $state = 'مسودة'; }
@@ -180,7 +180,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['holder_name'])) {
         }, 'issue save ' . ($is_editing ? 'edit#' . $id : 'new'));
     } catch (\Throwable $e) {
         error_log('issue_proc save rolled back: ' . $e->getMessage());
-        ems_gov_flash_redirect('issue_proc.php', 'تعذّر الحفظ ❌', 'GOV-FAIL-409', ''); exit();
+        ems_gov_flash_redirect('issue_proc.php', 'تعذر الحفظ ❌', 'GOV-FAIL-409', ''); exit();
     }
     // ① أثرُ الصرف المالي على أبعاده (معدة/مشروع/أمر) — من منبعه بعطالته.
     // لا يرمي: الصرفُ حقيقةٌ تشغيليةٌ لا تُفقد لتعثّرِ نشرٍ مالي.
@@ -268,7 +268,7 @@ function proc_iss_line_row($conn, $is_super_admin, $company_id, $line = null)
         . '<div class="form-group"><label for="emsf_380_a0417">الصنف (كتالوج)</label><select name="line_item_id[]" class="line-item" id="emsf_380_a0417">' . $opts . '</select></div>'
         . '<div class="form-group"><label for="emsf_381_fafc5">اسم الصنف <span class="required">*</span></label><input type="text" name="line_item_name[]" class="line-name" value="' . $iname . '" required id="emsf_381_fafc5"></div>'
         . '<div class="form-group"><label for="emsf_382_16b8d">الكمية</label><input type="number" step="0.01" name="line_qty[]" class="line-qty" value="' . $qty . '" id="emsf_382_16b8d"></div>'
-        . '<div class="form-group"><label for="emsf_383_3f8fe">تكلفة الوحدة <small>(صنفُ الكتالوج يُحتسب آليًّا بالمتوسط المرجح)</small></label><input type="number" step="0.01" name="line_cost[]" class="line-cost" value="' . $cost . '" id="emsf_383_3f8fe"></div>'
+        . '<div class="form-group"><label for="emsf_383_3f8fe">تكلفة الوحدة <small>(صنف الكتالوج يحتسب آليا بالمتوسط المرجح)</small></label><input type="number" step="0.01" name="line_cost[]" class="line-cost" value="' . $cost . '" id="emsf_383_3f8fe"></div>'
         . '<div class="form-group"><button type="button" class="btn-secondary removeLine"><i class="fas fa-times"></i></button></div>'
         . '</div>';
 }
@@ -285,8 +285,8 @@ function proc_iss_line_row($conn, $is_super_admin, $company_id, $line = null)
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا عملياتِ صرفٍ مسجَّلةً بعدُ',
-        'سجّل أولَ صرفٍ بزرِّ «صرف جديد» في رأسِ الشاشة: مستلِمٌ وبُعدُ تحميلٍ واحدٌ على الأقل');
+    echo ems_states_bundle('لا عمليات صرف مسجلة بعد',
+        'سجل أول صرف بزر «صرف جديد» في رأس الشاشة: مستلم وبعد تحميل واحد على الأقل');
     ?>
 
     <?php proc_msg_banner(); ?>
@@ -298,13 +298,13 @@ function proc_iss_line_row($conn, $is_super_admin, $company_id, $line = null)
         unset($_SESSION['proc_shortage_flash']);
     ?>
     <div class="card proc-iss-shortage"><div class="card-body">
-        <strong><i class="fa fa-triangle-exclamation"></i> نقصُ مخزونٍ بعد الصرف
+        <strong><i class="fa fa-triangle-exclamation"></i> نقص مخزون بعد الصرف
             (<?php echo htmlspecialchars((string)$psf['issue_ref']); ?>):</strong>
         <?php foreach ($psf['items'] as $sh): ?>
             <a class="btn-primary proc-iss-shortage-btn"
                href="requests_proc.php?prefill_item=<?php echo intval($sh['item_id']); ?>&need_source=<?php
                    echo rawurlencode('نقص مخزون'); ?>&source_ref=<?php echo rawurlencode((string)$psf['issue_ref']); ?>">
-                <i class="fa fa-cart-plus"></i> طلبُ شراءٍ بمرجع الأمر —
+                <i class="fa fa-cart-plus"></i> طلب شراء بمرجع الأمر —
                 <?php echo htmlspecialchars($sh['name'] . ' (الرصيد ' . $sh['balance'] . ')'); ?></a>
         <?php endforeach; ?>
     </div></div>
@@ -322,7 +322,7 @@ function proc_iss_line_row($conn, $is_super_admin, $company_id, $line = null)
                         <select name="warehouse_id" id="emsf_384_d97b8"><?php echo proc_warehouses_options($conn, $is_super_admin, $company_id, $edit ? intval($edit['warehouse_id']) : 0); ?></select>
                     </div>
                     <div class="form-group">
-                        <label for="emsf_385_945c4">المستلِم <span class="required">*</span></label>
+                        <label for="emsf_385_945c4">المستلم <span class="required">*</span></label>
                         <input type="text" name="holder_name" id="emsf_385_945c4" required value="<?php echo $edit ? htmlspecialchars((string)$edit['holder_name']) : ''; ?>">
                     </div>
                     <div class="form-group">
@@ -330,15 +330,15 @@ function proc_iss_line_row($conn, $is_super_admin, $company_id, $line = null)
                         <input type="date" name="issue_date" id="emsf_386_49337" value="<?php echo $edit ? htmlspecialchars((string)$edit['issue_date']) : ''; ?>">
                     </div>
                     <div class="form-group">
-                        <label for="emsf_387_0ed6d">المعدة <small>(بُعد تكلفة)</small></label>
+                        <label for="emsf_387_0ed6d">المعدة <small>(بعد تكلفة)</small></label>
                         <select name="equipment_id" id="emsf_387_0ed6d"><?php echo proc_equipment_options($conn, $is_super_admin, $company_id, $edit ? intval($edit['equipment_id']) : 0); ?></select>
                     </div>
                     <div class="form-group">
-                        <label for="emsf_388_2789a">المشروع <small>(بُعد تكلفة)</small></label>
+                        <label for="emsf_388_2789a">المشروع <small>(بعد تكلفة)</small></label>
                         <select name="project_id" id="emsf_388_2789a"><?php echo proc_project_options($conn, $is_super_admin, $company_id, $edit ? intval($edit['project_id']) : 0); ?></select>
                     </div>
                     <div class="form-group">
-                        <label for="emsf_389_14730">أمر الصيانة <small>(بُعد تكلفة)</small></label>
+                        <label for="emsf_389_14730">أمر الصيانة <small>(بعد تكلفة)</small></label>
                         <select name="maintenance_order_id" id="emsf_389_14730"><?php echo proc_options_from_rows($mnt_order_option_rows, $edit ? intval($edit['maintenance_order_id']) : 0, '— بلا أمر صيانة —'); ?></select>
                     </div>
                     <div class="form-group">
@@ -355,7 +355,7 @@ function proc_iss_line_row($conn, $is_super_admin, $company_id, $line = null)
                         <select name="supplier_id" id="emsf_391_7e80d"><?php echo proc_suppliers_options($conn, $is_super_admin, $company_id, $edit ? intval($edit['supplier_id']) : 0); ?></select>
                     </div>
                     <div class="form-group">
-                        <label for="emsf_392_9d977">معرّف العقد (اختياري)</label>
+                        <label for="emsf_392_9d977">معرف العقد (اختياري)</label>
                         <input type="number" name="contract_id" id="emsf_392_9d977" value="<?php echo $edit && $edit['contract_id'] !== null ? intval($edit['contract_id']) : ''; ?>">
                     </div>
                     <div class="form-group">
@@ -386,7 +386,7 @@ function proc_iss_line_row($conn, $is_super_admin, $company_id, $line = null)
                 </div>
                 <button type="button" id="addLine" class="add-btn proc-iss-addline"><i class="fas fa-plus"></i> إضافة سطر</button>
                 <div class="proc-iss-total">إجمالي التكلفة: <span id="issTotal">0.00</span></div>
-                <p class="proc-iss-rule">القاعدة: لا يُصرف صنفٌ دون مستلِمٍ وبُعد تحميلٍ واحدٍ على الأقل (معدة/مشروع/أمر صيانة).</p>
+                <p class="proc-iss-rule">القاعدة: لا يصرف صنف دون مستلم وبعد تحميل واحد على الأقل (معدة/مشروع/أمر صيانة).</p>
             </div>
 
             <div class="form-actions">
@@ -405,7 +405,7 @@ function proc_iss_line_row($conn, $is_super_admin, $company_id, $line = null)
             <table id="procTable" class="display nowrap alltables proc-iss-table"
                    data-scroll-x="1" data-state-save="false">
                 <thead><tr>
-                    <th>الإجراءات</th><th>كود المعدة</th><th>المستلِم</th><th>تاريخ الصرف</th><th>المعدة</th>
+                    <th>الإجراءات</th><th>كود المعدة</th><th>المستلم</th><th>تاريخ الصرف</th><th>المعدة</th>
                     <th>نوع الصيانة</th><th>إجمالي التكلفة</th><th>الحالة</th><th>عدد الأصناف</th>
                     <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
                     <th class="ems-fn-th" data-fn="1">رقم السند</th>
@@ -414,29 +414,29 @@ function proc_iss_line_row($conn, $is_super_admin, $company_id, $line = null)
                     <th class="ems-fn-th" data-fn="1">مرجع الطلب</th>
                     <th class="ems-fn-th" data-fn="1">أمر العمل أو المشروع</th>
                     <th class="ems-fn-th" data-fn="1">الوحدة التعاقدية</th>
-                    <th class="ems-fn-th" data-fn="1">قراءة العدّاد</th>
+                    <th class="ems-fn-th" data-fn="1">قراءة العداد</th>
                     <th class="ems-fn-th" data-fn="1">رقم الصنف</th>
                     <th class="ems-fn-th" data-fn="1">اسم الصنف</th>
                     <th class="ems-fn-th" data-fn="1">الكمية المصروفة</th>
                     <th class="ems-fn-th" data-fn="1">الوحدة</th>
                     <th class="ems-fn-th" data-fn="1">تكلفة الوحدة</th>
-                    <th class="ems-fn-th" data-fn="1">صفة المستلِم</th>
+                    <th class="ems-fn-th" data-fn="1">صفة المستلم</th>
                     <th class="ems-fn-th none" data-fn="1">نوع الصرف</th>
                     <th class="ems-fn-th none" data-fn="1">صرفه</th>
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                    <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                    <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                    <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                     <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                     <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-                    <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                    <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+                    <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                    <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
                     <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-                    <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+                    <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
                     <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
-                    <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
+                    <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
                     <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                     <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
-                    <th class="ems-gov-th none" data-gov="loaded_cost_center" data-slice="3" title="المركز الذي حُمّلت عليه التكلفة">مركز التكلفة المحمَّل</th>
+                    <th class="ems-gov-th none" data-gov="loaded_cost_center" data-slice="3" title="المركز الذي حملت عليه التكلفة">مركز التكلفة المحمل</th>
                     </tr></thead>
                 <tbody>
                     <?php

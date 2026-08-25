@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'valid_to'    => $_POST['valid_to'] ?? '',
             'note'        => $_POST['note'] ?? '',
         ), $uid);
-        $redirect($r['ok'] ? 'حُفظت قاعدةُ التحميل ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $cid);
+        $redirect($r['ok'] ? 'حفظت قاعدة التحميل ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $cid);
     }
 
     if ($action === 'penalty_rule') {
@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'valid_from'           => $_POST['pvalid_from'] ?? '',
             'valid_to'             => $_POST['pvalid_to'] ?? '',
         ), $uid);
-        $redirect($r['ok'] ? 'حُفظت قاعدةُ الجزاء ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $cid);
+        $redirect($r['ok'] ? 'حفظت قاعدة الجزاء ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $cid);
     }
 }
 
@@ -138,9 +138,9 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>';
     }
     ?>
-<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('supplier_contract', 'مصفوفةُ المسؤولياتِ والتكاليف'); ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('supplier_contract', 'مصفوفة المسؤوليات والتكاليف'); ?>
 
-    <?= ems_states_bundle('لا قواعدَ لهذا العقدِ بعدُ', 'اختر عقدًا آخرَ أو دوِّن قاعدةً مسعَّرةً من النموذجِ أعلاه') ?>
+    <?= ems_states_bundle('لا قواعد لهذا العقد بعد', 'اختر عقدا آخر أو دون قاعدة مسعرة من النموذج أعلاه') ?>
 
     <div class="card"><div class="card-body">
         <form method="get" class="sr-filter-form">
@@ -157,16 +157,16 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             </select>
         </form>
         <p class="sr-note sr-gap">
-            القاعدةُ تسري بسريانها <strong>وبمدة عقدها معًا</strong> — فقاعدةٌ مفتوحةُ النهاية
-            لا تعيش بعد انتهاء عقدها: لا عقدَ ⇒ لا تحميلَ بقاعدته.
+            القاعدة تسري بسريانها <strong>وبمدة عقدها معا</strong> — فقاعدة مفتوحة النهاية
+            لا تعيش بعد انتهاء عقدها: لا عقد ⇒ لا تحميل بقاعدته.
         </p>
     </div></div>
 
     <?php if ($can_add): ?>
-    <div class="card"><div class="card-header"><h5><i class="fa fa-coins"></i> قاعدةُ تحميلٍ مسعَّرة</h5></div>
+    <div class="card"><div class="card-header"><h5><i class="fa fa-coins"></i> قاعدة تحميل مسعرة</h5></div>
     <div class="card-body">
-        <p class="sr-note">«ما يُحمَّل عليه من مصروفاتنا … <strong>بأسعارٍ وقواعدَ مكتوبة</strong>» (§2-⑥)
-            — و<strong>قاعدةٌ بلا سعرٍ مكتوبٍ مرفوضة</strong>.</p>
+        <p class="sr-note">«ما يحمل عليه من مصروفاتنا … <strong>بأسعار وقواعد مكتوبة</strong>» (§2-⑥)
+            — و<strong>قاعدة بلا سعر مكتوب مرفوضة</strong>.</p>
         <form method="post" class="ems-form">
         <?= csrf_field() ?>
             <input type="hidden" name="sr_action" value="charge_rule">
@@ -188,9 +188,9 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                         <?php endforeach; ?>
                     </select>
                 </div>
-                <div class="form-group"><label for="emsf_1465_2ea0c">المعدل <small>— نسبةٌ أو مبلغٌ بحسب الطريقة</small></label>
+                <div class="form-group"><label for="emsf_1465_2ea0c">المعدل <small>— نسبة أو مبلغ بحسب الطريقة</small></label>
                     <input type="number" step="0.001" min="0" name="rate" id="emsf_1465_2ea0c"></div>
-                <div class="form-group"><label for="emsf_1466_59356">السقف <small>— فارغٌ = بلا سقفٍ مكتوب</small></label>
+                <div class="form-group"><label for="emsf_1466_59356">السقف <small>— فارغ = بلا سقف مكتوب</small></label>
                     <input type="number" step="0.01" min="0" name="cap" id="emsf_1466_59356"></div>
                 <div class="form-group"><label for="emsf_1467_e006f">سريان من <span class="required">*</span></label>
                     <input type="date" name="valid_from" required id="emsf_1467_e006f"></div>
@@ -202,7 +202,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     </div></div>
     <?php endif; ?>
 
-    <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> قواعدُ التحميل</h5></div>
+    <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> قواعد التحميل</h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap sr-table-full">
             <thead><tr><th>نوع التحميل</th><th>التسعير</th><th>المعدل</th><th>السقف الأقصى</th>
@@ -215,13 +215,13 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                 <th class="ems-fn-th" data-fn="1">معادلة الاحتساب</th>
                 <th class="ems-fn-th" data-fn="1">يحتاج موافقة المورد؟</th>
                 <th class="ems-fn-th" data-fn="1">دورة الاعتماد</th>
-                <th class="ems-fn-th" data-fn="1">عرّفها</th>
+                <th class="ems-fn-th" data-fn="1">عرفها</th>
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                 <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                 <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
                 <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                 <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                 <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
@@ -249,10 +249,10 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     </div></div></div>
 
     <?php if ($can_add): ?>
-    <div class="card"><div class="card-header"><h5><i class="fa fa-gavel"></i> قاعدةُ جزاءٍ بسقفها</h5></div>
+    <div class="card"><div class="card-header"><h5><i class="fa fa-gavel"></i> قاعدة جزاء بسقفها</h5></div>
     <div class="card-body">
-        <p class="sr-note">«الجزاءاتُ … <strong>وسقوفُها</strong>» (§2-⑦) — و<strong>«له أن يشدّد جزاءَه
-            لا أن يعكس إسنادًا»</strong> (§4): نقضُ الإسناد الموروث يلزمه سببٌ مكتوب.</p>
+        <p class="sr-note">«الجزاءات … <strong>وسقوفها</strong>» (§2-⑦) — و<strong>«له أن يشدد جزاءه
+            لا أن يعكس إسنادا»</strong> (§4): نقض الإسناد الموروث يلزمه سبب مكتوب.</p>
         <form method="post" class="ems-form">
         <?= csrf_field() ?>
             <input type="hidden" name="sr_action" value="penalty_rule">
@@ -266,18 +266,18 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                         <?php endforeach; ?>
                     </select>
                 </div>
-                <div class="form-group"><label for="emsf_1471_0ffcb">الحد/العتبة <small>— نسبةُ جاهزيةٍ دنيا · ساعاتُ إحلال …</small></label>
+                <div class="form-group"><label for="emsf_1471_0ffcb">الحد/العتبة <small>— نسبة جاهزية دنيا · ساعات إحلال …</small></label>
                     <input type="number" step="0.001" name="threshold" id="emsf_1471_0ffcb"></div>
                 <div class="form-group"><label for="emsf_1472_69e56">المعدل <span class="required">*</span></label>
                     <input type="number" step="0.001" min="0.001" name="prate" required id="emsf_1472_69e56"></div>
                 <div class="form-group">
                     <label for="emsf_1473_03214">أساس المعدل</label>
                     <select name="rate_basis" id="emsf_1473_03214">
-                        <option value="per_unit">لكل وحدةِ عجز</option>
-                        <option value="percent_of_base">نسبةٌ من الأساس</option>
+                        <option value="per_unit">لكل وحدة عجز</option>
+                        <option value="percent_of_base">نسبة من الأساس</option>
                     </select>
                 </div>
-                <div class="form-group"><label for="emsf_1474_a9a6f">سقف الجزاء ٪ <small>— فارغٌ = بلا سقفٍ مكتوب (يُعلَن)</small></label>
+                <div class="form-group"><label for="emsf_1474_a9a6f">سقف الجزاء ٪ <small>— فارغ = بلا سقف مكتوب (يعلن)</small></label>
                     <input type="number" step="0.01" min="0" max="100" name="cap_percent" id="emsf_1474_a9a6f"></div>
                 <div class="form-group">
                     <label for="emsf_1475_b189e">الدورية</label>
@@ -288,14 +288,14 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="emsf_1476_89fd5"><input type="checkbox" name="inherits" value="1" aria-label="يرث إسنادَ عقد العميل" checked>
-                        يرث إسنادَ عقد العميل (CON-02)</label>
+                    <label for="emsf_1476_89fd5"><input type="checkbox" name="inherits" value="1" aria-label="يرث إسناد عقد العميل" checked>
+                        يرث إسناد عقد العميل (CON-02)</label>
                 </div>
-                <div class="form-group"><label>سبب نقض الإسناد <small>— إلزاميٌّ متى نُقض</small></label>
+                <div class="form-group"><label>سبب نقض الإسناد <small>— إلزامي متى نقض</small></label>
                 </div>
-                <div class="form-group"><label>سبب نقض الإسناد <small>— إلزاميٌّ متى نُقض</small></label>
+                <div class="form-group"><label>سبب نقض الإسناد <small>— إلزامي متى نقض</small></label>
                     <input type="text" name="override_reason" maxlength="255" id="emsf_1476_89fd5"></div>
-                <div class="form-group"><label for="emsf_1477_c87f9">توثيقُ الصيغة <small>— نصٌّ لا يُقيَّم</small></label>
+                <div class="form-group"><label for="emsf_1477_c87f9">توثيق الصيغة <small>— نص لا يقيم</small></label>
                     <input type="text" name="formula_note" maxlength="255" id="emsf_1477_c87f9"></div>
                 <div class="form-group"><label for="emsf_1478_8080c">سريان من <span class="required">*</span></label>
                     <input type="date" name="pvalid_from" required id="emsf_1478_8080c"></div>
@@ -306,7 +306,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     </div></div>
     <?php endif; ?>
 
-    <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> قواعدُ الجزاء</h5></div>
+    <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> قواعد الجزاء</h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap sr-table-full">
             <thead><tr><th>النوع</th><th>العتبة</th><th>المعدل</th><th>الأساس</th>
@@ -317,7 +317,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     <td><?php echo htmlspecialchars(SRS::PENALTY_LABELS[$r['kind']] ?? $r['kind']); ?></td>
                     <td><?php echo $r['threshold'] !== null ? htmlspecialchars((string)$r['threshold']) : '—'; ?></td>
                     <td><?php echo htmlspecialchars((string)$r['rate']); ?></td>
-                    <td><?php echo (string)$r['rate_basis'] === 'percent_of_base' ? 'نسبةٌ من الأساس' : 'لكل وحدة'; ?></td>
+                    <td><?php echo (string)$r['rate_basis'] === 'percent_of_base' ? 'نسبة من الأساس' : 'لكل وحدة'; ?></td>
                     <td><?php echo $r['cap_percent'] !== null ? htmlspecialchars((string)$r['cap_percent']) . '٪'
                         : '<span class="badge badge-warning">بلا سقف</span>'; ?></td>
                     <td><?php if (intval($r['inherits_attribution']) === 1): ?>

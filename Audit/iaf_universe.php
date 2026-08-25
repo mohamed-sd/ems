@@ -24,17 +24,17 @@ $U13 = array(
     'icon'       => 'fa fa-globe',
     'nature'     => 'register',
     'doc'        => 'IAF-01 §4-3 · IAF-0013',
-    'intro'      => 'نطاقاتُ المراجعةِ كلُّها بدرجةِ خطرِ كلٍّ وتاريخِ آخرِ مراجعة',
-    'rule'       => 'IAF-0014: التقييمُ السنويُّ للمخاطرِ أساسُ الخطةِ لا الاجتهاد',
-    'empty_hint' => 'لم يُبنَ الكونُ الرقابيُّ بعدُ — ولا خطةَ بلا كون',
+    'intro'      => 'نطاقات المراجعة كلها بدرجة خطر كل وتاريخ آخر مراجعة',
+    'rule'       => 'IAF-0014: التقييم السنوي للمخاطر أساس الخطة لا الاجتهاد',
+    'empty_hint' => 'لم يبن الكون الرقابي بعد — ولا خطة بلا كون',
     'order'       => 'risk_score DESC',
 
     'actions'    => array(
         'build' => array(
             'code'  => 'iaf.universe.build',
-            'label' => 'إدراجُ مجالٍ في الكونِ الرقابي',
-            'rule'  => 'IAF-0044: لا كونَ بلا ميثاقٍ معتمد',
-            'fields' => array('area_code' => 'رمزُ المجال', 'area_name' => 'اسمُ المجال', 'owner_dept' => 'الإدارةُ المالكة', 'risk_score' => 'درجةُ الخطر'),
+            'label' => 'إدراج مجال في الكون الرقابي',
+            'rule'  => 'IAF-0044: لا كون بلا ميثاق معتمد',
+            'fields' => array('area_code' => 'رمز المجال', 'area_name' => 'اسم المجال', 'owner_dept' => 'الإدارة المالكة', 'risk_score' => 'درجة الخطر'),
             'run' => function ($conn, $co, $uid, $in) {
                 require_once __DIR__ . '/../app/Services/Audit/InternalAuditService.php';
                 return \App\Services\Audit\InternalAuditService::buildUniverse($conn, array(
@@ -48,6 +48,6 @@ require __DIR__ . '/../includes/u13_screen_kit.php';
 /* حزمةُ الحالاتِ الدنيا (بوابة ٩): تحميلٌ وفراغٌ وخطأٌ — مخفيةٌ افتراضًا
    ويُظهرها منطقُ الشاشةِ عند حالِها. الدالةُ من ux_components التي تُحمِّلها القشرة. */
 if (function_exists('ems_states_bundle')) {
-    echo ems_states_bundle('لم يُبنَ الكونُ الرقابيُّ بعدُ',
-                           'أدرِج مجالاتِ المراجعةِ بدرجةِ خطرِ كلٍّ — فالتقييمُ السنويُّ للمخاطرِ أساسُ الخطةِ لا الاجتهاد');
+    echo ems_states_bundle('لم يبن الكون الرقابي بعد',
+                           'أدرج مجالات المراجعة بدرجة خطر كل — فالتقييم السنوي للمخاطر أساس الخطة لا الاجتهاد');
 }

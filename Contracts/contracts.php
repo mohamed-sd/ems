@@ -119,7 +119,7 @@ $__pcNeg = ems_post_contract($conn, array(
     'idem'    => array('contract' => intval($_POST['csm_submit_id'] ?? 0), 'to' => 'تفاوض'),
     'validate' => function (array $in) {
         $cid = intval($in['csm_submit_id'] ?? 0);
-        if ($cid <= 0) { return array('ok' => false, 'msg' => 'عقدٌ غيرُ صالح (422)'); }
+        if ($cid <= 0) { return array('ok' => false, 'msg' => 'عقد غير صالح (422)'); }
         return array('ok' => true, 'data' => array('cid' => $cid, 'note' => trim($in['csm_note'] ?? '')));
     },
 ));
@@ -140,7 +140,7 @@ $__pcApp = ems_post_contract($conn, array(
     'idem'    => array('contract' => intval($_POST['csm_approve_id'] ?? 0), 'to' => 'معتمد'),
     'validate' => function (array $in) {
         $cid = intval($in['csm_approve_id'] ?? 0);
-        if ($cid <= 0) { return array('ok' => false, 'msg' => 'عقدٌ غيرُ صالح (422)'); }
+        if ($cid <= 0) { return array('ok' => false, 'msg' => 'عقد غير صالح (422)'); }
         return array('ok' => true, 'data' => array('cid' => $cid, 'note' => trim($in['csm_note'] ?? '')));
     },
 ));
@@ -175,8 +175,8 @@ $__pcLc = ems_post_contract($conn, array(
     'validate' => function (array $in) use ($__clcReg) {
         $cid = intval($in['clc_contract_id'] ?? 0);
         $act = trim(strval($in['clc_action'] ?? ''));
-        if ($cid <= 0)              { return array('ok' => false, 'msg' => 'عقدٌ غيرُ صالح (422)'); }
-        if (!isset($__clcReg[$act])) { return array('ok' => false, 'msg' => 'فعلٌ غيرُ مُعلَنٍ في سجلِّ دورةِ الحياة (422)'); }
+        if ($cid <= 0)              { return array('ok' => false, 'msg' => 'عقد غير صالح (422)'); }
+        if (!isset($__clcReg[$act])) { return array('ok' => false, 'msg' => 'فعل غير معلن في سجل دورة الحياة (422)'); }
         return array('ok' => true, 'data' => array('cid' => $cid, 'act' => $act,
                                                    'note' => trim(strval($in['clc_note'] ?? ''))));
     },
@@ -249,9 +249,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   $header_back = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
   include('../includes/page_header.php');
   ?>
-<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('contract', 'نظرةٌ عامة'); ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('contract', 'نظرة عامة'); ?>
 
-  <?php echo ems_states_bundle('لا عقودَ ضمن هذا الترشيح', 'وسّع الفترةَ أو غيّر المرشِّحات'); ?>
+  <?php echo ems_states_bundle('لا عقود ضمن هذا الترشيح', 'وسع الفترة أو غير المرشحات'); ?>
 
   <?php if ($csm_msg !== ''): ?>
     <!-- INJ-0001: حصيلةُ نقلِ الحالة — والتصعيدُ يُعلَن بلونٍ ثالثٍ لا يُخلط بالفشل -->
@@ -296,7 +296,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
         <!-- القسم 1: إجماليات الساعات (يومياً وللعقد) -->
         <div class="form-section">
-          <h6><i class="fas fa-file-contract"></i> إجماليات الساعات (يومياً وللعقد)</h6>
+          <h6><i class="fas fa-file-contract"></i> إجماليات الساعات (يوميا وللعقد)</h6>
           <div class="totals">
             <div class="kpi">
               <div class="v" id="kpi_month_total">0</div>
@@ -317,7 +317,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
         <div class="contracts-note-box">
           <p class="contracts-note-text">
-            <i class="fas fa-info-circle"></i> <strong>ملاحظة:</strong> يتم حساب الإجماليات تلقائياً بناءً على
+            <i class="fas fa-info-circle"></i> <strong>ملاحظة:</strong> يتم حساب الإجماليات تلقائيا بناء على
             البيانات المدخلة في الأقسام التالية
           </p>
         </div>
@@ -359,7 +359,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="field md-3 sm-6">
               <label>مدة العقد بالأيام </label>
               <div class="control"><input name="contract_duration_days" id="contract_duration_days" type="number"
-                  min="0" placeholder="يُحتسب تلقائياً" readonly></div>
+                  min="0" placeholder="يحتسب تلقائيا" readonly></div>
             </div>
 
 
@@ -424,7 +424,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <div class="control"><input name="shift_contract" type="number" min="0" aria-label="ساعات الوردية للعقد"></div>
             </div>
             <div class="field md-3 sm-6">
-              <label>إجمالي الوحدات يومياً للعقد </label>
+              <label>إجمالي الوحدات يوميا للعقد </label>
               <div class="control"><input name="equip_total_contract" type="number" placeholder=" "></div>
             </div>
             <div class="field md-3 sm-6">
@@ -584,9 +584,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <div class="control"><input name="shift_hours_1" type="number" min="0" aria-label="ساعات الوردية"></div>
                   </div>
                   <div class="field md-3 sm-6">
-                    <label>إجمالي الوحدات يومياً</label>
+                    <label>إجمالي الوحدات يوميا</label>
                     <div class="control"><input name="equip_total_month_1" type="number" readonly
-                        placeholder="يُحتسب تلقائياً"></div>
+                        placeholder="يحتسب تلقائيا"></div>
                   </div>
                   <div class="field md-3 sm-6">
                     <label>وحدات العمل في الشهر</label>
@@ -597,7 +597,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                   <div class="field md-3 sm-6">
                     <label>إجمالي وحدات العقد</label>
                     <div class="control"><input name="equip_total_contract_1" type="number" readonly
-                        placeholder="يُحتسب تلقائياً"></div>
+                        placeholder="يحتسب تلقائيا"></div>
                   </div>
 
 
@@ -731,7 +731,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                  ظاهرٌ ⇒ ثانويّ. وتعدُّدُ الرئيسيِّ يُلغي معناه. */ ?>
         <div class="filter-actions">
           <button type="submit" class="btn-secondary"><i class="fa fa-search"></i> تطبيق</button>
-          <button type="button" class="btn-secondary" title="إعادة تعيين"><a href="contracts.php" class="ct-1" aria-label="إعادة تعيين المرشِّحات" title="إعادة تعيين المرشِّحات"><i class="fa fa-rotate-right" aria-hidden="true"></i></a></button>
+          <button type="button" class="btn-secondary" title="إعادة تعيين"><a href="contracts.php" class="ct-1" aria-label="إعادة تعيين المرشحات" title="إعادة تعيين المرشحات"><i class="fa fa-rotate-right" aria-hidden="true"></i></a></button>
         </div>
       </div>
     </div>
@@ -757,7 +757,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="group-status"> الإجراءات</th>
               <!-- INJ-0001: حالةُ العقدِ في آلةِ الحالة — عمودٌ حاكمٌ كان غائبًا -->
               <th class="group-status"> حالة العقد</th>
-              <th class="group-status ems-lc-cell"> نقلُ الحالة</th>
+              <th class="group-status ems-lc-cell"> نقل الحالة</th>
               <!-- المعلومات الأساسية -->
               <th class="group-basic"> رقم العقد</th>
               <th class="group-basic"> المشروع</th>
@@ -786,8 +786,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="group-services"> الورشة</th>
 
               <!-- التشغيل اليومي -->
-              <th class="group-operations" data-col-group-default="hidden"> ساعات العمل يومياً</th>
-              <th class="group-operations"> عدد المشغلين يومياً</th>
+              <th class="group-operations" data-col-group-default="hidden"> ساعات العمل يوميا</th>
+              <th class="group-operations"> عدد المشغلين يوميا</th>
 
               <!-- البيانات المالية -->
               <th class="group-basic"> عملة التسعير</th>
@@ -809,7 +809,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="ems-fn-th none" data-fn="1">المدة بالأشهر</th>
               <th class="ems-fn-th none" data-fn="1">نموذج التسعير</th>
               <th class="ems-fn-th none" data-fn="1">نوع القيمة</th>
-              <th class="ems-fn-th none" data-fn="1">القيمة الموقَّعة</th>
+              <th class="ems-fn-th none" data-fn="1">القيمة الموقعة</th>
               <th class="ems-fn-th none" data-fn="1">عملة الفوترة</th>
               <th class="ems-fn-th none" data-fn="1">عملة التحصيل</th>
               <th class="ems-fn-th none" data-fn="1">دورة التسوية</th>
@@ -819,20 +819,20 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="ems-fn-th none" data-fn="1">حالة خط الأساس</th>
               <th class="ems-fn-th none" data-fn="1">ملاحظات حرجة مفتوحة</th>
               <th class="ems-fn-th none" data-fn="1">جاهزية الاعتماد القانوني</th>
-              <th class="ems-fn-th none" data-fn="1">وقّعه عنّا</th>
-              <th class="ems-fn-th none" data-fn="1">وقّعه العميل</th>
+              <th class="ems-fn-th none" data-fn="1">وقعه عنا</th>
+              <th class="ems-fn-th none" data-fn="1">وقعه العميل</th>
               <th class="ems-fn-th none" data-fn="1">نسخة القاعدة المستعملة</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-              <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
               <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-              <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+              <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
               <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
-              <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
+              <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
               <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
               <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
@@ -1100,7 +1100,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               if ($result && $eq_saved) {
                 echo "<script>window.location.href='contracts.php?id=$posted_project_id';</script>";
               } else {
-                $ems_save_err = !$result ? 'تعذّر حفظ بيانات العقد — لم يُحفظ' : 'حُفظ العقد لكن فشل حفظ بعض المعدات — يرجى مراجعتها';
+                $ems_save_err = !$result ? 'تعذر حفظ بيانات العقد — لم يحفظ' : 'حفظ العقد لكن فشل حفظ بعض المعدات — يرجى مراجعتها';
                 ems_gov_flash_redirect("contracts.php?id=$posted_project_id", "❌ " . $ems_save_err . "", 'GOV-SCOPE-403', '');
               }
               exit;
@@ -1214,8 +1214,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     foreach ($__acts as $__code => $__a) {
                         $__rv = \App\Services\Contract\ContractLifecycleActions::reverseOf('customer', $__code);
                         $__tip = $__a['label'] . ' — '
-                               . ($__rv['has'] ? ('له عكسٌ: ' . $__rv['label'])
-                                               : ('لا عكسَ له: ' . (string) $__rv['why']));
+                               . ($__rv['has'] ? ('له عكس: ' . $__rv['label'])
+                                               : ('لا عكس له: ' . (string) $__rv['why']));
                         $__needNote = (!empty($__a['needs']) && $__a['needs'] === 'note');
                         $csm_cell .= "<form method='post' class='ems-inline-form' data-ems-c='ct-2'>" . csrf_field()
                           . "<input type='hidden' name='clc_contract_id' value='{$cid}'>"
@@ -1514,8 +1514,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <div class="control"><input name="shift_hours_${equipmentIndex}" type="number" min="0" aria-label="ساعات الوردية"></div>
             </div>
             <div class="field md-3 sm-6">
-              <label>إجمالي الساعات يومياً</label>
-              <div class="control"><input name="equip_total_month_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً" aria-label="إجمالي الساعات يومياً"></div>
+              <label>إجمالي الساعات يوميا</label>
+              <div class="control"><input name="equip_total_month_${equipmentIndex}" type="number" readonly placeholder="يحتسب تلقائيا" aria-label="إجمالي الساعات يوميا"></div>
             </div>
             <div class="field md-3 sm-6">
               <label>وحدات العمل في الشهر</label>
@@ -1524,7 +1524,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
             <div class="field md-3 sm-6">
               <label>إجمالي ساعات العقد</label>
-              <div class="control"><input name="equip_total_contract_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً" aria-label="إجمالي ساعات العقد"></div>
+              <div class="control"><input name="equip_total_contract_${equipmentIndex}" type="number" readonly placeholder="يحتسب تلقائيا" aria-label="إجمالي ساعات العقد"></div>
             </div>
             <div class="field md-3 sm-6">
               <label>العملة</label>
@@ -1832,8 +1832,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <div class="control"><input name="shift_hours_${equipmentIndex}" type="number" min="0" value="${equip.shift_hours}" aria-label="ساعات الوردية"></div>
                       </div>
                       <div class="field md-3 sm-6">
-                        <label>إجمالي الساعات يومياً</label>
-                        <div class="control"><input name="equip_total_month_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً" value="${equip.equip_total_month}" aria-label="إجمالي الساعات يومياً"></div>
+                        <label>إجمالي الساعات يوميا</label>
+                        <div class="control"><input name="equip_total_month_${equipmentIndex}" type="number" readonly placeholder="يحتسب تلقائيا" value="${equip.equip_total_month}" aria-label="إجمالي الساعات يوميا"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>وحدات العمل في الشهر</label>
@@ -1841,7 +1841,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                       </div>
                       <div class="field md-3 sm-6">
                         <label>إجمالي ساعات العقد</label>
-                        <div class="control"><input name="equip_total_contract_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً" value="${equip.equip_total_contract}" aria-label="إجمالي ساعات العقد"></div>
+                        <div class="control"><input name="equip_total_contract_${equipmentIndex}" type="number" readonly placeholder="يحتسب تلقائيا" value="${equip.equip_total_contract}" aria-label="إجمالي ساعات العقد"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>العملة</label>

@@ -16,7 +16,7 @@ if (isset($_GET['reset']) && $_GET['reset'] === 'success') {
     $statusMessage = 'تم تحديث كلمة المرور. يمكنك تسجيل الدخول الآن.';
 }
 if (isset($_GET['security']) && $_GET['security'] === '1') {
-    $statusMessage = 'تم إنهاء الجلسة السابقة لأسباب أمنية. يرجى تسجيل الدخول مجدداً.';
+    $statusMessage = 'تم إنهاء الجلسة السابقة لأسباب أمنية. يرجى تسجيل الدخول مجددا.';
 }
 if (isset($_GET['msg']) && trim($_GET['msg']) !== '') {
     $error = trim($_GET['msg']);
@@ -134,7 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $sql !== '' ? mysqli_prepare($conn, $sql) : false;
 
                 if (!$stmt) {
-                    $error = 'تعذر تسجيل الدخول حالياً.';
+                    $error = 'تعذر تسجيل الدخول حاليا.';
                 } else {
                     if ($bindTypes === 'ss') {
                         mysqli_stmt_bind_param($stmt, $bindTypes, $bindValues[0], $bindValues[1]);
@@ -178,7 +178,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         // Check #1: users.status = active
                         if ($error === '' && company_users_has_column('status') && isset($user['status']) && strtolower((string)$user['status']) !== 'active') {
-                            $error = 'الحساب معطّل، يرجى التواصل مع مدير شركتك.';
+                            $error = 'الحساب معطل، يرجى التواصل مع مدير شركتك.';
                         }
 
                         // Check #2: companies.status = active
@@ -187,7 +187,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 if (!isset($user['cid']) || intval($user['cid']) <= 0) {
                                     $error = 'الحساب غير مرتبط بشركة. يرجى مراجعة الإدارة.';
                                 } elseif (!isset($user['company_status']) || strtolower((string)$user['company_status']) !== 'active') {
-                                    $error = 'الشركة موقوفة حالياً. يرجى التواصل مع الدعم.';
+                                    $error = 'الشركة موقوفة حاليا. يرجى التواصل مع الدعم.';
                                 } elseif (!empty($user['subscription_end']) && strtotime($user['subscription_end']) < strtotime(date('Y-m-d'))) {
                                     $error = 'انتهت صلاحية اشتراك الشركة. يرجى التجديد.';
                                 }
@@ -398,7 +398,7 @@ ems_public_head('دخول مستخدمي الشركات | EMS'); ?>
             <button class="btn" type="submit">دخول</button>
         </form>
 
-        <div class="foot">بعد النجاح سيتم تحميل صلاحيات الدور، نطاق المشروع للمستخدم، وبيانات باقة الشركة ثم التوجيه تلقائياً للوحة المناسبة.</div>
+        <div class="foot">بعد النجاح سيتم تحميل صلاحيات الدور، نطاق المشروع للمستخدم، وبيانات باقة الشركة ثم التوجيه تلقائيا للوحة المناسبة.</div>
     </div>
 </body>
 </html>

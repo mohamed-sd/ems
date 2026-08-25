@@ -49,7 +49,7 @@ foreach ($companies as $cid) {
                 AND ue.created_at < DATE_SUB(NOW(), INTERVAL {$sla} HOUR)");
         $n = ($rr && ($y = mysqli_fetch_assoc($rr))) ? (int) $y['n'] : 0;
         if ($n <= 0) { continue; }
-        $title = "تجاوزُ مهلة اعتماد: {$n} وحدةً بحالة {$state} فوق {$sla} ساعة";
+        $title = "تجاوز مهلة اعتماد: {$n} وحدة بحالة {$state} فوق {$sla} ساعة";
         $link  = '../Approvals/hours_approval.php#sla-' . $state;
         foreach (ems_uc_stage_owner_roles($state) as $roleId) {
             $ur = mysqli_query($conn,
@@ -58,20 +58,20 @@ foreach ($companies as $cid) {
                 if (ems_uc_notify_once($conn, $cid, (int) $u['id'], $title, $link)) { $totalNotified++; }
             }
         }
-        echo "[co{$cid}] {$state}: {$n} متجاوزًا (مهلة {$sla}س)\n";
+        echo "[co{$cid}] {$state}: {$n} متجاوزا (مهلة {$sla}س)\n";
     }
 
     // تصعيد DEC-01 ⑦: الأقدم فوق سبعة أيام → الإدارة العامة
     $m = ems_uc_lag_metrics($conn, $cid);
     if ($m['oldest_days'] > 7 && $m['pending'] > 0) {
-        $t = "DEC-01 ⑦: {$m['pending']} وحدةً غيرَ معتمدةٍ وأقدمُها {$m['oldest_days']} يومًا (شركة {$cid})";
+        $t = "DEC-01 ⑦: {$m['pending']} وحدة غير معتمدة وأقدمها {$m['oldest_days']} يوما (شركة {$cid})";
         if (ems_uc_notify_once($conn, $cid, EXEC_ACCOUNT_UID, $t, '../Approvals/hours_approval.php#dec01-7')) {
             $totalNotified++;
         }
-        echo "[co{$cid}] تصعيدٌ للإدارة العامة: أقدمُ العالق {$m['oldest_days']} يومًا\n";
+        echo "[co{$cid}] تصعيد للإدارة العامة: أقدم العالق {$m['oldest_days']} يوما\n";
     }
 }
-echo "تم — إشعاراتٌ جديدة: {$totalNotified}\n";
+echo "تم — إشعارات جديدة: {$totalNotified}\n";
 
 /* ── نبض محرّك WFM يركب الساعةَ نفسَها (كنسُ مهلٍ بجوار كنسِ مهل) ──────────
  * تسجيلُ مهمةٍ مستقلةٍ EMS_WFM_Engine يحتاج يدَ المالك (schtasks محجوبٌ على

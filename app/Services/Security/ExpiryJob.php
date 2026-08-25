@@ -68,7 +68,7 @@ class ExpiryJob
                                   WHERE company_id = {$co} AND title LIKE 'صلاحيات قاربة الانتهاء%'
                                     AND DATE(created_at) = CURDATE() LIMIT 1");
             if (!$chk || $chk->num_rows === 0) {
-                $title = 'صلاحيات قاربة الانتهاء: ' . $soonEx . ' استثناء و' . $soonGr . ' منحًا حساسًا بمراجعة مستحقة خلال 30 يومًا';
+                $title = 'صلاحيات قاربة الانتهاء: ' . $soonEx . ' استثناء و' . $soonGr . ' منحا حساسا بمراجعة مستحقة خلال 30 يوما';
                 $stmt = $conn->prepare("INSERT INTO fin_notifications (company_id, target_level, title, link)
                                         VALUES (?, 'all', ?, 'admin/org_assignments.php')");
                 $stmt->bind_param('is', $co, $title);

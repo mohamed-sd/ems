@@ -75,8 +75,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_currency'])) {
     $sym  = trim(strval($_POST['symbol'] ?? ''));
 
     $err = null;
-    if ($code === '' || !preg_match('/^[A-Z]{3}$/', $code)) { $err = 'الرمز ثلاثةُ أحرفٍ لاتينية (ISO)'; }
-    elseif ($name === '')                                   { $err = 'اسمُ العملة إلزامي'; }
+    if ($code === '' || !preg_match('/^[A-Z]{3}$/', $code)) { $err = 'الرمز ثلاثة أحرف لاتينية (ISO)'; }
+    elseif ($name === '')                                   { $err = 'اسم العملة إلزامي'; }
     if ($err !== null) { ems_gov_flash_redirect('currencies_fin.php', "{$err} ❌", 'GOV-FAIL-409', ''); exit(); }
 
     try {
@@ -91,11 +91,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_currency'])) {
             'created_by' => $current_user_id,
         ));
         ems_fx_cache_clear();
-        ems_gov_flash_redirect('currencies_fin.php', "سُجّلت العملة {$code} — أدخِل سعرَ صرفها ✅", 'GOV-OK-200', '');
+        ems_gov_flash_redirect('currencies_fin.php', "سجلت العملة {$code} — أدخل سعر صرفها ✅", 'GOV-OK-200', '');
     } catch (\Throwable $t) {
         error_log('currencies add: ' . $t->getMessage());
         $dup = (strpos($t->getMessage(), 'Duplicate') !== false);
-        ems_gov_flash_redirect('currencies_fin.php', ($dup ? 'العملةُ مسجَّلةٌ سلفًا' : 'تعذّر التسجيل') . ' ❌', 'GOV-FAIL-409', '');
+        ems_gov_flash_redirect('currencies_fin.php', ($dup ? 'العملة مسجلة سلفا' : 'تعذر التسجيل') . ' ❌', 'GOV-FAIL-409', '');
     }
     exit();
 }
@@ -116,11 +116,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_rate'])) {
 
     $known = ems_fx_currencies();
     $err = null;
-    if (!isset($known[$code]))                       { $err = 'اختر عملةً مسجَّلة'; }
-    elseif ($rateRaw === '')                         { $err = 'السعرُ إلزامي'; }
-    elseif ($rate === null)                          { $err = 'السعرُ رقمٌ — يُقبل الكسرُ العشري (مثال 0.00166667)'; }
-    elseif ($rate <= 0)                              { $err = 'السعرُ رقمٌ موجب'; }
-    elseif ($from === '' || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $from)) { $err = 'تاريخُ السريان إلزامي'; }
+    if (!isset($known[$code]))                       { $err = 'اختر عملة مسجلة'; }
+    elseif ($rateRaw === '')                         { $err = 'السعر إلزامي'; }
+    elseif ($rate === null)                          { $err = 'السعر رقم — يقبل الكسر العشري (مثال 0.00166667)'; }
+    elseif ($rate <= 0)                              { $err = 'السعر رقم موجب'; }
+    elseif ($from === '' || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $from)) { $err = 'تاريخ السريان إلزامي'; }
     if ($err !== null) { ems_gov_flash_redirect('currencies_fin.php', "{$err} ❌", 'GOV-FAIL-409', ''); exit(); }
 
     try {
@@ -134,15 +134,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_rate'])) {
         ));
         $co = $is_super_admin ? $company_id : $company_id;
         $done = fx_revalue_pending($conn, $co, $code);
-        $msg = 'سُجّل السعر ✅';
+        $msg = 'سجل السعر ✅';
         if ($done['events'] > 0 || $done['dues'] > 0) {
-            $msg .= ' — وقُيّم ' . intval($done['events']) . ' حدثًا و' . intval($done['dues']) . ' ذمّة';
+            $msg .= ' — وقيم ' . intval($done['events']) . ' حدثا و' . intval($done['dues']) . ' ذمة';
         }
         ems_gov_flash_redirect('currencies_fin.php', "{$msg}", 'GOV-INFO-200', '');
     } catch (\Throwable $t) {
         error_log('fx rate add: ' . $t->getMessage());
         $dup = (strpos($t->getMessage(), 'Duplicate') !== false);
-        ems_gov_flash_redirect('currencies_fin.php', ($dup ? 'لهذه العملة سعرٌ بهذا التاريخ سلفًا' : 'تعذّر التسجيل') . ' ❌', 'GOV-FAIL-409', '');
+        ems_gov_flash_redirect('currencies_fin.php', ($dup ? 'لهذه العملة سعر بهذا التاريخ سلفا' : 'تعذر التسجيل') . ' ❌', 'GOV-FAIL-409', '');
     }
     exit();
 }
@@ -212,7 +212,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا عملاتٍ مسجَّلةً بعدَ عملةِ الأساس', 'سجّلْ عملةً بنموذجِ «عملةٌ جديدة» ثم أدخلْ سعرَ صرفها بتاريخِ سريانه');
+    echo ems_states_bundle('لا عملات مسجلة بعد عملة الأساس', 'سجل عملة بنموذج «عملة جديدة» ثم أدخل سعر صرفها بتاريخ سريانه');
     ?>
 
     <?php fin_msg_banner(); ?>
@@ -220,25 +220,25 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-body">
         <p class="fin-cur-lead">
             <i class="fas fa-circle-info"></i>
-            سجّلْ عملاتِ التعامل وأسعارَ صرفها بتواريخها — تدخلها كلما تغيّر السعر.
-            كلُّ مبلغٍ في النظام يُقاس بـ<strong>عملة الأساس</strong>
-            (<strong><?php echo htmlspecialchars((string) $baseCode); ?></strong>، معلَنةٌ في بيانات الشركة)
+            سجل عملات التعامل وأسعار صرفها بتواريخها — تدخلها كلما تغير السعر.
+            كل مبلغ في النظام يقاس ب<strong>عملة الأساس</strong>
+            (<strong><?php echo htmlspecialchars((string) $baseCode); ?></strong>، معلنة في بيانات الشركة)
             بالمعادلة <code>المعادل = المبلغ × السعر</code> بسعر <strong>يوم الواقعة</strong> لا سعر اليوم.
-            وما لا سعرَ لتاريخه يبقى <strong>بلا معادل</strong> ولا يُحسب برقمٍ مفترَض —
-            وإدخالُ السعر يُقيّمه فورًا.
+            وما لا سعر لتاريخه يبقى <strong>بلا معادل</strong> ولا يحسب برقم مفترض —
+            وإدخال السعر يقيمه فورا.
         </p>
         <div class="fin-cur-chips">
             <span class="badge badge-success fin-cur-chip">
-                <?php echo count($currencies); ?> عملة مسجَّلة
+                <?php echo count($currencies); ?> عملة مسجلة
             </span>
             <?php if ($pendingTotal > 0): ?>
             <span class="badge badge-warning fin-cur-chip">
                 <i class="fas fa-hourglass-half"></i>
-                <?php echo $pendingTotal; ?> صفًّا بانتظار سعرِ صرفٍ لتاريخه
+                <?php echo $pendingTotal; ?> صفا بانتظار سعر صرف لتاريخه
             </span>
             <?php else: ?>
             <span class="badge badge-success fin-cur-chip">
-                <i class="fas fa-check"></i> لا صفَّ ينتظر سعرًا
+                <i class="fas fa-check"></i> لا صف ينتظر سعرا
             </span>
             <?php endif; ?>
         </div>
@@ -246,7 +246,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <?php if ($can_edit): ?>
     <div class="card"><div class="card-body">
-        <h5 class="fin-cur-h5"><i class="fas fa-plus"></i> سعرُ صرفٍ جديد</h5>
+        <h5 class="fin-cur-h5"><i class="fas fa-plus"></i> سعر صرف جديد</h5>
         <form action="" method="post" class="allforms allforms-visible fin-cur-form">
         <?php echo csrf_field(); ?>
             <input type="hidden" name="add_rate" value="1">
@@ -273,7 +273,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </div>
                 <div class="form-group">
                     <label>يسري من *</label>
-                    <input type="date" name="effective_from" required aria-label="تاريخُ بدءِ سريانِ السعر" value="<?php echo date('Y-m-d'); ?>">
+                    <input type="date" name="effective_from" required aria-label="تاريخ بدء سريان السعر" value="<?php echo date('Y-m-d'); ?>">
                 </div>
                 <div class="form-group">
                     <label for="emsf_230_40a3b">المصدر</label>
@@ -305,14 +305,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <th class="ems-fn-th" data-fn="1">نوع السعر</th>
                     <th class="ems-fn-th" data-fn="1">المستند المرجعي</th>
                     <th class="ems-fn-th" data-fn="1">اعتمده</th>
-                    <th class="ems-fn-th" data-fn="1">سارٍ من</th>
-                    <th class="ems-fn-th" data-fn="1">سارٍ إلى</th>
+                    <th class="ems-fn-th" data-fn="1">سار من</th>
+                    <th class="ems-fn-th" data-fn="1">سار إلى</th>
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                     <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                     <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
                     <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                     <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                     <th class="ems-gov-th" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
@@ -333,7 +333,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <td><code><?php echo htmlspecialchars((string) $code); ?></code></td>
                     <td>
                         <?php if ($isBase): ?>
-                            <span class="badge badge-primary">عملةُ الأساس</span>
+                            <span class="badge badge-primary">عملة الأساس</span>
                         <?php elseif (empty($c['active'])): ?>
                             <span class="badge badge-secondary">موقوفة</span>
                         <?php else: ?>
@@ -342,18 +342,18 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </td>
                     <td>
                         <?php if ($isBase): ?>
-                            <span class="fin-cur-muted">1 (نفسُها)</span>
+                            <span class="fin-cur-muted">1 (نفسها)</span>
                         <?php elseif ($current !== null): ?>
                             <strong><?php echo htmlspecialchars(rtrim(rtrim((string) $current['rate_to_base'], '0'), '.')); ?></strong>
                         <?php else: ?>
-                            <span class="badge badge-warning">لا سعرَ بعد</span>
+                            <span class="badge badge-warning">لا سعر بعد</span>
                         <?php endif; ?>
                     </td>
                     <td><?php echo $current !== null ? htmlspecialchars((string) $current['effective_from']) : '—'; ?></td>
-                    <td><?php echo count($list); ?> سعرًا</td>
+                    <td><?php echo count($list); ?> سعرا</td>
                     <td>
                         <?php if ($waitE + $waitD > 0): ?>
-                            <span class="badge badge-warning"><?php echo $waitE; ?> حدثًا · <?php echo $waitD; ?> ذمّة</span>
+                            <span class="badge badge-warning"><?php echo $waitE; ?> حدثا · <?php echo $waitD; ?> ذمة</span>
                         <?php else: ?>
                             <span class="fin-cur-ok">—</span>
                         <?php endif; ?>
@@ -367,9 +367,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <?php if ($can_edit): ?>
     <div class="card"><div class="card-body">
-        <h5 class="fin-cur-h5"><i class="fas fa-plus"></i> عملةٌ جديدة</h5>
+        <h5 class="fin-cur-h5"><i class="fas fa-plus"></i> عملة جديدة</h5>
         <p class="fin-cur-hint">
-            عملةُ الأساس تُعلَن في بيانات الشركة ولا تُختار هنا — وما يُسجَّل هنا يُقاس بها.
+            عملة الأساس تعلن في بيانات الشركة ولا تختار هنا — وما يسجل هنا يقاس بها.
         </p>
         <form action="" method="post" class="allforms allforms-visible fin-cur-form">
         <?php echo csrf_field(); ?>

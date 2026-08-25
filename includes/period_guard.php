@@ -46,8 +46,8 @@ if (!function_exists('ems_period_check')) {
             && in_array((string) $row['state'], array('soft_closed', 'closed', 'locked'), true)) {
             $out['ok'] = false;
             $out['code'] = 423;
-            $out['reason'] = '423 فترةٌ ماليةٌ مقفلة: ' . $d . ' يقع في فترةٍ حالتُها «'
-                . $row['state'] . '» لا تقبل القيد — تُفتح استثنائيًّا من شاشة إقفال الفترات بقرارٍ موثَّق';
+            $out['reason'] = '423 فترة مالية مقفلة: ' . $d . ' يقع في فترة حالتها «'
+                . $row['state'] . '» لا تقبل القيد — تفتح استثنائيا من شاشة إقفال الفترات بقرار موثق';
         }
         return $out;
     }
@@ -77,7 +77,7 @@ if (!function_exists('ems_period_close_blockers')) {
               AND state = 'draft' AND posting_date BETWEEN '{$s}' AND '{$e}'");
         $n = $r ? intval($r->fetch_assoc()['c']) : 0;
         if ($n > 0) {
-            $blockers[] = array('label' => 'قيودٌ غيرُ مرحَّلة', 'count' => $n,
+            $blockers[] = array('label' => 'قيود غير مرحلة', 'count' => $n,
                                 'link' => 'journal_form_fin.php');
         }
 
@@ -88,7 +88,7 @@ if (!function_exists('ems_period_close_blockers')) {
               AND DATE(COALESCE(occurred_at, created_at)) BETWEEN '{$s}' AND '{$e}'");
         $n = $r ? intval($r->fetch_assoc()['c']) : 0;
         if ($n > 0) {
-            $blockers[] = array('label' => 'أحداثٌ في وسط دورتها (معتمدة/مدقَّقة بلا ترحيل)', 'count' => $n,
+            $blockers[] = array('label' => 'أحداث في وسط دورتها (معتمدة/مدققة بلا ترحيل)', 'count' => $n,
                                 'link' => 'events_list_fin.php');
         }
 
@@ -105,7 +105,7 @@ if (!function_exists('ems_period_close_blockers')) {
                   AND DATE(COALESCE(ev.occurred_at, ev.created_at)) BETWEEN '{$s}' AND '{$e}'");
             $n = $r ? intval($r->fetch_assoc()['c']) : 0;
             if ($n > 0) {
-                $blockers[] = array('label' => 'أحداثٌ بدرجة أثرٍ مبدئيةٍ لم تُرقَّ (AC-E01-05)', 'count' => $n,
+                $blockers[] = array('label' => 'أحداث بدرجة أثر مبدئية لم ترق (AC-E01-05)', 'count' => $n,
                                     'link' => 'events_list_fin.php');
             }
         }
@@ -144,12 +144,12 @@ if (!function_exists('ems_period_close_blockers')) {
             if ($q === false) {
                 /* الفشلُ يُعلَن حاجبًا — فلا يُقفَل دورٌ ماليٌّ بحارسٍ أعمى */
                 $blockers[] = array(
-                    'label' => 'تعذّر فحصُ فروقِ المطابقةِ البنكية — يُعالَج قبل الإقفال',
+                    'label' => 'تعذر فحص فروق المطابقة البنكية — يعالج قبل الإقفال',
                     'count' => -1, 'link' => 'bank_recon_fin.php');
             } else {
                 $n = intval($q->fetch_assoc()['c']);
                 if ($n > 0) {
-                    $blockers[] = array('label' => 'فروقُ مطابقةٍ بنكيةٍ مفتوحة', 'count' => $n,
+                    $blockers[] = array('label' => 'فروق مطابقة بنكية مفتوحة', 'count' => $n,
                                         'link' => 'bank_recon_fin.php');
                 }
             }

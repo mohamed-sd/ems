@@ -54,7 +54,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     $header_context = array('المقام' => 'السجل المركزي (نطاقك)', 'الفترة' => 'لحظي ' . $today);
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا مخاطرَ مفتوحةً ولا تصعيداتٍ في نطاقِك', 'افرزْ صندوقَ الإشاراتِ لتحويلِ ما يستحقُّ إلى خطرٍ مسجَّل');
+    echo ems_states_bundle('لا مخاطر مفتوحة ولا تصعيدات في نطاقك', 'افرز صندوق الإشارات لتحويل ما يستحق إلى خطر مسجل');
     ems_screen_about('لوحة الرئيس ومدير المخاطر: المحفظة بمستوياتها والتصعيدات المفتوحة — الخطر الحرج لا يختفي (RK-08).',
         array('التصعيد آلي بالمصفوفة — ولا يملك أحد إخفاءه ولا مدير المخاطر نفسه'));
 
@@ -94,7 +94,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <td><?php echo $t['ru_code']; ?></td>
                     <td><?php echo htmlspecialchars((string) $t['owner_unit'] ?: '—'); ?></td>
                     <td><span class="badge badge-<?php echo in_array($t['current_level'], array('حرج', 'محظور'), true) ? 'danger' : 'secondary'; ?>">
-                        <?php echo $t['current_level'] !== null && $t['current_level'] !== '' ? $t['current_level'] : 'لم يقيَّم'; ?></span></td>
+                        <?php echo $t['current_level'] !== null && $t['current_level'] !== '' ? $t['current_level'] : 'لم يقيم'; ?></span></td>
                     <td><?php echo $t['state']; ?></td>
                     <td><a href="risk_card.php?id=<?php echo (int) $t['id']; ?>" class="btn btn-sm btn-secondary">فتح</a></td></tr>
                 <?php endforeach; ?></tbody>
@@ -102,7 +102,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
             <?php if (empty($top)): ?><div id="rbEmpty"></div>
             <script>document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById('rbEmpty').appendChild(EmsUI.emptyState({
-                    reason: 'لا مخاطر مفتوحة في نطاقك — الإشارات تُفرز أولًا', createHref: 'risk_signals.php', createLabel: 'صندوق الإشارات' }));
+                    reason: 'لا مخاطر مفتوحة في نطاقك — الإشارات تفرز أولا', createHref: 'risk_signals.php', createLabel: 'صندوق الإشارات' }));
             });</script><?php endif; ?>
         </div>
         <div class="ems-card ems-col-4" id="escList">

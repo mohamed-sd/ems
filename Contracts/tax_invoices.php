@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && strval($_POST['ti_action'] ?? '') =
     if (!$can_edit) { $redirect('لا توجد صلاحية لهذا الإجراء ❌'); }
     $r = TIS::cancel($conn, $gate, $company_id, intval($_POST['invoice_id'] ?? 0),
         strval($_POST['cancel_reason'] ?? ''), $uid);
-    $redirect($r['ok'] ? 'أُلغيت الفاتورةُ ضريبيًّا بسببها ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'));
+    $redirect($r['ok'] ? 'ألغيت الفاتورة ضريبيا بسببها ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'));
 }
 
 $invoices = TIS::listAll($gate, 200);
@@ -75,7 +75,7 @@ require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
-require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('contract', 'المستخلصاتُ والفواتير');
+require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('contract', 'المستخلصات والفواتير');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main ems-unified-page-shell ems-doc-cycle">
@@ -89,17 +89,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>';
     }
     // UXW-01 ⑫: شاشةُ دورةٍ اعتماديةٍ تنطق بحالتِها الحية (صادرة · ملغاة) — فتُعلن خطوتَها التالية
-    echo ems_next_step('الفاتورةُ الصادرةُ تُحصَّل في ذمّةِ العميل — وتصحيحُها بإشعارٍ دائن/مدينٍ لا بتعديلها');
+    echo ems_next_step('الفاتورة الصادرة تحصل في ذمة العميل — وتصحيحها بإشعار دائن/مدين لا بتعديلها');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا فواتيرَ ضريبيةً صادرةً بعدُ', 'الفاتورةُ تصدر آليًّا عند إجازةِ مستخلصٍ من شاشةِ المستخلصات');
+    echo ems_states_bundle('لا فواتير ضريبية صادرة بعد', 'الفاتورة تصدر آليا عند إجازة مستخلص من شاشة المستخلصات');
     ?>
 
     <div class="card"><div class="card-body">
         <p class="ti-note">
-            الفاتورةُ تُصدَر <strong>من المستخلص المعتمد وحدَه</strong> برقمٍ
-            <strong>تسلسليٍّ نظاميٍّ لكل (شركة × سنة)</strong>، و<strong>لا تعديلَ بعد الإصدار</strong>:
-            التصحيحُ <strong>بإشعارٍ دائن/مدين</strong>، والإلغاءُ الضريبيُّ يلزمه سببٌ مكتوب
-            و<strong>رقمُ الملغاة لا يُعاد استعمالُه</strong>.
+            الفاتورة تصدر <strong>من المستخلص المعتمد وحده</strong> برقم
+            <strong>تسلسلي نظامي لكل (شركة × سنة)</strong>، و<strong>لا تعديل بعد الإصدار</strong>:
+            التصحيح <strong>بإشعار دائن/مدين</strong>، والإلغاء الضريبي يلزمه سبب مكتوب
+            و<strong>رقم الملغاة لا يعاد استعماله</strong>.
         </p>
     </div></div>
 
@@ -127,16 +127,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <th class="ems-fn-th" data-fn="1">تاريخ التقديم</th>
                 <th class="ems-fn-th none" data-fn="1">حالة السداد</th>
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                 <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                 <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                 <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-                <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+                <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
                 <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-                <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+                <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
                 <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
-                <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
+                <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
                 <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                 <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                 <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
@@ -184,9 +184,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <table class="alltables display nowrap ti-w100" data-no-dt="1">
             <tbody>
             <tr><th>البائع</th><td><?php echo htmlspecialchars((string)($fields['seller_name'] ?? '—')); ?>
-                — رقمٌ ضريبيٌّ: <?php echo htmlspecialchars((string)($fields['seller_tax_no'] ?? '—')); ?></td></tr>
+                — رقم ضريبي: <?php echo htmlspecialchars((string)($fields['seller_tax_no'] ?? '—')); ?></td></tr>
             <tr><th>المشتري</th><td><?php echo htmlspecialchars((string)($fields['buyer_name'] ?? '—')); ?>
-                — رقمٌ ضريبيٌّ: <?php echo htmlspecialchars((string)($fields['buyer_tax_no'] ?? '—')); ?>
+                — رقم ضريبي: <?php echo htmlspecialchars((string)($fields['buyer_tax_no'] ?? '—')); ?>
                 <?php echo htmlspecialchars((string)($fields['buyer_address'] ?? '')); ?></td></tr>
             <tr><th>المستخلص والفترة</th><td><?php echo htmlspecialchars((string)($fields['claim_no'] ?? '')); ?>
                 · <?php echo htmlspecialchars((string)($fields['period_from'] ?? '')); ?>
@@ -206,8 +206,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
 
         <?php if ($invLines): ?>
-        <h6 class="ti-mt14"><i class="fa fa-list-ol"></i> أسطرُ المستخلص ببند بيعها
-            <small class="ti-muted">(تُقرأ من مصدرها الحي — والفاتورةُ لا تخزّن أسطرًا)</small></h6>
+        <h6 class="ti-mt14"><i class="fa fa-list-ol"></i> أسطر المستخلص ببند بيعها
+            <small class="ti-muted">(تقرأ من مصدرها الحي — والفاتورة لا تخزن أسطرا)</small></h6>
         <div class="table-container">
         <table class="alltables display nowrap ti-w100" data-no-dt="1">
             <thead><tr><th>بند البيع</th><th>تاريخ الاستحقاق</th><th>المعدة</th><th>وحدة القياس</th>
@@ -221,7 +221,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <small>(<?php echo htmlspecialchars((string)($ln['sale_line_model'] ?? '')); ?>
                                 · <?php echo htmlspecialchars((string)($ln['sale_tax_status'] ?? '')); ?>)</small>
                         <?php else: ?>
-                            <span class="badge badge-warning">⚠ غيرُ موصولٍ ببند بيع</span>
+                            <span class="badge badge-warning">⚠ غير موصول ببند بيع</span>
                         <?php endif; ?></td>
                     <td><?php echo htmlspecialchars((string)$ln['work_date']); ?></td>
                     <td><?php echo htmlspecialchars((string)$ln['equipment_ref']); ?></td>
@@ -250,9 +250,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="form-group"><label for="emsf_122_ab841">سبب الإلغاء الضريبي <span class="ti-req">*</span></label>
                     <input type="text" name="cancel_reason" maxlength="255" required id="emsf_122_ab841"></div>
             </div>
-            <p class="ti-warn">الإلغاءُ لا يمحو صفًّا و<strong>لا يُعيد استعمال رقمه</strong> —
-                والتصحيحُ العاديُّ <strong>بإشعار</strong> لا بإلغاء.</p>
-            <div><button type="submit" class="btn-primary"><i class="fa fa-ban"></i> ألغِ ضريبيًّا</button></div>
+            <p class="ti-warn">الإلغاء لا يمحو صفا و<strong>لا يعيد استعمال رقمه</strong> —
+                والتصحيح العادي <strong>بإشعار</strong> لا بإلغاء.</p>
+            <div><button type="submit" class="btn-primary"><i class="fa fa-ban"></i> ألغ ضريبيا</button></div>
         </form>
         <?php endif; ?>
     </div></div>

@@ -15,7 +15,7 @@ if (!function_exists('m00_norm')) {
         $s = str_replace(array('أ', 'إ', 'آ'), 'ا', $s);
         $s = str_replace('ة', 'ه', $s);
         $s = str_replace('ى', 'ي', $s);
-        return preg_replace('/[ًٌٍَُِّْ]/u', '', $s);
+        return preg_replace('/[]/u', '', $s);
     }
 }
 
@@ -40,7 +40,7 @@ if (!function_exists('m00_review_block')) {
             $blocks = mb_strpos((string) ($p['يحجب الاعتماد؟'] ?? ''), 'نعم') !== false
                    || mb_strpos((string) ($p['يحجب الاعتماد؟'] ?? ''), 'يحجب') !== false;
             $open = trim((string) ($p['تاريخ الإقفال'] ?? '')) === ''
-                 && !in_array(trim((string) ($p['الحالة'] ?? '')), array('مقفل', 'مقفلة', 'مغلقة', 'معالَجة'), true);
+                 && !in_array(trim((string) ($p['الحالة'] ?? '')), array('مقفل', 'مقفلة', 'مغلقة', 'معالجة'), true);
             if ($sameContract && $blocks && $open) { $block = (string) ($p['رقم الملاحظة'] ?? '؟'); break; }
         }
         return $block;

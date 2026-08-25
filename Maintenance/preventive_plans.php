@@ -179,9 +179,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'postp
     $pid = intval($_POST['plan_id'] ?? 0);
     $days = max(1, min(90, intval($_POST['days'] ?? 7)));
     $reason = trim((string)($_POST['reason'] ?? ''));
-    if ($reason === '') { ems_gov_flash_redirect('preventive_plans.php', 'التأجيلُ بسببٍ مكتوبٍ — لا تأجيلَ صامتًا ❌', 'GOV-FAIL-409', ''); exit(); }
+    if ($reason === '') { ems_gov_flash_redirect('preventive_plans.php', 'التأجيل بسبب مكتوب — لا تأجيل صامتا ❌', 'GOV-FAIL-409', ''); exit(); }
     $plan = mnt_fetch_plan($conn, $pid, $company_id, $is_super_admin);
-    if (!$plan || $plan['next_due_date'] === null) { ems_gov_flash_redirect('preventive_plans.php', 'خطةٌ غير صالحة للتأجيل ❌', 'GOV-FAIL-409', ''); exit(); }
+    if (!$plan || $plan['next_due_date'] === null) { ems_gov_flash_redirect('preventive_plans.php', 'خطة غير صالحة للتأجيل ❌', 'GOV-FAIL-409', ''); exit(); }
     $newDue = date('Y-m-d', strtotime($plan['next_due_date'] . ' +' . $days . ' day'));
     ems_tenant_db()->update('mnt_plan', array('next_due_date' => $newDue), array('id' => $pid));
     require_once '../includes/audit_trail.php';
@@ -189,7 +189,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'postp
         array('next_due_date' => (string)$plan['next_due_date']),
         array('next_due_date' => $newDue, 'days' => $days, 'reason' => $reason),
         array('company_id' => intval($company_id), 'user_id' => intval($current_user_id)));
-    ems_gov_flash_redirect('preventive_plans.php', 'أُجّلت ' . $days . ' يومًا بسببها الموثَّق ✅', 'GOV-OK-200', ''); exit();
+    ems_gov_flash_redirect('preventive_plans.php', 'أجلت ' . $days . ' يوما بسببها الموثق ✅', 'GOV-OK-200', ''); exit();
 }
 
 // ── توليد أمر صيانة وقائي من خطة (يدوي) ──
@@ -208,14 +208,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'gener
          . $conn->real_escape_string($cycle_key) . "' LIMIT 1");
     if ($dup && ($dx = $dup->fetch_assoc())) {
         ems_gov_redirect("Location: orders.php?id=" . intval($dx['id'])
-             . "&msg=" . rawurlencode('هذه الدورةُ ولّدت أمرَها سلفًا #' . $dx['id'] . ' — لا توليدَ مرتين (M-36) ❌'));
+             . "&msg=" . rawurlencode('هذه الدورة ولدت أمرها سلفا #' . $dx['id'] . ' — لا توليد مرتين (M-36) ❌'));
         exit();
     }
     $new_id = ems_tenant_db()->insert('mnt_order', array(
         'code' => $code, 'plan_id' => $pid, 'equipment_id' => $eq, 'pm_cycle_key' => $cycle_key,
         'source' => 'وقائي', 'maint_type' => 'صيانة وقائية', 'state' => 'بلاغ', 'created_by' => $current_user_id));
     if (!$new_id) { // الفريدُ حكمٌ عند التزاحم — mysqli لا يرمي (گوتشا config)
-        ems_gov_flash_redirect('preventive_plans.php', 'رفض الفريدُ التوليدَ — الدورةُ مولَّدةٌ سلفًا (M-36) ❌', 'GOV-FAIL-409', '');
+        ems_gov_flash_redirect('preventive_plans.php', 'رفض الفريد التوليد — الدورة مولدة سلفا (M-36) ❌', 'GOV-FAIL-409', '');
         exit();
     }
     ems_gov_redirect("Location: orders.php?id=" . intval($new_id) . "&msg=تم+توليد+أمر+وقائي+من+الخطة+✅"); exit();
@@ -283,7 +283,7 @@ function mnt_opt($value, $label, $selected) {
     );
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا مهامَّ في هذه الخطةِ الوقائيةِ بعدُ', 'أضف أولَ مهمةٍ بزرِّ «إضافة مهمة» في لوحةِ مهامِّ الخطة');
+    echo ems_states_bundle('لا مهام في هذه الخطة الوقائية بعد', 'أضف أول مهمة بزر «إضافة مهمة» في لوحة مهام الخطة');
     ?>
     <form method="post" action="" class="allforms allforms-visible" id="planForm">
         <?= csrf_field() ?>
@@ -314,24 +314,24 @@ function mnt_opt($value, $label, $selected) {
                 <div class="form-group"><label for="emsf_335_3578a">الفاصل (ساعات أو أيام)</label><input type="number" name="interval_value" id="emsf_335_3578a" value="<?php echo htmlspecialchars((string) $plan['interval_value']); ?>"></div>
                 <div class="form-group"><label for="emsf_336_4795a">هامش السماح</label><input type="number" name="tolerance" id="emsf_336_4795a" value="<?php echo htmlspecialchars((string) $plan['tolerance']); ?>"></div>
                 <div class="form-group"><label for="emsf_337_1ddc7">آخر تنفيذ (تاريخ)</label><input type="date" name="last_done_date" id="emsf_337_1ddc7" value="<?php echo htmlspecialchars((string) $plan['last_done_date']); ?>"></div>
-                <div class="form-group"><label for="emsf_338_2a157">عدّاد آخر تنفيذ</label><input type="number" step="0.01" name="last_done_meter" id="emsf_338_2a157" value="<?php echo htmlspecialchars((string) $plan['last_done_meter']); ?>"></div>
+                <div class="form-group"><label for="emsf_338_2a157">عداد آخر تنفيذ</label><input type="number" step="0.01" name="last_done_meter" id="emsf_338_2a157" value="<?php echo htmlspecialchars((string) $plan['last_done_meter']); ?>"></div>
                 <div class="form-group"><label for="emsf_339_44363">الاستحقاق القادم (تاريخ)</label><input type="date" name="next_due_date" id="emsf_339_44363" value="<?php echo htmlspecialchars((string) $plan['next_due_date']); ?>"></div>
-                <div class="form-group"><label for="emsf_340_40caf">الاستحقاق القادم (عدّاد)</label><input type="number" step="0.01" name="next_due_meter" id="emsf_340_40caf" value="<?php echo htmlspecialchars((string) $plan['next_due_meter']); ?>"></div>
+                <div class="form-group"><label for="emsf_340_40caf">الاستحقاق القادم (عداد)</label><input type="number" step="0.01" name="next_due_meter" id="emsf_340_40caf" value="<?php echo htmlspecialchars((string) $plan['next_due_meter']); ?>"></div>
                 <div class="form-group"><label for="emsf_341_330e5">الحالة</label>
                     <select name="state" id="emsf_341_330e5"><?php foreach ($states as $s) echo mnt_opt($s, $s, $plan['state'] === $s); ?></select>
                 </div>
             </div></div>
             <div class="form-actions">
                 <button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ الخطة</button>
-                <button type="button" class="btn-secondary" id="collapsePlanForm"><i class="fas fa-chevron-up"></i> طيّ النموذج</button>
+                <button type="button" class="btn-secondary" id="collapsePlanForm"><i class="fas fa-chevron-up"></i> طي النموذج</button>
             </div>
         </div></div>
     </form>
 
     <div class="card"><div class="card-body">
         <div class="mnt-cost-summary">
-            <div class="mnt-cost-box"><span>عدّاد التشغيل الفعلي (تايم‌شيت)</span><strong><?php echo number_format((float) $current_meter, 1); ?></strong></div>
-            <div class="mnt-cost-box"><span>الاستحقاق القادم (عدّاد)</span><strong><?php echo $plan['next_due_meter'] !== null ? number_format((float) $plan['next_due_meter'], 1) : '—'; ?></strong></div>
+            <div class="mnt-cost-box"><span>عداد التشغيل الفعلي (تايم‌شيت)</span><strong><?php echo number_format((float) $current_meter, 1); ?></strong></div>
+            <div class="mnt-cost-box"><span>الاستحقاق القادم (عداد)</span><strong><?php echo $plan['next_due_meter'] !== null ? number_format((float) $plan['next_due_meter'], 1) : '—'; ?></strong></div>
             <div class="mnt-cost-box"><span>الاستحقاق القادم (تاريخ)</span><strong><?php echo htmlspecialchars((string) ($plan['next_due_date'] ?? '—')); ?></strong></div>
         </div>
     </div></div>
@@ -350,7 +350,7 @@ function mnt_opt($value, $label, $selected) {
                 <div class="mnt-line-grid">
                     <div class="form-group"><label for="emsf_342_a9a44">المهمة</label><input type="text" name="task_name" placeholder="مثال: تغيير زيت المحرك" id="emsf_342_a9a44"></div>
                     <div class="form-group"><label for="emsf_343_0ac85">نوع المهمة</label><select name="task_type" id="emsf_343_0ac85"><option value="">-- اختر --</option><?php foreach ($task_types as $id => $nm) echo mnt_opt($id, $nm, false); ?></select></div>
-                    <div class="form-group"><label for="emsf_344_e3ddd">المكوّن</label><input type="text" name="component" placeholder="مثال: المحرك" id="emsf_344_e3ddd"></div>
+                    <div class="form-group"><label for="emsf_344_e3ddd">المكون</label><input type="text" name="component" placeholder="مثال: المحرك" id="emsf_344_e3ddd"></div>
                     <div class="form-group"><label for="emsf_345_6d6e3">ساعات تقديرية</label><input type="number" step="0.01" name="est_hours" value="0" id="emsf_345_6d6e3"></div>
                 </div>
                 <div class="mnt-line-actions">
@@ -360,7 +360,7 @@ function mnt_opt($value, $label, $selected) {
             </form>
             <?php endif; ?>
             <div class="table-container"><table class="alltables no-datatable mnt-line-table mnt-pl-w100" id="taskTable" data-no-dt="hard">
-                <thead><tr><th>المهمة</th><th>نوع المعدة</th><th>المكوّن</th><th>ساعات تقديرية</th><?php if ($can_edit) echo '<th></th>'; ?></tr></thead>
+                <thead><tr><th>المهمة</th><th>نوع المعدة</th><th>المكون</th><th>ساعات تقديرية</th><?php if ($can_edit) echo '<th></th>'; ?></tr></thead>
                 <tbody>
                     <?php foreach ($tasks as $t): ?>
                     <tr data-line="<?php echo intval($t['id']); ?>">
@@ -387,7 +387,7 @@ function mnt_opt($value, $label, $selected) {
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا خططَ صيانةٍ وقائيةٍ مسجَّلةً بعدُ', 'أنشئ أولَ خطةٍ بزرِّ «خطة جديدة» في رأسِ الشاشة، وحدِّد أساسَ تكرارِها ساعاتٍ أو زمنًا');
+    echo ems_states_bundle('لا خطط صيانة وقائية مسجلة بعد', 'أنشئ أول خطة بزر «خطة جديدة» في رأس الشاشة، وحدد أساس تكرارها ساعات أو زمنا');
 ?>
     <?php if ($can_add): ?>
     <!-- فورم إنشاء خطة (نمط العملاء/المشاريع: يُفتح بزر «خطة جديدة»، ولا يُحفظ شيء إلا عند الإرسال) -->
@@ -494,16 +494,16 @@ function mnt_opt($value, $label, $selected) {
                     <td><?php echo htmlspecialchars((string) $r['name']); ?></td>
                     <td><?php echo htmlspecialchars((string) ($r['equipment_name'] ?? '-')); ?></td>
                     <td><?php echo htmlspecialchars((string) $r['trigger_basis']); ?></td>
-                    <td><?php echo $r['trigger_basis'] === 'ساعات' ? ('عدّاد: ' . htmlspecialchars((string) $r['next_due_meter'])) : ('تاريخ: ' . htmlspecialchars((string) $r['next_due_date'])); ?>
+                    <td><?php echo $r['trigger_basis'] === 'ساعات' ? ('عداد: ' . htmlspecialchars((string) $r['next_due_meter'])) : ('تاريخ: ' . htmlspecialchars((string) $r['next_due_date'])); ?>
                         <?php if ($can_edit && $r['trigger_basis'] === 'زمن'): ?>
                         <form method="post" class="mnt-pl-postpone"
-                              onsubmit="return this.reason.value.trim() !== '' || (alert('السببُ إلزامي'), false)">
+                              onsubmit="return this.reason.value.trim() !== '' || (alert('السبب إلزامي'), false)">
         <?= csrf_field() ?>
                             <input type="hidden" name="action" value="postpone_plan">
                             <input type="hidden" name="plan_id" value="<?php echo intval($r['id']); ?>">
                             <input type="number" name="days" min="1" max="90" value="7" class="mnt-pl-w56" title="أيام التأجيل" aria-label="أيام التأجيل">
-                            <input type="text" name="reason" placeholder="سببُ التأجيل *" class="mnt-pl-w130" required aria-label="سببُ التأجيل">
-                            <button type="submit" class="btn-primary" title="تأجيلٌ بسبب (E-16)"><i class="fas fa-clock"></i></button>
+                            <input type="text" name="reason" placeholder="سبب التأجيل *" class="mnt-pl-w130" required aria-label="سبب التأجيل">
+                            <button type="submit" class="btn-primary" title="تأجيل بسبب (E-16)"><i class="fas fa-clock"></i></button>
                         </form>
                         <?php endif; ?></td>
                 </tr>
@@ -520,21 +520,21 @@ function mnt_opt($value, $label, $selected) {
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">نوع الخدمة</th>
               <th class="ems-fn-th" data-fn="1">دورية الساعات</th>
-              <th class="ems-fn-th" data-fn="1">العدّاد عند آخر خدمة</th>
-              <th class="ems-fn-th" data-fn="1">العدّاد الحالي</th>
+              <th class="ems-fn-th" data-fn="1">العداد عند آخر خدمة</th>
+              <th class="ems-fn-th" data-fn="1">العداد الحالي</th>
               <th class="ems-fn-th" data-fn="1">الساعات المتبقية</th>
               <th class="ems-fn-th" data-fn="1">القطع المطلوبة</th>
               <th class="ems-fn-th" data-fn="1">الكمية</th>
               <th class="ems-fn-th" data-fn="1">حالة توفر القطع</th>
-              <th class="ems-fn-th" data-fn="1">أمر العمل المولَّد</th>
+              <th class="ems-fn-th" data-fn="1">أمر العمل المولد</th>
               <th class="ems-fn-th" data-fn="1">المسؤول</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-              <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
               <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
               <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
@@ -628,7 +628,7 @@ function mnt_opt($value, $label, $selected) {
             e.preventDefault();
             var fd = new FormData(this); fd.append('ajax','1');
             postLine(new URLSearchParams(fd)).then(function(res){
-                if(!res.success){ alert(res.message || 'تعذّر إضافة المهمة'); return; }
+                if(!res.success){ alert(res.message || 'تعذر إضافة المهمة'); return; }
                 var t = res.task;
                 var row = '<tr data-line="'+t.id+'">'
                     + '<td>'+esc(t.name)+'</td><td>'+esc(t.type_name||'—')+'</td><td>'+esc(t.component||'')+'</td>'
@@ -648,7 +648,7 @@ function mnt_opt($value, $label, $selected) {
         var pid = ($('#taskForm input[name=plan_id]').val() || $('input[name=id]').val());
         var body = new URLSearchParams({ ajax:'1', action:'del_task', plan_id: pid, task_id: taskId });
         postLine(body).then(function(res){
-            if(!res.success){ alert(res.message || 'تعذّر الحذف'); return; }
+            if(!res.success){ alert(res.message || 'تعذر الحذف'); return; }
             var $tbody = $btn.closest('tbody'); $btn.closest('tr').remove();
             $('#taskCount').text(res.count);
             if ($tbody.find('tr').length === 0) { document.getElementById('taskEmpty').classList.remove('is-hidden'); }

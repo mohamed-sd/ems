@@ -126,8 +126,8 @@ if (!function_exists('fin_project_scope')) {
         if (!in_array($r, $projectRoles, true)) {
             /* دورٌ غيرُ مصنَّفٍ في أيِّ قائمة — يُمنَع حتى يُصنَّف، ويُسجَّل
                ليُعلم أنه يحتاج تصنيفًا لا ليبقى صامتًا. */
-            error_log('[GAP-22] fin_project_scope: دورٌ غيرُ مصنَّفٍ للنطاق role=' . $r
-                    . ' — أُرجع صفرُ صفٍّ حتى يُصنَّف في FIN_SCOPE_*_ROLES');
+            error_log('[GAP-22] fin_project_scope: دور غير مصنف للنطاق role=' . $r
+                    . ' — أرجع صفر صف حتى يصنف في FIN_SCOPE_*_ROLES');
             return -1;
         }
         try {
@@ -220,7 +220,7 @@ if (!function_exists('fin_level_owner_label')) {
     function fin_level_owner_label($level)
     {
         $m = array('dept_accountant' => 'محاسب الإدارة', 'dept_manager' => 'مدير الإدارة',
-                   'finance_reviewer' => 'المراجع/المدقّق', 'finance_manager' => 'المدير المالي',
+                   'finance_reviewer' => 'المراجع/المدقق', 'finance_manager' => 'المدير المالي',
                    'treasurer' => 'أمين الخزينة');
         return isset($m[$level]) ? $m[$level] : $level;
     }
@@ -445,8 +445,8 @@ if (!function_exists('fin_event_states')) {
             'fin_review'    => 'مراجعة مالية',
             'audited'       => 'تدقيق',
             'approved'      => 'معتمد مالياً',
-            'posted'        => 'مقيَّد',
-            'settled'       => 'مصروف/محصّل',
+            'posted'        => 'مقيد',
+            'settled'       => 'مصروف/محصل',
             'rejected'      => 'مرفوض',
             'closed'        => 'مقفل',
         );
@@ -497,7 +497,7 @@ if (!function_exists('fin_level_labels')) {
     function fin_level_labels()
     {
         return array('dept_accountant' => 'محاسب الإدارة', 'dept_manager' => 'مدير الإدارة',
-                     'finance_reviewer' => 'المراجع المالي', 'auditor' => 'المدقّق',
+                     'finance_reviewer' => 'المراجع المالي', 'auditor' => 'المدقق',
                      'finance_manager' => 'المدير المالي', 'executive' => 'التنفيذي', 'board' => 'المجلس');
     }
 }
@@ -811,7 +811,7 @@ if (!function_exists('fin_notifications_panel')) {
         echo '<div class="card"><div class="card-body" style="padding:10px 14px">';
         echo '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">';
         echo '<strong><i class="fas fa-bell"></i> تنبيهاتك (' . count($notifs) . ')</strong>';
-        echo '<a href="' . htmlspecialchars($self_url . $sep . 'notif_read=all') . '" class="badge badge-secondary" style="text-decoration:none">تعليم الكل مقروءًا</a></div>';
+        echo '<a href="' . htmlspecialchars($self_url . $sep . 'notif_read=all') . '" class="badge badge-secondary" style="text-decoration:none">تعليم الكل مقروءا</a></div>';
         foreach ($notifs as $nf) {
             echo '<div style="display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-top:1px dashed #e5e7eb">';
             echo '<span style="font-size:13px">🔔 ' . htmlspecialchars($nf['title'])
@@ -832,13 +832,13 @@ if (!function_exists('fin_work_models')) {
 if (!function_exists('fin_match_states')) {
     function fin_match_states()
     {
-        return array('pending' => 'بانتظار المصادقات', 'matched' => 'متطابق ✓', 'variance' => 'فرق — يُعالَج', 'approved' => 'معتمد (توأمان)');
+        return array('pending' => 'بانتظار المصادقات', 'matched' => 'متطابق ✓', 'variance' => 'فرق — يعالج', 'approved' => 'معتمد (توأمان)');
     }
 }
 if (!function_exists('fin_downtime_causes')) {
     function fin_downtime_causes()
     {
-        return array('breakdown' => 'عطل', 'standby' => 'انتظار', 'operator_shortage' => 'نقص مشغّلين',
+        return array('breakdown' => 'عطل', 'standby' => 'انتظار', 'operator_shortage' => 'نقص مشغلين',
                      'mobilization' => 'نقل وتحريك', 'client' => 'بسبب العميل');
     }
 }
@@ -868,7 +868,7 @@ if (!function_exists('fin_bank_account_options')) {
         foreach ($rows as &$r) {
             $r['label'] = $r['name'] . (($r['bank_name'] === null || $r['bank_name'] === '') ? '' : (' — ' . $r['bank_name']));
         } unset($r);
-        return fin_options_from_rows($rows, $selected, '— اختر حساباً بنكياً —');
+        return fin_options_from_rows($rows, $selected, '— اختر حسابا بنكيا —');
     }
 }
 
@@ -905,7 +905,7 @@ if (!function_exists('fin_facility_purposes')) {
 if (!function_exists('fin_facility_states')) {
     function fin_facility_states()
     {
-        return array('draft' => 'مسودة', 'approved' => 'معتمد', 'active' => 'نشط', 'settled' => 'مُسدَّد', 'closed' => 'مقفل');
+        return array('draft' => 'مسودة', 'approved' => 'معتمد', 'active' => 'نشط', 'settled' => 'مسدد', 'closed' => 'مقفل');
     }
 }
 
@@ -913,8 +913,8 @@ if (!function_exists('fin_facility_states')) {
 if (!function_exists('fin_period_states')) {
     function fin_period_states()
     {
-        return array('planned' => 'مخطّطة', 'open' => 'مفتوحة', 'soft_closed' => 'إقفال مرحلي',
-                     'closed' => 'مقفلة', 'locked' => 'مقفلة نهائياً', 'reopened' => 'مفتوحة استثناءً');
+        return array('planned' => 'مخططة', 'open' => 'مفتوحة', 'soft_closed' => 'إقفال مرحلي',
+                     'closed' => 'مقفلة', 'locked' => 'مقفلة نهائيا', 'reopened' => 'مفتوحة استثناء');
     }
 }
 if (!function_exists('fin_closing_steps')) {
@@ -948,7 +948,7 @@ if (!function_exists('fin_employee_options')) {
         // ملاحظة: جدول employees لا يحوي is_deleted (soft=false) — قراءةٌ معزولة بالشركة
         $rows = fin_gate($is_super)->select('employees', array('columns' => array('id', 'name'), 'orderBy' => 'name ASC'));
         foreach ($rows as &$r) { $r['label'] = $r['name']; } unset($r);
-        return fin_options_from_rows($rows, $selected, '— اختر موظفاً —');
+        return fin_options_from_rows($rows, $selected, '— اختر موظفا —');
     }
 }
 if (!function_exists('fin_due_types')) {
@@ -966,7 +966,7 @@ if (!function_exists('fin_due_types')) {
 if (!function_exists('fin_settlement_states')) {
     function fin_settlement_states()
     {
-        return array('pending' => 'معلّق', 'settled' => 'مُسوّى', 'paid' => 'مصروف');
+        return array('pending' => 'معلق', 'settled' => 'مسوى', 'paid' => 'مصروف');
     }
 }
 if (!function_exists('fin_payment_methods')) {
@@ -1039,7 +1039,7 @@ if (!function_exists('fin_budget_states')) {
     {
         // «معادة» أُضيفت 2026-07-27 مع دورة الرفع — الثلاثيةُ الموحّدة تقتضيها
         // (الدستور §4.3): إجازةٌ · إعادةٌ بسبب · وما بينهما انتظار.
-        return array('draft' => 'مسودة', 'submitted' => 'مقدَّمة', 'returned' => 'معادة',
+        return array('draft' => 'مسودة', 'submitted' => 'مقدمة', 'returned' => 'معادة',
                      'approved' => 'معتمدة', 'active' => 'نشطة', 'closed' => 'مقفلة');
     }
 }
@@ -1092,7 +1092,7 @@ if (!function_exists('fin_postable_account_options')) {
     {
         $rows = fin_gate($is_super)->select('fin_chart_of_accounts', array('columns' => array('id', 'code', 'name'), 'whereRaw' => 'is_postable=1', 'orderBy' => 'code ASC'));
         foreach ($rows as &$r) { $r['label'] = $r['code'] . ' — ' . $r['name']; } unset($r);
-        return fin_options_from_rows($rows, $selected, '— اختر حساباً —');
+        return fin_options_from_rows($rows, $selected, '— اختر حسابا —');
     }
 }
 if (!function_exists('fin_cost_center_options')) {
@@ -1241,14 +1241,14 @@ if (!function_exists('fin_queue_pricing')) {
             if ($id <= 0) {
                 // صفُّ سلسلةٍ بلا جسرِ دوامٍ — دَينٌ معلَنٌ لا صفٌّ مُسقَط
                 $out[0] = array('ready' => false,
-                    'reason' => 'بلا جسرِ سجلِّ دوام — شغّل tools/e02_bridge_backfill.php ثم أعد التحميل',
+                    'reason' => 'بلا جسر سجل دوام — شغل tools/e02_bridge_backfill.php ثم أعد التحميل',
                     'qty' => null, 'unit' => null, 'revenue' => null, 'due' => null);
                 continue;
             }
             try { $ctx = \App\Services\EffectFanout::resolveTimesheet($conn, $id); }
             catch (\Throwable $x) { $ctx = null; }
             if ($ctx === null) {
-                $out[$id] = array('ready' => false, 'reason' => 'تعذّرت قراءة صف الدوام',
+                $out[$id] = array('ready' => false, 'reason' => 'تعذرت قراءة صف الدوام',
                                   'qty' => null, 'unit' => null, 'revenue' => null, 'due' => null);
                 continue;
             }
@@ -1460,12 +1460,12 @@ if (!function_exists('fin_budget_transition')) {
     {
         $out = array('status' => 'failed', 'reason' => '');
         $budget_id = intval($budget_id);
-        if ($budget_id <= 0) { $out['reason'] = 'معرّفٌ غير صالح'; return $out; }
+        if ($budget_id <= 0) { $out['reason'] = 'معرف غير صالح'; return $out; }
 
         $gate = fin_gate($is_super);
         try { $b = $gate->selectOne('fin_budgets', array('where' => array('id' => $budget_id))); }
         catch (\Throwable $t) { error_log('budget transition fetch: ' . $t->getMessage()); return $out; }
-        if (!$b) { $out['reason'] = 'الموازنةُ غير موجودة'; return $out; }
+        if (!$b) { $out['reason'] = 'الموازنة غير موجودة'; return $out; }
 
         $state = strval($b['state']);
         $dept  = strval($b['dept_module']);
@@ -1474,48 +1474,48 @@ if (!function_exists('fin_budget_transition')) {
 
         if ($action === 'submit') {
             if (!fin_budget_can_submit($role, $dept, $is_super)) {
-                $out['status'] = 'denied'; $out['reason'] = 'رفعُ موازنة القسم لمديره وحده'; return $out;
+                $out['status'] = 'denied'; $out['reason'] = 'رفع موازنة القسم لمديره وحده'; return $out;
             }
             if (!in_array($state, fin_budget_editable_states(), true)) {
-                $out['status'] = 'state'; $out['reason'] = 'لا تُرفع إلا مسودةٌ أو معادة'; return $out;
+                $out['status'] = 'state'; $out['reason'] = 'لا ترفع إلا مسودة أو معادة'; return $out;
             }
             $data = array('state' => 'submitted', 'submitted_by' => intval($user_id), 'submitted_at' => $now);
         } elseif ($action === 'approve') {
             if (!fin_budget_is_approver($role, $is_super)) {
-                $out['status'] = 'denied'; $out['reason'] = 'الإجازةُ للإدارة المالية'; return $out;
+                $out['status'] = 'denied'; $out['reason'] = 'الإجازة للإدارة المالية'; return $out;
             }
             if (fin_budget_self_owned($role, $dept, $is_super)) {
-                $out['status'] = 'denied'; $out['reason'] = 'لا تُجيز موازنةَ قسمٍ تديره'; return $out;
+                $out['status'] = 'denied'; $out['reason'] = 'لا تجيز موازنة قسم تديره'; return $out;
             }
             if ($state !== 'submitted') {
-                $out['status'] = 'state'; $out['reason'] = 'لا تُجاز إلا موازنةٌ مرفوعة'; return $out;
+                $out['status'] = 'state'; $out['reason'] = 'لا تجاز إلا موازنة مرفوعة'; return $out;
             }
             /* P1-B — الفصلُ القائمُ هنا **إداريٌّ** (`fin_budget_self_owned`: لا
                تُجيز موازنةَ قسمٍ تديره) وهو لا يمنع **الشخصَ** من إجازةِ ما رفعه
                هو في قسمٍ آخر. والحكمُ «من أنشأ لا يعتمد» على الشخصِ لا القسم. */
             require_once __DIR__ . '/../includes/self_approval_guard.php';
             $__sa = ems_assert_not_self_approval($conn, 'fin_budgets', 'id', $budget_id,
-                'موازنةٌ #' . $budget_id, intval($b['company_id'] ?? 0));
+                'موازنة #' . $budget_id, intval($b['company_id'] ?? 0));
             if ($__sa !== null) { $out['status'] = 'denied'; $out['reason'] = $__sa['reason']; return $out; }
             $data = array('state' => 'approved', 'approved_by' => intval($user_id), 'approved_at' => $now);
         } elseif ($action === 'return') {
             if (!fin_budget_is_approver($role, $is_super)) {
-                $out['status'] = 'denied'; $out['reason'] = 'الإعادةُ للإدارة المالية'; return $out;
+                $out['status'] = 'denied'; $out['reason'] = 'الإعادة للإدارة المالية'; return $out;
             }
             if (fin_budget_self_owned($role, $dept, $is_super)) {
-                $out['status'] = 'denied'; $out['reason'] = 'لا تُعيد موازنةَ قسمٍ تديره'; return $out;
+                $out['status'] = 'denied'; $out['reason'] = 'لا تعيد موازنة قسم تديره'; return $out;
             }
             if ($state !== 'submitted') {
-                $out['status'] = 'state'; $out['reason'] = 'لا تُعاد إلا موازنةٌ مرفوعة'; return $out;
+                $out['status'] = 'state'; $out['reason'] = 'لا تعاد إلا موازنة مرفوعة'; return $out;
             }
             $reason = trim((string) $reason);
             if ($reason === '') {
-                $out['status'] = 'denied'; $out['reason'] = 'سببُ الإعادة إلزامي'; return $out;
+                $out['status'] = 'denied'; $out['reason'] = 'سبب الإعادة إلزامي'; return $out;
             }
             $data = array('state' => 'returned', 'returned_by' => intval($user_id),
                           'returned_at' => $now, 'return_reason' => mb_substr($reason, 0, 255));
         } else {
-            $out['reason'] = 'إجراءٌ غير معروف'; return $out;
+            $out['reason'] = 'إجراء غير معروف'; return $out;
         }
 
         try { $gate->update('fin_budgets', $data, array('id' => $budget_id)); }
@@ -1528,13 +1528,13 @@ if (!function_exists('fin_budget_transition')) {
             $no    = strval($b['budget_no']);
             if ($action === 'submit') {
                 fin_notify($conn, intval($b['company_id']), 'finance_manager',
-                    'موازنةٌ مرفوعةٌ تنتظر إجازتك: ' . $label . ' — ' . $no, 'budget_form_fin.php');
+                    'موازنة مرفوعة تنتظر إجازتك: ' . $label . ' — ' . $no, 'budget_form_fin.php');
             } elseif ($action === 'approve') {
                 fin_notify($conn, intval($b['company_id']), 'department',
-                    'أُجيزت موازنةُ ' . $label . ' — ' . $no, 'budget_form_fin.php');
+                    'أجيزت موازنة ' . $label . ' — ' . $no, 'budget_form_fin.php');
             } else {
                 fin_notify($conn, intval($b['company_id']), 'department',
-                    'أُعيدت موازنةُ ' . $label . ' لاستكمال: ' . mb_substr($reason, 0, 80), 'budget_form_fin.php');
+                    'أعيدت موازنة ' . $label . ' لاستكمال: ' . mb_substr($reason, 0, 80), 'budget_form_fin.php');
             }
         } catch (\Throwable $t) { /* الإشعارُ لا يُسقط الانتقال */ }
 

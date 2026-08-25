@@ -57,7 +57,7 @@ class TicketRouter
         } elseif (!empty($d['ticket_type_id'])) {
             $type = $conn->query("SELECT * FROM ticket_types WHERE id = " . intval($d['ticket_type_id']) . " AND active = 1")->fetch_assoc();
         }
-        if (!$type) { $out['code'] = 422; $out['reason'] = 'نوع بلاغ غير معرَّف — يُضاف صفًّا لا كودًا'; return $out; }
+        if (!$type) { $out['code'] = 422; $out['reason'] = 'نوع بلاغ غير معرف — يضاف صفا لا كودا'; return $out; }
 
         // السياق المحمول — شاشة تشغيلية بلا سياق = مخالفة تُعاد (§2)
         $ctx = isset($d['context']) && is_array($d['context']) ? $d['context'] : array();
@@ -65,7 +65,7 @@ class TicketRouter
         $operationalScreens = array('timesheet', 'movement', 'maintenance', 'warehouse', 'transport', 'operators');
         if (in_array($screen, $operationalScreens, true) && empty($ctx['site_id']) && empty($ctx['equipment_id'])) {
             $out['code'] = 422;
-            $out['reason'] = 'سياق ناقص من شاشة تشغيلية — البلاغ يحمل سياقه ولا يُدخل المستخدم ما يعرفه النظام';
+            $out['reason'] = 'سياق ناقص من شاشة تشغيلية — البلاغ يحمل سياقه ولا يدخل المستخدم ما يعرفه النظام';
             return $out;
         }
 
@@ -185,7 +185,7 @@ class TicketRouter
                         }
                         $stmt2 = $conn->prepare("INSERT INTO fin_notifications (company_id, target_level, title, link)
                                                  VALUES (?, 'all', ?, 'Tickets/tickets_list.php')");
-                        $title = 'بلاغ #' . $tkId . ': لا مكلف نافذ لمسار ' . $w['workstream_type'] . ' — أُسند لمدير الحركة';
+                        $title = 'بلاغ #' . $tkId . ': لا مكلف نافذ لمسار ' . $w['workstream_type'] . ' — أسند لمدير الحركة';
                         $stmt2->bind_param('is', $co, $title);
                         $stmt2->execute();
                         $stmt2->close();
@@ -216,8 +216,8 @@ class TicketRouter
                                 'verifier_user_id' => \App\Services\Work\WorkItemService::resolveVerifier($conn, $co, $assignee),
                                 'org_unit_id' => $unitId ?: 1, 'site_id' => $siteId ?: 0,
                                 'title' => 'معالجة بلاغ #' . intval($tkId) . ' — مسار ' . $w['workstream_type'],
-                                'deliverable' => 'إغلاق المسار بتوثيق الحل وتأكيد المبلِّغ',
-                                'evidence_required' => 'توثيق الحل وتأكيد المبلِّغ (الورقة 11)',
+                                'deliverable' => 'إغلاق المسار بتوثيق الحل وتأكيد المبلغ',
+                                'evidence_required' => 'توثيق الحل وتأكيد المبلغ (الورقة 11)',
                                 'priority' => ($w['response_sla_minutes'] !== null && intval($w['response_sla_minutes']) <= 60) ? 'P1' : 'P2',
                                 'due_at' => date('Y-m-d H:i:s', time() + $dueMin * 60),
                                 'created_by' => 0, 'parent_ref' => 'TKT-' . intval($tkId),
@@ -242,14 +242,14 @@ class TicketRouter
                 }
                 $stmt2 = $conn->prepare("INSERT INTO fin_notifications (company_id, target_level, title, link)
                                          VALUES (?, 'all', ?, 'Tickets/tickets_list.php')");
-                $title = 'طارئ سلامة #' . $tkId . ': إيقاف فوري بنيوي وتصعيد مباشر للإدارة العامة — لا يُغلق إلا بموافقة السلامة';
+                $title = 'طارئ سلامة #' . $tkId . ': إيقاف فوري بنيوي وتصعيد مباشر للإدارة العامة — لا يغلق إلا بموافقة السلامة';
                 $stmt2->bind_param('is', $co, $title);
                 $stmt2->execute();
                 $stmt2->close();
             }
             $conn->commit();
             $out['ok'] = true; $out['code'] = 201; $out['tk_id'] = $tkId; $out['priority'] = $priority;
-            $out['reason'] = 'أُنشئ ووُجّه آليًّا خلال ثانية — ' . count($out['routed']) . ' مسار فوري و'
+            $out['reason'] = 'أنشئ ووجه آليا خلال ثانية — ' . count($out['routed']) . ' مسار فوري و'
                 . $out['pending_conditional'] . ' شرطي pending';
             return $out;
         } catch (\Throwable $e) {

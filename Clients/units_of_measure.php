@@ -124,7 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     // الكود
     $uom_code_raw = isset($_POST['uom_code']) ? trim($_POST['uom_code']) : '';
     if ($uom_code_raw === '' || !preg_match('/^[A-Za-z0-9_\-]+$/', $uom_code_raw)) {
-        uom_redirect_with_msg('كود الوحدة غير صالح. استخدم أحرفًا وأرقامًا و - أو _ فقط ❌');
+        uom_redirect_with_msg('كود الوحدة غير صالح. استخدم أحرفا وأرقاما و - أو _ فقط ❌');
     }
 
     // الاسم
@@ -165,7 +165,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                 array($uom_code_raw, $uom_id));
         } catch (\Throwable $t) { $dup = array(); }
         if (!empty($dup)) {
-            uom_redirect_with_msg('كود الوحدة موجود مسبقاً داخل شركتك ❌');
+            uom_redirect_with_msg('كود الوحدة موجود مسبقا داخل شركتك ❌');
         }
 
         try {
@@ -194,7 +194,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                 array($uom_code_raw));
         } catch (\Throwable $t) { $dup = array(); }
         if (!empty($dup)) {
-            uom_redirect_with_msg('كود الوحدة موجود مسبقاً داخل شركتك ❌');
+            uom_redirect_with_msg('كود الوحدة موجود مسبقا داخل شركتك ❌');
         }
 
         try {
@@ -318,7 +318,7 @@ include('../includes/page_header.php');
         </div>
     <?php endif; ?>
 
-    <?php echo ems_states_bundle('لا وحداتِ قياسٍ مسجَّلةً ضمن هذا الترشيح', 'أضف وحدةَ قياسٍ جديدةً أو غيّر المرشِّحات'); ?>
+    <?php echo ems_states_bundle('لا وحدات قياس مسجلة ضمن هذا الترشيح', 'أضف وحدة قياس جديدة أو غير المرشحات'); ?>
 
     <div class="stats-section uom-hidden" id="uomStatsSection">
         <div class="stats-grid">
@@ -440,10 +440,10 @@ include('../includes/page_header.php');
                             <th class="ems-fn-th" data-fn="1">النوع</th>
                             <th class="ems-fn-th" data-fn="1">الوحدة الأساسية</th>
                             <th class="ems-fn-th" data-fn="1">عدد المنازل العشرية</th>
-                            <th class="ems-fn-th" data-fn="1">يُستعمل في</th>
-                            <th class="ems-fn-th" data-fn="1">عرّفها</th>
+                            <th class="ems-fn-th" data-fn="1">يستعمل في</th>
+                            <th class="ems-fn-th" data-fn="1">عرفها</th>
                             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
                             <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
                             </tr>
                     </thead>
@@ -526,7 +526,7 @@ include('../includes/page_header.php');
         });
         }
 
-        // الربطُ بعد تهيئةِ المكوّنِ المركزي للجدول (أو فورًا إن سبقنا)
+        // الربط بعد تهيئة المكون المركزي للجدول (أو فورا إن سبقنا)
         if ($.fn.dataTable && $.fn.dataTable.isDataTable('#uomTable')) {
             bindUomFilters();
         } else {
@@ -545,13 +545,13 @@ include('../includes/page_header.php');
     const statsSection = $('#uomStatsSection');
 
     /**
-     * إظهارُ حقلِ الكودِ المولَّد وإخفاؤه.
+     * إظهار حقل الكود المولد وإخفاؤه.
      *
      * ⚠️ **لا تستعمل `jQuery.hide()` هنا** — `assets/css/ems-forms.css` يحمل:
      *     :is(.allforms, .ems-form) .form-grid > div { display: block !important }
-     * والغلافُ ابنٌ مباشرٌ لـ`.form-grid`، فـ`!important` من ورقةِ الأنماطِ تهزم
-     * الإخفاءَ السطريَّ **بلا أولوية**: السمةُ تُكتب فعلًا والحقلُ يبقى ظاهرًا، بلا
-     * خطأٍ في وحدةِ التحكم ولا سطرٍ في أيِّ سجل. (نظيرُ شاشتَي العملاءِ والمشاريع.)
+     * والغلاف ابن مباشر ل`.form-grid`، ف`!important` من ورقة الأنماط تهزم
+     * الإخفاء السطري **بلا أولوية**: السمة تكتب فعلا والحقل يبقى ظاهرا، بلا
+     * خطأ في وحدة التحكم ولا سطر في أي سجل. (نظير شاشتي العملاء والمشاريع.)
      */
     function setGeneratedCodeShown(shown) {
         var el = generatedCodeWrapper[0];
@@ -562,9 +562,9 @@ include('../includes/page_header.php');
     function setAddMode() {
         formTitle.text('إضافة وحدة قياس جديدة'); submitBtnText.text('حفظ الوحدة');
         setGeneratedCodeShown(true);
-        // الكودُ المولَّدُ يعود إلى خانتِه كلَّما دخلنا وضعَ الإضافة — ومصدرُه حقلُ
-        // العرضِ نفسُه لا نسخةٌ ثانيةٌ منه (مصدرُ حقيقةٍ واحد). و`reset()` يكفي
-        // للإلغاء، لكنَّ الانتقالَ من «تعديل» إلى «إضافة» قد يقع بلا reset.
+        // الكود المولد يعود إلى خانته كلما دخلنا وضع الإضافة — ومصدره حقل
+        // العرض نفسه لا نسخة ثانية منه (مصدر حقيقة واحد). و`reset()` يكفي
+        // للإلغاء، لكن الانتقال من «تعديل» إلى «إضافة» قد يقع بلا reset.
         var genCode = $('#generated_uom_code').val();
         if (genCode) { $('#uom_code').val(genCode); }
     }
@@ -641,7 +641,7 @@ include('../includes/page_header.php');
         });
     });
 
-    // ── عرض التفاصيل عبر EmsDetailsModal الموحّد ──
+    // ── عرض التفاصيل عبر EmsDetailsModal الموحد ──
     $(document).on('click', '.viewUomBtn', function () {
         const d = $(this).data();
         const fields = [

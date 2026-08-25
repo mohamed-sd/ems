@@ -50,7 +50,7 @@ try {
         'whereRaw' => "`state` = 'approved' AND `penalty_amount` > 0", 'limit' => 500));
     foreach ($penRows as $p) {
         $c = (string) ($p['currency'] ?? '');
-        if ($c === '') { $c = 'بلا عملةٍ معلنة'; }
+        if ($c === '') { $c = 'بلا عملة معلنة'; }
         if (!isset($penalties[$c])) { $penalties[$c] = array('n' => 0, 'sum' => 0.0); }
         $penalties[$c]['n']++;
         $penalties[$c]['sum'] += (float) $p['penalty_amount'];
@@ -69,7 +69,7 @@ try {
     arsort($tally);
     $topSup = array_slice($tally, 0, 10, true);
 } catch (\Throwable $e) {
-    $readFail = 'تعذّرت قراءةُ المصادر: ' . $e->getMessage();
+    $readFail = 'تعذرت قراءة المصادر: ' . $e->getMessage();
 }
 
 $page_title = 'لوحة إدارة الموردين';
@@ -87,11 +87,11 @@ require_once __DIR__ . '/../includes/kpi_card.php';
   $header_actions = array();
   $header_back = false;
   include __DIR__ . '/../includes/page_header.php';
-  echo ems_states_bundle('لا بياناتِ مورّدين في نطاقِك بعد',
-      'اللوحةُ مشتقّةٌ من السجلاتِ القائمة — تُحسب لحظةَ العرضِ ولا تُخزَّن مجمَّعة');
+  echo ems_states_bundle('لا بيانات موردين في نطاقك بعد',
+      'اللوحة مشتقة من السجلات القائمة — تحسب لحظة العرض ولا تخزن مجمعة');
   ?>
-  <p class="text-muted">الورقة م٢٣ · لوحةُ قراءةٍ مشتقّة — <strong>لا جدولَ جديدًا لها ولا فعلَ منها</strong>؛
-     كلُّ رقمٍ يُحسب من مصدرِه لحظةَ العرض، ووجهةُ التعمّقِ إلزاميّةٌ لكلِّ رقم.</p>
+  <p class="text-muted">الورقة م٢٣ · لوحة قراءة مشتقة — <strong>لا جدول جديدا لها ولا فعل منها</strong>؛
+     كل رقم يحسب من مصدره لحظة العرض، ووجهة التعمق إلزامية لكل رقم.</p>
   <?php if ($readFail !== ''): ?>
     <div class="alert alert-danger"><?= htmlspecialchars($readFail, ENT_QUOTES, 'UTF-8') ?></div>
   <?php endif; ?>
@@ -99,13 +99,13 @@ require_once __DIR__ . '/../includes/kpi_card.php';
   <div class="ems-grid">
     <?php
     $kpis = array(
-        array('موردون فاعلون', $kSup, 'مورّد', 'neutral', 'suppliers.php'),
-        array('عقود مورّدين سارية', $kCon, 'عقد', 'neutral', 'supplierscontracts.php'),
+        array('موردون فاعلون', $kSup, 'مورد', 'neutral', 'suppliers.php'),
+        array('عقود موردين سارية', $kCon, 'عقد', 'neutral', 'supplierscontracts.php'),
         array('مخالفات تنتظر الاعتماد', $kVioOpen, 'مخالفة', $kVioOpen > 0 ? 'warn' : 'ok', 'supplier_violations.php'),
-        array('مخالفات معتمَدة', $kVioAppr, 'مخالفة', $kVioAppr > 0 ? 'warn' : 'ok', 'supplier_violations.php'),
-        array('تسويات مسودّة', $kSetDraft, 'تسوية', $kSetDraft > 0 ? 'warn' : 'ok', 'settlements.php'),
-        array('تقييمات لم تُقرَّر', $kEvalDue, 'تقييم', $kEvalDue > 0 ? 'warn' : 'ok', 'supplier_evaluation.php'),
-        array('طاقاتٌ معلَنةٌ سارية', $kCap, 'إعلان', 'neutral', 'supplier_capacity.php'),
+        array('مخالفات معتمدة', $kVioAppr, 'مخالفة', $kVioAppr > 0 ? 'warn' : 'ok', 'supplier_violations.php'),
+        array('تسويات مسودة', $kSetDraft, 'تسوية', $kSetDraft > 0 ? 'warn' : 'ok', 'settlements.php'),
+        array('تقييمات لم تقرر', $kEvalDue, 'تقييم', $kEvalDue > 0 ? 'warn' : 'ok', 'supplier_evaluation.php'),
+        array('طاقات معلنة سارية', $kCap, 'إعلان', 'neutral', 'supplier_capacity.php'),
     );
     foreach ($kpis as $k) {
         echo ems_kpi_card(array(
@@ -121,15 +121,15 @@ require_once __DIR__ . '/../includes/kpi_card.php';
     ?>
   </div>
 
-  <h6 class="mt-4">الجزاءات المعتمَدة — مفصّلةً بالعملة</h6>
-  <p class="text-muted">لا جمعَ لعملتين في رقمٍ واحد؛ ولا يُنفَّذ الجزاءُ هنا — أثرُه في
+  <h6 class="mt-4">الجزاءات المعتمدة — مفصلة بالعملة</h6>
+  <p class="text-muted">لا جمع لعملتين في رقم واحد؛ ولا ينفذ الجزاء هنا — أثره في
      <a href="settlements.php">التسويات</a>.</p>
   <table class="table table-striped" data-no-dt>
     <thead><tr><th>العملة</th><th>عدد المخالفات</th><th>إجمالي الجزاء</th>
       <th class="ems-gov-th none" data-gov="currency" data-slice="3">العملة</th></tr></thead>
     <tbody>
       <?php if (empty($penalties)): ?>
-        <tr><td colspan="3" class="text-center text-muted">لا جزاءَ معتمَدًا بمبلغٍ بعد</td></tr>
+        <tr><td colspan="3" class="text-center text-muted">لا جزاء معتمدا بمبلغ بعد</td></tr>
       <?php endif; ?>
       <?php foreach ($penalties as $cur => $agg): ?>
         <tr><td><?= htmlspecialchars((string) $cur, ENT_QUOTES, 'UTF-8') ?></td>
@@ -141,11 +141,11 @@ require_once __DIR__ . '/../includes/kpi_card.php';
 
   <h6 class="mt-4">مخالفات تنتظر الاعتماد</h6>
   <table class="table table-striped" data-no-dt>
-    <thead><tr><th>الرقم</th><th>المورّد</th><th>النوع</th><th>الوقوع</th><th>الجزاء</th><th>التعمّق</th>
+    <thead><tr><th>الرقم</th><th>المورد</th><th>النوع</th><th>الوقوع</th><th>الجزاء</th><th>التعمق</th>
       <th class="ems-gov-th none" data-gov="entity" data-slice="1">الكيان</th></tr></thead>
     <tbody>
       <?php if (empty($vioRows)): ?>
-        <tr><td colspan="6" class="text-center text-muted">لا مخالفةَ تنتظر الاعتماد</td></tr>
+        <tr><td colspan="6" class="text-center text-muted">لا مخالفة تنتظر الاعتماد</td></tr>
       <?php endif; ?>
       <?php foreach ($vioRows as $v): ?>
         <tr>
@@ -160,20 +160,20 @@ require_once __DIR__ . '/../includes/kpi_card.php';
     </tbody>
   </table>
 
-  <h6 class="mt-4">الموردون الأكثر مخالفاتٍ مسجَّلة</h6>
-  <p class="text-muted">إشارةٌ للمتابعةِ لا حكمًا — والمرصودُ غيرُ المعتمَد.</p>
+  <h6 class="mt-4">الموردون الأكثر مخالفات مسجلة</h6>
+  <p class="text-muted">إشارة للمتابعة لا حكما — والمرصود غير المعتمد.</p>
   <table class="table table-striped" data-no-dt>
-    <thead><tr><th>المورّد</th><th>مخالفات مسجَّلة</th><th>منها معتمَدة</th><th>التعمّق</th>
+    <thead><tr><th>المورد</th><th>مخالفات مسجلة</th><th>منها معتمدة</th><th>التعمق</th>
       <th class="ems-gov-th none" data-gov="entity" data-slice="1">الكيان</th></tr></thead>
     <tbody>
       <?php if (empty($topSup)): ?>
-        <tr><td colspan="4" class="text-center text-muted">لا مخالفةَ مسجَّلةٌ بعد</td></tr>
+        <tr><td colspan="4" class="text-center text-muted">لا مخالفة مسجلة بعد</td></tr>
       <?php endif; ?>
       <?php foreach ($topSup as $sid => $agg): ?>
         <tr><td>#<?= (int) $sid ?></td>
             <td><?= (int) $agg['n'] ?></td>
             <td><?= (int) $agg['appr'] ?></td>
-            <td><a class="action-btn" href="supplier_profile.php?id=<?= (int) $sid ?>"><i class="fa fa-id-card"></i> ملفُّ المورّد</a></td></tr>
+            <td><a class="action-btn" href="supplier_profile.php?id=<?= (int) $sid ?>"><i class="fa fa-id-card"></i> ملف المورد</a></td></tr>
       <?php endforeach; ?>
     </tbody>
   </table>

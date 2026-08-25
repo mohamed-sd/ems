@@ -54,9 +54,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif (!in_array($package, $allowedPackages, true)) {
             $error = 'الباقة المطلوبة غير صالحة.';
         } elseif (!validate_length($notes, 0, 1000)) {
-            $error = 'الملاحظات طويلة جداً.';
+            $error = 'الملاحظات طويلة جدا.';
         } elseif (!company_table_exists('admin_subscription_requests')) {
-            $error = 'جدول طلبات الاشتراك غير موجود. شغّل ملف database/admin_saas_tables.sql أولاً.';
+            $error = 'جدول طلبات الاشتراك غير موجود. شغل ملف database/admin_saas_tables.sql أولا.';
         } else {
             $message = 'المسؤول: ' . $responsibleName;
             if ($notes !== '') {
@@ -71,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             );
 
             if (!$insertStmt) {
-                $error = 'تعذر حفظ الطلب حالياً.';
+                $error = 'تعذر حفظ الطلب حاليا.';
             } else {
                 mysqli_stmt_bind_param($insertStmt, 'sssis', $companyName, $officialEmail, $phone, $planId, $message);
                 $ok = mysqli_stmt_execute($insertStmt);
@@ -99,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         }
                     }
 
-                    $success = 'تم استلام طلب الاشتراك بنجاح. سيتم مراجعته من الإدارة العليا قريباً.';
+                    $success = 'تم استلام طلب الاشتراك بنجاح. سيتم مراجعته من الإدارة العليا قريبا.';
                     $_POST = array();
                 }
             }
@@ -300,8 +300,8 @@ ems_public_head('طلب اشتراك جديد | EMS'); ?>
 <div class="shell">
     <section class="hero">
         <div class="hero-badge"><i class="fas fa-rocket"></i> بوابة الاشتراك</div>
-        <h1>قدّم طلب اشتراك شركتك خلال أقل من دقيقة</h1>
-        <p>هذا الرابط مستقل تماماً عن لوحة الإدارة العليا. بعد الإرسال يتم إنشاء طلب بحالة pending ويظهر مباشرة لفريق Super Admin للمراجعة.</p>
+        <h1>قدم طلب اشتراك شركتك خلال أقل من دقيقة</h1>
+        <p>هذا الرابط مستقل تماما عن لوحة الإدارة العليا. بعد الإرسال يتم إنشاء طلب بحالة pending ويظهر مباشرة لفريق Super Admin للمراجعة.</p>
         <div class="hero-list">
             <div class="hero-item"><i class="fas fa-building"></i> تسجيل بيانات الشركة الأساسية</div>
             <div class="hero-item"><i class="fas fa-envelope"></i> البريد الرسمي سيصبح بريد المدير العام بعد التفعيل</div>

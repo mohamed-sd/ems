@@ -65,10 +65,10 @@ if (!function_exists('ux_toolbar')) {
     {
         $h = '<div class="ux-toolbar" role="toolbar">';
         if (array_key_exists('search', $tools)) {
-            $ph = is_string($tools['search']) && $tools['search'] !== '' ? $tools['search'] : 'بحثٌ في السجلِّ الحالي';
+            $ph = is_string($tools['search']) && $tools['search'] !== '' ? $tools['search'] : 'بحث في السجل الحالي';
             $h .= '<div class="ux-toolbar__search"><input type="search" placeholder="' . ux_e($ph) . '" aria-label="بحث"></div>';
         }
-        foreach (array('filters' => 'مرشِّحات', 'views' => 'منظر', 'columns' => 'أعمدة', 'export' => 'تصدير') as $k => $lbl) {
+        foreach (array('filters' => 'مرشحات', 'views' => 'منظر', 'columns' => 'أعمدة', 'export' => 'تصدير') as $k => $lbl) {
             if (array_key_exists($k, $tools)) {
                 $h .= '<button type="button" class="ux-btn ux-btn--secondary" data-ux-tool="' . $k . '">' . $lbl . '</button>';
             }
@@ -93,11 +93,11 @@ if (!function_exists('ux_filter_chips')) {
         $h = '<div class="ux-chiprow">';
         foreach ($chips as $c) {
             $h .= '<span class="ux-chip">' . ux_e($c['label'])
-                . (isset($c['remove']) ? '<a class="ux-chip__x" href="' . ux_e($c['remove']) . '" aria-label="إزالةُ المرشِّح">×</a>' : '')
+                . (isset($c['remove']) ? '<a class="ux-chip__x" href="' . ux_e($c['remove']) . '" aria-label="إزالة المرشح">×</a>' : '')
                 . '</span>';
         }
         if ($clearAllHref !== '') {
-            $h .= '<a class="ux-btn ux-btn--ghost" href="' . ux_e($clearAllHref) . '">مسحُ الكل</a>';
+            $h .= '<a class="ux-btn ux-btn--ghost" href="' . ux_e($clearAllHref) . '">مسح الكل</a>';
         }
         $h .= '</div>';
         return $h;
@@ -116,9 +116,9 @@ if (!function_exists('ux_kpi_card')) {
         $meta = array();
         if (!empty($opts['period']))  { $meta[] = ux_e($opts['period']); }
         if (!empty($opts['compare'])) { $meta[] = ux_e($opts['compare']); }
-        if (!empty($opts['stale']))   { $meta[] = '<span class="ux-stale">آخرُ تحديث: ' . ux_e($opts['stale']) . '</span>'; }
+        if (!empty($opts['stale']))   { $meta[] = '<span class="ux-stale">آخر تحديث: ' . ux_e($opts['stale']) . '</span>'; }
         if ($meta) { $h .= '<span class="ux-kpi__meta">' . implode(' · ', $meta) . '</span>'; }
-        if (!empty($opts['href'])) { $h .= '<a class="ux-btn ux-btn--ghost" href="' . ux_e($opts['href']) . '">تعمّق</a>'; }
+        if (!empty($opts['href'])) { $h .= '<a class="ux-btn ux-btn--ghost" href="' . ux_e($opts['href']) . '">تعمق</a>'; }
         $h .= '</div>';
         return $h;
     }
@@ -164,7 +164,7 @@ if (!function_exists('ux_transition')) {
                         . (isset($t['attrs']) ? ' ' . $t['attrs'] : '') . '>' . ux_e($t['label']) . '</a>';
                 } else {
                     $h .= '<span class="ux-transition__item" aria-disabled="1">' . ux_e($t['label'])
-                        . '<span class="ux-transition__why">' . ux_e(isset($t['why']) ? $t['why'] : 'غيرُ متاحٍ في هذه الحالة') . '</span></span>';
+                        . '<span class="ux-transition__why">' . ux_e(isset($t['why']) ? $t['why'] : 'غير متاح في هذه الحالة') . '</span></span>';
                 }
             }
             $h .= '</div></details>';
@@ -189,14 +189,14 @@ if (!function_exists('ux_error_state')) {
     {
         $h = '<div class="ux-error" role="alert"><span class="ux-error__title">' . ux_e($title) . '</span>';
         if ($hint !== '') { $h .= '<span class="ux-error__hint">' . ux_e($hint) . '</span>'; }
-        if ($retryHref !== '') { $h .= '<a class="ux-btn ux-btn--secondary" href="' . ux_e($retryHref) . '">إعادةُ المحاولة</a>'; }
+        if ($retryHref !== '') { $h .= '<a class="ux-btn ux-btn--secondary" href="' . ux_e($retryHref) . '">إعادة المحاولة</a>'; }
         return $h . '</div>';
     }
 }
 if (!function_exists('ux_noperm_state')) {
     function ux_noperm_state($reason, $requestHint = '')
     {
-        $h = '<div class="ux-noperm"><span class="ux-noperm__title">لا صلاحيةَ لهذا المحتوى</span>'
+        $h = '<div class="ux-noperm"><span class="ux-noperm__title">لا صلاحية لهذا المحتوى</span>'
            . '<span class="ux-noperm__hint">' . ux_e($reason) . '</span>';
         if ($requestHint !== '') { $h .= '<span class="ux-noperm__hint">' . ux_e($requestHint) . '</span>'; }
         return $h . '</div>';
@@ -215,21 +215,21 @@ if (!function_exists('ux_loading_state')) {
 if (!function_exists('ux_training_banner')) {
     function ux_training_banner()
     {
-        return '<div class="ux-training-banner">وضعُ التدريب — البياناتُ هنا تدريبيةٌ ولا تدخل تقريرًا حقيقيًّا</div>';
+        return '<div class="ux-training-banner">وضع التدريب — البيانات هنا تدريبية ولا تدخل تقريرا حقيقيا</div>';
     }
 }
 if (!function_exists('ux_cap_hold_card')) {
     function ux_cap_hold_card($capName, $ref = '')
     {
         return '<div class="ux-cap-hold"><span>' . ems_status_badge('cap_unresolved') . '</span>'
-             . '<span>هذه المعاملةُ محفوظةٌ وتستأنف تلقائيًّا فورَ اعتمادِ السقف: <b>' . ux_e($capName) . '</b>'
+             . '<span>هذه المعاملة محفوظة وتستأنف تلقائيا فور اعتماد السقف: <b>' . ux_e($capName) . '</b>'
              . ($ref !== '' ? ' — المرجع: ' . ux_e($ref) : '') . '</span></div>';
     }
 }
 if (!function_exists('ux_stale_badge')) {
     function ux_stale_badge($lastUpdated)
     {
-        return '<span class="ux-stale">آخرُ تحديث: ' . ux_e($lastUpdated) . '</span>';
+        return '<span class="ux-stale">آخر تحديث: ' . ux_e($lastUpdated) . '</span>';
     }
 }
 
@@ -242,43 +242,43 @@ if (!function_exists('ux_component_registry')) {
     {
         return array(
             'ترويسة الصفحة'        => array('impl' => 'new',      'ref' => 'ux_page_header()'),
-            'مسار التنقل'           => array('impl' => 'new',      'ref' => 'ux_page_header() — العمقُ الثالثُ فصاعدًا'),
-            'التبويبات'             => array('impl' => 'existing', 'ref' => 'includes/entity_tabs.php (نظامُ تبويباتٍ واحدٌ لبطاقةِ الكيان)'),
-            'الخطوات'               => array('impl' => 'existing', 'ref' => 'includes/journey_bar.php (شريطُ الرحلةِ الموحَّد)'),
-            'الدرج'                 => array('impl' => 'existing', 'ref' => 'EmsDetailsModal (assets/js) — درجُ التفاصيل'),
-            'النافذة'               => array('impl' => 'existing', 'ref' => 'EmsDetailsModal / bootstrap modal الموحَّد'),
-            'حوار التأكيد'          => array('impl' => 'existing', 'ref' => 'EmsAlert.confirm (نظامُ الرسائلِ الموحَّد)'),
-            'رفع المرفق'            => array('impl' => 'existing', 'ref' => 'نظامُ المرفقاتِ الموحَّدُ في النماذج (ems-forms)'),
-            'قائمة المرفقات'        => array('impl' => 'existing', 'ref' => 'مكوّنُ المرفقاتِ في بطاقاتِ الكيان'),
-            'INJAZ DataGrid'        => array('impl' => 'existing', 'ref' => 'DataTables المركزي + ems-tables.css + كثافةُ ux-grid-density'),
+            'مسار التنقل'           => array('impl' => 'new',      'ref' => 'ux_page_header() — العمق الثالث فصاعدا'),
+            'التبويبات'             => array('impl' => 'existing', 'ref' => 'includes/entity_tabs.php (نظام تبويبات واحد لبطاقة الكيان)'),
+            'الخطوات'               => array('impl' => 'existing', 'ref' => 'includes/journey_bar.php (شريط الرحلة الموحد)'),
+            'الدرج'                 => array('impl' => 'existing', 'ref' => 'EmsDetailsModal (assets/js) — درج التفاصيل'),
+            'النافذة'               => array('impl' => 'existing', 'ref' => 'EmsDetailsModal / bootstrap modal الموحد'),
+            'حوار التأكيد'          => array('impl' => 'existing', 'ref' => 'EmsAlert.confirm (نظام الرسائل الموحد)'),
+            'رفع المرفق'            => array('impl' => 'existing', 'ref' => 'نظام المرفقات الموحد في النماذج (ems-forms)'),
+            'قائمة المرفقات'        => array('impl' => 'existing', 'ref' => 'مكون المرفقات في بطاقات الكيان'),
+            'INJAZ DataGrid'        => array('impl' => 'existing', 'ref' => 'DataTables المركزي + ems-tables.css + كثافة ux-grid-density'),
             'الشريط الموحد'         => array('impl' => 'new',      'ref' => 'ux_toolbar()'),
             'البحث'                 => array('impl' => 'new',      'ref' => 'ux_toolbar()[search]'),
-            'البحث العام'           => array('impl' => 'existing', 'ref' => 'main/global_search.php (التسعُ كيانات)'),
+            'البحث العام'           => array('impl' => 'existing', 'ref' => 'main/global_search.php (التسع كيانات)'),
             'المرشحات'              => array('impl' => 'new',      'ref' => 'ux_toolbar()[filters] + ux_filter_chips()'),
-            'المناظر المحفوظة'      => array('impl' => 'existing', 'ref' => 'includes/nav_views.php (المناظرُ المعلنةُ ?view=)'),
-            'منتقي الأعمدة'         => array('impl' => 'existing', 'ref' => 'DataTables colvis المركزي — يُلبَس ux-btn عندَ الترحيل'),
+            'المناظر المحفوظة'      => array('impl' => 'existing', 'ref' => 'includes/nav_views.php (المناظر المعلنة ?view=)'),
+            'منتقي الأعمدة'         => array('impl' => 'existing', 'ref' => 'DataTables colvis المركزي — يلبس ux-btn عند الترحيل'),
             'التصفيح'               => array('impl' => 'existing', 'ref' => 'DataTables paging المركزي'),
             'بطاقة مؤشر'            => array('impl' => 'new',      'ref' => 'ux_kpi_card()'),
             'بطاقة قرار'            => array('impl' => 'new',      'ref' => 'ux_decision_card()'),
-            'بطاقة مهمة'            => array('impl' => 'existing', 'ref' => 'Portal/my_tasks.php بطاقةُ المهمة — تُوحَّد قشرتُها ux عندَ ترحيلِ الذهبية ②'),
-            'بطاقة اعتماد'          => array('impl' => 'existing', 'ref' => 'Finance/approvals_inbox.php — تُوحَّد قشرتُها ux عندَ ترحيلِ الذهبية ⑦'),
-            'بطاقة تنبيه'           => array('impl' => 'existing', 'ref' => 'EmsAlert.banner (اللافتةُ السطرية)'),
-            'وسم الحالة'            => array('impl' => 'new',      'ref' => 'ems_status_badge() — القاموسُ الاثنا عشر'),
-            'مكون الانتقال'         => array('impl' => 'new',      'ref' => 'ux_transition() — يقرأ المسموحَ من آلةِ الحالةِ الممرَّرة'),
-            'الخط الزمني'           => array('impl' => 'existing', 'ref' => 'includes/journey_bar.php + سجلُّ أحداثِ الكيان'),
-            'سجل النشاط'            => array('impl' => 'existing', 'ref' => 'ActivityLogs/activity_logs.php — لغتُه تُهذَّب في موجتِه'),
+            'بطاقة مهمة'            => array('impl' => 'existing', 'ref' => 'Portal/my_tasks.php بطاقة المهمة — توحد قشرتها ux عند ترحيل الذهبية ②'),
+            'بطاقة اعتماد'          => array('impl' => 'existing', 'ref' => 'Finance/approvals_inbox.php — توحد قشرتها ux عند ترحيل الذهبية ⑦'),
+            'بطاقة تنبيه'           => array('impl' => 'existing', 'ref' => 'EmsAlert.banner (اللافتة السطرية)'),
+            'وسم الحالة'            => array('impl' => 'new',      'ref' => 'ems_status_badge() — القاموس الاثنا عشر'),
+            'مكون الانتقال'         => array('impl' => 'new',      'ref' => 'ux_transition() — يقرأ المسموح من آلة الحالة الممررة'),
+            'الخط الزمني'           => array('impl' => 'existing', 'ref' => 'includes/journey_bar.php + سجل أحداث الكيان'),
+            'سجل النشاط'            => array('impl' => 'existing', 'ref' => 'ActivityLogs/activity_logs.php — لغته تهذب في موجته'),
             'الرسائل العابرة'       => array('impl' => 'existing', 'ref' => 'EmsAlert.toast'),
-            'الرسوم'                => array('impl' => 'existing', 'ref' => 'مكوّنُ الرسومِ في اللوحات (Chart.js المركزي)'),
-            'حالة الفراغ'           => array('impl' => 'new',      'ref' => 'ux_empty_state() — وems-states.css القائمةُ للمرحَّلِ سابقًا'),
+            'الرسوم'                => array('impl' => 'existing', 'ref' => 'مكون الرسوم في اللوحات (Chart.js المركزي)'),
+            'حالة الفراغ'           => array('impl' => 'new',      'ref' => 'ux_empty_state() — وems-states.css القائمة للمرحل سابقا'),
             'حالة التحميل'          => array('impl' => 'new',      'ref' => 'ux_loading_state()'),
             'حالة الخطأ'            => array('impl' => 'new',      'ref' => 'ux_error_state()'),
-            'حالة لا صلاحية'        => array('impl' => 'new',      'ref' => 'ux_noperm_state() — وincludes/deny_page.php للصفحةِ الكاملة'),
-            'قراءة فقط'             => array('impl' => 'existing', 'ref' => 'نمطُ القراءةِ في النماذجِ المعتمدة (ems-forms) + شارةُ ems_status_badge'),
-            'غير متصل'              => array('impl' => 'existing', 'ref' => 'صندوقُ الميدان (Timesheet offline) — شريطُه يُلبَس ux-offline عندَ موجتِه'),
-            'مؤشر صندوق الخروج'     => array('impl' => 'existing', 'ref' => 'عدّاداتُ الرفعِ المحليِّ في شاشاتِ الميدان'),
+            'حالة لا صلاحية'        => array('impl' => 'new',      'ref' => 'ux_noperm_state() — وincludes/deny_page.php للصفحة الكاملة'),
+            'قراءة فقط'             => array('impl' => 'existing', 'ref' => 'نمط القراءة في النماذج المعتمدة (ems-forms) + شارة ems_status_badge'),
+            'غير متصل'              => array('impl' => 'existing', 'ref' => 'صندوق الميدان (Timesheet offline) — شريطه يلبس ux-offline عند موجته'),
+            'مؤشر صندوق الخروج'     => array('impl' => 'existing', 'ref' => 'عدادات الرفع المحلي في شاشات الميدان'),
             'بيانات متقادمة'        => array('impl' => 'new',      'ref' => 'ux_stale_badge()'),
-            'شارة وضع التدريب'      => array('impl' => 'new',      'ref' => 'ux_training_banner() + حالةُ training في القاموس'),
-            'بطاقة السقف الموقوف'   => array('impl' => 'new',      'ref' => 'ux_cap_hold_card() + حالةُ cap_unresolved'),
+            'شارة وضع التدريب'      => array('impl' => 'new',      'ref' => 'ux_training_banner() + حالة training في القاموس'),
+            'بطاقة السقف الموقوف'   => array('impl' => 'new',      'ref' => 'ux_cap_hold_card() + حالة cap_unresolved'),
         );
     }
 }

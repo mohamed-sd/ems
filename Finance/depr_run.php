@@ -40,14 +40,14 @@ if (!$is_super_admin && empty($__pp['can_view'])) {
 $__canWrite = $is_super_admin || !empty($__pp['can_add']) || !empty($__pp['can_edit']);
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$__canWrite) {
     http_response_code(403);
-    exit('غير مصرَّحٍ بالكتابة في هذه الشاشة — اطلبِ المنحةَ من مدير الصلاحيات');
+    exit('غير مصرح بالكتابة في هذه الشاشة — اطلب المنحة من مدير الصلاحيات');
 }
 
 // ═══ ⑤ رمزُ الحماية — قبلَ أيِّ معالجةٍ لا بعدَها ═══
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!function_exists('verify_csrf_token') || !verify_csrf_token($_POST['csrf_token'] ?? '')) {
         http_response_code(403);
-        exit('رمزُ الحمايةِ غيرُ صالح — أعدْ تحميلَ الصفحة');
+        exit('رمز الحماية غير صالح — أعد تحميل الصفحة');
     }
 }
 
@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'reason' => $_POST['reason'] ?? '',
             'actor'  => $uid,
         ));
-        $flash = $r['ok'] ? ('عُكس ' . $r['reversed'] . ' بمرجعٍ ' . $r['ref']) : $r['reason'];
+        $flash = $r['ok'] ? ('عكس ' . $r['reversed'] . ' بمرجع ' . $r['ref']) : $r['reason'];
         $flashKind = $r['ok'] ? 'success' : 'error';
     }
 }
@@ -89,9 +89,9 @@ $s = $conn->query(
 )->fetch_assoc();
 $PAGE_TITLE = 'احتساب إهلاك الفترة';
 $TILES = array(
-    array('إهلاكٌ قائم', number_format((float) $s['live'], 2)),
-    array('مبالغُ معكوسةٌ بمرجعها', number_format((float) $s['rev'], 2)),
-    array('إهلاكٌ على معدةِ مورد (CK-18)', (int) $s['bad']),
+    array('إهلاك قائم', number_format((float) $s['live'], 2)),
+    array('مبالغ معكوسة بمرجعها', number_format((float) $s['rev'], 2)),
+    array('إهلاك على معدة مورد (CK-18)', (int) $s['bad']),
 );
 $COLS = array('#','كود المعدة','الفترة','الملكية','الطريقة','ساعات التشغيل','معدل الساعة','الإهلاك','مرجع القيد','مبلغ معكوس','مرجع العكس','وقت العكس');
 /* UXW-01 §8-2: موضعُ الشاشةِ من رحلةِ المعدة — الغلافُ يُخرِج الشريط */

@@ -235,7 +235,7 @@ function super_admin_send_reset_email($email, $name, $token) {
     $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
     $headers .= 'From: EMS <noreply@' . $fromHost . ">\r\n";
 
-    $message = "مرحباً " . $name . "،\n\n";
+    $message = "مرحبا " . $name . "،\n\n";
     $message .= "تم استلام طلب لإعادة تعيين كلمة مرور الإدارة العليا.\n";
     $message .= "استخدم الرابط التالي لإدخال كلمة مرور جديدة:\n" . $resetUrl . "\n\n";
     $message .= "ينتهي هذا الرابط خلال ساعة واحدة. إذا لم تطلب إعادة التعيين فتجاهل هذه الرسالة.\n";

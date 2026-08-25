@@ -109,15 +109,15 @@ $dangling = 0;
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap ent-table">
             <thead><tr>
-                <th>الرمز</th><th>الفترة</th><th>سجلُّ الوحدة</th>
-                <th>حكمُ العميل</th><th>مبلغُ العميل</th>
-                <th>حكمُ المورد</th><th>مبلغُ المورد</th>
-                <th>حكمُ المشغّل</th><th>مبلغُ المشغّل</th>
+                <th>الرمز</th><th>الفترة</th><th>سجل الوحدة</th>
+                <th>حكم العميل</th><th>مبلغ العميل</th>
+                <th>حكم المورد</th><th>مبلغ المورد</th>
+                <th>حكم المشغل</th><th>مبلغ المشغل</th>
                 <th>العملة</th><th>الحالة</th>
             </tr></thead>
             <tbody>
             <?php if (!$ENT_ROWS): ?>
-                <tr><td colspan="11" class="ent-empty">لا استحقاقَ في هذا النطاق</td></tr>
+                <tr><td colspan="11" class="ent-empty">لا استحقاق في هذا النطاق</td></tr>
             <?php endif; ?>
             <?php foreach ($ENT_ROWS as $r):
                 $uid  = (int) $r['unit_record_id'];
@@ -129,8 +129,8 @@ $dangling = 0;
                     <td><?php echo $e($r['period']); ?></td>
                     <td><?php
                         if ($unit === null) {
-                            echo '<span class="badge badge-warning" title="مرجعٌ معدوم: سجلُّ الوحدةِ غيرُ موجود">#'
-                               . $uid . ' — مرجعٌ معدوم</span>';
+                            echo '<span class="badge badge-warning" title="مرجع معدوم: سجل الوحدة غير موجود">#'
+                               . $uid . ' — مرجع معدوم</span>';
                         } else {
                             echo '<span class="badge badge-secondary">' . $e($unit['record_no']) . '</span> '
                                . '<span class="ent-mstate">' . $e($unit['match_state']) . '</span>';
@@ -150,10 +150,10 @@ $dangling = 0;
     </div>
     <?php if ($dangling > 0): ?>
         <p class="ent-warn">
-            ◆ <strong><?php echo $dangling; ?></strong> استحقاقًا مرجعُه <strong>معدوم</strong> —
-            سجلُّ الوحدةِ الذي يشير إليه غيرُ موجود.
-            <strong>وهو أخطرُ من «غيرِ معتمَد» لأنَّه يبدو موصولًا</strong>؛
-            ووصلٌ داخليٌّ في العرضِ كان سيُسقطه فيُخفي العطب.
+            ◆ <strong><?php echo $dangling; ?></strong> استحقاقا مرجعه <strong>معدوم</strong> —
+            سجل الوحدة الذي يشير إليه غير موجود.
+            <strong>وهو أخطر من «غير معتمد» لأنه يبدو موصولا</strong>؛
+            ووصل داخلي في العرض كان سيسقطه فيخفي العطب.
         </p>
     <?php endif; ?>
     </div></div>

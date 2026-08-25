@@ -31,16 +31,16 @@ class ContractSnapshotService
                      'id' => null, 'fingerprint' => null, 'reused' => false);
         $contractId = (int) $contractId;
         $asOf = self::dateOrNull($asOfDate);
-        if ($asOf === null) { $out['code'] = 422; $out['reason'] = 'تاريخُ الاحتساب إلزاميٌّ بصيغةٍ سليمة'; return $out; }
+        if ($asOf === null) { $out['code'] = 422; $out['reason'] = 'تاريخ الاحتساب إلزامي بصيغة سليمة'; return $out; }
 
         $c = null;
         try { $c = $gate->selectOne('employee_contracts', array('where' => array('id' => $contractId))); }
-        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $c'); $c = null; }
-        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقدُ غير موجود'; return $out; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $c'); $c = null; }
+        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقد غير موجود'; return $out; }
         $state = (string) $c['state'];
         if (!EmployeeContractStateMachine::isReadable($state)) {
             $out['code'] = 422;
-            $out['reason'] = 'لا يُقرأ في الاحتساب إلا عقدٌ نافذ (Active/Confirmed/Amended/Seconded) — العقدُ '
+            $out['reason'] = 'لا يقرأ في الاحتساب إلا عقد نافذ (Active/Confirmed/Amended/Seconded) — العقد '
                 . EmployeeContractStateMachine::labelAr($state);
             return $out;
         }
@@ -59,7 +59,7 @@ class ContractSnapshotService
                  WHERE {TENANT_SCOPE} AND cs.contract_id = ? AND cs.as_of_date = ?
                    AND cs.fingerprint = ? AND cs.valid = 1
                  ORDER BY cs.id DESC LIMIT 1", array($contractId, $asOf, $fp));
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $existing'); $existing = array(); }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $existing'); $existing = array(); }
         if ($existing) {
             $out['ok'] = true; $out['code'] = 200; $out['id'] = (int) $existing[0]['id']; $out['reused'] = true;
             return $out;
@@ -76,9 +76,9 @@ class ContractSnapshotService
                 'created_by'   => (int) $actor ?: null,
             ));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الإدراج: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الإدراج: ' . $t->getMessage(); return $out;
         }
-        if ($newId <= 0) { $out['code'] = 422; $out['reason'] = 'تعذّر الإدراج — افحص القيود'; return $out; }
+        if ($newId <= 0) { $out['code'] = 422; $out['reason'] = 'تعذر الإدراج — افحص القيود'; return $out; }
 
         $out['ok'] = true; $out['code'] = 200; $out['id'] = $newId;
         return $out;
@@ -105,12 +105,12 @@ class ContractSnapshotService
                      'id' => null, 'fingerprint' => null, 'reused' => false, 'minted' => false);
         $contractId = (int) $contractId;
         $asOf = self::dateOrNull($asOfDate);
-        if ($asOf === null) { $out['code'] = 422; $out['reason'] = 'تاريخُ الأثر إلزاميٌّ بصيغةٍ سليمة'; return $out; }
+        if ($asOf === null) { $out['code'] = 422; $out['reason'] = 'تاريخ الأثر إلزامي بصيغة سليمة'; return $out; }
 
         $c = null;
         try { $c = $gate->selectOne('employee_contracts', array('where' => array('id' => $contractId))); }
-        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $c'); $c = null; }
-        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقدُ غير موجود'; return $out; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $c'); $c = null; }
+        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقد غير موجود'; return $out; }
 
         // ① لقطةٌ قائمةٌ صالحةٌ حتى تاريخ الأثر — **تُقرأ ولا تُصنع**
         $prior = array();
@@ -120,7 +120,7 @@ class ContractSnapshotService
                  WHERE {TENANT_SCOPE} AND cs.contract_id = ? AND cs.valid = 1
                    AND cs.as_of_date <= ?
                  ORDER BY cs.as_of_date DESC, cs.id DESC LIMIT 1", array($contractId, $asOf));
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $prior'); $prior = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $prior'); $prior = array(); }
         if ($prior) {
             $out['ok'] = true; $out['code'] = 200; $out['reused'] = true;
             $out['id'] = (int) $prior[0]['id'];
@@ -132,7 +132,7 @@ class ContractSnapshotService
         $state = (string) $c['state'];
         if (!in_array($state, self::SETTLEMENT_STATES, true)) {
             $out['code'] = 422;
-            $out['reason'] = 'قناةُ التصفية للمنتهي والمنهَى والمقفل حصرًا — العقدُ '
+            $out['reason'] = 'قناة التصفية للمنتهي والمنهى والمقفل حصرا — العقد '
                 . EmployeeContractStateMachine::labelAr($state);
             return $out;
         }
@@ -150,7 +150,7 @@ class ContractSnapshotService
                  WHERE {TENANT_SCOPE} AND cs.contract_id = ? AND cs.as_of_date = ?
                    AND cs.fingerprint = ? AND cs.valid = 1
                  ORDER BY cs.id DESC LIMIT 1", array($contractId, $asOf, $fp));
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $existing'); $existing = array(); }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $existing'); $existing = array(); }
         if ($existing) {
             $out['ok'] = true; $out['code'] = 200; $out['id'] = (int) $existing[0]['id']; $out['reused'] = true;
             return $out;
@@ -167,9 +167,9 @@ class ContractSnapshotService
                 'created_by'    => (int) $actor ?: null,
             ));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الإدراج: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الإدراج: ' . $t->getMessage(); return $out;
         }
-        if ($newId <= 0) { $out['code'] = 422; $out['reason'] = 'تعذّر الإدراج — افحص القيود'; return $out; }
+        if ($newId <= 0) { $out['code'] = 422; $out['reason'] = 'تعذر الإدراج — افحص القيود'; return $out; }
 
         $out['ok'] = true; $out['code'] = 200; $out['id'] = $newId; $out['minted'] = true;
         return $out;
@@ -180,7 +180,7 @@ class ContractSnapshotService
     {
         $s = null;
         try { $s = $gate->selectOne('contract_snapshots', array('where' => array('id' => (int) $snapshotId))); }
-        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $s'); $s = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $s'); $s = null; }
         if (!$s) { return null; }
         $p = json_decode((string) $s['snapshot_json'], true);
         return is_array($p) ? $p : null;
@@ -191,11 +191,11 @@ class ContractSnapshotService
     {
         $s = null;
         try { $s = $gate->selectOne('contract_snapshots', array('where' => array('id' => (int) $snapshotId))); }
-        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $s'); $s = null; }
-        if (!$s) { return array('ok' => false, 'reason' => 'اللقطةُ غير موجودة'); }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $s'); $s = null; }
+        if (!$s) { return array('ok' => false, 'reason' => 'اللقطة غير موجودة'); }
         $match = sha1((string) $s['snapshot_json']) === (string) $s['fingerprint'];
         return array('ok' => $match,
-                     'reason' => $match ? '' : 'البصمةُ لا تطابق المضمون — تلاعبٌ مكشوف');
+                     'reason' => $match ? '' : 'البصمة لا تطابق المضمون — تلاعب مكشوف');
     }
 
     /**
@@ -212,7 +212,7 @@ class ContractSnapshotService
                 "SELECT cs.id FROM contract_snapshots cs
                  WHERE {TENANT_SCOPE} AND cs.contract_id = ? AND cs.valid = 1
                    AND cs.as_of_date >= ?", array((int) $contractId, $from));
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $rows'); $rows = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $rows'); $rows = array(); }
         $n = 0;
         foreach ($rows as $row) {
             try {

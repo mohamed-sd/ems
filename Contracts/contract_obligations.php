@@ -94,20 +94,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_obligation'])) {
     $from   = trim(strval($_POST['valid_from'] ?? ''));
     $to     = trim(strval($_POST['valid_to'] ?? ''));
 
-    if (!isset($OBL_TYPES[$otype]))    { obl_back('بندُ الالتزام غير صالح ❌', $cid); }
-    if (!isset($OBL_OBLIGORS[$obligor])) { obl_back('الطرفُ الملتزم غير صالح ❌', $cid); }
-    if (!isset($OBL_EFFECTS[$effect])) { obl_back('أثرُ الإخلال على الفوترة غير صالح ❌', $cid); }
+    if (!isset($OBL_TYPES[$otype]))    { obl_back('بند الالتزام غير صالح ❌', $cid); }
+    if (!isset($OBL_OBLIGORS[$obligor])) { obl_back('الطرف الملتزم غير صالح ❌', $cid); }
+    if (!isset($OBL_EFFECTS[$effect])) { obl_back('أثر الإخلال على الفوترة غير صالح ❌', $cid); }
     if ($from === '' || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $from)) {
-        obl_back('تاريخُ السريان إلزاميٌّ — به يُعرف أيُّ نصٍّ حكم الواقعة ❌', $cid);
+        obl_back('تاريخ السريان إلزامي — به يعرف أي نص حكم الواقعة ❌', $cid);
     }
-    if ($to !== '' && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $to)) { obl_back('تاريخُ الانتهاء غير صالح ❌', $cid); }
-    if ($to !== '' && $to < $from) { obl_back('تاريخُ الانتهاء قبل تاريخ السريان ❌', $cid); }
+    if ($to !== '' && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $to)) { obl_back('تاريخ الانتهاء غير صالح ❌', $cid); }
+    if ($to !== '' && $to < $from) { obl_back('تاريخ الانتهاء قبل تاريخ السريان ❌', $cid); }
 
     // العقدُ ضمن نطاق الشركة — تحقّقٌ عبر البوابة لا بالثقة في المدخل
     try {
         $chk = $gate->selectOne('contracts', array('columns' => array('id'), 'where' => array('id' => $cid)));
     } catch (\Throwable $t) { $chk = null; }
-    if (!$chk) { obl_back('العقدُ غير موجود أو خارج نطاق شركتك ❌', $cid); }
+    if (!$chk) { obl_back('العقد غير موجود أو خارج نطاق شركتك ❌', $cid); }
 
     try {
         if ($oid > 0) {
@@ -115,9 +115,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_obligation'])) {
             $cur = $gate->selectOne('contract_obligations', array(
                 'columns' => array('id', 'approval_state'), 'where' => array('id' => $oid),
             ));
-            if (!$cur) { obl_back('البندُ غير موجود أو خارج نطاق شركتك ❌', $cid); }
+            if (!$cur) { obl_back('البند غير موجود أو خارج نطاق شركتك ❌', $cid); }
             if ($cur['approval_state'] === 'approved') {
-                obl_back('البندُ مُجازٌ ونافذ — التغييرُ يكون بصفٍّ جديدٍ بتاريخ سريانه لا بتعديل الماضي ❌', $cid);
+                obl_back('البند مجاز ونافذ — التغيير يكون بصف جديد بتاريخ سريانه لا بتعديل الماضي ❌', $cid);
             }
             $gate->update('contract_obligations', array(
                 'obligation_type'   => $otype,
@@ -126,7 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_obligation'])) {
                 'valid_from'        => $from,
                 'valid_to'          => ($to === '' ? null : $to),
             ), array('id' => $oid), 'is_deleted = 0');
-            obl_back('عُدّلت المسودة ✅', $cid);
+            obl_back('عدلت المسودة ✅', $cid);
         } else {
             $gate->insert('contract_obligations', array(
                 'client_contract_id' => $cid,
@@ -138,15 +138,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_obligation'])) {
                 'approval_state'     => 'draft',
                 'created_by'         => $uid,
             ));
-            obl_back('أُضيفت المسودة — وتنتظر إجازةَ المالية ✅', $cid);
+            obl_back('أضيفت المسودة — وتنتظر إجازة المالية ✅', $cid);
         }
     } catch (\Throwable $t) {
         if (strpos($t->getMessage(), 'uq_obligation_contract_type_from') !== false
             || strpos($t->getMessage(), 'Duplicate') !== false) {
-            obl_back('لهذا البند صفٌّ بنفس تاريخ السريان — غيّر التاريخَ أو عدّل القائم ❌', $cid);
+            obl_back('لهذا البند صف بنفس تاريخ السريان — غير التاريخ أو عدل القائم ❌', $cid);
         }
         error_log('contract_obligations save: ' . $t->getMessage());
-        obl_back('تعذّر الحفظ ❌', $cid);
+        obl_back('تعذر الحفظ ❌', $cid);
     }
 }
 
@@ -155,7 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_obligation'])) {
 // ══════════════════════════════════════════════════════════════════════════════
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approve_action'])) {
     $cid = intval($_POST['client_contract_id'] ?? 0);
-    if (!$can_approve) { obl_back('الإجازةُ صلاحيةُ مدير الإدارة المالية وحدَه ❌', $cid); }
+    if (!$can_approve) { obl_back('الإجازة صلاحية مدير الإدارة المالية وحده ❌', $cid); }
 
     $act = strval($_POST['approve_action']);
     $now = date('Y-m-d H:i:s');
@@ -165,12 +165,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approve_action'])) {
             $cur = $gate->selectOne('contract_obligations', array(
                 'where' => array('id' => $oid),
             ));
-            if (!$cur) { obl_back('البندُ غير موجود أو خارج نطاق شركتك ❌', $cid); }
-            if ($cur['approval_state'] === 'approved') { obl_back('البندُ مُجازٌ سلفًا', $cid); }
+            if (!$cur) { obl_back('البند غير موجود أو خارج نطاق شركتك ❌', $cid); }
+            if ($cur['approval_state'] === 'approved') { obl_back('البند مجاز سلفا', $cid); }
             // P1-B — «من أنشأ لا يعتمد»: البندُ التعاقديُّ يُلزم الشركةَ، فإجازتُه يدٌ ثانية.
             require_once __DIR__ . '/../includes/self_approval_guard.php';
             $__sa = ems_no_self_approval($conn, intval($cur['created_by'] ?? 0), intval($uid),
-                'بندُ التزامٍ تعاقديٍّ #' . $oid, intval($cur['company_id'] ?? 0));
+                'بند التزام تعاقدي #' . $oid, intval($cur['company_id'] ?? 0));
             if ($__sa !== null) { obl_back($__sa['reason'], $cid); }
             $gate->update('contract_obligations', array(
                 'approval_state' => 'approved', 'approved_by' => $uid, 'approved_at' => $now,
@@ -179,14 +179,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approve_action'])) {
             // — «ما قبله بحكمه القديم وما بعده بالجديد» بنيويًّا لا التباسًا.
             require_once __DIR__ . '/../app/Services/Contract/ClientAmendmentEffects.php';
             $closed = \App\Services\Contract\ClientAmendmentEffects::closePredecessors($gate, $cur);
-            obl_back('أُجيز البند — وصار نافذًا من تاريخ سريانه ✅'
-                . ($closed > 0 ? ' وأُقفل سلفُه على ما قبل سريانه' : ''), $cid);
+            obl_back('أجيز البند — وصار نافذا من تاريخ سريانه ✅'
+                . ($closed > 0 ? ' وأقفل سلفه على ما قبل سريانه' : ''), $cid);
         } elseif ($act === 'all') {
             $drafts = $gate->scopedQuery(array('scope' => array('o' => 'contract_obligations')),
                 "SELECT o.id FROM contract_obligations o
                   WHERE {TENANT_SCOPE} AND o.is_deleted = 0 AND o.client_contract_id = ?
                     AND o.approval_state = 'draft'", array($cid));
-            if (empty($drafts)) { obl_back('لا مسوداتٍ تنتظر الإجازة', $cid); }
+            if (empty($drafts)) { obl_back('لا مسودات تنتظر الإجازة', $cid); }
             require_once __DIR__ . '/../app/Services/Contract/ClientAmendmentEffects.php';
             $n = 0;
             $gate->runInTransaction(function ($g) use ($drafts, $uid, $now, &$n) {
@@ -200,13 +200,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approve_action'])) {
                     $n++;
                 }
             });
-            obl_back('أُجيزت ' . $n . ' مسودةً — وصارت نافذةً من تواريخ سريانها وأُقفلت أسلافُها ✅', $cid);
+            obl_back('أجيزت ' . $n . ' مسودة — وصارت نافذة من تواريخ سريانها وأقفلت أسلافها ✅', $cid);
         }
     } catch (\Throwable $t) {
         error_log('contract_obligations approve: ' . $t->getMessage());
-        obl_back('تعذّرت الإجازة ❌', $cid);
+        obl_back('تعذرت الإجازة ❌', $cid);
     }
-    obl_back('إجراءٌ غير معروف ❌', $cid);
+    obl_back('إجراء غير معروف ❌', $cid);
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -221,16 +221,16 @@ if (isset($_GET['delete_id'])) {
             'columns' => array('id', 'approval_state'), 'where' => array('id' => $oid),
         ));
     } catch (\Throwable $t) { $cur = null; }
-    if (!$cur) { obl_back('البندُ غير موجود أو خارج نطاق شركتك ❌', $cid); }
+    if (!$cur) { obl_back('البند غير موجود أو خارج نطاق شركتك ❌', $cid); }
     if ($cur['approval_state'] === 'approved') {
-        obl_back('البندُ مُجازٌ ونافذ — لا يُحذف. أنهِ سريانَه بصفٍّ جديدٍ بدلًا من محو الماضي ❌', $cid);
+        obl_back('البند مجاز ونافذ — لا يحذف. أنه سريانه بصف جديد بدلا من محو الماضي ❌', $cid);
     }
     try {
         $gate->softDelete('contract_obligations', $oid);
-        obl_back('حُذفت المسودة ✅', $cid);
+        obl_back('حذفت المسودة ✅', $cid);
     } catch (\Throwable $t) {
         error_log('contract_obligations delete: ' . $t->getMessage());
-        obl_back('تعذّر الحذف ❌', $cid);
+        obl_back('تعذر الحذف ❌', $cid);
     }
 }
 
@@ -322,8 +322,8 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fa-solid fa-share', 'label' => '');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا
-    echo ems_states_bundle('لا التزاماتِ عقدٍ مسجّلةً على هذا العقدِ بعدُ',
-                           'اختر العقدَ من المرشِّح أعلاه ثمّ سجّل أولَ التزامٍ بزرِّ الإضافةِ في رأسِ الشاشة');
+    echo ems_states_bundle('لا التزامات عقد مسجلة على هذا العقد بعد',
+                           'اختر العقد من المرشح أعلاه ثم سجل أول التزام بزر الإضافة في رأس الشاشة');
     ?>
 
     <?php if (!empty($_GET['msg'])):
@@ -338,9 +338,9 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     <div class="obl-warning">
         <i class="fas fa-triangle-exclamation"></i>
         <div>
-            <strong>تغييرُ الملتزم يسري من تاريخه ولا يمسّ الوقائعَ السابقة.</strong>
-            فالبندُ المُجاز نافذٌ لا يُعدَّل ولا يُحذف — وتغييرُه يكون <em>بصفٍّ جديدٍ بتاريخ سريانه</em>،
-            كي تبقى كلُّ واقعةٍ محكومةً بالنصّ الذي كان ساريًا يومَ وقوعها.
+            <strong>تغيير الملتزم يسري من تاريخه ولا يمس الوقائع السابقة.</strong>
+            فالبند المجاز نافذ لا يعدل ولا يحذف — وتغييره يكون <em>بصف جديد بتاريخ سريانه</em>،
+            كي تبقى كل واقعة محكومة بالنص الذي كان ساريا يوم وقوعها.
         </div>
     </div>
 
@@ -360,7 +360,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                             $n = isset($coverage[$cid]) ? $coverage[$cid] : 0; ?>
                             <option value="<?php echo $cid; ?>" <?php echo $cid === $sel_contract ? 'selected' : ''; ?>>
                                 عقد #<?php echo $cid; ?> — <?php echo obl_e($c['project_name']); ?>
-                                (<?php echo $n; ?>/9 نافذًا)
+                                (<?php echo $n; ?>/9 نافذا)
                             </option>
                         <?php endforeach; ?>
                     </select>
@@ -374,9 +374,9 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         <div class="obl-coverage <?php echo $covered === 9 ? 'is-full' : 'is-partial'; ?>">
             <div class="obl-coverage-head">
                 <i class="fas <?php echo $covered === 9 ? 'fa-circle-check' : 'fa-circle-half-stroke'; ?>"></i>
-                <strong>المصفوفةُ النافذةُ اليوم: <?php echo $covered; ?> من 9 بنودٍ مُجازة</strong>
+                <strong>المصفوفة النافذة اليوم: <?php echo $covered; ?> من 9 بنود مجازة</strong>
                 <?php if ($draft_count > 0): ?>
-                    <span class="obl-chip obl-chip-draft"><?php echo $draft_count; ?> مسودةً تنتظر الإجازة</span>
+                    <span class="obl-chip obl-chip-draft"><?php echo $draft_count; ?> مسودة تنتظر الإجازة</span>
                 <?php endif; ?>
             </div>
             <?php if ($covered < 9): ?>
@@ -387,18 +387,18 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     <?php endif; endforeach; ?>
                 </div>
                 <div class="obl-coverage-note">
-                    ما دام بندٌ غيرَ مُجازٍ فالعقدُ ناقصُ المصفوفة — وعند تفعيل الحارس تُرفض واقعتُه بـ<code>423</code> (ق-2).
+                    ما دام بند غير مجاز فالعقد ناقص المصفوفة — وعند تفعيل الحارس ترفض واقعته ب<code>423</code> (ق-2).
                 </div>
             <?php else: ?>
-                <div class="obl-coverage-note">المصفوفةُ كاملةٌ ونافذة — العقدُ جاهزٌ لتفعيل الحارس.</div>
+                <div class="obl-coverage-note">المصفوفة كاملة ونافذة — العقد جاهز لتفعيل الحارس.</div>
             <?php endif; ?>
             <?php if ($can_approve && $draft_count > 0): ?>
                 <form method="post" action="" class="obl-inline-form"
-                      onsubmit="return confirm('إجازةُ كل المسودات؟ المُجازُ نافذٌ لا يُعدَّل بعدها.')">
+                      onsubmit="return confirm('إجازة كل المسودات؟ المجاز نافذ لا يعدل بعدها.')">
         <?php echo csrf_field(); ?>
                     <input type="hidden" name="approve_action" value="all">
                     <input type="hidden" name="client_contract_id" value="<?php echo $sel_contract; ?>">
-                    <button type="submit" class="btn-primary"><i class="fas fa-stamp"></i> إجازةُ كل المسودات (<?php echo $draft_count; ?>)</button>
+                    <button type="submit" class="btn-primary"><i class="fas fa-stamp"></i> إجازة كل المسودات (<?php echo $draft_count; ?>)</button>
                 </form>
             <?php endif; ?>
         </div>
@@ -407,7 +407,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         <form id="oblForm" action="" method="post" class="allforms">
         <?php echo csrf_field(); ?>
             <div class="card-header">
-                <h5><i class="fas fa-edit"></i> <span id="formTitle">إضافة بندِ التزام</span></h5>
+                <h5><i class="fas fa-edit"></i> <span id="formTitle">إضافة بند التزام</span></h5>
             </div>
             <input type="hidden" name="save_obligation" value="1">
             <input type="hidden" name="obligation_id" id="obligation_id" value="">
@@ -416,7 +416,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                 <div class="card-body">
                     <div class="form-grid">
                         <div>
-                            <label for="obligation_type"><i class="fas fa-list-check"></i> بندُ الالتزام *</label>
+                            <label for="obligation_type"><i class="fas fa-list-check"></i> بند الالتزام *</label>
                             <select name="obligation_type" id="obligation_type" required>
                                 <?php foreach ($OBL_TYPES as $k => $v): ?>
                                     <option value="<?php echo obl_e($k); ?>"><?php echo obl_e($v); ?></option>
@@ -424,16 +424,16 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                             </select>
                         </div>
                         <div>
-                            <label for="obligor"><i class="fas fa-user-shield"></i> الطرفُ الملتزم *</label>
+                            <label for="obligor"><i class="fas fa-user-shield"></i> الطرف الملتزم *</label>
                             <select name="obligor" id="obligor" required>
                                 <?php foreach ($OBL_OBLIGORS as $k => $v): ?>
                                     <option value="<?php echo obl_e($k); ?>" <?php echo $k === 'company' ? 'selected' : ''; ?>><?php echo obl_e($v); ?></option>
                                 <?php endforeach; ?>
                             </select>
-                            <small class="obl-hint">ما لم يُنص عليه يُعدُّ التزامَ الشركة (§4)</small>
+                            <small class="obl-hint">ما لم ينص عليه يعد التزام الشركة (§4)</small>
                         </div>
                         <div>
-                            <label for="effect_on_billing"><i class="fas fa-file-invoice-dollar"></i> أثرُ الإخلال على الفوترة *</label>
+                            <label for="effect_on_billing"><i class="fas fa-file-invoice-dollar"></i> أثر الإخلال على الفوترة *</label>
                             <select name="effect_on_billing" id="effect_on_billing" required>
                                 <?php foreach ($OBL_EFFECTS as $k => $v): ?>
                                     <option value="<?php echo obl_e($k); ?>" <?php echo $k === 'per_clause' ? 'selected' : ''; ?>><?php echo obl_e($v); ?></option>
@@ -447,7 +447,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         <div>
                             <label for="valid_to"><i class="fas fa-calendar-xmark"></i> حتى (اختياري)</label>
                             <input type="date" name="valid_to" id="valid_to">
-                            <small class="obl-hint">فارغٌ أي مفتوحُ السريان</small>
+                            <small class="obl-hint">فارغ أي مفتوح السريان</small>
                         </div>
                     </div>
                     <div class="pu-form-actions">
@@ -466,17 +466,17 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         <thead>
                             <tr>
                                 <th>إجراءات</th>
-                                <th>بندُ الالتزام</th>
-                                <th>الطرفُ الملتزم</th>
-                                <th>أثرُ الإخلال</th>
+                                <th>بند الالتزام</th>
+                                <th>الطرف الملتزم</th>
+                                <th>أثر الإخلال</th>
                                 <th>السريان</th>
                                 <th>الحالة</th>
                                 <th>الإجازة</th>
                                 <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                                 <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                                 <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                                 <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -485,7 +485,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         <tbody>
                         <?php if (empty($rows)): ?>
                             <tr><td colspan="7" class="obl-empty">
-                                لا بنودَ لهذا العقد بعد — والمصفوفةُ الفارغةُ تعني أن المسؤولَ يُشتق من حالة الساعة لا من العقد.
+                                لا بنود لهذا العقد بعد — والمصفوفة الفارغة تعني أن المسؤول يشتق من حالة الساعة لا من العقد.
                             </td></tr>
                         <?php else: foreach ($rows as $r):
                             $eff = intval($r['is_effective']) === 1;
@@ -505,7 +505,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                                         <?php endif; ?>
                                         <?php if ($can_approve && !$approved): ?>
                                             <form method="post" action="" class="obl-inline-form"
-                                                  onsubmit="return confirm('إجازةُ هذا البند؟ المُجازُ نافذٌ لا يُعدَّل.')">
+                                                  onsubmit="return confirm('إجازة هذا البند؟ المجاز نافذ لا يعدل.')">
         <?php echo csrf_field(); ?>
                                                 <input type="hidden" name="approve_action" value="one">
                                                 <input type="hidden" name="obligation_id" value="<?php echo intval($r['id']); ?>">
@@ -516,10 +516,10 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                                         <?php if ($can_delete && !$approved): ?>
                                             <a href="?contract=<?php echo $sel_contract; ?>&delete_id=<?php echo intval($r['id']); ?>"
                                                class="action-btn delete"
-                                               onclick="return confirm('حذفُ هذه المسودة؟')" title="حذف المسودة"><i class="fas fa-trash-alt"></i></a>
+                                               onclick="return confirm('حذف هذه المسودة؟')" title="حذف المسودة"><i class="fas fa-trash-alt"></i></a>
                                         <?php endif; ?>
                                         <?php if ($approved): ?>
-                                            <span class="obl-lock" title="مُجازٌ ونافذ — لا يُعدَّل (لا رجعية §6)"><i class="fas fa-lock"></i></span>
+                                            <span class="obl-lock" title="مجاز ونافذ — لا يعدل (لا رجعية §6)"><i class="fas fa-lock"></i></span>
                                         <?php endif; ?>
                                     </div>
                                 </td>
@@ -535,7 +535,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                                     <?php if ($eff): ?>
                                         <span class="obl-badge obl-badge-eff"><i class="fas fa-circle-check"></i> نافذ</span>
                                     <?php elseif ($approved): ?>
-                                        <span class="obl-badge obl-badge-past"><i class="fas fa-clock-rotate-left"></i> مُجازٌ خارجَ المدة</span>
+                                        <span class="obl-badge obl-badge-past"><i class="fas fa-clock-rotate-left"></i> مجاز خارج المدة</span>
                                     <?php else: ?>
                                         <span class="obl-badge obl-badge-draft"><i class="fas fa-pen"></i> مسودة</span>
                                     <?php endif; ?>
@@ -557,7 +557,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         </div>
     <?php else: ?>
         <div class="card"><div class="card-body obl-empty">
-            اختر عقدًا لعرض مصفوفة التزاماته.
+            اختر عقدا لعرض مصفوفة التزاماته.
         </div></div>
     <?php endif; ?>
 </div>
@@ -568,7 +568,7 @@ $(function () {
     const oblForm = $('#oblForm');
     const toggleBtn = $('#toggleForm');
 
-    function setAdd() { $('#formTitle').text('إضافة بندِ التزام'); $('#submitBtnText').text('حفظ المسودة'); }
+    function setAdd() { $('#formTitle').text('إضافة بند التزام'); $('#submitBtnText').text('حفظ المسودة'); }
     function setEdit() { $('#formTitle').text('تعديل المسودة'); $('#submitBtnText').text('تحديث المسودة'); }
     function resetForm() { if (!oblForm.length) return; oblForm[0].reset(); $('#obligation_id').val(''); setAdd(); if (window.EmsSelect) EmsSelect.refresh(); }
 

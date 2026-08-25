@@ -15,7 +15,7 @@ $is_super_admin = ($current_role === '-1');
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    echo "<script>alert('❌ معرّف الشركة غير متوفر'); window.location.href='equipments.php';</script>";
+    echo "<script>alert('❌ معرف الشركة غير متوفر'); window.location.href='equipments.php';</script>";
     exit;
 }
 

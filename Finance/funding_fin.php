@@ -118,13 +118,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا تسهيلاتِ تمويلٍ مسجَّلةً بعدُ', 'أضفْ تمويلًا بزرِّ «إضافة تمويل» في رأسِ الشاشة فيُولَّد جدولُ سدادِه آليًّا');
+    echo ems_states_bundle('لا تسهيلات تمويل مسجلة بعد', 'أضف تمويلا بزر «إضافة تمويل» في رأس الشاشة فيولد جدول سداده آليا');
     ?>
     <?php fin_msg_banner(); ?>
 
     <form id="finForm" action="" method="post" class="allforms">
         <?php echo csrf_field(); ?>
-        <div class="card-header"><h5><i class="fas fa-edit"></i> إضافة تمويل (يولّد جدول السداد آليّاً)</h5></div>
+        <div class="card-header"><h5><i class="fas fa-edit"></i> إضافة تمويل (يولد جدول السداد آليا)</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
             <div class="form-group"><label for="emsf_230_c6d01">نوع التمويل <span class="required">*</span></label>
                 <select name="facility_type" id="emsf_230_c6d01"><?php foreach ($ftypes as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
@@ -134,7 +134,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="form-group"><label for="emsf_233_21a6f">أصل التمويل <span class="required">*</span></label><input type="number" step="0.01" min="0" name="principal" required id="emsf_233_21a6f"></div>
             <div class="form-group"><label for="emsf_234_b703a">هامش الربح %</label><input type="number" step="0.01" name="profit_rate" placeholder="مثال 12" id="emsf_234_b703a"></div>
             <div class="form-group"><label for="emsf_235_3b31f">العملة</label><select name="currency" id="emsf_235_3b31f"><option value="SDG">SDG</option><option value="USD">USD</option></select></div>
-            <div class="form-group"><label for="emsf_236_4d9af">تاريخ البداية</label><input type="date" name="start_date" aria-label="تاريخُ بدايةِ التمويل" id="emsf_236_4d9af" value="<?php echo date('Y-m-d'); ?>"></div>
+            <div class="form-group"><label for="emsf_236_4d9af">تاريخ البداية</label><input type="date" name="start_date" aria-label="تاريخ بداية التمويل" id="emsf_236_4d9af" value="<?php echo date('Y-m-d'); ?>"></div>
             <div class="form-group"><label for="emsf_237_a0d82">عدد الأقساط <span class="required">*</span></label><input type="number" min="1" max="120" name="installments" value="12" required id="emsf_237_a0d82"></div>
         </div></div>
         <div class="form-actions"><button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
@@ -148,10 +148,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <table id="finTable" class="display nowrap alltables fin-fnd-tbl" data-scroll-x="1" data-state-save="false">
                 <thead><tr><th>الإجراءات</th><th>الرقم</th><th>النوع</th><th>الغرض</th><th>الممول</th><th>الأصل</th><th>الهامش %</th><th>الحالة</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -165,7 +165,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     echo "<tr><td><div class='action-btns'>";
                     echo "<a href='?fid=$id' class='action-btn' title='جدول السداد'><i class='fas fa-list-check'></i></a>";
                     if ($can_edit && in_array($st, array('draft','approved'))) echo "<a href='?action=activate&fid=$id' class='action-btn edit' title='تفعيل'><i class='fas fa-play'></i></a>";
-                    if ($can_edit && $st === 'active') echo "<a href='?action=settle&fid=$id' class='action-btn edit' title='تسديد' onclick='return confirm(\"وضع التمويل كمُسدَّد؟\")'><i class='fas fa-flag-checkered'></i></a>";
+                    if ($can_edit && $st === 'active') echo "<a href='?action=settle&fid=$id' class='action-btn edit' title='تسديد' onclick='return confirm(\"وضع التمويل كمسدد؟\")'><i class='fas fa-flag-checkered'></i></a>";
                     if ($can_delete && $st === 'draft') echo "<a href='?delete_id=$id' class='action-btn delete' onclick='return confirm(\"حذف؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>";
                     echo "</div></td>";
                     echo "<td>" . htmlspecialchars((string)$row['facility_no']) . "</td>";
@@ -186,7 +186,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <h5 class="fin-fnd-h5-next"><i class="fas fa-calendar-days"></i> جدول سداد التمويل #<?php echo $sel_fid; ?></h5>
         <div class="table-container">
             <table class="alltables fin-fnd-tbl">
-                <thead><tr><th>القسط</th><th>الاستحقاق</th><th>الأصل</th><th>الفائدة</th><th>الإجمالي</th><th>المسدَّد</th><th>الحالة</th><th>الإجراء</th></tr></thead>
+                <thead><tr><th>القسط</th><th>الاستحقاق</th><th>الأصل</th><th>الفائدة</th><th>الإجمالي</th><th>المسدد</th><th>الحالة</th><th>الإجراء</th></tr></thead>
                 <tbody>
                 <?php
                 $today = date('Y-m-d'); $sum_total = 0; $sum_paid = 0;
@@ -197,7 +197,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     $overdue = ($s['state'] !== 'paid' && $s['due_date'] < $today);
                     $st = $overdue ? 'overdue' : (string)$s['state'];
                     $tone = $st === 'paid' ? 'success' : ($st === 'overdue' ? 'danger' : ($st === 'partial' ? 'primary' : 'secondary'));
-                    $lbl = array('due' => 'مستحق', 'partial' => 'جزئي', 'paid' => 'مسدَّد', 'overdue' => 'متأخر');
+                    $lbl = array('due' => 'مستحق', 'partial' => 'جزئي', 'paid' => 'مسدد', 'overdue' => 'متأخر');
                     echo "<tr>";
                     echo "<td>" . intval($s['installment_no']) . "</td>";
                     echo "<td>" . htmlspecialchars((string)$s['due_date']) . "</td>";
@@ -212,7 +212,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 } }
                 ?>
                 </tbody>
-                <tfoot><tr><th colspan="4">الإجمالي</th><th><?php echo number_format($sum_total, 2); ?></th><th><?php echo number_format($sum_paid, 2); ?></th><th colspan="2">المتبقّي: <?php echo number_format($sum_total - $sum_paid, 2); ?></th></tr></tfoot>
+                <tfoot><tr><th colspan="4">الإجمالي</th><th><?php echo number_format($sum_total, 2); ?></th><th><?php echo number_format($sum_paid, 2); ?></th><th colspan="2">المتبقي: <?php echo number_format($sum_total - $sum_paid, 2); ?></th></tr></tfoot>
             </table>
         </div>
         <?php endif; ?>

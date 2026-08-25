@@ -49,23 +49,23 @@ class CapabilityService
         $opp = (int) ($d['opportunity_id'] ?? 0);
         $svc = trim((string) ($d['service_type'] ?? ''));
         $qty = round((float) ($d['qty'] ?? 0), 4);
-        if ($opp <= 0) { return self::fail(422, 'لا احتياجَ بلا فرصةٍ أمّ — السجلُّ تابعٌ لا مستقل'); }
-        if (mb_strlen($svc) < 3) { return self::fail(422, 'نوعُ الخدمةِ إلزاميّ'); }
-        if ($qty <= 0) { return self::fail(422, 'الكميةُ يجب أن تكون موجبة'); }
+        if ($opp <= 0) { return self::fail(422, 'لا احتياج بلا فرصة أم — السجل تابع لا مستقل'); }
+        if (mb_strlen($svc) < 3) { return self::fail(422, 'نوع الخدمة إلزامي'); }
+        if ($qty <= 0) { return self::fail(422, 'الكمية يجب أن تكون موجبة'); }
 
         /* الأبُ يُقرأ: حالتُه ومسؤولُه — والوراثةُ منه لا إعادةُ إدخال */
         $o = $gate->selectOne('opportunities', array('where' => array('id' => $opp)));
-        if (!$o) { return self::fail(404, 'الفرصةُ غيرُ موجودة'); }
+        if (!$o) { return self::fail(404, 'الفرصة غير موجودة'); }
         /* ◆ **المرحلةُ تُقرأ من عمودِها الحيِّ لا من اسمٍ مفترَض**: العمودُ
          *   `stage` بقيمٍ عربيةٍ محكومة، و`status` لا وجودَ له في الجدول.
          *   والمغلقةُ ثلاثٌ: فوز · خسارة · مستبعدة. */
         $stage = trim((string) ($o['stage'] ?? ''));
         $CLOSED = array('فوز', 'خسارة', 'مستبعدة');
         if ($stage !== '' && in_array($stage, $CLOSED, true)) {
-            return self::fail(409, "لا يُسجَّل احتياجٌ على فرصةٍ غيرِ مفتوحة — مرحلتُها: {$stage}");
+            return self::fail(409, "لا يسجل احتياج على فرصة غير مفتوحة — مرحلتها: {$stage}");
         }
         if ((int) ($o['is_deleted'] ?? 0) === 1) {
-            return self::fail(409, 'الفرصةُ محذوفةٌ ناعمًا — لا يُسجَّل عليها احتياج');
+            return self::fail(409, 'الفرصة محذوفة ناعما — لا يسجل عليها احتياج');
         }
         $no  = 'NED-' . str_pad((string) $opp, 6, '0', STR_PAD_LEFT) . '-'
              . str_pad((string) (int) $gate->count('sal_client_needs',
@@ -87,9 +87,9 @@ class CapabilityService
             'notes' => mb_substr((string) ($d['notes'] ?? ''), 0, 400),
             'state' => 'draft', 'created_by' => (int) $by,
             'idem_key' => self::idem(array('ned', (int) $companyId, $opp, $svc, $qty)),
-        ), 'احتياجٌ مسجَّلٌ سلفًا بالخدمةِ والكميةِ نفسِهما — عطالة');
+        ), 'احتياج مسجل سلفا بالخدمة والكمية نفسهما — عطالة');
         if (!$r['ok']) { return self::fail(!empty($r['dup']) ? 200 : 500, $r['msg']); }
-        return self::done(201, "سُجِّل الاحتياجُ {$no} — ولا يُصدَر عرضٌ قبلَ رفعِه", $r['id']);
+        return self::done(201, "سجل الاحتياج {$no} — ولا يصدر عرض قبل رفعه", $r['id']);
     }
 
     /** رفعُ الاحتياجِ — وبه وحدَه يُتاح إصدارُ العرض. */
@@ -98,8 +98,8 @@ class CapabilityService
         $n = $gate->update('sal_client_needs',
             array('state' => 'submitted', 'submitted_at' => date('Y-m-d H:i:s')),
             array('id' => (int) $id, 'state' => 'draft'));
-        if ((int) $n === 0) { return self::fail(409, 'لا يُرفع إلا احتياجٌ مسودّة'); }
-        return self::done(200, 'رُفع الاحتياج — وصار إصدارُ العرضِ متاحًا', $id);
+        if ((int) $n === 0) { return self::fail(409, 'لا يرفع إلا احتياج مسودة'); }
+        return self::done(200, 'رفع الاحتياج — وصار إصدار العرض متاحا', $id);
     }
 
     /* ══ الورقة 08 — بنودُ العروض ═══════════════════════════════════════ */
@@ -112,12 +112,12 @@ class CapabilityService
         $pr  = round((float) ($d['unit_price'] ?? 0), 2);
         $cur = mb_substr(trim((string) ($d['currency'] ?? '')), 0, 8);
         $disc = round((float) ($d['discount_pct'] ?? 0), 2);
-        if ($q <= 0) { return self::fail(422, 'لا بندَ بلا رأسِ عرض — البنودُ تابعةٌ لرأسِها'); }
-        if (mb_strlen($desc) < 3) { return self::fail(422, 'وصفُ البندِ إلزاميّ'); }
-        if ($qty <= 0) { return self::fail(422, 'الكميةُ يجب أن تكون موجبة'); }
-        if ($pr < 0)   { return self::fail(422, 'السعرُ لا يكون سالبًا'); }
-        if (mb_strlen($cur) < 3) { return self::fail(422, 'لا مبلغَ بلا عملة'); }
-        if ($disc < 0 || $disc > 100) { return self::fail(422, 'الخصمُ بين صفرٍ ومئة'); }
+        if ($q <= 0) { return self::fail(422, 'لا بند بلا رأس عرض — البنود تابعة لرأسها'); }
+        if (mb_strlen($desc) < 3) { return self::fail(422, 'وصف البند إلزامي'); }
+        if ($qty <= 0) { return self::fail(422, 'الكمية يجب أن تكون موجبة'); }
+        if ($pr < 0)   { return self::fail(422, 'السعر لا يكون سالبا'); }
+        if (mb_strlen($cur) < 3) { return self::fail(422, 'لا مبلغ بلا عملة'); }
+        if ($disc < 0 || $disc > 100) { return self::fail(422, 'الخصم بين صفر ومئة'); }
 
         /* ◆ **الحسابُ في طبقةِ الخدمةِ لا في الشاشة** — يُعرض ولا يُدخَل */
         $total = round($qty * $pr * (1 - $disc / 100), 2);
@@ -131,9 +131,9 @@ class CapabilityService
             'unit_price' => $pr, 'currency' => $cur, 'discount_pct' => $disc,
             'line_total' => $total, 'notes' => mb_substr((string) ($d['notes'] ?? ''), 0, 200),
             'created_by' => (int) $by,
-        ), 'بندٌ بالرقمِ نفسِه مسجَّلٌ سلفًا — عطالة');
+        ), 'بند بالرقم نفسه مسجل سلفا — عطالة');
         if (!$r['ok']) { return self::fail(!empty($r['dup']) ? 200 : 500, $r['msg']); }
-        return self::done(201, "أُضيف البندُ رقم {$next} — الإجمالي " . number_format($total, 2) . " {$cur}", $r['id']);
+        return self::done(201, "أضيف البند رقم {$next} — الإجمالي " . number_format($total, 2) . " {$cur}", $r['id']);
     }
 
     /* ══ الورقة 09 — التفاوضُ ومراجعاتُ العرض ══════════════════════════ */
@@ -145,10 +145,10 @@ class CapabilityService
         $party = (string) ($d['party'] ?? '');
         $note = trim((string) ($d['note'] ?? ''));
         $KINDS = array('issued', 'sent', 'client_counter', 'revised', 'accepted', 'rejected', 'expired');
-        if ($q <= 0) { return self::fail(422, 'لا واقعةَ تفاوضٍ بلا عرض'); }
-        if (!in_array($kind, $KINDS, true)) { return self::fail(422, 'نوعُ الواقعةِ محكومٌ من قائمةٍ مغلقة'); }
-        if (!in_array($party, array('us', 'client'), true)) { return self::fail(422, 'الطرفُ: نحن أو العميل'); }
-        if (mb_strlen($note) < 8) { return self::fail(422, 'لا واقعةَ تفاوضٍ بلا نصٍّ يشرحها'); }
+        if ($q <= 0) { return self::fail(422, 'لا واقعة تفاوض بلا عرض'); }
+        if (!in_array($kind, $KINDS, true)) { return self::fail(422, 'نوع الواقعة محكوم من قائمة مغلقة'); }
+        if (!in_array($party, array('us', 'client'), true)) { return self::fail(422, 'الطرف: نحن أو العميل'); }
+        if (mb_strlen($note) < 8) { return self::fail(422, 'لا واقعة تفاوض بلا نص يشرحها'); }
 
         $next = (int) $gate->count('sal_quotation_revisions', array('where' => array('quotation_id' => $q))) + 1;
         $r = self::guardedInsert($gate, 'sal_quotation_revisions', array(
@@ -162,9 +162,9 @@ class CapabilityService
             'valid_until' => ($d['valid_until'] ?? '') !== '' ? $d['valid_until'] : null,
             'decided_by' => (int) $by,
             'idem_key' => self::idem(array('sqr', (int) $companyId, $q, $kind, $note)),
-        ), 'واقعةٌ مسجَّلةٌ سلفًا بالنصِّ نفسِه — عطالة');
+        ), 'واقعة مسجلة سلفا بالنص نفسه — عطالة');
         if (!$r['ok']) { return self::fail(!empty($r['dup']) ? 200 : 500, $r['msg']); }
-        return self::done(201, "سُجِّلت المراجعةُ رقم {$next}", $r['id']);
+        return self::done(201, "سجلت المراجعة رقم {$next}", $r['id']);
     }
 
     /* ══ الورقة م19 — المخالفاتُ والجزاءات ═════════════════════════════ */
@@ -178,11 +178,11 @@ class CapabilityService
         $amt  = round((float) ($d['penalty_amount'] ?? 0), 2);
         $cur  = mb_substr(trim((string) ($d['currency'] ?? '')), 0, 8);
         $KINDS = array('availability', 'quality', 'safety', 'document', 'delay', 'other');
-        if ($sup <= 0) { return self::fail(422, 'لا مخالفةَ بلا مورّد'); }
-        if (!in_array($kind, $KINDS, true)) { return self::fail(422, 'نوعُ المخالفةِ محكومٌ من قائمةٍ مغلقة'); }
-        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $on)) { return self::fail(422, 'تاريخُ الوقوعِ بصيغةِ YYYY-MM-DD'); }
-        if (mb_strlen($desc) < 8) { return self::fail(422, 'لا مخالفةَ بلا وصفٍ مفهوم'); }
-        if ($amt > 0 && mb_strlen($cur) < 3) { return self::fail(422, 'لا جزاءَ بمبلغٍ بلا عملة'); }
+        if ($sup <= 0) { return self::fail(422, 'لا مخالفة بلا مورد'); }
+        if (!in_array($kind, $KINDS, true)) { return self::fail(422, 'نوع المخالفة محكوم من قائمة مغلقة'); }
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $on)) { return self::fail(422, 'تاريخ الوقوع بصيغة YYYY-MM-DD'); }
+        if (mb_strlen($desc) < 8) { return self::fail(422, 'لا مخالفة بلا وصف مفهوم'); }
+        if ($amt > 0 && mb_strlen($cur) < 3) { return self::fail(422, 'لا جزاء بمبلغ بلا عملة'); }
 
         $no = 'VIO-' . str_replace('-', '', $on) . '-' . str_pad((string) $sup, 5, '0', STR_PAD_LEFT);
         $r = self::guardedInsert($gate, 'sup_violations', array(
@@ -196,9 +196,9 @@ class CapabilityService
             'penalty_amount' => $amt, 'currency' => $amt > 0 ? $cur : null,
             'recorded_by' => (int) $by, 'state' => 'recorded',
             'idem_key' => self::idem(array('vio', (int) $companyId, $sup, $on, $kind, $desc)),
-        ), 'مخالفةٌ مسجَّلةٌ سلفًا لهذا المورّدِ بالتاريخِ والنوعِ نفسِهما — عطالة');
+        ), 'مخالفة مسجلة سلفا لهذا المورد بالتاريخ والنوع نفسهما — عطالة');
         if (!$r['ok']) { return self::fail(!empty($r['dup']) ? 200 : 500, $r['msg']); }
-        return self::done(201, "سُجِّلت المخالفةُ {$no} — والاعتمادُ بيدٍ غيرِ يدِ راصدِها", $r['id']);
+        return self::done(201, "سجلت المخالفة {$no} — والاعتماد بيد غير يد راصدها", $r['id']);
     }
 
     /** الاعتماد — **مَن رصد لا يعتمد**، وقيدُ القاعدةِ يسنده. */
@@ -206,35 +206,35 @@ class CapabilityService
     {
         $row = $gate->selectOne('sup_violations', array(
             'columns' => array('state', 'recorded_by'), 'where' => array('id' => (int) $id)));
-        if (!$row) { return self::fail(404, 'المخالفةُ غيرُ موجودة'); }
-        if ($row['state'] === 'approved') { return self::fail(200, 'معتمَدةٌ سلفًا — عطالة'); }
-        if ($row['state'] !== 'recorded') { return self::fail(409, "الاعتمادُ على «مرصودة» وحدَها — الحالُ: {$row['state']}"); }
+        if (!$row) { return self::fail(404, 'المخالفة غير موجودة'); }
+        if ($row['state'] === 'approved') { return self::fail(200, 'معتمدة سلفا — عطالة'); }
+        if ($row['state'] !== 'recorded') { return self::fail(409, "الاعتماد على «مرصودة» وحدها — الحال: {$row['state']}"); }
         if ((int) $row['recorded_by'] === (int) $actor) {
-            return self::fail(403, '**مَن رصد لا يعتمد** — والجزاءُ أثرٌ ماليٌّ لا يقرّره راصدُه وحدَه');
+            return self::fail(403, '**من رصد لا يعتمد** — والجزاء أثر مالي لا يقرره راصده وحده');
         }
         $n = $gate->update('sup_violations',
             array('state' => 'approved', 'approved_by' => (int) $actor, 'approved_at' => date('Y-m-d H:i:s')),
             array('id' => (int) $id, 'state' => 'recorded'));
-        if ((int) $n === 0) { return self::fail(409, 'تغيّرت الحالةُ بين القراءةِ والكتابة'); }
-        return self::done(200, 'اعتُمدت المخالفةُ — وأثرُها يظهر في التسوية', $id);
+        if ((int) $n === 0) { return self::fail(409, 'تغيرت الحالة بين القراءة والكتابة'); }
+        return self::done(200, 'اعتمدت المخالفة — وأثرها يظهر في التسوية', $id);
     }
 
     /** الإسقاط — بسببٍ مكتوبٍ إلزامًا (قيدُ القاعدةِ يرفض دونَه). */
     public static function waiveViolation($conn, $gate, $companyId, $id, $reason, $actor)
     {
         $reason = trim((string) $reason);
-        if (mb_strlen($reason) < 8) { return self::fail(422, 'لا إسقاطَ بلا سببٍ مكتوبٍ مفهوم'); }
+        if (mb_strlen($reason) < 8) { return self::fail(422, 'لا إسقاط بلا سبب مكتوب مفهوم'); }
         $row = $gate->selectOne('sup_violations', array(
             'columns' => array('state', 'recorded_by'), 'where' => array('id' => (int) $id)));
-        if (!$row) { return self::fail(404, 'المخالفةُ غيرُ موجودة'); }
+        if (!$row) { return self::fail(404, 'المخالفة غير موجودة'); }
         if ((int) $row['recorded_by'] === (int) $actor) {
-            return self::fail(403, '**مَن رصد لا يُسقط** — فصلُ الواجباتِ لا يُختصر');
+            return self::fail(403, '**من رصد لا يسقط** — فصل الواجبات لا يختصر');
         }
         $n = $gate->update('sup_violations',
             array('state' => 'waived', 'waive_reason' => mb_substr($reason, 0, 300),
                   'approved_by' => (int) $actor, 'approved_at' => date('Y-m-d H:i:s')),
             array('id' => (int) $id), "`state` IN ('recorded','reviewed')");
-        if ((int) $n === 0) { return self::fail(409, 'لا يُسقَط إلا ما لم يُعتمد بعد'); }
-        return self::done(200, 'أُسقطت المخالفةُ بسببٍ مكتوب', $id);
+        if ((int) $n === 0) { return self::fail(409, 'لا يسقط إلا ما لم يعتمد بعد'); }
+        return self::done(200, 'أسقطت المخالفة بسبب مكتوب', $id);
     }
 }

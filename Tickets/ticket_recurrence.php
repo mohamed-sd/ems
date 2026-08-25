@@ -77,14 +77,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => 'tickets_list.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا قواعدَ تكرارٍ معرَّفةً بعدُ', 'أضف أولَ قاعدةِ تكرارٍ بزرِّ الإضافةِ في رأسِ الشاشة');
+    echo ems_states_bundle('لا قواعد تكرار معرفة بعد', 'أضف أول قاعدة تكرار بزر الإضافة في رأس الشاشة');
     ?>
     <?php tkt_msg_banner(); ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <div class="success-message is-success tkt-rec-note">
         <i class="fas fa-circle-info"></i>
-        تولّد <strong>دورة البلاغات المجدوَلة</strong> التذكرةَ قبل موعدها بعدد أيام المهلة، ثم تدفع «التوليد التالي» بمقدار الفاصل — فلا يُنسى تفتيشٌ ولا تجديد.
+        تولد <strong>دورة البلاغات المجدولة</strong> التذكرة قبل موعدها بعدد أيام المهلة، ثم تدفع «التوليد التالي» بمقدار الفاصل — فلا ينسى تفتيش ولا تجديد.
     </div>
 
     <form id="tktForm" action="" method="post" class="allforms">
@@ -94,7 +94,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <input type="hidden" name="id" id="r_id" value="">
             <div class="form-section"><div class="form-grid">
                 <div class="form-group"><label for="r_name">اسم القالب <span class="required">*</span></label><input type="text" name="name" id="r_name" required></div>
-                <div class="form-group"><label for="r_type">نوع التذكرة المُولَّدة <span class="required">*</span></label>
+                <div class="form-group"><label for="r_type">نوع التذكرة المولدة <span class="required">*</span></label>
                     <select name="ticket_type_id" id="r_type" required><?php echo tkt_type_options(); ?></select></div>
                 <div class="form-group"><label for="r_equipment">المعدة المستهدفة (اختياري)</label>
                     <select name="equipment_id" id="r_equipment"><?php echo tkt_equipment_options(); ?></select></div>
@@ -102,10 +102,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="form-group"><label for="r_unit">الوحدة <span class="required">*</span></label>
                     <select name="recurrence_unit" id="r_unit"><?php foreach ($units as $k => $v): ?><option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option><?php endforeach; ?></select></div>
                 <div class="form-group"><label for="r_next">التوليد التالي <span class="required">*</span></label><input type="date" name="next_occurrence_date" id="r_next" required></div>
-                <div class="form-group"><label for="r_lead">التوليد قبل الموعد بـ (أيام)</label><input type="number" min="0" name="lead_time_days" id="r_lead" value="0"></div>
-                <div class="form-group"><label for="r_priority">أولوية التذكرة المُولَّدة</label>
+                <div class="form-group"><label for="r_lead">التوليد قبل الموعد ب (أيام)</label><input type="number" min="0" name="lead_time_days" id="r_lead" value="0"></div>
+                <div class="form-group"><label for="r_priority">أولوية التذكرة المولدة</label>
                     <select name="default_priority" id="r_priority"><?php foreach ($priorities as $k => $v): ?><option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option><?php endforeach; ?></select></div>
-                <div class="form-group"><label>مفعّل؟</label><label class="switch-inline"><input type="checkbox" name="active" id="r_active" aria-label="تفعيلُ قاعدةِ التكرار" value="1" checked> نعم</label></div>
+                <div class="form-group"><label>مفعل؟</label><label class="switch-inline"><input type="checkbox" name="active" id="r_active" aria-label="تفعيل قاعدة التكرار" value="1" checked> نعم</label></div>
             </div></div>
             <div class="form-actions">
                 <button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
@@ -127,28 +127,28 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="ems-fn-th" data-fn="1">آخر بلاغ</th>
               <th class="ems-fn-th" data-fn="1">إجمالي ساعات التوقف</th>
               <th class="ems-fn-th" data-fn="1">إجمالي التكلفة</th>
-              <th class="ems-fn-th" data-fn="1">السبب الجذري المرجَّح</th>
+              <th class="ems-fn-th" data-fn="1">السبب الجذري المرجح</th>
               <th class="ems-fn-th" data-fn="1">الإجراء الجذري</th>
               <th class="ems-fn-th" data-fn="1">المسؤول</th>
               <th class="ems-fn-th" data-fn="1">تاريخ الإقفال</th>
               <th class="ems-fn-th" data-fn="1">رقم القالب</th>
               <th class="ems-fn-th none" data-fn="1">الفئة</th>
               <th class="ems-fn-th none" data-fn="1">الإدارة المستهدفة</th>
-              <th class="ems-fn-th none" data-fn="1">المكلَّف الافتراضي</th>
+              <th class="ems-fn-th none" data-fn="1">المكلف الافتراضي</th>
               <th class="ems-fn-th none" data-fn="1">الدورية</th>
               <th class="ems-fn-th none" data-fn="1">يوم التوليد</th>
               <th class="ems-fn-th none" data-fn="1">آخر توليد</th>
-              <th class="ems-fn-th none" data-fn="1">عدد المولَّد</th>
+              <th class="ems-fn-th none" data-fn="1">عدد المولد</th>
               <th class="ems-fn-th none" data-fn="1">نسبة الإنجاز</th>
-              <th class="ems-fn-th none" data-fn="1">عرّفه</th>
+              <th class="ems-fn-th none" data-fn="1">عرفه</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-              <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
               <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
               <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>

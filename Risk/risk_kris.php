@@ -34,12 +34,12 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     $header_icon = 'fas fa-gauge-high';
     $header_actions = array();
     $header_back = array();
-    $header_context = array('المقام' => count($rows) . ' مؤشرًا (ورقة 26)', 'حرجة' => $critN, 'إنذار' => $warnN);
+    $header_context = array('المقام' => count($rows) . ' مؤشرا (ورقة 26)', 'حرجة' => $critN, 'إنذار' => $warnN);
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا مؤشراتِ خطرٍ نشطةً في نطاقِك', 'فعِّلْ مؤشراتِ الورقةِ 26 لإدارتِك مع إدارةِ المخاطرِ ثمّ أعِدْ فتحَ الشاشة');
-    ems_screen_about('المؤشر يُقرأ من النظام وينذر باقتراب الخطر قبل وقوعه — وبلوغ الحد الحرج يولد إشارة SG-15 وتصعيدًا بمهلته.',
-        array('فشل مؤشر الضابط (KCI) يرفع الخطر المتبقي فورًا'));
+    echo ems_states_bundle('لا مؤشرات خطر نشطة في نطاقك', 'فعل مؤشرات الورقة 26 لإدارتك مع إدارة المخاطر ثم أعد فتح الشاشة');
+    ems_screen_about('المؤشر يقرأ من النظام وينذر باقتراب الخطر قبل وقوعه — وبلوغ الحد الحرج يولد إشارة SG-15 وتصعيدا بمهلته.',
+        array('فشل مؤشر الضابط (KCI) يرفع الخطر المتبقي فورا'));
     ?>
     <div class="card"><div class="card-body table-responsive">
         <table class="table table-striped kri-table">
@@ -56,14 +56,14 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                 <td><?php echo htmlspecialchars((string) $k['ru_code']); ?></td>
                 <td><?php echo htmlspecialchars((string) $k['current_value'] ?: '—'); ?></td>
                 <td><?php $map = array('ok' => array('success', 'سليم'), 'warn' => array('warning', 'إنذار'),
-                        'critical' => array('danger', 'حرج'), 'unread' => array('secondary', 'لم يُقرأ'));
+                        'critical' => array('danger', 'حرج'), 'unread' => array('secondary', 'لم يقرأ'));
                     $mm = $map[$k['kri_state']]; ?>
                     <span class="badge badge-<?php echo $mm[0]; ?>"><?php echo $mm[1]; ?></span></td>
                 <td><?php echo htmlspecialchars((string) $k['last_read_at'] ?: '—'); ?></td>
                 <?php if ($canWrite): ?>
                 <td class="kri-update-cell">
-                    <input class="kriVal form-control form-control-sm kri-val-input" placeholder="القيمة" aria-label="القيمةُ المقروءةُ للمؤشر">
-                    <select class="kriState form-control form-control-sm kri-state-select" aria-label="حالةُ المؤشرِ بعدَ القراءة">
+                    <input class="kriVal form-control form-control-sm kri-val-input" placeholder="القيمة" aria-label="القيمة المقروءة للمؤشر">
+                    <select class="kriState form-control form-control-sm kri-state-select" aria-label="حالة المؤشر بعد القراءة">
                         <option value="ok">سليم</option><option value="warn">إنذار</option><option value="critical">حرج</option>
                     </select>
                     <button class="btn btn-sm btn-secondary kriGo" data-id="<?php echo (int) $k['id']; ?>">حفظ</button>

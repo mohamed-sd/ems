@@ -107,7 +107,7 @@ function u13_cell($val, $col)
    القالبُ — يعمل في النطاقِ العامِّ ويحتاج `$U13` مصفوفةَ العقد
    ═══════════════════════════════════════════════════════════════════════════ */
 if (!isset($U13) || !is_array($U13)) {
-    exit('u13_screen_kit: تُضمَّن العُدّةُ بعد تعريفِ $U13 — انظر رأسَ الملف');
+    exit('u13_screen_kit: تضمن العدة بعد تعريف $U13 — انظر رأس الملف');
 }
 
 $u13Root = dirname(__DIR__);
@@ -247,18 +247,18 @@ if ($u13Actions && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['u13_ac
     /* ① الرمزُ المميّز — الحارسُ المركزيُّ متدرِّجٌ بمساراتِه، وهذه مسالكُ
          كتابةٍ جديدةٌ فتُنفَذ عليها من يومِها لا بانتظارِ دورِها في القائمة. */
     if (!function_exists('verify_csrf_token') || !verify_csrf_token((string) ($_POST['csrf_token'] ?? ''))) {
-        $u13Msg = '✗ رمزُ الحمايةِ غيرُ صالحٍ — أعِد تحميلَ الصفحةِ وحاول';
+        $u13Msg = '✗ رمز الحماية غير صالح — أعد تحميل الصفحة وحاول';
         if (function_exists('log_security_event')) {
             log_security_event('U13_ACTION_CSRF_FAIL', $U13['screen'] . ' · ' . $act);
         }
     } elseif ($spec === null) {
-        $u13Msg = '✗ فعلٌ غيرُ معرَّفٍ لهذه الشاشة';
+        $u13Msg = '✗ فعل غير معرف لهذه الشاشة';
     } elseif (!$u13IsSuper && empty($__pp['can_edit'])) {
-        $u13Msg = '✗ لا صلاحيةَ كتابةٍ في هذه الشاشة';
+        $u13Msg = '✗ لا صلاحية كتابة في هذه الشاشة';
     } elseif (!u13_action_registered($conn, $code)) {
         /* ② «الوصلُ في موضعين وإلا زخرفة»: فعلٌ بلا رمزٍ في القاموسِ لا يُقاس
              ولا يُدقَّق — فلا يُنفَّذ. */
-        $u13Msg = '✗ فعلٌ غيرُ مسجَّلٍ في قاموسِ الأفعال: ' . ($code !== '' ? $code : '(بلا رمز)');
+        $u13Msg = '✗ فعل غير مسجل في قاموس الأفعال: ' . ($code !== '' ? $code : '(بلا رمز)');
         if (function_exists('log_security_event')) {
             log_security_event('U13_ACTION_UNREGISTERED', $U13['screen'] . ' · ' . $act . ' · ' . $code);
         }
@@ -267,11 +267,11 @@ if ($u13Actions && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['u13_ac
             $res = call_user_func($spec['run'], $conn, $u13Company, $u13Uid, $_POST);
             $u13Msg = !empty($res['ok'])
                     ? '✓ ' . (string) ($res['reason'] ?? 'تمّ')
-                    : '✗ ' . (string) ($res['reason'] ?? 'تعذّر الفعل');
+                    : '✗ ' . (string) ($res['reason'] ?? 'تعذر الفعل');
             if (function_exists('log_security_event')) {
                 log_security_event('U13_ACTION', $code . ' — ' . mb_substr($u13Msg, 0, 160));
             }
-        } catch (\Throwable $e) { ems_catch_ignored($e, __METHOD__, 'نصُّ الاستثناءِ يُعرض للمستخدمِ في رسالةِ الشاشةِ — فالفشلُ ظاهرٌ لا مبتلَع');
+        } catch (\Throwable $e) { ems_catch_ignored($e, __METHOD__, 'نص الاستثناء يعرض للمستخدم في رسالة الشاشة — فالفشل ظاهر لا مبتلع');
             $u13Msg = '✗ ' . $e->getMessage();
         }
     }
@@ -313,13 +313,13 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
    في العُدّةِ لا في الملفِّ المولَّدِ فلا تمحوها إعادةُ التوليد */
 if (function_exists('ems_states_bundle')) {
     echo ems_states_bundle(
-        isset($U13['empty_title']) ? $U13['empty_title'] : 'لا توجد بياناتٌ لهذه الفترة',
-        isset($U13['empty_hint']) ? $U13['empty_hint'] : 'غيّر الفترةَ أو تحقق من توفرِ السجلات'
+        isset($U13['empty_title']) ? $U13['empty_title'] : 'لا توجد بيانات لهذه الفترة',
+        isset($U13['empty_hint']) ? $U13['empty_hint'] : 'غير الفترة أو تحقق من توفر السجلات'
     );
 }
 
 $u13Nature = isset($U13['nature']) ? $U13['nature'] : 'read';
-$u13NatureLabel = array('document' => 'مستندٌ يُعتمد', 'register' => 'سجلٌّ أو إعداد', 'read' => 'قارئة');
+$u13NatureLabel = array('document' => 'مستند يعتمد', 'register' => 'سجل أو إعداد', 'read' => 'قارئة');
 ?>
 <div class="main ems-unified-page-shell" dir="rtl">
     <?php
@@ -339,7 +339,7 @@ $u13NatureLabel = array('document' => 'مستندٌ يُعتمد', 'register' =>
 
     <?php if ($u13Actions && ($u13IsSuper || !empty($__pp['can_edit']))): ?>
     <div class="card"><div class="card-header">
-        <h5><i class="fa fa-bolt"></i> الأفعالُ المتاحةُ على هذه الشاشة</h5>
+        <h5><i class="fa fa-bolt"></i> الأفعال المتاحة على هذه الشاشة</h5>
     </div><div class="card-body">
         <?php foreach ($u13Actions as $key => $spec): ?>
         <form method="post" action="" class="u13-act">
@@ -377,7 +377,7 @@ $u13NatureLabel = array('document' => 'مستندٌ يُعتمد', 'register' =>
                 <div style="opacity:.78;font-size:.92em"><?php echo htmlspecialchars($U13['rule'], ENT_QUOTES, 'UTF-8'); ?></div>
                 <?php endif; ?>
                 <div style="opacity:.6;font-size:.85em;margin-top:6px">
-                    طبيعتُها: <?php echo $u13NatureLabel[$u13Nature]; ?>
+                    طبيعتها: <?php echo $u13NatureLabel[$u13Nature]; ?>
                     · الأعمدة: <?php echo count($u13Cols); ?>
                     · الصفوف: <?php echo count($u13Rows); ?>
                     <?php if (!empty($U13['doc'])): ?> · المصدر: <?php echo htmlspecialchars($U13['doc'], ENT_QUOTES, 'UTF-8'); ?><?php endif; ?>
@@ -388,7 +388,7 @@ $u13NatureLabel = array('document' => 'مستندٌ يُعتمد', 'register' =>
     <?php endif; ?>
 
     <?php if ($u13Err !== ''): ?>
-        <div class="alert alert-danger">تعذّرت القراءة: <?php echo htmlspecialchars($u13Err, ENT_QUOTES, 'UTF-8'); ?></div>
+        <div class="alert alert-danger">تعذرت القراءة: <?php echo htmlspecialchars($u13Err, ENT_QUOTES, 'UTF-8'); ?></div>
     <?php endif; ?>
 
     <div class="card"><div class="card-body">
@@ -410,17 +410,17 @@ $u13NatureLabel = array('document' => 'مستندٌ يُعتمد', 'register' =>
                 <?php foreach ($u13Cols as $k => $c):
                     $vk = isset($u13Views[$c['dc']]) ? $u13Views[$c['dc']]['key'] : 'fin'; ?>
                 <th data-dc="<?php echo $c['dc']; ?>" data-view="<?php echo $vk; ?>"
-                    <?php echo $c['sensitive'] ? 'class="ems-gov-th" data-slice="1" title="حقلٌ حساسٌ — يُسجَّل الاطّلاعُ عليه"' : ''; ?>>
+                    <?php echo $c['sensitive'] ? 'class="ems-gov-th" data-slice="1" title="حقل حساس — يسجل الاطلاع عليه"' : ''; ?>>
                     <?php echo htmlspecialchars($c['label'], ENT_QUOTES, 'UTF-8'); ?>
                 </th>
                 <?php endforeach; ?>
             </tr></thead>
             <tbody>
             <?php if (!$u13Cols): ?>
-                <tr><td class="text-center text-muted">لا عمودَ مصنَّفٌ لهذه الشاشة — والحقلُ بلا صنفٍ لا يُدرَج (OBL-0052)</td></tr>
+                <tr><td class="text-center text-muted">لا عمود مصنف لهذه الشاشة — والحقل بلا صنف لا يدرج (OBL-0052)</td></tr>
             <?php elseif (!$u13Rows): ?>
                 <tr><td colspan="<?php echo count($u13Cols); ?>" class="text-center text-muted">
-                    <?php echo htmlspecialchars(isset($U13['empty_hint']) ? $U13['empty_hint'] : 'لا بياناتَ بعدُ', ENT_QUOTES, 'UTF-8'); ?>
+                    <?php echo htmlspecialchars(isset($U13['empty_hint']) ? $U13['empty_hint'] : 'لا بيانات بعد', ENT_QUOTES, 'UTF-8'); ?>
                 </td></tr>
             <?php else: foreach ($u13Rows as $r): ?>
                 <tr>

@@ -39,7 +39,7 @@ if (!$is_super_admin && empty($__pp['can_view'])) {
     exit();
 }
 if (!$is_super_admin && $_SERVER['REQUEST_METHOD'] === 'POST' && empty($__pp['can_add']) && empty($__pp['can_edit'])) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'غير مصرح بالكتابة في هذه الشاشة ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
+    ems_gov_flash_redirect('../main/dashboard.php', 'غير مصرح بالكتابة في هذه الشاشة ❌', 'GOV-PERM-403', 'اطلب المنحة من مدير الصلاحيات إن كانت ضمن عملك');
 }
 $COLS   = array (
   0 => 'الكيان',
@@ -50,12 +50,12 @@ $COLS   = array (
   5 => 'سبب التصنيف',
   6 => 'من يراه',
   7 => 'سياسة الإخفاء',
-  8 => 'يُسجَّل الاطّلاع؟',
-  9 => 'يُصدَّر؟',
+  8 => 'يسجل الاطلاع؟',
+  9 => 'يصدر؟',
   10 => 'الأساس النظامي',
   11 => 'تاريخ السريان',
-  12 => 'المُنشئ — الاسم والصفة',
-  13 => 'المعتمِد — الاسم والصفة',
+  12 => 'المنشئ — الاسم والصفة',
+  13 => 'المعتمد — الاسم والصفة',
   14 => 'تاريخ الاعتماد',
   15 => 'الحالة',
 );
@@ -67,11 +67,11 @@ $FIELDS = array (
   4 => 'سبب التصنيف',
   5 => 'من يراه',
   6 => 'سياسة الإخفاء',
-  7 => 'يُسجَّل الاطّلاع؟',
-  8 => 'يُصدَّر؟',
+  7 => 'يسجل الاطلاع؟',
+  8 => 'يصدر؟',
   9 => 'الأساس النظامي',
   10 => 'تاريخ السريان',
-  11 => 'المعتمِد — الاسم والصفة',
+  11 => 'المعتمد — الاسم والصفة',
   12 => 'تاريخ الاعتماد',
   13 => 'الحالة',
 );
@@ -87,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     $creator = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
     // الموجة ٢: الحفظ في الجدول الأصلي للشاشة (الفارغ NULL — لا مخزن بينيًّا)
     $ok = cmp03_store_insert($conn, $company_id, $CANONICAL, $payload, $status, $uid, $creator);
-    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
+    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
     exit();
 }
 
@@ -102,7 +102,7 @@ $entityName = $govCtx['values']['entity'] ?? '—';
 function cmp03_cell($col, $row, $entityName) {
     $n = cmp03_screen_norm($col);
     if ($n === cmp03_screen_norm('الكيان')) { return $entityName; }
-    if ($n === cmp03_screen_norm('المُنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المُنشئة')) {
+    if ($n === cmp03_screen_norm('المنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المنشئة')) {
         return $row['created_by_name'] ?: '—';
     }
     if ($n === cmp03_screen_norm('تاريخ الإنشاء')) { return $row['created_at']; }
@@ -117,7 +117,7 @@ function cmp03_screen_norm($s) {
     $s = str_replace(array('أ','إ','آ'), 'ا', $s);
     $s = str_replace('ة', 'ه', $s);
     $s = str_replace('ى', 'ي', $s);
-    return preg_replace('/[ًٌٍَُِّْ]/u', '', $s);
+    return preg_replace('/[]/u', '', $s);
 }
 
 $page_title = 'إيكوبيشن | سياسات الحقول الحساسة';
@@ -145,8 +145,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     /* حزمةُ الحالاتِ الدنيا (بوابة ٩): تحميلٌ وفراغٌ وخطأٌ — مخفيةٌ افتراضًا
        ويُظهرها منطقُ الشاشةِ عند حالِها. الدالةُ من ux_components التي تُحمِّلها القشرة. */
     if (function_exists('ems_states_bundle')) {
-        echo ems_states_bundle('لا سياساتِ حقولٍ حساسةٍ مسجَّلةً بعدُ',
-                               'أضف أولَ سياسةٍ بزر «إضافة» — لكلِّ حقلٍ حساسٍ تصنيفٌ ومَن يراه وسياسةُ إخفاءٍ وأساسٌ نظامي');
+        echo ems_states_bundle('لا سياسات حقول حساسة مسجلة بعد',
+                               'أضف أول سياسة بزر «إضافة» — لكل حقل حساس تصنيف ومن يراه وسياسة إخفاء وأساس نظامي');
     }
     ?>
 
@@ -172,15 +172,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="f5" maxlength="190" id="emsf_654_18f34"></div>
                 <div class="form-group"><label for="emsf_655_c9bc8">سياسة الإخفاء</label>
                     <input type="text" name="f6" maxlength="190" id="emsf_655_c9bc8"></div>
-                <div class="form-group"><label for="emsf_656_be227">يُسجَّل الاطّلاع؟</label>
+                <div class="form-group"><label for="emsf_656_be227">يسجل الاطلاع؟</label>
                     <input type="text" name="f7" maxlength="190" id="emsf_656_be227"></div>
-                <div class="form-group"><label for="emsf_657_a6ae6">يُصدَّر؟</label>
+                <div class="form-group"><label for="emsf_657_a6ae6">يصدر؟</label>
                     <input type="text" name="f8" maxlength="190" id="emsf_657_a6ae6"></div>
                 <div class="form-group"><label for="emsf_658_32404">الأساس النظامي</label>
                     <input type="text" name="f9" maxlength="190" id="emsf_658_32404"></div>
                 <div class="form-group"><label for="emsf_659_fc420">تاريخ السريان</label>
                     <input type="date" name="f10" id="emsf_659_fc420"></div>
-                <div class="form-group"><label for="emsf_660_55799">المعتمِد — الاسم والصفة</label>
+                <div class="form-group"><label for="emsf_660_55799">المعتمد — الاسم والصفة</label>
                     <input type="text" name="f11" maxlength="190" id="emsf_660_55799"></div>
                 <div class="form-group"><label for="emsf_661_46f31">تاريخ الاعتماد</label>
                     <input type="date" name="f12" id="emsf_661_46f31"></div>
@@ -198,7 +198,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="table-responsive">
         <table class="alltables display" id="sensitive_fieldsTable">
             <thead><tr>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
             <th>رقم السياسة</th>
             <th>الجدول</th>
             <th>الحقل</th>
@@ -206,18 +206,18 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th>سبب التصنيف</th>
             <th>من يراه</th>
             <th>سياسة الإخفاء</th>
-            <th>يُسجَّل الاطّلاع؟</th>
-            <th>يُصدَّر؟</th>
+            <th>يسجل الاطلاع؟</th>
+            <th>يصدر؟</th>
             <th>الأساس النظامي</th>
             <th>تاريخ السريان</th>
-            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
             <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
             <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
             </tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="16" class="text-center text-muted">لا بياناتَ بعدُ — أضف أول صفٍّ بزر «إضافة»</td></tr>
+                <tr><td colspan="16" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
                     <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>

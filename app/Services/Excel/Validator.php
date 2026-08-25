@@ -103,16 +103,16 @@ class Validator
                         continue;
                     }
                     if ($c->unique && self::existsInDb($conn, $def, $c->field, (string) $data[$c->field], $companyId)) {
-                        $errors[] = self::err($rowNum, $c->label, "القيمة «{$data[$c->field]}» موجودة مسبقاً في النظام", 'استخدم قيمة جديدة أو احذف الصف');
+                        $errors[] = self::err($rowNum, $c->label, "القيمة «{$data[$c->field]}» موجودة مسبقا في النظام", 'استخدم قيمة جديدة أو احذف الصف');
                     }
                     if ($c->foreignKey && !self::fkExists($conn, $c, (string) $data[$c->field], $companyId)) {
-                        $errors[] = self::err($rowNum, $c->label, "القيمة «{$data[$c->field]}» غير موجودة في الجدول المرتبط", 'تأكد من إدخال قيمة موجودة مسبقاً');
+                        $errors[] = self::err($rowNum, $c->label, "القيمة «{$data[$c->field]}» غير موجودة في الجدول المرتبط", 'تأكد من إدخال قيمة موجودة مسبقا');
                     }
                     // بحث/Lookup: تحويل الاسم/الكود إلى مفتاح أجنبي.
                     if ($c->lookup) {
                         $resolved = self::resolveLookup($conn, $c->lookup, (string) $data[$c->field], $companyId);
                         if ($resolved === null) {
-                            $errors[] = self::err($rowNum, $c->label, "القيمة «{$data[$c->field]}» غير موجودة في النظام", 'أدخل اسماً أو كوداً موجوداً مسبقاً، أو أضِف السجل أولاً');
+                            $errors[] = self::err($rowNum, $c->label, "القيمة «{$data[$c->field]}» غير موجودة في النظام", 'أدخل اسما أو كودا موجودا مسبقا، أو أضف السجل أولا');
                         } else {
                             $storeIdIn = $c->lookup['storeIdIn'];
                             // الحالة 1 (عمود نصّي منفصل): أعِد كتابة الاسم القانوني في عمود العرض.
@@ -166,12 +166,12 @@ class Validator
         switch ($c->type) {
             case Column::TYPE_INT:
                 if (!preg_match('/^-?\d+$/', $value)) {
-                    return ['msg' => 'يجب أن تكون رقماً صحيحاً', 'fix' => 'أدخل رقماً بدون كسور (مثل: 2020)'];
+                    return ['msg' => 'يجب أن تكون رقما صحيحا', 'fix' => 'أدخل رقما بدون كسور (مثل: 2020)'];
                 }
                 break;
             case Column::TYPE_FLOAT:
                 if (!is_numeric(str_replace(',', '', $value))) {
-                    return ['msg' => 'يجب أن تكون رقماً', 'fix' => 'أدخل رقماً (مثل: 1500 أو 1500.50)'];
+                    return ['msg' => 'يجب أن تكون رقما', 'fix' => 'أدخل رقما (مثل: 1500 أو 1500.50)'];
                 }
                 break;
             case Column::TYPE_EMAIL:
@@ -181,7 +181,7 @@ class Validator
                 break;
             case Column::TYPE_PHONE:
                 if (!preg_match('/^[\+]?[0-9\s\-]{7,20}$/', $value)) {
-                    return ['msg' => 'صيغة رقم الهاتف غير صحيحة', 'fix' => 'استخدم أرقاماً فقط مع رمز الدولة (+249...)'];
+                    return ['msg' => 'صيغة رقم الهاتف غير صحيحة', 'fix' => 'استخدم أرقاما فقط مع رمز الدولة (+249...)'];
                 }
                 break;
             case Column::TYPE_DATE:

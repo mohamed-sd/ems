@@ -79,29 +79,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $ed     = (string) ($_POST['end_date'] ?? '');
         $state  = (string) ($_POST['state'] ?? 'مبدئي');
 
-        if (!$vd($sd) || !$vd($ed)) { fc_back('تواريخُ الحجز غير صالحة ❌', $qs); }
-        if (strtotime($ed) < strtotime($sd)) { fc_back('نهايةُ الحجز قبل بدايته ❌', $qs); }
-        if (!in_array($state, $FC_STATES, true)) { fc_back('حالةُ الحجز غير صالحة ❌', $qs); }
-        if ($eqId <= 0 && $typeId <= 0) { fc_back('اختر معدةً بعينها أو فئةً بعدد ❌', $qs); }
+        if (!$vd($sd) || !$vd($ed)) { fc_back('تواريخ الحجز غير صالحة ❌', $qs); }
+        if (strtotime($ed) < strtotime($sd)) { fc_back('نهاية الحجز قبل بدايته ❌', $qs); }
+        if (!in_array($state, $FC_STATES, true)) { fc_back('حالة الحجز غير صالحة ❌', $qs); }
+        if ($eqId <= 0 && $typeId <= 0) { fc_back('اختر معدة بعينها أو فئة بعدد ❌', $qs); }
 
         // الحارسُ الجوهري: لا حجزَ على نافذةٍ مشغولة
         if ($eqId > 0) {
             $eqRow = $fc_gate->selectOne('equipments', array('columns' => array('id', 'code'), 'where' => array('id' => $eqId)));
-            if ($eqRow === null) { fc_back('المعدةُ المحددة خارج نطاق شركتك ❌', $qs); }
+            if ($eqRow === null) { fc_back('المعدة المحددة خارج نطاق شركتك ❌', $qs); }
             $conf = AV::conflictsFor($fc_gate, $eqId, $sd, $ed, $rid);
             if (count($conf['operations'])) {
-                fc_back('المعدةُ مشغولةٌ بتشغيلٍ سارٍ في هذه النافذة — لا حجز ❌', $qs);
+                fc_back('المعدة مشغولة بتشغيل سار في هذه النافذة — لا حجز ❌', $qs);
             }
             if (count($conf['reservations'])) {
                 $c0 = $conf['reservations'][0];
-                fc_back('تعارضٌ مع الحجز ' . $c0['reservation_no'] . ' (' . $c0['start_date'] . ' → ' . $c0['end_date'] . ') ❌', $qs);
+                fc_back('تعارض مع الحجز ' . $c0['reservation_no'] . ' (' . $c0['start_date'] . ' → ' . $c0['end_date'] . ') ❌', $qs);
             }
         }
 
         $clientId = intval($_POST['client_id'] ?? 0);
         if ($clientId > 0) {
             $cRow = $fc_gate->selectOne('clients', array('columns' => array('id'), 'where' => array('id' => $clientId)));
-            if ($cRow === null) { fc_back('العميلُ المحدد خارج نطاق شركتك ❌', $qs); }
+            if ($cRow === null) { fc_back('العميل المحدد خارج نطاق شركتك ❌', $qs); }
         }
         $oppId = intval($_POST['opportunity_id'] ?? 0);
         if ($oppId > 0) {
@@ -125,10 +125,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             if ($rid > 0) {
                 $own = $fc_gate->selectOne('fleet_reservations', array('columns' => array('id'), 'where' => array('id' => $rid)));
-                if ($own === null) { fc_back('لا يمكنك تعديل حجزٍ لا يتبع شركتك ❌', $qs); }
+                if ($own === null) { fc_back('لا يمكنك تعديل حجز لا يتبع شركتك ❌', $qs); }
                 $data['updated_at'] = date('Y-m-d H:i:s');
                 $fc_gate->update('fleet_reservations', $data, array('id' => $rid));
-                fc_back('حُدِّث الحجز ✅', $qs);
+                fc_back('حدث الحجز ✅', $qs);
             }
             $data['reservation_no'] = AV::nextReservationNo($fc_gate, $company_id);
             $data['created_by'] = $uid;
@@ -136,10 +136,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data['updated_at'] = date('Y-m-d H:i:s');
             $data['is_deleted'] = 0;
             $fc_gate->insert('fleet_reservations', $data);
-            fc_back('حُجزت النافذة ' . $data['reservation_no'] . ' ✅', $qs);
+            fc_back('حجزت النافذة ' . $data['reservation_no'] . ' ✅', $qs);
         } catch (\Throwable $t) {
             error_log('fleet_calendar save: ' . $t->getMessage());
-            fc_back('تعذّر حفظُ الحجز ❌', $qs);
+            fc_back('تعذر حفظ الحجز ❌', $qs);
         }
     }
 
@@ -149,13 +149,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $rid = intval($_POST['res_id'] ?? 0);
         try {
             $own = $fc_gate->selectOne('fleet_reservations', array('columns' => array('id'), 'where' => array('id' => $rid)));
-            if ($own === null) { fc_back('الحجزُ خارج نطاق شركتك ❌', $qs); }
+            if ($own === null) { fc_back('الحجز خارج نطاق شركتك ❌', $qs); }
             $fc_gate->update('fleet_reservations',
                 array('state' => 'ملغى', 'updated_at' => date('Y-m-d H:i:s')), array('id' => $rid));
-            fc_back('أُلغي الحجز — والسجلُّ باقٍ ✅', $qs);
+            fc_back('ألغي الحجز — والسجل باق ✅', $qs);
         } catch (\Throwable $t) {
             error_log('fleet_calendar cancel: ' . $t->getMessage());
-            fc_back('تعذّر الإلغاء ❌', $qs);
+            fc_back('تعذر الإلغاء ❌', $qs);
         }
     }
 }
@@ -245,25 +245,25 @@ include '../insidebar.php';
 </style>
 <div class="main ems-unified-page-shell">
 <?php
-$header_title = 'تقويمُ الأسطول والحجز';
+$header_title = 'تقويم الأسطول والحجز';
 $header_icon = 'fa fa-calendar-check';
 $header_actions = array();
 if ($can_add) {
     $header_actions[] = array('id' => 'fcToggleForm', 'class' => 'add-btn',
-        'icon' => 'fa fa-plus', 'label' => 'حجزٌ جديد');
+        'icon' => 'fa fa-plus', 'label' => 'حجز جديد');
 }
 $header_back = array('href' => '../main/role_board.php', 'class' => '', 'icon' => 'fa-solid fa-share', 'label' => '');
 include('../includes/page_header.php');
 if (function_exists('ems_screen_about')) {
     ems_screen_about(
-        'التأجيرُ يؤجّر الأصلَ نفسه مرارًا — فالسؤالُ الأول: أمتاحةٌ من كذا إلى كذا؟ '
-        . 'هذه الشاشةُ تجيب قبل أن تَعِد: سعةُ كل فئةٍ في النافذة، والمعداتُ المتاحةُ فعلًا، '
-        . 'وحجزُ نافذةٍ يرفضه الحارسُ إن تعارضت مع تشغيلٍ سارٍ أو حجزٍ قائم.',
-        array('حدّد النافذة الزمنية', 'اقرأ سعةَ الفئة قبل الوعد', 'احجز ثم حوّل إلى عقد')
+        'التأجير يؤجر الأصل نفسه مرارا — فالسؤال الأول: أمتاحة من كذا إلى كذا؟ '
+        . 'هذه الشاشة تجيب قبل أن تعد: سعة كل فئة في النافذة، والمعدات المتاحة فعلا، '
+        . 'وحجز نافذة يرفضه الحارس إن تعارضت مع تشغيل سار أو حجز قائم.',
+        array('حدد النافذة الزمنية', 'اقرأ سعة الفئة قبل الوعد', 'احجز ثم حول إلى عقد')
     );
 }
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضيًا
-echo ems_states_bundle('لا حجوزاتِ أسطولٍ في هذه النافذةِ الزمنية', 'وسّعِ النافذةَ أو اضغط «حجزٌ جديد» لتسجيلِ أولِ حجز');
+echo ems_states_bundle('لا حجوزات أسطول في هذه النافذة الزمنية', 'وسع النافذة أو اضغط «حجز جديد» لتسجيل أول حجز');
 ?>
   <?php if (!empty($_GET['msg'])): ?>
     <div class="alert alert-info fc-flash"><?php echo fc_e($_GET['msg']); ?></div>
@@ -286,8 +286,8 @@ echo ems_states_bundle('لا حجوزاتِ أسطولٍ في هذه الناف�
           <?php endforeach; ?>
         </select></div>
       <div><button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> اعرض</button></div>
-      <div class="fc-window-note">النافذة <b><?php echo (int) $span_days; ?></b> يومًا ·
-        متاحٌ <b class="fc-ok"><?php echo (int) $tot_free; ?></b> من <?php echo (int) $tot_all; ?></div>
+      <div class="fc-window-note">النافذة <b><?php echo (int) $span_days; ?></b> يوما ·
+        متاح <b class="fc-ok"><?php echo (int) $tot_free; ?></b> من <?php echo (int) $tot_all; ?></div>
     </form>
         </div>
     </div>
@@ -295,9 +295,9 @@ echo ems_states_bundle('لا حجوزاتِ أسطولٍ في هذه الناف�
 
   <!-- ① سعةُ الفئات -->
   <div class="card fc-card"><div class="card-body">
-    <h5 class="fc-tight"><i class="fa fa-layer-group"></i> سعةُ الفئات في النافذة</h5>
+    <h5 class="fc-tight"><i class="fa fa-layer-group"></i> سعة الفئات في النافذة</h5>
     <div class="table-responsive"><table class="table table-sm" data-no-dt="hard">
-      <thead><tr><th>الفئة</th><th>الإجمالي</th><th>المتاح</th><th>المشغول</th><th class="fc-col-pct">نسبةُ الإتاحة</th></tr></thead>
+      <thead><tr><th>الفئة</th><th>الإجمالي</th><th>المتاح</th><th>المشغول</th><th class="fc-col-pct">نسبة الإتاحة</th></tr></thead>
       <tbody>
       <?php foreach ($capacity as $c):
         $pct = $c['total'] > 0 ? round(100 * $c['free'] / $c['total']) : 0; ?>
@@ -315,7 +315,7 @@ echo ems_states_bundle('لا حجوزاتِ أسطولٍ في هذه الناف�
         </tr>
       <?php endforeach; ?>
       <?php if (!count($capacity)): ?>
-        <tr><td colspan="5" class="text-center text-muted">لا معداتٍ في نطاقك</td></tr>
+        <tr><td colspan="5" class="text-center text-muted">لا معدات في نطاقك</td></tr>
       <?php endif; ?>
       </tbody>
     </table></div>
@@ -324,22 +324,22 @@ echo ems_states_bundle('لا حجوزاتِ أسطولٍ في هذه الناف�
   <!-- ② نموذجُ الحجز -->
   <?php if ($can_add): ?>
   <div class="card allforms fc-card" id="fcFormCard"><div class="card-body">
-    <h5 class="fc-tight"><i class="fa fa-plus"></i> حجزُ نافذة</h5>
+    <h5 class="fc-tight"><i class="fa fa-plus"></i> حجز نافذة</h5>
     <form method="post" class="ems-form">
       <input type="hidden" name="csrf_token" value="<?php echo fc_e($fc_csrf); ?>">
       <input type="hidden" name="fc_action" value="save">
       <input type="hidden" name="res_id" id="fc_res_id" value="0">
       <div class="form-grid fc-form-grid">
-        <div><label for="fc_eq">المعدة (حجزٌ بعينها)</label>
+        <div><label for="fc_eq">المعدة (حجز بعينها)</label>
           <select name="equipment_id" id="fc_eq" class="form-control">
-            <option value="0">— بلا تحديد (احجز فئةً) —</option>
+            <option value="0">— بلا تحديد (احجز فئة) —</option>
             <?php foreach ($free as $e): ?>
               <option value="<?php echo (int) $e['id']; ?>">
-                <?php echo fc_e($e['code'] . ' — ' . $e['name'] . ' (' . ($e['type_name'] ?: 'غير مصنَّفة') . ')'); ?>
+                <?php echo fc_e($e['code'] . ' — ' . $e['name'] . ' (' . ($e['type_name'] ?: 'غير مصنفة') . ')'); ?>
               </option>
             <?php endforeach; ?>
           </select>
-          <small class="text-muted">القائمةُ تعرض المتاحَ في النافذة أعلاه فقط</small>
+          <small class="text-muted">القائمة تعرض المتاح في النافذة أعلاه فقط</small>
         </div>
         <div><label for="emsf_355_71993">أو الفئة</label>
           <select name="equipment_type_id" class="form-control" id="emsf_355_71993">
@@ -385,17 +385,17 @@ echo ems_states_bundle('لا حجوزاتِ أسطولٍ في هذه الناف�
 
   <!-- ③ الحجوزات -->
   <div class="card fc-card"><div class="card-body">
-    <h5 class="fc-tight"><i class="fa fa-bookmark"></i> حجوزاتُ النافذة</h5>
+    <h5 class="fc-tight"><i class="fa fa-bookmark"></i> حجوزات النافذة</h5>
     <div class="table-responsive"><table class="table display" id="fcTable" data-order='[[3,"desc"]]' data-page-length="25" data-state-save="false">
       <thead><tr>
         <th>إجراءات</th>
         <th>رقم الحجز</th><th>المعدة/الفئة</th><th>العميل</th><th>من</th><th>إلى</th>
         <th>الأيام</th><th>الحالة</th><th>الغرض</th>
         <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-        <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-        <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-        <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-        <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+        <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+        <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+        <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+        <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
         <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
         <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
         <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -411,7 +411,7 @@ echo ems_states_bundle('لا حجوزاتِ أسطولٍ في هذه الناف�
         <tr>
           <td>
             <?php if ($can_edit && $r['state'] !== 'ملغى'): ?>
-            <form method="post" class="fc-inline" onsubmit="return confirm('إلغاءُ الحجز؟ السجلُّ يبقى.')">
+            <form method="post" class="fc-inline" onsubmit="return confirm('إلغاء الحجز؟ السجل يبقى.')">
               <input type="hidden" name="csrf_token" value="<?php echo fc_e($fc_csrf); ?>">
               <input type="hidden" name="fc_action" value="cancel">
               <input type="hidden" name="res_id" value="<?php echo (int) $r['id']; ?>">
@@ -434,7 +434,7 @@ echo ems_states_bundle('لا حجوزاتِ أسطولٍ في هذه الناف�
       </tbody>
     </table></div>
     <?php if (!count($reservations)): ?>
-      <p class="text-muted fc-note">لا حجوزاتٍ في هذه النافذة — والحجزُ يمنع الوعدَ بما لا تملك.</p>
+      <p class="text-muted fc-note">لا حجوزات في هذه النافذة — والحجز يمنع الوعد بما لا تملك.</p>
     <?php endif; ?>
   </div></div>
 </div>

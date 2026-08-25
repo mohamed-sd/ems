@@ -51,15 +51,15 @@ foreach ($rows as $x) {
     if ($x['state'] !== 'closed') { $stats['open']++; }
 }
 
-$STATE_AR = array('classified' => 'مصنَّف', 'owner_assigned' => 'بمالك', 'inherent_assessed' => 'متأصل مقيَّم',
-    'controls_linked' => 'بضوابط', 'controls_evaluated' => 'ضوابط مقيَّمة', 'residual_assessed' => 'متبقٍّ مقيَّم',
+$STATE_AR = array('classified' => 'مصنف', 'owner_assigned' => 'بمالك', 'inherent_assessed' => 'متأصل مقيم',
+    'controls_linked' => 'بضوابط', 'controls_evaluated' => 'ضوابط مقيمة', 'residual_assessed' => 'متبق مقيم',
     'appetite_compared' => 'قورن بالشهية', 'treatment_planned' => 'بخطة معالجة', 'accepted' => 'مقبول',
     'monitoring' => 'مراقبة', 'reassessment' => 'إعادة تقييم', 'closed' => 'مغلق', 'reopened' => 'أعيد فتحه');
 
 $page_title = 'إيكوبيشن | سجل المخاطر المركزي';
 include '../inheader.php';
 include '../insidebar.php';
-require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('risk', 'نظرةٌ عامة');
+require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('risk', 'نظرة عامة');
 if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main ems-unified-page-shell">
@@ -75,17 +75,17 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         'الإجمالي في نطاقك' => $stats['total'] . ' خطر',
         'المفتوح' => $stats['open'],
         'الحرج/المحظور' => $stats['critical'],
-        'المنظر' => $view === 'all' ? 'كل الأعمدة (36)' : 'مختصر موجَّه للمهمة',
+        'المنظر' => $view === 'all' ? 'كل الأعمدة (36)' : 'مختصر موجه للمهمة',
     );
     include('../includes/page_header.php');
     ems_screen_about(
-        'السجل المركزي الواحد للمخاطر — الخطر يُملك حيث نشأ (RK-01) ويُعرض لكل إدارة بزاويتها ولا يُنسخ. '
-        . 'لا حذف إطلاقًا: الإغلاق بدليل واعتماد بالسقف، والدمج بقرار محلل مسبَّب.',
-        array('التقييمات نسخ تاريخية لا تُكتب فوقها (RK-03)', 'القبول فوق السقف يُرفض ويُصعَّد آليًّا (RK-04)',
-              'نموذجُ البياناتِ لا يُختزل: المنظرُ يقلّل الأعمدةَ والفلترُ يقلّل الصفوف — ولا يُخفى عمودُ حوكمة'));
+        'السجل المركزي الواحد للمخاطر — الخطر يملك حيث نشأ (RK-01) ويعرض لكل إدارة بزاويتها ولا ينسخ. '
+        . 'لا حذف إطلاقا: الإغلاق بدليل واعتماد بالسقف، والدمج بقرار محلل مسبب.',
+        array('التقييمات نسخ تاريخية لا تكتب فوقها (RK-03)', 'القبول فوق السقف يرفض ويصعد آليا (RK-04)',
+              'نموذج البيانات لا يختزل: المنظر يقلل الأعمدة والفلتر يقلل الصفوف — ولا يخفى عمود حوكمة'));
     risk_view_bar('risk_register', $view, array_filter(array(
         'ru' => $fUnit ?: null, 'level' => $fLevel ?: null, 'state' => $fState ?: null)));
-    echo ems_states_bundle('لا مخاطرَ مسجَّلةً ضمن هذا الترشيح', 'وسّع الترشيحَ أو راجع صندوقَ الإشارات');
+    echo ems_states_bundle('لا مخاطر مسجلة ضمن هذا الترشيح', 'وسع الترشيح أو راجع صندوق الإشارات');
     ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
@@ -129,7 +129,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     <div class="ems-card" id="rskEmpty"></div>
     <script>document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('rskEmpty').appendChild(EmsUI.emptyState({
-            reason: 'لا مخاطر مسجلة في نطاقك بعد — الإشارات تُفرز أولًا في صندوق الإشارات',
+            reason: 'لا مخاطر مسجلة في نطاقك بعد — الإشارات تفرز أولا في صندوق الإشارات',
             createHref: 'risk_signals.php', createLabel: 'إلى صندوق الإشارات'
         }));
     });</script>
@@ -150,7 +150,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                 <?php if ($V('velocity')): ?><th>سرعة التحقق</th><?php endif; ?>
                 <?php if ($V('horizon')): ?><th>الأفق</th><?php endif; ?>
                 <?php if ($V('appetite_verdict')): ?><th>حكم الشهية</th><?php endif; ?>
-                <?php if ($V('exposure_amount')): ?><th>التعرض المقدَّر</th><?php endif; ?>
+                <?php if ($V('exposure_amount')): ?><th>التعرض المقدر</th><?php endif; ?>
                 <?php if ($V('state')): ?><th>الحالة</th><?php endif; ?>
                 <?php if ($V('review_due')): ?><th>مراجعة قبل</th><?php endif; ?>
                 <?php if ($V('created_at')): ?><th>تاريخ الإنشاء</th><?php endif; ?>
@@ -173,7 +173,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <?php if ($V('current_level')): ?>
                     <td><?php $lv = (string) $x['current_level'];
                         $cls = $lv === 'حرج' || $lv === 'محظور' ? 'badge-danger' : ($lv === 'مرتفع' ? 'badge-warning' : 'badge-secondary'); ?>
-                        <span class="badge <?php echo $cls; ?>"><?php echo $lv !== '' ? $lv : 'لم يقيَّم'; ?></span></td><?php endif; ?>
+                        <span class="badge <?php echo $cls; ?>"><?php echo $lv !== '' ? $lv : 'لم يقيم'; ?></span></td><?php endif; ?>
                     <?php if ($V('target_level')): ?>
                     <td><?php echo htmlspecialchars((string) $x['target_level'] ?: '—'); ?></td><?php endif; ?>
                     <?php if ($V('control_effectiveness')): ?>
@@ -208,7 +208,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
 
     <?php if ($RISK_FULL && (!empty($__pp['can_add']) || $is_super_admin)): ?>
     <div class="card rsk-new-card is-hidden" id="rskNewCard"><div class="card-body">
-        <h5>خطر جديد (بعد الفرز — RK-05: الإشارة أولًا إن لم يكن مصدره فرزًا)</h5>
+        <h5>خطر جديد (بعد الفرز — RK-05: الإشارة أولا إن لم يكن مصدره فرزا)</h5>
         <form id="rskNewForm" class="allforms">
             <div class="row">
                 <div class="col-md-4"><label>الوحدة *<select name="ru_id" class="form-control" aria-label="الوحدة" required>
@@ -223,7 +223,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                          سواها بـ422 (لا يكفي ترشيحُ الواجهةِ وحدَه). */ ?>
                 <div class="col-md-4"><label>الإدارة المالكة (وحدة الهيكل)
                     <select name="owner_unit_id" class="form-control" aria-label="الإدارة المالكة">
-                        <option value="">— بلا إدارةٍ مالكة —</option>
+                        <option value="">— بلا إدارة مالكة —</option>
                         <?php foreach ($orgUnits as $ou): ?>
                         <option value="<?= (int) $ou['unit_id'] ?>"><?= htmlspecialchars($ou['name_ar']) ?><?php
                             if ($ou['unit_code'] !== '') { echo ' · ' . htmlspecialchars($ou['unit_code']); } ?></option>
@@ -251,7 +251,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
             fetch('risk_actions.php', { method: 'POST', body: fd }).then(function (r) { return r.json(); })
             .then(function (j) {
                 var m = document.getElementById('rskNewMsg');
-                if (j.ok) { m.textContent = '✔ سُجل ' + (j.risk_code || ''); setTimeout(function () { location.reload(); }, 800); }
+                if (j.ok) { m.textContent = '✔ سجل ' + (j.risk_code || ''); setTimeout(function () { location.reload(); }, 800); }
                 else if (j.duplicates && j.duplicates.length) {
                     m.textContent = '⚠ ' + (j.hint || 'مطابق قائم') + ' — ' + j.duplicates.map(function (d) { return d.risk_code; }).join('، ');
                 } else { m.textContent = '✘ ' + (j.code || '') + ' ' + (j.msg || ''); }

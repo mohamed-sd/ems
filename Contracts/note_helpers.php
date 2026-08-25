@@ -54,8 +54,8 @@ if (!function_exists('cdnote_kinds')) {
     function cdnote_kinds()
     {
         return array(
-            'credit' => 'إشعارٌ دائن (يُنقص مطالبةَ العميل)',
-            'debit'  => 'إشعارٌ مدين (يزيد مطالبةَ العميل)',
+            'credit' => 'إشعار دائن (ينقص مطالبة العميل)',
+            'debit'  => 'إشعار مدين (يزيد مطالبة العميل)',
         );
     }
 }
@@ -106,31 +106,31 @@ if (!function_exists('cdnote_create')) {
         $doc_ref = trim((string) $doc_ref);
 
         if (!isset(cdnote_kinds()[$kind])) {
-            $out['code'] = 422; $out['reason'] = 'اتجاهُ الإشعار إما دائنٌ أو مدين'; return $out;
+            $out['code'] = 422; $out['reason'] = 'اتجاه الإشعار إما دائن أو مدين'; return $out;
         }
         if ($amount <= 0) {
-            $out['code'] = 422; $out['reason'] = 'مبلغُ الإشعار موجبٌ دائمًا — والاتجاهُ يحمل الإشارة'; return $out;
+            $out['code'] = 422; $out['reason'] = 'مبلغ الإشعار موجب دائما — والاتجاه يحمل الإشارة'; return $out;
         }
         if ($reason === '') {
-            $out['code'] = 422; $out['reason'] = 'سببُ الإشعار إلزامي — لا تتحرك ذمّةٌ بلا سببٍ مكتوب'; return $out;
+            $out['code'] = 422; $out['reason'] = 'سبب الإشعار إلزامي — لا تتحرك ذمة بلا سبب مكتوب'; return $out;
         }
         if ($doc_ref === '') {
-            $out['code'] = 422; $out['reason'] = 'مرجعُ المستند المؤيِّد إلزامي'; return $out;
+            $out['code'] = 422; $out['reason'] = 'مرجع المستند المؤيد إلزامي'; return $out;
         }
 
         try {
             $c = $gate->selectOne('claims', array('where' => array('id' => $claim_id)));
         } catch (\Throwable $t) {
             error_log('cdnote_create claim: ' . $t->getMessage());
-            $out['code'] = 500; $out['reason'] = 'تعذّرت قراءةُ المستخلص'; return $out;
+            $out['code'] = 500; $out['reason'] = 'تعذرت قراءة المستخلص'; return $out;
         }
-        if (!$c) { $out['code'] = 404; $out['reason'] = 'المستخلصُ غير موجود'; return $out; }
+        if (!$c) { $out['code'] = 404; $out['reason'] = 'المستخلص غير موجود'; return $out; }
 
         // لا إشعارَ إلا على فاتورةٍ صدرت: ما لم يُفوتر بعدُ يُصحَّح في موضعه
         if (!in_array((string) $c['state'], array('invoiced', 'collected'), true)) {
             $out['code'] = 422;
-            $out['reason'] = 'لا إشعارَ إلا على مستخلصٍ صدرت فاتورتُه — حالتُه: '
-                           . (string) $c['state'] . ' (وما لم يُفوتر بعدُ يُصحَّح في موضعه)';
+            $out['reason'] = 'لا إشعار إلا على مستخلص صدرت فاتورته — حالته: '
+                           . (string) $c['state'] . ' (وما لم يفوتر بعد يصحح في موضعه)';
             return $out;
         }
 
@@ -142,7 +142,7 @@ if (!function_exists('cdnote_create')) {
                     'columns' => array('id', 'claim_id'), 'where' => array('id' => $lineId)));
             } catch (\Throwable $t) { $ln = null; }
             if (!$ln || intval($ln['claim_id']) !== $claim_id) {
-                $out['code'] = 422; $out['reason'] = 'السطرُ المشار إليه ليس من هذا المستخلص'; return $out;
+                $out['code'] = 422; $out['reason'] = 'السطر المشار إليه ليس من هذا المستخلص'; return $out;
             }
         }
 
@@ -157,7 +157,7 @@ if (!function_exists('cdnote_create')) {
             if ($ex) {
                 $out['ok'] = true; $out['code'] = 200; $out['existing'] = true;
                 $out['note_id'] = intval($ex['id']); $out['note_no'] = (string) $ex['note_no'];
-                $out['reason'] = 'إشعارٌ بهذا المفتاح قائمٌ سلفًا: ' . $ex['note_no'];
+                $out['reason'] = 'إشعار بهذا المفتاح قائم سلفا: ' . $ex['note_no'];
                 return $out;
             }
         }
@@ -168,8 +168,8 @@ if (!function_exists('cdnote_create')) {
             $room = round((float) $c['net_amount'] + (float) $c['tax_amount'] - $already, 2);
             if ($amount > $room) {
                 $out['code'] = 422;
-                $out['reason'] = 'الإشعارُ الدائن (' . number_format($amount, 2) . ') يتجاوز المتبقي من الفاتورة ('
-                               . number_format($room, 2) . ') — ولا يُفتح رصيدٌ دائنٌ من عدم';
+                $out['reason'] = 'الإشعار الدائن (' . number_format($amount, 2) . ') يتجاوز المتبقي من الفاتورة ('
+                               . number_format($room, 2) . ') — ولا يفتح رصيد دائن من عدم';
                 return $out;
             }
         }
@@ -193,7 +193,7 @@ if (!function_exists('cdnote_create')) {
             )));
         } catch (\Throwable $t) {
             error_log('cdnote_create insert: ' . $t->getMessage());
-            $out['code'] = 500; $out['reason'] = 'تعذّر إنشاءُ الإشعار'; return $out;
+            $out['code'] = 500; $out['reason'] = 'تعذر إنشاء الإشعار'; return $out;
         }
 
         $out['ok'] = true; $out['code'] = 201; $out['note_id'] = $id; $out['note_no'] = $no;
@@ -227,12 +227,12 @@ if (!function_exists('cdnote_submit')) {
         $out = array('ok' => false, 'code' => 0, 'reason' => '');
         try { $n = $gate->selectOne('credit_debit_notes', array('where' => array('id' => intval($note_id)))); }
         catch (\Throwable $t) { $n = null; }
-        if (!$n) { $out['code'] = 404; $out['reason'] = 'الإشعارُ غير موجود'; return $out; }
+        if (!$n) { $out['code'] = 404; $out['reason'] = 'الإشعار غير موجود'; return $out; }
         if ((string) $n['state'] === 'review') {
-            $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'مرفوعٌ سلفًا'; return $out;
+            $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'مرفوع سلفا'; return $out;
         }
         if ((string) $n['state'] !== 'draft') {
-            $out['code'] = 422; $out['reason'] = 'لا يُرفع إلا إشعارٌ مسودة — حالتُه: ' . $n['state']; return $out;
+            $out['code'] = 422; $out['reason'] = 'لا يرفع إلا إشعار مسودة — حالته: ' . $n['state']; return $out;
         }
         $gate->update('credit_debit_notes', array(
             'state' => 'review', 'submitted_by' => intval($uid) ?: null,
@@ -259,17 +259,17 @@ if (!function_exists('cdnote_approve')) {
         $note_id = intval($note_id);
         try { $n = $gate->selectOne('credit_debit_notes', array('where' => array('id' => $note_id))); }
         catch (\Throwable $t) { $n = null; }
-        if (!$n) { $out['code'] = 404; $out['reason'] = 'الإشعارُ غير موجود'; return $out; }
+        if (!$n) { $out['code'] = 404; $out['reason'] = 'الإشعار غير موجود'; return $out; }
 
         // ① العطالة: المعتمَدُ يُرجَع كما هو — لا ذمّةَ تتحرك مرتين
         if ((string) $n['state'] === 'approved') {
             $out['ok'] = true; $out['code'] = 200; $out['existing'] = true;
             $out['receivable_id'] = ($n['receivable_id'] !== null) ? intval($n['receivable_id']) : null;
-            $out['reason'] = 'الإشعارُ معتمدٌ سلفًا — ' . $n['note_no'];
+            $out['reason'] = 'الإشعار معتمد سلفا — ' . $n['note_no'];
             return $out;
         }
         if ((string) $n['state'] === 'cancelled') {
-            $out['code'] = 422; $out['reason'] = 'الإشعارُ ملغى'; return $out;
+            $out['code'] = 422; $out['reason'] = 'الإشعار ملغى'; return $out;
         }
 
         /* ══ INJ-0027 — **يدٌ معلومةٌ قبلَ يدٍ ثانية**.
@@ -283,8 +283,8 @@ if (!function_exists('cdnote_approve')) {
              يُكسر. */
         if (intval($uid) <= 0) {
             $out['code'] = 403;
-            $out['reason'] = 'إجازةٌ بلا يدٍ معلومةٍ لا تُقبل — الإشعارُ يحرّك ذمّةً '
-                           . 'فلا يمرُّ إلا بمُجيزٍ يُدوَّن اسمُه (INJ-0027)';
+            $out['reason'] = 'إجازة بلا يد معلومة لا تقبل — الإشعار يحرك ذمة '
+                           . 'فلا يمر إلا بمجيز يدون اسمه (INJ-0027)';
             return $out;
         }
 
@@ -293,12 +293,12 @@ if (!function_exists('cdnote_approve')) {
              الثانيةُ شرطُ صحته. (**العطالةُ فوقَه**: المعتمَدُ سلفًا رجع قبل هذا.) */
         require_once __DIR__ . '/../includes/self_approval_guard.php';
         $__sa = ems_no_self_approval($conn, intval($n['created_by'] ?? 0), intval($uid),
-            'إشعارٌ دائن/مدين ' . (string) ($n['note_no'] ?? ('#' . $note_id)),
+            'إشعار دائن/مدين ' . (string) ($n['note_no'] ?? ('#' . $note_id)),
             intval($n['company_id'] ?? 0));
         if ($__sa !== null) { $out['code'] = 403; $out['reason'] = $__sa['reason']; return $out; }
         if ((string) $n['state'] !== 'review') {
             $out['code'] = 422;
-            $out['reason'] = 'لا يُجاز إلا إشعارٌ رُفع للمالية — حالتُه: ' . $n['state'];
+            $out['reason'] = 'لا يجاز إلا إشعار رفع للمالية — حالته: ' . $n['state'];
             return $out;
         }
 
@@ -306,13 +306,13 @@ if (!function_exists('cdnote_approve')) {
         $preparer = intval($n['submitted_by']) ?: intval($n['prepared_by']);
         if ($preparer > 0 && $preparer === intval($uid)) {
             $out['code'] = 403;
-            $out['reason'] = 'لا يُجيز الإشعارَ من أعدّه — الإجازةُ يدٌ ثانية';
+            $out['reason'] = 'لا يجيز الإشعار من أعده — الإجازة يد ثانية';
             return $out;
         }
 
         try { $c = $gate->selectOne('claims', array('where' => array('id' => intval($n['claim_id'])))); }
         catch (\Throwable $t) { $c = null; }
-        if (!$c) { $out['code'] = 404; $out['reason'] = 'المستخلصُ الأصلي غير موجود'; return $out; }
+        if (!$c) { $out['code'] = 404; $out['reason'] = 'المستخلص الأصلي غير موجود'; return $out; }
 
         $kind   = (string) $n['note_kind'];
         $amount = round((float) $n['amount'], 2);
@@ -359,7 +359,7 @@ if (!function_exists('cdnote_approve')) {
                 'project_id'         => !empty($c['project_id']) ? intval($c['project_id']) : null,
                 'customer_entity_id' => !empty($c['client_id']) ? intval($c['client_id']) : null,
                 'contract_id'        => !empty($c['contract_id']) ? intval($c['contract_id']) : null,
-                'notes'              => (($kind === 'credit') ? 'إشعارٌ دائن ' : 'إشعارٌ مدين ')
+                'notes'              => (($kind === 'credit') ? 'إشعار دائن ' : 'إشعار مدين ')
                                       . $n['note_no'] . ' على فاتورة ' . (string) $n['invoice_no'],
                 'payload'            => array(
                     'note_id'       => $note_id,
@@ -375,7 +375,7 @@ if (!function_exists('cdnote_approve')) {
                     'doc_ref'       => (string) $n['doc_ref'],
                     // شفافيةُ الحدّ: الإشعارُ يفوتر عكسًا ولا يعترف من جديد
                     'recognition'   => 'none',
-                    'note'          => 'يحرّك الذمّةَ ولا يُنشئ قيدَ إيراد — الاعترافُ في مساره',
+                    'note'          => 'يحرك الذمة ولا ينشئ قيد إيراد — الاعتراف في مساره',
                 ),
             ));
             $eventId = (is_array($pub) && isset($pub['id'])) ? intval($pub['id']) : null;
@@ -383,7 +383,7 @@ if (!function_exists('cdnote_approve')) {
         } catch (\Throwable $t) {
             $conn->rollback();
             error_log('cdnote publish #' . $note_id . ': ' . $t->getMessage());
-            $out['code'] = 500; $out['reason'] = 'تعذّر تدوينُ حقيقة الإشعار'; return $out;
+            $out['code'] = 500; $out['reason'] = 'تعذر تدوين حقيقة الإشعار'; return $out;
         }
 
         // ④ أثرُ الذمّة — بمقدار الإشعار وباتجاهه
@@ -433,14 +433,14 @@ if (!function_exists('cdnote_cancel')) {
         $out = array('ok' => false, 'code' => 0, 'reason' => '');
         try { $n = $gate->selectOne('credit_debit_notes', array('where' => array('id' => intval($note_id)))); }
         catch (\Throwable $t) { $n = null; }
-        if (!$n) { $out['code'] = 404; $out['reason'] = 'الإشعارُ غير موجود'; return $out; }
+        if (!$n) { $out['code'] = 404; $out['reason'] = 'الإشعار غير موجود'; return $out; }
         if ((string) $n['state'] === 'approved') {
             $out['code'] = 422;
-            $out['reason'] = 'الإشعارُ المعتمدُ لا يُلغى — يُقابَل بإشعارٍ عكسيٍّ موثَّق';
+            $out['reason'] = 'الإشعار المعتمد لا يلغى — يقابل بإشعار عكسي موثق';
             return $out;
         }
         if ((string) $n['state'] === 'cancelled') {
-            $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'ملغًى سلفًا'; return $out;
+            $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'ملغى سلفا'; return $out;
         }
         $gate->update('credit_debit_notes', array(
             'state' => 'cancelled', 'version' => intval($n['version']) + 1,

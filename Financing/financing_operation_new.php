@@ -32,7 +32,7 @@ $granted = ($role === '-1') || OwnershipDomainGuard::hasGrant($conn, $co, $uid, 
 if (!$granted) {
     require_once __DIR__ . '/../includes/permissions_helper.php';
     ems_gov_flash_redirect('financing_board.php',
-        'إنشاءُ عمليات التمويل خلف منحةٍ فرديةٍ (شروطُ التمويل) ❌',
+        'إنشاء عمليات التمويل خلف منحة فردية (شروط التمويل) ❌',
         'GOV-PERM-403', 'اطلب منحة ownership.finance_terms من مدير الصلاحيات');
 }
 
@@ -79,17 +79,17 @@ include '../insidebar.php';
 ?>
 <div class="main ems-unified-page-shell">
     <?php
-    $header_title = 'إنشاء عملية تمويل — النموذج أولًا'; $header_icon = 'fa fa-money-check-dollar';
+    $header_title = 'إنشاء عملية تمويل — النموذج أولا'; $header_icon = 'fa fa-money-check-dollar';
     $header_actions = array();
     include('../includes/page_header.php');
-    ems_screen_about('النموذج أولًا فيحدد بقية الحقول والمعالجة المحاسبية: المرابحة أصل ملموس والتزام، '
+    ems_screen_about('النموذج أولا فيحدد بقية الحقول والمعالجة المحاسبية: المرابحة أصل ملموس والتزام، '
         . 'والإجارة التشغيلية حق استخدام لا أصل مملوك — ولو عوملت كالمرابحة لتضخمت الأصول والالتزامات '
-        . 'معًا. لا اعتماد بلا نموذج ومعالجة مكتوبة، والأقساط تُولَّد من العملية ولا تُدخل يدويًّا.',
+        . 'معا. لا اعتماد بلا نموذج ومعالجة مكتوبة، والأقساط تولد من العملية ولا تدخل يدويا.',
         array('اختر النموذج قبل كل شيء', 'المعالجة المحاسبية تظهر تحت كل نموذج'));
     if ($msg !== '') { echo '<div class="alert alert-success">' . htmlspecialchars($msg) . '</div>'; }
     if ($err !== '') { echo '<div class="alert alert-danger">' . htmlspecialchars($err) . '</div>'; }
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا نماذجَ تمويلٍ مفعَّلةً — ولا عمليةَ بلا نموذجٍ ومعالجةٍ مكتوبة', 'فعِّلْ نموذجَ تمويلٍ بسياستِه المحاسبيةِ في سجلِّ النماذجِ ثم أنشئ العملية');
+    echo ems_states_bundle('لا نماذج تمويل مفعلة — ولا عملية بلا نموذج ومعالجة مكتوبة', 'فعل نموذج تمويل بسياسته المحاسبية في سجل النماذج ثم أنشئ العملية');
     ?>
     <style>
       .fin-opn-table { width: 100%; }
@@ -101,10 +101,10 @@ include '../insidebar.php';
         <div class="table-container"><table class="alltables display fin-opn-table" data-no-dt="1">
         <thead><tr><th></th><th>النموذج</th><th>أثر الملكية</th><th>الاعتراف المحاسبي</th><th>حامل الإهلاك</th><th>السياسة المكتوبة</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -112,13 +112,13 @@ include '../insidebar.php';
               </tr></thead><tbody>
         <?php foreach ($models as $m): ?>
         <tr>
-            <td><input type="radio" name="model_pick" aria-label="اختيارُ نموذجِ التمويلِ لهذا الصف" value="<?php echo htmlspecialchars($m['model_code']); ?>" form="opform"
+            <td><input type="radio" name="model_pick" aria-label="اختيار نموذج التمويل لهذا الصف" value="<?php echo htmlspecialchars($m['model_code']); ?>" form="opform"
                        onclick="document.getElementById('model_code').value=this.value"></td>
             <td><strong><?php echo htmlspecialchars($m['name_ar']); ?></strong><br><small><?php echo htmlspecialchars($m['model_code']); ?></small></td>
             <td><?php echo htmlspecialchars($m['legal_owner_effect']); ?></td>
             <td><?php echo htmlspecialchars($m['accounting_recognition']); ?></td>
             <td><?php echo htmlspecialchars((string) $m['depreciation_bearer']); ?></td>
-            <td><small><?php echo htmlspecialchars((string) $m['policy_doc_ref']) ?: '<span class="badge badge-danger">بلا سياسة — لن يُقبل</span>'; ?></small></td>
+            <td><small><?php echo htmlspecialchars((string) $m['policy_doc_ref']) ?: '<span class="badge badge-danger">بلا سياسة — لن يقبل</span>'; ?></small></td>
         </tr>
         <?php endforeach; ?>
         </tbody></table></div>
@@ -130,25 +130,25 @@ include '../insidebar.php';
         <?= csrf_field() ?>
             <input type="hidden" name="model_code" id="model_code" value="">
             <input type="text" name="op_code" placeholder="كود العملية *" required aria-label="كود العملية">
-            <select name="financier_entity_id" aria-label="الممولُ الطرفُ في العملية" required>
+            <select name="financier_entity_id" aria-label="الممول الطرف في العملية" required>
                 <option value="">— الممول *</option>
                 <?php foreach ($financiers as $f): ?>
                 <option value="<?php echo intval($f['entity_id']); ?>"><?php echo htmlspecialchars($f['legal_name']); ?></option>
                 <?php endforeach; ?>
             </select>
             <input type="text" name="currency" placeholder="العملة *" required aria-label="العملة">
-            <input type="date" name="signed_date" aria-label="تاريخُ توقيعِ العملية" value="<?php echo date('Y-m-d'); ?>">
+            <input type="date" name="signed_date" aria-label="تاريخ توقيع العملية" value="<?php echo date('Y-m-d'); ?>">
             <input type="number" step="0.01" name="capital" placeholder="رأس المال *" required aria-label="رأس المال">
             <input type="number" step="0.01" name="purchase_value" placeholder="قيمة شراء العين" aria-label="قيمة شراء العين">
             <input type="number" step="0.01" name="down_payment" placeholder="المقدم" value="0" aria-label="المقدم">
             <input type="number" step="0.01" name="profit_rate" placeholder="نسبة الأرباح ٪" aria-label="نسبة الأرباح ٪">
             <input type="number" step="0.01" name="profit_amount" placeholder="قيمة الأرباح" aria-label="قيمة الأرباح">
             <input type="number" name="installments_no" placeholder="عدد الأقساط" aria-label="عدد الأقساط">
-            <input type="number" step="0.01" name="installment_amount" placeholder="قيمة القسط (تُحسب إن تُركت)" aria-label="قيمة القسط (تُحسب إن تُركت)">
-            <input type="date" name="first_due" title="استحقاق أول قسط — لتوليد الجدول آليًّا" aria-label="استحقاق أول قسط — لتوليد الجدول آليًّا">
+            <input type="number" step="0.01" name="installment_amount" placeholder="قيمة القسط (تحسب إن تركت)" aria-label="قيمة القسط (تحسب إن تركت)">
+            <input type="date" name="first_due" title="استحقاق أول قسط — لتوليد الجدول آليا" aria-label="استحقاق أول قسط — لتوليد الجدول آليا">
             <input type="date" name="maturity_date" title="تاريخ النهاية" aria-label="تاريخ النهاية">
             <button class="btn-primary fin-opn-submit" type="submit"
-                    onclick="if(!document.getElementById('model_code').value){alert('النموذج أولًا — اختره من الجدول أعلاه');return false;}">
+                    onclick="if(!document.getElementById('model_code').value){alert('النموذج أولا — اختره من الجدول أعلاه');return false;}">
                 إنشاء العملية وتوليد أقساطها
             </button>
         </form>

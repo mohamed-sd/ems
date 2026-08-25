@@ -125,13 +125,13 @@ class ContractStateMachine
     {
         $s = (string) $contractState;
         if ($s === self::SUSPENDED) {
-            return array('active' => false, 'reason' => 'العقدُ معلَّق — وكلُّ ما تحته معلَّقٌ تبعًا له حتى الاستئناف');
+            return array('active' => false, 'reason' => 'العقد معلق — وكل ما تحته معلق تبعا له حتى الاستئناف');
         }
         if (in_array($s, array(self::ENDED, self::CLOSED, self::SETTLED), true)) {
-            return array('active' => false, 'reason' => 'العقدُ ' . $s . ' — وما تحته مُقفلٌ للتسجيل ويبقى للقراءة');
+            return array('active' => false, 'reason' => 'العقد ' . $s . ' — وما تحته مقفل للتسجيل ويبقى للقراءة');
         }
         if (!self::isEffective($s)) {
-            return array('active' => false, 'reason' => 'العقدُ ليس نافذًا بعد (' . $s . ') — ولا فرعَ نشطٌ تحت عقدٍ غيرِ نافذ');
+            return array('active' => false, 'reason' => 'العقد ليس نافذا بعد (' . $s . ') — ولا فرع نشط تحت عقد غير نافذ');
         }
         return array('active' => true, 'reason' => '');
     }
@@ -155,41 +155,41 @@ class ContractStateMachine
         $to = (string) $to;
 
         $c = self::contractOf($gate, $contractId);
-        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقدُ غير موجود'; return $out; }
+        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقد غير موجود'; return $out; }
 
         $from = (string) $c['contract_status'];
         $out['from'] = $from; $out['to'] = $to;
 
         // العطالةُ قبل الحكم: الانتقالُ إلى الحالة نفسِها لا شيء
         if ($from === $to) {
-            $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'العقدُ في هذه الحالة سلفًا';
+            $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'العقد في هذه الحالة سلفا';
             return $out;
         }
         if (!in_array($to, self::ALL, true)) {
-            $out['code'] = 422; $out['reason'] = 'حالةٌ غيرُ معروفة: ' . $to; return $out;
+            $out['code'] = 422; $out['reason'] = 'حالة غير معروفة: ' . $to; return $out;
         }
         if (in_array($from, self::TERMINAL_STATES, true)) {
             $out['code'] = 423;
-            $out['reason'] = 'العقدُ ' . $from . ' — حالةٌ نهائيةٌ بلا رجوع';
+            $out['reason'] = 'العقد ' . $from . ' — حالة نهائية بلا رجوع';
             return $out;
         }
         // التعليقُ والاستئنافُ لهما بابُهما (suspend/resume) — لا يمرّان من هنا
         if ($to === self::SUSPENDED) {
             $out['code'] = 422;
-            $out['reason'] = 'التعليقُ يقع بـ«علِّق العقد» — فهو يلزمه سببٌ ومدةٌ ويحفظ ما قبله';
+            $out['reason'] = 'التعليق يقع ب«علق العقد» — فهو يلزمه سبب ومدة ويحفظ ما قبله';
             return $out;
         }
         if ($from === self::SUSPENDED) {
             $out['code'] = 422;
-            $out['reason'] = 'العقدُ معلَّق — يُستأنَف أولًا فيعود إلى حيث كان، ثم يمضي';
+            $out['reason'] = 'العقد معلق — يستأنف أولا فيعود إلى حيث كان، ثم يمضي';
             return $out;
         }
         if (!self::canTransition($from, $to)) {
             $out['code'] = 422;
             $allowed = self::allowedFrom($from);
-            $out['reason'] = 'انتقالٌ غيرُ مشروع: ' . $from . ' ← ' . $to
-                . ($allowed ? (' — والمشروعُ من هنا: ' . implode(' · ', $allowed))
-                            : ' — ولا انتقالَ مشروعٌ من هذه الحالة');
+            $out['reason'] = 'انتقال غير مشروع: ' . $from . ' ← ' . $to
+                . ($allowed ? (' — والمشروع من هنا: ' . implode(' · ', $allowed))
+                            : ' — ولا انتقال مشروع من هذه الحالة');
             return $out;
         }
 
@@ -209,14 +209,14 @@ class ContractStateMachine
                                                   FROM users WHERE id = ' . (int) $actor);
                     $u = $rs ? mysqli_fetch_assoc($rs) : null;
                     $actorRole = ($u && $u['r'] !== null) ? strval($u['r']) : '';
-                } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل بقيمةِ \'\' — $actorRole'); $actorRole = ''; }
+                } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل بقيمة \'\' — $actorRole'); $actorRole = ''; }
             }
             $isExec = ($actorRole === '9' || $actorRole === '-1');
             if ($isExec && $authorityRef === '') { $authorityRef = 'سلطة أصلية'; }
             if ($authorityRef === '') {
                 $out['code'] = 403;
-                $out['reason'] = 'BR-CEO-01: التوقيعُ محصورٌ بالسلطة الأصلية للمدير التنفيذي'
-                    . ' أو تفويضٍ موثَّقٍ بمرجعه — مرِّر authority_ref أو وقِّع بحساب الإدارة التنفيذية';
+                $out['reason'] = 'BR-CEO-01: التوقيع محصور بالسلطة الأصلية للمدير التنفيذي'
+                    . ' أو تفويض موثق بمرجعه — مرر authority_ref أو وقع بحساب الإدارة التنفيذية';
                 return $out;
             }
         }
@@ -258,20 +258,20 @@ class ContractStateMachine
         $note = trim((string) $note);
         if ($note === '') {
             $out['code'] = 422;
-            $out['reason'] = 'سببُ التعليق إلزامي — تعليقٌ يجمّد عقدًا وكلَّ ما تحته لا يكون بلا سببٍ مكتوب';
+            $out['reason'] = 'سبب التعليق إلزامي — تعليق يجمد عقدا وكل ما تحته لا يكون بلا سبب مكتوب';
             return $out;
         }
         $c = self::contractOf($gate, (int) $contractId);
-        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقدُ غير موجود'; return $out; }
+        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقد غير موجود'; return $out; }
 
         $from = (string) $c['contract_status'];
         $out['from'] = $from;
         if ($from === self::SUSPENDED) {
-            $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'معلَّقٌ سلفًا'; return $out;
+            $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'معلق سلفا'; return $out;
         }
         if (!in_array($from, self::SUSPENDABLE, true)) {
             $out['code'] = 422;
-            $out['reason'] = 'لا يُعلَّق عقدٌ حالتُه «' . $from . '» — التعليقُ للعقود الحيّة';
+            $out['reason'] = 'لا يعلق عقد حالته «' . $from . '» — التعليق للعقود الحية';
             return $out;
         }
 
@@ -294,15 +294,15 @@ class ContractStateMachine
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'to' => null, 'changed' => false);
         $c = self::contractOf($gate, (int) $contractId);
-        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقدُ غير موجود'; return $out; }
+        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقد غير موجود'; return $out; }
         if ((string) $c['contract_status'] !== self::SUSPENDED) {
-            $out['code'] = 422; $out['reason'] = 'العقدُ ليس معلَّقًا'; return $out;
+            $out['code'] = 422; $out['reason'] = 'العقد ليس معلقا'; return $out;
         }
         $back = (string) $c['pause_state_before'];
         if ($back === '' || !in_array($back, self::ALL, true)) {
             // لا يُخترع مرجع: عقدٌ عُلّق قبل هذه الآلة لا يُعرف ما قبله
             $out['code'] = 422;
-            $out['reason'] = 'لا حالةَ محفوظةً قبل التعليق — يُنقل يدويًّا إلى حالته الصحيحة بقرارٍ موثَّق';
+            $out['reason'] = 'لا حالة محفوظة قبل التعليق — ينقل يدويا إلى حالته الصحيحة بقرار موثق';
             return $out;
         }
         $gate->update('contracts', array(
@@ -353,7 +353,7 @@ class ContractStateMachine
                 'idempotency_key' => 'contract_state:' . (int) $contractId . ':' . $from . '>' . $to
                                      . ':' . gmdate('YmdHis'),
                 'contract_id'     => (int) $contractId,
-                'notes'           => 'حالةُ العقد: ' . $from . ' ← ' . $to,
+                'notes'           => 'حالة العقد: ' . $from . ' ← ' . $to,
                 'payload'         => array(
                     'contract_id' => (int) $contractId,
                     'from'        => $from,
@@ -380,7 +380,7 @@ class ContractStateMachine
                     'created_by'      => (int) $actor ?: 1,
                     'idempotency_key' => 'contract_signed:' . (int) $contractId . ':' . $from,
                     'contract_id'     => (int) $contractId,
-                    'notes'           => 'توقيعُ العقد #' . (int) $contractId
+                    'notes'           => 'توقيع العقد #' . (int) $contractId
                                          . (!empty($row['second_party']) ? ' — ' . $row['second_party'] : ''),
                     'payload'         => array(
                         'contract_id'  => (int) $contractId,

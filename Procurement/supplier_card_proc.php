@@ -19,7 +19,7 @@ $company_id = $ctx['company_id'];
 $is_super_admin = $ctx['is_super'];
 if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php"); exit(); }
 $perms = proc_page_perms($conn, 'Procurement/supplier_card_proc.php', $is_super_admin);
-if (!$perms['can_view']) { ems_gov_flash_redirect('../main/dashboard.php', 'لا صلاحيةَ عرضٍ لبطاقة المورد ❌', 'GOV-PERM-403', ''); exit(); }
+if (!$perms['can_view']) { ems_gov_flash_redirect('../main/dashboard.php', 'لا صلاحية عرض لبطاقة المورد ❌', 'GOV-PERM-403', ''); exit(); }
 
 $sid = intval($_GET['id'] ?? 0);
 $sup = $sid > 0 ? proc_gate($is_super_admin)->selectOne('proc_supplier',
@@ -28,9 +28,9 @@ $tab = in_array(strval($_GET['tab'] ?? '1'), array('1','2','3','4','5','6','7','
      ? strval($_GET['tab'] ?? '1') : '1';
 $co = intval($company_id);
 
-$TABS = array('1' => 'البيانات', '2' => 'أوامرُ الشراء', '3' => 'الاستلامات',
-              '4' => 'الفواتيرُ والمطابقة', '5' => 'العهد', '6' => 'الأصناف', '7' => 'السجل',
-              '8' => 'كشفُ الحساب');
+$TABS = array('1' => 'البيانات', '2' => 'أوامر الشراء', '3' => 'الاستلامات',
+              '4' => 'الفواتير والمطابقة', '5' => 'العهد', '6' => 'الأصناف', '7' => 'السجل',
+              '8' => 'كشف الحساب');
 
 $page_title = 'إيكوبيشن | بطاقة مورد المشتريات';
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
@@ -46,14 +46,14 @@ include '../insidebar.php';
     $header_back = array('href' => 'suppliers_proc.php', 'class' => '',
                          'icon' => 'fas fa-arrow-right', 'label' => 'الموردون');
     include('../includes/page_header.php');
-    ems_screen_about('بطاقةُ المورد الواحدة بتبويباتها السبعة — بدل الجدول المسطّح: '
-        . 'كلُّ تبويبٍ قراءةٌ حيةٌ من جدول مالكه برابط أصله.', array());
+    ems_screen_about('بطاقة المورد الواحدة بتبويباتها السبعة — بدل الجدول المسطح: '
+        . 'كل تبويب قراءة حية من جدول مالكه برابط أصله.', array());
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا بياناتٍ في هذا التبويبِ لهذا المورد',
-        'انتقل إلى تبويبٍ آخرَ من شريطِ التبويبات، أو اختر موردًا آخرَ من شاشة الموردين');
+    echo ems_states_bundle('لا بيانات في هذا التبويب لهذا المورد',
+        'انتقل إلى تبويب آخر من شريط التبويبات، أو اختر موردا آخر من شاشة الموردين');
     ?>
 
-    <?php if (!$sup): ems_state_empty('اختر موردًا من القائمة', 'إلى الموردين', 'suppliers_proc.php'); ?>
+    <?php if (!$sup): ems_state_empty('اختر موردا من القائمة', 'إلى الموردين', 'suppliers_proc.php'); ?>
     <?php else: ?>
     <div class="card"><div class="card-body proc-sc-head">
         <strong class="proc-sc-name"><?php echo htmlspecialchars((string)$sup['name']); ?></strong>
@@ -89,14 +89,14 @@ include '../insidebar.php';
                                  FROM proc_order WHERE company_id={$co} AND supplier_id={$sid}
                                   AND COALESCE(is_deleted,0)=0 ORDER BY id DESC LIMIT 100");
             while ($r && ($x = $r->fetch_assoc())) { $rows[] = $x; }
-            if (!$rows) { ems_state_empty('لا أوامرَ لهذا المورد', 'أمرٌ جديد', 'orders_proc.php'); break; }
+            if (!$rows) { ems_state_empty('لا أوامر لهذا المورد', 'أمر جديد', 'orders_proc.php'); break; }
             echo '<div class="table-container"><table class="alltables display proc-sc-table" data-no-dt="1">'
                . '<thead><tr><th>الكود</th><th>الحالة</th><th>الإجمالي</th><th>استلم٪</th><th>موعد التسليم</th><th></th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -119,7 +119,7 @@ include '../insidebar.php';
                                 WHERE rl.company_id={$co} AND rc.supplier_id={$sid}
                                 ORDER BY rl.id DESC LIMIT 100");
             while ($r && ($x = $r->fetch_assoc())) { $rows[] = $x; }
-            if (!$rows) { ems_state_empty('لا استلاماتٍ بعدُ'); break; }
+            if (!$rows) { ems_state_empty('لا استلامات بعد'); break; }
             echo '<div class="table-container"><table class="alltables display proc-sc-table" data-no-dt="1">'
                . '<thead><tr><th>عهدة الاستلام</th><th>الصنف</th><th>الكمية</th><th>التاريخ</th></tr></thead><tbody>';
             foreach ($rows as $x) {
@@ -137,7 +137,7 @@ include '../insidebar.php';
                                  FROM proc_order WHERE company_id={$co} AND supplier_id={$sid}
                                   AND invoice_no IS NOT NULL ORDER BY id DESC LIMIT 100");
             while ($r && ($x = $r->fetch_assoc())) { $rows[] = $x; }
-            if (!$rows) { ems_state_empty('لا فواتيرَ مسجَّلةً بعدُ'); break; }
+            if (!$rows) { ems_state_empty('لا فواتير مسجلة بعد'); break; }
             echo '<div class="table-container"><table class="alltables display proc-sc-table" data-no-dt="1">'
                . '<thead><tr><th>الأمر</th><th>الفاتورة</th><th>مبلغها</th><th>الفرق</th><th>المطابقة</th></tr></thead><tbody>';
             foreach ($rows as $x) {
@@ -158,7 +158,7 @@ include '../insidebar.php';
                                   AND COALESCE(rc.is_deleted,0)=0
                                 ORDER BY rc.id DESC LIMIT 100");
             while ($r && ($x = $r->fetch_assoc())) { $rows[] = $x; }
-            if (!$rows) { ems_state_empty('لا عهدَ استلامٍ لهذا المورد'); break; }
+            if (!$rows) { ems_state_empty('لا عهد استلام لهذا المورد'); break; }
             echo '<div class="table-container"><table class="alltables display proc-sc-table" data-no-dt="1">'
                . '<thead><tr><th>الكود</th><th>المستلم</th><th>التاريخ</th><th>الموقع</th><th>الحالة</th></tr></thead><tbody>';
             foreach ($rows as $x) {
@@ -177,7 +177,7 @@ include '../insidebar.php';
                                 WHERE ol.company_id={$co} AND o.supplier_id={$sid}
                                 GROUP BY ol.item_name ORDER BY n DESC LIMIT 100");
             while ($r && ($x = $r->fetch_assoc())) { $rows[] = $x; }
-            if (!$rows) { ems_state_empty('لا أصنافَ مورَّدةً بعدُ'); break; }
+            if (!$rows) { ems_state_empty('لا أصناف موردة بعد'); break; }
             echo '<div class="table-container"><table class="alltables display proc-sc-table" data-no-dt="1">'
                . '<thead><tr><th>الصنف</th><th>مرات التوريد</th><th>إجمالي الكمية</th></tr></thead><tbody>';
             foreach ($rows as $x) {
@@ -199,7 +199,7 @@ include '../insidebar.php';
                                   AND d.party_ref={$sid} AND d.due_type='purchase'
                                 ORDER BY d.id DESC LIMIT 200");
             while ($r && ($x = $r->fetch_assoc())) { $rows[] = $x; }
-            if (!$rows) { ems_state_empty('لا ذممَ مقيَّدةً لهذا المورد — الذمّةُ تُفتح بالمطابقة الثلاثية', 'إلى المطابقة', 'po_match.php'); break; }
+            if (!$rows) { ems_state_empty('لا ذمم مقيدة لهذا المورد — الذمة تفتح بالمطابقة الثلاثية', 'إلى المطابقة', 'po_match.php'); break; }
             $tot = array();   // إجمالي المفتوح لكل عملة
             foreach ($rows as $x) {
                 if ((string) $x['settlement_state'] === 'pending') {
@@ -207,11 +207,11 @@ include '../insidebar.php';
                     $tot[$cur] = ($tot[$cur] ?? 0) + (float) $x['amount'];
                 }
             }
-            echo '<p class="proc-sc-total">الرصيدُ المفتوح (بانتظار التسوية): '
+            echo '<p class="proc-sc-total">الرصيد المفتوح (بانتظار التسوية): '
                . ($tot ? implode(' · ', array_map(function ($c, $v) { return number_format($v, 2) . ' ' . $c; }, array_keys($tot), $tot)) : 'صفر')
                . '</p>';
             echo '<div class="table-container"><table class="alltables display proc-sc-table" data-no-dt="1">'
-               . '<thead><tr><th>الذمّة</th><th>المرجع</th><th>المبلغ</th><th>الاتجاه</th><th>حالة التسوية</th><th>تاريخ القيد</th></tr></thead><tbody>';
+               . '<thead><tr><th>الذمة</th><th>المرجع</th><th>المبلغ</th><th>الاتجاه</th><th>حالة التسوية</th><th>تاريخ القيد</th></tr></thead><tbody>';
             foreach ($rows as $x) {
                 $oid_ref = (strpos((string) $x['period_ref'], 'PO-') === 0) ? intval(substr((string) $x['period_ref'], 3)) : 0;
                 echo '<tr><td>#' . intval($x['id']) . '</td>'
@@ -230,7 +230,7 @@ include '../insidebar.php';
                                 WHERE company_id={$co} AND record_id={$sid}
                                   AND screen_name LIKE '%proc%' ORDER BY id DESC LIMIT 50");
             while ($r && ($x = $r->fetch_assoc())) { $rows[] = $x; }
-            if (!$rows) { ems_state_empty('لا سجلَّ نشاطٍ محفوظًا لهذا المورد'); break; }
+            if (!$rows) { ems_state_empty('لا سجل نشاط محفوظا لهذا المورد'); break; }
             echo '<ul>';
             foreach ($rows as $x) {
                 echo '<li><small>' . htmlspecialchars($x['created_at'] . ' — ' . $x['action_type']

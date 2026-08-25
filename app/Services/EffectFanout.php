@@ -66,13 +66,13 @@ class EffectFanout
         $company = intval($unit['company_id']);
         $model = strval($unit['work_model']);
         if (!isset(self::WORK_MODEL_UNIT[$model])) {
-            throw new \RuntimeException('EffectFanout: نموذج عملٍ غير معروف: ' . $model);
+            throw new \RuntimeException('EffectFanout: نموذج عمل غير معروف: ' . $model);
         }
         // ④ وحدةٌ واحدةٌ للمروحة — تُقرأ مرةً وتُمرَّر كما هي
         $uom = self::WORK_MODEL_UNIT[$model];
         $qty = round((float) ($unit['approved_qty'] !== null ? $unit['approved_qty'] : $unit['ops_qty']), 4);
         if ($qty <= 0) {
-            throw new \RuntimeException('EffectFanout: كميةٌ معتمدةٌ غير موجبة للوحدة #' . $unitId);
+            throw new \RuntimeException('EffectFanout: كمية معتمدة غير موجبة للوحدة #' . $unitId);
         }
         $clientPrice = ($unit['client_unit_price'] !== null) ? (float) $unit['client_unit_price'] : null;
         $supplierPrice = ($unit['supplier_unit_price'] !== null) ? (float) $unit['supplier_unit_price'] : null;
@@ -107,7 +107,7 @@ class EffectFanout
             if ($twin === null) {
                 $out['stale_anchors'][] = array(
                     'column' => $anchorCol, 'value' => intval($unit[$anchorCol]), 'table' => $anchorTbl,
-                    'reason' => 'الهدفُ غيرُ موجودٍ في نطاق الشركة — لا تبنّيَ لتوأمٍ معدوم',
+                    'reason' => 'الهدف غير موجود في نطاق الشركة — لا تبني لتوأم معدوم',
                 );
                 $unit[$anchorCol] = null;
                 $gate->update('fin_unit_records', array($anchorCol => null), array('id' => $unitId));
@@ -147,7 +147,7 @@ class EffectFanout
             }
             if (intval($eff['is_active']) !== 1) {
                 $out['skipped'][] = array('effect' => $type, 'label' => $eff['effect_label'],
-                    'reason' => strval($eff['unavailable_reason'] ?: 'معطّل في خريطة الآثار'));
+                    'reason' => strval($eff['unavailable_reason'] ?: 'معطل في خريطة الآثار'));
                 continue;
             }
 
@@ -155,7 +155,7 @@ class EffectFanout
                 case 'revenue_event':
                     if ($clientPrice === null) {
                         $out['skipped'][] = array('effect' => $type, 'label' => $eff['effect_label'],
-                            'reason' => 'لا سعر عقدِ عميلٍ على الوحدة');
+                            'reason' => 'لا سعر عقد عميل على الوحدة');
                         break;
                     }
                     // تبنٍّ: توأمٌ ولّده المسار القديم — يُربط ولا يُضاعف
@@ -192,7 +192,7 @@ class EffectFanout
                 case 'supplier_due':
                     if ($supplierId === null || $supplierPrice === null) {
                         $out['skipped'][] = array('effect' => $type, 'label' => $eff['effect_label'],
-                            'reason' => 'لا شريك إنتاجٍ أو لا سعر عقدِ مورد على الوحدة');
+                            'reason' => 'لا شريك إنتاج أو لا سعر عقد مورد على الوحدة');
                         break;
                     }
                     if (!empty($unit['supplier_due_id'])) {
@@ -218,7 +218,7 @@ class EffectFanout
                 case 'cost_record':
                     if ($supplierPrice === null) {
                         $out['skipped'][] = array('effect' => $type, 'label' => $eff['effect_label'],
-                            'reason' => 'لا سعر تكلفةٍ (سعر عقد المورد) على الوحدة');
+                            'reason' => 'لا سعر تكلفة (سعر عقد المورد) على الوحدة');
                         break;
                     }
                     // تكلفة الوحدة = ما ندفعه للمورد؛ وإيرادها = ما نقبضه من العميل
@@ -241,14 +241,14 @@ class EffectFanout
                 case 'employee_due':
                     // بنيويًّا غير متاح اليوم — الخريطة تحمل سببه ولا يُلفَّق رقم.
                     $out['skipped'][] = array('effect' => $type, 'label' => $eff['effect_label'],
-                        'reason' => strval($eff['unavailable_reason'] ?: 'لا مصدر تكليفِ مشغّل'));
+                        'reason' => strval($eff['unavailable_reason'] ?: 'لا مصدر تكليف مشغل'));
                     break;
 
                 case 'metric_update': // مخصّص الصيانة المحمَّل على المعدة (معامله في الخريطة)
                     $rate = ($eff['param_value'] !== null) ? (float) $eff['param_value'] : 0.0;
                     if ($rate <= 0 || $equipmentId === null) {
                         $out['skipped'][] = array('effect' => $type, 'label' => $eff['effect_label'],
-                            'reason' => $rate <= 0 ? 'معدّل المخصّص غير مضبوط (param_value)' : 'لا معدةَ على الوحدة');
+                            'reason' => $rate <= 0 ? 'معدل المخصص غير مضبوط (param_value)' : 'لا معدة على الوحدة');
                         break;
                     }
                     $prov = round($qty * $rate, 2);
@@ -266,7 +266,7 @@ class EffectFanout
 
                 default:
                     $out['skipped'][] = array('effect' => $type, 'label' => $eff['effect_label'],
-                        'reason' => 'لا مولّدَ مسجَّلٌ لهذا النوع في المحرّك');
+                        'reason' => 'لا مولد مسجل لهذا النوع في المحرك');
             }
         }
         return $out;
@@ -513,7 +513,7 @@ class EffectFanout
                     if (function_exists('log_security_event')) {
                         log_security_event('FANOUT_LEGAL_PARTIAL',
                             'ts=' . $tsId . ' ue=' . intval($le['id'])
-                            . ' مرآةٌ نصفية (qty=0 بلا أسطر) — ارتدادٌ معلَنٌ لأعمدة الدوام');
+                            . ' مرآة نصفية (qty=0 بلا أسطر) — ارتداد معلن لأعمدة الدوام');
                     }
                     $le = null; // لا تُطبَّق تجاوزات المصدر القانوني
                 }
@@ -543,15 +543,15 @@ class EffectFanout
         // ── جانب العميل: وحدةُ عقده تختار العمود المقروء، ثم سعرٌ موجبٌ وعملةٌ معروفة ──
         $cl = &$ctx['client'];
         $clUnit = isset(self::CONTRACT_UNIT[$cl['unit_label']]) ? self::CONTRACT_UNIT[$cl['unit_label']] : null;
-        if ($t['op_id'] === null)                       { $cl['reason'] = 'لا تشغيلَ مربوطًا بصف الدوام'; }
-        elseif ($cl['contract_id'] === null)            { $cl['reason'] = 'لا عقدَ عميلٍ على التشغيل'; }
-        elseif ($t['client_price'] === null || (float) $t['client_price'] <= 0) { $cl['reason'] = 'لا سعر وحدةٍ لنوع المعدة في عقد العميل'; }
-        elseif ($clUnit === null)                       { $cl['reason'] = 'وحدة فوترةٍ غير معروفة في عقد العميل: ' . $cl['unit_label']; }
-        elseif (!isset($recorded[$clUnit]))             { $cl['reason'] = 'وحدة عقد العميل «' . $cl['unit_label'] . '» لا يسجّلها سجلّ الدوام بعد'; }
+        if ($t['op_id'] === null)                       { $cl['reason'] = 'لا تشغيل مربوطا بصف الدوام'; }
+        elseif ($cl['contract_id'] === null)            { $cl['reason'] = 'لا عقد عميل على التشغيل'; }
+        elseif ($t['client_price'] === null || (float) $t['client_price'] <= 0) { $cl['reason'] = 'لا سعر وحدة لنوع المعدة في عقد العميل'; }
+        elseif ($clUnit === null)                       { $cl['reason'] = 'وحدة فوترة غير معروفة في عقد العميل: ' . $cl['unit_label']; }
+        elseif (!isset($recorded[$clUnit]))             { $cl['reason'] = 'وحدة عقد العميل «' . $cl['unit_label'] . '» لا يسجلها سجل الدوام بعد'; }
         elseif ($recorded[$clUnit] <= 0) {
             // ⚠️ الوحدة مطابقةٌ لكن خانتها فارغة: تعذّرٌ معلَنٌ لا اشتقاقٌ من عمودٍ آخر.
-            $cl['reason'] = 'عقد العميل يفوتر بـ«' . ($cl['unit_label'] !== '' ? $cl['unit_label'] : 'ساعة')
-                . '» ولا كميةَ مسجّلةً بهذه الوحدة على الصف — لا تسعير ملفَّق';
+            $cl['reason'] = 'عقد العميل يفوتر ب«' . ($cl['unit_label'] !== '' ? $cl['unit_label'] : 'ساعة')
+                . '» ولا كمية مسجلة بهذه الوحدة على الصف — لا تسعير ملفق';
         }
         elseif (!isset(self::CONTRACT_CURRENCY[trim($cl['currency_label'])])) { $cl['reason'] = 'عملة عقد العميل غير معروفة: ' . $cl['currency_label']; }
         else {
@@ -578,7 +578,7 @@ class EffectFanout
 
         // ── جانب المورد: سلّم الحسم — الساري بالتاريخ ← النشط الوحيد ← تعذّر ──
         $sp = &$ctx['supplier'];
-        if ($ctx['supplier_id'] === null || $t['op_id'] === null) { $sp['reason'] = 'لا موردَ على معدة التشغيل'; }
+        if ($ctx['supplier_id'] === null || $t['op_id'] === null) { $sp['reason'] = 'لا مورد على معدة التشغيل'; }
         else {
             $sq = $conn->prepare(
                 "SELECT sc.id, sc.price_currency_contract AS cur_label, sce.equip_price, sce.equip_unit,
@@ -600,10 +600,10 @@ class EffectFanout
             foreach ($cands as $cand) { if (intval($cand['in_force']) === 1) { $inForce[] = $cand; } }
             $pick = null;
             if (count($inForce) === 1)      { $pick = $inForce[0]; $sp['resolved_by'] = 'in_force_at_date'; }
-            elseif (count($inForce) > 1)    { $sp['reason'] = 'أكثر من عقد موردٍ سارٍ بتاريخ العمل — يلزم حسمٌ يدوي'; }
+            elseif (count($inForce) > 1)    { $sp['reason'] = 'أكثر من عقد مورد سار بتاريخ العمل — يلزم حسم يدوي'; }
             elseif (count($cands) === 1)    { $pick = $cands[0]; $sp['resolved_by'] = 'single_active'; }
-            elseif (count($cands) > 1)      { $sp['reason'] = 'عقودُ موردٍ متعددةٌ ولا ساريَ بتاريخ العمل — لا يُخمَّن سعر'; }
-            else                            { $sp['reason'] = 'لا سعر وحدةٍ لنوع المعدة في أي عقد موردٍ نشط'; }
+            elseif (count($cands) > 1)      { $sp['reason'] = 'عقود مورد متعددة ولا ساري بتاريخ العمل — لا يخمن سعر'; }
+            else                            { $sp['reason'] = 'لا سعر وحدة لنوع المعدة في أي عقد مورد نشط'; }
             if ($pick !== null) {
                 $sp['contract_id'] = intval($pick['id']);
                 $sp['unit_label'] = trim((string) $pick['equip_unit']);
@@ -613,11 +613,11 @@ class EffectFanout
                                         : (string) $pick['cur_label'];
                 // وحدةُ عقد المورد تختار عمودَه المقروء — **مستقلةً عن وحدة العميل**
                 $spUnit = isset(self::CONTRACT_UNIT[$sp['unit_label']]) ? self::CONTRACT_UNIT[$sp['unit_label']] : null;
-                if ($spUnit === null) { $sp['reason'] = 'وحدة فوترةٍ غير معروفة في عقد المورد: ' . $sp['unit_label']; }
-                elseif (!isset($recorded[$spUnit])) { $sp['reason'] = 'وحدة عقد المورد «' . $sp['unit_label'] . '» لا يسجّلها سجلّ الدوام بعد'; }
+                if ($spUnit === null) { $sp['reason'] = 'وحدة فوترة غير معروفة في عقد المورد: ' . $sp['unit_label']; }
+                elseif (!isset($recorded[$spUnit])) { $sp['reason'] = 'وحدة عقد المورد «' . $sp['unit_label'] . '» لا يسجلها سجل الدوام بعد'; }
                 elseif ($recorded[$spUnit] <= 0) {
-                    $sp['reason'] = 'عقد المورد يفوتر بـ«' . ($sp['unit_label'] !== '' ? $sp['unit_label'] : 'ساعة')
-                        . '» ولا كميةَ مسجّلةً بهذه الوحدة على الصف — لا تسعير ملفَّق';
+                    $sp['reason'] = 'عقد المورد يفوتر ب«' . ($sp['unit_label'] !== '' ? $sp['unit_label'] : 'ساعة')
+                        . '» ولا كمية مسجلة بهذه الوحدة على الصف — لا تسعير ملفق';
                 }
                 elseif (!isset(self::CONTRACT_CURRENCY[trim($sp['currency_label'])])) { $sp['reason'] = 'عملة عقد المورد غير معروفة: ' . $sp['currency_label']; }
                 else {
@@ -726,7 +726,7 @@ class EffectFanout
             }
         }
         return array('ruling' => 'case_by_case', 'pct' => null,
-                     'note' => 'لا قاعدةَ مسجَّلةٌ لهذه الحالة', 'scope' => 'missing',
+                     'note' => 'لا قاعدة مسجلة لهذه الحالة', 'scope' => 'missing',
                      'obligation_type' => $ob);
     }
 
@@ -815,15 +815,15 @@ class EffectFanout
         // للمورد قرارٌ آخر لم يُحسم بعد، فلا يُبتّ فيه هنا ضمنًا.
         $qtyRuled = $qty;
         $state = 'due';
-        $qtyNote = 'عقدُ إنتاجٍ: الاستحقاق بالكمية المنجزة لا بتوزيع الزمن';
+        $qtyNote = 'عقد إنتاج: الاستحقاق بالكمية المنجزة لا بتوزيع الزمن';
         $qtyBillable = isset($ctx['qty_billable']) ? $ctx['qty_billable'] : null;
 
         if ($party === 'client' && $qtyBillable !== null && (int) $qtyBillable === 0) {
             $qtyRuled = 0.0;
             $state = 'not_due';
             $reason = (isset($ctx['qty_ruling_note']) && $ctx['qty_ruling_note'] !== null)
-                    ? $ctx['qty_ruling_note'] : 'حُكم بعدم فوترة الكمية';
-            $qtyNote = 'الكميةُ غيرُ مفوترةٍ بحكمٍ على الواقعة — ' . $reason;
+                    ? $ctx['qty_ruling_note'] : 'حكم بعدم فوترة الكمية';
+            $qtyNote = 'الكمية غير مفوترة بحكم على الواقعة — ' . $reason;
         }
 
         // ── H-07 · السعرُ المقرَّر إن أعلنه بندُ عقد المورد ────────────────────
@@ -865,15 +865,15 @@ class EffectFanout
                 'standby_amount'   => $sbAmount,
                 'standby_currency' => $sbCurrency,
                 'standby_note' => $needsRate
-                    ? ('استعدادٌ مفوترٌ بشرطٍ صريح: ' . round($sbBillable, 2)
-                       . ' ساعة — ولا سعرَ ساعةٍ في عقدٍ مسعَّرٍ بـ' . $unit
-                       . '، فلا يُحوَّل إلى مالٍ بلا سعرٍ مقرَّر')
+                    ? ('استعداد مفوتر بشرط صريح: ' . round($sbBillable, 2)
+                       . ' ساعة — ولا سعر ساعة في عقد مسعر ب' . $unit
+                       . '، فلا يحول إلى مال بلا سعر مقرر')
                     : (($sbAmount !== null)
-                        ? ('استعدادٌ مفوترٌ محسوبٌ بسعرٍ مقرَّر: ' . round($sbBillable, 2)
+                        ? ('استعداد مفوتر محسوب بسعر مقرر: ' . round($sbBillable, 2)
                            . ' ساعة ⇒ ' . $sbAmount . ' — ' . $sbAmountNote)
                         : (($sbUndecided > 0)
-                            ? ('زمنُ توقفٍ بلا حكمٍ مقرَّر: ' . round($sbUndecided, 2) . ' ساعة')
-                            : 'لا استعدادَ مفوترًا')),
+                            ? ('زمن توقف بلا حكم مقرر: ' . round($sbUndecided, 2) . ' ساعة')
+                            : 'لا استعداد مفوترا')),
             ),
         );
     }
@@ -921,7 +921,7 @@ class EffectFanout
             $snap = ($snapKey !== null && isset($ln[$snapKey])) ? $ln[$snapKey] : null;
             if ($snap !== null) {
                 $rule = array('ruling' => ((int) $snap === 1) ? 'full' : 'none', 'pct' => null,
-                              'note' => 'لقطةُ إسنادٍ مقرَّرةٌ على السطر (CON-02 §5)',
+                              'note' => 'لقطة إسناد مقررة على السطر (CON-02 §5)',
                               'scope' => 'attribution_snapshot', 'obligation_type' => $oblig);
             } else {
                 $rule = self::resolveRuling($policy, $state, $oblig);
@@ -963,7 +963,7 @@ class EffectFanout
     public static function forTimesheetId(\mysqli $conn, $gate, $tsId, $actor)
     {
         $ctx = self::resolveTimesheet($conn, $tsId);
-        if ($ctx === null) { throw new \RuntimeException('EffectFanout: صفّ دوامٍ غير موجود #' . intval($tsId)); }
+        if ($ctx === null) { throw new \RuntimeException('EffectFanout: صف دوام غير موجود #' . intval($tsId)); }
         $tsId = intval($ctx['id']);
         $company = $ctx['company_id'];
         $map = self::mapFor($gate, $company, self::SOURCE_TIMESHEET);
@@ -1003,12 +1003,12 @@ class EffectFanout
             $revLink = $done['revenue_event'];
             $old = null;
             try { $old = $gate->selectOne('fin_financial_events', array('where' => array('id' => intval($revLink['target_id'])), 'includeDeleted' => true)); }
-            catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة حارسٍ فقط'); /* قراءة حارسٍ فقط */ }
+            catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة حارس فقط'); /* قراءة حارسٍ فقط */ }
             $nowQty = $ruledQty('client');
             if ($old && round((float) $old['quantity'], 2) !== round($nowQty, 2)) {
                 $out['revision_pending'] = true;
                 $out['skipped'][] = array('effect' => 'revenue_event', 'label' => 'مراجعة كمية',
-                    'reason' => 'الكمية تغيّرت بعد توليد المروحة (' . $old['quantity'] . ' ← ' . $nowQty . ') — التصحيح لمحرّك العكسيات لا للتوليد');
+                    'reason' => 'الكمية تغيرت بعد توليد المروحة (' . $old['quantity'] . ' ← ' . $nowQty . ') — التصحيح لمحرك العكسيات لا للتوليد');
                 if (function_exists('log_security_event')) {
                     log_security_event('FANOUT_REVISION_PENDING', 'timesheet=' . $tsId
                         . ' old_qty=' . $old['quantity'] . ' new_qty=' . $nowQty);
@@ -1023,7 +1023,7 @@ class EffectFanout
             if (isset($done[$type])) { continue; } // ③ العطالة
             if (intval($eff['is_active']) !== 1) {
                 $out['skipped'][] = array('effect' => $type, 'label' => $eff['effect_label'],
-                    'reason' => strval($eff['unavailable_reason'] ?: 'معطّل في خريطة الآثار'));
+                    'reason' => strval($eff['unavailable_reason'] ?: 'معطل في خريطة الآثار'));
                 continue;
             }
 
@@ -1098,7 +1098,7 @@ class EffectFanout
                 case 'cost_record':
                     if (!$ctx['supplier']['ok']) {
                         $out['skipped'][] = array('effect' => $type, 'label' => $eff['effect_label'],
-                            'reason' => 'لا سعر تكلفةٍ: ' . $ctx['supplier']['reason']);
+                            'reason' => 'لا سعر تكلفة: ' . $ctx['supplier']['reason']);
                         break;
                     }
                     $spCostQty = $ruledQty('supplier');
@@ -1135,7 +1135,7 @@ class EffectFanout
                     // الأثر متعذّرًا ولا يُكتب صفٌّ فارغٌ يوهم بوجود حكم.
                     if (!$ctx['client']['ok'] && !$ctx['supplier']['ok']) {
                         $out['skipped'][] = array('effect' => $type, 'label' => $eff['effect_label'],
-                            'reason' => 'لا طرفَ قابلًا للحكم — العميل: ' . $ctx['client']['reason']
+                            'reason' => 'لا طرف قابلا للحكم — العميل: ' . $ctx['client']['reason']
                                       . ' · المورد: ' . $ctx['supplier']['reason']);
                         break;
                     }
@@ -1239,8 +1239,8 @@ class EffectFanout
                     $mhHours = round((float) $ctx['recorded']['hour'], 2); // executed_hours
                     if ($rate <= 0 || $ctx['equipment_id'] === null || $mhHours <= 0) {
                         $out['skipped'][] = array('effect' => $type, 'label' => $eff['effect_label'],
-                            'reason' => $rate <= 0 ? 'معدّل المخصّص غير مضبوط (param_value)'
-                                : ($ctx['equipment_id'] === null ? 'لا معدةَ على صف الدوام' : 'لا ساعاتِ تشغيلٍ فعليةً على الصف'));
+                            'reason' => $rate <= 0 ? 'معدل المخصص غير مضبوط (param_value)'
+                                : ($ctx['equipment_id'] === null ? 'لا معدة على صف الدوام' : 'لا ساعات تشغيل فعلية على الصف'));
                         break;
                     }
                     $prov = round($mhHours * $rate, 2);
@@ -1263,7 +1263,7 @@ class EffectFanout
                     $empId = $ctx['employee_id'];
                     if ($empId === null) {
                         $out['skipped'][] = array('effect' => $type, 'label' => $eff['effect_label'],
-                            'reason' => 'لا مشغّلَ (employee_id) على صف الدوام');
+                            'reason' => 'لا مشغل (employee_id) على صف الدوام');
                         break;
                     }
 
@@ -1319,14 +1319,14 @@ class EffectFanout
                     } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'غياب الصف = بالراتب'); /* غياب الصف = بالراتب */ }
                     if ($mode !== 'due') {
                         $out['skipped'][] = array('effect' => $type, 'label' => $eff['effect_label'],
-                            'reason' => 'المشغّل «بالراتب» — لا مستحقَ من المروحة (تدفعه الرواتب)');
+                            'reason' => 'المشغل «بالراتب» — لا مستحق من المروحة (تدفعه الرواتب)');
                         break;
                     }
                     $rate = ($eff['param_value'] !== null) ? (float) $eff['param_value'] : 0.0;
                     $ohours = round((float) $ctx['operator_hours'], 2);
                     if ($rate <= 0 || $ohours <= 0) {
                         $out['skipped'][] = array('effect' => $type, 'label' => $eff['effect_label'],
-                            'reason' => $rate <= 0 ? 'معدّل حافز المشغّل غير مضبوط (param_value)' : 'لا ساعاتِ مشغّلٍ على الصف');
+                            'reason' => $rate <= 0 ? 'معدل حافز المشغل غير مضبوط (param_value)' : 'لا ساعات مشغل على الصف');
                         break;
                     }
                     $empAmount = round($ohours * $rate, 2);
@@ -1343,7 +1343,7 @@ class EffectFanout
 
                 default:
                     $out['skipped'][] = array('effect' => $type, 'label' => $eff['effect_label'],
-                        'reason' => 'لا مولّدَ مسجَّلٌ لهذا النوع في المحرّك');
+                        'reason' => 'لا مولد مسجل لهذا النوع في المحرك');
             }
         }
         return $out;

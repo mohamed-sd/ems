@@ -78,8 +78,8 @@ include('../insidebar.php'); ?>
         $header_back    = array('href' => 'reports.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
         include('../includes/page_header.php');
         // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-        echo ems_states_bundle('لا ساعاتِ عملِ سائقين مطابقةً لهذه الفلاتر',
-            'وسّع مدى التاريخِ أو اختر «الكل» في المشروعِ والسائقِ والوردية ثم اضغط بحث');
+        echo ems_states_bundle('لا ساعات عمل سائقين مطابقة لهذه الفلاتر',
+            'وسع مدى التاريخ أو اختر «الكل» في المشروع والسائق والوردية ثم اضغط بحث');
         ?>
 
     <div class="card">
@@ -98,7 +98,7 @@ include('../insidebar.php'); ?>
             <form method="GET" class="form-grid fc-filter-bar">
                 <div class="field md-3 sm-6">
                     <label class="fc-filter-label"><i class="fas fa-project-diagram rpt-drv-ico"></i> المشروع</label>
-                    <div class="control"><select name="project" aria-label="تصفيةُ التقريرِ بالمشروع">
+                    <div class="control"><select name="project" aria-label="تصفية التقرير بالمشروع">
                         <option value="">-- الكل --</option>
                         <?php
                         $prj = array();
@@ -115,7 +115,7 @@ include('../insidebar.php'); ?>
 
                 <div class="field md-3 sm-6">
                     <label class="fc-filter-label"><i class="fas fa-user-tie rpt-drv-ico"></i> السائق</label>
-                    <div class="control"><select name="driver" aria-label="تصفيةُ التقريرِ بالسائق">
+                    <div class="control"><select name="driver" aria-label="تصفية التقرير بالسائق">
                         <option value="">-- الكل --</option>
                         <?php
                         $drv = array();
@@ -132,17 +132,17 @@ include('../insidebar.php'); ?>
 
                 <div class="field md-3 sm-6">
                     <label class="fc-filter-label"><i class="fas fa-calendar-day rpt-drv-ico"></i> من تاريخ</label>
-                    <div class="control"><input type="date" name="start_date" aria-label="تاريخُ بدايةِ الفترة" value="<?php echo $start_date; ?>"></div>
+                    <div class="control"><input type="date" name="start_date" aria-label="تاريخ بداية الفترة" value="<?php echo $start_date; ?>"></div>
                 </div>
 
                 <div class="field md-3 sm-6">
                     <label class="fc-filter-label"><i class="fas fa-calendar-day rpt-drv-ico"></i> إلى تاريخ</label>
-                    <div class="control"><input type="date" name="end_date" aria-label="تاريخُ نهايةِ الفترة" value="<?php echo $end_date; ?>"></div>
+                    <div class="control"><input type="date" name="end_date" aria-label="تاريخ نهاية الفترة" value="<?php echo $end_date; ?>"></div>
                 </div>
 
                 <div class="field md-3 sm-6">
                     <label class="fc-filter-label"><i class="fas fa-moon rpt-drv-ico"></i> الوردية</label>
-                    <div class="control"><select name="shift" aria-label="تصفيةُ التقريرِ بالوردية">
+                    <div class="control"><select name="shift" aria-label="تصفية التقرير بالوردية">
                         <option value="">-- الكل --</option>
                         <option value="D" <?php if ($shift_filter == "D") echo "selected"; ?>>صباحية</option>
                         <option value="N" <?php if ($shift_filter == "N") echo "selected"; ?>>مسائية</option>
@@ -151,7 +151,7 @@ include('../insidebar.php'); ?>
 
                 <div class="field md-3 sm-6">
                     <label class="fc-filter-label"><i class="fas fa-cogs rpt-drv-ico"></i> الآلية</label>
-                    <div class="control"><select name="equipment_id" aria-label="تصفيةُ التقريرِ بالآلية">
+                    <div class="control"><select name="equipment_id" aria-label="تصفية التقرير بالآلية">
                         <option value="">-- الكل --</option>
                         <?php
                         $res = array();

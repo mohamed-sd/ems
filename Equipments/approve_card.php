@@ -56,6 +56,6 @@ if ($equipment_id > 0 && db_table_has_column($conn, 'equipments', 'card_state'))
     exit();
 }
 
-ems_flash_set('تعذّر اعتماد الكرت');
+ems_flash_set('تعذر اعتماد الكرت');
 header('Location: ' . $return_url);
 exit();

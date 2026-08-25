@@ -95,7 +95,7 @@ class CashflowService
                 $deficits[] = array('date' => $dd, 'currency' => $cur,
                     'shortfall' => round($cumOut - $cum, 2),
                     'trigger' => $d['op_code'] . ' قسط ' . $d['seq_no'],
-                    'note' => 'عجز يُكشف قبل وقوعه لا يوم الاستحقاق');
+                    'note' => 'عجز يكشف قبل وقوعه لا يوم الاستحقاق');
             }
         }
         return array('buckets' => $buckets, 'deficits' => $deficits);
@@ -142,7 +142,7 @@ class CashflowService
         }
         if ($total <= 0) {
             return array('ok' => true, 'lines' => array(), 'total_hours' => 0.0,
-                'reason' => 'لا ساعات تشغيل لأصول مموَّلة في ' . $period . ' — لا تحميل (لا يُحمَّل مشروع كلفة أصول لم يستعملها)');
+                'reason' => 'لا ساعات تشغيل لأصول ممولة في ' . $period . ' — لا تحميل (لا يحمل مشروع كلفة أصول لم يستعملها)');
         }
         $amount = (float) $financingCost['amount'];
         $lines = array();
@@ -154,10 +154,10 @@ class CashflowService
                 'amount' => round($amount * $h / $total, 2),
                 'currency' => (string) $financingCost['currency'],
                 'state' => 'Proposed',
-                'note' => 'تكلفة تمويل ' . $period . ' بنسبة ساعات التشغيل — كلفة مجرَّدة بلا كشف الممول، وتمر ببوابة الاستحقاق',
+                'note' => 'تكلفة تمويل ' . $period . ' بنسبة ساعات التشغيل — كلفة مجردة بلا كشف الممول، وتمر ببوابة الاستحقاق',
             );
         }
         return array('ok' => true, 'lines' => $lines, 'total_hours' => round($total, 2),
-            'reason' => count($lines) . ' مشروعًا بنسبة ساعاته من ' . $total);
+            'reason' => count($lines) . ' مشروعا بنسبة ساعاته من ' . $total);
     }
 }

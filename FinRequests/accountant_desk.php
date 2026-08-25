@@ -62,7 +62,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     // وخطوتُه التاليةُ التي تنطق بها الشاشةُ نفسُها: ولادةُ الحدثِ المالي.
     echo ems_next_step('ولادة الحدث المالي (D04)');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ)
-    echo ems_states_bundle('لا مهامَّ تنتظر دورَك', 'ستظهر المعاملاتُ الواردةُ هنا فورَ إحالتِها');
+    echo ems_states_bundle('لا مهام تنتظر دورك', 'ستظهر المعاملات الواردة هنا فور إحالتها');
     ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
@@ -86,16 +86,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
             <div class="card-body">
                 <div class="fad-facts">
-                    <div><strong>المبرّر:</strong> <?php echo htmlspecialchars($r['justification']); ?></div>
+                    <div><strong>المبرر:</strong> <?php echo htmlspecialchars($r['justification']); ?></div>
                     <div><strong>المستفيد:</strong> <?php echo htmlspecialchars($r['beneficiary_name'] ?? '-'); ?> (<?php echo htmlspecialchars($r['beneficiary_type']); ?>)</div>
                     <div><strong>المبلغ:</strong> <?php echo number_format(floatval($r['amount']), 2) . ' ' . htmlspecialchars($r['currency']); ?></div>
                     <div><strong>المرجع المصدري:</strong> <?php echo htmlspecialchars($r['source_ref'] ?? '—'); ?></div>
                 </div>
                 <?php $frag = finreq_fragmentation($gate, $r); if ($frag): ?>
                     <div class="alert alert-warning fad-warn">
-                        ⚠️ كشف التجزئة (§8.5): <?php echo intval($frag['count']); ?> طلباتٍ حيّةٍ لنفس المستفيد والنوع خلال 30 يومًا
+                        ⚠️ كشف التجزئة (§8.5): <?php echo intval($frag['count']); ?> طلبات حية لنفس المستفيد والنوع خلال 30 يوما
                         بمجموع <strong><?php echo number_format($frag['total'], 2) . ' ' . htmlspecialchars($r['currency']); ?></strong>
-                        — طبّق مستوى الاعتماد على المجموع لا على هذا الطلب وحده (مصفوفة D04).
+                        — طبق مستوى الاعتماد على المجموع لا على هذا الطلب وحده (مصفوفة D04).
                     </div>
                 <?php endif; ?>
                 <form action="request_actions.php" method="post" class="allforms allforms-visible">
@@ -115,7 +115,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <div>
                             <label for="emsf_166_f0eb7">بند الموازنة (بوابة ② — التجاوز يستلزم استثناء §8.3)</label>
                             <select name="budget_line_id" id="emsf_166_f0eb7">
-                                <option value="">— خارج الموازنة (يُدوَّن بقرارك) —</option>
+                                <option value="">— خارج الموازنة (يدون بقرارك) —</option>
                                 <?php
                                 $suggest = finreq_budget_category_for($r['request_type'], $r['source_module']);
                                 foreach ($budget_lines as $bl):
@@ -142,7 +142,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <input type="hidden" name="action" value="return_request">
                         <input type="hidden" name="id" value="<?php echo intval($r['id']); ?>">
                         <input type="hidden" name="back" value="accountant_desk.php">
-                        <input type="text" name="reason" placeholder="إعادة للمصدر بسببٍ (نقص تصنيف/أبعاد)" required class="fad-w240" aria-label="إعادة للمصدر بسببٍ (نقص تصنيف/أبعاد)">
+                        <input type="text" name="reason" placeholder="إعادة للمصدر بسبب (نقص تصنيف/أبعاد)" required class="fad-w240" aria-label="إعادة للمصدر بسبب (نقص تصنيف/أبعاد)">
                         <button type="submit" class="btn btn-secondary"><i class="fa fa-rotate-left"></i> إعادة للمصدر</button>
                     </form>
                     <?php if (intval($r['duplicate_flag']) === 1): ?>
@@ -153,14 +153,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <input type="hidden" name="back" value="accountant_desk.php">
                         <input type="text" name="merge_into_no" placeholder="رقم الطلب الأصل FR-…" required class="fad-w160" aria-label="رقم الطلب الأصل FR-…">
                         <input type="text" name="reason" placeholder="سبب الدمج" required class="fad-w150" aria-label="سبب الدمج">
-                        <button type="submit" class="btn btn-secondary"><i class="fa fa-code-merge"></i> دمج المكرّر</button>
+                        <button type="submit" class="btn btn-secondary"><i class="fa fa-code-merge"></i> دمج المكرر</button>
                     </form>
                     <?php endif; ?>
                 </div>
             </div>
         </div>
     <?php endforeach; if (!$rows): ?>
-        <?php echo ems_state('empty', 'لا مهامَّ تنتظر دورَك', 'ستظهر المعاملاتُ الواردةُ هنا فورَ إحالتِها'); ?>
+        <?php echo ems_state('empty', 'لا مهام تنتظر دورك', 'ستظهر المعاملات الواردة هنا فور إحالتها'); ?>
     <?php endif; ?>
 </div>
 </body>

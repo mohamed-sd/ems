@@ -157,7 +157,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['quotation_code'])) {
     // الكود
     $quo_code_raw = isset($_POST['quotation_code']) ? trim($_POST['quotation_code']) : '';
     if ($quo_code_raw === '' || !preg_match('/^[A-Za-z0-9_\-]+$/', $quo_code_raw)) {
-        quo_redirect_with_msg('كود العرض غير صالح. استخدم أحرفًا وأرقامًا و - أو _ فقط ❌');
+        quo_redirect_with_msg('كود العرض غير صالح. استخدم أحرفا وأرقاما و - أو _ فقط ❌');
     }
 
     // التحقق من القوائم الثابتة
@@ -224,7 +224,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['quotation_code'])) {
                 array($quo_code_raw, $quo_id));
         } catch (\Throwable $t) { $dup = array(); }
         if (!empty($dup)) {
-            quo_redirect_with_msg('كود العرض موجود مسبقاً داخل شركتك ❌');
+            quo_redirect_with_msg('كود العرض موجود مسبقا داخل شركتك ❌');
         }
 
         try {
@@ -256,7 +256,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['quotation_code'])) {
                 array($quo_code_raw));
         } catch (\Throwable $t) { $dup = array(); }
         if (!empty($dup)) {
-            quo_redirect_with_msg('كود العرض موجود مسبقاً داخل شركتك ❌');
+            quo_redirect_with_msg('كود العرض موجود مسبقا داخل شركتك ❌');
         }
 
         try {
@@ -418,9 +418,9 @@ function quo_state_tone($state)
     foreach (ems_excel_header_actions('quotations', 'عروض الأسعار', $can_add) as $__xl) { $header_actions[] = $__xl; }
     include('../includes/page_header.php');
     // UXW-01 ⑫: شاشةُ دورةٍ اعتماديةٍ تنطق بحالتِها الحية (مسودة · مقدم · مقبول · مرفوض) — فتُعلن خطوتَها التالية
-    echo ems_next_step('العرضُ يُقدَّم للعميلِ فيُقبل أو يُرفض — وقبولُه يولّد عقدًا مسودةً يحمل مرجعَه');
+    echo ems_next_step('العرض يقدم للعميل فيقبل أو يرفض — وقبوله يولد عقدا مسودة يحمل مرجعه');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا عروضَ أسعارٍ ضمن هذا الترشيح', 'أضف عرضًا جديدًا أو غيّر المرشِّحات');
+    echo ems_states_bundle('لا عروض أسعار ضمن هذا الترشيح', 'أضف عرضا جديدا أو غير المرشحات');
     ?>
 
     <?php if (!empty($_GET['msg'])):
@@ -441,7 +441,7 @@ function quo_state_tone($state)
             <div class="stats-card">
                 <div class="stats-icon"><i class="fas fa-paper-plane"></i></div>
                 <div class="stats-value"><?php echo $stat_offered; ?></div>
-                <div class="stats-title">مقدَّمة</div>
+                <div class="stats-title">مقدمة</div>
             </div>
             <div class="stats-card">
                 <div class="stats-icon"><i class="fas fa-circle-check"></i></div>
@@ -582,7 +582,7 @@ function quo_state_tone($state)
         <div class="card-body">
             <?php if (!empty($quo_load_error)): ?>
                 <div class="alert alert-danger quo-load-error">
-                    ⚠ تعذّر تحميل عروض الأسعار — قد يكون هناك خللٌ مؤقت. يرجى إعادة تحميل الصفحة.
+                    ⚠ تعذر تحميل عروض الأسعار — قد يكون هناك خلل مؤقت. يرجى إعادة تحميل الصفحة.
                 </div>
             <?php endif; ?>
             <div class="table-container">
@@ -608,13 +608,13 @@ function quo_state_tone($state)
                             <th class="ems-fn-th" data-fn="1">شروط الدفع</th>
                             <th class="ems-fn-th" data-fn="1">شروط التسليم</th>
                             <th class="ems-fn-th" data-fn="1">النسخة</th>
-                            <th class="ems-fn-th" data-fn="1">أعدّه</th>
+                            <th class="ems-fn-th" data-fn="1">أعده</th>
                             <th class="ems-fn-th" data-fn="1">اعتمده</th>
                             <th class="ems-fn-th" data-fn="1">تاريخ الإرسال</th>
                             <th class="ems-fn-th" data-fn="1">حالة العميل</th>
                             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                            <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                            <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                            <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                            <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                             <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                             <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                             <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
@@ -674,7 +674,7 @@ function quo_state_tone($state)
                                                 <input type="hidden" name="csrf_token" value="<?php echo quo_e($quo_csrf_token); ?>">
                                                 <input type="hidden" name="quo_make_contract" value="<?php echo intval($row['id']); ?>">
                                                 <button type="submit" class="action-btn edit"
-                                                        title="توليدُ عقدٍ مسودةٍ من هذا العرضِ — يحمل مرجعَه ولا يُولَّد مرتين">
+                                                        title="توليد عقد مسودة من هذا العرض — يحمل مرجعه ولا يولد مرتين">
                                                     <i class="fas fa-file-contract"></i>
                                                 </button>
                                             </form>
@@ -720,7 +720,7 @@ function quo_state_tone($state)
         }
         fillFilterOptions(6, '#filterState');
 
-        // العملة تُستخرج من نص القيمة (آخر كلمة)
+        // العملة تستخرج من نص القيمة (آخر كلمة)
         (function () {
             const select = $('#filterCurrency');
             const values = [];

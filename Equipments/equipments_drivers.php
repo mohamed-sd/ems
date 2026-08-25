@@ -264,7 +264,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
 
             // التحقق من عدم تجاوز العدد المتعاقد عليه
             if ($current_added >= $contracted_count) {
-                $success_msg = "⚠️ تحذير: تم الوصول للحد الأقصى! العدد المتعاقد عليه: $contracted_count | المضاف حالياً: $current_added. لا يمكن إضافة المزيد من المعدات.";
+                $success_msg = "⚠️ تحذير: تم الوصول للحد الأقصى! العدد المتعاقد عليه: $contracted_count | المضاف حاليا: $current_added. لا يمكن إضافة المزيد من المعدات.";
                 goto skip_save;
             }
         }
@@ -337,8 +337,8 @@ include __DIR__ . '/../includes/page_header.php';
     <?php
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     if (function_exists('ems_states_bundle')) {
-        echo ems_states_bundle('لا معدةَ مرتبطةً بسائقٍ في هذا العرضِ بعدُ',
-                               'أضف معدةً بزرِّ «إضافة» في رأسِ الشاشة، أو وسِّع فلاترَ المورِّدِ والنوعِ والحالة');
+        echo ems_states_bundle('لا معدة مرتبطة بسائق في هذا العرض بعد',
+                               'أضف معدة بزر «إضافة» في رأس الشاشة، أو وسع فلاتر المورد والنوع والحالة');
     }
     ?>
 
@@ -860,10 +860,10 @@ include __DIR__ . '/../includes/page_header.php';
                         <th data-group="technical"><i class="fas fa-traffic-light"></i> التوفر</th>
                         <th data-group="status"><i class="fas fa-toggle-on"></i> الحالة</th>
                         <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                        <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                        <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                        <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                        <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                        <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                        <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                        <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                        <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                         <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                         <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                         <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -1490,7 +1490,7 @@ include __DIR__ . '/../includes/page_header.php';
     })();
 </script>
 
-<!-- استيراد المعدات يتم عبر معالج إطار Excel الموحّد (يُطبع في نهاية الصفحة عبر ems_excel_render). -->
+<!-- استيراد المعدات يتم عبر معالج إطار Excel الموحد (يطبع في نهاية الصفحة عبر ems_excel_render). -->
 
 <style>
 /* UXW-01 بوابتا ١·٢: أنماطُ أزرارِ إكسل في الرأس ورابطِ التعديلِ في النافذة —
@@ -1721,7 +1721,7 @@ include __DIR__ . '/../includes/page_header.php';
 }
 </style>
 
-<!-- استيراد المعدات القديم أُزيل — يتولّاه الآن معالج إطار Excel الموحّد (assets/js/ems-excel.js). -->
+<!-- استيراد المعدات القديم أزيل — يتولاه الآن معالج إطار Excel الموحد (assets/js/ems-excel.js). -->
 
 </div> <!-- closing main div -->
 <?php if (function_exists('ems_excel_render')) { ems_excel_render(); } ?>

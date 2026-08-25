@@ -81,23 +81,23 @@ class StockReturnService
      */
     public function returnToWarehouse(int $companyId, int $issueId, int $itemId, float $qty, string $reason, int $actorId): array
     {
-        if ($qty <= 0)        { return array('ok' => false, 'msg' => 'الكميةُ المرتجعةُ يجب أن تكون موجبة (422)', 'move_id' => 0, 'available' => 0.0); }
-        if (trim($reason) === '') { return array('ok' => false, 'msg' => 'سببُ الإرجاع إلزامي (422)', 'move_id' => 0, 'available' => 0.0); }
+        if ($qty <= 0)        { return array('ok' => false, 'msg' => 'الكمية المرتجعة يجب أن تكون موجبة (422)', 'move_id' => 0, 'available' => 0.0); }
+        if (trim($reason) === '') { return array('ok' => false, 'msg' => 'سبب الإرجاع إلزامي (422)', 'move_id' => 0, 'available' => 0.0); }
 
         $this->conn->begin_transaction();
         try {
             $st = $this->returnableOf($companyId, $issueId, $itemId, true);
             if (!$st['found']) {
                 $this->conn->rollback();
-                return array('ok' => false, 'msg' => 'سطرُ صرفٍ غيرُ موجودٍ لهذا الصنفِ في السند (404)', 'move_id' => 0, 'available' => 0.0);
+                return array('ok' => false, 'msg' => 'سطر صرف غير موجود لهذا الصنف في السند (404)', 'move_id' => 0, 'available' => 0.0);
             }
             if ($qty > $st['available'] + 1e-9) {
                 $this->conn->rollback();
                 return array(
                     'ok'  => false,
-                    'msg' => 'المرتجعُ يتجاوز المتاح — مصروفٌ ' . $st['issued']
-                           . ' · أُرجع سابقًا ' . $st['returned']
-                           . ' · المتاحُ ' . $st['available'] . ' — يُرفض 409',
+                    'msg' => 'المرتجع يتجاوز المتاح — مصروف ' . $st['issued']
+                           . ' · أرجع سابقا ' . $st['returned']
+                           . ' · المتاح ' . $st['available'] . ' — يرفض 409',
                     'move_id' => 0, 'available' => $st['available'],
                 );
             }
@@ -117,8 +117,8 @@ class StockReturnService
             return array(
                 'ok' => true, 'move_id' => $moveId,
                 'available' => round($st['available'] - $qty, 4),
-                'msg' => 'أُرجع ' . $qty . ' بمرجع سند الصرف #' . $issueId
-                       . ' — المتاحُ بعدَه ' . round($st['available'] - $qty, 4),
+                'msg' => 'أرجع ' . $qty . ' بمرجع سند الصرف #' . $issueId
+                       . ' — المتاح بعده ' . round($st['available'] - $qty, 4),
             );
         } catch (\Throwable $e) {
             // CS-12: لا ابتلاعَ ولا نجاحٌ كاذب — يُرجع رمزٌ ويُسجَّل السبب.
@@ -129,7 +129,7 @@ class StockReturnService
             if (stripos($m, 'FN-07') !== false) {
                 return array('ok' => false, 'msg' => $m, 'move_id' => 0, 'available' => 0.0);
             }
-            return array('ok' => false, 'msg' => 'تعذّر تسجيلُ المرتجع — لم يُكتب شيء (ERR-STK-1044)', 'move_id' => 0, 'available' => 0.0);
+            return array('ok' => false, 'msg' => 'تعذر تسجيل المرتجع — لم يكتب شيء (ERR-STK-1044)', 'move_id' => 0, 'available' => 0.0);
         }
     }
 }

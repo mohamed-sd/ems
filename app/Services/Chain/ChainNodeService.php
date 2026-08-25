@@ -64,34 +64,34 @@ class ChainNodeService
     {
         $entryId = (int) $entryId; $preparedBy = (int) $preparedBy;
         $period = mb_substr((string) $period, 0, 7);
-        if (!preg_match('/^\d{4}-\d{2}$/', $period)) { return self::fail(422, 'الفترةُ بصيغةِ YYYY-MM'); }
+        if (!preg_match('/^\d{4}-\d{2}$/', $period)) { return self::fail(422, 'الفترة بصيغة YYYY-MM'); }
         $entry = $gate->selectOne('unit_entries', array('columns' => array('state'),
                                                         'where' => array('id' => $entryId)));
-        if (!$entry) { return self::fail(404, 'الواقعةُ غيرُ موجودة'); }
+        if (!$entry) { return self::fail(404, 'الواقعة غير موجودة'); }
         if (!in_array($entry['state'], array('sales_approved', 'converted'), true)) {
-            return self::fail(409, "الاعتمادُ النهائيُّ يتطلب اكتمالَ السلسلةِ التجارية — الحالية: {$entry['state']}");
+            return self::fail(409, "الاعتماد النهائي يتطلب اكتمال السلسلة التجارية — الحالية: {$entry['state']}");
         }
         $r = self::guardedInsert($gate, 'unit_final_approvals', array(
             'period' => $period, 'entry_id' => $entryId, 'prepared_by' => $preparedBy,
             'state' => 'prepared',
             'idem_key' => self::idem(array('ufa', (int) $companyId, $entryId, $period)),
-        ), 'مُعَدٌّ سلفًا لهذه الواقعةِ والفترة — عطالة');
+        ), 'معد سلفا لهذه الواقعة والفترة — عطالة');
         if (!$r['ok']) { return self::fail(!empty($r['dup']) ? 200 : 500, $r['msg']); }
-        return self::done(201, 'أُعِدَّ الاعتمادُ الماليُّ النهائيُّ بانتظارِ الاعتماد', $r['id']);
+        return self::done(201, 'أعد الاعتماد المالي النهائي بانتظار الاعتماد', $r['id']);
     }
 
     public static function approveFinal($conn, $gate, $companyId, $id, $actor)
     {
         return self::advance($gate, 'unit_final_approvals', (int) $id, (int) $actor,
             'prepared', 'approved', 'approved_by', 'approved_at', 'prepared_by',
-            'الاعتمادُ الماليُّ النهائيُّ وقع — وبقيت إجازةُ الرقابة');
+            'الاعتماد المالي النهائي وقع — وبقيت إجازة الرقابة');
     }
 
     public static function controlFinal($conn, $gate, $companyId, $id, $actor)
     {
         return self::advance($gate, 'unit_final_approvals', (int) $id, (int) $actor,
             'approved', 'controlled', 'control_by', 'control_at', 'approved_by',
-            'أُجيزت الرقابةُ المحاسبية — والترحيلُ لمحرّكِه وحدَه');
+            'أجيزت الرقابة المحاسبية — والترحيل لمحركه وحده');
     }
 
     /* ══ العقدة ١٦ — استحقاقُ عقدِ العميل ═════════════════════════════════ */
@@ -105,10 +105,10 @@ class ChainNodeService
         $amount   = round((float) ($data['amount'] ?? 0), 2);
         $cur      = mb_substr(trim((string) ($data['currency'] ?? '')), 0, 8);
         $rate     = (float) ($data['fx_rate'] ?? 1);
-        if (!preg_match('/^\d{4}-\d{2}$/', $period)) { return self::fail(422, 'الفترةُ بصيغةِ YYYY-MM'); }
-        if ($contract <= 0) { return self::fail(422, 'لا استحقاقَ بلا عقدٍ مرجعيّ'); }
-        if ($amount <= 0)   { return self::fail(422, 'المبلغُ يجب أن يكون موجبًا'); }
-        if (mb_strlen($cur) < 3) { return self::fail(422, 'لا مبلغَ بلا عملة'); }
+        if (!preg_match('/^\d{4}-\d{2}$/', $period)) { return self::fail(422, 'الفترة بصيغة YYYY-MM'); }
+        if ($contract <= 0) { return self::fail(422, 'لا استحقاق بلا عقد مرجعي'); }
+        if ($amount <= 0)   { return self::fail(422, 'المبلغ يجب أن يكون موجبا'); }
+        if (mb_strlen($cur) < 3) { return self::fail(422, 'لا مبلغ بلا عملة'); }
         if ($rate <= 0) { $rate = 1; }
         $no = 'ACR-' . $period . '-' . str_pad((string) $contract, 6, '0', STR_PAD_LEFT);
         $r = self::guardedInsert($gate, 'ar_accruals', array(
@@ -117,16 +117,16 @@ class ChainNodeService
             'fx_rate' => $rate, 'base_amount' => round($amount * $rate, 2),
             'prepared_by' => $preparedBy, 'state' => 'prepared',
             'idem_key' => self::idem(array('acr', (int) $companyId, $contract, $period, $claim)),
-        ), 'استحقاقٌ مُعَدٌّ سلفًا لهذا العقدِ والفترة — عطالة');
+        ), 'استحقاق معد سلفا لهذا العقد والفترة — عطالة');
         if (!$r['ok']) { return self::fail(!empty($r['dup']) ? 200 : 500, $r['msg']); }
-        return self::done(201, "أُعِدَّ الاستحقاقُ {$no}", $r['id']);
+        return self::done(201, "أعد الاستحقاق {$no}", $r['id']);
     }
 
     public static function controlAccrual($conn, $gate, $companyId, $id, $actor)
     {
         return self::advance($gate, 'ar_accruals', (int) $id, (int) $actor,
             'prepared', 'controlled', 'control_by', 'control_at', 'prepared_by',
-            'أُجيز الاستحقاقُ محاسبيًّا — والترحيلُ لمحرّكِه');
+            'أجيز الاستحقاق محاسبيا — والترحيل لمحركه');
     }
 
     /* ══ العقدة ١٧ — شهادةُ الإنجازِ الشهرية · LD-06 ═════════════════════════ */
@@ -140,10 +140,10 @@ class ChainNodeService
         $qty      = round((float) ($data['approved_qty'] ?? 0), 4);
         $unit     = mb_substr((string) ($data['unit_type'] ?? 'hour'), 0, 16);
         $measure  = mb_substr(trim((string) ($data['measure_ref'] ?? '')), 0, 120);
-        if (!preg_match('/^\d{4}-\d{2}$/', $period)) { return self::fail(422, 'الفترةُ بصيغةِ YYYY-MM'); }
-        if ($contract <= 0) { return self::fail(422, 'لا شهادةَ بلا عقدٍ مرجعيّ'); }
-        if ($qty <= 0) { return self::fail(422, 'الكميةُ المعتمدةُ يجب أن تكون موجبة'); }
-        if ($measure === '') { return self::fail(422, 'لا شهادةَ إنجازٍ بلا مرجعِ قياسٍ معتمَد'); }
+        if (!preg_match('/^\d{4}-\d{2}$/', $period)) { return self::fail(422, 'الفترة بصيغة YYYY-MM'); }
+        if ($contract <= 0) { return self::fail(422, 'لا شهادة بلا عقد مرجعي'); }
+        if ($qty <= 0) { return self::fail(422, 'الكمية المعتمدة يجب أن تكون موجبة'); }
+        if ($measure === '') { return self::fail(422, 'لا شهادة إنجاز بلا مرجع قياس معتمد'); }
         $no = 'CRT-' . $period . '-' . str_pad((string) $contract, 6, '0', STR_PAD_LEFT);
         $r = self::guardedInsert($gate, 'ar_completion_certs', array(
             'cert_no' => $no, 'period' => $period, 'contract_id' => $contract,
@@ -151,16 +151,16 @@ class ChainNodeService
             'unit_type' => $unit, 'measure_ref' => $measure, 'prepared_by' => $preparedBy,
             'state' => 'prepared',
             'idem_key' => self::idem(array('crt', (int) $companyId, $contract, $period)),
-        ), 'شهادةٌ مُعَدَّةٌ سلفًا لهذا العقدِ والفترة — عطالة');
+        ), 'شهادة معدة سلفا لهذا العقد والفترة — عطالة');
         if (!$r['ok']) { return self::fail(!empty($r['dup']) ? 200 : 500, $r['msg']); }
-        return self::done(201, "أُعِدَّت الشهادةُ {$no}", $r['id']);
+        return self::done(201, "أعدت الشهادة {$no}", $r['id']);
     }
 
     public static function approveCert($conn, $gate, $companyId, $id, $actor)
     {
         return self::advance($gate, 'ar_completion_certs', (int) $id, (int) $actor,
             'prepared', 'approved', 'approved_by', 'approved_at', 'prepared_by',
-            'اعتُمدت شهادةُ الإنجاز — وتُبنى عليها الفاتورة');
+            'اعتمدت شهادة الإنجاز — وتبنى عليها الفاتورة');
     }
 
     /* ══ العقدة ١٨ — فاتورةُ المطالبةِ وإحالتُها · LD-06 ═════════════════════ */
@@ -173,17 +173,17 @@ class ChainNodeService
         $cert   = (int) ($data['cert_id'] ?? 0);
         $amount = round((float) ($data['amount'] ?? 0), 2);
         $cur    = mb_substr(trim((string) ($data['currency'] ?? '')), 0, 8);
-        if (!preg_match('/^\d{4}-\d{2}$/', $period)) { return self::fail(422, 'الفترةُ بصيغةِ YYYY-MM'); }
-        if ($claim <= 0)  { return self::fail(422, 'لا فاتورةَ مطالبةٍ بلا مطالبة'); }
-        if ($amount <= 0) { return self::fail(422, 'المبلغُ يجب أن يكون موجبًا'); }
-        if (mb_strlen($cur) < 3) { return self::fail(422, 'لا مبلغَ بلا عملة'); }
+        if (!preg_match('/^\d{4}-\d{2}$/', $period)) { return self::fail(422, 'الفترة بصيغة YYYY-MM'); }
+        if ($claim <= 0)  { return self::fail(422, 'لا فاتورة مطالبة بلا مطالبة'); }
+        if ($amount <= 0) { return self::fail(422, 'المبلغ يجب أن يكون موجبا'); }
+        if (mb_strlen($cur) < 3) { return self::fail(422, 'لا مبلغ بلا عملة'); }
         /* ◆ **الفاتورةُ تُبنى على شهادةِ إنجازٍ معتمَدة** — لا على رأسِ المطالبة */
         if ($cert > 0) {
             $c = $gate->selectOne('ar_completion_certs', array('columns' => array('state'),
                                                                'where' => array('id' => $cert)));
-            if (!$c) { return self::fail(404, 'شهادةُ الإنجازِ غيرُ موجودة'); }
+            if (!$c) { return self::fail(404, 'شهادة الإنجاز غير موجودة'); }
             if (!in_array($c['state'], array('approved', 'issued'), true)) {
-                return self::fail(409, "لا فاتورةَ على شهادةٍ غيرِ معتمَدة — حالتُها: {$c['state']}");
+                return self::fail(409, "لا فاتورة على شهادة غير معتمدة — حالتها: {$c['state']}");
             }
         }
         $no = 'INV-' . $period . '-' . str_pad((string) $claim, 6, '0', STR_PAD_LEFT);
@@ -192,23 +192,23 @@ class ChainNodeService
             'cert_id' => $cert > 0 ? $cert : null, 'amount' => $amount, 'currency' => $cur,
             'prepared_by' => $preparedBy, 'state' => 'prepared',
             'idem_key' => self::idem(array('aci', (int) $companyId, $claim, $period)),
-        ), 'فاتورةٌ مُعَدَّةٌ سلفًا لهذه المطالبةِ والفترة — عطالة');
+        ), 'فاتورة معدة سلفا لهذه المطالبة والفترة — عطالة');
         if (!$r['ok']) { return self::fail(!empty($r['dup']) ? 200 : 500, $r['msg']); }
-        return self::done(201, "أُعِدَّت الفاتورةُ {$no}", $r['id']);
+        return self::done(201, "أعدت الفاتورة {$no}", $r['id']);
     }
 
     public static function approveClaimInvoice($conn, $gate, $companyId, $id, $actor)
     {
         return self::advance($gate, 'ar_claim_invoices', (int) $id, (int) $actor,
             'prepared', 'approved', 'approved_by', 'approved_at', 'prepared_by',
-            'اعتُمدت الفاتورة — وبقيت إجازةُ الرقابة');
+            'اعتمدت الفاتورة — وبقيت إجازة الرقابة');
     }
 
     public static function controlClaimInvoice($conn, $gate, $companyId, $id, $actor)
     {
         return self::advance($gate, 'ar_claim_invoices', (int) $id, (int) $actor,
             'approved', 'controlled', 'control_by', 'control_at', 'approved_by',
-            'أُجيزت الفاتورةُ محاسبيًّا');
+            'أجيزت الفاتورة محاسبيا');
     }
 
     /** الإحالةُ لقسمِ التحصيل — بعدَ الإجازةِ لا قبلها. */
@@ -216,13 +216,13 @@ class ChainNodeService
     {
         $id = (int) $id;
         if (!in_array($to, array('collections', 'on_hold', 'cancelled'), true)) {
-            return self::fail(422, 'وجهةُ الإحالةِ محكومةٌ من قائمةٍ مغلقة');
+            return self::fail(422, 'وجهة الإحالة محكومة من قائمة مغلقة');
         }
         $n = $gate->update('ar_claim_invoices',
             array('referred_to' => $to, 'referred_at' => date('Y-m-d H:i:s'), 'state' => 'referred'),
             array('id' => $id, 'state' => 'controlled'));
-        if ((int) $n === 0) { return self::fail(409, 'لا تُحال فاتورةٌ لم تُجَز رقابيًّا'); }
-        return self::done(200, 'أُحيلت الفاتورةُ إلى ' . $to, $id);
+        if ((int) $n === 0) { return self::fail(409, 'لا تحال فاتورة لم تجز رقابيا'); }
+        return self::done(200, 'أحيلت الفاتورة إلى ' . $to, $id);
     }
 
     /* ══ العقدة ١٣ — تصحيحُ الوحداتِ بالسلسلةِ الثلاثية ═══════════════════ */
@@ -236,42 +236,42 @@ class ChainNodeService
         $before = mb_substr((string) ($data['value_before'] ?? ''), 0, 120);
         $after  = mb_substr((string) ($data['value_after'] ?? ''), 0, 120);
         $reason = mb_substr(trim((string) ($data['reason'] ?? '')), 0, 400);
-        if ($entry <= 0) { return self::fail(422, 'لا تصحيحَ بلا واقعة'); }
+        if ($entry <= 0) { return self::fail(422, 'لا تصحيح بلا واقعة'); }
         if (!in_array($kind, array('adjustment', 'reversal', 'split', 'merge'), true)) {
-            return self::fail(422, 'نوعُ التصحيحِ محكومٌ من قائمةٍ مغلقة');
+            return self::fail(422, 'نوع التصحيح محكوم من قائمة مغلقة');
         }
         if (!in_array($field, array('quantity', 'responsible_party', 'time_state', 'classification'), true)) {
-            return self::fail(422, 'الحقلُ المُصحَّحُ محكومٌ من قائمةٍ مغلقة');
+            return self::fail(422, 'الحقل المصحح محكوم من قائمة مغلقة');
         }
-        if (mb_strlen($reason) < 8) { return self::fail(422, 'لا تصحيحَ بلا سببٍ مكتوبٍ مفهوم'); }
-        if ($before === $after) { return self::fail(422, 'لا تصحيحَ بلا تغيير'); }
+        if (mb_strlen($reason) < 8) { return self::fail(422, 'لا تصحيح بلا سبب مكتوب مفهوم'); }
+        if ($before === $after) { return self::fail(422, 'لا تصحيح بلا تغيير'); }
         $r = self::guardedInsert($gate, 'unit_corrections', array(
             'entry_id' => $entry, 'correction_kind' => $kind, 'field_changed' => $field,
             'value_before' => $before, 'value_after' => $after, 'reason' => $reason,
             'requested_by' => $by, 'state' => 'in_chain',
             'idem_key' => self::idem(array('ucor', (int) $companyId, $entry, $field, $after)),
-        ), 'تصحيحٌ مفتوحٌ سلفًا بالقيمةِ نفسِها — عطالة');
+        ), 'تصحيح مفتوح سلفا بالقيمة نفسها — عطالة');
         if (!$r['ok']) { return self::fail(!empty($r['dup']) ? 200 : 500, $r['msg']); }
-        return self::done(201, 'فُتح التصحيحُ — ولا يمرُّ إلا بالأطرافِ الثلاثةِ معًا', $r['id']);
+        return self::done(201, 'فتح التصحيح — ولا يمر إلا بالأطراف الثلاثة معا', $r['id']);
     }
 
     /** موافقةُ طرفٍ واحد — والاعتمادُ لا يقع إلا باكتمالِ الثلاثة. */
     public static function correctionPartyOk($conn, $gate, $companyId, $id, $party, $actor)
     {
         $map = array('client' => 'client_ok', 'supplier' => 'supplier_ok', 'worker' => 'worker_ok');
-        if (!isset($map[$party])) { return self::fail(422, 'الطرفُ محكومٌ: عميل أو مورّد أو مشغّل'); }
+        if (!isset($map[$party])) { return self::fail(422, 'الطرف محكوم: عميل أو مورد أو مشغل'); }
         $col = $map[$party];
         $id = (int) $id; $actor = (int) $actor;
         $n = $gate->update('unit_corrections',
             array($col . '_by' => $actor, $col . '_at' => date('Y-m-d H:i:s')),
             array('id' => $id, 'state' => 'in_chain'), '`' . $col . '_at` IS NULL');
-        if ((int) $n === 0) { return self::fail(200, 'قرارُ هذا الطرفِ مسجَّلٌ سلفًا أو التصحيحُ ليس في السلسلة'); }
+        if ((int) $n === 0) { return self::fail(200, 'قرار هذا الطرف مسجل سلفا أو التصحيح ليس في السلسلة'); }
 
         $full = $gate->update('unit_corrections', array('state' => 'approved'),
             array('id' => $id, 'state' => 'in_chain'),
             '`client_ok_at` IS NOT NULL AND `supplier_ok_at` IS NOT NULL AND `worker_ok_at` IS NOT NULL');
-        return self::done(200, (int) $full > 0 ? 'اكتملت السلسلةُ الثلاثيةُ — التصحيحُ معتمَد'
-                                               : 'سُجِّل قرارُ الطرف — وبقي غيرُه', $id);
+        return self::done(200, (int) $full > 0 ? 'اكتملت السلسلة الثلاثية — التصحيح معتمد'
+                                               : 'سجل قرار الطرف — وبقي غيره', $id);
     }
 
     /* ══ العقدة ٢٥ — دفعاتُ الدفعِ والتنفيذ ══════════════════════════════ */
@@ -282,16 +282,16 @@ class ChainNodeService
         $date = (string) ($data['value_date'] ?? '');
         $cur  = mb_substr(trim((string) ($data['currency'] ?? '')), 0, 8);
         $acct = mb_substr(trim((string) ($data['bank_account'] ?? '')), 0, 64);
-        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) { return self::fail(422, 'تاريخُ القيمةِ بصيغةِ YYYY-MM-DD'); }
-        if (mb_strlen($cur) < 3) { return self::fail(422, 'لا دفعةَ بلا عملة'); }
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) { return self::fail(422, 'تاريخ القيمة بصيغة YYYY-MM-DD'); }
+        if (mb_strlen($cur) < 3) { return self::fail(422, 'لا دفعة بلا عملة'); }
         $no = 'PB-' . str_replace('-', '', $date) . '-' . mb_substr(md5($acct . $cur . (int) $companyId), 0, 6);
         $r = self::guardedInsert($gate, 'tre_pay_batches', array(
             'batch_no' => $no, 'value_date' => $date, 'bank_account' => $acct,
             'currency' => $cur, 'prepared_by' => $by, 'state' => 'draft',
             'idem_key' => self::idem(array('tpb', (int) $companyId, $date, $acct, $cur)),
-        ), 'دفعةٌ مفتوحةٌ سلفًا بالتاريخِ والحسابِ نفسِهما — عطالة');
+        ), 'دفعة مفتوحة سلفا بالتاريخ والحساب نفسهما — عطالة');
         if (!$r['ok']) { return self::fail(!empty($r['dup']) ? 200 : 500, $r['msg']); }
-        return self::done(201, "فُتحت الدفعةُ {$no}", $r['id']);
+        return self::done(201, "فتحت الدفعة {$no}", $r['id']);
     }
 
     /** تجهيزُ الدفعةِ للتنفيذ — خطوةٌ مستقلةٌ فالإعدادُ لا يُنشئ تنفيذًا. */
@@ -300,8 +300,8 @@ class ChainNodeService
         $id = (int) $id;
         $n = $gate->update('tre_pay_batches', array('state' => 'ready'),
                            array('id' => $id, 'state' => 'draft'));
-        if ((int) $n === 0) { return self::fail(409, 'لا تُجهَّز إلا دفعةٌ مسودّة'); }
-        return self::done(200, 'جُهِّزت الدفعةُ للتنفيذ — والتنفيذُ بيدٍ غيرِ يدِ المُعِدّ', $id);
+        if ((int) $n === 0) { return self::fail(409, 'لا تجهز إلا دفعة مسودة'); }
+        return self::done(200, 'جهزت الدفعة للتنفيذ — والتنفيذ بيد غير يد المعد', $id);
     }
 
     /**
@@ -312,24 +312,24 @@ class ChainNodeService
     {
         $id = (int) $id; $actor = (int) $actor;
         $bankRef = mb_substr(trim((string) $bankRef), 0, 120);
-        if ($bankRef === '') { return self::fail(422, 'لا تنفيذَ بلا مرجعِ حركةٍ بنكيّ'); }
+        if ($bankRef === '') { return self::fail(422, 'لا تنفيذ بلا مرجع حركة بنكي'); }
         $b = $gate->selectOne('tre_pay_batches', array(
             'columns' => array('prepared_by', 'state'), 'where' => array('id' => $id)));
-        if (!$b) { return self::fail(404, 'الدفعةُ غيرُ موجودة'); }
-        if ($b['state'] === 'executed') { return self::fail(200, 'نُفِّذت سلفًا — عطالة'); }
-        if ($b['state'] !== 'ready')    { return self::fail(409, "لا تُنفَّذ دفعةٌ حالتُها {$b['state']}"); }
+        if (!$b) { return self::fail(404, 'الدفعة غير موجودة'); }
+        if ($b['state'] === 'executed') { return self::fail(200, 'نفذت سلفا — عطالة'); }
+        if ($b['state'] !== 'ready')    { return self::fail(409, "لا تنفذ دفعة حالتها {$b['state']}"); }
         if ((int) $b['prepared_by'] === $actor) {
-            return self::fail(403, '**مَن أعدَّ الدفعةَ لا ينفّذها** — فصلُ الواجباتِ لا يُختصر');
+            return self::fail(403, '**من أعد الدفعة لا ينفذها** — فصل الواجبات لا يختصر');
         }
         $n = $gate->update('tre_pay_batches', array(
             'executed_by' => $actor, 'executed_at' => date('Y-m-d H:i:s'),
             'bank_ref' => $bankRef, 'state' => 'executed',
         ), array('id' => $id, 'state' => 'ready'));
-        if ((int) $n === 0) { return self::fail(409, 'تعذّر التنفيذ — تغيّرت الحالةُ بين القراءةِ والكتابة'); }
+        if ((int) $n === 0) { return self::fail(409, 'تعذر التنفيذ — تغيرت الحالة بين القراءة والكتابة'); }
         $gate->update('tre_pay_batch_lines',
             array('line_state' => 'executed', 'bank_ref' => $bankRef),
             array('batch_id' => $id, 'line_state' => 'pending'));
-        return self::done(200, 'نُفِّذت الدفعةُ وأُنتج مرجعُ الحركة — ولا قيدَ من الخزينة', $id);
+        return self::done(200, 'نفذت الدفعة وأنتج مرجع الحركة — ولا قيد من الخزينة', $id);
     }
 
     /* ══ انتقالٌ محروسٌ عام — يُستعمل حيث الشكلُ واحد ═════════════════════ */
@@ -339,18 +339,18 @@ class ChainNodeService
     {
         $row = $gate->selectOne($table, array('columns' => array('state', $notSameAs),
                                               'where' => array('id' => $id)));
-        if (!$row) { return self::fail(404, 'السجلُّ غيرُ موجود'); }
-        if ($row['state'] === $toState) { return self::fail(200, 'وقع سلفًا — عطالة'); }
+        if (!$row) { return self::fail(404, 'السجل غير موجود'); }
+        if ($row['state'] === $toState) { return self::fail(200, 'وقع سلفا — عطالة'); }
         if ($row['state'] !== $fromState) {
-            return self::fail(409, "الانتقالُ يتطلب حالةَ {$fromState} — الحالية: {$row['state']}");
+            return self::fail(409, "الانتقال يتطلب حالة {$fromState} — الحالية: {$row['state']}");
         }
         if ((int) $row[$notSameAs] === (int) $actor) {
-            return self::fail(403, '**لا يدَ تجمع خطوتَين** — فصلُ الواجباتِ لا يُختصر');
+            return self::fail(403, '**لا يد تجمع خطوتين** — فصل الواجبات لا يختصر');
         }
         $n = $gate->update($table,
             array($whoCol => (int) $actor, $whenCol => date('Y-m-d H:i:s'), 'state' => $toState),
             array('id' => $id, 'state' => $fromState));
-        if ((int) $n === 0) { return self::fail(409, 'تغيّرت الحالةُ بين القراءةِ والكتابة'); }
+        if ((int) $n === 0) { return self::fail(409, 'تغيرت الحالة بين القراءة والكتابة'); }
         return self::done(200, $okMsg, $id);
     }
 }

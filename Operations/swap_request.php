@@ -42,9 +42,9 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     $est_h    = floatval($_POST['estimated_hours'] ?? 0);
     // §6.3-⑤: لا تبديلَ مفتوحُ المدة · و§6.1-①: سببٌ من قائمةٍ محكومة
     if ($reason === '' || $until === '' || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $until)) {
-        $msg = 'السببُ المحكومُ وتاريخُ النهاية إلزاميان — ولا تبديلَ مفتوحُ المدة (422)';
+        $msg = 'السبب المحكوم وتاريخ النهاية إلزاميان — ولا تبديل مفتوح المدة (422)';
     } elseif ($sub_eq <= 0 && $sub_op <= 0) {
-        $msg = 'حدّد بديلًا: معدةً أو مشغّلًا (422)';
+        $msg = 'حدد بديلا: معدة أو مشغلا (422)';
     } else {
         // المقعدُ المغطّى من حاوية المعدة في الموقع
         $seat = 0;
@@ -111,7 +111,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
             'valid_from'            => date('Y-m-d'),
             'valid_to'              => $until,
             'estimated_hours'       => $est_h,
-            'note'                  => 'طلبُ تبديلٍ من شاشةِ الموقع',
+            'note'                  => 'طلب تبديل من شاشة الموقع',
         ), $uid);
         $__insOk = !empty($__res['ok']);
         if (!$__insOk) {
@@ -130,8 +130,8 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
                     mysqli_stmt_fetch($__q);
                     mysqli_stmt_close($__q);
                 }
-                $msg = 'هذا الطلبُ مسجَّلٌ سلفًا — لم يُنشأ صفٌّ ثانٍ'
-                     . ($__ref ? (' (الطلبُ القائم #' . (int) $__ref . ')') : '') . ' (409)';
+                $msg = 'هذا الطلب مسجل سلفا — لم ينشأ صف ثان'
+                     . ($__ref ? (' (الطلب القائم #' . (int) $__ref . ')') : '') . ' (409)';
             } else {
                 $msg = $__res['reason'] . ' (' . (int) $__res['code'] . ')';
             }
@@ -153,11 +153,11 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
                           'estimated_hours' => $est_h, 'state' => 'pending_approvals'),
                     array('company_id' => $company_id,
                           'user_id' => intval($_SESSION['user']['id'] ?? 0),
-                          'note' => 'طلبُ تبديلِ تغطيةٍ — بانتظارِ الاعتماد'));
+                          'note' => 'طلب تبديل تغطية — بانتظار الاعتماد'));
             }
             // البندُ يظهر في صندوق الاعتماد الجامع عبر مجمِّعه (ApprovalsInboxService
             // يقرأ substitute_coverages بحالة pending_approvals) — لا جدولَ وسيطًا.
-            $msg = "أُرسل الطلبُ #$covId — بانتظار موافقة القوى التشغيلية ثم الإدارة المعنية";
+            $msg = "أرسل الطلب #$covId — بانتظار موافقة القوى التشغيلية ثم الإدارة المعنية";
         }
         /* ولا فرعَ `else` هنا: الرسالةُ ضُبطت أعلاه برمزِ الخدمةِ وسببِها —
            و`mysqli_error($conn)` **خاوٍ** بعد فشلِ جملةٍ محضَّرة، فكان الفرعُ
@@ -192,12 +192,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 /* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
    شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
 $header_icon = 'fa fa-exchange-alt';
-$header_title_html = htmlspecialchars('طلبُ تبديلٍ — بموافقتين', ENT_QUOTES, 'UTF-8');
+$header_title_html = htmlspecialchars('طلب تبديل — بموافقتين', ENT_QUOTES, 'UTF-8');
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضيًا
-echo ems_states_bundle('لا بدائلَ احتياطيةً مسجَّلةً في هذا الموقع', 'سجّلِ المعداتِ الاحتياطيةَ في حاوياتِ الموقعِ أو اختر مشغّلًا بديلًا');
+echo ems_states_bundle('لا بدائل احتياطية مسجلة في هذا الموقع', 'سجل المعدات الاحتياطية في حاويات الموقع أو اختر مشغلا بديلا');
 ?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
 
@@ -206,31 +206,31 @@ echo ems_states_bundle('لا بدائلَ احتياطيةً مسجَّلةً ف
     <input type="hidden" name="site" value="<?= $site ?>">
     <input type="hidden" name="equipment" value="<?= $equipment ?>">
     <div class="form-group">
-      <label for="emsf_998_3378c">السببُ — من قائمةٍ محكومةٍ لا نصٍّ حر</label>
+      <label for="emsf_998_3378c">السبب — من قائمة محكومة لا نص حر</label>
       <select name="reason_code" class="form-control" required id="emsf_998_3378c">
         <option value="">— اختر —</option>
         <option value="breakdown">عطل</option>
-        <option value="scheduled_maintenance">صيانةٌ مجدولة</option>
-        <option value="transfer_out">خروجٌ للترحيل</option>
-        <option value="expired_document">وثيقةٌ منتهية</option>
-        <option value="operator_shortage">نقصُ مشغّل</option>
+        <option value="scheduled_maintenance">صيانة مجدولة</option>
+        <option value="transfer_out">خروج للترحيل</option>
+        <option value="expired_document">وثيقة منتهية</option>
+        <option value="operator_shortage">نقص مشغل</option>
       </select>
     </div>
-    <div class="form-group"><label for="emsf_999_051ff">المعدةُ البديلة (احتياطيُّ الموقع)</label>
+    <div class="form-group"><label for="emsf_999_051ff">المعدة البديلة (احتياطي الموقع)</label>
       <select name="substitute_equipment" class="form-control" id="emsf_999_051ff"><option value="0">—</option>
         <?php foreach ($subEq as $e): ?><option value="<?= intval($e['id']) ?>"><?= htmlspecialchars($e['name'], ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?>
       </select></div>
-    <div class="form-group"><label for="emsf_1000_69769">المشغّلُ البديل</label>
+    <div class="form-group"><label for="emsf_1000_69769">المشغل البديل</label>
       <select name="substitute_operator" class="form-control" id="emsf_1000_69769"><option value="0">—</option>
         <?php foreach ($subOp as $o): ?><option value="<?= intval($o['id']) ?>"><?= htmlspecialchars($o['name'], ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?>
       </select></div>
     <div class="form-group"><label for="emsf_1001_a275b">حتى تاريخ — إلزامي</label>
       <input type="date" name="valid_until" class="form-control" required id="emsf_1001_a275b"></div>
-    <div class="form-group"><label for="emsf_1002_98ab4">الساعاتُ المقدَّرةُ المتأثرة (الأثرُ يُعرض على الموافقين)</label>
+    <div class="form-group"><label for="emsf_1002_98ab4">الساعات المقدرة المتأثرة (الأثر يعرض على الموافقين)</label>
       <input type="number" step="0.5" name="estimated_hours" class="form-control" value="0" id="emsf_1002_98ab4"></div>
-    <button type="submit" class="btn btn-primary">إرسالُ الطلب لصندوق الاعتماد</button>
+    <button type="submit" class="btn btn-primary">إرسال الطلب لصندوق الاعتماد</button>
   </form>
   <p class="text-muted swr-note">
-    لا يغيّر التبديلُ الحصةَ التعاقديةَ ولا يصفّر عجزَ المتعطل (CAP-01 §7) —
-    والموافقتان: القوى التشغيلية (تأهيلُ البديل) ثم الإدارةُ المعنية.</p>
+    لا يغير التبديل الحصة التعاقدية ولا يصفر عجز المتعطل (CAP-01 §7) —
+    والموافقتان: القوى التشغيلية (تأهيل البديل) ثم الإدارة المعنية.</p>
 </div>

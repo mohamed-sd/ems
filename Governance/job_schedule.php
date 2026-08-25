@@ -40,14 +40,14 @@ if (!$is_super_admin && empty($__pp['can_view'])) {
 $__canWrite = $is_super_admin || !empty($__pp['can_add']) || !empty($__pp['can_edit']);
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$__canWrite) {
     http_response_code(403);
-    exit('غير مصرَّحٍ بالكتابة في هذه الشاشة — اطلبِ المنحةَ من مدير الصلاحيات');
+    exit('غير مصرح بالكتابة في هذه الشاشة — اطلب المنحة من مدير الصلاحيات');
 }
 
 // ═══ ⑤ رمزُ الحماية — قبلَ أيِّ معالجةٍ لا بعدَها ═══
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!function_exists('verify_csrf_token') || !verify_csrf_token($_POST['csrf_token'] ?? '')) {
         http_response_code(403);
-        exit('رمزُ الحمايةِ غيرُ صالح — أعدْ تحميلَ الصفحة');
+        exit('رمز الحماية غير صالح — أعد تحميل الصفحة');
     }
 }
 
@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $flash = $r['reason']; $flashKind = $r['ok'] ? 'success' : 'error';
     } elseif ($__action === 'alert_stalled') {
         $n = \App\Services\Queue\JobScheduleService::alertStalled($conn);
-        $flash = 'رُفع ' . $n . ' إنذارَ توقف'; $flashKind = 'success';
+        $flash = 'رفع ' . $n . ' إنذار توقف'; $flashKind = 'success';
     }
 }
 
@@ -86,11 +86,11 @@ $tot = (int) $conn->query('SELECT COUNT(*) FROM ems_job_schedule WHERE is_active
 $repl = (int) $conn->query("SELECT COUNT(*) FROM ems_job_schedule WHERE replaces_manual IS NOT NULL AND replaces_manual NOT LIKE '—%'")->fetch_row()[0];
 $PAGE_TITLE = 'جدولة المهام الدورية';
 $TILES = array(
-    array('جدولاتٌ نشطة', $tot),
-    array('ألغت أمرًا يدويًّا', $repl),
-    array('متوقفةٌ فوق مهلة الإنذار (CK-15)', count($stalled)),
+    array('جدولات نشطة', $tot),
+    array('ألغت أمرا يدويا', $repl),
+    array('متوقفة فوق مهلة الإنذار (CK-15)', count($stalled)),
 );
-$COLS = array('النوع','التعبير الزمني','أقصى زمن تشغيل','مهلة الإنذار','الدور المسؤول','آخر نجاح','منذ (دقيقة)','مفعَّلة','الأمر اليدوي الملغى');
-$EMPTY_TITLE = 'لا جدولاتٍ دوريةً معرَّفةً بعدُ';
-$EMPTY_HINT  = 'عرِّف جدولةً لكلِّ مهمةٍ آليةٍ حتى لا يبقى أمرٌ يدويٌّ بلا بديل';
+$COLS = array('النوع','التعبير الزمني','أقصى زمن تشغيل','مهلة الإنذار','الدور المسؤول','آخر نجاح','منذ (دقيقة)','مفعلة','الأمر اليدوي الملغى');
+$EMPTY_TITLE = 'لا جدولات دورية معرفة بعد';
+$EMPTY_HINT  = 'عرف جدولة لكل مهمة آلية حتى لا يبقى أمر يدوي بلا بديل';
 include __DIR__ . '/../includes/eng01_screen_view.php';

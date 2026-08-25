@@ -60,9 +60,9 @@ class CapacitySourceService
                     'ledger_consumed' => $ledger,
                     'diff_qty'        => round($stored - $ledger, 2),
                     'noted_on'        => self::dbToday($conn),
-                    'detail'          => 'ظلُّ الاستهلاك — المخزَّنُ لا يساوي الدفتر',
+                    'detail'          => 'ظل الاستهلاك — المخزن لا يساوي الدفتر',
                 ));
-            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'uq_shadow_daily: فرقُ اليوم مسجَّلٌ سلفًا — يكفي صفٌّ يوميٌّ واحد');
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'uq_shadow_daily: فرق اليوم مسجل سلفا — يكفي صف يومي واحد');
                 // uq_shadow_daily: فرقُ اليوم مسجَّلٌ سلفًا — يكفي صفٌّ يوميٌّ واحد
             }
         }

@@ -262,7 +262,7 @@ $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-echo ems_states_bundle('لا تفاصيلَ تنفيذٍ مسجلةً لهذا العقد', 'اختر عقدًا من القائمةِ أعلاه أو سجّل ساعاتِ الوردياتِ أولًا');
+echo ems_states_bundle('لا تفاصيل تنفيذ مسجلة لهذا العقد', 'اختر عقدا من القائمة أعلاه أو سجل ساعات الورديات أولا');
 ?>
             <div class="rpt-ca-actions">
                 <a href="reports.php" class="back-btn">

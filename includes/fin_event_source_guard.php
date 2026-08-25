@@ -57,18 +57,18 @@ if (!function_exists('ems_fin_event_resolve_source')) {
 
         $reg = ems_fin_event_source_registry();
         if (!isset($reg[$sourceModule])) {
-            $out['reason'] = 'إدارةُ مصدرٍ غيرُ معروفة — والحدثُ لا يُفتح على إدارةٍ لا سجلَّ لها';
+            $out['reason'] = 'إدارة مصدر غير معروفة — والحدث لا يفتح على إدارة لا سجل لها';
             return $out;
         }
         if ($sourceRef === '') {
-            $out['reason'] = '422 مرجعُ المصدرِ إلزاميّ — لا حدثَ ماليَّ بلا واقعةٍ تُسنده';
+            $out['reason'] = '422 مرجع المصدر إلزامي — لا حدث مالي بلا واقعة تسنده';
             return $out;
         }
         $def = $reg[$sourceModule];
         if (empty($def['table'])) {
             /* إدارةٌ بلا جدولٍ مُعرَّفٍ: تُعلَن ولا تُمنع */
             $out['ok'] = true; $out['code'] = 200; $out['declared'] = true;
-            $out['reason'] = 'لا جدولَ مصدرٍ مُعرَّفٌ لهذه الإدارةِ بعد — مُعلَنٌ لا مُتحقَّقٌ منه';
+            $out['reason'] = 'لا جدول مصدر معرف لهذه الإدارة بعد — معلن لا متحقق منه';
             return $out;
         }
         /* أموجودٌ الجدولُ أصلًا؟ جدولٌ غائبٌ لا يُدين مستخدمًا */
@@ -77,7 +77,7 @@ if (!function_exists('ems_fin_event_resolve_source')) {
                             . $conn->real_escape_string($def['table']) . "' LIMIT 1");
         if (!$chk || !$chk->fetch_row()) {
             $out['ok'] = true; $out['code'] = 200; $out['declared'] = true;
-            $out['reason'] = 'جدولُ المصدرِ `' . $def['table'] . '` غيرُ موجودٍ — مُعلَنٌ لا مُتحقَّقٌ منه';
+            $out['reason'] = 'جدول المصدر `' . $def['table'] . '` غير موجود — معلن لا متحقق منه';
             return $out;
         }
 
@@ -95,7 +95,7 @@ if (!function_exists('ems_fin_event_resolve_source')) {
             $where[] = '`' . $def['ref_col'] . "` = '" . $conn->real_escape_string($sourceRef) . "'";
         }
         if (!$where) {
-            $out['reason'] = '422 المرجعُ لا يطابق معرِّفًا رقميًّا، ولا عمودَ كودٍ في `' . $def['table'] . '`';
+            $out['reason'] = '422 المرجع لا يطابق معرفا رقميا، ولا عمود كود في `' . $def['table'] . '`';
             return $out;
         }
         $sql = 'SELECT `' . $def['id_col'] . '` FROM `' . $def['table'] . '` WHERE ('
@@ -106,9 +106,9 @@ if (!function_exists('ems_fin_event_resolve_source')) {
             $out['ok'] = true; $out['code'] = 200; $out['source_doc_id'] = (int) $row[0];
             return $out;
         }
-        $out['reason'] = '422 المرجعُ «' . mb_substr($sourceRef, 0, 40) . '» لا يقابله صفٌّ في `'
-                       . $def['table'] . '`' . ($hasCompany ? ' ضمن نطاقِ شركتك' : '')
-                       . ' — ولا حدثَ ماليَّ على واقعةٍ لا وجودَ لها';
+        $out['reason'] = '422 المرجع «' . mb_substr($sourceRef, 0, 40) . '» لا يقابله صف في `'
+                       . $def['table'] . '`' . ($hasCompany ? ' ضمن نطاق شركتك' : '')
+                       . ' — ولا حدث مالي على واقعة لا وجود لها';
         return $out;
     }
 }

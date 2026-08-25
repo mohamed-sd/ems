@@ -210,7 +210,7 @@ require_once __DIR__ . '/includes/layout_head.php';
                                 </button>
                             </form>
                             <?php endif; ?>
-                            <form method="post" action="<?php echo e(super_admin_url('companies/action.php')); ?>" style="display:inline" onsubmit="return confirm('حذف الشركة نهائياً؟ لا يمكن التراجع.');">
+                            <form method="post" action="<?php echo e(super_admin_url('companies/action.php')); ?>" style="display:inline" onsubmit="return confirm('حذف الشركة نهائيا؟ لا يمكن التراجع.');">
                                 <input type="hidden" name="csrf_token" value="<?php echo e($csrf); ?>">
                                 <input type="hidden" name="id" value="<?php echo intval($co['id']); ?>">
                                 <input type="hidden" name="action" value="delete">

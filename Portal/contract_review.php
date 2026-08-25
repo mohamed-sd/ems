@@ -38,7 +38,7 @@ $COLS   = array (
   6 => 'البند المتأثر',
   7 => 'وصف الملاحظة',
   8 => 'الأثر المحتمل',
-  9 => 'القيمة المعرَّضة',
+  9 => 'القيمة المعرضة',
   10 => 'العملة',
   11 => 'الجهة الراصدة',
   12 => 'الإجراء المطلوب',
@@ -47,8 +47,8 @@ $COLS   = array (
   15 => 'تاريخ المعالجة',
   16 => 'مستند المعالجة',
   17 => 'يحجب الاعتماد؟',
-  18 => 'المُنشئ — الاسم والصفة',
-  19 => 'المعتمِد — الاسم والصفة',
+  18 => 'المنشئ — الاسم والصفة',
+  19 => 'المعتمد — الاسم والصفة',
   20 => 'تاريخ الإقفال',
   21 => 'الحالة',
 );
@@ -61,7 +61,7 @@ $FIELDS = array (
   5 => 'البند المتأثر',
   6 => 'وصف الملاحظة',
   7 => 'الأثر المحتمل',
-  8 => 'القيمة المعرَّضة',
+  8 => 'القيمة المعرضة',
   9 => 'العملة',
   10 => 'الجهة الراصدة',
   11 => 'الإجراء المطلوب',
@@ -70,7 +70,7 @@ $FIELDS = array (
   14 => 'تاريخ المعالجة',
   15 => 'مستند المعالجة',
   16 => 'يحجب الاعتماد؟',
-  17 => 'المعتمِد — الاسم والصفة',
+  17 => 'المعتمد — الاسم والصفة',
   18 => 'تاريخ الإقفال',
   19 => 'الحالة',
 );
@@ -86,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     $creator = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
     // الموجة ٢: الحفظ في الجدول الأصلي للشاشة (الفارغ NULL — لا مخزن بينيًّا)
     $ok = cmp03_store_insert($conn, $company_id, $CANONICAL, $payload, $status, $uid, $creator);
-    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
+    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
     exit();
 }
 
@@ -101,7 +101,7 @@ $entityName = $govCtx['values']['entity'] ?? '—';
 function cmp03_cell($col, $row, $entityName) {
     $n = cmp03_screen_norm($col);
     if ($n === cmp03_screen_norm('الكيان')) { return $entityName; }
-    if ($n === cmp03_screen_norm('المُنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المُنشئة')) {
+    if ($n === cmp03_screen_norm('المنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المنشئة')) {
         return $row['created_by_name'] ?: '—';
     }
     if ($n === cmp03_screen_norm('تاريخ الإنشاء')) { return $row['created_at']; }
@@ -116,7 +116,7 @@ function cmp03_screen_norm($s) {
     $s = str_replace(array('أ','إ','آ'), 'ا', $s);
     $s = str_replace('ة', 'ه', $s);
     $s = str_replace('ى', 'ي', $s);
-    return preg_replace('/[ًٌٍَُِّْ]/u', '', $s);
+    return preg_replace('/[]/u', '', $s);
 }
 
 $page_title = 'إيكوبيشن | مراجعة العقود وملاحظاتها';
@@ -138,8 +138,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     );
     $header_back = false;
     include '../includes/page_header.php';
-    echo ems_states_bundle('لا ملاحظاتِ مراجعةٍ مسجَّلةً على العقودِ بعدُ', 'أضف ملاحظةً بزر «إضافة» أو تحقق من توفرِ السجلات');
-    echo ems_next_step('معالجةُ الملاحظةِ بمستندِ معالجةٍ ثم إقفالُها — والحاجبةُ المفتوحةُ تمنع توقيعَ عقدِها');
+    echo ems_states_bundle('لا ملاحظات مراجعة مسجلة على العقود بعد', 'أضف ملاحظة بزر «إضافة» أو تحقق من توفر السجلات');
+    echo ems_next_step('معالجة الملاحظة بمستند معالجة ثم إقفالها — والحاجبة المفتوحة تمنع توقيع عقدها');
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
@@ -169,7 +169,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="f6" maxlength="190" id="emsf_1154_65de2"></div>
                 <div class="form-group"><label for="emsf_1155_e86d7">الأثر المحتمل</label>
                     <input type="text" name="f7" maxlength="190" id="emsf_1155_e86d7"></div>
-                <div class="form-group"><label for="emsf_1156_fcaba">القيمة المعرَّضة</label>
+                <div class="form-group"><label for="emsf_1156_fcaba">القيمة المعرضة</label>
                     <input type="text" inputmode="decimal" name="f8" placeholder="0" id="emsf_1156_fcaba"></div>
                 <div class="form-group"><label for="emsf_1157_fcfef">العملة</label>
                     <input type="text" name="f9" maxlength="190" id="emsf_1157_fcfef"></div>
@@ -187,7 +187,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="f15" maxlength="190" id="emsf_1163_14623"></div>
                 <div class="form-group"><label for="emsf_1164_8a010">يحجب الاعتماد؟</label>
                     <input type="text" name="f16" maxlength="190" id="emsf_1164_8a010"></div>
-                <div class="form-group"><label for="emsf_1165_e32a7">المعتمِد — الاسم والصفة</label>
+                <div class="form-group"><label for="emsf_1165_e32a7">المعتمد — الاسم والصفة</label>
                     <input type="text" name="f17" maxlength="190" id="emsf_1165_e32a7"></div>
                 <div class="form-group"><label for="emsf_1166_a129d">تاريخ الإقفال</label>
                     <input type="date" name="f18" id="emsf_1166_a129d"></div>
@@ -205,7 +205,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="table-responsive">
         <table class="alltables display" id="contract_reviewTable">
             <thead><tr>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
             <th>رقم الملاحظة</th>
             <th>العقد</th>
             <th>تاريخ الرصد</th>
@@ -214,7 +214,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th>البند المتأثر</th>
             <th>وصف الملاحظة</th>
             <th>الأثر المحتمل</th>
-            <th>القيمة المعرَّضة</th>
+            <th>القيمة المعرضة</th>
             <th class="ems-gov-th" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
             <th>الجهة الراصدة</th>
             <th>الإجراء المطلوب</th>
@@ -223,14 +223,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th>تاريخ المعالجة</th>
             <th>مستند المعالجة</th>
             <th>يحجب الاعتماد؟</th>
-            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
             <th>تاريخ الإقفال</th>
             <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
             </tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="22" class="text-center text-muted">لا بياناتَ بعدُ — أضف أول صفٍّ بزر «إضافة»</td></tr>
+                <tr><td colspan="22" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
                     <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>

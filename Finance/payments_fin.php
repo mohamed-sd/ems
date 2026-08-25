@@ -27,7 +27,7 @@ $directions = fin_payment_directions(); $methods = fin_payment_methods(); $party
 if (isset($_GET['execute_id'])) {
     if (!$can_edit) { ems_gov_flash_redirect('payments_fin.php', 'لا توجد صلاحية التنفيذ ❌', 'GOV-PERM-403', ''); exit(); }
     if (!fin_verify_action_token()) { ems_gov_flash_redirect('payments_fin.php', 'رمز الحماية غير صالح ❌', 'GOV-FAIL-409', ''); exit(); } // إصلاح #2
-    if (!fin_can_perform($conn, $ctx['role'], 'treasurer')) { ems_gov_flash_redirect('payments_fin.php', 'الصرف/التحصيل يخصّ أمين الخزينة فقط ❌', 'GOV-FAIL-409', ''); exit(); } // فصل الواجبات
+    if (!fin_can_perform($conn, $ctx['role'], 'treasurer')) { ems_gov_flash_redirect('payments_fin.php', 'الصرف/التحصيل يخص أمين الخزينة فقط ❌', 'GOV-FAIL-409', ''); exit(); } // فصل الواجبات
     $pid = intval($_GET['execute_id']);
     $gate = fin_gate($is_super_admin);
     $pay = $gate->selectOne('fin_payments', array('where' => array('id' => $pid)));
@@ -40,7 +40,7 @@ if (isset($_GET['execute_id'])) {
         $recv = $gate->selectOne('fin_receivables', array('columns' => array('outstanding', 'collected', 'amount'), 'where' => array('id' => $rid)));
         $out = $recv ? (float) $recv['outstanding'] : 0;
         if ((float)$pay['amount'] > $out + 0.01) {
-            ems_gov_flash_redirect(ems_flash_to('payments_fin.php', number_format($out, 2) . ")+❌"), 'لا تنفيذ: المبلغ يتجاوز المتبقّي على الذمّة (', 'GOV-INFO-200', ''); exit();
+            ems_gov_flash_redirect(ems_flash_to('payments_fin.php', number_format($out, 2) . ")+❌"), 'لا تنفيذ: المبلغ يتجاوز المتبقي على الذمة (', 'GOV-INFO-200', ''); exit();
         }
     }
 
@@ -48,7 +48,7 @@ if (isset($_GET['execute_id'])) {
     if ($pay['direction'] === 'disbursement' && $pay['party_type'] === 'supplier') {
         $sref = intval($pay['party_ref']);
         $n = $gate->count('fin_dues', array('where' => array('party_type' => 'supplier', 'party_ref' => $sref, 'settlement_state' => 'pending')));
-        if ($n > 0) { ems_gov_flash_redirect('payments_fin.php', "لا صرف: للمورد مستحقات غير مُسوّاة ($n) ❌", 'GOV-FAIL-409', ''); exit(); }
+        if ($n > 0) { ems_gov_flash_redirect('payments_fin.php', "لا صرف: للمورد مستحقات غير مسواة ($n) ❌", 'GOV-FAIL-409', ''); exit(); }
     }
 
     // ═══ update0013 · حارسُ الاعتمادِ الرباعيِّ قبلَ التنفيذ ═══════════════════
@@ -84,10 +84,10 @@ if (isset($_GET['execute_id'])) {
        `includes/self_approval_guard.php` ولم يكن يُنادى هنا. */
     require_once __DIR__ . '/../includes/self_approval_guard.php';
     $__sa = ems_assert_not_self_approval($conn, 'fin_payments', 'id', $pid,
-        'أمرُ دفعٍ ' . (string) ($pay['payment_no'] ?? ('#' . $pid)),
+        'أمر دفع ' . (string) ($pay['payment_no'] ?? ('#' . $pid)),
         intval($pay['company_id'] ?? $company_id));
     if ($__sa !== null) {
-        ems_gov_flash_redirect('payments_fin.php', $__sa['reason'], 'GOV-PERM-403', 'التنفيذُ يدٌ ثانيةٌ غيرُ يدِ الإنشاء');
+        ems_gov_flash_redirect('payments_fin.php', $__sa['reason'], 'GOV-PERM-403', 'التنفيذ يد ثانية غير يد الإنشاء');
         exit();
     }
 
@@ -115,7 +115,7 @@ if (isset($_GET['execute_id'])) {
     }
     // (فجوة 4) إشعار المدير المالي بحركة الخزينة
     $dir_lbl = $pay['direction'] === 'collection' ? 'تحصيل' : 'صرف';
-    fin_notify($conn, $company_id, 'finance_manager', 'نُفِّذ ' . $dir_lbl . ' ' . $pay['payment_no'] . ' بمبلغ ' . number_format((float)$pay['amount'], 0), 'payments_fin.php');
+    fin_notify($conn, $company_id, 'finance_manager', 'نفذ ' . $dir_lbl . ' ' . $pay['payment_no'] . ' بمبلغ ' . number_format((float)$pay['amount'], 0), 'payments_fin.php');
     ems_gov_flash_redirect('payments_fin.php', 'تم تنفيذ الحركة بنجاح ✅', 'GOV-OK-200', ''); exit();
 }
 
@@ -156,7 +156,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['direction'])) {
             intval($_POST['receivable_id'] ?? 0), $current_user_id);
         if (!$__lg['ok']) {
             ems_gov_flash_redirect('payments_fin.php', $__lg['reason'] . ' ❌', EMS_LADDER_DENY_CODE,
-                'الجهةُ تُحَلُّ من محرّكِ السلاليمِ لا من الشاشة');
+                'الجهة تحل من محرك السلاليم لا من الشاشة');
             exit();
         }
     }
@@ -164,7 +164,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['direction'])) {
     $__pd = ems_period_check($conn, (int) $company_id, date('Y-m-d'));
     if (empty($__pd['ok'])) {
         ems_gov_flash_redirect('payments_fin.php', $__pd['reason'], 'GOV-PERIOD-423',
-            'تُفتح الفترةُ استثنائيًّا من شاشة إقفال الفترات بقرارٍ موثَّق');
+            'تفتح الفترة استثنائيا من شاشة إقفال الفترات بقرار موثق');
         exit();
     }
 
@@ -176,8 +176,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['direction'])) {
     if ($direction === 'disbursement') {
         if (!$receivable_id) {
             ems_gov_flash_redirect('payments_fin.php',
-                '422 لا صرفَ بلا مستندِ التزامٍ أو ذمّةٍ معتمدة — اختر الذمّةَ التي يُسدَّد عنها',
-                'GOV-REF-422', 'الصرفُ أثرٌ لالتزامٍ قائمٍ لا قرارٌ منفرد');
+                '422 لا صرف بلا مستند التزام أو ذمة معتمدة — اختر الذمة التي يسدد عنها',
+                'GOV-REF-422', 'الصرف أثر لالتزام قائم لا قرار منفرد');
             exit();
         }
         /* والمستندُ يُحَلُّ فعلًا: قائمٌ · لهذه الشركةِ · وله رصيدٌ قائم */
@@ -189,10 +189,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['direction'])) {
             $__rq->execute();
             $__rr = $__rq->get_result()->fetch_assoc();
             $__rq->close();
-            if (!$__rr) { $__why = 'الذمّةُ #' . $receivable_id . ' غيرُ موجودةٍ في نطاقِ شركتك'; }
-            elseif ((float) $__rr['outstanding'] <= 0) { $__why = 'الذمّةُ #' . $receivable_id . ' بلا رصيدٍ قائم'; }
+            if (!$__rr) { $__why = 'الذمة #' . $receivable_id . ' غير موجودة في نطاق شركتك'; }
+            elseif ((float) $__rr['outstanding'] <= 0) { $__why = 'الذمة #' . $receivable_id . ' بلا رصيد قائم'; }
             else { $__okSrc = true; }
-        } else { $__why = 'تعذَّر التحقّقُ من المستند'; }
+        } else { $__why = 'تعذر التحقق من المستند'; }
         if (!$__okSrc) {
             ems_gov_flash_redirect('payments_fin.php', '422 ' . $__why, 'GOV-REF-422', '');
             exit();
@@ -225,7 +225,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا حركاتِ صرفٍ أو تحصيلٍ مسجَّلةً بعدُ', 'سجّلْ أوّلَ حركةِ خزينةٍ بزرِّ «حركة خزينة» في رأسِ الشاشة');
+    echo ems_states_bundle('لا حركات صرف أو تحصيل مسجلة بعد', 'سجل أول حركة خزينة بزر «حركة خزينة» في رأس الشاشة');
     ?>
     <?php fin_msg_banner(); ?>
 
@@ -241,7 +241,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="form-group"><label for="emsf_417_988b5">طريقة الدفع</label>
                 <select name="method" id="emsf_417_988b5"><?php foreach ($methods as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
             <div class="form-group"><label for="emsf_418_17729">المبلغ <span class="required">*</span></label><input type="number" step="0.01" min="0" name="amount" required id="emsf_418_17729"></div>
-            <div class="form-group"><label for="emsf_419_792aa">ذمّة عميل (للتحصيل)</label>
+            <div class="form-group"><label for="emsf_419_792aa">ذمة عميل (للتحصيل)</label>
                 <select name="receivable_id" id="emsf_419_792aa"><option value="">— بلا —</option>
                 <?php
                 $recv_opts = fin_gate($is_super_admin)->scopedQuery(array('scope' => array('r' => 'fin_receivables')),
@@ -273,7 +273,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="ems-fn-th" data-fn="1">المعادل بعملة الدفاتر</th>
               <th class="ems-fn-th" data-fn="1">بند الموازنة</th>
               <th class="ems-fn-th" data-fn="1">المتاح قبل</th>
-              <th class="ems-fn-th" data-fn="1">قدّمه</th>
+              <th class="ems-fn-th" data-fn="1">قدمه</th>
               <th class="ems-fn-th" data-fn="1">اعتماد الإدارة</th>
               <th class="ems-fn-th none" data-fn="1">الاعتماد المالي</th>
               <th class="ems-fn-th none" data-fn="1">اعتماد الإدارة العامة</th>
@@ -281,15 +281,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="ems-fn-th none" data-fn="1">رقم سند الصرف</th>
               <th class="ems-fn-th none" data-fn="1">نسخة القاعدة المستعملة</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-              <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+              <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
               <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
-              <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
-              <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطّلاع</th>
+              <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
+              <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطلاع</th>
               <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
               <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
@@ -311,7 +311,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 $pay_rows = fin_gate($is_super_admin)->select('fin_payments', $pay_opts);
                 { foreach ($pay_rows as $row) {
                     $st = (string)$row['state'];
-                    $st_lbl = array('draft' => 'مسودة', 'approved' => 'معتمدة', 'executed' => 'منفّذة', 'reconciled' => 'مطابَقة');
+                    $st_lbl = array('draft' => 'مسودة', 'approved' => 'معتمدة', 'executed' => 'منفذة', 'reconciled' => 'مطابقة');
                     $st_tone = $st === 'executed' ? 'success' : ($st === 'reconciled' ? 'dark' : 'secondary');
                     $dir = $row['direction'] === 'collection' ? 'تحصيل' : 'صرف';
                     echo "<tr><td><div class='action-btns'>";

@@ -27,18 +27,18 @@ class PermissionDerivation
 {
     /** العواملُ العشرةُ الموجبةُ ثم السالبُ — بترتيبِ الوثيقةِ ومرجعِ كلٍّ. */
     const FACTORS = array(
-        'PFACTOR-01' => array('relation',   'العلاقةُ الوظيفية',          'FACC-0071', 1),
-        'PFACTOR-02' => array('family',     'العائلةُ الوظيفية',          'FACC-0072', 1),
-        'PFACTOR-03' => array('spec',       'التخصصُ المحاسبي',           'FACC-0073', 1),
+        'PFACTOR-01' => array('relation',   'العلاقة الوظيفية',          'FACC-0071', 1),
+        'PFACTOR-02' => array('family',     'العائلة الوظيفية',          'FACC-0072', 1),
+        'PFACTOR-03' => array('spec',       'التخصص المحاسبي',           'FACC-0073', 1),
         'PFACTOR-04' => array('level',      'المستوى الوظيفي',            'FACC-0074', 1),
         'PFACTOR-05' => array('department', 'الإدارة',                    'FACC-0075', 1),
         'PFACTOR-06' => array('entity',     'الكيان',                     'FACC-0076', 1),
-        'PFACTOR-07' => array('project',    'المشروعُ أو مركزُ التكلفة',   'FACC-0077', 1),
+        'PFACTOR-07' => array('project',    'المشروع أو مركز التكلفة',   'FACC-0077', 1),
         'PFACTOR-08' => array('assignment', 'التكليف',                    'FACC-0078', 1),
-        'PFACTOR-09' => array('cap',        'السقفُ المالي',              'FACC-0079', 1),
-        'PFACTOR-10' => array('validity',   'مدةُ السريان',               'FACC-0080', 1),
+        'PFACTOR-09' => array('cap',        'السقف المالي',              'FACC-0079', 1),
+        'PFACTOR-10' => array('validity',   'مدة السريان',               'FACC-0080', 1),
         /* ◆ السالب: نقضٌ لا موازنة. */
-        'PFACTOR-11' => array('deny',       'المنعُ الصريح',              'FACC-0081', -1),
+        'PFACTOR-11' => array('deny',       'المنع الصريح',              'FACC-0081', -1),
     );
 
     /**
@@ -54,7 +54,7 @@ class PermissionDerivation
         $co  = intval($ctx['company_id'] ?? 0);
         if ($uid <= 0 || $co <= 0) {
             return array('allowed' => false, 'code' => 422, 'factors' => array(),
-                         'reason' => 'الاشتقاقُ يحتاج الشخصَ والكيان');
+                         'reason' => 'الاشتقاق يحتاج الشخص والكيان');
         }
         $action = trim((string) ($ctx['action_code'] ?? ''));
         $amount = isset($ctx['amount']) && $ctx['amount'] !== '' ? (float) $ctx['amount'] : null;
@@ -62,46 +62,46 @@ class PermissionDerivation
         $u = self::userRow($conn, $uid);
         if ($u === null) {
             return array('allowed' => false, 'code' => 404, 'factors' => array(),
-                         'reason' => 'مستخدمٌ غيرُ موجود: ' . $uid);
+                         'reason' => 'مستخدم غير موجود: ' . $uid);
         }
         $acc = self::accountantRow($conn, $co, $u);
         $F = array();
 
         /* ① العلاقةُ الوظيفية — أهو موظفٌ مربوطٌ بحسابٍ حيٍّ أصلًا؟ */
         $rel = (int) $u['employee_id'] > 0 && (int) $u['is_active'] === 1;
-        $F['PFACTOR-01'] = self::f($rel, $rel ? 'موظفٌ مربوطٌ وحسابُه حي' : 'حسابٌ بلا موظفٍ أو غيرُ نشط');
+        $F['PFACTOR-01'] = self::f($rel, $rel ? 'موظف مربوط وحسابه حي' : 'حساب بلا موظف أو غير نشط');
 
         /* ② العائلةُ الوظيفية — أهو في عائلةِ المالية؟ */
         $famRoles = array(17, 18, 19, 20, 21, 22, 31, 32, 33, 34, 35);
         $inFam = in_array((int) $u['role_id'], $famRoles, true);
-        $F['PFACTOR-02'] = self::f($inFam, $inFam ? 'ضمنَ العائلةِ المالية' : 'خارجَ العائلةِ المالية — الدور ' . $u['role_id']);
+        $F['PFACTOR-02'] = self::f($inFam, $inFam ? 'ضمن العائلة المالية' : 'خارج العائلة المالية — الدور ' . $u['role_id']);
 
         /* ③ التخصصُ المحاسبي — من `fin_accountants.spec_code` لا من مسمّى. */
         $spec = $acc ? (string) $acc['spec_code'] : '';
-        $F['PFACTOR-03'] = self::f($spec !== '', $spec !== '' ? 'التخصص ' . $spec : 'بلا تخصصٍ مسنَد');
+        $F['PFACTOR-03'] = self::f($spec !== '', $spec !== '' ? 'التخصص ' . $spec : 'بلا تخصص مسند');
 
         /* ④ المستوى الوظيفي — من `positions` عبر `users.position_id`. */
         $lvl = self::positionName($conn, (int) $u['position_id']);
-        $F['PFACTOR-04'] = self::f($lvl !== '', $lvl !== '' ? 'المسمّى «' . $lvl . '»' : 'بلا مسمًّى وظيفيٍّ مسجَّل');
+        $F['PFACTOR-04'] = self::f($lvl !== '', $lvl !== '' ? 'المسمى «' . $lvl . '»' : 'بلا مسمى وظيفي مسجل');
 
         /* ⑤ الإدارة. */
         $dept = $acc ? (int) $acc['finance_unit_id'] : 0;
-        $F['PFACTOR-05'] = self::f($dept > 0, $dept > 0 ? 'وحدةٌ ماليةٌ #' . $dept : 'بلا وحدةٍ مالية');
+        $F['PFACTOR-05'] = self::f($dept > 0, $dept > 0 ? 'وحدة مالية #' . $dept : 'بلا وحدة مالية');
 
         /* ⑥ الكيان — والعزلُ بنيويٌّ: كيانُ الشخصِ هو كيانُ الطلبِ أو لا صلاحية. */
         $sameCo = ((int) $u['company_id'] === $co);
-        $F['PFACTOR-06'] = self::f($sameCo, $sameCo ? 'الكيان ' . $co : 'كيانُ الشخصِ ' . $u['company_id'] . ' ≠ ' . $co);
+        $F['PFACTOR-06'] = self::f($sameCo, $sameCo ? 'الكيان ' . $co : 'كيان الشخص ' . $u['company_id'] . ' ≠ ' . $co);
 
         /* ⑦ المشروعُ أو مركزُ التكلفة — `users.project_id` هو النطاقُ الحي:
              الفارغُ = بلا تقييدِ مشروعٍ · والمملوءُ = هذا المشروعُ وحدَه. */
         $prj = intval($ctx['project_id'] ?? 0);
         $myPrj = (int) $u['project_id'];
-        if ($prj <= 0)      { $F['PFACTOR-07'] = self::f(true, 'لا مشروعَ مطلوبًا — العاملُ غيرُ مقيِّد'); }
-        elseif ($myPrj <= 0) { $F['PFACTOR-07'] = self::f(true, 'بلا تقييدِ مشروعٍ على الشخص'); }
+        if ($prj <= 0)      { $F['PFACTOR-07'] = self::f(true, 'لا مشروع مطلوبا — العامل غير مقيد'); }
+        elseif ($myPrj <= 0) { $F['PFACTOR-07'] = self::f(true, 'بلا تقييد مشروع على الشخص'); }
         else {
             $ok7 = ($myPrj === $prj);
-            $F['PFACTOR-07'] = self::f($ok7, $ok7 ? 'المشروع #' . $prj . ' هو نطاقُه'
-                                               : 'نطاقُه المشروع #' . $myPrj . ' لا #' . $prj);
+            $F['PFACTOR-07'] = self::f($ok7, $ok7 ? 'المشروع #' . $prj . ' هو نطاقه'
+                                               : 'نطاقه المشروع #' . $myPrj . ' لا #' . $prj);
         }
 
         /* ⑧ التكليف — والتكليفُ لا يسري قبلَ موافقةِ الرئيس (CEO-Y0121). */
@@ -109,17 +109,17 @@ class PermissionDerivation
         $needsAsg = \App\Services\Exec\AssignmentGate::kindOfRole((int) $u['role_id']) !== 'none';
         $asgOk = !$needsAsg || \App\Services\Exec\AssignmentGate::isEffective($conn, $co, $uid, (int) $u['role_id']);
         $F['PFACTOR-08'] = self::f($asgOk, $needsAsg
-            ? ($asgOk ? 'تكليفٌ ساري المفعول' : 'مسمًّى قياديٌّ/رقابيٌّ بلا تكليفٍ ساري (CEO-Y0121)')
-            : 'مسمًّى لا يحتاج تكليفًا');
+            ? ($asgOk ? 'تكليف ساري المفعول' : 'مسمى قيادي/رقابي بلا تكليف ساري (CEO-Y0121)')
+            : 'مسمى لا يحتاج تكليفا');
 
         /* ⑨ السقفُ المالي — يُفحص حين يحمل الطلبُ مبلغًا. */
-        if ($amount === null) { $F['PFACTOR-09'] = self::f(true, 'بلا مبلغٍ — العاملُ غيرُ مقيِّد'); }
+        if ($amount === null) { $F['PFACTOR-09'] = self::f(true, 'بلا مبلغ — العامل غير مقيد'); }
         else {
             $cap = $acc ? (float) $acc['review_limit_usd'] : 0.0;
             $ok9 = ($cap > 0 && $amount <= $cap);
             $F['PFACTOR-09'] = self::f($ok9, $ok9
-                ? 'المبلغ ' . number_format($amount, 2) . ' ضمنَ سقفِه ' . number_format($cap, 2)
-                : 'المبلغ ' . number_format($amount, 2) . ' يتجاوز سقفَه ' . number_format($cap, 2));
+                ? 'المبلغ ' . number_format($amount, 2) . ' ضمن سقفه ' . number_format($cap, 2)
+                : 'المبلغ ' . number_format($amount, 2) . ' يتجاوز سقفه ' . number_format($cap, 2));
         }
 
         /* ⑩ مدةُ السريان — موضعُها `exec_assignments.effective_to` لا عمودٌ في
@@ -127,12 +127,12 @@ class PermissionDerivation
         $validTo = self::assignmentValidTo($conn, $co, $uid, (int) $u['role_id']);
         $ok10 = ($validTo === '' || strtotime($validTo) >= strtotime(date('Y-m-d')));
         $F['PFACTOR-10'] = self::f($ok10, $ok10
-            ? ($validTo === '' ? 'سريانٌ مفتوحٌ بلا نهاية' : 'ساري حتى ' . $validTo)
-            : 'انتهى سريانُ تكليفِه في ' . $validTo);
+            ? ($validTo === '' ? 'سريان مفتوح بلا نهاية' : 'ساري حتى ' . $validTo)
+            : 'انتهى سريان تكليفه في ' . $validTo);
 
         /* ⑪ المنعُ الصريح — **يُحسب أخيرًا وينقض ما قبلَه**. */
         $deny = self::explicitDeny($conn, $co, $u, $action);
-        $F['PFACTOR-11'] = self::f($deny === '', $deny === '' ? 'لا منعَ صريح' : $deny);
+        $F['PFACTOR-11'] = self::f($deny === '', $deny === '' ? 'لا منع صريح' : $deny);
 
         /* الحكم: العشرةُ الموجبةُ **كلُّها** ثم السالبُ ينقض. */
         $positives = 0; $failed = array();
@@ -148,9 +148,9 @@ class PermissionDerivation
             'denied_by' => $deny !== '' ? 'PFACTOR-11' : ($failed ? $failed[0] : ''),
             'failed' => $failed,
             'reason' => $deny !== ''
-                ? 'منعٌ صريحٌ ينقض العواملَ العشرةَ مهما اجتمعت: ' . $deny
-                : ($allowed ? 'العواملُ العشرةُ مستوفاةٌ ولا منعَ صريح'
-                            : 'عواملُ غيرُ مستوفاة: ' . implode(' · ', array_slice($failed, 0, 4))),
+                ? 'منع صريح ينقض العوامل العشرة مهما اجتمعت: ' . $deny
+                : ($allowed ? 'العوامل العشرة مستوفاة ولا منع صريح'
+                            : 'عوامل غير مستوفاة: ' . implode(' · ', array_slice($failed, 0, 4))),
         );
     }
 
@@ -175,14 +175,14 @@ class PermissionDerivation
                 $st->execute();
                 $row = $st->get_result()->fetch_assoc();
                 $st->close();
-                if ($row) { return 'حدٌّ مُنفَذ ' . $row['code'] . ': ' . mb_substr((string) $row['forbidden'], 0, 90); }
+                if ($row) { return 'حد منفذ ' . $row['code'] . ': ' . mb_substr((string) $row['forbidden'], 0, 90); }
             }
         }
 
         /* ② زوجُ فصلِ واجباتٍ حاجبٌ يجمعه الشخصُ فعلًا. */
         require_once dirname(dirname(__DIR__)) . '/Services/Exec/AssignmentGate.php';
         $chk = \App\Services\Exec\AssignmentGate::checkConflicts($conn, $co, (int) $u['id'], $role);
-        if (empty($chk['clean'])) { return 'تعارضُ واجباتٍ حاجب: ' . mb_substr((string) $chk['detail'], 0, 90); }
+        if (empty($chk['clean'])) { return 'تعارض واجبات حاجب: ' . mb_substr((string) $chk['detail'], 0, 90); }
 
         return '';
     }

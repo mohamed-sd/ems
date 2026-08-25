@@ -134,7 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['risk_type'])) {
     // الكود
     $risk_code_raw = isset($_POST['risk_code']) ? trim($_POST['risk_code']) : '';
     if ($risk_code_raw === '' || !preg_match('/^[A-Za-z0-9_\-]+$/', $risk_code_raw)) {
-        risk_redirect_with_msg('كود الخطر غير صالح. استخدم أحرفًا وأرقامًا و - أو _ فقط ❌');
+        risk_redirect_with_msg('كود الخطر غير صالح. استخدم أحرفا وأرقاما و - أو _ فقط ❌');
     }
 
     // وصف الخطر
@@ -213,7 +213,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['risk_type'])) {
                 array($risk_code_raw, $risk_id));
         } catch (\Throwable $t) { $dup = array(); }
         if (!empty($dup)) {
-            risk_redirect_with_msg('كود الخطر موجود مسبقاً داخل شركتك ❌');
+            risk_redirect_with_msg('كود الخطر موجود مسبقا داخل شركتك ❌');
         }
 
         try {
@@ -246,7 +246,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['risk_type'])) {
                 array($risk_code_raw));
         } catch (\Throwable $t) { $dup = array(); }
         if (!empty($dup)) {
-            risk_redirect_with_msg('كود الخطر موجود مسبقاً داخل شركتك ❌');
+            risk_redirect_with_msg('كود الخطر موجود مسبقا داخل شركتك ❌');
         }
 
         /* ══ INJ-0108 · «السجلُّ المركزيُّ الواحدُ للمخاطر» ═══════════════════════
@@ -280,12 +280,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['risk_type'])) {
                     $__sigId, ['risk_code' => $risk_code_raw, 'via' => 'INJ-0108']);
             }
             risk_redirect_with_msg(($__again
-                    ? ('إشارةُ هذا الخطرِ مرفوعةٌ سلفًا #' . $__sigId . ' — لم تُكرَّر')
-                    : ('رُفعت إشارةُ خطرٍ #' . $__sigId . ' إلى السجلِّ المركزيّ'))
-                . ' — تُفرَز في «إشارات الخطر والفرز» ✅');
+                    ? ('إشارة هذا الخطر مرفوعة سلفا #' . $__sigId . ' — لم تكرر')
+                    : ('رفعت إشارة خطر #' . $__sigId . ' إلى السجل المركزي'))
+                . ' — تفرز في «إشارات الخطر والفرز» ✅');
         } catch (\Throwable $t) {
             error_log('commercial_risks.php signal failed: ' . $t->getMessage());
-            risk_redirect_with_msg('تعذّر رفعُ الإشارة: ' . mb_substr($t->getMessage(), 0, 90) . ' ❌');
+            risk_redirect_with_msg('تعذر رفع الإشارة: ' . mb_substr($t->getMessage(), 0, 90) . ' ❌');
         }
     }
 }
@@ -446,7 +446,7 @@ function risk_entity_label($type, $map)
         </div>
     <?php endif; ?>
 
-    <?php echo ems_states_bundle('لا مخاطرَ تجاريةً مسجَّلةً ضمن هذا الترشيح', 'أبلغ عن خطرٍ جديدٍ أو غيّر المرشِّحات'); ?>
+    <?php echo ems_states_bundle('لا مخاطر تجارية مسجلة ضمن هذا الترشيح', 'أبلغ عن خطر جديد أو غير المرشحات'); ?>
 
     <div class="stats-section risk-hidden" id="riskStatsSection">
         <div class="stats-grid">
@@ -618,18 +618,18 @@ function risk_entity_label($type, $map)
                             <th class="ems-fn-th" data-fn="1">تاريخ التسجيل</th>
                             <th class="ems-fn-th" data-fn="1">العقد</th>
                             <th class="ems-fn-th" data-fn="1">الاحتمال</th>
-                            <th class="ems-fn-th" data-fn="1">الأثر المالي المقدَّر</th>
+                            <th class="ems-fn-th" data-fn="1">الأثر المالي المقدر</th>
                             <th class="ems-fn-th" data-fn="1">خطة المعالجة</th>
                             <th class="ems-fn-th" data-fn="1">تاريخ المراجعة</th>
                             <th class="ems-fn-th" data-fn="1">حالة المعالجة</th>
                             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                             <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                             <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                             <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-                            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                            <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+                            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                            <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
                             <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                             <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
                             </tr>
@@ -758,7 +758,7 @@ function risk_entity_label($type, $map)
         });
         }
 
-        // الربطُ بعد تهيئةِ المكوّنِ المركزي للجدول (أو فورًا إن سبقنا)
+        // الربط بعد تهيئة المكون المركزي للجدول (أو فورا إن سبقنا)
         if ($.fn.dataTable && $.fn.dataTable.isDataTable('#riskTable')) {
             bindRiskFilters();
         } else {
@@ -780,13 +780,13 @@ function risk_entity_label($type, $map)
     const statsSection = $('#riskStatsSection');
 
     /**
-     * إظهارُ حقلِ الكودِ المولَّد وإخفاؤه.
+     * إظهار حقل الكود المولد وإخفاؤه.
      *
      * ⚠️ **لا تستعمل `jQuery.hide()` هنا** — `assets/css/ems-forms.css` يحمل:
      *     :is(.allforms, .ems-form) .form-grid > div { display: block !important }
-     * والغلافُ ابنٌ مباشرٌ لـ`.form-grid`، فـ`!important` من ورقةِ الأنماطِ تهزم
-     * الإخفاءَ السطريَّ **بلا أولوية**: السمةُ تُكتب فعلًا والحقلُ يبقى ظاهرًا، بلا
-     * خطأٍ في وحدةِ التحكم ولا سطرٍ في أيِّ سجل. (نظيرُ شاشتَي العملاءِ والمشاريع.)
+     * والغلاف ابن مباشر ل`.form-grid`، ف`!important` من ورقة الأنماط تهزم
+     * الإخفاء السطري **بلا أولوية**: السمة تكتب فعلا والحقل يبقى ظاهرا، بلا
+     * خطأ في وحدة التحكم ولا سطر في أي سجل. (نظير شاشتي العملاء والمشاريع.)
      */
     function setGeneratedCodeShown(shown) {
         var el = generatedCodeWrapper[0];
@@ -797,9 +797,9 @@ function risk_entity_label($type, $map)
     function setAddMode() {
         formTitle.text('إضافة خطر جديد'); submitBtnText.text('حفظ الخطر');
         setGeneratedCodeShown(true);
-        // الكودُ المولَّدُ يعود إلى خانتِه كلَّما دخلنا وضعَ الإضافة — ومصدرُه حقلُ
-        // العرضِ نفسُه لا نسخةٌ ثانيةٌ منه (مصدرُ حقيقةٍ واحد). و`reset()` يكفي
-        // للإلغاء، لكنَّ الانتقالَ من «تعديل» إلى «إضافة» قد يقع بلا reset.
+        // الكود المولد يعود إلى خانته كلما دخلنا وضع الإضافة — ومصدره حقل
+        // العرض نفسه لا نسخة ثانية منه (مصدر حقيقة واحد). و`reset()` يكفي
+        // للإلغاء، لكن الانتقال من «تعديل» إلى «إضافة» قد يقع بلا reset.
         var genCode = $('#generated_risk_code').val();
         if (genCode) { $('#risk_code').val(genCode); }
     }
@@ -881,7 +881,7 @@ function risk_entity_label($type, $map)
         });
     });
 
-    // ── عرض التفاصيل عبر EmsDetailsModal الموحّد ──
+    // ── عرض التفاصيل عبر EmsDetailsModal الموحد ──
     $(document).on('click', '.viewRiskBtn', function () {
         const d = $(this).data();
         const sevTone = d.severity === 'عالية' ? 'active' : (d.severity === 'متوسطة' ? 'pending' : 'inactive');

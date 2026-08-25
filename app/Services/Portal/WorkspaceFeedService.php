@@ -122,10 +122,10 @@ class WorkspaceFeedService
                      'cards' => array(), 'decisions' => array(), 'pulse' => array(),
                      'hidden_cards' => array(), 'breadcrumb' => array());
         if (!in_array((string) $entityType, self::ENTITY_TYPES, true)) {
-            $out['code'] = 422; $out['reason'] = 'نوعُ كيانٍ مجهول'; return $out;
+            $out['code'] = 422; $out['reason'] = 'نوع كيان مجهول'; return $out;
         }
         if (!in_array((string) $period, array('today', 'week', 'month'), true)) {
-            $out['code'] = 422; $out['reason'] = 'فترةٌ غيرُ صالحة: today · week · month'; return $out;
+            $out['code'] = 422; $out['reason'] = 'فترة غير صالحة: today · week · month'; return $out;
         }
 
         // «كيانٌ خارج نطاق الصفة → 403 مسجَّلةً» (W3)
@@ -133,7 +133,7 @@ class WorkspaceFeedService
             self::logNav($conn, $companyId, $accountId, null,
                 $entityType . ':' . $entityId, (string) $entityId, 'denied');
             $out['code'] = 403;
-            $out['reason'] = 'الكيانُ خارج نطاق صفتك — **403 مسجَّلةٌ** والطبقةُ لا تظهر في مبدّلك أصلًا';
+            $out['reason'] = 'الكيان خارج نطاق صفتك — **403 مسجلة** والطبقة لا تظهر في مبدلك أصلا';
             return $out;
         }
 
@@ -184,7 +184,7 @@ class WorkspaceFeedService
                         $q = $conn->query("SELECT COUNT(*) n FROM tickets
                                             WHERE company_id={$co} {$w} AND close_date IS NULL");
                         $x = $q ? $q->fetch_assoc() : null;
-                        $value = $x ? ($x['n'] . ' بلاغًا مفتوحًا') : null;
+                        $value = $x ? ($x['n'] . ' بلاغا مفتوحا') : null;
                         $link = 'Tickets/tickets_list.php';
                         break;
                     case 'claims.period':
@@ -192,7 +192,7 @@ class WorkspaceFeedService
                                             WHERE company_id={$co} AND COALESCE(is_deleted,0)=0
                                               AND created_at >= {$dateCond}");
                         $x = $q ? $q->fetch_assoc() : null;
-                        $value = $x ? ($x['n'] . ' مستخلصًا · ' . $x['v']) : null;
+                        $value = $x ? ($x['n'] . ' مستخلصا · ' . $x['v']) : null;
                         $link = 'Contracts/claims.php';
                         break;
                     case 'stops.by_owner':
@@ -201,7 +201,7 @@ class WorkspaceFeedService
                     case 'contract.commitment':
                     case 'person.achievement':
                         // «مؤشرٌ بلا تغذيةٍ من مالكه → يظهر "غيرُ متاح" بمالكه لا صفرًا» (W4)
-                        $unavailable = 'غيرُ متاحٍ بعدُ — مالكُه ' . $meta['owner_doc']
+                        $unavailable = 'غير متاح بعد — مالكه ' . $meta['owner_doc']
                                      . ' (' . $meta['source_service'] . ')';
                         break;
                     case 'events.pulse':
@@ -212,13 +212,13 @@ class WorkspaceFeedService
                             $pulse[] = $x['event_type'] . ' · ' . $x['created_at'];
                         }
                         $out['pulse'] = $pulse;
-                        $value = count($pulse) . ' أحداثٍ أخيرة';
+                        $value = count($pulse) . ' أحداث أخيرة';
                         $link = 'Finance/events_list.php';
                         break;
                     default:
-                        $unavailable = 'غيرُ متاحٍ — بطاقةٌ بلا باني (مالكُها ' . $meta['owner_doc'] . ')';
+                        $unavailable = 'غير متاح — بطاقة بلا باني (مالكها ' . $meta['owner_doc'] . ')';
                 }
-            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'الفشلُ يُعرض للمستخدمِ نصًّا في البطاقةِ «تعذّرت القراءة» — فلا يختفي'); $unavailable = 'تعذّرت القراءةُ من المصدر'; }
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'الفشل يعرض للمستخدم نصا في البطاقة «تعذرت القراءة» — فلا يختفي'); $unavailable = 'تعذرت القراءة من المصدر'; }
 
             $out['cards'][] = array(
                 'code' => (string) $code,

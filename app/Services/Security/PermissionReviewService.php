@@ -55,7 +55,7 @@ class PermissionReviewService
             }
             $conn->commit();
             $out['ok'] = true; $out['code'] = 201; $out['cycle_id'] = $cycleId; $out['lines'] = $n;
-            $out['reason'] = 'فُتحت الدورة بـ' . $n . ' بندًا';
+            $out['reason'] = 'فتحت الدورة ب' . $n . ' بندا';
             return $out;
         } catch (\Throwable $e) {
             $conn->rollback();
@@ -79,7 +79,7 @@ class PermissionReviewService
         $ok = $stmt->affected_rows === 1;
         $stmt->close();
         return array('ok' => $ok, 'code' => $ok ? 200 : 409,
-            'reason' => $ok ? 'سُجّل' : 'بند محسوم سلفًا — السجل لا يُعاد');
+            'reason' => $ok ? 'سجل' : 'بند محسوم سلفا — السجل لا يعاد');
     }
 
     /** توقيع الدورة — لا توقيع وفيها بند بلا قرار. */
@@ -93,7 +93,7 @@ class PermissionReviewService
         }
         $r = $conn->query("SELECT COUNT(*) c FROM permission_review_lines WHERE cycle_id = {$cycleId} AND decision IS NULL")->fetch_assoc();
         if (intval($r['c']) > 0) {
-            return array('ok' => false, 'code' => 409, 'reason' => 'بقي ' . $r['c'] . ' بندًا بلا قرار — بندًا بندًا لا جملة');
+            return array('ok' => false, 'code' => 409, 'reason' => 'بقي ' . $r['c'] . ' بندا بلا قرار — بندا بندا لا جملة');
         }
         $conn->query("UPDATE permission_review_cycles SET state = 'signed', signed_at = NOW() WHERE cycle_id = {$cycleId}");
         // تنفيذ قرارات الإلغاء: استثناء منع؟ الخفض والإلغاء ينفذهما مدير الصلاحيات
@@ -105,7 +105,7 @@ class PermissionReviewService
                 $x['decision'] === 'revoke' ? 'revoked' : 'reduced', $x['permission_code'], null,
                 'قرار المراجعة الدورية ' . $c['period'] . ' — ينفذه مدير الصلاحيات من المصدر', intval($managerPersonId));
         }
-        return array('ok' => true, 'code' => 200, 'reason' => 'وُقِّعت الدورة');
+        return array('ok' => true, 'code' => 200, 'reason' => 'وقعت الدورة');
     }
 
     /** التصعيد: دورات فات أجلها بلا توقيع → escalated + تنبيه الإدارة العامة (S25). */
@@ -122,7 +122,7 @@ class PermissionReviewService
                 "INSERT INTO fin_notifications (company_id, target_level, title, link)
                  VALUES (?, 'all', ?, 'admin/org_assignments.php')");
             $co = intval($x['company_id']);
-            $title = 'تصعيد للإدارة العامة: مراجعة الصلاحيات ' . $x['period'] . ' للوحدة #' . $x['org_unit_id'] . ' لم تُوقَّع في مهلتها';
+            $title = 'تصعيد للإدارة العامة: مراجعة الصلاحيات ' . $x['period'] . ' للوحدة #' . $x['org_unit_id'] . ' لم توقع في مهلتها';
             $stmt->bind_param('is', $co, $title);
             $stmt->execute();
             $stmt->close();

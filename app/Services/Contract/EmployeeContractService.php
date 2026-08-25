@@ -50,38 +50,38 @@ class EmployeeContractService
         $startDate  = self::dateOrNull(isset($data['start_date']) ? $data['start_date'] : null);
         $endDate    = self::dateOrNull(isset($data['end_date']) ? $data['end_date'] : null);
 
-        if ($employeeId <= 0) { $out['code'] = 422; $out['reason'] = 'الشخصُ إلزامي — «العقدُ يشير إلى سجل الأشخاص»'; return $out; }
+        if ($employeeId <= 0) { $out['code'] = 422; $out['reason'] = 'الشخص إلزامي — «العقد يشير إلى سجل الأشخاص»'; return $out; }
         if (!in_array($category, self::CATEGORIES, true)) {
-            $out['code'] = 422; $out['reason'] = 'فئةٌ من خارج قائمة CON-01 §2: ' . $category; return $out;
+            $out['code'] = 422; $out['reason'] = 'فئة من خارج قائمة CON-01 §2: ' . $category; return $out;
         }
         if ($startDate !== null && $endDate !== null && $endDate < $startDate) {
-            $out['code'] = 422; $out['reason'] = 'نهايةُ المدة قبل بدايتها'; return $out;
+            $out['code'] = 422; $out['reason'] = 'نهاية المدة قبل بدايتها'; return $out;
         }
 
         // الشخصُ من نطاق الشركة (البوابةُ ترفض الأجنبي)
         $emp = null;
         try { $emp = $gate->selectOne('employees', array('columns' => array('id'), 'where' => array('id' => $employeeId))); }
-        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $emp'); $emp = null; }
-        if (!$emp) { $out['code'] = 422; $out['reason'] = 'الشخصُ غير موجودٍ في نطاقك'; return $out; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $emp'); $emp = null; }
+        if (!$emp) { $out['code'] = 422; $out['reason'] = 'الشخص غير موجود في نطاقك'; return $out; }
 
         // «نموذجٌ غيرُ مذكورٍ في القائمة الخمس عشرة → 422» — الكتالوجُ المحكوم حصرًا
         $pm = self::payModelOf($conn, $payModelId);
-        if (!$pm) { $out['code'] = 422; $out['reason'] = 'نموذجُ أجرٍ من خارج القائمة الخمس عشرة المحكومة'; return $out; }
+        if (!$pm) { $out['code'] = 422; $out['reason'] = 'نموذج أجر من خارج القائمة الخمس عشرة المحكومة'; return $out; }
 
         // المشروعُ من النطاق إن حُدّد
         $projectId = isset($data['project_id']) ? (int) $data['project_id'] : 0;
         if ($projectId > 0) {
             $proj = null;
             try { $proj = $gate->selectOne('project', array('columns' => array('id'), 'where' => array('id' => $projectId))); }
-            catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $proj'); $proj = null; }
-            if (!$proj) { $out['code'] = 422; $out['reason'] = 'المشروعُ غير موجودٍ في نطاقك'; return $out; }
+            catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $proj'); $proj = null; }
+            if (!$proj) { $out['code'] = 422; $out['reason'] = 'المشروع غير موجود في نطاقك'; return $out; }
         }
 
         // «عقدٌ متداخلُ المدة للشخص نفسه في الكيان نفسه → 409 بمرجع القائم»
         $clash = self::overlapOf($gate, $employeeId, $startDate, $endDate, 0);
         if ($clash) {
             $out['code'] = 409;
-            $out['reason'] = 'مدةٌ متداخلةٌ مع العقد #' . (int) $clash['id']
+            $out['reason'] = 'مدة متداخلة مع العقد #' . (int) $clash['id']
                 . ' (' . EmployeeContractStateMachine::labelAr($clash['state'])
                 . ' · ' . ($clash['start_date'] ?: '؟') . ' → ' . ($clash['end_date'] ?: 'مفتوح') . ')';
             return $out;
@@ -105,12 +105,12 @@ class EmployeeContractService
             $newId = (int) $gate->insert('employee_contracts', $row);
         } catch (\Throwable $t) {
             $out['code'] = 409;
-            $out['reason'] = 'تعذّر الإنشاء — عقدٌ بالبداية نفسها للشخص نفسه قائم؟ (' . $t->getMessage() . ')';
+            $out['reason'] = 'تعذر الإنشاء — عقد بالبداية نفسها للشخص نفسه قائم؟ (' . $t->getMessage() . ')';
             return $out;
         }
         if ($newId <= 0) {
             // گوتشا مقيسة: mysqli لا يرمي — خرقُ قيدٍ يعود false صامتًا
-            $out['code'] = 409; $out['reason'] = 'تعذّر الإنشاء — قيدُ التفرد (الشخصُ × الكيانُ × البداية)';
+            $out['code'] = 409; $out['reason'] = 'تعذر الإنشاء — قيد التفرد (الشخص × الكيان × البداية)';
             return $out;
         }
 
@@ -133,26 +133,26 @@ class EmployeeContractService
 
         $c = null;
         try { $c = $gate->selectOne('employee_contracts', array('where' => array('id' => $contractId))); }
-        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $c'); $c = null; }
-        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقدُ غير موجود'; return $out; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $c'); $c = null; }
+        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقد غير موجود'; return $out; }
 
         $src = trim((string) ($c['source_table'] ?? ''));
         if ($src !== '') {
             $out['code'] = 423;
-            $out['reason'] = 'صفٌّ مرحَّلٌ قراءةً — كاتبُه مصدرُه القديم (' . $src . ') حتى إقفال القديم (N-04)';
+            $out['reason'] = 'صف مرحل قراءة — كاتبه مصدره القديم (' . $src . ') حتى إقفال القديم (N-04)';
             return $out;
         }
         $state = (string) $c['state'];
         if (EmployeeContractStateMachine::isReadable($state)
             || $state === EmployeeContractStateMachine::SUSPENDED) {
             $out['code'] = 423;
-            $out['reason'] = 'لا تعديلَ مباشرًا على عقدٍ نافذ — التغييرُ بملحقٍ بسريان (H-10)';
+            $out['reason'] = 'لا تعديل مباشرا على عقد نافذ — التغيير بملحق بسريان (H-10)';
             return $out;
         }
         if (!in_array($state, self::EDITABLE_STATES, true)) {
             $out['code'] = 423;
-            $out['reason'] = 'العقدُ في دورة اعتماده (' . EmployeeContractStateMachine::labelAr($state)
-                . ') — يُعاد إلى المسودة بقرارٍ أو يُكمل دورتَه';
+            $out['reason'] = 'العقد في دورة اعتماده (' . EmployeeContractStateMachine::labelAr($state)
+                . ') — يعاد إلى المسودة بقرار أو يكمل دورته';
             return $out;
         }
 
@@ -166,13 +166,13 @@ class EmployeeContractService
         if (array_key_exists('category', $data)) {
             $cat = (string) $data['category'];
             if (!in_array($cat, self::CATEGORIES, true)) {
-                $out['code'] = 422; $out['reason'] = 'فئةٌ من خارج القائمة: ' . $cat; return $out;
+                $out['code'] = 422; $out['reason'] = 'فئة من خارج القائمة: ' . $cat; return $out;
             }
             $upd['category'] = $cat;
         }
         if (array_key_exists('pay_model_id', $data)) {
             $pm = self::payModelOf($conn, (int) $data['pay_model_id']);
-            if (!$pm) { $out['code'] = 422; $out['reason'] = 'نموذجُ أجرٍ من خارج القائمة المحكومة'; return $out; }
+            if (!$pm) { $out['code'] = 422; $out['reason'] = 'نموذج أجر من خارج القائمة المحكومة'; return $out; }
             $upd['pay_model_id'] = (int) $pm['id'];
         }
         if (array_key_exists('project_id', $data)) {
@@ -180,8 +180,8 @@ class EmployeeContractService
             if ($pid > 0) {
                 $proj = null;
                 try { $proj = $gate->selectOne('project', array('columns' => array('id'), 'where' => array('id' => $pid))); }
-                catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $proj'); $proj = null; }
-                if (!$proj) { $out['code'] = 422; $out['reason'] = 'المشروعُ غير موجودٍ في نطاقك'; return $out; }
+                catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $proj'); $proj = null; }
+                if (!$proj) { $out['code'] = 422; $out['reason'] = 'المشروع غير موجود في نطاقك'; return $out; }
             }
             $upd['project_id'] = $pid > 0 ? $pid : null;
         }
@@ -190,12 +190,12 @@ class EmployeeContractService
         $ns = array_key_exists('start_date', $upd) ? $upd['start_date'] : $c['start_date'];
         $ne = array_key_exists('end_date', $upd) ? $upd['end_date'] : $c['end_date'];
         if ($ns !== null && $ne !== null && $ne < $ns) {
-            $out['code'] = 422; $out['reason'] = 'نهايةُ المدة قبل بدايتها'; return $out;
+            $out['code'] = 422; $out['reason'] = 'نهاية المدة قبل بدايتها'; return $out;
         }
         $clash = self::overlapOf($gate, (int) $c['employee_id'], $ns, $ne, $contractId);
         if ($clash) {
             $out['code'] = 409;
-            $out['reason'] = 'مدةٌ متداخلةٌ مع العقد #' . (int) $clash['id'];
+            $out['reason'] = 'مدة متداخلة مع العقد #' . (int) $clash['id'];
             return $out;
         }
 
@@ -219,22 +219,22 @@ class EmployeeContractService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '');
         $fileRef = trim((string) $fileRef);
-        if ($fileRef === '') { $out['code'] = 422; $out['reason'] = 'مرجعُ الملف إلزامي'; return $out; }
+        if ($fileRef === '') { $out['code'] = 422; $out['reason'] = 'مرجع الملف إلزامي'; return $out; }
         $c = null;
         try { $c = $gate->selectOne('employee_contracts', array('where' => array('id' => (int) $contractId))); }
-        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $c'); $c = null; }
-        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقدُ غير موجود'; return $out; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $c'); $c = null; }
+        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقد غير موجود'; return $out; }
         if (trim((string) ($c['source_table'] ?? '')) !== '') {
-            $out['code'] = 423; $out['reason'] = 'صفٌّ مرحَّلٌ قراءةً — كاتبُه مصدرُه القديم'; return $out;
+            $out['code'] = 423; $out['reason'] = 'صف مرحل قراءة — كاتبه مصدره القديم'; return $out;
         }
         if (trim((string) ($c['signed_file_ref'] ?? '')) !== '') {
             $out['code'] = 423;
-            $out['reason'] = 'النسخةُ الموقَّعة ثابتةٌ لا تُستبدل — التصحيحُ ملحقٌ يوضّح (CON-01 §5)';
+            $out['reason'] = 'النسخة الموقعة ثابتة لا تستبدل — التصحيح ملحق يوضح (CON-01 §5)';
             return $out;
         }
         if ((string) $c['state'] !== EmployeeContractStateMachine::ACCEPTED) {
             $out['code'] = 422;
-            $out['reason'] = 'النسخةُ تُرفع بعد قبول الموظف (accepted) — العقدُ '
+            $out['reason'] = 'النسخة ترفع بعد قبول الموظف (accepted) — العقد '
                 . EmployeeContractStateMachine::labelAr($c['state']);
             return $out;
         }
@@ -269,7 +269,7 @@ class EmployeeContractService
         'fixed_amount' => 'مبلغ ثابت', 'pct_reference' => 'نسبة من المرجعي',
         'pct_basic' => 'نسبة من الأساسي', 'pct_gross' => 'نسبة من الإجمالي',
         'per_day' => 'عن يوم', 'per_shift' => 'عن وردية', 'per_hour' => 'عن ساعة',
-        'per_unit' => 'عن وحدة', 'tiers' => 'شرائح', 'custom_formula' => 'معادلة مخصّصة',
+        'per_unit' => 'عن وحدة', 'tiers' => 'شرائح', 'custom_formula' => 'معادلة مخصصة',
     );
 
     /** ما يلزمه مبلغٌ (value) وما يلزمه معدلٌ (rate) — الشرائحُ والمعادلةُ بيانُهما لاحق. */
@@ -302,8 +302,8 @@ class EmployeeContractService
 
         $newId = 0;
         try { $newId = (int) $gate->insert('pay_components', $row); }
-        catch (\Throwable $t) { $out['code'] = 422; $out['reason'] = 'تعذّر الحفظ: ' . $t->getMessage(); return $out; }
-        if ($newId <= 0) { $out['code'] = 422; $out['reason'] = 'تعذّر الحفظ — افحص القيود'; return $out; }
+        catch (\Throwable $t) { $out['code'] = 422; $out['reason'] = 'تعذر الحفظ: ' . $t->getMessage(); return $out; }
+        if ($newId <= 0) { $out['code'] = 422; $out['reason'] = 'تعذر الحفظ — افحص القيود'; return $out; }
 
         require_once dirname(__DIR__, 3) . '/includes/audit_trail.php';
         ems_audit_change($conn, 'workforce', 'pay_components', 'create', $newId,
@@ -318,7 +318,7 @@ class EmployeeContractService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '');
         $c = self::componentOf($gate, $componentId);
-        if (!$c) { $out['code'] = 404; $out['reason'] = 'المكوّنُ غير موجود'; return $out; }
+        if (!$c) { $out['code'] = 404; $out['reason'] = 'المكون غير موجود'; return $out; }
         $guard = self::componentContractGuard($gate, (int) $c['contract_id']);
         if (!$guard['ok']) { return array_merge($out, $guard['err']); }
 
@@ -347,11 +347,11 @@ class EmployeeContractService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '');
         $c = self::componentOf($gate, $componentId);
-        if (!$c) { $out['code'] = 404; $out['reason'] = 'المكوّنُ غير موجود'; return $out; }
+        if (!$c) { $out['code'] = 404; $out['reason'] = 'المكون غير موجود'; return $out; }
         $guard = self::componentContractGuard($gate, (int) $c['contract_id']);
         if (!$guard['ok']) { return array_merge($out, $guard['err']); }
         $d = self::dateOrNull($endDate);
-        if ($d === null) { $out['code'] = 422; $out['reason'] = 'تاريخُ الإنهاء إلزاميٌّ بصيغةٍ سليمة'; return $out; }
+        if ($d === null) { $out['code'] = 422; $out['reason'] = 'تاريخ الإنهاء إلزامي بصيغة سليمة'; return $out; }
 
         $upd = array('state' => 'ended', 'valid_to' => $d);
         $gate->update('pay_components', $upd, array('id' => (int) $componentId));
@@ -369,18 +369,18 @@ class EmployeeContractService
     {
         $c = null;
         try { $c = $gate->selectOne('employee_contracts', array('where' => array('id' => (int) $contractId))); }
-        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $c'); $c = null; }
-        if (!$c) { return array('ok' => false, 'err' => array('code' => 404, 'reason' => 'العقدُ غير موجود')); }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $c'); $c = null; }
+        if (!$c) { return array('ok' => false, 'err' => array('code' => 404, 'reason' => 'العقد غير موجود')); }
         $src = trim((string) ($c['source_table'] ?? ''));
         if ($src !== '') {
             return array('ok' => false, 'err' => array('code' => 423,
-                'reason' => 'صفٌّ مرحَّلٌ قراءةً — كاتبُه مصدرُه القديم (' . $src . ') حتى إقفال القديم (N-04)'));
+                'reason' => 'صف مرحل قراءة — كاتبه مصدره القديم (' . $src . ') حتى إقفال القديم (N-04)'));
         }
         $state = (string) $c['state'];
         if (!in_array($state, self::EDITABLE_STATES, true)) {
             return array('ok' => false, 'err' => array('code' => 423,
-                'reason' => 'العقدُ ' . EmployeeContractStateMachine::labelAr($state)
-                    . ' — تغييرُ المكوّنات على النافذ بملحقٍ بسريان (H-10)'));
+                'reason' => 'العقد ' . EmployeeContractStateMachine::labelAr($state)
+                    . ' — تغيير المكونات على النافذ بملحق بسريان (H-10)'));
         }
         return array('ok' => true, 'contract' => $c);
     }
@@ -391,30 +391,30 @@ class EmployeeContractService
         $type   = isset($data['component_type']) ? (string) $data['component_type'] : '';
         $method = isset($data['calc_method']) ? (string) $data['calc_method'] : '';
         if (!isset(self::COMPONENT_TYPES[$type])) {
-            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'نوعُ مكوّنٍ من خارج قائمة §3.2 العشرين: ' . $type));
+            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'نوع مكون من خارج قائمة §3.2 العشرين: ' . $type));
         }
         if (!isset(self::CALC_METHODS[$method])) {
-            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'طريقةُ احتسابٍ من خارج العشر: ' . $method));
+            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'طريقة احتساب من خارج العشر: ' . $method));
         }
         $value = (isset($data['value']) && trim((string) $data['value']) !== '') ? round((float) $data['value'], 2) : null;
         $rate  = (isset($data['rate'])  && trim((string) $data['rate'])  !== '') ? round((float) $data['rate'], 2)  : null;
         if (in_array($method, self::VALUE_METHODS, true) && $value === null) {
-            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'طريقةُ «' . self::CALC_METHODS[$method] . '» تلزم مبلغًا (value)'));
+            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'طريقة «' . self::CALC_METHODS[$method] . '» تلزم مبلغا (value)'));
         }
         if (in_array($method, self::RATE_METHODS, true) && $rate === null) {
-            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'طريقةُ «' . self::CALC_METHODS[$method] . '» تلزم معدلًا (rate)'));
+            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'طريقة «' . self::CALC_METHODS[$method] . '» تلزم معدلا (rate)'));
         }
         if ($value !== null && $value < 0) {
-            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'المبلغُ لا يكون سالبًا — الخصومُ بيتُها M-11 لا المكوّنات'));
+            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'المبلغ لا يكون سالبا — الخصوم بيتها M-11 لا المكونات'));
         }
         $from = self::dateOrNull(isset($data['valid_from']) ? $data['valid_from'] : null);
         $to   = self::dateOrNull(isset($data['valid_to']) ? $data['valid_to'] : null);
         if ($from !== null && $to !== null && $to < $from) {
-            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'نهايةُ السريان قبل بدايته'));
+            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'نهاية السريان قبل بدايته'));
         }
         $bearerType = isset($data['cost_bearer_type']) ? trim((string) $data['cost_bearer_type']) : '';
         if ($bearerType !== '' && !in_array($bearerType, self::BEARER_TYPES, true)) {
-            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'جهةُ تحمّلٍ من خارج الأربع'));
+            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'جهة تحمل من خارج الأربع'));
         }
         $per = isset($data['periodicity']) ? (string) $data['periodicity'] : 'monthly';
         if (!in_array($per, array('monthly', 'periodic', 'once'), true)) { $per = 'monthly'; }
@@ -473,8 +473,8 @@ class EmployeeContractService
 
         $newId = 0;
         try { $newId = (int) $gate->insert('incentive_rules', $row); }
-        catch (\Throwable $t) { $out['code'] = 422; $out['reason'] = 'تعذّر الحفظ: ' . $t->getMessage(); return $out; }
-        if ($newId <= 0) { $out['code'] = 422; $out['reason'] = 'تعذّر الحفظ — افحص القيود'; return $out; }
+        catch (\Throwable $t) { $out['code'] = 422; $out['reason'] = 'تعذر الحفظ: ' . $t->getMessage(); return $out; }
+        if ($newId <= 0) { $out['code'] = 422; $out['reason'] = 'تعذر الحفظ — افحص القيود'; return $out; }
 
         require_once dirname(__DIR__, 3) . '/includes/audit_trail.php';
         ems_audit_change($conn, 'workforce', 'incentive_rules', 'create', $newId,
@@ -489,11 +489,11 @@ class EmployeeContractService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '');
         $r = self::ruleOf($gate, $ruleId);
-        if (!$r) { $out['code'] = 404; $out['reason'] = 'القاعدةُ غير موجودة'; return $out; }
+        if (!$r) { $out['code'] = 404; $out['reason'] = 'القاعدة غير موجودة'; return $out; }
         $guard = self::componentContractGuard($gate, (int) $r['contract_id']);
         if (!$guard['ok']) { return array_merge($out, $guard['err']); }
         $d = self::dateOrNull($endDate);
-        if ($d === null) { $out['code'] = 422; $out['reason'] = 'تاريخُ الإنهاء إلزامي'; return $out; }
+        if ($d === null) { $out['code'] = 422; $out['reason'] = 'تاريخ الإنهاء إلزامي'; return $out; }
 
         $upd = array('state' => 'ended', 'valid_to' => $d);
         $gate->update('incentive_rules', $upd, array('id' => (int) $ruleId));
@@ -516,7 +516,7 @@ class EmployeeContractService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '');
         $r = self::ruleOf($gate, $ruleId);
-        if (!$r) { $out['code'] = 404; $out['reason'] = 'القاعدةُ غير موجودة'; return $out; }
+        if (!$r) { $out['code'] = 404; $out['reason'] = 'القاعدة غير موجودة'; return $out; }
         $guard = self::componentContractGuard($gate, (int) $r['contract_id']);
         if (!$guard['ok']) { return array_merge($out, $guard['err']); }
 
@@ -526,13 +526,13 @@ class EmployeeContractService
             $bid = isset($row['beneficiary_id']) ? (int) $row['beneficiary_id'] : 0;
             $pct = isset($row['percent']) ? round((float) $row['percent'], 2) : 0.0;
             if (!in_array($bt, self::BENEFICIARY_TYPES, true) || $bid <= 0) {
-                $out['code'] = 422; $out['reason'] = 'مستفيدُ السطر ' . ($i + 1) . ' ناقصُ النوع أو المعرّف'; return $out;
+                $out['code'] = 422; $out['reason'] = 'مستفيد السطر ' . ($i + 1) . ' ناقص النوع أو المعرف'; return $out;
             }
             if ($pct <= 0 || $pct > 100) {
-                $out['code'] = 422; $out['reason'] = 'نسبةُ السطر ' . ($i + 1) . ' خارج (0، 100]'; return $out;
+                $out['code'] = 422; $out['reason'] = 'نسبة السطر ' . ($i + 1) . ' خارج (0، 100]'; return $out;
             }
             $key = $bt . '#' . $bid;
-            if (isset($seen[$key])) { $out['code'] = 422; $out['reason'] = 'مستفيدٌ مكرر: ' . $key; return $out; }
+            if (isset($seen[$key])) { $out['code'] = 422; $out['reason'] = 'مستفيد مكرر: ' . $key; return $out; }
             $seen[$key] = true;
             $sum = round($sum + $pct, 2);
             $clean[] = array('beneficiary_type' => $bt, 'beneficiary_id' => $bid, 'percent' => $pct);
@@ -540,7 +540,7 @@ class EmployeeContractService
         if ($clean && $sum !== 100.00) {
             // 422 **بالفارق** — نصُّ §7.2 حرفيًّا (N2: توزيعٌ 80/30 يُرفض ولا يُحفظ)
             $out['code'] = 422;
-            $out['reason'] = 'مجموعُ التوزيع ' . number_format($sum, 2) . '٪ لا 100٪ — الفارق '
+            $out['reason'] = 'مجموع التوزيع ' . number_format($sum, 2) . '٪ لا 100٪ — الفارق '
                 . number_format(round(100 - $sum, 2), 2) . '٪';
             return $out;
         }
@@ -549,7 +549,7 @@ class EmployeeContractService
             $gate->replaceChildren('incentive_rules', (int) $ruleId, 'incentive_allocations', 'rule_id',
                 $clean, 'H-08-3 incentive allocations Σ=100');
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الاستبدال الذري: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الاستبدال الذري: ' . $t->getMessage(); return $out;
         }
 
         require_once dirname(__DIR__, 3) . '/includes/audit_trail.php';
@@ -566,11 +566,11 @@ class EmployeeContractService
     {
         $basis = isset($data['basis']) ? (string) $data['basis'] : '';
         if (!isset(self::INCENTIVE_BASES[$basis])) {
-            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'أساسٌ من خارج السبعة (§3.3): ' . $basis));
+            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'أساس من خارج السبعة (§3.3): ' . $basis));
         }
         $type = trim((string) (isset($data['incentive_type']) ? $data['incentive_type'] : ''));
         if ($type === '') {
-            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'اسمُ الحافز إلزامي'));
+            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'اسم الحافز إلزامي'));
         }
         $num = function ($k) use ($data) {
             return (isset($data[$k]) && trim((string) $data[$k]) !== '') ? round((float) $data[$k], 4) : null;
@@ -578,19 +578,19 @@ class EmployeeContractService
         $rate = $num('rate'); $threshold = $num('threshold');
         $cap = $num('cap'); $floor = $num('floor');
         if ($rate !== null && $rate < 0) {
-            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'المعدلُ لا يكون سالبًا'));
+            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'المعدل لا يكون سالبا'));
         }
         if ($cap !== null && $floor !== null && $cap < $floor) {
-            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'السقفُ دون الحد الأدنى'));
+            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'السقف دون الحد الأدنى'));
         }
         $from = self::dateOrNull(isset($data['valid_from']) ? $data['valid_from'] : null);
         $to   = self::dateOrNull(isset($data['valid_to']) ? $data['valid_to'] : null);
         if ($from !== null && $to !== null && $to < $from) {
-            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'نهايةُ السريان قبل بدايته'));
+            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'نهاية السريان قبل بدايته'));
         }
         $scopeType = isset($data['scope_type']) ? trim((string) $data['scope_type']) : '';
         if ($scopeType !== '' && !in_array($scopeType, self::INCENTIVE_SCOPES, true)) {
-            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'نطاقٌ من خارج الثلاثة (مشروع · نوع معدة · موقع)'));
+            return array('ok' => false, 'err' => array('code' => 422, 'reason' => 'نطاق من خارج الثلاثة (مشروع · نوع معدة · موقع)'));
         }
         $per = isset($data['periodicity']) ? (string) $data['periodicity'] : 'monthly';
         if (!in_array($per, array('monthly', 'periodic', 'once'), true)) { $per = 'monthly'; }
@@ -632,10 +632,10 @@ class EmployeeContractService
         $out = array('ok' => false, 'code' => 0, 'reason' => '');
         $ownerType = (string) $ownerType; $ownerId = (int) $ownerId;
         if (!in_array($ownerType, self::OWNER_TYPES, true)) {
-            $out['code'] = 422; $out['reason'] = 'مالكُ التحمّل مكوّنٌ أو قاعدةٌ حصرًا'; return $out;
+            $out['code'] = 422; $out['reason'] = 'مالك التحمل مكون أو قاعدة حصرا'; return $out;
         }
         $owner = $ownerType === 'component' ? self::componentOf($gate, $ownerId) : self::ruleOf($gate, $ownerId);
-        if (!$owner) { $out['code'] = 404; $out['reason'] = 'مالكُ التحمّل غير موجود'; return $out; }
+        if (!$owner) { $out['code'] = 404; $out['reason'] = 'مالك التحمل غير موجود'; return $out; }
         $guard = self::componentContractGuard($gate, (int) $owner['contract_id']);
         if (!$guard['ok']) { return array_merge($out, $guard['err']); }
 
@@ -646,35 +646,35 @@ class EmployeeContractService
             $bid = !empty($row['bearer_id']) ? (int) $row['bearer_id'] : null;
             $pct = isset($row['percent']) ? round((float) $row['percent'], 2) : 0.0;
             if (!isset(self::COST_BEARER_TYPES[$bt])) {
-                $out['code'] = 422; $out['reason'] = 'جهةُ السطر ' . ($i + 1) . ' من خارج الأربع (§3.3)'; return $out;
+                $out['code'] = 422; $out['reason'] = 'جهة السطر ' . ($i + 1) . ' من خارج الأربع (§3.3)'; return $out;
             }
             if ($bt !== 'company' && ($bid === null || $bid <= 0)) {
-                $out['code'] = 422; $out['reason'] = 'جهةُ «' . self::COST_BEARER_TYPES[$bt] . '» تلزم معرّفًا'; return $out;
+                $out['code'] = 422; $out['reason'] = 'جهة «' . self::COST_BEARER_TYPES[$bt] . '» تلزم معرفا'; return $out;
             }
             if ($bt === 'company') { $bid = null; }
             if ($pct <= 0 || $pct > 100) {
-                $out['code'] = 422; $out['reason'] = 'نسبةُ السطر ' . ($i + 1) . ' خارج (0، 100]'; return $out;
+                $out['code'] = 422; $out['reason'] = 'نسبة السطر ' . ($i + 1) . ' خارج (0، 100]'; return $out;
             }
             // المشروعُ وعقدُ العميل من نطاق الشركة (البوابةُ ترفض الأجنبي)
             if ($bt === 'project' || $bt === 'client_contract') {
                 $tbl = $bt === 'project' ? 'project' : 'contracts';
                 $ref = null;
                 try { $ref = $gate->selectOne($tbl, array('columns' => array('id'), 'where' => array('id' => $bid))); }
-                catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $ref'); $ref = null; }
+                catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $ref'); $ref = null; }
                 if (!$ref) {
-                    $out['code'] = 422; $out['reason'] = self::COST_BEARER_TYPES[$bt] . ' #' . $bid . ' غيرُ موجودٍ في نطاقك'; return $out;
+                    $out['code'] = 422; $out['reason'] = self::COST_BEARER_TYPES[$bt] . ' #' . $bid . ' غير موجود في نطاقك'; return $out;
                 }
             }
             $key = $bt . '#' . ($bid === null ? '0' : $bid);
-            if (isset($seen[$key])) { $out['code'] = 422; $out['reason'] = 'جهةٌ مكررة: ' . $key; return $out; }
+            if (isset($seen[$key])) { $out['code'] = 422; $out['reason'] = 'جهة مكررة: ' . $key; return $out; }
             $seen[$key] = true;
             $sum = round($sum + $pct, 2);
             $clean[] = array('bearer_type' => $bt, 'bearer_id' => $bid, 'percent' => $pct);
         }
         if ($clean && $sum !== 100.00) {
             $out['code'] = 422;
-            $out['reason'] = 'مجموعُ التحمّل ' . number_format($sum, 2) . '٪ لا 100٪ — الفارق '
-                . number_format(round(100 - $sum, 2), 2) . '٪ (يُرفض الحفظ — PLAN-01 §5.2-④)';
+            $out['reason'] = 'مجموع التحمل ' . number_format($sum, 2) . '٪ لا 100٪ — الفارق '
+                . number_format(round(100 - $sum, 2), 2) . '٪ (يرفض الحفظ — PLAN-01 §5.2-④)';
             return $out;
         }
 
@@ -694,13 +694,13 @@ class EmployeeContractService
                 return true;
             }, 'H-08-4 cost bearers Σ=100');
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الاستبدال الذري: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الاستبدال الذري: ' . $t->getMessage(); return $out;
         }
 
         require_once dirname(__DIR__, 3) . '/includes/audit_trail.php';
         ems_audit_change($conn, 'workforce', 'cost_bearers', 'replace', $ownerId,
             array('owner' => $ownerType . '#' . $ownerId),
-            array('rows' => $clean, 'sum' => $clean ? $sum : 'غائبٌ — إشارةُ المالك المفردة/جهةُ العقد'),
+            array('rows' => $clean, 'sum' => $clean ? $sum : 'غائب — إشارة المالك المفردة/جهة العقد'),
             array('company_id' => (int) $companyId, 'user_id' => (int) $actor));
 
         $out['ok'] = true; $out['code'] = 200;

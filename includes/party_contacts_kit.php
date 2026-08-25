@@ -62,7 +62,7 @@ if (!defined('EMS_PC_KIT')) {
             ? verify_csrf_token($posted)
             : ($posted !== '' && hash_equals(ems_pc_token(), $posted));
         if (!$okTok) {
-            ems_gov_flash_redirect($selfRoute, 'رمزُ الحمايةِ غيرُ مطابق ❌', 'GOV-CSRF-403', '');
+            ems_gov_flash_redirect($selfRoute, 'رمز الحماية غير مطابق ❌', 'GOV-CSRF-403', '');
             exit();
         }
 
@@ -105,7 +105,7 @@ if (!defined('EMS_PC_KIT')) {
              ويردُّ برسالةٍ عن حقلٍ لا يطلبه الفعلُ أصلًا. (قِيس: الصفُّ يبقى
              و`is_deleted = 0` ولا سطرَ خطأٍ في أيِّ مكان.) */
         if ($act !== 'delete' && $row['contact_name'] === null) {
-            ems_gov_flash_redirect($selfRoute, 'اسمُ جهةِ الاتصالِ مطلوب ❌', 'GOV-INFO-200', '');
+            ems_gov_flash_redirect($selfRoute, 'اسم جهة الاتصال مطلوب ❌', 'GOV-INFO-200', '');
             exit();
         }
         /* ◆ **ويُشرَح المنعُ قبلَ أن ترفضه القاعدة**: القيدُ هو الحكم، والرسالةُ
@@ -113,13 +113,13 @@ if (!defined('EMS_PC_KIT')) {
         if ($act !== 'delete' && $isSig === 1 && ($row['authority_kind'] === '—' || $row['authority_scope'] === null
                              || $row['authority_doc_ref'] === null)) {
             ems_gov_flash_redirect($selfRoute,
-                'المفوَّضُ بالتوقيع يلزمه صفةٌ ومدًى ومستندٌ مرجعيّ — والتفويضُ حجّيةٌ لا خانةُ تأشير ❌',
+                'المفوض بالتوقيع يلزمه صفة ومدى ومستند مرجعي — والتفويض حجية لا خانة تأشير ❌',
                 'GOV-INFO-200', '');
             exit();
         }
         if ($act !== 'delete' && $row['authority_from'] !== null && $row['authority_to'] !== null
             && $row['authority_to'] < $row['authority_from']) {
-            ems_gov_flash_redirect($selfRoute, 'نهايةُ التفويضِ قبلَ بدايتِه ❌', 'GOV-INFO-200', '');
+            ems_gov_flash_redirect($selfRoute, 'نهاية التفويض قبل بدايته ❌', 'GOV-INFO-200', '');
             exit();
         }
 
@@ -127,22 +127,22 @@ if (!defined('EMS_PC_KIT')) {
             if ($act === 'add') {
                 $row['created_by'] = isset($_SESSION['user']['id']) ? (int) $_SESSION['user']['id'] : null;
                 $gate->insert('party_contacts', $row);
-                $msg = 'أُضيفت جهةُ الاتصال ✅';
+                $msg = 'أضيفت جهة الاتصال ✅';
             } elseif ($act === 'edit') {
                 $id = isset($_POST['pc_id']) ? (int) $_POST['pc_id'] : 0;
-                if ($id <= 0) { throw new RuntimeException('معرِّفٌ غيرُ صالح'); }
+                if ($id <= 0) { throw new RuntimeException('معرف غير صالح'); }
                 $gate->update('party_contacts', $row, array('id' => $id));
-                $msg = 'حُدِّثت جهةُ الاتصال ✅';
+                $msg = 'حدثت جهة الاتصال ✅';
             } elseif ($act === 'delete') {
                 $id = isset($_POST['pc_id']) ? (int) $_POST['pc_id'] : 0;
-                if ($id <= 0) { throw new RuntimeException('معرِّفٌ غيرُ صالح'); }
+                if ($id <= 0) { throw new RuntimeException('معرف غير صالح'); }
                 $gate->softDelete('party_contacts', $id);
-                $msg = 'أُزيلت جهةُ الاتصال (حذفٌ ناعمٌ يُبقي الأثر) ✅';
+                $msg = 'أزيلت جهة الاتصال (حذف ناعم يبقي الأثر) ✅';
             } else {
                 return;
             }
         } catch (Throwable $e) {
-            ems_gov_flash_redirect($selfRoute, 'تعذّر الحفظ: ' . mb_substr($e->getMessage(), 0, 160) . ' ❌',
+            ems_gov_flash_redirect($selfRoute, 'تعذر الحفظ: ' . mb_substr($e->getMessage(), 0, 160) . ' ❌',
                 'GOV-INFO-200', '');
             exit();
         }

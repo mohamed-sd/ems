@@ -181,10 +181,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     array('href' => 'suppliers.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'العودة للموردين'),
     array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fa-solid fa-house', 'label' => 'الرئيسية'),
   );
-  require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('supplier_contract', 'بياناتُ العقد');
+  require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('supplier_contract', 'بيانات العقد');
   include('../includes/page_header.php');
   // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-  echo ems_states_bundle('لا عقودَ مورِّدين مسجَّلةً بعدُ', 'أضف أولَ عقدِ مورِّدٍ بزرِّ «عقد جديد» في رأسِ الشاشة');
+  echo ems_states_bundle('لا عقود موردين مسجلة بعد', 'أضف أول عقد مورد بزر «عقد جديد» في رأس الشاشة');
   ?>
 
   <!-- فورم إضافة عقد -->
@@ -246,7 +246,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <label>عقد المشروع <font color="red">*</font></label>
                 <div class="control">
                   <select name="project_contract_id" id="project_contract_id" aria-label="عقد المشروع المرتبط" required disabled>
-                    <option value="">— اختر المشروع أولاً —</option>
+                    <option value="">— اختر المشروع أولا —</option>
                   </select>
                 </div>
               </div>
@@ -255,7 +255,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
           <!-- عرض معلومات ساعات العقد -->
           <div class="form-section">
-            <h6><i class="fas fa-file-contract"></i> إجماليات الساعات (يومياً وللعقد)</h6>
+            <h6><i class="fas fa-file-contract"></i> إجماليات الساعات (يوميا وللعقد)</h6>
             <div id="projectHoursInfo" class="project-hours-info sc-is-hidden">
               <div class="project-hours-grid">
                 <div class="project-hours-card">
@@ -309,7 +309,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
           <div class="contracts-note-box">
             <p class="contracts-note-text">
-              <i class="fas fa-info-circle"></i> <strong>ملاحظة:</strong> يتم حساب الإجماليات تلقائياً بناءً على
+              <i class="fas fa-info-circle"></i> <strong>ملاحظة:</strong> يتم حساب الإجماليات تلقائيا بناء على
               البيانات المدخلة في الأقسام التالية
             </p>
           </div>
@@ -353,7 +353,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <div class="field md-3 sm-6">
                 <label>مدة العقد بالأيام </label>
                 <div class="control"><input name="contract_duration_days" id="contract_duration_days" type="number"
-                    min="0" placeholder="يُحتسب تلقائياً" readonly></div>
+                    min="0" placeholder="يحتسب تلقائيا" readonly></div>
               </div>
 
 
@@ -418,7 +418,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="control"><input name="shift_contract" aria-label="ساعات الوردية للعقد" type="number" min="0"></div>
               </div>
               <div class="field md-3 sm-6">
-                <label>إجمالي الوحدات يومياً للعقد </label>
+                <label>إجمالي الوحدات يوميا للعقد </label>
                 <div class="control"><input name="equip_total_contract" type="number" placeholder=" "></div>
               </div>
               <div class="field md-3 sm-6">
@@ -577,9 +577,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                       <div class="control"><input name="shift_hours_1" aria-label="ساعات الوردية للمعدة رقم 1" type="number" min="0"></div>
                     </div>
                     <div class="field md-3 sm-6">
-                      <label>إجمالي الوحدات يومياً</label>
+                      <label>إجمالي الوحدات يوميا</label>
                       <div class="control"><input name="equip_total_month_1" type="number" readonly
-                          placeholder="يُحتسب تلقائياً"></div>
+                          placeholder="يحتسب تلقائيا"></div>
                     </div>
                     <div class="field md-3 sm-6">
                       <label>وحدات العمل في الشهر</label>
@@ -590,7 +590,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <div class="field md-3 sm-6">
                       <label>إجمالي وحدات العقد</label>
                       <div class="control"><input name="equip_total_contract_1" type="number" readonly
-                          placeholder="يُحتسب تلقائياً"></div>
+                          placeholder="يحتسب تلقائيا"></div>
                     </div>
 
 
@@ -798,7 +798,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
             <!-- الساعات والأهداف -->
             <th class="group-hours"> هدف ساعات شهري</th>
-            <th class="group-hours"> وقّعه</th>
+            <th class="group-hours"> وقعه</th>
 
             <!-- أطراف العقد -->
             <th class="group-parties"> الطرف الأول</th>
@@ -813,8 +813,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th class="group-services"> الورشة</th>
 
             <!-- التشغيل اليومي -->
-            <th class="group-operations"> ساعات العمل يومياً</th>
-            <th class="group-operations"> عدد المشغلين يومياً</th>
+            <th class="group-operations"> ساعات العمل يوميا</th>
+            <th class="group-operations"> عدد المشغلين يوميا</th>
 
             <!-- البيانات المالية -->
             <th class="group-basic"> العملة</th>
@@ -844,16 +844,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th class="ems-fn-th none" data-fn="1">مهلة السداد</th>
             <th class="ems-fn-th none" data-fn="1">نسخة القاعدة المستعملة</th>
             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-            <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-            <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+            <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+            <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
             <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
             <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
             <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-            <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+            <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
             <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-            <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+            <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
             <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
-            <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
+            <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
             <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
             <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
             <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
@@ -1432,8 +1432,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <div class="control"><input name="shift_hours_${equipmentIndex}" aria-label="ساعات الوردية للمعدة رقم ${equipmentIndex}" type="number" min="0"></div>
             </div>
             <div class="field md-3 sm-6">
-              <label>إجمالي الساعات يومياً</label>
-              <div class="control"><input name="equip_total_month_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً" aria-label="يُحتسب تلقائياً"></div>
+              <label>إجمالي الساعات يوميا</label>
+              <div class="control"><input name="equip_total_month_${equipmentIndex}" type="number" readonly placeholder="يحتسب تلقائيا" aria-label="يحتسب تلقائيا"></div>
             </div>
             <div class="field md-3 sm-6">
               <label>وحدات العمل في الشهر</label>
@@ -1442,7 +1442,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
             <div class="field md-3 sm-6">
               <label>إجمالي ساعات العقد</label>
-              <div class="control"><input name="equip_total_contract_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً" aria-label="يُحتسب تلقائياً"></div>
+              <div class="control"><input name="equip_total_contract_${equipmentIndex}" type="number" readonly placeholder="يحتسب تلقائيا" aria-label="يحتسب تلقائيا"></div>
             </div>
             <div class="field md-3 sm-6">
               <label>العملة</label>
@@ -1617,7 +1617,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         }
       });
     } else {
-      $('#project_contract_id').html('<option value="">— اختر المشروع أولاً —</option>').prop('disabled', true);
+      $('#project_contract_id').html('<option value="">— اختر المشروع أولا —</option>').prop('disabled', true);
     }
   });
 
@@ -1977,8 +1977,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <div class="control"><input name="shift_hours_${equipmentIndex}" aria-label="ساعات الوردية للمعدة رقم ${equipmentIndex}" type="number" min="0" value="${equip.shift_hours}"></div>
                       </div>
                       <div class="field md-3 sm-6">
-                        <label>إجمالي الساعات يومياً</label>
-                        <div class="control"><input name="equip_total_month_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً" value="${equip.equip_total_month}" aria-label="يُحتسب تلقائياً"></div>
+                        <label>إجمالي الساعات يوميا</label>
+                        <div class="control"><input name="equip_total_month_${equipmentIndex}" type="number" readonly placeholder="يحتسب تلقائيا" value="${equip.equip_total_month}" aria-label="يحتسب تلقائيا"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>وحدات العمل في الشهر</label>
@@ -1986,7 +1986,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                       </div>
                       <div class="field md-3 sm-6">
                         <label>إجمالي ساعات العقد</label>
-                        <div class="control"><input name="equip_total_contract_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً" value="${equip.equip_total_contract}" aria-label="يُحتسب تلقائياً"></div>
+                        <div class="control"><input name="equip_total_contract_${equipmentIndex}" type="number" readonly placeholder="يحتسب تلقائيا" value="${equip.equip_total_contract}" aria-label="يحتسب تلقائيا"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>العملة</label>

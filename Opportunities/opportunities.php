@@ -112,7 +112,7 @@ if (!function_exists('opp_build_requirements')) {
             }
             $parts[] = implode('، ', $eq_parts);
         }
-        if ($operators > 0) { $parts[] = 'مشغّلون: ' . $operators; }
+        if ($operators > 0) { $parts[] = 'مشغلون: ' . $operators; }
         if ($suppliers > 0) { $parts[] = 'موردون: ' . $suppliers; }
 
         return array('json' => $json, 'summary' => implode(' · ', $parts));
@@ -237,7 +237,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['title'])) {
     // كود الفرصة
     $opp_code_raw = isset($_POST['opp_code']) ? trim($_POST['opp_code']) : '';
     if ($opp_code_raw === '' || !preg_match('/^[A-Za-z0-9_\-]+$/', $opp_code_raw)) {
-        opp_redirect_with_msg('كود الفرصة غير صالح. استخدم أحرفًا وأرقامًا و - أو _ فقط ❌');
+        opp_redirect_with_msg('كود الفرصة غير صالح. استخدم أحرفا وأرقاما و - أو _ فقط ❌');
     }
 
     // التحقق من القوائم الثابتة
@@ -271,12 +271,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['title'])) {
     $expected_revenue_raw = (isset($_POST['expected_revenue']) && $_POST['expected_revenue'] !== '')
         ? (float) $_POST['expected_revenue'] : 0;
     if ($expected_revenue_raw < 0) {
-        opp_redirect_with_msg('الإيراد المتوقع لا يكون سالبًا ❌');
+        opp_redirect_with_msg('الإيراد المتوقع لا يكون سالبا ❌');
     }
     $funding_needed_raw = (isset($_POST['funding_needed']) && $_POST['funding_needed'] !== '')
         ? (float) $_POST['funding_needed'] : 0;
     if ($funding_needed_raw < 0) {
-        opp_redirect_with_msg('التمويل المطلوب لا يكون سالبًا ❌');
+        opp_redirect_with_msg('التمويل المطلوب لا يكون سالبا ❌');
     }
 
     // ح-10 · إقفالُ الفرصة يلزمه سببُه. الحقلان موجودان في النموذج فالنيّةُ معلنة —
@@ -284,10 +284,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['title'])) {
     $win_reason_raw  = isset($_POST['win_reason']) ? trim($_POST['win_reason']) : '';
     $lost_reason_raw = isset($_POST['lost_reason']) ? trim($_POST['lost_reason']) : '';
     if ($stage_raw === 'فوز' && $win_reason_raw === '') {
-        opp_redirect_with_msg('لا تُقفل الفرصة على «فوز» بلا سبب فوز ❌');
+        opp_redirect_with_msg('لا تقفل الفرصة على «فوز» بلا سبب فوز ❌');
     }
     if (($stage_raw === 'خسارة' || $stage_raw === 'مستبعدة') && $lost_reason_raw === '') {
-        opp_redirect_with_msg('لا تُقفل الفرصة على «' . $stage_raw . '» بلا سبب ❌');
+        opp_redirect_with_msg('لا تقفل الفرصة على «' . $stage_raw . '» بلا سبب ❌');
     }
 
     // العميل المرتبط — البوابة تعزل بالشركة والحذف الناعم آليًا
@@ -344,7 +344,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['title'])) {
                 'whereRaw' => 'id != ?', 'params' => array($opp_id),
             ));
             if ($dup > 0) {
-                opp_redirect_with_msg('كود الفرصة موجود مسبقاً داخل شركتك ❌');
+                opp_redirect_with_msg('كود الفرصة موجود مسبقا داخل شركتك ❌');
             }
             $gate->update('opportunities', $data, array('id' => $opp_id, 'is_deleted' => 0));
             if (class_exists('\\App\\Services\\ActivityLogService')) {
@@ -354,7 +354,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['title'])) {
         } else {
             $dup = $gate->count('opportunities', array('where' => array('opp_code' => $opp_code_raw)));
             if ($dup > 0) {
-                opp_redirect_with_msg('كود الفرصة موجود مسبقاً داخل شركتك ❌');
+                opp_redirect_with_msg('كود الفرصة موجود مسبقا داخل شركتك ❌');
             }
             $data['created_by'] = intval($_SESSION['user']['id']);
             // لا company_id هنا — البوابة تحقنه من هوية الجلسة حصريًا
@@ -544,7 +544,7 @@ include('../includes/page_header.php');
         </div>
     <?php endif; ?>
 
-    <?php echo ems_states_bundle('لا فرصًا بيعيةً مسجَّلةً ضمن هذا الترشيح', 'أضف فرصةً جديدةً أو غيّر المرشِّحات'); ?>
+    <?php echo ems_states_bundle('لا فرصا بيعية مسجلة ضمن هذا الترشيح', 'أضف فرصة جديدة أو غير المرشحات'); ?>
 
     <div class="stats-section opp-hidden" id="oppStatsSection">
         <div class="stats-grid">
@@ -571,7 +571,7 @@ include('../includes/page_header.php');
             <div class="stats-card">
                 <div class="stats-icon"><i class="fas fa-star"></i></div>
                 <div class="stats-value"><?php echo $stat_qualified_plus; ?></div>
-                <div class="stats-title">مؤهّلة فأكثر</div>
+                <div class="stats-title">مؤهلة فأكثر</div>
             </div>
             <div class="stats-card">
                 <div class="stats-icon"><i class="fas fa-trophy"></i></div>
@@ -687,7 +687,7 @@ include('../includes/page_header.php');
                     </div>
                     <div>
                         <label for="probability"><i class="fas fa-percent"></i> احتمال الفوز (%)</label>
-                        <input type="number" step="0.1" min="0" max="100" name="probability" id="probability" placeholder="يُشتق من المرحلة إن تُرك فارغاً" />
+                        <input type="number" step="0.1" min="0" max="100" name="probability" id="probability" placeholder="يشتق من المرحلة إن ترك فارغا" />
                     </div>
                     <div>
                         <label for="expected_close_date"><i class="fas fa-calendar-day"></i> تاريخ الإغلاق المتوقع</label>
@@ -714,7 +714,7 @@ include('../includes/page_header.php');
                     <div>
                         <label for="study_decision"><i class="fas fa-clipboard-check"></i> قرار الدراسة</label>
                         <select name="study_decision" id="study_decision">
-                            <option value="">-- لم يُتخذ --</option>
+                            <option value="">-- لم يتخذ --</option>
                             <?php foreach ($OPP_DECISION as $d): ?>
                                 <option value="<?php echo opp_e($d); ?>"><?php echo opp_e($d); ?></option>
                             <?php endforeach; ?>
@@ -725,7 +725,7 @@ include('../includes/page_header.php');
                         <input type="number" step="0.01" min="0" name="funding_needed" id="funding_needed" placeholder="0.00" />
                     </div>
                     <div class="opp-col-full opp-req-block">
-                        <label class="opp-req-title" for="req_operators"><i class="fas fa-boxes-stacked"></i> المتطلبات المبدئية <span class="opp-req-hint">— قدّر ما تحتاجه هذه الفرصة لو فازت</span></label>
+                        <label class="opp-req-title" for="req_operators"><i class="fas fa-boxes-stacked"></i> المتطلبات المبدئية <span class="opp-req-hint">— قدر ما تحتاجه هذه الفرصة لو فازت</span></label>
                         <div class="opp-req-panel">
                             <div class="opp-req-summary" aria-live="polite">
                                 <div class="opp-req-sumcard">
@@ -736,7 +736,7 @@ include('../includes/page_header.php');
                                 <div class="opp-req-sumcard">
                                     <span class="opp-req-sumicon"><i class="fas fa-user-gear"></i></span>
                                     <span class="opp-req-sumnum" id="reqSumOps">0</span>
-                                    <span class="opp-req-sumlbl">مشغّلون</span>
+                                    <span class="opp-req-sumlbl">مشغلون</span>
                                 </div>
                                 <div class="opp-req-sumcard">
                                     <span class="opp-req-sumicon"><i class="fas fa-industry"></i></span>
@@ -746,15 +746,15 @@ include('../includes/page_header.php');
                             </div>
 
                             <div id="reqLegacyNote" class="opp-req-legacy opp-req-hidden">
-                                <i class="fas fa-clock-rotate-left"></i> متطلبات قديمة (نصّ حرّ): <span id="reqLegacyText"></span>
-                                <div class="opp-req-legacy-hint">أعد إدخالها بالحقول أدناه لتُحفظ بشكلٍ مُهيكل.</div>
+                                <i class="fas fa-clock-rotate-left"></i> متطلبات قديمة (نص حر): <span id="reqLegacyText"></span>
+                                <div class="opp-req-legacy-hint">أعد إدخالها بالحقول أدناه لتحفظ بشكل مهيكل.</div>
                             </div>
 
                             <div class="opp-req-main">
                                 <div class="opp-req-eqsec">
                                     <div class="opp-req-seclbl"><i class="fas fa-truck-monster"></i> المعدات المطلوبة (بالنوع)</div>
                                     <div id="reqEquipRows" class="opp-req-rows"></div>
-                                    <div id="reqEquipEmpty" class="opp-req-empty">لم تُضف أنواع معدات بعد — اضغط «أضف نوع معدة».</div>
+                                    <div id="reqEquipEmpty" class="opp-req-empty">لم تضف أنواع معدات بعد — اضغط «أضف نوع معدة».</div>
                                     <button type="button" id="reqAddEquip" class="opp-req-add"><i class="fas fa-plus"></i> أضف نوع معدة</button>
                                 </div>
 
@@ -762,7 +762,7 @@ include('../includes/page_header.php');
                                     <div class="opp-req-seclbl"><i class="fas fa-users-gear"></i> الطاقم والموردون</div>
                                     <div class="opp-req-countgrid">
                                         <div class="opp-req-countfield">
-                                            <label for="req_operators"><i class="fas fa-user-gear"></i> عدد المشغّلين</label>
+                                            <label for="req_operators"><i class="fas fa-user-gear"></i> عدد المشغلين</label>
                                             <input type="number" min="0" step="1" name="req_operators" id="req_operators" placeholder="0" />
                                             <div class="opp-req-fieldhint" id="reqOpsHint">مقترح ≥ عدد المعدات</div>
                                         </div>
@@ -850,13 +850,13 @@ include('../includes/page_header.php');
                             <th class="ems-fn-th" data-fn="1">المسؤول</th>
                             <th class="ems-fn-th" data-fn="1">سبب الإسقاط</th>
                             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                             <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                             <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                             <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-                            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                            <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+                            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                            <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
                             <th class="ems-gov-th none" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
                             <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                             <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
@@ -985,7 +985,7 @@ include('../includes/page_header.php');
         });
         }
 
-        // الربطُ بعد تهيئةِ المكوّنِ المركزي للجدول (أو فورًا إن سبقنا)
+        // الربط بعد تهيئة المكون المركزي للجدول (أو فورا إن سبقنا)
         if ($.fn.dataTable && $.fn.dataTable.isDataTable('#oppTable')) {
             bindOppFilters();
         } else {
@@ -1003,7 +1003,7 @@ include('../includes/page_header.php');
     const statsToggleBtn = $('#toggleStats');
     const statsSection = $('#oppStatsSection');
 
-    // ══ المتطلبات المبدئية المُهيكلة (§2.6): صفوف [نوع معدة + عدد] + عددا مشغّلين/موردين ══
+    // ══ المتطلبات المبدئية المهيكلة (§2.6): صفوف [نوع معدة + عدد] + عددا مشغلين/موردين ══
     var OPP_EQUIP_TYPES = <?php echo json_encode(array_map(function ($t) { return array('id' => intval($t['id']), 'type' => $t['type']); }, $opp_equipment_types), JSON_UNESCAPED_UNICODE); ?>;
 
     function oppEscHtml(s) {
@@ -1085,7 +1085,7 @@ include('../includes/page_header.php');
         }
         var html = '<div class="opp-reqv"><div class="opp-reqv-chips">' +
             '<span class="opp-reqv-chip"><i class="fas fa-truck-monster"></i> معدات: <b>' + totalEq + '</b></span>' +
-            '<span class="opp-reqv-chip"><i class="fas fa-user-gear"></i> مشغّلون: <b>' + ops + '</b></span>' +
+            '<span class="opp-reqv-chip"><i class="fas fa-user-gear"></i> مشغلون: <b>' + ops + '</b></span>' +
             '<span class="opp-reqv-chip"><i class="fas fa-industry"></i> موردون: <b>' + sup + '</b></span></div>';
         if (eq.length) {
             html += '<table class="opp-reqv-table"><thead><tr><th>نوع المعدة</th><th>العدد</th></tr></thead><tbody>';

@@ -25,17 +25,17 @@ class FinAnalysisService
     /** مستوياتُ الهامشِ الخمسةُ (COA §05) — أكوادُها من الشجرةِ لا من نصّ. */
     const MARGINS = array(
         'M1' => array('label' => 'الإيرادُ الصافي',     'plus' => array('41', '42'), 'minus' => array()),
-        'M2' => array('label' => 'الهامشُ الإجمالي',    'plus' => array('41'),       'minus' => array('51')),
-        'M3' => array('label' => 'الربحُ التشغيلي',     'plus' => array('41'),       'minus' => array('51', '52', '53', '55')),
-        'M4' => array('label' => 'الربحُ قبل الضريبة',  'plus' => array('41', '42'), 'minus' => array('51', '52', '53', '55', '54', '56')),
-        'M5' => array('label' => 'الربحُ الصافي',       'plus' => array('41', '42'), 'minus' => array('51', '52', '53', '55', '54', '56', '5603')),
+        'M2' => array('label' => 'الهامش الإجمالي',    'plus' => array('41'),       'minus' => array('51')),
+        'M3' => array('label' => 'الربح التشغيلي',     'plus' => array('41'),       'minus' => array('51', '52', '53', '55')),
+        'M4' => array('label' => 'الربح قبل الضريبة',  'plus' => array('41', '42'), 'minus' => array('51', '52', '53', '55', '54', '56')),
+        'M5' => array('label' => 'الربح الصافي',       'plus' => array('41', '42'), 'minus' => array('51', '52', '53', '55', '54', '56', '5603')),
     );
 
     public static function nextCode(\mysqli $db, $companyId, $table, $column, $prefix, $width = 6)
     {
         $allowed = array('fin_project_pl' => 'pl_code', 'fin_cashflow' => 'cf_code');
         if (!isset($allowed[$table]) || $allowed[$table] !== $column) {
-            throw new \RuntimeException('FIN-500: جدولٌ خارجَ قائمةِ الترقيم');
+            throw new \RuntimeException('FIN-500: جدول خارج قائمة الترقيم');
         }
         $len = strlen($prefix) + 2;
         $st = $db->prepare("SELECT COALESCE(MAX(CAST(SUBSTRING(`$column`, $len) AS UNSIGNED)),0)+1 nx
@@ -260,14 +260,14 @@ class FinAnalysisService
             // بحرّاسها (العطالةُ · نافذةُ التكرارِ · الفرزُ الرباعي).
             $idem = 'finsig:' . $rule['signal_code'] . ':' . $period;
             $title = $rule['name_ar'] . ' — ' . $period;
-            $details = 'قاعدةٌ: ' . $rule['rule_expr'] . ' · القيمةُ المقيسة: ' . $v
+            $details = 'قاعدة: ' . $rule['rule_expr'] . ' · القيمة المقيسة: ' . $v
                 . ' · الشدة: ' . $rule['severity'] . ' · الوجهة: ' . $rule['destination_ar'];
             $sig = \App\Services\Risk\RiskService::createSignal($db, $companyId, array(
                 'source' => 'auto',
                 'rule_key' => $idem,
                 'title' => $title,
                 'details' => $details,
-                'root_cause' => 'إشارةُ إنذارٍ ماليٍّ آليةٌ من محرّكِ النسبِ (' . $rule['signal_code'] . ')',
+                'root_cause' => 'إشارة إنذار مالي آلية من محرك النسب (' . $rule['signal_code'] . ')',
                 'sync_uuid' => $idem,
             ), $actor);
             $sigId = (int) ($sig['id'] ?? 0);
@@ -296,7 +296,7 @@ class FinAnalysisService
     public static function generateProjectPL(\mysqli $db, $companyId, $projectId, $period, $actor, $basis = '')
     {
         $projectId = (int) $projectId;
-        if ($projectId <= 0) { throw new \RuntimeException('FIN-422: المشروعُ إلزاميّ'); }
+        if ($projectId <= 0) { throw new \RuntimeException('FIN-422: المشروع إلزامي'); }
         $scope = array('project_id' => $projectId);
         $rev = CoaService::balance($db, $companyId, array('41', '42'), $period, $scope);
         $dc  = CoaService::balance($db, $companyId, array('51'), $period, $scope);
@@ -307,7 +307,7 @@ class FinAnalysisService
         $allTotal = CoaService::balance($db, $companyId, array('41', '42'), $period);
         $ga = CoaService::balance($db, $companyId, array('52'), $period);
         $share = 0.0;
-        $basisText = $basis !== '' ? $basis : 'نسبةُ إيرادِ المشروعِ إلى إجماليِّ الإيرادِ في الفترة';
+        $basisText = $basis !== '' ? $basis : 'نسبة إيراد المشروع إلى إجمالي الإيراد في الفترة';
         if ($allTotal && abs($allTotal['balance']) > 0.0001 && $ga) {
             $share = round($ga['balance'] * ($revenue / $allTotal['balance']), 2);
         }
@@ -328,7 +328,7 @@ class FinAnalysisService
         $lines = json_encode(array('revenue_codes' => '41,42', 'direct_codes' => '51',
             'overhead_code' => '52', 'basis' => $basisText), JSON_UNESCAPED_UNICODE);
         $sup = $prev ? (int) $prev['id'] : null;
-        $auth = 'المحاسبُ يولّد والمديرُ الماليُّ يراجع (M-10 §7-1)';
+        $auth = 'المحاسب يولد والمدير المالي يراجع (M-10 §7-1)';
         $parent = 'PROJECT-' . $projectId;
         $st = $db->prepare("INSERT INTO fin_project_pl
             (company_id, pl_code, project_id, period, revenue_total, direct_cost_total,
@@ -418,9 +418,9 @@ class FinAnalysisService
 
         // ◆ تتوازن أو تُرفض — والرفضُ برمزٍ محكومٍ يبيّن الفرق
         if (!$ok) {
-            throw new \RuntimeException('FIN-CF-422: قائمةُ التدفقاتِ لا تتوازن مع تغيرِ النقديةِ الفعليِّ — '
-                . 'المحسوبُ ' . number_format($netChange, 2) . ' والفعليُّ ' . number_format($actual, 2)
-                . ' والفرقُ ' . number_format($diff, 2) . ' · تُراجَع تصنيفاتُ نشاطِ التدفقِ (R4)');
+            throw new \RuntimeException('FIN-CF-422: قائمة التدفقات لا تتوازن مع تغير النقدية الفعلي — '
+                . 'المحسوب ' . number_format($netChange, 2) . ' والفعلي ' . number_format($actual, 2)
+                . ' والفرق ' . number_format($diff, 2) . ' · تراجع تصنيفات نشاط التدفق (R4)');
         }
 
         $idem = 'cfs:' . $period;
@@ -494,7 +494,7 @@ class FinAnalysisService
             $rows[] = array($code, $name, $opening, $add, $ded, 0.0, $closing, $computed, $ok);
         }
         if ($bad) {
-            throw new \RuntimeException('FIN-EQ-422: بندٌ لا يتوازن — الختاميُّ ≠ الافتتاحيُّ + الحركاتُ في: '
+            throw new \RuntimeException('FIN-EQ-422: بند لا يتوازن — الختامي ≠ الافتتاحي + الحركات في: '
                 . implode(' · ', $bad));
         }
 

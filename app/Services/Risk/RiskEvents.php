@@ -121,12 +121,12 @@ class RiskEvents
         $userId = (int) $userId > 0 ? (int) $userId : self::SYSTEM_ACTOR;
         if (!isset(self::MAP[$eventName])) {
             // حدثٌ خارجَ القاموسِ خطأُ برمجةٍ لا حالةُ بيانات — يُرمى ليُصلَح بناءً.
-            throw new \RuntimeException('RSK-500: حدثٌ خارجَ قاموسِ M-16: ' . $eventName);
+            throw new \RuntimeException('RSK-500: حدث خارج قاموس M-16: ' . $eventName);
         }
         list($key, $category, $entityType) = self::MAP[$eventName];
         $entityId = (int) $entityId;
         if ($entityId <= 0) {
-            throw new \RuntimeException('RSK-500: الحدثُ ' . $eventName . ' بلا معرّفِ كيان');
+            throw new \RuntimeException('RSK-500: الحدث ' . $eventName . ' بلا معرف كيان');
         }
         $idem = null;
         if ($idemSuffix !== '') {

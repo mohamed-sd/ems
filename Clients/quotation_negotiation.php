@@ -29,8 +29,8 @@ $uid = intval($_SESSION['user']['id'] ?? 0);
 $msg = '';
 
 $KINDS = array('issued' => 'صدور العرض', 'sent' => 'إرسال للعميل',
-               'client_counter' => 'ردٌّ مضادٌّ من العميل', 'revised' => 'نسخةٌ منقَّحة',
-               'accepted' => 'قبولُ العميل', 'rejected' => 'رفضُ العميل', 'expired' => 'انتهاءُ السريان');
+               'client_counter' => 'رد مضاد من العميل', 'revised' => 'نسخة منقحة',
+               'accepted' => 'قبول العميل', 'rejected' => 'رفض العميل', 'expired' => 'انتهاء السريان');
 $PARTY = array('us' => 'نحن', 'client' => 'العميل');
 
 $__pcLog = ems_post_contract($conn, array(
@@ -45,10 +45,10 @@ $__pcLog = ems_post_contract($conn, array(
         $k = (string) ($in['event_kind'] ?? '');
         $p = (string) ($in['party'] ?? '');
         $n = trim((string) ($in['note'] ?? ''));
-        if ($q <= 0) { return array('ok' => false, 'msg' => 'لا واقعةَ تفاوضٍ بلا عرض (422)'); }
-        if (!isset($KINDS[$k])) { return array('ok' => false, 'msg' => 'نوعُ الواقعةِ محكومٌ من قائمةٍ مغلقة (422)'); }
-        if (!isset($PARTY[$p])) { return array('ok' => false, 'msg' => 'الطرفُ: نحن أو العميل (422)'); }
-        if (mb_strlen($n) < 8) { return array('ok' => false, 'msg' => 'لا واقعةَ تفاوضٍ بلا نصٍّ يشرحها (422)'); }
+        if ($q <= 0) { return array('ok' => false, 'msg' => 'لا واقعة تفاوض بلا عرض (422)'); }
+        if (!isset($KINDS[$k])) { return array('ok' => false, 'msg' => 'نوع الواقعة محكوم من قائمة مغلقة (422)'); }
+        if (!isset($PARTY[$p])) { return array('ok' => false, 'msg' => 'الطرف: نحن أو العميل (422)'); }
+        if (mb_strlen($n) < 8) { return array('ok' => false, 'msg' => 'لا واقعة تفاوض بلا نص يشرحها (422)'); }
         return array('ok' => true, 'data' => array(
             'quotation_id' => $q, 'event_kind' => $k, 'party' => $p, 'note' => $n,
             'doc_ref' => (string) ($in['doc_ref'] ?? ''),
@@ -72,7 +72,7 @@ try {
         'orderBy' => '`quotation_id` DESC, `revision_no` DESC', 'limit' => 300));
     $quotes = $gate->select('quotations', array('columns' => array('id'),
         'orderBy' => '`id` DESC', 'limit' => 120));
-} catch (\Throwable $e) { $queueFail = 'تعذّر قراءةُ السجل: ' . $e->getMessage(); }
+} catch (\Throwable $e) { $queueFail = 'تعذر قراءة السجل: ' . $e->getMessage(); }
 
 $page_title = 'التفاوض ومراجعات العرض';
 require_once __DIR__ . '/../includes/screen_contract.php';
@@ -93,11 +93,11 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
   $header_actions = array(array('raw' => trim((string) ob_get_clean())));
   $header_back = false;
   include __DIR__ . '/../includes/page_header.php';
-  echo ems_states_bundle('لا واقعةَ تفاوضٍ مسجَّلةٌ بعد',
-      'كلُّ نسخةٍ ووقائعِ تغييرِها تُسجَّل بنصِّها ومرجعِها — فالسجلُّ يُقرأ بعدَ سنةٍ ويُفهم');
+  echo ems_states_bundle('لا واقعة تفاوض مسجلة بعد',
+      'كل نسخة ووقائع تغييرها تسجل بنصها ومرجعها — فالسجل يقرأ بعد سنة ويفهم');
   ?>
-  <p class="text-muted">الورقة ٠٩ · سجلُّ نسخِ العرضِ ووقائعِ التفاوض —
-     <strong>لا واقعةَ بلا نصٍّ يشرحها</strong>، ونوعُها محكومٌ من قائمةٍ مغلقة.</p>
+  <p class="text-muted">الورقة ٠٩ · سجل نسخ العرض ووقائع التفاوض —
+     <strong>لا واقعة بلا نص يشرحها</strong>، ونوعها محكوم من قائمة مغلقة.</p>
   <?php if ($msg !== ''): ?>
     <div class="alert <?= (mb_strpos($msg, '✅') !== false ? 'alert-success' : 'alert-danger') ?>">
       <?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div>
@@ -110,7 +110,7 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
     <?php echo csrf_field(); ?>
     <div class="col-auto"><label class="form-label" for="qn_q">العرض</label>
       <select class="form-control form-control-sm" name="quotation_id" id="qn_q" required>
-        <option value="">— رأسُ العرض —</option>
+        <option value="">— رأس العرض —</option>
         <?php foreach ($quotes as $q): ?><option value="<?= (int) $q['id'] ?>">#<?= (int) $q['id'] ?></option><?php endforeach; ?>
       </select></div>
     <div class="col-auto"><label class="form-label" for="qn_k">نوع الواقعة</label>
@@ -138,13 +138,13 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
   <table class="table table-striped" data-no-dt>
     <thead><tr>
       <th>العرض</th><th>النسخة</th><th>الواقعة</th><th>الطرف</th><th>النص</th>
-      <th>قبل</th><th>بعد</th><th>السريان</th><th>سجّلها</th>
+      <th>قبل</th><th>بعد</th><th>السريان</th><th>سجلها</th>
       <th class="ems-gov-th none" data-gov="entity" data-slice="1">الكيان</th>
       <th class="ems-gov-th none" data-gov="idem_key" data-slice="2">مفتاح منع التكرار</th>
     </tr></thead>
     <tbody>
     <?php if (empty($rows)): ?>
-      <tr><td colspan="9" class="text-center text-muted">لا واقعةَ تفاوضٍ مسجَّلةٌ بعد</td></tr>
+      <tr><td colspan="9" class="text-center text-muted">لا واقعة تفاوض مسجلة بعد</td></tr>
     <?php endif; ?>
     <?php foreach ($rows as $r): ?>
       <tr>

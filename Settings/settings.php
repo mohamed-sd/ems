@@ -255,7 +255,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back    = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا أقسامَ إعداداتٍ متاحةً لصلاحيتِك الحالية', 'راجع مديرَ الصلاحياتِ لمنحِ الأقسامِ التي يلزمها عملُك');
+    echo ems_states_bundle('لا أقسام إعدادات متاحة لصلاحيتك الحالية', 'راجع مدير الصلاحيات لمنح الأقسام التي يلزمها عملك');
     ?>
 
     <div class="settings-shell">

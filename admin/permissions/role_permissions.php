@@ -47,13 +47,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         !empty($_POST['sod_compensating'])
                     );
                     if (is_array($__r) && empty($__r['ok'])) {
-                        $sod_conflict = (string) ($__r['message'] ?? 'تعارضُ فصلِ واجباتٍ يمنع هذا المنح');
+                        $sod_conflict = (string) ($__r['message'] ?? 'تعارض فصل واجبات يمنع هذا المنح');
                     }
                 }
             } catch (\Throwable $__se) {
                 // فشلُ الفاحصِ لا يمنح ولا يمنع صامتًا — يُسجَّل ويُعلَن للمشغّل.
                 ems_catch_ignored($__se, __FILE__,
-                    'تعذّر فحصُ فصلِ الواجبات — المنحُ يستمرُّ والفحصُ يُعاد في مراجعةِ الدورة');
+                    'تعذر فحص فصل الواجبات — المنح يستمر والفحص يعاد في مراجعة الدورة');
             }
         }
     }
@@ -748,7 +748,7 @@ require_once __DIR__ . '/../includes/layout_head.php';
                 <?php endif; ?>
             <?php else: ?>
                 <div class="empty-state alert-custom" style="background: linear-gradient(135deg, #e0f2fe 0%, #dcf0ff 100%); color: var(--blue); border-right-color: var(--blue);">
-                    <i class="fas fa-arrow-left"></i> اختر دوراً من القائمة لعرض الصفحات والصلاحيات
+                    <i class="fas fa-arrow-left"></i> اختر دورا من القائمة لعرض الصفحات والصلاحيات
                 </div>
             <?php endif; ?>
         </div>

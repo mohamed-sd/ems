@@ -44,7 +44,7 @@ class FileReader
             $messages = [
                 UPLOAD_ERR_INI_SIZE   => 'حجم الملف يتجاوز الحد المسموح في الخادم',
                 UPLOAD_ERR_FORM_SIZE  => 'حجم الملف يتجاوز الحد المسموح',
-                UPLOAD_ERR_PARTIAL    => 'تم رفع الملف جزئياً فقط',
+                UPLOAD_ERR_PARTIAL    => 'تم رفع الملف جزئيا فقط',
                 UPLOAD_ERR_NO_FILE    => 'لم يتم اختيار ملف',
                 UPLOAD_ERR_NO_TMP_DIR => 'مجلد الملفات المؤقتة غير موجود',
                 UPLOAD_ERR_CANT_WRITE => 'فشل حفظ الملف المؤقت',
@@ -119,7 +119,7 @@ class FileReader
     private static function readSpreadsheet(string $path, int $maxRows): array
     {
         if (!class_exists('ZipArchive')) {
-            throw new \RuntimeException('قراءة ملفات Excel تتطلب تفعيل إضافة php_zip. استخدم CSV مؤقتاً.');
+            throw new \RuntimeException('قراءة ملفات Excel تتطلب تفعيل إضافة php_zip. استخدم CSV مؤقتا.');
         }
         if (!class_exists(\PhpOffice\PhpSpreadsheet\IOFactory::class)) {
             throw new \RuntimeException('مكتبة PhpSpreadsheet غير متوفرة.');

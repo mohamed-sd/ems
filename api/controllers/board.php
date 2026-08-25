@@ -255,7 +255,7 @@ function board_index(): void
             'operators'         => $total_operators,
         ],
         'suppliers' => $suppliers_out,
-    ], 'تم جلب اللوحة الحيّة');
+    ], 'تم جلب اللوحة الحية');
 }
 
 /** قراءة قيمة عددية مفردة (مكافئ dashboard_scalar في map_page.php). */

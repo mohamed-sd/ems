@@ -137,16 +137,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back    = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا انتقالاتِ دورةٍ مسجَّلةً بعدُ ليُقاسَ زمنُها', 'افتحْ «بوابة المالية» من رأسِ الشاشةِ وسيِّرْ طلبًا ليبدأ سجلُّ الانتقالاتِ بالتراكم');
+    echo ems_states_bundle('لا انتقالات دورة مسجلة بعد ليقاس زمنها', 'افتح «بوابة المالية» من رأس الشاشة وسير طلبا ليبدأ سجل الانتقالات بالتراكم');
     ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <div class="stats-grid fcb-mb14">
-        <div class="stat-card"><div class="stat-label">الالتزام بـSLA (النشط الآن)</div>
+        <div class="stat-card"><div class="stat-label">الالتزام بSLA (النشط الآن)</div>
             <div class="stat-value<?php echo $compliance < 80 ? ' fcb-danger' : ''; ?>"><?php echo $compliance; ?>%</div></div>
         <div class="stat-card"><div class="stat-label">ضمن المدة / متجاوز</div>
             <div class="stat-value"><?php echo $on_time; ?> / <span class="fcb-danger"><?php echo $overdue; ?></span></div></div>
-        <div class="stat-card"><div class="stat-label">تصعيداتٌ مفتوحة</div>
+        <div class="stat-card"><div class="stat-label">تصعيدات مفتوحة</div>
             <div class="stat-value"><?php echo count($escalated); ?></div></div>
         <div class="stat-card"><div class="stat-label">أعلى اختناق</div>
             <div class="stat-value fcb-stat-sm"><?php echo $bottleneck !== null ? htmlspecialchars($stage_labels[$bottleneck] ?? $bottleneck) : '—'; ?></div></div>
@@ -158,19 +158,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="stats-grid">
                 <div class="stat-card"><div class="stat-label">⑥ زمن الدورة (إنشاء←إقفال) — متوسط</div>
                     <div class="stat-value"><?php echo $cycle_avg !== null ? $cycle_avg . ' <small>ساعة</small>' : '—'; ?></div>
-                    <?php if ($cycle_min !== null): ?><div class="fcb-note">أسرع <?php echo $cycle_min; ?> · أبطأ <?php echo $cycle_max; ?> ساعة (<?php echo count($cycle_hours); ?> مقفلًا)</div><?php endif; ?>
+                    <?php if ($cycle_min !== null): ?><div class="fcb-note">أسرع <?php echo $cycle_min; ?> · أبطأ <?php echo $cycle_max; ?> ساعة (<?php echo count($cycle_hours); ?> مقفلا)</div><?php endif; ?>
                 </div>
                 <div class="stat-card"><div class="stat-label">⑦ نسبة الإعادة (من السجل)</div>
                     <div class="stat-value<?php echo $return_pct > 20 ? ' fcb-warn' : ''; ?>"><?php echo $return_pct; ?>%</div>
-                    <div class="fcb-note"><?php echo $returned_n; ?> أُعيد من <?php echo $submitted_n; ?> مُرسَل</div>
+                    <div class="fcb-note"><?php echo $returned_n; ?> أعيد من <?php echo $submitted_n; ?> مرسل</div>
                 </div>
                 <div class="stat-card"><div class="stat-label">⑦ نسبة الرفض (من السجل)</div>
                     <div class="stat-value<?php echo $reject_pct > 15 ? ' fcb-danger' : ''; ?>"><?php echo $reject_pct; ?>%</div>
-                    <div class="fcb-note"><?php echo $rejected_n; ?> رُفض من <?php echo $submitted_n; ?> مُرسَل</div>
+                    <div class="fcb-note"><?php echo $rejected_n; ?> رفض من <?php echo $submitted_n; ?> مرسل</div>
                 </div>
                 <div class="stat-card"><div class="stat-label">⑧ اكتمال المستندات من أول إرسال</div>
                     <div class="stat-value fcb-ok"><?php echo $docs_complete_pct; ?>%</div>
-                    <div class="fcb-note">البوابة تمنع الإرسال الناقص بنيويًا (§3.1)<?php echo $rej_docs > 0 ? ' · ' . $rej_docs . ' رُفض لنقص مستند' : ''; ?></div>
+                    <div class="fcb-note">البوابة تمنع الإرسال الناقص بنيويا (§3.1)<?php echo $rej_docs > 0 ? ' · ' . $rej_docs . ' رفض لنقص مستند' : ''; ?></div>
                 </div>
             </div>
         </div>
@@ -194,7 +194,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <?php endforeach; ?>
                 </tbody>
             </table>
-            <?php else: ?>لا انتقالاتٍ مكتملةً بعد — تتراكم البيانات مع استعمال الدورة<?php endif; ?>
+            <?php else: ?>لا انتقالات مكتملة بعد — تتراكم البيانات مع استعمال الدورة<?php endif; ?>
         </div>
     </div>
 
@@ -214,12 +214,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="ems-fn-th" data-fn="1">المستهدف</th>
               <th class="ems-fn-th" data-fn="1">الانحراف</th>
               <th class="ems-fn-th" data-fn="1">أطول حلقة</th>
-              <th class="ems-fn-th" data-fn="1">المعتمِد الأبطأ</th>
+              <th class="ems-fn-th" data-fn="1">المعتمد الأبطأ</th>
               <th class="ems-fn-th" data-fn="1">عدد المتجاوز للمهلة</th>
               <th class="ems-fn-th" data-fn="1">نسبة الالتزام</th>
               <th class="ems-fn-th" data-fn="1">الإجراء</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
               <th class="ems-gov-th" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
               </tr></thead>
@@ -245,7 +245,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="card-header"><h5><i class="fa fa-gavel"></i> قائمة المساءلة الأسبوعية — المستوى ④ (§8.2)</h5></div>
         <div class="card-body">
             <?php if ($level3): ?>
-                <p class="fcb-lead">كل ما بلغ المستوى الثالث يخضع لمراجعةٍ أسبوعيةٍ إلزامية (المدير المالي + مدير الإدارة المعنية):</p>
+                <p class="fcb-lead">كل ما بلغ المستوى الثالث يخضع لمراجعة أسبوعية إلزامية (المدير المالي + مدير الإدارة المعنية):</p>
                 <?php foreach ($level3 as $e): ?>
                     <div class="fcb-row">
                         ⚖️ <strong><?php echo htmlspecialchars($e['request_no']); ?></strong>
@@ -265,7 +265,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <?php foreach ($exc_breaches as $b): ?>
                 <div class="fcb-row">
                     🚨 <strong><?php echo htmlspecialchars($b['request_no']); ?></strong>
-                    — استثناءٌ معتمدٌ لم تُستكمل دورته رجعيًّا خلال 72 ساعة · <?php echo finreq_state_badge($b['state']); ?>
+                    — استثناء معتمد لم تستكمل دورته رجعيا خلال 72 ساعة · <?php echo finreq_state_badge($b['state']); ?>
                     <a href="request_form.php?id=<?php echo intval($b['id']); ?>" class="fcb-link">فتح ↗</a>
                 </div>
             <?php endforeach; ?>

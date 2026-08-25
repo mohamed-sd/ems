@@ -33,7 +33,7 @@ $uid = intval($_SESSION['user']['id'] ?? 0);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($can_add || $can_edit)) {
     $act = (string) ($_POST['action'] ?? '');
-    $msg = '⚠ لم يُنفَّذ';
+    $msg = '⚠ لم ينفذ';
     if ($act === 'exit' && $can_add) {
         $r = ALS::exitAsset($gate, array(
             'equipment_id'    => intval($_POST['equipment_id'] ?? 0),
@@ -46,10 +46,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($can_add || $can_edit)) {
             'doc_ref'         => trim($_POST['doc_ref'] ?? ''),
             'decided_by'      => $uid,
         ));
-        $msg = $r['ok'] ? '✅ سُجِّلت واقعةُ الخروج' : ('❌ ' . $r['reason']);
+        $msg = $r['ok'] ? '✅ سجلت واقعة الخروج' : ('❌ ' . $r['reason']);
     } elseif ($act === 'return' && $can_edit) {
         $r = ALS::returnAsset($gate, intval($_POST['exit_id'] ?? 0), trim($_POST['actual_return'] ?? ''), $uid);
-        $msg = $r['ok'] ? '✅ سُجِّلت العودة' : ('❌ ' . $r['reason'] . ($r['reason_code'] !== '' ? ' [' . $r['reason_code'] . ']' : ''));
+        $msg = $r['ok'] ? '✅ سجلت العودة' : ('❌ ' . $r['reason'] . ($r['reason_code'] !== '' ? ' [' . $r['reason_code'] . ']' : ''));
     }
     ems_gov_flash_redirect('asset_exit.php', $msg, 'GOV-OK-200', ''); exit();
 }
@@ -68,7 +68,7 @@ include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main ems-unified-page-shell">
-    <?php $header_title = 'خروج الأصل — المؤقّت يعود والدائم لا'; $header_icon = 'fa fa-right-from-bracket'; $header_actions = array();
+    <?php $header_title = 'خروج الأصل — المؤقت يعود والدائم لا'; $header_icon = 'fa fa-right-from-bracket'; $header_actions = array();
     if ($can_add) { $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'واقعة خروج'); }
     $header_back = array('href' => 'asset_assignments.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'الإسناد والحركة');
     include('../includes/page_header.php'); ?>
@@ -76,7 +76,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="success-message <?= $ok ? 'is-success' : 'is-error' ?>"><i class="fas <?= $ok ? 'fa-check-circle' : 'fa-exclamation-circle' ?>"></i> <?= htmlspecialchars($_GET['msg']) ?></div>
     <?php endif; ?>
     <?php require_once __DIR__ . '/../includes/ux_components.php';
-    echo ems_states_bundle('لا وقائعَ خروجٍ مسجَّلةً بعدُ', 'سجّلْ أوّلَ واقعةٍ بزرِّ «واقعة خروج» في رأسِ الشاشة'); ?>
+    echo ems_states_bundle('لا وقائع خروج مسجلة بعد', 'سجل أول واقعة بزر «واقعة خروج» في رأس الشاشة'); ?>
 
     <form id="xForm" action="" method="post" class="allforms">
         <?= csrf_field() ?>
@@ -87,11 +87,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <option value="">—</option><?php foreach ($equip as $eid => $en): ?><option value="<?= (int) $eid ?>"><?= htmlspecialchars($en) ?></option><?php endforeach; ?>
             </select></div>
             <div class="field"><label for="w5_x_k">نوع الخروج</label><select name="exit_kind" id="w5_x_k">
-                <option value="temporary">مؤقّت</option><option value="permanent">دائم</option>
+                <option value="temporary">مؤقت</option><option value="permanent">دائم</option>
             </select></div>
             <div class="field"><label for="w5_x_r">سبب الخروج</label><input type="text" name="reason_code" id="w5_x_r" required></div>
             <div class="field"><label for="w5_x_d">تاريخ الخروج</label><input type="date" name="exit_date" id="w5_x_d" required></div>
-            <div class="field"><label for="w5_x_e">العودة المتوقَّعة (للمؤقّت)</label><input type="date" name="expected_return" id="w5_x_e"></div>
+            <div class="field"><label for="w5_x_e">العودة المتوقعة (للمؤقت)</label><input type="date" name="expected_return" id="w5_x_e"></div>
             <div class="field"><label for="w5_x_p">نوع الاستبعاد (للدائم)</label><input type="text" name="disposal_kind" id="w5_x_p"></div>
             <div class="field"><label for="w5_x_f">المرجع المالي (للدائم)</label><input type="text" name="finance_ref" id="w5_x_f"></div>
             <div class="field"><label for="w5_x_o">مرجع المستند</label><input type="text" name="doc_ref" id="w5_x_o"></div>
@@ -101,7 +101,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="table-wrap"><table class="data-table">
         <thead><tr><th>إجراءات</th><th>الأصل</th><th>النوع</th><th>السبب</th><th>تاريخ الخروج</th>
-            <th>العودة المتوقَّعة</th><th>العودة الفعلية</th><th>الحالة</th><th>المرجع المالي</th></tr></thead>
+            <th>العودة المتوقعة</th><th>العودة الفعلية</th><th>الحالة</th><th>المرجع المالي</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>
             <tr>
@@ -111,7 +111,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <?php endif; ?>
                 </div></td>
                 <td><?= htmlspecialchars(isset($equip[(int) $r['equipment_id']]) ? $equip[(int) $r['equipment_id']] : ('#' . (int) $r['equipment_id'])) ?></td>
-                <td><?= $r['exit_kind'] === 'permanent' ? 'دائم' : 'مؤقّت' ?></td>
+                <td><?= $r['exit_kind'] === 'permanent' ? 'دائم' : 'مؤقت' ?></td>
                 <td><?= htmlspecialchars((string) $r['reason_code']) ?></td>
                 <td><?= htmlspecialchars((string) $r['exit_date']) ?></td>
                 <td><?= htmlspecialchars((string) ($r['expected_return'] ?? '—')) ?></td>
@@ -120,14 +120,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= htmlspecialchars((string) $r['finance_ref']) ?></td>
             </tr>
         <?php endforeach; else: ?>
-            <tr><td colspan="9">لا وقائعَ خروجٍ بعدُ.</td></tr>
+            <tr><td colspan="9">لا وقائع خروج بعد.</td></tr>
         <?php endif; ?>
         </tbody></table></div>
 
     <form id="rForm" action="" method="post" class="allforms">
         <?= csrf_field() ?>
         <input type="hidden" name="action" value="return"><input type="hidden" name="exit_id" value="0">
-        <div class="card-header"><h5><i class="fas fa-rotate-left"></i> تسجيل عودة من خروجٍ مؤقّت</h5></div>
+        <div class="card-header"><h5><i class="fas fa-rotate-left"></i> تسجيل عودة من خروج مؤقت</h5></div>
         <div class="ems-form-grid">
             <div class="field"><label for="w5_r_d">تاريخ العودة الفعلي</label><input type="date" name="actual_return" id="w5_r_d" required></div>
         </div>

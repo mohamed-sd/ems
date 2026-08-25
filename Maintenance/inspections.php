@@ -34,7 +34,7 @@ $can_gen_order = $is_super_admin ? true : (bool) $orders_permissions['can_add'];
 // ── الحالات وقوائم القيم ───────────────────────────────────────────────
 $states     = array('جديد', 'مجدول', 'قيد التنفيذ', 'مكتمل', 'مغلق');
 $conditions = array('ممتازة', 'جيدة', 'متوسطة', 'ضعيفة', 'حرجة');
-$readiness  = array('جاهزة', 'جاهزة بتحفّظ', 'غير جاهزة');
+$readiness  = array('جاهزة', 'جاهزة بتحفظ', 'غير جاهزة');
 
 // رموز حالة البند حسب مخطّط الاستمارة (condition_scale)
 $SCALES = array(
@@ -206,7 +206,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'conve
     if (!$line) { ems_gov_flash_redirect('inspections.php', 'البند غير موجود ❌', 'GOV-REF-404', ''); exit(); }
     if (!empty($line['converted_ticket_id'])) {
         ems_gov_redirect("Location: inspections.php?open=" . intval($line['inspection_id'])
-             . "&msg=" . rawurlencode('الملاحظةُ محوَّلةٌ سلفًا إلى البلاغ #' . $line['converted_ticket_id'] . ' — لا تحويلَ مرتين ❌'));
+             . "&msg=" . rawurlencode('الملاحظة محولة سلفا إلى البلاغ #' . $line['converted_ticket_id'] . ' — لا تحويل مرتين ❌'));
         exit();
     }
     $insp = ems_tenant_db()->selectOne('mnt_inspection', array('where' => array('id' => intval($line['inspection_id']))));
@@ -215,8 +215,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'conve
     $tt = $conn->query("SELECT id, owner_role_id, default_nature FROM ticket_types
                          WHERE active=1 ORDER BY (owner_role_id=13) DESC, id ASC LIMIT 1");
     $type = $tt ? $tt->fetch_assoc() : null;
-    if (!$type) { ems_gov_flash_redirect('inspections.php', 'لا نوعَ بلاغٍ فعّالًا — أنشئه أولًا ❌', 'GOV-FAIL-409', ''); exit(); }
-    $complaint = 'ملاحظةُ تفتيشٍ محوَّلة (NoteConverted): ' . strval($line['component'] ?? '')
+    if (!$type) { ems_gov_flash_redirect('inspections.php', 'لا نوع بلاغ فعالا — أنشئه أولا ❌', 'GOV-FAIL-409', ''); exit(); }
+    $complaint = 'ملاحظة تفتيش محولة (NoteConverted): ' . strval($line['component'] ?? '')
                . ' — ' . strval($line['note'] ?? '') . ' · التوصية: ' . strval($line['recommendation'] ?? '');
     $new_tid = 0;
     // الرقم قبل المعاملة — تخصيصه بداخلها يجعل الارتداد يتراجع بالعدّاد.
@@ -238,12 +238,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'conve
         $g->insert('ticket_events', array(
             'ticket_id' => $new_tid, 'event_type' => 'system',
             'actor_user_id' => intval($current_user_id), 'actor_role_id' => intval($current_role),
-            'body' => 'NoteConverted — بلاغٌ مولَّدٌ من ملاحظة تفتيش (M-34)', 'new_value' => 'routed'));
+            'body' => 'NoteConverted — بلاغ مولد من ملاحظة تفتيش (M-34)', 'new_value' => 'routed'));
         $g->update('mnt_inspection_line', array('converted_ticket_id' => $new_tid),
             array('id' => intval($line['id'])));
     }, 'convert inspection note to ticket');
     ems_gov_redirect("Location: inspections.php?open=" . intval($line['inspection_id'])
-         . "&msg=" . rawurlencode('حُوّلت الملاحظةُ بلاغًا #' . $new_tid . ' — والخيطُ موصولٌ بالاتجاهين ✅'));
+         . "&msg=" . rawurlencode('حولت الملاحظة بلاغا #' . $new_tid . ' — والخيط موصول بالاتجاهين ✅'));
     exit();
 }
 
@@ -368,13 +368,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'gener
 
     // حرس ١: التفتيش مكتملٌ أو مغلق (لا أمرَ من استمارةٍ لم تُنجَز).
     if (!in_array((string) $ins_g['state'], array('مكتمل', 'مغلق'), true)) {
-        header("Location: " . $back . urlencode('لا يُولَّد أمرٌ إلا من تفتيشٍ مكتمل ❌')); exit();
+        header("Location: " . $back . urlencode('لا يولد أمر إلا من تفتيش مكتمل ❌')); exit();
     }
 
     // حرس ٢: لا بدّ من معدةٍ فعلية — رؤوس المورّد/الخارجي (ما قبل الشراء/التعاقد) بلا معدة.
     $eq_id = !empty($ins_g['equipment_id']) ? intval($ins_g['equipment_id']) : 0;
     if ($eq_id <= 0) {
-        header("Location: " . $back . urlencode('هذا التفتيش بلا معدةٍ مسجّلة — لا يمكن توليد أمر صيانة ❌')); exit();
+        header("Location: " . $back . urlencode('هذا التفتيش بلا معدة مسجلة — لا يمكن توليد أمر صيانة ❌')); exit();
     }
 
     // حرس ٣: منعُ التكرار — أمرٌ نشطٌ لنفس التفتيش يمنع توليدَ ثانٍ (ويُسمح بعد إغلاقه).
@@ -382,7 +382,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'gener
         'where'    => array('inspection_id' => $iid),
         'whereRaw' => "state NOT IN ('إغلاق', 'ملغى')"));
     if ($dup > 0) {
-        header("Location: " . $back . urlencode('لهذا التفتيش أمرُ صيانةٍ نشطٌ سلفًا — أغلِقه أولًا ❌')); exit();
+        header("Location: " . $back . urlencode('لهذا التفتيش أمر صيانة نشط سلفا — أغلقه أولا ❌')); exit();
     }
 
     // البنودُ الحرجة: شرطُ التوليد ومصدرُ نصّ التشخيص معًا (قراءةٌ واحدة).
@@ -400,7 +400,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'gener
         $crit_txt[] = $piece;
     }
     if (empty($crit_txt)) {
-        header("Location: " . $back . urlencode('لا بنودَ حرجةً في هذا التفتيش — لا حاجةَ لأمر صيانة ❌')); exit();
+        header("Location: " . $back . urlencode('لا بنود حرجة في هذا التفتيش — لا حاجة لأمر صيانة ❌')); exit();
     }
 
     $diagnosis = 'من تفتيش ' . (string) $ins_g['code'] . ': ' . implode('؛ ', $crit_txt);
@@ -506,7 +506,7 @@ function mnt_seg_kind($c) {
 <div class="main mnt-inspections-main ems-unified-page-shell">
 
     <?php // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ)
-    echo ems_states_bundle('لا فحوصَ دوريةً مسجَّلةً في نطاقك', 'أنشئ تفتيشًا جديدًا أو عدِّل تصفيةَ الحالة'); ?>
+    echo ems_states_bundle('لا فحوص دورية مسجلة في نطاقك', 'أنشئ تفتيشا جديدا أو عدل تصفية الحالة'); ?>
 
     <?php if (!empty($_GET['msg'])):
         $isSuccess = strpos($_GET['msg'], '✅') !== false; ?>
@@ -564,10 +564,10 @@ function mnt_seg_kind($c) {
         // فورمٌ مصغَّرٌ داخل رأس الصفحة (رمزُ CSRF يُحقن مركزيًّا — لا يُضاف يدويًّا).
         $header_actions[] = array('raw' =>
             '<form method="post" action="" class="mnt-inline-form" '
-            . 'onsubmit="return confirm(\'توليد أمر صيانة من هذا التفتيش (' . $cnt_crit . ' بندًا حرجًا)؟\');">' . csrf_field() . ''
+            . 'onsubmit="return confirm(\'توليد أمر صيانة من هذا التفتيش (' . $cnt_crit . ' بندا حرجا)؟\');">' . csrf_field() . ''
             . '<input type="hidden" name="action" value="generate_order">'
             . '<input type="hidden" name="inspection_id" value="' . intval($ins['id']) . '">'
-            . '<button type="submit" class="add-btn" title="ينشئ أمر صيانةٍ معبَّأً بالمعدة والمشروع والبنود الحرجة">'
+            . '<button type="submit" class="add-btn" title="ينشئ أمر صيانة معبأ بالمعدة والمشروع والبنود الحرجة">'
             . '<i class="fas fa-wrench"></i> توليد أمر صيانة</button></form>');
     } elseif ($ins_order) {
         $header_actions[] = array('tag' => 'a', 'href' => 'orders.php?id=' . intval($ins_order['id']),
@@ -602,13 +602,13 @@ function mnt_seg_kind($c) {
                     </select>
                 </div>
                 <div class="form-group"><label for="emsf_282_33223">المعدة</label>
-                    <select name="equipment_id" class="mnt-eq" id="emsf_282_33223" data-selected="<?php echo intval($ins['equipment_id']); ?>"><option value="">— اختر المشروع أولاً —</option>
+                    <select name="equipment_id" class="mnt-eq" id="emsf_282_33223" data-selected="<?php echo intval($ins['equipment_id']); ?>"><option value="">— اختر المشروع أولا —</option>
                         <?php foreach ($equipments as $e) echo mnt_opt($e['id'], $e['name'] . (!empty($e['code']) ? ' (' . $e['code'] . ')' : ''), intval($ins['equipment_id']) === intval($e['id'])); ?>
                     </select>
                 </div>
                 <?php elseif ($header_type === 'supplier'): ?>
-                <div class="form-group"><label for="emsf_283_f42ad">المورّد</label>
-                    <select name="supplier_id" id="emsf_283_f42ad"><option value="">— اختر المورّد —</option>
+                <div class="form-group"><label for="emsf_283_f42ad">المورد</label>
+                    <select name="supplier_id" id="emsf_283_f42ad"><option value="">— اختر المورد —</option>
                         <?php foreach ($suppliers as $sp) echo mnt_opt($sp['id'], $sp['name'], intval($ins['supplier_id']) === intval($sp['id'])); ?>
                     </select>
                 </div>
@@ -631,7 +631,7 @@ function mnt_seg_kind($c) {
                 <div class="form-group"><label for="emsf_287_047a0">تاريخ التفتيش</label>
                     <input type="date" name="scheduled_date" id="emsf_287_047a0" value="<?php echo htmlspecialchars((string) $ins['scheduled_date']); ?>">
                 </div>
-                <div class="form-group"><label for="scoreReadout">الدرجة (تُحسب تلقائيًا)</label>
+                <div class="form-group"><label for="scoreReadout">الدرجة (تحسب تلقائيا)</label>
                     <input type="text" id="scoreReadout" value="<?php echo $cnt_app > 0 ? $cnt_score . '%' : '—'; ?>" readonly>
                 </div>
                 <div class="form-group"><label for="emsf_288_e0dcd">الجاهزية الفنية</label>
@@ -642,12 +642,12 @@ function mnt_seg_kind($c) {
                 <div class="form-group"><label for="emsf_289_f702c">النتيجة العامة</label>
                     <input type="text" name="overall_result" id="emsf_289_f702c" value="<?php echo htmlspecialchars((string) $ins['overall_result']); ?>">
                 </div>
-                <div class="form-group"><label for="emsf_290_56253">حالة المعدة (تُكتب للكرت عند الإكمال)</label>
+                <div class="form-group"><label for="emsf_290_56253">حالة المعدة (تكتب للكرت عند الإكمال)</label>
                     <select name="equipment_condition" id="emsf_290_56253"><option value="">-- اختر --</option>
                         <?php foreach ($conditions as $c) echo mnt_opt($c, $c, $ins['equipment_condition'] === $c); ?>
                     </select>
                 </div>
-                <div class="form-group"><label for="emsf_291_9ca88">حالة المحرك (تُكتب للكرت عند الإكمال)</label>
+                <div class="form-group"><label for="emsf_291_9ca88">حالة المحرك (تكتب للكرت عند الإكمال)</label>
                     <select name="engine_condition" id="emsf_291_9ca88"><option value="">-- اختر --</option>
                         <?php foreach ($conditions as $c) echo mnt_opt($c, $c, $ins['engine_condition'] === $c); ?>
                     </select>
@@ -755,13 +755,13 @@ function mnt_seg_kind($c) {
                                     <?php // M-34: تحويلُ الملاحظة بلاغًا بنقرة — والمحوَّلُ يعرض بلاغَه (الخيطُ بالاتجاهين)
                                     if (!empty($l['converted_ticket_id'])): ?>
                                         <a class="badge badge-success" href="../Tickets/ticket_form.php?id=<?php echo intval($l['converted_ticket_id']); ?>"
-                                           title="بلاغُ هذه الملاحظة"><i class="fas fa-tower-observation"></i> بلاغ #<?php echo intval($l['converted_ticket_id']); ?></a>
+                                           title="بلاغ هذه الملاحظة"><i class="fas fa-tower-observation"></i> بلاغ #<?php echo intval($l['converted_ticket_id']); ?></a>
                                     <?php elseif (trim((string)($l['note'] ?? '')) !== '' || trim((string)($l['recommendation'] ?? '')) !== ''): ?>
-                                        <form method="post" class="mnt-inline-form" onsubmit="return confirm('تحويلُ هذه الملاحظة بلاغًا؟')">
+                                        <form method="post" class="mnt-inline-form" onsubmit="return confirm('تحويل هذه الملاحظة بلاغا؟')">
         <?= csrf_field() ?>
                                             <input type="hidden" name="action" value="convert_note_ticket">
                                             <input type="hidden" name="line_id" value="<?php echo intval($l['id']); ?>">
-                                            <button type="submit" class="action-btn view" title="حوّلها بلاغًا (NoteConverted)"><i class="fas fa-tower-observation"></i></button>
+                                            <button type="submit" class="action-btn view" title="حولها بلاغا (NoteConverted)"><i class="fas fa-tower-observation"></i></button>
                                         </form>
                                     <?php endif; ?>
                                 <?php else:
@@ -833,10 +833,10 @@ function mnt_seg_kind($c) {
                     </select>
                 </div>
                 <div class="form-group hdr-equipment"><label for="emsf_295_6fbe0">المعدة</label>
-                    <select name="equipment_id" class="mnt-eq" data-selected="" id="emsf_295_6fbe0"><option value="">— اختر المشروع أولاً —</option></select>
+                    <select name="equipment_id" class="mnt-eq" data-selected="" id="emsf_295_6fbe0"><option value="">— اختر المشروع أولا —</option></select>
                 </div>
-                <div class="form-group hdr-supplier hdr-external mnt-hidden"><label for="emsf_296_3b5ac">المورّد / البائع</label>
-                    <select name="supplier_id" id="emsf_296_3b5ac"><option value="">— اختر المورّد —</option>
+                <div class="form-group hdr-supplier hdr-external mnt-hidden"><label for="emsf_296_3b5ac">المورد / البائع</label>
+                    <select name="supplier_id" id="emsf_296_3b5ac"><option value="">— اختر المورد —</option>
                         <?php foreach ($suppliers as $sp) echo mnt_opt($sp['id'], $sp['name'], false); ?>
                     </select>
                 </div>
@@ -874,7 +874,7 @@ function mnt_seg_kind($c) {
               <th class="ems-fn-th" data-fn="1">رقم التفتيش</th>
               <th class="ems-fn-th" data-fn="1">كود المعدة</th>
               <th class="ems-fn-th" data-fn="1">الموقع</th>
-              <th class="ems-fn-th" data-fn="1">قراءة العدّاد</th>
+              <th class="ems-fn-th" data-fn="1">قراءة العداد</th>
               <th class="ems-fn-th" data-fn="1">عدد البنود المفحوصة</th>
               <th class="ems-fn-th" data-fn="1">بنود سليمة</th>
               <th class="ems-fn-th" data-fn="1">بنود ملاحظة</th>
@@ -885,11 +885,11 @@ function mnt_seg_kind($c) {
               <th class="ems-fn-th" data-fn="1">الفني</th>
               <th class="ems-fn-th" data-fn="1">اعتمده</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
               <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-              <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
               <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               </tr></thead>
                 <tbody>
@@ -1147,7 +1147,7 @@ function mnt_seg_kind($c) {
             component: comp, condition_state: $('#xl_condition').val()||'',
             measured_value: $('#xl_measured').val()||'', note: $('#xl_note').val()||'', recommendation: $('#xl_rec').val()||'' });
         postLine(fd).then(function(res){
-            if(!res.success){ alert(res.message || 'تعذّر إضافة البند'); return; }
+            if(!res.success){ alert(res.message || 'تعذر إضافة البند'); return; }
             location.reload();
         }).catch(function(){ alert('خطأ في الاتصال'); });
     });
@@ -1158,7 +1158,7 @@ function mnt_seg_kind($c) {
         var iid = $('input[name=id]').val();
         var body = new URLSearchParams({ ajax:'1', action:'del_line', inspection_id: iid, line_id: lineId });
         postLine(body).then(function(res){
-            if(!res.success){ alert(res.message || 'تعذّر الحذف'); return; }
+            if(!res.success){ alert(res.message || 'تعذر الحذف'); return; }
             $btn.closest('tr').remove();
             $('#lineCount').text(res.count);
             recomputeSummary();
@@ -1197,8 +1197,8 @@ function mnt_seg_kind($c) {
         if (!$eq.length) return;
         var projectId = $proj.val();
         var current = $eq.val() || $eq.attr('data-selected') || '';
-        if (!projectId) { $eq.html('<option value="">— اختر المشروع أولاً —</option>'); return; }
-        $eq.html('<option value="">جارٍ التحميل…</option>');
+        if (!projectId) { $eq.html('<option value="">— اختر المشروع أولا —</option>'); return; }
+        $eq.html('<option value="">جار التحميل…</option>');
         var url = '/ems/Maintenance/get_project_equipment.php?mode=all&project_id=' + encodeURIComponent(projectId)
                 + (current ? '&include_id=' + encodeURIComponent(current) : '');
         fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
@@ -1214,7 +1214,7 @@ function mnt_seg_kind($c) {
                 });
                 $eq.html(opts);
             })
-            .catch(function(){ $eq.html('<option value="">تعذّر تحميل المعدات</option>'); });
+            .catch(function(){ $eq.html('<option value="">تعذر تحميل المعدات</option>'); });
     }
     $(document).on('change', '.mnt-proj', function(){ inspLoadProjectEquipment($(this)); });
     $('.mnt-proj').each(function(){ if ($(this).val()) inspLoadProjectEquipment($(this)); });

@@ -45,7 +45,7 @@ class TaxInvoiceService
         $claimId = (int) $claimId;
 
         $claim = self::claimOf($gate, $claimId);
-        if (!$claim) { $out['code'] = 404; $out['reason'] = 'المستخلصُ غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!$claim) { $out['code'] = 404; $out['reason'] = 'المستخلص غير موجود في نطاقك'; return $out; }
 
         // ── «ولا فاتورةَ بلا مستخلصٍ معتمد» (§4 · §7-Validation) ───────────
         // و`approving=true` تعني أن **المستدعي هو انتقالُ الاعتماد نفسُه** وقد
@@ -58,26 +58,26 @@ class TaxInvoiceService
             : self::INVOICEABLE_CLAIM_STATES;
         if (!in_array((string) $claim['state'], $allowed, true)) {
             $out['code'] = 422;
-            $out['reason'] = 'المستخلصُ في حالة «' . $claim['state'] . '» — و**لا فاتورةَ بلا مستخلصٍ '
-                           . 'معتمد** (ENT-03 §4): اعتمِدْه ثم أصدِر';
+            $out['reason'] = 'المستخلص في حالة «' . $claim['state'] . '» — و**لا فاتورة بلا مستخلص '
+                           . 'معتمد** (ENT-03 §4): اعتمده ثم أصدر';
             return $out;
         }
         if (empty($claim['client_id'])) {
-            $out['code'] = 422; $out['reason'] = 'لا عميلَ على المستخلص — ولا فاتورةَ بلا مشترٍ'; return $out;
+            $out['code'] = 422; $out['reason'] = 'لا عميل على المستخلص — ولا فاتورة بلا مشتر'; return $out;
         }
 
         $ex = self::byClaim($gate, $claimId);
         if ($ex) {
             $out['code'] = 409; $out['invoice_id'] = (int) $ex['id'];
             $out['serial_no'] = (string) $ex['serial_no'];
-            $out['reason'] = 'للمستخلص فاتورةٌ صادرةٌ ' . $ex['serial_no']
-                           . ' — **والتصحيحُ بإشعارٍ دائن/مدين لا بإعادة إصدار**';
+            $out['reason'] = 'للمستخلص فاتورة صادرة ' . $ex['serial_no']
+                           . ' — **والتصحيح بإشعار دائن/مدين لا بإعادة إصدار**';
             return $out;
         }
 
         $net = round((float) $claim['net_amount'], 2);
         if ($net <= 0) {
-            $out['code'] = 422; $out['reason'] = 'صافي المستخلص غيرُ موجب — لا فاتورةَ لصفر'; return $out;
+            $out['code'] = 422; $out['reason'] = 'صافي المستخلص غير موجب — لا فاتورة لصفر'; return $out;
         }
 
         // ── الضريبةُ **بمرجعها**: الرمزُ يُقرأ من سجله ونسبتُه منه ─────────
@@ -88,11 +88,11 @@ class TaxInvoiceService
             try {
                 $tc = $gate->selectOne('fin_tax_codes',
                     array('whereRaw' => 'code = ?', 'params' => array($taxCode)));
-            } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $tc'); $tc = null; }
+            } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $tc'); $tc = null; }
             if (!$tc) {
                 $out['code'] = 422;
-                $out['reason'] = 'رمزٌ ضريبيٌّ غيرُ مسجَّل: ' . $taxCode
-                               . ' — و**الضريبةُ سطرٌ بمرجعها** لا نسبةٌ تُكتب يدًا (§5)';
+                $out['reason'] = 'رمز ضريبي غير مسجل: ' . $taxCode
+                               . ' — و**الضريبة سطر بمرجعها** لا نسبة تكتب يدا (§5)';
                 return $out;
             }
             $taxRate = round((float) $tc['rate'], 2);
@@ -104,7 +104,7 @@ class TaxInvoiceService
         $fields = self::statutoryFields($conn, $gate, $companyId, $claim);
         if (!empty($fields['_missing'])) {
             $out['code'] = 422;
-            $out['reason'] = 'حقولٌ نظاميةٌ ناقصةٌ للفاتورة: ' . implode(' · ', $fields['_missing'])
+            $out['reason'] = 'حقول نظامية ناقصة للفاتورة: ' . implode(' · ', $fields['_missing'])
                            . ' — «بحقولها النظامية» (§4)';
             return $out;
         }
@@ -139,10 +139,10 @@ class TaxInvoiceService
         } catch (\Throwable $t) {
             if (strpos($t->getMessage(), 'Duplicate') !== false) {
                 $out['code'] = 409;
-                $out['reason'] = 'تزاحمٌ على التسلسل — أعد المحاولة (الفريدُ حرس التسلسل)';
+                $out['reason'] = 'تزاحم على التسلسل — أعد المحاولة (الفريد حرس التسلسل)';
                 return $out;
             }
-            $out['code'] = 422; $out['reason'] = 'تعذّر الإصدار: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الإصدار: ' . $t->getMessage(); return $out;
         }
 
         self::audit($conn, $companyId, $actor, 'create', (int) $invoiceId, array(),
@@ -177,19 +177,19 @@ class TaxInvoiceService
         try {
             $r = $conn->query("SELECT * FROM admin_companies WHERE id = " . (int) $companyId . " LIMIT 1");
             $co = $r ? $r->fetch_assoc() : null;
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $co'); $co = null; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $co'); $co = null; }
         $f['seller_name'] = $co ? (string) self::pick($co, array('company_name', 'name', 'title')) : '';
         $f['seller_tax_no'] = $co ? (string) self::pick($co, array('tax_number', 'tax_no', 'vat_number')) : '';
-        if ($f['seller_name'] === '') { $f['_missing'][] = 'اسمُ البائع (بيانات الشركة)'; }
+        if ($f['seller_name'] === '') { $f['_missing'][] = 'اسم البائع (بيانات الشركة)'; }
 
         $client = null;
         try {
             $client = $gate->selectOne('clients', array('where' => array('id' => (int) $claim['client_id'])));
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $client'); $client = null; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $client'); $client = null; }
         $f['buyer_name'] = $client ? (string) self::pick($client, array('name', 'client_name', 'company_name')) : '';
         $f['buyer_tax_no'] = $client ? (string) self::pick($client, array('tax_number', 'tax_no', 'vat_number')) : '';
         $f['buyer_address'] = $client ? (string) self::pick($client, array('address', 'full_address')) : '';
-        if ($f['buyer_name'] === '') { $f['_missing'][] = 'اسمُ المشتري (سجل العميل)'; }
+        if ($f['buyer_name'] === '') { $f['_missing'][] = 'اسم المشتري (سجل العميل)'; }
 
         $f['claim_no']    = (string) $claim['claim_no'];
         $f['period_from'] = (string) $claim['period_from'];
@@ -219,8 +219,8 @@ class TaxInvoiceService
         $inv = self::byClaim($gate, (int) $claimId);
         if (!$inv || (string) $inv['state'] === 'cancelled') { return null; }
         return array('code' => 423,
-            'reason' => 'للمستخلص فاتورةٌ ضريبيةٌ صادرة (' . $inv['serial_no'] . ') — '
-                      . '**لا تعديلَ بعد الإصدار**، والتصحيحُ **بإشعارٍ دائن/مدين** (ENT-03 §6)');
+            'reason' => 'للمستخلص فاتورة ضريبية صادرة (' . $inv['serial_no'] . ') — '
+                      . '**لا تعديل بعد الإصدار**، والتصحيح **بإشعار دائن/مدين** (ENT-03 §6)');
     }
 
     /** إلغاءٌ ضريبيٌّ بسببٍ مكتوب — ولا يُمحى صفٌّ ولا يُعاد استعمالُ رقمه. */
@@ -228,14 +228,14 @@ class TaxInvoiceService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '');
         $inv = self::head($gate, (int) $invoiceId);
-        if (!$inv) { $out['code'] = 404; $out['reason'] = 'الفاتورةُ غيرُ موجودةٍ في نطاقك'; return $out; }
+        if (!$inv) { $out['code'] = 404; $out['reason'] = 'الفاتورة غير موجودة في نطاقك'; return $out; }
         if ((string) $inv['state'] === 'cancelled') {
-            $out['code'] = 409; $out['reason'] = 'الفاتورةُ ملغاةٌ سلفًا'; return $out;
+            $out['code'] = 409; $out['reason'] = 'الفاتورة ملغاة سلفا'; return $out;
         }
         $reason = trim((string) $reason);
         if ($reason === '') {
             $out['code'] = 422;
-            $out['reason'] = 'الإلغاءُ الضريبيُّ **يلزمه سببٌ مكتوب** — ورقمُ الملغاة لا يُعاد استعمالُه';
+            $out['reason'] = 'الإلغاء الضريبي **يلزمه سبب مكتوب** — ورقم الملغاة لا يعاد استعماله';
             return $out;
         }
         try {
@@ -244,7 +244,7 @@ class TaxInvoiceService
                 'cancelled_at' => date('Y-m-d H:i:s'), 'cancelled_by' => (int) $actor ?: null,
             ), array('id' => (int) $invoiceId));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الإلغاء: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الإلغاء: ' . $t->getMessage(); return $out;
         }
         self::audit($conn, $companyId, $actor, 'cancel', (int) $invoiceId,
             array('state' => 'issued'), array('state' => 'cancelled', 'reason' => $reason));

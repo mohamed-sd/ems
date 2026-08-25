@@ -27,7 +27,7 @@ if (!$granted) {
     $g = mysqli_query($conn, "SELECT 1 FROM ownership_access_grants WHERE person_id = $uid AND state = 'active' LIMIT 1");
     $granted = $g && mysqli_num_rows($g) > 0;
 }
-if (!$granted) { ems_gov_flash_redirect('../main/dashboard.php', 'المجالُ المقيَّد — سجلُّ المُلّاك بمنحٍ فردي (FIN-01 §1.1) ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك'); }
+if (!$granted) { ems_gov_flash_redirect('../main/dashboard.php', 'المجال المقيد — سجل الملاك بمنح فردي (FIN-01 §1.1) ❌', 'GOV-PERM-403', 'اطلب المنحة من مدير الصلاحيات إن كانت ضمن عملك'); }
 
 /* كلُّ اطّلاعٍ على السجل يُسجَّل — سجلُّ اطّلاع المجال المقيَّد */
 mysqli_query($conn, "INSERT INTO action_execution_log (company_id, action_code, person_id, subject_ref, result)
@@ -68,17 +68,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 /* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
    شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
 $header_icon = 'fa fa-user-shield';
-$header_title_html = htmlspecialchars('الملكيةُ والمُلّاك — سجلٌّ مقيَّد', ENT_QUOTES, 'UTF-8');
-ob_start(); ?><span class="badge fin-own-badge-audit">كلُّ اطّلاعٍ مسجَّل</span><?php
+$header_title_html = htmlspecialchars('الملكية والملاك — سجل مقيد', ENT_QUOTES, 'UTF-8');
+ob_start(); ?><span class="badge fin-own-badge-audit">كل اطلاع مسجل</span><?php
 $header_actions = array(array('raw' => trim((string) ob_get_clean())));
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-echo ems_states_bundle('لا معداتٍ مسجَّلةً في سجلِّ المُلّاكِ والحصص', 'سجِّلْ ملكيةَ المعدةِ وحصةَ مموِّلِها لتظهرَ في هذا السجلّ');
+echo ems_states_bundle('لا معدات مسجلة في سجل الملاك والحصص', 'سجل ملكية المعدة وحصة ممولها لتظهر في هذا السجل');
 ?>
   <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
   <table class="table table-striped" data-no-dt>
-    <thead><tr><th>كود المعدة</th><th>نوعُ المالك</th><th>مرجع التفويض</th><th>الممولُ الحالي</th><th>حصتُه ٪</th><th>سريانُها</th><th>ملاحظة</th>
+    <thead><tr><th>كود المعدة</th><th>نوع المالك</th><th>مرجع التفويض</th><th>الممول الحالي</th><th>حصته ٪</th><th>سريانها</th><th>ملاحظة</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">المالك القانوني</th>
               <th class="ems-fn-th" data-fn="1">نوع الملكية</th>
@@ -91,11 +91,11 @@ echo ems_states_bundle('لا معداتٍ مسجَّلةً في سجلِّ ال�
               <th class="ems-fn-th" data-fn="1">مستند الملكية</th>
               <th class="ems-fn-th" data-fn="1">حق الرجوع</th>
               <th class="ems-fn-th" data-fn="1">درجة السرية</th>
-              <th class="ems-fn-th" data-fn="1">من يملك صلاحية الاطّلاع</th>
+              <th class="ems-fn-th" data-fn="1">من يملك صلاحية الاطلاع</th>
               <th class="ems-fn-th" data-fn="1">رقم الحصة</th>
               <th class="ems-fn-th" data-fn="1">كود العين</th>
               <th class="ems-fn-th" data-fn="1">الممول أو المالك</th>
-              <th class="ems-fn-th none" data-fn="1">النسبة المسجَّلة</th>
+              <th class="ems-fn-th none" data-fn="1">النسبة المسجلة</th>
               <th class="ems-fn-th none" data-fn="1">النسبة المصححة</th>
               <th class="ems-fn-th none" data-fn="1">سبب التصحيح</th>
               <th class="ems-fn-th none" data-fn="1">من تاريخ</th>
@@ -107,21 +107,21 @@ echo ems_states_bundle('لا معداتٍ مسجَّلةً في سجلِّ ال�
               <th class="ems-fn-th none" data-fn="1">مستند الحصة</th>
               <th class="ems-fn-th none" data-fn="1">مجموع الحصص النشطة</th>
               <th class="ems-fn-th none" data-fn="1">حالة قيد المئة</th>
-              <th class="ems-fn-th none" data-fn="1">سجّلها</th>
+              <th class="ems-fn-th none" data-fn="1">سجلها</th>
               <th class="ems-fn-th none" data-fn="1">اعتمدها</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
               <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-              <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
               <th class="ems-gov-th none" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-              <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطّلاع</th>
+              <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطلاع</th>
               <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               </tr></thead>
     <tbody>
-    <?php if (empty($rows)): ?><tr><td colspan="7" class="text-center text-muted">السجلُّ فارغ</td></tr><?php endif; ?>
+    <?php if (empty($rows)): ?><tr><td colspan="7" class="text-center text-muted">السجل فارغ</td></tr><?php endif; ?>
     <?php foreach ($rows as $o): ?>
       <tr>
         <td><?= htmlspecialchars($o['eq_name'] ?: '#' . $o['equipment_id'], ENT_QUOTES, 'UTF-8') ?></td>
@@ -135,5 +135,5 @@ echo ems_states_bundle('لا معداتٍ مسجَّلةً في سجلِّ ال�
     <?php endforeach; ?>
     </tbody>
   </table>
-  <p><a class="action-btn" href="asset_disposal.php"><i class="fa fa-exchange-alt"></i> التصرفُ في الأصل — نقلُ حصةٍ أو بيعُها</a></p>
+  <p><a class="action-btn" href="asset_disposal.php"><i class="fa fa-exchange-alt"></i> التصرف في الأصل — نقل حصة أو بيعها</a></p>
 </div>

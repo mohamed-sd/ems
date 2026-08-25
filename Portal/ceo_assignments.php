@@ -24,17 +24,17 @@ $U13 = array(
     'icon'       => 'fa fa-user-shield',
     'nature'     => 'document',
     'doc'        => 'PROP-01 §5-1 · CEO-Y0121',
-    'intro'      => 'كلُّ مسمًّى قياديٍّ أو رقابيٍّ — بفحصِ تعارضِ الواجباتِ والاستقلالِ آليًّا قبلَ العرض',
-    'rule'       => 'CEO-Y0121: التكليفُ لا يسري ولا يمنح صلاحيةً قبلَ الموافقة · CEO-Y0122: والمتعارضُ لا يُعرض حتى يُحسم',
-    'empty_hint' => 'لا طلباتِ تكليفٍ معروضة',
+    'intro'      => 'كل مسمى قيادي أو رقابي — بفحص تعارض الواجبات والاستقلال آليا قبل العرض',
+    'rule'       => 'CEO-Y0121: التكليف لا يسري ولا يمنح صلاحية قبل الموافقة · CEO-Y0122: والمتعارض لا يعرض حتى يحسم',
+    'empty_hint' => 'لا طلبات تكليف معروضة',
     'order'       => 'requested_at DESC',
 
     'actions'    => array(
         'approve' => array(
             'code'  => 'exec.assign.decide',
-            'label' => 'الموافقةُ على تكليف',
-            'rule'  => 'CEO-Y0121: للرئيسِ التنفيذيِّ حصرًا — والمتعارضُ لا يُقرَّر (CEO-Y0122)',
-            'fields' => array('assignment_no' => 'رقمُ التكليف', 'decision_reason' => 'حيثياتُ القرار'),
+            'label' => 'الموافقة على تكليف',
+            'rule'  => 'CEO-Y0121: للرئيس التنفيذي حصرا — والمتعارض لا يقرر (CEO-Y0122)',
+            'fields' => array('assignment_no' => 'رقم التكليف', 'decision_reason' => 'حيثيات القرار'),
             'optional' => array('decision_reason' => true),
             'run' => function ($conn, $co, $uid, $in) {
                 require_once __DIR__ . '/../app/Services/Exec/AssignmentGate.php';
@@ -45,9 +45,9 @@ $U13 = array(
             }),
         'reject' => array(
             'code'  => 'exec.assign.decide',
-            'label' => 'ردُّ تكليف',
-            'rule'  => 'ملزمٌ بحيثياتِه — ولا يُردُّ بلا سبب',
-            'fields' => array('assignment_no' => 'رقمُ التكليف', 'decision_reason' => 'سببُ الرد'),
+            'label' => 'رد تكليف',
+            'rule'  => 'ملزم بحيثياته — ولا يرد بلا سبب',
+            'fields' => array('assignment_no' => 'رقم التكليف', 'decision_reason' => 'سبب الرد'),
             'run' => function ($conn, $co, $uid, $in) {
                 require_once __DIR__ . '/../app/Services/Exec/AssignmentGate.php';
                 return \App\Services\Exec\AssignmentGate::decide($conn, array(

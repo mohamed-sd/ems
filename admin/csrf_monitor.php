@@ -129,8 +129,8 @@ require_once __DIR__ . '/includes/layout_head.php';
         <form method="get" style="display:inline">
             <select name="days" class="form-ctrl-sm" onchange="this.form.submit()">
                 <option value="7"  <?php echo $window_days === 7  ? 'selected' : ''; ?>>آخر 7 أيام</option>
-                <option value="30" <?php echo $window_days === 30 ? 'selected' : ''; ?>>آخر 30 يومًا</option>
-                <option value="90" <?php echo $window_days === 90 ? 'selected' : ''; ?>>آخر 90 يومًا</option>
+                <option value="30" <?php echo $window_days === 30 ? 'selected' : ''; ?>>آخر 30 يوما</option>
+                <option value="90" <?php echo $window_days === 90 ? 'selected' : ''; ?>>آخر 90 يوما</option>
                 <option value="0"  <?php echo $window_days === 0  ? 'selected' : ''; ?>>كل السجل</option>
             </select>
         </form>
@@ -154,7 +154,7 @@ require_once __DIR__ . '/includes/layout_head.php';
     <div>
         <strong>مسارات الحجب المتدرج (.env):</strong>
         <?php if (empty($enforced_paths)): ?>
-            <span class="text-muted">لا شيء بعد — يُبدأ بالمسارات «الجاهزة» أدناه</span>
+            <span class="text-muted">لا شيء بعد — يبدأ بالمسارات «الجاهزة» أدناه</span>
         <?php else: ?>
             <?php foreach ($enforced_paths as $p): ?>
                 <code style="background:#eef2ff;padding:2px 8px;border-radius:6px;margin-inline-start:4px;"><?php echo e($p); ?></code>
@@ -171,7 +171,7 @@ require_once __DIR__ . '/includes/layout_head.php';
     </div>
     <div class="card" style="padding:16px;text-align:center;">
         <div style="font-size:1.9rem;font-weight:800;color:#64748b;"><?php echo number_format($total_harness); ?></div>
-        <div class="text-muted">ضجيج أدوات اختبار<br><small>(curl/سكربتات — يُهمل)</small></div>
+        <div class="text-muted">ضجيج أدوات اختبار<br><small>(curl/سكربتات — يهمل)</small></div>
     </div>
     <div class="card" style="padding:16px;text-align:center;">
         <div style="font-size:1.9rem;font-weight:800;color:<?php echo ($days_clean === null || $days_clean >= $READY_DAYS) ? '#16a34a' : '#b45309'; ?>;">
@@ -210,7 +210,7 @@ require_once __DIR__ . '/includes/layout_head.php';
     <div style="padding:14px 18px 0;"><h3 style="margin:0;">المخالفات الحقيقية حسب الصفحة — وجاهزية الحجب</h3></div>
     <?php if (empty($by_script)): ?>
     <div class="empty-state"><i class="fas fa-shield-check"></i>
-        <p>لا مخالفات متصفح حقيقية في هذه النافذة — <strong>كل المسارات مرشّحة للحجب المتدرج.</strong></p>
+        <p>لا مخالفات متصفح حقيقية في هذه النافذة — <strong>كل المسارات مرشحة للحجب المتدرج.</strong></p>
     </div>
     <?php else: ?>
     <div style="overflow-x:auto;">
@@ -231,7 +231,7 @@ require_once __DIR__ . '/includes/layout_head.php';
             <td><?php echo e(date('Y-m-d', $st['last'])); ?> <small class="text-muted">(قبل <?php echo $age_days; ?> يوم)</small></td>
             <td>
                 <?php if ($global_enforce || $enforced): ?>
-                    <span style="color:#16a34a;font-weight:700;"><i class="fas fa-shield-halved"></i> مُنفَذ</span>
+                    <span style="color:#16a34a;font-weight:700;"><i class="fas fa-shield-halved"></i> منفذ</span>
                 <?php elseif ($age_days >= $READY_DAYS): ?>
                     <span style="color:#16a34a;font-weight:700;"><i class="fas fa-circle-check"></i> جاهز للحجب</span>
                 <?php else: ?>
@@ -251,7 +251,7 @@ require_once __DIR__ . '/includes/layout_head.php';
     <div style="padding:14px 18px 0;"><h3 style="margin:0;">آخر 30 مخالفة (كل الأنواع)</h3></div>
     <?php $recent = array_slice(array_reverse($events), 0, 30); ?>
     <?php if (empty($recent)): ?>
-    <div class="empty-state"><i class="fas fa-shield-check"></i><p>لا مخالفات في هذه النافذة إطلاقًا.</p></div>
+    <div class="empty-state"><i class="fas fa-shield-check"></i><p>لا مخالفات في هذه النافذة إطلاقا.</p></div>
     <?php else: ?>
     <div style="overflow-x:auto;">
     <table class="table" style="width:100%;">

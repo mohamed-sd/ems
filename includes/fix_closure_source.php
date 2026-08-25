@@ -81,7 +81,7 @@ if (!function_exists('ems_fix_mentions')) {
             $src = (string) @file_get_contents($f);
             if ($src === '') { continue; }
             $head = mb_substr($src, 0, 6000);
-            if (!preg_match_all('~شواهدُ أحكامٍ\s*:(.{0,1200})~su', $head, $blocks)) { continue; }
+            if (!preg_match_all('~شواهد أحكام\s*:(.{0,1200})~su', $head, $blocks)) { continue; }
             foreach ($blocks[1] as $blk) {
                 /* ── الوسمُ يمتدُّ ما امتدَّت **أسطرُ المعرِّفات** ────────────────
                      يقف عند أوّلِ سطرٍ لا يحمل معرِّفًا — فلا يبتلع نثرَ الترويسةِ

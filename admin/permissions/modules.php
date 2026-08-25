@@ -101,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $mp_dup = $mp_pg->selectOne('modules', array('columns' => array('id'),
                     'whereRaw' => '`code` = ? AND `owner_role_id` <=> ?', 'params' => array($code, $owner_role_id)));
                 if ($mp_dup !== null) {
-                    $error_msg = 'هذه الصفحة مضافة مسبقاً لنفس الدور المسؤول ❌';
+                    $error_msg = 'هذه الصفحة مضافة مسبقا لنفس الدور المسؤول ❌';
                 } else {
                     $mp_pg->insert('modules', array(
                         'name' => $name, 'code' => $code, 'owner_role_id' => $owner_role_id,
@@ -402,12 +402,12 @@ input[type="radio"] {
                                 <option value="<?= (int) $lg['id']; ?>"
                                         data-role="<?= (int) $lg['owner_role_id']; ?>"
                                     <?= (!empty($editData) && (int) ($editData['group_id'] ?? 0) === (int) $lg['id']) ? 'selected' : ''; ?>>
-                                    <?= htmlspecialchars($lg['name'], ENT_QUOTES, 'UTF-8'); ?><?= ((int) $lg['is_active'] === 0) ? ' (معطّلة)' : ''; ?>
+                                    <?= htmlspecialchars($lg['name'], ENT_QUOTES, 'UTF-8'); ?><?= ((int) $lg['is_active'] === 0) ? ' (معطلة)' : ''; ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
                         <small style="color: #666; display: block; margin-top: 5px;">
-                            <i class="fas fa-info-circle"></i> تُعرض مجموعات الدور المسؤول المختار فقط —
+                            <i class="fas fa-info-circle"></i> تعرض مجموعات الدور المسؤول المختار فقط —
                             <a href="link_groups.php" style="color: var(--blue);">إدارة المجموعات</a>
                         </small>
                     </div>
@@ -487,7 +487,7 @@ input[type="radio"] {
                                placeholder="0" min="0" step="1"
                                value="<?= htmlspecialchars($editData['display_order'] ?? '0', ENT_QUOTES, 'UTF-8'); ?>" />
                         <small style="color: #666; display: block; margin-top: 5px;">
-                            <i class="fas fa-info-circle"></i> الرقم الأصغر يظهر أولاً
+                            <i class="fas fa-info-circle"></i> الرقم الأصغر يظهر أولا
                         </small>
                     </div>
 

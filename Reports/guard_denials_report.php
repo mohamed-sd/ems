@@ -48,25 +48,25 @@ include '../insidebar.php';
     $header_title = 'تقرير المنع — مقياس ملاءمة الحمايات'; $header_icon = 'fa fa-ban';
     $header_actions = array();
     include('../includes/page_header.php');
-    ems_screen_about('متى مُنع النظام ومن حاول ولماذا — الحماية التي تُمنع كثيرًا إما الواقع '
+    ems_screen_about('متى منع النظام ومن حاول ولماذا — الحماية التي تمنع كثيرا إما الواقع '
         . 'يخالف السياسة أو السياسة تحتاج مراجعة. مقياس ملاءمة لا سجل مخالفات.',
-        array('اقرأ العدّاد لكل حماية', 'راجع صنف ما ارتفع منعه'));
+        array('اقرأ العداد لكل حماية', 'راجع صنف ما ارتفع منعه'));
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا وقائعَ منعٍ مسجلةً في هذه المدة', 'وسّع عددَ الأيامِ ثمّ اضغط عرض — وإن بقيت النتيجةُ صفرًا فافحص عملَ الرصد');
+    echo ems_states_bundle('لا وقائع منع مسجلة في هذه المدة', 'وسع عدد الأيام ثم اضغط عرض — وإن بقيت النتيجة صفرا فافحص عمل الرصد');
     ?>
     <div class="card"><div class="card-body">
         <form method="get" class="rpt-gd-filter">
-            <label for="emsf_462_55a08">آخر</label><input type="number" name="days" min="1" max="365" id="emsf_462_55a08" class="rpt-gd-days" value="<?php echo $days; ?>"><label>يومًا</label>
+            <label for="emsf_462_55a08">آخر</label><input type="number" name="days" min="1" max="365" id="emsf_462_55a08" class="rpt-gd-days" value="<?php echo $days; ?>"><label>يوما</label>
             <button class="btn-primary" type="submit">عرض</button>
         </form>
     </div></div>
     <div class="card"><div class="card-body">
-        <h6>عدّاد المنع لكل حماية (مقياس الملاءمة)</h6>
+        <h6>عداد المنع لكل حماية (مقياس الملاءمة)</h6>
         <div class="rpt-gd-counters">
         <?php foreach ($sum as $s): ?>
             <div class="badge <?php echo intval($s['n']) >= 100 ? 'badge-danger' : 'badge-secondary'; ?> rpt-gd-counter">
                 <?php echo htmlspecialchars($s['name_ar']); ?>: <strong><?php echo intval($s['n']); ?></strong>
-                <?php if (intval($s['n']) >= 100): ?> — تُراجَع<?php endif; ?>
+                <?php if (intval($s['n']) >= 100): ?> — تراجع<?php endif; ?>
             </div>
         <?php endforeach; if (empty($sum)): ?><em>صفر منع في المدة — انضباط أو توقف رصد</em><?php endif; ?>
         </div>

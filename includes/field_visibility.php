@@ -121,6 +121,6 @@ if (!function_exists('ems_masked_or_absent')) {
         if (ems_may_see_field($conn, $elementCode, $subjectRef, $screen)) {
             return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
         }
-        return '<span class="ems-field-withheld" title="محجوبٌ — يحتاج منحةً فردية">—</span>';
+        return '<span class="ems-field-withheld" title="محجوب — يحتاج منحة فردية">—</span>';
     }
 }

@@ -87,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($edit_id > 0) { $dupWhere .= " AND id != ?"; $dupParams[] = $edit_id; }
     $dup = $fc_gate->selectOne('failure_codes', array('columns' => array('id'), 'whereRaw' => $dupWhere, 'params' => $dupParams));
     if ($dup) {
-        $error_msg = "⚠️ الكود الكامل '$full_code' موجود مسبقاً";
+        $error_msg = "⚠️ الكود الكامل '$full_code' موجود مسبقا";
         goto done;
     }
 
@@ -207,8 +207,8 @@ $stat_eq3    = $fc_gate->count('failure_codes', array('whereRaw' => "equipment_t
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     if (function_exists('ems_states_bundle')) {
-        echo ems_states_bundle('لا كودَ عطلٍ مسجَّلًا في دليلِ التصنيفاتِ بعدُ',
-                               'أضف أولَ كودٍ بزرِّ «إضافة كود جديد» في رأسِ الشاشة، أو استورد الدليلَ من ملفِّ إكسل');
+        echo ems_states_bundle('لا كود عطل مسجلا في دليل التصنيفات بعد',
+                               'أضف أول كود بزر «إضافة كود جديد» في رأس الشاشة، أو استورد الدليل من ملف إكسل');
     }
     ?>
 
@@ -447,14 +447,14 @@ $stat_eq3    = $fc_gate->count('failure_codes', array('whereRaw' => "equipment_t
                             <th class="ems-fn-th" data-fn="1">تصنيف العطل</th>
                             <th class="ems-fn-th" data-fn="1">السبب المباشر</th>
                             <th class="ems-fn-th" data-fn="1">السبب الجذري</th>
-                            <th class="ems-fn-th" data-fn="1">تكرار العطل خلال 90 يومًا</th>
+                            <th class="ems-fn-th" data-fn="1">تكرار العطل خلال 90 يوما</th>
                             <th class="ems-fn-th" data-fn="1">مجموعة التكرار</th>
                             <th class="ems-fn-th" data-fn="1">ساعات التوقف التراكمية</th>
                             <th class="ems-fn-th none" data-fn="1">التكلفة التراكمية</th>
                             <th class="ems-fn-th none" data-fn="1">الإجراء التصحيحي</th>
                             <th class="ems-fn-th none" data-fn="1">المسؤول</th>
                             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                            <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                            <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
                             <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                             <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
                             </tr>
@@ -533,7 +533,7 @@ $stat_eq3    = $fc_gate->count('failure_codes', array('whereRaw' => "equipment_t
                 <h5 class="modal-title text-danger"><i class="fas fa-exclamation-triangle"></i> تأكيد الحذف النهائي</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">هل أنت متأكد من حذف هذا الكود نهائياً؟ لا يمكن التراجع عن هذا الإجراء.</div>
+            <div class="modal-body">هل أنت متأكد من حذف هذا الكود نهائيا؟ لا يمكن التراجع عن هذا الإجراء.</div>
             <div class="modal-footer">
                 <form method="POST" id="hardDeleteForm">
         <?= csrf_field() ?>

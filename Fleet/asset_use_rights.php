@@ -31,7 +31,7 @@ if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد
 $gate = $is_super_admin ? ems_tenant_db()->forAllTenants('asset use rights super') : ems_tenant_db();
 ALS::setEventConnection($conn);
 $uid = intval($_SESSION['user']['id'] ?? 0);
-$KINDS = array('company' => 'الشركة', 'financier' => 'مموّل', 'supplier' => 'مورّد', 'client' => 'عميل');
+$KINDS = array('company' => 'الشركة', 'financier' => 'مموّل', 'supplier' => 'مورد', 'client' => 'عميل');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'grant' && $can_add) {
     $r = ALS::grantUseRight($gate, array(
@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'grant
         'granted_by'   => $uid,
     ));
     $msg = $r['ok']
-        ? ('✅ سُجِّل حقُّ الاستخدام — التزامنُ المقيس ' . $r['concurrency_pct'] . '٪ (' . $r['rule'] . ')')
+        ? ('✅ سجل حق الاستخدام — التزامن المقيس ' . $r['concurrency_pct'] . '٪ (' . $r['rule'] . ')')
         : ('❌ ' . $r['reason']);
     ems_gov_flash_redirect('asset_use_rights.php', $msg, 'GOV-OK-200', ''); exit();
 }
@@ -68,7 +68,7 @@ include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main ems-unified-page-shell">
-    <?php $header_title = 'حق الاستخدام التشغيلي — الملكيّة متعاقبة لا متزامنة'; $header_icon = 'fa fa-handshake'; $header_actions = array();
+    <?php $header_title = 'حق الاستخدام التشغيلي — الملكية متعاقبة لا متزامنة'; $header_icon = 'fa fa-handshake'; $header_actions = array();
     if ($can_add) { $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'منح حق'); }
     $header_back = array('href' => 'asset_intake.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'طلب الإدخال');
     include('../includes/page_header.php'); ?>
@@ -76,11 +76,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="success-message <?= $ok ? 'is-success' : 'is-error' ?>"><i class="fas <?= $ok ? 'fa-check-circle' : 'fa-exclamation-circle' ?>"></i> <?= htmlspecialchars($_GET['msg']) ?></div>
     <?php endif; ?>
     <div class="ems-stat-cards">
-        <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">حقوق مسجَّلة</div></div>
-        <div class="ems-stat-card"><div class="ems-stat-value"><?= $openN ?></div><div class="ems-stat-label">حقٌّ متزامنٌ مفتوح</div></div>
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">حقوق مسجلة</div></div>
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= $openN ?></div><div class="ems-stat-label">حق متزامن مفتوح</div></div>
     </div>
     <?php require_once __DIR__ . '/../includes/ux_components.php';
-    echo ems_states_bundle('لا حقوقَ استخدامٍ مسجَّلةً بعدُ', 'امنحْ أوّلَ حقٍّ بزرِّ «منح حق» في رأسِ الشاشة'); ?>
+    echo ems_states_bundle('لا حقوق استخدام مسجلة بعد', 'امنح أول حق بزر «منح حق» في رأس الشاشة'); ?>
 
     <form id="gForm" action="" method="post" class="allforms">
         <?= csrf_field() ?>
@@ -122,7 +122,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= htmlspecialchars((string) $r['doc_ref']) ?></td>
             </tr>
         <?php endforeach; else: ?>
-            <tr><td colspan="11">لا حقوقَ استخدامٍ بعدُ.</td></tr>
+            <tr><td colspan="11">لا حقوق استخدام بعد.</td></tr>
         <?php endif; ?>
         </tbody></table></div>
 </div>

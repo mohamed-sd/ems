@@ -76,7 +76,7 @@ if ($hooksMode === 'monitor' || $hooksMode === 'publish') {
     if ($orphans && $orphans->num_rows > 0) {
         while ($o = $orphans->fetch_assoc()) {
             $msg = 'orphaned hour_logged: event_id=' . $o['id'] . ' no=' . $o['event_no']
-                 . ' timesheet=' . $o['entity_id'] . ' (اعتمادُه زال بالرفض — بانتظار الحدث العكسي K5.1)';
+                 . ' timesheet=' . $o['entity_id'] . ' (اعتماده زال بالرفض — بانتظار الحدث العكسي K5.1)';
             if (function_exists('log_security_event')) {
                 log_security_event('EVENT_ORPHANED_ALERT', $msg);
             }

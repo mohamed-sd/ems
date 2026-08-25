@@ -53,7 +53,7 @@ class PermissionChangeWorkflow
                 'ChangeRequested — ' . $kind . ' (' . $risk . ')', $by);
             $conn->commit();
             $out['ok'] = true; $out['code'] = 201; $out['req_id'] = $reqId;
-            $out['reason'] = 'فُتح الطلب بخطواته (' . $seq . ') بدرجة المخاطرة — ' . $risk;
+            $out['reason'] = 'فتح الطلب بخطواته (' . $seq . ') بدرجة المخاطرة — ' . $risk;
             return $out;
         } catch (\Throwable $e) {
             $conn->rollback();
@@ -72,7 +72,7 @@ class PermissionChangeWorkflow
         $approverPersonId = intval($approverPersonId);
         $req = $conn->query("SELECT * FROM permission_change_requests WHERE req_id = {$reqId}")->fetch_assoc();
         if (!$req) { $out['code'] = 404; $out['reason'] = 'طلب غير موجود'; return $out; }
-        if ($req['state'] !== 'pending') { $out['code'] = 409; $out['reason'] = 'الطلب ليس معلقًا'; return $out; }
+        if ($req['state'] !== 'pending') { $out['code'] = 409; $out['reason'] = 'الطلب ليس معلقا'; return $out; }
 
         // لا يعتمد المرء طلبه ولا يمنح نفسه
         $sg = SelfGrantGuard::checkApproval($conn, $approverPersonId, intval($req['created_by']), intval($req['company_id']), 'pcr:' . $reqId);
@@ -88,7 +88,7 @@ class PermissionChangeWorkflow
         $next = null;
         foreach ($steps as $s) {
             if ($s['decision'] === null) { $next = $s; break; }
-            if ($s['decision'] === 'reject') { $out['code'] = 409; $out['reason'] = 'مرفوض سلفًا'; return $out; }
+            if ($s['decision'] === 'reject') { $out['code'] = 409; $out['reason'] = 'مرفوض سلفا'; return $out; }
         }
         if ($next === null) { $out['code'] = 409; $out['reason'] = 'الموافقات مكتملة'; return $out; }
 
@@ -104,7 +104,7 @@ class PermissionChangeWorkflow
         if ($dec === 'reject') {
             $conn->query("UPDATE permission_change_requests SET state = 'rejected' WHERE req_id = {$reqId}");
             $out['ok'] = true; $out['code'] = 200; $out['state'] = 'rejected';
-            $out['reason'] = 'رُفض في الخطوة ' . $next['seq_no'];
+            $out['reason'] = 'رفض في الخطوة ' . $next['seq_no'];
             return $out;
         }
 
@@ -120,7 +120,7 @@ class PermissionChangeWorkflow
             $out['reason'] = 'اكتملت الموافقات الإلزامية — جاهز للتطبيق';
         } else {
             $out['state'] = 'pending';
-            $out['reason'] = 'سُجّلت — بقي ' . $remaining . ' إلزامية (المصفوفة لا تُختصر)';
+            $out['reason'] = 'سجلت — بقي ' . $remaining . ' إلزامية (المصفوفة لا تختصر)';
         }
         $out['ok'] = true; $out['code'] = 200;
         return $out;
@@ -134,13 +134,13 @@ class PermissionChangeWorkflow
         if (!$req) { return array('ok' => false, 'code' => 404, 'reason' => 'غير موجود'); }
         if ($req['state'] !== 'approved') {
             return array('ok' => false, 'code' => 409,
-                'reason' => 'لا يُطبَّق تغيير قبل اكتمال الموافقات الإلزامية — الحالة: ' . $req['state']);
+                'reason' => 'لا يطبق تغيير قبل اكتمال الموافقات الإلزامية — الحالة: ' . $req['state']);
         }
         $conn->query("UPDATE permission_change_requests SET state = 'applied' WHERE req_id = {$reqId}");
         PositionService::audit($conn, intval($req['company_id']), intval($req['person_id']),
             'elevated', 'change_request:' . $reqId, $req['to_json'], 'ChangeApplied', intval($executedBy));
         require_once __DIR__ . '/PermissionResolver.php';
         PermissionResolver::rebuild($conn, intval($req['person_id']), intval($req['company_id']));
-        return array('ok' => true, 'code' => 200, 'reason' => 'طُبِّق وأُعيد بناء المشتق');
+        return array('ok' => true, 'code' => 200, 'reason' => 'طبق وأعيد بناء المشتق');
     }
 }

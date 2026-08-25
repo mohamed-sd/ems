@@ -49,8 +49,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $can_edit) {
     if ($act === 'add_rule') {
         $rate = trim(strval($_POST['rate'] ?? ''));
         $from = strval($_POST['effective_from'] ?? '');
-        if ($rate === '' || !is_numeric($rate) || (float) $rate <= 0) { $redirect('المعدّلُ رقمٌ موجبٌ إلزامي ❌'); }
-        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $from)) { $redirect('تاريخُ السريان إلزامي ❌'); }
+        if ($rate === '' || !is_numeric($rate) || (float) $rate <= 0) { $redirect('المعدل رقم موجب إلزامي ❌'); }
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $from)) { $redirect('تاريخ السريان إلزامي ❌'); }
         $eq = intval($_POST['equipment_id'] ?? 0);
         $ty = intval($_POST['equipment_type'] ?? 0);
         try {
@@ -65,8 +65,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $can_edit) {
                 'note' => mb_substr(trim(strval($_POST['note'] ?? '')), 0, 200) ?: null,
                 'created_by' => $uid,
             ));
-            $redirect('أُضيفت قاعدةُ المخصص ✅');
-        } catch (\Throwable $t) { $redirect('تعذّرت الإضافة: ' . $t->getMessage() . ' ❌'); }
+            $redirect('أضيفت قاعدة المخصص ✅');
+        } catch (\Throwable $t) { $redirect('تعذرت الإضافة: ' . $t->getMessage() . ' ❌'); }
     }
 }
 
@@ -107,37 +107,37 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضيًا
-    echo ems_states_bundle('لا دورياتِ ماليةً مولّدةً لهذه الفترة', 'اخترِ الفترةَ ثم شغّلْ دوريةً من أزرارِ التشغيلِ أعلاه — ولا مخصصَ بلا قاعدةٍ سارية');
+    echo ems_states_bundle('لا دوريات مالية مولدة لهذه الفترة', 'اختر الفترة ثم شغل دورية من أزرار التشغيل أعلاه — ولا مخصص بلا قاعدة سارية');
     ?>
     <?php fin_msg_banner(); ?>
 
     <div class="card"><div class="card-body">
         <p class="fin-per-lead">
             <i class="fas fa-circle-info"></i>
-            ثلاثُ دورياتٍ <strong>كلٌّ بمفتاحها الذي يمنع التكرار</strong>:
-            مخصصُ الصيانة <code>(المعدة × الفترة)</code> · قسطُ التمويل <code>(الالتزام × القسط)</code> ·
-            الإقرارُ الضريبي <code>(الفترة)</code>.
-            و<strong>لا كتابةَ يدويةً على الدفتر</strong>: كلُّ مبلغٍ محسوبٌ من مصدره —
-            ولا يقع شيءٌ منها في <strong>فترةٍ مقفلة</strong>.
+            ثلاث دوريات <strong>كل بمفتاحها الذي يمنع التكرار</strong>:
+            مخصص الصيانة <code>(المعدة × الفترة)</code> · قسط التمويل <code>(الالتزام × القسط)</code> ·
+            الإقرار الضريبي <code>(الفترة)</code>.
+            و<strong>لا كتابة يدوية على الدفتر</strong>: كل مبلغ محسوب من مصدره —
+            ولا يقع شيء منها في <strong>فترة مقفلة</strong>.
         </p>
         <form method="get" class="fin-per-filter">
             <label for="emsf_254_00734">الفترة:</label>
-            <input type="month" name="period" aria-label="فترةُ عرضِ الدوريات" value="<?php echo htmlspecialchars($period); ?>" id="emsf_254_00734">
+            <input type="month" name="period" aria-label="فترة عرض الدوريات" value="<?php echo htmlspecialchars($period); ?>" id="emsf_254_00734">
             <button type="submit" class="btn-primary"><i class="fa fa-filter"></i> اعرض</button>
         </form>
         <?php if ($can_edit): ?>
         <div class="fin-per-runbar">
             <?php foreach (array(
-                'provisions'   => array('مخصصُ الصيانة', 'fa-screwdriver-wrench'),
-                'installments' => array('أقساطُ التمويل المستحقة', 'fa-file-invoice-dollar'),
-                'tax_return'   => array('الإقرارُ الضريبي', 'fa-percent'),
+                'provisions'   => array('مخصص الصيانة', 'fa-screwdriver-wrench'),
+                'installments' => array('أقساط التمويل المستحقة', 'fa-file-invoice-dollar'),
+                'tax_return'   => array('الإقرار الضريبي', 'fa-percent'),
             ) as $k => $v): ?>
             <form method="post" class="fin-per-inline-form">
         <?php echo csrf_field(); ?>
                 <input type="hidden" name="per_action" value="<?php echo $k; ?>">
                 <input type="hidden" name="period" value="<?php echo htmlspecialchars($period); ?>">
                 <button type="submit" class="btn-primary"><i class="fa <?php echo $v[1]; ?>"></i>
-                    شغّل <?php echo $v[0]; ?></button>
+                    شغل <?php echo $v[0]; ?></button>
             </form>
             <?php endforeach; ?>
         </div>
@@ -145,24 +145,24 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div></div>
 
     <?php if ($can_edit): ?>
-    <div class="card"><div class="card-header"><h5><i class="fa fa-plus"></i> قاعدةُ مخصصِ صيانةٍ جديدة</h5></div>
+    <div class="card"><div class="card-header"><h5><i class="fa fa-plus"></i> قاعدة مخصص صيانة جديدة</h5></div>
     <div class="card-body">
         <form method="post" class="ems-form">
         <?php echo csrf_field(); ?>
             <input type="hidden" name="per_action" value="add_rule">
             <div class="form-grid">
-                <div class="form-group"><label for="emsf_255_f7046">معدةٌ بعينها <small>— 0 = الأعمّ</small></label>
+                <div class="form-group"><label for="emsf_255_f7046">معدة بعينها <small>— 0 = الأعم</small></label>
                     <input type="number" name="equipment_id" min="0" value="0" id="emsf_255_f7046"></div>
-                <div class="form-group"><label for="emsf_256_a476e">نوعُ المعدة <small>— 0 = أي نوع</small></label>
+                <div class="form-group"><label for="emsf_256_a476e">نوع المعدة <small>— 0 = أي نوع</small></label>
                     <input type="number" name="equipment_type" min="0" value="0" id="emsf_256_a476e"></div>
                 <div class="form-group"><label for="emsf_257_a43c9">الأساس</label>
                     <select name="basis" id="emsf_257_a43c9"><option value="hour">ساعة</option><option value="unit">وحدة</option></select></div>
-                <div class="form-group"><label for="emsf_258_b3336">المعدّل <span class="fin-per-req">*</span></label>
+                <div class="form-group"><label for="emsf_258_b3336">المعدل <span class="fin-per-req">*</span></label>
                     <input type="number" name="rate" step="0.0001" min="0.0001" required id="emsf_258_b3336"></div>
                 <div class="form-group"><label for="emsf_259_38d9e">العملة</label><input type="text" name="currency" value="SDG" maxlength="8" id="emsf_259_38d9e"></div>
                 <div class="form-group"><label for="emsf_260_e7a32">سريان من <span class="fin-per-req">*</span></label>
                     <input type="date" name="effective_from" required id="emsf_260_e7a32"></div>
-                <div class="form-group"><label for="emsf_261_3ad4a">مرجعُ القاعدة</label><input type="text" name="note" maxlength="200" id="emsf_261_3ad4a"></div>
+                <div class="form-group"><label for="emsf_261_3ad4a">مرجع القاعدة</label><input type="text" name="note" maxlength="200" id="emsf_261_3ad4a"></div>
             </div>
             <div class="fin-per-actions"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> أضف القاعدة</button></div>
         </form>
@@ -170,16 +170,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php endif; ?>
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-screwdriver-wrench"></i>
-        ① قواعدُ المخصص ومخصصاتُ <?php echo htmlspecialchars($period); ?></h5></div>
+        ① قواعد المخصص ومخصصات <?php echo htmlspecialchars($period); ?></h5></div>
     <div class="card-body">
         <div class="table-container">
         <table class="alltables display nowrap no-datatable fin-per-table" data-no-dt="1">
-            <thead><tr><th>القاعدة</th><th>المعدة</th><th>النوع</th><th>الأساس</th><th>المعدّل</th>
+            <thead><tr><th>القاعدة</th><th>المعدة</th><th>النوع</th><th>الأساس</th><th>المعدل</th>
                 <th>السريان</th><th>الحال</th></tr></thead>
             <tbody>
             <?php foreach ($rules as $r): ?>
                 <tr><td>#<?php echo intval($r['id']); ?></td>
-                    <td><?php echo $r['equipment_id'] !== null ? intval($r['equipment_id']) : '<em>الأعمّ</em>'; ?></td>
+                    <td><?php echo $r['equipment_id'] !== null ? intval($r['equipment_id']) : '<em>الأعم</em>'; ?></td>
                     <td><?php echo $r['equipment_type'] !== null ? intval($r['equipment_type']) : '—'; ?></td>
                     <td><?php echo (string)$r['basis'] === 'hour' ? 'ساعة' : 'وحدة'; ?></td>
                     <td><strong><?php echo htmlspecialchars((string)$r['rate']); ?></strong>
@@ -190,13 +190,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         ? '<span class="badge badge-success">سارية</span>'
                         : '<span class="badge badge-secondary">منتهية</span>'; ?></td></tr>
             <?php endforeach; ?>
-            <?php if (!$rules): ?><tr><td colspan="7"><em>لا قواعدَ — وبلا قاعدةٍ <strong>لا مخصص</strong></em></td></tr><?php endif; ?>
+            <?php if (!$rules): ?><tr><td colspan="7"><em>لا قواعد — وبلا قاعدة <strong>لا مخصص</strong></em></td></tr><?php endif; ?>
             </tbody>
         </table>
         </div>
         <div class="table-container fin-per-gap">
         <table class="alltables display nowrap no-datatable fin-per-table" data-no-dt="1">
-            <thead><tr><th>المعدة</th><th>الأساس</th><th>الكمية</th><th>المعدّل</th><th>المبلغ</th>
+            <thead><tr><th>المعدة</th><th>الأساس</th><th>الكمية</th><th>المعدل</th><th>المبلغ</th>
                 <th>القاعدة</th><th>الحدث</th></tr></thead>
             <tbody>
             <?php foreach ($provs as $p): ?>
@@ -211,14 +211,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         ? ('<span class="badge badge-success">#' . intval($p['event_id']) . '</span>')
                         : '<span class="badge badge-warning">بلا حدث</span>'; ?></td></tr>
             <?php endforeach; ?>
-            <?php if (!$provs): ?><tr><td colspan="7"><em>لا مخصصَ لهذه الفترة بعد</em></td></tr><?php endif; ?>
+            <?php if (!$provs): ?><tr><td colspan="7"><em>لا مخصص لهذه الفترة بعد</em></td></tr><?php endif; ?>
             </tbody>
         </table>
         </div>
     </div></div>
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-file-invoice-dollar"></i>
-        ② أقساطُ التمويل المستحقة حتى نهاية <?php echo htmlspecialchars($period); ?></h5></div>
+        ② أقساط التمويل المستحقة حتى نهاية <?php echo htmlspecialchars($period); ?></h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap no-datatable fin-per-table" data-no-dt="1">
             <thead><tr><th>الالتزام</th><th>القسط</th><th>الاستحقاق</th><th>الأصل</th><th>الربح</th>
@@ -237,23 +237,23 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         ? ('<span class="badge badge-success">حدث #' . intval($s['event_id']) . '</span>')
                         : '<span class="badge badge-warning">بلا اعتراف</span>'; ?></td></tr>
             <?php endforeach; ?>
-            <?php if (!$insts): ?><tr><td colspan="8"><em>لا قسطَ مستحقًّا حتى هذا التاريخ</em></td></tr><?php endif; ?>
+            <?php if (!$insts): ?><tr><td colspan="8"><em>لا قسط مستحقا حتى هذا التاريخ</em></td></tr><?php endif; ?>
             </tbody>
         </table>
     </div></div></div>
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-percent"></i>
-        ③ الإقراراتُ الضريبية</h5></div>
+        ③ الإقرارات الضريبية</h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap no-datatable fin-per-table" data-no-dt="1">
-            <thead><tr><th>الفترة</th><th>المبيعاتُ الخاضعة</th><th>ضريبةُ المخرجات</th>
-                <th>المشتريات</th><th>ضريبةُ المدخلات</th><th>الصافي</th><th>الحركات</th>
+            <thead><tr><th>الفترة</th><th>المبيعات الخاضعة</th><th>ضريبة المخرجات</th>
+                <th>المشتريات</th><th>ضريبة المدخلات</th><th>الصافي</th><th>الحركات</th>
                 <th>الحال</th><th>الحدث</th>
                 <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                 <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                 <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                 <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -268,14 +268,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <td><?php echo htmlspecialchars((string)$t['input_tax']); ?></td>
                     <td><strong><?php echo htmlspecialchars((string)$t['net_tax']); ?></strong></td>
                     <td><?php echo intval($t['lines_count']) === 0
-                        ? '<span class="badge badge-warning">صفر — يُعلَن</span>'
+                        ? '<span class="badge badge-warning">صفر — يعلن</span>'
                         : intval($t['lines_count']); ?></td>
                     <td><?php echo (string)$t['state'] === 'filed'
                         ? '<span class="badge badge-success">مقدَّم</span>'
                         : '<span class="badge badge-secondary">مسودة</span>'; ?></td>
                     <td><?php echo $t['event_id'] !== null ? ('#' . intval($t['event_id'])) : '—'; ?></td></tr>
             <?php endforeach; ?>
-            <?php if (!$rets): ?><tr><td colspan="9"><em>لا إقراراتٍ بعد</em></td></tr><?php endif; ?>
+            <?php if (!$rets): ?><tr><td colspan="9"><em>لا إقرارات بعد</em></td></tr><?php endif; ?>
             </tbody>
         </table>
     </div></div></div>

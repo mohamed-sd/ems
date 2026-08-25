@@ -19,7 +19,7 @@ if (!$is_super_admin) {
     if (empty($__pp['can_view'])) {
         while (ob_get_level()) ob_end_clean();
         http_response_code(403);
-        die(json_encode(['error' => 'لا صلاحيةَ عرضٍ لسجل الدوام'], JSON_UNESCAPED_UNICODE));
+        die(json_encode(['error' => 'لا صلاحية عرض لسجل الدوام'], JSON_UNESCAPED_UNICODE));
     }
 }
 

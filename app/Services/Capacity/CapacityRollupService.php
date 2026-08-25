@@ -52,7 +52,7 @@ class CapacityRollupService
                 $out['fixed']++;
             } else {
                 /* رفضته قيودُ CHECK — الأبناءُ يتجاوزون السعةَ: يُبلَّغ ولا يُدفَن */
-                $out['blocked'][] = $p['container_no'] . ' (مجموعُ الأبناء ' . $want . ' وسعةُ الأب ' . $p['cap_qty'] . ')';
+                $out['blocked'][] = $p['container_no'] . ' (مجموع الأبناء ' . $want . ' وسعة الأب ' . $p['cap_qty'] . ')';
             }
             $st->close();
         }

@@ -24,7 +24,7 @@ if (!is_dir($dir)) { mkdir($dir, 0775, true); }
 $csv = $dir . '/unit_chain_weekly.csv';
 $new = !file_exists($csv);
 $f = fopen($csv, 'a');
-if ($new) { fwrite($f, "\xEF\xBB\xBF"); fputcsv($f, array('التاريخ','الشركة','غير المعتمد','أقدمه بالأيام','مسجَّل الأسبوع','معتمَد الأسبوع','النسبة٪','خرق')); }
+if ($new) { fwrite($f, "\xEF\xBB\xBF"); fputcsv($f, array('التاريخ','الشركة','غير المعتمد','أقدمه بالأيام','مسجل الأسبوع','معتمد الأسبوع','النسبة٪','خرق')); }
 
 $r = mysqli_query($conn, "SELECT id FROM admin_companies WHERE LOWER(COALESCE(status,'active'))='active'");
 $companies = array();
@@ -38,7 +38,7 @@ foreach ($companies as $cid) {
                       $m['week_registered'], $m['week_converted'],
                       $m['ratio'] === null ? '—' : $m['ratio'], $breach ? 'نعم' : 'لا'));
 
-    $title = "مؤشر DEC-01 ⑦ الأسبوعي: عالق {$m['pending']} · أقدمه {$m['oldest_days']} يومًا"
+    $title = "مؤشر DEC-01 ⑦ الأسبوعي: عالق {$m['pending']} · أقدمه {$m['oldest_days']} يوما"
            . ($m['ratio'] !== null ? " · النسبة {$m['ratio']}٪" : '');
     $link = '../Approvals/hours_approval.php#dec01-7-weekly';
     foreach (array(1, 6) as $roleId) {
@@ -49,10 +49,10 @@ foreach ($companies as $cid) {
     }
     if ($breach) {
         ems_uc_notify_once($conn, $cid, EXEC_ACCOUNT_UID,
-            'خرقُ مستهدف DEC-01 ⑦ (شركة ' . $cid . '): ' . $title, $link);
+            'خرق مستهدف DEC-01 ⑦ (شركة ' . $cid . '): ' . $title, $link);
     }
     echo "[co{$cid}] عالق={$m['pending']} أقدم={$m['oldest_days']}ي أسبوع={$m['week_converted']}/{$m['week_registered']}"
        . ($m['ratio'] !== null ? " ({$m['ratio']}٪)" : '') . ($breach ? ' ⚠ خرق' : '') . "\n";
 }
 fclose($f);
-echo "أُلحق بالتقرير: storage/reports/unit_chain_weekly.csv\n";
+echo "ألحق بالتقرير: storage/reports/unit_chain_weekly.csv\n";

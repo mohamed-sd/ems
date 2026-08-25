@@ -21,7 +21,7 @@ class IntercompanyLoanService
         }
         $lender = intval($a['lender_entity_id']); $borrower = intval($a['borrower_entity_id']);
         if ($lender === $borrower) {
-            $out['code'] = 422; $out['reason'] = 'لا كيانَ يتعاقد مع نفسه — قيد التناقض ⑥ (CHECK بنيوي يسنده)';
+            $out['code'] = 422; $out['reason'] = 'لا كيان يتعاقد مع نفسه — قيد التناقض ⑥ (CHECK بنيوي يسنده)';
             return $out;
         }
         // الطرفان داخليان (مستأجران في المجموعة)
@@ -61,7 +61,7 @@ class IntercompanyLoanService
         // فتح النمط ② لنطاق الكيانين — علم internal_parties (LEG-01 §7)
         foreach (array($lender, $borrower) as $e) {
             $conn->query("INSERT INTO governance_flags (element_code, scope_type, scope_id, enabled, reason, set_by)
-                          VALUES ('internal_parties', 'entity', " . intval($e) . ", 1, 'N-09: فُتح النمط ② بإعارة #" . $out['loan_id'] . "', " . $act . ")
+                          VALUES ('internal_parties', 'entity', " . intval($e) . ", 1, 'N-09: فتح النمط ② بإعارة #" . $out['loan_id'] . "', " . $act . ")
                           ON DUPLICATE KEY UPDATE enabled = 1");
         }
         $out['ok'] = true; $out['code'] = 201;
@@ -94,6 +94,6 @@ class IntercompanyLoanService
         if ($stmt->affected_rows === 1) { $created++; }
         $stmt->close();
         return array('ok' => true, 'code' => 200, 'created' => $created, 'amount' => $due,
-            'reason' => $created ? 'مستحق متبادل ' . $per . ': للمعير على المستعير ' . $due . ' ' . $cur . ' (بنسبة تحمّله ' . $borrowerPct . '%)' : 'مستحق الفترة قائم — عاطل');
+            'reason' => $created ? 'مستحق متبادل ' . $per . ': للمعير على المستعير ' . $due . ' ' . $cur . ' (بنسبة تحمله ' . $borrowerPct . '%)' : 'مستحق الفترة قائم — عاطل');
     }
 }

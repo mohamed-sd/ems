@@ -26,12 +26,12 @@ $role = strval($_SESSION['user']['role'] ?? '');
 // قراءةً فقط (FIN-26: ملكية الشاشة للحوكمة والدور 26 يطالعها — DEC-01 ②)
 $gov_write = ($role === '-1' || in_array($role, array('1', '19'), true));
 if (!$gov_write && $role !== EMS_ROLE_FINANCING_MGR) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'باب الحوكمة خلف صلاحيته ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
+    ems_gov_flash_redirect('../main/dashboard.php', 'باب الحوكمة خلف صلاحيته ❌', 'GOV-PERM-403', 'اطلب المنحة من مدير الصلاحيات إن كانت ضمن عملك');
 }
 
 $msg = ''; $err = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$gov_write) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'الدور قارئ هنا: الكتابة لملّاك الشاشة (1 · 19) ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
+    ems_gov_flash_redirect('../main/dashboard.php', 'الدور قارئ هنا: الكتابة لملاك الشاشة (1 · 19) ❌', 'GOV-PERM-403', 'اطلب المنحة من مدير الصلاحيات إن كانت ضمن عملك');
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $op = strval($_POST['op'] ?? '');
@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         else {
             $st = $conn->prepare("INSERT INTO entity_licenses (entity_id, lic_type, issuer, lic_no, expiry_date, alert_days, state) VALUES (?, ?, ?, ?, ?, ?, 'active')");
             $st->bind_param('issssi', $eid, $type, $issuer, $no, $expiry, $alert);
-            if ($st->execute()) { $msg = 'سُجّل الترخيص بتنبيهه قبل ' . $alert . ' يومًا'; } else { $err = $st->error; }
+            if ($st->execute()) { $msg = 'سجل الترخيص بتنبيهه قبل ' . $alert . ' يوما'; } else { $err = $st->error; }
             $st->close();
         }
     } elseif ($op === 'guarantee') {
@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $st = $conn->prepare("INSERT INTO guarantees (direction, entity_id, counterparty_id, gtee_type, bank, amount, currency, expiry_date, doc_ref, state) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'active')");
             $st->bind_param('siissdsss', $dir, $eid, $cp, $type, $bank, $amount, $cur, $expiry, $doc);
-            if ($st->execute()) { $msg = 'سُجّلت الكفالة (' . ($dir === 'issued' ? 'صادرة — التزام محتمل' : 'واردة — حق محتمل') . ')'; } else { $err = $st->error; }
+            if ($st->execute()) { $msg = 'سجلت الكفالة (' . ($dir === 'issued' ? 'صادرة — التزام محتمل' : 'واردة — حق محتمل') . ')'; } else { $err = $st->error; }
             $st->close();
         }
     } elseif ($op === 'renew') {
@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $st->bind_param('ssi', $newExp, $doc, $lid);
             $st->execute();
             $st->close();
-            $msg = 'جُدّد الترخيص #' . $lid . ' حتى ' . $newExp;
+            $msg = 'جدد الترخيص #' . $lid . ' حتى ' . $newExp;
         }
     }
 }
@@ -99,8 +99,8 @@ $entities = $conn->query("SELECT entity_id, legal_name FROM legal_entities WHERE
 function expiry_badge($daysLeft) {
     $d = intval($daysLeft);
     if ($d < 0) { return '<span class="badge badge-danger">منتهية منذ ' . abs($d) . ' يوم</span>'; }
-    if ($d <= 30) { return '<span class="badge badge-warning">تنتهي خلال ' . $d . ' يومًا</span>'; }
-    return '<span class="badge badge-success">' . $d . ' يومًا متبقية</span>';
+    if ($d <= 30) { return '<span class="badge badge-warning">تنتهي خلال ' . $d . ' يوما</span>'; }
+    return '<span class="badge badge-success">' . $d . ' يوما متبقية</span>';
 }
 
 $page_title = 'إيكوبيشن | التراخيص والكفالات';
@@ -118,18 +118,18 @@ include '../insidebar.php';
     $header_actions = array();
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا تراخيصَ ولا كفالاتٍ مسجَّلةً بعدُ', 'سجِّل أولَ ترخيصٍ أو كفالةٍ من نماذجِ التسجيلِ أسفلَ الشاشة');
-    ems_screen_about('التراخيص بتواريخ انتهائها ملوَّنة، والكفالات الصادرة (التزام محتمل خارج الميزانية) '
-        . 'مفصولة عن الواردة (حق محتمل) — ومفصولة كلتاهما عن المحتجَز النقدي. ترخيص منتهٍ ونحن نعمل '
-        . 'به مخالفة لا تُكتشف إلا من الخارج — فالتنبيه قبل الانتهاء بمدة معرَّفة.',
-        array('الأحمر منتهٍ والبرتقالي ≤30 يومًا', 'التجديد برفع مستند'));
+    echo ems_states_bundle('لا تراخيص ولا كفالات مسجلة بعد', 'سجل أول ترخيص أو كفالة من نماذج التسجيل أسفل الشاشة');
+    ems_screen_about('التراخيص بتواريخ انتهائها ملونة، والكفالات الصادرة (التزام محتمل خارج الميزانية) '
+        . 'مفصولة عن الواردة (حق محتمل) — ومفصولة كلتاهما عن المحتجز النقدي. ترخيص منته ونحن نعمل '
+        . 'به مخالفة لا تكتشف إلا من الخارج — فالتنبيه قبل الانتهاء بمدة معرفة.',
+        array('الأحمر منته والبرتقالي ≤30 يوما', 'التجديد برفع مستند'));
     if ($msg !== '') { echo '<div class="alert alert-success">' . htmlspecialchars($msg) . '</div>'; }
     if ($err !== '') { echo '<div class="alert alert-danger">' . htmlspecialchars($err) . '</div>'; }
     ?>
     <div class="card"><div class="card-body">
         <h4>التراخيص والسجلات</h4>
         <div class="table-container"><table class="alltables display gov-lic-table" data-no-dt="1">
-        <thead><tr><th>الكيان</th><th>نوع المستند</th><th>الجهة المصدِرة</th><th>رقم السجل</th><th>تاريخ الانتهاء</th><th>تجديد</th>
+        <thead><tr><th>الكيان</th><th>نوع المستند</th><th>الجهة المصدرة</th><th>رقم السجل</th><th>تاريخ الانتهاء</th><th>تجديد</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">الرقم أو المرجع</th>
               <th class="ems-fn-th" data-fn="1">المستفيد</th>
@@ -140,11 +140,11 @@ include '../insidebar.php';
               <th class="ems-fn-th" data-fn="1">حالة الرد أو المصادرة</th>
               <th class="ems-fn-th" data-fn="1">المسؤول</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
               <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
               <th class="ems-gov-th" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
@@ -163,7 +163,7 @@ include '../insidebar.php';
         <?= csrf_field() ?>
                     <input type="hidden" name="op" value="renew">
                     <input type="hidden" name="lic_id" value="<?php echo intval($l['lic_id']); ?>">
-                    <input type="date" name="new_expiry" aria-label="تاريخُ الانتهاءِ الجديدِ بعد التجديد" required>
+                    <input type="date" name="new_expiry" aria-label="تاريخ الانتهاء الجديد بعد التجديد" required>
                     <input type="text" name="doc_ref" class="gov-lic-doc" placeholder="مستند التجديد" required aria-label="مستند التجديد">
                     <button class="btn-primary" type="submit">تجديد</button>
                 </form>
@@ -200,7 +200,7 @@ include '../insidebar.php';
             <form method="post" class="ems-form gov-lic-grid">
         <?= csrf_field() ?>
                 <input type="hidden" name="op" value="license">
-                <select name="entity_id" aria-label="الكيانُ القانونيُّ صاحبُ الترخيص" required>
+                <select name="entity_id" aria-label="الكيان القانوني صاحب الترخيص" required>
                     <option value="">— الكيان *</option>
                     <?php foreach ($entities as $e): ?>
                     <option value="<?php echo intval($e['entity_id']); ?>"><?php echo htmlspecialchars($e['legal_name']); ?></option>
@@ -209,7 +209,7 @@ include '../insidebar.php';
                 <input type="text" name="lic_type" placeholder="النوع (سجل تجاري · رخصة نشاط…) *" required aria-label="النوع (سجل تجاري · رخصة نشاط…)">
                 <input type="text" name="issuer" placeholder="الجهة المصدرة" aria-label="الجهة المصدرة">
                 <input type="text" name="lic_no" placeholder="الرقم" aria-label="الرقم">
-                <input type="date" name="expiry_date" aria-label="تاريخُ انتهاءِ الترخيص" required>
+                <input type="date" name="expiry_date" aria-label="تاريخ انتهاء الترخيص" required>
                 <input type="number" name="alert_days" value="30" title="التنبيه قبل الانتهاء بأيام" aria-label="التنبيه قبل الانتهاء بأيام">
                 <button class="btn-primary" type="submit">تسجيل</button>
             </form>
@@ -219,17 +219,17 @@ include '../insidebar.php';
             <form method="post" class="ems-form gov-lic-grid">
         <?= csrf_field() ?>
                 <input type="hidden" name="op" value="guarantee">
-                <select name="direction" aria-label="اتجاهُ الكفالة: صادرةٌ منا أو واردةٌ إلينا" required>
+                <select name="direction" aria-label="اتجاه الكفالة: صادرة منا أو واردة إلينا" required>
                     <option value="issued">صادرة منا (التزام محتمل)</option>
                     <option value="received">واردة إلينا (حق محتمل)</option>
                 </select>
-                <select name="entity_id" aria-label="كياننا الضامنُ في الكفالة" required>
+                <select name="entity_id" aria-label="كياننا الضامن في الكفالة" required>
                     <option value="">— كياننا *</option>
                     <?php foreach ($entities as $e): ?>
                     <option value="<?php echo intval($e['entity_id']); ?>"><?php echo htmlspecialchars($e['legal_name']); ?></option>
                     <?php endforeach; ?>
                 </select>
-                <select name="counterparty_id" aria-label="الطرفُ المقابلُ في الكفالة">
+                <select name="counterparty_id" aria-label="الطرف المقابل في الكفالة">
                     <option value="0">— الطرف المقابل</option>
                     <?php foreach ($entities as $e): ?>
                     <option value="<?php echo intval($e['entity_id']); ?>"><?php echo htmlspecialchars($e['legal_name']); ?></option>
@@ -238,8 +238,8 @@ include '../insidebar.php';
                 <input type="text" name="gtee_type" placeholder="النوع (حسن تنفيذ · دفعة مقدمة…)" aria-label="النوع (حسن تنفيذ · دفعة مقدمة…)">
                 <input type="text" name="bank" placeholder="البنك المصدر" aria-label="البنك المصدر">
                 <input type="number" step="0.01" name="amount" placeholder="القيمة *" required aria-label="القيمة">
-                <input type="text" name="currency" aria-label="عملةُ قيمةِ الكفالة" value="USD">
-                <input type="date" name="expiry_date" aria-label="تاريخُ انتهاءِ الكفالة" required>
+                <input type="text" name="currency" aria-label="عملة قيمة الكفالة" value="USD">
+                <input type="date" name="expiry_date" aria-label="تاريخ انتهاء الكفالة" required>
                 <input type="text" name="doc_ref" placeholder="مرجع المستند *" required aria-label="مرجع المستند">
                 <button class="btn-primary" type="submit">تسجيل</button>
             </form>

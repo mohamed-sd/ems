@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 if (function_exists('verify_csrf_token') && !verify_csrf_token($_POST['csrf_token'] ?? '')) {
     http_response_code(403);
-    exit(json_encode(array('ok' => false, 'code' => 'FIN-CSRF', 'msg' => 'رمز الجلسة غير صالح — حدّث الصفحة')));
+    exit(json_encode(array('ok' => false, 'code' => 'FIN-CSRF', 'msg' => 'رمز الجلسة غير صالح — حدث الصفحة')));
 }
 
 /* الصلاحيات: الشاشاتُ العشرُ نفسُها هي مصدرُ الحكم */
@@ -75,11 +75,11 @@ $period = (string) ($_POST['period'] ?? date('Y-m'));
 try {
     if (!preg_match('/^\d{4}-\d{2}$/', $period) && $action !== 'posting_matrix_set'
         && $action !== 'ratio_target_set' && $action !== 'ratio_drill') {
-        throw new \RuntimeException('FIN-422: الفترةُ YYYY-MM إلزامًا');
+        throw new \RuntimeException('FIN-422: الفترة YYYY-MM إلزاما');
     }
     switch ($action) {
         case 'ratio_compute': // fin.ratio.compute
-            if (!$canWrite) { throw new \RuntimeException('FIN-403: الحسابُ للمالية'); }
+            if (!$canWrite) { throw new \RuntimeException('FIN-403: الحساب للمالية'); }
             $scope = array();
             foreach (array('project_id', 'contract_id', 'equipment_id') as $k) {
                 if (!empty($_POST[$k])) { $scope[$k] = (int) $_POST[$k]; }
@@ -96,7 +96,7 @@ try {
             $st->execute();
             $t = $st->get_result()->fetch_assoc();
             $st->close();
-            if (!$t) { throw new \RuntimeException('FIN-404: نسبةٌ غيرُ معرَّفة'); }
+            if (!$t) { throw new \RuntimeException('FIN-404: نسبة غير معرفة'); }
             $accounts = array();
             foreach (array('numerator_codes' => 'بسط', 'denominator_codes' => 'مقام') as $f => $side) {
                 foreach (array_filter(array_map('trim', explode(',', (string) $t[$f]))) as $c) {
@@ -112,7 +112,7 @@ try {
 
         case 'ratio_target_set': // fin.ratio.target — بسلطةِ النائب المالي
             if (!$canApproveTarget) {
-                throw new \RuntimeException('FIN-403: اعتمادُ الحدِّ لنائبِ الرئيسِ للشؤون المالية');
+                throw new \RuntimeException('FIN-403: اعتماد الحد لنائب الرئيس للشؤون المالية');
             }
             $code = (string) $_POST['ratio_code'];
             $st = $conn->prepare("SELECT * FROM fin_ratio_targets WHERE company_id = ? AND ratio_code = ?
@@ -121,14 +121,14 @@ try {
             $st->execute();
             $cur = $st->get_result()->fetch_assoc();
             $st->close();
-            if (!$cur) { throw new \RuntimeException('FIN-404: نسبةٌ غيرُ معرَّفة'); }
+            if (!$cur) { throw new \RuntimeException('FIN-404: نسبة غير معرفة'); }
             $ver = (int) $cur['version_no'] + 1;
             $warn = $_POST['warn_value'] !== '' ? (float) $_POST['warn_value'] : null;
             $crit = $_POST['critical_value'] !== '' ? (float) $_POST['critical_value'] : null;
             $tgt  = $_POST['target_value'] !== '' ? (float) $_POST['target_value'] : null;
             $owner = trim((string) ($_POST['owner_role'] ?? $cur['owner_role']));
             $cad = trim((string) ($_POST['cadence'] ?? $cur['cadence']));
-            $auth = 'اعتمادُ حدِّ نسبةٍ — نائبُ الرئيس للشؤون المالية والاستثمار · بصفة: ' . $actorCapacity;
+            $auth = 'اعتماد حد نسبة — نائب الرئيس للشؤون المالية والاستثمار · بصفة: ' . $actorCapacity;
             $parent = $cur['ratio_code'] . '@v' . $cur['version_no'];
             $st = $conn->prepare("INSERT INTO fin_ratio_targets
                 (company_id, ratio_code, group_code, name_ar, name_en, formula_ar, numerator_codes,
@@ -167,28 +167,28 @@ try {
             break;
 
         case 'project_pl': // fin.project.pl
-            if (!$canWrite) { throw new \RuntimeException('FIN-403: التوليدُ للمالية'); }
+            if (!$canWrite) { throw new \RuntimeException('FIN-403: التوليد للمالية'); }
             $out = array('ok' => true) + FA::generateProjectPL($conn, $company_id,
                 (int) $_POST['project_id'], $period, $uid, (string) ($_POST['basis'] ?? ''));
             break;
 
         case 'cashflow_generate': // fin.cashflow.generate — تتوازن أو تُرفض
-            if (!$canWrite) { throw new \RuntimeException('FIN-403: التوليدُ للمدير المالي'); }
+            if (!$canWrite) { throw new \RuntimeException('FIN-403: التوليد للمدير المالي'); }
             $out = array('ok' => true) + FA::generateCashflow($conn, $company_id, $period, $uid);
             break;
 
         case 'equity_generate': // fin.equity.generate — تتوازن أو تُرفض
-            if (!$canWrite) { throw new \RuntimeException('FIN-403: التوليدُ للمدير المالي'); }
+            if (!$canWrite) { throw new \RuntimeException('FIN-403: التوليد للمدير المالي'); }
             $out = array('ok' => true) + FA::generateEquity($conn, $company_id, $period, $uid);
             break;
 
         case 'signal_raise': // fin.signal.raise — تُنشر للمخاطر
-            if (!$canWrite) { throw new \RuntimeException('FIN-403: التقييمُ للمالية'); }
+            if (!$canWrite) { throw new \RuntimeException('FIN-403: التقييم للمالية'); }
             $out = array('ok' => true) + FA::evaluateSignals($conn, $company_id, $period, $uid);
             break;
 
         case 'posting_matrix_set': // fin.posting.matrix — بمراجعةِ الحوكمة
-            if (!$canWrite) { throw new \RuntimeException('FIN-403: المصفوفةُ للمدير المالي'); }
+            if (!$canWrite) { throw new \RuntimeException('FIN-403: المصفوفة للمدير المالي'); }
             $rule = (string) $_POST['rule_code'];
             $st = $conn->prepare("SELECT * FROM fin_posting_matrix WHERE company_id = ? AND rule_code = ?
                                    ORDER BY version_no DESC LIMIT 1");
@@ -196,7 +196,7 @@ try {
             $st->execute();
             $cur = $st->get_result()->fetch_assoc();
             $st->close();
-            if (!$cur) { throw new \RuntimeException('FIN-404: صفٌّ غيرُ معرَّف'); }
+            if (!$cur) { throw new \RuntimeException('FIN-404: صف غير معرف'); }
             $ver = (int) $cur['version_no'] + 1;
             $rev = trim((string) ($_POST['revenue_accounts'] ?? $cur['revenue_accounts']));
             $cost = trim((string) ($_POST['cost_accounts'] ?? $cur['cost_accounts']));
@@ -204,7 +204,7 @@ try {
             foreach (array_filter(array_map('trim', preg_split('/[,·\s]+/u', $rev . ',' . $cost))) as $c) {
                 if (!preg_match('/^\d{2,4}$/', $c)) { continue; }
                 $acc = CoaService::account($conn, $company_id, $c);
-                if (!$acc) { throw new \RuntimeException('COA-404: كودٌ خارجَ الشجرةِ القانونية — ' . $c); }
+                if (!$acc) { throw new \RuntimeException('COA-404: كود خارج الشجرة القانونية — ' . $c); }
             }
             $st = $conn->prepare("INSERT INTO fin_posting_matrix
                 (company_id, rule_code, dept_ar, source_event, revenue_accounts, cost_accounts,
@@ -223,7 +223,7 @@ try {
 
         default:
             http_response_code(400);
-            $out = array('ok' => false, 'code' => 'FIN-400', 'msg' => 'فعلٌ غيرُ معرَّف — لا زرَّ بلا عقد');
+            $out = array('ok' => false, 'code' => 'FIN-400', 'msg' => 'فعل غير معرف — لا زر بلا عقد');
     }
 } catch (\Throwable $e) {
     $msg = $e->getMessage();

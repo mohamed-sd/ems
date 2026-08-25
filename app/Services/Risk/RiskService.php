@@ -170,8 +170,8 @@ class RiskService
         $sig = $st->get_result()->fetch_assoc();
         $st->close();
         if (!$sig) { throw new \RuntimeException('RSK-404: الإشارة غير موجودة في نطاقك'); }
-        if ($sig['state'] !== 'pending') { throw new \RuntimeException('RSK-409: الإشارة مفروزة سلفًا (' . $sig['state'] . ')'); }
-        if (trim((string) $reason) === '') { throw new \RuntimeException('RSK-422: قرار الفرز بسببه المكتوب — لا فرز صامتًا'); }
+        if ($sig['state'] !== 'pending') { throw new \RuntimeException('RSK-409: الإشارة مفروزة سلفا (' . $sig['state'] . ')'); }
+        if (trim((string) $reason) === '') { throw new \RuntimeException('RSK-422: قرار الفرز بسببه المكتوب — لا فرز صامتا'); }
 
         $linkedRiskId = null;
         $newState = null;
@@ -203,7 +203,7 @@ class RiskService
                 if (empty($risk['id'])) {
                     // مطابقٌ قائم داخل النافذة — لا تحويل أعمى (ورقة 32: الدمج بقرار)
                     $dupCodes = implode('، ', array_map(function ($d) { return $d['risk_code']; }, $risk['duplicates']));
-                    throw new \RuntimeException('RSK-409: خطر مطابق قائم (' . $dupCodes . ') — اربط الإشارة به أو أكد الإنشاء بقرار مسبَّب');
+                    throw new \RuntimeException('RSK-409: خطر مطابق قائم (' . $dupCodes . ') — اربط الإشارة به أو أكد الإنشاء بقرار مسبب');
                 }
                 $linkedRiskId = $risk['id'];
                 $newState = 'converted';
@@ -243,14 +243,14 @@ class RiskService
            وهذا يفحص **الحضورَ** وحدَه، وهو ما كان غائبًا. */
         if (empty($d['owner_unit_id']) || (int) $d['owner_unit_id'] <= 0) {
             throw new \RuntimeException(
-                'RSK-422: الوحدةُ المالكةُ إلزاميةٌ — «لا خطرَ يُسجَّل بلا وحدةٍ مالكة»');
+                'RSK-422: الوحدة المالكة إلزامية — «لا خطر يسجل بلا وحدة مالكة»');
         }
         $key = self::dedupKey($ruId, $d['entity_type'] ?? '', $d['entity_id'] ?? 0,
             $d['root_cause'] ?? '', $d['scope_ref_type'] ?? '', $d['scope_ref_id'] ?? 0);
         $dups = self::dedupCandidates($db, $companyId, $key, $ruId);
         if (!empty($dups) && !$forceDuplicate) {
             return array('id' => 0, 'duplicates' => $dups, 'dedup_key' => $key,
-                'hint' => 'خطر بالمفتاح نفسه داخل النافذة — اربط الإشارة به أو أكد الإنشاء بقرار محلل مسبَّب');
+                'hint' => 'خطر بالمفتاح نفسه داخل النافذة — اربط الإشارة به أو أكد الإنشاء بقرار محلل مسبب');
         }
         // الرمز التسلسلي RSK-000001 لكل شركة — بالمُرقِّمِ الواحدِ لا باستعلامٍ
         // ثانٍ هنا (INJ-0631: النسخةُ المحليةُ كانت تقتطع بالموضعِ فتلتقط بادئةً
@@ -281,7 +281,7 @@ class RiskService
             $chk->close();
             if (!$found) {
                 return array('id' => 0, 'duplicates' => array(), 'error' => 'RSK-UNIT-422',
-                    'hint' => 'الإدارة المالكة ليست وحدةً نشطةً في هيكل هذا الكيان');
+                    'hint' => 'الإدارة المالكة ليست وحدة نشطة في هيكل هذا الكيان');
             }
         }
         $rowner = !empty($d['risk_owner_user_id']) ? (int) $d['risk_owner_user_id'] : null;
@@ -379,7 +379,7 @@ class RiskService
             $up->execute(); $up->close();
             if ($level === 'حرج' || $level === 'محظور') {
                 self::escalate($db, $companyId, $riskId, null,
-                    'تقييم ' . ($type === 'inherent' ? 'متأصل' : 'متبقٍ') . ' بمستوى ' . $level, 'ceo', $userId);
+                    'تقييم ' . ($type === 'inherent' ? 'متأصل' : 'متبق') . ' بمستوى ' . $level, 'ceo', $userId);
             }
             // المرحلة ٩ «مقارنةُ الشهية»: حكمٌ آليٌّ يتبع كلَّ تقييمٍ — لا يُدخَل يدويًّا.
             if ($type === 'residual') {
@@ -472,7 +472,7 @@ class RiskService
 
         if ($verdict === 'محظور' || $verdict === 'فوق حد التحمل') {
             self::escalate($db, $companyId, $riskId, null,
-                'محرّك الشهية: ' . $verdict . ' في مجال ' . (string) $row['domain'], 'ceo', $userId);
+                'محرك الشهية: ' . $verdict . ' في مجال ' . (string) $row['domain'], 'ceo', $userId);
         }
         return $verdict;
     }
@@ -487,7 +487,7 @@ class RiskService
         $st->close();
         if (!$ctl) { throw new \RuntimeException('RSK-404: الضابط غير موجود'); }
         if ((int) $ctl['is_critical'] === 1 && (int) $ctl['owner_user_id'] === (int) $userId) {
-            throw new \RuntimeException('RSK-403: الضابط الحرج لا يتحقق مالكه من نفسه — متحقق مستقل إلزامًا');
+            throw new \RuntimeException('RSK-403: الضابط الحرج لا يتحقق مالكه من نفسه — متحقق مستقل إلزاما');
         }
         if (!in_array($result, array('فعال', 'فعال جزئيا', 'غير فعال'), true)) { throw new \RuntimeException('RSK-422: نتيجة تحقق غير معروفة'); }
         if (trim((string) $evidenceText) === '') { throw new \RuntimeException('RSK-422: التحقق بدليل لا بادعاء (RK-07)'); }
@@ -537,9 +537,9 @@ class RiskService
         $st->close();
         if (!$ctl) { throw new \RuntimeException('RSK-404: الضابط غير موجود'); }
         if ((int) $ctl['is_critical'] !== 1) {
-            throw new \RuntimeException('RSK-422: فعلُ الفشلِ للضابطِ الحرجِ وحدَه — وغيرُه يُسجَّل تحققًا غيرَ فعّال');
+            throw new \RuntimeException('RSK-422: فعل الفشل للضابط الحرج وحده — وغيره يسجل تحققا غير فعال');
         }
-        if (trim((string) $reason) === '') { throw new \RuntimeException('RSK-422: فشلُ الضابطِ بسببِه المكتوب'); }
+        if (trim((string) $reason) === '') { throw new \RuntimeException('RSK-422: فشل الضابط بسببه المكتوب'); }
 
         $up = $db->prepare("UPDATE risk_controls SET effectiveness = 'غير فعال', last_verify_result = ?, last_verified_at = CURDATE() WHERE id = ? AND company_id = ?");
         $up->bind_param('sii', $reason, $controlId, $companyId);
@@ -639,15 +639,15 @@ class RiskService
             }
             $__isOwner = ((int) ($risk['risk_owner_user_id'] ?? 0) === (int) $userId);
             if (!$__isOwner && $__myUnit !== $__ownerUnit) {
-                throw new \RuntimeException('RSK-403-OWNER: الخطرُ مملوكٌ لوحدةٍ أخرى (#'
-                    . $__ownerUnit . ') — قبولُه إقرارٌ بتحمّلِ أثرِه، ولا يتحمّله من لا يقع عليه');
+                throw new \RuntimeException('RSK-403-OWNER: الخطر مملوك لوحدة أخرى (#'
+                    . $__ownerUnit . ') — قبوله إقرار بتحمل أثره، ولا يتحمله من لا يقع عليه');
             }
         }
         $level = (string) $risk['current_level'];
-        if ($level === '' || $level === null) { throw new \RuntimeException('RSK-409: لا قبول قبل تقييم متبقٍّ معتمد'); }
+        if ($level === '' || $level === null) { throw new \RuntimeException('RSK-409: لا قبول قبل تقييم متبق معتمد'); }
         if ($level === 'محظور') {
             self::escalate($db, $companyId, $riskId, null, 'محاولة قبول خطر محظور — إيقاف النشاط', 'ceo', $userId);
-            throw new \RuntimeException('RSK-403: المحظور لا يُقبل بحال — صُعِّد فورًا');
+            throw new \RuntimeException('RSK-403: المحظور لا يقبل بحال — صعد فورا');
         }
         $need = self::AUTHORITY_MATRIX[$level];
         $rank = array('risk_owner' => 1, 'owner_with_analyst' => 2, 'analyst' => 2, 'deputy' => 3, 'ceo' => 4);
@@ -660,7 +660,7 @@ class RiskService
         } elseif ($have < $rank[$need]) {
             $to = $need === 'ceo' ? 'ceo' : 'deputy';
             self::escalate($db, $companyId, $riskId, null, 'محاولة قبول ' . $level . ' بسلطة أدنى — تصعيد آلي', $to, $userId);
-            throw new \RuntimeException('RSK-403: قبول ' . $level . ' يتطلب سلطة ' . $need . ' — صُعِّد آليًّا (RK-04)');
+            throw new \RuntimeException('RSK-403: قبول ' . $level . ' يتطلب سلطة ' . $need . ' — صعد آليا (RK-04)');
         }
         $reviewDays = self::REVIEW_DAYS[$level];
         $auth = $need;
@@ -712,22 +712,22 @@ class RiskService
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'acceptance_id' => null);
         $acceptanceId = (int) $acceptanceId;
         $why = trim((string) $why);
-        if ($acceptanceId <= 0) { $out['code'] = 422; $out['reason'] = 'RSK-422: قبولٌ غيرُ صالح'; return $out; }
+        if ($acceptanceId <= 0) { $out['code'] = 422; $out['reason'] = 'RSK-422: قبول غير صالح'; return $out; }
         if ($why === '') {
             $out['code'] = 422;
-            $out['reason'] = 'RSK-422: سحبُ القبولِ يلزمه سببٌ مكتوب — لا سحبَ صامت';
+            $out['reason'] = 'RSK-422: سحب القبول يلزمه سبب مكتوب — لا سحب صامت';
             return $out;
         }
 
         $st = $db->prepare('SELECT risk_id, withdrawn_by FROM risk_acceptances WHERE id = ? AND company_id = ? LIMIT 1');
-        if (!$st) { $out['code'] = 500; $out['reason'] = 'RSK-500: تعذّر التحضير'; return $out; }
+        if (!$st) { $out['code'] = 500; $out['reason'] = 'RSK-500: تعذر التحضير'; return $out; }
         $st->bind_param('ii', $acceptanceId, $companyId);
         $st->execute();
         $row = $st->get_result()->fetch_assoc();
         $st->close();
-        if (!$row) { $out['code'] = 404; $out['reason'] = 'RSK-404: القبولُ غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!$row) { $out['code'] = 404; $out['reason'] = 'RSK-404: القبول غير موجود في نطاقك'; return $out; }
         if (!empty($row['withdrawn_by'])) {
-            $out['code'] = 422; $out['reason'] = 'RSK-422: القبولُ مسحوبٌ سلفًا — لا سحبَ ثانٍ'; return $out;
+            $out['code'] = 422; $out['reason'] = 'RSK-422: القبول مسحوب سلفا — لا سحب ثان'; return $out;
         }
         $riskId = (int) $row['risk_id'];
 
@@ -735,12 +735,12 @@ class RiskService
                                SET withdrawn_by = ?, withdrawn_at = NOW(),
                                    note = CONCAT(COALESCE(note,''), ' · سُحب: ', ?)
                              WHERE id = ? AND withdrawn_by IS NULL");
-        if (!$up) { $out['code'] = 500; $out['reason'] = 'RSK-500: تعذّر التحضير'; return $out; }
+        if (!$up) { $out['code'] = 500; $out['reason'] = 'RSK-500: تعذر التحضير'; return $out; }
         $u = (int) $userId;
         $up->bind_param('isi', $u, $why, $acceptanceId);
         $done = ($up->execute() && $db->affected_rows > 0);
         $up->close();
-        if (!$done) { $out['code'] = 409; $out['reason'] = 'RSK-409: لم يقع السحبُ — أُعيد التحميل'; return $out; }
+        if (!$done) { $out['code'] = 409; $out['reason'] = 'RSK-409: لم يقع السحب — أعيد التحميل'; return $out; }
 
         /* ② والخطرُ يعود إلى إعادةِ التقييم — فالقبولُ زال وحكمُه معه */
         $rs = $db->prepare("UPDATE risk_register SET state = 'reassessment'
@@ -757,7 +757,7 @@ class RiskService
         }
 
         $out['ok'] = true; $out['code'] = 200; $out['acceptance_id'] = $acceptanceId;
-        $out['reason'] = 'سُحب القبولُ #' . $acceptanceId . ' — وعاد الخطرُ إلى إعادةِ التقييم';
+        $out['reason'] = 'سحب القبول #' . $acceptanceId . ' — وعاد الخطر إلى إعادة التقييم';
         return $out;
     }
 
@@ -772,7 +772,7 @@ class RiskService
         $verified = (int) $st->get_result()->fetch_assoc()['c'];
         $st->close();
         if ($verified === 0) {
-            throw new \RuntimeException('RSK-403-CLOSE1: لا إغلاق بلا معالجة منفَّذة بدليل مقبول من المتحقق (RK-03)');
+            throw new \RuntimeException('RSK-403-CLOSE1: لا إغلاق بلا معالجة منفذة بدليل مقبول من المتحقق (RK-03)');
         }
         // ② إعادة تقييم بعد آخر معالجة موثقة
         $st = $db->prepare("SELECT
@@ -800,14 +800,14 @@ class RiskService
     /** إعادةُ الفتحِ (§7-1): «الخطرُ يعود للدورةِ بتقييمٍ جديدٍ يحفظ التاريخَ كلَّه» */
     public static function reopenRisk(\mysqli $db, $companyId, $riskId, $reason, $userId)
     {
-        if (trim((string) $reason) === '') { throw new \RuntimeException('RSK-422: إعادةُ الفتحِ بسببِها المكتوب'); }
+        if (trim((string) $reason) === '') { throw new \RuntimeException('RSK-422: إعادة الفتح بسببها المكتوب'); }
         $st = $db->prepare("SELECT state FROM risk_register WHERE id = ? AND company_id = ?");
         $st->bind_param('ii', $riskId, $companyId);
         $st->execute();
         $r = $st->get_result()->fetch_assoc();
         $st->close();
         if (!$r) { throw new \RuntimeException('RSK-404: الخطر غير موجود'); }
-        if ((string) $r['state'] !== 'closed') { throw new \RuntimeException('RSK-409: المفتوحُ لا يُعاد فتحه'); }
+        if ((string) $r['state'] !== 'closed') { throw new \RuntimeException('RSK-409: المفتوح لا يعاد فتحه'); }
         $up = $db->prepare("UPDATE risk_register SET state = 'reopened' WHERE id = ? AND company_id = ?");
         $up->bind_param('ii', $riskId, $companyId);
         $up->execute(); $up->close();
@@ -832,10 +832,10 @@ class RiskService
     {
         self::requireRisk($db, $companyId, (int) $riskId);
         if (!in_array($decision, array('استمرار', 'إغلاق', 'تصعيد'), true)) {
-            throw new \RuntimeException('RSK-422: قرارُ المراجعةِ أحدُ ثلاثةٍ: استمرارٌ أو إغلاقٌ أو تصعيد');
+            throw new \RuntimeException('RSK-422: قرار المراجعة أحد ثلاثة: استمرار أو إغلاق أو تصعيد');
         }
         if (trim((string) $findings) === '') {
-            throw new \RuntimeException('RSK-422: المراجعةُ بشاهدِها المكتوب — لا مراجعةَ صامتة');
+            throw new \RuntimeException('RSK-422: المراجعة بشاهدها المكتوب — لا مراجعة صامتة');
         }
         if (!in_array($triggerKind, array('دورية', 'حدث', 'فشل ضابط', 'تجاوز مؤشر'), true)) { $triggerKind = 'دورية'; }
 
@@ -890,12 +890,12 @@ class RiskService
     {
         $itype = (string) ($d['itype'] ?? 'واقعة');
         if (!in_array($itype, array('واقعة', 'واقعة كادت تقع', 'واقعة خسارة'), true)) {
-            throw new \RuntimeException('RSK-422: نوعُ الواقعةِ أحدُ ثلاثةٍ — ولا تُخلط (§11-2)');
+            throw new \RuntimeException('RSK-422: نوع الواقعة أحد ثلاثة — ولا تخلط (§11-2)');
         }
-        if (trim((string) ($d['title'] ?? '')) === '') { throw new \RuntimeException('RSK-422: عنوانُ الواقعةِ إلزاميّ'); }
+        if (trim((string) ($d['title'] ?? '')) === '') { throw new \RuntimeException('RSK-422: عنوان الواقعة إلزامي'); }
         $occurred = (string) ($d['occurred_at'] ?? '');
         if ($occurred === '' || !preg_match('~^\d{4}-\d{2}-\d{2}([ T]\d{2}:\d{2}(:\d{2})?)?$~', $occurred)) {
-            throw new \RuntimeException('RSK-422: وقتُ الواقعةِ لا وقتُ التسجيل — بصيغةٍ صحيحة');
+            throw new \RuntimeException('RSK-422: وقت الواقعة لا وقت التسجيل — بصيغة صحيحة');
         }
         $occurred = str_replace('T', ' ', $occurred);
         if (strlen($occurred) === 10) { $occurred .= ' 00:00:00'; }
@@ -964,18 +964,18 @@ class RiskService
     public static function setAppetite(\mysqli $db, $companyId, $domain, $appetiteAr, $toleranceAr, $planMode, $actorAuthority, $userId)
     {
         if ($actorAuthority !== 'ceo') {
-            throw new \RuntimeException('RSK-403: الشهيةُ يعتمدها الرئيسُ التنفيذيُّ حصرًا (§13-1) — والإداراتُ تقترح ولا تقرر');
+            throw new \RuntimeException('RSK-403: الشهية يعتمدها الرئيس التنفيذي حصرا (§13-1) — والإدارات تقترح ولا تقرر');
         }
         $st = $db->prepare('SELECT id, immutable_floor, appetite_ar FROM risk_appetite WHERE company_id = ? AND domain = ?');
         $st->bind_param('is', $companyId, $domain);
         $st->execute();
         $row = $st->get_result()->fetch_assoc();
         $st->close();
-        if (!$row) { throw new \RuntimeException('RSK-404: مجالُ شهيةٍ غيرُ معروف'); }
+        if (!$row) { throw new \RuntimeException('RSK-404: مجال شهية غير معروف'); }
         if ((int) $row['immutable_floor'] === 1) {
-            throw new \RuntimeException('RSK-403: أرضيةٌ لا تتغير بحال — السلامةُ والالتزامُ القانونيُّ وتسربُ البيانات (§13-2)');
+            throw new \RuntimeException('RSK-403: أرضية لا تتغير بحال — السلامة والالتزام القانوني وتسرب البيانات (§13-2)');
         }
-        if (trim((string) $appetiteAr) === '') { throw new \RuntimeException('RSK-422: نصُّ الشهيةِ إلزاميّ'); }
+        if (trim((string) $appetiteAr) === '') { throw new \RuntimeException('RSK-422: نص الشهية إلزامي'); }
         $mode = in_array($planMode, array('النمو والتوسع', 'التثبيت والكفاءة', 'الحماية والانكماش'), true) ? $planMode : '';
 
         $prev = (string) $row['appetite_ar'];
@@ -1032,7 +1032,7 @@ class RiskService
         $st->execute();
         $ru = $st->get_result()->fetch_assoc();
         $st->close();
-        if (!$ru) { throw new \RuntimeException('RSK-404: وحدةُ مخاطرَ غيرُ موجودة'); }
+        if (!$ru) { throw new \RuntimeException('RSK-404: وحدة مخاطر غير موجودة'); }
 
         $wantActive = isset($d['active']) ? (int) (bool) $d['active'] : (int) $ru['active'];
         if ($wantActive === 0 && (int) $ru['active'] === 1) {
@@ -1042,7 +1042,7 @@ class RiskService
             $open = (int) $st->get_result()->fetch_assoc()['c'];
             $st->close();
             if ($open > 0) {
-                throw new \RuntimeException('RSK-409: لا تعطيلَ لوحدةٍ عليها ' . $open . ' خطرًا مفتوحًا — رحّلها أولًا (التعديلُ بترحيلٍ لا بحذف)');
+                throw new \RuntimeException('RSK-409: لا تعطيل لوحدة عليها ' . $open . ' خطرا مفتوحا — رحلها أولا (التعديل بترحيل لا بحذف)');
             }
         }
         $win = isset($d['dedup_window_days']) ? max(1, min(3650, (int) $d['dedup_window_days'])) : null;
@@ -1088,7 +1088,7 @@ class RiskService
         if ($w !== null && $c !== null) {
             // الحرجُ أشدُّ من الإنذارِ دائمًا — والاتجاهُ يحدد معنى «أشد».
             $bad = ($dir === 'تصاعدي') ? ($c < $w) : ($c > $w);
-            if ($bad) { throw new \RuntimeException('RSK-422: الحدُّ الحرجُ أشدُّ من الإنذارِ باتجاهِ المؤشر'); }
+            if ($bad) { throw new \RuntimeException('RSK-422: الحد الحرج أشد من الإنذار باتجاه المؤشر'); }
         }
         $up = $db->prepare('UPDATE risk_kris SET warn_num = ?, critical_num = ?, direction = ? WHERE id = ? AND company_id = ?');
         $up->bind_param('ddsii', $w, $c, $dir, $kriId, $companyId);
@@ -1109,7 +1109,7 @@ class RiskService
     public static function logExport(\mysqli $db, $companyId, array $d, $userId)
     {
         $screen = (string) ($d['screen_code'] ?? '');
-        if ($screen === '') { throw new \RuntimeException('RSK-422: سجلُّ التصديرِ بشاشتِه'); }
+        if ($screen === '') { throw new \RuntimeException('RSK-422: سجل التصدير بشاشته'); }
         $st = $db->prepare('INSERT INTO risk_export_log
             (company_id, exported_by, actor_capacity, screen_code, view_key, columns_text, filters_text, blocked_text, row_count, fmt)
             VALUES (?,?,?,?,?,?,?,?,?,?)');
@@ -1148,7 +1148,7 @@ class RiskService
                 $r = self::createSignal($db, $companyId, $it, $userId);
                 if (!empty($r['idempotent'])) { $idempotent[] = array('sync_uuid' => $it['sync_uuid'], 'id' => $r['id']); }
                 else { $created[] = array('sync_uuid' => $it['sync_uuid'], 'id' => $r['id']); }
-            } catch (\Throwable $ex) { ems_catch_ignored($ex, __METHOD__, 'مزامنةُ إشارةٍ ميدانيةٍ واحدةٍ فشلت — بقيةُ الدفعةِ تُزامَن، والفاشلةُ تُعاد بمعرِّفها');
+            } catch (\Throwable $ex) { ems_catch_ignored($ex, __METHOD__, 'مزامنة إشارة ميدانية واحدة فشلت — بقية الدفعة تزامن، والفاشلة تعاد بمعرفها');
                 $failed[] = array('i' => $i, 'reason' => $ex->getMessage());
             }
         }
@@ -1171,7 +1171,7 @@ class RiskService
      */
     public static function attestAccessReview(\mysqli $db, $companyId, $scopeCode, $headcount, $note, $userId)
     {
-        if (trim((string) $scopeCode) === '') { throw new \RuntimeException('RSK-422: نطاقُ التصديقِ إلزاميّ'); }
+        if (trim((string) $scopeCode) === '') { throw new \RuntimeException('RSK-422: نطاق التصديق إلزامي'); }
         $ev = RiskEvents::fire($db, $companyId, 'AccessReviewAttested', (int) $userId, array(
             'scope_code' => $scopeCode, 'headcount' => (int) $headcount, 'note' => (string) $note,
             'grants_permission' => false, // يشهد بصحتها ولا يمنحها
@@ -1223,11 +1223,11 @@ class RiskService
     public static function nextCode(\mysqli $db, $companyId, $table, $column, $prefix, $width)
     {
         if (!isset(self::CODE_TABLES[$table]) || self::CODE_TABLES[$table] !== $column) {
-            throw new \RuntimeException('RSK-500: جدولٌ أو عمودٌ خارجَ قائمةِ الترقيم');
+            throw new \RuntimeException('RSK-500: جدول أو عمود خارج قائمة الترقيم');
         }
         // البادئةُ تُركَّب في نمطِ REGEXP — فتُحصر في حروفٍ لاتينيةٍ وشَرطةٍ ختامية
         if (!preg_match('~^[A-Z]{2,8}-$~', (string) $prefix)) {
-            throw new \RuntimeException('RSK-500: بادئةُ ترقيمٍ غيرُ مقبولة: ' . $prefix);
+            throw new \RuntimeException('RSK-500: بادئة ترقيم غير مقبولة: ' . $prefix);
         }
         $len = strlen($prefix) + 1;
         $sql = "SELECT COALESCE(MAX(CAST(SUBSTRING(`$column`, $len) AS UNSIGNED)), 0) + 1 nx
@@ -1240,11 +1240,11 @@ class RiskService
         $nx = (int) $st->get_result()->fetch_assoc()['nx'];
         $st->close();
         if ($nx < 1 || $nx > 99999999) {
-            throw new \RuntimeException('RSK-500: تسلسلُ ' . $table . ' خارجَ المدى (' . $nx . ') — لا يُبنى عليه رمز');
+            throw new \RuntimeException('RSK-500: تسلسل ' . $table . ' خارج المدى (' . $nx . ') — لا يبنى عليه رمز');
         }
         $code = $prefix . str_pad((string) $nx, $width, '0', STR_PAD_LEFT);
         if (strlen($code) > self::CODE_LEN) {
-            throw new \RuntimeException('RSK-500: رمزٌ أطولُ من سعةِ العمود: ' . $code);
+            throw new \RuntimeException('RSK-500: رمز أطول من سعة العمود: ' . $code);
         }
         return $code;
     }
@@ -1253,7 +1253,7 @@ class RiskService
     public static function mergeRisks(\mysqli $db, $companyId, $srcRiskId, $dstRiskId, $reason, $userId)
     {
         if ((int) $srcRiskId === (int) $dstRiskId) { throw new \RuntimeException('RSK-422: لا دمج ذاتي'); }
-        if (trim((string) $reason) === '') { throw new \RuntimeException('RSK-422: الدمج بقرار محلل مسبَّب'); }
+        if (trim((string) $reason) === '') { throw new \RuntimeException('RSK-422: الدمج بقرار محلل مسبب'); }
         $st = $db->prepare("UPDATE risk_register SET merged_into_id = ?, state = 'closed' WHERE id = ? AND company_id = ? AND merged_into_id IS NULL");
         $st->bind_param('iii', $dstRiskId, $srcRiskId, $companyId);
         $st->execute();
@@ -1265,7 +1265,7 @@ class RiskService
             $up->execute(); $up->close();
             RiskEvents::fire($db, $companyId, 'RiskMerged', (int) $dstRiskId, array(
                 'merged_from' => (int) $srcRiskId, 'reason' => $reason,
-                'note' => 'الصفُّ المدموجُ يبقى أثرًا لا يُحذف',
+                'note' => 'الصف المدموج يبقى أثرا لا يحذف',
             ), $userId, (string) $srcRiskId);
         }
         return $ok;

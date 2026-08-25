@@ -33,7 +33,7 @@ $COLS   = array (
   1 => 'رقم الإذن',
   2 => 'نوع الإذن',
   3 => 'الموقع',
-  4 => 'كود المشغّل',
+  4 => 'كود المشغل',
   5 => 'الاسم',
   6 => 'التبعية',
   7 => 'المورد التابع له',
@@ -42,11 +42,11 @@ $COLS   = array (
   10 => 'تاريخ بداية العمل',
   11 => 'تاريخ نهاية العمل',
   12 => 'رحلة الدخول أو الخروج',
-  13 => 'السكن المخصَّص',
+  13 => 'السكن المخصص',
   14 => 'حالة الرخصة',
   15 => 'حالة الفحص الطبي',
   16 => 'المصادقة الأمنية',
-  17 => 'المُنشئ — الاسم والصفة',
+  17 => 'المنشئ — الاسم والصفة',
   18 => 'اعتماد مدير الموقع',
   19 => 'اعتماد مدير التشغيل',
   20 => 'تاريخ الاعتماد',
@@ -56,7 +56,7 @@ $FIELDS = array (
   0 => 'رقم الإذن',
   1 => 'نوع الإذن',
   2 => 'الموقع',
-  3 => 'كود المشغّل',
+  3 => 'كود المشغل',
   4 => 'الاسم',
   5 => 'التبعية',
   6 => 'المورد التابع له',
@@ -65,7 +65,7 @@ $FIELDS = array (
   9 => 'تاريخ بداية العمل',
   10 => 'تاريخ نهاية العمل',
   11 => 'رحلة الدخول أو الخروج',
-  12 => 'السكن المخصَّص',
+  12 => 'السكن المخصص',
   13 => 'حالة الرخصة',
   14 => 'حالة الفحص الطبي',
   15 => 'المصادقة الأمنية',
@@ -86,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     $creator = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
     // الموجة ٢: الحفظ في الجدول الأصلي للشاشة (الفارغ NULL — لا مخزن بينيًّا)
     $ok = cmp03_store_insert($conn, $company_id, $CANONICAL, $payload, $status, $uid, $creator);
-    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
+    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
     exit();
 }
 
@@ -101,7 +101,7 @@ $entityName = $govCtx['values']['entity'] ?? '—';
 function cmp03_cell($col, $row, $entityName) {
     $n = cmp03_screen_norm($col);
     if ($n === cmp03_screen_norm('الكيان')) { return $entityName; }
-    if ($n === cmp03_screen_norm('المُنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المُنشئة')) {
+    if ($n === cmp03_screen_norm('المنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المنشئة')) {
         return $row['created_by_name'] ?: '—';
     }
     if ($n === cmp03_screen_norm('تاريخ الإنشاء')) { return $row['created_at']; }
@@ -116,10 +116,10 @@ function cmp03_screen_norm($s) {
     $s = str_replace(array('أ','إ','آ'), 'ا', $s);
     $s = str_replace('ة', 'ه', $s);
     $s = str_replace('ى', 'ي', $s);
-    return preg_replace('/[ًٌٍَُِّْ]/u', '', $s);
+    return preg_replace('/[]/u', '', $s);
 }
 
-$page_title = 'إيكوبيشن | أذون دخول وخروج المشغّلين';
+$page_title = 'إيكوبيشن | أذون دخول وخروج المشغلين';
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
 require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(null);
@@ -129,7 +129,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 ?>
 <div class="main ems-unified-page-shell" dir="rtl">
     <?php
-    $header_title = 'أذون دخول وخروج المشغّلين';
+    $header_title = 'أذون دخول وخروج المشغلين';
     $header_icon = 'fa fa-door-open';
     $header_actions = array(
         array('tag' => 'button', 'id' => 'cmp03AddBtn', 'class' => '', 'icon' => 'fa fa-plus',
@@ -140,7 +140,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
-    echo ems_states_bundle('لا أذونَ دخولٍ أو خروجٍ مسجَّلةً بعدُ', 'أضف أولَ إذنٍ بزرِّ «إضافة» في رأسِ الشاشة');
+    echo ems_states_bundle('لا أذون دخول أو خروج مسجلة بعد', 'أضف أول إذن بزر «إضافة» في رأس الشاشة');
     ?>
 <?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('operator', ''); ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
@@ -150,7 +150,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <?= csrf_field() ?>
         <input type="hidden" name="cmp03_action" value="add">
         <div class="card"><div class="card-header">
-            <h5><i class="fa fa-plus"></i> إضافة — أذون دخول وخروج المشغّلين</h5>
+            <h5><i class="fa fa-plus"></i> إضافة — أذون دخول وخروج المشغلين</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
                 <div class="form-group"><label for="emsf_938_0f047">رقم الإذن</label>
@@ -159,7 +159,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="f1" maxlength="190" id="emsf_939_e4081"></div>
                 <div class="form-group"><label for="emsf_940_fba8a">الموقع</label>
                     <input type="text" name="f2" maxlength="190" id="emsf_940_fba8a"></div>
-                <div class="form-group"><label for="emsf_941_111c5">كود المشغّل</label>
+                <div class="form-group"><label for="emsf_941_111c5">كود المشغل</label>
                     <input type="text" name="f3" maxlength="190" id="emsf_941_111c5"></div>
                 <div class="form-group"><label for="emsf_942_cba30">الاسم</label>
                     <input type="text" name="f4" maxlength="190" id="emsf_942_cba30"></div>
@@ -177,7 +177,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="date" name="f10" id="emsf_948_02d8f"></div>
                 <div class="form-group"><label for="emsf_949_886f0">رحلة الدخول أو الخروج</label>
                     <input type="text" name="f11" maxlength="190" id="emsf_949_886f0"></div>
-                <div class="form-group"><label for="emsf_950_febfe">السكن المخصَّص</label>
+                <div class="form-group"><label for="emsf_950_febfe">السكن المخصص</label>
                     <input type="text" name="f12" maxlength="190" id="emsf_950_febfe"></div>
                 <div class="form-group"><label for="emsf_951_6a5bc">حالة الرخصة</label>
                     <input type="text" name="f13" maxlength="190" id="emsf_951_6a5bc"></div>
@@ -205,11 +205,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="table-responsive">
         <table class="alltables display" id="site_gate_personTable">
             <thead><tr>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
             <th>رقم الإذن</th>
             <th>نوع الإذن</th>
             <th>الموقع</th>
-            <th>كود المشغّل</th>
+            <th>كود المشغل</th>
             <th>الاسم</th>
             <th>التبعية</th>
             <th>المورد التابع له</th>
@@ -218,11 +218,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th>تاريخ بداية العمل</th>
             <th>تاريخ نهاية العمل</th>
             <th>رحلة الدخول أو الخروج</th>
-            <th>السكن المخصَّص</th>
+            <th>السكن المخصص</th>
             <th>حالة الرخصة</th>
             <th>حالة الفحص الطبي</th>
             <th>المصادقة الأمنية</th>
-            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
             <th>اعتماد مدير الموقع</th>
             <th>اعتماد مدير التشغيل</th>
             <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -230,7 +230,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="22" class="text-center text-muted">لا بياناتَ بعدُ — أضف أول صفٍّ بزر «إضافة»</td></tr>
+                <tr><td colspan="22" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
                     <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>

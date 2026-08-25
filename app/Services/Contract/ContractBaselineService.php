@@ -37,7 +37,7 @@ class ContractBaselineService
 
     const STATE_AR = array(
         'draft' => 'مسودة', 'reviewed' => 'مُراجَع', 'approved' => 'معتمَد',
-        'locked' => 'مقفل', 'amended' => 'مُعدَّل بملحق', 'superseded' => 'مُستبدَل',
+        'locked' => 'مقفل', 'amended' => 'مُعدَّل بملحق', 'superseded' => 'مستبدل',
     );
 
     /** **قائمةُ سماحٍ لا منع** — وما لم يُذكر هنا مرفوضٌ (نمطُ H-02). */
@@ -57,7 +57,7 @@ class ContractBaselineService
         'plan_sealed' => 'ختمُ الجدول — Σ = المتعاقَد',
         'resource_plan' => 'خطةُ الموارد (P-04)',
         'payment_schedule' => 'خطةُ الدفع (P-05)',
-        'sites' => 'نطاقُ التنفيذ (P-01)',
+        'sites' => 'نطاق التنفيذ (P-01)',
     );
 
     // ═════════════════════════════════════════════════════════════════════
@@ -77,7 +77,7 @@ class ContractBaselineService
         $nLines = count($lines);
         $o['counts']['lines'] = $nLines;
         $o['components']['lines'] = ($nLines > 0);
-        if ($nLines === 0) { $o['gaps'][] = self::COMPONENTS['lines'] . ': **لا بندَ بيعٍ نافذ**'; }
+        if ($nLines === 0) { $o['gaps'][] = self::COMPONENTS['lines'] . ': **لا بند بيع نافذ**'; }
 
         $months = 0; $sealed = 0; $unsealed = array();
         foreach ($lines as $l) {
@@ -90,12 +90,12 @@ class ContractBaselineService
         $o['counts']['plan_sealed'] = $sealed;
         $o['components']['monthly_plan'] = ($nLines > 0 && $months > 0);
         if ($nLines > 0 && $months === 0) {
-            $o['gaps'][] = self::COMPONENTS['monthly_plan'] . ': **لا شهرَ مخطَّطٌ واحد**';
+            $o['gaps'][] = self::COMPONENTS['monthly_plan'] . ': **لا شهر مخطط واحد**';
         }
         $o['components']['plan_sealed'] = ($nLines > 0 && $sealed === $nLines);
         if ($nLines > 0 && $sealed < $nLines) {
             $o['gaps'][] = self::COMPONENTS['plan_sealed'] . ': **' . count($unsealed)
-                . ' بندًا غيرَ مختوم** (' . implode(' · ', $unsealed) . ')';
+                . ' بندا غير مختوم** (' . implode(' · ', $unsealed) . ')';
         }
 
         $res = 0;
@@ -108,20 +108,20 @@ class ContractBaselineService
         $pay = self::countRows($gate, 'contract_payment_schedule', 'contract_id', $contractId, "AND t.effective_to IS NULL");
         $o['counts']['payment_rows'] = $pay;
         $o['components']['payment_schedule'] = ($pay > 0);
-        if ($pay === 0) { $o['gaps'][] = self::COMPONENTS['payment_schedule'] . ': **لا خطةَ دفعٍ نافذة**'; }
+        if ($pay === 0) { $o['gaps'][] = self::COMPONENTS['payment_schedule'] . ': **لا خطة دفع نافذة**'; }
 
         $sites = self::countRows($gate, 'contract_operational_sites', 'contract_id', $contractId,
                                  "AND COALESCE(t.is_deleted,0)=0");
         $o['counts']['sites'] = $sites;
         $o['components']['sites'] = ($sites > 0);
-        if ($sites === 0) { $o['gaps'][] = self::COMPONENTS['sites'] . ': **لا نطاقَ تنفيذٍ مسجَّل**'; }
+        if ($sites === 0) { $o['gaps'][] = self::COMPONENTS['sites'] . ': **لا نطاق تنفيذ مسجل**'; }
 
         $o['ok'] = empty($o['gaps']);
         $o['fingerprint'] = sha1(json_encode(array($contractId, $o['counts'])));
         $o['note'] = $o['ok']
-            ? '**المكوّناتُ مكتملة** — ' . $nLines . ' بندًا · ' . $months . ' شهرًا · '
-              . $pay . ' سطرَ دفعٍ · ' . $sites . ' نطاقًا'
-            : '**' . count($o['gaps']) . ' فجوةً**: ' . implode(' · ', $o['gaps']);
+            ? '**المكونات مكتملة** — ' . $nLines . ' بندا · ' . $months . ' شهرا · '
+              . $pay . ' سطر دفع · ' . $sites . ' نطاقا'
+            : '**' . count($o['gaps']) . ' فجوة**: ' . implode(' · ', $o['gaps']);
         return $o;
     }
 
@@ -149,8 +149,8 @@ class ContractBaselineService
         if ($cur) {
             $out['ok'] = true; $out['code'] = 200; $out['id'] = (int) $cur['id'];
             $out['version'] = (int) $cur['version'];
-            $out['reason'] = 'خطُّ أساسٍ قائمٌ بالنسخة ' . (int) $cur['version']
-                           . ' وحالُه «' . self::STATE_AR[(string) $cur['state']] . '» — **فعلٌ عاطل**';
+            $out['reason'] = 'خط أساس قائم بالنسخة ' . (int) $cur['version']
+                           . ' وحاله «' . self::STATE_AR[(string) $cur['state']] . '» — **فعل عاطل**';
             return $out;
         }
         try {
@@ -158,11 +158,11 @@ class ContractBaselineService
                 'contract_id' => (int) $contractId, 'version' => 1, 'state' => 'draft',
                 'created_by' => (int) $actor ?: null));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الفتح: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الفتح: ' . $t->getMessage(); return $out;
         }
         self::audit($conn, $companyId, $actor, 'baseline_open', $id, array(), array('contract' => $contractId));
         $out['ok'] = true; $out['code'] = 200; $out['id'] = $id; $out['version'] = 1;
-        $out['reason'] = 'فُتح خطُّ الأساس **مسودةً**';
+        $out['reason'] = 'فتح خط الأساس **مسودة**';
         return $out;
     }
 
@@ -175,21 +175,21 @@ class ContractBaselineService
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'state' => '');
         $to = (string) $to;
         if (!in_array($to, self::STATES, true)) {
-            $out['code'] = 422; $out['reason'] = 'حالٌ غيرُ معروف: ' . $to; return $out;
+            $out['code'] = 422; $out['reason'] = 'حال غير معروف: ' . $to; return $out;
         }
         $b = self::current($gate, (int) $contractId);
-        if (!$b) { $out['code'] = 404; $out['reason'] = 'لا خطَّ أساسٍ لهذا العقد — افتحه أولًا'; return $out; }
+        if (!$b) { $out['code'] = 404; $out['reason'] = 'لا خط أساس لهذا العقد — افتحه أولا'; return $out; }
         $from = (string) $b['state'];
         $out['state'] = $from;
         if ($from === $to) {
             $out['ok'] = true; $out['code'] = 200;
-            $out['reason'] = 'الحالُ «' . self::STATE_AR[$to] . '» كما هو — **فعلٌ عاطل**'; return $out;
+            $out['reason'] = 'الحال «' . self::STATE_AR[$to] . '» كما هو — **فعل عاطل**'; return $out;
         }
         $allowed = isset(self::ALLOWED[$from]) ? self::ALLOWED[$from] : array();
         if (!in_array($to, $allowed, true)) {
             $out['code'] = 422;
-            $out['reason'] = '**انتقالٌ غيرُ مشروع**: ' . self::STATE_AR[$from] . ' ← ' . self::STATE_AR[$to]
-                . ' — والمشروعُ من هنا: '
+            $out['reason'] = '**انتقال غير مشروع**: ' . self::STATE_AR[$from] . ' ← ' . self::STATE_AR[$to]
+                . ' — والمشروع من هنا: '
                 . ($allowed ? implode(' · ', array_map(function ($s) { return self::STATE_AR[$s]; }, $allowed))
                             : '**لا شيء (نهائية)**');
             return $out;
@@ -203,7 +203,7 @@ class ContractBaselineService
             // ولا يعتمد المرءُ ما راجع — **يدان لا يدٌ واحدة** (نظيرُ المستخلص)
             if ((int) $b['reviewed_by'] > 0 && (int) $b['reviewed_by'] === (int) $actor) {
                 $out['code'] = 422;
-                $out['reason'] = '**لا يعتمد خطَّ الأساس من راجعه** — الاعتمادُ يدٌ ثانية'; return $out;
+                $out['reason'] = '**لا يعتمد خط الأساس من راجعه** — الاعتماد يد ثانية'; return $out;
             }
             $data['approved_by'] = (int) $actor ?: null; $data['approved_at'] = $now;
         }
@@ -212,7 +212,7 @@ class ContractBaselineService
             $r = self::readiness($gate, (int) $contractId);
             if (!$r['ok']) {
                 $out['code'] = 422;
-                $out['reason'] = '**لا يُقفل خطُّ أساسٍ بفجوة** — ' . $r['note'];
+                $out['reason'] = '**لا يقفل خط أساس بفجوة** — ' . $r['note'];
                 return $out;
             }
             $data['locked_by'] = (int) $actor ?: null; $data['locked_at'] = $now;
@@ -226,17 +226,17 @@ class ContractBaselineService
         }
         if (in_array($to, array('amended', 'superseded'), true) && trim((string) $note) === '') {
             $out['code'] = 422;
-            $out['reason'] = '**سببُ التعديل إلزامي** — ولا يُفتح ملحقٌ صامتًا'; return $out;
+            $out['reason'] = '**سبب التعديل إلزامي** — ولا يفتح ملحق صامتا'; return $out;
         }
 
         try { $gate->update('contract_baseline', $data, array('id' => (int) $b['id'])); }
         catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الانتقال: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الانتقال: ' . $t->getMessage(); return $out;
         }
         self::audit($conn, $companyId, $actor, 'baseline_state', (int) $b['id'],
             array('state' => $from), array('state' => $to, 'note' => $note));
         $out['ok'] = true; $out['code'] = 200; $out['state'] = $to;
-        $out['reason'] = 'صار خطُّ الأساس «' . self::STATE_AR[$to] . '»'
+        $out['reason'] = 'صار خط الأساس «' . self::STATE_AR[$to] . '»'
             . ($to === 'locked' ? ' — **ومن هنا تبدأ الفوترة**' : '');
         return $out;
     }
@@ -246,15 +246,15 @@ class ContractBaselineService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'version' => 0);
         $b = self::current($gate, (int) $contractId);
-        if (!$b) { $out['code'] = 404; $out['reason'] = 'لا خطَّ أساسٍ لهذا العقد'; return $out; }
+        if (!$b) { $out['code'] = 404; $out['reason'] = 'لا خط أساس لهذا العقد'; return $out; }
         if ((string) $b['state'] !== 'locked') {
             $out['code'] = 409;
-            $out['reason'] = '**لا يُعدَّل إلا مقفل** — وحالُه «' . self::STATE_AR[(string) $b['state']] . '»';
+            $out['reason'] = '**لا يعدل إلا مقفل** — وحاله «' . self::STATE_AR[(string) $b['state']] . '»';
             return $out;
         }
         $reason = trim((string) $reason);
         if ($reason === '') {
-            $out['code'] = 422; $out['reason'] = '**سببُ الملحق إلزامي**'; return $out;
+            $out['code'] = 422; $out['reason'] = '**سبب الملحق إلزامي**'; return $out;
         }
         $old = (int) $b['version'];
         try {
@@ -271,13 +271,13 @@ class ContractBaselineService
                     'created_by' => (int) $actor ?: null));
             }, 'ملحق خط أساس ' . $contractId);
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الملحق: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الملحق: ' . $t->getMessage(); return $out;
         }
         self::audit($conn, $companyId, $actor, 'baseline_amend', (int) $b['id'],
             array('version' => $old), array('version' => $old + 1, 'reason' => $reason));
         $out['ok'] = true; $out['code'] = 200; $out['version'] = $old + 1;
-        $out['reason'] = 'فُتحت النسخة ' . ($old + 1) . ' **مسودةً** — **والنسخة ' . $old
-                       . ' مُستبدَلةٌ وباقيةٌ بسببها**';
+        $out['reason'] = 'فتحت النسخة ' . ($old + 1) . ' **مسودة** — **والنسخة ' . $old
+                       . ' مستبدلة وباقية بسببها**';
         return $out;
     }
 
@@ -322,28 +322,28 @@ class ContractBaselineService
         $o = array('allow' => true, 'code' => 200, 'mode' => $mode, 'state' => $state, 'reason' => '');
 
         if ($mode === 'off') {
-            $o['reason'] = '**الحارسُ مطفأ** (§2-②: القاعدةُ تسري على الجديد لا على القائم)';
+            $o['reason'] = '**الحارس مطفأ** (§2-②: القاعدة تسري على الجديد لا على القائم)';
             return $o;
         }
         $pilot = self::pilotContracts();
         if (!in_array((int) $contractId, $pilot, true)) {
-            $o['reason'] = '**العقدُ خارجَ الرائدة** — والحارسُ لا يُقلب على الجميع دفعةً واحدة (فخُّ E-08)';
+            $o['reason'] = '**العقد خارج الرائدة** — والحارس لا يقلب على الجميع دفعة واحدة (فخ E-08)';
             return $o;
         }
         if ($locked) {
-            $o['reason'] = 'خطُّ الأساس **مقفل** — والفوترةُ من هنا تبدأ';
+            $o['reason'] = 'خط الأساس **مقفل** — والفوترة من هنا تبدأ';
             return $o;
         }
         if ($mode === 'monitor') {
-            $o['reason'] = '⚠ **مراقبة**: خطُّ الأساس غيرُ مقفل ('
-                . ($state !== null ? self::STATE_AR[$state] : 'لا خطَّ أساسٍ أصلًا')
-                . ') — **سُجّل ولم يُمنع**';
+            $o['reason'] = '⚠ **مراقبة**: خط الأساس غير مقفل ('
+                . ($state !== null ? self::STATE_AR[$state] : 'لا خط أساس أصلا')
+                . ') — **سجل ولم يمنع**';
             self::log($contractId, $o['reason']);
             return $o;
         }
         $o['allow'] = false; $o['code'] = 423;
-        $o['reason'] = '**لا فوترةَ قبل قفل خط الأساس** — حالُه '
-            . ($state !== null ? self::STATE_AR[$state] : '**غيرُ مفتوحٍ أصلًا**')
+        $o['reason'] = '**لا فوترة قبل قفل خط الأساس** — حاله '
+            . ($state !== null ? self::STATE_AR[$state] : '**غير مفتوح أصلا**')
             . ' (PLAN-03 §9-⑱)';
         self::log($contractId, $o['reason']);
         return $o;

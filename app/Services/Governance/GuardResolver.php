@@ -32,12 +32,12 @@ class GuardResolver
         if (!$g) {
             // لا حماية بلا صنف معلن — والحارس غير المصنَّف يمنع (fail-closed)
             self::deny($conn, $companyId, $guardCode, $personId, $ref, 'unclassified');
-            return array('decision' => 'deny', 'req_id' => null, 'reason' => 'حماية بلا صنف — لا تُقلب ولا تُستثنى قبل التصنيف');
+            return array('decision' => 'deny', 'req_id' => null, 'reason' => 'حماية بلا صنف — لا تقلب ولا تستثنى قبل التصنيف');
         }
         $class = (string) $g['guard_class'];
 
         if ($class === 'advisory') {
-            return array('decision' => 'allow', 'req_id' => null, 'reason' => 'تنبيه مسجَّل — القرار للمدير');
+            return array('decision' => 'allow', 'req_id' => null, 'reason' => 'تنبيه مسجل — القرار للمدير');
         }
         if ($class === 'absolute') {
             self::deny($conn, $companyId, $guardCode, $personId, $ref, 'absolute');
@@ -72,7 +72,7 @@ class GuardResolver
             }
         }
         self::deny($conn, $companyId, $guardCode, $personId, $ref, 'no_exception');
-        return array('decision' => 'deny', 'req_id' => null, 'reason' => 'ممنوع افتراضًا — يُرفع استثناء محكوم بموافقاته');
+        return array('decision' => 'deny', 'req_id' => null, 'reason' => 'ممنوع افتراضا — يرفع استثناء محكوم بموافقاته');
     }
 
     private static function deny(\mysqli $conn, $companyId, $guardCode, $personId, $ref, $reasonCode)

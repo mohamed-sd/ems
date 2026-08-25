@@ -127,7 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'params' => array($code, $owner_role_id)));
             } catch (\Throwable $t) { error_log('modules.php dup check: ' . $t->getMessage()); }
             if ($md_dup !== null) {
-                $error_msg = 'هذه الصفحة مضافة مسبقاً لنفس الدور المسؤول ❌';
+                $error_msg = 'هذه الصفحة مضافة مسبقا لنفس الدور المسؤول ❌';
             } else {
                 // إضافة
                 if ($module_has_icon_column) {
@@ -233,8 +233,8 @@ include __DIR__ . '/../includes/page_header.php';
 
     <?php
     /* UXW-01 ⑨: حزمةُ الحالاتِ الدنيا — مخفيةٌ افتراضًا ويُظهرها منطقُ الشاشةِ عند حالِها */
-    echo ems_states_bundle('لا شاشاتِ نظامٍ مسجَّلةً بعدُ',
-        'أضف شاشةً جديدةً من زرِّ «إضافة صفحة جديدة» — والكودُ مفتاحُ حلِّ الصلاحية');
+    echo ems_states_bundle('لا شاشات نظام مسجلة بعد',
+        'أضف شاشة جديدة من زر «إضافة صفحة جديدة» — والكود مفتاح حل الصلاحية');
     ?>
 
     <!-- فورم إضافة / تعديل — الإظهارُ بصنفِ is-hidden لا بنمطٍ موضعيّ (UXW-01 ②)،
@@ -269,7 +269,7 @@ include __DIR__ . '/../includes/page_header.php';
                             <div class="icon-preview-card">
                                 <div class="icon-preview-box"><i id="icon_preview" class="<?= htmlspecialchars($default_module_icon, ENT_QUOTES, 'UTF-8'); ?>"></i></div>
                                 <div class="icon-preview-meta">
-                                    <strong>الأيقونة المختارة للـ sidebar</strong>
+                                    <strong>الأيقونة المختارة لل sidebar</strong>
                                     <span id="icon_preview_text"><?= htmlspecialchars($default_module_icon, ENT_QUOTES, 'UTF-8'); ?></span>
                                 </div>
                             </div>
@@ -370,22 +370,22 @@ include __DIR__ . '/../includes/page_header.php';
                             <th class="ems-fn-th" data-fn="1">المسار</th>
                             <th class="ems-fn-th" data-fn="1">الإدارة المالكة</th>
                             <th class="ems-fn-th" data-fn="1">نوع الشاشة</th>
-                            <th class="ems-fn-th" data-fn="1">مفعَّلة؟</th>
+                            <th class="ems-fn-th" data-fn="1">مفعلة؟</th>
                             <th class="ems-fn-th" data-fn="1">تظهر في القائمة؟</th>
                             <th class="ems-fn-th" data-fn="1">المرحلة في الدورة</th>
                             <th class="ems-fn-th" data-fn="1">المجموعة</th>
                             <th class="ems-fn-th" data-fn="1">ترتيبها</th>
                             <th class="ems-fn-th" data-fn="1">تحويل مسار من</th>
-                            <th class="ems-fn-th" data-fn="1">عدّاد الطرق القديم</th>
+                            <th class="ems-fn-th" data-fn="1">عداد الطرق القديم</th>
                             <th class="ems-fn-th" data-fn="1">تاريخ التفعيل</th>
                             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                             <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                             <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                             <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-                            <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                            <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+                            <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                            <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
                             <th class="ems-gov-th none" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
                             <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                             </tr>

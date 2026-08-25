@@ -69,12 +69,12 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     );
     include('../includes/page_header.php');
     ems_screen_about(
-        'الواقعةُ حدثٌ وقع بالفعل — والخطرُ لم يقع بعد. و«كادت تقع» من أهمِّ مصادرِ الإشاراتِ '
-        . 'ولا تُهمَل: تسجيلُها يولّد إشارةَ SG-14 آليًّا تدخل الفرز.',
-        array('تقييمُ الواقعةِ لا يُنشئ قيدًا ماليًّا — التعرضُ تقديرٌ وحدثٌ يُنشر للمالية (RK-06)',
-              'واقعةٌ تُحقق خطرًا قائمًا تُعيد تقييمَه حتمًا — لا اختيارًا',
-              'التصحيحُ واقعةٌ جديدةٌ بمرجعِ الأصلِ — ولا حذفَ إطلاقًا'));
-    echo ems_states_bundle('لا وقائعَ مسجَّلةً في نطاقك', 'الواقعةُ تُسجَّل بوقتِ وقوعِها لا بوقتِ تسجيلِها — و«كادت تقع» تولّد إشارةَ فرزٍ آليًّا');
+        'الواقعة حدث وقع بالفعل — والخطر لم يقع بعد. و«كادت تقع» من أهم مصادر الإشارات '
+        . 'ولا تهمل: تسجيلها يولد إشارة SG-14 آليا تدخل الفرز.',
+        array('تقييم الواقعة لا ينشئ قيدا ماليا — التعرض تقدير وحدث ينشر للمالية (RK-06)',
+              'واقعة تحقق خطرا قائما تعيد تقييمه حتما — لا اختيارا',
+              'التصحيح واقعة جديدة بمرجع الأصل — ولا حذف إطلاقا'));
+    echo ems_states_bundle('لا وقائع مسجلة في نطاقك', 'الواقعة تسجل بوقت وقوعها لا بوقت تسجيلها — و«كادت تقع» تولد إشارة فرز آليا');
     ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
@@ -94,7 +94,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     <div class="ems-card" id="incEmpty"></div>
     <script>document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('incEmpty').appendChild(EmsUI.emptyState({
-            reason: 'لا وقائع مسجلة في نطاقك — والواقعة تُسجَّل بوقت وقوعها لا بوقت تسجيلها'
+            reason: 'لا وقائع مسجلة في نطاقك — والواقعة تسجل بوقت وقوعها لا بوقت تسجيلها'
         }));
     });</script>
     <?php else: ?>
@@ -103,7 +103,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
             <thead><tr>
                 <th>الرمز</th><th>النوع</th><th>العنوان</th><th>وقت الوقوع</th>
                 <th>الوحدة</th><th>السبب الجذري</th><th>إصابات</th><th>توقف (ساعة)</th>
-                <th>تعرض مقدَّر</th><th>حقق الخطر</th><th>الحالة</th><th>المُنشئ</th>
+                <th>تعرض مقدر</th><th>حقق الخطر</th><th>الحالة</th><th>المنشئ</th>
             </tr></thead>
             <tbody>
             <?php foreach ($rows as $x): ?>
@@ -143,9 +143,9 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                 </select></label></div>
                 <div class="col-md-3"><label>وقت الوقوع *
                     <input name="occurred_at" type="datetime-local" class="form-control" aria-label="وقت وقوع الواقعة" required></label>
-                    <span class="rsk-hint">وقتُ الواقعةِ لا وقتُ التسجيل</span></div>
+                    <span class="rsk-hint">وقت الواقعة لا وقت التسجيل</span></div>
                 <div class="col-md-6"><label>العنوان *<input name="title" class="form-control" aria-label="عنوان الواقعة" required></label></div>
-                <div class="col-md-4"><label>الوحدة المرشَّحة<select name="ru_id" class="form-control" aria-label="وحدة المخاطر المرشَّحة">
+                <div class="col-md-4"><label>الوحدة المرشحة<select name="ru_id" class="form-control" aria-label="وحدة المخاطر المرشحة">
                     <option value="">—</option>
                     <?php foreach ($units as $u): ?>
                     <option value="<?php echo (int) $u['id']; ?>"><?php echo htmlspecialchars($u['ru_code'] . ' · ' . $u['name_ar']); ?></option>
@@ -153,11 +153,11 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                 </select></label></div>
                 <div class="col-md-4"><label>السبب الجذري<input name="root_cause" class="form-control" aria-label="السبب الجذري"></label></div>
                 <div class="col-md-4"><label>خطر قائم تحقق (id)<input name="realized_risk_id" type="number" class="form-control" aria-label="الخطر القائم الذي تحقق برقمه التسلسلي"></label>
-                    <span class="rsk-hint">الربطُ يُعيد تقييمَ الخطرِ حتمًا</span></div>
+                    <span class="rsk-hint">الربط يعيد تقييم الخطر حتما</span></div>
                 <div class="col-md-2"><label>إصابات<input name="injury_count" type="number" min="0" value="0" class="form-control" aria-label="عدد الإصابات"></label></div>
                 <div class="col-md-2"><label>توقف (ساعة)<input name="downtime_hours" type="number" step="0.25" min="0" value="0" class="form-control" aria-label="ساعات التوقف"></label></div>
-                <div class="col-md-3"><label>تعرض مقدَّر<input name="loss_estimate" type="number" step="0.01" class="form-control" aria-label="التعرض المالي المقدَّر"></label></div>
-                <div class="col-md-2"><label>العملة<input name="currency" class="form-control" maxlength="8" aria-label="عملة التعرض المقدَّر"></label></div>
+                <div class="col-md-3"><label>تعرض مقدر<input name="loss_estimate" type="number" step="0.01" class="form-control" aria-label="التعرض المالي المقدر"></label></div>
+                <div class="col-md-2"><label>العملة<input name="currency" class="form-control" maxlength="8" aria-label="عملة التعرض المقدر"></label></div>
                 <div class="col-md-3"><label>المعدة (id)<input name="equipment_id" type="number" class="form-control" aria-label="المعدة برقمها التسلسلي"></label></div>
                 <div class="col-md-12"><label>التفاصيل<textarea name="details" class="form-control" aria-label="تفاصيل الواقعة"></textarea></label></div>
             </div>
@@ -179,7 +179,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
             fetch('risk_actions.php', { method: 'POST', body: fd }).then(function (r) { return r.json(); })
             .then(function (j) {
                 var m = document.getElementById('incNewMsg');
-                if (j.ok) { m.textContent = '✔ سُجلت ' + (j.incident_code || ''); setTimeout(function () { location.reload(); }, 800); }
+                if (j.ok) { m.textContent = '✔ سجلت ' + (j.incident_code || ''); setTimeout(function () { location.reload(); }, 800); }
                 else { m.textContent = '✘ ' + (j.code || '') + ' ' + (j.msg || ''); }
             });
         });

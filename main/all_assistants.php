@@ -96,7 +96,7 @@ if (isset($_GET['delete']) && is_numeric($_GET['delete']) && $can_delete) {
     if ($aa_deleted > 0) {
         ems_gov_flash_redirect('all_assistants.php', 'تم حذف المعاون بنجاح ✅', 'GOV-OK-200', '');
     } else {
-        ems_gov_flash_redirect('all_assistants.php', 'تعذّر الحذف أو ليس حساباً فرعياً ❌', 'GOV-FAIL-409', '');
+        ems_gov_flash_redirect('all_assistants.php', 'تعذر الحذف أو ليس حسابا فرعيا ❌', 'GOV-FAIL-409', '');
     }
     exit;
 }
@@ -118,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
 
     // 1) المدير الأب ضمن الشركة وعُلوي (النطاق عبر البوابة)
     $parent_role = aa_user_role($aa_gate, $parent_user);
-    if ($parent_user <= 0 || $parent_role <= 0) { ems_gov_flash_redirect('all_assistants.php', 'اختر مديراً أباً صالحاً ❌', 'GOV-FAIL-409', ''); exit; }
+    if ($parent_user <= 0 || $parent_role <= 0) { ems_gov_flash_redirect('all_assistants.php', 'اختر مديرا أبا صالحا ❌', 'GOV-FAIL-409', ''); exit; }
 
     // 2) الدور ابنٌ فعلاً لدور المدير الأب (roles مرجع عام — قراءة عبر البوابة)
     $aa_role_ok = null;
@@ -127,7 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
             'where' => array('id' => $role, 'parent_role_id' => $parent_role),
             'whereRaw' => "(status='1' OR status=1)"));
     } catch (\Throwable $t) { error_log('all_assistants.php role check: ' . $t->getMessage()); }
-    if ($aa_role_ok === null) { ems_gov_flash_redirect('all_assistants.php', 'الدور يجب أن يكون تابعاً للمدير الأب ❌', 'GOV-FAIL-409', ''); exit; }
+    if ($aa_role_ok === null) { ems_gov_flash_redirect('all_assistants.php', 'الدور يجب أن يكون تابعا للمدير الأب ❌', 'GOV-FAIL-409', ''); exit; }
 
     // 3) ربط الموظف إلزامي + تحقّق الملكية/التفرّد
     if ($users_has_employee_id && $employee_link_id <= 0) { ems_gov_flash_redirect('all_assistants.php', 'يجب إسناد موظف للحساب ❌', 'GOV-FAIL-409', ''); exit; }
@@ -151,7 +151,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     $username_esc = mysqli_real_escape_string($conn, $username);
     $dupExcl = $is_editing ? " AND id != $uid" : "";
     $dup = mysqli_query($conn, "SELECT id FROM users WHERE username='$username_esc' $dupExcl AND COALESCE(is_deleted,0)=0 LIMIT 1");
-    if ($dup && mysqli_num_rows($dup) > 0) { ems_gov_flash_redirect('all_assistants.php', 'اسم المستخدم موجود مسبقاً ❌', 'GOV-FAIL-409', ''); exit; }
+    if ($dup && mysqli_num_rows($dup) > 0) { ems_gov_flash_redirect('all_assistants.php', 'اسم المستخدم موجود مسبقا ❌', 'GOV-FAIL-409', ''); exit; }
 
     if ($is_editing) {
         $aa_data = array(
@@ -199,7 +199,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href'=>'../main/dashboard.php','class'=>'','icon'=>'fas fa-arrow-right','label'=>'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا معاونين مسجَّلين في الشركة بعدُ', 'أضف أولَ معاونٍ بزرِّ «إضافة معاون» في رأسِ الشاشة');
+    echo ems_states_bundle('لا معاونين مسجلين في الشركة بعد', 'أضف أول معاون بزر «إضافة معاون» في رأس الشاشة');
     ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
     <?php if (!empty($_GET['msg'])): $ok = strpos($_GET['msg'], '✅') !== false; ?>
@@ -226,7 +226,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <div>
                         <label for="role"><i class="fas fa-shield-alt"></i> الدور (تابع للمدير) *</label>
                         <select name="role" id="role" required>
-                            <option value="">-- اختر المدير أولاً --</option>
+                            <option value="">-- اختر المدير أولا --</option>
                         </select>
                     </div>
                     <div>
@@ -240,7 +240,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <div>
                         <label for="password"><i class="fas fa-lock"></i> كلمة المرور <span id="pwReq">*</span></label>
                         <input type="password" name="password" id="password" placeholder="كلمة المرور">
-                        <small id="pwHint" class="pu-password-hint pu-hidden">اتركه فارغاً للاحتفاظ بالحالية عند التعديل</small>
+                        <small id="pwHint" class="pu-password-hint pu-hidden">اتركه فارغا للاحتفاظ بالحالية عند التعديل</small>
                     </div>
                     <div>
                         <label for="phone"><i class="fas fa-phone"></i> رقم الهاتف *</label>
@@ -248,7 +248,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </div>
                     <?php if ($users_has_employee_id): ?>
                     <div>
-                        <label for="employee_id_link"><i class="fas fa-id-card-alt"></i> الموظف المُسنَد *</label>
+                        <label for="employee_id_link"><i class="fas fa-id-card-alt"></i> الموظف المسند *</label>
                         <select name="employee_id" id="employee_id_link" required>
                             <option value="">— اختر الموظف —</option>
                             <?php foreach ($employees_for_link as $emp): ?>
@@ -259,7 +259,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 </option>
                             <?php endforeach; ?>
                         </select>
-                        <small class="pu-password-hint">إلزامي — لا حساب يعمل بلا موظف مُسنَد. تُعبّأ بياناته تلقائياً.</small>
+                        <small class="pu-password-hint">إلزامي — لا حساب يعمل بلا موظف مسند. تعبأ بياناته تلقائيا.</small>
                     </div>
                     <?php endif; ?>
                 </div>
@@ -281,7 +281,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <th class="ems-fn-th" data-fn="1">صفته</th>
                 <th class="ems-fn-th" data-fn="1">المعاون</th>
                 <th class="ems-fn-th" data-fn="1">نوع النيابة</th>
-                <th class="ems-fn-th" data-fn="1">النطاق المفوَّض</th>
+                <th class="ems-fn-th" data-fn="1">النطاق المفوض</th>
                 <th class="ems-fn-th" data-fn="1">سقف الاعتماد</th>
                 <th class="ems-fn-th" data-fn="1">من تاريخ</th>
                 <th class="ems-fn-th" data-fn="1">إلى تاريخ</th>
@@ -289,8 +289,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <th class="ems-fn-th" data-fn="1">مرجع تفويض الأصيل</th>
                 <th class="ems-fn-th" data-fn="1">أصدره</th>
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                 <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                 <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                 <th class="ems-gov-th none" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
@@ -404,7 +404,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     window.resetForm = function(){
         form.reset(); document.getElementById('uid').value = 0;
-        roleSel.innerHTML = '<option value="">-- اختر المدير أولاً --</option>';
+        roleSel.innerHTML = '<option value="">-- اختر المدير أولا --</option>';
         document.getElementById('formTitle').textContent = 'إضافة معاون';
         document.getElementById('submitTxt').textContent = 'حفظ المعاون';
         document.getElementById('pwReq').classList.remove('pu-hidden');

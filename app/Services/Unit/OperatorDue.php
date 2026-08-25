@@ -116,7 +116,7 @@ class OperatorDue
                      'lines' => array(), 'skipped' => array(), 'reason' => null, 'is_trial' => false);
 
         if (empty($ctx['employee_id'])) {
-            $out['reason'] = 'لا مشغّلَ على الواقعة';
+            $out['reason'] = 'لا مشغل على الواقعة';
             return $out;
         }
         // نموذجُ عمل الواقعة من وحدة عقدها — يرشّح السياسات (§8.2)
@@ -124,14 +124,14 @@ class OperatorDue
             $modelMap = array('hour' => 'hour', 'ton' => 'ton', 'meter' => 'meter', 'trip' => 'trip');
             $ut = isset($ctx['unit_type']) ? (string) $ctx['unit_type'] : '';
             if (!isset($modelMap[$ut])) {
-                $out['reason'] = 'نموذجُ عملٍ غير معروفٍ لوحدة الواقعة «' . $ut . '» — لا حكم';
+                $out['reason'] = 'نموذج عمل غير معروف لوحدة الواقعة «' . $ut . '» — لا حكم';
                 return $out;
             }
             $ctx['work_model'] = $modelMap[$ut];
         }
         $policies = self::applicablePolicies($conn, $companyId, $ctx);
         if (empty($policies)) {
-            $out['reason'] = 'لا سياسةَ منطبقةً لهذا المشغّل في هذا التاريخ والنطاق';
+            $out['reason'] = 'لا سياسة منطبقة لهذا المشغل في هذا التاريخ والنطاق';
             return $out;
         }
 
@@ -163,11 +163,11 @@ class OperatorDue
                     break;
                 case 'composite':
                     $out['skipped'][] = array('policy_id' => (int) $p['id'],
-                        'reason' => 'الأساس المركّب بلا صيغةٍ معتمدةٍ بعد — لا يُحسب ولا يُلفَّق');
+                        'reason' => 'الأساس المركب بلا صيغة معتمدة بعد — لا يحسب ولا يلفق');
                     continue 2;
                 default:
                     $out['skipped'][] = array('policy_id' => (int) $p['id'],
-                        'reason' => 'أساسٌ غير معروف: ' . $basis);
+                        'reason' => 'أساس غير معروف: ' . $basis);
                     continue 2;
             }
             if ($qty <= 0) { continue; } // لا كميةَ لأساسه اليوم — صفرٌ صامتٌ مشروع
@@ -175,7 +175,7 @@ class OperatorDue
             // اتفاق العملة — لا جمعَ عملتين
             if ($out['currency'] !== null && $out['currency'] !== $p['currency']) {
                 $out['skipped'][] = array('policy_id' => (int) $p['id'],
-                    'reason' => "عملة السياسة {$p['currency']} تخالف {$out['currency']} — لا جمعَ عملتين");
+                    'reason' => "عملة السياسة {$p['currency']} تخالف {$out['currency']} — لا جمع عملتين");
                 continue;
             }
 
@@ -202,7 +202,7 @@ class OperatorDue
         }
 
         if (!$out['ok'] && $out['reason'] === null) {
-            $out['reason'] = 'سياساتٌ منطبقةٌ لكن لا كميةَ لأيّ أساسٍ منها في هذا اليوم';
+            $out['reason'] = 'سياسات منطبقة لكن لا كمية لأي أساس منها في هذا اليوم';
         }
         return $out;
     }

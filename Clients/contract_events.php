@@ -129,7 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['event_code'])) {
     // الكود
     $evt_code_raw = isset($_POST['event_code']) ? trim($_POST['event_code']) : '';
     if ($evt_code_raw === '' || !preg_match('/^[A-Za-z0-9_\-]+$/', $evt_code_raw)) {
-        evt_redirect_with_msg('كود الحدث غير صالح. استخدم أحرفًا وأرقامًا و - أو _ فقط ❌');
+        evt_redirect_with_msg('كود الحدث غير صالح. استخدم أحرفا وأرقاما و - أو _ فقط ❌');
     }
 
     // التحقق من القوائم الثابتة (ENUM)
@@ -195,7 +195,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['event_code'])) {
                 array($evt_code_raw, $evt_id));
         } catch (\Throwable $t) { $dup = array(); }
         if (!empty($dup)) {
-            evt_redirect_with_msg('كود الحدث موجود مسبقاً داخل شركتك ❌');
+            evt_redirect_with_msg('كود الحدث موجود مسبقا داخل شركتك ❌');
         }
 
         try {
@@ -225,7 +225,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['event_code'])) {
                 array($evt_code_raw));
         } catch (\Throwable $t) { $dup = array(); }
         if (!empty($dup)) {
-            evt_redirect_with_msg('كود الحدث موجود مسبقاً داخل شركتك ❌');
+            evt_redirect_with_msg('كود الحدث موجود مسبقا داخل شركتك ❌');
         }
 
         try {
@@ -340,7 +340,7 @@ ems_shell_axes(isset($perms) ? $perms : null);
 include("../inheader.php");
 include('../insidebar.php');
 // UXW-01 §8-2: موضعُ الشاشةِ من رحلةِ العميل
-require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('contract', 'سجلُّ التغييرات');
+require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('contract', 'سجل التغييرات');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 // NAV-01 §8 (update0006-b): الشاشةُ قسمٌ من ملف العقد الأم لا صفحةٌ يتيمة
 $cf_contract_id = intval($_GET['contract'] ?? $_GET['id'] ?? 0); $cf_active = 'events';
@@ -390,7 +390,7 @@ function evt_state_tone($state)
         </div>
     <?php endif; ?>
 
-    <?php echo ems_states_bundle('لا أحداثَ تعاقديةً مسجَّلةً ضمن هذا الترشيح', 'سجّل حدثًا جديدًا أو غيّر المرشِّحات'); ?>
+    <?php echo ems_states_bundle('لا أحداث تعاقدية مسجلة ضمن هذا الترشيح', 'سجل حدثا جديدا أو غير المرشحات'); ?>
 
     <div class="stats-section evt-hidden" id="evtStatsSection">
         <div class="stats-grid">
@@ -543,7 +543,7 @@ function evt_state_tone($state)
                             <th class="ems-fn-th" data-fn="1">المستخدم</th>
                             <th class="ems-fn-th" data-fn="1">الصفة</th>
                             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
                             <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                             <th class="ems-gov-th" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
                             <th class="ems-gov-th" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
@@ -639,7 +639,7 @@ function evt_state_tone($state)
         });
         }
 
-        // الربطُ بعد تهيئةِ المكوّنِ المركزي للجدول (أو فورًا إن سبقنا)
+        // الربط بعد تهيئة المكون المركزي للجدول (أو فورا إن سبقنا)
         if ($.fn.dataTable && $.fn.dataTable.isDataTable('#evtTable')) {
             bindEvtFilters();
         } else {
@@ -658,13 +658,13 @@ function evt_state_tone($state)
     const statsSection = $('#evtStatsSection');
 
     /**
-     * إظهارُ حقلِ الكودِ المولَّد وإخفاؤه.
+     * إظهار حقل الكود المولد وإخفاؤه.
      *
      * ⚠️ **لا تستعمل `jQuery.hide()` هنا** — `assets/css/ems-forms.css` يحمل:
      *     :is(.allforms, .ems-form) .form-grid > div { display: block !important }
-     * والغلافُ ابنٌ مباشرٌ لـ`.form-grid`، فـ`!important` من ورقةِ الأنماطِ تهزم
-     * الإخفاءَ السطريَّ **بلا أولوية**: السمةُ تُكتب فعلًا والحقلُ يبقى ظاهرًا، بلا
-     * خطأٍ في وحدةِ التحكم ولا سطرٍ في أيِّ سجل. (نظيرُ شاشتَي العملاءِ والمشاريع.)
+     * والغلاف ابن مباشر ل`.form-grid`، ف`!important` من ورقة الأنماط تهزم
+     * الإخفاء السطري **بلا أولوية**: السمة تكتب فعلا والحقل يبقى ظاهرا، بلا
+     * خطأ في وحدة التحكم ولا سطر في أي سجل. (نظير شاشتي العملاء والمشاريع.)
      */
     function setGeneratedCodeShown(shown) {
         var el = generatedCodeWrapper[0];
@@ -675,9 +675,9 @@ function evt_state_tone($state)
     function setAddMode() {
         formTitle.text('إضافة حدث جديد'); submitBtnText.text('حفظ الحدث');
         setGeneratedCodeShown(true);
-        // الكودُ المولَّدُ يعود إلى خانتِه كلَّما دخلنا وضعَ الإضافة — ومصدرُه حقلُ
-        // العرضِ نفسُه لا نسخةٌ ثانيةٌ منه (مصدرُ حقيقةٍ واحد). و`reset()` يكفي
-        // للإلغاء، لكنَّ الانتقالَ من «تعديل» إلى «إضافة» قد يقع بلا reset.
+        // الكود المولد يعود إلى خانته كلما دخلنا وضع الإضافة — ومصدره حقل
+        // العرض نفسه لا نسخة ثانية منه (مصدر حقيقة واحد). و`reset()` يكفي
+        // للإلغاء، لكن الانتقال من «تعديل» إلى «إضافة» قد يقع بلا reset.
         var genCode = $('#generated_evt_code').val();
         if (genCode) { $('#event_code').val(genCode); }
     }
@@ -756,7 +756,7 @@ function evt_state_tone($state)
         });
     });
 
-    // ── عرض التفاصيل عبر EmsDetailsModal الموحّد ──
+    // ── عرض التفاصيل عبر EmsDetailsModal الموحد ──
     $(document).on('click', '.viewEvtBtn', function () {
         const d = $(this).data();
         const stateTone = {

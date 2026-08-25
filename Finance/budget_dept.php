@@ -48,12 +48,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 /* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
    شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
 $header_icon = 'fa fa-coins';
-$header_title_html = htmlspecialchars('ميزانيةُ إدارتي — ' . ($isFinance ? 'كلُّ الإدارات (زاويةُ المالية)' : htmlspecialchars($dept !== '' ? ems_dept_label($dept) : 'دورُك بلا وحدة', ENT_QUOTES, 'UTF-8')), ENT_QUOTES, 'UTF-8');
+$header_title_html = htmlspecialchars('ميزانية إدارتي — ' . ($isFinance ? 'كل الإدارات (زاوية المالية)' : htmlspecialchars($dept !== '' ? ems_dept_label($dept) : 'دورك بلا وحدة', ENT_QUOTES, 'UTF-8')), ENT_QUOTES, 'UTF-8');
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الثلاثُ من المكوّنِ المركزيّ
-echo ems_states_bundle('لا ميزانيةَ لنطاقِك في هذه السنة', 'غيِّر السنةَ أو راجعْ اعتمادَ ميزانيةِ إدارتِك');
+echo ems_states_bundle('لا ميزانية لنطاقك في هذه السنة', 'غير السنة أو راجع اعتماد ميزانية إدارتك');
 ?>
   <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
   <form method="get" class="bd-filter-form"><label for="emsf_222_9326f">السنة</label>
@@ -71,12 +71,12 @@ echo ems_states_bundle('لا ميزانيةَ لنطاقِك في هذه الس�
               <th class="ems-fn-th" data-fn="1">طلبات تعديل قائمة</th>
               <th class="ems-fn-th" data-fn="1">المسؤول</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
               <th class="ems-gov-th" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
               </tr></thead>
     <tbody>
-    <?php if (empty($rows)): ?><tr><td colspan="7" class="text-center text-muted">لا ميزانيةَ لنطاقك في <?= $year ?></td></tr><?php endif; ?>
+    <?php if (empty($rows)): ?><tr><td colspan="7" class="text-center text-muted">لا ميزانية لنطاقك في <?= $year ?></td></tr><?php endif; ?>
     <?php foreach ($rows as $b):
         $var = floatval($b['actual']) - floatval($b['planned']); ?>
       <tr>

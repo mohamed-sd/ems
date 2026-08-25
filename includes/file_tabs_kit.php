@@ -61,7 +61,7 @@ if (!function_exists('ems_file_tabs')) {
             if (!is_array($t) || empty($t['text'])) { continue; }
             $cls = 'ems-file-tab' . (empty($t['active']) ? '' : ' is-active');
             if (empty($t['href'])) {
-                $h .= '<span class="' . $cls . ' is-unbuilt" title="غيرُ مبنيةٍ بعد">'
+                $h .= '<span class="' . $cls . ' is-unbuilt" title="غير مبنية بعد">'
                     . $e($t['text']) . '</span>';
             } elseif (!empty($t['active'])) {
                 $h .= '<span class="' . $cls . '" aria-current="page">' . $e($t['text']) . '</span>';
@@ -76,7 +76,7 @@ if (!function_exists('ems_file_tabs')) {
         if (!empty($o['subs']) && is_array($o['subs']) && count($o['subs']) > 1) {
             $h .= '<div class="ems-file-tabs-subs">';
             $h .= '<span class="ems-file-tabs-subs-label">'
-                . $e(isset($o['subs_label']) ? $o['subs_label'] : 'أقسامُ التبويب') . ':</span>';
+                . $e(isset($o['subs_label']) ? $o['subs_label'] : 'أقسام التبويب') . ':</span>';
             foreach ($o['subs'] as $s) {
                 if (!is_array($s) || empty($s['text'])) { continue; }
                 $scls = 'ems-file-sub' . (empty($s['active']) ? '' : ' is-active');

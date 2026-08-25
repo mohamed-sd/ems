@@ -121,7 +121,7 @@ foreach (array_keys($company_ids) as $cid) {
             $target = tkt_escalation_target_role($hit['escalate_to_role'], intval($t['owner_role_id']));
             $dedupe = 'escalation:' . $tid . ':L' . intval($hit['level_no']);
             if (tkt_notify('escalation', 'تصعيد المستوى ' . intval($hit['level_no']) . ' — التذكرة ' . $t['ticket_no'],
-                    'تجاوزت موعد الإنجاز بـ' . (int) floor($late_h) . ' ساعة', $tid, $target,
+                    'تجاوزت موعد الإنجاز ب' . (int) floor($late_h) . ' ساعة', $tid, $target,
                     'ticket_form.php?id=' . $tid, $dedupe)) {
                 $n_escal++;
                 $cycleGate->update('tickets',
@@ -129,7 +129,7 @@ foreach (array_keys($company_ids) as $cid) {
                     array('id' => $tid));
                 tkt_log_event($tid, 'escalation',
                     'تصعيد تلقائي (مستوى ' . intval($hit['level_no']) . ') إلى: ' . $hit['escalate_to_role']
-                    . ' — تأخّر ' . (int) floor($late_h) . ' ساعة',
+                    . ' — تأخر ' . (int) floor($late_h) . ' ساعة',
                     null, null, null, $target);
             }
         }
@@ -174,7 +174,7 @@ foreach (array_keys($company_ids) as $cid) {
                     'call_date' => $tpl['next_occurrence_date'], 'call_time' => '00:00',
                     'reporting_person' => 'النظام (توليد دوري)',
                     'equipment_id' => ($tpl['equipment_id'] !== null) ? intval($tpl['equipment_id']) : null,
-                    'complaint' => $tpl['name'] . ' — تذكرة دورية مُولَّدة تلقائيًا لدورة ' . $tpl['next_occurrence_date'],
+                    'complaint' => $tpl['name'] . ' — تذكرة دورية مولدة تلقائيا لدورة ' . $tpl['next_occurrence_date'],
                     'owner_role_id' => ($tpl['default_owner_role_id'] !== null)
                         ? intval($tpl['default_owner_role_id']) : intval($type['owner_role_id']),
                     'is_recurring' => 1, 'recurrence_template_id' => $tplId,
@@ -183,7 +183,7 @@ foreach (array_keys($company_ids) as $cid) {
                               $tpl['next_occurrence_date'], '00:00');
                 $g->insert('ticket_events', array(
                     'ticket_id' => $tid, 'event_type' => 'system',
-                    'body' => 'تذكرة دورية مُولَّدة من القالب: ' . $tpl['name'], 'new_value' => 'routed',
+                    'body' => 'تذكرة دورية مولدة من القالب: ' . $tpl['name'], 'new_value' => 'routed',
                 ));
                 // دفع الدورة التالية بمقدار الفاصل
                 $next = date('Y-m-d', strtotime($tpl['next_occurrence_date']

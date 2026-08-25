@@ -120,7 +120,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back    = array('href' => 'reports.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا سجلاتِ وردياتٍ مطابقةً لهذه الفلاتر', 'غيّر التاريخَ أو اختر «الكل» في المشروعِ والموردِ ثمّ اضغط بحث');
+    echo ems_states_bundle('لا سجلات ورديات مطابقة لهذه الفلاتر', 'غير التاريخ أو اختر «الكل» في المشروع والمورد ثم اضغط بحث');
     ?>
 
     <div class="card mb-4">

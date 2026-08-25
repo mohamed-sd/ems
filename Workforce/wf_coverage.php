@@ -47,7 +47,7 @@ try { $kpi['moves'] = (int) $gate->count('worker_movement', array()); }
 catch (\Throwable $t) { error_log('wf_coverage.php moves: ' . $t->getMessage()); }
 
 $STATE_AR = array('SHORTAGE' => 'عجز', 'SURPLUS' => 'فائض', 'BALANCED' => 'متوازن',
-                  'PLANNED' => 'مخطَّط', 'UNMAPPED' => 'خارجَ الجسر');
+                  'PLANNED' => 'مخطط', 'UNMAPPED' => 'خارج الجسر');
 
 $page_title = 'إيكوبيشن | لوحة القوى — المطلوب مقابل المتوفر';
 require_once __DIR__ . '/../includes/screen_contract.php';
@@ -57,24 +57,24 @@ include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main ems-unified-page-shell">
-    <?php $header_title = 'لوحة القوى — المطلوب مقابل المتوفر (مشتقّ لا مُدخَل)'; $header_icon = 'fa fa-people-group'; $header_actions = array();
+    <?php $header_title = 'لوحة القوى — المطلوب مقابل المتوفر (مشتق لا مدخل)'; $header_icon = 'fa fa-people-group'; $header_actions = array();
     $header_back = array('href' => 'workforce_requirement.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'احتياج المشروع');
     include('../includes/page_header.php'); ?>
     <div class="ems-stat-cards">
-        <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">سطور تغطية مشتقّة</div></div>
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">سطور تغطية مشتقة</div></div>
         <div class="ems-stat-card"><div class="ems-stat-value"><?= $kpi['need'] ?></div><div class="ems-stat-label">إجمالي المطلوب</div></div>
         <div class="ems-stat-card"><div class="ems-stat-value"><?= $kpi['gap'] ?></div><div class="ems-stat-label">إجمالي العجز</div></div>
-        <div class="ems-stat-card"><div class="ems-stat-value"><?= $kpi['variance'] ?></div><div class="ems-stat-label">فارقٌ مفتوحٌ بين المشتقّ والمُعلَن</div></div>
-        <div class="ems-stat-card"><div class="ems-stat-value"><?= $kpi['assigned'] ?></div><div class="ems-stat-label">تكاليف تنظيمية نشِطة</div></div>
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= $kpi['variance'] ?></div><div class="ems-stat-label">فارق مفتوح بين المشتق والمعلن</div></div>
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= $kpi['assigned'] ?></div><div class="ems-stat-label">تكاليف تنظيمية نشطة</div></div>
         <div class="ems-stat-card"><div class="ems-stat-value"><?= $kpi['moves'] ?></div><div class="ems-stat-label">وقائع حركة وتواجد</div></div>
     </div>
     <?php require_once __DIR__ . '/../includes/ux_components.php';
-    echo ems_states_bundle('لا سطورَ تغطيةٍ مشتقّةً بعدُ', 'الاشتقاقُ يجري من احتياجِ المشروعِ والمتوفّرِ الجاهز — ولا يُدخَل من هنا'); ?>
+    echo ems_states_bundle('لا سطور تغطية مشتقة بعد', 'الاشتقاق يجري من احتياج المشروع والمتوفر الجاهز — ولا يدخل من هنا'); ?>
 
     <div class="table-wrap"><table class="data-table">
-        <thead><tr><th>#</th><th>المشروع</th><th>الفئة التشغيلية</th><th>المطلوب</th><th>المتوفّر</th>
-            <th>العجز المشتقّ</th><th>الفائض المشتقّ</th><th>الحالة المشتقّة</th>
-            <th>العجز المُعلَن</th><th>الحالة المُعلَنة</th><th>حكم الفارق</th><th>قاعدة الاشتقاق</th></tr></thead>
+        <thead><tr><th>#</th><th>المشروع</th><th>الفئة التشغيلية</th><th>المطلوب</th><th>المتوفر</th>
+            <th>العجز المشتق</th><th>الفائض المشتق</th><th>الحالة المشتقة</th>
+            <th>العجز المعلن</th><th>الحالة المعلنة</th><th>حكم الفارق</th><th>قاعدة الاشتقاق</th></tr></thead>
         <tbody>
         <?php if ($rows): $i = 0; foreach ($rows as $r): $i++; $open = ($r['variance_rule'] === 'W5_COVERAGE_VARIANCE_OPEN'); ?>
             <tr><td><?= $i ?></td>
@@ -87,11 +87,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= htmlspecialchars(isset($STATE_AR[$r['coverage_state']]) ? $STATE_AR[$r['coverage_state']] : (string) $r['coverage_state']) ?></td>
                 <td><?= (int) $r['declared_gap'] ?></td>
                 <td><?= htmlspecialchars(isset($STATE_AR[$r['declared_state']]) ? $STATE_AR[$r['declared_state']] : (string) $r['declared_state']) ?></td>
-                <td><?= $open ? '<i class="fas fa-triangle-exclamation"></i> فارقٌ مفتوح' : 'مطابق' ?></td>
+                <td><?= $open ? '<i class="fas fa-triangle-exclamation"></i> فارق مفتوح' : 'مطابق' ?></td>
                 <td><small><?= htmlspecialchars((string) $r['derivation_rule']) ?></small></td>
             </tr>
         <?php endforeach; else: ?>
-            <tr><td colspan="12">لا سطورَ تغطيةٍ مشتقّةً بعدُ.</td></tr>
+            <tr><td colspan="12">لا سطور تغطية مشتقة بعد.</td></tr>
         <?php endif; ?>
         </tbody></table></div>
 </div>

@@ -38,7 +38,7 @@ $GOV_DEPT = array(
     'attest_scope' => 'gov_dept_gov',
     'sod_queries' => array(
         array(
-            'title' => 'طالبُ الاستثناءِ هو مانحُه',
+            'title' => 'طالب الاستثناء هو مانحه',
             'sql' => "SELECT CONCAT('EXC-', e.req_id) doc, u.name person
                         FROM exception_requests e
                         JOIN exception_approvals a ON a.req_id = e.req_id AND a.decision = 'approve'
@@ -47,7 +47,7 @@ $GOV_DEPT = array(
                          AND a.approver_person_id = e.requester_person_id LIMIT 20",
         ),
         array(
-            'title' => 'مراجعُ المنعِ هو المحاوِلُ نفسُه',
+            'title' => 'مراجع المنع هو المحاول نفسه',
             'sql' => "SELECT r.review_code doc, u.name person
                         FROM gov_denial_reviews r
                         JOIN guard_denials d ON d.deny_id = r.denial_id AND d.company_id = r.company_id
@@ -61,6 +61,6 @@ require __DIR__ . '/../includes/dept_gov_space.php';
 /* حزمةُ الحالاتِ الدنيا (بوابة ٩): تحميلٌ وفراغٌ وخطأٌ — مخفيةٌ افتراضًا
    ويُظهرها منطقُ الشاشةِ عند حالِها. الدالةُ من ux_components التي تُحمِّلها القشرة. */
 if (function_exists('ems_states_bundle')) {
-    echo ems_states_bundle('لا قياساتِ فصلِ واجباتٍ ضمن نطاق الحوكمة والالتزام',
-                           'تُقاس القياساتُ على طلباتِ الاستثناءِ ومراجعاتِ المنعِ الحية — راجع الفترةَ أو حسابات الدور 15');
+    echo ems_states_bundle('لا قياسات فصل واجبات ضمن نطاق الحوكمة والالتزام',
+                           'تقاس القياسات على طلبات الاستثناء ومراجعات المنع الحية — راجع الفترة أو حسابات الدور 15');
 }

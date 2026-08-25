@@ -236,7 +236,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
 
             // التحقق من عدم تجاوز العدد المتعاقد عليه
             if ($current_added >= $contracted_count) {
-                $success_msg = "⚠️ تحذير: تم الوصول للحد الأقصى! العدد المتعاقد عليه: $contracted_count | المضاف حالياً: $current_added. لا يمكن إضافة المزيد من المعدات.";
+                $success_msg = "⚠️ تحذير: تم الوصول للحد الأقصى! العدد المتعاقد عليه: $contracted_count | المضاف حاليا: $current_added. لا يمكن إضافة المزيد من المعدات.";
                 goto skip_save;
             }
         }
@@ -317,7 +317,7 @@ ob_start(); ?><a href="../main/dashboard.php" class="back-btn">
 $header_back = array('raw' => trim((string) ob_get_clean()));
 include __DIR__ . '/../includes/page_header.php';
 ?>
-<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('equipment', 'نظرةٌ عامة'); ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('equipment', 'نظرة عامة'); ?>
 
     <?php if (!empty($success_msg)):
         $isSuccess = strpos($success_msg, '✅') !== false;
@@ -333,8 +333,8 @@ include __DIR__ . '/../includes/page_header.php';
        افتراضًا ويُظهرها منطقُ الشاشةِ عند حالِها. الدالةُ من ux_components
        التي تُحمِّلها القشرة. */
     if (function_exists('ems_states_bundle')) {
-        echo ems_states_bundle('لا معداتٍ مسجلةً في سجلِّ المعداتِ بعدُ',
-                               'أضف معدةً جديدةً بزرِّ «إضافة معدة جديدة» أو راجع فلاترَ العرض');
+        echo ems_states_bundle('لا معدات مسجلة في سجل المعدات بعد',
+                               'أضف معدة جديدة بزر «إضافة معدة جديدة» أو راجع فلاتر العرض');
     }
     ?>
 
@@ -479,7 +479,7 @@ include __DIR__ . '/../includes/page_header.php';
                             }
                             ?>
                         </select>
-                        <small class="eq-2">عند الاختيار تُملأ تلقائياً حقول النوع والماركة والموديل من السجل.</small>
+                        <small class="eq-2">عند الاختيار تملأ تلقائيا حقول النوع والماركة والموديل من السجل.</small>
                     </div>
                     <?php endif; ?>
 
@@ -896,9 +896,9 @@ include __DIR__ . '/../includes/page_header.php';
                         <th class="ems-fn-th" data-fn="1">المصدر</th>
                         <th class="ems-fn-th" data-fn="1">المالك القانوني</th>
                         <th class="ems-fn-th" data-fn="1">تاريخ الدخول</th>
-                        <th class="ems-fn-th none" data-fn="1">العدّاد الافتتاحي</th>
-                        <th class="ems-fn-th none" data-fn="1">العدّاد الحالي</th>
-                        <th class="ems-fn-th none" data-fn="1">وحدة العدّاد</th>
+                        <th class="ems-fn-th none" data-fn="1">العداد الافتتاحي</th>
+                        <th class="ems-fn-th none" data-fn="1">العداد الحالي</th>
+                        <th class="ems-fn-th none" data-fn="1">وحدة العداد</th>
                         <th class="ems-fn-th none" data-fn="1">تكلفة الشراء</th>
                         <th class="ems-fn-th none" data-fn="1">العمر الإنتاجي بالساعات</th>
                         <th class="ems-fn-th none" data-fn="1">معدل الإهلاك بالساعة</th>
@@ -914,14 +914,14 @@ include __DIR__ . '/../includes/page_header.php';
                         <th class="ems-fn-th none" data-fn="1">الموقع الحالي</th>
                         <th class="ems-fn-th none" data-fn="1">الحالة الأسطولية</th>
                         <th class="ems-fn-th none" data-fn="1">الجاهزية الفنية</th>
-                        <th class="ems-fn-th none" data-fn="1">سجّله</th>
+                        <th class="ems-fn-th none" data-fn="1">سجله</th>
                         <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                        <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                        <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                        <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                        <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                         <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                         <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                         <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-                        <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+                        <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
                         <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                         <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                         <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
@@ -1365,8 +1365,8 @@ include __DIR__ . '/../includes/page_header.php';
                 { label: 'نوع المصدر', value: eqVal(data.source_type), icon: 'fas fa-handshake' },
                 { label: 'تاريخ الدخول', value: eqVal(data.entry_date), icon: 'fas fa-calendar-day' },
                 { label: 'تكلفة الشراء', value: (data.acquisition_cost ? (data.acquisition_cost + ' ' + (data.acquisition_currency || '')) : 'غير محدد'), icon: 'fas fa-money-check-dollar' },
-                { label: 'العدّاد الافتتاحي', value: (data.opening_meter ? (data.opening_meter + ' ' + (data.meter_uom || '')) : 'غير محدد'), icon: 'fas fa-gauge' },
-                { label: 'مصدر العدّاد', value: eqVal(data.meter_source), icon: 'fas fa-satellite-dish' },
+                { label: 'العداد الافتتاحي', value: (data.opening_meter ? (data.opening_meter + ' ' + (data.meter_uom || '')) : 'غير محدد'), icon: 'fas fa-gauge' },
+                { label: 'مصدر العداد', value: eqVal(data.meter_source), icon: 'fas fa-satellite-dish' },
                 { label: 'سنة الصنع', value: eqVal(data.manufacturing_year), icon: 'fas fa-calendar' },
                 { label: 'سنة الاستيراد', value: eqVal(data.import_year), icon: 'fas fa-calendar-plus' },
                 { label: 'حالة المعدة', value: eqVal(data.equipment_condition), icon: 'fas fa-cogs' },

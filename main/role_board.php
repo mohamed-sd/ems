@@ -77,7 +77,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array();
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا مؤشراتِ يومٍ محسوبةً لدورِك الآن', 'افتحِ الصندوقَ أو المهامَّ من الشريطِ الجانبي — والمؤشراتُ تُحسب مع أولِ حركةٍ مسجَّلة');
+    echo ems_states_bundle('لا مؤشرات يوم محسوبة لدورك الآن', 'افتح الصندوق أو المهام من الشريط الجانبي — والمؤشرات تحسب مع أول حركة مسجلة');
     ?>
     <style>
       .rbd-lead { margin: 4px 2px 10px; }
@@ -113,7 +113,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         }
       }
     </style>
-    <p class="text-muted rbd-lead"><i class="fas fa-mug-hot"></i> أسئلةُ أول اليوم لدورك — اضغط أي رقمٍ لفتح مصدره. (<?php echo $today; ?>)</p>
+    <p class="text-muted rbd-lead"><i class="fas fa-mug-hot"></i> أسئلة أول اليوم لدورك — اضغط أي رقم لفتح مصدره. (<?php echo $today; ?>)</p>
 
     <!-- ① مؤشرات اليوم — بطاقة KPI السباعية (UI-07: صفر رقم بلا عقده السبعة).
          الوحدة «سجل» حقيقية (الاستعلامات COUNT) والفترة «لحظي» حقيقية (تُقرأ الآن)،

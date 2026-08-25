@@ -24,18 +24,18 @@ $U13 = array(
     'icon'       => 'fa fa-comments',
     'nature'     => 'document',
     'doc'        => 'IAF-01 §4-3 · IAF-0027',
-    'intro'      => 'ردُّ الإدارةِ إلزاميٌّ بمهلة — والسكوتُ يُصعَّد للجهةِ المشرفة',
-    'rule'       => 'BF-15: والردُّ إلزاميٌّ بمهلةٍ · والسكوتُ يُصعَّد',
-    'empty_hint' => 'لا ردودَ واردةً بعدُ',
+    'intro'      => 'رد الإدارة إلزامي بمهلة — والسكوت يصعد للجهة المشرفة',
+    'rule'       => 'BF-15: والرد إلزامي بمهلة · والسكوت يصعد',
+    'empty_hint' => 'لا ردود واردة بعد',
     'where'       => 'state IN (\'responded\',\'in_remediation\',\'evidence_submitted\')',
     'order'       => 'responded_at DESC',
 
     'actions'    => array(
         'submit' => array(
             'code'  => 'iaf.response.submit',
-            'label' => 'ردُّ الإدارةِ على ملاحظة',
-            'rule'  => 'فصلُ الواجبات: الردُّ فعلُ الإدارةِ المُلاحَظِ عليها لا فعلُ المراجع',
-            'fields' => array('finding_no' => 'رقمُ الملاحظة', 'response_text' => 'نصُّ الرد'),
+            'label' => 'رد الإدارة على ملاحظة',
+            'rule'  => 'فصل الواجبات: الرد فعل الإدارة الملاحظ عليها لا فعل المراجع',
+            'fields' => array('finding_no' => 'رقم الملاحظة', 'response_text' => 'نص الرد'),
             'run' => function ($conn, $co, $uid, $in) {
                 require_once __DIR__ . '/../app/Services/Audit/InternalAuditService.php';
                 return \App\Services\Audit\InternalAuditService::submitResponse($conn, array(

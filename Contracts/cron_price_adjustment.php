@@ -32,7 +32,7 @@ $conn->set_charset('utf8mb4');
 
 $date = isset($argv[1]) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $argv[1]) ? $argv[1] : date('Y-m-d');
 $raw = trim((string) ems_env('EMS_PRICE_ADJUST', ''));
-if ($raw === '') { fwrite(STDOUT, "العلمُ فارغٌ — مراجعةُ الأسعار الدورية مطفأة.\n"); exit(0); }
+if ($raw === '') { fwrite(STDOUT, "العلم فارغ — مراجعة الأسعار الدورية مطفأة.\n"); exit(0); }
 
 $made = 0; $skipped = 0;
 foreach (explode(',', $raw) as $c) {
@@ -44,7 +44,7 @@ foreach (explode(',', $raw) as $c) {
     $st->execute();
     $row = $st->get_result()->fetch_assoc();
     $st->close();
-    if (!$row) { fwrite(STDOUT, "العقد {$cid}: غيرُ موجود — يُتخطى.\n"); continue; }
+    if (!$row) { fwrite(STDOUT, "العقد {$cid}: غير موجود — يتخطى.\n"); continue; }
     $co = (int) $row['company_id'];
     $gate = new TenantDb($conn, TenantContext::forSystem($co, 0, '', true));
 
@@ -55,8 +55,8 @@ foreach (explode(',', $raw) as $c) {
     $made += (int) $r['created']; $skipped += (int) $r['skipped'];
     $kinds = array();
     foreach ($r['rows'] as $x) { $kinds[] = (string) $x['outcome']; }
-    fwrite(STDOUT, "العقد {$cid} ({$date}): وُلّد " . intval($r['created']) . " مراجعةً · عاطلٌ "
+    fwrite(STDOUT, "العقد {$cid} ({$date}): ولد " . intval($r['created']) . " مراجعة · عاطل "
         . intval($r['skipped']) . ($kinds ? (' · النتائج: ' . implode('،', array_unique($kinds))) : '') . "\n");
 }
-fwrite(STDOUT, "الإجمالي: {$made} مراجعةً جديدة · {$skipped} عاطلة (تنتظر الاعتماد لتصير مالًا).\n");
+fwrite(STDOUT, "الإجمالي: {$made} مراجعة جديدة · {$skipped} عاطلة (تنتظر الاعتماد لتصير مالا).\n");
 exit(0);

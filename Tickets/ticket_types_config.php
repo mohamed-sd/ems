@@ -88,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
                 'nature' => $default_nature, 'ref' => $ref_table_val, 'co' => $company_id));
             if (ems_pc_idem_seen($conn, $__idem)) {
                 ems_gov_flash_redirect('ticket_types_config.php',
-                    'هذا النوعُ سُجِّل سلفًا بالطلبِ نفسِه — لا صفَّ ثانيًا ✅', 'GOV-OK-200', '');
+                    'هذا النوع سجل سلفا بالطلب نفسه — لا صف ثانيا ✅', 'GOV-OK-200', '');
                 exit();
             }
             $code = tkt_gen_code('ticket_types');
@@ -126,8 +126,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا نوعَ بلاغٍ مسجَّلًا لهذه الشركة',
-                           'أضفْ نوعًا بزرِّ «إضافة نوع» — وأنواعُ النظامِ العامةُ تظهر للقراءةِ وحدَها');
+    echo ems_states_bundle('لا نوع بلاغ مسجلا لهذه الشركة',
+                           'أضف نوعا بزر «إضافة نوع» — وأنواع النظام العامة تظهر للقراءة وحدها');
     ?>
 
     <?php tkt_msg_banner(); ?>
@@ -169,8 +169,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>مفعّل؟</label>
-                        <label class="switch-inline" for="t_active"><input type="checkbox" name="active" id="t_active" value="1" checked> نعم، مفعّل</label>
+                        <label>مفعل؟</label>
+                        <label class="switch-inline" for="t_active"><input type="checkbox" name="active" id="t_active" value="1" checked> نعم، مفعل</label>
                     </div>
                 </div>
             </div>
@@ -186,33 +186,33 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <table id="tktTable" class="display nowrap alltables tkt-typ-table"
                    data-scroll-x="1" data-state-save="false">
                 <thead><tr>
-                    <th>الإجراءات</th><th>الكود</th><th>المُنشئ — الاسم والصفة</th><th>الإدارة المالكة</th><th>نموذج التنفيذ</th><th>الطبيعة</th><th>النطاق</th><th>الحالة</th>
+                    <th>الإجراءات</th><th>الكود</th><th>المنشئ — الاسم والصفة</th><th>الإدارة المالكة</th><th>نموذج التنفيذ</th><th>الطبيعة</th><th>النطاق</th><th>الحالة</th>
                     <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
                     <th class="ems-fn-th" data-fn="1">رقم القاعدة</th>
                     <th class="ems-fn-th" data-fn="1">الفئة</th>
                     <th class="ems-fn-th" data-fn="1">النوع</th>
                     <th class="ems-fn-th" data-fn="1">الموقع</th>
                     <th class="ems-fn-th" data-fn="1">الإدارة المختصة</th>
-                    <th class="ems-fn-th" data-fn="1">الدور المستقبِل</th>
+                    <th class="ems-fn-th" data-fn="1">الدور المستقبل</th>
                     <th class="ems-fn-th" data-fn="1">مهلة الاستجابة</th>
                     <th class="ems-fn-th" data-fn="1">مهلة الإنجاز</th>
                     <th class="ems-fn-th" data-fn="1">الأولوية الافتراضية</th>
                     <th class="ems-fn-th" data-fn="1">شرط رفع الأولوية</th>
                     <th class="ems-fn-th" data-fn="1">سياسة الإغلاق</th>
                     <th class="ems-fn-th" data-fn="1">تاريخ السريان</th>
-                    <th class="ems-fn-th" data-fn="1">عرّفها</th>
+                    <th class="ems-fn-th" data-fn="1">عرفها</th>
                     <th class="ems-fn-th" data-fn="1">رقم الإعداد</th>
                     <th class="ems-fn-th none" data-fn="1">نوع قياس المهلة</th>
-                    <th class="ems-fn-th none" data-fn="1">سلّم التصعيد</th>
+                    <th class="ems-fn-th none" data-fn="1">سلم التصعيد</th>
                     <th class="ems-fn-th none" data-fn="1">مستوى السرية الافتراضي</th>
-                    <th class="ems-fn-th none" data-fn="1">عرّفه</th>
+                    <th class="ems-fn-th none" data-fn="1">عرفه</th>
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                    <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                    <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                    <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                     <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                     <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                     <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-                    <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+                    <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
                     <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                     </tr></thead>
                 <tbody>

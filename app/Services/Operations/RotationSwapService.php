@@ -40,33 +40,33 @@ class RotationSwapService
         $reason = trim((string) $reason);
         $date = $date !== null && preg_match('/^\d{4}-\d{2}-\d{2}$/', (string) $date) ? (string) $date : date('Y-m-d');
 
-        if ($reason === '') { $out['code'] = 422; $out['reason'] = 'سببُ الاستبدال إلزامي — «بقرارٍ موثَّق»'; return $out; }
-        if ($inRef <= 0) { $out['code'] = 422; $out['reason'] = 'الحائزُ الداخل إلزامي'; return $out; }
+        if ($reason === '') { $out['code'] = 422; $out['reason'] = 'سبب الاستبدال إلزامي — «بقرار موثق»'; return $out; }
+        if ($inRef <= 0) { $out['code'] = 422; $out['reason'] = 'الحائز الداخل إلزامي'; return $out; }
 
         $c = null;
         try { $c = $gate->selectOne('op_containers', array('where' => array('id' => $containerId))); }
-        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $c'); $c = null; }
-        if (!$c) { $out['code'] = 404; $out['reason'] = 'الحاويةُ غير موجودةٍ في نطاقك'; return $out; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $c'); $c = null; }
+        if (!$c) { $out['code'] = 404; $out['reason'] = 'الحاوية غير موجودة في نطاقك'; return $out; }
         $level = (string) $c['level'];
         if (!in_array($level, self::SWAPPABLE_LEVELS, true)) {
             $out['code'] = 422;
-            $out['reason'] = 'الاستبدالُ لحاويات المعدات والمشغّلين — لا «' . $level . '»';
+            $out['reason'] = 'الاستبدال لحاويات المعدات والمشغلين — لا «' . $level . '»';
             return $out;
         }
         if ((string) $c['state'] !== 'نشطة') {
-            $out['code'] = 423; $out['reason'] = 'الحاويةُ «' . $c['state'] . '» — الاستبدالُ للنشطة'; return $out;
+            $out['code'] = 423; $out['reason'] = 'الحاوية «' . $c['state'] . '» — الاستبدال للنشطة'; return $out;
         }
         $holderCol = $level === 'معدة' ? 'equipment_id' : 'operator_employee_id';
         $outRef = (int) $c[$holderCol];
         if ($outRef === $inRef) {
-            $out['code'] = 422; $out['reason'] = 'الداخلُ هو الخارجُ نفسُه — لا استبدال'; return $out;
+            $out['code'] = 422; $out['reason'] = 'الداخل هو الخارج نفسه — لا استبدال'; return $out;
         }
         // الحائزُ الداخل من النطاق
         $refTable = $level === 'معدة' ? 'equipments' : 'employees';
         $refRow = null;
         try { $refRow = $gate->selectOne($refTable, array('columns' => array('id'), 'where' => array('id' => $inRef))); }
-        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $refRow'); $refRow = null; }
-        if (!$refRow) { $out['code'] = 422; $out['reason'] = 'الحائزُ الداخل غيرُ موجودٍ في نطاقك'; return $out; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $refRow'); $refRow = null; }
+        if (!$refRow) { $out['code'] = 422; $out['reason'] = 'الحائز الداخل غير موجود في نطاقك'; return $out; }
 
         /* المتبقي = الرصيدُ **الحرُّ** — «لا تُفقد وحدةٌ ولا تُحتسب مرتين»
            ─────────────────────────────────────────────────────────────────────
@@ -90,9 +90,9 @@ class RotationSwapService
                  وحين أضفتُ الموزَّعَ إلى الحساب سقطت الكلمةُ من النص — فسقط حارسٌ
                  في `tests/rotation_swap_test.php` يقرأها. والرقمُ الصحيحُ لا يُغني
                  عن الكلمةِ التي تُفهِم القارئَ **أن لا شيءَ هناك**. */
-            $out['reason'] = 'لا رصيدَ حرًّا يُنقل — الحرُّ صفرٌ (سقف ' . $c['cap_qty']
-                           . ' · مستهلكةٌ ' . $c['consumed_qty']
-                           . ' · موزَّعةٌ على أبنائها ' . $allocated . ')';
+            $out['reason'] = 'لا رصيد حرا ينقل — الحر صفر (سقف ' . $c['cap_qty']
+                           . ' · مستهلكة ' . $c['consumed_qty']
+                           . ' · موزعة على أبنائها ' . $allocated . ')';
             return $out;
         }
 
@@ -107,7 +107,7 @@ class RotationSwapService
                  ORDER BY o.id LIMIT 1",
                 array((int) $c['parent_id'], $level, $inRef));
             $sibling = $rows ? $rows[0] : null;
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $sibling'); $sibling = null; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $sibling'); $sibling = null; }
 
         $toId = null; $swapId = null;
         try {
@@ -122,7 +122,7 @@ class RotationSwapService
                 $g->update('op_containers', array(
                     'state' => 'معلَّقة', 'valid_to' => $date,
                     'cap_qty' => $keep,
-                    'close_reason' => mb_substr('استبدالٌ: ' . $reason, 0, 200),
+                    'close_reason' => mb_substr('استبدال: ' . $reason, 0, 200),
                 ), array('id' => $containerId));
 
                 // ② البديلة: تفعيلُ القائمة أو إنشاءٌ بالمتبقي
@@ -131,7 +131,7 @@ class RotationSwapService
                     $g->update('op_containers', array(
                         'cap_qty' => round((float) $sibling['cap_qty'] + $remaining, 2),
                         'state' => 'نشطة',
-                        'origin_note' => mb_substr('فُعّلت بالمتبقي من #' . $containerId . ' — ' . $reason, 0, 255),
+                        'origin_note' => mb_substr('فعلت بالمتبقي من #' . $containerId . ' — ' . $reason, 0, 255),
                     ), array('id' => $toId));
                 } else {
                     $no = 'SWP-' . $containerId . '-' . preg_replace('/\D/', '', $date);
@@ -151,7 +151,7 @@ class RotationSwapService
                         'valid_from'   => $date,
                         'valid_to'     => $c['valid_to'] !== $date ? $c['valid_to'] : null,
                         'origin'       => 'عقد',
-                        'origin_note'  => mb_substr('بديلةُ #' . $containerId . ' بالمتبقي — ' . $reason, 0, 255),
+                        'origin_note'  => mb_substr('بديلة #' . $containerId . ' بالمتبقي — ' . $reason, 0, 255),
                         'created_by'   => (int) $actor ?: null,
                     ));
                 }
@@ -174,7 +174,7 @@ class RotationSwapService
                 return true;
             }, 'H-04 atomic swap #' . $containerId);
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر النقلُ الذري: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر النقل الذري: ' . $t->getMessage(); return $out;
         }
 
         require_once dirname(__DIR__, 3) . '/includes/audit_trail.php';
@@ -206,7 +206,7 @@ class RotationSwapService
         $out = array('ok' => true, 'transferred' => 0, 'skipped' => array());
         $projectId = (int) $projectId;
         if (!self::autoTransferEnabledFor($projectId)) {
-            $out['skipped'][] = 'المشروعُ خارج علم EMS_ROTATION_AUTOTRANSFER — لا نقلَ آليًّا';
+            $out['skipped'][] = 'المشروع خارج علم EMS_ROTATION_AUTOTRANSFER — لا نقل آليا';
             return $out;
         }
         $eqs = array();
@@ -216,13 +216,13 @@ class RotationSwapService
                  WHERE {TENANT_SCOPE} AND c.project_id = ? AND c.level = 'معدة'
                    AND c.state = 'نشطة' AND COALESCE(c.is_deleted,0)=0
                  ORDER BY c.id", array($projectId));
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $eqs'); $eqs = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $eqs'); $eqs = array(); }
 
         foreach ($eqs as $eq) {
             $eqId = (int) $eq['id'];
             $duty = self::onDuty($gate, $eqId, $date);
             if ($duty['on_duty'] === null) {
-                $out['skipped'][] = 'معدة#' . $eqId . ': لا مناوبَ بحسب الجدول — يُعلَن ولا يُخترع';
+                $out['skipped'][] = 'معدة#' . $eqId . ': لا مناوب بحسب الجدول — يعلن ولا يخترع';
                 continue;
             }
             // الحائزُ النشطُ الحالي
@@ -233,11 +233,11 @@ class RotationSwapService
                      WHERE {TENANT_SCOPE} AND o.parent_id = ? AND o.level = 'مشغّل'
                        AND o.state = 'نشطة' AND COALESCE(o.is_deleted,0)=0
                      ORDER BY o.id", array($eqId));
-            } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $actives'); $actives = array(); }
+            } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $actives'); $actives = array(); }
             if (count($actives) !== 1) {
                 if (count($actives) > 1) {
                     $out['skipped'][] = 'معدة#' . $eqId . ': ' . count($actives)
-                        . ' حاوياتٍ نشطة (شراكةٌ لا تناوب) — تُدار يدويًّا';
+                        . ' حاويات نشطة (شراكة لا تناوب) — تدار يدويا';
                 }
                 continue;
             }
@@ -245,7 +245,7 @@ class RotationSwapService
             if ($holder === (int) $duty['on_duty']) { continue; }   // عطالة — الحائزُ هو المناوب
 
             $r = self::swap($conn, $gate, $companyId, (int) $actives[0]['id'], (int) $duty['on_duty'],
-                'تناوبٌ مجدول — انتقالُ الحصة آليًّا لمناوبِ ' . $date . ' (N-05)', '', $actor, $date);
+                'تناوب مجدول — انتقال الحصة آليا لمناوب ' . $date . ' (N-05)', '', $actor, $date);
             if (!empty($r['ok'])) { $out['transferred']++; }
             else { $out['skipped'][] = 'معدة#' . $eqId . ': ' . $r['reason']; }
         }
@@ -282,7 +282,7 @@ class RotationSwapService
                  WHERE {TENANT_SCOPE} AND o.parent_id = ? AND o.level = 'مشغّل'
                    AND o.state <> 'مقفلة' AND COALESCE(o.is_deleted,0)=0
                  ORDER BY o.id", array((int) $equipmentContainerId));
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $ops'); $ops = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $ops'); $ops = array(); }
 
         foreach ($ops as $o) {
             $rot = null;
@@ -290,23 +290,23 @@ class RotationSwapService
                 $rot = $gate->selectOne('operator_rotations', array(
                     'whereRaw' => "container_id = ? AND (valid_to IS NULL OR valid_to >= ?)",
                     'params' => array((int) $o['id'], (string) $date)));
-            } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $rot'); $rot = null; }
+            } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $rot'); $rot = null; }
 
-            $duty = true; $why = 'بلا دورةٍ — مناوبٌ دائمًا (الغيابُ لا يُخترع له نمط)';
+            $duty = true; $why = 'بلا دورة — مناوب دائما (الغياب لا يخترع له نمط)';
             if ($rot) {
                 $on = (int) $rot['cycle_on_days']; $off = (int) $rot['cycle_off_days'];
                 $anchor = (string) $rot['cycle_start'];
                 $span = $on + $off;
                 if ($on <= 0 || $span <= 0 || $anchor === '') {
-                    $duty = true; $why = 'دورةٌ غيرُ صالحةٍ — تُعامل مناوبًا وتُعلَن';
+                    $duty = true; $why = 'دورة غير صالحة — تعامل مناوبا وتعلن';
                 } else {
                     $days = (int) floor((strtotime($date) - strtotime($anchor)) / 86400);
-                    if ($days < 0) { $duty = false; $why = 'دورتُه لم تبدأ بعد (' . $anchor . ')'; }
+                    if ($days < 0) { $duty = false; $why = 'دورته لم تبدأ بعد (' . $anchor . ')'; }
                     else {
                         $pos = $days % $span;
                         $duty = $pos < $on;
                         $why = $duty
-                            ? 'مناوبٌ (اليوم ' . ($pos + 1) . ' من ' . $on . ' عمل)'
+                            ? 'مناوب (اليوم ' . ($pos + 1) . ' من ' . $on . ' عمل)'
                             : 'في راحته (اليوم ' . ($pos - $on + 1) . ' من ' . $off . ' راحة)';
                     }
                 }

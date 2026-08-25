@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && strncmp((string) ($_POST['action'] 
             super_admin_write_audit($aid, 'delete', 'قاعدة البيانات', 'حذف نسخة احتياطية: ' . basename($path));
             $db_msg = 'success:تم حذف النسخة الاحتياطية';
         } else {
-            $db_msg = 'error:تعذّر حذف النسخة (ملف غير موجود أو غير صالح)';
+            $db_msg = 'error:تعذر حذف النسخة (ملف غير موجود أو غير صالح)';
         }
     } elseif ($act === 'db_restore') {
         if (empty($_POST['confirm_replace'])) {
@@ -68,17 +68,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && strncmp((string) ($_POST['action'] 
             $ecode = $_FILES['sqlfile']['error'] ?? UPLOAD_ERR_NO_FILE;
             $etxt  = ($ecode === UPLOAD_ERR_INI_SIZE || $ecode === UPLOAD_ERR_FORM_SIZE)
                    ? 'حجم الملف يتجاوز الحد المسموح للرفع (' . ini_get('upload_max_filesize') . ')'
-                   : 'لم يُرفع ملف صالح';
+                   : 'لم يرفع ملف صالح';
             $db_msg = 'error:' . $etxt;
         } else {
             $orig = (string) $_FILES['sqlfile']['name'];
             $ext  = strtolower(pathinfo($orig, PATHINFO_EXTENSION));
             if ($ext !== 'sql') {
-                $db_msg = 'error:يُقبل ملف بصيغة .sql فقط';
+                $db_msg = 'error:يقبل ملف بصيغة .sql فقط';
             } else {
                 $dest = ems_dbtool_backup_dir() . '/ems_uploaded_' . date('Ymd_His') . '.sql';
                 if (!@move_uploaded_file($_FILES['sqlfile']['tmp_name'], $dest)) {
-                    $db_msg = 'error:تعذّر حفظ الملف المرفوع على الخادم';
+                    $db_msg = 'error:تعذر حفظ الملف المرفوع على الخادم';
                 } else {
                     $err = '';
                     $ab  = null;
@@ -99,16 +99,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && strncmp((string) ($_POST['action'] 
         $cfg['retention']     = intval($_POST['retention'] ?? 14);
         if (ems_dbtool_schedule_save($cfg)) {
             super_admin_write_audit($aid, 'update', 'قاعدة البيانات',
-                'تحديث جدولة النسخ التلقائي (' . ($cfg['enabled'] ? 'مفعّلة كل ' . max(1, intval($cfg['interval_days'])) . ' يوم' : 'معطّلة') . ')');
+                'تحديث جدولة النسخ التلقائي (' . ($cfg['enabled'] ? 'مفعلة كل ' . max(1, intval($cfg['interval_days'])) . ' يوم' : 'معطلة') . ')');
             $db_msg = 'success:تم حفظ إعدادات الجدولة';
         } else {
-            $db_msg = 'error:تعذّر حفظ إعدادات الجدولة';
+            $db_msg = 'error:تعذر حفظ إعدادات الجدولة';
         }
     } elseif ($act === 'db_run_now') {
         $rerr = '';
         $res = ems_dbtool_run_scheduled($rerr, true);
         if ($res['ok']) {
-            super_admin_write_audit($aid, 'backup', 'قاعدة البيانات', 'تشغيل نسخة مجدولة يدويًا: ' . ($res['file'] ?? ''));
+            super_admin_write_audit($aid, 'backup', 'قاعدة البيانات', 'تشغيل نسخة مجدولة يدويا: ' . ($res['file'] ?? ''));
             $db_msg = 'success:' . $res['message'];
         } else {
             $db_msg = 'error:' . $res['message'];
@@ -240,7 +240,7 @@ require_once __DIR__ . '/includes/layout_head.php';
                 <div class="alert alert-success" style="margin-bottom:0;">
                     <i class="fas fa-lock"></i>
                     <div style="font-size:0.84rem;">
-                        التحقق يتم بـ <strong>bcrypt</strong> مع CSRF token لكل طلب.<br>
+                        التحقق يتم ب <strong>bcrypt</strong> مع CSRF token لكل طلب.<br>
                         الجلسة مستقلة عن باقي المستخدمين عبر <code>$_SESSION['super_admin']</code>.
                     </div>
                 </div>
@@ -352,13 +352,13 @@ $db_name = ems_dbtool_db_name();
         <?php $sched = ems_dbtool_schedule_get(); ?>
         <div class="card" style="box-shadow:none;border:1px solid var(--line);margin-bottom:18px;">
             <div class="card-hd">
-                <span class="card-hd-title"><i class="fas fa-calendar-check" style="color:var(--gold);margin-left:6px"></i>النسخ الاحتياطي التلقائي المجدوَل</span>
+                <span class="card-hd-title"><i class="fas fa-calendar-check" style="color:var(--gold);margin-left:6px"></i>النسخ الاحتياطي التلقائي المجدول</span>
                 <?php echo !empty($sched['enabled'])
-                    ? '<span class="badge bg-green"><i class="fas fa-circle-play"></i> مفعّل</span>'
-                    : '<span class="badge bg-gray">متوقّف</span>'; ?>
+                    ? '<span class="badge bg-green"><i class="fas fa-circle-play"></i> مفعل</span>'
+                    : '<span class="badge bg-gray">متوقف</span>'; ?>
             </div>
             <div class="card-body">
-                <p class="text-muted" style="margin-bottom:14px;">تُؤخَذ نسخة تلقائيًا كل عددٍ من الأيام تحدّده، ويُحتفَظ بأحدث عددٍ منها فقط (تُحذف الأقدم تلقائيًا). تعمل عبر مهمّة نظامٍ مجدولة، مع فحصٍ احتياطي عند فتح اللوحة.</p>
+                <p class="text-muted" style="margin-bottom:14px;">تؤخذ نسخة تلقائيا كل عدد من الأيام تحدده، ويحتفظ بأحدث عدد منها فقط (تحذف الأقدم تلقائيا). تعمل عبر مهمة نظام مجدولة، مع فحص احتياطي عند فتح اللوحة.</p>
                 <div class="flex" style="gap:16px;flex-wrap:wrap;align-items:flex-end;">
                     <form method="post" class="flex" style="gap:16px;flex-wrap:wrap;align-items:flex-end;margin:0;">
                         <input type="hidden" name="action" value="db_schedule">
@@ -372,7 +372,7 @@ $db_name = ems_dbtool_db_name();
                             <input class="form-ctrl" type="number" name="interval_days" min="1" max="365" value="<?php echo intval($sched['interval_days']); ?>" style="width:120px;">
                         </div>
                         <div class="form-group" style="margin:0;">
-                            <label class="form-label" for="emsf_702_af672">الاحتفاظ بآخر (نُسخ)</label>
+                            <label class="form-label" for="emsf_702_af672">الاحتفاظ بآخر (نسخ)</label>
                             <input class="form-ctrl" type="number" name="retention" min="1" max="365" value="<?php echo intval($sched['retention']); ?>" style="width:140px;" id="emsf_702_af672">
                         </div>
                         <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> حفظ الجدولة</button>
@@ -403,7 +403,7 @@ $db_name = ems_dbtool_db_name();
             <div class="card" style="box-shadow:none;border:1px solid var(--line);">
                 <div class="card-hd"><span class="card-hd-title"><i class="fas fa-download" style="color:var(--green);margin-left:6px"></i>إنشاء نسخة احتياطية</span></div>
                 <div class="card-body">
-                    <p class="text-muted" style="margin-bottom:14px;">نسخة كاملة (جداول + إجراءات + مشغّلات) من قاعدة EMS، تُحفَظ على الخادم وتُنزَّل إلى جهازك مباشرةً.</p>
+                    <p class="text-muted" style="margin-bottom:14px;">نسخة كاملة (جداول + إجراءات + مشغلات) من قاعدة EMS، تحفظ على الخادم وتنزل إلى جهازك مباشرة.</p>
                     <form method="post">
                         <input type="hidden" name="action" value="db_backup">
                         <input type="hidden" name="csrf_token" value="<?php echo e($csrf); ?>">
@@ -418,9 +418,9 @@ $db_name = ems_dbtool_db_name();
                 <div class="card-body">
                     <div class="alert alert-warning" style="font-size:0.8rem;margin-bottom:14px;">
                         <i class="fas fa-triangle-exclamation"></i>
-                        <div>عملية استبدال: يحلّ محتوى الملف محلّ بيانات القاعدة الحالية. تُؤخَذ نسخة وقائية تلقائيًا قبل الاستبدال. الحدّ الأقصى للرفع: <?php echo e(ini_get('upload_max_filesize')); ?>.</div>
+                        <div>عملية استبدال: يحل محتوى الملف محل بيانات القاعدة الحالية. تؤخذ نسخة وقائية تلقائيا قبل الاستبدال. الحد الأقصى للرفع: <?php echo e(ini_get('upload_max_filesize')); ?>.</div>
                     </div>
-                    <form method="post" enctype="multipart/form-data" onsubmit="return confirm('سيُستبدَل محتوى قاعدة البيانات الحالية بالملف المرفوع (مع أخذ نسخة وقائية أولًا). هل أنت متأكد؟');">
+                    <form method="post" enctype="multipart/form-data" onsubmit="return confirm('سيستبدل محتوى قاعدة البيانات الحالية بالملف المرفوع (مع أخذ نسخة وقائية أولا). هل أنت متأكد؟');">
                         <input type="hidden" name="action" value="db_import">
                         <input type="hidden" name="csrf_token" value="<?php echo e($csrf); ?>">
                         <div class="form-group">
@@ -455,11 +455,11 @@ $db_name = ems_dbtool_db_name();
                                         <input type="hidden" name="action" value="db_download"><input type="hidden" name="csrf_token" value="<?php echo e($csrf); ?>"><input type="hidden" name="file" value="<?php echo e($b['name']); ?>">
                                         <button class="btn btn-ghost btn-sm" title="تنزيل"><i class="fas fa-download"></i></button>
                                     </form>
-                                    <form method="post" style="display:inline;margin:0;" onsubmit="return confirm('ستُستبدَل القاعدة الحالية بمحتوى هذه النسخة (مع نسخة وقائية أولًا). متابعة؟');">
+                                    <form method="post" style="display:inline;margin:0;" onsubmit="return confirm('ستستبدل القاعدة الحالية بمحتوى هذه النسخة (مع نسخة وقائية أولا). متابعة؟');">
                                         <input type="hidden" name="action" value="db_restore"><input type="hidden" name="csrf_token" value="<?php echo e($csrf); ?>"><input type="hidden" name="file" value="<?php echo e($b['name']); ?>"><input type="hidden" name="confirm_replace" value="1">
                                         <button class="btn btn-secondary btn-sm" title="استعادة"><i class="fas fa-rotate-left"></i></button>
                                     </form>
-                                    <form method="post" style="display:inline;margin:0;" onsubmit="return confirm('حذف هذه النسخة نهائيًا؟');">
+                                    <form method="post" style="display:inline;margin:0;" onsubmit="return confirm('حذف هذه النسخة نهائيا؟');">
                                         <input type="hidden" name="action" value="db_delete"><input type="hidden" name="csrf_token" value="<?php echo e($csrf); ?>"><input type="hidden" name="file" value="<?php echo e($b['name']); ?>">
                                         <button class="btn btn-danger btn-sm" title="حذف"><i class="fas fa-trash"></i></button>
                                     </form>
@@ -506,11 +506,11 @@ function checkStrength(val) {
     if (/[^A-Za-z0-9]/.test(val)) score++;
 
     var levels = [
-        { w:'20%', color:'#dc2626', label:'ضعيفة جدًا' },
+        { w:'20%', color:'#dc2626', label:'ضعيفة جدا' },
         { w:'40%', color:'#d97706', label:'ضعيفة' },
         { w:'60%', color:'#d6a700', label:'متوسطة' },
         { w:'80%', color:'#2563eb', label:'جيدة' },
-        { w:'100%',color:'#059669', label:'قوية جدًا' },
+        { w:'100%',color:'#059669', label:'قوية جدا' },
     ];
     var lvl = levels[Math.min(score, 4)];
     bar.style.width = lvl.w;

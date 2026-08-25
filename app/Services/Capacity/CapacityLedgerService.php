@@ -41,31 +41,31 @@ class CapacityLedgerService
         $recId = isset($ln['unit_record_id']) ? (int) $ln['unit_record_id'] : 0;
         $recVer = isset($ln['unit_record_version']) ? (int) $ln['unit_record_version'] : -1;
         if ($recId <= 0 || $recVer < 0) {
-            $out['code'] = 422; $out['reason'] = 'سجلُّ الوحدة ونسختُه إلزاميان — لا سطرَ دفترٍ بلا مصدرٍ مرقَّم (§13.2)';
+            $out['code'] = 422; $out['reason'] = 'سجل الوحدة ونسخته إلزاميان — لا سطر دفتر بلا مصدر مرقم (§13.2)';
             return $out;
         }
         $effect = isset($ln['effect_type']) ? (string) $ln['effect_type'] : '';
         if (!in_array($effect, self::EFFECT_TYPES, true)) {
             $out['code'] = 422;
-            $out['reason'] = 'أثرٌ خارج الأربعة (' . implode('·', self::EFFECT_TYPES) . ') — والعكسُ عبر reverse() حصرًا';
+            $out['reason'] = 'أثر خارج الأربعة (' . implode('·', self::EFFECT_TYPES) . ') — والعكس عبر reverse() حصرا';
             return $out;
         }
         $targetType = isset($ln['effect_target_type']) ? (string) $ln['effect_target_type'] : '';
         $targetRef = isset($ln['effect_target_ref']) ? trim((string) $ln['effect_target_ref']) : '';
         if (!in_array($targetType, self::TARGET_TYPES, true) || $targetRef === '') {
-            $out['code'] = 422; $out['reason'] = 'طرفُ الأثر ومرجعُه إلزاميان — المفتاحُ عليهما';
+            $out['code'] = 422; $out['reason'] = 'طرف الأثر ومرجعه إلزاميان — المفتاح عليهما';
             return $out;
         }
         $measure = isset($ln['measure_code']) ? (string) $ln['measure_code'] : '';
         if (!in_array($measure, self::MEASURES, true)) {
-            $out['code'] = 422; $out['reason'] = 'مقياسٌ خارج الأربعة (hour·ton·trip·meter) — فلا يُخصم الطنُّ من حصة ساعات';
+            $out['code'] = 422; $out['reason'] = 'مقياس خارج الأربعة (hour·ton·trip·meter) — فلا يخصم الطن من حصة ساعات';
             return $out;
         }
         $qty = isset($ln['qty']) ? (float) $ln['qty'] : -1;
-        if ($qty < 0) { $out['code'] = 422; $out['reason'] = 'الكميةُ موجبةٌ — والردُّ سطرُ عكسٍ لا كميةٌ سالبة'; return $out; }
+        if ($qty < 0) { $out['code'] = 422; $out['reason'] = 'الكمية موجبة — والرد سطر عكس لا كمية سالبة'; return $out; }
         $period = isset($ln['period']) ? (string) $ln['period'] : '';
         if (!preg_match('/^\d{4}-\d{2}$/', $period)) {
-            $out['code'] = 422; $out['reason'] = 'الفترةُ YYYY-MM إلزامية'; return $out;
+            $out['code'] = 422; $out['reason'] = 'الفترة YYYY-MM إلزامية'; return $out;
         }
         $role = isset($ln['role_snapshot']) && in_array((string) $ln['role_snapshot'], array('primary', 'standby'), true)
                 ? (string) $ln['role_snapshot'] : null;
@@ -104,13 +104,13 @@ class CapacityLedgerService
                 $existing = self::findByKey($gate, $recId, $recVer, $effect, $targetType, $targetRef);
                 $out['code'] = 409;
                 $out['existing_led_id'] = $existing;
-                $out['reason'] = 'السطرُ مقيَّدٌ من قبل — مرجعُه led#' . ($existing ?: '?') . ' · صفرُ خصمٍ ثانٍ (C25)';
+                $out['reason'] = 'السطر مقيد من قبل — مرجعه led#' . ($existing ?: '?') . ' · صفر خصم ثان (C25)';
                 return $out;
             }
             throw $t;
         }
         $out['ok'] = true; $out['code'] = 200; $out['led_id'] = $ledId;
-        $out['reason'] = 'قُيّد سطرُ ' . $effect . ' للوحدة ' . $recId . '·v' . $recVer . ' — ' . $qty . ' ' . $measure;
+        $out['reason'] = 'قيد سطر ' . $effect . ' للوحدة ' . $recId . '·v' . $recVer . ' — ' . $qty . ' ' . $measure;
         return $out;
     }
 
@@ -122,15 +122,15 @@ class CapacityLedgerService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'led_id' => null, 'existing_led_id' => null);
         $ledId = (int) $ledId;
-        if ($ledId <= 0) { $out['code'] = 422; $out['reason'] = 'عكسٌ بلا مرجعِ سطرٍ أصلي — مرفوض (§16-Validation)'; return $out; }
+        if ($ledId <= 0) { $out['code'] = 422; $out['reason'] = 'عكس بلا مرجع سطر أصلي — مرفوض (§16-Validation)'; return $out; }
 
         $rows = $gate->scopedQuery(array('scope' => array('l' => 'capacity_consumption_ledger')),
             "SELECT l.* FROM capacity_consumption_ledger l WHERE {TENANT_SCOPE} AND l.led_id = ?",
             array($ledId));
-        if (!$rows) { $out['code'] = 404; $out['reason'] = 'سطرُ الدفتر غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!$rows) { $out['code'] = 404; $out['reason'] = 'سطر الدفتر غير موجود في نطاقك'; return $out; }
         $orig = $rows[0];
         if ((string) $orig['effect_type'] === 'reversal') {
-            $out['code'] = 422; $out['reason'] = 'لا يُعكس سطرُ عكسٍ — التصحيحُ نسخةٌ جديدةٌ بأسطرها';
+            $out['code'] = 422; $out['reason'] = 'لا يعكس سطر عكس — التصحيح نسخة جديدة بأسطرها';
             return $out;
         }
         $prior = $gate->scopedQuery(array('scope' => array('l' => 'capacity_consumption_ledger')),
@@ -138,7 +138,7 @@ class CapacityLedgerService
             array($ledId));
         if ($prior) {
             $out['code'] = 409; $out['existing_led_id'] = (int) $prior[0]['led_id'];
-            $out['reason'] = 'السطرُ معكوسٌ من قبل — مرجعُ العكس led#' . $prior[0]['led_id'];
+            $out['reason'] = 'السطر معكوس من قبل — مرجع العكس led#' . $prior[0]['led_id'];
             return $out;
         }
         try {
@@ -168,13 +168,13 @@ class CapacityLedgerService
         } catch (\Throwable $t) {
             if (self::isDuplicate($t)) {
                 $out['code'] = 409;
-                $out['reason'] = 'عكسُ هذه النسخة لهذا الطرف مقيَّدٌ من قبل — المفتاحُ يمنع الازدواج';
+                $out['reason'] = 'عكس هذه النسخة لهذا الطرف مقيد من قبل — المفتاح يمنع الازدواج';
                 return $out;
             }
             throw $t;
         }
         $out['ok'] = true; $out['code'] = 200; $out['led_id'] = $revId;
-        $out['reason'] = 'عُكس led#' . $ledId . ' بالسطر العاكس led#' . $revId . ' — والأصلُ باقٍ (C26)';
+        $out['reason'] = 'عكس led#' . $ledId . ' بالسطر العاكس led#' . $revId . ' — والأصل باق (C26)';
         return $out;
     }
 
@@ -186,7 +186,7 @@ class CapacityLedgerService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'lnk_id' => null);
         if ((int) $ledId <= 0 || (int) $finEventId <= 0) {
-            $out['code'] = 422; $out['reason'] = 'سطرُ الدفتر والحدثُ الماليُّ إلزاميان'; return $out;
+            $out['code'] = 422; $out['reason'] = 'سطر الدفتر والحدث المالي إلزاميان'; return $out;
         }
         try {
             $lnkId = (int) $gate->insert('capacity_financial_event_links', array(
@@ -196,12 +196,12 @@ class CapacityLedgerService
             ));
         } catch (\Throwable $t) {
             if (self::isDuplicate($t)) {
-                $out['code'] = 409; $out['reason'] = 'الربطُ قائمٌ — UQ(led,fin) يمنع الربطَ مرتين'; return $out;
+                $out['code'] = 409; $out['reason'] = 'الربط قائم — UQ(led,fin) يمنع الربط مرتين'; return $out;
             }
             throw $t;
         }
         $out['ok'] = true; $out['code'] = 200; $out['lnk_id'] = $lnkId;
-        $out['reason'] = 'رُبط led#' . $ledId . ' بالحدث المالي #' . $finEventId;
+        $out['reason'] = 'ربط led#' . $ledId . ' بالحدث المالي #' . $finEventId;
         return $out;
     }
 

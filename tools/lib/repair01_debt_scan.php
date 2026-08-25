@@ -71,6 +71,61 @@ function repair01_debt_classes()
     );
 }
 
+/**
+ * صنفا دَينِ نقاءِ اللغة (‏REPAIR01 · W06 §٤-٩) — **في دالّةٍ مستقلّةٍ عمدًا**.
+ * ═══════════════════════════════════════════════════════════════════════════
+ * ◆ **ولماذا لا يُضافانِ إلى `repair01_debt_classes()`**: حاجبُ `W1-11` في
+ *   مرحلةٍ **مُغلقةٍ** يشترط `count($cls) === 8` نصًّا. وضمُّهما إلى تلك الدالّةِ
+ *   يُسقط حاجبَ W01 — و«لا يُعدَّل حاجبٌ مُغلقٌ لتيسيرِ مرحلةٍ تستفيد منه»
+ *   (‏_CONTEXT · RPR-PATCH-02). فالثمانيةُ الحَوكميّةُ تبقى ثمانيةً كما وُصفت،
+ *   والصنفانِ الجديدانِ **سجلٌّ ثانٍ تضمُّه السقّاطةُ** إلى قائمتِها.
+ *   والحاجبُ نفسُه يشترط `count($baseKeys) >= 14` — فنموُّ خطِّ الأساسِ مسموحٌ
+ *   بنصِّه، والمانعُ عددُ الأصنافِ في تلك الدالّةِ وحدَها.
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+function repair01_ui_debt_classes()
+{
+    return array(
+        'UI-01' => array(
+            'label' => 'تشكيلٌ ظاهرٌ في نصِّ شاشةٍ حيّة',
+            'owner' => 'W06 — يُنزع بالمنقّي أو يُكتب بلا شكلٍ ابتداءً',
+            'why'   => 'قرارُ المالك: نصُّ النظامِ خالٍ من التشكيل — والنصُّ في الشيفرةِ نصُّ نظام',
+        ),
+        'UI-02' => array(
+            'label' => 'زخرفةٌ أو رمزٌ تقنيٌّ ظاهرٌ في نصِّ شاشةٍ حيّة',
+            'owner' => 'W06 — تُنزع الزخرفةُ ويُعرَض الرمزُ من قاموسِ العرض',
+            'why'   => 'السهمُ والماسةُ والنقطةُ الوسطى زينةٌ، والرمزُ الخامُّ لغةُ نظامٍ لا لغةُ عمل',
+        ),
+    );
+}
+
+/**
+ * نصُّ الواجهةِ في ملفِّ شاشة — **بالتحليلِ اللغويِّ لا بنمطٍ على الخام**.
+ * ═══════════════════════════════════════════════════════════════════════════
+ * ◆ **ولماذا `token_get_all` لا `preg_match` على الملفّ**: التعليقاتُ في هذا
+ *   المستودعِ عربيّةٌ مشكولةٌ بكثافة — وعدُّها «نصَّ واجهة» يجعل الرقمَ وصفًا
+ *   لأسلوبِ التوثيقِ لا لِما يراه المستخدم. فالمقامُ **رموزُ النصِّ وحدَها**:
+ *   السلاسلُ المقتبَسةُ وHTML الخارجُ عن الوسوم — والتعليقاتُ خارجَ البنية.
+ * ◆ **وما ليس عربيًّا ليس نصَّ واجهة**: سلسلةٌ بلا حرفٍ عربيٍّ اسمُ مفتاحٍ أو
+ *   مسارٌ أو استعلام — تُستبعَد، وإلّا عُدَّ كلُّ `SELECT` زخرفة.
+ * @return array<string> مقاطعُ النصِّ العربيِّ في الملفّ
+ */
+function repair01_ui_text_chunks($src)
+{
+    $out = array();
+    $toks = @token_get_all($src);
+    if (!is_array($toks)) { return $out; }
+    $want = array(T_CONSTANT_ENCAPSED_STRING, T_ENCAPSED_AND_WHITESPACE, T_INLINE_HTML);
+    foreach ($toks as $t) {
+        if (!is_array($t) || !in_array($t[0], $want, true)) { continue; }
+        $s = (string) $t[1];
+        if ($t[0] === T_INLINE_HTML) { $s = strip_tags($s); }
+        if (!preg_match('/[\x{0620}-\x{064A}]/u', $s)) { continue; }
+        $out[] = $s;
+    }
+    return $out;
+}
+
 /** المستبعَدُ مُعلَنٌ لا مُخفى — والكاشفُ من ضمنِه. */
 function repair01_debt_skips()
 {
@@ -132,7 +187,9 @@ function repair01_debt_measure($ROOT, $conn = null)
     $files  = repair01_debt_files($ROOT);
     $counts = array();
     $hits   = array();
-    foreach (array_keys(repair01_debt_classes()) as $k) { $counts[$k] = 0; $hits[$k] = array(); }
+    foreach (array_keys(array_merge(repair01_debt_classes(), repair01_ui_debt_classes())) as $k) {
+        $counts[$k] = 0; $hits[$k] = array();
+    }
 
     $ADMIN = repair01_admin_paths();
 
@@ -211,6 +268,18 @@ function repair01_debt_measure($ROOT, $conn = null)
         $c = preg_match_all(
             '~\b(?:SUM|COUNT|AVG|MIN|MAX|COALESCE|IFNULL|ROUND|DATEDIFF|TIMESTAMPDIFF|GROUP_CONCAT|CASE)\s*\([^;]{0,400}?\)\s+AS\s+`?[A-Za-z_][A-Za-z0-9_]*`?~is', $src);
         if ($c) { $counts['RP-08'] += $c; $hits['RP-08'][$rel] = $c; }
+
+        /* UI-01 · UI-02 — نقاءُ لغةِ الواجهة (‏W06 §٤-٩). المقامُ مقاطعُ النصِّ
+           العربيِّ في الرموزِ وحدَها، والعدُّ **لكلِّ مقطعٍ** لا لكلِّ حرف:
+           مقطعٌ فيه عشرُ شدّاتٍ عيبٌ واحدٌ يُصلَح مرّةً. */
+        $uiDia = 0; $uiDec = 0;
+        foreach (repair01_ui_text_chunks($src) as $chunk) {
+            if (preg_match('/[\x{0610}-\x{061A}\x{064B}-\x{065F}\x{0670}\x{06D6}-\x{06ED}\x{0640}]/u', $chunk)) { $uiDia++; }
+            if (preg_match('/[\x{2190}-\x{21FF}\x{25A0}-\x{25FF}\x{2600}-\x{27BF}\x{2022}\x{00B7}\x{2014}\x{2013}]/u', $chunk)
+                || preg_match('/\b[A-Z][A-Z0-9]*_[A-Z0-9_]+\b/u', $chunk)) { $uiDec++; }
+        }
+        if ($uiDia) { $counts['UI-01'] += $uiDia; $hits['UI-01'][$rel] = $uiDia; }
+        if ($uiDec) { $counts['UI-02'] += $uiDec; $hits['UI-02'][$rel] = $uiDec; }
     }
 
     /* RP-02 — مسارُ تنقّلٍ حيٌّ بلا إدارةٍ مالكة (يُقاس من السجلِّ لا من الشيفرة). */

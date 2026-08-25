@@ -64,8 +64,8 @@ if (!headers_sent()) {
     foreach (headers_list() as $__h) {
         if (stripos($__h, 'Access-Control-Allow-Credentials') !== false && $__allowed === '*') {
             header_remove('Access-Control-Allow-Credentials');
-            error_log('[GAP-33] رُفض Access-Control-Allow-Credentials مع Allow-Origin:* '
-                    . '— أعلِن EMS_API_ALLOWED_ORIGINS قبلَ توثيقِ الارتباط');
+            error_log('[GAP-33] رفض Access-Control-Allow-Credentials مع Allow-Origin:* '
+                    . '— أعلن EMS_API_ALLOWED_ORIGINS قبل توثيق الارتباط');
         }
     }
 }

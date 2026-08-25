@@ -32,7 +32,7 @@ if (!$is_super_admin && $company_id <= 0) {
 $perms = fin_page_perms($conn, 'Finance/operator_pay_fin.php', $is_super_admin);
 $can_view = $perms['can_view']; $can_edit = $perms['can_edit'];
 if (!$can_view) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض وضع دفع المشغّل ❌', 'GOV-PERM-403', '');
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض وضع دفع المشغل ❌', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -49,7 +49,7 @@ if (isset($_GET['toggle_emp'])) {
         $gate->insert('fin_operator_pay', array('employee_id' => $eid, 'pay_mode' => $mode, 'created_by' => $current_user_id));
     }
     $lbl = $mode === 'due' ? 'بالمستحق' : 'بالراتب';
-    ems_gov_flash_redirect('operator_pay_fin.php', "تم ضبط وضع المشغّل: $lbl ✅", 'GOV-OK-200', ''); exit();
+    ems_gov_flash_redirect('operator_pay_fin.php', "تم ضبط وضع المشغل: $lbl ✅", 'GOV-OK-200', ''); exit();
 }
 
 // ── حفظ معدّل مستحق المشغّل (يُكتب على صفَّي employee_due) ──
@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rate'])) {
     if ($raw === '') {
         $rate = 0.0;
     } elseif (!is_numeric($raw) || (float)$raw < 0) {
-        ems_gov_flash_redirect('operator_pay_fin.php', 'المعدّل يجب أن يكون رقماً غير سالب ❌', 'GOV-FAIL-409', ''); exit();
+        ems_gov_flash_redirect('operator_pay_fin.php', 'المعدل يجب أن يكون رقما غير سالب ❌', 'GOV-FAIL-409', ''); exit();
     } else {
         $rate = round((float)$raw, 4);
     }
@@ -68,8 +68,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rate'])) {
         'is_active'   => $rate > 0 ? 1 : 0,
     ), array('effect_type' => 'employee_due'));
     $msg = $rate > 0
-        ? 'تم ضبط معدّل مستحق المشغّل وتفعيله ✅'
-        : 'تم إفراغ المعدّل — مستحق المشغّل معطّل الآن ✅';
+        ? 'تم ضبط معدل مستحق المشغل وتفعيله ✅'
+        : 'تم إفراغ المعدل — مستحق المشغل معطل الآن ✅';
     ems_gov_flash_redirect('operator_pay_fin.php', "$msg", 'GOV-INFO-200', ''); exit();
 }
 
@@ -100,7 +100,7 @@ $cnt_due = 0;
 foreach ($operators as $op) { if (($mode_map[intval($op['employee_id'])] ?? 'salary') === 'due') { $cnt_due++; } }
 $cnt_salary = count($operators) - $cnt_due;
 
-$page_title = 'إيكوبيشن | قواعد مستحقات المشغّلين';
+$page_title = 'إيكوبيشن | قواعد مستحقات المشغلين';
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
 require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(isset($perms) ? $perms : null);
@@ -125,13 +125,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 <div class="main fin-oppay-main ems-unified-page-shell">
     <?php
-    $header_title = 'قواعد مستحقات المشغّلين';
+    $header_title = 'قواعد مستحقات المشغلين';
     $header_icon  = 'fa fa-user-clock';
     $header_actions = array();
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضيًا
-    echo ems_states_bundle('لا مشغّلين في سجلّ الدوام بعدُ', 'سجّلْ ساعاتِ دوامٍ للمشغّلين ثم اضبطْ وضعَ كلِّ مشغّلٍ من هذه الشاشة');
+    echo ems_states_bundle('لا مشغلين في سجل الدوام بعد', 'سجل ساعات دوام للمشغلين ثم اضبط وضع كل مشغل من هذه الشاشة');
     ?>
 
     <?php fin_msg_banner(); ?>
@@ -139,14 +139,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-body">
         <p class="fin-oppay-lead">
             <i class="fas fa-circle-info"></i>
-            لكل مشغّلٍ وضعٌ تقرّره: <strong>«بالراتب»</strong> (تدفعه الرواتب — لا مستحقَ من محرك الآثار)، أو
-            <strong>«بالمستحق»</strong> (محرك الآثار المالية يدفعه: <code>ساعات المشغّل × المعدّل</code>، تصنيف «إضافي»).
-            الافتراض «بالراتب» حتى تُفعّل مشغّلًا صراحةً وتضبط المعدّل — فلا يُحتسب رقمٌ قبل ذلك.
+            لكل مشغل وضع تقرره: <strong>«بالراتب»</strong> (تدفعه الرواتب — لا مستحق من محرك الآثار)، أو
+            <strong>«بالمستحق»</strong> (محرك الآثار المالية يدفعه: <code>ساعات المشغل × المعدل</code>، تصنيف «إضافي»).
+            الافتراض «بالراتب» حتى تفعل مشغلا صراحة وتضبط المعدل — فلا يحتسب رقم قبل ذلك.
         </p>
         <div class="fin-oppay-chips">
             <span class="badge badge-<?php echo $cur_active ? 'success' : 'secondary'; ?> fin-oppay-chip-lg">
                 <i class="fas fa-<?php echo $cur_active ? 'circle-check' : 'circle-pause'; ?>"></i>
-                المعدّل <?php echo $cur_active ? 'مفعّل' : 'غير مفعّل (فارغ)'; ?>
+                المعدل <?php echo $cur_active ? 'مفعل' : 'غير مفعل (فارغ)'; ?>
             </span>
             <span class="badge badge-info fin-oppay-chip"><?php echo $cnt_due; ?> بالمستحق</span>
             <span class="badge badge-secondary fin-oppay-chip"><?php echo $cnt_salary; ?> بالراتب</span>
@@ -157,12 +157,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <?php echo csrf_field(); ?>
             <div class="form-section"><div class="form-grid">
                 <div class="form-group">
-                    <label for="emsf_239_29635">معدّل مستحق المشغّل لكل ساعة (SDG)</label>
-                    <input type="number" name="rate" step="0.0001" min="0" aria-label="معدّلُ مستحقِّ المشغّلِ لكلِّ ساعة" value="<?php echo htmlspecialchars($cur_rate_display); ?>" placeholder="فارغ = معطّل — اكتب المعدّل لتفعيله" id="emsf_239_29635">
+                    <label for="emsf_239_29635">معدل مستحق المشغل لكل ساعة (SDG)</label>
+                    <input type="number" name="rate" step="0.0001" min="0" aria-label="معدل مستحق المشغل لكل ساعة" value="<?php echo htmlspecialchars($cur_rate_display); ?>" placeholder="فارغ = معطل — اكتب المعدل لتفعيله" id="emsf_239_29635">
                 </div>
             </div></div>
             <div class="form-actions">
-                <button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ المعدّل</button>
+                <button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ المعدل</button>
             </div>
         </form>
         <?php else: ?>
@@ -171,17 +171,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div></div>
 
     <div class="card"><div class="card-body">
-        <h5 class="fin-oppay-h5"><i class="fas fa-users"></i> المشغّلون وأوضاعهم</h5>
+        <h5 class="fin-oppay-h5"><i class="fas fa-users"></i> المشغلون وأوضاعهم</h5>
         <div class="table-container">
             <table id="opTable" class="display nowrap alltables fin-oppay-table">
                 <thead><tr>
                     <?php if ($can_edit) echo '<th>تبديل</th>'; ?>
-                    <th>المشغّل</th><th>الوضع</th>
+                    <th>المشغل</th><th>الوضع</th>
                     <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                     <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                     <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                     <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -207,7 +207,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </table>
         </div>
         <?php if (empty($operators)): ?>
-            <p class="fin-oppay-empty"><i class="fas fa-circle-info"></i> لا مشغّلين في سجلّ الدوام بعد.</p>
+            <p class="fin-oppay-empty"><i class="fas fa-circle-info"></i> لا مشغلين في سجل الدوام بعد.</p>
         <?php endif; ?>
     </div></div>
 </div>

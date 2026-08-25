@@ -146,9 +146,9 @@ function cr_p($row, $key) {
     $header_actions = array();
     $header_back = false;
     include '../includes/page_header.php';
-    ems_screen_about('ثمانيةُ تقارير M-00 مشتقةٌ حيًّا من مصادرها — العقودُ والمشاريعُ من جداولها، والوقائعُ من الجذر المحايد، والمعلَّقاتُ من مصادرها الثلاثة، والمتابعاتُ من المحرّك.');
+    ems_screen_about('ثمانية تقارير M-00 مشتقة حيا من مصادرها — العقود والمشاريع من جداولها، والوقائع من الجذر المحايد، والمعلقات من مصادرها الثلاثة، والمتابعات من المحرك.');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا بياناتٍ في التقاريرِ الثمانيةِ بعدُ', 'تمتلئ التقاريرُ آليًّا من العقودِ والمشاريعِ ووقائعِ الجذرِ المحايد — ولا تُدخَل يدويًّا');
+    echo ems_states_bundle('لا بيانات في التقارير الثمانية بعد', 'تمتلئ التقارير آليا من العقود والمشاريع ووقائع الجذر المحايد — ولا تدخل يدويا');
     ?>
 
     <style>
@@ -193,16 +193,16 @@ function cr_p($row, $key) {
             </div>
             <?php endforeach; ?>
         </div>
-        <div class="text-muted cro-note">المصدر: contracts · project · الجذر المحايد ems_business_events · محرّك العمل (SRC-10)</div>
+        <div class="text-muted cro-note">المصدر: contracts · project · الجذر المحايد ems_business_events · محرك العمل (SRC-10)</div>
     </div></div>
 
     <!-- ② معلَّقات الاعتماد الأعلى -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-hourglass-half"></i> ② معلَّقات الاعتماد الأعلى (المصادر الثلاثة)</h5></div>
+    <div class="card"><div class="card-header"><h5><i class="fa fa-hourglass-half"></i> ② معلقات الاعتماد الأعلى (المصادر الثلاثة)</h5></div>
     <div class="card-body">
         <table class="alltables display no-datatable cro-table"><thead>
             <tr><th>المصدر</th><th>المرجع</th><th>البيان</th><th>الحالة/المهلة</th></tr></thead><tbody>
             <?php if (!$pInterim && !$pReqs && !$pLinks): ?>
-                <tr><td colspan="4" class="text-center text-muted">لا معلَّقَ الآن — صفرُ انتظارٍ أمام القمة</td></tr>
+                <tr><td colspan="4" class="text-center text-muted">لا معلق الآن — صفر انتظار أمام القمة</td></tr>
             <?php else: ?>
                 <?php foreach ($pInterim as $w): ?>
                 <tr><td>شاشة الاعتمادات</td><td><?php echo htmlspecialchars((string) ($w['request_no'] ?: ('#' . $w['id'])), ENT_QUOTES, 'UTF-8'); ?></td>
@@ -252,7 +252,7 @@ function cr_p($row, $key) {
             <tr><td>#<?php echo (int) $w['pid']; ?></td>
                 <td><?php echo htmlspecialchars((string) ($p['name'] ?? '—'), ENT_QUOTES, 'UTF-8'); ?></td>
                 <td><?php echo htmlspecialchars((string) $w['occurred_at'], ENT_QUOTES, 'UTF-8'); ?></td></tr>
-            <?php endforeach; if (!$charteredLast): ?><tr><td colspan="3" class="text-muted">لا وقائعَ فتحٍ بعدُ — تُنشر آليًّا عند إدراج مشروع</td></tr><?php endif; ?>
+            <?php endforeach; if (!$charteredLast): ?><tr><td colspan="3" class="text-muted">لا وقائع فتح بعد — تنشر آليا عند إدراج مشروع</td></tr><?php endif; ?>
         </tbody></table>
     </div></div>
 
@@ -260,12 +260,12 @@ function cr_p($row, $key) {
     <div class="card"><div class="card-header"><h5><i class="fa fa-gavel"></i> ⑤ القرارات التنفيذية ومتابعاتها (SRC-10)</h5></div>
     <div class="card-body">
         <table class="alltables display no-datatable cro-table"><thead>
-            <tr><th>القرار</th><th>القضية</th><th>المكلَّف</th><th>المهلة</th><th>حالة الصف</th><th>متابعته</th>
+            <tr><th>القرار</th><th>القضية</th><th>المكلف</th><th>المهلة</th><th>حالة الصف</th><th>متابعته</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -282,28 +282,28 @@ function cr_p($row, $key) {
                 <td><?php echo htmlspecialchars((string) ($w['exec_deadline'] ?: '—'), ENT_QUOTES, 'UTF-8'); ?></td>
                 <td><?php echo htmlspecialchars((string) $w['status'], ENT_QUOTES, 'UTF-8'); ?></td>
                 <td><?php echo $fu ? htmlspecialchars($fu['status'] . ' · ' . $fu['due_at'], ENT_QUOTES, 'UTF-8') : '—'; ?></td></tr>
-            <?php endforeach; if (!$decRows): ?><tr><td colspan="6" class="text-center text-muted">لا قراراتَ بعدُ — تُقيَّد من شاشة القرارات</td></tr><?php endif; ?>
+            <?php endforeach; if (!$decRows): ?><tr><td colspan="6" class="text-center text-muted">لا قرارات بعد — تقيد من شاشة القرارات</td></tr><?php endif; ?>
         </tbody></table>
     </div></div>
 
     <!-- ⑥ نبض المال -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-coins"></i> ⑥ نبض المال — وقائع 30 يومًا من الجذر</h5></div>
+    <div class="card"><div class="card-header"><h5><i class="fa fa-coins"></i> ⑥ نبض المال — وقائع 30 يوما من الجذر</h5></div>
     <div class="card-body">
         <table class="alltables display no-datatable cro-table"><thead>
             <tr><th>الواقعة</th><th>العدد</th></tr></thead><tbody>
             <?php foreach ($finPulse as $w): ?>
             <tr><td dir="ltr" class="cro-ltr"><?php echo htmlspecialchars((string) $w['k'], ENT_QUOTES, 'UTF-8'); ?></td>
                 <td><?php echo (int) $w['c']; ?></td></tr>
-            <?php endforeach; if (!$finPulse): ?><tr><td colspan="2" class="text-center text-muted">لا وقائعَ ماليةً في الثلاثين يومًا</td></tr><?php endif; ?>
+            <?php endforeach; if (!$finPulse): ?><tr><td colspan="2" class="text-center text-muted">لا وقائع مالية في الثلاثين يوما</td></tr><?php endif; ?>
         </tbody></table>
-        <div class="text-muted cro-sm">التفصيل بشاشات المالية — هذه نبضٌ جامعٌ من ems_business_events (category=financial)</div>
+        <div class="text-muted cro-sm">التفصيل بشاشات المالية — هذه نبض جامع من ems_business_events (category=financial)</div>
     </div></div>
 
     <!-- ⑦ المخاطر المفتوحة -->
     <div class="card"><div class="card-header"><h5><i class="fa fa-triangle-exclamation"></i> ⑦ القضايا بلا حسم (سجل المخاطر)</h5></div>
     <div class="card-body">
         <table class="alltables display no-datatable cro-table"><thead>
-            <tr><th>المرجع</th><th>النوع</th><th>القضية</th><th>الأثر المقدَّر</th><th>الحالة</th></tr></thead><tbody>
+            <tr><th>المرجع</th><th>النوع</th><th>القضية</th><th>الأثر المقدر</th><th>الحالة</th></tr></thead><tbody>
             <?php /* INJ-0411: المرجعُ رمزُ السجلِّ المركزيِّ والنقرُ يفتح بطاقتَه —
                      فالرقمُ والمصدرُ واحدٌ لا رقمان في شاشتين. */ ?>
             <?php foreach ($openRisk as $w): ?>
@@ -313,7 +313,7 @@ function cr_p($row, $key) {
                 <td><?php echo htmlspecialchars(mb_substr((string) $w['issue_desc'], 0, 70), ENT_QUOTES, 'UTF-8'); ?></td>
                 <td><?php echo htmlspecialchars((string) $w['est_impact'], ENT_QUOTES, 'UTF-8'); ?></td>
                 <td><?php echo htmlspecialchars((string) $w['status'], ENT_QUOTES, 'UTF-8'); ?></td></tr>
-            <?php endforeach; if (!$openRisk): ?><tr><td colspan="5" class="text-center text-muted">لا قضيةَ مفتوحةً — كلُّ المرفوع محسوم</td></tr><?php endif; ?>
+            <?php endforeach; if (!$openRisk): ?><tr><td colspan="5" class="text-center text-muted">لا قضية مفتوحة — كل المرفوع محسوم</td></tr><?php endif; ?>
         </tbody></table>
     </div></div>
 
@@ -331,9 +331,9 @@ function cr_p($row, $key) {
             <tr><td><?php echo htmlspecialchars((string) $w['budget_no'], ENT_QUOTES, 'UTF-8'); ?></td>
                 <td><?php echo htmlspecialchars((string) $w['status'], ENT_QUOTES, 'UTF-8'); ?></td>
                 <td><?php echo (int) $w['lines_c']; ?></td></tr>
-            <?php endforeach; if (!$budgets): ?><tr><td colspan="3" class="text-muted">لا موازناتِ للشركة</td></tr><?php endif; ?>
+            <?php endforeach; if (!$budgets): ?><tr><td colspan="3" class="text-muted">لا موازنات للشركة</td></tr><?php endif; ?>
         </tbody></table>
-        <div class="text-muted cro-note-full">حدودُ DEC-01 (5٪/10k$ للإدارة العامة · حدا الصافي ⅓+½) مُنفذةٌ في محرّك المنح — هذه خريطةُ الملكية</div>
+        <div class="text-muted cro-note-full">حدود DEC-01 (5٪/10k$ للإدارة العامة · حدا الصافي ⅓+½) منفذة في محرك المنح — هذه خريطة الملكية</div>
     </div></div>
 </div>
 

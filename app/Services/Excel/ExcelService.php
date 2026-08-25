@@ -33,7 +33,7 @@ class ExcelService
         $this->conn = $conn;
         $user = $_SESSION['user'] ?? null;
         if (!$user) {
-            $this->fail(401, 'غير مصرّح — يرجى تسجيل الدخول');
+            $this->fail(401, 'غير مصرح — يرجى تسجيل الدخول');
         }
         $role = isset($user['role']) ? (string) $user['role'] : '';
         $this->isSuperAdmin = ($role === '-1');
@@ -49,7 +49,7 @@ class ExcelService
     {
         $def = ExcelRegistry::get($entityKey);
         if (!$def) {
-            $this->fail(404, 'الكيان المطلوب غير معرّف في نظام Excel');
+            $this->fail(404, 'الكيان المطلوب غير معرف في نظام Excel');
         }
         return $def;
     }
@@ -70,13 +70,13 @@ class ExcelService
         }
         if (!function_exists('check_page_permissions')) {
             // ◆ لا توافقيةَ مع غيابِ الحارس: الغيابُ خللٌ في التحميلِ لا حالةٌ عادية.
-            $this->fail(500, 'طبقةُ الصلاحياتِ غيرُ محمَّلةٍ — التصديرُ ممنوعٌ (فشلٌ مغلق)');
+            $this->fail(500, 'طبقة الصلاحيات غير محملة — التصدير ممنوع (فشل مغلق)');
         }
         $perms = check_page_permissions($this->conn, $def->moduleCode);
         $allowed = ($action === 'add') ? !empty($perms['can_add']) : !empty($perms['can_view']);
         if (!$allowed) {
             $label = ($action === 'add') ? 'استيراد' : 'تصدير';
-            $this->fail(403, "لا توجد صلاحية {$label} لـ {$def->title}");
+            $this->fail(403, "لا توجد صلاحية {$label} ل {$def->title}");
         }
     }
 
@@ -117,15 +117,15 @@ class ExcelService
         // E-19: معاييرُ التصدير المطبَّقةُ فعلًا — تُعلَن في الملف لا تُضمَر
         $criteria = [];
         if (!$this->isSuperAdmin && $def->companyScoped) {
-            $criteria[] = 'نطاقُ الشركة #' . $this->companyId;
+            $criteria[] = 'نطاق الشركة #' . $this->companyId;
         }
         if ($def->softDeleteColumn) { $criteria[] = 'بلا المحذوف'; }
-        if (is_callable($def->exportRowScope)) { $criteria[] = 'نطاقُ رؤية الشاشة'; }
+        if (is_callable($def->exportRowScope)) { $criteria[] = 'نطاق رؤية الشاشة'; }
         if ($gov['blocked']) {
             // ◆ المستبعَدُ يُعلَن في وجهِ الملفِّ لا يُحذف صامتًا — فالصمتُ يُقرأ اكتمالًا.
-            $criteria[] = 'حقولٌ حساسةٌ مُستبعَدةٌ بلا منح: ' . implode('، ', $gov['blocked']);
+            $criteria[] = 'حقول حساسة مستبعدة بلا منح: ' . implode('، ', $gov['blocked']);
         }
-        $criteria[] = 'عددُ الصفوف: ' . count($rows);
+        $criteria[] = 'عدد الصفوف: ' . count($rows);
 
         $this->logGovernedExport($def, $gov, count($rows), $criteria);
 
@@ -250,7 +250,7 @@ class ExcelService
         }
         if (!$select) {
             // كلُّ الأعمدةِ محجوبة ⇒ لا تصديرَ يُبثّ. المنعُ صريحٌ لا ملفٌّ فارغ.
-            $this->fail(403, 'كلُّ أعمدةِ هذا الكيانِ حساسةٌ ولا منحَ لدورِك — لا يوجد ما يُصدَّر');
+            $this->fail(403, 'كل أعمدة هذا الكيان حساسة ولا منح لدورك — لا يوجد ما يصدر');
         }
         $table = preg_replace('/[^a-zA-Z0-9_]/', '', $def->table);
         $sql = 'SELECT ' . implode(', ', $select) . " FROM `{$table}` WHERE 1=1";

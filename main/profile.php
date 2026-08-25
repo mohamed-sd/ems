@@ -220,11 +220,11 @@ function profile_val($value, $fallback = 'غير محدّد')
 function profile_date($value, $withTime = true)
 {
     if (empty($value) || $value === '0000-00-00 00:00:00' || $value === '0000-00-00') {
-        return 'غير متوفّر';
+        return 'غير متوفر';
     }
     $ts = strtotime($value);
     if ($ts === false) {
-        return 'غير متوفّر';
+        return 'غير متوفر';
     }
     return $withTime ? date('Y-m-d H:i', $ts) : date('Y-m-d', $ts);
 }
@@ -282,8 +282,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     include('../includes/page_header.php');
 
     /* UXW-01 ⑨: حزمةُ الحالاتِ الدنيا — مخفيةٌ افتراضًا ويُظهرها منطقُ الشاشةِ عند حالِها */
-    echo ems_states_bundle('لا سجلَّ نشاطٍ لحسابك بعدُ',
-        'الإحصاءاتُ والرسومُ تُبنى من نشاطِك المسجَّلِ على الشاشات');
+    echo ems_states_bundle('لا سجل نشاط لحسابك بعد',
+        'الإحصاءات والرسوم تبنى من نشاطك المسجل على الشاشات');
     ?>
 
     <div class="profile-shell">
@@ -396,7 +396,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
         <!-- الرسوم البيانية -->
         <div class="profile-analytics">
-            <?php echo ems_profile_section_open(array('title' => 'النشاط خلال آخر 14 يوماً', 'icon' => 'fas fa-chart-column')); ?>
+            <?php echo ems_profile_section_open(array('title' => 'النشاط خلال آخر 14 يوما', 'icon' => 'fas fa-chart-column')); ?>
                 <div class="chart-wrap"><canvas id="activityTrendChart"></canvas></div>
             <?php echo ems_profile_section_close(); ?>
             <?php echo ems_profile_section_open(array('title' => 'توزيع أنواع النشاط', 'icon' => 'fas fa-chart-pie')); ?>
@@ -427,9 +427,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <th class="ems-fn-th" data-fn="1">الحساب البنكي</th>
                                 <th class="ems-fn-th" data-fn="1">الوثائق المرفقة</th>
                                 <th class="ems-fn-th" data-fn="1">تاريخ آخر تحديث</th>
-                                <th class="ems-fn-th" data-fn="1">حقول تحتاج اعتمادًا</th>
+                                <th class="ems-fn-th" data-fn="1">حقول تحتاج اعتمادا</th>
                                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
                                 <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
                                 </tr>
                         </thead>
@@ -460,7 +460,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </div>
             <?php echo ems_profile_section_close(); ?>
 
-            <?php echo ems_profile_section_open(array('title' => 'أكثر الشاشات استخداماً', 'icon' => 'fas fa-ranking-star')); ?>
+            <?php echo ems_profile_section_open(array('title' => 'أكثر الشاشات استخداما', 'icon' => 'fas fa-ranking-star')); ?>
                 <?php if (!empty($act_top_screens)): ?>
                     <?php $top_max = max(array_map(function ($x) { return $x['count']; }, $act_top_screens)); ?>
                     <?php foreach ($act_top_screens as $screen): ?>
@@ -482,8 +482,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
         <?php elseif ($activity_available): ?>
         <?php
-        echo ems_profile_section_open(array('title' => 'سجلُّ النشاط', 'icon' => 'fas fa-clock-rotate-left'));
-        echo ems_profile_note('لا يوجد سجل نشاط مسجّل لحسابك حتى الآن.', 'info');
+        echo ems_profile_section_open(array('title' => 'سجل النشاط', 'icon' => 'fas fa-clock-rotate-left'));
+        echo ems_profile_note('لا يوجد سجل نشاط مسجل لحسابك حتى الآن.', 'info');
         echo ems_profile_section_close();
         ?>
         <?php endif; ?>
@@ -514,7 +514,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             var host = c && c.parentNode ? c.parentNode : null;
             if (host) {
                 host.innerHTML = '<div class="pf-chart-empty">'
-                    + 'لا بيانات في الفترة المعروضة — الرسم لا يُعرض بمحاور افتراضية</div>';
+                    + 'لا بيانات في الفترة المعروضة — الرسم لا يعرض بمحاور افتراضية</div>';
             }
             return null;
         }

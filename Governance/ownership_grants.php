@@ -34,7 +34,7 @@ $role = strval($_SESSION['user']['role'] ?? '');
 $is_super = ($role === '-1');
 // خلف الصلاحية: الإدارة العليا والمالية العليا حصرًا (1 · 19 · -1)
 if (!$is_super && !in_array($role, array('1', '19'), true)) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'منح المجال المقيَّد خلف صلاحية مقيَّدة ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
+    ems_gov_flash_redirect('../main/dashboard.php', 'منح المجال المقيد خلف صلاحية مقيدة ❌', 'GOV-PERM-403', 'اطلب المنحة من مدير الصلاحيات إن كانت ضمن عملك');
 }
 $co = ems_scope_company($conn);
 $uid = intval($_SESSION['user']['id'] ?? 0);
@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $from = ($_POST['valid_from'] ?? '') !== '' ? strval($_POST['valid_from']) : null;
         $to = ($_POST['valid_to'] ?? '') !== '' ? strval($_POST['valid_to']) : null;
         if ($pid <= 0 || !isset($PERM_AR[$code])) {
-            $err = 'المستخدم والكود من القائمة — لا منح مبهمًا';
+            $err = 'المستخدم والكود من القائمة — لا منح مبهما';
         } else {
             // المنح عبر الخدمة حصرًا — قيمة الشراء بلا سبب ومدة تُرفض 422 فيها
             $r = ODG::grant($conn, $co, $pid, $code, $uid, $reason !== '' ? $reason : null, $from, $to);
@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($gid <= 0) {
             $err = 'منحة غير معروفة';
         } elseif ($why === '') {
-            $err = 'سبب الإلغاء إلزامي — المنح والإلغاء قراران موثَّقان';
+            $err = 'سبب الإلغاء إلزامي — المنح والإلغاء قراران موثقان';
         } else {
             $st = $conn->prepare("UPDATE ownership_access_grants
                                      SET state = 'revoked', revoked_by = ?, revoked_at = NOW(),
@@ -91,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'document_type' => 'ownership_grant', 'document_id' => $gid,
                     'step' => 'revoke:' . date('YmdHis'), 'person_id' => $uid,
                 ));
-                $msg = 'أُلغيت المنحة #' . $gid . ' بسببها وسطر توقيعها — الصف باقٍ للتدقيق لا يُحذف';
+                $msg = 'ألغيت المنحة #' . $gid . ' بسببها وسطر توقيعها — الصف باق للتدقيق لا يحذف';
             } else {
                 $err = 'لا منحة نافذة بهذا الرقم لهذه الشركة';
             }
@@ -117,7 +117,7 @@ $users = $conn->query(
       ORDER BY name"
 )->fetch_all(MYSQLI_ASSOC);
 
-$page_title = 'إيكوبيشن | منح المجال المقيَّد';
+$page_title = 'إيكوبيشن | منح المجال المقيد';
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
 require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(null);
@@ -135,15 +135,15 @@ include '../insidebar.php';
 </style>
 <div class="main ems-unified-page-shell">
     <?php
-    $header_title = 'منح المجال المقيَّد'; $header_icon = 'fa fa-user-lock';
+    $header_title = 'منح المجال المقيد'; $header_icon = 'fa fa-user-lock';
     $header_actions = array();
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا منحَ مجالٍ مقيَّدٍ مسجَّلةً لهذه الشركة', 'امنحْ أولَ صلاحيةٍ فرديةٍ من نموذجِ «منح صلاحية فردية» أعلى الشاشة');
-    ems_screen_about('بيانات ملّاك المعدات وشروط تمويلها ليست بيانًا تشغيليًّا (FIN-01 §1.1): الاطّلاع '
-        . 'بصلاحية فردية بأكوادها الثلاثة لا بالعضوية في إدارة — تُمنح وتُلغى هنا بقرار موثَّق '
-        . 'بتوقيعه، وقيمة الشراء (الأشد) لا تُمنح إلا بسبب ومدة، وكل قراءة لاحقة بسطر اطّلاع.',
-        array('المنح فردي لا جماعي', 'الإلغاء بسبب — والصف باقٍ للتدقيق'));
+    echo ems_states_bundle('لا منح مجال مقيد مسجلة لهذه الشركة', 'امنح أول صلاحية فردية من نموذج «منح صلاحية فردية» أعلى الشاشة');
+    ems_screen_about('بيانات ملاك المعدات وشروط تمويلها ليست بيانا تشغيليا (FIN-01 §1.1): الاطلاع '
+        . 'بصلاحية فردية بأكوادها الثلاثة لا بالعضوية في إدارة — تمنح وتلغى هنا بقرار موثق '
+        . 'بتوقيعه، وقيمة الشراء (الأشد) لا تمنح إلا بسبب ومدة، وكل قراءة لاحقة بسطر اطلاع.',
+        array('المنح فردي لا جماعي', 'الإلغاء بسبب — والصف باق للتدقيق'));
     if ($msg !== '') { echo '<div class="alert alert-success">' . htmlspecialchars($msg) . '</div>'; }
     if ($err !== '') { echo '<div class="alert alert-danger">' . htmlspecialchars($err) . '</div>'; }
     ?>
@@ -151,7 +151,7 @@ include '../insidebar.php';
     <div class="card"><div class="card-header"><h5><i class="fa fa-plus"></i> منح صلاحية فردية</h5></div>
     <div class="card-body">
         <form method="post" class="gov-og-form"
-              onsubmit="return confirm('المنح قرار حوكمة موثَّق بتوقيعه — أتؤكد؟');">
+              onsubmit="return confirm('المنح قرار حوكمة موثق بتوقيعه — أتؤكد؟');">
         <?= csrf_field() ?>
             <input type="hidden" name="op" value="grant">
             <div><label for="og_person">المستخدم</label><br>
@@ -176,16 +176,16 @@ include '../insidebar.php';
         </form>
     </div></div>
 
-    <div class="card"><div class="card-header"><h5><i class="fa fa-user-lock"></i> المنح — النافذة أولًا</h5></div>
+    <div class="card"><div class="card-header"><h5><i class="fa fa-user-lock"></i> المنح — النافذة أولا</h5></div>
     <div class="card-body">
         <?php if (empty($grants)): ems_state_empty('لا منح بعد — باب التمويل محجوب عن الجميع حتى أول منحة فردية'); else: ?>
         <div class="table-container"><table class="alltables display gov-og-table" data-no-dt="1">
         <thead><tr><th>#</th><th>المستخدم</th><th>الكود</th><th>المدة</th><th>السبب</th><th>مانحها</th><th>الحالة</th><th>إلغاء (بسبب)</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -206,7 +206,7 @@ include '../insidebar.php';
             <td>
                 <?php if ($g['state'] === 'active'): ?>
                 <form method="post" class="gov-og-revoke"
-                      onsubmit="return confirm('إلغاء المنحة يحجب الباب عن صاحبها فورًا — أتؤكد بقرار موثَّق؟');">
+                      onsubmit="return confirm('إلغاء المنحة يحجب الباب عن صاحبها فورا — أتؤكد بقرار موثق؟');">
         <?= csrf_field() ?>
                     <input type="hidden" name="op" value="revoke">
                     <input type="hidden" name="grant_id" value="<?php echo intval($g['grant_id']); ?>">

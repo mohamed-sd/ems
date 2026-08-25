@@ -105,9 +105,9 @@ function kpi_card($label, $value, $link, $hint = '')
     $header_back = false;
     include '../includes/page_header.php';
     require_once __DIR__ . '/../includes/screen_contract.php';
-    ems_screen_about('مؤشراتي مشتقةٌ آليًّا من عملي — كلُّ رقمٍ يقود لمصدره، وفريقي من الهيكل لا من قوائم.');
+    ems_screen_about('مؤشراتي مشتقة آليا من عملي — كل رقم يقود لمصدره، وفريقي من الهيكل لا من قوائم.');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا مؤشراتِ عملٍ في هذا المدى', 'وسّع المدى بين التاريخين أعلاه — أو ابدأ بمهمةٍ من «مهامي» ليُشتقَّ المؤشر');
+    echo ems_states_bundle('لا مؤشرات عمل في هذا المدى', 'وسع المدى بين التاريخين أعلاه — أو ابدأ بمهمة من «مهامي» ليشتق المؤشر');
     ?>
     <style>
     .mkpi-filter  { display: flex; gap: 10px; align-items: end; margin-bottom: 12px; flex-wrap: wrap; }
@@ -122,8 +122,8 @@ function kpi_card($label, $value, $link, $hint = '')
         <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
         <div class="filter-body">
     <form method="get" class="mkpi-filter">
-        <div><label class="mkpi-lbl" for="emsf_377_da0ec">من</label><input type="date" name="from" aria-label="بدايةُ مدى المؤشرات" class="form-control" value="<?php echo htmlspecialchars($from); ?>" id="emsf_377_da0ec"></div>
-        <div><label class="mkpi-lbl" for="emsf_378_7cf8e">إلى</label><input type="date" name="to" aria-label="نهايةُ مدى المؤشرات" class="form-control" value="<?php echo htmlspecialchars($to); ?>" id="emsf_378_7cf8e"></div>
+        <div><label class="mkpi-lbl" for="emsf_377_da0ec">من</label><input type="date" name="from" aria-label="بداية مدى المؤشرات" class="form-control" value="<?php echo htmlspecialchars($from); ?>" id="emsf_377_da0ec"></div>
+        <div><label class="mkpi-lbl" for="emsf_378_7cf8e">إلى</label><input type="date" name="to" aria-label="نهاية مدى المؤشرات" class="form-control" value="<?php echo htmlspecialchars($to); ?>" id="emsf_378_7cf8e"></div>
         <?php if ($team): ?><div><label class="mkpi-lbl" for="emsf_379_76884">عمق الفريق</label>
             <select name="depth" class="form-control" id="emsf_379_76884"><option value="1" <?php echo $depth === 1 ? 'selected' : ''; ?>>مباشر</option>
             <option value="2" <?php echo $depth === 2 ? 'selected' : ''; ?>>مستويان</option></select></div><?php endif; ?>
@@ -132,13 +132,13 @@ function kpi_card($label, $value, $link, $hint = '')
         </div>
     </div>
 
-    <h6><i class="fas fa-user"></i> مؤشراتي — كل رقمٍ يقود لمصدره</h6>
+    <h6><i class="fas fa-user"></i> مؤشراتي — كل رقم يقود لمصدره</h6>
     <div class="mkpi-cards">
         <?php
         $t = $mine['tasks'];
         $onTimePct = intval($t['closed_n'] ?? 0) > 0 ? round(100 * intval($t['closed_on_time']) / intval($t['closed_n'])) . '٪' : '—';
         kpi_card('مهامي المفتوحة', intval($t['open_n'] ?? 0), 'my_tasks.php?view=today');
-        kpi_card('أُغلق في المدى', intval($t['closed_n'] ?? 0), 'my_tasks.php?view=today', 'قبول المتحقق — لا التصريح');
+        kpi_card('أغلق في المدى', intval($t['closed_n'] ?? 0), 'my_tasks.php?view=today', 'قبول المتحقق — لا التصريح');
         kpi_card('الالتزام بالمهلة', $onTimePct, 'my_tasks.php?view=late', 'من المغلق داخل مهلته');
         kpi_card('متأخرة الآن', intval($t['overdue_n'] ?? 0), 'my_tasks.php?view=late');
         kpi_card('متعطلة', intval($t['blocked_n'] ?? 0), 'my_tasks.php?view=blocked');
@@ -152,13 +152,13 @@ function kpi_card($label, $value, $link, $hint = '')
     <h6><i class="fas fa-people-group"></i> فريقي — من الهيكل لا من قوائم (WFM-072)</h6>
     <div class="card"><div class="card-body"><div class="table-responsive">
         <table class="alltables display no-datatable mkpi-table">
-            <thead><tr><th>الموظف</th><th>مفتوح</th><th>متأخر</th><th>متعطل</th><th>أُغلق بالمدى</th>
+            <thead><tr><th>الموظف</th><th>مفتوح</th><th>متأخر</th><th>متعطل</th><th>أغلق بالمدى</th>
                 <th>الالتزام بالمهلة</th><th>استجابة (س)</th><th>إنجاز حي</th>
                 <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                 <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                 <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                 <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -181,6 +181,6 @@ function kpi_card($label, $value, $link, $hint = '')
     </div></div></div>
     <?php else: ?>
     <div class="text-muted mkpi-hint"><i class="fas fa-circle-info"></i>
-        لا مرؤوسين في الهيكل — لوحة الفريق تظهر للمديرين وحدهم (لا تُعرض صفرًا مضلِّلًا · IAM-024)</div>
+        لا مرؤوسين في الهيكل — لوحة الفريق تظهر للمديرين وحدهم (لا تعرض صفرا مضللا · IAM-024)</div>
     <?php endif; ?>
 </div>

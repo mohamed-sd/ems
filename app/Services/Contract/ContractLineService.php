@@ -58,7 +58,7 @@ class ContractLineService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'line_id' => null);
         $c = self::contractOf($gate, (int) $contractId);
-        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقدُ غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقد غير موجود في نطاقك'; return $out; }
 
         // ① الطاقةُ لا تصير بندَ بيع — **الحارسُ الأول قبل أي شيء**
         $srcId = (isset($a['source_commitment_id']) && (int) $a['source_commitment_id'] > 0)
@@ -66,67 +66,67 @@ class ContractLineService
         if ($srcId !== null) {
             $cm = null;
             try { $cm = $gate->selectOne('contract_commitments', array('where' => array('id' => $srcId))); }
-            catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $cm'); $cm = null; }
-            if (!$cm) { $out['code'] = 422; $out['reason'] = 'الالتزامُ غيرُ موجودٍ في نطاقك'; return $out; }
+            catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $cm'); $cm = null; }
+            if (!$cm) { $out['code'] = 422; $out['reason'] = 'الالتزام غير موجود في نطاقك'; return $out; }
             if ((int) $cm['contract_ref'] !== (int) $contractId) {
-                $out['code'] = 422; $out['reason'] = 'الالتزامُ يخصُّ عقدًا آخر'; return $out;
+                $out['code'] = 422; $out['reason'] = 'الالتزام يخص عقدا آخر'; return $out;
             }
             $type = (string) $cm['commitment_type'];
             if (in_array($type, self::CAPACITY_TYPES, true)) {
                 $out['code'] = 422;
-                $out['reason'] = '**التزامُ طاقةٍ لا يصير بندَ بيع**: «'
+                $out['reason'] = '**التزام طاقة لا يصير بند بيع**: «'
                     . (isset(self::CAPACITY_LABEL_AR[$type]) ? self::CAPACITY_LABEL_AR[$type] : $type)
                     . '» — بيتُه **خطةُ الموارد** (P-04) و**لا يدخل القيمة**. '
-                    . 'وخلطُهما **يضاعف الإيراد** في عقدٍ واحد';
+                    . 'وخلطهما **يضاعف الإيراد** في عقد واحد';
                 return $out;
             }
             if (!in_array($type, self::BILLABLE_TYPES, true)) {
                 $out['code'] = 422;
-                $out['reason'] = 'نوعُ التزامٍ لا يُعرف له حكمٌ في القيمة: ' . $type
-                               . ' — **يُعلَن ولا يُفترض**';
+                $out['reason'] = 'نوع التزام لا يعرف له حكم في القيمة: ' . $type
+                               . ' — **يعلن ولا يفترض**';
                 return $out;
             }
         }
 
         $model = (string) (isset($a['pricing_model']) ? $a['pricing_model'] : '');
         if (!in_array($model, self::MODELS, true)) {
-            $out['code'] = 422; $out['reason'] = 'نموذجُ تسعيرٍ غير معروف: ' . $model; return $out;
+            $out['code'] = 422; $out['reason'] = 'نموذج تسعير غير معروف: ' . $model; return $out;
         }
         $qty = round((float) (isset($a['qty_contracted']) ? $a['qty_contracted'] : 0), 2);
         if ($model === 'lump_sum' && $qty <= 0) { $qty = 1.0; }
         $price = round((float) (isset($a['unit_price']) ? $a['unit_price'] : 0), 4);
         if ($qty <= 0 || $price <= 0) {
-            $out['code'] = 422; $out['reason'] = 'الكميةُ والسعرُ موجبان'; return $out;
+            $out['code'] = 422; $out['reason'] = 'الكمية والسعر موجبان'; return $out;
         }
         $from = self::dateOrNull(isset($a['valid_from']) ? $a['valid_from'] : null);
         if ($from === null) {
             $out['code'] = 422;
-            $out['reason'] = '**تاريخُ السريان إلزامي** — وبلا سريانٍ لا يُعرف أيُّ فترةٍ يحكمها البند';
+            $out['reason'] = '**تاريخ السريان إلزامي** — وبلا سريان لا يعرف أي فترة يحكمها البند';
             return $out;
         }
         $to = self::dateOrNull(isset($a['valid_to']) ? $a['valid_to'] : null);
         if ($to !== null && $to < $from) {
-            $out['code'] = 422; $out['reason'] = 'نهايةُ السريان قبل بدايته'; return $out;
+            $out['code'] = 422; $out['reason'] = 'نهاية السريان قبل بدايته'; return $out;
         }
 
         // ② ولا سعرَ بلا مرجعٍ ضريبيّ
         $tax = (string) (isset($a['tax_status']) ? $a['tax_status'] : 'taxable');
         if (!in_array($tax, self::TAX_STATUSES, true)) {
-            $out['code'] = 422; $out['reason'] = 'حالةٌ ضريبيةٌ غير معروفة: ' . $tax; return $out;
+            $out['code'] = 422; $out['reason'] = 'حالة ضريبية غير معروفة: ' . $tax; return $out;
         }
         $taxCode = (isset($a['tax_code_id']) && (int) $a['tax_code_id'] > 0) ? (int) $a['tax_code_id'] : null;
         if ($tax === 'taxable') {
             if ($taxCode === null) {
                 $out['code'] = 422;
-                $out['reason'] = '**بندٌ خاضعٌ بلا رمزٍ ضريبيّ** — «الضريبةُ سطرٌ بمرجعها» (M-03 §5)';
+                $out['reason'] = '**بند خاضع بلا رمز ضريبي** — «الضريبة سطر بمرجعها» (M-03 §5)';
                 return $out;
             }
             $tc = null;
             try { $tc = $gate->selectOne('fin_tax_codes', array('where' => array('id' => $taxCode))); }
-            catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $tc'); $tc = null; }
+            catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $tc'); $tc = null; }
             if (!$tc) {
                 $out['code'] = 422;
-                $out['reason'] = 'الرمزُ الضريبيُّ غيرُ مسجَّلٍ في نطاقك — ولا يُخترع';
+                $out['reason'] = 'الرمز الضريبي غير مسجل في نطاقك — ولا يخترع';
                 return $out;
             }
         } else {
@@ -137,9 +137,9 @@ class ContractLineService
         $clash = self::overlapping($gate, (int) $contractId, $model, $from, $to, $srcId, 0);
         if ($clash !== null) {
             $out['code'] = 409; $out['line_id'] = (int) $clash['id'];
-            $out['reason'] = 'بندٌ قائمٌ #' . (int) $clash['id'] . ' يتداخل سريانُه ('
+            $out['reason'] = 'بند قائم #' . (int) $clash['id'] . ' يتداخل سريانه ('
                 . (string) $clash['valid_from'] . ' → ' . (string) ($clash['valid_to'] ?? '…')
-                . ') — **والتغييرُ نسخةٌ تُخلِف لا تداخلٌ**';
+                . ') — **والتغيير نسخة تخلف لا تداخل**';
             return $out;
         }
 
@@ -169,9 +169,9 @@ class ContractLineService
                 'created_by' => (int) $actor ?: null,
             ));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّرت الإضافة: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذرت الإضافة: ' . $t->getMessage(); return $out;
         }
-        if ($lid <= 0) { $out['code'] = 422; $out['reason'] = 'تعذّر الإدراج — افحص القيود'; return $out; }
+        if ($lid <= 0) { $out['code'] = 422; $out['reason'] = 'تعذر الإدراج — افحص القيود'; return $out; }
 
         self::audit($conn, $companyId, $actor, 'add_line', $lid, array(),
             array('contract_id' => (int) $contractId, 'model' => $model, 'qty' => $qty, 'price' => $price));
@@ -188,20 +188,20 @@ class ContractLineService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'new_line_id' => null);
         $l = self::lineOf($gate, (int) $lineId);
-        if (!$l) { $out['code'] = 404; $out['reason'] = 'البندُ غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!$l) { $out['code'] = 404; $out['reason'] = 'البند غير موجود في نطاقك'; return $out; }
         if ((string) $l['state'] !== 'active') {
-            $out['code'] = 409; $out['reason'] = 'إعادةُ التسعير للنافذ (حالُه: ' . $l['state'] . ')'; return $out;
+            $out['code'] = 409; $out['reason'] = 'إعادة التسعير للنافذ (حاله: ' . $l['state'] . ')'; return $out;
         }
         $from = self::dateOrNull($effectiveFrom);
-        if ($from === null) { $out['code'] = 422; $out['reason'] = 'تاريخُ سريان السعر الجديد إلزامي'; return $out; }
+        if ($from === null) { $out['code'] = 422; $out['reason'] = 'تاريخ سريان السعر الجديد إلزامي'; return $out; }
         if ($from <= (string) $l['valid_from']) {
             $out['code'] = 422;
-            $out['reason'] = 'سريانُ النسخة الجديدة **بعد** سريان القائمة ('
-                           . (string) $l['valid_from'] . ') — **ولا تعديلَ رجعيًّا**';
+            $out['reason'] = 'سريان النسخة الجديدة **بعد** سريان القائمة ('
+                           . (string) $l['valid_from'] . ') — **ولا تعديل رجعيا**';
             return $out;
         }
         $price = round((float) $newPrice, 4);
-        if ($price <= 0) { $out['code'] = 422; $out['reason'] = 'السعرُ موجب'; return $out; }
+        if ($price <= 0) { $out['code'] = 422; $out['reason'] = 'السعر موجب'; return $out; }
 
         $cut = date('Y-m-d', strtotime($from . ' -1 day'));
         $newId = null;
@@ -225,13 +225,13 @@ class ContractLineService
                     'supersedes_line_id' => (int) $lineId,
                     'state' => 'active',
                     'note' => mb_substr(trim((string) $note) !== '' ? (string) $note
-                              : ('إعادةُ تسعيرٍ من ' . $l['unit_price'] . ' إلى ' . $price), 0, 255),
+                              : ('إعادة تسعير من ' . $l['unit_price'] . ' إلى ' . $price), 0, 255),
                     'created_by' => (int) $actor ?: null,
                 ));
-                if ($newId <= 0) { throw new \RuntimeException('تعذّر إنشاءُ النسخة'); }
+                if ($newId <= 0) { throw new \RuntimeException('تعذر إنشاء النسخة'); }
             }, 'إعادة تسعير بند ' . $lineId);
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّرت إعادةُ التسعير: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذرت إعادة التسعير: ' . $t->getMessage(); return $out;
         }
 
         self::audit($conn, $companyId, $actor, 'reprice', (int) $lineId,
@@ -281,7 +281,7 @@ class ContractLineService
                 $p = array((int) $contractId);
             }
             $rows = $gate->scopedQuery(array('scope' => array('l' => 'client_contract_lines')), $sql, $p);
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $rows'); $rows = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $rows'); $rows = array(); }
 
         foreach ($rows as $r) {
             $cur = (string) $r['currency'];
@@ -312,18 +312,18 @@ class ContractLineService
                     'type' => $t,
                     'label' => isset(self::CAPACITY_LABEL_AR[$t]) ? self::CAPACITY_LABEL_AR[$t] : $t,
                     'qty' => (float) $e['qty'],
-                    'why' => '**طاقةٌ لا تُفوتَر** — بيتُها خطةُ الموارد (P-04) ولا تدخل القيمة',
+                    'why' => '**طاقة لا تفوتر** — بيتها خطة الموارد (P-04) ولا تدخل القيمة',
                 );
             }
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'الاستبعادُ يُعلَن حين يُقرأ'); /* الاستبعادُ يُعلَن حين يُقرأ */ }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'الاستبعاد يعلن حين يقرأ'); /* الاستبعادُ يُعلَن حين يُقرأ */ }
 
         $parts = array();
         foreach ($out['by_currency'] as $cur => $v) { $parts[] = $v . ' ' . $cur; }
         $out['note'] = ($parts ? implode(' · ', $parts) : 'صفر')
-            . ' من ' . count($out['lines']) . ' بندِ بيع'
+            . ' من ' . count($out['lines']) . ' بند بيع'
             . (count($out['excluded']) > 0
-               ? (' · **واستُبعد ' . count($out['excluded']) . ' التزامَ طاقةٍ معلَنًا**') : '')
-            . (count($out['by_currency']) > 1 ? ' · **تعدُّدُ عملاتٍ: لا يُجمع في رقم**' : '');
+               ? (' · **واستبعد ' . count($out['excluded']) . ' التزام طاقة معلنا**') : '')
+            . (count($out['by_currency']) > 1 ? ' · **تعدد عملات: لا يجمع في رقم**' : '');
         return $out;
     }
 

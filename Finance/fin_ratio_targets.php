@@ -10,9 +10,9 @@ $FA_SCREEN = array(
     'file' => 'fin_ratio_targets.php',
     'title' => 'حدود النسب وأهدافها',
     'icon' => 'fas fa-bullseye',
-    'about' => 'لكل نسبةٍ حدُّ إنذارٍ وحدٌّ حرجٌ وهدفٌ ومالكٌ ودورية — ولا نسبةَ تُعرض بلا حد. واعتمادُ الحدِّ لنائبِ الرئيسِ للشؤون المالية والاستثمار.',
+    'about' => 'لكل نسبة حد إنذار وحد حرج وهدف ومالك ودورية — ولا نسبة تعرض بلا حد. واعتماد الحد لنائب الرئيس للشؤون المالية والاستثمار.',
     'notes' => array (
-  0 => 'تعديلُ الحدِّ نسخةٌ جديدةٌ تشير للسابقة — والعكسُ إعادةُ الحدِّ السابقِ بقرار',
+  0 => 'تعديل الحد نسخة جديدة تشير للسابقة — والعكس إعادة الحد السابق بقرار',
 ),
     'context' => array(),
     'filters' => '',
@@ -27,13 +27,13 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
     while ($x = $r->fetch_assoc()) { $rows[] = $x; }
 ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
-    <?php echo ems_states_bundle('لا حدودَ نسبٍ معتمدةً بعد', 'تُعتمد الحدودُ من هذه الشاشةِ بصلاحيةِ نائبِ الرئيسِ للشؤونِ الماليةِ والاستثمار'); ?>
+    <?php echo ems_states_bundle('لا حدود نسب معتمدة بعد', 'تعتمد الحدود من هذه الشاشة بصلاحية نائب الرئيس للشؤون المالية والاستثمار'); ?>
     <div class="card"><div class="card-body table-responsive">
         <table class="alltables display nowrap fa-table-full">
             <thead><tr>
                 <th>الرمز</th><th>النسبة</th><th>المجموعة</th><th>الوحدة</th><th>اتجاه الحد</th>
                 <th>حد الإنذار</th><th>الحد الحرج</th><th>الهدف</th><th>نص الحد</th>
-                <th>الدورية</th><th>المالك</th><th>النسخة</th><th>المعتمِد</th><th>مرجع التفويض</th><th></th>
+                <th>الدورية</th><th>المالك</th><th>النسخة</th><th>المعتمد</th><th>مرجع التفويض</th><th></th>
             </tr></thead>
             <tbody>
             <?php foreach ($rows as $x): ?>
@@ -62,11 +62,11 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
     </div></div>
     <script>
     function faSetTarget(code) {
-        var w = prompt('حدُّ الإنذارِ للنسبة ' + code + ' (اتركه فارغًا لإبقائه):', '');
+        var w = prompt('حد الإنذار للنسبة ' + code + ' (اتركه فارغا لإبقائه):', '');
         if (w === null) { return; }
-        var c = prompt('الحدُّ الحرج:', '');
+        var c = prompt('الحد الحرج:', '');
         if (c === null) { return; }
-        var t = prompt('الهدفُ المعتمد:', '');
+        var t = prompt('الهدف المعتمد:', '');
         if (t === null) { return; }
         faPost('ratio_target_set', { ratio_code: code, warn_value: w, critical_value: c, target_value: t });
     }

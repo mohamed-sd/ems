@@ -57,10 +57,10 @@ class UnitConversionService
                 $ue = $st->get_result()->fetch_assoc();
                 $st->close();
                 if (!$ue) {
-                    throw new \RuntimeException('لا صفَّ سلسلةٍ بجسر ' . $uuid . ' — شغّل أداة الجسر أولًا');
+                    throw new \RuntimeException('لا صف سلسلة بجسر ' . $uuid . ' — شغل أداة الجسر أولا');
                 }
                 if ((string) $ue['state'] !== 'sales_approved') {
-                    throw new \RuntimeException('حالة السلسلة ' . $ue['state'] . ' — لا يُحوَّل إلا sales_approved');
+                    throw new \RuntimeException('حالة السلسلة ' . $ue['state'] . ' — لا يحول إلا sales_approved');
                 }
 
                 // ② المروحة (عطالتها fin_event_links — إعادة النداء لا تكرر)
@@ -76,14 +76,14 @@ class UnitConversionService
                 }
                 $out['skipped'] = $res['skipped'];
                 if (!empty($res['revision_pending'])) {
-                    throw new \RuntimeException('مراجعة كمية معلّقة — التصحيح لمحرّك العكسيات');
+                    throw new \RuntimeException('مراجعة كمية معلقة — التصحيح لمحرك العكسيات');
                 }
                 if ($out['effects'] + $out['adopted'] === 0) {
                     // كلُّ الآثار متعذّرة بأسبابها — لا ختم ولا فشل: يبقى في الطابور
                     $reasons = array();
                     foreach (array_slice($res['skipped'], 0, 2) as $s) { $reasons[] = $s['reason']; }
                     $out['ok'] = true;
-                    $out['reason'] = 'صفر أثرٍ قابلٍ للتوليد: ' . implode(' · ', $reasons);
+                    $out['reason'] = 'صفر أثر قابل للتوليد: ' . implode(' · ', $reasons);
                     return;
                 }
 
@@ -96,7 +96,7 @@ class UnitConversionService
                 $st->execute();
                 $n = $st->affected_rows;
                 $st->close();
-                if ($n !== 1) { throw new \RuntimeException('تعذّر ختمُ السلسلة #' . $ueId . ' — سباقُ حالة'); }
+                if ($n !== 1) { throw new \RuntimeException('تعذر ختم السلسلة #' . $ueId . ' — سباق حالة'); }
 
                 $out['ok'] = true;
                 $out['converted'] = true;
@@ -106,7 +106,7 @@ class UnitConversionService
                         . ' adopted=' . $out['adopted'] . ' actor=' . intval($actor));
                 }
             }, 'unit chain conversion ts ' . $tsId);
-        } catch (\Throwable $e) { ems_catch_ignored($e, __METHOD__, 'تحويلُ سلسلةِ وحدةٍ واحدةٍ فشل — بقيةُ السلاسلِ تُحوَّل، والفاشلةُ تبقى غيرَ محوَّلة');
+        } catch (\Throwable $e) { ems_catch_ignored($e, __METHOD__, 'تحويل سلسلة وحدة واحدة فشل — بقية السلاسل تحول، والفاشلة تبقى غير محولة');
             $out['ok'] = false;
             $out['reason'] = $e->getMessage();
         }
@@ -133,7 +133,7 @@ class UnitConversionService
             $row = $st->get_result()->fetch_assoc();
             $st->close();
             if (!$row) {
-                $sum['failed'][] = 'TS-' . $tsId . ': لا صفَّ سلسلةٍ بجسره';
+                $sum['failed'][] = 'TS-' . $tsId . ': لا صف سلسلة بجسره';
                 continue;
             }
             if (isset($_SESSION['user']['id']) && function_exists('ems_tenant_db')) {

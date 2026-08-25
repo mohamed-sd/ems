@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['line_id'])) {
     if ($affected > 0) {
         ems_gov_flash_redirect('variance_monitor_fin.php', 'تم حفظ معالجة الانحراف ✅', 'GOV-OK-200', ''); exit();
     }
-    ems_gov_flash_redirect('variance_monitor_fin.php', 'تعذّر الحفظ (بندٌ غير موجود في شركتك) ❌', 'GOV-REF-404', ''); exit();
+    ems_gov_flash_redirect('variance_monitor_fin.php', 'تعذر الحفظ (بند غير موجود في شركتك) ❌', 'GOV-REF-404', ''); exit();
 }
 
 // ── تصفية العرض ──
@@ -123,7 +123,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا انحرافاتِ موازنةٍ مطابقةً للتصفيةِ الحالية', 'بدّل التصفيةَ إلى «الكل» أو اعتمد موازنةً لتظهرَ بنودُها');
+    echo ems_states_bundle('لا انحرافات موازنة مطابقة للتصفية الحالية', 'بدل التصفية إلى «الكل» أو اعتمد موازنة لتظهر بنودها');
     ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
@@ -167,11 +167,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="form-grid">
                     <div class="form-group fin-var-full">
                         <label for="emsf_272_3ca83">سبب الانحراف</label>
-                        <input type="text" name="cause" maxlength="200" id="emsf_272_3ca83" placeholder="ما الذي سبّب الفرق بين المخطّط والفعلي؟" aria-label="سبب الانحراف" value="<?php echo htmlspecialchars($editLine['cause'] ?? ''); ?>">
+                        <input type="text" name="cause" maxlength="200" id="emsf_272_3ca83" placeholder="ما الذي سبب الفرق بين المخطط والفعلي؟" aria-label="سبب الانحراف" value="<?php echo htmlspecialchars($editLine['cause'] ?? ''); ?>">
                     </div>
                     <div class="form-group fin-var-full">
                         <label for="emsf_273_0f631">الإجراء التصحيحي</label>
-                        <input type="text" name="corrective_action" maxlength="200" id="emsf_273_0f631" placeholder="ما الإجراء المتّخذ لمعالجته؟" aria-label="الإجراء التصحيحي لمعالجة الانحراف" value="<?php echo htmlspecialchars($editLine['corrective_action'] ?? ''); ?>">
+                        <input type="text" name="corrective_action" maxlength="200" id="emsf_273_0f631" placeholder="ما الإجراء المتخذ لمعالجته؟" aria-label="الإجراء التصحيحي لمعالجة الانحراف" value="<?php echo htmlspecialchars($editLine['corrective_action'] ?? ''); ?>">
                     </div>
                     <div class="form-group">
                         <label for="emsf_274_dcb83">المسؤول (المالك)</label>
@@ -205,7 +205,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5 class="fin-var-toolbar-title"><i class="fas fa-list"></i> انحرافات الموازنات المعتمدة</h5>
             <div class="var-filters fin-var-chips">
                 <?php
-                $chips = array('all' => 'الكل', 'breaches' => 'تجاوزات > 10%', 'unresolved' => 'غير المُغلقة');
+                $chips = array('all' => 'الكل', 'breaches' => 'تجاوزات > 10%', 'unresolved' => 'غير المغلقة');
                 foreach ($chips as $k => $lbl) {
                     $active = ($flt === $k) ? ' badge-primary' : ' badge-secondary';
                     echo "<a href='?flt=" . $k . "' class='badge fin-var-chip" . $active . "'>" . htmlspecialchars($lbl) . "</a>";
@@ -224,14 +224,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <th class="ems-fn-th" data-fn="1">الفترة</th>
                     <th class="ems-fn-th" data-fn="1">العقد</th>
                     <th class="ems-fn-th" data-fn="1">الوحدة</th>
-                    <th class="ems-fn-th" data-fn="1">المنفَّذة</th>
+                    <th class="ems-fn-th" data-fn="1">المنفذة</th>
                     <th class="ems-fn-th" data-fn="1">المفوترة</th>
-                    <th class="ems-fn-th" data-fn="1">المحصَّلة</th>
+                    <th class="ems-fn-th" data-fn="1">المحصلة</th>
                     <th class="ems-fn-th" data-fn="1">انحراف الفوترة</th>
                     <th class="ems-fn-th" data-fn="1">انحراف التحصيل</th>
                     <th class="ems-fn-th" data-fn="1">تاريخ المتابعة</th>
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                    <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                    <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
                     </tr></thead>
                 <tbody>
                     <?php foreach ($var_rows as $l) {
@@ -265,7 +265,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </table>
         </div>
         <?php if (empty($var_rows)): ?>
-            <p class="fin-var-emptynote"><i class="fas fa-circle-info"></i> لا بنودَ مطابقةً للتصفية الحالية. (تظهر بنود الموازنات المعتمدة/النشطة فقط.)</p>
+            <p class="fin-var-emptynote"><i class="fas fa-circle-info"></i> لا بنود مطابقة للتصفية الحالية. (تظهر بنود الموازنات المعتمدة/النشطة فقط.)</p>
         <?php endif; ?>
     </div></div>
 </div>

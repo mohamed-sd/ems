@@ -150,7 +150,7 @@ class Installer
         }
         $ac->close();
         if ($made > 0) {
-            $this->step('طورُ القوادحِ الإداريّ', "أُنشئ {$made} قادحًا بحسابٍ إداريٍّ مُعلَن (النقصُ كان {$shortBy})");
+            $this->step('طور القوادح الإداري', "أنشئ {$made} قادحا بحساب إداري معلن (النقص كان {$shortBy})");
         }
         return $made;
     }
@@ -183,12 +183,12 @@ class Installer
         );
 
         foreach (self::REQUIRED_EXT as $ext) {
-            $c[] = $this->check(extension_loaded($ext), "إضافة {$ext}", extension_loaded($ext) ? 'محمَّلة' : 'مفقودة');
+            $c[] = $this->check(extension_loaded($ext), "إضافة {$ext}", extension_loaded($ext) ? 'محملة' : 'مفقودة');
         }
 
-        $c[] = $this->check(!$this->isInstalled(), 'علامةُ التثبيت', $this->isInstalled()
-            ? 'الملف .installed موجود — النظام مثبَّتٌ مسبقًا. احذفه عمدًا إن أردت إعادةَ التثبيت.'
-            : 'غير موجودة (تثبيتٌ أوّل)');
+        $c[] = $this->check(!$this->isInstalled(), 'علامة التثبيت', $this->isInstalled()
+            ? 'الملف .installed موجود — النظام مثبت مسبقا. احذفه عمدا إن أردت إعادة التثبيت.'
+            : 'غير موجودة (تثبيت أول)');
 
         // مصنوعاتُ التثبيت وسلامةُ بصماتها
         $c = array_merge($c, $this->checkArtifacts());
@@ -208,11 +208,11 @@ class Installer
             'admin_username' => 'اسم الدخول',
             'admin_password' => 'كلمة المرور',
         ) as $k => $label) {
-            $c[] = $this->check(trim((string) $this->cfg[$k]) !== '', $label, trim((string) $this->cfg[$k]) !== '' ? 'مُدخَل' : 'مطلوب');
+            $c[] = $this->check(trim((string) $this->cfg[$k]) !== '', $label, trim((string) $this->cfg[$k]) !== '' ? 'مدخل' : 'مطلوب');
         }
 
         if (trim((string) $this->cfg['admin_password']) !== '' && strlen($this->cfg['admin_password']) < 8) {
-            $c[] = $this->check(false, 'طول كلمة المرور', 'ثمانيةُ محارفَ على الأقل');
+            $c[] = $this->check(false, 'طول كلمة المرور', 'ثمانية محارف على الأقل');
         }
 
         return $c;
@@ -236,15 +236,15 @@ class Installer
         $manifestPath = $dir . '/MANIFEST.json';
 
         if (!is_file($manifestPath)) {
-            $out[] = $this->check(false, 'بيانُ المصنوعات', 'MANIFEST.json مفقود — شغّل `php database/migrate.php dump-schema`');
+            $out[] = $this->check(false, 'بيان المصنوعات', 'MANIFEST.json مفقود — شغل `php database/migrate.php dump-schema`');
             return $out;
         }
         $manifest = json_decode((string) file_get_contents($manifestPath), true);
         if (!is_array($manifest) || !isset($manifest['files'])) {
-            $out[] = $this->check(false, 'بيانُ المصنوعات', 'MANIFEST.json تالفٌ أو بلا مفتاح files');
+            $out[] = $this->check(false, 'بيان المصنوعات', 'MANIFEST.json تالف أو بلا مفتاح files');
             return $out;
         }
-        $out[] = $this->check(true, 'بيانُ المصنوعات', 'مولَّدٌ في ' . (isset($manifest['generated_at']) ? $manifest['generated_at'] : '؟'));
+        $out[] = $this->check(true, 'بيان المصنوعات', 'مولد في ' . (isset($manifest['generated_at']) ? $manifest['generated_at'] : '؟'));
 
         foreach ($manifest['files'] as $name => $meta) {
             $path = $dir . '/' . $name;
@@ -257,7 +257,7 @@ class Installer
             $out[] = $this->check(
                 $ok,
                 "بصمة {$name}",
-                $ok ? 'مطابقة' : 'غيرُ مطابقة — الملف حُرِّر بيدٍ بعد التوليد. أعِد dump-schema.'
+                $ok ? 'مطابقة' : 'غير مطابقة — الملف حرر بيد بعد التوليد. أعد dump-schema.'
             );
         }
         return $out;
@@ -278,7 +278,7 @@ class Installer
             $out[] = $this->check(
                 (bool) $this->cfg['db_create'],
                 'القاعدة ' . $this->cfg['db_name'],
-                $this->cfg['db_create'] ? 'غيرُ موجودةٍ — سيُنشئها المُثبِّت' : 'غيرُ موجودة. أنشئها أو فعّل خيار الإنشاء.'
+                $this->cfg['db_create'] ? 'غير موجودة — سينشئها المثبت' : 'غير موجودة. أنشئها أو فعل خيار الإنشاء.'
             );
             return $out;
         }
@@ -291,7 +291,7 @@ class Installer
         $out[] = $this->check(
             $n === 0,
             'القاعدة فارغة',
-            $n === 0 ? 'نعم (صفر كائن)' : "تحتوي {$n} كائنًا — المُثبِّتُ يرفض العملَ فوق قاعدةٍ عامرة."
+            $n === 0 ? 'نعم (صفر كائن)' : "تحتوي {$n} كائنا — المثبت يرفض العمل فوق قاعدة عامرة."
         );
         return $out;
     }
@@ -309,19 +309,19 @@ class Installer
 
         $checks = $this->preflight();
         if (!self::passed($checks)) {
-            return $this->fail('الفحصُ القبليُّ لم يجتز — عالج الملاحظاتِ ثم أعِد المحاولة.');
+            return $this->fail('الفحص القبلي لم يجتز — عالج الملاحظات ثم أعد المحاولة.');
         }
 
         // ① القاعدة
         if (!$this->databaseExists($this->cfg['db_name'])) {
             $name = $this->qi($this->cfg['db_name']);
             if (!$this->conn->query("CREATE DATABASE {$name} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci")) {
-                return $this->fail('تعذّر إنشاء القاعدة: ' . $this->conn->error);
+                return $this->fail('تعذر إنشاء القاعدة: ' . $this->conn->error);
             }
-            $this->step('أُنشئت القاعدة ' . $this->cfg['db_name'], 'utf8mb4_unicode_ci');
+            $this->step('أنشئت القاعدة ' . $this->cfg['db_name'], 'utf8mb4_unicode_ci');
         }
         if (!$this->conn->select_db($this->cfg['db_name'])) {
-            return $this->fail('تعذّر اختيار القاعدة: ' . $this->conn->error);
+            return $this->fail('تعذر اختيار القاعدة: ' . $this->conn->error);
         }
         $this->conn->set_charset('utf8mb4');
         $this->conn->query("SET collation_connection = 'utf8mb4_unicode_ci'");
@@ -329,9 +329,9 @@ class Installer
         // ② المخطّط
         $err = $this->runSqlFile($this->schemaDir() . '/schema.sql');
         if ($err !== '') {
-            return $this->fail('فشل استيراد المخطّط: ' . $err);
+            return $this->fail('فشل استيراد المخطط: ' . $err);
         }
-        $this->step('استُورد المخطّط', $this->objectCount() . ' كائنًا');
+        $this->step('استورد المخطط', $this->objectCount() . ' كائنا');
 
         /* ══ INJ-FIX-01 · GAP-18/GAP-33 — القوادحُ تُعَدُّ ولا تُفترَض ══════════
            ◆ **العطبُ الذي يمنعه هذا الفحص**: `schema.sql` يصدّر أربعةً وثلاثين
@@ -370,28 +370,28 @@ class Installer
                 $v = $this->conn->query("SHOW VARIABLES LIKE 'log_bin'");
                 $vr = $v ? $v->fetch_assoc() : null;
                 if ($vr && strtoupper((string) $vr['Value']) === 'ON') {
-                    $hint = ' والسجلُّ الثنائيُّ يعمل، فإنشاءُ القادحِ يلزمه امتيازٌ '
-                          . '(SUPER أو log_bin_trust_function_creators=1) — امنحه لحسابِ النشرِ '
-                          . 'أو أعلِن DB_ADMIN_USER وDB_ADMIN_PASS ليعمل طورُ القوادحِ بحسابٍ إداريّ.';
+                    $hint = ' والسجل الثنائي يعمل، فإنشاء القادح يلزمه امتياز '
+                          . '(SUPER أو log_bin_trust_function_creators=1) — امنحه لحساب النشر '
+                          . 'أو أعلن DB_ADMIN_USER وDB_ADMIN_PASS ليعمل طور القوادح بحساب إداري.';
                 }
                 $declared = (string) ems_env('DB_ADMIN_USER', '');
                 $hint .= $declared === ''
-                    ? ' ولم يُعلَن اعتمادٌ إداريٌّ في البيئةِ فلم يُجرَّب الطورُ الثاني.'
-                    : " وجُرِّب الطورُ الثاني بالحساب «{$declared}» ولم يكفِ.";
+                    ? ' ولم يعلن اعتماد إداري في البيئة فلم يجرب الطور الثاني.'
+                    : " وجرب الطور الثاني بالحساب «{$declared}» ولم يكف.";
                 return $this->fail(
-                    "نقصُ حرّاسِ القاعدة: المخطّطُ يُعلن {$wantTriggers} قادحًا وأُنشئ منها {$got}."
-                  . ' ولا يُسلَّم نظامٌ بلا حرّاسِه — فهي تمنع مخزونًا سالبًا وتحفظ عدمَ'
-                  . ' رجعيةِ القرارات.' . $hint);
+                    "نقص حراس القاعدة: المخطط يعلن {$wantTriggers} قادحا وأنشئ منها {$got}."
+                  . ' ولا يسلم نظام بلا حراسه — فهي تمنع مخزونا سالبا وتحفظ عدم'
+                  . ' رجعية القرارات.' . $hint);
             }
-            $this->step('حرّاسُ القاعدة', "{$got}/{$wantTriggers} قادحًا — مُثبَتٌ لا مفترَض");
+            $this->step('حراس القاعدة', "{$got}/{$wantTriggers} قادحا — مثبت لا مفترض");
         }
 
         // ③ الشركة — تسبق البذرةَ المستأجَرة لأن معرّفَها يُحقن فيها
         $companyId = $this->createCompany();
         if ($companyId <= 0) {
-            return $this->fail('تعذّر إنشاء الشركة: ' . $this->conn->error);
+            return $this->fail('تعذر إنشاء الشركة: ' . $this->conn->error);
         }
-        $this->step('أُنشئت الشركة', $this->cfg['company_name'] . ' (id=' . $companyId . ')');
+        $this->step('أنشئت الشركة', $this->cfg['company_name'] . ' (id=' . $companyId . ')');
 
         // ④ البذرة
         $err = $this->runSqlFile(
@@ -401,7 +401,7 @@ class Installer
         if ($err !== '') {
             return $this->fail('فشل استيراد البذرة: ' . $err);
         }
-        $this->step('استُوردت البذرة المرجعية', 'company_id=' . $companyId);
+        $this->step('استوردت البذرة المرجعية', 'company_id=' . $companyId);
 
         /* ══ INJ-0060 · «وبلا فحصٍ يمنع النشرَ عند خلوِّ الجدول» ═══════════════════
              كان تصنيفُ الحقولِ يُبذر بأداةِ CLI خارجَ مسارِ النشر، فنشرٌ نظيفٌ من
@@ -414,46 +414,46 @@ class Installer
         $__gfcN = ($__gfc && ($__x = $__gfc->fetch_row())) ? (int) $__x[0] : -1;
         if ($__gfcN <= 0) {
             return $this->fail(
-                'INSTALL-500: تصنيفُ الحقولِ (`gov_field_class`) خاوٍ بعد البذرة — '
-                . 'والشاشاتُ الحاكمةُ الأربعُ والأربعون تُصيَّر بلا أعمدة. '
-                . 'أعِد توليدَ `seed_reference.sql` بـ`php database/migrate.php dump-schema`.');
+                'INSTALL-500: تصنيف الحقول (`gov_field_class`) خاو بعد البذرة — '
+                . 'والشاشات الحاكمة الأربع والأربعون تصير بلا أعمدة. '
+                . 'أعد توليد `seed_reference.sql` ب`php database/migrate.php dump-schema`.');
         }
-        $this->step('تُحقِّق من تصنيف الحقول', $__gfcN . ' صفًّا في gov_field_class');
+        $this->step('تحقق من تصنيف الحقول', $__gfcN . ' صفا في gov_field_class');
 
         // ⑤ الموظّف ثمّ الحساب — «لا حساب بلا موظّف»
         $employeeId = $this->createEmployee($companyId);
         if ($employeeId <= 0) {
-            return $this->fail('تعذّر إنشاء الموظّف: ' . $this->conn->error);
+            return $this->fail('تعذر إنشاء الموظف: ' . $this->conn->error);
         }
-        $this->step('أُنشئ الموظّف', $this->cfg['admin_name'] . ' (id=' . $employeeId . ')');
+        $this->step('أنشئ الموظف', $this->cfg['admin_name'] . ' (id=' . $employeeId . ')');
 
         $userId = $this->createUser($companyId, $employeeId);
         if ($userId <= 0) {
-            return $this->fail('تعذّر إنشاء الحساب: ' . $this->conn->error);
+            return $this->fail('تعذر إنشاء الحساب: ' . $this->conn->error);
         }
-        $this->step('أُنشئ الحساب', $this->cfg['admin_username'] . ' → employee_id=' . $employeeId);
+        $this->step('أنشئ الحساب', $this->cfg['admin_username'] . ' → employee_id=' . $employeeId);
 
         // ⑥ تسويةُ سجلّ الترحيلات — ما في المخطَّط لا يُعاد تطبيقُه
         $marked = $this->markMigrationsBaseline();
-        $this->step('سُوّي سجلُّ الترحيلات', $marked . ' ملفًّا كخطِّ أساس');
+        $this->step('سوي سجل الترحيلات', $marked . ' ملفا كخط أساس');
 
         // ⑦ ملفّ البيئة
         if ($this->cfg['write_env']) {
             $envErr = $this->writeEnv();
             if ($envErr !== '') {
                 // لا يُفشِل التثبيت: القاعدةُ صارت سليمة، والملفُّ يُكتب يدويًّا.
-                $this->step('⚠ تعذّرت كتابة .env', $envErr);
+                $this->step('⚠ تعذرت كتابة .env', $envErr);
             } else {
-                $this->step('كُتب ملفّ .env', 'راجع المفاتيح قبل التشغيل');
+                $this->step('كتب ملف .env', 'راجع المفاتيح قبل التشغيل');
             }
         }
 
         // ⑧ العلامة
         $markerErr = $this->writeMarker($companyId, $userId);
         if ($markerErr !== '') {
-            $this->step('⚠ تعذّرت كتابة .installed', $markerErr);
+            $this->step('⚠ تعذرت كتابة .installed', $markerErr);
         } else {
-            $this->step('كُتبت علامةُ التثبيت', '.installed');
+            $this->step('كتبت علامة التثبيت', '.installed');
         }
 
         return array(
@@ -591,7 +591,7 @@ class Installer
     {
         $target = $this->root . '/.env';
         if (is_file($target)) {
-            return 'الملف موجودٌ سلفًا — لم يُمَسّ';
+            return 'الملف موجود سلفا — لم يمس';
         }
         $tpl = $this->root . '/.env.example';
         if (!is_file($tpl)) {
@@ -619,7 +619,7 @@ class Installer
         }
 
         if (file_put_contents($target, $content) === false) {
-            return 'تعذّرت الكتابة';
+            return 'تعذرت الكتابة';
         }
         @chmod($target, 0640);
         return '';
@@ -640,7 +640,7 @@ class Installer
             ) : null,
         );
         $json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        return file_put_contents($this->markerPath(), $json . "\n") === false ? 'تعذّرت الكتابة' : '';
+        return file_put_contents($this->markerPath(), $json . "\n") === false ? 'تعذرت الكتابة' : '';
     }
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -694,7 +694,7 @@ class Installer
     {
         $sql = @file_get_contents($path);
         if ($sql === false) {
-            return "تعذّرت قراءة {$path}";
+            return "تعذرت قراءة {$path}";
         }
         if (substr($sql, 0, 3) === "\xEF\xBB\xBF") {
             $sql = substr($sql, 3);

@@ -28,7 +28,7 @@ $redirect = function ($msg, $extra = '') {
     ems_gov_redirect("Location: my_evaluation.php?{$extra}" . ($extra !== '' ? '&' : '') . "msg=" . rawurlencode($msg)); exit();
 };
 
-$AXES = array('quality' => 'جودةُ العمل', 'commitment' => 'الالتزامُ بالمهل',
+$AXES = array('quality' => 'جودة العمل', 'commitment' => 'الالتزام بالمهل',
               'cooperation' => 'التعاون', 'initiative' => 'المبادرة');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -47,26 +47,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($a === 'self_save') {
         $r = EVS::selfSave($conn, $gate, $company_id, intval($_POST['capacity_id'] ?? 0),
             strval($_POST['from'] ?? ''), strval($_POST['to'] ?? ''), $scores, $uid);
-        $redirect($r['ok'] ? 'حُفظ الذاتي ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $q);
+        $redirect($r['ok'] ? 'حفظ الذاتي ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $q);
     }
     if ($a === 'self_close') {
         $r = EVS::selfClose($conn, $gate, $company_id, $evalId, $ver, $uid);
-        $redirect($r['ok'] ? 'أُقفل الذاتي — وصار بابُ المدير مفتوحًا ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $q);
+        $redirect($r['ok'] ? 'أقفل الذاتي — وصار باب المدير مفتوحا ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $q);
     }
     if ($a === 'mgr_submit') {
         $r = EVS::mgrSubmit($conn, $gate, $company_id, $evalId, $ver, $scores,
             strval($_POST['mgr_comment'] ?? ''), $uid);
-        $redirect($r['ok'] ? 'سُجّل تقييمُ المدير ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $q);
+        $redirect($r['ok'] ? 'سجل تقييم المدير ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $q);
     }
     if ($a === 'discuss') {
         $r = EVS::discuss($conn, $gate, $company_id, $evalId, $ver,
             strval($_POST['notes'] ?? ''), $uid);
-        $redirect($r['ok'] ? 'سُجّلت المناقشة ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $q);
+        $redirect($r['ok'] ? 'سجلت المناقشة ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $q);
     }
     if ($a === 'approve') {
         $r = EVS::approve($conn, $gate, $company_id, $evalId, $ver,
             floatval($_POST['final_score'] ?? 0), $uid);
-        $redirect($r['ok'] ? 'اعتُمد التقييم — ويمكن إصدارُ الشهادة ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $q);
+        $redirect($r['ok'] ? 'اعتمد التقييم — ويمكن إصدار الشهادة ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $q);
     }
 }
 
@@ -94,7 +94,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array(array('href' => 'my_achievement.php', 'icon' => 'fa fa-chart-simple', 'label' => 'إنجازي'));
     include('../includes/page_header.php');
     // حزمةُ الحالاتِ الدنيا (بوابة ٩) — مخفيةٌ افتراضًا ويُظهرها منطقُ الشاشة
-    echo ems_states_bundle('لا تقييمَ مفتوحًا لهذه الفترة', 'افتح الفترةَ بالصفةِ والتاريخين لبدءِ خطواتِ تقييمي: ذاتيٌّ فمديرٌ فمناقشةٌ فاعتماد');
+    echo ems_states_bundle('لا تقييم مفتوحا لهذه الفترة', 'افتح الفترة بالصفة والتاريخين لبدء خطوات تقييمي: ذاتي فمدير فمناقشة فاعتماد');
     if (isset($_GET['msg'])) { echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>'; }
     ?>
 
@@ -117,9 +117,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </form>
             </div>
         </div>
-        <p class="ems-pte-note">المعالج: <strong>ذاتيٌّ ← إقفالٌ ← مديرٌ ← مناقشةٌ ← اعتماد</strong> —
-            والمديرُ <strong>لا يفتح قبل إقفال الذاتي</strong> (منعًا للتأثير)، وفارقُ درجتين فأكثرَ
-            <strong>يوجب تعليقًا</strong>، والانتقالاتُ <strong>بفحص النسخة</strong>.</p>
+        <p class="ems-pte-note">المعالج: <strong>ذاتي ← إقفال ← مدير ← مناقشة ← اعتماد</strong> —
+            والمدير <strong>لا يفتح قبل إقفال الذاتي</strong> (منعا للتأثير)، وفارق درجتين فأكثر
+            <strong>يوجب تعليقا</strong>، والانتقالات <strong>بفحص النسخة</strong>.</p>
     </div></div>
 
     <?php $state = $ev ? (string)$ev['state'] : 'جديد'; ?>
@@ -129,7 +129,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card-body">
 
         <?php if (!$ev || $state === 'SelfDraft'): ?>
-        <h6>① التقييمُ الذاتي</h6>
+        <h6>① التقييم الذاتي</h6>
         <form method="post" class="ems-form">
         <?= csrf_field() ?>
             <input type="hidden" name="ev_action" value="self_save">
@@ -157,13 +157,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <input type="hidden" name="capacity_id" value="<?php echo $capId; ?>">
             <input type="hidden" name="from" value="<?php echo htmlspecialchars($from); ?>">
             <input type="hidden" name="to" value="<?php echo htmlspecialchars($to); ?>">
-            <button type="submit" class="btn-primary"><i class="fa fa-lock"></i> أقفل الذاتي (لا تعديلَ بعده)</button>
+            <button type="submit" class="btn-primary"><i class="fa fa-lock"></i> أقفل الذاتي (لا تعديل بعده)</button>
         </form>
         <?php endif; ?>
         <?php endif; ?>
 
         <?php if ($ev && in_array($state, array('SelfClosed', 'MgrDraft'), true)): ?>
-        <h6>② تقييمُ المدير <small class="ems-pte-muted">(يرى الذاتيَّ الآن — بعد إقفاله)</small></h6>
+        <h6>② تقييم المدير <small class="ems-pte-muted">(يرى الذاتي الآن — بعد إقفاله)</small></h6>
         <p><small>الذاتي: <?php echo htmlspecialchars((string)$ev['self_scores_json']); ?></small></p>
         <form method="post" class="ems-form">
         <?= csrf_field() ?>
@@ -178,11 +178,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <div class="form-group"><label><?php echo htmlspecialchars($lbl); ?> (1–5)</label>
                         <input type="number" step="0.5" min="1" max="5" aria-label="<?php echo htmlspecialchars($lbl); ?> من 1 إلى 5" name="score_<?php echo $k; ?>"></div>
                 <?php endforeach; ?>
-                <div class="form-group"><label for="emsf_374_89ed5">تعليقُ المدير
-                    <span class="mnt-req-hint">(إلزاميٌّ عند فارقٍ ≥ درجتين)</span></label>
+                <div class="form-group"><label for="emsf_374_89ed5">تعليق المدير
+                    <span class="mnt-req-hint">(إلزامي عند فارق ≥ درجتين)</span></label>
                     <input type="text" name="mgr_comment" maxlength="500" id="emsf_374_89ed5"></div>
             </div>
-            <div class="ems-pte-actions-solo"><button type="submit" class="btn-primary">سجّل تقييمَ المدير</button></div>
+            <div class="ems-pte-actions-solo"><button type="submit" class="btn-primary">سجل تقييم المدير</button></div>
         </form>
         <?php endif; ?>
 
@@ -196,14 +196,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <input type="hidden" name="capacity_id" value="<?php echo $capId; ?>">
             <input type="hidden" name="from" value="<?php echo htmlspecialchars($from); ?>">
             <input type="hidden" name="to" value="<?php echo htmlspecialchars($to); ?>">
-            <div class="form-group"><label for="emsf_375_2542a">نقاطُ الاتفاق والاختلاف وخطةُ التطوير *</label>
+            <div class="form-group"><label for="emsf_375_2542a">نقاط الاتفاق والاختلاف وخطة التطوير *</label>
                 <textarea name="notes" rows="3" required id="emsf_375_2542a"></textarea></div>
-            <div class="ems-pte-actions-solo"><button type="submit" class="btn-primary">سجّل الجلسة</button></div>
+            <div class="ems-pte-actions-solo"><button type="submit" class="btn-primary">سجل الجلسة</button></div>
         </form>
         <?php endif; ?>
 
         <?php if ($ev && $state === 'Discussed'): ?>
-        <h6 class="ems-pte-step-title">④ الاعتماد <small class="ems-pte-muted">(لا اعتمادَ للذات)</small></h6>
+        <h6 class="ems-pte-step-title">④ الاعتماد <small class="ems-pte-muted">(لا اعتماد للذات)</small></h6>
         <form method="post" class="ems-form">
         <?= csrf_field() ?>
             <input type="hidden" name="ev_action" value="approve">
@@ -212,16 +212,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <input type="hidden" name="capacity_id" value="<?php echo $capId; ?>">
             <input type="hidden" name="from" value="<?php echo htmlspecialchars($from); ?>">
             <input type="hidden" name="to" value="<?php echo htmlspecialchars($to); ?>">
-            <div class="form-group"><label for="emsf_376_1f165">الدرجةُ النهائية (بأوزان المحاور) *</label>
+            <div class="form-group"><label for="emsf_376_1f165">الدرجة النهائية (بأوزان المحاور) *</label>
                 <input type="number" step="0.01" min="0.01" max="5" name="final_score" required id="emsf_376_1f165"></div>
-            <div class="ems-pte-actions-solo"><button type="submit" class="btn-primary">اعتمِد</button></div>
+            <div class="ems-pte-actions-solo"><button type="submit" class="btn-primary">اعتمد</button></div>
         </form>
         <?php endif; ?>
 
         <?php if ($ev && $state === 'Approved'): ?>
-        <div class="alert alert-success">اعتُمد بدرجة <strong><?php echo htmlspecialchars((string)$ev['final_score']); ?></strong>
+        <div class="alert alert-success">اعتمد بدرجة <strong><?php echo htmlspecialchars((string)$ev['final_score']); ?></strong>
             في <?php echo htmlspecialchars((string)$ev['approved_at']); ?> —
-            <a href="my_certificate.php?eval_id=<?php echo intval($ev['id']); ?>">أصدر شهادةَ الإنجاز ▸</a></div>
+            <a href="my_certificate.php?eval_id=<?php echo intval($ev['id']); ?>">أصدر شهادة الإنجاز ▸</a></div>
         <?php endif; ?>
     </div></div>
 </div>

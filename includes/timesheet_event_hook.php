@@ -193,13 +193,13 @@ if (!function_exists('ems_timesheet_event_hook')) {
                         . ' skipped=' . count($fanRes['skipped'])
                         . ' revision=' . (!empty($fanRes['revision_pending']) ? '1' : '0'));
                 }
-            } catch (\Throwable $fx) { ems_catch_ignored($fx, __METHOD__, 'مروحةُ أثرِ التايم شيت فشلت — الساعاتُ محفوظةٌ والأثرُ يُستدرَك بإعادةِ المروحة');
+            } catch (\Throwable $fx) { ems_catch_ignored($fx, __METHOD__, 'مروحة أثر التايم شيت فشلت — الساعات محفوظة والأثر يستدرك بإعادة المروحة');
                 if (function_exists('log_security_event')) {
                     log_security_event('FANOUT_TS_FAILED',
                         'timesheet=' . $tsId . ' err=' . substr($fx->getMessage(), 0, 300));
                 }
             }
-        } catch (\Throwable $x) { ems_catch_ignored($x, __METHOD__, 'الاعتماد لا يُكسر أبدًا — الفشل يُسجَّل ويُصالَح لاحقًا (cron_events).');
+        } catch (\Throwable $x) { ems_catch_ignored($x, __METHOD__, 'الاعتماد لا يكسر أبدا — الفشل يسجل ويصالح لاحقا (cron_events).');
             // الاعتماد لا يُكسر أبدًا — الفشل يُسجَّل ويُصالَح لاحقًا (cron_events).
             if (function_exists('log_security_event')) {
                 log_security_event('EVENT_PUBLISH_FAILED',

@@ -19,16 +19,16 @@ $flash = null; $flash_ok = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($PERMS['can_edit']) && empty($PERMS['can_add'])) {
-        $flash = 'لا تملك صلاحيةَ المطابقة — راجِعْ مديرَك.';
+        $flash = 'لا تملك صلاحية المطابقة — راجع مديرك.';
     } else {
         require_csrf();
         $eid = (int) ($_POST['entry_id'] ?? 0);
         $dec = (string) ($_POST['decision'] ?? '');
         $ref = trim((string) ($_POST['match_ref'] ?? ''));
         if ($eid <= 0 || !in_array($dec, array('matched', 'disputed'), true)) {
-            $flash = 'اختر القيدَ والقرار.';
+            $flash = 'اختر القيد والقرار.';
         } elseif ($ref === '') {
-            $flash = 'مرجعُ المطابقةِ إلزاميّ — رقمُ كشفِ العميلِ أو محضرُه.';
+            $flash = 'مرجع المطابقة إلزامي — رقم كشف العميل أو محضره.';
         } else {
             $st = $conn->prepare("UPDATE unit_entries
                 SET client_match_state = ?, client_match_at = NOW(), client_match_by = ?,
@@ -40,8 +40,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $st->execute();
             $flash_ok = $st->affected_rows > 0;
             $flash = $flash_ok
-                ? ($dec === 'matched' ? 'طُوبق القيدُ وقُبل — وسيظهر في كشفِ العميل.' : 'سُجِّل النزاعُ بمرجعِه — يُحسم مع العميل.')
-                : 'لم يُحدَّث — القيدُ ليس في مرحلةِ المطابقةِ (يلزم اعتمادُ المبيعاتِ أولًا).';
+                ? ($dec === 'matched' ? 'طوبق القيد وقبل — وسيظهر في كشف العميل.' : 'سجل النزاع بمرجعه — يحسم مع العميل.')
+                : 'لم يحدث — القيد ليس في مرحلة المطابقة (يلزم اعتماد المبيعات أولا).';
             $st->close();
         }
     }
@@ -61,7 +61,7 @@ $rs = $st->get_result();
 while ($x = $rs->fetch_assoc()) { $rows[] = $x; }
 $st->close();
 
-$page_title = 'إيكوبيشن | مطابقةُ العميلِ على الوحدات';
+$page_title = 'إيكوبيشن | مطابقة العميل على الوحدات';
 include __DIR__ . '/../inheader.php';
 include __DIR__ . '/../insidebar.php';
 require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('client', 'العقود');
@@ -71,21 +71,21 @@ $canWrite = !empty($PERMS['can_edit']) || !empty($PERMS['can_add']);
 ?>
 <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="content-wrapper ems-doc-cycle" dir="rtl">
-  <section class="content-header"><h1>مطابقةُ العميلِ على الوحدات</h1>
-    <p class="ucm-sub">القيودُ التي اعتمدتها المبيعاتُ تُعرض على العميل: نطابقُ ما قَبِله ونسجّل ما نازعَ فيه — بمرجعٍ دائمًا.</p>
-    <?php echo ems_next_step('اعتمادُ مديرِ المبيعاتِ بعد مطابقةِ العميل'); ?>
+  <section class="content-header"><h1>مطابقة العميل على الوحدات</h1>
+    <p class="ucm-sub">القيود التي اعتمدتها المبيعات تعرض على العميل: نطابق ما قبله ونسجل ما نازع فيه — بمرجع دائما.</p>
+    <?php echo ems_next_step('اعتماد مدير المبيعات بعد مطابقة العميل'); ?>
   </section>
   <section class="content">
-    <?php echo ems_states_bundle('لا قيودَ في مرحلةِ المطابقة', 'القيدُ يصل هنا بعد اعتمادِ المبيعات'); ?>
+    <?php echo ems_states_bundle('لا قيود في مرحلة المطابقة', 'القيد يصل هنا بعد اعتماد المبيعات'); ?>
     <?php if ($flash !== null): ?>
       <div class="alert <?= $flash_ok ? 'alert-success' : 'alert-danger' ?>"><?= ($flash_ok ? '✔ ' : '✖ ') . htmlspecialchars($flash, ENT_QUOTES, 'UTF-8') ?></div>
     <?php endif; ?>
     <div class="box"><div class="box-body table-responsive">
       <?php if (!$rows): ?>
-        <p class="ucm-empty-note">لا قيودَ في مرحلةِ المطابقة — القيدُ يصل هنا بعد اعتمادِ المبيعات.</p>
+        <p class="ucm-empty-note">لا قيود في مرحلة المطابقة — القيد يصل هنا بعد اعتماد المبيعات.</p>
       <?php else: ?>
       <table class="table table-bordered table-striped">
-        <thead><tr><th>القيد</th><th>التاريخ</th><th>الوردية</th><th>الكمية</th><th>حالةُ المطابقة</th><th>المرجع</th><?php if ($canWrite): ?><th>القرار</th><?php endif; ?></tr></thead>
+        <thead><tr><th>القيد</th><th>التاريخ</th><th>الوردية</th><th>الكمية</th><th>حالة المطابقة</th><th>المرجع</th><?php if ($canWrite): ?><th>القرار</th><?php endif; ?></tr></thead>
         <tbody>
         <?php foreach ($rows as $r): ?>
           <tr>
@@ -94,8 +94,8 @@ $canWrite = !empty($PERMS['can_edit']) || !empty($PERMS['can_add']);
             <td><?= htmlspecialchars((string) $r['shift'], ENT_QUOTES, 'UTF-8') ?></td>
             <td><?= number_format((float) $r['qty'], 2) . ' ' . ($r['unit_type'] === 'hour' ? 'ساعة' : htmlspecialchars((string) $r['unit_type'], ENT_QUOTES, 'UTF-8')) ?></td>
             <td>
-              <?php if ($r['mstate'] === 'matched'): ?><span class="label label-success">✔ مُطابَق</span>
-              <?php elseif ($r['mstate'] === 'disputed'): ?><span class="label label-danger">✖ متنازَع</span>
+              <?php if ($r['mstate'] === 'matched'): ?><span class="label label-success">✔ مطابق</span>
+              <?php elseif ($r['mstate'] === 'disputed'): ?><span class="label label-danger">✖ متنازع</span>
               <?php else: ?><span class="label label-warning">⏳ ينتظر المطابقة</span><?php endif; ?>
             </td>
             <td><?= htmlspecialchars((string) ($r['client_match_ref'] ?: '—'), ENT_QUOTES, 'UTF-8') ?></td>
@@ -105,9 +105,9 @@ $canWrite = !empty($PERMS['can_edit']) || !empty($PERMS['can_add']);
               <form method="post" class="ucm-decide-form">
                 <?= csrf_field() ?>
                 <input type="hidden" name="entry_id" value="<?= (int) $r['id'] ?>">
-                <input type="text" name="match_ref" placeholder="مرجعُ الكشف *" required class="form-control input-sm ucm-ref-input">
+                <input type="text" name="match_ref" placeholder="مرجع الكشف *" required class="form-control input-sm ucm-ref-input">
                 <button name="decision" value="matched" class="btn btn-success btn-sm">اقبل</button>
-                <button name="decision" value="disputed" class="btn btn-danger btn-sm">سجّل نزاعًا</button>
+                <button name="decision" value="disputed" class="btn btn-danger btn-sm">سجل نزاعا</button>
               </form>
               <?php else: ?>—<?php endif; ?>
             </td>

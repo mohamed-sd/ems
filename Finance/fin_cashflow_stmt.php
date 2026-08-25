@@ -10,9 +10,9 @@ $FA_SCREEN = array(
     'file' => 'fin_cashflow_stmt.php',
     'title' => 'قائمة التدفقات النقدية',
     'icon' => 'fas fa-money-bill-transfer',
-    'about' => 'بالطريقةِ غيرِ المباشرة: النتيجةُ ثم التسوياتُ ثم التغيرُ في رأسِ المالِ العامل — وتتوازن مع تغيرِ النقديةِ الفعليِّ أو تُرفض.',
+    'about' => 'بالطريقة غير المباشرة: النتيجة ثم التسويات ثم التغير في رأس المال العامل — وتتوازن مع تغير النقدية الفعلي أو ترفض.',
     'notes' => array (
-  0 => 'تصنيفُ نشاطِ التدفقِ على كل حساب (R4) شرطُ إنتاجِ القائمةِ آليًّا',
+  0 => 'تصنيف نشاط التدفق على كل حساب (R4) شرط إنتاج القائمة آليا',
 ),
     'context' => array(),
     'filters' => '',
@@ -27,16 +27,16 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
     if ($r) { while ($x = $r->fetch_assoc()) { $rows[] = $x; } }
 ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
-    <?php echo ems_states_bundle('لا بياناتٍ لهذه الفترةِ المالية', 'غيّر الفترةَ أو تحقق من ترحيلِ القيود'); ?>
+    <?php echo ems_states_bundle('لا بيانات لهذه الفترة المالية', 'غير الفترة أو تحقق من ترحيل القيود'); ?>
     <?php if ($can_write): ?>
     <div class="card"><div class="card-body">
-        <button class="ems-btn-primary" onclick="faPost('cashflow_generate', {}, function(j){ alert('وُلّدت ' + j.cf_code + ' · التشغيلي ' + j.operating + ' · الفرق ' + j.balance_diff + ' — متوازنة ✔'); location.reload(); })">توليد القائمة للفترة</button>
-        <span class="fa-note">◆ لا تُحفظ إن لم تتوازن — والرفضُ يبيّن الفرقَ ويقود لتصنيفِ النشاط</span>
+        <button class="ems-btn-primary" onclick="faPost('cashflow_generate', {}, function(j){ alert('ولدت ' + j.cf_code + ' · التشغيلي ' + j.operating + ' · الفرق ' + j.balance_diff + ' — متوازنة ✔'); location.reload(); })">توليد القائمة للفترة</button>
+        <span class="fa-note">◆ لا تحفظ إن لم تتوازن — والرفض يبين الفرق ويقود لتصنيف النشاط</span>
     </div></div>
     <?php endif; ?>
     <div class="card"><div class="card-body table-responsive">
         <?php if (!$rows): ?>
-            <?php ems_state_empty('لا قوائمَ تدفقاتٍ مولَّدةً بعد'); ?>
+            <?php ems_state_empty('لا قوائم تدفقات مولدة بعد'); ?>
         <?php else: ?>
         <table class="alltables display nowrap fa-table-full">
             <thead><tr><th>الرقم</th><th>الفترة</th><th>العملة</th><th>الربح الصافي</th><th>الإهلاك</th><th>المخصصات</th>

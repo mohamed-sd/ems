@@ -129,7 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tender_code'])) {
     // الكود
     $tnd_code_raw = isset($_POST['tender_code']) ? trim($_POST['tender_code']) : '';
     if ($tnd_code_raw === '' || !preg_match('/^[A-Za-z0-9_\-]+$/', $tnd_code_raw)) {
-        tnd_redirect_with_msg('كود المناقصة غير صالح. استخدم أحرفًا وأرقامًا و - أو _ فقط ❌');
+        tnd_redirect_with_msg('كود المناقصة غير صالح. استخدم أحرفا وأرقاما و - أو _ فقط ❌');
     }
 
     // الاسم / رقم الدعوة
@@ -200,7 +200,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tender_code'])) {
                 array($tnd_code_raw, $tnd_id));
         } catch (\Throwable $t) { $dup = array(); }
         if (!empty($dup)) {
-            tnd_redirect_with_msg('كود المناقصة موجود مسبقاً داخل شركتك ❌');
+            tnd_redirect_with_msg('كود المناقصة موجود مسبقا داخل شركتك ❌');
         }
 
         try {
@@ -232,7 +232,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tender_code'])) {
                 array($tnd_code_raw));
         } catch (\Throwable $t) { $dup = array(); }
         if (!empty($dup)) {
-            tnd_redirect_with_msg('كود المناقصة موجود مسبقاً داخل شركتك ❌');
+            tnd_redirect_with_msg('كود المناقصة موجود مسبقا داخل شركتك ❌');
         }
 
         try {
@@ -398,7 +398,7 @@ $sft_family = 'opportunity'; $sft_active = 'tenders';
 include __DIR__ . '/../includes/sales_family_tabs.php';
 include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا مناقصاتِ مسجَّلةً بعدُ', 'أضف أولَ مناقصةٍ بزرِّ «إضافة» في رأسِ الشاشة');
+    echo ems_states_bundle('لا مناقصات مسجلة بعد', 'أضف أول مناقصة بزر «إضافة» في رأس الشاشة');
     ?>
 
     <?php if (!empty($_GET['msg'])):
@@ -419,7 +419,7 @@ include('../includes/page_header.php');
             <div class="stats-card">
                 <div class="stats-icon"><i class="fas fa-paper-plane"></i></div>
                 <div class="stats-value"><?php echo $stat_submitted; ?></div>
-                <div class="stats-title">مقدَّمة</div>
+                <div class="stats-title">مقدمة</div>
             </div>
             <div class="stats-card">
                 <div class="stats-icon"><i class="fas fa-trophy"></i></div>
@@ -559,10 +559,10 @@ include('../includes/page_header.php');
                             <th>حالة المشاركة</th>
                             <th>النتيجة</th>
                             <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                             <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                             <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                             <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -682,13 +682,13 @@ include('../includes/page_header.php');
     const statsSection = $('#tndStatsSection');
 
     /**
-     * إظهارُ حقلِ الكودِ المولَّد وإخفاؤه.
+     * إظهار حقل الكود المولد وإخفاؤه.
      *
      * ⚠️ **لا تستعمل `jQuery.hide()` هنا** — `assets/css/ems-forms.css` يحمل:
      *     :is(.allforms, .ems-form) .form-grid > div { display: block !important }
-     * والغلافُ ابنٌ مباشرٌ لـ`.form-grid`، فـ`!important` من ورقةِ الأنماطِ تهزم
-     * الإخفاءَ السطريَّ **بلا أولوية**: السمةُ تُكتب فعلًا والحقلُ يبقى ظاهرًا، بلا
-     * خطأٍ في وحدةِ التحكم ولا سطرٍ في أيِّ سجل. (نظيرُ شاشتَي العملاءِ والمشاريع.)
+     * والغلاف ابن مباشر ل`.form-grid`، ف`!important` من ورقة الأنماط تهزم
+     * الإخفاء السطري **بلا أولوية**: السمة تكتب فعلا والحقل يبقى ظاهرا، بلا
+     * خطأ في وحدة التحكم ولا سطر في أي سجل. (نظير شاشتي العملاء والمشاريع.)
      */
     function setGeneratedCodeShown(shown) {
         var el = generatedCodeWrapper[0];
@@ -699,9 +699,9 @@ include('../includes/page_header.php');
     function setAddMode() {
         formTitle.text('إضافة مناقصة جديدة'); submitBtnText.text('حفظ المناقصة');
         setGeneratedCodeShown(true);
-        // الكودُ المولَّدُ يعود إلى خانتِه كلَّما دخلنا وضعَ الإضافة — ومصدرُه حقلُ
-        // العرضِ نفسُه لا نسخةٌ ثانيةٌ منه (مصدرُ حقيقةٍ واحد). و`reset()` يكفي
-        // للإلغاء، لكنَّ الانتقالَ من «تعديل» إلى «إضافة» قد يقع بلا reset.
+        // الكود المولد يعود إلى خانته كلما دخلنا وضع الإضافة — ومصدره حقل
+        // العرض نفسه لا نسخة ثانية منه (مصدر حقيقة واحد). و`reset()` يكفي
+        // للإلغاء، لكن الانتقال من «تعديل» إلى «إضافة» قد يقع بلا reset.
         var genCode = $('#generated_tnd_code').val();
         if (genCode) { $('#tender_code').val(genCode); }
     }
@@ -782,7 +782,7 @@ include('../includes/page_header.php');
         });
     });
 
-    // ── عرض التفاصيل عبر EmsDetailsModal الموحّد ──
+    // ── عرض التفاصيل عبر EmsDetailsModal الموحد ──
     $(document).on('click', '.viewTndBtn', function () {
         const d = $(this).data();
         const resultTone = {

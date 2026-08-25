@@ -40,7 +40,7 @@ function ts_db_insert(mysqli $conn, string $table, array $assoc): int
     $sql = "INSERT INTO `$table` (`" . implode('`, `', $cols) . "`) VALUES ($place)";
     $stmt = mysqli_prepare($conn, $sql);
     if (!$stmt) {
-        throw new TimesheetError('تعذّر تجهيز الإدراج: ' . mysqli_error($conn), 500);
+        throw new TimesheetError('تعذر تجهيز الإدراج: ' . mysqli_error($conn), 500);
     }
     $vals = array_values($assoc);
     $types = str_repeat('s', count($vals));
@@ -64,7 +64,7 @@ function ts_db_update(mysqli $conn, string $table, array $assoc, string $whereSq
     $sql = "UPDATE `$table` SET " . implode(', ', $sets) . " WHERE $whereSql";
     $stmt = mysqli_prepare($conn, $sql);
     if (!$stmt) {
-        throw new TimesheetError('تعذّر تجهيز التحديث: ' . mysqli_error($conn), 500);
+        throw new TimesheetError('تعذر تجهيز التحديث: ' . mysqli_error($conn), 500);
     }
     $vals = array_merge(array_values($assoc), $whereVals);
     $types = str_repeat('s', count($vals));
@@ -205,7 +205,7 @@ function ts_compute(array &$r, int $type, float $shiftHours): void
         if (abs($sum - $totalFault) > 0.001) {
             throw new TimesheetError(
                 'خطأ في توزيع ساعات الأعطال: مجموع الجهات (' . round($sum, 2) .
-                ') يجب أن يساوي إجمالي ساعات التعطّل (' . round($totalFault, 2) . ')',
+                ') يجب أن يساوي إجمالي ساعات التعطل (' . round($totalFault, 2) . ')',
                 422
             );
         }
@@ -496,7 +496,7 @@ function ts_save(mysqli $conn, array $ctx, int $projectId, array $payload, ?int 
         if ($e instanceof TimesheetError) {
             throw $e;
         }
-        throw new TimesheetError('تعذّر حفظ السجل: ' . $e->getMessage(), 500);
+        throw new TimesheetError('تعذر حفظ السجل: ' . $e->getMessage(), 500);
     }
 }
 
@@ -1020,7 +1020,7 @@ function timesheets_update(int $id): void
     $projectId = api_resolve_project_id($ctx);
     api_fetch_project($ctx, $projectId);
     if ($id <= 0) {
-        api_fail('معرّف السجل غير صحيح', 400);
+        api_fail('معرف السجل غير صحيح', 400);
     }
     $payload = api_input();
     try {
@@ -1040,7 +1040,7 @@ function timesheets_delete(int $id): void
     $projectId = api_resolve_project_id($ctx);
     api_fetch_project($ctx, $projectId);
     if ($id <= 0) {
-        api_fail('معرّف السجل غير صحيح', 400);
+        api_fail('معرف السجل غير صحيح', 400);
     }
     // تأكد من ملكية المشروع.
     $row = ts_load_one($conn, $ctx, $projectId, $id, false);
@@ -1062,7 +1062,7 @@ function timesheets_delete(int $id): void
         mysqli_commit($conn);
     } catch (\Throwable $e) {
         mysqli_rollback($conn);
-        api_fail('تعذّر حذف السجل', 500);
+        api_fail('تعذر حذف السجل', 500);
     }
     api_ok(['id' => $id], 'تم حذف السجل ✅');
 }

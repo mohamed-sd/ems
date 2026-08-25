@@ -86,7 +86,7 @@ class PeriodicEventService
                     AND DATE_FORMAT(u.entry_date, '%Y-%m') = ?
                   GROUP BY u.equipment_id", array((string) $period));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّرت قراءةُ الوحدات: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذرت قراءة الوحدات: ' . $t->getMessage(); return $out;
         }
 
         foreach ($rows as $r) {
@@ -96,21 +96,21 @@ class PeriodicEventService
 
             if (self::exists($gate, 'fin_maint_provisions',
                     'equipment_id = ? AND period_ref = ?', array($eid, (string) $period))) {
-                $out['skipped'][] = array('equipment_id' => $eid, 'code' => 409, 'reason' => 'مخصَّصٌ سلفًا');
+                $out['skipped'][] = array('equipment_id' => $eid, 'code' => 409, 'reason' => 'مخصص سلفا');
                 continue;
             }
             $rule = self::provisionRule($gate, $eid, $etype, $lastDay);
             if (!$rule) {
                 // «لا كتابةَ يدويةً على الدفتر» — وبلا قاعدةٍ لا مخصص ولا تقدير
                 $out['skipped'][] = array('equipment_id' => $eid, 'code' => 422,
-                    'reason' => 'لا قاعدةَ مخصصٍ مكتوبةً منطبقةً على المعدة ' . $eid . ' في ' . $period);
+                    'reason' => 'لا قاعدة مخصص مكتوبة منطبقة على المعدة ' . $eid . ' في ' . $period);
                 continue;
             }
             $qty = ((string) $rule['basis'] === 'hour')
                    ? round((float) $r['hour_qty'], 2) : round((float) $r['unit_qty'], 2);
             if ($qty <= 0) {
                 $out['skipped'][] = array('equipment_id' => $eid, 'code' => 422,
-                    'reason' => 'صفرُ كميةٍ معتمدةٍ لأساس «' . $rule['basis'] . '»');
+                    'reason' => 'صفر كمية معتمدة لأساس «' . $rule['basis'] . '»');
                 continue;
             }
             $amount = round($qty * (float) $rule['rate'], 2);
@@ -133,7 +133,7 @@ class PeriodicEventService
                         'legacy' => 'expense', 'amount' => $amount,
                         'currency' => (string) $rule['currency'],
                         'equipment_id' => $eid,
-                        'notes' => 'مخصصُ صيانةِ المعدة ' . $eid . ' — الفترة ' . $period,
+                        'notes' => 'مخصص صيانة المعدة ' . $eid . ' — الفترة ' . $period,
                         'payload' => $basis,
                     ), $actor);
                     $rowId = (int) $gg->insert('fin_maint_provisions', array(
@@ -145,9 +145,9 @@ class PeriodicEventService
                         'source' => in_array($source, array('screen', 'cron'), true) ? $source : 'screen',
                         'created_by' => (int) $actor ?: null,
                     ));
-                    if ($rowId <= 0) { throw new \RuntimeException('تعذّر إدراجُ المخصص'); }
+                    if ($rowId <= 0) { throw new \RuntimeException('تعذر إدراج المخصص'); }
                 }, 'مخصص صيانة ' . $eid . ' ' . $period);
-            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'مخصصُ صيانةِ معدةٍ واحدةٍ فشل — بقيةُ المعداتِ تستمرّ، والفاشلُ يُستدرَك بالدورةِ التالية');
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'مخصص صيانة معدة واحدة فشل — بقية المعدات تستمر، والفاشل يستدرك بالدورة التالية');
                 $out['skipped'][] = array('equipment_id' => $eid, 'code' => 422, 'reason' => $t->getMessage());
                 continue;
             }
@@ -155,8 +155,8 @@ class PeriodicEventService
             $out['total'] = round($out['total'] + $amount, 2);
         }
         $out['ok'] = true; $out['code'] = 200;
-        $out['reason'] = 'مخصصُ ' . $period . ': ' . $out['posted'] . ' معدةً بمجموع ' . $out['total']
-                       . ' · متخطًّى ' . count($out['skipped']);
+        $out['reason'] = 'مخصص ' . $period . ': ' . $out['posted'] . ' معدة بمجموع ' . $out['total']
+                       . ' · متخطى ' . count($out['skipped']);
         return $out;
     }
 
@@ -188,7 +188,7 @@ class PeriodicEventService
                   WHERE {TENANT_SCOPE} AND s.due_date <= ? AND s.event_id IS NULL
                   ORDER BY s.due_date, s.id", array($day));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّرت قراءةُ جدول السداد: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذرت قراءة جدول السداد: ' . $t->getMessage(); return $out;
         }
 
         foreach ($rows as $r) {
@@ -196,7 +196,7 @@ class PeriodicEventService
             if ($scope && !isset($scope[$sid])) { continue; }
             $amount = round((float) $r['total_due'], 2);
             if ($amount <= 0) {
-                $out['skipped'][] = array('schedule_id' => $sid, 'code' => 422, 'reason' => 'قسطٌ صفريّ');
+                $out['skipped'][] = array('schedule_id' => $sid, 'code' => 422, 'reason' => 'قسط صفري');
                 continue;
             }
             // قفلُ الفترة على **تاريخ الاستحقاق** لا على اليوم
@@ -218,7 +218,7 @@ class PeriodicEventService
                         'idem' => 'fund:' . (int) $r['facility_id'] . ':' . (int) $r['installment_no'],
                         'legacy' => 'payable', 'amount' => $amount, 'currency' => $cur,
                         'source_ref' => (string) $r['facility_no'],
-                        'notes' => 'قسطُ تمويلٍ ' . (int) $r['installment_no']
+                        'notes' => 'قسط تمويل ' . (int) $r['installment_no']
                                    . ' — ' . (string) $r['facility_no'],
                         'payload' => array(
                             'facility_id' => (int) $r['facility_id'],
@@ -231,7 +231,7 @@ class PeriodicEventService
                         array('event_id' => $eventId, 'accrued_at' => date('Y-m-d H:i:s')),
                         array('id' => $sid));
                 }, 'استحقاق قسط ' . $sid);
-            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'استحقاقُ قسطِ تمويلٍ واحدٍ فشل — بقيةُ الأقساطِ تستمرّ، والفاشلُ يُستدرَك بالدورةِ التالية');
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'استحقاق قسط تمويل واحد فشل — بقية الأقساط تستمر، والفاشل يستدرك بالدورة التالية');
                 $out['skipped'][] = array('schedule_id' => $sid, 'code' => 422, 'reason' => $t->getMessage());
                 continue;
             }
@@ -239,8 +239,8 @@ class PeriodicEventService
             $out['total'] = round($out['total'] + $amount, 2);
         }
         $out['ok'] = true; $out['code'] = 200;
-        $out['reason'] = 'الأقساطُ حتى ' . $day . ': ' . $out['posted'] . ' قسطًا بمجموع '
-                       . $out['total'] . ' · متخطًّى ' . count($out['skipped']);
+        $out['reason'] = 'الأقساط حتى ' . $day . ': ' . $out['posted'] . ' قسطا بمجموع '
+                       . $out['total'] . ' · متخطى ' . count($out['skipped']);
         return $out;
     }
 
@@ -265,11 +265,11 @@ class PeriodicEventService
                 "SELECT t.id, t.state, t.net_tax FROM fin_tax_returns t
                   WHERE {TENANT_SCOPE} AND t.period_ref = ? LIMIT 1", array((string) $period));
             $ex = $rows ? $rows[0] : null;
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $ex'); $ex = null; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $ex'); $ex = null; }
         if ($ex && (string) $ex['state'] === 'filed') {
             $out['code'] = 409; $out['return_id'] = (int) $ex['id'];
             $out['net'] = round((float) $ex['net_tax'], 2);
-            $out['reason'] = 'إقرارُ الفترة ' . $period . ' مقدَّمٌ سلفًا (#' . (int) $ex['id'] . ')';
+            $out['reason'] = 'إقرار الفترة ' . $period . ' مقدم سلفا (#' . (int) $ex['id'] . ')';
             return $out;
         }
 
@@ -294,7 +294,7 @@ class PeriodicEventService
                 }
             }
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الاشتقاق: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الاشتقاق: ' . $t->getMessage(); return $out;
         }
         $net = round($agg['output_tax'] - $agg['input_tax'], 2);
 
@@ -309,7 +309,7 @@ class PeriodicEventService
                     'occurred_at' => $lastDay . ' 23:59:59',
                     'idem' => 'taxret:' . $companyId . ':' . $period,
                     'legacy' => 'expense', 'amount' => abs($net), 'currency' => 'SDG',
-                    'notes' => 'إقرارٌ ضريبيٌّ للفترة ' . $period,
+                    'notes' => 'إقرار ضريبي للفترة ' . $period,
                     'payload' => array_merge($agg, array('period' => (string) $period, 'net' => $net)),
                     'entity_fallback' => true,
                 ), $actor);
@@ -324,19 +324,19 @@ class PeriodicEventService
                 );
                 if ($rid) { $gg->update('fin_tax_returns', $data, array('id' => $rid)); }
                 else { $data['created_by'] = (int) $actor ?: null; $rid = (int) $gg->insert('fin_tax_returns', $data); }
-                if (!$rid) { throw new \RuntimeException('تعذّر حفظُ الإقرار'); }
+                if (!$rid) { throw new \RuntimeException('تعذر حفظ الإقرار'); }
                 // وسمُ الحركات `filed` — فلا تدخل إقرارًا ثانيًا
                 $gg->update('fin_tax_transactions', array('state' => 'filed'),
                     array(), 'period_ref = ? AND state = ?', array((string) $period, 'draft'));
             }, 'إقرار ضريبي ' . $period);
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر التقديم: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر التقديم: ' . $t->getMessage(); return $out;
         }
 
         $out['ok'] = true; $out['code'] = 200; $out['return_id'] = $rid; $out['net'] = $net;
-        $out['reason'] = 'إقرارُ ' . $period . ': مخرجاتٌ ' . $agg['output_tax']
-                       . ' − مدخلاتٌ ' . $agg['input_tax'] . ' = **' . $net . '**'
-                       . ($agg['n'] === 0 ? ' · **صفرُ حركةٍ في الفترة — يُعلَن ولا يُخفى**' : '');
+        $out['reason'] = 'إقرار ' . $period . ': مخرجات ' . $agg['output_tax']
+                       . ' − مدخلات ' . $agg['input_tax'] . ' = **' . $net . '**'
+                       . ($agg['n'] === 0 ? ' · **صفر حركة في الفترة — يعلن ولا يخفى**' : '');
         return $out;
     }
 
@@ -385,7 +385,7 @@ class PeriodicEventService
     private static function guardPeriod($conn, $companyId, $period)
     {
         if (!preg_match('/^\d{4}-\d{2}$/', (string) $period)) {
-            return array('ok' => false, 'code' => 422, 'reason' => 'الفترةُ بصيغة YYYY-MM', 'last_day' => '');
+            return array('ok' => false, 'code' => 422, 'reason' => 'الفترة بصيغة YYYY-MM', 'last_day' => '');
         }
         $lastDay = date('Y-m-t', strtotime($period . '-01'));
         require_once dirname(__DIR__, 3) . '/includes/period_guard.php';

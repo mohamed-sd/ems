@@ -29,8 +29,8 @@ if (!function_exists('claim_states')) {
             'approved'  => 'معتمد',
             'invoiced'  => 'مفوتر',
             // M-05 (ENT-03 §4): «Invoiced → **PartiallyCollected** → Collected»
-            'partially_collected' => 'محصَّلٌ جزئيًّا',
-            'collected' => 'محصَّل',
+            'partially_collected' => 'محصل جزئيا',
+            'collected' => 'محصل',
             'cancelled' => 'ملغى',
         );
     }
@@ -381,17 +381,17 @@ if (!function_exists('claim_period_diagnosis')) {
         if (!$rows) { return ''; }
         $d = $rows[0];
         $total = intval($d['total']);
-        if ($total === 0) { return 'لا يومَ عملٍ مسجَّلًا لهذا العقد في الفترة أصلًا'; }
+        if ($total === 0) { return 'لا يوم عمل مسجلا لهذا العقد في الفترة أصلا'; }
 
         $parts = array();
         $notApproved = $total - intval($d['approved4']);
         $awaiting = intval($d['approved4']) - intval($d['converted']);
         $noRevenue = intval($d['converted']) - intval($d['with_revenue']);
-        if ($notApproved > 0) { $parts[] = $notApproved . ' يومًا لم يكتمل اعتمادُه الرباعي'; }
-        if ($awaiting > 0)    { $parts[] = $awaiting . ' مكتملَ الاعتماد بانتظار تحويل المالية من «وحدات الأطراف»'; }
-        if ($noRevenue > 0)   { $parts[] = $noRevenue . ' حُوِّل بلا قيدِ إيراد (لا سعرَ عقدِ عميلٍ لنوع المعدة أو لا كميةَ بوحدته)'; }
-        if (intval($d['claimed']) > 0) { $parts[] = intval($d['claimed']) . ' استُخلص سلفًا'; }
-        return $parts ? ('في الفترة ' . $total . ' يومًا: ' . implode(' · ', $parts)) : '';
+        if ($notApproved > 0) { $parts[] = $notApproved . ' يوما لم يكتمل اعتماده الرباعي'; }
+        if ($awaiting > 0)    { $parts[] = $awaiting . ' مكتمل الاعتماد بانتظار تحويل المالية من «وحدات الأطراف»'; }
+        if ($noRevenue > 0)   { $parts[] = $noRevenue . ' حول بلا قيد إيراد (لا سعر عقد عميل لنوع المعدة أو لا كمية بوحدته)'; }
+        if (intval($d['claimed']) > 0) { $parts[] = intval($d['claimed']) . ' استخلص سلفا'; }
+        return $parts ? ('في الفترة ' . $total . ' يوما: ' . implode(' · ', $parts)) : '';
     }
 }
 
@@ -405,10 +405,10 @@ if (!function_exists('claim_generate')) {
         $out = array('status' => 'failed', 'claim_id' => null, 'lines' => 0, 'gross' => 0.0, 'reason' => '');
         $contract_id = intval($contract_id);
         if ($contract_id <= 0 || $from === '' || $to === '') {
-            $out['reason'] = 'العقدُ والفترةُ إلزاميان'; $out['status'] = 'failed'; return $out;
+            $out['reason'] = 'العقد والفترة إلزاميان'; $out['status'] = 'failed'; return $out;
         }
         if (strtotime($to) < strtotime($from)) {
-            $out['reason'] = 'نهايةُ الفترة قبل بدايتها'; $out['status'] = 'failed'; return $out;
+            $out['reason'] = 'نهاية الفترة قبل بدايتها'; $out['status'] = 'failed'; return $out;
         }
 
         $gate = claim_gate(false);
@@ -422,23 +422,23 @@ if (!function_exists('claim_generate')) {
             if ($ex) {
                 $out['status'] = 'exists';
                 $out['claim_id'] = intval($ex['id']);
-                $out['reason'] = 'مستخلصُ الفترة قائمٌ بالرقم ' . $ex['claim_no'];
+                $out['reason'] = 'مستخلص الفترة قائم بالرقم ' . $ex['claim_no'];
                 return $out;
             }
         } catch (\Throwable $t) {
             error_log('claim exists check: ' . $t->getMessage());
-            $out['reason'] = 'تعذّر الفحص'; return $out;
+            $out['reason'] = 'تعذر الفحص'; return $out;
         }
 
         $ctx = claim_contract_context($gate, $contract_id);
-        if ($ctx === null) { $out['reason'] = 'العقدُ غير موجود'; return $out; }
+        if ($ctx === null) { $out['reason'] = 'العقد غير موجود'; return $out; }
 
         // تعذّرٌ معلَن: عملةُ العقد لا رمزَ مسجَّلًا لها. لا يُستخلص بعملةٍ
         // مجهولةٍ ولا بعملةٍ مفترَضة — تُسجَّل العملةُ من شاشتها ثم يُعاد التوليد.
         if ($ctx['currency'] === null) {
             $out['reason'] = ($ctx['currency_raw'] === '')
-                ? 'العقدُ بلا عملة — سجّلها في بياناته أولًا'
-                : 'عملةُ العقد «' . $ctx['currency_raw'] . '» غير مسجَّلةٍ في سجل العملات';
+                ? 'العقد بلا عملة — سجلها في بياناته أولا'
+                : 'عملة العقد «' . $ctx['currency_raw'] . '» غير مسجلة في سجل العملات';
             return $out;
         }
 
@@ -446,7 +446,7 @@ if (!function_exists('claim_generate')) {
             $units = claim_billable_units($gate, $contract_id, $from, $to);
         } catch (\Throwable $t) {
             error_log('claim units: ' . $t->getMessage());
-            $out['reason'] = 'تعذّرت قراءةُ الوحدات'; return $out;
+            $out['reason'] = 'تعذرت قراءة الوحدات'; return $out;
         }
 
         // البندُ = قيدُ إيرادٍ معترَفٌ به. كميتُه ومبلغُه كما وقعا في الدفتر،
@@ -505,17 +505,17 @@ if (!function_exists('claim_generate')) {
                 $out['status'] = 'conflict';
                 $out['code'] = 409;
                 $out['billed_conflicts'] = $billed;
-                $out['reason'] = '409: ' . count($billed) . ' وحدةً في الفترة فُوترت سابقًا — '
+                $out['reason'] = '409: ' . count($billed) . ' وحدة في الفترة فوترت سابقا — '
                     . implode(' · ', $refs)
                     . (count($billed) > 5 ? ' · …' : '')
-                    . ' — صفرُ ازدواجٍ في الإيراد';
+                    . ' — صفر ازدواج في الإيراد';
                 return $out;
             }
             $out['status'] = 'empty';
-            $out['reason'] = 'لا يومَ قابلًا للاستخلاص'
+            $out['reason'] = 'لا يوم قابلا للاستخلاص'
                 . ($diag !== '' ? (' — ' . $diag) : '')
-                . ($curMismatch > 0 ? (' · ' . $curMismatch . ' بعملةٍ تخالف عملة العقد') : '')
-                . ($zeroQty > 0 ? (' · ' . $zeroQty . ' بكميةٍ أو مبلغٍ صفري') : '');
+                . ($curMismatch > 0 ? (' · ' . $curMismatch . ' بعملة تخالف عملة العقد') : '')
+                . ($zeroQty > 0 ? (' · ' . $zeroQty . ' بكمية أو مبلغ صفري') : '');
             return $out;
         }
 
@@ -546,19 +546,19 @@ if (!function_exists('claim_generate')) {
             $out['lines'] = count($lines);
             $out['gross'] = $gross;
             $skips = array();
-            if ($curMismatch > 0) { $skips[] = $curMismatch . ' بعملةٍ تخالف عملة العقد'; }
-            if ($zeroQty > 0)     { $skips[] = $zeroQty . ' بكميةٍ أو مبلغٍ صفري'; }
-            if ($penSkipped > 0)  { $skips[] = $penSkipped . ' جزاءً/حافزًا بعملةٍ مخالفة'; }
+            if ($curMismatch > 0) { $skips[] = $curMismatch . ' بعملة تخالف عملة العقد'; }
+            if ($zeroQty > 0)     { $skips[] = $zeroQty . ' بكمية أو مبلغ صفري'; }
+            if ($penSkipped > 0)  { $skips[] = $penSkipped . ' جزاء/حافزا بعملة مخالفة'; }
             // M-08: المفوترةُ سابقًا تُعلَن بعدّها ومراجعها — لا استبعادَ صامتًا
             $billedPartial = claim_already_billed_units($gate, $contract_id, $from, $to);
             if (!empty($billedPartial)) {
                 $out['billed_conflicts'] = $billedPartial;
-                $skips[] = count($billedPartial) . ' وحدةً فُوترت سابقًا (لم تُكرَّر — 409 لكلٍّ بمرجع سطرها)';
+                $skips[] = count($billedPartial) . ' وحدة فوترت سابقا (لم تكرر — 409 لكل بمرجع سطرها)';
             }
-            if ($skips) { $out['reason'] = 'تُركت: ' . implode(' · ', $skips); }
+            if ($skips) { $out['reason'] = 'تركت: ' . implode(' · ', $skips); }
         } catch (\Throwable $t) {
             error_log('claim generate: ' . $t->getMessage());
-            $out['reason'] = 'تعذّر الحفظ';
+            $out['reason'] = 'تعذر الحفظ';
         }
         return $out;
     }
@@ -719,10 +719,10 @@ if (!function_exists('claim_retention_release')) {
         $role = strval($role);
         if ($role !== '19' && $role !== '-1') {
             $out['code'] = 403;
-            $out['reason'] = 'ردُّ ضمان حسن التنفيذ بيد مدير الإدارة المالية وحدَه (ق-20)';
+            $out['reason'] = 'رد ضمان حسن التنفيذ بيد مدير الإدارة المالية وحده (ق-20)';
             return $out;
         }
-        if ($contract_id <= 0) { $out['reason'] = 'معرّفُ عقدٍ غير صالح'; return $out; }
+        if ($contract_id <= 0) { $out['reason'] = 'معرف عقد غير صالح'; return $out; }
 
         $gate = claim_gate(false);
         $c = null;
@@ -738,18 +738,18 @@ if (!function_exists('claim_retention_release')) {
             $c = $rows ? $rows[0] : null;
         } catch (\Throwable $t) {
             error_log('retention release fetch: ' . $t->getMessage());
-            $out['reason'] = 'تعذّرت قراءةُ العقد'; return $out;
+            $out['reason'] = 'تعذرت قراءة العقد'; return $out;
         }
-        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقدُ غير موجود'; return $out; }
+        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقد غير موجود'; return $out; }
 
         // ② الشرطُ الزمني: **بعد تجاوز actual_end حصرًا** — لا قبله ولا في يومه
         $end = (string) $c['actual_end'];
         if ($end === '' || $end === '0000-00-00') {
-            $out['reason'] = 'العقدُ بلا تاريخِ انتهاءٍ مسجَّل — ولا يُردُّ ضمانٌ قبل انتهاءٍ معلوم';
+            $out['reason'] = 'العقد بلا تاريخ انتهاء مسجل — ولا يرد ضمان قبل انتهاء معلوم';
             return $out;
         }
         if (strtotime($end) >= strtotime($as_of)) {
-            $out['reason'] = 'العقدُ لم ينتهِ بعد (ينتهي ' . $end . ') — والردُّ لا يكون إلا بعد تجاوز مدته (ق-20)';
+            $out['reason'] = 'العقد لم ينته بعد (ينتهي ' . $end . ') — والرد لا يكون إلا بعد تجاوز مدته (ق-20)';
             return $out;
         }
 
@@ -768,13 +768,13 @@ if (!function_exists('claim_retention_release')) {
             if (!empty($prev)) {
                 $out['status'] = 'exists'; $out['code'] = 409;
                 $out['claim_id'] = intval($prev[0]['claim_id']);
-                $out['reason'] = 'رُدَّ الضمانُ سلفًا في المستخلص #' . intval($prev[0]['claim_id'])
-                               . ' — ولا يُردُّ ضمانٌ مرتين';
+                $out['reason'] = 'رد الضمان سلفا في المستخلص #' . intval($prev[0]['claim_id'])
+                               . ' — ولا يرد ضمان مرتين';
                 return $out;
             }
         } catch (\Throwable $t) {
             error_log('retention release dupe: ' . $t->getMessage());
-            $out['reason'] = 'تعذّر فحصُ الردّ السابق'; return $out;
+            $out['reason'] = 'تعذر فحص الرد السابق'; return $out;
         }
 
         // ④ الرصيد: كاملًا بلا خصمٍ للغرامات المعلّقة (منعُ الازدواج)
@@ -782,21 +782,21 @@ if (!function_exists('claim_retention_release')) {
             $held = claim_retention_balance($gate, $contract_id);
         } catch (\Throwable $t) {
             error_log('retention release balance: ' . $t->getMessage());
-            $out['reason'] = 'تعذّر حسابُ الرصيد'; return $out;
+            $out['reason'] = 'تعذر حساب الرصيد'; return $out;
         }
         if ($held <= 0) {
             $out['reason'] = ($held < 0)
-                ? 'الرصيدُ سالبٌ (' . number_format($held, 2) . ') — رُدَّ أكثرُ مما احتُجز، فيُراجَع قبل أي ردٍّ جديد'
-                : 'لا رصيدَ ضمانٍ محتجَزٌ على هذا العقد — لا شيءَ يُردّ';
+                ? 'الرصيد سالب (' . number_format($held, 2) . ') — رد أكثر مما احتجز، فيراجع قبل أي رد جديد'
+                : 'لا رصيد ضمان محتجز على هذا العقد — لا شيء يرد';
             return $out;
         }
 
         $ctx = claim_contract_context($gate, $contract_id);
-        if ($ctx === null) { $out['code'] = 404; $out['reason'] = 'العقدُ غير موجود'; return $out; }
+        if ($ctx === null) { $out['code'] = 404; $out['reason'] = 'العقد غير موجود'; return $out; }
         if ($ctx['currency'] === null) {
             $out['reason'] = ($ctx['currency_raw'] === '')
-                ? 'العقدُ بلا عملة — سجّلها في بياناته أولًا'
-                : 'عملةُ العقد «' . $ctx['currency_raw'] . '» غير مسجَّلةٍ في سجل العملات';
+                ? 'العقد بلا عملة — سجلها في بياناته أولا'
+                : 'عملة العقد «' . $ctx['currency_raw'] . '» غير مسجلة في سجل العملات';
             return $out;
         }
 
@@ -818,7 +818,7 @@ if (!function_exists('claim_retention_release')) {
                     'gross_amount' => $held,
                     'net_amount'   => $held,
                     'state'        => 'draft',
-                    'notes'        => 'مستخلصٌ ختاميّ — ردُّ ضمان حسن التنفيذ (ق-20)',
+                    'notes'        => 'مستخلص ختامي — رد ضمان حسن التنفيذ (ق-20)',
                     'created_by'   => intval($uid) > 0 ? intval($uid) : null,
                 )));
                 $g->insert('claim_lines', array(
@@ -837,7 +837,7 @@ if (!function_exists('claim_retention_release')) {
             }, 'retention release');
         } catch (\Throwable $t) {
             error_log('retention release write #' . $contract_id . ': ' . $t->getMessage());
-            $out['code'] = 500; $out['reason'] = 'تعذّر حفظُ المستخلص الختامي';
+            $out['code'] = 500; $out['reason'] = 'تعذر حفظ المستخلص الختامي';
             return $out;
         }
 
@@ -863,14 +863,14 @@ if (!function_exists('claim_retention_release')) {
                 'contract_id'        => $contract_id,
                 'project_id'         => $ctx['project_id'],
                 'customer_entity_id' => $ctx['client_id'],
-                'notes'              => 'ردُّ ضمان حسن التنفيذ — العقد #' . $contract_id . ' المنتهي ' . $end,
+                'notes'              => 'رد ضمان حسن التنفيذ — العقد #' . $contract_id . ' المنتهي ' . $end,
                 'payload'            => array(
                     'contract_id' => $contract_id, 'claim_id' => $claimId,
                     'released'    => $held, 'actual_end' => $end,
                     'released_by' => intval($uid),
                     // شفافيةُ التصنيف: لا اعترافَ جديدًا — الردُّ تحريرُ مطالبةٍ
                     'recognition' => 'none',
-                    'rationale'   => 'الاحتجازُ خصمُ مطالبةٍ لا خصمُ اعتراف — فردُّه لا يخلق إيرادًا',
+                    'rationale'   => 'الاحتجاز خصم مطالبة لا خصم اعتراف — فرده لا يخلق إيرادا',
                 ),
             ));
         } catch (\Throwable $t) {
@@ -882,8 +882,8 @@ if (!function_exists('claim_retention_release')) {
         $out['code'] = 200;
         $out['claim_id'] = $claimId;
         $out['amount'] = $held;
-        $out['reason'] = 'رُدَّ ضمانُ حسن التنفيذ كاملًا (' . number_format($held, 2) . ' '
-                       . $ctx['currency'] . ') في مستخلصٍ ختاميٍّ مسودة — يُرفع ثم تُجيزه يدٌ ثانية';
+        $out['reason'] = 'رد ضمان حسن التنفيذ كاملا (' . number_format($held, 2) . ' '
+                       . $ctx['currency'] . ') في مستخلص ختامي مسودة — يرفع ثم تجيزه يد ثانية';
         return $out;
     }
 }
@@ -936,27 +936,27 @@ if (!function_exists('claim_submit')) {
     {
         $out = array('status' => 'failed', 'reason' => '');
         $claim_id = intval($claim_id);
-        if ($claim_id <= 0) { $out['reason'] = 'معرّفٌ غير صالح'; return $out; }
+        if ($claim_id <= 0) { $out['reason'] = 'معرف غير صالح'; return $out; }
         $gate = claim_gate(false);
         try {
             $c = $gate->selectOne('claims', array('where' => array('id' => $claim_id)));
         } catch (\Throwable $t) {
             error_log('claim submit fetch: ' . $t->getMessage()); return $out;
         }
-        if (!$c) { $out['reason'] = 'المستخلصُ غير موجود'; return $out; }
+        if (!$c) { $out['reason'] = 'المستخلص غير موجود'; return $out; }
         if ((string) $c['state'] === 'review') {
-            $out['status'] = 'exists'; $out['reason'] = 'مرفوعٌ سلفًا وبانتظار المالية'; return $out;
+            $out['status'] = 'exists'; $out['reason'] = 'مرفوع سلفا وبانتظار المالية'; return $out;
         }
         if ((string) $c['state'] !== 'draft') {
             $out['status'] = 'blocked';
-            $out['reason'] = 'لا يُرفع إلا مستخلصٌ مسودة — حالتُه: ' . (string) $c['state'];
+            $out['reason'] = 'لا يرفع إلا مستخلص مسودة — حالته: ' . (string) $c['state'];
             return $out;
         }
         // لا يُرفع فارغٌ ولا سالب: المراجعةُ المالية تستحقّ رقمًا حقيقيًّا
         $net = claim_recalc($gate, $claim_id);
         if ($net <= 0) {
             $out['status'] = 'blocked';
-            $out['reason'] = 'الصافي صفرٌ أو سالب — لا يُرفع للمالية';
+            $out['reason'] = 'الصافي صفر أو سالب — لا يرفع للمالية';
             return $out;
         }
         try {
@@ -967,10 +967,10 @@ if (!function_exists('claim_submit')) {
             ), array('id' => $claim_id));
         } catch (\Throwable $t) {
             error_log('claim submit #' . $claim_id . ': ' . $t->getMessage());
-            $out['reason'] = 'تعذّر الرفع'; return $out;
+            $out['reason'] = 'تعذر الرفع'; return $out;
         }
         $out['status'] = 'submitted';
-        $out['reason'] = 'رُفع للمالية بصافي ' . number_format($net, 2);
+        $out['reason'] = 'رفع للمالية بصافي ' . number_format($net, 2);
         return $out;
     }
 }
@@ -998,7 +998,7 @@ if (!function_exists('claim_approve')) {
     {
         $out = array('status' => 'failed', 'invoice_no' => null, 'receivable_id' => null, 'reason' => '');
         $claim_id = intval($claim_id);
-        if ($claim_id <= 0) { $out['reason'] = 'معرّفٌ غير صالح'; return $out; }
+        if ($claim_id <= 0) { $out['reason'] = 'معرف غير صالح'; return $out; }
 
         $gate = claim_gate(false);
         try {
@@ -1006,7 +1006,7 @@ if (!function_exists('claim_approve')) {
         } catch (\Throwable $t) {
             error_log('claim approve fetch: ' . $t->getMessage()); return $out;
         }
-        if (!$c) { $out['reason'] = 'المستخلصُ غير موجود'; return $out; }
+        if (!$c) { $out['reason'] = 'المستخلص غير موجود'; return $out; }
 
         /* ══ P1-B — «من أنشأ لا يعتمد» على المستخلص ═══════════════════════════
            كان الختمُ يُكتب (`approved_by`) بلا مقارنةِ المُعِدِّ بالمعتمِد —
@@ -1015,17 +1015,17 @@ if (!function_exists('claim_approve')) {
         if ((string) $c['state'] === 'review' || (string) $c['state'] === 'submitted') {
             require_once __DIR__ . '/../includes/self_approval_guard.php';
             $__sa = ems_no_self_approval($conn, intval($c['created_by'] ?? 0), intval($uid),
-                'مستخلصٌ #' . $claim_id, intval($c['company_id'] ?? 0));
+                'مستخلص #' . $claim_id, intval($c['company_id'] ?? 0));
             if ($__sa !== null) { $out['reason'] = $__sa['reason']; return $out; }
         }
 
         if (in_array((string) $c['state'], array('approved', 'invoiced', 'collected'), true)) {
             $out['status'] = 'exists';
             $out['invoice_no'] = (string) $c['invoice_no'];
-            $out['reason'] = 'المستخلصُ معتمدٌ سلفًا';
+            $out['reason'] = 'المستخلص معتمد سلفا';
             return $out;
         }
-        if ((string) $c['state'] === 'cancelled') { $out['reason'] = 'المستخلصُ ملغى'; $out['status'] = 'blocked'; return $out; }
+        if ((string) $c['state'] === 'cancelled') { $out['reason'] = 'المستخلص ملغى'; $out['status'] = 'blocked'; return $out; }
 
         // ── P-10: «فوترةٌ قبل قفل خط الأساس تُرفض» (PLAN-03 §9-⑱) ────────────
         // **وبحدود §2-② الملزِمة**: البوابةُ **تبدأ مطفأة** والعقودُ القائمةُ
@@ -1037,19 +1037,19 @@ if (!function_exists('claim_approve')) {
             $out['reason'] = $__bg['reason'];
             return $out;
         }
-        if (empty($c['client_id'])) { $out['reason'] = 'لا عميلَ على العقد — لا ذمّةَ بلا مَدين'; $out['status'] = 'blocked'; return $out; }
+        if (empty($c['client_id'])) { $out['reason'] = 'لا عميل على العقد — لا ذمة بلا مدين'; $out['status'] = 'blocked'; return $out; }
 
         // ── يدان لا يدٌ واحدة (قرارُ المالك 2026-07-28) ──────────────────────
         // ① لا تُجاز إلا مرفوعةٌ: المسودةُ ملكُ المبيعات تعدّلها حتى ترفعها.
         if ((string) $c['state'] !== 'review') {
             $out['status'] = 'blocked';
-            $out['reason'] = 'لا تُجاز إلا مستخلصٌ رفعته المبيعاتُ للمالية — حالتُه: ' . (string) $c['state'];
+            $out['reason'] = 'لا تجاز إلا مستخلص رفعته المبيعات للمالية — حالته: ' . (string) $c['state'];
             return $out;
         }
         // ② ولا يعتمد المرءُ ما رفع (نظيرُ حاجز تسويات الموردين) — حاجزٌ فوق المنح.
         if (!empty($c['submitted_by']) && intval($c['submitted_by']) === intval($uid)) {
             $out['status'] = 'blocked';
-            $out['reason'] = 'لا يُجيز المستخلصَ من رفعه — الإجازةُ يدٌ ثانية';
+            $out['reason'] = 'لا يجيز المستخلص من رفعه — الإجازة يد ثانية';
             return $out;
         }
 
@@ -1066,7 +1066,7 @@ if (!function_exists('claim_approve')) {
 
         // بندٌ متنازَعٌ عليه يقف وحده — والمجاميعُ تُعاد بلا احتسابه
         $net = claim_recalc($gate, $claim_id);
-        if ($net <= 0) { $out['reason'] = 'الصافي صفرٌ أو سالب — لا استحقاق'; $out['status'] = 'blocked'; return $out; }
+        if ($net <= 0) { $out['reason'] = 'الصافي صفر أو سالب — لا استحقاق'; $out['status'] = 'blocked'; return $out; }
 
         $currency  = (string) $c['currency'];
         $company   = intval($c['company_id']);
@@ -1121,7 +1121,7 @@ if (!function_exists('claim_approve')) {
                 'project_id'         => !empty($c['project_id']) ? intval($c['project_id']) : null,
                 'customer_entity_id' => intval($c['client_id']),
                 'contract_id'        => !empty($c['contract_id']) ? intval($c['contract_id']) : null,
-                'notes'              => 'فاتورةُ مستخلص ' . $c['claim_no'] . ' — ' . $invoiceNo,
+                'notes'              => 'فاتورة مستخلص ' . $c['claim_no'] . ' — ' . $invoiceNo,
                 'payload'            => array(
                     'claim_id'    => $claim_id,
                     'claim_no'    => (string) $c['claim_no'],
@@ -1142,7 +1142,7 @@ if (!function_exists('claim_approve')) {
         } catch (\Throwable $t) {
             $conn->rollback();
             error_log('claim approve publish #' . $claim_id . ': ' . $t->getMessage());
-            $out['reason'] = 'تعذّر تدوينُ حقيقة الفوترة';
+            $out['reason'] = 'تعذر تدوين حقيقة الفوترة';
             return $out;
         }
 
@@ -1169,7 +1169,7 @@ if (!function_exists('claim_approve')) {
                 if (empty($srcDoc['ok'])) {
                     $out['status'] = 'blocked';
                     $out['code']   = (int) $srcDoc['code'];
-                    $out['reason'] = 'تعذّر ربطُ الذمّةِ بفاتورتها — ' . $srcDoc['reason'];
+                    $out['reason'] = 'تعذر ربط الذمة بفاتورتها — ' . $srcDoc['reason'];
                     return $out;
                 }
                 $recvId = intval($gate->insert('fin_receivables', array(

@@ -282,13 +282,13 @@ if (empty($header_context) || !is_array($header_context)) {
             $__ent = isset($__gc['values']['entity']) ? (string) $__gc['values']['entity'] : '';
         }
         if ($__ent === '' && !empty($_SESSION['user']['company_id'])) {
-            $__ent = 'الكيان #' . (int) $_SESSION['user']['company_id'];
+            $__ent = 'الكيان رقم ' . (int) $_SESSION['user']['company_id'];
         }
         if ($__ent !== '') { $header_context['النطاق'] = $__ent; }
         $__permMap = array('full' => 'تحرير', 'partial' => 'قراءة', 'none' => 'بلا صلاحية');
         $__p = isset($__ax['permission']) ? $__ax['permission'] : 'unmeasured';
         if (isset($__permMap[$__p])) { $header_context['صلاحيتك'] = $__permMap[$__p]; }
-        $header_context['لحظةُ القراءة'] = date('Y-m-d H:i');
+        $header_context['لحظة القراءة'] = date('Y-m-d H:i');
     }
 }
 if (!empty($header_context) && is_array($header_context)) {
@@ -322,7 +322,9 @@ if (empty($GLOBALS['__ems_cycle_line_done']) && isset($GLOBALS['conn']) && $GLOB
             $__od = (string) $__cy['od'];
             $__odShown = ($__od !== '' && mb_strpos($__od, 'بلا مستندٍ رسمي') === false
                           && $__od !== '—' && $__od !== '-')
-                ? ' <span class="ems-cycle-doc">← ينتج: ' . htmlspecialchars($__od, ENT_QUOTES, 'UTF-8') . '</span>'
+                /* السهمُ زخرفةٌ لا معنًى (‏W06 §٤-٥ · ٦٥٨ زخرفةً في نصٍّ مُصيَّر):
+                   «ينتج:» وحدَها تحمل العلاقةَ كاملةً. */
+                ? ' <span class="ems-cycle-doc">ينتج: ' . htmlspecialchars($__od, ENT_QUOTES, 'UTF-8') . '</span>'
                 : '';
             echo '<div class="ems-cycle-line" dir="rtl">'
                . ems_next_step((string) $__cy['ns'])

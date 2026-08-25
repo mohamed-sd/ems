@@ -99,7 +99,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back    = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا طلباتٍ ماليةً واردةً بهذا المرشِّح', 'أزِلْ مرشِّحَ الحالةِ من قائمةِ «كل الحالات» أو انتظرْ ورودَ طلبٍ من الإدارات');
+    echo ems_states_bundle('لا طلبات مالية واردة بهذا المرشح', 'أزل مرشح الحالة من قائمة «كل الحالات» أو انتظر ورود طلب من الإدارات');
     ?>
     <style>
     .fgw-mb14        { margin-bottom: 14px; }
@@ -130,23 +130,23 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="stat-card"><div class="stat-label">معتمد/مقيد</div><div class="stat-value"><?php echo ($counts['approved'] ?? 0) + ($counts['posted'] ?? 0); ?></div></div>
         <div class="stat-card"><div class="stat-label">مدفوع/مغلق</div><div class="stat-value"><?php echo ($counts['paid'] ?? 0) + ($counts['collected'] ?? 0) + ($counts['closed'] ?? 0); ?></div></div>
         <div class="stat-card">
-            <div class="stat-label">مؤشر الدستور (30 يومًا): أحداثٌ عبر البوابة</div>
+            <div class="stat-label">مؤشر الدستور (30 يوما): أحداث عبر البوابة</div>
             <div class="stat-value"><?php echo $gateway_events; ?> / <?php echo $total_events_30d; ?>
                 <?php if ($total_events_30d > 0): ?><small>(<?php echo round($gateway_events / $total_events_30d * 100); ?>%)</small><?php endif; ?>
             </div>
         </div>
         <div class="stat-card">
-            <div class="stat-label">الاستثناءات الشهرية (§8.3 — الحدّ 5%)</div>
+            <div class="stat-label">الاستثناءات الشهرية (§8.3 — الحد 5%)</div>
             <div class="stat-value<?php echo $exc_pct > 5 ? " fgw-danger" : ""; ?>">
                 <?php echo $exc_month; ?> / <?php echo $req_month; ?> <small>(<?php echo $exc_pct; ?>%)</small>
-                <?php if ($exc_pct > 5): ?><small>⚠️ تجاوزٌ يستوجب مراجعة سببٍ جذري</small><?php endif; ?>
+                <?php if ($exc_pct > 5): ?><small>⚠️ تجاوز يستوجب مراجعة سبب جذري</small><?php endif; ?>
             </div>
         </div>
     </div>
 
     <?php if ($exception_queue): ?>
     <div class="card fgw-card-danger">
-        <div class="card-header"><h5><i class="fa fa-bolt fgw-danger"></i> طلبات الاستثناء الطارئ — قرارك حصرًا (§8.3)</h5></div>
+        <div class="card-header"><h5><i class="fa fa-bolt fgw-danger"></i> طلبات الاستثناء الطارئ — قرارك حصرا (§8.3)</h5></div>
         <div class="card-body">
             <?php foreach ($exception_queue as $xq):
                 $last_reason = '';
@@ -193,7 +193,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="card-header fgw-card-head">
             <h5><i class="fas fa-table"></i> كل الطلبات</h5>
             <form method="get" class="fgw-filter-form">
-                <select name="state" aria-label="ترشيحُ الطلباتِ بالحالة" onchange="this.form.submit()">
+                <select name="state" aria-label="ترشيح الطلبات بالحالة" onchange="this.form.submit()">
                     <option value="">— كل الحالات —</option>
                     <?php foreach ($states as $k => $s): ?>
                         <option value="<?php echo $k; ?>" <?php echo $state_filter === $k ? 'selected' : ''; ?>><?php echo $s['label']; ?></option>
@@ -206,12 +206,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <thead>
                     <tr>
                         <th>الرقم</th><th>الإدارة</th><th>النوع</th><th>المستفيد</th>
-                        <th>المبلغ</th><th>الحالة</th><th>الحدث</th><th>منشئه</th><th>أُنشئ</th><th></th>
+                        <th>المبلغ</th><th>الحالة</th><th>الحدث</th><th>منشئه</th><th>أنشئ</th><th></th>
                         <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                        <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                        <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                        <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                        <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                        <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                        <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                        <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                        <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                         <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                         <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                         <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -253,7 +253,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 </form>
                                 <?php endif; ?>
                                 <?php if ($r['state'] === 'pending_approval'): ?>
-                                <form action="request_actions.php" method="post" class="fgw-form-inline" onsubmit="var x=prompt('سبب الإلغاء (إلزامي — وبعد الولادة تُعالَج آثاره في D04):');if(!x)return false;this.reason.value=x;">
+                                <form action="request_actions.php" method="post" class="fgw-form-inline" onsubmit="var x=prompt('سبب الإلغاء (إلزامي — وبعد الولادة تعالج آثاره في D04):');if(!x)return false;this.reason.value=x;">
         <?php echo csrf_field(); ?>
                                     <input type="hidden" name="action" value="cancel">
                                     <input type="hidden" name="id" value="<?php echo intval($r['id']); ?>">

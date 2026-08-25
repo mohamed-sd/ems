@@ -33,13 +33,13 @@ class HandoverService
         $why  = trim((string) ($in['reason'] ?? ''));
 
         $miss = array();
-        if ($from <= 0)              { $miss[] = 'الحاويةُ المسلِّمة'; }
-        if ($to <= 0)                { $miss[] = 'الحاويةُ المستلِمة'; }
-        if ($from > 0 && $from === $to) { $miss[] = 'الطرفانِ متطابقان — التسليمُ بين حاويتين مختلفتين'; }
-        if ($qty <= 0)               { $miss[] = 'الكميةُ المنقولة (أكبرُ من صفر)'; }
-        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) { $miss[] = 'تاريخُ السريان'; }
-        if ($doc === '')             { $miss[] = 'مستندُ التسليم (محضرٌ أو خطاب)'; }
-        if ($why === '')             { $miss[] = 'سببُ التسليم'; }
+        if ($from <= 0)              { $miss[] = 'الحاوية المسلمة'; }
+        if ($to <= 0)                { $miss[] = 'الحاوية المستلمة'; }
+        if ($from > 0 && $from === $to) { $miss[] = 'الطرفان متطابقان — التسليم بين حاويتين مختلفتين'; }
+        if ($qty <= 0)               { $miss[] = 'الكمية المنقولة (أكبر من صفر)'; }
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) { $miss[] = 'تاريخ السريان'; }
+        if ($doc === '')             { $miss[] = 'مستند التسليم (محضر أو خطاب)'; }
+        if ($why === '')             { $miss[] = 'سبب التسليم'; }
         if ($miss) { return array('ok' => false, 'code' => 422, 'swap_id' => null, 'reasons' => $miss); }
 
         /* الطرفان من كيانِ الجلسةِ وحيّان */
@@ -53,12 +53,12 @@ class HandoverService
         $st->close();
         if (!isset($rows[$from], $rows[$to])) {
             return array('ok' => false, 'code' => 404, 'swap_id' => null,
-                         'reasons' => array('إحدى الحاويتين غيرُ موجودةٍ في كيانِك'));
+                         'reasons' => array('إحدى الحاويتين غير موجودة في كيانك'));
         }
         if ((float) $rows[$from]['allocated_qty'] < $qty) {
             return array('ok' => false, 'code' => 409, 'swap_id' => null,
-                         'reasons' => array('المسلِّمةُ لا تحمل ' . number_format($qty, 2)
-                             . ' — المتاحُ فيها ' . number_format((float) $rows[$from]['allocated_qty'], 2) . ' ساعة'));
+                         'reasons' => array('المسلمة لا تحمل ' . number_format($qty, 2)
+                             . ' — المتاح فيها ' . number_format((float) $rows[$from]['allocated_qty'], 2) . ' ساعة'));
         }
 
         /* HO-05 مبكّرًا (والقادحُ يصدُّه في القاعدةِ أيضًا) */
@@ -71,7 +71,7 @@ class HandoverService
         $st->close();
         if ($closed) {
             return array('ok' => false, 'code' => 409, 'swap_id' => null,
-                         'reasons' => array('الشهرُ مغلقٌ — لا حدثَ يعيد احتسابَ شهرٍ مقفل (HO-05)'));
+                         'reasons' => array('الشهر مغلق — لا حدث يعيد احتساب شهر مقفل (HO-05)'));
         }
 
         $swapId = 0;
@@ -84,7 +84,7 @@ class HandoverService
                 $t = $g->selectOne('op_containers', array('columns' => array('allocated_qty'), 'where' => array('id' => $to)));
                 $newFrom = round((float) $f['allocated_qty'] - $qty, 2);
                 $newTo   = round((float) $t['allocated_qty'] + $qty, 2);
-                if ($newFrom < 0) { throw new \RuntimeException('الرصيدُ تغيّر أثناءَ الحفظ — أعِد المحاولة'); }
+                if ($newFrom < 0) { throw new \RuntimeException('الرصيد تغير أثناء الحفظ — أعد المحاولة'); }
                 $g->update('op_containers', array('allocated_qty' => $newFrom), array('id' => $from));
                 $g->update('op_containers', array('allocated_qty' => $newTo), array('id' => $to));
                 $swapId = (int) $g->insert('container_swaps', array(
@@ -97,7 +97,7 @@ class HandoverService
                     'doc_ref'         => mb_substr($doc, 0, 190),
                     'created_by'      => (int) $actor ?: null,
                 ));
-                if ($swapId <= 0) { throw new \RuntimeException('فشل تسجيلُ حدثِ التسليم'); }
+                if ($swapId <= 0) { throw new \RuntimeException('فشل تسجيل حدث التسليم'); }
             });
         } catch (\Throwable $e) {
             return array('ok' => false, 'code' => 409, 'swap_id' => null,

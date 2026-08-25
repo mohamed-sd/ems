@@ -35,16 +35,16 @@ $gate = $is_super_admin ? ems_tenant_db()->forAllTenants('asset intake super') :
 ALS::setEventConnection($conn);
 $uid = intval($_SESSION['user']['id'] ?? 0);
 
-$REASONS = array('intake' => 'تفتيشُ دخول', 'periodic' => 'تفتيشٌ دوريّ', 'post_repair' => 'ما بعدَ الإصلاح',
-                 'pre_exit' => 'ما قبلَ الخروج', 'incident' => 'واقعةٌ طارئة');
+$REASONS = array('intake' => 'تفتيش دخول', 'periodic' => 'تفتيش دوري', 'post_repair' => 'ما بعد الإصلاح',
+                 'pre_exit' => 'ما قبل الخروج', 'incident' => 'واقعة طارئة');
 $SOURCES = array('owned' => 'مملوكة', 'financed' => 'ممولة', 'supplier_external' => 'مورّدة', 'rented' => 'مستأجرة');
-$STATES  = array('draft' => 'مسودة', 'submitted' => 'مرفوع', 'source_verified' => 'مصدرٌ محقَّق',
-                 'inspection_ordered' => 'أمرُ تفتيشٍ صادر', 'inspected' => 'مُفتَّش',
-                 'card_issued' => 'كرتٌ صادر', 'activated' => 'مُفعَّل', 'rejected' => 'مرفوض');
+$STATES  = array('draft' => 'مسودة', 'submitted' => 'مرفوع', 'source_verified' => 'مصدر محقق',
+                 'inspection_ordered' => 'أمر تفتيش صادر', 'inspected' => 'مفتش',
+                 'card_issued' => 'كرت صادر', 'activated' => 'مفعل', 'rejected' => 'مرفوض');
 
 $act = isset($_POST['action']) ? (string) $_POST['action'] : '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $act !== '' && ($can_add || $can_edit)) {
-    $msg = '⚠ لم يُنفَّذ'; $code = 'GOV-INFO-200';
+    $msg = '⚠ لم ينفذ'; $code = 'GOV-INFO-200';
     if ($act === 'open_intake' && $can_add) {
         $r = ALS::openIntake($gate, array(
             'intake_no'      => trim($_POST['intake_no'] ?? ''),
@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $act !== '' && ($can_add || $can_ed
             'requested_by'   => $uid,
             'source_ref'     => 'Fleet/asset_intake.php',
         ));
-        $msg = $r['ok'] ? '✅ سُجِّل طلبُ الإدخال' : '❌ ' . $r['reason'];
+        $msg = $r['ok'] ? '✅ سجل طلب الإدخال' : '❌ ' . $r['reason'];
     } elseif ($act === 'verify' && $can_edit) {
         $r = ALS::verifySource($gate, intval($_POST['intake_id'] ?? 0), array(
             'doc_type'       => trim($_POST['doc_type'] ?? ''),
@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $act !== '' && ($can_add || $can_ed
             'fail_reason'    => trim($_POST['fail_reason'] ?? ''),
             'verified_by'    => $uid,
         ));
-        $msg = $r['ok'] ? '✅ سُجِّلت واقعةُ التحقُّق' : '❌ ' . $r['reason'];
+        $msg = $r['ok'] ? '✅ سجلت واقعة التحقق' : '❌ ' . $r['reason'];
     } elseif ($act === 'order_inspection' && $can_edit) {
         $r = ALS::orderInspection($gate, array(
             'order_no'  => trim($_POST['order_no'] ?? ''),
@@ -74,13 +74,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $act !== '' && ($can_add || $can_ed
             'due_date'  => trim($_POST['due_date'] ?? ''),
             'ordered_by' => $uid,
         ));
-        $msg = $r['ok'] ? '✅ صدر أمرُ التفتيش' : '❌ ' . $r['reason'];
+        $msg = $r['ok'] ? '✅ صدر أمر التفتيش' : '❌ ' . $r['reason'];
     } elseif ($act === 'issue_card' && $can_edit) {
         $r = ALS::issueCard($gate, intval($_POST['intake_id'] ?? 0), intval($_POST['equipment_id'] ?? 0), $uid);
-        $msg = $r['ok'] ? '✅ صدر كرتُ الأصل' : '❌ ' . $r['reason'];
+        $msg = $r['ok'] ? '✅ صدر كرت الأصل' : '❌ ' . $r['reason'];
     } elseif ($act === 'activate' && $can_edit) {
         $r = ALS::activateAsset($gate, intval($_POST['intake_id'] ?? 0), $uid);
-        $msg = $r['ok'] ? '✅ فُعِّل الأصل' : '❌ ' . $r['reason'];
+        $msg = $r['ok'] ? '✅ فعل الأصل' : '❌ ' . $r['reason'];
     }
     ems_gov_flash_redirect('asset_intake.php', $msg, $code, ''); exit();
 }
@@ -111,7 +111,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="success-message <?= $ok ? 'is-success' : 'is-error' ?>"><i class="fas <?= $ok ? 'fa-check-circle' : 'fa-exclamation-circle' ?>"></i> <?= htmlspecialchars($_GET['msg']) ?></div>
     <?php endif; ?>
     <?php require_once __DIR__ . '/../includes/ux_components.php';
-    echo ems_states_bundle('لا طلباتِ إدخالٍ مسجَّلةً بعدُ', 'ابدأْ دورةَ الأصلِ بزرِّ «طلب إدخال» في رأسِ الشاشة'); ?>
+    echo ems_states_bundle('لا طلبات إدخال مسجلة بعد', 'ابدأ دورة الأصل بزر «طلب إدخال» في رأس الشاشة'); ?>
 
     <form id="iForm" action="" method="post" class="allforms">
         <?= csrf_field() ?>
@@ -140,7 +140,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <tr>
                 <td><div class="action-btns">
                     <?php if ($can_edit && in_array($r['state'], array('submitted', 'source_verified'), true)): ?>
-                        <a href="javascript:void(0)" class="action-btn edit w5-verify" data-id="<?= $iid ?>" title="تحقُّق من المصدر"><i class="fas fa-file-shield"></i></a>
+                        <a href="javascript:void(0)" class="action-btn edit w5-verify" data-id="<?= $iid ?>" title="تحقق من المصدر"><i class="fas fa-file-shield"></i></a>
                     <?php endif; ?>
                     <?php if ($can_edit && $passed > 0 && $r['state'] !== 'activated' && $r['state'] !== 'rejected'): ?>
                         <a href="javascript:void(0)" class="action-btn edit w5-order" data-id="<?= $iid ?>" title="أمر تفتيش"><i class="fas fa-clipboard-check"></i></a>
@@ -164,19 +164,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= htmlspecialchars((string) $r['reject_reason']) ?></td>
             </tr>
         <?php endforeach; else: ?>
-            <tr><td colspan="10">لا طلباتِ إدخالٍ بعدُ.</td></tr>
+            <tr><td colspan="10">لا طلبات إدخال بعد.</td></tr>
         <?php endif; ?>
         </tbody></table></div>
 
     <form id="vForm" action="" method="post" class="allforms">
         <?= csrf_field() ?>
         <input type="hidden" name="action" value="verify"><input type="hidden" name="intake_id" value="0">
-        <div class="card-header"><h5><i class="fas fa-file-shield"></i> واقعة تحقُّق من المصدر — ولا كرتَ قبلَ اجتيازِها</h5></div>
+        <div class="card-header"><h5><i class="fas fa-file-shield"></i> واقعة تحقق من المصدر — ولا كرت قبل اجتيازها</h5></div>
         <div class="ems-form-grid">
             <div class="field"><label for="w5_v_res">النتيجة</label><select name="verify_result" id="w5_v_res"><option value="passed">مجتازة</option><option value="failed">مخفقة</option></select></div>
             <div class="field"><label for="w5_v_dt">نوع المستند</label><input type="text" name="doc_type" id="w5_v_dt"></div>
             <div class="field"><label for="w5_v_dr">مرجع المستند</label><input type="text" name="doc_ref" id="w5_v_dr"></div>
-            <div class="field"><label for="w5_v_od">المالك المُعلَن</label><input type="text" name="owner_declared" id="w5_v_od"></div>
+            <div class="field"><label for="w5_v_od">المالك المعلن</label><input type="text" name="owner_declared" id="w5_v_od"></div>
             <div class="field"><label for="w5_v_ol">المالك القانوني</label><input type="text" name="owner_legal" id="w5_v_ol"></div>
             <div class="field"><label for="w5_v_fr">سبب الإخفاق</label><input type="text" name="fail_reason" id="w5_v_fr"></div>
         </div>
@@ -186,7 +186,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <form id="oForm" action="" method="post" class="allforms">
         <?= csrf_field() ?>
         <input type="hidden" name="action" value="order_inspection"><input type="hidden" name="intake_id" value="0">
-        <div class="card-header"><h5><i class="fas fa-clipboard-check"></i> أمر تفتيش — والتفتيشُ يبدأ بأمرٍ لا بزيارة</h5></div>
+        <div class="card-header"><h5><i class="fas fa-clipboard-check"></i> أمر تفتيش — والتفتيش يبدأ بأمر لا بزيارة</h5></div>
         <div class="ems-form-grid">
             <div class="field"><label for="w5_o_no">رقم الأمر</label><input type="text" name="order_no" id="w5_o_no" required></div>
             <div class="field"><label for="w5_o_rs">سبب التفتيش</label><select name="reason" id="w5_o_rs">

@@ -40,7 +40,7 @@ if (!$is_super_admin && empty($__pp['can_view'])) {
     exit();
 }
 if (!$is_super_admin && $_SERVER['REQUEST_METHOD'] === 'POST' && empty($__pp['can_add']) && empty($__pp['can_edit'])) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'غير مصرح بالكتابة في هذه الشاشة ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
+    ems_gov_flash_redirect('../main/dashboard.php', 'غير مصرح بالكتابة في هذه الشاشة ❌', 'GOV-PERM-403', 'اطلب المنحة من مدير الصلاحيات إن كانت ضمن عملك');
 }
 $COLS   = array (
   0 => 'رمز الحارس',
@@ -52,14 +52,14 @@ $COLS   = array (
   6 => 'رسالة المنع',
   7 => 'درجة الخطورة',
   8 => 'الموافقات المطلوبة للاستثناء',
-  9 => 'حالة العلَم',
-  10 => 'تاريخ قلب العلَم',
-  11 => 'صنّفها',
+  9 => 'حالة العلم',
+  10 => 'تاريخ قلب العلم',
+  11 => 'صنفها',
   12 => 'الحالة',
   13 => 'الكيان',
-  14 => 'المُنشئ — الاسم والصفة',
+  14 => 'المنشئ — الاسم والصفة',
   15 => 'تاريخ الإنشاء',
-  16 => 'المعتمِد — الاسم والصفة',
+  16 => 'المعتمد — الاسم والصفة',
   17 => 'تاريخ الاعتماد',
   18 => 'مرجع التفويض',
   19 => 'المرجع الأب',
@@ -75,11 +75,11 @@ $FIELDS = array (
   6 => 'رسالة المنع',
   7 => 'درجة الخطورة',
   8 => 'الموافقات المطلوبة للاستثناء',
-  9 => 'حالة العلَم',
-  10 => 'تاريخ قلب العلَم',
-  11 => 'صنّفها',
+  9 => 'حالة العلم',
+  10 => 'تاريخ قلب العلم',
+  11 => 'صنفها',
   12 => 'الحالة',
-  13 => 'المعتمِد — الاسم والصفة',
+  13 => 'المعتمد — الاسم والصفة',
   14 => 'تاريخ الاعتماد',
   15 => 'مرجع التفويض',
   16 => 'المرجع الأب',
@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     $creator = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
     // الموجة ٢: الحفظ في الجدول الأصلي للشاشة (الفارغ NULL — لا مخزن بينيًّا)
     $ok = cmp03_store_insert($conn, $company_id, $CANONICAL, $payload, $status, $uid, $creator);
-    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
+    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
     exit();
 }
 
@@ -112,7 +112,7 @@ $entityName = $govCtx['values']['entity'] ?? '—';
 function cmp03_cell($col, $row, $entityName) {
     $n = cmp03_screen_norm($col);
     if ($n === cmp03_screen_norm('الكيان')) { return $entityName; }
-    if ($n === cmp03_screen_norm('المُنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المُنشئة')) {
+    if ($n === cmp03_screen_norm('المنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المنشئة')) {
         return $row['created_by_name'] ?: '—';
     }
     if ($n === cmp03_screen_norm('تاريخ الإنشاء')) { return $row['created_at']; }
@@ -127,7 +127,7 @@ function cmp03_screen_norm($s) {
     $s = str_replace(array('أ','إ','آ'), 'ا', $s);
     $s = str_replace('ة', 'ه', $s);
     $s = str_replace('ى', 'ي', $s);
-    return preg_replace('/[ًٌٍَُِّْ]/u', '', $s);
+    return preg_replace('/[]/u', '', $s);
 }
 
 $page_title = 'إيكوبيشن | تصنيف قواعد المنع';
@@ -151,7 +151,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
-    echo ems_states_bundle('لا قواعدَ منعٍ مصنَّفةً بعد', 'سجِّل الحارسَ وصنِّف حمايتَه بزرِّ «إضافة» أعلى الشاشة');
+    echo ems_states_bundle('لا قواعد منع مصنفة بعد', 'سجل الحارس وصنف حمايته بزر «إضافة» أعلى الشاشة');
     ?>
 
     <!-- فورم الإضافة الموحد (ems-forms) — مطويٌّ حتى زرِّ الرأس -->
@@ -180,15 +180,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="f7" maxlength="190" id="emsf_604_05b4c"></div>
                 <div class="form-group"><label for="emsf_605_dd4d3">الموافقات المطلوبة للاستثناء</label>
                     <input type="text" name="f8" maxlength="190" id="emsf_605_dd4d3"></div>
-                <div class="form-group"><label for="emsf_606_4eb74">حالة العلَم</label>
+                <div class="form-group"><label for="emsf_606_4eb74">حالة العلم</label>
                     <input type="text" name="f9" maxlength="190" id="emsf_606_4eb74"></div>
-                <div class="form-group"><label for="emsf_607_b5362">تاريخ قلب العلَم</label>
+                <div class="form-group"><label for="emsf_607_b5362">تاريخ قلب العلم</label>
                     <input type="date" name="f10" id="emsf_607_b5362"></div>
-                <div class="form-group"><label for="emsf_608_b1be0">صنّفها</label>
+                <div class="form-group"><label for="emsf_608_b1be0">صنفها</label>
                     <input type="text" name="f11" maxlength="190" id="emsf_608_b1be0"></div>
                 <div class="form-group"><label for="emsf_609_6271c">الحالة</label>
                     <select name="f12" id="emsf_609_6271c"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
-                <div class="form-group"><label for="emsf_610_4078a">المعتمِد — الاسم والصفة</label>
+                <div class="form-group"><label for="emsf_610_4078a">المعتمد — الاسم والصفة</label>
                     <input type="text" name="f13" maxlength="190" id="emsf_610_4078a"></div>
                 <div class="form-group"><label for="emsf_611_7f699">تاريخ الاعتماد</label>
                     <input type="date" name="f14" id="emsf_611_7f699"></div>
@@ -219,22 +219,22 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th>رسالة المنع</th>
             <th>درجة الخطورة</th>
             <th>الموافقات المطلوبة للاستثناء</th>
-            <th>حالة العلَم</th>
-            <th>تاريخ قلب العلَم</th>
-            <th>صنّفها</th>
+            <th>حالة العلم</th>
+            <th>تاريخ قلب العلم</th>
+            <th>صنفها</th>
             <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
             <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
             <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
             <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
             <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
             </tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="21" class="text-center text-muted">لا بياناتَ بعدُ — أضف أول صفٍّ بزر «إضافة»</td></tr>
+                <tr><td colspan="21" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
                     <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>

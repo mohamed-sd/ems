@@ -78,8 +78,8 @@ class EventOutboxFanout
         $n = count($subs);
         if ($n === 0) {
             throw new \RuntimeException(
-                self::ERR_NO_CONSUMER . ': نوعُ الحدث «' . $eventCode . '» لا مشتركَ نشطًا له — '
-                . 'سجّلْ مستهلكَه في event_consumers قبلَ نشرِه. فالنشرُ بلا مستهلكٍ عملٌ ضائع (CK-11).'
+                self::ERR_NO_CONSUMER . ': نوع الحدث «' . $eventCode . '» لا مشترك نشطا له — '
+                . 'سجل مستهلكه في event_consumers قبل نشره. فالنشر بلا مستهلك عمل ضائع (CK-11).'
             );
         }
         return $n;

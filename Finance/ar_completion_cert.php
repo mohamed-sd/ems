@@ -38,10 +38,10 @@ $__pcPrep = ems_post_contract($conn, array(
         $p = (string) ($in['period'] ?? '');
         $q = (float) ($in['approved_qty'] ?? 0);
         $m = trim((string) ($in['measure_ref'] ?? ''));
-        if ($c <= 0) { return array('ok' => false, 'msg' => 'لا شهادةَ بلا عقدٍ مرجعيّ (422)'); }
-        if (!preg_match('/^\d{4}-\d{2}$/', $p)) { return array('ok' => false, 'msg' => 'الفترةُ بصيغةِ YYYY-MM (422)'); }
-        if ($q <= 0) { return array('ok' => false, 'msg' => 'الكميةُ المعتمدةُ يجب أن تكون موجبة (422)'); }
-        if ($m === '') { return array('ok' => false, 'msg' => 'لا شهادةَ إنجازٍ بلا مرجعِ قياسٍ معتمَد (422)'); }
+        if ($c <= 0) { return array('ok' => false, 'msg' => 'لا شهادة بلا عقد مرجعي (422)'); }
+        if (!preg_match('/^\d{4}-\d{2}$/', $p)) { return array('ok' => false, 'msg' => 'الفترة بصيغة YYYY-MM (422)'); }
+        if ($q <= 0) { return array('ok' => false, 'msg' => 'الكمية المعتمدة يجب أن تكون موجبة (422)'); }
+        if ($m === '') { return array('ok' => false, 'msg' => 'لا شهادة إنجاز بلا مرجع قياس معتمد (422)'); }
         return array('ok' => true, 'data' => array('contract_id' => $c, 'period' => $p,
             'claim_id' => intval($in['claim_id'] ?? 0), 'approved_qty' => $q,
             'unit_type' => (string) ($in['unit_type'] ?? 'hour'), 'measure_ref' => $m));
@@ -62,7 +62,7 @@ $__pcApp = ems_post_contract($conn, array(
     'idem'    => array('id' => intval($_POST['approve_cert'] ?? 0)),
     'validate' => function (array $in) {
         $id = intval($in['approve_cert'] ?? 0);
-        if ($id <= 0) { return array('ok' => false, 'msg' => 'شهادةٌ غيرُ صالحة (422)'); }
+        if ($id <= 0) { return array('ok' => false, 'msg' => 'شهادة غير صالحة (422)'); }
         return array('ok' => true, 'data' => array('id' => $id));
     },
 ));
@@ -90,7 +90,7 @@ $rows = array(); $queueFail = '';
 try {
     $rows = $gate->select('ar_completion_certs', array(
         'orderBy' => "`state` = 'prepared' DESC, `id` DESC", 'limit' => 200));
-} catch (\Throwable $e) { $queueFail = 'تعذّر قراءةُ الطابور: ' . $e->getMessage(); }
+} catch (\Throwable $e) { $queueFail = 'تعذر قراءة الطابور: ' . $e->getMessage(); }
 
 $page_title = 'شهادة الإنجاز الشهرية';
 require_once __DIR__ . '/../includes/screen_contract.php';
@@ -107,11 +107,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   $header_actions = array(array('raw' => trim((string) ob_get_clean())));
   $header_back = false;
   include __DIR__ . '/../includes/page_header.php';
-  echo ems_states_bundle('لا شهادةَ إنجازٍ مُعَدَّةٌ بعد',
-      'الشهادةُ تُعَدُّ من الأداءِ المعتمدِ بمرجعِ قياسٍ ثم تُعتمد — وعليها تُبنى الفاتورة');
+  echo ems_states_bundle('لا شهادة إنجاز معدة بعد',
+      'الشهادة تعد من الأداء المعتمد بمرجع قياس ثم تعتمد — وعليها تبنى الفاتورة');
   ?>
-  <p class="text-muted">العقدة ١٧ · السلّم <code>LD-06</code> · نسخةُ السلّم <code>LD-06-INST</code> —
-     مشتركةٌ مع العقدة ١٨، فلا طلبَ اعتمادٍ ثانٍ لمجرّدِ تقسيمِ الواجهة.</p>
+  <p class="text-muted">العقدة ١٧ · السلم <code>LD-06</code> · نسخة السلم <code>LD-06-INST</code> —
+     مشتركة مع العقدة ١٨، فلا طلب اعتماد ثان لمجرد تقسيم الواجهة.</p>
   <?php if ($msg !== ''): ?>
     <div class="alert <?= (mb_strpos($msg, '✅') !== false ? 'alert-success' : 'alert-danger') ?>">
       <?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div>
@@ -143,14 +143,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   <table class="table table-striped" data-no-dt>
     <thead><tr>
       <th>الإجراء</th><th>رقم الشهادة</th><th>الفترة</th><th>العقد</th><th>المطالبة</th>
-      <th>الكمية</th><th>مرجع القياس</th><th>الحالة</th><th>السلّم</th><th>أعدَّها</th><th>اعتمدها</th>
+      <th>الكمية</th><th>مرجع القياس</th><th>الحالة</th><th>السلم</th><th>أعدها</th><th>اعتمدها</th>
       <th class="ems-gov-th none" data-gov="entity" data-slice="1">الكيان</th>
       <th class="ems-gov-th none" data-gov="approved_at" data-slice="1">تاريخ الاعتماد</th>
       <th class="ems-gov-th none" data-gov="idem_key" data-slice="2">مفتاح منع التكرار</th>
     </tr></thead>
     <tbody>
     <?php if (empty($rows)): ?>
-      <tr><td colspan="11" class="text-center text-muted">لا شهادةَ إنجازٍ مُعَدَّةٌ بعد</td></tr>
+      <tr><td colspan="11" class="text-center text-muted">لا شهادة إنجاز معدة بعد</td></tr>
     <?php endif; ?>
     <?php foreach ($rows as $r): ?>
       <tr>

@@ -75,7 +75,7 @@ class PenaltyService
         $ctx = self::contractCtx($gate, $contractId);
         if ($ctx === null) {
             return array('ok' => false, 'computed' => 0, 'rows' => array(),
-                         'skipped' => array('العقدُ غير موجود أو خارج نطاق شركتك'));
+                         'skipped' => array('العقد غير موجود أو خارج نطاق شركتك'));
         }
 
         $rules = $gate->scopedQuery(array('scope' => array('r' => 'contract_penalty_rules')),
@@ -114,19 +114,19 @@ class PenaltyService
 
         // ── ق-11: لا احتسابَ قبل اكتمال الدورية ──
         if (!self::periodComplete($r['periodicity'], $from, $to, $ctx)) {
-            return array('skip' => $label . ': الدوريةُ لم تكتمل في هذه الفترة — يُؤجَّل الاحتسابُ ولا يُحتسب نسبيًّا (ق-11)');
+            return array('skip' => $label . ': الدورية لم تكتمل في هذه الفترة — يؤجل الاحتساب ولا يحتسب نسبيا (ق-11)');
         }
 
         $cm = null;
         if (!empty($r['commitment_ref'])) {
             $cm = self::commitment($gate, intval($r['commitment_ref']));
-            if ($cm === null) { return array('skip' => $label . ': البندُ الملتزَمُ المرساة غير موجود'); }
+            if ($cm === null) { return array('skip' => $label . ': البند الملتزم المرساة غير موجود'); }
         }
 
         // ── ق-15: اتجاهٌ واحد — لا غرامةَ إلا حين نكون نحن المقصّرين ──
         if ($kind === 'penalty' && $cm !== null && $cm['obliged_party'] !== 'company') {
-            return array('skip' => $label . ': الملتزمُ «' . $cm['obliged_party']
-                . '» لا الشركة — تقصيرُه تعالجه مصفوفةُ §4 لا محرّكُ الغرامة (ق-15)');
+            return array('skip' => $label . ': الملتزم «' . $cm['obliged_party']
+                . '» لا الشركة — تقصيره تعالجه مصفوفة §4 لا محرك الغرامة (ق-15)');
         }
 
         $currency = ($r['currency'] !== null && $r['currency'] !== '') ? $r['currency'] : $ctx['currency'];
@@ -144,15 +144,15 @@ class PenaltyService
             // ق-10: مبلغٌ مقطوعٌ بمعيارٍ يدويٍّ معتمد — لا اشتقاقَ من كمية
             $row['raw_amount'] = round((float) $r['fixed_amount'], 2);
             $row['amount'] = $row['raw_amount'];
-            if ($row['amount'] <= 0) { return array('skip' => $label . ': مبلغٌ مقطوعٌ غيرُ مسجَّل'); }
+            if ($row['amount'] <= 0) { return array('skip' => $label . ': مبلغ مقطوع غير مسجل'); }
             return $row;
         }
 
-        if ($cm === null) { return array('skip' => $label . ': القاعدةُ بلا بندٍ ملتزَمٍ مرساة — لا أساسَ للقياس'); }
+        if ($cm === null) { return array('skip' => $label . ': القاعدة بلا بند ملتزم مرساة — لا أساس للقياس'); }
 
         $price = self::unitPrice($gate, $contractId, $cm['unit_type']);
         if ($price === null || $price <= 0) {
-            return array('skip' => $label . ': لا سعرَ وحدةٍ في العقد لوحدة «' . $cm['unit_type'] . '» — لا تسعير ملفَّق');
+            return array('skip' => $label . ': لا سعر وحدة في العقد لوحدة «' . $cm['unit_type'] . '» — لا تسعير ملفق');
         }
         $committed = self::committedForPeriod((float) $cm['qty'], $cm['period'], $from, $to);
         $actual = self::actualQty($gate, $contractId, $cm['unit_type'], $from, $to);
@@ -165,20 +165,20 @@ class PenaltyService
         $row['base_amount'] = $base;
 
         if ($r['rule_kind'] === 'shortfall_pct') {
-            if ($row['gap_qty'] <= 0) { return array('skip' => $label . ': لا عجزَ في الفترة'); }
+            if ($row['gap_qty'] <= 0) { return array('skip' => $label . ': لا عجز في الفترة'); }
             $row['raw_amount'] = round($row['gap_qty'] * $price * ((float) $r['rate'] / 100), 2);
 
         } elseif ($r['rule_kind'] === 'readiness_min') {
             $rd = self::readiness($gate, $contractId, $from, $to);
-            if ($rd === null) { return array('skip' => $label . ': لا ساعاتِ ورديةٍ مسجَّلةٌ فتُقاس الجاهزية'); }
+            if ($rd === null) { return array('skip' => $label . ': لا ساعات وردية مسجلة فتقاس الجاهزية'); }
             $row['readiness_pct'] = round($rd, 2);
             if ($rd >= (float) $r['min_readiness_pct']) {
-                return array('skip' => $label . ': الجاهزيةُ ' . round($rd, 2) . '٪ بلغت العتبة ' . $r['min_readiness_pct'] . '٪');
+                return array('skip' => $label . ': الجاهزية ' . round($rd, 2) . '٪ بلغت العتبة ' . $r['min_readiness_pct'] . '٪');
             }
             $row['raw_amount'] = round($base * ((float) $r['rate'] / 100), 2);
 
         } elseif ($r['rule_kind'] === 'bonus_qty_pct') {
-            if ($row['gap_qty'] >= 0) { return array('skip' => $label . ': لا تجاوزَ للكمية الملتزَمة'); }
+            if ($row['gap_qty'] >= 0) { return array('skip' => $label . ': لا تجاوز للكمية الملتزمة'); }
             $excess = -$row['gap_qty'];
             $row['raw_amount'] = round($excess * $price * ((float) $r['rate'] / 100), 2);
         }
@@ -190,7 +190,7 @@ class PenaltyService
             $row['cap_amount'] = $cap;
             if ($row['amount'] > $cap) { $row['amount'] = $cap; }
         }
-        if ($row['amount'] <= 0) { return array('skip' => $label . ': المبلغُ المحتسبُ صفر'); }
+        if ($row['amount'] <= 0) { return array('skip' => $label . ': المبلغ المحتسب صفر'); }
         return $row;
     }
 
@@ -209,19 +209,19 @@ class PenaltyService
               ORDER BY c.id LIMIT 1", array($contractId));
         if (empty($rows)) { return null; }
         $cm = $rows[0];
-        $label = 'الحدُّ الأدنى المضمون (بند #' . $cm['id'] . ')';
+        $label = 'الحد الأدنى المضمون (بند #' . $cm['id'] . ')';
 
         if (!self::periodComplete($cm['period'], $from, $to, $ctx)) {
-            return array('skip' => $label . ': الدوريةُ لم تكتمل — يُؤجَّل (ق-11)');
+            return array('skip' => $label . ': الدورية لم تكتمل — يؤجل (ق-11)');
         }
         $price = self::unitPrice($gate, $contractId, $cm['unit_type']);
         if ($price === null || $price <= 0) {
-            return array('skip' => $label . ': لا سعرَ وحدةٍ في العقد لوحدة «' . $cm['unit_type'] . '»');
+            return array('skip' => $label . ': لا سعر وحدة في العقد لوحدة «' . $cm['unit_type'] . '»');
         }
         $committed = self::committedForPeriod((float) $cm['qty'], $cm['period'], $from, $to);
         $actual = self::actualQty($gate, $contractId, $cm['unit_type'], $from, $to);
         $gap = $committed - $actual;
-        if ($gap <= 0) { return array('skip' => $label . ': المنفَّذُ بلغ الحدَّ الأدنى فلا فارقَ يُفوتر'); }
+        if ($gap <= 0) { return array('skip' => $label . ': المنفذ بلغ الحد الأدنى فلا فارق يفوتر'); }
 
         return array(
             'kind' => 'min_guarantee', 'rule_id' => null, 'rule_kind' => 'min_guaranteed',
@@ -233,7 +233,7 @@ class PenaltyService
             'unit_price' => $price, 'base_amount' => round($committed * $price, 2),
             'raw_amount' => round($gap * $price, 2), 'cap_amount' => null,
             'amount' => round($gap * $price, 2),
-            'note' => 'فارقُ الحد الأدنى — بندٌ باسمه لا يُدسّ في كميات الوحدات (§5)',
+            'note' => 'فارق الحد الأدنى — بند باسمه لا يدس في كميات الوحدات (§5)',
         );
     }
 
@@ -245,12 +245,12 @@ class PenaltyService
     public static function review($gate, $companyId, $id, $actor)
     {
         $a = self::one($gate, $id);
-        if (!$a) { return array('ok' => false, 'reason' => 'الاحتسابُ غير موجود'); }
-        if ($a['state'] !== 'computed') { return array('ok' => false, 'reason' => 'لا يُراجَع إلا المحتسَبُ حديثًا'); }
+        if (!$a) { return array('ok' => false, 'reason' => 'الاحتساب غير موجود'); }
+        if ($a['state'] !== 'computed') { return array('ok' => false, 'reason' => 'لا يراجع إلا المحتسب حديثا'); }
         $gate->update('contract_penalty_assessments', array(
             'state' => 'reviewed', 'reviewed_by' => intval($actor), 'reviewed_at' => date('Y-m-d H:i:s'),
         ), array('id' => intval($id)), 'is_deleted = 0');
-        return array('ok' => true, 'reason' => 'روجِع وأُحيل إلى المالية للإجازة');
+        return array('ok' => true, 'reason' => 'روجع وأحيل إلى المالية للإجازة');
     }
 
     /**
@@ -260,12 +260,12 @@ class PenaltyService
     public static function approve($conn, $gate, $companyId, $id, $actor)
     {
         $a = self::one($gate, $id);
-        if (!$a) { return array('ok' => false, 'reason' => 'الاحتسابُ غير موجود'); }
+        if (!$a) { return array('ok' => false, 'reason' => 'الاحتساب غير موجود'); }
         if ($a['state'] !== 'reviewed') {
-            return array('ok' => false, 'reason' => 'لا يُجاز إلا ما راجعته المبيعاتُ أولًا (ق-13)');
+            return array('ok' => false, 'reason' => 'لا يجاز إلا ما راجعته المبيعات أولا (ق-13)');
         }
         if (intval($a['reviewed_by']) === intval($actor)) {
-            return array('ok' => false, 'reason' => 'لا اعتمادَ ذاتٍ: مَن راجع لا يُجيز');
+            return array('ok' => false, 'reason' => 'لا اعتماد ذات: من راجع لا يجيز');
         }
 
         $eventId = null;
@@ -278,18 +278,18 @@ class PenaltyService
         }, 'penalty approve');
 
         return array('ok' => true, 'event_id' => $eventId,
-                     'reason' => 'أُجيز ونُشر قيدُه — ويظهر بندًا في مستخلص الفترة');
+                     'reason' => 'أجيز ونشر قيده — ويظهر بندا في مستخلص الفترة');
     }
 
     /** الإعفاءُ بيد 19 **بسببٍ إلزاميٍّ موثَّق** (ق-13). */
     public static function waive($conn, $gate, $companyId, $id, $reason, $actor)
     {
         $reason = trim((string) $reason);
-        if ($reason === '') { return array('ok' => false, 'reason' => 'سببُ الإعفاء إلزاميٌّ وموثَّق (ق-13)'); }
+        if ($reason === '') { return array('ok' => false, 'reason' => 'سبب الإعفاء إلزامي وموثق (ق-13)'); }
         $a = self::one($gate, $id);
-        if (!$a) { return array('ok' => false, 'reason' => 'الاحتسابُ غير موجود'); }
+        if (!$a) { return array('ok' => false, 'reason' => 'الاحتساب غير موجود'); }
         if (in_array($a['state'], array('posted', 'waived'), true)) {
-            return array('ok' => false, 'reason' => 'لا يُعفى ما نُشر قيدُه أو أُعفي سلفًا');
+            return array('ok' => false, 'reason' => 'لا يعفى ما نشر قيده أو أعفي سلفا');
         }
         $gate->update('contract_penalty_assessments', array(
             'state' => 'waived', 'waive_reason' => mb_substr($reason, 0, 255),
@@ -298,7 +298,7 @@ class PenaltyService
 
         self::emit($conn, $companyId, intval($a['client_contract_id']), self::EVT_PENALTY_WAIVED, $actor,
             array('assessment_id' => intval($id), 'amount' => (float) $a['amount'], 'reason' => $reason));
-        return array('ok' => true, 'reason' => 'أُعفي بسببه الموثَّق — ولا يدخل المستخلص');
+        return array('ok' => true, 'reason' => 'أعفي بسببه الموثق — ولا يدخل المستخلص');
     }
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -318,8 +318,8 @@ class PenaltyService
 
         $key = ($kind === 'penalty') ? self::EVT_PENALTY_APPROVED : self::EVT_INCENTIVE_APPROVED;
         $unit = ($kind === 'min_guarantee') ? self::MIN_GUARANTEE_UNIT : $kind;
-        $noteMap = array('penalty' => 'غرامةٌ تعاقدية', 'incentive' => 'حافزٌ تعاقدي',
-                         'min_guarantee' => 'فارقُ الحد الأدنى المضمون');
+        $noteMap = array('penalty' => 'غرامة تعاقدية', 'incentive' => 'حافز تعاقدي',
+                         'min_guarantee' => 'فارق الحد الأدنى المضمون');
 
         $res = EventPublisher::publish($conn, array(
             'event_key' => $key,

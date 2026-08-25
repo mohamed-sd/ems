@@ -14,7 +14,7 @@ if (!isset($rb_pulse_series)) { $rb_pulse_series = array('وارد', 'صادر')
         <div class="card"><div class="card-body">
             <h5 style="margin:0 0 10px"><i class="fas fa-list-check"></i> مهامي</h5>
             <?php if (empty($rb_tasks)): ?>
-                <p class="text-muted" style="font-size:13px;margin:0">لا مهامَّ عاجلةً الآن ✔</p>
+                <p class="text-muted" style="font-size:13px;margin:0">لا مهام عاجلة الآن ✔</p>
             <?php else: foreach ($rb_tasks as $t): ?>
                 <a href="<?php echo htmlspecialchars($t['href']); ?>" style="display:flex;justify-content:space-between;align-items:center;padding:8px 4px;border-bottom:1px solid #f1f5f9;text-decoration:none;color:inherit">
                     <span style="font-size:13px"><i class="<?php echo htmlspecialchars($t['icon']); ?>" style="opacity:.6;margin-left:6px"></i><?php echo htmlspecialchars($t['label']); ?></span>
@@ -26,7 +26,7 @@ if (!isset($rb_pulse_series)) { $rb_pulse_series = array('وارد', 'صادر')
         <div class="card"><div class="card-body">
             <h5 style="margin:0 0 10px"><i class="fas fa-inbox"></i> موافقاتي</h5>
             <?php if (empty($rb_approvals)): ?>
-                <p class="text-muted" style="font-size:13px;margin:0">لا شيءَ ينتظر اعتمادك ✔</p>
+                <p class="text-muted" style="font-size:13px;margin:0">لا شيء ينتظر اعتمادك ✔</p>
             <?php else: foreach ($rb_approvals as $a): ?>
                 <a href="<?php echo htmlspecialchars($a['href']); ?>" style="display:flex;justify-content:space-between;align-items:center;padding:8px 4px;border-bottom:1px solid #f1f5f9;text-decoration:none;color:inherit">
                     <span style="font-size:13px"><i class="<?php echo htmlspecialchars($a['icon']); ?>" style="opacity:.6;margin-left:6px"></i><?php echo htmlspecialchars($a['label']); ?></span>
@@ -38,7 +38,7 @@ if (!isset($rb_pulse_series)) { $rb_pulse_series = array('وارد', 'صادر')
         <div class="card"><div class="card-body">
             <h5 style="margin:0 0 10px"><i class="fas fa-bell"></i> التنبيهات</h5>
             <?php if (empty($rb_alerts)): ?>
-                <p class="text-muted" style="font-size:13px;margin:0">لا متأخرَ ولا حرجَ الآن ✔</p>
+                <p class="text-muted" style="font-size:13px;margin:0">لا متأخر ولا حرج الآن ✔</p>
             <?php else: foreach ($rb_alerts as $al): $rbTone = $al['tone'] === 'err' ? '#991b1b' : '#92400e'; ?>
                 <a href="<?php echo htmlspecialchars($al['href']); ?>" style="display:flex;justify-content:space-between;align-items:center;padding:8px 4px;border-bottom:1px solid #f1f5f9;text-decoration:none;color:<?php echo $rbTone; ?>">
                     <span style="font-size:13px"><i class="fas fa-triangle-exclamation" style="margin-left:6px"></i><?php echo htmlspecialchars($al['label']); ?></span>
@@ -68,7 +68,7 @@ if (!isset($rb_pulse_series)) { $rb_pulse_series = array('وارد', 'صادر')
         <div class="card"><div class="card-body">
             <h5 style="margin:0 0 10px"><i class="fas fa-clock-rotate-left"></i> عملي الأخير</h5>
             <?php if (empty($rb_recent)): ?>
-                <p class="text-muted" style="font-size:13px;margin:0">لا نشاطَ مسجَّلًا بعد</p>
+                <p class="text-muted" style="font-size:13px;margin:0">لا نشاط مسجلا بعد</p>
             <?php else: foreach ($rb_recent as $rc):
                 $rcHref = preg_replace('#^.*?/ems/#', '../', (string)($rc['url'] ?? '')); if ($rcHref === '') { $rcHref = '#'; } ?>
                 <a href="<?php echo htmlspecialchars($rcHref); ?>" style="display:block;padding:6px 4px;border-bottom:1px solid #f1f5f9;text-decoration:none;color:inherit;font-size:13px">
@@ -94,7 +94,7 @@ if (!isset($rb_pulse_series)) { $rb_pulse_series = array('وارد', 'صادر')
         function draw() {
             if (window.EmsUI && typeof window.EmsUI.chartGuard === 'function') {
                 return window.EmsUI.chartGuard(__rbCanvas, __rbHas, drawChart,
-                    { emptyReason: 'لا حركةَ مسجَّلةً في هذه الفترة — الرسمُ لا يُعرض بمحاورَ افتراضية' });
+                    { emptyReason: 'لا حركة مسجلة في هذه الفترة — الرسم لا يعرض بمحاور افتراضية' });
             }
             /* المكوّنُ لم يُحمَّل بعد — انتظارٌ **محدود** لا لانهائيّ */
             if (!draw._n) { draw._n = 0; }

@@ -25,7 +25,7 @@ $type = isset($_GET['type']) ? trim($_GET['type']) : '';
 $shift_type = isset($_GET['shift']) ? trim($_GET['shift']) : '';
 if ($type !== '1' && $type !== '2' && $type !== '3') {
     while (ob_get_level()) ob_end_clean();
-    echo "<option value=''>-- اختر نوع الآلية أولاً --</option>";
+    echo "<option value=''>-- اختر نوع الآلية أولا --</option>";
     exit;
 }
 

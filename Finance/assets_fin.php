@@ -34,7 +34,7 @@ if (isset($_GET['run_dep'])) {
               ? (string) $_GET['period'] : date('Y-m', strtotime('first day of last month'));
     $r = DEP::runPeriod($conn, fin_gate($is_super_admin), $company_id, $period, $current_user_id, 'screen');
     $msg = $r['ok']
-        ? ($r['reason'] . ' · أحداثٌ منشورة: ' . $r['events'] . ' ✅')
+        ? ($r['reason'] . ' · أحداث منشورة: ' . $r['events'] . ' ✅')
         : ($r['code'] . ' — ' . $r['reason'] . ' ❌');
     ems_gov_flash_redirect('assets_fin.php', $msg, 'GOV-INFO-200', ''); exit();
 }
@@ -86,7 +86,7 @@ ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
-$state_lbl = array('active' => 'نشط', 'fully_depreciated' => 'مُهلَك بالكامل', 'disposed' => 'مستبعَد');
+$state_lbl = array('active' => 'نشط', 'fully_depreciated' => 'مهلك بالكامل', 'disposed' => 'مستبعد');
 ?>
 <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main fin-assets-main ems-unified-page-shell">
@@ -104,7 +104,7 @@ $state_lbl = array('active' => 'نشط', 'fully_depreciated' => 'مُهلَك ب
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا أصولَ ثابتةً مسجَّلةً بعدُ', 'أضفْ أصلًا بزرِّ «إضافة أصل» في رأسِ الشاشة ثمّ شغّلْ «استدراك الشهور الفائتة» لبناءِ سجلِّ إهلاكِه');
+    echo ems_states_bundle('لا أصول ثابتة مسجلة بعد', 'أضف أصلا بزر «إضافة أصل» في رأس الشاشة ثم شغل «استدراك الشهور الفائتة» لبناء سجل إهلاكه');
     ?>
     <?php fin_msg_banner(); ?>
 
@@ -116,7 +116,7 @@ $state_lbl = array('active' => 'نشط', 'fully_depreciated' => 'مُهلَك ب
             <div class="form-group"><label for="emsf_200_b6b52">اسم الأصل <span class="required">*</span></label><input type="text" name="name" required id="emsf_200_b6b52"></div>
             <div class="form-group"><label for="emsf_201_d1522">الفئة</label><input type="text" name="category" placeholder="معدات/مباني/سيارات" id="emsf_201_d1522"></div>
             <div class="form-group"><label for="emsf_202_b8ed1">المعدة المرتبطة</label><select name="equipment_id" id="emsf_202_b8ed1"><?php echo fin_equipment_options($conn, $is_super_admin, $company_id); ?></select></div>
-            <div class="form-group"><label for="emsf_203_c79d2">تاريخ الاقتناء</label><input type="date" name="acquisition_date" aria-label="تاريخُ اقتناءِ الأصل" id="emsf_203_c79d2" value="<?php echo date('Y-m-d'); ?>"></div>
+            <div class="form-group"><label for="emsf_203_c79d2">تاريخ الاقتناء</label><input type="date" name="acquisition_date" aria-label="تاريخ اقتناء الأصل" id="emsf_203_c79d2" value="<?php echo date('Y-m-d'); ?>"></div>
             <div class="form-group"><label for="emsf_204_98031">تكلفة الاقتناء <span class="required">*</span></label><input type="number" step="0.01" min="0" name="acquisition_cost" required id="emsf_204_98031"></div>
             <div class="form-group"><label for="emsf_205_1a728">القيمة التخريدية</label><input type="number" step="0.01" min="0" name="salvage_value" value="0" id="emsf_205_1a728"></div>
             <div class="form-group"><label for="emsf_206_d25e1">العمر الإنتاجي (شهر)</label><input type="number" min="1" name="useful_life_months" value="60" id="emsf_206_d25e1"></div>
@@ -128,13 +128,13 @@ $state_lbl = array('active' => 'نشط', 'fully_depreciated' => 'مُهلَك ب
 
     <div class="card"><div class="card-body">
         <p class="text-muted fin-ast-note"><i class="fas fa-circle-info"></i>
-            الإهلاك بطريقة القسط الثابت: (التكلفة − التخريدية) ÷ العمر الإنتاجي شهريًا —
-            <strong>حدثٌ دوريٌّ بمفتاح (الأصل × الفترة)</strong> لا يتكرر، ولا يقع
-            <strong>قبل شهر الاقتناء</strong> ولا في <strong>فترةٍ مقفلة</strong>.
-            وعمودُ «شهورٌ غير محتسَبة» يُري الفجوةَ — و«الاستدراك» يسدّها من شهر الاقتناء.</p>
+            الإهلاك بطريقة القسط الثابت: (التكلفة − التخريدية) ÷ العمر الإنتاجي شهريا —
+            <strong>حدث دوري بمفتاح (الأصل × الفترة)</strong> لا يتكرر، ولا يقع
+            <strong>قبل شهر الاقتناء</strong> ولا في <strong>فترة مقفلة</strong>.
+            وعمود «شهور غير محتسبة» يري الفجوة — و«الاستدراك» يسدها من شهر الاقتناء.</p>
         <div class="table-container">
             <table id="finTable" class="display nowrap alltables fin-ast-tbl" data-scroll-x="1" data-state-save="false">
-                <thead><tr><th>الإجراءات</th><th>كود المعدة</th><th>الأصل</th><th>الفئة</th><th>مركز التكلفة</th><th>مجمّع الإهلاك</th><th>القيمة الدفترية</th><th>العمر(شهر)</th><th>شهورٌ غير محتسَبة</th><th>الحالة</th>
+                <thead><tr><th>الإجراءات</th><th>كود المعدة</th><th>الأصل</th><th>الفئة</th><th>مركز التكلفة</th><th>مجمع الإهلاك</th><th>القيمة الدفترية</th><th>العمر(شهر)</th><th>شهور غير محتسبة</th><th>الحالة</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">رقم القيد</th>
               <th class="ems-fn-th" data-fn="1">طريقة الإهلاك</th>
@@ -152,17 +152,17 @@ $state_lbl = array('active' => 'نشط', 'fully_depreciated' => 'مُهلَك ب
               <th class="ems-fn-th none" data-fn="1">رقم القيد المحاسبي</th>
               <th class="ems-fn-th none" data-fn="1">نسخة القاعدة المستعملة</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-              <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
               <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-              <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+              <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
               <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
-              <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
-              <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطّلاع</th>
+              <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
+              <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطلاع</th>
               <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
               </tr></thead>
@@ -196,7 +196,7 @@ $state_lbl = array('active' => 'نشط', 'fully_depreciated' => 'مُهلَك ب
             </table>
         </div>
 
-        <h5 class="fin-ast-h5-next"><i class="fas fa-clock-rotate-left"></i> سجلّ الإهلاك</h5>
+        <h5 class="fin-ast-h5-next"><i class="fas fa-clock-rotate-left"></i> سجل الإهلاك</h5>
         <div class="table-container">
             <table id="depTable" class="display nowrap alltables fin-ast-tbl" data-scroll-x="1" data-state-save="false">
                 <thead><tr><th>الأصل</th><th>الفترة</th><th>مبلغ الإهلاك</th><th>تاريخ الاحتساب</th></tr></thead>

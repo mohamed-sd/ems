@@ -66,7 +66,7 @@ if ($myStages) {
         $items[] = array(
             'kind' => 'سلسلة الوحدة', 'ref' => $x['entry_no'],
             'title' => 'حلقة «' . $stageAr[$x['state']] . '» — ' . ($x['project_name'] ?: 'وحدة') . ' · ' . $x['entry_date'],
-            'age' => intval($x['age_d']) . ' يومًا', 'sla' => intval($x['age_d']) > 3 ? 'متجاوز' : 'ضمن المهلة',
+            'age' => intval($x['age_d']) . ' يوما', 'sla' => intval($x['age_d']) > 3 ? 'متجاوز' : 'ضمن المهلة',
             'link' => $link, 'action' => 'اعتمد في شاشة الحلقة',
         );
     }
@@ -83,8 +83,8 @@ while ($r && ($x = mysqli_fetch_assoc($r))) {
     $items[] = array(
         'kind' => 'طلب', 'ref' => $x['request_no'],
         'title' => $x['name_ar'] . ' — ' . $x['title'],
-        'age' => 'قُدّم ' . $x['submitted_at'], 'sla' => $late ? 'متجاوز' : ('مهلته ' . $x['sla_due_at']),
-        'link' => 'my_requests.php', 'action' => $x['status'] === 'approved' ? 'نفّذ وأغلق بالرد التسعة' : 'قرّر (اعتماد/إعادة/رفض)',
+        'age' => 'قدم ' . $x['submitted_at'], 'sla' => $late ? 'متجاوز' : ('مهلته ' . $x['sla_due_at']),
+        'link' => 'my_requests.php', 'action' => $x['status'] === 'approved' ? 'نفذ وأغلق بالرد التسعة' : 'قرر (اعتماد/إعادة/رفض)',
     );
 }
 
@@ -119,9 +119,9 @@ include '../insidebar.php';
     $header_back = false;
     include '../includes/page_header.php';
     require_once __DIR__ . '/../includes/screen_contract.php';
-    ems_screen_about('صندوقٌ واحدٌ لكل ما ينتظر قراري من كل المنابع — وكلُّ سطرٍ يقفز لموضع الفعل بحارسه.');
+    ems_screen_about('صندوق واحد لكل ما ينتظر قراري من كل المنابع — وكل سطر يقفز لموضع الفعل بحارسه.');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('صندوقُ موافقاتِك فارغٌ — لا قرارَ معلَّقًا عليك', 'ستظهر هنا حلقاتُ سلسلةِ الوحدةِ والطلباتُ وخطواتُ الاعتمادِ فورَ إسنادِها إليك أو إلى دورِك');
+    echo ems_states_bundle('صندوق موافقاتك فارغ — لا قرار معلقا عليك', 'ستظهر هنا حلقات سلسلة الوحدة والطلبات وخطوات الاعتماد فور إسنادها إليك أو إلى دورك');
     ?>
     <style>
     .apin-lead  { margin: 0 0 10px; }
@@ -129,22 +129,22 @@ include '../insidebar.php';
     </style>
     <div class="card"><div class="card-body">
         <p class="text-muted apin-lead">
-            <i class="fas fa-inbox"></i> <strong>صندوقٌ واحدٌ لكل ما ينتظر قرارك</strong> —
-            والقرارُ يقع في شاشة صاحبه بحارسه (WF-01): كلُّ سطرٍ يقفز لموضع الفعل، ولا سطرَ بلا إجراء (IAM-019).
+            <i class="fas fa-inbox"></i> <strong>صندوق واحد لكل ما ينتظر قرارك</strong> —
+            والقرار يقع في شاشة صاحبه بحارسه (WF-01): كل سطر يقفز لموضع الفعل، ولا سطر بلا إجراء (IAM-019).
             <?php /* ⑤ **لا يُكذَبُ بالسقف.** كان يُعرَض عددُ السطورِ المقصوصةِ على
                      ستِّينَ لكلِّ مكوِّنٍ فيقرأه المستخدمُ مجموعًا كاملًا، ورقمُ
                      البلاطةِ هو المجموعُ الصادق — فيختلفان بلا سببٍ ظاهر
                      (INJ-0587). فالآن يُعلَن الاثنان: الصادقُ ثم المعروض. */ ?>
             <span class="badge bg-warning"><?php echo (int) $__cnt['total']; ?> بانتظارك</span>
             <?php if (count($items) < (int) $__cnt['total']): ?>
-                <span class="badge bg-secondary" title="سقفُ العرضِ <?php echo (int) $__cap; ?> سطرًا لكلِّ منبعٍ — والرقمُ أعلاه هو المجموعُ الكامل">
-                    يُعرَض <?php echo count($items); ?> منها
+                <span class="badge bg-secondary" title="سقف العرض <?php echo (int) $__cap; ?> سطرا لكل منبع — والرقم أعلاه هو المجموع الكامل">
+                    يعرض <?php echo count($items); ?> منها
                 </span>
             <?php endif; ?>
             <?php if ((int) $__cnt['untyped'] > 0): ?>
                 <?php /* ② على حاملِها فعلٌ ونوعُها غيرُ مسجَّلٍ فلا سطرَ لها — تُعلَن ولا تُدفَن */ ?>
-                <span class="badge bg-danger" title="طلباتٌ عليك فيها فعلٌ ونوعُها غيرُ مسجَّلٍ في request_types فلا يُمكن عرضُها — تحتاج تسجيلَ نوعِها">
-                    <?php echo (int) $__cnt['untyped']; ?> بنوعٍ غيرِ مسجَّلٍ لا تُعرَض
+                <span class="badge bg-danger" title="طلبات عليك فيها فعل ونوعها غير مسجل في request_types فلا يمكن عرضها — تحتاج تسجيل نوعها">
+                    <?php echo (int) $__cnt['untyped']; ?> بنوع غير مسجل لا تعرض
                 </span>
             <?php endif; ?>
         </p>
@@ -153,10 +153,10 @@ include '../insidebar.php';
             <thead><tr><th>النوع</th><th>المرجع</th><th>ما ينتظر قرارك</th><th>العمر/التقديم</th>
                 <th>المهلة</th><th>الإجراء</th>
                 <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                 <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                 <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                 <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -164,7 +164,7 @@ include '../insidebar.php';
                 </tr></thead>
             <tbody>
             <?php if (!$items): ?>
-                <tr><td colspan="6" class="text-center text-muted">صندوقك فارغ — لا قرارَ معلَّقًا عليك</td></tr>
+                <tr><td colspan="6" class="text-center text-muted">صندوقك فارغ — لا قرار معلقا عليك</td></tr>
             <?php else: foreach ($items as $it): ?>
                 <tr>
                     <td><span class="badge bg-secondary"><?php echo htmlspecialchars($it['kind']); ?></span></td>

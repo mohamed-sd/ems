@@ -43,10 +43,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'fields_json' => json_encode(array('تفاصيل' => trim((string) ($_POST['details'] ?? ''))), JSON_UNESCAPED_UNICODE),
             'created_by' => $uid,
         ));
-        $msg = $r['ok'] ? ('قُدّم ' . $r['request_no'] . ' ✅') : ($r['reason'] . ' ❌');
+        $msg = $r['ok'] ? ('قدم ' . $r['request_no'] . ' ✅') : ($r['reason'] . ' ❌');
     } elseif ($act === 'rq_decide') {
         $r = RQ::decide($conn, intval($_POST['req_id'] ?? 0), (string) ($_POST['decision'] ?? ''), $uid, trim((string) ($_POST['note'] ?? '')));
-        $msg = $r['ok'] ? 'قُرّر ✅' : ($r['reason'] . ' ❌');
+        $msg = $r['ok'] ? 'قرر ✅' : ($r['reason'] . ' ❌');
     } elseif ($act === 'rq_execute') {
         $r = RQ::executeAndClose($conn, intval($_POST['req_id'] ?? 0), $uid, array(
             'decision' => 'approved',
@@ -57,10 +57,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'executed_summary' => trim((string) ($_POST['executed_summary'] ?? '')),
             'next_step' => trim((string) ($_POST['next_step'] ?? '')),
         ));
-        $msg = $r['ok'] ? 'نُفِّذ وأُغلق بالرد التسعة ✅' : ($r['reason'] . ' ❌');
+        $msg = $r['ok'] ? 'نفذ وأغلق بالرد التسعة ✅' : ($r['reason'] . ' ❌');
     } elseif ($act === 'rq_cancel') {
         $r = RQ::cancel($conn, intval($_POST['req_id'] ?? 0), $uid, trim((string) ($_POST['reason'] ?? '')));
-        $msg = $r['ok'] ? 'أُلغي وعُكس أثره ✅' : ($r['reason'] . ' ❌');
+        $msg = $r['ok'] ? 'ألغي وعكس أثره ✅' : ($r['reason'] . ' ❌');
     } else { $msg = 'فعل غير معروف ❌'; }
     ems_gov_flash_redirect('my_requests.php', $msg, 'GOV-INFO-200', '');
     exit();
@@ -103,15 +103,15 @@ if (isset($_GET['explain'])) {
         $isRequester = intval($exq['requester_user_id']) === $uid;
         $isHolder = intval($exq['current_holder_user_id']) === $uid;
         $explainRq = array('complete' => ($isRequester || $isHolder), 'steps' => array(
-            array('q' => 'ما أصلُ هذا العنصر؟', 'ok' => true,
-                  'a' => 'طلبٌ من قاموس الأنواع (' . $exq['request_type_code'] . ' · ' . $exq['type_name'] . ') — الورقة 04'),
-            array('q' => 'بأي قاعدةٍ وُجِّه؟', 'ok' => true,
-                  'a' => 'قاعدةُ القاموس: يستقبله وتعتمده سلسلتُه المعرَّفة — لا اجتهاد (WF-07)'),
-            array('q' => 'بأي صفةٍ أراه؟', 'ok' => ($isRequester || $isHolder),
-                  'a' => $isRequester ? 'أنت مقدِّمُه — تتابع أين توقف' : ($isHolder ? 'أنت حاملُه الحالي — القرارُ أو التنفيذُ عندك' : 'لستَ طرفَه — يُحجب')),
+            array('q' => 'ما أصل هذا العنصر؟', 'ok' => true,
+                  'a' => 'طلب من قاموس الأنواع (' . $exq['request_type_code'] . ' · ' . $exq['type_name'] . ') — الورقة 04'),
+            array('q' => 'بأي قاعدة وجه؟', 'ok' => true,
+                  'a' => 'قاعدة القاموس: يستقبله وتعتمده سلسلته المعرفة — لا اجتهاد (WF-07)'),
+            array('q' => 'بأي صفة أراه؟', 'ok' => ($isRequester || $isHolder),
+                  'a' => $isRequester ? 'أنت مقدمه — تتابع أين توقف' : ($isHolder ? 'أنت حامله الحالي — القرار أو التنفيذ عندك' : 'لست طرفه — يحجب')),
             array('q' => 'ما نطاقي فيه؟', 'ok' => true,
-                  'a' => 'كيانُك وسياقُ الطلب (إدارة/مشروع) — والعزلُ محقونٌ بنيويًّا'),
-            array('q' => 'أصالةً أم تفويضًا؟', 'ok' => true, 'a' => 'أصالةً بصفتك المذكورة'),
+                  'a' => 'كيانك وسياق الطلب (إدارة/مشروع) — والعزل محقون بنيويا'),
+            array('q' => 'أصالة أم تفويضا؟', 'ok' => true, 'a' => 'أصالة بصفتك المذكورة'),
         ));
     }
 }
@@ -131,11 +131,11 @@ include '../insidebar.php';
     $header_back = false;
     include '../includes/page_header.php';
     require_once __DIR__ . '/../includes/screen_contract.php';
-    ems_screen_about('أقدّم طلبًا من القاموس الحاكم وأتابع أين توقف — والمعالجةُ قرارٌ ثم تنفيذٌ بالرد التسعة لا تغييرُ حالة.');
+    ems_screen_about('أقدم طلبا من القاموس الحاكم وأتابع أين توقف — والمعالجة قرار ثم تنفيذ بالرد التسعة لا تغيير حالة.');
 
     if (isset($_GET['msg'])) { echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>'; }
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لم تقدّم طلبًا بعدُ ولا ينتظر قرارَك طلب', 'قدّم طلبًا من نموذجِ «تقديم طلب — من القاموس الحاكم» أعلاه');
+    echo ems_states_bundle('لم تقدم طلبا بعد ولا ينتظر قرارك طلب', 'قدم طلبا من نموذج «تقديم طلب — من القاموس الحاكم» أعلاه');
     ?>
 
     <style>
@@ -176,7 +176,7 @@ include '../insidebar.php';
     <?php endif; ?>
 
     <div class="card mrq-card">
-        <div class="card-header"><strong><i class="fas fa-plus-circle"></i> تقديم طلب — من القاموس الحاكم (<?php echo count($types); ?> نوعًا)</strong></div>
+        <div class="card-header"><strong><i class="fas fa-plus-circle"></i> تقديم طلب — من القاموس الحاكم (<?php echo count($types); ?> نوعا)</strong></div>
         <div class="card-body">
             <form method="post" class="mrq-newform">
         <?= csrf_field() ?>
@@ -187,7 +187,7 @@ include '../insidebar.php';
                         <option value="">— اختر —</option>
                         <?php foreach ($types as $t): ?>
                         <option value="<?php echo htmlspecialchars($t['code']); ?>"
-                            data-hint="يستقبله: <?php echo htmlspecialchars($t['receiver']); ?> · السلسلة: <?php echo htmlspecialchars($t['approval_chain']); ?> · المهلة <?php echo intval($t['sla_hours']); ?> ساعة · المخرَج: <?php echo htmlspecialchars($t['deliverable']); ?>">
+                            data-hint="يستقبله: <?php echo htmlspecialchars($t['receiver']); ?> · السلسلة: <?php echo htmlspecialchars($t['approval_chain']); ?> · المهلة <?php echo intval($t['sla_hours']); ?> ساعة · المخرج: <?php echo htmlspecialchars($t['deliverable']); ?>">
                             <?php echo htmlspecialchars($t['code'] . ' · ' . $t['name_ar']); ?></option>
                         <?php endforeach; ?>
                     </select></div>
@@ -208,7 +208,7 @@ include '../insidebar.php';
             <span class="badge bg-warning"><?php echo count($inboxRows); ?></span></div>
         <div class="card-body"><div class="table-responsive">
             <table class="alltables display no-datatable mrq-table">
-                <thead><tr><th>الرقم</th><th>النوع</th><th>الموضوع</th><th>المقدّم منذ</th><th>مهلته</th><th>الحالة</th><th>المعالجة</th></tr></thead>
+                <thead><tr><th>الرقم</th><th>النوع</th><th>الموضوع</th><th>المقدم منذ</th><th>مهلته</th><th>الحالة</th><th>المعالجة</th></tr></thead>
                 <tbody><?php foreach ($inboxRows as $q): $id = intval($q['id']); ?>
                 <tr>
                     <td><code><?php echo htmlspecialchars((string) $q['request_no']); ?></code></td>
@@ -225,18 +225,18 @@ include '../insidebar.php';
                             <details class="mrq-ib"><summary class="btn btn-sm btn-danger mrq-ib">رفض/إعادة</summary>
                                 <form method="post" class="mrq-subform">
         <?= csrf_field() ?><input type="hidden" name="action" value="rq_decide"><input type="hidden" name="req_id" value="<?php echo $id; ?>">
-                                    <select name="decision" aria-label="نوعُ القرار — إعادةٌ لاستكمالٍ أو رفض" class="form-control form-control-sm mrq-mb4"><option value="return">إعادة لاستكمال</option><option value="reject">رفض</option></select>
+                                    <select name="decision" aria-label="نوع القرار — إعادة لاستكمال أو رفض" class="form-control form-control-sm mrq-mb4"><option value="return">إعادة لاستكمال</option><option value="reject">رفض</option></select>
                                     <input name="note" class="form-control form-control-sm mrq-mb4" placeholder="السبب (إلزامي)" required aria-label="السبب (إلزامي)">
                                     <button class="btn btn-sm btn-danger">تأكيد</button></form></details>
                         <?php elseif ($q['status'] === 'approved'): ?>
                             <details><summary class="btn btn-sm btn-primary">تنفيذ وإغلاق (الرد التسعة)</summary>
                                 <form method="post" class="mrq-subform-wide">
         <?= csrf_field() ?><input type="hidden" name="action" value="rq_execute"><input type="hidden" name="req_id" value="<?php echo $id; ?>">
-                                    <input name="result_doc_ref" aria-label="المستندُ الناتجُ عن التنفيذ (إلزامي)" class="form-control form-control-sm mrq-mb4" placeholder="⑦ المستند الناتج (إلزامي)" required>
-                                    <input name="executed_summary" aria-label="ملخصُ التنفيذِ الذي تم (إلزامي)" class="form-control form-control-sm mrq-mb4" placeholder="⑧ التنفيذ الذي تم (إلزامي)" required>
-                                    <input name="action_required" aria-label="الإجراءُ المطلوبُ فعلُه" class="form-control form-control-sm mrq-mb4" placeholder="⑥ ما يجب فعله">
-                                    <input name="next_step" aria-label="الخطوةُ اللاحقة" class="form-control form-control-sm mrq-mb4" placeholder="⑨ الخطوة اللاحقة">
-                                    <input name="notes" aria-label="ملاحظاتُ الرد" class="form-control form-control-sm mrq-mb4" placeholder="⑤ الملاحظات">
+                                    <input name="result_doc_ref" aria-label="المستند الناتج عن التنفيذ (إلزامي)" class="form-control form-control-sm mrq-mb4" placeholder="⑦ المستند الناتج (إلزامي)" required>
+                                    <input name="executed_summary" aria-label="ملخص التنفيذ الذي تم (إلزامي)" class="form-control form-control-sm mrq-mb4" placeholder="⑧ التنفيذ الذي تم (إلزامي)" required>
+                                    <input name="action_required" aria-label="الإجراء المطلوب فعله" class="form-control form-control-sm mrq-mb4" placeholder="⑥ ما يجب فعله">
+                                    <input name="next_step" aria-label="الخطوة اللاحقة" class="form-control form-control-sm mrq-mb4" placeholder="⑨ الخطوة اللاحقة">
+                                    <input name="notes" aria-label="ملاحظات الرد" class="form-control form-control-sm mrq-mb4" placeholder="⑤ الملاحظات">
                                     <button class="btn btn-sm btn-primary">إغلاق بالرد الكامل</button></form></details>
                         <?php endif; ?>
                     </td>
@@ -248,16 +248,16 @@ include '../insidebar.php';
     <?php endif; ?>
 
     <div class="card"><div class="card-body">
-        <h6><i class="fas fa-list"></i> طلباتي المقدَّمة — وكلُّ طلبٍ يُعرف أين توقف (AC-WFM-07)</h6>
+        <h6><i class="fas fa-list"></i> طلباتي المقدمة — وكل طلب يعرف أين توقف (AC-WFM-07)</h6>
         <div class="table-responsive">
         <table class="alltables display" id="myRequestsTable">
-            <thead><tr><th>الرقم</th><th>النوع</th><th>الموضوع</th><th>قُدّم</th><th>الحالة</th>
-                <th>عند مَن الآن</th><th>القرار والرد</th><th>إجراء</th>
+            <thead><tr><th>الرقم</th><th>النوع</th><th>الموضوع</th><th>قدم</th><th>الحالة</th>
+                <th>عند من الآن</th><th>القرار والرد</th><th>إجراء</th>
                 <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                 <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                 <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                 <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -272,7 +272,7 @@ include '../insidebar.php';
                 <td><?php echo htmlspecialchars((string) $q['submitted_at']); ?></td>
                 <td><?php echo htmlspecialchars($STATE_AR[$q['status']] ?? $q['status']); ?>
                     <?php if ($q['status_reason']): ?><div class="mrq-reason"><?php echo htmlspecialchars((string) $q['status_reason']); ?></div><?php endif; ?></td>
-                <td><?php echo htmlspecialchars((string) ($q['holder_name'] ?: ($q['status'] === 'closed' ? 'أُغلق' : '—'))); ?></td>
+                <td><?php echo htmlspecialchars((string) ($q['holder_name'] ?: ($q['status'] === 'closed' ? 'أغلق' : '—'))); ?></td>
                 <td class="mrq-resp">
                     <?php if ($q['resp_decision']): ?>
                         <strong><?php echo htmlspecialchars((string) $q['resp_decision']); ?></strong>

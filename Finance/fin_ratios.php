@@ -10,10 +10,10 @@ $FA_SCREEN = array(
     'file' => 'fin_ratios.php',
     'title' => 'لوحة النسب المالية',
     'icon' => 'fas fa-chart-line',
-    'about' => 'أربعٌ وأربعون نسبةً في إحدى عشرةَ مجموعةً — محسوبةٌ من القيودِ لا من إدخالٍ يدويّ. وكلُّ نسبةٍ بحدِّ إنذارٍ وحدٍّ حرجٍ ومالكٍ ودورية، والرقمُ يفتح مصدرَه.',
+    'about' => 'أربع وأربعون نسبة في إحدى عشرة مجموعة — محسوبة من القيود لا من إدخال يدوي. وكل نسبة بحد إنذار وحد حرج ومالك ودورية، والرقم يفتح مصدره.',
     'notes' => array (
-  0 => 'المقامُ صفرٌ ⇒ شرطةٌ لا صفرٌ كاذب — والحالةُ «غيرُ مقيسة»',
-  1 => 'انقر النسبةَ لتتعمّق إلى حساباتِها ثم قيودِها ثم وقائعِها المصدر',
+  0 => 'المقام صفر ⇒ شرطة لا صفر كاذب — والحالة «غير مقيسة»',
+  1 => 'انقر النسبة لتتعمق إلى حساباتها ثم قيودها ثم وقائعها المصدر',
 ),
     'context' => array(),
     'filters' => '',
@@ -38,14 +38,14 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
     foreach ($rows as $x) { $f = $x['status_flag'] ?: 'unmeasured'; $byFlag[$f] = ($byFlag[$f] ?? 0) + 1; }
 ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
-    <?php echo ems_states_bundle('لا توجد بياناتٌ لهذه الفترة', 'غيّر الفترةَ أو تحقق من توفرِ السجلات'); ?>
+    <?php echo ems_states_bundle('لا توجد بيانات لهذه الفترة', 'غير الفترة أو تحقق من توفر السجلات'); ?>
     <?php if (!$rows): /* حالةُ الفراغِ تُعرض بدل أصفارِ العدّاداتِ والجدولِ الخالي — والأفعالُ تبقى متاحة */ ?>
     <div class="card"><div class="card-body">
-        <?php echo ems_state('empty', 'لا توجد بياناتٌ لهذه الفترة', 'غيّر الفترةَ أو تحقق من توفرِ السجلات'); ?>
+        <?php echo ems_state('empty', 'لا توجد بيانات لهذه الفترة', 'غير الفترة أو تحقق من توفر السجلات'); ?>
         <?php if ($can_write): ?>
         <div class="fa-kpi-row">
             <button class="ems-btn-primary" onclick="faPost('ratio_compute', {})">احتساب النسب للفترة</button>
-            <button class="ems-btn-secondary" onclick="faPost('signal_raise', {}, function(j){ alert('قواعدُ فُحصت: ' + j.checked + ' · إشاراتٌ رُفعت: ' + j.raised.length); location.reload(); })">تقييم إشارات الإنذار</button>
+            <button class="ems-btn-secondary" onclick="faPost('signal_raise', {}, function(j){ alert('قواعد فحصت: ' + j.checked + ' · إشارات رفعت: ' + j.raised.length); location.reload(); })">تقييم إشارات الإنذار</button>
         </div>
         <?php endif; ?>
     </div></div>
@@ -57,7 +57,7 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
         <span class="badge badge-secondary fa-kpi-badge">غير مقيسة: <strong><?php echo $byFlag['unmeasured']; ?></strong></span>
         <?php if ($can_write): ?>
         <button class="ems-btn-primary" onclick="faPost('ratio_compute', {})">احتساب النسب للفترة</button>
-        <button class="ems-btn-secondary" onclick="faPost('signal_raise', {}, function(j){ alert('قواعدُ فُحصت: ' + j.checked + ' · إشاراتٌ رُفعت: ' + j.raised.length); location.reload(); })">تقييم إشارات الإنذار</button>
+        <button class="ems-btn-secondary" onclick="faPost('signal_raise', {}, function(j){ alert('قواعد فحصت: ' + j.checked + ' · إشارات رفعت: ' + j.raised.length); location.reload(); })">تقييم إشارات الإنذار</button>
         <?php endif; ?>
     </div></div>
 
@@ -88,7 +88,7 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
                     <td class="fa-cell-sm"><?php echo htmlspecialchars($x['owner_role']); ?></td>
                     <td><?php echo $x['numerator_value'] !== null ? number_format((float)$x['numerator_value'], 2) : '—'; ?></td>
                     <td><?php echo $x['denominator_value'] !== null ? number_format((float)$x['denominator_value'], 2) : '—'; ?></td>
-                    <td><a class="btn-primary" href="fin_ratio_detail.php?ratio=<?php echo urlencode($x['ratio_code']); ?>&period=<?php echo urlencode($period); ?>">تعمّق ▸</a></td>
+                    <td><a class="btn-primary" href="fin_ratio_detail.php?ratio=<?php echo urlencode($x['ratio_code']); ?>&period=<?php echo urlencode($period); ?>">تعمق ▸</a></td>
                     <td><?php echo (int) $company_id; ?></td>
                     <td><?php echo htmlspecialchars($period); ?></td>
                 </tr>

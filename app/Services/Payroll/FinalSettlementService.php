@@ -66,19 +66,19 @@ class FinalSettlementService
                      'basis' => array(), 'snapshot_id' => null, 'fingerprint' => null);
 
         $c = self::contractOf($gate, (int) $contractId);
-        if (!$c) { $out['code'] = 404; $out['reason'] = 'عقدُ الموظف غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!$c) { $out['code'] = 404; $out['reason'] = 'عقد الموظف غير موجود في نطاقك'; return $out; }
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', (string) $effectiveDate)) {
-            $out['code'] = 422; $out['reason'] = 'تاريخُ الأثر إلزاميٌّ بصيغة Y-m-d'; return $out;
+            $out['code'] = 422; $out['reason'] = 'تاريخ الأثر إلزامي بصيغة Y-m-d'; return $out;
         }
 
         $start = (string) $c['start_date'];
         if ($start === '' || $start === '0000-00-00') {
             $out['code'] = 422;
-            $out['reason'] = 'العقدُ بلا تاريخِ بداية — ومدةُ الخدمة لا تُقدَّر (§5)';
+            $out['reason'] = 'العقد بلا تاريخ بداية — ومدة الخدمة لا تقدر (§5)';
             return $out;
         }
         if ($effectiveDate < $start) {
-            $out['code'] = 422; $out['reason'] = 'تاريخُ الأثر قبل بداية العقد'; return $out;
+            $out['code'] = 422; $out['reason'] = 'تاريخ الأثر قبل بداية العقد'; return $out;
         }
         $days  = (strtotime($effectiveDate) - strtotime($start)) / 86400.0;
         $years = round($days / 365.25, 3);
@@ -88,7 +88,7 @@ class FinalSettlementService
             $conn, $gate, $companyId, (int) $c['id'], (string) $effectiveDate, $actor);
         if (!$snap['ok']) {
             $out['code'] = $snap['code'];
-            $out['reason'] = 'لا لقطةَ صالحةً للاحتساب — «بقاعدتها **من اللقطة**» (§5): ' . $snap['reason'];
+            $out['reason'] = 'لا لقطة صالحة للاحتساب — «بقاعدتها **من اللقطة**» (§5): ' . $snap['reason'];
             return $out;
         }
         $out['snapshot_id'] = $snap['id'];
@@ -117,52 +117,52 @@ class FinalSettlementService
         $dues = self::openDues($gate, (int) $c['employee_id'], (string) $effectiveDate);
         $out['lines'][] = array(
             'line_type' => 'dues', 'computable' => 1,
-            'description' => 'المستحقُّ حتى تاريخ الأثر',
+            'description' => 'المستحق حتى تاريخ الأثر',
             'qty' => null, 'rate' => null, 'amount' => $dues,
-            'source_note' => 'ذممٌ دائنةٌ غيرُ مسوّاةٍ في `fin_dues` حتى ' . $effectiveDate
-                           . ' — **اعتُرف بها في مصدرها** فتُعرض ولا يُعاد الاعترافُ بها');
+            'source_note' => 'ذمم دائنة غير مسواة في `fin_dues` حتى ' . $effectiveDate
+                           . ' — **اعترف بها في مصدرها** فتعرض ولا يعاد الاعتراف بها');
 
         // ── رصيدُ الإجازات ──────────────────────────────────────────────────
         $leaveAmount = 0.0; $leaveDays = null; $leaveRate = null; $leaveOk = 1; $leaveNote = '';
         if ($basis['leave_days_per_year'] === null) {
             $leaveOk = 0;
-            $leaveNote = '⚠ **لا قاعدةَ أيامِ إجازةٍ مكتوبةً في العقد** — لا تُحتسب ولا تُقدَّر';
+            $leaveNote = '⚠ **لا قاعدة أيام إجازة مكتوبة في العقد** — لا تحتسب ولا تقدر';
         } elseif ($leave['base'] <= 0) {
             $leaveOk = 0;
-            $leaveNote = '⚠ **لا مكوّنَ أجرٍ بعلَم `in_leave_pay` في اللقطة** — فلا أساسَ لأجر الإجازة';
+            $leaveNote = '⚠ **لا مكون أجر بعلم `in_leave_pay` في اللقطة** — فلا أساس لأجر الإجازة';
         } else {
             $accrued   = round($basis['leave_days_per_year'] * $years, 2);
             $taken     = self::leaveDaysTaken($gate, (int) $c['employee_id'], $start, (string) $effectiveDate);
             $leaveDays = round(max(0.0, $accrued - $taken), 2);
             $leaveRate = round($leave['base'] / self::MONTH_DAYS, 2);
             $leaveAmount = round($leaveDays * $leaveRate, 2);
-            $leaveNote = 'مستحقٌّ ' . $accrued . ' يومًا − مأخوذٌ ' . $taken . ' = ' . $leaveDays
-                       . ' × أجرٍ يوميٍّ ' . $leaveRate . ' (أساسُ `in_leave_pay` ' . $leave['base'] . ')';
+            $leaveNote = 'مستحق ' . $accrued . ' يوما − مأخوذ ' . $taken . ' = ' . $leaveDays
+                       . ' × أجر يومي ' . $leaveRate . ' (أساس `in_leave_pay` ' . $leave['base'] . ')';
         }
         $out['lines'][] = array(
             'line_type' => 'leave', 'computable' => $leaveOk,
-            'description' => 'رصيدُ الإجازات', 'qty' => $leaveDays, 'rate' => $leaveRate,
+            'description' => 'رصيد الإجازات', 'qty' => $leaveDays, 'rate' => $leaveRate,
             'amount' => $leaveAmount, 'source_note' => $leaveNote);
 
         // ── نهايةُ الخدمة بقاعدتها ─────────────────────────────────────────
         $eosAmount = 0.0; $eosDays = null; $eosRate = null; $eosOk = 1; $eosNote = '';
         if ($basis['eos_days_per_year'] === null) {
             $eosOk = 0;
-            $eosNote = '⚠ **لا قاعدةَ نهاية خدمةٍ مكتوبةً في العقد** — لا تُحتسب ولا تُقدَّر';
+            $eosNote = '⚠ **لا قاعدة نهاية خدمة مكتوبة في العقد** — لا تحتسب ولا تقدر';
         } elseif ($eos['base'] <= 0) {
             $eosOk = 0;
-            $eosNote = '⚠ **لا مكوّنَ أجرٍ بعلَم `in_eos` في اللقطة** — فلا أساسَ لنهاية الخدمة';
+            $eosNote = '⚠ **لا مكون أجر بعلم `in_eos` في اللقطة** — فلا أساس لنهاية الخدمة';
         } else {
             $eosDays = round($basis['eos_days_per_year'] * $years, 2);
             $eosRate = round($eos['base'] / self::MONTH_DAYS, 2);
             $eosAmount = round($eosDays * $eosRate, 2);
-            $eosNote = $basis['eos_days_per_year'] . ' يومًا × ' . $years . ' سنةَ خدمةٍ = ' . $eosDays
-                     . ' × أجرٍ يوميٍّ ' . $eosRate . ' (أساسُ `in_eos` ' . $eos['base']
+            $eosNote = $basis['eos_days_per_year'] . ' يوما × ' . $years . ' سنة خدمة = ' . $eosDays
+                     . ' × أجر يومي ' . $eosRate . ' (أساس `in_eos` ' . $eos['base']
                      . ' · لقطة #' . (int) $snap['id'] . ')';
         }
         $out['lines'][] = array(
             'line_type' => 'eos', 'computable' => $eosOk,
-            'description' => 'نهايةُ الخدمة', 'qty' => $eosDays, 'rate' => $eosRate,
+            'description' => 'نهاية الخدمة', 'qty' => $eosDays, 'rate' => $eosRate,
             'amount' => $eosAmount, 'source_note' => $eosNote);
 
         // ── ④ المقاصّةُ ظاهرةٌ ومحدودة ─────────────────────────────────────
@@ -170,15 +170,15 @@ class FinalSettlementService
         $balance   = self::advanceBalance($gate, (int) $c['employee_id']);
         $offset    = round(min($balance, $entitled), 2);
         $remaining = round($balance - $offset, 2);
-        $offNote = 'رصيدٌ مفتوحٌ في `employee_advances` ' . $balance
-                 . ' — **يُطرح ظاهرًا لا صامتًا**';
+        $offNote = 'رصيد مفتوح في `employee_advances` ' . $balance
+                 . ' — **يطرح ظاهرا لا صامتا**';
         if ($remaining > 0) {
-            $offNote .= ' · **والمقاصّةُ لا تتجاوز المستحقَّ ' . $entitled . '**: يبقى '
-                      . $remaining . ' رصيدًا مفتوحًا يُعلَن ولا يُسقَط';
+            $offNote .= ' · **والمقاصة لا تتجاوز المستحق ' . $entitled . '**: يبقى '
+                      . $remaining . ' رصيدا مفتوحا يعلن ولا يسقط';
         }
         $out['lines'][] = array(
             'line_type' => 'advance_offset', 'computable' => 1,
-            'description' => 'مقاصّةُ السلف والعهد', 'qty' => null, 'rate' => null,
+            'description' => 'مقاصة السلف والعهد', 'qty' => null, 'rate' => null,
             'amount' => $offset, 'source_note' => $offNote);
 
         $out['totals']['dues'] = $dues;
@@ -203,18 +203,18 @@ class FinalSettlementService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'settlement_id' => null, 'net' => 0.0);
         $c = self::contractOf($gate, (int) $contractId);
-        if (!$c) { $out['code'] = 404; $out['reason'] = 'عقدُ الموظف غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!$c) { $out['code'] = 404; $out['reason'] = 'عقد الموظف غير موجود في نطاقك'; return $out; }
 
         if (!in_array((string) $c['state'], self::CLOSABLE_STATES, true)) {
             $out['code'] = 422;
-            $out['reason'] = 'العقدُ في حالة «' . $c['state'] . '» — و**التصفيةُ يفتحها الإنهاء** '
-                           . '(ENT-01 §5): أنهِ العقدَ ثم صفِّ';
+            $out['reason'] = 'العقد في حالة «' . $c['state'] . '» — و**التصفية يفتحها الإنهاء** '
+                           . '(ENT-01 §5): أنه العقد ثم صف';
             return $out;
         }
         $ex = self::byContract($gate, (int) $contractId);
         if ($ex) {
             $out['code'] = 409; $out['settlement_id'] = (int) $ex['id'];
-            $out['reason'] = 'للعقد تصفيةٌ قائمةٌ #' . $ex['id'] . ' («بمفتاح العقد × التصفية»)';
+            $out['reason'] = 'للعقد تصفية قائمة #' . $ex['id'] . ' («بمفتاح العقد × التصفية»)';
             return $out;
         }
 
@@ -244,7 +244,7 @@ class FinalSettlementService
                     'state'             => 'draft',
                     'prepared_by'       => (int) $actor ?: null,
                 ));
-                if ($sid <= 0) { throw new \RuntimeException('تعذّر إدراجُ رأس التصفية'); }
+                if ($sid <= 0) { throw new \RuntimeException('تعذر إدراج رأس التصفية'); }
                 foreach ($calc['lines'] as $l) {
                     $g->insert('employee_final_settlement_lines', array(
                         'settlement_id' => $sid,
@@ -259,7 +259,7 @@ class FinalSettlementService
                 }
             }, 'تصفية إنهاء خدمة عقد ' . $contractId);
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الفتح: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الفتح: ' . $t->getMessage(); return $out;
         }
 
         self::audit($conn, $companyId, $actor, 'create', (int) $sid, array(),
@@ -278,21 +278,21 @@ class FinalSettlementService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'due_id' => null, 'recovered' => 0.0);
         $s = self::head($gate, (int) $settlementId);
-        if (!$s) { $out['code'] = 404; $out['reason'] = 'التصفيةُ غيرُ موجودةٍ في نطاقك'; return $out; }
+        if (!$s) { $out['code'] = 404; $out['reason'] = 'التصفية غير موجودة في نطاقك'; return $out; }
         if ((string) $s['state'] !== 'draft') {
-            $out['code'] = 409; $out['reason'] = 'التصفيةُ ليست مسودةً (حالُها: ' . $s['state'] . ')'; return $out;
+            $out['code'] = 409; $out['reason'] = 'التصفية ليست مسودة (حالها: ' . $s['state'] . ')'; return $out;
         }
         if ($s['net_due_ref'] !== null) {
             $out['code'] = 409; $out['due_id'] = (int) $s['net_due_ref'];
-            $out['reason'] = 'للتصفية حدثٌ ماليٌّ قائمٌ #' . (int) $s['net_due_ref'] . ' — «لا يتكرر»';
+            $out['reason'] = 'للتصفية حدث مالي قائم #' . (int) $s['net_due_ref'] . ' — «لا يتكرر»';
             return $out;
         }
         if ((int) $s['prepared_by'] > 0 && (int) $s['prepared_by'] === (int) $actor) {
-            $out['code'] = 403; $out['reason'] = 'لا يعتمد المرءُ ما أعدّ (فصلُ اليدين)'; return $out;
+            $out['code'] = 403; $out['reason'] = 'لا يعتمد المرء ما أعد (فصل اليدين)'; return $out;
         }
         $doc = trim((string) $clearanceDoc);
         if ($doc === '') {
-            $out['code'] = 422; $out['reason'] = '**مرفقُ الإخلاء إلزامي** (ENT-01 §6)'; return $out;
+            $out['code'] = 422; $out['reason'] = '**مرفق الإخلاء إلزامي** (ENT-01 §6)'; return $out;
         }
 
         $recognized = round((float) $s['recognized_amount'], 2);
@@ -313,7 +313,7 @@ class FinalSettlementService
                         'source_doc_type' => 'employee_closure', 'source_doc_id' => (int) $s['id'],
                         'created_by' => (int) $actor ?: null,
                     ));
-                    if ($dueId <= 0) { throw new \RuntimeException('تعذّر إنشاءُ ذمّة التصفية'); }
+                    if ($dueId <= 0) { throw new \RuntimeException('تعذر إنشاء ذمة التصفية'); }
                 }
                 // ② واستردادُ السلف فعليًّا بمقدار المقاصّة — الأقدمُ أولًا
                 $recovered = self::recoverAdvances($g, (int) $s['employee_id'], $offset);
@@ -325,7 +325,7 @@ class FinalSettlementService
                 ), array('id' => (int) $s['id']));
             }, 'اعتماد تصفية ' . (int) $s['id']);
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الاعتماد: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الاعتماد: ' . $t->getMessage(); return $out;
         }
 
         self::finalizedFact($conn, $companyId, $s, $dueId, $recovered, $actor);
@@ -342,20 +342,20 @@ class FinalSettlementService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '');
         $s = self::head($gate, (int) $settlementId);
-        if (!$s) { $out['code'] = 404; $out['reason'] = 'التصفيةُ غيرُ موجودةٍ في نطاقك'; return $out; }
+        if (!$s) { $out['code'] = 404; $out['reason'] = 'التصفية غير موجودة في نطاقك'; return $out; }
         if ((string) $s['state'] !== 'draft') {
             $out['code'] = 423;
-            $out['reason'] = 'المعتمَدةُ لا تُلغى — التصحيحُ بحركةٍ عاكسةٍ لا بمحوٍ (SPEC-00 §3.1)';
+            $out['reason'] = 'المعتمدة لا تلغى — التصحيح بحركة عاكسة لا بمحو (SPEC-00 §3.1)';
             return $out;
         }
         $why = trim((string) $reason);
-        if ($why === '') { $out['code'] = 422; $out['reason'] = 'سببُ الإلغاء إلزامي'; return $out; }
+        if ($why === '') { $out['code'] = 422; $out['reason'] = 'سبب الإلغاء إلزامي'; return $out; }
         try {
             $gate->update('employee_final_settlements',
                 array('state' => 'cancelled', 'cancel_reason' => mb_substr($why, 0, 255)),
                 array('id' => (int) $settlementId));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الإلغاء: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الإلغاء: ' . $t->getMessage(); return $out;
         }
         self::audit($conn, $companyId, $actor, 'cancel', (int) $settlementId,
             array('state' => 'draft'), array('state' => 'cancelled', 'reason' => $why));
@@ -461,7 +461,7 @@ class FinalSettlementService
                   WHERE {TENANT_SCOPE} AND a.person_id = ? AND COALESCE(a.is_deleted,0)=0
                     AND a.state IN ('active','approved') AND a.recovered < a.amount
                   ORDER BY a.issued_date, a.id", array((int) $employeeId));
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $rows'); $rows = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $rows'); $rows = array(); }
 
         $done = 0.0;
         foreach ($rows as $a) {

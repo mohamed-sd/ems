@@ -54,17 +54,17 @@ class SupplierRuleService
         $contractId = (int) $contractId;
 
         $head = self::contractOf($gate, $contractId);
-        if (!$head) { $out['code'] = 404; $out['reason'] = 'عقدُ المورد غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!$head) { $out['code'] = 404; $out['reason'] = 'عقد المورد غير موجود في نطاقك'; return $out; }
 
         $type = isset($args['charge_type']) ? trim((string) $args['charge_type']) : '';
         if (!in_array($type, self::CHARGE_TYPES, true)) {
             $out['code'] = 422;
-            $out['reason'] = 'نوعُ تحميلٍ خارج الستة (§2-⑥): ' . implode(' · ', self::CHARGE_TYPES);
+            $out['reason'] = 'نوع تحميل خارج الستة (§2-⑥): ' . implode(' · ', self::CHARGE_TYPES);
             return $out;
         }
         $pricing = isset($args['pricing']) ? trim((string) $args['pricing']) : 'cost';
         if (!in_array($pricing, self::PRICING, true)) {
-            $out['code'] = 422; $out['reason'] = 'طريقةُ تسعيرٍ خارج الثلاث'; return $out;
+            $out['code'] = 422; $out['reason'] = 'طريقة تسعير خارج الثلاث'; return $out;
         }
         $rate = (isset($args['rate']) && trim((string) $args['rate']) !== '')
                 ? round((float) $args['rate'], 3) : null;
@@ -72,23 +72,23 @@ class SupplierRuleService
         // ── «قاعدةُ تحميلٍ بلا سعرٍ مكتوب → 422» (§6-Validation) ───────────
         if ($pricing !== 'cost' && ($rate === null || $rate <= 0)) {
             $out['code'] = 422;
-            $out['reason'] = 'طريقةُ «' . self::PRICING_LABELS[$pricing]
-                           . '» **بلا سعرٍ مكتوب** — قاعدةٌ تُكتب ثم يُسأل عنها «بكم؟» مرفوضة (§6)';
+            $out['reason'] = 'طريقة «' . self::PRICING_LABELS[$pricing]
+                           . '» **بلا سعر مكتوب** — قاعدة تكتب ثم يسأل عنها «بكم؟» مرفوضة (§6)';
             return $out;
         }
         if ($pricing === 'cost') { $rate = null; }
         if ($pricing === 'cost_plus' && $rate !== null && $rate > 100) {
-            $out['code'] = 422; $out['reason'] = 'نسبةُ الإضافة تتجاوز 100٪ — راجعها'; return $out;
+            $out['code'] = 422; $out['reason'] = 'نسبة الإضافة تتجاوز 100٪ — راجعها'; return $out;
         }
 
         $cap = (isset($args['cap']) && trim((string) $args['cap']) !== '')
                ? round((float) $args['cap'], 2) : null;
         if ($cap !== null && $cap <= 0) {
-            $out['code'] = 422; $out['reason'] = 'السقفُ موجبٌ أو غيرُ مكتوب'; return $out;
+            $out['code'] = 422; $out['reason'] = 'السقف موجب أو غير مكتوب'; return $out;
         }
         $from = isset($args['valid_from']) ? trim((string) $args['valid_from']) : '';
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $from)) {
-            $out['code'] = 422; $out['reason'] = 'سريانُ القاعدة إلزامي'; return $out;
+            $out['code'] = 422; $out['reason'] = 'سريان القاعدة إلزامي'; return $out;
         }
 
         try {
@@ -107,9 +107,9 @@ class SupplierRuleService
             ));
         } catch (\Throwable $t) {
             if (strpos($t->getMessage(), 'Duplicate') !== false) {
-                $out['code'] = 409; $out['reason'] = 'للعقد قاعدةٌ بهذا النوع والسريان (UQ)'; return $out;
+                $out['code'] = 409; $out['reason'] = 'للعقد قاعدة بهذا النوع والسريان (UQ)'; return $out;
             }
-            $out['code'] = 422; $out['reason'] = 'تعذّر الحفظ: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الحفظ: ' . $t->getMessage(); return $out;
         }
 
         self::audit($conn, $companyId, $actor, 'supplier_charge_rules', 'create',
@@ -125,25 +125,25 @@ class SupplierRuleService
         $contractId = (int) $contractId;
 
         $head = self::contractOf($gate, $contractId);
-        if (!$head) { $out['code'] = 404; $out['reason'] = 'عقدُ المورد غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!$head) { $out['code'] = 404; $out['reason'] = 'عقد المورد غير موجود في نطاقك'; return $out; }
 
         $kind = isset($args['kind']) ? trim((string) $args['kind']) : '';
         if (!in_array($kind, self::PENALTY_KINDS, true)) {
             $out['code'] = 422;
-            $out['reason'] = 'نوعُ جزاءٍ خارج الأربعة (§6): ' . implode(' · ', self::PENALTY_KINDS);
+            $out['reason'] = 'نوع جزاء خارج الأربعة (§6): ' . implode(' · ', self::PENALTY_KINDS);
             return $out;
         }
         $rate = isset($args['rate']) ? round((float) $args['rate'], 3) : 0.0;
-        if ($rate <= 0) { $out['code'] = 422; $out['reason'] = 'معدلُ الجزاء موجب'; return $out; }
+        if ($rate <= 0) { $out['code'] = 422; $out['reason'] = 'معدل الجزاء موجب'; return $out; }
 
         $basis = isset($args['rate_basis']) ? trim((string) $args['rate_basis']) : 'per_unit';
         if (!in_array($basis, array('per_unit', 'percent_of_base'), true)) {
-            $out['code'] = 422; $out['reason'] = 'أساسُ المعدل: per_unit أو percent_of_base'; return $out;
+            $out['code'] = 422; $out['reason'] = 'أساس المعدل: per_unit أو percent_of_base'; return $out;
         }
         $cap = (isset($args['cap_percent']) && trim((string) $args['cap_percent']) !== '')
                ? round((float) $args['cap_percent'], 2) : null;
         if ($cap !== null && ($cap <= 0 || $cap > 100)) {
-            $out['code'] = 422; $out['reason'] = 'سقفُ الجزاء نسبةٌ في (0، 100]'; return $out;
+            $out['code'] = 422; $out['reason'] = 'سقف الجزاء نسبة في (0، 100]'; return $out;
         }
 
         // ── «يشدّد لا يعكس» (§4): نقضُ الإسناد يلزمه سببٌ مكتوب ────────────
@@ -151,13 +151,13 @@ class SupplierRuleService
         $override = isset($args['override_reason']) ? trim((string) $args['override_reason']) : '';
         if ($inherits !== 1 && $override === '') {
             $out['code'] = 422;
-            $out['reason'] = 'نقضُ إسناد عقد العميل **يلزمه سببٌ مكتوب** — «له أن يشدّد جزاءَه '
-                           . 'لا أن يعكس إسنادًا» (CON-03 §4)';
+            $out['reason'] = 'نقض إسناد عقد العميل **يلزمه سبب مكتوب** — «له أن يشدد جزاءه '
+                           . 'لا أن يعكس إسنادا» (CON-03 §4)';
             return $out;
         }
         $from = isset($args['valid_from']) ? trim((string) $args['valid_from']) : '';
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $from)) {
-            $out['code'] = 422; $out['reason'] = 'سريانُ القاعدة إلزامي'; return $out;
+            $out['code'] = 422; $out['reason'] = 'سريان القاعدة إلزامي'; return $out;
         }
 
         try {
@@ -182,9 +182,9 @@ class SupplierRuleService
             ));
         } catch (\Throwable $t) {
             if (strpos($t->getMessage(), 'Duplicate') !== false) {
-                $out['code'] = 409; $out['reason'] = 'للعقد قاعدةٌ بهذا النوع والسريان (UQ)'; return $out;
+                $out['code'] = 409; $out['reason'] = 'للعقد قاعدة بهذا النوع والسريان (UQ)'; return $out;
             }
-            $out['code'] = 422; $out['reason'] = 'تعذّر الحفظ: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الحفظ: ' . $t->getMessage(); return $out;
         }
 
         self::audit($conn, $companyId, $actor, 'supplier_penalty_rules', 'create',
@@ -215,9 +215,9 @@ class SupplierRuleService
         if ($rule === null) {
             return array('amount' => $baseCost, 'basis' => 'no_rule', 'rule_id' => null,
                          'capped' => false,
-                         'note' => '⚠ بلا قاعدةِ تسعيرٍ مكتوبةٍ لـ«'
+                         'note' => '⚠ بلا قاعدة تسعير مكتوبة ل«'
                                    . (self::CHARGE_LABELS[$type] ?? $type)
-                                   . '» — حُمّل بتكلفته الخام ويُعلَن (§2-⑥ يوجب قاعدةً مكتوبة)');
+                                   . '» — حمل بتكلفته الخام ويعلن (§2-⑥ يوجب قاعدة مكتوبة)');
         }
 
         $pricing = (string) $rule['pricing'];
@@ -227,17 +227,17 @@ class SupplierRuleService
             $note = 'بسعر التكلفة بقاعدة #' . (int) $rule['id'];
         } elseif ($pricing === 'cost_plus') {
             $amount = round($baseCost * (1 + ($rate / 100.0)), 2);
-            $note = 'تكلفةٌ + ' . $rate . '٪ بقاعدة #' . (int) $rule['id'];
+            $note = 'تكلفة + ' . $rate . '٪ بقاعدة #' . (int) $rule['id'];
         } else {   // fixed
             $amount = round($rate, 2);
-            $note = 'مبلغٌ ثابتٌ ' . $rate . ' بقاعدة #' . (int) $rule['id'];
+            $note = 'مبلغ ثابت ' . $rate . ' بقاعدة #' . (int) $rule['id'];
         }
 
         $capped = false;
         if ($rule['cap'] !== null && (float) $rule['cap'] > 0 && $amount > (float) $rule['cap']) {
             $amount = round((float) $rule['cap'], 2);
             $capped = true;
-            $note .= ' — **مقصوصٌ بالسقف** ' . $rule['cap'];
+            $note .= ' — **مقصوص بالسقف** ' . $rule['cap'];
         }
         return array('amount' => $amount, 'basis' => $pricing, 'rule_id' => (int) $rule['id'],
                      'capped' => $capped, 'note' => $note);
@@ -257,9 +257,9 @@ class SupplierRuleService
                      'inherits_attribution' => true, 'note' => '');
         $rule = self::activePenaltyRule($gate, $supplierId, (string) $kind, $date);
         if ($rule === null) {
-            $out['note'] = 'لا قاعدةَ جزاءٍ مكتوبةً لـ«'
+            $out['note'] = 'لا قاعدة جزاء مكتوبة ل«'
                          . (self::PENALTY_LABELS[(string) $kind] ?? $kind)
-                         . '» — **لا يُجزى بلا قاعدة**';
+                         . '» — **لا يجزى بلا قاعدة**';
             return $out;
         }
         $out['rule_id'] = (int) $rule['id'];
@@ -275,7 +275,7 @@ class SupplierRuleService
             $gap = ($threshold !== null) ? max(0.0, $measured - $threshold) : $measured;
         }
         if ($gap <= 0) {
-            $out['note'] = 'لا عجزَ يُجزى عليه (القياس ' . $measured
+            $out['note'] = 'لا عجز يجزى عليه (القياس ' . $measured
                          . ($threshold !== null ? (' · الحد ' . $threshold) : '') . ')';
             return $out;
         }
@@ -285,7 +285,7 @@ class SupplierRuleService
         $amount = ((string) $rule['rate_basis'] === 'percent_of_base')
                   ? round((float) $baseAmount * $gap * $rate / 100.0, 2)
                   : round($gap * $rate, 2);
-        $note = 'عجزٌ ' . round($gap, 3) . ' × ' . $rate
+        $note = 'عجز ' . round($gap, 3) . ' × ' . $rate
               . ((string) $rule['rate_basis'] === 'percent_of_base' ? '٪ من الأساس' : ' للوحدة')
               . ' بقاعدة #' . (int) $rule['id'];
 
@@ -294,14 +294,14 @@ class SupplierRuleService
             $ceiling = round((float) $baseAmount * ((float) $rule['cap_percent']) / 100.0, 2);
             if ($amount > $ceiling) {
                 $amount = $ceiling; $out['capped'] = true;
-                $note .= ' — **مقصوصٌ بسقف ' . $rule['cap_percent'] . '٪ من الأساس** (' . $ceiling . ')';
+                $note .= ' — **مقصوص بسقف ' . $rule['cap_percent'] . '٪ من الأساس** (' . $ceiling . ')';
             }
         } elseif ($rule['cap_percent'] === null) {
-            $note .= ' · ⚠ بلا سقفٍ مكتوب — يُعلَن';
+            $note .= ' · ⚠ بلا سقف مكتوب — يعلن';
         }
 
         if (!$out['inherits_attribution']) {
-            $note .= ' · **ينقض الإسنادَ الموروث** بسبب: ' . (string) $rule['override_reason'];
+            $note .= ' · **ينقض الإسناد الموروث** بسبب: ' . (string) $rule['override_reason'];
         }
         $out['amount'] = $amount; $out['note'] = $note;
         return $out;

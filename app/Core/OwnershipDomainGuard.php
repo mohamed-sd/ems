@@ -115,7 +115,7 @@ class OwnershipDomainGuard
     public static function grant(\mysqli $conn, $companyId, $personId, $permCode, $grantedBy, $reason = null, $from = null, $to = null)
     {
         if ($permCode === self::PERM_VALUE && ($reason === null || $from === null || $to === null)) {
-            return array('ok' => false, 'code' => 422, 'reason' => 'صلاحية قيمة الشراء أشد الثلاثة — لا تُمنح إلا بسببٍ ومدةٍ مكتوبين');
+            return array('ok' => false, 'code' => 422, 'reason' => 'صلاحية قيمة الشراء أشد الثلاثة — لا تمنح إلا بسبب ومدة مكتوبين');
         }
         $stmt = $conn->prepare(
             'INSERT INTO ownership_access_grants (company_id, person_id, permission_code, reason, valid_from, valid_to, granted_by)
@@ -124,10 +124,10 @@ class OwnershipDomainGuard
         $stmt->bind_param('iissssi', $companyId, $personId, $permCode, $reason, $from, $to, $grantedBy);
         if (!$stmt->execute()) {
             $err = $stmt->error; $stmt->close();
-            return array('ok' => false, 'code' => 422, 'reason' => 'رُفض المنح: ' . $err);
+            return array('ok' => false, 'code' => 422, 'reason' => 'رفض المنح: ' . $err);
         }
         $id = $stmt->insert_id; $stmt->close();
-        return array('ok' => true, 'code' => 201, 'grant_id' => $id, 'reason' => 'مُنحت ' . $permCode);
+        return array('ok' => true, 'code' => 201, 'grant_id' => $id, 'reason' => 'منحت ' . $permCode);
     }
 
     /** سطر اطّلاع — Insert-only، وفشله لا يوقف القراءة لكنه يُسجَّل. */

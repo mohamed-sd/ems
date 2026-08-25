@@ -102,9 +102,9 @@ if (!function_exists('cmp03_store_insert')) {
         }
 
         if (cmp03_status_is_terminal($status)) {
-            error_log("cmp03_local_store: حالةٌ نهائيةٌ عند الإدراجِ حُطّت — {$canonical} «{$status}» (INJ-0219)");
-            cmp03_store_notice('الحالةُ «' . $status . '» لا تُختار عند الإنشاء — حُفظ الصفُّ «مسودة».'
-                . ' الاعتمادُ يمرُّ بسلّمِ الموافقاتِ بيدين مختلفتين، لا بمنتقٍ في يدِ المنشئ.');
+            error_log("cmp03_local_store: حالة نهائية عند الإدراج حطت — {$canonical} «{$status}» (INJ-0219)");
+            cmp03_store_notice('الحالة «' . $status . '» لا تختار عند الإنشاء — حفظ الصف «مسودة».'
+                . ' الاعتماد يمر بسلم الموافقات بيدين مختلفتين، لا بمنتق في يد المنشئ.');
             $status = 'مسودة';
             /* والحمولةُ نفسُها تحمل نسخةً من الحالةِ في عمودِ العرض — تُحَطُّ معها
                وإلا أعلن الجدولُ «معتمد» في عمودٍ والحقيقةُ «مسودة» في آخر. */
@@ -195,9 +195,9 @@ if (!function_exists('cmp03_store_insert')) {
             if ($stillThere) {
                 $conn->rollback();
                 mysqli_report($prevRep);
-                cmp03_store_notice('هذا الصفُّ محفوظٌ سلفًا — لم يُنشأ صفٌّ ثانٍ.'
-                    . ' مرجعُ الأثرِ الأول: #' . $ref . '.'
-                    . ' (تحديثُ الصفحةِ بعد الحفظِ لا يضاعف البيانة.)');
+                cmp03_store_notice('هذا الصف محفوظ سلفا — لم ينشأ صف ثان.'
+                    . ' مرجع الأثر الأول: #' . $ref . '.'
+                    . ' (تحديث الصفحة بعد الحفظ لا يضاعف البيانة.)');
                 return true;   // الأثرُ واقعٌ سلفًا — والعطالةُ نجاحٌ لا فشل
             }
             /* الأثرُ ذهب: يُعاد استعمالُ صفِّ المفتاحِ نفسِه — ولا حذفَ ولا صفٌّ ثانٍ */
@@ -217,7 +217,7 @@ if (!function_exists('cmp03_store_insert')) {
         if ($keyOk) { $idemId = (int) $conn->insert_id; }
         if (empty($idemId)) {
             $conn->rollback(); mysqli_report($prevRep);
-            error_log('cmp03_local_store: تعذّر تثبيتُ مفتاحِ العطالة');
+            error_log('cmp03_local_store: تعذر تثبيت مفتاح العطالة');
             return false;
         }
 
@@ -392,13 +392,13 @@ if (!function_exists('cmp03_store_update')) {
         $reg = cmp03_registry();
         if (!isset($reg[$canonical])) {
             error_log("cmp03_store_update: شاشة خارج السجل — {$canonical}");
-            return array('ok' => false, 'msg' => 'شاشةٌ خارجَ السجل — لا تصحيحَ (409)', 'changed' => array());
+            return array('ok' => false, 'msg' => 'شاشة خارج السجل — لا تصحيح (409)', 'changed' => array());
         }
         $before = cmp03_store_row($conn, $canonical, $companyId, $id);
-        if ($before === null) { return array('ok' => false, 'msg' => 'صفٌّ غيرُ موجود (404)', 'changed' => array()); }
+        if ($before === null) { return array('ok' => false, 'msg' => 'صف غير موجود (404)', 'changed' => array()); }
         if (isset($before['status']) && mb_strpos((string) $before['status'], 'معتمد') !== false) {
             return array('ok' => false, 'changed' => array(),
-                'msg' => 'مستندٌ معتمدٌ لا رجعيةَ فيه — صحّحْ بحركةٍ عاكسةٍ ثم إنشاءٍ جديد (CS-11 · 409)');
+                'msg' => 'مستند معتمد لا رجعية فيه — صحح بحركة عاكسة ثم إنشاء جديد (CS-11 · 409)');
         }
 
         $table = $reg[$canonical]['table'];
@@ -416,7 +416,7 @@ if (!function_exists('cmp03_store_update')) {
             $types .= 's';
             $changed[$col] = array('before' => $old, 'after' => $new);
         }
-        if (!$sets) { return array('ok' => true, 'msg' => 'لا تغييرَ — لم يُكتب شيء', 'changed' => array()); }
+        if (!$sets) { return array('ok' => true, 'msg' => 'لا تغيير — لم يكتب شيء', 'changed' => array()); }
 
         $sets[] = '`updated_at` = NOW()';
         $sql = "UPDATE `{$table}` SET " . implode(', ', $sets) . ' WHERE id = ?';
@@ -424,15 +424,15 @@ if (!function_exists('cmp03_store_update')) {
         if (intval($companyId) > 0) { $sql .= ' AND company_id = ?'; $vals[] = intval($companyId); $types .= 'i'; }
 
         $st = $conn->prepare($sql);
-        if (!$st) { error_log('cmp03_store_update: prepare — ' . $conn->error); return array('ok' => false, 'msg' => 'تعذّر التصحيح (500)', 'changed' => array()); }
+        if (!$st) { error_log('cmp03_store_update: prepare — ' . $conn->error); return array('ok' => false, 'msg' => 'تعذر التصحيح (500)', 'changed' => array()); }
         $st->bind_param($types, ...$vals);
         $ok = $st->execute();
         if (!$ok) { error_log('cmp03_store_update: execute — ' . $st->error); }
         $st->close();
-        if (!$ok) { return array('ok' => false, 'msg' => 'تعذّر التصحيح (500)', 'changed' => array()); }
+        if (!$ok) { return array('ok' => false, 'msg' => 'تعذر التصحيح (500)', 'changed' => array()); }
 
         cmp03_store_audit($conn, $companyId, $canonical, $table, $id, 'update', $changed, $uid, $actorName);
-        return array('ok' => true, 'msg' => 'صُحِّح الصفُّ #' . intval($id) . ' — ' . count($changed) . ' حقلًا بسجلِّ قبلَ وبعد', 'changed' => $changed);
+        return array('ok' => true, 'msg' => 'صحح الصف #' . intval($id) . ' — ' . count($changed) . ' حقلا بسجل قبل وبعد', 'changed' => $changed);
     }
 }
 
@@ -447,14 +447,14 @@ if (!function_exists('cmp03_store_reverse')) {
     function cmp03_store_reverse(mysqli $conn, $companyId, $canonical, $id, $reason, $uid, $actorName)
     {
         if (trim((string) $reason) === '') {
-            return array('ok' => false, 'msg' => 'سببُ العكس إلزامي (422)', 'reversal_id' => 0);
+            return array('ok' => false, 'msg' => 'سبب العكس إلزامي (422)', 'reversal_id' => 0);
         }
         $reg = cmp03_registry();
-        if (!isset($reg[$canonical])) { return array('ok' => false, 'msg' => 'شاشةٌ خارجَ السجل (409)', 'reversal_id' => 0); }
+        if (!isset($reg[$canonical])) { return array('ok' => false, 'msg' => 'شاشة خارج السجل (409)', 'reversal_id' => 0); }
         $before = cmp03_store_row($conn, $canonical, $companyId, $id);
-        if ($before === null) { return array('ok' => false, 'msg' => 'صفٌّ غيرُ موجود (404)', 'reversal_id' => 0); }
+        if ($before === null) { return array('ok' => false, 'msg' => 'صف غير موجود (404)', 'reversal_id' => 0); }
         if (isset($before['status']) && mb_strpos((string) $before['status'], 'معكوس') !== false) {
-            return array('ok' => false, 'msg' => 'الصفُّ معكوسٌ سلفًا — لا عكسَ للعكس (409)', 'reversal_id' => 0);
+            return array('ok' => false, 'msg' => 'الصف معكوس سلفا — لا عكس للعكس (409)', 'reversal_id' => 0);
         }
 
         $table = $reg[$canonical]['table'];
@@ -468,7 +468,7 @@ if (!function_exists('cmp03_store_reverse')) {
         try {
             $okIns = cmp03_store_insert($conn, $companyId, $canonical, $payload,
                 'عكس — مرجع #' . intval($id), $uid, $actorName);
-            if (!$okIns) { throw new RuntimeException('تعذّر إنشاءُ الحركةِ العاكسة'); }
+            if (!$okIns) { throw new RuntimeException('تعذر إنشاء الحركة العاكسة'); }
             $revId = (int) $conn->insert_id;
 
             $st = $conn->prepare("UPDATE `{$table}` SET `status` = ?, `updated_at` = NOW() WHERE id = ?");
@@ -485,11 +485,11 @@ if (!function_exists('cmp03_store_reverse')) {
                       'reason' => array('before' => '', 'after' => (string) $reason)),
                 $uid, $actorName);
             return array('ok' => true, 'reversal_id' => $revId,
-                'msg' => 'عُكس الصفُّ #' . $idI . ' بحركةٍ عاكسةٍ #' . $revId . ' — والأصلُ باقٍ');
+                'msg' => 'عكس الصف #' . $idI . ' بحركة عاكسة #' . $revId . ' — والأصل باق');
         } catch (\Throwable $e) {
             $conn->rollback();
             error_log('cmp03_store_reverse: ' . $e->getMessage());
-            return array('ok' => false, 'msg' => 'تعذّر العكس — لم يُكتب شيء (ERR-CMP-1049)', 'reversal_id' => 0);
+            return array('ok' => false, 'msg' => 'تعذر العكس — لم يكتب شيء (ERR-CMP-1049)', 'reversal_id' => 0);
         }
     }
 }
@@ -526,7 +526,7 @@ if (!function_exists('cmp03_store_audit')) {
                 $co, $user, $roleId, $roleNm, $screen, $module, $act, $fields, $rec, $old, $new);
             $st->execute();
             $st->close();
-        } catch (\Throwable $e) { ems_catch_ignored($e, __METHOD__, 'CS-12: لا يُبتلع — يُسجَّل ولا يُوقف الأثرَ (السجلُّ تابعٌ لا شرط).');
+        } catch (\Throwable $e) { ems_catch_ignored($e, __METHOD__, 'CS-12: لا يبتلع — يسجل ولا يوقف الأثر (السجل تابع لا شرط).');
             // CS-12: لا يُبتلع — يُسجَّل ولا يُوقف الأثرَ (السجلُّ تابعٌ لا شرط).
             error_log('cmp03_store_audit failed: ' . $e->getMessage());
         }

@@ -39,20 +39,20 @@ if (!$is_super_admin && empty($__pp['can_view'])) {
 /* AC-F2 · AC-P1A: الحارسُ المركزيُّ **أولَ ما يواجه الطلبَ الكاتب** — ويردُّ
    برمزِه الحوكميِّ فيراه السجلُّ والفاحص. وموضعُه قبلَ المنعِ المحليِّ مقصود:
    منعٌ محليٌّ بلا رمزٍ يسبقه = طلبٌ مُنع فعلًا ويُعلَن «لم يُمنع». */
-ems_require_action($conn, $SCREEN, 'write', array('deny_msg' => 'تسجيلُ القرارِ بيدِ الحوكمةِ حصرًا'));
+ems_require_action($conn, $SCREEN, 'write', array('deny_msg' => 'تسجيل القرار بيد الحوكمة حصرا'));
 
 // ═══ ④ حارسُ الفعل ═══
 $__canDecide = $is_super_admin || !empty($__pp['can_edit']);
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$__canDecide) {
     http_response_code(403);
-    exit('GOV-PERM-403-WRITE — غير مصرَّحٍ بتسجيلِ قرارٍ في هذه الشاشة — اطلبِ المنحةَ من مدير الصلاحيات');
+    exit('GOV-PERM-403-WRITE — غير مصرح بتسجيل قرار في هذه الشاشة — اطلب المنحة من مدير الصلاحيات');
 }
 
 // ═══ ⑤ رمزُ الحماية ═══
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!function_exists('verify_csrf_token') || !verify_csrf_token($_POST['csrf_token'] ?? '')) {
         http_response_code(403);
-        exit('رمزُ الحمايةِ غيرُ صالح — أعدْ تحميلَ الصفحة');
+        exit('رمز الحماية غير صالح — أعد تحميل الصفحة');
     }
 }
 
@@ -68,15 +68,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'recor
                                WHERE id=?");
         $st->bind_param('ssi', $dec, $dec, $oid);
         if ($st->execute() && $st->affected_rows > 0) {
-            $flash = 'سُجِّل القرارُ — والتفعيلُ في القائمةِ فعلُ هجرةٍ لاحقةٍ مقيس';
+            $flash = 'سجل القرار — والتفعيل في القائمة فعل هجرة لاحقة مقيس';
             $flashKind = 'success';
         } else {
-            $flash = 'لم يتغير شيء — تحقق من الصفِّ المختار';
+            $flash = 'لم يتغير شيء — تحقق من الصف المختار';
             $flashKind = 'warning';
         }
         $st->close();
     } else {
-        $flash = 'قرارٌ غيرُ معروف — الخياراتُ: اعتمادُ المقترحِ · نقلٌ · تقاعدٌ · إرجاءٌ';
+        $flash = 'قرار غير معروف — الخيارات: اعتماد المقترح · نقل · تقاعد · إرجاء';
         $flashKind = 'danger';
     }
 }
@@ -97,9 +97,9 @@ $rows = $conn->query(
 );
 
 $DECISION_AR = array(
-    'pending'   => 'بانتظارِ قرارِ المالك',
-    'approved'  => 'اعتُمد المقترح',
-    'relocated' => 'يُنقل لموضعٍ آخر',
+    'pending'   => 'بانتظار قرار المالك',
+    'approved'  => 'اعتمد المقترح',
+    'relocated' => 'ينقل لموضع آخر',
     'retired'   => 'يتقاعد',
 );
 
@@ -111,10 +111,10 @@ include __DIR__ . '/../insidebar.php';
   <?php
   $header_title = $PAGE_TITLE;
   $header_icon = 'fa fa-scale-balanced';
-  $header_desc = 'روابطُ التنقلِ التي أخرجها الدفترُ الحاكمُ من واجهةِ التشغيل — محفوظةٌ هنا بقرارٍ معلَّقٍ حتى يبتَّ المالكُ صفًّا صفًّا. التسجيلُ هنا قرارٌ لا تنفيذ.';
+  $header_desc = 'روابط التنقل التي أخرجها الدفتر الحاكم من واجهة التشغيل — محفوظة هنا بقرار معلق حتى يبت المالك صفا صفا. التسجيل هنا قرار لا تنفيذ.';
   $header_back = false;
   include __DIR__ . '/../includes/page_header.php';
-  echo ems_next_step('قرارُ المالكِ صفًّا صفًّا ثم هجرةُ إعادةِ الإسناد');
+  echo ems_next_step('قرار المالك صفا صفا ثم هجرة إعادة الإسناد');
   ?>
 
   <?php if ($flash !== null): ?>
@@ -125,26 +125,26 @@ include __DIR__ . '/../insidebar.php';
 
   <div class="row">
     <div class="col"><div class="kpi-card"><div>الكل</div><strong><?php echo (int) $g['total']; ?></strong></div></div>
-    <div class="col"><div class="kpi-card"><div>بانتظارُ القرار</div><strong><?php echo (int) $g['pend']; ?></strong></div></div>
-    <div class="col"><div class="kpi-card"><div>اعتُمد المقترح</div><strong><?php echo (int) $g['ok']; ?></strong></div></div>
-    <div class="col"><div class="kpi-card"><div>يُنقل</div><strong><?php echo (int) $g['moved']; ?></strong></div></div>
+    <div class="col"><div class="kpi-card"><div>بانتظار القرار</div><strong><?php echo (int) $g['pend']; ?></strong></div></div>
+    <div class="col"><div class="kpi-card"><div>اعتمد المقترح</div><strong><?php echo (int) $g['ok']; ?></strong></div></div>
+    <div class="col"><div class="kpi-card"><div>ينقل</div><strong><?php echo (int) $g['moved']; ?></strong></div></div>
     <div class="col"><div class="kpi-card"><div>يتقاعد</div><strong><?php echo (int) $g['ret']; ?></strong></div></div>
   </div>
 
-  <?php echo ems_states_bundle('لا روابطَ يتيمةً مسجَّلة', 'اكتمل البتُّ فيها كلِّها أو لم تُبذَر الورقةُ بعد'); ?>
+  <?php echo ems_states_bundle('لا روابط يتيمة مسجلة', 'اكتمل البت فيها كلها أو لم تبذر الورقة بعد'); ?>
 
   <?php if ($rows !== false && $rows->num_rows > 0): ?>
   <div class="table-responsive">
     <table class="table" id="orphanLinksTable">
       <thead>
         <tr>
-          <th>القائمةُ في الدفتر</th>
+          <th>القائمة في الدفتر</th>
           <th>الرابط</th>
           <th>المسار</th>
-          <th>التصنيفُ الحي</th>
-          <th>المجموعةُ المقترحة</th>
-          <th>قرارُ المالك</th>
-          <?php if ($__canDecide): ?><th>تسجيلُ القرار</th><?php endif; ?>
+          <th>التصنيف الحي</th>
+          <th>المجموعة المقترحة</th>
+          <th>قرار المالك</th>
+          <?php if ($__canDecide): ?><th>تسجيل القرار</th><?php endif; ?>
         </tr>
       </thead>
       <tbody>
@@ -166,14 +166,14 @@ include __DIR__ . '/../insidebar.php';
               <?php echo function_exists('csrf_field') ? csrf_field() : ''; ?>
               <input type="hidden" name="action" value="record_decision">
               <input type="hidden" name="orphan_id" value="<?php echo (int) $r['id']; ?>">
-              <label class="ems-visually-hidden" for="dec<?php echo (int) $r['id']; ?>">قرارُ هذا الرابط</label>
+              <label class="ems-visually-hidden" for="dec<?php echo (int) $r['id']; ?>">قرار هذا الرابط</label>
               <select name="decision" id="dec<?php echo (int) $r['id']; ?>">
-                <option value="approved">اعتمادُ المقترح</option>
-                <option value="relocated">نقلٌ لموضعٍ آخر</option>
+                <option value="approved">اعتماد المقترح</option>
+                <option value="relocated">نقل لموضع آخر</option>
                 <option value="retired">تقاعد</option>
                 <option value="pending">إرجاء</option>
               </select>
-              <button type="submit" class="btn btn-sm btn-primary">سجِّل</button>
+              <button type="submit" class="btn btn-sm btn-primary">سجل</button>
             </form>
           </td>
           <?php endif; ?>
@@ -183,6 +183,6 @@ include __DIR__ . '/../insidebar.php';
     </table>
   </div>
   <?php else: ?>
-    <?php echo ems_state('empty', 'لا روابطَ يتيمةً مسجَّلة', 'اكتمل البتُّ فيها كلِّها أو لم تُبذَر الورقةُ بعد'); ?>
+    <?php echo ems_state('empty', 'لا روابط يتيمة مسجلة', 'اكتمل البت فيها كلها أو لم تبذر الورقة بعد'); ?>
   <?php endif; ?>
 </div>

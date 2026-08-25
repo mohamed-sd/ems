@@ -73,8 +73,8 @@ include __DIR__ . '/../includes/page_header.php';
 
         <?php
         // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-        echo ems_states_bundle('لا بياناتِ عقدٍ لعرضها بهذا المُعرِّف',
-                               'عُد إلى «سجلِّ العقود» واختر عقدًا قائمًا لفتحِ تفاصيله');
+        echo ems_states_bundle('لا بيانات عقد لعرضها بهذا المعرف',
+                               'عد إلى «سجل العقود» واختر عقدا قائما لفتح تفاصيله');
         ?>
 
         <!-- ===== ACTIONS SECTION ===== -->
@@ -199,7 +199,7 @@ include __DIR__ . '/../includes/page_header.php';
                  (نوعُ المعدة ← توزيعُ الموردين ← المعداتُ المخصَّصة) والفجوةُ بالساعات -->
             <div class="cd-coverage-tab">
                 <a href="contract_coverage.php?contract_id=<?php echo intval($contract_id); ?>" class="cd-coverage-link">
-                    <i class="fas fa-shield-halved"></i> التغطية التعاقدية — الالتزامُ والموردون والمعداتُ والفجوةُ بالساعات
+                    <i class="fas fa-shield-halved"></i> التغطية التعاقدية — الالتزام والموردون والمعدات والفجوة بالساعات
                 </a>
             </div>
 <!-- ===== SUMMARY CARDS ===== -->
@@ -308,12 +308,12 @@ include __DIR__ . '/../includes/page_header.php';
             <div class="section-wrapper">
                 <div class="section-header">
                     <div class="section-header-icon"><i class="fas fa-hand-holding-dollar"></i></div>
-                    <h4>الدفعةُ المقدَّمة — الرصيدُ التراكمي</h4>
+                    <h4>الدفعة المقدمة — الرصيد التراكمي</h4>
                 </div>
                 <div class="cd-1">
                     <p class="cd-2">
                         <strong>المقبوض:</strong> <?php echo number_format($adv_bal['received'], 2); ?>
-                        · <strong>المستهلَك:</strong> <?php echo number_format($adv_bal['recovered'], 2); ?>
+                        · <strong>المستهلك:</strong> <?php echo number_format($adv_bal['recovered'], 2); ?>
                         · <strong>المتبقي:</strong>
                         <?php /* INJ-0442: اللونُ صار صنفًا — فالحكمُ (سالبٌ/موجب) يبقى في
                                  الشفرةِ واللونُ في ورقةِ الأنماطِ برموزِ النظام. */ ?>
@@ -321,17 +321,17 @@ include __DIR__ . '/../includes/page_header.php';
                             <?php echo number_format($adv_bal['balance'], 2); ?></strong>
                         <?php if ($adv_bal['balance'] < 0): ?>
                             <br><i class="fas fa-triangle-exclamation"></i>
-                            <strong>رصيدٌ سالب:</strong> استُردّ أكثرُ ممّا قُبض —
-                            وهو انحرافٌ معلَنٌ ينتظر قرارَ المالك، ولا يُصحَّح بمسحٍ ولا تعديل.
+                            <strong>رصيد سالب:</strong> استرد أكثر مما قبض —
+                            وهو انحراف معلن ينتظر قرار المالك، ولا يصحح بمسح ولا تعديل.
                         <?php elseif ($adv_bal['balance'] == 0 && $adv_bal['received'] > 0): ?>
                             <br><i class="fas fa-circle-check"></i>
-                            استُردّت الدفعةُ بالكامل — <strong>ولا استقطاعَ بعدها</strong>.
+                            استردت الدفعة بالكامل — <strong>ولا استقطاع بعدها</strong>.
                         <?php endif; ?>
                     </p>
                     <?php if ($adv_recv): ?>
                     <div class="cd-3">
                     <table class="table table-sm cd-4">
-                        <thead><tr><th>سندُ القبض</th><th>التاريخ</th><th>المبلغ</th><th>المستند</th><th>الحالة</th></tr></thead>
+                        <thead><tr><th>سند القبض</th><th>التاريخ</th><th>المبلغ</th><th>المستند</th><th>الحالة</th></tr></thead>
                         <tbody>
                         <?php foreach ($adv_recv as $a): ?>
                             <tr<?php echo ((string) $a['state'] === 'cancelled') ? ' data-ems-c="cd-5"' : ''; ?>>
@@ -347,10 +347,10 @@ include __DIR__ . '/../includes/page_header.php';
                     </div>
                     <?php endif; ?>
                     <?php if ($adv_sch): ?>
-                    <p class="cd-6">جدولُ الاستهلاك</p>
+                    <p class="cd-6">جدول الاستهلاك</p>
                     <div class="cd-3">
                     <table class="table table-sm cd-4">
-                        <thead><tr><th>المستخلص</th><th>الفترة</th><th>المستهلَك</th><th>حالتُه</th></tr></thead>
+                        <thead><tr><th>المستخلص</th><th>الفترة</th><th>المستهلك</th><th>حالته</th></tr></thead>
                         <tbody>
                         <?php foreach ($adv_sch as $s): ?>
                             <tr>
@@ -364,7 +364,7 @@ include __DIR__ . '/../includes/page_header.php';
                     </table>
                     </div>
                     <?php else: ?>
-                        <p class="cd-7">لم يُستهلك منها شيءٌ بعد.</p>
+                        <p class="cd-7">لم يستهلك منها شيء بعد.</p>
                     <?php endif; ?>
                 </div>
             </div>
@@ -626,10 +626,10 @@ include __DIR__ . '/../includes/page_header.php';
                             }
                             ?>
                             <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                             <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                             <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                             <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -904,7 +904,7 @@ include __DIR__ . '/../includes/page_header.php';
                 <div class="modal-body">
                     <div class="alert alert-warning" role="alert">
                         <i class="fas fa-exclamation-triangle"></i>
-                        <strong>تنبيه:</strong> سيتم إيقاف العقد مؤقتاً. يمكنك استئنافه لاحقاً.
+                        <strong>تنبيه:</strong> سيتم إيقاف العقد مؤقتا. يمكنك استئنافه لاحقا.
                     </div>
                     <div class="mb-4">
                         <label for="pauseDate" class="form-label">
@@ -1061,7 +1061,7 @@ include __DIR__ . '/../includes/page_header.php';
                         <i class="fas fa-times"></i> إلغاء
                     </button>
                     <button type="button" class="btn btn-danger" id="confirmTerminate">
-                        <i class="fas fa-times-circle"></i> إنهاء نهائياً
+                        <i class="fas fa-times-circle"></i> إنهاء نهائيا
                     </button>
                 </div>
             </div>
@@ -1154,7 +1154,7 @@ include __DIR__ . '/../includes/page_header.php';
                                 <i class="fa fa-cube"></i> معدات العقد المختار
                             </div>
                             <div id="selectedContractEquipments" class="cd-21">
-                                اختر عقداً لعرض معداته
+                                اختر عقدا لعرض معداته
                             </div>
                         </div>
                     </div>
@@ -1909,7 +1909,7 @@ include __DIR__ . '/../includes/page_header.php';
             const selectedContractId = $(this).val();
 
             if (!selectedContractId) {
-                $('#selectedContractEquipments').html('<p class="cd-20">اختر عقداً لعرض معداته</p>');
+                $('#selectedContractEquipments').html('<p class="cd-20">اختر عقدا لعرض معداته</p>');
                 return;
             }
 
@@ -1973,7 +1973,7 @@ include __DIR__ . '/../includes/page_header.php';
             });
             bootstrap.Modal.getInstance(document.getElementById('mergeModal')).hide();
             $('#mergeWithId').val('');
-            $('#selectedContractEquipments').html('<p class="cd-20">اختر عقداً لعرض معداته</p>');
+            $('#selectedContractEquipments').html('<p class="cd-20">اختر عقدا لعرض معداته</p>');
         });
 
         function goBack() {

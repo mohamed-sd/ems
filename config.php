@@ -189,7 +189,7 @@ if (!function_exists('ems_db_config_fail')) {
             exit(1);
         }
         http_response_code(500);
-        die('<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>خطأ في إعدادات النظام</title><style>body{font-family:Cairo,Arial;text-align:center;padding:50px;background:#f5f5f5}.error{background:#fff;padding:40px;border-radius:10px;max-width:500px;margin:0 auto;box-shadow:0 2px 10px rgba(0,0,0,.1)}h1{color:#dc2626}</style></head><body><div class="error"><h1>⚠️ خطأ في إعدادات النظام</h1><p>تعذّر تحميل إعدادات الاتصال. يرجى إبلاغ مسؤول النظام.</p></div></body></html>');
+        die('<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>خطأ في إعدادات النظام</title><style>body{font-family:Cairo,Arial;text-align:center;padding:50px;background:#f5f5f5}.error{background:#fff;padding:40px;border-radius:10px;max-width:500px;margin:0 auto;box-shadow:0 2px 10px rgba(0,0,0,.1)}h1{color:#dc2626}</style></head><body><div class="error"><h1>⚠️ خطأ في إعدادات النظام</h1><p>تعذر تحميل إعدادات الاتصال. يرجى إبلاغ مسؤول النظام.</p></div></body></html>');
     }
 }
 
@@ -230,7 +230,7 @@ if ($conn->connect_error) {
         <body>
             <div class="error">
                 <h1>⚠️ خطأ في الاتصال</h1>
-                <p>عذراً، حدث خطأ في الاتصال بقاعدة البيانات. يرجى المحاولة لاحقاً.</p>
+                <p>عذرا، حدث خطأ في الاتصال بقاعدة البيانات. يرجى المحاولة لاحقا.</p>
             </div>
         </body>
         </html>
@@ -459,7 +459,7 @@ function ems_enforce_ajax_endpoint_security()
     $windowSeconds = 60;
     $rateKey = $script !== '' ? $script : (isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : 'ajax');
     if (!ems_ajax_rate_limit_check($rateKey, $maxAttempts, $windowSeconds)) {
-        ems_ajax_guard_response(429, 'تم تجاوز الحد المسموح للطلبات. حاول لاحقاً.');
+        ems_ajax_guard_response(429, 'تم تجاوز الحد المسموح للطلبات. حاول لاحقا.');
     }
 }
 

@@ -58,21 +58,21 @@ if ($period) {
     while ($x = $rs->fetch_assoc()) { $periods[] = $x['p']; }
     $st->close();
 }
-if (!$periods) { exit("لا فترةَ ذاتَ نشاط\n"); }
+if (!$periods) { exit("لا فترة ذات نشاط\n"); }
 
-echo "══ مطابقةُ ساعاتِ الأصولِ — كيان $companyId · حدُّ السماح $tol ساعة ══\n";
+echo "══ مطابقة ساعات الأصول — كيان $companyId · حد السماح $tol ساعة ══\n";
 echo '  الفترات: ' . implode(' · ', $periods) . "\n";
 
 $one = function (string $s) use ($conn) { $r = $conn->query($s); return $r ? (int) $r->fetch_row()[0] : 0; };
 $before = $one("SELECT COUNT(*) FROM asset_hour_reconciliations WHERE company_id=$companyId");
 
 if ($dry) {
-    echo "\n◆ قياسٌ فقط — لا كتابة\n";
+    echo "\n◆ قياس فقط — لا كتابة\n";
     foreach ($periods as $p) {
         $pe = $conn->real_escape_string($p);
         $n = $one("SELECT COUNT(DISTINCT o.equipment) FROM timesheet t JOIN operations o ON o.id=t.operator
                    WHERE t.company_id=$companyId AND DATE_FORMAT(t.`date`,'%Y-%m')='$pe'");
-        printf("  %-9s معداتٌ ذاتُ نشاط: %s\n", $p, number_format($n));
+        printf("  %-9s معدات ذات نشاط: %s\n", $p, number_format($n));
     }
     exit(0);
 }
@@ -82,18 +82,18 @@ foreach ($periods as $p) {
     $res = ARS::buildPeriod($conn, $companyId, $p, $tol);
     $totRows += (int) $res['rows'];
     $totUndep += (int) $res['undepreciated'];
-    printf("  %-9s معدات=%-5s عملت ولم تُهلك=%-5s %s\n",
+    printf("  %-9s معدات=%-5s عملت ولم تهلك=%-5s %s\n",
         $p, $res['rows'], $res['undepreciated'], empty($res['ok']) ? '✘ ' . $res['reason'] : '');
 }
 
 $after = $one("SELECT COUNT(*) FROM asset_hour_reconciliations WHERE company_id=$companyId");
 echo "\n══ الحصيلة ══\n";
-printf("  صفوفُ المطابقة: %s ⇐ %s\n", number_format($before), number_format($after));
-printf("  عولجت %s معدة-فترة · منها %s عملت ولم تُهلك\n", number_format($totRows), number_format($totUndep));
+printf("  صفوف المطابقة: %s ⇐ %s\n", number_format($before), number_format($after));
+printf("  عولجت %s معدة-فترة · منها %s عملت ولم تهلك\n", number_format($totRows), number_format($totUndep));
 
 $open = $one("SELECT COUNT(*) FROM asset_hour_reconciliations WHERE company_id=$companyId AND state='open'");
 $undep = $one("SELECT COUNT(*) FROM asset_hour_reconciliations WHERE company_id=$companyId AND undepreciated_flag=1");
-printf("  فروقٌ تنتظر تفسيرًا: %s · إهلاكٌ غيرُ محتسَب: %s\n", number_format($open), number_format($undep));
+printf("  فروق تنتظر تفسيرا: %s · إهلاك غير محتسب: %s\n", number_format($open), number_format($undep));
 
 $r = $conn->query("SELECT period, equipment_id, register_hours, timesheet_hours,
                           ROUND(ABS(register_hours-timesheet_hours),2) فرق, undepreciated_flag
@@ -101,8 +101,8 @@ $r = $conn->query("SELECT period, equipment_id, register_hours, timesheet_hours,
                    WHERE company_id=$companyId AND state='open'
                    ORDER BY ABS(register_hours-timesheet_hours) DESC LIMIT 8");
 if ($r && $r->num_rows) {
-    echo "\n  أكبرُ الفروقِ غيرِ المفسَّرة:\n";
-    printf("    %-9s %-8s %12s %12s %10s %s\n", 'الفترة', 'معدة', 'سجلُّ الأصول', 'التايم شيت', 'الفرق', 'بلا إهلاك');
+    echo "\n  أكبر الفروق غير المفسرة:\n";
+    printf("    %-9s %-8s %12s %12s %10s %s\n", 'الفترة', 'معدة', 'سجل الأصول', 'التايم شيت', 'الفرق', 'بلا إهلاك');
     while ($x = $r->fetch_row()) {
         printf("    %-9s %-8s %12s %12s %10s %s\n", $x[0], $x[1], $x[2], $x[3], $x[4], $x[5] ? 'نعم' : '—');
     }

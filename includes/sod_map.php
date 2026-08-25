@@ -27,48 +27,48 @@ if (!function_exists('ems_sod_map')) {
             // ① دورة المورد
             'supplier.create'          => $m('Suppliers/suppliers.php',                'create', 'exact'),
             'supplier.bank.update'     => $m('Suppliers/supplier_documents.php',       'update', 'exact',
-                                             'شاشةٌ مخصصةٌ لوثائق المورد وحسابه البنكي'),
+                                             'شاشة مخصصة لوثائق المورد وحسابه البنكي'),
             'supplier.payment.approve' => $m('Finance/payments_fin.php',               'update', 'approx',
-                                             'الاعتمادُ يقع على راية «تعديل» في المدفوعات والخزينة'),
+                                             'الاعتماد يقع على راية «تعديل» في المدفوعات والخزينة'),
             // ② دورة الشراء
             'proc.request'             => $m('Procurement/requests_proc.php',          'create', 'exact'),
             'proc.award'               => $m('Procurement/orders_proc.php',            'create', 'approx',
-                                             'الترسيةُ = إنشاءُ أمر شراء — والشاشةُ تحمل غيرَه'),
+                                             'الترسية = إنشاء أمر شراء — والشاشة تحمل غيره'),
             'proc.receive'             => $m('Procurement/receipt_custody_proc.php',   'create', 'exact'),
             'proc.disburse'            => $m('Procurement/issue_proc.php',             'create', 'exact'),
             // ③ الساعات والمستخلص
             'timesheet.entry'          => $m('Timesheet/timesheet_type.php',           'create', 'exact'),
             'timesheet.approve'        => $m('Approvals/hours_approval.php',        'update', 'exact',
-                                             'سُجّلت 2026-08-06 — الشاشةُ كلُّها اعتماد فرايةُ التعديل تمثله'),
+                                             'سجلت 2026-08-06 — الشاشة كلها اعتماد فراية التعديل تمثله'),
             'claim.create'             => $m('Contracts/claims.php',                   'create', 'exact'),
             // ④ دورة المسيّر
             'employee.create'          => $m('Employees/employees.php',                'create', 'exact'),
             'payroll.salary.update'    => $m('Employees/employee_contracts_details.php','update', 'approx',
-                                             'الأجرُ في ملف عقد الموظف — والرايةُ تشمل بقيةَ بنوده'),
+                                             'الأجر في ملف عقد الموظف — والراية تشمل بقية بنوده'),
             'payroll.run'              => $m('Workforce/payroll_runs.php',             'create', 'exact'),
             // ⑤ إخفاء التحصيل
             'invoice.create'           => $m('Contracts/tax_invoices.php',             'create', 'exact'),
             'receipt.create'           => $m('Contracts/collections.php',              'create', 'approx',
-                                             'لا شاشةَ سندِ قبضٍ مستقلة — الأقربُ الذممُ والتحصيل'),
+                                             'لا شاشة سند قبض مستقلة — الأقرب الذمم والتحصيل'),
             'bank.reconcile'           => $m('Finance/bank_reconciliation_fin.php',    'update', 'exact'),
             // ⑥ الصلاحية الذاتية
             'permission.create'        => $m('Settings/role_permissions.php',          'create', 'exact'),
             'permission.approve'       => $m('Governance/access_review.php',           'update', 'approx',
-                                             'الاعتمادُ في دورة المراجعة الدورية'),
+                                             'الاعتماد في دورة المراجعة الدورية'),
             'permission.apply'         => $m('Settings/role_permissions.php',          'update', 'approx',
-                                             'يتقاسم شاشةَ الإنشاء — الرايةُ لا تفرّق'),
+                                             'يتقاسم شاشة الإنشاء — الراية لا تفرق'),
             // ⑦ نقل الملكية
-            'ownership.share.create'   => $m(null, null, 'absent', 'لا شاشةَ لحصص الملكية في السجل'),
-            'ownership.transfer.approve' => $m(null, null, 'absent', 'لا شاشةَ لنقل الحصص في السجل'),
+            'ownership.share.create'   => $m(null, null, 'absent', 'لا شاشة لحصص الملكية في السجل'),
+            'ownership.transfer.approve' => $m(null, null, 'absent', 'لا شاشة لنقل الحصص في السجل'),
             // ⑧ الفترة والقيد — الفتحُ والإقفالُ (شاشةٌ واحدةٌ ورايةٌ واحدة):
             // تعارضُهما يقع بالبناء لا بالواقع فيُنتج إنذارًا كاذبًا لكل من يملك
             // الشاشةَ — يُعلَنان غيرَ قابلَين للقياس حتى تدقّ الأبعاد (DEC-SEC-K).
             // والحمايةُ الفعليةُ للدورة في الزوج ⑨ (قيد + مطابقة) القابلِ للقياس.
             'period.open'              => $m(null, null, 'absent',
-                                             'يتقاسم الشاشةَ والرايةَ مع الإقفال — قياسُه بالرايات إنذارٌ كاذب'),
+                                             'يتقاسم الشاشة والراية مع الإقفال — قياسه بالرايات إنذار كاذب'),
             'journal.entry'            => $m('Finance/journal_form_fin.php',           'create', 'exact'),
             'period.close.approve'     => $m(null, null, 'absent',
-                                             'يتقاسم الشاشةَ والرايةَ مع الفتح — قياسُه بالرايات إنذارٌ كاذب'),
+                                             'يتقاسم الشاشة والراية مع الفتح — قياسه بالرايات إنذار كاذب'),
         );
     }
 }

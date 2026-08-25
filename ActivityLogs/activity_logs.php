@@ -105,7 +105,7 @@ if (isset($_POST['ajax']) && $_POST['ajax'] === 'clear_logs') {
 
     $roleId = intval($_POST['role_id'] ?? 0);
     if ($roleId <= 0) {
-        echo json_encode(['success' => false, 'message' => 'معرّف الدور غير صالح']);
+        echo json_encode(['success' => false, 'message' => 'معرف الدور غير صالح']);
         exit();
     }
 
@@ -352,7 +352,7 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
             : false;
         include(__DIR__ . '/../includes/page_header.php');
         // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-        echo ems_states_bundle('لا سجلاتِ نشاطٍ مطابقةً لهذه الفلاتر', 'وسِّعِ المدى الزمنيَّ أو أعِدْ ضبطَ الفلاتر بزرِّ «إعادة»');
+        echo ems_states_bundle('لا سجلات نشاط مطابقة لهذه الفلاتر', 'وسع المدى الزمني أو أعد ضبط الفلاتر بزر «إعادة»');
         ?>
 
 
@@ -509,12 +509,12 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
                                     <th class="text-center" data-orderable="false">تفاصيل</th><!-- col 9 -->
                                     <th class="d-none">http_method</th><!-- col 10 hidden -->
                                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — خلاياها من renderLogCells (serverSide) -->
-                                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th><!-- col 11 -->
-                                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th><!-- col 12 -->
+                                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th><!-- col 11 -->
+                                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th><!-- col 12 -->
                                     <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th><!-- col 13 -->
-                                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th><!-- col 14 -->
+                                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th><!-- col 14 -->
                                     <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th><!-- col 15 -->
-                                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th><!-- col 16 -->
+                                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th><!-- col 16 -->
                                     <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th><!-- col 17 -->
                                     <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th><!-- col 18 -->
                                     <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th><!-- col 19 -->
@@ -753,7 +753,7 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
                 })
                 .fail(function () {
                     getModal('clearConfirmModal').hide();
-                    showToast('danger', 'تعذّر الاتصال بالخادم');
+                    showToast('danger', 'تعذر الاتصال بالخادم');
                 })
                 .always(function () {
                     $btn.prop('disabled', false).html('<i class="fa fa-trash me-1"></i>نعم، تفريغ السجلات');
@@ -886,7 +886,7 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
 
         // Simple toast notification
         function showToast(type, msg) {
-            // UXW-01 ①: الشكلُ في أصنافِ الشاشةِ (.activity-toast) لا في cssText
+            // UXW-01 ①: الشكل في أصناف الشاشة (.activity-toast) لا في cssText
             var known = { success: 1, danger: 1, warning: 1 };
             var toast = document.createElement('div');
             toast.className = 'activity-toast' + (known[type] ? ' activity-toast-' + type : '');

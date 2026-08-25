@@ -58,7 +58,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back    = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا طلباتٍ تحتَ المراجعةِ لإداراتِك الآن', 'راجِعِ الطلباتِ الواردةَ لاحقًا، أو افتحْ «التفاصيل والسجل» لطلبٍ سبقَ بتُّه');
+    echo ems_states_bundle('لا طلبات تحت المراجعة لإداراتك الآن', 'راجع الطلبات الواردة لاحقا، أو افتح «التفاصيل والسجل» لطلب سبق بته');
     ?>
     <style>
     .fdi-alert      { margin-bottom: 14px; font-weight: 700; }
@@ -76,7 +76,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php endif; ?>
 
     <?php if (!$my_routes): ?>
-        <div class="card"><div class="card-body"><h5>⛔ دورك ليس مراجعًا ولا معتمدًا لأي إدارةٍ مفعّلة</h5></div></div>
+        <div class="card"><div class="card-body"><h5>⛔ دورك ليس مراجعا ولا معتمدا لأي إدارة مفعلة</h5></div></div>
     <?php else: foreach ($rows as $r):
         $rt = $my_routes[$r['source_module']];
         $can_recommend = $is_super || finreq_role_is($rt, $role, 'reviewer');
@@ -96,7 +96,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="card-body">
                 <div class="fdi-summary">
                     <div><strong>الإدارة:</strong> <?php echo htmlspecialchars($rt['module_label']); ?></div>
-                    <div><strong>المبرّر:</strong> <?php echo htmlspecialchars($r['justification']); ?></div>
+                    <div><strong>المبرر:</strong> <?php echo htmlspecialchars($r['justification']); ?></div>
                     <div><strong>المستفيد:</strong> <?php echo htmlspecialchars($r['beneficiary_name'] ?? '-'); ?></div>
                     <div><strong>المبلغ:</strong> <?php echo number_format(floatval($r['amount']), 2) . ' ' . htmlspecialchars($r['currency']); ?></div>
                     <div><strong>الحاجة:</strong> <?php echo htmlspecialchars($r['need_class']); ?></div>
@@ -127,7 +127,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <input type="hidden" name="action" value="reject">
                         <input type="hidden" name="id" value="<?php echo intval($r['id']); ?>">
                         <input type="hidden" name="back" value="dept_inbox.php">
-                        <select name="rejection_class" aria-label="تصنيفُ سببِ الرفض" required>
+                        <select name="rejection_class" aria-label="تصنيف سبب الرفض" required>
                             <option value="">— تصنيف الرفض —</option>
                             <?php foreach ($rej_classes as $k => $v): ?><option value="<?php echo $k; ?>"><?php echo $v; ?></option><?php endforeach; ?>
                         </select>

@@ -99,7 +99,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا مراكزَ تكلفةٍ ولا تخصيصاتٍ بينيةً مسجَّلةً بعدُ', 'أنشئْ مركزًا بزرِّ «مركز تكلفة/ربح» ثمّ وزّعِ التكلفةَ بزرِّ «تخصيص/تسوية»');
+    echo ems_states_bundle('لا مراكز تكلفة ولا تخصيصات بينية مسجلة بعد', 'أنشئ مركزا بزر «مركز تكلفة/ربح» ثم وزع التكلفة بزر «تخصيص/تسوية»');
     ?>
     <?php fin_msg_banner(); ?>
 
@@ -143,13 +143,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="ems-fn-th" data-fn="1">طبيعة الرصيد</th>
               <th class="ems-fn-th" data-fn="1">يقبل القيد المباشر؟</th>
               <th class="ems-fn-th" data-fn="1">مركز التكلفة إلزامي؟</th>
-              <th class="ems-fn-th" data-fn="1">عرّفه</th>
+              <th class="ems-fn-th" data-fn="1">عرفه</th>
               <th class="ems-fn-th" data-fn="1">تاريخ التعريف</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
               <th class="ems-gov-th" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
-              <th class="ems-gov-th" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
+              <th class="ems-gov-th" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
               <th class="ems-gov-th" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
               <th class="ems-gov-th" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
               </tr></thead>

@@ -28,7 +28,7 @@ $role = strval($_SESSION['user']['role'] ?? '');
 $is_super = ($role === '-1');
 // خلف الصلاحية: الإدارة العليا والمالية العليا حصرًا (1 · 19 · -1)
 if (!$is_super && !in_array($role, array('1', '19'), true)) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'شاشة التصنيف خلف صلاحية مقيَّدة ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
+    ems_gov_flash_redirect('../main/dashboard.php', 'شاشة التصنيف خلف صلاحية مقيدة ❌', 'GOV-PERM-403', 'اطلب المنحة من مدير الصلاحيات إن كانت ضمن عملك');
 }
 
 $msg = ''; $err = '';
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!in_array($newClass, array('absolute', 'exception_allowed', 'advisory'), true)) {
         $err = 'صنف غير معروف';
     } elseif ($reason === '') {
-        $err = 'سبب التغيير إلزامي — الصنف يتغير بقرار حوكمة موثَّق لا بتعديل إعداد';
+        $err = 'سبب التغيير إلزامي — الصنف يتغير بقرار حوكمة موثق لا بتعديل إعداد';
     } else {
         $cur = null;
         $st = $conn->prepare('SELECT guard_class FROM guard_policies WHERE guard_code = ?');
@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $st->bind_param('siss', $newClass, $uid, $full, $code);
             $st->execute();
             $st->close();
-            $msg = 'غُيّر الصنف بقراره الموثق وتوقيعه — وقيمتا قبل/بعد في السبب';
+            $msg = 'غير الصنف بقراره الموثق وتوقيعه — وقيمتا قبل/بعد في السبب';
         }
     }
 }
@@ -73,7 +73,7 @@ $guards = array();
 $r = $conn->query('SELECT * FROM guard_policies ORDER BY guard_code');
 while ($r && ($x = $r->fetch_assoc())) { $guards[] = $x; }
 
-$CLASS_AR = array('absolute' => 'منع مطلق — لا استثناء', 'exception_allowed' => 'منع باستثناء محكوم', 'advisory' => 'تنبيه مسجَّل');
+$CLASS_AR = array('absolute' => 'منع مطلق — لا استثناء', 'exception_allowed' => 'منع باستثناء محكوم', 'advisory' => 'تنبيه مسجل');
 $page_title = 'إيكوبيشن | تصنيف الحمايات';
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
 require_once __DIR__ . '/../includes/screen_contract.php';
@@ -93,10 +93,10 @@ include '../insidebar.php';
     $header_actions = array();
     include('../includes/page_header.php');
     ems_screen_about('صنف كل حماية ودرجتها وموافقوها وعلم بيئتها — لا حماية بلا صنف معلن، '
-        . 'ولا يُقلب علم حماية إلى الإنفاذ قبل تصنيفها، والصنف يتغير بقرار موثَّق بسببه.',
+        . 'ولا يقلب علم حماية إلى الإنفاذ قبل تصنيفها، والصنف يتغير بقرار موثق بسببه.',
         array('راجع الصنف والدرجة', 'أي تغيير صنف يلزمه سبب'));
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا حماياتٍ مصنَّفةً في سجلِّ السياسات بعدُ', 'اطلب من الحوكمةِ تسجيلَ الحمايةِ وصنفَها قبل قلبِ علمِ بيئتِها');
+    echo ems_states_bundle('لا حمايات مصنفة في سجل السياسات بعد', 'اطلب من الحوكمة تسجيل الحماية وصنفها قبل قلب علم بيئتها');
     if ($msg !== '') { echo '<div class="alert alert-success">' . htmlspecialchars($msg) . '</div>'; }
     if ($err !== '') { echo '<div class="alert alert-danger">' . htmlspecialchars($err) . '</div>'; }
     ?>
@@ -104,10 +104,10 @@ include '../insidebar.php';
         <div class="table-container"><table class="alltables display gcl-table" data-no-dt="1">
         <thead><tr><th>الحماية</th><th>البيت</th><th>الصنف</th><th>الدرجة</th><th>علم البيئة</th><th>آخر سبب</th><th>تغيير الصنف (بقرار)</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -124,10 +124,10 @@ include '../insidebar.php';
             <td><small><?php echo htmlspecialchars(mb_substr((string) $g['reason'], 0, 60)); ?></small></td>
             <td>
                 <form method="post" class="gcl-form"
-                      onsubmit="return confirm('تحذير الأثر: تغيير صنف «<?php echo htmlspecialchars($g['name_ar']); ?>» يغيّر سلوك الحارس الحي (منع/استثناء/تنبيه). أتؤكد بقرار موثَّق؟');">
+                      onsubmit="return confirm('تحذير الأثر: تغيير صنف «<?php echo htmlspecialchars($g['name_ar']); ?>» يغير سلوك الحارس الحي (منع/استثناء/تنبيه). أتؤكد بقرار موثق؟');">
                     <?= csrf_field() ?>
                     <input type="hidden" name="guard_code" value="<?php echo htmlspecialchars($g['guard_code']); ?>">
-                    <select name="guard_class" aria-label="صنفُ الحمايةِ الجديد">
+                    <select name="guard_class" aria-label="صنف الحماية الجديد">
                         <?php foreach ($CLASS_AR as $ck => $cl): ?>
                         <option value="<?php echo $ck; ?>" <?php echo $ck === $g['guard_class'] ? 'selected' : ''; ?>><?php echo $cl; ?></option>
                         <?php endforeach; ?>

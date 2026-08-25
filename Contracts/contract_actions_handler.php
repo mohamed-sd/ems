@@ -632,12 +632,12 @@ else if ($action === 'change_obligation') {
         ), $user_id);
     if ($r['ok']) {
         addContractNote($contract_id,
-            'ملحقُ تغيير التزامات #' . intval($r['amendment_id'])
-            . ' — ولّد بندَ مصفوفةٍ مسودةً #' . intval($r['obligation_id']) . ' ينتظر إجازةَ المالية',
+            'ملحق تغيير التزامات #' . intval($r['amendment_id'])
+            . ' — ولد بند مصفوفة مسودة #' . intval($r['obligation_id']) . ' ينتظر إجازة المالية',
             $user_id, $conn);
     }
     echo json_encode(['success' => (bool) $r['ok'], 'message' => $r['ok']
-        ? ('أُنشئ الملحقُ وولّد بندَ المصفوفة مسودةً — بانتظار إجازة المالية ✅')
+        ? ('أنشئ الملحق وولد بند المصفوفة مسودة — بانتظار إجازة المالية ✅')
         : ($r['reason'] . ' (' . intval($r['code']) . ')'),
         'amendment_id' => $r['amendment_id'], 'obligation_id' => $r['obligation_id']]);
 }

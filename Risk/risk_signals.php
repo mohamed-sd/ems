@@ -47,18 +47,18 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     $header_context = array('المصدر' => 'risk_signals', 'تنتظر الفرز' => $pendingN, 'المعروض' => count($rows) . ' إشارة');
     include('../includes/page_header.php');
     ems_screen_about(
-        'الإشارة تُفرز قبل أن تصير خطرًا (RK-05): تُهمل بسبب موسوم، أو تُربط بخطر قائم فيُعاد تقييمه، '
-        . 'أو تُنشئ خطرًا جديدًا، أو تُصعَّد فورًا للرئيس في اليوم نفسه.',
-        array('التحويل الآلي لكل بلاغ إلى خطر يُنتج آلاف المخاطر المزعجة — الفرز حارس المعنى'));
+        'الإشارة تفرز قبل أن تصير خطرا (RK-05): تهمل بسبب موسوم، أو تربط بخطر قائم فيعاد تقييمه، '
+        . 'أو تنشئ خطرا جديدا، أو تصعد فورا للرئيس في اليوم نفسه.',
+        array('التحويل الآلي لكل بلاغ إلى خطر ينتج آلاف المخاطر المزعجة — الفرز حارس المعنى'));
     echo ems_next_step($canTriage
-        ? 'فرزُ المعلَّقِ بقرارٍ مسبَّبٍ — إهمالٌ بوسمٍ أو ربطٌ بقائمٍ أو تحويلٌ بوحدةٍ مالكةٍ أو تصعيد'
-        : 'الفرزُ بيدِ إدارةِ المخاطر — وإشارتُك تدخل الصندوقَ وتنتظر قرارَها');
-    echo ems_states_bundle('لا إشاراتٍ بهذه الحالة', 'الإشارةُ تُفرز قبل أن تصيرَ خطرًا — بدّل تبويبَ الحالةِ أو سجّل إشارةً جديدة');
+        ? 'فرز المعلق بقرار مسبب — إهمال بوسم أو ربط بقائم أو تحويل بوحدة مالكة أو تصعيد'
+        : 'الفرز بيد إدارة المخاطر — وإشارتك تدخل الصندوق وتنتظر قرارها');
+    echo ems_states_bundle('لا إشارات بهذه الحالة', 'الإشارة تفرز قبل أن تصير خطرا — بدل تبويب الحالة أو سجل إشارة جديدة');
     ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <div class="ems-toolbar">
-        <?php foreach (array('pending' => 'تنتظر', 'converted' => 'حُوّلت', 'linked' => 'رُبطت', 'dismissed' => 'أُهملت بوسم', 'escalated' => 'صُعِّدت') as $k => $v): ?>
+        <?php foreach (array('pending' => 'تنتظر', 'converted' => 'حولت', 'linked' => 'ربطت', 'dismissed' => 'أهملت بوسم', 'escalated' => 'صعدت') as $k => $v): ?>
         <a class="ems-btn-<?php echo $fState === $k ? 'primary' : 'secondary'; ?>" href="?state=<?php echo $k; ?>"><?php echo $v; ?></a>
         <?php endforeach; ?>
     </div>
@@ -72,7 +72,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     <div class="card"><div class="card-body table-responsive">
         <table class="table table-striped rsk-w100">
             <thead><tr><th>#</th><th>المصدر</th><th>القاعدة</th><th>العنوان</th><th>الوحدة المرشحة</th>
-                <th>السبب الجذري</th><th>المُنشئ</th><th>التاريخ</th>
+                <th>السبب الجذري</th><th>المنشئ</th><th>التاريخ</th>
                 <?php if ($canTriage && $fState === 'pending'): ?><th>الفرز</th><?php endif; ?>
                 <?php if ($fState !== 'pending'): ?><th>قرار الفرز</th><?php endif; ?></tr></thead>
             <tbody><?php foreach ($rows as $s): ?>
@@ -88,10 +88,10 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                 <?php if ($canTriage && $fState === 'pending'): ?>
                 <td class="rsk-triage-cell">
                     <select class="sigDecision form-control form-control-sm rsk-inline-auto" aria-label="قرار الفرز" data-id="<?php echo (int) $s['id']; ?>">
-                        <option value="convert">يُنشئ خطرًا</option>
-                        <option value="link">يُربط بقائم</option>
-                        <option value="dismiss">يُهمل بوسم</option>
-                        <option value="escalate">يُصعَّد فورًا</option>
+                        <option value="convert">ينشئ خطرا</option>
+                        <option value="link">يربط بقائم</option>
+                        <option value="dismiss">يهمل بوسم</option>
+                        <option value="escalate">يصعد فورا</option>
                     </select>
                     <input class="sigReason form-control form-control-sm rsk-inline-150" placeholder="السبب المكتوب *" aria-label="السبب المكتوب">
                     <input class="sigExtra form-control form-control-sm rsk-inline-110" placeholder="رقم الخطر/الوحدة" aria-label="رقم الخطر/الوحدة">
@@ -108,7 +108,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                                 echo htmlspecialchars((string) $ou['name_ar'], ENT_QUOTES, 'UTF-8'); ?></option>
                         <?php endforeach; ?>
                     </select>
-                    <button class="btn btn-sm btn-secondary sigGo">نفّذ</button>
+                    <button class="btn btn-sm btn-secondary sigGo">نفذ</button>
                 </td>
                 <?php endif; ?>
                 <?php if ($fState !== 'pending'): ?>
@@ -122,7 +122,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     <?php endif; ?>
 
     <div class="card rsk-new-card is-hidden" id="sigNewCard"><div class="card-body">
-        <h6>إشارة جديدة — حق كل إدارة (تدخل الفرز ولا تُسجَّل خطرًا مباشرة)</h6>
+        <h6>إشارة جديدة — حق كل إدارة (تدخل الفرز ولا تسجل خطرا مباشرة)</h6>
         <form id="sigNewForm" class="allforms">
             <div class="row">
                 <div class="col-md-6"><label>العنوان *<input name="title" class="form-control" aria-label="عنوان الإشارة" required></label></div>
@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var d = { do: 'signal_create' };
         new FormData(nf).forEach(function (v, k) { d[k] = v; });
         post(d, function (j) {
-            document.getElementById('sigNewMsg').textContent = j.ok ? '✔ سُجلت #' + j.id : '✘ ' + (j.msg || '');
+            document.getElementById('sigNewMsg').textContent = j.ok ? '✔ سجلت #' + j.id : '✘ ' + (j.msg || '');
             if (j.ok) { setTimeout(function () { location.reload(); }, 700); }
         });
     }); }
@@ -174,7 +174,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 var own = tr.querySelector('.sigOwner');
                 d.owner_unit_id = own ? own.value : '';
                 if (!d.owner_unit_id) {
-                    alert('RSK-422: الوحدةُ المالكةُ إلزاميةٌ — لا خطرَ يُسجَّل بلا وحدةٍ مالكة');
+                    alert('RSK-422: الوحدة المالكة إلزامية — لا خطر يسجل بلا وحدة مالكة');
                     return;
                 }
             }

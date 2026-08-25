@@ -106,7 +106,7 @@ $dept_in = $dept_ids ? implode(',', $dept_ids) : '0';
 // المرشَّحُ على المستلم لكل الأدوار لا لدور 24 وحده.
 $TABS = array(
     'open'     => array('مفتوحة', " AND t.stage NOT IN ('done','closed','cancelled')"),
-    'approval' => array('تنتظر اعتمادًا', " AND t.stage = 'done'"),
+    'approval' => array('تنتظر اعتمادا', " AND t.stage = 'done'"),
     'mine'     => array('بلاغاتي', ' AND (t.reporter_user_id = ' . intval($current_user_id)
                        . ' OR t.assigned_user_id = ' . intval($current_user_id)
                        . ' OR t.created_by = ' . intval($current_user_id) . ')'),
@@ -114,7 +114,7 @@ $TABS = array(
 );
 // التبويبُ يظهر لمن له وحدةٌ تنظيميةٌ فقط — والمديرُ الأعلى يرى الكلَّ أصلًا
 if ($dept_unit > 0) {
-    $TABS['dept'] = array('موجَّهة لإدارتي', ' AND t.id IN (' . $dept_in . ')');
+    $TABS['dept'] = array('موجهة لإدارتي', ' AND t.id IN (' . $dept_in . ')');
 }
 
 /* ══ «موجَّهة لإدارتي» لا تخضع لشجرةِ الأدوار ═══════════════════════════════
@@ -174,7 +174,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا بلاغاتِ في هذا التبويب', 'بدّل التبويبَ أو أزل الفلاترَ — أو افتح بلاغًا بزرِّ «بلاغ جديد»');
+    echo ems_states_bundle('لا بلاغات في هذا التبويب', 'بدل التبويب أو أزل الفلاتر — أو افتح بلاغا بزر «بلاغ جديد»');
     ?>
     <style>
     /* UXW-01 ①②: أنماطُ قائمةِ البلاغاتِ الثابتة — بادئةُ الشاشة tkt-list- */
@@ -212,7 +212,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     .tkt-list-tab.is-active { background: var(--c-e2b93b, #e2b93b); font-weight: 800; }
     .tkt-list-table       { width: 100%; }
     </style>
-<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('ticket', 'نظرةٌ عامة'); ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('ticket', 'نظرة عامة'); ?>
 
     <?php tkt_msg_banner(); ?>
 
@@ -231,8 +231,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     // فصنفُ النغمةِ كان يبقى مكتوبًا بلا أثرٍ بصريٍّ — وهو أسوأُ من غيابه.
     $glance_cards = array(
         array('مفتوحة الآن', (int)$g['open_cnt'], 'fa-folder-open'),
-        array('متأخّرة', (int)$g['late_cnt'], 'fa-triangle-exclamation'),
-        array('حرِجة للإنتاج', (int)$g['crit_cnt'], 'fa-bolt'),
+        array('متأخرة', (int)$g['late_cnt'], 'fa-triangle-exclamation'),
+        array('حرجة للإنتاج', (int)$g['crit_cnt'], 'fa-bolt'),
     );
     ?>
     <div class="stats-section">
@@ -298,21 +298,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <table id="tktTable" class="display nowrap alltables tkt-list-table" data-scroll-x="1" data-state-save="false">
                 <thead><tr>
                     <th>تاريخ الفتح</th><th>رقم التذكرة</th><th>النوع</th><th>الطبيعة</th><th>المرحلة</th><th>الإدارة المالكة</th>
-                    <th>المُبلِّغ</th><th>المعدة</th><th>المشروع</th><th>الوصف</th><th>تاريخ البلاغ</th><th>موعد الإنجاز</th><th>متأخّر</th>
+                    <th>المبلغ</th><th>المعدة</th><th>المشروع</th><th>الوصف</th><th>تاريخ البلاغ</th><th>موعد الإنجاز</th><th>متأخر</th>
                     <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
                     <th class="ems-fn-th" data-fn="1">رقم البلاغ</th>
                     <th class="ems-fn-th" data-fn="1">الفئة</th>
                     <th class="ems-fn-th" data-fn="1">الأولوية</th>
                     <th class="ems-fn-th" data-fn="1">الموقع</th>
                     <th class="ems-fn-th" data-fn="1">الإدارة المختصة</th>
-                    <th class="ems-fn-th" data-fn="1">المكلَّف</th>
+                    <th class="ems-fn-th" data-fn="1">المكلف</th>
                     <th class="ems-fn-th" data-fn="1">مستوى السرية</th>
                     <th class="ems-fn-th" data-fn="1">المسارات المتوازية</th>
                     <th class="ems-fn-th" data-fn="1">المهلة</th>
                     <th class="ems-fn-th none" data-fn="1">المتبقي</th>
                     <th class="ems-fn-th none" data-fn="1">التصعيد الحالي</th>
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                    <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                    <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
                     <th class="ems-gov-th none" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
                     </tr></thead>
                 <tbody>

@@ -50,7 +50,7 @@ class PayrollStateMachine
 
     const LABELS_AR = array(
         self::OPEN => 'مفتوحة', self::CALCULATED => 'محتسَبة', self::BLOCKED => 'موقوفة',
-        self::REVIEW => 'مراجعة', self::APPROVED => 'معتمَدة', self::PAID => 'مدفوعة',
+        self::REVIEW => 'مراجعة', self::APPROVED => 'معتمدة', self::PAID => 'مدفوعة',
         self::CLOSED => 'مقفلة',
     );
 
@@ -93,10 +93,10 @@ class PayrollStateMachine
                 "SELECT COUNT(*) n FROM payroll_lines l
                   WHERE {TENANT_SCOPE} AND l.run_id = ? AND l.calc_state <> 'computed'", array($runId));
             $out['pending'] = $r ? (int) $r[0]['n'] : 0;
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'فشلٌ يُعامَل بقيمةٍ افتراضية — $out[\'pending\'] = 0'); $out['pending'] = 0; }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'فشل يعامل بقيمة افتراضية — $out[\'pending\'] = 0'); $out['pending'] = 0; }
         if ($out['pending'] > 0) {
-            $out['reasons'][] = $out['pending'] . ' سطرًا لم يكتمل احتسابُه (`pending_slice`) — '
-                              . '«صفٌّ بلا احتسابٍ تامٍّ لا يُعتمد»';
+            $out['reasons'][] = $out['pending'] . ' سطرا لم يكتمل احتسابه (`pending_slice`) — '
+                              . '«صف بلا احتساب تام لا يعتمد»';
         }
 
         // ② موانعُ مفتوحة (المستبعَدُ ليس مانعًا — ENT-01 يفرّق)
@@ -105,16 +105,16 @@ class PayrollStateMachine
                 "SELECT COUNT(*) n FROM payroll_run_blocks b
                   WHERE {TENANT_SCOPE} AND b.run_id = ? AND b.kind = 'blocked'", array($runId));
             $out['blocked'] = $r ? (int) $r[0]['n'] : 0;
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'فشلٌ يُعامَل بقيمةٍ افتراضية — $out[\'blocked\'] = 0'); $out['blocked'] = 0; }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'فشل يعامل بقيمة افتراضية — $out[\'blocked\'] = 0'); $out['blocked'] = 0; }
         if ($out['blocked'] > 0) {
-            $out['reasons'][] = $out['blocked'] . ' مانعًا مفتوحًا — «لا احتسابَ ناقصٌ صامت»';
+            $out['reasons'][] = $out['blocked'] . ' مانعا مفتوحا — «لا احتساب ناقص صامت»';
         }
 
         // ③ لقطةٌ لا تطابق بصمتَها (كشفُ التلاعب — ENT-01 §2)
         $v = PayrollRunService::verifyImmutability($gate, $runId);
         $out['tampered'] = count($v['tampered']) + (int) $v['without_snapshot'];
         if ($out['tampered'] > 0) {
-            $out['reasons'][] = $out['tampered'] . ' لقطةً لا تطابق بصمتَها أو سطرًا بلا لقطة — تلاعبٌ مكشوف';
+            $out['reasons'][] = $out['tampered'] . ' لقطة لا تطابق بصمتها أو سطرا بلا لقطة — تلاعب مكشوف';
         }
 
         $out['ok'] = ($out['pending'] === 0 && $out['blocked'] === 0 && $out['tampered'] === 0);
@@ -135,12 +135,12 @@ class PayrollStateMachine
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'state' => null, 'event_id' => null);
         $runId = (int) $runId; $to = (string) $to;
         $run = PayrollRunService::runOf($gate, $runId);
-        if (!$run) { $out['code'] = 404; $out['reason'] = 'الدورةُ غير موجودةٍ في نطاقك'; return $out; }
+        if (!$run) { $out['code'] = 404; $out['reason'] = 'الدورة غير موجودة في نطاقك'; return $out; }
         $from = (string) $run['state'];
 
         if (!self::canTransition($from, $to)) {
             $out['code'] = 422;
-            $out['reason'] = 'انتقالٌ غيرُ مشروعٍ من «' . self::labelAr($from) . '» إلى «' . self::labelAr($to)
+            $out['reason'] = 'انتقال غير مشروع من «' . self::labelAr($from) . '» إلى «' . self::labelAr($to)
                            . '» — المسموح: ' . (implode(' · ', array_map(
                                array(__CLASS__, 'labelAr'), self::allowedFrom($from))) ?: 'لا شيء');
             return $out;
@@ -152,7 +152,7 @@ class PayrollStateMachine
             $pg = ems_period_check($conn, $companyId, (string) $run['period_to']);
             if (empty($pg['ok'])) {
                 $out['code'] = 423;
-                $out['reason'] = 'فترةُ ' . $run['period_to'] . ' مقفلة: ' . $pg['reason'];
+                $out['reason'] = 'فترة ' . $run['period_to'] . ' مقفلة: ' . $pg['reason'];
                 return $out;
             }
         }
@@ -162,12 +162,12 @@ class PayrollStateMachine
             $red = self::redRows($gate, $runId);
             if (!$red['ok']) {
                 $out['code'] = 422;
-                $out['reason'] = '**صفرُ صفٍّ أحمرَ معتمد** (PLAN-01 §6.1-⑤): ' . implode(' · ', $red['reasons']);
+                $out['reason'] = '**صفر صف أحمر معتمد** (PLAN-01 §6.1-⑤): ' . implode(' · ', $red['reasons']);
                 return $out;
             }
             $lines = (int) $run['lines_count'];
             if ($lines <= 0) {
-                $out['code'] = 422; $out['reason'] = 'دورةٌ بلا أسطر — لا شيءَ يُراجع'; return $out;
+                $out['code'] = 422; $out['reason'] = 'دورة بلا أسطر — لا شيء يراجع'; return $out;
             }
         }
 
@@ -175,7 +175,7 @@ class PayrollStateMachine
         if ($to === self::APPROVED) {
             if ((int) $run['created_by'] > 0 && (int) $run['created_by'] === (int) $actor) {
                 $out['code'] = 403;
-                $out['reason'] = 'من أنشأ الدورةَ لا يعتمدها — الفصلُ بنيويٌّ لا اختياري (§5)';
+                $out['reason'] = 'من أنشأ الدورة لا يعتمدها — الفصل بنيوي لا اختياري (§5)';
                 return $out;
             }
         }
@@ -184,7 +184,7 @@ class PayrollStateMachine
         $payRef = isset($opts['payment_ref']) ? trim((string) $opts['payment_ref']) : '';
         if ($to === self::PAID && $payRef === '') {
             $out['code'] = 422;
-            $out['reason'] = 'مرجعُ الصرف إلزامي — «تنفيذُ الصرف **بمرجعه**» (§5)';
+            $out['reason'] = 'مرجع الصرف إلزامي — «تنفيذ الصرف **بمرجعه**» (§5)';
             return $out;
         }
 
@@ -193,19 +193,19 @@ class PayrollStateMachine
             $red = self::redRows($gate, $runId);
             if (!$red['ok']) {
                 $out['code'] = 422;
-                $out['reason'] = 'لا يُقفل وفيه معلَّق: ' . implode(' · ', $red['reasons']);
+                $out['reason'] = 'لا يقفل وفيه معلق: ' . implode(' · ', $red['reasons']);
                 return $out;
             }
         }
 
         $data = array('state' => $to, 'version' => (int) $run['version'] + 1);
         if ($to === self::PAID) {
-            $data['note'] = mb_substr('صُرف بمرجع ' . $payRef, 0, 255);
+            $data['note'] = mb_substr('صرف بمرجع ' . $payRef, 0, 255);
         }
         try {
             $gate->update('payroll_runs', $data, array('id' => $runId, 'version' => (int) $run['version']));
         } catch (\Throwable $t) {
-            $out['code'] = 409; $out['reason'] = 'تغيّرت الدورةُ من طرفٍ آخر — أعد التحميل'; return $out;
+            $out['code'] = 409; $out['reason'] = 'تغيرت الدورة من طرف آخر — أعد التحميل'; return $out;
         }
 
         // ── حدثُ FES عند الاعتماد: **واحدٌ لكل (شخص × فترة)** ─────────────
@@ -238,7 +238,7 @@ class PayrollStateMachine
                    FROM payroll_lines l
                   WHERE {TENANT_SCOPE} AND l.run_id = ?
                   GROUP BY l.person_id", array((int) $run['id']));
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $persons'); $persons = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $persons'); $persons = array(); }
 
         $n = 0;
         foreach ($persons as $p) {
@@ -260,7 +260,7 @@ class PayrollStateMachine
                     'currency'      => ($run['currency'] !== null && $run['currency'] !== '')
                                        ? (string) $run['currency'] : 'SDG',
                     'source_ref'    => 'PAYRUN-' . (int) $run['id'],
-                    'notes'         => 'اعتمادُ مسيّرِ ' . $period . ' للشخص #' . $pid,
+                    'notes'         => 'اعتماد مسير ' . $period . ' للشخص #' . $pid,
                     'payload'       => array(
                         'run_id' => (int) $run['id'], 'person_id' => $pid,
                         'period_from' => (string) $run['period_from'],
@@ -299,13 +299,13 @@ class PayrollStateMachine
                 "SELECT l.* FROM payroll_lines l
                   WHERE {TENANT_SCOPE} AND l.run_id = ? AND l.person_id = ?
                   ORDER BY l.line_kind, l.id", array($runId, $personId));
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $lines'); $lines = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $lines'); $lines = array(); }
 
         // الطبقاتُ الأربعُ بأسمائها من النص
         $map = array(
-            'component' => 'الأجرُ والبدلات', 'production' => 'الإنتاج',
-            'incentive' => 'الحوافزُ بأساسها', 'overtime' => 'الإضافي',
-            'absence_deduction' => 'خصمُ الغياب',
+            'component' => 'الأجر والبدلات', 'production' => 'الإنتاج',
+            'incentive' => 'الحوافز بأساسها', 'overtime' => 'الإضافي',
+            'absence_deduction' => 'خصم الغياب',
         );
         foreach ($lines as $l) {
             $k = (string) $l['line_kind'];
@@ -328,7 +328,7 @@ class PayrollStateMachine
                 "SELECT d.* FROM payroll_deductions d
                   WHERE {TENANT_SCOPE} AND d.run_id = ? AND d.person_id = ?
                   ORDER BY d.id", array($runId, $personId));
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $ded'); $ded = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $ded'); $ded = array(); }
         if ($ded) {
             $out['layers']['الخصوماتُ بمراجعها'] = array('rows' => $ded, 'total' => 0.0);
             foreach ($ded as $d) {
@@ -362,7 +362,7 @@ class PayrollStateMachine
                    FROM payroll_lines l
                   WHERE {TENANT_SCOPE} AND l.run_id = ?
                   GROUP BY l.person_id ORDER BY l.person_id", array($runId));
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $rows'); $rows = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $rows'); $rows = array(); }
 
         foreach ($rows as $i => $r) {
             $pid = (int) $r['person_id'];

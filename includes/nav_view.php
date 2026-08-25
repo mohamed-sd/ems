@@ -141,12 +141,12 @@ function ems_nav_view_chip()
           if (txt.indexOf(cfg.val) === -1) { rows[r].style.display = 'none'; } else { kept++; }
         }
         applied = 1;
-        if (state) { state.textContent = '— ' + kept + ' صفًّا'; }
+        if (state) { state.textContent = '— ' + kept + ' صفا'; }
       }
     }
 
     box.setAttribute('data-ems-view-applied', applied ? '1' : '0');
-    if (!applied && state) { state.textContent = '— لم يُطبَّق: القسمُ غيرُ ظاهرٍ لصلاحيتك'; }
+    if (!applied && state) { state.textContent = '— لم يطبق: القسم غير ظاهر لصلاحيتك'; }
   }
   if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', apply); }
   else { apply(); }

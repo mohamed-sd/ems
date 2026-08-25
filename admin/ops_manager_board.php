@@ -88,7 +88,7 @@ foreach ($qa("SELECT CONCAT('تكليف #', a.asg_id, ' (', t.name_ar, ') ينت
                 FROM org_assignments a JOIN org_assignment_types t ON t.type_code = a.assignment_type_code
                WHERE a.company_id = {$company_id} AND a.state = 'active'
                  AND a.valid_to BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)") as $x) {
-    $x['wait_h'] = 0; $x['label'] .= ' (خلال 30 يومًا)';
+    $x['wait_h'] = 0; $x['label'] .= ' (خلال 30 يوما)';
     $pending[] = $x;
 }
 usort($pending, function ($a, $b) { return intval($b['wait_h']) - intval($a['wait_h']); });
@@ -140,12 +140,12 @@ function ems_board_tile($icon, $title, $value, $meta, $action, $link)
 
     ems_screen_about(
         'المجموعات السبع (ORG-01 §3.1) — كل رقم معه إجراؤه، وما ينتظر قرارك '
-        . 'معروض بساعات الانتظار لا بالعدد فقط: البند الأقدم انتظارًا أولًا.',
-        array('ابدأ من «ما ينتظر قراره» — الأقدم ساعاتٍ أولًا',
+        . 'معروض بساعات الانتظار لا بالعدد فقط: البند الأقدم انتظارا أولا.',
+        array('ابدأ من «ما ينتظر قراره» — الأقدم ساعات أولا',
               'كل بطاقة بزر يقفز إلى موضع الفعل'));
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا بندَ ينتظر قرارَك الآن',
-        'تظهر هنا خططُ المواقعِ المرفوعةُ وأذوناتُ العملِ والتكليفاتُ المنتهية حالَ رفعِها');
+    echo ems_states_bundle('لا بند ينتظر قرارك الآن',
+        'تظهر هنا خطط المواقع المرفوعة وأذونات العمل والتكليفات المنتهية حال رفعها');
     ?>
 
     <style>
@@ -156,18 +156,18 @@ function ems_board_tile($icon, $title, $value, $meta, $action, $link)
     </style>
 
     <div class="card"><div class="card-header"><h5>⑦ ما ينتظر قراره —
-        <strong><?php echo count($pending); ?></strong> بندًا بمجموع انتظار
+        <strong><?php echo count($pending); ?></strong> بندا بمجموع انتظار
         <strong><?php echo $totalWaitH; ?> ساعة</strong> (بالساعات لا بالعدد)</h5></div>
     <div class="card-body">
         <?php if (!$pending) { ems_state_empty('لا شيء ينتظر قرارك — نظيف ✨'); } else { ?>
         <div class="table-container">
         <table class="alltables display nowrap ops-mb-table" data-no-dt="1">
-            <thead><tr><th>البند</th><th>منتظرًا منذ (ساعة)</th><th>الإجراء</th>
+            <thead><tr><th>البند</th><th>منتظرا منذ (ساعة)</th><th>الإجراء</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -211,7 +211,7 @@ function ems_board_tile($icon, $title, $value, $meta, $action, $link)
             intval($mnt['open_orders'] ?? 0),
             'توقف ' . round(floatval($mnt['downtime_h'] ?? 0)) . ' س',
             'رفع أولوية', '../Maintenance/orders.php');
-        ems_board_tile('fa-users', '④ القوى — مشغّلون معيَّنون',
+        ems_board_tile('fa-users', '④ القوى — مشغلون معينون',
             intval($ops4['c'] ?? 0), '',
             'طلب نقل أو بديل', '../Oprators/oprators.php');
         ems_board_tile('fa-cart-shopping', '⑤ المشتريات — أوامر مفتوحة',

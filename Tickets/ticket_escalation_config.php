@@ -19,7 +19,7 @@ $company_id = $ctx['company_id'];
 if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة ❌', 'GOV-SCOPE-403', ''); exit(); }
 $perms = tkt_page_perms($conn, 'Tickets/ticket_escalation_config.php', $is_super_admin);
 $can_view = $perms['can_view']; $can_add = $perms['can_add']; $can_edit = $perms['can_edit'];
-if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض سلّم التصعيد ❌', 'GOV-PERM-403', ''); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض سلم التصعيد ❌', 'GOV-PERM-403', ''); exit(); }
 
 $levels = array(
     'responsible'  => 'المسؤول / الإدارة المالكة',
@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
     }
 }
 
-$page_title = 'إيكوبيشن | سلّم التصعيد';
+$page_title = 'إيكوبيشن | سلم التصعيد';
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
 require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(isset($perms) ? $perms : null);
@@ -71,21 +71,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 ?>
 <div class="main tkt-esc-main ems-unified-page-shell">
     <?php
-    $header_title = 'سلّم التصعيد';
+    $header_title = 'سلم التصعيد';
     $header_icon  = 'fa fa-arrow-up-right-dots';
     $header_actions = array();
     if ($can_add) { $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة مستوى'); }
     $header_back = array('href' => 'tickets_list.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا مستوياتِ تصعيدٍ معرَّفةً بعدُ', 'أضف أولَ مستوًى بزرِّ «إضافة مستوى» في رأسِ الشاشة');
+    echo ems_states_bundle('لا مستويات تصعيد معرفة بعد', 'أضف أول مستوى بزر «إضافة مستوى» في رأس الشاشة');
     ?>
     <?php tkt_msg_banner(); ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <div class="success-message is-success tkt-esc-note">
         <i class="fas fa-circle-info"></i>
-        يعمل السلّم عبر <strong>دورة البلاغات المجدوَلة</strong>: عند تجاوز موعد الإنجاز بالساعات المحدَّدة يُرسَل إشعارٌ للدور الهدف (يُحسب من شجرة الأدوار الحيّة) ويُقيَّد حدثُ تصعيدٍ على التذكرة.
+        يعمل السلم عبر <strong>دورة البلاغات المجدولة</strong>: عند تجاوز موعد الإنجاز بالساعات المحددة يرسل إشعار للدور الهدف (يحسب من شجرة الأدوار الحية) ويقيد حدث تصعيد على التذكرة.
     </div>
 
     <form id="tktForm" action="" method="post" class="allforms">
@@ -96,8 +96,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="form-section"><div class="form-grid">
                 <div class="form-group"><label for="e_name">اسم القاعدة <span class="required">*</span></label><input type="text" name="name" id="e_name" required></div>
                 <div class="form-group"><label for="e_level">المستوى (1..5) <span class="required">*</span></label><input type="number" min="1" max="5" name="level_no" id="e_level" value="1" required></div>
-                <div class="form-group"><label for="e_after">يُصعَّد بعد (ساعات من تجاوز الإنجاز) <span class="required">*</span></label><input type="number" step="0.5" min="0.5" name="escalate_after_hours" id="e_after" required></div>
-                <div class="form-group"><label for="e_to">الجهة المُصعَّد إليها <span class="required">*</span></label>
+                <div class="form-group"><label for="e_after">يصعد بعد (ساعات من تجاوز الإنجاز) <span class="required">*</span></label><input type="number" step="0.5" min="0.5" name="escalate_after_hours" id="e_after" required></div>
+                <div class="form-group"><label for="e_to">الجهة المصعد إليها <span class="required">*</span></label>
                     <select name="escalate_to_role" id="e_to" required>
                         <?php foreach ($levels as $k => $v): ?><option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option><?php endforeach; ?>
                     </select></div>
@@ -105,7 +105,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <select name="notify_channel" id="e_channel">
                         <?php foreach ($channels as $k => $v): ?><option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option><?php endforeach; ?>
                     </select></div>
-                <div class="form-group"><label>مفعّلة؟</label><label class="switch-inline"><input type="checkbox" name="active" id="e_active" aria-label="تفعيلُ قاعدةِ التصعيد" value="1" checked> نعم</label></div>
+                <div class="form-group"><label>مفعلة؟</label><label class="switch-inline"><input type="checkbox" name="active" id="e_active" aria-label="تفعيل قاعدة التصعيد" value="1" checked> نعم</label></div>
             </div></div>
             <div class="form-actions">
                 <button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
@@ -122,15 +122,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="ems-fn-th" data-fn="1">البلاغ</th>
               <th class="ems-fn-th" data-fn="1">المهلة المتجاوزة</th>
               <th class="ems-fn-th" data-fn="1">المستوى بعد</th>
-              <th class="ems-fn-th" data-fn="1">المصعَّد إليه</th>
+              <th class="ems-fn-th" data-fn="1">المصعد إليه</th>
               <th class="ems-fn-th" data-fn="1">تاريخ التصعيد</th>
               <th class="ems-fn-th" data-fn="1">مدة التجاوز</th>
               <th class="ems-fn-th" data-fn="1">المالك الأصلي</th>
-              <th class="ems-fn-th" data-fn="1">هل بقي مسؤولًا؟</th>
+              <th class="ems-fn-th" data-fn="1">هل بقي مسؤولا؟</th>
               <th class="ems-fn-th" data-fn="1">الإجراء المتخذ</th>
               <th class="ems-fn-th" data-fn="1">تاريخ رفع التصعيد</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
               </tr></thead>
             <tbody>
             <?php

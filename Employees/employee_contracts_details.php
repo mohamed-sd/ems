@@ -603,7 +603,7 @@ $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 // UXW-01 (9): halat al-shasha — loading/empty/error, hidden by default
-echo ems_states_bundle('لا عقدَ موظفٍ معروضًا الآن', 'ارجعْ إلى قائمةِ الموظّفين واخترْ عقدًا مسجَّلًا لعرضِ تفاصيلِه');
+echo ems_states_bundle('لا عقد موظف معروضا الآن', 'ارجع إلى قائمة الموظفين واختر عقدا مسجلا لعرض تفاصيله');
 ?>
 
 
@@ -786,7 +786,7 @@ foreach ($dcd_rows as $row) {
                 <span class="info-value dcd-val-onprimary"><?php echo isset($row['shift_contract']) ? $row['shift_contract'] : 0; ?> ساعة</span>
             </div>
             <div class="info-item">
-                <span class="info-label dcd-lbl-onprimary">الوحدات يومياً</span>
+                <span class="info-label dcd-lbl-onprimary">الوحدات يوميا</span>
                 <span class="info-value dcd-val-onprimary"><?php echo isset($row['equip_total_contract_daily']) ? $row['equip_total_contract_daily'] : 0; ?></span>
             </div>
             <div class="info-item">
@@ -1006,10 +1006,10 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                     }
                     ?>
                     <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                     <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                     <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                     <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -1319,7 +1319,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
             <div class="modal-body">
                 <div class="alert alert-warning" role="alert">
                     <i class="fas fa-exclamation-triangle"></i>
-                    <strong>تنبيه:</strong> سيتم إيقاف العقد مؤقتاً. يمكنك استئنافه لاحقاً.
+                    <strong>تنبيه:</strong> سيتم إيقاف العقد مؤقتا. يمكنك استئنافه لاحقا.
                 </div>
                 <div class="mb-4">
                     <label for="pauseDate" class="form-label">
@@ -1493,7 +1493,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                     <i class="fas fa-times"></i> إلغاء
                 </button>
                 <button type="button" class="btn btn-danger" id="confirmTerminate">
-                    <i class="fas fa-times-circle"></i> إنهاء نهائياً
+                    <i class="fas fa-times-circle"></i> إنهاء نهائيا
                 </button>
             </div>
         </div>
@@ -1587,7 +1587,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                             <i class="fa fa-cube"></i> معدات العقد المختار
                         </h6>
                         <div id="selectedContractEquipments" class="dcd-minh-100">
-                            <p class="dcd-empty-note">اختر عقداً لعرض معداته</p>
+                            <p class="dcd-empty-note">اختر عقدا لعرض معداته</p>
                         </div>
                     </div>
                 </div>
@@ -2350,7 +2350,7 @@ $('#mergeWithId').on('change', function() {
     const selectedContractId = $(this).val();
 
     if (!selectedContractId) {
-        $('#selectedContractEquipments').html('<p class="dcd-empty-note">اختر عقداً لعرض معداته</p>');
+        $('#selectedContractEquipments').html('<p class="dcd-empty-note">اختر عقدا لعرض معداته</p>');
         return;
     }
 
@@ -2416,7 +2416,7 @@ $('#confirmMerge').click(function() {
     // Close modal
     bootstrap.Modal.getInstance(document.getElementById('mergeModal')).hide();
     $('#mergeWithId').val('');
-    $('#selectedContractEquipments').html('<p class="dcd-empty-note">اختر عقداً لعرض معداته</p>');
+    $('#selectedContractEquipments').html('<p class="dcd-empty-note">اختر عقدا لعرض معداته</p>');
 });
 </script>
 

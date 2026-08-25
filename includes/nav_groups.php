@@ -39,12 +39,40 @@ if (!function_exists('ems_nav_groups_def')) {
      */
     function ems_nav_groups_def()
     {
+        $def = ems_nav_groups_def_raw();
+        /* ══ الاسمُ من السجلِّ المركزيِّ لا من الملفّ (‏REPAIR01 · W06 §٤-٣) ══
+           «يُمنع كتابةُ اسمِ حقلٍ أو شاشةٍ يدويًّا في ملفّ — فلا يظهر المصطلحُ
+           بثلاثِ صيغٍ في ثلاثِ شاشات». والقائمةُ أدناه **بذرةٌ** لا مصدر:
+           إن كان للمفتاحِ صفٌّ في `repair01_ui_labels` فهو الحاكم، وإلّا بقيت
+           البذرةُ فلا تنكسر قائمةٌ لغيابِ سجلّ. واستعلامٌ واحدٌ لكلِّ طلبٍ
+           بذاكرةٍ ساكنة — والسايدبارُ يُصيَّر مرّةً في الصفحة. */
+        static $reg = null;
+        if ($reg === null) {
+            $reg = array();
+            $c = isset($GLOBALS['conn']) ? $GLOBALS['conn'] : null;
+            if ($c instanceof mysqli) {
+                $q = @$c->query("SELECT technical_key, arabic_ui_label FROM repair01_ui_labels
+                                  WHERE technical_key LIKE 'group\\_key:%' AND label_state <> 'DEPRECATED'");
+                while ($q && $x = $q->fetch_row()) { $reg[substr((string) $x[0], 10)] = (string) $x[1]; }
+            }
+        }
+        foreach ($def as $code => $g) {
+            if (isset($reg[$code]) && $reg[$code] !== '') { $def[$code]['name'] = $reg[$code]; }
+        }
+        return $def;
+    }
+}
+
+if (!function_exists('ems_nav_groups_def_raw')) {
+    /** البذرةُ الأصليّةُ للاثنتَي عشرة — تُقرأ حين لا سجلَّ مركزيًّا. */
+    function ems_nav_groups_def_raw()
+    {
         return array(
             'MINE'       => array('sort' => 1,  'name' => 'مساحتي',              'icon' => 'fa fa-house',           'open' => 1),
             'DAILY'      => array('sort' => 2,  'name' => 'التشغيل اليومي',      'icon' => 'fa fa-briefcase',       'open' => 0),
             'COMMERCIAL' => array('sort' => 3,  'name' => 'العقود والعملاء',     'icon' => 'fa fa-file-signature',  'open' => 0),
             'ASSETS'     => array('sort' => 4,  'name' => 'المعدات والأسطول',    'icon' => 'fa fa-truck-field',     'open' => 0),
-            'PEOPLE'     => array('sort' => 5,  'name' => 'الموظفون والمشغّلون', 'icon' => 'fa fa-users',           'open' => 0),
+            'PEOPLE'     => array('sort' => 5,  'name' => 'الموظفون والمشغلون', 'icon' => 'fa fa-users',           'open' => 0),
             'SUPPLY'     => array('sort' => 6,  'name' => 'الموردون والمشتريات', 'icon' => 'fa fa-truck-ramp-box',  'open' => 0),
             'FINANCE'    => array('sort' => 7,  'name' => 'المالية والمحاسبة',   'icon' => 'fa fa-calculator',      'open' => 0),
             'TREASURY'   => array('sort' => 8,  'name' => 'الخزينة والتمويل',    'icon' => 'fa fa-coins',           'open' => 0),

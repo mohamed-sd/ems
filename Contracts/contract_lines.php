@@ -70,14 +70,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && strval($_POST['cl_action'] ?? '') !
             'tax_code_id' => intval($_POST['tax_code_id'] ?? 0),
             'note' => strval($_POST['note'] ?? ''),
         ), $uid);
-        $redirect($r['ok'] ? 'أُضيف البند ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $cid);
+        $redirect($r['ok'] ? 'أضيف البند ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $cid);
     }
     if ($act === 'reprice') {
         if (!$can_edit) { $redirect('لا توجد صلاحية ❌', $cid); }
         $r = CLS::reprice($conn, $gate, $company_id, intval($_POST['line_id'] ?? 0),
                           strval($_POST['new_price'] ?? ''), strval($_POST['effective_from'] ?? ''),
                           $uid, strval($_POST['note'] ?? ''));
-        $redirect($r['ok'] ? ('نسخةٌ جديدةٌ #' . $r['new_line_id'] . ' — والقديمةُ أُغلقت بسعرها ✅')
+        $redirect($r['ok'] ? ('نسخة جديدة #' . $r['new_line_id'] . ' — والقديمة أغلقت بسعرها ✅')
                            : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $cid);
     }
 }
@@ -98,9 +98,9 @@ $taxes = CLS::taxCodes($gate);
 $MODEL_AR = array('hour' => 'ساعة', 'ton' => 'طن', 'trip' => 'نقلة', 'meter' => 'متر',
                   'cbm' => 'متر مكعب', 'day' => 'يوم', 'shift' => 'وردية',
                   'lump_sum' => 'مقطوع', 'standby' => 'استعداد');
-$TAX_AR = array('taxable' => 'خاضع', 'exempt' => 'معفًى', 'zero_rated' => 'صفريّ',
-                'reverse_charge' => 'عكسُ التكليف');
-$ST_AR = array('draft' => 'مسودة', 'active' => 'نافذ', 'superseded' => 'مستبدَل', 'ended' => 'منتهٍ');
+$TAX_AR = array('taxable' => 'خاضع', 'exempt' => 'معفى', 'zero_rated' => 'صفري',
+                'reverse_charge' => 'عكس التكليف');
+$ST_AR = array('draft' => 'مسودة', 'active' => 'نافذ', 'superseded' => 'مستبدل', 'ended' => 'منتهٍ');
 
 $page_title = 'إيكوبيشن | بنود عقد العميل';
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
@@ -122,8 +122,8 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     include('../includes/page_header.php');
     if (isset($_GET['msg'])) { echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>'; }
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا بنودَ بيعٍ مسجَّلةً على هذا العقد بعدُ',
-                           'اختر عقدًا من جدولِ العقود ثم أضف أولَ بندِ بيعٍ بنموذجِه وسعرِه وسريانِه');
+    echo ems_states_bundle('لا بنود بيع مسجلة على هذا العقد بعد',
+                           'اختر عقدا من جدول العقود ثم أضف أول بند بيع بنموذجه وسعره وسريانه');
     ?>
 
     <style>
@@ -180,14 +180,14 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
 
     <?php if ($sel > 0 && $value !== null): ?>
     <div class="card"><div class="card-header"><h5><i class="fa fa-sack-dollar"></i>
-        قيمةُ العقد #<?php echo $sel; ?></h5></div>
+        قيمة العقد #<?php echo $sel; ?></h5></div>
     <div class="card-body">
         <form method="get" class="cl-filter-form">
             <input type="hidden" name="contract" value="<?php echo $sel; ?>">
-            <label for="emsf_46_ee666">القيمةُ بتاريخ:</label>
+            <label for="emsf_46_ee666">القيمة بتاريخ:</label>
             <input type="date" name="as_of" id="emsf_46_ee666" value="<?php echo htmlspecialchars($asOf); ?>">
             <button type="submit" class="btn-primary"><i class="fa fa-calculator"></i> احسب</button>
-            <small class="cl-muted">— فارغٌ = القيمةُ النافذةُ اليوم · وبتاريخٍ = <strong>ما حكم ذلك اليوم</strong></small>
+            <small class="cl-muted">— فارغ = القيمة النافذة اليوم · وبتاريخ = <strong>ما حكم ذلك اليوم</strong></small>
         </form>
         <div class="cl-badges">
             <?php foreach ($value['by_currency'] as $cur => $amt): ?>
@@ -195,14 +195,14 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     <?php echo number_format($amt, 2); ?> <?php echo htmlspecialchars((string)$cur); ?></span>
             <?php endforeach; ?>
             <?php if (!$value['by_currency']): ?>
-                <span class="badge badge-secondary cl-badge-pad">لا بنودَ بيعٍ نافذة</span>
+                <span class="badge badge-secondary cl-badge-pad">لا بنود بيع نافذة</span>
             <?php endif; ?>
         </div>
         <p class="cl-note-muted"><?php echo htmlspecialchars($value['note']); ?></p>
 
         <?php if ($value['excluded']): ?>
         <div class="alert alert-warning cl-alert-gap">
-            <strong>مستبعَدٌ من القيمة — التزاماتُ طاقةٍ لا تُفوتَر:</strong>
+            <strong>مستبعد من القيمة — التزامات طاقة لا تفوتر:</strong>
             <?php foreach ($value['excluded'] as $e): ?>
                 <div>• <?php echo htmlspecialchars((string)$e['code']); ?> —
                     <strong><?php echo htmlspecialchars((string)$e['label']); ?></strong>
@@ -217,12 +217,12 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         <table class="alltables display nowrap no-datatable cl-table" data-no-dt="1">
             <thead><tr><th>#</th><th>الوصف</th><th>النموذج</th><th>الكمية</th><th>السعر</th>
                 <th>القيمة</th><th>السريان</th><th>الضريبة</th><th>الحال</th>
-                <?php if ($can_edit) echo '<th>إعادةُ تسعير</th>'; ?>
+                <?php if ($can_edit) echo '<th>إعادة تسعير</th>'; ?>
                 <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                 <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                 <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                 <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -234,7 +234,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     <td><?php echo intval($l['line_no']); ?></td>
                     <td class="cl-wrap"><?php echo htmlspecialchars((string)$l['description']); ?>
                         <?php if ($l['supersedes_line_id'] !== null): ?>
-                            <div><small>يُخلِف البند #<?php echo intval($l['supersedes_line_id']); ?></small></div>
+                            <div><small>يخلف البند #<?php echo intval($l['supersedes_line_id']); ?></small></div>
                         <?php endif; ?></td>
                     <td><?php echo htmlspecialchars($MODEL_AR[(string)$l['pricing_model']] ?? (string)$l['pricing_model']); ?></td>
                     <td><?php echo htmlspecialchars((string)$l['qty_contracted']); ?></td>
@@ -255,15 +255,15 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                             <input type="hidden" name="contract_id" value="<?php echo $sel; ?>">
                             <input type="hidden" name="line_id" value="<?php echo intval($l['id']); ?>">
                             <input type="number" name="new_price" step="0.0001" min="0.0001" required
-                                   placeholder="السعرُ الجديد" class="cl-w90" aria-label="السعرُ الجديدُ للبند">
-                            <input type="date" name="effective_from" class="cl-w140" required aria-label="تاريخُ سريانِ السعرِ الجديد">
-                            <button type="submit" class="badge badge-info cl-mini-btn">أخلِف</button>
+                                   placeholder="السعر الجديد" class="cl-w90" aria-label="السعر الجديد للبند">
+                            <input type="date" name="effective_from" class="cl-w140" required aria-label="تاريخ سريان السعر الجديد">
+                            <button type="submit" class="badge badge-info cl-mini-btn">أخلف</button>
                         </form>
                     <?php else: ?>—<?php endif; ?></td>
                     <?php endif; ?>
                 </tr>
             <?php endforeach; ?>
-            <?php if (!$lines): ?><tr><td colspan="10"><em>لا بنودَ بيعٍ بعد</em></td></tr><?php endif; ?>
+            <?php if (!$lines): ?><tr><td colspan="10"><em>لا بنود بيع بعد</em></td></tr><?php endif; ?>
             </tbody>
         </table>
     </div>
@@ -274,7 +274,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         <input type="hidden" name="cl_action" value="add">
         <input type="hidden" name="contract_id" value="<?php echo $sel; ?>">
         <div class="form-grid">
-            <div class="form-group"><label for="emsf_47_02dd8">مشتقٌّ من التزام <small>— الكمياتُ وحدَها</small></label>
+            <div class="form-group"><label for="emsf_47_02dd8">مشتق من التزام <small>— الكميات وحدها</small></label>
                 <select name="source_commitment_id" id="emsf_47_02dd8">
                     <option value="0">— بلا اشتقاق —</option>
                     <?php foreach ($split['billable'] as $m): ?>
@@ -286,7 +286,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     <?php endforeach; ?>
                 </select>
                 <?php if ($split['capacity']): ?>
-                <small class="cl-req">⚠ التزاماتُ الطاقة **لا تظهر هنا**:
+                <small class="cl-req">⚠ التزامات الطاقة **لا تظهر هنا**:
                     <?php $names = array(); foreach ($split['capacity'] as $m) { $names[] = (string)$m['commitment_code']; }
                           echo htmlspecialchars(implode(' · ', $names)); ?></small>
                 <?php endif; ?></div>
@@ -298,18 +298,18 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <div class="form-group"><label for="emsf_49_156b9">الوصف</label><input type="text" name="description" maxlength="200" id="emsf_49_156b9"></div>
             <div class="form-group"><label for="emsf_50_5ed2f">الكمية <span class="cl-req">*</span></label>
                 <input type="number" name="qty_contracted" step="0.01" min="0.01" required id="emsf_50_5ed2f"></div>
-            <div class="form-group"><label for="emsf_51_1ad79">سعرُ الوحدة <span class="cl-req">*</span></label>
+            <div class="form-group"><label for="emsf_51_1ad79">سعر الوحدة <span class="cl-req">*</span></label>
                 <input type="number" name="unit_price" step="0.0001" min="0.0001" required id="emsf_51_1ad79"></div>
             <div class="form-group"><label for="emsf_52_ff69f">العملة</label><input type="text" name="currency" value="SDG" maxlength="8" id="emsf_52_ff69f"></div>
             <div class="form-group"><label for="emsf_53_0548a">سريان من <span class="cl-req">*</span></label>
                 <input type="date" name="valid_from" required id="emsf_53_0548a"></div>
             <div class="form-group"><label for="emsf_54_bc668">سريان إلى</label><input type="date" name="valid_to" id="emsf_54_bc668"></div>
-            <div class="form-group"><label for="emsf_55_127c2">الحالةُ الضريبية</label>
+            <div class="form-group"><label for="emsf_55_127c2">الحالة الضريبية</label>
                 <select name="tax_status" id="emsf_55_127c2">
                     <?php foreach ($TAX_AR as $k => $v): ?>
                         <option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option>
                     <?php endforeach; ?></select></div>
-            <div class="form-group"><label for="emsf_56_0fe40">الرمزُ الضريبي <small>— إلزاميٌّ للخاضع</small></label>
+            <div class="form-group"><label for="emsf_56_0fe40">الرمز الضريبي <small>— إلزامي للخاضع</small></label>
                 <select name="tax_code_id" id="emsf_56_0fe40"><option value="0">—</option>
                     <?php foreach ($taxes as $t): ?>
                         <option value="<?php echo intval($t['id']); ?>">
@@ -319,7 +319,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <div class="form-group"><label for="emsf_57_93be6">ملاحظة</label><input type="text" name="note" maxlength="200" id="emsf_57_93be6"></div>
         </div>
         <div class="cl-actions"><button type="submit" class="btn-primary">
-            <i class="fa fa-plus"></i> أضف بندَ بيع</button></div>
+            <i class="fa fa-plus"></i> أضف بند بيع</button></div>
     </form>
     <?php endif; ?>
     </div></div>

@@ -67,13 +67,13 @@ $gate = $is_super_admin ? ems_tenant_db()->forAllTenants('contract registry supe
 $CATEGORIES = array(
     'permanent'       => 'موظف دائم',
     'project'         => 'موظف مشروع (مؤقت)',
-    'operator'        => 'مشغّل وسائق',
-    'supplier_worker' => 'عامل مورد (تسجيلٌ تشغيلي)',
+    'operator'        => 'مشغل وسائق',
+    'supplier_worker' => 'عامل مورد (تسجيل تشغيلي)',
 );
 $SOURCES = array(
     'worker_contract'       => 'عقود العاملين (القديم)',
     'drivercontracts'       => 'عقود السائقين (القديم)',
-    'fin_operator_policies' => 'سياسات المشغّلين',
+    'fin_operator_policies' => 'سياسات المشغلين',
 );
 
 // ── إنشاءُ رأسِ عقدٍ (مسودة) ───────────────────────────────────────────────
@@ -90,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['do'] ?? '') === 'create') 
         'relation_type' => strval($_POST['relation_type'] ?? ''),
         'currency'      => strval($_POST['currency'] ?? ''),
     ), $uid);
-    $msg = $r['ok'] ? ('أُنشئ رأسُ العقد #' . intval($r['id']) . ' مسودةً ✅')
+    $msg = $r['ok'] ? ('أنشئ رأس العقد #' . intval($r['id']) . ' مسودة ✅')
                     : ($r['reason'] . ' ❌ (' . intval($r['code']) . ')');
     ems_gov_flash_redirect('contract_registry.php', $msg, 'GOV-INFO-200', ''); exit();
 }
@@ -109,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array(($_POST['do'] ?? ''), arra
     } else {
         $r = ECSM::resume($conn, $gate, $company_id, $cid, $note, $uid);
     }
-    $msg = $r['ok'] ? ($r['changed'] ? 'نُفّذ ✅' : ($r['reason'] . ' ✅')) : ($r['reason'] . ' ❌ (' . intval($r['code']) . ')');
+    $msg = $r['ok'] ? ($r['changed'] ? 'نفذ ✅' : ($r['reason'] . ' ✅')) : ($r['reason'] . ' ❌ (' . intval($r['code']) . ')');
     ems_gov_flash_redirect('contract_registry.php', $msg, 'GOV-INFO-200', ''); exit();
 }
 
@@ -138,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array(($_POST['do'] ?? ''), arra
     } else {
         $r = ECS::endComponent($conn, $gate, $company_id, intval($_POST['component_id'] ?? 0), strval($_POST['end_date'] ?? ''), $uid);
     }
-    $msg = $r['ok'] ? 'نُفّذ ✅' : ($r['reason'] . ' ❌ (' . intval($r['code']) . ')');
+    $msg = $r['ok'] ? 'نفذ ✅' : ($r['reason'] . ' ❌ (' . intval($r['code']) . ')');
     ems_gov_redirect("Location: contract_registry.php?contract_id={$ctxContract}&msg=" . rawurlencode($msg)); exit();
 }
 
@@ -177,7 +177,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array(($_POST['do'] ?? ''), arra
         }
         $r = ECS::setIncentiveAllocations($conn, $gate, $company_id, intval($_POST['rule_id'] ?? 0), $allocRows, $uid);
     }
-    $msg = $r['ok'] ? 'نُفّذ ✅' : ($r['reason'] . ' ❌ (' . intval($r['code']) . ')');
+    $msg = $r['ok'] ? 'نفذ ✅' : ($r['reason'] . ' ❌ (' . intval($r['code']) . ')');
     ems_gov_redirect("Location: contract_registry.php?contract_id={$ctxContract}&msg=" . rawurlencode($msg)); exit();
 }
 
@@ -196,7 +196,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['do'] ?? '') === 'bearer_se
     }
     $r = ECS::setCostBearers($conn, $gate, $company_id,
         strval($_POST['owner_type'] ?? ''), intval($_POST['owner_id'] ?? 0), $bearerRows, $uid);
-    $msg = $r['ok'] ? 'نُفّذ ✅' : ($r['reason'] . ' ❌ (' . intval($r['code']) . ')');
+    $msg = $r['ok'] ? 'نفذ ✅' : ($r['reason'] . ' ❌ (' . intval($r['code']) . ')');
     ems_gov_redirect("Location: contract_registry.php?contract_id={$ctxContract}&msg=" . rawurlencode($msg)); exit();
 }
 
@@ -222,8 +222,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array(($_POST['do'] ?? ''), arra
     } else {
         $r = ECS::attachSignedFile($conn, $gate, $company_id, $ctxContract, strval($_POST['signed_file_ref'] ?? ''), $uid);
     }
-    $msg = $r['ok'] ? 'نُفّذ ✅' . (isset($r['snapshot_invalidated_from']) && $r['snapshot_invalidated_from']
-                        ? ' (أُبطلت اللقطاتُ من ' . $r['snapshot_invalidated_from'] . ')' : '')
+    $msg = $r['ok'] ? 'نفذ ✅' . (isset($r['snapshot_invalidated_from']) && $r['snapshot_invalidated_from']
+                        ? ' (أبطلت اللقطات من ' . $r['snapshot_invalidated_from'] . ')' : '')
                     : ($r['reason'] . ' ❌ (' . intval($r['code']) . ')');
     ems_gov_redirect("Location: contract_registry.php?contract_id={$ctxContract}&msg=" . rawurlencode($msg)); exit();
 }
@@ -326,7 +326,7 @@ $vc_editable = $view_contract
     && in_array(strval($view_contract['state']), ECS::EDITABLE_STATES, true)
     && ($can_add || $can_edit);
 
-$page_title = 'إيكوبيشن | سجل العقود الموحّد';
+$page_title = 'إيكوبيشن | سجل العقود الموحد';
 // CM-00 (DEC-E · U10): بذرُ محاورِ الغلافِ من الخادم — AX-2/3 من محرك الصلاحيات
 require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : null));
@@ -350,7 +350,7 @@ $stateChip = function ($state) {
 $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable, &$view_contract) {
     $list = $view_bearers[$ownerType . '#' . $ownerId] ?? array();
     if (!$list) {
-        echo '<span class="badge badge-secondary" title="الغائبُ = إشارةُ المالك المفردة أو جهةُ العقد">—</span> ';
+        echo '<span class="badge badge-secondary" title="الغائب = إشارة المالك المفردة أو جهة العقد">—</span> ';
     } else {
         foreach ($list as $cb) {
             echo '<span class="badge badge-warning">'
@@ -361,7 +361,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
     }
     if ($vc_editable) { ?>
         <details class="cr-inline-block">
-            <summary class="action-btn edit cr-pointer" title="جهات التحمّل">تحمّل</summary>
+            <summary class="action-btn edit cr-pointer" title="جهات التحمل">تحمل</summary>
             <form method="post" class="cr-mt6">
         <?= csrf_field() ?>
                 <input type="hidden" name="do" value="bearer_set">
@@ -370,17 +370,17 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                 <input type="hidden" name="owner_id" value="<?php echo intval($ownerId); ?>">
                 <?php for ($bi = 0; $bi < 3; $bi++): ?>
                 <div class="cr-flex-row">
-                    <select name="bearer_type[]" aria-label="جهة التحمّل">
+                    <select name="bearer_type[]" aria-label="جهة التحمل">
                         <option value="">—</option>
                         <?php foreach (ECS::COST_BEARER_TYPES as $bk => $bl): ?>
                             <option value="<?php echo $bk; ?>"><?php echo $bl; ?></option>
                         <?php endforeach; ?>
                     </select>
-                    <input type="number" name="bearer_id[]" placeholder="المعرّف" class="cr-w70" aria-label="المعرّف">
+                    <input type="number" name="bearer_id[]" placeholder="المعرف" class="cr-w70" aria-label="المعرف">
                     <input type="number" step="0.01" name="bearer_pct[]" placeholder="٪" class="cr-w60" aria-label="٪">
                 </div>
                 <?php endfor; ?>
-                <button type="submit" class="btn-primary">حفظ التحمّل (Σ=100)</button>
+                <button type="submit" class="btn-primary">حفظ التحمل (Σ=100)</button>
             </form>
         </details>
     <?php }
@@ -388,7 +388,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
 ?>
 <div class="main ems-unified-page-shell">
     <?php
-    $header_title = 'سجل العقود الموحّد'; $header_icon = 'fa fa-file-signature';
+    $header_title = 'سجل العقود الموحد'; $header_icon = 'fa fa-file-signature';
     $header_actions = array();
     if ($can_add) {
         $header_actions[] = array('href' => 'javascript:void(0)', 'id' => 'toggleForm',
@@ -400,20 +400,20 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>';
     }
     require_once __DIR__ . '/../includes/ux_components.php';
-    echo ems_states_bundle('لا عقودَ في سجلِّ العقودِ الموحَّدِ ضمن هذا النطاق', 'أنشئ رأسَ عقدٍ بزرِّ «رأس عقد جديد» أو وسِّع الفلاتر');
+    echo ems_states_bundle('لا عقود في سجل العقود الموحد ضمن هذا النطاق', 'أنشئ رأس عقد بزر «رأس عقد جديد» أو وسع الفلاتر');
     ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <?php if ($view_contract): ?>
     <div class="card">
         <div class="card-header"><h5><i class="fa fa-puzzle-piece"></i>
-            مكوّناتُ أجر العقد #<?php echo intval($view_contract['id']); ?> —
+            مكونات أجر العقد #<?php echo intval($view_contract['id']); ?> —
             <?php echo htmlspecialchars($view_contract['employee_name'] ?? ''); ?>
             <?php echo $stateChip(strval($view_contract['state'])); ?>
             <?php if (trim(strval($view_contract['source_table'] ?? '')) !== ''): ?>
-                <span class="badge badge-light">مرحَّل قراءةً — مكوّناتُه في مصدره القديم</span>
+                <span class="badge badge-light">مرحل قراءة — مكوناته في مصدره القديم</span>
             <?php elseif (!$vc_editable): ?>
-                <span class="badge badge-info">التغييرُ على النافذ بملحق (H-10)</span>
+                <span class="badge badge-info">التغيير على النافذ بملحق (H-10)</span>
             <?php endif; ?>
             <a href="contract_registry.php" class="cr-close-link">✕ إغلاق</a>
         </h5></div>
@@ -422,7 +422,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                 <table class="alltables display no-datatable cr-table-full" data-no-dt="hard">
                     <thead><tr>
                         <th>#</th><th>نوع العقد</th><th>الطريقة</th><th>المبلغ</th><th>المعدل</th>
-                        <th>الأعلام السبعة</th><th>الدورية</th><th>السريان</th><th>التحمّل</th><th>الحالة</th>
+                        <th>الأعلام السبعة</th><th>الدورية</th><th>السريان</th><th>التحمل</th><th>الحالة</th>
                         <?php if ($vc_editable): ?><th>إنهاء</th><?php endif; ?>
                     </tr></thead>
                     <tbody>
@@ -444,7 +444,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                             <td><?php echo htmlspecialchars(($pc['valid_from'] ?: '؟') . ' → ' . ($pc['valid_to'] ?: 'مفتوح')); ?></td>
                             <td><?php $bearerCell('component', intval($pc['id'])); ?></td>
                             <td><?php echo array('active' => "<span class='badge badge-success'>ساري</span>",
-                                                 'replaced' => "<span class='badge badge-secondary'>مُستبدَل</span>",
+                                                 'replaced' => "<span class='badge badge-secondary'>مستبدل</span>",
                                                  'ended' => "<span class='badge badge-dark'>منتهٍ</span>")[$pc['state']] ?? htmlspecialchars($pc['state']); ?></td>
                             <?php if ($vc_editable): ?>
                             <td>
@@ -463,7 +463,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                         </tr>
                     <?php endforeach; ?>
                     <?php if (!$view_components): ?>
-                        <tr><td colspan="11">لا مكوّناتَ بعد<?php echo $vc_editable ? ' — أضف أولَها أدناه' : ''; ?></td></tr>
+                        <tr><td colspan="11">لا مكونات بعد<?php echo $vc_editable ? ' — أضف أولها أدناه' : ''; ?></td></tr>
                     <?php endif; ?>
                     </tbody>
                 </table>
@@ -509,23 +509,23 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                             </label>
                         <?php endforeach; ?>
                         <label class="cr-flag-label">
-                            <input type="checkbox" aria-label="متغيّر" name="is_variable" value="1"> متغيّر
+                            <input type="checkbox" aria-label="متغير" name="is_variable" value="1"> متغير
                         </label>
                     </div>
                 </div>
                 <div class="cr-mt10">
-                    <button type="submit" class="btn-primary"><i class="fa fa-plus"></i> إضافة مكوّن</button>
+                    <button type="submit" class="btn-primary"><i class="fa fa-plus"></i> إضافة مكون</button>
                 </div>
             </form>
             <?php endif; ?>
 
             <!-- ── H-08-③: قواعدُ الحوافز وتوزيعُها Σ=100 (تدمج M-23) ── -->
-            <h6 class="cr-mt18"><i class="fa fa-bullseye"></i> قواعدُ الحوافز — التوزيعُ بمجموع 100٪ قيدًا</h6>
+            <h6 class="cr-mt18"><i class="fa fa-bullseye"></i> قواعد الحوافز — التوزيع بمجموع 100٪ قيدا</h6>
             <div class="table-container">
                 <table class="alltables display no-datatable cr-table-full" data-no-dt="hard">
                     <thead><tr>
                         <th>#</th><th>الحافز</th><th>الأساس</th><th>المعدل</th><th>العتبة</th>
-                        <th>السقف/الأدنى</th><th>التوزيع</th><th>التحمّل</th><th>السريان</th><th>الحالة</th>
+                        <th>السقف/الأدنى</th><th>التوزيع</th><th>التحمل</th><th>السريان</th><th>الحالة</th>
                         <?php if ($vc_editable): ?><th>إجراء</th><?php endif; ?>
                     </tr></thead>
                     <tbody>
@@ -540,17 +540,17 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                                           . ($vr['floor'] !== null ? htmlspecialchars($vr['floor']) : '—'); ?></td>
                             <td>
                                 <?php $als = $view_allocs[$rid] ?? array();
-                                if (!$als) { echo '<span class="badge badge-secondary" title="التوزيعُ الغائب = كلُّه لصاحب العقد">100٪ لصاحب العقد</span>'; }
+                                if (!$als) { echo '<span class="badge badge-secondary" title="التوزيع الغائب = كله لصاحب العقد">100٪ لصاحب العقد</span>'; }
                                 else { foreach ($als as $al) {
                                     echo '<span class="badge badge-info">'
-                                        . ($al['beneficiary_type'] === 'employee' ? 'موظف' : 'مسمًّى') . ' #'
+                                        . ($al['beneficiary_type'] === 'employee' ? 'موظف' : 'مسمى') . ' #'
                                         . intval($al['beneficiary_id']) . ' · ' . htmlspecialchars($al['percent']) . '٪</span> ';
                                 } } ?>
                             </td>
                             <td><?php $bearerCell('rule', $rid); ?></td>
                             <td><?php echo htmlspecialchars(($vr['valid_from'] ?: '؟') . ' → ' . ($vr['valid_to'] ?: 'مفتوح')); ?></td>
                             <td><?php echo array('active' => "<span class='badge badge-success'>ساري</span>",
-                                                 'replaced' => "<span class='badge badge-secondary'>مُستبدَل</span>",
+                                                 'replaced' => "<span class='badge badge-secondary'>مستبدل</span>",
                                                  'ended' => "<span class='badge badge-dark'>منتهٍ</span>")[$vr['state']] ?? htmlspecialchars($vr['state']); ?></td>
                             <?php if ($vc_editable): ?>
                             <td>
@@ -567,9 +567,9 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                                             <select name="alloc_type[]" aria-label="نوع المستفيد">
                                                 <option value="">—</option>
                                                 <option value="employee">موظف</option>
-                                                <option value="job_title">مسمًّى وظيفي</option>
+                                                <option value="job_title">مسمى وظيفي</option>
                                             </select>
-                                            <input type="number" name="alloc_id[]" placeholder="المعرّف" class="cr-w70">
+                                            <input type="number" name="alloc_id[]" placeholder="المعرف" class="cr-w70">
                                             <input type="number" step="0.01" name="alloc_pct[]" placeholder="٪" class="cr-w60">
                                         </div>
                                         <?php endfor; ?>
@@ -590,7 +590,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                         </tr>
                     <?php endforeach; ?>
                     <?php if (!$view_rules): ?>
-                        <tr><td colspan="11">لا قواعدَ حوافزَ بعد</td></tr>
+                        <tr><td colspan="11">لا قواعد حوافز بعد</td></tr>
                     <?php endif; ?>
                     </tbody>
                 </table>
@@ -609,23 +609,23 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                             </label>
                         <?php endforeach; ?>
                         <label class="cr-flag-label">
-                            <input type="checkbox" aria-label="متغيّر" name="is_variable" value="1"> متغيّر
+                            <input type="checkbox" aria-label="متغير" name="is_variable" value="1"> متغير
                         </label>
                     </div>
                 </div>
                 <div class="cr-mt10">
-                    <button type="submit" class="btn-primary"><i class="fa fa-plus"></i> إضافة مكوّن</button>
+                    <button type="submit" class="btn-primary"><i class="fa fa-plus"></i> إضافة مكون</button>
                 </div>
             </form>
             <?php endif; ?>
 
             <!-- ── H-08-③: قواعدُ الحوافز وتوزيعُها Σ=100 (تدمج M-23) ── -->
-            <h6 class="cr-mt18"><i class="fa fa-bullseye"></i> قواعدُ الحوافز — التوزيعُ بمجموع 100٪ قيدًا</h6>
+            <h6 class="cr-mt18"><i class="fa fa-bullseye"></i> قواعد الحوافز — التوزيع بمجموع 100٪ قيدا</h6>
             <div class="table-container">
                 <table class="alltables display no-datatable cr-table-full" data-no-dt="hard">
                     <thead><tr>
                         <th>#</th><th>الحافز</th><th>الأساس</th><th>المعدل</th><th>العتبة</th>
-                        <th>السقف/الأدنى</th><th>التوزيع</th><th>التحمّل</th><th>السريان</th><th>الحالة</th>
+                        <th>السقف/الأدنى</th><th>التوزيع</th><th>التحمل</th><th>السريان</th><th>الحالة</th>
                         <?php if ($vc_editable): ?><th>إجراء</th><?php endif; ?>
                     </tr></thead>
                     <tbody>
@@ -640,17 +640,17 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                                           . ($vr['floor'] !== null ? htmlspecialchars($vr['floor']) : '—'); ?></td>
                             <td>
                                 <?php $als = $view_allocs[$rid] ?? array();
-                                if (!$als) { echo '<span class="badge badge-secondary" title="التوزيعُ الغائب = كلُّه لصاحب العقد">100٪ لصاحب العقد</span>'; }
+                                if (!$als) { echo '<span class="badge badge-secondary" title="التوزيع الغائب = كله لصاحب العقد">100٪ لصاحب العقد</span>'; }
                                 else { foreach ($als as $al) {
                                     echo '<span class="badge badge-info">'
-                                        . ($al['beneficiary_type'] === 'employee' ? 'موظف' : 'مسمًّى') . ' #'
+                                        . ($al['beneficiary_type'] === 'employee' ? 'موظف' : 'مسمى') . ' #'
                                         . intval($al['beneficiary_id']) . ' · ' . htmlspecialchars($al['percent']) . '٪</span> ';
                                 } } ?>
                             </td>
                             <td><?php $bearerCell('rule', $rid); ?></td>
                             <td><?php echo htmlspecialchars(($vr['valid_from'] ?: '؟') . ' → ' . ($vr['valid_to'] ?: 'مفتوح')); ?></td>
                             <td><?php echo array('active' => "<span class='badge badge-success'>ساري</span>",
-                                                 'replaced' => "<span class='badge badge-secondary'>مُستبدَل</span>",
+                                                 'replaced' => "<span class='badge badge-secondary'>مستبدل</span>",
                                                  'ended' => "<span class='badge badge-dark'>منتهٍ</span>")[$vr['state']] ?? htmlspecialchars($vr['state']); ?></td>
                             <?php if ($vc_editable): ?>
                             <td>
@@ -667,9 +667,9 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                                             <select name="alloc_type[]" aria-label="نوع المستفيد">
                                                 <option value="">—</option>
                                                 <option value="employee">موظف</option>
-                                                <option value="job_title">مسمًّى وظيفي</option>
+                                                <option value="job_title">مسمى وظيفي</option>
                                             </select>
-                                            <input type="number" name="alloc_id[]" placeholder="المعرّف" class="cr-w70">
+                                            <input type="number" name="alloc_id[]" placeholder="المعرف" class="cr-w70">
                                             <input type="number" step="0.01" name="alloc_pct[]" placeholder="٪" class="cr-w60">
                                         </div>
                                         <?php endfor; ?>
@@ -690,7 +690,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                         </tr>
                     <?php endforeach; ?>
                     <?php if (!$view_rules): ?>
-                        <tr><td colspan="11">لا قواعدَ حوافزَ بعد</td></tr>
+                        <tr><td colspan="11">لا قواعد حوافز بعد</td></tr>
                     <?php endif; ?>
                     </tbody>
                 </table>
@@ -726,7 +726,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                             <option value="equipment_type">نوع معدة</option>
                             <option value="site">موقع</option>
                         </select></div>
-                    <div class="form-group"><label for="emsf_1633_94e48">معرّف النطاق</label><input type="number" name="scope_id" id="emsf_1633_94e48"></div>
+                    <div class="form-group"><label for="emsf_1633_94e48">معرف النطاق</label><input type="number" name="scope_id" id="emsf_1633_94e48"></div>
                     <div class="form-group"><label for="emsf_1634_e529f">سريان من</label><input type="date" name="valid_from" id="emsf_1634_e529f"></div>
                     <div class="form-group"><label for="emsf_1635_a81ce">سريان إلى</label><input type="date" name="valid_to" id="emsf_1635_a81ce"></div>
                 </div>
@@ -737,14 +737,14 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
             <?php endif; ?>
 
             <!-- ── H-10: الملاحقُ والنسخةُ الموقَّعة المقفلة ── -->
-            <h6 class="cr-mt18"><i class="fa fa-file-medical"></i> الملاحق — «لا تعديلَ مباشرًا على نافذ؛ كلُّ تغييرٍ ملحقٌ بسريان»</h6>
+            <h6 class="cr-mt18"><i class="fa fa-file-medical"></i> الملاحق — «لا تعديل مباشرا على نافذ؛ كل تغيير ملحق بسريان»</h6>
             <?php $vcState = strval($view_contract['state']);
                   $isAmendable = in_array($vcState, ECAS::AMENDABLE, true)
                       && trim(strval($view_contract['source_table'] ?? '')) === '' && ($can_add || $can_edit); ?>
             <div class="table-container">
                 <table class="alltables display no-datatable cr-table-full" data-no-dt="hard">
                     <thead><tr>
-                        <th>#</th><th>نوع الطرف</th><th>السريان</th><th>قبل ← بعد</th><th>الحالة</th><th>المعتمِد — الاسم والصفة</th>
+                        <th>#</th><th>نوع الطرف</th><th>السريان</th><th>قبل ← بعد</th><th>الحالة</th><th>المعتمد — الاسم والصفة</th>
                         <?php if ($can_edit): ?><th>إجراء</th><?php endif; ?>
                         <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
                         <th class="ems-fn-th" data-fn="1">رقم العقد</th>
@@ -755,14 +755,14 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                         <th class="ems-fn-th" data-fn="1">القيمة</th>
                         <th class="ems-fn-th" data-fn="1">الالتزام القائم</th>
                         <th class="ems-fn-th" data-fn="1">حالة الكفالة</th>
-                        <th class="ems-fn-th" data-fn="1">المفوَّض بالتوقيع</th>
+                        <th class="ems-fn-th" data-fn="1">المفوض بالتوقيع</th>
                         <th class="ems-fn-th" data-fn="1">الإدارة المالكة</th>
                         <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                        <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                        <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                        <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                        <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                         <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                         <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-                        <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+                        <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
                         <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                         <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
                         <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
@@ -792,7 +792,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                                     <input type="hidden" name="do" value="amd_approve">
                                     <input type="hidden" name="contract_id" value="<?php echo intval($view_contract['id']); ?>">
                                     <input type="hidden" name="amendment_id" value="<?php echo $aid; ?>">
-                                    <button type="submit" class="action-btn edit" title="اعتماد (لا اعتمادَ لمن أنشأ)"><i class="fas fa-check"></i></button>
+                                    <button type="submit" class="action-btn edit" title="اعتماد (لا اعتماد لمن أنشأ)"><i class="fas fa-check"></i></button>
                                 </form>
                                 <form method="post" class="cr-inline-flex">
         <?= csrf_field() ?>
@@ -808,7 +808,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                         </tr>
                     <?php endforeach; ?>
                     <?php if (!$view_amendments): ?>
-                        <tr><td colspan="7">لا ملاحقَ بعد</td></tr>
+                        <tr><td colspan="7">لا ملاحق بعد</td></tr>
                     <?php endif; ?>
                     </tbody>
                 </table>
@@ -832,7 +832,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                     <div class="form-group"><label for="emsf_1638_43c95">الحقل المستهدف <span class="cr-required">*</span>
                         <small>(head:end_date · component:ID:value · rule:ID:rate …)</small></label>
                         <input type="text" name="amd_field" required placeholder="head:end_date" id="emsf_1638_43c95"></div>
-                    <div class="form-group"><label for="emsf_1639_9303d">القيمة بعد («قبل» يُلتقط من الواقع)</label>
+                    <div class="form-group"><label for="emsf_1639_9303d">القيمة بعد («قبل» يلتقط من الواقع)</label>
                         <input type="text" name="amd_after" id="emsf_1639_9303d"></div>
                 </div>
                 <div class="cr-mt10">
@@ -847,12 +847,12 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                 <input type="hidden" name="do" value="sign_attach">
                 <input type="hidden" name="contract_id" value="<?php echo intval($view_contract['id']); ?>">
                 <div class="form-grid">
-                    <div class="form-group"><label for="emsf_1640_5f6ab">مرجع النسخة الموقَّعة <span class="cr-required">*</span>
-                        <small>(ثابتةٌ لا تُستبدل — التصحيحُ ملحقٌ يوضّح)</small></label>
+                    <div class="form-group"><label for="emsf_1640_5f6ab">مرجع النسخة الموقعة <span class="cr-required">*</span>
+                        <small>(ثابتة لا تستبدل — التصحيح ملحق يوضح)</small></label>
                         <input type="text" name="signed_file_ref" required maxlength="255" placeholder="uploads/contracts/....pdf" id="emsf_1640_5f6ab"></div>
                 </div>
                 <div class="cr-mt10">
-                    <button type="submit" class="btn-primary"><i class="fa fa-file-signature"></i> تثبيت النسخة الموقَّعة</button>
+                    <button type="submit" class="btn-primary"><i class="fa fa-file-signature"></i> تثبيت النسخة الموقعة</button>
                 </div>
             </form>
             <?php endif; ?>
@@ -864,7 +864,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
     <form method="post" class="allforms" id="headForm">
         <?= csrf_field() ?>
         <input type="hidden" name="do" value="create">
-        <div class="card"><div class="card-header"><h5><i class="fa fa-file-signature"></i> رأسُ عقدٍ جديد (مسودة — المكوّناتُ والحوافزُ والتحمّل مع الشرائح التالية)</h5></div>
+        <div class="card"><div class="card-header"><h5><i class="fa fa-file-signature"></i> رأس عقد جديد (مسودة — المكونات والحوافز والتحمل مع الشرائح التالية)</h5></div>
         <div class="card-body"><div class="form-grid">
             <div class="form-group">
                 <label for="emsf_1641_fccec">الشخص <span class="cr-required">*</span></label>
@@ -884,7 +884,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                 </select>
             </div>
             <div class="form-group">
-                <label for="emsf_1643_71877">نموذج الأجر <span class="cr-required">*</span> <small>(اختيارٌ مستقلٌّ لا يُشتق من الوظيفة)</small></label>
+                <label for="emsf_1643_71877">نموذج الأجر <span class="cr-required">*</span> <small>(اختيار مستقل لا يشتق من الوظيفة)</small></label>
                 <select name="pay_model_id" required id="emsf_1643_71877">
                     <option value="">— من القائمة الخمس عشرة —</option>
                     <?php foreach ($pay_models as $pm): ?>
@@ -1007,7 +1007,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                                 <?php endif; ?>
                             <?php endif; ?>
                         </td>
-                        <td><a href="?contract_id=<?php echo intval($r['id']); ?>" title="مكوّنات الأجر (H-08-②)"><?php echo intval($r['id']); ?></a></td>
+                        <td><a href="?contract_id=<?php echo intval($r['id']); ?>" title="مكونات الأجر (H-08-②)"><?php echo intval($r['id']); ?></a></td>
                         <td><strong><?php echo htmlspecialchars($r['employee_name'] ?? ('#' . intval($r['employee_id']))); ?></strong></td>
                         <td><?php echo htmlspecialchars($CATEGORIES[$r['category']] ?? $r['category']); ?></td>
                         <td><?php echo htmlspecialchars($r['pay_label'] ?? '—'); ?></td>
@@ -1015,17 +1015,17 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                         <td>
                             <?php echo htmlspecialchars($r['start_date'] ?: '؟'); ?> → <?php echo htmlspecialchars($r['end_date'] ?: 'مفتوح'); ?>
                             <?php if ($daysLeft !== null && $daysLeft >= 0 && $daysLeft <= 30 && ECSM::isReadable($state)): ?>
-                                <span class="badge badge-warning" title="CON-01 §6: شارةُ عقدٍ ينتهي خلال ثلاثين يومًا">ينتهي بعد <?php echo $daysLeft; ?> يومًا</span>
+                                <span class="badge badge-warning" title="CON-01 §6: شارة عقد ينتهي خلال ثلاثين يوما">ينتهي بعد <?php echo $daysLeft; ?> يوما</span>
                             <?php endif; ?>
                         </td>
                         <td><?php echo $stateChip($state); ?></td>
                         <td>
                             <?php if ($isMigrated): ?>
-                                <span class="badge badge-light" title="الترحيلُ قراءةً — الكتابةُ في مصدره القديم حتى إقفاله بمطابقة (N-04)">
-                                    مرحَّل قراءةً · <?php echo htmlspecialchars($SOURCES[$r['source_table']] ?? $r['source_table']); ?>
+                                <span class="badge badge-light" title="الترحيل قراءة — الكتابة في مصدره القديم حتى إقفاله بمطابقة (N-04)">
+                                    مرحل قراءة · <?php echo htmlspecialchars($SOURCES[$r['source_table']] ?? $r['source_table']); ?>
                                 </span>
                             <?php else: ?>
-                                <span class="badge badge-primary">السجل الموحّد</span>
+                                <span class="badge badge-primary">السجل الموحد</span>
                             <?php endif; ?>
                         </td>
                     </tr>

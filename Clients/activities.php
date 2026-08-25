@@ -131,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['activity_type'])) {
     // الكود
     $act_code_raw = isset($_POST['activity_code']) ? trim($_POST['activity_code']) : '';
     if ($act_code_raw === '' || !preg_match('/^[A-Za-z0-9_\-]+$/', $act_code_raw)) {
-        act_redirect_with_msg('كود النشاط غير صالح. استخدم أحرفًا وأرقامًا و - أو _ فقط ❌');
+        act_redirect_with_msg('كود النشاط غير صالح. استخدم أحرفا وأرقاما و - أو _ فقط ❌');
     }
 
     // التحقق من القوائم الثابتة
@@ -201,7 +201,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['activity_type'])) {
                 array($act_code_raw, $act_id));
         } catch (\Throwable $t) { $dup = array(); }
         if (!empty($dup)) {
-            act_redirect_with_msg('كود النشاط موجود مسبقاً داخل شركتك ❌');
+            act_redirect_with_msg('كود النشاط موجود مسبقا داخل شركتك ❌');
         }
 
         try {
@@ -234,7 +234,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['activity_type'])) {
                 array($act_code_raw));
         } catch (\Throwable $t) { $dup = array(); }
         if (!empty($dup)) {
-            act_redirect_with_msg('كود النشاط موجود مسبقاً داخل شركتك ❌');
+            act_redirect_with_msg('كود النشاط موجود مسبقا داخل شركتك ❌');
         }
 
         try {
@@ -425,7 +425,7 @@ $sft_family = 'opportunity'; $sft_active = 'activities';
 include __DIR__ . '/../includes/sales_family_tabs.php';
 include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا أنشطةَ تجاريةً مسجَّلةً بعدُ', 'سجّل أولَ نشاطٍ تجاريٍّ بزرِّ «إضافة» في رأسِ الشاشة');
+    echo ems_states_bundle('لا أنشطة تجارية مسجلة بعد', 'سجل أول نشاط تجاري بزر «إضافة» في رأس الشاشة');
     ?>
 
     <?php if (!empty($_GET['msg'])):
@@ -535,8 +535,8 @@ include('../includes/page_header.php');
                         </select>
                     </div>
                     <div class="act-col-full">
-                        <label for="outcome"><i class="fas fa-clipboard-check"></i> المخرجات / ما اتُّفق عليه</label>
-                        <textarea name="outcome" id="outcome" rows="2" placeholder="الحضور وما اتُّفق عليه"></textarea>
+                        <label for="outcome"><i class="fas fa-clipboard-check"></i> المخرجات / ما اتفق عليه</label>
+                        <textarea name="outcome" id="outcome" rows="2" placeholder="الحضور وما اتفق عليه"></textarea>
                     </div>
                     <div class="act-col-full">
                         <label for="notes"><i class="fas fa-note-sticky"></i> ملاحظات</label>
@@ -591,10 +591,10 @@ include('../includes/page_header.php');
                             <th>التاريخ</th>
                             <th>المسؤول</th>
                             <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                             <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                             <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                             <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -742,13 +742,13 @@ include('../includes/page_header.php');
     const statsSection = $('#actStatsSection');
 
     /**
-     * إظهارُ حقلِ الكودِ المولَّد وإخفاؤه.
+     * إظهار حقل الكود المولد وإخفاؤه.
      *
      * ⚠️ **لا تستعمل `jQuery.hide()` هنا** — `assets/css/ems-forms.css` يحمل:
      *     :is(.allforms, .ems-form) .form-grid > div { display: block !important }
-     * والغلافُ ابنٌ مباشرٌ لـ`.form-grid`، فـ`!important` من ورقةِ الأنماطِ تهزم
-     * الإخفاءَ السطريَّ **بلا أولوية**: السمةُ تُكتب فعلًا والحقلُ يبقى ظاهرًا، بلا
-     * خطأٍ في وحدةِ التحكم ولا سطرٍ في أيِّ سجل. (نظيرُ شاشتَي العملاءِ والمشاريع.)
+     * والغلاف ابن مباشر ل`.form-grid`، ف`!important` من ورقة الأنماط تهزم
+     * الإخفاء السطري **بلا أولوية**: السمة تكتب فعلا والحقل يبقى ظاهرا، بلا
+     * خطأ في وحدة التحكم ولا سطر في أي سجل. (نظير شاشتي العملاء والمشاريع.)
      */
     function setGeneratedCodeShown(shown) {
         var el = generatedCodeWrapper[0];
@@ -759,9 +759,9 @@ include('../includes/page_header.php');
     function setAddMode() {
         formTitle.text('إضافة نشاط جديد'); submitBtnText.text('حفظ النشاط');
         setGeneratedCodeShown(true);
-        // الكودُ المولَّدُ يعود إلى خانتِه كلَّما دخلنا وضعَ الإضافة — ومصدرُه حقلُ
-        // العرضِ نفسُه لا نسخةٌ ثانيةٌ منه (مصدرُ حقيقةٍ واحد). و`reset()` يكفي
-        // للإلغاء، لكنَّ الانتقالَ من «تعديل» إلى «إضافة» قد يقع بلا reset.
+        // الكود المولد يعود إلى خانته كلما دخلنا وضع الإضافة — ومصدره حقل
+        // العرض نفسه لا نسخة ثانية منه (مصدر حقيقة واحد). و`reset()` يكفي
+        // للإلغاء، لكن الانتقال من «تعديل» إلى «إضافة» قد يقع بلا reset.
         var genCode = $('#generated_act_code').val();
         if (genCode) { $('#activity_code').val(genCode); }
     }
@@ -843,7 +843,7 @@ include('../includes/page_header.php');
         });
     });
 
-    // ── عرض التفاصيل عبر EmsDetailsModal الموحّد ──
+    // ── عرض التفاصيل عبر EmsDetailsModal الموحد ──
     $(document).on('click', '.viewActBtn', function () {
         const d = $(this).data();
         const isNego = String(d.negotiation) === '1';

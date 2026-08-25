@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['gov_action'])) {
         $r = PTS::createVersion($conn, strval($_POST['tpl_kind'] ?? ''), strval($_POST['key_code'] ?? ''),
             is_array($perms) ? $perms : array(), strval($_POST['change_ref'] ?? ''));
         ems_gov_redirect("Location: sec_governance.php?msg=" . rawurlencode(
-            (is_array($r) ? strval($r['reason'] ?? 'أُنشئت نسخةُ القالب') : 'أُنشئت نسخةُ القالب')
+            (is_array($r) ? strval($r['reason'] ?? 'أنشئت نسخة القالب') : 'أنشئت نسخة القالب')
             . (is_array($r) && empty($r['ok']) ? ' ❌' : ' ✅')));
         exit();
     } elseif ($act === 'tpl_preview' && $can_view) {
@@ -93,19 +93,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['gov_action'])) {
     } elseif ($act === 'tpl_tested' && $can_edit) {
         $r = PTS::markTested($conn, intval($_POST['ver_id'] ?? 0), strval($_POST['test_ref'] ?? ''));
         ems_gov_redirect("Location: sec_governance.php?msg=" . rawurlencode(
-            (is_array($r) ? strval($r['reason'] ?? 'وُسِم القالبُ مُختبَرًا') : 'وُسِم القالبُ مُختبَرًا')
+            (is_array($r) ? strval($r['reason'] ?? 'وسم القالب مختبرا') : 'وسم القالب مختبرا')
             . (is_array($r) && empty($r['ok']) ? ' ❌' : ' ✅')));
         exit();
     } elseif ($act === 'tpl_publish' && $can_edit) {
         $approvalRef = trim(strval($_POST['approval_ref'] ?? ''));
         if ($approvalRef === '') {
             ems_gov_redirect("Location: sec_governance.php?msg=" . rawurlencode(
-                'مرجعُ الاعتمادِ إلزاميٌّ للنشر — ولا يُنشر قالبٌ بلا مَن أقرّه ❌'));
+                'مرجع الاعتماد إلزامي للنشر — ولا ينشر قالب بلا من أقره ❌'));
             exit();
         }
         $r = PTS::publish($conn, intval($_POST['ver_id'] ?? 0), $approvalRef);
         ems_gov_redirect("Location: sec_governance.php?msg=" . rawurlencode(
-            (is_array($r) ? strval($r['reason'] ?? 'نُشر القالب') : 'نُشر القالب')
+            (is_array($r) ? strval($r['reason'] ?? 'نشر القالب') : 'نشر القالب')
             . (is_array($r) && empty($r['ok']) ? ' ❌' : ' ✅')));
         exit();
     }
@@ -167,17 +167,17 @@ include '../insidebar.php';
     include('../includes/page_header.php');
 
     ems_screen_about(
-        'الصلاحية تُشتق ولا تُمنح: مركز مدير الصلاحيات بمجموعاته الثماني (SEC-01 §10.1) — '
-        . 'يعرّف الشخص بطبقاته السبع فيمنحه النظام قالبه، ويفسّر مصدر كل صلاحية، ولا يمنح نفسه.',
+        'الصلاحية تشتق ولا تمنح: مركز مدير الصلاحيات بمجموعاته الثماني (SEC-01 §10.1) — '
+        . 'يعرف الشخص بطبقاته السبع فيمنحه النظام قالبه، ويفسر مصدر كل صلاحية، ولا يمنح نفسه.',
         array('«لماذا يملك فلان هذه الصلاحية؟» في التقارير — أهم خدمة للمراجع',
-              'المراجعة النصف سنوية بندًا بندًا — وما لم يُوقَّع يُصعَّد',
-              'الحراس السبعة عشر تُقرأ سياساتهم ولا تُستثنى'));
+              'المراجعة النصف سنوية بندا بندا — وما لم يوقع يصعد',
+              'الحراس السبعة عشر تقرأ سياساتهم ولا تستثنى'));
 
     if ($msg !== '') { echo '<div class="alert alert-info">' . htmlspecialchars($msg) . '</div>'; }
 
     /* UXW-01 ⑨: حزمةُ الحالاتِ الدنيا — مخفيةٌ افتراضًا ويُظهرها منطقُ الشاشةِ عند حالِها */
-    echo ems_states_bundle('لا بياناتِ حوكمةِ صلاحياتٍ ضمن نطاقك بعدُ',
-        'اللوحةُ تُقاس من سجلاتِ الاستثناءاتِ والتكليفاتِ والحراسِ الحيّة');
+    echo ems_states_bundle('لا بيانات حوكمة صلاحيات ضمن نطاقك بعد',
+        'اللوحة تقاس من سجلات الاستثناءات والتكليفات والحراس الحية');
     ?>
 
     <div class="card"><div class="card-header"><h5>① لوحة الحوكمة</h5></div>
@@ -197,7 +197,7 @@ include '../insidebar.php';
             <!-- UXW-01 ⑥: السماتُ الثابتةُ (id·placeholder) قبل value المضمَّنةِ بـPHP — فخُّ ?> يبتر الوسم -->
             <div class="form-group"><label for="emsf_697_c288a">الصلاحية</label><input type="text" name="permission_code" id="emsf_697_c288a" placeholder="unit.approve" required value="<?php echo htmlspecialchars($_POST['permission_code'] ?? ''); ?>"></div>
             <div class="form-group"><label for="emsf_698_d6fe5">النطاق</label><input type="text" name="scope" id="emsf_698_d6fe5" placeholder="site:18" required value="<?php echo htmlspecialchars($_POST['scope'] ?? ''); ?>"></div>
-            <button type="submit" class="btn-primary">فسّر</button>
+            <button type="submit" class="btn-primary">فسر</button>
         </form>
         <?php if ($explainResult !== null): ?>
         <pre class="secg-json"><?php
@@ -223,7 +223,7 @@ include '../insidebar.php';
               <th class="ems-fn-th" data-fn="1">اعتمده</th>
               <th class="ems-fn-th" data-fn="1">تاريخ المراجعة القادمة</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
               </tr></thead>
             <tbody>
             <?php foreach ($pcrs as $x): ?>
@@ -243,7 +243,7 @@ include '../insidebar.php';
                     <?php elseif ($can_edit && $x['state'] === 'approved'): ?>
                         <form method="post" class="secg-inline"><input type="hidden" name="gov_action" value="apply_pcr">
                             <input type="hidden" name="req_id" value="<?php echo intval($x['req_id']); ?>">
-                            <button class="btn-primary" type="submit">طبّق</button></form>
+                            <button class="btn-primary" type="submit">طبق</button></form>
                     <?php endif; ?>
                     </td></tr>
             <?php endforeach; ?>
@@ -253,9 +253,9 @@ include '../insidebar.php';
 
     <div class="card"><div class="card-header"><h5>⑤ المتابعة — الخامل والمنتهي وبلا مصدر</h5></div>
     <div class="card-body secg-grid3">
-        <div><strong>خامل 90 يومًا (<?php echo count($dormant); ?>)</strong><ul class="secg-scroll-list">
+        <div><strong>خامل 90 يوما (<?php echo count($dormant); ?>)</strong><ul class="secg-scroll-list">
             <?php foreach ($dormant as $d) { echo '<li>' . htmlspecialchars($d['name']) . '</li>'; } if (!$dormant) { echo '<li class="secg-muted">لا خامل</li>'; } ?></ul></div>
-        <div><strong>ينتهي خلال 30 يومًا (<?php echo count($expiring); ?>)</strong><ul class="secg-scroll-list">
+        <div><strong>ينتهي خلال 30 يوما (<?php echo count($expiring); ?>)</strong><ul class="secg-scroll-list">
             <?php foreach ($expiring as $e) { echo '<li>' . htmlspecialchars($e['kind'] . ' #' . $e['id'] . ' — ' . $e['code'] . ' · ' . $e['ts']) . '</li>'; } if (!$expiring) { echo '<li class="secg-muted">لا شيء</li>'; } ?></ul></div>
         <div><strong>صلاحيات بلا مصدر (<?php echo count($orphans); ?>)</strong><ul class="secg-scroll-list">
             <?php foreach ($orphans as $o) { echo '<li>دور ' . intval($o['role_id']) . ' → موديول محذوف</li>'; } if (!$orphans) { echo '<li class="secg-muted">صفر — كل صلاحية لها مصدر</li>'; } ?></ul></div>
@@ -269,7 +269,7 @@ include '../insidebar.php';
             <div class="form-group"><label for="emsf_699_5d543">الوحدة</label>
                 <select name="org_unit_id" id="emsf_699_5d543"><?php foreach ($units as $u) { echo '<option value="' . intval($u['unit_id']) . '">' . htmlspecialchars($u['name_ar']) . '</option>'; } ?></select></div>
             <div class="form-group"><label for="emsf_700_fe2f8">الفترة</label><input type="text" name="period" placeholder="2026-H2" required id="emsf_700_fe2f8"></div>
-            <div class="form-group"><label for="emsf_701_1e14c">المدير الموقِّع</label>
+            <div class="form-group"><label for="emsf_701_1e14c">المدير الموقع</label>
                 <select name="manager_person_id" id="emsf_701_1e14c"><?php foreach ($usersList as $u) { echo '<option value="' . intval($u['id']) . '">' . htmlspecialchars($u['name']) . '</option>'; } ?></select></div>
             <button type="submit" class="btn-primary">افتح مراجعة نصف سنوية</button>
         </form>
@@ -284,7 +284,7 @@ include '../insidebar.php';
         <div class="secg-mt10">
             <?php foreach ($founding as $f) {
                 echo '<span class="badge ' . (intval($f['enabled']) ? 'badge-danger' : 'badge-secondary') . ' secg-founding">وضع '
-                    . htmlspecialchars($f['mode']) . ': ' . (intval($f['enabled']) ? ('مفعَّل حتى ' . $f['ends_at']) : 'مطفأ') . '</span>';
+                    . htmlspecialchars($f['mode']) . ': ' . (intval($f['enabled']) ? ('مفعل حتى ' . $f['ends_at']) : 'مطفأ') . '</span>';
             } ?>
         </div>
     </div></div>

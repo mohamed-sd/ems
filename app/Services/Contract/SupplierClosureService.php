@@ -37,20 +37,20 @@ class SupplierClosureService
 
         require_once __DIR__ . '/SupplierContractService.php';
         $head = SupplierContractService::head($gate, $contractId);
-        if (!$head) { $out['code'] = 404; $out['reason'] = 'عقدُ المورد غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!$head) { $out['code'] = 404; $out['reason'] = 'عقد المورد غير موجود في نطاقك'; return $out; }
 
         // ── «عند الإنهاء» — لا قبله ────────────────────────────────────────
         if (!in_array((string) $head['state'], self::CLOSABLE_FROM, true)) {
             $out['code'] = 422;
-            $out['reason'] = 'العقدُ في حالة «' . $head['state'] . '» — و**التصفيةُ عند الإنهاء لا قبله** '
-                           . '(ENT-02 §4): أنهِ العقدَ ثم صفِّه';
+            $out['reason'] = 'العقد في حالة «' . $head['state'] . '» — و**التصفية عند الإنهاء لا قبله** '
+                           . '(ENT-02 §4): أنه العقد ثم صفه';
             return $out;
         }
 
         $ex = self::byContract($gate, $contractId);
         if ($ex) {
             $out['code'] = 409; $out['closure_id'] = (int) $ex['id'];
-            $out['reason'] = 'للعقد تصفيةٌ قائمةٌ #' . $ex['id'] . ' («بمفتاح العقد × التصفية»)';
+            $out['reason'] = 'للعقد تصفية قائمة #' . $ex['id'] . ' («بمفتاح العقد × التصفية»)';
             return $out;
         }
 
@@ -81,7 +81,7 @@ class SupplierClosureService
                 'opened_by'          => (int) $actor ?: null,
             ));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر فتحُ التصفية: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر فتح التصفية: ' . $t->getMessage(); return $out;
         }
 
         self::audit($conn, $companyId, $actor, 'create', (int) $out['closure_id'], array(),
@@ -102,12 +102,12 @@ class SupplierClosureService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'closed' => 0);
         $cl = self::head($gate, (int) $closureId);
-        if (!$cl) { $out['code'] = 404; $out['reason'] = 'التصفيةُ غيرُ موجودةٍ في نطاقك'; return $out; }
+        if (!$cl) { $out['code'] = 404; $out['reason'] = 'التصفية غير موجودة في نطاقك'; return $out; }
         if ((string) $cl['state'] === 'closed') {
-            $out['code'] = 409; $out['reason'] = 'التصفيةُ مقفلةٌ — والتصحيحُ بعدها بعكسٍ موثَّق'; return $out;
+            $out['code'] = 409; $out['reason'] = 'التصفية مقفلة — والتصحيح بعدها بعكس موثق'; return $out;
         }
         if ($cl['quota_closed_at'] !== null) {
-            $out['code'] = 409; $out['reason'] = 'الحصةُ أُقفلت سلفًا'; return $out;
+            $out['code'] = 409; $out['reason'] = 'الحصة أقفلت سلفا'; return $out;
         }
 
         $open = self::openQuotas($gate, (int) $cl['supplier_id']);
@@ -117,8 +117,8 @@ class SupplierClosureService
         $reason = trim((string) $reason);
         if ($unconsumed > 0 && $reason === '') {
             $out['code'] = 422;
-            $out['reason'] = $unconsumed . ' حاويةً **لم تُستهلك بالكامل** — وإقفالُها يلزمه سببٌ مكتوب '
-                           . '(كما لا يُتجاوز السقفُ صامتًا لا يُقفل الباقي صامتًا)';
+            $out['reason'] = $unconsumed . ' حاوية **لم تستهلك بالكامل** — وإقفالها يلزمه سبب مكتوب '
+                           . '(كما لا يتجاوز السقف صامتا لا يقفل الباقي صامتا)';
             return $out;
         }
 
@@ -129,7 +129,7 @@ class SupplierClosureService
                     // لا بلغةٍ ثانيةٍ تُخترع هنا (وإلا ابتلع ENUM القيمةَ صامتًا)
                     $g->update('op_containers',
                         array('state' => 'مقفلة',
-                              'close_reason' => mb_substr('تصفيةُ إنهاء العقد #' . $cl['contract_id']
+                              'close_reason' => mb_substr('تصفية إنهاء العقد #' . $cl['contract_id']
                                                 . ($reason !== '' ? (' — ' . $reason) : ''), 0, 255)),
                         array('id' => (int) $c['id']));
                     $out['closed']++;
@@ -141,7 +141,7 @@ class SupplierClosureService
                 ), array('id' => (int) $cl['id']));
             }, 'إقفال حصة تصفية ' . $cl['id']);
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر إقفالُ الحصة: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر إقفال الحصة: ' . $t->getMessage(); return $out;
         }
 
         self::audit($conn, $companyId, $actor, 'close_quota', (int) $cl['id'],
@@ -159,9 +159,9 @@ class SupplierClosureService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'balance' => 0.0);
         $cl = self::head($gate, (int) $closureId);
-        if (!$cl) { $out['code'] = 404; $out['reason'] = 'التصفيةُ غيرُ موجودةٍ في نطاقك'; return $out; }
+        if (!$cl) { $out['code'] = 404; $out['reason'] = 'التصفية غير موجودة في نطاقك'; return $out; }
         if ((string) $cl['state'] === 'closed') {
-            $out['code'] = 409; $out['reason'] = 'التصفيةُ مقفلة'; return $out;
+            $out['code'] = 409; $out['reason'] = 'التصفية مقفلة'; return $out;
         }
 
         require_once dirname(__DIR__) . '/Settlement/SupplierAdvanceService.php';
@@ -174,10 +174,10 @@ class SupplierClosureService
             try {
                 $gate->update('supplier_contract_closures', array('advances_balance' => $balance),
                     array('id' => (int) $cl['id']));
-            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'القراءةُ تُعلن ولو تعذّر الوسم'); /* القراءةُ تُعلن ولو تعذّر الوسم */ }
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'القراءة تعلن ولو تعذر الوسم'); /* القراءةُ تُعلن ولو تعذّر الوسم */ }
             $out['code'] = 423;
-            $out['reason'] = 'رصيدُ سلفٍ مفتوحٌ ' . $balance . ' — **يُسترد أو يُحوَّل ذمّةً مدينةً '
-                           . 'قبل الإخلاء** (ENT-02 §4: «تسويةُ العهد والسلف»)';
+            $out['reason'] = 'رصيد سلف مفتوح ' . $balance . ' — **يسترد أو يحول ذمة مدينة '
+                           . 'قبل الإخلاء** (ENT-02 §4: «تسوية العهد والسلف»)';
             return $out;
         }
 
@@ -186,7 +186,7 @@ class SupplierClosureService
                 array('advances_balance' => 0, 'advances_settled_at' => date('Y-m-d H:i:s')),
                 array('id' => (int) $cl['id']));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الوسم: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الوسم: ' . $t->getMessage(); return $out;
         }
         self::audit($conn, $companyId, $actor, 'settle_advances', (int) $cl['id'], array(), array('balance' => 0));
         $out['ok'] = true; $out['code'] = 200;
@@ -202,18 +202,18 @@ class SupplierClosureService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'due_id' => null);
         $cl = self::head($gate, (int) $closureId);
-        if (!$cl) { $out['code'] = 404; $out['reason'] = 'التصفيةُ غيرُ موجودةٍ في نطاقك'; return $out; }
+        if (!$cl) { $out['code'] = 404; $out['reason'] = 'التصفية غير موجودة في نطاقك'; return $out; }
         if ((string) $cl['state'] === 'closed') {
-            $out['code'] = 409; $out['reason'] = 'التصفيةُ مقفلة'; return $out;
+            $out['code'] = 409; $out['reason'] = 'التصفية مقفلة'; return $out;
         }
         if ($cl['guarantee_amount'] === null || (float) $cl['guarantee_amount'] <= 0) {
             $out['code'] = 422;
-            $out['reason'] = 'لا ضمانَ أداءٍ مكتوبًا في هذا العقد — **ولا يُردُّ ما لم يُؤخذ**';
+            $out['reason'] = 'لا ضمان أداء مكتوبا في هذا العقد — **ولا يرد ما لم يؤخذ**';
             return $out;
         }
         if ($cl['guarantee_released_at'] !== null) {
             $out['code'] = 409;
-            $out['reason'] = 'الضمانُ رُدَّ سلفًا بذمّة #' . (int) $cl['guarantee_due_ref'];
+            $out['reason'] = 'الضمان رد سلفا بذمة #' . (int) $cl['guarantee_due_ref'];
             $out['due_id'] = (int) $cl['guarantee_due_ref'];
             return $out;
         }
@@ -222,8 +222,8 @@ class SupplierClosureService
         $today = (preg_match('/^\d{4}-\d{2}-\d{2}$/', (string) $asOf)) ? (string) $asOf : date('Y-m-d');
         if ($cl['guarantee_due_date'] !== null && $today < (string) $cl['guarantee_due_date']) {
             $out['code'] = 423;
-            $out['reason'] = 'مهلةُ الضمان لم تنقضِ — يُردُّ في ' . $cl['guarantee_due_date']
-                           . ' («ردُّ الضمان **بعد مهلته**» — ENT-02 §4)';
+            $out['reason'] = 'مهلة الضمان لم تنقض — يرد في ' . $cl['guarantee_due_date']
+                           . ' («رد الضمان **بعد مهلته**» — ENT-02 §4)';
             return $out;
         }
 
@@ -248,7 +248,7 @@ class SupplierClosureService
                 ), array('id' => (int) $cl['id']));
             }, 'رد ضمان تصفية ' . $cl['id']);
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر ردُّ الضمان: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر رد الضمان: ' . $t->getMessage(); return $out;
         }
 
         self::audit($conn, $companyId, $actor, 'release_guarantee', (int) $cl['id'], array(),
@@ -266,23 +266,23 @@ class SupplierClosureService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '');
         $cl = self::head($gate, (int) $closureId);
-        if (!$cl) { $out['code'] = 404; $out['reason'] = 'التصفيةُ غيرُ موجودةٍ في نطاقك'; return $out; }
+        if (!$cl) { $out['code'] = 404; $out['reason'] = 'التصفية غير موجودة في نطاقك'; return $out; }
         if ((string) $cl['state'] === 'closed') {
-            $out['code'] = 409; $out['reason'] = 'التصفيةُ مقفلةٌ سلفًا'; return $out;
+            $out['code'] = 409; $out['reason'] = 'التصفية مقفلة سلفا'; return $out;
         }
 
         $doc = trim((string) $clearanceDoc);
         if ($doc === '') {
             $out['code'] = 422;
-            $out['reason'] = '**شهادةُ إخلاءٍ موثَّقة** إلزامية — «الإخلاءُ بلا مستندٍ كلامٌ» (ENT-02 §4)';
+            $out['reason'] = '**شهادة إخلاء موثقة** إلزامية — «الإخلاء بلا مستند كلام» (ENT-02 §4)';
             return $out;
         }
 
         $missing = self::missingSteps($cl);
         if ($missing) {
             $out['code'] = 423;
-            $out['reason'] = 'خطواتٌ لم تكتمل: ' . implode(' · ', $missing)
-                           . ' — **ولا إخلاءَ قبل إتمامها**';
+            $out['reason'] = 'خطوات لم تكتمل: ' . implode(' · ', $missing)
+                           . ' — **ولا إخلاء قبل إتمامها**';
             return $out;
         }
 
@@ -292,7 +292,7 @@ class SupplierClosureService
                 'closed_by' => (int) $actor ?: null, 'closed_at' => date('Y-m-d H:i:s'),
             ), array('id' => (int) $cl['id']));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الإقفال: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الإقفال: ' . $t->getMessage(); return $out;
         }
 
         self::audit($conn, $companyId, $actor, 'close', (int) $cl['id'],
@@ -305,11 +305,11 @@ class SupplierClosureService
     public static function missingSteps($cl)
     {
         $missing = array();
-        if ($cl['quota_closed_at'] === null)     { $missing[] = 'إقفالُ الحصة'; }
-        if ($cl['advances_settled_at'] === null) { $missing[] = 'تسويةُ العهد والسلف'; }
+        if ($cl['quota_closed_at'] === null)     { $missing[] = 'إقفال الحصة'; }
+        if ($cl['advances_settled_at'] === null) { $missing[] = 'تسوية العهد والسلف'; }
         if ($cl['guarantee_amount'] !== null && (float) $cl['guarantee_amount'] > 0
             && $cl['guarantee_released_at'] === null) {
-            $missing[] = 'ردُّ الضمان';
+            $missing[] = 'رد الضمان';
         }
         return $missing;
     }
@@ -323,16 +323,16 @@ class SupplierClosureService
         $cl = self::byContract($gate, (int) $contractId);
         if (!$cl) {
             return array('ok' => false,
-                'reason' => 'لا تصفيةَ إنهاءٍ لهذا العقد — و«إقفالُ الحصة وتسويةُ السلف وردُّ الضمان '
-                          . 'وشهادةُ الإخلاء» شرطُ إقفاله (ENT-02 §4): افتح تصفيتَه ثم أقفِله');
+                'reason' => 'لا تصفية إنهاء لهذا العقد — و«إقفال الحصة وتسوية السلف ورد الضمان '
+                          . 'وشهادة الإخلاء» شرط إقفاله (ENT-02 §4): افتح تصفيته ثم أقفله');
         }
         if ((string) $cl['state'] !== 'closed') {
             $missing = self::missingSteps($cl);
             return array('ok' => false,
-                'reason' => 'تصفيةُ العقد #' . $cl['id'] . ' لم تُقفل بعد'
-                          . ($missing ? (' — الناقص: ' . implode(' · ', $missing)) : ' — تنقصها شهادةُ الإخلاء'));
+                'reason' => 'تصفية العقد #' . $cl['id'] . ' لم تقفل بعد'
+                          . ($missing ? (' — الناقص: ' . implode(' · ', $missing)) : ' — تنقصها شهادة الإخلاء'));
         }
-        return array('ok' => true, 'reason' => 'تصفيةٌ مقفلةٌ بشهادة ' . $cl['clearance_doc']);
+        return array('ok' => true, 'reason' => 'تصفية مقفلة بشهادة ' . $cl['clearance_doc']);
     }
 
     // ═════════════════════════════════════════════════════════════════════

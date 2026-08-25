@@ -71,7 +71,7 @@ function ems_xf_registry()
         'Clients/clients.php' => array(
             'table' => 'clients',
             'title' => 'بيانات إضافية للعميل',
-            'hint'  => 'كلُّها اختياريةٌ — احفظ العميلَ بالحدِّ الأدنى الآن، وأكملْ هذه متى توفّرت.',
+            'hint'  => 'كلها اختيارية — احفظ العميل بالحد الأدنى الآن، وأكمل هذه متى توفرت.',
             'group' => array('key' => 'extra', 'label' => 'بيانات إضافية', 'default' => 'hidden'),
             'columns' => array(
 
@@ -95,9 +95,9 @@ function ems_xf_registry()
 
                 array('key' => 'tax_id', 'label' => 'الرقم الضريبي', 'kind' => 'own',
                       'type' => 'text', 'max' => 100, 'icon' => 'fas fa-percent',
-                      'ph' => 'الرقم الضريبي المسجَّل'),
+                      'ph' => 'الرقم الضريبي المسجل'),
 
-                array('key' => 'registered_address', 'label' => 'العنوان المسجَّل', 'kind' => 'own',
+                array('key' => 'registered_address', 'label' => 'العنوان المسجل', 'kind' => 'own',
                       'type' => 'textarea', 'max' => 500, 'icon' => 'fas fa-map-marker-alt',
                       'ph' => 'العنوان كما في وثائق التسجيل', 'wide' => true),
 
@@ -122,7 +122,7 @@ function ems_xf_registry()
                       'options' => array('أ — بالغة الأهمية', 'ب — مهمة', 'ج — عادية', 'د — محدودة')),
 
                 /* ◆ مشتقّتان: مصدرُهما `created_by` و`created_at` في الصفِّ نفسِه */
-                array('key' => 'created_by', 'label' => 'سجّله', 'kind' => 'derived',
+                array('key' => 'created_by', 'label' => 'سجله', 'kind' => 'derived',
                       'render' => 'actor', 'icon' => 'fas fa-user-plus'),
 
                 array('key' => 'created_at', 'label' => 'تاريخ التسجيل', 'kind' => 'derived',

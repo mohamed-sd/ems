@@ -165,7 +165,7 @@ if ($existing) {
 ?>
 
 <div class="warning">
-  <strong>⚠️ تحذير أمني:</strong> احذف هذا الملف فورًا بعد الانتهاء!<br>
+  <strong>⚠️ تحذير أمني:</strong> احذف هذا الملف فورا بعد الانتهاء!<br>
   المسار: <code>admin/setup_once.php</code>
 </div>
 

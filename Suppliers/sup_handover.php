@@ -22,7 +22,7 @@ $flash = null; $flash_ok = false;
 /* ── معالجُ POST — الشاشةُ تنادي الخدمةَ والخدمةُ تكتب (TS-09) ── */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($PERMS['can_add'])) {
-        $flash = 'لا تملك صلاحيةَ تسجيلِ التسليم — راجِعْ مديرَك.';
+        $flash = 'لا تملك صلاحية تسجيل التسليم — راجع مديرك.';
     } else {
         require_csrf();
         $res = \App\Services\Capacity\HandoverService::record(ems_tenant_db(), $conn, array(
@@ -36,8 +36,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ), $actor_id);
         $flash_ok = !empty($res['ok']);
         $flash = $flash_ok
-            ? 'سُجِّل التسليمُ برقم #' . (int) $res['swap_id'] . ' — وانتقلت الحصةُ بين الحاويتين.'
-            : 'لم يُسجَّل: ' . implode(' · ', (array) $res['reasons']);
+            ? 'سجل التسليم برقم #' . (int) $res['swap_id'] . ' — وانتقلت الحصة بين الحاويتين.'
+            : 'لم يسجل: ' . implode(' · ', (array) $res['reasons']);
     }
 }
 
@@ -69,14 +69,14 @@ $rs = $st->get_result();
 while ($x = $rs->fetch_assoc()) { $swaps[] = $x; }
 $st->close();
 
-$page_title = 'إيكوبيشن | تسليمُ الحصص بين الموردين';
+$page_title = 'إيكوبيشن | تسليم الحصص بين الموردين';
 /* CM-00 · UXR P4 — بذرُ محاورِ الغلافِ الحاكمِ من الخادمِ قبلَ التصيير، فيُقرأ
    نطاقُك ومدى صلاحيتِك ولحظةُ القراءةِ في سطرِ سياقِ الرأسِ الموحَّد. */
 require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes($PERMS);
 include __DIR__ . '/../inheader.php';
 include __DIR__ . '/../insidebar.php';
-require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('supplier', 'الطاقةُ والجاهزية');
+require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('supplier', 'الطاقة والجاهزية');
 require_once __DIR__ . '/../includes/screen_contract.php';
 if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
@@ -94,23 +94,23 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
           داخلَ `.main`، وبغيابِهما يبقى الـ`<template>` بلا زرٍّ ولا بطاقة.
        ③ **زرُّ «أبلغ عن مشكلة» الطافي**: يُحقن قبلَ `</body>` — و`</body>` لم
           تكن تُطبع أصلًا، لأن `infooter.php` المُضمَّنَ غيرُ موجودٍ في الشجرة. */
-  $header_title   = 'تسليمُ الحصص بين الموردين';
+  $header_title   = 'تسليم الحصص بين الموردين';
   $header_icon    = 'fa fa-right-left';
   $header_actions = array();
   if (!empty($PERMS['can_add'])) {
       $header_actions[] = array('href' => 'javascript:void(0)', 'id' => 'toggleSuphForm',
-          'icon' => 'fa fa-plus', 'label' => 'تسليمٌ جديد', 'class' => 'add-btn');
+          'icon' => 'fa fa-plus', 'label' => 'تسليم جديد', 'class' => 'add-btn');
   }
   $header_back = array('href' => 'shares_coverage.php', 'class' => '',
-                       'icon' => 'fas fa-arrow-right', 'label' => 'حصصُ الموردين والتغطية');
+                       'icon' => 'fas fa-arrow-right', 'label' => 'حصص الموردين والتغطية');
   
 /* شريطُ تبويباتِ العائلة — قرارُ وثيقةِ المواءمة (مكوّنٌ مركزيّ) */
 $sft_family = 'capacity'; $sft_active = 'handover';
 include __DIR__ . '/../includes/sales_family_tabs.php';
 include __DIR__ . '/../includes/page_header.php';
 
-  echo ems_next_step('تسجيلُ التسليمِ بمستندِه وتاريخِ سريانِه — والحصةُ تنتقل بين الحاويتين فورَ الحفظ');
-  echo ems_states_bundle('لا تسليماتِ حصصٍ مسجَّلةً بعد', 'سجّلِ التسليمَ بمستندِه وتاريخِه فيظهر أثرُه هنا');
+  echo ems_next_step('تسجيل التسليم بمستنده وتاريخ سريانه — والحصة تنتقل بين الحاويتين فور الحفظ');
+  echo ems_states_bundle('لا تسليمات حصص مسجلة بعد', 'سجل التسليم بمستنده وتاريخه فيظهر أثره هنا');
 
   /* لافتةُ النتيجةِ بلغةِ النظامِ الموحَّدة (ems-alerts.css) — النغمةُ من الصنف */
   if ($flash !== null) {
@@ -122,8 +122,8 @@ include __DIR__ . '/../includes/page_header.php';
 
   <div class="alert alert-info suph-note">
     <i class="fa fa-circle-info"></i>
-    <span>هنا نسجّل انتقالَ حصةِ ساعاتٍ من موردٍ إلى آخر — <strong>بمستندٍ وتاريخِ سريان</strong>،
-      ولا يُمسُّ شهرٌ مغلق.</span>
+    <span>هنا نسجل انتقال حصة ساعات من مورد إلى آخر — <strong>بمستند وتاريخ سريان</strong>،
+      ولا يمس شهر مغلق.</span>
   </div>
 
   <?php if (!empty($PERMS['can_add'])): ?>
@@ -133,11 +133,11 @@ include __DIR__ . '/../includes/page_header.php';
         class="allforms<?= ($flash !== null && !$flash_ok) ? ' allforms-visible' : '' ?>">
     <?= csrf_field() ?>
     <div class="card">
-      <div class="card-header"><h5><i class="fa fa-right-left"></i> سجّل تسليمًا جديدًا</h5></div>
+      <div class="card-header"><h5><i class="fa fa-right-left"></i> سجل تسليما جديدا</h5></div>
       <div class="card-body">
         <div class="form-grid">
           <div class="form-group">
-            <label for="suph_from"><i class="fas fa-truck-arrow-right"></i> الموردُ المسلِّم <span class="suph-req">*</span></label>
+            <label for="suph_from"><i class="fas fa-truck-arrow-right"></i> المورد المسلم <span class="suph-req">*</span></label>
             <select name="from_container_id" id="suph_from" required>
               <option value="">— اختر —</option>
               <?php foreach ($containers as $c): ?>
@@ -146,7 +146,7 @@ include __DIR__ . '/../includes/page_header.php';
             </select>
           </div>
           <div class="form-group">
-            <label for="suph_to"><i class="fas fa-truck-ramp-box"></i> الموردُ المستلِم <span class="suph-req">*</span></label>
+            <label for="suph_to"><i class="fas fa-truck-ramp-box"></i> المورد المستلم <span class="suph-req">*</span></label>
             <select name="to_container_id" id="suph_to" required>
               <option value="">— اختر —</option>
               <?php foreach ($containers as $c): ?>
@@ -155,24 +155,24 @@ include __DIR__ . '/../includes/page_header.php';
             </select>
           </div>
           <div class="form-group">
-            <label for="suph_qty"><i class="fas fa-hourglass-half"></i> الكميةُ المنقولة (ساعة) <span class="suph-req">*</span></label>
+            <label for="suph_qty"><i class="fas fa-hourglass-half"></i> الكمية المنقولة (ساعة) <span class="suph-req">*</span></label>
             <input type="number" step="0.01" min="0.01" name="moved_qty" id="suph_qty" required placeholder="مثال: 300">
           </div>
           <div class="form-group">
-            <label for="suph_eff"><i class="fas fa-calendar-day"></i> تاريخُ السريان <span class="suph-req">*</span></label>
+            <label for="suph_eff"><i class="fas fa-calendar-day"></i> تاريخ السريان <span class="suph-req">*</span></label>
             <input type="date" name="effective_from" id="suph_eff" required>
           </div>
           <div class="form-group">
-            <label for="suph_doc"><i class="fas fa-file-signature"></i> مستندُ التسليم <span class="suph-req">*</span></label>
-            <input type="text" name="doc_ref" id="suph_doc" required placeholder="رقمُ المحضرِ أو الخطاب">
+            <label for="suph_doc"><i class="fas fa-file-signature"></i> مستند التسليم <span class="suph-req">*</span></label>
+            <input type="text" name="doc_ref" id="suph_doc" required placeholder="رقم المحضر أو الخطاب">
           </div>
           <div class="form-group">
             <label for="suph_reason"><i class="fas fa-comment-dots"></i> السبب <span class="suph-req">*</span></label>
-            <input type="text" name="reason" id="suph_reason" required placeholder="لماذا يُسلَّم؟">
+            <input type="text" name="reason" id="suph_reason" required placeholder="لماذا يسلم؟">
           </div>
         </div>
         <div class="pu-form-actions">
-          <button type="submit" class="btn-primary"><i class="fas fa-save"></i> احفظِ التسليم</button>
+          <button type="submit" class="btn-primary"><i class="fas fa-save"></i> احفظ التسليم</button>
           <button type="button" id="suphCancel" class="btn-secondary"><i class="fas fa-times"></i> إلغاء</button>
         </div>
       </div>
@@ -181,7 +181,7 @@ include __DIR__ . '/../includes/page_header.php';
   <?php endif; ?>
 
   <div class="card">
-    <div class="card-header"><h5><i class="fas fa-list"></i> آخرُ التسليمات</h5></div>
+    <div class="card-header"><h5><i class="fas fa-list"></i> آخر التسليمات</h5></div>
     <div class="card-body">
       <div class="table-container">
         <?php /* الجدولُ يُصيَّر دائمًا — والفراغُ تحمله رسالةُ العُدَّةِ المعرَّبةُ
@@ -197,12 +197,12 @@ include __DIR__ . '/../includes/page_header.php';
               <th>المستند</th>
               <th>السبب</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-              <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
               <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
             </tr>
           </thead>
@@ -214,7 +214,7 @@ include __DIR__ . '/../includes/page_header.php';
               <td><?= htmlspecialchars((string) $w['from_no'], ENT_QUOTES, 'UTF-8') ?></td>
               <td><?= htmlspecialchars((string) $w['to_no'], ENT_QUOTES, 'UTF-8') ?></td>
               <td><?= $w['moved_qty'] !== null ? number_format((float) $w['moved_qty'], 2) . ' ساعة' : '—' ?></td>
-              <td><?= htmlspecialchars((string) ($w['doc_ref'] ?: '— (تاريخيٌّ قبل الإلزام)'), ENT_QUOTES, 'UTF-8') ?></td>
+              <td><?= htmlspecialchars((string) ($w['doc_ref'] ?: '— (تاريخي قبل الإلزام)'), ENT_QUOTES, 'UTF-8') ?></td>
               <td><?= htmlspecialchars(mb_substr((string) $w['reason'], 0, 60), ENT_QUOTES, 'UTF-8') ?></td>
             </tr>
           <?php endforeach; ?>

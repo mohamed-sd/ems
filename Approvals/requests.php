@@ -38,8 +38,8 @@ ob_start(); ?><a href="../main/dashboard.php" class="back-btn"><i class="fas fa-
 $header_back = array('raw' => trim((string) ob_get_clean()));
 include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-echo ems_states_bundle('لا طلباتِ موافقاتٍ في هذا التبويب',
-                       'بدّلْ التبويبَ (معلقة · معتمدة · مرفوضة · الكل) أو انتظرْ ورودَ طلبٍ يخصُّ دورَك');
+echo ems_states_bundle('لا طلبات موافقات في هذا التبويب',
+                       'بدل التبويب (معلقة · معتمدة · مرفوضة · الكل) أو انتظر ورود طلب يخص دورك');
 ?>
 
     <?php
@@ -159,9 +159,9 @@ echo ems_states_bundle('لا طلباتِ موافقاتٍ في هذا التب�
                         <th class="apr-req-w10">الحالة</th>
                         <th class="apr-req-w18">تاريخ الإنشاء</th>
                         <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                        <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                        <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                        <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                        <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                        <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                        <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                         <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                         <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                         </tr>
@@ -509,7 +509,7 @@ $(function () {
         const btn = $(this);
         const originalText = btn.html();
 
-        btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> جارٍ التنفيذ...');
+        btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> جار التنفيذ...');
 
         $.ajax({
             url: 'approval_api.php',
@@ -558,7 +558,7 @@ $(function () {
             },
             error: function (xhr) {
                 console.error('AJAX Error:', xhr);
-                alert('خطأ: تعذر الاتصال بالخادم. يرجى المحاولة لاحقاً');
+                alert('خطأ: تعذر الاتصال بالخادم. يرجى المحاولة لاحقا');
                 btn.prop('disabled', false).html(originalText);
             }
         });

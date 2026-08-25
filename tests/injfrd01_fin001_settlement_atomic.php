@@ -50,11 +50,17 @@ $src = (string) file_get_contents($SVC);
  *   قُيّدت، فإسقاطُ اعتمادٍ مودَعٍ لأجلِ طلبٍ **قابلٍ للإعادةِ من الشاشة**
  *   ضررٌ أكبر. فيُعلَن ولا يُبتلع صامتًا — والمعلَنُ يُعَدُّ ويُراجَع. */
 $DECLARED = array('التعذّرُ يُسجَّل ولا يُسقط اعتمادَ التسوية');
+/* ◆ **المطابقةُ بعد نزعِ التشكيل** (RPR-W06): معيارُ نقاءِ لغةِ الواجهةِ نزع
+     التشكيلَ من رسائلِ النظامِ المُصيَّرة، فصارت المرساةُ المشكولةُ لا تجد
+     نصَّها. والمطلبُ لم يتغيَّر — الإعلانُ قائمٌ بنصِّه — فتُنزَع العلاماتُ من
+     **الطرفَين** قبل المقارنة. مرساةٌ أمتنُ لا أضعف: تبقى تشترط الإعلانَ
+     حرفًا، وتنجو من قاعدةٍ دستوريّةٍ أقرَّها المالك. */
+$nd = function ($s) { return preg_replace('/[\x{064B}-\x{0652}\x{0670}]/u', '', (string) $s); };
 $swallow = 0; $undeclared = array();
 if (preg_match_all('~ems_catch_ignored\([^;]*;~u', $src, $sm)) {
     foreach ($sm[0] as $one) {
         $isDeclared = false;
-        foreach ($DECLARED as $d) { if (mb_strpos($one, $d) !== false) { $isDeclared = true; } }
+        foreach ($DECLARED as $d) { if (mb_strpos($nd($one), $nd($d)) !== false) { $isDeclared = true; } }
         if (!$isDeclared) { $swallow++; $undeclared[] = mb_substr($one, 0, 50); }
     }
 }
@@ -102,7 +108,8 @@ try {
     chk($after === $before && $afterL === $beforeL,
         '**وصفرُ تسويةٍ وصفرُ سطرٍ كُتبا**',
         "تسويات {$before}⇐{$after} · سطور {$beforeL}⇐{$afterL}");
-    chk(mb_strpos((string) ($res['reason'] ?? ''), 'قطعُ الغيار') !== false,
+    /* المرساةُ بعد نزعِ التشكيل — RPR-W06 نقّى رسائلَ النظامِ المُصيَّرة */
+    chk(mb_strpos($nd((string) ($res['reason'] ?? '')), $nd('قطعُ الغيار')) !== false,
         'والسببُ **يسمّي المكوِّنَ الذي فشل**',
         mb_substr((string) ($res['reason'] ?? ''), 0, 70));
 } catch (\Throwable $e) {

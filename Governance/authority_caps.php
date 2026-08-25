@@ -37,7 +37,7 @@ ems_shell_axes($__pp);
 
 // ═══ ③-ب التعديل — باعتمادِ المالكِ وحدَه (والقادحُ خلفَ الشاشةِ يفرضه بنيويًّا) ═══
 /* AC-F2: حارسُ الكتابةِ المركزيُّ **قبلَ** أولِ عبارةِ كتابة — fail-closed. */
-ems_require_action($conn, $SCREEN, 'write', array('deny_msg' => 'تعديلُ السقوفِ بيدِ المالكِ وحدَه'));
+ems_require_action($conn, $SCREEN, 'write', array('deny_msg' => 'تعديل السقوف بيد المالك وحده'));
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $lc     = preg_replace('/[^A-Z0-9-]/', '', (string) ($_POST['ladder_code'] ?? ''));
     $amt    = ($_POST['cap_amount'] ?? '') === '' ? null : (float) $_POST['cap_amount'];
@@ -48,9 +48,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $reason = trim((string) ($_POST['reason'] ?? ''));
     $ok = false; $msg = '';
     if ($role !== 9 && !$is_super_admin) {
-        $msg = 'تعديلُ السقفِ باعتمادِ المالكِ وحدَه (الإدارةُ التنفيذية)';
+        $msg = 'تعديل السقف باعتماد المالك وحده (الإدارة التنفيذية)';
     } elseif ($lc === '' || $reason === '') {
-        $msg = 'السلّمُ والسببُ إلزاميانِ — السجلُّ يُقرأ بعدَ سنة';
+        $msg = 'السلم والسبب إلزاميان — السجل يقرأ بعد سنة';
     } else {
         $st = $conn->prepare(
             "INSERT INTO gov_cap_history (ladder_code, cap_amount, cap_currency, effective_from, changed_by, reason)
@@ -67,11 +67,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $upd->close();
             ems_audit_change($conn, 'governance', $SCREEN, 'cap.change', 0,
                 array(), array('ladder' => $lc, 'amount' => $amt, 'currency' => $cur, 'reason' => $reason));
-            $ok = true; $msg = "سُجِّل سقفُ {$lc} الجديدُ — يسري على المعاملاتِ الجديدةِ فقط";
+            $ok = true; $msg = "سجل سقف {$lc} الجديد — يسري على المعاملات الجديدة فقط";
         } else {
             $msg = ($conn->errno === 1644)
-                 ? 'رفضه القيدُ: تعديلُ السقفِ باعتمادِ المالكِ وحدَه'
-                 : 'تعذَّر: ' . $st->error;
+                 ? 'رفضه القيد: تعديل السقف باعتماد المالك وحده'
+                 : 'تعذر: ' . $st->error;
         }
         $st->close();
     }
@@ -84,9 +84,9 @@ unset($_SESSION['caps_flash']);
 
 // ═══ ④ العرض ═══
 $LADDER_NAMES = array(
-    'LD-05' => 'الاعتمادُ الماليُّ الأوليّ', 'LD-06' => 'إصدارُ المستخلصِ والفاتورة',
-    'LD-07' => 'الاعتمادُ الماليُّ النهائيّ', 'LD-08' => 'طلبُ الدفع', 'LD-09' => 'الخزينة',
-    'LD-10' => 'طلبُ الشراء', 'LD-11' => 'أمرُ الشراء', 'LD-12' => 'الاستلام', 'LD-13' => 'التسويةُ النهائية',
+    'LD-05' => 'الاعتماد المالي الأولي', 'LD-06' => 'إصدار المستخلص والفاتورة',
+    'LD-07' => 'الاعتماد المالي النهائي', 'LD-08' => 'طلب الدفع', 'LD-09' => 'الخزينة',
+    'LD-10' => 'طلب الشراء', 'LD-11' => 'أمر الشراء', 'LD-12' => 'الاستلام', 'LD-13' => 'التسوية النهائية',
 );
 $current = array();
 $r = $conn->query(
@@ -113,14 +113,14 @@ include __DIR__ . '/../insidebar.php';
 ?>
 <div class="main ems-unified-page-shell" dir="rtl">
   <?php
-  $header_title = 'حدودُ المبالغِ التسعة';
+  $header_title = 'حدود المبالغ التسعة';
   $header_icon = 'fa fa-scale-balanced';
-  $header_desc = 'السقوفُ مرنةٌ من هذه الشاشةِ بلا تعديلٍ برمجيّ: القديمُ لا يُحذف بل يُحفظ بمن غيَّره ومتى ولماذا · والتعديلُ باعتمادِ المالكِ وحدَه · ويسري على المعاملاتِ الجديدةِ فقط. وغيرُ المحسومِ يوقف المعاملةَ ببطاقةِ «بانتظارِ اعتمادِ السقف» لا كعطل.';
+  $header_desc = 'السقوف مرنة من هذه الشاشة بلا تعديل برمجي: القديم لا يحذف بل يحفظ بمن غيره ومتى ولماذا · والتعديل باعتماد المالك وحده · ويسري على المعاملات الجديدة فقط. وغير المحسوم يوقف المعاملة ببطاقة «بانتظار اعتماد السقف» لا كعطل.';
   $header_back = false;
   include __DIR__ . '/../includes/page_header.php';
   ?>
 
-  <?php echo ems_states_bundle('لا سقوفَ مسجَّلةً بعد', 'تُبذر من هجرةِ السقوفِ ثم تُدار من هنا'); ?>
+  <?php echo ems_states_bundle('لا سقوف مسجلة بعد', 'تبذر من هجرة السقوف ثم تدار من هنا'); ?>
 
   <?php if ($FLASH !== null): ?>
     <div class="<?php echo $FLASH['ok'] ? 'ems-state-readonly' : 'ems-state-noperm'; ?> ems-state" role="status">
@@ -131,8 +131,8 @@ include __DIR__ . '/../insidebar.php';
   <div class="card"><div class="card-body">
     <table class="table" id="capsTable" data-no-dt="hard">
       <thead><tr>
-        <th>السلّم</th><th>اسمُه</th><th>السقفُ الساري</th><th>العملة</th><th>سريانُه منذ</th>
-        <th>آخرُ من غيَّره</th><th>الحال</th>
+        <th>السلم</th><th>اسمه</th><th>السقف الساري</th><th>العملة</th><th>سريانه منذ</th>
+        <th>آخر من غيره</th><th>الحال</th>
         <?php if ($role === 9 || $is_super_admin): ?><th>تعديل</th><?php endif; ?>
       </tr></thead>
       <tbody>
@@ -148,8 +148,8 @@ include __DIR__ . '/../insidebar.php';
           <td class="rtl-number"><?php echo htmlspecialchars(isset($c['effective_from']) ? $c['effective_from'] : '—'); ?></td>
           <td><?php echo htmlspecialchars(isset($c['changed_by_name']) && $c['changed_by_name'] !== null ? $c['changed_by_name'] : '—'); ?></td>
           <td><?php
-              if (!$isBuilt) { echo '<span class="status-badge status-review">سلّمُه لم يُبنَ — يُعرض معَ بنائِه</span>'; }
-              elseif ($c === null || $c['cap_amount'] === null) { echo '<span class="status-badge status-pending">بانتظارِ اعتمادِ السقف — وقفٌ آمنٌ لا عطل</span>'; }
+              if (!$isBuilt) { echo '<span class="status-badge status-review">سلمه لم يبن — يعرض مع بنائه</span>'; }
+              elseif ($c === null || $c['cap_amount'] === null) { echo '<span class="status-badge status-pending">بانتظار اعتماد السقف — وقف آمن لا عطل</span>'; }
               else { echo '<span class="status-badge status-active">ساري</span>'; }
           ?></td>
           <?php if ($role === 9 || $is_super_admin): ?>
@@ -157,11 +157,11 @@ include __DIR__ . '/../insidebar.php';
             <form method="post" class="caps-edit-form">
               <?php echo csrf_field(); ?>
               <input type="hidden" name="ladder_code" value="<?php echo htmlspecialchars($lc); ?>">
-              <input type="number" step="0.01" min="0" name="cap_amount" aria-label="السقفُ الجديدُ لهذا السلّم"
+              <input type="number" step="0.01" min="0" name="cap_amount" aria-label="السقف الجديد لهذا السلم"
                      value="<?php echo $c !== null && $c['cap_amount'] !== null ? htmlspecialchars((string) $c['cap_amount']) : ''; ?>">
               <input type="text" name="cap_currency" maxlength="8" aria-label="العملة" value="<?php echo htmlspecialchars(isset($c['cap_currency']) ? $c['cap_currency'] : 'USD'); ?>" class="caps-cur">
-              <input type="datetime-local" name="effective_from" aria-label="تاريخُ السريان" value="<?php echo date('Y-m-d') . 'T' . date('H:i'); ?>">
-              <input type="text" name="reason" required maxlength="300" aria-label="سببُ التغيير — إلزامي" placeholder="لماذا — يُقرأ بعدَ سنة">
+              <input type="datetime-local" name="effective_from" aria-label="تاريخ السريان" value="<?php echo date('Y-m-d') . 'T' . date('H:i'); ?>">
+              <input type="text" name="reason" required maxlength="300" aria-label="سبب التغيير — إلزامي" placeholder="لماذا — يقرأ بعد سنة">
               <button type="submit" class="btn btn-primary btn-sm">اعتماد</button>
             </form>
           </td>
@@ -173,9 +173,9 @@ include __DIR__ . '/../insidebar.php';
   </div></div>
 
   <div class="card"><div class="card-body">
-    <h3 class="caps-hist-title">السجلُّ الكامل — لا يُحذف قديم</h3>
+    <h3 class="caps-hist-title">السجل الكامل — لا يحذف قديم</h3>
     <table class="table" id="capsHistTable" data-no-dt="hard">
-      <thead><tr><th>السلّم</th><th>المبلغ</th><th>العملة</th><th>سريانُه</th><th>من</th><th>لماذا</th><th>سُجِّل</th></tr></thead>
+      <thead><tr><th>السلم</th><th>المبلغ</th><th>العملة</th><th>سريانه</th><th>من</th><th>لماذا</th><th>سجل</th></tr></thead>
       <tbody>
       <?php while ($h = $hist->fetch_assoc()): ?>
         <tr>

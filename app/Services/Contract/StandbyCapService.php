@@ -43,13 +43,13 @@ class StandbyCapService
                FROM supplier_contract_lines l
               WHERE {TENANT_SCOPE} AND l.id = ? AND l.is_deleted = 0",
             array((int) $supplierContractLineId));
-        if (!$lines) { $out['code'] = 404; $out['reason'] = 'بندُ عقد المورد غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!$lines) { $out['code'] = 404; $out['reason'] = 'بند عقد المورد غير موجود في نطاقك'; return $out; }
         $line = $lines[0];
 
         // ② بلا سقفٍ معرَّف → 422 (fail-closed — لا يُفترض سقف)
         if ($line['standby_units_allowed'] === null) {
             $out['code'] = 422;
-            $out['reason'] = 'لا سقفَ احتياطيٍّ معرَّفًا في عقد المورد (standby_units_allowed) — عرِّف السقفَ في العقد أولًا';
+            $out['reason'] = 'لا سقف احتياطي معرفا في عقد المورد (standby_units_allowed) — عرف السقف في العقد أولا';
             return $out;
         }
         $supplierCap = (int) $line['standby_units_allowed'];
@@ -58,16 +58,16 @@ class StandbyCapService
         $oblRef = $line['contract_obligation_ref'] !== null ? (int) $line['contract_obligation_ref'] : 0;
         if ($oblRef <= 0) {
             $out['code'] = 422;
-            $out['reason'] = 'البندُ بلا مرجعِ التزامٍ في عقد العميل (contract_obligation_ref) — لا حصةَ بلا التزام';
+            $out['reason'] = 'البند بلا مرجع التزام في عقد العميل (contract_obligation_ref) — لا حصة بلا التزام';
             return $out;
         }
         $obls = $gate->scopedQuery(array('scope' => array('c' => 'contract_commitments')),
             "SELECT c.id, c.standby_units_allowed FROM contract_commitments c
               WHERE {TENANT_SCOPE} AND c.id = ? AND c.is_deleted = 0", array($oblRef));
-        if (!$obls) { $out['code'] = 404; $out['reason'] = 'التزامُ نوع المعدة غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!$obls) { $out['code'] = 404; $out['reason'] = 'التزام نوع المعدة غير موجود في نطاقك'; return $out; }
         if ($obls[0]['standby_units_allowed'] === null) {
             $out['code'] = 422;
-            $out['reason'] = 'لا سقفَ احتياطيٍّ معرَّفًا في عقد العميل (standby_units_allowed) — عرِّف السقفَ في العقد أولًا';
+            $out['reason'] = 'لا سقف احتياطي معرفا في عقد العميل (standby_units_allowed) — عرف السقف في العقد أولا';
             return $out;
         }
         $clientCap = (int) $obls[0]['standby_units_allowed'];
@@ -93,15 +93,15 @@ class StandbyCapService
         $extra = max(1, (int) $extra);
         if ($out['supplier_count'] + $extra > $supplierCap || $out['total_count'] + $extra > $clientCap) {
             $out['code'] = 409;
-            $out['reason'] = 'تجاوزُ سقف الاحتياطي — سقفُ عقد المورد: ' . $supplierCap
-                . ' (المسجَّلُ ' . $out['supplier_count'] . ') · سقفُ عقد العميل: ' . $clientCap
-                . ' (المسجَّلُ ' . $out['total_count'] . ')';
+            $out['reason'] = 'تجاوز سقف الاحتياطي — سقف عقد المورد: ' . $supplierCap
+                . ' (المسجل ' . $out['supplier_count'] . ') · سقف عقد العميل: ' . $clientCap
+                . ' (المسجل ' . $out['total_count'] . ')';
             return $out;
         }
 
         $out['ok'] = true; $out['code'] = 200;
-        $out['reason'] = 'ضمن السقفين — عقدُ المورد ' . ($out['supplier_count'] + $extra) . '/' . $supplierCap
-            . ' · عقدُ العميل ' . ($out['total_count'] + $extra) . '/' . $clientCap;
+        $out['reason'] = 'ضمن السقفين — عقد المورد ' . ($out['supplier_count'] + $extra) . '/' . $supplierCap
+            . ' · عقد العميل ' . ($out['total_count'] + $extra) . '/' . $clientCap;
         return $out;
     }
 
@@ -126,7 +126,7 @@ class StandbyCapService
             $type = isset($contractRow['standby_compensation_type']) ? $contractRow['standby_compensation_type'] : null;
             if ($type !== null && $type !== '' && $type !== 'none') {
                 $out['ok'] = true; $out['code'] = 200; $out['compensation_type'] = (string) $type;
-                $out['reason'] = 'مقابلُ الاحتياطي منصوصٌ في عقد العميل: ' . $type;
+                $out['reason'] = 'مقابل الاحتياطي منصوص في عقد العميل: ' . $type;
                 return $out;
             }
         } else {
@@ -135,14 +135,14 @@ class StandbyCapService
             $rate  = isset($contractRow['standby_rate']) ? $contractRow['standby_rate'] : null;
             if ($terms !== '' && $basis !== 'none' && $rate !== null && (float) $rate > 0) {
                 $out['ok'] = true; $out['code'] = 200; $out['compensation_type'] = $basis;
-                $out['reason'] = 'مقابلُ الاحتياطي منصوصٌ في عقد المورد: ' . $terms;
+                $out['reason'] = 'مقابل الاحتياطي منصوص في عقد المورد: ' . $terms;
                 return $out;
             }
         }
 
         // بلا نصٍّ عقديٍّ صريح → 422 مسجَّلة (DEC-CAP-A · §4-③)
         $out['code'] = 422;
-        $out['reason'] = 'لا مقابلَ للاحتياطي بلا نصٍّ عقديٍّ صريح — بلا نصٍّ فهي التزامُ موردٍ لا بندُ إيراد (DEC-CAP-A)';
+        $out['reason'] = 'لا مقابل للاحتياطي بلا نص عقدي صريح — بلا نص فهي التزام مورد لا بند إيراد (DEC-CAP-A)';
         try {
             ActivityLogService::log(array(
                 'action_type' => 'blocked',
@@ -151,7 +151,7 @@ class StandbyCapService
                 'record_id'   => isset($ctx['record_id']) ? (int) $ctx['record_id'] : null,
                 'new_value'   => array('side' => $side, 'code' => 422, 'reason' => $out['reason']),
             ));
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'التسجيلُ لا يُسقط الحكم'); /* التسجيلُ لا يُسقط الحكم */ }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'التسجيل لا يسقط الحكم'); /* التسجيلُ لا يُسقط الحكم */ }
         return $out;
     }
 }

@@ -10,9 +10,9 @@ $FA_SCREEN = array(
     'file' => 'fin_early_warning.php',
     'title' => 'الإنذار المالي المبكر',
     'icon' => 'fas fa-triangle-exclamation',
-    'about' => 'ستَّ عشرةَ قاعدةَ إنذارٍ تُقاس آليًّا — وكلُّ إشارةٍ تُنشر لإدارةِ المخاطرِ فتدخل الفرزَ الرباعي ولا تبقى في المالية.',
+    'about' => 'ست عشرة قاعدة إنذار تقاس آليا — وكل إشارة تنشر لإدارة المخاطر فتدخل الفرز الرباعي ولا تبقى في المالية.',
     'notes' => array (
-  0 => 'الإشارةُ ليست خطرًا — فليس كلُّ ما يُبلَّغ عنه خطرًا (RK-05)',
+  0 => 'الإشارة ليست خطرا — فليس كل ما يبلغ عنه خطرا (RK-05)',
 ),
     'context' => array(),
     'filters' => '',
@@ -31,18 +31,18 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
     while ($x = $r->fetch_assoc()) { $sigs[] = $x; }
 ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
-    <?php echo ems_states_bundle('لا توجد بياناتٌ لهذه الفترة', 'غيّر الفترةَ أو تحقق من توفرِ السجلات'); ?>
+    <?php echo ems_states_bundle('لا توجد بيانات لهذه الفترة', 'غير الفترة أو تحقق من توفر السجلات'); ?>
     <div class="card"><div class="card-body fa-kpi-row">
         <span class="badge badge-info fa-kpi-badge">قواعد: <strong><?php echo count($rules); ?></strong></span>
         <span class="badge badge-warning fa-kpi-badge">إشارات مرفوعة: <strong><?php echo count($sigs); ?></strong></span>
         <?php if ($can_write): ?>
-        <button class="ems-btn-primary" onclick="faPost('signal_raise', {}, function(j){ alert('فُحصت ' + j.checked + ' قاعدةً · رُفعت ' + j.raised.length + ' إشارة'); location.reload(); })">تقييم القواعد للفترة</button>
+        <button class="ems-btn-primary" onclick="faPost('signal_raise', {}, function(j){ alert('فحصت ' + j.checked + ' قاعدة · رفعت ' + j.raised.length + ' إشارة'); location.reload(); })">تقييم القواعد للفترة</button>
         <?php endif; ?>
     </div></div>
     <div class="card"><div class="card-body table-responsive">
         <h6>قواعد الإنذار الست عشرة</h6>
         <?php if (!$rules): /* حالةُ الفراغِ تُعرض بدل جدولٍ خالٍ */ ?>
-            <?php ems_state_empty('لا قواعدَ إنذارٍ معرَّفةً لهذا الكيان بعد'); ?>
+            <?php ems_state_empty('لا قواعد إنذار معرفة لهذا الكيان بعد'); ?>
         <?php else: ?>
         <table class="alltables display nowrap fa-table-full">
             <thead><tr><th>الرمز</th><th>الإشارة</th><th>القاعدة</th><th>النسبة</th><th>المعامل</th>
@@ -69,7 +69,7 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
     <div class="card fa-card-gap"><div class="card-body table-responsive">
         <h6>الإشارات المرفوعة لإدارة المخاطر</h6>
         <?php if (!$sigs): ?>
-            <?php ems_state_empty('لا إشاراتٍ مرفوعةً بعد — شغّل التقييمَ للفترة'); ?>
+            <?php ems_state_empty('لا إشارات مرفوعة بعد — شغل التقييم للفترة'); ?>
         <?php else: ?>
         <table class="table table-sm table-striped fa-table-full" data-no-dt="1">
             <thead><tr><th>الرمز</th><th>العنوان</th><th>الحالة في الفرز</th><th>المفتاح</th><th>الوقت</th></tr></thead>

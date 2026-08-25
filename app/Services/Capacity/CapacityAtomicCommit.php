@@ -39,7 +39,7 @@ class CapacityAtomicCommit
         $lines = isset($steps['lines']) && is_array($steps['lines']) ? $steps['lines'] : array();
         $events = isset($steps['events']) && is_array($steps['events']) ? $steps['events'] : array();
         if (empty($lines)) {
-            $out['code'] = 422; $out['reason'] = 'لا اعتمادَ بلا أسطرِ دفتر — الواقعةُ تُنتج أحكامَها (§13.1)';
+            $out['code'] = 422; $out['reason'] = 'لا اعتماد بلا أسطر دفتر — الواقعة تنتج أحكامها (§13.1)';
             return $out;
         }
         // C25 قبل فتح المعاملة: مفتاحٌ مقيَّدٌ سلفًا → 409 بمرجع السطر القائم
@@ -56,8 +56,8 @@ class CapacityAtomicCommit
             if ($existing !== null) {
                 $out['code'] = 409;
                 $out['existing_led_id'] = $existing;
-                $out['reason'] = 'الوحدةُ بنسختها مقيَّدةٌ سلفًا — مرجعُها led#' . $existing
-                               . ' · صفرُ خصمٍ ثانٍ في كل الطبقات (C25)';
+                $out['reason'] = 'الوحدة بنسختها مقيدة سلفا — مرجعها led#' . $existing
+                               . ' · صفر خصم ثان في كل الطبقات (C25)';
                 return $out;
             }
         }
@@ -98,13 +98,13 @@ class CapacityAtomicCommit
             return $out;
         } catch (\Throwable $t) {
             $out['code'] = 422;
-            $out['reason'] = 'أُلغيت المعاملةُ كلُّها — ' . $t->getMessage() . ' (C27: صفرُ وحدةٍ وصفرُ استهلاكٍ وصفرُ صادر)';
+            $out['reason'] = 'ألغيت المعاملة كلها — ' . $t->getMessage() . ' (C27: صفر وحدة وصفر استهلاك وصفر صادر)';
             return $out;
         }
         $out['ok'] = true; $out['code'] = 201;
         $out['led_ids'] = $result['led_ids']; $out['obx_ids'] = $result['obx_ids'];
-        $out['reason'] = 'اكتملت الكتاباتُ الخمسُ ذريًّا — ' . count($result['led_ids']) . ' سطرًا و'
-                       . count($result['obx_ids']) . ' صفَّ صادر؛ والنشرُ بعد COMMIT';
+        $out['reason'] = 'اكتملت الكتابات الخمس ذريا — ' . count($result['led_ids']) . ' سطرا و'
+                       . count($result['obx_ids']) . ' صف صادر؛ والنشر بعد COMMIT';
         return $out;
     }
 }

@@ -19,7 +19,7 @@
  */
 
 if (!isset($GOV_DEPT) || !is_array($GOV_DEPT)) {
-    exit('GOV-DEPT-500: المكوّنُ يحتاج عقدَ إعدادٍ من الشاشةِ الحاملة');
+    exit('GOV-DEPT-500: المكون يحتاج عقد إعداد من الشاشة الحاملة');
 }
 
 require_once __DIR__ . '/screen_contract.php';
@@ -122,10 +122,10 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا — تُمرَّر من الشاشةِ الحاملةِ بنصِّها الخاصّ
     if (!empty($GOV_DEPT_STATES)) { echo $GOV_DEPT_STATES; }
     ems_screen_about(
-        'قراءةٌ لا كتابة: الحساباتُ التابعةُ وصلاحياتُها وفصلُ الواجباتِ وسجلاتُ التدقيق. '
-        . 'وفعلُها الوحيدُ الكاتبُ تصديقُ مراجعةِ الوصول (' . $GOV_DEPT['attest_code'] . ') — يشهد ولا يمنح.',
-        array('الحوكمةُ والالتزامُ تملك الصلاحيةَ التقنيةَ — ومديرُ الإدارةِ لا يمنحها ولا يمنعها',
-              'خرقُ فصلِ الواجباتِ يُقاس على المستندات الحيةِ لا يُوصف نصًّا'));
+        'قراءة لا كتابة: الحسابات التابعة وصلاحياتها وفصل الواجبات وسجلات التدقيق. '
+        . 'وفعلها الوحيد الكاتب تصديق مراجعة الوصول (' . $GOV_DEPT['attest_code'] . ') — يشهد ولا يمنح.',
+        array('الحوكمة والالتزام تملك الصلاحية التقنية — ومدير الإدارة لا يمنحها ولا يمنعها',
+              'خرق فصل الواجبات يقاس على المستندات الحية لا يوصف نصا'));
     ?>
 
     <?php if ($sodTotal > 0): ?>
@@ -140,7 +140,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     <?php elseif (!empty($GOV_DEPT['sod_queries'])): ?>
     <div class="ems-card" style="padding:10px;margin:10px 0;border-inline-start:4px solid #198754">
         <strong style="color:#146c43">✔ صفر خرق لفصل الواجبات</strong>
-        <span style="font-size:.82rem;opacity:.8"> — الأزواجُ المقيسة: <?php
+        <span style="font-size:.82rem;opacity:.8"> — الأزواج المقيسة: <?php
             echo htmlspecialchars(implode(' · ', array_map(function ($s) { return $s['title']; }, $GOV_DEPT['sod_queries'])));
         ?>.</span>
     </div>
@@ -152,9 +152,9 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
          لا حكم. فصار الفرعُ الأخضرُ مشروطًا بوجودِ قياسٍ واحدٍ على الأقل، وهذه
          حالةٌ ثالثةٌ **تُعلن الصمتَ صمتًا**. */ ?>
     <div class="ems-card" style="padding:10px;margin:10px 0;border-inline-start:4px solid #6c757d">
-        <strong style="color:#5a6268">○ لا قياسَ معلَنٌ لفصل الواجبات في هذه الإدارة</strong>
-        <span style="font-size:.82rem;opacity:.8"> — و«لا قياس» ليست «صفرَ خرق»:
-            الأزواجُ المتعارضةُ تُعرَّف بعقود الإدارة ثم تُقاس على الحسابات الحية.</span>
+        <strong style="color:#5a6268">○ لا قياس معلن لفصل الواجبات في هذه الإدارة</strong>
+        <span style="font-size:.82rem;opacity:.8"> — و«لا قياس» ليست «صفر خرق»:
+            الأزواج المتعارضة تعرف بعقود الإدارة ثم تقاس على الحسابات الحية.</span>
     </div>
     <?php endif; ?>
 
@@ -176,13 +176,13 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                         <?php echo htmlspecialchars((string) $x['status']); ?></span></td>
                 </tr>
             <?php endforeach; ?>
-            <?php if (!$team): ?><tr><td colspan="7" style="opacity:.7">لا حساباتٍ على أدوار الإدارة بعد.</td></tr><?php endif; ?>
+            <?php if (!$team): ?><tr><td colspan="7" style="opacity:.7">لا حسابات على أدوار الإدارة بعد.</td></tr><?php endif; ?>
             </tbody>
         </table>
     </div></div>
 
     <div class="card" style="margin-top:12px"><div class="card-body table-responsive">
-        <h6>صلاحيات شاشات الإدارة بالدور — من محرّك الصلاحيات</h6>
+        <h6>صلاحيات شاشات الإدارة بالدور — من محرك الصلاحيات</h6>
         <table class="table table-sm table-striped" style="width:100%">
             <thead><tr><th>الشاشة</th>
                 <?php foreach ($GOV_DEPT['team_roles'] as $rid): ?><th>دور <?php echo (int) $rid; ?></th><?php endforeach; ?>
@@ -206,7 +206,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <?php endforeach; ?>
                 </tr>
             <?php endforeach; ?>
-            <?php if (!$perms): ?><tr><td colspan="<?php echo 1 + count($GOV_DEPT['team_roles']); ?>" style="opacity:.7">لا شاشاتٍ مسجَّلةً بالبادئة بعد.</td></tr><?php endif; ?>
+            <?php if (!$perms): ?><tr><td colspan="<?php echo 1 + count($GOV_DEPT['team_roles']); ?>" style="opacity:.7">لا شاشات مسجلة بالبادئة بعد.</td></tr><?php endif; ?>
             </tbody>
         </table>
     </div></div>
@@ -220,12 +220,12 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <td><strong><?php echo $v; ?></strong></td></tr>
                 <?php endforeach; ?>
             </tbody></table>
-            <p style="font-size:.76rem;opacity:.75">تُكتب من الطبقةِ المشتركةِ لا من كودِ الشاشة — بنيويًّا ولا يُتجاوز.</p>
+            <p style="font-size:.76rem;opacity:.75">تكتب من الطبقة المشتركة لا من كود الشاشة — بنيويا ولا يتجاوز.</p>
         </div></div></div>
         <div class="col-md-7"><div class="card"><div class="card-body table-responsive">
-            <h6>الحقول الحساسة المسجَّلة (AC-06)</h6>
+            <h6>الحقول الحساسة المسجلة (AC-06)</h6>
             <table class="table table-sm table-striped">
-                <thead><tr><th>السياسة</th><th>الجدول</th><th>الحقل</th><th>الحساسية</th><th>يُسجَّل اطّلاعه؟</th></tr></thead>
+                <thead><tr><th>السياسة</th><th>الجدول</th><th>الحقل</th><th>الحساسية</th><th>يسجل اطلاعه؟</th></tr></thead>
                 <tbody>
                 <?php foreach (array_slice($sensFields, 0, 25) as $x): ?>
                     <tr>
@@ -236,7 +236,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                         <td><?php echo (int) $x['log_views_flag'] ? 'نعم' : 'لا'; ?></td>
                     </tr>
                 <?php endforeach; ?>
-                <?php if (!$sensFields): ?><tr><td colspan="5" style="opacity:.7">لا سياساتٍ مسجَّلةً بالبادئة بعد — تُستكمل من قاموس الحوكمة.</td></tr><?php endif; ?>
+                <?php if (!$sensFields): ?><tr><td colspan="5" style="opacity:.7">لا سياسات مسجلة بالبادئة بعد — تستكمل من قاموس الحوكمة.</td></tr><?php endif; ?>
                 </tbody>
             </table>
         </div></div></div>
@@ -245,16 +245,16 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     <?php if ($canAttest): ?>
     <div class="card" style="margin-top:12px"><div class="card-body">
         <h6>تصديق مراجعة الوصول (<?php echo htmlspecialchars($GOV_DEPT['attest_code']); ?>)</h6>
-        <p style="font-size:.8rem;opacity:.8">التصديقُ يشهد بصحةِ قائمةِ الفريق أعلاه ولا يمنح صلاحيةً —
-            وما يحتاج تغييرًا يُطلب من مديرِ الصلاحيات.</p>
+        <p style="font-size:.8rem;opacity:.8">التصديق يشهد بصحة قائمة الفريق أعلاه ولا يمنح صلاحية —
+            وما يحتاج تغييرا يطلب من مدير الصلاحيات.</p>
         <?php if ($attests): ?>
-        <p style="font-size:.76rem">آخرُ تصديق: <strong><?php echo htmlspecialchars($attests[0]['occurred_at']); ?></strong></p>
+        <p style="font-size:.76rem">آخر تصديق: <strong><?php echo htmlspecialchars($attests[0]['occurred_at']); ?></strong></p>
         <?php endif; ?>
         <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
             <label style="font-size:.78rem">ملاحظة التصديق
-                <input type="text" id="govAttestNote" class="form-control form-control-sm" style="min-width:280px" placeholder="راجعتُ القائمةَ وأشهد بصحتها" aria-label="راجعتُ القائمةَ وأشهد بصحتها">
+                <input type="text" id="govAttestNote" class="form-control form-control-sm" style="min-width:280px" placeholder="راجعت القائمة وأشهد بصحتها" aria-label="راجعت القائمة وأشهد بصحتها">
             </label>
-            <button class="ems-btn-primary" onclick="govDeptAttest()">أُصدّق على قائمة الفريق (<?php echo count($team); ?>)</button>
+            <button class="ems-btn-primary" onclick="govDeptAttest()">أصدق على قائمة الفريق (<?php echo count($team); ?>)</button>
         </div>
     </div></div>
     <?php endif; ?>
@@ -275,7 +275,7 @@ function govDeptAttest() {
         .then(function (r) { return r.json(); })
         .then(function (j) {
             if (!j.ok) { alert((j.code || 'GOV-500') + ': ' + (j.msg || 'تعذر التصديق')); return; }
-            alert('سُجّل التصديقُ — يشهد ولا يمنح ✔');
+            alert('سجل التصديق — يشهد ولا يمنح ✔');
             location.reload();
         })
         .catch(function () { alert('تعذر الاتصال — أعد المحاولة'); });

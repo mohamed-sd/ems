@@ -35,32 +35,32 @@ class ActionContractService
         $st = mysqli_prepare($this->conn, 'SELECT 1 FROM actions WHERE action_code = ? LIMIT 1');
         mysqli_stmt_bind_param($st, 's', $code);
         mysqli_stmt_execute($st);
-        if (mysqli_stmt_fetch($st)) { mysqli_stmt_close($st); return array('ok' => false, 'code' => 409, 'reason' => 'كودُ الفعل مسجَّلٌ من قبل'); }
+        if (mysqli_stmt_fetch($st)) { mysqli_stmt_close($st); return array('ok' => false, 'code' => 409, 'reason' => 'كود الفعل مسجل من قبل'); }
         mysqli_stmt_close($st);
 
         // معالجٌ غيرُ موجودٍ → 422 (يُفحص وجودُ الصنف والدالة لا الاسمُ فقط — الفحص ②)
         $cls = $c['handler_class'] ?? null; $meth = $c['handler_method'] ?? null; $path = $c['handler_path'] ?? null;
         if ($cls !== null) {
             if (!class_exists($cls) || ($meth !== null && !method_exists($cls, $meth)))
-                return array('ok' => false, 'code' => 422, 'reason' => "المعالجُ غيرُ موجود: {$cls}::{$meth}");
+                return array('ok' => false, 'code' => 422, 'reason' => "المعالج غير موجود: {$cls}::{$meth}");
         } elseif ($path !== null) {
             if (!is_file(dirname(__DIR__, 3) . '/' . ltrim($path, '/')))
-                return array('ok' => false, 'code' => 422, 'reason' => "ملفُّ المعالج غيرُ موجود: {$path}");
+                return array('ok' => false, 'code' => 422, 'reason' => "ملف المعالج غير موجود: {$path}");
         } else {
-            return array('ok' => false, 'code' => 422, 'reason' => 'فعلٌ بلا معالجٍ أصلًا');
+            return array('ok' => false, 'code' => 422, 'reason' => 'فعل بلا معالج أصلا');
         }
 
         $isWrite = (int)($c['is_write'] ?? 0);
         $guards  = $c['guards'] ?? array();
         // فعلُ كتابةٍ بلا حرّاس → 422 (القاعدة ③ — والقراءةُ وحدَها تُعفى)
         if ($isWrite && empty($guards))
-            return array('ok' => false, 'code' => 422, 'reason' => 'فعلُ كتابةٍ بلا حارسٍ معلن');
+            return array('ok' => false, 'code' => 422, 'reason' => 'فعل كتابة بلا حارس معلن');
 
         $isFin = (int)($c['is_financial'] ?? 0);
         $rev   = $c['reverse_action_code'] ?? null;
         // ماليٌّ أو تعاقديٌّ بلا عكسٍ → 422 (القاعدة ⑧ — ولا عكسَ بحذفٍ ولا بتعديل)
         if ($isFin && ($rev === null || $rev === ''))
-            return array('ok' => false, 'code' => 422, 'reason' => 'فعلٌ ماليٌّ بلا فعلِ عكسٍ معرَّف');
+            return array('ok' => false, 'code' => 422, 'reason' => 'فعل مالي بلا فعل عكس معرف');
 
         $st = mysqli_prepare($this->conn,
             'INSERT INTO actions (action_code, name_ar, module_id, placement, handler_class, handler_method,
@@ -78,7 +78,7 @@ class ActionContractService
         $ok = mysqli_stmt_execute($st);
         mysqli_stmt_close($st);
         if (!$ok) return array('ok' => false, 'code' => 500, 'reason' => mysqli_error($this->conn));
-        return array('ok' => true, 'code' => 201, 'reason' => 'سُجّل');
+        return array('ok' => true, 'code' => 201, 'reason' => 'سجل');
     }
 
     /**
@@ -89,16 +89,16 @@ class ActionContractService
     public function resolveReverse($actionCode, $originalRef)
     {
         if ($originalRef === null || $originalRef === '')
-            return array('ok' => false, 'code' => 422, 'reason' => 'عكسٌ بلا مرجعِ أصل', 'reverse_code' => null);
+            return array('ok' => false, 'code' => 422, 'reason' => 'عكس بلا مرجع أصل', 'reverse_code' => null);
         $st = mysqli_prepare($this->conn, 'SELECT reverse_action_code, is_financial FROM actions WHERE action_code = ? AND active = 1');
         mysqli_stmt_bind_param($st, 's', $actionCode);
         mysqli_stmt_execute($st);
         mysqli_stmt_bind_result($st, $rev, $fin);
-        if (!mysqli_stmt_fetch($st)) { mysqli_stmt_close($st); return array('ok' => false, 'code' => 404, 'reason' => 'فعلٌ غيرُ مسجَّل', 'reverse_code' => null); }
+        if (!mysqli_stmt_fetch($st)) { mysqli_stmt_close($st); return array('ok' => false, 'code' => 404, 'reason' => 'فعل غير مسجل', 'reverse_code' => null); }
         mysqli_stmt_close($st);
         if ($fin && !$rev)
-            return array('ok' => false, 'code' => 403, 'reason' => 'ماليٌّ بلا عكسٍ معرَّف — والحذفُ بدل العكس ممنوعٌ بنيويًّا', 'reverse_code' => null);
-        return array('ok' => true, 'code' => 200, 'reason' => 'العكسُ معرَّف', 'reverse_code' => $rev);
+            return array('ok' => false, 'code' => 403, 'reason' => 'مالي بلا عكس معرف — والحذف بدل العكس ممنوع بنيويا', 'reverse_code' => null);
+        return array('ok' => true, 'code' => 200, 'reason' => 'العكس معرف', 'reverse_code' => $rev);
     }
 
     /** سجلُّ التنفيذ — Insert-only (§8-⑥). */

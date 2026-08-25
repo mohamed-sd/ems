@@ -31,9 +31,9 @@ class CapacityService
     const CAPACITY_AR = array(
         'employee' => 'موظفٌ مؤسسي', 'project_employee' => 'موظفُ مشروع',
         'operator' => 'مشغّل', 'technician' => 'فني',
-        'shift_supervisor' => 'مشرفُ ورديات', 'project_manager' => 'مديرُ مشروع',
-        'supplier_supervisor' => 'مشرفُ مورد', 'client_rep' => 'ممثلُ عميل',
-        'auditor' => 'مدقّق', 'executive' => 'إدارةٌ عليا',
+        'shift_supervisor' => 'مشرفُ ورديات', 'project_manager' => 'مدير مشروع',
+        'supplier_supervisor' => 'مشرف مورد', 'client_rep' => 'ممثل عميل',
+        'auditor' => 'مدقق', 'executive' => 'إدارة عليا',
     );
 
     /** خريطةُ فئة العقد (H-08) إلى الصفة — والمشغّلُ من فئته لا من ظنّ */
@@ -80,7 +80,7 @@ class CapacityService
                     'capacity_type' => 'supplier_supervisor',
                     'scope_type' => 'supplier', 'scope_id' => (int) $u['supplier_entity_id'],
                     'source_type' => 'delegation', 'source_id' => null,
-                    'source_note' => 'تفويضُ مشرف موردٍ قائمٌ قبل طبقة الصفات — يُعلَن ولا يُلفَّق',
+                    'source_note' => 'تفويض مشرف مورد قائم قبل طبقة الصفات — يعلن ولا يلفق',
                     'valid_from' => substr((string) $u['created_at'], 0, 10), 'valid_to' => null,
                 );
             } elseif ((int) $u['employee_id'] > 0) {
@@ -94,7 +94,7 @@ class CapacityService
                             AND COALESCE(c.is_deleted,0)=0
                           ORDER BY c.start_date DESC LIMIT 1", array((int) $u['employee_id']));
                     $ec = $rows ? $rows[0] : null;
-                } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $ec'); $ec = null; }
+                } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $ec'); $ec = null; }
 
                 if ($ec) {
                     $cat = (string) $ec['category'];
@@ -118,10 +118,10 @@ class CapacityService
                         'capacity_type' => 'employee',
                         'scope_type' => 'company', 'scope_id' => null,
                         'source_type' => 'delegation', 'source_id' => null,
-                        'source_note' => 'حسابٌ قائمٌ قبل طبقة الصفات بلا عقدٍ نشطٍ في السجل — تفويضٌ موروثٌ يُعلَن',
+                        'source_note' => 'حساب قائم قبل طبقة الصفات بلا عقد نشط في السجل — تفويض موروث يعلن',
                         'valid_from' => substr((string) $u['created_at'], 0, 10), 'valid_to' => null,
                     );
-                    $out['declared'][] = 'حساب #' . $accountId . ': بلا عقدٍ نشطٍ — صفةُ موظفٍ بتفويضٍ موروثٍ معلَن';
+                    $out['declared'][] = 'حساب #' . $accountId . ': بلا عقد نشط — صفة موظف بتفويض موروث معلن';
                 }
             } else {
                 // حسابٌ بلا موظفٍ ولا مورد (نظاميٌّ/خدمي) — تفويضٌ موروثٌ معلَن
@@ -129,10 +129,10 @@ class CapacityService
                     'capacity_type' => 'executive',
                     'scope_type' => 'company', 'scope_id' => null,
                     'source_type' => 'delegation', 'source_id' => null,
-                    'source_note' => 'حسابٌ بلا سجل موظفٍ ولا مورد — تفويضٌ موروثٌ يُعلَن',
+                    'source_note' => 'حساب بلا سجل موظف ولا مورد — تفويض موروث يعلن',
                     'valid_from' => substr((string) $u['created_at'], 0, 10), 'valid_to' => null,
                 );
-                $out['declared'][] = 'حساب #' . $accountId . ': بلا موظفٍ ولا مورد — صفةُ إدارةٍ بتفويضٍ معلَن';
+                $out['declared'][] = 'حساب #' . $accountId . ': بلا موظف ولا مورد — صفة إدارة بتفويض معلن';
             }
 
             if ($plan === null) { continue; }
@@ -164,7 +164,7 @@ class CapacityService
                         'state' => 'active',
                         'created_by' => (int) $actor ?: null,
                     ));
-                } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'خطةُ قدرةٍ واحدةٍ فشلت — تُحصى متخطاةً وتستمرُّ البقية'); $out['skipped']++; continue; }
+                } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'خطة قدرة واحدة فشلت — تحصى متخطاة وتستمر البقية'); $out['skipped']++; continue; }
             }
             $out['created']++;
         }
@@ -229,7 +229,7 @@ class CapacityService
     {
         if ($cap['valid_to'] !== null && (string) $cap['valid_to'] !== ''
             && (string) $cap['valid_to'] < $onDate) {
-            return 'انقضت نافذةُ الصفة في ' . $cap['valid_to'] . ' — انتهاءٌ آليٌّ (USR-01 §2)';
+            return 'انقضت نافذة الصفة في ' . $cap['valid_to'] . ' — انتهاء آلي (USR-01 §2)';
         }
         if ((string) $cap['source_type'] === 'contract' && (int) $cap['source_id'] > 0) {
             try {
@@ -237,10 +237,10 @@ class CapacityService
                     "SELECT c.state FROM employee_contracts c
                       WHERE {TENANT_SCOPE} AND c.id = ? LIMIT 1", array((int) $cap['source_id']));
                 if ($rows && (string) $rows[0]['state'] !== 'active') {
-                    return 'عقدُ المصدر #' . $cap['source_id'] . ' لم يعد نشطًا (حالُه: '
-                         . $rows[0]['state'] . ') — الصفةُ تسقط بسقوط مصدرها';
+                    return 'عقد المصدر #' . $cap['source_id'] . ' لم يعد نشطا (حاله: '
+                         . $rows[0]['state'] . ') — الصفة تسقط بسقوط مصدرها';
                 }
-            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'تعذّر القياس ⇒ لا تجميدَ بالظن'); /* تعذّر القياس ⇒ لا تجميدَ بالظن */ }
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'تعذر القياس ⇒ لا تجميد بالظن'); /* تعذّر القياس ⇒ لا تجميدَ بالظن */ }
         }
         return null;
     }
@@ -250,7 +250,7 @@ class CapacityService
     {
         $reason = trim((string) $reason);
         if ($reason === '') { return array('ok' => false, 'code' => 422,
-            'reason' => 'التجميدُ بسببٍ مكتوب — CHECK يرفض غيرَه'); }
+            'reason' => 'التجميد بسبب مكتوب — CHECK يرفض غيره'); }
         try {
             $gate->update('user_capacities', array(
                 'state' => 'frozen', 'state_reason' => mb_substr($reason, 0, 255),
@@ -284,8 +284,8 @@ class CapacityService
             }
         }
         return array('code' => 403,
-            'reason' => 'لا صفةَ مشرفِ موردٍ نشطةً بنطاق المورد #' . (int) $supplierId
-                      . ' لهذا الحساب — والعزلُ fail-closed (H-15 يستوعب H-20)');
+            'reason' => 'لا صفة مشرف مورد نشطة بنطاق المورد #' . (int) $supplierId
+                      . ' لهذا الحساب — والعزل fail-closed (H-15 يستوعب H-20)');
     }
 
     // ═════════════════════════════════════════════════════════════════════
@@ -304,15 +304,15 @@ class CapacityService
         $cap = null;
         try {
             $cap = $gate->selectOne('user_capacities', array('where' => array('id' => (int) $capacityId)));
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $cap'); $cap = null; }
-        if (!$cap) { $out['code'] = 404; $out['reason'] = 'الصفةُ غيرُ موجودةٍ في نطاقك'; return $out; }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $cap'); $cap = null; }
+        if (!$cap) { $out['code'] = 404; $out['reason'] = 'الصفة غير موجودة في نطاقك'; return $out; }
 
         if ((int) $cap['account_id'] !== (int) $accountId) {
             self::audit($conn, $companyId, $actor, 'switch_denied', (int) $capacityId,
                 array(), array('attempted_by_account' => (int) $accountId,
                                'owner_account' => (int) $cap['account_id']));
             $out['code'] = 403;
-            $out['reason'] = 'الصفةُ لحسابٍ آخر — **التبديلُ بين صفاتك أنت حصرًا** (403 مسجَّلة)';
+            $out['reason'] = 'الصفة لحساب آخر — **التبديل بين صفاتك أنت حصرا** (403 مسجلة)';
             return $out;
         }
         // الانتهاءُ الكسول قبل التبديل — لا تبديلَ إلى منتهية
@@ -320,8 +320,8 @@ class CapacityService
         foreach ($fresh as $f) { if ((int) $f['id'] === (int) $capacityId) { $cap = $f; break; } }
         if ((string) $cap['state'] !== 'active') {
             $out['code'] = 409;
-            $out['reason'] = 'الصفةُ ' . $cap['state'] . ' (' . $cap['state_reason']
-                           . ') — المجمَّدةُ تُقرأ ولا تُلبَس';
+            $out['reason'] = 'الصفة ' . $cap['state'] . ' (' . $cap['state_reason']
+                           . ') — المجمدة تقرأ ولا تلبس';
             return $out;
         }
 

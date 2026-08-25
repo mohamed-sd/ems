@@ -191,14 +191,14 @@ class AttributionService
         // ── 423: العقدُ بلا مصفوفة — ولا ارتدادَ للافتراضي (ق-2) ──
         if ($contractId <= 0) {
             return array('ok' => false, 'code' => 423, 'lines' => $lines,
-                         'reasons' => array('الواقعةُ بلا عقدٍ مرتبط — ولا مصفوفةَ التزاماتٍ تُقرأ منها المسؤولية'));
+                         'reasons' => array('الواقعة بلا عقد مرتبط — ولا مصفوفة التزامات تقرأ منها المسؤولية'));
         }
         $matrix = self::matrixFor($gate, $contractId, $date);
         if (empty($matrix)) {
             return array('ok' => false, 'code' => 423, 'lines' => $lines,
-                         'reasons' => array('مصفوفةُ التزامات العقد #' . $contractId
-                             . ' غيرُ معرَّفةٍ أو غيرُ مُجازةٍ بتاريخ ' . $date
-                             . ' — تُملأ من شاشة «مصفوفة التزامات العقد» وتُجيزها المالية'));
+                         'reasons' => array('مصفوفة التزامات العقد #' . $contractId
+                             . ' غير معرفة أو غير مجازة بتاريخ ' . $date
+                             . ' — تملأ من شاشة «مصفوفة التزامات العقد» وتجيزها المالية'));
         }
 
         // ── 422: فترةٌ بلا مسؤول · وبندٌ خارج قائمة العقد ──
@@ -207,12 +207,12 @@ class AttributionService
             $ob = ($l['obligation_type'] === null || $l['obligation_type'] === '') ? null : $l['obligation_type'];
             $label = self::lineLabel($l);
             if ($ob === null) {
-                $reasons[] = $label . ': زمنُ توقفٍ بلا بندِ التزامٍ مُسنَد — لا تُقفل واقعةٌ بزمنٍ بلا مسؤول (§5)';
+                $reasons[] = $label . ': زمن توقف بلا بند التزام مسند — لا تقفل واقعة بزمن بلا مسؤول (§5)';
                 continue;
             }
             if (!isset($matrix[$ob])) {
-                $reasons[] = $label . ': البندُ «' . $ob . '» خارج مصفوفة العقد #' . $contractId
-                           . ' النافذةِ بتاريخ ' . $date;
+                $reasons[] = $label . ': البند «' . $ob . '» خارج مصفوفة العقد #' . $contractId
+                           . ' النافذة بتاريخ ' . $date;
             }
         }
         if (!empty($reasons)) {
@@ -246,12 +246,12 @@ class AttributionService
 
         if ($contractId <= 0) {
             return array('ok' => false, 'code' => 423, 'decided' => 0,
-                         'reasons' => array('الواقعةُ بلا عقدٍ مرتبط — لا مصفوفةَ تُقرأ'));
+                         'reasons' => array('الواقعة بلا عقد مرتبط — لا مصفوفة تقرأ'));
         }
         $matrix = self::matrixFor($gate, $contractId, $date);
         if (empty($matrix)) {
             return array('ok' => false, 'code' => 423, 'decided' => 0,
-                         'reasons' => array('مصفوفةُ التزامات العقد #' . $contractId . ' غيرُ مُجازةٍ بتاريخ ' . $date));
+                         'reasons' => array('مصفوفة التزامات العقد #' . $contractId . ' غير مجازة بتاريخ ' . $date));
         }
 
         $polClient = \App\Services\EffectFanout::hourPolicy($gate, $companyId, 'client', $contractId, $date);
@@ -266,7 +266,7 @@ class AttributionService
         foreach ($assign as $lineId => $ob) {
             $lineId = intval($lineId);
             if (!isset($byId[$lineId])) {
-                $reasons[] = 'سطرُ زمنٍ #' . $lineId . ' ليس من هذه الواقعة';
+                $reasons[] = 'سطر زمن #' . $lineId . ' ليس من هذه الواقعة';
                 continue;
             }
             $l = $byId[$lineId];
@@ -274,13 +274,13 @@ class AttributionService
             if ($l['ops_state'] === self::NO_OBLIGATION_STATE) {
                 $ob = null; // التشغيلُ الفعليُّ لا بندَ له (هـ-1)
             } elseif ($ob === null) {
-                $reasons[] = self::lineLabel($l) . ': لا بندَ التزامٍ مُسنَد (422)';
+                $reasons[] = self::lineLabel($l) . ': لا بند التزام مسند (422)';
                 continue;
             } elseif (!in_array($ob, self::TYPES, true)) {
-                $reasons[] = self::lineLabel($l) . ': بندٌ غيرُ معروف «' . $ob . '»';
+                $reasons[] = self::lineLabel($l) . ': بند غير معروف «' . $ob . '»';
                 continue;
             } elseif (!isset($matrix[$ob])) {
-                $reasons[] = self::lineLabel($l) . ': البندُ خارج مصفوفة العقد النافذة (422)';
+                $reasons[] = self::lineLabel($l) . ': البند خارج مصفوفة العقد النافذة (422)';
                 continue;
             }
             $plan[$lineId] = array('line' => $l, 'oblig' => $ob,
@@ -344,12 +344,12 @@ class AttributionService
 
         if ($billable !== null && !in_array((int) $billable, array(0, 1), true)) {
             return array('ok' => false, 'code' => 422, 'changed' => false,
-                         'reasons' => array('حكمُ الكمية إما «تُفوتر» أو «لا تُفوتر»'));
+                         'reasons' => array('حكم الكمية إما «تفوتر» أو «لا تفوتر»'));
         }
         $note = trim((string) $note);
         if ($billable !== null && (int) $billable === 0 && $note === '') {
             return array('ok' => false, 'code' => 422, 'changed' => false,
-                         'reasons' => array('سببُ منع فوترة الكمية إلزامي — لا مالَ يُمنع بلا سببٍ مكتوب'));
+                         'reasons' => array('سبب منع فوترة الكمية إلزامي — لا مال يمنع بلا سبب مكتوب'));
         }
 
         // العطالةُ قبل كل شيء: الحكمُ نفسُه لا يُكتب مرتين ولا يُنشر مرتين
@@ -397,10 +397,10 @@ class AttributionService
     {
         $reason = trim((string) $reason);
         if ($reason === '') {
-            return array('ok' => false, 'code' => 422, 'reasons' => array('سببُ الاعتراض إلزامي'));
+            return array('ok' => false, 'code' => 422, 'reasons' => array('سبب الاعتراض إلزامي'));
         }
         $line = self::lineById($conn, $companyId, $lineId);
-        if (!$line) { return array('ok' => false, 'code' => 404, 'reasons' => array('سطرُ الزمن غير موجود')); }
+        if (!$line) { return array('ok' => false, 'code' => 404, 'reasons' => array('سطر الزمن غير موجود')); }
 
         $gate->update('unit_time_log', array(
             'objection_state'  => 'objected',
@@ -423,9 +423,9 @@ class AttributionService
     public static function resolve($conn, $gate, $companyId, $lineId, $newOblig, $actor)
     {
         $line = self::lineById($conn, $companyId, $lineId);
-        if (!$line) { return array('ok' => false, 'code' => 404, 'reasons' => array('سطرُ الزمن غير موجود')); }
+        if (!$line) { return array('ok' => false, 'code' => 404, 'reasons' => array('سطر الزمن غير موجود')); }
         if ($line['objection_state'] !== 'objected') {
-            return array('ok' => false, 'code' => 409, 'reasons' => array('لا اعتراضَ مفتوحًا على هذا السطر'));
+            return array('ok' => false, 'code' => 409, 'reasons' => array('لا اعتراض مفتوحا على هذا السطر'));
         }
 
         // ── 409 قبل أي كتابة: حسمُ الاعتراض يبدّل الحالة ثم قد يستدعي decide()،
@@ -490,19 +490,19 @@ class AttributionService
         $role = strval($actorRole);
         if ($role !== '19' && $role !== '-1') {
             $out['code'] = 403;
-            $out['reasons'][] = 'عكسُ الإسناد بيد مدير الإدارة المالية وحدَه (ق-13) — لا يُعكس حكمٌ ماليٌّ بغير يده';
+            $out['reasons'][] = 'عكس الإسناد بيد مدير الإدارة المالية وحده (ق-13) — لا يعكس حكم مالي بغير يده';
             return $out;
         }
         $reason = trim((string) $reason);
         if ($reason === '') {
-            $out['reasons'][] = 'سببُ العكس إلزاميٌّ وموثَّق — لا يُبطل قيدٌ بلا تعليل';
+            $out['reasons'][] = 'سبب العكس إلزامي وموثق — لا يبطل قيد بلا تعليل';
             return $out;
         }
 
         $line = self::lineById($conn, $companyId, $lineId, true);
-        if (!$line) { $out['code'] = 404; $out['reasons'][] = 'سطرُ الزمن غير موجود'; return $out; }
+        if (!$line) { $out['code'] = 404; $out['reasons'][] = 'سطر الزمن غير موجود'; return $out; }
         if ($line['decided_at'] === null) {
-            $out['reasons'][] = 'لا إسنادَ مقرَّرًا على هذا السطر — لا شيءَ يُعكس (والتعديلُ المباشرُ يكفي)';
+            $out['reasons'][] = 'لا إسناد مقررا على هذا السطر — لا شيء يعكس (والتعديل المباشر يكفي)';
             return $out;
         }
         $entryId = intval($line['entry_id']);
@@ -514,7 +514,7 @@ class AttributionService
         if ($dupe) {
             $out['ok'] = true; $out['code'] = 200;
             $out['reversal_line_id'] = intval($dupe['id']);
-            $out['reasons'][] = 'عُكس سلفًا بالسطر #' . intval($dupe['id']) . ' — ولا يُعكس حدثٌ مرتين';
+            $out['reasons'][] = 'عكس سلفا بالسطر #' . intval($dupe['id']) . ' — ولا يعكس حدث مرتين';
             return $out;
         }
 
@@ -528,16 +528,16 @@ class AttributionService
         $corr = null;
         if ($newOblig !== null) {
             if (!in_array($newOblig, self::TYPES, true)) {
-                $out['reasons'][] = 'بندُ تصحيحٍ غيرُ معروف «' . $newOblig . '»'; return $out;
+                $out['reasons'][] = 'بند تصحيح غير معروف «' . $newOblig . '»'; return $out;
             }
             $matrix = self::matrixFor($gate, $contractId, $date);
             if (empty($matrix)) {
                 $out['code'] = 423;
-                $out['reasons'][] = 'مصفوفةُ التزامات العقد #' . $contractId . ' غيرُ مُجازةٍ بتاريخ ' . $date;
+                $out['reasons'][] = 'مصفوفة التزامات العقد #' . $contractId . ' غير مجازة بتاريخ ' . $date;
                 return $out;
             }
             if (!isset($matrix[$newOblig])) {
-                $out['reasons'][] = 'بندُ التصحيح خارج مصفوفة العقد النافذة (422)'; return $out;
+                $out['reasons'][] = 'بند التصحيح خارج مصفوفة العقد النافذة (422)'; return $out;
             }
             $corr = self::rulings($matrix, $line['ops_state'], $newOblig,
                 \App\Services\EffectFanout::hourPolicy($gate, $companyId, 'client', $contractId, $date),
@@ -574,7 +574,7 @@ class AttributionService
                     'supplier_countable' => $line['supplier_countable'],
                     'operator_countable' => $line['operator_countable'],
                     'objection_ref'      => $marker,
-                    'cause_note'         => mb_substr('عكسُ سطر #' . intval($lineId) . ' — ' . $reason, 0, 200),
+                    'cause_note'         => mb_substr('عكس سطر #' . intval($lineId) . ' — ' . $reason, 0, 200),
                 ))));
                 if ($corr !== null) {
                     $corrId = intval($g->insert('unit_time_log', array_merge($base, array(
@@ -584,13 +584,13 @@ class AttributionService
                         'supplier_countable' => $corr['supplier_countable'],
                         'operator_countable' => $corr['operator_countable'],
                         'objection_ref'      => 'FIX:' . intval($lineId),
-                        'cause_note'         => mb_substr('تصحيحُ سطر #' . intval($lineId) . ' — ' . $reason, 0, 200),
+                        'cause_note'         => mb_substr('تصحيح سطر #' . intval($lineId) . ' — ' . $reason, 0, 200),
                     ))));
                 }
             }, 'attribution reverse');
         } catch (\Throwable $t) {
             error_log('AttributionService reverse #' . intval($lineId) . ': ' . $t->getMessage());
-            $out['code'] = 500; $out['reasons'][] = 'تعذّرت كتابةُ السطر العاكس';
+            $out['code'] = 500; $out['reasons'][] = 'تعذرت كتابة السطر العاكس';
             return $out;
         }
 
@@ -734,15 +734,15 @@ class AttributionService
     /** رسالةُ الـ409 — تقول ما وقع **وما العلاج**، فالرفضُ يدلّ على بابه. */
     private static function conflictReason($entryId, array $posted)
     {
-        $names = array('revenue_event' => 'قيدُ إيراد', 'supplier_due' => 'مستحقُّ مورد',
-                       'employee_due' => 'مستحقُّ مشغّل', 'cost_record' => 'قيدُ تكلفة',
-                       'receivable' => 'ذمّة', 'party_award' => 'حكمُ طرف');
+        $names = array('revenue_event' => 'قيد إيراد', 'supplier_due' => 'مستحق مورد',
+                       'employee_due' => 'مستحق مشغل', 'cost_record' => 'قيد تكلفة',
+                       'receivable' => 'ذمة', 'party_award' => 'حكم طرف');
         $what = array();
         foreach ($posted['effects'] as $e) { $what[] = isset($names[$e]) ? $names[$e] : $e; }
-        return 'الواقعةُ #' . intval($entryId) . ' ولّدت مالًا سلفًا ('
-             . ($what ? implode(' · ', $what) : $posted['count'] . ' قيدًا')
-             . ') — ولا يُكتب فوق حكمٍ ماليٍّ قائم. التصحيحُ **بعكس الحدث**: '
-             . 'سطرٌ عاكسٌ يُضاف بيد مدير الإدارة المالية والأصلُ يبقى.';
+        return 'الواقعة #' . intval($entryId) . ' ولدت مالا سلفا ('
+             . ($what ? implode(' · ', $what) : $posted['count'] . ' قيدا')
+             . ') — ولا يكتب فوق حكم مالي قائم. التصحيح **بعكس الحدث**: '
+             . 'سطر عاكس يضاف بيد مدير الإدارة المالية والأصل يبقى.';
     }
 
     /** آخرُ حدثٍ جذريٍّ بمفتاحه على الواقعة — نسبُ العكس إلى أصله (ADR-15). */

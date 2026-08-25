@@ -51,13 +51,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     require_once __DIR__ . '/../includes/report_button.php';
     ems_report_button(array('screen' => 'warehouse'));
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا حركاتِ مخزونٍ في الفترةِ والمخزنِ المختارين',
-        'وسّع الفترةَ أو اختر «كلَّ المخازن»، فالأرصدةُ هنا محسوبةٌ من الحركاتِ لا من رقمٍ مخزَّن');
+    echo ems_states_bundle('لا حركات مخزون في الفترة والمخزن المختارين',
+        'وسع الفترة أو اختر «كل المخازن»، فالأرصدة هنا محسوبة من الحركات لا من رقم مخزن');
     ?>
 
     <div class="success-message is-success proc-stk-note">
         <i class="fas fa-circle-info"></i>
-        القاعدة المحورية: <b>المتاح = الرصيد المادي − المحجوز</b>. الأرصدة هنا محسوبة من حركات المخزون الفعلية (الوارد + المرتجع − المصروف)، لا من رقمٍ مخزَّن.
+        القاعدة المحورية: <b>المتاح = الرصيد المادي − المحجوز</b>. الأرصدة هنا محسوبة من حركات المخزون الفعلية (الوارد + المرتجع − المصروف)، لا من رقم مخزن.
     </div>
 
     <?php
@@ -82,7 +82,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $__wr->close();
     ?>
     <form method="get" class="filter" data-ems-period="1">
-        <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-calendar-days"></i></span> فترةُ الحركاتِ والمخزن</div>
+        <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-calendar-days"></i></span> فترة الحركات والمخزن</div>
         <div class="filter-body">
             <div class="filter-field"><label for="stkFrom">من تاريخ</label>
                 <input type="date" id="stkFrom" name="from" class="form-control" value="<?php echo htmlspecialchars($__pFrom); ?>"></div>
@@ -90,7 +90,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <input type="date" id="stkTo" name="to" class="form-control" value="<?php echo htmlspecialchars($__pTo); ?>"></div>
             <div class="filter-field"><label for="stkWh">المخزن</label>
                 <select id="stkWh" name="wh" class="form-control">
-                    <option value="">— كلُّ المخازن —</option>
+                    <option value="">— كل المخازن —</option>
                     <?php foreach ($__whList as $__w): ?>
                     <option value="<?php echo (int) $__w['id']; ?>"<?php echo ((int) $__w['id'] === $__pWh ? ' selected' : ''); ?>><?php
                         echo htmlspecialchars($__w['name'], ENT_QUOTES, 'UTF-8'); ?></option>
@@ -125,13 +125,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <th class="ems-fn-th" data-fn="1">قيمة الرصيد</th>
                     <th class="ems-fn-th" data-fn="1">آخر حركة</th>
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                    <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                     <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                     <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                     <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-                    <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                    <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+                    <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                    <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
                     <th class="ems-gov-th none" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
                     <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                     <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>

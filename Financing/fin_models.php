@@ -43,11 +43,11 @@ $COLS   = array (
   11 => 'تاريخ الاعتماد',
   12 => 'الحالة',
   13 => 'الكيان',
-  14 => 'المُنشئ — الاسم والصفة',
+  14 => 'المنشئ — الاسم والصفة',
   15 => 'تاريخ الإنشاء',
   16 => 'مرجع التفويض',
   17 => 'المرفق',
-  18 => 'سجل الاطّلاع',
+  18 => 'سجل الاطلاع',
 );
 $FIELDS = array (
   0 => 'رمز النموذج',
@@ -90,7 +90,7 @@ $__pc = ems_post_contract($conn, array(
     'idem'    => array('code' => trim((string) ($_POST['model_code'] ?? ''))),
     'validate' => function (array $in) {
         if (trim((string) ($in['model_code'] ?? '')) === '') {
-            return array('ok' => false, 'msg' => 'رمزُ النموذجِ إلزامي (422)');
+            return array('ok' => false, 'msg' => 'رمز النموذج إلزامي (422)');
         }
         return array('ok' => true, 'data' => $in);
     },
@@ -122,7 +122,7 @@ foreach ($fm_models as $i => $m) {
             'اعتمده المراجع'     => $m['approved_by'] ? ('#' . $m['approved_by']) : '—',
             'تاريخ الاعتماد'     => $m['approved_at'] ?: '—',
         ),
-        'status'          => ((int) $m['active'] === 1 ? 'نافذ' : 'معطَّل'),
+        'status'          => ((int) $m['active'] === 1 ? 'نافذ' : 'معطل'),
         'created_by_name' => $m['approved_by'] ? ('#' . $m['approved_by']) : '—',
         'created_at'      => $m['approved_at'] ?: '',
         'is_seed'         => 0,
@@ -136,7 +136,7 @@ $entityName = $govCtx['values']['entity'] ?? '—';
 function cmp03_cell($col, $row, $entityName) {
     $n = cmp03_screen_norm($col);
     if ($n === cmp03_screen_norm('الكيان')) { return $entityName; }
-    if ($n === cmp03_screen_norm('المُنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المُنشئة')) {
+    if ($n === cmp03_screen_norm('المنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المنشئة')) {
         return $row['created_by_name'] ?: '—';
     }
     if ($n === cmp03_screen_norm('تاريخ الإنشاء')) { return $row['created_at']; }
@@ -151,7 +151,7 @@ function cmp03_screen_norm($s) {
     $s = str_replace(array('أ','إ','آ'), 'ا', $s);
     $s = str_replace('ة', 'ه', $s);
     $s = str_replace('ى', 'ي', $s);
-    return preg_replace('/[ًٌٍَُِّْ]/u', '', $s);
+    return preg_replace('/[]/u', '', $s);
 }
 
 $page_title = 'إيكوبيشن | نماذج التمويل ومعالجتها';
@@ -175,9 +175,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
-    echo ems_states_bundle('لا نماذجَ تمويلٍ معرَّفةً بعدُ', 'أضف أولَ نموذجٍ بزرِّ «إضافة» — والنموذجُ المعرَّفُ هنا هو ما تُنشأ به عملياتُ التمويل');
+    echo ems_states_bundle('لا نماذج تمويل معرفة بعد', 'أضف أول نموذج بزر «إضافة» — والنموذج المعرف هنا هو ما تنشأ به عمليات التمويل');
     ?>
-<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('financing', 'الممولُ والشروط'); ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('financing', 'الممول والشروط'); ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <?php if ($fm_msg !== ''): ?>
@@ -196,11 +196,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
                 <?php $FMS = '\\App\\Services\\Financing\\FinancingModelService'; ?>
-                <div class="form-group"><label for="fm_code">رمز النموذج <small>(لاتينيٌّ صغيرٌ وأرقامٌ و_)</small></label>
+                <div class="form-group"><label for="fm_code">رمز النموذج <small>(لاتيني صغير وأرقام و_)</small></label>
                     <input type="text" name="model_code" required maxlength="32" pattern="[a-z0-9_]{2,32}" id="fm_code"></div>
                 <div class="form-group"><label for="fm_name">اسم النموذج</label>
                     <input type="text" name="name_ar" required maxlength="120" id="fm_name"></div>
-                <div class="form-group"><label for="fm_owner">أثرُ الملكية القانونية</label>
+                <div class="form-group"><label for="fm_owner">أثر الملكية القانونية</label>
                     <select name="legal_owner_effect" required id="fm_owner">
                         <option value="">— اختر —</option>
                         <?php foreach ($FMS::LEGAL_OWNER as $k => $v): ?>
@@ -225,12 +225,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="depreciation_bearer" required maxlength="60" id="fm_bearer"></div>
                 <div class="form-group"><label for="fm_holder">مرتهن الضمان <small>(اختياري)</small></label>
                     <input type="text" name="security_interest_holder" maxlength="60" id="fm_holder"></div>
-                <div class="form-group"><label for="fm_policy">المرجع المحاسبي — سندُ السياسة</label>
+                <div class="form-group"><label for="fm_policy">المرجع المحاسبي — سند السياسة</label>
                     <input type="text" name="policy_doc_ref" required maxlength="160" id="fm_policy"></div>
                 <div class="form-group"><label for="fm_active">الحالة</label>
                     <select name="active" id="fm_active">
                         <option value="1">نافذ</option>
-                        <option value="0">معطَّل</option>
+                        <option value="0">معطل</option>
                     </select></div>
             </div></div>
             <div class="cmp03-form-actions">
@@ -257,16 +257,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th>اعتمده المراجع</th>
             <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
             <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
             <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
             <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
-            <th class="ems-gov-th" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطّلاع</th>
+            <th class="ems-gov-th" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطلاع</th>
             </tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="19" class="text-center text-muted">لا بياناتَ بعدُ — أضف أول صفٍّ بزر «إضافة»</td></tr>
+                <tr><td colspan="19" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
                     <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>

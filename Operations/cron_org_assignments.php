@@ -26,7 +26,7 @@ $conn->set_charset('utf8mb4');
 
 $r = AssignmentExpiryJob::run($conn);
 $p = PermitGate::sweepExpired($conn);
-fwrite(STDOUT, "التكليفات: أُنهي آليًّا " . intval($r['expired'])
-    . " · ونُبِّه على " . intval($r['notified']) . " قادمة على الانتهاء"
-    . " · وانتهت صلاحية " . intval($p) . " إذنًا (PermitExpired).\n");
+fwrite(STDOUT, "التكليفات: أنهي آليا " . intval($r['expired'])
+    . " · ونبه على " . intval($r['notified']) . " قادمة على الانتهاء"
+    . " · وانتهت صلاحية " . intval($p) . " إذنا (PermitExpired).\n");
 exit(0);

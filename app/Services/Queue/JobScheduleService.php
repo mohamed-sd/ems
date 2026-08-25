@@ -35,15 +35,15 @@ class JobScheduleService
     {
         $type = (string) ($in['job_type'] ?? '');
         if (!in_array($type, self::TYPES, true)) {
-            return array('ok' => false, 'reason' => 'نوعُ المهمةِ خارجَ القائمةِ المغلقة: ' . $type);
+            return array('ok' => false, 'reason' => 'نوع المهمة خارج القائمة المغلقة: ' . $type);
         }
         $cron = trim((string) ($in['cron_expr'] ?? ''));
         if ($cron === '' || !self::validExpr($cron)) {
-            return array('ok' => false, 'reason' => 'تعبيرٌ زمنيٌّ غيرُ صالح (خمسةُ حقول): ' . $cron);
+            return array('ok' => false, 'reason' => 'تعبير زمني غير صالح (خمسة حقول): ' . $cron);
         }
         $owner = (int) ($in['owner_role_id'] ?? 0);
         if ($owner <= 0) {
-            return array('ok' => false, 'reason' => 'المسؤولُ عند التوقفِ إلزاميّ — ولا جدولةَ بلا مالك');
+            return array('ok' => false, 'reason' => 'المسؤول عند التوقف إلزامي — ولا جدولة بلا مالك');
         }
         $maxRt  = max(30, (int) ($in['max_runtime_seconds'] ?? 600));
         $alert  = max(60, (int) ($in['alert_after_seconds'] ?? 3600));
@@ -73,7 +73,7 @@ class JobScheduleService
         $id = (int) $conn->query(
             "SELECT `id` FROM `ems_job_schedule` WHERE `job_type`='" . $conn->real_escape_string($type) . "'"
         )->fetch_row()[0];
-        return array('ok' => true, 'id' => $id, 'reason' => 'سُجّلت الجدولة');
+        return array('ok' => true, 'id' => $id, 'reason' => 'سجلت الجدولة');
     }
 
     /**
@@ -203,11 +203,11 @@ class JobScheduleService
             if ($dupe > 0) { continue; }
 
             $late = $s['never_ran']
-                ? 'لم تعمل قطُّ منذ تعريفِها'
-                : 'تأخّرت ' . self::humanSeconds((int) $s['late_seconds']);
+                ? 'لم تعمل قط منذ تعريفها'
+                : 'تأخرت ' . self::humanSeconds((int) $s['late_seconds']);
             $title = mb_substr(
-                $tag . ' توقّفَ العاملُ عن «' . $s['job_type'] . '» — ' . $late
-                . '. وتوقفُ العاملِ صامتًا أخطرُ من فشلِ مهمة.', 0, 195);
+                $tag . ' توقف العامل عن «' . $s['job_type'] . '» — ' . $late
+                . '. وتوقف العامل صامتا أخطر من فشل مهمة.', 0, 195);
 
             $st = $conn->prepare(
                 "INSERT INTO `fin_notifications` (`company_id`,`target_level`,`title`,`link`)
@@ -271,6 +271,6 @@ class JobScheduleService
     {
         if ($s < 3600) { return intdiv($s, 60) . ' دقيقة'; }
         if ($s < 86400) { return intdiv($s, 3600) . ' ساعة'; }
-        return intdiv($s, 86400) . ' يومًا';
+        return intdiv($s, 86400) . ' يوما';
     }
 }

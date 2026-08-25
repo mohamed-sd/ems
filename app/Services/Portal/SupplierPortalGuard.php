@@ -71,8 +71,8 @@ class SupplierPortalGuard
         if (self::isPortalScreen($relativeScript)) { return; }
         self::log403($conn, $sessionUser, strval($relativeScript), 0, 'portal_404_out_of_scope');
         require_once dirname(__DIR__, 3) . '/includes/deny_page.php';
-        ems_deny_page('PORTAL-404', 'الصفحةُ خارجَ حسابك',
-            'حسابُك حسابُ بوابةِ مورّد، وهذا المسارُ ليس ضمنَ شاشاتِ البوابة.',
+        ems_deny_page('PORTAL-404', 'الصفحة خارج حسابك',
+            'حسابك حساب بوابة مورد، وهذا المسار ليس ضمن شاشات البوابة.',
             array('status' => 404));
         exit;
     }
@@ -205,14 +205,14 @@ class SupplierPortalGuard
         $out['supplier_id'] = $mine;
         if ($mine === null) {
             $out['ok'] = false; $out['code'] = 403;
-            $out['reason'] = 'حسابُك على دور مشرف الموردين وغيرُ مربوطٍ بأي مورد — يربطه مديرُ الصلاحيات من شاشة المستخدمين ثم تدخل';
+            $out['reason'] = 'حسابك على دور مشرف الموردين وغير مربوط بأي مورد — يربطه مدير الصلاحيات من شاشة المستخدمين ثم تدخل';
             self::log403($conn, $sessionUser, $screen, 0, 'unlinked_account');
             return $out;
         }
         $req = intval($requestedSupplierId);
         if ($req > 0 && $req !== $mine) {
             $out['ok'] = false; $out['code'] = 403;
-            $out['reason'] = 'هذا الموردُ خارجَ نطاق حسابك — محاولةُ التجاوز سُجّلت';
+            $out['reason'] = 'هذا المورد خارج نطاق حسابك — محاولة التجاوز سجلت';
             self::log403($conn, $sessionUser, $screen, $req, 'cross_supplier_attempt');
             return $out;
         }
@@ -231,7 +231,7 @@ class SupplierPortalGuard
         $v = self::assertSupplier($conn, $sessionUser, $requestedSupplierId, $screen);
         if (!$v['ok']) {
             require_once dirname(__DIR__, 3) . '/includes/deny_page.php';
-            ems_deny_page('PORTAL-403', 'خارجَ نطاقِ حسابك',
+            ems_deny_page('PORTAL-403', 'خارج نطاق حسابك',
                 (string) $v['reason'], array('status' => 403));
             exit;
         }

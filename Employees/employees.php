@@ -147,7 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         if ($id > 0) { $dupWhere .= " AND id != ?"; $dupParams[] = $id; }
         $dup = $emp_gate->selectOne('employees', array('columns' => array('id'), 'whereRaw' => $dupWhere, 'params' => $dupParams));
         if ($dup) {
-            ems_gov_flash_redirect('employees.php', 'كود المشغل موجود مسبقاً ❌', 'GOV-FAIL-409', '');
+            ems_gov_flash_redirect('employees.php', 'كود المشغل موجود مسبقا ❌', 'GOV-FAIL-409', '');
             exit;
         }
     }
@@ -251,10 +251,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     include('../includes/page_header.php');
 
     /* UXW-01 ⑨: حزمةُ الحالاتِ الدنيا — مخفيةٌ افتراضًا ويُظهرها منطقُ الشاشةِ عند حالِها */
-    echo ems_states_bundle('لا موظفين مسجَّلين ضمن نطاقك بعدُ',
-        'أضف موظفًا جديدًا من زرِّ «إضافة موظف جديد» أو استوردهم من معالجِ Excel الموحَّد');
+    echo ems_states_bundle('لا موظفين مسجلين ضمن نطاقك بعد',
+        'أضف موظفا جديدا من زر «إضافة موظف جديد» أو استوردهم من معالج Excel الموحد');
     ?>
-<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('employee', 'نظرةٌ عامة'); ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('employee', 'نظرة عامة'); ?>
 
     <?php if (!empty($_GET['msg'])):
         $isSuccess = strpos($_GET['msg'], '✅') !== false;
@@ -397,12 +397,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <div>
                                 <label for="employee_photo"><i class="fas fa-camera"></i> صورة السائق ( تحت التجهيز)</label>
                                 <input type="text" name="employee_photo" id="employee_photo"
-                                    placeholder="سيتم تفعيل رفع صورة السائق لاحقاً" readonly />
+                                    placeholder="سيتم تفعيل رفع صورة السائق لاحقا" readonly />
                             </div>
                             <div>
                                 <label for="identity_photo"><i class="fas fa-id-card"></i> صورة هوية السائق ( تحت التجهيز)</label>
                                 <input type="text" name="identity_photo" id="identity_photo"
-                                    placeholder="سيتم تفعيل رفع صورة الهوية لاحقاً" readonly />
+                                    placeholder="سيتم تفعيل رفع صورة الهوية لاحقا" readonly />
                             </div>
                         </div>
                     </div>
@@ -418,10 +418,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <div class="form-section-body">
                         <p class="emp-3">
                             <i class="fas fa-circle-info"></i>
-                            بيانات رخصة القيادة والمعدات المتخصّصة باتت تُدار من صفحة
-                            <a href="equipment_operators.php" target="_blank"><strong>السائقون والمشغّلون</strong></a>
-                            (لكل موظفٍ سائق/مشغّل سجلٌّ واحد، فلا تتكرّر البيانات).
-                            احفظ الموظف هنا أولاً، ثم سجّله سائقاً/مشغّلاً وأدخِل رخصته هناك.
+                            بيانات رخصة القيادة والمعدات المتخصصة باتت تدار من صفحة
+                            <a href="equipment_operators.php" target="_blank"><strong>السائقون والمشغلون</strong></a>
+                            (لكل موظف سائق/مشغل سجل واحد، فلا تتكرر البيانات).
+                            احفظ الموظف هنا أولا، ثم سجله سائقا/مشغلا وأدخل رخصته هناك.
                         </p>
                     </div>
                 </div>
@@ -555,7 +555,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             </div>
                             <?php else: ?>
                             <div class="alert alert-warning emp-5">
-                                <i class="fa fa-lock"></i> قسمُ الأجورِ محجوبٌ — يُفتح بمنحٍ صريحٍ على عنصرِ
+                                <i class="fa fa-lock"></i> قسم الأجور محجوب — يفتح بمنح صريح على عنصر
                                 <code>card.payroll</code> من لوحة الظهور (M-14 · SCN-872).
                             </div>
                             <?php endif; ?>
@@ -608,7 +608,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <select name="performance_rating" id="performance_rating">
                                     <option value="">-- اختر التقييم --</option>
                                     <option value="ممتاز">⭐⭐⭐⭐⭐ ممتاز</option>
-                                    <option value="جيد جداً">⭐⭐⭐⭐ جيد جداً</option>
+                                    <option value="جيد جدا">⭐⭐⭐⭐ جيد جدا</option>
                                     <option value="جيد">⭐⭐⭐ جيد</option>
                                     <option value="مقبول">⭐⭐ مقبول</option>
                                     <option value="ضعيف">⭐ ضعيف</option>
@@ -734,7 +734,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 </select>
                                 <small class="emp-6">
                                     <i class="fas fa-info-circle"></i>
-                                    مسار التوظيف من التقديم إلى الاعتماد — مستقلٌّ عن حالة المشغل التشغيلية
+                                    مسار التوظيف من التقديم إلى الاعتماد — مستقل عن حالة المشغل التشغيلية
                                 </small>
                             </div>
                             <div>
@@ -870,15 +870,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <th class="ems-fn-th" data-fn="1">الحساب البنكي</th>
                         <th class="ems-fn-th" data-fn="1">البنك</th>
                         <th class="ems-fn-th none" data-fn="1">حالة الخدمة</th>
-                        <th class="ems-fn-th none" data-fn="1">سجّله</th>
+                        <th class="ems-fn-th none" data-fn="1">سجله</th>
                         <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                        <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                        <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                        <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                        <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                         <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                         <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                         <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-                        <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                        <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطّلاع</th>
+                        <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                        <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطلاع</th>
                         <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                         </tr>
                 </thead>
@@ -901,7 +901,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                              ORDER BY d.id DESC", array());
 
                     { foreach ($emp_rows as $row) {
-                        $statusBadge = $row['status'] == "1" ? '<span class="status-pill status-active">✅ مفعّل</span>' : '<span class="status-pill status-inactive">❌ موقف</span>';
+                        $statusBadge = $row['status'] == "1" ? '<span class="status-pill status-active">✅ مفعل</span>' : '<span class="status-pill status-inactive">❌ موقف</span>';
                         $driver_name_cell = "<a class='client-name-link' href='employee_profile.php?id=" . intval($row['id']) . "'><strong>" . htmlspecialchars($row['name']) . "</strong></a>";
                         if (intval($row['numcontracts']) === 0) {
                             $driver_name_cell .= " <span class='link-alert-chip' title='المشغل ليس لديه عقد'><i class='fas fa-exclamation-triangle'></i>تنبيه</span>";
@@ -963,11 +963,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             $classificationBadge = "<span class='emp-class-pill $cls_class'>"
                                 . $cls_icon . ' ' . htmlspecialchars($cls_value) . '</span>';
                         } else {
-                            $classificationBadge = "<span class='emp-class-pill emp-class-none'>— غير مصنّف</span>";
+                            $classificationBadge = "<span class='emp-class-pill emp-class-none'>— غير مصنف</span>";
                         }
 
                         // سمات الصفّ لفلاتر اللوحة الموحّدة (تُقرأ في بحث DataTables المخصّص)
-                        $st_label = $row['status'] == "1" ? 'مفعّل' : 'موقف';
+                        $st_label = $row['status'] == "1" ? 'مفعل' : 'موقف';
                         $row_data = "data-type='"        . htmlspecialchars((string) ($row['employee_type'] ?? ''), ENT_QUOTES) . "' "
                                   . "data-jobtitle='"    . htmlspecialchars((string) ($row['job_title_name'] ?? ''), ENT_QUOTES) . "' "
                                   . "data-emprole='"     . htmlspecialchars((string) ($row['employee_role_name'] ?? ''), ENT_QUOTES) . "' "
@@ -1096,7 +1096,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     $sel.append('<option value="' + v.replace(/"/g, '&quot;') + '">' + v + '</option>');
                 });
             });
-            // بحث DataTables مخصّص يقارن قيم الفلاتر بسمات data على الصفّ (مقيّد بهذا الجدول فقط)
+            // بحث DataTables مخصص يقارن قيم الفلاتر بسمات data على الصف (مقيد بهذا الجدول فقط)
             $.fn.dataTable.ext.search.push(function (settings, dataArr, dataIndex) {
                 if (settings.nTable.id !== 'driversTable') return true;
                 var node = empTable.row(dataIndex).node();
@@ -1202,8 +1202,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         $("#supplier_id").val(driver.supplier_id);
                         $("#project_id").val(driver.project_id);
                         $("#employment_affiliation").val(driver.employment_affiliation);
-                        // INJ-0004: الحقلُ الحساسُ قد يكون محذوفًا من الاستجابةِ أصلًا —
-                        // فلا يُملأ إلا إن وصل، وإلا كتب undefined فوقَ قيمةٍ صحيحة.
+                        // INJ-0004: الحقل الحساس قد يكون محذوفا من الاستجابة أصلا —
+                        // فلا يملأ إلا إن وصل، وإلا كتب undefined فوق قيمة صحيحة.
                         if (driver.salary_type !== undefined) { $("#salary_type").val(driver.salary_type); }
                         if (driver.monthly_salary !== undefined) { $("#monthly_salary").val(driver.monthly_salary); }
                         $("#email").val(driver.email);
@@ -1253,7 +1253,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     })();
 
-    // الاستيراد القديم أُزيل — يتولّاه الآن معالج إطار Excel الموحّد (assets/js/ems-excel.js).
+    // الاستيراد القديم أزيل — يتولاه الآن معالج إطار Excel الموحد (assets/js/ems-excel.js).
 </script>
 <?php if (function_exists('ems_excel_render')) { ems_excel_render(); } ?>
 </body>

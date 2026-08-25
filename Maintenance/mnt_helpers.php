@@ -302,7 +302,7 @@ if (!defined('MNT_HELPERS_LOADED')) {
         $company_id   = intval($company_id);
         if ($equipment_id <= 0) {
             return array('value' => 0.0, 'source' => 'none', 'as_of' => null,
-                         'is_reading' => false, 'note' => 'لا معدةَ محدَّدة');
+                         'is_reading' => false, 'note' => 'لا معدة محددة');
         }
         require_once dirname(__DIR__) . '/app/Services/Fleet/MeterReadingService.php';
         return \App\Services\Fleet\MeterReadingService::currentMeter(

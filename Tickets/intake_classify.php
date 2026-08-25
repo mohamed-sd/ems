@@ -24,8 +24,8 @@ $company_id = $ctx['company_id'];
 $uid = $ctx['user_id'];
 /* UI-13: المنعُ يُقال داخلَ النظامِ برمزٍ محكومٍ ووجهةٍ فيها طريقُ رجوع. */
 if (intval($ctx['role']) !== 24 && !$ctx['is_super']) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'التصنيفُ من عمل مركز البلاغات ❌',
-        'GOV-PERM-403', 'أرسل البلاغَ وسيصنّفه المركز');
+    ems_gov_flash_redirect('../main/dashboard.php', 'التصنيف من عمل مركز البلاغات ❌',
+        'GOV-PERM-403', 'أرسل البلاغ وسيصنفه المركز');
 }
 $msg = '';
 
@@ -33,7 +33,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['classify_tk']
     $tid = intval($_POST['classify_tk']);
     $cat = intval($_POST['category_id'] ?? 0);
     $typ = intval($_POST['type_id'] ?? 0);
-    if ($cat <= 0 || $typ <= 0) { $msg = 'الفئةُ والنوعُ إلزاميان (422)'; }
+    if ($cat <= 0 || $typ <= 0) { $msg = 'الفئة والنوع إلزاميان (422)'; }
     else {
         // التصنيف يوجّه فعلًا: النوعُ يحدّد الإدارةَ المالكة، والمرحلةُ تصير
         // «محالة» — كانت تقف عند «مصنّفة» ولا مخرجَ لها، فيعلق البلاغُ حيًّا
@@ -54,7 +54,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['classify_tk']
         mysqli_stmt_execute($st);
         if (mysqli_stmt_affected_rows($st) > 0) {
             mysqli_query($conn, "INSERT INTO ticket_events (company_id, ticket_id, event_type, body, actor_user_id, new_value)
-                                 VALUES ($company_id, $tid, 'reclassified', 'صُنّف من شاشة الاستقبال ووُجّه للإدارة المختصة', $uid, 'routed')");
+                                 VALUES ($company_id, $tid, 'reclassified', 'صنف من شاشة الاستقبال ووجه للإدارة المختصة', $uid, 'routed')");
             // المهلة تُحسب عند التوجيه إن لم تكن حُسبت عند الإنشاء
             $trow = mysqli_query($conn, "SELECT priority, business_impact, call_date, call_time, resolution_due_at
                                            FROM tickets WHERE id = $tid AND company_id = $company_id");
@@ -63,8 +63,8 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['classify_tk']
                 tkt_apply_sla(tkt_gate(false), $tid, $typ, $tk['priority'], $tk['business_impact'],
                               $tk['call_date'], $tk['call_time']);
             }
-            $msg = "صُنّف البلاغُ #$tid ووُجّه للإدارة المختصة ✅";
-        } else { $msg = 'تجاوز مرحلةَ التصنيف (409)'; }
+            $msg = "صنف البلاغ #$tid ووجه للإدارة المختصة ✅";
+        } else { $msg = 'تجاوز مرحلة التصنيف (409)'; }
     }
 }
 
@@ -96,12 +96,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 /* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
    شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
 $header_icon = 'fa fa-inbox';
-$header_title_html = htmlspecialchars('الاستقبالُ والتصنيف — الجديدةُ وغيرُ المصنَّفة', ENT_QUOTES, 'UTF-8');
+$header_title_html = htmlspecialchars('الاستقبال والتصنيف — الجديدة وغير المصنفة', ENT_QUOTES, 'UTF-8');
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-echo ems_states_bundle('لا بلاغاتِ جديدةً تنتظر التصنيف', 'ستظهر البلاغاتُ هنا فورَ ورودِها — أو راجع قوائمَ البلاغاتِ للمصنَّفِ منها');
+echo ems_states_bundle('لا بلاغات جديدة تنتظر التصنيف', 'ستظهر البلاغات هنا فور ورودها — أو راجع قوائم البلاغات للمصنف منها');
 ?>
   <style>
   /* UXW-01 ①②: أنماطُ شاشةِ الاستقبالِ والتصنيفِ الثابتة — بادئةُ الشاشة tkt-ic- */
@@ -111,19 +111,19 @@ echo ems_states_bundle('لا بلاغاتِ جديدةً تنتظر التصني
   </style>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
   <table class="table table-striped" data-no-dt>
-    <thead><tr><th>البلاغ</th><th>الوصف</th><th>منذ</th><th>تصنيفُه الحالي</th><th>التصنيف</th>
+    <thead><tr><th>البلاغ</th><th>الوصف</th><th>منذ</th><th>تصنيفه الحالي</th><th>التصنيف</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
               </tr></thead>
     <tbody>
-    <?php if (empty($rows)): ?><tr><td colspan="5" class="text-center tkt-ic-clean">✔ لا جديدَ بلا تصنيف</td></tr><?php endif; ?>
+    <?php if (empty($rows)): ?><tr><td colspan="5" class="text-center tkt-ic-clean">✔ لا جديد بلا تصنيف</td></tr><?php endif; ?>
     <?php foreach ($rows as $t): ?>
       <tr>
         <td><a href="tickets_list.php?open=<?= intval($t['id']) ?>"><?= htmlspecialchars($t['ticket_no'], ENT_QUOTES, 'UTF-8') ?></a></td>
@@ -134,15 +134,15 @@ echo ems_states_bundle('لا بلاغاتِ جديدةً تنتظر التصني
           <form method="post" class="tkt-ic-row-form">
         <?php echo csrf_field(); ?>
             <input type="hidden" name="classify_tk" value="<?= intval($t['id']) ?>">
-            <select name="category_id" aria-label="فئةُ البلاغ" class="form-control form-control-sm tkt-ic-picker" required>
+            <select name="category_id" aria-label="فئة البلاغ" class="form-control form-control-sm tkt-ic-picker" required>
               <option value="">— الفئة —</option>
               <?php foreach ($cats as $c2): ?><option value="<?= intval($c2['id']) ?>"><?= htmlspecialchars($c2['name'], ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?>
             </select>
-            <select name="type_id" aria-label="نوعُ البلاغ — يحدّد الإدارةَ المالكة" class="form-control form-control-sm tkt-ic-picker" required>
+            <select name="type_id" aria-label="نوع البلاغ — يحدد الإدارة المالكة" class="form-control form-control-sm tkt-ic-picker" required>
               <option value="">— النوع —</option>
               <?php foreach ($types as $t2): ?><option value="<?= intval($t2['id']) ?>"><?= htmlspecialchars($t2['name'], ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?>
             </select>
-            <button class="action-btn" type="submit">صنّف</button>
+            <button class="action-btn" type="submit">صنف</button>
           </form>
         </td>
       </tr>

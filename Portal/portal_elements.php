@@ -47,15 +47,15 @@ else {
     }
     $st->close();
 }
-if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا صلاحيةَ عرضٍ لمكوّنات البوابة ❌', 'GOV-PERM-403', ''); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا صلاحية عرض لمكونات البوابة ❌', 'GOV-PERM-403', ''); exit(); }
 
 $redirect = function ($msg) { ems_gov_flash_redirect('portal_elements.php', $msg, 'GOV-INFO-200', ''); exit(); };
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['pe_action'] ?? '') === 'toggle') {
-    if (!$can_edit) { $redirect('القاموسُ لمدير البوابة وحدَه ❌'); }
+    if (!$can_edit) { $redirect('القاموس لمدير البوابة وحده ❌'); }
     $code = strval($_POST['element_code'] ?? '');
     $el = VPS::element($conn, $code);
-    if (!$el) { $redirect('العنصرُ غيرُ موجودٍ في القاموس ❌'); }
+    if (!$el) { $redirect('العنصر غير موجود في القاموس ❌'); }
     $to = intval($el['active']) === 1 ? 0 : 1;
     $st = $conn->prepare("UPDATE portal_elements SET active = ? WHERE element_code = ?");
     $st->bind_param('is', $to, $code);
@@ -65,12 +65,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['pe_action'] ?? '') === 'to
     ems_audit_change($conn, 'portal', 'portal_elements', $to ? 'activate' : 'deactivate', 0,
         array('active' => intval($el['active'])), array('active' => $to, 'element' => $code),
         array('company_id' => $company_id, 'user_id' => $uid));
-    $redirect($ok ? ($to ? 'فُعّل المكوّن ✅' : 'أُوقف المكوّن — لن يُصيَّر لأحد ✅') : 'تعذّر التبديل ❌');
+    $redirect($ok ? ($to ? 'فعل المكون ✅' : 'أوقف المكون — لن يصير لأحد ✅') : 'تعذر التبديل ❌');
 }
 
 $elements = VPS::elements($conn);
 
-$page_title = 'إيكوبيشن | مكوّنات البوابة';
+$page_title = 'إيكوبيشن | مكونات البوابة';
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
 require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(null);
@@ -80,12 +80,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 ?>
 <div class="main ems-unified-page-shell">
     <?php
-    $header_title = 'مكوّنات البوابة (القاموس)'; $header_icon = 'fa fa-puzzle-piece';
+    $header_title = 'مكونات البوابة (القاموس)'; $header_icon = 'fa fa-puzzle-piece';
     $header_actions = array();
     include('../includes/page_header.php');
     if (isset($_GET['msg'])) { echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>'; }
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا عناصرَ مسجَّلةً في قاموسِ البوابة', 'يُسجَّل العنصرُ بكودِه ووثيقتِه المالكةِ قبلَ أن يُصيَّر في أيِّ شاشة');
+    echo ems_states_bundle('لا عناصر مسجلة في قاموس البوابة', 'يسجل العنصر بكوده ووثيقته المالكة قبل أن يصير في أي شاشة');
     ?>
 
     <style>
@@ -95,22 +95,22 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </style>
 
     <div class="card"><div class="card-body"><p class="pel-note">
-        <strong>كلُّ ما يمكن إظهارُه له كودٌ واحدٌ في قاموسٍ واحد — وما ليس في القاموس
-        لا يُصيَّر أصلًا.</strong> هذه الشاشةُ للقاموس وحدَه <strong>بلا أي بياناتٍ شخصية</strong>؛
-        وفتحُ العناصر وإغلاقُها بيتُه <a href="visibility_keys.php">مفاتيحُ الظهور</a>
-        (فصلُ واجبات: من يملك المحتوى لا يرى البيانات).
+        <strong>كل ما يمكن إظهاره له كود واحد في قاموس واحد — وما ليس في القاموس
+        لا يصير أصلا.</strong> هذه الشاشة للقاموس وحده <strong>بلا أي بيانات شخصية</strong>؛
+        وفتح العناصر وإغلاقها بيته <a href="visibility_keys.php">مفاتيح الظهور</a>
+        (فصل واجبات: من يملك المحتوى لا يرى البيانات).
     </p></div></div>
 
-    <div class="card"><div class="card-header"><h5><i class="fa fa-book"></i> القاموس (<?php echo count($elements); ?> عنصرًا)</h5></div>
+    <div class="card"><div class="card-header"><h5><i class="fa fa-book"></i> القاموس (<?php echo count($elements); ?> عنصرا)</h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap pel-table">
             <thead><tr><th>الكود</th><th>الاسم</th><th>الوثيقة المالكة</th>
                 <th>الحساسية</th><th>الافتراض</th><th>الحال</th><th></th>
                 <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                 <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                 <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                 <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -123,21 +123,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <td><?php echo htmlspecialchars((string)$e['title_ar']); ?></td>
                     <td><?php echo htmlspecialchars((string)$e['owner_doc']); ?></td>
                     <td><?php echo (string)$e['sensitivity'] === 'sensitive'
-                        ? "<span class='badge badge-danger'>حساس — بمدةٍ وسبب</span>"
+                        ? "<span class='badge badge-danger'>حساس — بمدة وسبب</span>"
                         : "<span class='badge badge-secondary'>عادي</span>"; ?></td>
                     <td><?php echo (string)$e['default_mode'] === 'open'
                         ? "<span class='badge badge-success'>مفتوح</span>"
                         : "<span class='badge badge-danger'>مغلق</span>"; ?></td>
                     <td><?php echo intval($e['active']) === 1
-                        ? "<span class='badge badge-success'>فعّال</span>"
-                        : "<span class='badge badge-secondary'>موقوف — لا يُصيَّر</span>"; ?></td>
+                        ? "<span class='badge badge-success'>فعال</span>"
+                        : "<span class='badge badge-secondary'>موقوف — لا يصير</span>"; ?></td>
                     <td><?php if ($can_edit): ?>
                         <form method="post" class="pel-inline">
         <?= csrf_field() ?>
                             <input type="hidden" name="pe_action" value="toggle">
                             <input type="hidden" name="element_code" value="<?php echo htmlspecialchars((string)$e['element_code']); ?>">
                             <button type="submit" class="btn-primary">
-                                <?php echo intval($e['active']) === 1 ? 'أوقفه' : 'فعّله'; ?></button>
+                                <?php echo intval($e['active']) === 1 ? 'أوقفه' : 'فعله'; ?></button>
                         </form>
                     <?php endif; ?></td>
                 </tr>

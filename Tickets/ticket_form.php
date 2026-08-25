@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket_id === 0 && isset($_POST['c
     $meter_val = ($meter_reading === '') ? null : floatval($meter_reading);
 
     if ($type_id <= 0 || $complaint === '' || $reporting_person === '') {
-        ems_gov_flash_redirect('ticket_form.php', 'النوع والوصف واسم المُبلِّغ إلزامية ❌', 'GOV-FAIL-409', ''); exit();
+        ems_gov_flash_redirect('ticket_form.php', 'النوع والوصف واسم المبلغ إلزامية ❌', 'GOV-FAIL-409', ''); exit();
     }
     $type = tkt_gate(false)->selectOne('ticket_types', array(
         'columns' => array('id', 'owner_role_id', 'default_nature'),
@@ -115,7 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket_id === 0 && isset($_POST['c
             $g->insert('ticket_events', array(
                 'ticket_id' => $tid, 'event_type' => 'system',
                 'actor_user_id' => $current_user_id, 'actor_role_id' => $current_role_id,
-                'body' => 'إنشاء البلاغ وتوجيهه تلقائيًا بحسب النوع', 'new_value' => 'routed',
+                'body' => 'إنشاء البلاغ وتوجيهه تلقائيا بحسب النوع', 'new_value' => 'routed',
             ));
             $g->insert('ticket_watchers', array(
                 'ticket_id' => $tid, 'user_id' => $current_user_id,
@@ -149,12 +149,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && ($_POST['action'] ?? '')
     if ($do === 'close') {
         $open_children = tkt_open_children_count($ticket_id);
         if ($open_children > 0) {
-            ems_gov_redirect("Location: $self_url&msg=" . urlencode('لا يمكن الإغلاق: ' . $open_children . ' فرعًا ما زال مفتوحًا ❌')); exit();
+            ems_gov_redirect("Location: $self_url&msg=" . urlencode('لا يمكن الإغلاق: ' . $open_children . ' فرعا ما زال مفتوحا ❌')); exit();
         }
         // ولا تُغلق ومسارٌ إلزاميٌّ مفتوح — وإلا انفصل رأسُ البلاغ عن تنفيذه
         $open_ws = tkt_open_mandatory_ws_count(tkt_gate(false), $ticket_id);
         if ($open_ws > 0) {
-            ems_gov_redirect("Location: $self_url&msg=" . urlencode('لا يمكن الإغلاق: ' . $open_ws . ' مسارًا إلزاميًّا ما زال مفتوحًا ❌')); exit();
+            ems_gov_redirect("Location: $self_url&msg=" . urlencode('لا يمكن الإغلاق: ' . $open_ws . ' مسارا إلزاميا ما زال مفتوحا ❌')); exit();
         }
     }
 
@@ -170,11 +170,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && ($_POST['action'] ?? '')
                    نفسِها» هو عينُه في ملاحظاتِ المراجعة.) */
                 require_once __DIR__ . '/../includes/self_approval_guard.php';
                 $__sa = ems_no_self_approval($conn, intval($ticket['created_by'] ?? 0), intval($current_user_id),
-                    'بلاغٌ ' . (string) ($ticket['ticket_no'] ?? ('#' . ($ticket['id'] ?? ''))),
+                    'بلاغ ' . (string) ($ticket['ticket_no'] ?? ('#' . ($ticket['id'] ?? ''))),
                     intval($ticket['company_id'] ?? 0));
                 if ($__sa !== null) {
                     ems_gov_flash_redirect('tickets_list.php', $__sa['reason'], 'GOV-PERM-403',
-                        'الإقفالُ من الجهةِ المعالِجةِ لا من المُبلِّغ');
+                        'الإقفال من الجهة المعالجة لا من المبلغ');
                     exit();
                 }
                 $upd['close_date'] = date('Y-m-d');
@@ -184,7 +184,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && ($_POST['action'] ?? '')
                         'company_id' => intval($ticket['company_id'] ?? 0),
                         'target_level' => 'user',
                         'target_user_id' => intval($ticket['reporter_user_id']),
-                        'title' => 'أُغلق بلاغُك ' . (string) ($ticket['ticket_no'] ?? '') . ($reason !== '' ? ' — السبب: ' . mb_substr($reason, 0, 120) : ''),
+                        'title' => 'أغلق بلاغك ' . (string) ($ticket['ticket_no'] ?? '') . ($reason !== '' ? ' — السبب: ' . mb_substr($reason, 0, 120) : ''),
                         'link' => 'Tickets/ticket_form.php?id=' . intval($ticket_id),
                         'is_read' => 0,
                     ));
@@ -231,7 +231,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && ($_POST['action'] ?? '')
     $reason  = trim($_POST['reason'] ?? '');
     if (!in_array($to_role, tkt_owner_role_ids(), true)) { ems_gov_redirect("Location: $self_url&msg=الإدارة+الهدف+غير+صالحة+❌"); exit(); }
     if ($reason === '') { ems_gov_redirect("Location: $self_url&msg=سبب+التحويل+إلزامي+❌"); exit(); }
-    if ($to_role === intval($ticket['owner_role_id'])) { ems_gov_redirect("Location: $self_url&msg=التذكرة+لدى+هذه+الإدارة+أصلًا+❌"); exit(); }
+    if ($to_role === intval($ticket['owner_role_id'])) { ems_gov_redirect("Location: $self_url&msg=التذكرة+لدى+هذه+الإدارة+أصلا+❌"); exit(); }
 
     try {
         tkt_gate(false)->runInTransaction(function ($g) use ($ticket, $ticket_id, $to_role, $reason, $current_user_id, $current_role_id, $roles_map) {
@@ -262,7 +262,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && ($_POST['action'] ?? '')
 // ══════════════════════════════════════════════════════════════════════════
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && ($_POST['action'] ?? '') === 'cancel') {
     if (!$can_admin) { ems_gov_redirect("Location: $self_url&msg=الإلغاء+بصلاحية+مدير+البلاغات+❌"); exit(); }
-    if ($is_final)   { ems_gov_redirect("Location: $self_url&msg=التذكرة+منتهية+أصلًا+❌"); exit(); }
+    if ($is_final)   { ems_gov_redirect("Location: $self_url&msg=التذكرة+منتهية+أصلا+❌"); exit(); }
     $reason = trim($_POST['reason'] ?? '');
     if ($reason === '') { ems_gov_redirect("Location: $self_url&msg=سبب+الإلغاء+إلزامي+❌"); exit(); }
     try {
@@ -283,7 +283,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && ($_POST['action'] ?? '')
         error_log('ticket cancel failed: ' . $e->getMessage());
         ems_gov_redirect("Location: $self_url&msg=تعذر+الإلغاء+❌"); exit();
     }
-    ems_gov_redirect("Location: $self_url&msg=" . urlencode('أُلغيت التذكرة (تبقى في السجل للتدقيق) ✅')); exit();
+    ems_gov_redirect("Location: $self_url&msg=" . urlencode('ألغيت التذكرة (تبقى في السجل للتدقيق) ✅')); exit();
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -324,7 +324,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && ($_POST['action'] ?? '')
         error_log('ticket refine failed: ' . $e->getMessage());
         ems_gov_redirect("Location: $self_url&msg=تعذر+الحفظ+❌"); exit();
     }
-    ems_gov_redirect("Location: $self_url&msg=" . urlencode('حُفظ التصنيف والإسناد ✅')); exit();
+    ems_gov_redirect("Location: $self_url&msg=" . urlencode('حفظ التصنيف والإسناد ✅')); exit();
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -333,7 +333,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && ($_POST['action'] ?? '')
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && ($_POST['action'] ?? '') === 'branch') {
     if (!$can_manage) { ems_gov_redirect("Location: $self_url&msg=التفريع+بيد+فريق+البلاغات+❌"); exit(); }
     if ($is_final)    { ems_gov_redirect("Location: $self_url&msg=لا+تفريع+بعد+الإغلاق/الإلغاء+❌"); exit(); }
-    if ($ticket['parent_id'] !== null) { ems_gov_redirect("Location: $self_url&msg=لا+تفريع+من+تذكرةٍ+فرعية+❌"); exit(); }
+    if ($ticket['parent_id'] !== null) { ems_gov_redirect("Location: $self_url&msg=لا+تفريع+من+تذكرة+فرعية+❌"); exit(); }
     $child_type = intval($_POST['child_type_id'] ?? 0);
     $child_desc = trim($_POST['child_complaint'] ?? '');
     if ($child_type <= 0 || $child_desc === '') { ems_gov_redirect("Location: $self_url&msg=نوع+الفرع+ووصفه+إلزاميان+❌"); exit(); }
@@ -378,7 +378,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && ($_POST['action'] ?? '')
             $g->insert('ticket_events', array(
                 'ticket_id' => $cid_new, 'event_type' => 'system',
                 'actor_user_id' => $current_user_id, 'actor_role_id' => $current_role_id,
-                'body' => 'فرعٌ مُولَّد عن التذكرة الرئيسية ' . $ticket['ticket_no'], 'new_value' => 'routed',
+                'body' => 'فرع مولد عن التذكرة الرئيسية ' . $ticket['ticket_no'], 'new_value' => 'routed',
             ));
             $g->insert('ticket_watchers', array(
                 'ticket_id' => $cid_new, 'user_id' => $current_user_id,
@@ -389,7 +389,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && ($_POST['action'] ?? '')
         error_log('ticket branch failed: ' . $e->getMessage());
         ems_gov_redirect("Location: $self_url&msg=تعذر+التفريع+❌"); exit();
     }
-    ems_gov_redirect("Location: $self_url&msg=" . urlencode('أُنشئ الفرع ' . $child_no . ' ✅')); exit();
+    ems_gov_redirect("Location: $self_url&msg=" . urlencode('أنشئ الفرع ' . $child_no . ' ✅')); exit();
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -407,7 +407,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && ($_POST['action'] ?? '')
     }
     if ($is_final) { ems_gov_redirect("Location: $self_url&msg=لا+إصدار+بعد+الإغلاق/الإلغاء+❌"); exit(); }
     if (!empty($ticket['linked_ref_id']) && $ticket['linked_ref_table'] === 'mnt_order') {
-        ems_gov_redirect("Location: $self_url&msg=التذكرة+مرتبطةٌ+بأمر+صيانة+مسبقًا+❌"); exit();
+        ems_gov_redirect("Location: $self_url&msg=التذكرة+مرتبطة+بأمر+صيانة+مسبقا+❌"); exit();
     }
 
     $new_order_id = 0;
@@ -445,17 +445,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && ($_POST['action'] ?? '')
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && ($_POST['action'] ?? '') === 'comment') {
     $body = trim($_POST['body'] ?? '');
     $has_file = isset($_FILES['attachment']) && ($_FILES['attachment']['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK;
-    if ($body === '' && !$has_file) { ems_gov_redirect("Location: $self_url&msg=اكتب+تعليقًا+أو+أرفق+ملفًا+❌"); exit(); }
+    if ($body === '' && !$has_file) { ems_gov_redirect("Location: $self_url&msg=اكتب+تعليقا+أو+أرفق+ملفا+❌"); exit(); }
     if ($body !== '') {
         tkt_log_event($ticket_id, 'communication', $body, null, null, $current_user_id, $current_role_id);
     }
     if ($has_file) {
         $rel = tkt_save_attachment($ticket_id, $_FILES['attachment'], $current_user_id);
         if ($rel !== null) {
-            tkt_log_event($ticket_id, 'attachment', 'أُرفق ملف: ' . $rel, null, null, $current_user_id, $current_role_id);
+            tkt_log_event($ticket_id, 'attachment', 'أرفق ملف: ' . $rel, null, null, $current_user_id, $current_role_id);
         }
     }
-    ems_gov_redirect("Location: $self_url&msg=" . urlencode('أُضيف إلى سجل التواصل ✅')); exit();
+    ems_gov_redirect("Location: $self_url&msg=" . urlencode('أضيف إلى سجل التواصل ✅')); exit();
 }
 
 $page_title = $ticket ? ('إيكوبيشن | تذكرة ' . $ticket['ticket_no']) : 'إيكوبيشن | بلاغ جديد';
@@ -497,7 +497,7 @@ if ($ticket) {
     $header_back = array('href' => 'tickets_list.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا بلاغَ بهذا الرقم — أو لم يُسجَّل بعدُ', 'ارجع إلى قائمةِ البلاغاتِ واختر بلاغًا، أو سجّل بلاغًا جديدًا من هذه الشاشة');
+    echo ems_states_bundle('لا بلاغ بهذا الرقم — أو لم يسجل بعد', 'ارجع إلى قائمة البلاغات واختر بلاغا، أو سجل بلاغا جديدا من هذه الشاشة');
     ?>
     <style>
     /* UXW-01 ②: أنماطُ شاشةِ البلاغِ الثابتة — بادئةُ الشاشة tkt-frm- */
@@ -505,7 +505,7 @@ if ($ticket) {
     .tkt-frm-op-head    { margin: 14px 0 8px; }
     .tkt-frm-subtable   { width: 100%; }
     </style>
-<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('ticket', 'السياقُ والمصدر'); ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('ticket', 'السياق والمصدر'); ?>
 
     <?php tkt_msg_banner(); ?>
 
@@ -520,7 +520,7 @@ endif; ?>
     <!-- ═══ وضع الإنشاء — بخطوة واحدة ═══ -->
     <form id="tktForm" action="" method="post" class="allforms allforms-visible">
         <?php echo csrf_field(); ?>
-        <div class="card-header"><h5><i class="fas fa-bullhorn"></i> بيانات البلاغ — الإدخال الأدنى (يُوجَّه تلقائيًا بحسب النوع)</h5></div>
+        <div class="card-header"><h5><i class="fas fa-bullhorn"></i> بيانات البلاغ — الإدخال الأدنى (يوجه تلقائيا بحسب النوع)</h5></div>
         <div class="card"><div class="card-body">
             <div class="form-section">
                 <div class="form-grid">
@@ -529,7 +529,7 @@ endif; ?>
                         <select name="ticket_type_id" id="f_type" required><?php echo tkt_type_options(); ?></select>
                     </div>
                     <div class="form-group">
-                        <label for="emsf_511_b950d">اسم المُبلِّغ <span class="required">*</span></label>
+                        <label for="emsf_511_b950d">اسم المبلغ <span class="required">*</span></label>
                         <input type="text" name="reporting_person" id="emsf_511_b950d" required value="<?php echo htmlspecialchars((string)($_SESSION['user']['name'] ?? '')); ?>">
                     </div>
                     <div class="form-group">
@@ -552,7 +552,7 @@ endif; ?>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="emsf_516_8c811">قراءة العدّاد</label>
+                        <label for="emsf_516_8c811">قراءة العداد</label>
                         <input type="number" step="0.01" min="0" name="meter_reading" placeholder="مثال: 12450.5" id="emsf_516_8c811">
                     </div>
                 </div>
@@ -577,7 +577,7 @@ endif; ?>
     $__overdue   = tkt_is_overdue($ticket);
     $__headline  = trim(preg_replace('~\s+~u', ' ', (string) $ticket['complaint']));
     if (mb_strlen($__headline) > 130) { $__headline = mb_substr($__headline, 0, 130) . '…'; }
-    if ($__headline === '') { $__headline = 'بلاغٌ بلا وصفٍ مكتوب'; }
+    if ($__headline === '') { $__headline = 'بلاغ بلا وصف مكتوب'; }
     ?>
     <section class="tkt-hero">
         <div class="tkt-hero__top">
@@ -600,7 +600,7 @@ endif; ?>
             <?php if ($__overdue): ?>
                 <span class="tkt-chip is-danger"><i class="fa fa-hourglass-end" aria-hidden="true"></i> كسر مهلة الإنجاز</span>
             <?php elseif ($ticket['close_date']): ?>
-                <span class="tkt-chip is-ok"><i class="fa fa-circle-check" aria-hidden="true"></i> أُغلق <?php echo htmlspecialchars((string) $ticket['close_date']); ?></span>
+                <span class="tkt-chip is-ok"><i class="fa fa-circle-check" aria-hidden="true"></i> أغلق <?php echo htmlspecialchars((string) $ticket['close_date']); ?></span>
             <?php endif; ?>
         </div>
     </section>
@@ -613,12 +613,12 @@ endif; ?>
             <div class="tkt-panel__head">
                 <i class="fa fa-bullhorn" aria-hidden="true"></i>
                 <h3>وصف المشكلة كما ورد</h3>
-                <span class="tkt-chip"><i class="fa fa-lock" aria-hidden="true"></i> لا يُعدَّل بعد التسجيل</span>
+                <span class="tkt-chip"><i class="fa fa-lock" aria-hidden="true"></i> لا يعدل بعد التسجيل</span>
             </div>
             <div class="tkt-panel__body">
                 <div class="tkt-quote"><?php echo htmlspecialchars($ticket['complaint']); ?></div>
                 <?php if ($ticket['issue_status']): ?>
-                    <div class="tkt-op__k tkt-frm-op-head"><i class="fa fa-screwdriver-wrench" aria-hidden="true"></i> حالة المعالجة — تُقرأ من الإدارة المنفِّذة</div>
+                    <div class="tkt-op__k tkt-frm-op-head"><i class="fa fa-screwdriver-wrench" aria-hidden="true"></i> حالة المعالجة — تقرأ من الإدارة المنفذة</div>
                     <div class="tkt-quote tkt-quote--status"><?php echo htmlspecialchars($ticket['issue_status']); ?></div>
                 <?php endif; ?>
             </div>
@@ -654,8 +654,8 @@ endif; ?>
                 <div class="form-group"><label for="emsf_519_4395b">الوزن التشغيلي</label>
                     <select name="business_impact" id="emsf_519_4395b"><?php foreach ($impacts as $k => $v): ?><option value="<?php echo $k; ?>"<?php echo $ticket['business_impact'] === $k ? ' selected' : ''; ?>><?php echo htmlspecialchars($v); ?></option><?php endforeach; ?></select></div>
                 <div class="form-group"><label>يوقف الإنتاج؟</label>
-                    <label class="switch-inline"><input type="checkbox" name="production_critical" aria-label="البلاغُ يوقف الإنتاج" value="1"<?php echo intval($ticket['production_critical']) === 1 ? ' checked' : ''; ?>> نعم</label></div>
-                <div class="form-group"><label for="tkfAssigned">المسؤول المُسنَد</label>
+                    <label class="switch-inline"><input type="checkbox" name="production_critical" aria-label="البلاغ يوقف الإنتاج" value="1"<?php echo intval($ticket['production_critical']) === 1 ? ' checked' : ''; ?>> نعم</label></div>
+                <div class="form-group"><label for="tkfAssigned">المسؤول المسند</label>
                     <select name="assigned_user_id" id="tkfAssigned"><?php echo tkt_user_options(intval($ticket['assigned_user_id'])); ?></select></div>
                 <div class="form-group"><label for="emsf_520_70558">فريق المعالجة</label>
                     <select name="service_team" id="emsf_520_70558">
@@ -664,7 +664,7 @@ endif; ?>
                         <option value="external_workshop"<?php echo $ticket['service_team'] === 'external_workshop' ? ' selected' : ''; ?>>ورشة خارجية</option>
                     </select></div>
             </div>
-            <div class="form-group"><label for="emsf_521_49bd2">حالة المعالجة (تُقرأ من الإدارة المنفِّذة)</label>
+            <div class="form-group"><label for="emsf_521_49bd2">حالة المعالجة (تقرأ من الإدارة المنفذة)</label>
                 <textarea name="issue_status" rows="2" id="emsf_521_49bd2"><?php echo htmlspecialchars((string)$ticket['issue_status']); ?></textarea></div>
             <div class="form-actions"><button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ التصنيف</button></div>
         </div>
@@ -688,7 +688,7 @@ endif; ?>
         <h3>ما الخطوة التالية؟</h3>
         <?php if (!empty($avail)): ?>
             <span class="tkt-chip is-ok"><i class="fa fa-arrow-turn-down" aria-hidden="true"></i>
-                <?php echo count($avail) === 1 ? 'إجراءٌ متاحٌ واحد' : count($avail) . ' إجراءاتٍ متاحة'; ?></span>
+                <?php echo count($avail) === 1 ? 'إجراء متاح واحد' : count($avail) . ' إجراءات متاحة'; ?></span>
         <?php endif; ?>
       </div>
       <div class="tkt-panel__body">
@@ -711,24 +711,24 @@ endif; ?>
         </div>
         <?php else: ?>
         <div class="tkt-empty"><i class="fa fa-circle-check" aria-hidden="true"></i>
-            لا انتقالَ متاحٌ لك من هذه المرحلة.</div>
+            لا انتقال متاح لك من هذه المرحلة.</div>
         <?php endif; ?>
 
         <div class="tkt-ops">
         <?php if ($can_manage && !$is_final): ?>
         <div class="tkt-op">
-            <div class="tkt-op__k"><i class="fa fa-right-left" aria-hidden="true"></i> تحويل الملكية إلى إدارةٍ أخرى</div>
+            <div class="tkt-op__k"><i class="fa fa-right-left" aria-hidden="true"></i> تحويل الملكية إلى إدارة أخرى</div>
             <form method="post" action="<?php echo htmlspecialchars($self_url); ?>">
                 <?php echo csrf_field(); ?>
                 <input type="hidden" name="action" value="transfer">
                 <input type="hidden" name="ticket_id" value="<?php echo $ticket_id; ?>">
-                <label class="sr-only" for="emsf_522_086d6">الإدارة المستلِمة</label>
+                <label class="sr-only" for="emsf_522_086d6">الإدارة المستلمة</label>
                 <select name="to_role_id" required id="emsf_522_086d6">
                     <?php foreach (tkt_owner_role_ids() as $rid): ?>
                         <option value="<?php echo $rid; ?>"<?php echo intval($ticket['owner_role_id']) === $rid ? ' disabled' : ''; ?>><?php echo htmlspecialchars(tkt_label($roles_map, $rid)); ?></option>
                     <?php endforeach; ?>
                 </select>
-                <input type="text" name="reason" required placeholder="سبب التحويل (إلزامي — يُقيَّد في السجل)" aria-label="سبب التحويل (إلزامي — يُقيَّد في السجل)">
+                <input type="text" name="reason" required placeholder="سبب التحويل (إلزامي — يقيد في السجل)" aria-label="سبب التحويل (إلزامي — يقيد في السجل)">
                 <button type="submit" class="btn-primary"><i class="fas fa-right-left" aria-hidden="true"></i> تحويل</button>
             </form>
         </div>
@@ -749,7 +749,7 @@ endif; ?>
             <?php if ($__linked): ?>
                 <div class="tkt-op__linked">
                     <i class="fas fa-link" aria-hidden="true"></i>
-                    <span>مرتبطٌ بأمر صيانة رقم <strong>#<?php echo intval($ticket['linked_ref_id']); ?></strong></span>
+                    <span>مرتبط بأمر صيانة رقم <strong>#<?php echo intval($ticket['linked_ref_id']); ?></strong></span>
                     <a class="action-btn edit" href="../Maintenance/orders.php?id=<?php echo intval($ticket['linked_ref_id']); ?>" title="فتح أمر الصيانة"><i class="fas fa-up-right-from-square" aria-hidden="true"></i></a>
                 </div>
             <?php else: ?>
@@ -766,7 +766,7 @@ endif; ?>
 
         <?php if ($can_manage && !$is_final && $ticket['parent_id'] === null): ?>
         <div class="tkt-op">
-            <div class="tkt-op__k"><i class="fa fa-code-branch" aria-hidden="true"></i> تفريعُ تذكرةٍ لإدارةٍ أخرى</div>
+            <div class="tkt-op__k"><i class="fa fa-code-branch" aria-hidden="true"></i> تفريع تذكرة لإدارة أخرى</div>
             <form method="post" action="<?php echo htmlspecialchars($self_url); ?>">
                 <?php echo csrf_field(); ?>
                 <input type="hidden" name="action" value="branch">
@@ -781,9 +781,9 @@ endif; ?>
 
         <?php if ($can_admin && !$is_final): ?>
         <div class="tkt-op tkt-op--danger">
-            <div class="tkt-op__k"><i class="fa fa-ban" aria-hidden="true"></i> إلغاء التذكرة (مكرَّرة أو غير صحيحة) — تبقى في السجلِّ للتدقيق ولا تُحذف</div>
+            <div class="tkt-op__k"><i class="fa fa-ban" aria-hidden="true"></i> إلغاء التذكرة (مكررة أو غير صحيحة) — تبقى في السجل للتدقيق ولا تحذف</div>
             <form method="post" action="<?php echo htmlspecialchars($self_url); ?>"
-                  onsubmit="return confirm('إلغاء التذكرة؟ تبقى في السجل للتدقيق ولا تُحذف.');">
+                  onsubmit="return confirm('إلغاء التذكرة؟ تبقى في السجل للتدقيق ولا تحذف.');">
                 <?php echo csrf_field(); ?>
                 <input type="hidden" name="action" value="cancel">
                 <input type="hidden" name="ticket_id" value="<?php echo $ticket_id; ?>">
@@ -813,10 +813,10 @@ endif; ?>
         <table class="alltables no-datatable tkt-frm-subtable">
             <thead><tr><th>فتح</th><th>رقم الفرع</th><th>المرحلة</th><th>الإدارة المالكة</th><th>الوصف</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -844,7 +844,7 @@ endif; ?>
       <div class="tkt-panel__head">
         <i class="fa fa-right-left" aria-hidden="true"></i>
         <h3>سجل انتقال الملكية</h3>
-        <span class="tkt-chip"><i class="fa fa-shield-halved" aria-hidden="true"></i> قيدٌ دائم</span>
+        <span class="tkt-chip"><i class="fa fa-shield-halved" aria-hidden="true"></i> قيد دائم</span>
       </div>
       <div class="tkt-panel__body tkt-scroll">
         <table class="alltables no-datatable tkt-frm-subtable">
@@ -868,13 +868,13 @@ endif; ?>
     <section class="tkt-panel">
       <div class="tkt-panel__head">
         <i class="fa fa-timeline" aria-hidden="true"></i>
-        <h3>ماذا جرى — سجلُّ الأحداثِ والتواصل</h3>
-        <span class="tkt-chip"><i class="fa fa-shield-halved" aria-hidden="true"></i> لا يُحرَّر ولا يُحذَف</span>
+        <h3>ماذا جرى — سجل الأحداث والتواصل</h3>
+        <span class="tkt-chip"><i class="fa fa-shield-halved" aria-hidden="true"></i> لا يحرر ولا يحذف</span>
       </div>
       <div class="tkt-panel__body">
         <div class="tkt-tl">
             <?php if (empty($events)): ?>
-                <div class="tkt-empty"><i class="fa fa-inbox" aria-hidden="true"></i> لا أحداثَ بعد — أوّلُ تعليقٍ يبدأ السجل.</div>
+                <div class="tkt-empty"><i class="fa fa-inbox" aria-hidden="true"></i> لا أحداث بعد — أول تعليق يبدأ السجل.</div>
             <?php endif; ?>
             <?php foreach ($events as $ev):
                 /* رمزُ العقدةِ يتبع نوعَ الحدث: انتقالٌ في المسار · كلامٌ بين الأطراف
@@ -908,12 +908,12 @@ endif; ?>
             <?php echo csrf_field(); ?>
             <input type="hidden" name="action" value="comment">
             <input type="hidden" name="ticket_id" value="<?php echo $ticket_id; ?>">
-            <label class="sr-only" for="emsf_525_comment">تعليقٌ يظهر لكل الأطراف</label>
-            <textarea name="body" id="emsf_525_comment" rows="3" placeholder="أضف تعليقًا أو تواصلًا يظهر لكل الأطراف…"></textarea>
+            <label class="sr-only" for="emsf_525_comment">تعليق يظهر لكل الأطراف</label>
+            <textarea name="body" id="emsf_525_comment" rows="3" placeholder="أضف تعليقا أو تواصلا يظهر لكل الأطراف…"></textarea>
             <div class="tkt-composer__bar">
                 <label class="sr-only" for="emsf_526_file">مرفق</label>
                 <input class="tkt-file" type="file" name="attachment" id="emsf_526_file" accept=".jpg,.jpeg,.png,.webp,.pdf">
-                <span class="tkt-composer__hint">صورةٌ أو PDF — حتى 8 م.ب</span>
+                <span class="tkt-composer__hint">صورة أو PDF — حتى 8 م.ب</span>
                 <button type="submit" class="btn-primary"><i class="fas fa-paper-plane" aria-hidden="true"></i> إضافة</button>
             </div>
         </form>
@@ -941,7 +941,7 @@ endif; ?>
                     <span class="tkt-meta__v"><?php echo htmlspecialchars(tkt_label($roles_map, intval($ticket['owner_role_id']))); ?></span></div>
                 <div class="tkt-meta__row"><span class="tkt-meta__k">فريق المعالجة</span>
                     <span class="tkt-meta__v"><?php echo $ticket['service_team'] === 'internal' ? 'داخلي' : ($ticket['service_team'] === 'external_workshop' ? 'ورشة خارجية' : '<span class="muted">غير محدد</span>'); ?></span></div>
-                <div class="tkt-meta__row"><span class="tkt-meta__k">المُبلِّغ</span>
+                <div class="tkt-meta__row"><span class="tkt-meta__k">المبلغ</span>
                     <span class="tkt-meta__v"><?php echo htmlspecialchars($ticket['reporting_person']);
                         echo $ticket['reporter_contact'] ? ' <span class="muted">· ' . htmlspecialchars($ticket['reporter_contact']) . '</span>' : ''; ?></span></div>
                 <div class="tkt-meta__row"><span class="tkt-meta__k">تاريخ البلاغ</span>

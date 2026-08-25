@@ -11,9 +11,9 @@ $FA_SCREEN = array(
     'file' => 'fin_ratio_detail.php',
     'title' => 'تفصيل نسبة مالية',
     'icon' => 'fas fa-magnifying-glass-chart',
-    'about' => 'التعمّقُ من النسبةِ إلى حساباتِها ثم قيودِها ثم وقائعِها المصدر — ورقمٌ لا يُتعمَّق فيه لا يُقرَّر عليه.',
+    'about' => 'التعمق من النسبة إلى حساباتها ثم قيودها ثم وقائعها المصدر — ورقم لا يتعمق فيه لا يقرر عليه.',
     'notes' => array (
-  0 => 'البسطُ والمقامُ أكوادُ شجرةٍ معلنةٌ لا صيغةٌ خفية',
+  0 => 'البسط والمقام أكواد شجرة معلنة لا صيغة خفية',
 ),
     'context' => array(),
     'filters' => '<label class="fa-field-label">النسبة <input type="text" name="ratio" value="" class="form-control form-control-sm" placeholder="FR-01" aria-label="رمز النسبة المالية المطلوب تفصيلها"></label>',
@@ -24,7 +24,7 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
 {
 ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
-    <?php echo ems_states_bundle('لا قياسَ لهذه النسبةِ في هذه الفترة', 'غيّر الفترةَ أو تحقق من احتسابِ النسبِ للفترة'); ?>
+    <?php echo ems_states_bundle('لا قياس لهذه النسبة في هذه الفترة', 'غير الفترة أو تحقق من احتساب النسب للفترة'); ?>
 <?php
     $code = isset($_GET['ratio']) ? preg_replace('/[^A-Z0-9\-]/', '', strtoupper($_GET['ratio'])) : 'FR-01';
     $st = $conn->prepare("SELECT * FROM fin_ratio_targets WHERE company_id = ? AND ratio_code = ?
@@ -33,7 +33,7 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
     $st->execute();
     $t = $st->get_result()->fetch_assoc();
     $st->close();
-    if (!$t) { ems_state_empty('لا نسبةَ بهذا الرمز — اختر من لوحة النسب'); return; }
+    if (!$t) { ems_state_empty('لا نسبة بهذا الرمز — اختر من لوحة النسب'); return; }
     $st = $conn->prepare("SELECT * FROM fin_ratio_values WHERE company_id = ? AND ratio_code = ?
                             AND period = ? AND scope_kind = 'company' ORDER BY id DESC LIMIT 1");
     $st->bind_param('iss', $company_id, $code, $period);
@@ -62,11 +62,11 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
             <tr><td>النتيجة</td><td><strong><?php echo $v && $v['result_value'] !== null ? ems_sensitive_display($conn, "fin_ratio_values.result_value", number_format((float)$v["result_value"],4), "ratio:" . htmlspecialchars($code), "تفصيل النسبة") : '— غير مقيسة'; ?></strong> <?php echo htmlspecialchars($t['unit_ar']); ?></td></tr>
             <tr><td>الحد والمالك</td><td><?php echo htmlspecialchars($t['limit_text'] . ' · ' . $t['owner_role']); ?></td></tr>
             <tr><td>الاتجاه عبر الفترات</td><td><?php echo htmlspecialchars($v['trend_direction'] ?? 'na'); ?></td></tr>
-            <tr><td>الأبعاد المطبَّقة</td><td>D1 الكيان · الفترة <?php echo htmlspecialchars($period); ?></td></tr>
+            <tr><td>الأبعاد المطبقة</td><td>D1 الكيان · الفترة <?php echo htmlspecialchars($period); ?></td></tr>
         </tbody></table>
     </div></div>
     <div class="card"><div class="card-body table-responsive">
-        <h6>الحسابات المكوِّنة — والقيودُ خلفها</h6>
+        <h6>الحسابات المكونة — والقيود خلفها</h6>
         <table class="table table-sm table-striped fa-table-full" data-no-dt="1">
             <thead><tr><th>الجهة</th><th>الكود</th><th>الحساب</th><th>القائمة</th><th>نشاط التدفق</th><th>الرصيد</th><th>عدد القيود</th></tr></thead>
             <tbody>

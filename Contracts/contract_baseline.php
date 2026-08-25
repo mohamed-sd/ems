@@ -108,8 +108,8 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     include('../includes/page_header.php');
     if (isset($_GET['msg'])) { echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>'; }
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا
-    echo ems_states_bundle('لا خطَّ أساسٍ مفتوحًا على العقدِ المختار',
-                           'اختر عقدًا من جدولِ العقودِ أعلاه ثمّ اضغط «افتح خطَّ الأساس»');
+    echo ems_states_bundle('لا خط أساس مفتوحا على العقد المختار',
+                           'اختر عقدا من جدول العقود أعلاه ثم اضغط «افتح خط الأساس»');
     ?>
 
     <style>
@@ -132,26 +132,26 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     <div class="card"><div class="card-body">
         <p class="bl-note">
             <i class="fas fa-circle-info"></i>
-            <strong>عند القفل تُقفل كلُّ المكوّنات — ومن هنا فقط تبدأ الفوترة</strong>.
-            و<strong>لا يُقفل خطُّ أساسٍ بفجوة</strong>: المكوّناتُ الستةُ تُعدّ وتُسمّى فجوتُها.
-            و<strong>لا يعتمد خطَّ الأساس من راجعه</strong> — يدان لا يدٌ واحدة.
+            <strong>عند القفل تقفل كل المكونات — ومن هنا فقط تبدأ الفوترة</strong>.
+            و<strong>لا يقفل خط أساس بفجوة</strong>: المكونات الستة تعد وتسمى فجوتها.
+            و<strong>لا يعتمد خط الأساس من راجعه</strong> — يدان لا يد واحدة.
             <br>
-            <strong>والبوابةُ تبدأ مطفأة</strong> (الملحق §2-②): القاعدةُ تسري على <strong>الجديد لا على القائم</strong>،
-            والعقودُ القائمةُ <strong>تُفوتر كما هي</strong> — <strong>ولا تُقلب على الجميع دفعةً واحدة</strong>.
+            <strong>والبوابة تبدأ مطفأة</strong> (الملحق §2-②): القاعدة تسري على <strong>الجديد لا على القائم</strong>،
+            والعقود القائمة <strong>تفوتر كما هي</strong> — <strong>ولا تقلب على الجميع دفعة واحدة</strong>.
         </p>
         <div class="bl-modes">
             <span class="bl-badge-pad badge <?php echo $MODE === 'enforce' ? 'badge-warning'
                 : ($MODE === 'monitor' ? 'badge-info' : 'badge-secondary'); ?>">
-                وضعُ البوابة: <strong><?php echo htmlspecialchars($MODE); ?></strong></span>
+                وضع البوابة: <strong><?php echo htmlspecialchars($MODE); ?></strong></span>
             <span class="badge badge-secondary bl-badge-pad">
-                العقودُ الرائدة: <?php echo $PILOT ? htmlspecialchars(implode(' · ', $PILOT)) : '<strong>لا شيء</strong>'; ?></span>
+                العقود الرائدة: <?php echo $PILOT ? htmlspecialchars(implode(' · ', $PILOT)) : '<strong>لا شيء</strong>'; ?></span>
         </div>
     </div></div>
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-file-contract"></i> العقود</h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap no-datatable bl-table" data-no-dt="1">
-            <thead><tr><th>#</th><th>العميل</th><th>المدة</th><th>حالُ العقد</th><th></th></tr></thead>
+            <thead><tr><th>#</th><th>العميل</th><th>المدة</th><th>حال العقد</th><th></th></tr></thead>
             <tbody>
             <?php foreach ($contracts as $c): ?>
                 <tr><td>#<?php echo intval($c['id']); ?></td>
@@ -159,7 +159,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     <td><?php echo htmlspecialchars((string)$c['actual_start'] . ' → ' . (string)$c['actual_end']); ?></td>
                     <td><?php echo htmlspecialchars((string)$c['contract_status']); ?></td>
                     <td><a class="action-btn" href="?contract=<?php echo intval($c['id']); ?>">
-                        <i class="fa fa-lock"></i> خطُّ الأساس</a></td></tr>
+                        <i class="fa fa-lock"></i> خط الأساس</a></td></tr>
             <?php endforeach; ?>
             </tbody>
         </table>
@@ -167,15 +167,15 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
 
     <?php if ($CID > 0): ?>
     <div class="card"><div class="card-header"><h5><i class="fa fa-list-check"></i>
-        المكوّناتُ الستة — للعقد #<?php echo $CID; ?></h5></div>
+        المكونات الستة — للعقد #<?php echo $CID; ?></h5></div>
     <div class="card-body">
         <div class="bl-chips">
             <span class="bl-badge-pad badge <?php echo $cur ? 'badge-info' : 'badge-warning'; ?>">
-                خطُّ الأساس: <strong><?php echo $cur
+                خط الأساس: <strong><?php echo $cur
                     ? htmlspecialchars($STATE_AR[(string)$cur['state']]) . ' · نسخة ' . intval($cur['version'])
-                    : 'غيرُ مفتوح'; ?></strong></span>
+                    : 'غير مفتوح'; ?></strong></span>
             <span class="bl-badge-pad badge <?php echo $rd['ok'] ? 'badge-success' : 'badge-warning'; ?>">
-                <?php echo $rd['ok'] ? 'المكوّناتُ مكتملة' : (count($rd['gaps']) . ' فجوة'); ?></span>
+                <?php echo $rd['ok'] ? 'المكونات مكتملة' : (count($rd['gaps']) . ' فجوة'); ?></span>
             <?php if ($gt !== null): ?>
                 <span class="bl-badge-pad badge <?php echo $gt['allow'] ? 'badge-success' : 'badge-warning'; ?>"
                     >الفوترة:
@@ -189,7 +189,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
 
         <div class="table-container">
         <table class="alltables display nowrap no-datatable bl-table" data-no-dt="1">
-            <thead><tr><th>المكوّن</th><th>الحال</th><th>العدّ</th></tr></thead>
+            <thead><tr><th>المكون</th><th>الحال</th><th>العد</th></tr></thead>
             <tbody>
             <?php
             $countMap = array('lines' => 'lines', 'monthly_plan' => 'plan_months',
@@ -220,7 +220,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <form method="post">
         <?php echo csrf_field(); ?><input type="hidden" name="bl_action" value="open">
                 <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
-                <button type="submit" class="btn-primary"><i class="fa fa-folder-open"></i> افتح خطَّ الأساس</button>
+                <button type="submit" class="btn-primary"><i class="fa fa-folder-open"></i> افتح خط الأساس</button>
             </form>
             <?php else: ?>
             <form method="post" class="bl-form-inline">
@@ -240,12 +240,12 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         <?php echo csrf_field(); ?>
                 <input type="hidden" name="bl_action" value="amend">
                 <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
-                <div class="form-group"><label for="emsf_50_55026">سببُ الملحق <span class="bl-req">*</span></label>
+                <div class="form-group"><label for="emsf_50_55026">سبب الملحق <span class="bl-req">*</span></label>
                     <input type="text" name="note" maxlength="255" required class="bl-w220" id="emsf_50_55026"></div>
-                <div class="form-group"><label for="emsf_51_164a9">رقمُ الملحق</label>
+                <div class="form-group"><label for="emsf_51_164a9">رقم الملحق</label>
                     <input type="number" name="amendment_id" class="bl-w110" id="emsf_51_164a9"></div>
                 <button type="submit" class="btn-primary"><i class="fa fa-code-branch"></i>
-                    ملحقٌ — <strong>نسخةٌ جديدةٌ والقديمةُ تبقى</strong></button>
+                    ملحق — <strong>نسخة جديدة والقديمة تبقى</strong></button>
             </form>
             <?php endif; ?>
         </div>
@@ -254,16 +254,16 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
 
     <?php if ($vers): ?>
     <div class="card"><div class="card-header"><h5><i class="fa fa-clock-rotate-left"></i>
-        النسخُ — <strong>والمُستبدَلةُ تبقى</strong></h5></div>
+        النسخ — <strong>والمستبدلة تبقى</strong></h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap no-datatable bl-table" data-no-dt="1">
             <thead><tr><th>النسخة</th><th>الحال</th><th>راجع</th><th>اعتمد</th><th>أقفل</th>
-                <th>البصمة</th><th>المكوّنات وقتَ القفل</th><th>السبب</th>
+                <th>البصمة</th><th>المكونات وقت القفل</th><th>السبب</th>
                 <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                 <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                 <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                 <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>

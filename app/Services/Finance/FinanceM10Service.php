@@ -53,7 +53,7 @@ class FinanceM10Service
             'fin_cycle_time_metrics'    => 'metric_code',
         );
         if (!isset($allowed[$table]) || $allowed[$table] !== $column) {
-            throw new \RuntimeException('FIN-500: جدولٌ أو عمودٌ خارجَ قائمةِ الترقيم');
+            throw new \RuntimeException('FIN-500: جدول أو عمود خارج قائمة الترقيم');
         }
         $len = strlen($prefix) + 2; // البادئة + الشرطة
         $sql = "SELECT COALESCE(MAX(CAST(SUBSTRING(`$column`, $len) AS UNSIGNED)), 0) + 1 nx FROM `$table` WHERE company_id = ?";
@@ -78,7 +78,7 @@ class FinanceM10Service
         $st->execute();
         $unit = $st->get_result()->fetch_assoc();
         $st->close();
-        if (!$unit) { throw new \RuntimeException('FIN-404: الواقعةُ غيرُ موجودةٍ في نطاقك'); }
+        if (!$unit) { throw new \RuntimeException('FIN-404: الواقعة غير موجودة في نطاقك'); }
 
         // ① اكتمالُ سلسلة الاعتماد — الحلقاتُ شهدت والاعتمادُ النهائيُّ وقع
         $chainOk = ($unit['match_state'] === 'approved' && (float) ($unit['approved_qty'] ?? 0) > 0) ? 1 : 0;
@@ -179,11 +179,11 @@ class FinanceM10Service
         if ($unit['client_unit_price'] !== null) {
             $impact = round((float) ($unit['approved_qty'] ?? 0) * (float) $unit['client_unit_price'], 2);
         }
-        $clientRuling = $unit['client_unit_price'] !== null ? 'يُفوتر' : 'لا سعرَ عميلٍ — يُتخطى معلَنًا';
+        $clientRuling = $unit['client_unit_price'] !== null ? 'يفوتر' : 'لا سعر عميل — يتخطى معلنا';
         $supplierRuling = !empty($unit['supplier_entity_id'])
-            ? ($unit['supplier_unit_price'] !== null ? 'يستحق' : 'لا سعرَ موردٍ — يُتخطى معلَنًا')
-            : 'معدةٌ مملوكة — لا مورد';
-        $operatorRuling = 'من مصدر التكليف إن وُجد';
+            ? ($unit['supplier_unit_price'] !== null ? 'يستحق' : 'لا سعر مورد — يتخطى معلنا')
+            : 'معدة مملوكة — لا مورد';
+        $operatorRuling = 'من مصدر التكليف إن وجد';
 
         $factId = null;
         if ($chk['result'] === 'pass') {
@@ -263,18 +263,18 @@ class FinanceM10Service
         // المروحةُ القائمة — الآثارُ الثلاثةُ بأحكامها والمتخطَّى بسببه
         $fan = EffectFanout::forUnitRecord($db, $gate, $unit, (int) $actor);
 
-        $rulings = array('client' => 'تُخُطي', 'supplier' => 'تُخُطي', 'operator' => 'تُخُطي');
+        $rulings = array('client' => 'تخطي', 'supplier' => 'تخطي', 'operator' => 'تخطي');
         $amounts = array('client' => null, 'supplier' => null, 'operator' => null);
         foreach (array_merge($fan['effects'], $fan['adopted']) as $eff) {
             $t = (string) ($eff['effect'] ?? $eff['effect_type'] ?? '');
             $amt = isset($eff['amount']) ? (float) $eff['amount'] : null;
-            if (strpos($t, 'revenue') !== false) { $rulings['client'] = 'وُلّد الإيراد'; $amounts['client'] = $amt; }
-            if (strpos($t, 'supplier') !== false) { $rulings['supplier'] = 'وُلّد الاستحقاق'; $amounts['supplier'] = $amt; }
-            if (strpos($t, 'operator') !== false || strpos($t, 'pay') !== false) { $rulings['operator'] = 'وُلّد الأجر'; $amounts['operator'] = $amt; }
+            if (strpos($t, 'revenue') !== false) { $rulings['client'] = 'ولد الإيراد'; $amounts['client'] = $amt; }
+            if (strpos($t, 'supplier') !== false) { $rulings['supplier'] = 'ولد الاستحقاق'; $amounts['supplier'] = $amt; }
+            if (strpos($t, 'operator') !== false || strpos($t, 'pay') !== false) { $rulings['operator'] = 'ولد الأجر'; $amounts['operator'] = $amt; }
         }
         foreach ($fan['skipped'] as $sk) {
             $t = (string) ($sk['effect'] ?? '');
-            $reason = 'تُخُطي: ' . (string) ($sk['reason'] ?? '');
+            $reason = 'تخطي: ' . (string) ($sk['reason'] ?? '');
             if (strpos($t, 'revenue') !== false) { $rulings['client'] = $reason; }
             if (strpos($t, 'supplier') !== false) { $rulings['supplier'] = $reason; }
             if (strpos($t, 'operator') !== false || strpos($t, 'pay') !== false) { $rulings['operator'] = $reason; }
@@ -303,7 +303,7 @@ class FinanceM10Service
              idempotency_key, ruleset_version)
             VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
         $cur = 'SDG';
-        $authorityRef = 'دورُ المديرِ المالي — سلطةُ توليدِ الاستحقاق (M-10 §7-1)';
+        $authorityRef = 'دور المدير المالي — سلطة توليد الاستحقاق (M-10 §7-1)';
         $ruleset = 'M-10@update0012';
         $st->bind_param('issiisdsdsdssisissss',
             $companyId, $code, $period, $gateRes['checks']['contract_id'], $unitId,
@@ -346,8 +346,8 @@ class FinanceM10Service
     public static function budgetCommit(\mysqli $db, $companyId, $budgetId, $lineId, $sourceKind, $sourceRef, $amount, $actor)
     {
         $amount = round((float) $amount, 2);
-        if ($amount <= 0) { throw new \RuntimeException('FIN-422: مبلغُ الالتزامِ موجبٌ إلزامًا'); }
-        if (trim((string) $sourceRef) === '') { throw new \RuntimeException('FIN-422: مرجعُ المصدرِ إلزاميّ'); }
+        if ($amount <= 0) { throw new \RuntimeException('FIN-422: مبلغ الالتزام موجب إلزاما'); }
+        if (trim((string) $sourceRef) === '') { throw new \RuntimeException('FIN-422: مرجع المصدر إلزامي'); }
 
         $idem = 'commit:' . $sourceKind . ':' . $sourceRef;
         $st = $db->prepare("SELECT id, commit_code, state FROM fin_budget_commitments
@@ -372,8 +372,8 @@ class FinanceM10Service
         $committed = $r ? (float) $r->fetch_assoc()['c'] : 0.0;
         $available = (float) $row['planned'] - (float) $row['actual'] - $committed;
         if ($amount > $available + 0.005) {
-            throw new \RuntimeException('FIN-BUDGET-EXCEEDED: المتاحُ ' . number_format($available, 2)
-                . ' والمطلوبُ ' . number_format($amount, 2) . ' — يُوقف الطلبُ حتى اعتمادِ تعديلِ الموازنة');
+            throw new \RuntimeException('FIN-BUDGET-EXCEEDED: المتاح ' . number_format($available, 2)
+                . ' والمطلوب ' . number_format($amount, 2) . ' — يوقف الطلب حتى اعتماد تعديل الموازنة');
         }
 
         $code = self::nextCode($db, $companyId, 'fin_budget_commitments', 'commit_code', 'CMB');
@@ -396,7 +396,7 @@ class FinanceM10Service
             'idempotency_key' => 'evt:' . $idem, 'amount' => $amount, 'currency' => 'SDG',
             'source_ref' => $code,
             'payload' => array('event_name' => 'BudgetCommitted',
-                'consumers' => array('الإدارةُ المعنية', 'المالية'),
+                'consumers' => array('الإدارة المعنية', 'المالية'),
                 'available_before' => $available, 'available_after' => $available - $amount),
         ));
         return array('idempotent' => false, 'id' => $id, 'commit_code' => $code,
@@ -406,7 +406,7 @@ class FinanceM10Service
     /** العكس: تحريرُ الالتزام عند الإلغاء — بسببٍ مكتوبٍ لا حذفًا. */
     public static function budgetRelease(\mysqli $db, $companyId, $commitId, $reason, $actor)
     {
-        if (trim((string) $reason) === '') { throw new \RuntimeException('FIN-422: سببُ التحريرِ إلزاميّ'); }
+        if (trim((string) $reason) === '') { throw new \RuntimeException('FIN-422: سبب التحرير إلزامي'); }
         $st = $db->prepare("UPDATE fin_budget_commitments
                                SET state = 'released', released_reason = ?, released_at = NOW()
                              WHERE id = ? AND company_id = ? AND state = 'committed'");
@@ -414,7 +414,7 @@ class FinanceM10Service
         $st->execute();
         $ok = $db->affected_rows > 0;
         $st->close();
-        if (!$ok) { throw new \RuntimeException('FIN-409: الالتزامُ غيرُ قائمٍ أو حُرّر سلفًا'); }
+        if (!$ok) { throw new \RuntimeException('FIN-409: الالتزام غير قائم أو حرر سلفا'); }
         return array('ok' => true);
     }
 
@@ -428,13 +428,13 @@ class FinanceM10Service
         $st->execute();
         $b = $st->get_result()->fetch_assoc();
         $st->close();
-        if (!$b) { throw new \RuntimeException('FIN-404: الموازنةُ غيرُ موجودة'); }
+        if (!$b) { throw new \RuntimeException('FIN-404: الموازنة غير موجودة'); }
         if (!in_array($b['state'], array('submitted', 'draft'), true)) {
-            throw new \RuntimeException('FIN-409: حالةُ الموازنةِ «' . $b['state'] . '» لا تقبل الاعتماد — الانتقالُ غيرُ المعرَّفِ يُرفض');
+            throw new \RuntimeException('FIN-409: حالة الموازنة «' . $b['state'] . '» لا تقبل الاعتماد — الانتقال غير المعرف يرفض');
         }
         // فصلُ الواجبات: من أنشأ أو رفع لا يعتمد (§9-3)
         if ((int) $b['created_by'] === (int) $actor || (int) ($b['submitted_by'] ?? 0) === (int) $actor) {
-            throw new \RuntimeException('FIN-SOD-403: من أنشأ المستندَ لا يعتمده — القيدُ بنيويّ');
+            throw new \RuntimeException('FIN-SOD-403: من أنشأ المستند لا يعتمده — القيد بنيوي');
         }
         $st = $db->prepare("UPDATE fin_budgets SET state = 'approved', approved_by = ?, approved_at = NOW()
                              WHERE id = ? AND company_id = ?");
@@ -449,7 +449,7 @@ class FinanceM10Service
             'occurred_at' => gmdate('Y-m-d H:i:s'), 'created_by' => (int) $actor ?: 1,
             'idempotency_key' => 'budget:approve:' . (int) $budgetId,
             'source_ref' => 'BUD-' . (int) $budgetId,
-            'payload' => array('event_name' => 'BudgetApproved', 'consumers' => array('كلُّ الإدارات'),
+            'payload' => array('event_name' => 'BudgetApproved', 'consumers' => array('كل الإدارات'),
                 'capacity' => (string) $capacity, 'authority_ref' => (string) $authorityRef),
         ));
         return array('ok' => true, 'budget_id' => (int) $budgetId);
@@ -460,7 +460,7 @@ class FinanceM10Service
     public static function budgetChangeRequest(\mysqli $db, $companyId, $budgetId, $lineId, $deptModule, $currentAmount, $requestedAmount, $impactNote, $actor)
     {
         if (trim((string) $impactNote) === '') {
-            throw new \RuntimeException('FIN-422: بيانُ الأثرِ إلزاميٌّ — لا يُعدَّل السقفُ قبل الاعتماد');
+            throw new \RuntimeException('FIN-422: بيان الأثر إلزامي — لا يعدل السقف قبل الاعتماد');
         }
         $code = self::nextCode($db, $companyId, 'fin_budget_change_requests', 'req_code', 'BCR');
         $st = $db->prepare("INSERT INTO fin_budget_change_requests
@@ -498,7 +498,7 @@ class FinanceM10Service
         $st->execute();
         $ok = $db->affected_rows > 0;
         $st->close();
-        if (!$ok) { throw new \RuntimeException('FIN-409: لا طلبَ قائمًا لك بهذا الرقم'); }
+        if (!$ok) { throw new \RuntimeException('FIN-409: لا طلب قائما لك بهذا الرقم'); }
         return array('ok' => true);
     }
 
@@ -507,7 +507,7 @@ class FinanceM10Service
     public static function issueClientStatement(\mysqli $db, $gate, $companyId, $clientId, $from, $to, $actor, $capacity)
     {
         $clientId = (int) $clientId;
-        if ($clientId <= 0) { throw new \RuntimeException('FIN-422: العميلُ إلزاميّ'); }
+        if ($clientId <= 0) { throw new \RuntimeException('FIN-422: العميل إلزامي'); }
         $built = ClientStatementService::build($gate, $clientId, $from, $to);
 
         // النسخة: الإصدارُ الجديدُ للفترة نفسِها يَنسخ السابقَ ويشير إليه (§8-3)
@@ -536,7 +536,7 @@ class FinanceM10Service
         $collections = (float) $t['collections'];
         $advance = (float) $t['advance'];
         $retention = (float) $t['retention'];
-        $authorityRef = 'سلطةُ إصدار الكشف — المالية (M-10 §7-1) · ' . (string) $capacity;
+        $authorityRef = 'سلطة إصدار الكشف — المالية (M-10 §7-1) · ' . (string) $capacity;
         $parentRef = 'CLIENT-' . $clientId;
         $supersedes = $prev ? (int) $prev['id'] : null;
 
@@ -581,7 +581,7 @@ class FinanceM10Service
     public static function computeMargin(\mysqli $db, $companyId, $period, $contractId, $actor)
     {
         if (!preg_match('/^\d{4}-\d{2}$/', (string) $period)) {
-            throw new \RuntimeException('FIN-422: الفترةُ YYYY-MM إلزامًا');
+            throw new \RuntimeException('FIN-422: الفترة YYYY-MM إلزاما');
         }
         $contractId = $contractId ? (int) $contractId : null;
 
@@ -608,7 +608,7 @@ class FinanceM10Service
                AND DATE_FORMAT(ur.record_date, '%Y-%m') = '" . $db->real_escape_string($period) . "'"
              . $scopeUnit;
         $r = $db->query($q);
-        if ($r === false) { throw new \RuntimeException('FIN-500: تعذّر حسابُ المصادر — ' . $db->error); }
+        if ($r === false) { throw new \RuntimeException('FIN-500: تعذر حساب المصادر — ' . $db->error); }
         $agg = $r->fetch_assoc();
         $revenue = round((float) $agg['rev'], 2);
         $costOperators = round((float) $agg['op'], 2);
@@ -676,7 +676,7 @@ class FinanceM10Service
     public static function measureCycleTime(\mysqli $db, $companyId, $period, $actor)
     {
         if (!preg_match('/^\d{4}-\d{2}$/', (string) $period)) {
-            throw new \RuntimeException('FIN-422: الفترةُ YYYY-MM إلزامًا');
+            throw new \RuntimeException('FIN-422: الفترة YYYY-MM إلزاما');
         }
         // من دفتر أحداث الطلبات المالية: أزمانُ الحلقات من الطوابع المتتالية
         $q = "SELECT r.request_type rt,

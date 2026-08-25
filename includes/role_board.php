@@ -149,38 +149,38 @@ function roleBoardAlertSpecs($roleId)
     $specs = array(
         // §8.11 · المدير المالي
         17 => array(
-            array('key' => 'liquidity', 'label' => 'سيولةٌ دون الحد',            'href' => '../Finance/cash_forecast_fin.php',  'tone' => 'err'),
-            array('key' => 'aged_dues', 'label' => 'ذممٌ تجاوزت أعمارها',        'href' => '../Finance/dues_fin.php',           'tone' => 'err'),
-            array('key' => 'req_sla',   'label' => 'طلباتٌ فوق مهلة الاعتماد',   'href' => '../FinRequests/finance_gateway.php','tone' => 'warn'),
-            array('key' => 'variance',  'label' => 'انحرافُ ميزانيةٍ فوق النسبة', 'href' => '../Finance/budget_form_fin.php',    'tone' => 'warn'),
+            array('key' => 'liquidity', 'label' => 'سيولة دون الحد',            'href' => '../Finance/cash_forecast_fin.php',  'tone' => 'err'),
+            array('key' => 'aged_dues', 'label' => 'ذمم تجاوزت أعمارها',        'href' => '../Finance/dues_fin.php',           'tone' => 'err'),
+            array('key' => 'req_sla',   'label' => 'طلبات فوق مهلة الاعتماد',   'href' => '../FinRequests/finance_gateway.php','tone' => 'warn'),
+            array('key' => 'variance',  'label' => 'انحراف ميزانية فوق النسبة', 'href' => '../Finance/budget_form_fin.php',    'tone' => 'warn'),
         ),
         // §8.8 · ادارة الصيانة — التنبيه الرابع في النص («قطعةٌ منتظرةٌ توقف
         // أمرًا») بلا مصدرِ بياناتٍ اليوم: لا حالةَ wait_parts في آلة الأمر
         // والقطعُ نصٌّ حرٌّ (قرار DEC-10) — لا يُعرض حتى يُبنى مصدرُه
         // (تدقيق الصيانة، المستوى الأول #6). قاعدةُ عدم التلفيق نافذة.
         13 => array(
-            array('key' => 'critical_down', 'label' => 'معدةٌ حرجةٌ متوقفة',        'href' => '../Maintenance/orders.php',           'tone' => 'err'),
-            array('key' => 'order_overdue', 'label' => 'أمرٌ مفتوحٌ فوق مدته',      'href' => '../Maintenance/orders.php',           'tone' => 'warn'),
-            array('key' => 'pm_late',       'label' => 'وقائيةٌ متأخرة',            'href' => '../Maintenance/preventive_plans.php', 'tone' => 'warn'),
+            array('key' => 'critical_down', 'label' => 'معدة حرجة متوقفة',        'href' => '../Maintenance/orders.php',           'tone' => 'err'),
+            array('key' => 'order_overdue', 'label' => 'أمر مفتوح فوق مدته',      'href' => '../Maintenance/orders.php',           'tone' => 'warn'),
+            array('key' => 'pm_late',       'label' => 'وقائية متأخرة',            'href' => '../Maintenance/preventive_plans.php', 'tone' => 'warn'),
         ),
         // §8.10 · مسؤول المشتريات — الأربعة نصًّا
         16 => array(
-            array('key' => 'reorder_hit',   'label' => 'صنفٌ بلغ حدَّ الطلب',          'href' => '../Procurement/reordering_proc.php',      'tone' => 'err'),
-            array('key' => 'po_late',       'label' => 'أمرُ شراءٍ متأخرُ التوريد',    'href' => '../Procurement/orders_proc.php',          'tone' => 'warn'),
-            array('key' => 'custody_over',  'label' => 'استلامٌ مؤقتٌ تجاوز مهلته',    'href' => '../Procurement/receipt_custody_proc.php', 'tone' => 'warn'),
-            array('key' => 'issue_waiting', 'label' => 'طلبُ صرفٍ ينتظر',              'href' => '../Procurement/issue_proc.php',           'tone' => 'warn'),
+            array('key' => 'reorder_hit',   'label' => 'صنف بلغ حد الطلب',          'href' => '../Procurement/reordering_proc.php',      'tone' => 'err'),
+            array('key' => 'po_late',       'label' => 'أمر شراء متأخر التوريد',    'href' => '../Procurement/orders_proc.php',          'tone' => 'warn'),
+            array('key' => 'custody_over',  'label' => 'استلام مؤقت تجاوز مهلته',    'href' => '../Procurement/receipt_custody_proc.php', 'tone' => 'warn'),
+            array('key' => 'issue_waiting', 'label' => 'طلب صرف ينتظر',              'href' => '../Procurement/issue_proc.php',           'tone' => 'warn'),
         ),
         // §8.12 · مدير النقل والترحيل — الثلاثة نصًّا
         23 => array(
-            array('key' => 'trip_late',     'label' => 'رحلةٌ متأخرةٌ عن موعدها',      'href' => '../Transport/transfer_orders_list.php', 'tone' => 'err'),
-            array('key' => 'req_waiting',   'label' => 'طلبُ ترحيلٍ ينتظر اعتمادك',    'href' => '../Transport/transfer_requests.php',    'tone' => 'warn'),
-            array('key' => 'undocumented',  'label' => 'تسليمٌ بلا توثيق',             'href' => '../Transport/transfer_orders_list.php', 'tone' => 'warn'),
+            array('key' => 'trip_late',     'label' => 'رحلة متأخرة عن موعدها',      'href' => '../Transport/transfer_orders_list.php', 'tone' => 'err'),
+            array('key' => 'req_waiting',   'label' => 'طلب ترحيل ينتظر اعتمادك',    'href' => '../Transport/transfer_requests.php',    'tone' => 'warn'),
+            array('key' => 'undocumented',  'label' => 'تسليم بلا توثيق',             'href' => '../Transport/transfer_orders_list.php', 'tone' => 'warn'),
         ),
         // §8.13 · إدارة البلاغات — الثلاثة نصًّا
         24 => array(
-            array('key' => 'critical_unassigned', 'label' => 'بلاغٌ حرجٌ بلا مستلِم',   'href' => '../Tickets/tickets_list.php', 'tone' => 'err'),
-            array('key' => 'sla_broken',          'label' => 'بلاغٌ كسر مهلته',          'href' => '../Tickets/tickets_list.php', 'tone' => 'err'),
-            array('key' => 'repeat_late_dept',    'label' => 'إدارةٌ تكرر التأخر',       'href' => '../Tickets/ticket_dashboard.php', 'tone' => 'warn'),
+            array('key' => 'critical_unassigned', 'label' => 'بلاغ حرج بلا مستلم',   'href' => '../Tickets/tickets_list.php', 'tone' => 'err'),
+            array('key' => 'sla_broken',          'label' => 'بلاغ كسر مهلته',          'href' => '../Tickets/tickets_list.php', 'tone' => 'err'),
+            array('key' => 'repeat_late_dept',    'label' => 'إدارة تكرر التأخر',       'href' => '../Tickets/ticket_dashboard.php', 'tone' => 'warn'),
         ),
         // §8.7 · ادارة المبيعات — **الأربعةُ كاملةً منذ 2026-07-29**.
         // كان هنا تعليقٌ يقول إن «مطالبةً معلَّقة» و«وحداتٍ جاهزةً للفوترة» بلا
@@ -189,55 +189,55 @@ function roleBoardAlertSpecs($roleId)
         // الاتجاهين — لا رقمَ بلا مصدر، ولا إعلانَ عدمِ مصدرٍ ومصدرُه قائم.
         // والتعريفان يُقرآن من `claim_helpers` نفسِها التي تقرأ منها الشاشة.
         12 => array(
-            array('key' => 'unbilled_units',  'label' => 'وحداتٌ جاهزةٌ للفوترة لم تُفوتر', 'href' => '../Contracts/claims.php?unbilled=1', 'tone' => 'err'),
-            array('key' => 'claim_pending',   'label' => 'مطالبةٌ معلَّقة',                 'href' => '../Contracts/claims.php?pending=1',  'tone' => 'warn'),
-            array('key' => 'contract_ending', 'label' => 'عقدٌ ينتهي خلال 30 يومًا',     'href' => '../Contracts/contracts.php',   'tone' => 'warn'),
-            array('key' => 'quote_stale',     'label' => 'عرضٌ بلا ردٍّ فوق أسبوع',      'href' => '../Clients/quotations.php',    'tone' => 'warn'),
+            array('key' => 'unbilled_units',  'label' => 'وحدات جاهزة للفوترة لم تفوتر', 'href' => '../Contracts/claims.php?unbilled=1', 'tone' => 'err'),
+            array('key' => 'claim_pending',   'label' => 'مطالبة معلقة',                 'href' => '../Contracts/claims.php?pending=1',  'tone' => 'warn'),
+            array('key' => 'contract_ending', 'label' => 'عقد ينتهي خلال 30 يوما',     'href' => '../Contracts/contracts.php',   'tone' => 'warn'),
+            array('key' => 'quote_stale',     'label' => 'عرض بلا رد فوق أسبوع',      'href' => '../Clients/quotations.php',    'tone' => 'warn'),
         ),
         // §8.2 · ادارة الموردين — «توقفٌ محسوبٌ على المورد يحتاج حسمًا» بلا
         // حقلِ مسؤوليةٍ للتوقف في الدوام بعد (ينتظر سجل الزمن الموحّد UX-03)
         2 => array(
-            array('key' => 'units_pending_sup', 'label' => 'وحداتٌ تنتظر اعتماد المورد', 'href' => '../Approvals/hours_approval.php',      'tone' => 'warn'),
-            array('key' => 'sup_contract_end',  'label' => 'عقدُ موردٍ ينتهي قريبًا',    'href' => '../Suppliers/supplierscontracts.php',  'tone' => 'warn'),
+            array('key' => 'units_pending_sup', 'label' => 'وحدات تنتظر اعتماد المورد', 'href' => '../Approvals/hours_approval.php',      'tone' => 'warn'),
+            array('key' => 'sup_contract_end',  'label' => 'عقد مورد ينتهي قريبا',    'href' => '../Suppliers/supplierscontracts.php',  'tone' => 'warn'),
         ),
         // §8.3 · ادارة الاسطول — «فوق حدّها» بلا حدٍّ معرَّفٍ بعد → «متوقفةٌ الآن»
         3 => array(
-            array('key' => 'eq_stopped',   'label' => 'معدةٌ متوقفةٌ (تحت الصيانة)',   'href' => '../Equipments/equipments_fleet.php', 'tone' => 'err'),
-            array('key' => 'meter_stale',  'label' => 'عدّادٌ لم يُحدَّث (30 يومًا)',   'href' => '../Equipments/equipments_fleet.php', 'tone' => 'warn'),
-            array('key' => 'doc_expiring', 'label' => 'وثيقةُ معدةٍ تنتهي (30 يومًا)',  'href' => '../Equipments/equipments_fleet.php', 'tone' => 'warn'),
+            array('key' => 'eq_stopped',   'label' => 'معدة متوقفة (تحت الصيانة)',   'href' => '../Equipments/equipments_fleet.php', 'tone' => 'err'),
+            array('key' => 'meter_stale',  'label' => 'عداد لم يحدث (30 يوما)',   'href' => '../Equipments/equipments_fleet.php', 'tone' => 'warn'),
+            array('key' => 'doc_expiring', 'label' => 'وثيقة معدة تنتهي (30 يوما)',  'href' => '../Equipments/equipments_fleet.php', 'tone' => 'warn'),
         ),
         // §8.4 · ادارة الموارد البشرية — الأربعة نصًّا
         4 => array(
-            array('key' => 'absence_noperm', 'label' => 'غيابٌ بلا إذن',                'href' => '../Workforce/worker_leave_absence.php', 'tone' => 'err'),
-            array('key' => 'units_unapproved','label' => 'وحداتُ عاملٍ غير معتمدة',     'href' => '../Approvals/hours_approval.php',       'tone' => 'warn'),
-            array('key' => 'wcontract_end',  'label' => 'عقدُ عاملٍ ينتهي قريبًا',      'href' => '../Workforce/worker_contract.php',      'tone' => 'warn'),
-            array('key' => 'settle_waiting', 'label' => 'تسويةٌ تنتظر الاعتماد',        'href' => '../Workforce/worker_settlement.php',    'tone' => 'warn'),
+            array('key' => 'absence_noperm', 'label' => 'غياب بلا إذن',                'href' => '../Workforce/worker_leave_absence.php', 'tone' => 'err'),
+            array('key' => 'units_unapproved','label' => 'وحدات عامل غير معتمدة',     'href' => '../Approvals/hours_approval.php',       'tone' => 'warn'),
+            array('key' => 'wcontract_end',  'label' => 'عقد عامل ينتهي قريبا',      'href' => '../Workforce/worker_contract.php',      'tone' => 'warn'),
+            array('key' => 'settle_waiting', 'label' => 'تسوية تنتظر الاعتماد',        'href' => '../Workforce/worker_settlement.php',    'tone' => 'warn'),
         ),
         // §8.5 · مدير الموقع — الثلاثة نصًّا (تجاوزُ الطاقة من حارس D02 الحي)
         5 => array(
-            array('key' => 'ts_today_missing', 'label' => 'تايم شيت اليوم لم يُرسل',    'href' => '../Timesheet/timesheet_type.php',   'tone' => 'err'),
-            array('key' => 'units_await_me',   'label' => 'وحداتٌ تنتظر اعتمادك',       'href' => '../Approvals/hours_approval.php',   'tone' => 'warn'),
-            array('key' => 'capacity_flag',    'label' => 'تجاوزُ طاقةٍ يحتاج سببًا',   'href' => '../Timesheet/timesheet_type.php',   'tone' => 'err'),
+            array('key' => 'ts_today_missing', 'label' => 'تايم شيت اليوم لم يرسل',    'href' => '../Timesheet/timesheet_type.php',   'tone' => 'err'),
+            array('key' => 'units_await_me',   'label' => 'وحدات تنتظر اعتمادك',       'href' => '../Approvals/hours_approval.php',   'tone' => 'warn'),
+            array('key' => 'capacity_flag',    'label' => 'تجاوز طاقة يحتاج سببا',   'href' => '../Timesheet/timesheet_type.php',   'tone' => 'err'),
         ),
         // §8.6 · مدير حركة وتشغيل — الثلاثة نصًّا
         6 => array(
-            array('key' => 'eq_no_operator', 'label' => 'معدةٌ عاملةٌ بلا مشغّل',           'href' => '../Oprators/select_project.php',    'tone' => 'err'),
-            array('key' => 'assign_conflict','label' => 'تعارضُ توزيعٍ (مشغّلان لمعدة)',    'href' => '../Oprators/select_project.php',    'tone' => 'err'),
-            array('key' => 'move_waiting',   'label' => 'طلبُ تنقّلٍ ينتظر',                'href' => '../Workforce/worker_movement.php',  'tone' => 'warn'),
+            array('key' => 'eq_no_operator', 'label' => 'معدة عاملة بلا مشغل',           'href' => '../Oprators/select_project.php',    'tone' => 'err'),
+            array('key' => 'assign_conflict','label' => 'تعارض توزيع (مشغلان لمعدة)',    'href' => '../Oprators/select_project.php',    'tone' => 'err'),
+            array('key' => 'move_waiting',   'label' => 'طلب تنقل ينتظر',                'href' => '../Workforce/worker_movement.php',  'tone' => 'warn'),
         ),
         // §8.1 · ادارة التشغيل (UX-03 §1 و§6) — ثلاثةٌ من أربعة: «انحرافُ
         // التزامٍ فوق الحد» بلا محركِ التزامٍ بعد (contract_commitments تصريحيةٌ
         // بلا قياس منفَّذ — محرّكُها تبويبُ غرفة العمليات ④ القادم) فلا يُعرض.
         1 => array(
-            array('key' => 'units_since_yday', 'label' => 'وحداتٌ غير معتمدةٍ منذ أمس',   'href' => '../Approvals/hours_approval.php',  'tone' => 'err'),
-            array('key' => 'site_no_ts',       'label' => 'موقعٌ لم يرفع تايم شيته اليوم', 'href' => '../Timesheet/timesheet_type.php', 'tone' => 'warn'),
-            array('key' => 'eq_down_noreason', 'label' => 'معدةٌ متوقفةٌ بلا سبب',        'href' => '../Oprators/select_project.php',   'tone' => 'err'),
+            array('key' => 'units_since_yday', 'label' => 'وحدات غير معتمدة منذ أمس',   'href' => '../Approvals/hours_approval.php',  'tone' => 'err'),
+            array('key' => 'site_no_ts',       'label' => 'موقع لم يرفع تايم شيته اليوم', 'href' => '../Timesheet/timesheet_type.php', 'tone' => 'warn'),
+            array('key' => 'eq_down_noreason', 'label' => 'معدة متوقفة بلا سبب',        'href' => '../Oprators/select_project.php',   'tone' => 'err'),
         ),
         // §8.9 · مدير الصلاحيات — الثلاثة نصًّا
         15 => array(
-            array('key' => 'user_no_role', 'label' => 'مستخدمٌ بلا دورٍ صالح',   'href' => '../main/users.php',  'tone' => 'err'),
-            array('key' => 'role_no_screens', 'label' => 'دورٌ بلا شاشات',       'href' => '../main/users.php',  'tone' => 'warn'),
-            array('key' => 'dormant_account', 'label' => 'حسابٌ خاملٌ طويلًا (90 يومًا)', 'href' => '../main/users.php', 'tone' => 'warn'),
+            array('key' => 'user_no_role', 'label' => 'مستخدم بلا دور صالح',   'href' => '../main/users.php',  'tone' => 'err'),
+            array('key' => 'role_no_screens', 'label' => 'دور بلا شاشات',       'href' => '../main/users.php',  'tone' => 'warn'),
+            array('key' => 'dormant_account', 'label' => 'حساب خامل طويلا (90 يوما)', 'href' => '../main/users.php', 'tone' => 'warn'),
         ),
     );
     return isset($specs[intval($roleId)]) ? $specs[intval($roleId)] : array();
@@ -360,7 +360,7 @@ function roleBoardAlerts($conn, $gate, $roleId)
             "SELECT COUNT(*) FROM capacity_gap_watch g WHERE {TENANT_SCOPE} AND g.closed_on IS NULL");
         if ($gapCount > 0) {
             $out[] = array('key' => 'coverage_gap_hours',
-                'label' => 'فجوةُ تغطيةٍ تعاقدية: ' . number_format($gapHours, 1) . ' ساعةً شهريةً غيرَ مغطاة',
+                'label' => 'فجوة تغطية تعاقدية: ' . number_format($gapHours, 1) . ' ساعة شهرية غير مغطاة',
                 'href' => '../Contracts/contracts.php', 'tone' => 'err', 'count' => $gapCount);
         }
     }
@@ -375,9 +375,9 @@ function roleBoardAlerts($conn, $gate, $roleId)
             $mLag = ems_uc_lag_metrics($conn, $cidLag);
             if ($mLag['pending'] > 0) {
                 $out[] = array('key' => 'chain_lag',
-                    'label' => 'بانتظار الاعتماد: ' . $mLag['pending'] . ' وحدةً · الأقدمُ '
-                             . $mLag['oldest_days'] . ' يومًا'
-                             . ($mLag['ratio'] !== null ? ' · نسبةُ الأسبوع ' . $mLag['ratio'] . '٪' : ''),
+                    'label' => 'بانتظار الاعتماد: ' . $mLag['pending'] . ' وحدة · الأقدم '
+                             . $mLag['oldest_days'] . ' يوما'
+                             . ($mLag['ratio'] !== null ? ' · نسبة الأسبوع ' . $mLag['ratio'] . '٪' : ''),
                     'href' => '../Approvals/hours_approval.php',
                     'tone' => ($mLag['oldest_days'] > 7 ? 'err' : 'warn'),
                     'count' => $mLag['pending']);
@@ -508,7 +508,7 @@ function roleBoardAlerts($conn, $gate, $roleId)
                     AND NOT EXISTS (SELECT 1 FROM role_permissions p WHERE p.role_id = ro.id AND p.can_view = 1)
                     AND NOT EXISTS (SELECT 1 FROM modules m WHERE m.owner_role_id = ro.id)");
                 $counts['role_no_screens'] = $r ? intval($r->fetch_row()[0]) : 0;
-            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'فشلٌ يُعامَل بقيمةٍ افتراضية — $counts[\'role_no_screens\'] = 0'); $counts['role_no_screens'] = 0; }
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'فشل يعامل بقيمة افتراضية — $counts[\'role_no_screens\'] = 0'); $counts['role_no_screens'] = 0; }
         }
         // ── §8.7 عدّادا المبيعات — من `claim_helpers` لا باستعلامٍ منسوخ ──────
         // خارجَ الجدول التصريحي عمدًا: تعريفُ «الجاهز للفوترة» ثلاثُ وصلاتٍ
@@ -520,7 +520,7 @@ function roleBoardAlerts($conn, $gate, $roleId)
                 require_once dirname(__DIR__) . '/Contracts/claim_helpers.php';
                 $counts['unbilled_units'] = claim_unbilled_days($gate);
                 $counts['claim_pending']  = claim_pending_count($gate);
-            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'تعذّرٌ يُسجَّل ويُطفئ التنبيهَ — ولا يُخترع له رقم');
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'تعذر يسجل ويطفئ التنبيه — ولا يخترع له رقم');
                 // تعذّرٌ يُسجَّل ويُطفئ التنبيهَ — ولا يُخترع له رقم
                 error_log('role_board sales counters: ' . $t->getMessage());
                 $counts['unbilled_units'] = 0;
@@ -632,19 +632,19 @@ function roleBoardGenericConfig($rid)
         // «تعمل بلا مشغّلٍ نشط». و«انحرافُ الالتزام» ينتظر محرّكَه (تبويب ④).
         1 => array('title' => 'لوحة ادارة التشغيل', 'icon' => 'fa fa-tower-observation',
             'cards' => array(
-                array('مواقعُ لم ترفع اليوم', 'fa-location-crosshairs', array('t' => 'operations', 'a' => 'o', 'enrich' => array('ts' => 'timesheet')), "SELECT COUNT(DISTINCT o.project_id) FROM operations o WHERE {TENANT_SCOPE} AND o.op_state='تعمل' AND NOT EXISTS(SELECT 1 FROM timesheet ts WHERE ts.operator=o.id AND ts.date=CURDATE())", '../Timesheet/timesheet_type.php', 'err'),
+                array('مواقع لم ترفع اليوم', 'fa-location-crosshairs', array('t' => 'operations', 'a' => 'o', 'enrich' => array('ts' => 'timesheet')), "SELECT COUNT(DISTINCT o.project_id) FROM operations o WHERE {TENANT_SCOPE} AND o.op_state='تعمل' AND NOT EXISTS(SELECT 1 FROM timesheet ts WHERE ts.operator=o.id AND ts.date=CURDATE())", '../Timesheet/timesheet_type.php', 'err'),
                 // UI-DEF-03: كانت تعدّ 48,746 صفَّ دوامٍ كلَّها وتسميها «وحدات» —
                 // المصدر الصادق قيود الوحدات في حالات ما قبل التحويل (المقام معلن بالتسمية).
-                array('وحداتٌ تنتظر الاعتماد (قيود الوحدات قبل التحويل)', 'fa-check-double', array('t' => 'unit_entries', 'a' => 'ue'), "SELECT COUNT(*) FROM unit_entries ue WHERE {TENANT_SCOPE} AND ue.state IN('submitted','site_approved','parties_approved')", '../Approvals/hours_approval.php', 'warn'),
-                array('معداتٌ متوقفة', 'fa-heart-crack', array('t' => 'operations', 'a' => 'o'), "SELECT COUNT(*) FROM operations o WHERE {TENANT_SCOPE} AND o.op_state='معطلة'", '../Oprators/select_project.php', 'err'),
-                array('تعمل بلا مشغّلٍ نشط', 'fa-user-slash', array('t' => 'operations', 'a' => 'o', 'enrich' => array('ed' => 'equipment_drivers')), "SELECT COUNT(*) FROM operations o WHERE {TENANT_SCOPE} AND o.op_state='تعمل' AND NOT EXISTS(SELECT 1 FROM equipment_drivers ed WHERE ed.equipment_id=o.equipment AND ed.status=1)", '../Oprators/select_project.php', 'err'),
-                array('التزاماتُ العقود', 'fa-file-signature', array('t' => 'contract_commitments', 'a' => 'cc'), "SELECT COUNT(*) FROM contract_commitments cc WHERE {TENANT_SCOPE} AND COALESCE(cc.is_deleted,0)=0", '../Clients/contract_commitments.php', 'or'),
+                array('وحدات تنتظر الاعتماد (قيود الوحدات قبل التحويل)', 'fa-check-double', array('t' => 'unit_entries', 'a' => 'ue'), "SELECT COUNT(*) FROM unit_entries ue WHERE {TENANT_SCOPE} AND ue.state IN('submitted','site_approved','parties_approved')", '../Approvals/hours_approval.php', 'warn'),
+                array('معدات متوقفة', 'fa-heart-crack', array('t' => 'operations', 'a' => 'o'), "SELECT COUNT(*) FROM operations o WHERE {TENANT_SCOPE} AND o.op_state='معطلة'", '../Oprators/select_project.php', 'err'),
+                array('تعمل بلا مشغل نشط', 'fa-user-slash', array('t' => 'operations', 'a' => 'o', 'enrich' => array('ed' => 'equipment_drivers')), "SELECT COUNT(*) FROM operations o WHERE {TENANT_SCOPE} AND o.op_state='تعمل' AND NOT EXISTS(SELECT 1 FROM equipment_drivers ed WHERE ed.equipment_id=o.equipment AND ed.status=1)", '../Oprators/select_project.php', 'err'),
+                array('التزامات العقود', 'fa-file-signature', array('t' => 'contract_commitments', 'a' => 'cc'), "SELECT COUNT(*) FROM contract_commitments cc WHERE {TENANT_SCOPE} AND COALESCE(cc.is_deleted,0)=0", '../Clients/contract_commitments.php', 'or'),
             ),
             'tasks' => array(
-                array('اعتمادُ الوحدات المنتظرة (قبل التحويل)', 'fa fa-check-double', array('t' => 'unit_entries', 'a' => 'ue'), "SELECT COUNT(*) FROM unit_entries ue WHERE {TENANT_SCOPE} AND ue.state IN('submitted','site_approved','parties_approved')", '../Approvals/hours_approval.php'),
-                array('مطالبةُ المواقع المتأخرة بالرفع', 'fa fa-bullhorn', array('t' => 'operations', 'a' => 'o', 'enrich' => array('ts' => 'timesheet')), "SELECT COUNT(DISTINCT o.project_id) FROM operations o WHERE {TENANT_SCOPE} AND o.op_state='تعمل' AND NOT EXISTS(SELECT 1 FROM timesheet ts WHERE ts.operator=o.id AND ts.date=CURDATE())", '../Timesheet/timesheet_type.php'),
+                array('اعتماد الوحدات المنتظرة (قبل التحويل)', 'fa fa-check-double', array('t' => 'unit_entries', 'a' => 'ue'), "SELECT COUNT(*) FROM unit_entries ue WHERE {TENANT_SCOPE} AND ue.state IN('submitted','site_approved','parties_approved')", '../Approvals/hours_approval.php'),
+                array('مطالبة المواقع المتأخرة بالرفع', 'fa fa-bullhorn', array('t' => 'operations', 'a' => 'o', 'enrich' => array('ts' => 'timesheet')), "SELECT COUNT(DISTINCT o.project_id) FROM operations o WHERE {TENANT_SCOPE} AND o.op_state='تعمل' AND NOT EXISTS(SELECT 1 FROM timesheet ts WHERE ts.operator=o.id AND ts.date=CURDATE())", '../Timesheet/timesheet_type.php'),
             ),
-            'pulse' => array('نبض الأداء — وحداتُ الدوام (7 أيام)', array('أُدخلت', 'اعتُمدت'),
+            'pulse' => array('نبض الأداء — وحدات الدوام (7 أيام)', array('أدخلت', 'اعتمدت'),
                 array('t' => 'timesheet', 'a' => 'ts'), "SELECT COUNT(*) FROM timesheet ts WHERE {TENANT_SCOPE} AND ts.date=?",
                 // كانت السلسلة «اعتُمدت» ميتةً (status<>1 لا يطابق شيئًا) — التحويل هو الاعتماد النهائي
                 array('t' => 'unit_entries', 'a' => 'ue'), "SELECT COUNT(*) FROM unit_entries ue WHERE {TENANT_SCOPE} AND DATE(ue.converted_at)=?")),
@@ -654,44 +654,44 @@ function roleBoardGenericConfig($rid)
                 array('حرجة مفتوحة', 'fa-fire', array('t' => 'tickets', 'a' => 't'), "SELECT COUNT(*) FROM tickets t WHERE {TENANT_SCOPE} AND t.priority='critical' AND t.stage NOT IN('closed','cancelled','done')", '../Tickets/tickets_list.php', 'err'),
                 array('كسرت مهلتها', 'fa-hourglass-end', array('t' => 'tickets', 'a' => 't'), "SELECT COUNT(*) FROM tickets t WHERE {TENANT_SCOPE} AND t.resolution_due_at<NOW() AND t.stage NOT IN('closed','cancelled','done')", '../Tickets/tickets_list.php', 'err'),
                 array('بلا مستلم', 'fa-user-slash', array('t' => 'tickets', 'a' => 't'), "SELECT COUNT(*) FROM tickets t WHERE {TENANT_SCOPE} AND t.assigned_user_id IS NULL AND t.stage NOT IN('closed','cancelled','done')", '../Tickets/tickets_list.php', 'warn'),
-                array('أُغلقت هذا الأسبوع', 'fa-circle-check', array('t' => 'tickets', 'a' => 't'), "SELECT COUNT(*) FROM tickets t WHERE {TENANT_SCOPE} AND t.stage='closed' AND t.updated_at>=DATE_SUB(NOW(),INTERVAL 7 DAY)", '../Tickets/tickets_list.php', 'ok'),
+                array('أغلقت هذا الأسبوع', 'fa-circle-check', array('t' => 'tickets', 'a' => 't'), "SELECT COUNT(*) FROM tickets t WHERE {TENANT_SCOPE} AND t.stage='closed' AND t.updated_at>=DATE_SUB(NOW(),INTERVAL 7 DAY)", '../Tickets/tickets_list.php', 'ok'),
             ),
             'tasks' => array(
-                array('بلاغاتٌ موجَّهةٌ تنتظر الاستلام', 'fa fa-inbox', array('t' => 'tickets', 'a' => 't'), "SELECT COUNT(*) FROM tickets t WHERE {TENANT_SCOPE} AND t.stage='routed'", '../Tickets/tickets_list.php'),
+                array('بلاغات موجهة تنتظر الاستلام', 'fa fa-inbox', array('t' => 'tickets', 'a' => 't'), "SELECT COUNT(*) FROM tickets t WHERE {TENANT_SCOPE} AND t.stage='routed'", '../Tickets/tickets_list.php'),
                 array('قيد المعالجة والمتابعة', 'fa fa-spinner', array('t' => 'tickets', 'a' => 't'), "SELECT COUNT(*) FROM tickets t WHERE {TENANT_SCOPE} AND t.stage IN('in_progress','waiting','follow_up')", '../Tickets/tickets_list.php'),
-                array('منجزةٌ تنتظر الإغلاق', 'fa fa-flag-checkered', array('t' => 'tickets', 'a' => 't'), "SELECT COUNT(*) FROM tickets t WHERE {TENANT_SCOPE} AND t.stage='done'", '../Tickets/tickets_list.php'),
+                array('منجزة تنتظر الإغلاق', 'fa fa-flag-checkered', array('t' => 'tickets', 'a' => 't'), "SELECT COUNT(*) FROM tickets t WHERE {TENANT_SCOPE} AND t.stage='done'", '../Tickets/tickets_list.php'),
             ),
-            'pulse' => array('نبض الأداء — فُتحت مقابل أُغلقت (7 أيام)', array('فُتحت', 'أُغلقت'),
+            'pulse' => array('نبض الأداء — فتحت مقابل أغلقت (7 أيام)', array('فتحت', 'أغلقت'),
                 array('t' => 'tickets', 'a' => 't'), "SELECT COUNT(*) FROM tickets t WHERE {TENANT_SCOPE} AND DATE(t.created_at)=?",
                 array('t' => 'tickets', 'a' => 't'), "SELECT COUNT(*) FROM tickets t WHERE {TENANT_SCOPE} AND t.stage='closed' AND DATE(t.updated_at)=?")),
         12 => array('title' => 'لوحة ادارة المبيعات', 'icon' => 'fa fa-chart-line',
             'cards' => array(
                 array('فرص مفتوحة', 'fa-bullseye', array('t' => 'opportunities', 'a' => 'op'), "SELECT COUNT(*) FROM opportunities op WHERE {TENANT_SCOPE} AND op.stage NOT IN('فوز','خسارة','مستبعدة')", '../Opportunities/opportunities.php', 'or'),
-                array('عروض مقدَّمة بلا رد', 'fa-file-signature', array('t' => 'quotations', 'a' => 'q'), "SELECT COUNT(*) FROM quotations q WHERE {TENANT_SCOPE} AND q.state='مقدم'", '../Clients/quotations.php', 'warn'),
+                array('عروض مقدمة بلا رد', 'fa-file-signature', array('t' => 'quotations', 'a' => 'q'), "SELECT COUNT(*) FROM quotations q WHERE {TENANT_SCOPE} AND q.state='مقدم'", '../Clients/quotations.php', 'warn'),
                 array('عقود نشطة', 'fa-file-contract', array('t' => 'contracts', 'a' => 'c'), "SELECT COUNT(*) FROM contracts c WHERE {TENANT_SCOPE} AND c.status=1", '../Contracts/contracts.php', 'ok'),
-                array('تنتهي خلال 30 يومًا', 'fa-hourglass-half', array('t' => 'contracts', 'a' => 'c'), "SELECT COUNT(*) FROM contracts c WHERE {TENANT_SCOPE} AND c.status=1 AND c.actual_end BETWEEN CURDATE() AND DATE_ADD(CURDATE(),INTERVAL 30 DAY)", '../Contracts/contracts.php', 'err'),
+                array('تنتهي خلال 30 يوما', 'fa-hourglass-half', array('t' => 'contracts', 'a' => 'c'), "SELECT COUNT(*) FROM contracts c WHERE {TENANT_SCOPE} AND c.status=1 AND c.actual_end BETWEEN CURDATE() AND DATE_ADD(CURDATE(),INTERVAL 30 DAY)", '../Contracts/contracts.php', 'err'),
                 array('مناقصات', 'fa-gavel', array('t' => 'tenders', 'a' => 'tn'), "SELECT COUNT(*) FROM tenders tn WHERE {TENANT_SCOPE}", '../Clients/tenders.php', 'or'),
             ),
             'tasks' => array(
-                array('فرصٌ في التفاوض تحتاج دفعة', 'fa fa-handshake', array('t' => 'opportunities', 'a' => 'op'), "SELECT COUNT(*) FROM opportunities op WHERE {TENANT_SCOPE} AND op.stage='تفاوض'", '../Opportunities/opportunities.php'),
-                array('عروضٌ مسودةٌ لم تُرسل', 'fa fa-pen', array('t' => 'quotations', 'a' => 'q'), "SELECT COUNT(*) FROM quotations q WHERE {TENANT_SCOPE} AND q.state='مسودة'", '../Clients/quotations.php'),
+                array('فرص في التفاوض تحتاج دفعة', 'fa fa-handshake', array('t' => 'opportunities', 'a' => 'op'), "SELECT COUNT(*) FROM opportunities op WHERE {TENANT_SCOPE} AND op.stage='تفاوض'", '../Opportunities/opportunities.php'),
+                array('عروض مسودة لم ترسل', 'fa fa-pen', array('t' => 'quotations', 'a' => 'q'), "SELECT COUNT(*) FROM quotations q WHERE {TENANT_SCOPE} AND q.state='مسودة'", '../Clients/quotations.php'),
             ),
-            'pulse' => array('نبض الأداء — فرصٌ أُنشئت مقابل عروضٍ قُدّمت (7 أيام)', array('فرص', 'عروض'),
+            'pulse' => array('نبض الأداء — فرص أنشئت مقابل عروض قدمت (7 أيام)', array('فرص', 'عروض'),
                 array('t' => 'opportunities', 'a' => 'op'), "SELECT COUNT(*) FROM opportunities op WHERE {TENANT_SCOPE} AND DATE(op.created_at)=?",
                 array('t' => 'quotations', 'a' => 'q'), "SELECT COUNT(*) FROM quotations q WHERE {TENANT_SCOPE} AND DATE(q.created_at)=?")),
         2 => array('title' => 'لوحة ادارة الموردين', 'icon' => 'fa fa-truck-field',
             'cards' => array(
                 array('الموردون', 'fa-truck-field', array('t' => 'suppliers', 'a' => 's'), "SELECT COUNT(*) FROM suppliers s WHERE {TENANT_SCOPE}", '../Suppliers/suppliers.php', 'or'),
                 array('عقود نشطة', 'fa-file-contract', array('t' => 'supplierscontracts', 'a' => 'sc'), "SELECT COUNT(*) FROM supplierscontracts sc WHERE {TENANT_SCOPE} AND sc.status=1", '../Suppliers/supplierscontracts.php', 'ok'),
-                array('تنتهي خلال 30 يومًا', 'fa-hourglass-half', array('t' => 'supplierscontracts', 'a' => 'sc'), "SELECT COUNT(*) FROM supplierscontracts sc WHERE {TENANT_SCOPE} AND sc.status=1 AND sc.actual_end BETWEEN CURDATE() AND DATE_ADD(CURDATE(),INTERVAL 30 DAY)", '../Suppliers/supplierscontracts.php', 'err'),
+                array('تنتهي خلال 30 يوما', 'fa-hourglass-half', array('t' => 'supplierscontracts', 'a' => 'sc'), "SELECT COUNT(*) FROM supplierscontracts sc WHERE {TENANT_SCOPE} AND sc.status=1 AND sc.actual_end BETWEEN CURDATE() AND DATE_ADD(CURDATE(),INTERVAL 30 DAY)", '../Suppliers/supplierscontracts.php', 'err'),
                 /* العنوانُ يقول ما يقيسه الاستعلامُ حرفًا — «أطرافُ الاعتماد» كانت
                    تعني أيَّ طرفٍ بينما الإدارةُ تنتظر طرفَ الموردِ وحدَه. */
-                array('وحداتٌ تنتظر أطرافَ الاعتماد (بعد الموقع)', 'fa-scale-balanced', array('t' => 'unit_entries', 'a' => 'ue'), roleBoardSupplierPendingSql(), '../Approvals/hours_approval.php', 'warn'),
+                array('وحدات تنتظر أطراف الاعتماد (بعد الموقع)', 'fa-scale-balanced', array('t' => 'unit_entries', 'a' => 'ue'), roleBoardSupplierPendingSql(), '../Approvals/hours_approval.php', 'warn'),
             ),
             'tasks' => array(
-                array('وحداتٌ تنتظر اعتماد جزء المورد (بعد الموقع)', 'fa fa-check-double', array('t' => 'unit_entries', 'a' => 'ue'), roleBoardSupplierPendingSql(), '../Approvals/hours_approval.php'),
+                array('وحدات تنتظر اعتماد جزء المورد (بعد الموقع)', 'fa fa-check-double', array('t' => 'unit_entries', 'a' => 'ue'), roleBoardSupplierPendingSql(), '../Approvals/hours_approval.php'),
             ),
-            'pulse' => array('نبض الأداء — وحداتُ الدوام المدخلة (7 أيام)', array('أُدخلت', 'اعتُمدت'),
+            'pulse' => array('نبض الأداء — وحدات الدوام المدخلة (7 أيام)', array('أدخلت', 'اعتمدت'),
                 array('t' => 'timesheet', 'a' => 'ts'), "SELECT COUNT(*) FROM timesheet ts WHERE {TENANT_SCOPE} AND ts.date=?",
                 // كانت السلسلة «اعتُمدت» ميتةً (status<>1 لا يطابق شيئًا) — التحويل هو الاعتماد النهائي
                 array('t' => 'unit_entries', 'a' => 'ue'), "SELECT COUNT(*) FROM unit_entries ue WHERE {TENANT_SCOPE} AND DATE(ue.converted_at)=?")),
@@ -708,59 +708,59 @@ function roleBoardGenericConfig($rid)
                 // فيفشل صامتًا — استُبدل بمؤشرَي الوثائق (المصدرُ قائمٌ ومقيس:
                 // 37 من 39 وثيقةً منتهيةً يومَ البناء). قراءاتُ العدّاد حين يُبنى
                 // جدولُها (UX-10 §8.1 ب) يعود مؤشرُها بمصدرٍ حقيقي.
-                array('وثائقُ منتهيةٌ (معدات ومشغّلون)', 'fa fa-file-circle-xmark', array('t' => 'equipment_documents', 'a' => 'd'), "SELECT COUNT(*) FROM equipment_documents d WHERE {TENANT_SCOPE} AND COALESCE(d.is_deleted,0)=0 AND d.status<>'ملغاة' AND d.expiry_date IS NOT NULL AND d.expiry_date < CURDATE()", '../Equipments/equipment_documents.php'),
-                array('وثائقُ توشك على الانتهاء (بمهلة كلِّ وثيقة)', 'fa fa-hourglass-half', array('t' => 'equipment_documents', 'a' => 'd'), "SELECT COUNT(*) FROM equipment_documents d WHERE {TENANT_SCOPE} AND COALESCE(d.is_deleted,0)=0 AND d.status<>'ملغاة' AND d.expiry_date >= CURDATE() AND d.expiry_date <= DATE_ADD(CURDATE(), INTERVAL d.alert_days DAY)", '../Equipments/equipment_documents.php'),
+                array('وثائق منتهية (معدات ومشغلون)', 'fa fa-file-circle-xmark', array('t' => 'equipment_documents', 'a' => 'd'), "SELECT COUNT(*) FROM equipment_documents d WHERE {TENANT_SCOPE} AND COALESCE(d.is_deleted,0)=0 AND d.status<>'ملغاة' AND d.expiry_date IS NOT NULL AND d.expiry_date < CURDATE()", '../Equipments/equipment_documents.php'),
+                array('وثائق توشك على الانتهاء (بمهلة كل وثيقة)', 'fa fa-hourglass-half', array('t' => 'equipment_documents', 'a' => 'd'), "SELECT COUNT(*) FROM equipment_documents d WHERE {TENANT_SCOPE} AND COALESCE(d.is_deleted,0)=0 AND d.status<>'ملغاة' AND d.expiry_date >= CURDATE() AND d.expiry_date <= DATE_ADD(CURDATE(), INTERVAL d.alert_days DAY)", '../Equipments/equipment_documents.php'),
             ),
-            'pulse' => array('نبض الأداء — أوامرُ صيانةٍ فُتحت مقابل أُغلقت على الأسطول (7 أيام)', array('فُتحت', 'أُغلقت'),
+            'pulse' => array('نبض الأداء — أوامر صيانة فتحت مقابل أغلقت على الأسطول (7 أيام)', array('فتحت', 'أغلقت'),
                 array('t' => 'mnt_order', 'a' => 'mo'), "SELECT COUNT(*) FROM mnt_order mo WHERE {TENANT_SCOPE} AND COALESCE(mo.is_deleted,0)=0 AND DATE(mo.created_at)=?",
                 array('t' => 'mnt_order', 'a' => 'mo'), "SELECT COUNT(*) FROM mnt_order mo WHERE {TENANT_SCOPE} AND COALESCE(mo.is_deleted,0)=0 AND mo.state='إغلاق' AND DATE(mo.closed_at)=?")),
         4 => array('title' => 'لوحة ادارة الموارد البشرية', 'icon' => 'fa fa-id-card',
             'cards' => array(
                 array('الموظفون', 'fa-id-card', array('t' => 'employees', 'a' => 'em'), "SELECT COUNT(*) FROM employees em WHERE {TENANT_SCOPE}", '../Employees/employees.php', 'or'),
-                array('وحداتٌ تنتظر الاعتماد (قيود الوحدات قبل التحويل)', 'fa-scale-balanced', array('t' => 'unit_entries', 'a' => 'ue'), "SELECT COUNT(*) FROM unit_entries ue WHERE {TENANT_SCOPE} AND ue.state IN('submitted','site_approved','parties_approved')", '../Approvals/hours_approval.php', 'warn'),
-                array('طلباتُ إجازةٍ منتظرة', 'fa-umbrella-beach', array('t' => 'worker_leave_absence', 'a' => 'wl'), "SELECT COUNT(*) FROM worker_leave_absence wl WHERE {TENANT_SCOPE} AND wl.state='مطلوب'", '../Workforce/worker_leave_absence.php', 'warn'),
-                array('عقودٌ تنتهي (30 يومًا)', 'fa-hourglass-half', array('t' => 'worker_contract', 'a' => 'wc'), "SELECT COUNT(*) FROM worker_contract wc WHERE {TENANT_SCOPE} AND wc.state='نافذ' AND wc.date_end BETWEEN CURDATE() AND DATE_ADD(CURDATE(),INTERVAL 30 DAY)", '../Workforce/worker_contract.php', 'err'),
-                array('تسوياتٌ تنتظر الاعتماد', 'fa-hand-holding-dollar', array('t' => 'worker_settlement', 'a' => 'ws'), "SELECT COUNT(*) FROM worker_settlement ws WHERE {TENANT_SCOPE} AND ws.state='محتسب'", '../Workforce/worker_settlement.php', 'warn'),
+                array('وحدات تنتظر الاعتماد (قيود الوحدات قبل التحويل)', 'fa-scale-balanced', array('t' => 'unit_entries', 'a' => 'ue'), "SELECT COUNT(*) FROM unit_entries ue WHERE {TENANT_SCOPE} AND ue.state IN('submitted','site_approved','parties_approved')", '../Approvals/hours_approval.php', 'warn'),
+                array('طلبات إجازة منتظرة', 'fa-umbrella-beach', array('t' => 'worker_leave_absence', 'a' => 'wl'), "SELECT COUNT(*) FROM worker_leave_absence wl WHERE {TENANT_SCOPE} AND wl.state='مطلوب'", '../Workforce/worker_leave_absence.php', 'warn'),
+                array('عقود تنتهي (30 يوما)', 'fa-hourglass-half', array('t' => 'worker_contract', 'a' => 'wc'), "SELECT COUNT(*) FROM worker_contract wc WHERE {TENANT_SCOPE} AND wc.state='نافذ' AND wc.date_end BETWEEN CURDATE() AND DATE_ADD(CURDATE(),INTERVAL 30 DAY)", '../Workforce/worker_contract.php', 'err'),
+                array('تسويات تنتظر الاعتماد', 'fa-hand-holding-dollar', array('t' => 'worker_settlement', 'a' => 'ws'), "SELECT COUNT(*) FROM worker_settlement ws WHERE {TENANT_SCOPE} AND ws.state='محتسب'", '../Workforce/worker_settlement.php', 'warn'),
                 // ── تنبيهاتُ وثائق الأفراد (طلبُ المالك 2026-07-27) ──────────────
                 // المقيسُ يومَ الإضافة: 25 رخصةَ قيادةٍ منتهية و26 هويةً منتهية —
                 // وأصحابُها كلُّهم بحالةٍ نشطةٍ يعملون. المصدرُ ملفُّ الوثائق
                 // الموحّد لا الأعمدةُ المتناثرة، فالتجديدُ يُسجَّل مرةً واحدةً ويُرى هنا.
-                array('رخصُ قيادةٍ منتهية', 'fa-id-card-clip', array('t' => 'equipment_documents', 'a' => 'd'), "SELECT COUNT(*) FROM equipment_documents d WHERE {TENANT_SCOPE} AND COALESCE(d.is_deleted,0)=0 AND d.status<>'ملغاة' AND d.subject_type='operator' AND d.doc_type='رخصة قيادة' AND d.expiry_date IS NOT NULL AND d.expiry_date < CURDATE()", '../Equipments/equipment_documents.php', 'err'),
-                array('هوياتٌ منتهية', 'fa-address-card', array('t' => 'equipment_documents', 'a' => 'd'), "SELECT COUNT(*) FROM equipment_documents d WHERE {TENANT_SCOPE} AND COALESCE(d.is_deleted,0)=0 AND d.status<>'ملغاة' AND d.subject_type='operator' AND d.doc_type='هوية' AND d.expiry_date IS NOT NULL AND d.expiry_date < CURDATE()", '../Equipments/equipment_documents.php', 'err'),
+                array('رخص قيادة منتهية', 'fa-id-card-clip', array('t' => 'equipment_documents', 'a' => 'd'), "SELECT COUNT(*) FROM equipment_documents d WHERE {TENANT_SCOPE} AND COALESCE(d.is_deleted,0)=0 AND d.status<>'ملغاة' AND d.subject_type='operator' AND d.doc_type='رخصة قيادة' AND d.expiry_date IS NOT NULL AND d.expiry_date < CURDATE()", '../Equipments/equipment_documents.php', 'err'),
+                array('هويات منتهية', 'fa-address-card', array('t' => 'equipment_documents', 'a' => 'd'), "SELECT COUNT(*) FROM equipment_documents d WHERE {TENANT_SCOPE} AND COALESCE(d.is_deleted,0)=0 AND d.status<>'ملغاة' AND d.subject_type='operator' AND d.doc_type='هوية' AND d.expiry_date IS NOT NULL AND d.expiry_date < CURDATE()", '../Equipments/equipment_documents.php', 'err'),
             ),
             'tasks' => array(
-                array('وثائقُ أفرادٍ توشك على الانتهاء (بمهلة كلِّ وثيقة)', 'fa fa-hourglass-half', array('t' => 'equipment_documents', 'a' => 'd'), "SELECT COUNT(*) FROM equipment_documents d WHERE {TENANT_SCOPE} AND COALESCE(d.is_deleted,0)=0 AND d.status<>'ملغاة' AND d.subject_type='operator' AND d.expiry_date >= CURDATE() AND d.expiry_date <= DATE_ADD(CURDATE(), INTERVAL d.alert_days DAY)", '../Equipments/equipment_documents.php'),
-                array('تقييماتٌ وتنقلاتٌ قيد المعالجة', 'fa fa-people-arrows', array('t' => 'worker_movement', 'a' => 'wm'), "SELECT COUNT(*) FROM worker_movement wm WHERE {TENANT_SCOPE} AND wm.state='مسودة'", '../Workforce/worker_movement.php'),
+                array('وثائق أفراد توشك على الانتهاء (بمهلة كل وثيقة)', 'fa fa-hourglass-half', array('t' => 'equipment_documents', 'a' => 'd'), "SELECT COUNT(*) FROM equipment_documents d WHERE {TENANT_SCOPE} AND COALESCE(d.is_deleted,0)=0 AND d.status<>'ملغاة' AND d.subject_type='operator' AND d.expiry_date >= CURDATE() AND d.expiry_date <= DATE_ADD(CURDATE(), INTERVAL d.alert_days DAY)", '../Equipments/equipment_documents.php'),
+                array('تقييمات وتنقلات قيد المعالجة', 'fa fa-people-arrows', array('t' => 'worker_movement', 'a' => 'wm'), "SELECT COUNT(*) FROM worker_movement wm WHERE {TENANT_SCOPE} AND wm.state='مسودة'", '../Workforce/worker_movement.php'),
             ),
-            'pulse' => array('نبض الأداء — وحداتُ الدوام (7 أيام)', array('أُدخلت', 'اعتُمدت'),
+            'pulse' => array('نبض الأداء — وحدات الدوام (7 أيام)', array('أدخلت', 'اعتمدت'),
                 array('t' => 'timesheet', 'a' => 'ts'), "SELECT COUNT(*) FROM timesheet ts WHERE {TENANT_SCOPE} AND ts.date=?",
                 // كانت السلسلة «اعتُمدت» ميتةً (status<>1 لا يطابق شيئًا) — التحويل هو الاعتماد النهائي
                 array('t' => 'unit_entries', 'a' => 'ue'), "SELECT COUNT(*) FROM unit_entries ue WHERE {TENANT_SCOPE} AND DATE(ue.converted_at)=?")),
         5 => array('title' => 'لوحة مدير الموقع', 'icon' => 'fa fa-map-location-dot',
             'cards' => array(
                 array('تايم شيت اليوم', 'fa-business-time', array('t' => 'timesheet', 'a' => 'ts'), "SELECT COUNT(*) FROM timesheet ts WHERE {TENANT_SCOPE} AND ts.date=CURDATE()", '../Timesheet/timesheet_type.php', 'or'),
-                array('وحداتٌ تنتظر اعتماد الموقع (المقدَّمة)', 'fa-check-double', array('t' => 'unit_entries', 'a' => 'ue'), "SELECT COUNT(*) FROM unit_entries ue WHERE {TENANT_SCOPE} AND ue.state='submitted'", '../Approvals/hours_approval.php', 'warn'),
-                array('أعلامُ تجاوز الطاقة', 'fa-triangle-exclamation', array('t' => 'unit_capacity_flags', 'a' => 'f'), "SELECT COUNT(*) FROM unit_capacity_flags f WHERE {TENANT_SCOPE} AND f.cleared_at IS NULL", '../Timesheet/timesheet_type.php', 'err'),
+                array('وحدات تنتظر اعتماد الموقع (المقدمة)', 'fa-check-double', array('t' => 'unit_entries', 'a' => 'ue'), "SELECT COUNT(*) FROM unit_entries ue WHERE {TENANT_SCOPE} AND ue.state='submitted'", '../Approvals/hours_approval.php', 'warn'),
+                array('أعلام تجاوز الطاقة', 'fa-triangle-exclamation', array('t' => 'unit_capacity_flags', 'a' => 'f'), "SELECT COUNT(*) FROM unit_capacity_flags f WHERE {TENANT_SCOPE} AND f.cleared_at IS NULL", '../Timesheet/timesheet_type.php', 'err'),
             ),
             'tasks' => array(
-                array('إدخالُ تايم شيت اليوم', 'fa fa-plus', array('t' => 'timesheet', 'a' => 'ts'), "SELECT CASE WHEN COUNT(*)=0 THEN 1 ELSE 0 END FROM timesheet ts WHERE {TENANT_SCOPE} AND ts.date=CURDATE()", '../Timesheet/timesheet_type.php'),
-                array('اعتمادُ وحدات الموقع (المقدَّمة)', 'fa fa-check-double', array('t' => 'unit_entries', 'a' => 'ue'), "SELECT COUNT(*) FROM unit_entries ue WHERE {TENANT_SCOPE} AND ue.state='submitted'", '../Approvals/hours_approval.php'),
+                array('إدخال تايم شيت اليوم', 'fa fa-plus', array('t' => 'timesheet', 'a' => 'ts'), "SELECT CASE WHEN COUNT(*)=0 THEN 1 ELSE 0 END FROM timesheet ts WHERE {TENANT_SCOPE} AND ts.date=CURDATE()", '../Timesheet/timesheet_type.php'),
+                array('اعتماد وحدات الموقع (المقدمة)', 'fa fa-check-double', array('t' => 'unit_entries', 'a' => 'ue'), "SELECT COUNT(*) FROM unit_entries ue WHERE {TENANT_SCOPE} AND ue.state='submitted'", '../Approvals/hours_approval.php'),
             ),
-            'pulse' => array('نبض الأداء — وحداتُ الموقع (7 أيام)', array('أُدخلت', 'اعتُمدت'),
+            'pulse' => array('نبض الأداء — وحدات الموقع (7 أيام)', array('أدخلت', 'اعتمدت'),
                 array('t' => 'timesheet', 'a' => 'ts'), "SELECT COUNT(*) FROM timesheet ts WHERE {TENANT_SCOPE} AND ts.date=?",
                 // كانت السلسلة «اعتُمدت» ميتةً (status<>1 لا يطابق شيئًا) — التحويل هو الاعتماد النهائي
                 array('t' => 'unit_entries', 'a' => 'ue'), "SELECT COUNT(*) FROM unit_entries ue WHERE {TENANT_SCOPE} AND DATE(ue.converted_at)=?")),
         6 => array('title' => 'لوحة مدير الحركة والتشغيل', 'icon' => 'fa fa-people-arrows',
             'cards' => array(
-                array('تشغيلاتٌ تعمل الآن', 'fa-play-circle', array('t' => 'operations', 'a' => 'o'), "SELECT COUNT(*) FROM operations o WHERE {TENANT_SCOPE} AND o.op_state='تعمل'", '../Oprators/select_project.php', 'ok'),
-                array('جاهزةٌ (احتياط)', 'fa-circle-pause', array('t' => 'operations', 'a' => 'o'), "SELECT COUNT(*) FROM operations o WHERE {TENANT_SCOPE} AND o.op_state='جاهزة'", '../Oprators/select_project.php', 'or'),
+                array('تشغيلات تعمل الآن', 'fa-play-circle', array('t' => 'operations', 'a' => 'o'), "SELECT COUNT(*) FROM operations o WHERE {TENANT_SCOPE} AND o.op_state='تعمل'", '../Oprators/select_project.php', 'ok'),
+                array('جاهزة (احتياط)', 'fa-circle-pause', array('t' => 'operations', 'a' => 'o'), "SELECT COUNT(*) FROM operations o WHERE {TENANT_SCOPE} AND o.op_state='جاهزة'", '../Oprators/select_project.php', 'or'),
                 array('معطلة', 'fa-heart-crack', array('t' => 'operations', 'a' => 'o'), "SELECT COUNT(*) FROM operations o WHERE {TENANT_SCOPE} AND o.op_state='معطلة'", '../Oprators/select_project.php', 'err'),
-                array('عاملةٌ بلا مشغّل', 'fa-user-slash', array('t' => 'operations', 'a' => 'o', 'enrich' => array('ed' => 'equipment_drivers')), "SELECT COUNT(*) FROM operations o WHERE {TENANT_SCOPE} AND o.op_state='تعمل' AND NOT EXISTS(SELECT 1 FROM equipment_drivers ed WHERE ed.equipment_id=o.equipment AND ed.status=1)", '../Oprators/select_project.php', 'err'),
+                array('عاملة بلا مشغل', 'fa-user-slash', array('t' => 'operations', 'a' => 'o', 'enrich' => array('ed' => 'equipment_drivers')), "SELECT COUNT(*) FROM operations o WHERE {TENANT_SCOPE} AND o.op_state='تعمل' AND NOT EXISTS(SELECT 1 FROM equipment_drivers ed WHERE ed.equipment_id=o.equipment AND ed.status=1)", '../Oprators/select_project.php', 'err'),
             ),
             'tasks' => array(
-                array('طلباتُ تنقّلٍ تنتظر', 'fa fa-people-arrows', array('t' => 'worker_movement', 'a' => 'wm'), "SELECT COUNT(*) FROM worker_movement wm WHERE {TENANT_SCOPE} AND wm.state='مسودة'", '../Workforce/worker_movement.php'),
+                array('طلبات تنقل تنتظر', 'fa fa-people-arrows', array('t' => 'worker_movement', 'a' => 'wm'), "SELECT COUNT(*) FROM worker_movement wm WHERE {TENANT_SCOPE} AND wm.state='مسودة'", '../Workforce/worker_movement.php'),
             ),
-            'pulse' => array('نبض الأداء — وحداتُ الدوام (7 أيام)', array('أُدخلت', 'اعتُمدت'),
+            'pulse' => array('نبض الأداء — وحدات الدوام (7 أيام)', array('أدخلت', 'اعتمدت'),
                 array('t' => 'timesheet', 'a' => 'ts'), "SELECT COUNT(*) FROM timesheet ts WHERE {TENANT_SCOPE} AND ts.date=?",
                 // كانت السلسلة «اعتُمدت» ميتةً (status<>1 لا يطابق شيئًا) — التحويل هو الاعتماد النهائي
                 array('t' => 'unit_entries', 'a' => 'ue'), "SELECT COUNT(*) FROM unit_entries ue WHERE {TENANT_SCOPE} AND DATE(ue.converted_at)=?")),
@@ -768,11 +768,11 @@ function roleBoardGenericConfig($rid)
             'cards' => array(
                 array('المستخدمون', 'fa-users', array('t' => 'users', 'a' => 'u'), "SELECT COUNT(*) FROM users u WHERE {TENANT_SCOPE} AND u.role<>'-1'", '../main/users.php', 'or'),
                 array('نشطون', 'fa-user-check', array('t' => 'users', 'a' => 'u'), "SELECT COUNT(*) FROM users u WHERE {TENANT_SCOPE} AND u.status='active'", '../main/users.php', 'ok'),
-                array('خاملون (90 يومًا)', 'fa-user-clock', array('t' => 'users', 'a' => 'u'), "SELECT COUNT(*) FROM users u WHERE {TENANT_SCOPE} AND u.status='active' AND (u.last_login_at IS NULL OR u.last_login_at<DATE_SUB(NOW(),INTERVAL 90 DAY))", '../main/users.php', 'warn'),
-                array('بلا دورٍ صالح', 'fa-user-slash', array('t' => 'users', 'a' => 'u'), "SELECT COUNT(*) FROM users u WHERE {TENANT_SCOPE} AND (u.role IS NULL OR u.role='' OR u.role NOT IN(SELECT id FROM roles))", '../main/users.php', 'err'),
+                array('خاملون (90 يوما)', 'fa-user-clock', array('t' => 'users', 'a' => 'u'), "SELECT COUNT(*) FROM users u WHERE {TENANT_SCOPE} AND u.status='active' AND (u.last_login_at IS NULL OR u.last_login_at<DATE_SUB(NOW(),INTERVAL 90 DAY))", '../main/users.php', 'warn'),
+                array('بلا دور صالح', 'fa-user-slash', array('t' => 'users', 'a' => 'u'), "SELECT COUNT(*) FROM users u WHERE {TENANT_SCOPE} AND (u.role IS NULL OR u.role='' OR u.role NOT IN(SELECT id FROM roles))", '../main/users.php', 'err'),
             ),
             'tasks' => array(),
-            'pulse' => array('نبض الأداء — دخولُ المستخدمين (7 أيام)', array('دخلوا', ''),
+            'pulse' => array('نبض الأداء — دخول المستخدمين (7 أيام)', array('دخلوا', ''),
                 array('t' => 'users', 'a' => 'u'), "SELECT COUNT(*) FROM users u WHERE {TENANT_SCOPE} AND DATE(u.last_login_at)=?",
                 null, null)),
         /* ── §8.10 · إدارة المشتريات ───────────────────────────────────────
@@ -801,7 +801,7 @@ function roleBoardGenericConfig($rid)
                     function ($g) { return (float) $g->count('proc_request', array('whereRaw' => 'state NOT IN (?, ?)', 'params' => array('مغلق', 'مرفوض'))); },
                     '../Procurement/requests_proc.php', 'warn', array('unit' => 'طلب')),
 
-                array('أوامر شراء مؤكَّدة', 'fa-file-invoice-dollar', array('t' => 'proc_order', 'a' => 'o'),
+                array('أوامر شراء مؤكدة', 'fa-file-invoice-dollar', array('t' => 'proc_order', 'a' => 'o'),
                     function ($g) { return (float) $g->count('proc_order', array('where' => array('state' => 'مؤكَّد'))); },
                     '../Procurement/orders_proc.php', 'ok', array('unit' => 'أمر')),
 
@@ -819,7 +819,7 @@ function roleBoardGenericConfig($rid)
             ),
             // ② مهامُّ الدورِ منطقُها مكتوبٌ في roleBoardTasks(16) — لا تُكرَّر هنا
             'tasks' => array(),
-            'pulse' => array('نبض الأداء — طلباتٌ واردة مقابل صرفيات (7 أيام)', array('طلبات واردة', 'صرفيات'),
+            'pulse' => array('نبض الأداء — طلبات واردة مقابل صرفيات (7 أيام)', array('طلبات واردة', 'صرفيات'),
                 array('t' => 'proc_request', 'a' => 'r'),
                 "SELECT COUNT(*) FROM proc_request r WHERE {TENANT_SCOPE} AND COALESCE(r.is_deleted,0)=0 AND DATE(r.created_at)=?",
                 array('t' => 'proc_issue', 'a' => 'i'),
@@ -851,20 +851,20 @@ function roleBoardGenericConfig($rid)
                                 "SELECT COALESCE(SUM(CASE WHEN l.direction='deposit' THEN l.amount ELSE -l.amount END),0) FROM fin_bank_statement_lines l WHERE {TENANT_SCOPE}");
                     },
                     '../Finance/bank_reconciliation_fin.php', 'ok',
-                    array('unit' => 'مبلغ', 'decimals' => 0, 'scope' => 'يجمع عملاتِ الحسابات')),
+                    array('unit' => 'مبلغ', 'decimals' => 0, 'scope' => 'يجمع عملات الحسابات')),
 
-                array('متحصّلات اليوم', 'fa-arrow-down', array('t' => 'fin_payments', 'a' => 'p'),
+                array('متحصلات اليوم', 'fa-arrow-down', array('t' => 'fin_payments', 'a' => 'p'),
                     "SELECT COALESCE(SUM(p.amount),0) FROM fin_payments p WHERE {TENANT_SCOPE} AND COALESCE(p.is_deleted,0)=0 AND p.direction='collection' AND p.state IN('executed','reconciled') AND DATE(COALESCE(p.paid_at,p.created_at))=CURDATE()",
                     '../Finance/payments_fin.php', 'ok',
-                    array('unit' => 'مبلغ', 'decimals' => 0, 'scope' => 'يجمع عملاتِ الدفعات')),
+                    array('unit' => 'مبلغ', 'decimals' => 0, 'scope' => 'يجمع عملات الدفعات')),
 
                 array('مدفوعات اليوم', 'fa-arrow-up', array('t' => 'fin_payments', 'a' => 'p'),
                     "SELECT COALESCE(SUM(p.amount),0) FROM fin_payments p WHERE {TENANT_SCOPE} AND COALESCE(p.is_deleted,0)=0 AND p.direction='disbursement' AND p.state IN('executed','reconciled') AND DATE(COALESCE(p.paid_at,p.created_at))=CURDATE()",
                     '../Finance/payments_fin.php', 'or',
-                    array('unit' => 'مبلغ', 'decimals' => 0, 'scope' => 'يجمع عملاتِ الدفعات')),
+                    array('unit' => 'مبلغ', 'decimals' => 0, 'scope' => 'يجمع عملات الدفعات')),
 
                 // ④ صافي الأسبوع = ذممٌ تستحق خلال 7 أيام − (مستحقاتٌ معلّقة + أقساطُ 7 أيام)
-                array('صافي الأسبوع المتوقّع', 'fa-scale-unbalanced', array('t' => 'fin_receivables', 'a' => 'r'),
+                array('صافي الأسبوع المتوقع', 'fa-scale-unbalanced', array('t' => 'fin_receivables', 'a' => 'r'),
                     function ($g) {
                         $wk = date('Y-m-d', strtotime('+7 days'));
                         $in  = roleBoardScalar($g, array('scope' => array('r' => 'fin_receivables')),
@@ -876,7 +876,7 @@ function roleBoardGenericConfig($rid)
                         return $in - $out;
                     },
                     '../Finance/cash_forecast_fin.php', 'ok',
-                    array('unit' => 'مبلغ', 'decimals' => 0, 'period' => 'الأيامُ السبعةُ القادمة', 'scope' => 'يجمع عملاتِ الذممِ والمستحقات')),
+                    array('unit' => 'مبلغ', 'decimals' => 0, 'period' => 'الأيام السبعة القادمة', 'scope' => 'يجمع عملات الذمم والمستحقات')),
 
                 array('وحدات أمس المعتمدة', 'fa-cubes', array('t' => 'fin_unit_records', 'a' => 'u'),
                     "SELECT COALESCE(SUM(u.approved_qty),0) FROM fin_unit_records u WHERE {TENANT_SCOPE} AND COALESCE(u.is_deleted,0)=0 AND u.match_state='approved' AND u.record_date=DATE_SUB(CURDATE(), INTERVAL 1 DAY)",
@@ -891,22 +891,22 @@ function roleBoardGenericConfig($rid)
                 array('الذمم المتأخرة', 'fa-hourglass-end', array('t' => 'fin_receivables', 'a' => 'r'),
                     "SELECT COALESCE(SUM(r.outstanding),0) FROM fin_receivables r WHERE {TENANT_SCOPE} AND COALESCE(r.is_deleted,0)=0 AND r.outstanding>0 AND r.due_date IS NOT NULL AND r.due_date<CURDATE()",
                     '../Finance/dues_fin.php', 'err',
-                    array('unit' => 'مبلغ', 'decimals' => 0, 'scope' => 'يجمع عملاتِ الذمم')),
+                    array('unit' => 'مبلغ', 'decimals' => 0, 'scope' => 'يجمع عملات الذمم')),
 
-                array('المسوّى الجاهز للصرف', 'fa-hand-holding-dollar', array('t' => 'fin_dues', 'a' => 'd'),
+                array('المسوى الجاهز للصرف', 'fa-hand-holding-dollar', array('t' => 'fin_dues', 'a' => 'd'),
                     "SELECT COALESCE(SUM(d.amount),0) FROM fin_dues d WHERE {TENANT_SCOPE} AND COALESCE(d.is_deleted,0)=0 AND d.direction='credit' AND d.settlement_state='settled'",
                     '../Finance/payments_fin.php', 'or',
-                    array('unit' => 'مبلغ', 'decimals' => 0, 'scope' => 'يجمع عملاتِ المستحقات')),
+                    array('unit' => 'مبلغ', 'decimals' => 0, 'scope' => 'يجمع عملات المستحقات')),
 
                 array('انحرافات فوق 10%', 'fa-triangle-exclamation', array('t' => 'fin_budget_lines', 'a' => 'l', 'enrich' => array('b' => 'fin_budgets')),
                     "SELECT COUNT(*) FROM fin_budget_lines l LEFT JOIN fin_budgets b ON b.id=l.budget_id WHERE {TENANT_SCOPE} AND b.id IS NOT NULL AND COALESCE(b.is_deleted,0)=0 AND l.variance_pct IS NOT NULL AND ABS(l.variance_pct)>10",
                     '../Finance/budget_form_fin.php', 'err',
-                    array('unit' => 'سطرَ موازنة')),
+                    array('unit' => 'سطر موازنة')),
 
                 array('أقساط تمويل خلال 7 أيام', 'fa-landmark', array('t' => 'fin_funding_schedules', 'a' => 'f'),
                     "SELECT COALESCE(SUM(f.total_due-f.paid_amount),0) FROM fin_funding_schedules f WHERE {TENANT_SCOPE} AND f.state<>'paid' AND f.due_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)",
                     '../Finance/funding_fin.php', 'or',
-                    array('unit' => 'مبلغ', 'decimals' => 0, 'period' => 'الأيامُ السبعةُ القادمة')),
+                    array('unit' => 'مبلغ', 'decimals' => 0, 'period' => 'الأيام السبعة القادمة')),
             ),
             // ② مهامُّ الدورِ منطقُها مكتوبٌ في roleBoardTasks(17) — لا تُكرَّر هنا
             'tasks' => array(),
@@ -1067,23 +1067,23 @@ function roleBoardTasks($conn, $gate, $roleId)
         $n = (int) roleBoardScalar($gate, array('scope' => array('p' => 'fin_payments')),
             "SELECT COUNT(*) FROM fin_payments p WHERE {TENANT_SCOPE} AND COALESCE(p.is_deleted,0)=0
              AND p.direction='disbursement' AND p.state='approved'");
-        if ($n > 0) { $out[] = array('label' => 'مدفوعاتٌ جاهزةٌ للتنفيذ', 'count' => $n, 'href' => '../Finance/payments_fin.php', 'icon' => 'fa fa-money-bill-transfer'); }
+        if ($n > 0) { $out[] = array('label' => 'مدفوعات جاهزة للتنفيذ', 'count' => $n, 'href' => '../Finance/payments_fin.php', 'icon' => 'fa fa-money-bill-transfer'); }
 
         $n = (int) roleBoardScalar($gate, array('scope' => array('e' => 'fin_financial_events')),
             "SELECT COUNT(*) FROM fin_financial_events e WHERE {TENANT_SCOPE} AND COALESCE(e.is_deleted,0)=0 AND e.state='draft'");
-        if ($n > 0) { $out[] = array('label' => 'معاملاتٌ واردةٌ تنتظر المراجعة', 'count' => $n, 'href' => '../Finance/events_list_fin.php', 'icon' => 'fa fa-receipt'); }
+        if ($n > 0) { $out[] = array('label' => 'معاملات واردة تنتظر المراجعة', 'count' => $n, 'href' => '../Finance/events_list_fin.php', 'icon' => 'fa fa-receipt'); }
 
         $n = (int) roleBoardScalar($gate, array('scope' => array('u' => 'fin_unit_records')),
             "SELECT COUNT(*) FROM fin_unit_records u WHERE {TENANT_SCOPE} AND COALESCE(u.is_deleted,0)=0 AND u.match_state='matched'");
-        if ($n > 0) { $out[] = array('label' => 'وحداتٌ تنتظر ختم المالية', 'count' => $n, 'href' => '../Finance/unit_records_fin.php', 'icon' => 'fa fa-scale-balanced'); }
+        if ($n > 0) { $out[] = array('label' => 'وحدات تنتظر ختم المالية', 'count' => $n, 'href' => '../Finance/unit_records_fin.php', 'icon' => 'fa fa-scale-balanced'); }
     }
 
     if ($rid === 13) {
         // دورة الأمر بحالاتها العربية الخمس — كل حالةٍ مفتوحةٍ صندوقُ عملٍ بقفزة
         $map = array(
-            array('بلاغ',  'بلاغاتٌ تنتظر بدءَ التنفيذ', 'fa fa-bell'),
-            array('تنفيذ', 'أوامرُ قيد التنفيذ',          'fa fa-screwdriver-wrench'),
-            array('فحص',   'أوامرُ تنتظر الفحصَ والإقفال', 'fa fa-clipboard-check'),
+            array('بلاغ',  'بلاغات تنتظر بدء التنفيذ', 'fa fa-bell'),
+            array('تنفيذ', 'أوامر قيد التنفيذ',          'fa fa-screwdriver-wrench'),
+            array('فحص',   'أوامر تنتظر الفحص والإقفال', 'fa fa-clipboard-check'),
         );
         foreach ($map as $m) {
             $n = (int) roleBoardScalar($gate, array('scope' => array('o' => 'mnt_order')),
@@ -1094,15 +1094,15 @@ function roleBoardTasks($conn, $gate, $roleId)
         $n = (int) roleBoardScalar($gate, array('scope' => array('p' => 'mnt_plan')),
             "SELECT COUNT(*) FROM mnt_plan p WHERE {TENANT_SCOPE} AND COALESCE(p.is_deleted,0)=0
              AND p.next_due_date IS NOT NULL AND p.next_due_date <= DATE_ADD(CURDATE(), INTERVAL 7 DAY)");
-        if ($n > 0) { $out[] = array('label' => 'وقائيةُ الأسبوع المستحقة', 'count' => $n, 'href' => '../Maintenance/preventive_plans.php', 'icon' => 'fa fa-calendar-check'); }
+        if ($n > 0) { $out[] = array('label' => 'وقائية الأسبوع المستحقة', 'count' => $n, 'href' => '../Maintenance/preventive_plans.php', 'icon' => 'fa fa-calendar-check'); }
     }
 
     if ($rid === 16) {
         // خيطُ القطعة بحالاته العربية الحية: وارد ← أمرٌ مؤكَّد ← عهدةٌ مفتوحة
         $map = array(
-            array("r.state IN('مقدَّم','اعتماد المشتريات')", 'proc_request', 'r', 'طلباتُ شراءٍ واردةٌ تنتظر قرارك', '../Procurement/requests_proc.php', 'fa fa-file-lines'),
-            array("o.state = 'مؤكَّد'",                      'proc_order',   'o', 'أوامرُ مؤكَّدةٌ تنتظر الاستلام',   '../Procurement/orders_proc.php',   'fa fa-file-invoice-dollar'),
-            array("rc.state <> 'مسلَّمة للوجهة'",            'proc_receipt_custody', 'rc', 'عهدُ استلامٍ مفتوحة',   '../Procurement/receipt_custody_proc.php', 'fa fa-truck-ramp-box'),
+            array("r.state IN('مقدَّم','اعتماد المشتريات')", 'proc_request', 'r', 'طلبات شراء واردة تنتظر قرارك', '../Procurement/requests_proc.php', 'fa fa-file-lines'),
+            array("o.state = 'مؤكَّد'",                      'proc_order',   'o', 'أوامر مؤكدة تنتظر الاستلام',   '../Procurement/orders_proc.php',   'fa fa-file-invoice-dollar'),
+            array("rc.state <> 'مسلَّمة للوجهة'",            'proc_receipt_custody', 'rc', 'عهد استلام مفتوحة',   '../Procurement/receipt_custody_proc.php', 'fa fa-truck-ramp-box'),
         );
         foreach ($map as $m) {
             $n = (int) roleBoardScalar($gate, array('scope' => array($m[2] => $m[1])),
@@ -1114,10 +1114,10 @@ function roleBoardTasks($conn, $gate, $roleId)
     if ($rid === 23) {
         // دورة الرحلة بمراحلها: طلبٌ وارد ← جاهزةٌ للانطلاق ← جاريةٌ ← وصلت تنتظر الإغلاق
         $map = array(
-            array("r.state = 'submitted'", 'transfer_requests', 'r', 'طلباتُ ترحيلٍ تنتظر اعتمادك', '../Transport/transfer_requests.php', 'fa fa-inbox'),
-            array("o.stage IN('planned','ready')", 'transfer_orders', 'o', 'رحلاتٌ مخطَّطةٌ تنتظر الانطلاق', '../Transport/transfer_orders_list.php', 'fa fa-route'),
-            array("o.stage = 'in_transit'", 'transfer_orders', 'o', 'رحلاتٌ جاريةٌ الآن', '../Transport/transfer_orders_list.php', 'fa fa-truck-fast'),
-            array("o.stage = 'arrived'", 'transfer_orders', 'o', 'وصلت — تنتظر توثيقَ التسليم والإغلاق', '../Transport/transfer_orders_list.php', 'fa fa-flag-checkered'),
+            array("r.state = 'submitted'", 'transfer_requests', 'r', 'طلبات ترحيل تنتظر اعتمادك', '../Transport/transfer_requests.php', 'fa fa-inbox'),
+            array("o.stage IN('planned','ready')", 'transfer_orders', 'o', 'رحلات مخططة تنتظر الانطلاق', '../Transport/transfer_orders_list.php', 'fa fa-route'),
+            array("o.stage = 'in_transit'", 'transfer_orders', 'o', 'رحلات جارية الآن', '../Transport/transfer_orders_list.php', 'fa fa-truck-fast'),
+            array("o.stage = 'arrived'", 'transfer_orders', 'o', 'وصلت — تنتظر توثيق التسليم والإغلاق', '../Transport/transfer_orders_list.php', 'fa fa-flag-checkered'),
         );
         foreach ($map as $m) {
             $n = (int) roleBoardScalar($gate, array('scope' => array($m[2] => $m[1])),

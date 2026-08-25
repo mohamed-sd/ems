@@ -495,9 +495,9 @@ $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 // UXW-01 (9): حالاتُ الشاشةِ الدنيا (تحميل / فراغ / خطأ) — مخفيةٌ افتراضيًّا
-echo ems_states_bundle('لا تفاصيلَ لهذه الوحدةِ اليومية', 'ارجعْ إلى سجلِّ الوحداتِ اليوميةِ واختر سطرًا بزرِّ «عرض التفاصيل»');
+echo ems_states_bundle('لا تفاصيل لهذه الوحدة اليومية', 'ارجع إلى سجل الوحدات اليومية واختر سطرا بزر «عرض التفاصيل»');
 ?>
-                    <p class="hero-subtitle">عرض تقرير مفصّل لجميع ساعات التشغيل والأعطال والمشغل</p>
+                    <p class="hero-subtitle">عرض تقرير مفصل لجميع ساعات التشغيل والأعطال والمشغل</p>
                 </div>
             </div>
             <a href="javascript:history.back()" class="btn-secondary">
@@ -955,8 +955,8 @@ if ($result) foreach ($result as $row) {
                                 <th class="tsd-cell">الفئة الفرعية</th>
                                 <th class="tsd-cell">تفصيل العطل</th>
                                                 <!-- U10-B12: النواة الحاكمة (الخلايا يحشوها ui-unification.js) -->
-                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ السجل وبأي صفة">المُنشئ — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ السجل وبأي صفة">المنشئ — الاسم والصفة</th>
                     <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء">تاريخ الإنشاء</th>
                     <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="السجل الذي تولد عنه">المرجع الأب</th>
 </tr>
@@ -1172,9 +1172,9 @@ if ($result) foreach ($result as $row) {
                     <thead>
                         <tr class="tsd-thead-row">
                             <th class="tsd-cell tsd-w15">#</th>
-                            <th class="tsd-cell tsd-w20">الحقل المعدّل</th>
+                            <th class="tsd-cell tsd-w20">الحقل المعدل</th>
                             <th class="tsd-cell tsd-w35">الملاحظة</th>
-                            <th class="tsd-cell tsd-w15">المعدِّل</th>
+                            <th class="tsd-cell tsd-w15">المعدل</th>
                             <th class="tsd-cell tsd-w15">التاريخ والوقت</th>
                         </tr>
                     </thead>

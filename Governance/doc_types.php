@@ -40,7 +40,7 @@ if (!$is_super_admin && empty($__pp['can_view'])) {
     exit();
 }
 if (!$is_super_admin && $_SERVER['REQUEST_METHOD'] === 'POST' && empty($__pp['can_add']) && empty($__pp['can_edit'])) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'غير مصرح بالكتابة في هذه الشاشة ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
+    ems_gov_flash_redirect('../main/dashboard.php', 'غير مصرح بالكتابة في هذه الشاشة ❌', 'GOV-PERM-403', 'اطلب المنحة من مدير الصلاحيات إن كانت ضمن عملك');
 }
 $COLS   = array (
   0 => 'الكيان',
@@ -51,14 +51,14 @@ $COLS   = array (
   5 => 'بادئة الترقيم',
   6 => 'دورية التسلسل',
   7 => 'آلة الحالة المرتبطة',
-  8 => 'يحتاج اعتمادًا؟',
+  8 => 'يحتاج اعتمادا؟',
   9 => 'عدد حلقات الاعتماد',
   10 => 'له أثر مالي؟',
   11 => 'قابل للعكس؟',
   12 => 'نمط العكس',
   13 => 'مدة الحفظ النظامية',
   14 => 'سياسة الأرشفة',
-  15 => 'المُنشئ — الاسم والصفة',
+  15 => 'المنشئ — الاسم والصفة',
   16 => 'تاريخ السريان',
   17 => 'الحالة',
 );
@@ -70,7 +70,7 @@ $FIELDS = array (
   4 => 'بادئة الترقيم',
   5 => 'دورية التسلسل',
   6 => 'آلة الحالة المرتبطة',
-  7 => 'يحتاج اعتمادًا؟',
+  7 => 'يحتاج اعتمادا؟',
   8 => 'عدد حلقات الاعتماد',
   9 => 'له أثر مالي؟',
   10 => 'قابل للعكس؟',
@@ -92,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     $creator = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
     // الموجة ٢: الحفظ في الجدول الأصلي للشاشة (الفارغ NULL — لا مخزن بينيًّا)
     $ok = cmp03_store_insert($conn, $company_id, $CANONICAL, $payload, $status, $uid, $creator);
-    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
+    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
     exit();
 }
 
@@ -107,7 +107,7 @@ $entityName = $govCtx['values']['entity'] ?? '—';
 function cmp03_cell($col, $row, $entityName) {
     $n = cmp03_screen_norm($col);
     if ($n === cmp03_screen_norm('الكيان')) { return $entityName; }
-    if ($n === cmp03_screen_norm('المُنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المُنشئة')) {
+    if ($n === cmp03_screen_norm('المنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المنشئة')) {
         return $row['created_by_name'] ?: '—';
     }
     if ($n === cmp03_screen_norm('تاريخ الإنشاء')) { return $row['created_at']; }
@@ -122,7 +122,7 @@ function cmp03_screen_norm($s) {
     $s = str_replace(array('أ','إ','آ'), 'ا', $s);
     $s = str_replace('ة', 'ه', $s);
     $s = str_replace('ى', 'ي', $s);
-    return preg_replace('/[ًٌٍَُِّْ]/u', '', $s);
+    return preg_replace('/[]/u', '', $s);
 }
 
 $page_title = 'إيكوبيشن | سجل أنواع المستندات';
@@ -146,7 +146,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
-    echo ems_states_bundle('لا أنواعَ مستنداتٍ مسجَّلةً بعد', 'أضف نوعَ المستندِ وترقيمَه ودورتَه بزرِّ «إضافة» أعلى الشاشة');
+    echo ems_states_bundle('لا أنواع مستندات مسجلة بعد', 'أضف نوع المستند وترقيمه ودورته بزر «إضافة» أعلى الشاشة');
     ?>
 
     <!-- فورم الإضافة الموحد (ems-forms) — مطويٌّ حتى زرِّ الرأس -->
@@ -171,7 +171,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="f5" maxlength="190" id="emsf_565_f6532"></div>
                 <div class="form-group"><label for="emsf_566_f8ae5">آلة الحالة المرتبطة</label>
                     <input type="text" name="f6" maxlength="190" id="emsf_566_f8ae5"></div>
-                <div class="form-group"><label for="emsf_567_e96e9">يحتاج اعتمادًا؟</label>
+                <div class="form-group"><label for="emsf_567_e96e9">يحتاج اعتمادا؟</label>
                     <input type="text" name="f7" maxlength="190" id="emsf_567_e96e9"></div>
                 <div class="form-group"><label for="emsf_568_53c9a">عدد حلقات الاعتماد</label>
                     <input type="text" inputmode="decimal" name="f8" placeholder="0" id="emsf_568_53c9a"></div>
@@ -201,7 +201,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="table-responsive">
         <table class="alltables display" id="doc_typesTable">
             <thead><tr>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
             <th>كود النوع</th>
             <th>اسم المستند</th>
             <th>الإدارة المالكة</th>
@@ -209,20 +209,20 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th>بادئة الترقيم</th>
             <th>دورية التسلسل</th>
             <th>آلة الحالة المرتبطة</th>
-            <th>يحتاج اعتمادًا؟</th>
+            <th>يحتاج اعتمادا؟</th>
             <th>عدد حلقات الاعتماد</th>
             <th>له أثر مالي؟</th>
             <th>قابل للعكس؟</th>
             <th>نمط العكس</th>
             <th>مدة الحفظ النظامية</th>
             <th>سياسة الأرشفة</th>
-            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
             <th>تاريخ السريان</th>
             <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
             </tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="18" class="text-center text-muted">لا بياناتَ بعدُ — أضف أول صفٍّ بزر «إضافة»</td></tr>
+                <tr><td colspan="18" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
                     <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>

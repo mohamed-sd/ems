@@ -273,8 +273,8 @@ function printUnifiedNavDoor($doorKey, $doorMeta, $items, $basePrefix = '../', $
 function ems_nav_stage_label($rawTitle, $stageNo) {
     $title = trim((string) $rawTitle);
     if ($title !== '') {
-        $ord = 'أولًا|أولاً|ثانيًا|ثانياً|ثالثًا|ثالثاً|رابعًا|رابعاً|خامسًا|خامساً|'
-             . 'سادسًا|سادساً|سابعًا|سابعاً|ثامنًا|ثامناً|تاسعًا|تاسعاً|عاشرًا|عاشراً';
+        $ord = 'أولا|أولا|ثانيا|ثانيا|ثالثا|ثالثا|رابعا|رابعا|خامسا|خامسا|'
+             . 'سادسا|سادسا|سابعا|سابعا|ثامنا|ثامنا|تاسعا|تاسعا|عاشرا|عاشرا';
         $stripped = preg_replace('~^\s*(?:' . $ord . ')\s*[:：\-–—]\s*~u', '', $title);
         if (is_string($stripped) && trim($stripped) !== '') { $title = trim($stripped); }
     }

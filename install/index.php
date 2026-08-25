@@ -32,9 +32,9 @@ use App\Install\Installer;
 if (is_file($ROOT . '/.installed')) {
     http_response_code(403);
     render_gate(
-        'النظامُ مثبَّتٌ سلفًا',
-        'وُجد الملفُّ <code>.installed</code> في جذر المشروع، فالمُثبِّتُ يرفض العمل — تشغيلُه فوق نظامٍ قائمٍ إتلاف.',
-        'إن كنت تريد إعادةَ التثبيت عمدًا: أسقِط قاعدةَ البيانات، واحذف <code>.installed</code>، ثمّ عُد.'
+        'النظام مثبت سلفا',
+        'وجد الملف <code>.installed</code> في جذر المشروع، فالمثبت يرفض العمل — تشغيله فوق نظام قائم إتلاف.',
+        'إن كنت تريد إعادة التثبيت عمدا: أسقط قاعدة البيانات، واحذف <code>.installed</code>، ثم عد.'
     );
     exit;
 }
@@ -44,9 +44,9 @@ $tokenPath = __DIR__ . '/install.token';
 if (!is_file($tokenPath)) {
     http_response_code(403);
     render_gate(
-        'ملفُّ الرمز مفقود',
-        'المُثبِّتُ عبر المتصفّح لا يعمل قبل إثبات الوصول إلى نظام الملفّات على الخادم.',
-        'أنشئ الملفَّ <code>install/install.token</code> بمحتوًى عشوائي، ثمّ أدخل المحتوى نفسه هنا:<br>'
+        'ملف الرمز مفقود',
+        'المثبت عبر المتصفح لا يعمل قبل إثبات الوصول إلى نظام الملفات على الخادم.',
+        'أنشئ الملف <code>install/install.token</code> بمحتوى عشوائي، ثم أدخل المحتوى نفسه هنا:<br>'
         . '<code dir="ltr">php -r "echo bin2hex(random_bytes(16));" &gt; install/install.token</code>'
     );
     exit;
@@ -54,7 +54,7 @@ if (!is_file($tokenPath)) {
 $expectedToken = trim((string) file_get_contents($tokenPath));
 if ($expectedToken === '') {
     http_response_code(403);
-    render_gate('ملفُّ الرمز فارغ', 'الملفُّ <code>install/install.token</code> موجودٌ لكنه فارغ.', 'اكتب فيه محتوًى عشوائيًّا ثمّ أعِد المحاولة.');
+    render_gate('ملف الرمز فارغ', 'الملف <code>install/install.token</code> موجود لكنه فارغ.', 'اكتب فيه محتوى عشوائيا ثم أعد المحاولة.');
     exit;
 }
 
@@ -119,7 +119,7 @@ function render_gate($title, $body, $hint)
     ?><!doctype html>
 <html lang="ar" dir="rtl"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title><?php echo h($title); ?> — مُثبِّت EMS</title>
+<title><?php echo h($title); ?> — مثبت EMS</title>
 <?php render_style(); ?>
 </head><body><div class="wrap"><div class="card gate">
 <h1><?php echo h($title); ?></h1>
@@ -175,25 +175,25 @@ if ($result !== null && $result['ok']) {
 <div class="card">
   <h1>✔ اكتمل التثبيت</h1>
   <div class="banner b-no" style="margin-top:14px">
-    <b>افعل هذا الآن:</b> احذف مجلَّد <code>install/</code> بالكامل من الخادم.
-    بقاؤه يترك مسارَ تثبيتٍ مكشوفًا وإن كان محروسًا.
+    <b>افعل هذا الآن:</b> احذف مجلد <code>install/</code> بالكامل من الخادم.
+    بقاؤه يترك مسار تثبيت مكشوفا وإن كان محروسا.
   </div>
   <dl>
-    <dt>القاعدة</dt><dd><?php echo h($s['database']); ?> — <?php echo (int) $s['objects']; ?> كائنًا</dd>
+    <dt>القاعدة</dt><dd><?php echo h($s['database']); ?> — <?php echo (int) $s['objects']; ?> كائنا</dd>
     <dt>الشركة</dt><dd>id=<?php echo (int) $s['company_id']; ?></dd>
-    <dt>الموظّف</dt><dd>id=<?php echo (int) $s['employee_id']; ?></dd>
+    <dt>الموظف</dt><dd>id=<?php echo (int) $s['employee_id']; ?></dd>
     <dt>الحساب</dt><dd><?php echo h($s['username']); ?> (id=<?php echo (int) $s['user_id']; ?>)</dd>
   </dl>
 </div>
 <div class="card">
-  <h2>ما نُفِّذ</h2>
+  <h2>ما نفذ</h2>
   <table><?php foreach ($result['steps'] as $st) { ?>
     <tr><td class="st ok">✔</td><td class="lb"><?php echo h($st['label']); ?></td>
         <td class="dt"><?php echo h($st['detail']); ?></td></tr>
   <?php } ?></table>
   <p class="hint" style="margin-top:16px">
-    راجع <code>.env</code> ثمّ ادخل من <code>login.php</code>.
-    تغييراتُ المخطَّط لاحقًا عبر <code>php database/migrate.php up</code>.
+    راجع <code>.env</code> ثم ادخل من <code>login.php</code>.
+    تغييرات المخطط لاحقا عبر <code>php database/migrate.php up</code>.
   </p>
 </div>
 </div></body></html><?php
@@ -205,31 +205,31 @@ $passed = !empty($checks) && Installer::passed($checks);
 ?><!doctype html>
 <html lang="ar" dir="rtl"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>مُثبِّت EMS</title><?php render_style(); ?></head>
+<title>مثبت EMS</title><?php render_style(); ?></head>
 <body><div class="wrap">
 
 <div class="card">
-  <h1>مُثبِّت EMS</h1>
-  <p class="hint">يُنصَب النظامُ على قاعدةٍ <b>فارغة</b>: المخطَّطُ الكامل ثمّ البذرةُ المرجعية
-     ثمّ شركةٌ وموظّفٌ وحسابُ دخولٍ مترابطة. لا يعمل فوق قاعدةٍ عامرة.</p>
+  <h1>مثبت EMS</h1>
+  <p class="hint">ينصب النظام على قاعدة <b>فارغة</b>: المخطط الكامل ثم البذرة المرجعية
+     ثم شركة وموظف وحساب دخول مترابطة. لا يعمل فوق قاعدة عامرة.</p>
 </div>
 
 <?php if ($posted && !$tokenOk) { ?>
-  <div class="banner b-no">رمزُ التثبيت غير مطابق لمحتوى <code>install/install.token</code>.</div>
+  <div class="banner b-no">رمز التثبيت غير مطابق لمحتوى <code>install/install.token</code>.</div>
 <?php } ?>
 
 <?php if ($result !== null && !$result['ok']) { ?>
   <div class="banner b-no"><b>فشل التثبيت:</b> <?php echo h($result['error']); ?><br>
-  القاعدةُ قد تكون نصفَ مبنيّة — أسقِطها وأعِد التثبيت من قاعدةٍ فارغة.</div>
+  القاعدة قد تكون نصف مبنية — أسقطها وأعد التثبيت من قاعدة فارغة.</div>
 <?php } ?>
 
 <?php if (!empty($checks)) { ?>
   <div class="card">
-    <h2>الفحصُ القبلي</h2>
+    <h2>الفحص القبلي</h2>
     <div class="banner <?php echo $passed ? 'b-ok' : 'b-no'; ?>">
       <?php echo $passed
-        ? 'اجتاز الفحصُ بالكامل — يمكنك التثبيت الآن.'
-        : 'لم يجتز — عالج ما عليه ✘ ثمّ أعِد الفحص.'; ?>
+        ? 'اجتاز الفحص بالكامل — يمكنك التثبيت الآن.'
+        : 'لم يجتز — عالج ما عليه ✘ ثم أعد الفحص.'; ?>
     </div>
     <table><?php foreach ($checks as $c) { ?>
       <tr><td class="st <?php echo $c['ok'] ? 'ok' : 'no'; ?>"><?php echo $c['ok'] ? '✔' : '✘'; ?></td>
@@ -241,7 +241,7 @@ $passed = !empty($checks) && Installer::passed($checks);
 
 <form method="post" autocomplete="off">
 <div class="card">
-  <h2>رمزُ التثبيت</h2>
+  <h2>رمز التثبيت</h2>
   <div class="row">
     <label for="emsf_724_15ce6">محتوى <code>install/install.token</code></label>
     <input type="password" name="install_token" value="<?php echo h($in['install_token']); ?>" required id="emsf_724_15ce6">
@@ -271,8 +271,8 @@ $passed = !empty($checks) && Installer::passed($checks);
 </div>
 
 <div class="card">
-  <h2>حسابُ الدخول الأوّل</h2>
-  <p class="hint">يُنشأ موظّفٌ مربوطٌ بالحساب — النظامُ يرفض أيَّ حسابٍ بلا موظّفٍ مُسنَد.</p>
+  <h2>حساب الدخول الأول</h2>
+  <p class="hint">ينشأ موظف مربوط بالحساب — النظام يرفض أي حساب بلا موظف مسند.</p>
   <div class="grid">
     <div class="row"><label for="emsf_732_bc9b8">الاسم الكامل</label><input type="text" name="admin_name" value="<?php echo h($in['admin_name']); ?>" required id="emsf_732_bc9b8"></div>
     <div class="row"><label for="emsf_733_27206">اسم الدخول</label><input type="text" name="admin_username" value="<?php echo h($in['admin_username']); ?>" required id="emsf_733_27206"></div>
@@ -285,9 +285,9 @@ $passed = !empty($checks) && Installer::passed($checks);
 <div class="card">
   <button type="submit" name="action" value="check" class="ghost">افحص فقط</button>
   <?php if ($passed) { ?>
-    <button type="submit" name="action" value="install">ثبِّت الآن</button>
+    <button type="submit" name="action" value="install">ثبت الآن</button>
   <?php } ?>
-  <p class="hint" style="margin-top:12px">زرُّ التثبيت لا يظهر قبل اجتياز الفحص القبلي كاملًا.</p>
+  <p class="hint" style="margin-top:12px">زر التثبيت لا يظهر قبل اجتياز الفحص القبلي كاملا.</p>
 </div>
 </form>
 

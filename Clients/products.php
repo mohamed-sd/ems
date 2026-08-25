@@ -143,7 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     // الكود
     $prod_code_raw = isset($_POST['product_code']) ? trim($_POST['product_code']) : '';
     if ($prod_code_raw === '' || !preg_match('/^[A-Za-z0-9_\-]+$/', $prod_code_raw)) {
-        prod_redirect_with_msg('كود المنتج غير صالح. استخدم أحرفًا وأرقامًا و - أو _ فقط ❌');
+        prod_redirect_with_msg('كود المنتج غير صالح. استخدم أحرفا وأرقاما و - أو _ فقط ❌');
     }
 
     // الاسم
@@ -197,7 +197,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                 array($prod_code_raw, $prod_id));
         } catch (\Throwable $t) { $dup = array(); }
         if (!empty($dup)) {
-            prod_redirect_with_msg('كود المنتج موجود مسبقاً داخل شركتك ❌');
+            prod_redirect_with_msg('كود المنتج موجود مسبقا داخل شركتك ❌');
         }
 
         try {
@@ -228,7 +228,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                 array($prod_code_raw));
         } catch (\Throwable $t) { $dup = array(); }
         if (!empty($dup)) {
-            prod_redirect_with_msg('كود المنتج موجود مسبقاً داخل شركتك ❌');
+            prod_redirect_with_msg('كود المنتج موجود مسبقا داخل شركتك ❌');
         }
 
         try {
@@ -361,7 +361,7 @@ include('../includes/page_header.php');
         </div>
     <?php endif; ?>
 
-    <?php echo ems_states_bundle('لا منتجاتٍ ولا خدماتٍ مسجَّلةً ضمن هذا الترشيح', 'أضف منتجًا أو خدمةً جديدةً أو غيّر المرشِّحات'); ?>
+    <?php echo ems_states_bundle('لا منتجات ولا خدمات مسجلة ضمن هذا الترشيح', 'أضف منتجا أو خدمة جديدة أو غير المرشحات'); ?>
 
     <div class="stats-section prod-hidden" id="prodStatsSection">
         <div class="stats-grid">
@@ -512,10 +512,10 @@ include('../includes/page_header.php');
                             <th class="ems-fn-th" data-fn="1">قابل للخصم؟</th>
                             <th class="ems-fn-th" data-fn="1">الحد الأدنى للسعر</th>
                             <th class="ems-fn-th" data-fn="1">العملة الافتراضية</th>
-                            <th class="ems-fn-th" data-fn="1">العقود المستعمِلة</th>
-                            <th class="ems-fn-th" data-fn="1">عرّفه</th>
+                            <th class="ems-fn-th" data-fn="1">العقود المستعملة</th>
+                            <th class="ems-fn-th" data-fn="1">عرفه</th>
                             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
                             <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
                             <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                             <th class="ems-gov-th" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
@@ -612,7 +612,7 @@ include('../includes/page_header.php');
         });
         }
 
-        // الربطُ بعد تهيئةِ المكوّنِ المركزي للجدول (أو فورًا إن سبقنا)
+        // الربط بعد تهيئة المكون المركزي للجدول (أو فورا إن سبقنا)
         if ($.fn.dataTable && $.fn.dataTable.isDataTable('#prodTable')) {
             bindProdFilters();
         } else {
@@ -631,13 +631,13 @@ include('../includes/page_header.php');
     const statsSection = $('#prodStatsSection');
 
     /**
-     * إظهارُ حقلِ الكودِ المولَّد وإخفاؤه.
+     * إظهار حقل الكود المولد وإخفاؤه.
      *
      * ⚠️ **لا تستعمل `jQuery.hide()` هنا** — `assets/css/ems-forms.css` يحمل:
      *     :is(.allforms, .ems-form) .form-grid > div { display: block !important }
-     * والغلافُ ابنٌ مباشرٌ لـ`.form-grid`، فـ`!important` من ورقةِ الأنماطِ تهزم
-     * الإخفاءَ السطريَّ **بلا أولوية**: السمةُ تُكتب فعلًا والحقلُ يبقى ظاهرًا، بلا
-     * خطأٍ في وحدةِ التحكم ولا سطرٍ في أيِّ سجل. (نظيرُ شاشتَي العملاءِ والمشاريع.)
+     * والغلاف ابن مباشر ل`.form-grid`، ف`!important` من ورقة الأنماط تهزم
+     * الإخفاء السطري **بلا أولوية**: السمة تكتب فعلا والحقل يبقى ظاهرا، بلا
+     * خطأ في وحدة التحكم ولا سطر في أي سجل. (نظير شاشتي العملاء والمشاريع.)
      */
     function setGeneratedCodeShown(shown) {
         var el = generatedCodeWrapper[0];
@@ -648,9 +648,9 @@ include('../includes/page_header.php');
     function setAddMode() {
         formTitle.text('إضافة منتج جديد'); submitBtnText.text('حفظ المنتج');
         setGeneratedCodeShown(true);
-        // الكودُ المولَّدُ يعود إلى خانتِه كلَّما دخلنا وضعَ الإضافة — ومصدرُه حقلُ
-        // العرضِ نفسُه لا نسخةٌ ثانيةٌ منه (مصدرُ حقيقةٍ واحد). و`reset()` يكفي
-        // للإلغاء، لكنَّ الانتقالَ من «تعديل» إلى «إضافة» قد يقع بلا reset.
+        // الكود المولد يعود إلى خانته كلما دخلنا وضع الإضافة — ومصدره حقل
+        // العرض نفسه لا نسخة ثانية منه (مصدر حقيقة واحد). و`reset()` يكفي
+        // للإلغاء، لكن الانتقال من «تعديل» إلى «إضافة» قد يقع بلا reset.
         var genCode = $('#generated_prod_code').val();
         if (genCode) { $('#product_code').val(genCode); }
     }
@@ -729,7 +729,7 @@ include('../includes/page_header.php');
         });
     });
 
-    // ── عرض التفاصيل عبر EmsDetailsModal الموحّد ──
+    // ── عرض التفاصيل عبر EmsDetailsModal الموحد ──
     $(document).on('click', '.viewProdBtn', function () {
         const d = $(this).data();
         const cur = d.currency || '';

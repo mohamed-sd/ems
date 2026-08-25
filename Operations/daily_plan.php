@@ -73,25 +73,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dp_action'])) {
     $act = strval($_POST['dp_action']);
     if ($act === 'generate') {
         $r = DPS::generateNeeds($conn, $gate, $company_id, $sel_project, $sel_date, $uid);
-        $dp_back($r['ok'] ? ('وُلّد الاحتياج: ' . $r['created'] . ' سطرًا جديدًا · ' . $r['existing'] . ' قائمًا ✅')
+        $dp_back($r['ok'] ? ('ولد الاحتياج: ' . $r['created'] . ' سطرا جديدا · ' . $r['existing'] . ' قائما ✅')
                           : ($r['reason'] . ' ❌'));
     } elseif ($act === 'assign') {
         $r = DPS::assign($conn, $gate, $company_id, intval($_POST['line_id'] ?? 0),
                          intval($_POST['operator_employee_id'] ?? 0), $uid);
-        $dp_back($r['ok'] ? 'وُزّع ✅' : ($r['reason'] . ' ❌ (' . intval($r['code']) . ')'));
+        $dp_back($r['ok'] ? 'وزع ✅' : ($r['reason'] . ' ❌ (' . intval($r['code']) . ')'));
     } elseif ($act === 'approve') {
         $r = DPS::approve($conn, $gate, $company_id, intval($_POST['plan_id'] ?? 0), $uid);
-        $dp_back($r['ok'] ? 'اعتمدت الحركةُ الخطة ✅' : ($r['reason'] . ' ❌ (' . intval($r['code']) . ')'));
+        $dp_back($r['ok'] ? 'اعتمدت الحركة الخطة ✅' : ($r['reason'] . ' ❌ (' . intval($r['code']) . ')'));
     } elseif ($act === 'open') {
         $r = DPS::open($conn, $gate, $company_id, intval($_POST['plan_id'] ?? 0), $uid);
-        $dp_back($r['ok'] ? 'فُتح يومُ الغد وأُشعرت المواقع ✅'
+        $dp_back($r['ok'] ? 'فتح يوم الغد وأشعرت المواقع ✅'
                           : ($r['reason'] . (empty($r['missing']) ? '' : ' — ' . implode(' · ', $r['missing'])) . ' ❌'));
     } elseif ($act === 'reopen') {
         $r = DPS::reopen($conn, $gate, $company_id, intval($_POST['plan_id'] ?? 0),
                          strval($_POST['reason'] ?? ''), $uid);
-        $dp_back($r['ok'] ? 'أُرجعت الخطةُ للمسودة بسببها ✅' : ($r['reason'] . ' ❌'));
+        $dp_back($r['ok'] ? 'أرجعت الخطة للمسودة بسببها ✅' : ($r['reason'] . ' ❌'));
     }
-    $dp_back('إجراءٌ غير معروف ❌');
+    $dp_back('إجراء غير معروف ❌');
 }
 
 // ── القراءة ────────────────────────────────────────────────────────────────
@@ -149,7 +149,7 @@ if ($sel_project > 0) {
         }
     }
 }
-$STATES = array('draft' => 'مسودة (توزيع)', 'approved' => 'معتمدةُ الحركة', 'opened' => 'مفتوحة ✓', 'closed' => 'مقفلة');
+$STATES = array('draft' => 'مسودة (توزيع)', 'approved' => 'معتمدة الحركة', 'opened' => 'مفتوحة ✓', 'closed' => 'مقفلة');
 $editable = $plan && strval($plan['state']) === 'draft' && ($can_add || $can_edit);
 
 $page_title = 'إيكوبيشن | خطة عمل الغد';
@@ -159,7 +159,7 @@ ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 // UXW-01 §8-2: موضعُ الشاشةِ من رحلةِ المشغّل — فعلُها تكليفُ المشغّلين على المعدات
-require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('operator', 'التكليفُ على المعدات');
+require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('operator', 'التكليف على المعدات');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
@@ -172,7 +172,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>';
     }
-    echo ems_states_bundle('لا خطةَ لهذا اليومِ بعدُ', 'اختر المشروعَ واليومَ ثم ولّدِ الاحتياجَ من الحاويات');
+    echo ems_states_bundle('لا خطة لهذا اليوم بعد', 'اختر المشروع واليوم ثم ولد الاحتياج من الحاويات');
     ?>
 
     <div class="card"><div class="card-body">
@@ -200,14 +200,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php if ($sel_project > 0): ?>
     <div class="card"><div class="card-body">
         <?php if (!$plan): ?>
-            <p>لا خطةَ لهذا اليوم بعد — الاحتياجُ يُولَّد من حاويات المعدات النشطة (لا من اليد).</p>
+            <p>لا خطة لهذا اليوم بعد — الاحتياج يولد من حاويات المعدات النشطة (لا من اليد).</p>
             <?php if ($can_add): ?>
             <form method="post" class="dp-inline">
         <?= csrf_field() ?>
                 <input type="hidden" name="dp_action" value="generate">
                 <input type="hidden" name="project_id" value="<?php echo $sel_project; ?>">
                 <input type="hidden" name="plan_date" value="<?php echo htmlspecialchars($sel_date); ?>">
-                <button type="submit" class="btn-primary"><i class="fa fa-bolt"></i> ولّد احتياجَ اليوم</button>
+                <button type="submit" class="btn-primary"><i class="fa fa-bolt"></i> ولد احتياج اليوم</button>
             </form>
             <?php endif; ?>
         <?php else: ?>
@@ -228,7 +228,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="hidden" name="dp_action" value="generate">
                     <input type="hidden" name="project_id" value="<?php echo $sel_project; ?>">
                     <input type="hidden" name="plan_date" value="<?php echo htmlspecialchars($sel_date); ?>">
-                    <button type="submit" class="btn btn-sm btn-secondary">حدّث الاحتياج</button>
+                    <button type="submit" class="btn btn-sm btn-secondary">حدث الاحتياج</button>
                 </form>
                 <form method="post" class="dp-inline">
         <?= csrf_field() ?>
@@ -236,7 +236,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="hidden" name="plan_id" value="<?php echo intval($plan['id']); ?>">
                     <input type="hidden" name="project_id" value="<?php echo $sel_project; ?>">
                     <input type="hidden" name="plan_date" value="<?php echo htmlspecialchars($sel_date); ?>">
-                    <button type="submit" class="btn btn-sm btn-secondary" title="لا اعتمادَ لمن أنشأ">اعتمادُ الحركة</button>
+                    <button type="submit" class="btn btn-sm btn-secondary" title="لا اعتماد لمن أنشأ">اعتماد الحركة</button>
                 </form>
                 <?php elseif ($plan['state'] === 'approved' && $can_edit): ?>
                 <form method="post" class="dp-inline">
@@ -245,7 +245,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="hidden" name="plan_id" value="<?php echo intval($plan['id']); ?>">
                     <input type="hidden" name="project_id" value="<?php echo $sel_project; ?>">
                     <input type="hidden" name="plan_date" value="<?php echo htmlspecialchars($sel_date); ?>">
-                    <button type="submit" class="btn btn-sm btn-primary" title="لا يُفتح موقعٌ ناقصُ التخصيص">افتح يومَ الغد</button>
+                    <button type="submit" class="btn btn-sm btn-primary" title="لا يفتح موقع ناقص التخصيص">افتح يوم الغد</button>
                 </form>
                 <?php endif; ?>
                 <?php if (in_array(strval($plan['state']), array('approved', 'opened'), true) && $can_edit): ?>
@@ -256,7 +256,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="hidden" name="project_id" value="<?php echo $sel_project; ?>">
                     <input type="hidden" name="plan_date" value="<?php echo htmlspecialchars($sel_date); ?>">
                     <input type="text" name="reason" placeholder="سبب الإرجاع (إلزامي)" class="dp-reason" aria-label="سبب الإرجاع (إلزامي)">
-                    <button type="submit" class="btn btn-sm btn-secondary">أرجِع للمسودة</button>
+                    <button type="submit" class="btn btn-sm btn-secondary">أرجع للمسودة</button>
                 </form>
                 <?php endif; ?>
             </div>
@@ -264,8 +264,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="table-container">
                 <table class="alltables display no-datatable dp-table-full">
                     <thead><tr>
-                        <th>نوع المعدة</th><th>الوردية</th><th>المشغّل الموزَّع</th>
-                        <?php if ($editable): ?><th>التوزيع (من سلسلة حاويتها حصرًا)</th><?php endif; ?>
+                        <th>نوع المعدة</th><th>الوردية</th><th>المشغل الموزع</th>
+                        <?php if ($editable): ?><th>التوزيع (من سلسلة حاويتها حصرا)</th><?php endif; ?>
                         <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
                         <th class="ems-fn-th" data-fn="1">رقم الخطة</th>
                         <th class="ems-fn-th" data-fn="1">تاريخ التنفيذ</th>
@@ -273,17 +273,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <th class="ems-fn-th" data-fn="1">المشروع</th>
                         <th class="ems-fn-th" data-fn="1">رقم العقد</th>
                         <th class="ems-fn-th" data-fn="1">كود المعدة</th>
-                        <th class="ems-fn-th" data-fn="1">المشغّل الأساسي</th>
-                        <th class="ems-fn-th" data-fn="1">المشغّل البديل</th>
+                        <th class="ems-fn-th" data-fn="1">المشغل الأساسي</th>
+                        <th class="ems-fn-th" data-fn="1">المشغل البديل</th>
                         <th class="ems-fn-th" data-fn="1">الساعات المخططة</th>
                         <th class="ems-fn-th" data-fn="1">الكمية المستهدفة</th>
                         <th class="ems-fn-th" data-fn="1">جبهة العمل</th>
                         <th class="ems-fn-th" data-fn="1">حالة الجاهزية</th>
-                        <th class="ems-fn-th" data-fn="1">أعدّها</th>
+                        <th class="ems-fn-th" data-fn="1">أعدها</th>
                         <th class="ems-fn-th" data-fn="1">اعتمدها</th>
                         <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                        <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                        <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                        <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                        <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                         <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                         <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                         <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
@@ -299,7 +299,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <?php if ($l['operator_employee_id']): ?>
                                     <span class="badge badge-success"><?php echo htmlspecialchars($l['operator_name'] ?? ('#' . intval($l['operator_employee_id']))); ?></span>
                                 <?php else: ?>
-                                    <span class="badge badge-danger" title="لا يُفتح موقعٌ ناقصُ التخصيص">بلا مشغّل</span>
+                                    <span class="badge badge-danger" title="لا يفتح موقع ناقص التخصيص">بلا مشغل</span>
                                 <?php endif; ?>
                             </td>
                             <?php if ($editable): ?>
@@ -310,25 +310,25 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                     <input type="hidden" name="line_id" value="<?php echo intval($l['id']); ?>">
                                     <input type="hidden" name="project_id" value="<?php echo $sel_project; ?>">
                                     <input type="hidden" name="plan_date" value="<?php echo htmlspecialchars($sel_date); ?>">
-                                    <select name="operator_employee_id" aria-label="المشغّل الموزَّع">
+                                    <select name="operator_employee_id" aria-label="المشغل الموزع">
                                         <option value="0">— أزل التخصيص —</option>
                                         <?php foreach (($chains[$ecId] ?? array()) as $c): ?>
                                             <option value="<?php echo intval($c['operator_employee_id']); ?>">
                                                 <?php echo htmlspecialchars(($c['name'] ?? ('#' . intval($c['operator_employee_id'])))
                                                     . ($c['role_kind'] ? ' (' . $c['role_kind'] . ')' : '')
                                                     . ((isset($onDuty[$ecId]) && $onDuty[$ecId] === intval($c['operator_employee_id']))
-                                                        ? ' ★ مناوبُ اليوم' : '')); ?>
+                                                        ? ' ★ مناوب اليوم' : '')); ?>
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
-                                    <button type="submit" class="action-btn edit" title="وزّع"><i class="fas fa-user-check"></i></button>
+                                    <button type="submit" class="action-btn edit" title="وزع"><i class="fas fa-user-check"></i></button>
                                 </form>
                             </td>
                             <?php endif; ?>
                         </tr>
                     <?php endforeach; ?>
                     <?php if (!$lines): ?>
-                        <tr><td colspan="4">لا سطورَ بعد — ولّد الاحتياجَ من الحاويات</td></tr>
+                        <tr><td colspan="4">لا سطور بعد — ولد الاحتياج من الحاويات</td></tr>
                     <?php endif; ?>
                     </tbody>
                 </table>

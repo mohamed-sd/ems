@@ -45,10 +45,10 @@ class RFQService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'rfq_id' => null, 'lines' => 0);
         $contractId = (int) $contractId;
-        if ($contractId <= 0) { $out['code'] = 422; $out['reason'] = 'العقدُ إلزامي'; return $out; }
+        if ($contractId <= 0) { $out['code'] = 422; $out['reason'] = 'العقد إلزامي'; return $out; }
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', (string) $dueDate)) {
             $out['code'] = 422;
-            $out['reason'] = '**موعدُ الإقفال إلزامي** — وبلا موعدٍ لا معنى لـ«عرضٌ بعد الإقفال»';
+            $out['reason'] = '**موعد الإقفال إلزامي** — وبلا موعد لا معنى ل«عرض بعد الإقفال»';
             return $out;
         }
 
@@ -56,8 +56,8 @@ class RFQService
         $commits = self::commitmentsOf($gate, $contractId);
         if (!$commits) {
             $out['code'] = 422;
-            $out['reason'] = '**عقدٌ بلا التزاماتٍ** يلتزم بها طرفُنا (§8.2) — '
-                           . 'فلا بنودَ تُشتق، ولا يُفتح طلبٌ فارغ';
+            $out['reason'] = '**عقد بلا التزامات** يلتزم بها طرفنا (§8.2) — '
+                           . 'فلا بنود تشتق، ولا يفتح طلب فارغ';
             return $out;
         }
 
@@ -72,7 +72,7 @@ class RFQService
                     'due_date' => (string) $dueDate, 'state' => 'draft',
                     'created_by' => (int) $actor ?: null,
                 ));
-                if ($rfqId <= 0) { throw new \RuntimeException('تعذّر إنشاءُ الطلب'); }
+                if ($rfqId <= 0) { throw new \RuntimeException('تعذر إنشاء الطلب'); }
                 $i = 0;
                 foreach ($commits as $c) {
                     $i++;
@@ -88,7 +88,7 @@ class RFQService
                 }
             }, 'فتح RFQ للعقد ' . $contractId);
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الفتح: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الفتح: ' . $t->getMessage(); return $out;
         }
 
         self::fact($conn, $companyId, 'supplier.rfq.opened', (int) $rfqId,
@@ -97,7 +97,7 @@ class RFQService
             array('contract_id' => $contractId, 'lines' => $n));
 
         $out['ok'] = true; $out['code'] = 200; $out['rfq_id'] = (int) $rfqId; $out['lines'] = $n;
-        $out['reason'] = 'فُتح ' . $no . ' بـ' . $n . ' بندًا **مشتقًّا من الالتزامات**';
+        $out['reason'] = 'فتح ' . $no . ' ب' . $n . ' بندا **مشتقا من الالتزامات**';
         return $out;
     }
 
@@ -106,15 +106,15 @@ class RFQService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '');
         $r = self::rfqOf($gate, (int) $rfqId);
-        if (!$r) { $out['code'] = 404; $out['reason'] = 'الطلبُ غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!$r) { $out['code'] = 404; $out['reason'] = 'الطلب غير موجود في نطاقك'; return $out; }
         if ((string) $r['state'] !== 'draft') {
-            $out['code'] = 409; $out['reason'] = 'الإرسالُ للمسودة (حالُه: ' . $r['state'] . ')'; return $out;
+            $out['code'] = 409; $out['reason'] = 'الإرسال للمسودة (حاله: ' . $r['state'] . ')'; return $out;
         }
         try {
             $gate->update('supplier_rfqs',
                 array('state' => 'sent', 'sent_at' => date('Y-m-d H:i:s')), array('id' => (int) $rfqId));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الإرسال: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الإرسال: ' . $t->getMessage(); return $out;
         }
         self::fact($conn, $companyId, 'supplier.rfq.sent', (int) $rfqId,
             'rfq_sent:' . (int) $rfqId, array('due_date' => (string) $r['due_date']), $actor);
@@ -127,15 +127,15 @@ class RFQService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '');
         $r = self::rfqOf($gate, (int) $rfqId);
-        if (!$r) { $out['code'] = 404; $out['reason'] = 'الطلبُ غيرُ موجود'; return $out; }
+        if (!$r) { $out['code'] = 404; $out['reason'] = 'الطلب غير موجود'; return $out; }
         if ((string) $r['state'] !== 'sent') {
-            $out['code'] = 409; $out['reason'] = 'الإقفالُ للمرسَل (حالُه: ' . $r['state'] . ')'; return $out;
+            $out['code'] = 409; $out['reason'] = 'الإقفال للمرسل (حاله: ' . $r['state'] . ')'; return $out;
         }
         try {
             $gate->update('supplier_rfqs',
                 array('state' => 'closed', 'closed_at' => date('Y-m-d H:i:s')), array('id' => (int) $rfqId));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الإقفال'; return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الإقفال'; return $out;
         }
         $out['ok'] = true; $out['code'] = 200;
         return $out;
@@ -153,19 +153,19 @@ class RFQService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'quote_id' => null);
         $l = self::lineOf($gate, (int) $lineId);
-        if (!$l) { $out['code'] = 404; $out['reason'] = 'البندُ غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!$l) { $out['code'] = 404; $out['reason'] = 'البند غير موجود في نطاقك'; return $out; }
         $r = self::rfqOf($gate, (int) $l['rfq_id']);
-        if (!$r) { $out['code'] = 404; $out['reason'] = 'الطلبُ غيرُ موجود'; return $out; }
+        if (!$r) { $out['code'] = 404; $out['reason'] = 'الطلب غير موجود'; return $out; }
 
         // ② الإقفالُ يحكم — حالةً وتاريخًا معًا
         if (!in_array((string) $r['state'], self::OPEN_STATES, true)) {
             $out['code'] = 423;
-            $out['reason'] = 'الطلبُ «' . $r['state'] . '» — **لا عرضَ إلا على مرسَلٍ مفتوح** (§8.2)';
+            $out['reason'] = 'الطلب «' . $r['state'] . '» — **لا عرض إلا على مرسل مفتوح** (§8.2)';
             return $out;
         }
         if (date('Y-m-d') > (string) $r['due_date']) {
             $out['code'] = 423;
-            $out['reason'] = '**عرضٌ بعد الإقفال** — انقضى موعدُ ' . (string) $r['due_date'];
+            $out['reason'] = '**عرض بعد الإقفال** — انقضى موعد ' . (string) $r['due_date'];
             return $out;
         }
 
@@ -174,11 +174,11 @@ class RFQService
         $price = round((float) (isset($q['unit_price']) ? $q['unit_price'] : 0), 4);
         $qty   = round((float) (isset($q['qty_offered']) ? $q['qty_offered'] : 0), 2);
         if ($price <= 0 || $qty <= 0) {
-            $out['code'] = 422; $out['reason'] = 'السعرُ والكميةُ موجبان'; return $out;
+            $out['code'] = 422; $out['reason'] = 'السعر والكمية موجبان'; return $out;
         }
         if ($qty > round((float) $l['qty_required'], 2)) {
             $out['code'] = 422;
-            $out['reason'] = 'الكميةُ المعروضةُ تجاوز المطلوبَ ' . $l['qty_required'];
+            $out['reason'] = 'الكمية المعروضة تجاوز المطلوب ' . $l['qty_required'];
             return $out;
         }
 
@@ -199,7 +199,7 @@ class RFQService
         try {
             $ex = $gate->selectOne('rfq_quotes', array(
                 'whereRaw' => 'line_id = ? AND supplier_id = ?', 'params' => array((int) $lineId, $supplierId)));
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $ex'); $ex = null; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $ex'); $ex = null; }
 
         try {
             if ($ex) {
@@ -212,7 +212,7 @@ class RFQService
                 $out['quote_id'] = (int) $gate->insert('rfq_quotes', $data);
             }
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الحفظ: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الحفظ: ' . $t->getMessage(); return $out;
         }
 
         self::fact($conn, $companyId, 'supplier.rfq_quote.submitted', (int) $out['quote_id'],
@@ -233,14 +233,14 @@ class RFQService
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'rows' => array());
         $asking = (int) $askingSupplierId;
         $of = (int) $ofSupplierId > 0 ? (int) $ofSupplierId : $asking;
-        if ($asking <= 0) { $out['code'] = 422; $out['reason'] = 'هويةُ المورد إلزامية'; return $out; }
+        if ($asking <= 0) { $out['code'] = 422; $out['reason'] = 'هوية المورد إلزامية'; return $out; }
         if ($of !== $asking) {
             if (function_exists('log_security_event')) {
                 log_security_event('rfq_cross_supplier_read',
                     'REFUSED | asking=' . $asking . ' of=' . $of . ' rfq=' . (int) $rfqId);
             }
             $out['code'] = 403;
-            $out['reason'] = '**لا يقرأ موردٌ عرضَ غيره** (§8.2) — والمحاولةُ مسجَّلة';
+            $out['reason'] = '**لا يقرأ مورد عرض غيره** (§8.2) — والمحاولة مسجلة';
             return $out;
         }
         try {
@@ -248,7 +248,7 @@ class RFQService
                 "SELECT q.* FROM rfq_quotes q
                   WHERE {TENANT_SCOPE} AND q.rfq_id = ? AND q.supplier_id = ?
                   ORDER BY q.line_id", array((int) $rfqId, $asking));
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'فشلٌ يُعامَل بقيمةٍ افتراضية — $out[\'rows\'] = array()'); $out['rows'] = array(); }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'فشل يعامل بقيمة افتراضية — $out[\'rows\'] = array()'); $out['rows'] = array(); }
         $out['ok'] = true; $out['code'] = 200;
         return $out;
     }
@@ -293,13 +293,13 @@ class RFQService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'awarded' => 0, 'total' => 0.0);
         $r = self::rfqOf($gate, (int) $rfqId);
-        if (!$r) { $out['code'] = 404; $out['reason'] = 'الطلبُ غيرُ موجود'; return $out; }
+        if (!$r) { $out['code'] = 404; $out['reason'] = 'الطلب غير موجود'; return $out; }
         if (!in_array((string) $r['state'], array('closed', 'awarded'), true)) {
             $out['code'] = 423;
-            $out['reason'] = '**الترسيةُ بعد الإقفال** — الطلبُ «' . $r['state'] . '»';
+            $out['reason'] = '**الترسية بعد الإقفال** — الطلب «' . $r['state'] . '»';
             return $out;
         }
-        if (!$awards) { $out['code'] = 422; $out['reason'] = 'لا ترسيةَ فارغة'; return $out; }
+        if (!$awards) { $out['code'] = 422; $out['reason'] = 'لا ترسية فارغة'; return $out; }
 
 
         /* ══ INJ-0031 · **مسارُ كتابةٍ واحدٌ لـ`rfq_awards`** ═══════════════════════
@@ -325,20 +325,20 @@ class RFQService
         foreach ($awards as $a) {
             $lid = (int) (isset($a['line_id']) ? $a['line_id'] : 0);
             $qty = round((float) (isset($a['qty']) ? $a['qty'] : 0), 2);
-            if ($lid <= 0 || $qty <= 0) { $out['code'] = 422; $out['reason'] = 'ترسيةٌ ناقصةُ البند أو الكمية'; return $out; }
+            if ($lid <= 0 || $qty <= 0) { $out['code'] = 422; $out['reason'] = 'ترسية ناقصة البند أو الكمية'; return $out; }
             if (!isset($need[$lid])) { $need[$lid] = 0.0; }
             $need[$lid] = round($need[$lid] + $qty, 2);
         }
         foreach ($need as $lid => $q) {
             $l = self::lineOf($gate, $lid);
             if (!$l || (int) $l['rfq_id'] !== (int) $rfqId) {
-                $out['code'] = 422; $out['reason'] = 'بندٌ خارج هذا الطلب: ' . $lid; return $out;
+                $out['code'] = 422; $out['reason'] = 'بند خارج هذا الطلب: ' . $lid; return $out;
             }
             $avail = round((float) $l['qty_required'] - (float) $l['qty_awarded'], 2);
             if ($q > $avail + 0.0001) {
                 $out['code'] = 409;
-                $out['reason'] = '**تخصيصٌ يجاوز الالتزام** في البند ' . $lid
-                               . ' — المطلوبُ ' . $q . ' **والمتاحُ ' . $avail . '**';
+                $out['reason'] = '**تخصيص يجاوز الالتزام** في البند ' . $lid
+                               . ' — المطلوب ' . $q . ' **والمتاح ' . $avail . '**';
                 return $out;
             }
         }
@@ -387,10 +387,10 @@ class RFQService
                         $quote = $g->selectOne('rfq_quotes', array(
                             'whereRaw' => 'line_id = ? AND supplier_id = ?',
                             'params' => array($lid, $sup)));
-                    } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $quote'); $quote = null; }
+                    } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $quote'); $quote = null; }
                     if (!$quote) {
-                        throw new \RuntimeException('لا عرضَ لهذا المورد في البند ' . $lid
-                            . ' — **ولا تُرسى كميةٌ بلا عرضٍ مقدَّم**');
+                        throw new \RuntimeException('لا عرض لهذا المورد في البند ' . $lid
+                            . ' — **ولا ترسى كمية بلا عرض مقدم**');
                     }
                     $g->insert('rfq_awards', array(
                         'rfq_id' => (int) $rfqId, 'line_id' => $lid, 'supplier_id' => $sup,
@@ -415,7 +415,7 @@ class RFQService
                         "SELECT l.qty_awarded, l.qty_required FROM rfq_lines l
                           WHERE {TENANT_SCOPE} AND l.id = ? FOR UPDATE",
                         array($lid));
-                    if (!$lrows) { throw new \RuntimeException('بندُ الطلب ' . $lid . ' غيرُ موجودٍ في نطاقك'); }
+                    if (!$lrows) { throw new \RuntimeException('بند الطلب ' . $lid . ' غير موجود في نطاقك'); }
                     $line   = $lrows[0];
                     $newQty = round((float) $line['qty_awarded'] + $qty, 2);
                     if ($newQty > (float) $line['qty_required'] + 0.0001) {
@@ -425,14 +425,14 @@ class RFQService
                             array($lid));
                         $refs = array();
                         foreach ((array) $prev as $pv) {
-                            $refs[] = '#' . (int) $pv['id'] . ' (موردٌ ' . (int) $pv['supplier_id']
+                            $refs[] = '#' . (int) $pv['id'] . ' (مورد ' . (int) $pv['supplier_id']
                                     . ' · ' . rtrim(rtrim((string) $pv['qty_awarded'], '0'), '.') . ')';
                         }
-                        throw new \RuntimeException('RFQ-409: البندُ ' . $lid . ' مُرسًى سلفًا — المطلوبُ '
+                        throw new \RuntimeException('RFQ-409: البند ' . $lid . ' مرسى سلفا — المطلوب '
                             . rtrim(rtrim((string) $line['qty_required'], '0'), '.') . ' والمرسى '
                             . rtrim(rtrim((string) $line['qty_awarded'], '0'), '.')
-                            . ($refs ? (' · الترسياتُ القائمة: ' . implode(' · ', $refs)) : '')
-                            . ' — فلا تُرسى كميةٌ فوقَ المطلوب');
+                            . ($refs ? (' · الترسيات القائمة: ' . implode(' · ', $refs)) : '')
+                            . ' — فلا ترسى كمية فوق المطلوب');
                     }
                     $g->update('rfq_lines', array('qty_awarded' => $newQty), array('id' => $lid));
                     $n++;
@@ -443,7 +443,7 @@ class RFQService
                     'awarded_by' => (int) $actor ?: null), array('id' => (int) $rfqId));
             }, 'ترسية RFQ ' . $rfqId);
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّرت الترسية: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذرت الترسية: ' . $t->getMessage(); return $out;
         }
 
         // ⑤ **حقيقةٌ محايدة لا حدثٌ مالي** — «FES يبدأ من الوحدات»
@@ -454,7 +454,7 @@ class RFQService
             array('awards' => $n, 'value' => $total));
 
         $out['ok'] = true; $out['code'] = 200; $out['awarded'] = $n; $out['total'] = $total;
-        $out['reason'] = 'رُسي ' . $n . ' بندًا-موردًا بقيمةٍ تقديريةٍ ' . $total;
+        $out['reason'] = 'رسي ' . $n . ' بندا-موردا بقيمة تقديرية ' . $total;
         return $out;
     }
 
@@ -463,9 +463,9 @@ class RFQService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '');
         $r = self::rfqOf($gate, (int) $rfqId);
-        if (!$r) { $out['code'] = 404; $out['reason'] = 'الطلبُ غيرُ موجود'; return $out; }
+        if (!$r) { $out['code'] = 404; $out['reason'] = 'الطلب غير موجود'; return $out; }
         if ((string) $r['state'] !== 'awarded') {
-            $out['code'] = 409; $out['reason'] = 'التعاقدُ بعد الترسية (حالُه: ' . $r['state'] . ')'; return $out;
+            $out['code'] = 409; $out['reason'] = 'التعاقد بعد الترسية (حاله: ' . $r['state'] . ')'; return $out;
         }
         try {
             $gate->update('supplier_rfqs', array('state' => 'contracted'), array('id' => (int) $rfqId));
@@ -556,7 +556,7 @@ class RFQService
                   WHERE {TENANT_SCOPE} AND e.supplier_id = ? AND e.state = 'approved'
                   ORDER BY e.id DESC LIMIT 1", array((int) $supplierId));
             if ($r && $r[0]['score'] !== null) { return round((float) $r[0]['score'] / 20.0, 2); }
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'لا تقييمَ مقروء'); /* لا تقييمَ مقروء */ }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'لا تقييم مقروء'); /* لا تقييمَ مقروء */ }
         return null;
     }
 

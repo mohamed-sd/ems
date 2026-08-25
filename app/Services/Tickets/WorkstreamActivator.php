@@ -38,14 +38,14 @@ class WorkstreamActivator
             $stmt = $conn->prepare("INSERT INTO ticket_responses (tk_id, ws_id, person_id, response_type, body) VALUES (?, ?, ?, 'info_added', ?)");
             $wsId = intval($w['ws_id']);
             $actor = intval($actorPersonId);
-            $body = 'WorkstreamActivated — فُتح مسار ' . $w['workstream_type'] . ' بحدث ' . $eventName;
+            $body = 'WorkstreamActivated — فتح مسار ' . $w['workstream_type'] . ' بحدث ' . $eventName;
             $stmt->bind_param('iiis', $tkId, $wsId, $actor, $body);
             $stmt->execute();
             $stmt->close();
             $n++;
         }
         return array('ok' => true, 'code' => 200, 'activated' => $n,
-            'reason' => $n > 0 ? "فُتح {$n} مسارًا شرطيًّا بحدث {$eventName}" : 'لا مسار يترقب هذا الحدث');
+            'reason' => $n > 0 ? "فتح {$n} مسارا شرطيا بحدث {$eventName}" : 'لا مسار يترقب هذا الحدث');
     }
 
     /** عند إغلاق الرأس: الشرطي الذي لم يقع حدثه يُعلَّم skipped (WorkstreamSkipped). */

@@ -112,8 +112,8 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     include('../includes/page_header.php');
     if (isset($_GET['msg'])) { echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>'; }
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا
-    echo ems_states_bundle('لا صفوفَ مخطَّطٍ ومنفَّذٍ ومفوترٍ في النطاقِ المختار',
-                           'اختر عقدًا من جدولِ العقودِ أعلاه وحدِّد مدى الأشهرِ ثمّ اضغط «اعرض»');
+    echo ems_states_bundle('لا صفوف مخطط ومنفذ ومفوتر في النطاق المختار',
+                           'اختر عقدا من جدول العقود أعلاه وحدد مدى الأشهر ثم اضغط «اعرض»');
     ?>
 
     <style>
@@ -136,18 +136,18 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     <div class="card"><div class="card-body">
         <p class="pal-note">
             <i class="fas fa-circle-info"></i>
-            «المخطَّطُ» و«المنفَّذُ» و«المفوتَرُ» ثلاثةُ أرقامٍ كانت <strong>لا تلتقي على مفتاح</strong>،
-            فمقارنتُها <strong>تخمينٌ بالتاريخ والعقد</strong>. وبمفاتيح
+            «المخطط» و«المنفذ» و«المفوتر» ثلاثة أرقام كانت <strong>لا تلتقي على مفتاح</strong>،
+            فمقارنتها <strong>تخمين بالتاريخ والعقد</strong>. وبمفاتيح
             <code>contract_line_id</code> و<code>plan_period_id</code> و<code>operational_site_id</code>
-            صارت <strong>تلتقي على مفتاحٍ واحد</strong>.
-            و<strong>الوصلُ يُشتقّ ولا يُخمَّن</strong>: بندان يصلحان ⇒ <strong>يُعلَن الالتباسُ ولا يُختار بالحدس</strong>.
-            و<strong>غيرُ الموصول يُعدّ ولا يُخفى</strong>.
+            صارت <strong>تلتقي على مفتاح واحد</strong>.
+            و<strong>الوصل يشتق ولا يخمن</strong>: بندان يصلحان ⇒ <strong>يعلن الالتباس ولا يختار بالحدس</strong>.
+            و<strong>غير الموصول يعد ولا يخفى</strong>.
         </p>
         <div class="pal-cov">
             <span class="badge badge-secondary pal-badge-pad">
-                وحداتٌ موصولة <?php echo $cov['units_linked'] . '/' . $cov['units_total']; ?></span>
+                وحدات موصولة <?php echo $cov['units_linked'] . '/' . $cov['units_total']; ?></span>
             <span class="badge badge-secondary pal-badge-pad">
-                أسطرُ مستخلصٍ موصولة <?php echo $cov['claims_linked'] . '/' . $cov['claims_total']; ?></span>
+                أسطر مستخلص موصولة <?php echo $cov['claims_linked'] . '/' . $cov['claims_total']; ?></span>
         </div>
     </div></div>
 
@@ -170,7 +170,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
 
     <?php if ($CID > 0): ?>
     <div class="card"><div class="card-header"><h5><i class="fa fa-table-columns"></i>
-        المخطَّطُ · المنفَّذُ · المفوتَر — للعقد #<?php echo $CID; ?></h5></div>
+        المخطط · المنفذ · المفوتر — للعقد #<?php echo $CID; ?></h5></div>
     <div class="card-body">
                 <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
         <div class="filter">
@@ -191,11 +191,11 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         </div>
 
         <div class="pal-chips">
-            <span class="badge badge-secondary pal-badge-pad">مخطَّط
+            <span class="badge badge-secondary pal-badge-pad">مخطط
                 <?php echo $pv['totals']['planned']; ?></span>
-            <span class="badge badge-info pal-badge-pad">منفَّذ
+            <span class="badge badge-info pal-badge-pad">منفذ
                 <?php echo $pv['totals']['actual']; ?></span>
-            <span class="badge badge-success pal-badge-pad">مفوتَر
+            <span class="badge badge-success pal-badge-pad">مفوتر
                 <?php echo $pv['totals']['billed']; ?></span>
         </div>
 
@@ -205,10 +205,10 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                 <th>مخطَّط</th><th>منفَّذ</th><th>مفوتَر</th>
                 <th>فجوةُ التنفيذ</th><th>فجوةُ الفوترة</th>
                 <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                 <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                 <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                 <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -228,7 +228,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     <td><span class="badge <?php echo abs($r['gap_bill']) < 0.005
                         ? 'badge-success' : 'badge-warning'; ?>"><?php echo $r['gap_bill']; ?></span></td></tr>
             <?php endforeach; ?>
-            <?php if (!$pv['rows']): ?><tr><td colspan="9"><em>لا جدولَ شهريًّا نافذًا لبنود هذا العقد</em></td></tr><?php endif; ?>
+            <?php if (!$pv['rows']): ?><tr><td colspan="9"><em>لا جدول شهريا نافذا لبنود هذا العقد</em></td></tr><?php endif; ?>
             </tbody>
         </table>
         </div>
@@ -240,21 +240,21 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                 <input type="hidden" name="pal_action" value="dry">
                 <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
                 <button type="submit" class="btn-primary"><i class="fa fa-magnifying-glass"></i>
-                    اعرض المرشَّح <strong>(بلا كتابة)</strong></button>
+                    اعرض المرشح <strong>(بلا كتابة)</strong></button>
             </form>
             <form method="post" class="pal-inline">
         <?php echo csrf_field(); ?>
                 <input type="hidden" name="pal_action" value="link_all">
                 <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
                 <button type="submit" class="btn-primary"><i class="fa fa-link"></i>
-                    صِل ما يمكن وصلُه — <strong>والملتبسُ يُعلَن</strong></button>
+                    صل ما يمكن وصله — <strong>والملتبس يعلن</strong></button>
             </form>
         </div>
         <?php endif; ?>
     </div></div>
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-link-slash"></i>
-        وحداتٌ <strong>غيرُ موصولة</strong> — <?php echo count($unlinked); ?></h5></div>
+        وحدات <strong>غير موصولة</strong> — <?php echo count($unlinked); ?></h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap no-datatable pal-table" data-no-dt="1">
             <thead><tr><th>الرقم</th><th>التاريخ</th><th>الوحدة</th><th>الكمية</th><th>الحال</th><th></th></tr></thead>
@@ -273,12 +273,12 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                             <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
                             <input type="hidden" name="row_kind" value="unit">
                             <input type="hidden" name="row_id" value="<?php echo intval($u['id']); ?>">
-                            <input type="number" name="line_id" placeholder="بندٌ صريح (اختياري)" class="pal-w150" aria-label="بندٌ صريح (اختياري)">
-                            <button type="submit" class="action-btn"><i class="fa fa-link"></i> صِل</button>
+                            <input type="number" name="line_id" placeholder="بند صريح (اختياري)" class="pal-w150" aria-label="بند صريح (اختياري)">
+                            <button type="submit" class="action-btn"><i class="fa fa-link"></i> صل</button>
                         </form>
                     <?php else: ?>—<?php endif; ?></td></tr>
             <?php endforeach; ?>
-            <?php if (!$unlinked): ?><tr><td colspan="6"><em>لا وحدةَ غيرَ موصولة — <strong>الفجوةُ صفر</strong></em></td></tr><?php endif; ?>
+            <?php if (!$unlinked): ?><tr><td colspan="6"><em>لا وحدة غير موصولة — <strong>الفجوة صفر</strong></em></td></tr><?php endif; ?>
             </tbody>
         </table>
     </div></div></div>

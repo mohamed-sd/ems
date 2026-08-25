@@ -38,13 +38,13 @@ else {
     }
     $st->close();
 }
-if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا صلاحيةَ عرضٍ لمفاتيح الظهور ❌', 'GOV-PERM-403', ''); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا صلاحية عرض لمفاتيح الظهور ❌', 'GOV-PERM-403', ''); exit(); }
 
 $gate = $is_super_admin ? ems_tenant_db()->forAllTenants('visibility keys super') : ems_tenant_db();
 $redirect = function ($msg) { ems_gov_flash_redirect('visibility_keys.php', $msg, 'GOV-INFO-200', ''); exit(); };
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['vk_action'] ?? '') === 'set') {
-    if (!$can_edit) { $redirect('لا صلاحيةَ ضبطٍ — المفاتيحُ لشؤون الموظفين ❌'); }
+    if (!$can_edit) { $redirect('لا صلاحية ضبط — المفاتيح لشؤون الموظفين ❌'); }
     $r = VPS::setKey($conn, $gate, $company_id, array(
         'element_code' => strval($_POST['element_code'] ?? ''),
         'scope_type'   => strval($_POST['scope_type'] ?? ''),
@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['vk_action'] ?? '') === 'se
         'reason'       => strval($_POST['reason'] ?? ''),
         'expires_at'   => strval($_POST['expires_at'] ?? ''),
     ), $uid);
-    $redirect($r['ok'] ? ('ضُبط المفتاحُ — سيتأثر ' . $r['affected'] . ' حسابًا ✅')
+    $redirect($r['ok'] ? ('ضبط المفتاح — سيتأثر ' . $r['affected'] . ' حسابا ✅')
                        : ($r['code'] . ' — ' . $r['reason'] . ' ❌'));
 }
 
@@ -75,20 +75,20 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     include('../includes/page_header.php');
     if (isset($_GET['msg'])) { echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>'; }
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا مفاتيحَ ظهورٍ مضبوطةً بعدُ', 'اضبط أولَ مفتاحٍ من نموذجِ «ضبطُ مفتاح» أعلاه — ويُعلَن عددُ المتأثرين قبلَ الحفظ');
+    echo ems_states_bundle('لا مفاتيح ظهور مضبوطة بعد', 'اضبط أول مفتاح من نموذج «ضبط مفتاح» أعلاه — ويعلن عدد المتأثرين قبل الحفظ');
     ?>
 
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <div class="card"><div class="card-body"><p class="vkey-note">
-        المفاتيحُ <strong>تمنح ظهورًا لا صلاحيةَ عمل</strong> — بستة نطاقاتٍ وأولويةٍ محسومة:
-        <strong>الحسابُ يغلب الفئةَ</strong> والفئةُ تغلب الإدارة/المشروع وهذه تغلب المورد/العميل،
-        وما لم يُضبط <strong>موروثٌ</strong> وما لا سياسةَ له على <strong>افتراض عنصره</strong>
-        (والحساسُ مغلق). <strong>الحساسُ لا يُفتح إلا بمدةٍ وسبب</strong> — ولا منحَ للذات.
+        المفاتيح <strong>تمنح ظهورا لا صلاحية عمل</strong> — بستة نطاقات وأولوية محسومة:
+        <strong>الحساب يغلب الفئة</strong> والفئة تغلب الإدارة/المشروع وهذه تغلب المورد/العميل،
+        وما لم يضبط <strong>موروث</strong> وما لا سياسة له على <strong>افتراض عنصره</strong>
+        (والحساس مغلق). <strong>الحساس لا يفتح إلا بمدة وسبب</strong> — ولا منح للذات.
     </p></div></div>
 
     <?php if ($can_edit): ?>
-    <div class="card"><div class="card-header"><h5><i class="fa fa-sliders"></i> ضبطُ مفتاح</h5></div>
+    <div class="card"><div class="card-header"><h5><i class="fa fa-sliders"></i> ضبط مفتاح</h5></div>
     <div class="card-body">
         <form method="post" class="ems-form">
         <?= csrf_field() ?>
@@ -104,15 +104,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </select></div>
                 <div class="form-group"><label for="emsf_1250_a823d">نوع النطاق *</label>
                     <select name="scope_type" required id="emsf_1250_a823d">
-                        <option value="account">حسابٌ بعينه</option>
-                        <option value="capacity_type">فئةُ صفة (H-15)</option>
+                        <option value="account">حساب بعينه</option>
+                        <option value="capacity_type">فئة صفة (H-15)</option>
                         <option value="department">إدارة</option>
                         <option value="project">مشروع</option>
                         <option value="supplier">مورد</option>
                         <option value="client">عميل</option>
                     </select></div>
-                <div class="form-group"><label for="emsf_1251_463b4">معرّف النطاق *
-                    <span class="mnt-req-hint">(رقمٌ — أو كودُ الفئة مثل operator)</span></label>
+                <div class="form-group"><label for="emsf_1251_463b4">معرف النطاق *
+                    <span class="mnt-req-hint">(رقم — أو كود الفئة مثل operator)</span></label>
                     <input type="text" name="scope_id" required id="emsf_1251_463b4"></div>
                 <div class="form-group"><label for="emsf_1252_70802">الوضع *</label>
                     <select name="mode" required id="emsf_1252_70802">
@@ -120,18 +120,18 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <option value="closed">مغلق</option>
                         <option value="inherit">موروث</option>
                     </select></div>
-                <div class="form-group"><label for="emsf_1253_e95e8">السبب <span class="mnt-req-hint">(إلزاميٌّ لغير الموروث)</span></label>
+                <div class="form-group"><label for="emsf_1253_e95e8">السبب <span class="mnt-req-hint">(إلزامي لغير الموروث)</span></label>
                     <input type="text" name="reason" maxlength="255" id="emsf_1253_e95e8"></div>
-                <div class="form-group"><label for="emsf_1254_03a5c">ينتهي في <span class="mnt-req-hint">(إلزاميٌّ لفتح الحساس)</span></label>
+                <div class="form-group"><label for="emsf_1254_03a5c">ينتهي في <span class="mnt-req-hint">(إلزامي لفتح الحساس)</span></label>
                     <input type="datetime-local" name="expires_at" id="emsf_1254_03a5c"></div>
             </div>
             <div class="vkey-form-foot"><button type="submit" class="btn-primary">
-                <i class="fa fa-check"></i> احفظ — وسيُعلَن عددُ المتأثرين</button></div>
+                <i class="fa fa-check"></i> احفظ — وسيعلن عدد المتأثرين</button></div>
         </form>
     </div></div>
     <?php endif; ?>
 
-    <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> المفاتيحُ المضبوطة (<?php echo count($keys); ?>)</h5></div>
+    <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> المفاتيح المضبوطة (<?php echo count($keys); ?>)</h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap vkey-table">
             <thead><tr><th>العنصر</th><th>النطاق</th><th>الوضع</th><th>السبب</th>
@@ -151,12 +151,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <th class="ems-fn-th" data-fn="1">تاريخ السريان</th>
                 <th class="ems-fn-th" data-fn="1">أنشأه</th>
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                 <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                 <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                 <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-                <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+                <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
                 <th class="ems-gov-th none" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
                 <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                 </tr></thead>

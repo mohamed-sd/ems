@@ -24,9 +24,9 @@ $U13 = array(
     'icon'       => 'fa fa-right-left',
     'nature'     => 'register',
     'doc'        => 'FIN-MGR-01 §4-3 · FMGR-0018',
-    'intro'      => 'إعادةُ تصنيفٍ وبناءٌ فوقَ الموجودِ لا اختراعُ نظامٍ موازٍ',
-    'rule'       => 'FMGR-0022: ولا يُحذف دورٌ قديمٌ قبل ترحيلِ حاملِه',
-    'empty_hint' => 'لا ترحيلاتٍ مسجَّلة',
+    'intro'      => 'إعادة تصنيف وبناء فوق الموجود لا اختراع نظام مواز',
+    'rule'       => 'FMGR-0022: ولا يحذف دور قديم قبل ترحيل حامله',
+    'empty_hint' => 'لا ترحيلات مسجلة',
     'order'       => 'old_role_id ASC',
 );
 require __DIR__ . '/../includes/u13_screen_kit.php';

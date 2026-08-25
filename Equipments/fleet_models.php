@@ -126,7 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($edit_id > 0) { $dupWhere .= " AND id <> ?"; $dupParams[] = $edit_id; }
         $dup = $fm_gate->selectOne('fleet_model', array('columns' => array('id'), 'whereRaw' => $dupWhere, 'params' => $dupParams));
         if ($dup) {
-            $errors[] = 'كود الموديل مستخدم مسبقاً في شركتك';
+            $errors[] = 'كود الموديل مستخدم مسبقا في شركتك';
         }
     }
 
@@ -134,7 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($errors) && $edit_id > 0) {
         $own = $fm_gate->selectOne('fleet_model', array('columns' => array('id'), 'where' => array('id' => $edit_id)));
         if (!$own) {
-            $errors[] = 'الموديل غير موجود أو لا يخصّ شركتك';
+            $errors[] = 'الموديل غير موجود أو لا يخص شركتك';
         }
     }
 
@@ -205,7 +205,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ems_gov_flash_redirect('fleet_models.php', $edit_id > 0 ? '✅ تم تحديث الموديل' : '✅ تم إضافة الموديل', 'GOV-OK-200', '');
             exit();
         } catch (\Throwable $e) {
-            $errors[] = 'تعذّر الحفظ: ' . $e->getMessage();
+            $errors[] = 'تعذر الحفظ: ' . $e->getMessage();
         }
     }
 }
@@ -290,7 +290,7 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
     $header_back = array('href' => 'equipments_fleet.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا موديلَ معدّاتٍ مسجَّلًا بعدُ', 'أضف أولَ موديلٍ بزرِّ «إضافة موديل جديد» في رأسِ الشاشة');
+    echo ems_states_bundle('لا موديل معدات مسجلا بعد', 'أضف أول موديل بزر «إضافة موديل جديد» في رأس الشاشة');
     ?>
 
     <?php if (!empty($flash)): ?>
@@ -419,7 +419,7 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                                 </option>
                             <?php endforeach; ?>
                         </select>
-                        <small class="fm-hint">المعدّات التابعة لهذا الموديل ترث افتراضات الإهلاك منه.</small>
+                        <small class="fm-hint">المعدات التابعة لهذا الموديل ترث افتراضات الإهلاك منه.</small>
                     </div>
                     <?php endif; ?>
 
@@ -470,15 +470,15 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                                     <tr class="spec-row">
                                         <td>
                                             <input type="text" name="spec_item_type[]" list="specItemTypes"
-                                                   placeholder="فلتر / زيت ..." aria-label="نوعُ البند"
+                                                   placeholder="فلتر / زيت ..." aria-label="نوع البند"
                                                    value="<?= $iv('item_type'); ?>">
                                         </td>
-                                        <td><input type="text" name="spec_recommended_ref[]" aria-label="المرجعُ الموصى به" value="<?= $iv('recommended_ref'); ?>"></td>
-                                        <td><input type="number" step="0.01" name="spec_qty[]" class="fm-qty-cell" aria-label="الكميةُ المطلوبة" value="<?= $iv('qty'); ?>"></td>
+                                        <td><input type="text" name="spec_recommended_ref[]" aria-label="المرجع الموصى به" value="<?= $iv('recommended_ref'); ?>"></td>
+                                        <td><input type="number" step="0.01" name="spec_qty[]" class="fm-qty-cell" aria-label="الكمية المطلوبة" value="<?= $iv('qty'); ?>"></td>
                                         <td>
-                                            <input type="text" name="spec_uom[]" list="specUoms" class="fm-uom-cell" aria-label="وحدةُ القياس" value="<?= $iv('uom'); ?>">
+                                            <input type="text" name="spec_uom[]" list="specUoms" class="fm-uom-cell" aria-label="وحدة القياس" value="<?= $iv('uom'); ?>">
                                         </td>
-                                        <td><input type="text" name="spec_alt_ref[]" aria-label="المرجعُ البديل" value="<?= $iv('alt_ref'); ?>"></td>
+                                        <td><input type="text" name="spec_alt_ref[]" aria-label="المرجع البديل" value="<?= $iv('alt_ref'); ?>"></td>
                                         <td>
                                             <input type="hidden" name="spec_existing_photo[]" value="<?= $e($photo); ?>">
                                             <?php if (!empty($photo)): ?>
@@ -486,9 +486,9 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                                                     <img src="../<?= $e($photo); ?>" class="spec-thumb" alt="صورة">
                                                 </a>
                                             <?php endif; ?>
-                                            <input type="file" name="spec_photo[]" accept="image/*" class="spec-file" aria-label="صورةُ البند">
+                                            <input type="file" name="spec_photo[]" accept="image/*" class="spec-file" aria-label="صورة البند">
                                         </td>
-                                        <td><input type="text" name="spec_note[]" aria-label="ملاحظةٌ على البند" value="<?= $iv('note'); ?>"></td>
+                                        <td><input type="text" name="spec_note[]" aria-label="ملاحظة على البند" value="<?= $iv('note'); ?>"></td>
                                         <td class="text-center">
                                             <button type="button" class="action-btn delete removeSpecRow" title="حذف البند">
                                                 <i class="fa-solid fa-trash"></i>
@@ -554,9 +554,9 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                             <th class="ems-fn-th" data-fn="1">دورية الفلاتر</th>
                             <th class="ems-fn-th" data-fn="1">العمر الإنتاجي بالساعات</th>
                             <th class="ems-fn-th" data-fn="1">القطع القياسية</th>
-                            <th class="ems-fn-th" data-fn="1">عرّفه</th>
+                            <th class="ems-fn-th" data-fn="1">عرفه</th>
                             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
                             </tr>
                     </thead>
                     <tbody>
@@ -675,16 +675,16 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
 <!-- قالب سطر مواصفة جديد (لإضافته عبر JS) -->
 <template id="specRowTemplate">
     <tr class="spec-row">
-        <td><input type="text" name="spec_item_type[]" list="specItemTypes" placeholder="فلتر / زيت ..." aria-label="نوعُ البند"></td>
-        <td><input type="text" name="spec_recommended_ref[]" aria-label="المرجعُ الموصى به"></td>
-        <td><input type="number" step="0.01" name="spec_qty[]" class="fm-qty-cell" aria-label="الكميةُ المطلوبة"></td>
-        <td><input type="text" name="spec_uom[]" list="specUoms" class="fm-uom-cell" aria-label="وحدةُ القياس"></td>
-        <td><input type="text" name="spec_alt_ref[]" aria-label="المرجعُ البديل"></td>
+        <td><input type="text" name="spec_item_type[]" list="specItemTypes" placeholder="فلتر / زيت ..." aria-label="نوع البند"></td>
+        <td><input type="text" name="spec_recommended_ref[]" aria-label="المرجع الموصى به"></td>
+        <td><input type="number" step="0.01" name="spec_qty[]" class="fm-qty-cell" aria-label="الكمية المطلوبة"></td>
+        <td><input type="text" name="spec_uom[]" list="specUoms" class="fm-uom-cell" aria-label="وحدة القياس"></td>
+        <td><input type="text" name="spec_alt_ref[]" aria-label="المرجع البديل"></td>
         <td>
             <input type="hidden" name="spec_existing_photo[]" value="">
-            <input type="file" name="spec_photo[]" accept="image/*" class="spec-file" aria-label="صورةُ البند">
+            <input type="file" name="spec_photo[]" accept="image/*" class="spec-file" aria-label="صورة البند">
         </td>
-        <td><input type="text" name="spec_note[]" aria-label="ملاحظةٌ على البند"></td>
+        <td><input type="text" name="spec_note[]" aria-label="ملاحظة على البند"></td>
         <td class="text-center">
             <button type="button" class="action-btn delete removeSpecRow" title="حذف البند">
                 <i class="fa-solid fa-trash"></i>
@@ -772,7 +772,7 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
 
             html += '<h6 class="fm-spec-h"><i class="fas fa-screwdriver-wrench"></i> المواصفات القياسية للصيانة</h6>';
             if (!specs.length) {
-                html += '<div class="fm-empty">لا توجد مواصفات مسجّلة لهذا الموديل.</div>';
+                html += '<div class="fm-empty">لا توجد مواصفات مسجلة لهذا الموديل.</div>';
             } else {
                 html += '<div class="table-container"><table class="table spec-table"><thead><tr>' +
                     '<th>نوع البند</th><th>المرجع الموصى به</th><th>الكمية</th><th>الوحدة</th>' +

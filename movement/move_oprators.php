@@ -43,7 +43,7 @@ function validate_csrf(): void
 {
     $token = $_POST['csrf_token'] ?? '';
     if (!hash_equals($_SESSION['csrf_token'], $token)) {
-        ems_gov_flash_redirect('../main/dashboard.php', 'طلب غير صالح - CSRF validation failed ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
+        ems_gov_flash_redirect('../main/dashboard.php', 'طلب غير صالح - CSRF validation failed ❌', 'GOV-PERM-403', 'اطلب المنحة من مدير الصلاحيات إن كانت ضمن عملك');
     }
 }
 
@@ -775,7 +775,7 @@ include("../inheader.php"); ?>
     $header_back = array('href' => '../main/dashboard.php', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include(__DIR__ . '/../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا آلياتٍ مُشغَّلةً في هذا المشروعِ بعدُ', 'أضفْ أولَ تشغيلِ آليةٍ من نموذجِ «اضافة تشغيل آلية جديد» أسفلَ الشاشة');
+    echo ems_states_bundle('لا آليات مشغلة في هذا المشروع بعد', 'أضف أول تشغيل آلية من نموذج «اضافة تشغيل آلية جديد» أسفل الشاشة');
     ?>
 
     <div class="ems-content">
@@ -814,15 +814,15 @@ include("../inheader.php"); ?>
                         <input type="hidden" name="project_id"   id="project_id"
                                value="<?= intval($selected_project_id) ?>">
 
-                        <select name="contract_id" id="contract_id" aria-label="عقدُ التشغيل" required>
+                        <select name="contract_id" id="contract_id" aria-label="عقد التشغيل" required>
                             <option value="">-- اختر العقد --</option>
                         </select>
 
-                        <select name="supplier_id" id="supplier_id" aria-label="المورِّدُ المُشغِّل" required>
+                        <select name="supplier_id" id="supplier_id" aria-label="المورد المشغل" required>
                             <option value="">-- اختر المورد --</option>
                         </select>
 
-                        <select name="type" id="type" aria-label="نوعُ المعدة" required>
+                        <select name="type" id="type" aria-label="نوع المعدة" required>
                             <option value="">-- حدد نوع المعدة --</option>
                             <?php foreach ($type_rows as $type_row): ?>
                             <option value="<?= intval($type_row['id']) ?>">
@@ -831,7 +831,7 @@ include("../inheader.php"); ?>
                             <?php endforeach; ?>
                         </select>
 
-                        <select name="equipment" id="equipment" aria-label="المعدةُ المُشغَّلة" required>
+                        <select name="equipment" id="equipment" aria-label="المعدة المشغلة" required>
                             <option value="">-- اختر المعدة --</option>
                         </select>
 
@@ -879,7 +879,7 @@ include("../inheader.php"); ?>
                             </select>
                         </div>
 
-                        <select name="status" id="status" aria-label="حالةُ التشغيل: سارٍ أو منتهٍ" required>
+                        <select name="status" id="status" aria-label="حالة التشغيل: سار أو منته" required>
                             <option value="1">ساري</option>
                             <option value="0">منتهي</option>
                         </select>
@@ -912,8 +912,8 @@ include("../inheader.php"); ?>
                                 <th>المتبقي للإضافة</th>
                                 <th>توزيع المعدات والساعات</th>
                                                 <!-- U10-B12: النواة الحاكمة (الخلايا يحشوها ui-unification.js) -->
-                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ السجل وبأي صفة">المُنشئ — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ السجل وبأي صفة">المنشئ — الاسم والصفة</th>
                     <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء">تاريخ الإنشاء</th>
                     <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="السجل الذي تولد عنه">المرجع الأب</th>
 </tr>
@@ -1093,7 +1093,7 @@ include("../inheader.php"); ?>
                                 <span class="shift-badge <?= $shift_info['class'] ?>">
                                     <?= $shift_info['label'] ?>
                                 </span>
-                                <select class="shift-edit-select is-hidden" aria-label="وردية المشغّل"
+                                <select class="shift-edit-select is-hidden" aria-label="وردية المشغل"
                                         data-operation-id="<?= intval($row['id']) ?>">
                                     <option value="D" <?= $shift_code === 'D' ? 'selected' : '' ?>>☀️ نهاري فقط</option>
                                     <option value="N" <?= $shift_code === 'N' ? 'selected' : '' ?>>🌙 ليلي فقط</option>

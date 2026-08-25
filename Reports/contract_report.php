@@ -162,7 +162,7 @@ $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضيًا
-echo ems_states_bundle('لا ساعاتِ تنفيذٍ مسجلةً لهذا العقد', 'اختر عقدًا من القائمةِ أعلاه أو سجّل ساعاتِ الوردياتِ أولًا');
+echo ems_states_bundle('لا ساعات تنفيذ مسجلة لهذا العقد', 'اختر عقدا من القائمة أعلاه أو سجل ساعات الورديات أولا');
 ?>
         <div class="rpt-con-actions">
             <a href="reports.php" class="back-btn">
@@ -205,7 +205,7 @@ echo ems_states_bundle('لا ساعاتِ تنفيذٍ مسجلةً لهذا ا�
                     <div class="summary-item"><div class="label">مدة العقد</div><div class="value"><?php echo $contract_data['contract_duration_months']; ?> شهور</div></div>
                     <div class="summary-item"><div class="label">الهدف الشهري</div><div class="value"><?php echo $contract_data['hours_monthly_target']; ?></div></div>
                     <div class="summary-item"><div class="label">إجمالي الساعات المتوقعة</div><div class="value"><?php echo $contract_data['forecasted_contracted_hours']; ?></div></div>
-                    <div class="summary-item"><div class="label">المنفذ فعلياً</div><div class="value"><?php echo $contract_data['actual_hours']; ?></div></div>
+                    <div class="summary-item"><div class="label">المنفذ فعليا</div><div class="value"><?php echo $contract_data['actual_hours']; ?></div></div>
                     <div class="summary-item"><div class="label">المتبقي</div><div class="value"><?php echo $contract_data['remaining_hours']; ?></div></div>
                 </div>
                 <div class="report-progress">
@@ -323,7 +323,7 @@ echo ems_states_bundle('لا ساعاتِ تنفيذٍ مسجلةً لهذا ا�
             var host = c && c.parentNode ? c.parentNode : null;
             if (host) {
                 host.innerHTML = '<div class="rpt-con-chart-empty">'
-                    + 'لا بيانات في الفترة المعروضة — الرسم لا يُعرض بمحاور افتراضية</div>';
+                    + 'لا بيانات في الفترة المعروضة — الرسم لا يعرض بمحاور افتراضية</div>';
             }
             return null;
         }

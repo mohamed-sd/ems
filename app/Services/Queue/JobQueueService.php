@@ -151,7 +151,7 @@ class JobQueueService
         $type = (string) $job['job_type'];
         if (!isset($handlers[$type])) {
             self::fail($conn, $id, intval($job['attempts']), intval($job['max_attempts']),
-                'لا معالج للنوع ' . $type . ' — يسجَّل صفًّا في worker لا كودًا هنا');
+                'لا معالج للنوع ' . $type . ' — يسجل صفا في worker لا كودا هنا');
             return false;
         }
         try {
@@ -212,7 +212,7 @@ class JobQueueService
             $conn->query("UPDATE ems_job_queue SET progress_done = {$b}, batch_failures = '{$fj}' WHERE job_id = {$jobId}");
         }
         return array('ok' => true, 'done' => $doneCount, 'failed_batches' => count($failures),
-            'summary' => $doneCount . ' دفعة نجحت و' . count($failures) . ' فشلت (مسجلة ظاهرًا) — والباقي لم يسقط');
+            'summary' => $doneCount . ' دفعة نجحت و' . count($failures) . ' فشلت (مسجلة ظاهرا) — والباقي لم يسقط');
     }
 
     /** فشل بمحاولات تصاعدية: 1د → 5د → 25د — وبعد الحد dead ظاهرًا. */

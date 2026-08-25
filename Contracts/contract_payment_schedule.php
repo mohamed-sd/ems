@@ -107,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && strval($_POST['ps_action'] ?? '') !
     }
     if ($act === 'refresh') {
         $n = CPS::refreshStates($gate, $cid);
-        $redirect('حُدّثت حالاتُ ' . $n . ' سطرًا — والمتأخرُ يُعلَن ✅', $cid);
+        $redirect('حدثت حالات ' . $n . ' سطرا — والمتأخر يعلن ✅', $cid);
     }
 }
 
@@ -153,8 +153,8 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     include('../includes/page_header.php');
     if (isset($_GET['msg'])) { echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>'; }
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا خطةَ دفعٍ نافذةً على هذا العقد بعدُ',
-                           'اختر عقدًا من جدولِ العقود ثم ولّد الخطةَ من الرأسِ والجدولِ الشهري');
+    echo ems_states_bundle('لا خطة دفع نافذة على هذا العقد بعد',
+                           'اختر عقدا من جدول العقود ثم ولد الخطة من الرأس والجدول الشهري');
     ?>
 
     <style>
@@ -186,12 +186,12 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     <div class="card"><div class="card-body">
         <p class="ps-note">
             <i class="fas fa-circle-info"></i>
-            الخطةُ تقول <strong>ما استُحقّ ومتى</strong> — لا ما قُبض ولا ما فُوتر.
-            و<strong>أنواعُ المقدم الأربعة لا تُخلط</strong>: المستهلَكُ <strong>دَينٌ يُستهلك من
-            المستخلصات</strong>، ورسومُ الحجز ودفعةُ المعلَم <strong>إيراد</strong>،
-            ورسومُ التعبئة <strong>بحسب نص العقد فتُعلَن ولا تُفترض</strong> —
-            <strong>والخلطُ بينها يقلب التزامًا إلى إيرادٍ أو العكس</strong>.
-            و<strong>Σ الخطة ليست قيمةَ العقد</strong>: المقدمُ يُستهلك من المستخلصات فلا يُجمع معها.
+            الخطة تقول <strong>ما استحق ومتى</strong> — لا ما قبض ولا ما فوتر.
+            و<strong>أنواع المقدم الأربعة لا تخلط</strong>: المستهلك <strong>دين يستهلك من
+            المستخلصات</strong>، ورسوم الحجز ودفعة المعلم <strong>إيراد</strong>،
+            ورسوم التعبئة <strong>بحسب نص العقد فتعلن ولا تفترض</strong> —
+            <strong>والخلط بينها يقلب التزاما إلى إيراد أو العكس</strong>.
+            و<strong>Σ الخطة ليست قيمة العقد</strong>: المقدم يستهلك من المستخلصات فلا يجمع معها.
         </p>
     </div></div>
 
@@ -217,23 +217,23 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
 
     <?php if ($head): ?>
     <div class="card"><div class="card-header"><h5><i class="fa fa-money-check-dollar"></i>
-        خطةُ العقد #<?php echo $CID; ?> — <?php echo htmlspecialchars((string)$head['second_party']); ?></h5></div>
+        خطة العقد #<?php echo $CID; ?> — <?php echo htmlspecialchars((string)$head['second_party']); ?></h5></div>
     <div class="card-body">
         <?php if ($rows): ?>
         <div class="ps-badges">
             <span class="badge badge-secondary ps-badge-pad">النسخة
                 <?php echo intval($sum['version']); ?></span>
-            <span class="badge badge-info ps-badge-pad">متوقَّع
+            <span class="badge badge-info ps-badge-pad">متوقع
                 <?php echo $sum['expected'] . ' ' . htmlspecialchars((string)$sum['currency']); ?></span>
             <span class="badge badge-success ps-badge-pad">مستلم <?php echo $sum['received']; ?></span>
-            <span class="badge badge-secondary ps-badge-pad">متبقٍّ <?php echo $sum['remaining']; ?></span>
+            <span class="badge badge-secondary ps-badge-pad">متبق <?php echo $sum['remaining']; ?></span>
             <?php if ($sum['overdue_rows'] > 0): ?>
                 <span class="badge badge-warning ps-badge-pad">
-                    متأخر <?php echo $sum['overdue']; ?> في <?php echo $sum['overdue_rows']; ?> سطرًا</span>
+                    متأخر <?php echo $sum['overdue']; ?> في <?php echo $sum['overdue_rows']; ?> سطرا</span>
             <?php endif; ?>
             <span class="badge badge-secondary ps-badge-pad">
-                مقبوضٌ التزامًا <?php echo $sum['liability']; ?> ·
-                إيرادًا <?php echo $sum['revenue']; ?> — <strong>لا يُجمعان</strong></span>
+                مقبوض التزاما <?php echo $sum['liability']; ?> ·
+                إيرادا <?php echo $sum['revenue']; ?> — <strong>لا يجمعان</strong></span>
         </div>
         <?php endif; ?>
 
@@ -243,50 +243,50 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <input type="hidden" name="ps_action" value="generate">
             <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
             <h6 class="ps-gen-title"><i class="fa fa-wand-magic-sparkles"></i>
-                توليدٌ آليٌّ من الرأس والجدول الشهري</h6>
+                توليد آلي من الرأس والجدول الشهري</h6>
             <div class="ps-grid-10">
                 <div class="form-group"><label for="emsf_59_524ba">النمط</label>
                     <select name="pattern" id="emsf_59_524ba">
                         <?php foreach ($PATTERN_AR as $k => $v): ?>
                             <option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option>
                         <?php endforeach; ?></select></div>
-                <div class="form-group"><label for="emsf_60_9d874">مهلةُ السداد (يومًا)</label>
+                <div class="form-group"><label for="emsf_60_9d874">مهلة السداد (يوما)</label>
                     <input type="number" name="due_days" value="30" min="0" class="ps-w110" id="emsf_60_9d874"></div>
-                <div class="form-group"><label for="emsf_61_5e04e">نوعُ المقدم (اختياري)</label>
+                <div class="form-group"><label for="emsf_61_5e04e">نوع المقدم (اختياري)</label>
                     <select name="adv_type" id="emsf_61_5e04e">
                         <option value="">— بلا مقدم —</option>
                         <?php foreach ($ADV_AR as $k => $v): ?>
                             <option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option>
                         <?php endforeach; ?></select></div>
-                <div class="form-group"><label for="emsf_62_d9bbb">نسبتُه %</label>
+                <div class="form-group"><label for="emsf_62_d9bbb">نسبته %</label>
                     <input type="number" step="0.001" name="adv_percent" class="ps-w100" id="emsf_62_d9bbb"></div>
-                <div class="form-group"><label for="emsf_63_7a62a">تاريخُ استحقاقه</label>
+                <div class="form-group"><label for="emsf_63_7a62a">تاريخ استحقاقه</label>
                     <input type="date" name="adv_due" id="emsf_63_7a62a"></div>
-                <div class="form-group"><label for="emsf_64_f5a33">معالجتُه (للتعبئة وحدَها)</label>
+                <div class="form-group"><label for="emsf_64_f5a33">معالجته (للتعبئة وحدها)</label>
                     <select name="adv_treatment" id="emsf_64_f5a33">
-                        <option value="">— محكومةٌ بالنوع —</option>
-                        <option value="liability">التزام (دَين)</option>
+                        <option value="">— محكومة بالنوع —</option>
+                        <option value="liability">التزام (دين)</option>
                         <option value="revenue">إيراد</option>
                     </select></div>
-                <div class="form-group ps-mw280"><label for="emsf_65_00dd6">نصُّ العقد الحاكم (للتعبئة)</label>
+                <div class="form-group ps-mw280"><label for="emsf_65_00dd6">نص العقد الحاكم (للتعبئة)</label>
                     <input type="text" name="adv_basis_text" maxlength="255"
-                           placeholder="البند 7-3: رسومُ التعبئة غيرُ مستردة…" id="emsf_65_00dd6"></div>
+                           placeholder="البند 7-3: رسوم التعبئة غير مستردة…" id="emsf_65_00dd6"></div>
             </div>
-            <button type="submit" class="btn-primary"><i class="fa fa-wand-magic-sparkles"></i> ولّد الخطة</button>
+            <button type="submit" class="btn-primary"><i class="fa fa-wand-magic-sparkles"></i> ولد الخطة</button>
         </form>
         <?php endif; ?>
 
         <?php if ($rows): ?>
         <div class="table-container">
         <table class="alltables display nowrap no-datatable ps-table" data-no-dt="1">
-            <thead><tr><th>#</th><th>النوع</th><th>المقدمُ ومعالجتُه</th><th>الأساس</th><th>المتوقَّع</th>
+            <thead><tr><th>#</th><th>النوع</th><th>المقدم ومعالجته</th><th>الأساس</th><th>المتوقع</th>
                 <th>المستلم</th><th>المتبقي</th><th>الاستحقاق</th><th>الشهر</th><th>الحال</th>
-                <th>مرجعُ التحصيل</th><th></th>
+                <th>مرجع التحصيل</th><th></th>
                 <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                 <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                 <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                 <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -327,9 +327,9 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                             <input type="hidden" name="ps_action" value="receive">
                             <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
                             <input type="hidden" name="row_id" value="<?php echo intval($r['id']); ?>">
-                            <input type="number" step="0.01" name="amount" class="ps-w100" placeholder="المبلغُ المقبوض" required aria-label="المبلغُ المقبوض">
-                            <input type="date" name="received_date" class="ps-w140" required aria-label="تاريخُ القبض">
-                            <input type="text" name="doc_ref" class="ps-w130" placeholder="سندُ القبض" required aria-label="سندُ القبض">
+                            <input type="number" step="0.01" name="amount" class="ps-w100" placeholder="المبلغ المقبوض" required aria-label="المبلغ المقبوض">
+                            <input type="date" name="received_date" class="ps-w140" required aria-label="تاريخ القبض">
+                            <input type="text" name="doc_ref" class="ps-w130" placeholder="سند القبض" required aria-label="سند القبض">
                             <button type="submit" class="action-btn"><i class="fa fa-hand-holding-dollar"></i> اقبض</button>
                         </form>
                     <?php else: ?>—<?php endif; ?></td></tr>
@@ -358,23 +358,23 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     <div class="form-group"><label for="emsf_68_1dc6e">العملة</label>
                         <input type="text" name="currency" maxlength="8" class="ps-w80" id="emsf_68_1dc6e"
                                value="<?php echo htmlspecialchars((string)$rows[0]['currency']); ?>"></div>
-                    <div class="form-group"><label for="emsf_69_10456">تاريخُ الاستحقاق</label>
+                    <div class="form-group"><label for="emsf_69_10456">تاريخ الاستحقاق</label>
                         <input type="date" name="due_date" id="emsf_69_10456"></div>
-                    <div class="form-group ps-mw220"><label for="emsf_70_a103a">أو شرطُه</label>
+                    <div class="form-group ps-mw220"><label for="emsf_70_a103a">أو شرطه</label>
                         <input type="text" name="due_condition" maxlength="200" id="emsf_70_a103a"></div>
-                    <div class="form-group"><label for="emsf_71_e8e8a">نوعُ المقدم (إن كان مقدمًا)</label>
+                    <div class="form-group"><label for="emsf_71_e8e8a">نوع المقدم (إن كان مقدما)</label>
                         <select name="row_adv_type" id="emsf_71_e8e8a">
                             <option value="">—</option>
                             <?php foreach ($ADV_AR as $k => $v): ?>
                                 <option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option>
                             <?php endforeach; ?></select></div>
-                    <div class="form-group"><label for="emsf_72_f41b4">معالجتُه (للتعبئة)</label>
+                    <div class="form-group"><label for="emsf_72_f41b4">معالجته (للتعبئة)</label>
                         <select name="row_adv_treatment" id="emsf_72_f41b4">
-                            <option value="">— محكومةٌ بالنوع —</option>
+                            <option value="">— محكومة بالنوع —</option>
                             <option value="liability">التزام</option>
                             <option value="revenue">إيراد</option>
                         </select></div>
-                    <div class="form-group ps-mw240"><label for="emsf_73_ddeb5">نصُّ العقد الحاكم</label>
+                    <div class="form-group ps-mw240"><label for="emsf_73_ddeb5">نص العقد الحاكم</label>
                         <input type="text" name="row_adv_basis" maxlength="255" id="emsf_73_ddeb5"></div>
                 </div>
                 <button type="submit" class="btn-primary"><i class="fa fa-plus"></i> أضف السطر</button>
@@ -384,34 +384,34 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         <?php echo csrf_field(); ?>
                 <input type="hidden" name="ps_action" value="new_version">
                 <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
-                <h6><i class="fa fa-code-branch"></i> نسخةٌ جديدةٌ بملحق</h6>
-                <div class="form-group"><label for="emsf_74_2ae97">سريانُها</label>
+                <h6><i class="fa fa-code-branch"></i> نسخة جديدة بملحق</h6>
+                <div class="form-group"><label for="emsf_74_2ae97">سريانها</label>
                     <input type="date" name="effective_from" required id="emsf_74_2ae97"></div>
-                <div class="form-group"><label for="emsf_75_d54e3">رقمُ الملحق (اختياري)</label>
+                <div class="form-group"><label for="emsf_75_d54e3">رقم الملحق (اختياري)</label>
                     <input type="number" name="amendment_id" class="ps-w120" id="emsf_75_d54e3"></div>
                 <button type="submit" class="btn-primary"><i class="fa fa-code-branch"></i>
-                    افتح نسخةً — <strong>والقديمةُ محفوظة</strong></button>
+                    افتح نسخة — <strong>والقديمة محفوظة</strong></button>
             </form>
 
             <form method="post" class="ps-form-end">
         <?php echo csrf_field(); ?>
                 <input type="hidden" name="ps_action" value="refresh">
                 <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
-                <button type="submit" class="btn-primary"><i class="fa fa-rotate"></i> حدّث الحالات</button>
+                <button type="submit" class="btn-primary"><i class="fa fa-rotate"></i> حدث الحالات</button>
             </form>
         </div>
         <?php endif; ?>
         <?php elseif ($head): ?>
-            <p><em>لا خطةَ دفعٍ نافذةً لهذا العقد — ولّدها من الرأس والجدول الشهري.</em></p>
+            <p><em>لا خطة دفع نافذة لهذا العقد — ولدها من الرأس والجدول الشهري.</em></p>
         <?php endif; ?>
     </div></div>
 
     <?php if ($vers): ?>
     <div class="card"><div class="card-header"><h5><i class="fa fa-clock-rotate-left"></i>
-        النسخُ — <strong>والقديمةُ محفوظة</strong></h5></div>
+        النسخ — <strong>والقديمة محفوظة</strong></h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap no-datatable ps-table" data-no-dt="1">
-            <thead><tr><th>النسخة</th><th>من</th><th>إلى</th><th>الأسطر</th><th>المتوقَّع</th></tr></thead>
+            <thead><tr><th>النسخة</th><th>من</th><th>إلى</th><th>الأسطر</th><th>المتوقع</th></tr></thead>
             <tbody>
             <?php foreach ($vers as $v): ?>
                 <tr><td><span class="badge <?php echo $v['effective_to'] === null

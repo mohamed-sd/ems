@@ -40,14 +40,14 @@ if (!$is_super_admin && empty($__pp['can_view'])) {
 $__canWrite = $is_super_admin || !empty($__pp['can_add']) || !empty($__pp['can_edit']);
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$__canWrite) {
     http_response_code(403);
-    exit('غير مصرَّحٍ بالكتابة في هذه الشاشة — اطلبِ المنحةَ من مدير الصلاحيات');
+    exit('غير مصرح بالكتابة في هذه الشاشة — اطلب المنحة من مدير الصلاحيات');
 }
 
 // ═══ ⑤ رمزُ الحماية — قبلَ أيِّ معالجةٍ لا بعدَها ═══
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!function_exists('verify_csrf_token') || !verify_csrf_token($_POST['csrf_token'] ?? '')) {
         http_response_code(403);
-        exit('رمزُ الحمايةِ غيرُ صالح — أعدْ تحميلَ الصفحة');
+        exit('رمز الحماية غير صالح — أعد تحميل الصفحة');
     }
 }
 
@@ -59,10 +59,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // إعادةُ عدِّ المستهلكينَ المعلَنينَ لحدثٍ — خدمةٌ لا كتابةٌ من هنا
         $oid = (int) ($_POST['outbox_id'] ?? 0);
         $row = $conn->query("SELECT event_key, company_id FROM ems_business_events WHERE id=" . $oid)->fetch_assoc();
-        if (!$row) { $flash = 'صفُّ صادرٍ غيرُ موجود'; $flashKind = 'error'; }
+        if (!$row) { $flash = 'صف صادر غير موجود'; $flashKind = 'error'; }
         else {
             $n = \App\Services\Bus\EventOutboxFanout::open($conn, $oid, $row['event_key'], (int) $row['company_id']);
-            $flash = 'أُعيد فتحُ ' . $n . ' صفَّ تسليمٍ للحدث #' . $oid; $flashKind = 'success';
+            $flash = 'أعيد فتح ' . $n . ' صف تسليم للحدث #' . $oid; $flashKind = 'success';
         }
     }
 }
@@ -86,12 +86,12 @@ $stats = $conn->query(
 )->fetch_assoc();
 $PAGE_TITLE = 'صندوق الأحداث الصادر';
 $TILES = array(
-    array('وقائعُ منشورة', (int) $stats['total']),
-    array('سُلّمت لمستهلكٍ واحدٍ فأكثر', (int) $stats['delivered']),
+    array('وقائع منشورة', (int) $stats['total']),
+    array('سلمت لمستهلك واحد فأكثر', (int) $stats['delivered']),
     array('بانتظار التسليم', (int) $stats['pending']),
     array('في صندوق الموتى', (int) $stats['dlq']),
 );
-$COLS = array('#','رقم الحدث','رمز الحدث','نوع الواقعة','معرّفها','وقت النشر','مستهلكون معلَنون','نجح','فشل','صندوق الموتى','وسم البذر');
-$EMPTY_TITLE = 'صندوقُ الصادرِ فارغٌ بعدُ';
-$EMPTY_HINT  = 'تُنشَر الوقائعُ آليًّا عند اعتمادِ المستنداتِ وحركاتِ النظام';
+$COLS = array('#','رقم الحدث','رمز الحدث','نوع الواقعة','معرفها','وقت النشر','مستهلكون معلنون','نجح','فشل','صندوق الموتى','وسم البذر');
+$EMPTY_TITLE = 'صندوق الصادر فارغ بعد';
+$EMPTY_HINT  = 'تنشر الوقائع آليا عند اعتماد المستندات وحركات النظام';
 include __DIR__ . '/../includes/eng01_screen_view.php';

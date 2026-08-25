@@ -94,10 +94,10 @@ class EmployeeContractStateMachine
     const LABELS_AR = array(
         self::DRAFT => 'مسودة', self::COMPLETED => 'مكتمل', self::VALIDATED => 'محقَّق',
         self::APPROVED => 'معتمد', self::REJECTED => 'مرفوض', self::ACCEPTED => 'مقبول',
-        self::DECLINED => 'معتذَر عنه', self::SIGNED => 'موقَّع', self::ACTIVE => 'نافذ',
-        self::CONFIRMED => 'مثبَّت', self::AMENDED => 'معدَّل بملحق', self::SUSPENDED => 'معلَّق',
-        self::SECONDED => 'معار', self::EXPIRED => 'منتهٍ', self::TERMINATED => 'منهًى',
-        self::SETTLED => 'مصفًّى', self::CLOSED => 'مقفل', self::ARCHIVED => 'مؤرشف',
+        self::DECLINED => 'معتذر عنه', self::SIGNED => 'موقَّع', self::ACTIVE => 'نافذ',
+        self::CONFIRMED => 'مثبت', self::AMENDED => 'معدل بملحق', self::SUSPENDED => 'معلَّق',
+        self::SECONDED => 'معار', self::EXPIRED => 'منتهٍ', self::TERMINATED => 'منهى',
+        self::SETTLED => 'مصفى', self::CLOSED => 'مقفل', self::ARCHIVED => 'مؤرشف',
     );
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -147,7 +147,7 @@ class EmployeeContractStateMachine
         $to = (string) $to;
 
         $c = self::contractOf($gate, $contractId);
-        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقدُ غير موجود'; return $out; }
+        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقد غير موجود'; return $out; }
 
         $guard = self::guardWritable($c);
         if ($guard !== null) { return array_merge($out, $guard); }
@@ -157,51 +157,51 @@ class EmployeeContractStateMachine
 
         // العطالةُ قبل الحكم
         if ($from === $to) {
-            $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'العقدُ في هذه الحالة سلفًا';
+            $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'العقد في هذه الحالة سلفا';
             return $out;
         }
         if (!in_array($to, self::ALL, true)) {
-            $out['code'] = 422; $out['reason'] = 'حالةٌ غيرُ معروفة: ' . $to; return $out;
+            $out['code'] = 422; $out['reason'] = 'حالة غير معروفة: ' . $to; return $out;
         }
         if (in_array($from, self::TERMINAL_STATES, true)) {
             $out['code'] = 423;
-            $out['reason'] = 'العقدُ مؤرشف — حالةٌ نهائيةٌ بلا رجوع';
+            $out['reason'] = 'العقد مؤرشف — حالة نهائية بلا رجوع';
             return $out;
         }
         if ($to === self::SUSPENDED || $to === self::SECONDED) {
             $out['code'] = 422;
-            $out['reason'] = 'التعليقُ والإعارةُ ببابيهما (hold) — يلزمهما سببٌ ويحفظان ما قبلهما';
+            $out['reason'] = 'التعليق والإعارة ببابيهما (hold) — يلزمهما سبب ويحفظان ما قبلهما';
             return $out;
         }
         if ($from === self::SUSPENDED || $from === self::SECONDED) {
             $out['code'] = 422;
-            $out['reason'] = 'العقدُ ' . self::labelAr($from) . ' — يُستأنف أولًا فيعود إلى حيث كان، ثم يمضي';
+            $out['reason'] = 'العقد ' . self::labelAr($from) . ' — يستأنف أولا فيعود إلى حيث كان، ثم يمضي';
             return $out;
         }
         // «لا اعتمادَ لمن أنشأ» (CON-01 §4/§7.2) → 403
         if ($to === self::APPROVED && (int) $actor > 0
             && (int) $c['created_by'] === (int) $actor) {
             $out['code'] = 403;
-            $out['reason'] = 'لا اعتمادَ لمن أنشأ — فصلُ الواجبات بنيويٌّ لا إخفاءُ زر';
+            $out['reason'] = 'لا اعتماد لمن أنشأ — فصل الواجبات بنيوي لا إخفاء زر';
             return $out;
         }
         // H-10: «Accepted → Signed · شرطُه رفعُ النسخة الموقَّعة (ثابتةٌ لا تُعدَّل)»
         if ($to === self::SIGNED && trim((string) ($c['signed_file_ref'] ?? '')) === '') {
             $out['code'] = 422;
-            $out['reason'] = 'النسخةُ الموقَّعةُ تُرفع أولًا (attachSignedFile) — شرطُ التوقيع (CON-01 §4)';
+            $out['reason'] = 'النسخة الموقعة ترفع أولا (attachSignedFile) — شرط التوقيع (CON-01 §4)';
             return $out;
         }
         if ($expectedVersion !== null && (int) $expectedVersion !== (int) $c['version']) {
             $out['code'] = 409;
-            $out['reason'] = 'نسخةٌ متغيرة — أعِد التحميل (المسجَّلة ' . (int) $c['version'] . ')';
+            $out['reason'] = 'نسخة متغيرة — أعد التحميل (المسجلة ' . (int) $c['version'] . ')';
             return $out;
         }
         if (!self::canTransition($from, $to)) {
             $allowed = self::allowedFrom($from);
             $out['code'] = 422;
-            $out['reason'] = 'انتقالٌ غيرُ مشروع: ' . self::labelAr($from) . ' ← ' . self::labelAr($to)
-                . ($allowed ? (' — والمشروعُ من هنا: ' . implode(' · ', array_map(array(__CLASS__, 'labelAr'), $allowed)))
-                            : ' — ولا انتقالَ مشروعٌ من هذه الحالة');
+            $out['reason'] = 'انتقال غير مشروع: ' . self::labelAr($from) . ' ← ' . self::labelAr($to)
+                . ($allowed ? (' — والمشروع من هنا: ' . implode(' · ', array_map(array(__CLASS__, 'labelAr'), $allowed)))
+                            : ' — ولا انتقال مشروع من هذه الحالة');
             return $out;
         }
 
@@ -215,7 +215,7 @@ class EmployeeContractStateMachine
         // ما بعده لا ما قبله» (ENT-01 §2؛ والملحقُ H-10 سيمرّ بسريانه).
         if ($to === self::TERMINATED || $to === self::EXPIRED) {
             self::invalidateSnapshots($conn, $gate, (int) $c['company_id'], $contractId,
-                'انتقالُ الحالة: ' . self::labelAr($from) . ' ← ' . self::labelAr($to), $actor);
+                'انتقال الحالة: ' . self::labelAr($from) . ' ← ' . self::labelAr($to), $actor);
         }
         self::emit($conn, $gate, (int) $c['company_id'], $contractId, $from, $to, $note, $actor);
 
@@ -232,18 +232,18 @@ class EmployeeContractStateMachine
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'from' => null, 'changed' => false);
         $kind = (string) $kind;
         if ($kind !== self::SUSPENDED && $kind !== self::SECONDED) {
-            $out['code'] = 422; $out['reason'] = 'بابُ الإيقاف: تعليقٌ أو إعارةٌ حصرًا'; return $out;
+            $out['code'] = 422; $out['reason'] = 'باب الإيقاف: تعليق أو إعارة حصرا'; return $out;
         }
         $note = trim((string) $note);
         if ($note === '') {
             $out['code'] = 422;
             $out['reason'] = ($kind === self::SUSPENDED
-                ? 'سببُ التعليق إلزامي — «قرارٌ موثَّقٌ بسببٍ ومدة» (CON-01 §4)'
-                : 'بيانُ الإعارة إلزامي — «كيانٌ مستفيدٌ آخرُ بمدةٍ ونسبِ تحمّل» (CON-01 §4)');
+                ? 'سبب التعليق إلزامي — «قرار موثق بسبب ومدة» (CON-01 §4)'
+                : 'بيان الإعارة إلزامي — «كيان مستفيد آخر بمدة ونسب تحمل» (CON-01 §4)');
             return $out;
         }
         $c = self::contractOf($gate, (int) $contractId);
-        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقدُ غير موجود'; return $out; }
+        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقد غير موجود'; return $out; }
 
         $guard = self::guardWritable($c);
         if ($guard !== null) { return array_merge($out, $guard); }
@@ -251,12 +251,12 @@ class EmployeeContractStateMachine
         $from = (string) $c['state'];
         $out['from'] = $from;
         if ($from === $kind) {
-            $out['ok'] = true; $out['code'] = 200; $out['reason'] = self::labelAr($kind) . ' سلفًا'; return $out;
+            $out['ok'] = true; $out['code'] = 200; $out['reason'] = self::labelAr($kind) . ' سلفا'; return $out;
         }
         if (!in_array($from, self::HOLDABLE, true)) {
             $out['code'] = 422;
-            $out['reason'] = 'لا ' . ($kind === self::SUSPENDED ? 'يُعلَّق' : 'يُعار')
-                . ' عقدٌ حالتُه «' . self::labelAr($from) . '» — البابُ للعقود النافذة العاملة';
+            $out['reason'] = 'لا ' . ($kind === self::SUSPENDED ? 'يعلق' : 'يعار')
+                . ' عقد حالته «' . self::labelAr($from) . '» — الباب للعقود النافذة العاملة';
             return $out;
         }
 
@@ -268,7 +268,7 @@ class EmployeeContractStateMachine
         ), array('id' => (int) $contractId));
         // H-11: التعليقُ/الإعارةُ من مصادر الإبطال المسمّاة (ENT-01 §2)
         self::invalidateSnapshots($conn, $gate, (int) $c['company_id'], (int) $contractId,
-            ($kind === self::SUSPENDED ? 'تعليقُ العقد: ' : 'إعارةُ العقد: ') . $note, $actor);
+            ($kind === self::SUSPENDED ? 'تعليق العقد: ' : 'إعارة العقد: ') . $note, $actor);
         self::emit($conn, $gate, (int) $c['company_id'], (int) $contractId, $from, $kind, $note, $actor);
 
         $out['ok'] = true; $out['code'] = 200; $out['changed'] = true;
@@ -280,20 +280,20 @@ class EmployeeContractStateMachine
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'to' => null, 'changed' => false);
         $c = self::contractOf($gate, (int) $contractId);
-        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقدُ غير موجود'; return $out; }
+        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقد غير موجود'; return $out; }
 
         $guard = self::guardWritable($c);
         if ($guard !== null) { return array_merge($out, $guard); }
 
         $from = (string) $c['state'];
         if ($from !== self::SUSPENDED && $from !== self::SECONDED) {
-            $out['code'] = 422; $out['reason'] = 'العقدُ ليس معلَّقًا ولا معارًا'; return $out;
+            $out['code'] = 422; $out['reason'] = 'العقد ليس معلقا ولا معارا'; return $out;
         }
         $back = (string) $c['state_before_hold'];
         if ($back === '' || !in_array($back, self::ALL, true)) {
             // لا يُخترع مرجع
             $out['code'] = 422;
-            $out['reason'] = 'لا حالةَ محفوظةً قبل الإيقاف — يُنقل يدويًّا بقرارٍ موثَّق';
+            $out['reason'] = 'لا حالة محفوظة قبل الإيقاف — ينقل يدويا بقرار موثق';
             return $out;
         }
         $gate->update('employee_contracts', array(
@@ -304,7 +304,7 @@ class EmployeeContractStateMachine
         ), array('id' => (int) $contractId));
         // H-11: الاستئنافُ يعيد سريانَ القواعد — لقطاتُ ما بعده تُبطل فتُعاد
         self::invalidateSnapshots($conn, $gate, (int) $c['company_id'], (int) $contractId,
-            'استئنافُ العقد من ' . self::labelAr($from), $actor);
+            'استئناف العقد من ' . self::labelAr($from), $actor);
         self::emit($conn, $gate, (int) $c['company_id'], (int) $contractId,
                    $from, $back, $note, $actor);
 
@@ -332,8 +332,8 @@ class EmployeeContractStateMachine
         $src = isset($c['source_table']) ? trim((string) $c['source_table']) : '';
         if ($src !== '') {
             return array('code' => 423,
-                'reason' => 'صفٌّ مرحَّلٌ قراءةً — كاتبُه مصدرُه القديم (' . $src
-                    . ') حتى إقفال الكتابة القديمة بمطابقة فترةٍ (N-04)');
+                'reason' => 'صف مرحل قراءة — كاتبه مصدره القديم (' . $src
+                    . ') حتى إقفال الكتابة القديمة بمطابقة فترة (N-04)');
         }
         return null;
     }
@@ -372,7 +372,7 @@ class EmployeeContractStateMachine
                 'created_by'      => (int) $actor ?: 1,
                 'idempotency_key' => 'employee_contract_state:' . (int) $contractId . ':' . $from . '>' . $to
                                      . ':' . gmdate('YmdHis'),
-                'notes'           => 'حالةُ عقد الموظف: ' . self::labelAr($from) . ' ← ' . self::labelAr($to),
+                'notes'           => 'حالة عقد الموظف: ' . self::labelAr($from) . ' ← ' . self::labelAr($to),
                 'payload'         => array(
                     'employee_contract_id' => (int) $contractId,
                     'from' => $from, 'to' => $to,

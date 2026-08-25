@@ -33,7 +33,7 @@ foreach ($rows as $x) {
 $page_title = 'إيكوبيشن | سجل الضوابط';
 include '../inheader.php';
 include '../insidebar.php';
-require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('risk', 'الضوابطُ والمعالجة');
+require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('risk', 'الضوابط والمعالجة');
 if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main ems-unified-page-shell">
@@ -43,15 +43,15 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     $header_actions = $canWrite ? array(array('id' => 'ctlNewBtn', 'class' => 'add-btn', 'icon' => 'fas fa-plus', 'label' => 'ضابط جديد')) : array();
     $header_back = array();
     $header_context = array('الإجمالي' => count($rows) . ' ضابط', 'الحرجة' => $criticalN,
-        'غير المثبتة' => $unprovenN, 'المنظر' => $view === 'all' ? 'كل الأعمدة (24)' : 'مختصر موجَّه للمهمة');
+        'غير المثبتة' => $unprovenN, 'المنظر' => $view === 'all' ? 'كل الأعمدة (24)' : 'مختصر موجه للمهمة');
     include('../includes/page_header.php');
     ems_screen_about(
         'وجود الضابط لا يخفض درجة الخطر — يلزم دليل تنفيذ وتحقق دوري (RK-07). '
-        . 'الحرج قليل ومحدَّد: حدث عالي العواقب ومعيار أداء وطريقة تحقق ومتحقق مستقل وإجراء فشل.',
+        . 'الحرج قليل ومحدد: حدث عالي العواقب ومعيار أداء وطريقة تحقق ومتحقق مستقل وإجراء فشل.',
         array('لا يتحقق مالك الضابط من نفسه — الحارس يرفضه برمز',
-              'نموذجُ البياناتِ لا يُختزل: المنظرُ يقلّل الأعمدةَ لا الصفوف'));
+              'نموذج البيانات لا يختزل: المنظر يقلل الأعمدة لا الصفوف'));
     risk_view_bar('risk_controls', $view);
-    echo ems_states_bundle('لا ضوابطَ مسجَّلةً بعد', 'الضابطُ يُسجَّل بدليلِ تنفيذٍ محدَّد — والحرجُ بحقوله الخمسة');
+    echo ems_states_bundle('لا ضوابط مسجلة بعد', 'الضابط يسجل بدليل تنفيذ محدد — والحرج بحقوله الخمسة');
     ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
@@ -135,7 +135,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                 <div class="col-md-2"><label>التكرار<select name="frequency" class="form-control" aria-label="تكرار تنفيذ الضابط">
                     <option>يومي</option><option>كل وردية</option><option>أسبوعي</option><option>شهري</option><option>عند الحدث</option></select></label></div>
                 <div class="col-md-2"><label>حرج؟<select name="is_critical" class="form-control" aria-label="هل الضابط حرج"><option value="0">لا</option><option value="1">نعم</option></select></label></div>
-                <div class="col-md-6"><label>العملية التي ينفَّذ فيها<input name="process_ref" class="form-control" aria-label="العملية التي ينفذ فيها الضابط"></label></div>
+                <div class="col-md-6"><label>العملية التي ينفذ فيها<input name="process_ref" class="form-control" aria-label="العملية التي ينفذ فيها الضابط"></label></div>
                 <div class="col-md-6"><label>دليل التنفيذ المطلوب *<input name="evidence_spec" class="form-control" aria-label="دليل التنفيذ المطلوب" required></label></div>
                 <div class="col-md-4"><label>الحدث عالي العواقب (حرج)<input name="hico_event" class="form-control" aria-label="الحدث عالي العواقب الذي يمنعه الضابط"></label></div>
                 <div class="col-md-4"><label>معيار الأداء (حرج)<input name="perf_criterion" class="form-control" aria-label="معيار أداء الضابط الحرج"></label></div>

@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $email = trim(isset($_POST['email']) ? $_POST['email'] : '');
         if (!validate_email($email) || !validate_length($email, 5, 150)) {
-            $error = 'أدخل بريداً إلكترونياً صحيحاً.';
+            $error = 'أدخل بريدا إلكترونيا صحيحا.';
         } else {
             $message = 'تم إيقاف إعادة التعيين التلقائي. يرجى التواصل مباشرة مع إدارة الشركة عبر البريد الإلكتروني أو رقم الهاتف المعتمد لاستعادة كلمة المرور.';
         }

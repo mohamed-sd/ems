@@ -24,18 +24,18 @@ $U13 = array(
     'icon'       => 'fa fa-list-check',
     'nature'     => 'document',
     'doc'        => 'IAF-01 §4-3 · IAF-0028',
-    'intro'      => 'الاتفاقُ على خططِ المعالجةِ ومتابعةُ تنفيذها بمهلةِ كلٍّ',
-    'rule'       => 'IAF-0028: المتابعةُ للمراجعِ — والإدارةُ تنفّذ ولا تشهد على نفسها',
-    'empty_hint' => 'لا خططَ معالجةٍ قائمة',
+    'intro'      => 'الاتفاق على خطط المعالجة ومتابعة تنفيذها بمهلة كل',
+    'rule'       => 'IAF-0028: المتابعة للمراجع — والإدارة تنفذ ولا تشهد على نفسها',
+    'empty_hint' => 'لا خطط معالجة قائمة',
     'where'       => 'action_plan IS NOT NULL AND state <> \'closed\'',
     'order'       => 'action_due ASC',
 
     'actions'    => array(
         'set' => array(
             'code'  => 'iaf.actionplan.set',
-            'label' => 'ضبطُ خطةِ المعالجةِ ومالكِها ومهلتِها',
-            'rule'  => 'IAF-0044: لا خطةَ معالجةٍ بلا ردِّ إدارةٍ سابق',
-            'fields' => array('finding_no' => 'رقمُ الملاحظة', 'action_plan' => 'خطةُ المعالجة', 'action_owner' => 'مالكُ الإجراء', 'action_due' => 'المهلة'),
+            'label' => 'ضبط خطة المعالجة ومالكها ومهلتها',
+            'rule'  => 'IAF-0044: لا خطة معالجة بلا رد إدارة سابق',
+            'fields' => array('finding_no' => 'رقم الملاحظة', 'action_plan' => 'خطة المعالجة', 'action_owner' => 'مالك الإجراء', 'action_due' => 'المهلة'),
             'run' => function ($conn, $co, $uid, $in) {
                 require_once __DIR__ . '/../app/Services/Audit/InternalAuditService.php';
                 return \App\Services\Audit\InternalAuditService::setActionPlan($conn, array(

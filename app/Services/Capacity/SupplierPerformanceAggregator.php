@@ -38,7 +38,7 @@ class SupplierPerformanceAggregator
               WHERE {TENANT_SCOPE} AND l.id = ?",
             array($lineId));
         if (!$lines) {
-            throw new \RuntimeException('بندُ الحصة غيرُ موجودٍ في نطاقك');
+            throw new \RuntimeException('بند الحصة غير موجود في نطاقك');
         }
         $line = $lines[0];
         $planned = round((float) $line['planned_month'], 2); // ① مشتقةٌ لا تُدخل (§5-⑦)
@@ -102,7 +102,7 @@ class SupplierPerformanceAggregator
     {
         if ((string) $effectType === 'exceptional_coverage' && $intoShareExecution) {
             return array('ok' => false, 'code' => 403,
-                'reason' => 'ساعاتُ التغطية الاستثنائية بندٌ مستقلٌّ — لا تدخل تنفيذَ الحصة ولا ترفع نسبتَه (C19: وإلا صار كلُّ موردٍ منفِّذًا مئةً بالمئة)');
+                'reason' => 'ساعات التغطية الاستثنائية بند مستقل — لا تدخل تنفيذ الحصة ولا ترفع نسبته (C19: وإلا صار كل مورد منفذا مئة بالمئة)');
         }
         return array('ok' => true, 'code' => 200, 'reason' => '');
     }
@@ -124,8 +124,8 @@ class SupplierPerformanceAggregator
         if ($rows) {
             $periods = array_map(function ($r) { return $r['period']; }, $rows);
             return array('ok' => false, 'code' => 423, 'closed_periods' => $periods,
-                'reason' => 'الحصةُ استُهلك منها في شهرٍ مقفل (' . implode(' · ', $periods)
-                          . ') — لا تُعدَّل لتطابق المنفَّذ؛ الانحرافُ التاريخيُّ محفوظٌ والتعديلُ فترةٌ جديدةٌ بسريان (C12)');
+                'reason' => 'الحصة استهلك منها في شهر مقفل (' . implode(' · ', $periods)
+                          . ') — لا تعدل لتطابق المنفذ؛ الانحراف التاريخي محفوظ والتعديل فترة جديدة بسريان (C12)');
         }
         return array('ok' => true, 'code' => 200, 'reason' => '', 'closed_periods' => array());
     }

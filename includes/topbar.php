@@ -156,7 +156,7 @@ if (!defined('EMS_TOPBAR_RENDERED')) {
             ?>
             <div class="ems-ctx-switcher" id="emsCtxSwitcher">
                 <button type="button" class="ems-topbar-pill ems-ctx-btn" aria-haspopup="true" aria-expanded="false"
-                        title="مبدّل السياق — الإدارة والصفة والنطاق"
+                        title="مبدل السياق — الإدارة والصفة والنطاق"
                         data-value="<?php echo htmlspecialchars($ems_tb_ctxShow, ENT_QUOTES, 'UTF-8'); ?>">
                     <i class="fas fa-user-shield"></i><?php echo htmlspecialchars($ems_tb_roleText, ENT_QUOTES, 'UTF-8'); ?>
                     <?php if ($ems_tb_capLabel !== ''): ?><span class="ems-ctx-sep">|</span><?php echo htmlspecialchars($ems_tb_capLabel, ENT_QUOTES, 'UTF-8'); ?><?php endif; ?>
@@ -302,15 +302,15 @@ if (!defined('EMS_TOPBAR_RENDERED')) {
             if ($ems_tb_appLevel > 0):
                 $ems_tb_appUrl   = function_exists('ems_url') ? ems_url('Approvals/hours_approval.php') : '/ems/Approvals/hours_approval.php';
                 $ems_tb_appTitle = $ems_tb_appCount > 0
-                    ? 'الاعتمادات — ' . $ems_tb_appCount . ' سجلَّ ساعاتٍ ينتظر اعتمادَ إدارتك'
-                    : 'الاعتمادات — لا سجلَّ ينتظر اعتمادَ إدارتك';
+                    ? 'الاعتمادات — ' . $ems_tb_appCount . ' سجل ساعات ينتظر اعتماد إدارتك'
+                    : 'الاعتمادات — لا سجل ينتظر اعتماد إدارتك';
             ?>
             <a href="<?php echo htmlspecialchars($ems_tb_appUrl, ENT_QUOTES, 'UTF-8'); ?>"
                class="ems-topbar-icon ems-topbar-icon--badged" id="emsTopbarApprovals"
                title="<?php echo htmlspecialchars($ems_tb_appTitle, ENT_QUOTES, 'UTF-8'); ?>"
                aria-label="<?php echo htmlspecialchars($ems_tb_appTitle, ENT_QUOTES, 'UTF-8'); ?>"><i class="fas fa-stamp"></i><span id="emsApprovalsBadge" class="ems-topbar-badge"<?php
                 echo $ems_tb_appCount > 0
-                    ? ' aria-label="' . htmlspecialchars($ems_tb_appCount . ' سجلًّا ينتظر الاعتماد', ENT_QUOTES, 'UTF-8') . '">'
+                    ? ' aria-label="' . htmlspecialchars($ems_tb_appCount . ' سجلا ينتظر الاعتماد', ENT_QUOTES, 'UTF-8') . '">'
                       . htmlspecialchars($ems_tb_appCount > 99 ? '99+' : (string) $ems_tb_appCount, ENT_QUOTES, 'UTF-8')
                     : ' style="display:none;">';
             ?></span></a>

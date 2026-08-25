@@ -46,12 +46,12 @@ include '../insidebar.php';
     $header_title = 'سجل الوحدات اليومية'; $header_icon = 'fa fa-table-list';
     $header_actions = array();
     include('../includes/page_header.php');
-    ems_screen_about('السجلُّ التحليليُّ الواحد لوحدات العمل بوحداتها المنفصلة — يستوعب '
-        . 'تقاريرَ الساعات القديمة الثلاثة. قراءةٌ واشتقاقٌ بلا أثر — ولا تُجمع وحدتان في رقم.',
-        array('حدّد الفترةَ والمشروع', 'اقرأ المجاميعَ بوحدةٍ وحدة'));
+    ems_screen_about('السجل التحليلي الواحد لوحدات العمل بوحداتها المنفصلة — يستوعب '
+        . 'تقارير الساعات القديمة الثلاثة. قراءة واشتقاق بلا أثر — ولا تجمع وحدتان في رقم.',
+        array('حدد الفترة والمشروع', 'اقرأ المجاميع بوحدة وحدة'));
     // UXW-01 ⑨: حالتا التحميلِ والخطأِ (حالةُ الفراغِ قائمةٌ أسفلُ) — مخفيتانِ افتراضًا
-    echo ems_state('loading', 'جارٍ تحميلُ سجلِّ الوحداتِ اليومية', '', '', true);
-    echo ems_state('error', 'تعذّر عرضُ سجلِّ الوحدات', 'أعد المحاولةَ — وإن استمر الخللُ أبلغ عن مشكلةٍ من هذه الشاشة', '', true);
+    echo ems_state('loading', 'جار تحميل سجل الوحدات اليومية', '', '', true);
+    echo ems_state('error', 'تعذر عرض سجل الوحدات', 'أعد المحاولة — وإن استمر الخلل أبلغ عن مشكلة من هذه الشاشة', '', true);
     ?>
 
     <div class="card"><div class="card-body">
@@ -74,17 +74,17 @@ include '../insidebar.php';
                     <?php echo htmlspecialchars($ut); ?>: <strong><?php echo htmlspecialchars((string)$q); ?></strong></div>
             <?php endforeach; ?>
             <?php if (count($rep['totals_by_unit']) > 1): ?>
-                <small class="rpt-du-unit-note">⚠ المجاميعُ بوحدةٍ وحدة — ولا تُجمع وحدتان في رقم</small>
+                <small class="rpt-du-unit-note">⚠ المجاميع بوحدة وحدة — ولا تجمع وحدتان في رقم</small>
             <?php endif; ?>
         </div>
     </div></div>
 
     <div class="card"><div class="card-body">
-        <?php if (!$rep['rows']): ems_state_empty('لا وحداتٍ في هذه الفترة', 'وسّع المدة',
+        <?php if (!$rep['rows']): ems_state_empty('لا وحدات في هذه الفترة', 'وسع المدة',
             '?from=' . date('Y-01-01') . '&to=' . $to); else: ?>
         <div class="table-container"><table class="alltables display nowrap rpt-du-table">
             <thead><tr><th>التاريخ</th><th>المشروع</th><th>المعدة</th><th>المورد</th>
-                <th>المشغّل</th><th>الوحدة</th><th>الكمية</th><th>الحالة</th></tr></thead>
+                <th>المشغل</th><th>الوحدة</th><th>الكمية</th><th>الحالة</th></tr></thead>
             <tbody>
             <?php foreach ($rep['rows'] as $x): ?>
                 <tr><td><?php echo htmlspecialchars((string)$x['entry_date']); ?></td>

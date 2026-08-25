@@ -91,7 +91,7 @@ if (!function_exists('ems_screen_about')) {
                             ems_screen_about((string) $row['description'], array(), '', array('src' => 'registry'));
                         }
                     }
-                } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'السجلُّ قد لا يكون مُرحَّلًا — لا تُسقط الشاشة'); /* السجلُّ قد لا يكون مُرحَّلًا — لا تُسقط الشاشة */ }
+                } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'السجل قد لا يكون مرحلا — لا تسقط الشاشة'); /* السجلُّ قد لا يكون مُرحَّلًا — لا تُسقط الشاشة */ }
             }
         }
 
@@ -182,7 +182,7 @@ if (!function_exists('ems_state_offline_bar')) {
     {
         echo '<div id="emsOfflineBar" style="display:none;position:fixed;top:0;right:0;left:0;'
            . 'z-index:9999;background:#8a1f1f;color:#fff;text-align:center;padding:6px;font-weight:700">'
-           . '⚠ لا اتصالَ بالشبكة — ما تكتبه محفوظٌ محليًّا (المسودةُ التلقائية) ولن يضيع</div>'
+           . '⚠ لا اتصال بالشبكة — ما تكتبه محفوظ محليا (المسودة التلقائية) ولن يضيع</div>'
            . '<script>window.addEventListener("offline",function(){'
            . 'document.getElementById("emsOfflineBar").style.display="block"});'
            . 'window.addEventListener("online",function(){'
@@ -232,7 +232,7 @@ if (!function_exists('ems_screen_about_auto')) {
                     if ($name === '') { $name = trim((string) $d['title_ar']); }
                 }
                 $st->close();
-            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'التعريفُ إرشادٌ — لا يُسقط الشاشة'); /* التعريفُ إرشادٌ — لا يُسقط الشاشة */ }
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'التعريف إرشاد — لا يسقط الشاشة'); /* التعريفُ إرشادٌ — لا يُسقط الشاشة */ }
 
             if ($name === '') { $name = basename($rel, '.php'); }
             $text = 'شاشة «' . $name . '»' . ($dept !== '' ? ' — ضمن نطاق ' . $dept : '') . '.';

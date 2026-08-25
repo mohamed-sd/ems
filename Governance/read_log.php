@@ -36,7 +36,7 @@ if (!$is_super_admin && $company_id <= 0) { header('Location: ../login.php'); ex
 
 $__pp = check_page_permissions($conn, 'Governance/read_log.php');
 if (!$is_super_admin && empty($__pp['can_view'])) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'لا تملك صلاحية عرض سجل الاطّلاع الحساس', 'GOV-PERM-403', 'سجلُّ الاطّلاعِ للحوكمة والمراجعة');
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا تملك صلاحية عرض سجل الاطلاع الحساس', 'GOV-PERM-403', 'سجل الاطلاع للحوكمة والمراجعة');
 }
 ems_shell_axes($__pp);
 
@@ -99,7 +99,7 @@ if (!$queryFailed) {
     }
 }
 
-$page_title = 'سجل الاطّلاع على الحقول الحساسة';
+$page_title = 'سجل الاطلاع على الحقول الحساسة';
 include '../inheader.php';
 include '../insidebar.php';
 if (isset($conn)) { ems_screen_about_auto($conn); }
@@ -107,12 +107,12 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
 <div class="main" dir="rtl">
 <?php
 $header_icon = 'fa fa-eye';
-$header_title_html = htmlspecialchars('سجلُّ الاطّلاعِ على الحقولِ الحساسة', ENT_QUOTES, 'UTF-8');
+$header_title_html = htmlspecialchars('سجل الاطلاع على الحقول الحساسة', ENT_QUOTES, 'UTF-8');
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-echo ems_states_bundle('لا اطّلاعَ على حقلٍ حسّاسٍ مسجَّلٌ في المدى المختار', 'وسِّع المدى الزمنيَّ من حقلَي «من» و«إلى» ثم اضغط «تصفية»');
+echo ems_states_bundle('لا اطلاع على حقل حساس مسجل في المدى المختار', 'وسع المدى الزمني من حقلي «من» و«إلى» ثم اضغط «تصفية»');
 ?>
 
 <style>
@@ -138,26 +138,26 @@ echo ems_states_bundle('لا اطّلاعَ على حقلٍ حسّاسٍ مسج�
 
   <?php if ($queryFailed): ?>
   <div class="alert alert-danger gov-rl-alert">
-    <strong>تعذّر قراءةُ السجل.</strong>
-    فرقٌ بين «لا اطّلاعَ وقع» و«تعذّر السؤال» — وهذه الثانية. راجِع سجلَّ الأخطاء.
+    <strong>تعذر قراءة السجل.</strong>
+    فرق بين «لا اطلاع وقع» و«تعذر السؤال» — وهذه الثانية. راجع سجل الأخطاء.
   </div>
   <?php else: ?>
 
   <div class="gov-rl-kpis">
     <div class="ems-card gov-rl-kpi gov-rl-kpi-ok">
-      <div class="gov-rl-kpi-label">اطّلاعٌ مسموح</div>
+      <div class="gov-rl-kpi-label">اطلاع مسموح</div>
       <div class="gov-rl-kpi-val"><?php echo number_format($cnt['allowed']); ?></div>
     </div>
     <div class="ems-card gov-rl-kpi gov-rl-kpi-denied">
-      <div class="gov-rl-kpi-label">محاولةٌ مردودة</div>
+      <div class="gov-rl-kpi-label">محاولة مردودة</div>
       <div class="gov-rl-kpi-val"><?php echo number_format($cnt['denied']); ?></div>
     </div>
     <div class="ems-card gov-rl-kpi gov-rl-kpi-people">
-      <div class="gov-rl-kpi-label">مطّلعون مميَّزون</div>
+      <div class="gov-rl-kpi-label">مطلعون مميزون</div>
       <div class="gov-rl-kpi-val"><?php echo number_format($cnt['people']); ?></div>
     </div>
     <div class="ems-card gov-rl-kpi gov-rl-kpi-elems">
-      <div class="gov-rl-kpi-label">حقولٌ مميَّزة</div>
+      <div class="gov-rl-kpi-label">حقول مميزة</div>
       <div class="gov-rl-kpi-val"><?php echo number_format($cnt['elements']); ?></div>
     </div>
   </div>
@@ -185,7 +185,7 @@ echo ems_states_bundle('لا اطّلاعَ على حقلٍ حسّاسٍ مسج�
     </div>
     <div class="form-group gov-rl-fg">
       <label for="rl_el">الحقل</label>
-      <input type="text" id="rl_el" name="element" class="form-control form-control-sm" value="<?php echo htmlspecialchars($elem, ENT_QUOTES, 'UTF-8'); ?>" placeholder="مثلًا: salary">
+      <input type="text" id="rl_el" name="element" class="form-control form-control-sm" value="<?php echo htmlspecialchars($elem, ENT_QUOTES, 'UTF-8'); ?>" placeholder="مثلا: salary">
     </div>
     <button type="submit" class="btn btn-primary btn-sm">تصفية</button>
   </form>
@@ -201,7 +201,7 @@ echo ems_states_bundle('لا اطّلاعَ على حقلٍ حسّاسٍ مسج�
       <tbody>
       <?php if (!$rows): ?>
         <tr><td colspan="10" class="gov-rl-empty">
-          لا اطّلاعَ مسجَّلٌ في هذا المدى — والسجلُّ يُكتب لحظةَ فتحِ حقلٍ حساسٍ فعلًا.
+          لا اطلاع مسجل في هذا المدى — والسجل يكتب لحظة فتح حقل حساس فعلا.
         </td></tr>
       <?php else: foreach ($rows as $x): ?>
         <tr>
@@ -226,9 +226,9 @@ echo ems_states_bundle('لا اطّلاعَ على حقلٍ حسّاسٍ مسج�
       </tbody>
     </table>
     <p class="text-muted gov-rl-note">
-      قراءةٌ محضة — السجلُّ يُكتب من الحرّاسِ لحظةَ الاطّلاعِ ولا يُصحَّح من هنا؛
-      فسجلُّ تدقيقٍ قابلٌ للتحرير من شاشتِه ليس سجلَّ تدقيق.
-      وأحدثُ 500 صفٍّ في المدى المختار.
+      قراءة محضة — السجل يكتب من الحراس لحظة الاطلاع ولا يصحح من هنا؛
+      فسجل تدقيق قابل للتحرير من شاشته ليس سجل تدقيق.
+      وأحدث 500 صف في المدى المختار.
     </p>
   </div></div>
 

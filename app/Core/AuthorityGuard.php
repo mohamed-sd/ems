@@ -35,7 +35,7 @@ class AuthorityGuard
 
         // ① اعتماد الذات — بنيويًّا في كل الصناديق (قيد ⑤)
         if (isset($a['created_by_person_id']) && intval($a['created_by_person_id']) === $person) {
-            $out['code'] = 403; $out['reason'] = 'لا يعتمد المرء ما أنشأه — بنيويًّا';
+            $out['code'] = 403; $out['reason'] = 'لا يعتمد المرء ما أنشأه — بنيويا';
             self::record($conn, $company, $docType, $docId, $step, $person, null, $amount, 'denied');
             return $out;
         }
@@ -85,14 +85,14 @@ class AuthorityGuard
 
         if ($capsOn) {
             if (!$auth) {
-                $out['code'] = 403; $out['reason'] = 'لا تفويضَ ساريًا لهذا الشخص عن الكيان — الاعتماد مرفوض بنيويًّا';
+                $out['code'] = 403; $out['reason'] = 'لا تفويض ساريا لهذا الشخص عن الكيان — الاعتماد مرفوض بنيويا';
                 self::record($conn, $company, $docType, $docId, $step, $person, null, $amount, 'denied');
                 return $out;
             }
             if ($auth['amount_cap'] !== null && $amount !== null && $amount > (float) $auth['amount_cap']) {
                 $out['code'] = 409;
                 $out['reason'] = 'فوق السقف — المتاح ' . number_format((float) $auth['amount_cap'], 2)
-                    . ' ' . $auth['currency'] . '؛ يُرفع للمستوى الأعلى';
+                    . ' ' . $auth['currency'] . '؛ يرفع للمستوى الأعلى';
                 self::record($conn, $company, $docType, $docId, $step, $person, intval($auth['auth_id']), $amount, 'denied');
                 return $out;
             }
@@ -114,7 +114,7 @@ class AuthorityGuard
             return $out;
         }
         $out['ok'] = true; $out['code'] = 201; $out['sig_id'] = $sigId; $out['auth_id'] = $authId;
-        $out['reason'] = 'وُقّع' . ($authId ? ' بمرجع التفويض #' . $authId : ' (نمط ① — عنصر السقوف مطفأ)');
+        $out['reason'] = 'وقع' . ($authId ? ' بمرجع التفويض #' . $authId : ' (نمط ① — عنصر السقوف مطفأ)');
         return $out;
     }
 

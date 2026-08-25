@@ -140,8 +140,8 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     include('../includes/page_header.php');
     if (isset($_GET['msg'])) { echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>'; }
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا خطةَ مواردَ مسجَّلةً لهذا البند بعدُ',
-                           'اختر بندَ بيعٍ نافذًا من الجدولِ أعلاه ثم وزِّع الحصصَ حتى تكتملَ المائة');
+    echo ems_states_bundle('لا خطة موارد مسجلة لهذا البند بعد',
+                           'اختر بند بيع نافذا من الجدول أعلاه ثم وزع الحصص حتى تكتمل المائة');
     ?>
 
     <style>
@@ -190,14 +190,14 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     <td><a class="action-btn" href="?line=<?php echo intval($l['id']); ?>">
                         <i class="fa fa-truck-ramp-box"></i> الخطة</a></td></tr>
             <?php endforeach; ?>
-            <?php if (!$lines): ?><tr><td colspan="8"><em>لا بنودَ بيعٍ نافذة — ابدأ من «بنود العقد»</em></td></tr><?php endif; ?>
+            <?php if (!$lines): ?><tr><td colspan="8"><em>لا بنود بيع نافذة — ابدأ من «بنود العقد»</em></td></tr><?php endif; ?>
             </tbody>
         </table>
     </div></div></div>
 
     <?php if ($line): ?>
     <div class="card"><div class="card-header"><h5><i class="fa fa-truck-ramp-box"></i>
-        خطةُ البند #<?php echo intval($line['line_no']); ?> —
+        خطة البند #<?php echo intval($line['line_no']); ?> —
         <?php echo htmlspecialchars((string)$line['description']); ?></h5></div>
     <div class="card-body">
         <div class="crp-badges">
@@ -206,9 +206,9 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <span class="badge badge-info crp-badge-pad">Σ الحصص <?php echo $share; ?>%</span>
             <span class="badge crp-badge-pad <?php echo abs($gap) < 0.0005 ? 'badge-success' : 'badge-warning'; ?>"
                 >الفجوة <?php echo $gap; ?>%
-                <?php echo abs($gap) < 0.0005 ? '— مكتملة' : '— غيرُ مكتملة'; ?></span>
+                <?php echo abs($gap) < 0.0005 ? '— مكتملة' : '— غير مكتملة'; ?></span>
             <?php if ($cap['ok']): ?>
-                <span class="badge badge-secondary crp-badge-pad">الطاقةُ المخطَّطة
+                <span class="badge badge-secondary crp-badge-pad">الطاقة المخططة
                     <?php echo $cap['total'] . ' ' . htmlspecialchars((string)$cap['unit']); ?></span>
             <?php elseif ($LID > 0 && isset($cap['reason']) && $cap['reason'] !== ''): ?>
                 <span class="badge badge-warning crp-badge-pad">
@@ -216,10 +216,10 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <?php endif; ?>
             <?php if ($crew): ?>
                 <span class="badge badge-secondary crp-badge-pad">
-                    طلبُ العمالة: <?php echo intval($crew['operators']); ?> مشغّلًا ·
-                    <?php echo intval($crew['supervisors']); ?> مشرفًا ·
-                    <?php echo intval($crew['technicians']); ?> فنيًّا ·
-                    <?php echo intval($crew['assistants']); ?> مساعدًا</span>
+                    طلب العمالة: <?php echo intval($crew['operators']); ?> مشغلا ·
+                    <?php echo intval($crew['supervisors']); ?> مشرفا ·
+                    <?php echo intval($crew['technicians']); ?> فنيا ·
+                    <?php echo intval($crew['assistants']); ?> مساعدا</span>
             <?php endif; ?>
         </div>
 
@@ -228,20 +228,20 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <input type="hidden" name="rp_action" value="save">
             <input type="hidden" name="line_id" value="<?php echo $LID; ?>">
             <div class="form-group crp-field-narrow">
-                <label for="emsf_76_afeca">سريانُ الخطة</label>
+                <label for="emsf_76_afeca">سريان الخطة</label>
                 <input type="date" name="valid_from" id="emsf_76_afeca"
                        value="<?php echo htmlspecialchars((string)($live ? $live[0]['valid_from'] : $line['valid_from'])); ?>">
             </div>
             <div class="table-container">
             <table class="alltables display nowrap no-datatable crp-table" data-no-dt="1">
-                <thead><tr><th>نوعُ المعدة</th><th>الحصة %</th><th>الصفة</th><th>أساسية</th><th>احتياطية</th>
-                    <th>ورديّات</th><th>ساعات/وردية</th><th>مشغّلون</th><th>مشرفون</th><th>فنيّون</th>
+                <thead><tr><th>نوع المعدة</th><th>الحصة %</th><th>الصفة</th><th>أساسية</th><th>احتياطية</th>
+                    <th>ورديات</th><th>ساعات/وردية</th><th>مشغلون</th><th>مشرفون</th><th>فنيون</th>
                     <th>مساعدون</th><th>الحجم</th><th>الموقع</th><th>ملاحظة</th><th>الطاقة</th>
                     <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                     <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                     <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                     <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -253,46 +253,46 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     foreach ($cap['rows'] as $cr) { if ((int)$cr['equipment_type_id'] === (int)$tid) { $capQty = $cr['planned_qty']; } } ?>
                     <tr<?php echo $r === null ? ' class="crp-row-new"' : ''; ?>>
                         <td><strong><?php echo htmlspecialchars((string)$tname); ?></strong></td>
-                        <td><input type="number" step="0.001" min="0" max="100" class="crp-w90" aria-label="حصةُ الطاقة بالمائة"
+                        <td><input type="number" step="0.001" min="0" max="100" class="crp-w90" aria-label="حصة الطاقة بالمائة"
                             name="share[<?php echo intval($tid); ?>]"
                             value="<?php echo $r !== null ? htmlspecialchars((string)$r['capacity_share_percent']) : ''; ?>"></td>
-                        <td><select aria-label="صفةُ الحصة — منتجة أو احتياطية" name="kind[<?php echo intval($tid); ?>]">
+                        <td><select aria-label="صفة الحصة — منتجة أو احتياطية" name="kind[<?php echo intval($tid); ?>]">
                             <?php foreach ($KIND_AR as $k => $v): ?>
                                 <option value="<?php echo $k; ?>"
                                     <?php echo ($r !== null && (string)$r['share_kind'] === $k) ? 'selected' : ''; ?>>
                                     <?php echo htmlspecialchars($v); ?></option>
                             <?php endforeach; ?></select></td>
-                        <td><input type="number" min="0" class="crp-w70" aria-label="عددُ المعدات الأساسية" name="basic[<?php echo intval($tid); ?>]"
+                        <td><input type="number" min="0" class="crp-w70" aria-label="عدد المعدات الأساسية" name="basic[<?php echo intval($tid); ?>]"
                             value="<?php echo $r !== null ? intval($r['count_basic']) : ''; ?>"></td>
-                        <td><input type="number" min="0" class="crp-w70" aria-label="عددُ المعدات الاحتياطية" name="backup[<?php echo intval($tid); ?>]"
+                        <td><input type="number" min="0" class="crp-w70" aria-label="عدد المعدات الاحتياطية" name="backup[<?php echo intval($tid); ?>]"
                             value="<?php echo $r !== null ? intval($r['count_backup']) : ''; ?>"></td>
-                        <td><input type="number" min="1" max="4" class="crp-w70" aria-label="عددُ الورديّات في اليوم" name="shifts[<?php echo intval($tid); ?>]"
+                        <td><input type="number" min="1" max="4" class="crp-w70" aria-label="عدد الورديات في اليوم" name="shifts[<?php echo intval($tid); ?>]"
                             value="<?php echo $r !== null ? intval($r['shifts_per_day']) : 1; ?>"></td>
-                        <td><input type="number" step="0.25" min="0" max="24" class="crp-w80" aria-label="ساعاتُ الوردية الواحدة" name="hours[<?php echo intval($tid); ?>]"
+                        <td><input type="number" step="0.25" min="0" max="24" class="crp-w80" aria-label="ساعات الوردية الواحدة" name="hours[<?php echo intval($tid); ?>]"
                             value="<?php echo $r !== null ? htmlspecialchars((string)$r['hours_per_shift']) : ''; ?>"></td>
-                        <td><input type="number" min="0" class="crp-w70" aria-label="عددُ المشغّلين" name="ops[<?php echo intval($tid); ?>]"
+                        <td><input type="number" min="0" class="crp-w70" aria-label="عدد المشغلين" name="ops[<?php echo intval($tid); ?>]"
                             value="<?php echo $r !== null ? intval($r['operators_count']) : ''; ?>"></td>
-                        <td><input type="number" min="0" class="crp-w70" aria-label="عددُ المشرفين" name="sup[<?php echo intval($tid); ?>]"
+                        <td><input type="number" min="0" class="crp-w70" aria-label="عدد المشرفين" name="sup[<?php echo intval($tid); ?>]"
                             value="<?php echo $r !== null ? intval($r['supervisors_count']) : ''; ?>"></td>
-                        <td><input type="number" min="0" class="crp-w70" aria-label="عددُ الفنيّين" name="tec[<?php echo intval($tid); ?>]"
+                        <td><input type="number" min="0" class="crp-w70" aria-label="عدد الفنيين" name="tec[<?php echo intval($tid); ?>]"
                             value="<?php echo $r !== null ? intval($r['technicians_count']) : ''; ?>"></td>
-                        <td><input type="number" min="0" class="crp-w70" aria-label="عددُ المساعدين" name="asst[<?php echo intval($tid); ?>]"
+                        <td><input type="number" min="0" class="crp-w70" aria-label="عدد المساعدين" name="asst[<?php echo intval($tid); ?>]"
                             value="<?php echo $r !== null ? intval($r['assistants_count']) : ''; ?>"></td>
-                        <td><input type="number" min="0" class="crp-w80" aria-label="حجمُ المعدة" name="size[<?php echo intval($tid); ?>]"
+                        <td><input type="number" min="0" class="crp-w80" aria-label="حجم المعدة" name="size[<?php echo intval($tid); ?>]"
                             value="<?php echo ($r !== null && $r['equipment_size'] !== null) ? intval($r['equipment_size']) : ''; ?>"></td>
-                        <td><select aria-label="الموقعُ التشغيليُّ للحصة" name="site[<?php echo intval($tid); ?>]">
-                            <option value="0">— كلُّ العقد —</option>
+                        <td><select aria-label="الموقع التشغيلي للحصة" name="site[<?php echo intval($tid); ?>]">
+                            <option value="0">— كل العقد —</option>
                             <?php foreach ($sites as $s): ?>
                                 <option value="<?php echo intval($s['id']); ?>"
                                     <?php echo ($r !== null && (int)$r['operational_site_id'] === (int)$s['id']) ? 'selected' : ''; ?>>
                                     <?php echo htmlspecialchars((string)$s['scope_name']); ?></option>
                             <?php endforeach; ?></select></td>
-                        <td><input type="text" maxlength="200" class="crp-w180" aria-label="ملاحظةٌ على صفِّ الخطة" name="rnote[<?php echo intval($tid); ?>]"
+                        <td><input type="text" maxlength="200" class="crp-w180" aria-label="ملاحظة على صف الخطة" name="rnote[<?php echo intval($tid); ?>]"
                             value="<?php echo $r !== null ? htmlspecialchars((string)($r['note'] ?? '')) : ''; ?>"></td>
                         <td><?php echo $capQty !== null
                             ? ('<span class="badge badge-info">' . $capQty . '</span>') : '—'; ?></td></tr>
                 <?php endforeach; ?>
-                <?php if (!$types): ?><tr><td colspan="15"><em>لا أنواعَ معداتٍ نشطة</em></td></tr><?php endif; ?>
+                <?php if (!$types): ?><tr><td colspan="15"><em>لا أنواع معدات نشطة</em></td></tr><?php endif; ?>
                 </tbody>
             </table>
             </div>
@@ -305,11 +305,11 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     </div></div>
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-clock-rotate-left"></i>
-        سجلُّ الخطة — <strong>والمنتهيةُ تبقى للتاريخ</strong></h5></div>
+        سجل الخطة — <strong>والمنتهية تبقى للتاريخ</strong></h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap no-datatable crp-table" data-no-dt="1">
             <thead><tr><th>#</th><th>النوع</th><th>الحصة</th><th>الصفة</th><th>من</th><th>إلى</th>
-                <th>الحال</th><th>سببُ الإنهاء</th><th></th></tr></thead>
+                <th>الحال</th><th>سبب الإنهاء</th><th></th></tr></thead>
             <tbody>
             <?php foreach ($all as $r): ?>
                 <tr><td><?php echo intval($r['id']); ?></td>
@@ -328,12 +328,12 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                             <input type="hidden" name="rp_action" value="end_row">
                             <input type="hidden" name="line_id" value="<?php echo $LID; ?>">
                             <input type="hidden" name="row_id" value="<?php echo intval($r['id']); ?>">
-                            <input type="text" name="end_reason" class="crp-w150" placeholder="سببُ الإنهاء" required aria-label="سببُ الإنهاء">
-                            <button type="submit" class="action-btn"><i class="fa fa-ban"></i> أنهِ</button>
+                            <input type="text" name="end_reason" class="crp-w150" placeholder="سبب الإنهاء" required aria-label="سبب الإنهاء">
+                            <button type="submit" class="action-btn"><i class="fa fa-ban"></i> أنه</button>
                         </form>
                     <?php else: ?>—<?php endif; ?></td></tr>
             <?php endforeach; ?>
-            <?php if (!$all): ?><tr><td colspan="9"><em>لا صفوفَ بعد</em></td></tr><?php endif; ?>
+            <?php if (!$all): ?><tr><td colspan="9"><em>لا صفوف بعد</em></td></tr><?php endif; ?>
             </tbody>
         </table>
     </div></div></div>

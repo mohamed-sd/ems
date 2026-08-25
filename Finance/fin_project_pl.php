@@ -10,9 +10,9 @@ $FA_SCREEN = array(
     'file' => 'fin_project_pl.php',
     'title' => 'قائمة دخل المشروع',
     'icon' => 'fas fa-diagram-project',
-    'about' => 'الإيرادُ والتكلفةُ المباشرةُ بالبُعد D2 والحصةُ المحمَّلةُ بأساسِ تحميلٍ معلَن — تُنتَج من الأبعادِ لا من شجرةٍ منفصلة.',
+    'about' => 'الإيراد والتكلفة المباشرة بالبعد D2 والحصة المحملة بأساس تحميل معلن — تنتج من الأبعاد لا من شجرة منفصلة.',
     'notes' => array (
-  0 => 'أساسُ التحميلِ يُعلَن ولا يُخترع — والتوليدُ نسخةٌ تشير لسابقتها',
+  0 => 'أساس التحميل يعلن ولا يخترع — والتوليد نسخة تشير لسابقتها',
 ),
     'context' => array(),
     'filters' => '',
@@ -32,7 +32,7 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
     if ($r) { while ($x = $r->fetch_assoc()) { $rows[] = $x; } }
 ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
-    <?php echo ems_states_bundle('لا بياناتٍ لهذه الفترةِ المالية', 'غيّر الفترةَ أو تحقق من ترحيلِ القيود'); ?>
+    <?php echo ems_states_bundle('لا بيانات لهذه الفترة المالية', 'غير الفترة أو تحقق من ترحيل القيود'); ?>
     <?php if ($can_write && $projects): ?>
     <div class="card"><div class="card-body fa-gen-bar">
         <label class="fa-field-label" for="faProj">المشروع
@@ -47,12 +47,12 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
     <?php endif; ?>
     <div class="card"><div class="card-body table-responsive">
         <?php if (!$rows): ?>
-            <?php ems_state_empty('لا قوائمَ مولَّدةً لهذه الفترة'); ?>
+            <?php ems_state_empty('لا قوائم مولدة لهذه الفترة'); ?>
         <?php else: ?>
         <table class="alltables display nowrap fa-table-full">
             <thead><tr><th>الرقم</th><th>المشروع</th><th>الفترة</th><th>العملة</th><th>الإيراد</th><th>التكلفة المباشرة</th>
-                <th>الحصة المحمَّلة</th><th>أساس التحميل</th><th>الهامش الإجمالي</th><th>الربح التشغيلي</th>
-                <th>نسبة الهامش</th><th>الحالة</th><th>مولّدها</th><th>مرجع التفويض</th><th>المرجع الأب</th></tr></thead>
+                <th>الحصة المحملة</th><th>أساس التحميل</th><th>الهامش الإجمالي</th><th>الربح التشغيلي</th>
+                <th>نسبة الهامش</th><th>الحالة</th><th>مولدها</th><th>مرجع التفويض</th><th>المرجع الأب</th></tr></thead>
             <tbody>
             <?php foreach ($rows as $x): ?>
                 <tr>
@@ -82,7 +82,7 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
 
 /* UXW-01 §8-2: موضعُ الشاشةِ من رحلةِ المشروع — القشرةُ تُخرِج الشريط */
 $ENTITY_KEY = 'project';
-$ENTITY_TAB = 'الميزانيةُ والإنجاز';
+$ENTITY_TAB = 'الميزانية والإنجاز';
 
 /* القشرةُ الموحَّدةُ هي التي تُنفِّذ include '../inheader.php' ثم insidebar بعد الحارسِ (البوابة ٤) */
 require __DIR__ . '/../includes/fin_analysis_shell.php';

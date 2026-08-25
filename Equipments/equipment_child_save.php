@@ -74,7 +74,7 @@ if ($action === 'delete') {
     try {
         $child_gate->update($table, array('is_deleted' => 1), array('id' => $row_id, 'equipment_id' => $equipment_id));
     } catch (\Throwable $e) {
-        fleet_redirect($equipment_id, $anchor, '❌ تعذّر الحذف');
+        fleet_redirect($equipment_id, $anchor, '❌ تعذر الحذف');
     }
     fleet_redirect($equipment_id, $anchor, '🗑️ تم الحذف');
 }
@@ -128,7 +128,7 @@ if ($entity === 'compliance') {
     );
     if ($is_super) { $row['company_id'] = $company_val; }
     try { $child_gate->insert('fleet_equipment_compliance', $row); }
-    catch (\Throwable $e) { fleet_redirect($equipment_id, $anchor, '❌ تعذّر الحفظ'); }
+    catch (\Throwable $e) { fleet_redirect($equipment_id, $anchor, '❌ تعذر الحفظ'); }
     fleet_redirect($equipment_id, $anchor, '✅ تم إضافة الوثيقة');
 }
 
@@ -158,13 +158,13 @@ if ($entity === 'protection') {
     );
     if ($is_super) { $row['company_id'] = $company_val; }
     try { $child_gate->insert('fleet_equipment_protection', $row); }
-    catch (\Throwable $e) { fleet_redirect($equipment_id, $anchor, '❌ تعذّر الحفظ'); }
+    catch (\Throwable $e) { fleet_redirect($equipment_id, $anchor, '❌ تعذر الحفظ'); }
     fleet_redirect($equipment_id, $anchor, '✅ تم إضافة تجهيز الحماية');
 }
 
 if ($entity === 'component') {
     $ctype = $S('component_type');
-    if ($ctype === '') fleet_redirect($equipment_id, $anchor, '❌ نوع المكوّن مطلوب');
+    if ($ctype === '') fleet_redirect($equipment_id, $anchor, '❌ نوع المكون مطلوب');
     $serial = $D('serial_no');
     $install = $D('install_date');
     $is_current = !empty($_POST['is_current']) ? 1 : 0;
@@ -178,8 +178,8 @@ if ($entity === 'component') {
     );
     if ($is_super) { $row['company_id'] = $company_val; }
     try { $child_gate->insert('fleet_equipment_component', $row); }
-    catch (\Throwable $e) { fleet_redirect($equipment_id, $anchor, '❌ تعذّر الحفظ'); }
-    fleet_redirect($equipment_id, $anchor, '✅ تم إضافة المكوّن');
+    catch (\Throwable $e) { fleet_redirect($equipment_id, $anchor, '❌ تعذر الحفظ'); }
+    fleet_redirect($equipment_id, $anchor, '✅ تم إضافة المكون');
 }
 
 if ($entity === 'history') {
@@ -204,8 +204,8 @@ if ($entity === 'history') {
     );
     if ($is_super) { $row['company_id'] = $company_val; }
     try { $child_gate->insert('fleet_equipment_history', $row); }
-    catch (\Throwable $e) { fleet_redirect($equipment_id, $anchor, '❌ تعذّر الحفظ'); }
+    catch (\Throwable $e) { fleet_redirect($equipment_id, $anchor, '❌ تعذر الحفظ'); }
     fleet_redirect($equipment_id, $anchor, '✅ تم تسجيل الحدث');
 }
 
-fleet_redirect($equipment_id, $anchor, '❌ تعذّر الحفظ');
+fleet_redirect($equipment_id, $anchor, '❌ تعذر الحفظ');

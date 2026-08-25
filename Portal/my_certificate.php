@@ -90,38 +90,38 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array();
     include('../includes/page_header.php');
     // حزمةُ الحالاتِ الدنيا (بوابة ٩) — مخفيةٌ افتراضًا ويُظهرها منطقُ الشاشة
-    echo ems_states_bundle('لا شهادةَ إنجازٍ صادرةً بعدُ', 'شهادتي تُصدَر من تقييمٍ معتمدٍ — أكمل دورةَ التقييمِ ثم أصدرها من هنا');
+    echo ems_states_bundle('لا شهادة إنجاز صادرة بعد', 'شهادتي تصدر من تقييم معتمد — أكمل دورة التقييم ثم أصدرها من هنا');
     if (isset($_GET['msg'])) { echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>'; }
     ?>
 
     <div class="card"><div class="card-body">
-        <p class="ems-ptc-note"><strong>الشهادةُ تُولَّد من الأرقام المقاسة لا من كتابةٍ حرة</strong> —
-            ولا تُصدَر لفترةٍ لم تُقفل بلقطةٍ أو لتقييمٍ لم يُعتمد، ولا تُصدَر مرتين،
-            ولكلِّ شهادةٍ رقمٌ تسلسليٌّ ورمزُ تحققٍ يمنع التزوير.</p>
+        <p class="ems-ptc-note"><strong>الشهادة تولد من الأرقام المقاسة لا من كتابة حرة</strong> —
+            ولا تصدر لفترة لم تقفل بلقطة أو لتقييم لم يعتمد، ولا تصدر مرتين،
+            ولكل شهادة رقم تسلسلي ورمز تحقق يمنع التزوير.</p>
         <form method="get" class="ems-ptc-filter">
-            <strong>تحقّق من شهادة:</strong>
+            <strong>تحقق من شهادة:</strong>
             <input type="text" name="verify" placeholder="رمز التحقق" value="<?php echo htmlspecialchars($verify); ?>" aria-label="رمز التحقق">
-            <button type="submit" class="btn-primary">تحقّق</button>
+            <button type="submit" class="btn-primary">تحقق</button>
             <?php if ($verify !== ''): ?>
                 <?php if ($verified): ?>
                     <span class="badge badge-success">صحيحة — <?php echo htmlspecialchars((string)$verified['serial_no']); ?>
                         · <?php echo htmlspecialchars($verified['period_from'] . ' → ' . $verified['period_to']); ?></span>
                 <?php else: ?>
-                    <span class="badge badge-danger">لا شهادةَ بهذا الرمز</span>
+                    <span class="badge badge-danger">لا شهادة بهذا الرمز</span>
                 <?php endif; ?>
             <?php endif; ?>
         </form>
     </div></div>
 
     <?php if ($approved): ?>
-    <div class="card"><div class="card-header"><h5><i class="fa fa-stamp"></i> معتمدٌ بلا شهادة</h5></div>
+    <div class="card"><div class="card-header"><h5><i class="fa fa-stamp"></i> معتمد بلا شهادة</h5></div>
     <div class="card-body">
         <?php foreach ($approved as $e): ?>
             <form method="post" class="ems-ptc-issue-row">
         <?= csrf_field() ?>
                 <input type="hidden" name="ct_action" value="issue">
                 <input type="hidden" name="eval_id" value="<?php echo intval($e['id']); ?>">
-                <span>تقييمُ <?php echo htmlspecialchars($e['period_from'] . ' → ' . $e['period_to']); ?>
+                <span>تقييم <?php echo htmlspecialchars($e['period_from'] . ' → ' . $e['period_to']); ?>
                     بدرجة <strong><?php echo htmlspecialchars((string)$e['final_score']); ?></strong></span>
                 <button type="submit" class="btn-primary"><i class="fa fa-certificate"></i> أصدر الشهادة</button>
             </form>
@@ -132,7 +132,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> شهاداتي (<?php echo count($certs); ?>)</h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap ems-ptc-w100" data-no-dt="1">
-            <thead><tr><th>رقم الشهادة</th><th>الفترة</th><th>رمز التحقق</th><th>أُصدرت</th><th></th>
+            <thead><tr><th>رقم الشهادة</th><th>الفترة</th><th>رمز التحقق</th><th>أصدرت</th><th></th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">الموظف</th>
               <th class="ems-fn-th" data-fn="1">الإدارة</th>
@@ -145,12 +145,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="ems-fn-th" data-fn="1">أصدرها</th>
               <th class="ems-fn-th" data-fn="1">تاريخ الإصدار</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
               <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
               <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               </tr></thead>
@@ -172,23 +172,23 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         $m = json_decode((string)$openCert['metrics_json'], true) ?: array();
     ?>
     <div class="card" id="printable"><div class="card-body ems-ptc-cert-body">
-        <h3>شهادةُ إنجاز</h3>
+        <h3>شهادة إنجاز</h3>
         <p>رقم <strong><?php echo htmlspecialchars((string)$openCert['serial_no']); ?></strong>
-            · رمزُ التحقق <code><?php echo htmlspecialchars((string)$openCert['verify_code']); ?></code></p>
+            · رمز التحقق <code><?php echo htmlspecialchars((string)$openCert['verify_code']); ?></code></p>
         <p>عن الفترة <strong><?php echo htmlspecialchars($openCert['period_from'] . ' → ' . $openCert['period_to']); ?></strong></p>
         <div class="ems-ptc-cert-metrics">
-            <p><strong>الإنجازُ بالأرقام المقاسة:</strong></p>
+            <p><strong>الإنجاز بالأرقام المقاسة:</strong></p>
             <ul>
-                <li>الطلبات: أُنشئ <?php echo intval($m['requests']['created'] ?? 0); ?> · اكتمل <?php echo intval($m['requests']['completed'] ?? 0); ?></li>
-                <li>الاعتمادات: بُتّ في <?php echo intval($m['approvals']['decided'] ?? 0); ?></li>
+                <li>الطلبات: أنشئ <?php echo intval($m['requests']['created'] ?? 0); ?> · اكتمل <?php echo intval($m['requests']['completed'] ?? 0); ?></li>
+                <li>الاعتمادات: بت في <?php echo intval($m['approvals']['decided'] ?? 0); ?></li>
                 <li>الالتزام بالمهل: <?php echo isset($m['sla']['rate']) && $m['sla']['rate'] !== null
                     ? (round($m['sla']['rate'] * 100, 1) . '٪') : 'لا ينطبق'; ?></li>
                 <li>الإنتاج: <?php echo !empty($m['production']['not_applicable'])
-                    ? 'لا ينطبق' : (($m['production']['qty_due'] ?? 0) . ' كميةً مستحقة'); ?></li>
+                    ? 'لا ينطبق' : (($m['production']['qty_due'] ?? 0) . ' كمية مستحقة'); ?></li>
             </ul>
         </div>
-        <p><small>أُصدرت في <?php echo htmlspecialchars((string)$openCert['issued_at']); ?> —
-            وتُتحقَّق برمزها في هذه الشاشة</small></p>
+        <p><small>أصدرت في <?php echo htmlspecialchars((string)$openCert['issued_at']); ?> —
+            وتتحقق برمزها في هذه الشاشة</small></p>
     </div></div>
     <div class="ems-ptc-print-row"><button type="button" class="btn-primary" onclick="window.print()">
         <i class="fa fa-print"></i> الطباعة الرسمية</button></div>

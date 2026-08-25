@@ -37,12 +37,12 @@ include '../insidebar.php';
         array('href' => '../Fleet/readiness_board.php', 'icon' => 'fa fa-heart-pulse', 'label' => 'لوحة الجاهزية'),
     );
     include('../includes/page_header.php');
-    ems_screen_about('الشاشةُ الأم للتشغيل بتبويبات اليوم الأربعة: من رفع ومن تأخر · '
-        . 'تايم شيتات اليوم · صندوقُ الاعتماد بعدّاده · والالتزامُ بالوتيرة اللازمة. '
-        . 'قراءةٌ وقفزٌ — لا أثرَ ماليًّا من هنا؛ الأثرُ يقع عند اكتمال سلسلة الوحدة.',
-        array('اختر التاريخ', 'طالِب المواقعَ المتأخرة', 'اقفز للإدخال أو الاعتماد في بيته'));
+    ems_screen_about('الشاشة الأم للتشغيل بتبويبات اليوم الأربعة: من رفع ومن تأخر · '
+        . 'تايم شيتات اليوم · صندوق الاعتماد بعداده · والالتزام بالوتيرة اللازمة. '
+        . 'قراءة وقفز — لا أثر ماليا من هنا؛ الأثر يقع عند اكتمال سلسلة الوحدة.',
+        array('اختر التاريخ', 'طالب المواقع المتأخرة', 'اقفز للإدخال أو الاعتماد في بيته'));
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضيًا
-    echo ems_states_bundle('لا حركةَ تشغيلٍ مسجَّلةً في هذا اليوم', 'اختر يومًا آخرَ أو طالِبِ المواقعَ المتأخرةَ برفعِ وحداتها');
+    echo ems_states_bundle('لا حركة تشغيل مسجلة في هذا اليوم', 'اختر يوما آخر أو طالب المواقع المتأخرة برفع وحداتها');
     ?>
 
     <div class="card"><div class="card-body opr-bar">
@@ -62,11 +62,11 @@ include '../insidebar.php';
     <?php if ($tab === '1'):
         $sites = OBS::sitesToday($conn, $company_id, $date); ?>
     <div class="card"><div class="card-header"><h5><i class="fa fa-location-dot"></i>
-        مواقعُ اليوم — مَن رفع ومَن تأخر</h5></div>
+        مواقع اليوم — من رفع ومن تأخر</h5></div>
     <div class="card-body">
-        <?php if (!$sites): ems_state_empty('لا مواقعَ نشطةً في آخر أسبوعين', 'افتح التايم شيت', '?tab=2'); else: ?>
+        <?php if (!$sites): ems_state_empty('لا مواقع نشطة في آخر أسبوعين', 'افتح التايم شيت', '?tab=2'); else: ?>
         <div class="table-container"><table class="alltables display nowrap opr-table-full" data-no-dt="1">
-            <thead><tr><th>الموقع</th><th>رفعُ اليوم</th><th>آخرُ تحديث</th><th></th>
+            <thead><tr><th>الموقع</th><th>رفع اليوم</th><th>آخر تحديث</th><th></th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">المشروع</th>
               <th class="ems-fn-th" data-fn="1">المعدات المخططة</th>
@@ -75,10 +75,10 @@ include '../insidebar.php';
               <th class="ems-fn-th" data-fn="1">نسبة التشغيل</th>
               <th class="ems-fn-th" data-fn="1">الإنتاج اليوم</th>
               <th class="ems-fn-th" data-fn="1">نسبة الإنجاز من الخطة</th>
-              <th class="ems-fn-th" data-fn="1">وحدات لم تُرفع</th>
+              <th class="ems-fn-th" data-fn="1">وحدات لم ترفع</th>
               <th class="ems-fn-th" data-fn="1">بلاغات مفتوحة</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
               </tr></thead>
             <tbody>
             <?php foreach ($sites as $s): ?>
@@ -90,7 +90,7 @@ include '../insidebar.php';
                     <td><small><?php echo htmlspecialchars((string)($s['last_at'] ?? '—')); ?></small></td>
                     <td><?php if ($s['late']): ?>
                         <a class="btn-primary" href="../Tickets/ticket_form.php?subject=<?php
-                            echo rawurlencode('مطالبة رفع الوحدات — ' . $s['project']); ?>">مطالبةٌ فورية ▸</a>
+                            echo rawurlencode('مطالبة رفع الوحدات — ' . $s['project']); ?>">مطالبة فورية ▸</a>
                     <?php endif; ?></td>
                 </tr>
             <?php endforeach; ?>
@@ -106,7 +106,7 @@ include '../insidebar.php';
             <span class="badge badge-secondary"><?php echo htmlspecialchars($st . ': ' . $n); ?></span>
         <?php endforeach; ?></h5></div>
     <div class="card-body">
-        <?php if (!$ts['rows']): ems_state_empty('لا تايم شيت لهذا اليوم بعدُ', 'افتح الإدخال', '../Operations/units.php'); else: ?>
+        <?php if (!$ts['rows']): ems_state_empty('لا تايم شيت لهذا اليوم بعد', 'افتح الإدخال', '../Operations/units.php'); else: ?>
         <div class="table-container"><table class="alltables display nowrap opr-table-full" data-no-dt="1">
             <thead><tr><th>الرقم</th><th>المعدة</th><th>الوردية</th><th>الوحدة</th>
                 <th>الكمية</th><th>الحالة</th><th></th></tr></thead>
@@ -127,9 +127,9 @@ include '../insidebar.php';
     <?php elseif ($tab === '3'):
         $box = OBS::approvalBox($conn, $company_id); ?>
     <div class="card"><div class="card-header"><h5><i class="fa fa-stamp"></i>
-        صندوقُ الاعتماد بعدّاده — والقرارُ في بيته</h5></div>
+        صندوق الاعتماد بعداده — والقرار في بيته</h5></div>
     <div class="card-body">
-        <?php if (!$box): ems_state_empty('لا وحداتٍ تنتظر اعتمادًا — نظيف ✨'); else: ?>
+        <?php if (!$box): ems_state_empty('لا وحدات تنتظر اعتمادا — نظيف ✨'); else: ?>
         <div class="opr-chips">
             <?php foreach ($box as $st => $n): ?>
                 <a class="badge badge-warning opr-chip"
@@ -137,19 +137,19 @@ include '../insidebar.php';
                     <?php echo htmlspecialchars($st); ?>: <strong><?php echo intval($n); ?></strong> ▸</a>
             <?php endforeach; ?>
         </div>
-        <p class="opr-hint">الثلاثيةُ الموحّدة وحارسُ الطاقة في شاشة الاعتماد نفسِها —
-            هنا العدّادُ والقفز.</p>
+        <p class="opr-hint">الثلاثية الموحدة وحارس الطاقة في شاشة الاعتماد نفسها —
+            هنا العداد والقفز.</p>
         <?php endif; ?>
     </div></div>
 
     <?php else:
         $com = OBS::commitmentTab($conn, $company_id); ?>
     <div class="card"><div class="card-header"><h5><i class="fa fa-scale-balanced"></i>
-        الالتزامُ هذا الشهر — الفجوةُ حتى اليوم والوتيرةُ اللازمة</h5></div>
+        الالتزام هذا الشهر — الفجوة حتى اليوم والوتيرة اللازمة</h5></div>
     <div class="card-body">
-        <?php if (!$com): ems_state_empty('لا خططَ شهريةً لهذا الشهر', 'افتح الخطة الشهرية', '../Contracts/contract_monthly_plan.php'); else: ?>
+        <?php if (!$com): ems_state_empty('لا خطط شهرية لهذا الشهر', 'افتح الخطة الشهرية', '../Contracts/contract_monthly_plan.php'); else: ?>
         <div class="table-container"><table class="alltables display nowrap opr-table-full" data-no-dt="1">
-            <thead><tr><th>العقد</th><th>الملتزَم (الشهر)</th><th>المنفَّذ</th>
+            <thead><tr><th>العقد</th><th>الملتزم (الشهر)</th><th>المنفذ</th>
                 <th>الفجوة حتى اليوم</th><th>الوتيرة اللازمة/يوم</th><th>المسؤول</th></tr></thead>
             <tbody>
             <?php foreach ($com as $c): ?>

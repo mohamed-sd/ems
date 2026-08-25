@@ -27,14 +27,14 @@ if (!$granted) {
     $g = mysqli_query($conn, "SELECT 1 FROM ownership_access_grants WHERE person_id = $uid AND state = 'active' LIMIT 1");
     $granted = $g && mysqli_num_rows($g) > 0;
 }
-if (!$granted) { ems_gov_flash_redirect('../main/dashboard.php', 'المجالُ المقيَّد (FIN-01 §1.1) ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك'); }
+if (!$granted) { ems_gov_flash_redirect('../main/dashboard.php', 'المجال المقيد (FIN-01 §1.1) ❌', 'GOV-PERM-403', 'اطلب المنحة من مدير الصلاحيات إن كانت ضمن عملك'); }
 $msg = '';
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['close_dev'])) {
     $did = intval($_POST['close_dev']);
     $dec = trim($_POST['decision'] ?? '');
     $doc = trim($_POST['decision_doc'] ?? '');
-    if ($dec === '') { $msg = 'القرارُ إلزاميٌّ — الانحرافُ يُغلق بقرارٍ لا بصمت (422)'; }
+    if ($dec === '') { $msg = 'القرار إلزامي — الانحراف يغلق بقرار لا بصمت (422)'; }
     else {
         /* ── INJ-0206 · «قبل» تُقرأ من الصفِّ قبل الكتابة ────────────────────────
              الكتابةُ هنا مباشرةٌ لا عبر بوابةِ المستأجرِ (التي صارت تُدقّق آليًّا)،
@@ -62,7 +62,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['close_dev']))
                 array('state' => 'closed', 'decision' => $dec, 'decision_doc_ref' => $doc),
                 array('company_id' => $company_id, 'user_id' => $uid));
         }
-        $msg = $__aff > 0 ? "أُغلق الانحرافُ #$did بقراره" : 'مغلقٌ من قبل (409)';
+        $msg = $__aff > 0 ? "أغلق الانحراف #$did بقراره" : 'مغلق من قبل (409)';
     }
 }
 
@@ -94,8 +94,8 @@ if ($r) while ($x = mysqli_fetch_assoc($r)) $rows[] = $x;
 /* ◆ التعدادُ في القاعدة `enum('no_ledger','payment_gap','unrecorded_exit')` —
      وكانت الخريطةُ تقول `no_movement` فيُعرض صنفُ «بلا دفتر» **فارغًا**.
      والمفتاحانِ يبقيان معًا: القديمُ لبياناتٍ مرحَّلةٍ إن وُجدت. */
-$types = array('no_ledger' => 'عقدٌ بلا حركة', 'no_movement' => 'عقدٌ بلا حركة',
-               'payment_gap' => 'فروقُ سداد', 'unrecorded_exit' => 'خروجٌ غيرُ مسجَّل');
+$types = array('no_ledger' => 'عقد بلا حركة', 'no_movement' => 'عقد بلا حركة',
+               'payment_gap' => 'فروق سداد', 'unrecorded_exit' => 'خروج غير مسجل');
 
 $page_title = 'الانحرافات الثلاث';
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
@@ -110,17 +110,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 /* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
    شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
 $header_icon = 'fa fa-exclamation-triangle';
-$header_title_html = htmlspecialchars('الانحرافاتُ الثلاث', ENT_QUOTES, 'UTF-8');
+$header_title_html = htmlspecialchars('الانحرافات الثلاث', ENT_QUOTES, 'UTF-8');
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-echo ems_states_bundle('صفرُ انحرافٍ مرصودٍ على عملياتِ التمويل', 'الرصدُ آليٌّ عند كلِّ فتحٍ — راجعْ لاحقًا أو افحصْ عملياتِ التمويلِ النافذة');
+echo ems_states_bundle('صفر انحراف مرصود على عمليات التمويل', 'الرصد آلي عند كل فتح — راجع لاحقا أو افحص عمليات التمويل النافذة');
 ?>
   <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
   <table class="table table-striped" data-no-dt>
-    <thead><tr><th>الصنف</th><th>الموضوع</th><th>الوصف</th><th>الأولوية</th><th>الحالة</th><th>الإغلاقُ بقرار</th>
+    <thead><tr><th>الصنف</th><th>الموضوع</th><th>الوصف</th><th>الأولوية</th><th>الحالة</th><th>الإغلاق بقرار</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">رقم الورقة</th>
               <th class="ems-fn-th" data-fn="1">نوع الانحراف</th>
@@ -128,26 +128,26 @@ echo ems_states_bundle('صفرُ انحرافٍ مرصودٍ على عمليات
               <th class="ems-fn-th" data-fn="1">الممول</th>
               <th class="ems-fn-th" data-fn="1">العين</th>
               <th class="ems-fn-th" data-fn="1">الفترة</th>
-              <th class="ems-fn-th" data-fn="1">المسجَّل</th>
+              <th class="ems-fn-th" data-fn="1">المسجل</th>
               <th class="ems-fn-th" data-fn="1">المتوقع</th>
               <th class="ems-fn-th" data-fn="1">الفرق</th>
               <th class="ems-fn-th" data-fn="1">نسبة الفرق</th>
-              <th class="ems-fn-th" data-fn="1">السبب المرجَّح</th>
+              <th class="ems-fn-th" data-fn="1">السبب المرجح</th>
               <th class="ems-fn-th" data-fn="1">الأدلة</th>
               <th class="ems-fn-th" data-fn="1">المستند المطلوب</th>
               <th class="ems-fn-th" data-fn="1">قرار التسوية</th>
               <th class="ems-fn-th" data-fn="1">قيد التسوية</th>
               <th class="ems-fn-th" data-fn="1">تاريخ الإقفال</th>
-              <th class="ems-fn-th none" data-fn="1">المسجَّل في الدفاتر</th>
+              <th class="ems-fn-th none" data-fn="1">المسجل في الدفاتر</th>
               <th class="ems-fn-th none" data-fn="1">المتوقع بالعقد</th>
               <th class="ems-fn-th none" data-fn="1">ترجيح السبب</th>
               <th class="ems-fn-th none" data-fn="1">القرار المتخذ</th>
-              <th class="ems-fn-th none" data-fn="1">حلّله</th>
+              <th class="ems-fn-th none" data-fn="1">حلله</th>
               <th class="ems-fn-th none" data-fn="1">اعتمده</th>
               <th class="ems-fn-th none" data-fn="1">رقم المحضر</th>
               <th class="ems-fn-th none" data-fn="1">كود العين</th>
               <th class="ems-fn-th none" data-fn="1">المالك السابق</th>
-              <th class="ems-fn-th none" data-fn="1">النسبة المسجَّلة</th>
+              <th class="ems-fn-th none" data-fn="1">النسبة المسجلة</th>
               <th class="ems-fn-th none" data-fn="1">تاريخ البيع الفعلي</th>
               <th class="ems-fn-th none" data-fn="1">تاريخ اكتشاف الخروج</th>
               <th class="ems-fn-th none" data-fn="1">أيام التسجيل الزائد</th>
@@ -165,21 +165,21 @@ echo ems_states_bundle('صفرُ انحرافٍ مرصودٍ على عمليات
               <th class="ems-fn-th none" data-fn="1">أيام السكون</th>
               <th class="ems-fn-th none" data-fn="1">الحالة المفترضة</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-              <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطّلاع</th>
+              <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطلاع</th>
               <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
               <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
               <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
               </tr></thead>
     <tbody>
-    <?php if (empty($rows)): ?><tr><td colspan="6" class="text-center text-muted">صفرُ انحرافٍ مفتوح — والرصدُ آليٌّ عند كل فتح</td></tr><?php endif; ?>
+    <?php if (empty($rows)): ?><tr><td colspan="6" class="text-center text-muted">صفر انحراف مفتوح — والرصد آلي عند كل فتح</td></tr><?php endif; ?>
     <?php foreach ($rows as $d): $open = $d['state'] !== 'closed'; ?>
       <tr>
         <td><?= htmlspecialchars($types[$d['dev_type']] ?? $d['dev_type'], ENT_QUOTES, 'UTF-8') ?></td>
@@ -187,14 +187,14 @@ echo ems_states_bundle('صفرُ انحرافٍ مرصودٍ على عمليات
         <td><?= htmlspecialchars(mb_substr($d['description'], 0, 60), ENT_QUOTES, 'UTF-8') ?></td>
         <td><?= htmlspecialchars($d['priority'], ENT_QUOTES, 'UTF-8') ?></td>
         <td><?= $open ? '<span class="badge fin-dev-badge-open">مفتوح</span>'
-                       : '<span class="badge fin-dev-badge-closed">مغلقٌ بقرار</span>' ?></td>
+                       : '<span class="badge fin-dev-badge-closed">مغلق بقرار</span>' ?></td>
         <td>
           <?php if ($open): ?>
           <form method="post" class="fin-dev-close-form">
         <?= csrf_field() ?>
             <input type="hidden" name="close_dev" value="<?= intval($d['dev_id']) ?>">
             <input type="text" name="decision" class="form-control form-control-sm fin-dev-decision" placeholder="القرار" required aria-label="القرار">
-            <input type="text" name="decision_doc" class="form-control form-control-sm fin-dev-docref" placeholder="مرجعُ المستند" aria-label="مرجعُ المستند">
+            <input type="text" name="decision_doc" class="form-control form-control-sm fin-dev-docref" placeholder="مرجع المستند" aria-label="مرجع المستند">
             <button class="action-btn" type="submit">أغلق</button>
           </form>
           <?php else: ?><?= htmlspecialchars($d['decision'], ENT_QUOTES, 'UTF-8') ?><?php endif; ?>

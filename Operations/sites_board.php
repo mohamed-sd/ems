@@ -81,11 +81,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 /* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
    شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
 $header_icon = 'fa fa-map';
-$header_title_html = htmlspecialchars('لوحةُ المواقع', ENT_QUOTES, 'UTF-8');
+$header_title_html = htmlspecialchars('لوحة المواقع', ENT_QUOTES, 'UTF-8');
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
-echo ems_states_bundle('لا مواقعَ مسجَّلةً لهذا الكيان', 'تحقق من تسجيلِ المشاريعِ أو من نطاقِ صلاحيتك');
+echo ems_states_bundle('لا مواقع مسجلة لهذا الكيان', 'تحقق من تسجيل المشاريع أو من نطاق صلاحيتك');
 ?>
 
   <div class="ems-sites-tiles">
@@ -104,19 +104,19 @@ echo ems_states_bundle('لا مواقعَ مسجَّلةً لهذا الكيان
 
   <?php if ($sel_site > 0): ?>
   <table class="table table-striped" data-no-dt>
-    <thead><tr><th>المعدة</th><th>الحالة</th><th>المشغّل (وردية ١)</th><th>المشغّل (وردية ٢)</th><th>إجراء</th>
+    <thead><tr><th>المعدة</th><th>الحالة</th><th>المشغل (وردية ١)</th><th>المشغل (وردية ٢)</th><th>إجراء</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               </tr></thead>
     <tbody>
     <?php if (empty($rows)): ?>
-      <tr><td colspan="5" class="text-center text-muted">لا معداتَ مخصَّصةً لهذا الموقع</td></tr>
+      <tr><td colspan="5" class="text-center text-muted">لا معدات مخصصة لهذا الموقع</td></tr>
     <?php endif; ?>
     <?php foreach ($rows as $eqId => $r):
         $stopped = intval($r['status']) !== 1; ?>
@@ -133,6 +133,6 @@ echo ems_states_bundle('لا مواقعَ مسجَّلةً لهذا الكيان
     <?php endforeach; ?>
     </tbody>
   </table>
-  <p class="text-muted ems-sites-note">زرُّ التبديل يفتح طلبًا بموافقتين لا فعلًا مباشرًا (NAV-01 §6.3) — ولا يُعرض مالكُ المعدة ولا مموّلُها (المجالُ المقيَّد).</p>
+  <p class="text-muted ems-sites-note">زر التبديل يفتح طلبا بموافقتين لا فعلا مباشرا (NAV-01 §6.3) — ولا يعرض مالك المعدة ولا ممولها (المجال المقيد).</p>
   <?php endif; ?>
 </div>

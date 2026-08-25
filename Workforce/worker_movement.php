@@ -109,7 +109,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 ?>
 <div class="main">
     <?php $header_title='تنقلات العاملين'; $header_icon='fas fa-route'; $header_actions=array();
-    if($can_add) $header_actions[]=array('id'=>'toggleForm','class'=>'add-btn','icon'=>'fas fa-plus-circle','label'=>'أمر تحرّك/نقل');
+    if($can_add) $header_actions[]=array('id'=>'toggleForm','class'=>'add-btn','icon'=>'fas fa-plus-circle','label'=>'أمر تحرك/نقل');
     $header_back=array('href'=>'worker_register.php','class'=>'','icon'=>'fas fa-arrow-right','label'=>'سجل العامل');
     include('../includes/page_header.php'); ?>
 <?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('employee', ''); ?>
@@ -117,12 +117,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="success-message <?= $ok?'is-success':'is-error' ?>"><i class="fas <?= $ok?'fa-check-circle':'fa-exclamation-circle' ?>"></i> <?= htmlspecialchars($_GET['msg']) ?></div>
     <?php endif; ?>
     <?php require_once __DIR__ . '/../includes/ux_components.php';
-    echo ems_states_bundle('لا أوامرَ تحرّكٍ أو نقلٍ للعاملين مسجَّلةً بعدُ', 'أضف أولَ أمرٍ بزرِّ «أمر تحرّك/نقل» في رأسِ الشاشة'); ?>
+    echo ems_states_bundle('لا أوامر تحرك أو نقل للعاملين مسجلة بعد', 'أضف أول أمر بزر «أمر تحرك/نقل» في رأس الشاشة'); ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
     <form id="mForm" action="" method="post" class="allforms">
         <?= csrf_field() ?>
         <input type="hidden" name="action" value="save">
-        <div class="card-header"><h5><i class="fas fa-plus"></i> أمر تحرّك / نقل</h5></div>
+        <div class="card-header"><h5><i class="fas fa-plus"></i> أمر تحرك / نقل</h5></div>
         <div class="wm-form-grid">
             <!-- صف 1: الأساسيات -->
             <div class="field"><label for="emsf_1867_78531">الموظف</label><select name="worker_id" required id="emsf_1867_78531"><option value="">—</option><?php foreach($workers as $wid=>$wn): ?><option value="<?= intval($wid) ?>"><?= htmlspecialchars($wn) ?></option><?php endforeach; ?></select></div>
@@ -146,11 +146,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="field"><label for="dep_date">تاريخ التحرك</label><input type="date" name="departure_date" id="dep_date" onchange="emsCalcTrip()"></div>
             <div class="field"><label for="emsf_1879_9054c">الوصول المتوقع</label><input type="date" name="expected_arrival" id="emsf_1879_9054c"></div>
             <div class="field"><label for="act_date">الوصول الفعلي</label><input type="date" name="actual_arrival" id="act_date" onchange="emsCalcTrip()"></div>
-            <div class="field"><label for="trip_days">زمن الرحلة (محسوب)</label><input type="text" id="trip_days" readonly placeholder="يُحسب من التحرك → الوصول الفعلي"></div>
+            <div class="field"><label for="trip_days">زمن الرحلة (محسوب)</label><input type="text" id="trip_days" readonly placeholder="يحسب من التحرك → الوصول الفعلي"></div>
 
             <!-- صف 5: الجاهزية والاستلام -->
             <div class="field"><label for="emsf_1880_54aa5">تاريخ الجاهزية</label><input type="date" name="ready_date" id="emsf_1880_54aa5"></div>
-            <div class="field"><label for="emsf_1881_6cf45">المستلِم (موظف #)</label><input type="number" name="received_by" id="emsf_1881_6cf45"></div>
+            <div class="field"><label for="emsf_1881_6cf45">المستلم (موظف #)</label><input type="number" name="received_by" id="emsf_1881_6cf45"></div>
             <div class="field wm-span-2"><input type="checkbox" name="safety_kit_received" id="skr" value="1"><label for="skr">استلام معدات السلامة</label></div>
 
             <!-- صف 6: الملاحظات (عرض كامل) -->
@@ -176,16 +176,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="ems-fn-th" data-fn="1">السكن الجديد</th>
               <th class="ems-fn-th" data-fn="1">أصدره</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-              <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
               <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-              <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+              <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
               <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
-              <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
+              <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
               <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
               <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
@@ -200,7 +200,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         } catch (\Throwable $t) { error_log('worker_movement.php list: ' . $t->getMessage()); }
         $i=1; $WF_VIEW = []; if($list){ foreach($list as $r): $i++;
             $sc=($r['state']==='جاهزٌ للعمل'||$r['state']==='مستلَم بالموقع')?'status-active':(($r['state']==='ملغى')?'status-inactive':'status-warning');
-            $WF_VIEW[$r['id']] = ems_wf_view_payload('تفاصيل أمر التحرّك/النقل', 'fas fa-route', [
+            $WF_VIEW[$r['id']] = ems_wf_view_payload('تفاصيل أمر التحرك/النقل', 'fas fa-route', [
                 ems_wf_field('الموظف', $r['wname'] ?: '-', 'fas fa-user', ['size' => 'lg']),
                 ems_wf_field('نوع الحركة', $r['direction'], 'fas fa-arrows-turn-right'),
                 ems_wf_field('الانطلاق (الولاية)', ($r['origin_state'] ?? '') ?: '-', 'fas fa-location-arrow'),
@@ -224,7 +224,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <?= ems_wf_view_button($r['id']) ?>
                 <form action="" method="post" class="wm-inline-form">
         <?= csrf_field() ?><input type="hidden" name="action" value="set_state"><input type="hidden" name="id" value="<?= intval($r['id']) ?>">
-                    <select name="new_state" aria-label="تغيير حالة أمر التحرّك" onchange="this.form.submit()" class="wm-state-select" <?= $can_edit?'':'disabled' ?>><?php foreach($STATES as $s): ?><option value="<?= $s ?>" <?= ($r['state']===$s)?'selected':'' ?>><?= $s ?></option><?php endforeach; ?></select>
+                    <select name="new_state" aria-label="تغيير حالة أمر التحرك" onchange="this.form.submit()" class="wm-state-select" <?= $can_edit?'':'disabled' ?>><?php foreach($STATES as $s): ?><option value="<?= $s ?>" <?= ($r['state']===$s)?'selected':'' ?>><?= $s ?></option><?php endforeach; ?></select>
                 </form>
                 <?php if($can_delete): ?><a href="worker_movement.php?delete=<?= intval($r['id']) ?>" class="action-btn delete" onclick="return confirm('حذف؟')"><i class="fas fa-trash"></i></a><?php endif; ?>
             </div></td>
@@ -233,7 +233,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <td><?= htmlspecialchars($r['actual_arrival'] ?: '-') ?></td>
             <td><?= ($r['trip_days']!==null && $r['trip_days']!=='') ? (intval($r['trip_days']).' يوم') : '-' ?></td>
             <td><span class="status-pill <?= $sc ?>"><?= htmlspecialchars($r['state']) ?></span></td></tr>
-        <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="8" class="wm-empty-cell">لا توجد أوامرٌ بعد.</td></tr><?php endif; ?>
+        <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="8" class="wm-empty-cell">لا توجد أوامر بعد.</td></tr><?php endif; ?>
         </tbody></table></div>
 </div>
 <?php ems_wf_view_modal($WF_VIEW); ?>

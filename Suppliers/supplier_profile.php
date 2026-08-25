@@ -155,7 +155,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     ?>
 <?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('supplier', 'البيانات'); ?>
 
-    <?php echo ems_states_bundle('لا بياناتَ مسجَّلةً لهذا المورد بعد', 'ستظهر معداتُه وعقودُه هنا فورَ تسجيلِها'); ?>
+    <?php echo ems_states_bundle('لا بيانات مسجلة لهذا المورد بعد', 'ستظهر معداته وعقوده هنا فور تسجيلها'); ?>
 
     <?php
     /* ══ لوحُ الهوية ═══════════════════════════════════════════════════════
@@ -173,16 +173,16 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
         ),
         'chips'  => array(
             array('text' => $supplier['supplier_code'], 'icon' => 'fas fa-hashtag', 'mono' => true),
-            array('text' => $supplier['supplier_type'] ?: 'نوعٌ غيرُ محدد', 'icon' => 'fas fa-tag'),
+            array('text' => $supplier['supplier_type'] ?: 'نوع غير محدد', 'icon' => 'fas fa-tag'),
         ),
         /* الحقولُ من أعمدةِ `suppliers` المقيسةِ حرفًا — لا عمودَ يُفترض:
            العنوانُ فيها `full_address` لا `address`. */
         'facts'  => array(
             array('label' => 'الهاتف',        'value' => $supplier['phone']),
             array('label' => 'البريد',        'value' => $supplier['email']),
-            array('label' => 'جهةُ الاتصال',  'value' => $supplier['contact_person_name']),
-            array('label' => 'هاتفُ الاتصال', 'value' => $supplier['contact_person_phone']),
-            array('label' => 'السجلُّ التجاري', 'value' => $supplier['commercial_registration']),
+            array('label' => 'جهة الاتصال',  'value' => $supplier['contact_person_name']),
+            array('label' => 'هاتف الاتصال', 'value' => $supplier['contact_person_phone']),
+            array('label' => 'السجل التجاري', 'value' => $supplier['commercial_registration']),
             array('label' => 'العنوان',       'value' => $supplier['full_address']),
         ),
     ));
@@ -219,33 +219,33 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
         array('title' => 'عدد المعدات', 'value' => $equipments_count, 'unit' => 'معدة',
               'period' => $__now, 'status' => $equipments_count > 0 ? 'ok' : 'warn',
               'drill' => '../Equipments/equipments.php?supplier=' . $__sid,
-              'icon' => 'fa-truck', 'scope' => 'المعداتُ المرتبطةُ بهذا المورّد'),
+              'icon' => 'fa-truck', 'scope' => 'المعدات المرتبطة بهذا المورد'),
         array('title' => 'عدد العقود', 'value' => $contracts_count, 'unit' => 'عقد',
               'period' => $__now, 'status' => $contracts_count > 0 ? 'ok' : 'warn',
               'drill' => 'supplierscontracts.php?supplier=' . $__sid,
-              'icon' => 'fa-file-contract', 'scope' => 'كلُّ العقودِ المسجَّلةِ له'),
+              'icon' => 'fa-file-contract', 'scope' => 'كل العقود المسجلة له'),
         array('title' => 'العقود النشطة', 'value' => $active_contracts, 'unit' => 'عقد',
               'period' => $__now, 'status' => $active_contracts > 0 ? 'ok' : 'warn',
-              'comparison' => 'من ' . (int) $contracts_count . ' عقدًا مسجَّلًا',
+              'comparison' => 'من ' . (int) $contracts_count . ' عقدا مسجلا',
               'drill' => 'supplierscontracts.php?supplier=' . $__sid . '&state=active',
-              'icon' => 'fa-circle-check', 'scope' => 'العقودُ السارية'),
+              'icon' => 'fa-circle-check', 'scope' => 'العقود السارية'),
         array('title' => 'المشاريع المرتبطة', 'value' => $projects_count, 'unit' => 'مشروع',
               'period' => $__now, 'status' => $projects_count > 0 ? 'ok' : 'neutral',
               'drill' => '../Projects/sites.php?supplier=' . $__sid,
-              'icon' => 'fa-diagram-project', 'scope' => 'المشاريعُ التي يعمل فيها'),
+              'icon' => 'fa-diagram-project', 'scope' => 'المشاريع التي يعمل فيها'),
         array('title' => 'إجمالي ساعات العقود', 'value' => number_format($total_hours, 0),
               'unit' => 'ساعة', 'period' => $__now, 'status' => 'neutral',
               'drill' => 'supplierscontracts.php?supplier=' . $__sid,
-              'icon' => 'fa-hourglass-half', 'scope' => 'المُتعاقَدُ عليه'),
+              'icon' => 'fa-hourglass-half', 'scope' => 'المتعاقد عليه'),
         array('title' => 'ساعات التشغيل الفعلية', 'value' => number_format($timesheet_hours, 0),
               'unit' => 'ساعة', 'period' => $__now,
               'status' => ($total_hours > 0 && $timesheet_hours < $total_hours * 0.5) ? 'warn' : 'ok',
               'comparison' => $total_hours > 0
-                    ? ('من ' . number_format($total_hours, 0) . ' متعاقَدًا ('
+                    ? ('من ' . number_format($total_hours, 0) . ' متعاقدا ('
                        . round($timesheet_hours * 100 / max(1, $total_hours)) . '٪)')
                     : '',
               'drill' => '../Timesheet/view_timesheet.php?supplier=' . $__sid,
-              'icon' => 'fa-clock', 'scope' => 'المُسجَّلُ في التايم شيت'),
+              'icon' => 'fa-clock', 'scope' => 'المسجل في التايم شيت'),
     );
     ?>
     <?php
@@ -265,10 +265,10 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
         <?php foreach ($__cards as $__c) { echo ems_kpi_card($__c); } ?>
         <?php if (!$__mayHours || !$__mayContracts): ?>
         <div class="ems-kpi-card ems-kpi-warn" role="note">
-            <div class="ems-kpi-title">بطاقاتٌ محجوبةٌ عن دورك</div>
-            <div class="ems-kpi-value"><small>ساعاتُ العقودِ والتشغيلِ تُعرض لمن يملك
-                عرضَ مصدرِها — ولا تُرسَل في استجابةِ الخادمِ لغيرِه.</small></div>
-            <div class="ems-kpi-meta"><span>GOV-PERM-403</span><span>اطلبِ المنحَ من مدير الصلاحيات</span></div>
+            <div class="ems-kpi-title">بطاقات محجوبة عن دورك</div>
+            <div class="ems-kpi-value"><small>ساعات العقود والتشغيل تعرض لمن يملك
+                عرض مصدرها — ولا ترسل في استجابة الخادم لغيره.</small></div>
+            <div class="ems-kpi-meta"><span>GOV-PERM-403</span><span>اطلب المنح من مدير الصلاحيات</span></div>
         </div>
         <?php endif; ?>
     </div>
@@ -279,14 +279,14 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
        لغةٌ ثالثةٌ بجانبِ لغةِ العميلِ ولغةِ الموظف. صارتا قسمَين في المكوّنِ
        الواحد: أعلى عشرِ معداتٍ بالساعات، ثم آخرُ عشرةِ عقود. */
     echo ems_profile_group_open(array(
-        'title' => 'ما يقدّمه المورد',
+        'title' => 'ما يقدمه المورد',
         'icon'  => 'fas fa-handshake',
-        'meta'  => 'معدّاتٌ ← عقودٌ',
+        'meta'  => 'معدات ← عقود',
     ));
     echo ems_profile_section_open(array(
         'title' => 'المعدات المرتبطة بالمورد',
         'icon'  => 'fas fa-truck',
-        'meta'  => 'أعلى عشرٍ بالساعات',
+        'meta'  => 'أعلى عشر بالساعات',
     ));
     ?>
             <table id="supplierEquipmentsTable" class="display spf-table">
@@ -307,15 +307,15 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     <?php echo ems_profile_section_open(array(
         'title' => 'آخر عقود المورد',
         'icon'  => 'fas fa-file-contract',
-        'meta'  => 'آخرُ عشرة',
+        'meta'  => 'آخر عشرة',
     )); ?>
             <table id="supplierContractsTable" class="display spf-table">
                 <thead><tr><th>المشروع</th><th>تاريخ التوقيع</th><th>مستهدف شهري</th><th>إجمالي ساعات</th><th>الحالة</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>

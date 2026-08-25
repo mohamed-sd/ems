@@ -93,7 +93,7 @@ class SlaMonitor
         $stmt->close();
         $conn->query("UPDATE tickets SET escalation_level = escalation_level + 1 WHERE id = " . intval($tkId));
         $stmt = $conn->prepare("INSERT INTO fin_notifications (company_id, target_level, title, link) VALUES (?, 'all', ?, 'Tickets/tickets_list.php')");
-        $title = 'تصعيد آلي (' . $next . '): بلاغ #' . intval($tkId) . ' مسار #' . $wsId . ' — ' . $trigger . ' · والمالك الأصلي يبقى مسؤولًا';
+        $title = 'تصعيد آلي (' . $next . '): بلاغ #' . intval($tkId) . ' مسار #' . $wsId . ' — ' . $trigger . ' · والمالك الأصلي يبقى مسؤولا';
         $stmt->bind_param('is', $companyId, $title);
         $stmt->execute();
         $stmt->close();
@@ -118,7 +118,7 @@ class SlaMonitor
                                 w.resolve_due_at = IF(w.resolve_due_at IS NULL, NULL,
                                     DATE_ADD(w.resolve_due_at, INTERVAL TIMESTAMPDIFF(SECOND, h.started_at, h.ended_at) SECOND))");
             $conn->commit();
-            return array('ok' => true, 'code' => 200, 'reason' => 'رُفع التعليق وعادت الساعة بإزاحة مدته');
+            return array('ok' => true, 'code' => 200, 'reason' => 'رفع التعليق وعادت الساعة بإزاحة مدته');
         } catch (\Throwable $e) {
             $conn->rollback();
             return array('ok' => false, 'code' => 500, 'reason' => $e->getMessage());

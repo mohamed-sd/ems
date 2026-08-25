@@ -72,20 +72,20 @@ class OperationalTransformService
         $contractId = (int) $contractId;
 
         $c = self::contractOf($gate, $contractId);
-        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقدُ غير موجود'; return $out; }
+        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقد غير موجود'; return $out; }
 
         // «لا حاويةَ تُفتح إلا من عقدٍ نافذ» — والتعريفُ من آلة الحالات لا من نصٍّ هنا
         if (!CSM::isEffective($c['contract_status'])) {
             $out['code'] = 423;
-            $out['reason'] = 'العقدُ ليس نافذًا (' . $c['contract_status']
-                           . ') — ولا حاويةَ تُفتح إلا من عقدٍ نافذ';
+            $out['reason'] = 'العقد ليس نافذا (' . $c['contract_status']
+                           . ') — ولا حاوية تفتح إلا من عقد نافذ';
             return $out;
         }
 
         $items = self::contractItems($gate, $contractId);
         if (empty($items)) {
             $out['code'] = 422;
-            $out['reason'] = 'العقدُ بلا بنودٍ في `contractequipments` — ولا سقفَ يُشتق منه';
+            $out['reason'] = 'العقد بلا بنود في `contractequipments` — ولا سقف يشتق منه';
             return $out;
         }
 
@@ -95,12 +95,12 @@ class OperationalTransformService
             $unit = self::unitOf($it['equip_unit']);
 
             if ($cap <= 0) {
-                $out['skipped'][] = 'بند #' . $itemId . ': سقفُه صفرٌ أو غيرُ مسجَّل — لا حاويةَ بلا سقف';
+                $out['skipped'][] = 'بند #' . $itemId . ': سقفه صفر أو غير مسجل — لا حاوية بلا سقف';
                 continue;
             }
             if ($unit === null) {
-                $out['skipped'][] = 'بند #' . $itemId . ': وحدتُه «' . $it['equip_unit']
-                                  . '» غيرُ معروفة — ولا تُخمَّن';
+                $out['skipped'][] = 'بند #' . $itemId . ': وحدته «' . $it['equip_unit']
+                                  . '» غير معروفة — ولا تخمن';
                 continue;
             }
             if (self::mainExists($gate, $itemId)) { $out['existing']++; continue; }
@@ -120,7 +120,7 @@ class OperationalTransformService
                 'valid_to'         => !empty($c['actual_end']) ? $c['actual_end'] : null,
                 // سقفُ البند رقمٌ **متفقٌ عليه** في العقد — لا اشتقاقَ فيه
                 'origin'           => 'عقد',
-                'origin_note'      => 'سقفُ بند العقد #' . $itemId . ' (equip_total_contract)',
+                'origin_note'      => 'سقف بند العقد #' . $itemId . ' (equip_total_contract)',
                 'created_by'       => (int) $actor ?: null,
             ));
             $out['created']++;
@@ -156,27 +156,27 @@ class OperationalTransformService
         $childLevel = (string) $childLevel;
 
         if (!isset(self::PARENT_OF[$childLevel])) {
-            $out['code'] = 422; $out['reason'] = 'مستوًى غيرُ معروف: ' . $childLevel; return $out;
+            $out['code'] = 422; $out['reason'] = 'مستوى غير معروف: ' . $childLevel; return $out;
         }
         if ($qty <= 0) {
-            $out['code'] = 422; $out['reason'] = 'الحصةُ موجبةٌ — ولا تُخصَّص حاويةٌ بصفر'; return $out;
+            $out['code'] = 422; $out['reason'] = 'الحصة موجبة — ولا تخصص حاوية بصفر'; return $out;
         }
         if ($childRef <= 0) {
-            $out['code'] = 422; $out['reason'] = 'مرجعُ الطرف إلزامي'; return $out;
+            $out['code'] = 422; $out['reason'] = 'مرجع الطرف إلزامي'; return $out;
         }
 
         $p = self::containerOf($gate, $parentId);
-        if (!$p) { $out['code'] = 404; $out['reason'] = 'الحاويةُ الأمُّ غير موجودة'; return $out; }
+        if (!$p) { $out['code'] = 404; $out['reason'] = 'الحاوية الأم غير موجودة'; return $out; }
 
         if ((string) $p['level'] !== self::PARENT_OF[$childLevel]) {
             $out['code'] = 422;
-            $out['reason'] = 'ترتيبُ الشجرة: «' . $childLevel . '» تُخصَّص من «'
+            $out['reason'] = 'ترتيب الشجرة: «' . $childLevel . '» تخصص من «'
                            . self::PARENT_OF[$childLevel] . '» لا من «' . $p['level'] . '»';
             return $out;
         }
         if ((string) $p['state'] !== 'نشطة') {
             $out['code'] = 423;
-            $out['reason'] = 'الحاويةُ الأمُّ «' . $p['state'] . '» — لا يُخصَّص منها';
+            $out['reason'] = 'الحاوية الأم «' . $p['state'] . '» — لا يخصص منها';
             return $out;
         }
 
@@ -192,10 +192,10 @@ class OperationalTransformService
         $free = round((float) $p['cap_qty'] - (float) $p['allocated_qty'], 2);
         if ($qty > $free) {
             $out['code'] = 422;
-            $out['reason'] = 'الحصةُ المطلوبة ' . number_format($qty, 2)
-                           . ' تتجاوز المتاحَ في «' . $p['container_no'] . '» ('
+            $out['reason'] = 'الحصة المطلوبة ' . number_format($qty, 2)
+                           . ' تتجاوز المتاح في «' . $p['container_no'] . '» ('
                            . number_format($free, 2) . ' من ' . number_format((float) $p['cap_qty'], 2)
-                           . ') — وزّع أقلَّ أو ارفع سقفَ الأم';
+                           . ') — وزع أقل أو ارفع سقف الأم';
             return $out;
         }
 
@@ -237,7 +237,7 @@ class OperationalTransformService
             // خرقُ القيد يصل هنا عبر البوابة — يُترجَم ولا يُبتلع
             error_log('container allocate parent#' . $parentId . ': ' . $t->getMessage());
             $out['code'] = 422;
-            $out['reason'] = 'تعذّر التخصيص — المتاحُ في الأم '
+            $out['reason'] = 'تعذر التخصيص — المتاح في الأم '
                            . number_format($free, 2) . ' والمطلوب ' . number_format($qty, 2);
             return $out;
         }
@@ -271,26 +271,26 @@ class OperationalTransformService
         $idemKey = trim((string) $idemKey);
 
         if ($idemKey === '') {
-            $out['code'] = 422; $out['reason'] = 'مفتاحُ العطالة إلزامي — بدونه يُخصم مرتين'; return $out;
+            $out['code'] = 422; $out['reason'] = 'مفتاح العطالة إلزامي — بدونه يخصم مرتين'; return $out;
         }
         if ($qty == 0.0) {
-            $out['code'] = 422; $out['reason'] = 'لا استهلاكَ بصفر'; return $out;
+            $out['code'] = 422; $out['reason'] = 'لا استهلاك بصفر'; return $out;
         }
 
         // العطالةُ **قبل** فحص الرصيد (القاعدة ⑦)
         try {
             $ex = $gate->selectOne('container_consumption', array(
                 'whereRaw' => 'idem_key = ?', 'params' => array($idemKey)));
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $ex'); $ex = null; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $ex'); $ex = null; }
         if ($ex) {
             $out['ok'] = true; $out['code'] = 200; $out['existing'] = true;
-            $out['reason'] = 'مسجَّلٌ سلفًا بهذا المفتاح';
+            $out['reason'] = 'مسجل سلفا بهذا المفتاح';
             return $out;
         }
 
         $chain = self::chainOf($gate, $leafId);
         if (empty($chain)) {
-            $out['code'] = 404; $out['reason'] = 'الحاويةُ غير موجودة'; return $out;
+            $out['code'] = 404; $out['reason'] = 'الحاوية غير موجودة'; return $out;
         }
         $leaf = $chain[0];
 
@@ -300,7 +300,7 @@ class OperationalTransformService
             $free = CapacitySourceService::freeOf($gate, $leaf);
             if ($qty > $free) {
                 $out['code'] = 422;
-                $out['reason'] = 'المطلوب ' . number_format($qty, 2) . ' يتجاوز متبقّي «'
+                $out['reason'] = 'المطلوب ' . number_format($qty, 2) . ' يتجاوز متبقي «'
                                . $leaf['container_no'] . '» (' . number_format($free, 2) . ')';
                 return $out;
             }
@@ -337,7 +337,7 @@ class OperationalTransformService
         } catch (\Throwable $t) {
             error_log('container consume leaf#' . $leafId . ': ' . $t->getMessage());
             $out['code'] = 422;
-            $out['reason'] = 'تعذّر الخصم — تجاوزٌ في أحد مستويات السلسلة، فلم يُخصم شيء';
+            $out['reason'] = 'تعذر الخصم — تجاوز في أحد مستويات السلسلة، فلم يخصم شيء';
             return $out;
         }
 
@@ -391,7 +391,7 @@ class OperationalTransformService
             if ($orig !== null) {
                 $r = CapacityLedgerService::reverse($g, $orig, $actor);
                 if (!$r['ok'] && (int) $r['code'] !== 409) {
-                    throw new \RuntimeException('فشل سطرُ العكس: ' . $r['reason']);
+                    throw new \RuntimeException('فشل سطر العكس: ' . $r['reason']);
                 }
             }
             return;
@@ -409,7 +409,7 @@ class OperationalTransformService
             'role_snapshot'       => isset($opts['role_snapshot']) ? (string) $opts['role_snapshot'] : null,
         ), $actor);
         if (!$r['ok'] && (int) $r['code'] !== 409) {
-            throw new \RuntimeException('فشل سطرُ الدفتر: ' . $r['reason']);
+            throw new \RuntimeException('فشل سطر الدفتر: ' . $r['reason']);
         }
     }
 
@@ -450,7 +450,7 @@ class OperationalTransformService
 
         $mains = self::mainsOf($gate, $contractId);
         if (empty($mains)) {
-            $out['code'] = 422; $out['reason'] = 'لا حاويةَ رئيسيةً للعقد'; return $out;
+            $out['code'] = 422; $out['reason'] = 'لا حاوية رئيسية للعقد'; return $out;
         }
 
         // ② الواقعُ: الأطرافُ الثلاثةُ مجمَّعةً — والكميةُ بوحدتها
@@ -493,8 +493,8 @@ class OperationalTransformService
                 $out['unmatched'][] = array(
                     'unit_type' => $u, 'equip_type' => $et,
                     'entries' => (int) $r['n'], 'qty' => (float) $r['qty'],
-                    'reason' => 'واقعةٌ بوحدة «' . $u . '» لنوع معدةٍ «' . ($et !== '' ? $et : '—')
-                              . '» لا بندَ له في العقد — تنتظر بندًا أو ملحقًا',
+                    'reason' => 'واقعة بوحدة «' . $u . '» لنوع معدة «' . ($et !== '' ? $et : '—')
+                              . '» لا بند له في العقد — تنتظر بندا أو ملحقا',
                 );
                 continue;
             }
@@ -504,7 +504,7 @@ class OperationalTransformService
             if ($sup <= 0 || $eq <= 0) {
                 $out['unmatched'][] = array(
                     'unit_type' => $u, 'entries' => (int) $r['n'], 'qty' => (float) $r['qty'],
-                    'reason' => 'واقعةٌ بلا موردٍ أو بلا معدة — لا تُبنى منها سلسلةٌ ناقصة',
+                    'reason' => 'واقعة بلا مورد أو بلا معدة — لا تبنى منها سلسلة ناقصة',
                 );
                 continue;
             }
@@ -525,15 +525,15 @@ class OperationalTransformService
                 $supQty = round($supQty, 2);
                 if ($supQty <= 0 || $supQty > $mainFree) {
                     $out['unmatched'][] = array('unit_type' => $unit, 'qty' => $supQty,
-                        'reason' => 'حصةُ المورد #' . $supId . ' لا تتّسع في المتاح ('
-                                    . number_format($mainFree, 2) . ') — تُوزَّع يدويًّا');
+                        'reason' => 'حصة المورد #' . $supId . ' لا تتسع في المتاح ('
+                                    . number_format($mainFree, 2) . ') — توزع يدويا');
                     continue;
                 }
                 $supC = self::findChild($gate, (int) $main['id'], 'supplier_id', $supId);
                 if ($supC === null) {
                     $r1 = self::allocate($conn, $gate, $companyId, (int) $main['id'], self::LEVEL_SUPPLIER,
                         $supId, $supQty, array('actor' => $actor, 'origin' => 'مشتقّة',
-                            'origin_note' => 'مشتقّةٌ من صفوف التشغيل: Σ وقائع المورد = '
+                            'origin_note' => 'مشتقة من صفوف التشغيل: Σ وقائع المورد = '
                                              . number_format($supQty, 2) . ' ' . $unit));
                     if (empty($r1['ok'])) { $out['unmatched'][] = array('reason' => $r1['reason']); continue; }
                     $out['created']['supplier']++;
@@ -549,7 +549,7 @@ class OperationalTransformService
                         $r2 = self::allocate($conn, $gate, $companyId, (int) $supC['id'], self::LEVEL_EQUIP,
                             $eqId, $eqQty, array('actor' => $actor, 'origin' => 'مشتقّة',
                                 'role_kind' => 'أساسية',
-                                'origin_note' => 'مشتقّةٌ من صفوف التشغيل: Σ وقائع المعدة = '
+                                'origin_note' => 'مشتقة من صفوف التشغيل: Σ وقائع المعدة = '
                                                  . number_format($eqQty, 2) . ' ' . $unit));
                         if (empty($r2['ok'])) { $out['unmatched'][] = array('reason' => $r2['reason']); continue; }
                         $out['created']['equipment']++;
@@ -563,7 +563,7 @@ class OperationalTransformService
                         $r3 = self::allocate($conn, $gate, $companyId, (int) $eqC['id'], self::LEVEL_OPERATOR,
                             $opId, $opQty, array('actor' => $actor, 'origin' => 'مشتقّة',
                                 'role_kind' => 'أساسي',
-                                'origin_note' => 'مشتقّةٌ من صفوف التشغيل: Σ وقائع المشغّل على هذه المعدة = '
+                                'origin_note' => 'مشتقة من صفوف التشغيل: Σ وقائع المشغل على هذه المعدة = '
                                                  . number_format($opQty, 2) . ' ' . $unit));
                         if (empty($r3['ok'])) { $out['unmatched'][] = array('reason' => $r3['reason']); continue; }
                         $out['created']['operator']++;
@@ -623,12 +623,12 @@ class OperationalTransformService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '');
         $c = self::containerOf($gate, (int) $containerId);
-        if (!$c) { $out['code'] = 404; $out['reason'] = 'الحاويةُ غير موجودة'; return $out; }
+        if (!$c) { $out['code'] = 404; $out['reason'] = 'الحاوية غير موجودة'; return $out; }
         if ((string) $c['origin'] !== 'مشتقّة') {
-            $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'ليست مشتقّةً — لا إقرارَ لها'; return $out;
+            $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'ليست مشتقة — لا إقرار لها'; return $out;
         }
         if ($c['origin_ack_by'] !== null) {
-            $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'مُقرَّةٌ سلفًا'; return $out;
+            $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'مقرة سلفا'; return $out;
         }
         $gate->update('op_containers', array(
             'origin_ack_by' => (int) $actor ?: null,
@@ -753,7 +753,7 @@ class OperationalTransformService
                 'columns' => array('container_no'),
                 'whereRaw' => "container_no LIKE ?", 'params' => array('CNT-' . $year . '-%'),
                 'orderBy' => 'id DESC', 'limit' => 1, 'includeDeleted' => true));
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $rows'); $rows = array(); }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $rows'); $rows = array(); }
         $seq = 1;
         if ($rows && preg_match('~-(\d+)$~', (string) $rows[0]['container_no'], $m)) {
             $seq = (int) $m[1] + 1;

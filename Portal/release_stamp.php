@@ -36,17 +36,17 @@ $COLS   = array (
   3 => 'تاريخ النشر',
   4 => 'نوع الإصدار',
   5 => 'الشاشات المضافة',
-  6 => 'الشاشات المعدَّلة',
+  6 => 'الشاشات المعدلة',
   7 => 'الأعمدة المضافة',
   8 => 'الأفعال المضافة',
   9 => 'القواعد المتغيرة',
-  10 => 'الهجرات المنفَّذة',
+  10 => 'الهجرات المنفذة',
   11 => 'تقرير الاكتمال',
   12 => 'الاختبارات المجتازة',
   13 => 'الاختبارات الراسبة',
-  14 => 'علَم الرجوع',
+  14 => 'علم الرجوع',
   15 => 'الناشر — الاسم والصفة',
-  16 => 'المعتمِد — الاسم والصفة',
+  16 => 'المعتمد — الاسم والصفة',
   17 => 'الحالة',
 );
 $FIELDS = array (
@@ -55,17 +55,17 @@ $FIELDS = array (
   2 => 'تاريخ النشر',
   3 => 'نوع الإصدار',
   4 => 'الشاشات المضافة',
-  5 => 'الشاشات المعدَّلة',
+  5 => 'الشاشات المعدلة',
   6 => 'الأعمدة المضافة',
   7 => 'الأفعال المضافة',
   8 => 'القواعد المتغيرة',
-  9 => 'الهجرات المنفَّذة',
+  9 => 'الهجرات المنفذة',
   10 => 'تقرير الاكتمال',
   11 => 'الاختبارات المجتازة',
   12 => 'الاختبارات الراسبة',
-  13 => 'علَم الرجوع',
+  13 => 'علم الرجوع',
   14 => 'الناشر — الاسم والصفة',
-  15 => 'المعتمِد — الاسم والصفة',
+  15 => 'المعتمد — الاسم والصفة',
   16 => 'الحالة',
 );
 
@@ -115,8 +115,8 @@ $RELEASE = release_stamp_compute($conn, dirname(__DIR__));
 /* ◆ **ولا مسلكَ إدخالٍ يدويّ**: مَن أرسل الفورمَ القديمَ يُردُّ برمزٍ يُقرأ. */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 'add') {
     ems_gov_flash_redirect(basename(__FILE__),
-        'REL-422-NOMANUAL: بصمةُ الإصدارِ تُولَّد من النسخةِ المنشورةِ ولا تُدخَل يدويًّا ❌',
-        'GOV-FAIL-422', 'البصمةُ حقيقةٌ تُقاس لا رأيٌ يُكتب');
+        'REL-422-NOMANUAL: بصمة الإصدار تولد من النسخة المنشورة ولا تدخل يدويا ❌',
+        'GOV-FAIL-422', 'البصمة حقيقة تقاس لا رأي يكتب');
     exit();
 }
 /* ◆ **والمسلكُ القديمُ نُزع لا عُطِّل**: شفرةٌ ميتةٌ خلف `if (false)` دَينٌ
@@ -133,7 +133,7 @@ $entityName = $govCtx['values']['entity'] ?? '—';
 function cmp03_cell($col, $row, $entityName) {
     $n = cmp03_screen_norm($col);
     if ($n === cmp03_screen_norm('الكيان')) { return $entityName; }
-    if ($n === cmp03_screen_norm('المُنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المُنشئة')) {
+    if ($n === cmp03_screen_norm('المنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المنشئة')) {
         return $row['created_by_name'] ?: '—';
     }
     if ($n === cmp03_screen_norm('تاريخ الإنشاء')) { return $row['created_at']; }
@@ -148,7 +148,7 @@ function cmp03_screen_norm($s) {
     $s = str_replace(array('أ','إ','آ'), 'ا', $s);
     $s = str_replace('ة', 'ه', $s);
     $s = str_replace('ى', 'ي', $s);
-    return preg_replace('/[ًٌٍَُِّْ]/u', '', $s);
+    return preg_replace('/[]/u', '', $s);
 }
 
 $page_title = 'إيكوبيشن | بصمة الإصدار وتقرير النشر';
@@ -171,7 +171,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = false;
     include '../includes/page_header.php';
     // حزمةُ الحالاتِ الدنيا (بوابة ٩) — مخفيةٌ افتراضًا ويُظهرها منطقُ الشاشة
-    echo ems_states_bundle('لا سجلاتِ نشرٍ مدوَّنةً بعدُ', 'ختمُ الإصدارِ يُحسب حيًّا في اللوحةِ أعلاه — وسجلُّ النشرِ يُضاف بزرِّ «إضافة»');
+    echo ems_states_bundle('لا سجلات نشر مدونة بعد', 'ختم الإصدار يحسب حيا في اللوحة أعلاه — وسجل النشر يضاف بزر «إضافة»');
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
@@ -185,30 +185,30 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
          والشاشاتِ والجداول — فتغيُّرُ أيٍّ منها يغيّرها حتمًا. */
     ?>
     <div class="card"><div class="card-header">
-        <h5><i class="fa fa-fingerprint"></i> بصمةُ الإصدارِ الحالية — مولَّدةٌ من النسخةِ المنشورة</h5>
+        <h5><i class="fa fa-fingerprint"></i> بصمة الإصدار الحالية — مولدة من النسخة المنشورة</h5>
     </div><div class="card-body">
         <p class="text-muted ems-pts-note">
-            هذه البصمةُ <strong>تُحسب ولا تُكتب</strong>: تُشتقُّ من مخطَّطِ القاعدةِ
-            المُصدَّرِ للمثبِّت وعددِ الهجراتِ المطبَّقةِ والشاشاتِ الحيّةِ وجداولِ
-            القاعدة. فبصمةٌ تُدخَل يدويًّا تُطابق ما يريده كاتبُها لا ما يعمل على الخادم.
+            هذه البصمة <strong>تحسب ولا تكتب</strong>: تشتق من مخطط القاعدة
+            المصدر للمثبت وعدد الهجرات المطبقة والشاشات الحية وجداول
+            القاعدة. فبصمة تدخل يدويا تطابق ما يريده كاتبها لا ما يعمل على الخادم.
         </p>
         <table class="table table-striped" data-no-dt>
             <tbody>
                 <tr><th class="ems-pts-th-key">البصمة</th>
                     <td><strong class="ems-pts-stamp"><?php
                         echo htmlspecialchars((string) $RELEASE['stamp'], ENT_QUOTES, 'UTF-8'); ?></strong></td></tr>
-                <tr><th>بصمةُ بيانِ المخطَّط</th>
+                <tr><th>بصمة بيان المخطط</th>
                     <td><?php echo htmlspecialchars((string) $RELEASE['schema_manifest'], ENT_QUOTES, 'UTF-8'); ?></td></tr>
-                <tr><th>بصمةُ ملفِّ المخطَّط</th>
+                <tr><th>بصمة ملف المخطط</th>
                     <td><?php echo htmlspecialchars((string) $RELEASE['schema_sql'], ENT_QUOTES, 'UTF-8'); ?>
                         · <?php echo number_format((int) $RELEASE['schema_bytes']); ?> بايت</td></tr>
-                <tr><th>الهجراتُ في المستودع</th>
+                <tr><th>الهجرات في المستودع</th>
                     <td><?php echo (int) $RELEASE['migrations']; ?></td></tr>
-                <tr><th>الشاشاتُ المسجَّلة</th>
+                <tr><th>الشاشات المسجلة</th>
                     <td><?php echo (int) $RELEASE['modules']; ?></td></tr>
-                <tr><th>جداولُ القاعدة</th>
+                <tr><th>جداول القاعدة</th>
                     <td><?php echo (int) $RELEASE['tables']; ?></td></tr>
-                <tr><th>لحظةُ الاحتساب</th>
+                <tr><th>لحظة الاحتساب</th>
                     <td><?php echo htmlspecialchars((string) $RELEASE['computed_at'], ENT_QUOTES, 'UTF-8'); ?></td></tr>
             </tbody>
         </table>
@@ -218,28 +218,28 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="table-responsive">
         <table class="alltables display" id="release_stampTable">
             <thead><tr>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
             <th>رقم الإصدار</th>
             <th>بصمة الإصدار</th>
             <th>تاريخ النشر</th>
             <th>نوع الإصدار</th>
             <th>الشاشات المضافة</th>
-            <th>الشاشات المعدَّلة</th>
+            <th>الشاشات المعدلة</th>
             <th>الأعمدة المضافة</th>
             <th>الأفعال المضافة</th>
             <th>القواعد المتغيرة</th>
-            <th>الهجرات المنفَّذة</th>
+            <th>الهجرات المنفذة</th>
             <th>تقرير الاكتمال</th>
             <th>الاختبارات المجتازة</th>
             <th>الاختبارات الراسبة</th>
-            <th>علَم الرجوع</th>
+            <th>علم الرجوع</th>
             <th>الناشر — الاسم والصفة</th>
-            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
             <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
             </tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="18" class="text-center text-muted">لا بياناتَ بعدُ — أضف أول صفٍّ بزر «إضافة»</td></tr>
+                <tr><td colspan="18" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
                     <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>

@@ -54,16 +54,16 @@ class VisibilityGuard
         if (isset(self::EXTERNAL_ELEMENTS[$vType])
             && !in_array($elementCode, self::EXTERNAL_ELEMENTS[$vType], true)) {
             return array('decision' => 'hide', 'dimension' => 1,
-                'reason' => 'عنصرٌ خارج ما تمنحه الصفةُ الخارجية — لا يُصيَّر أصلًا (Hide Node)');
+                'reason' => 'عنصر خارج ما تمنحه الصفة الخارجية — لا يصير أصلا (Hide Node)');
         }
 
         // ── البُعد ② — العلاقةُ بالشخص المعروض: 403 مسجَّلة ─────────────────
         $relation = self::relation($conn, $gate, $companyId, $viewer, $subject);
         if ($relation === 'none') {
             self::logDeny($conn, $companyId, $viewerAcc, $elementCode, $subjectAcc,
-                'خارج العلاقة: لا هو نفسُه ولا مرؤوسُه ولا في نطاقه');
+                'خارج العلاقة: لا هو نفسه ولا مرؤوسه ولا في نطاقه');
             return array('decision' => 'deny', 'dimension' => 2,
-                'reason' => 'الشخصُ المعروض خارج علاقتك — **403 مسجَّلةٌ في سجل الأمن**');
+                'reason' => 'الشخص المعروض خارج علاقتك — **403 مسجلة في سجل الأمن**');
         }
 
         // ── البُعد ③ — مفتاحُ الموارد البشرية (H-16): قرارٌ موثَّق ──────────
@@ -87,16 +87,16 @@ class VisibilityGuard
             $el = VisibilityPolicyService::element($conn, $elementCode);
             if ($el && (int) $el['active'] === 1) {
                 return array('decision' => 'allow', 'dimension' => 3,
-                    'reason' => 'صاحبُ البيانات يرى بياناتِه — والافتراضُ المغلقُ يحجب الغيرَ لا الذات');
+                    'reason' => 'صاحب البيانات يرى بياناته — والافتراض المغلق يحجب الغير لا الذات');
             }
         }
         if (!$d['visible']) {
             return array('decision' => 'hide', 'dimension' => 3,
-                'reason' => 'مخفيٌّ بقرارٍ موثَّق (' . $d['source'] . ')'
+                'reason' => 'مخفي بقرار موثق (' . $d['source'] . ')'
                           . ($d['reason'] !== null ? ' — ' . $d['reason'] : ''));
         }
 
-        return array('decision' => 'allow', 'dimension' => 0, 'reason' => 'اجتاز الأبعادَ الثلاثة');
+        return array('decision' => 'allow', 'dimension' => 0, 'reason' => 'اجتاز الأبعاد الثلاثة');
     }
 
     /**
@@ -135,7 +135,7 @@ class VisibilityGuard
                         AND c.scope_type = ? AND c.scope_id = ? LIMIT 1",
                     array($subjectAcc, $vScopeT, (int) $vScopeI));
                 if ($rows) { return 'scope'; }
-            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'لا نطاقَ مشتركًا يُثبت'); /* لا نطاقَ مشتركًا يُثبت */ }
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'لا نطاق مشتركا يثبت'); /* لا نطاقَ مشتركًا يُثبت */ }
         }
 
         return 'none';

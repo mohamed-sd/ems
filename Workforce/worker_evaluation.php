@@ -180,7 +180,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="success-message <?= $ok?'is-success':'is-error' ?>"><i class="fas <?= $ok?'fa-check-circle':'fa-exclamation-circle' ?>"></i> <?= htmlspecialchars($_GET['msg']) ?></div>
     <?php endif; ?>
     <?php require_once __DIR__ . '/../includes/ux_components.php';
-    echo ems_states_bundle('لا تقييماتِ عاملين مسجَّلةً بعدُ', 'أضف أولَ تقييمٍ بزرِّ «تقييم جديد» في رأسِ الشاشة'); ?>
+    echo ems_states_bundle('لا تقييمات عاملين مسجلة بعد', 'أضف أول تقييم بزر «تقييم جديد» في رأس الشاشة'); ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
     <form id="eForm" action="" method="post" class="allforms<?= $edit?' allforms-visible':'' ?>">
         <?= csrf_field() ?>
@@ -189,11 +189,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="ev-form-grid">
             <div class="field"><label>الموظف</label><?php if($edit): ?><input type="text" aria-label="الموظف" value="<?= htmlspecialchars($edit['wname'] ?: ('#'.$edit['employee_id'])) ?>" disabled><?php else: ?><select name="worker_id" aria-label="الموظف" required><option value="">—</option><?php foreach($workers as $wid=>$wn): ?><option value="<?= intval($wid) ?>"><?= htmlspecialchars($wn) ?></option><?php endforeach; ?></select><?php endif; ?></div>
             <div class="field"><label>الفترة</label><input type="date" name="period" aria-label="فترة التقييم" value="<?= htmlspecialchars($edit['period'] ?? '') ?>"></div>
-            <div class="field"><label for="emsf_592_91c89">الدرجة <?= !empty($kpis)?'(محسوبةٌ من البنود)':'' ?></label><input type="number" step="0.01" name="score" aria-label="الدرجة الإجمالية" value="<?= htmlspecialchars($edit['score'] ?? '') ?>" <?= !empty($kpis)?'readonly title="تُحتسَب آلياً من بنود المؤشّرات"':'' ?> id="emsf_592_91c89"></div>
+            <div class="field"><label for="emsf_592_91c89">الدرجة <?= !empty($kpis)?'(محسوبة من البنود)':'' ?></label><input type="number" step="0.01" name="score" aria-label="الدرجة الإجمالية" value="<?= htmlspecialchars($edit['score'] ?? '') ?>" <?= !empty($kpis)?'readonly title="تحتسب آليا من بنود المؤشرات"':'' ?> id="emsf_592_91c89"></div>
             <div class="field"><label for="emsf_593_670b4">الحالة</label><select name="state" id="emsf_593_670b4"><?php foreach($STATES as $s): ?><option value="<?= $s ?>" <?= (($edit['state']??'مسودة')===$s)?'selected':'' ?>><?= $s ?></option><?php endforeach; ?></select></div>
             <div class="field"><label for="emsf_594_b3e3a">النوع</label><select name="incentive_penalty_type" id="emsf_594_b3e3a"><?php foreach(['بلا','حافز','جزاء'] as $t): ?><option value="<?= $t ?>" <?= (($edit['incentive_penalty_type']??'بلا')===$t)?'selected':'' ?>><?= $t ?></option><?php endforeach; ?></select></div>
             <div class="field"><label for="emsf_595_7abb8">المبلغ (مالي — يدوي)</label><input type="number" step="0.01" name="amount" aria-label="المبلغ" value="<?= htmlspecialchars($edit['amount'] ?? '') ?>" id="emsf_595_7abb8"></div>
-            <div class="field ev-span-3end"><label for="emsf_596_c617b">تعليق مالي (للمالية لاحقاً)</label><input type="text" name="amount_finance_note" aria-label="تعليق مالي" value="<?= htmlspecialchars($edit['amount_finance_note'] ?? '') ?>" id="emsf_596_c617b"></div>
+            <div class="field ev-span-3end"><label for="emsf_596_c617b">تعليق مالي (للمالية لاحقا)</label><input type="text" name="amount_finance_note" aria-label="تعليق مالي" value="<?= htmlspecialchars($edit['amount_finance_note'] ?? '') ?>" id="emsf_596_c617b"></div>
             <div class="field"><label for="emsf_597_5d4f1">ساعات التشغيل</label><input type="number" step="0.01" name="operating_hours" aria-label="ساعات التشغيل" value="<?= htmlspecialchars($edit['operating_hours'] ?? '') ?>" id="emsf_597_5d4f1"></div>
             <div class="field"><label for="emsf_598_354bd">الالتزام بالحضور %</label><input type="number" step="0.01" name="attendance_rate" aria-label="الالتزام بالحضور" value="<?= htmlspecialchars($edit['attendance_rate'] ?? '') ?>" id="emsf_598_354bd"></div>
             <div class="field"><label for="emsf_599_c13e5">الإنتاجية</label><input type="number" step="0.01" name="productivity" aria-label="الإنتاجية" value="<?= htmlspecialchars($edit['productivity'] ?? '') ?>" id="emsf_599_c13e5"></div>
@@ -209,7 +209,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         $computed = ems_eval_weighted_score($ev_gate, intval($edit['id']));
         $sumW=0; foreach($kpis as $k){ $sumW += floatval($k['weight']); } ?>
     <div class="allforms allforms-visible">
-        <div class="card-header"><h5><i class="fas fa-list-check"></i> بنود مؤشّرات الأداء (KPI) — الدرجة الموزونة المحسوبة:
+        <div class="card-header"><h5><i class="fas fa-list-check"></i> بنود مؤشرات الأداء (KPI) — الدرجة الموزونة المحسوبة:
             <strong><?= $computed!==null ? number_format($computed,2) : '—' ?></strong>
             <?php if($sumW>0): ?><span class="ev-weight-note">(مجموع الأوزان: <?= number_format($sumW,2) ?>)</span><?php endif; ?>
         </h5></div>
@@ -217,15 +217,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <form action="" method="post" class="ev-kpi-grid">
         <?= csrf_field() ?>
             <input type="hidden" name="action" value="add_kpi"><input type="hidden" name="evaluation_id" value="<?= intval($edit['id']) ?>">
-            <div class="field"><label for="emsf_604_ddef9">اسم المؤشّر</label><input type="text" name="kpi_name" required id="emsf_604_ddef9"></div>
+            <div class="field"><label for="emsf_604_ddef9">اسم المؤشر</label><input type="text" name="kpi_name" required id="emsf_604_ddef9"></div>
             <div class="field"><label for="emsf_605_a8e92">الوزن</label><input type="number" step="0.01" name="weight" placeholder="مثال 30" id="emsf_605_a8e92"></div>
             <div class="field"><label for="emsf_606_ececd">الدرجة</label><input type="number" step="0.01" name="kpi_score" placeholder="0-100" id="emsf_606_ececd"></div>
             <div class="field"><label for="emsf_607_210d7">ملاحظة</label><input type="text" name="kpi_note" id="emsf_607_210d7"></div>
             <div class="field"><button type="submit" class="add-btn"><i class="fas fa-plus"></i> إضافة بند</button></div>
         </form>
         <?php endif; ?>
-        <table class="data-table ev-table-full"><thead><tr><th>المؤشّر</th><th>الوزن</th><th>الدرجة</th><th>ملاحظة</th><th></th></tr></thead><tbody>
-        <?php if(empty($kpis)): ?><tr><td colspan="5" class="ev-empty-cell-sm">لا بنود — الدرجة تبقى المُدخَلة يدوياً.</td></tr>
+        <table class="data-table ev-table-full"><thead><tr><th>المؤشر</th><th>الوزن</th><th>الدرجة</th><th>ملاحظة</th><th></th></tr></thead><tbody>
+        <?php if(empty($kpis)): ?><tr><td colspan="5" class="ev-empty-cell-sm">لا بنود — الدرجة تبقى المدخلة يدويا.</td></tr>
         <?php else: foreach($kpis as $k): ?>
             <tr><td><strong><?= htmlspecialchars($k['kpi_name']) ?></strong></td><td><?= htmlspecialchars($k['weight'] ?? '-') ?></td><td><?= htmlspecialchars($k['score'] ?? '-') ?></td><td><?= htmlspecialchars($k['notes'] ?: '-') ?></td>
             <td><?php if($can_delete): ?><a href="worker_evaluation.php?edit=<?= intval($edit['id']) ?>&del_kpi=<?= intval($k['id']) ?>" class="action-btn delete" onclick="return confirm('حذف البند؟')"><i class="fas fa-trash"></i></a><?php endif; ?></td></tr>
@@ -247,11 +247,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="ems-fn-th" data-fn="1">النسبة</th>
               <th class="ems-fn-th" data-fn="1">التصنيف</th>
               <th class="ems-fn-th" data-fn="1">التوصية</th>
-              <th class="ems-fn-th" data-fn="1">المقيِّم</th>
+              <th class="ems-fn-th" data-fn="1">المقيم</th>
               <th class="ems-fn-th" data-fn="1">اعتماد الموارد</th>
               <th class="ems-fn-th" data-fn="1">تاريخ الإقفال</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
               </tr></thead><tbody>
         <?php $list = array();
         try {
@@ -280,7 +280,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             ]); ?>
             <tr><td><div class="action-btns ev-actions-cell">
                 <?= ems_wf_view_button($r['id']) ?>
-                <?php if($can_edit): ?><a href="worker_evaluation.php?edit=<?= intval($r['id']) ?>" class="action-btn edit" title="تعديل + بنود المؤشّرات"><i class="fas fa-edit"></i></a><?php endif; ?>
+                <?php if($can_edit): ?><a href="worker_evaluation.php?edit=<?= intval($r['id']) ?>" class="action-btn edit" title="تعديل + بنود المؤشرات"><i class="fas fa-edit"></i></a><?php endif; ?>
                 <form action="" method="post" class="ev-inline-form">
         <?= csrf_field() ?><input type="hidden" name="action" value="set_state"><input type="hidden" name="id" value="<?= intval($r['id']) ?>">
                     <select name="new_state" aria-label="تغيير حالة التقييم" onchange="this.form.submit()" class="ev-state-select" <?= $can_edit?'':'disabled' ?>><?php foreach($STATES as $s): ?><option value="<?= $s ?>" <?= ($r['state']===$s)?'selected':'' ?>><?= $s ?></option><?php endforeach; ?></select>
@@ -292,7 +292,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <td><span class="badge badge-info"><?= htmlspecialchars($r['incentive_penalty_type']) ?></span></td>
             <td><?= htmlspecialchars($r['amount'] ?: '-') ?></td>
             <td><span class="status-pill <?= $sc ?>"><?= htmlspecialchars($r['state']) ?></span></td></tr>
-        <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="8" class="ev-empty-cell">لا توجد تقييماتٌ بعد.</td></tr><?php endif; ?>
+        <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="8" class="ev-empty-cell">لا توجد تقييمات بعد.</td></tr><?php endif; ?>
         </tbody></table></div>
 </div>
 <?php ems_wf_view_modal($WF_VIEW); ?>

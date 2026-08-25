@@ -39,7 +39,7 @@ if (!$is_super_admin && empty($__pp['can_view'])) {
     exit();
 }
 if (!$is_super_admin && $_SERVER['REQUEST_METHOD'] === 'POST' && empty($__pp['can_add']) && empty($__pp['can_edit'])) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'غير مصرح بالكتابة في هذه الشاشة ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
+    ems_gov_flash_redirect('../main/dashboard.php', 'غير مصرح بالكتابة في هذه الشاشة ❌', 'GOV-PERM-403', 'اطلب المنحة من مدير الصلاحيات إن كانت ضمن عملك');
 }
 $COLS   = array (
   0 => 'الكيان',
@@ -53,7 +53,7 @@ $COLS   = array (
   8 => 'حكمه',
   9 => 'مصدر المنع',
   10 => 'حكمه',
-  11 => 'قاعدة الدمج المطبَّقة',
+  11 => 'قاعدة الدمج المطبقة',
   12 => 'النطاق الناتج',
   13 => 'السقف الناتج',
   14 => 'تاريخ الفحص',
@@ -70,7 +70,7 @@ $FIELDS = array (
   7 => 'حكمه',
   8 => 'مصدر المنع',
   9 => 'حكمه',
-  10 => 'قاعدة الدمج المطبَّقة',
+  10 => 'قاعدة الدمج المطبقة',
   11 => 'النطاق الناتج',
   12 => 'السقف الناتج',
   13 => 'تاريخ الفحص',
@@ -88,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     $creator = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
     // الموجة ٢: الحفظ في الجدول الأصلي للشاشة (الفارغ NULL — لا مخزن بينيًّا)
     $ok = cmp03_store_insert($conn, $company_id, $CANONICAL, $payload, $status, $uid, $creator);
-    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
+    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
     exit();
 }
 
@@ -118,7 +118,7 @@ $entityName = $govCtx['values']['entity'] ?? '—';
 function cmp03_cell($col, $row, $entityName) {
     $n = cmp03_screen_norm($col);
     if ($n === cmp03_screen_norm('الكيان')) { return $entityName; }
-    if ($n === cmp03_screen_norm('المُنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المُنشئة')) {
+    if ($n === cmp03_screen_norm('المنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المنشئة')) {
         return $row['created_by_name'] ?: '—';
     }
     if ($n === cmp03_screen_norm('تاريخ الإنشاء')) { return $row['created_at']; }
@@ -133,7 +133,7 @@ function cmp03_screen_norm($s) {
     $s = str_replace(array('أ','إ','آ'), 'ا', $s);
     $s = str_replace('ة', 'ه', $s);
     $s = str_replace('ى', 'ي', $s);
-    return preg_replace('/[ًٌٍَُِّْ]/u', '', $s);
+    return preg_replace('/[]/u', '', $s);
 }
 
 $page_title = 'إيكوبيشن | تفسير مصدر الصلاحية';
@@ -161,14 +161,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     /* حزمةُ الحالاتِ الدنيا (بوابة ٩): تحميلٌ وفراغٌ وخطأٌ — مخفيةٌ افتراضًا
        ويُظهرها منطقُ الشاشةِ عند حالِها. الدالةُ من ux_components التي تُحمِّلها القشرة. */
     if (function_exists('ems_states_bundle')) {
-        echo ems_states_bundle('لا نتيجةَ تفسيرٍ بعدُ',
-                               'اختر الدورَ والشاشةَ ثم اضغط «فسِّر» لعرضِ كلِّ مصدرِ صلاحيةٍ بحكمِه والنتيجةِ النهائية');
+        echo ems_states_bundle('لا نتيجة تفسير بعد',
+                               'اختر الدور والشاشة ثم اضغط «فسر» لعرض كل مصدر صلاحية بحكمه والنتيجة النهائية');
     }
     ?>
 
     <!-- ── المفسِّر الحي: دورٌ × شاشة ← كلُّ مصدرٍ بحكمه والنتيجة ── -->
     <div class="card"><div class="card-header">
-        <h5><i class="fa fa-question-circle"></i> لماذا يرى هذا الدورُ هذه الشاشة — أو لا يراها؟</h5>
+        <h5><i class="fa fa-question-circle"></i> لماذا يرى هذا الدور هذه الشاشة — أو لا يراها؟</h5>
     </div><div class="card-body">
                 <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
         <div class="filter">
@@ -191,7 +191,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <?php echo htmlspecialchars($s0['name'], ENT_QUOTES, 'UTF-8'); ?></option>
                     <?php endforeach; ?>
                 </select></div>
-            <button type="submit" class="btn-primary"><i class="fa fa-search"></i> فسِّر</button>
+            <button type="submit" class="btn-primary"><i class="fa fa-search"></i> فسر</button>
         </form>
             </div>
         </div>
@@ -202,7 +202,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 — <?php echo htmlspecialchars($px_result['reason'], ENT_QUOTES, 'UTF-8'); ?>
             </div>
             <table class="alltables no-datatable px-table-full" data-no-dt="1">
-                <thead><tr><th class="px-th-source">المصدر</th><th>حكمُه</th></tr></thead>
+                <thead><tr><th class="px-th-source">المصدر</th><th>حكمه</th></tr></thead>
                 <tbody>
                 <?php foreach ($px_result['chain'] as $step): ?>
                     <tr><td><?php echo htmlspecialchars($step['step'], ENT_QUOTES, 'UTF-8'); ?></td>
@@ -211,7 +211,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </tbody>
             </table>
             <?php if (!empty($px_result['grantor'])): ?>
-            <div class="px-grantor">المنحُ من: <?php echo htmlspecialchars($px_result['grantor'], ENT_QUOTES, 'UTF-8'); ?></div>
+            <div class="px-grantor">المنح من: <?php echo htmlspecialchars($px_result['grantor'], ENT_QUOTES, 'UTF-8'); ?></div>
             <?php endif; ?>
         </div>
         <?php endif; ?>
@@ -245,7 +245,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="f8" maxlength="190" id="emsf_625_29f5a"></div>
                 <div class="form-group"><label for="emsf_626_36d52">حكمه</label>
                     <input type="text" name="f9" maxlength="190" id="emsf_626_36d52"></div>
-                <div class="form-group"><label for="emsf_627_9e844">قاعدة الدمج المطبَّقة</label>
+                <div class="form-group"><label for="emsf_627_9e844">قاعدة الدمج المطبقة</label>
                     <input type="text" name="f10" maxlength="190" id="emsf_627_9e844"></div>
                 <div class="form-group"><label for="emsf_628_26056">النطاق الناتج</label>
                     <input type="text" name="f11" maxlength="190" id="emsf_628_26056"></div>
@@ -267,7 +267,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="table-responsive">
         <table class="alltables display" id="perm_explainTable">
             <thead><tr>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
             <th>الحساب</th>
             <th>الشاشة</th>
             <th>الفعل</th>
@@ -278,7 +278,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th>حكمه</th>
             <th>مصدر المنع</th>
             <th>حكمه</th>
-            <th>قاعدة الدمج المطبَّقة</th>
+            <th>قاعدة الدمج المطبقة</th>
             <th>النطاق الناتج</th>
             <th>السقف الناتج</th>
             <th>تاريخ الفحص</th>
@@ -286,7 +286,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="16" class="text-center text-muted">لا بياناتَ بعدُ — أضف أول صفٍّ بزر «إضافة»</td></tr>
+                <tr><td colspan="16" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
                     <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>

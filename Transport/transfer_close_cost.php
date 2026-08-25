@@ -35,8 +35,8 @@ $__pc = ems_post_contract($conn, array(
     'validate' => function (array $in) {
         $oid  = intval($in['close_id'] ?? 0);
         $cost = floatval($in['actual_cost'] ?? 0);
-        if ($oid <= 0)  { return array('ok' => false, 'msg' => 'أمرٌ غيرُ صالح (422)'); }
-        if ($cost <= 0) { return array('ok' => false, 'msg' => 'التكلفةُ الفعليةُ إلزاميةٌ للإقفال — ولا إقفالَ بتكلفةٍ صفر (422)'); }
+        if ($oid <= 0)  { return array('ok' => false, 'msg' => 'أمر غير صالح (422)'); }
+        if ($cost <= 0) { return array('ok' => false, 'msg' => 'التكلفة الفعلية إلزامية للإقفال — ولا إقفال بتكلفة صفر (422)'); }
         return array('ok' => true, 'data' => array('oid' => $oid, 'cost' => $cost));
     },
 ));
@@ -87,7 +87,7 @@ $r = mysqli_query($conn,
      WHERE o.company_id = $company_id AND o.is_deleted = 0 AND o.stage = 'arrived'
      ORDER BY o.arrival_datetime");
 /* ◆ ولا يبتلع `if ($r)` رسوبَ الاستعلامِ صامتًا — الفشلُ يُعلَن برمزٍ (CS-12) */
-if ($r === false) { $msg = 'TRS-500 · تعذّرت قراءةُ أوامرِ الإقفال — ' . mysqli_error($conn); }
+if ($r === false) { $msg = 'TRS-500 · تعذرت قراءة أوامر الإقفال — ' . mysqli_error($conn); }
 else { while ($x = mysqli_fetch_assoc($r)) { $rows[] = $x; } }
 
 $page_title = 'إقفال الأمر وتحميل التكلفة';
@@ -104,12 +104,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 /* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
    شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
 $header_icon = 'fa fa-lock';
-$header_title_html = htmlspecialchars('إقفالُ الأمر وتحميلُ التكلفة', ENT_QUOTES, 'UTF-8');
+$header_title_html = htmlspecialchars('إقفال الأمر وتحميل التكلفة', ENT_QUOTES, 'UTF-8');
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-echo ems_states_bundle('لا أوامرَ بانتظارِ الإقفالِ وتحميلِ التكلفة', 'وثّقِ التسليمَ في شاشةِ «الوصولُ والتسليم» ليصيرَ الأمرُ قابلًا للإقفال');
+echo ems_states_bundle('لا أوامر بانتظار الإقفال وتحميل التكلفة', 'وثق التسليم في شاشة «الوصول والتسليم» ليصير الأمر قابلا للإقفال');
 ?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
   <table class="table table-striped" data-no-dt>
@@ -117,17 +117,17 @@ echo ems_states_bundle('لا أوامرَ بانتظارِ الإقفالِ وت
          التي كانت بلا سجلٍّ في القاعدةِ رُفعت ولم تُملأ بفراغ:
          اعتمده مدير النقل · اعتمدته المالية · رقم القيد · مرجع التفويض ·
          تاريخ الاعتماد · معكوس بـ · عكس عن · درجة الأثر. -->
-    <thead><tr><th>أمر الترحيل</th><th>المشروعُ المحمَّل</th><th>المقدَّرة $</th><th>الفعلية $</th><th>تاريخ الإقفال</th>
+    <thead><tr><th>أمر الترحيل</th><th>المشروع المحمل</th><th>المقدرة $</th><th>الفعلية $</th><th>تاريخ الإقفال</th>
               <th class="ems-fn-th" data-fn="1">رقم المحضر</th>
               <th class="ems-fn-th" data-fn="1">بند التكلفة</th>
               <th class="ems-fn-th" data-fn="1">الوصف</th>
               <th class="ems-fn-th" data-fn="1">المبلغ</th>
               <th class="ems-fn-th" data-fn="1">المستند المؤيد</th>
               <th class="ems-fn-th" data-fn="1">المتحمل</th>
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
               <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
               <th class="ems-gov-th" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
               <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
@@ -135,7 +135,7 @@ echo ems_states_bundle('لا أوامرَ بانتظارِ الإقفالِ وت
               <th class="ems-gov-th" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
               </tr></thead>
     <tbody>
-    <?php if (empty($rows)): ?><tr><td colspan="20" class="text-center text-muted">لا أوامرَ بانتظار الإقفال</td></tr><?php endif; ?>
+    <?php if (empty($rows)): ?><tr><td colspan="20" class="text-center text-muted">لا أوامر بانتظار الإقفال</td></tr><?php endif; ?>
     <?php foreach ($rows as $o): ?>
       <tr>
         <td><?= htmlspecialchars($o['order_no'], ENT_QUOTES, 'UTF-8') ?></td>
@@ -145,20 +145,20 @@ echo ems_states_bundle('لا أوامرَ بانتظارِ الإقفالِ وت
           <?php $rid = intval($o['id']); if (!$o['doc_ref']): ?>
             <!-- FIXC-0048: لا نموذجَ إقفالٍ أصلًا قبلَ تخزينِ مستندِ التسليم —
                  والحارسُ في الخدمةِ يرفضه ولو أُرسل يدويًّا (لا اتكالَ على العرض). -->
-            <span class="text-muted">لا مستندَ تسليمٍ مخزَّن —
-              <a href="transfer_arrival.php">وثّقِ التسليمَ أولًا</a></span>
+            <span class="text-muted">لا مستند تسليم مخزن —
+              <a href="transfer_arrival.php">وثق التسليم أولا</a></span>
         </td>
         <td>—</td>
           <?php else: ?>
           <form method="post" class="trs-cc-row">
         <?= csrf_field() ?>
             <input type="hidden" name="close_id" value="<?= $rid ?>">
-            <label class="visually-hidden" for="cls_cost_<?= $rid ?>">التكلفةُ الفعلية</label>
-            <input aria-label="التكلفةُ الفعليةُ بالدولار" id="cls_cost_<?= $rid ?>" type="number" step="0.01" min="0.01" name="actual_cost" class="form-control form-control-sm trs-cc-cost"
+            <label class="visually-hidden" for="cls_cost_<?= $rid ?>">التكلفة الفعلية</label>
+            <input aria-label="التكلفة الفعلية بالدولار" id="cls_cost_<?= $rid ?>" type="number" step="0.01" min="0.01" name="actual_cost" class="form-control form-control-sm trs-cc-cost"
                    value="<?= htmlspecialchars($o['actual_cost_usd'] ?: $o['estimated_cost_usd'], ENT_QUOTES, 'UTF-8') ?>" required>
             <small class="text-muted">سند: <?= htmlspecialchars($o['doc_ref'], ENT_QUOTES, 'UTF-8') ?></small>
         </td>
-        <td><button class="action-btn" type="submit"><i class="fa fa-lock"></i> أقفل وحمّل</button></form></td>
+        <td><button class="action-btn" type="submit"><i class="fa fa-lock"></i> أقفل وحمل</button></form></td>
           <?php endif; ?>
         <?php
         /* INJ-0317 · الخمسةَ عشرَ عمودًا الباقيةُ من مصادرِها المخزَّنة — لا حشوَ
@@ -172,16 +172,16 @@ echo ems_states_bundle('لا أوامرَ بانتظارِ الإقفالِ وت
         $cell($o['cost_types']);                                         // بند التكلفة
         $cell($o['notes']);                                              // الوصف
         $cell($o['lines_usd'] !== null ? number_format((float) $o['lines_usd'], 2) : '');  // المبلغ
-        $cell((int) $o['att_n'] > 0 ? ((int) $o['att_n'] . ' مرفقًا') : '');               // المستند المؤيد
+        $cell((int) $o['att_n'] > 0 ? ((int) $o['att_n'] . ' مرفقا') : '');               // المستند المؤيد
         $cell($o['cost_bearer']);                                        // المتحمل
         $cell($o['entity_name']);                                        // الكيان
         $cell($o['created_at']);                                         // تاريخ الإنشاء
-        $cell($o['request_code'] !== null ? ('طلبُ ترحيلٍ ' . $o['request_code']) : '');   // المرجع الأب
+        $cell($o['request_code'] !== null ? ('طلب ترحيل ' . $o['request_code']) : '');   // المرجع الأب
         $cell($o['creator_name']);                                       // المُنشئ
         $cell($o['stage']);                                              // الحالة
         $cell($o['sync_uuid']);                                          // مفتاح منع التكرار
         $cell($o['analytic_cost_center']);                               // مركز التكلفة
-        $cell($o['fx_rate'] !== null ? ('سعرُ بندِ التكلفة ' . rtrim(rtrim((string) $o['fx_rate'], '0'), '.')) : ''); // سعر الصرف ومصدره
+        $cell($o['fx_rate'] !== null ? ('سعر بند التكلفة ' . rtrim(rtrim((string) $o['fx_rate'], '0'), '.')) : ''); // سعر الصرف ومصدره
         $cell($o['tariff_currency']);                                    // العملة
         ?>
       </tr>

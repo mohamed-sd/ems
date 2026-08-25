@@ -47,21 +47,21 @@ class ApprovalGate
         $who  = intval($ctx['actor_user_id'] ?? 0);
         $dec  = (string) ($ctx['decision'] ?? 'approved');
         if ($co <= 0 || $kind === '' || $ref === '' || $apr === '' || $who <= 0) {
-            return self::fail(422, 'الاعتمادُ يحتاج الكيانَ والمستندَ ونوعَه وفاعلَه');
+            return self::fail(422, 'الاعتماد يحتاج الكيان والمستند ونوعه وفاعله');
         }
         if (!in_array($dec, array('approved', 'rejected', 'escalated'), true)) {
-            return self::fail(422, 'قرارٌ غيرُ معرَّف: ' . $dec);
+            return self::fail(422, 'قرار غير معرف: ' . $dec);
         }
 
         $type = self::typeOf($conn, $apr);
-        if ($type === null) { return self::fail(404, "نوعُ اعتمادٍ غيرُ معرَّف: {$apr}"); }
+        if ($type === null) { return self::fail(404, "نوع اعتماد غير معرف: {$apr}"); }
 
         /* ── حارسُ الدور (FMGR-0004) ─────────────────────────────────────── */
         $roleId = self::actorRole($conn, $who, $ctx);
         if (trim($type['allowed_roles']) !== '') {
             $allowed = array_filter(array_map('trim', explode(',', $type['allowed_roles'])));
             if (!in_array((string) $roleId, $allowed, true)) {
-                return self::fail(403, $type['title'] . ' — لا يملكه هذا الدور: صاحبُه '
+                return self::fail(403, $type['title'] . ' — لا يملكه هذا الدور: صاحبه '
                                      . $type['owner_label'] . ' (FMGR-0004)');
             }
         }
@@ -71,8 +71,8 @@ class ApprovalGate
             $have = self::approvedSet($conn, $co, $kind, $ref);
             foreach (self::typesBefore($conn, $type['seq']) as $prior) {
                 if (!in_array($prior, $have, true)) {
-                    return self::fail(409, $type['title'] . ' لا يقع قبلَ ' . $prior
-                                         . ' — والأنواعُ لا يُغني أحدُها عن الآخر (FACC-0044)');
+                    return self::fail(409, $type['title'] . ' لا يقع قبل ' . $prior
+                                         . ' — والأنواع لا يغني أحدها عن الآخر (FACC-0044)');
                 }
             }
         }
@@ -81,7 +81,7 @@ class ApprovalGate
         foreach (self::conflictsOf($conn, $apr) as $other) {
             $prev = self::actorOf($conn, $co, $kind, $ref, $other['code']);
             if ($prev > 0 && $prev === $who) {
-                return self::fail(409, 'الشخصُ نفسُه لا يجمع ' . $apr . ' و' . $other['code']
+                return self::fail(409, 'الشخص نفسه لا يجمع ' . $apr . ' و' . $other['code']
                                      . ' — ' . $other['rule_text'] . ' (' . $other['doc_ref'] . ')');
             }
         }
@@ -91,15 +91,15 @@ class ApprovalGate
         $cap    = null;
         if ((int) $type['needs_cap'] === 1 && $dec === 'approved') {
             if ($amount === null) {
-                return self::fail(422, $type['title'] . ' لا يقع بلا مبلغٍ يُقاس على السقف');
+                return self::fail(422, $type['title'] . ' لا يقع بلا مبلغ يقاس على السقف');
             }
             $cap = self::capFor($conn, $co, $who, $roleId, $apr);
             if ($cap === null) {
-                return self::fail(403, $type['title'] . ' لا يُمنح بلا سقفٍ معلَنٍ لصاحبِه (APR-3)');
+                return self::fail(403, $type['title'] . ' لا يمنح بلا سقف معلن لصاحبه (APR-3)');
             }
             if ($amount > (float) $cap['max_amount']) {
                 return self::fail(409, sprintf(
-                    'المبلغُ %s يتجاوز سقفَ صاحبِه %s — ولا يُنفَّذ قبلَ قرارِ من فوقَه (CEO-Y0120)',
+                    'المبلغ %s يتجاوز سقف صاحبه %s — ولا ينفذ قبل قرار من فوقه (CEO-Y0120)',
                     number_format($amount, 2), number_format((float) $cap['max_amount'], 2)));
             }
         }
@@ -111,7 +111,7 @@ class ApprovalGate
                    reason_code, note, decided_at, created_by)
                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),?)";
         $st = $conn->prepare($sql);
-        if (!$st) { return self::fail(500, 'تعذّر تسجيلُ الاعتماد: ' . $conn->error); }
+        if (!$st) { return self::fail(500, 'تعذر تسجيل الاعتماد: ' . $conn->error); }
         $rid = $roleId > 0 ? $roleId : null;
         $capV = $cap !== null ? (float) $cap['max_amount'] : null;
         $capacity = mb_substr((string) ($ctx['actor_capacity'] ?? $type['owner_label']), 0, 120);
@@ -122,21 +122,21 @@ class ApprovalGate
         $vals  = array($co, $kind, $ref, $apr, $dec, $who, $rid, $capacity, $amount, $cur, $capV, $rc, $note, $by);
         $types = 'i' . 'ssss' . 'ii' . 's' . 'd' . 's' . 'd' . 'ss' . 'i';
         if (strlen($types) !== count($vals)) {
-            return self::fail(500, sprintf('انزياحُ وسائط: أنواع %d · قيم %d', strlen($types), count($vals)));
+            return self::fail(500, sprintf('انزياح وسائط: أنواع %d · قيم %d', strlen($types), count($vals)));
         }
         $st->bind_param($types, ...$vals);
         if (!$st->execute()) {
             $e = $st->errno; $msg = $st->error; $st->close();
             if ($e === 1062) {
-                return self::fail(409, $type['title'] . ' مسجَّلٌ على هذا المستندِ مرةً — والنوعُ لا يتكرر');
+                return self::fail(409, $type['title'] . ' مسجل على هذا المستند مرة — والنوع لا يتكرر');
             }
-            return self::fail(500, 'تعذّر تسجيلُ الاعتماد: ' . $msg);
+            return self::fail(500, 'تعذر تسجيل الاعتماد: ' . $msg);
         }
         $id = $st->insert_id;
         $st->close();
 
         return array('ok' => true, 'code' => 200, 'id' => $id,
-                     'reason' => $type['title'] . ' سُجِّل', 'cap' => $capV);
+                     'reason' => $type['title'] . ' سجل', 'cap' => $capV);
     }
 
     /**
@@ -149,10 +149,10 @@ class ApprovalGate
         $need = self::typesBefore($conn, 4);   // APR-1 · APR-2 · APR-3
         $miss = array_values(array_diff($need, $have));
         if ($miss) {
-            return self::fail(409, 'لا يُنفَّذ الطلبُ بلا: ' . implode(' · ', $miss)
-                                 . ' — والأنواعُ الأربعةُ لا تُدمج (FACC-0044)');
+            return self::fail(409, 'لا ينفذ الطلب بلا: ' . implode(' · ', $miss)
+                                 . ' — والأنواع الأربعة لا تدمج (FACC-0044)');
         }
-        return array('ok' => true, 'code' => 200, 'reason' => 'السلسلةُ كاملةٌ — ' . implode(' · ', $have));
+        return array('ok' => true, 'code' => 200, 'reason' => 'السلسلة كاملة — ' . implode(' · ', $have));
     }
 
     /** حالةُ الأنواعِ الأربعةِ على مستندٍ — للعرضِ في الشاشة. */

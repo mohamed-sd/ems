@@ -90,7 +90,7 @@ class UnitStateChangeService
         $isDeputy = !empty($a['delegated_from_auth_id']);
         if ($isDeputy && (empty($a['valid_to']) || (string) $a['valid_to'] === '')) {
             return array('ok' => false, 'code' => 422,
-                'reason' => 'النائب المفوَّض بمدة وسقف مكتوبين — لا تفويض شفوي ولا مفتوح المدة (DEC-01 ①)');
+                'reason' => 'النائب المفوض بمدة وسقف مكتوبين — لا تفويض شفوي ولا مفتوح المدة (DEC-01 ①)');
         }
         foreach (array('person_id', 'entity_id', 'valid_from', 'doc_ref') as $f) {
             if (empty($a[$f])) { return array('ok' => false, 'code' => 422, 'reason' => 'حقل إلزامي: ' . $f); }
@@ -109,11 +109,11 @@ class UnitStateChangeService
         $stmt->bind_param('iiisiisss', $companyId, $pid, $eid, $scopeType, $scopeId, $del, $vf, $vt, $doc);
         if (!$stmt->execute()) {
             $err = $stmt->error; $stmt->close();
-            return array('ok' => false, 'code' => 422, 'reason' => 'تعذّر التعيين: ' . $err);
+            return array('ok' => false, 'code' => 422, 'reason' => 'تعذر التعيين: ' . $err);
         }
         $id = intval($stmt->insert_id); $stmt->close();
         return array('ok' => true, 'code' => 201, 'auth_id' => $id,
-            'reason' => ($isDeputy ? 'نائب مفوَّض' : 'تفويض حركة') . ' #' . $id
+            'reason' => ($isDeputy ? 'نائب مفوض' : 'تفويض حركة') . ' #' . $id
                 . ' — نطاقه ' . ($scopeType === 'site' ? 'الموقع #' . $scopeId : 'كل المواقع') . ' (سقف نطاقي لا نقدي)');
     }
 
@@ -152,12 +152,12 @@ class UnitStateChangeService
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'chg_id' => 0, 'needs_gm' => false);
         foreach (array('scope_type', 'scope_id', 'date_from', 'date_to', 'field_changed', 'value_before', 'value_after', 'reason', 'doc_ref', 'estimated_impact', 'requested_by') as $f) {
             if (!isset($a[$f]) || $a[$f] === '' || $a[$f] === null) {
-                $out['code'] = 422; $out['reason'] = 'حقل إلزامي مفقود: ' . $f . ' — لا طلب بلا نطاق وسبب ومستند وأثر مقدَّر';
+                $out['code'] = 422; $out['reason'] = 'حقل إلزامي مفقود: ' . $f . ' — لا طلب بلا نطاق وسبب ومستند وأثر مقدر';
                 return $out;
             }
         }
         if (!is_array($a['estimated_impact']) || empty($a['estimated_impact'])) {
-            $out['code'] = 422; $out['reason'] = 'الأثر المقدَّر لكل طرف إلزامي — يُحسب قبل الإرسال لا بعده';
+            $out['code'] = 422; $out['reason'] = 'الأثر المقدر لكل طرف إلزامي — يحسب قبل الإرسال لا بعده';
             return $out;
         }
         $companyId = intval($companyId);
@@ -171,7 +171,7 @@ class UnitStateChangeService
         $imp = json_encode($a['estimated_impact'], JSON_UNESCAPED_UNICODE);
         $by = intval($a['requested_by']);
         $stmt->bind_param('isissssssssi', $companyId, $st, $sid, $df, $dt, $fc, $vb, $va, $rs, $doc, $imp, $by);
-        if (!$stmt->execute()) { $out['code'] = 422; $out['reason'] = 'تعذّر الإنشاء: ' . $stmt->error; $stmt->close(); return $out; }
+        if (!$stmt->execute()) { $out['code'] = 422; $out['reason'] = 'تعذر الإنشاء: ' . $stmt->error; $stmt->close(); return $out; }
         $out['chg_id'] = intval($stmt->insert_id);
         $stmt->close();
         // DEC-01 ③: الحد محسوب في الطلب قبل الإرسال — 5٪ أو 10,000$ أيهما أقل،
@@ -186,7 +186,7 @@ class UnitStateChangeService
         $out['needs_gm'] = $gm['needs_gm'] || !empty($a['exceeds_threshold']) || !empty($a['touches_material_right']);
         $out['gm_reason'] = $gm['reason'];
         $out['ok'] = true; $out['code'] = 201;
-        $out['reason'] = 'طلب #' . $out['chg_id'] . ' — السلّم: مدير الحركة ← الإدارة المعنية ← المالية'
+        $out['reason'] = 'طلب #' . $out['chg_id'] . ' — السلم: مدير الحركة ← الإدارة المعنية ← المالية'
             . ($out['needs_gm'] ? ' ← الإدارة العامة (أثر كبير أو حق جوهري)' : '');
         return $out;
     }
@@ -205,8 +205,8 @@ class UnitStateChangeService
         $chg = $stmt->get_result()->fetch_assoc();
         $stmt->close();
         if (!$chg) { $out['code'] = 404; $out['reason'] = 'الطلب غير موجود'; return $out; }
-        if ((string) $chg['state'] !== 'Pending') { $out['code'] = 409; $out['reason'] = 'الطلب ليس معلَّقًا — حاله ' . $chg['state']; return $out; }
-        if (!isset(self::LADDER[$seqNo])) { $out['code'] = 422; $out['reason'] = 'خطوة خارج السلّم الرباعي'; return $out; }
+        if ((string) $chg['state'] !== 'Pending') { $out['code'] = 409; $out['reason'] = 'الطلب ليس معلقا — حاله ' . $chg['state']; return $out; }
+        if (!isset(self::LADDER[$seqNo])) { $out['code'] = 422; $out['reason'] = 'خطوة خارج السلم الرباعي'; return $out; }
 
         // الترتيب: كل الخطوات السابقة مكتملة موافَقةً
         $stmt = $conn->prepare('SELECT seq_no FROM change_approvals WHERE chg_id = ? AND decision = \'approve\'');
@@ -219,11 +219,11 @@ class UnitStateChangeService
                 $out['code'] = ($i === 1) ? 422 : 409;
                 $out['reason'] = ($i === 1)
                     ? 'بلا موافقة مدير الحركة لا يبدأ الطلب — هو مالك الواقعة التشغيلية'
-                    : 'خطوة قبل سابقتها — تُعلَّق حتى تكتمل السابقة (' . self::LADDER[$i] . ')';
+                    : 'خطوة قبل سابقتها — تعلق حتى تكتمل السابقة (' . self::LADDER[$i] . ')';
                 return $out;
             }
         }
-        if (in_array($seqNo, $done, true)) { $out['code'] = 409; $out['reason'] = 'الخطوة موقَّعة سلفًا'; return $out; }
+        if (in_array($seqNo, $done, true)) { $out['code'] = 409; $out['reason'] = 'الخطوة موقعة سلفا'; return $out; }
 
         // DEC-01 ①: خطوة مدير الحركة — السقف نطاقي: تفويضه يجب أن يغطي
         // نطاق الطلب (الموقع/المشروع)؛ ومن لا تفويض حركة له يمضي على النمط النافذ.
@@ -231,7 +231,7 @@ class UnitStateChangeService
             $covers = self::movementScopeCovers($conn, $companyId, $personId, (string) $chg['scope_type'], intval($chg['scope_id']));
             if ($covers === false) {
                 $out['code'] = 403;
-                $out['reason'] = 'تفويض الحركة لا يغطي هذا النطاق — السقف نطاقي (مواقع لا مبالغ · DEC-01 ①)؛ يعتمدها صاحب النطاق أو نائبه المفوَّض بمدته';
+                $out['reason'] = 'تفويض الحركة لا يغطي هذا النطاق — السقف نطاقي (مواقع لا مبالغ · DEC-01 ①)؛ يعتمدها صاحب النطاق أو نائبه المفوض بمدته';
                 return $out;
             }
         }
@@ -252,14 +252,14 @@ class UnitStateChangeService
 
         if ($decision === 'reject') {
             $conn->query("UPDATE unit_state_changes SET state = 'Rejected' WHERE chg_id = {$chgId}");
-            $out['ok'] = true; $out['code'] = 200; $out['state'] = 'Rejected'; $out['reason'] = 'رُفض بسبب محكوم';
+            $out['ok'] = true; $out['code'] = 200; $out['state'] = 'Rejected'; $out['reason'] = 'رفض بسبب محكوم';
             return $out;
         }
         $required = $needsGm ? 4 : 3;
         if ($seqNo >= $required) {
             $conn->query("UPDATE unit_state_changes SET state = 'Approved' WHERE chg_id = {$chgId}");
             $out['state'] = 'Approved';
-            $out['reason'] = 'اكتمل السلّم — الطلب معتمد وجاهز للتطبيق';
+            $out['reason'] = 'اكتمل السلم — الطلب معتمد وجاهز للتطبيق';
         } else {
             $out['state'] = 'Pending';
             $out['reason'] = 'موافقة ' . $seqNo . '/' . $required . ' (' . $role . ')';
@@ -288,14 +288,14 @@ class UnitStateChangeService
         }
         if ($priorEffectPosted && ($reversalRef === null || $reversalRef === '')) {
             $out['code'] = 423;
-            $out['reason'] = 'الأثر السابق مقيَّد — **يُعكس بمرجعه ولا يُعدَّل**، مرّر reversal_ref لحدث العكس';
+            $out['reason'] = 'الأثر السابق مقيد — **يعكس بمرجعه ولا يعدل**، مرر reversal_ref لحدث العكس';
             return $out;
         }
         $ref = $reversalRef !== null ? "'" . $conn->real_escape_string((string) $reversalRef) . "'" : 'NULL';
         $conn->query("UPDATE unit_state_changes SET state = 'Applied', applied_at = NOW(), reversal_ref = {$ref} WHERE chg_id = {$chgId}");
         $out['ok'] = true; $out['code'] = 200;
-        $out['reason'] = 'طُبّق — الحالة الأصلية والجديدة محفوظتان معًا بسببهما وموافقيهما'
-            . ($priorEffectPosted ? ' · والقديم عُكس بمرجع ' . $reversalRef : '');
+        $out['reason'] = 'طبق — الحالة الأصلية والجديدة محفوظتان معا بسببهما وموافقيهما'
+            . ($priorEffectPosted ? ' · والقديم عكس بمرجع ' . $reversalRef : '');
         return $out;
     }
 
@@ -312,7 +312,7 @@ class UnitStateChangeService
         ));
         if (!$sig['ok']) { return array('ok' => false, 'code' => $sig['code'], 'reason' => $sig['reason']); }
         $conn->query("UPDATE unit_state_changes SET state = 'Applied', applied_at = NOW(), reversal_ref = 'EMERGENCY-PENDING-DOCS' WHERE chg_id = {$chgId} AND state IN ('Pending','Approved')");
-        return array('ok' => true, 'code' => 200, 'reason' => 'طوارئ: طُبّق باعتماد الإدارة العامة — يُستكمل توثيق الثلاث خلال 48 ساعة وإلا عُكس آليًّا');
+        return array('ok' => true, 'code' => 200, 'reason' => 'طوارئ: طبق باعتماد الإدارة العامة — يستكمل توثيق الثلاث خلال 48 ساعة وإلا عكس آليا');
     }
 
     /** كنس الطوارئ: 48 ساعة بلا اكتمال الثلاث → عكس آلي ورفع للمراجعة. */
@@ -328,7 +328,7 @@ class UnitStateChangeService
             $id = intval($r['chg_id']);
             $conn->query("UPDATE unit_state_changes SET state = 'Reversed', reversal_ref = 'EMERGENCY-AUTOREVERSED' WHERE chg_id = {$id}");
             $conn->query("INSERT INTO fin_notifications (company_id, target_level, title, link)
-                          VALUES (" . intval($r['company_id']) . ", 'finance_manager', 'طوارئ #{$id}: لم يُستكمل التوثيق خلال 48 ساعة — عُكس الأثر آليًّا ورُفع للمراجعة', 'admin/bus_monitor.php')");
+                          VALUES (" . intval($r['company_id']) . ", 'finance_manager', 'طوارئ #{$id}: لم يستكمل التوثيق خلال 48 ساعة — عكس الأثر آليا ورفع للمراجعة', 'admin/bus_monitor.php')");
         }
         return count($rows);
     }
@@ -357,11 +357,11 @@ class UnitStateChangeService
         foreach ($rows as $r) { $byMonth[(string) $r['ym']] = intval($r['c']); }
         $max = empty($byMonth) ? 0 : max($byMonth);
         if ($max > 10) {
-            $rec = 'الحد منخفض (' . $max . ' طلبًا في شهر > 10) — يُرفع بقرار لاحق بالأرقام';
+            $rec = 'الحد منخفض (' . $max . ' طلبا في شهر > 10) — يرفع بقرار لاحق بالأرقام';
         } elseif ($max < 2) {
-            $rec = 'الحد مرتفع (' . $max . ' < 2 شهريًّا) — يُخفض بقرار لاحق بالأرقام';
+            $rec = 'الحد مرتفع (' . $max . ' < 2 شهريا) — يخفض بقرار لاحق بالأرقام';
         } else {
-            $rec = 'الحد مناسب (' . $max . ' شهريًّا ضمن [2،10]) — لا تعديل';
+            $rec = 'الحد مناسب (' . $max . ' شهريا ضمن [2،10]) — لا تعديل';
         }
         return array('months' => $byMonth, 'recommendation' => $rec);
     }

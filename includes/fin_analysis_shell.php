@@ -11,7 +11,7 @@
  * والشاشةُ الحاملةُ تُعرّف دالةَ fa_render_body() لجسمها.
  */
 if (!isset($FA_SCREEN) || !is_array($FA_SCREEN)) {
-    exit('FA-500: القشرةُ تحتاج عقدَ إعدادٍ من الشاشةِ الحاملة');
+    exit('FA-500: القشرة تحتاج عقد إعداد من الشاشة الحاملة');
 }
 
 require_once __DIR__ . '/../includes/session_bootstrap.php';
@@ -36,7 +36,7 @@ $__pp = check_page_permissions($conn, 'Finance/' . $FA_SCREEN['file']);
 if (!$is_super_admin && empty($__pp['can_view'])) {
     ems_gov_flash_redirect('../main/dashboard.php',
         'لا تملك صلاحية عرض ' . $FA_SCREEN['title'],
-        'FIN-PERM-403', 'شاشاتُ التحليلِ الماليِّ يمنحها مديرُ الصلاحيات');
+        'FIN-PERM-403', 'شاشات التحليل المالي يمنحها مدير الصلاحيات');
 }
 $fa_can_write = $is_super_admin || !empty($__pp['can_add']) || !empty($__pp['can_edit']);
 ems_shell_axes($__pp);

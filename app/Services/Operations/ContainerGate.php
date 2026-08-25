@@ -102,9 +102,9 @@ class ContainerGate
         if ($opId <= 0) {
             $reasons[] = array(
                 'kind'  => 'no_operator',
-                'text'  => 'معدةٌ بلا مشغّل — لا تُسجَّل وحدةٌ بلا صاحبِ ساعاتها',
+                'text'  => 'معدة بلا مشغل — لا تسجل وحدة بلا صاحب ساعاتها',
                 'href'  => '../Oprators/select_project.php',
-                'label' => 'عيِّن مشغّلًا للمعدة',
+                'label' => 'عين مشغلا للمعدة',
             );
         }
 
@@ -115,9 +115,9 @@ class ContainerGate
             if ($leaf === null) {
                 $reasons[] = array(
                     'kind'  => 'no_container',
-                    'text'  => 'حاويةٌ ناقصة — لا حصةَ لهذا المشغّل على هذه المعدة في حاويات العقد',
+                    'text'  => 'حاوية ناقصة — لا حصة لهذا المشغل على هذه المعدة في حاويات العقد',
                     'href'  => '../Operations/containers.php?contract=' . $contractId,
-                    'label' => 'افتح حاويات العقد ووزّع الحصة',
+                    'label' => 'افتح حاويات العقد ووزع الحصة',
                 );
             }
         }
@@ -128,9 +128,9 @@ class ContainerGate
             if (!self::hasRotation($gate, (int) $leaf['id'])) {
                 $reasons[] = array(
                     'kind'  => 'no_rotation',
-                    'text'  => 'مشغّلٌ بلا دورة تناوب — لا يُعرف أهو مناوبٌ هذا اليوم أم في راحته',
+                    'text'  => 'مشغل بلا دورة تناوب — لا يعرف أهو مناوب هذا اليوم أم في راحته',
                     'href'  => '../Operations/containers.php?contract=' . $contractId,
-                    'label' => 'سجّل دورةَ تناوبه',
+                    'label' => 'سجل دورة تناوبه',
                 );
             }
         }
@@ -142,9 +142,9 @@ class ContainerGate
             if (!DailyPlanService::hasOpenPlan($gate, $projectId, (string) $ctx['entry_date'])) {
                 $reasons[] = array(
                     'kind'  => 'no_open_plan',
-                    'text'  => 'موقعٌ بلا خطةِ يومٍ مفتوحة — «لا يُفتح تسجيلٌ لموقعٍ ناقص التخصيص»',
+                    'text'  => 'موقع بلا خطة يوم مفتوحة — «لا يفتح تسجيل لموقع ناقص التخصيص»',
                     'href'  => '../Operations/daily_plan.php?project=' . $projectId,
-                    'label' => 'افتح خطةَ اليوم (توليدٌ ← توزيعٌ ← اعتمادٌ ← فتح)',
+                    'label' => 'افتح خطة اليوم (توليد ← توزيع ← اعتماد ← فتح)',
                 );
             }
         }
@@ -257,13 +257,13 @@ class ContainerGate
         $out = array('ok' => true, 'skipped' => true, 'reason' => '', 'levels' => 0);
         $projectId = isset($entry['project_id']) ? (int) $entry['project_id'] : 0;
         if (!self::isEnabledFor($projectId)) {
-            $out['reason'] = 'الموقعُ خارج العلَم — لا استهلاك'; return $out;
+            $out['reason'] = 'الموقع خارج العلم — لا استهلاك'; return $out;
         }
 
         $leaf = self::leafFor($gate, (int) $entry['contract_id'], (int) $entry['equipment_id'],
                               (int) $entry['operator_employee_id'], (string) $entry['unit_type']);
         if ($leaf === null) {
-            $out['reason'] = 'لا حاويةَ لهذه الواقعة — لا يُخصم من عدم'; return $out;
+            $out['reason'] = 'لا حاوية لهذه الواقعة — لا يخصم من عدم'; return $out;
         }
 
         $round = isset($entry['current_round']) ? (int) $entry['current_round'] : 1;
@@ -273,7 +273,7 @@ class ContainerGate
                 'source_kind' => 'unit_entry', 'source_ref' => (int) $entry['id'],
                 'unit_type'   => (string) $entry['unit_type'],
                 'consumed_on' => (string) $entry['entry_date'],
-                'note'        => 'اكتمالُ سلسلة الاعتماد — الجولة ' . $round,
+                'note'        => 'اكتمال سلسلة الاعتماد — الجولة ' . $round,
                 // CAP-31/33: النسخةُ والدورُ من لقطة الواقعة المثبَّتة لا من الوضع الحالي
                 'revision_no'   => isset($entry['revision_no']) ? (int) $entry['revision_no'] : null,
                 'role_snapshot' => isset($entry['cap_role_snapshot']) ? $entry['cap_role_snapshot'] : null,
@@ -300,15 +300,15 @@ class ContainerGate
         try {
             $orig = $gate->selectOne('container_consumption', array(
                 'whereRaw' => 'idem_key = ?', 'params' => array($key)));
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $orig'); $orig = null; }
-        if (!$orig) { $out['reason'] = 'لا خصمَ لهذه الجولة — لا شيءَ يُردّ'; return $out; }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $orig'); $orig = null; }
+        if (!$orig) { $out['reason'] = 'لا خصم لهذه الجولة — لا شيء يرد'; return $out; }
 
         $r = OTS::consume($conn, $gate, $companyId, (int) $orig['container_id'],
             -1 * round((float) $orig['qty'], 2), $key . ':rev', array(
                 'source_kind' => 'unit_entry', 'source_ref' => (int) $entry['id'],
                 'unit_type'   => (string) $orig['unit_type'],
                 'consumed_on' => date('Y-m-d'),
-                'note'        => 'ردُّ استهلاكٍ بإعادة الواقعة — الجولة ' . (int) $round,
+                'note'        => 'رد استهلاك بإعادة الواقعة — الجولة ' . (int) $round,
             ));
         $out['ok'] = !empty($r['ok']);
         $out['skipped'] = !empty($r['existing']);

@@ -463,15 +463,15 @@ function ems_enforce_csrf_protection() {
     if ($isAjax) {
         header('Content-Type: application/json; charset=UTF-8');
         echo json_encode(
-            array('success' => false, 'message' => 'فشل التحقق الأمني (CSRF). يرجى تحديث الصفحة والمحاولة مجدداً.'),
+            array('success' => false, 'message' => 'فشل التحقق الأمني (CSRF). يرجى تحديث الصفحة والمحاولة مجددا.'),
             JSON_UNESCAPED_UNICODE
         );
     } else {
         require_once __DIR__ . '/deny_page.php';
         ems_deny_page('CSRF-403', 'فشل التحقق الأمني',
-            'انتهت صلاحية الجلسة أو أن الطلب غير موثوق. حدِّث الصفحة وأعد المحاولة.',
+            'انتهت صلاحية الجلسة أو أن الطلب غير موثوق. حدث الصفحة وأعد المحاولة.',
             array('status' => 403,
-                  'hint' => 'إن تكرر الأمر فأرفق الرمزَ والمسارَ أدناه في بلاغك.'));
+                  'hint' => 'إن تكرر الأمر فأرفق الرمز والمسار أدناه في بلاغك.'));
     }
     exit();
 }
@@ -708,7 +708,7 @@ function require_role($allowed_roles) {
     if (!in_array($user_role, $allowed_roles) && $user_role != '-1') { // -1 = مدير النظام
         require_once __DIR__ . '/deny_page.php';
         ems_deny_page('GOV-ROLE-403', 'غير مصرح لك بالوصول',
-            'دورُك الحاليُّ لا يملك صلاحيةَ فتحِ هذه الشاشة.',
+            'دورك الحالي لا يملك صلاحية فتح هذه الشاشة.',
             array('status' => 403, 'exit_url' => ems_url('main/dashboard.php')));
         exit;
     }
@@ -731,7 +731,7 @@ function check_ownership($resource_id, $user_field = 'project_id') {
     if ($user_value != $resource_id) {
         require_once __DIR__ . '/deny_page.php';
         ems_deny_page('GOV-OWNER-403', 'غير مصرح لك بالوصول',
-            'هذا المحتوى يخصُّ جهةً غيرَ التي يرتبط بها حسابُك.',
+            'هذا المحتوى يخص جهة غير التي يرتبط بها حسابك.',
             array('status' => 403, 'exit_url' => ems_url('main/dashboard.php')));
         exit;
     }
@@ -768,10 +768,10 @@ function check_rate_limit($action, $max_attempts = 10, $time_window = 60) {
 
     if ($_SESSION[$key]['count'] > $max_attempts) {
         require_once __DIR__ . '/deny_page.php';
-        ems_deny_page('RATE-429', 'محاولاتٌ كثيرةٌ جدًّا',
-            'تجاوزتَ الحدَّ المسموحَ من المحاولات على هذا الإجراء. انتظر قليلًا ثم أعد المحاولة.',
-            array('status' => 429, 'hint' => 'الحدُّ ' . (int) $max_attempts
-                . ' محاولةً كلَّ ' . (int) $time_window . ' ثانية.'));
+        ems_deny_page('RATE-429', 'محاولات كثيرة جدا',
+            'تجاوزت الحد المسموح من المحاولات على هذا الإجراء. انتظر قليلا ثم أعد المحاولة.',
+            array('status' => 429, 'hint' => 'الحد ' . (int) $max_attempts
+                . ' محاولة كل ' . (int) $time_window . ' ثانية.'));
         exit;
     }
 }
@@ -831,7 +831,7 @@ function validate_file_upload($file, $allowed_types = [], $max_size = 2097152) {
 
     // التحقق من الحجم
     if ($file['size'] > $max_size) {
-        $errors[] = 'حجم الملف كبير جداً. الحد الأقصى: ' . ($max_size / 1024 / 1024) . 'MB';
+        $errors[] = 'حجم الملف كبير جدا. الحد الأقصى: ' . ($max_size / 1024 / 1024) . 'MB';
     }
 
     // التحقق من نوع الملف

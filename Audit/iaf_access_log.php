@@ -20,13 +20,13 @@ $U13 = array(
     'file'       => 'Audit/iaf_access_log.php',
     'screen'     => 'iaf_access_log',
     'table'      => 'iaf_access_log',
-    'title'      => 'سجل اطّلاع المراجع الحساس',
+    'title'      => 'سجل اطلاع المراجع الحساس',
     'icon'       => 'fa fa-eye',
     'nature'     => 'read',
     'doc'        => 'IAF-01 §4-4 · IAF-0036',
-    'intro'      => 'كلُّ اطّلاعٍ حساسٍ مسجَّلٌ بمرجعِ المهمةِ التي تُبرِّره',
-    'rule'       => 'OBL-0127: فالوظيفةُ الرقابيةُ مراقَبةٌ أيضًا',
-    'empty_hint' => 'لا اطّلاعاتٍ مسجَّلة',
+    'intro'      => 'كل اطلاع حساس مسجل بمرجع المهمة التي تبرره',
+    'rule'       => 'OBL-0127: فالوظيفة الرقابية مراقبة أيضا',
+    'empty_hint' => 'لا اطلاعات مسجلة',
     'order'       => 'accessed_at DESC',
 );
 require __DIR__ . '/../includes/u13_screen_kit.php';

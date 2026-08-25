@@ -67,38 +67,38 @@ class ContractGuaranteeService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'id' => 0);
         try { $c = $gate->selectOne('contracts', array('where' => array('id' => (int) $contractId))); }
-        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $c'); $c = null; }
-        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقدُ غيرُ موجودٍ في نطاقك'; return $out; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $c'); $c = null; }
+        if (!$c) { $out['code'] = 404; $out['reason'] = 'العقد غير موجود في نطاقك'; return $out; }
 
         $kind = (string) (isset($a['kind']) ? $a['kind'] : '');
         if (!in_array($kind, self::KINDS, true)) {
-            $out['code'] = 422; $out['reason'] = '**نوعُ الأداة إلزاميٌّ** وواحدٌ من الستة'; return $out;
+            $out['code'] = 422; $out['reason'] = '**نوع الأداة إلزامي** وواحد من الستة'; return $out;
         }
         // ① الطبيعةُ **لا تُختار** — ومحاولةُ اختيارها خلافَ النوع تُرفض بنصِّها
         $nature = self::NATURE_OF[$kind];
         $asked = (string) (isset($a['nature']) ? $a['nature'] : '');
         if ($asked !== '' && $asked !== $nature) {
             $out['code'] = 422;
-            $out['reason'] = '**«' . self::KIND_AR[$kind] . '» طبيعتُه «' . self::NATURE_AR[$nature]
-                . '» حتمًا** — والخلطُ بين الأصل والالتزام المحتمل **خطأٌ محاسبيٌّ لا خيارُ مستخدم**';
+            $out['reason'] = '**«' . self::KIND_AR[$kind] . '» طبيعته «' . self::NATURE_AR[$nature]
+                . '» حتما** — والخلط بين الأصل والالتزام المحتمل **خطأ محاسبي لا خيار مستخدم**';
             return $out;
         }
         // ② ولا يُخصم من مستخلصٍ إلا المحتجَزُ النقدي
         $deduct = !empty($a['deductible_from_claim']) ? 1 : 0;
         if ($deduct === 1 && $kind !== 'cash_retention') {
             $out['code'] = 422;
-            $out['reason'] = '**«' . self::KIND_AR[$kind] . '» لا يُخصم من مستخلصٍ أبدًا** — '
-                . 'وليس نقدًا محجوزًا حتى يُخصم';
+            $out['reason'] = '**«' . self::KIND_AR[$kind] . '» لا يخصم من مستخلص أبدا** — '
+                . 'وليس نقدا محجوزا حتى يخصم';
             return $out;
         }
         if ($kind === 'cash_retention') { $deduct = 1; }
 
         $amount = round((float) (isset($a['amount']) ? $a['amount'] : 0), 2);
-        if ($amount < 0) { $out['code'] = 422; $out['reason'] = 'قيمةُ الأداة غيرُ سالبة'; return $out; }
+        if ($amount < 0) { $out['code'] = 422; $out['reason'] = 'قيمة الأداة غير سالبة'; return $out; }
         $pct = (isset($a['percent_value']) && trim((string) $a['percent_value']) !== '')
                ? round((float) $a['percent_value'], 3) : null;
         if ($pct !== null && ($pct < 0 || $pct > 100)) {
-            $out['code'] = 422; $out['reason'] = 'النسبةُ في [0,100]'; return $out;
+            $out['code'] = 422; $out['reason'] = 'النسبة في [0,100]'; return $out;
         }
         $expiry = self::dateOrNull(isset($a['expiry_date']) ? $a['expiry_date'] : null);
         $due = self::dateOrNull(isset($a['due_release_date']) ? $a['due_release_date'] : null);
@@ -108,15 +108,15 @@ class ContractGuaranteeService
         if ($kind === 'cash_retention') {
             if ($due === null && $cond === '') {
                 $out['code'] = 422;
-                $out['reason'] = '**المحتجَزُ أصلٌ بذمةٍ مؤجَّلةٍ — فلا بدَّ من تاريخِ ردٍّ أو شرطِه**؛ '
-                    . 'وأصلٌ بلا موعدِ عودةٍ رقمٌ معلَّق';
+                $out['reason'] = '**المحتجز أصل بذمة مؤجلة — فلا بد من تاريخ رد أو شرطه**؛ '
+                    . 'وأصل بلا موعد عودة رقم معلق';
                 return $out;
             }
         } else {
             if ($expiry === null) {
                 $out['code'] = 422;
-                $out['reason'] = '**تاريخُ انتهاء سريان «' . self::KIND_AR[$kind] . '» إلزامي** — '
-                    . 'والتزامٌ محتملٌ بلا أفقٍ يبقى معلَّقًا إلى الأبد';
+                $out['reason'] = '**تاريخ انتهاء سريان «' . self::KIND_AR[$kind] . '» إلزامي** — '
+                    . 'والتزام محتمل بلا أفق يبقى معلقا إلى الأبد';
                 return $out;
             }
         }
@@ -137,13 +137,13 @@ class ContractGuaranteeService
         );
         try { $id = (int) $gate->insert('contract_guarantees', $row); }
         catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر التسجيل: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر التسجيل: ' . $t->getMessage(); return $out;
         }
         self::audit($conn, $companyId, $actor, 'add_guarantee', $id, array(), $row);
         $out['ok'] = true; $out['code'] = 200; $out['id'] = $id;
-        $out['reason'] = 'سُجّل «' . self::KIND_AR[$kind] . '» بقيمة ' . $amount . ' '
+        $out['reason'] = 'سجل «' . self::KIND_AR[$kind] . '» بقيمة ' . $amount . ' '
             . $row['currency'] . ' · **' . self::NATURE_AR[$nature] . '**'
-            . ($deduct ? ' · يُخصم من المستخلص' : ' · **لا يُخصم من مستخلص**');
+            . ($deduct ? ' · يخصم من المستخلص' : ' · **لا يخصم من مستخلص**');
         return $out;
     }
 
@@ -152,17 +152,17 @@ class ContractGuaranteeService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '');
         if (!in_array((string) $state, self::STATES, true)) {
-            $out['code'] = 422; $out['reason'] = 'حالٌ غيرُ معروف'; return $out;
+            $out['code'] = 422; $out['reason'] = 'حال غير معروف'; return $out;
         }
         $g = self::rowOf($gate, (int) $id);
-        if (!$g) { $out['code'] = 404; $out['reason'] = 'الأداةُ غيرُ موجودة'; return $out; }
+        if (!$g) { $out['code'] = 404; $out['reason'] = 'الأداة غير موجودة'; return $out; }
         $reason = trim((string) $reason);
         if (in_array((string) $state, array('released', 'called', 'expired'), true) && $reason === '') {
             $out['code'] = 422;
-            $out['reason'] = '**سببُ الخروج إلزامي** — ولا أداةَ تخرج صامتة'; return $out;
+            $out['reason'] = '**سبب الخروج إلزامي** — ولا أداة تخرج صامتة'; return $out;
         }
         if ((string) $g['state'] === (string) $state) {
-            $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'الحالُ كما هو — فعلٌ عاطل'; return $out;
+            $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'الحال كما هو — فعل عاطل'; return $out;
         }
         try {
             $gate->update('contract_guarantees', array(
@@ -172,12 +172,12 @@ class ContractGuaranteeService
                 'needs_review' => 0,
             ), array('id' => (int) $id));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر التغيير: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر التغيير: ' . $t->getMessage(); return $out;
         }
         self::audit($conn, $companyId, $actor, 'guarantee_state', (int) $id,
             array('state' => $g['state']), array('state' => $state, 'reason' => $reason));
         $out['ok'] = true; $out['code'] = 200;
-        $out['reason'] = 'صار الحالُ «' . self::STATE_AR[(string) $state] . '»';
+        $out['reason'] = 'صار الحال «' . self::STATE_AR[(string) $state] . '»';
         return $out;
     }
 
@@ -195,7 +195,7 @@ class ContractGuaranteeService
                   WHERE {TENANT_SCOPE} AND c.contract_id = ? AND COALESCE(c.is_deleted,0)=0",
                 array((int) $contractId));
             $o['withheld'] = $r ? round((float) $r[0]['s'], 2) : 0.0;
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'لا مستخلصَ = صفر'); /* لا مستخلصَ = صفر */ }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'لا مستخلص = صفر'); /* لا مستخلصَ = صفر */ }
         try {
             $r = $gate->scopedQuery(
                 array('scope' => array('l' => 'claim_lines'), 'enrich' => array('c' => 'claims')),
@@ -204,10 +204,10 @@ class ContractGuaranteeService
                   WHERE {TENANT_SCOPE} AND c.contract_id = ? AND l.source_kind = 'retention_release'",
                 array((int) $contractId));
             $o['released'] = $r ? round((float) $r[0]['s'], 2) : 0.0;
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'لا ردَّ = صفر'); /* لا ردَّ = صفر */ }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'لا رد = صفر'); /* لا ردَّ = صفر */ }
         $o['balance'] = round($o['withheld'] - $o['released'], 2);
-        $o['note'] = 'محتجزٌ ' . $o['withheld'] . ' · مردودٌ ' . $o['released']
-            . ' · **الرصيدُ ' . $o['balance'] . '** — مقروءًا من المستخلصات لا من سجل الضمانات';
+        $o['note'] = 'محتجز ' . $o['withheld'] . ' · مردود ' . $o['released']
+            . ' · **الرصيد ' . $o['balance'] . '** — مقروءا من المستخلصات لا من سجل الضمانات';
         return $o;
     }
 
@@ -232,10 +232,10 @@ class ContractGuaranteeService
         }
         // **الأصلُ رصيدُ المحتجَز الفعليُّ من المستخلصات** لا قيمةَ سطرِ السجل
         $o['asset'] = $bal['balance'];
-        $o['note'] = 'أصلٌ (محتجزٌ نقديٌّ فعليّ) ' . $o['asset']
-            . ' · **والتزامٌ محتملٌ خارج الميزانية** ' . $o['off_balance']
-            . ' — **رقمان لا يُجمعان**'
-            . ($o['expiring'] > 0 ? (' · **' . $o['expiring'] . ' أداةً انقضى سريانُها**') : '');
+        $o['note'] = 'أصل (محتجز نقدي فعلي) ' . $o['asset']
+            . ' · **والتزام محتمل خارج الميزانية** ' . $o['off_balance']
+            . ' — **رقمان لا يجمعان**'
+            . ($o['expiring'] > 0 ? (' · **' . $o['expiring'] . ' أداة انقضى سريانها**') : '');
         return $o;
     }
 

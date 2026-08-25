@@ -75,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'valid_to'              => $_POST['valid_to'] ?? '',
             'note'                  => $_POST['note'] ?? '',
         ), $uid);
-        $redirect($r['ok'] ? 'حُفظت بطاقةُ الطاقة ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $cid);
+        $redirect($r['ok'] ? 'حفظت بطاقة الطاقة ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $cid);
     }
 }
 
@@ -142,9 +142,9 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>';
     }
-    echo ems_states_bundle('لا بطاقاتِ طاقةٍ لهذا العقدِ في الفترة', 'أضف بطاقةَ طاقةٍ لكلِّ معدةٍ مخصَّصة، أو غيّرِ العقدَ والفترة');
+    echo ems_states_bundle('لا بطاقات طاقة لهذا العقد في الفترة', 'أضف بطاقة طاقة لكل معدة مخصصة، أو غير العقد والفترة');
     ?>
-<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('supplier', 'الطاقةُ والجاهزية'); ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('supplier', 'الطاقة والجاهزية'); ?>
 
     <div class="card"><div class="card-body">
                 <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
@@ -153,7 +153,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             <div class="filter-body">
         <form method="get" class="scap-filter">
             <strong>عقد المورد:</strong>
-            <select name="contract_id" onchange="this.form.submit()" class="scap-contract-select" aria-label="اختيارُ عقدِ الموردِ المقيس">
+            <select name="contract_id" onchange="this.form.submit()" class="scap-contract-select" aria-label="اختيار عقد المورد المقيس">
                 <?php foreach ($contracts as $c): ?>
                     <option value="<?php echo intval($c['id']); ?>" <?php echo $selected === intval($c['id']) ? 'selected' : ''; ?>>
                         #<?php echo intval($c['id']); ?> — <?php echo htmlspecialchars((string)($c['supplier_name'] ?? '—')); ?>
@@ -171,19 +171,19 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
         </div>
         <p class="scap-penalty-note">
             <i class="fa fa-triangle-exclamation"></i>
-            <strong>تحذيرُ الأثر على الجزاءات:</strong> ما يُكتب هنا <strong>يفعّل مالًا</strong> —
-            <strong>نسبةُ الجاهزية الدنيا</strong> هي بوابةُ تفعيل جزاء الجاهزية («نقصُها عن الحد التعاقدي
-            يفعّل الجزاءَ بقاعدته» §3)، و<strong>مهلةُ الإحلال</strong> <strong>تنقل</strong> ساعاتِ التوقف
-            الزائدةَ من جزاء الجاهزية إلى <strong>جزاء التغطية الأشد</strong> — نقلًا لا إضافةً:
-            الساعةُ تُجزى مرةً واحدة. والمبلغُ يُحتسب بقاعدة الجزاء المكتوبة، و<strong>بلا قاعدةٍ لا جزاء</strong>.
+            <strong>تحذير الأثر على الجزاءات:</strong> ما يكتب هنا <strong>يفعل مالا</strong> —
+            <strong>نسبة الجاهزية الدنيا</strong> هي بوابة تفعيل جزاء الجاهزية («نقصها عن الحد التعاقدي
+            يفعل الجزاء بقاعدته» §3)، و<strong>مهلة الإحلال</strong> <strong>تنقل</strong> ساعات التوقف
+            الزائدة من جزاء الجاهزية إلى <strong>جزاء التغطية الأشد</strong> — نقلا لا إضافة:
+            الساعة تجزى مرة واحدة. والمبلغ يحتسب بقاعدة الجزاء المكتوبة، و<strong>بلا قاعدة لا جزاء</strong>.
         </p>
     </div></div>
 
     <?php if ($can_add): ?>
-    <div class="card"><div class="card-header"><h5><i class="fa fa-gauge-high"></i> بطاقةُ طاقةٍ لمعدة</h5></div>
+    <div class="card"><div class="card-header"><h5><i class="fa fa-gauge-high"></i> بطاقة طاقة لمعدة</h5></div>
     <div class="card-body">
-        <p class="scap-quote">«لكل معدةٍ مخصَّصةٍ <strong>طاقةٌ نظريةٌ يوميةٌ بنموذجها</strong> …
-            <strong>تُثبَّت في العقد</strong> — ومنها يُقاس أداءُ المورد <strong>لا من تقديرٍ لاحق</strong>» (§3).</p>
+        <p class="scap-quote">«لكل معدة مخصصة <strong>طاقة نظرية يومية بنموذجها</strong> …
+            <strong>تثبت في العقد</strong> — ومنها يقاس أداء المورد <strong>لا من تقدير لاحق</strong>» (§3).</p>
         <form method="post" class="ems-form">
         <?= csrf_field() ?>
             <input type="hidden" name="cap_action" value="capacity">
@@ -210,9 +210,9 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                 </div>
                 <div class="form-group"><label for="emsf_483_91e41">الطاقة النظرية اليومية <span class="scap-req">*</span></label>
                     <input type="number" step="0.01" min="0.01" name="theoretical_daily" required id="emsf_483_91e41"></div>
-                <div class="form-group"><label for="emsf_484_0af35">نسبة الجاهزية الدنيا ٪ <small>— فارغٌ = لم يُشترط (يُعلَن)</small></label>
+                <div class="form-group"><label for="emsf_484_0af35">نسبة الجاهزية الدنيا ٪ <small>— فارغ = لم يشترط (يعلن)</small></label>
                     <input type="number" step="0.01" min="0" max="100" name="min_readiness_percent" id="emsf_484_0af35"></div>
-                <div class="form-group"><label for="emsf_485_75cf7">مهلة الإحلال (ساعات) <small>— فارغٌ = لا مهلةَ مكتوبة</small></label>
+                <div class="form-group"><label for="emsf_485_75cf7">مهلة الإحلال (ساعات) <small>— فارغ = لا مهلة مكتوبة</small></label>
                     <input type="number" step="1" min="1" name="replace_hours" id="emsf_485_75cf7"></div>
                 <div class="form-group"><label for="emsf_486_96b94">سريان من <span class="scap-req">*</span></label>
                     <input type="date" name="valid_from" required id="emsf_486_96b94"></div>
@@ -224,7 +224,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     </div></div>
     <?php endif; ?>
 
-    <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> صفٌّ لكل معدة</h5></div>
+    <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> صف لكل معدة</h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap scap-table">
             <thead><tr><th>نوع المعدة</th><th>النموذج</th><th>الطاقة اليومية</th>
@@ -234,7 +234,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                 <th class="ems-fn-th" data-fn="1">المورد</th>
                 <th class="ems-fn-th" data-fn="1">العقد</th>
                 <th class="ems-fn-th" data-fn="1">الطاقة التعاقدية (وحدات)</th>
-                <th class="ems-fn-th" data-fn="1">الطاقة المفعَّلة</th>
+                <th class="ems-fn-th" data-fn="1">الطاقة المفعلة</th>
                 <th class="ems-fn-th" data-fn="1">متوسط زمن الإحلال</th>
                 <th class="ems-fn-th" data-fn="1">حالات تجاوز المهلة</th>
                 <th class="ems-fn-th" data-fn="1">قيمة الجزاء المستحق</th>
@@ -242,27 +242,27 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                 <th class="ems-fn-th" data-fn="1">نسخة القاعدة المستعملة</th>
                 <th class="ems-fn-th" data-fn="1">الفترة</th>
                 <th class="ems-fn-th" data-fn="1">الوحدات المتعاقدة</th>
-                <th class="ems-fn-th" data-fn="1">الوحدات المفعَّلة</th>
+                <th class="ems-fn-th" data-fn="1">الوحدات المفعلة</th>
                 <th class="ems-fn-th" data-fn="1">فجوة التغطية</th>
                 <th class="ems-fn-th none" data-fn="1">الساعات التعاقدية</th>
-                <th class="ems-fn-th none" data-fn="1">الساعات المنفَّذة</th>
+                <th class="ems-fn-th none" data-fn="1">الساعات المنفذة</th>
                 <th class="ems-fn-th none" data-fn="1">المستهدف</th>
                 <th class="ems-fn-th none" data-fn="1">العجز</th>
                 <th class="ems-fn-th none" data-fn="1">حالات تأخر الإحلال</th>
                 <th class="ems-fn-th none" data-fn="1">قيمة الجزاء</th>
                 <th class="ems-fn-th none" data-fn="1">التقييم العام</th>
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                 <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                 <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                 <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-                <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+                <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
                 <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-                <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+                <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
                 <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
-                <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
+                <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
                 <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                 <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                 <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
@@ -276,10 +276,10 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     <td><?php echo htmlspecialchars((string)$r['theoretical_daily']); ?></td>
                     <td><?php echo $r['min_readiness_percent'] !== null
                         ? htmlspecialchars((string)$r['min_readiness_percent']) . '٪'
-                        : '<span class="badge badge-warning">لم يُشترط — لا جزاءَ جاهزية</span>'; ?></td>
+                        : '<span class="badge badge-warning">لم يشترط — لا جزاء جاهزية</span>'; ?></td>
                     <td><?php echo $r['replace_hours'] !== null
                         ? htmlspecialchars((string)$r['replace_hours']) . ' ساعة'
-                        : '<span class="badge badge-secondary">بلا مهلةٍ مكتوبة</span>'; ?></td>
+                        : '<span class="badge badge-secondary">بلا مهلة مكتوبة</span>'; ?></td>
                     <td><?php echo htmlspecialchars((string)$r['valid_from']); ?>
                         → <?php echo htmlspecialchars((string)($r['valid_to'] ?? 'مفتوح')); ?></td>
                     <td><?php echo (string)$r['state'] === 'active'
@@ -293,12 +293,12 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     </div></div></div>
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-chart-line"></i>
-        قياسُ الجاهزية <?php echo htmlspecialchars($mFrom); ?> → <?php echo htmlspecialchars($mTo); ?></h5></div>
+        قياس الجاهزية <?php echo htmlspecialchars($mFrom); ?> → <?php echo htmlspecialchars($mTo); ?></h5></div>
     <div class="card-body">
         <p class="scap-quote">
-            الجاهزية٪ = <strong>(الزمنُ المخطط − زمنُ عدمِ الصلاحية) ÷ الزمنِ المخطط</strong> —
-            تُقرأ من <strong>سجل الزمن الموحّد</strong> (§3). والزمنُ المخطط يستثني الوقفةَ المخططةَ والقوةَ
-            القاهرة، وغيرُ المسجَّل <strong>يُعلَن عددًا مستقلًّا</strong> ولا يُطرح صامتًا.
+            الجاهزية٪ = <strong>(الزمن المخطط − زمن عدم الصلاحية) ÷ الزمن المخطط</strong> —
+            تقرأ من <strong>سجل الزمن الموحد</strong> (§3). والزمن المخطط يستثني الوقفة المخططة والقوة
+            القاهرة، وغير المسجل <strong>يعلن عددا مستقلا</strong> ولا يطرح صامتا.
         </p>
         <div class="scap-badges">
             <div class="badge scap-badge-lg <?php echo ($measure['readiness'] !== null && $measure['contract_min'] !== null
@@ -317,10 +317,10 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                 غير صالح للعمل: <?php echo htmlspecialchars((string)$measure['unfit_hours']); ?> ساعة
             </div>
             <div class="badge badge-warning scap-badge-lg">
-                نُقل إلى التغطية: <?php echo htmlspecialchars((string)$measure['coverage_hours']); ?> ساعة
+                نقل إلى التغطية: <?php echo htmlspecialchars((string)$measure['coverage_hours']); ?> ساعة
             </div>
             <div class="badge badge-warning scap-badge-lg">
-                غير مسجَّل: <?php echo htmlspecialchars((string)$measure['unlogged_hours']); ?> ساعة
+                غير مسجل: <?php echo htmlspecialchars((string)$measure['unlogged_hours']); ?> ساعة
             </div>
         </div>
         <?php foreach ($measure['notes'] as $n): ?>
@@ -328,8 +328,8 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
         <?php endforeach; ?>
         <div class="table-container">
         <table class="alltables display nowrap scap-table">
-            <thead><tr><th>المعدة</th><th>الزمن المخطط</th><th>غير صالح</th><th>نُقل للتغطية</th>
-                <th>غير مسجَّل</th><th>الجاهزية الفعلية</th><th>الحد</th><th>النوب</th></tr></thead>
+            <thead><tr><th>المعدة</th><th>الزمن المخطط</th><th>غير صالح</th><th>نقل للتغطية</th>
+                <th>غير مسجل</th><th>الجاهزية الفعلية</th><th>الحد</th><th>النوب</th></tr></thead>
             <tbody>
             <?php foreach ($measure['equipment'] as $m): ?>
                 <tr>
@@ -350,7 +350,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                         $eps = array();
                         foreach ($m['episodes'] as $ep) {
                             $eps[] = $ep['from'] . '→' . $ep['to'] . ': ' . $ep['hours'] . 'س'
-                                   . ($ep['converted'] > 0 ? (' (نُقل ' . $ep['converted'] . ')') : '');
+                                   . ($ep['converted'] > 0 ? (' (نقل ' . $ep['converted'] . ')') : '');
                         }
                         echo htmlspecialchars($eps ? implode(' · ', $eps) : '—');
                     ?></small></td>

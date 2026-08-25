@@ -78,11 +78,11 @@ require_once __DIR__ . '/includes/layout_head.php';
 <div class="phead">
     <div>
         <h2>مراقبة ناقل الأحداث</h2>
-        <p class="sub">صحّة الناقل ومقياس التأخّر (exactly-once) — قرائيّ، لا يمسّ الناشر/الموزّع (A-2 · C7)</p>
+        <p class="sub">صحة الناقل ومقياس التأخر (exactly-once) — قرائي، لا يمس الناشر/الموزع (A-2 · C7)</p>
     </div>
     <div class="phead-right">
         <span class="badge <?php echo $health === 'ok' ? 'badge-green' : ($health === 'err' ? 'badge-red' : 'badge-amber'); ?>">
-            <?php echo $health === 'ok' ? '● سليم' : ($health === 'err' ? '● رسائل ميتة' : '● تأخّر قائم'); ?>
+            <?php echo $health === 'ok' ? '● سليم' : ($health === 'err' ? '● رسائل ميتة' : '● تأخر قائم'); ?>
         </span>
     </div>
 </div>
@@ -97,7 +97,7 @@ require_once __DIR__ . '/includes/layout_head.php';
         <div class="stat-ico"><i class="fas fa-satellite-dish"></i></div>
     </div></div>
     <div class="stat-card hex-stat-card <?php echo $max_lag === 0 ? 'hex-stat-green' : 'hex-stat-orange'; ?>"><div class="stat-row">
-        <div><div class="stat-val"><?php echo number_format($max_lag); ?></div><div class="stat-lbl">أقصى تأخّر (backlog)</div></div>
+        <div><div class="stat-val"><?php echo number_format($max_lag); ?></div><div class="stat-lbl">أقصى تأخر (backlog)</div></div>
         <div class="stat-ico"><i class="fas fa-hourglass-half"></i></div>
     </div></div>
     <div class="stat-card hex-stat-card <?php echo $dlq === 0 ? 'hex-stat-green' : 'hex-stat-red'; ?>"><div class="stat-row">
@@ -109,25 +109,25 @@ require_once __DIR__ . '/includes/layout_head.php';
         <div class="stat-ico"><i class="fas fa-paper-plane"></i></div>
     </div></div>
     <div class="stat-card hex-stat-card hex-stat-blue"><div class="stat-row">
-        <div><div class="stat-val"><?php echo number_format($processed); ?></div><div class="stat-lbl">عطالة موزّعة (processed)</div></div>
+        <div><div class="stat-val"><?php echo number_format($processed); ?></div><div class="stat-lbl">عطالة موزعة (processed)</div></div>
         <div class="stat-ico"><i class="fas fa-fingerprint"></i></div>
     </div></div>
 </div>
 
 <div class="card" style="margin-top:16px">
-    <div class="card-h"><i class="fas fa-users-gear"></i> المستهلكون وتأخّر كلٍّ</div>
+    <div class="card-h"><i class="fas fa-users-gear"></i> المستهلكون وتأخر كل</div>
     <div class="card-b" style="overflow-x:auto">
         <table class="tbl" style="width:100%">
-            <thead><tr><th>المستهلك</th><th>مفعَّل</th><th>المؤشّر (cursor)</th><th>التأخّر (أحداث بعده)</th><th>آخر تحديث</th></tr></thead>
+            <thead><tr><th>المستهلك</th><th>مفعل</th><th>المؤشر (cursor)</th><th>التأخر (أحداث بعده)</th><th>آخر تحديث</th></tr></thead>
             <tbody>
             <?php if (empty($consumers)): ?>
-                <tr><td colspan="5" style="text-align:center;color:var(--muted)">لا مستهلكون مسجَّلون بعد</td></tr>
+                <tr><td colspan="5" style="text-align:center;color:var(--muted)">لا مستهلكون مسجلون بعد</td></tr>
             <?php else: foreach ($consumers as $c): ?>
                 <tr>
                     <td><strong><?php echo htmlspecialchars($c['consumer']); ?></strong></td>
                     <td><?php echo $c['enabled'] ? '<span class="badge badge-green">نعم</span>' : '<span class="badge badge-red">لا</span>'; ?></td>
                     <td><?php echo (int) $c['cursor_event_id']; ?></td>
-                    <td><?php echo $c['lag'] === 0 ? '<span class="badge badge-green">0 — محدّث</span>' : '<span class="badge badge-amber">' . (int) $c['lag'] . '</span>'; ?></td>
+                    <td><?php echo $c['lag'] === 0 ? '<span class="badge badge-green">0 — محدث</span>' : '<span class="badge badge-amber">' . (int) $c['lag'] . '</span>'; ?></td>
                     <td><?php echo htmlspecialchars((string) ($c['updated_at'] ?? '—')); ?></td>
                 </tr>
             <?php endforeach; endif; ?>
@@ -161,9 +161,9 @@ require_once __DIR__ . '/includes/layout_head.php';
 <div class="card" style="margin-top:16px">
     <div class="card-h"><i class="fas fa-circle-info"></i> ملاحظات التشغيل</div>
     <div class="card-b" style="font-size:.86rem;line-height:1.9">
-        <p><strong>ضمان «مرّة واحدة بالضبط»</strong> قائمٌ بالمؤشّر (<code>cursor_event_id</code>) + جدول التسليمات (<code>ems_event_deliveries</code>) + الرسائل الميتة. جدول <code>ems_processed_events</code> عطالةٌ موزّعةٌ احتياطية تُفعَّل عند تعدّد الموزّعات.</p>
-        <p><strong>المُصالِح</strong> (في <code>cron_events.php</code>) يعيد نشر الأحداث الفائتة ويرصد اليتيمة في كل دورة. <strong>الجدولة المقترحة</strong>: مهمة نظام التشغيل كل دقيقة — <code>php <?php echo dirname(__DIR__); ?>/cron_events.php</code> (أو عبر مفتاح <code>?key=</code> من .env).</p>
-        <p><strong>التأخّر (backlog)</strong> = عدد أحداث الدفتر الأحدث من مؤشّر المستهلك؛ صفرٌ = محدَّث. أيّ رسالةٍ ميتة = تدخّلٌ يدويّ (فحص <code>last_error</code>).</p>
+        <p><strong>ضمان «مرة واحدة بالضبط»</strong> قائم بالمؤشر (<code>cursor_event_id</code>) + جدول التسليمات (<code>ems_event_deliveries</code>) + الرسائل الميتة. جدول <code>ems_processed_events</code> عطالة موزعة احتياطية تفعل عند تعدد الموزعات.</p>
+        <p><strong>المصالح</strong> (في <code>cron_events.php</code>) يعيد نشر الأحداث الفائتة ويرصد اليتيمة في كل دورة. <strong>الجدولة المقترحة</strong>: مهمة نظام التشغيل كل دقيقة — <code>php <?php echo dirname(__DIR__); ?>/cron_events.php</code> (أو عبر مفتاح <code>?key=</code> من .env).</p>
+        <p><strong>التأخر (backlog)</strong> = عدد أحداث الدفتر الأحدث من مؤشر المستهلك؛ صفر = محدث. أي رسالة ميتة = تدخل يدوي (فحص <code>last_error</code>).</p>
     </div>
 </div>
 

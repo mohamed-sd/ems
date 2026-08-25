@@ -29,15 +29,15 @@ $since = date('Y-m-d', strtotime('-7 days'));
 $today = date('Y-m-d');
 
 $lines = array();
-$lines[] = '# تقريرُ مطابقة بوابة الحصص — أسبوع ' . $since . ' → ' . $today;
+$lines[] = '# تقرير مطابقة بوابة الحصص — أسبوع ' . $since . ' → ' . $today;
 $lines[] = '';
-$lines[] = '> H-01-③ · شرطُ PLAN-01 §13-①: يقارن ما رُفض (أو ما كان سيُرفض تحت الرصد) بما مرّ — والتعميمُ/قلبُ enforce بعد أسبوعٍ نظيف.';
+$lines[] = '> H-01-③ · شرط PLAN-01 §13-①: يقارن ما رفض (أو ما كان سيرفض تحت الرصد) بما مر — والتعميم/قلب enforce بعد أسبوع نظيف.';
 $lines[] = '';
-$lines[] = '- **العلَم:** `EMS_CONTAINER_GATE=' . ($sites ? implode(',', $sites) : '(فارغ)') . '` · **الوضع:** ' . $mode;
+$lines[] = '- **العلم:** `EMS_CONTAINER_GATE=' . ($sites ? implode(',', $sites) : '(فارغ)') . '` · **الوضع:** ' . $mode;
 $lines[] = '';
 
 if (!$sites) {
-    $lines[] = '**البوابةُ مطفأة** — لا مشاريعَ مفعَّلة، ولا شيءَ يُطابَق.';
+    $lines[] = '**البوابة مطفأة** — لا مشاريع مفعلة، ولا شيء يطابق.';
 } else {
     foreach ($sites as $pid) {
         $pid = (int) $pid;
@@ -74,17 +74,17 @@ if (!$sites) {
         $lines[] = '';
         $lines[] = '| القياس | العدد |';
         $lines[] = '|---|---|';
-        $lines[] = '| وحداتٌ سُجّلت في الأسبوع (مرّت) | ' . $entries . ' |';
-        $lines[] = '| محاولاتٌ ' . ($mode === 'monitor' ? 'كانت ستُحجب (رصد)' : 'حُجبت') . ' | ' . $blockTotal . ' |';
+        $lines[] = '| وحدات سجلت في الأسبوع (مرت) | ' . $entries . ' |';
+        $lines[] = '| محاولات ' . ($mode === 'monitor' ? 'كانت ستحجب (رصد)' : 'حجبت') . ' | ' . $blockTotal . ' |';
         foreach ($blocks as $kind => $n) {
-            $label = array('no_operator' => 'معدةٌ بلا مشغّل', 'no_container' => 'حاويةٌ ناقصة',
-                           'no_rotation' => 'مشغّلٌ بلا دورة تناوب')[$kind] ?? $kind;
+            $label = array('no_operator' => 'معدة بلا مشغل', 'no_container' => 'حاوية ناقصة',
+                           'no_rotation' => 'مشغل بلا دورة تناوب')[$kind] ?? $kind;
             $lines[] = '| — منها: ' . $label . ' | ' . $n . ' |';
         }
         $lines[] = '';
         $lines[] = $blockTotal === 0
-            ? '**أسبوعٌ نظيف** — صفرُ ما كان سيُحجب' . ($mode === 'monitor' ? ' ⇒ شرطُ قلب `enforce` مستوفًى (N-04 §2-④)' : '') . '.'
-            : '**ليس نظيفًا بعد** — عالج الأسبابَ أعلاه (الدوراتُ من شاشة الحاويات · التوزيعُ منها) قبل قلب `enforce`.';
+            ? '**أسبوع نظيف** — صفر ما كان سيحجب' . ($mode === 'monitor' ? ' ⇒ شرط قلب `enforce` مستوفى (N-04 §2-④)' : '') . '.'
+            : '**ليس نظيفا بعد** — عالج الأسباب أعلاه (الدورات من شاشة الحاويات · التوزيع منها) قبل قلب `enforce`.';
         $lines[] = '';
     }
 }
@@ -93,5 +93,5 @@ $dir = dirname(__DIR__) . '/docs/reports';
 if (!is_dir($dir)) { mkdir($dir, 0755, true); }
 $path = $dir . '/CONTAINER_GATE_WEEK_' . str_replace('-', '', $today) . '.md';
 file_put_contents($path, implode("\n", $lines) . "\n");
-fwrite(STDOUT, "كُتب التقرير: {$path}\n");
+fwrite(STDOUT, "كتب التقرير: {$path}\n");
 exit(0);

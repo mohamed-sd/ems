@@ -43,7 +43,7 @@ class PolicyResolver
         }
         if (!$policy) {
             $out['code'] = 422;
-            $out['reason'] = 'لا سياسةَ نافذةً مطابقةً لإدارة «' . $domain . '» في ' . $onDate . ' — **ولا يُفترض شيء**';
+            $out['reason'] = 'لا سياسة نافذة مطابقة لإدارة «' . $domain . '» في ' . $onDate . ' — **ولا يفترض شيء**';
             return $out;
         }
         $pid = intval($policy['policy_id']);
@@ -71,7 +71,7 @@ class PolicyResolver
         $stmt->close();
         if (!$row) {
             return array('ok' => false, 'code' => 422,
-                'reason' => 'الحالة «' . $stateCode . '» ليست في مصفوفة أثر السياسة للطرف «' . $partyType . '» — تُرفض ولا يُستنتج أثرها');
+                'reason' => 'الحالة «' . $stateCode . '» ليست في مصفوفة أثر السياسة للطرف «' . $partyType . '» — ترفض ولا يستنتج أثرها');
         }
         return array('ok' => true, 'code' => 200, 'effect' => (string) $row['effect']);
     }

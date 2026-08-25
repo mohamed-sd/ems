@@ -50,16 +50,16 @@ enforce_current_page_view_permission($conn, '../main/dashboard.php');
 $PERM = check_page_permissions($conn, 'Operations/shift_entry.php');
 if (empty($PERM['can_view'])) {
     http_response_code(403);
-    echo '<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>'
+    echo '<?php /* نقلت أنماط هذه الشاشة إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفر نمط محلي) */ ?>'
        . '<div dir="rtl" class="se-deny">'
-       . 'لا تملك صلاحيةَ فتحِ شاشةِ قيدِ الوردية — راجِعْ مديرَك.</div>';
+       . 'لا تملك صلاحية فتح شاشة قيد الوردية — راجع مديرك.</div>';
     exit();
 }
 if (!$is_super_admin && $company_id <= 0) {
     http_response_code(403);
     echo ''
        . '<div dir="rtl" class="se-deny">'
-       . 'جلستُك بلا كيانٍ محدَّد — سجّلْ خروجًا ثم دخولًا، فإن تكرّر راجِعْ مديرَك.</div>';
+       . 'جلستك بلا كيان محدد — سجل خروجا ثم دخولا، فإن تكرر راجع مديرك.</div>';
     exit();
 }
 
@@ -75,11 +75,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $act = isset($_POST['action']) ? trim((string) $_POST['action']) : '';
 
     if (!verify_csrf_token(isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '')) {
-        $flash = ['kind' => 'err', 'text' => 'انتهت صلاحيةُ الصفحة. أعِدْ تحميلَها ثم احفظْ من جديد.'];
+        $flash = ['kind' => 'err', 'text' => 'انتهت صلاحية الصفحة. أعد تحميلها ثم احفظ من جديد.'];
     } elseif ($act === 'record') {
         if (!$CAN_RECORD) {
             http_response_code(403);
-            $flash = ['kind' => 'err', 'text' => 'لا تملك صلاحيةَ تسجيلِ قيدِ الوردية — راجِعْ مديرَك.'];
+            $flash = ['kind' => 'err', 'text' => 'لا تملك صلاحية تسجيل قيد الوردية — راجع مديرك.'];
         } else {
             $formOld = $_POST;
             /* الحقولُ الإلزاميةُ تُفحص هنا بأسمائِها العربيةِ قبلَ نداءِ الخدمة،
@@ -88,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'entry_date'   => 'التاريخ',
                 'equipment_id' => 'الآلية',
                 'shift'        => 'الوردية',
-                'qty'          => 'الكمية المنفَّذة',
+                'qty'          => 'الكمية المنفذة',
                 'unit_type'    => 'وحدة القياس',
             ];
             $missingAr = [];
@@ -110,17 +110,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'cause_note' => isset($hn[$i]) ? trim((string) $hn[$i]) : '',
                 ];
             }
-            if (!$hoursRows) { $missingAr[] = 'توزيعُ ساعاتِ الوردية (سطرٌ واحدٌ على الأقل)'; }
+            if (!$hoursRows) { $missingAr[] = 'توزيع ساعات الوردية (سطر واحد على الأقل)'; }
 
             $sumH = 0.0;
             foreach ($hoursRows as $r) { $sumH += $r['hours']; }
             if ($sumH > 24) {
-                $missingAr[] = 'مجموعُ الساعات ' . number_format($sumH, 2) . ' ساعة — واليومُ ٢٤ ساعة';
+                $missingAr[] = 'مجموع الساعات ' . number_format($sumH, 2) . ' ساعة — واليوم ٢٤ ساعة';
             }
 
             if ($missingAr) {
                 $flash = ['kind' => 'warn',
-                          'text' => 'لم يُحفظ. أكمِلْ أولًا: ' . implode(' · ', $missingAr)];
+                          'text' => 'لم يحفظ. أكمل أولا: ' . implode(' · ', $missingAr)];
             } else {
                 require_once __DIR__ . '/../app/Services/Unit/TimesheetEntryService.php';
                 $gate = ems_tenant_db();
@@ -148,38 +148,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if (!empty($res['ok']) && !empty($res['existing'])) {
                     $flash = ['kind' => 'warn',
-                              'text' => 'هذا القيدُ مسجَّلٌ سلفًا لهذه الآليةِ في هذه الورديةِ من هذا اليوم — لم يُضَفْ قيدٌ ثانٍ.',
+                              'text' => 'هذا القيد مسجل سلفا لهذه الآلية في هذه الوردية من هذا اليوم — لم يضف قيد ثان.',
                               'ref'  => $res['entry']['entry_no'] ?? null];
                 } elseif (!empty($res['ok'])) {
-                    $flash = ['kind' => 'ok', 'text' => 'حُفظ القيدُ وأُرسل للمراجعة.',
+                    $flash = ['kind' => 'ok', 'text' => 'حفظ القيد وأرسل للمراجعة.',
                               'ref'  => $res['entry']['entry_no'] ?? null];
                     $formOld = [];
                 } else {
-                    $why = !empty($res['missing']) ? implode(' · ', (array) $res['missing']) : 'سببٌ غيرُ معلوم';
-                    $flash = ['kind' => 'err', 'text' => 'لم يُحفظ — ' . $why];
+                    $why = !empty($res['missing']) ? implode(' · ', (array) $res['missing']) : 'سبب غير معلوم';
+                    $flash = ['kind' => 'err', 'text' => 'لم يحفظ — ' . $why];
                 }
             }
         }
     } elseif ($act === 'void') {
         if (!$CAN_VOID) {
             http_response_code(403);
-            $flash = ['kind' => 'err', 'text' => 'لا تملك صلاحيةَ إلغاءِ القيود — راجِعْ مديرَك.'];
+            $flash = ['kind' => 'err', 'text' => 'لا تملك صلاحية إلغاء القيود — راجع مديرك.'];
         } else {
             $vid    = (int) ($_POST['entry_id'] ?? 0);
             $reason = trim((string) ($_POST['void_reason'] ?? ''));
             if ($vid <= 0 || $reason === '') {
-                $flash = ['kind' => 'warn', 'text' => 'لم يُلغَ. اختَرِ القيدَ واكتبْ سببَ الإلغاء.'];
+                $flash = ['kind' => 'warn', 'text' => 'لم يلغ. اختر القيد واكتب سبب الإلغاء.'];
             } else {
                 require_once __DIR__ . '/../app/Services/Unit/TimesheetEntryService.php';
                 $vres = \App\Services\Unit\TimesheetEntryService::voidEntry(
                     $conn, ems_tenant_db(), $company_id, $vid, $reason, $uid);
                 if (!empty($vres['ok'])) {
                     $flash = ['kind' => 'ok',
-                              'text' => 'أُلغي القيدُ بحركةٍ عاكسة — ولم يُحذف. والخانةُ صارت متاحةً لقيدٍ بديل.',
+                              'text' => 'ألغي القيد بحركة عاكسة — ولم يحذف. والخانة صارت متاحة لقيد بديل.',
                               'ref'  => 'REV-' . str_pad((string) $vres['void_entry_id'], 6, '0', STR_PAD_LEFT)];
                 } else {
                     $flash = ['kind' => 'err',
-                              'text' => 'لم يُلغَ — ' . implode(' · ', (array) ($vres['reasons'] ?? []))];
+                              'text' => 'لم يلغ — ' . implode(' · ', (array) ($vres['reasons'] ?? []))];
                 }
             }
         }
@@ -206,7 +206,7 @@ if ($st) {
     while ($x = $rs->fetch_assoc()) { $equipments[] = $x; }
     $st->close();
 } else {
-    error_log('shift_entry: تعذّر تحضيرُ استعلامِ الآليات — ' . $conn->error);
+    error_log('shift_entry: تعذر تحضير استعلام الآليات — ' . $conn->error);
 }
 
 /* قيودُ اليومِ الجاريةِ — لعرضِ ما سُجِّل حتى الآن */
@@ -228,7 +228,7 @@ if ($st) {
     while ($x = $rs->fetch_assoc()) { $todayRows[] = $x; }
     $st->close();
 } else {
-    error_log('shift_entry: تعذّر تحضيرُ استعلامِ قيودِ اليوم — ' . $conn->error);
+    error_log('shift_entry: تعذر تحضير استعلام قيود اليوم — ' . $conn->error);
 }
 
 /* الحالاتُ العشرُ من التعدادِ الحيِّ لا من قائمةٍ مكتوبةٍ يدويًّا */
@@ -240,18 +240,18 @@ if ($rs && ($ct = $rs->fetch_row())) {
     if (preg_match_all("/'([^']+)'/", $ct[0], $m)) { $OPS_STATES = $m[1]; }
 }
 $OPS_AR = [
-    'actual_work' => 'تشغيلٌ فعلي', 'standby' => 'استعداد', 'tech_breakdown' => 'تعطلٌ فني',
-    'supplier_stop' => 'توقفٌ بسبب المورد', 'operator_stop' => 'توقفٌ بسبب المشغّل',
-    'client_stop' => 'توقفٌ بسبب العميل', 'fuel_logistics_stop' => 'توقفٌ وقودٍ أو نقل',
-    'planned_stop' => 'توقفٌ مخطَّط', 'force_majeure' => 'قوةٌ قاهرة', 'unlogged' => 'غيرُ مسجَّل',
+    'actual_work' => 'تشغيل فعلي', 'standby' => 'استعداد', 'tech_breakdown' => 'تعطل فني',
+    'supplier_stop' => 'توقف بسبب المورد', 'operator_stop' => 'توقف بسبب المشغل',
+    'client_stop' => 'توقف بسبب العميل', 'fuel_logistics_stop' => 'توقف وقود أو نقل',
+    'planned_stop' => 'توقف مخطط', 'force_majeure' => 'قوة قاهرة', 'unlogged' => 'غير مسجل',
 ];
 $PARTY_AR = ['company' => 'الشركة', 'client' => 'العميل', 'supplier' => 'المورد',
-             'operator' => 'المشغّل', 'planned' => 'مخطَّط', 'force_majeure' => 'قوةٌ قاهرة', 'none' => 'لا طرف'];
+             'operator' => 'المشغل', 'planned' => 'مخطط', 'force_majeure' => 'قوة قاهرة', 'none' => 'لا طرف'];
 /* لونُ الشارةِ صنفُ CSS من كتلةِ الشاشة (UXW-01 بوابة ١) — لا لونَ حرفيًّا في PHP */
-$STATE_AR = ['draft' => ['مسوَّدة', 'se-b-muted'], 'submitted' => ['بانتظار اعتماد الموقع', 'se-b-warn'],
-             'site_approved' => ['اعتمدها الموقع', 'se-b-ok'], 'parties_review' => ['مراجعةُ الأطراف', 'se-b-warn'],
+$STATE_AR = ['draft' => ['مسودة', 'se-b-muted'], 'submitted' => ['بانتظار اعتماد الموقع', 'se-b-warn'],
+             'site_approved' => ['اعتمدها الموقع', 'se-b-ok'], 'parties_review' => ['مراجعة الأطراف', 'se-b-warn'],
              'parties_approved' => ['اعتمدها الأطراف', 'se-b-ok'], 'sales_approved' => ['اعتمدتها المبيعات', 'se-b-ok'],
-             'returned' => ['أُعيد للموقع', 'se-b-err'], 'converted' => ['حُوِّل', 'se-b-ok']];
+             'returned' => ['أعيد للموقع', 'se-b-err'], 'converted' => ['حول', 'se-b-ok']];
 
 $old = function (string $k, $d = '') use ($formOld) {
     return isset($formOld[$k]) ? htmlspecialchars((string) $formOld[$k], ENT_QUOTES, 'UTF-8') : $d;
@@ -266,7 +266,7 @@ $old = function (string $k, $d = '') use ($formOld) {
 /* `$page_title` قبلَ القشرةِ لا بعدَها: `inheader.php` يقرؤه في السطر 39، وكان
    غائبًا فيُسجَّل تحذيرُ «متغيّرٌ غيرُ معرَّف» في **كلِّ** فتحةِ صفحة (مقيسٌ في
    السجلِّ منذ 06:45)، ويخرج عنوانُ التبويبِ فارغًا. */
-$page_title = 'إيكوبيشن | قيدُ الوردية اليومي';
+$page_title = 'إيكوبيشن | قيد الوردية اليومي';
 require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(null);
 include '../inheader.php';
@@ -275,7 +275,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main ems-unified-page-shell ems-doc-cycle" dir="rtl">
 <?php
-$header_title   = 'قيدُ الوردية اليومي';
+$header_title   = 'قيد الوردية اليومي';
 $header_icon    = 'fa fa-clipboard-check';
 $header_actions = array();
 $header_back    = array('href' => '../main/dashboard.php', 'class' => '',
@@ -283,21 +283,21 @@ $header_back    = array('href' => '../main/dashboard.php', 'class' => '',
 include __DIR__ . '/../includes/page_header.php';
 
 /* بوابة ١٢: قيدُ الورديةِ دورةٌ مستندية — خطوتُها التالية مُعلَنة */
-echo ems_next_step('مراجعةُ الموقعِ واعتمادُ القيدِ المُرسَل');
+echo ems_next_step('مراجعة الموقع واعتماد القيد المرسل');
 /* حزمةُ الحالاتِ الدنيا (بوابة ٩) — مخفيةٌ افتراضًا ويُظهرها منطقُ الشاشة */
-echo ems_states_bundle('لم يُسجَّل قيدُ ورديةٍ بعدُ', 'ابدأ بنموذجِ القيدِ أعلى الشاشة');
+echo ems_states_bundle('لم يسجل قيد وردية بعد', 'ابدأ بنموذج القيد أعلى الشاشة');
 ?>
 
 <?php if ($flash): ?>
     <div class="alert alert-<?= $flash['kind'] === 'ok' ? 'success' : ($flash['kind'] === 'warn' ? 'warning' : 'danger') ?>">
       <span><?= htmlspecialchars($flash['text'], ENT_QUOTES, 'UTF-8') ?><?php
-        if (!empty($flash['ref'])): ?> — رقمُ القيد: <strong><?= htmlspecialchars((string) $flash['ref'], ENT_QUOTES, 'UTF-8') ?></strong><?php endif; ?></span>
+        if (!empty($flash['ref'])): ?> — رقم القيد: <strong><?= htmlspecialchars((string) $flash['ref'], ENT_QUOTES, 'UTF-8') ?></strong><?php endif; ?></span>
     </div>
 <?php endif; ?>
 
 <?php if (!$CAN_RECORD): ?>
     <div class="alert alert-warning">
-      <span>تستطيع الاطّلاعَ ولا تستطيع التسجيل. لا تملك صلاحيةَ تسجيلِ قيدِ الوردية.</span>
+      <span>تستطيع الاطلاع ولا تستطيع التسجيل. لا تملك صلاحية تسجيل قيد الوردية.</span>
     </div>
 <?php endif; ?>
 
@@ -307,12 +307,12 @@ echo ems_states_bundle('لم يُسجَّل قيدُ ورديةٍ بعدُ', 'ا
     <?= csrf_field() ?>
     <input type="hidden" name="action" value="record">
     <div class="card">
-      <div class="card-header"><h5><i class="fa fa-clipboard-check"></i> قيدُ الوردية اليومي</h5></div>
+      <div class="card-header"><h5><i class="fa fa-clipboard-check"></i> قيد الوردية اليومي</h5></div>
       <div class="card-body">
         <div class="alert alert-info">
           <i class="fa fa-circle-info"></i>
-          <span>سجّلْ سطرًا واحدًا لكلِّ آليةٍ في كلِّ ورديةٍ في كلِّ يوم.
-            الحقولُ الموسومةُ <span class="se-req">*</span> إلزاميةٌ قبلَ الحفظ.</span>
+          <span>سجل سطرا واحدا لكل آلية في كل وردية في كل يوم.
+            الحقول الموسومة <span class="se-req">*</span> إلزامية قبل الحفظ.</span>
         </div>
 
         <div class="form-grid">
@@ -339,8 +339,8 @@ echo ems_states_bundle('لم يُسجَّل قيدُ ورديةٍ بعدُ', 'ا
             </select>
           </div>
           <div class="form-group">
-            <label for="se_qty">الكمية المنفَّذة <span class="se-req">*</span></label>
-            <input type="number" step="0.01" min="0" name="qty" id="se_qty" aria-label="الكمية المنفَّذة" value="<?= $old('qty') ?>" required>
+            <label for="se_qty">الكمية المنفذة <span class="se-req">*</span></label>
+            <input type="number" step="0.01" min="0" name="qty" id="se_qty" aria-label="الكمية المنفذة" value="<?= $old('qty') ?>" required>
           </div>
           <div class="form-group">
             <label for="se_unit">وحدة القياس <span class="se-req">*</span></label>
@@ -352,32 +352,32 @@ echo ems_states_bundle('لم يُسجَّل قيدُ ورديةٍ بعدُ', 'ا
             </select>
           </div>
           <div class="form-group">
-            <label for="se_mb">قراءةُ العدّادِ قبل <span class="se-unit">(ساعة عدّاد)</span></label>
-            <input type="number" step="0.01" min="0" name="meter_before" id="se_mb" aria-label="قراءةُ العدّادِ قبل" value="<?= $old('meter_before') ?>">
+            <label for="se_mb">قراءة العداد قبل <span class="se-unit">(ساعة عداد)</span></label>
+            <input type="number" step="0.01" min="0" name="meter_before" id="se_mb" aria-label="قراءة العداد قبل" value="<?= $old('meter_before') ?>">
           </div>
           <div class="form-group">
-            <label for="se_ma">قراءةُ العدّادِ بعد <span class="se-unit">(ساعة عدّاد)</span></label>
-            <input type="number" step="0.01" min="0" name="meter_after" id="se_ma" aria-label="قراءةُ العدّادِ بعد" value="<?= $old('meter_after') ?>">
+            <label for="se_ma">قراءة العداد بعد <span class="se-unit">(ساعة عداد)</span></label>
+            <input type="number" step="0.01" min="0" name="meter_after" id="se_ma" aria-label="قراءة العداد بعد" value="<?= $old('meter_after') ?>">
           </div>
           <div class="form-group">
-            <label for="se_fr">وقودٌ مستلَم <span class="se-unit">(لتر)</span></label>
-            <input type="number" step="0.01" min="0" name="fuel_received_qty" id="se_fr" aria-label="وقودٌ مستلَم باللتر" value="<?= $old('fuel_received_qty') ?>">
+            <label for="se_fr">وقود مستلم <span class="se-unit">(لتر)</span></label>
+            <input type="number" step="0.01" min="0" name="fuel_received_qty" id="se_fr" aria-label="وقود مستلم باللتر" value="<?= $old('fuel_received_qty') ?>">
           </div>
           <div class="form-group">
-            <label for="se_fi">وقودٌ مصروف <span class="se-unit">(لتر)</span></label>
-            <input type="number" step="0.01" min="0" name="fuel_issued_qty" id="se_fi" aria-label="وقودٌ مصروف باللتر" value="<?= $old('fuel_issued_qty') ?>">
+            <label for="se_fi">وقود مصروف <span class="se-unit">(لتر)</span></label>
+            <input type="number" step="0.01" min="0" name="fuel_issued_qty" id="se_fi" aria-label="وقود مصروف باللتر" value="<?= $old('fuel_issued_qty') ?>">
           </div>
           <div class="form-group">
-            <label for="se_ck">مفتاحُ الحاوية <span class="se-unit">(اختياري)</span></label>
-            <input type="text" name="container_key" id="se_ck" aria-label="مفتاحُ الحاوية" maxlength="32" value="<?= $old('container_key') ?>">
+            <label for="se_ck">مفتاح الحاوية <span class="se-unit">(اختياري)</span></label>
+            <input type="text" name="container_key" id="se_ck" aria-label="مفتاح الحاوية" maxlength="32" value="<?= $old('container_key') ?>">
           </div>
         </div>
 
-        <h3 class="se-h2b">توزيعُ ساعاتِ الوردية <span class="se-req">*</span></h3>
+        <h3 class="se-h2b">توزيع ساعات الوردية <span class="se-req">*</span></h3>
         <div class="alert alert-info">
           <i class="fa fa-circle-info"></i>
-          <span>كلُّ سطرٍ حالةٌ واحدةٌ بساعاتِها وطرفِها المسؤول. يمكنك إضافةُ أسطر،
-            ومجموعُ الساعاتِ لا يتجاوز <strong>٢٤ ساعة</strong>.</span>
+          <span>كل سطر حالة واحدة بساعاتها وطرفها المسؤول. يمكنك إضافة أسطر،
+            ومجموع الساعات لا يتجاوز <strong>٢٤ ساعة</strong>.</span>
         </div>
         <?php /* `se-hrow` و`se-hours` يبقيان: الجافاسكربت يستنسخ الصفَّ بهما.
                  و`form-grid` معهما فيأخذ الصفُّ تخطيطَ الشبكةِ الموحَّدة. */ ?>
@@ -385,7 +385,7 @@ echo ems_states_bundle('لم يُسجَّل قيدُ ورديةٍ بعدُ', 'ا
           <div class="se-hrow form-grid">
             <div class="form-group">
               <label>الحالة</label>
-              <select name="h_state[]" aria-label="حالةُ سطرِ الساعات">
+              <select name="h_state[]" aria-label="حالة سطر الساعات">
                 <option value="">— اختر —</option>
 <?php foreach ($OPS_STATES as $s): ?>
                 <option value="<?= htmlspecialchars($s, ENT_QUOTES, 'UTF-8') ?>" <?= $s === 'actual_work' ? 'selected' : '' ?>>
@@ -396,19 +396,19 @@ echo ems_states_bundle('لم يُسجَّل قيدُ ورديةٍ بعدُ', 'ا
             </div>
             <div class="form-group">
               <label>الساعات <span class="se-unit">(ساعة)</span></label>
-              <input type="number" step="0.25" min="0" max="24" name="h_hours[]" aria-label="ساعاتُ السطر">
+              <input type="number" step="0.25" min="0" max="24" name="h_hours[]" aria-label="ساعات السطر">
             </div>
             <div class="form-group">
-              <label>الطرفُ المسؤول</label>
-              <select name="h_party[]" aria-label="الطرفُ المسؤول">
+              <label>الطرف المسؤول</label>
+              <select name="h_party[]" aria-label="الطرف المسؤول">
 <?php foreach ($PARTY_AR as $k => $v): ?>
                 <option value="<?= $k ?>" <?= $k === 'company' ? 'selected' : '' ?>><?= $v ?></option>
 <?php endforeach; ?>
               </select>
             </div>
             <div class="form-group">
-              <label>سببُ التوقف <span class="se-unit">(عند التوقف)</span></label>
-              <input type="text" name="h_note[]" aria-label="سببُ التوقف" maxlength="190">
+              <label>سبب التوقف <span class="se-unit">(عند التوقف)</span></label>
+              <input type="text" name="h_note[]" aria-label="سبب التوقف" maxlength="190">
             </div>
             <div class="se-hrow-act"><button type="button" class="btn-secondary se-btn2" onclick="seAddRow()">+ سطر</button></div>
           </div>
@@ -416,32 +416,32 @@ echo ems_states_bundle('لم يُسجَّل قيدُ ورديةٍ بعدُ', 'ا
 
         <div class="form-grid se-mt12">
           <div class="form-group form-grid-full">
-            <label for="se_note">ملاحظاتٌ ميدانية</label>
-            <input type="text" name="note" id="se_note" aria-label="ملاحظاتٌ ميدانية" maxlength="500" value="<?= $old('note') ?>">
+            <label for="se_note">ملاحظات ميدانية</label>
+            <input type="text" name="note" id="se_note" aria-label="ملاحظات ميدانية" maxlength="500" value="<?= $old('note') ?>">
           </div>
         </div>
 
         <div class="pu-form-actions">
-          <button type="submit" class="btn-primary" <?= $CAN_RECORD ? '' : 'disabled' ?>><i class="fas fa-save"></i> احفظ القيدَ وأرسِلْه</button>
+          <button type="submit" class="btn-primary" <?= $CAN_RECORD ? '' : 'disabled' ?>><i class="fas fa-save"></i> احفظ القيد وأرسله</button>
         </div>
       </div>
     </div>
   </form>
 
   <div class="card">
-    <div class="card-header"><h5><i class="fa fa-list"></i> ما سُجِّل اليوم — <?= htmlspecialchars($today, ENT_QUOTES, 'UTF-8') ?></h5></div>
+    <div class="card-header"><h5><i class="fa fa-list"></i> ما سجل اليوم — <?= htmlspecialchars($today, ENT_QUOTES, 'UTF-8') ?></h5></div>
     <div class="card-body">
       <div class="alert alert-info">
         <i class="fa fa-circle-info"></i>
-        <span>قيودُ هذا اليومِ في كيانِك. الحالةُ بلونٍ ونصٍّ معًا.</span>
+        <span>قيود هذا اليوم في كيانك. الحالة بلون ونص معا.</span>
       </div>
       <div class="table-container">
         <?php /* الجدولُ يُصيَّر دائمًا — والفراغُ تحمله رسالةُ العُدَّةِ المعرَّبة،
                  فلا فقرةُ فراغٍ محليّةٌ تخصُّ شاشةً واحدة. */ ?>
         <table class="alltables display nowrap">
           <thead><tr>
-            <th>رقمُ القيد</th><th>الآلية</th><th>الوردية</th><th>الكمية</th>
-            <th>ساعاتُ التشغيل</th><th>مجموعُ الساعات</th><th>العدّاد</th><th>وقودٌ مصروف</th><th>الحالة</th>
+            <th>رقم القيد</th><th>الآلية</th><th>الوردية</th><th>الكمية</th>
+            <th>ساعات التشغيل</th><th>مجموع الساعات</th><th>العداد</th><th>وقود مصروف</th><th>الحالة</th>
             <?= $CAN_VOID ? '<th>إلغاء</th>' : '' ?>
           </tr></thead>
           <tbody>
@@ -469,9 +469,9 @@ echo ems_states_bundle('لم يُسجَّل قيدُ ورديةٍ بعدُ', 'ا
                   <?= csrf_field() ?>
                   <input type="hidden" name="action" value="void">
                   <input type="hidden" name="entry_id" value="<?= (int) $r['id'] ?>">
-                  <input type="text" name="void_reason" placeholder="سببُ الإلغاء" required maxlength="190"
+                  <input type="text" name="void_reason" placeholder="سبب الإلغاء" required maxlength="190"
                          class="se-void-input">
-                  <button type="submit" class="btn-secondary se-btn2 se-btn2-sm">ألغِ</button>
+                  <button type="submit" class="btn-secondary se-btn2 se-btn2-sm">ألغ</button>
                 </form>
 <?php endif; ?>
               </td>
@@ -488,8 +488,8 @@ echo ems_states_bundle('لم يُسجَّل قيدُ ورديةٍ بعدُ', 'ا
 <script>
 function seConfirmVoid(f){
   var r = f.void_reason.value.trim();
-  if (!r) { alert('اكتبْ سببَ الإلغاء أولًا.'); return false; }
-  return confirm('سيُنشأ قيدٌ عاكسٌ ولن يُحذف شيء، وتتحرّر الخانةُ لقيدٍ بديل.\n\nالسبب: ' + r);
+  if (!r) { alert('اكتب سبب الإلغاء أولا.'); return false; }
+  return confirm('سينشأ قيد عاكس ولن يحذف شيء، وتتحرر الخانة لقيد بديل.\n\nالسبب: ' + r);
 }
 function seAddRow(){
   var box = document.getElementById('se-hours');

@@ -34,7 +34,7 @@ else {
     if ($row = $st->get_result()->fetch_assoc()) { $can_view = intval($row['can_view']) === 1; }
     $st->close();
 }
-if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا صلاحيةَ عرضٍ للمحاكاة ❌', 'GOV-PERM-403', ''); exit(); }
+if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا صلاحية عرض للمحاكاة ❌', 'GOV-PERM-403', ''); exit(); }
 
 $gate = $is_super_admin ? ems_tenant_db()->forAllTenants('visibility sim super') : ems_tenant_db();
 
@@ -81,7 +81,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array();
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لم تُطلَب محاكاةٌ بعدُ', 'اختر حسابًا لتعرفَ ما يراه، أو عنصرًا لتعرفَ من يراه، ثم اضغط «أجب»');
+    echo ems_states_bundle('لم تطلب محاكاة بعد', 'اختر حسابا لتعرف ما يراه، أو عنصرا لتعرف من يراه، ثم اضغط «أجب»');
     ?>
 
     <style>
@@ -97,16 +97,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="filter-body">
         <form method="get" class="vsim-filter">
             <strong>ماذا يرى الحساب؟</strong>
-            <select name="account_id" aria-label="الحسابُ المرادُ معرفةُ ما يراه">
-                <option value="0">— اختر حسابًا —</option>
+            <select name="account_id" aria-label="الحساب المراد معرفة ما يراه">
+                <option value="0">— اختر حسابا —</option>
                 <?php foreach ($accounts as $a): ?>
                     <option value="<?php echo intval($a['id']); ?>" <?php echo $askAccount === intval($a['id']) ? 'selected' : ''; ?>>
                         #<?php echo intval($a['id']); ?> — <?php echo htmlspecialchars((string)$a['name']); ?></option>
                 <?php endforeach; ?>
             </select>
             <strong>· من يرى العنصر؟</strong>
-            <select name="element_code" aria-label="العنصرُ المرادُ معرفةُ من يراه">
-                <option value="">— اختر عنصرًا —</option>
+            <select name="element_code" aria-label="العنصر المراد معرفة من يراه">
+                <option value="">— اختر عنصرا —</option>
                 <?php foreach ($elements as $e): ?>
                     <option value="<?php echo htmlspecialchars((string)$e['element_code']); ?>"
                         <?php echo $askElement === (string)$e['element_code'] ? 'selected' : ''; ?>>
@@ -122,15 +122,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php if ($simulation !== null): ?>
     <div class="card"><div class="card-header"><h5><i class="fa fa-eye"></i>
         ماذا يرى الحساب #<?php echo $askAccount; ?>؟
-        <small class="vsim-ctx">(السياقُ من صفته النشطة: <?php echo htmlspecialchars(json_encode($ctxUsed, JSON_UNESCAPED_UNICODE)); ?>)</small></h5></div>
+        <small class="vsim-ctx">(السياق من صفته النشطة: <?php echo htmlspecialchars(json_encode($ctxUsed, JSON_UNESCAPED_UNICODE)); ?>)</small></h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap vsim-table" data-no-dt="1">
-            <thead><tr><th>العنصر</th><th>القرار</th><th>مصدرُ القرار</th><th>سببُه</th>
+            <thead><tr><th>العنصر</th><th>القرار</th><th>مصدر القرار</th><th>سببه</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -142,7 +142,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <td><code><?php echo htmlspecialchars($code); ?></code></td>
                     <td><?php echo $d['visible']
                         ? "<span class='badge badge-success'>يظهر</span>"
-                        : "<span class='badge badge-danger'>لا يُصيَّر</span>"; ?></td>
+                        : "<span class='badge badge-danger'>لا يصير</span>"; ?></td>
                     <td><?php echo htmlspecialchars((string)$d['source']); ?></td>
                     <td><small><?php echo htmlspecialchars((string)($d['reason'] ?? '')); ?></small></td>
                 </tr>
@@ -154,10 +154,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <?php if ($watchers !== null): ?>
     <div class="card"><div class="card-header"><h5><i class="fa fa-users-viewfinder"></i>
-        من يرى «<?php echo htmlspecialchars($askElement); ?>»؟ — <?php echo count($watchers); ?> حسابًا</h5></div>
+        من يرى «<?php echo htmlspecialchars($askElement); ?>»؟ — <?php echo count($watchers); ?> حسابا</h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap vsim-table" data-no-dt="1">
-            <thead><tr><th>الحساب</th><th>فئةُ صفته</th><th>مصدرُ القرار</th></tr></thead>
+            <thead><tr><th>الحساب</th><th>فئة صفته</th><th>مصدر القرار</th></tr></thead>
             <tbody>
             <?php foreach ($watchers as $w): ?>
                 <tr>

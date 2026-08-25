@@ -44,14 +44,14 @@ class RestoreDrillService
         $by      = (int) ($in['actor'] ?? 0);
         $byRole  = (int) ($in['actor_role'] ?? 0);
 
-        if ($start === '')  { return array('ok' => false, 'reason' => 'وقتُ بدءِ التجربةِ إلزامي'); }
-        if ($target === '') { return array('ok' => false, 'reason' => 'الدقيقةُ المستعادُ إليها إلزامية — ولا تجربةَ بلا نقطةِ زمن'); }
+        if ($start === '')  { return array('ok' => false, 'reason' => 'وقت بدء التجربة إلزامي'); }
+        if ($target === '') { return array('ok' => false, 'reason' => 'الدقيقة المستعاد إليها إلزامية — ولا تجربة بلا نقطة زمن'); }
         if ($verdict !== null && !in_array($verdict, array('pass', 'fail', 'aborted'), true)) {
-            return array('ok' => false, 'reason' => 'حكمٌ غيرُ معروف');
+            return array('ok' => false, 'reason' => 'حكم غير معروف');
         }
         if ($verdict === 'pass' && ($actual === null || $actual !== 0)) {
             return array('ok' => false,
-                'reason' => 'لا يُحكم بالنجاحِ وما بعدَ اللحظةِ عاد — والقيدُ يرفضه في القاعدةِ أيضًا');
+                'reason' => 'لا يحكم بالنجاح وما بعد اللحظة عاد — والقيد يرفضه في القاعدة أيضا');
         }
 
         // رقمُ المحضر: خادميٌّ ومتسلسلٌ لكلِّ كيان — لا يُملى من الشاشة
@@ -84,7 +84,7 @@ class RestoreDrillService
         }
         $id = (int) $conn->insert_id;
         $st->close();
-        return array('ok' => true, 'reason' => 'سُجّل المحضر', 'id' => $id, 'drill_no' => $drillNo);
+        return array('ok' => true, 'reason' => 'سجل المحضر', 'id' => $id, 'drill_no' => $drillNo);
     }
 
     /** آخرُ تجربةٍ ناجحةٍ — وعليها يقوم شرطُ «مُجرَّبةٌ شهريًّا» (PR-02). */

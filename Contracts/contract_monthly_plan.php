@@ -126,7 +126,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     include('../includes/page_header.php');
     if (isset($_GET['msg'])) { echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>'; }
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا
-    echo ems_states_bundle('لا بنودَ بيعٍ نافذةً لها جدولٌ شهريٌّ','اختر بندًا من جدولِ بنودِ البيعِ أعلاه ثمّ احفظ نسخةً للجدول');
+    echo ems_states_bundle('لا بنود بيع نافذة لها جدول شهري','اختر بندا من جدول بنود البيع أعلاه ثم احفظ نسخة للجدول');
     ?>
 
     <style>
@@ -164,10 +164,10 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <thead><tr><th>العقد</th><th>#</th><th>الوصف</th><th>المتعاقَد</th><th>المخطَّط</th>
                 <th>الفجوة</th><th>مختوم</th><th></th>
                 <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                 <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                 <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                 <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -189,14 +189,14 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     <td><a class="action-btn" href="?line=<?php echo intval($l['id']); ?>&v=1">
                         <i class="fa fa-calendar-days"></i> الجدول</a></td></tr>
             <?php endforeach; ?>
-            <?php if (!$lines): ?><tr><td colspan="8"><em>لا بنودَ بيعٍ نافذة — ابدأ من «بنود العقد»</em></td></tr><?php endif; ?>
+            <?php if (!$lines): ?><tr><td colspan="8"><em>لا بنود بيع نافذة — ابدأ من «بنود العقد»</em></td></tr><?php endif; ?>
             </tbody>
         </table>
     </div></div></div>
 
     <?php if ($line): ?>
     <div class="card"><div class="card-header"><h5><i class="fa fa-calendar-days"></i>
-        جدولُ البند #<?php echo intval($line['line_no']); ?> —
+        جدول البند #<?php echo intval($line['line_no']); ?> —
         <?php echo htmlspecialchars((string)$line['description']); ?></h5></div>
     <div class="card-body">
         <div class="mp-chips">
@@ -207,10 +207,10 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <?php $gap = round((float)$line['qty_contracted'] - $sum, 2); ?>
             <span class="mp-badge-pad badge <?php echo abs($gap) < 0.005 ? 'badge-success' : 'badge-warning'; ?>"
                 >الفجوة <?php echo $gap; ?>
-                <?php echo abs($gap) < 0.005 ? '— **يُختم**' : '— **لا يُختم**'; ?></span>
+                <?php echo abs($gap) < 0.005 ? '— **يختم**' : '— **لا يختم**'; ?></span>
             <?php if ($miss): ?>
                 <span class="badge badge-warning mp-badge-pad">
-                    <?php echo count($miss); ?> شهرًا غائبًا</span>
+                    <?php echo count($miss); ?> شهرا غائبا</span>
             <?php endif; ?>
         </div>
 
@@ -232,28 +232,28 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <input type="hidden" name="line_id" value="<?php echo $LID; ?>">
             <input type="hidden" name="plan_version" value="<?php echo $VER; ?>">
             <div class="form-group mp-eff">
-                <label for="emsf_58_73c4b">سريانُ النسخة <span class="mp-req">*</span></label>
-                <input type="date" name="effective_from" aria-label="تاريخُ سريانِ نسخةِ الجدول" required
+                <label for="emsf_58_73c4b">سريان النسخة <span class="mp-req">*</span></label>
+                <input type="date" name="effective_from" aria-label="تاريخ سريان نسخة الجدول" required
                        value="<?php echo htmlspecialchars((string)($rows ? $rows[0]['effective_from'] : $line['valid_from'])); ?>" id="emsf_58_73c4b">
             </div>
             <div class="table-container">
             <table class="alltables display nowrap no-datatable mp-table" data-no-dt="1">
-                <thead><tr><th>الشهر</th><th>الكمية</th><th>طبيعتُه</th><th>ملاحظة</th></tr></thead>
+                <thead><tr><th>الشهر</th><th>الكمية</th><th>طبيعته</th><th>ملاحظة</th></tr></thead>
                 <tbody>
                 <?php foreach ($grid as $mm): $r = isset($byMonth[$mm]) ? $byMonth[$mm] : null; ?>
                     <tr<?php echo $r === null ? " class='mp-row-missing'" : ''; ?>>
                         <td><strong><?php echo htmlspecialchars($mm); ?></strong>
                             <?php echo $r === null ? '<span class="badge badge-warning">غائب</span>' : ''; ?></td>
-                        <td><input type="number" step="0.01" min="0" aria-label="الكميةُ المخطَّطةُ لهذا الشهر" class="mp-qty"
+                        <td><input type="number" step="0.01" min="0" aria-label="الكمية المخططة لهذا الشهر" class="mp-qty"
                             name="qty[<?php echo $mm; ?>]"
                             value="<?php echo $r !== null ? htmlspecialchars((string)$r['qty_planned']) : ''; ?>"></td>
-                        <td><select aria-label="طبيعةُ الشهرِ في المنحنى" name="kind[<?php echo $mm; ?>]">
+                        <td><select aria-label="طبيعة الشهر في المنحنى" name="kind[<?php echo $mm; ?>]">
                             <?php foreach ($KIND_AR as $k => $v): ?>
                                 <option value="<?php echo $k; ?>"
                                     <?php echo ($r !== null && (string)$r['month_kind'] === $k) ? 'selected' : ''; ?>>
                                     <?php echo htmlspecialchars($v); ?></option>
                             <?php endforeach; ?></select></td>
-                        <td><input type="text" maxlength="200" aria-label="ملاحظةُ الشهرِ المخطَّط" class="mp-note-in"
+                        <td><input type="text" maxlength="200" aria-label="ملاحظة الشهر المخطط" class="mp-note-in"
                             name="mnote[<?php echo $mm; ?>]"
                             value="<?php echo $r !== null ? htmlspecialchars((string)($r['note'] ?? '')) : ''; ?>"></td></tr>
                 <?php endforeach; ?>
@@ -279,7 +279,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             </form>
             <a class="btn-primary mp-btn-link"
                href="?line=<?php echo $LID; ?>&v=<?php echo $VER + 1; ?>">
-                <i class="fa fa-copy"></i> نسخةٌ جديدة (<?php echo $VER + 1; ?>)</a>
+                <i class="fa fa-copy"></i> نسخة جديدة (<?php echo $VER + 1; ?>)</a>
         </div>
         <?php endif; ?>
     </div></div>

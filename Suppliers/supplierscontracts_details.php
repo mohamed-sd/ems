@@ -67,7 +67,7 @@ include __DIR__ . '/../includes/page_header.php';
 
         <?php
         // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا
-        echo ems_states_bundle('لا بياناتِ عقدٍ لهذا المعرِّف', 'عد إلى قائمةِ عقودِ المورِّد واختر عقدًا قائمًا');
+        echo ems_states_bundle('لا بيانات عقد لهذا المعرف', 'عد إلى قائمة عقود المورد واختر عقدا قائما');
         ?>
         <div class="actions-section">
             <div class="actions-header">
@@ -511,10 +511,10 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                     }
                     ?>
                     <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                     <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                     <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                     <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -827,7 +827,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
             <div class="modal-body">
                 <div class="alert alert-warning" role="alert">
                     <i class="fas fa-exclamation-triangle"></i>
-                    <strong>تنبيه:</strong> سيتم إيقاف العقد مؤقتاً. يمكنك استئنافه لاحقاً.
+                    <strong>تنبيه:</strong> سيتم إيقاف العقد مؤقتا. يمكنك استئنافه لاحقا.
                 </div>
                 <div class="mb-4">
                     <label for="pauseDate" class="form-label">
@@ -1001,7 +1001,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                     <i class="fas fa-times"></i> إلغاء
                 </button>
                 <button type="button" class="btn btn-danger" id="confirmTerminate">
-                    <i class="fas fa-times-circle"></i> إنهاء نهائياً
+                    <i class="fas fa-times-circle"></i> إنهاء نهائيا
                 </button>
             </div>
         </div>
@@ -1094,7 +1094,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                             <i class="fa fa-cube"></i> معدات العقد المختار
                         </h6>
                         <div id="selectedContractEquipments" class="scd-minh100">
-                            <p class="scd-muted-center">اختر عقداً لعرض معداته</p>
+                            <p class="scd-muted-center">اختر عقدا لعرض معداته</p>
                         </div>
                     </div>
                 </div>
@@ -1863,7 +1863,7 @@ $('#mergeWithId').on('change', function() {
     const selectedContractId = $(this).val();
 
     if (!selectedContractId) {
-        $('#selectedContractEquipments').html('<p class="scd-muted-center">اختر عقداً لعرض معداته</p>');
+        $('#selectedContractEquipments').html('<p class="scd-muted-center">اختر عقدا لعرض معداته</p>');
         return;
     }
 
@@ -1929,7 +1929,7 @@ $('#confirmMerge').click(function() {
     // Close modal
     bootstrap.Modal.getInstance(document.getElementById('mergeModal')).hide();
     $('#mergeWithId').val('');
-    $('#selectedContractEquipments').html('<p class="scd-muted-center">اختر عقداً لعرض معداته</p>');
+    $('#selectedContractEquipments').html('<p class="scd-muted-center">اختر عقدا لعرض معداته</p>');
 });
 </script>
 

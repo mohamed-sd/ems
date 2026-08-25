@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tk_save'])) {
     }
     if (!empty($_POST['follow_ticket_id'])) {
         $r = DD::linkDuplicate($conn, intval($_POST['follow_ticket_id']), $uid);
-        ems_gov_flash_redirect('tickets_list.php', 'أُضفت متابعًا للبلاغ الأصل — ولا بلاغ ثانٍ ✅', 'GOV-OK-200', '');
+        ems_gov_flash_redirect('tickets_list.php', 'أضفت متابعا للبلاغ الأصل — ولا بلاغ ثان ✅', 'GOV-OK-200', '');
         exit();
     }
     if (!$dupFound) {
@@ -88,17 +88,17 @@ include '../insidebar.php';
     $header_actions = array();
     include('../includes/page_header.php');
     ems_screen_about(
-        'البلاغ يُفتح من موضع المشكلة ويحمل سياقه كاملًا — فلا تُدخل حرفًا مما يعرفه النظام. '
-        . 'ثلاث نقرات (الفئة والنوع والأولوية) والوصف الحر، والنظام يوجّه ويصعّد آليًّا.',
-        array('السياق أدناه محمول للقراءة — ومن أدخل رقم معدة يدويًّا فقد فُقد السياق',
-              'إن وُجد بلاغ مفتوح مشابه يُعرض قبل الحفظ: تابِعه ولا تفتح ثانيًا'));
+        'البلاغ يفتح من موضع المشكلة ويحمل سياقه كاملا — فلا تدخل حرفا مما يعرفه النظام. '
+        . 'ثلاث نقرات (الفئة والنوع والأولوية) والوصف الحر، والنظام يوجه ويصعد آليا.',
+        array('السياق أدناه محمول للقراءة — ومن أدخل رقم معدة يدويا فقد فقد السياق',
+              'إن وجد بلاغ مفتوح مشابه يعرض قبل الحفظ: تابعه ولا تفتح ثانيا'));
     if ($msg !== '') { echo '<div class="alert alert-danger">' . htmlspecialchars($msg) . '</div>'; }
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا أنواعَ بلاغاتٍ مفعَّلةً للاختيار', 'راجع إعدادَ أنواعِ البلاغاتِ مع مركزِ البلاغاتِ قبلَ الرفع');
+    echo ems_states_bundle('لا أنواع بلاغات مفعلة للاختيار', 'راجع إعداد أنواع البلاغات مع مركز البلاغات قبل الرفع');
     ?>
 
     <?php if ($dupFound): ?>
-    <div class="card"><div class="card-header"><h5>يوجد بلاغ مفتوح مشابه — أتتابعه أم تفتح جديدًا؟ (T16)</h5></div>
+    <div class="card"><div class="card-header"><h5>يوجد بلاغ مفتوح مشابه — أتتابعه أم تفتح جديدا؟ (T16)</h5></div>
     <div class="card-body">
         <?php foreach ($dupFound as $d): ?>
         <form method="post" class="tkt-tco-dup-form">
@@ -119,14 +119,14 @@ include '../insidebar.php';
             <input type="hidden" name="type_code" value="<?php echo htmlspecialchars($_POST['type_code'] ?? ''); ?>">
             <input type="hidden" name="description" value="<?php echo htmlspecialchars($_POST['description'] ?? ''); ?>">
             <input type="hidden" name="priority" value="<?php echo htmlspecialchars($_POST['priority'] ?? ''); ?>">
-            <button type="submit" class="action-btn delete">بل أفتح بلاغًا جديدًا</button>
+            <button type="submit" class="action-btn delete">بل أفتح بلاغا جديدا</button>
         </form>
     </div></div>
     <?php endif; ?>
 
     <div class="card"><div class="card-header"><h5>السياق المحمول (للقراءة)</h5></div>
     <div class="card-body tkt-tco-ctx">
-        <?php if (!$ctx) { echo '<span class="tkt-tco-noctx">فُتح من القائمة — بلا سياق شاشة (النوع «نظام» متاح)</span>'; }
+        <?php if (!$ctx) { echo '<span class="tkt-tco-noctx">فتح من القائمة — بلا سياق شاشة (النوع «نظام» متاح)</span>'; }
         foreach ($ctx as $k => $v) {
             echo '<span class="badge badge-secondary tkt-tco-chip">' . htmlspecialchars($k) . ': ' . htmlspecialchars((string) $v) . '</span>';
         } ?>
@@ -145,12 +145,12 @@ include '../insidebar.php';
                 } ?></select></div>
             <div class="form-group"><label for="tkoPriority">الأولوية (ترفعها ولا تخفضها)</label>
                 <select name="priority" id="tkoPriority"><option value="">اقتراح النظام</option>
-                    <option value="high">عالٍ</option><option value="critical">حرج</option></select></div>
-            <div class="form-group"><label><input type="checkbox" name="is_anonymous" aria-label="رفعُ البلاغِ بلا كشفِ هوية" value="1"> بلا كشف هوية (للأنواع التي تقبله)</label></div>
+                    <option value="high">عال</option><option value="critical">حرج</option></select></div>
+            <div class="form-group"><label><input type="checkbox" name="is_anonymous" aria-label="رفع البلاغ بلا كشف هوية" value="1"> بلا كشف هوية (للأنواع التي تقبله)</label></div>
         </div>
         <div class="form-group"><label for="tkoDescription">الوصف * — الحقل الحر الوحيد</label>
             <textarea name="description" id="tkoDescription" rows="3" required></textarea></div>
-        <button type="submit" class="btn-primary">رفع البلاغ — يوجَّه آليًّا خلال ثانية</button>
+        <button type="submit" class="btn-primary">رفع البلاغ — يوجه آليا خلال ثانية</button>
     </form>
 </div>
 

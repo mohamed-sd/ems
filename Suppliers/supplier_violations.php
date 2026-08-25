@@ -29,7 +29,7 @@ $company_id = intval($_SESSION['user']['company_id'] ?? 0);
 $uid = intval($_SESSION['user']['id'] ?? 0);
 $msg = '';
 
-$KINDS = array('availability' => 'الجاهزية والتوفّر', 'quality' => 'الجودة',
+$KINDS = array('availability' => 'الجاهزية والتوفر', 'quality' => 'الجودة',
                'safety' => 'السلامة', 'document' => 'الوثائق', 'delay' => 'التأخير', 'other' => 'أخرى');
 
 $__pcNew = ems_post_contract($conn, array(
@@ -46,11 +46,11 @@ $__pcNew = ems_post_contract($conn, array(
         $d = trim((string) ($in['description'] ?? ''));
         $a = (float) ($in['penalty_amount'] ?? 0);
         $c = trim((string) ($in['currency'] ?? ''));
-        if ($s <= 0) { return array('ok' => false, 'msg' => 'لا مخالفةَ بلا مورّد (422)'); }
-        if (!isset($KINDS[$k])) { return array('ok' => false, 'msg' => 'نوعُ المخالفةِ محكومٌ من قائمةٍ مغلقة (422)'); }
-        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $o)) { return array('ok' => false, 'msg' => 'تاريخُ الوقوعِ بصيغةِ YYYY-MM-DD (422)'); }
-        if (mb_strlen($d) < 8) { return array('ok' => false, 'msg' => 'لا مخالفةَ بلا وصفٍ مفهوم (422)'); }
-        if ($a > 0 && mb_strlen($c) < 3) { return array('ok' => false, 'msg' => 'لا جزاءَ بمبلغٍ بلا عملة (422)'); }
+        if ($s <= 0) { return array('ok' => false, 'msg' => 'لا مخالفة بلا مورد (422)'); }
+        if (!isset($KINDS[$k])) { return array('ok' => false, 'msg' => 'نوع المخالفة محكوم من قائمة مغلقة (422)'); }
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $o)) { return array('ok' => false, 'msg' => 'تاريخ الوقوع بصيغة YYYY-MM-DD (422)'); }
+        if (mb_strlen($d) < 8) { return array('ok' => false, 'msg' => 'لا مخالفة بلا وصف مفهوم (422)'); }
+        if ($a > 0 && mb_strlen($c) < 3) { return array('ok' => false, 'msg' => 'لا جزاء بمبلغ بلا عملة (422)'); }
         return array('ok' => true, 'data' => array(
             'supplier_id' => $s, 'violation_kind' => $k, 'occurred_on' => $o, 'description' => $d,
             'penalty_amount' => $a, 'currency' => $c,
@@ -75,7 +75,7 @@ $__pcApp = ems_post_contract($conn, array(
     'idem'    => array('id' => intval($_POST['approve_violation'] ?? 0)),
     'validate' => function (array $in) {
         $id = intval($in['approve_violation'] ?? 0);
-        if ($id <= 0) { return array('ok' => false, 'msg' => 'مخالفةٌ غيرُ صالحة (422)'); }
+        if ($id <= 0) { return array('ok' => false, 'msg' => 'مخالفة غير صالحة (422)'); }
         return array('ok' => true, 'data' => array('id' => $id));
     },
 ));
@@ -96,8 +96,8 @@ $__pcWv = ems_post_contract($conn, array(
     'validate' => function (array $in) {
         $id = intval($in['waive_violation'] ?? 0);
         $r  = trim((string) ($in['waive_reason'] ?? ''));
-        if ($id <= 0) { return array('ok' => false, 'msg' => 'مخالفةٌ غيرُ صالحة (422)'); }
-        if (mb_strlen($r) < 8) { return array('ok' => false, 'msg' => 'لا إسقاطَ بلا سببٍ مكتوبٍ مفهوم (422)'); }
+        if ($id <= 0) { return array('ok' => false, 'msg' => 'مخالفة غير صالحة (422)'); }
+        if (mb_strlen($r) < 8) { return array('ok' => false, 'msg' => 'لا إسقاط بلا سبب مكتوب مفهوم (422)'); }
         return array('ok' => true, 'data' => array('id' => $id, 'reason' => $r));
     },
 ));
@@ -116,7 +116,7 @@ try {
         'orderBy' => "`state` = 'recorded' DESC, `id` DESC", 'limit' => 300));
     $sups = $gate->select('suppliers', array('columns' => array('id'),
         'orderBy' => '`id` DESC', 'limit' => 200));
-} catch (\Throwable $e) { $queueFail = 'تعذّر قراءةُ السجل: ' . $e->getMessage(); }
+} catch (\Throwable $e) { $queueFail = 'تعذر قراءة السجل: ' . $e->getMessage(); }
 
 $page_title = 'المخالفات والجزاءات';
 require_once __DIR__ . '/../includes/screen_contract.php';
@@ -137,12 +137,12 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
   $header_actions = array(array('raw' => trim((string) ob_get_clean())));
   $header_back = false;
   include __DIR__ . '/../includes/page_header.php';
-  echo ems_states_bundle('لا مخالفةَ مسجَّلةٌ بعد',
-      'المخالفةُ تُرصد بوصفٍ ودليل، ثم تُعتمد بيدٍ غيرِ يدِ راصدِها — وأثرُها في التسوية');
+  echo ems_states_bundle('لا مخالفة مسجلة بعد',
+      'المخالفة ترصد بوصف ودليل، ثم تعتمد بيد غير يد راصدها — وأثرها في التسوية');
   ?>
-  <p class="text-muted">الورقة م١٩ · سجلٌّ تابعٌ للتسوية —
-     <strong>مَن رصد لا يعتمد ولا يُسقط</strong>، ولا إسقاطَ بلا سببٍ مكتوب.
-     ولا تنفيذَ نقديًّا هنا — الأثرُ يظهر في <a href="settlements.php">التسويات</a>.</p>
+  <p class="text-muted">الورقة م١٩ · سجل تابع للتسوية —
+     <strong>من رصد لا يعتمد ولا يسقط</strong>، ولا إسقاط بلا سبب مكتوب.
+     ولا تنفيذ نقديا هنا — الأثر يظهر في <a href="settlements.php">التسويات</a>.</p>
   <?php if ($msg !== ''): ?>
     <div class="alert <?= (mb_strpos($msg, '✅') !== false ? 'alert-success' : 'alert-danger') ?>">
       <?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div>
@@ -153,9 +153,9 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
 
   <form method="post" class="row g-2 mb-3">
     <?php echo csrf_field(); ?>
-    <div class="col-auto"><label class="form-label" for="sv_s">المورّد</label>
+    <div class="col-auto"><label class="form-label" for="sv_s">المورد</label>
       <select class="form-control form-control-sm" name="supplier_id" id="sv_s" required>
-        <option value="">— المورّد —</option>
+        <option value="">— المورد —</option>
         <?php foreach ($sups as $s): ?><option value="<?= (int) $s['id'] ?>">#<?= (int) $s['id'] ?></option><?php endforeach; ?>
       </select></div>
     <div class="col-auto"><label class="form-label" for="sv_k">نوع المخالفة</label>
@@ -180,7 +180,7 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
 
   <table class="table table-striped" data-no-dt>
     <thead><tr>
-      <th>الإجراء</th><th>الرقم</th><th>المورّد</th><th>النوع</th><th>الوقوع</th>
+      <th>الإجراء</th><th>الرقم</th><th>المورد</th><th>النوع</th><th>الوقوع</th>
       <th>الوصف</th><th>الجزاء</th><th>الحالة</th><th>رصدها</th><th>اعتمدها</th>
       <th class="ems-gov-th none" data-gov="entity" data-slice="1">الكيان</th>
       <th class="ems-gov-th none" data-gov="approved_at" data-slice="1">تاريخ الاعتماد</th>
@@ -188,7 +188,7 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
     </tr></thead>
     <tbody>
     <?php if (empty($rows)): ?>
-      <tr><td colspan="10" class="text-center text-muted">لا مخالفةَ مسجَّلةٌ بعد</td></tr>
+      <tr><td colspan="10" class="text-center text-muted">لا مخالفة مسجلة بعد</td></tr>
     <?php endif; ?>
     <?php foreach ($rows as $r): $id = (int) $r['id']; ?>
       <tr>
@@ -201,7 +201,7 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
               <input type="hidden" name="waive_violation" value="<?= $id ?>">
               <label class="visually-hidden" for="sv_w_<?= $id ?>">سبب الإسقاط</label>
               <input class="form-control form-control-sm" type="text" minlength="8" maxlength="300"
-                     required name="waive_reason" id="sv_w_<?= $id ?>" placeholder="سببُ الإسقاطِ المكتوب">
+                     required name="waive_reason" id="sv_w_<?= $id ?>" placeholder="سبب الإسقاط المكتوب">
               <button class="action-btn" type="submit"><i class="fa fa-ban"></i> إسقاط</button></form>
           <?php else: ?><span class="badge">—</span><?php endif; ?>
         </td>

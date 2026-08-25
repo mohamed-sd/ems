@@ -46,13 +46,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $st->bind_param('ii', $nid, $uid);
         $st->execute();
         $st->close();
-        $msg = 'قُرئ ✅';
+        $msg = 'قرئ ✅';
     } elseif ($act === 'ntf_read_all') {
         $st = $conn->prepare("UPDATE personal_notifications SET read_at = NOW() WHERE user_id = ? AND read_at IS NULL");
         $st->bind_param('i', $uid);
         $st->execute();
         $st->close();
-        $msg = 'قُرئ الكل ✅';
+        $msg = 'قرئ الكل ✅';
     } elseif ($act === 'ntf_to_task') {
         // WF-06: التحويل الصريح — تنبيهٌ بفعلٍ مطلوب يولّد مهمةً مرتبطة
         $st = $conn->prepare("SELECT * FROM personal_notifications WHERE id = ? AND user_id = ? LIMIT 1");
@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $n = $st->get_result()->fetch_assoc();
         $st->close();
         if (!$n) { $msg = 'التنبيه غير موجود ❌'; }
-        elseif (!empty($n['task_item_id'])) { $msg = 'له مهمة مرتبطة سلفًا (WI-' . intval($n['task_item_id']) . ') ❌'; }
+        elseif (!empty($n['task_item_id'])) { $msg = 'له مهمة مرتبطة سلفا (WI-' . intval($n['task_item_id']) . ') ❌'; }
         else {
             $r = WI::create($conn, array(
                 'company_id' => intval($n['company_id']), 'source_type' => 'SRC-14',
@@ -69,14 +69,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'owner_user_id' => $uid, 'assigned_user_id' => $uid, 'org_unit_id' => 1,
                 'verifier_user_id' => WI::resolveVerifier($conn, intval($n['company_id']), $uid),
                 'title' => 'متابعة تنبيه: ' . $n['title'],
-                'deliverable' => 'إجراء التنبيه منفَّذًا', 'details' => (string) $n['body'],
-                'evidence_required' => 'أثرُ الفعلِ المطلوبِ في سجلِّ التدقيق',
+                'deliverable' => 'إجراء التنبيه منفذا', 'details' => (string) $n['body'],
+                'evidence_required' => 'أثر الفعل المطلوب في سجل التدقيق',
                 'due_at' => date('Y-m-d H:i:s', time() + 172800), 'created_by' => $uid,
             ));
             if ($r['ok']) {
                 $tid = intval($r['id']);
                 $conn->query("UPDATE personal_notifications SET task_item_id = {$tid}, read_at = COALESCE(read_at, NOW()) WHERE id = " . intval($n['id']));
-                $msg = 'وُلّدت المهمة WI-' . $tid . ' ✅';
+                $msg = 'ولدت المهمة WI-' . $tid . ' ✅';
             } else { $msg = $r['reason'] . ' ❌'; }
         }
     } else { $msg = 'فعل غير معروف ❌'; }
@@ -109,11 +109,11 @@ include '../insidebar.php';
     $header_back = false;
     include '../includes/page_header.php';
     require_once __DIR__ . '/../includes/screen_contract.php';
-    ems_screen_about('إحاطاتي — وما يتطلب فعلًا أحوّله مهمةً بزرٍّ صريح فلا يضيع في الزحام.');
+    ems_screen_about('إحاطاتي — وما يتطلب فعلا أحوله مهمة بزر صريح فلا يضيع في الزحام.');
 
     if (isset($_GET['msg'])) { echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>'; }
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا تنبيهاتِ خلالَ التسعين يومًا الأخيرة', 'تصلك الإحاطاتُ آليًّا من الشاشاتِ التي تخصُّك — ولا يلزمك إنشاؤها');
+    echo ems_states_bundle('لا تنبيهات خلال التسعين يوما الأخيرة', 'تصلك الإحاطات آليا من الشاشات التي تخصك — ولا يلزمك إنشاؤها');
     ?>
     <style>
     .ntf-bar        { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
@@ -132,21 +132,21 @@ include '../insidebar.php';
     <div class="card"><div class="card-body">
         <div class="ntf-bar">
             <h6 class="ntf-bar-h"><i class="fas fa-envelope"></i> غير المقروء: <span class="badge bg-danger"><?php echo $unread; ?></span>
-                <span class="text-muted ntf-note">— الاحتفاظ 90 يومًا (قرار 8)</span></h6>
+                <span class="text-muted ntf-note">— الاحتفاظ 90 يوما (قرار 8)</span></h6>
             <?php if ($unread): ?>
             <form method="post">
         <?= csrf_field() ?><input type="hidden" name="action" value="ntf_read_all">
-                <button class="btn btn-sm btn-secondary">تعليم الكل مقروءًا</button></form>
+                <button class="btn btn-sm btn-secondary">تعليم الكل مقروءا</button></form>
             <?php endif; ?>
         </div>
         <div class="table-responsive">
         <table class="alltables display no-datatable ntf-table">
             <thead><tr><th class="ntf-th-ico"></th><th>التنبيه</th><th>وقته</th><th>رابط الأصل</th><th>الإجراء</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -157,7 +157,7 @@ include '../insidebar.php';
                 <tr><td colspan="5" class="text-center text-muted">لا تنبيهات</td></tr>
             <?php else: foreach ($rows as $n): $nid = intval($n['id']); $isUnread = ($n['read_at'] === null); ?>
                 <tr class="<?php echo $isUnread ? 'ntf-unread' : 'ntf-read'; ?>">
-                    <td><?php echo $n['requires_action'] ? '<i class="fas fa-bolt ntf-ico-action" title="يتطلب فعلًا"></i>'
+                    <td><?php echo $n['requires_action'] ? '<i class="fas fa-bolt ntf-ico-action" title="يتطلب فعلا"></i>'
                                                         : '<i class="far fa-circle ntf-ico-info" title="إحاطة"></i>'; ?></td>
                     <td class="ntf-title-cell"><strong><?php echo htmlspecialchars((string) $n['title']); ?></strong>
                         <?php if ($n['body']): ?><div class="ntf-body"><?php echo htmlspecialchars((string) $n['body']); ?></div><?php endif; ?></td>
@@ -167,7 +167,7 @@ include '../insidebar.php';
                         <?php if ($isUnread): ?>
                         <form method="post" class="ntf-inline">
         <?= csrf_field() ?><input type="hidden" name="action" value="ntf_read"><input type="hidden" name="notif_id" value="<?php echo $nid; ?>">
-                            <button class="btn btn-sm btn-secondary">قُرئ</button></form>
+                            <button class="btn btn-sm btn-secondary">قرئ</button></form>
                         <?php endif; ?>
                         <?php if ($n['requires_action']): ?>
                             <?php if (!empty($n['task_item_id'])): ?>

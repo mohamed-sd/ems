@@ -29,7 +29,7 @@ if (strpos($host, ':') !== false) {
 $conn = new mysqli($host, (string) ems_env('DB_USER', ''), (string) ems_env('DB_PASS', ''),
                    (string) ems_env('DB_NAME', ''), $port);
 if ($conn->connect_errno) {
-    fwrite(STDERR, "تعذّر الاتصال بالقاعدة: " . $conn->connect_error . "\n");
+    fwrite(STDERR, "تعذر الاتصال بالقاعدة: " . $conn->connect_error . "\n");
     exit(1);
 }
 $conn->set_charset('utf8mb4');
@@ -56,7 +56,7 @@ while ($t = $res->fetch_assoc()) {
                                $t['priority'], $t['business_impact']);
     if ($policy === null) {
         $nopolicy++;
-        printf("  %-14s → لا سياسةَ مطابقة (يبقى بلا مهلة)\n", $t['ticket_no']);
+        printf("  %-14s → لا سياسة مطابقة (يبقى بلا مهلة)\n", $t['ticket_no']);
         continue;
     }
     $due = TicketSla::computeDue($t['call_date'], $t['call_time'], $policy);
@@ -69,5 +69,5 @@ while ($t = $res->fetch_assoc()) {
     }
 }
 
-printf("\n[sla-backfill]%s مرشَّح=%d · مُهِل=%d · بلا سياسة=%d\n",
+printf("\n[sla-backfill]%s مرشح=%d · مهل=%d · بلا سياسة=%d\n",
        $dry ? ' (تجريبي)' : '', $total, $applied, $nopolicy);

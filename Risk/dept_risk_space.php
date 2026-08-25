@@ -53,8 +53,8 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     $header_context = array('الزاوية' => $unitName !== '' ? $unitName : 'كل النطاق', 'الحكم' => 'قراءة — والتعديل بطلب لإدارة المخاطر');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا بياناتِ مخاطرَ في زاويةِ إدارتِك ضمنَ هذا التبويب', 'انتقلْ إلى تبويبٍ آخرَ من شريطِ التبويباتِ أو أبلغْ عن إشارةٍ من تبويبِ «الإشارات والحوادث»');
-    ems_screen_about('مكوّن نطاقي واحد على السجل المركزي — الإدارة ترى زاويتها ولا سجل موازيًا لها (RK-02). '
+    echo ems_states_bundle('لا بيانات مخاطر في زاوية إدارتك ضمن هذا التبويب', 'انتقل إلى تبويب آخر من شريط التبويبات أو أبلغ عن إشارة من تبويب «الإشارات والحوادث»');
+    ems_screen_about('مكون نطاقي واحد على السجل المركزي — الإدارة ترى زاويتها ولا سجل موازيا لها (RK-02). '
         . 'حقاك الفعليان هنا: الإبلاغ عن إشارة، وتسجيل دليل ضابط تملكه.',
         array('تعديل التصنيف أو الدرجة أو الإغلاق: بطلب لإدارة المخاطر — والقبول ضمن سقفك فقط'));
     ?>
@@ -140,7 +140,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     } elseif ($tab === 'signals') {
         $r = $conn->query("SELECT id, title, source, state, created_at FROM risk_signals
                             WHERE company_id={$company_id} AND created_by = {$uid} ORDER BY created_at DESC LIMIT 100");
-        echo '<h6>إشاراتك المبلَّغة (الإبلاغ حقك — والفرز لإدارة المخاطر)</h6>';
+        echo '<h6>إشاراتك المبلغة (الإبلاغ حقك — والفرز لإدارة المخاطر)</h6>';
         echo '<form id="deptSigForm" class="ems-toolbar"><input name="title" class="form-control drs-sig-title" placeholder="عنوان الإشارة *" required aria-label="عنوان الإشارة">'
            . '<input name="root_cause" class="form-control drs-sig-cause" placeholder="السبب الجذري" aria-label="السبب الجذري">'
            . '<button class="ems-btn-primary" type="submit">إبلاغ</button><span id="deptSigMsg"></span></form>';
@@ -150,7 +150,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
             echo '<tr><td>' . (int) $x['id'] . '</td><td>' . htmlspecialchars($x['title']) . '</td><td>' . $x['source']
                . '</td><td>' . $x['state'] . '</td><td>' . $x['created_at'] . '</td></tr>';
         }
-        if ($n === 0) { echo '<tr><td colspan="5" class="text-muted">لم تبلّغ عن إشارات بعد</td></tr>'; }
+        if ($n === 0) { echo '<tr><td colspan="5" class="text-muted">لم تبلغ عن إشارات بعد</td></tr>'; }
         echo '</tbody></table>';
     } else { // reviews
         $r = $conn->query("SELECT a.level_at_acceptance, a.authority, a.review_due, a.created_at, rr.risk_code, rr.title

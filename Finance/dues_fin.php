@@ -26,7 +26,7 @@ $due_types = fin_due_types(); $settle_states = fin_settlement_states(); $party_t
 if (isset($_GET['settle_supplier'])) {
     if (!$can_edit) { ems_gov_flash_redirect('dues_fin.php', 'لا توجد صلاحية التسوية ❌', 'GOV-PERM-403', ''); exit(); }
     if (!fin_verify_action_token()) { ems_gov_flash_redirect('dues_fin.php', 'رمز الحماية غير صالح ❌', 'GOV-FAIL-409', ''); exit(); } // إصلاح #2
-    if (!fin_can_perform($conn, $ctx['role'], 'treasurer')) { ems_gov_flash_redirect('dues_fin.php', 'التسوية تخصّ أمين الخزينة فقط ❌', 'GOV-FAIL-409', ''); exit(); } // فصل الواجبات
+    if (!fin_can_perform($conn, $ctx['role'], 'treasurer')) { ems_gov_flash_redirect('dues_fin.php', 'التسوية تخص أمين الخزينة فقط ❌', 'GOV-FAIL-409', ''); exit(); } // فصل الواجبات
     $sid = intval($_GET['settle_supplier']);
     $net = fin_supplier_net($conn, $company_id, $sid);
     fin_gate($is_super_admin)->update('fin_dues',
@@ -50,7 +50,7 @@ if (isset($_GET['delete_recv'])) {
     if (!$can_delete) { ems_gov_flash_redirect('dues_fin.php', 'لا توجد صلاحية حذف ❌', 'GOV-PERM-403', ''); exit(); }
     $d = intval($_GET['delete_recv']);
     fin_gate($is_super_admin)->softDelete('fin_receivables', $d);
-    ems_gov_flash_redirect('dues_fin.php', 'تم حذف الذمّة ✅', 'GOV-OK-200', ''); exit();
+    ems_gov_flash_redirect('dues_fin.php', 'تم حذف الذمة ✅', 'GOV-OK-200', ''); exit();
 }
 
 // ── حفظ مستحق ──
@@ -82,14 +82,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['due_type'])) {
     if ($direction === 'debit') {
         if ($src_type === 'pending_source') {
             if (!in_array($due_type, $PENDING_OK, true)) {
-                ems_gov_flash_redirect(ems_flash_to('dues_fin.php', "+❌"), '«بلا مصدرٍ بعد» تُقبل للسلف والخصومات وحدَها — وهذا النوعُ له مستندٌ مبنيٌّ فاختره', 'GOV-INFO-200', '');
+                ems_gov_flash_redirect(ems_flash_to('dues_fin.php', "+❌"), '«بلا مصدر بعد» تقبل للسلف والخصومات وحدها — وهذا النوع له مستند مبني فاختره', 'GOV-INFO-200', '');
                 exit();
             }
         } elseif (!in_array($src_type, $ALLOWED_SRC, true)) {
-            ems_gov_flash_redirect(ems_flash_to('dues_fin.php', "+❌"), 'كلُّ خصمٍ يلزمه مستندٌ مصدر — اختر نوعَه (سندُ صرفٍ · أمرُ صيانة · أمرُ نقل · احتسابُ جزاء · تسوية)', 'GOV-INFO-200', '');
+            ems_gov_flash_redirect(ems_flash_to('dues_fin.php', "+❌"), 'كل خصم يلزمه مستند مصدر — اختر نوعه (سند صرف · أمر صيانة · أمر نقل · احتساب جزاء · تسوية)', 'GOV-INFO-200', '');
             exit();
         } elseif ($src_id <= 0) {
-            ems_gov_flash_redirect(ems_flash_to('dues_fin.php', "+❌"), 'رقمُ المستند المصدر إلزامي — الرقمُ الذي يُخصم يجب أن يُنقر إلى أصله', 'GOV-INFO-200', '');
+            ems_gov_flash_redirect(ems_flash_to('dues_fin.php', "+❌"), 'رقم المستند المصدر إلزامي — الرقم الذي يخصم يجب أن ينقر إلى أصله', 'GOV-INFO-200', '');
             exit();
         }
     }
@@ -113,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['doc_type'])) {
     $doc_ref  = trim($_POST['doc_ref'] ?? '');
     $amount   = round(floatval($_POST['r_amount'] ?? 0), 2);
     $due_date = trim($_POST['due_date'] ?? '') ?: null;
-    if ($cust <= 0 || $amount <= 0) { ems_gov_flash_redirect('dues_fin.php', 'بيانات الذمّة غير صحيحة ❌', 'GOV-REF-404', ''); exit(); }
+    if ($cust <= 0 || $amount <= 0) { ems_gov_flash_redirect('dues_fin.php', 'بيانات الذمة غير صحيحة ❌', 'GOV-REF-404', ''); exit(); }
     /* ══ INJ-0036 — «المالُ أثرٌ لا مصدر».
          كان `doc_ref` نصًّا حرًّا لا يُتحقَّق منه، فتُفتح ذمّةٌ على فاتورةٍ لا
          وجودَ لها ثم يُبنى عليها تحصيلٌ في الخزينة (`payments_fin.php`).
@@ -145,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['doc_type'])) {
         'base_amount' => ($r_rate === null) ? null : round($amount * $r_rate, 2),
         'due_date' => $due_date, 'state' => 'open', 'created_by' => $current_user_id,
     ));
-    ems_gov_flash_redirect('dues_fin.php', 'تمت إضافة الذمّة ✅', 'GOV-OK-200', ''); exit();
+    ems_gov_flash_redirect('dues_fin.php', 'تمت إضافة الذمة ✅', 'GOV-OK-200', ''); exit();
 }
 
 $page_title = 'إيكوبيشن | الذمم والتحصيل';
@@ -163,12 +163,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array();
     if ($can_add) {
         $header_actions[] = array('id' => 'toggleDue', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة مستحق');
-        $header_actions[] = array('id' => 'toggleRecv', 'class' => 'add-btn', 'icon' => 'fas fa-file-invoice', 'label' => 'إضافة ذمّة عميل');
+        $header_actions[] = array('id' => 'toggleRecv', 'class' => 'add-btn', 'icon' => 'fas fa-file-invoice', 'label' => 'إضافة ذمة عميل');
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا مستحقاتٍ ولا ذممًا مسجَّلةً في هذا النطاق', 'أضفْ مستحقًّا بزرِّ «إضافة مستحق» أو ذمّةَ عميلٍ بزرِّ «إضافة ذمّة عميل»');
+    echo ems_states_bundle('لا مستحقات ولا ذمما مسجلة في هذا النطاق', 'أضف مستحقا بزر «إضافة مستحق» أو ذمة عميل بزر «إضافة ذمة عميل»');
     ?>
     <?php fin_msg_banner(); ?>
 
@@ -189,23 +189,23 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <select name="direction" id="d_dir"><option value="credit">له (دائن)</option><option value="debit">عليه (مدين)</option></select></div>
             <?php /* M-11: مصدرُ الخصم — يظهر مع «عليه» وحدَه، فالاستحقاقُ مصدرُه حدثُ المروحة */ ?>
             <div class="form-group is-hidden" id="d_srcwrap">
-                <label for="d_srctype">مستندُ الخصم <span class="required">*</span>
-                    <span class="mnt-req-hint">(كلُّ خصمٍ ينقر إلى أصله)</span></label>
+                <label for="d_srctype">مستند الخصم <span class="required">*</span>
+                    <span class="mnt-req-hint">(كل خصم ينقر إلى أصله)</span></label>
                 <select name="source_doc_type" id="d_srctype">
-                    <option value="">— اختر نوعَ المستند —</option>
-                    <option value="proc_issue">سندُ صرف (قطعُ غيار · وقود)</option>
-                    <option value="mnt_order">أمرُ صيانة</option>
-                    <option value="transfer_order">أمرُ نقل</option>
-                    <option value="penalty_assessment">احتسابُ جزاء</option>
+                    <option value="">— اختر نوع المستند —</option>
+                    <option value="proc_issue">سند صرف (قطع غيار · وقود)</option>
+                    <option value="mnt_order">أمر صيانة</option>
+                    <option value="transfer_order">أمر نقل</option>
+                    <option value="penalty_assessment">احتساب جزاء</option>
                     <option value="settlement">تسوية</option>
-                    <option value="pending_source">بلا مصدرٍ بعد — سلفةٌ أو خصمٌ (فجوةٌ معلَنة)</option>
+                    <option value="pending_source">بلا مصدر بعد — سلفة أو خصم (فجوة معلنة)</option>
                 </select>
                 <small class="fin-dues-srcnote">
-                    «بلا مصدرٍ بعد» للسلف والخصومات وحدَها: لا جدولَ مستنديًّا لها حتى الآن،
-                    فتُعلَن الفجوةُ ولا تُخبَّأ. وما له مستندٌ مبنيٌّ يُرفض بدونه.
+                    «بلا مصدر بعد» للسلف والخصومات وحدها: لا جدول مستنديا لها حتى الآن،
+                    فتعلن الفجوة ولا تخبأ. وما له مستند مبني يرفض بدونه.
                 </small></div>
             <div class="form-group is-hidden" id="d_srcidwrap">
-                <label for="d_srcid">رقمُ المستند <span class="required">*</span></label>
+                <label for="d_srcid">رقم المستند <span class="required">*</span></label>
                 <input type="number" min="1" name="source_doc_id" id="d_srcid"></div>
             <div class="form-group"><label for="emsf_375_f6091">المبلغ <span class="required">*</span></label>
                 <input type="number" step="0.01" min="0" name="amount" required id="emsf_375_f6091"></div>
@@ -218,7 +218,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <!-- فورم ذمّة عميل -->
     <form id="recvForm" action="" method="post" class="allforms">
         <?php echo csrf_field(); ?>
-        <div class="card-header"><h5><i class="fas fa-file-invoice"></i> إضافة ذمّة عميل</h5></div>
+        <div class="card-header"><h5><i class="fas fa-file-invoice"></i> إضافة ذمة عميل</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
             <div class="form-group"><label for="emsf_376_24d3e">العميل <span class="required">*</span></label>
                 <select name="customer_entity_id" required id="emsf_376_24d3e"><?php echo fin_client_options($conn, $is_super_admin, $company_id); ?></select></div>
@@ -248,7 +248,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <h5 class="fin-dues-h5"><i class="fas fa-hand-holding-dollar"></i> مستحقات الموردين والموظفين</h5>
         <div class="table-container">
             <table id="finTable" class="display nowrap alltables fin-dues-tbl" data-scroll-x="1" data-state-save="false">
-                <thead><tr><th>الإجراءات</th><th>الطرف</th><th>المُنشئ — الاسم والصفة</th><th>نوع المستفيد</th><th>الاتجاه</th><th>المبلغ</th><th>التسوية</th></tr></thead>
+                <thead><tr><th>الإجراءات</th><th>الطرف</th><th>المنشئ — الاسم والصفة</th><th>نوع المستفيد</th><th>الاتجاه</th><th>المبلغ</th><th>التسوية</th></tr></thead>
                 <tbody>
                 <?php
                 // نطاق نوع الطرف (fin_party_scope): الموارد البشرية ترى الموظفين حصرًا،
@@ -300,11 +300,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <h5 class="fin-dues-h5-next"><i class="fas fa-file-invoice"></i> الذمم المدينة (العملاء)</h5>
         <div class="table-container">
             <table id="recvTable" class="display nowrap alltables fin-dues-tbl" data-scroll-x="1" data-state-save="false">
-                <thead><tr><th>الإجراءات</th><th>العميل</th><th>المستند</th><th>المرجع</th><th>المبلغ</th><th>المحصّل</th><th>المتبقّي</th><th>تاريخ الاستحقاق</th><th>الحالة</th>
+                <thead><tr><th>الإجراءات</th><th>العميل</th><th>المستند</th><th>المرجع</th><th>المبلغ</th><th>المحصل</th><th>المتبقي</th><th>تاريخ الاستحقاق</th><th>الحالة</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">المستفيد</th>
               <th class="ems-fn-th" data-fn="1">قيمة الاستحقاق</th>
-              <th class="ems-fn-th" data-fn="1">المسدَّد</th>
+              <th class="ems-fn-th" data-fn="1">المسدد</th>
               <th class="ems-fn-th" data-fn="1">الرصيد</th>
               <th class="ems-fn-th" data-fn="1">المعادل بعملة الدفاتر</th>
               <th class="ems-fn-th" data-fn="1">أيام التأخر</th>
@@ -312,15 +312,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="ems-fn-th" data-fn="1">سبب التأخير</th>
               <th class="ems-fn-th" data-fn="1">تاريخ السداد المخطط</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-              <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
               <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-              <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+              <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
               <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
-              <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
+              <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
               <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
               <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
@@ -338,7 +338,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     $overdue = ($row['due_date'] && $row['due_date'] < date('Y-m-d') && (float)$row['outstanding'] > 0);
                     $st = $overdue ? 'overdue' : (string)$row['state'];
                     $st_tone = $st === 'collected' ? 'success' : ($st === 'overdue' ? 'danger' : ($st === 'partial' ? 'primary' : 'secondary'));
-                    $st_lbl = array('open' => 'مفتوحة', 'partial' => 'جزئي', 'collected' => 'محصّلة', 'overdue' => 'متأخرة');
+                    $st_lbl = array('open' => 'مفتوحة', 'partial' => 'جزئي', 'collected' => 'محصلة', 'overdue' => 'متأخرة');
                     echo "<tr><td><div class='action-btns'>";
                     if ($can_delete) { echo "<a href='?delete_recv=" . intval($row['id']) . "' class='action-btn delete' onclick='return confirm(\"حذف؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>"; }
                     echo "</div></td>";
@@ -350,11 +350,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     $__ref  = htmlspecialchars((string)($row['doc_ref'] ?? ''));
                     $__link = ems_receivable_source_link($row['doc_type'], $row['source_doc_id'] ?? 0);
                     if ($__link !== null) {
-                        echo "<td><a href='" . htmlspecialchars($__link) . "' title='افتح المستندَ المصدر'>"
+                        echo "<td><a href='" . htmlspecialchars($__link) . "' title='افتح المستند المصدر'>"
                            . $__ref . " <i class='fas fa-external-link-alt fa-xs'></i></a></td>";
                     } elseif (!empty($row['legacy_no_ref'])) {
                         echo "<td>{$__ref} <span class='badge badge-warning' "
-                           . "title='موروثٌ بلا مستندٍ مقابل — يُعلَن ولا يُمحى'>بلا مستند</span></td>";
+                           . "title='موروث بلا مستند مقابل — يعلن ولا يمحى'>بلا مستند</span></td>";
                     } else {
                         echo "<td>{$__ref}</td>";
                     }

@@ -41,10 +41,10 @@ $__pcPrep = ems_post_contract($conn, array(
         $p  = (string) ($in['period'] ?? '');
         $a  = (float) ($in['amount'] ?? 0);
         $cu = trim((string) ($in['currency'] ?? ''));
-        if ($cl <= 0) { return array('ok' => false, 'msg' => 'لا فاتورةَ مطالبةٍ بلا مطالبة (422)'); }
-        if (!preg_match('/^\d{4}-\d{2}$/', $p)) { return array('ok' => false, 'msg' => 'الفترةُ بصيغةِ YYYY-MM (422)'); }
-        if ($a <= 0) { return array('ok' => false, 'msg' => 'المبلغُ يجب أن يكون موجبًا (422)'); }
-        if (mb_strlen($cu) < 3) { return array('ok' => false, 'msg' => 'لا مبلغَ بلا عملة (422)'); }
+        if ($cl <= 0) { return array('ok' => false, 'msg' => 'لا فاتورة مطالبة بلا مطالبة (422)'); }
+        if (!preg_match('/^\d{4}-\d{2}$/', $p)) { return array('ok' => false, 'msg' => 'الفترة بصيغة YYYY-MM (422)'); }
+        if ($a <= 0) { return array('ok' => false, 'msg' => 'المبلغ يجب أن يكون موجبا (422)'); }
+        if (mb_strlen($cu) < 3) { return array('ok' => false, 'msg' => 'لا مبلغ بلا عملة (422)'); }
         return array('ok' => true, 'data' => array('claim_id' => $cl, 'period' => $p,
             'cert_id' => intval($in['cert_id'] ?? 0), 'amount' => $a, 'currency' => $cu));
     },
@@ -67,7 +67,7 @@ foreach (array(
         'idem' => array('id' => intval($_POST[$trig] ?? 0)),
         'validate' => function (array $in) use ($trig) {
             $id = intval($in[$trig] ?? 0);
-            if ($id <= 0) { return array('ok' => false, 'msg' => 'فاتورةٌ غيرُ صالحة (422)'); }
+            if ($id <= 0) { return array('ok' => false, 'msg' => 'فاتورة غير صالحة (422)'); }
             return array('ok' => true, 'data' => array('id' => $id));
         },
     ));
@@ -99,8 +99,8 @@ $__pcRef = ems_post_contract($conn, array(
     'validate' => function (array $in) use ($REFER) {
         $id = intval($in['refer_inv'] ?? 0);
         $to = (string) ($in['refer_to'] ?? '');
-        if ($id <= 0) { return array('ok' => false, 'msg' => 'فاتورةٌ غيرُ صالحة (422)'); }
-        if (!isset($REFER[$to])) { return array('ok' => false, 'msg' => 'وجهةُ الإحالةِ محكومةٌ من قائمةٍ مغلقة (422)'); }
+        if ($id <= 0) { return array('ok' => false, 'msg' => 'فاتورة غير صالحة (422)'); }
+        if (!isset($REFER[$to])) { return array('ok' => false, 'msg' => 'وجهة الإحالة محكومة من قائمة مغلقة (422)'); }
         return array('ok' => true, 'data' => array('id' => $id, 'to' => $to));
     },
 ));
@@ -133,7 +133,7 @@ try {
     foreach ($rows as $k => $r) {
         $rows[$k]['cert_no'] = isset($certNo[(int) $r['cert_id']]) ? $certNo[(int) $r['cert_id']] : null;
     }
-} catch (\Throwable $e) { $queueFail = 'تعذّر قراءةُ الطابور: ' . $e->getMessage(); }
+} catch (\Throwable $e) { $queueFail = 'تعذر قراءة الطابور: ' . $e->getMessage(); }
 
 $page_title = 'فاتورة المطالبة وإحالتها';
 require_once __DIR__ . '/../includes/screen_contract.php';
@@ -150,12 +150,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   $header_actions = array(array('raw' => trim((string) ob_get_clean())));
   $header_back = false;
   include __DIR__ . '/../includes/page_header.php';
-  echo ems_states_bundle('لا فاتورةَ مطالبةٍ مُعَدَّةٌ بعد',
-      'الفاتورةُ تُبنى على شهادةِ إنجازٍ معتمَدة ثم تُعتمد وتُجاز وتُحال للتحصيل');
+  echo ems_states_bundle('لا فاتورة مطالبة معدة بعد',
+      'الفاتورة تبنى على شهادة إنجاز معتمدة ثم تعتمد وتجاز وتحال للتحصيل');
   ?>
-  <p class="text-muted">العقدة ١٨ · السلّم <code>LD-06</code> — يهيّئ محاسبُ المبيعاتِ ولا يعتمد ·
-     ولا إحالةَ قبلَ الإجازةِ المحاسبية · والفاتورةُ الرسميةُ بيتُها
-     <a href="../Contracts/tax_invoices.php">الفاتورة الضريبية</a> — تُشار ولا تُنسَخ.</p>
+  <p class="text-muted">العقدة ١٨ · السلم <code>LD-06</code> — يهيئ محاسب المبيعات ولا يعتمد ·
+     ولا إحالة قبل الإجازة المحاسبية · والفاتورة الرسمية بيتها
+     <a href="../Contracts/tax_invoices.php">الفاتورة الضريبية</a> — تشار ولا تنسخ.</p>
   <?php if ($msg !== ''): ?>
     <div class="alert <?= (mb_strpos($msg, '✅') !== false ? 'alert-success' : 'alert-danger') ?>">
       <?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div>
@@ -183,14 +183,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   <table class="table table-striped" data-no-dt>
     <thead><tr>
       <th>الإجراء</th><th>رقم الفاتورة</th><th>الفترة</th><th>المطالبة</th><th>الشهادة</th>
-      <th>المبلغ</th><th>الحالة</th><th>الإحالة</th><th>أعدَّها</th><th>اعتمدها</th><th>أجازها</th>
+      <th>المبلغ</th><th>الحالة</th><th>الإحالة</th><th>أعدها</th><th>اعتمدها</th><th>أجازها</th>
       <th class="ems-gov-th none" data-gov="entity" data-slice="1">الكيان</th>
       <th class="ems-gov-th none" data-gov="approved_at" data-slice="1">تاريخ الاعتماد</th>
       <th class="ems-gov-th none" data-gov="currency" data-slice="3">العملة</th>
     </tr></thead>
     <tbody>
     <?php if (empty($rows)): ?>
-      <tr><td colspan="11" class="text-center text-muted">لا فاتورةَ مطالبةٍ مُعَدَّةٌ بعد</td></tr>
+      <tr><td colspan="11" class="text-center text-muted">لا فاتورة مطالبة معدة بعد</td></tr>
     <?php endif; ?>
     <?php foreach ($rows as $r): $id = (int) $r['id']; ?>
       <tr>
@@ -208,7 +208,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <input type="hidden" name="refer_inv" value="<?= $id ?>">
               <label class="visually-hidden" for="ci_to_<?= $id ?>">وجهة الإحالة</label>
               <select class="form-control form-control-sm" name="refer_to" id="ci_to_<?= $id ?>" required>
-                <option value="">— وجهةُ الإحالة —</option>
+                <option value="">— وجهة الإحالة —</option>
                 <?php foreach ($REFER as $k => $v): ?>
                   <option value="<?= htmlspecialchars($k, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($v, ENT_QUOTES, 'UTF-8') ?></option>
                 <?php endforeach; ?>

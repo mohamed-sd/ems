@@ -10,9 +10,9 @@ $FA_SCREEN = array(
     'file' => 'fin_equity_stmt.php',
     'title' => 'قائمة التغيرات في حقوق الملكية',
     'icon' => 'fas fa-scale-balanced',
-    'about' => 'الرصيدُ الافتتاحيُّ ثم الحركاتُ ثم الختاميُّ لكل بند — والختاميُّ = الافتتاحيُّ + الحركاتُ أو تُرفض.',
+    'about' => 'الرصيد الافتتاحي ثم الحركات ثم الختامي لكل بند — والختامي = الافتتاحي + الحركات أو ترفض.',
     'notes' => array (
-  0 => 'رأسُ المالِ والاحتياطياتُ والمحتجزةُ والتوزيعاتُ من الجذر 3',
+  0 => 'رأس المال والاحتياطيات والمحتجزة والتوزيعات من الجذر 3',
 ),
     'context' => array(),
     'filters' => '',
@@ -28,16 +28,16 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
     if ($r) { while ($x = $r->fetch_assoc()) { $rows[] = $x; } }
 ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
-    <?php echo ems_states_bundle('لا بياناتٍ لهذه الفترةِ المالية', 'غيّر الفترةَ أو تحقق من ترحيلِ القيود'); ?>
+    <?php echo ems_states_bundle('لا بيانات لهذه الفترة المالية', 'غير الفترة أو تحقق من ترحيل القيود'); ?>
     <?php if ($can_write): ?>
     <div class="card"><div class="card-body">
-        <button class="ems-btn-primary" onclick="faPost('equity_generate', {}, function(j){ alert('وُلّدت ' + j.eq_code + ' · بنود: ' + j.components + ' — متوازنة ✔'); location.reload(); })">توليد القائمة للفترة</button>
-        <span class="fa-note">◆ بندٌ لا يتوازن يوقف التوليدَ برمزٍ يسمّيه</span>
+        <button class="ems-btn-primary" onclick="faPost('equity_generate', {}, function(j){ alert('ولدت ' + j.eq_code + ' · بنود: ' + j.components + ' — متوازنة ✔'); location.reload(); })">توليد القائمة للفترة</button>
+        <span class="fa-note">◆ بند لا يتوازن يوقف التوليد برمز يسميه</span>
     </div></div>
     <?php endif; ?>
     <div class="card"><div class="card-body table-responsive">
         <?php if (!$rows): ?>
-            <?php ems_state_empty('لا قائمةَ حقوقِ ملكيةٍ لهذه الفترة'); ?>
+            <?php ems_state_empty('لا قائمة حقوق ملكية لهذه الفترة'); ?>
         <?php else: ?>
         <table class="alltables display nowrap fa-table-full">
             <thead><tr><th>الرقم</th><th>البند</th><th>الاسم</th><th>الرصيد الافتتاحي</th>

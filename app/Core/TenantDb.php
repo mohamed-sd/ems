@@ -576,7 +576,7 @@ class TenantDb
             $this->deny('scopedQuery: SELECT only', substr($sql, 0, 80));
         }
         if (substr_count($stripped, '{TENANT_SCOPE}') !== 1) {
-            $this->deny('scopedQuery: {TENANT_SCOPE} مطلوب مرةً واحدة بالضبط', substr($sql, 0, 120));
+            $this->deny('scopedQuery: {TENANT_SCOPE} مطلوب مرة واحدة بالضبط', substr($sql, 0, 120));
         }
 
         // مواضع العمق 0 للكلمات الحاكمة.
@@ -615,7 +615,7 @@ class TenantDb
         foreach (array('GROUP BY', 'HAVING', 'ORDER BY', 'LIMIT') as $kw) {
             $kp = $depth0($kw);
             if (!empty($kp) && $tokenPos > $kp[0]) {
-                $this->deny('scopedQuery: الرمز بعد ' . $kw . ' — العزل غير نافذٍ على مصادر الصفوف', '');
+                $this->deny('scopedQuery: الرمز بعد ' . $kw . ' — العزل غير نافذ على مصادر الصفوف', '');
             }
         }
 
@@ -627,7 +627,7 @@ class TenantDb
                 $def = TenantRegistry::get(strtolower($tname));
                 if ($def !== null && $def['type'] !== TenantRegistry::T_GLOBAL
                     && !in_array($tname, $declaredTables, true)) {
-                    $this->deny('scopedQuery: جدولٌ مستأجرٌ غير معلَن', strtolower($tname));
+                    $this->deny('scopedQuery: جدول مستأجر غير معلن', strtolower($tname));
                 }
             }
         }
@@ -636,7 +636,7 @@ class TenantDb
             if (preg_match_all('/(\S+\s+)?JOIN\s+`?' . preg_quote($tU, '/') . '`?/', $upper, $jm, PREG_SET_ORDER)) {
                 foreach ($jm as $j) {
                     if (stripos($j[0], 'LEFT') === false) {
-                        $this->deny('scopedQuery: جدول الإثراء يُربط LEFT JOIN حصرًا', $table);
+                        $this->deny('scopedQuery: جدول الإثراء يربط LEFT JOIN حصرا', $table);
                     }
                 }
             }

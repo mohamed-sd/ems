@@ -31,7 +31,7 @@ ems_public_head('إعادة تعيين كلمة المرور | EMS Company', arr
 <body class="standalone-brand">
     <div class="card">
         <h1>إعادة التعيين عبر الإدارة</h1>
-        <p>تحديث كلمة المرور ذاتيًا عبر رابط لم يعد متاحًا في بوابة الشركة.</p>
+        <p>تحديث كلمة المرور ذاتيا عبر رابط لم يعد متاحا في بوابة الشركة.</p>
 
         <?php if ($error !== ''): ?><div class="alert"><?php echo e($error); ?></div><?php endif; ?>
 

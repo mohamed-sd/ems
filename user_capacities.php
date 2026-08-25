@@ -66,15 +66,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $r = CAP::switchTo($conn, $gate, $company_id, $uid,
             intval($_POST['capacity_id'] ?? 0), $_SESSION, $uid);
         $redirect($r['ok']
-            ? ('تحوّلتَ إلى صفة «' . $_SESSION['active_capacity']['label'] . '» ✅')
+            ? ('تحولت إلى صفة «' . $_SESSION['active_capacity']['label'] . '» ✅')
             : ($r['code'] . ' — ' . $r['reason'] . ' ❌'));
     }
 
     if ($action === 'derive_dry' || $action === 'derive_apply') {
         if (!$can_edit) { $redirect('لا توجد صلاحية لهذا الإجراء ❌'); }
         $r = CAP::derive($conn, $gate, $company_id, $uid, $action === 'derive_dry');
-        $redirect(($action === 'derive_dry' ? 'تجريبُ الاشتقاق: ' : 'الاشتقاق: ')
-            . $r['created'] . ' جديدة · ' . $r['skipped'] . ' قائمة تُخطّيت'
+        $redirect(($action === 'derive_dry' ? 'تجريب الاشتقاق: ' : 'الاشتقاق: ')
+            . $r['created'] . ' جديدة · ' . $r['skipped'] . ' قائمة تخطيت'
             . ($r['declared'] ? (' · إعلانات: ' . count($r['declared'])) : '') . ' ✅');
     }
 
@@ -82,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$can_edit) { $redirect('لا توجد صلاحية لهذا الإجراء ❌'); }
         $r = CAP::freeze($conn, $gate, $company_id,
             intval($_POST['capacity_id'] ?? 0), strval($_POST['reason'] ?? ''), $uid);
-        $redirect($r['ok'] ? 'جُمّدت الصفةُ بسببها — والسجلُّ باقٍ للقراءة ✅'
+        $redirect($r['ok'] ? 'جمدت الصفة بسببها — والسجل باق للقراءة ✅'
                            : ($r['code'] . ' — ' . $r['reason'] . ' ❌'));
     }
 }
@@ -91,7 +91,7 @@ $myCaps = CAP::activeOf($conn, $gate, $uid);
 $allCaps = $can_edit ? CAP::listAll($gate, 500) : array();
 $activeCapId = isset($_SESSION['active_capacity']['id']) ? intval($_SESSION['active_capacity']['id']) : 0;
 
-$page_title = 'إيكوبيشن | صفاتي ومبدّل المساحة';
+$page_title = 'إيكوبيشن | صفاتي ومبدل المساحة';
 // CM-00 (DEC-E · U10): بذرُ محاورِ الغلافِ من الخادم — AX-2/3 من محرك الصلاحيات
 // (الملفُّ في جذرِ ems — فمسارُ includes مباشرٌ لا بـ../ التي كانت تشير خارجَ الجذر)
 require_once __DIR__ . '/includes/screen_contract.php';
@@ -102,7 +102,7 @@ require_once __DIR__ . '/includes/screen_contract.php'; if (isset($conn)) { ems_
 ?>
 <div class="main ems-unified-page-shell">
     <?php
-    $header_title = 'صفاتي ومبدّل المساحة'; $header_icon = 'fa fa-id-badge';
+    $header_title = 'صفاتي ومبدل المساحة'; $header_icon = 'fa fa-id-badge';
     $header_actions = array();
     include('includes/page_header.php');
     if (isset($_GET['msg'])) {
@@ -110,16 +110,16 @@ require_once __DIR__ . '/includes/screen_contract.php'; if (isset($conn)) { ems_
     }
 
     /* UXW-01 ⑨: حزمةُ الحالاتِ الدنيا — مخفيةٌ افتراضًا ويُظهرها منطقُ الشاشةِ عند حالِها */
-    echo ems_states_bundle('لا صفاتٍ مشتقةً لحسابك بعدُ',
-        'الاشتقاقُ بيد مديرِ الصلاحيات — الصفةُ تُشتقّ من عقدِك أو ربطِك لا تُمنح يدويًّا');
+    echo ems_states_bundle('لا صفات مشتقة لحسابك بعد',
+        'الاشتقاق بيد مدير الصلاحيات — الصفة تشتق من عقدك أو ربطك لا تمنح يدويا');
     ?>
 
     <div class="card"><div class="card-body">
         <p class="uc-note">
-            <strong>الشخصُ واحدٌ والصفاتُ متعددةٌ ومتزامنة</strong> (USR-01 §2) — كلُّ صفةٍ
-            بنطاقها ودورِها منفصلةً <strong>ولا تتسرّب بينهما بيانات</strong>. الصلاحياتُ
-            مرتبطةٌ <strong>بالصفة لا بالشخص</strong>: انتهاءُ العقد أو التفويض
-            <strong>يجمّد الصفةَ آليًّا</strong> ويبقى سجلُّها للقراءة.
+            <strong>الشخص واحد والصفات متعددة ومتزامنة</strong> (USR-01 §2) — كل صفة
+            بنطاقها ودورها منفصلة <strong>ولا تتسرب بينهما بيانات</strong>. الصلاحيات
+            مرتبطة <strong>بالصفة لا بالشخص</strong>: انتهاء العقد أو التفويض
+            <strong>يجمد الصفة آليا</strong> ويبقى سجلها للقراءة.
         </p>
     </div></div>
 
@@ -131,13 +131,13 @@ require_once __DIR__ . '/includes/screen_contract.php'; if (isset($conn)) { ems_
             <tbody>
             <?php if (!$myCaps): ?>
                 <tr><td colspan="7" class="uc-empty-cell">
-                    لا صفاتَ مشتقةً لحسابك بعدُ — الاشتقاقُ بيد مدير الصلاحيات</td></tr>
+                    لا صفات مشتقة لحسابك بعد — الاشتقاق بيد مدير الصلاحيات</td></tr>
             <?php endif; ?>
             <?php foreach ($myCaps as $c): ?>
                 <tr<?php echo (string)$c['state'] !== 'active' ? ' class="uc-frozen"' : ''; ?>>
                     <td><strong><?php echo htmlspecialchars(CAP::CAPACITY_AR[$c['capacity_type']] ?? $c['capacity_type']); ?></strong>
                         <?php if (intval($c['id']) === $activeCapId): ?>
-                            <span class="badge badge-success">الفعّالة الآن</span>
+                            <span class="badge badge-success">الفعالة الآن</span>
                         <?php endif; ?></td>
                     <td><?php echo htmlspecialchars((string)$c['role']); ?></td>
                     <td><?php echo htmlspecialchars((string)$c['scope_type']); ?>
@@ -145,7 +145,7 @@ require_once __DIR__ . '/includes/screen_contract.php'; if (isset($conn)) { ems_
                     <td><?php echo htmlspecialchars((string)$c['source_type']); ?>
                         <?php if ($c['source_id'] !== null): ?>#<?php echo intval($c['source_id']); ?><?php endif; ?>
                         <?php if ((string)$c['source_note'] !== ''): ?>
-                            <small class="uc-declared" title="<?php echo htmlspecialchars((string)$c['source_note']); ?>">⚠ معلَن</small>
+                            <small class="uc-declared" title="<?php echo htmlspecialchars((string)$c['source_note']); ?>">⚠ معلن</small>
                         <?php endif; ?></td>
                     <td><?php echo htmlspecialchars((string)$c['valid_from']); ?>
                         → <?php echo $c['valid_to'] !== null ? htmlspecialchars((string)$c['valid_to']) : 'مفتوح'; ?></td>
@@ -153,7 +153,7 @@ require_once __DIR__ . '/includes/screen_contract.php'; if (isset($conn)) { ems_
                             <span class="badge badge-success">نشطة</span>
                         <?php else: ?>
                             <span class="badge badge-secondary" title="<?php echo htmlspecialchars((string)$c['state_reason']); ?>">
-                                مجمَّدة — للقراءة</span>
+                                مجمدة — للقراءة</span>
                         <?php endif; ?></td>
                     <td><?php if ((string)$c['state'] === 'active' && intval($c['id']) !== $activeCapId): ?>
                         <form method="post" class="uc-inline">
@@ -172,14 +172,14 @@ require_once __DIR__ . '/includes/screen_contract.php'; if (isset($conn)) { ems_
     <div class="card"><div class="card-header"><h5><i class="fa fa-wand-magic-sparkles"></i>
         الاشتقاق من القائم (لمدير الصلاحيات)</h5></div>
     <div class="card-body">
-        <p class="uc-note">يشتقّ صفةً لكل حسابٍ نشطٍ من <strong>عقده النشط في السجل الموحّد</strong>
-            (H-08) أو من <strong>ربط المورد</strong> — وما لا مصدرَ له يُعلَن
-            <strong>«تفويضًا موروثًا»</strong> ولا يُلفَّق. <strong>الإعادةُ لا تكرّر صفًّا.</strong></p>
+        <p class="uc-note">يشتق صفة لكل حساب نشط من <strong>عقده النشط في السجل الموحد</strong>
+            (H-08) أو من <strong>ربط المورد</strong> — وما لا مصدر له يعلن
+            <strong>«تفويضا موروثا»</strong> ولا يلفق. <strong>الإعادة لا تكرر صفا.</strong></p>
         <div class="uc-actions-row">
             <form method="post"><input type="hidden" name="cap_action" value="derive_dry">
-                <button type="submit" class="btn-primary"><i class="fa fa-flask"></i> جرّب (بلا كتابة)</button></form>
+                <button type="submit" class="btn-primary"><i class="fa fa-flask"></i> جرب (بلا كتابة)</button></form>
             <form method="post"><input type="hidden" name="cap_action" value="derive_apply">
-                <button type="submit" class="btn-primary"><i class="fa fa-play"></i> اشتقّ فعلًا</button></form>
+                <button type="submit" class="btn-primary"><i class="fa fa-play"></i> اشتق فعلا</button></form>
         </div>
     </div></div>
 
@@ -196,13 +196,13 @@ require_once __DIR__ . '/includes/screen_contract.php'; if (isset($conn)) { ems_
                 <th class="ems-fn-th" data-fn="1">الصفة النشطة الآن</th>
                 <th class="ems-fn-th" data-fn="1">آخر تبديل</th>
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                 <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                 <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                 <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطّلاع</th>
+                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطلاع</th>
                 <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                 </tr></thead>
             <tbody>
@@ -226,7 +226,7 @@ require_once __DIR__ . '/includes/screen_contract.php'; if (isset($conn)) { ems_
                             <input type="hidden" name="cap_action" value="freeze">
                             <input type="hidden" name="capacity_id" value="<?php echo intval($c['id']); ?>">
                             <input type="text" name="reason" placeholder="السبب *" required class="uc-reason-input" aria-label="سبب التجميد">
-                            <button type="submit" class="btn-primary">جمّد</button>
+                            <button type="submit" class="btn-primary">جمد</button>
                         </form>
                     <?php endif; ?></td>
                 </tr>

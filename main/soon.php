@@ -38,7 +38,7 @@ if ($meta) {
     if ($r) { while ($x = mysqli_fetch_assoc($r)) { $exposures[] = $x; } }
 }
 
-$page_title = 'قريبًا';
+$page_title = 'قريبا';
 /* inheader.php ليس زينةً: هو مَن يكتب <!DOCTYPE> و<meta viewport> ومكتبةَ
    الأيقونات. كانت هذه الشاشةُ وحدَها تستدعي insidebar بلا رأسٍ إطلاقًا،
    فيسقط المتصفّحُ في Quirks Mode ويقرأ العرضَ 981px على هاتفٍ عرضُه 375px —
@@ -60,7 +60,7 @@ $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-echo ems_states_bundle('لا عقدَ شاشةٍ مسجَّلًا لهذا الاسمِ القانوني', 'ارجعْ إلى القائمةِ واختر شاشةً من شريطِ التنقل');
+echo ems_states_bundle('لا عقد شاشة مسجلا لهذا الاسم القانوني', 'ارجع إلى القائمة واختر شاشة من شريط التنقل');
 ?>
 <style>
   .soon-wrap { max-width: 660px; margin: 40px auto; text-align: center; }
@@ -73,20 +73,20 @@ echo ems_states_bundle('لا عقدَ شاشةٍ مسجَّلًا لهذا ال�
 </style>
 
   <?php if (!$meta): ?>
-    <div class="alert alert-warning">شاشةٌ غيرُ معروفةٍ في القاموس القانوني — <a href="dashboard.php">العودة</a></div>
+    <div class="alert alert-warning">شاشة غير معروفة في القاموس القانوني — <a href="dashboard.php">العودة</a></div>
   <?php else: ?>
   <div class="soon-wrap">
     <div class="soon-icon"><i class="fa fa-hard-hat"></i></div>
     <h3 class="soon-title"><?= htmlspecialchars($meta['title_ar'], ENT_QUOTES, 'UTF-8') ?></h3>
-    <p class="text-muted">هذه الشاشةُ في خطة البناء — وموضعُها في النظام محجوزٌ ومعرَّفٌ بعقدها أدناه.</p>
+    <p class="text-muted">هذه الشاشة في خطة البناء — وموضعها في النظام محجوز ومعرف بعقدها أدناه.</p>
     <table class="table table-sm soon-table" data-no-dt>
-      <tr><th class="soon-th-name">الاسمُ القانوني</th><td><code><?= htmlspecialchars($meta['canonical_file'], ENT_QUOTES, 'UTF-8') ?></code></td></tr>
-      <tr><th>الإدارةُ المالكة</th><td><?= htmlspecialchars($meta['owner_dept'], ENT_QUOTES, 'UTF-8') ?></td></tr>
+      <tr><th class="soon-th-name">الاسم القانوني</th><td><code><?= htmlspecialchars($meta['canonical_file'], ENT_QUOTES, 'UTF-8') ?></code></td></tr>
+      <tr><th>الإدارة المالكة</th><td><?= htmlspecialchars($meta['owner_dept'], ENT_QUOTES, 'UTF-8') ?></td></tr>
       <?php foreach (array_slice($exposures, 0, 1) as $e2): ?>
-      <tr><th>نطاقُك فيها</th><td><?= htmlspecialchars($e2['scope_text'] ?: '—', ENT_QUOTES, 'UTF-8') ?></td></tr>
-      <tr><th>زاويتُك</th><td><?= htmlspecialchars($e2['angle'] ?: '—', ENT_QUOTES, 'UTF-8') ?></td></tr>
-      <tr><th>ما سيُسمح لك</th><td class="soon-allowed"><?= htmlspecialchars($e2['allowed_text'] ?: '—', ENT_QUOTES, 'UTF-8') ?></td></tr>
-      <tr><th>ما سيُحجب</th><td class="soon-blocked"><?= htmlspecialchars($e2['blocked_text'] ?: '—', ENT_QUOTES, 'UTF-8') ?></td></tr>
+      <tr><th>نطاقك فيها</th><td><?= htmlspecialchars($e2['scope_text'] ?: '—', ENT_QUOTES, 'UTF-8') ?></td></tr>
+      <tr><th>زاويتك</th><td><?= htmlspecialchars($e2['angle'] ?: '—', ENT_QUOTES, 'UTF-8') ?></td></tr>
+      <tr><th>ما سيسمح لك</th><td class="soon-allowed"><?= htmlspecialchars($e2['allowed_text'] ?: '—', ENT_QUOTES, 'UTF-8') ?></td></tr>
+      <tr><th>ما سيحجب</th><td class="soon-blocked"><?= htmlspecialchars($e2['blocked_text'] ?: '—', ENT_QUOTES, 'UTF-8') ?></td></tr>
       <?php endforeach; ?>
     </table>
     <a class="action-btn" href="javascript:history.back()"><i class="fa fa-arrow-right"></i> عودة</a>

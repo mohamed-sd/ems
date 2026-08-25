@@ -55,7 +55,7 @@ class JobHandlers
             $r3 = \App\Services\Finance\PostingService::retryFailed($gate, $conn, $co, $actor, $limit);
             $r4 = \App\Services\Finance\PostingService::postApproved($gate, $conn, $co, $actor, $limit);
             $done[] = "co$co: راجع=" . self::n($r1) . " اعتمد=" . self::n($r2)
-                    . " أعاد=" . self::n($r3) . " رحّل=" . self::n($r4);
+                    . " أعاد=" . self::n($r3) . " رحل=" . self::n($r4);
         }
         return array('ok' => true, 'summary' => implode(' · ', $done));
     }
@@ -99,7 +99,7 @@ class JobHandlers
             );
             $n += max(0, $conn->affected_rows);
         }
-        return array('ok' => true, 'summary' => "ذممٌ وُسمت متأخرةً: $n");
+        return array('ok' => true, 'summary' => "ذمم وسمت متأخرة: $n");
     }
 
     // ═══════════════ ⑤ إرسالُ الإنذارات — ومنها إنذارُ توقفِ العامل ═══════════════
@@ -107,7 +107,7 @@ class JobHandlers
     {
         require_once __DIR__ . '/JobScheduleService.php';
         $stall = JobScheduleService::alertStalled($conn);
-        return array('ok' => true, 'summary' => "إنذاراتُ توقفٍ مرفوعة: $stall");
+        return array('ok' => true, 'summary' => "إنذارات توقف مرفوعة: $stall");
     }
 
     // ═══════════ ⑥ إعادةُ محاولاتِ الناقل — تسليمٌ وتحريرُ العالق ═══════════
@@ -118,8 +118,8 @@ class JobHandlers
         $released = $w->releaseStale(3600);
         $st = $w->runOnce(min(500, max(1, (int) ($payload['limit'] ?? 200))));
         return array('ok' => true, 'summary' =>
-            "حُرّر عالقًا=$released · التقط={$st['claimed']} نجح={$st['processed']} "
-            . "فشل={$st['failed']} عُزل={$st['dlq']}");
+            "حرر عالقا=$released · التقط={$st['claimed']} نجح={$st['processed']} "
+            . "فشل={$st['failed']} عزل={$st['dlq']}");
     }
 
     // ═══════════════ ⑦ إعادةُ احتسابِ التسويات ═══════════════
@@ -133,7 +133,7 @@ class JobHandlers
             );
             $n += $r ? (int) $r->fetch_row()[0] : 0;
         }
-        return array('ok' => true, 'summary' => "تسوياتٌ مقيسة: $n");
+        return array('ok' => true, 'summary' => "تسويات مقيسة: $n");
     }
 
     // ═══════════════ ⑧ مراقبةُ التجربةِ الرائدة ═══════════════
@@ -143,7 +143,7 @@ class JobHandlers
         $stuck = (int) $conn->query(
             "SELECT COUNT(*) FROM `ems_job_queue` WHERE `state`='claimed' AND `lock_expires_at` < NOW(3)"
         )->fetch_row()[0];
-        return array('ok' => true, 'summary' => "صندوقُ الموتى=$dlq · مهامُّ مقفولةٌ منتهيةُ المهلة=$stuck");
+        return array('ok' => true, 'summary' => "صندوق الموتى=$dlq · مهام مقفولة منتهية المهلة=$stuck");
     }
 
     /** تلخيصٌ محايدٌ لمُرجَعٍ قد يكون مصفوفةً أو رقمًا — ولا يُخترع رقم. */

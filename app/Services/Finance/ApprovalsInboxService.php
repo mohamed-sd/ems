@@ -77,8 +77,8 @@ class ApprovalsInboxService
         $r = $conn->query("SELECT id, request_no, request_type, amount, currency, state, created_at
                              FROM fin_requests
                             WHERE company_id={$co}
-                              /* `submitted` ليست في تعدادِ `fin_requests.state` (INJ-0334):
-                                 أوّلُ حالةٍ بعد التقديمِ هي `under_review`. */
+                              /* `submitted` ليست في تعداد `fin_requests.state` (INJ-0334):
+                                 أول حالة بعد التقديم هي `under_review`. */
                               AND state IN ('under_review','pending_approval')
                               {$notMine}
                             ORDER BY created_at LIMIT 50");
@@ -120,7 +120,7 @@ class ApprovalsInboxService
                 'link' => '../Finance/journal_form_fin.php?id=' . (int) $x['id'],
                 'since' => (string) $x['posting_date']);
         }
-        $boxes[] = array('key' => 'journals', 'title' => 'القيود اليدوية غير المرحّلة',
+        $boxes[] = array('key' => 'journals', 'title' => 'القيود اليدوية غير المرحلة',
             'owner' => self::screenName($conn, 'Finance/journal_form_fin.php'), 'rows' => $rows, 'count' => count($rows));
 
         // ── ④ إقفالُ الفترات — المقفلةُ ناعمًا تنتظر الإقفالَ النهائي ────────
@@ -130,7 +130,7 @@ class ApprovalsInboxService
                             WHERE company_id={$co} AND state = 'soft_closed'
                             ORDER BY fiscal_year, period_no LIMIT 24");
         while ($r && ($x = $r->fetch_assoc())) {
-            $rows[] = array('label' => 'فترة ' . $x['period_code'] . ' — مقفلةٌ ناعمًا تنتظر النهائي',
+            $rows[] = array('label' => 'فترة ' . $x['period_code'] . ' — مقفلة ناعما تنتظر النهائي',
                 'link' => '../Finance/periods_fin.php',
                 'since' => (string) $x['period_code']);
         }

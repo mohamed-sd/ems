@@ -41,11 +41,11 @@ function driver_create(): void
     if (!mysqli_stmt_execute($stmt)) {
         $err = mysqli_stmt_error($stmt);
         mysqli_stmt_close($stmt);
-        api_fail('تعذّر التعيين: ' . $err, 422);
+        api_fail('تعذر التعيين: ' . $err, 422);
     }
     $id = mysqli_stmt_insert_id($stmt);
     mysqli_stmt_close($stmt);
-    api_ok(array('rel_id' => (int) $id), 'عُيّن السائق على المعدة');
+    api_ok(array('rel_id' => (int) $id), 'عين السائق على المعدة');
 }
 
 /** PUT /api/equipment-drivers/{rel_id} */
@@ -75,7 +75,7 @@ function driver_update(int $relId): void
     if ($n < 1) {
         api_fail('التعيين غير موجود في نطاقك أو لا تغيير', 404);
     }
-    api_ok(array('rel_id' => $relId), 'عُدّل التعيين');
+    api_ok(array('rel_id' => $relId), 'عدل التعيين');
 }
 
 /** GET /api/drivers/available?equipment_id= */

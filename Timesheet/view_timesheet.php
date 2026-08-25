@@ -844,7 +844,7 @@ $header_actions = array(
 $header_back = array('href' => 'timesheet_type.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
 include('../includes/page_header.php');
 // UXW-01 (9): حالاتُ الشاشةِ الدنيا (تحميل / فراغ / خطأ) — مخفيةٌ افتراضيًّا
-echo ems_states_bundle('لا سطورَ ساعاتٍ يوميةً مطابقةً للفلاتر المختارة', 'وسّعِ المدى الزمنيَّ أو امسحِ الفلاتر بزرِّ «مسح الفلاتر»');
+echo ems_states_bundle('لا سطور ساعات يومية مطابقة للفلاتر المختارة', 'وسع المدى الزمني أو امسح الفلاتر بزر «مسح الفلاتر»');
 ?>
 
 
@@ -866,8 +866,8 @@ echo ems_states_bundle('لا سطورَ ساعاتٍ يوميةً مطابقةً
                 return '<div class="stats-value">' . number_format($v, 2) . '</div>';
             }
             $why = ((int) $rowsCount === 0)
-                ? 'لا سطورَ في هذا الكشف بعد'
-                : 'سطورُ الكشفِ لا تحمل ساعاتٍ من هذا النوع';
+                ? 'لا سطور في هذا الكشف بعد'
+                : 'سطور الكشف لا تحمل ساعات من هذا النوع';
             return '<div class="stats-empty">0.00 — ' . $why . '</div>';
         }
     }
@@ -918,7 +918,7 @@ echo ems_states_bundle('لا سطورَ ساعاتٍ يوميةً مطابقةً
                 <div class="form-group">
                     <label for="operation_filter"><i class="fas fa-truck-moving"></i> الآلية</label>
                     <select name="operation_id" id="operation_filter">
-                        <option value=""><?= ($equipment_type === '1' || $equipment_type === '2') ? '-- اختر الآلية --' : '-- اختر نوع الآلية أولاً --' ?></option>
+                        <option value=""><?= ($equipment_type === '1' || $equipment_type === '2') ? '-- اختر الآلية --' : '-- اختر نوع الآلية أولا --' ?></option>
                         <?php foreach ($operations as $op) { ?>
                             <option value="<?= intval($op['id']) ?>" <?= $operation_id === intval($op['id']) ? 'selected' : '' ?>>
                                 <?= htmlspecialchars($op['eq_code'] . ' - ' . $op['eq_name']) ?>
@@ -937,7 +937,7 @@ echo ems_states_bundle('لا سطورَ ساعاتٍ يوميةً مطابقةً
                 <div class="form-group">
                     <label for="driver_filter"><i class="fas fa-user"></i> المشغل (السائق)</label>
                     <select name="employee_id" id="driver_filter">
-                        <option value=""><?= $operation_id > 0 ? '-- اختر السائق --' : '-- اختر الآلية أولاً --' ?></option>
+                        <option value=""><?= $operation_id > 0 ? '-- اختر السائق --' : '-- اختر الآلية أولا --' ?></option>
                         <?php foreach ($drivers as $driver) { ?>
                             <option value="<?= intval($driver['id']) ?>" <?= $employee_id === intval($driver['id']) ? 'selected' : '' ?>>
                                 <?= htmlspecialchars($driver['name']) ?>
@@ -947,19 +947,19 @@ echo ems_states_bundle('لا سطورَ ساعاتٍ يوميةً مطابقةً
                 </div>
                 <div class="form-group">
                     <label for="emsf_525_44920"><i class="fas fa-calendar-day"></i> تاريخ محدد</label>
-                    <input type="date" name="filter_date" id="emsf_525_44920" aria-label="تاريخٌ محدَّدٌ لسجلِّ الساعات" value="<?= htmlspecialchars($filter_date) ?>">
+                    <input type="date" name="filter_date" id="emsf_525_44920" aria-label="تاريخ محدد لسجل الساعات" value="<?= htmlspecialchars($filter_date) ?>">
                 </div>
                 <div class="form-group">
                     <label for="emsf_526_90bf6"><i class="fas fa-calendar"></i> من تاريخ</label>
-                    <input type="date" name="start_date" id="emsf_526_90bf6" aria-label="بدايةُ المدى الزمني" value="<?= htmlspecialchars($start_date) ?>">
+                    <input type="date" name="start_date" id="emsf_526_90bf6" aria-label="بداية المدى الزمني" value="<?= htmlspecialchars($start_date) ?>">
                 </div>
                 <div class="form-group">
                     <label for="emsf_527_24253"><i class="fas fa-calendar"></i> إلى تاريخ</label>
-                    <input type="date" name="end_date" id="emsf_527_24253" aria-label="نهايةُ المدى الزمني" value="<?= htmlspecialchars($end_date) ?>">
+                    <input type="date" name="end_date" id="emsf_527_24253" aria-label="نهاية المدى الزمني" value="<?= htmlspecialchars($end_date) ?>">
                 </div>
                 <div class="form-group">
                     <label for="emsf_528_b119d"><i class="fas fa-calendar-alt"></i> الشهر</label>
-                    <input type="month" name="month" id="emsf_528_b119d" aria-label="شهرُ سجلِّ الساعات" value="<?= htmlspecialchars($month_filter) ?>">
+                    <input type="month" name="month" id="emsf_528_b119d" aria-label="شهر سجل الساعات" value="<?= htmlspecialchars($month_filter) ?>">
                 </div>
                 <div class="form-group">
                     <label for="emsf_529_4b5c6"><i class="fas fa-toggle-on"></i> حالة السجل</label>
@@ -1061,8 +1061,8 @@ echo ems_states_bundle('لا سطورَ ساعاتٍ يوميةً مطابقةً
 
                         <th data-group="basic">عرض التفاصيل</th>
                                         <!-- U10-B12: النواة الحاكمة (الخلايا يحشوها ui-unification.js) -->
-                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ السجل وبأي صفة">المُنشئ — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ السجل وبأي صفة">المنشئ — الاسم والصفة</th>
                     <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء">تاريخ الإنشاء</th>
                     <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="السجل الذي تولد عنه">المرجع الأب</th>
 </tr>
@@ -1179,10 +1179,10 @@ $(document).ready(function () {
         var driverSelect = $('#driver_filter');
 
         operationSelect.html("<option value=''>-- جاري تحميل الآليات... --</option>");
-        driverSelect.html("<option value=''>-- اختر الآلية أولاً --</option>");
+        driverSelect.html("<option value=''>-- اختر الآلية أولا --</option>");
 
         if (typeVal !== '1' && typeVal !== '2' && typeVal !== '3') {
-            operationSelect.html("<option value=''>-- اختر نوع الآلية أولاً --</option>");
+            operationSelect.html("<option value=''>-- اختر نوع الآلية أولا --</option>");
             return;
         }
 
@@ -1206,7 +1206,7 @@ $(document).ready(function () {
         driverSelect.html("<option value=''>-- جاري تحميل السائقين... --</option>");
 
         if (!operationId) {
-            driverSelect.html("<option value=''>-- اختر الآلية أولاً --</option>");
+            driverSelect.html("<option value=''>-- اختر الآلية أولا --</option>");
             return;
         }
 

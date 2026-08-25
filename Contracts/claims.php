@@ -67,14 +67,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'gener
     $res = claim_generate($conn, $_POST['contract_id'] ?? 0,
         trim($_POST['period_from'] ?? ''), trim($_POST['period_to'] ?? ''), $current_user_id);
     if ($res['status'] === 'created') {
-        clm_back('وُلّد المستخلص بـ' . $res['lines'] . ' بندًا · إجمالي ' . number_format($res['gross'], 2)
+        clm_back('ولد المستخلص ب' . $res['lines'] . ' بندا · إجمالي ' . number_format($res['gross'], 2)
                  . ($res['reason'] !== '' ? (' — ' . $res['reason']) : '') . ' ✅');
     } elseif ($res['status'] === 'exists') {
         clm_back($res['reason'] . ' ⚠️');
     } elseif ($res['status'] === 'empty') {
         clm_back($res['reason'] . ' ⚠️');
     }
-    clm_back('تعذّر التوليد: ' . ($res['reason'] !== '' ? $res['reason'] : 'خطأٌ داخلي') . ' ❌');
+    clm_back('تعذر التوليد: ' . ($res['reason'] !== '' ? $res['reason'] : 'خطأ داخلي') . ' ❌');
 }
 
 // رفعٌ للمالية (يدُ المبيعات) — draft → review
@@ -83,12 +83,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'submi
     if (!clm_check_csrf()) { clm_back('رمز الحماية غير صالح ❌'); }
     $res = claim_submit(intval($_POST['id'] ?? 0), $current_user_id);
     if ($res['status'] === 'submitted') { clm_back($res['reason'] . ' — بانتظار إجازة المالية ✅'); }
-    clm_back($res['reason'] !== '' ? ($res['reason'] . ' ⚠️') : 'تعذّر الرفع ❌');
+    clm_back($res['reason'] !== '' ? ($res['reason'] . ' ⚠️') : 'تعذر الرفع ❌');
 }
 
 // إجازةٌ مالية (يدُ المالية) — فاتورةٌ ضريبيةٌ + ذمّةُ العميل
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'approve') {
-    if (!$can_approve) { clm_back('الإجازةُ صلاحيةُ المالية — لا يعتمد المستخلصَ من أنشأه ❌'); }
+    if (!$can_approve) { clm_back('الإجازة صلاحية المالية — لا يعتمد المستخلص من أنشأه ❌'); }
     if (!clm_check_csrf()) { clm_back('رمز الحماية غير صالح ❌'); }
     // «من أنشأ لا يعتمد» بنيويًّا (E-04 UXP-090 · حارس self.approval=never):
     // كانت الرسالةُ أعلاه تَعِد بما لا يفحصه الكود — $can_approve رايةُ دورٍ لا
@@ -102,11 +102,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'appro
     $res = claim_approve($conn, intval($_POST['id'] ?? 0),
         (($_POST['tax_code'] ?? '') !== '' ? $_POST['tax_code'] : null), $current_user_id);
     if ($res['status'] === 'approved') {
-        clm_back('أُجيز المستخلص · فاتورة ' . $res['invoice_no'] . ' · وفُتحت ذمّةُ العميل ✅');
+        clm_back('أجيز المستخلص · فاتورة ' . $res['invoice_no'] . ' · وفتحت ذمة العميل ✅');
     } elseif ($res['status'] === 'exists') {
-        clm_back('المستخلصُ معتمدٌ سلفًا (فاتورة ' . $res['invoice_no'] . ') ⚠️');
+        clm_back('المستخلص معتمد سلفا (فاتورة ' . $res['invoice_no'] . ') ⚠️');
     }
-    clm_back('تعذّرت الإجازة: ' . ($res['reason'] !== '' ? $res['reason'] : 'خطأٌ داخلي') . ' ❌');
+    clm_back('تعذرت الإجازة: ' . ($res['reason'] !== '' ? $res['reason'] : 'خطأ داخلي') . ' ❌');
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'cancel') {
@@ -115,15 +115,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'cance
     $cid = intval($_POST['id'] ?? 0);
     try {
         $c = $gate->selectOne('claims', array('where' => array('id' => $cid)));
-        if (!$c) { clm_back('المستخلصُ غير موجود ❌'); }
+        if (!$c) { clm_back('المستخلص غير موجود ❌'); }
         if (in_array((string) $c['state'], array('approved', 'invoiced', 'collected'), true)) {
-            clm_back('لا يُلغى مستخلصٌ معتمد — التصحيحُ بمستخلصٍ عاكسٍ موثَّق ❌');
+            clm_back('لا يلغى مستخلص معتمد — التصحيح بمستخلص عاكس موثق ❌');
         }
         $gate->update('claims', array('state' => 'cancelled'), array('id' => $cid));
-        clm_back('أُلغي المستخلصُ ورُدَّت وقائعُه للاستخلاص ✅');
+        clm_back('ألغي المستخلص وردت وقائعه للاستخلاص ✅');
     } catch (\Throwable $t) {
         error_log('claim cancel: ' . $t->getMessage());
-        clm_back('تعذّر الإلغاء ❌');
+        clm_back('تعذر الإلغاء ❌');
     }
 }
 
@@ -134,7 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'cance
 // يُرفع من الشاشة ولا يُحسم. واليدان: **الرفعُ لمن يُعدّ** (`can_add` — المبيعاتُ
 // أو مراجعُ العميل)، و**الحسمُ ليدِ الإجازة** (`can_approve` — المالية).
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'dispute_raise') {
-    if (!$can_add) { clm_back('رفعُ النزاع صلاحيةُ من يُعدّ ❌'); }
+    if (!$can_add) { clm_back('رفع النزاع صلاحية من يعد ❌'); }
     if (!clm_check_csrf()) { clm_back('رمز الحماية غير صالح ❌'); }
     require_once __DIR__ . '/../app/Services/Revenue/ClaimDisputeService.php';
     $r = \App\Services\Revenue\ClaimDisputeService::raise($conn, $gate, $company_id,
@@ -142,19 +142,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'dispu
         array('reason' => strval($_POST['dispute_reason'] ?? ''),
               'doc_ref' => strval($_POST['dispute_doc_ref'] ?? '')), $current_user_id);
     clm_back($r['ok']
-        ? ('رُفع النزاعُ على البند — والبقيةُ تمضي (نزاعٌ مفتوح: ' . $r['open_count'] . ') ✅')
+        ? ('رفع النزاع على البند — والبقية تمضي (نزاع مفتوح: ' . $r['open_count'] . ') ✅')
         : ($r['code'] . ' — ' . $r['reason'] . ' ❌'));
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'dispute_resolve') {
-    if (!$can_approve) { clm_back('حسمُ النزاع صلاحيةُ المالية ❌'); }
+    if (!$can_approve) { clm_back('حسم النزاع صلاحية المالية ❌'); }
     if (!clm_check_csrf()) { clm_back('رمز الحماية غير صالح ❌'); }
     require_once __DIR__ . '/../app/Services/Revenue/ClaimDisputeService.php';
     $r = \App\Services\Revenue\ClaimDisputeService::resolve($conn, $gate, $company_id,
         intval($_POST['line_id'] ?? 0), strval($_POST['resolution'] ?? ''),
         strval($_POST['resolution_note'] ?? ''), $current_user_id);
     clm_back($r['ok']
-        ? ('حُسم النزاعُ — الصافي ' . $r['net'] . ' · نزاعٌ مفتوح: ' . $r['open_count'] . ' ✅')
+        ? ('حسم النزاع — الصافي ' . $r['net'] . ' · نزاع مفتوح: ' . $r['open_count'] . ' ✅')
         : ($r['code'] . ' — ' . $r['reason'] . ' ❌'));
 }
 
@@ -168,7 +168,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'dispu
 // M-01: تسجيلُ قبضِ دفعةٍ مقدَّمة — **يدُ المالية** (`can_edit`)، فهي التي تقبض.
 // والمبلغُ يُدخَل من سند القبض ولا يُشتق من نسبةٍ (قاعدةُ عدم التلفيق).
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'advance_record') {
-    if (!$can_approve) { clm_back('تسجيلُ قبض الدفعة صلاحيةُ المالية ❌'); }
+    if (!$can_approve) { clm_back('تسجيل قبض الدفعة صلاحية المالية ❌'); }
     if (!clm_check_csrf()) { clm_back('رمز الحماية غير صالح ❌'); }
     $res = advance_record($conn, $gate, intval($_POST['contract_id'] ?? 0),
         $_POST['amount'] ?? 0, strval($_POST['received_date'] ?? ''),
@@ -176,12 +176,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'advan
     if (!$res['ok']) { clm_back($res['reason'] . ' ❌'); }
     clm_back(!empty($res['existing'])
         ? ($res['reason'] . ' ⚠️')
-        : ('سُجّل قبضُ الدفعة ' . $res['advance_no']
-           . ' — ومن الآن يُستقطع منها بسقفها ولا يتجاوزه ✅'));
+        : ('سجل قبض الدفعة ' . $res['advance_no']
+           . ' — ومن الآن يستقطع منها بسقفها ولا يتجاوزه ✅'));
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'note_create') {
-    if (!$can_add) { clm_back('إنشاءُ الإشعار صلاحيةُ المبيعات ❌'); }
+    if (!$can_add) { clm_back('إنشاء الإشعار صلاحية المبيعات ❌'); }
     if (!clm_check_csrf()) { clm_back('رمز الحماية غير صالح ❌'); }
     $res = cdnote_create($gate, intval($_POST['claim_id'] ?? 0),
         strval($_POST['note_kind'] ?? ''), $_POST['amount'] ?? 0,
@@ -193,32 +193,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'note_
         $current_user_id);
     if (!$res['ok']) { clm_back($res['reason'] . ' ❌'); }
     clm_back(!empty($res['existing'])
-        ? ('إشعارٌ مطابقٌ قائمٌ سلفًا: ' . $res['note_no'] . ' ⚠️')
-        : ('أُنشئ الإشعار ' . $res['note_no'] . ' مسودةً — ارفعه للمالية ✅'));
+        ? ('إشعار مطابق قائم سلفا: ' . $res['note_no'] . ' ⚠️')
+        : ('أنشئ الإشعار ' . $res['note_no'] . ' مسودة — ارفعه للمالية ✅'));
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'note_submit') {
     if (!$can_add) { clm_back('لا توجد صلاحية رفع ❌'); }
     if (!clm_check_csrf()) { clm_back('رمز الحماية غير صالح ❌'); }
     $res = cdnote_submit($gate, intval($_POST['note_id'] ?? 0), $current_user_id);
-    clm_back($res['ok'] ? 'رُفع الإشعارُ للمالية ✅' : ($res['reason'] . ' ❌'));
+    clm_back($res['ok'] ? 'رفع الإشعار للمالية ✅' : ($res['reason'] . ' ❌'));
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'note_approve') {
-    if (!$can_approve) { clm_back('إجازةُ الإشعار صلاحيةُ المالية ❌'); }
+    if (!$can_approve) { clm_back('إجازة الإشعار صلاحية المالية ❌'); }
     if (!clm_check_csrf()) { clm_back('رمز الحماية غير صالح ❌'); }
     $res = cdnote_approve($conn, $gate, intval($_POST['note_id'] ?? 0), $current_user_id);
     if (!$res['ok']) { clm_back($res['reason'] . ' ❌'); }
     clm_back(!empty($res['existing'])
         ? ($res['reason'] . ' ⚠️')
-        : 'أُجيز الإشعارُ وتحرّكت ذمّةُ العميل بمقداره — والفاتورةُ الأصليةُ كما صدرت ✅');
+        : 'أجيز الإشعار وتحركت ذمة العميل بمقداره — والفاتورة الأصلية كما صدرت ✅');
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'note_cancel') {
     if (!$can_add) { clm_back('لا توجد صلاحية ❌'); }
     if (!clm_check_csrf()) { clm_back('رمز الحماية غير صالح ❌'); }
     $res = cdnote_cancel($gate, intval($_POST['note_id'] ?? 0), $current_user_id);
-    clm_back($res['ok'] ? 'أُلغي الإشعار ✅' : ($res['reason'] . ' ❌'));
+    clm_back($res['ok'] ? 'ألغي الإشعار ✅' : ($res['reason'] . ' ❌'));
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -303,7 +303,7 @@ require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : null));
 include('../inheader.php');
 include('../insidebar.php');
-require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('contract', 'المستخلصاتُ والفواتير');
+require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('contract', 'المستخلصات والفواتير');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main ems-unified-page-shell ems-doc-cycle">
@@ -324,18 +324,18 @@ include('../includes/page_header.php');
     require_once __DIR__ . '/../includes/report_button.php';
     ems_report_button(array('screen' => 'claims', 'contract_id' => $contract_id ?? null));
     // UXW-01 ⑫: شاشةُ دورةٍ اعتماديةٍ تنطق بحالتِها الحية (مسودة · مراجعة · مفوتر) — فتُعلن خطوتَها التالية
-    echo ems_next_step('توليدُ المستخلص ثم رفعُه للمالية فإجازتُه — فتصدر الفاتورةُ الضريبيةُ وتُفتح ذمّةُ العميل');
+    echo ems_next_step('توليد المستخلص ثم رفعه للمالية فإجازته — فتصدر الفاتورة الضريبية وتفتح ذمة العميل');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا مستخلصاتٍ ضمن هذا الترشيح', 'ولّد مستخلصَ فترةٍ لعقدٍ من زرِّ الرأس أو غيّر مرشِّحَ الحالة');
+    echo ems_states_bundle('لا مستخلصات ضمن هذا الترشيح', 'ولد مستخلص فترة لعقد من زر الرأس أو غير مرشح الحالة');
     ?>
 
     <p class="text-muted clm-m4-12">
         <i class="fa fa-route"></i>
-        أيامٌ <strong>حوّلتها المالية</strong> ← <strong>مستخلص</strong> ← رفعٌ للمالية ← فاتورةٌ ضريبية ← ذمّةُ العميل.
-        اختر العقدَ والفترةَ فقط — الكمياتُ والأسعارُ والعميلُ تُشتق كلُّها.
+        أيام <strong>حولتها المالية</strong> ← <strong>مستخلص</strong> ← رفع للمالية ← فاتورة ضريبية ← ذمة العميل.
+        اختر العقد والفترة فقط — الكميات والأسعار والعميل تشتق كلها.
         <br><i class="fa fa-shield-halved"></i>
-        <strong>البنودُ من قيود الإيراد المعترَف بها وحدها</strong>: يومٌ لم يكتمل اعتمادُه الرباعي
-        ولم تحوّله المالية <strong>لا يُستخلص</strong> — والمستخلصُ يفوتر ولا يُنشئ إيرادًا ثانيًا.
+        <strong>البنود من قيود الإيراد المعترف بها وحدها</strong>: يوم لم يكتمل اعتماده الرباعي
+        ولم تحوله المالية <strong>لا يستخلص</strong> — والمستخلص يفوتر ولا ينشئ إيرادا ثانيا.
     </p>
 
     <?php if (isset($_GET['msg']) && trim($_GET['msg']) !== ''): ?>
@@ -351,7 +351,7 @@ include('../includes/page_header.php');
             <input type="hidden" name="action" value="generate">
             <input type="hidden" name="clm_csrf" value="<?php echo clm_e($clm_csrf); ?>">
             <div class="form-section">
-                <div class="form-group"><label for="emsf_21_efbd2">العقد <span class="mnt-req-hint">(العميلُ يُشتق منه)</span></label>
+                <div class="form-group"><label for="emsf_21_efbd2">العقد <span class="mnt-req-hint">(العميل يشتق منه)</span></label>
                     <select name="contract_id" required id="emsf_21_efbd2">
                         <option value="">— اختر العقد —</option>
                         <?php foreach ($contract_rows as $c): ?>
@@ -368,7 +368,7 @@ include('../includes/page_header.php');
                     <input type="date" name="period_to" required id="emsf_23_cac2e"></div>
             </div>
             <div class="clm-mt10">
-                <button type="submit" class="btn-primary"><i class="fas fa-bolt"></i> ولّد المستخلص</button>
+                <button type="submit" class="btn-primary"><i class="fas fa-bolt"></i> ولد المستخلص</button>
             </div>
         </div></div>
     </form>
@@ -377,21 +377,21 @@ include('../includes/page_header.php');
     <?php if ($show_unbilled): ?>
     <div class="card clm-mb14">
         <div class="card-header"><h5><i class="fas fa-hourglass-half"></i>
-            جاهزٌ للفوترة ولم يُفوتر — <?php echo intval($unbilled_days); ?> يومَ عملٍ
+            جاهز للفوترة ولم يفوتر — <?php echo intval($unbilled_days); ?> يوم عمل
             في <?php echo count($unbilled_contracts); ?> عقد</h5></div>
         <div class="card-body table-container">
             <?php if (empty($unbilled_rows)): ?>
                 <p class="text-muted clm-m6-2">
                     <i class="fa fa-circle-check"></i>
-                    لا يومَ عملٍ جاهزًا للفوترة خارجَ المستخلصات — كلُّ ما حوّلته الماليةُ مُطالَبٌ به.
+                    لا يوم عمل جاهزا للفوترة خارج المستخلصات — كل ما حولته المالية مطالب به.
                 </p>
             <?php else: ?>
             <p class="text-muted clm-m2-10">
                 <i class="fa fa-shield-halved"></i>
-                أيامٌ <strong>حوّلتها المالية</strong> ولم يشملها مستخلصٌ قائم. اختر العقدَ لتُولّد مستخلصَ مداه.
+                أيام <strong>حولتها المالية</strong> ولم يشملها مستخلص قائم. اختر العقد لتولد مستخلص مداه.
                 <br><i class="fa fa-coins"></i>
-                <strong>صفٌّ لكل عملة</strong>: العقدُ الواحد قد تكون أيامُه بعملتين، ولا تُجمعان في رقمٍ
-                واحدٍ ما لم يُدخَل سعرُ صرفهما.
+                <strong>صف لكل عملة</strong>: العقد الواحد قد تكون أيامه بعملتين، ولا تجمعان في رقم
+                واحد ما لم يدخل سعر صرفهما.
             </p>
             <table class="display clm-w100">
                 <thead><tr><th>العقد</th><th>المشروع</th><th>العميل</th><th>العملة</th><th>الأيام</th>
@@ -404,18 +404,18 @@ include('../includes/page_header.php');
                     <th class="ems-fn-th" data-fn="1">محتجز الضمان</th>
                     <th class="ems-fn-th" data-fn="1">تاريخ إرسال العميل</th>
                     <th class="ems-fn-th" data-fn="1">تاريخ اعتماد العميل</th>
-                    <th class="ems-fn-th" data-fn="1">أعدّه</th>
+                    <th class="ems-fn-th" data-fn="1">أعده</th>
                     <th class="ems-fn-th" data-fn="1">اعتمده</th>
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                     <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                     <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                     <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                     <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-                    <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+                    <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
                     <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
-                    <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
+                    <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
                     <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                     <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                     <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
@@ -437,7 +437,7 @@ include('../includes/page_header.php');
                                data-contract="<?php echo intval($u['contract_id']); ?>"
                                data-from="<?php echo clm_e($u['first_date']); ?>"
                                data-to="<?php echo clm_e($u['last_date']); ?>">
-                               <i class="fas fa-wand-magic-sparkles"></i> ولّد مداه</a>
+                               <i class="fas fa-wand-magic-sparkles"></i> ولد مداه</a>
                             <?php endif; ?>
                         </td>
                     </tr>
@@ -476,11 +476,11 @@ include('../includes/page_header.php');
                                 بند <?php echo intval($l['sale_line_no']); ?>
                                 <small>(<?php echo clm_e($l['sale_line_model']); ?>)</small>
                             <?php else: ?>
-                                <span class="badge badge-warning" title="النزاعُ يُروى بلا بندٍ يُنسَب إليه — صِل السطرَ من شاشة الربط 178">⚠ غيرُ موصول</span>
+                                <span class="badge badge-warning" title="النزاع يروى بلا بند ينسب إليه — صل السطر من شاشة الربط 178">⚠ غير موصول</span>
                             <?php endif; ?></td>
                         <td>
                         <?php if ($dstate === 'open'): ?>
-                            <span class="badge badge-warning">متنازَعٌ عليه</span>
+                            <span class="badge badge-warning">متنازع عليه</span>
                             <small><?php echo clm_e($l['dispute_reason']); ?>
                                 · مستند <?php echo clm_e($l['dispute_doc_ref']); ?></small>
                             <?php if ($can_approve): ?>
@@ -501,7 +501,7 @@ include('../includes/page_header.php');
                             <span class="badge <?php echo (string)$l['resolution'] === 'upheld'
                                 ? 'badge-danger' : 'badge-success'; ?>">
                                 <?php echo (string)$l['resolution'] === 'upheld'
-                                    ? 'أُقرَّ — البندُ ساقط' : 'رُدَّ — البندُ محتسَب'; ?></span>
+                                    ? 'أقر — البند ساقط' : 'رد — البند محتسب'; ?></span>
                             <small><?php echo clm_e($l['resolution_note']); ?></small>
                         <?php elseif ($can_add): ?>
                             <form method="post" class="clm-flexform">
@@ -509,9 +509,9 @@ include('../includes/page_header.php');
                                 <input type="hidden" name="clm_csrf" value="<?php echo clm_e($clm_csrf); ?>">
                                 <input type="hidden" name="action" value="dispute_raise">
                                 <input type="hidden" name="line_id" value="<?php echo intval($l['id']); ?>">
-                                <input type="text" name="dispute_reason" placeholder="سببُ الاعتراض" required aria-label="سببُ الاعتراض">
-                                <input type="text" name="dispute_doc_ref" placeholder="مستندُه" required aria-label="مستندُه">
-                                <button type="submit" class="btn-primary">ارفع نزاعًا</button>
+                                <input type="text" name="dispute_reason" placeholder="سبب الاعتراض" required aria-label="سبب الاعتراض">
+                                <input type="text" name="dispute_doc_ref" placeholder="مستنده" required aria-label="مستنده">
+                                <button type="submit" class="btn-primary">ارفع نزاعا</button>
                             </form>
                         <?php else: ?>
                             <span class="text-muted">—</span>
@@ -550,26 +550,26 @@ include('../includes/page_header.php');
     <?php if ($adv_pct > 0 || $adv['received'] > 0 || $adv['recovered'] > 0): ?>
     <div class="card clm-mb14">
         <div class="card-header"><h5><i class="fas fa-hand-holding-dollar"></i>
-            الدفعةُ المقدَّمة — عقد #<?php echo $adv_cid; ?></h5></div>
+            الدفعة المقدمة — عقد #<?php echo $adv_cid; ?></h5></div>
         <div class="card-body">
             <p class="text-muted clm-adv-note">
                 <strong>المقبوض:</strong> <?php echo clm_num($adv['received']); ?>
-                · <strong>المستهلَك:</strong> <?php echo clm_num($adv['recovered']); ?>
+                · <strong>المستهلك:</strong> <?php echo clm_num($adv['recovered']); ?>
                 · <strong>المتبقي:</strong>
                 <strong class="<?php echo ($adv['balance'] < 0) ? 'clm-neg' : 'clm-pos'; ?>">
                     <?php echo clm_num($adv['balance']); ?></strong>
-                <?php if ($adv_pct > 0): ?> · نسبةُ الاسترداد <?php echo clm_num($adv_pct); ?>٪<?php endif; ?>
+                <?php if ($adv_pct > 0): ?> · نسبة الاسترداد <?php echo clm_num($adv_pct); ?>٪<?php endif; ?>
                 <br>
                 <?php if ($adv['received'] <= 0 && $adv_pct > 0): ?>
                     <i class="fa fa-triangle-exclamation"></i>
-                    <strong>للعقد نسبةُ استردادٍ ولا دفعةَ مقبوضةً مسجَّلة</strong> —
-                    فلا يُستقطع شيءٌ (لا استردادَ لدَينٍ لم يُقرَض). سجّل سندَ القبض ليبدأ الاستقطاع.
+                    <strong>للعقد نسبة استرداد ولا دفعة مقبوضة مسجلة</strong> —
+                    فلا يستقطع شيء (لا استرداد لدين لم يقرض). سجل سند القبض ليبدأ الاستقطاع.
                 <?php elseif ($adv['balance'] <= 0 && $adv['received'] > 0): ?>
                     <i class="fa fa-circle-check"></i>
-                    استُردّت بالكامل — <strong>ولا استقطاعَ في هذا المستخلص ولا فيما بعده</strong>.
+                    استردت بالكامل — <strong>ولا استقطاع في هذا المستخلص ولا فيما بعده</strong>.
                 <?php elseif ($adv['balance'] > 0): ?>
                     <i class="fa fa-circle-info"></i>
-                    الاستقطاعُ في كل فترةٍ = الأقلُّ من (النسبة × أساس الفترة) و<strong>المتبقي</strong>.
+                    الاستقطاع في كل فترة = الأقل من (النسبة × أساس الفترة) و<strong>المتبقي</strong>.
                 <?php endif; ?>
             </p>
             <?php if ($can_approve): ?>
@@ -580,17 +580,17 @@ include('../includes/page_header.php');
                 <input type="hidden" name="clm_csrf" value="<?php echo clm_e($clm_csrf); ?>">
                 <div class="form-section"><div class="form-grid">
                     <div class="form-group"><label for="emsf_24_3ce23">المبلغ المقبوض *
-                        <span class="mnt-req-hint">(من سند القبض — لا يُشتق من نسبة)</span></label>
+                        <span class="mnt-req-hint">(من سند القبض — لا يشتق من نسبة)</span></label>
                         <input type="number" step="0.01" min="0.01" name="amount" required id="emsf_24_3ce23"></div>
                     <div class="form-group"><label for="emsf_25_085b3">تاريخ القبض *</label>
                         <input type="date" name="received_date" required id="emsf_25_085b3"></div>
-                    <div class="form-group"><label for="emsf_26_a8c63">مرجعُ السند *</label>
+                    <div class="form-group"><label for="emsf_26_a8c63">مرجع السند *</label>
                         <input type="text" name="doc_ref" maxlength="120" required id="emsf_26_a8c63"></div>
                     <div class="form-group"><label for="emsf_27_e5f9e">ملاحظة</label>
                         <input type="text" name="note" maxlength="255" id="emsf_27_e5f9e"></div>
                 </div></div>
                 <div class="clm-mt10">
-                    <button type="submit" class="btn-primary"><i class="fas fa-receipt"></i> سجّل قبضَ الدفعة</button>
+                    <button type="submit" class="btn-primary"><i class="fas fa-receipt"></i> سجل قبض الدفعة</button>
                 </div>
             </form>
             <?php endif; ?>
@@ -610,12 +610,12 @@ include('../includes/page_header.php');
     ?>
     <div class="card clm-mb14">
         <div class="card-header"><h5><i class="fas fa-file-circle-exclamation"></i>
-            الإشعاراتُ الدائنة/المدينة على <?php echo clm_e($open_claim['claim_no']); ?></h5></div>
+            الإشعارات الدائنة/المدينة على <?php echo clm_e($open_claim['claim_no']); ?></h5></div>
         <div class="card-body table-container">
             <p class="text-muted clm-m2-10">
                 <i class="fa fa-shield-halved"></i>
-                <strong>الفاتورةُ الصادرة لا تُعدَّل</strong> — تُصحَّح بإشعارٍ يشير إليها
-                ويحرّك ذمّةَ العميل بمقداره. والأصلُ يبقى كما صدر.
+                <strong>الفاتورة الصادرة لا تعدل</strong> — تصحح بإشعار يشير إليها
+                ويحرك ذمة العميل بمقداره. والأصل يبقى كما صدر.
                 <br><i class="fa fa-calculator"></i>
                 <strong>صافي المطالبة:</strong>
                 <?php echo clm_num($open_net['invoiced']); ?>
@@ -641,7 +641,7 @@ include('../includes/page_header.php');
                         <td><?php echo clm_e($n['reason']); ?></td>
                         <td><?php echo clm_e($n['doc_ref']); ?></td>
                         <td><?php echo $n['claim_line_id'] !== null
-                                ? ('#' . intval($n['claim_line_id'])) : 'المستخلص كلُّه'; ?></td>
+                                ? ('#' . intval($n['claim_line_id'])) : 'المستخلص كله'; ?></td>
                         <td><?php echo clm_e($note_states[$n['state']] ?? $n['state']); ?></td>
                         <td class="clm-nowrap">
                             <?php if ($can_add && (string) $n['state'] === 'draft'): ?>
@@ -650,13 +650,13 @@ include('../includes/page_header.php');
                                 <input type="hidden" name="action" value="note_submit">
                                 <input type="hidden" name="note_id" value="<?php echo intval($n['id']); ?>">
                                 <input type="hidden" name="clm_csrf" value="<?php echo clm_e($clm_csrf); ?>">
-                                <button type="submit" class="action-btn edit" title="رفعٌ للمالية">
+                                <button type="submit" class="action-btn edit" title="رفع للمالية">
                                     <i class="fa fa-paper-plane"></i></button>
                             </form>
                             <?php endif; ?>
                             <?php if ($can_approve && (string) $n['state'] === 'review'): ?>
                             <form action="claims.php" method="post" class="clm-inline"
-                                  onsubmit="return confirm('إجازةُ الإشعار تحرّك ذمّةَ العميل بمقداره. متابعة؟');">
+                                  onsubmit="return confirm('إجازة الإشعار تحرك ذمة العميل بمقداره. متابعة؟');">
         <?php echo csrf_field(); ?>
                                 <input type="hidden" name="action" value="note_approve">
                                 <input type="hidden" name="note_id" value="<?php echo intval($n['id']); ?>">
@@ -681,7 +681,7 @@ include('../includes/page_header.php');
                 </tbody>
             </table>
             <?php else: ?>
-                <p class="text-muted clm-m6-2">لا إشعاراتٍ على هذا المستخلص.</p>
+                <p class="text-muted clm-m6-2">لا إشعارات على هذا المستخلص.</p>
             <?php endif; ?>
 
             <?php if ($can_add && in_array((string) $open_claim['state'], $invoiced_states, true)): ?>
@@ -698,11 +698,11 @@ include('../includes/page_header.php');
                             <?php endforeach; ?>
                         </select></div>
                     <div class="form-group"><label for="emsf_29_6d8df">المبلغ *
-                        <span class="mnt-req-hint">(موجبٌ دائمًا — الاتجاهُ يحمل الإشارة)</span></label>
+                        <span class="mnt-req-hint">(موجب دائما — الاتجاه يحمل الإشارة)</span></label>
                         <input type="number" step="0.01" min="0.01" name="amount" required id="emsf_29_6d8df"></div>
                     <div class="form-group"><label for="emsf_30_6e755">السطر <span class="mnt-req-hint">(اختياري)</span></label>
                         <select name="claim_line_id" id="emsf_30_6e755">
-                            <option value="">المستخلص كلُّه</option>
+                            <option value="">المستخلص كله</option>
                             <?php foreach ($open_lines as $l): ?>
                                 <option value="<?php echo intval($l['id']); ?>">
                                     #<?php echo intval($l['id']); ?> — <?php echo clm_e($l['work_date']); ?>
@@ -711,10 +711,10 @@ include('../includes/page_header.php');
                         </select></div>
                     <div class="form-group"><label for="emsf_31_3aaaf">السبب *</label>
                         <input type="text" name="reason" maxlength="255" required
-                               placeholder="لماذا يُصحَّح؟" id="emsf_31_3aaaf"></div>
-                    <div class="form-group"><label for="emsf_32_0b3ca">مرجعُ المستند *</label>
+                               placeholder="لماذا يصحح؟" id="emsf_31_3aaaf"></div>
+                    <div class="form-group"><label for="emsf_32_0b3ca">مرجع المستند *</label>
                         <input type="text" name="doc_ref" maxlength="120" required
-                               placeholder="رقمُ المستند المؤيِّد" id="emsf_32_0b3ca"></div>
+                               placeholder="رقم المستند المؤيد" id="emsf_32_0b3ca"></div>
                 </div></div>
                 <div class="clm-mt10">
                     <button type="submit" class="btn-primary"><i class="fas fa-file-circle-plus"></i> أنشئ الإشعار</button>
@@ -723,7 +723,7 @@ include('../includes/page_header.php');
             <?php elseif ($can_add): ?>
                 <p class="text-muted clm-m10-2">
                     <i class="fa fa-circle-info"></i>
-                    لا إشعارَ إلا على مستخلصٍ صدرت فاتورتُه — وما لم يُفوتر بعدُ يُصحَّح في موضعه.
+                    لا إشعار إلا على مستخلص صدرت فاتورته — وما لم يفوتر بعد يصحح في موضعه.
                 </p>
             <?php endif; ?>
         </div>
@@ -758,36 +758,36 @@ include('../includes/page_header.php');
                                     <i class="fa fa-eye"></i></a>
                                 <?php if ($can_add && (string)$c['state'] === 'draft'): ?>
                                     <form action="claims.php" method="post" class="clm-inline"
-                                          onsubmit="return confirm('رفعُ المستخلص للمالية يقفل تعديلَه عندك. متابعة؟');">
+                                          onsubmit="return confirm('رفع المستخلص للمالية يقفل تعديله عندك. متابعة؟');">
         <?php echo csrf_field(); ?>
                                         <input type="hidden" name="action" value="submit">
                                         <input type="hidden" name="id" value="<?php echo intval($c['id']); ?>">
                                         <input type="hidden" name="clm_csrf" value="<?php echo clm_e($clm_csrf); ?>">
-                                        <button type="submit" class="action-btn edit" title="رفعٌ للمالية">
+                                        <button type="submit" class="action-btn edit" title="رفع للمالية">
                                             <i class="fa fa-paper-plane"></i></button>
                                     </form>
                                 <?php endif; ?>
                                 <?php if ($can_approve && (string)$c['state'] === 'review'): ?>
                                     <form action="claims.php" method="post" class="clm-inline"
-                                          onsubmit="return confirm('إجازةُ المستخلص تولّد فاتورةً ضريبيةً وتفتح ذمّةً على العميل. متابعة؟');">
+                                          onsubmit="return confirm('إجازة المستخلص تولد فاتورة ضريبية وتفتح ذمة على العميل. متابعة؟');">
         <?php echo csrf_field(); ?>
                                         <input type="hidden" name="action" value="approve">
                                         <input type="hidden" name="id" value="<?php echo intval($c['id']); ?>">
                                         <input type="hidden" name="clm_csrf" value="<?php echo clm_e($clm_csrf); ?>">
                                         <?php if ($tax_rows): ?>
-                                        <select name="tax_code" aria-label="رمزُ الضريبة" class="clm-tax-select">
+                                        <select name="tax_code" aria-label="رمز الضريبة" class="clm-tax-select">
                                             <option value="">بلا ضريبة</option>
                                             <?php foreach ($tax_rows as $t): ?>
                                                 <option value="<?php echo clm_e($t['code']); ?>"><?php echo clm_e($t['code']); ?></option>
                                             <?php endforeach; ?>
                                         </select>
                                         <?php endif; ?>
-                                        <button type="submit" class="action-btn edit" title="إجازةٌ مالية"><i class="fa fa-check"></i></button>
+                                        <button type="submit" class="action-btn edit" title="إجازة مالية"><i class="fa fa-check"></i></button>
                                     </form>
                                 <?php endif; ?>
                                 <?php if ($can_add && in_array((string)$c['state'], array('draft', 'review'), true)): ?>
                                     <form action="claims.php" method="post" class="clm-inline"
-                                          onsubmit="return confirm('إلغاءُ المستخلص يردّ وقائعَه للاستخلاص. متابعة؟');">
+                                          onsubmit="return confirm('إلغاء المستخلص يرد وقائعه للاستخلاص. متابعة؟');">
         <?php echo csrf_field(); ?>
                                         <input type="hidden" name="action" value="cancel">
                                         <input type="hidden" name="id" value="<?php echo intval($c['id']); ?>">
@@ -813,7 +813,7 @@ include('../includes/page_header.php');
             </table>
             <?php if (!$claims): ?>
                 <p class="text-muted clm-mt12">
-                    لا مستخلصاتٍ بعد — ابدأ بتوليد مستخلصِ فترةٍ لعقدٍ من الزرّ أعلاه.
+                    لا مستخلصات بعد — ابدأ بتوليد مستخلص فترة لعقد من الزر أعلاه.
                 </p>
             <?php endif; ?>
         </div>

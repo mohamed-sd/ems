@@ -25,18 +25,18 @@ require_once dirname(__DIR__) . '/app/Core/EntityGovernanceService.php';
 
 $role = strval($_SESSION['user']['role'] ?? '');
 if ($role !== '-1' && !in_array($role, array('1', '19'), true)) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'باب الحوكمة خلف صلاحيته ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
+    ems_gov_flash_redirect('../main/dashboard.php', 'باب الحوكمة خلف صلاحيته ❌', 'GOV-PERM-403', 'اطلب المنحة من مدير الصلاحيات إن كانت ضمن عملك');
 }
 $uid = intval($_SESSION['user']['id'] ?? 0);
 
 /** العناصر الحاكمة وأثر كل تفعيل — تُعرض معاينةً قبل الحفظ */
 $ELEMENTS = array(
     'external_accounts' => array('حسابات الأطراف الخارجية', 'النمط ③: العميل يرى مستخلصاته ويعتمد والمورد يعتمد وحداته — بنطاق معزول'),
-    'signing_caps'      => array('التفويض بالسقوف', 'النمط ④: كل اعتماد يُفحص تفويضه وسقفه — وبلا تفويض ساري 403'),
-    'joint_signing'     => array('التوقيع المشترك', 'النمط ④: مستندات كبيرة بتوقيعين متقابلين موثَّقين'),
+    'signing_caps'      => array('التفويض بالسقوف', 'النمط ④: كل اعتماد يفحص تفويضه وسقفه — وبلا تفويض ساري 403'),
+    'joint_signing'     => array('التوقيع المشترك', 'النمط ④: مستندات كبيرة بتوقيعين متقابلين موثقين'),
     'guarantees'        => array('الكفالات بمتابعتها', 'النمط ④: تنبيهات انتهاء الكفالات وحالات الرد والمصادرة'),
     'licenses'          => array('التراخيص بتنبيهاتها', 'مسح يومي وتنبيه قبل الانتهاء وإسقاط صلاحية آلي'),
-    'internal_parties'  => array('الكيانات الداخلية أطرافًا', 'النمط ②: عقد بين كيانين داخليين بمستحق متبادل مسجَّل'),
+    'internal_parties'  => array('الكيانات الداخلية أطرافا', 'النمط ②: عقد بين كيانين داخليين بمستحق متبادل مسجل'),
 );
 
 $msg = ''; $err = '';
@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $en = $enable ? 1 : 0;
         $st->bind_param('ssiisi', $element, $scopeType, $scopeId, $en, $reason, $uid);
         if ($st->execute()) {
-            $msg = ($enable ? 'فُعّل' : 'عُطّل') . ' «' . $ELEMENTS[$element][0] . '» على ' . ($scopeType === 'contract' ? 'العقد' : 'الكيان') . ' #' . $scopeId
+            $msg = ($enable ? 'فعل' : 'عطل') . ' «' . $ELEMENTS[$element][0] . '» على ' . ($scopeType === 'contract' ? 'العقد' : 'الكيان') . ' #' . $scopeId
                  . ' — والترقية بين الأنماط بلا هجرة بيانات';
         } else { $err = $st->error; }
         $st->close();
@@ -87,42 +87,42 @@ include '../insidebar.php';
     $header_actions = array();
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا أعلامَ تفعيلٍ مضبوطةً — النظامُ كلُّه على النمط ① (داخليٌّ محض)', 'اضبطْ أولَ علمٍ من نموذجِ «ضبط علم» أسفلَ الشاشةِ بمعاينةِ أثرِه');
-    ems_screen_about('النظام يوفّر البنية كاملة وأنت تقرر ما تفعّله: الافتراض النمط ① (داخلي محض — '
-        . 'كله مطفأ)، وكل عنصر بعلَم مستقل على الكيان والعقد معًا والعقد يغلب. عقد بالنمط ① وآخر '
-        . 'بالنمط ④ في الشركة نفسها — والعناصر غير المفعَّلة لا تُصيَّر ولا تُطلب ولا تعطِّل.',
+    echo ems_states_bundle('لا أعلام تفعيل مضبوطة — النظام كله على النمط ① (داخلي محض)', 'اضبط أول علم من نموذج «ضبط علم» أسفل الشاشة بمعاينة أثره');
+    ems_screen_about('النظام يوفر البنية كاملة وأنت تقرر ما تفعله: الافتراض النمط ① (داخلي محض — '
+        . 'كله مطفأ)، وكل عنصر بعلم مستقل على الكيان والعقد معا والعقد يغلب. عقد بالنمط ① وآخر '
+        . 'بالنمط ④ في الشركة نفسها — والعناصر غير المفعلة لا تصير ولا تطلب ولا تعطل.',
         array('راجع الأثر قبل الحفظ', 'التعطيل بسبب إلزامي'));
     if ($msg !== '') { echo '<div class="alert alert-success">' . htmlspecialchars($msg) . '</div>'; }
     if ($err !== '') { echo '<div class="alert alert-danger">' . htmlspecialchars($err) . '</div>'; }
     ?>
     <div class="card"><div class="card-body">
-        <h4>الأعلام النافذة (ما لم يُضبط فالافتراض: مطفأ — النمط ①)</h4>
+        <h4>الأعلام النافذة (ما لم يضبط فالافتراض: مطفأ — النمط ①)</h4>
         <div class="table-container"><table class="alltables display gov-act-table" data-no-dt="1">
         <thead><tr><th>العنصر</th><th>النطاق</th><th>الحالة</th><th>سبب النمط</th><th>آخر ضبط</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">كود النمط</th>
               <th class="ems-fn-th" data-fn="1">الكيان أو العقد</th>
               <th class="ems-fn-th" data-fn="1">نمط التفعيل</th>
-              <th class="ems-fn-th" data-fn="1">العناصر المفعَّلة</th>
+              <th class="ems-fn-th" data-fn="1">العناصر المفعلة</th>
               <th class="ems-fn-th" data-fn="1">العناصر المطفأة</th>
               <th class="ems-fn-th" data-fn="1">تاريخ التفعيل</th>
               <th class="ems-fn-th" data-fn="1">تاريخ الترقية المتوقع</th>
               <th class="ems-fn-th" data-fn="1">شرط الترقية</th>
               <th class="ems-fn-th" data-fn="1">اعتمده</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
               <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               </tr></thead><tbody>
         <?php foreach ($flags as $f): $el = $ELEMENTS[$f['element_code']] ?? array($f['element_code'], ''); ?>
         <tr>
             <td><strong><?php echo htmlspecialchars($el[0]); ?></strong><br><small><?php echo htmlspecialchars($f['element_code']); ?></small></td>
             <td><?php echo ($f['scope_type'] === 'contract' ? 'العقد #' . intval($f['scope_id']) : htmlspecialchars((string) ($f['legal_name'] ?: ('الكيان #' . $f['scope_id'])))); ?></td>
-            <td><span class="badge badge-<?php echo intval($f['enabled']) === 1 ? 'success' : 'secondary'; ?>"><?php echo intval($f['enabled']) === 1 ? 'مفعَّل' : 'مطفأ'; ?></span></td>
+            <td><span class="badge badge-<?php echo intval($f['enabled']) === 1 ? 'success' : 'secondary'; ?>"><?php echo intval($f['enabled']) === 1 ? 'مفعل' : 'مطفأ'; ?></span></td>
             <td><small><?php echo htmlspecialchars((string) $f['reason']); ?></small></td>
             <td><small><?php echo htmlspecialchars((string) $f['set_at']); ?></small></td>
         </tr>
@@ -137,20 +137,20 @@ include '../insidebar.php';
         <form method="post" class="ems-form gov-act-grid"
               onsubmit="var el=this.element_code.value, en=this.enable.value==='1';
                         var fx={<?php foreach ($ELEMENTS as $k => $v) { echo "'" . $k . "':'" . htmlspecialchars($v[1], ENT_QUOTES) . "',"; } ?>};
-                        return confirm('معاينة الأثر قبل الحفظ:\n' + (fx[el]||'') + '\n\n' + (en?'تفعيل':'تعطيل — بسبب موثَّق') + '. أتؤكد؟');">
+                        return confirm('معاينة الأثر قبل الحفظ:\n' + (fx[el]||'') + '\n\n' + (en?'تفعيل':'تعطيل — بسبب موثق') + '. أتؤكد؟');">
             <?= csrf_field() ?>
-            <select name="element_code" aria-label="العنصرُ الحاكمُ المرادُ ضبطُ علمِه" required>
+            <select name="element_code" aria-label="العنصر الحاكم المراد ضبط علمه" required>
                 <?php foreach ($ELEMENTS as $k => $v): ?>
                 <option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v[0]); ?></option>
                 <?php endforeach; ?>
             </select>
-            <select name="scope_type" aria-label="نطاقُ العلم: على كيانٍ أو على عقد" required>
+            <select name="scope_type" aria-label="نطاق العلم: على كيان أو على عقد" required>
                 <option value="entity">على كيان</option>
                 <option value="contract">على عقد (يغلب الكيان)</option>
             </select>
             <input type="number" name="scope_id" placeholder="رقم الكيان أو العقد *" required
                    title="الكيانات: <?php foreach (array_slice($entities, 0, 6) as $e) { echo '#' . intval($e['entity_id']) . ' ' . htmlspecialchars($e['legal_name']) . ' · '; } ?>" aria-label="رقم الكيان أو العقد">
-            <select name="enable" aria-label="الإجراء: تفعيلُ العنصرِ أو تعطيلُه بسبب">
+            <select name="enable" aria-label="الإجراء: تفعيل العنصر أو تعطيله بسبب">
                 <option value="1">تفعيل</option>
                 <option value="0">تعطيل (بسبب)</option>
             </select>

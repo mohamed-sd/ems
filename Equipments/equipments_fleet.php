@@ -108,7 +108,7 @@ if (isset($_GET['delete_id'])) {
     } catch (\Throwable $e) { /* سياق ناقص → يُعامل كصفر ويحسمه فحص الملكية أدناه */ }
 
     if ($ops_count > 0) {
-        ems_gov_flash_redirect('equipments_fleet.php', 'لا يمكن حذف المعدة لأنها بصدد التشغيل حالياً ❌', 'GOV-FAIL-409', '');
+        ems_gov_flash_redirect('equipments_fleet.php', 'لا يمكن حذف المعدة لأنها بصدد التشغيل حاليا ❌', 'GOV-FAIL-409', '');
         exit();
     }
 
@@ -313,7 +313,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['code'])) {
 
             // التحقق من عدم تجاوز العدد المتعاقد عليه
             if ($current_added >= $contracted_count) {
-                $success_msg = "⚠️ تحذير: تم الوصول للحد الأقصى! العدد المتعاقد عليه: $contracted_count | المضاف حالياً: $current_added. لا يمكن إضافة المزيد من المعدات.";
+                $success_msg = "⚠️ تحذير: تم الوصول للحد الأقصى! العدد المتعاقد عليه: $contracted_count | المضاف حاليا: $current_added. لا يمكن إضافة المزيد من المعدات.";
                 goto skip_save;
             }
         }
@@ -521,7 +521,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
     );
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا معدّةَ مسجَّلةً في الأسطولِ بعدُ', 'أضف أولَ معدّةٍ بزرِّ «إضافة معدة جديدة» في رأسِ الشاشة');
+    echo ems_states_bundle('لا معدة مسجلة في الأسطول بعد', 'أضف أول معدة بزر «إضافة معدة جديدة» في رأس الشاشة');
     ?>
 
 
@@ -724,7 +724,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                                 }
                                 ?>
                             </select>
-                            <small class="eqf-hint">عند الاختيار تُملأ تلقائياً حقول النوع والماركة والموديل من السجل.</small>
+                            <small class="eqf-hint">عند الاختيار تملأ تلقائيا حقول النوع والماركة والموديل من السجل.</small>
                         </div>
                         <?php endif; ?>
 
@@ -1210,10 +1210,10 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                             <th data-group="status"> التوفر</th>
                             <th data-group="status"> الحالة </th>
                             <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                             <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                             <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                             <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -1713,7 +1713,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                     availabilityStatusInput.value = 'قيد الاستخدام';
                     availabilityStatusInput.setAttribute('disabled', 'disabled');
                     if (availabilityStatusHint) {
-                        availabilityStatusHint.textContent = 'عند توفر الآلية يتم تثبيت الحالة تلقائياً على قيد الاستخدام.';
+                        availabilityStatusHint.textContent = 'عند توفر الآلية يتم تثبيت الحالة تلقائيا على قيد الاستخدام.';
                     }
                 } else {
                     availabilityStatusInput.value = normalizeAvailabilityStatus(normalizedState, availabilityStatusInput.value);
@@ -1803,8 +1803,8 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                     { label: 'نوع المصدر', value: eqVal(data.source_type), icon: 'fas fa-handshake' },
                     { label: 'تاريخ الدخول', value: eqVal(data.entry_date), icon: 'fas fa-calendar-day' },
                     { label: 'تكلفة الشراء', value: (data.acquisition_cost ? (data.acquisition_cost + ' ' + (data.acquisition_currency || '')) : 'غير محدد'), icon: 'fas fa-money-check-dollar' },
-                    { label: 'العدّاد الافتتاحي', value: (data.opening_meter ? (data.opening_meter + ' ' + (data.meter_uom || '')) : 'غير محدد'), icon: 'fas fa-gauge' },
-                    { label: 'مصدر العدّاد', value: eqVal(data.meter_source), icon: 'fas fa-satellite-dish' },
+                    { label: 'العداد الافتتاحي', value: (data.opening_meter ? (data.opening_meter + ' ' + (data.meter_uom || '')) : 'غير محدد'), icon: 'fas fa-gauge' },
+                    { label: 'مصدر العداد', value: eqVal(data.meter_source), icon: 'fas fa-satellite-dish' },
                     { label: 'سنة الصنع', value: eqVal(data.manufacturing_year), icon: 'fas fa-calendar' },
                     { label: 'سنة الاستيراد', value: eqVal(data.import_year), icon: 'fas fa-calendar-plus' },
                     { label: 'حالة المعدة', value: eqVal(data.equipment_condition), icon: 'fas fa-cogs' },
@@ -1894,7 +1894,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
         })();
     </script>
 
-    <!-- استيراد المعدات: نافذة معالج إطار Excel الموحّد (متعددة الخطوات: رفع ← معاينة ← تنفيذ). -->
+    <!-- استيراد المعدات: نافذة معالج إطار Excel الموحد (متعددة الخطوات: رفع ← معاينة ← تنفيذ). -->
     <?php ems_excel_render(); ?>
 
 </div> <!-- closing main div -->

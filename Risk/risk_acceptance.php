@@ -48,7 +48,7 @@ foreach ($rows as $x) {
 $page_title = 'إيكوبيشن | القبول والاستثناءات';
 include '../inheader.php';
 include '../insidebar.php';
-require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('risk', 'القبولُ والتصعيد');
+require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('risk', 'القبول والتصعيد');
 if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main ems-unified-page-shell ems-doc-cycle">
@@ -67,13 +67,13 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     );
     include('../includes/page_header.php');
     ems_screen_about(
-        'قرارُ قبولٍ موقَّعٌ بسلطةٍ محددةٍ ومهلةِ مراجعةٍ وضوابطَ معوِّضة — لا إهمالٌ ولا صمت. '
-        . 'والسلطةُ من مصفوفةِ الاعتماد: الحرجُ للرئيسِ حصرًا والمحظورُ لا يُقبل بحال (RK-04).',
-        array('محاولةُ قبولٍ فوقَ السقفِ تُرفض وتُصعَّد آليًّا — ولو وقّع إداريًّا',
-              'مهلةُ المراجعةِ بالدرجة: سنويًّا للمنخفضِ وشهريًّا للحرج (§14-2)',
-              'سحبُ القبولِ بقرارٍ من الجهةِ نفسِها أو أعلى — لا حذفَ للقرار'));
-    echo ems_next_step('مراجعةُ القرارِ قبل مهلتِه — وإعادةُ التقييمِ أو السحبُ من ملفِّ الخطر', 'risk_register.php');
-    echo ems_states_bundle('لا قراراتِ قبولٍ ضمن هذا الترشيح', 'القبولُ يُسجَّل من ملفِّ الخطرِ حيث الدرجةُ الجاريةُ وحارسُ السلطة');
+        'قرار قبول موقع بسلطة محددة ومهلة مراجعة وضوابط معوضة — لا إهمال ولا صمت. '
+        . 'والسلطة من مصفوفة الاعتماد: الحرج للرئيس حصرا والمحظور لا يقبل بحال (RK-04).',
+        array('محاولة قبول فوق السقف ترفض وتصعد آليا — ولو وقع إداريا',
+              'مهلة المراجعة بالدرجة: سنويا للمنخفض وشهريا للحرج (§14-2)',
+              'سحب القبول بقرار من الجهة نفسها أو أعلى — لا حذف للقرار'));
+    echo ems_next_step('مراجعة القرار قبل مهلته — وإعادة التقييم أو السحب من ملف الخطر', 'risk_register.php');
+    echo ems_states_bundle('لا قرارات قبول ضمن هذا الترشيح', 'القبول يسجل من ملف الخطر حيث الدرجة الجارية وحارس السلطة');
     ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
@@ -87,7 +87,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     <div class="ems-card" id="acEmpty"></div>
     <script>document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('acEmpty').appendChild(EmsUI.emptyState({
-            reason: 'لا قرارات قبول في نطاقك — والقبولُ يُسجَّل من ملفِّ الخطرِ حيث الدرجةُ الجاريةُ وحارسُ السلطة',
+            reason: 'لا قرارات قبول في نطاقك — والقبول يسجل من ملف الخطر حيث الدرجة الجارية وحارس السلطة',
             createHref: 'risk_register.php', createLabel: 'إلى السجل المركزي'
         }));
     });</script>
@@ -96,8 +96,8 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         <table class="table table-striped rsk-w100">
             <thead><tr>
                 <th>الخطر</th><th>الوحدة</th><th>الدرجة عند القبول</th><th>حكم الشهية</th>
-                <th>السلطة</th><th>مرجع التفويض</th><th>المُقِرّ</th><th>مراجعة المحلل</th>
-                <th>ضوابط معوِّضة</th><th>مهلة المراجعة</th><th>التأخر</th>
+                <th>السلطة</th><th>مرجع التفويض</th><th>المقر</th><th>مراجعة المحلل</th>
+                <th>ضوابط معوضة</th><th>مهلة المراجعة</th><th>التأخر</th>
                 <th>الملاحظة</th><th>المرجع الأب</th><th>الحالة</th><th>فتح</th>
             </tr></thead>
             <tbody>
@@ -117,7 +117,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <td><?php echo htmlspecialchars((string) $x['analyst'] ?: '—'); ?></td>
                     <td class="rsk-fs76"><?php echo htmlspecialchars((string) $x['compensating_ctl'] ?: '—'); ?></td>
                     <td><?php echo htmlspecialchars((string) $x['review_due']); ?></td>
-                    <td><?php echo $late ? '<span class="badge badge-warning">' . (int) $x['late_days'] . ' يومًا</span>' : '—'; ?></td>
+                    <td><?php echo $late ? '<span class="badge badge-warning">' . (int) $x['late_days'] . ' يوما</span>' : '—'; ?></td>
                     <td class="rsk-cell-w200"><?php echo htmlspecialchars(mb_substr((string) $x['note'], 0, 80) ?: '—'); ?></td>
                     <td class="rsk-fs74"><?php echo htmlspecialchars((string) $x['parent_ref'] ?: '—'); ?></td>
                     <td><?php echo !empty($x['withdrawn_at'])
@@ -133,9 +133,9 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                             <input type="hidden" name="action" value="risk_accept_withdraw">
                             <input type="hidden" name="acceptance_id" value="<?php echo (int) $x['id']; ?>">
                             <input type="text" name="note" required minlength="3" class="ems-note-inline"
-                                   placeholder="سببُ السحب">
+                                   placeholder="سبب السحب">
                             <button type="submit" class="btn btn-sm btn-secondary"
-                                    title="سحبُ القبولِ — حركةٌ تُختم بمن سحبها ومتى، ولا تمحو القرارَ الأول">
+                                    title="سحب القبول — حركة تختم بمن سحبها ومتى، ولا تمحو القرار الأول">
                                 اسحب القبول
                             </button>
                         </form>

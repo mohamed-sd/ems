@@ -31,7 +31,7 @@ $conn->set_charset('utf8mb4');
 
 $date = isset($argv[1]) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $argv[1]) ? $argv[1] : date('Y-m-d');
 $raw = trim((string) ems_env('EMS_ROTATION_AUTOTRANSFER', ''));
-if ($raw === '') { fwrite(STDOUT, "العلمُ فارغٌ — النقلُ الآليُّ مطفأ.\n"); exit(0); }
+if ($raw === '') { fwrite(STDOUT, "العلم فارغ — النقل الآلي مطفأ.\n"); exit(0); }
 
 $total = 0;
 foreach (explode(',', $raw) as $p) {
@@ -43,13 +43,13 @@ foreach (explode(',', $raw) as $p) {
     $st->execute();
     $row = $st->get_result()->fetch_assoc();
     $st->close();
-    if (!$row) { fwrite(STDOUT, "المشروع {$pid}: غيرُ موجود — يُتخطى.\n"); continue; }
+    if (!$row) { fwrite(STDOUT, "المشروع {$pid}: غير موجود — يتخطى.\n"); continue; }
     $co = (int) $row['company_id'];
     $gate = new TenantDb($conn, TenantContext::forSystem($co, 0, '', true));
     $r = RSS::autoTransferForDate($conn, $gate, $co, $pid, $date, 0);
     $total += (int) $r['transferred'];
-    fwrite(STDOUT, "المشروع {$pid} ({$date}): نُقل " . intval($r['transferred']) . " حصةً"
-        . ($r['skipped'] ? ' · تخطّى: ' . implode(' | ', $r['skipped']) : '') . "\n");
+    fwrite(STDOUT, "المشروع {$pid} ({$date}): نقل " . intval($r['transferred']) . " حصة"
+        . ($r['skipped'] ? ' · تخطى: ' . implode(' | ', $r['skipped']) : '') . "\n");
 }
-fwrite(STDOUT, "الإجمالي: {$total} نقلًا آليًّا.\n");
+fwrite(STDOUT, "الإجمالي: {$total} نقلا آليا.\n");
 exit(0);

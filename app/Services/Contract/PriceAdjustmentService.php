@@ -54,40 +54,40 @@ class PriceAdjustmentService
 
         $contract = null;
         try { $contract = $gate->selectOne('contracts', array('where' => array('id' => $contractId))); }
-        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $contract'); $contract = null; }
-        if (!$contract) { $out['code'] = 404; $out['reason'] = 'العقدُ غير موجودٍ في نطاقك'; return $out; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $contract'); $contract = null; }
+        if (!$contract) { $out['code'] = 404; $out['reason'] = 'العقد غير موجود في نطاقك'; return $out; }
 
         $trigger = isset($args['trigger_kind']) ? trim((string) $args['trigger_kind']) : '';
         if (!in_array($trigger, self::TRIGGERS, true)) {
             $out['code'] = 422;
-            $out['reason'] = 'محفِّزٌ خارج الثلاثة المسمّاة في §2-③ (وقودٌ · تضخمٌ · صرف)';
+            $out['reason'] = 'محفز خارج الثلاثة المسماة في §2-③ (وقود · تضخم · صرف)';
             return $out;
         }
         $indexCode = isset($args['index_code']) ? strtoupper(trim((string) $args['index_code'])) : '';
         if ($indexCode === '') {
-            $out['code'] = 422; $out['reason'] = 'رمزُ المؤشر إلزامي — «لا رقمَ بلا مرجعٍ يُقرأ منه»'; return $out;
+            $out['code'] = 422; $out['reason'] = 'رمز المؤشر إلزامي — «لا رقم بلا مرجع يقرأ منه»'; return $out;
         }
         $base = isset($args['base_index']) ? (float) $args['base_index'] : 0.0;
-        if ($base <= 0) { $out['code'] = 422; $out['reason'] = 'القيمةُ المرجعيةُ للمؤشر إلزاميةٌ وموجبة'; return $out; }
+        if ($base <= 0) { $out['code'] = 422; $out['reason'] = 'القيمة المرجعية للمؤشر إلزامية وموجبة'; return $out; }
 
         $pass = isset($args['pass_through_percent']) && $args['pass_through_percent'] !== ''
                 ? (float) $args['pass_through_percent'] : 100.0;
         if ($pass <= 0 || $pass > 100) {
-            $out['code'] = 422; $out['reason'] = 'نسبةُ التمرير بين 0 و100 حصرًا'; return $out;
+            $out['code'] = 422; $out['reason'] = 'نسبة التمرير بين 0 و100 حصرا'; return $out;
         }
         $threshold = isset($args['threshold_percent']) && $args['threshold_percent'] !== ''
                      ? (float) $args['threshold_percent'] : 0.0;
-        if ($threshold < 0) { $out['code'] = 422; $out['reason'] = 'عتبةُ التفعيل لا تكون سالبة'; return $out; }
+        if ($threshold < 0) { $out['code'] = 422; $out['reason'] = 'عتبة التفعيل لا تكون سالبة'; return $out; }
         $cap = isset($args['cap_percent']) && $args['cap_percent'] !== '' ? (float) $args['cap_percent'] : null;
-        if ($cap !== null && $cap <= 0) { $out['code'] = 422; $out['reason'] = 'السقفُ موجبٌ أو غيرُ مكتوب'; return $out; }
+        if ($cap !== null && $cap <= 0) { $out['code'] = 422; $out['reason'] = 'السقف موجب أو غير مكتوب'; return $out; }
 
         $periodicity = isset($args['periodicity']) ? trim((string) $args['periodicity']) : 'quarterly';
         if (!in_array($periodicity, self::PERIODICITIES, true)) {
-            $out['code'] = 422; $out['reason'] = 'دوريةُ مراجعةٍ غيرُ معروفة'; return $out;
+            $out['code'] = 422; $out['reason'] = 'دورية مراجعة غير معروفة'; return $out;
         }
         $from = isset($args['valid_from']) ? trim((string) $args['valid_from']) : '';
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $from)) {
-            $out['code'] = 422; $out['reason'] = 'سريانُ الشرط إلزامي — «ملحقٌ بسريان» يبدأ من شرطٍ بسريان'; return $out;
+            $out['code'] = 422; $out['reason'] = 'سريان الشرط إلزامي — «ملحق بسريان» يبدأ من شرط بسريان'; return $out;
         }
 
         // **0 = كلُّ بنود العقد** لا NULL: المفتاحُ الفريد في MySQL لا يرى NULL
@@ -97,9 +97,9 @@ class PriceAdjustmentService
         if ($itemId > 0) {
             $it = null;
             try { $it = $gate->selectOne('contractequipments', array('where' => array('id' => $itemId))); }
-            catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $it'); $it = null; }
+            catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $it'); $it = null; }
             if (!$it || (int) $it['contract_id'] !== $contractId) {
-                $out['code'] = 422; $out['reason'] = 'بندُ التسعير لا ينتمي لهذا العقد'; return $out;
+                $out['code'] = 422; $out['reason'] = 'بند التسعير لا ينتمي لهذا العقد'; return $out;
             }
         }
 
@@ -108,9 +108,9 @@ class PriceAdjustmentService
         if ($termId > 0) {
             $cur = null;
             try { $cur = $gate->selectOne('contract_price_terms', array('where' => array('id' => $termId))); }
-            catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $cur'); $cur = null; }
+            catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $cur'); $cur = null; }
             if (!$cur || (int) $cur['contract_id'] !== $contractId) {
-                $out['code'] = 404; $out['reason'] = 'الشرطُ غيرُ موجودٍ في هذا العقد'; return $out;
+                $out['code'] = 404; $out['reason'] = 'الشرط غير موجود في هذا العقد'; return $out;
             }
             $used = 0;
             try {
@@ -118,11 +118,11 @@ class PriceAdjustmentService
                     "SELECT COUNT(*) n FROM contract_price_revisions r
                       WHERE {TENANT_SCOPE} AND r.term_id = ? AND r.approved_at IS NOT NULL", array($termId));
                 $used = $rows ? (int) $rows[0]['n'] : 0;
-            } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل بقيمةِ 0 — $used'); $used = 0; }
+            } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل بقيمة 0 — $used'); $used = 0; }
             if ($used > 0) {
                 $out['code'] = 423;
-                $out['reason'] = 'للشرط ' . $used . ' مراجعةً معتمَدةً حرّكت سعرًا — لا تُبدَّل معادلتُه بأثرٍ رجعي: '
-                               . 'أنهِه بسريانٍ واكتب بديلَه (CON-02 §6)';
+                $out['reason'] = 'للشرط ' . $used . ' مراجعة معتمدة حركت سعرا — لا تبدل معادلته بأثر رجعي: '
+                               . 'أنهه بسريان واكتب بديله (CON-02 §6)';
                 return $out;
             }
         }
@@ -151,9 +151,9 @@ class PriceAdjustmentService
             }
         } catch (\Throwable $t) {
             if (strpos($t->getMessage(), 'Duplicate') !== false || strpos($t->getMessage(), 'uq_price_term') !== false) {
-                $out['code'] = 409; $out['reason'] = 'للعقد شرطٌ بالمحفِّز والنطاق والسريان نفسِها (UQ)'; return $out;
+                $out['code'] = 409; $out['reason'] = 'للعقد شرط بالمحفز والنطاق والسريان نفسها (UQ)'; return $out;
             }
-            $out['code'] = 422; $out['reason'] = 'تعذّر الحفظ: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الحفظ: ' . $t->getMessage(); return $out;
         }
 
         self::audit($conn, $companyId, $actor, 'contract_price_terms', $termId > 0 ? 'save' : 'create',
@@ -172,12 +172,12 @@ class PriceAdjustmentService
         $ref = isset($args['source_ref']) ? trim((string) $args['source_ref']) : '';
 
         if ($code === '' || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
-            $out['code'] = 422; $out['reason'] = 'رمزُ المؤشر وتاريخُ القراءة إلزاميان'; return $out;
+            $out['code'] = 422; $out['reason'] = 'رمز المؤشر وتاريخ القراءة إلزاميان'; return $out;
         }
-        if ($value <= 0) { $out['code'] = 422; $out['reason'] = 'قيمةُ المؤشر موجبة'; return $out; }
+        if ($value <= 0) { $out['code'] = 422; $out['reason'] = 'قيمة المؤشر موجبة'; return $out; }
         if ($ref === '') {
             $out['code'] = 422;
-            $out['reason'] = 'مرجعُ المستند إلزامي — رقمٌ بلا مرجعٍ يحرّك مالًا تلفيقٌ (عقيدة ⑦)';
+            $out['reason'] = 'مرجع المستند إلزامي — رقم بلا مرجع يحرك مالا تلفيق (عقيدة ⑦)';
             return $out;
         }
         /* ◆ **ولا سعرَ بلا مُسعِّرٍ مُعرَّف.** قرارُ المالك 2026-08-12 يجعل المصدرَ
@@ -187,7 +187,7 @@ class PriceAdjustmentService
              ما أُغلق في `applyDue`/`approve` بعمودِ منشإٍ وقيدَين. */
         if ((int) $actor <= 0) {
             $out['code'] = 403;
-            $out['reason'] = 'تسعيرٌ بلا مُسعِّرٍ مُعرَّفٍ — لا يُسجَّل سعرٌ بلا صاحب';
+            $out['reason'] = 'تسعير بلا مسعر معرف — لا يسجل سعر بلا صاحب';
             return $out;
         }
         try {
@@ -200,9 +200,9 @@ class PriceAdjustmentService
             ));
         } catch (\Throwable $t) {
             if (strpos($t->getMessage(), 'Duplicate') !== false) {
-                $out['code'] = 409; $out['reason'] = 'للمؤشر قراءةٌ بهذا التاريخ سلفًا — القراءةُ واقعةٌ لا تُكرَّر'; return $out;
+                $out['code'] = 409; $out['reason'] = 'للمؤشر قراءة بهذا التاريخ سلفا — القراءة واقعة لا تكرر'; return $out;
             }
-            $out['code'] = 422; $out['reason'] = 'تعذّر التسجيل: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر التسجيل: ' . $t->getMessage(); return $out;
         }
         self::audit($conn, $companyId, $actor, 'contract_price_index_readings', 'create',
                     (int) $out['reading_id'], array(), array('index_code' => $code, 'value' => $value, 'ref' => $ref), 0);
@@ -232,15 +232,15 @@ class PriceAdjustmentService
                                    WHERE company_id = ? AND currency_code = ?
                                      AND COALESCE(is_deleted,0) = 0 AND effective_from <= ?
                                    ORDER BY effective_from DESC, id DESC LIMIT 1");
-            if (!$st) { return array('ok' => false, 'value' => null, 'source' => null, 'reason' => 'تعذّر الاستعلام'); }
+            if (!$st) { return array('ok' => false, 'value' => null, 'source' => null, 'reason' => 'تعذر الاستعلام'); }
             $st->bind_param('iss', $companyId, $indexCode, $asOf);
             $st->execute();
             $row = $st->get_result()->fetch_assoc();
             $st->close();
             if (!$row || (float) $row['rate_to_base'] <= 0) {
                 return array('ok' => false, 'value' => null, 'source' => null,
-                             'reason' => 'لا سعرَ صرفٍ ساريًا للعملة «' . $indexCode . '» بتاريخ ' . $asOf
-                                       . ' — لا يُخترع سعر');
+                             'reason' => 'لا سعر صرف ساريا للعملة «' . $indexCode . '» بتاريخ ' . $asOf
+                                       . ' — لا يخترع سعر');
             }
             return array('ok' => true, 'value' => (float) $row['rate_to_base'],
                          'source' => 'fin_fx_rates@' . $row['effective_from'], 'reason' => '');
@@ -250,15 +250,15 @@ class PriceAdjustmentService
                                WHERE company_id = ? AND index_code = ?
                                  AND COALESCE(is_deleted,0) = 0 AND reading_date <= ?
                                ORDER BY reading_date DESC, id DESC LIMIT 1");
-        if (!$st) { return array('ok' => false, 'value' => null, 'source' => null, 'reason' => 'تعذّر الاستعلام'); }
+        if (!$st) { return array('ok' => false, 'value' => null, 'source' => null, 'reason' => 'تعذر الاستعلام'); }
         $st->bind_param('iss', $companyId, $indexCode, $asOf);
         $st->execute();
         $row = $st->get_result()->fetch_assoc();
         $st->close();
         if (!$row) {
             return array('ok' => false, 'value' => null, 'source' => null,
-                         'reason' => 'لا قراءةَ مسجَّلةً للمؤشر «' . $indexCode . '» حتى ' . $asOf
-                                   . ' — تُسجَّل بمرجعها ولا تُخترع');
+                         'reason' => 'لا قراءة مسجلة للمؤشر «' . $indexCode . '» حتى ' . $asOf
+                                   . ' — تسجل بمرجعها ولا تخترع');
         }
         return array('ok' => true, 'value' => (float) $row['value'],
                      'source' => $row['source_ref'] . '@' . $row['reading_date'], 'reason' => '');
@@ -354,7 +354,7 @@ class PriceAdjustmentService
                                             date('Y-m-d', strtotime($eff . ' -1 day')), $base);
                 if ($old <= 0) {
                     $p['outcome'] = 'no_base_price';
-                    $p['note'] = 'البندُ بلا سعرٍ أساسٍ موجب — لا نسبةَ تُطبَّق على صفر';
+                    $p['note'] = 'البند بلا سعر أساس موجب — لا نسبة تطبق على صفر';
                     $proposals[] = $p; continue;
                 }
                 $p['old_price'] = round($old, 4);
@@ -363,7 +363,7 @@ class PriceAdjustmentService
                     $p['outcome'] = 'below_threshold';
                     $p['applied_percent'] = 0.0;
                     $p['new_price'] = round($old, 4);
-                    $p['note'] = 'فارقُ المؤشر ' . round($delta, 4) . '٪ دون عتبة التفعيل '
+                    $p['note'] = 'فارق المؤشر ' . round($delta, 4) . '٪ دون عتبة التفعيل '
                                . (float) $term['threshold_percent'] . '٪ — لا تعديل';
                     $proposals[] = $p; continue;
                 }
@@ -377,8 +377,8 @@ class PriceAdjustmentService
                 $p['applied_percent'] = round($applied, 4);
                 $p['new_price'] = round($old * (1 + $applied / 100.0), 4);
                 $p['outcome'] = $capped ? 'capped' : 'amended';
-                $p['note'] = 'مؤشرٌ ' . round($delta, 4) . '٪ × تمرير ' . (float) $term['pass_through_percent'] . '٪'
-                           . ($capped ? (' — مقصوصٌ بسقف ' . (float) $term['cap_percent'] . '٪') : '')
+                $p['note'] = 'مؤشر ' . round($delta, 4) . '٪ × تمرير ' . (float) $term['pass_through_percent'] . '٪'
+                           . ($capped ? (' — مقصوص بسقف ' . (float) $term['cap_percent'] . '٪') : '')
                            . ' ⇒ ' . round($applied, 4) . '٪';
                 $proposals[] = $p;
             }
@@ -411,12 +411,12 @@ class PriceAdjustmentService
         if ($origin === 'user' && (int) $actor <= 0) {
             return array('ok' => false, 'created' => 0, 'skipped' => 0, 'rows' => array(),
                          'code' => 403,
-                         'reason' => 'فعلُ إنسانٍ بلا معرِّفٍ — لا يُكتب. (الكرونُ يُصرّح origin=system)');
+                         'reason' => 'فعل إنسان بلا معرف — لا يكتب. (الكرون يصرح origin=system)');
         }
         if ($origin === 'system' && (int) $actor > 0) {
             return array('ok' => false, 'created' => 0, 'skipped' => 0, 'rows' => array(),
                          'code' => 422,
-                         'reason' => 'منشأٌ آليٌّ بمعرِّفِ إنسانٍ — تصريحٌ متناقض');
+                         'reason' => 'منشأ آلي بمعرف إنسان — تصريح متناقض');
         }
         $proposals = self::evaluate($conn, $gate, $companyId, $contractId, $asOf);
         foreach ($proposals as $p) {
@@ -426,7 +426,7 @@ class PriceAdjustmentService
                     "SELECT r.id FROM contract_price_revisions r
                       WHERE {TENANT_SCOPE} AND r.term_id = ? AND r.period_key = ? AND r.contract_item_id = ?",
                     array($p['term_id'], $p['period_key'], $p['contract_item_id']));
-            } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $exists'); $exists = array(); }
+            } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $exists'); $exists = array(); }
             if ($exists) {
                 $out['skipped']++;
                 $out['rows'][] = array('revision_id' => (int) $exists[0]['id'], 'outcome' => 'idempotent');
@@ -450,11 +450,11 @@ class PriceAdjustmentService
                             'amend_date'     => $p['as_of_date'],
                             'effective_from' => $p['effective_from'],   // ← «ملحقٌ بسريان» (§6)
                             'requested_by'   => (int) $actor ?: null,
-                            'reason'         => mb_substr('تعديلُ سعرٍ بشرط العقد — ' . $p['note'], 0, 500),
+                            'reason'         => mb_substr('تعديل سعر بشرط العقد — ' . $p['note'], 0, 500),
                             'old_value'      => (string) $p['old_price'],
                             'new_value'      => (string) $p['new_price'],
                             'effect_price'   => round((float) $p['new_price'] - (float) $p['old_price'], 2),
-                            'effect_summary' => 'بندُ التسعير #' . $p['contract_item_id'] . ': '
+                            'effect_summary' => 'بند التسعير #' . $p['contract_item_id'] . ': '
                                               . $p['old_price'] . ' ⇐ ' . $p['new_price']
                                               . ' من ' . $p['effective_from'],
                             'created_by'     => (int) $actor ?: null,
@@ -474,7 +474,7 @@ class PriceAdjustmentService
                     ));
                     return true;
                 }, 'M-09 price revision term#' . $p['term_id']);
-            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'مراجعةُ سعرِ بندٍ واحدٍ فشلت — بقيةُ البنودِ تُراجَع، والفاشلُ يبقى بسعرِه القديم');
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'مراجعة سعر بند واحد فشلت — بقية البنود تراجع، والفاشل يبقى بسعره القديم');
                 $out['ok'] = false;
                 $out['rows'][] = array('revision_id' => null, 'outcome' => 'error', 'reason' => $t->getMessage());
                 continue;
@@ -497,19 +497,19 @@ class PriceAdjustmentService
         $out = array('ok' => false, 'code' => 0, 'reason' => '');
         $rev = null;
         try { $rev = $gate->selectOne('contract_price_revisions', array('where' => array('id' => (int) $revisionId))); }
-        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $rev'); $rev = null; }
-        if (!$rev) { $out['code'] = 404; $out['reason'] = 'المراجعةُ غيرُ موجودةٍ في نطاقك'; return $out; }
-        if ($rev['approved_at'] !== null) { $out['code'] = 422; $out['reason'] = 'معتمَدةٌ سلفًا'; return $out; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $rev'); $rev = null; }
+        if (!$rev) { $out['code'] = 404; $out['reason'] = 'المراجعة غير موجودة في نطاقك'; return $out; }
+        if ($rev['approved_at'] !== null) { $out['code'] = 422; $out['reason'] = 'معتمدة سلفا'; return $out; }
         if (!in_array((string) $rev['outcome'], array('amended', 'capped'), true)) {
             $out['code'] = 422;
-            $out['reason'] = 'مراجعةٌ لم تحرّك سعرًا (' . $rev['outcome'] . ') — لا شيءَ يُعتمد';
+            $out['reason'] = 'مراجعة لم تحرك سعرا (' . $rev['outcome'] . ') — لا شيء يعتمد';
             return $out;
         }
         /* ◆ **لا اعتمادَ بلا معتمِدٍ مُعرَّف.** كان `approved_by => (int)$actor ?: null`
              يسجّل «اعتُمد» بمعتمِدٍ نُلٍّ — أثرٌ بلا صاحب. فيُردُّ الآن، ويُثبِّته
              القيدُ `chk_price_rev_approver_known` في القاعدةِ كذلك. */
         if ((int) $actor <= 0) {
-            $out['code'] = 403; $out['reason'] = 'اعتمادٌ بلا معتمِدٍ مُعرَّفٍ — لا يُسجَّل أثرٌ بلا صاحب'; return $out;
+            $out['code'] = 403; $out['reason'] = 'اعتماد بلا معتمد معرف — لا يسجل أثر بلا صاحب'; return $out;
         }
         /* ◆ حارسُ الفصلِ — **بالمنشإِ المُصرَّحِ لا بموجَبيةِ المعرِّف.** كان شرطُه
              `created_by > 0` فكان يسكت على كلِّ صفٍّ نُلِّ المُنشئ، وصفوفُ الكرونِ
@@ -517,18 +517,18 @@ class PriceAdjustmentService
         $origin = isset($rev['created_origin']) ? (string) $rev['created_origin'] : 'user';
         if ($origin === 'user' && (int) $rev['created_by'] <= 0) {
             $out['code'] = 409;
-            $out['reason'] = 'مُنشئٌ مجهولٌ على صفٍّ بشريِّ المنشإ — لا يُعتمد حتى يُعرَف';
+            $out['reason'] = 'منشئ مجهول على صف بشري المنشإ — لا يعتمد حتى يعرف';
             return $out;
         }
         if ($origin === 'user' && (int) $rev['created_by'] === (int) $actor) {
-            $out['code'] = 403; $out['reason'] = 'من أنشأ لا يعتمد — الفصلُ بنيويٌّ لا اختياري'; return $out;
+            $out['code'] = 403; $out['reason'] = 'من أنشأ لا يعتمد — الفصل بنيوي لا اختياري'; return $out;
         }
         try {
             $gate->update('contract_price_revisions',
                 array('approved_by' => (int) $actor ?: null, 'approved_at' => date('Y-m-d H:i:s')),
                 array('id' => (int) $revisionId));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الاعتماد: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الاعتماد: ' . $t->getMessage(); return $out;
         }
         self::audit($conn, $companyId, $actor, 'contract_price_revisions', 'approve', (int) $revisionId,
                     array('approved_at' => null), array('approved_at' => date('Y-m-d H:i:s')),

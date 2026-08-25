@@ -58,13 +58,13 @@ class PayrollRunService
         $from = isset($args['period_from']) ? trim((string) $args['period_from']) : '';
         $to   = isset($args['period_to']) ? trim((string) $args['period_to']) : '';
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $from) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $to)) {
-            $out['code'] = 422; $out['reason'] = 'مدةُ الدورة إلزاميةٌ بتاريخين صالحين'; return $out;
+            $out['code'] = 422; $out['reason'] = 'مدة الدورة إلزامية بتاريخين صالحين'; return $out;
         }
-        if ($to < $from) { $out['code'] = 422; $out['reason'] = 'نهايةُ المدة قبل بدايتها'; return $out; }
+        if ($to < $from) { $out['code'] = 422; $out['reason'] = 'نهاية المدة قبل بدايتها'; return $out; }
 
         $cat = isset($args['category_filter']) ? trim((string) $args['category_filter']) : 'all';
         if (!in_array($cat, self::CATEGORIES, true)) {
-            $out['code'] = 422; $out['reason'] = 'فئةٌ من خارج قائمة CON-01 §2'; return $out;
+            $out['code'] = 422; $out['reason'] = 'فئة من خارج قائمة CON-01 §2'; return $out;
         }
 
         // ── فترةٌ مقفلة → 423 (ENT-01 §8 نصًّا · حارسُ M-39) ────────────────
@@ -72,7 +72,7 @@ class PayrollRunService
         $pg = ems_period_check($conn, $companyId, $to);
         if (empty($pg['ok'])) {
             $out['code'] = 423;
-            $out['reason'] = 'فترةُ ' . $to . ' مقفلةٌ — لا تُفتح دورةُ مسيّرٍ عليها: ' . $pg['reason'];
+            $out['reason'] = 'فترة ' . $to . ' مقفلة — لا تفتح دورة مسير عليها: ' . $pg['reason'];
             return $out;
         }
 
@@ -80,7 +80,7 @@ class PayrollRunService
         $dup = self::runByKey($gate, $from, $to, $cat);
         if ($dup) {
             $out['code'] = 409;
-            $out['reason'] = 'دورةٌ قائمةٌ لهذا المفتاح (#' . (int) $dup['id'] . ' · ' . $dup['state'] . ')';
+            $out['reason'] = 'دورة قائمة لهذا المفتاح (#' . (int) $dup['id'] . ' · ' . $dup['state'] . ')';
             $out['run_id'] = (int) $dup['id'];
             return $out;
         }
@@ -92,14 +92,14 @@ class PayrollRunService
                 'project_filter' => isset($args['project_filter']) && (int) $args['project_filter'] > 0
                                     ? (int) $args['project_filter'] : null,
                 'state' => 'Open',
-                'note' => 'الشريحة ① — بوابةُ اللقطة (الاحتسابُ الزمنيُّ والإنتاجيُّ في ②③)',
+                'note' => 'الشريحة ① — بوابة اللقطة (الاحتساب الزمني والإنتاجي في ②③)',
                 'created_by' => (int) $actor ?: null,
             ));
         } catch (\Throwable $t) {
             if (strpos($t->getMessage(), 'Duplicate') !== false) {
-                $out['code'] = 409; $out['reason'] = 'دورةٌ قائمةٌ للمفتاح (سباقُ كتابة)'; return $out;
+                $out['code'] = 409; $out['reason'] = 'دورة قائمة للمفتاح (سباق كتابة)'; return $out;
             }
-            $out['code'] = 422; $out['reason'] = 'تعذّر الفتح: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الفتح: ' . $t->getMessage(); return $out;
         }
 
         self::audit($conn, $companyId, $actor, 'open', (int) $out['run_id'], array(),
@@ -127,10 +127,10 @@ class PayrollRunService
                      'persons' => 0, 'lines' => 0, 'blocked' => 0, 'state' => '');
         $runId = (int) $runId;
         $run = self::runOf($gate, $runId);
-        if (!$run) { $out['code'] = 404; $out['reason'] = 'الدورةُ غير موجودةٍ في نطاقك'; return $out; }
+        if (!$run) { $out['code'] = 404; $out['reason'] = 'الدورة غير موجودة في نطاقك'; return $out; }
         if (!in_array((string) $run['state'], array('Open', 'Blocked'), true)) {
             $out['code'] = 423;
-            $out['reason'] = 'الدورةُ «' . $run['state'] . '» — الربطُ للمفتوحة أو الممنوعة حصرًا';
+            $out['reason'] = 'الدورة «' . $run['state'] . '» — الربط للمفتوحة أو الممنوعة حصرا';
             return $out;
         }
 
@@ -153,8 +153,8 @@ class PayrollRunService
             // دورةً — تُكتب خارجَ النطاق بسببها وتمضي الدورة.
             if (!EmployeeContractStateMachine::isReadable((string) $c['state'])) {
                 self::block($gate, $runId, $cid, $pid, 'contract_not_readable', 422,
-                    'عقدٌ غيرُ نافذٍ بالفترة (' . EmployeeContractStateMachine::labelAr((string) $c['state'])
-                    . ') — يُستبعد بسببٍ مكتوب', 'excluded');
+                    'عقد غير نافذ بالفترة (' . EmployeeContractStateMachine::labelAr((string) $c['state'])
+                    . ') — يستبعد بسبب مكتوب', 'excluded');
                 $excluded++;
                 continue;
             }
@@ -163,7 +163,7 @@ class PayrollRunService
             $snap = ContractSnapshotService::snapshotFor($conn, $gate, $companyId, $cid, $run['period_to'], $actor);
             if (empty($snap['ok'])) {
                 self::block($gate, $runId, $cid, $pid, 'snapshot_missing', (int) $snap['code'],
-                    'لقطةٌ متعذّرة: ' . $snap['reason']);
+                    'لقطة متعذرة: ' . $snap['reason']);
                 $blocked++;
                 continue;
             }
@@ -172,7 +172,7 @@ class PayrollRunService
             $payload = self::payloadOf($gate, $snapId);
             if ($payload === null) {
                 self::block($gate, $runId, $cid, $pid, 'snapshot_unreadable', 422,
-                    'اللقطةُ #' . $snapId . ' غيرُ قابلةٍ للقراءة — لا احتسابَ بقيمٍ افتراضية');
+                    'اللقطة #' . $snapId . ' غير قابلة للقراءة — لا احتساب بقيم افتراضية');
                 $blocked++;
                 continue;
             }
@@ -192,7 +192,7 @@ class PayrollRunService
             }
             if ($badBearer !== null) {
                 self::block($gate, $runId, $cid, $pid, 'bearer_sum_invalid', 422,
-                    'Σ نسب التحمّل للمكوّن ' . $badBearer[0] . ' = ' . $badBearer[1] . '٪ لا 100٪');
+                    'Σ نسب التحمل للمكون ' . $badBearer[0] . ' = ' . $badBearer[1] . '٪ لا 100٪');
                 $blocked++;
                 continue;
             }
@@ -211,7 +211,7 @@ class PayrollRunService
             $made = self::materialize($conn, $gate, $companyId, $runId, $pid, $cid, $snapId,
                                       $path, $components, $bearersMap, $basic, $actor);
             if ($made < 0) {
-                self::block($gate, $runId, $cid, $pid, 'materialize_failed', 422, 'تعذّر توليدُ الأسطر ذريًّا');
+                self::block($gate, $runId, $cid, $pid, 'materialize_failed', 422, 'تعذر توليد الأسطر ذريا');
                 $blocked++;
                 continue;
             }
@@ -227,7 +227,7 @@ class PayrollRunService
                 'blocked_count' => $blocked, 'state' => $state,
                 'version' => (int) $run['version'] + 1,
             ), array('id' => $runId));
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'الأسطرُ كُتبت — الرأسُ يُحدَّث بأفضل جهد'); /* الأسطرُ كُتبت — الرأسُ يُحدَّث بأفضل جهد */ }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'الأسطر كتبت — الرأس يحدث بأفضل جهد'); /* الأسطرُ كُتبت — الرأسُ يُحدَّث بأفضل جهد */ }
 
         self::audit($conn, $companyId, $actor, 'bind_snapshots', $runId,
             array('state' => $run['state']),
@@ -237,10 +237,10 @@ class PayrollRunService
         $out['persons'] = count($persons); $out['lines'] = $lines;
         $out['blocked'] = $blocked; $out['excluded'] = $excluded; $out['state'] = $state;
         $out['reason'] = $blocked > 0
-            ? ($blocked . ' عقدًا ممنوعًا بقائمة موانعه — لا احتسابَ ناقصٌ صامت'
-               . ($excluded > 0 ? (' · و' . $excluded . ' مستبعَدًا بسببٍ مكتوب') : ''))
-            : ('كلُّ عقدٍ مؤهَّلٍ رُبط بلقطته'
-               . ($excluded > 0 ? (' · و' . $excluded . ' مستبعَدًا بسببٍ مكتوب') : ''));
+            ? ($blocked . ' عقدا ممنوعا بقائمة موانعه — لا احتساب ناقص صامت'
+               . ($excluded > 0 ? (' · و' . $excluded . ' مستبعدا بسبب مكتوب') : ''))
+            : ('كل عقد مؤهل ربط بلقطته'
+               . ($excluded > 0 ? (' · و' . $excluded . ' مستبعدا بسبب مكتوب') : ''));
         return $out;
     }
 
@@ -264,18 +264,18 @@ class PayrollRunService
                     // ── ما تحتسبه الشريحة ① ────────────────────────────────
                     $amount = null; $qty = null; $rate = null;
                     $calcState = 'pending_slice';
-                    $note = 'يحتاج مدخلَ زمنٍ أو إنتاج — بيتُه المسارُ الزمني ② أو الإنتاجي ③';
+                    $note = 'يحتاج مدخل زمن أو إنتاج — بيته المسار الزمني ② أو الإنتاجي ③';
 
                     if ($method === 'fixed_amount') {
                         $qty = 1.00; $rate = round((float) $pc['value'], 4);
                         $amount = round((float) $pc['value'], 2);
                         $calcState = 'computed';
-                        $note = 'مبلغٌ ثابتٌ من اللقطة';
+                        $note = 'مبلغ ثابت من اللقطة';
                     } elseif ($method === 'pct_basic') {
                         $qty = 1.00; $rate = round((float) $pc['rate'], 4);
                         $amount = round($basic * ((float) $pc['rate'] / 100.0), 2);
                         $calcState = 'computed';
-                        $note = 'نسبةٌ من الأساسيّ الثابت (' . round($basic, 2) . ') باللقطة';
+                        $note = 'نسبة من الأساسي الثابت (' . round($basic, 2) . ') باللقطة';
                     }
 
                     $bearers = isset($bearersMap[$ref]) ? $bearersMap[$ref] : array();
@@ -333,7 +333,7 @@ class PayrollRunService
             $rows = $gate->scopedQuery(array('scope' => array('l' => 'payroll_lines')),
                 "SELECT l.id, l.snapshot_id FROM payroll_lines l
                   WHERE {TENANT_SCOPE} AND l.run_id = ?", array((int) $runId));
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $rows'); $rows = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $rows'); $rows = array(); }
         $out['lines'] = count($rows);
         $seen = array();
         foreach ($rows as $r) {
@@ -421,7 +421,7 @@ class PayrollRunService
     {
         $s = null;
         try { $s = $gate->selectOne('contract_snapshots', array('where' => array('id' => (int) $snapshotId))); }
-        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $s'); $s = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $s'); $s = null; }
         if (!$s) { return null; }
         $p = json_decode((string) $s['snapshot_json'], true);
         return is_array($p) ? $p : null;
@@ -442,7 +442,7 @@ class PayrollRunService
                 'block_code' => (string) $code, 'block_http' => (int) $http,
                 'reason' => mb_substr((string) $reason, 0, 255),
             ));
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'المفتاحُ الفريد يمنع التكرار'); /* المفتاحُ الفريد يمنع التكرار */ }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'المفتاح الفريد يمنع التكرار'); /* المفتاحُ الفريد يمنع التكرار */ }
     }
 
     private static function audit($conn, $companyId, $actor, $action, $rowId, $before, $after)

@@ -101,10 +101,10 @@ function fin_stmt_rows($rows, $type_lbl)
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا قيودَ مرحَّلةً تُشتَقُّ منها القوائمُ بعدُ', 'رحِّل قيدًا واحدًا على الأقلِّ من دفترِ اليوميةِ لتظهرَ القوائمُ الثلاث');
+    echo ems_states_bundle('لا قيود مرحلة تشتق منها القوائم بعد', 'رحل قيدا واحدا على الأقل من دفتر اليومية لتظهر القوائم الثلاث');
     ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
-    <p class="text-muted fin-stmt-note"><i class="fas fa-circle-info"></i> مُشتَقّة من <strong>القيود المرحّلة فقط</strong> · عملة الأساس SDG · المركز المالي يتوازن آليًا (نتيجة القيد المزدوج).</p>
+    <p class="text-muted fin-stmt-note"><i class="fas fa-circle-info"></i> مشتقة من <strong>القيود المرحلة فقط</strong> · عملة الأساس SDG · المركز المالي يتوازن آليا (نتيجة القيد المزدوج).</p>
 
     <!-- قائمة الدخل -->
     <div class="card"><div class="card-body">
@@ -139,18 +139,18 @@ function fin_stmt_rows($rows, $type_lbl)
               <th class="ems-fn-th" data-fn="1">المستوى</th>
               <th class="ems-fn-th" data-fn="1">البند الأب</th>
               <th class="ems-fn-th" data-fn="1">حالة الإقفال</th>
-              <th class="ems-fn-th" data-fn="1">أعدّها</th>
+              <th class="ems-fn-th" data-fn="1">أعدها</th>
               <th class="ems-fn-th" data-fn="1">راجعها</th>
               <th class="ems-fn-th" data-fn="1">اعتمدها</th>
               <th class="ems-fn-th" data-fn="1">المراجع الخارجي</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-              <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطّلاع</th>
+              <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطلاع</th>
               <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
               <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
@@ -174,13 +174,13 @@ function fin_stmt_rows($rows, $type_lbl)
 
     <!-- التدفق النقدي -->
     <div class="card"><div class="card-body">
-        <h5 class="fin-stmt-h5"><i class="fas fa-water"></i> قائمة التدفق النقدي (مبسّطة — من المدفوعات المنفّذة)</h5>
+        <h5 class="fin-stmt-h5"><i class="fas fa-water"></i> قائمة التدفق النقدي (مبسطة — من المدفوعات المنفذة)</h5>
         <div class="table-container"><table class="alltables no-datatable fin-stmt-tbl" data-no-dt="1">
             <tbody>
-                <tr><td>التدفّق النقدي الداخل (تحصيل)</td><td class="fin-stmt-num"><?php echo number_format($inflow, 2); ?></td></tr>
-                <tr><td>التدفّق النقدي الخارج (صرف)</td><td class="fin-stmt-num">(<?php echo number_format($outflow, 2); ?>)</td></tr>
+                <tr><td>التدفق النقدي الداخل (تحصيل)</td><td class="fin-stmt-num"><?php echo number_format($inflow, 2); ?></td></tr>
+                <tr><td>التدفق النقدي الخارج (صرف)</td><td class="fin-stmt-num">(<?php echo number_format($outflow, 2); ?>)</td></tr>
             </tbody>
-            <tfoot><tr><th>صافي التدفّق النقدي</th>
+            <tfoot><tr><th>صافي التدفق النقدي</th>
                 <th class="fin-stmt-num"><span class="badge badge-<?php echo $net_cash >= 0 ? 'success' : 'danger'; ?>"><?php echo number_format($net_cash, 2); ?></span></th></tr></tfoot>
         </table></div>
     </div></div>

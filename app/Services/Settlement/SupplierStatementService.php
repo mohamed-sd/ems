@@ -77,7 +77,7 @@ class SupplierStatementService
                     AND s.period_to BETWEEN ? AND ?
                   ORDER BY s.period_from, l.id",
                 array($supplierId, (string) $from, (string) $to));
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $lines'); $lines = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $lines'); $lines = array(); }
 
         foreach ($lines as $l) {
             $isCharge = ((string) $l['line_kind'] === 'charge');
@@ -119,11 +119,11 @@ class SupplierStatementService
                     AND DATE(r.created_at) BETWEEN ? AND ?
                   ORDER BY r.id",
                 array($supplierId, (string) $from, (string) $to));
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $recs'); $recs = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $recs'); $recs = array(); }
         foreach ($recs as $r) {
             $out['layers']['advances']['rows'][] = self::row(
-                'استردادُ سلفةٍ #' . (int) $r['advance_id'] . ' — سند ' . $r['doc_ref']
-                . ' · الرصيدُ بعده ' . $r['balance'],
+                'استرداد سلفة #' . (int) $r['advance_id'] . ' — سند ' . $r['doc_ref']
+                . ' · الرصيد بعده ' . $r['balance'],
                 substr((string) $r['created_at'], 0, 10),
                 0.0,                               // الأثرُ المالي في بند التسوية أعلاه — هذا سطرُ أثرٍ لا مبلغٍ ثانٍ
                 '', 'supplier_advance', (string) $r['advance_id'],
@@ -143,10 +143,10 @@ class SupplierStatementService
                     AND DATE(COALESCE(p.paid_at, p.created_at)) BETWEEN ? AND ?
                   ORDER BY p.id",
                 array($supplierId, (string) $from, (string) $to));
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $pays'); $pays = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $pays'); $pays = array(); }
         foreach ($pays as $p) {
             $row = self::row(
-                'سدادٌ ' . $p['payment_no'] . ' (' . $p['state'] . ' · ' . $p['method'] . ')'
+                'سداد ' . $p['payment_no'] . ' (' . $p['state'] . ' · ' . $p['method'] . ')'
                 . (trim((string) $p['memo']) !== '' ? ' — ' . $p['memo'] : ''),
                 substr((string) $p['pay_date'], 0, 10),
                 -1 * (float) $p['amount'],

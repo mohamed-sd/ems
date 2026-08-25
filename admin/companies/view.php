@@ -151,7 +151,7 @@ require_once dirname(__DIR__) . '/includes/layout_head.php';
                 </button>
             </form>
             <?php endif; ?>
-            <form method="post" action="<?php echo e(super_admin_url('companies/action.php')); ?>" style="display:inline" onsubmit="return confirm('حذف الشركة نهائياً؟ لا يمكن التراجع.');">
+            <form method="post" action="<?php echo e(super_admin_url('companies/action.php')); ?>" style="display:inline" onsubmit="return confirm('حذف الشركة نهائيا؟ لا يمكن التراجع.');">
                 <input type="hidden" name="csrf_token" value="<?php echo e($csrf); ?>">
                 <input type="hidden" name="id" value="<?php echo $id; ?>">
                 <input type="hidden" name="action" value="delete">
@@ -167,7 +167,7 @@ require_once dirname(__DIR__) . '/includes/layout_head.php';
 <?php if (!$password_target_user): ?>
 <div class="alert alert-warning" style="margin-bottom:16px;">
     <i class="fas fa-triangle-exclamation"></i>
-    <span>لا يمكن تعديل كلمة المرور حالياً لعدم وجود مستخدم مرتبط بهذه الشركة.</span>
+    <span>لا يمكن تعديل كلمة المرور حاليا لعدم وجود مستخدم مرتبط بهذه الشركة.</span>
 </div>
 <?php endif; ?>
 

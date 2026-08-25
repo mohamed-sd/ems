@@ -49,17 +49,17 @@ class MeterReadingService
 
         $type = isset($args['meter_type']) ? trim((string) $args['meter_type']) : 'hour';
         if (!in_array($type, self::METER_TYPES, true)) {
-            $out['code'] = 422; $out['reason'] = 'نوعُ عدّادٍ خارج (hour · km) — قائمةُ UX-10 §8'; return $out;
+            $out['code'] = 422; $out['reason'] = 'نوع عداد خارج (hour · km) — قائمة UX-10 §8'; return $out;
         }
         $date = isset($args['reading_date']) ? trim((string) $args['reading_date']) : '';
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
-            $out['code'] = 422; $out['reason'] = 'تاريخُ القراءة إلزامي — القراءةُ واقعةٌ بيومها'; return $out;
+            $out['code'] = 422; $out['reason'] = 'تاريخ القراءة إلزامي — القراءة واقعة بيومها'; return $out;
         }
         if (!isset($args['value']) || trim((string) $args['value']) === '') {
-            $out['code'] = 422; $out['reason'] = 'قيمةُ القراءة إلزامية'; return $out;
+            $out['code'] = 422; $out['reason'] = 'قيمة القراءة إلزامية'; return $out;
         }
         $value = round((float) $args['value'], 2);
-        if ($value < 0) { $out['code'] = 422; $out['reason'] = 'قيمةُ عدّادٍ سالبة'; return $out; }
+        if ($value < 0) { $out['code'] = 422; $out['reason'] = 'قيمة عداد سالبة'; return $out; }
 
         $source = isset($args['source']) ? trim((string) $args['source']) : 'manual';
         if (!in_array($source, self::SOURCES, true) || $source === 'reset') {
@@ -70,15 +70,15 @@ class MeterReadingService
         // المعدةُ من النطاق (البوابةُ ترفض الأجنبية)
         $eq = null;
         try { $eq = $gate->selectOne('equipments', array('columns' => array('id'), 'where' => array('id' => $equipmentId))); }
-        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $eq'); $eq = null; }
-        if (!$eq) { $out['code'] = 422; $out['reason'] = 'المعدةُ غيرُ موجودةٍ في نطاقك'; return $out; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $eq'); $eq = null; }
+        if (!$eq) { $out['code'] = 422; $out['reason'] = 'المعدة غير موجودة في نطاقك'; return $out; }
 
         // «409 قراءةُ اليوم قائمة» — بمرجعها لا برفضٍ أصمّ
         $same = self::readingOn($gate, $equipmentId, $type, $date);
         if ($same) {
             $out['code'] = 409;
-            $out['reason'] = 'للمعدة قراءةٌ بتاريخ ' . $date . ' سلفًا (#' . (int) $same['id']
-                           . ' بقيمة ' . $same['value'] . ') — القراءةُ واقعةُ يومٍ لا تُكرَّر';
+            $out['reason'] = 'للمعدة قراءة بتاريخ ' . $date . ' سلفا (#' . (int) $same['id']
+                           . ' بقيمة ' . $same['value'] . ') — القراءة واقعة يوم لا تكرر';
             return $out;
         }
 
@@ -88,17 +88,17 @@ class MeterReadingService
         // ── القاعدةُ الحاكمة: «value ≥ آخرِ قراءة» داخل السلسلة ────────────
         if ($prev !== null && $value < (float) $prev['value']) {
             $out['code'] = 422;
-            $out['reason'] = 'قراءةٌ (' . $value . ') أقلُّ من آخرِ قراءةٍ في السلسلة ('
+            $out['reason'] = 'قراءة (' . $value . ') أقل من آخر قراءة في السلسلة ('
                            . $prev['value'] . ' بتاريخ ' . $prev['reading_date'] . ') — '
-                           . 'لا رجوعَ عدّادٍ إلا **بقرارِ تصفيرٍ موثَّق** يفتح سلسلةً جديدة (UX-10 §8)';
+                           . 'لا رجوع عداد إلا **بقرار تصفير موثق** يفتح سلسلة جديدة (UX-10 §8)';
             return $out;
         }
         // ولا يجوز أن تكون أكبرَ من قراءةٍ **لاحقةٍ** مسجَّلةٍ سلفًا (إدخالٌ متأخر)
         $next = self::nextReading($gate, $equipmentId, $type, $chain, $date);
         if ($next !== null && $value > (float) $next['value']) {
             $out['code'] = 422;
-            $out['reason'] = 'قراءةٌ (' . $value . ') تتجاوز قراءةً لاحقةً مسجَّلةً ('
-                           . $next['value'] . ' بتاريخ ' . $next['reading_date'] . ') — السلسلةُ لا تتراجع';
+            $out['reason'] = 'قراءة (' . $value . ') تتجاوز قراءة لاحقة مسجلة ('
+                           . $next['value'] . ' بتاريخ ' . $next['reading_date'] . ') — السلسلة لا تتراجع';
             return $out;
         }
 
@@ -132,9 +132,9 @@ class MeterReadingService
             }, 'M-25 meter reading eq#' . $equipmentId);
         } catch (\Throwable $t) {
             if (strpos($t->getMessage(), 'Duplicate') !== false) {
-                $out['code'] = 409; $out['reason'] = 'قراءةُ اليوم قائمة (سباقُ كتابة)'; return $out;
+                $out['code'] = 409; $out['reason'] = 'قراءة اليوم قائمة (سباق كتابة)'; return $out;
             }
-            $out['code'] = 422; $out['reason'] = 'تعذّر التسجيل: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر التسجيل: ' . $t->getMessage(); return $out;
         }
 
         self::audit($conn, $companyId, $actor, 'record', (int) $newId,
@@ -158,32 +158,32 @@ class MeterReadingService
 
         $type = isset($args['meter_type']) ? trim((string) $args['meter_type']) : 'hour';
         if (!in_array($type, self::METER_TYPES, true)) {
-            $out['code'] = 422; $out['reason'] = 'نوعُ عدّادٍ خارج (hour · km)'; return $out;
+            $out['code'] = 422; $out['reason'] = 'نوع عداد خارج (hour · km)'; return $out;
         }
         $date = isset($args['reading_date']) ? trim((string) $args['reading_date']) : '';
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
-            $out['code'] = 422; $out['reason'] = 'تاريخُ التصفير إلزامي'; return $out;
+            $out['code'] = 422; $out['reason'] = 'تاريخ التصفير إلزامي'; return $out;
         }
         $value = isset($args['value']) ? round((float) $args['value'], 2) : 0.0;
-        if ($value < 0) { $out['code'] = 422; $out['reason'] = 'قيمةُ بدايةِ السلسلة سالبة'; return $out; }
+        if ($value < 0) { $out['code'] = 422; $out['reason'] = 'قيمة بداية السلسلة سالبة'; return $out; }
 
         $reason = isset($args['reset_reason']) ? trim((string) $args['reset_reason']) : '';
         $docRef = isset($args['reset_doc_ref']) ? trim((string) $args['reset_doc_ref']) : '';
         if ($reason === '' || $docRef === '') {
             $out['code'] = 422;
-            $out['reason'] = 'التصفيرُ يلزمه **سببٌ ومرجعُ مستند** — «لا رجوعَ عدّادٍ إلا بقرارٍ موثَّق» (UX-10 §8)';
+            $out['reason'] = 'التصفير يلزمه **سبب ومرجع مستند** — «لا رجوع عداد إلا بقرار موثق» (UX-10 §8)';
             return $out;
         }
 
         $eq = null;
         try { $eq = $gate->selectOne('equipments', array('columns' => array('id'), 'where' => array('id' => $equipmentId))); }
-        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $eq'); $eq = null; }
-        if (!$eq) { $out['code'] = 422; $out['reason'] = 'المعدةُ غيرُ موجودةٍ في نطاقك'; return $out; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $eq'); $eq = null; }
+        if (!$eq) { $out['code'] = 422; $out['reason'] = 'المعدة غير موجودة في نطاقك'; return $out; }
 
         $same = self::readingOn($gate, $equipmentId, $type, $date);
         if ($same) {
             $out['code'] = 409;
-            $out['reason'] = 'للمعدة قراءةٌ بتاريخ ' . $date . ' سلفًا — صفِّر بتاريخٍ خالٍ';
+            $out['reason'] = 'للمعدة قراءة بتاريخ ' . $date . ' سلفا — صفر بتاريخ خال';
             return $out;
         }
 
@@ -198,7 +198,7 @@ class MeterReadingService
                     'delta' => null, 'source' => 'reset', 'is_reset' => 1,
                     'reset_reason' => mb_substr($reason, 0, 255),
                     'reset_doc_ref' => mb_substr($docRef, 0, 120),
-                    'note' => 'بدايةُ سلسلةٍ جديدة #' . $newChain . ' — السابقةُ محفوظةٌ كاملةً',
+                    'note' => 'بداية سلسلة جديدة #' . $newChain . ' — السابقة محفوظة كاملة',
                     'recorded_by' => (int) $actor ?: null,
                 ));
                 if ($type === 'hour') {
@@ -208,7 +208,7 @@ class MeterReadingService
                 return true;
             }, 'M-25 meter reset eq#' . $equipmentId);
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر التصفير: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر التصفير: ' . $t->getMessage(); return $out;
         }
 
         self::audit($conn, $companyId, $actor, 'reset', (int) $newId,
@@ -242,7 +242,7 @@ class MeterReadingService
         if ($last !== null) {
             return array('value' => (float) $last['value'], 'source' => 'reading',
                          'as_of' => (string) $last['reading_date'], 'is_reading' => true,
-                         'note' => 'قراءةُ عدّادٍ مسجَّلةٌ (سلسلة ' . $chain . ' · مصدرُها '
+                         'note' => 'قراءة عداد مسجلة (سلسلة ' . $chain . ' · مصدرها '
                                  . $last['source'] . ')');
         }
 
@@ -251,19 +251,19 @@ class MeterReadingService
             $eq = $gate->selectOne('equipments', array(
                 'columns' => array('id', 'opening_meter', 'operating_hours'),
                 'where' => array('id' => $equipmentId)));
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $eq'); $eq = null; }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $eq'); $eq = null; }
 
         if ($eq && $eq['opening_meter'] !== null && (float) $eq['opening_meter'] > 0) {
             return array('value' => (float) $eq['opening_meter'], 'source' => 'opening',
                          'as_of' => null, 'is_reading' => false,
-                         'note' => 'عدّادٌ افتتاحيٌّ مسجَّلٌ على المعدة — بلا تاريخِ قراءة');
+                         'note' => 'عداد افتتاحي مسجل على المعدة — بلا تاريخ قراءة');
         }
 
         // ③ البديلُ الموروث — **يُسمّى بديلًا**
         $proxy = self::legacyProxyHours($gate, $equipmentId);
         return array('value' => $proxy, 'source' => 'legacy_proxy', 'as_of' => null, 'is_reading' => false,
-                     'note' => '⚠ ليس قراءةَ عدّاد: مجموعُ ساعات التشغيل من سجل الدوام '
-                             . '(بديلٌ موروثٌ حتى تُسجَّل أولُ قراءة)');
+                     'note' => '⚠ ليس قراءة عداد: مجموع ساعات التشغيل من سجل الدوام '
+                             . '(بديل موروث حتى تسجل أول قراءة)');
     }
 
     /**
@@ -280,11 +280,11 @@ class MeterReadingService
                      'remaining' => null, 'meter_source' => 'none', 'is_reading' => false);
 
         if ($basis !== 'ساعات') {
-            $out['reason'] = 'الخطةُ بأساسٍ زمنيٍّ لا بعدّاد — الاستحقاقُ بتاريخها';
+            $out['reason'] = 'الخطة بأساس زمني لا بعداد — الاستحقاق بتاريخها';
             return $out;
         }
-        if ($eqId <= 0) { $out['reason'] = 'خطةٌ بلا معدةٍ محدَّدة — لا عدّادَ يُقاس عليه'; return $out; }
-        if ($interval <= 0) { $out['reason'] = 'خطةٌ بلا فترةٍ موجبة — لا استحقاقَ يُحسب'; return $out; }
+        if ($eqId <= 0) { $out['reason'] = 'خطة بلا معدة محددة — لا عداد يقاس عليه'; return $out; }
+        if ($interval <= 0) { $out['reason'] = 'خطة بلا فترة موجبة — لا استحقاق يحسب'; return $out; }
 
         $m = self::currentMeter($conn, $gate, $companyId, $eqId, 'hour');
         $out['current'] = $m['value'];
@@ -297,15 +297,15 @@ class MeterReadingService
                  ? (float) $plan['next_due_meter']
                  : ($lastDone !== null ? $lastDone + $interval : null);
         if ($dueAt === null) {
-            $out['reason'] = 'الخطةُ بلا عدّادِ آخرِ تنفيذٍ ولا استحقاقٍ مسجَّل — يُعلَن ولا يُخترع';
+            $out['reason'] = 'الخطة بلا عداد آخر تنفيذ ولا استحقاق مسجل — يعلن ولا يخترع';
             return $out;
         }
         $out['due_at'] = round($dueAt, 2);
         $out['remaining'] = round($dueAt - $m['value'], 2);
         $out['due'] = ($m['value'] >= $dueAt);
         $out['reason'] = $out['due']
-            ? ('مستحقةٌ: العدّاد ' . $m['value'] . ' بلغ ' . round($dueAt, 2) . ' — ' . $m['note'])
-            : ('غيرُ مستحقة: يتبقى ' . $out['remaining'] . ' — ' . $m['note']);
+            ? ('مستحقة: العداد ' . $m['value'] . ' بلغ ' . round($dueAt, 2) . ' — ' . $m['note'])
+            : ('غير مستحقة: يتبقى ' . $out['remaining'] . ' — ' . $m['note']);
         return $out;
     }
 
@@ -343,25 +343,25 @@ class MeterReadingService
     {
         $out = array('ok' => false, 'skipped' => '', 'reading_id' => null);
         $eqId = (int) (isset($ts['eq_id']) ? $ts['eq_id'] : (isset($ts['equipment_id']) ? $ts['equipment_id'] : 0));
-        if ($eqId <= 0) { $out['skipped'] = 'لا معدةَ على الصف'; return $out; }
+        if ($eqId <= 0) { $out['skipped'] = 'لا معدة على الصف'; return $out; }
 
         // العدّادُ ساعاتٌ ودقائقُ وثوانٍ في الصف الموروث — تُجمع ساعاتٍ عشرية
         $h = isset($ts['end_hours']) ? (float) $ts['end_hours'] : 0.0;
         $m = isset($ts['end_minutes']) ? (float) $ts['end_minutes'] : 0.0;
         $s = isset($ts['end_seconds']) ? (float) $ts['end_seconds'] : 0.0;
         if ($h <= 0 && $m <= 0 && $s <= 0) {
-            $out['skipped'] = 'لا قراءةَ عدّادٍ على الصف (الحقولُ صفرٌ) — لا يُخترع رقم';
+            $out['skipped'] = 'لا قراءة عداد على الصف (الحقول صفر) — لا يخترع رقم';
             return $out;
         }
         $value = round($h + ($m / 60.0) + ($s / 3600.0), 2);
         $date = isset($ts['date']) ? (string) $ts['date'] : '';
-        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) { $out['skipped'] = 'تاريخُ الصف غيرُ صالح'; return $out; }
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) { $out['skipped'] = 'تاريخ الصف غير صالح'; return $out; }
 
         $r = self::record($conn, $gate, $companyId, $eqId, array(
             'meter_type' => 'hour', 'reading_date' => $date, 'value' => $value,
             'source' => 'timesheet',
             'source_ref' => 'TS-' . (int) (isset($ts['id']) ? $ts['id'] : 0),
-            'note' => 'قراءةُ نهاية الوردية من سجل الدوام',
+            'note' => 'قراءة نهاية الوردية من سجل الدوام',
         ), $actor);
 
         if (!empty($r['ok'])) { $out['ok'] = true; $out['reading_id'] = $r['reading_id']; return $out; }

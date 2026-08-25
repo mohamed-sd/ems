@@ -77,21 +77,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'scale_max' => $_POST['scale_max'] ?? '',
             'note'      => $_POST['wnote'] ?? '',
         ), $uid);
-        $redirect($r['ok'] ? 'حُفظ وزنُ المؤشر ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $sid);
+        $redirect($r['ok'] ? 'حفظ وزن المؤشر ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $sid);
     }
 
     if ($action === 'generate') {
         $r = SES::generate($conn, $gate, $company_id, $sid,
             strval($_POST['from'] ?? ''), strval($_POST['to'] ?? ''), $uid);
-        $redirect($r['ok'] ? ('وُلّد التقييم — النتيجة ' . ($r['score'] ?? '—')
-                              . ' بتغطيةِ وزنٍ ' . $r['coverage'] . '٪ ✅')
+        $redirect($r['ok'] ? ('ولد التقييم — النتيجة ' . ($r['score'] ?? '—')
+                              . ' بتغطية وزن ' . $r['coverage'] . '٪ ✅')
                            : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $sid);
     }
 
     if ($action === 'decide') {
         $r = SES::decide($conn, $gate, $company_id, intval($_POST['evaluation_id'] ?? 0),
             strval($_POST['renewal_flag'] ?? ''), strval($_POST['decision_note'] ?? ''), $uid);
-        $redirect($r['ok'] ? 'اعتُمد التقييمُ بقراره ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $sid);
+        $redirect($r['ok'] ? 'اعتمد التقييم بقراره ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $sid);
     }
 }
 
@@ -120,7 +120,7 @@ require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
-require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('supplier', 'التقييمُ والمخاطر');
+require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('supplier', 'التقييم والمخاطر');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 // NAV-01 §8 (update0006-b): الشاشةُ قسمٌ من ملف المورد الأم
 $sf_supplier_id = intval($_GET['supplier_id'] ?? $_GET['id'] ?? 0); $sf_active = 'evaluation';
@@ -137,8 +137,8 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>';
     }
-    echo ems_next_step('اعتمادُ قرارِ التجديدِ على التقييمِ المسودةِ — الرقمُ يخبر والإنسانُ يقرّر');
-    echo ems_states_bundle('لا تقييماتٍ لهذا الموردِ في الفترة', 'ولّدِ التقييمَ من سجلاتِ النظامِ أو غيّرِ الفترة');
+    echo ems_next_step('اعتماد قرار التجديد على التقييم المسودة — الرقم يخبر والإنسان يقرر');
+    echo ems_states_bundle('لا تقييمات لهذا المورد في الفترة', 'ولد التقييم من سجلات النظام أو غير الفترة');
     ?>
 
     <div class="card"><div class="card-body">
@@ -148,7 +148,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             <div class="filter-body">
         <form method="get" class="sev-filter">
             <strong>المورد:</strong>
-            <select name="supplier_id" onchange="this.form.submit()" class="sev-supplier-select" aria-label="اختيارُ الموردِ المُقيَّم">
+            <select name="supplier_id" onchange="this.form.submit()" class="sev-supplier-select" aria-label="اختيار المورد المقيم">
                 <?php foreach ($suppliers as $s): ?>
                     <option value="<?php echo intval($s['id']); ?>" <?php echo $selected === intval($s['id']) ? 'selected' : ''; ?>>
                         #<?php echo intval($s['id']); ?> — <?php echo htmlspecialchars((string)$s['name']); ?>
@@ -162,18 +162,18 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             </div>
         </div>
         <p class="sev-quote">
-            «دوريٌّ <strong>بمؤشراتٍ من سجلات النظام لا انطباعًا</strong>» (§4) — فلا حقلَ هنا
-            لكتابة نتيجةٍ ولا قيمةِ مؤشر: كلُّ رقمٍ <strong>يُقرأ من مصدره</strong>، والقرارُ وحدَه إنسانيّ.
+            «دوري <strong>بمؤشرات من سجلات النظام لا انطباعا</strong>» (§4) — فلا حقل هنا
+            لكتابة نتيجة ولا قيمة مؤشر: كل رقم <strong>يقرأ من مصدره</strong>، والقرار وحده إنساني.
         </p>
         <div class="alert <?php echo $gateInfo['ok'] ? 'alert-success' : 'alert-warning'; ?>">
-            <strong>بوابةُ التجديد:</strong> <?php echo htmlspecialchars((string)$gateInfo['reason']); ?>
+            <strong>بوابة التجديد:</strong> <?php echo htmlspecialchars((string)$gateInfo['reason']); ?>
         </div>
     </div></div>
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-scale-balanced"></i>
-        أوزانُ المؤشرات — Σ = <?php echo htmlspecialchars((string)$wSum); ?>٪
+        أوزان المؤشرات — Σ = <?php echo htmlspecialchars((string)$wSum); ?>٪
         <?php if (abs($wSum - 100.0) > 0.005): ?>
-            <span class="badge badge-danger">والواجبُ 100٪ — لا تقييمَ قبل ضبطها</span>
+            <span class="badge badge-danger">والواجب 100٪ — لا تقييم قبل ضبطها</span>
         <?php else: ?><span class="badge badge-success">مضبوطة</span><?php endif; ?>
     </h5></div>
     <div class="card-body">
@@ -191,7 +191,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     </select></div>
                 <div class="form-group"><label for="emsf_504_462de">الوزن ٪ <span class="sev-req">*</span></label>
                     <input type="number" step="0.01" min="0.01" max="100" name="weight" required id="emsf_504_462de"></div>
-                <div class="form-group"><label for="emsf_505_1f9c5">المقياس <small>— للحوادث: العددُ الذي تبلغ عنده النتيجةُ صفرًا</small></label>
+                <div class="form-group"><label for="emsf_505_1f9c5">المقياس <small>— للحوادث: العدد الذي تبلغ عنده النتيجة صفرا</small></label>
                     <input type="number" step="0.01" min="0" name="scale_max" id="emsf_505_1f9c5"></div>
                 <div class="form-group"><label for="emsf_506_2aa6a">ملاحظة</label><input type="text" name="wnote" maxlength="255" id="emsf_506_2aa6a"></div>
             </div>
@@ -225,16 +225,16 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             <input type="hidden" name="from" value="<?php echo htmlspecialchars($pFrom); ?>">
             <input type="hidden" name="to" value="<?php echo htmlspecialchars($pTo); ?>">
             <button type="submit" class="btn-primary"><i class="fa fa-gears"></i>
-                ولّد تقييمَ <?php echo htmlspecialchars($pFrom); ?> → <?php echo htmlspecialchars($pTo); ?></button>
-            <span class="sev-muted">— يُقرأ من السجلات، ولا يُكتب رقمٌ يدويًّا</span>
+                ولد تقييم <?php echo htmlspecialchars($pFrom); ?> → <?php echo htmlspecialchars($pTo); ?></button>
+            <span class="sev-muted">— يقرأ من السجلات، ولا يكتب رقم يدويا</span>
         </form>
     </div></div>
     <?php endif; ?>
 
-    <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> تقييماتُ المورد</h5></div>
+    <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> تقييمات المورد</h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap sev-table">
-            <thead><tr><th>الفترة</th><th>النتيجة</th><th>تغطيةُ الوزن</th><th>الحالة</th>
+            <thead><tr><th>الفترة</th><th>النتيجة</th><th>تغطية الوزن</th><th>الحالة</th>
                 <th>قرار التجديد</th><th>السبب</th><th></th>
                 <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
                 <th class="ems-fn-th" data-fn="1">رقم التقييم</th>
@@ -248,15 +248,15 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                 <th class="ems-fn-th" data-fn="1">الدرجة القصوى</th>
                 <th class="ems-fn-th" data-fn="1">التصنيف الناتج</th>
                 <th class="ems-fn-th" data-fn="1">أثر التقييم</th>
-                <th class="ems-fn-th" data-fn="1">قيّمه</th>
+                <th class="ems-fn-th" data-fn="1">قيمه</th>
                 <th class="ems-fn-th" data-fn="1">اعتمده</th>
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                 <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                 <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                 <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-                <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+                <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
                 <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                 </tr></thead>
             <tbody>
@@ -268,7 +268,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                         : '—'; ?></strong></td>
                     <td><?php echo htmlspecialchars((string)$e['weight_measured']); ?>٪
                         <?php if ((float)$e['weight_measured'] < 100): ?>
-                            <small class="sev-partial-note">(الباقي بلا مصدرٍ — معلَن)</small>
+                            <small class="sev-partial-note">(الباقي بلا مصدر — معلن)</small>
                         <?php endif; ?></td>
                     <td><?php echo (string)$e['state'] === 'decided'
                         ? "<span class='badge badge-success'>معتمَد</span>"
@@ -286,15 +286,15 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
 
     <?php if ($openEval !== null): ?>
     <div class="card"><div class="card-header"><h5><i class="fa fa-magnifying-glass-chart"></i>
-        مؤشراتُ تقييم <?php echo htmlspecialchars((string)$openEval['period_from']); ?>
+        مؤشرات تقييم <?php echo htmlspecialchars((string)$openEval['period_from']); ?>
         → <?php echo htmlspecialchars((string)$openEval['period_to']); ?>
         · النتيجة <strong><?php echo $openEval['score'] !== null ? htmlspecialchars((string)$openEval['score']) : '—'; ?></strong>
-        من 100 بتغطيةِ وزنٍ <?php echo htmlspecialchars((string)$openEval['weight_measured']); ?>٪</h5></div>
+        من 100 بتغطية وزن <?php echo htmlspecialchars((string)$openEval['weight_measured']); ?>٪</h5></div>
     <div class="card-body">
         <div class="table-container">
         <table class="alltables display nowrap sev-table">
             <thead><tr><th>المؤشر</th><th>القياس</th><th>الأساس</th><th>النسبة</th>
-                <th>الوزن</th><th>المكتسَب</th><th>المصدر</th></tr></thead>
+                <th>الوزن</th><th>المكتسب</th><th>المصدر</th></tr></thead>
             <tbody>
             <?php foreach ($openLines as $l): ?>
                 <tr>
@@ -327,11 +327,11 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                             <option value="<?php echo $k; ?>"><?php echo $lbl; ?></option>
                         <?php endforeach; ?>
                     </select></div>
-                <div class="form-group"><label for="emsf_508_d31f7">السبب <small>— إلزاميٌّ عند منع التجديد</small></label>
+                <div class="form-group"><label for="emsf_508_d31f7">السبب <small>— إلزامي عند منع التجديد</small></label>
                     <input type="text" name="decision_note" maxlength="255" id="emsf_508_d31f7"></div>
             </div>
-            <p class="sev-decision-note">الرقمُ يخبر و<strong>الإنسانُ يقرّر</strong> — والقرارُ يصير
-                <strong>شرطًا في التجديد</strong> بعد اعتماده، ولا يُعاد.</p>
+            <p class="sev-decision-note">الرقم يخبر و<strong>الإنسان يقرر</strong> — والقرار يصير
+                <strong>شرطا في التجديد</strong> بعد اعتماده، ولا يعاد.</p>
             <div><button type="submit" class="btn-primary"><i class="fa fa-gavel"></i> اعتمد القرار</button></div>
         </form>
         <?php endif; ?>

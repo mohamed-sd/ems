@@ -117,13 +117,13 @@ class DocumentGuard
     {
         $who = ($doc['subject_type'] === 'equipment')
              ? 'المعدة #' . $doc['subject_id']
-             : 'المشغّل #' . $doc['subject_id'];
+             : 'المشغل #' . $doc['subject_id'];
         $no  = (isset($doc['doc_no']) && trim((string) $doc['doc_no']) !== '')
              ? ' رقم ' . $doc['doc_no'] : '';
 
         return $who . ': «' . $doc['doc_type'] . '»' . $no
-             . ' منتهيةٌ بتاريخ ' . $doc['expiry_date']
-             . ' — جدّدها من شاشة وثائق المعدات والمشغّلين ثم أعد الاعتماد';
+             . ' منتهية بتاريخ ' . $doc['expiry_date']
+             . ' — جددها من شاشة وثائق المعدات والمشغلين ثم أعد الاعتماد';
     }
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -158,7 +158,7 @@ class DocumentGuard
 
         // monitor — يرصد ويمرّ: أسبوعُ قياسٍ قبل الإلزام، والرقمُ يُقرأ من السجل
         error_log('[doc-expiry] ' . ($ref !== '' ? $ref . ' ' : '')
-            . 'وثائقُ أهليةٍ منتهيةٌ يومَ ' . $onDate . ' (' . count($docs) . '): '
+            . 'وثائق أهلية منتهية يوم ' . $onDate . ' (' . count($docs) . '): '
             . implode(' · ', $reasons));
 
         return array('ok' => true, 'code' => 200, 'reasons' => $reasons, 'docs' => $docs, 'monitored' => true);

@@ -77,8 +77,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     include('../includes/page_header.php');
     if (isset($_GET['msg'])) { echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>'; }
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا عقودَ نافذةً في نافذةِ اللوحةِ الحالية',
-                           'افتح «كلُّ العقود» من زرِّ النطاقِ أعلاه أو اعتمد خطَّ أساسٍ لعقدٍ نافذ');
+    echo ems_states_bundle('لا عقود نافذة في نافذة اللوحة الحالية',
+                           'افتح «كل العقود» من زر النطاق أعلاه أو اعتمد خط أساس لعقد نافذ');
     ?>
 
     <style>
@@ -102,14 +102,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-body">
         <p class="cb-note">
             <i class="fas fa-circle-info"></i>
-            <strong>المخططُ · المنفَّذُ · المفوترُ · المحصَّل</strong> في سطرٍ واحدٍ لكل عقدٍ نافذ —
-            <strong>وكلُّ فجوةٍ بمالكها</strong>.
-            و<strong>كلُّ رقمٍ من بيته</strong>: المخطَّطُ من الجدول الشهري · والمنفَّذُ من الوحدات
-            <strong>بمفتاح الربط</strong> · والمفوترُ من المستخلصات · والمحصَّلُ من الذمم —
-            <strong>ولا جدولَ ثالثٌ يحفظ اللوحة</strong> فلا يفترق رقمٌ عن مصدره.
+            <strong>المخطط · المنفذ · المفوتر · المحصل</strong> في سطر واحد لكل عقد نافذ —
+            <strong>وكل فجوة بمالكها</strong>.
+            و<strong>كل رقم من بيته</strong>: المخطط من الجدول الشهري · والمنفذ من الوحدات
+            <strong>بمفتاح الربط</strong> · والمفوتر من المستخلصات · والمحصل من الذمم —
+            <strong>ولا جدول ثالث يحفظ اللوحة</strong> فلا يفترق رقم عن مصدره.
             <br>
-            و<strong>مصداقيةُ السطر تُعلَن مع أرقامه</strong>: وحدةٌ غيرُ موصولةٍ تعني
-            <strong>منفَّذًا ناقصًا يبدو تامًّا</strong> — فيُوسَم السطرُ ولا يُقرأ على أنه تام.
+            و<strong>مصداقية السطر تعلن مع أرقامه</strong>: وحدة غير موصولة تعني
+            <strong>منفذا ناقصا يبدو تاما</strong> — فيوسم السطر ولا يقرأ على أنه تام.
         </p>
         <div class="cb-actions">
             <span class="cb-badge-pad badge <?php echo $cl['ok'] ? 'badge-success' : 'badge-warning'; ?>"
@@ -117,13 +117,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 echo htmlspecialchars(str_replace('**', '', (string)$cl['reason'])); ?></span>
             <a class="badge badge-secondary cb-badge-link"
                href="?all=<?php echo $ALL ? '0' : '1'; ?>">
-               <?php echo $ALL ? 'النافذةُ فقط' : 'كلُّ العقود'; ?></a>
+               <?php echo $ALL ? 'النافذة فقط' : 'كل العقود'; ?></a>
         </div>
     </div></div>
 
     <?php if ($tot): ?>
     <div class="card"><div class="card-header"><h5><i class="fa fa-calculator"></i>
-        المجاميع — <strong>بعملةٍ عملة، ولا تُجمع عملتان</strong></h5></div>
+        المجاميع — <strong>بعملة عملة، ولا تجمع عملتان</strong></h5></div>
     <div class="card-body"><div class="cb-totals">
         <?php foreach ($tot as $cur => $t):
             $curOn   = ((string)$cur === $CUR);
@@ -132,21 +132,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="cb-total-card<?php echo $curOn ? ' cb-total-on' : ''; ?>">
                 <div class="cb-total-cur">
                     <a class="cb-total-link" href="<?php echo htmlspecialchars($curHref); ?>"
-                       title="<?php echo $curOn ? 'ارفع التصفية' : 'اعرض عقودَ هذه العملةِ وحدَها'; ?>"
+                       title="<?php echo $curOn ? 'ارفع التصفية' : 'اعرض عقود هذه العملة وحدها'; ?>"
                     ><?php echo htmlspecialchars((string)$cur); ?>
-                        — <?php echo intval($t['contracts']); ?> عقدًا<?php
+                        — <?php echo intval($t['contracts']); ?> عقدا<?php
                         echo $curOn ? ' ✕' : ' ↩'; ?></a></div>
-                <div>مخطَّط: <strong><?php echo $t['planned']; ?></strong></div>
-                <div>منفَّذ: <strong><?php echo $t['executed']; ?></strong></div>
-                <div>مفوتَر: <strong><?php echo $t['billed']; ?></strong></div>
-                <div>محصَّل: <strong><?php echo $t['collected']; ?></strong></div>
+                <div>مخطط: <strong><?php echo $t['planned']; ?></strong></div>
+                <div>منفذ: <strong><?php echo $t['executed']; ?></strong></div>
+                <div>مفوتر: <strong><?php echo $t['billed']; ?></strong></div>
+                <div>محصل: <strong><?php echo $t['collected']; ?></strong></div>
             </div>
         <?php endforeach; ?>
     </div></div></div>
     <?php endif; ?>
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-chart-line"></i>
-        سطرٌ لكل عقد — <?php echo count($rows); ?></h5></div>
+        سطر لكل عقد — <?php echo count($rows); ?></h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap no-datatable cb-table" data-no-dt="1">
             <thead><tr>
@@ -157,10 +157,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <th>فجوةُ التحصيل<br><small>المالية</small></th>
                 <th>العملة</th><th>المصداقية</th>
                 <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                 <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                 <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                 <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -171,7 +171,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <tr<?php echo $r['credible'] ? '' : " class='cb-row-review'"; ?>>
                     <td><a class="cb-drill"
                            href="contracts_details.php?id=<?php echo intval($r['contract_id']); ?>"
-                           title="افتح ملفَّ العقدِ — مصدرُ أرقامِ هذا السطر"
+                           title="افتح ملف العقد — مصدر أرقام هذا السطر"
                         >#<?php echo intval($r['contract_id']); ?></a></td>
                     <td class="cb-wrap"><?php
                         echo htmlspecialchars((string)($r['second_party'] ?? '')); ?></td>
@@ -180,7 +180,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         ? ('<span class="badge ' . ((string)$r['baseline'] === 'locked'
                             ? 'badge-success' : 'badge-secondary') . '">'
                            . htmlspecialchars($STATE_AR[(string)$r['baseline']]) . '</span>')
-                        : '<span class="badge badge-warning">غيرُ مفتوح</span>'; ?></td>
+                        : '<span class="badge badge-warning">غير مفتوح</span>'; ?></td>
                     <?php if (!$r['ok']): ?>
                         <td colspan="7" class="cb-wrap"><em><?php
                             echo htmlspecialchars(str_replace('**', '', (string)$r['note'])); ?></em></td>
@@ -224,11 +224,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <td><strong><?php echo htmlspecialchars($GAPS['execution']['owner']); ?></strong></td>
                     <td><?php echo htmlspecialchars($GAPS['execution']['role']); ?></td>
                     <td><?php echo htmlspecialchars($GAPS['execution']['question']); ?></td></tr>
-                <tr><td><strong>فجوةُ الفوترة</strong></td><td>مفوتَر − منفَّذ</td>
+                <tr><td><strong>فجوة الفوترة</strong></td><td>مفوتر − منفذ</td>
                     <td><strong><?php echo htmlspecialchars($GAPS['billing']['owner']); ?></strong></td>
                     <td><?php echo htmlspecialchars($GAPS['billing']['role']); ?></td>
                     <td><?php echo htmlspecialchars($GAPS['billing']['question']); ?></td></tr>
-                <tr><td><strong>فجوةُ التحصيل</strong></td><td>محصَّل − مفوتَر</td>
+                <tr><td><strong>فجوة التحصيل</strong></td><td>محصل − مفوتر</td>
                     <td><strong><?php echo htmlspecialchars($GAPS['collection']['owner']); ?></strong></td>
                     <td><?php echo htmlspecialchars($GAPS['collection']['role']); ?></td>
                     <td><?php echo htmlspecialchars($GAPS['collection']['question']); ?></td></tr>

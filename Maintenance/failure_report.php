@@ -58,12 +58,12 @@ include '../insidebar.php';
     $header_title = 'تقرير الأعطال — التصنيف الموحد'; $header_icon = 'fa fa-chart-column';
     $header_actions = array();
     include('../includes/page_header.php');
-    ems_screen_about('تكرارُ الأعطال بالتصنيف الموحّد (M-31): أوامرُ الصيانة والبلاغاتُ على '
-        . 'محور main_category واحدٍ — فلا يفسد التقريرَ جدولان متوازيان. '
-        . 'وما لا وصلةَ له يُعلَن «موروثًا» ولا يُخفى.',
-        array('حدّد الفترة', 'اقرأ الأكثرَ تكرارًا وكلفةً أولًا'));
+    ems_screen_about('تكرار الأعطال بالتصنيف الموحد (M-31): أوامر الصيانة والبلاغات على '
+        . 'محور main_category واحد — فلا يفسد التقرير جدولان متوازيان. '
+        . 'وما لا وصلة له يعلن «موروثا» ولا يخفى.',
+        array('حدد الفترة', 'اقرأ الأكثر تكرارا وكلفة أولا'));
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا أعطالَ مصنَّفةً في هذه الفترة', 'وسّع الفترةَ أو تحقق من ربطِ أوامرِ الصيانةِ بأكوادِ الأعطال');
+    echo ems_states_bundle('لا أعطال مصنفة في هذه الفترة', 'وسع الفترة أو تحقق من ربط أوامر الصيانة بأكواد الأعطال');
     ?>
 
     <div class="card"><div class="card-body">
@@ -81,17 +81,17 @@ include '../insidebar.php';
     </div></div>
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-list-ol"></i>
-        التكرارُ بالفئة الرئيسية — <?php echo count($orders); ?> فئة</h5></div>
+        التكرار بالفئة الرئيسية — <?php echo count($orders); ?> فئة</h5></div>
     <div class="card-body">
-        <?php if (!$orders): ems_state_empty('لا أوامرَ في الفترة', 'وسّع المدة', '?from=' . date('Y-01-01', strtotime('-1 year'))); else: ?>
+        <?php if (!$orders): ems_state_empty('لا أوامر في الفترة', 'وسع المدة', '?from=' . date('Y-01-01', strtotime('-1 year'))); else: ?>
         <div class="table-container"><table class="alltables display nowrap mnt-fr-w100">
-            <thead><tr><th>الفئة (الموحّدة)</th><th>أوامرُ الصيانة</th><th>بلاغاتُها</th>
+            <thead><tr><th>الفئة (الموحدة)</th><th>أوامر الصيانة</th><th>بلاغاتها</th>
                 <th>التكلفة</th><th>ساعات التوقف</th>
                 <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                 <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                 <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                 <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -113,8 +113,8 @@ include '../insidebar.php';
         <?php $orphanTix = 0;
         foreach ($tix as $code => $n) { if (strpos((string)$code, 'موروث') !== false) { $orphanTix = $n; } }
         if ($orphanTix > 0): ?>
-            <p class="mnt-fr-warn">⚠ <?php echo $orphanTix; ?> بلاغًا بتصنيفٍ
-                **بلا وصلةٍ للموحّد** — موروثٌ يُعلَن ولا يُمحى (M-31)</p>
+            <p class="mnt-fr-warn">⚠ <?php echo $orphanTix; ?> بلاغا بتصنيف
+                **بلا وصلة للموحد** — موروث يعلن ولا يمحى (M-31)</p>
         <?php endif; ?>
     </div></div>
 </div>

@@ -108,7 +108,7 @@ class ProcReorderService
             $cycle = self::openCycle($conn, $co, $itemId);
             if ($cycle) {
                 $out['skipped'][] = array('item' => (string) $p['item_name'],
-                    'reason' => 'دورةٌ جاريةٌ ' . $cycle['code'] . ' (' . $cycle['state'] . ') — لا توليدَ ثانيًا');
+                    'reason' => 'دورة جارية ' . $cycle['code'] . ' (' . $cycle['state'] . ') — لا توليد ثانيا');
                 continue;
             }
 
@@ -127,7 +127,7 @@ class ProcReorderService
                             // خارجَها فتلوث الفلاتر (نفسُ علة بذور UAT)
                             'op_classification' => 'استهلاكية', 'requesting_dept' => 'المستودع',
                             'priority' => 'عادي', 'state' => 'مقدَّم',
-                            'notes' => 'توليدٌ آليٌّ: الرصيدُ بلغ الحد (M-43)',
+                            'notes' => 'توليد آلي: الرصيد بلغ الحد (M-43)',
                             'created_by' => (int) $actor,
                         ));
                         $g->insert('proc_request_line', array(
@@ -136,9 +136,9 @@ class ProcReorderService
                         ));
                     }, 'auto reorder request');
                     $plan['request_id'] = $reqId;
-                } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'طلبُ إعادةِ طلبٍ آليٍّ فشل — حدُّ إعادةِ الطلبِ يبقى قائمًا فيُعاد في الدورةِ التالية');
+                } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'طلب إعادة طلب آلي فشل — حد إعادة الطلب يبقى قائما فيعاد في الدورة التالية');
                     $out['skipped'][] = array('item' => (string) $p['item_name'],
-                        'reason' => 'تعذّر التوليد: ' . $t->getMessage());
+                        'reason' => 'تعذر التوليد: ' . $t->getMessage());
                     continue;
                 }
             }

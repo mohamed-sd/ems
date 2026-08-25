@@ -68,7 +68,7 @@ class PermitGate
         $doc = isset($d['doc_ref']) ? (string) $d['doc_ref'] : null;
         $stmt->bind_param('issiiss', $co, $ptc, $ref, $site, $by, $reason, $doc);
         if (!$stmt->execute()) {
-            $out['code'] = 422; $out['reason'] = 'نوع إذن غير معرَّف أو بيانات ناقصة';
+            $out['code'] = 422; $out['reason'] = 'نوع إذن غير معرف أو بيانات ناقصة';
             $stmt->close();
             return $out;
         }
@@ -76,7 +76,7 @@ class PermitGate
         $stmt->close();
         self::history($conn, $reqId, 'draft', 'pending', $by);
         $out['ok'] = true; $out['code'] = 201; $out['req_id'] = $reqId;
-        $out['reason'] = 'أُنشئ طلب الإذن #' . $reqId . ' — بانتظار موافقات مصفوفة §5 بترتيبها';
+        $out['reason'] = 'أنشئ طلب الإذن #' . $reqId . ' — بانتظار موافقات مصفوفة §5 بترتيبها';
         return $out;
     }
 
@@ -104,7 +104,7 @@ class PermitGate
                 $out['code'] = 409; $out['reason'] = 'الطلب مرفوض في خطوة سابقة'; return $out;
             }
         }
-        if ($next === null) { $out['code'] = 409; $out['reason'] = 'الموافقات مكتملة أصلًا'; return $out; }
+        if ($next === null) { $out['code'] = 409; $out['reason'] = 'الموافقات مكتملة أصلا'; return $out; }
 
         // ① «لا تُفتح خطوة قبل اكتمال ما قبلها» — 409
         if ($stepRqId !== null && intval($stepRqId) !== intval($next['rq_id'])) {
@@ -117,7 +117,7 @@ class PermitGate
         // ② «موافق بلا تفويض ساري» — 403
         if (!self::approverAuthorized($conn, $personId, intval($req['company_id']), (string) $next['approver_role'], intval($req['site_id']))) {
             $out['code'] = 403;
-            $out['reason'] = 'لا تفويض ساريًا لهذا الشخص عن دور ' . $next['approver_role'] . ' في هذا الموقع';
+            $out['reason'] = 'لا تفويض ساريا لهذا الشخص عن دور ' . $next['approver_role'] . ' في هذا الموقع';
             self::denyLog($conn, intval($req['company_id']), $personId, 'permit:' . $reqId, 'approver_without_authority');
             return $out;
         }
@@ -135,7 +135,7 @@ class PermitGate
             $conn->query("UPDATE permit_requests SET state = 'rejected' WHERE req_id = {$reqId}");
             self::history($conn, $reqId, 'pending', 'rejected', $personId);
             $out['ok'] = true; $out['code'] = 200; $out['state'] = 'rejected';
-            $out['reason'] = 'رُفض الطلب في الخطوة ' . $next['seq_no'];
+            $out['reason'] = 'رفض الطلب في الخطوة ' . $next['seq_no'];
             return $out;
         }
 
@@ -157,7 +157,7 @@ class PermitGate
             return $out;
         }
         $out['ok'] = true; $out['code'] = 200; $out['state'] = 'pending';
-        $out['reason'] = 'سُجّلت الموافقة — بقي ' . $remaining . ' خطوة';
+        $out['reason'] = 'سجلت الموافقة — بقي ' . $remaining . ' خطوة';
         return $out;
     }
 
@@ -193,13 +193,13 @@ class PermitGate
 
         $deny = null;
         if (!$p || $p['state'] === 'used') {
-            $deny = array(403, 'لا إذن مكتمل الموافقات لهذا الموضوع وهذا الموقع — الفعل ممنوع ويُطلب إذن ' . $permitTypeCode);
+            $deny = array(403, 'لا إذن مكتمل الموافقات لهذا الموضوع وهذا الموقع — الفعل ممنوع ويطلب إذن ' . $permitTypeCode);
         } elseif ($p['state'] === 'expired' || intval($p['still_valid']) !== 1) {
             if ($p['state'] === 'approved') {
                 $conn->query("UPDATE permit_requests SET state = 'expired' WHERE req_id = " . intval($p['req_id']));
                 self::history($conn, intval($p['req_id']), 'approved', 'expired', 0); // PermitExpired
             }
-            $deny = array(423, 'الإذن منتهي المدة — يُطلب تجديده (423)');
+            $deny = array(423, 'الإذن منتهي المدة — يطلب تجديده (423)');
         }
 
         if ($deny !== null) {

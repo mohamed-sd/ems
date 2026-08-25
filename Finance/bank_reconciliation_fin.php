@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && strval($_POST['h13'] ?? '') !== '')
     if ($act === 'open_diff') {
         $r = BRS::openDifference($conn, $h13_gate, $company_id, intval($_POST['match_id'] ?? 0),
                                  strval($_POST['why'] ?? ''), $current_user_id);
-        $h13_redirect(($r['ok'] ? 'فُتح الفرقُ بسببه ✅' : $r['code'] . ' — ' . $r['reason'] . ' ❌'),
+        $h13_redirect(($r['ok'] ? 'فتح الفرق بسببه ✅' : $r['code'] . ' — ' . $r['reason'] . ' ❌'),
                       intval($_POST['statement_id'] ?? 0));
     }
     if ($act === 'resolve') {
@@ -86,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && strval($_POST['h13'] ?? '') !== '')
                                     strval($_POST['decision'] ?? ''), strval($_POST['why'] ?? ''),
                                     $current_user_id);
         $h13_redirect(($r['ok']
-            ? ('حُسم الفرق' . ($r['event_id'] ? (' · قيدُ تسويةٍ #' . $r['event_id']) : ' بلا قيد') . ' ✅')
+            ? ('حسم الفرق' . ($r['event_id'] ? (' · قيد تسوية #' . $r['event_id']) : ' بلا قيد') . ' ✅')
             : $r['code'] . ' — ' . $r['reason'] . ' ❌'), intval($_POST['statement_id'] ?? 0));
     }
     if ($act === 'accept') {
@@ -94,8 +94,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && strval($_POST['h13'] ?? '') !== '')
         try {
             $h13_gate->update('bank_statement_lines', array('match_state' => 'matched'),
                 array('id' => intval($_POST['line_id'] ?? 0)));
-            $h13_redirect('قُبلت المضاهاة ✅', intval($_POST['statement_id'] ?? 0));
-        } catch (\Throwable $t) { $h13_redirect('تعذّر القبول ❌', intval($_POST['statement_id'] ?? 0)); }
+            $h13_redirect('قبلت المضاهاة ✅', intval($_POST['statement_id'] ?? 0));
+        } catch (\Throwable $t) { $h13_redirect('تعذر القبول ❌', intval($_POST['statement_id'] ?? 0)); }
     }
     if ($act === 'close') {
         $r = BRS::close($conn, $h13_gate, $company_id, intval($_POST['statement_id'] ?? 0), $current_user_id);
@@ -149,7 +149,7 @@ if (isset($_GET['automatch']) && $sel_acct > 0) {
             break;
         }
     }
-    ems_gov_redirect("Location: bank_reconciliation_fin.php?acct=$sel_acct&msg=تمت+مطابقة+$matched+بند+آليًا+✅"); exit();
+    ems_gov_redirect("Location: bank_reconciliation_fin.php?acct=$sel_acct&msg=تمت+مطابقة+$matched+بند+آليا+✅"); exit();
 }
 
 // ── إلغاء مطابقة بند ──
@@ -248,19 +248,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا كشوفَ بنكيةً مستوردةً لهذا الحساب', 'استورد كشفًا من نموذجِ «كشوفُ البنك ودورةُ المطابقة» أعلاه أو اختر حسابًا آخر');
+    echo ems_states_bundle('لا كشوف بنكية مستوردة لهذا الحساب', 'استورد كشفا من نموذج «كشوف البنك ودورة المطابقة» أعلاه أو اختر حسابا آخر');
     ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
     <?php fin_msg_banner(); ?>
 
     <!-- ═══ H-13 · الدورةُ الكاملة (SPEC-01 #19) ═══ -->
     <div class="card"><div class="card-body">
-        <h5 class="fin-bank-h5"><i class="fas fa-file-import"></i> كشوفُ البنك ودورةُ المطابقة</h5>
+        <h5 class="fin-bank-h5"><i class="fas fa-file-import"></i> كشوف البنك ودورة المطابقة</h5>
         <p class="fin-bank-intro">
-            <strong>استيرادٌ لا يكرر</strong> (بصمةُ السطر: كشف × مرجع × تاريخ × اتجاه × مبلغ — والملفُّ
-            نفسُه يُستورد مرارًا بصفر سطرٍ مكرر) · <strong>ومضاهاةٌ بقاعدتها</strong> (المرجعُ أولًا ثم
-            المبلغُ والتاريخُ ± 3 أيام — والقاعدةُ تُحفظ) · <strong>وفرقٌ يُفتح بسببٍ ويُحسم بقيدِ تسويةٍ
-            بمرجعه</strong> والسندُ الأصليُّ لا يُمسّ · <strong>ولا إقفالَ وفرقٌ مفتوح</strong>.
+            <strong>استيراد لا يكرر</strong> (بصمة السطر: كشف × مرجع × تاريخ × اتجاه × مبلغ — والملف
+            نفسه يستورد مرارا بصفر سطر مكرر) · <strong>ومضاهاة بقاعدتها</strong> (المرجع أولا ثم
+            المبلغ والتاريخ ± 3 أيام — والقاعدة تحفظ) · <strong>وفرق يفتح بسبب ويحسم بقيد تسوية
+            بمرجعه</strong> والسند الأصلي لا يمس · <strong>ولا إقفال وفرق مفتوح</strong>.
         </p>
         <?php if ($can_edit): ?>
         <form method="post" class="allforms allforms-visible fin-bank-form-flat">
@@ -281,17 +281,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="date" name="period_from" required id="emsf_209_613dc"></div>
                 <div class="form-group"><label for="emsf_210_780de">إلى تاريخ <span class="required">*</span></label>
                     <input type="date" name="period_to" required id="emsf_210_780de"></div>
-                <div class="form-group"><label for="emsf_211_616ad">رصيدٌ افتتاحي</label>
+                <div class="form-group"><label for="emsf_211_616ad">رصيد افتتاحي</label>
                     <input type="number" step="0.01" name="opening_balance" value="0" id="emsf_211_616ad"></div>
-                <div class="form-group"><label for="emsf_212_024c7">رصيدٌ ختامي</label>
+                <div class="form-group"><label for="emsf_212_024c7">رصيد ختامي</label>
                     <input type="number" step="0.01" name="closing_balance" value="0" id="emsf_212_024c7"></div>
             </div>
             <div class="form-group fin-bank-mt10">
-                <label for="emsf_213_646db">أسطرُ الكشف — سطرٌ لكل حركة:
+                <label for="emsf_213_646db">أسطر الكشف — سطر لكل حركة:
                     <code>التاريخ | الوصف | deposit أو withdrawal | المبلغ | المرجع البنكي</code></label>
                 <textarea name="lines_raw" rows="5" class="fin-bank-raw"
                     placeholder="2026-07-01 | تحصيل عميل | deposit | 1000.00 | REF-001" id="emsf_213_646db"></textarea>
-                <small class="fin-bank-hint">سطرٌ <strong>بلا مرجعٍ بنكيٍّ يُرفض ويُعلَن</strong> — ولا يُخترع له مفتاح.</small>
+                <small class="fin-bank-hint">سطر <strong>بلا مرجع بنكي يرفض ويعلن</strong> — ولا يخترع له مفتاح.</small>
             </div></div>
             <div class="form-actions"><button type="submit" class="btn-primary">
                 <i class="fas fa-file-import"></i> استورد الكشف</button></div>
@@ -319,7 +319,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <td><a class="action-btn" href="?stmt=<?php echo intval($s['id']); ?>">
                         <i class="fa fa-eye"></i> افتح</a></td></tr>
             <?php endforeach; ?>
-            <?php if (!$h13_statements): ?><tr><td colspan="7"><em>لا كشوفَ مستوردةً بعد</em></td></tr><?php endif; ?>
+            <?php if (!$h13_statements): ?><tr><td colspan="7"><em>لا كشوف مستوردة بعد</em></td></tr><?php endif; ?>
             </tbody>
         </table>
         </div>
@@ -330,9 +330,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <h5 class="fin-bank-h5"><i class="fas fa-scale-balanced"></i>
             كشف <?php echo htmlspecialchars((string)$h13_head['statement_ref']); ?></h5>
         <div class="fin-bank-chips">
-            <span class="badge badge-success fin-bank-chip">نسبةُ المطابقة
+            <span class="badge badge-success fin-bank-chip">نسبة المطابقة
                 <?php echo htmlspecialchars((string)$h13_stats['rate']); ?>٪</span>
-            <span class="badge fin-bank-chip <?php echo $h13_stats['open_diff'] > 0 ? 'badge-danger' : 'badge-success'; ?>">فروقٌ مفتوحة <?php echo intval($h13_stats['open_diff']); ?></span>
+            <span class="badge fin-bank-chip <?php echo $h13_stats['open_diff'] > 0 ? 'badge-danger' : 'badge-success'; ?>">فروق مفتوحة <?php echo intval($h13_stats['open_diff']); ?></span>
             <span class="badge badge-secondary fin-bank-chip">بلا نظير
                 <?php echo intval($h13_stats['none']); ?></span>
         </div>
@@ -342,7 +342,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <?php echo csrf_field(); ?>
                 <input type="hidden" name="h13" value="automatch">
                 <input type="hidden" name="statement_id" value="<?php echo intval($h13_stmt); ?>">
-                <button type="submit" class="btn-primary"><i class="fa fa-wand-magic-sparkles"></i> مضاهاةٌ آلية</button>
+                <button type="submit" class="btn-primary"><i class="fa fa-wand-magic-sparkles"></i> مضاهاة آلية</button>
             </form>
             <form method="post" class="fin-bank-inline">
         <?php echo csrf_field(); ?>
@@ -364,22 +364,22 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <th class="ems-fn-th" data-fn="1">الرصيد حسب الدفتر</th>
                 <th class="ems-fn-th" data-fn="1">الرصيد حسب الكشف</th>
                 <th class="ems-fn-th" data-fn="1">حركات في الدفتر لم تظهر بالبنك</th>
-                <th class="ems-fn-th" data-fn="1">حركات بالبنك لم تُقيَّد</th>
-                <th class="ems-fn-th" data-fn="1">شيكات معلَّقة</th>
-                <th class="ems-fn-th" data-fn="1">رسوم بنكية غير مقيَّدة</th>
+                <th class="ems-fn-th" data-fn="1">حركات بالبنك لم تقيد</th>
+                <th class="ems-fn-th" data-fn="1">شيكات معلقة</th>
+                <th class="ems-fn-th" data-fn="1">رسوم بنكية غير مقيدة</th>
                 <th class="ems-fn-th" data-fn="1">تسويات معتمدة</th>
                 <th class="ems-fn-th" data-fn="1">الرصيد بعد التسوية</th>
                 <th class="ems-fn-th none" data-fn="1">اعتمده</th>
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
                 <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                 <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
                 </tr></thead>
             <tbody>
             <?php foreach ($h13_lines as $l):
                 $ms = (string)$l['match_state'];
-                $msLbl = array('unmatched' => 'لم يُضاهَ', 'matched' => 'مطابق',
-                               'difference' => 'فرقٌ بقيمته', 'no_counterpart' => 'بلا نظير');
+                $msLbl = array('unmatched' => 'لم يضاه', 'matched' => 'مطابق',
+                               'difference' => 'فرق بقيمته', 'no_counterpart' => 'بلا نظير');
                 $msCls = $ms === 'matched' ? 'badge-success' : ($ms === 'difference' ? 'badge-warning' : 'badge-secondary');
             ?>
                 <tr><td><?php echo intval($l['line_no']); ?></td>
@@ -397,7 +397,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <?php if ((string)($l['match_row_state'] ?? '') === 'open_difference'): ?>
                             <div><small class="fin-bank-diff"><?php echo htmlspecialchars((string)$l['difference_reason']); ?></small></div>
                         <?php elseif ($l['adjustment_event_id'] !== null): ?>
-                            <div><small>قيدُ تسويةٍ #<?php echo intval($l['adjustment_event_id']); ?></small></div>
+                            <div><small>قيد تسوية #<?php echo intval($l['adjustment_event_id']); ?></small></div>
                         <?php endif; ?></td>
                     <?php if ($can_edit && (string)$h13_head['state'] !== 'closed'): ?>
                     <td class="fin-bank-wrap">
@@ -408,8 +408,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <input type="hidden" name="h13" value="open_diff">
                                 <input type="hidden" name="match_id" value="<?php echo $mid; ?>">
                                 <input type="hidden" name="statement_id" value="<?php echo intval($h13_stmt); ?>">
-                                <input type="text" name="why" required maxlength="200" placeholder="سببُ الفرق" class="fin-bank-why-130" aria-label="سببُ الفرق">
-                                <button type="submit" class="badge badge-warning fin-bank-mini-btn">افتح فرقًا</button>
+                                <input type="text" name="why" required maxlength="200" placeholder="سبب الفرق" class="fin-bank-why-130" aria-label="سبب الفرق">
+                                <button type="submit" class="badge badge-warning fin-bank-mini-btn">افتح فرقا</button>
                             </form>
                         <?php elseif ($mid > 0 && $mrs === 'open_difference'): ?>
                             <form method="post" class="fin-bank-row-form-wrap">
@@ -417,8 +417,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <input type="hidden" name="h13" value="resolve">
                                 <input type="hidden" name="match_id" value="<?php echo $mid; ?>">
                                 <input type="hidden" name="statement_id" value="<?php echo intval($h13_stmt); ?>">
-                                <select name="decision" aria-label="قرارُ حسمِ الفرق"><option value="adjust">قيدُ تسوية</option><option value="reject">رفض</option></select>
-                                <input type="text" name="why" required maxlength="200" placeholder="قرارٌ بسببه" class="fin-bank-why-120" aria-label="قرارٌ بسببه">
+                                <select name="decision" aria-label="قرار حسم الفرق"><option value="adjust">قيد تسوية</option><option value="reject">رفض</option></select>
+                                <input type="text" name="why" required maxlength="200" placeholder="قرار بسببه" class="fin-bank-why-120" aria-label="قرار بسببه">
                                 <button type="submit" class="badge badge-success fin-bank-mini-btn">احسم</button>
                             </form>
                         <?php elseif ($ms !== 'matched'): ?>
@@ -434,7 +434,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <?php endif; ?>
                 </tr>
             <?php endforeach; ?>
-            <?php if (!$h13_lines): ?><tr><td colspan="11"><em>لا أسطرَ</em></td></tr><?php endif; ?>
+            <?php if (!$h13_lines): ?><tr><td colspan="11"><em>لا أسطر</em></td></tr><?php endif; ?>
             </tbody>
         </table>
         </div>
@@ -442,16 +442,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php endif; ?>
 
     <div class="card"><div class="card-body">
-        <h5 class="fin-bank-h5-tight"><i class="fas fa-clock-rotate-left"></i> الدورةُ القديمة (تبقى للقراءة والتاريخ)</h5>
+        <h5 class="fin-bank-h5-tight"><i class="fas fa-clock-rotate-left"></i> الدورة القديمة (تبقى للقراءة والتاريخ)</h5>
         <p class="fin-bank-note">
-            `fin_bank_statement_lines` ومطابقتُها بالمبلغ والاتجاه — <strong>لا تُحذف ولا تُرحَّل قسرًا</strong>،
-            والانتقالُ إلى الدورة أعلاه قرارُ مالك.</p>
+            `fin_bank_statement_lines` ومطابقتها بالمبلغ والاتجاه — <strong>لا تحذف ولا ترحل قسرا</strong>،
+            والانتقال إلى الدورة أعلاه قرار مالك.</p>
     </div></div>
 
     <div class="card"><div class="card-body">
         <form method="get" class="fin-bank-filter">
             <strong><i class="fas fa-building-columns"></i> الحساب البنكي:</strong>
-            <select name="acct" aria-label="الحساب البنكي المعروضة بنودُه" class="fin-bank-select" onchange="this.form.submit()"><?php echo fin_bank_account_options($conn, $is_super_admin, $company_id, $sel_acct); ?></select>
+            <select name="acct" aria-label="الحساب البنكي المعروضة بنوده" class="fin-bank-select" onchange="this.form.submit()"><?php echo fin_bank_account_options($conn, $is_super_admin, $company_id, $sel_acct); ?></select>
             <?php if ($sel_acct > 0 && $can_edit): ?>
                 <a href="?acct=<?php echo $sel_acct; ?>&automatch=1&_t=<?php echo fin_action_token(); ?>" class="btn-primary fin-bank-plain-link" onclick="return confirm('مطابقة آلية بالمبلغ والاتجاه؟')"><i class="fas fa-wand-magic-sparkles"></i> مطابقة آلية</a>
             <?php endif; ?>
@@ -459,9 +459,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <?php if ($sel_acct > 0): ?>
         <div class="form-grid fin-bank-mt12">
             <div class="card fin-bank-kpi"><div class="card-body"><div class="text-muted">رصيد الكشف البنكي</div><div class="fin-bank-kpi-value"><?php echo number_format($bank_balance, 2); ?></div></div></div>
-            <div class="card fin-bank-kpi"><div class="card-body"><div class="text-muted">بنود مُطابَقة</div><div class="fin-bank-kpi-value"><span class="badge badge-success"><?php echo $rec_lines; ?></span></div></div></div>
-            <div class="card fin-bank-kpi"><div class="card-body"><div class="text-muted">بنود غير مُطابَقة</div><div class="fin-bank-kpi-value"><span class="badge badge-<?php echo $unrec_lines > 0 ? 'danger' : 'success'; ?>"><?php echo $unrec_lines; ?></span></div></div></div>
-            <div class="card fin-bank-kpi"><div class="card-body"><div class="text-muted">مدفوعات غير مُطابَقة</div><div class="fin-bank-kpi-value"><span class="badge badge-<?php echo $unmatched_pay > 0 ? 'warn' : 'success'; ?>"><?php echo $unmatched_pay; ?></span></div></div></div>
+            <div class="card fin-bank-kpi"><div class="card-body"><div class="text-muted">بنود مطابقة</div><div class="fin-bank-kpi-value"><span class="badge badge-success"><?php echo $rec_lines; ?></span></div></div></div>
+            <div class="card fin-bank-kpi"><div class="card-body"><div class="text-muted">بنود غير مطابقة</div><div class="fin-bank-kpi-value"><span class="badge badge-<?php echo $unrec_lines > 0 ? 'danger' : 'success'; ?>"><?php echo $unrec_lines; ?></span></div></div></div>
+            <div class="card fin-bank-kpi"><div class="card-body"><div class="text-muted">مدفوعات غير مطابقة</div><div class="fin-bank-kpi-value"><span class="badge badge-<?php echo $unmatched_pay > 0 ? 'warn' : 'success'; ?>"><?php echo $unmatched_pay; ?></span></div></div></div>
         </div>
         <?php endif; ?>
     </div></div>
@@ -514,7 +514,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     echo "<td>" . htmlspecialchars((string)($row['description'] ?? '')) . "</td>";
                     echo "<td>" . ($row['direction'] === 'deposit' ? 'إيداع' : 'سحب') . "</td>";
                     echo "<td>" . number_format((float)$row['amount'], 2) . "</td>";
-                    echo "<td>" . ($rec ? "<span class='badge badge-success'>مُطابَق #" . intval($row['matched_payment_id']) . "</span>" : "<span class='badge badge-danger'>غير مُطابَق</span>") . "</td>";
+                    echo "<td>" . ($rec ? "<span class='badge badge-success'>مطابق #" . intval($row['matched_payment_id']) . "</span>" : "<span class='badge badge-danger'>غير مطابق</span>") . "</td>";
                     echo "</tr>";
                 }
                 ?>

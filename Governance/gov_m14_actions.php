@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 if (function_exists('verify_csrf_token') && !verify_csrf_token($_POST['csrf_token'] ?? '')) {
     http_response_code(403);
-    exit(json_encode(array('ok' => false, 'code' => 'GOV-CSRF', 'msg' => 'رمز الجلسة غير صالح — حدّث الصفحة')));
+    exit(json_encode(array('ok' => false, 'code' => 'GOV-CSRF', 'msg' => 'رمز الجلسة غير صالح — حدث الصفحة')));
 }
 
 /* صلاحياتُ الكتابة الحوكمية — من سجل الشاشات */
@@ -113,38 +113,38 @@ try {
     switch ($action) {
         case 'approval_reject': // approval.reject — رفضٌ بسببٍ محكومٍ يُقاس
         case 'approval_return': // approval.return — إعادةٌ للتصحيح والمهلةُ تتوقف
-            if (!$canDecide) { throw new \RuntimeException('GOV-403: القرارُ للمعتمِد المخوَّل'); }
+            if (!$canDecide) { throw new \RuntimeException('GOV-403: القرار للمعتمد المخول'); }
             $decision = $action === 'approval_reject' ? 'rejected' : 'returned';
             $r = M14::decideApproval($conn, $company_id,
                 (string) ($_POST['source_kind'] ?? 'fin_request'),
                 trim((string) $_POST['source_ref']), $decision,
                 (string) $_POST['reason_code'], trim((string) ($_POST['reason_note'] ?? '')),
-                $uid, $actorCapacity, 'قرارُ الحلقةِ ضمن سقفِ الدور — M-14 §7-1');
+                $uid, $actorCapacity, 'قرار الحلقة ضمن سقف الدور — M-14 §7-1');
             $out = array('ok' => true) + $r;
             break;
 
         case 'denial_review': // denial.review — التصنيفُ الرباعي
-            if (!$canGovern) { throw new \RuntimeException('GOV-403: المراجعةُ للحوكمة'); }
+            if (!$canGovern) { throw new \RuntimeException('GOV-403: المراجعة للحوكمة'); }
             $r = M14::reviewDenial($conn, $company_id, (int) $_POST['denial_id'],
                 (string) $_POST['classification'], trim((string) ($_POST['note'] ?? '')),
                 trim((string) ($_POST['follow_up_ref'] ?? '')), $uid,
-                'مراجعةُ المنع — الحوكمةُ والالتزام (M-14 §7-1)');
+                'مراجعة المنع — الحوكمة والالتزام (M-14 §7-1)');
             $out = array('ok' => true) + $r;
             break;
 
         case 'org_change': // org.change — نسخةٌ بقرارٍ مرجعي
-            if (!$canOrg) { throw new \RuntimeException('GOV-403: تغييرُ الهيكلِ للحوكمة'); }
+            if (!$canOrg) { throw new \RuntimeException('GOV-403: تغيير الهيكل للحوكمة'); }
             $change = json_decode((string) ($_POST['change_json'] ?? '{}'), true);
             if (!is_array($change)) { $change = array(); }
             $unitId = !empty($_POST['unit_id']) ? (int) $_POST['unit_id'] : null;
             $r = M14::orgChange($conn, $company_id, (string) $_POST['change_kind'], $unitId,
                 trim((string) $_POST['decision_ref']), (string) $_POST['effective_date'],
-                $change, $uid, 'قرارُ الهيكل — الحوكمةُ والالتزام (M-14 §7-1)');
+                $change, $uid, 'قرار الهيكل — الحوكمة والالتزام (M-14 §7-1)');
             $out = array('ok' => true) + $r;
             break;
 
         case 'gov_attest': // gov.gov.attest — يشهد ولا يمنح
-            if (!$canAttest) { throw new \RuntimeException('GOV-403: التصديقُ لمدير الإدارة'); }
+            if (!$canAttest) { throw new \RuntimeException('GOV-403: التصديق لمدير الإدارة'); }
             /* النطاقُ من السجلِّ المُتحقَّقِ أعلاه — لا نصًّا من الطلبِ ولا ثابتًا */
             $r = RiskService::attestAccessReview($conn, $company_id,
                 $attestScope . ':' . gmdate('Y-m'), (int) ($_POST['headcount'] ?? 0),
@@ -154,7 +154,7 @@ try {
 
         default:
             http_response_code(400);
-            $out = array('ok' => false, 'code' => 'GOV-400', 'msg' => 'فعلٌ غيرُ معرَّف — لا زرَّ بلا عقد');
+            $out = array('ok' => false, 'code' => 'GOV-400', 'msg' => 'فعل غير معرف — لا زر بلا عقد');
     }
 } catch (\Throwable $e) {
     $msg = $e->getMessage();

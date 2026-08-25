@@ -50,17 +50,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 /* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
    شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
 $header_icon = 'fa fa-truck';
-$header_title_html = htmlspecialchars('خطةُ معدات المورد', ENT_QUOTES, 'UTF-8');
+$header_title_html = htmlspecialchars('خطة معدات المورد', ENT_QUOTES, 'UTF-8');
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-echo ems_states_bundle('لا خطةَ معداتٍ لهذا المورد', 'اختر موردًا من القائمةِ أعلاه، أو خصِّص له مقاعدَ معداتٍ في حاويةِ التشغيل');
+echo ems_states_bundle('لا خطة معدات لهذا المورد', 'اختر موردا من القائمة أعلاه، أو خصص له مقاعد معدات في حاوية التشغيل');
 ?>
   <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
   <form method="get" class="ems-form sup-eqp-filter">
     <select name="supplier_id" aria-label="المورد" class="form-control sup-eqp-picker" onchange="this.form.submit()">
-      <option value="">— اختر موردًا —</option>
+      <option value="">— اختر موردا —</option>
       <?php foreach ($sups as $s): ?>
         <option value="<?= intval($s['id']) ?>" <?= $s['id'] == $sup ? 'selected' : '' ?>><?= htmlspecialchars($s['name'], ENT_QUOTES, 'UTF-8') ?></option>
       <?php endforeach; ?>
@@ -73,10 +73,10 @@ echo ems_states_bundle('لا خطةَ معداتٍ لهذا المورد', 'اخ
               <th class="ems-fn-th" data-fn="1">رقم الخطة</th>
               <th class="ems-fn-th" data-fn="1">المورد</th>
               <th class="ems-fn-th" data-fn="1">العقد</th>
-              <th class="ems-fn-th" data-fn="1">العدد المتعهَّد</th>
+              <th class="ems-fn-th" data-fn="1">العدد المتعهد</th>
               <th class="ems-fn-th" data-fn="1">الموديل المتوقع</th>
               <th class="ems-fn-th" data-fn="1">سنة الصنع الدنيا</th>
-              <th class="ems-fn-th" data-fn="1">تاريخ الجاهزية المتعهَّد</th>
+              <th class="ems-fn-th" data-fn="1">تاريخ الجاهزية المتعهد</th>
               <th class="ems-fn-th" data-fn="1">الوصول الفعلي</th>
               <th class="ems-fn-th" data-fn="1">التأخر بالأيام</th>
               <th class="ems-fn-th" data-fn="1">جزاء التأخر</th>
@@ -91,33 +91,33 @@ echo ems_states_bundle('لا خطةَ معداتٍ لهذا المورد', 'اخ
               <th class="ems-fn-th none" data-fn="1">العقد المرتبط</th>
               <th class="ems-fn-th none" data-fn="1">الوحدة التعاقدية</th>
               <th class="ems-fn-th none" data-fn="1">تاريخ التفعيل</th>
-              <th class="ems-fn-th none" data-fn="1">العدّاد عند التفعيل</th>
-              <th class="ems-fn-th none" data-fn="1">العدّاد الحالي</th>
+              <th class="ems-fn-th none" data-fn="1">العداد عند التفعيل</th>
+              <th class="ems-fn-th none" data-fn="1">العداد الحالي</th>
               <th class="ems-fn-th none" data-fn="1">حالة الجاهزية</th>
               <th class="ems-fn-th none" data-fn="1">حق الرجوع</th>
               <th class="ems-fn-th none" data-fn="1">درجة سرية الملكية</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-              <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطّلاع</th>
+              <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطلاع</th>
               <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
               </tr></thead>
     <tbody>
-    <?php if (empty($rows)): ?><tr><td colspan="7" class="text-center text-muted">لا خطةَ معداتٍ لهذا المورد</td></tr><?php endif; ?>
+    <?php if (empty($rows)): ?><tr><td colspan="7" class="text-center text-muted">لا خطة معدات لهذا المورد</td></tr><?php endif; ?>
     <?php foreach ($rows as $c):
         $standby = ($c['role_kind'] === 'standby'); ?>
       <tr>
         <td><?= htmlspecialchars($c['project_name'] !== null ? $c['project_name'] : '—', ENT_QUOTES, 'UTF-8') ?></td>
         <td><?= htmlspecialchars($c['seat_no'] !== null ? $c['seat_no'] : '—', ENT_QUOTES, 'UTF-8') ?></td>
         <td><?= $c['eq_id'] ? '<a href="../Equipments/equipment_profile.php?id=' . intval($c['eq_id']) . '">'
-              . htmlspecialchars($c['eq_name'], ENT_QUOTES, 'UTF-8') . '</a>' : '<span class="text-muted">فجوةٌ — بلا معدة</span>' ?></td>
-        <td><?= $standby ? '<span class="badge sup-eqp-role-standby">احتياطية — صفرُ ساعاتٍ قبل التفعيل</span>'
+              . htmlspecialchars($c['eq_name'], ENT_QUOTES, 'UTF-8') . '</a>' : '<span class="text-muted">فجوة — بلا معدة</span>' ?></td>
+        <td><?= $standby ? '<span class="badge sup-eqp-role-standby">احتياطية — صفر ساعات قبل التفعيل</span>'
                           : '<span class="badge sup-eqp-role-primary">أساسية</span>' ?></td>
         <td><?= number_format(floatval($c['cap_qty']), 1) ?></td>
         <td><?= htmlspecialchars(($c['valid_from'] !== null ? $c['valid_from'] : '؟') . ' ← ' . ($c['valid_to'] !== null ? $c['valid_to'] : 'ساري'), ENT_QUOTES, 'UTF-8') ?></td>

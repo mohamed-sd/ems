@@ -8,7 +8,7 @@ while (ob_get_level()) {
 
 if (!isset($_SESSION['user'])) {
     header('Content-Type: application/json; charset=utf-8');
-    echo json_encode(['success' => false, 'message' => 'غير مصرّح']);
+    echo json_encode(['success' => false, 'message' => 'غير مصرح']);
     exit();
 }
 
@@ -45,7 +45,7 @@ try {
         WHERE {TENANT_SCOPE} AND fm.id = ? AND fm.is_deleted = 0
         LIMIT 1", array($model_id));
 } catch (\Throwable $t) {
-    echo json_encode(['success' => false, 'message' => 'تعذّر الاستعلام']);
+    echo json_encode(['success' => false, 'message' => 'تعذر الاستعلام']);
     exit();
 }
 $row = empty($md_rows) ? null : $md_rows[0];

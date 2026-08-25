@@ -88,7 +88,7 @@ class AssetReconciliationService
             $rows++;
         }
         return array('ok' => true, 'rows' => $rows, 'undepreciated' => $undep,
-            'reason' => $rows . ' معدة طوبقت — ' . $undep . ' عملت ولم تُهلك (تشوه التكلفة معلَن)');
+            'reason' => $rows . ' معدة طوبقت — ' . $undep . ' عملت ولم تهلك (تشوه التكلفة معلن)');
     }
 
     /** تفسير فرق — إلزامي لإغلاق الصف (CHECK يسنده). */
@@ -106,7 +106,7 @@ class AssetReconciliationService
         $stmt->execute();
         $done = $stmt->affected_rows > 0;
         $stmt->close();
-        return array('ok' => $done, 'code' => $done ? 200 : 404, 'reason' => $done ? 'فُسّر الفرق بسببه' : 'غير موجود أو مفسَّر');
+        return array('ok' => $done, 'code' => $done ? 200 : 404, 'reason' => $done ? 'فسر الفرق بسببه' : 'غير موجود أو مفسر');
     }
 
     // ═══════════ N-19 — فصل المصدر عن الملكية ═══════════
@@ -119,7 +119,7 @@ class AssetReconciliationService
         }
         $note = trim((string) $note);
         if ($note === '') {
-            return array('ok' => false, 'code' => 422, 'reason' => 'قرار الإقفال بسببه — لا إقفال صامتًا');
+            return array('ok' => false, 'code' => 422, 'reason' => 'قرار الإقفال بسببه — لا إقفال صامتا');
         }
         $stmt = $conn->prepare(
             "INSERT INTO equipment_ownership_registry (company_id, equipment_id, operational_source, source_decided_by, source_decided_at, source_decision_note, note)
@@ -132,7 +132,7 @@ class AssetReconciliationService
         $stmt->bind_param('iisis', $companyId, $equipmentId, $src, $act, $note);
         $stmt->execute();
         $stmt->close();
-        return array('ok' => true, 'code' => 200, 'reason' => 'حُسم مصدر المعدة #' . $equipmentId . ': ' . $src . ' — بقرار موثق');
+        return array('ok' => true, 'code' => 200, 'reason' => 'حسم مصدر المعدة #' . $equipmentId . ': ' . $src . ' — بقرار موثق');
     }
 
     /** تقرير غير المحدد — المتبقي للإقفال (في المجال المقيَّد — للمخوَّلين). */

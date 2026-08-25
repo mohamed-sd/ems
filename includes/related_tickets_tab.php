@@ -90,19 +90,19 @@ foreach ($rt_rows as $t) {
 
 $rt_pre  = (strpos($_SERVER['SCRIPT_NAME'] ?? '', '/Tickets/') !== false) ? '' : '../Tickets/';
 $rt_meta = array();
-$rt_meta[] = ems_profile_badge(count($rt_rows) . ' بلاغًا', 'neutral');
+$rt_meta[] = ems_profile_badge(count($rt_rows) . ' بلاغا', 'neutral');
 if ($rt_open > 0) { $rt_meta[] = ems_profile_badge($rt_open . ' مفتوح', 'warn'); }
 if ($rt_crit > 0) { $rt_meta[] = ems_profile_badge($rt_crit . ' حرج', 'danger'); }
 
 echo ems_profile_section_open(array(
-    'title'   => 'البلاغاتُ المتصلة',
+    'title'   => 'البلاغات المتصلة',
     'icon'    => 'fas fa-bell',
     'actions' => implode(' ', $rt_meta),
-    'note'    => 'آخرُ ثلاثين بلاغًا يحملون هذا الكِيانَ في سياقِهم — الأحدثُ أولًا.',
+    'note'    => 'آخر ثلاثين بلاغا يحملون هذا الكيان في سياقهم — الأحدث أولا.',
 ));
 
 if (empty($rt_rows)) {
-    echo ems_profile_note('لا بلاغاتَ متصلةً بهذا الكيان.', 'info');
+    echo ems_profile_note('لا بلاغات متصلة بهذا الكيان.', 'info');
 } else {
     ?>
     <?php /* ◆ **ولا لغةَ جدولٍ رابعةٌ تُخترع هنا**: الغلافُ `table-container`
@@ -115,7 +115,7 @@ if (empty($rt_rows)) {
         <thead>
           <tr>
             <th>الرقم</th><th>الوصف</th><th>الأولوية</th><th>المرحلة</th>
-            <th>مساراتٌ مفتوحة</th><th>التاريخ</th>
+            <th>مسارات مفتوحة</th><th>التاريخ</th>
           </tr>
         </thead>
         <tbody>

@@ -44,10 +44,10 @@ if (!function_exists('ems_journey_ago')) {
         $future = $d < 0;
         $d = abs($d);
         if ($d < 60)      { $s = 'أقل من دقيقة'; }
-        elseif ($d < 3600) { $n = (int) ($d / 60);   $s = ems_journey_plural($n, 'دقيقة', 'دقيقتين', 'دقائق', 'دقيقةً'); }
-        elseif ($d < 86400) { $n = (int) ($d / 3600); $s = ems_journey_plural($n, 'ساعة', 'ساعتين', 'ساعات', 'ساعةً'); }
-        elseif ($d < 2592000) { $n = (int) ($d / 86400); $s = ems_journey_plural($n, 'يوم', 'يومين', 'أيام', 'يومًا'); }
-        else { $n = (int) ($d / 2592000); $s = ems_journey_plural($n, 'شهر', 'شهرين', 'أشهر', 'شهرًا'); }
+        elseif ($d < 3600) { $n = (int) ($d / 60);   $s = ems_journey_plural($n, 'دقيقة', 'دقيقتين', 'دقائق', 'دقيقة'); }
+        elseif ($d < 86400) { $n = (int) ($d / 3600); $s = ems_journey_plural($n, 'ساعة', 'ساعتين', 'ساعات', 'ساعة'); }
+        elseif ($d < 2592000) { $n = (int) ($d / 86400); $s = ems_journey_plural($n, 'يوم', 'يومين', 'أيام', 'يوما'); }
+        else { $n = (int) ($d / 2592000); $s = ems_journey_plural($n, 'شهر', 'شهرين', 'أشهر', 'شهرا'); }
         return ($future ? 'بعد ' : 'منذ ') . $s;
     }
 }
@@ -93,7 +93,7 @@ if (!function_exists('ems_journey_bar')) {
             // الرمز: منجَزةٌ صحٌّ، والحاليةُ رقمُها، وما بعدها رقمُه باهتًا
             $glyph = ($status === 'done') ? '✓' : (string) $i;
 
-            $aria = $status === 'done' ? 'مكتملة' : ($status === 'current' ? 'المرحلة الحالية' : ($status === 'off' ? 'لم تُبلَغ' : 'لاحقة'));
+            $aria = $status === 'done' ? 'مكتملة' : ($status === 'current' ? 'المرحلة الحالية' : ($status === 'off' ? 'لم تبلغ' : 'لاحقة'));
 
             echo '    <div class="' . $cls . '" aria-label="' . $e($s['label'] . ' — ' . $aria) . '">' . "\n";
             echo '      <div class="ems-jdot" aria-hidden="true">' . $e($glyph) . '</div>' . "\n";

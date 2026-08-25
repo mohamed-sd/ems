@@ -140,23 +140,23 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                          'icon' => 'fas fa-arrow-right', 'label' => 'ملف العقد');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا
-    echo ems_states_bundle('لا بنودَ تغطيةٍ محسوبةً لهذا العقد',
-                           'افتح «ملفَّ العقد» وسجّل بنودَ الخدمةِ وساعاتِها ثمّ عُد إلى هذه الشاشة');
+    echo ems_states_bundle('لا بنود تغطية محسوبة لهذا العقد',
+                           'افتح «ملف العقد» وسجل بنود الخدمة وساعاتها ثم عد إلى هذه الشاشة');
     ?>
 
     <!-- الفجوةُ بالساعات — تتصدر لوحةَ العقد (§10-①) -->
     <div class="cov-gap-banner <?php echo $total_gap_hours > 0 ? 'is-gap' : 'is-ok'; ?>">
         <i class="fas <?php echo $total_gap_hours > 0 ? 'fa-triangle-exclamation' : 'fa-circle-check'; ?>"></i>
         <?php if ($total_gap_hours > 0): ?>
-            فجوةُ التغطية الآن: <strong><?php echo number_format($total_gap_hours, 2); ?> ساعةً شهريةً</strong>
-            غيرُ مغطاة — بالساعات لا بالعدد فقط، فالفجوةُ التي تُكتشف آخرَ الشهر خسارةٌ وقعت
+            فجوة التغطية الآن: <strong><?php echo number_format($total_gap_hours, 2); ?> ساعة شهرية</strong>
+            غير مغطاة — بالساعات لا بالعدد فقط، فالفجوة التي تكتشف آخر الشهر خسارة وقعت
         <?php else: ?>
-            التغطيةُ مكتملةٌ اليوم — صفرُ ساعاتٍ غيرِ مغطاة
+            التغطية مكتملة اليوم — صفر ساعات غير مغطاة
         <?php endif; ?>
     </div>
 
     <!-- المستوى ① · التزاماتُ أنواع المعدات -->
-    <div class="card"><div class="card-header"><h5><i class="fas fa-layer-group"></i> نوعُ المعدة — الالتزامُ والتغطيةُ والفجوة</h5></div>
+    <div class="card"><div class="card-header"><h5><i class="fas fa-layer-group"></i> نوع المعدة — الالتزام والتغطية والفجوة</h5></div>
     <div class="card-body"><div class="table-container">
         <table class="display no-datatable cov-table">
             <thead><tr>
@@ -173,23 +173,23 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <th class="ems-fn-th" data-fn="1">الساعات الشهرية للوحدة</th>
                 <th class="ems-fn-th" data-fn="1">إجمالي ساعات العقد</th>
                 <th class="ems-fn-th" data-fn="1">الحد الأدنى المضمون</th>
-                <th class="ems-fn-th" data-fn="1">الساعات المعرَّضة للخطر</th>
+                <th class="ems-fn-th" data-fn="1">الساعات المعرضة للخطر</th>
                 <th class="ems-fn-th" data-fn="1">قاعدة الزيادة</th>
                 <th class="ems-fn-th" data-fn="1">سعر الوحدة</th>
                 <th class="ems-fn-th" data-fn="1">تاريخ السريان</th>
                 <th class="ems-fn-th none" data-fn="1">نسخة القاعدة المستعملة</th>
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                 <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                 <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                 <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-                <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+                <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
                 <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-                <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+                <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
                 <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
-                <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
+                <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
                 <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                 <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                 <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
@@ -197,7 +197,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </tr></thead>
             <tbody>
             <?php if (empty($rows1)): ?>
-                <tr><td colspan="8">لا التزاماتِ أنواعٍ معرَّفةً لهذا العقد — عرِّفها في شاشة التزامات العقود</td></tr>
+                <tr><td colspan="8">لا التزامات أنواع معرفة لهذا العقد — عرفها في شاشة التزامات العقود</td></tr>
             <?php endif; ?>
             <?php foreach ($rows1 as $r): $o = $r['obl']; ?>
                 <tr>
@@ -213,7 +213,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <td><?php echo (int) $r['pct']; ?>٪</td>
                     <td><?php echo $cv_e($o['plan_state']); ?>
                         <?php if (!empty($o['sigma_exception_ref'])): ?>
-                            <small title="اعتمادٌ بفجوةٍ ظاهرةٍ بقرار استثناء">⚠ <?php echo $cv_e($o['sigma_exception_ref']); ?></small>
+                            <small title="اعتماد بفجوة ظاهرة بقرار استثناء">⚠ <?php echo $cv_e($o['sigma_exception_ref']); ?></small>
                         <?php endif; ?></td>
                 </tr>
             <?php endforeach; ?>
@@ -225,21 +225,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         $sup = $suppliersOf($oblId); $seats = $seatsOf($oblId); ?>
     <!-- المستوى ② · توزيعُ الموردين — داخل نوع «<?php echo $cv_e($o['equipment_type_code']); ?>» -->
     <div class="card cov-lvl2"><div class="card-header">
-        <h5><i class="fas fa-truck-field"></i> توزيعُ الموردين — <?php echo $cv_e($o['equipment_type_code']); ?></h5></div>
+        <h5><i class="fas fa-truck-field"></i> توزيع الموردين — <?php echo $cv_e($o['equipment_type_code']); ?></h5></div>
     <div class="card-body"><div class="table-container">
         <table class="display no-datatable cov-table">
             <thead><tr>
                 <th>المتاح من الموردين</th><th>وحداته</th><th>ساعته الشهرية (مشتقة)</th><th>مهلة الإحلال</th>
-                <th colspan="9">المؤشراتُ التسعة — <?php echo $cv_e($period); ?> (⑦ لا تدخل ④ ولا ترفع ⑥)</th>
+                <th colspan="9">المؤشرات التسعة — <?php echo $cv_e($period); ?> (⑦ لا تدخل ④ ولا ترفع ⑥)</th>
             </tr>
             <tr class="cov-sub">
                 <th colspan="4"></th>
-                <th>① المخطط</th><th>② بالأساسية</th><th>③ باحتياطيّه</th><th>④ التنفيذ (②+③)</th>
-                <th>قاعدة العجز</th><th>⑥ النسبة</th><th>⑦ تغطيةٌ أعطاها</th><th>⑧ غُطّي عنه</th><th>⑨ المتبقي</th>
+                <th>① المخطط</th><th>② بالأساسية</th><th>③ باحتياطيه</th><th>④ التنفيذ (②+③)</th>
+                <th>قاعدة العجز</th><th>⑥ النسبة</th><th>⑦ تغطية أعطاها</th><th>⑧ غطي عنه</th><th>⑨ المتبقي</th>
             </tr></thead>
             <tbody>
             <?php if (empty($sup)): ?>
-                <tr><td colspan="13">لا حصصَ موردين مرتبطةً بهذا الالتزام بعد</td></tr>
+                <tr><td colspan="13">لا حصص موردين مرتبطة بهذا الالتزام بعد</td></tr>
             <?php endif; ?>
             <?php foreach ($sup as $ln): $n = $ln['nine']; ?>
                 <tr>
@@ -255,7 +255,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <td><strong><?php echo number_format($n['executed_share_total'], 1); ?></strong></td>
                         <td class="<?php echo $n['share_gap'] > 0 ? 'cov-bad' : ''; ?>"><?php echo number_format($n['share_gap'], 1); ?></td>
                         <td><?php echo number_format($n['share_execution_pct'], 1); ?>٪</td>
-                        <td class="cov-sep"><?php echo number_format($n['exceptional_coverage_given'], 1); ?> ← بندٌ مستقل</td>
+                        <td class="cov-sep"><?php echo number_format($n['exceptional_coverage_given'], 1); ?> ← بند مستقل</td>
                         <td><?php echo number_format($n['coverage_received'], 1); ?></td>
                         <td><?php echo number_format($n['remaining_contract_qty'], 1); ?></td>
                     <?php else: ?>
@@ -269,7 +269,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <!-- المستوى ③ · المعداتُ المخصَّصة -->
     <div class="card cov-lvl3"><div class="card-header">
-        <h5><i class="fas fa-truck-monster"></i> المعداتُ المخصَّصة — <?php echo $cv_e($o['equipment_type_code']); ?></h5></div>
+        <h5><i class="fas fa-truck-monster"></i> المعدات المخصصة — <?php echo $cv_e($o['equipment_type_code']); ?></h5></div>
     <div class="card-body"><div class="table-container">
         <table class="display no-datatable cov-table">
             <thead><tr>
@@ -278,7 +278,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </tr></thead>
             <tbody>
             <?php if (empty($seats)): ?>
-                <tr><td colspan="6">لا معداتٍ مخصَّصةً بعد — الفجوةُ كاملة</td></tr>
+                <tr><td colspan="6">لا معدات مخصصة بعد — الفجوة كاملة</td></tr>
             <?php endif; ?>
             <?php foreach ($seats as $s): ?>
                 <tr>
@@ -288,7 +288,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <td><?php echo $cv_e($s['date_to'] ?? 'جالسة الآن'); ?></td>
                     <td><?php echo $cv_e($s['assignment_role']); ?>
                         <?php if ($s['assignment_role'] === 'احتياطي' && $s['activation_state'] !== 'active'): ?>
-                            <small>(غيرُ مفعَّلة — صفرُ ساعات)</small>
+                            <small>(غير مفعلة — صفر ساعات)</small>
                         <?php endif; ?></td>
                     <td><?php echo $s['planned_qty_month'] !== null
                         ? number_format((float) $s['planned_qty_month'], 2) . ' ' . $cv_e($s['measure_code'] ?? '') : '—'; ?></td>

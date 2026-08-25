@@ -44,8 +44,8 @@ if (!function_exists('ems_cron_guard')) {
 
         /* الرفضُ يُسجَّل — فمحاولةُ التشغيلِ من المتصفّحِ خبرٌ أمنيٌّ لا صمت */
         $why = ($token === '')
-            ? 'لا رمزَ جدولةٍ في البيئةِ — فكلُّ نداءٍ HTTP محجوب'
-            : 'رمزُ الجدولةِ غيرُ مطابق';
+            ? 'لا رمز جدولة في البيئة — فكل نداء HTTP محجوب'
+            : 'رمز الجدولة غير مطابق';
         if (function_exists('ems_log_denial')) {
             @ems_log_denial('GOV-CRON-403', ($jobLabel !== '' ? $jobLabel : basename((string) ($_SERVER['SCRIPT_NAME'] ?? ''))), $why);
         } elseif (isset($GLOBALS['conn']) && $GLOBALS['conn'] instanceof mysqli) {
@@ -53,7 +53,7 @@ if (!function_exists('ems_cron_guard')) {
                 'INSERT INTO security_log (event_type, details, ip_address, created_at) VALUES (?, ?, ?, NOW())');
             if ($st) {
                 $et = 'GOV-CRON-403';
-                $d  = 'محاولةُ تشغيلِ مهمةِ جدولةٍ من المتصفّح: '
+                $d  = 'محاولة تشغيل مهمة جدولة من المتصفح: '
                     . ($jobLabel !== '' ? $jobLabel : (string) ($_SERVER['SCRIPT_NAME'] ?? '')) . ' — ' . $why;
                 $ip = (string) ($_SERVER['REMOTE_ADDR'] ?? '');
                 $st->bind_param('sss', $et, $d, $ip);
@@ -63,7 +63,7 @@ if (!function_exists('ems_cron_guard')) {
         }
 
         if (!headers_sent()) { header('Content-Type: text/plain; charset=utf-8', true, 403); }
-        echo "GOV-CRON-403: مهمةُ الجدولةِ لا تُشغَّل من المتصفّح — {$why}\n";
+        echo "GOV-CRON-403: مهمة الجدولة لا تشغل من المتصفح — {$why}\n";
         exit;
     }
 }

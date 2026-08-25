@@ -52,7 +52,7 @@ class SubstituteCoverageService
 
         $level = isset($a['level']) ? (string) $a['level'] : '';
         if (!isset(self::REQUIRED_APPROVALS[$level])) {
-            $out['code'] = 422; $out['reason'] = 'درجةٌ خارج سلّم §6 الثلاث — والزيادةُ فوق المتعاقد بابُها الملحقُ وSigmaGuard (§10-④)';
+            $out['code'] = 422; $out['reason'] = 'درجة خارج سلم §6 الثلاث — والزيادة فوق المتعاقد بابها الملحق وSigmaGuard (§10-④)';
             return $out;
         }
         $seatId = isset($a['covered_seat_id']) ? (int) $a['covered_seat_id'] : 0;
@@ -60,7 +60,7 @@ class SubstituteCoverageService
             "SELECT c.id, c.supplier_id, c.parent_id, c.contract_id, c.contract_hours_monthly
                FROM op_containers c WHERE {TENANT_SCOPE} AND c.id = ? AND c.is_deleted = 0",
             array($seatId));
-        if (!$seats) { $out['code'] = 404; $out['reason'] = 'المقعدُ المغطى غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!$seats) { $out['code'] = 404; $out['reason'] = 'المقعد المغطى غير موجود في نطاقك'; return $out; }
         $seat = $seats[0];
 
         // الموردُ المتعطل — لقطةٌ من شجرة المقعد (المقعدُ أو أبوه «مورد»)
@@ -73,17 +73,17 @@ class SubstituteCoverageService
         }
         $covering = isset($a['covering_supplier_id']) ? (int) $a['covering_supplier_id'] : 0;
         if ($level === 'own_standby') { $covering = $covering ?: (int) $failedSupplier; }
-        if ($covering <= 0) { $out['code'] = 422; $out['reason'] = 'الموردُ المغطِّي إلزامي'; return $out; }
+        if ($covering <= 0) { $out['code'] = 422; $out['reason'] = 'المورد المغطي إلزامي'; return $out; }
         if ($level === 'own_standby' && $failedSupplier !== null && $covering !== $failedSupplier) {
             $out['code'] = 422;
-            $out['reason'] = 'الدرجةُ ① احتياطيُّ المورد نفسِه — مغطٍّ مختلفٌ درجتُه ② بموافقاتها الثلاث';
+            $out['reason'] = 'الدرجة ① احتياطي المورد نفسه — مغط مختلف درجته ② بموافقاتها الثلاث';
             return $out;
         }
 
         $from = isset($a['valid_from']) ? (string) $a['valid_from'] : '';
         $to = isset($a['valid_to']) ? (string) $a['valid_to'] : '';
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $from) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $to)) {
-            $out['code'] = 422; $out['reason'] = 'لا تغطيةَ مفتوحةَ المدة — البدايةُ والنهايةُ إلزاميتان (§6.1-②)';
+            $out['code'] = 422; $out['reason'] = 'لا تغطية مفتوحة المدة — البداية والنهاية إلزاميتان (§6.1-②)';
             return $out;
         }
 
@@ -94,8 +94,8 @@ class SubstituteCoverageService
                 $days = (int) ((strtotime($to) - strtotime($from)) / 86400) + 1;
                 if ($days > $sla) {
                     $out['code'] = 422;
-                    $out['reason'] = 'مدةُ الدرجة ① (' . $days . ' يومًا) تتجاوز مهلةَ الإحلال ('
-                                   . $sla . ' يومًا) — فوقها الدرجةُ ② أو إحلالٌ دائم';
+                    $out['reason'] = 'مدة الدرجة ① (' . $days . ' يوما) تتجاوز مهلة الإحلال ('
+                                   . $sla . ' يوما) — فوقها الدرجة ② أو إحلال دائم';
                     return $out;
                 }
             }
@@ -107,7 +107,7 @@ class SubstituteCoverageService
             $doc = self::readinessOf($gate, $coveringEq, $from);
             if (!$doc['ok']) {
                 $out['code'] = 403;
-                $out['reason'] = 'الجاهزيةُ شرطٌ فنيٌّ لا إداري — ' . $doc['reason'] . ' (§6.1-③)';
+                $out['reason'] = 'الجاهزية شرط فني لا إداري — ' . $doc['reason'] . ' (§6.1-③)';
                 return $out;
             }
         }
@@ -116,7 +116,7 @@ class SubstituteCoverageService
         $hours = isset($a['estimated_hours']) && $a['estimated_hours'] !== '' ? round((float) $a['estimated_hours'], 2) : null;
         if ($hours === null || $hours <= 0) {
             $out['code'] = 422;
-            $out['reason'] = 'الأثرُ يُحسب قبل الاعتماد — الساعاتُ المقدَّرةُ إلزاميةٌ ولا تُقدَّر بعد التنفيذ (§6.1-⑤)';
+            $out['reason'] = 'الأثر يحسب قبل الاعتماد — الساعات المقدرة إلزامية ولا تقدر بعد التنفيذ (§6.1-⑤)';
             return $out;
         }
         $impact = self::computeImpact($level, $hours, $failedSupplier, $covering);
@@ -141,11 +141,11 @@ class SubstituteCoverageService
             ));
         } catch (\Throwable $t) {
             $out['code'] = 422;
-            $out['reason'] = 'رفضٌ بنيوي: ' . $t->getMessage();
+            $out['reason'] = 'رفض بنيوي: ' . $t->getMessage();
             return $out;
         }
         $out['ok'] = true; $out['code'] = 201; $out['cov_id'] = $covId; $out['impact'] = $impact;
-        $out['reason'] = 'طلبُ تغطيةٍ درجة «' . $level . '» أُنشئ بأثرٍ محسوبٍ معروضٍ على موافقيه ('
+        $out['reason'] = 'طلب تغطية درجة «' . $level . '» أنشئ بأثر محسوب معروض على موافقيه ('
                        . implode(' + ', self::REQUIRED_APPROVALS[$level]) . ')';
         return $out;
     }
@@ -164,16 +164,16 @@ class SubstituteCoverageService
         $rows = $gate->scopedQuery(array('scope' => array('v' => 'substitute_coverages')),
             "SELECT v.* FROM substitute_coverages v WHERE {TENANT_SCOPE} AND v.cov_id = ?",
             array((int) $covId));
-        if (!$rows) { $out['code'] = 404; $out['reason'] = 'التغطيةُ غيرُ موجودةٍ في نطاقك'; return $out; }
+        if (!$rows) { $out['code'] = 404; $out['reason'] = 'التغطية غير موجودة في نطاقك'; return $out; }
         $cov = $rows[0];
         if ((string) $cov['state'] !== 'pending_approvals') {
-            $out['code'] = 409; $out['reason'] = 'التغطيةُ ليست في انتظار الموافقات — حالتُها: ' . $cov['state'];
+            $out['code'] = 409; $out['reason'] = 'التغطية ليست في انتظار الموافقات — حالتها: ' . $cov['state'];
             return $out;
         }
         $required = self::REQUIRED_APPROVALS[(string) $cov['level']];
         if (!in_array((string) $role, $required, true)) {
             $out['code'] = 403;
-            $out['reason'] = 'الدرجةُ «' . $cov['level'] . '» لا يعتمدها هذا الدور — موافقوها: '
+            $out['reason'] = 'الدرجة «' . $cov['level'] . '» لا يعتمدها هذا الدور — موافقوها: '
                            . implode(' + ', $required) . ' (§6)';
             return $out;
         }
@@ -189,8 +189,8 @@ class SubstituteCoverageService
         $out['ok'] = true; $out['code'] = 200; $out['state'] = $newState;
         $out['granted'] = array_keys($granted); $out['missing'] = $missing;
         $out['reason'] = empty($missing)
-            ? 'اكتملت موافقاتُ الدرجة — التغطيةُ معتمدة'
-            : 'موافقةُ «' . $role . '» سُجّلت — الناقص: ' . implode(' + ', $missing) . ' (لا اعتمادَ حتى تكتمل)';
+            ? 'اكتملت موافقات الدرجة — التغطية معتمدة'
+            : 'موافقة «' . $role . '» سجلت — الناقص: ' . implode(' + ', $missing) . ' (لا اعتماد حتى تكتمل)';
         return $out;
     }
 
@@ -204,17 +204,17 @@ class SubstituteCoverageService
         $rows = $gate->scopedQuery(array('scope' => array('v' => 'substitute_coverages')),
             "SELECT v.* FROM substitute_coverages v WHERE {TENANT_SCOPE} AND v.cov_id = ?",
             array((int) $covId));
-        if (!$rows) { $out['code'] = 404; $out['reason'] = 'التغطيةُ غيرُ موجودة'; return $out; }
+        if (!$rows) { $out['code'] = 404; $out['reason'] = 'التغطية غير موجودة'; return $out; }
         $cov = $rows[0];
         if (!in_array((string) $cov['state'], array('approved', 'active'), true)) {
-            $out['code'] = 409; $out['reason'] = 'لا تسويةَ لتغطيةٍ غيرِ معتمدة — الحالة: ' . $cov['state'];
+            $out['code'] = 409; $out['reason'] = 'لا تسوية لتغطية غير معتمدة — الحالة: ' . $cov['state'];
             return $out;
         }
         $prior = $gate->scopedQuery(array('scope' => array('l' => 'coverage_settlement_lines')),
             "SELECT COUNT(*) n FROM coverage_settlement_lines l WHERE {TENANT_SCOPE} AND l.cov_id = ?",
             array((int) $covId));
         if ($prior && (int) $prior[0]['n'] > 0) {
-            $out['code'] = 409; $out['reason'] = 'بنودُ التسوية مقيَّدةٌ من قبل — لا ازدواج';
+            $out['code'] = 409; $out['reason'] = 'بنود التسوية مقيدة من قبل — لا ازدواج';
             return $out;
         }
         $qty = round((float) $qty, 2);
@@ -223,13 +223,13 @@ class SubstituteCoverageService
         // مستقلٌّ بسعر التغطية المتفق · والمشغّلُ يستحق بعقده هو
         $lines = array(
             array('party' => 'client', 'effect' => 'billable',
-                  'note' => 'تُفوتر ساعاتُ التغطية كأنها نُفّذت — الخدمةُ وصلت (§7-①)'),
+                  'note' => 'تفوتر ساعات التغطية كأنها نفذت — الخدمة وصلت (§7-①)'),
             array('party' => 'failed_supplier', 'effect' => 'gap_kept',
-                  'note' => 'العجزُ باقٍ كاملًا وجزاؤه بقاعدة عقده ومهلتُه من لحظة التعطل (§7-②)'),
+                  'note' => 'العجز باق كاملا وجزاؤه بقاعدة عقده ومهلته من لحظة التعطل (§7-②)'),
             array('party' => 'covering_supplier', 'effect' => 'exceptional_line',
-                  'note' => 'بندُ تغطيةٍ استثنائيةٍ بسعره ومرجعِ قراره — لا يرفع حصتَه (§7-③)'),
+                  'note' => 'بند تغطية استثنائية بسعره ومرجع قراره — لا يرفع حصته (§7-③)'),
             array('party' => 'operator', 'effect' => 'entitlement',
-                  'note' => 'يستحق أجرَه وحافزَه على ما شغّل بعقده هو (§7-④)'),
+                  'note' => 'يستحق أجره وحافزه على ما شغل بعقده هو (§7-④)'),
         );
         foreach ($lines as $ln) {
             $gate->insert('coverage_settlement_lines', array(
@@ -246,7 +246,7 @@ class SubstituteCoverageService
             $out['lines']++;
         }
         $out['ok'] = true; $out['code'] = 201;
-        $out['reason'] = 'قُيّدت بنودُ الأطراف الأربعة ظاهرةً — والعجزُ محفوظٌ والحصةُ لم تُرفع';
+        $out['reason'] = 'قيدت بنود الأطراف الأربعة ظاهرة — والعجز محفوظ والحصة لم ترفع';
         return $out;
     }
 
@@ -257,14 +257,14 @@ class SubstituteCoverageService
     public static function zeroFailedGap()
     {
         return array('ok' => false, 'code' => 403,
-            'reason' => 'التغطيةُ البديلةُ لا تُصفّر عجزَ المتعطل ولا تُسقط جزاءَه — العجزُ يبقى مسجَّلًا ظاهرًا (§6.1-⑥)');
+            'reason' => 'التغطية البديلة لا تصفر عجز المتعطل ولا تسقط جزاءه — العجز يبقى مسجلا ظاهرا (§6.1-⑥)');
     }
 
     /** «محاولةُ تعديل الحصة الأصلية» عبر التغطية → 423 (§16-Validation). */
     public static function modifyOriginalShare()
     {
         return array('ok' => false, 'code' => 423,
-            'reason' => 'التغطيةُ لا تُعدِّل الحصةَ الأصلية — أثرُها بندٌ استثنائيٌّ مستقل (§6-②)');
+            'reason' => 'التغطية لا تعدل الحصة الأصلية — أثرها بند استثنائي مستقل (§6-②)');
     }
 
     /** الأثرُ على الأطراف الأربعة — يُعرض على الموافقين قبل القرار (§6.1-⑤). */
@@ -272,17 +272,17 @@ class SubstituteCoverageService
     {
         return array(
             'client'            => array('effect' => 'billable', 'hours' => $hours,
-                                         'note' => 'يُفوتر كاملًا — الخدمةُ تصل'),
+                                         'note' => 'يفوتر كاملا — الخدمة تصل'),
             'failed_supplier'   => array('ref' => $failedSupplier, 'effect' => 'gap_kept', 'hours' => $hours,
-                                         'note' => 'عجزُه يبقى وجزاؤه بقاعدة عقده'),
+                                         'note' => 'عجزه يبقى وجزاؤه بقاعدة عقده'),
             'covering_supplier' => array('ref' => $coveringSupplier,
                                          'effect' => $level === 'own_standby' ? 'share_execution_standby' : 'exceptional_line',
                                          'hours' => $hours,
                                          'note' => $level === 'own_standby'
-                                             ? 'تنفيذُ حصته باحتياطيّه — لا أثرَ على الحصة (§6-①)'
-                                             : 'بندٌ استثنائيٌّ مستقلٌّ لا حصةٌ تُرفع'),
+                                             ? 'تنفيذ حصته باحتياطيه — لا أثر على الحصة (§6-①)'
+                                             : 'بند استثنائي مستقل لا حصة ترفع'),
             'operator'          => array('effect' => 'entitlement',
-                                         'note' => 'تكليفُه قرارٌ مستقلٌّ بتأهيله — لا يُنقل تلقائيًّا (§6.1-④)'),
+                                         'note' => 'تكليفه قرار مستقل بتأهيله — لا ينقل تلقائيا (§6.1-④)'),
         );
     }
 
@@ -313,7 +313,7 @@ class SubstituteCoverageService
             array((int) $equipmentId, (string) $onDate));
         if ($rows) {
             $names = array_map(function ($r) { return $r['doc_type'] . ' (انتهت ' . $r['expiry_date'] . ')'; }, $rows);
-            return array('ok' => false, 'reason' => 'المعدةُ البديلةُ بوثائقَ منتهية: ' . implode(' · ', $names));
+            return array('ok' => false, 'reason' => 'المعدة البديلة بوثائق منتهية: ' . implode(' · ', $names));
         }
         return array('ok' => true, 'reason' => '');
     }

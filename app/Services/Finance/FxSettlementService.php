@@ -66,15 +66,15 @@ class FxSettlementService
         try {
             $c = $gate->selectOne('contracts', array('where' => array('id' => (int) $contractId)));
             if ($c) { $contract = (string) ems_fx_code($c['price_currency_contract']); }
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل بقيمةِ \'\' — $contract'); $contract = ''; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل بقيمة \'\' — $contract'); $contract = ''; }
         if ($contract === '') { $contract = $functional; }
         $set = ($settlement !== null && trim((string) $settlement) !== '')
                ? (string) ems_fx_code($settlement) : null;
         $n = count(array_unique(array_filter(array($contract, $set, $functional))));
         return array(
             'contract' => $contract, 'settlement' => $set, 'functional' => $functional,
-            'note' => 'عقدٌ ' . $contract . ' · سدادٌ ' . ($set ?: '—') . ' · وظيفيةٌ ' . $functional
-                    . ($n > 1 ? ' — **ثلاثُ عملاتٍ لا تُجمع في رقم**' : ' — عملةٌ واحدة'),
+            'note' => 'عقد ' . $contract . ' · سداد ' . ($set ?: '—') . ' · وظيفية ' . $functional
+                    . ($n > 1 ? ' — **ثلاث عملات لا تجمع في رقم**' : ' — عملة واحدة'),
         );
     }
 
@@ -98,12 +98,12 @@ class FxSettlementService
         $rf = self::rateOf($from, $date);
         $rt = self::rateOf($to, $date);
         if ($rf === null || $rf <= 0) {
-            $o['reason'] = '**لا سعرَ صرفٍ مسجَّلٌ للعملة ' . $from . '** في ' . ($date ?: 'اليوم')
-                . ' — ولا يُحوَّل بسعرٍ مخمَّن';
+            $o['reason'] = '**لا سعر صرف مسجل للعملة ' . $from . '** في ' . ($date ?: 'اليوم')
+                . ' — ولا يحول بسعر مخمن';
             return $o;
         }
         if ($rt === null || $rt <= 0) {
-            $o['reason'] = '**لا سعرَ صرفٍ مسجَّلٌ للعملة ' . $to . '**';
+            $o['reason'] = '**لا سعر صرف مسجل للعملة ' . $to . '**';
             return $o;
         }
         $base = round($amount * $rf, 2);
@@ -141,15 +141,15 @@ class FxSettlementService
         $kind = (string) (isset($a['kind']) ? $a['kind'] : '');
         if (!in_array($kind, array('realized', 'unrealized'), true)) {
             $out['code'] = 422;
-            $out['reason'] = '**المُخزَّنُ فرقان لا أربعة**: المحقَّقُ وغيرُ المحقَّق. '
-                . 'أما الرصيدُ غيرُ المسدد فبيتُه `' . self::DIFF_HOME['unpaid_balance']
-                . '` وزيادةُ السداد `' . self::DIFF_HOME['overpayment'] . '` — **ولا يُنقلان إلى هنا**';
+            $out['reason'] = '**المخزن فرقان لا أربعة**: المحقق وغير المحقق. '
+                . 'أما الرصيد غير المسدد فبيته `' . self::DIFF_HOME['unpaid_balance']
+                . '` وزيادة السداد `' . self::DIFF_HOME['overpayment'] . '` — **ولا ينقلان إلى هنا**';
             return $out;
         }
         $amount = round((float) (isset($a['amount']) ? $a['amount'] : 0), 2);
         if (abs($amount) < 0.005) {
             $out['ok'] = true; $out['code'] = 200;
-            $out['reason'] = '**صفرٌ ليس فرقًا** — ولا يُكتب سطرٌ يُخفي الفروقَ الحقيقية';
+            $out['reason'] = '**صفر ليس فرقا** — ولا يكتب سطر يخفي الفروق الحقيقية';
             return $out;
         }
         require_once dirname(__DIR__, 3) . '/includes/fx.php';
@@ -168,19 +168,19 @@ class FxSettlementService
             'created_by' => (int) $actor ?: null,
         );
         if ($row['source_ref'] <= 0 || $row['from_currency'] === '') {
-            $out['code'] = 422; $out['reason'] = 'مصدرُ الفرق وعملتُه إلزاميان'; return $out;
+            $out['code'] = 422; $out['reason'] = 'مصدر الفرق وعملته إلزاميان'; return $out;
         }
         try { $id = (int) $gate->insert('fin_fx_differences', $row); }
         catch (\Throwable $t) {
             if (strpos($t->getMessage(), 'Duplicate') !== false) {
                 $out['ok'] = true; $out['code'] = 200;
-                $out['reason'] = 'الفرقُ مسجَّلٌ سلفًا لهذا المصدر — **فعلٌ عاطل**';
+                $out['reason'] = 'الفرق مسجل سلفا لهذا المصدر — **فعل عاطل**';
                 return $out;
             }
-            $out['code'] = 422; $out['reason'] = 'تعذّر التسجيل: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر التسجيل: ' . $t->getMessage(); return $out;
         }
         $out['ok'] = true; $out['code'] = 200; $out['id'] = $id;
-        $out['reason'] = ($amount > 0 ? 'ربحُ صرفٍ ' : 'خسارةُ صرفٍ ') . abs($amount) . ' '
+        $out['reason'] = ($amount > 0 ? 'ربح صرف ' : 'خسارة صرف ') . abs($amount) . ' '
             . $row['functional_currency'] . ' · ' . self::DIFF_AR[$kind]
             . ' — **بسطره في العملة الوظيفية**';
         return $out;
@@ -209,7 +209,7 @@ class FxSettlementService
                    FROM fin_receivables r
                   WHERE {TENANT_SCOPE} AND COALESCE(r.is_deleted,0)=0 AND r.outstanding > 0
                   ORDER BY r.id");
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $open'); $open = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $open'); $open = array(); }
 
         foreach ($open as $r) {
             $cur = (string) $r['currency'];
@@ -231,12 +231,12 @@ class FxSettlementService
                     'source_ref' => (int) $r['id'], 'party_ref' => (int) $r['customer_entity_id'],
                     'from_currency' => $cur, 'amount' => $diff,
                     'rate_from' => $then, 'rate_to' => $now, 'occurred_on' => $day,
-                    'note' => 'إعادةُ تقييم ' . $r['doc_ref'] . ' — **تقديرٌ لا يُقفل ذمّة**',
+                    'note' => 'إعادة تقييم ' . $r['doc_ref'] . ' — **تقدير لا يقفل ذمة**',
                 ), $actor);
             }
         }
-        $o['note'] = $o['rows'] . ' ذمّةً أُعيد تقييمُها بفرقٍ **غيرِ محقَّق** ' . $o['total'] . ' ' . $fn
-            . ' — **ولا رصيدَ تغيّر ولا ذمّةَ أُقفلت**';
+        $o['note'] = $o['rows'] . ' ذمة أعيد تقييمها بفرق **غير محقق** ' . $o['total'] . ' ' . $fn
+            . ' — **ولا رصيد تغير ولا ذمة أقفلت**';
         return $o;
     }
 
@@ -264,7 +264,7 @@ class FxSettlementService
                   WHERE {TENANT_SCOPE} AND COALESCE(r.is_deleted,0)=0 AND r.outstanding > 0" . $w . "
                   GROUP BY r.currency", $p);
             foreach ($rows as $x) { $o['unpaid'][(string) $x['currency']] = round((float) $x['s'], 2); }
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'لا ذمّةَ = فراغ'); /* لا ذمّةَ = فراغ */ }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'لا ذمة = فراغ'); /* لا ذمّةَ = فراغ */ }
 
         // ②③ الفرقان المخزَّنان
         try {
@@ -285,15 +285,15 @@ class FxSettlementService
                   WHERE {TENANT_SCOPE} AND p.direction = 'collection'
                     AND COALESCE(p.is_deleted,0)=0 AND p.unallocated_amount > 0" . $w, $p);
             $o['overpayment'] = $rows ? round((float) $rows[0]['s'], 2) : 0.0;
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'فشلٌ يُعامَل بقيمةٍ افتراضية — $o[\'overpayment\'] = 0.0'); $o['overpayment'] = 0.0; }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'فشل يعامل بقيمة افتراضية — $o[\'overpayment\'] = 0.0'); $o['overpayment'] = 0.0; }
 
         $parts = array();
         foreach ($o['unpaid'] as $cur => $v) { $parts[] = $v . ' ' . $cur; }
         $o['note'] = '① رصيدٌ غيرُ مسدد: ' . ($parts ? implode(' · ', $parts) : 'صفر')
-            . ' · ② محقَّقٌ: ' . $o['realized'] . ' ' . $fn
-            . ' · ③ غيرُ محقَّق: ' . $o['unrealized'] . ' ' . $fn
-            . ' · ④ زيادةُ سداد: ' . $o['overpayment']
-            . ' — **أربعةٌ لا تُخلط ولا تُجمع في رقم**';
+            . ' · ② محقق: ' . $o['realized'] . ' ' . $fn
+            . ' · ③ غير محقق: ' . $o['unrealized'] . ' ' . $fn
+            . ' · ④ زيادة سداد: ' . $o['overpayment']
+            . ' — **أربعة لا تخلط ولا تجمع في رقم**';
         return $o;
     }
 

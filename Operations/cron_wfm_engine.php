@@ -30,7 +30,7 @@ fwrite(STDOUT, "══ نبض WFM · " . date('Y-m-d H:i') . " ══\n");
 
 /* ① مهل المهام */
 $sla = WI::sweepSla($conn);
-fwrite(STDOUT, "① المهل: وُسم متأخرًا {$sla['overdue']} · صُعّد {$sla['escalated']}\n");
+fwrite(STDOUT, "① المهل: وسم متأخرا {$sla['overdue']} · صعد {$sla['escalated']}\n");
 
 /* ② المهام الدورية */
 $made = 0;
@@ -55,7 +55,7 @@ while ($r && ($t = mysqli_fetch_assoc($r))) {
     $pick = ems_pick_available($conn, array($assignee));
     if ($pick['on_leave']) {
         WI::notifyUser($conn, $co, intval($t['owner_role_id']) > 0 ? $assignee : $assignee,
-            'مهمةٌ دوريةٌ مؤجلة — المكلَّف في إجازة', (string) $t['title'], 'Portal/my_tasks.php', false, 0);
+            'مهمة دورية مؤجلة — المكلف في إجازة', (string) $t['title'], 'Portal/my_tasks.php', false, 0);
         continue;
     }
     $assignee = $pick['user_id'];
@@ -80,7 +80,7 @@ while ($r && ($t = mysqli_fetch_assoc($r))) {
     $nx = date('Y-m-d H:i:s', strtotime($step, strtotime($t['next_run_at'])));
     mysqli_query($conn, "UPDATE recurring_tasks SET last_run_at = NOW(), next_run_at = '{$nx}' WHERE id = " . intval($t['id']));
 }
-fwrite(STDOUT, "② الدورية: وُلّد {$made}\n");
+fwrite(STDOUT, "② الدورية: ولد {$made}\n");
 
 /* ③ التفويضات المنتهية — الإغلاق في اللحظة (AC-WFM-10) */
 $ended = 0;
@@ -91,9 +91,9 @@ while ($r && ($d = mysqli_fetch_assoc($r))) {
     if (mysqli_affected_rows($conn) < 1) { continue; }
     $ended++;
     $co = intval($d['company_id']);
-    WI::notifyUser($conn, $co, intval($d['from_user_id']), 'انتهى تفويضُك (' . $d['kind'] . ')',
-        'النطاق: ' . $d['scope_ref'] . ' — المفتوحُ يبقى بقراره والتوليدُ توقف', 'Portal/my_tasks.php', false, 0);
-    WI::notifyUser($conn, $co, intval($d['to_user_id']), 'انتهت صلاحيةُ تفويضٍ إليك (' . $d['kind'] . ')',
+    WI::notifyUser($conn, $co, intval($d['from_user_id']), 'انتهى تفويضك (' . $d['kind'] . ')',
+        'النطاق: ' . $d['scope_ref'] . ' — المفتوح يبقى بقراره والتوليد توقف', 'Portal/my_tasks.php', false, 0);
+    WI::notifyUser($conn, $co, intval($d['to_user_id']), 'انتهت صلاحية تفويض إليك (' . $d['kind'] . ')',
         'النطاق: ' . $d['scope_ref'], 'Portal/my_tasks.php', false, 0);
 }
 fwrite(STDOUT, "③ التفويضات المنتهية: {$ended}\n");
@@ -122,11 +122,11 @@ while ($r && ($q = mysqli_fetch_assoc($r))) {
     $st->bind_param('iiiis', $co, $rid, $holder, $target, $note);
     $st->execute();
     $st->close();
-    WI::notifyUser($conn, $co, $target, 'تجاوزُ مهلةِ طلبٍ يحتاج تصعيدًا (' . $q['request_no'] . ')',
+    WI::notifyUser($conn, $co, $target, 'تجاوز مهلة طلب يحتاج تصعيدا (' . $q['request_no'] . ')',
         (string) $q['title'], 'Portal/my_requests.php', true, 0);
     $esc++;
 }
-fwrite(STDOUT, "④ مهل الطلبات: صُعّد {$esc}\n");
+fwrite(STDOUT, "④ مهل الطلبات: صعد {$esc}\n");
 
 /* ⑤ حوكمة M-14 · BR-GOV-05: الاستثناء ينقضي بانقضاء مدته ولا يمتد بالسكوت.
    (الموجة ٢: الشاشة تحررت إلى جدولها الأصلي scr_exceptions — ارتحل الكنس معها) */
@@ -146,7 +146,7 @@ while ($r && ($x = mysqli_fetch_assoc($r))) {
     if ($st->execute() && $st->affected_rows > 0) { $expired++; }
     $st->close();
 }
-fwrite(STDOUT, "⑤ استثناءاتٌ انقضت آليًّا: {$expired}\n");
+fwrite(STDOUT, "⑤ استثناءات انقضت آليا: {$expired}\n");
 
 /* ⑥ SRC-09 · M-14 (SCN-728): «المنعُ المتكرر يكشف: حاجةَ استثناءٍ أو خطأَ
    تصنيفٍ أو محاولةَ تجاوز» — ≥5 لمحاولةٍ واحدةٍ (مستخدم×حدث) في أسبوعٍ
@@ -191,9 +191,9 @@ if (is_file($logF)) {
                 'owner_user_id' => $govUser, 'assigned_user_id' => $govUser,
                 'verifier_user_id' => WI::resolveVerifier($conn, 4, $govUser),
                 'org_unit_id' => 1,
-                'title' => 'إجراء تصحيحي: منعٌ متكرر (' . $n . '×) — «' . mb_substr($who, 0, 30) . '» على ' . mb_substr($ev, 0, 40),
-                'details' => 'المنع المتكرر يكشف: حاجةَ استثناءٍ أو خطأَ تصنيف حمايةٍ أو محاولةَ تجاوز — يُحسم أحدها ويوثَّق.',
-                'deliverable' => 'قرارٌ موثَّق: استثناءٌ أو تصحيحُ تصنيفٍ أو تصعيدٌ أمني',
+                'title' => 'إجراء تصحيحي: منع متكرر (' . $n . '×) — «' . mb_substr($who, 0, 30) . '» على ' . mb_substr($ev, 0, 40),
+                'details' => 'المنع المتكرر يكشف: حاجة استثناء أو خطأ تصنيف حماية أو محاولة تجاوز — يحسم أحدها ويوثق.',
+                'deliverable' => 'قرار موثق: استثناء أو تصحيح تصنيف أو تصعيد أمني',
                 'evidence_required' => 'مرجع القرار في سجل الحوكمة',
                 'priority' => 'P2', 'due_at' => date('Y-m-d H:i:s', time() + 72 * 3600),
                 'created_by' => 0, 'parent_ref' => 'gov_reports:denials',
@@ -202,7 +202,7 @@ if (is_file($logF)) {
         }
     }
 }
-fwrite(STDOUT, "⑥ إجراءاتٌ تصحيحيةٌ من المنع المتكرر: {$corrective}\n");
+fwrite(STDOUT, "⑥ إجراءات تصحيحية من المنع المتكرر: {$corrective}\n");
 
 /* ⑦ SRC-13 · ورقة المخازن: العهدةُ المصروفة غيرُ المسوّاة تولّد مهمةَ تسويةٍ
  * لحاملها المربوط (holder_id ← users.employee_id) — idempotent بمرجع العهدة.
@@ -231,9 +231,9 @@ if ($cq) {
             'source_screen' => 'Procurement/custody.php',
             'owner_user_id' => $hu, 'assigned_user_id' => $hu, 'org_unit_id' => 1,
             'verifier_user_id' => WI::resolveVerifier($conn, intval($c['company_id']), $hu),
-            'title' => 'تسوية عهدة: ' . mb_substr((string) $c['item_name'], 0, 60) . ' (متبقٍ ' . $remain . ')',
+            'title' => 'تسوية عهدة: ' . mb_substr((string) $c['item_name'], 0, 60) . ' (متبق ' . $remain . ')',
             'details' => 'عهدة مصروفة بلا تسوية — الإرجاع أو إثبات الاستهلاك بمستنده.',
-            'deliverable' => 'عهدة مسوّاة: إرجاع أو استهلاك موثق',
+            'deliverable' => 'عهدة مسواة: إرجاع أو استهلاك موثق',
             'evidence_required' => 'مستند الإرجاع/الاستهلاك على ' . $ref,
             'priority' => 'P3', 'due_at' => date('Y-m-d H:i:s', time() + 7 * 86400),
             'created_by' => 0, 'parent_ref' => $ref,
@@ -241,7 +241,7 @@ if ($cq) {
         if (!empty($res['ok'])) { $custTasks++; }
     }
 }
-fwrite(STDOUT, "⑦ مهامُّ تسوية عهدةٍ وُلدت: {$custTasks}" . ($custUnlinked ? " · بلا ربط حامل: {$custUnlinked}" : '') . "\n");
+fwrite(STDOUT, "⑦ مهام تسوية عهدة ولدت: {$custTasks}" . ($custUnlinked ? " · بلا ربط حامل: {$custUnlinked}" : '') . "\n");
 /* ⑧ M-14 · حملة المراجعة الدورية للوصول (الموجة ٦): كل ربع سنةٍ تُفتح دورة
    AR-<سنة>Q<ربع> في scr_access_review وتُولَّد مهامها: قائدُ الحملة (الحوكمة
    15) + مهمةُ مراجعةٍ لمدير كل إدارةٍ من خريطة الـ17 على أعضائها (SRC-08 —
@@ -284,10 +284,10 @@ foreach ($coRows as $co) {
         'source_ref' => 'ARC-' . $cycle . '-LEAD', 'source_screen' => 'Governance/access_review.php',
         'owner_user_id' => $lead, 'assigned_user_id' => $lead, 'org_unit_id' => 6,
         'verifier_user_id' => WI::resolveVerifier($conn, $co, $lead),
-        'title' => 'حملة المراجعة الدورية للوصول ' . $cycle . ' — قُد الدورة وأقفلها',
-        'details' => 'M-14: مراجعة كل الحسابات النشطة (' . $nAcc . ') — والصمت يُعد طلب سحبٍ يقيد يدويًّا حتى قلب المصدر.',
+        'title' => 'حملة المراجعة الدورية للوصول ' . $cycle . ' — قد الدورة وأقفلها',
+        'details' => 'M-14: مراجعة كل الحسابات النشطة (' . $nAcc . ') — والصمت يعد طلب سحب يقيد يدويا حتى قلب المصدر.',
         'deliverable' => 'دورة ' . $cycle . ' مقفلة بنسب استجابتها في شاشة المراجعة',
-        'evidence_required' => 'صف الدورة محدثًا بأعداده وتاريخ إقفاله',
+        'evidence_required' => 'صف الدورة محدثا بأعداده وتاريخ إقفاله',
         'priority' => 'P2', 'due_at' => date('Y-m-d H:i:s', time() + 86400 * 14), 'created_by' => 0,
         'parent_ref' => 'ARC-' . $cycle,
     ));
@@ -309,15 +309,15 @@ foreach ($coRows as $co) {
             'owner_user_id' => $lead, 'assigned_user_id' => $mgr, 'org_unit_id' => $unit,
             'verifier_user_id' => WI::resolveVerifier($conn, $co, $mgr, $lead),
             'title' => 'راجع وصول أعضاء إدارتك — حملة ' . $cycle,
-            'details' => 'أكّد حاجة كل عضوٍ لصلاحياته الحالية أو اطلب سحبها — M-14 §المراجعة الدورية.',
-            'deliverable' => 'تأكيد أو طلبات سحبٍ لكل أعضاء الإدارة',
-            'evidence_required' => 'ملاحظة الإقفال بأسماء من رُوجعوا',
+            'details' => 'أكد حاجة كل عضو لصلاحياته الحالية أو اطلب سحبها — M-14 §المراجعة الدورية.',
+            'deliverable' => 'تأكيد أو طلبات سحب لكل أعضاء الإدارة',
+            'evidence_required' => 'ملاحظة الإقفال بأسماء من روجعوا',
             'priority' => 'P3', 'due_at' => date('Y-m-d H:i:s', time() + 86400 * 14), 'created_by' => 0,
             'parent_ref' => 'ARC-' . $cycle,
         ));
         if (!empty($res['ok'])) { $campTasks++; }
     }
 }
-fwrite(STDOUT, "⑧ حملة المراجعة الدورية {$cycle}: مهام وُلدت {$campTasks}\n");
+fwrite(STDOUT, "⑧ حملة المراجعة الدورية {$cycle}: مهام ولدت {$campTasks}\n");
 
 fwrite(STDOUT, "✔ اكتمل النبض\n");

@@ -53,7 +53,7 @@ $cards = array(
     array('label' => 'الأصناف',                 'value' => $k_items,    'icon' => 'fa fa-boxes-stacked',       'href' => 'items_proc.php'),
     array('label' => 'القطع الحرجة',            'value' => $k_critical, 'icon' => 'fa fa-triangle-exclamation','href' => 'items_proc.php'),
     array('label' => 'طلبات شراء مفتوحة',       'value' => $k_req_open, 'icon' => 'fa fa-file-lines',          'href' => 'requests_proc.php'),
-    array('label' => 'أوامر شراء مؤكَّدة',       'value' => $k_po_conf,  'icon' => 'fa fa-file-invoice-dollar', 'href' => 'orders_proc.php'),
+    array('label' => 'أوامر شراء مؤكدة',       'value' => $k_po_conf,  'icon' => 'fa fa-file-invoice-dollar', 'href' => 'orders_proc.php'),
     array('label' => 'عهد استلام مفتوحة',       'value' => $k_rc_open,  'icon' => 'fa fa-truck-ramp-box',      'href' => 'receipt_custody_proc.php'),
     array('label' => 'عمليات الصرف',            'value' => $k_issues,   'icon' => 'fa fa-hand-holding-box',    'href' => 'issue_proc.php'),
     array('label' => 'الموردون التشغيليون',     'value' => $k_suppliers,'icon' => 'fa fa-truck-field',         'href' => 'suppliers_proc.php'),
@@ -83,7 +83,7 @@ for ($d = 6; $d >= 0; $d--) {
     $rb_pulse['out'][] = roleBoardScalar($g, array('scope' => array('i' => 'proc_issue')),
         "SELECT COUNT(*) FROM proc_issue i WHERE {TENANT_SCOPE} AND COALESCE(i.is_deleted,0)=0 AND DATE(i.created_at)=?", array($day));
 }
-$rb_pulse_title  = 'نبض الأداء — طلباتٌ واردة مقابل صرفيات (7 أيام)';
+$rb_pulse_title  = 'نبض الأداء — طلبات واردة مقابل صرفيات (7 أيام)';
 $rb_pulse_series = array('طلبات واردة', 'صرفيات');
 
 $page_title = 'إيكوبيشن | لوحة المشتريات';
@@ -104,8 +104,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا قطعَ حرجةً مسجَّلةً بعدُ',
-        'حدِّد الصنفَ «قطعةً حرجة» من شاشة الأصناف ليظهر هنا بحدِّه الأدنى ومدةِ توريده');
+    echo ems_states_bundle('لا قطع حرجة مسجلة بعد',
+        'حدد الصنف «قطعة حرجة» من شاشة الأصناف ليظهر هنا بحده الأدنى ومدة توريده');
     ?>
 
     <div class="stats-section proc-hidden" id="procStatsSection">
@@ -127,7 +127,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if ($waiting_eq): ?>
     <div class="card proc-dash-alert">
         <div class="card-header"><h5><i class="fas fa-triangle-exclamation proc-dash-alert-ico"></i>
-            معداتٌ بانتظار قطعٍ (<?php echo count($waiting_eq); ?>) — كلُّ يومٍ هنا إيرادُ تأجيرٍ ضائع</h5></div>
+            معدات بانتظار قطع (<?php echo count($waiting_eq); ?>) — كل يوم هنا إيراد تأجير ضائع</h5></div>
         <div class="card-body"><div class="table-container">
             <table class="alltables display proc-dash-table" data-no-dt="1">
                 <thead><tr><th>المعدة</th><th>أمر الصيانة</th><th>الانتظار (يوم)</th><th>طلب الشراء</th><th>حالته</th><th>الأولوية</th></tr></thead>
@@ -139,7 +139,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <td><strong><?php echo intval($we['waiting_days']); ?></strong></td>
                         <td><?php echo $we['req_code']
                             ? '<a href="requests_proc.php">' . htmlspecialchars((string)$we['req_code']) . '</a>'
-                            : '<span class="proc-dash-nolink">بلا طلبٍ بعد — ولّده من شاشة الطلبات</span>'; ?></td>
+                            : '<span class="proc-dash-nolink">بلا طلب بعد — ولده من شاشة الطلبات</span>'; ?></td>
                         <td><?php echo htmlspecialchars((string)($we['req_state'] ?? '—')); ?></td>
                         <td><?php echo htmlspecialchars((string)($we['priority'] ?? '—')); ?></td>
                     </tr>
@@ -183,10 +183,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <thead><tr>
                     <th>الكود</th><th>الصنف</th><th>الفئة</th><th>الحد الأدنى</th><th>مخزون الأمان</th><th>مدة التوريد (يوم)</th>
                     <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                     <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                     <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                     <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>

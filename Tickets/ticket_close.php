@@ -75,9 +75,9 @@ $gate = tkt_gate(false);
 foreach ($rows as $i => $x) {
     $blockers = array();
     $openWs = tkt_open_mandatory_ws_count($gate, (int) $x['id']);
-    if ($openWs > 0) { $blockers[] = $openWs . ' مسارًا إلزاميًّا ما زال مفتوحًا'; }
+    if ($openWs > 0) { $blockers[] = $openWs . ' مسارا إلزاميا ما زال مفتوحا'; }
     if ((int) $x['created_by'] === $uid && $uid > 0) {
-        $blockers[] = 'أنت المُبلِّغُ — والإقفالُ من الجهةِ المعالِجة';
+        $blockers[] = 'أنت المبلغ — والإقفال من الجهة المعالجة';
     }
     $rows[$i]['blockers'] = $blockers;
     $rows[$i]['open_ws']  = $openWs;
@@ -86,7 +86,7 @@ $ready   = 0;
 foreach ($rows as $x) { if (!$x['blockers']) { $ready++; } }
 $blocked = count($rows) - $ready;
 
-$page_title = 'إغلاق البلاغات المنجَزة';
+$page_title = 'إغلاق البلاغات المنجزة';
 include '../inheader.php';
 include '../insidebar.php';
 if (isset($conn)) { ems_screen_about_auto($conn); }
@@ -94,30 +94,30 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
 <div class="main ems-doc-cycle" dir="rtl">
 <?php
 $header_icon = 'fa fa-lock';
-$header_title_html = htmlspecialchars('طابورُ الإغلاق — ما أُنجز وينتظر الإقفال', ENT_QUOTES, 'UTF-8');
+$header_title_html = htmlspecialchars('طابور الإغلاق — ما أنجز وينتظر الإقفال', ENT_QUOTES, 'UTF-8');
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
-echo ems_next_step('تأكيدُ الحلِّ ثم الإقفالُ — يقعان في شاشةِ البلاغِ نفسِها بزرِّ «فتحُ البلاغ للإقفال»');
-echo ems_states_bundle('لا بلاغَ منجَزًا ينتظر الإقفال', 'الطابورُ يمتلئ حين تبلغ البلاغاتُ مرحلةَ «منجَز» فعلًا');
+echo ems_next_step('تأكيد الحل ثم الإقفال — يقعان في شاشة البلاغ نفسها بزر «فتح البلاغ للإقفال»');
+echo ems_states_bundle('لا بلاغ منجزا ينتظر الإقفال', 'الطابور يمتلئ حين تبلغ البلاغات مرحلة «منجز» فعلا');
 ?>
 <?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('ticket', 'الإغلاق'); ?>
   <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
   <?php if ($failed): ?>
   <div class="alert alert-danger tkc-alert-gap">
-    <strong>تعذّرت قراءةُ الطابور.</strong>
-    فرقٌ بين «لا بلاغَ ينتظر» و«تعذّر السؤال» — وهذه الثانية.
+    <strong>تعذرت قراءة الطابور.</strong>
+    فرق بين «لا بلاغ ينتظر» و«تعذر السؤال» — وهذه الثانية.
   </div>
   <?php else: ?>
 
   <div class="tkc-stat-row">
     <div class="ems-card tkc-stat-card tkc-stat-ready">
-      <div class="tkc-stat-label">جاهزٌ للإقفال</div>
+      <div class="tkc-stat-label">جاهز للإقفال</div>
       <div class="tkc-stat-value"><?php echo number_format($ready); ?></div>
     </div>
     <div class="ems-card tkc-stat-card tkc-stat-blocked">
-      <div class="tkc-stat-label">منجَزٌ ومحجوب</div>
+      <div class="tkc-stat-label">منجز ومحجوب</div>
       <div class="tkc-stat-value"><?php echo number_format($blocked); ?></div>
     </div>
   </div>
@@ -125,13 +125,13 @@ echo ems_states_bundle('لا بلاغَ منجَزًا ينتظر الإقفال
   <div class="card"><div class="card-body table-responsive">
     <table class="table table-sm table-striped tkc-w100">
       <thead><tr>
-        <th>#</th><th>رقم البلاغ</th><th>العنوان</th><th>المُبلِّغ</th>
+        <th>#</th><th>رقم البلاغ</th><th>العنوان</th><th>المبلغ</th>
         <th>الإدارة المالكة</th><th>الحال</th><th>الإجراء</th>
       </tr></thead>
       <tbody>
       <?php if (!$rows): ?>
         <tr><td colspan="7" class="tkc-empty-cell">
-          لا بلاغَ منجَزًا ينتظر الإقفال — والطابورُ يمتلئ حين يُنجَز عملُ بلاغٍ فعلًا.
+          لا بلاغ منجزا ينتظر الإقفال — والطابور يمتلئ حين ينجز عمل بلاغ فعلا.
         </td></tr>
       <?php else: foreach ($rows as $x): ?>
         <tr>
@@ -142,7 +142,7 @@ echo ems_states_bundle('لا بلاغَ منجَزًا ينتظر الإقفال
           <td><?php echo htmlspecialchars((string) $x['owner_role_name'], ENT_QUOTES, 'UTF-8'); ?></td>
           <td>
             <?php if (!$x['blockers']): ?>
-              <span class="badge tkc-badge-ready">جاهزٌ للإقفال</span>
+              <span class="badge tkc-badge-ready">جاهز للإقفال</span>
             <?php else: ?>
               <span class="badge tkc-badge-blocked">محجوب</span>
               <div class="tkc-blockers">
@@ -152,7 +152,7 @@ echo ems_states_bundle('لا بلاغَ منجَزًا ينتظر الإقفال
           </td>
           <td>
             <a class="btn btn-sm btn-primary" href="ticket_form.php?id=<?php echo (int) $x['id']; ?>">
-              فتحُ البلاغ للإقفال
+              فتح البلاغ للإقفال
             </a>
           </td>
         </tr>
@@ -160,10 +160,10 @@ echo ems_states_bundle('لا بلاغَ منجَزًا ينتظر الإقفال
       </tbody>
     </table>
     <p class="text-muted tkc-footnote">
-      الإقفالُ يقع في <code>ticket_form.php</code> — مسارٌ واحدٌ يحمل حارسَ «من رفع
-      البلاغَ لا يُقفله» ومنعَ الإقفالِ ومسارٌ إلزاميٌّ مفتوح وختمَ وقتِ الإقفال.
-      وهذه الشاشةُ تسرد وتشخّص ولا تكتب — فمسارا إقفالٍ يتفرّقان أسوأُ من شاشةٍ ناقصة.
-      والإغلاقُ الإداريُّ للمكرَّرِ والملغى في <code>admin_close.php</code> وهو غيرُ هذا.
+      الإقفال يقع في <code>ticket_form.php</code> — مسار واحد يحمل حارس «من رفع
+      البلاغ لا يقفله» ومنع الإقفال ومسار إلزامي مفتوح وختم وقت الإقفال.
+      وهذه الشاشة تسرد وتشخص ولا تكتب — فمسارا إقفال يتفرقان أسوأ من شاشة ناقصة.
+      والإغلاق الإداري للمكرر والملغى في <code>admin_close.php</code> وهو غير هذا.
     </p>
   </div></div>
 

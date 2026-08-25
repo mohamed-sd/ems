@@ -73,7 +73,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     $header_actions = array();
     $header_back = array();
     $header_context = array(
-        'المقام' => 'ما تملكه أنت ميدانيًّا',
+        'المقام' => 'ما تملكه أنت ميدانيا',
         'ضوابطي' => count($myControls),
         'إجراءاتي' => count($myTreatments),
         'متأخرة' => $overdue,
@@ -81,29 +81,29 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     );
     include('../includes/page_header.php');
     ems_screen_about(
-        'حقُّك الميدانيُّ ثلاثةٌ: رفعُ إشارةٍ · تسجيلُ دليلِ تنفيذِ ضابطٍ تملكه · تقديمُ دليلِ إنجازِ '
-        . 'إجراءٍ مسنَدٍ إليك. ولا تسجّل خطرًا ولا تقيّم ولا تقبل.',
-        array('الإشارةُ تُحفظ في جهازك فورًا ثم تُزامن — والإعادةُ ترجع مرجعَ الأولى ولا تُنشئ ثانية',
-              'فعاليةُ الضابطِ يحكمها متحقِّقٌ مستقلٌّ لا أنت — ودليلُك شاهدٌ لا حكم',
-              'إغلاقُ الإجراءِ بقبولِ المتحقِّقِ لا بتنفيذك'));
-    echo ems_states_bundle('لا مهامَّ ميدانيةً في عهدتك بعد', 'الميدانيُّ يرفع إشارةً ويسجّل دليلَ ضابطِه ودليلَ إنجازِ إجرائِه — لا أكثر');
+        'حقك الميداني ثلاثة: رفع إشارة · تسجيل دليل تنفيذ ضابط تملكه · تقديم دليل إنجاز '
+        . 'إجراء مسند إليك. ولا تسجل خطرا ولا تقيم ولا تقبل.',
+        array('الإشارة تحفظ في جهازك فورا ثم تزامن — والإعادة ترجع مرجع الأولى ولا تنشئ ثانية',
+              'فعالية الضابط يحكمها متحقق مستقل لا أنت — ودليلك شاهد لا حكم',
+              'إغلاق الإجراء بقبول المتحقق لا بتنفيذك'));
+    echo ems_states_bundle('لا مهام ميدانية في عهدتك بعد', 'الميداني يرفع إشارة ويسجل دليل ضابطه ودليل إنجاز إجرائه — لا أكثر');
     ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <div id="fieldSyncBar" class="ems-card rsk-syncbar is-hidden">
         <span id="fieldPendCount"></span>
         <button class="ems-btn-primary rsk-ms10" id="fieldSyncBtn">
-            <i class="fa fa-rotate"></i> مزامنة المعلَّق (RSK-FIELD-SYNC)</button>
+            <i class="fa fa-rotate"></i> مزامنة المعلق (RSK-FIELD-SYNC)</button>
         <span id="fieldSyncMsg" class="rsk-msg"></span>
     </div>
 
     <div class="card"><div class="card-body">
         <h6>رفع إشارة خطر من الميدان</h6>
-        <p class="rsk-note-sm">تُحفظ في جهازك أولًا — فلا تُفقد بانقطاعِ الشبكة.</p>
+        <p class="rsk-note-sm">تحفظ في جهازك أولا — فلا تفقد بانقطاع الشبكة.</p>
         <form id="fieldSigForm" class="allforms">
             <div class="row">
                 <div class="col-md-6"><label>العنوان *<input name="title" class="form-control" aria-label="عنوان الإشارة الميدانية" required></label></div>
-                <div class="col-md-3"><label>الوحدة المرشَّحة<select name="ru_hint_id" class="form-control" aria-label="وحدة المخاطر المرشَّحة">
+                <div class="col-md-3"><label>الوحدة المرشحة<select name="ru_hint_id" class="form-control" aria-label="وحدة المخاطر المرشحة">
                     <option value="">—</option>
                     <?php foreach ($units as $u): ?>
                     <option value="<?php echo (int) $u['id']; ?>"><?php echo htmlspecialchars($u['ru_code'] . ' · ' . $u['name_ar']); ?></option>
@@ -125,7 +125,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     <div class="card rsk-mt12"><div class="card-body table-responsive">
         <h6>ضوابطي — تسجيل دليل التنفيذ</h6>
         <?php if (empty($myControls)): ?>
-        <p class="rsk-empty-note">لا ضوابط مسنَدة إليك — والدليلُ يسجّله مالكُ الضابطِ وحدَه.</p>
+        <p class="rsk-empty-note">لا ضوابط مسندة إليك — والدليل يسجله مالك الضابط وحده.</p>
         <?php else: ?>
         <table class="table table-sm table-striped rsk-w100">
             <thead><tr><th>الرمز</th><th>الضابط</th><th>التكرار</th><th>الدليل المطلوب</th>
@@ -151,9 +151,9 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     </div></div>
 
     <div class="card rsk-mt12"><div class="card-body table-responsive">
-        <h6>إجراءاتي المسنَدة — تقديم دليل الإنجاز</h6>
+        <h6>إجراءاتي المسندة — تقديم دليل الإنجاز</h6>
         <?php if (empty($myTreatments)): ?>
-        <p class="rsk-empty-note">لا إجراءات مسنَدة إليك.</p>
+        <p class="rsk-empty-note">لا إجراءات مسندة إليك.</p>
         <?php else: ?>
         <table class="table table-sm table-striped rsk-w100">
             <thead><tr><th>الخطر</th><th>النوع</th><th>الخطة</th><th>المهلة</th><th>الحالة</th><th>الفعل</th></tr></thead>
@@ -240,7 +240,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         if (!p.length) { bar.classList.add('is-hidden'); return; }
         bar.classList.remove('is-hidden');
         document.getElementById('fieldPendCount').textContent =
-            '⏳ معلَّق في جهازك: ' + p.length + ' إشارة — تُرفع بمفاتيحها ولا تتكرر';
+            '⏳ معلق في جهازك: ' + p.length + ' إشارة — ترفع بمفاتيحها ولا تتكرر';
     }
 
     document.getElementById('fieldSigForm').addEventListener('submit', function (ev) {
@@ -251,7 +251,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         // ① الحفظُ المحليُّ أولًا — قبل أي شبكة (§15-10)
         var p = pending(); p.push(item); savePending(p); refreshBar();
         f.reset();
-        document.getElementById('fieldSigMsg').textContent = '✔ حُفظت محليًّا — تُزامن الآن';
+        document.getElementById('fieldSigMsg').textContent = '✔ حفظت محليا — تزامن الآن';
         // ② ثم المزامنةُ الفورية؛ وإن فشلت بقيت معلَّقةً بمفتاحها
         syncNow();
     });
@@ -260,7 +260,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         var p = pending();
         if (!p.length) { return; }
         var msg = document.getElementById('fieldSyncMsg');
-        msg.textContent = 'جارٍ الرفع…';
+        msg.textContent = 'جار الرفع…';
         var fd = new FormData();
         fd.append('do', 'field_sync');
         fd.append('items', JSON.stringify(p));
@@ -274,13 +274,13 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                 (j.idempotent || []).forEach(function (c) { done[c.sync_uuid] = true; });
                 savePending(pending().filter(function (it) { return !done[it.sync_uuid]; }));
                 refreshBar();
-                msg.textContent = '✔ رُفع ' + (j.created || []).length
+                msg.textContent = '✔ رفع ' + (j.created || []).length
                     + ' · معاد (رجع مرجع الأول) ' + (j.idempotent || []).length
                     + ((j.failed || []).length ? ' · فشل ' + j.failed.length : '');
                 if ((j.created || []).length) { setTimeout(function () { location.reload(); }, 1200); }
             })
             .catch(function () {
-                msg.textContent = '⚠ لا اتصال — المعلَّق محفوظٌ في جهازك ويُرفع بمفتاحه لاحقًا';
+                msg.textContent = '⚠ لا اتصال — المعلق محفوظ في جهازك ويرفع بمفتاحه لاحقا';
             });
     }
     document.getElementById('fieldSyncBtn').addEventListener('click', syncNow);
@@ -294,8 +294,8 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         document.getElementById('fieldEvTitle').textContent = kind === 'control'
             ? 'دليل تنفيذ الضابط ' + code : 'دليل إنجاز معالجة الخطر ' + code;
         document.getElementById('fieldEvMsg').textContent = kind === 'control'
-            ? 'الفعاليةُ يحكمها متحقِّقٌ مستقلٌّ — ودليلُك شاهدٌ لا حكم'
-            : 'الإغلاقُ بقبولِ المتحقِّقِ لا بتنفيذك';
+            ? 'الفعالية يحكمها متحقق مستقل — ودليلك شاهد لا حكم'
+            : 'الإغلاق بقبول المتحقق لا بتنفيذك';
         evCard.classList.remove('is-hidden');
         evCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
@@ -324,7 +324,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         fetch('risk_actions.php', { method: 'POST', body: fd }).then(function (r) { return r.json(); })
         .then(function (j) {
             var m = document.getElementById('fieldEvMsg');
-            if (j.ok) { m.textContent = '✔ سُجل الدليل'; setTimeout(function () { location.reload(); }, 900); }
+            if (j.ok) { m.textContent = '✔ سجل الدليل'; setTimeout(function () { location.reload(); }, 900); }
             else { m.textContent = '✘ ' + (j.code || '') + ' ' + (j.msg || ''); }
         });
     });

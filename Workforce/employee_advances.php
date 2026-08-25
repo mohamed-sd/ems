@@ -64,9 +64,9 @@ if (!$can_view) {
 
 $gate = $is_super_admin ? ems_tenant_db()->forAllTenants('advances super') : ems_tenant_db();
 
-$TYPE_LABELS  = array('cash' => 'سلفةٌ نقدية', 'on_behalf' => 'دفعٌ نيابةً عنه', 'charged' => 'مصروفٌ محمَّلٌ عليه');
-$STATE_LABELS = array('draft' => 'مسودة', 'approved' => 'معتمَدة', 'active' => 'نشطة',
-                      'settled' => 'مستردَّة', 'cancelled' => 'ملغاة');
+$TYPE_LABELS  = array('cash' => 'سلفة نقدية', 'on_behalf' => 'دفعٌ نيابةً عنه', 'charged' => 'مصروف محمل عليه');
+$STATE_LABELS = array('draft' => 'مسودة', 'approved' => 'معتمدة', 'active' => 'نشطة',
+                      'settled' => 'مستردة', 'cancelled' => 'ملغاة');
 
 $redirect = function ($msg) { ems_gov_flash_redirect('employee_advances.php', $msg, 'GOV-INFO-200', ''); exit(); };
 
@@ -87,14 +87,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'first_deduction_period' => $_POST['first_deduction_period'] ?? '',
             'note'               => $_POST['note'] ?? '',
         ), $uid);
-        $redirect($r['ok'] ? 'فُتحت السلفة (مسودة) — تنتظر اعتمادَ غيرِ منشئها ✅'
+        $redirect($r['ok'] ? 'فتحت السلفة (مسودة) — تنتظر اعتماد غير منشئها ✅'
                            : ($r['code'] . ' — ' . $r['reason'] . ' ❌'));
     }
 
     if ($action === 'approve') {
         if (!$can_edit) { $redirect('لا توجد صلاحية لهذا الإجراء ❌'); }
         $r = OFS::approveAdvance($conn, $gate, $company_id, intval($_POST['advance_id'] ?? 0), $uid);
-        $redirect($r['ok'] ? 'اعتُمدت السلفة — تُخصم أقساطُها في المسيّر ✅'
+        $redirect($r['ok'] ? 'اعتمدت السلفة — تخصم أقساطها في المسير ✅'
                            : ($r['code'] . ' — ' . $r['reason'] . ' ❌'));
     }
 
@@ -102,7 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$can_edit) { $redirect('لا توجد صلاحية لهذا الإجراء ❌'); }
         $raw = trim(strval($_POST['protection_percent'] ?? ''));
         $val = ($raw === '') ? null : round(floatval($raw), 2);
-        if ($val !== null && ($val < 0 || $val > 100)) { $redirect('نسبةُ الحماية بين 0 و100 ❌'); }
+        if ($val !== null && ($val < 0 || $val > 100)) { $redirect('نسبة الحماية بين 0 و100 ❌'); }
         $exists = $conn->query("SELECT id FROM payroll_settings WHERE company_id=" . intval($company_id))->fetch_assoc();
         $sql = $val === null ? 'NULL' : $val;
         if ($exists) {
@@ -112,8 +112,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $conn->query("INSERT INTO payroll_settings (company_id, protection_percent, updated_by)
                           VALUES (" . intval($company_id) . ", {$sql}, " . intval($uid) . ")");
         }
-        $redirect($val === null ? 'أُلغي حدُّ الحماية — يُعلَن أنه غيرُ مقرَّر ✅'
-                                : ('حدُّ الحماية صار ' . $val . '٪ ✅'));
+        $redirect($val === null ? 'ألغي حد الحماية — يعلن أنه غير مقرر ✅'
+                                : ('حد الحماية صار ' . $val . '٪ ✅'));
     }
 }
 
@@ -146,10 +146,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             'icon' => 'fa fa-plus', 'label' => 'سلفة جديدة', 'class' => 'add');
     }
     $header_back = array('href' => 'payroll_runs.php', 'class' => '',
-                         'icon' => 'fas fa-arrow-right', 'label' => 'مسيّر الرواتب');
+                         'icon' => 'fas fa-arrow-right', 'label' => 'مسير الرواتب');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا سلفياتِ موظفين مفتوحةً بعدُ', 'افتحْ أولَ سلفةٍ بزرِّ «سلفة جديدة» في رأسِ الشاشة');
+    echo ems_states_bundle('لا سلفيات موظفين مفتوحة بعد', 'افتح أول سلفة بزر «سلفة جديدة» في رأس الشاشة');
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>';
     }
@@ -157,21 +157,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <div class="card"><div class="card-body">
-        <strong>حدُّ حمايةِ الصافي:</strong>
+        <strong>حد حماية الصافي:</strong>
         <?php if ($protection === null): ?>
-            <span class="badge badge-warning">لم يُقرَّر بعد</span>
-            <span class="adv-note-muted"> — وحتى يُقرَّر يُخصم القسطُ كاملًا، ولا يُفترض حدٌّ لم يقرّره أحد.</span>
+            <span class="badge badge-warning">لم يقرر بعد</span>
+            <span class="adv-note-muted"> — وحتى يقرر يخصم القسط كاملا، ولا يفترض حد لم يقرره أحد.</span>
         <?php else: ?>
             <span class="badge badge-success"><?php echo htmlspecialchars((string)$protection); ?>٪</span>
-            <span class="adv-note-muted"> — لا ينزل صافي العامل تحت هذه النسبة من إجماليه؛ وما لا يسعه الحدُّ
-                <strong>يُرحَّل</strong> للفترة التالية ولا يُلغى.</span>
+            <span class="adv-note-muted"> — لا ينزل صافي العامل تحت هذه النسبة من إجماليه؛ وما لا يسعه الحد
+                <strong>يرحل</strong> للفترة التالية ولا يلغى.</span>
         <?php endif; ?>
         <?php if ($can_edit): ?>
         <form method="post" class="adv-protection-form">
         <?= csrf_field() ?>
             <input type="hidden" name="ad_action" value="set_protection">
             <input type="number" step="0.01" min="0" max="100" name="protection_percent" class="adv-protection-input"
-                   placeholder="فارغٌ = غيرُ مقرَّر" aria-label="فارغٌ = غيرُ مقرَّر"
+                   placeholder="فارغ = غير مقرر" aria-label="فارغ = غير مقرر"
                    value="<?php echo $protection === null ? '' : htmlspecialchars((string)$protection); ?>">
             <button type="submit" class="btn-primary"><i class="fa fa-shield-halved"></i> حفظ الحد</button>
         </form>
@@ -182,7 +182,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <form method="post" class="allforms" id="advForm">
         <?= csrf_field() ?>
         <input type="hidden" name="ad_action" value="open">
-        <div class="card"><div class="card-header"><h5><i class="fa fa-hand-holding-dollar"></i> سلفةٌ جديدة</h5></div>
+        <div class="card"><div class="card-header"><h5><i class="fa fa-hand-holding-dollar"></i> سلفة جديدة</h5></div>
         <div class="card-body"><div class="form-grid">
             <div class="form-group">
                 <label for="emsf_1675_61b58">المستفيد <span class="adv-required-mark">*</span></label>
@@ -207,13 +207,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <input type="number" step="0.01" min="0.01" name="amount" required id="emsf_1677_95bc0"></div>
             <div class="form-group"><label for="emsf_1678_244f8">العملة</label><input type="text" name="currency" maxlength="8" id="emsf_1678_244f8"></div>
             <div class="form-group"><label for="emsf_1679_3b65c">مستند الصرف <span class="adv-required-mark">*</span>
-                    <small>— «كلٌّ بمستنده»</small></label>
-                <input type="text" name="doc_ref" required maxlength="120" placeholder="إذنُ صرف 2049/221" id="emsf_1679_3b65c"></div>
+                    <small>— «كل بمستنده»</small></label>
+                <input type="text" name="doc_ref" required maxlength="120" placeholder="إذن صرف 2049/221" id="emsf_1679_3b65c"></div>
             <div class="form-group"><label for="emsf_1680_f09a4">تاريخ الصرف <span class="adv-required-mark">*</span></label>
                 <input type="date" name="issued_date" required id="emsf_1680_f09a4"></div>
             <div class="form-group"><label for="emsf_1681_8f91d">عدد الأقساط</label>
                 <input type="number" min="1" name="installments_count" value="1" id="emsf_1681_8f91d"></div>
-            <div class="form-group"><label for="emsf_1682_8818a">قسط الفترة <small>— فارغٌ = المبلغ ÷ الأقساط</small></label>
+            <div class="form-group"><label for="emsf_1682_8818a">قسط الفترة <small>— فارغ = المبلغ ÷ الأقساط</small></label>
                 <input type="number" step="0.01" min="0.01" name="installment_amount" id="emsf_1682_8818a"></div>
             <div class="form-group"><label for="emsf_1683_dd69b">أول فترة خصم</label>
                 <input type="date" name="first_deduction_period" id="emsf_1683_dd69b"></div>
@@ -224,12 +224,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </form>
     <?php endif; ?>
 
-    <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> السلفيات وأرصدتُها</h5></div>
+    <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> السلفيات وأرصدتها</h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap adv-table-full">
             <thead><tr>
                 <th>الإجراءات</th><th>المستفيد</th><th>النوع</th><th>المبلغ</th>
-                <th>قيمة القسط</th><th>المستردّ</th><th>الرصيد</th><th>المستند</th><th>الحالة</th>
+                <th>قيمة القسط</th><th>المسترد</th><th>الرصيد</th><th>المستند</th><th>الحالة</th>
                 <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
                 <th class="ems-fn-th" data-fn="1">رقم السلفة</th>
                 <th class="ems-fn-th" data-fn="1">كود الموظف</th>
@@ -237,23 +237,23 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <th class="ems-fn-th" data-fn="1">سبب السلفة</th>
                 <th class="ems-fn-th" data-fn="1">عدد أقساط الاستقطاع</th>
                 <th class="ems-fn-th" data-fn="1">تاريخ بدء الاستقطاع</th>
-                <th class="ems-fn-th" data-fn="1">المسدَّد</th>
+                <th class="ems-fn-th" data-fn="1">المسدد</th>
                 <th class="ems-fn-th" data-fn="1">المتبقي</th>
                 <th class="ems-fn-th" data-fn="1">اعتماد المدير</th>
                 <th class="ems-fn-th" data-fn="1">الاعتماد المالي</th>
                 <th class="ems-fn-th" data-fn="1">تاريخ الصرف</th>
                 <th class="ems-fn-th" data-fn="1">رقم سند الصرف</th>
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                 <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                 <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                 <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-                <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+                <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
                 <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-                <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+                <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
                 <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
-                <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
+                <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
                 <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                 <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                 <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>

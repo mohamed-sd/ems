@@ -104,7 +104,7 @@ if (!function_exists('ems_require_governance_screen')) {
         if ($perms['id'] === null) {
             ems_gov_log('GOVERNANCE_SCREEN_DENY_UNREGISTERED',
                 'path=' . $script . ' role=' . $role);
-            ems_gov_flash_redirect($redirect, 'الشاشة غير مسجَّلة في سجل الوحدات فلا تُمنح صلاحيتها لأحد', 'GOV-PERM-403', 'راجع مدير الصلاحيات لتسجيل الشاشة قبل طلب الوصول');
+            ems_gov_flash_redirect($redirect, 'الشاشة غير مسجلة في سجل الوحدات فلا تمنح صلاحيتها لأحد', 'GOV-PERM-403', 'راجع مدير الصلاحيات لتسجيل الشاشة قبل طلب الوصول');
         }
         if (empty($perms['can_view'])) {
             ems_gov_log('GOVERNANCE_SCREEN_DENY',

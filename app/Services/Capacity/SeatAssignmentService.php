@@ -37,11 +37,11 @@ class SeatAssignmentService
         $seats = $gate->scopedQuery(array('scope' => array('c' => 'op_containers')),
             "SELECT c.id, c.level, c.container_no FROM op_containers c
               WHERE {TENANT_SCOPE} AND c.id = ? AND c.is_deleted = 0", array($containerId));
-        if (!$seats) { $out['code'] = 404; $out['reason'] = 'المقعدُ غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!$seats) { $out['code'] = 404; $out['reason'] = 'المقعد غير موجود في نطاقك'; return $out; }
 
         $from = isset($a['date_from']) ? (string) $a['date_from'] : '';
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $from)) {
-            $out['code'] = 422; $out['reason'] = 'تاريخُ بداية التخصيص إلزامي'; return $out;
+            $out['code'] = 422; $out['reason'] = 'تاريخ بداية التخصيص إلزامي'; return $out;
         }
         $to = isset($a['date_to']) && preg_match('/^\d{4}-\d{2}-\d{2}$/', (string) $a['date_to'])
               ? (string) $a['date_to'] : null;
@@ -50,7 +50,7 @@ class SeatAssignmentService
         $docs = self::expiredBlockingDocs($gate, $equipmentId, $from);
         if (!empty($docs)) {
             $out['code'] = 403;
-            $out['reason'] = 'معدةٌ بوثيقةِ أهليةٍ منتهية — لا تُخصَّص: ' . implode(' · ', $docs);
+            $out['reason'] = 'معدة بوثيقة أهلية منتهية — لا تخصص: ' . implode(' · ', $docs);
             return $out;
         }
 
@@ -71,8 +71,8 @@ class SeatAssignmentService
                 array($containerId, $from, $to, $to));
             if ($overlap) {
                 $out['code'] = 409;
-                $out['reason'] = 'تداخلُ فترتين فعّالتين للمقعد — التخصيصُ القائم #' . $overlap[0]['id']
-                               . ' (والاحتياطيُّ غيرُ المفعَّل وحدَه يجلس معه — C4)';
+                $out['reason'] = 'تداخل فترتين فعالتين للمقعد — التخصيص القائم #' . $overlap[0]['id']
+                               . ' (والاحتياطي غير المفعل وحده يجلس معه — C4)';
                 return $out;
             }
         }
@@ -100,19 +100,19 @@ class SeatAssignmentService
         } catch (\Throwable $t) {
             if (strpos($t->getMessage(), 'uq_sa_active_open') !== false) {
                 $out['code'] = 409;
-                $out['reason'] = 'تخصيصٌ مفتوحٌ فعّالٌ قائمٌ للمقعد — القيدُ بنيوي (C4)';
+                $out['reason'] = 'تخصيص مفتوح فعال قائم للمقعد — القيد بنيوي (C4)';
                 return $out;
             }
             if (strpos($t->getMessage(), 'ck_sa_standby_zero') !== false) {
                 $out['code'] = 422;
-                $out['reason'] = 'الاحتياطيُّ صفرُ كمياتٍ قبل التفعيل — بنيويًّا (§8.3)';
+                $out['reason'] = 'الاحتياطي صفر كميات قبل التفعيل — بنيويا (§8.3)';
                 return $out;
             }
             throw $t;
         }
         $out['ok'] = true; $out['code'] = 201; $out['assignment_id'] = $id;
-        $out['reason'] = 'خُصّصت المعدةُ #' . $equipmentId . ' للمقعد من ' . $from
-                       . ($role === 'احتياطي' && $activation === 'pending' ? ' — احتياطيةً غيرَ مفعَّلة (صفرُ ساعات)' : '');
+        $out['reason'] = 'خصصت المعدة #' . $equipmentId . ' للمقعد من ' . $from
+                       . ($role === 'احتياطي' && $activation === 'pending' ? ' — احتياطية غير مفعلة (صفر ساعات)' : '');
         return $out;
     }
 
@@ -128,14 +128,14 @@ class SeatAssignmentService
         $rows = $gate->scopedQuery(array('scope' => array('s' => 'seat_assignments')),
             "SELECT s.* FROM seat_assignments s WHERE {TENANT_SCOPE} AND s.id = ?",
             array((int) $assignmentId));
-        if (!$rows) { $out['code'] = 404; $out['reason'] = 'التخصيصُ غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!$rows) { $out['code'] = 404; $out['reason'] = 'التخصيص غير موجود في نطاقك'; return $out; }
         $cur = $rows[0];
         if ((string) $cur['state'] !== 'active') {
-            $out['code'] = 409; $out['reason'] = 'التخصيصُ منتهٍ سلفًا'; return $out;
+            $out['code'] = 409; $out['reason'] = 'التخصيص منته سلفا'; return $out;
         }
         $reason = isset($a['replace_reason']) ? trim((string) $a['replace_reason']) : '';
         if ($reason === '') {
-            $out['code'] = 422; $out['reason'] = 'سببُ الاستبدال إلزامي — لا استبدالَ بلا سبب';
+            $out['code'] = 422; $out['reason'] = 'سبب الاستبدال إلزامي — لا استبدال بلا سبب';
             return $out;
         }
         $endDate = isset($a['end_date']) && preg_match('/^\d{4}-\d{2}-\d{2}$/', (string) $a['end_date'])
@@ -143,7 +143,7 @@ class SeatAssignmentService
         $newFrom = isset($a['date_from']) && preg_match('/^\d{4}-\d{2}-\d{2}$/', (string) $a['date_from'])
                    ? (string) $a['date_from'] : null;
         if ($endDate === null || $newFrom === null) {
-            $out['code'] = 422; $out['reason'] = 'تاريخا الإقفال والفتح إلزاميان — فيُقاس زمنُ عدم التغطية';
+            $out['code'] = 422; $out['reason'] = 'تاريخا الإقفال والفتح إلزاميان — فيقاس زمن عدم التغطية';
             return $out;
         }
 
@@ -166,7 +166,7 @@ class SeatAssignmentService
             $gate->update('seat_assignments',
                 array('state' => 'active', 'date_to' => $cur['date_to']),
                 array('id' => (int) $assignmentId));
-            return array_merge($out, array('code' => $r['code'], 'reason' => 'أُلغي الاستبدال — ' . $r['reason']));
+            return array_merge($out, array('code' => $r['code'], 'reason' => 'ألغي الاستبدال — ' . $r['reason']));
         }
 
         // زمنُ عدم التغطية ومدى الالتزام بمهلة الإحلال (C3)
@@ -181,10 +181,10 @@ class SeatAssignmentService
             }
         }
         $out['ok'] = true; $out['code'] = 200; $out['assignment_id'] = $r['assignment_id'];
-        $out['reason'] = 'استُبدلت المعدةُ: خرجت #' . $cur['equipment_id'] . ' (' . $endDate . ') ودخلت #'
-                       . (int) $newEquipmentId . ' (' . $newFrom . ') — زمنُ عدم التغطية ' . $uncovered
-                       . ' يومًا' . ($out['sla_met'] === null ? '' : ($out['sla_met'] ? ' ضمن مهلة الإحلال' : ' **متجاوزًا مهلةَ الإحلال**'))
-                       . ' · والحصةُ وقيمةُ العقد لم تتغيرا (C3)';
+        $out['reason'] = 'استبدلت المعدة: خرجت #' . $cur['equipment_id'] . ' (' . $endDate . ') ودخلت #'
+                       . (int) $newEquipmentId . ' (' . $newFrom . ') — زمن عدم التغطية ' . $uncovered
+                       . ' يوما' . ($out['sla_met'] === null ? '' : ($out['sla_met'] ? ' ضمن مهلة الإحلال' : ' **متجاوزا مهلة الإحلال**'))
+                       . ' · والحصة وقيمة العقد لم تتغيرا (C3)';
         return $out;
     }
 

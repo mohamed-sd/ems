@@ -66,15 +66,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $st   = (string) ($_POST['state'] ?? 'مسودة');
         $cid  = intval($_POST['client_id'] ?? 0);
 
-        if ($name === '') { rb_back('اسمُ الدفتر مطلوب ❌', $qs); }
+        if ($name === '') { rb_back('اسم الدفتر مطلوب ❌', $qs); }
         if (!in_array($curr, $RB_CURR, true)) { rb_back('العملة غير صالحة ❌', $qs); }
-        if (!in_array($st, $RB_STATES, true)) { rb_back('حالةُ الدفتر غير صالحة ❌', $qs); }
-        if (!$vd($vf)) { rb_back('تاريخُ بدء السريان غير صالح ❌', $qs); }
-        if ($vt !== '' && !$vd($vt)) { rb_back('تاريخُ نهاية السريان غير صالح ❌', $qs); }
-        if ($vt !== '' && strtotime($vt) < strtotime($vf)) { rb_back('نهايةُ السريان قبل بدايته ❌', $qs); }
+        if (!in_array($st, $RB_STATES, true)) { rb_back('حالة الدفتر غير صالحة ❌', $qs); }
+        if (!$vd($vf)) { rb_back('تاريخ بدء السريان غير صالح ❌', $qs); }
+        if ($vt !== '' && !$vd($vt)) { rb_back('تاريخ نهاية السريان غير صالح ❌', $qs); }
+        if ($vt !== '' && strtotime($vt) < strtotime($vf)) { rb_back('نهاية السريان قبل بدايته ❌', $qs); }
         if ($cid > 0) {
             $c = $rb_gate->selectOne('clients', array('columns' => array('id'), 'where' => array('id' => $cid)));
-            if ($c === null) { rb_back('العميلُ المحدد خارج نطاق شركتك ❌', $qs); }
+            if ($c === null) { rb_back('العميل المحدد خارج نطاق شركتك ❌', $qs); }
         }
 
         $data = array('name' => $name, 'currency' => $curr, 'valid_from' => $vf,
@@ -92,11 +92,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             require_once __DIR__ . '/../includes/self_approval_guard.php';
             if ($bid > 0) {
                 $__sa = ems_assert_not_self_approval($conn, 'rate_books', 'id', $bid,
-                    'دفترُ أسعارٍ #' . $bid, intval($_SESSION['user']['company_id'] ?? 0));
+                    'دفتر أسعار #' . $bid, intval($_SESSION['user']['company_id'] ?? 0));
                 if ($__sa !== null) { rb_back($__sa['reason'], $qs); }
             } else {
                 // دفترٌ جديدٌ: مُنشئُه هو الفاعلُ قطعًا — فلا يُولد معتمَدًا.
-                rb_back('**من أنشأ لا يعتمد** — يُحفظ الدفترُ مسودةً ثم تعتمده يدٌ ثانية (UI-01 §8)', $qs);
+                rb_back('**من أنشأ لا يعتمد** — يحفظ الدفتر مسودة ثم تعتمده يد ثانية (UI-01 §8)', $qs);
             }
             $data['approved_by'] = $uid;
             $data['approved_at'] = date('Y-m-d H:i:s');
@@ -105,17 +105,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             if ($bid > 0) {
                 $own = $rb_gate->selectOne('rate_books', array('columns' => array('id'), 'where' => array('id' => $bid)));
-                if ($own === null) { rb_back('الدفترُ خارج نطاق شركتك ❌', $qs); }
+                if ($own === null) { rb_back('الدفتر خارج نطاق شركتك ❌', $qs); }
                 $rb_gate->update('rate_books', $data, array('id' => $bid));
-                rb_back('حُدِّث الدفتر ✅', 'book=' . $bid);
+                rb_back('حدث الدفتر ✅', 'book=' . $bid);
             }
             $data['book_code'] = RB::nextBookCode($rb_gate);
             $data['created_by'] = $uid;
             $data['created_at'] = date('Y-m-d H:i:s');
             $data['is_deleted'] = 0;
             $rb_gate->insert('rate_books', $data);
-            rb_back('أُنشئ الدفتر ' . $data['book_code'] . ' ✅');
-        } catch (\Throwable $t) { error_log('rate_books save_book: ' . $t->getMessage()); rb_back('تعذّر الحفظ ❌', $qs); }
+            rb_back('أنشئ الدفتر ' . $data['book_code'] . ' ✅');
+        } catch (\Throwable $t) { error_log('rate_books save_book: ' . $t->getMessage()); rb_back('تعذر الحفظ ❌', $qs); }
     }
 
     // ── بندُ الدفتر ───────────────────────────────────────────────────────
@@ -132,11 +132,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mh   = max(1, intval($_POST['min_hire_days'] ?? 1));
 
         $own = $rb_gate->selectOne('rate_books', array('columns' => array('id'), 'where' => array('id' => $bid)));
-        if ($own === null) { rb_back('الدفترُ خارج نطاق شركتك ❌', $qs); }
-        if ($tid <= 0) { rb_back('اختر فئةَ المعدة ❌', 'book=' . $bid); }
-        if (!isset(RB::WORK_MODELS[$wm])) { rb_back('نموذجُ العمل غير صالح ❌', 'book=' . $bid); }
-        if ($up < 0) { rb_back('سعرُ الوحدة لا يكون سالبًا ❌', 'book=' . $bid); }
-        if ($tt !== null && $tt < $tf) { rb_back('نهايةُ الشريحة قبل بدايتها ❌', 'book=' . $bid); }
+        if ($own === null) { rb_back('الدفتر خارج نطاق شركتك ❌', $qs); }
+        if ($tid <= 0) { rb_back('اختر فئة المعدة ❌', 'book=' . $bid); }
+        if (!isset(RB::WORK_MODELS[$wm])) { rb_back('نموذج العمل غير صالح ❌', 'book=' . $bid); }
+        if ($up < 0) { rb_back('سعر الوحدة لا يكون سالبا ❌', 'book=' . $bid); }
+        if ($tt !== null && $tt < $tf) { rb_back('نهاية الشريحة قبل بدايتها ❌', 'book=' . $bid); }
 
         $data = array('book_id' => $bid, 'equipment_type_id' => $tid, 'work_model' => $wm,
             'tier_from_days' => $tf, 'tier_to_days' => $tt, 'unit_price' => $up,
@@ -149,18 +149,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             if ($lid > 0) {
                 $ol = $rb_gate->selectOne('rate_book_lines', array('columns' => array('id'), 'where' => array('id' => $lid)));
-                if ($ol === null) { rb_back('البندُ خارج نطاق شركتك ❌', 'book=' . $bid); }
+                if ($ol === null) { rb_back('البند خارج نطاق شركتك ❌', 'book=' . $bid); }
                 $rb_gate->update('rate_book_lines', $data, array('id' => $lid));
-                rb_back('حُدِّث البند ✅', 'book=' . $bid);
+                rb_back('حدث البند ✅', 'book=' . $bid);
             }
             $data['created_by'] = $uid;
             $data['created_at'] = date('Y-m-d H:i:s');
             $data['is_deleted'] = 0;
             $rb_gate->insert('rate_book_lines', $data);
-            rb_back('أُضيف البند ✅', 'book=' . $bid);
+            rb_back('أضيف البند ✅', 'book=' . $bid);
         } catch (\Throwable $t) {
             error_log('rate_books save_line: ' . $t->getMessage());
-            rb_back('تعذّر حفظُ البند — قد تكون الشريحةُ مكرَّرةً لنفس الفئة والنموذج ❌', 'book=' . $bid);
+            rb_back('تعذر حفظ البند — قد تكون الشريحة مكررة لنفس الفئة والنموذج ❌', 'book=' . $bid);
         }
     }
 }
@@ -229,7 +229,7 @@ if ($c_type > 0 && $c_days > 0) {
     $calc_tiers = RB::tiersFor($rb_gate, $c_type, $c_model, $c_client);
 }
 
-$page_title = 'إيكوبيشن | دفترُ الأسعار';
+$page_title = 'إيكوبيشن | دفتر الأسعار';
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
 require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(null);
@@ -271,20 +271,20 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
 </style>
 <div class="main ems-unified-page-shell rb-page">
 <?php
-$header_title = 'دفترُ الأسعار بالشرائح';
+$header_title = 'دفتر الأسعار بالشرائح';
 $header_icon = 'fa fa-book-open';
 $header_actions = array();
-if ($can_add) { $header_actions[] = array('id' => 'rbToggleBook', 'class' => 'add-btn', 'icon' => 'fa fa-plus', 'label' => 'دفترٌ جديد'); }
+if ($can_add) { $header_actions[] = array('id' => 'rbToggleBook', 'class' => 'add-btn', 'icon' => 'fa fa-plus', 'label' => 'دفتر جديد'); }
 $header_back = array('href' => '../main/role_board.php', 'class' => '', 'icon' => 'fa-solid fa-share', 'label' => '');
 include('../includes/page_header.php');
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-echo ems_states_bundle('لا دفاترَ أسعارٍ مسجَّلةً بعدُ', 'أنشئ دفترًا بزرِّ «دفترٌ جديد» في رأسِ الشاشةِ ثم اعتمدْه ليُستعمل في التسعير');
+echo ems_states_bundle('لا دفاتر أسعار مسجلة بعد', 'أنشئ دفترا بزر «دفتر جديد» في رأس الشاشة ثم اعتمده ليستعمل في التسعير');
 if (function_exists('ems_screen_about')) {
     ems_screen_about(
-        'السعرُ في التأجير دالّةُ مدةٍ لا رقمٌ واحد: لكل فئةٍ ونموذجِ عملٍ شريحةُ مدةٍ وسعرُها. '
-        . 'ودفترُ العميل يغلب الدفترَ العام، والأحدثُ سريانًا يغلب الأقدم. '
-        . 'والحدُّ الأدنى للمدة يرفع الكميةَ المفوترة ولا يمنع الحجز — وهذا عرفُ التأجير.',
-        array('أنشئ دفترًا واعتمده', 'أضف بنودًا بشرائحَ متدرجة', 'جرّب الحاسبة قبل التسعير')
+        'السعر في التأجير دالة مدة لا رقم واحد: لكل فئة ونموذج عمل شريحة مدة وسعرها. '
+        . 'ودفتر العميل يغلب الدفتر العام، والأحدث سريانا يغلب الأقدم. '
+        . 'والحد الأدنى للمدة يرفع الكمية المفوترة ولا يمنع الحجز — وهذا عرف التأجير.',
+        array('أنشئ دفترا واعتمده', 'أضف بنودا بشرائح متدرجة', 'جرب الحاسبة قبل التسعير')
     );
 }
 ?>
@@ -294,7 +294,7 @@ if (function_exists('ems_screen_about')) {
 
   <!-- ③ حاسبةُ أفضل سعر -->
   <div class="card rb-mt6"><div class="card-body">
-    <h5 class="rb-h5"><i class="fa fa-calculator"></i> حاسبةُ أفضل سعر</h5>
+    <h5 class="rb-h5"><i class="fa fa-calculator"></i> حاسبة أفضل سعر</h5>
     <form method="get" class="rb-calc-form">
       <input type="hidden" name="book" value="<?php echo (int) $sel_book; ?>">
       <div><label for="emsf_2_44625">الفئة</label>
@@ -305,7 +305,7 @@ if (function_exists('ems_screen_about')) {
               <?php echo rb_e($t['type']); ?></option>
           <?php endforeach; ?>
         </select></div>
-      <div><label for="emsf_3_d90df">نموذجُ العمل</label>
+      <div><label for="emsf_3_d90df">نموذج العمل</label>
         <select name="c_model" class="form-control" id="emsf_3_d90df">
           <?php foreach (RB::WORK_MODELS as $k => $v): ?>
             <option value="<?php echo rb_e($k); ?>" <?php echo $c_model === $k ? 'selected' : ''; ?>>
@@ -313,10 +313,10 @@ if (function_exists('ems_screen_about')) {
           <?php endforeach; ?>
         </select></div>
       <div><label for="emsf_4_89926">المدة (أيام)</label>
-        <input type="number" name="c_days" min="1" id="emsf_4_89926" class="form-control rb-w120" aria-label="المدة بالأيام لحسابِ أفضل سعر" value="<?php echo $c_days ?: ''; ?>"></div>
+        <input type="number" name="c_days" min="1" id="emsf_4_89926" class="form-control rb-w120" aria-label="المدة بالأيام لحساب أفضل سعر" value="<?php echo $c_days ?: ''; ?>"></div>
       <div><label for="emsf_5_9b848">العميل (اختياري)</label>
         <select name="c_client" class="form-control" id="emsf_5_9b848">
-          <option value="0">— الدفترُ العام —</option>
+          <option value="0">— الدفتر العام —</option>
           <?php foreach ($clients as $c): ?>
             <option value="<?php echo (int) $c['id']; ?>" <?php echo $c_client === (int) $c['id'] ? 'selected' : ''; ?>>
               <?php echo rb_e($c['client_name']); ?></option>
@@ -328,8 +328,8 @@ if (function_exists('ems_screen_about')) {
     <?php if ($c_type > 0 && $c_days > 0): ?>
       <?php if ($calc === null): ?>
         <div class="alert alert-warning rb-mt12">
-          لا سعرَ مطابقٌ لهذه الفئة والنموذج والمدة في أي دفترٍ <b>معتمدٍ</b> ساري المفعول —
-          فلا سعرَ يُخترع. أضف بندًا في دفترٍ معتمد.
+          لا سعر مطابق لهذه الفئة والنموذج والمدة في أي دفتر <b>معتمد</b> ساري المفعول —
+          فلا سعر يخترع. أضف بندا في دفتر معتمد.
         </div>
       <?php else: ?>
         <div class="alert alert-success rb-mt12">
@@ -340,14 +340,14 @@ if (function_exists('ems_screen_about')) {
             &nbsp;·&nbsp; الشريحة: <b><?php echo rb_e(RB::tierLabel($calc['tier_from_days'], $calc['tier_to_days'])); ?></b>
             &nbsp;·&nbsp; الدفتر: <?php echo rb_e($calc['book_code'] . ' — ' . $calc['book_name']); ?>
             <?php if ($calc['client_id'] !== null): ?>
-              <span class="badge rb-badge-client">دفترُ عميل</span>
+              <span class="badge rb-badge-client">دفتر عميل</span>
             <?php endif; ?>
           </div>
           <div class="rb-mt6">
-            الأيامُ المفوترة: <b><?php echo (int) $calc['billable_days']; ?></b>
+            الأيام المفوترة: <b><?php echo (int) $calc['billable_days']; ?></b>
             <?php if (!empty($calc['min_applied'])): ?>
-              <span class="rb-warn-ink">(رُفعت من <?php echo (int) $c_days; ?> بحدٍّ أدنى
-                <?php echo (int) $calc['min_hire_days']; ?> يومًا)</span>
+              <span class="rb-warn-ink">(رفعت من <?php echo (int) $c_days; ?> بحد أدنى
+                <?php echo (int) $calc['min_hire_days']; ?> يوما)</span>
             <?php endif; ?>
             &nbsp;·&nbsp; الإجمالي: <b><?php echo number_format((float) $calc['line_total'], 2); ?></b>
             <?php echo rb_e($calc['currency']); ?>
@@ -356,21 +356,21 @@ if (function_exists('ems_screen_about')) {
             <?php endif; ?>
           </div>
           <div class="rb-calc-note">
-            المشغّل: <?php echo !empty($calc['operator_included']) ? 'ضمن السعر' : 'خارج السعر'; ?>
+            المشغل: <?php echo !empty($calc['operator_included']) ? 'ضمن السعر' : 'خارج السعر'; ?>
             &nbsp;·&nbsp; الوقود: <?php echo !empty($calc['fuel_included']) ? 'ضمن السعر' : 'خارج السعر'; ?>
           </div>
         </div>
         <?php if (!empty($calc_tiers) && count($calc_tiers) > 1): ?>
           <div class="rb-mt8">
-            <small class="text-muted">كلُّ الشرائح لهذه الفئة — «الأطولُ أرخص» يُرى لا يُقال:</small>
+            <small class="text-muted">كل الشرائح لهذه الفئة — «الأطول أرخص» يرى لا يقال:</small>
             <table class="table table-sm rb-tier-table" data-no-dt="hard">
-              <thead><tr><th>الشريحة</th><th>سعرُ الوحدة</th><th>الحدُّ الأدنى</th></tr></thead>
+              <thead><tr><th>الشريحة</th><th>سعر الوحدة</th><th>الحد الأدنى</th></tr></thead>
               <tbody>
               <?php foreach ($calc_tiers as $tr): ?>
                 <tr<?php echo ((int) $tr['tier_from_days'] === (int) $calc['tier_from_days']) ? ' class="rb-tier-active"' : ''; ?>>
                   <td><?php echo rb_e(RB::tierLabel($tr['tier_from_days'], $tr['tier_to_days'])); ?></td>
                   <td><?php echo number_format((float) $tr['unit_price'], 2) . ' ' . rb_e($tr['currency']); ?></td>
-                  <td><?php echo (int) $tr['min_hire_days']; ?> يومًا</td>
+                  <td><?php echo (int) $tr['min_hire_days']; ?> يوما</td>
                 </tr>
               <?php endforeach; ?>
               </tbody>
@@ -384,24 +384,24 @@ if (function_exists('ems_screen_about')) {
   <!-- ① الدفاتر -->
   <?php if ($can_add): ?>
   <div class="card allforms rb-mt14 is-hidden" id="rbBookCard"><div class="card-body">
-    <h5 class="rb-h5"><i class="fa fa-plus"></i> دفترٌ جديد</h5>
+    <h5 class="rb-h5"><i class="fa fa-plus"></i> دفتر جديد</h5>
     <form method="post" class="ems-form">
       <input type="hidden" name="csrf_token" value="<?php echo rb_e($rb_csrf); ?>">
       <input type="hidden" name="rb_action" value="save_book">
       <input type="hidden" name="book_id" value="0">
       <div class="rb-grid-210">
-        <div><label for="emsf_6_e1a0e">اسمُ الدفتر *</label><input type="text" name="name" required maxlength="160" class="form-control"
+        <div><label for="emsf_6_e1a0e">اسم الدفتر *</label><input type="text" name="name" required maxlength="160" class="form-control"
              placeholder="تسعيرة 2026 — تعدين" id="emsf_6_e1a0e"></div>
         <div><label for="emsf_7_afaa9">العملة</label><select name="currency" class="form-control" id="emsf_7_afaa9">
             <?php foreach ($RB_CURR as $c): ?><option value="<?php echo $c; ?>"><?php echo $c; ?></option><?php endforeach; ?>
           </select></div>
         <div><label for="emsf_8_1f145">يسري من *</label><input type="date" name="valid_from" required id="emsf_8_1f145" class="form-control" value="<?php echo date('Y-m-d'); ?>"></div>
-        <div><label for="emsf_9_eacd5">إلى (اتركه فارغًا = مفتوح)</label><input type="date" name="valid_to" class="form-control" id="emsf_9_eacd5"></div>
+        <div><label for="emsf_9_eacd5">إلى (اتركه فارغا = مفتوح)</label><input type="date" name="valid_to" class="form-control" id="emsf_9_eacd5"></div>
         <div><label for="emsf_10_d59c8">الحالة</label><select name="state" class="form-control" id="emsf_10_d59c8">
             <?php foreach ($RB_STATES as $s): ?><option value="<?php echo rb_e($s); ?>"><?php echo rb_e($s); ?></option><?php endforeach; ?>
-          </select><small class="text-muted">المعتمدُ وحدَه يُستعمل في التسعير</small></div>
-        <div><label for="emsf_11_4be6c">خاصٌّ بعميل (اختياري)</label><select name="client_id" class="form-control" id="emsf_11_4be6c">
-            <option value="0">— دفترٌ عام —</option>
+          </select><small class="text-muted">المعتمد وحده يستعمل في التسعير</small></div>
+        <div><label for="emsf_11_4be6c">خاص بعميل (اختياري)</label><select name="client_id" class="form-control" id="emsf_11_4be6c">
+            <option value="0">— دفتر عام —</option>
             <?php foreach ($clients as $c): ?>
               <option value="<?php echo (int) $c['id']; ?>"><?php echo rb_e($c['client_name']); ?></option>
             <?php endforeach; ?>
@@ -436,7 +436,7 @@ if (function_exists('ems_screen_about')) {
         </tr>
       <?php endforeach; ?>
       <?php if (!count($books)): ?>
-        <tr><td colspan="8" class="text-center text-muted">لا دفاترَ بعد — أنشئ دفترًا واعتمده ليُستعمل في التسعير</td></tr>
+        <tr><td colspan="8" class="text-center text-muted">لا دفاتر بعد — أنشئ دفترا واعتمده ليستعمل في التسعير</td></tr>
       <?php endif; ?>
       </tbody>
     </table></div>
@@ -445,7 +445,7 @@ if (function_exists('ems_screen_about')) {
   <!-- ② البنود -->
   <?php if ($sel_book > 0): ?>
   <div class="card rb-mt14"><div class="card-body">
-    <h5 class="rb-h5"><i class="fa fa-layer-group"></i> بنودُ الدفتر المحدَّد</h5>
+    <h5 class="rb-h5"><i class="fa fa-layer-group"></i> بنود الدفتر المحدد</h5>
     <?php if ($can_add): ?>
     <form method="post" class="ems-form rb-line-form">
       <input type="hidden" name="csrf_token" value="<?php echo rb_e($rb_csrf); ?>">
@@ -459,23 +459,23 @@ if (function_exists('ems_screen_about')) {
               <option value="<?php echo (int) $t['id']; ?>"><?php echo rb_e($t['type']); ?></option>
             <?php endforeach; ?>
           </select></div>
-        <div><label for="emsf_14_34529">نموذجُ العمل *</label><select name="work_model" class="form-control" id="emsf_14_34529">
+        <div><label for="emsf_14_34529">نموذج العمل *</label><select name="work_model" class="form-control" id="emsf_14_34529">
             <?php foreach (RB::WORK_MODELS as $k => $v): ?>
               <option value="<?php echo rb_e($k); ?>"><?php echo rb_e($v); ?></option>
             <?php endforeach; ?>
           </select></div>
         <div><label for="emsf_15_7438d">من (يوم) *</label><input type="number" name="tier_from_days" min="1" value="1" required class="form-control" id="emsf_15_7438d"></div>
         <div><label for="emsf_16_0965e">إلى (فارغ = فأكثر)</label><input type="number" name="tier_to_days" min="1" class="form-control" id="emsf_16_0965e"></div>
-        <div><label for="emsf_17_c0e04">سعرُ الوحدة *</label><input type="number" step="0.01" min="0" name="unit_price" required class="form-control" id="emsf_17_c0e04"></div>
-        <div><label for="emsf_18_60077">حدٌّ أدنى (أيام)</label><input type="number" name="min_hire_days" min="1" value="1" class="form-control" id="emsf_18_60077"></div>
-        <div><label for="emsf_19_8846f">حدٌّ أدنى ساعات/يوم</label><input type="number" step="0.5" min="0" name="min_hours_per_day" class="form-control" id="emsf_19_8846f"></div>
-        <div><label for="emsf_20_68ffe">رسمُ الترحيل</label><input type="number" step="0.01" min="0" name="mobilization_fee" value="0" class="form-control" id="emsf_20_68ffe"></div>
+        <div><label for="emsf_17_c0e04">سعر الوحدة *</label><input type="number" step="0.01" min="0" name="unit_price" required class="form-control" id="emsf_17_c0e04"></div>
+        <div><label for="emsf_18_60077">حد أدنى (أيام)</label><input type="number" name="min_hire_days" min="1" value="1" class="form-control" id="emsf_18_60077"></div>
+        <div><label for="emsf_19_8846f">حد أدنى ساعات/يوم</label><input type="number" step="0.5" min="0" name="min_hours_per_day" class="form-control" id="emsf_19_8846f"></div>
+        <div><label for="emsf_20_68ffe">رسم الترحيل</label><input type="number" step="0.01" min="0" name="mobilization_fee" value="0" class="form-control" id="emsf_20_68ffe"></div>
         <div class="rb-flex-end">
-          <label class="rb-check-label"><input type="checkbox" name="operator_included" value="1" aria-label="السعرُ يشمل المشغّل" checked> بمشغّل</label>
-          <label class="rb-check-label"><input type="checkbox" name="fuel_included" value="1" aria-label="السعرُ يشمل الوقود"> بوقود</label>
+          <label class="rb-check-label"><input type="checkbox" name="operator_included" value="1" aria-label="السعر يشمل المشغل" checked> بمشغل</label>
+          <label class="rb-check-label"><input type="checkbox" name="fuel_included" value="1" aria-label="السعر يشمل الوقود"> بوقود</label>
         </div>
       </div>
-      <div class="rb-mt10"><button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-plus"></i> أضف بندًا</button></div>
+      <div class="rb-mt10"><button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-plus"></i> أضف بندا</button></div>
     </form>
     <?php endif; ?>
 
@@ -483,10 +483,10 @@ if (function_exists('ems_screen_about')) {
       <thead><tr><th>الفئة</th><th>نموذجُ العمل</th><th>الشريحة</th><th>سعرُ الوحدة</th>
         <th>حدٌّ أدنى (أيام)</th><th>ساعات/يوم</th><th>ترحيل</th><th>مشغّل</th><th>وقود</th>
         <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-        <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-        <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-        <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-        <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+        <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+        <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+        <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+        <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
         <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
         <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
         <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -509,7 +509,7 @@ if (function_exists('ems_screen_about')) {
       </tbody>
     </table></div>
     <?php if (!count($lines)): ?>
-      <p class="text-muted rb-mt8">لا بنودَ في هذا الدفتر — والدفترُ بلا بنودٍ لا يُسعّر شيئًا.</p>
+      <p class="text-muted rb-mt8">لا بنود في هذا الدفتر — والدفتر بلا بنود لا يسعر شيئا.</p>
     <?php endif; ?>
   </div></div>
   <?php endif; ?>

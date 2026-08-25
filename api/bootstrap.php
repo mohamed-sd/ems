@@ -92,7 +92,7 @@ register_shutdown_function(static function (): void {
     if ($err && in_array($err['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR], true)) {
         api_log_error('FATAL', $err['message'] . ' @ ' . $err['file'] . ':' . $err['line']);
         if (!headers_sent()) {
-            api_respond(false, 'تعذّر إكمال الطلب بسبب خطأ في النظام. تم تسجيل المشكلة.', null, 500);
+            api_respond(false, 'تعذر إكمال الطلب بسبب خطأ في النظام. تم تسجيل المشكلة.', null, 500);
         }
     }
 });
@@ -100,7 +100,7 @@ register_shutdown_function(static function (): void {
 // تحويل الاستثناءات غير الملتقطة إلى JSON.
 set_exception_handler(static function (\Throwable $e): void {
     api_log_error('EXCEPTION', $e->getMessage() . ' @ ' . $e->getFile() . ':' . $e->getLine());
-    api_respond(false, 'حدث خطأ غير متوقّع في الخادم. تم تسجيل المشكلة.', null, 500);
+    api_respond(false, 'حدث خطأ غير متوقع في الخادم. تم تسجيل المشكلة.', null, 500);
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -237,12 +237,12 @@ function api_issue_token(int $userId, int $days = 30): array
         'INSERT INTO api_tokens (user_id, token_hash, device, expires_at) VALUES (?, ?, ?, ?)'
     );
     if (!$stmt) {
-        api_fail('تعذّر إصدار التوكن', 500);
+        api_fail('تعذر إصدار التوكن', 500);
     }
     mysqli_stmt_bind_param($stmt, 'isss', $userId, $hash, $device, $expires);
     if (!mysqli_stmt_execute($stmt)) {
         mysqli_stmt_close($stmt);
-        api_fail('تعذّر إصدار التوكن', 500);
+        api_fail('تعذر إصدار التوكن', 500);
     }
     mysqli_stmt_close($stmt);
 
@@ -277,7 +277,7 @@ function api_require_auth(): array
 
     $token = api_bearer_token();
     if ($token === '') {
-        api_fail('غير مصرّح — التوكن مفقود', 401);
+        api_fail('غير مصرح — التوكن مفقود', 401);
     }
 
     $hash = api_hash_token($token);
@@ -288,7 +288,7 @@ function api_require_auth(): array
          LIMIT 1'
     );
     if (!$stmt) {
-        api_fail('تعذّر التحقق من التوكن', 500);
+        api_fail('تعذر التحقق من التوكن', 500);
     }
     mysqli_stmt_bind_param($stmt, 's', $hash);
     mysqli_stmt_execute($stmt);
@@ -297,7 +297,7 @@ function api_require_auth(): array
     mysqli_stmt_close($stmt);
 
     if (!$row) {
-        api_fail('غير مصرّح — التوكن غير صالح أو منتهٍ', 401);
+        api_fail('غير مصرح — التوكن غير صالح أو منته', 401);
     }
 
     $userId = intval($row['user_id']);
@@ -317,7 +317,7 @@ function api_require_auth(): array
          FROM users WHERE id = ? LIMIT 1'
     );
     if (!$ustmt) {
-        api_fail('تعذّر تحميل بيانات المستخدم', 500);
+        api_fail('تعذر تحميل بيانات المستخدم', 500);
     }
     mysqli_stmt_bind_param($ustmt, 'i', $userId);
     mysqli_stmt_execute($ustmt);
@@ -426,7 +426,7 @@ function api_fetch_project(array $ctx, int $projectId): array
          LIMIT 1"
     );
     if (!$stmt) {
-        api_fail('تعذّر جلب المشروع', 500);
+        api_fail('تعذر جلب المشروع', 500);
     }
     mysqli_stmt_bind_param($stmt, 'i', $projectId);
     mysqli_stmt_execute($stmt);

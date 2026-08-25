@@ -26,7 +26,7 @@ $can_view = $is_super_admin || !empty($__pp['can_view']);
 $can_generate = $is_super_admin || !empty($__pp['can_add']) || !empty($__pp['can_edit']);
 if (!$can_view) {
     // GOV-403 داخل الشاشة لا في الرابط (UI-DEF-06)
-    $_SESSION['ems_gov_flash'] = 'FIN-PERM-403: لا صلاحيةَ عرضٍ لتوليد المستحق — تُطلب من الحوكمة';
+    $_SESSION['ems_gov_flash'] = 'FIN-PERM-403: لا صلاحية عرض لتوليد المستحق — تطلب من الحوكمة';
     header('Location: ../main/dashboard.php');
     exit();
 }
@@ -97,13 +97,13 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     );
     include('../includes/page_header.php');
     ems_screen_about(
-        'واقعةٌ واحدةٌ اجتازت سلسلتَها تولّد ثلاثةَ آثارٍ بأحكامٍ مستقلة: إيرادُ العميل وذمةُ المورد '
-        . 'وأجرُ المشغّل — عبر البوابةِ الرباعيةِ ثم محرّكِ المروحة. ولا أثرَ ماليًّا بإدخالٍ مباشر (PR-04).',
-        array('افحص البوابةَ أولًا — الردُّ بسببٍ محكومٍ يقود لصاحب الحلقة الناقصة',
-              'المتخطَّى في المروحة يُعلَن بسببِه («لا سعرَ عقد») ولا يُخترع له رقم',
-              'إعادةُ التوليد ترجع المحضرَ الأول — العطالةُ بنيوية (AR-04)'));
+        'واقعة واحدة اجتازت سلسلتها تولد ثلاثة آثار بأحكام مستقلة: إيراد العميل وذمة المورد '
+        . 'وأجر المشغل — عبر البوابة الرباعية ثم محرك المروحة. ولا أثر ماليا بإدخال مباشر (PR-04).',
+        array('افحص البوابة أولا — الرد بسبب محكوم يقود لصاحب الحلقة الناقصة',
+              'المتخطى في المروحة يعلن بسببه («لا سعر عقد») ولا يخترع له رقم',
+              'إعادة التوليد ترجع المحضر الأول — العطالة بنيوية (AR-04)'));
     // UXW-01 ⑨: حالاتُ الشاشةِ الثلاثُ من المكوّنِ المركزيّ
-    echo ems_states_bundle('لا وقائعَ ولا محاضرَ لهذه الفترة', 'غيِّر الفترةَ أو تحققْ من اعتمادِ الوقائع');
+    echo ems_states_bundle('لا وقائع ولا محاضر لهذه الفترة', 'غير الفترة أو تحقق من اعتماد الوقائع');
     ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
@@ -115,9 +115,9 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     </form>
 
     <div class="card"><div class="card-body table-responsive">
-        <h6>وقائعُ معتمدةٌ تنتظر التوليد (<?php echo count($pending); ?>)</h6>
+        <h6>وقائع معتمدة تنتظر التوليد (<?php echo count($pending); ?>)</h6>
         <?php if (!$pending): ?>
-            <?php if (function_exists('ems_state_empty')) { ems_state_empty('لا وقائعَ معتمدةً بلا محضرٍ في هذه الفترة — المروحةُ مكتملة ✨'); } else { echo '<p class="ent-dim">لا وقائع.</p>'; } ?>
+            <?php if (function_exists('ems_state_empty')) { ems_state_empty('لا وقائع معتمدة بلا محضر في هذه الفترة — المروحة مكتملة ✨'); } else { echo '<p class="ent-dim">لا وقائع.</p>'; } ?>
         <?php else: ?>
         <table class="table table-sm table-striped ent-w100" data-no-dt="1">
             <thead><tr>
@@ -131,16 +131,16 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <td><?php echo htmlspecialchars($x['record_date']); ?></td>
                     <td><?php echo htmlspecialchars($x['work_model']); ?></td>
                     <td><?php echo htmlspecialchars((string) $x['approved_qty']); ?></td>
-                    <td class="ent-fs78"><?php echo $x['client_unit_price'] !== null ? 'سعرٌ متاح — يُفوتر' : '<span class="ent-reject-note">لا سعرَ عميل — سيُتخطى معلَنًا</span>'; ?></td>
+                    <td class="ent-fs78"><?php echo $x['client_unit_price'] !== null ? 'سعر متاح — يفوتر' : '<span class="ent-reject-note">لا سعر عميل — سيتخطى معلنا</span>'; ?></td>
                     <td class="ent-fs78"><?php
-                        if (empty($x['supplier_entity_id'])) { echo 'معدةٌ مملوكة — لا مورد'; }
-                        else { echo $x['supplier_unit_price'] !== null ? 'سعرٌ متاح — يستحق' : '<span class="ent-reject-note">لا سعرَ مورد</span>'; }
+                        if (empty($x['supplier_entity_id'])) { echo 'معدة مملوكة — لا مورد'; }
+                        else { echo $x['supplier_unit_price'] !== null ? 'سعر متاح — يستحق' : '<span class="ent-reject-note">لا سعر مورد</span>'; }
                     ?></td>
                     <td class="ent-nowrap">
                         <?php if ($can_generate): ?>
                         <button class="ems-btn-secondary" onclick="m10Gate(<?php echo (int) $x['id']; ?>)">فحص البوابة</button>
                         <button class="ems-btn-primary" onclick="m10Entitle(<?php echo (int) $x['id']; ?>)">توليد المحضر</button>
-                        <?php else: ?><span class="ent-readonly-hint">قراءة — التوليدُ للمخوَّل</span><?php endif; ?>
+                        <?php else: ?><span class="ent-readonly-hint">قراءة — التوليد للمخول</span><?php endif; ?>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -151,9 +151,9 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
 
     <?php if ($rejects): ?>
     <div class="ems-card ent-reject-card">
-        <strong class="ent-reject-title">وقائعُ ردّتها البوابةُ الرباعية — <?php echo count($rejects); ?></strong>
+        <strong class="ent-reject-title">وقائع ردتها البوابة الرباعية — <?php echo count($rejects); ?></strong>
         <table class="table table-sm ent-mt6">
-            <thead><tr><th>البوابة</th><th>الواقعة</th><th>السببُ المحكوم</th><th>الوقت</th></tr></thead>
+            <thead><tr><th>البوابة</th><th>الواقعة</th><th>السبب المحكوم</th><th>الوقت</th></tr></thead>
             <tbody>
             <?php foreach ($rejects as $x): ?>
                 <tr>
@@ -169,9 +169,9 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     <?php endif; ?>
 
     <div class="card ent-mt12"><div class="card-body table-responsive">
-        <h6>محاضرُ التوليد — السجلُّ الكامل (<?php echo count($generated); ?>)</h6>
+        <h6>محاضر التوليد — السجل الكامل (<?php echo count($generated); ?>)</h6>
         <?php if (!$generated): ?>
-            <?php if (function_exists('ems_state_empty')) { ems_state_empty('لا محاضرَ في هذه الفترة بعد.'); } else { echo '<p class="ent-dim">لا محاضر.</p>'; } ?>
+            <?php if (function_exists('ems_state_empty')) { ems_state_empty('لا محاضر في هذه الفترة بعد.'); } else { echo '<p class="ent-dim">لا محاضر.</p>'; } ?>
         <?php else: ?>
         <div class="table-container">
         <table class="alltables display nowrap ent-w100">
@@ -179,16 +179,16 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                 <th>رقم المحضر</th><th>الفترة</th><th>الواقعة المرجعية</th>
                 <th>حكم العميل</th><th>قيمة إيراد العميل</th>
                 <th>حكم المورد</th><th>قيمة استحقاق المورد</th>
-                <th>حكم المشغّل</th><th>قيمة أجر المشغّل</th>
+                <th>حكم المشغل</th><th>قيمة أجر المشغل</th>
                 <th>العملة</th><th>تاريخ اكتمال السلسلة</th><th>رقم الحدث</th>
-                <th>الحالة</th><th>المُنشئ — الاسم والصفة</th><th>تاريخ الإنشاء</th>
+                <th>الحالة</th><th>المنشئ — الاسم والصفة</th><th>تاريخ الإنشاء</th>
                 <th>مرجع التفويض</th><th>المرجع الأب</th><th>مفتاح منع التكرار</th>
-                <th>درجة الأثر</th><th>معكوس بـ</th><th>نسخة القاعدة</th>
+                <th>درجة الأثر</th><th>معكوس ب</th><th>نسخة القاعدة</th>
                 <?php /* الأعمدةُ الحاكمةُ الخمسةُ التي يطلبها تصميمُ الشاشة (CMP-03) —
                          كلُّها من أعمدةِ `fin_entitlements` نفسِها لا مُلفَّقة:
                          company_id · fx_rate · cost_center_id · reverses_ref ·
                          وjournal_ref مستندُ الإثباتِ المحاسبيِّ للمحضر. */ ?>
-                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
                 <th class="ems-gov-th" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
                 <th class="ems-gov-th" data-gov="fx_rate" data-slice="3" title="سعر التحويل لعملة الدفاتر">سعر الصرف</th>
                 <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
@@ -251,24 +251,24 @@ function m10Gate(unitId) {
     m10Post(fd, function (j) {
         if (!j.ok) { alert(j.code + ': ' + j.msg); return; }
         if (j.result === 'pass') {
-            alert('البوابة ' + j.gate_code + ': الفحوصُ الأربعةُ مجتازة ✔');
+            alert('البوابة ' + j.gate_code + ': الفحوص الأربعة مجتازة ✔');
         } else {
-            alert('البوابة ' + j.gate_code + ' ردّت الواقعة — ' + j.reject_code + ': ' + (j.reject_msg || ''));
+            alert('البوابة ' + j.gate_code + ' ردت الواقعة — ' + j.reject_code + ': ' + (j.reject_msg || ''));
         }
         location.reload();
     });
 }
 function m10Entitle(unitId) {
-    if (!confirm('توليدُ المحضرِ يفرّع الأثرَ الماليَّ عبر المروحة — تأكيد؟')) { return; }
+    if (!confirm('توليد المحضر يفرع الأثر المالي عبر المروحة — تأكيد؟')) { return; }
     var fd = new FormData();
     fd.append('do', 'entitle_generate');
     fd.append('unit_id', unitId);
     m10Post(fd, function (j) {
         if (!j.ok) { alert(j.code + ': ' + j.msg); return; }
         var msg = j.idempotent
-            ? 'محضرٌ سابقٌ ' + j.entitle_code + ' — الإعادةُ ترجع الأول (AR-04)'
-            : 'وُلّد المحضر ' + j.entitle_code + ' — آثارٌ: ' + j.effects + ' · متبنّاة: ' + j.adopted
-              + (j.skipped && j.skipped.length ? ' · متخطّاة معلَنة: ' + j.skipped.length : '');
+            ? 'محضر سابق ' + j.entitle_code + ' — الإعادة ترجع الأول (AR-04)'
+            : 'ولد المحضر ' + j.entitle_code + ' — آثار: ' + j.effects + ' · متبناة: ' + j.adopted
+              + (j.skipped && j.skipped.length ? ' · متخطاة معلنة: ' + j.skipped.length : '');
         alert(msg);
         location.reload();
     });

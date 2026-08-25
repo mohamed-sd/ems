@@ -45,15 +45,15 @@ if ($is_super_admin) {
 }
 if ($deptCode === null || !isset($REG[$deptCode])) {
     ems_gov_flash_redirect('../main/dashboard.php',
-        'لا نطاقَ حوكمةٍ مُعلَنٌ لدورك — ولا يُخمَّن لك نطاقُ إدارةٍ أخرى',
-        'GOV-SCOPE-404', 'يُضاف نطاقُ الإدارةِ في includes/dept_gov_registry.php');
+        'لا نطاق حوكمة معلن لدورك — ولا يخمن لك نطاق إدارة أخرى',
+        'GOV-SCOPE-404', 'يضاف نطاق الإدارة في includes/dept_gov_registry.php');
 }
 
 $GOV_DEPT = $REG[$deptCode];
 
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
 // ويُخرجها includes/dept_gov_space.php بعدَ ترويسةِ الصفحةِ مباشرة
-$GOV_DEPT_STATES = ems_states_bundle('لا سجلاتِ حوكمةٍ في نطاقِ هذه الإدارة', 'راجِعْ حساباتِ الإدارةِ التابعةَ وصلاحياتِها — والنطاقُ من دورِ الجلسةِ لا من الرابط');
+$GOV_DEPT_STATES = ems_states_bundle('لا سجلات حوكمة في نطاق هذه الإدارة', 'راجع حسابات الإدارة التابعة وصلاحياتها — والنطاق من دور الجلسة لا من الرابط');
 
 /* فصلُ الواجباتِ يُقاس على المستنداتِ الحيةِ لا نصًّا — وكلُّ قياسٍ مقيَّدٌ
    بشركةِ الجلسة، فلا يتسرّب صفٌّ من شركةٍ أخرى فضلًا عن إدارةٍ أخرى. */
@@ -61,7 +61,7 @@ $GOV_DEPT['sod_queries'] = array();
 if ($deptCode === 'flt') {
     $GOV_DEPT['sod_queries'] = array(
         array(
-            'title' => 'تسجيلُ عطلِ المعدةِ وإغلاقُه بيدٍ واحدة',
+            'title' => 'تسجيل عطل المعدة وإغلاقه بيد واحدة',
             'sql' => "SELECT CONCAT('FLT-', f.id) doc, u.name person
                         FROM fleet_failures f LEFT JOIN users u ON u.id = f.closed_by
                        WHERE f.company_id = {$company_id} AND f.closed_by IS NOT NULL
@@ -71,7 +71,7 @@ if ($deptCode === 'flt') {
 } elseif ($deptCode === 'trp') {
     $GOV_DEPT['sod_queries'] = array(
         array(
-            'title' => 'إنشاءُ أمرِ الترحيلِ واعتمادُه بيدٍ واحدة',
+            'title' => 'إنشاء أمر الترحيل واعتماده بيد واحدة',
             'sql' => "SELECT t.order_no doc, u.name person
                         FROM transfer_orders t LEFT JOIN users u ON u.id = t.created_by
                        WHERE t.company_id = {$company_id} AND t.stage <> 'request'

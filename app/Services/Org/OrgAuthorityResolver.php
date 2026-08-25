@@ -68,8 +68,8 @@ class OrgAuthorityResolver
             $had = intval($stmt->get_result()->fetch_assoc()['c']);
             $stmt->close();
             $out['reason'] = $had > 0
-                ? 'التكليف منتهٍ — الصلاحية سقطت آليًّا بانتهاء مدته (ORG-01 §2)'
-                : 'لا تكليف تنظيميًّا نافذًا لهذا الشخص';
+                ? 'التكليف منته — الصلاحية سقطت آليا بانتهاء مدته (ORG-01 §2)'
+                : 'لا تكليف تنظيميا نافذا لهذا الشخص';
             self::deny($conn, $companyId, $personId, $out['reason'], $opt);
             return $out;
         }
@@ -87,7 +87,7 @@ class OrgAuthorityResolver
                     && floatval($opt['amount']) > floatval($cap['amount_cap'])) {
                     $out['code'] = 409;
                     $out['reason'] = 'فوق سقف التكليف — المتاح ' . number_format(floatval($cap['amount_cap']), 2)
-                        . ' ' . ($cap['currency'] ?: '') . '؛ يُرفع للمستوى الأعلى';
+                        . ' ' . ($cap['currency'] ?: '') . '؛ يرفع للمستوى الأعلى';
                     $out['asg_id'] = intval($a['asg_id']);
                     return $out;
                 }

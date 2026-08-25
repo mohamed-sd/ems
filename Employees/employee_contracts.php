@@ -79,7 +79,7 @@ include('../insidebar.php'); ?>
     $header_back = array('href' => 'employees.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا عقودَ مسجَّلةً لهذا السائق بعدُ', 'أنشئ أولَ عقدٍ بزرِّ «عقد جديد» في رأسِ الشاشة');
+    echo ems_states_bundle('لا عقود مسجلة لهذا السائق بعد', 'أنشئ أول عقد بزر «عقد جديد» في رأس الشاشة');
     ?>
 
     <!-- فورم إضافة عقد -->
@@ -121,7 +121,7 @@ include('../insidebar.php'); ?>
               <label>عقد المشروع <font color="red">*</font></label>
               <div class="control">
                 <select name="project_contract_id" aria-label="عقد المشروع" id="project_contract_id" required disabled>
-                  <option value="">— اختر المشروع أولاً —</option>
+                  <option value="">— اختر المشروع أولا —</option>
                 </select>
               </div>
             </div>
@@ -157,7 +157,7 @@ include('../insidebar.php'); ?>
           <hr class="hr" />
 
           <!-- القسم 2: إجماليات الساعات (يومياً وللعقد) -->
-          <div class="section-title"><span class="chip">2</span> إجماليات الساعات (يومياً وللعقد)</div>
+          <div class="section-title"><span class="chip">2</span> إجماليات الساعات (يوميا وللعقد)</div>
           <br>
 
           <div class="totals">
@@ -179,7 +179,7 @@ include('../insidebar.php'); ?>
 
           <div class="contract-hours-note">
             <p>
-              <i class="fas fa-info-circle"></i> <strong>ملاحظة:</strong> يتم حساب الإجماليات تلقائياً بناءً على
+              <i class="fas fa-info-circle"></i> <strong>ملاحظة:</strong> يتم حساب الإجماليات تلقائيا بناء على
               البيانات المدخلة في الأقسام التالية
             </p>
           </div>
@@ -224,7 +224,7 @@ include('../insidebar.php'); ?>
             <div class="field md-3 sm-6">
               <label>مدة العقد بالأيام </label>
               <div class="control"><input name="contract_duration_days" id="contract_duration_days" type="number"
-                  min="0" placeholder="يُحتسب تلقائياً" readonly aria-label="يُحتسب تلقائياً"></div>
+                  min="0" placeholder="يحتسب تلقائيا" readonly aria-label="يحتسب تلقائيا"></div>
             </div>
 
 
@@ -289,7 +289,7 @@ include('../insidebar.php'); ?>
               <div class="control"><input name="shift_contract" aria-label="ساعات الوردية للعقد" type="number" min="0"></div>
             </div>
             <div class="field md-3 sm-6">
-              <label>إجمالي الوحدات يومياً للعقد </label>
+              <label>إجمالي الوحدات يوميا للعقد </label>
               <div class="control"><input name="equip_total_contract" type="number" placeholder=" "></div>
             </div>
             <div class="field md-3 sm-6">
@@ -456,9 +456,9 @@ include('../insidebar.php'); ?>
                     <div class="control"><input name="shift_hours_1" aria-label="ساعات الوردية — المعدة رقم 1" type="number" min="0"></div>
                   </div>
                   <div class="field md-3 sm-6">
-                    <label>إجمالي الوحدات يومياً</label>
+                    <label>إجمالي الوحدات يوميا</label>
                     <div class="control"><input name="equip_total_month_1" type="number" readonly
-                        placeholder="يُحتسب تلقائياً" aria-label="يُحتسب تلقائياً"></div>
+                        placeholder="يحتسب تلقائيا" aria-label="يحتسب تلقائيا"></div>
                   </div>
                   <div class="field md-3 sm-6">
                     <label>وحدات العمل في الشهر</label>
@@ -469,7 +469,7 @@ include('../insidebar.php'); ?>
                   <div class="field md-3 sm-6">
                     <label>إجمالي وحدات العقد</label>
                     <div class="control"><input name="equip_total_contract_1" type="number" readonly
-                        placeholder="يُحتسب تلقائياً" aria-label="يُحتسب تلقائياً"></div>
+                        placeholder="يحتسب تلقائيا" aria-label="يحتسب تلقائيا"></div>
                   </div>
 
 
@@ -655,8 +655,8 @@ include('../insidebar.php'); ?>
               <th class="group-services"><i class="fas fa-wrench"></i> الورشة</th>
 
               <!-- التشغيل اليومي -->
-              <th class="group-operations"><i class="fas fa-business-time"></i> ساعات العمل يومياً</th>
-              <th class="group-operations"><i class="fas fa-users-cog"></i> عدد المشغلين يومياً</th>
+              <th class="group-operations"><i class="fas fa-business-time"></i> ساعات العمل يوميا</th>
+              <th class="group-operations"><i class="fas fa-users-cog"></i> عدد المشغلين يوميا</th>
 
               <!-- البيانات المالية -->
               <th class="group-basic"><i class="fas fa-money-bill-wave"></i> العملة</th>
@@ -674,8 +674,8 @@ include('../insidebar.php'); ?>
               <th class="ems-fn-th none" data-fn="1">عقد المورد المرتبط</th>
               <th class="ems-fn-th none" data-fn="1">تاريخ البدء</th>
               <th class="ems-fn-th none" data-fn="1">تاريخ الانتهاء المخطط</th>
-              <th class="ems-fn-th none" data-fn="1">محفّزات الانتهاء الثلاثة</th>
-              <th class="ems-fn-th none" data-fn="1">المحفّز الواقع</th>
+              <th class="ems-fn-th none" data-fn="1">محفزات الانتهاء الثلاثة</th>
+              <th class="ems-fn-th none" data-fn="1">المحفز الواقع</th>
               <th class="ems-fn-th none" data-fn="1">تاريخ الانتهاء الفعلي</th>
               <th class="ems-fn-th none" data-fn="1">فترة التجربة</th>
               <th class="ems-fn-th none" data-fn="1">الراتب الأساسي</th>
@@ -685,20 +685,20 @@ include('../insidebar.php'); ?>
               <th class="ems-fn-th none" data-fn="1">نموذج الحافز</th>
               <th class="ems-fn-th none" data-fn="1">رصيد الإجازة السنوية</th>
               <th class="ems-fn-th none" data-fn="1">جهة التحمل</th>
-              <th class="ems-fn-th none" data-fn="1">وقّعه عنّا</th>
-              <th class="ems-fn-th none" data-fn="1">وقّعه الموظف</th>
+              <th class="ems-fn-th none" data-fn="1">وقعه عنا</th>
+              <th class="ems-fn-th none" data-fn="1">وقعه الموظف</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-              <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
               <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-              <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+              <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
               <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
-              <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
-              <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطّلاع</th>
+              <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
+              <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطلاع</th>
               <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
               <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
@@ -849,7 +849,7 @@ include('../insidebar.php'); ?>
                   $__ecData = array(
                       'employee_id'   => $driver_id_post ?: $employee_id,
                       'category'      => 'operator',
-                      'relation_type' => 'عقدُ تشغيلٍ بمعدة',
+                      'relation_type' => 'عقد تشغيل بمعدة',
                       'project_id'    => $project_id ?: null,
                       'start_date'    => $contract_signing_date ?: null,
                       'currency'      => $price_currency_contract ?: null,
@@ -1239,8 +1239,8 @@ include('../insidebar.php'); ?>
               <div class="control"><input name="shift_hours_${equipmentIndex}" aria-label="ساعات الوردية — المعدة رقم ${equipmentIndex}" type="number" min="0"></div>
             </div>
             <div class="field md-3 sm-6">
-              <label>إجمالي الساعات يومياً</label>
-              <div class="control"><input name="equip_total_month_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً" aria-label="يُحتسب تلقائياً"></div>
+              <label>إجمالي الساعات يوميا</label>
+              <div class="control"><input name="equip_total_month_${equipmentIndex}" type="number" readonly placeholder="يحتسب تلقائيا" aria-label="يحتسب تلقائيا"></div>
             </div>
             <div class="field md-3 sm-6">
               <label>وحدات العمل في الشهر</label>
@@ -1249,7 +1249,7 @@ include('../insidebar.php'); ?>
 
             <div class="field md-3 sm-6">
               <label>إجمالي ساعات العقد</label>
-              <div class="control"><input name="equip_total_contract_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً" aria-label="يُحتسب تلقائياً"></div>
+              <div class="control"><input name="equip_total_contract_${equipmentIndex}" type="number" readonly placeholder="يحتسب تلقائيا" aria-label="يحتسب تلقائيا"></div>
             </div>
             <div class="field md-3 sm-6">
               <label>العملة</label>
@@ -1382,7 +1382,7 @@ include('../insidebar.php'); ?>
           }
         });
       } else {
-        $('#project_contract_id').html('<option value="">— اختر المشروع أولاً —</option>').prop('disabled', true);
+        $('#project_contract_id').html('<option value="">— اختر المشروع أولا —</option>').prop('disabled', true);
       }
     });
 
@@ -1643,8 +1643,8 @@ include('../insidebar.php'); ?>
                         <div class="control"><input name="shift_hours_${equipmentIndex}" aria-label="ساعات الوردية — المعدة رقم ${equipmentIndex}" type="number" min="0" value="${equip.shift_hours}"></div>
                       </div>
                       <div class="field md-3 sm-6">
-                        <label>إجمالي الساعات يومياً</label>
-                        <div class="control"><input name="equip_total_month_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً" value="${equip.equip_total_month}" aria-label="يُحتسب تلقائياً"></div>
+                        <label>إجمالي الساعات يوميا</label>
+                        <div class="control"><input name="equip_total_month_${equipmentIndex}" type="number" readonly placeholder="يحتسب تلقائيا" value="${equip.equip_total_month}" aria-label="يحتسب تلقائيا"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>وحدات العمل في الشهر</label>
@@ -1652,7 +1652,7 @@ include('../insidebar.php'); ?>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>إجمالي ساعات العقد</label>
-                        <div class="control"><input name="equip_total_contract_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً" value="${equip.equip_total_contract}" aria-label="يُحتسب تلقائياً"></div>
+                        <div class="control"><input name="equip_total_contract_${equipmentIndex}" type="number" readonly placeholder="يحتسب تلقائيا" value="${equip.equip_total_contract}" aria-label="يحتسب تلقائيا"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>العملة</label>

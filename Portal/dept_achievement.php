@@ -63,39 +63,39 @@ $ue_state   = ems_uc_accepted_sql('unit_entries');   // التعريفُ الم�
  */
 if (intval($unit) === 11) {   // المشتريات
     $metrics = array(
-        array('أوامرُ شراءٍ صدرت (غادرت المسودة)', $q("SELECT COUNT(*) FROM proc_order WHERE $cw
+        array('أوامر شراء صدرت (غادرت المسودة)', $q("SELECT COUNT(*) FROM proc_order WHERE $cw
               AND COALESCE(is_deleted,0)=0 AND state <> 'مسودة'
               AND created_at BETWEEN '$from' AND '$to 23:59:59'")),
-        array('عهدُ استلامٍ سُجّلت', $q("SELECT COUNT(*) FROM proc_receipt_custody WHERE $cw
+        array('عهد استلام سجلت', $q("SELECT COUNT(*) FROM proc_receipt_custody WHERE $cw
               AND COALESCE(is_deleted,0)=0
               AND created_at BETWEEN '$from' AND '$to 23:59:59'")),
-        array('فواتيرُ طوبقت (مطابقة ثلاثية)', $q("SELECT COUNT(*) FROM proc_order WHERE $cw
+        array('فواتير طوبقت (مطابقة ثلاثية)', $q("SELECT COUNT(*) FROM proc_order WHERE $cw
               AND COALESCE(is_deleted,0)=0 AND match_state = 'matched'
               AND matched_at BETWEEN '$from' AND '$to 23:59:59'")),
-        array('ذممُ موردين فُتحت بالمطابقة', $q("SELECT COUNT(*) FROM fin_dues WHERE $cw
+        array('ذمم موردين فتحت بالمطابقة', $q("SELECT COUNT(*) FROM fin_dues WHERE $cw
               AND party_type = 'proc_supplier' AND due_type = 'purchase'
               AND created_at BETWEEN '$from' AND '$to 23:59:59'")),
-        array('صرفياتُ مخزونٍ نُفّذت', $q("SELECT COUNT(*) FROM proc_issue WHERE $cw
+        array('صرفيات مخزون نفذت', $q("SELECT COUNT(*) FROM proc_issue WHERE $cw
               AND COALESCE(is_deleted,0)=0
               AND created_at BETWEEN '$from' AND '$to 23:59:59'")),
-        array('مساراتُ بلاغاتٍ أغلقتها الإدارة', $q("SELECT COUNT(*) FROM ticket_workstreams ws
+        array('مسارات بلاغات أغلقتها الإدارة', $q("SELECT COUNT(*) FROM ticket_workstreams ws
               JOIN tickets t ON t.id = ws.tk_id AND t.$cw
               WHERE ws.org_unit_id = " . intval($unit) . " AND ws.state = 'closed'
               AND ws.closed_at BETWEEN '$from' AND '$to 23:59:59'")),
     );
 } else {
 $metrics = array(
-    array('وحداتٌ معتمدةٌ في المدة', $q("SELECT COUNT(*) FROM unit_entries WHERE $cw
+    array('وحدات معتمدة في المدة', $q("SELECT COUNT(*) FROM unit_entries WHERE $cw
           AND $ue_state AND entry_date BETWEEN '$from' AND '$to'
           AND entered_by IN ($dept_users)")),
-    array('ساعاتٌ منفَّذةٌ معتمدة', $q("SELECT COALESCE(SUM(qty),0) FROM unit_entries WHERE $cw
+    array('ساعات منفذة معتمدة', $q("SELECT COALESCE(SUM(qty),0) FROM unit_entries WHERE $cw
           AND $ue_state AND entry_date BETWEEN '$from' AND '$to'
           AND entered_by IN ($dept_users)")),
-    array('مساراتُ بلاغاتٍ أغلقتها الإدارة', $q("SELECT COUNT(*) FROM ticket_workstreams ws
+    array('مسارات بلاغات أغلقتها الإدارة', $q("SELECT COUNT(*) FROM ticket_workstreams ws
           JOIN tickets t ON t.id = ws.tk_id AND t.$cw
           WHERE ws.org_unit_id = " . intval($unit) . " AND ws.state = 'closed'
           AND ws.closed_at BETWEEN '$from' AND '$to 23:59:59'")),
-    array('أوامرُ صيانةٍ أُقفلت', $q("SELECT COUNT(*) FROM mnt_order WHERE $cw
+    array('أوامر صيانة أقفلت', $q("SELECT COUNT(*) FROM mnt_order WHERE $cw
           AND state = 'إغلاق' AND updated_at BETWEEN '$from' AND '$to 23:59:59'
           AND created_by IN ($dept_users)")),
 );
@@ -115,11 +115,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 /* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
    شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
 $header_icon = 'fa fa-chart-line';
-$header_title_html = htmlspecialchars('إنجازُ الإدارة', ENT_QUOTES, 'UTF-8');
+$header_title_html = htmlspecialchars('إنجاز الإدارة', ENT_QUOTES, 'UTF-8');
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
-echo ems_states_bundle('لا نشاطَ معتمدًا للإدارةِ في هذه المدة', 'وسّع «من/إلى» أعلاه أو تحقق من توفرِ السجلات');
+echo ems_states_bundle('لا نشاط معتمدا للإدارة في هذه المدة', 'وسع «من/إلى» أعلاه أو تحقق من توفر السجلات');
 ?>
     <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
   <div class="filter">
@@ -134,7 +134,7 @@ echo ems_states_bundle('لا نشاطَ معتمدًا للإدارةِ في ه�
   </div>
   <?php $allZero = true; foreach ($metrics as $m2) if ($m2[1] > 0) { $allZero = false; break; }
   if ($allZero): ?>
-    <div class="alert alert-warning">لا نشاطَ معتمدًا في هذه المدة — وسّع «من/إلى» أعلاه.</div>
+    <div class="alert alert-warning">لا نشاط معتمدا في هذه المدة — وسع «من/إلى» أعلاه.</div>
   <?php endif; ?>
   <?php
   /* بطاقاتُ الإحصاءِ الموحَّدة — التصميمُ من `assets/css/ems-statcards.css` وحدَه.
@@ -157,5 +157,5 @@ echo ems_states_bundle('لا نشاطَ معتمدًا للإدارةِ في ه�
     </div>
     <?php endforeach; ?>
   </div>
-  <p class="text-muted ems-dach-note">إنجازُ الفرد في «إنجازي» بمساحة عملي — وهذا إنجازُ الإدارة (NAV-01 §7-④).</p>
+  <p class="text-muted ems-dach-note">إنجاز الفرد في «إنجازي» بمساحة عملي — وهذا إنجاز الإدارة (NAV-01 §7-④).</p>
 </div>

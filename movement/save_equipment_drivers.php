@@ -19,7 +19,7 @@ $is_super_admin = ($current_role === '-1');
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    echo "❌ معرّف الشركة غير متوفر.";
+    echo "❌ معرف الشركة غير متوفر.";
     exit;
 }
 

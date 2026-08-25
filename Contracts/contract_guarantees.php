@@ -117,8 +117,8 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     include('../includes/page_header.php');
     if (isset($_GET['msg'])) { echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>'; }
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا أدواتِ ضمانٍ مسجَّلةً على هذا العقد بعدُ',
-                           'اختر عقدًا من جدولِ العقود ثم سجّل أولَ أداةٍ بنموذجِ «أداةُ ضمانٍ جديدة»');
+    echo ems_states_bundle('لا أدوات ضمان مسجلة على هذا العقد بعد',
+                           'اختر عقدا من جدول العقود ثم سجل أول أداة بنموذج «أداة ضمان جديدة»');
     ?>
 
     <style>
@@ -179,7 +179,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
 
     <?php if ($head): ?>
     <div class="card"><div class="card-header"><h5><i class="fa fa-shield-halved"></i>
-        ضماناتُ العقد #<?php echo $CID; ?> — <?php echo htmlspecialchars((string)$head['second_party']); ?></h5></div>
+        ضمانات العقد #<?php echo $CID; ?> — <?php echo htmlspecialchars((string)$head['second_party']); ?></h5></div>
     <div class="card-body">
         <div class="cg-cards">
             <div class="cg-card">
@@ -192,27 +192,27 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                 <div class="cg-card-label"><strong>التزامٌ محتملٌ خارج الميزانية</strong></div>
                 <div class="cg-card-value"><?php echo $exp['off_balance']; ?>
                     <?php echo htmlspecialchars((string)$exp['currency']); ?></div>
-                <small><strong>لا يظهر أصلًا ولا يُخصم من مستخلص</strong></small>
+                <small><strong>لا يظهر أصلا ولا يخصم من مستخلص</strong></small>
             </div>
             <div class="cg-card-side">
-                <span class="badge badge-warning cg-badge-pad"><strong>رقمان لا يُجمعان</strong></span>
+                <span class="badge badge-warning cg-badge-pad"><strong>رقمان لا يجمعان</strong></span>
                 <?php if (($exp['expiring'] ?? 0) > 0): ?>
                     <span class="badge badge-warning cg-badge-pad">
-                        <?php echo intval($exp['expiring']); ?> أداةً انقضى سريانُها</span>
+                        <?php echo intval($exp['expiring']); ?> أداة انقضى سريانها</span>
                 <?php endif; ?>
             </div>
         </div>
 
         <div class="table-container">
         <table class="alltables display nowrap no-datatable cg-table" data-no-dt="1">
-            <thead><tr><th>#</th><th>النوع</th><th>الطبيعة</th><th>يُخصم؟</th><th>القيمة</th><th>%</th>
-                <th>المُصدر</th><th>المرجع</th><th>انتهاءُ السريان</th><th>ردُّ المحتجَز</th>
-                <th>الحال</th><th>النصُّ الأصلي</th><th></th>
+            <thead><tr><th>#</th><th>النوع</th><th>الطبيعة</th><th>يخصم؟</th><th>القيمة</th><th>%</th>
+                <th>المصدر</th><th>المرجع</th><th>انتهاء السريان</th><th>رد المحتجز</th>
+                <th>الحال</th><th>النص الأصلي</th><th></th>
                 <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                 <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                 <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                 <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -251,17 +251,17 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                             <input type="hidden" name="g_action" value="state">
                             <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
                             <input type="hidden" name="gid" value="<?php echo intval($r['id']); ?>">
-                            <select name="state" class="cg-w110" aria-label="الحالُ الجديدُ لأداةِ الضمان">
+                            <select name="state" class="cg-w110" aria-label="الحال الجديد لأداة الضمان">
                                 <?php foreach ($STATE_AR as $k => $v): ?>
                                     <option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option>
                                 <?php endforeach; ?></select>
-                            <input type="text" name="state_reason" class="cg-w130" placeholder="سببُ تغييرِ الحال" aria-label="سببُ تغييرِ حالِ الأداة">
-                            <input type="date" name="state_at" class="cg-w140" aria-label="تاريخُ تغييرِ حالِ الأداة">
+                            <input type="text" name="state_reason" class="cg-w130" placeholder="سبب تغيير الحال" aria-label="سبب تغيير حال الأداة">
+                            <input type="date" name="state_at" class="cg-w140" aria-label="تاريخ تغيير حال الأداة">
                             <button type="submit" class="action-btn"><i class="fa fa-check"></i></button>
                         </form>
                     <?php else: ?>—<?php endif; ?></td></tr>
             <?php endforeach; ?>
-            <?php if (!$rows): ?><tr><td colspan="13"><em>لا ضماناتٍ مسجَّلة</em></td></tr><?php endif; ?>
+            <?php if (!$rows): ?><tr><td colspan="13"><em>لا ضمانات مسجلة</em></td></tr><?php endif; ?>
             </tbody>
         </table>
         </div>
@@ -271,8 +271,8 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         <?php echo csrf_field(); ?>
             <input type="hidden" name="g_action" value="add">
             <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
-            <h6><i class="fa fa-plus"></i> أداةُ ضمانٍ جديدة —
-                <strong>والنوعُ يحسم الطبيعةَ وقابليةَ الخصم</strong></h6>
+            <h6><i class="fa fa-plus"></i> أداة ضمان جديدة —
+                <strong>والنوع يحسم الطبيعة وقابلية الخصم</strong></h6>
             <div class="cg-add-grid">
                 <div class="form-group"><label for="emsf_35_741f3">النوع</label>
                     <select name="kind" id="emsf_35_741f3">
@@ -286,22 +286,22 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                 <div class="form-group"><label for="emsf_38_b0f47">العملة</label>
                     <input type="text" name="currency" maxlength="8" class="cg-w80" id="emsf_38_b0f47"
                            value="<?php echo htmlspecialchars((string)$head['price_currency_contract']); ?>"></div>
-                <div class="form-group"><label for="emsf_39_1693c">المُصدر</label>
+                <div class="form-group"><label for="emsf_39_1693c">المصدر</label>
                     <input type="text" name="issuer" maxlength="190" class="cg-w200" id="emsf_39_1693c"></div>
-                <div class="form-group"><label for="emsf_40_d6e85">رقمُ الخطاب/الوثيقة</label>
+                <div class="form-group"><label for="emsf_40_d6e85">رقم الخطاب/الوثيقة</label>
                     <input type="text" name="instrument_ref" maxlength="120" class="cg-w150" id="emsf_40_d6e85"></div>
-                <div class="form-group"><label for="emsf_41_c32f3">تاريخُ الإصدار</label>
+                <div class="form-group"><label for="emsf_41_c32f3">تاريخ الإصدار</label>
                     <input type="date" name="issue_date" id="emsf_41_c32f3"></div>
-                <div class="form-group"><label for="emsf_42_def6e">انتهاءُ السريان <small>(لغير المحتجَز)</small></label>
+                <div class="form-group"><label for="emsf_42_def6e">انتهاء السريان <small>(لغير المحتجز)</small></label>
                     <input type="date" name="expiry_date" id="emsf_42_def6e"></div>
-                <div class="form-group"><label for="emsf_43_97f1d">تاريخُ ردِّ المحتجَز</label>
+                <div class="form-group"><label for="emsf_43_97f1d">تاريخ رد المحتجز</label>
                     <input type="date" name="due_release_date" id="emsf_43_97f1d"></div>
-                <div class="form-group cg-mw260"><label for="emsf_44_7e7b1">أو شرطُ الرد</label>
+                <div class="form-group cg-mw260"><label for="emsf_44_7e7b1">أو شرط الرد</label>
                     <input type="text" name="release_condition" maxlength="200" id="emsf_44_7e7b1"></div>
                 <div class="form-group cg-mw220"><label for="emsf_45_cd491">ملاحظة</label>
                     <input type="text" name="note" maxlength="255" id="emsf_45_cd491"></div>
             </div>
-            <button type="submit" class="btn-primary"><i class="fa fa-plus"></i> سجّل الأداة</button>
+            <button type="submit" class="btn-primary"><i class="fa fa-plus"></i> سجل الأداة</button>
         </form>
         <?php endif; ?>
     </div></div>

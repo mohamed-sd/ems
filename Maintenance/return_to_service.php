@@ -26,7 +26,7 @@ $msg = '';
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['rts_order'])) {
     $oid  = intval($_POST['rts_order']);
     $cert = trim($_POST['readiness_note'] ?? '');
-    if ($cert === '') { $msg = 'شهادةُ الجاهزية إلزامية (422)'; }
+    if ($cert === '') { $msg = 'شهادة الجاهزية إلزامية (422)'; }
     else {
         $r = mysqli_query($conn, "SELECT equipment_id FROM mnt_order WHERE id=$oid AND company_id=$company_id AND state IN ('Done','Executed','QA')");
         if ($r && ($o = mysqli_fetch_assoc($r))) {
@@ -62,10 +62,10 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['rts_order']))
                           'readiness_note' => mb_substr($cert, 0, 200),
                           'equipment_id' => (int) $o['equipment_id']),
                     array('company_id' => (int) $company_id, 'user_id' => (int) $uid));
-                $msg = "عادت المعدةُ للخدمة وأُقفل الأمرُ #$oid — الشهادة: $cert";
+                $msg = "عادت المعدة للخدمة وأقفل الأمر #$oid — الشهادة: $cert";
             }
             else { mysqli_rollback($conn); $msg = 'فشلت المعاملة: ' . mysqli_error($conn); }
-        } else { $msg = 'الأمرُ ليس منجَزًا بانتظار العودة (409)'; }
+        } else { $msg = 'الأمر ليس منجزا بانتظار العودة (409)'; }
     }
 }
 
@@ -89,28 +89,28 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 /* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
    شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
 $header_icon = 'fa fa-check-circle';
-$header_title_html = htmlspecialchars('العودةُ للخدمة', ENT_QUOTES, 'UTF-8');
+$header_title_html = htmlspecialchars('العودة للخدمة', ENT_QUOTES, 'UTF-8');
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-echo ems_states_bundle('لا أوامرَ صيانةٍ منجَزةً بانتظارِ العودةِ للخدمة', 'أنجِزْ أمرَ الصيانةِ من شاشةِ أوامرِ الصيانةِ ليظهر هنا لإصدارِ شهادةِ الجاهزية');
+echo ems_states_bundle('لا أوامر صيانة منجزة بانتظار العودة للخدمة', 'أنجز أمر الصيانة من شاشة أوامر الصيانة ليظهر هنا لإصدار شهادة الجاهزية');
 ?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
   <table class="table table-striped" data-no-dt>
-    <thead><tr><th>الأمر</th><th>المعدة</th><th>حالتها</th><th>شهادةُ الجاهزية</th><th>إجراء</th>
+    <thead><tr><th>الأمر</th><th>المعدة</th><th>حالتها</th><th>شهادة الجاهزية</th><th>إجراء</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
               </tr></thead>
     <tbody>
-    <?php if (empty($rows)): ?><tr><td colspan="5" class="text-center text-muted">لا أوامرَ منجَزةً بانتظار العودة</td></tr><?php endif; ?>
+    <?php if (empty($rows)): ?><tr><td colspan="5" class="text-center text-muted">لا أوامر منجزة بانتظار العودة</td></tr><?php endif; ?>
     <?php foreach ($rows as $o): ?>
       <tr>
         <td><?= htmlspecialchars($o['order_no'] ?: '#' . $o['id'], ENT_QUOTES, 'UTF-8') ?></td>
@@ -119,7 +119,7 @@ echo ems_states_bundle('لا أوامرَ صيانةٍ منجَزةً بانتظ
         <form method="post">
         <?= csrf_field() ?>
           <input type="hidden" name="rts_order" value="<?= intval($o['id']) ?>">
-          <td><input type="text" name="readiness_note" class="form-control form-control-sm" placeholder="فُحصت وجاهزة — التوقيع الفني" required aria-label="فُحصت وجاهزة — التوقيع الفني"></td>
+          <td><input type="text" name="readiness_note" class="form-control form-control-sm" placeholder="فحصت وجاهزة — التوقيع الفني" required aria-label="فحصت وجاهزة — التوقيع الفني"></td>
           <td><button class="action-btn" type="submit"><i class="fa fa-undo"></i> أعد للخدمة وأقفل</button></td>
         </form>
       </tr>

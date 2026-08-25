@@ -33,7 +33,7 @@ class EntityGovernanceService
         $entityId = intval($entityId);
         $mode = (string) $mode;
         if (!in_array($mode, array('full', 'partial', 'unknown'), true)) {
-            return array('ok' => false, 'code' => 422, 'reason' => 'وسمُ اكتمالٍ غيرُ معروف: ' . $mode);
+            return array('ok' => false, 'code' => 422, 'reason' => 'وسم اكتمال غير معروف: ' . $mode);
         }
         $r = $conn->query('SELECT ownership_completeness FROM legal_entities WHERE entity_id = ' . $entityId);
         $ent = $r ? $r->fetch_assoc() : null;
@@ -46,8 +46,8 @@ class EntityGovernanceService
             foreach (self::treeAt($conn, $entityId, date('Y-m-d')) as $row) { $sum += (float) $row['percent']; }
             if (abs($sum - 100.0) > 0.005) {
                 return array('ok' => false, 'code' => 422,
-                    'reason' => 'لا يُوسم «كامل الهيكل»: Σ الحصص النافذة ' . number_format($sum, 2)
-                              . ' (الفارق ' . sprintf('%+0.2f', $sum - 100) . ') — أكمل الهيكل إلى 100 ثم وسِّم');
+                    'reason' => 'لا يوسم «كامل الهيكل»: Σ الحصص النافذة ' . number_format($sum, 2)
+                              . ' (الفارق ' . sprintf('%+0.2f', $sum - 100) . ') — أكمل الهيكل إلى 100 ثم وسم');
             }
         }
         $stmt = $conn->prepare('UPDATE legal_entities SET ownership_completeness = ? WHERE entity_id = ?');
@@ -78,7 +78,7 @@ class EntityGovernanceService
 
         if ($mode === 'full' && $sum - 100.0 > 0.005) {
             return array('ok' => false, 'code' => 422,
-                'reason' => 'كيان «كامل الهيكل»: Σ ' . number_format($sum, 2) . ' (الفارق ' . sprintf('%+0.2f', $sum - 100) . ') — يُفرض 100 بالضبط');
+                'reason' => 'كيان «كامل الهيكل»: Σ ' . number_format($sum, 2) . ' (الفارق ' . sprintf('%+0.2f', $sum - 100) . ') — يفرض 100 بالضبط');
         }
         if ($mode === 'partial' && $sum - 100.0 > 0.005) {
             return array('ok' => false, 'code' => 422, 'reason' => 'كيان «جزئي»: Σ لا تتجاوز 100 — الفعلي ' . number_format($sum, 2));
@@ -95,7 +95,7 @@ class EntityGovernanceService
         if (!$stmt->execute()) { $err = $stmt->error; $stmt->close(); return array('ok' => false, 'code' => 422, 'reason' => $err); }
         $id = intval($stmt->insert_id);
         $stmt->close();
-        $flag = ($mode === 'unknown') ? ' — الهيكل مجهول: المعلوم يُسجَّل موسومًا بالنقص لا ملفَّقًا' : '';
+        $flag = ($mode === 'unknown') ? ' — الهيكل مجهول: المعلوم يسجل موسوما بالنقص لا ملفقا' : '';
         // تضارب المصالح: مالكٌ شخصٌ هو موظف/مستخدم عندنا — كشفٌ وتنبيه لا منع
         $conflict = false;
         if ($ot === 'person') {
@@ -107,7 +107,7 @@ class EntityGovernanceService
             }
         }
         return array('ok' => true, 'code' => 201, 'own_id' => $id, 'conflict_detected' => $conflict,
-            'reason' => 'سُجّلت العلاقة (Σ عند ' . $from . ' = ' . number_format($sum, 2) . ')' . $flag);
+            'reason' => 'سجلت العلاقة (Σ عند ' . $from . ' = ' . number_format($sum, 2) . ')' . $flag);
     }
 
     /** بيع/تغيير: إنهاء السابقة بتاريخ وفتح الجديدة من التاريخ نفسه — لا أثر رجعي. */
@@ -119,7 +119,7 @@ class EntityGovernanceService
         $row = $r ? $r->fetch_assoc() : null;
         if (!$row) { return array('ok' => false, 'code' => 404, 'reason' => 'العلاقة غير موجودة'); }
         if ($row['valid_to'] !== null) {
-            return array('ok' => false, 'code' => 423, 'reason' => 'علاقة منتهية سلفًا — لا تُعدَّل نسبة قائمة بأثر رجعي، والتغيير علاقة جديدة بتاريخها');
+            return array('ok' => false, 'code' => 423, 'reason' => 'علاقة منتهية سلفا — لا تعدل نسبة قائمة بأثر رجعي، والتغيير علاقة جديدة بتاريخها');
         }
         if ($onDate <= $row['valid_from']) {
             return array('ok' => false, 'code' => 423, 'reason' => 'تاريخ الانتقال قبل بدء العلاقة — لا أثر رجعي');
@@ -137,7 +137,7 @@ class EntityGovernanceService
         $newId = intval($stmt->insert_id);
         $stmt->close();
         return array('ok' => true, 'code' => 200, 'new_own_id' => $newId,
-            'reason' => 'أُنهيت حصة البائع ' . $prevEnd . ' وفُتحت حصة المشتري ' . $onDate . ' — Σ باقٍ كما هو');
+            'reason' => 'أنهيت حصة البائع ' . $prevEnd . ' وفتحت حصة المشتري ' . $onDate . ' — Σ باق كما هو');
     }
 
     /** شجرة الملكية في تاريخ. */
@@ -198,6 +198,6 @@ class EntityGovernanceService
             $n++;
         }
         return array('ok' => true, 'code' => 200, 'elements' => $n,
-            'reason' => 'النمط ' . $pattern . ' مفعَّل لنطاقه وحده — وبقية النطاقات كما هي (G7/G8)');
+            'reason' => 'النمط ' . $pattern . ' مفعل لنطاقه وحده — وبقية النطاقات كما هي (G7/G8)');
     }
 }

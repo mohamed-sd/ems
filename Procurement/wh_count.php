@@ -41,9 +41,9 @@ $__pc = ems_post_contract($conn, array(
     'validate' => function (array $in) {
         $why  = trim($in['reason'] ?? '');
         $diff = floatval($in['actual_qty'] ?? 0) - floatval($in['book_qty'] ?? 0);
-        if ($why === '')            { return array('ok' => false, 'msg' => 'سببُ التسوية إلزامي (422)'); }
-        if (abs($diff) < 0.001)     { return array('ok' => false, 'msg' => 'لا فرقَ — لا تسويةَ تُكتب'); }
-        if (intval($in['adjust_item'] ?? 0) <= 0) { return array('ok' => false, 'msg' => 'صنفٌ غيرُ صالح (422)'); }
+        if ($why === '')            { return array('ok' => false, 'msg' => 'سبب التسوية إلزامي (422)'); }
+        if (abs($diff) < 0.001)     { return array('ok' => false, 'msg' => 'لا فرق — لا تسوية تكتب'); }
+        if (intval($in['adjust_item'] ?? 0) <= 0) { return array('ok' => false, 'msg' => 'صنف غير صالح (422)'); }
         return array('ok' => true, 'data' => array(
             'item' => intval($in['adjust_item']), 'diff' => $diff, 'why' => $why,
         ));
@@ -97,13 +97,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 /* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
    شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
 $header_icon = 'fa fa-clipboard-list';
-$header_title_html = htmlspecialchars('الجردُ والتسويات', ENT_QUOTES, 'UTF-8');
+$header_title_html = htmlspecialchars('الجرد والتسويات', ENT_QUOTES, 'UTF-8');
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 /* حزمةُ الحالاتِ الدنيا (بوابة ٩): تحميلٌ وفراغٌ وخطأٌ — مخفيةٌ افتراضًا */
-echo ems_states_bundle('لا أصنافَ للجردِ في هذا الاختيار',
-    'اخترِ المخزنَ وفترةَ الحركات — فيُعرضُ الرصيدُ الدفتريُّ المحسوبُ من الحركاتِ ويُجرى الجردُ عليه');
+echo ems_states_bundle('لا أصناف للجرد في هذا الاختيار',
+    'اختر المخزن وفترة الحركات — فيعرض الرصيد الدفتري المحسوب من الحركات ويجرى الجرد عليه');
 ?>
   <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
@@ -111,7 +111,7 @@ echo ems_states_bundle('لا أصنافَ للجردِ في هذا الاختي�
            تحمل `moved_at`. فأُضيف مدى تاريخٍ يُطبَّق في وصلِ الحركاتِ نفسِه،
            وعدّادُ الفلاترِ وزرُّ التفريغِ من شريطِ العُدَّةِ المشترك. */ ?>
   <form method="get" class="filter" data-ems-period="1">
-    <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> المخزنُ وفترةُ الحركات</div>
+    <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> المخزن وفترة الحركات</div>
     <div class="filter-body">
       <div class="filter-field"><label for="emsf_1349_f75ee">المخزن</label>
         <select name="wh" class="form-control" id="emsf_1349_f75ee"><option value="">—</option>
@@ -127,7 +127,7 @@ echo ems_states_bundle('لا أصنافَ للجردِ في هذا الاختي�
            بلا جدولٍ ولا تفسير. صار يُصيَّر دائمًا: الحالةُ الفارغةُ المشتركةُ
            تشرح ما ينقص (اختيارُ مخزن). */ ?>
   <table class="table table-striped" data-no-dt>
-    <thead><tr><th>رقم الصنف</th><th>الدفتري (محسوبٌ من الحركات)</th><th>الفعليُّ المجرود</th><th>سبب الفرق</th><th>قرار التسوية</th>
+    <thead><tr><th>رقم الصنف</th><th>الدفتري (محسوب من الحركات)</th><th>الفعلي المجرود</th><th>سبب الفرق</th><th>قرار التسوية</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">رقم المحضر</th>
               <th class="ems-fn-th" data-fn="1">تاريخ الجرد</th>
@@ -136,26 +136,26 @@ echo ems_states_bundle('لا أصنافَ للجردِ في هذا الاختي�
               <th class="ems-fn-th" data-fn="1">الفترة</th>
               <th class="ems-fn-th" data-fn="1">اسم الصنف</th>
               <th class="ems-fn-th" data-fn="1">الرصيد الدفتري</th>
-              <th class="ems-fn-th" data-fn="1">العدّ الفعلي</th>
+              <th class="ems-fn-th" data-fn="1">العد الفعلي</th>
               <th class="ems-fn-th" data-fn="1">الفرق</th>
               <th class="ems-fn-th" data-fn="1">نسبة الفرق</th>
               <th class="ems-fn-th" data-fn="1">قيمة الفرق</th>
               <th class="ems-fn-th" data-fn="1">رقم قيد التسوية</th>
-              <th class="ems-fn-th" data-fn="1">عدّه</th>
+              <th class="ems-fn-th" data-fn="1">عده</th>
               <th class="ems-fn-th" data-fn="1">راجعه</th>
               <th class="ems-fn-th" data-fn="1">اعتمده</th>
               <th class="ems-fn-th" data-fn="1">نسخة القاعدة المستعملة</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th none" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
               <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-              <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+              <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
               <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
-              <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
+              <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
               <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
               <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
@@ -169,9 +169,9 @@ echo ems_states_bundle('لا أصنافَ للجردِ في هذا الاختي�
         <?= csrf_field() ?>
           <input type="hidden" name="adjust_item" value="<?= intval($it['id']) ?>">
           <input type="hidden" name="book_qty" value="<?= floatval($it['book']) ?>">
-          <td><input type="number" step="0.01" name="actual_qty" class="form-control form-control-sm whc-qty-input" aria-label="الفعليُّ المجرود" value="<?= floatval($it['book']) ?>"></td>
-          <td><input type="text" name="reason" class="form-control form-control-sm" placeholder="سببُ الفرق" aria-label="سببُ الفرق"></td>
-          <td><button class="action-btn" type="submit">سوِّ</button></td>
+          <td><input type="number" step="0.01" name="actual_qty" class="form-control form-control-sm whc-qty-input" aria-label="الفعلي المجرود" value="<?= floatval($it['book']) ?>"></td>
+          <td><input type="text" name="reason" class="form-control form-control-sm" placeholder="سبب الفرق" aria-label="سبب الفرق"></td>
+          <td><button class="action-btn" type="submit">سو</button></td>
         </form>
       </tr>
     <?php endforeach; ?>

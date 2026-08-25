@@ -132,7 +132,7 @@ if (!function_exists('trs_location_options')) {
         ));
         foreach ($rows as &$r) { $r['label'] = $r['name'] . ' (' . $r['code'] . ')'; }
         unset($r);
-        return trs_options_from_rows($rows, $selected, '— اختر موقعاً —');
+        return trs_options_from_rows($rows, $selected, '— اختر موقعا —');
     }
 }
 
@@ -147,7 +147,7 @@ if (!function_exists('trs_type_options')) {
         ));
         foreach ($rows as &$r) { $r['label'] = $r['name']; }
         unset($r);
-        return trs_options_from_rows($rows, $selected, '— اختر نوعاً —');
+        return trs_options_from_rows($rows, $selected, '— اختر نوعا —');
     }
 }
 
@@ -178,7 +178,7 @@ if (!function_exists('trs_employee_options')) {
         $rows = trs_gate($is_super)->select('employees', array('columns' => array('id', 'name'), 'orderBy' => 'name ASC'));
         foreach ($rows as &$r) { $r['label'] = $r['name']; }
         unset($r);
-        return trs_options_from_rows($rows, $selected, '— اختر موظفاً —');
+        return trs_options_from_rows($rows, $selected, '— اختر موظفا —');
     }
 }
 
@@ -193,7 +193,7 @@ if (!function_exists('trs_supplier_options')) {
         ));
         foreach ($rows as &$r) { $r['label'] = $r['name']; }
         unset($r);
-        return trs_options_from_rows($rows, $selected, '— اختر مقاولاً ناقلاً —');
+        return trs_options_from_rows($rows, $selected, '— اختر مقاولا ناقلا —');
     }
 }
 
@@ -204,7 +204,7 @@ if (!function_exists('trs_item_options')) {
         $rows = trs_gate($is_super)->select('proc_item', array('columns' => array('id', 'name'), 'orderBy' => 'name ASC'));
         foreach ($rows as &$r) { $r['label'] = $r['name']; }
         unset($r);
-        return trs_options_from_rows($rows, $selected, '— اختر صنفاً —');
+        return trs_options_from_rows($rows, $selected, '— اختر صنفا —');
     }
 }
 
@@ -327,8 +327,8 @@ if (!function_exists('trs_operational_categories')) {
         return array(
             'equipment_transfer'  => 'ترحيل معدة',
             'parts_transfer'      => 'نقل قطع غيار',
-            'personnel_move'      => 'تنقّل أفراد',
-            'equipment_plus_move' => 'ترحيل معدة + تنقّل',
+            'personnel_move'      => 'تنقل أفراد',
+            'equipment_plus_move' => 'ترحيل معدة + تنقل',
         );
     }
 }
@@ -371,7 +371,7 @@ if (!function_exists('trs_stages')) {
     function trs_stages() {
         return array(
             'request'    => 'طلب',
-            'planned'    => 'مخطَّط',
+            'planned'    => 'مخطط',
             'ready'      => 'جاهز',
             'in_transit' => 'قيد الرحلة',
             'arrived'    => 'وصل',
@@ -393,7 +393,7 @@ if (!function_exists('trs_source_modules')) {
 }
 if (!function_exists('trs_request_states')) {
     function trs_request_states() {
-        return array('submitted' => 'مقدَّم', 'approved' => 'معتمد', 'converted' => 'محوَّل لأمر', 'rejected' => 'مرفوض');
+        return array('submitted' => 'مقدَّم', 'approved' => 'معتمد', 'converted' => 'محول لأمر', 'rejected' => 'مرفوض');
     }
 }
 if (!function_exists('trs_priorities')) {
@@ -460,7 +460,7 @@ if (!function_exists('trs_transitions')) {
      */
     function trs_transitions() {
         return array(
-            'plan'              => array('from' => 'request',    'to' => 'planned',    'need' => 'edit',   'label' => 'اعتماد وتحويل لمخطَّط', 'icon' => 'fa-clipboard-check', 'color' => '#0d6efd'),
+            'plan'              => array('from' => 'request',    'to' => 'planned',    'need' => 'edit',   'label' => 'اعتماد وتحويل لمخطط', 'icon' => 'fa-clipboard-check', 'color' => '#0d6efd'),
             'prepare'           => array('from' => 'planned',    'to' => 'ready',      'need' => 'edit',   'label' => 'تجهيز (جاهز للتنفيذ)',  'icon' => 'fa-toolbox',         'color' => '#0dcaf0'),
             'confirm_departure' => array('from' => 'ready',      'to' => 'in_transit', 'need' => 'edit',   'label' => 'تأكيد المغادرة',        'icon' => 'fa-truck-arrow-right','color' => '#fd7e14'),
             'confirm_arrival'   => array('from' => 'in_transit', 'to' => 'arrived',    'need' => 'edit',   'label' => 'تأكيد الوصول',          'icon' => 'fa-flag-checkered',  'color' => '#198754'),
@@ -560,7 +560,7 @@ if (!function_exists('trs_close_gate')) {
     {
         $out = array('ok' => false, 'code' => 422, 'reason' => '');
         $orderId = (int) $orderId;
-        if ($orderId <= 0) { $out['reason'] = 'TRS-422: أمرٌ غيرُ صالح'; return $out; }
+        if ($orderId <= 0) { $out['reason'] = 'TRS-422: أمر غير صالح'; return $out; }
 
         $o = null;
         try {
@@ -568,26 +568,26 @@ if (!function_exists('trs_close_gate')) {
                 'columns' => array('id', 'cost_bearer', 'analytic_cost_center', 'stage'),
                 'where'   => array('id' => $orderId)));
         } catch (\Throwable $t) { $o = null; }
-        if (!$o) { $out['code'] = 404; $out['reason'] = 'TRS-404: الأمرُ غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!$o) { $out['code'] = 404; $out['reason'] = 'TRS-404: الأمر غير موجود في نطاقك'; return $out; }
 
         $miss = array();
-        if (trim((string) $o['cost_bearer']) === '') { $miss[] = 'المتحمِّل'; }
-        if (trim((string) $o['analytic_cost_center']) === '') { $miss[] = 'مركزُ التكلفة'; }
+        if (trim((string) $o['cost_bearer']) === '') { $miss[] = 'المتحمل'; }
+        if (trim((string) $o['analytic_cost_center']) === '') { $miss[] = 'مركز التكلفة'; }
 
         $lines = 0;
         try {
             $lines = (int) $gate->count('transfer_lines',
                 array('whereRaw' => 'order_id = ' . $orderId . ' AND COALESCE(is_deleted,0) = 0'));
         } catch (\Throwable $t) { $lines = 0; }
-        if ($lines === 0) { $miss[] = 'بندٌ واحدٌ على الأقل'; }
+        if ($lines === 0) { $miss[] = 'بند واحد على الأقل'; }
 
         if ($miss) {
             $out['code'] = 422;
-            $out['reason'] = 'TRS-422-CLOSE: لا إقفالَ بلا ' . implode(' و', $miss)
-                           . ' — والتكلفةُ لا تُحمَّل على مجهول';
+            $out['reason'] = 'TRS-422-CLOSE: لا إقفال بلا ' . implode(' و', $miss)
+                           . ' — والتكلفة لا تحمل على مجهول';
             return $out;
         }
-        $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'مستوفٍ لشروطِ الإقفال';
+        $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'مستوف لشروط الإقفال';
         return $out;
     }
 }
@@ -602,7 +602,7 @@ if (!function_exists('trs_readiness_gate')) {
     {
         $out = array('ok' => false, 'code' => 422, 'reason' => '', 'valid' => 0);
         $orderId = (int) $orderId;
-        if ($orderId <= 0) { $out['reason'] = 'TRS-422: أمرٌ غيرُ صالح'; return $out; }
+        if ($orderId <= 0) { $out['reason'] = 'TRS-422: أمر غير صالح'; return $out; }
 
         $valid = 0;
         try {
@@ -617,11 +617,11 @@ if (!function_exists('trs_readiness_gate')) {
         $out['valid'] = $valid;
         if ($valid === 0) {
             $out['code'] = 422;
-            $out['reason'] = 'TRS-422-PERMIT: لا تصريحَ نافذًا على هذا الأمر — ولا تجهيزَ بلا تصريح';
+            $out['reason'] = 'TRS-422-PERMIT: لا تصريح نافذا على هذا الأمر — ولا تجهيز بلا تصريح';
             return $out;
         }
         $out['ok'] = true; $out['code'] = 200;
-        $out['reason'] = 'تصاريحُ نافذةٌ: ' . $valid;
+        $out['reason'] = 'تصاريح نافذة: ' . $valid;
         return $out;
     }
 }

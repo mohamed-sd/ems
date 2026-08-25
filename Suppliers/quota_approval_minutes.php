@@ -26,7 +26,7 @@ if (!$is_super_admin && $company_id <= 0) { header('Location: ../login.php'); ex
 
 $__pp = check_page_permissions($conn, 'Suppliers/quota_approval_minutes.php');
 if (!$is_super_admin && empty($__pp['can_view'])) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'لا تملك صلاحية عرض هذه الشاشة', 'GOV-PERM-403', 'الصلاحياتُ يمنحها مدير الصلاحيات');
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا تملك صلاحية عرض هذه الشاشة', 'GOV-PERM-403', 'الصلاحيات يمنحها مدير الصلاحيات');
 }
 ems_shell_axes($__pp);
 
@@ -43,7 +43,7 @@ else {
     $st->close();
 }
 
-$page_title = 'محاضرُ اعتمادِ وحداتِ المورد';
+$page_title = 'محاضر اعتماد وحدات المورد';
 include '../inheader.php';
 include '../insidebar.php';
 if (isset($conn)) { ems_screen_about_auto($conn); }
@@ -51,12 +51,12 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
 <div class="main" dir="rtl">
 <?php
 $header_icon = 'fa fa-file-signature';
-$header_title_html = htmlspecialchars('محاضرُ اعتمادِ وحداتِ المورد', ENT_QUOTES, 'UTF-8');
+$header_title_html = htmlspecialchars('محاضر اعتماد وحدات المورد', ENT_QUOTES, 'UTF-8');
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-echo ems_states_bundle('لا محضرَ اعتمادِ تغطيةٍ بديلةٍ مسجَّلًا بعدُ', 'يُنشأ الطلبُ من شاشةِ طلبِ الإحلال ثم يُعتمد من صندوقِ الاعتمادِ الجامع');
+echo ems_states_bundle('لا محضر اعتماد تغطية بديلة مسجلا بعد', 'ينشأ الطلب من شاشة طلب الإحلال ثم يعتمد من صندوق الاعتماد الجامع');
 ?>
   <style>
     .sup-qam-alert      { margin: 10px 0; }
@@ -69,12 +69,12 @@ echo ems_states_bundle('لا محضرَ اعتمادِ تغطيةٍ بديلةٍ
   </style>
   <?php if ($failed): ?>
   <div class="alert alert-danger sup-qam-alert">
-    <strong>تعذّرت قراءةُ البيانات.</strong>
-    فرقٌ بين «لا صفَّ» و«تعذّر السؤال» — وهذه الثانية.
+    <strong>تعذرت قراءة البيانات.</strong>
+    فرق بين «لا صف» و«تعذر السؤال» — وهذه الثانية.
   </div>
   <?php else: ?>
   <div class="ems-card sup-qam-kpi">
-    <div class="sup-qam-kpi-label">صفوفٌ معروضة</div>
+    <div class="sup-qam-kpi-label">صفوف معروضة</div>
     <div class="sup-qam-kpi-value"><?php echo number_format(count($rows)); ?></div>
   </div>
   <div class="card"><div class="card-body table-responsive">
@@ -82,17 +82,17 @@ echo ems_states_bundle('لا محضرَ اعتمادِ تغطيةٍ بديلةٍ
       <thead><tr>
         <th>#</th>
         <th>الدرجة</th>
-        <th>المقعدُ المغطّى</th>
+        <th>المقعد المغطى</th>
         <th>السبب</th>
         <th>من</th>
         <th>إلى</th>
-        <th>ساعاتٌ مقدَّرة</th>
+        <th>ساعات مقدرة</th>
         <th>الحال</th>
-        <th>مرجعُ الاعتماد</th>
+        <th>مرجع الاعتماد</th>
       </tr></thead>
       <tbody>
       <?php if (!$rows): ?>
-        <tr><td colspan="99" class="sup-qam-empty-cell">لا صفَّ مسجَّلٌ بعد.</td></tr>
+        <tr><td colspan="99" class="sup-qam-empty-cell">لا صف مسجل بعد.</td></tr>
       <?php else: foreach ($rows as $x): ?>
         <tr>
           <td><?php echo htmlspecialchars((string) $x['cov_id'], ENT_QUOTES, 'UTF-8'); ?></td>
@@ -109,7 +109,7 @@ echo ems_states_bundle('لا محضرَ اعتمادِ تغطيةٍ بديلةٍ
       </tbody>
     </table>
     <p class="text-muted sup-qam-note">
-      قراءةٌ محضة — التغطيةُ البديلةُ باعتمادين (CAP-01) — والطلبُ يُنشأ من Operations/swap_request.php والاعتمادُ من صندوقِ الاعتمادِ الجامع؛ وهذه الشاشةُ محضرُها. وأحدثُ 500 صفٍّ.
+      قراءة محضة — التغطية البديلة باعتمادين (CAP-01) — والطلب ينشأ من Operations/swap_request.php والاعتماد من صندوق الاعتماد الجامع؛ وهذه الشاشة محضرها. وأحدث 500 صف.
     </p>
   </div></div>
   <?php endif; ?>

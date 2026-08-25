@@ -57,7 +57,7 @@ if (!function_exists('unit_journey_party_label')) {
     /** تسميةُ الطرف بلغة المهمة — لا `supplier` ولا `stage` في وجه المستخدم. */
     function unit_journey_party_label($stage)
     {
-        $map = array('supplier' => 'المورد', 'operator' => 'المشغّل',
+        $map = array('supplier' => 'المورد', 'operator' => 'المشغل',
                      'supervisor' => 'المشرف', 'fleet' => 'الأسطول');
         return isset($map[$stage]) ? $map[$stage] : $stage;
     }
@@ -142,11 +142,11 @@ if (!function_exists('unit_journey')) {
         foreach ($required as $p) { $partyOwners[] = unit_journey_party_label($p); }
 
         $defs = array(
-            1 => array('label' => 'إدخالُ اليوم',      'owner' => 'مُدخِلُ الدوام'),
-            2 => array('label' => 'اعتمادُ الموقع',    'owner' => $siteOwner),
-            3 => array('label' => 'بطاقاتُ الأطراف',   'owner' => implode(' · ', $partyOwners)),
-            4 => array('label' => 'اعتمادُ المبيعات',  'owner' => $salesOwner),
-            5 => array('label' => 'التحويلُ المالي',   'owner' => $finOwner),
+            1 => array('label' => 'إدخال اليوم',      'owner' => 'مدخل الدوام'),
+            2 => array('label' => 'اعتماد الموقع',    'owner' => $siteOwner),
+            3 => array('label' => 'بطاقات الأطراف',   'owner' => implode(' · ', $partyOwners)),
+            4 => array('label' => 'اعتماد المبيعات',  'owner' => $salesOwner),
+            5 => array('label' => 'التحويل المالي',   'owner' => $finOwner),
         );
 
         $stages = array();
@@ -168,7 +168,7 @@ if (!function_exists('unit_journey')) {
             if ($k === 3 && $status === 'done' && $reqCount > 1) {
                 $row['note'] = 'اكتملت ' . $reqCount . ' بطاقات';
             }
-            if ($status === 'current' && $isPaused) { $row['note'] = 'موقوفةٌ مؤقتًا'; }
+            if ($status === 'current' && $isPaused) { $row['note'] = 'موقوفة مؤقتا'; }
             $stages[] = $row;
         }
 
@@ -196,7 +196,7 @@ if (!function_exists('unit_journey')) {
             $note = ($lastReturn !== null) ? trim(strval($lastReturn['note'])) : '';
             $j['banner'] = array(
                 'kind'  => 'return',
-                'title' => 'أُعيدت إليك لاستكمال:',
+                'title' => 'أعيدت إليك لاستكمال:',
                 'text'  => ($note !== '') ? $note : 'راجع بيانات اليوم وأعد الإرسال.',
                 'meta'  => (($lastReturn !== null && !empty($lastReturn['decided_at']))
                             ? (ems_journey_ago($lastReturn['decided_at']) . ' · ') : '')
@@ -205,19 +205,19 @@ if (!function_exists('unit_journey')) {
             );
         } elseif ($isStopped) {
             $labels = array('rejected' => 'مرفوضة', 'cancelled' => 'ملغاة',
-                            'reversed' => 'معكوسة', 'superseded' => 'محلٌّ محلَّها غيرُها');
+                            'reversed' => 'معكوسة', 'superseded' => 'محل محلها غيرها');
             $j['banner'] = array(
                 'kind'  => 'stop',
                 'title' => 'توقفت الرحلة: ' . (isset($labels[$state]) ? $labels[$state] : $state),
                 'text'  => '',
             );
         } elseif ($isPaused) {
-            $j['banner'] = array('kind' => 'stop', 'title' => 'الوحدةُ موقوفةٌ مؤقتًا',
-                'text' => 'الرحلةُ متوقفةٌ حتى يُرفع سببُ الوقف — ولم تُلغَ.');
+            $j['banner'] = array('kind' => 'stop', 'title' => 'الوحدة موقوفة مؤقتا',
+                'text' => 'الرحلة متوقفة حتى يرفع سبب الوقف — ولم تلغ.');
         } elseif ($state === 'converted') {
             $j['banner'] = array(
                 'kind'  => 'done',
-                'title' => 'اكتملت الرحلة — وصارت الوحدةُ مالًا في الدفتر.',
+                'title' => 'اكتملت الرحلة — وصارت الوحدة مالا في الدفتر.',
                 'meta'  => isset($at[5]) ? ems_journey_ago($at[5]) : '',
             );
         }

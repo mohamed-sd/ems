@@ -99,15 +99,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا تصنيفَ فنيًّا مسجَّلًا لهذه الشركة',
-                           'أضفْ تصنيفًا بزرِّ «إضافة تصنيف» — والتصنيفاتُ العامةُ تظهر للقراءةِ وحدَها');
+    echo ems_states_bundle('لا تصنيف فنيا مسجلا لهذه الشركة',
+                           'أضف تصنيفا بزر «إضافة تصنيف» — والتصنيفات العامة تظهر للقراءة وحدها');
     ?>
 
     <?php tkt_msg_banner(); ?>
 
     <form id="tktForm" action="" method="post" class="allforms">
         <?php echo csrf_field(); ?>
-        <div class="card-header"><h5><i class="fas fa-edit"></i> إضافة / تعديل تصنيف فنّي</h5></div>
+        <div class="card-header"><h5><i class="fas fa-edit"></i> إضافة / تعديل تصنيف فني</h5></div>
         <div class="card"><div class="card-body">
             <input type="hidden" name="id" id="c_id" value="">
             <div class="form-section">
@@ -118,11 +118,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </div>
                     <div class="form-group">
                         <label for="c_applies">ينطبق على (اختياري)</label>
-                        <input type="text" name="applies_to" id="c_applies" maxlength="40" placeholder="مثال: حفّارات · شاحنات">
+                        <input type="text" name="applies_to" id="c_applies" maxlength="40" placeholder="مثال: حفارات · شاحنات">
                     </div>
                     <div class="form-group">
-                        <label>مفعّل؟</label>
-                        <label class="switch-inline" for="c_active"><input type="checkbox" name="active" id="c_active" value="1" checked> نعم، مفعّل</label>
+                        <label>مفعل؟</label>
+                        <label class="switch-inline" for="c_active"><input type="checkbox" name="active" id="c_active" value="1" checked> نعم، مفعل</label>
                     </div>
                 </div>
             </div>
@@ -140,10 +140,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <thead><tr>
                     <th>الإجراءات</th><th>الكود</th><th>الاسم</th><th>ينطبق على</th><th>النطاق</th><th>الحالة</th>
                     <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                     <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                     <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                     <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>

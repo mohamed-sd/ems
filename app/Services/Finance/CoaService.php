@@ -31,7 +31,7 @@ class CoaService
     );
 
     /** كلماتٌ تدلُّ على اسمِ شخصٍ في اسمِ حساب — R2 يرفضها. */
-    const PERSON_HINTS = array('Custody', 'عهدة', 'عهدةُ', 'سلفة');
+    const PERSON_HINTS = array('Custody', 'عهدة', 'عهدة', 'سلفة');
 
     /** الحسابُ القانونيُّ بكودِه — أو null. */
     public static function account(\mysqli $db, $companyId, $code)
@@ -56,10 +56,10 @@ class CoaService
     public static function assertDims(\mysqli $db, $companyId, $accountCode, array $dims)
     {
         $acc = self::account($db, $companyId, $accountCode);
-        if (!$acc) { throw new \RuntimeException('COA-404: حسابٌ خارجَ الشجرةِ القانونية — ' . $accountCode); }
+        if (!$acc) { throw new \RuntimeException('COA-404: حساب خارج الشجرة القانونية — ' . $accountCode); }
         if ((int) $acc['is_postable'] !== 1) {
             throw new \RuntimeException('COA-LEVEL-422: المستوى ' . $acc['acc_level']
-                . ' تجميعيٌّ لا يُقيَّد عليه — ' . $accountCode);
+                . ' تجميعي لا يقيد عليه — ' . $accountCode);
         }
         $need = array_filter(array_map('trim', explode(',', (string) $acc['required_dims'])));
         $missing = array();
@@ -68,7 +68,7 @@ class CoaService
             if ($v === null || $v === '' || $v === 0 || $v === '0') { $missing[] = $d . ' ' . (self::DIMS[$d] ?? ''); }
         }
         if ($missing) {
-            throw new \RuntimeException('COA-DIM-422: القيدُ ينقصه بُعدٌ يلزم حسابَه — ' . implode(' · ', $missing));
+            throw new \RuntimeException('COA-DIM-422: القيد ينقصه بعد يلزم حسابه — ' . implode(' · ', $missing));
         }
         return $acc;
     }
@@ -81,14 +81,14 @@ class CoaService
     {
         foreach (self::PERSON_HINTS as $h) {
             if (mb_stripos($name, $h) !== false) {
-                throw new \RuntimeException('COA-R2-422: لا اسمَ شخصٍ في دليلِ الحسابات — '
-                    . 'العهدةُ حسابٌ واحدٌ (1103) والشخصُ بُعد D6');
+                throw new \RuntimeException('COA-R2-422: لا اسم شخص في دليل الحسابات — '
+                    . 'العهدة حساب واحد (1103) والشخص بعد D6');
             }
         }
         // R8: كودٌ بأربعِ خاناتٍ فأكثرَ تحت مستوًى ثالثٍ قائمٍ = تفصيلٌ يميّزه بُعد
         if (strlen(preg_replace('/\D/', '', $code)) > 4) {
-            throw new \RuntimeException('COA-R8-422: لا حسابَ يُنشأ لواقعةٍ يمكن تمييزُها ببُعد — '
-                . 'استعمل المستوى الثالثَ مع أبعادِه');
+            throw new \RuntimeException('COA-R8-422: لا حساب ينشأ لواقعة يمكن تمييزها ببعد — '
+                . 'استعمل المستوى الثالث مع أبعاده');
         }
         return true;
     }
@@ -110,14 +110,14 @@ class CoaService
         $st->execute();
         $rule = $st->get_result()->fetch_assoc();
         $st->close();
-        if (!$rule) { throw new \RuntimeException('COA-MATRIX-404: لا صفَّ ترحيلٍ للرمز ' . $ruleCode); }
+        if (!$rule) { throw new \RuntimeException('COA-MATRIX-404: لا صف ترحيل للرمز ' . $ruleCode); }
 
         $field = $side === 'revenue' ? 'revenue_accounts' : 'cost_accounts';
         $codes = array_values(array_filter(array_map('trim',
             preg_split('/[,·\s]+/u', (string) $rule[$field]))));
         $codes = array_values(array_filter($codes, function ($c) { return preg_match('/^\d{2,4}$/', $c); }));
         if (!$codes) {
-            throw new \RuntimeException('COA-MATRIX-422: الصفُّ ' . $ruleCode . ' بلا حسابِ ' . $side);
+            throw new \RuntimeException('COA-MATRIX-422: الصف ' . $ruleCode . ' بلا حساب ' . $side);
         }
 
         // نموذجُ العملِ يحسم بين أكوادِ الإيرادِ الثلاثة (D7)

@@ -69,7 +69,7 @@ class FinancingService
         if ($closePrevious !== null) {
             foreach ($shares as $s) {
                 if (empty($s['doc_ref'])) {
-                    $out['code'] = 422; $out['reason'] = 'بيع/انتقال حصة بلا مستند يُرفض — doc_ref إلزامي';
+                    $out['code'] = 422; $out['reason'] = 'بيع/انتقال حصة بلا مستند يرفض — doc_ref إلزامي';
                     return $out;
                 }
             }
@@ -130,13 +130,13 @@ class FinancingService
             $conn->commit();
         } catch (\Throwable $t) {
             $conn->rollback();
-            $out['code'] = 422; $out['reason'] = 'فشل الحفظ معاملةً: ' . $t->getMessage();
+            $out['code'] = 422; $out['reason'] = 'فشل الحفظ معاملة: ' . $t->getMessage();
             return $out;
         }
         $final = 0.0;
         foreach (self::sharesAt($conn, $companyId, $assetKind, $assetId, $from) as $r) { $final += (float) $r['percent']; }
         $out['ok'] = true; $out['code'] = 200; $out['sum_at_date'] = round($final, 2); $out['shares'] = $n;
-        $out['reason'] = 'طُبّقت — Σ عند ' . $from . ' = ' . number_format($final, 2);
+        $out['reason'] = 'طبقت — Σ عند ' . $from . ' = ' . number_format($final, 2);
         return $out;
     }
 
@@ -156,7 +156,7 @@ class FinancingService
         $done = $stmt->affected_rows > 0;
         $stmt->close();
         return array('ok' => $done, 'code' => $done ? 200 : 404,
-            'reason' => $done ? 'صُحّحت موثَّقةً — المسجَّلة والمصححة والسبب والحكم، والأصل محفوظ للتدقيق' : 'غير موجودة');
+            'reason' => $done ? 'صححت موثقة — المسجلة والمصححة والسبب والحكم، والأصل محفوظ للتدقيق' : 'غير موجودة');
     }
 
     // ═══════════════ العمليات — FinancingOperationService ═══════════════
@@ -171,7 +171,7 @@ class FinancingService
         $stmt->execute();
         $model = $stmt->get_result()->fetch_assoc();
         $stmt->close();
-        if (!$model) { $out['code'] = 422; $out['reason'] = 'نموذج تمويل غير معرَّف: «' . $mc . '» — ولا يُفترض نموذج أبدًا'; return $out; }
+        if (!$model) { $out['code'] = 422; $out['reason'] = 'نموذج تمويل غير معرف: «' . $mc . '» — ولا يفترض نموذج أبدا'; return $out; }
         if ((string) $model['policy_doc_ref'] === '') { $out['code'] = 422; $out['reason'] = 'لا اعتماد بلا معالجة محاسبية مكتوبة'; return $out; }
         foreach (array('op_code', 'financier_entity_id', 'currency', 'capital') as $f) {
             if (!isset($a[$f]) || $a[$f] === '') { $out['code'] = 422; $out['reason'] = 'حقل إلزامي: ' . $f; return $out; }
@@ -217,12 +217,12 @@ class FinancingService
                             ?, ?, ?, 'قيد المراجعة', 'escalation', ?, ?)");
                 if ($esc) {
                     $rq  = 'ESC-FIN-' . date('ymdHis') . '-' . intval($actor);
-                    $doc = 'عمليةُ تمويلٍ ' . (string) $a['op_code'];
-                    $why = 'تجاوزُ سقفِ التفويضِ عند الإنشاء' . $capMsg;
+                    $doc = 'عملية تمويل ' . (string) $a['op_code'];
+                    $why = 'تجاوز سقف التفويض عند الإنشاء' . $capMsg;
                     $amtS = (string) $capital;
                     $curS = (string) $a['currency'];
                     $act2 = intval($actor);
-                    $nm  = 'منشئُ العملية #' . $act2;
+                    $nm  = 'منشئ العملية #' . $act2;
                     /* ثمانِ علاماتٍ في العبارةِ ⇐ ثمانيةُ مُعامَلات: `company_id`
                        أوّلُها — وقد سقط في أوّلِ صياغةٍ فرمى `ArgumentCountError`. */
                     $esc->bind_param('isssssis', $companyId, $rq, $doc, $why, $amtS, $curS, $act2, $nm);
@@ -259,8 +259,8 @@ class FinancingService
         $out['reason'] = ($newState === 'active')
             ? ('عملية ' . $code . ' (' . $mc . ' — ' . $model['accounting_recognition'] . ') نافذة برصيد '
                . $outstanding . ($authRef !== null ? ' · بمرجع تفويض ' . $authRef : ''))
-            : ('عملية ' . $code . ' **معلَّقةٌ ولم تنفذ**' . $capMsg
-               . ($escRef !== null ? ' · رُفعت لصندوق الاعتماد الأعلى (' . $escRef . ')' : ''));
+            : ('عملية ' . $code . ' **معلقة ولم تنفذ**' . $capMsg
+               . ($escRef !== null ? ' · رفعت لصندوق الاعتماد الأعلى (' . $escRef . ')' : ''));
         return $out;
     }
 
@@ -275,7 +275,7 @@ class FinancingService
         $op = $stmt->get_result()->fetch_assoc();
         $stmt->close();
         if (!$op || intval($op['installments_no']) <= 0) {
-            return array('ok' => false, 'code' => 422, 'reason' => 'لا نظام أقساطٍ في العملية');
+            return array('ok' => false, 'code' => 422, 'reason' => 'لا نظام أقساط في العملية');
         }
         $n = intval($op['installments_no']);
         $amt = ($op['installment_amount'] !== null) ? (float) $op['installment_amount'] : round((float) $op['outstanding_balance'] / $n, 2);
@@ -291,7 +291,7 @@ class FinancingService
             $stmt->close();
         }
         return array('ok' => true, 'code' => 200, 'created' => $created,
-            'reason' => $created . '/' . $n . ' قسطًا مولَّدًا — والتكرار عاطل بمفتاح (العملية×القسط)');
+            'reason' => $created . '/' . $n . ' قسطا مولدا — والتكرار عاطل بمفتاح (العملية×القسط)');
     }
 
     /** استحقاق قسط → حدث مالي بمفتاح (العملية × القسط) — لا يتكرر (F6). */
@@ -323,7 +323,7 @@ class FinancingService
         $conn->query("UPDATE financing_installments SET state = 'due' WHERE op_id = {$opId} AND seq_no = {$seqNo} AND state = 'scheduled'");
         return array('ok' => true, 'code' => 200, 'event_id' => intval($r['id']),
             'duplicate' => !empty($r['duplicate']),
-            'reason' => !empty($r['duplicate']) ? 'حدث القسط قائم — 409 دلاليًّا بمفتاحه' : 'InstallmentDue منشور');
+            'reason' => !empty($r['duplicate']) ? 'حدث القسط قائم — 409 دلاليا بمفتاحه' : 'InstallmentDue منشور');
     }
 
     /** سداد قسط — يُثبَّت سعر يوم السداد (فرق محقق بسطره) وينقص الرصيد. */
@@ -340,7 +340,7 @@ class FinancingService
         $stmt->execute();
         $changed = $stmt->affected_rows > 0;
         $stmt->close();
-        if (!$changed) { return array('ok' => true, 'code' => 200, 'reason' => 'مسدَّد سلفًا — عاطل'); }
+        if (!$changed) { return array('ok' => true, 'code' => 200, 'reason' => 'مسدد سلفا — عاطل'); }
         $stmt = $conn->prepare(
             "UPDATE financing_operations o
                 SET o.outstanding_balance = GREATEST(0, o.outstanding_balance - (SELECT amount_total FROM financing_installments WHERE op_id = ? AND seq_no = ?)),
@@ -349,7 +349,7 @@ class FinancingService
         $stmt->bind_param('iii', $opId, $seqNo, $opId);
         $stmt->execute();
         $stmt->close();
-        return array('ok' => true, 'code' => 200, 'reason' => 'سُدّد القسط والرصيد نقص — والسداد يتجاوز الرصيد محال بالقص إلى صفر');
+        return array('ok' => true, 'code' => 200, 'reason' => 'سدد القسط والرصيد نقص — والسداد يتجاوز الرصيد محال بالقص إلى صفر');
     }
 
     /**
@@ -397,7 +397,7 @@ class FinancingService
             $rows[] = array('op' => $op['op_code'], 'diff' => $diff, 'currency' => $cur);
         }
         return array('ok' => true, 'created' => $created, 'rows' => $rows,
-            'reason' => $created . ' فرقًا غير محققٍ بسطره — يُعكس عند السداد ولا يُدمج في تكلفة التمويل');
+            'reason' => $created . ' فرقا غير محقق بسطره — يعكس عند السداد ولا يدمج في تكلفة التمويل');
     }
 
     // ═══════════════ الانحرافات — DeviationMonitor ═══════════════
@@ -443,7 +443,7 @@ class FinancingService
     {
         $decision = trim((string) $decision); $docRef = trim((string) $docRef);
         if ($decision === '' || $docRef === '') {
-            return array('ok' => false, 'code' => 422, 'reason' => 'لا يُغلق صف بلا قرار ومستند');
+            return array('ok' => false, 'code' => 422, 'reason' => 'لا يغلق صف بلا قرار ومستند');
         }
         $stmt = $conn->prepare(
             "UPDATE financing_deviations SET state = 'closed', decision = ?, decision_doc_ref = ?, closed_by = ?, closed_at = NOW()
@@ -453,6 +453,6 @@ class FinancingService
         $stmt->execute();
         $done = $stmt->affected_rows > 0;
         $stmt->close();
-        return array('ok' => $done, 'code' => $done ? 200 : 404, 'reason' => $done ? 'أُغلق بقراره ومستنده' : 'غير موجود أو مغلق');
+        return array('ok' => $done, 'code' => $done ? 200 : 404, 'reason' => $done ? 'أغلق بقراره ومستنده' : 'غير موجود أو مغلق');
     }
 }

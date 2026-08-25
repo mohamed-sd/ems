@@ -28,7 +28,7 @@ class GovernanceM14Service
         'RSN-AUTH'   => 'خارجَ سقفِ أو نطاقِ التفويض',
         'RSN-DUP'    => 'ازدواجٌ مع مستندٍ قائم',
         'RSN-DATA'   => 'بياناتٌ ناقصةٌ أو متعارضة',
-        'RSN-OTHER'  => 'سببٌ آخرُ — البيانُ إلزامي',
+        'RSN-OTHER'  => 'سبب آخر — البيان إلزامي',
     );
 
     public static function nextCode(\mysqli $db, $companyId, $table, $column, $prefix, $width = 6)
@@ -39,7 +39,7 @@ class GovernanceM14Service
             'org_structure_versions' => 'version_code',
         );
         if (!isset($allowed[$table]) || $allowed[$table] !== $column) {
-            throw new \RuntimeException('GOV-500: جدولٌ أو عمودٌ خارجَ قائمةِ الترقيم');
+            throw new \RuntimeException('GOV-500: جدول أو عمود خارج قائمة الترقيم');
         }
         $len = strlen($prefix) + 2;
         $st = $db->prepare("SELECT COALESCE(MAX(CAST(SUBSTRING(`$column`, $len) AS UNSIGNED)), 0) + 1 nx FROM `$table` WHERE company_id = ?");
@@ -60,16 +60,16 @@ class GovernanceM14Service
     public static function decideApproval(\mysqli $db, $companyId, $sourceKind, $sourceRef, $decision, $reasonCode, $reasonNote, $actor, $capacity, $authorityRef)
     {
         if (!in_array($decision, array('rejected', 'returned'), true)) {
-            throw new \RuntimeException('GOV-422: القرارُ rejected أو returned حصرًا');
+            throw new \RuntimeException('GOV-422: القرار rejected أو returned حصرا');
         }
         if (!isset(self::REASONS[$reasonCode])) {
-            throw new \RuntimeException('GOV-422: السببُ من القائمة المحكومة حصرًا — ' . implode(' · ', array_keys(self::REASONS)));
+            throw new \RuntimeException('GOV-422: السبب من القائمة المحكومة حصرا — ' . implode(' · ', array_keys(self::REASONS)));
         }
         if ($reasonCode === 'RSN-OTHER' && trim((string) $reasonNote) === '') {
-            throw new \RuntimeException('GOV-422: RSN-OTHER يلزمه بيانُ السبب');
+            throw new \RuntimeException('GOV-422: RSN-OTHER يلزمه بيان السبب');
         }
         $sourceRef = trim((string) $sourceRef);
-        if ($sourceRef === '') { throw new \RuntimeException('GOV-422: مرجعُ المستندِ إلزاميّ'); }
+        if ($sourceRef === '') { throw new \RuntimeException('GOV-422: مرجع المستند إلزامي'); }
 
         // القرارُ يقع في المصدر أولًا — «كلُّ سطرٍ قرارُه في شاشة مالكه بخدمته»
         $ringNo = 1;
@@ -81,13 +81,13 @@ class GovernanceM14Service
                 $st->execute();
                 $req = $st->get_result()->fetch_assoc();
                 $st->close();
-                if (!$req) { throw new \RuntimeException('GOV-404: الطلبُ الماليُّ غيرُ موجودٍ في نطاقك'); }
+                if (!$req) { throw new \RuntimeException('GOV-404: الطلب المالي غير موجود في نطاقك'); }
                 if ((int) $req['requester_id'] === (int) $actor || (int) $req['created_by'] === (int) $actor) {
-                    throw new \RuntimeException('GOV-SOD-403: مُنشئُ الطلبِ لا يقرر فيه — فصلُ الواجبات بنيوي');
+                    throw new \RuntimeException('GOV-SOD-403: منشئ الطلب لا يقرر فيه — فصل الواجبات بنيوي');
                 }
                 // الانتقالُ المعرَّفُ حصرًا: القرارُ على ما ينتظر قرارًا لا على المنفَّذ
                 if (!in_array($req['state'], array('draft', 'under_review', 'pending_approval', 'returned'), true)) {
-                    throw new \RuntimeException('GOV-409: حالةُ الطلبِ «' . $req['state'] . '» لا تقبل هذا القرار — الانتقالُ غيرُ المعرَّفِ يُرفض');
+                    throw new \RuntimeException('GOV-409: حالة الطلب «' . $req['state'] . '» لا تقبل هذا القرار — الانتقال غير المعرف يرفض');
                 }
                 $newState = $decision === 'rejected' ? 'rejected' : 'returned';
                 $oldState = (string) $req['state'];
@@ -116,9 +116,9 @@ class GovernanceM14Service
                 $st->execute();
                 $je = $st->get_result()->fetch_assoc();
                 $st->close();
-                if (!$je) { throw new \RuntimeException('GOV-404: القيدُ غيرُ موجودٍ في نطاقك'); }
+                if (!$je) { throw new \RuntimeException('GOV-404: القيد غير موجود في نطاقك'); }
                 if ($je['state'] === 'posted') {
-                    throw new \RuntimeException('GOV-409: القيدُ المنشورُ لا يُرفض — التصحيحُ بقيدٍ عاكس (PR-06)');
+                    throw new \RuntimeException('GOV-409: القيد المنشور لا يرفض — التصحيح بقيد عاكس (PR-06)');
                 }
                 $newState = 'draft'; // الإعادةُ والرفضُ يعيدانه مسودةً للتصحيح — والسجلُّ يحفظ القرار
                 $st = $db->prepare("UPDATE fin_journal_entries SET state = ? WHERE id = ? AND company_id = ?");
@@ -135,7 +135,7 @@ class GovernanceM14Service
                 break;
 
             default:
-                throw new \RuntimeException('GOV-422: مصدرٌ خارجَ الأنواع الأربعة');
+                throw new \RuntimeException('GOV-422: مصدر خارج الأنواع الأربعة');
         }
 
         $idem = 'apd:' . $sourceKind . ':' . $sourceRef . ':' . $decision . ':r' . $ringNo;
@@ -164,7 +164,7 @@ class GovernanceM14Service
             'source_ref' => $sourceKind . ':' . $sourceRef,
             'payload' => array(
                 'event_name' => $eventName,
-                'consumers' => $decision === 'rejected' ? array('المُنشئ', 'المسار') : array('المُنشئ'),
+                'consumers' => $decision === 'rejected' ? array('المنشئ', 'المسار') : array('المنشئ'),
                 'reason_code' => $reasonCode,
             ),
         ));
@@ -195,14 +195,14 @@ class GovernanceM14Service
     {
         $valid = array('يحتاج استثناءً', 'خطأ تصنيف حماية', 'محاولة تجاوز', 'عابر — لا إجراء');
         if (!in_array($classification, $valid, true)) {
-            throw new \RuntimeException('GOV-422: التصنيفُ من الأربعة حصرًا');
+            throw new \RuntimeException('GOV-422: التصنيف من الأربعة حصرا');
         }
         $st = $db->prepare("SELECT deny_id, guard_code FROM guard_denials WHERE deny_id = ? AND company_id = ? LIMIT 1");
         $st->bind_param('ii', $denialId, $companyId);
         $st->execute();
         $dn = $st->get_result()->fetch_assoc();
         $st->close();
-        if (!$dn) { throw new \RuntimeException('GOV-404: المحاولةُ غيرُ موجودةٍ في نطاقك'); }
+        if (!$dn) { throw new \RuntimeException('GOV-404: المحاولة غير موجودة في نطاقك'); }
 
         // مراجعةٌ واحدةٌ للمحاولة (uq) — التكرارُ يرجع الأولى (AR-04)
         $st = $db->prepare("SELECT id, review_code FROM gov_denial_reviews
@@ -239,7 +239,7 @@ class GovernanceM14Service
             'idempotency_key' => 'dnr:' . $denialId,
             'source_ref' => $code,
             'payload' => array('event_name' => 'DenialReviewed',
-                'consumers' => array('الإدارةُ المعنية'), 'classification' => $classification),
+                'consumers' => array('الإدارة المعنية'), 'classification' => $classification),
         ));
         return array('idempotent' => false, 'id' => $id, 'review_code' => $code);
     }
@@ -250,13 +250,13 @@ class GovernanceM14Service
     {
         $kinds = array('إنشاء وحدة', 'تعديل وحدة', 'تعطيل وحدة', 'نقل تبعية', 'تعديل مسمى', 'رجوع لنسخة');
         if (!in_array($changeKind, $kinds, true)) {
-            throw new \RuntimeException('GOV-422: نوعُ التغيير من الستة حصرًا');
+            throw new \RuntimeException('GOV-422: نوع التغيير من الستة حصرا');
         }
         if (trim((string) $decisionRef) === '') {
-            throw new \RuntimeException('GOV-422: قرارُ التغييرِ المرجعيُّ إلزاميٌّ — لا تغييرَ هيكلٍ بلا قرار');
+            throw new \RuntimeException('GOV-422: قرار التغيير المرجعي إلزامي — لا تغيير هيكل بلا قرار');
         }
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', (string) $effectiveDate)) {
-            throw new \RuntimeException('GOV-422: تاريخُ السريان YYYY-MM-DD');
+            throw new \RuntimeException('GOV-422: تاريخ السريان YYYY-MM-DD');
         }
 
         // اللقطةُ قبل التغيير — أساسُ الرجوع
@@ -270,7 +270,7 @@ class GovernanceM14Service
         switch ($changeKind) {
             case 'إنشاء وحدة':
                 if (empty($change['unit_code']) || empty($change['name_ar'])) {
-                    throw new \RuntimeException('GOV-422: كودُ الوحدةِ واسمُها إلزاميان');
+                    throw new \RuntimeException('GOV-422: كود الوحدة واسمها إلزاميان');
                 }
                 $st = $db->prepare("INSERT INTO org_units (company_id, unit_code, name_ar, layer, parent_unit_id, active)
                                      VALUES (?,?,?,?,?,1)");
@@ -284,8 +284,8 @@ class GovernanceM14Service
                 break;
             case 'تعديل وحدة':
             case 'تعديل مسمى':
-                if (!$unitId) { throw new \RuntimeException('GOV-422: الوحدةُ إلزامية'); }
-                if (empty($change['name_ar'])) { throw new \RuntimeException('GOV-422: الاسمُ الجديدُ إلزامي'); }
+                if (!$unitId) { throw new \RuntimeException('GOV-422: الوحدة إلزامية'); }
+                if (empty($change['name_ar'])) { throw new \RuntimeException('GOV-422: الاسم الجديد إلزامي'); }
                 $st = $db->prepare("UPDATE org_units SET name_ar = ? WHERE unit_id = ? AND company_id = ?");
                 $st->bind_param('sii', $change['name_ar'], $unitId, $companyId);
                 $st->execute();
@@ -293,17 +293,17 @@ class GovernanceM14Service
                 break;
             case 'نقل تبعية':
                 if (!$unitId || !isset($change['parent_unit_id'])) {
-                    throw new \RuntimeException('GOV-422: الوحدةُ والأبُ الجديدُ إلزاميان');
+                    throw new \RuntimeException('GOV-422: الوحدة والأب الجديد إلزاميان');
                 }
                 $newParent = (int) $change['parent_unit_id'] ?: null;
-                if ($newParent === $unitId) { throw new \RuntimeException('GOV-422: لا تبعيةَ ذاتية'); }
+                if ($newParent === $unitId) { throw new \RuntimeException('GOV-422: لا تبعية ذاتية'); }
                 $st = $db->prepare("UPDATE org_units SET parent_unit_id = ? WHERE unit_id = ? AND company_id = ?");
                 $st->bind_param('iii', $newParent, $unitId, $companyId);
                 $st->execute();
                 $st->close();
                 break;
             case 'تعطيل وحدة':
-                if (!$unitId) { throw new \RuntimeException('GOV-422: الوحدةُ إلزامية'); }
+                if (!$unitId) { throw new \RuntimeException('GOV-422: الوحدة إلزامية'); }
                 $st = $db->prepare("UPDATE org_units SET active = 0 WHERE unit_id = ? AND company_id = ?");
                 $st->bind_param('ii', $unitId, $companyId);
                 $st->execute();
@@ -312,7 +312,7 @@ class GovernanceM14Service
             case 'رجوع لنسخة':
                 // الرجوعُ بقرارٍ: يتطلب version_code سابقًا وتُستعاد لقطتُه
                 if (empty($change['revert_to_code'])) {
-                    throw new \RuntimeException('GOV-422: نسخةُ الرجوعِ إلزامية');
+                    throw new \RuntimeException('GOV-422: نسخة الرجوع إلزامية');
                 }
                 $st = $db->prepare("SELECT id, snapshot_json FROM org_structure_versions
                                      WHERE company_id = ? AND version_code = ? LIMIT 1");
@@ -320,7 +320,7 @@ class GovernanceM14Service
                 $st->execute();
                 $ver = $st->get_result()->fetch_assoc();
                 $st->close();
-                if (!$ver) { throw new \RuntimeException('GOV-404: النسخةُ غيرُ موجودة'); }
+                if (!$ver) { throw new \RuntimeException('GOV-404: النسخة غير موجودة'); }
                 $snap = json_decode((string) $ver['snapshot_json'], true) ?: array();
                 foreach ($snap as $u) {
                     $st = $db->prepare("UPDATE org_units SET name_ar = ?, layer = ?, parent_unit_id = ?, active = ?
@@ -344,7 +344,7 @@ class GovernanceM14Service
             (company_id, version_code, change_kind, unit_id, decision_ref, effective_date,
              snapshot_json, change_json, assignments_review_note, changed_by, authority_ref)
             VALUES (?,?,?,?,?,?,?,?,?,?,?)");
-        $reviewNote = 'التكليفاتُ القائمةُ على الوحدة تُراجَع — org_assignments';
+        $reviewNote = 'التكليفات القائمة على الوحدة تراجع — org_assignments';
         $st->bind_param('ississsssis',
             $companyId, $code, $changeKind, $unitId, $decisionRef, $effectiveDate,
             $snapJson, $changeJson, $reviewNote, $actor, $authorityRef);
@@ -361,7 +361,7 @@ class GovernanceM14Service
             'idempotency_key' => 'org:' . $code,
             'source_ref' => $code,
             'payload' => array('event_name' => 'OrgStructureChanged',
-                'consumers' => array('كلُّ الإدارات'), 'kind' => $changeKind, 'unit_id' => $unitId),
+                'consumers' => array('كل الإدارات'), 'kind' => $changeKind, 'unit_id' => $unitId),
         ));
         return array('id' => $id, 'version_code' => $code, 'unit_id' => $unitId);
     }

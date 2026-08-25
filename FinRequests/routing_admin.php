@@ -19,7 +19,7 @@ $gate = $is_super ? ems_tenant_db()->forAllTenants('fin routing admin super') : 
 
 $__pp = check_page_permissions($conn, 'FinRequests/routing_admin.php');
 if (!$is_super && !($__pp['can_view'] && $role === '17')) {
-    ems_gov_flash_redirect('../main/dashboard.php', '❌ إدارة التوجيه للمدير المالي حصرًا', 'GOV-FAIL-409', '');
+    ems_gov_flash_redirect('../main/dashboard.php', '❌ إدارة التوجيه للمدير المالي حصرا', 'GOV-FAIL-409', '');
     exit();
 }
 
@@ -61,11 +61,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (function_exists('log_security_event')) {
             log_security_event('finreq_routing_change', 'module=' . $sm . ' active=' . $active . ' by=' . $user_id);
         }
-        ems_gov_flash_redirect('routing_admin.php', '✅ حُفظ توجيه ' . $modules_all[$sm], 'GOV-OK-200', '');
+        ems_gov_flash_redirect('routing_admin.php', '✅ حفظ توجيه ' . $modules_all[$sm], 'GOV-OK-200', '');
         exit();
     } catch (\Throwable $t) {
         error_log('finreq routing save: ' . $t->getMessage());
-        ems_gov_flash_redirect('routing_admin.php', '❌ تعذّر الحفظ', 'GOV-FAIL-409', '');
+        ems_gov_flash_redirect('routing_admin.php', '❌ تعذر الحفظ', 'GOV-FAIL-409', '');
         exit();
     }
 }
@@ -100,7 +100,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back    = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ)
-    echo ems_states_bundle('لا صفوفَ توجيهٍ بعد', 'أضف توجيهَ إدارةٍ من نموذج «إضافة/تعديل توجيه إدارة» أدناه');
+    echo ems_states_bundle('لا صفوف توجيه بعد', 'أضف توجيه إدارة من نموذج «إضافة/تعديل توجيه إدارة» أدناه');
     ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
@@ -118,21 +118,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="ems-fn-th" data-fn="1">نوع الطلب</th>
               <th class="ems-fn-th" data-fn="1">حد المبلغ من</th>
               <th class="ems-fn-th" data-fn="1">حد المبلغ إلى</th>
-              <th class="ems-fn-th" data-fn="1">المعتمِد الأول</th>
-              <th class="ems-fn-th" data-fn="1">المعتمِد الثاني</th>
-              <th class="ems-fn-th" data-fn="1">المعتمِد الثالث</th>
+              <th class="ems-fn-th" data-fn="1">المعتمد الأول</th>
+              <th class="ems-fn-th" data-fn="1">المعتمد الثاني</th>
+              <th class="ems-fn-th" data-fn="1">المعتمد الثالث</th>
               <th class="ems-fn-th" data-fn="1">الإدارة العامة مطلوبة؟</th>
               <th class="ems-fn-th" data-fn="1">درجة الخطورة</th>
               <th class="ems-fn-th" data-fn="1">مهلة كل حلقة</th>
               <th class="ems-fn-th" data-fn="1">تاريخ السريان</th>
-              <th class="ems-fn-th" data-fn="1">عرّفها</th>
+              <th class="ems-fn-th" data-fn="1">عرفها</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-              <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
               <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
               <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
@@ -150,10 +150,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <td><?php echo htmlspecialchars($roles_map[intval($r['reviewer_role_id'])] ?? $r['reviewer_role_id']); ?></td>
                         <td><?php echo htmlspecialchars($roles_map[intval($r['manager_role_id'])] ?? $r['manager_role_id']); ?></td>
                         <td><?php echo isset($accountants[$r['source_module']]) ? ('موظف #' . $accountants[$r['source_module']]) : '<span class="badge bg-warning">بلا تعيين — يغطيه المحاسب المركزي (18)</span>'; ?></td>
-                        <td><?php echo intval($r['is_active']) === 1 ? '<span class="badge bg-success">مفعّلة</span>' : '<span class="badge bg-secondary">موقوفة</span>'; ?></td>
+                        <td><?php echo intval($r['is_active']) === 1 ? '<span class="badge bg-success">مفعلة</span>' : '<span class="badge bg-secondary">موقوفة</span>'; ?></td>
                     </tr>
                 <?php endforeach; if (!$rows): ?>
-                    <tr><td colspan="6">لا صفوف توجيهٍ بعد</td></tr>
+                    <tr><td colspan="6">لا صفوف توجيه بعد</td></tr>
                 <?php endif; ?>
                 </tbody>
             </table>
@@ -174,7 +174,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div><label for="emsf_317_dd1d7">أدوار الإنشاء (أرقامًا بفواصل) *</label><input type="text" name="requester_roles" placeholder="13,14" required id="emsf_317_dd1d7"></div>
+                    <div><label for="emsf_317_dd1d7">أدوار الإنشاء (أرقاما بفواصل) *</label><input type="text" name="requester_roles" placeholder="13,14" required id="emsf_317_dd1d7"></div>
                     <div>
                         <label for="emsf_318_30edd">دور المراجع (الرئيس المباشر) *</label>
                         <select name="reviewer_role_id" required id="emsf_318_30edd">
@@ -188,12 +188,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </select>
                     </div>
                     <div class="fra-self-end">
-                        <label class="fra-check"><input type="checkbox" name="is_active" value="1" aria-label="مفعّلة — يبدأ الإنشاء فورًا"> مفعّلة (يبدأ الإنشاء فورًا)</label>
+                        <label class="fra-check"><input type="checkbox" name="is_active" value="1" aria-label="مفعلة — يبدأ الإنشاء فورا"> مفعلة (يبدأ الإنشاء فورا)</label>
                     </div>
                     <div class="fra-self-end"><button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> حفظ التوجيه</button></div>
                 </div>
             </form>
-            <p class="fra-hint">💡 التعميم المتدرج (القرار المقفل): فعّل إدارةً جديدة هنا متى نجحت سابقتها — لا حاجة لأي تعديل كود.</p>
+            <p class="fra-hint">💡 التعميم المتدرج (القرار المقفل): فعل إدارة جديدة هنا متى نجحت سابقتها — لا حاجة لأي تعديل كود.</p>
         </div>
     </div>
 </div>

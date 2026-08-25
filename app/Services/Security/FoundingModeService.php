@@ -33,7 +33,7 @@ class FoundingModeService
             return array('ok' => false, 'code' => 422, 'reason' => 'رفضته القاعدة: ' . $err);
         }
         return array('ok' => true, 'code' => 200,
-            'reason' => 'فُعِّل ' . $mode . ' حتى ' . $endsAt . ' — بشريط ظاهر ووسم لكل فعل');
+            'reason' => 'فعل ' . $mode . ' حتى ' . $endsAt . ' — بشريط ظاهر ووسم لكل فعل');
     }
 
     /** أوضاع التأسيس الحية — للشريط الظاهر في كل شاشة (§7-③). */
@@ -72,23 +72,23 @@ class FoundingModeService
         $pt = $conn->query("SELECT started_at FROM founding_mode WHERE mode = 'permission_test' AND started_at IS NOT NULL")->fetch_assoc();
         if (!$pt) {
             $out['code'] = 409;
-            $out['reason'] = 'لا إغلاق قبل اجتياز وضع اختبار الصلاحيات — لم يُفعَّل قط (§7 القاعدة القاطعة)';
+            $out['reason'] = 'لا إغلاق قبل اجتياز وضع اختبار الصلاحيات — لم يفعل قط (§7 القاعدة القاطعة)';
             return $out;
         }
 
         // ① جرد الصلاحيات الفعلية
         $inv = $conn->query("SELECT COUNT(*) c, COUNT(DISTINCT person_id) p FROM effective_permissions WHERE company_id = {$companyId}")->fetch_assoc();
-        $out['steps']['①_inventory'] = 'جُردت ' . $inv['c'] . ' صلاحية مشتقة لـ' . $inv['p'] . ' شخصًا';
+        $out['steps']['①_inventory'] = 'جردت ' . $inv['c'] . ' صلاحية مشتقة ل' . $inv['p'] . ' شخصا';
 
         // ② القوالب النهائية من المصادر الأربعة — قياس المنشور
         $tpl = $conn->query("SELECT COUNT(DISTINCT tpl_id) c FROM permission_template_versions WHERE state = 'published'")->fetch_assoc();
-        $out['steps']['②_templates'] = $tpl['c'] . ' قالبًا بإصدار منشور';
+        $out['steps']['②_templates'] = $tpl['c'] . ' قالبا بإصدار منشور';
 
         // ③ إخراج المتدربين والحسابات التجريبية — تعطيل لا حذف
         $conn->query("UPDATE person_relationships SET state = 'ended', valid_to = CURDATE()
                       WHERE company_id = {$companyId} AND relation_code = 'rel_trainee' AND state = 'active'");
         $trainees = $conn->affected_rows;
-        $out['steps']['③_trainees'] = 'أُنهي ' . $trainees . ' علاقة متدرب — أرشفة لا حذف';
+        $out['steps']['③_trainees'] = 'أنهي ' . $trainees . ' علاقة متدرب — أرشفة لا حذف';
 
         // ④ إعادة التصنيف — كل شخص نشط له مركز بطبقاته
         $unclassified = intval($conn->query(
@@ -98,14 +98,14 @@ class FoundingModeService
                                  WHERE p.person_id = r.person_id AND p.state = 'active')")->fetch_assoc()['c']);
         $out['steps']['④_reclassify'] = $unclassified === 0
             ? 'كل صاحب علاقة نشطة له مركز بطبقاته'
-            : $unclassified . ' علاقة نشطة بلا مركز — تُصنَّف قبل الإغلاق';
+            : $unclassified . ' علاقة نشطة بلا مركز — تصنف قبل الإغلاق';
 
         // ⑤ الخفض الجماعي: إسقاط استثناءات التأسيس (البذور الموسومة) دفعة واحدة
         $conn->query("UPDATE permission_exceptions SET state = 'revoked'
                       WHERE company_id = {$companyId} AND state = 'active'
                         AND reason LIKE '%تأسيس%'");
         $dropped = $conn->affected_rows;
-        $out['steps']['⑤_mass_reduce'] = 'أُسقط ' . $dropped . ' استثناء تأسيس بقرار واحد';
+        $out['steps']['⑤_mass_reduce'] = 'أسقط ' . $dropped . ' استثناء تأسيس بقرار واحد';
 
         // ⑥ الشهادة — الشروط الثلاثة
         $foundingGrants = intval($conn->query(
@@ -131,7 +131,7 @@ class FoundingModeService
         $out['certificate'] = $cert;
         if (!$pass) {
             $out['code'] = 409;
-            $out['reason'] = 'شروط الشهادة منقوصة — لا إغلاق مدَّعى: '
+            $out['reason'] = 'شروط الشهادة منقوصة — لا إغلاق مدعى: '
                 . json_encode($cert, JSON_UNESCAPED_UNICODE);
             return $out;
         }
@@ -147,7 +147,7 @@ class FoundingModeService
             json_encode($cert, JSON_UNESCAPED_UNICODE), 'شهادة إغلاق التأسيس — البروتوكول السداسي', $closedBy);
         $out['ok'] = true;
         $out['code'] = 200;
-        $out['reason'] = 'أُغلق التأسيس بشهادة موقَّعة — يوقّعها مدير الصلاحيات والمدير التنفيذي';
+        $out['reason'] = 'أغلق التأسيس بشهادة موقعة — يوقعها مدير الصلاحيات والمدير التنفيذي';
         return $out;
     }
 }

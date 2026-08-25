@@ -43,7 +43,7 @@ if (!$is_super_admin && empty($__pp['can_view'])) {
     exit();
 }
 if (!$is_super_admin && $_SERVER['REQUEST_METHOD'] === 'POST' && empty($__pp['can_add']) && empty($__pp['can_edit'])) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'غير مصرح بالكتابة في هذه الشاشة ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
+    ems_gov_flash_redirect('../main/dashboard.php', 'غير مصرح بالكتابة في هذه الشاشة ❌', 'GOV-PERM-403', 'اطلب المنحة من مدير الصلاحيات إن كانت ضمن عملك');
 }
 $COLS   = array (
   0 => 'الكيان',
@@ -57,13 +57,13 @@ $COLS   = array (
   8 => 'العملة',
   9 => 'سقف الإدارة',
   10 => 'التجاوز',
-  11 => 'المعتمِدون قبلي',
+  11 => 'المعتمدون قبلي',
   12 => 'المهلة',
   13 => 'قراري',
   14 => 'سبب القرار',
   15 => 'تاريخ القرار',
-  16 => 'المُنشئ — الاسم والصفة',
-  17 => 'المعتمِد — الاسم والصفة',
+  16 => 'المنشئ — الاسم والصفة',
+  17 => 'المعتمد — الاسم والصفة',
   18 => 'مرجع التفويض',
   19 => 'تاريخ الإنشاء',
   20 => 'تاريخ الاعتماد',
@@ -130,14 +130,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
             $__q->execute();
             $__rs = $__q->get_result();
             if ($__rs && ($__row = $__rs->fetch_assoc())) {
-                $__ref = ' — الصفُّ القائم #' . (int) $__row['id'] . ' (' . $__row['status'] . ')';
+                $__ref = ' — الصف القائم #' . (int) $__row['id'] . ' (' . $__row['status'] . ')';
             }
             $__q->close();
         }
     }
     ems_gov_flash_redirect(basename(__FILE__),
-        $ok ? 'حُفظ الصف ✅'
-            : ($__dup ? ('رقمُ الطلب «' . $in['request_no'] . '» مسجَّلٌ سلفًا — لم يُنشأ صفٌّ ثانٍ' . $__ref . ' ❌')
+        $ok ? 'حفظ الصف ✅'
+            : ($__dup ? ('رقم الطلب «' . $in['request_no'] . '» مسجل سلفا — لم ينشأ صف ثان' . $__ref . ' ❌')
                       : 'تعذر الحفظ ❌'),
         $ok ? 'GOV-OK-200' : ($__dup ? 'GOV-FAIL-409' : 'GOV-OK-200'), '');
     exit();
@@ -152,17 +152,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     $goBack = function ($m) { ems_gov_flash_redirect(basename(__FILE__), $m, 'GOV-INFO-200', ''); exit(); };
     $actorRole = strval($_SESSION['user']['role'] ?? '');
     if (!$is_super_admin && $actorRole !== '9') {
-        ems_gov_flash_redirect('../main/dashboard.php', 'الاعتمادُ الأعلى قرارُ الإدارة التنفيذية وحدها ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
+        ems_gov_flash_redirect('../main/dashboard.php', 'الاعتماد الأعلى قرار الإدارة التنفيذية وحدها ❌', 'GOV-PERM-403', 'اطلب المنحة من مدير الصلاحيات إن كانت ضمن عملك');
     }
     $rowId    = intval($_POST['row'] ?? 0);
     $decision = trim((string) ($_POST['decision'] ?? ''));
     $reason   = trim((string) ($_POST['reason'] ?? ''));
     $until    = trim((string) ($_POST['until'] ?? ''));
     $OPTS = array('اعتماد' => 'معتمد', 'اعتماد بشرط' => 'معتمد بشرط', 'رد' => 'مردود', 'تأجيل' => 'مؤجل');
-    if ($rowId <= 0 || !isset($OPTS[$decision])) { $goBack('قرارٌ غير معروف ❌'); }
-    if ($decision === 'اعتماد بشرط' && $reason === '') { $goBack('الاعتمادُ المشروط يستلزم نصَّ الشرط ❌'); }
-    if ($decision === 'رد' && $reason === '') { $goBack('الردُّ يستلزم سببًا مكتوبًا ❌'); }
-    if ($decision === 'تأجيل' && $until === '') { $goBack('التأجيلُ يستلزم تاريخًا ❌'); }
+    if ($rowId <= 0 || !isset($OPTS[$decision])) { $goBack('قرار غير معروف ❌'); }
+    if ($decision === 'اعتماد بشرط' && $reason === '') { $goBack('الاعتماد المشروط يستلزم نص الشرط ❌'); }
+    if ($decision === 'رد' && $reason === '') { $goBack('الرد يستلزم سببا مكتوبا ❌'); }
+    if ($decision === 'تأجيل' && $until === '') { $goBack('التأجيل يستلزم تاريخا ❌'); }
 
     $st = $conn->prepare("SELECT * FROM exec_approvals WHERE id = ?"
         . ($is_super_admin && $company_id <= 0 ? '' : ' AND company_id = ?'));
@@ -171,10 +171,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     $st->execute();
     $row = $st->get_result()->fetch_assoc();
     $st->close();
-    if (!$row) { $goBack('الصفُّ غير موجودٍ في نطاقك ❌'); }
+    if (!$row) { $goBack('الصف غير موجود في نطاقك ❌'); }
     // القابل للقرار: الحيُّ والمؤجَّل (يُعاد بتُّه) — والمقرَّر لا يُقرَّر ثانية
     if (!in_array((string) $row['status'], array('مسودة', 'قيد المراجعة', 'مؤجل'), true)) {
-        $goBack('الصفُّ مقرَّرٌ سلفًا (' . $row['status'] . ') — لا قرارَ على قرار ❌');
+        $goBack('الصف مقرر سلفا (' . $row['status'] . ') — لا قرار على قرار ❌');
     }
 
     /* ══ INJ-0017 (P1) — «حارسُ منعِ اعتمادِ الذات» لا يُستدعى هنا ═══════════
@@ -182,11 +182,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
        فمن رفع الطلبَ يقرّره إن كان في الدور 9. والحارسُ مبنيٌّ منذ M-45. */
     require_once __DIR__ . '/../includes/self_approval_guard.php';
     $__sa = ems_assert_not_self_approval($conn, 'exec_approvals', 'id', $rowId,
-        'اعتمادٌ تنفيذيٌّ ' . (string) ($row['request_no'] ?? ('#' . $rowId)), $company_id);
+        'اعتماد تنفيذي ' . (string) ($row['request_no'] ?? ('#' . $rowId)), $company_id);
     if ($__sa !== null) { $goBack($__sa['reason']); }
 
     $actorName = (trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid)) . ' (الإدارة التنفيذية)';
-    $decisionReason = ($reason !== '') ? $reason : ($decision === 'اعتماد' ? 'اعتمادٌ مطلق' : (string) ($row['decision_reason'] ?? ''));
+    $decisionReason = ($reason !== '') ? $reason : ($decision === 'اعتماد' ? 'اعتماد مطلق' : (string) ($row['decision_reason'] ?? ''));
     if ($decision === 'تأجيل') { $decisionReason = trim('مؤجل إلى ' . $until . ($reason !== '' ? ' — ' . $reason : '')); }
     $decisionDate = date('Y-m-d');
     $authorityRef = trim((string) ($row['authority_ref'] ?? '')) !== '' ? (string) $row['authority_ref'] : 'سلطة أصلية';
@@ -228,7 +228,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
                 'occurred_at'     => gmdate('Y-m-d H:i:s'),
                 'created_by'      => $uid ?: 1,
                 'idempotency_key' => 'exec_approval:EXAP-' . $rowId,
-                'notes'           => 'اعتمادٌ أعلى: ' . mb_substr((string) ($row['document'] ?? $row['request_no']), 0, 120),
+                'notes'           => 'اعتماد أعلى: ' . mb_substr((string) ($row['document'] ?? $row['request_no']), 0, 120),
                 'payload'         => array(
                     'approval_ref' => 'EXAP-' . $rowId,
                     'request_no'   => (string) $row['request_no'],
@@ -243,7 +243,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
             ));
         } catch (\Throwable $t) { error_log('ceo_approvals fact #' . $rowId . ': ' . $t->getMessage()); }
     }
-    $goBack('قُيّد القرار: ' . $decision . ' ✅');
+    $goBack('قيد القرار: ' . $decision . ' ✅');
 }
 
 /* ── القراءة: صفوف الكيان من الجدول الأصلي ──────────────────────────────── */
@@ -293,8 +293,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     );
     $header_back = false;
     include '../includes/page_header.php';
-    echo ems_states_bundle('لا اعتماداتٍ معروضةً على الإدارةِ التنفيذيةِ بعدُ', 'أضف صفًّا بزر «إضافة» — أو يصل الرفعُ الآليُّ من بوابةِ الطلبِ المالي عند تجاوزِ السقف');
-    echo ems_next_step('قرارُ الإدارةِ التنفيذية على المعروض: اعتمادٌ أو اعتمادٌ بشرطٍ أو ردٌّ أو تأجيل — والمقرَّرُ لا يُقرَّرُ ثانية');
+    echo ems_states_bundle('لا اعتمادات معروضة على الإدارة التنفيذية بعد', 'أضف صفا بزر «إضافة» — أو يصل الرفع الآلي من بوابة الطلب المالي عند تجاوز السقف');
+    echo ems_next_step('قرار الإدارة التنفيذية على المعروض: اعتماد أو اعتماد بشرط أو رد أو تأجيل — والمقرر لا يقرر ثانية');
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
@@ -328,7 +328,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" inputmode="decimal" name="f8" placeholder="0" id="emsf_1078_f6fbb"></div>
                 <div class="form-group"><label for="emsf_1079_d9c37">التجاوز</label>
                     <input type="text" inputmode="decimal" name="f9" placeholder="0" id="emsf_1079_d9c37"></div>
-                <div class="form-group"><label for="emsf_1080_cb8a3">المعتمِدون قبلي</label>
+                <div class="form-group"><label for="emsf_1080_cb8a3">المعتمدون قبلي</label>
                     <input type="text" name="f10" maxlength="190" id="emsf_1080_cb8a3"></div>
                 <div class="form-group"><label for="emsf_1081_1b3d7">المهلة</label>
                     <input type="text" name="f11" maxlength="190" id="emsf_1081_1b3d7"></div>
@@ -338,7 +338,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="f13" maxlength="190" id="emsf_1083_d8638"></div>
                 <div class="form-group"><label for="emsf_1084_c76ef">تاريخ القرار</label>
                     <input type="date" name="f14" id="emsf_1084_c76ef"></div>
-                <div class="form-group"><label for="emsf_1085_e0899">المعتمِد — الاسم والصفة</label>
+                <div class="form-group"><label for="emsf_1085_e0899">المعتمد — الاسم والصفة</label>
                     <input type="text" name="f15" maxlength="190" id="emsf_1085_e0899"></div>
                 <div class="form-group"><label for="emsf_1086_e0b45">مرجع التفويض</label>
                     <input type="text" name="f16" maxlength="190" id="emsf_1086_e0b45"></div>
@@ -400,7 +400,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="table-responsive">
         <table class="alltables display" id="ceo_approvalsTable">
             <thead><tr>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
             <th>رقم الطلب</th>
             <th>تاريخ الورود</th>
             <th>نوع المستند</th>
@@ -411,22 +411,22 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th class="ems-gov-th" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
             <th>سقف الإدارة</th>
             <th>التجاوز</th>
-            <th>المعتمِدون قبلي</th>
+            <th>المعتمدون قبلي</th>
             <th>المهلة</th>
             <th>قراري</th>
             <th>سبب القرار</th>
             <th>تاريخ القرار</th>
-            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
             <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
             <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-            <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولَّد عنه — خيط التتبع">المرجع الأب</th>
+            <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
             <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
             </tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="23" class="text-center text-muted">لا بياناتَ بعدُ — أضف أول صفٍّ بزر «إضافة»</td></tr>
+                <tr><td colspan="23" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
                     <?php foreach (array_keys($COLS) as $i): $v = m00_cell_at($i, $r, $entityName, $COLDB); ?>

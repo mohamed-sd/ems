@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $reason = trim($_POST['reason'] ?? '');
         $priority = trim($_POST['priority'] ?? 'normal');
         if ($transfer_type_id <= 0 || !array_key_exists($source_module, $srcs) || $reason === '') {
-            ems_gov_flash_redirect('transfer_requests.php', 'بيانات الطلب غير مكتملة (النوع/المصدر/المبرّر) ❌', 'GOV-FAIL-409', ''); exit();
+            ems_gov_flash_redirect('transfer_requests.php', 'بيانات الطلب غير مكتملة (النوع/المصدر/المبرر) ❌', 'GOV-FAIL-409', ''); exit();
         }
         $code = trs_gen_req_code($conn, $company_id);
         try {
@@ -88,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$can_edit) { ems_gov_flash_redirect('transfer_requests.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
         $rid = intval($_POST['request_id'] ?? 0);
         $direction = trim($_POST['direction'] ?? '');
-        if (!array_key_exists($direction, $dirs)) { ems_gov_flash_redirect('transfer_requests.php', 'الاتجاه إلزامي لتحويل الطلب أمراً ❌', 'GOV-FAIL-409', ''); exit(); }
+        if (!array_key_exists($direction, $dirs)) { ems_gov_flash_redirect('transfer_requests.php', 'الاتجاه إلزامي لتحويل الطلب أمرا ❌', 'GOV-FAIL-409', ''); exit(); }
         // اجلب الطلب المعتمد (عبر البوابة — الكتابة التالية بشركة السياق حصرًا،
         // فالقراءة تُنطَّق بها أيضًا: تسدّ حافة super القديمة غير المتسقة)
         $req = trs_gate(false)->selectOne('transfer_requests', array(
@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$req) { ems_gov_flash_redirect('transfer_requests.php', 'الطلب غير معتمد أو غير موجود ❌', 'GOV-REF-404', ''); exit(); }
         $from_loc = intval($req['from_location_id'] ?? 0);
         $to_loc = intval($req['to_location_id'] ?? 0);
-        if ($from_loc <= 0 || $to_loc <= 0) { ems_gov_flash_redirect('transfer_requests.php', 'الطلب بلا موقعَي انطلاق/وصول — أكملهما أولاً ❌', 'GOV-FAIL-409', ''); exit(); }
+        if ($from_loc <= 0 || $to_loc <= 0) { ems_gov_flash_redirect('transfer_requests.php', 'الطلب بلا موقعي انطلاق/وصول — أكملهما أولا ❌', 'GOV-FAIL-409', ''); exit(); }
 
         $project_id = ($req['project_id'] !== null) ? intval($req['project_id']) : null;
         $project_days = trs_project_days($conn, $company_id, $project_id);
@@ -127,7 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }, 'convert request#' . $rid);
         } catch (\App\Core\TenantGateException $e) {
             error_log('transfer_requests convert rolled back: ' . $e->getMessage());
-            ems_gov_flash_redirect('transfer_requests.php', 'تعذّر التحويل ❌', 'GOV-FAIL-409', ''); exit();
+            ems_gov_flash_redirect('transfer_requests.php', 'تعذر التحويل ❌', 'GOV-FAIL-409', ''); exit();
         }
         trs_log_event($conn, $company_id, $order_id, 'system', "تحويل الطلب {$req['code']} إلى أمر ($order_no)", 'submitted', $stage, $current_user_id, 'transport');
         ems_gov_redirect("Location: transfer_order_form.php?id=$order_id&msg=تم+تحويل+الطلب+إلى+أمر+($order_no)+✅"); exit();
@@ -152,7 +152,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا طلباتِ ترحيلٍ مقدَّمةً بعدُ', 'قدّم أولَ طلبٍ بزرِّ «طلب جديد» في رأسِ الشاشة');
+    echo ems_states_bundle('لا طلبات ترحيل مقدمة بعد', 'قدم أول طلب بزر «طلب جديد» في رأس الشاشة');
     // TKT-15 · زر الإبلاغ السياقي — النقل والترحيل (§2-④)
     require_once __DIR__ . '/../includes/report_button.php';
     ems_report_button(array('screen' => 'transport'));
@@ -179,7 +179,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <select name="to_location_id" id="emsf_1601_02058"><?php echo trs_location_options($conn, $is_super_admin, $company_id, 0); ?></select></div>
             <div class="form-group"><label for="emsf_1602_e56fc">الأولوية</label>
                 <select name="priority" id="emsf_1602_e56fc"><?php foreach ($prios as $k => $v) echo "<option value='$k'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
-            <div class="form-group trs-rq-full"><label for="emsf_1603_27f33">مبرّر الاحتياج <span class="required">*</span></label>
+            <div class="form-group trs-rq-full"><label for="emsf_1603_27f33">مبرر الاحتياج <span class="required">*</span></label>
                 <input type="text" name="reason" required placeholder="سبب الترحيل ومصدره" id="emsf_1603_27f33"></div>
         </div></div>
         <div class="form-actions">
@@ -191,7 +191,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-body"><div class="table-container">
         <table id="reqTable" class="display nowrap alltables trs-rq-tbl" data-order='[[1,"desc"]]' data-state-save="false" data-scroll-x="true"><thead><tr>
-            <th>الإجراءات</th><th>كود العنصر</th><th>نوع الترحيل</th><th>مصدر تحميل التكلفة</th><th>المشروع</th><th>المبرّر</th><th>الأولوية</th><th>الحالة</th>
+            <th>الإجراءات</th><th>كود العنصر</th><th>نوع الترحيل</th><th>مصدر تحميل التكلفة</th><th>المشروع</th><th>المبرر</th><th>الأولوية</th><th>الحالة</th>
             <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
             <th class="ems-fn-th" data-fn="1">رقم الطلب</th>
             <th class="ems-fn-th" data-fn="1">تاريخ الطلب</th>
@@ -200,11 +200,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th class="ems-fn-th" data-fn="1">من</th>
             <th class="ems-fn-th" data-fn="1">إلى</th>
             <th class="ems-fn-th" data-fn="1">التاريخ المطلوب</th>
-            <th class="ems-fn-th" data-fn="1">قدّمه</th>
+            <th class="ems-fn-th" data-fn="1">قدمه</th>
             <th class="ems-fn-th" data-fn="1">اعتمده</th>
             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
             <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
             <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
             <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>

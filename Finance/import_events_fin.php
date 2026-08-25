@@ -52,7 +52,7 @@ function fin_import_publish($conn, array $rows, array $cfg, $uid)
     $n = 0;
     foreach ($rows as $row) {
         $docCompany = intval($row['company_id'] ?? 0);
-        if ($docCompany <= 0) { error_log('fin import ' . $cfg['module'] . ' ' . $row['code'] . ': صف مستندٍ بلا شركة — تخطٍّ'); continue; }
+        if ($docCompany <= 0) { error_log('fin import ' . $cfg['module'] . ' ' . $row['code'] . ': صف مستند بلا شركة — تخط'); continue; }
         $conn->begin_transaction();
         try {
             \App\Core\EventPublisher::publish($conn, array(
@@ -169,22 +169,22 @@ $mnt_pending  = count(fin_pending_import(ems_tenant_db(), 'mnt_order', 'total_co
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضيًا
-    echo ems_states_bundle('لا أحداثَ ماليةً مستوردةً بعدُ', 'ولّدْ أحداثَ المشترياتِ أوِ الصيانةِ من بطاقتي الأعلى حين يظهرُ عددٌ منتظر');
+    echo ems_states_bundle('لا أحداث مالية مستوردة بعد', 'ولد أحداث المشتريات أو الصيانة من بطاقتي الأعلى حين يظهر عدد منتظر');
     ?>
     <?php fin_msg_banner(); ?>
 
     <div class="card"><div class="card-body">
         <div class="success-message is-success fin-imp-notice">
             <i class="fas fa-shield-halved"></i>
-            المالية تقرأ أوامر المشتريات والصيانة <strong>قراءةً فقط</strong> وتولّد أحداثاً مالية جديدة —
-            <strong>دون أي تعديل على النظام القائم</strong>. الأحداث المولّدة تبدأ «مسودة» وتمرّ بدورة الاعتماد كالمعتاد.
+            المالية تقرأ أوامر المشتريات والصيانة <strong>قراءة فقط</strong> وتولد أحداثا مالية جديدة —
+            <strong>دون أي تعديل على النظام القائم</strong>. الأحداث المولدة تبدأ «مسودة» وتمر بدورة الاعتماد كالمعتاد.
         </div>
 
         <div class="form-grid fin-imp-cards">
             <div class="card fin-imp-card"><div class="card-body">
                 <h5><i class="fas fa-file-invoice-dollar"></i> المشتريات (أوامر الشراء)</h5>
                 <p class="fin-imp-count"><strong><?php echo $proc_pending; ?></strong></p>
-                <p class="text-muted">أمر شراء لم يُولّد له حدث بعد</p>
+                <p class="text-muted">أمر شراء لم يولد له حدث بعد</p>
                 <?php if ($can_add && $proc_pending > 0): ?>
                     <a href="?gen_proc=1&_t=<?php echo fin_action_token(); ?>" class="btn-primary fin-imp-cta" onclick="return confirm('توليد <?php echo $proc_pending; ?> حدث مصروف من المشتريات؟')"><i class="fas fa-bolt"></i> توليد أحداث المشتريات</a>
                 <?php elseif ($proc_pending === 0): ?>
@@ -195,7 +195,7 @@ $mnt_pending  = count(fin_pending_import(ems_tenant_db(), 'mnt_order', 'total_co
             <div class="card fin-imp-card"><div class="card-body">
                 <h5><i class="fas fa-screwdriver-wrench"></i> الصيانة (أوامر الصيانة)</h5>
                 <p class="fin-imp-count"><strong><?php echo $mnt_pending; ?></strong></p>
-                <p class="text-muted">أمر صيانة بتكلفة لم يُولّد له حدث بعد</p>
+                <p class="text-muted">أمر صيانة بتكلفة لم يولد له حدث بعد</p>
                 <?php if ($can_add && $mnt_pending > 0): ?>
                     <a href="?gen_mnt=1&_t=<?php echo fin_action_token(); ?>" class="btn-primary fin-imp-cta" onclick="return confirm('توليد <?php echo $mnt_pending; ?> حدث مصروف من الصيانة؟')"><i class="fas fa-bolt"></i> توليد أحداث الصيانة</a>
                 <?php elseif ($mnt_pending === 0): ?>
@@ -211,10 +211,10 @@ $mnt_pending  = count(fin_pending_import(ems_tenant_db(), 'mnt_order', 'total_co
             <table id="finTable" class="display nowrap alltables fin-imp-table">
                 <thead><tr><th>رقم الحدث</th><th>المصدر</th><th>المرجع</th><th>المبلغ</th><th>الحالة</th><th>ملاحظة</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>

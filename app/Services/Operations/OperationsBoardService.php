@@ -160,8 +160,8 @@ class OperationsBoardService
                            HAVING n > 1");
         while ($r && ($x = $r->fetch_assoc())) {
             $out[] = array('kind' => 'double_booking',
-                'message' => 'المشغّل ' . ($x['name'] ?: ('#' . $x['operator_employee_id']))
-                    . ' في ' . $x['n'] . ' معداتٍ (' . $x['eqs'] . ') بوردية ' . $x['shift'] . ' الواحدة');
+                'message' => 'المشغل ' . ($x['name'] ?: ('#' . $x['operator_employee_id']))
+                    . ' في ' . $x['n'] . ' معدات (' . $x['eqs'] . ') بوردية ' . $x['shift'] . ' الواحدة');
         }
 
         // ② معدةٌ عاملةٌ بلا مشغّلٍ مسمًّى
@@ -173,7 +173,7 @@ class OperationsBoardService
         while ($r && ($x = $r->fetch_assoc())) {
             $out[] = array('kind' => 'no_operator',
                 'message' => 'المعدة ' . ($x['name'] ?: ('#' . $x['equipment_id']))
-                    . ' عاملةٌ اليومَ **بلا مشغّلٍ مسمًّى**');
+                    . ' عاملة اليوم **بلا مشغل مسمى**');
         }
 
         // ③ مشغّلٌ برخصةٍ منتهية — أو بلا سجل رخصةٍ (يُعلَن ولا يُتجاهل)
@@ -187,10 +187,10 @@ class OperationsBoardService
                               AND (eo.id IS NULL OR eo.license_expiry_date < '{$d}')");
         while ($r && ($x = $r->fetch_assoc())) {
             $out[] = array('kind' => 'license',
-                'message' => 'المشغّل ' . ($x['name'] ?: ('#' . $x['operator_employee_id']))
+                'message' => 'المشغل ' . ($x['name'] ?: ('#' . $x['operator_employee_id']))
                     . ($x['license_expiry_date'] === null
-                        ? ' **بلا سجل رخصةٍ** — يُعلَن ولا يُتجاهل'
-                        : ' برخصةٍ **منتهيةٍ منذ ' . $x['license_expiry_date'] . '**'));
+                        ? ' **بلا سجل رخصة** — يعلن ولا يتجاهل'
+                        : ' برخصة **منتهية منذ ' . $x['license_expiry_date'] . '**'));
         }
         return $out;
     }

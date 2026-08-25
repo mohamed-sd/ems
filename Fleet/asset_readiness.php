@@ -53,11 +53,11 @@ include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main ems-unified-page-shell">
-    <?php $header_title = 'الجاهزية والملخص الشهري — مشتقّة بالكامل لا إدخال'; $header_icon = 'fa fa-gauge-high'; $header_actions = array();
+    <?php $header_title = 'الجاهزية والملخص الشهري — مشتقة بالكامل لا إدخال'; $header_icon = 'fa fa-gauge-high'; $header_actions = array();
     $header_back = array('href' => 'readiness_board.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'لوحة الجاهزية');
     include('../includes/page_header.php'); ?>
     <div class="ems-stat-cards">
-        <div class="ems-stat-card"><div class="ems-stat-value"><?= $n ?></div><div class="ems-stat-label">صفوف مشتقّة (أصل × شهر)</div></div>
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= $n ?></div><div class="ems-stat-label">صفوف مشتقة (أصل × شهر)</div></div>
         <div class="ems-stat-card"><div class="ems-stat-value"><?= $avg ?>٪</div><div class="ems-stat-label">متوسط الجاهزية</div></div>
         <div class="ems-stat-card"><div class="ems-stat-value"><?= $util ?>٪</div><div class="ems-stat-label">متوسط الاستغلال</div></div>
     </div>
@@ -70,11 +70,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </select></div>
     </form>
     <?php require_once __DIR__ . '/../includes/ux_components.php';
-    echo ems_states_bundle('لا صفوفَ جاهزيّةٍ مشتقّةً بعدُ', 'الاشتقاقُ يجري من التايم شيتِ وسجلِّ التوقُّف — ولا يُدخَل من هنا'); ?>
+    echo ems_states_bundle('لا صفوف جاهزية مشتقة بعد', 'الاشتقاق يجري من التايم شيت وسجل التوقف — ولا يدخل من هنا'); ?>
 
     <div class="table-wrap"><table class="data-table">
-        <thead><tr><th>#</th><th>الأصل</th><th>الفترة</th><th>ساعات الوردية</th><th>منفَّذة</th><th>استعداد</th>
-            <th>ساعات عطل</th><th>ساعات توقُّف</th><th>الجاهزية ٪</th><th>الاستغلال ٪</th>
+        <thead><tr><th>#</th><th>الأصل</th><th>الفترة</th><th>ساعات الوردية</th><th>منفذة</th><th>استعداد</th>
+            <th>ساعات عطل</th><th>ساعات توقف</th><th>الجاهزية ٪</th><th>الاستغلال ٪</th>
             <th>حالة الأصل</th><th>قاعدة الاشتقاق</th><th>المصادر</th></tr></thead>
         <tbody>
         <?php if ($rows): $i = 0; foreach ($rows as $r): $i++; ?>
@@ -93,7 +93,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><small><?= htmlspecialchars((string) $r['derived_from']) ?></small></td>
             </tr>
         <?php endforeach; else: ?>
-            <tr><td colspan="13">لا صفوفَ جاهزيّةٍ مشتقّةً بعدُ.</td></tr>
+            <tr><td colspan="13">لا صفوف جاهزية مشتقة بعد.</td></tr>
         <?php endif; ?>
         </tbody></table></div>
 </div>

@@ -255,7 +255,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
       $__ck->close();
       if ($__seen) {
         $__tp = isset($_POST['type']) ? urlencode($_POST['type']) : '1';
-        echo "<script>alert('↺ هذا الإدخالُ مُطبَّقٌ سلفًا — لم يُكتب مرتين');"
+        echo "<script>alert('↺ هذا الإدخال مطبق سلفا — لم يكتب مرتين');"
            . "window.location.href='timesheet.php?type=" . $__tp . "';</script>";
         exit;
       }
@@ -340,11 +340,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
   // لا يُحفظ يومُ عملٍ بلا آليةٍ ولا بلا مشغّل — فساعاتُ المشغّل بلا مشغّلٍ
   // مالٌ بلا صاحب.
   if (intval($values['operator']) <= 0) {
-    echo "<script>alert('❌ الآلية حقلٌ إلزامي — اختر الآلية');</script>";
+    echo "<script>alert('❌ الآلية حقل إلزامي — اختر الآلية');</script>";
     exit;
   }
   if (intval($values['employee_id']) <= 0) {
-    echo "<script>alert('❌ المشغّل حقلٌ إلزامي — لا يُحفظ يومُ عملٍ بلا مشغّل\\n\\n(ساعاتُ المشغّل تُحسب مستحقًّا، فلا بدّ من صاحبها)');</script>";
+    echo "<script>alert('❌ المشغل حقل إلزامي — لا يحفظ يوم عمل بلا مشغل\\n\\n(ساعات المشغل تحسب مستحقا، فلا بد من صاحبها)');</script>";
     exit;
   }
 
@@ -360,8 +360,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
           AND COALESCE(dd.is_deleted, 0) = 0 AND dd.subject_id = ?",
       array(intval($values['employee_id'])));
     if ($lic && isset($lic[0]['exp']) && $lic[0]['exp'] !== null && $lic[0]['exp'] < date('Y-m-d')) {
-      $ts_license_warn = '\n\n⚠️ تنبيه: رخصةُ قيادة هذا المشغّل منتهيةٌ منذ ' . $lic[0]['exp']
-        . ' — جدّدها من شاشة وثائق المعدات والمشغّلين.';
+      $ts_license_warn = '\n\n⚠️ تنبيه: رخصة قيادة هذا المشغل منتهية منذ ' . $lic[0]['exp']
+        . ' — جددها من شاشة وثائق المعدات والمشغلين.';
     }
   } catch (\Throwable $t) { error_log('timesheet license warn: ' . $t->getMessage()); }
 
@@ -449,7 +449,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
 
     // يجب أن يكون المجموع مساوياً لمجموع ساعات التعطل
     if ($total_faults_sum != $total_fault_hours) {
-      echo "<script>alert('❌ خطأ في توزيع ساعات الأعطال!\\n\\nمجموع حقول الأعطال: " . $total_faults_sum . " ساعة\\nمجموع ساعات التعطل: " . $total_fault_hours . " ساعة\\n\\nيجب أن يكون مجموع الحقول التالية مساوياً لمجموع ساعات التعطل:\\n• عطل HR\\n• عطل صيانة\\n• عطل تسويق\\n• عطل اعتماد\\n• ساعات أعطال أخرى\\n• توقف على المورد\\n• توقف مخطط\\n• قوة قاهرة');</script>";
+      echo "<script>alert('❌ خطأ في توزيع ساعات الأعطال!\\n\\nمجموع حقول الأعطال: " . $total_faults_sum . " ساعة\\nمجموع ساعات التعطل: " . $total_fault_hours . " ساعة\\n\\nيجب أن يكون مجموع الحقول التالية مساويا لمجموع ساعات التعطل:\\n• عطل HR\\n• عطل صيانة\\n• عطل تسويق\\n• عطل اعتماد\\n• ساعات أعطال أخرى\\n• توقف على المورد\\n• توقف مخطط\\n• قوة قاهرة');</script>";
       exit;
     }
   }
@@ -470,7 +470,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
       $svc_eq_row = $ts_gate->selectOne('operations', array('columns' => array('id', 'equipment'), 'where' => array('id' => $svc_op)));
     } catch (\Throwable $t) { /* يُعالج أدناه */ }
     if (!$svc_eq_row || empty($svc_eq_row['equipment'])) {
-      echo "<script>alert('❌ لا معدةَ على هذا التشغيل — لا تُكتب واقعةٌ بلا معدة');</script>";
+      echo "<script>alert('❌ لا معدة على هذا التشغيل — لا تكتب واقعة بلا معدة');</script>";
       exit;
     }
     $svc_eq = intval($svc_eq_row['equipment']);
@@ -481,15 +481,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
       $svc_lines = array();
       $svc_map = array(
         array('executed_hours', 'actual_work', 'none', null),
-        array('standby_hours', 'standby', 'client', 'استعدادٌ بسبب العميل'),
+        array('standby_hours', 'standby', 'client', 'استعداد بسبب العميل'),
         array('dependence_hours', 'standby', 'company', 'تبعية/انتظار اعتماد'),
         array('maintenance_fault', 'tech_breakdown', 'company', null),
         array('hr_fault', 'operator_stop', 'operator', null),
-        array('marketing_fault', 'client_stop', 'client', 'توقفٌ سببه العميل'),
+        array('marketing_fault', 'client_stop', 'client', 'توقف سببه العميل'),
         array('ts_supplier_stop_hours', 'supplier_stop', 'supplier', null),
         array('ts_planned_stop_hours', 'planned_stop', 'planned', null),
         array('ts_force_majeure_hours', 'force_majeure', 'force_majeure', null),
-        array('other_fault_hours', 'unlogged', 'none', 'أعطالٌ أخرى غير مصنّفة'),
+        array('other_fault_hours', 'unlogged', 'none', 'أعطال أخرى غير مصنفة'),
       );
       foreach ($svc_map as $sm) {
         $h = isset($values[$sm[0]]) ? (float) $values[$sm[0]] : 0.0;
@@ -522,10 +522,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
             array('qty' => $svc_qty, 'unit_type' => $svc_unit,
                   'operator_employee_id' => $svc_emp, 'time_lines' => $svc_lines), $svc_actor);
           if (!$rf['ok'] && $rf['code'] === 423) {
-            echo "<script>alert('🔒 قفلُ نسخة: اعتُمد موقعُ هذا اليوم — التعديلُ بالإعادة الرسمية بسببٍ وبالرقم نفسه (UX-03 §8.2)');</script>";
+            echo "<script>alert('🔒 قفل نسخة: اعتمد موقع هذا اليوم — التعديل بالإعادة الرسمية بسبب وبالرقم نفسه (UX-03 §8.2)');</script>";
             exit;
           }
-          if (!$rf['ok']) { throw new \RuntimeException('تعذّر تحديث الواقعة: ' . (isset($rf['skipped']) ? $rf['skipped'] : $rf['code'])); }
+          if (!$rf['ok']) { throw new \RuntimeException('تعذر تحديث الواقعة: ' . (isset($rf['skipped']) ? $rf['skipped'] : $rf['code'])); }
           foreach ((isset($rf['warnings']) ? $rf['warnings'] : array()) as $w) {
             if ($w['type'] === 'capacity') { $svc_capacity_warn = true; }
           }
@@ -558,7 +558,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
           'source_ref' => trim((string)($_POST['field_ref'] ?? '')) !== ''
                         ? mb_substr(trim((string)$_POST['field_ref']), 0, 64) : 'TS-SCREEN',
           'operation_id' => $svc_op, 'operator_employee_id' => $svc_emp,
-          'note' => 'كُتبت من الشاشة — الخدمةُ المصدرُ الأول (EMS_TS_WRITER=service)',
+          'note' => 'كتبت من الشاشة — الخدمة المصدر الأول (EMS_TS_WRITER=service)',
           'publish_events' => false,
         ), $svc_actor);
 
@@ -572,11 +572,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
             /* UXW-01 ①/②: مخرَجٌ مستقلٌّ قبل تحميلِ القشرة — الأصنافُ محلُّ الأنماطِ
                السطرية، والرموزُ تحمل قيمَها الاحتياطيةَ حرفًا بحرفٍ لأن design-tokens
                غيرُ محمَّلٍ في هذا المخرَجِ المبكر (فلا يتغيّر بكسلٌ واحد). */
-            echo '<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>';
+            echo '<?php /* نقلت أنماط هذه الشاشة إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفر نمط محلي) */ ?>';
             echo '<div class="ts-blocked-wrap">';
-            echo '<h3 data-ems-c="ts-1">لم يُسجَّل يومُ العمل — حاوياتُ الموقع لم تكتمل</h3>';
+            echo '<h3 data-ems-c="ts-1">لم يسجل يوم العمل — حاويات الموقع لم تكتمل</h3>';
             echo '<p data-ems-c="ts-2">'
-               . 'الوحدةُ لا تُسجَّل في موقعٍ لم تكتمل حاوياتُه. وهذا ما ينقص، ولكلٍّ موضعُ إصلاحه:</p><ul data-ems-c="ts-3">';
+               . 'الوحدة لا تسجل في موقع لم تكتمل حاوياته. وهذا ما ينقص، ولكل موضع إصلاحه:</p><ul data-ems-c="ts-3">';
             foreach ($svc_res['blocked'] as $b) {
               echo '<li data-ems-c="ts-4">'
                  . '<strong>' . htmlspecialchars((string) $b['text'], ENT_QUOTES, 'UTF-8') . '</strong><br>'
@@ -585,20 +585,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
                  . htmlspecialchars((string) $b['label'], ENT_QUOTES, 'UTF-8') . ' ↗</a></li>';
             }
             echo '</ul><div data-ems-c="ts-5">'
-               . '<a href="javascript:history.back()" class="ts-blocked-back">رجوعٌ للنموذج</a></div>';
+               . '<a href="javascript:history.back()" class="ts-blocked-back">رجوع للنموذج</a></div>';
             echo '<p data-ems-c="ts-6">'
-               . 'بياناتُ اليوم لم تُفقد — ارجع وأكمل بعد الإصلاح.</p></div>';
+               . 'بيانات اليوم لم تفقد — ارجع وأكمل بعد الإصلاح.</p></div>';
             exit;
           }
           $miss = !empty($svc_res['reasons']) ? implode(' · ', $svc_res['reasons'])
-                : (isset($svc_res['missing']) ? implode(' · ', $svc_res['missing']) : 'نقصٌ غير مفسَّر');
-          echo "<script>alert('❌ رفضت خدمةُ الإدخال الحفظ (422): " . addslashes($miss) . "');</script>";
+                : (isset($svc_res['missing']) ? implode(' · ', $svc_res['missing']) : 'نقص غير مفسر');
+          echo "<script>alert('❌ رفضت خدمة الإدخال الحفظ (422): " . addslashes($miss) . "');</script>";
           exit;
         }
         if (!empty($svc_res['existing'])) {
           // مفتاحُ العطالة (معدة×يوم×وردية): بابُ التكرار الذي دخل منه القديمُ أُغلق
           $ex_no = isset($svc_res['entry']['entry_no']) ? $svc_res['entry']['entry_no'] : ('#' . $svc_res['entry']['id']);
-          echo "<script>alert('⚠️ يومٌ مسجَّلٌ سلفًا لهذه المعدة بهذه الوردية — المرجع " . addslashes($ex_no) . "\\n\\nعدّل الصفَّ القائمَ بدل تكراره (مفتاح العطالة §8.2)');</script>";
+          echo "<script>alert('⚠️ يوم مسجل سلفا لهذه المعدة بهذه الوردية — المرجع " . addslashes($ex_no) . "\\n\\nعدل الصف القائم بدل تكراره (مفتاح العطالة §8.2)');</script>";
           exit;
         }
         foreach ((isset($svc_res['warnings']) ? $svc_res['warnings'] : array()) as $w) {
@@ -629,7 +629,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
       if ($ts_writer_service) {
         $type_param = isset($_POST['type']) ? urlencode($_POST['type']) : '1';
         $svc_msg = $svc_capacity_warn
-          ? '⚠️ حُفظ مع تجاوز طاقة!\n\nالمعدة أو المشغّل تجاوز حدَّه اليومي — الواقعةُ معلَّمةٌ ولن يكتمل اعتمادُ الموقع قبل بيان السبب وتخليص العلم.'
+          ? '⚠️ حفظ مع تجاوز طاقة!\n\nالمعدة أو المشغل تجاوز حده اليومي — الواقعة معلمة ولن يكتمل اعتماد الموقع قبل بيان السبب وتخليص العلم.'
           : '✅ تم الحفظ بنجاح (المصدر: السجل القانوني)' . $ts_license_warn;
         echo "<script>alert('" . $svc_msg . "'); window.location.href='timesheet.php?type=" . $type_param . "';</script>";
         exit;
@@ -687,7 +687,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
           // السطورُ الحقيقية (إن جُمعت) تدخل السجلَّ القانوني بحالاتها الدقيقة
           $dw = \App\Services\Unit\TimesheetEntryService::mirrorFromTimesheet($conn, $ts_gate, $saved_timesheet_id, $dw_actor, $ts_posted_lines);
           if (empty($dw['ok'])) {
-            error_log('unit dual-write mirror ts#' . $saved_timesheet_id . ': ' . (isset($dw['skipped']) ? $dw['skipped'] : 'فشل غير مفسَّر'));
+            error_log('unit dual-write mirror ts#' . $saved_timesheet_id . ': ' . (isset($dw['skipped']) ? $dw['skipped'] : 'فشل غير مفسر'));
           } elseif (!empty($dw['entry_id'])) {
             // ── شارةُ تجاوز الطاقة فورَ الحفظ (§5.1: «يُحفظ ويُعلَّم») ──
             // الحارسُ كان يعمل صامتًا في الخلفية — الآن يراه المُدخِل لحظتَها.
@@ -714,7 +714,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
 
     $type_param = isset($_POST['type']) ? urlencode($_POST['type']) : '1';
     $ts_save_msg = $ts_capacity_warn
-      ? '⚠️ حُفظ مع تجاوز طاقة!\n\nالمعدة أو المشغّل تجاوز حدَّه اليومي — الواقعةُ معلَّمةٌ ولن يكتمل اعتمادُ الموقع قبل بيان السبب وتخليص العلم.'
+      ? '⚠️ حفظ مع تجاوز طاقة!\n\nالمعدة أو المشغل تجاوز حده اليومي — الواقعة معلمة ولن يكتمل اعتماد الموقع قبل بيان السبب وتخليص العلم.'
       : '✅ تم الحفظ بنجاح' . $ts_license_warn;
     echo "<script>alert('" . $ts_save_msg . "'); window.location.href='timesheet.php?type=" . $type_param . "';</script>";
     exit;
@@ -867,9 +867,9 @@ try {
   $header_back = array('href' => 'timesheet_type.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
   include('../includes/page_header.php');
   // UXW-01 ⑫: شاشةُ دورةٍ مستندية — خطوةُ الدورةِ الثابتةُ التالية لإدخالِ اليوم
-  echo ems_next_step('مراجعةُ محاسبِ الموقعِ ثم اعتمادُ مديرِ الموقع');
+  echo ems_next_step('مراجعة محاسب الموقع ثم اعتماد مدير الموقع');
   // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ)
-  echo ems_states_bundle('لا سجلاتِ تايم شيت لهذا اليومِ بعد', 'أضف ساعاتِ عملٍ من زرِّ «إضافة ساعات عمل جديدة» أو غيّر نوعَ المعدة');
+  echo ems_states_bundle('لا سجلات تايم شيت لهذا اليوم بعد', 'أضف ساعات عمل من زر «إضافة ساعات عمل جديدة» أو غير نوع المعدة');
   ?>
 
   <?php /* UI-16 (UXR-0063): شريحة المزامنة ظاهرة دائمًا في الشاشة الميدانية —
@@ -887,9 +887,9 @@ try {
     <div class="card-body ts-9">
       <span class="ts-10">
         <i class="fas fa-clipboard-check <?php echo $ts_day_done >= $ts_day_total ? 'ts-day-ico-ok' : 'ts-day-ico-warn'; ?>"></i>
-        تايم شيت اليوم: سُجّل <?php echo $ts_day_done; ?> من <?php echo $ts_day_total; ?> معدةً نشطة
+        تايم شيت اليوم: سجل <?php echo $ts_day_done; ?> من <?php echo $ts_day_total; ?> معدة نشطة
         <?php if ($ts_day_done < $ts_day_total): ?>
-          — <span class="ts-11">متبقٍ <?php echo $ts_day_total - $ts_day_done; ?></span>
+          — <span class="ts-11">متبق <?php echo $ts_day_total - $ts_day_done; ?></span>
         <?php else: ?>
           — <span class="ts-12">اكتمل اليوم ✓</span>
         <?php endif; ?>
@@ -912,7 +912,7 @@ try {
            الميدانُ يعمل حيث لا شبكة: يُحفظ محليًّا، وتُعلَن «بانتظار المزامنة»،
            وعند عودةِ الشبكةِ يُرسَل **مرةً واحدةً** بمفتاحِ عطالتِه. */ ?>
   <form id="projectForm" action="" method="post" class="allforms"
-        data-ems-outbox="1" data-ems-outbox-label="إدخالُ ورديةٍ">
+        data-ems-outbox="1" data-ems-outbox-label="إدخال وردية">
         <?= csrf_field() ?>
     <?php if ($_GET['type'] == "1") {
       // نوع المعدة كان حفار
@@ -932,8 +932,8 @@ try {
               </select>
             </div>
             <div>
-              <label for="emsf_1502_07ad4">المرجع الميداني <span class="ts-15">(تذكرةُ وزنٍ · إشعارُ تسليم — E-10)</span></label>
-              <input type="text" name="field_ref" maxlength="64" placeholder="رقمُ المستند الميداني" id="emsf_1502_07ad4">
+              <label for="emsf_1502_07ad4">المرجع الميداني <span class="ts-15">(تذكرة وزن · إشعار تسليم — E-10)</span></label>
+              <input type="text" name="field_ref" maxlength="64" placeholder="رقم المستند الميداني" id="emsf_1502_07ad4">
             </div>
             <div>
               <label for="operator">الالية</label>
@@ -1036,7 +1036,7 @@ try {
               ساعات العمل </h3>
 
             <div>
-              <label for="executed_hours">الساعات المنفذة (محسوبة تلقائياً)</label>
+              <label for="executed_hours">الساعات المنفذة (محسوبة تلقائيا)</label>
               <input type="number" name="executed_hours" id="executed_hours" value="0" readonly class="ts-24">
             </div>
             <div>
@@ -1084,7 +1084,7 @@ try {
                   <p class="ts-30">
                     <strong>إذا كانت هناك ساعات أعطال (مجموع ساعات التعطل أكبر من صفر)،</strong><br>
                     <strong class="ts-31">يجب أن يساوي مجموع الحقول التالية = مجموع ساعات التعطل
-                      تماماً:</strong>
+                      تماما:</strong>
                   </p>
                   <ul class="ts-32">
                     <li><strong>عطل HR</strong></li>
@@ -1310,8 +1310,8 @@ try {
               </select>
             </div>
             <div>
-              <label for="emsf_1505_4eb0d">المرجع الميداني <span class="ts-15">(تذكرةُ وزنٍ · إشعارُ تسليم — E-10)</span></label>
-              <input type="text" name="field_ref" maxlength="64" placeholder="رقمُ المستند الميداني" id="emsf_1505_4eb0d">
+              <label for="emsf_1505_4eb0d">المرجع الميداني <span class="ts-15">(تذكرة وزن · إشعار تسليم — E-10)</span></label>
+              <input type="text" name="field_ref" maxlength="64" placeholder="رقم المستند الميداني" id="emsf_1505_4eb0d">
             </div>
             <div>
               <label for="operator">الالية</label>
@@ -1409,7 +1409,7 @@ try {
             </div>
 
             <div>
-              <label for="extra_hours_total">مجموع الساعات الإضافية (محسوبة تلقائياً)</label>
+              <label for="extra_hours_total">مجموع الساعات الإضافية (محسوبة تلقائيا)</label>
               <input type="number" name="extra_hours_total" id="extra_hours_total" value="0" readonly class="ts-24">
             </div>
             <div>
@@ -1464,7 +1464,7 @@ try {
                   <p class="ts-30">
                     <strong>إذا كانت هناك ساعات أعطال (مجموع ساعات التعطل أكبر من صفر)،</strong><br>
                     <strong class="ts-31">يجب أن يساوي مجموع الحقول التالية = مجموع ساعات التعطل
-                      تماماً:</strong>
+                      تماما:</strong>
                   </p>
                   <ul class="ts-32">
                     <li><strong>عطل HR</strong></li>
@@ -1685,8 +1685,8 @@ try {
               </select>
             </div>
             <div>
-              <label for="emsf_1508_b0080">المرجع الميداني <span class="ts-15">(تذكرةُ وزنٍ · إشعارُ تسليم — E-10)</span></label>
-              <input type="text" name="field_ref" maxlength="64" placeholder="رقمُ المستند الميداني" id="emsf_1508_b0080">
+              <label for="emsf_1508_b0080">المرجع الميداني <span class="ts-15">(تذكرة وزن · إشعار تسليم — E-10)</span></label>
+              <input type="text" name="field_ref" maxlength="64" placeholder="رقم المستند الميداني" id="emsf_1508_b0080">
             </div>
             <div>
               <label for="operator">الالية</label>
@@ -1776,7 +1776,7 @@ try {
               <input type="number" name="extra_hours" id="extra_hours" value="0">
             </div>
             <div>
-              <label for="extra_hours_total">مجموع الساعات الإضافية (محسوبة تلقائياً)</label>
+              <label for="extra_hours_total">مجموع الساعات الإضافية (محسوبة تلقائيا)</label>
               <input type="number" name="extra_hours_total" id="extra_hours_total" value="0" readonly class="ts-24">
             </div>
             <div>
@@ -1807,7 +1807,7 @@ try {
               </select>
             </div>
             <div>
-              <label for="meters_count">📐 عدد الأمتار (محسوبة تلقائياً)</label>
+              <label for="meters_count">📐 عدد الأمتار (محسوبة تلقائيا)</label>
               <input type="number" step="0.01" name="meters_count" id="meters_count" value="0" placeholder="0.00" readonly class="ts-24">
             </div>
             <div>
@@ -1831,7 +1831,7 @@ try {
                   <p class="ts-30">
                     <strong>إذا كانت هناك ساعات أعطال (مجموع ساعات التعطل أكبر من صفر)،</strong><br>
                     <strong class="ts-31">يجب أن يساوي مجموع الحقول التالية = مجموع ساعات التعطل
-                      تماماً:</strong>
+                      تماما:</strong>
                   </p>
                   <ul class="ts-32">
                     <li><strong>عطل HR</strong></li>
@@ -2070,28 +2070,28 @@ try {
             <th class="ems-fn-th" data-fn="1">الموقع</th>
             <th class="ems-fn-th" data-fn="1">العقد</th>
             <th class="ems-fn-th" data-fn="1">الوحدة التعاقدية</th>
-            <th class="ems-fn-th" data-fn="1">المشغّل</th>
+            <th class="ems-fn-th" data-fn="1">المشغل</th>
             <th class="ems-fn-th" data-fn="1">الفترة</th>
             <th class="ems-fn-th" data-fn="1">من الساعة</th>
             <th class="ems-fn-th none" data-fn="1">إلى الساعة</th>
             <th class="ems-fn-th none" data-fn="1">ساعات التوقف</th>
             <th class="ems-fn-th none" data-fn="1">سبب التوقف</th>
             <th class="ems-fn-th none" data-fn="1">الطرف المتحمل</th>
-            <th class="ems-fn-th none" data-fn="1">العدّاد أول</th>
-            <th class="ems-fn-th none" data-fn="1">العدّاد آخر</th>
-            <th class="ems-fn-th none" data-fn="1">المُدخِل</th>
+            <th class="ems-fn-th none" data-fn="1">العداد أول</th>
+            <th class="ems-fn-th none" data-fn="1">العداد آخر</th>
+            <th class="ems-fn-th none" data-fn="1">المدخل</th>
             <th class="ems-fn-th none" data-fn="1">اعتماد الموقع</th>
             <th class="ems-fn-th none" data-fn="1">اعتماد التشغيل</th>
             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-            <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-            <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+            <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+            <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
             <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
             <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
             <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
             <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-            <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+            <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
             <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
-            <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
+            <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
             <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
             </tr>
         </thead>
@@ -2237,7 +2237,7 @@ try {
           alert('❌ خطأ في توزيع ساعات الأعطال!\n\n' +
             'مجموع حقول الأعطال: ' + totalFaultsSum.toFixed(2) + ' ساعة\n' +
             'مجموع ساعات التعطل: ' + totalFaultHours.toFixed(2) + ' ساعة\n\n' +
-            'يجب أن يكون مجموع الحقول التالية مساوياً لمجموع ساعات التعطل:\n' +
+            'يجب أن يكون مجموع الحقول التالية مساويا لمجموع ساعات التعطل:\n' +
             '• عطل HR\n' +
             '• عطل صيانة\n' +
             '• عطل تسويق\n' +
@@ -2447,8 +2447,8 @@ try {
     $("#billing_unit_label").text(billing.label || "");
     $("#billing_field_" + billing.unit).show();
     $("#billing_hint").text(
-      "عقد هذا التشغيل يفوتر بـ«" + (billing.label || "") + "» — سجّل الكمية المنفذة بهذه الوحدة. "
-      + "الساعات تبقى مطلوبةً للتشغيل والصيانة، لكنها ليست وحدة الفوترة هنا.");
+      "عقد هذا التشغيل يفوتر ب«" + (billing.label || "") + "» — سجل الكمية المنفذة بهذه الوحدة. "
+      + "الساعات تبقى مطلوبة للتشغيل والصيانة، لكنها ليست وحدة الفوترة هنا.");
     setDisp("block");
   }
 
@@ -2458,8 +2458,8 @@ try {
       var shiftVal = $("#shift").val();
 
       if (!shiftVal) {
-        $("#operator").html("<option value=''>-- اختر الوردية أولاً --</option>");
-        $("#driver").html("<option value=''>-- اختر الوردية أولاً --</option>");
+        $("#operator").html("<option value=''>-- اختر الوردية أولا --</option>");
+        $("#driver").html("<option value=''>-- اختر الوردية أولا --</option>");
         $("#shift_hours").val("0");
         return;
       }
@@ -2586,7 +2586,7 @@ try {
           // تُضاف خيارًا موسومًا فلا تضيع الآليةُ صامتةً عند التعديل.
           if (_op && $("#operator option[value='" + _op + "']").length === 0) {
             $("#operator").append(
-              "<option value='" + _op + "'>(سجل قديم — آليةٌ بلا سائقٍ مرتبط)</option>");
+              "<option value='" + _op + "'>(سجل قديم — آلية بلا سائق مرتبط)</option>");
           }
           $("#operator").val(_op);
 
@@ -2598,7 +2598,7 @@ try {
               $("#driver").html(dhtml);
               if (_emp && $("#driver option[value='" + _emp + "']").length === 0) {
                 $("#driver").append(
-                  "<option value='" + _emp + "'>(سجل قديم — مشغّلٌ غيرُ مُسنَد)</option>");
+                  "<option value='" + _emp + "'>(سجل قديم — مشغل غير مسند)</option>");
               }
               $("#driver").val(_emp);
             }
@@ -2991,7 +2991,7 @@ try {
     $(document).on('click', '#addFaultBtn', function () {
       var selected = getCurrentFaultSelection();
       if (!selected) {
-        alert('يرجى اختيار تسلسل العطل كاملاً قبل الإضافة.');
+        alert('يرجى اختيار تسلسل العطل كاملا قبل الإضافة.');
         return;
       }
 
@@ -3003,7 +3003,7 @@ try {
         }
       }
       if (exists) {
-        alert('هذا العطل مضاف مسبقاً في نفس التايم شيت.');
+        alert('هذا العطل مضاف مسبقا في نفس التايم شيت.');
         return;
       }
 
@@ -3087,7 +3087,7 @@ try {
     { v: 'actual_work',         t: 'تشغيل فعلي',            resp: 'none',          cls: 'actual'  },
     { v: 'standby',             t: 'استعداد (للعميل)',       resp: 'client',        cls: 'standby' },
     { v: 'tech_breakdown',      t: 'عطل فني (صيانة)',        resp: 'company',       cls: 'stop' },
-    { v: 'operator_stop',       t: 'توقف مشغّل',             resp: 'operator',      cls: 'stop' },
+    { v: 'operator_stop',       t: 'توقف مشغل',             resp: 'operator',      cls: 'stop' },
     { v: 'client_stop',         t: 'توقف من العميل',         resp: 'client',        cls: 'stop' },
     { v: 'supplier_stop',       t: 'توقف على المورد',        resp: 'supplier',      cls: 'stop' },
     { v: 'fuel_logistics_stop', t: 'وقود/لوجستيات',          resp: 'company',       cls: 'stop' },
@@ -3097,7 +3097,7 @@ try {
   ];
   var RESPS = [
     { v: 'none', t: '—' }, { v: 'company', t: 'الشركة' }, { v: 'supplier', t: 'المورد' },
-    { v: 'operator', t: 'المشغّل' }, { v: 'client', t: 'العميل' },
+    { v: 'operator', t: 'المشغل' }, { v: 'client', t: 'العميل' },
     { v: 'planned', t: 'مخطط' }, { v: 'force_majeure', t: 'قوة قاهرة' }
   ];
   // خريطة الاشتقاق للأعمدة القديمة — مطابقة legacyColumnsFromLines خادميًّا
@@ -3116,7 +3116,7 @@ try {
     el.value = (Math.round(val * 100) / 100);
     el.setAttribute('readonly', 'readonly');
     el.classList.add('ts-derived-lock'); // UXW-01 ②: صنفٌ برمزِ اللون بدل نمطٍ من JS
-    el.title = 'يُشتق من سطور الزمن — عدّل السطور لا هذه الخانة';
+    el.title = 'يشتق من سطور الزمن — عدل السطور لا هذه الخانة';
   }
 
   function recompute() {
@@ -3149,14 +3149,14 @@ try {
     if (sumEl) {
       var undistributed = Math.round((shiftVal - sum) * 100) / 100;
       sumEl.innerHTML = '<span>الوردية: <b>' + shiftVal.toFixed(2) + '</b> س</span>'
-        + '<span>مجموعُ السطور: <b>' + sum.toFixed(2) + '</b></span>'
+        + '<span>مجموع السطور: <b>' + sum.toFixed(2) + '</b></span>'
         + '<span class="ts-12">فعلي: <b>' + col.executed_hours.toFixed(2) + '</b></span>'
         + '<span class="ts-72">استعداد: <b>' + (col.standby_hours + col.dependence_hours).toFixed(2) + '</b></span>'
         + '<span class="ts-73">توقف: <b>' + faults.toFixed(2) + '</b></span>'
         + (undistributed > 0
-            ? '<span class="ts-11">غيرُ موزَّع: <b>' + undistributed.toFixed(2) + '</b></span>'
+            ? '<span class="ts-11">غير موزع: <b>' + undistributed.toFixed(2) + '</b></span>'
             : (undistributed < 0
-                ? '<span class="ts-74">تجاوزَ الوردية بـ<b>' + Math.abs(undistributed).toFixed(2) + '</b></span>'
+                ? '<span class="ts-74">تجاوز الوردية ب<b>' + Math.abs(undistributed).toFixed(2) + '</b></span>'
                 : ''));
     }
   }
@@ -3170,11 +3170,11 @@ try {
       var stDef = STATES.filter(function (s) { return s.v === l.ops_state; })[0] || STATES[0];
       tr.className = 'tsl-state-' + stDef.cls;
       tr.innerHTML =
-        '<td class="ts-75"><input type="number" aria-label="ساعاتُ التشغيل في السطر" step="0.25" min="0.25" max="24" value="' + l.hours + '" data-i="' + i + '" data-k="hours"></td>'
-        + '<td class="ts-76"><select aria-label="حالةُ التشغيل" data-i="' + i + '" data-k="ops_state">'
+        '<td class="ts-75"><input type="number" aria-label="ساعات التشغيل في السطر" step="0.25" min="0.25" max="24" value="' + l.hours + '" data-i="' + i + '" data-k="hours"></td>'
+        + '<td class="ts-76"><select aria-label="حالة التشغيل" data-i="' + i + '" data-k="ops_state">'
         + STATES.map(function (s) { return '<option value="' + s.v + '"' + (s.v === l.ops_state ? ' selected' : '') + '>' + s.t + '</option>'; }).join('')
         + '</select></td>'
-        + '<td class="ts-77"><select aria-label="الطرفُ المسؤولُ المقترح" data-i="' + i + '" data-k="resp_party">'
+        + '<td class="ts-77"><select aria-label="الطرف المسؤول المقترح" data-i="' + i + '" data-k="resp_party">'
         + RESPS.map(function (r) { return '<option value="' + r.v + '"' + (r.v === l.resp_party ? ' selected' : '') + '>' + r.t + '</option>'; }).join('')
         + '</select></td>'
         + '<td><input type="text" maxlength="190" placeholder="المرجع/السبب (WO-5511…)" value="' + (l.cause_note || '') + '" data-i="' + i + '" data-k="cause_note" aria-label="المرجع/السبب (WO-5511…)"></td>'
@@ -3192,15 +3192,15 @@ try {
     var box = document.createElement('div');
     box.id = 'tsLinesBox';
     box.innerHTML =
-      '<div class="tsl-head"><i class="fas fa-stream ts-18"></i> توزيعُ زمن الوردية سطورًا '
-      + '<span class="ts-79">(كلُّ سطرٍ: ساعات · حالة · مسؤول · مرجع — والخاناتُ القديمة تُملأ تلقائيًّا)</span>'
+      '<div class="tsl-head"><i class="fas fa-stream ts-18"></i> توزيع زمن الوردية سطورا '
+      + '<span class="ts-79">(كل سطر: ساعات · حالة · مسؤول · مرجع — والخانات القديمة تملأ تلقائيا)</span>'
       + '<button type="button" id="tslAdd" class="btn-primary ts-80"><i class="fas fa-plus"></i> سطر زمن</button></div>'
       // ق-4 «الكاتبُ يقترح والمشرفُ يعتمد»: هذا العمودُ **اقتراحٌ** مشتقٌّ من
       // حالة الساعة، والقرارُ في «لوحة الإسناد اليومي» حيث يُسنَد كلُّ توقفٍ إلى
       // بندِ التزامٍ من مصفوفة العقد ومنه تُشتق الأحكامُ الثلاثة (CON-02 §5).
       + '<table><thead><tr><th>ساعات التشغيل</th><th>الحالة</th><th>المسؤول <small>(مقترح)</small></th><th>المرجع/السبب</th><th></th></tr></thead>'
       + '<tbody id="tslBody"></tbody></table>'
-      + '<div class="tsl-sum" id="tslSum"><span class="ts-81">لا سطورَ بعد — الإدخالُ القديم يعمل كما هو حتى تضيف أول سطر.</span></div>';
+      + '<div class="tsl-sum" id="tslSum"><span class="ts-81">لا سطور بعد — الإدخال القديم يعمل كما هو حتى تضيف أول سطر.</span></div>';
     grid.parentElement.insertBefore(box, grid);
 
     box.addEventListener('click', function (e) {

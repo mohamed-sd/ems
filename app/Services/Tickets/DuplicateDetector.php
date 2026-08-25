@@ -67,7 +67,7 @@ class DuplicateDetector
                 // ثلاثة فأكثر خلال شهر → تُرفع «مشكلة» لا حادثة — سبب جذري
                 $conn->query("UPDATE tickets SET ticket_nature = 'recurring' WHERE id = {$originalTkId}");
                 $stmt = $conn->prepare("INSERT INTO ticket_responses (tk_id, person_id, response_type, body) VALUES (?, 0, 'info_added', ?)");
-                $body = 'RecurrenceThresholdReached — ' . $cnt . ' في المجموعة خلال شهر: تُرفع مشكلةً وتُحال لسبب جذري (§9)';
+                $body = 'RecurrenceThresholdReached — ' . $cnt . ' في المجموعة خلال شهر: ترفع مشكلة وتحال لسبب جذري (§9)';
                 $stmt->bind_param('is', $originalTkId, $body);
                 $stmt->execute();
                 $stmt->close();
@@ -75,7 +75,7 @@ class DuplicateDetector
             }
             $conn->commit();
             return array('ok' => true, 'code' => 200, 'group' => $grp, 'count' => $cnt, 'promoted' => $promoted,
-                'reason' => 'أُضيف متابعًا للأصل — ولا بلاغ ثانٍ ولا أمر عمل ثانٍ');
+                'reason' => 'أضيف متابعا للأصل — ولا بلاغ ثان ولا أمر عمل ثان');
         } catch (\Throwable $e) {
             $conn->rollback();
             return array('ok' => false, 'code' => 500, 'reason' => $e->getMessage());

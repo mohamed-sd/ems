@@ -15,7 +15,7 @@ $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user'][
 /* UI-13: المنعُ يُقال برمزٍ محكومٍ ووجهةٍ فيها طريقُ رجوعٍ — لا صفحةَ نصٍّ عارية. */
 if (!$is_super_admin && $company_id <= 0) {
     ems_gov_flash_redirect('../login.php', 'لا توجد بيئة شركة صالحة لحسابك ❌',
-        'GOV-SCOPE-403', 'ادخل بحسابٍ مرتبطٍ بشركة');
+        'GOV-SCOPE-403', 'ادخل بحساب مرتبط بشركة');
 }
 
 // العزل عبر بوابة المستأجر (K9 · هجرة 2026-07-15): كشوف الأعمدة الخمسة وبُناة
@@ -40,8 +40,8 @@ $equipment = !empty($equipment_rows) ? $equipment_rows[0] : null;
 if (!$equipment) {
     require_once __DIR__ . '/../includes/permissions_helper.php';
     ems_gov_flash_redirect('../Equipments/equipments.php',
-        'المعدةُ غيرُ موجودةٍ أو خارجَ نطاقِ شركتك ❌',
-        'GOV-REF-404', 'افتح ربطَ المشغّلين من صفِّ المعدةِ في سجلِّ المعدات');
+        'المعدة غير موجودة أو خارج نطاق شركتك ❌',
+        'GOV-REF-404', 'افتح ربط المشغلين من صف المعدة في سجل المعدات');
 }
 
 // جلب المشغلين المرتبطين مسبقًا
@@ -60,7 +60,7 @@ foreach ($linked_rows as $r) {
     $linked[] = $r;
 }
 
-$page_title = "إيكوبيشن | مشغّلو المعدة";
+$page_title = "إيكوبيشن | مشغلو المعدة";
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
 require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(null);
@@ -955,7 +955,7 @@ include("../inheader.php");
     <?php
     // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
     $header_icon       = 'fas fa-users-cog';
-    $header_title_html = 'مشغّلو المعدة
+    $header_title_html = 'مشغلو المعدة
             <span class="adrv-hdr-sub">
                 <i class="fas fa-cogs"></i> ' . htmlspecialchars($equipment['name']) . '
                 <p><i class="fas fa-barcode"></i> الكود:
@@ -970,7 +970,7 @@ include("../inheader.php");
     $header_back = array('href' => '../main/dashboard.php', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include(__DIR__ . '/../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا مشغّلين مرتبطين بهذه المعدةِ بعدُ', 'أسنِدْ أولَ مشغلٍ بزرِّ «إسناد مشغل جديد» في رأسِ الشاشة');
+    echo ems_states_bundle('لا مشغلين مرتبطين بهذه المعدة بعد', 'أسند أول مشغل بزر «إسناد مشغل جديد» في رأس الشاشة');
     ?>
 
     <?php if (isset($_GET['msg'])): ?>
@@ -991,7 +991,7 @@ include("../inheader.php");
                 <div>
                     <strong>ملاحظة:</strong> يمكنك اختيار أكثر من مشغل بالنقر على البطاقات.
                     <br>استخدم البحث للعثور على مشغل محدد، أو استخدم "تحديد الكل" لاختيار جميع المشغلين المتاحين.
-                    <br>المشغلون المعروضون هم الذين لم يتم إسنادهم لأي معدة نشطة حالياً.
+                    <br>المشغلون المعروضون هم الذين لم يتم إسنادهم لأي معدة نشطة حاليا.
                 </div>
             </div>
 
@@ -1003,7 +1003,7 @@ include("../inheader.php");
                     <div class="driver-form-check-row adrv-span-full">
                         <i class="fas fa-info-circle adrv-info-ico"></i>
                         <label class="driver-form-check-label adrv-label-flush" for="emsf_2047_8d699">
-                            تُحتسب تواريخ بداية/نهاية التشغيل تلقائياً من عقد المشغل الساري؛
+                            تحتسب تواريخ بداية/نهاية التشغيل تلقائيا من عقد المشغل الساري؛
                             وإن لم يوجد عقد ساري تبدأ من تاريخ اليوم وتبقى مفتوحة حتى إنهاء العمل.
                         </label>
                     </div>
@@ -1028,7 +1028,7 @@ include("../inheader.php");
                     <div class="driver-form-check-row">
                         <input type="checkbox" id="auto_replace" name="auto_replace" value="1" checked>
                         <label for="auto_replace" class="driver-form-check-label">إيقاف أي تشغيل نشط لنفس السائق داخل
-                            المشروع تلقائيًا</label>
+                            المشروع تلقائيا</label>
                     </div>
                 </div>
 
@@ -1085,7 +1085,7 @@ include("../inheader.php");
                                     $driverInitial = mb_substr($driverName, 0, 1);
                                     echo "
                                     <div class='driver-card' data-driver-id='{$d['id']}' data-driver-name='$driverName' data-driver-phone='$driverPhone'>
-                                        <input type='checkbox' name='drivers[]' aria-label='اختيارُ المشغل $driverName' value='{$d['id']}' class='driver-checkbox-input is-hidden'>
+                                        <input type='checkbox' name='drivers[]' aria-label='اختيار المشغل $driverName' value='{$d['id']}' class='driver-checkbox-input is-hidden'>
                                         <div class='driver-card-header'>
                                             <div class='driver-checkbox'></div>
                                             <div class='driver-avatar'>$driverInitial</div>
@@ -1104,7 +1104,7 @@ include("../inheader.php");
                                 echo "
                                 <div class='no-drivers-message'>
                                     <i class='fas fa-user-slash'></i>
-                                    <p>لا يوجد مشغلون متاحون حالياً</p>
+                                    <p>لا يوجد مشغلون متاحون حاليا</p>
                                 </div>
                                 ";
                             }
@@ -1153,8 +1153,8 @@ include("../inheader.php");
                                 <th>نظام الوردية</th>
                                 <th>الحالة</th>
                                                 <!-- U10-B12: النواة الحاكمة (الخلايا يحشوها ui-unification.js) -->
-                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ السجل وبأي صفة">المُنشئ — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ السجل وبأي صفة">المنشئ — الاسم والصفة</th>
                     <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء">تاريخ الإنشاء</th>
                     <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="السجل الذي تولد عنه">المرجع الأب</th>
 </tr>

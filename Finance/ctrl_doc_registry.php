@@ -24,9 +24,9 @@ $U13 = array(
     'icon'       => 'fa fa-list-check',
     'nature'     => 'register',
     'doc'        => 'FIN-OBL-01 OBL-0307 · OBL-0307',
-    'intro'      => 'كلُّ بندٍ تعلنه الوثائقُ وأثرُه الحيُّ — والفارغُ ثغرةٌ تُرى',
-    'rule'       => 'OBL-0307: البندُ المعلَنُ بلا أثرٍ حيٍّ ثغرةٌ تُسجَّل لا تُهمَل',
-    'empty_hint' => 'لم يُزامَن السجلُّ بعدُ — شغّل u13_reverse_audit --sync',
+    'intro'      => 'كل بند تعلنه الوثائق وأثره الحي — والفارغ ثغرة ترى',
+    'rule'       => 'OBL-0307: البند المعلن بلا أثر حي ثغرة تسجل لا تهمل',
+    'empty_hint' => 'لم يزامن السجل بعد — شغل u13_reverse_audit --sync',
     'order'       => 'doc_code ASC, family ASC, seq ASC',
     'global_ref'  => 1,
 );

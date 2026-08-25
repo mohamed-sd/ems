@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $reg_dup = null;
             try { $reg_dup = $reg_gate->selectOne('employees', array('columns' => array('id'), 'where' => array('id' => $employee_id, 'is_workforce' => 1))); }
             catch (\Throwable $t) { error_log('worker_register.php dup check: ' . $t->getMessage()); }
-            if ($reg_dup !== null) { ems_gov_flash_redirect('worker_register.php', 'الموظف مصنّفٌ عاملاً مسبقاً ❌', 'GOV-FAIL-409', ''); exit(); }
+            if ($reg_dup !== null) { ems_gov_flash_redirect('worker_register.php', 'الموظف مصنف عاملا مسبقا ❌', 'GOV-FAIL-409', ''); exit(); }
             $target_id = $employee_id;
         } else {
             $target_id = $id;
@@ -106,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($is_editing) {
             ems_gov_redirect("Location: worker_register.php?edit=" . $target_id . "&msg=" . ($ok ? "✅+تم+تحديث+بيانات+العامل" : "❌+تعذّر+التحديث"));
         } else {
-            ems_gov_redirect("Location: worker_register.php?msg=" . ($ok ? "✅+تم+تصنيف+الموظف+عاملاً+تشغيلياً" : "❌+تعذّر+الحفظ"));
+            ems_gov_redirect("Location: worker_register.php?msg=" . ($ok ? "✅+تم+تصنيف+الموظف+عاملا+تشغيليا" : "❌+تعذّر+الحفظ"));
         }
         exit();
     }
@@ -196,7 +196,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا عمالَ تشغيليين مصنَّفين في السجلِّ بعدُ', 'صنّفْ أولَ موظفٍ عاملًا تشغيليًّا بزرِّ «تصنيف عامل تشغيلي» في رأسِ الشاشة');
+    echo ems_states_bundle('لا عمال تشغيليين مصنفين في السجل بعد', 'صنف أول موظف عاملا تشغيليا بزر «تصنيف عامل تشغيلي» في رأس الشاشة');
     ?>
     <style>
         .wrg-form-grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 14px; }
@@ -258,17 +258,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <input type="hidden" name="action" value="save_worker">
         <input type="hidden" name="id" value="<?= $edit_worker ? intval($edit_worker['id']) : 0 ?>">
         <div class="card-header">
-            <h5><i class="fas fa-edit"></i> <?= $edit_worker ? 'تعديل بيانات العامل' : 'تصنيف موظفٍ عاملاً تشغيلياً' ?></h5>
+            <h5><i class="fas fa-edit"></i> <?= $edit_worker ? 'تعديل بيانات العامل' : 'تصنيف موظف عاملا تشغيليا' ?></h5>
         </div>
 
         <div class="form-grid wrg-form-grid3">
             <div class="field">
                 <label for="employee_id"><i class="fas fa-user"></i> الموظف</label>
                 <?php if ($edit_worker): ?>
-                    <input type="text" id="employee_id" aria-label="اسمُ الموظفِ المصنَّف" value="<?= htmlspecialchars($edit_worker['employee_name'] ?? '-') ?>" disabled>
+                    <input type="text" id="employee_id" aria-label="اسم الموظف المصنف" value="<?= htmlspecialchars($edit_worker['employee_name'] ?? '-') ?>" disabled>
                 <?php else: ?>
                     <select name="employee_id" id="employee_id" required onchange="emsSuggestCategory()">
-                        <option value="">— اختر موظفاً غير مصنّف —</option>
+                        <option value="">— اختر موظفا غير مصنف —</option>
                         <?php foreach ($unclassified as $u): ?>
                             <option value="<?= intval($u['id']) ?>" data-emptype="<?= htmlspecialchars($u['employee_type'] ?? '') ?>">
                                 <?= htmlspecialchars($u['name']) ?>
@@ -280,7 +280,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
             <div class="field">
                 <label for="wrg_code"><i class="fas fa-barcode"></i> كود العامل (يدوي)</label>
-                <input type="text" name="code" id="wrg_code" placeholder="اختياري" aria-label="كودُ العاملِ التشغيلي — إدخالٌ يدوي" value="<?= htmlspecialchars($edit_worker['code'] ?? '') ?>">
+                <input type="text" name="code" id="wrg_code" placeholder="اختياري" aria-label="كود العامل التشغيلي — إدخال يدوي" value="<?= htmlspecialchars($edit_worker['code'] ?? '') ?>">
             </div>
 
             <div class="field">
@@ -340,7 +340,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
 
             <div class="field">
-                <label for="emsf_612_38167"><i class="fas fa-heart-pulse"></i> اللياقة الطبية <small>(تُحدَّث من 8.2 لاحقاً)</small></label>
+                <label for="emsf_612_38167"><i class="fas fa-heart-pulse"></i> اللياقة الطبية <small>(تحدث من 8.2 لاحقا)</small></label>
                 <select name="medical_fitness_status" id="emsf_612_38167">
                     <option value="">—</option>
                     <?php foreach (['لائق للعمل','لائق بشروط','موقوف طبيًّا','يحتاج إعادة تقييم'] as $mf): ?>
@@ -351,7 +351,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
             <div class="field">
                 <label for="emsf_613_a34d6"><i class="fas fa-notes-medical"></i> شروط اللياقة</label>
-                <input type="text" name="fitness_conditions" id="emsf_613_a34d6" placeholder="عند «لائق بشروط»" aria-label="شروطُ اللياقةِ الطبية" value="<?= htmlspecialchars($edit_worker['fitness_conditions'] ?? '') ?>">
+                <input type="text" name="fitness_conditions" id="emsf_613_a34d6" placeholder="عند «لائق بشروط»" aria-label="شروط اللياقة الطبية" value="<?= htmlspecialchars($edit_worker['fitness_conditions'] ?? '') ?>">
             </div>
 
             <div class="field">
@@ -372,7 +372,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
             <div class="field wrg-span-full">
                 <label for="wrg_notes"><i class="fas fa-align-right"></i> ملاحظات</label>
-                <textarea name="notes" id="wrg_notes" rows="2" aria-label="ملاحظاتٌ عامةٌ على العامل"><?= htmlspecialchars($edit_worker['notes'] ?? '') ?></textarea>
+                <textarea name="notes" id="wrg_notes" rows="2" aria-label="ملاحظات عامة على العامل"><?= htmlspecialchars($edit_worker['notes'] ?? '') ?></textarea>
             </div>
         </div>
 
@@ -448,10 +448,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <thead>
                 <tr><th>إجراءات</th><th>الكود</th><th>الاسم</th><th>الفئة</th><th>المصدر</th><th>موقع القوة</th><th>الدرجة</th><th>الحالة</th><th>اللياقة</th><th>الاعتمادات</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -488,7 +488,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     ems_wf_field('شروط اللياقة', $row['fitness_conditions'] ?: '-', 'fas fa-notes-medical', ['size' => 'lg']),
                     ems_wf_field('قابل للإحلال', intval($row['is_replaceable']) ? 'نعم' : 'لا', 'fas fa-right-left'),
                     ems_wf_field('عدد الاعتمادات', intval($row['quals_count']), 'fas fa-certificate'),
-                    ems_wf_field('اعتماد حرج منتهٍ', intval($row['expired_critical']) > 0 ? ('نعم (' . intval($row['expired_critical']) . ')') : 'لا', 'fas fa-triangle-exclamation'),
+                    ems_wf_field('اعتماد حرج منته', intval($row['expired_critical']) > 0 ? ('نعم (' . intval($row['expired_critical']) . ')') : 'لا', 'fas fa-triangle-exclamation'),
                     ems_wf_field('ملاحظات', $row['notes'] ?: '-', 'fas fa-align-right', ['size' => 'full']),
                 ]);
             ?>
@@ -508,12 +508,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <td><?= htmlspecialchars($row['medical_fitness_status'] ?: '-') ?></td>
                     <td>
                         <span class="badge badge-info"><?= intval($row['quals_count']) ?></span>
-                        <?php if (intval($row['expired_critical']) > 0): ?><span class="link-alert-chip" title="اعتماد حرج منتهٍ"><i class="fas fa-exclamation-triangle"></i></span><?php endif; ?>
+                        <?php if (intval($row['expired_critical']) > 0): ?><span class="link-alert-chip" title="اعتماد حرج منته"><i class="fas fa-exclamation-triangle"></i></span><?php endif; ?>
                     </td>
                 </tr>
             <?php endforeach; }
             if (!$res || $i === 1): ?>
-                <tr><td colspan="10" class="wrg-empty-cell">لا يوجد عمالٌ مصنّفون بعد. استخدم «تصنيف عامل تشغيلي» لإضافة أول عامل.</td></tr>
+                <tr><td colspan="10" class="wrg-empty-cell">لا يوجد عمال مصنفون بعد. استخدم «تصنيف عامل تشغيلي» لإضافة أول عامل.</td></tr>
             <?php endif; ?>
             </tbody>
         </table>

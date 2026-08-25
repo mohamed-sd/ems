@@ -68,18 +68,18 @@ class ContractResourcePlanService
                      'share' => 0.0, 'gap' => 100.0, 'complete' => false);
 
         $l = ContractLineService::lineOf($gate, (int) $lineId);
-        if (!$l) { $out['code'] = 404; $out['reason'] = 'بندُ البيع غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!$l) { $out['code'] = 404; $out['reason'] = 'بند البيع غير موجود في نطاقك'; return $out; }
         if ((string) $l['state'] === 'ended') {
-            $out['code'] = 409; $out['reason'] = 'البندُ منتهٍ — ولا خطةَ مواردَ لما انتهى'; return $out;
+            $out['code'] = 409; $out['reason'] = 'البند منته — ولا خطة موارد لما انتهى'; return $out;
         }
-        if (!$rows) { $out['code'] = 422; $out['reason'] = 'لا خطةَ فارغة'; return $out; }
+        if (!$rows) { $out['code'] = 422; $out['reason'] = 'لا خطة فارغة'; return $out; }
 
         $from = self::dateOrNull($validFrom);
         if ($from === null) { $from = (string) $l['valid_from']; }
         $to = ($l['valid_to'] !== null && (string) $l['valid_to'] !== '') ? (string) $l['valid_to'] : null;
         if ($to !== null && $from > $to) {
             $out['code'] = 422;
-            $out['reason'] = '**سريانُ الخطة ' . $from . ' بعد نهاية البند ' . $to . '**'; return $out;
+            $out['reason'] = '**سريان الخطة ' . $from . ' بعد نهاية البند ' . $to . '**'; return $out;
         }
 
         $types = self::activeTypes($gate);
@@ -87,16 +87,16 @@ class ContractResourcePlanService
         foreach ($rows as $r) {
             $tid = (int) (isset($r['equipment_type_id']) ? $r['equipment_type_id'] : 0);
             if ($tid <= 0 || !isset($types[$tid])) {
-                $out['code'] = 422; $out['reason'] = 'نوعُ معدةٍ غيرُ معروفٍ أو غيرُ نشط: ' . $tid; return $out;
+                $out['code'] = 422; $out['reason'] = 'نوع معدة غير معروف أو غير نشط: ' . $tid; return $out;
             }
             if (isset($clean[$tid])) {
                 $out['code'] = 409;
-                $out['reason'] = 'النوعُ «' . $types[$tid] . '» مكرَّرٌ في الخطة — '
-                               . '**ونوعٌ واحدٌ نافذٌ لكل بند**'; return $out;
+                $out['reason'] = 'النوع «' . $types[$tid] . '» مكرر في الخطة — '
+                               . '**ونوع واحد نافذ لكل بند**'; return $out;
             }
             $share = round((float) (isset($r['capacity_share_percent']) ? $r['capacity_share_percent'] : 0), 3);
             if ($share < 0 || $share > 100) {
-                $out['code'] = 422; $out['reason'] = 'حصةٌ خارج [0,100] للنوع «' . $types[$tid] . '»'; return $out;
+                $out['code'] = 422; $out['reason'] = 'حصة خارج [0,100] للنوع «' . $types[$tid] . '»'; return $out;
             }
             $kind = (string) (isset($r['share_kind']) ? $r['share_kind'] : 'productive');
             if (!in_array($kind, self::SHARE_KINDS, true)) { $kind = 'productive'; }
@@ -105,23 +105,23 @@ class ContractResourcePlanService
             // ولا حصةَ لمن ليس منتجًا — «الاحتياطيُّ جاهزيةٌ لا إنتاجٌ مخطَّط»
             if ($kind !== 'productive' && $share > 0) {
                 $out['code'] = 422;
-                $out['reason'] = '**' . self::KIND_AR[$kind] . ' بحصةٍ ' . $share . '%** — '
-                    . 'والحصةُ للمنتج وحدَه؛ فإمّا أن يُعلَن منتجًا وإمّا أن تكون حصتُه صفرًا';
+                $out['reason'] = '**' . self::KIND_AR[$kind] . ' بحصة ' . $share . '%** — '
+                    . 'والحصة للمنتج وحده؛ فإما أن يعلن منتجا وإما أن تكون حصته صفرا';
                 return $out;
             }
             $shifts = (int) (isset($r['shifts_per_day']) ? $r['shifts_per_day'] : 1);
             if ($shifts < 1) { $shifts = 1; }
             if ($shifts > 4) {
-                $out['code'] = 422; $out['reason'] = 'ورديّاتٌ فوق أربع لليوم الواحد'; return $out;
+                $out['code'] = 422; $out['reason'] = 'ورديات فوق أربع لليوم الواحد'; return $out;
             }
             $hrs = round((float) (isset($r['hours_per_shift']) ? $r['hours_per_shift'] : 0), 2);
             if ($hrs < 0 || $hrs > 24) {
-                $out['code'] = 422; $out['reason'] = 'ساعاتُ الوردية خارج [0,24]'; return $out;
+                $out['code'] = 422; $out['reason'] = 'ساعات الوردية خارج [0,24]'; return $out;
             }
             if ($shifts * $hrs > 24.0001) {
                 $out['code'] = 422;
-                $out['reason'] = '**' . $shifts . ' ورديّاتٍ × ' . $hrs . ' ساعةً = '
-                    . round($shifts * $hrs, 2) . ' — واليومُ أربعٌ وعشرون**'; return $out;
+                $out['reason'] = '**' . $shifts . ' ورديات × ' . $hrs . ' ساعة = '
+                    . round($shifts * $hrs, 2) . ' — واليوم أربع وعشرون**'; return $out;
             }
             $clean[$tid] = array(
                 'equipment_type_id' => $tid,
@@ -145,8 +145,8 @@ class ContractResourcePlanService
         // ② Σ لا يتجاوز المائةَ **أبدًا** — والفحصُ قبل أي كتابة
         if ($sum > 100.0001) {
             $out['code'] = 409;
-            $out['reason'] = '**Σ الحصص ' . $sum . '% تتجاوز المائة** — والفائضُ '
-                           . round($sum - 100, 3) . '%: لا طاقةَ فوق كمية البند';
+            $out['reason'] = '**Σ الحصص ' . $sum . '% تتجاوز المائة** — والفائض '
+                           . round($sum - 100, 3) . '%: لا طاقة فوق كمية البند';
             $out['share'] = $sum;
             return $out;
         }
@@ -156,7 +156,7 @@ class ContractResourcePlanService
             if ($c['operational_site_id'] !== null
                 && !self::siteBelongs($gate, (int) $c['operational_site_id'], (int) $l['contract_id'])) {
                 $out['code'] = 422;
-                $out['reason'] = 'الموقعُ ' . $c['operational_site_id'] . ' **ليس من نطاقات هذا العقد**';
+                $out['reason'] = 'الموقع ' . $c['operational_site_id'] . ' **ليس من نطاقات هذا العقد**';
                 return $out;
             }
         }
@@ -170,7 +170,7 @@ class ContractResourcePlanService
                         AND COALESCE(p.is_deleted,0) = 0", array((int) $lineId));
                 foreach ($live as $o) {
                     $g->update('contract_resource_plan',
-                        array('state' => 'ended', 'end_reason' => 'استُبدلت بخطةٍ أحدثَ بتاريخ ' . $from),
+                        array('state' => 'ended', 'end_reason' => 'استبدلت بخطة أحدث بتاريخ ' . $from),
                         array('id' => (int) $o['id']));
                 }
                 foreach ($clean as $row) {
@@ -187,7 +187,7 @@ class ContractResourcePlanService
                     array('id' => (int) $lineId));
             }, 'خطة موارد للبند ' . $lineId);
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الحفظ: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الحفظ: ' . $t->getMessage(); return $out;
         }
 
         self::audit($conn, $companyId, $actor, 'save_resource_plan', (int) $lineId, array(),
@@ -196,8 +196,8 @@ class ContractResourcePlanService
         $out['ok'] = true; $out['code'] = 200; $out['rows'] = count($clean);
         $out['share'] = $sum; $out['gap'] = round(100 - $sum, 3);
         $out['complete'] = (abs($out['gap']) < 0.0005);
-        $out['reason'] = count($clean) . ' نوعًا بحصةٍ مجموعُها ' . $sum . '%'
-            . ($out['complete'] ? ' · **مكتملة**' : (' · **ناقصٌ ' . $out['gap'] . '% — الخطةُ غيرُ مكتملة**'));
+        $out['reason'] = count($clean) . ' نوعا بحصة مجموعها ' . $sum . '%'
+            . ($out['complete'] ? ' · **مكتملة**' : (' · **ناقص ' . $out['gap'] . '% — الخطة غير مكتملة**'));
         return $out;
     }
 
@@ -207,12 +207,12 @@ class ContractResourcePlanService
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'share' => 0.0);
         $reason = trim((string) $reason);
         if ($reason === '') {
-            $out['code'] = 422; $out['reason'] = '**سببُ الإنهاء إلزامي** — ولا صفَّ يخرج صامتًا'; return $out;
+            $out['code'] = 422; $out['reason'] = '**سبب الإنهاء إلزامي** — ولا صف يخرج صامتا'; return $out;
         }
         $row = self::rowOf($gate, (int) $rowId);
-        if (!$row) { $out['code'] = 404; $out['reason'] = 'صفُّ الخطة غيرُ موجود'; return $out; }
+        if (!$row) { $out['code'] = 404; $out['reason'] = 'صف الخطة غير موجود'; return $out; }
         if ((string) $row['state'] === 'ended') {
-            $out['code'] = 409; $out['reason'] = 'الصفُّ منتهٍ سلفًا'; return $out;
+            $out['code'] = 409; $out['reason'] = 'الصف منته سلفا'; return $out;
         }
         $lineId = (int) $row['line_id'];
         try {
@@ -230,12 +230,12 @@ class ContractResourcePlanService
                     array('id' => $lineId));
             }, 'إنهاء صف خطة موارد ' . $rowId);
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الإنهاء: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الإنهاء: ' . $t->getMessage(); return $out;
         }
         self::audit($conn, $companyId, $actor, 'end_resource_row', (int) $rowId,
             array('state' => $row['state']), array('state' => 'ended', 'reason' => $reason));
         $out['ok'] = true; $out['code'] = 200; $out['share'] = self::shareTotal($gate, $lineId);
-        $out['reason'] = 'أُنهي الصفُّ ' . (int) $rowId . ' · وΣ الحصص صارت ' . $out['share'] . '%';
+        $out['reason'] = 'أنهي الصف ' . (int) $rowId . ' · وΣ الحصص صارت ' . $out['share'] . '%';
         return $out;
     }
 
@@ -255,12 +255,12 @@ class ContractResourcePlanService
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'total' => 0.0,
                      'unit' => '', 'rows' => array(), 'share' => 0.0);
         $l = ContractLineService::lineOf($gate, (int) $lineId);
-        if (!$l) { $out['code'] = 404; $out['reason'] = 'بندُ البيع غيرُ موجود'; return $out; }
+        if (!$l) { $out['code'] = 404; $out['reason'] = 'بند البيع غير موجود'; return $out; }
         $model = (string) $l['pricing_model'];
         if (in_array($model, self::NO_CONTAINER_MODELS, true)) {
             $out['code'] = 422;
-            $out['reason'] = '**لا طاقةَ تُقاس لبندٍ بنموذج «' . $model . '»** — '
-                . 'والمقطوعُ يُفوتَر بالإنجاز لا بالكمية';
+            $out['reason'] = '**لا طاقة تقاس لبند بنموذج «' . $model . '»** — '
+                . 'والمقطوع يفوتر بالإنجاز لا بالكمية';
             return $out;
         }
         $qty = round((float) $l['qty_contracted'], 2);
@@ -295,10 +295,10 @@ class ContractResourcePlanService
         $out['ok'] = true; $out['code'] = 200;
         $out['total'] = $running;
         $out['unit'] = isset(self::UNIT_OF_MODEL[$model]) ? self::UNIT_OF_MODEL[$model] : $model;
-        $out['reason'] = $running . ' ' . $out['unit'] . ' موزَّعةً على ' . $n . ' نوعٍ منتج'
+        $out['reason'] = $running . ' ' . $out['unit'] . ' موزعة على ' . $n . ' نوع منتج'
             . (abs($share - 100.0) < 0.0005
                ? ' · **Σ = المتعاقَد ' . $qty . '**'
-               : (' · **الحصصُ ' . $share . '% — والباقي ' . round($qty - $running, 2) . ' غيرُ مخطَّط**'));
+               : (' · **الحصص ' . $share . '% — والباقي ' . round($qty - $running, 2) . ' غير مخطط**'));
         return $out;
     }
 
@@ -341,7 +341,7 @@ class ContractResourcePlanService
             $sum['equipment_basic'] += (int) $r['count_basic'];
             $sum['equipment_backup'] += (int) $r['count_backup'];
         }
-        $sum['note'] = '**طلبٌ مخطَّط** — ولا يُنشئ استحقاقًا ولا كلفة';
+        $sum['note'] = '**طلب مخطط** — ولا ينشئ استحقاقا ولا كلفة';
         return $sum;
     }
 

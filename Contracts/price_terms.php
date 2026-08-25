@@ -59,9 +59,9 @@ $gate = $is_super_admin ? ems_tenant_db()->forAllTenants('price terms super') : 
 $TRIGGER_LABELS = array('fuel' => 'وقود', 'inflation' => 'تضخم', 'fx' => 'سعر صرف');
 $PERIOD_LABELS  = array('monthly' => 'شهري', 'quarterly' => 'ربع سنوي',
                         'semiannual' => 'نصف سنوي', 'annual' => 'سنوي');
-$OUTCOME_LABELS = array('amended' => 'تعديلٌ مولَّد', 'capped' => 'تعديلٌ مقصوصٌ بالسقف',
-                        'below_threshold' => 'دون العتبة — لا تعديل', 'no_reading' => 'لا قراءةَ مؤشر',
-                        'no_base_price' => 'لا سعرَ أساسٍ للبند');
+$OUTCOME_LABELS = array('amended' => 'تعديل مولد', 'capped' => 'تعديل مقصوص بالسقف',
+                        'below_threshold' => 'دون العتبة — لا تعديل', 'no_reading' => 'لا قراءة مؤشر',
+                        'no_base_price' => 'لا سعر أساس للبند');
 
 $selected = intval($_GET['contract_id'] ?? 0);
 $redirect = function ($msg, $cid) { ems_gov_redirect("Location: price_terms.php?contract_id=" . intval($cid)
@@ -89,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'valid_to'             => $_POST['valid_to'] ?? '',
             'note'                 => $_POST['note'] ?? '',
         ), $uid);
-        $redirect($r['ok'] ? 'حُفظ شرطُ التعديل ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $cid);
+        $redirect($r['ok'] ? 'حفظ شرط التعديل ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $cid);
     }
 
     if ($action === 'add_reading') {
@@ -101,20 +101,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'source_ref'   => $_POST['source_ref'] ?? '',
             'note'         => $_POST['reading_note'] ?? '',
         ), $uid);
-        $redirect($r['ok'] ? 'سُجّلت قراءةُ المؤشر بمرجعها ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $cid);
+        $redirect($r['ok'] ? 'سجلت قراءة المؤشر بمرجعها ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $cid);
     }
 
     if ($action === 'run_review') {
         if (!$can_edit) { $redirect('لا توجد صلاحية لهذا الإجراء ❌', $cid); }
         $r = PAS::applyDue($conn, $gate, $company_id, $cid, strval($_POST['as_of'] ?? date('Y-m-d')), $uid);
-        $redirect('المراجعة: وُلّد ' . intval($r['created']) . ' · عاطلٌ ' . intval($r['skipped'])
-                  . ' — والمعتمَدُ وحدَه يصير مالًا ✅', $cid);
+        $redirect('المراجعة: ولد ' . intval($r['created']) . ' · عاطل ' . intval($r['skipped'])
+                  . ' — والمعتمد وحده يصير مالا ✅', $cid);
     }
 
     if ($action === 'approve_revision') {
         if (!$can_edit) { $redirect('لا توجد صلاحية لهذا الإجراء ❌', $cid); }
         $r = PAS::approve($conn, $gate, $company_id, intval($_POST['revision_id'] ?? 0), $uid);
-        $redirect($r['ok'] ? 'اعتُمدت المراجعة — السعرُ يسري من تاريخه ✅'
+        $redirect($r['ok'] ? 'اعتمدت المراجعة — السعر يسري من تاريخه ✅'
                            : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $cid);
     }
 }
@@ -189,8 +189,8 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>';
     }
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا
-    echo ems_states_bundle('لا شروطَ تعديلِ سعرٍ مسجَّلةً على العقدِ المختار',
-                           'اختر عقدًا من قائمةِ العقودِ أعلاه ثمّ سجّل أولَ شرطٍ بنموذجِ «حفظ الشرط»');
+    echo ems_states_bundle('لا شروط تعديل سعر مسجلة على العقد المختار',
+                           'اختر عقدا من قائمة العقود أعلاه ثم سجل أول شرط بنموذج «حفظ الشرط»');
     ?>
 
     <style>
@@ -209,7 +209,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     <div class="card"><div class="card-body">
         <form method="get" class="pt-filter">
             <strong>العقد:</strong>
-            <select name="contract_id" aria-label="العقدُ المعروضةُ شروطُه" class="pt-contract-sel" onchange="this.form.submit()">
+            <select name="contract_id" aria-label="العقد المعروضة شروطه" class="pt-contract-sel" onchange="this.form.submit()">
                 <?php foreach ($contracts as $c): ?>
                     <option value="<?php echo intval($c['id']); ?>" <?php echo $selected === intval($c['id']) ? 'selected' : ''; ?>>
                         #<?php echo intval($c['id']); ?> — <?php echo htmlspecialchars((string)($c['first_party'] ?? '')); ?>
@@ -219,8 +219,8 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             </select>
         </form>
         <p class="pt-hint">
-            السعرُ الأساسيُّ في بنود العقد <strong>لا يُمسّ</strong> — والتعديلُ طبقةٌ بتاريخها فوقه،
-            فوقائعُ ما قبل السريان تبقى بسعرها القديم (CON-02 §6 · «لا رجعية»).
+            السعر الأساسي في بنود العقد <strong>لا يمس</strong> — والتعديل طبقة بتاريخها فوقه،
+            فوقائع ما قبل السريان تبقى بسعرها القديم (CON-02 §6 · «لا رجعية»).
         </p>
     </div></div>
 
@@ -230,10 +230,10 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         <input type="hidden" name="pt_action" value="save_term">
         <input type="hidden" name="contract_id" value="<?php echo $selected; ?>">
         <input type="hidden" name="term_id" id="f_term_id" value="">
-        <div class="card"><div class="card-header"><h5><i class="fa fa-arrow-trend-up"></i> شرطُ تعديل السعر</h5></div>
+        <div class="card"><div class="card-header"><h5><i class="fa fa-arrow-trend-up"></i> شرط تعديل السعر</h5></div>
         <div class="card-body"><div class="form-grid">
             <div class="form-group">
-                <label for="f_trigger">المحفِّز <span class="pt-req">*</span></label>
+                <label for="f_trigger">المحفز <span class="pt-req">*</span></label>
                 <select name="trigger_kind" id="f_trigger" required>
                     <?php foreach ($TRIGGER_LABELS as $k => $lbl): ?>
                         <option value="<?php echo $k; ?>"><?php echo $lbl; ?></option>
@@ -242,13 +242,13 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             </div>
             <div class="form-group">
                 <label for="f_index">رمز المؤشر <span class="pt-req">*</span>
-                    <small>— للصرف: رمزُ العملة (المصدر fin_fx_rates)</small></label>
+                    <small>— للصرف: رمز العملة (المصدر fin_fx_rates)</small></label>
                 <input type="text" name="index_code" id="f_index" required maxlength="32" placeholder="DIESEL_SD · CPI_SD · SDG">
             </div>
             <div class="form-group">
                 <label for="f_item">بند التسعير</label>
                 <select name="contract_item_id" id="f_item">
-                    <option value="">— كلُّ بنود العقد —</option>
+                    <option value="">— كل بنود العقد —</option>
                     <?php foreach ($items as $it): ?>
                         <option value="<?php echo intval($it['id']); ?>">
                             بند #<?php echo intval($it['id']); ?> — <?php echo htmlspecialchars((string)($it['equip_unit'] ?? '')); ?>
@@ -264,7 +264,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                 <input type="number" step="0.001" min="0" name="threshold_percent" id="f_threshold" value="0"></div>
             <div class="form-group"><label for="f_pass">نسبة التمرير ٪ <span class="pt-req">*</span></label>
                 <input type="number" step="0.001" min="0.001" max="100" name="pass_through_percent" id="f_pass" value="100" required></div>
-            <div class="form-group"><label for="f_cap">سقف المراجعة ٪ <small>— فارغٌ = بلا سقفٍ مكتوب</small></label>
+            <div class="form-group"><label for="f_cap">سقف المراجعة ٪ <small>— فارغ = بلا سقف مكتوب</small></label>
                 <input type="number" step="0.001" min="0.001" name="cap_percent" id="f_cap"></div>
             <div class="form-group">
                 <label for="f_period">دورية المراجعة</label>
@@ -284,27 +284,27 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     </form>
     <?php endif; ?>
 
-    <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> شروطُ العقد</h5></div>
+    <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> شروط العقد</h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap pt-table">
             <thead><tr>
-                <th>الإجراءات</th><th>المتغير المحفّز</th><th>المؤشر</th><th>مرجع التفويض</th><th>البند المتأثر</th>
+                <th>الإجراءات</th><th>المتغير المحفز</th><th>المؤشر</th><th>مرجع التفويض</th><th>البند المتأثر</th>
                 <th>عتبة</th><th>تمرير</th><th>السقف الأقصى للتعديل</th><th>دورية المراجعة</th><th>السريان</th><th>الحالة</th>
                 <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
                 <th class="ems-fn-th" data-fn="1">رقم الآلية</th>
                 <th class="ems-fn-th" data-fn="1">العقد</th>
-                <th class="ems-fn-th" data-fn="1">الحد المحفّز</th>
+                <th class="ems-fn-th" data-fn="1">الحد المحفز</th>
                 <th class="ems-fn-th" data-fn="1">اتجاه التعديل</th>
                 <th class="ems-fn-th" data-fn="1">معادلة التعديل</th>
                 <th class="ems-fn-th" data-fn="1">هل بلغ الحد؟</th>
                 <th class="ems-fn-th" data-fn="1">القرار</th>
-                <th class="ems-fn-th" data-fn="1">عرّفها</th>
+                <th class="ems-fn-th" data-fn="1">عرفها</th>
                 <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
                 <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                 <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-                <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+                <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
                 <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                 <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                 <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
@@ -349,7 +349,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     </div></div></div>
 
     <?php if ($can_add): ?>
-    <div class="card"><div class="card-header"><h5><i class="fa fa-file-import"></i> قراءةُ مؤشرٍ بمرجعها</h5></div>
+    <div class="card"><div class="card-header"><h5><i class="fa fa-file-import"></i> قراءة مؤشر بمرجعها</h5></div>
     <div class="card-body">
         <form method="post" class="ems-form">
         <?php echo csrf_field(); ?>
@@ -363,9 +363,9 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                 <div class="form-group"><label for="emsf_85_5dad8">القيمة <span class="pt-req">*</span></label>
                     <input type="number" step="0.00000001" min="0.00000001" name="value" required id="emsf_85_5dad8"></div>
                 <div class="form-group"><label for="emsf_86_62a3f">مرجع المستند <span class="pt-req">*</span>
-                        <small>— رقمٌ بلا مرجعٍ يحرّك مالًا مرفوض</small></label>
+                        <small>— رقم بلا مرجع يحرك مالا مرفوض</small></label>
                     <input type="text" name="source_ref" required maxlength="160"
-                           placeholder="نشرةُ الأسعار الرسمية 2026/07 — ص3" id="emsf_86_62a3f"></div>
+                           placeholder="نشرة الأسعار الرسمية 2026/07 — ص3" id="emsf_86_62a3f"></div>
                 <div class="form-group"><label for="emsf_87_8b313">ملاحظة</label><input type="text" name="reading_note" maxlength="255" id="emsf_87_8b313"></div>
             </div>
             <div class="pt-actions"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> تسجيل القراءة</button></div>
@@ -388,7 +388,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     </div></div>
     <?php endif; ?>
 
-    <div class="card"><div class="card-header"><h5><i class="fa fa-clock-rotate-left"></i> سجلُّ المراجعات</h5></div>
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clock-rotate-left"></i> سجل المراجعات</h5></div>
     <div class="card-body">
         <?php if ($can_edit): ?>
         <form method="post" class="pt-review-form">
@@ -396,16 +396,16 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <input type="hidden" name="pt_action" value="run_review">
             <input type="hidden" name="contract_id" value="<?php echo $selected; ?>">
             <div><label for="emsf_88_50f0f">تاريخ المراجعة</label>
-                <input type="date" name="as_of" aria-label="تاريخُ تشغيلِ مراجعةِ الأسعار" required id="emsf_88_50f0f" value="<?php echo date('Y-m-d'); ?>"></div>
-            <button type="submit" class="btn-primary"><i class="fa fa-play"></i> شغّل المراجعة</button>
-            <span class="pt-muted">تُولّد مراجعةً وملحقًا بسريانه — والاعتمادُ بيدٍ أخرى.</span>
+                <input type="date" name="as_of" aria-label="تاريخ تشغيل مراجعة الأسعار" required id="emsf_88_50f0f" value="<?php echo date('Y-m-d'); ?>"></div>
+            <button type="submit" class="btn-primary"><i class="fa fa-play"></i> شغل المراجعة</button>
+            <span class="pt-muted">تولد مراجعة وملحقا بسريانه — والاعتماد بيد أخرى.</span>
         </form>
         <?php endif; ?>
         <div class="table-container">
             <table class="alltables display nowrap pt-table">
                 <thead><tr>
                     <th>الإجراءات</th><th>الدورة</th><th>البند</th><th>المؤشر</th><th>المصدر</th>
-                    <th>الفارق</th><th>المطبَّق</th><th>قبل</th><th>بعد</th><th>السريان</th><th>النتيجة</th><th>تاريخ الاعتماد</th>
+                    <th>الفارق</th><th>المطبق</th><th>قبل</th><th>بعد</th><th>السريان</th><th>النتيجة</th><th>تاريخ الاعتماد</th>
                 </tr></thead>
                 <tbody>
                 <?php foreach ($revisions as $rv): ?>
@@ -437,7 +437,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                                 ? 'badge-success' : 'badge-secondary'; ?>">
                                 <?php echo htmlspecialchars($OUTCOME_LABELS[$oc] ?? $oc); ?></span></td>
                         <td><?php echo $rv['approved_at'] !== null
-                            ? "<span class='badge badge-success'>معتمَدة</span>"
+                            ? "<span class='badge badge-success'>معتمدة</span>"
                             : "<span class='badge badge-warning'>تنتظر</span>"; ?></td>
                     </tr>
                 <?php endforeach; ?>

@@ -59,14 +59,14 @@ class SiteDayService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'day_id' => 0, 'state' => '', 'created' => false);
         $siteId = (int) $siteId; $actorId = (int) $actorId;
-        if ($siteId <= 0)    { $out['code'] = 422; $out['reason'] = 'لا يومَ بلا موقع'; return $out; }
-        if (!self::isDate($date)) { $out['code'] = 422; $out['reason'] = 'تاريخُ اليومِ إلزاميٌّ بصيغةِ YYYY-MM-DD'; return $out; }
-        if ($actorId <= 0)   { $out['code'] = 422; $out['reason'] = 'لا فتحَ بلا فاعلٍ معروف'; return $out; }
+        if ($siteId <= 0)    { $out['code'] = 422; $out['reason'] = 'لا يوم بلا موقع'; return $out; }
+        if (!self::isDate($date)) { $out['code'] = 422; $out['reason'] = 'تاريخ اليوم إلزامي بصيغة YYYY-MM-DD'; return $out; }
+        if ($actorId <= 0)   { $out['code'] = 422; $out['reason'] = 'لا فتح بلا فاعل معروف'; return $out; }
 
         $existing = self::findDay($gate, $siteId, $date);
         if ($existing) {
             $out['ok'] = true; $out['code'] = 200; $out['day_id'] = (int) $existing['id'];
-            $out['state'] = $existing['state']; $out['reason'] = 'اليومُ مفتوحٌ سلفًا — عطالةٌ بالمفتاح';
+            $out['state'] = $existing['state']; $out['reason'] = 'اليوم مفتوح سلفا — عطالة بالمفتاح';
             return $out;
         }
         /* ⚠ `company_id` **لا يُمرَّر**: البوابةُ تحقنه من سياقِها، وتمريرُ غيرِه
@@ -86,8 +86,8 @@ class SiteDayService
         if ($newId <= 0) {
             /* سباقٌ على المفتاحِ الفريد ⇒ الآخرُ سبق: تُعاد قراءتُه لا يُعاد الإدراج */
             $again = self::findDay($gate, $siteId, $date);
-            if ($again) { $out['ok'] = true; $out['code'] = 200; $out['day_id'] = (int) $again['id']; $out['state'] = $again['state']; $out['reason'] = 'عطالةٌ بالمفتاح'; return $out; }
-            $out['code'] = 500; $out['reason'] = 'تعذّر فتحُ اليوم'; return $out;
+            if ($again) { $out['ok'] = true; $out['code'] = 200; $out['day_id'] = (int) $again['id']; $out['state'] = $again['state']; $out['reason'] = 'عطالة بالمفتاح'; return $out; }
+            $out['code'] = 500; $out['reason'] = 'تعذر فتح اليوم'; return $out;
         }
         $out['ok'] = true; $out['code'] = 201; $out['day_id'] = $newId;
         $out['state'] = 'open'; $out['created'] = true;
@@ -102,16 +102,16 @@ class SiteDayService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'shift_id' => 0, 'created' => false);
         $dayId = (int) $dayId;
-        if (!\in_array($shift, self::SHIFTS, true)) { $out['code'] = 422; $out['reason'] = 'مفردةُ وردية خارجَ المعياريّ'; return $out; }
+        if (!\in_array($shift, self::SHIFTS, true)) { $out['code'] = 422; $out['reason'] = 'مفردة وردية خارج المعياري'; return $out; }
         $day = self::dayById($gate, $dayId);
-        if (!$day) { $out['code'] = 404; $out['reason'] = 'اليومُ غيرُ موجود'; return $out; }
+        if (!$day) { $out['code'] = 404; $out['reason'] = 'اليوم غير موجود'; return $out; }
         if ($day['state'] === 'closed') {
-            self::logAttempt($gate, $day, 'shift_open', $shift, $actorId, 'DAY_CLOSED', 'وردية على يومٍ مُقفَل');
-            $out['code'] = 409; $out['reason'] = 'اليومُ مُقفَلٌ — لا تُفتح فيه وردية'; return $out;
+            self::logAttempt($gate, $day, 'shift_open', $shift, $actorId, 'DAY_CLOSED', 'وردية على يوم مقفل');
+            $out['code'] = 409; $out['reason'] = 'اليوم مقفل — لا تفتح فيه وردية'; return $out;
         }
         $ex = $gate->selectOne('site_day_shift', array(
             'columns' => array('id'), 'where' => array('day_id' => $dayId, 'shift' => $shift)));
-        if ($ex) { $out['ok'] = true; $out['code'] = 200; $out['shift_id'] = (int) $ex['id']; $out['reason'] = 'الورديةُ مفتوحةٌ سلفًا — عطالةٌ بالمفتاح'; return $out; }
+        if ($ex) { $out['ok'] = true; $out['code'] = 200; $out['shift_id'] = (int) $ex['id']; $out['reason'] = 'الوردية مفتوحة سلفا — عطالة بالمفتاح'; return $out; }
 
         $newId = 0;
         try {
@@ -123,7 +123,7 @@ class SiteDayService
                 'opened_at'     => self::now($gate),
             ));
         } catch (\Throwable $t) { $newId = 0; }
-        if ($newId <= 0) { $out['code'] = 500; $out['reason'] = 'تعذّر فتحُ الوردية'; return $out; }
+        if ($newId <= 0) { $out['code'] = 500; $out['reason'] = 'تعذر فتح الوردية'; return $out; }
         $out['ok'] = true; $out['code'] = 201; $out['shift_id'] = $newId; $out['created'] = true;
         return $out;
     }
@@ -137,30 +137,30 @@ class SiteDayService
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'reason_code' => '', 'day_id' => 0, 'attempt_id' => 0);
         $day = self::findDay($gate, (int) $siteId, $date);
         if (!$day) {
-            $out['reason_code'] = 'NO_DAY'; $out['code'] = 409; $out['reason'] = 'لا يومَ ميدانيًّا مفتوحًا لهذا الموقعِ والتاريخ';
+            $out['reason_code'] = 'NO_DAY'; $out['code'] = 409; $out['reason'] = 'لا يوم ميدانيا مفتوحا لهذا الموقع والتاريخ';
             $out['attempt_id'] = self::logAttempt($gate, array('id' => null, 'site_id' => (int) $siteId, 'day_date' => (string) $date),
                                                   'unit_entry', $shift, $actorId, 'NO_DAY', $out['reason'], $payloadRef);
             return $out;
         }
         $out['day_id'] = (int) $day['id'];
         if ($day['state'] === 'closed') {
-            $out['reason_code'] = 'DAY_CLOSED'; $out['code'] = 409; $out['reason'] = 'يومُ الموقعِ مُقفَلٌ — القيدُ بعدَ الإقفالِ مرفوض';
+            $out['reason_code'] = 'DAY_CLOSED'; $out['code'] = 409; $out['reason'] = 'يوم الموقع مقفل — القيد بعد الإقفال مرفوض';
             $out['attempt_id'] = self::logAttempt($gate, $day, 'unit_entry', $shift, $actorId, 'DAY_CLOSED', $out['reason'], $payloadRef);
             return $out;
         }
         $sh = $gate->selectOne('site_day_shift', array(
             'columns' => array('id', 'state'), 'where' => array('day_id' => (int) $day['id'], 'shift' => (string) $shift)));
         if (!$sh) {
-            $out['reason_code'] = 'NO_SHIFT'; $out['code'] = 409; $out['reason'] = 'لا وردية مفتوحةً بهذا الاسمِ في يومِ الموقع';
+            $out['reason_code'] = 'NO_SHIFT'; $out['code'] = 409; $out['reason'] = 'لا وردية مفتوحة بهذا الاسم في يوم الموقع';
             $out['attempt_id'] = self::logAttempt($gate, $day, 'unit_entry', $shift, $actorId, 'NO_SHIFT', $out['reason'], $payloadRef);
             return $out;
         }
         if ($sh['state'] === 'closed') {
-            $out['reason_code'] = 'SHIFT_CLOSED'; $out['code'] = 409; $out['reason'] = 'الورديةُ مُقفَلة';
+            $out['reason_code'] = 'SHIFT_CLOSED'; $out['code'] = 409; $out['reason'] = 'الوردية مقفلة';
             $out['attempt_id'] = self::logAttempt($gate, $day, 'unit_entry', $shift, $actorId, 'SHIFT_CLOSED', $out['reason'], $payloadRef);
             return $out;
         }
-        $out['ok'] = true; $out['code'] = 200; $out['reason_code'] = 'OPEN'; $out['reason'] = 'اليومُ والورديةُ مفتوحان';
+        $out['ok'] = true; $out['code'] = 200; $out['reason_code'] = 'OPEN'; $out['reason'] = 'اليوم والوردية مفتوحان';
         $out['attempt_id'] = self::logAttempt($gate, $day, 'unit_entry', $shift, $actorId, 'OPEN', $out['reason'], $payloadRef, 'allowed');
         return $out;
     }
@@ -170,15 +170,15 @@ class SiteDayService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '');
         $shiftId = (int) $shiftId; $handoverTo = (int) $handoverTo;
-        if ($handoverTo <= 0) { $out['code'] = 422; $out['reason'] = 'لا تُقفل ورديةٌ بلا محضرٍ بين المشرفَين'; return $out; }
+        if ($handoverTo <= 0) { $out['code'] = 422; $out['reason'] = 'لا تقفل وردية بلا محضر بين المشرفين'; return $out; }
         $cur = $gate->selectOne('site_day_shift', array('columns' => array('id', 'state'), 'where' => array('id' => $shiftId)));
-        if (!$cur || $cur['state'] !== 'open') { $out['code'] = 409; $out['reason'] = 'الورديةُ ليست مفتوحةً أو تعذّر التسليم'; return $out; }
+        if (!$cur || $cur['state'] !== 'open') { $out['code'] = 409; $out['reason'] = 'الوردية ليست مفتوحة أو تعذر التسليم'; return $out; }
         try {
             $gate->update('site_day_shift', array(
                 'state' => 'handed_over', 'handover_to' => $handoverTo,
                 'handover_at' => self::now($gate), 'handover_note' => (string) $note,
             ), array('id' => $shiftId));
-        } catch (\Throwable $t) { $out['code'] = 500; $out['reason'] = 'تعذّر التسليم'; return $out; }
+        } catch (\Throwable $t) { $out['code'] = 500; $out['reason'] = 'تعذر التسليم'; return $out; }
         $out['ok'] = true; $out['code'] = 200; return $out;
     }
 
@@ -188,13 +188,13 @@ class SiteDayService
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'open_shifts' => 0);
         $dayId = (int) $dayId; $actorId = (int) $actorId;
         $day = self::dayById($gate, $dayId);
-        if (!$day) { $out['code'] = 404; $out['reason'] = 'اليومُ غيرُ موجود'; return $out; }
-        if ($day['state'] === 'closed') { $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'مُقفَلٌ سلفًا — عطالةٌ بالحالة'; return $out; }
-        if ($actorId <= 0) { $out['code'] = 422; $out['reason'] = 'لا إقفالَ بلا فاعلٍ معروف'; return $out; }
+        if (!$day) { $out['code'] = 404; $out['reason'] = 'اليوم غير موجود'; return $out; }
+        if ($day['state'] === 'closed') { $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'مقفل سلفا — عطالة بالحالة'; return $out; }
+        if ($actorId <= 0) { $out['code'] = 422; $out['reason'] = 'لا إقفال بلا فاعل معروف'; return $out; }
         $openN = (int) $gate->count('site_day_shift', array('where' => array('day_id' => $dayId, 'state' => 'open')));
         if ($openN > 0) {
-            self::logAttempt($gate, $day, 'day_close', '', $actorId, 'SHIFT_STILL_OPEN', "وردياتٌ مفتوحةٌ بلا محضرِ تسليم: $openN");
-            $out['code'] = 409; $out['open_shifts'] = $openN; $out['reason'] = 'لا يُقفل اليومُ ووردياتُه مفتوحةٌ بلا محضرِ تسليم'; return $out;
+            self::logAttempt($gate, $day, 'day_close', '', $actorId, 'SHIFT_STILL_OPEN', "ورديات مفتوحة بلا محضر تسليم: $openN");
+            $out['code'] = 409; $out['open_shifts'] = $openN; $out['reason'] = 'لا يقفل اليوم ووردياته مفتوحة بلا محضر تسليم'; return $out;
         }
         try {
             $gate->update('site_day_shift', array('state' => 'closed', 'closed_at' => self::now($gate)),
@@ -203,7 +203,7 @@ class SiteDayService
                 'state' => 'closed', 'closed_by' => $actorId,
                 'closed_at' => self::now($gate), 'close_note' => (string) $note,
             ), array('id' => $dayId));
-        } catch (\Throwable $t) { $out['code'] = 500; $out['reason'] = 'تعذّر الإقفال'; return $out; }
+        } catch (\Throwable $t) { $out['code'] = 500; $out['reason'] = 'تعذر الإقفال'; return $out; }
         $out['ok'] = true; $out['code'] = 200;
         self::emit($gate, $day, 'operations.site_day.closed', 'site_day', $dayId,
                    array('site_id' => (int) $day['site_id'], 'day_date' => $day['day_date']), 'site_day:' . $dayId . ':closed');
@@ -215,15 +215,15 @@ class SiteDayService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '');
         $dayId = (int) $dayId; $actorId = (int) $actorId;
-        if (\trim((string) $reason) === '') { $out['code'] = 422; $out['reason'] = 'لا إعادةَ فتحٍ بلا سببٍ مكتوب'; return $out; }
+        if (\trim((string) $reason) === '') { $out['code'] = 422; $out['reason'] = 'لا إعادة فتح بلا سبب مكتوب'; return $out; }
         $day = self::dayById($gate, $dayId);
-        if (!$day || $day['state'] !== 'closed') { $out['code'] = 409; $out['reason'] = 'اليومُ ليس مُقفَلًا'; return $out; }
+        if (!$day || $day['state'] !== 'closed') { $out['code'] = 409; $out['reason'] = 'اليوم ليس مقفلا'; return $out; }
         try {
             $gate->update('site_day', array(
                 'state' => 'reopened', 'reopened_by' => $actorId,
                 'reopened_at' => self::now($gate), 'reopen_reason' => (string) $reason,
             ), array('id' => $dayId));
-        } catch (\Throwable $t) { $out['code'] = 500; $out['reason'] = 'تعذّرت إعادةُ الفتح'; return $out; }
+        } catch (\Throwable $t) { $out['code'] = 500; $out['reason'] = 'تعذرت إعادة الفتح'; return $out; }
         $out['ok'] = true; $out['code'] = 200; return $out;
     }
 
@@ -239,9 +239,9 @@ class SiteDayService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'stop_id' => 0, 'role' => '', 'created' => false);
         $key = (string) $o['occurrence_key'];
-        if (\strlen($key) !== 40) { $out['code'] = 422; $out['reason'] = 'مفتاحُ الواقعةِ غيرُ صالح'; return $out; }
+        if (\strlen($key) !== 40) { $out['code'] = 422; $out['reason'] = 'مفتاح الواقعة غير صالح'; return $out; }
         $reg = (string) $o['register_name'];
-        if (!\in_array($reg, array('unit_time_log', 'timesheet'), true)) { $out['code'] = 422; $out['reason'] = 'سجلُّ مصدرٍ غيرُ معروف'; return $out; }
+        if (!\in_array($reg, array('unit_time_log', 'timesheet'), true)) { $out['code'] = 422; $out['reason'] = 'سجل مصدر غير معروف'; return $out; }
 
         $cur = $gate->selectOne('ops_stop_register', array(
             'columns' => array('id', 'authority', 'hours'), 'where' => array('occurrence_key' => $key)));
@@ -279,7 +279,7 @@ class SiteDayService
             } else {
                 $cur = $gate->selectOne('ops_stop_register', array(
                     'columns' => array('id', 'authority', 'hours'), 'where' => array('occurrence_key' => $key)));
-                if (!$cur) { $out['code'] = 500; $out['reason'] = 'تعذّر تسجيلُ الواقعة'; return $out; }
+                if (!$cur) { $out['code'] = 500; $out['reason'] = 'تعذر تسجيل الواقعة'; return $out; }
             }
         }
         if ($out['stop_id'] === 0 && $cur) { $out['stop_id'] = (int) $cur['id']; $out['role'] = ($cur['authority'] === $reg) ? 'AUTHORITY' : 'MIRROR'; }
@@ -303,7 +303,7 @@ class SiteDayService
         try {
             if ($exists) { $gate->update('ops_stop_source', $src, array('id' => (int) $exists['id'])); }
             else { $gate->insert('ops_stop_source', \array_merge($src, array('occurrence_key' => $key, 'register_name' => $reg))); }
-        } catch (\Throwable $t) { $out['code'] = 500; $out['reason'] = 'تعذّر تسجيلُ قراءةِ السجلّ'; return $out; }
+        } catch (\Throwable $t) { $out['code'] = 500; $out['reason'] = 'تعذر تسجيل قراءة السجل'; return $out; }
         $out['ok'] = true; $out['code'] = $out['created'] ? 201 : 200;
         return $out;
     }

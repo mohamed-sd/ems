@@ -50,7 +50,7 @@ if ($uid > 0) {
               AND status IN ('submitted','routed','in_approval')"), 'approvals_inbox.php'),
         array('تنبيهات غير مقروءة', $qn("SELECT COUNT(*) FROM personal_notifications WHERE {$coW} user_id = {$uid}
               AND read_at IS NULL"), 'notifications.php'),
-        array('إنجازي — 30 يومًا', $qn("SELECT COUNT(*) FROM achievement_records WHERE {$coW} person_user_id = {$uid}
+        array('إنجازي — 30 يوما', $qn("SELECT COUNT(*) FROM achievement_records WHERE {$coW} person_user_id = {$uid}
               AND reversed_at IS NULL AND recognized_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)"), 'my_achievement.php'),
         array('رسائل غير مقروءة', $qn("SELECT COUNT(*) FROM messages WHERE {$coW} receiver_id = {$uid}
               AND is_read = 0 AND COALESCE(is_deleted_receiver,0) = 0"), '../chats/index.php'),
@@ -107,16 +107,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array(
         array('href' => 'my_achievement.php', 'icon' => 'fa fa-chart-simple', 'label' => 'إنجازي'),
         array('href' => 'my_evaluation.php', 'icon' => 'fa fa-user-check', 'label' => 'التقييم'),
-        array('href' => '../user_capacities.php', 'icon' => 'fa fa-people-arrows', 'label' => 'مبدّل المساحة'),
+        array('href' => '../user_capacities.php', 'icon' => 'fa fa-people-arrows', 'label' => 'مبدل المساحة'),
     );
     include('../includes/page_header.php');
     // حزمةُ الحالاتِ الدنيا (بوابة ٩) — مخفيةٌ افتراضًا ويُظهرها منطقُ الشاشة
-    echo ems_states_bundle('لا بطاقاتِ بياناتٍ في بوابتي بعدُ', 'بوابتي تتشكّل بالصفةِ النشطةِ ومفاتيحِ الظهور — راجع الصفةَ أو مفاتيحَ العرض');
+    echo ems_states_bundle('لا بطاقات بيانات في بوابتي بعد', 'بوابتي تتشكل بالصفة النشطة ومفاتيح الظهور — راجع الصفة أو مفاتيح العرض');
     ?>
 
     <?php if ($wfmCards): ?>
     <!-- مساحة عملي فوق المحرك (WFM-01) — كل رقمٍ ينقر لشاشته -->
-    <div class="card"><div class="card-header"><h5><i class="fa fa-briefcase"></i> مساحة عملي — من المحرك حيًّا</h5></div>
+    <div class="card"><div class="card-header"><h5><i class="fa fa-briefcase"></i> مساحة عملي — من المحرك حيا</h5></div>
     <div class="card-body">
         <!-- بطاقةُ الإحصاءِ الموحَّدة (`ems-statcards.css`) — البطاقةُ هي الرابطُ
              نفسُه فلا غلافَ بينهما، و`ems-statgrid--fill` يمدُّ الأخيرةَ على ما
@@ -133,7 +133,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php endif; ?>
 
     <?php if ($feed === null): ?>
-        <div class="alert alert-warning">لا صفةَ نشطةً لحسابك — الاشتقاقُ بيد مدير الصلاحيات (شاشة 182).</div>
+        <div class="alert alert-warning">لا صفة نشطة لحسابك — الاشتقاق بيد مدير الصلاحيات (شاشة 182).</div>
     <?php elseif (!$feed['ok']): ?>
         <div class="alert alert-danger"><?php echo htmlspecialchars($feed['reason']); ?></div>
     <?php else: ?>
@@ -170,13 +170,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
         <?php if ($feed['hidden_sections']): ?>
             <p class="ems-ptp-hidden-note"><i class="fa fa-lock"></i>
-                أقسامٌ محجوبةٌ بقرارٍ موثَّق: <?php echo count($feed['hidden_sections']); ?>
-                — إدارتُها في لوحة الظهور (ADM-01)</p>
+                أقسام محجوبة بقرار موثق: <?php echo count($feed['hidden_sections']); ?>
+                — إدارتها في لوحة الظهور (ADM-01)</p>
         <?php endif; ?>
     </div></div>
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-clock-rotate-left"></i>
-        سجلُّ نشاطي (لا يُعدَّل ولا يُحذف)</h5></div>
+        سجل نشاطي (لا يعدل ولا يحذف)</h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap ems-ptp-w100" data-no-dt="1">
             <thead><tr><th>الوقت</th><th>الفعل</th><th>الهدف</th><th>النتيجة</th>
@@ -185,16 +185,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="ems-fn-th" data-fn="1">الصفة</th>
               <th class="ems-fn-th" data-fn="1">الإدارة</th>
               <th class="ems-fn-th" data-fn="1">الموقع</th>
-              <th class="ems-fn-th" data-fn="1">المعدة المكلَّف عليها</th>
-              <th class="ems-fn-th" data-fn="1">المشغّل الآخر على المعدة</th>
+              <th class="ems-fn-th" data-fn="1">المعدة المكلف عليها</th>
+              <th class="ems-fn-th" data-fn="1">المشغل الآخر على المعدة</th>
               <th class="ems-fn-th" data-fn="1">مهام مفتوحة</th>
               <th class="ems-fn-th" data-fn="1">موافقات تنتظرني</th>
-              <th class="ems-fn-th" data-fn="1">طلباتي المعلَّقة</th>
+              <th class="ems-fn-th" data-fn="1">طلباتي المعلقة</th>
               <th class="ems-fn-th" data-fn="1">بلاغاتي المفتوحة</th>
               <th class="ems-fn-th" data-fn="1">إنجاز الشهر</th>
               <th class="ems-fn-th" data-fn="1">آخر دخول</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
               </tr></thead>
             <tbody>
             <?php foreach ($activity as $a): ?>

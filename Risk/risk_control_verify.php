@@ -57,7 +57,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     $header_actions = array();
     $header_back = array();
     $header_context = array(
-        'المقام' => 'الضوابط الحرجة وحدَها (ICMM)',
+        'المقام' => 'الضوابط الحرجة وحدها (ICMM)',
         'الإجمالي' => $stats['total'],
         'تجاوزت موعد التحقق' => $stats['overdue'],
         'غير فعالة' => $stats['failed'],
@@ -66,11 +66,11 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     );
     include('../includes/page_header.php');
     ems_screen_about(
-        'الضابطُ الحرجُ يمنع حدثًا عاليَ العواقب — وقلّتُه شرطُ معناه. ولا يُحتسب إلا بإثبات '
-        . 'فعاليته بدليلِ تنفيذٍ وتحققٍ دوريٍّ ونتيجةٍ موثَّقة (RK-07).',
-        array('المتحقِّقُ المستقلُّ ≠ مالكُ الضابط — والحارسُ يرفض في الخادم لا بإخفاءِ الزر',
-              'فشلُ ضابطٍ حرجٍ يصعَّد للرئيسِ في اليومِ نفسِه ولا يُعكس — يُغلق بإجراءٍ تصحيحيٍّ متحقَّقٍ منه'));
-    echo ems_states_bundle('لا ضوابطَ حرجةً ضمن هذا الترشيح', 'الحرجُ يُوسَم بحقوله الخمسةِ من شاشةِ الضوابط');
+        'الضابط الحرج يمنع حدثا عالي العواقب — وقلته شرط معناه. ولا يحتسب إلا بإثبات '
+        . 'فعاليته بدليل تنفيذ وتحقق دوري ونتيجة موثقة (RK-07).',
+        array('المتحقق المستقل ≠ مالك الضابط — والحارس يرفض في الخادم لا بإخفاء الزر',
+              'فشل ضابط حرج يصعد للرئيس في اليوم نفسه ولا يعكس — يغلق بإجراء تصحيحي متحقق منه'));
+    echo ems_states_bundle('لا ضوابط حرجة ضمن هذا الترشيح', 'الحرج يوسم بحقوله الخمسة من شاشة الضوابط');
     ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
@@ -79,7 +79,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
             <select name="due" class="form-control rsk-due-select" aria-label="حالة التحقق">
                 <option value="">الكل</option>
                 <option value="overdue" <?php echo $fState === 'overdue' ? 'selected' : ''; ?>>تجاوزت موعد التحقق</option>
-                <option value="soon" <?php echo $fState === 'soon' ? 'selected' : ''; ?>>تحقق مستحق خلال 14 يومًا</option>
+                <option value="soon" <?php echo $fState === 'soon' ? 'selected' : ''; ?>>تحقق مستحق خلال 14 يوما</option>
                 <option value="failed" <?php echo $fState === 'failed' ? 'selected' : ''; ?>>غير فعالة</option>
             </select></label>
         <button type="submit" class="ems-btn-secondary"><i class="fa fa-filter"></i> ترشيح</button>
@@ -89,7 +89,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     <div class="ems-card" id="cvEmpty"></div>
     <script>document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('cvEmpty').appendChild(EmsUI.emptyState({
-            reason: 'لا ضوابط حرجة مسجلة — والحرجُ يُوسَم بحقوله الخمسة من شاشة الضوابط',
+            reason: 'لا ضوابط حرجة مسجلة — والحرج يوسم بحقوله الخمسة من شاشة الضوابط',
             createHref: 'risk_controls.php', createLabel: 'إلى الضوابط'
         }));
     });</script>
@@ -202,7 +202,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
             fetch('risk_actions.php', { method: 'POST', body: fd }).then(function (r) { return r.json(); })
             .then(function (j) {
                 var m = document.getElementById('cvMsg');
-                if (j.ok) { m.textContent = '✔ سُجل'; setTimeout(function () { location.reload(); }, 800); }
+                if (j.ok) { m.textContent = '✔ سجل'; setTimeout(function () { location.reload(); }, 800); }
                 else { m.textContent = '✘ ' + (j.code || '') + ' ' + (j.msg || ''); }
             });
         });

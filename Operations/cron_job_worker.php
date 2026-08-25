@@ -37,7 +37,7 @@ $handlers = array(
             $conn, $gate, $co, intval($payload['run_id'] ?? 0), intval($payload['actor'] ?? 0));
         return array('ok' => !empty($r['ok']) || intval($r['code']) === 200,
             'reason' => isset($r['reason']) ? $r['reason'] : '',
-            'summary' => 'ربط المسيّر: أشخاص=' . intval($r['persons'] ?? 0) . ' أسطر=' . intval($r['lines'] ?? 0));
+            'summary' => 'ربط المسير: أشخاص=' . intval($r['persons'] ?? 0) . ' أسطر=' . intval($r['lines'] ?? 0));
     },
     // NFR-07: الدوريات المالية عبر الطابور
     'periodic_cron' => function (\mysqli $conn, $co, $payload, $jobId) {
@@ -89,5 +89,5 @@ while ($ran < $max) {
     $ran++;
     if (JQ::execute($conn, $job, $handlers)) { $okN++; }
 }
-fwrite(STDOUT, "العامل: نفّذ {$ran} مهمة ({$okN} نجحت) — والفاشل بمحاولات تصاعدية وسجل ظاهر.\n");
+fwrite(STDOUT, "العامل: نفذ {$ran} مهمة ({$okN} نجحت) — والفاشل بمحاولات تصاعدية وسجل ظاهر.\n");
 exit(0);

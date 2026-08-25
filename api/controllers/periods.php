@@ -24,7 +24,7 @@ function periods_sync_push(): void
     $body = api_input();
     $rows = isset($body['periods']) && is_array($body['periods']) ? $body['periods'] : null;
     if ($rows === null) {
-        api_fail('الحمولة: {"periods": [...]} — دفعة لا صفًّا حرًّا', 422);
+        api_fail('الحمولة: {"periods": [...]} — دفعة لا صفا حرا', 422);
     }
 
     require_once dirname(__DIR__, 2) . '/app/Services/Workforce/AttendanceService.php';
@@ -54,5 +54,5 @@ function periods_sync_push(): void
     api_ok(array(
         'applied' => $applied, 'duplicates' => $duplicates, 'rejected' => $rejected,
         'results' => $results,
-    ), 'مزامنة الفترات: ' . $applied . ' مطبَّق · ' . $duplicates . ' مكرر (عاطل) · ' . $rejected . ' مرفوض بسببه');
+    ), 'مزامنة الفترات: ' . $applied . ' مطبق · ' . $duplicates . ' مكرر (عاطل) · ' . $rejected . ' مرفوض بسببه');
 }

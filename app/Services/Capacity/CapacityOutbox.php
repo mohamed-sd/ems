@@ -39,13 +39,13 @@ class CapacityOutbox
         $key = isset($e['event_key']) ? (string) $e['event_key'] : '';
         if (!in_array($key, CapacityEvents::ALL, true)) {
             $out['code'] = 422;
-            $out['reason'] = 'حدثٌ خارج قاموس مجال القدرات الستة (CAP-29): ' . $key;
+            $out['reason'] = 'حدث خارج قاموس مجال القدرات الستة (CAP-29): ' . $key;
             return $out;
         }
         $idem = isset($e['idempotency_key']) ? substr((string) $e['idempotency_key'], 0, 64) : '';
-        if ($idem === '') { $out['code'] = 422; $out['reason'] = 'مفتاحُ العطالة إلزامي (CAP-30)'; return $out; }
+        if ($idem === '') { $out['code'] = 422; $out['reason'] = 'مفتاح العطالة إلزامي (CAP-30)'; return $out; }
         if (!isset($e['created_by']) || (int) $e['created_by'] <= 0) {
-            $out['code'] = 422; $out['reason'] = 'الفاعلُ إلزاميٌّ موجبٌ — عقدُ الناشر §9 يرفض غيرَه';
+            $out['code'] = 422; $out['reason'] = 'الفاعل إلزامي موجب — عقد الناشر §9 يرفض غيره';
             return $out;
         }
         try {
@@ -62,7 +62,7 @@ class CapacityOutbox
             ));
         } catch (\Throwable $t) {
             if (strpos($t->getMessage(), 'Duplicate') !== false) {
-                $out['code'] = 409; $out['reason'] = 'صفُّ الصادر مقيَّدٌ بهذا المفتاح — لا ازدواج';
+                $out['code'] = 409; $out['reason'] = 'صف الصادر مقيد بهذا المفتاح — لا ازدواج';
                 return $out;
             }
             throw $t;
@@ -109,7 +109,7 @@ class CapacityOutbox
                     'idempotency_key' => (string) $r['idempotency_key'],
                 ));
                 if ($res === null) {
-                    throw new \RuntimeException('جذرُ الأحداث مطفأ (EMS_EVENT_ROOT) — يبقى الصفُّ معلَّقًا');
+                    throw new \RuntimeException('جذر الأحداث مطفأ (EMS_EVENT_ROOT) — يبقى الصف معلقا');
                 }
                 $gate->update('capacity_outbox', array(
                     'state' => 'published',

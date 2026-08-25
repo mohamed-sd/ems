@@ -644,7 +644,7 @@ require_once __DIR__ . '/../includes/profile_kit.php';
     include('../includes/page_header.php');
     /* UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا.
        والإرشادُ يشير إلى بابٍ قائم: «رأسُ الشاشة» لم يعد يحمل زرَّ المشاريع. */
-    echo ems_states_bundle('لا مشاريعَ مسجَّلةً لهذا العميلِ بعدُ', 'افتح تبويبَ «المشاريعُ والمواقع» من شريطِ رحلةِ العميلِ وأضف أولَ مشروعٍ له');
+    echo ems_states_bundle('لا مشاريع مسجلة لهذا العميل بعد', 'افتح تبويب «المشاريع والمواقع» من شريط رحلة العميل وأضف أول مشروع له');
     ?>
 <?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('client', 'البيانات الأساسية'); ?>
 
@@ -664,8 +664,8 @@ require_once __DIR__ . '/../includes/profile_kit.php';
         ),
         'chips'  => array(
             array('text' => $client['client_code'], 'icon' => 'fas fa-hashtag', 'mono' => true),
-            array('text' => $client['entity_type'] ?: 'نوعٌ غيرُ محدد', 'icon' => 'fas fa-sitemap'),
-            array('text' => $client['sector_category'] ?: 'قطاعٌ غيرُ محدد', 'icon' => 'fas fa-industry'),
+            array('text' => $client['entity_type'] ?: 'نوع غير محدد', 'icon' => 'fas fa-sitemap'),
+            array('text' => $client['sector_category'] ?: 'قطاع غير محدد', 'icon' => 'fas fa-industry'),
         ),
         'facts'  => array(
             array('label' => 'الهاتف',        'value' => $client['phone']),
@@ -705,7 +705,7 @@ require_once __DIR__ . '/../includes/profile_kit.php';
     echo ems_profile_group_open(array(
         'title' => 'المسار التجاري',
         'icon'  => 'fas fa-filter-circle-dollar',
-        'meta'  => 'فرصة ← عرضُ سعر ← مناقصة',
+        'meta'  => 'فرصة ← عرض سعر ← مناقصة',
     ));
 
     /* ◆ المؤشراتُ تُبنى مصفوفةً ثم تُصيَّر دفعةً واحدة — فالشرطُ يضيف عنصرًا
@@ -720,14 +720,14 @@ require_once __DIR__ . '/../includes/profile_kit.php';
             'value' => ($opp_won + $opp_lost) > 0 ? number_format($opp_conversion, 1) . '٪' : '—',
             'label' => 'معدل تحويل الفرص' . (($opp_won + $opp_lost) > 0
                      ? ' (' . intval($opp_won) . ' فوز من ' . intval($opp_won + $opp_lost) . ' محسومة)'
-                     : ' — لا فرصةَ محسومةً بعدُ'),
+                     : ' — لا فرصة محسومة بعد'),
             'tone'  => ($opp_won + $opp_lost) > 0 ? '' : 'muted',
         );
         /* ◆ العملةُ الفارغةُ ليست عملة: `cp_money_fmt` تُخرج سطرًا لكلِّ عملةٍ
              ودلوًا مستقلًّا لـ«بلا عملة» — ولا يُجمع رقمان بعملتين أبدًا. */
         $cp_pipe_stats[] = array(
             'values'  => cp_money_fmt($opp_pipeline_by_cur),
-            'label'   => 'قيمة المسار المفتوح' . (count($opp_pipeline_by_cur) > 1 ? ' — كلُّ عملةٍ على حدة' : ''),
+            'label'   => 'قيمة المسار المفتوح' . (count($opp_pipeline_by_cur) > 1 ? ' — كل عملة على حدة' : ''),
             'variant' => 'money',
         );
     }
@@ -740,12 +740,12 @@ require_once __DIR__ . '/../includes/profile_kit.php';
             'value' => $quo_decided > 0 ? number_format($quo_win_rate, 1) . '٪' : '—',
             'label' => 'معدل قبول العروض' . ($quo_decided > 0
                      ? ' (' . intval($quo_accepted) . ' مقبول من ' . intval($quo_decided) . ' محسوم)'
-                     : ' — لا عرضَ محسومًا بعدُ'),
+                     : ' — لا عرض محسوما بعد'),
             'tone'  => $quo_decided > 0 ? '' : 'muted',
         );
         $cp_pipe_stats[] = array(
             'values'  => cp_money_fmt($quo_accepted_by_cur),
-            'label'   => 'قيمة العروض المقبولة' . (count($quo_accepted_by_cur) > 1 ? ' — كلُّ عملةٍ على حدة' : ''),
+            'label'   => 'قيمة العروض المقبولة' . (count($quo_accepted_by_cur) > 1 ? ' — كل عملة على حدة' : ''),
             'variant' => 'money',
         );
     }
@@ -754,13 +754,13 @@ require_once __DIR__ . '/../includes/profile_kit.php';
     if ($tnd_total > 0) {
         $cp_pipe_stats[] = array(
             'value' => intval($tnd_total),
-            'label' => 'المناقصات' . ($tnd_submitted > 0 ? ' (منها ' . intval($tnd_submitted) . ' مقدَّمة)' : ''),
+            'label' => 'المناقصات' . ($tnd_submitted > 0 ? ' (منها ' . intval($tnd_submitted) . ' مقدمة)' : ''),
         );
         $cp_pipe_stats[] = array(
             'value' => ($tnd_won + $tnd_lost) > 0 ? number_format($tnd_win_rate, 1) . '٪' : '—',
             'label' => 'معدل الفوز بالمناقصات' . (($tnd_won + $tnd_lost) > 0
                      ? ' (' . intval($tnd_won) . ' فوز من ' . intval($tnd_won + $tnd_lost) . ' محسومة)'
-                     : ' — لا مناقصةَ محسومةً بعدُ'),
+                     : ' — لا مناقصة محسومة بعد'),
             'tone'  => ($tnd_won + $tnd_lost) > 0 ? '' : 'muted',
         );
     }
@@ -771,7 +771,7 @@ require_once __DIR__ . '/../includes/profile_kit.php';
     <?php echo ems_profile_section_open(array(
         'title' => 'فرص العميل البيعية',
         'icon'  => 'fas fa-bullseye',
-        'note'  => 'مسارُ الفرصِ من الجديدةِ إلى المحسومة.'
+        'note'  => 'مسار الفرص من الجديدة إلى المحسومة.'
                  . (($opp_won || $opp_lost || $opp_excluded)
                     ? ' المحسومة: ' . intval($opp_won) . ' فوز · ' . intval($opp_lost) . ' خسارة · ' . intval($opp_excluded) . ' مستبعدة.'
                     : ''),
@@ -790,10 +790,10 @@ require_once __DIR__ . '/../includes/profile_kit.php';
                                 <th>الإغلاق المتوقع</th>
                                 <th>قرار الدراسة</th>
                                 <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                                 <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                                 <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                                 <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -830,12 +830,12 @@ require_once __DIR__ . '/../includes/profile_kit.php';
     <?php if (!empty($client_quotations)): ?>
     <?php echo ems_profile_section_open(array('title' => 'عروض أسعار العميل', 'icon' => 'fas fa-file-invoice-dollar')); ?>
             <div class="ems-profile__section-note">
-                العرضُ حلقةُ الوصلِ بين الفرصةِ والعقد.
+                العرض حلقة الوصل بين الفرصة والعقد.
                 <?php if ($quo_decided > 0): ?>
                     المحسوم: <?php echo intval($quo_accepted); ?> مقبول · <?php echo intval($quo_rejected); ?> مرفوض.
                 <?php endif; ?>
                 <?php if (isset($quo_accepted_by_cur['بلا عملة'])): ?>
-                    <strong>تنبيه: بعضُ العروضِ بلا عملةٍ مسجَّلة — تُجمع في خانةٍ مستقلّةٍ ولا تُضاف لعملةٍ أخرى.</strong>
+                    <strong>تنبيه: بعض العروض بلا عملة مسجلة — تجمع في خانة مستقلة ولا تضاف لعملة أخرى.</strong>
                 <?php endif; ?>
             </div>
             <div class="table-container">
@@ -849,12 +849,12 @@ require_once __DIR__ . '/../includes/profile_kit.php';
                             <th>القيمة</th>
                             <th>شروط الدفع</th>
                             <th>سريان العرض</th>
-                            <th>المُنشئ</th>
+                            <th>المنشئ</th>
                             <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                             <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                             <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                             <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -907,10 +907,10 @@ require_once __DIR__ . '/../includes/profile_kit.php';
                             <th>النتيجة</th>
                             <th>تاريخ الإقفال</th>
                             <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                             <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                             <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                             <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -944,7 +944,7 @@ require_once __DIR__ . '/../includes/profile_kit.php';
     <?php echo ems_profile_group_open(array(
         'title' => 'التنفيذ والتسليم',
         'icon'  => 'fas fa-helmet-safety',
-        'meta'  => 'عقدٌ ← مشروعٌ ← أسطولٌ على الأرض',
+        'meta'  => 'عقد ← مشروع ← أسطول على الأرض',
     )); ?>
 
     <?php /* لا جدولَ فارغًا: القسمُ لا يُصيَّر أصلًا بلا صفوف (قرارُ المالك 2026-08-19) */ ?>
@@ -960,10 +960,10 @@ require_once __DIR__ . '/../includes/profile_kit.php';
                             <th>الموردون</th>
                             <th>الساعات</th>
                             <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                             <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                             <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                             <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -989,7 +989,7 @@ require_once __DIR__ . '/../includes/profile_kit.php';
 
     <?php if (!empty($client_contracts)): ?>
     <?php echo ems_profile_section_open(array('title' => 'عقود العميل', 'icon' => 'fas fa-file-signature')); ?>
-            <div class="ems-profile__section-note">العقودُ تصل العميلَ عبرَ مشاريعِه — لا عمودَ عميلٍ في جدولِ العقود.</div>
+            <div class="ems-profile__section-note">العقود تصل العميل عبر مشاريعه — لا عمود عميل في جدول العقود.</div>
             <div class="table-container">
                 <table class="display" id="clientContractsTable" data-order='[[2,"desc"]]'>
                     <thead>
@@ -1003,10 +1003,10 @@ require_once __DIR__ . '/../includes/profile_kit.php';
                             <th>الهدف الشهري (ساعة)</th>
                             <th>الحالة</th>
                             <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                             <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                             <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                             <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -1034,7 +1034,7 @@ require_once __DIR__ . '/../includes/profile_kit.php';
 
     <?php if (!empty($client_reservations)): ?>
     <?php echo ems_profile_section_open(array('title' => 'حجوزات الأسطول', 'icon' => 'fas fa-calendar-check')); ?>
-            <div class="ems-profile__section-note">القائمُ منها الآن: <?php echo intval($rsv_active); ?> من <?php echo intval($rsv_total); ?> (مبدئيٌّ أو مؤكَّد).</div>
+            <div class="ems-profile__section-note">القائم منها الآن: <?php echo intval($rsv_active); ?> من <?php echo intval($rsv_total); ?> (مبدئي أو مؤكد).</div>
             <div class="table-container">
                 <table class="display" id="clientReservationsTable" data-order='[[4,"desc"]]'>
                     <thead>
@@ -1047,10 +1047,10 @@ require_once __DIR__ . '/../includes/profile_kit.php';
                             <th>إلى</th>
                             <th>الحالة</th>
                             <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                             <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                             <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                             <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -1088,7 +1088,7 @@ require_once __DIR__ . '/../includes/profile_kit.php';
     <?php echo ems_profile_group_open(array(
         'title' => 'الوضع المالي',
         'icon'  => 'fas fa-scale-balanced',
-        'meta'  => 'مستخلصٌ ← فاتورةٌ ← تحصيلٌ ← رصيد',
+        'meta'  => 'مستخلص ← فاتورة ← تحصيل ← رصيد',
     )); ?>
 
         <?php
@@ -1104,7 +1104,7 @@ require_once __DIR__ . '/../includes/profile_kit.php';
             $cp_money_stats[] = array(
                 'value'   => number_format((float) $stmt_current['collections_total'], 2),
                 'unit'    => $stmt_current['currency'],
-                'label'   => 'المحصَّل في المدة',
+                'label'   => 'المحصل في المدة',
                 'variant' => 'money',
                 'tone'    => (float) $stmt_current['collections_total'] > 0 ? 'ok' : 'muted',
             );
@@ -1112,7 +1112,7 @@ require_once __DIR__ . '/../includes/profile_kit.php';
             $cp_money_stats[] = array(
                 'value' => intval($stmt_current['overdue_days']),
                 'label' => 'أيام التأخر' . (!empty($stmt_current['oldest_unpaid_date'])
-                         ? ' — أقدمُ غيرِ مسدَّدٍ ' . $stmt_current['oldest_unpaid_date'] : ''),
+                         ? ' — أقدم غير مسدد ' . $stmt_current['oldest_unpaid_date'] : ''),
                 'tone'  => intval($stmt_current['overdue_days']) > 0 ? 'danger' : 'ok',
                 'unit'  => 'يوم',
             );
@@ -1129,12 +1129,12 @@ require_once __DIR__ . '/../includes/profile_kit.php';
             );
             $cp_money_stats[] = array(
                 'values'  => cp_money_fmt($clm_net_by_cur, 2),
-                'label'   => 'صافي المستخلصات' . (count($clm_net_by_cur) > 1 ? ' — كلُّ عملةٍ على حدة' : ''),
+                'label'   => 'صافي المستخلصات' . (count($clm_net_by_cur) > 1 ? ' — كل عملة على حدة' : ''),
                 'variant' => 'money',
             );
             $cp_money_stats[] = array(
                 'values'  => cp_money_fmt($clm_retention_by_cur, 2),
-                'label'   => 'المحتجَز التعاقدي',
+                'label'   => 'المحتجز التعاقدي',
                 'variant' => 'money',
             );
         }
@@ -1145,7 +1145,7 @@ require_once __DIR__ . '/../includes/profile_kit.php';
             );
             $cp_money_stats[] = array(
                 'values'  => cp_money_fmt($inv_total_by_cur, 2),
-                'label'   => 'إجمالي المفوتر' . ($inv_cancelled > 0 ? ' — الملغاةُ مطروحة' : ''),
+                'label'   => 'إجمالي المفوتر' . ($inv_cancelled > 0 ? ' — الملغاة مطروحة' : ''),
                 'variant' => 'money',
             );
         }
@@ -1171,10 +1171,10 @@ require_once __DIR__ . '/../includes/profile_kit.php';
                                 <th>تأخر (يوم)</th>
                                 <th>الحالة</th>
                                 <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                                 <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                                 <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                                 <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -1214,16 +1214,16 @@ require_once __DIR__ . '/../includes/profile_kit.php';
                                 <th>من</th>
                                 <th>إلى</th>
                                 <th>الإجمالي</th>
-                                <th>المحتجَز</th>
+                                <th>المحتجز</th>
                                 <th>الصافي</th>
                                 <th>الضريبة</th>
                                 <th>الفاتورة</th>
                                 <th>الحالة</th>
                                 <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                                 <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                                 <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                                 <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -1268,10 +1268,10 @@ require_once __DIR__ . '/../includes/profile_kit.php';
                                 <th>تاريخ الإصدار</th>
                                 <th>الحالة</th>
                                 <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                                 <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                                 <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                                 <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -1303,7 +1303,7 @@ require_once __DIR__ . '/../includes/profile_kit.php';
     <?php echo ems_profile_group_open(array(
         'title' => 'العلاقة والتواصل',
         'icon'  => 'fas fa-comments',
-        'meta'  => 'زياراتٌ · اجتماعاتٌ · جولاتُ تفاوض',
+        'meta'  => 'زيارات · اجتماعات · جولات تفاوض',
     )); ?>
 
         <?php echo ems_profile_stats(array(
@@ -1323,9 +1323,9 @@ require_once __DIR__ . '/../includes/profile_kit.php';
     <?php if (!empty($client_activities)): ?>
     <?php echo ems_profile_section_open(array('title' => 'أنشطة العميل التجارية', 'icon' => 'fas fa-handshake')); ?>
                 <div class="ems-profile__section-note">
-                    تشمل الأنشطةَ المعلَّقةَ على العميلِ مباشرةً، وعلى فرصِه، وعلى عقودِ مشاريعِه — ومصدرُ الوصلِ مُعلَنٌ في عمودِ «مصدر الوصل».
+                    تشمل الأنشطة المعلقة على العميل مباشرة، وعلى فرصه، وعلى عقود مشاريعه — ومصدر الوصل معلن في عمود «مصدر الوصل».
                     <?php if ($acts_total > count($client_activities)): ?>
-                        <strong>(معروضٌ أحدثُ <?php echo count($client_activities); ?> من <?php echo intval($acts_total); ?>)</strong>
+                        <strong>(معروض أحدث <?php echo count($client_activities); ?> من <?php echo intval($acts_total); ?>)</strong>
                     <?php endif; ?>
                 </div>
                 <div class="table-container">
@@ -1343,10 +1343,10 @@ require_once __DIR__ . '/../includes/profile_kit.php';
                                 <th>المسؤول</th>
                                 <th>المخرجات</th>
                                 <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                                 <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                                 <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                                 <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -1395,8 +1395,8 @@ require_once __DIR__ . '/../includes/profile_kit.php';
     if ($cp_projects_failed) {
         echo ems_state(
             'error',
-            'تعذّر عرضُ ملخصِ المشاريع',
-            'للعميلِ ' . intval($projects_total) . ' مشروعًا في السجلِّ لكنَّ قراءةَ الملخصِ أخفقت — أعد المحاولةَ، وإن استمر الخللُ أبلغ عن مشكلةٍ من هذه الشاشة'
+            'تعذر عرض ملخص المشاريع',
+            'للعميل ' . intval($projects_total) . ' مشروعا في السجل لكن قراءة الملخص أخفقت — أعد المحاولة، وإن استمر الخلل أبلغ عن مشكلة من هذه الشاشة'
         );
     }
     /* المجموعاتُ الأربعُ تُعرض لمن يفتح البطاقة، فالمقامُ أعدادُها لا صلاحياتُها.
@@ -1406,14 +1406,14 @@ require_once __DIR__ . '/../includes/profile_kit.php';
         && !$cp_grp_pipe && !$cp_grp_deliver && !$cp_grp_money && !$cp_grp_rel
         && $projects_total === 0;
     if ($cp_nothing):
-        $cp_empty_hint = 'لم يُسجَّل لهذا العميلِ مشروعٌ ولا فرصةٌ ولا عرضُ سعرٍ ولا مناقصةٌ'
-            . ' ولا عقدٌ ولا حركةٌ ماليةٌ ولا نشاطٌ تجاريٌّ بعدُ — تبدأ رحلتُه بأولِ مشروعٍ أو فرصة.';
+        $cp_empty_hint = 'لم يسجل لهذا العميل مشروع ولا فرصة ولا عرض سعر ولا مناقصة'
+            . ' ولا عقد ولا حركة مالية ولا نشاط تجاري بعد — تبدأ رحلته بأول مشروع أو فرصة.';
         echo ems_state(
             'empty',
-            'بطاقةُ العميلِ بلا سجلاتٍ بعدُ',
+            'بطاقة العميل بلا سجلات بعد',
             $cp_empty_hint,
             '<a class="add-btn" href="../Projects/projects.php?client_id=' . intval($client_id) . '">'
-                . '<i class="fas fa-diagram-project"></i> افتح مشاريعَ العميل</a>'
+                . '<i class="fas fa-diagram-project"></i> افتح مشاريع العميل</a>'
         );
     endif;
     ?>

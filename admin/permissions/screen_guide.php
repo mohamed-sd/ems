@@ -44,9 +44,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_id'])) {
     $desc  = trim((string) ($_POST['description'] ?? ''));
     $title = trim((string) ($_POST['title_ar'] ?? ''));
     if ($id <= 0) {
-        $error_msg = 'سجلٌّ غير صالح ❌';
+        $error_msg = 'سجل غير صالح ❌';
     } elseif (mb_strlen($desc) < 20) {
-        $error_msg = 'النصُّ التعريفيُّ أقصرُ من أن يكون دليلًا (20 حرفًا على الأقل) ❌';
+        $error_msg = 'النص التعريفي أقصر من أن يكون دليلا (20 حرفا على الأقل) ❌';
     } else {
         try {
             /* المحرَّرُ بيدٍ يُوسَم `authored` — فيُعرف أنه لا يُعاد توليدُه،
@@ -56,12 +56,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_id'])) {
                 'title_ar'    => $title,
                 'source'      => 'authored',
             ), array('id' => $id));
-            ems_flash_set('حُفظ التعريف ✔');
+            ems_flash_set('حفظ التعريف ✔');
         header('Location: screen_guide.php');
             exit;
         } catch (\Throwable $t) {
             error_log('admin/permissions/screen_guide save: ' . $t->getMessage());
-            $error_msg = 'تعذّر الحفظ ❌';
+            $error_msg = 'تعذر الحفظ ❌';
         }
     }
 }
@@ -146,8 +146,8 @@ require_once __DIR__ . '/../includes/layout_head.php';
       <i class="fa-solid fa-book-open"></i> دليل الشاشات
     </h2>
     <p style="margin:0;color:#666">
-      النصُّ الذي يقرؤه المستخدمُ في بطاقة «عن الشاشة» عند فتحِ أيِّ شاشة.
-      <b>الدليلُ ثابتٌ لكلِّ العملاء</b> — فما تحرّره هنا يظهر عند الجميع.
+      النص الذي يقرؤه المستخدم في بطاقة «عن الشاشة» عند فتح أي شاشة.
+      <b>الدليل ثابت لكل العملاء</b> — فما تحرره هنا يظهر عند الجميع.
     </p>
   </div>
 
@@ -161,17 +161,17 @@ require_once __DIR__ . '/../includes/layout_head.php';
   <!-- تغطيةُ الدليل: أداةُ حوكمةٍ تُري النقصَ بدل أن تُخفيه -->
   <div class="sg-kpis">
     <div class="sg-kpi"><span class="sg-kpi__v"><?= $total ?></span><span class="sg-kpi__l">شاشة في الدليل</span></div>
-    <div class="sg-kpi sg-kpi--ok"><span class="sg-kpi__v"><?= $bySource['authored'] ?></span><span class="sg-kpi__l">نصٌّ مكتوبٌ بيد</span></div>
-    <div class="sg-kpi"><span class="sg-kpi__v"><?= $bySource['composed'] ?></span><span class="sg-kpi__l">مركَّبٌ من مصادر النظام</span></div>
+    <div class="sg-kpi sg-kpi--ok"><span class="sg-kpi__v"><?= $bySource['authored'] ?></span><span class="sg-kpi__l">نص مكتوب بيد</span></div>
+    <div class="sg-kpi"><span class="sg-kpi__v"><?= $bySource['composed'] ?></span><span class="sg-kpi__l">مركب من مصادر النظام</span></div>
     <div class="sg-kpi <?= $bySource['derived'] > 0 ? 'sg-kpi--warn' : 'sg-kpi--ok' ?>">
-      <span class="sg-kpi__v"><?= $bySource['derived'] ?></span><span class="sg-kpi__l">تعريفٌ أدنى — يحتاج كتابة</span></div>
+      <span class="sg-kpi__v"><?= $bySource['derived'] ?></span><span class="sg-kpi__l">تعريف أدنى — يحتاج كتابة</span></div>
     <div class="sg-kpi <?= $noTitle > 0 ? 'sg-kpi--warn' : 'sg-kpi--ok' ?>">
-      <span class="sg-kpi__v"><?= $noTitle ?></span><span class="sg-kpi__l">بلا اسمٍ عربيٍّ معتمد</span></div>
+      <span class="sg-kpi__v"><?= $noTitle ?></span><span class="sg-kpi__l">بلا اسم عربي معتمد</span></div>
   </div>
 
   <div class="sg-filters">
     <input type="search" id="sgSearch" placeholder="ابحث بالمسار أو الاسم أو النص…" class="form-control" aria-label="ابحث بالمسار أو الاسم أو النص…">
-    <select id="sgDept" class="form-control" title="الإدارات الرئيسية فقط — والفرعيةُ محسوبةٌ مع أبيها" aria-label="الإدارات الرئيسية فقط — والفرعيةُ محسوبةٌ مع أبيها">
+    <select id="sgDept" class="form-control" title="الإدارات الرئيسية فقط — والفرعية محسوبة مع أبيها" aria-label="الإدارات الرئيسية فقط — والفرعية محسوبة مع أبيها">
       <option value="">كل الإدارات</option>
       <?php foreach ($deptCount as $rid => $cnt):
           $nm = isset($roleName[$rid]) ? $roleName[$rid] : ('دور ' . $rid); ?>
@@ -181,8 +181,8 @@ require_once __DIR__ . '/../includes/layout_head.php';
     </select>
     <select id="sgSource" class="form-control">
       <option value="">كل المصادر</option>
-      <option value="authored">مكتوبٌ بيد</option>
-      <option value="composed">مركَّب</option>
+      <option value="authored">مكتوب بيد</option>
+      <option value="composed">مركب</option>
       <option value="derived">أدنى — يحتاج كتابة</option>
     </select>
     <span class="sg-count" id="sgCount"></span>
@@ -196,7 +196,7 @@ require_once __DIR__ . '/../includes/layout_head.php';
           <th>المسار</th>
           <th>الاسم المعتمد</th>
           <th style="width:150px">الإدارة</th>
-          <th>النصُّ التعريفي</th>
+          <th>النص التعريفي</th>
           <th style="width:110px">المصدر</th>
           <th style="width:70px">الطول</th>
         </tr>
@@ -204,7 +204,7 @@ require_once __DIR__ . '/../includes/layout_head.php';
       <tbody>
       <?php foreach ($rows as $r):
           $src = (string) $r['source'];
-          $srcLabel = array('authored' => 'مكتوبٌ بيد', 'composed' => 'مركَّب', 'derived' => 'أدنى');
+          $srcLabel = array('authored' => 'مكتوب بيد', 'composed' => 'مركب', 'derived' => 'أدنى');
           $len = mb_strlen((string) $r['description']);
           $pKey  = strtolower((string) $r['screen_path']);
           $dIds  = !empty($deptOf[$pKey]) ? array_keys($deptOf[$pKey]) : array();
@@ -262,31 +262,31 @@ require_once __DIR__ . '/../includes/layout_head.php';
       </p>
 
       <label for="sgTitle">الاسم المعتمد للشاشة</label>
-      <input type="text" name="title_ar" id="sgTitle" class="form-control" placeholder="اسمُ الشاشة كما يُعرَف">
+      <input type="text" name="title_ar" id="sgTitle" class="form-control" placeholder="اسم الشاشة كما يعرف">
 
       <div class="sg-editor-head">
-        <label for="sgDesc" style="margin:0">النصُّ التعريفي</label>
+        <label for="sgDesc" style="margin:0">النص التعريفي</label>
         <div class="sg-tools">
-          <button type="button" class="sg-tool" data-act="para" title="فقرة جديدة (سطرٌ فارغ يفصلها)">
+          <button type="button" class="sg-tool" data-act="para" title="فقرة جديدة (سطر فارغ يفصلها)">
             <i class="fa-solid fa-paragraph"></i></button>
-          <button type="button" class="sg-tool" data-act="quote" title="ضع المحدَّد بين «قوسين عربيين»">«»</button>
+          <button type="button" class="sg-tool" data-act="quote" title="ضع المحدد بين «قوسين عربيين»">«»</button>
           <span class="sg-tools__sep"></span>
           <button type="button" class="sg-tool" id="sgRevert" title="تراجع عن كل التعديلات">
             <i class="fa-solid fa-rotate-left"></i></button>
-          <button type="button" class="sg-tool" id="sgWide" title="توسيع المحرِّر">
+          <button type="button" class="sg-tool" id="sgWide" title="توسيع المحرر">
             <i class="fa-solid fa-up-right-and-down-left-from-center"></i></button>
         </div>
       </div>
 
       <textarea name="description" id="sgDesc" rows="12" class="sg-textarea" spellcheck="true"
-                placeholder="اشرح ما هي الشاشةُ وما فيها…" aria-label="اشرح ما هي الشاشةُ وما فيها…"></textarea>
+                placeholder="اشرح ما هي الشاشة وما فيها…" aria-label="اشرح ما هي الشاشة وما فيها…"></textarea>
 
       <div class="sg-meter">
         <span id="sgCounts" class="sg-meter__counts"></span>
         <span id="sgWarn" class="sg-meter__warn" hidden>
-          <i class="fa-solid fa-triangle-exclamation"></i> النصُّ أقصرُ من 20 حرفًا — لن يُقبل الحفظ
+          <i class="fa-solid fa-triangle-exclamation"></i> النص أقصر من 20 حرفا — لن يقبل الحفظ
         </span>
-        <span class="sg-meter__hint">افصل الفقراتِ بسطرٍ فارغ · <kbd>Ctrl</kbd>+<kbd>S</kbd> للحفظ</span>
+        <span class="sg-meter__hint">افصل الفقرات بسطر فارغ · <kbd>Ctrl</kbd>+<kbd>S</kbd> للحفظ</span>
       </div>
 
       <div class="sg-preview">
@@ -303,7 +303,7 @@ require_once __DIR__ . '/../includes/layout_head.php';
     <div class="sg-modal__foot">
       <button type="submit" class="btn btn-primary" id="sgSave"><i class="fa-solid fa-floppy-disk"></i> حفظ</button>
       <button type="button" class="btn btn-secondary" id="sgCancel">إلغاء</button>
-      <span class="sg-dirty" id="sgDirty" hidden><i class="fa-solid fa-circle"></i> تعديلاتٌ غير محفوظة</span>
+      <span class="sg-dirty" id="sgDirty" hidden><i class="fa-solid fa-circle"></i> تعديلات غير محفوظة</span>
     </div>
   </form>
 </div>
@@ -398,7 +398,7 @@ require_once __DIR__ . '/../includes/layout_head.php';
     String(f.desc.value).split(/\n{2,}/).forEach(function (p) {
       p = p.trim(); if (p) { html += '<p class="ems-about__purpose">' + esc(p) + '</p>'; }
     });
-    f.pvB.innerHTML = html || '<p class="ems-about__purpose" style="opacity:.5">— لا نصَّ بعد —</p>';
+    f.pvB.innerHTML = html || '<p class="ems-about__purpose" style="opacity:.5">— لا نص بعد —</p>';
   }
 
   var box = modal.querySelector('.sg-modal__box');
@@ -413,7 +413,7 @@ require_once __DIR__ . '/../includes/layout_head.php';
     var words = v.trim() ? v.trim().split(/\s+/).length : 0;
     var paras = v.split(/\n{2,}/).filter(function (p) { return p.trim() !== ''; }).length;
     document.getElementById('sgCounts').textContent =
-      chars + ' حرفًا · ' + words + ' كلمة · ' + paras + ' فقرة';
+      chars + ' حرفا · ' + words + ' كلمة · ' + paras + ' فقرة';
     document.getElementById('sgWarn').hidden = (chars >= MIN);
     document.getElementById('sgSave').disabled = (chars < MIN);
     var dirty = (f.desc.value !== orig.desc || f.title.value !== orig.title);
@@ -459,7 +459,7 @@ require_once __DIR__ . '/../includes/layout_head.php';
 
   document.getElementById('sgRevert').addEventListener('click', function () {
     if (!meter()) { return; }
-    if (!confirm('تراجعٌ عن كل التعديلات وإرجاعُ النصِّ كما كان؟')) { return; }
+    if (!confirm('تراجع عن كل التعديلات وإرجاع النص كما كان؟')) { return; }
     f.title.value = orig.title; f.desc.value = orig.desc; refresh(); f.desc.focus();
   });
 
@@ -469,7 +469,7 @@ require_once __DIR__ . '/../includes/layout_head.php';
 
   /* الإغلاقُ لا يبتلع عملًا: تعديلٌ غيرُ محفوظٍ يُسأل عنه صراحةً */
   function close(force) {
-    if (!force && meter() && !confirm('لديك تعديلاتٌ غير محفوظة — إغلاقٌ بلا حفظ؟')) { return; }
+    if (!force && meter() && !confirm('لديك تعديلات غير محفوظة — إغلاق بلا حفظ؟')) { return; }
     modal.hidden = true;
     box.classList.remove('is-wide');
   }

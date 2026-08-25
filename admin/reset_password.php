@@ -28,7 +28,7 @@ if ($token === '' || !preg_match('/^[a-f0-9]{64}$/', $token)) {
     }
 
     if (!$resetRow) {
-        $error = 'هذا الرابط منتهي الصلاحية أو تم استخدامه سابقاً.';
+        $error = 'هذا الرابط منتهي الصلاحية أو تم استخدامه سابقا.';
     }
 }
 
@@ -86,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $error === '' && $resetRow) {
                 mysqli_stmt_close($expireOthersStmt);
             }
 
-            $error = 'تعذر تحديث كلمة المرور حالياً.';
+            $error = 'تعذر تحديث كلمة المرور حاليا.';
         }
     }
 }

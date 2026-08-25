@@ -396,8 +396,8 @@ function company_require_login() {
 
     $companyId = isset($session['company_id']) ? intval($session['company_id']) : 0;
     if ($companyId <= 0 || !company_is_active_company($companyId)) {
-        company_logout('تم إنهاء الجلسة تلقائياً: الشركة موقوفة');
-        company_redirect('login.php', array('msg' => 'تم تسجيل الخروج: الشركة موقوفة حالياً.'));
+        company_logout('تم إنهاء الجلسة تلقائيا: الشركة موقوفة');
+        company_redirect('login.php', array('msg' => 'تم تسجيل الخروج: الشركة موقوفة حاليا.'));
     }
 
     $_SESSION['company_user']['last_seen'] = $now;
@@ -422,7 +422,7 @@ function company_send_reset_email($email, $name, $token) {
     $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
     $headers .= 'From: EMS <noreply@' . $fromHost . "\r\n";
 
-    $message = "مرحباً " . $name . "،\n\n";
+    $message = "مرحبا " . $name . "،\n\n";
     $message .= "تم استلام طلب لإعادة تعيين كلمة مرور حساب الشركة.\n";
     $message .= "استخدم الرابط التالي خلال 60 دقيقة:\n" . $resetUrl . "\n\n";
     $message .= "إذا لم تطلب إعادة التعيين، تجاهل هذه الرسالة.\n";

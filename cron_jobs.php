@@ -51,13 +51,13 @@ $maxJobs  = max(1, (int) ($args['max'] ?? 20));
 $handlers = JH::map();
 $totals = array('released' => 0, 'enqueued' => 0, 'claimed' => 0, 'done' => 0, 'failed' => 0, 'alerts' => 0);
 
-echo "══ العاملُ الخلفي: {$workerId} · دورات={$cycles} · مهلةُ القفل={$lockSecs}ث ══\n";
+echo "══ العامل الخلفي: {$workerId} · دورات={$cycles} · مهلة القفل={$lockSecs}ث ══\n";
 
 for ($c = 1; $c <= $cycles; $c++) {
     // ① تحريرُ الأقفالِ المنقضية (F-16)
     $rel = JQ::releaseExpiredLocks($conn);
     $totals['released'] += $rel;
-    if ($rel > 0) { echo "  ① حُرّر {$rel} قفلًا منقضيًا\n"; }
+    if ($rel > 0) { echo "  ① حرر {$rel} قفلا منقضيا\n"; }
 
     // ② تجسيدُ المستحقِّ من الجدولة
     //   --bootstrap: خطوةُ تركيبٍ لمرةٍ واحدة — تُدرج تشغيلةً أولى لكلِّ جدولةٍ
@@ -66,10 +66,10 @@ for ($c = 1; $c <= $cycles; $c++) {
     //   عند التركيب، وبعدَها تحكمها دقائقُها وحدَها.
     if ($c === 1 && isset($args['bootstrap'])) {
         $mat = JS::materialize($conn, null, true);
-        echo "  ② [تركيب] أُدرج {$mat['enqueued']}: " . implode(', ', $mat['types']) . "\n";
+        echo "  ② [تركيب] أدرج {$mat['enqueued']}: " . implode(', ', $mat['types']) . "\n";
     } else {
         $mat = JS::materialize($conn);
-        if ($mat['enqueued'] > 0) { echo "  ② أُدرج {$mat['enqueued']}: " . implode(', ', $mat['types']) . "\n"; }
+        if ($mat['enqueued'] > 0) { echo "  ② أدرج {$mat['enqueued']}: " . implode(', ', $mat['types']) . "\n"; }
     }
     $totals['enqueued'] += $mat['enqueued'];
 
@@ -88,7 +88,7 @@ for ($c = 1; $c <= $cycles; $c++) {
 
         if (!isset($handlers[$type])) {
             JQ::fail($conn, $jobId, (int) $job['attempts'], (int) $job['max_attempts'],
-                'لا معالجَ للنوع ' . $type);
+                'لا معالج للنوع ' . $type);
             $totals['failed']++;
             echo "  ✗ #{$jobId} {$type} — لا معالج\n";
             continue;
@@ -99,7 +99,7 @@ for ($c = 1; $c <= $cycles; $c++) {
             $r = call_user_func($handlers[$type], $conn, (int) $job['company_id'], $payload, $jobId);
             if (is_array($r) && isset($r['ok']) && $r['ok'] === false) {
                 JQ::fail($conn, $jobId, (int) $job['attempts'], (int) $job['max_attempts'],
-                    (string) ($r['reason'] ?? 'فشلُ المعالج'));
+                    (string) ($r['reason'] ?? 'فشل المعالج'));
                 $totals['failed']++;
                 echo "  ✗ #{$jobId} {$type} — " . ($r['reason'] ?? 'فشل') . "\n";
                 continue;
@@ -120,15 +120,15 @@ for ($c = 1; $c <= $cycles; $c++) {
             echo "  ✗ #{$jobId} {$type} — " . mb_substr($e->getMessage(), 0, 120) . "\n";
         }
     }
-    if ($ran === 0) { echo "  ③ لا مهمةَ مستحقةً في هذه الدورة\n"; }
+    if ($ran === 0) { echo "  ③ لا مهمة مستحقة في هذه الدورة\n"; }
 }
 
 // ⑤ إنذارُ توقفِ العامل — «فتوقفُ العاملِ صامتًا أخطرُ من فشلِ مهمة»
 $totals['alerts'] = JS::alertStalled($conn);
-if ($totals['alerts'] > 0) { echo "  ⑤ رُفع {$totals['alerts']} إنذارَ توقف\n"; }
+if ($totals['alerts'] > 0) { echo "  ⑤ رفع {$totals['alerts']} إنذار توقف\n"; }
 
-echo "══ الحصيلة: حُرّر={$totals['released']} أُدرج={$totals['enqueued']} "
-   . "التُقط={$totals['claimed']} نجح={$totals['done']} فشل={$totals['failed']} "
+echo "══ الحصيلة: حرر={$totals['released']} أدرج={$totals['enqueued']} "
+   . "التقط={$totals['claimed']} نجح={$totals['done']} فشل={$totals['failed']} "
    . "إنذارات={$totals['alerts']} ══\n";
 
 exit($totals['failed'] > 0 ? 1 : 0);

@@ -26,7 +26,7 @@ if (!$is_super_admin && $company_id <= 0) { header('Location: ../login.php'); ex
 
 $__pp = check_page_permissions($conn, 'Tickets/my_tickets.php');
 if (!$is_super_admin && empty($__pp['can_view'])) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'لا تملك صلاحية عرض هذه الشاشة', 'GOV-PERM-403', 'الصلاحياتُ يمنحها مدير الصلاحيات');
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا تملك صلاحية عرض هذه الشاشة', 'GOV-PERM-403', 'الصلاحيات يمنحها مدير الصلاحيات');
 }
 ems_shell_axes($__pp);
 
@@ -66,23 +66,23 @@ $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-echo ems_states_bundle('لا بلاغَ رفعتَه أنت بعدُ',
-                       'ارفعْ بلاغًا بزرِّ «أبلغ عن مشكلة» في شريطِ الرأس — وبلاغاتُ إدارتِك في صندوقِ الإدارة');
+echo ems_states_bundle('لا بلاغ رفعته أنت بعد',
+                       'ارفع بلاغا بزر «أبلغ عن مشكلة» في شريط الرأس — وبلاغات إدارتك في صندوق الإدارة');
 ?>
   <?php if ($failed): ?>
   <div class="alert alert-danger tkt-my-alert">
-    <strong>تعذّرت قراءةُ البيانات.</strong>
-    فرقٌ بين «لا صفَّ» و«تعذّر السؤال» — وهذه الثانية.
+    <strong>تعذرت قراءة البيانات.</strong>
+    فرق بين «لا صف» و«تعذر السؤال» — وهذه الثانية.
   </div>
   <?php else: ?>
   <div class="ems-card tkt-my-kpi">
-    <div class="tkt-my-kpi-lbl">صفوفٌ معروضة</div>
+    <div class="tkt-my-kpi-lbl">صفوف معروضة</div>
     <div class="tkt-my-kpi-val"><?php echo number_format(count($rows)); ?></div>
   </div>
   <div class="card"><div class="card-body table-responsive">
     <table class="table table-sm table-striped tkt-my-table">
       <thead><tr>
-        <th>رقمُ البلاغ</th>
+        <th>رقم البلاغ</th>
         <th>المرحلة</th>
         <th>الأولوية</th>
         <th>التاريخ</th>
@@ -90,7 +90,7 @@ echo ems_states_bundle('لا بلاغَ رفعتَه أنت بعدُ',
       </tr></thead>
       <tbody>
       <?php if (!$rows): ?>
-        <tr><td colspan="99" class="tkt-my-empty">لا صفَّ مسجَّلٌ بعد.</td></tr>
+        <tr><td colspan="99" class="tkt-my-empty">لا صف مسجل بعد.</td></tr>
       <?php else: foreach ($rows as $x): ?>
         <tr>
           <td><?php echo htmlspecialchars((string) $x['ticket_no'], ENT_QUOTES, 'UTF-8'); ?></td>
@@ -103,7 +103,7 @@ echo ems_states_bundle('لا بلاغَ رفعتَه أنت بعدُ',
       </tbody>
     </table>
     <p class="text-muted tkt-my-note">
-      قراءةٌ محضة — ما رفعتَه أنت — والشرطُ على المُبلِّغِ لا على الإدارة؛ فبلاغاتُ إدارتِك في dept_inbox.php. وأحدثُ 500 صفٍّ.
+      قراءة محضة — ما رفعته أنت — والشرط على المبلغ لا على الإدارة؛ فبلاغات إدارتك في dept_inbox.php. وأحدث 500 صف.
     </p>
   </div></div>
   <?php endif; ?>

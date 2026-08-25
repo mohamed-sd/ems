@@ -34,7 +34,7 @@ if (!function_exists('ems_no_self_approval')) {
             array('company_id' => (int) $companyId, 'user_id' => $approverId));
         return array('code' => 403,
             'reason' => '**من أنشأ لا يعتمد** — ' . (string) $docLabel
-                      . ' أنشأتَه بنفسك، والاعتمادُ يدٌ ثانية (UI-01 §8 · 403 مسجَّلة)');
+                      . ' أنشأته بنفسك، والاعتماد يد ثانية (UI-01 §8 · 403 مسجلة)');
     }
 }
 

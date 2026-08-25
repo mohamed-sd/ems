@@ -814,7 +814,7 @@ case 'fleet_operations': {
     $kpi = [
         ['icon'=>'fa-cogs',           'value'=> number_format($kpiRow['total']      ?? 0),        'label'=>'إجمالي العمليات', 'color'=>'blue'],
         ['icon'=>'fa-play-circle',    'value'=> number_format($kpiRow['active']     ?? 0),        'label'=>'عمليات نشطة',    'color'=>'green'],
-        ['icon'=>'fa-tractor',        'value'=> number_format($kpiRow['equip_cnt']  ?? 0),        'label'=>'معدات مُشغَّلة', 'color'=>'teal'],
+        ['icon'=>'fa-tractor',        'value'=> number_format($kpiRow['equip_cnt']  ?? 0),        'label'=>'معدات مشغلة', 'color'=>'teal'],
         ['icon'=>'fa-project-diagram','value'=> number_format($kpiRow['proj_cnt']   ?? 0),        'label'=>'المشاريع',        'color'=>'gold'],
         ['icon'=>'fa-hourglass-half', 'value'=> number_format($kpiRow['total_eh']   ?? 0) . ' س','label'=>'ساعات المعدات',  'color'=>'purple'],
         ['icon'=>'fa-calendar-day',   'value'=> number_format($kpiRow['total_days'] ?? 0) . ' ي','label'=>'إجمالي الأيام',  'color'=>'red'],
@@ -1087,11 +1087,11 @@ case 'maintenance_summary': {
         ['icon'=>'fa-spinner',              'value'=> number_format($ka['open_cnt'] ?? 0),          'label'=>'أوامر مفتوحة',   'color'=>'gold'],
         ['icon'=>'fa-check-circle',         'value'=> number_format($ka['closed']   ?? 0),          'label'=>'أوامر مغلقة',    'color'=>'green'],
         ['icon'=>'fa-triangle-exclamation', 'value'=> number_format($ka['failures'] ?? 0),          'label'=>'أعطال',          'color'=>'red'],
-        ['icon'=>'fa-hourglass-half',       'value'=> number_format($ka['downtime'] ?? 0,1) . ' س', 'label'=>'ساعات التوقّف',  'color'=>'teal'],
+        ['icon'=>'fa-hourglass-half',       'value'=> number_format($ka['downtime'] ?? 0,1) . ' س', 'label'=>'ساعات التوقف',  'color'=>'teal'],
         ['icon'=>'fa-coins',                'value'=> number_format($ka['cost']     ?? 0,0),        'label'=>'إجمالي التكلفة', 'color'=>'purple'],
     ];
 
-    $headers = ['الكود','المعدة','إجمالي الأوامر','أعطال','مغلقة','ساعات التوقّف','التكلفة','ساعات التشغيل','MTBF','MTTR','نسبة الجاهزية%'];
+    $headers = ['الكود','المعدة','إجمالي الأوامر','أعطال','مغلقة','ساعات التوقف','التكلفة','ساعات التشغيل','MTBF','MTTR','نسبة الجاهزية%'];
     $sql = "SELECT IFNULL(e.code,'-') AS code,
                    IFNULL(e.name,'غير محدد') AS equipment_name,
                    COUNT(mo.id) AS total_orders,
@@ -1131,8 +1131,8 @@ case 'maintenance_summary': {
         $cl2 = []; $cv = [];
         foreach (array_slice($rows, 0, 8) as $r) { $cl2[] = mb_substr($r['equipment_name'], 0, 14, 'UTF-8'); $cv[] = floatval($r['downtime']); }
         $chartData = ['type'=>'bar','labels'=>$cl2,'datasets'=>[
-            ['label'=>'ساعات التوقّف','data'=>$cv,'color'=>'rgba(220,38,38,0.70)'],
-        ],'title'=>'أعلى المعدات في ساعات التوقّف'];
+            ['label'=>'ساعات التوقف','data'=>$cv,'color'=>'rgba(220,38,38,0.70)'],
+        ],'title'=>'أعلى المعدات في ساعات التوقف'];
     }
     break;
 }
@@ -1168,13 +1168,13 @@ case 'procurement_summary': {
     $kpi = [
         ['icon'=>'fa-file-invoice-dollar', 'value'=> number_format($ka['total']       ?? 0),   'label'=>'إجمالي الأوامر',        'color'=>'blue'],
         ['icon'=>'fa-paper-plane',         'value'=> number_format($ka['issued']      ?? 0),   'label'=>'أوامر صادرة',            'color'=>'gold'],
-        ['icon'=>'fa-truck-ramp-box',      'value'=> number_format($ka['received']    ?? 0),   'label'=>'مستلَمة نهائيًا',        'color'=>'teal'],
-        ['icon'=>'fa-scale-balanced',      'value'=> number_format($ka['matched']     ?? 0),   'label'=>'فواتير مطابَقة',         'color'=>'green'],
-        ['icon'=>'fa-triangle-exclamation','value'=> number_format($ka['pending_var'] ?? 0),   'label'=>'فروق معلَّقة',           'color'=>'red'],
+        ['icon'=>'fa-truck-ramp-box',      'value'=> number_format($ka['received']    ?? 0),   'label'=>'مستلمة نهائيا',        'color'=>'teal'],
+        ['icon'=>'fa-scale-balanced',      'value'=> number_format($ka['matched']     ?? 0),   'label'=>'فواتير مطابقة',         'color'=>'green'],
+        ['icon'=>'fa-triangle-exclamation','value'=> number_format($ka['pending_var'] ?? 0),   'label'=>'فروق معلقة',           'color'=>'red'],
         ['icon'=>'fa-coins',               'value'=> number_format($duesOpen, 0),              'label'=>'ذمم موردين مفتوحة',      'color'=>'purple'],
     ];
 
-    $headers = ['المورد','عدد الأوامر','قيمة الأوامر (معادل)','متوسط نسبة الاستلام%','مطابَقة','فروق معلَّقة','فواتير مرفوضة','ذمم مفتوحة'];
+    $headers = ['المورد','عدد الأوامر','قيمة الأوامر (معادل)','متوسط نسبة الاستلام%','مطابقة','فروق معلقة','فواتير مرفوضة','ذمم مفتوحة'];
     $sql = "SELECT IFNULL(ps.name,'غير محدد') AS supplier_name,
                    po.supplier_id AS sid,
                    COUNT(po.id) AS orders_cnt,
@@ -1899,7 +1899,7 @@ body {
                 <?php echo rr($page_title); ?>
                 <span class="cnt-badge"><?php echo count($rows); ?> سجل</span>
                 <?php if ($applyInitialLimit): ?>
-                <span class="cnt-badge" style="background:linear-gradient(120deg,#0d9488,#14b8a6)">عرض آخر <?php echo intval($INITIAL_LOAD_LIMIT); ?> سجل (افتراضيًا)</span>
+                <span class="cnt-badge" style="background:linear-gradient(120deg,#0d9488,#14b8a6)">عرض آخر <?php echo intval($INITIAL_LOAD_LIMIT); ?> سجل (افتراضيا)</span>
                 <?php endif; ?>
             </div>
             <?php if (!empty($rows) && !empty($headers)): ?>
@@ -2110,7 +2110,7 @@ $(function(){
         var supplierId   = currentUrl.searchParams.get('supplier_id') || '0';
 
         // إعادة تعيين قائمة الأسماء
-        nameSelect.innerHTML = '<option value="0">جارٍ التحميل...</option>';
+        nameSelect.innerHTML = '<option value="0">جار التحميل...</option>';
         nameSelect.disabled = true;
 
         var params = new URLSearchParams({

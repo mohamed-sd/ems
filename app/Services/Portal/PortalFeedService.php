@@ -29,9 +29,9 @@ class PortalFeedService
                      'cards' => array(), 'hidden_sections' => array());
         $cap = null;
         try { $cap = $gate->selectOne('user_capacities', array('where' => array('id' => (int) $capacityId))); }
-        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $cap'); $cap = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $cap'); $cap = null; }
         if (!$cap || (int) $cap['account_id'] !== (int) $accountId) {
-            $out['code'] = 403; $out['reason'] = 'الصفةُ ليست لهذا الحساب'; return $out;
+            $out['code'] = 403; $out['reason'] = 'الصفة ليست لهذا الحساب'; return $out;
         }
         // «صفةٌ منتهيةٌ → 403» (§9.2) — والانتهاءُ الكسولُ يفحص المصدر
         $fresh = CapacityService::activeOf($conn, $gate, (int) $accountId);
@@ -39,7 +39,7 @@ class PortalFeedService
         if ((string) $cap['state'] !== 'active') {
             self::log($conn, $companyId, $accountId, $capacityId, 'feed', 'capacity', (string) $capacityId, 'denied');
             $out['code'] = 403;
-            $out['reason'] = 'الصفةُ ' . $cap['state'] . ' — «قراءةُ تاريخِه فقط بلا إجراءات» (U8)';
+            $out['reason'] = 'الصفة ' . $cap['state'] . ' — «قراءة تاريخه فقط بلا إجراءات» (U8)';
             return $out;
         }
 
@@ -53,14 +53,14 @@ class PortalFeedService
 
         $builders = array(
             'card.contract' => function () use ($conn, $co, $personId) {
-                if ($personId <= 0) { return array('value' => 'لا سجلَّ موظف', 'period' => '', 'link' => null); }
+                if ($personId <= 0) { return array('value' => 'لا سجل موظف', 'period' => '', 'link' => null); }
                 $r = $conn->query("SELECT id, category, state, start_date, end_date
                                      FROM employee_contracts
                                     WHERE company_id={$co} AND employee_id={$personId}
                                       AND COALESCE(is_deleted,0)=0
                                     ORDER BY start_date DESC LIMIT 1");
                 $row = $r ? $r->fetch_assoc() : null;
-                if (!$row) { return array('value' => 'لا عقدَ في السجل', 'period' => '', 'link' => null); }
+                if (!$row) { return array('value' => 'لا عقد في السجل', 'period' => '', 'link' => null); }
                 return array('value' => $row['category'] . ' — ' . $row['state'],
                     'period' => $row['start_date'] . ' → ' . ($row['end_date'] ?: 'مفتوح'),
                     'link' => 'HR/employee_contracts.php?id=' . (int) $row['id']);
@@ -73,7 +73,7 @@ class PortalFeedService
                                       AND deleted_at IS NULL
                                       AND created_at >= DATE_FORMAT(CURDATE(), '%Y-%m-01')");
                 $row = $r ? $r->fetch_assoc() : array('n' => 0, 'q' => 0);
-                return array('value' => $row['n'] . ' حصةً · ' . $row['q'] . ' كميةً مستحقة',
+                return array('value' => $row['n'] . ' حصة · ' . $row['q'] . ' كمية مستحقة',
                     'period' => date('Y-m'), 'link' => 'Operations/units.php');
             },
             'card.requests' => function () use ($conn, $co, $accountId) {
@@ -88,7 +88,7 @@ class PortalFeedService
                                     WHERE company_id={$co} AND requester_id={$accountId}
                                       AND state NOT IN ('approved','rejected','paid','closed')");
                 if ($r && ($x = $r->fetch_assoc())) { $fin = intval($x['n']); }
-                return array('value' => ($wfm + $fin) . ' طلبًا جاريًا' . ($fin > 0 ? " (منها {$fin} مالية)" : ''),
+                return array('value' => ($wfm + $fin) . ' طلبا جاريا' . ($fin > 0 ? " (منها {$fin} مالية)" : ''),
                     'period' => '', 'link' => 'Portal/my_requests.php');
             },
             'card.approvals' => function () use ($conn, $co, $accountId) {
@@ -125,7 +125,7 @@ class PortalFeedService
                                       AND (reporter_user_id={$accountId} OR assigned_user_id={$accountId})
                                       AND close_date IS NULL");
                 $row = $r ? $r->fetch_assoc() : array('n' => 0);
-                return array('value' => $row['n'] . ' بلاغًا مفتوحًا', 'period' => '',
+                return array('value' => $row['n'] . ' بلاغا مفتوحا', 'period' => '',
                     'link' => 'Tickets/tickets_list.php');
             },
             'card.payroll' => function () use ($conn, $co, $personId) {
@@ -137,8 +137,8 @@ class PortalFeedService
                                       AND COALESCE(pr.is_deleted,0)=0
                                     GROUP BY pr.id ORDER BY pr.period_from DESC LIMIT 1");
                 $row = $r ? $r->fetch_assoc() : null;
-                if (!$row) { return array('value' => 'لا كشفَ بعد', 'period' => '', 'link' => null); }
-                return array('value' => 'إجمالي المكوّنات ' . $row['total'],
+                if (!$row) { return array('value' => 'لا كشف بعد', 'period' => '', 'link' => null); }
+                return array('value' => 'إجمالي المكونات ' . $row['total'],
                     'period' => $row['period_from'] . ' → ' . $row['period_to'],
                     'link' => 'Payroll/payroll_runs.php');
             },
@@ -146,8 +146,8 @@ class PortalFeedService
                 $r = $conn->query("SELECT MAX(at) last_at, COUNT(*) n FROM portal_activity_log
                                     WHERE company_id={$co} AND account_id={$accountId}");
                 $row = $r ? $r->fetch_assoc() : null;
-                return array('value' => ($row && $row['n'] ? $row['n'] . ' حدثًا' : 'لا نشاطَ مسجَّلًا'),
-                    'period' => $row && $row['last_at'] ? ('آخرُه ' . $row['last_at']) : '',
+                return array('value' => ($row && $row['n'] ? $row['n'] . ' حدثا' : 'لا نشاط مسجلا'),
+                    'period' => $row && $row['last_at'] ? ('آخره ' . $row['last_at']) : '',
                     'link' => null);
             },
         );
@@ -168,7 +168,7 @@ class PortalFeedService
                 $out['hidden_sections'][] = $code;
                 continue;
             }
-            try { $data = $fn(); } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'بانيةُ بطاقةٍ واحدةٍ فشلت — تُعرض بقيمةٍ محايدةٍ وبقيةُ البطاقاتِ تعمل'); $data = array('value' => '—', 'period' => '', 'link' => null); }
+            try { $data = $fn(); } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'بانية بطاقة واحدة فشلت — تعرض بقيمة محايدة وبقية البطاقات تعمل'); $data = array('value' => '—', 'period' => '', 'link' => null); }
             $out['cards'][] = array(
                 'code' => $code,
                 'title' => isset($titles[$code]) ? $titles[$code] : $code,

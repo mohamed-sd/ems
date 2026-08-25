@@ -58,7 +58,7 @@ class MntProcBridgeService
             ));
             if ($dup) {
                 $out['skipped'][] = array('mnt' => (string) $mo['code'],
-                    'reason' => 'طلبٌ قائمٌ ' . $dup['code'] . ' — لا ازدواج');
+                    'reason' => 'طلب قائم ' . $dup['code'] . ' — لا ازدواج');
                 continue;
             }
 
@@ -81,7 +81,7 @@ class MntProcBridgeService
                 );
             }
             if (!$parts) {
-                $out['skipped'][] = array('mnt' => (string) $mo['code'], 'reason' => 'قطعٌ بلا أسماء');
+                $out['skipped'][] = array('mnt' => (string) $mo['code'], 'reason' => 'قطع بلا أسماء');
                 continue;
             }
 
@@ -104,7 +104,7 @@ class MntProcBridgeService
                             'equipment_id'      => intval($mo['equipment_id']) > 0 ? intval($mo['equipment_id']) : null,
                             'priority'          => $isBreakdown ? 'حرج' : 'عاجل',
                             'state'             => 'مقدَّم',
-                            'notes'             => 'توليدٌ آليٌّ من أمر الصيانة ' . $mo['code'] . ' — جسرُ MNT↔PROC',
+                            'notes'             => 'توليد آلي من أمر الصيانة ' . $mo['code'] . ' — جسر MNT↔PROC',
                             'created_by'        => (int) $actor,
                         ));
                         foreach ($parts as $pl) {
@@ -115,9 +115,9 @@ class MntProcBridgeService
                         }
                     }, 'mnt bridge request ' . $ref);
                     $plan['request_id'] = $reqId;
-                } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'جسرُ الصيانةِ إلى المشترياتِ فشل — أمرُ الصيانةِ قائمٌ والطلبُ يُنشأ يدويًّا');
+                } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'جسر الصيانة إلى المشتريات فشل — أمر الصيانة قائم والطلب ينشأ يدويا');
                     $out['skipped'][] = array('mnt' => (string) $mo['code'],
-                        'reason' => 'تعذّر التوليد: ' . $t->getMessage());
+                        'reason' => 'تعذر التوليد: ' . $t->getMessage());
                     continue;
                 }
             }

@@ -71,7 +71,7 @@ foreach (array_keys($company_ids) as $cid) {
     )) as $o) {
         $oid = (int)$o['id'];
         trs_alert($n_delayed, $conn, $cid, $oid, 'delayed',
-            'رحلة متأخّرة: ' . $o['order_no'],
+            'رحلة متأخرة: ' . $o['order_no'],
             'تجاوزت التاريخ المخطط (' . $o['planned_date'] . ')',
             'transfer_order_form.php?id=' . $oid,
             'delayed:' . $oid . ':' . $today);
@@ -84,7 +84,7 @@ foreach (array_keys($company_ids) as $cid) {
     )) as $o) {
         $oid = (int)$o['id'];
         trs_alert($n_noarr, $conn, $cid, $oid, 'no_arrival',
-            'وصول غير مؤكَّد: ' . $o['order_no'],
+            'وصول غير مؤكد: ' . $o['order_no'],
             'مغادرة منذ ' . $o['departure_datetime'] . ' دون تأكيد وصول',
             'transfer_order_form.php?id=' . $oid,
             'no_arrival:' . $oid . ':' . $today);
@@ -126,8 +126,8 @@ foreach (array_keys($company_ids) as $cid) {
         $pd = trs_project_days($conn, $cid, (int)$o['project_id']);
         if ($pd !== null && $pd >= 60) {
             trs_alert($n_sixty, $conn, $cid, $oid, 'sixty_day',
-                'بلوغ عتبة الستين يومًا: ' . $o['order_no'],
-                'مدة المشروع ' . $pd . ' يوم — راجع متحمِّل العودة (تحوّل محتمل إلى الشركة)',
+                'بلوغ عتبة الستين يوما: ' . $o['order_no'],
+                'مدة المشروع ' . $pd . ' يوم — راجع متحمل العودة (تحول محتمل إلى الشركة)',
                 'transfer_order_form.php?id=' . $oid,
                 'sixty_day:' . $oid . ':' . $today);
         }

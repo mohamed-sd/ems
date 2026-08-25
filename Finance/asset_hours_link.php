@@ -40,14 +40,14 @@ if (!$is_super_admin && empty($__pp['can_view'])) {
 $__canWrite = $is_super_admin || !empty($__pp['can_add']) || !empty($__pp['can_edit']);
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$__canWrite) {
     http_response_code(403);
-    exit('غير مصرَّحٍ بالكتابة في هذه الشاشة — اطلبِ المنحةَ من مدير الصلاحيات');
+    exit('غير مصرح بالكتابة في هذه الشاشة — اطلب المنحة من مدير الصلاحيات');
 }
 
 // ═══ ⑤ رمزُ الحماية — قبلَ أيِّ معالجةٍ لا بعدَها ═══
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!function_exists('verify_csrf_token') || !verify_csrf_token($_POST['csrf_token'] ?? '')) {
         http_response_code(403);
-        exit('رمزُ الحمايةِ غيرُ صالح — أعدْ تحميلَ الصفحة');
+        exit('رمز الحماية غير صالح — أعد تحميل الصفحة');
     }
 }
 
@@ -67,12 +67,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'actor'             => $uid,
         ));
         $flash = $r['ok']
-            ? ('رُبط — ساعاتُ التشغيل من القيد اليومي: ' . $r['hours'] . ' · الملكية: ' . $r['owner_type'])
+            ? ('ربط — ساعات التشغيل من القيد اليومي: ' . $r['hours'] . ' · الملكية: ' . $r['owner_type'])
             : $r['reason'];
         $flashKind = $r['ok'] ? 'success' : 'error';
     } elseif ($__action === 'refresh_all') {
         $n = \App\Services\Assets\AssetHoursService::refreshAll($conn, $company_id);
-        $flash = 'رُدمت الساعاتُ لـ' . $n . ' صفَّ معدة-شهر'; $flashKind = 'success';
+        $flash = 'ردمت الساعات ل' . $n . ' صف معدة-شهر'; $flashKind = 'success';
     }
 }
 
@@ -95,13 +95,13 @@ $s = $conn->query(
 )->fetch_assoc();
 $PAGE_TITLE = 'ربط الأصل بساعات تشغيله';
 $TILES = array(
-    array('صفوفُ معدة-شهر', (int) $s['n']),
-    array('منها معداتُ موردين', (int) $s['sup']),
-    array('ساعاتُ تشغيلٍ مقيسة', round((float) $s['hrs'], 1)),
+    array('صفوف معدة-شهر', (int) $s['n']),
+    array('منها معدات موردين', (int) $s['sup']),
+    array('ساعات تشغيل مقيسة', round((float) $s['hrs'], 1)),
     array('عملت بلا إهلاك (CK-17)', (int) $s['undep']),
 );
 $COLS = array('#','كود المعدة','الفترة','الملكية','الأصل','طريقة الإهلاك','العمر (ساعة)','معدل الساعة','ساعات التشغيل','ساعات بلا إهلاك','الإهلاك','مبلغ معكوس','مرجع العكس');
 /* UXW-01 §8-2: موضعُ الشاشةِ من رحلةِ المعدة — الغلافُ يُخرِج الشريط */
 $ENTITY_KEY = 'equipment';
-$ENTITY_TAB = 'ساعاتُ التشغيل';
+$ENTITY_TAB = 'ساعات التشغيل';
 include __DIR__ . '/../includes/eng01_screen_view.php';

@@ -50,11 +50,11 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     );
     include('../includes/page_header.php');
     ems_screen_about(
-        'وحدات المخاطر الإحدى عشرة: تصنيفُ منشأِ الخطر ومعيارُه المرجعيُّ ونافذةُ منعِ التكرار. '
-        . 'التصنيفُ منهجٌ تملكه إدارةُ المخاطر — والإداراتُ تقترح ولا تعدّل (§14-4).',
-        array('التعديلُ بترحيلٍ لا بحذف — ولا تُعطَّل وحدةٌ وعليها خطرٌ مفتوح',
-              'نافذةُ التكرار تُقاس بالوحدة: الاستراتيجيةُ أطولُ والتشغيليةُ أقصر (ورقة 32)'));
-    echo ems_states_bundle('لا وحداتِ مخاطرَ مبذورةً لهذا الكيان', 'البذرةُ المرجعيةُ للوحداتِ الإحدى عشرةَ شرطُ تسجيلِ أيِّ خطر');
+        'وحدات المخاطر الإحدى عشرة: تصنيف منشأ الخطر ومعياره المرجعي ونافذة منع التكرار. '
+        . 'التصنيف منهج تملكه إدارة المخاطر — والإدارات تقترح ولا تعدل (§14-4).',
+        array('التعديل بترحيل لا بحذف — ولا تعطل وحدة وعليها خطر مفتوح',
+              'نافذة التكرار تقاس بالوحدة: الاستراتيجية أطول والتشغيلية أقصر (ورقة 32)'));
+    echo ems_states_bundle('لا وحدات مخاطر مبذورة لهذا الكيان', 'البذرة المرجعية للوحدات الإحدى عشرة شرط تسجيل أي خطر');
     ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
@@ -62,7 +62,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     <div class="ems-card" id="ruEmpty"></div>
     <script>document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('ruEmpty').appendChild(EmsUI.emptyState({
-            reason: 'لا وحدات مخاطر مبذورة لهذا الكيان — البذرة المرجعية شرطُ تسجيل أي خطر'
+            reason: 'لا وحدات مخاطر مبذورة لهذا الكيان — البذرة المرجعية شرط تسجيل أي خطر'
         }));
     });</script>
     <?php else: ?>
@@ -85,12 +85,12 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                         <?php endif; ?></td>
                     <td class="rsk-fs78"><?php echo htmlspecialchars($x['linked_depts']); ?></td>
                     <td class="rsk-fs78"><?php echo htmlspecialchars($x['ref_standard']); ?></td>
-                    <td><?php echo (int) $x['dedup_window_days']; ?> يومًا</td>
+                    <td><?php echo (int) $x['dedup_window_days']; ?> يوما</td>
                     <td><?php echo (int) $x['open_risks']; ?></td>
                     <td><?php echo (int) $x['total_risks']; ?></td>
                     <td><?php echo (int) $x['kris']; ?></td>
                     <td><span class="badge <?php echo (int) $x['active'] === 1 ? 'badge-success' : 'badge-secondary'; ?>">
-                        <?php echo (int) $x['active'] === 1 ? 'نشطة' : 'معطَّلة'; ?></span></td>
+                        <?php echo (int) $x['active'] === 1 ? 'نشطة' : 'معطلة'; ?></span></td>
                     <?php if ($canEdit): ?>
                     <td><button class="btn btn-sm btn-secondary ruEdit"
                         data-id="<?php echo (int) $x['id']; ?>"
@@ -110,14 +110,14 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     <?php if ($canEdit): ?>
     <div class="card rsk-new-card is-hidden" id="ruEditCard"><div class="card-body">
         <h5>تعديل وحدة <span id="ruEditCode"></span></h5>
-        <p class="rsk-note-sm">التعديلُ بترحيلٍ لا بحذف — والتعطيلُ مرفوضٌ إن كانت عليها مخاطرُ مفتوحة.</p>
+        <p class="rsk-note-sm">التعديل بترحيل لا بحذف — والتعطيل مرفوض إن كانت عليها مخاطر مفتوحة.</p>
         <form id="ruEditForm" class="allforms">
             <input type="hidden" name="ru_id" id="ruEditId">
             <div class="row">
                 <div class="col-md-6"><label>اسم الوحدة *<input name="name_ar" id="ruEditName" class="form-control" aria-label="اسم وحدة المخاطر" required></label></div>
                 <div class="col-md-3"><label>نافذة التكرار (أيام) *<input name="dedup_window_days" id="ruEditWin" type="number" min="1" max="3650" class="form-control" aria-label="نافذة منع التكرار بالأيام" required></label></div>
                 <div class="col-md-3"><label>الحالة<select name="active" id="ruEditActive" class="form-control" aria-label="حالة الوحدة">
-                    <option value="1">نشطة</option><option value="0">معطَّلة</option>
+                    <option value="1">نشطة</option><option value="0">معطلة</option>
                 </select></label></div>
                 <div class="col-md-6"><label>المعيار المرجعي<input name="ref_standard" class="form-control" aria-label="المعيار المرجعي"></label></div>
                 <div class="col-md-6"><label>نطاق التغطية<input name="coverage" class="form-control" aria-label="نطاق التغطية"></label></div>
@@ -137,7 +137,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                 document.getElementById('ruEditWin').value = b.dataset.win;
                 document.getElementById('ruEditActive').value = b.dataset.active;
                 document.getElementById('ruEditMsg').textContent = b.dataset.open > 0
-                    ? '⚠ عليها ' + b.dataset.open + ' خطرًا مفتوحًا — التعطيل سيُرفض'
+                    ? '⚠ عليها ' + b.dataset.open + ' خطرا مفتوحا — التعطيل سيرفض'
                     : '';
                 card.classList.remove('is-hidden');
                 card.scrollIntoView({ behavior: 'smooth', block: 'center' });

@@ -40,7 +40,7 @@ if (!$is_super_admin && empty($__pp['can_view'])) {
     exit();
 }
 if (!$is_super_admin && $_SERVER['REQUEST_METHOD'] === 'POST' && empty($__pp['can_add']) && empty($__pp['can_edit'])) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'غير مصرح بالكتابة في هذه الشاشة ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
+    ems_gov_flash_redirect('../main/dashboard.php', 'غير مصرح بالكتابة في هذه الشاشة ❌', 'GOV-PERM-403', 'اطلب المنحة من مدير الصلاحيات إن كانت ضمن عملك');
 }
 $COLS   = array (
   0 => 'الكيان',
@@ -48,18 +48,18 @@ $COLS   = array (
   2 => 'الفترة',
   3 => 'تاريخ الإطلاق',
   4 => 'الإدارة',
-  5 => 'عدد الحسابات المراجَعة',
-  6 => 'المؤكَّدة',
+  5 => 'عدد الحسابات المراجعة',
+  6 => 'المؤكدة',
   7 => 'المطلوب سحبها',
-  8 => 'المسحوبة آليًّا',
+  8 => 'المسحوبة آليا',
   9 => 'الحسابات الخاملة',
-  10 => 'المعطَّلة',
+  10 => 'المعطلة',
   11 => 'تعارضات واجبات مكتشفة',
   12 => 'استثناءات قائمة',
   13 => 'نسبة الاستجابة',
   14 => 'مراجع الإدارة',
   15 => 'تاريخ الإقفال',
-  16 => 'المعتمِد — الاسم والصفة',
+  16 => 'المعتمد — الاسم والصفة',
   17 => 'الحالة',
 );
 $FIELDS = array (
@@ -67,18 +67,18 @@ $FIELDS = array (
   1 => 'الفترة',
   2 => 'تاريخ الإطلاق',
   3 => 'الإدارة',
-  4 => 'عدد الحسابات المراجَعة',
-  5 => 'المؤكَّدة',
+  4 => 'عدد الحسابات المراجعة',
+  5 => 'المؤكدة',
   6 => 'المطلوب سحبها',
-  7 => 'المسحوبة آليًّا',
+  7 => 'المسحوبة آليا',
   8 => 'الحسابات الخاملة',
-  9 => 'المعطَّلة',
+  9 => 'المعطلة',
   10 => 'تعارضات واجبات مكتشفة',
   11 => 'استثناءات قائمة',
   12 => 'نسبة الاستجابة',
   13 => 'مراجع الإدارة',
   14 => 'تاريخ الإقفال',
-  15 => 'المعتمِد — الاسم والصفة',
+  15 => 'المعتمد — الاسم والصفة',
   16 => 'الحالة',
 );
 
@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     $creator = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
     // الموجة ٢: الحفظ في الجدول الأصلي للشاشة (الفارغ NULL — لا مخزن بينيًّا)
     $ok = cmp03_store_insert($conn, $company_id, $CANONICAL, $payload, $status, $uid, $creator);
-    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
+    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
     exit();
 }
 
@@ -108,7 +108,7 @@ $entityName = $govCtx['values']['entity'] ?? '—';
 function cmp03_cell($col, $row, $entityName) {
     $n = cmp03_screen_norm($col);
     if ($n === cmp03_screen_norm('الكيان')) { return $entityName; }
-    if ($n === cmp03_screen_norm('المُنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المُنشئة')) {
+    if ($n === cmp03_screen_norm('المنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المنشئة')) {
         return $row['created_by_name'] ?: '—';
     }
     if ($n === cmp03_screen_norm('تاريخ الإنشاء')) { return $row['created_at']; }
@@ -123,7 +123,7 @@ function cmp03_screen_norm($s) {
     $s = str_replace(array('أ','إ','آ'), 'ا', $s);
     $s = str_replace('ة', 'ه', $s);
     $s = str_replace('ى', 'ي', $s);
-    return preg_replace('/[ًٌٍَُِّْ]/u', '', $s);
+    return preg_replace('/[]/u', '', $s);
 }
 
 $page_title = 'إيكوبيشن | دورة المراجعة الدورية للصلاحيات';
@@ -147,7 +147,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
-    echo ems_states_bundle('لا دوراتِ مراجعةٍ دوريةً للصلاحياتِ بعد', 'أطلق دورةَ المراجعةِ الدوريةِ بزرِّ «إضافة» أعلى الشاشة');
+    echo ems_states_bundle('لا دورات مراجعة دورية للصلاحيات بعد', 'أطلق دورة المراجعة الدورية بزر «إضافة» أعلى الشاشة');
     ?>
 
     <!-- فورم الإضافة الموحد (ems-forms) — مطويٌّ حتى زرِّ الرأس -->
@@ -166,17 +166,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="date" name="f2" id="emsf_511_b810c"></div>
                 <div class="form-group"><label for="emsf_512_4a2f5">الإدارة</label>
                     <input type="text" name="f3" maxlength="190" id="emsf_512_4a2f5"></div>
-                <div class="form-group"><label for="emsf_513_c57fc">عدد الحسابات المراجَعة</label>
+                <div class="form-group"><label for="emsf_513_c57fc">عدد الحسابات المراجعة</label>
                     <input type="text" inputmode="decimal" name="f4" placeholder="0" id="emsf_513_c57fc"></div>
-                <div class="form-group"><label for="emsf_514_52f42">المؤكَّدة</label>
+                <div class="form-group"><label for="emsf_514_52f42">المؤكدة</label>
                     <input type="text" name="f5" maxlength="190" id="emsf_514_52f42"></div>
                 <div class="form-group"><label for="emsf_515_dc8d1">المطلوب سحبها</label>
                     <input type="text" name="f6" maxlength="190" id="emsf_515_dc8d1"></div>
-                <div class="form-group"><label for="emsf_516_f1f57">المسحوبة آليًّا</label>
+                <div class="form-group"><label for="emsf_516_f1f57">المسحوبة آليا</label>
                     <input type="text" name="f7" maxlength="190" id="emsf_516_f1f57"></div>
                 <div class="form-group"><label for="emsf_517_6ab67">الحسابات الخاملة</label>
                     <input type="text" name="f8" maxlength="190" id="emsf_517_6ab67"></div>
-                <div class="form-group"><label for="emsf_518_822fb">المعطَّلة</label>
+                <div class="form-group"><label for="emsf_518_822fb">المعطلة</label>
                     <input type="text" name="f9" maxlength="190" id="emsf_518_822fb"></div>
                 <div class="form-group"><label for="emsf_519_62a4d">تعارضات واجبات مكتشفة</label>
                     <input type="text" name="f10" maxlength="190" id="emsf_519_62a4d"></div>
@@ -188,7 +188,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="f13" maxlength="190" id="emsf_522_f977e"></div>
                 <div class="form-group"><label for="emsf_523_e693c">تاريخ الإقفال</label>
                     <input type="date" name="f14" id="emsf_523_e693c"></div>
-                <div class="form-group"><label for="emsf_524_c9143">المعتمِد — الاسم والصفة</label>
+                <div class="form-group"><label for="emsf_524_c9143">المعتمد — الاسم والصفة</label>
                     <input type="text" name="f15" maxlength="190" id="emsf_524_c9143"></div>
                 <div class="form-group"><label for="emsf_525_bb8a2">الحالة</label>
                     <select name="f16" id="emsf_525_bb8a2"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
@@ -204,28 +204,28 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="table-responsive">
         <table class="alltables display" id="access_reviewTable">
             <thead><tr>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
             <th>رقم الدورة</th>
             <th>الفترة</th>
             <th>تاريخ الإطلاق</th>
             <th>الإدارة</th>
-            <th>عدد الحسابات المراجَعة</th>
-            <th>المؤكَّدة</th>
+            <th>عدد الحسابات المراجعة</th>
+            <th>المؤكدة</th>
             <th>المطلوب سحبها</th>
-            <th>المسحوبة آليًّا</th>
+            <th>المسحوبة آليا</th>
             <th>الحسابات الخاملة</th>
-            <th>المعطَّلة</th>
+            <th>المعطلة</th>
             <th>تعارضات واجبات مكتشفة</th>
             <th>استثناءات قائمة</th>
             <th>نسبة الاستجابة</th>
             <th>مراجع الإدارة</th>
             <th>تاريخ الإقفال</th>
-            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
             <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
             </tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="18" class="text-center text-muted">لا بياناتَ بعدُ — أضف أول صفٍّ بزر «إضافة»</td></tr>
+                <tr><td colspan="18" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
                     <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>

@@ -52,11 +52,11 @@ $cards = array(
   array('fa-arrow-trend-up', number_format($revenue, 0), 'الإيراد المعتمد', 'ok'),
   array('fa-arrow-trend-down', number_format($expense, 0), 'المصروف المعتمد', 'warn'),
   array('fa-coins', number_format($profit, 0), 'صافي الربحية', $profit >= 0 ? 'ok' : 'err'),
-  array('fa-water', number_format($cashpos, 0), 'الوضع النقدي المتوقّع', $cashpos >= 0 ? 'ok' : 'err'),
+  array('fa-water', number_format($cashpos, 0), 'الوضع النقدي المتوقع', $cashpos >= 0 ? 'ok' : 'err'),
   array('fa-hand-holding-dollar', number_format($recv_out, 0), 'ذمم مستحقة (' . $recv_od . ' متأخرة)', 'warn'),
-  array('fa-truck-field', number_format($dues_pend, 0), 'مستحقات موردين معلّقة', 'or'),
+  array('fa-truck-field', number_format($dues_pend, 0), 'مستحقات موردين معلقة', 'or'),
   array('fa-triangle-exclamation', (string)$var_open, 'بنود بها انحراف', 'warn'),
-  array('fa-landmark', number_format($fund_due, 0), 'التزامات تمويل متبقّية', 'or'),
+  array('fa-landmark', number_format($fund_due, 0), 'التزامات تمويل متبقية', 'or'),
   array('fa-hourglass-half', (string)$pending_appr, 'أحداث بانتظار الاعتماد', 'or'),
 );
 
@@ -87,10 +87,10 @@ $states = fin_event_states();
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا أحداثَ ماليةً ولا ذممًا في نطاقِ الشركةِ لتُبنى منها اللوحة', 'سجّلِ الحدثَ الماليَّ الأولَ في «الأحداث المالية» فتظهرَ المؤشراتُ هنا');
+    echo ems_states_bundle('لا أحداث مالية ولا ذمما في نطاق الشركة لتبنى منها اللوحة', 'سجل الحدث المالي الأول في «الأحداث المالية» فتظهر المؤشرات هنا');
     ?>
 
-    <p class="text-muted fin-exec-note"><i class="fas fa-circle-info"></i> كل المبالغ موحّدة إلى عملة الأساس <strong>الجنيه (SDG)</strong> — تُحوَّل مبالغ USD بسعر الصرف.</p>
+    <p class="text-muted fin-exec-note"><i class="fas fa-circle-info"></i> كل المبالغ موحدة إلى عملة الأساس <strong>الجنيه (SDG)</strong> — تحول مبالغ USD بسعر الصرف.</p>
 
     <div class="stats-grid fin-exec-grid">
         <?php foreach ($cards as $cds): list($icon, $val, $lbl, $tone) = $cds; ?>
@@ -128,10 +128,10 @@ $states = fin_event_states();
             <table class="alltables fin-exec-tbl">
                 <thead><tr><th>المشروع</th><th>التكلفة</th><th>الإيراد</th><th>الربحية</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -159,7 +159,7 @@ $states = fin_event_states();
         <h5 class="fin-exec-h5-next"><i class="fas fa-hourglass-end"></i> أعمار الذمم المدينة</h5>
         <div class="table-container">
             <table class="alltables fin-exec-tbl">
-                <thead><tr><th>الفئة العمرية</th><th>العدد</th><th>المتبقّي</th></tr></thead>
+                <thead><tr><th>الفئة العمرية</th><th>العدد</th><th>المتبقي</th></tr></thead>
                 <tbody>
                 <?php
                 $buckets = array(

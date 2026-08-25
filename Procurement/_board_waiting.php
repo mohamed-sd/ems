@@ -24,7 +24,7 @@ if (empty($procWaiting)) { return; }
 <div class="shot-ops-box shot-ops-wide">
   <h4 class="shot-ops-box-title">
     <i class="fas fa-triangle-exclamation"></i>
-    معداتٌ بانتظار قطع (<?= count($procWaiting) ?>) — كلُّ يومٍ هنا إيرادُ تأجيرٍ ضائع
+    معدات بانتظار قطع (<?= count($procWaiting) ?>) — كل يوم هنا إيراد تأجير ضائع
   </h4>
   <div class="table-container">
     <table class="alltables" data-no-dt="hard">
@@ -37,7 +37,7 @@ if (empty($procWaiting)) { return; }
           <td><strong><?= intval($we['waiting_days']) ?></strong></td>
           <td><?= !empty($we['req_code'])
                 ? '<a href="../Procurement/requests_proc.php">' . htmlspecialchars((string) $we['req_code'], ENT_QUOTES, 'UTF-8') . '</a>'
-                : '<span class="text-muted">بلا طلبٍ بعد — ولّده من شاشة الطلبات</span>' ?></td>
+                : '<span class="text-muted">بلا طلب بعد — ولده من شاشة الطلبات</span>' ?></td>
           <td><?= htmlspecialchars((string) ($we['req_state'] ?? '—'), ENT_QUOTES, 'UTF-8') ?></td>
           <td><?= htmlspecialchars((string) ($we['priority'] ?? '—'), ENT_QUOTES, 'UTF-8') ?></td>
         </tr>

@@ -114,7 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['wz_action']) && $can_
             $stmt->bind_param('siis', $fn, $company_id, $eidBind, $pClass);
             if (!$stmt->execute()) {
                 $stmt->close();
-                ems_gov_redirect("Location: sec_employee_wizard.php?msg=" . rawurlencode('تعذّر إنشاء الشخص — الكيان والمفتاح الأم شرطان ❌'));
+                ems_gov_redirect("Location: sec_employee_wizard.php?msg=" . rawurlencode('تعذر إنشاء الشخص — الكيان والمفتاح الأم شرطان ❌'));
                 exit();
             }
             $personId = intval($conn->insert_id);
@@ -172,15 +172,15 @@ function wz_step($n, $title) { echo '<h5 class="sec-wz-step"><span class="badge 
     $header_actions = array();
     include('../includes/page_header.php');
     ems_screen_about(
-        'الطبقات السبع في معالج واحد: يُعدُّ به موظف جديد في دقائق — يختار قالبه فيمنحه '
+        'الطبقات السبع في معالج واحد: يعد به موظف جديد في دقائق — يختار قالبه فيمنحه '
         . 'النظام حزمته، ويعاين الصلاحيات بمصادرها قبل الإرسال، ولا تفعيل إلا باكتمال الموافقات.',
         array('لا موظف بلا عائلة ولا مركز بلا نطاق',
-              'المعاينة (⑨) تُظهر ما سيُمنح ومن أي مصدر قبل الإرسال',
-              'التفعيل (⑪) آليٌّ بعد الموافقات — لا نقرة صلاحية واحدة'));
+              'المعاينة (⑨) تظهر ما سيمنح ومن أي مصدر قبل الإرسال',
+              'التفعيل (⑪) آلي بعد الموافقات — لا نقرة صلاحية واحدة'));
     if ($msg !== '') { echo '<div class="alert alert-info">' . htmlspecialchars($msg) . '</div>'; }
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا معاينةَ صلاحياتٍ بعد',
-        'املأ الخطواتِ ① إلى ⑧ ثم اضغطْ «⑨ معاينة الصلاحيات بمصادرها» لعرضِ ما سيُمنح');
+    echo ems_states_bundle('لا معاينة صلاحيات بعد',
+        'املأ الخطوات ① إلى ⑧ ثم اضغط «⑨ معاينة الصلاحيات بمصادرها» لعرض ما سيمنح');
     ?>
 
     <style>
@@ -199,15 +199,15 @@ function wz_step($n, $title) { echo '<h5 class="sec-wz-step"><span class="badge 
         <input type="hidden" name="wz_action" value="preview" id="wzAction">
         <?php wz_step('①', 'هوية الشخص ونوع العلاقة'); ?>
         <div class="sec-wz-g3">
-            <div class="form-group"><label for="emsf_1991_7a2c4">شخص قائم (أو اتركه واكتب اسمًا)</label>
+            <div class="form-group"><label for="emsf_1991_7a2c4">شخص قائم (أو اتركه واكتب اسما)</label>
                 <select name="person_id" id="emsf_1991_7a2c4"><option value="0">— جديد —</option>
                     <?php foreach ($personsList as $p) { echo '<option value="' . intval($p['person_id']) . '">' . htmlspecialchars($p['full_name']) . '</option>'; } ?></select></div>
             <div class="form-group"><label for="emsf_1992_f9f7a">الاسم الكامل (للجديد)</label><input type="text" name="full_name" id="emsf_1992_f9f7a"></div>
             <?php /* RPR-W03: المفتاحُ الأمُّ Person_ID — بلا وصلٍ يصير الصفُّ «صفَّ هويةٍ» مُعلَنًا لا صفَّ قوًى عاملة */ ?>
-            <div class="form-group"><label for="emsf_w3_link">الموظّف في السجلِّ الأمّ (Person_ID)</label>
-                <select name="link_employee_id" id="emsf_w3_link"><option value="0">— صفُّ هويةٍ فقط (بلا موظّف) —</option>
+            <div class="form-group"><label for="emsf_w3_link">الموظف في السجل الأم (Person_ID)</label>
+                <select name="link_employee_id" id="emsf_w3_link"><option value="0">— صف هوية فقط (بلا موظف) —</option>
                     <?php foreach ($linkEmployees as $e) { echo '<option value="' . intval($e['id']) . '">' . htmlspecialchars($e['name']) . '</option>'; } ?></select>
-                <small>الشخصُ الجديدُ بلا موظّفٍ يُسجَّل <code>IDENTITY_ONLY</code> — ولا يُنشأ معرّفٌ ثانٍ لموظّفٍ له صفُّ هويةٍ سلفًا.</small></div>
+                <small>الشخص الجديد بلا موظف يسجل <code>IDENTITY_ONLY</code> — ولا ينشأ معرف ثان لموظف له صف هوية سلفا.</small></div>
             <div class="form-group"><label for="emsf_1993_4bb1a">نوع العلاقة *</label>
                 <select name="relation_code" required id="emsf_1993_4bb1a"><?php foreach ($relations as $x) { echo '<option value="' . htmlspecialchars($x['code']) . '">' . htmlspecialchars($x['name_ar']) . '</option>'; } ?></select></div>
         </div>
@@ -239,13 +239,13 @@ function wz_step($n, $title) { echo '<h5 class="sec-wz-step"><span class="badge 
                 <select name="scope_id" required id="emsf_2000_8e88c"><option value="0">0 (شركة/عام)</option>
                     <?php foreach ($sitesList as $s) { echo '<option value="' . intval($s['id']) . '">' . htmlspecialchars($s['name']) . '</option>'; } ?></select></div>
             <div class="form-group"><label for="emsf_2001_1f175">من * / إلى</label>
-                <input type="date" name="valid_from" required class="sec-wz-mb4" id="emsf_2001_1f175"><input type="date" name="valid_to" aria-label="نهايةُ سريانِ النطاق (اتركه فارغًا لسريانٍ مفتوح)"></div>
+                <input type="date" name="valid_from" required class="sec-wz-mb4" id="emsf_2001_1f175"><input type="date" name="valid_to" aria-label="نهاية سريان النطاق (اتركه فارغا لسريان مفتوح)"></div>
         </div>
         <?php wz_step('⑧', 'التكليف (اختياري — بيته ORG-01)'); ?>
         <div class="form-group"><label for="emsf_2002_0f1ee">تكليف نافذ مرتبط</label>
             <select name="linked_asg" id="emsf_2002_0f1ee"><option value="">— بلا —</option>
                 <?php foreach ($assignments as $a) { echo '<option value="' . intval($a['asg_id']) . '">#' . intval($a['asg_id']) . ' ' . htmlspecialchars($a['name_ar']) . '</option>'; } ?></select>
-            <small class="sec-wz-hint">التكليف يُنشأ ويُدار من شاشة التكليفات — وهنا إحالة قراءة.</small></div>
+            <small class="sec-wz-hint">التكليف ينشأ ويدار من شاشة التكليفات — وهنا إحالة قراءة.</small></div>
 
         <div class="sec-wz-actions">
             <button type="submit" class="btn-primary" onclick="document.getElementById('wzAction').value='preview'">⑨ معاينة الصلاحيات بمصادرها</button>
@@ -258,14 +258,14 @@ function wz_step($n, $title) { echo '<h5 class="sec-wz-step"><span class="badge 
     <?php if ($preview !== null): ?>
     <div class="card"><div class="card-header"><h5>⑨ الصلاحيات المقترحة بمصادرها (<?php echo intval($preview['count']); ?>)</h5></div>
     <div class="card-body">
-        <?php if (!$preview['proposed']) { ems_state_empty('لا محتوى منشورًا لقوالب هذه الطبقات بعد — تُبنى في شاشة القوالب'); } else { ?>
+        <?php if (!$preview['proposed']) { ems_state_empty('لا محتوى منشورا لقوالب هذه الطبقات بعد — تبنى في شاشة القوالب'); } else { ?>
         <div class="table-container"><table class="alltables sec-wz-table" data-no-dt="1">
             <thead><tr><th>المصدر</th><th>المرجع</th><th>الصلاحية</th><th>الحكم</th><th>النطاق</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>

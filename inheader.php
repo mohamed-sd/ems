@@ -187,7 +187,7 @@ if (isset($_SESSION['user']) && !empty($GLOBALS['EMS_COL_PERMS']) && is_array($G
      بدونَه تُجبَر الدورةُ على المرورِ بالشريطِ الجانبيِّ كلِّه (عشراتُ الروابط)
      قبلَ بلوغِ المحتوى، فتصير الدورةُ «كاملةً» ورقيًّا لا عمليًّا. مخفيٌّ حتى
      يُركَّز عليه — لا يزاحم البصرَ ويحضر للوحةِ المفاتيح. -->
-<a class="ems-skip-link" href="#ems-main-content">تخطّي إلى المحتوى</a>
+<a class="ems-skip-link" href="#ems-main-content">تخطي إلى المحتوى</a>
 <?php
 /* GOV-AUTH-01 §6-2 — شريطُ جلسةِ النيابةِ الدائمُ الظاهر: «تعمل الآن موضعَ
    فلان — بسببِ كذا — تنتهي في كذا». لا يُخفى عن الفاعلِ نفسِه فينسى أنه
@@ -196,15 +196,15 @@ if (isset($_SESSION['imp_session']['imp_id'])
     && strtotime((string) ($_SESSION['imp_session']['valid_to'] ?? '')) >= time()) {
     $__imp = $_SESSION['imp_session'];
     echo '<div class="ems-imp-strip" dir="rtl" role="status">'
-       . '<span class="ems-imp-strip-text">تعمل الآن موضعَ <b>'
+       . '<span class="ems-imp-strip-text">تعمل الآن موضع <b>'
        . htmlspecialchars((string) $__imp['target_name'], ENT_QUOTES, 'UTF-8')
-       . '</b> — بسببِ: ' . htmlspecialchars((string) $__imp['reason'], ENT_QUOTES, 'UTF-8')
+       . '</b> — بسبب: ' . htmlspecialchars((string) $__imp['reason'], ENT_QUOTES, 'UTF-8')
        . ' — تنتهي في ' . htmlspecialchars((string) $__imp['valid_to'], ENT_QUOTES, 'UTF-8')
        . '</span>'
        . '<form method="post" action="' . htmlspecialchars(function_exists('ems_url') ? ems_url('Governance/impersonations.php') : 'Governance/impersonations.php', ENT_QUOTES, 'UTF-8') . '" class="ems-imp-strip-form">'
        . (function_exists('csrf_field') ? csrf_field() : '')
        . '<input type="hidden" name="imp_action" value="close">'
-       . '<button type="submit" class="btn btn-sm btn-light">إنهاءُ الجلسة</button>'
+       . '<button type="submit" class="btn btn-sm btn-light">إنهاء الجلسة</button>'
        . '</form>'
        . '</div>';
 }

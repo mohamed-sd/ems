@@ -19,18 +19,18 @@ if (!function_exists('ems_status_dictionary')) {
     function ems_status_dictionary()
     {
         return array(
-            'draft'             => array('label' => 'مسودّة',                     'tone' => 'neutral',      'when' => 'أُنشئ ولم يُرسَل بعد'),
-            'under_review'      => array('label' => 'قيدُ المراجعة',              'tone' => 'info',         'when' => 'عند مراجعٍ فنيٍّ أو محاسبيّ'),
-            'pending_approval'  => array('label' => 'بانتظارِ الاعتماد',          'tone' => 'warning',      'when' => 'في خطوةِ سلّمِ اعتمادٍ لم تُحسَم'),
-            'payment_requested' => array('label' => 'بانتظارِ الدفع',             'tone' => 'warning',      'when' => 'اعتُمد ماليًّا وينتظر الصرف'),
-            'approved'          => array('label' => 'معتمَد',                     'tone' => 'success',      'when' => 'اكتمل سلّمُه'),
-            'executed'          => array('label' => 'منفَّذ',                     'tone' => 'success',      'when' => 'نُفِّذ أثرُه فعلًا'),
-            'rejected'          => array('label' => 'مرفوض',                      'tone' => 'danger',       'when' => 'رُفض بسببٍ مسجَّل'),
-            'suspended'         => array('label' => 'مُعلَّق',                    'tone' => 'suspend',      'when' => 'أُوقف مؤقَّتًا بسببٍ مسجَّل'),
-            'cancelled'         => array('label' => 'مُلغى',                      'tone' => 'neutral-dark', 'when' => 'أُلغي ولا أثرَ له'),
-            'closed'            => array('label' => 'مغلق',                       'tone' => 'neutral-dark', 'when' => 'انتهت دورتُه بلا فتحٍ ثانٍ'),
-            'cap_unresolved'    => array('label' => 'موقوفٌ لسقفٍ غيرِ معتمَد',   'tone' => 'warning',      'when' => 'سقفٌ لم يعتمده المالكُ — يظهر بنصِّه لا كعطل'),
-            'training'          => array('label' => 'بياناتُ تدريب',              'tone' => 'training',     'when' => 'سجلٌّ من وضعِ التدريب — لا يدخل تقريرًا حقيقيًّا'),
+            'draft'             => array('label' => 'مسودة',                     'tone' => 'neutral',      'when' => 'أنشئ ولم يرسل بعد'),
+            'under_review'      => array('label' => 'قيد المراجعة',              'tone' => 'info',         'when' => 'عند مراجع فني أو محاسبي'),
+            'pending_approval'  => array('label' => 'بانتظار الاعتماد',          'tone' => 'warning',      'when' => 'في خطوة سلم اعتماد لم تحسم'),
+            'payment_requested' => array('label' => 'بانتظار الدفع',             'tone' => 'warning',      'when' => 'اعتمد ماليا وينتظر الصرف'),
+            'approved'          => array('label' => 'معتمَد',                     'tone' => 'success',      'when' => 'اكتمل سلمه'),
+            'executed'          => array('label' => 'منفذ',                     'tone' => 'success',      'when' => 'نفذ أثره فعلا'),
+            'rejected'          => array('label' => 'مرفوض',                      'tone' => 'danger',       'when' => 'رفض بسبب مسجل'),
+            'suspended'         => array('label' => 'معلق',                    'tone' => 'suspend',      'when' => 'أوقف مؤقتا بسبب مسجل'),
+            'cancelled'         => array('label' => 'ملغى',                      'tone' => 'neutral-dark', 'when' => 'ألغي ولا أثر له'),
+            'closed'            => array('label' => 'مغلق',                       'tone' => 'neutral-dark', 'when' => 'انتهت دورته بلا فتح ثان'),
+            'cap_unresolved'    => array('label' => 'موقوف لسقف غير معتمد',   'tone' => 'warning',      'when' => 'سقف لم يعتمده المالك — يظهر بنصه لا كعطل'),
+            'training'          => array('label' => 'بيانات تدريب',              'tone' => 'training',     'when' => 'سجل من وضع التدريب — لا يدخل تقريرا حقيقيا'),
         );
     }
 }

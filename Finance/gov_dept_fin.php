@@ -39,21 +39,21 @@ $GOV_DEPT = array(
     'attest_scope' => 'gov_dept_fin',
     'sod_queries' => array(
         array(
-            'title' => 'إنشاءُ الموازنةِ واعتمادُها بيدٍ واحدة',
+            'title' => 'إنشاء الموازنة واعتمادها بيد واحدة',
             'sql' => "SELECT CONCAT('BUD-', b.id) doc, u.name person
                         FROM fin_budgets b LEFT JOIN users u ON u.id = b.approved_by
                        WHERE b.company_id = {$company_id} AND b.approved_by IS NOT NULL
                          AND b.approved_by = b.created_by LIMIT 20",
         ),
         array(
-            'title' => 'إعدادُ القيدِ ونشرُه بيدٍ واحدة',
+            'title' => 'إعداد القيد ونشره بيد واحدة',
             'sql' => "SELECT j.entry_no doc, u.name person
                         FROM fin_journal_entries j LEFT JOIN users u ON u.id = j.posted_by
                        WHERE j.company_id = {$company_id} AND j.posted_by IS NOT NULL
                          AND j.posted_by = j.created_by AND COALESCE(j.is_deleted,0) = 0 LIMIT 20",
         ),
         array(
-            'title' => 'إنشاءُ الصرفِ وتنفيذُه بيدٍ واحدة',
+            'title' => 'إنشاء الصرف وتنفيذه بيد واحدة',
             'sql' => "SELECT p.payment_no doc, u.name person
                         FROM fin_payments p LEFT JOIN users u ON u.id = p.executed_by
                        WHERE p.company_id = {$company_id} AND p.executed_by IS NOT NULL
@@ -69,6 +69,6 @@ require __DIR__ . '/../includes/dept_gov_space.php';
 /* حزمةُ الحالاتِ الدنيا (بوابة ٩): تحميلٌ وفراغٌ وخطأٌ — مخفيةٌ افتراضًا
    ويُظهرها منطقُ الشاشةِ عند حالِها. الدالةُ من ux_components التي تُحمِّلها القشرة. */
 if (function_exists('ems_states_bundle')) {
-    echo ems_states_bundle('لا قياساتِ فصلِ واجباتٍ ضمن هذا النطاق',
-                           'تُقاس القياساتُ على المستنداتِ الحيةِ للماليةِ والخزينة — راجع الفترةَ أو الحساباتِ التابعة');
+    echo ems_states_bundle('لا قياسات فصل واجبات ضمن هذا النطاق',
+                           'تقاس القياسات على المستندات الحية للمالية والخزينة — راجع الفترة أو الحسابات التابعة');
 }

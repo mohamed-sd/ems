@@ -90,7 +90,7 @@ function sync_push(): void
                 if ($existing > 0) {
                     $result['status'] = 'applied';
                     $result['server_id'] = $existing;
-                    $result['message'] = 'موجود مسبقاً (لم يُكرّر)';
+                    $result['message'] = 'موجود مسبقا (لم يكرر)';
                 } else {
                     $id = ts_save($conn, $ctx, $projectId, $payload, null, $clientUuid);
                     $result['status'] = 'applied';
@@ -107,7 +107,7 @@ function sync_push(): void
                     $id = ts_save($conn, $ctx, $projectId, $payload, null, $clientUuid);
                     $result['status'] = 'applied';
                     $result['server_id'] = $id;
-                    $result['message'] = 'أُنشئ (لم يكن مرفوعاً)';
+                    $result['message'] = 'أنشئ (لم يكن مرفوعا)';
                 } else {
                     // تحقّق التعارض.
                     $serverUpdated = sync_updated_at($conn, $serverId);
@@ -116,7 +116,7 @@ function sync_push(): void
                         $serverRow = ts_load_one($conn, $ctx, $projectId, $serverId, true);
                         $result['status'] = 'conflict';
                         $result['server_id'] = $serverId;
-                        $result['message'] = 'نسخة الخادم أحدث — يلزم حلّ التعارض';
+                        $result['message'] = 'نسخة الخادم أحدث — يلزم حل التعارض';
                         $result['server_record'] = $serverRow ? ts_format_row($serverRow) : null;
                     } else {
                         $id = ts_save($conn, $ctx, $projectId, $payload, $serverId, null);
@@ -132,7 +132,7 @@ function sync_push(): void
                 }
                 if ($serverId <= 0) {
                     $result['status'] = 'applied';
-                    $result['message'] = 'غير موجود (يُعدّ محذوفاً)';
+                    $result['message'] = 'غير موجود (يعد محذوفا)';
                 } else {
                     $exists = ts_load_one($conn, $ctx, $projectId, $serverId, false);
                     if ($exists) {
@@ -151,7 +151,7 @@ function sync_push(): void
                             mysqli_commit($conn);
                         } catch (\Throwable $e) {
                             mysqli_rollback($conn);
-                            throw new TimesheetError('تعذّر الحذف', 500);
+                            throw new TimesheetError('تعذر الحذف', 500);
                         }
                     }
                     $result['status'] = 'applied';
@@ -166,7 +166,7 @@ function sync_push(): void
             $result['message'] = $e->getMessage();
         } catch (\Throwable $e) {
             $result['status'] = 'error';
-            $result['message'] = 'خطأ غير متوقّع';
+            $result['message'] = 'خطأ غير متوقع';
         }
 
         $results[] = $result;

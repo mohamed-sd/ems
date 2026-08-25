@@ -56,14 +56,14 @@ class BankReconService
         $ref = trim((string) (isset($head['statement_ref']) ? $head['statement_ref'] : ''));
         $from = (string) (isset($head['period_from']) ? $head['period_from'] : '');
         $to   = (string) (isset($head['period_to']) ? $head['period_to'] : '');
-        if ($acc <= 0)  { $out['code'] = 422; $out['reason'] = 'الحسابُ البنكيُّ إلزامي'; return $out; }
+        if ($acc <= 0)  { $out['code'] = 422; $out['reason'] = 'الحساب البنكي إلزامي'; return $out; }
         if ($ref === '') {
             $out['code'] = 422;
-            $out['reason'] = '**مرجعُ الكشف إلزامي** — وبلا مرجعٍ لا مفتاحَ عطالةٍ للاستيراد';
+            $out['reason'] = '**مرجع الكشف إلزامي** — وبلا مرجع لا مفتاح عطالة للاستيراد';
             return $out;
         }
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $from) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $to) || $to < $from) {
-            $out['code'] = 422; $out['reason'] = 'مدى الكشف غيرُ صالح'; return $out;
+            $out['code'] = 422; $out['reason'] = 'مدى الكشف غير صالح'; return $out;
         }
 
         // رأسُ الكشف — عاطلٌ بمفتاحه: الموجودُ يُعاد لا يُكرَّر
@@ -72,11 +72,11 @@ class BankReconService
             $stmt = $gate->selectOne('bank_statements', array(
                 'whereRaw' => 'bank_account_id = ? AND statement_ref = ?',
                 'params' => array($acc, $ref)));
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $stmt'); $stmt = null; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $stmt'); $stmt = null; }
 
         if ($stmt && (string) $stmt['state'] === 'closed') {
             $out['code'] = 423; $out['statement_id'] = (int) $stmt['id'];
-            $out['reason'] = 'الكشفُ مقفلٌ — لا استيرادَ عليه («التصحيحُ بعكسٍ لا بمحو»)';
+            $out['reason'] = 'الكشف مقفل — لا استيراد عليه («التصحيح بعكس لا بمحو»)';
             return $out;
         }
 
@@ -98,7 +98,7 @@ class BankReconService
                     'created_by' => (int) $actor ?: null,
                 ));
             } catch (\Throwable $t) {
-                $out['code'] = 422; $out['reason'] = 'تعذّر إنشاءُ الكشف: ' . $t->getMessage(); return $out;
+                $out['code'] = 422; $out['reason'] = 'تعذر إنشاء الكشف: ' . $t->getMessage(); return $out;
             }
         }
         $out['statement_id'] = $sid;
@@ -110,7 +110,7 @@ class BankReconService
                 "SELECT COALESCE(MAX(l.line_no),0) AS m FROM bank_statement_lines l
                   WHERE {TENANT_SCOPE} AND l.statement_id = ?", array($sid));
             $no = $mx ? (int) $mx[0]['m'] : 0;
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل بقيمةِ 0 — $no'); $no = 0; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل بقيمة 0 — $no'); $no = 0; }
 
         foreach ($lines as $l) {
             $no++;
@@ -121,13 +121,13 @@ class BankReconService
 
             if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)
                 || !in_array($dir, array('deposit', 'withdrawal'), true) || $amt <= 0) {
-                $out['rejected'][] = array('line_no' => $no, 'reason' => 'سطرٌ ناقصُ التاريخ أو الاتجاه أو المبلغ');
+                $out['rejected'][] = array('line_no' => $no, 'reason' => 'سطر ناقص التاريخ أو الاتجاه أو المبلغ');
                 continue;
             }
             if ($bref === '') {
                 // «Idempotent **بمفتاح السطر**» — وبلا مرجعٍ لا مفتاح
                 $out['rejected'][] = array('line_no' => $no,
-                    'reason' => '**سطرٌ بلا مرجعٍ بنكيّ** — ولا يُخترع له مفتاح');
+                    'reason' => '**سطر بلا مرجع بنكي** — ولا يخترع له مفتاح');
                 continue;
             }
             $key = sha1($sid . '|' . $bref . '|' . $date . '|' . $dir . '|' . number_format($amt, 2, '.', ''));
@@ -142,7 +142,7 @@ class BankReconService
                     'match_state' => 'unmatched',
                 ));
                 $out['inserted']++;
-            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'UQ على `line_key` — «الملفُّ نفسُه يُستورد مرارًا بصفر سطرٍ مكرر»');
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'UQ على `line_key` — «الملف نفسه يستورد مرارا بصفر سطر مكرر»');
                 // UQ على `line_key` — «الملفُّ نفسُه يُستورد مرارًا بصفر سطرٍ مكرر»
                 $out['skipped']++;
             }
@@ -151,15 +151,15 @@ class BankReconService
         try {
             $n = $gate->count('bank_statement_lines', array('where' => array('statement_id' => $sid)));
             $gate->update('bank_statements', array('lines_count' => (int) $n), array('id' => $sid));
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'عدّادٌ لا يوقف'); /* عدّادٌ لا يوقف */ }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'عداد لا يوقف'); /* عدّادٌ لا يوقف */ }
 
         self::audit($conn, $companyId, $actor, 'import', $sid, array(),
             array('inserted' => $out['inserted'], 'skipped' => $out['skipped'],
                   'rejected' => count($out['rejected'])));
 
         $out['ok'] = true; $out['code'] = 200;
-        $out['reason'] = 'الكشف #' . $sid . ': أُدرج ' . $out['inserted'] . ' سطرًا · '
-                       . 'مكرَّرٌ متخطًّى ' . $out['skipped'] . ' · مرفوضٌ ' . count($out['rejected']);
+        $out['reason'] = 'الكشف #' . $sid . ': أدرج ' . $out['inserted'] . ' سطرا · '
+                       . 'مكرر متخطى ' . $out['skipped'] . ' · مرفوض ' . count($out['rejected']);
         return $out;
     }
 
@@ -175,9 +175,9 @@ class BankReconService
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'matched' => 0,
                      'differences' => 0, 'none' => 0);
         $stmt = self::statementOf($gate, (int) $statementId);
-        if (!$stmt) { $out['code'] = 404; $out['reason'] = 'الكشفُ غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!$stmt) { $out['code'] = 404; $out['reason'] = 'الكشف غير موجود في نطاقك'; return $out; }
         if ((string) $stmt['state'] === 'closed') {
-            $out['code'] = 423; $out['reason'] = 'الكشفُ مقفل'; return $out;
+            $out['code'] = 423; $out['reason'] = 'الكشف مقفل'; return $out;
         }
 
         $lines = array();
@@ -186,14 +186,14 @@ class BankReconService
                 "SELECT l.* FROM bank_statement_lines l
                   WHERE {TENANT_SCOPE} AND l.statement_id = ? AND l.match_state = 'unmatched'
                   ORDER BY l.line_no", array((int) $statementId));
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $lines'); $lines = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $lines'); $lines = array(); }
 
         foreach ($lines as $l) {
             $cand = self::findCounterpart($gate, $l);
             if ($cand === null) {
                 // «بلا نظير» — يُعلَن ولا يُخترع له سند
                 self::writeMatch($gate, $companyId, $l, null, 'none',
-                    'لا نظيرَ في سندات النظام (مرجعًا ولا مبلغًا بتاريخه ± '
+                    'لا نظير في سندات النظام (مرجعا ولا مبلغا بتاريخه ± '
                     . self::DATE_WINDOW_DAYS . ' أيام)', 0.0, 'no_counterpart', $actor);
                 $out['none']++;
                 continue;
@@ -213,7 +213,7 @@ class BankReconService
             array('matched' => $out['matched'], 'differences' => $out['differences'], 'none' => $out['none']));
 
         $out['ok'] = true; $out['code'] = 200;
-        $out['reason'] = 'مطابقٌ ' . $out['matched'] . ' · فرقٌ ' . $out['differences']
+        $out['reason'] = 'مطابقٌ ' . $out['matched'] . ' · فرق ' . $out['differences']
                        . ' · بلا نظير ' . $out['none'];
         return $out;
     }
@@ -237,7 +237,7 @@ class BankReconService
             "p.direction = ? AND p.bank_ref = ? AND p.bank_ref <> 'legacy_no_ref'",
             array($sysDir, $bref));
         $free = self::firstFree($gate, $rows);
-        if ($free) { return array('row' => $free, 'rule' => 'المرجعُ البنكيُّ مطابق: ' . $bref); }
+        if ($free) { return array('row' => $free, 'rule' => 'المرجع البنكي مطابق: ' . $bref); }
 
         // ② بالمبلغ والتاريخ ± أيام
         $rows = self::payments($gate,
@@ -247,7 +247,7 @@ class BankReconService
         $free = self::firstFree($gate, $rows);
         if ($free) {
             return array('row' => $free,
-                'rule' => 'المبلغُ ' . $amt . ' والتاريخُ ضمن ±' . self::DATE_WINDOW_DAYS . ' أيام');
+                'rule' => 'المبلغ ' . $amt . ' والتاريخ ضمن ±' . self::DATE_WINDOW_DAYS . ' أيام');
         }
         return null;
     }
@@ -261,15 +261,15 @@ class BankReconService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '');
         $m = self::matchOf($gate, (int) $matchId);
-        if (!$m) { $out['code'] = 404; $out['reason'] = 'المضاهاةُ غيرُ موجودة'; return $out; }
+        if (!$m) { $out['code'] = 404; $out['reason'] = 'المضاهاة غير موجودة'; return $out; }
         $r = trim((string) $why);
         if ($r === '') {
             $out['code'] = 422;
-            $out['reason'] = '**سببُ الفرق إلزامي** — «فتحُ فرقٍ بسبب» (§19)، وفرقٌ بلا سببٍ لا يُحسم';
+            $out['reason'] = '**سبب الفرق إلزامي** — «فتح فرق بسبب» (§19)، وفرق بلا سبب لا يحسم';
             return $out;
         }
         if (in_array((string) $m['state'], array('resolved', 'rejected'), true)) {
-            $out['code'] = 409; $out['reason'] = 'المضاهاةُ محسومةٌ سلفًا (' . $m['state'] . ')'; return $out;
+            $out['code'] = 409; $out['reason'] = 'المضاهاة محسومة سلفا (' . $m['state'] . ')'; return $out;
         }
         try {
             $gate->update('bank_recon_matches',
@@ -278,7 +278,7 @@ class BankReconService
             $gate->update('bank_statement_lines', array('match_state' => 'difference'),
                 array('id' => (int) $m['statement_line_id']));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الفتح: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الفتح: ' . $t->getMessage(); return $out;
         }
         self::audit($conn, $companyId, $actor, 'open_difference', (int) $matchId,
             array('state' => $m['state']), array('state' => 'open_difference', 'reason' => $r));
@@ -294,24 +294,24 @@ class BankReconService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'event_id' => null, 'amount' => 0.0);
         $m = self::matchOf($gate, (int) $matchId);
-        if (!$m) { $out['code'] = 404; $out['reason'] = 'المضاهاةُ غيرُ موجودة'; return $out; }
+        if (!$m) { $out['code'] = 404; $out['reason'] = 'المضاهاة غير موجودة'; return $out; }
         if ((string) $m['state'] !== 'open_difference') {
             $out['code'] = 409;
-            $out['reason'] = 'الحسمُ للفروق المفتوحة وحدَها (حالُها: ' . $m['state'] . ')';
+            $out['reason'] = 'الحسم للفروق المفتوحة وحدها (حالها: ' . $m['state'] . ')';
             return $out;
         }
         if ($m['adjustment_event_id'] !== null) {
             $out['code'] = 409; $out['event_id'] = (int) $m['adjustment_event_id'];
-            $out['reason'] = 'للفرق قيدُ تسويةٍ قائمٌ #' . (int) $m['adjustment_event_id'];
+            $out['reason'] = 'للفرق قيد تسوية قائم #' . (int) $m['adjustment_event_id'];
             return $out;
         }
         $decision = (string) $decision;
         if (!in_array($decision, array('adjust', 'reject'), true)) {
-            $out['code'] = 422; $out['reason'] = 'القرار: تسويةٌ (adjust) أو رفض (reject)'; return $out;
+            $out['code'] = 422; $out['reason'] = 'القرار: تسوية (adjust) أو رفض (reject)'; return $out;
         }
         $why = trim((string) $note);
         if ($why === '') {
-            $out['code'] = 422; $out['reason'] = '**قرارُ الفرق يُسجَّل بسببه** — ولا يكون صامتًا'; return $out;
+            $out['code'] = 422; $out['reason'] = '**قرار الفرق يسجل بسببه** — ولا يكون صامتا'; return $out;
         }
 
         $diff = round((float) $m['difference'], 2);
@@ -335,7 +335,7 @@ class BankReconService
                     array('id' => (int) $m['statement_line_id']));
             }, 'حسم فرق مطابقة ' . $matchId);
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الحسم: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الحسم: ' . $t->getMessage(); return $out;
         }
 
         self::audit($conn, $companyId, $actor, 'resolve_difference', (int) $matchId,
@@ -355,9 +355,9 @@ class BankReconService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'open' => array());
         $stmt = self::statementOf($gate, (int) $statementId);
-        if (!$stmt) { $out['code'] = 404; $out['reason'] = 'الكشفُ غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!$stmt) { $out['code'] = 404; $out['reason'] = 'الكشف غير موجود في نطاقك'; return $out; }
         if ((string) $stmt['state'] === 'closed') {
-            $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'مقفلٌ سلفًا'; return $out;
+            $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'مقفل سلفا'; return $out;
         }
 
         $open = array();
@@ -370,7 +370,7 @@ class BankReconService
                    LEFT JOIN bank_statement_lines l ON l.id = m.statement_line_id
                   WHERE {TENANT_SCOPE} AND l.statement_id = ? AND m.state = 'open_difference'
                   ORDER BY l.line_no", array((int) $statementId));
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $open'); $open = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $open'); $open = array(); }
 
         // «كشفٌ نصفُ مضاهًى ليس مقفلًا»: كلُّ سطرٍ غيرِ `matched` مانعٌ —
         // غيرُ المضاهى · وذو الفرق الذي لم يُبتّ · وبلا النظير.
@@ -381,15 +381,15 @@ class BankReconService
                   WHERE {TENANT_SCOPE} AND l.statement_id = ? AND l.match_state <> 'matched'",
                 array((int) $statementId));
             $pending = $u ? (int) $u[0]['n'] : 0;
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل بقيمةِ 0 — $pending'); $pending = 0; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل بقيمة 0 — $pending'); $pending = 0; }
 
         if ($open || $pending > 0) {
             $out['code'] = 423; $out['open'] = $open;
             $names = array();
             foreach ($open as $o) { $names[] = 'سطر ' . (int) $o['line_no'] . ' (فرق ' . $o['difference'] . ')'; }
-            $out['reason'] = '**لا إقفالَ وفرقٌ مفتوح** (§19): '
-                . (count($open) > 0 ? (count($open) . ' فرقًا مفتوحًا — ' . implode(' · ', array_slice($names, 0, 5))) : '')
-                . ($pending > 0 ? ((count($open) > 0 ? ' · ' : '') . $pending . ' سطرًا لم يستقر على «مطابق»') : '');
+            $out['reason'] = '**لا إقفال وفرق مفتوح** (§19): '
+                . (count($open) > 0 ? (count($open) . ' فرقا مفتوحا — ' . implode(' · ', array_slice($names, 0, 5))) : '')
+                . ($pending > 0 ? ((count($open) > 0 ? ' · ' : '') . $pending . ' سطرا لم يستقر على «مطابق»') : '');
             return $out;
         }
 
@@ -399,11 +399,11 @@ class BankReconService
                 'closed_by' => (int) $actor ?: null,
             ), array('id' => (int) $statementId));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الإقفال: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الإقفال: ' . $t->getMessage(); return $out;
         }
         self::audit($conn, $companyId, $actor, 'close', (int) $statementId,
             array('state' => $stmt['state']), array('state' => 'closed'));
-        $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'أُقفل الكشفُ بصفر فرقٍ مفتوح';
+        $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'أقفل الكشف بصفر فرق مفتوح';
         return $out;
     }
 
@@ -437,7 +437,7 @@ class BankReconService
                   WHERE {TENANT_SCOPE} AND l2.statement_id = ? AND m.state = 'open_difference'",
                 array((int) $statementId));
             $out['open_diff'] = $d ? (int) $d[0]['n'] : 0;
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ لا توقف'); /* قراءةٌ لا توقف */ }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة لا توقف'); /* قراءةٌ لا توقف */ }
         if ($out['lines'] > 0) { $out['rate'] = round($out['matched'] * 100.0 / $out['lines'], 2); }
         return $out;
     }
@@ -507,7 +507,7 @@ class BankReconService
                 $taken = $gate->selectOne('bank_recon_matches', array(
                     'whereRaw' => 'payment_id = ? AND state <> ?',
                     'params' => array((int) $r['id'], 'rejected')));
-            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $taken'); $taken = null; }
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $taken'); $taken = null; }
             if (!$taken) { return $r; }
         }
         return null;
@@ -565,7 +565,7 @@ class BankReconService
             'amount'            => round(abs($diff), 2),
             /* ◆ عملةُ الفرقِ من حسابِ كشفِه — لا حرفٌ مغروز */
             'currency'          => self::matchCurrency($conn, $companyId, $matchId),
-            'notes'             => 'قيدُ تسويةِ فرقٍ بنكيٍّ — مضاهاة #' . (int) $matchId,
+            'notes'             => 'قيد تسوية فرق بنكي — مضاهاة #' . (int) $matchId,
             'payload'           => array('match_id' => (int) $matchId, 'difference' => $diff,
                                          'decision_note' => $why),
         ));
@@ -595,7 +595,7 @@ class BankReconService
                 $acc = $gate->selectOne('fin_bank_accounts', array(
                     'columns' => array('currency'), 'where' => array('id' => (int) $accountId)));
             } catch (\Throwable $t) {
-                ems_catch_ignored($t, __METHOD__, 'قراءةٌ فاشلةٌ تُعامَل كغيابٍ — تُجرَّب عملةُ الأساس');
+                ems_catch_ignored($t, __METHOD__, 'قراءة فاشلة تعامل كغياب — تجرب عملة الأساس');
                 $acc = null;
             }
         }

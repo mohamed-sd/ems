@@ -31,8 +31,8 @@ $conn->set_charset('utf8mb4');
 
 $r  = ExpiryJob::run($conn);
 $bg = BreakGlassService::sweepUnreviewed($conn);
-fwrite(STDOUT, "الصلاحيات: أُسقط " . intval($r['exceptions']) . " استثناءً و" . intval($r['positions'])
-    . " مركزًا · وأُعيد بناء المشتق لـ" . intval($r['rebuilt']) . " شخصًا · تنبيهات: " . intval($r['notified'])
+fwrite(STDOUT, "الصلاحيات: أسقط " . intval($r['exceptions']) . " استثناء و" . intval($r['positions'])
+    . " مركزا · وأعيد بناء المشتق ل" . intval($r['rebuilt']) . " شخصا · تنبيهات: " . intval($r['notified'])
     . " · وكسر زجاج ساقط بلا مراجعة: " . intval($bg) . "\n");
 
 /* ══ MD-05 · تبنّي الكنّاساتِ الدورية — بناؤها ليس تبنّيها ══════════════════
@@ -74,8 +74,8 @@ foreach ($__sweeps as $__label => $__fn) {
         fwrite(STDOUT, '  · ' . $__label . ': ' . (is_numeric($__n) ? intval($__n) : 'تمّ') . "\n");
     } catch (\Throwable $__se) {
         ems_catch_ignored($__se, 'cron_permissions',
-            'كنّاسةٌ دوريةٌ واحدةٌ فشلت — أخواتُها تستمرُّ وتُعاد في الدورةِ التالية: ' . $__label);
-        fwrite(STDOUT, '  ✘ ' . $__label . ": تعذّرت — سُجِّل السبب\n");
+            'كناسة دورية واحدة فشلت — أخواتها تستمر وتعاد في الدورة التالية: ' . $__label);
+        fwrite(STDOUT, '  ✘ ' . $__label . ": تعذرت — سجل السبب\n");
     }
 }
 
@@ -83,11 +83,11 @@ foreach ($__sweeps as $__label => $__fn) {
    وهو شرطُ العبورِ من التشغيلِ المزدوجِ إلى المصدرِ الواحد. */
 try {
     $__ph = PermSourceService::phaseReport($conn);
-    fwrite(STDOUT, '  · مصدرُ الصلاحية: ' . PermSourceService::currentSource()
-        . ' · صفرُ فرقٍ منذ ' . intval($__ph['zero_diff_streak_days'] ?? 0) . " يومًا\n");
+    fwrite(STDOUT, '  · مصدر الصلاحية: ' . PermSourceService::currentSource()
+        . ' · صفر فرق منذ ' . intval($__ph['zero_diff_streak_days'] ?? 0) . " يوما\n");
 } catch (\Throwable $__pe) {
     ems_catch_ignored($__pe, 'cron_permissions',
-        'تقريرُ مصدرِ الصلاحيةِ تعذّر — لا يؤثر في الكنسِ نفسِه');
+        'تقرير مصدر الصلاحية تعذر — لا يؤثر في الكنس نفسه');
 }
 
 exit(0);

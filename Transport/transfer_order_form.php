@@ -264,9 +264,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
            ◆ والمنعُ يسمّي سببَه ولا يصمت. */
         if ($trans === 'plan' || $trans === 'close') {
             $selfDeny = ems_assert_not_self_approval($conn, 'transfer_orders', 'id', $id,
-                'أمرُ الترحيل ' . (string) ($orow['order_no'] ?? $id), $company_of);
+                'أمر الترحيل ' . (string) ($orow['order_no'] ?? $id), $company_of);
             if ($selfDeny !== null) {
-                $why = (string) ($selfDeny['reason'] ?? 'لا يجوز اعتمادُ ما أنشأتَه بنفسك');
+                $why = (string) ($selfDeny['reason'] ?? 'لا يجوز اعتماد ما أنشأته بنفسك');
                 ems_gov_redirect('Location: transfer_order_form.php?id=' . $id
                     . '&msg=' . rawurlencode($why) . '+❌');
                 exit();
@@ -276,7 +276,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($trans === 'plan') {
             // ربط بمشروع/مركز تكلفة قبل الاعتماد (§ب.8)
             $has_center = ($orow['project_id'] !== null) || (trim((string)$orow['analytic_cost_center']) !== '');
-            if (!$has_center) { $err = 'الاعتماد+يتطلب+ربطاً+بمشروع+أو+مركز+تكلفة'; }
+            if (!$has_center) { $err = 'الاعتماد+يتطلب+ربطا+بمشروع+أو+مركز+تكلفة'; }
         } elseif ($trans === 'prepare') {
             // عناصر + مسار؛ وللمعدة: وسيلة نقل + تصريح ساري (§ب.8 / §7.6)
             $nlines = trs_gate($is_super_admin)->count('transfer_lines', array('where' => array('order_id' => $id)));
@@ -295,9 +295,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                  الشاشةُ وأيُّ شاشةٍ أخرى، فلا يتفرّق الشرطُ نسخًا. */
             $__rdy = trs_readiness_gate(trs_gate($is_super_admin), $id);
             $has_valid_permit = !empty($__rdy['ok']);
-            if ($nlines === 0) { $err = 'لا+تجهيز+دون+عنصرٍ+منقولٍ+واحدٍ+على+الأقل'; }
+            if ($nlines === 0) { $err = 'لا+تجهيز+دون+عنصر+منقول+واحد+على+الأقل'; }
             elseif (trim((string)$orow['route']) === '') { $err = 'لا+تجهيز+دون+تحديد+المسار'; }
-            elseif ($has_equip && (empty($orow['vehicle_id']) || !$has_valid_permit)) { $err = 'ترحيل+المعدة+يتطلب+مركبة+ناقلة+وتصريحاً+سارياً'; }
+            elseif ($has_equip && (empty($orow['vehicle_id']) || !$has_valid_permit)) { $err = 'ترحيل+المعدة+يتطلب+مركبة+ناقلة+وتصريحا+ساريا'; }
         } elseif ($trans === 'confirm_departure') {
             $rel = trs_save_proof($conn, $company_of, $id, $_FILES['proof'] ?? null, 'departure_proof', $current_user_id);
             if (!$rel) { $err = 'تأكيد+المغادرة+يتطلب+إرفاق+إثبات+(صورة/PDF)'; }
@@ -313,7 +313,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'where' => array('order_id' => $id),
                 'whereRaw' => "(analytic_cost_center IS NULL OR analytic_cost_center='')",
             ));
-            if (empty($orow['cost_bearer'])) { $err = 'لا+إغلاق+دون+تحديد+متحمِّل+التكلفة'; }
+            if (empty($orow['cost_bearer'])) { $err = 'لا+إغلاق+دون+تحديد+متحمل+التكلفة'; }
             elseif ($no_center > 0) { $err = 'كل+بند+تكلفة+يجب+أن+يحمل+مركز+تكلفة+قبل+الإغلاق'; }
         }
         // reopen: بلا حارس (بيد صاحب صلاحية الحذف/المدير)
@@ -332,12 +332,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id = intval($_POST['id'] ?? 0);
         $reason = trim($_POST['reason'] ?? '');
         if (!$can_delete || !trs_order_owned($conn, $id, $is_super_admin, $company_id)) { ems_gov_redirect("Location: transfer_order_form.php?id=$id&msg=غير+مسموح+❌"); exit(); }
-        if ($reason === '') { ems_gov_redirect("Location: transfer_order_form.php?id=$id&msg=الإلغاء+يتطلب+سبباً+❌"); exit(); }
+        if ($reason === '') { ems_gov_redirect("Location: transfer_order_form.php?id=$id&msg=الإلغاء+يتطلب+سببا+❌"); exit(); }
         $orow = trs_gate($is_super_admin)->selectOne('transfer_orders', array(
             'columns' => array('stage', 'company_id'), 'where' => array('id' => $id),
         ));
         if (!$orow || in_array($orow['stage'], array('closed', 'cancelled'), true)) {
-            ems_gov_redirect("Location: transfer_order_form.php?id=$id&msg=لا+يمكن+إلغاء+أمرٍ+مغلقٍ+أو+ملغى+❌"); exit();
+            ems_gov_redirect("Location: transfer_order_form.php?id=$id&msg=لا+يمكن+إلغاء+أمر+مغلق+أو+ملغى+❌"); exit();
         }
         $cof = intval($orow['company_id']);
         trs_gate($is_super_admin)->update('transfer_orders', array('stage' => 'cancelled'), array('id' => $id));
@@ -431,7 +431,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     );
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا بياناتِ أمرِ ترحيلٍ لعرضها بعدُ', 'املأ رأسَ الأمرِ واحفظه لتُفتحَ تبويباتُ العناصرِ والتكاليفِ والتصاريح');
+    echo ems_states_bundle('لا بيانات أمر ترحيل لعرضها بعد', 'املأ رأس الأمر واحفظه لتفتح تبويبات العناصر والتكاليف والتصاريح');
     ?>
     <?php trs_msg_banner(); ?>
 
@@ -479,10 +479,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="hidden" name="id" value="<?php echo intval($order_id); ?>">
                     <input type="hidden" name="trans" value="<?php echo $k; ?>">
                     <label class="trs-of-lbl"><i class="fa <?php echo $tt['icon']; ?>" data-allow-style style="color:<?php echo $tt['color']; ?>"></i> <?php echo htmlspecialchars($tt['label']); ?></label>
-                    <input type="file" name="proof" aria-label="إثباتُ التنفيذ — صورةٌ أو ملفُّ PDF" accept="image/*,application/pdf" required class="trs-of-file">
+                    <input type="file" name="proof" aria-label="إثبات التنفيذ — صورة أو ملف PDF" accept="image/*,application/pdf" required class="trs-of-file">
                     <?php if ($k === 'confirm_arrival'): ?>
-                        <input type="text" name="gps_lat" placeholder="GPS lat" aria-label="إحداثيُّ خطِّ العرضِ عند الوصول" class="trs-of-gps">
-                        <input type="text" name="gps_lng" placeholder="GPS lng" aria-label="إحداثيُّ خطِّ الطولِ عند الوصول" class="trs-of-gps">
+                        <input type="text" name="gps_lat" placeholder="GPS lat" aria-label="إحداثي خط العرض عند الوصول" class="trs-of-gps">
+                        <input type="text" name="gps_lng" placeholder="GPS lng" aria-label="إحداثي خط الطول عند الوصول" class="trs-of-gps">
                     <?php endif; ?>
                     <button type="submit" class="btn-primary" data-allow-style style="background:<?php echo $tt['color']; ?>"><i class="fa fa-check"></i> تأكيد</button>
                 </form>
@@ -499,7 +499,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
             <?php if ($can_delete && !in_array($cur, array('closed', 'cancelled'), true)): ?>
             <form action="transfer_order_form.php?id=<?php echo intval($order_id); ?>" method="post"
-                  class="trs-of-row" onsubmit="return confirm('إلغاء الأمر نهائياً (مع تسجيل السبب)؟');">
+                  class="trs-of-row" onsubmit="return confirm('إلغاء الأمر نهائيا (مع تسجيل السبب)؟');">
                 <input type="hidden" name="action" value="cancel">
                 <input type="hidden" name="id" value="<?php echo intval($order_id); ?>">
                 <input type="text" name="reason" placeholder="سبب الإلغاء (إلزامي)" aria-label="سبب الإلغاء (إلزامي)" required class="trs-of-reason">
@@ -520,7 +520,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <button type="button" class="btn-primary trs-tab-btn" data-tab="lines"><i class="fa fa-boxes-stacked"></i> العناصر المنقولة</button>
         <button type="button" class="btn-primary trs-tab-btn" data-tab="costs"><i class="fa fa-hand-holding-dollar"></i> بنود التكلفة</button>
         <button type="button" class="btn-primary trs-tab-btn" data-tab="permits"><i class="fa fa-file-shield"></i> التصاريح</button>
-        <button type="button" class="btn-primary trs-tab-btn" data-tab="events"><i class="fa fa-clock-rotate-left"></i> سجلّ الأحداث</button>
+        <button type="button" class="btn-primary trs-tab-btn" data-tab="events"><i class="fa fa-clock-rotate-left"></i> سجل الأحداث</button>
     </div></div>
     <?php endif; ?>
 
@@ -580,7 +580,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="form-grid">
                     <div class="form-group"><label for="emsf_547_7b262">كود الحركة (محسوب)</label><input type="text" id="emsf_547_7b262" disabled value="<?php echo htmlspecialchars($order['order_no']); ?>"></div>
                     <div class="form-group"><label for="emsf_548_7bc79">مدة المشروع (يوم — محسوب)</label><input type="text" id="emsf_548_7bc79" disabled value="<?php echo htmlspecialchars((string)($order['project_days'] ?? '—')); ?>"></div>
-                    <div class="form-group"><label for="emsf_549_761eb">المتحمِّل (محسوب من القواعد)</label><input type="text" id="emsf_549_761eb" disabled value="<?php echo htmlspecialchars($order['cost_bearer'] ? trs_label($bearers, $order['cost_bearer']) : '—'); ?>"></div>
+                    <div class="form-group"><label for="emsf_549_761eb">المتحمل (محسوب من القواعد)</label><input type="text" id="emsf_549_761eb" disabled value="<?php echo htmlspecialchars($order['cost_bearer'] ? trs_label($bearers, $order['cost_bearer']) : '—'); ?>"></div>
                     <div class="form-group"><label for="emsf_550_1b8a2">التكلفة الفعلية (USD — محسوب)</label><input type="text" id="emsf_550_1b8a2" disabled value="<?php echo number_format((float)($order['actual_cost_usd'] ?? 0), 2); ?>"></div>
                 </div>
             </div>
@@ -607,7 +607,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="form-group"><label for="emsf_552_1c57b">المعدة</label><select name="equipment_id" id="emsf_552_1c57b"><?php echo trs_equipment_options($conn, $is_super_admin, $company_id, 0); ?></select></div>
                 <div class="form-group"><label for="emsf_553_2a720">مرجع المرفق</label><input type="text" name="attachment_ref" placeholder="جردل / جاك همر ..." id="emsf_553_2a720"></div>
                 <div class="form-group"><label for="emsf_554_385e4">الصنف (مخزون)</label><select name="product_id" id="emsf_554_385e4"><?php echo trs_item_options($conn, $is_super_admin, $company_id, 0); ?></select></div>
-                <div class="form-group"><label for="emsf_555_5038e">الموظف/المشغّل</label><select name="employee_id" id="emsf_555_5038e"><?php echo trs_employee_options($conn, $is_super_admin, $company_id, 0); ?></select></div>
+                <div class="form-group"><label for="emsf_555_5038e">الموظف/المشغل</label><select name="employee_id" id="emsf_555_5038e"><?php echo trs_employee_options($conn, $is_super_admin, $company_id, 0); ?></select></div>
                 <div class="form-group"><label for="emsf_556_6252b">الكمية</label><input type="number" step="0.01" name="quantity" value="" id="emsf_556_6252b"></div>
                 <div class="form-group trs-of-full"><label for="emsf_557_419d9">ملاحظة</label><input type="text" name="line_note" id="emsf_557_419d9"></div>
             </div></div>
@@ -619,10 +619,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <table class="display nowrap alltables no-datatable trs-of-tbl"><thead><tr>
                 <th>الإجراءات</th><th>النوع</th><th>المعدة</th><th>المرفق</th><th>الصنف</th><th>الموظف</th><th>الكمية</th><th>ملاحظة</th>
                 <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                 <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                 <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                 <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -671,7 +671,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="form-group"><label for="emsf_559_3b97e">المبلغ (محلي) <span class="required">*</span></label><input type="number" step="0.01" name="amount_local" required id="emsf_559_3b97e"></div>
                 <div class="form-group"><label for="emsf_560_64439">العملة</label><select name="currency" id="emsf_560_64439"><?php foreach ($currencies as $k => $v) echo "<option value='$k'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
                 <div class="form-group"><label for="emsf_561_21354">سعر الصرف → USD</label><input type="number" step="0.000001" name="fx_rate" placeholder="مثال: 0.00166" id="emsf_561_21354"></div>
-                <div class="form-group"><label for="emsf_562_00122">المتحمِّل <span class="required">*</span></label>
+                <div class="form-group"><label for="emsf_562_00122">المتحمل <span class="required">*</span></label>
                     <select name="cost_bearer" required id="emsf_562_00122"><?php foreach ($bearers as $k => $v) { $sel = ($order['cost_bearer'] === $k) ? ' selected' : ''; echo "<option value='$k'$sel>" . htmlspecialchars($v) . "</option>"; } ?></select></div>
                 <div class="form-group"><label for="emsf_563_d49af">مركز التكلفة</label><input type="text" name="cl_center" id="emsf_563_d49af" value="<?php echo htmlspecialchars($order['analytic_cost_center'] ?? ''); ?>"></div>
             </div></div>
@@ -681,7 +681,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <?php endif; ?>
         <div class="card"><div class="card-body"><div class="table-container">
             <table class="display nowrap alltables no-datatable trs-of-tbl"><thead><tr>
-                <th>الإجراءات</th><th>النوع</th><th>المبلغ المحلي</th><th>العملة</th><th>سعر الصرف</th><th>USD</th><th>المتحمِّل</th><th>مركز التكلفة</th>
+                <th>الإجراءات</th><th>النوع</th><th>المبلغ المحلي</th><th>العملة</th><th>سعر الصرف</th><th>USD</th><th>المتحمل</th><th>مركز التكلفة</th>
             </tr></thead><tbody>
             <?php
             $cost_rows = trs_gate($is_super_admin)->select('transfer_cost_lines', array(
@@ -717,7 +717,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
                 <div class="form-group"><label for="emsf_564_08e0b">نوع التصريح <span class="required">*</span></label>
                     <select name="permit_type" required id="emsf_564_08e0b"><?php foreach ($permit_types as $k => $v) echo "<option value='$k'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
-                <div class="form-group"><label for="emsf_565_09db3">الجهة المصدِرة</label><input type="text" name="authority" id="emsf_565_09db3"></div>
+                <div class="form-group"><label for="emsf_565_09db3">الجهة المصدرة</label><input type="text" name="authority" id="emsf_565_09db3"></div>
                 <div class="form-group"><label for="emsf_566_7ac79">تاريخ الإصدار</label><input type="date" name="issue_date" id="emsf_566_7ac79"></div>
                 <div class="form-group"><label for="emsf_567_415f8">تاريخ الانتهاء</label><input type="date" name="expiry_date" id="emsf_567_415f8"></div>
                 <div class="form-group"><label for="emsf_568_2ebc8">الحالة</label>

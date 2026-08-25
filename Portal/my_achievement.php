@@ -64,7 +64,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array(array('href' => 'my_certificate.php', 'icon' => 'fa fa-certificate', 'label' => 'شهادة الإنجاز'));
     include('../includes/page_header.php');
     // حزمةُ الحالاتِ الدنيا (بوابة ٩) — مخفيةٌ افتراضًا ويُظهرها منطقُ الشاشة
-    echo ems_states_bundle('لا قياساتِ إنجازٍ لهذه الفترة', 'غيّر الفترةَ أو الصفةَ ثم اضغط «قِس» لقياسِ إنجازي من مصادرِه');
+    echo ems_states_bundle('لا قياسات إنجاز لهذه الفترة', 'غير الفترة أو الصفة ثم اضغط «قس» لقياس إنجازي من مصادره');
     ?>
 
     <div class="card"><div class="card-body">
@@ -82,7 +82,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </select>
             <label for="emsf_370_07324">من</label><input type="date" name="from" id="emsf_370_07324" value="<?php echo htmlspecialchars($from); ?>">
             <label for="emsf_371_48875">إلى</label><input type="date" name="to" id="emsf_371_48875" value="<?php echo htmlspecialchars($to); ?>">
-            <button type="submit" class="btn-primary"><i class="fa fa-calculator"></i> قِس</button>
+            <button type="submit" class="btn-primary"><i class="fa fa-calculator"></i> قس</button>
             <?php
             /* أقراصُ الاختصارِ — ملاحظةٌ مُعلَنةٌ (`filter-note`) لا نصٌّ حُرّ:
                فالعونُ يترك ما أعلنتْه الشاشةُ، والتصميمُ في `ems-filters.css`.
@@ -113,8 +113,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="alert alert-danger"><?php echo htmlspecialchars($res['reason']); ?></div>
     <?php elseif ($res !== null): ?>
     <div class="card"><div class="card-header"><h5><i class="fa fa-gauge-high"></i>
-        المؤشراتُ السبعة — <?php echo htmlspecialchars($from . ' → ' . $to); ?>
-        <small class="ems-pta-muted">(لُقطت ببصمتها #<?php echo intval($res['snap_id']); ?>)</small></h5></div>
+        المؤشرات السبعة — <?php echo htmlspecialchars($from . ' → ' . $to); ?>
+        <small class="ems-pta-muted">(لقطت ببصمتها #<?php echo intval($res['snap_id']); ?>)</small></h5></div>
     <div class="card-body"><div class="table-container">
         <table class="alltables display nowrap ems-pta-w100" data-no-dt="1">
             <thead><tr><th>المؤشر</th><th>الفترة</th><th>الفترة السابقة (بالطول نفسه)</th>
@@ -122,19 +122,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="ems-fn-th" data-fn="1">الموظف</th>
               <th class="ems-fn-th" data-fn="1">الإدارة</th>
               <th class="ems-fn-th" data-fn="1">المدى المختار</th>
-              <th class="ems-fn-th" data-fn="1">المهام المسنَدة</th>
-              <th class="ems-fn-th" data-fn="1">المنجَزة في المهلة</th>
+              <th class="ems-fn-th" data-fn="1">المهام المسندة</th>
+              <th class="ems-fn-th" data-fn="1">المنجزة في المهلة</th>
               <th class="ems-fn-th" data-fn="1">المتأخرة</th>
               <th class="ems-fn-th" data-fn="1">نسبة الالتزام</th>
               <th class="ems-fn-th" data-fn="1">ساعات العمل</th>
               <th class="ems-fn-th" data-fn="1">الإنتاج المنسوب</th>
               <th class="ems-fn-th" data-fn="1">نسبة الإنجاز من المستهدف</th>
               <th class="ems-fn-th" data-fn="1">البلاغات المرفوعة</th>
-              <th class="ems-fn-th" data-fn="1">البلاغات المعالَجة</th>
+              <th class="ems-fn-th" data-fn="1">البلاغات المعالجة</th>
               <th class="ems-fn-th" data-fn="1">الترتيب في الإدارة</th>
               <th class="ems-fn-th" data-fn="1">تاريخ التوليد</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
               </tr></thead>
             <tbody>
             <?php foreach ($LABELS as $k => $lbl):
@@ -159,8 +159,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </tbody>
         </table>
     </div>
-    <p class="ems-pta-note">«المؤشرُ الذي لا يخصّ فئةً لا يُعرض لها صفرًا مضلِّلًا
-        بل يُخفى بنصِّ <strong>لا ينطبق</strong> — فالمقارنةُ تبقى عادلة» (USR-01 §6).</p>
+    <p class="ems-pta-note">«المؤشر الذي لا يخص فئة لا يعرض لها صفرا مضللا
+        بل يخفى بنص <strong>لا ينطبق</strong> — فالمقارنة تبقى عادلة» (USR-01 §6).</p>
     </div></div>
     <?php endif; ?>
 </div>

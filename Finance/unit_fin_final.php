@@ -36,8 +36,8 @@ $__pcPrep = ems_post_contract($conn, array(
     'validate' => function (array $in) {
         $e = intval($in['entry_id'] ?? 0);
         $p = (string) ($in['period'] ?? '');
-        if ($e <= 0) { return array('ok' => false, 'msg' => 'واقعةٌ غيرُ صالحة (422)'); }
-        if (!preg_match('/^\d{4}-\d{2}$/', $p)) { return array('ok' => false, 'msg' => 'الفترةُ بصيغةِ YYYY-MM (422)'); }
+        if ($e <= 0) { return array('ok' => false, 'msg' => 'واقعة غير صالحة (422)'); }
+        if (!preg_match('/^\d{4}-\d{2}$/', $p)) { return array('ok' => false, 'msg' => 'الفترة بصيغة YYYY-MM (422)'); }
         return array('ok' => true, 'data' => array('entry_id' => $e, 'period' => $p));
     },
 ));
@@ -60,7 +60,7 @@ foreach (array(
         'idem' => array('id' => intval($_POST[$trig] ?? 0)),
         'validate' => function (array $in) use ($trig) {
             $id = intval($in[$trig] ?? 0);
-            if ($id <= 0) { return array('ok' => false, 'msg' => 'سجلٌّ غيرُ صالح (422)'); }
+            if ($id <= 0) { return array('ok' => false, 'msg' => 'سجل غير صالح (422)'); }
             return array('ok' => true, 'data' => array('id' => $id));
         },
     ));
@@ -101,7 +101,7 @@ try {
         $rows[$k]['entry_no']    = $e ? $e['entry_no'] : null;
         $rows[$k]['entry_state'] = $e ? $e['state'] : '—';
     }
-} catch (\Throwable $e) { $queueFail = 'تعذّر قراءةُ الطابور: ' . $e->getMessage(); }
+} catch (\Throwable $e) { $queueFail = 'تعذر قراءة الطابور: ' . $e->getMessage(); }
 
 /* مرشَّحاتُ الإعداد — وقائعُ اكتملت سلسلتُها التجاريةُ ولم تُقفَل بعد */
 $cand = array();
@@ -131,16 +131,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   <?php
   $header_icon = 'fa fa-lock';
   $header_title_html = htmlspecialchars('الاعتماد المالي النهائي', ENT_QUOTES, 'UTF-8');
-  ob_start(); ?><span class="badge"><?= $queueFail === '' ? count($rows) : '—' ?> سجلًّا · <?= count($cand) ?> مرشَّحًا</span><?php
+  ob_start(); ?><span class="badge"><?= $queueFail === '' ? count($rows) : '—' ?> سجلا · <?= count($cand) ?> مرشحا</span><?php
   $header_actions = array(array('raw' => trim((string) ob_get_clean())));
   $header_back = false;
   include __DIR__ . '/../includes/page_header.php';
-  echo ems_states_bundle('لا اعتمادَ نهائيٌّ مُعَدٌّ بعد',
-      'الوقائعُ المكتملةُ تجاريًّا تظهر مرشَّحاتٍ هنا — ثم ثلاثُ أيدٍ: إعدادٌ فاعتمادٌ فإجازة');
+  echo ems_states_bundle('لا اعتماد نهائي معد بعد',
+      'الوقائع المكتملة تجاريا تظهر مرشحات هنا — ثم ثلاث أيد: إعداد فاعتماد فإجازة');
   ?>
-  <p class="text-muted">العقدة ٩ · السلّم <code>LD-07</code> —
-     <strong>ثلاثُ أيدٍ لا واحدة</strong>: المُعِدُّ لا يعتمد، والمعتمِدُ لا يُجيز،
-     ولا يُملأ رقمُ القيدِ إلا بعدَ الإجازةِ وبمحرّكِ الترحيلِ وحدَه.</p>
+  <p class="text-muted">العقدة ٩ · السلم <code>LD-07</code> —
+     <strong>ثلاث أيد لا واحدة</strong>: المعد لا يعتمد، والمعتمد لا يجيز،
+     ولا يملأ رقم القيد إلا بعد الإجازة وبمحرك الترحيل وحده.</p>
   <?php if ($msg !== ''): ?>
     <div class="alert <?= (mb_strpos($msg, '✅') !== false ? 'alert-success' : 'alert-danger') ?>">
       <?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div>
@@ -153,7 +153,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php echo csrf_field(); ?>
     <div class="col-auto"><label class="form-label" for="uf_entry">الواقعة</label>
       <select class="form-control form-control-sm" name="entry_id" id="uf_entry" required>
-        <option value="">— اختر واقعةً مكتملةَ السلسلة —</option>
+        <option value="">— اختر واقعة مكتملة السلسلة —</option>
         <?php foreach ($cand as $c): ?>
           <option value="<?= (int) $c['id'] ?>">#<?= (int) $c['id'] ?> ·
             <?= htmlspecialchars((string) $c['entry_no'], ENT_QUOTES, 'UTF-8') ?> ·
@@ -169,14 +169,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   <table class="table table-striped" data-no-dt>
     <thead><tr>
       <th>الإجراء</th><th>الفترة</th><th>الواقعة</th><th>حالة الواقعة</th><th>الحالة</th>
-      <th>السلّم</th><th>أعدَّه</th><th>اعتمده</th><th>أجازه</th><th>رقم القيد</th>
+      <th>السلم</th><th>أعده</th><th>اعتمده</th><th>أجازه</th><th>رقم القيد</th>
       <th class="ems-gov-th none" data-gov="entity" data-slice="1">الكيان</th>
       <th class="ems-gov-th none" data-gov="approved_at" data-slice="1">تاريخ الاعتماد</th>
       <th class="ems-gov-th none" data-gov="idem_key" data-slice="2">مفتاح منع التكرار</th>
     </tr></thead>
     <tbody>
     <?php if (empty($rows)): ?>
-      <tr><td colspan="10" class="text-center text-muted">لا اعتمادَ نهائيٌّ مُعَدٌّ بعد</td></tr>
+      <tr><td colspan="10" class="text-center text-muted">لا اعتماد نهائي معد بعد</td></tr>
     <?php endif; ?>
     <?php foreach ($rows as $r): $id = (int) $r['id']; ?>
       <tr>

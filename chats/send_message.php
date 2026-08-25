@@ -35,7 +35,7 @@ if (empty($message)) {
 }
 if (mb_strlen($message) > 2000) {
     while (ob_get_level()) ob_end_clean();
-    die(json_encode(['success' => false, 'message' => 'الرسالة طويلة جداً (الحد الأقصى 2000 حرف)'], JSON_UNESCAPED_UNICODE));
+    die(json_encode(['success' => false, 'message' => 'الرسالة طويلة جدا (الحد الأقصى 2000 حرف)'], JSON_UNESCAPED_UNICODE));
 }
 if ($receiver_id === $sender_id) {
     while (ob_get_level()) ob_end_clean();

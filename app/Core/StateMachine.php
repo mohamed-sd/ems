@@ -58,14 +58,14 @@ class StateMachine
         }
         foreach (array('entity_table', 'state_column') as $k) {
             if (!preg_match('/^[A-Za-z0-9_]+$/', $def[$k])) {
-                throw new StateMachineException("معرّف غير صالح في التعريف: {$k}");
+                throw new StateMachineException("معرف غير صالح في التعريف: {$k}");
             }
         }
         if (!isset($def['company_column'])) {
             $def['company_column'] = 'company_id';
         }
         if ($def['company_column'] !== null && !preg_match('/^[A-Za-z0-9_]+$/', $def['company_column'])) {
-            throw new StateMachineException('معرّف عمود الشركة غير صالح');
+            throw new StateMachineException('معرف عمود الشركة غير صالح');
         }
         foreach ($def['transitions'] as $action => $t) {
             foreach (array('from', 'to', 'roles') as $k) {
@@ -74,7 +74,7 @@ class StateMachine
                 }
             }
             if (!isset($def['states'][$t['from']]) || !isset($def['states'][$t['to']])) {
-                throw new StateMachineException("انتقال {$action} يشير لحالةٍ خارج التعريف");
+                throw new StateMachineException("انتقال {$action} يشير لحالة خارج التعريف");
             }
         }
         $this->conn = $conn;
@@ -106,7 +106,7 @@ class StateMachine
     public function apply($entityId, $action, $actorUserId, array $opts = array())
     {
         if (!isset($this->def['transitions'][$action])) {
-            throw new StateMachineException('فعل غير معرّف في سير العمل: ' . $action);
+            throw new StateMachineException('فعل غير معرف في سير العمل: ' . $action);
         }
         $t = $this->def['transitions'][$action];
         $entityId = intval($entityId);
@@ -119,7 +119,7 @@ class StateMachine
         $eff = ems_user_effective_role($this->conn, $actorUserId);
         if (!in_array($eff['role'], $t['roles'], true)) {
             throw new StateMachineException(
-                'فاعل غير مخوَّل: الدور الفعّال ' . $eff['role'] . ' (المصدر: ' . $eff['source'] . ') '
+                'فاعل غير مخول: الدور الفعال ' . $eff['role'] . ' (المصدر: ' . $eff['source'] . ') '
                 . 'ليس من أدوار الفعل ' . $action
             );
         }

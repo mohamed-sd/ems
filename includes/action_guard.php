@@ -206,7 +206,7 @@ if (!function_exists('ems_action_guard_registry')) {
             // معالجٌ غير مسجَّل — fail-closed.
             ems_action_guard_log('unregistered', $script, '-', $mode);
             if ($mode === 'enforce') {
-                ems_ajax_guard_response(403, 'هذا الإجراء غير مُصرَّح (معالج غير مسجَّل).');
+                ems_ajax_guard_response(403, 'هذا الإجراء غير مصرح (معالج غير مسجل).');
             }
             return;
         }
@@ -240,7 +240,7 @@ if (!function_exists('ems_action_guard_registry')) {
                     ems_action_guard_log('scope_denied', $script, $verb, $mode);
                     if ($mode === 'enforce') {
                         ems_ajax_guard_response(403,
-                            'هذا الإجراء يخصُّ مساحةَ عملٍ أخرى — بدِّلِ المساحةَ لتنفيذِه.');
+                            'هذا الإجراء يخص مساحة عمل أخرى — بدل المساحة لتنفيذه.');
                     }
                     return;
                 }

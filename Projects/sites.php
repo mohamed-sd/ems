@@ -102,7 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['site_name'])) {
             if (!$before) { ems_gov_flash_redirect('sites.php', 'الموقع غير موجود ❌', 'GOV-REF-404', ''); exit(); }
             if (intval($before['is_default']) === 1 && $status === 0) {
                 // الافتراضيُّ لا يُعطَّل — هو مرجعُ الترحيل الرجعي للعقود القائمة
-                ems_gov_flash_redirect('sites.php', 'الموقع الافتراضي لا يُعطَّل — هو مرجع الترحيل ❌', 'GOV-FAIL-409', ''); exit();
+                ems_gov_flash_redirect('sites.php', 'الموقع الافتراضي لا يعطل — هو مرجع الترحيل ❌', 'GOV-FAIL-409', ''); exit();
             }
             $gate->update('sites', $data, array('id' => $sid));
             ems_audit_change($conn, 'projects', 'Projects/sites.php', 'update', $sid,
@@ -113,11 +113,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['site_name'])) {
             $newId = $gate->insert('sites', $data);
             ems_audit_change($conn, 'projects', 'Projects/sites.php', 'create', intval($newId),
                 array(), $data, array('company_id' => $company_id, 'user_id' => $uid));
-            ems_gov_flash_redirect('sites.php', 'أُنشئ الموقع ✅', 'GOV-OK-200', ''); exit();
+            ems_gov_flash_redirect('sites.php', 'أنشئ الموقع ✅', 'GOV-OK-200', ''); exit();
         }
     } catch (\Throwable $t) {
         // گوتشا مقيسة: خرقُ UNIQUE يعود false/يرمي بحسب الوضع — الرسالةُ تسمّي السبب الأرجح
-        ems_gov_flash_redirect(ems_flash_to('sites.php', "+❌"), 'تعذّر الحفظ — الاسم مكرر داخل المشروع؟', 'GOV-FAIL-409', ''); exit();
+        ems_gov_flash_redirect(ems_flash_to('sites.php', "+❌"), 'تعذر الحفظ — الاسم مكرر داخل المشروع؟', 'GOV-FAIL-409', ''); exit();
     }
 }
 
@@ -180,8 +180,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>';
     }
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا موقعَ تنفيذٍ مسجَّلًا في هذا الترشيح',
-        'أضف موقعًا بزرِّ «موقع جديد» في رأسِ الشاشة أو أعِدْ مرشِّحَ المشروعِ إلى «الكل»');
+    echo ems_states_bundle('لا موقع تنفيذ مسجلا في هذا الترشيح',
+        'أضف موقعا بزر «موقع جديد» في رأس الشاشة أو أعد مرشح المشروع إلى «الكل»');
     ?>
 
     <style>
@@ -236,7 +236,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <label for="f_status">الحالة</label>
                 <select name="status" id="f_status">
                     <option value="1">نشط</option>
-                    <option value="0">معطَّل</option>
+                    <option value="0">معطل</option>
                 </select>
             </div>
         </div>
@@ -250,7 +250,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-body">
         <form method="get" class="prj-st-filter">
             <strong>المشروع:</strong>
-            <select name="project_id" aria-label="ترشيحُ المواقعِ بالمشروع" class="prj-st-filter-sel" onchange="this.form.submit()">
+            <select name="project_id" aria-label="ترشيح المواقع بالمشروع" class="prj-st-filter-sel" onchange="this.form.submit()">
                 <option value="0">الكل</option>
                 <?php foreach ($projects_options as $p): ?>
                     <option value="<?php echo intval($p['id']); ?>" <?php echo $filter_project === intval($p['id']) ? 'selected' : ''; ?>>
@@ -265,10 +265,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <th>الإجراءات</th><th>الموقع</th><th>النوع</th><th>المشروع</th>
                     <th>المسؤول</th><th>العقود</th><th>الحالة</th>
                     <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                     <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                     <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                     <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -291,7 +291,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </td>
                         <td><strong><?php echo htmlspecialchars($r['name']); ?></strong>
                             <?php if (intval($r['is_default']) === 1): ?>
-                                <span class="badge badge-secondary" title="موقعُ الترحيل الرجعي — المشروع كان الموقع ضمنًا">افتراضي</span>
+                                <span class="badge badge-secondary" title="موقع الترحيل الرجعي — المشروع كان الموقع ضمنا">افتراضي</span>
                             <?php endif; ?></td>
                         <td><?php echo htmlspecialchars($KINDS[$r['site_kind']] ?? $r['site_kind']); ?></td>
                         <td><?php echo htmlspecialchars($r['project_name'] ?? '—'); ?></td>
@@ -299,7 +299,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <td><?php echo intval($r['contracts_count']); ?></td>
                         <td><?php echo intval($r['status']) === 1
                             ? "<span class='badge badge-success'>نشط</span>"
-                            : "<span class='badge badge-danger'>معطَّل</span>"; ?></td>
+                            : "<span class='badge badge-danger'>معطل</span>"; ?></td>
                     </tr>
                 <?php endforeach; ?>
                 </tbody>

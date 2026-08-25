@@ -121,7 +121,7 @@ $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-echo ems_states_bundle('لا معداتِ مسجلةً لهذا الكيان', 'سجّل معدةً من شاشةِ المعدات ثمّ عاود فتح هذا التقرير');
+echo ems_states_bundle('لا معدات مسجلة لهذا الكيان', 'سجل معدة من شاشة المعدات ثم عاود فتح هذا التقرير');
 ?>
 
         <div class="container py-4">

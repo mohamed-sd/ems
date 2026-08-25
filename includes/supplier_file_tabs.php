@@ -18,11 +18,11 @@ $sf_pre = (strpos($_SERVER['SCRIPT_NAME'] ?? '', '/Suppliers/') !== false
 
 $sf_tabs = array(
     'profile'   => array('الملف', 'Suppliers/supplier_profile.php?id=%d'),
-    'contracts' => array('بنودُ العقد والحصص', 'Suppliers/supplier_contract_lines.php?supplier_id=%d'),
-    'capacity'  => array('الجاهزيةُ والقدرة', 'Suppliers/supplier_capacity.php?supplier_id=%d'),
+    'contracts' => array('بنود العقد والحصص', 'Suppliers/supplier_contract_lines.php?supplier_id=%d'),
+    'capacity'  => array('الجاهزية والقدرة', 'Suppliers/supplier_capacity.php?supplier_id=%d'),
     'documents' => array('الوثائق', 'Suppliers/supplier_documents.php?supplier_id=%d'),
-    'statement' => array('كشفُ الحساب', 'Finance/supplier_statement_fin.php?supplier_id=%d'),
-    'rules'     => array('القواعدُ والتقييمُ والإقفال', 'Suppliers/supplier_rules.php?supplier_id=%d'),
+    'statement' => array('كشف الحساب', 'Finance/supplier_statement_fin.php?supplier_id=%d'),
+    'rules'     => array('القواعد والتقييم والإقفال', 'Suppliers/supplier_rules.php?supplier_id=%d'),
 );
 /* القواعدُ والتقييمُ والإقفال أقسامٌ ثلاثةٌ تحت تبويبٍ واحد — ستةٌ حدًّا أقصى */
 $sf_subs = array(
@@ -46,7 +46,7 @@ if ($sf_top === 'rules') {
 }
 
 ems_file_tabs(array(
-    'label' => 'ملفُّ المورد',
+    'label' => 'ملف المورد',
     'tabs'  => $sf_items,
     'subs'  => $sf_subItems,
 ));

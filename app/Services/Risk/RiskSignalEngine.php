@@ -50,7 +50,7 @@ class RiskSignalEngine
             $code = strtoupper(substr($m, 0, 2)) . '-' . substr($m, 2);
             try {
                 $report[$code] = self::$m($db, $companyId, $userId, $dry);
-            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'مِرقابُ إشاراتٍ واحدٌ فشل — بقيةُ المراقيبِ تعمل، ونتيجتُه تغيب من تقريرِ الجولة');
+            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'مرقاب إشارات واحد فشل — بقية المراقيب تعمل، ونتيجته تغيب من تقرير الجولة');
                 $report[$code] = array('ok' => false, 'raised' => 0, 'reason' => $t->getMessage());
             }
         }
@@ -112,7 +112,7 @@ class RiskSignalEngine
             // لا مرةً كلَّ تشغيلٍ، فلا يغرق الصندوقُ بإشارةٍ لكل يومٍ للمعدةِ نفسها.
             $key = 'SG-01:eq' . (int) $x['equipment_id'] . ':' . gmdate('oW');
             if (self::raise($db, $companyId, 'SG-01', $key, array(
-                'title' => 'عطل متكرر — المعدة ' . $x['eq_code'] . ' (' . (int) $x['n'] . ' أعطال في 90 يومًا)',
+                'title' => 'عطل متكرر — المعدة ' . $x['eq_code'] . ' (' . (int) $x['n'] . ' أعطال في 90 يوما)',
                 'details' => 'آخر عطل: ' . $x['last_at'] . ' · العدد في النافذة: ' . (int) $x['n'],
                 'root_cause' => 'تكرار أعطال معدة',
                 'entity_type' => 'equipment', 'entity_id' => (int) $x['equipment_id'],
@@ -120,7 +120,7 @@ class RiskSignalEngine
             ), $userId, $dry)) { $raised++; }
         }
         $st->close();
-        return self::res($raised, $seen, 'mnt_breakdown · ٣ أعطال/٩٠ يومًا');
+        return self::res($raised, $seen, 'mnt_breakdown · ٣ أعطال/٩٠ يوما');
     }
 
     /* ═══ SG-02 · توقفٌ فوق الحدِّ في وردية ═══ */
@@ -172,7 +172,7 @@ class RiskSignalEngine
             $seen++;
             $key = 'SG-03:plan' . (int) $x['id'] . ':' . (string) $x['next_due_date'];
             if (self::raise($db, $companyId, 'SG-03', $key, array(
-                'title' => 'صيانة وقائية متأخرة ' . (int) $x['late_days'] . ' يومًا — ' . (string) $x['code'],
+                'title' => 'صيانة وقائية متأخرة ' . (int) $x['late_days'] . ' يوما — ' . (string) $x['code'],
                 'details' => (string) $x['name'] . ' · الموعد: ' . (string) $x['next_due_date'],
                 'root_cause' => 'تأخر صيانة وقائية',
                 'entity_type' => 'equipment', 'entity_id' => (int) $x['equipment_id'],
@@ -202,7 +202,7 @@ class RiskSignalEngine
             $left = (int) $x['days_left'];
             $key = 'SG-04:doc' . (int) $x['doc_id'] . ':' . (string) $x['expiry_date'];
             if (self::raise($db, $companyId, 'SG-04', $key, array(
-                'title' => ($left < 0 ? 'وثيقة منتهية' : 'وثيقة تنتهي بعد ' . $left . ' يومًا')
+                'title' => ($left < 0 ? 'وثيقة منتهية' : 'وثيقة تنتهي بعد ' . $left . ' يوما')
                            . ' — ' . (string) $x['doc_type'] . ' ' . (string) $x['doc_no'],
                 'details' => 'الانتهاء: ' . (string) $x['expiry_date'] . ' · الموضوع: '
                              . (string) $x['subject_type'] . '#' . (int) $x['subject_id'],
@@ -211,7 +211,7 @@ class RiskSignalEngine
             ), $userId, $dry)) { $raised++; }
         }
         $st->close();
-        return self::res($raised, $seen, 'equipment_documents.expiry_date ≤ ٣٠ يومًا');
+        return self::res($raised, $seen, 'equipment_documents.expiry_date ≤ ٣٠ يوما');
     }
 
     /* ═══ SG-05 · تأخرُ الموردِ في الإحلال: تجاوزُ المهلةِ التعاقدية ═══ */
@@ -237,7 +237,7 @@ class RiskSignalEngine
             $seen++;
             $key = 'SG-05:ord' . (int) $x['id'] . ':' . gmdate('oW');
             if (self::raise($db, $companyId, 'SG-05', $key, array(
-                'title' => 'تأخر المورد في الإحلال ' . (int) $x['late_days'] . ' يومًا — ' . $x['eq_code'],
+                'title' => 'تأخر المورد في الإحلال ' . (int) $x['late_days'] . ' يوما — ' . $x['eq_code'],
                 'details' => 'أمر مفتوح #' . (int) $x['id'] . ' على حساب المورد ' . (int) $x['charge_supplier_id'],
                 'root_cause' => 'تأخر مورد عن مهلة الإحلال',
                 'entity_type' => 'supplier', 'entity_id' => (int) $x['charge_supplier_id'],
@@ -245,7 +245,7 @@ class RiskSignalEngine
             ), $userId, $dry)) { $raised++; }
         }
         $st->close();
-        return self::res($raised, $seen, 'mnt_order مفتوح على مورّد ≥ ١٤ يومًا');
+        return self::res($raised, $seen, 'mnt_order مفتوح على مورد ≥ ١٤ يوما');
     }
 
     /* ═══ SG-06 · ذمةٌ تجاوزت الحدَّ: مستحقٌّ متأخرٌ فوقَ حدٍّ معلَن ═══ */
@@ -272,13 +272,13 @@ class RiskSignalEngine
             if (self::raise($db, $companyId, 'SG-06', $key, array(
                 'title' => 'ذمة متأخرة فوق الحد — العميل #' . (int) $x['customer_entity_id'],
                 'details' => 'القائم المتأخر: ' . (float) $x['total'] . ' على ' . (int) $x['n']
-                             . ' مستندًا · أقدم استحقاق: ' . (string) $x['oldest'],
+                             . ' مستندا · أقدم استحقاق: ' . (string) $x['oldest'],
                 'root_cause' => 'تجاوز حد التحصيل المعلن',
                 'entity_type' => 'customer', 'entity_id' => (int) $x['customer_entity_id'],
             ), $userId, $dry)) { $raised++; }
         }
         $st->close();
-        return self::res($raised, $seen, 'fin_receivables متأخر > ٣٠ يومًا (حدٌّ سلوكيٌّ لا عمودُ ائتمان)');
+        return self::res($raised, $seen, 'fin_receivables متأخر > ٣٠ يوما (حد سلوكي لا عمود ائتمان)');
     }
 
     /* ═══ SG-07 · عقدٌ يقترب من الانتهاءِ بلا تجديد: تسعون يومًا ═══ */
@@ -297,7 +297,7 @@ class RiskSignalEngine
             $seen++;
             $key = 'SG-07:ct' . (int) $x['id'] . ':' . (string) $x['actual_end'];
             if (self::raise($db, $companyId, 'SG-07', $key, array(
-                'title' => 'عقد ينتهي بعد ' . (int) $x['days_left'] . ' يومًا بلا تجديد — #' . (int) $x['id'],
+                'title' => 'عقد ينتهي بعد ' . (int) $x['days_left'] . ' يوما بلا تجديد — #' . (int) $x['id'],
                 'details' => 'نهاية العقد: ' . (string) $x['actual_end'],
                 'root_cause' => 'اقتراب انتهاء عقد بلا تجديد',
                 'entity_type' => 'contract', 'entity_id' => (int) $x['id'],
@@ -305,7 +305,7 @@ class RiskSignalEngine
             ), $userId, $dry)) { $raised++; }
         }
         $st->close();
-        return self::res($raised, $seen, 'contracts.actual_end ≤ ٩٠ يومًا');
+        return self::res($raised, $seen, 'contracts.actual_end ≤ ٩٠ يوما');
     }
 
     /* ═══ SG-08 · انحرافُ سعرِ الصرفِ عن نطاقِ التحمل ═══ */
@@ -327,7 +327,7 @@ class RiskSignalEngine
         $st = $db->prepare($sql);
         if (!$st) {
             return array('ok' => true, 'raised' => 0, 'matched' => 0,
-                'note' => 'معطَّلة بسببها: مخطَّطُ أسعارِ الصرفِ لا يوافق القاعدة');
+                'note' => 'معطلة بسببها: مخطط أسعار الصرف لا يوافق القاعدة');
         }
         $st->bind_param('i', $companyId);
         $st->execute();
@@ -340,13 +340,13 @@ class RiskSignalEngine
             $key = 'SG-08:' . (string) $x['currency_code'] . ':' . (string) $x['effective_from'];
             if (self::raise($db, $companyId, 'SG-08', $key, array(
                 'title' => 'انحراف سعر صرف ' . round($pct, 1) . '٪ — ' . (string) $x['currency_code'],
-                'details' => 'من ' . $old . ' إلى ' . $new . ' نفاذًا من ' . (string) $x['effective_from'],
+                'details' => 'من ' . $old . ' إلى ' . $new . ' نفاذا من ' . (string) $x['effective_from'],
                 'root_cause' => 'انحراف سعر صرف عن نطاق التحمل',
                 'entity_type' => 'currency', 'entity_id' => 0,
             ), $userId, $dry)) { $raised++; }
         }
         $st->close();
-        return self::res($raised, $seen, 'fin_fx_rates تغيّر ≥ ١٠٪ عن السابق المباشر');
+        return self::res($raised, $seen, 'fin_fx_rates تغير ≥ ١٠٪ عن السابق المباشر');
     }
 
     /* ═══ SG-09 · مخزونٌ حرجٌ تحت الحد: بلوغُ حدِّ إعادةِ الطلب ═══ */
@@ -399,14 +399,14 @@ class RiskSignalEngine
             $seen++;
             $key = 'SG-11:tt' . (int) $x['ticket_type_id'] . ':' . gmdate('oW');
             if (self::raise($db, $companyId, 'SG-11', $key, array(
-                'title' => 'تكرار بلاغ من النوع نفسه (' . (int) $x['n'] . ' في 30 يومًا) — نوع #' . (int) $x['ticket_type_id'],
+                'title' => 'تكرار بلاغ من النوع نفسه (' . (int) $x['n'] . ' في 30 يوما) — نوع #' . (int) $x['ticket_type_id'],
                 'details' => 'آخر بلاغ: ' . (string) $x['last_at'],
                 'root_cause' => 'تكرار بلاغات من نوع واحد',
                 'entity_type' => 'ticket_type', 'entity_id' => (int) $x['ticket_type_id'],
             ), $userId, $dry)) { $raised++; }
         }
         $st->close();
-        return self::res($raised, $seen, 'tickets ٣ من النوع/٣٠ يومًا');
+        return self::res($raised, $seen, 'tickets ٣ من النوع/٣٠ يوما');
     }
 
     /* ═══ SG-12 · مخالفةُ حوكمةٍ أو تجاوزُ حارس: رفضٌ متكررٌ من الحارس ═══ */
@@ -434,7 +434,7 @@ class RiskSignalEngine
             ), $userId, $dry)) { $raised++; }
         }
         $st->close();
-        return self::res($raised, $seen, 'action_execution_log رفضٌ ≥ ٥/أسبوع');
+        return self::res($raised, $seen, 'action_execution_log رفض ≥ ٥/أسبوع');
     }
 
     /* ═══ SG-13 · محاولةُ وصولٍ غيرُ معتادة: تجاوزُ المتوسطِ بضعفين ═══ */
@@ -469,7 +469,7 @@ class RiskSignalEngine
             ), $userId, $dry)) { $raised++; }
         }
         $st->close();
-        return self::res($raised, $seen, 'action_execution_log اليومُ ≥ ٢× المتوسط');
+        return self::res($raised, $seen, 'action_execution_log اليوم ≥ ٢× المتوسط');
     }
 
     /* ═══ SG-16 · انحرافُ التكلفةِ عن الميزانية: تجاوزُ النطاقِ المعتمد ═══ */
@@ -501,7 +501,7 @@ class RiskSignalEngine
             ), $userId, $dry)) { $raised++; }
         }
         $st->close();
-        return self::res($raised, $seen, 'fin_budget_lines انحرافٌ ≥ ١٠٪');
+        return self::res($raised, $seen, 'fin_budget_lines انحراف ≥ ١٠٪');
     }
 
     /* ═══════════════════════════════════════════════════════════════════════
@@ -567,7 +567,7 @@ class RiskSignalEngine
             if (!isset(self::KRI_READERS[$key])) {
                 $out['skipped']++;
                 $out['details'][] = array('id' => (int) $k['id'], 'name' => $k['name_ar'],
-                    'skipped' => 'لا قارئَ لمفتاح ' . $key);
+                    'skipped' => 'لا قارئ لمفتاح ' . $key);
                 continue;
             }
             $q = $db->prepare(self::KRI_READERS[$key]);
@@ -599,7 +599,7 @@ class RiskSignalEngine
                     'sg_code' => 'SG-15', 'source' => 'auto',
                     'rule_key' => 'SG-15:kri' . (int) $k['id'] . ':' . gmdate('Y-m-d'),
                     'title' => 'مؤشر بلغ حده الحرج — ' . (string) $k['name_ar'],
-                    'details' => 'القيمة المقروءة آليًّا: ' . $val . ' · الحد الحرج: ' . $crit,
+                    'details' => 'القيمة المقروءة آليا: ' . $val . ' · الحد الحرج: ' . $crit,
                     'root_cause' => 'تجاوز مؤشر خطر حده الحرج',
                     'ru_hint_id' => self::unitId($db, $companyId, 'RU-01'),
                 ), $userId ?: 1);

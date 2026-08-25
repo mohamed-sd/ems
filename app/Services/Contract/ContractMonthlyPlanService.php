@@ -51,22 +51,22 @@ class ContractMonthlyPlanService
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'version' => 0,
                      'months' => 0, 'planned' => 0.0, 'contracted' => 0.0, 'gap' => 0.0);
         $l = ContractLineService::lineOf($gate, (int) $lineId);
-        if (!$l) { $out['code'] = 404; $out['reason'] = 'بندُ البيع غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!$l) { $out['code'] = 404; $out['reason'] = 'بند البيع غير موجود في نطاقك'; return $out; }
         if ((string) $l['state'] !== 'active') {
             $out['code'] = 409;
-            $out['reason'] = 'الجدولُ للبند النافذ (حالُه: ' . $l['state'] . ')'; return $out;
+            $out['reason'] = 'الجدول للبند النافذ (حاله: ' . $l['state'] . ')'; return $out;
         }
         if ($l['plan_sealed_version'] !== null && (int) $version === (int) $l['plan_sealed_version']) {
             $out['code'] = 423;
-            $out['reason'] = 'النسخةُ ' . (int) $version . ' **مختومة** — والتغييرُ **بنسخةٍ جديدة** لا بتعديلها';
+            $out['reason'] = 'النسخة ' . (int) $version . ' **مختومة** — والتغيير **بنسخة جديدة** لا بتعديلها';
             return $out;
         }
         $version = max(1, (int) $version);
         $eff = self::dateOrNull($effectiveFrom);
         if ($eff === null) {
-            $out['code'] = 422; $out['reason'] = '**تاريخُ سريان النسخة إلزامي**'; return $out;
+            $out['code'] = 422; $out['reason'] = '**تاريخ سريان النسخة إلزامي**'; return $out;
         }
-        if (!$months) { $out['code'] = 422; $out['reason'] = 'لا جدولَ فارغ'; return $out; }
+        if (!$months) { $out['code'] = 422; $out['reason'] = 'لا جدول فارغ'; return $out; }
 
         $contracted = round((float) $l['qty_contracted'], 2);
         $from = substr((string) $l['valid_from'], 0, 7);
@@ -78,21 +78,21 @@ class ContractMonthlyPlanService
         foreach ($months as $m) {
             $mm = trim((string) (isset($m['period_month']) ? $m['period_month'] : ''));
             if (!preg_match('/^\d{4}-\d{2}$/', $mm)) {
-                $out['code'] = 422; $out['reason'] = 'شهرٌ بصيغةٍ غير صالحة: ' . $mm; return $out;
+                $out['code'] = 422; $out['reason'] = 'شهر بصيغة غير صالحة: ' . $mm; return $out;
             }
             if ($mm < $from) {
                 $out['code'] = 422;
-                $out['reason'] = 'الشهرُ ' . $mm . ' **قبل سريان البند** ' . $from; return $out;
+                $out['reason'] = 'الشهر ' . $mm . ' **قبل سريان البند** ' . $from; return $out;
             }
             if ($to !== null && $mm > $to) {
                 $out['code'] = 422;
-                $out['reason'] = 'الشهرُ ' . $mm . ' **بعد نهاية البند** ' . $to; return $out;
+                $out['reason'] = 'الشهر ' . $mm . ' **بعد نهاية البند** ' . $to; return $out;
             }
             if (isset($clean[$mm])) {
-                $out['code'] = 409; $out['reason'] = 'الشهرُ ' . $mm . ' مكرَّرٌ في الجدول'; return $out;
+                $out['code'] = 409; $out['reason'] = 'الشهر ' . $mm . ' مكرر في الجدول'; return $out;
             }
             $q = round((float) (isset($m['qty_planned']) ? $m['qty_planned'] : 0), 2);
-            if ($q < 0) { $out['code'] = 422; $out['reason'] = 'كميةٌ سالبةٌ في ' . $mm; return $out; }
+            if ($q < 0) { $out['code'] = 422; $out['reason'] = 'كمية سالبة في ' . $mm; return $out; }
             $kind = (string) (isset($m['month_kind']) ? $m['month_kind'] : 'normal');
             if (!in_array($kind, self::MONTH_KINDS, true)) { $kind = 'normal'; }
             // ③ صفرٌ يعني **توقفًا معلَنًا** — فيُلزَم بنوعٍ يفسّره
@@ -105,8 +105,8 @@ class ContractMonthlyPlanService
         // ① Σ لا يتجاوز المتعاقَد **أبدًا**
         if ($sum > $contracted + 0.0001) {
             $out['code'] = 409;
-            $out['reason'] = '**Σ الأشهر ' . $sum . ' تتجاوز المتعاقَد ' . $contracted . '** — '
-                           . 'والفائضُ ' . round($sum - $contracted, 2) . ' لا يُخطَّط لما لم يُتعاقد عليه';
+            $out['reason'] = '**Σ الأشهر ' . $sum . ' تتجاوز المتعاقد ' . $contracted . '** — '
+                           . 'والفائض ' . round($sum - $contracted, 2) . ' لا يخطط لما لم يتعاقد عليه';
             $out['planned'] = $sum; $out['contracted'] = $contracted;
             return $out;
         }
@@ -135,7 +135,7 @@ class ContractMonthlyPlanService
                     array('id' => (int) $lineId));
             }, 'جدول شهري للبند ' . $lineId . ' نسخة ' . $version);
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الحفظ: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الحفظ: ' . $t->getMessage(); return $out;
         }
 
         self::audit($conn, $companyId, $actor, 'save_plan', (int) $lineId, array(),
@@ -144,9 +144,9 @@ class ContractMonthlyPlanService
         $out['ok'] = true; $out['code'] = 200; $out['version'] = $version;
         $out['months'] = count($clean); $out['planned'] = $sum; $out['contracted'] = $contracted;
         $out['gap'] = round($contracted - $sum, 2);
-        $out['reason'] = 'النسخة ' . $version . ': ' . count($clean) . ' شهرًا بمجموع ' . $sum
+        $out['reason'] = 'النسخة ' . $version . ': ' . count($clean) . ' شهرا بمجموع ' . $sum
                        . ' من ' . $contracted
-                       . ($out['gap'] > 0.0001 ? (' · **ناقصٌ ' . $out['gap'] . ' — لا يُختم**') : ' · **مكتمل**');
+                       . ($out['gap'] > 0.0001 ? (' · **ناقص ' . $out['gap'] . ' — لا يختم**') : ' · **مكتمل**');
         return $out;
     }
 
@@ -158,7 +158,7 @@ class ContractMonthlyPlanService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'gap' => 0.0);
         $l = ContractLineService::lineOf($gate, (int) $lineId);
-        if (!$l) { $out['code'] = 404; $out['reason'] = 'بندُ البيع غيرُ موجود'; return $out; }
+        if (!$l) { $out['code'] = 404; $out['reason'] = 'بند البيع غير موجود'; return $out; }
         $sum = self::versionSum($gate, (int) $lineId, (int) $version);
         $contracted = round((float) $l['qty_contracted'], 2);
         $gap = round($contracted - $sum, 2);
@@ -166,7 +166,7 @@ class ContractMonthlyPlanService
         if (abs($gap) > 0.0001) {
             $out['code'] = 422;
             $out['reason'] = '**Σ الأشهر ' . $sum . ' ≠ المتعاقَد ' . $contracted . '** — '
-                . ($gap > 0 ? ('ناقصٌ ' . $gap) : ('زائدٌ ' . abs($gap)))
+                . ($gap > 0 ? ('ناقص ' . $gap) : ('زائد ' . abs($gap)))
                 . ' · «قيدُ Σ الكميات = المتعاقَد» شرطُ الختم';
             return $out;
         }
@@ -174,12 +174,12 @@ class ContractMonthlyPlanService
             $gate->update('client_contract_lines', array('plan_sealed_version' => (int) $version),
                 array('id' => (int) $lineId));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الختم: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الختم: ' . $t->getMessage(); return $out;
         }
         self::audit($conn, $companyId, $actor, 'seal_plan', (int) $lineId, array(),
             array('version' => (int) $version, 'planned' => $sum));
         $out['ok'] = true; $out['code'] = 200;
-        $out['reason'] = 'خُتمت النسخة ' . (int) $version . ' بـΣ = ' . $sum . ' = المتعاقَد';
+        $out['reason'] = 'ختمت النسخة ' . (int) $version . ' بΣ = ' . $sum . ' = المتعاقَد';
         return $out;
     }
 
@@ -203,7 +203,7 @@ class ContractMonthlyPlanService
                   ORDER BY p.effective_from DESC, p.plan_version DESC LIMIT 1",
                 array((int) $lineId, $day));
             if ($r) { $ver = (int) $r[0]['plan_version']; }
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $ver'); $ver = null; }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $ver'); $ver = null; }
         if ($ver === null) { return array('version' => null, 'rows' => array()); }
         return array('version' => $ver, 'rows' => self::rowsOf($gate, $lineId, $ver));
     }
@@ -243,8 +243,8 @@ class ContractMonthlyPlanService
         ksort($out['months']);
         $parts = array();
         foreach ($out['by_currency'] as $c => $v) { $parts[] = $v . ' ' . $c; }
-        $out['note'] = ($parts ? implode(' · ', $parts) : 'صفر') . ' على ' . count($out['months']) . ' شهرًا'
-                     . (count($out['by_currency']) > 1 ? ' · **تعدُّدُ عملاتٍ: لا يُجمع في رقم**' : '');
+        $out['note'] = ($parts ? implode(' · ', $parts) : 'صفر') . ' على ' . count($out['months']) . ' شهرا'
+                     . (count($out['by_currency']) > 1 ? ' · **تعدد عملات: لا يجمع في رقم**' : '');
         return $out;
     }
 

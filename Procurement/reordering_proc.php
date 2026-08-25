@@ -118,8 +118,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا قواعدَ إعادةِ طلبٍ مسجَّلةً بعدُ',
-        'أضف أولَ قاعدةٍ بزرِّ «إضافة قاعدة» في رأسِ الشاشة: صنفٌ وحدٌّ أدنى ونقطةُ إعادةِ طلب');
+    echo ems_states_bundle('لا قواعد إعادة طلب مسجلة بعد',
+        'أضف أول قاعدة بزر «إضافة قاعدة» في رأس الشاشة: صنف وحد أدنى ونقطة إعادة طلب');
     ?>
 
     <?php proc_msg_banner(); ?>
@@ -137,26 +137,26 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
     ?>
     <div class="card"><div class="card-header"><h5><i class="fa fa-rotate"></i>
-        التوليدُ الآلي لطلبات الشراء (M-43) — بمفتاح (صنف × دورة)</h5></div>
+        التوليد الآلي لطلبات الشراء (M-43) — بمفتاح (صنف × دورة)</h5></div>
     <div class="card-body">
-        <p class="proc-rop-note">لكل نقطةِ طلبٍ بلغ رصيدُها الحيُّ حدَّها: يولَّد طلبُ شراءٍ واحدٌ
-            بكمية (الحدُّ الأعلى − الرصيد) — <strong>والدورةُ الجاريةُ تمنع توليدًا ثانيًا</strong>
-            حتى تُقفل. والمتوسطُ اليوميُّ (آخر 90 يومًا) يُعرض <strong>مصدرًا مقترحًا للحد</strong> (M-51).</p>
+        <p class="proc-rop-note">لكل نقطة طلب بلغ رصيدها الحي حدها: يولد طلب شراء واحد
+            بكمية (الحد الأعلى − الرصيد) — <strong>والدورة الجارية تمنع توليدا ثانيا</strong>
+            حتى تقفل. والمتوسط اليومي (آخر 90 يوما) يعرض <strong>مصدرا مقترحا للحد</strong> (M-51).</p>
         <?php if ($can_add): ?>
         <div class="proc-rop-actions">
             <form method="post">
         <?= csrf_field() ?><input type="hidden" name="reorder_action" value="dry">
-                <button type="submit" class="btn-primary"><i class="fa fa-flask"></i> جرّب (بلا كتابة)</button></form>
+                <button type="submit" class="btn-primary"><i class="fa fa-flask"></i> جرب (بلا كتابة)</button></form>
             <form method="post">
         <?= csrf_field() ?><input type="hidden" name="reorder_action" value="apply">
-                <button type="submit" class="btn-primary"><i class="fa fa-play"></i> ولّد فعلًا</button></form>
+                <button type="submit" class="btn-primary"><i class="fa fa-play"></i> ولد فعلا</button></form>
         </div>
         <?php endif; ?>
         <?php if ($reorderResult !== null): ?>
             <div class="proc-rop-result">
                 <strong><?php echo $reorderResult['dry'] ? 'تجريب:' : 'توليد:'; ?></strong>
-                <?php echo count($reorderResult['generated']); ?> مرشحًا ·
-                <?php echo count($reorderResult['skipped']); ?> متجاوَزًا
+                <?php echo count($reorderResult['generated']); ?> مرشحا ·
+                <?php echo count($reorderResult['skipped']); ?> متجاوزا
                 <?php foreach ($reorderResult['generated'] as $g): ?>
                     <div class="alert alert-success proc-rop-line">
                         <?php echo htmlspecialchars($g['item'] . ' — الرصيد ' . $g['balance']
@@ -233,13 +233,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <table id="procTable" class="display nowrap alltables proc-rop-table"
                    data-scroll-x="1" data-state-save="false">
                 <thead><tr>
-                    <th>الإجراءات</th><th>الصنف</th><th>المخزن</th><th title="Min">الحدّ الأدنى</th><th title="Max">الحدّ الأقصى</th>
+                    <th>الإجراءات</th><th>الصنف</th><th>المخزن</th><th title="Min">الحد الأدنى</th><th title="Max">الحد الأقصى</th>
                     <th title="ROP — Re-Order Point">نقطة إعادة الطلب</th><th>مخزون الأمان</th><th>الوضع</th>
                     <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                    <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                    <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                     <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                     <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                     <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>

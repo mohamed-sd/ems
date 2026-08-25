@@ -37,8 +37,8 @@ $__pcOpen = ems_post_contract($conn, array(
     'validate' => function (array $in) {
         $d = (string) ($in['value_date'] ?? '');
         $c = trim((string) ($in['currency'] ?? ''));
-        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $d)) { return array('ok' => false, 'msg' => 'تاريخُ القيمةِ بصيغةِ YYYY-MM-DD (422)'); }
-        if (mb_strlen($c) < 3) { return array('ok' => false, 'msg' => 'لا دفعةَ بلا عملة (422)'); }
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $d)) { return array('ok' => false, 'msg' => 'تاريخ القيمة بصيغة YYYY-MM-DD (422)'); }
+        if (mb_strlen($c) < 3) { return array('ok' => false, 'msg' => 'لا دفعة بلا عملة (422)'); }
         return array('ok' => true, 'data' => array('value_date' => $d, 'currency' => $c,
             'bank_account' => trim((string) ($in['bank_account'] ?? ''))));
     },
@@ -59,7 +59,7 @@ $__pcReady = ems_post_contract($conn, array(
     'idem'    => array('id' => intval($_POST['ready_batch'] ?? 0)),
     'validate' => function (array $in) {
         $id = intval($in['ready_batch'] ?? 0);
-        if ($id <= 0) { return array('ok' => false, 'msg' => 'دفعةٌ غيرُ صالحة (422)'); }
+        if ($id <= 0) { return array('ok' => false, 'msg' => 'دفعة غير صالحة (422)'); }
         return array('ok' => true, 'data' => array('id' => $id));
     },
 ));
@@ -80,8 +80,8 @@ $__pcExec = ems_post_contract($conn, array(
     'validate' => function (array $in) {
         $id = intval($in['exec_batch'] ?? 0);
         $r  = trim((string) ($in['bank_ref'] ?? ''));
-        if ($id <= 0) { return array('ok' => false, 'msg' => 'دفعةٌ غيرُ صالحة (422)'); }
-        if ($r === '') { return array('ok' => false, 'msg' => 'لا تنفيذَ بلا مرجعِ حركةٍ بنكيّ (422)'); }
+        if ($id <= 0) { return array('ok' => false, 'msg' => 'دفعة غير صالحة (422)'); }
+        if ($r === '') { return array('ok' => false, 'msg' => 'لا تنفيذ بلا مرجع حركة بنكي (422)'); }
         return array('ok' => true, 'data' => array('id' => $id, 'bank_ref' => $r));
     },
 ));
@@ -109,7 +109,7 @@ try {
         $rows[$k]['lines_n'] = $gate->count('tre_pay_batch_lines',
             array('where' => array('batch_id' => (int) $r['id'])));
     }
-} catch (\Throwable $e) { $queueFail = 'تعذّر قراءةُ الطابور: ' . $e->getMessage(); }
+} catch (\Throwable $e) { $queueFail = 'تعذر قراءة الطابور: ' . $e->getMessage(); }
 
 $page_title = 'دفعات الدفع والتنفيذ';
 require_once __DIR__ . '/../includes/screen_contract.php';
@@ -126,12 +126,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   $header_actions = array(array('raw' => trim((string) ob_get_clean())));
   $header_back = false;
   include __DIR__ . '/../includes/page_header.php';
-  echo ems_states_bundle('لا دفعةَ دفعٍ مفتوحةٌ بعد',
-      'الدفعةُ تُفتح ثم تُجهَّز ثم تُنفَّذ بمرجعِ حركةٍ بنكيّ — بيدٍ غيرِ يدِ المُعِدّ');
+  echo ems_states_bundle('لا دفعة دفع مفتوحة بعد',
+      'الدفعة تفتح ثم تجهز ثم تنفذ بمرجع حركة بنكي — بيد غير يد المعد');
   ?>
   <p class="text-muted">العقدة ٢٥ · <code>RESOLVE_FROM_POLICY:treasury_disbursement</code> —
-     <strong>تنفيذٌ نقديٌّ ينتج مرجعَ الحركةِ ولا قيد</strong>؛ والمستفيدُ يجب أن يكون
-     متحقَّقًا في <a href="tre_beneficiary.php">سجل المستفيدين</a>.</p>
+     <strong>تنفيذ نقدي ينتج مرجع الحركة ولا قيد</strong>؛ والمستفيد يجب أن يكون
+     متحققا في <a href="tre_beneficiary.php">سجل المستفيدين</a>.</p>
   <?php if ($msg !== ''): ?>
     <div class="alert <?= (mb_strpos($msg, '✅') !== false ? 'alert-success' : 'alert-danger') ?>">
       <?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div>
@@ -155,14 +155,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   <table class="table table-striped" data-no-dt>
     <thead><tr>
       <th>الإجراء</th><th>رقم الدفعة</th><th>تاريخ القيمة</th><th>الحساب</th><th>العملة</th>
-      <th>السطور</th><th>الحالة</th><th>أعدَّها</th><th>نفَّذها</th><th>مرجع الحركة</th>
+      <th>السطور</th><th>الحالة</th><th>أعدها</th><th>نفذها</th><th>مرجع الحركة</th>
       <th class="ems-gov-th none" data-gov="entity" data-slice="1">الكيان</th>
       <th class="ems-gov-th none" data-gov="idem_key" data-slice="2">مفتاح منع التكرار</th>
       <th class="ems-gov-th none" data-gov="currency" data-slice="3">العملة</th>
     </tr></thead>
     <tbody>
     <?php if (empty($rows)): ?>
-      <tr><td colspan="10" class="text-center text-muted">لا دفعةَ دفعٍ مفتوحةٌ بعد</td></tr>
+      <tr><td colspan="10" class="text-center text-muted">لا دفعة دفع مفتوحة بعد</td></tr>
     <?php endif; ?>
     <?php foreach ($rows as $r): $id = (int) $r['id']; ?>
       <tr>

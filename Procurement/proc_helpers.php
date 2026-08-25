@@ -116,7 +116,7 @@ if (!function_exists('proc_items_options')) {
             $r['label'] = ($code === '' ? '' : $code . ' — ') . $r['name'];
         }
         unset($r);
-        return proc_options_from_rows($rows, $selected, '— اختر صنفاً —');
+        return proc_options_from_rows($rows, $selected, '— اختر صنفا —');
     }
 }
 
@@ -131,7 +131,7 @@ if (!function_exists('proc_suppliers_options')) {
         ));
         foreach ($rows as &$r) { $r['label'] = $r['name']; }
         unset($r);
-        return proc_options_from_rows($rows, $selected, '— اختر مورداً —');
+        return proc_options_from_rows($rows, $selected, '— اختر موردا —');
     }
 }
 
@@ -146,7 +146,7 @@ if (!function_exists('proc_warehouses_options')) {
         ));
         foreach ($rows as &$r) { $r['label'] = $r['name'] . ' (' . $r['type'] . ')'; }
         unset($r);
-        return proc_options_from_rows($rows, $selected, '— اختر مخزناً —');
+        return proc_options_from_rows($rows, $selected, '— اختر مخزنا —');
     }
 }
 
@@ -240,7 +240,7 @@ if (!function_exists('proc_issue_states')) {
     function proc_issue_states() { return array('مسودة', 'محجوز', 'مصروف', 'محمَّل التكلفة'); }
 }
 if (!function_exists('proc_custody_states')) {
-    function proc_custody_states() { return array('مصروفة', 'إرجاع جزئي', 'مستهلكة', 'مُقفلة'); }
+    function proc_custody_states() { return array('مصروفة', 'إرجاع جزئي', 'مستهلكة', 'مقفلة'); }
 }
 if (!function_exists('proc_material_natures')) {
     function proc_material_natures() { return array('قابل للتخزين', 'غير قابل للتخزين', 'خدمة ومصنعيات'); }
@@ -442,7 +442,7 @@ if (!function_exists('proc_match_invoice')) {
         $order_id = intval($order_id);
         $out = array('status' => 'skipped', 'qty_var' => 0.0, 'price_var' => 0.0,
                      'tolerance' => 0.0, 'due_id' => null, 'reason' => '');
-        if ($order_id <= 0) { $out['reason'] = 'معرّفٌ غير صالح'; return $out; }
+        if ($order_id <= 0) { $out['reason'] = 'معرف غير صالح'; return $out; }
 
         $invoice_no = trim((string) $invoice_no);
         $invoice_amount = (float) $invoice_amount;
@@ -450,11 +450,11 @@ if (!function_exists('proc_match_invoice')) {
         // (الفاتورة − ضريبتها) بقيمة الأمر — والذمّةُ تُفتح بالإجمالي (الضريبةُ دَينٌ أيضًا)
         $invoice_tax = max(0.0, (float) $invoice_tax);
         if ($invoice_no === '' || $invoice_amount <= 0) {
-            $out['reason'] = 'رقمُ الفاتورة وقيمتُها إلزاميان';
+            $out['reason'] = 'رقم الفاتورة وقيمتها إلزاميان';
             return $out;
         }
         if ($invoice_tax >= $invoice_amount) {
-            $out['reason'] = 'الضريبةُ لا تبلغ قيمةَ الفاتورة';
+            $out['reason'] = 'الضريبة لا تبلغ قيمة الفاتورة';
             return $out;
         }
 
@@ -465,11 +465,11 @@ if (!function_exists('proc_match_invoice')) {
             error_log('proc match #' . $order_id . ': ' . $t->getMessage());
             $out['status'] = 'failed'; return $out;
         }
-        if (!$po) { $out['reason'] = 'الأمرُ غير موجود'; return $out; }
+        if (!$po) { $out['reason'] = 'الأمر غير موجود'; return $out; }
 
         // الضلعُ الثاني شرطٌ: لا مطابقةَ قبل وصول البضاعة (نفسُ بوابة المصروف)
         if (!in_array((string) $po['state'], proc_order_expense_states(), true)) {
-            $out['reason'] = 'لا مطابقةَ قبل الاستلام النهائي — الحالة: ' . $po['state'];
+            $out['reason'] = 'لا مطابقة قبل الاستلام النهائي — الحالة: ' . $po['state'];
             return $out;
         }
 
@@ -527,8 +527,8 @@ if (!function_exists('proc_match_invoice')) {
 
         if (!$ok) {
             $out['status'] = 'var_pending';
-            $out['reason'] = (!$withinQty ? 'فرقُ كميةٍ ' . $qtyVar . ' ' : '')
-                           . (!$withinPrice ? 'فرقُ قيمةٍ ' . $priceVar . ' (السماح ' . round($tol, 2) . ')' : '');
+            $out['reason'] = (!$withinQty ? 'فرق كمية ' . $qtyVar . ' ' : '')
+                           . (!$withinPrice ? 'فرق قيمة ' . $priceVar . ' (السماح ' . round($tol, 2) . ')' : '');
             return $out;   // لا دَينَ حتى قرارٍ موثَّق
         }
 
@@ -582,7 +582,7 @@ if (!function_exists('proc_open_supplier_payable')) {
                 'currency'          => $currency,
                 'source_ref'        => (string) $invoice_no,
                 'project_id'        => (isset($po['project_id']) && intval($po['project_id']) > 0) ? intval($po['project_id']) : null,
-                'notes'             => 'استحقاقُ فاتورة مورد ' . $invoice_no . ' — أمر ' . $po['code'],
+                'notes'             => 'استحقاق فاتورة مورد ' . $invoice_no . ' — أمر ' . $po['code'],
                 'payload'           => array_merge(array(
                     'order_id'    => $order_id,
                     'order_code'  => (string) $po['code'],
@@ -651,9 +651,9 @@ if (!function_exists('proc_match_resolve')) {
 
         $valid = array('قبول الفرق', 'إشعار دائن', 'رفض الفاتورة');
         if ($order_id <= 0 || !in_array($decision, $valid, true)) {
-            $out['reason'] = 'قرارٌ غير معروف'; return $out;
+            $out['reason'] = 'قرار غير معروف'; return $out;
         }
-        if ($reason === '') { $out['reason'] = 'لا حسمَ بلا تفسير — السببُ إلزامي'; return $out; }
+        if ($reason === '') { $out['reason'] = 'لا حسم بلا تفسير — السبب إلزامي'; return $out; }
 
         $gate = proc_gate(false);
         try {
@@ -662,9 +662,9 @@ if (!function_exists('proc_match_resolve')) {
             error_log('proc resolve #' . $order_id . ': ' . $t->getMessage());
             $out['status'] = 'failed'; return $out;
         }
-        if (!$po) { $out['reason'] = 'الأمرُ غير موجود'; return $out; }
+        if (!$po) { $out['reason'] = 'الأمر غير موجود'; return $out; }
         if ((string) $po['match_state'] !== 'var_pending') {
-            $out['reason'] = 'لا فرقَ معلَّقًا على هذا الأمر — الحالة: ' . $po['match_state'];
+            $out['reason'] = 'لا فرق معلقا على هذا الأمر — الحالة: ' . $po['match_state'];
             return $out;
         }
 

@@ -88,7 +88,7 @@ class DepreciationService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'amount' => 0.0, 'basis' => array());
         if (!preg_match('/^\d{4}-\d{2}$/', (string) $period)) {
-            $out['code'] = 422; $out['reason'] = 'الفترةُ بصيغة YYYY-MM'; return $out;
+            $out['code'] = 422; $out['reason'] = 'الفترة بصيغة YYYY-MM'; return $out;
         }
         /* ◆ INJ-0033: الملفُّ يعلو حقولَ الأصل — والمصدرُ يُعلَن في الأساس */
         $srcOfTerms = 'asset';
@@ -103,7 +103,7 @@ class DepreciationService
         $life = (int) $asset['useful_life_months'];
         if ($life <= 0) {
             $out['code'] = 422;
-            $out['reason'] = 'العمرُ الإنتاجيُّ غيرُ مكتوب — ولا يُفترض له رقم';
+            $out['reason'] = 'العمر الإنتاجي غير مكتوب — ولا يفترض له رقم';
             return $out;
         }
 
@@ -112,12 +112,12 @@ class DepreciationService
                ? substr((string) $asset['acquisition_date'], 0, 7) : '';
         if ($acq === '') {
             $out['code'] = 422;
-            $out['reason'] = 'تاريخُ الاقتناء غيرُ مكتوب — ولا يُعرف متى يبدأ الإهلاك';
+            $out['reason'] = 'تاريخ الاقتناء غير مكتوب — ولا يعرف متى يبدأ الإهلاك';
             return $out;
         }
         if ((string) $period < $acq) {
             $out['code'] = 422;
-            $out['reason'] = 'الفترةُ ' . $period . ' **قبل شهر الاقتناء** ' . $acq . ' — لا إهلاكَ لما لم يُقتنَ بعد';
+            $out['reason'] = 'الفترة ' . $period . ' **قبل شهر الاقتناء** ' . $acq . ' — لا إهلاك لما لم يقتن بعد';
             return $out;
         }
 
@@ -127,13 +127,13 @@ class DepreciationService
         $depreciable = round($cost - $salv, 2);
         if ($depreciable <= 0) {
             $out['code'] = 422;
-            $out['reason'] = 'القيمةُ القابلةُ للإهلاك صفرٌ أو سالبة (التكلفة ' . $cost . ' والخردة ' . $salv . ')';
+            $out['reason'] = 'القيمة القابلة للإهلاك صفر أو سالبة (التكلفة ' . $cost . ' والخردة ' . $salv . ')';
             return $out;
         }
         $remaining = round($depreciable - $acc, 2);
         if ($remaining <= 0) {
             $out['code'] = 409;
-            $out['reason'] = 'الأصلُ مُهلَكٌ بالكامل — ولا تُهلَك خردة';
+            $out['reason'] = 'الأصل مهلك بالكامل — ولا تهلك خردة';
             return $out;
         }
 
@@ -183,7 +183,7 @@ class DepreciationService
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'posted' => 0,
                      'skipped' => array(), 'total' => 0.0, 'events' => 0);
         if (!preg_match('/^\d{4}-\d{2}$/', (string) $period)) {
-            $out['code'] = 422; $out['reason'] = 'الفترةُ بصيغة YYYY-MM'; return $out;
+            $out['code'] = 422; $out['reason'] = 'الفترة بصيغة YYYY-MM'; return $out;
         }
         $lastDay = date('Y-m-t', strtotime($period . '-01'));
 
@@ -201,7 +201,7 @@ class DepreciationService
                 'orderBy' => 'id',
             ));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّرت قراءةُ الأصول: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذرت قراءة الأصول: ' . $t->getMessage(); return $out;
         }
 
         $scope = array();
@@ -220,8 +220,8 @@ class DepreciationService
             }
         }
         $out['ok'] = true; $out['code'] = 200;
-        $out['reason'] = 'الفترة ' . $period . ': ' . $out['posted'] . ' أصلًا بمجموع '
-                       . $out['total'] . ' · متخطًّى ' . count($out['skipped']);
+        $out['reason'] = 'الفترة ' . $period . ': ' . $out['posted'] . ' أصلا بمجموع '
+                       . $out['total'] . ' · متخطى ' . count($out['skipped']);
         return $out;
     }
 
@@ -243,10 +243,10 @@ class DepreciationService
                   WHERE {TENANT_SCOPE} AND d.asset_id = ? AND d.period_ref = ? LIMIT 1",
                 array($aid, (string) $period));
             $ex = $rows ? $rows[0] : null;
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $ex'); $ex = null; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $ex'); $ex = null; }
         if ($ex) {
             $out['code'] = 409;
-            $out['reason'] = 'محتسَبٌ سلفًا للفترة ' . $period . ' (صف #' . (int) $ex['id'] . ')';
+            $out['reason'] = 'محتسب سلفا للفترة ' . $period . ' (صف #' . (int) $ex['id'] . ')';
             $out['amount'] = round((float) $ex['depreciation_amount'], 2);
             $out['row_id'] = (int) $ex['id'];
             $out['event_id'] = $ex['event_id'] !== null ? (int) $ex['event_id'] : null;
@@ -260,15 +260,15 @@ class DepreciationService
         $profile = self::profileFor($conn, $companyId, $asset);
         if ($profile === null) {
             $out['code'] = 422;
-            $out['reason'] = 'DEP-422: لا ملفَّ إهلاكٍ معتمدًا لهذا الأصل (فئة «'
+            $out['reason'] = 'DEP-422: لا ملف إهلاك معتمدا لهذا الأصل (فئة «'
                 . (string) ($asset['category'] ?? '—') . '») — '
-                . 'اعتمدْ سياسةً في «سياسات الإهلاك المعتمدة» قبل الترحيل';
+                . 'اعتمد سياسة في «سياسات الإهلاك المعتمدة» قبل الترحيل';
             return $out;
         }
         $calc = self::computeFor($asset, $period, $profile);
         if (!$calc['ok']) { return array_merge($out, array('code' => $calc['code'], 'reason' => $calc['reason'])); }
         $amount = $calc['amount'];
-        if ($amount <= 0) { $out['code'] = 422; $out['reason'] = 'قسطٌ صفريّ'; return $out; }
+        if ($amount <= 0) { $out['code'] = 422; $out['reason'] = 'قسط صفري'; return $out; }
 
         // الإهلاك المقسَّم (FIN-01 §6 · F11): الوظيفة القائمة **تقرأ الحصص** —
         // أصل بحصتين 60/40 ⇒ قيد بسطرين بنسبة الحصة النافذة في الفترة،
@@ -298,13 +298,13 @@ class DepreciationService
                     'source'     => in_array($source, array('screen', 'cron'), true) ? $source : 'screen',
                     'created_by' => (int) $actor ?: null,
                 ));
-                if ($rowId <= 0) { throw new \RuntimeException('تعذّر إدراجُ صفّ الإهلاك'); }
+                if ($rowId <= 0) { throw new \RuntimeException('تعذر إدراج صف الإهلاك'); }
                 $g->update('fin_assets',
                     array('accumulated_depreciation' => $newAcc, 'state' => $newState),
                     array('id' => $aid));
             }, 'إهلاك أصل ' . $aid . ' فترة ' . $period);
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر الاحتساب: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الاحتساب: ' . $t->getMessage(); return $out;
         }
 
         $out['ok'] = true; $out['code'] = 200; $out['amount'] = $amount;
@@ -328,7 +328,7 @@ class DepreciationService
             $assets = $gate->select('fin_assets', array(
                 'where' => array('state' => self::DEPRECIABLE_STATE), 'orderBy' => 'id'));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّرت قراءةُ الأصول'; return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذرت قراءة الأصول'; return $out;
         }
         $scope = array();
         foreach ($only as $x) { $scope[(int) $x] = true; }
@@ -341,7 +341,7 @@ class DepreciationService
         }
         if ($earliest === null) {
             $out['ok'] = true; $out['code'] = 200;
-            $out['reason'] = 'لا أصلَ بتاريخ اقتناءٍ مكتوب — لا استدراك';
+            $out['reason'] = 'لا أصل بتاريخ اقتناء مكتوب — لا استدراك';
             return $out;
         }
 
@@ -359,8 +359,8 @@ class DepreciationService
             $cur = date('Y-m', strtotime($cur . '-01 +1 month'));
         }
         $out['ok'] = true; $out['code'] = 200;
-        $out['reason'] = 'استُدرك من ' . $earliest . ' إلى ' . $end . ': '
-                       . $out['posted'] . ' قسطًا بمجموع ' . $out['total'];
+        $out['reason'] = 'استدرك من ' . $earliest . ' إلى ' . $end . ': '
+                       . $out['posted'] . ' قسطا بمجموع ' . $out['total'];
         return $out;
     }
 
@@ -467,7 +467,7 @@ class DepreciationService
             if (!empty($lines) && abs($allocated - $amount) > 0.001) {
                 $lines[0]['amount'] = round($lines[0]['amount'] + ($amount - $allocated), 2);
             }
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $lines'); $lines = array(); }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $lines'); $lines = array(); }
         if (empty($lines)) {
             $lines[] = array('bearer_kind' => 'tenant', 'ref' => null, 'pct' => 100.0, 'amount' => round((float) $amount, 2));
         }
@@ -494,7 +494,7 @@ class DepreciationService
             'source_ref'        => (string) $asset['code'],
             'equipment_id'      => ($asset['equipment_id'] !== null && (int) $asset['equipment_id'] > 0)
                                    ? (int) $asset['equipment_id'] : null,
-            'notes'             => 'إهلاكُ ' . (string) $asset['code'] . ' — الفترة ' . $period,
+            'notes'             => 'إهلاك ' . (string) $asset['code'] . ' — الفترة ' . $period,
             'payload'           => array(
                 'asset_id' => (int) $asset['id'], 'asset_code' => (string) $asset['code'],
                 'period' => (string) $period, 'amount' => round((float) $amount, 2),

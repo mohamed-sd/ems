@@ -134,15 +134,15 @@ class EventPublisher
         }
         foreach (array('company_id', 'entity_id', 'created_by') as $f) {
             if (!is_numeric($e[$f]) || intval($e[$f]) <= 0 || strval(intval($e[$f])) !== strval($e[$f])) {
-                throw new EventValidationException("عقد §9: {$f} معرّفٌ رقميٌّ موجبٌ حصرًا");
+                throw new EventValidationException("عقد §9: {$f} معرف رقمي موجب حصرا");
             }
         }
         $occurred = \DateTime::createFromFormat('Y-m-d H:i:s', $e['occurred_at']);
         if (!$occurred || $occurred->format('Y-m-d H:i:s') !== $e['occurred_at']) {
-            throw new EventValidationException('عقد §9: occurred_at بصيغة Y-m-d H:i:s (UTC) حصرًا');
+            throw new EventValidationException('عقد §9: occurred_at بصيغة Y-m-d H:i:s (UTC) حصرا');
         }
         if (!is_array($e['payload'])) {
-            throw new EventValidationException('عقد §9: payload مصفوفة تُسلسل JSON حصرًا');
+            throw new EventValidationException('عقد §9: payload مصفوفة تسلسل JSON حصرا');
         }
 
         // ── 3) المراجع: رقمية حصرًا — الحدث يحمل مراجع لا نسخًا (ADR-09) ──
@@ -153,7 +153,7 @@ class EventPublisher
                 continue;
             }
             if (!is_numeric($e[$f]) || intval($e[$f]) <= 0 || strval(intval($e[$f])) !== strval($e[$f])) {
-                throw new EventValidationException("عقد §9: {$f} مرجعٌ رقميٌّ إلى جدوله المالك — لا مفاتيح نصية");
+                throw new EventValidationException("عقد §9: {$f} مرجع رقمي إلى جدوله المالك — لا مفاتيح نصية");
             }
             $refs[$f] = intval($e[$f]);
         }
@@ -166,7 +166,7 @@ class EventPublisher
             ? (string) $e['idempotency_key']
             : ServerId::idempotencyKey($e['event_key'], $e['entity_type'], intval($e['entity_id']));
         if (strlen($idem) > 64 || strlen($correlation) > 64) {
-            throw new EventValidationException('عقد §9: correlation/idempotency ≤ 64 حرفًا');
+            throw new EventValidationException('عقد §9: correlation/idempotency ≤ 64 حرفا');
         }
 
         return array(

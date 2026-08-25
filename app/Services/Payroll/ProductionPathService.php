@@ -61,10 +61,10 @@ class ProductionPathService
                      'produced' => 0, 'incentives' => 0, 'declared' => 0);
         $runId = (int) $runId;
         $run = PayrollRunService::runOf($gate, $runId);
-        if (!$run) { $out['code'] = 404; $out['reason'] = 'الدورةُ غير موجودةٍ في نطاقك'; return $out; }
+        if (!$run) { $out['code'] = 404; $out['reason'] = 'الدورة غير موجودة في نطاقك'; return $out; }
         if (!in_array((string) $run['state'], array('Calculated', 'Blocked'), true)) {
             $out['code'] = 423;
-            $out['reason'] = 'المسارُ الإنتاجيُّ يعمل بعد ربط اللقطات — الدورةُ «' . $run['state'] . '»';
+            $out['reason'] = 'المسار الإنتاجي يعمل بعد ربط اللقطات — الدورة «' . $run['state'] . '»';
             return $out;
         }
         $pFrom = (string) $run['period_from'];
@@ -78,10 +78,10 @@ class ProductionPathService
                   WHERE {TENANT_SCOPE} AND l.run_id = ? AND l.path = 'project'
                     AND l.line_kind = 'component'
                   ORDER BY l.person_id, l.id", array($runId));
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $lines'); $lines = array(); }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $lines'); $lines = array(); }
         if (!$lines) {
             $out['ok'] = true; $out['code'] = 200;
-            $out['reason'] = 'لا أسطرَ مشروعيةً في هذه الدورة — لا شيءَ للمسار الإنتاجي';
+            $out['reason'] = 'لا أسطر مشروعية في هذه الدورة — لا شيء للمسار الإنتاجي';
             return $out;
         }
 
@@ -111,7 +111,7 @@ class ProductionPathService
             if ($model === null) {
                 self::addLine($gate, $runId, $personId, $contractId, $snapshotId, 'production',
                     'production:no_model', null, null, null, null, 'pending_slice',
-                    'لا نموذجَ أجرٍ على العقد — لا وحدةَ تُقاس ولا معدلَ يُقرأ');
+                    'لا نموذج أجر على العقد — لا وحدة تقاس ولا معدل يقرأ');
                 $declared++; continue;
             }
 
@@ -129,22 +129,22 @@ class ProductionPathService
                 if ((string) $model['calc_path'] !== 'production' && (string) $model['calc_path'] !== 'mixed') {
                     self::addLine($gate, $runId, $personId, $contractId, $snapshotId, 'production',
                         'production:time_model', null, null, null, null, 'pending_slice',
-                        'نموذجٌ «' . $model['label_ar'] . '» زمنيٌّ في عقدٍ مشروعي — '
-                        . 'لا يُحتسب بمسارٍ إنتاجيٍّ (§3: كلٌّ يُقرأ بمساره)');
+                        'نموذج «' . $model['label_ar'] . '» زمني في عقد مشروعي — '
+                        . 'لا يحتسب بمسار إنتاجي (§3: كل يقرأ بمساره)');
                     $declared++;
                 }
             } elseif ($awarded['qty'] <= 0) {
                 self::addLine($gate, $runId, $personId, $contractId, $snapshotId, 'production',
                     'production:' . $unit, 0.0, null, null, null, 'pending_slice',
-                    'صفرُ وحداتٍ **محكومةٍ** بـ«' . $unit . '» في الفترة — ' . $awarded['why']);
+                    'صفر وحدات **محكومة** ب«' . $unit . '» في الفترة — ' . $awarded['why']);
                 $declared++;
             } else {
                 $rate = self::unitRate($components, $unit);
                 if ($rate === null) {
                     self::addLine($gate, $runId, $personId, $contractId, $snapshotId, 'production',
                         'production:' . $unit, $awarded['qty'], null, null, null, 'pending_slice',
-                        $awarded['qty'] . ' ' . $unit . ' محكومةً — **ولا معدلَ وحدةٍ في اللقطة**: '
-                        . 'لا تسعيرَ ملفَّق (§4: من العقد لا من اجتهاد)');
+                        $awarded['qty'] . ' ' . $unit . ' محكومة — **ولا معدل وحدة في اللقطة**: '
+                        . 'لا تسعير ملفق (§4: من العقد لا من اجتهاد)');
                     $declared++;
                 } else {
                     $bearers = self::bearersFor($bearersMap, $rate['component_ref'], $components, $rate['component_id']);
@@ -168,7 +168,7 @@ class ProductionPathService
                 if (!in_array($basis, self::QTY_BASES, true)) {
                     self::addLine($gate, $runId, $personId, $contractId, $snapshotId, 'incentive',
                         'rule#' . $rule['id'], null, null, null, null, 'pending_slice',
-                        'حافزٌ بأساس «' . $basis . '» — مصدرُ قياسه ليس كميةً منجزةً؛ يُعلَن ولا يُخترع');
+                        'حافز بأساس «' . $basis . '» — مصدر قياسه ليس كمية منجزة؛ يعلن ولا يخترع');
                     $declared++;
                     continue;
                 }
@@ -177,7 +177,7 @@ class ProductionPathService
                 if ($rateV === null || $rateV <= 0) {
                     self::addLine($gate, $runId, $personId, $contractId, $snapshotId, 'incentive',
                         'rule#' . $rule['id'], $qty, null, null, null, 'pending_slice',
-                        'قاعدةُ حافزٍ بلا معدلٍ — لا تصير مالًا');
+                        'قاعدة حافز بلا معدل — لا تصير مالا');
                     $declared++;
                     continue;
                 }
@@ -189,10 +189,10 @@ class ProductionPathService
                 $amount = round($countable * $rateV, 2);
                 $capNote = '';
                 if ($rule['cap'] !== null && (float) $rule['cap'] > 0 && $amount > (float) $rule['cap']) {
-                    $amount = round((float) $rule['cap'], 2); $capNote = ' · مقصوصٌ بالسقف';
+                    $amount = round((float) $rule['cap'], 2); $capNote = ' · مقصوص بالسقف';
                 }
                 if ($rule['floor'] !== null && (float) $rule['floor'] > 0 && $amount < (float) $rule['floor']) {
-                    $amount = round((float) $rule['floor'], 2); $capNote = ' · رُفع للحد الأدنى';
+                    $amount = round((float) $rule['floor'], 2); $capNote = ' · رفع للحد الأدنى';
                 }
                 if ($amount <= 0) { continue; }
 
@@ -205,15 +205,15 @@ class ProductionPathService
                     if ((string) $a['beneficiary_type'] !== 'employee') {
                         self::addLine($gate, $runId, $personId, $contractId, $snapshotId, 'incentive',
                             'rule#' . $rule['id'], $countable, $rateV, null, null, 'pending_slice',
-                            'مستفيدٌ بمسمًّى وظيفيٍّ «' . $a['beneficiary_id'] . '» — يُحلُّ إلى أشخاصٍ '
-                            . 'وقتَ الاحتساب وبيتُه شريحةُ المسيّر ⑤');
+                            'مستفيد بمسمى وظيفي «' . $a['beneficiary_id'] . '» — يحل إلى أشخاص '
+                            . 'وقت الاحتساب وبيته شريحة المسير ⑤');
                         $declared++;
                         continue;
                     }
                     $share = round($amount * ((float) $a['percent']) / 100.0, 2);
                     self::addLine($gate, $runId, (int) $a['beneficiary_id'], $contractId, $snapshotId,
                         'incentive', 'rule#' . $rule['id'], $countable, $rateV, null, null, 'computed',
-                        'حافزُ «' . $rule['incentive_type'] . '» بأساس ' . $basis . ': '
+                        'حافز «' . $rule['incentive_type'] . '» بأساس ' . $basis . ': '
                         . $countable . ' × ' . $rateV . $capNote . ' × ' . $a['percent'] . '٪',
                         $share, (float) $a['percent']);
                     $incentives++;
@@ -226,8 +226,8 @@ class ProductionPathService
         $out['ok'] = true; $out['code'] = 200;
         $out['persons'] = count($byPerson);
         $out['produced'] = $produced; $out['incentives'] = $incentives; $out['declared'] = $declared;
-        $out['reason'] = 'المسارُ الإنتاجي: ' . $produced . ' سطرَ إنتاجٍ · ' . $incentives
-                       . ' حافزًا · ' . $declared . ' معلَنًا بلا مصدر';
+        $out['reason'] = 'المسار الإنتاجي: ' . $produced . ' سطر إنتاج · ' . $incentives
+                       . ' حافزا · ' . $declared . ' معلنا بلا مصدر';
         return $out;
     }
 
@@ -256,10 +256,10 @@ class ProductionPathService
                     AND e.entry_date BETWEEN ? AND ?
                   ORDER BY a.id",
                 array((int) $personId, (string) $unit, (string) $pFrom, (string) $pTo));
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $rows'); $rows = array(); }
+        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $rows'); $rows = array(); }
 
         if (!$rows) {
-            $out['why'] = 'لا وحداتٍ مسجَّلةً لهذا المشغّل بهذه الوحدة في الفترة';
+            $out['why'] = 'لا وحدات مسجلة لهذا المشغل بهذه الوحدة في الفترة';
             return $out;
         }
         $refs = array();
@@ -272,13 +272,13 @@ class ProductionPathService
             $refs[] = 'واقعة#' . (int) $r['source_ref'];
         }
         $out['qty'] = round($out['qty'], 2);
-        $out['refs'] = $refs ? ('مراجعُها: ' . implode(' · ', array_slice($refs, 0, 8))
+        $out['refs'] = $refs ? ('مراجعها: ' . implode(' · ', array_slice($refs, 0, 8))
                                 . (count($refs) > 8 ? ' …' : '')) : '';
         if ($out['excluded'] > 0) {
-            $out['why'] = $out['excluded'] . ' واقعةً **لم تكتمل أحكامُ أطرافها** فلا تدخل أجرًا (§3-②)';
+            $out['why'] = $out['excluded'] . ' واقعة **لم تكتمل أحكام أطرافها** فلا تدخل أجرا (§3-②)';
             if ($out['qty'] > 0) { $out['refs'] .= ' · و' . $out['why']; }
         } elseif ($out['qty'] <= 0) {
-            $out['why'] = 'الوقائعُ محكومةٌ وكميةُ استحقاقها صفر';
+            $out['why'] = 'الوقائع محكومة وكمية استحقاقها صفر';
         }
         return $out;
     }
@@ -330,7 +330,7 @@ class ProductionPathService
     {
         $s = null;
         try { $s = $gate->selectOne('contract_snapshots', array('where' => array('id' => (int) $snapshotId))); }
-        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كغيابٍ للسجل — $s'); $s = null; }
+        catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كغياب للسجل — $s'); $s = null; }
         if (!$s) { return null; }
         $p = json_decode((string) $s['snapshot_json'], true);
         return is_array($p) ? $p : null;

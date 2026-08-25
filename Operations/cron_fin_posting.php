@@ -33,8 +33,8 @@ $dry       = isset($args['dry-run']);
 $actor     = isset($args['actor']) ? (int) $args['actor'] : 0;
 
 if ($companyId <= 0) { exit("يلزم --company=<id>\n"); }
-if ($limit <= 0)     { exit("يلزم --limit=<n> — لا ترحيلَ بلا سقفٍ مُعلَن\n"); }
-if ($limit > 1000)   { exit("السقفُ الأقصى 1000 في التشغيلةِ الواحدة (طُلب $limit)\n"); }
+if ($limit <= 0)     { exit("يلزم --limit=<n> — لا ترحيل بلا سقف معلن\n"); }
+if ($limit > 1000)   { exit("السقف الأقصى 1000 في التشغيلة الواحدة (طلب $limit)\n"); }
 
 /* هويةٌ صريحةٌ: بوابةُ العزلِ تُبنى من الجلسةِ وهي fail-closed في CLI */
 if ($actor <= 0) {
@@ -45,13 +45,13 @@ if ($actor <= 0) {
         $actor = $r && ($x = $r->fetch_row()) ? (int) $x[0] : 0;
     }
 }
-if ($actor <= 0) { exit("تعذّر تحديدُ فاعلٍ للكيان $companyId — مرّر --actor=<id>\n"); }
+if ($actor <= 0) { exit("تعذر تحديد فاعل للكيان $companyId — مرر --actor=<id>\n"); }
 $_SESSION = array('user' => array('id' => $actor, 'company_id' => $companyId, 'role' => '17'));
 $gate = ems_tenant_db();
 
 $ts = date('Y-m-d H:i:s');
-echo "══ ترحيلُ الوقائعِ — كيان $companyId · سقف $limit · فاعل $actor · $ts ══\n";
-if ($dry) { echo "◆ قياسٌ فقط — لا كتابة\n"; }
+echo "══ ترحيل الوقائع — كيان $companyId · سقف $limit · فاعل $actor · $ts ══\n";
+if ($dry) { echo "◆ قياس فقط — لا كتابة\n"; }
 
 $one = function (string $s) use ($conn) { $r = $conn->query($s); return $r ? (int) $r->fetch_row()[0] : 0; };
 $snap = function () use ($one, $companyId) {
@@ -72,8 +72,8 @@ if ($dry) {
                       JOIN fin_financial_periods p ON p.company_id=e.company_id AND p.period_type='month'
                        AND p.posting_allowed=1 AND DATE(e.occurred_at) BETWEEN p.start_date AND p.end_date
                       WHERE e.company_id=$companyId AND e.fes_status='Published' AND e.amount>0");
-    echo "  المؤهَّلُ (منشورٌ · مبلغٌ موجب · فترةٌ مفتوحة): " . number_format($eligible) . "\n";
-    echo "  وسيُعالَج منها في هذه التشغيلة: " . number_format(min($eligible, $limit)) . "\n";
+    echo "  المؤهل (منشور · مبلغ موجب · فترة مفتوحة): " . number_format($eligible) . "\n";
+    echo "  وسيعالج منها في هذه التشغيلة: " . number_format(min($eligible, $limit)) . "\n";
     exit(0);
 }
 
@@ -94,7 +94,7 @@ $show('نتيجة', PS::reviewPublished($gate, $conn, $companyId, $actor, $limit
 echo "\n② الاعتماد (UnderReview ⇐ Approved)\n";
 $show('نتيجة', PS::approveReviewed($gate, $conn, $companyId, $actor, $limit));
 
-echo "\n②-ب إعادةُ ما رسب بعدَ زوالِ سببِه (PostingFailed ⇐ RetryPending)\n";
+echo "\n②-ب إعادة ما رسب بعد زوال سببه (PostingFailed ⇐ RetryPending)\n";
 $show('نتيجة', PS::retryFailed($gate, $conn, $companyId, $actor, $limit));
 
 echo "\n③ الترحيل (Approved · RetryPending ⇐ Posted)\n";
@@ -110,7 +110,7 @@ foreach ($before as $k => $v) {
 }
 $bal = $conn->query("SELECT COUNT(*) FROM fin_journal_entries
                      WHERE company_id=$companyId AND ABS(total_debit - total_credit) > 0.005");
-echo '  قيودٌ غيرُ متوازنة: ' . ($bal ? $bal->fetch_row()[0] : '?') . " (المتوقَّع 0)\n";
-printf("  مجموعُ ما رُحِّل: مدين %s · دائن %s\n",
+echo '  قيود غير متوازنة: ' . ($bal ? $bal->fetch_row()[0] : '?') . " (المتوقع 0)\n";
+printf("  مجموع ما رحل: مدين %s · دائن %s\n",
     number_format($p['debit_total'], 2), number_format($p['credit_total'], 2));
 echo "\n[fin-posting " . date('Y-m-d H:i:s') . "] posted={$p['posted']} skipped={$p['skipped']} failed={$p['failed']}\n";

@@ -37,7 +37,7 @@ if (!$can_view) {
 }
 
 // أنواع الكتالوج المعتمدة (قائمة بيضاء)
-$mnt_lookup_types = array('سبب عطل', 'سبب توقّف', 'نوع مهمة', 'ورشة');
+$mnt_lookup_types = array('سبب عطل', 'سبب توقف', 'نوع مهمة', 'ورشة');
 
 // شرط عزل الشركة للعرض/التعديل
 $company_scope_sql = $is_super_admin ? "1=1" : "company_id = " . intval($company_id);
@@ -115,7 +115,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا عناصرَ كتالوجِ صيانةٍ مسجَّلةً بعدُ', 'أضف أولَ عنصرٍ بزرِّ «إضافة عنصر» في رأسِ الشاشة — سببَ عطلٍ أو توقّفٍ أو نوعَ مهمةٍ أو ورشة');
+    echo ems_states_bundle('لا عناصر كتالوج صيانة مسجلة بعد', 'أضف أول عنصر بزر «إضافة عنصر» في رأس الشاشة — سبب عطل أو توقف أو نوع مهمة أو ورشة');
     ?>
 
     <?php if (!empty($_GET['msg'])):
@@ -188,10 +188,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <th>الاسم</th>
                             <th>وصف / تفصيل</th>
                             <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                             <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                             <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                             <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>

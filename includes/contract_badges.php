@@ -83,11 +83,11 @@ if (!function_exists('contract_capacity_badges')) {
             if ($left <= 0) { continue; }
             if ($left > $ceiling) {
                 $out['breaking'][] = array(
-                    'label' => 'التزامٌ ينكسر',
-                    'detail' => 'الباقي ' . number_format($left, 0) . ' ساعةً، وسقفُ الطاقة المتبقية '
-                        . number_format($ceiling, 0) . ' ساعةً فقط ('
+                    'label' => 'التزام ينكسر',
+                    'detail' => 'الباقي ' . number_format($left, 0) . ' ساعة، وسقف الطاقة المتبقية '
+                        . number_format($ceiling, 0) . ' ساعة فقط ('
                         . $equipCount . ' معدة × ' . rtrim(rtrim(number_format($shiftHours, 1), '0'), '.')
-                        . 'س × ' . $remainingDays . ' يومًا) — اللحاقُ مستحيلٌ حسابيًّا حتى بطاقةٍ كاملة',
+                        . 'س × ' . $remainingDays . ' يوما) — اللحاق مستحيل حسابيا حتى بطاقة كاملة',
                 );
             }
         }
@@ -124,8 +124,8 @@ if (!function_exists('contract_badges_html')) {
                 . '</span> <small class="ems-badge-why">' . htmlspecialchars($x['detail'], ENT_QUOTES, 'UTF-8') . '</small>';
         }
         if ($b['ending'] !== null) {
-            $h .= '<span class="ems-badge-end"><i class="fas fa-hourglass-half"></i> عقدٌ ينتهي خلال '
-                . intval($b['ending']['days']) . ' يومًا (' . htmlspecialchars($b['ending']['end'], ENT_QUOTES, 'UTF-8') . ')</span>';
+            $h .= '<span class="ems-badge-end"><i class="fas fa-hourglass-half"></i> عقد ينتهي خلال '
+                . intval($b['ending']['days']) . ' يوما (' . htmlspecialchars($b['ending']['end'], ENT_QUOTES, 'UTF-8') . ')</span>';
         }
         return $h;
     }

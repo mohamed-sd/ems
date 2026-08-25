@@ -39,7 +39,7 @@ if (!$is_super_admin && empty($__pp['can_view'])) {
     exit();
 }
 if (!$is_super_admin && $_SERVER['REQUEST_METHOD'] === 'POST' && empty($__pp['can_add']) && empty($__pp['can_edit'])) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'غير مصرح بالكتابة في هذه الشاشة ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
+    ems_gov_flash_redirect('../main/dashboard.php', 'غير مصرح بالكتابة في هذه الشاشة ❌', 'GOV-PERM-403', 'اطلب المنحة من مدير الصلاحيات إن كانت ضمن عملك');
 }
 $COLS   = array (
   0 => 'الكيان',
@@ -48,17 +48,17 @@ $COLS   = array (
   3 => 'رقم الانتقال',
   4 => 'من حالة',
   5 => 'إلى حالة',
-  6 => 'الفعل المُطلق',
+  6 => 'الفعل المطلق',
   7 => 'رمز الفعل',
-  8 => 'المخوَّل',
+  8 => 'المخول',
   9 => 'الشرط المسبق',
-  10 => 'الحارس المطبَّق',
+  10 => 'الحارس المطبق',
   11 => 'الحدث المنشور',
   12 => 'قابل للعكس؟',
   13 => 'فعل العكس',
   14 => 'تاريخ السريان',
   15 => 'النسخة',
-  16 => 'المُنشئ — الاسم والصفة',
+  16 => 'المنشئ — الاسم والصفة',
   17 => 'الحالة',
 );
 $FIELDS = array (
@@ -67,11 +67,11 @@ $FIELDS = array (
   2 => 'رقم الانتقال',
   3 => 'من حالة',
   4 => 'إلى حالة',
-  5 => 'الفعل المُطلق',
+  5 => 'الفعل المطلق',
   6 => 'رمز الفعل',
-  7 => 'المخوَّل',
+  7 => 'المخول',
   8 => 'الشرط المسبق',
-  9 => 'الحارس المطبَّق',
+  9 => 'الحارس المطبق',
   10 => 'الحدث المنشور',
   11 => 'قابل للعكس؟',
   12 => 'فعل العكس',
@@ -91,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     $creator = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
     // الموجة ٢: الحفظ في الجدول الأصلي للشاشة (الفارغ NULL — لا مخزن بينيًّا)
     $ok = cmp03_store_insert($conn, $company_id, $CANONICAL, $payload, $status, $uid, $creator);
-    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
+    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
     exit();
 }
 
@@ -106,7 +106,7 @@ $entityName = $govCtx['values']['entity'] ?? '—';
 function cmp03_cell($col, $row, $entityName) {
     $n = cmp03_screen_norm($col);
     if ($n === cmp03_screen_norm('الكيان')) { return $entityName; }
-    if ($n === cmp03_screen_norm('المُنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المُنشئة')) {
+    if ($n === cmp03_screen_norm('المنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المنشئة')) {
         return $row['created_by_name'] ?: '—';
     }
     if ($n === cmp03_screen_norm('تاريخ الإنشاء')) { return $row['created_at']; }
@@ -121,7 +121,7 @@ function cmp03_screen_norm($s) {
     $s = str_replace(array('أ','إ','آ'), 'ا', $s);
     $s = str_replace('ة', 'ه', $s);
     $s = str_replace('ى', 'ي', $s);
-    return preg_replace('/[ًٌٍَُِّْ]/u', '', $s);
+    return preg_replace('/[]/u', '', $s);
 }
 
 $page_title = 'إيكوبيشن | حالات المستندات وانتقالاتها';
@@ -133,7 +133,7 @@ include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 // UXW-01 بوابة ٩: حالاتُ التحميلِ والفراغِ والخطأِ من المكوّنِ المركزيِّ ux_components
 if (function_exists('ems_states_bundle')) {
-    echo ems_states_bundle('لا انتقالاتِ حالاتٍ مسجَّلةً بعدُ', 'أضف أولَ انتقالٍ بزرِّ «إضافة» أعلى الشاشة');
+    echo ems_states_bundle('لا انتقالات حالات مسجلة بعد', 'أضف أول انتقال بزر «إضافة» أعلى الشاشة');
 }
 ?>
 <div class="main ems-unified-page-shell" dir="rtl">
@@ -171,15 +171,15 @@ if (function_exists('ems_states_bundle')) {
                     <input type="text" name="f3" maxlength="190" id="emsf_666_e6416"></div>
                 <div class="form-group"><label for="emsf_667_73f8b">إلى حالة</label>
                     <input type="text" name="f4" maxlength="190" id="emsf_667_73f8b"></div>
-                <div class="form-group"><label for="emsf_668_ae33c">الفعل المُطلق</label>
+                <div class="form-group"><label for="emsf_668_ae33c">الفعل المطلق</label>
                     <input type="text" name="f5" maxlength="190" id="emsf_668_ae33c"></div>
                 <div class="form-group"><label for="emsf_669_c3295">رمز الفعل</label>
                     <input type="text" name="f6" maxlength="190" id="emsf_669_c3295"></div>
-                <div class="form-group"><label for="emsf_670_63d80">المخوَّل</label>
+                <div class="form-group"><label for="emsf_670_63d80">المخول</label>
                     <input type="text" name="f7" maxlength="190" id="emsf_670_63d80"></div>
                 <div class="form-group"><label for="emsf_671_f60ca">الشرط المسبق</label>
                     <input type="text" name="f8" maxlength="190" id="emsf_671_f60ca"></div>
-                <div class="form-group"><label for="emsf_672_0a9e4">الحارس المطبَّق</label>
+                <div class="form-group"><label for="emsf_672_0a9e4">الحارس المطبق</label>
                     <input type="text" name="f9" maxlength="190" id="emsf_672_0a9e4"></div>
                 <div class="form-group"><label for="emsf_673_0bb99">الحدث المنشور</label>
                     <input type="text" name="f10" maxlength="190" id="emsf_673_0bb99"></div>
@@ -205,28 +205,28 @@ if (function_exists('ems_states_bundle')) {
         <div class="table-responsive">
         <table class="alltables display" id="state_machinesTable">
             <thead><tr>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
             <th>كود الآلة</th>
             <th>نوع المستند</th>
             <th>رقم الانتقال</th>
             <th>من حالة</th>
             <th>إلى حالة</th>
-            <th>الفعل المُطلق</th>
+            <th>الفعل المطلق</th>
             <th>رمز الفعل</th>
-            <th>المخوَّل</th>
+            <th>المخول</th>
             <th>الشرط المسبق</th>
-            <th>الحارس المطبَّق</th>
+            <th>الحارس المطبق</th>
             <th>الحدث المنشور</th>
             <th>قابل للعكس؟</th>
             <th>فعل العكس</th>
             <th>تاريخ السريان</th>
             <th>النسخة</th>
-            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
             <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
             </tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="18" class="text-center text-muted">لا بياناتَ بعدُ — أضف أول صفٍّ بزر «إضافة»</td></tr>
+                <tr><td colspan="18" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
                     <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>

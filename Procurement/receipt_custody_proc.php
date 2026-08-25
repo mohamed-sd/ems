@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['expected_destination'
     $state = trim($_POST['state'] ?? 'مستلَمة');
     $notes = trim($_POST['notes'] ?? '');
 
-    if ($holder_name === '') { ems_gov_flash_redirect('receipt_custody_proc.php', 'اسم المستلِم إلزامي ❌', 'GOV-FAIL-409', ''); exit(); }
+    if ($holder_name === '') { ems_gov_flash_redirect('receipt_custody_proc.php', 'اسم المستلم إلزامي ❌', 'GOV-FAIL-409', ''); exit(); }
     if (!in_array($expected_destination, $destinations, true)) { $expected_destination = 'مخزن'; }
     if (!in_array($state, $states, true)) { $state = 'مستلَمة'; }
     // §15.6: الوجهةُ المخزنية بلا مخزنِ إدخالٍ = رصيدٌ لا يتحرك — تُرفض
@@ -147,7 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['expected_destination'
         }, 'receipt save ' . ($is_editing ? 'edit#' . $id : 'new'));
     } catch (\Throwable $e) {
         error_log('receipt_custody_proc save refused: ' . $e->getMessage());
-        ems_gov_flash_redirect('receipt_custody_proc.php', 'تعذّر الحفظ ❌', 'GOV-FAIL-409', ''); exit();
+        ems_gov_flash_redirect('receipt_custody_proc.php', 'تعذر الحفظ ❌', 'GOV-FAIL-409', ''); exit();
     }
 
     // الحالةُ تتبع الواقعة (UX-09 §5.1-② · §8.2): تُعاد نسبةُ الاستلام من
@@ -238,8 +238,8 @@ function proc_rc_line_row($conn, $is_super_admin, $company_id, $line = null)
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا عهدَ استلامٍ مؤقتٍ مسجَّلةً بعدُ',
-        'افتح أولَ عهدةٍ بزرِّ «عهدة جديدة» في رأسِ الشاشة، وقيِّد أصنافَها وموقعَ استلامِها');
+    echo ems_states_bundle('لا عهد استلام مؤقت مسجلة بعد',
+        'افتح أول عهدة بزر «عهدة جديدة» في رأس الشاشة، وقيد أصنافها وموقع استلامها');
     ?>
 
     <?php proc_msg_banner(); ?>
@@ -252,7 +252,7 @@ function proc_rc_line_row($conn, $is_super_admin, $company_id, $line = null)
             <div class="form-section">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="emsf_428_f73e2">المستلِم <span class="required">*</span></label>
+                        <label for="emsf_428_f73e2">المستلم <span class="required">*</span></label>
                         <input type="text" name="holder_name" id="emsf_428_f73e2" required value="<?php echo $edit ? htmlspecialchars((string)$edit['holder_name']) : ''; ?>">
                     </div>
                     <div class="form-group">
@@ -272,7 +272,7 @@ function proc_rc_line_row($conn, $is_super_admin, $company_id, $line = null)
                         <input type="text" name="receipt_location" id="emsf_432_d4311" placeholder="عطبرة / موقع المورد …" value="<?php echo $edit ? htmlspecialchars((string)$edit['receipt_location']) : ''; ?>">
                     </div>
                     <div class="form-group">
-                        <label for="emsf_433_f6614">مخزن الإدخال <span class="required">*</span> <small>(إلزامي حين الوجهة «مخزن» — يحرّك الرصيد)</small></label>
+                        <label for="emsf_433_f6614">مخزن الإدخال <span class="required">*</span> <small>(إلزامي حين الوجهة «مخزن» — يحرك الرصيد)</small></label>
                         <select name="warehouse_id" id="emsf_433_f6614"><?php echo proc_warehouses_options($conn, $is_super_admin, $company_id, $edit ? intval($edit['warehouse_id']) : 0); ?></select>
                     </div>
                     <div class="form-group">
@@ -328,7 +328,7 @@ function proc_rc_line_row($conn, $is_super_admin, $company_id, $line = null)
             <table id="procTable" class="display nowrap alltables proc-rc-table"
                    data-scroll-x="1" data-state-save="false">
                 <thead><tr>
-                    <th>الإجراءات</th><th>الكود</th><th>المستلِم</th><th>تاريخ الصرف</th><th>المورد</th>
+                    <th>الإجراءات</th><th>الكود</th><th>المستلم</th><th>تاريخ الصرف</th><th>المورد</th>
                     <th>موقع الاستلام</th><th>الوجهة</th><th>الحالة</th><th>عدد الأصناف</th>
                     <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
                     <th class="ems-fn-th" data-fn="1">رقم العهدة</th>
@@ -344,13 +344,13 @@ function proc_rc_line_row($conn, $is_super_admin, $company_id, $line = null)
                     <th class="ems-fn-th" data-fn="1">المتبقي في العهدة</th>
                     <th class="ems-fn-th" data-fn="1">المسؤول</th>
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-                    <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                    <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+                    <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
                     <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                     <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                     <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-                    <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-                    <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+                    <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+                    <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
                     <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                     </tr></thead>
                 <tbody>

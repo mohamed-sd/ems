@@ -539,7 +539,7 @@ $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-echo ems_states_bundle('لا أرقامَ تشغيليةً محسوبةً لهذا الدورِ اليوم', 'افتح شاشةَ العملياتِ أو القيدِ اليوميِّ — والمؤشراتُ تُحسب مع أولِ حركةٍ مسجَّلة');
+echo ems_states_bundle('لا أرقام تشغيلية محسوبة لهذا الدور اليوم', 'افتح شاشة العمليات أو القيد اليومي — والمؤشرات تحسب مع أول حركة مسجلة');
 ?>
 <style>
 /* UXW-01 ①: لوحةُ ألوانِ رسومِ اللوحةِ صارت رموزًا تُقرأ من CSS لا قيمًا مثبَّتةً
@@ -688,8 +688,8 @@ echo ems_states_bundle('لا أرقامَ تشغيليةً محسوبةً لهذ
     // دور بلا فرع عدادات: لا نلفّق أصفارًا (UI-DEF-02 / قاعدة «لا رقم بلا بيانات») —
     // تُعرض شرطة «—» بدل عدّاد كاذب.
     $displayStats = !empty($stats) ? $stats : [
-      ['fa-users', null, 'العمـــــلاء', 'or'],
-      ['fa-project-diagram', null, 'المشــــاريع', 'or'],
+      ['fa-users', null, 'العملاء', 'or'],
+      ['fa-project-diagram', null, 'المشاريع', 'or'],
       ['fa-file-contract', null, 'العقود', 'or'],
       ['fa-user-shield', null, 'المستخدمون', 'or'],
     ];
@@ -792,7 +792,7 @@ echo ems_states_bundle('لا أرقامَ تشغيليةً محسوبةً لهذ
         </div>
         <div class="shot-ops-recent">
           <?php if (empty($dash_board['recent'])): ?>
-            <p class="shot-ops-empty">لا نشاطَ مسجَّلًا بعد</p>
+            <p class="shot-ops-empty">لا نشاط مسجلا بعد</p>
           <?php else: foreach ($dash_board['recent'] as $rc):
             $rcHref = preg_replace('#^.*?/ems/#', '../', (string) ($rc['url'] ?? ''));
             if ($rcHref === '') { $rcHref = '#'; } ?>
@@ -891,10 +891,10 @@ echo ems_states_bundle('لا أرقامَ تشغيليةً محسوبةً لهذ
     if (!host) { return null; }
     if (window.EmsUI && EmsUI.chartGuard) {
       return EmsUI.chartGuard(host, [{ data: [] }], renderFn,
-        { reason: 'لا بيانات في الفترة المعروضة — الرسم لا يُعرض بمحاور افتراضية' });
+        { reason: 'لا بيانات في الفترة المعروضة — الرسم لا يعرض بمحاور افتراضية' });
     }
     host.innerHTML = '<div class="db-2">' +
-      'لا بيانات في الفترة المعروضة — الرسم لا يُعرض بمحاور افتراضية</div>';
+      'لا بيانات في الفترة المعروضة — الرسم لا يعرض بمحاور افتراضية</div>';
     return null;
   }
 

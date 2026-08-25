@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['admin_module'])) {
             'specialization' => $spec, 'review_limit_usd' => $limit, 'created_by' => $current_user_id,
         ));
     } catch (\App\Core\TenantGateException $e) {
-        if (strpos($e->getMessage(), 'Duplicate entry') !== false) { ems_gov_flash_redirect('accountants_fin.php', 'المحاسب مُسنَد لهذه الإدارة مسبقاً ❌', 'GOV-FAIL-409', ''); exit(); }
+        if (strpos($e->getMessage(), 'Duplicate entry') !== false) { ems_gov_flash_redirect('accountants_fin.php', 'المحاسب مسند لهذه الإدارة مسبقا ❌', 'GOV-FAIL-409', ''); exit(); }
         error_log('fin_accountants insert refused: ' . $e->getMessage());
         ems_gov_flash_redirect('accountants_fin.php', 'حدث خطأ أثناء الحفظ ❌', 'GOV-FAIL-409', ''); exit();
     }
@@ -102,7 +102,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا وحداتٍ ماليةً ولا محاسبي إداراتٍ مسجَّلين بعدُ', 'أنشئْ وحدةً بزرِّ «وحدة مالية» ثمّ اربطْ بها محاسبًا بزرِّ «محاسب إدارة»');
+    echo ems_states_bundle('لا وحدات مالية ولا محاسبي إدارات مسجلين بعد', 'أنشئ وحدة بزر «وحدة مالية» ثم اربط بها محاسبا بزر «محاسب إدارة»');
     ?>
     <?php fin_msg_banner(); ?>
 
@@ -121,7 +121,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <form id="acctForm" action="" method="post" class="allforms">
         <?php echo csrf_field(); ?>
-        <div class="card-header"><h5><i class="fas fa-user-tie"></i> محاسب إدارة (تبعيّة مزدوجة)</h5></div>
+        <div class="card-header"><h5><i class="fas fa-user-tie"></i> محاسب إدارة (تبعية مزدوجة)</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
             <div class="form-group"><label for="emsf_323_77a22">الموظف المحاسب <span class="required">*</span></label><select name="employee_id" required id="emsf_323_77a22"><?php echo fin_employee_options($conn, $is_super_admin, $company_id); ?></select></div>
             <div class="form-group"><label for="emsf_324_ffb09">الإدارة المتبوعة <span class="required">*</span></label><select name="admin_module" required id="emsf_324_ffb09"><option value="">— اختر —</option><?php foreach ($modules_lbl as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
@@ -156,15 +156,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </table>
         </div>
 
-        <h5 class="fin-acct-h5-next"><i class="fas fa-user-tie"></i> محاسبو الإدارات (النموذج الموزّع)</h5>
+        <h5 class="fin-acct-h5-next"><i class="fas fa-user-tie"></i> محاسبو الإدارات (النموذج الموزع)</h5>
         <div class="table-container">
             <table id="aTable" class="display nowrap alltables fin-acct-tbl" data-scroll-x="1" data-state-save="false">
                 <thead><tr><th>الإجراءات</th><th>المحاسب</th><th>الإدارة المتبوعة</th><th>الوحدة المالية</th><th>التخصص</th><th>حد المراجعة</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>

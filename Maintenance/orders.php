@@ -119,7 +119,7 @@ $is_ajax = (isset($_POST['ajax']) && $_POST['ajax'] === '1');
    البوابةِ لا عند الفرع. وصيغةُ الردِّ تتبع صيغةَ الطلبِ فلا يُكسَر AJAX.
    ◆ ولا يُحاسَب طلبٌ قارئٌ: الحارسُ لا يعمل إلا على POST. */
 ems_require_action($conn, 'Maintenance/orders.php', 'write', array(
-    'deny_msg' => 'تعديلُ أوامرِ الصيانةِ يحتاج صلاحيةَ تحرير',
+    'deny_msg' => 'تعديل أوامر الصيانة يحتاج صلاحية تحرير',
 ));
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $is_ajax
@@ -244,7 +244,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
     // منع إعادة فتح أمر مُغلق أو ملغى إلى حالة نشطة (سلامة آلة الحالة)
     if (in_array($order['state'], array('إغلاق', 'ملغى'), true)
         && in_array($requested_state, $active_states, true)) {
-        ems_gov_redirect("Location: orders.php?id=" . intval($oid) . "&msg=" . urlencode('لا يمكن إعادة فتح أمر مُغلق أو ملغى ❌'));
+        ems_gov_redirect("Location: orders.php?id=" . intval($oid) . "&msg=" . urlencode('لا يمكن إعادة فتح أمر مغلق أو ملغى ❌'));
         exit();
     }
 
@@ -262,7 +262,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
     $effective_state = $requested_state;
     if ($requested_state === 'إغلاق') {
         if ($actions_taken === '' || $root_cause_id === null || $inspection_result !== 'ناجح') {
-            $close_error = 'تعذّر الإغلاق: يلزم (الإجراءات المتخذة + السبب الجذري + نتيجة الفحص «ناجح»).';
+            $close_error = 'تعذر الإغلاق: يلزم (الإجراءات المتخذة + السبب الجذري + نتيجة الفحص «ناجح»).';
             $effective_state = 'فحص';
         }
     }
@@ -289,9 +289,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
     if ($closing_now) {
         require_once __DIR__ . '/../includes/self_approval_guard.php';
         $__sa = ems_no_self_approval($conn, intval($order['created_by'] ?? 0), intval($current_user_id),
-            'أمرُ صيانةٍ #' . intval($oid), intval($company_id));
+            'أمر صيانة #' . intval($oid), intval($company_id));
         if ($__sa !== null) {
-            ems_gov_flash_redirect('orders.php', $__sa['reason'], 'GOV-PERM-403', 'الإقفالُ يدٌ ثانيةٌ غيرُ يدِ الفتح');
+            ems_gov_flash_redirect('orders.php', $__sa['reason'], 'GOV-PERM-403', 'الإقفال يد ثانية غير يد الفتح');
             exit();
         }
         $ord_data['closed_at'] = date('Y-m-d H:i:s');
@@ -325,7 +325,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
                     'verifier_user_id' => intval($supervisor_id) ?: null,
                     'org_unit_id' => 1, 'project_id' => intval($project_id ?: 0),
                     'title' => 'تنفيذ أمر الصيانة #' . intval($oid) . ' — ' . ($maint_type ?: 'صيانة'),
-                    'deliverable' => 'إقفال الأمر بفحصٍ «ناجح» وسببٍ جذريٍّ وإجراءات',
+                    'deliverable' => 'إقفال الأمر بفحص «ناجح» وسبب جذري وإجراءات',
                     'evidence_required' => 'نتيجة الفحص النهائي على الأمر',
                     'priority' => ($priority === 'طارئة') ? 'P1' : (($priority === 'عالية') ? 'P2' : 'P3'),
                     'due_at' => date('Y-m-d H:i:s', time() + $slaH * 3600),
@@ -334,7 +334,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
             }
         }
         if ($closing_now) {
-            $evd = 'إقفال MNT-' . intval($oid) . ' — فحص «ناجح» · السبب الجذري موثَّق';
+            $evd = 'إقفال MNT-' . intval($oid) . ' — فحص «ناجح» · السبب الجذري موثق';
             if (intval($technician_id ?: 0) > 0) {
                 \App\Services\Work\AchievementService::derive($conn, array(
                     'company_id' => $company_id, 'source_kind' => 'work_order',
@@ -532,7 +532,7 @@ function mnt_state_class($st) {
 <div class="main mnt-orders-main ems-unified-page-shell ems-doc-cycle">
 
     <?php // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ)
-    echo ems_states_bundle('لا أوامرَ صيانةٍ مسجَّلةً في نطاقك', 'أنشئ أمرَ صيانةٍ جديدًا أو عدِّل تصفيةَ الحالة'); ?>
+    echo ems_states_bundle('لا أوامر صيانة مسجلة في نطاقك', 'أنشئ أمر صيانة جديدا أو عدل تصفية الحالة'); ?>
 
     <?php if (!empty($_GET['msg'])):
         $isSuccess = strpos($_GET['msg'], '✅') !== false; ?>
@@ -575,15 +575,15 @@ function mnt_state_class($st) {
     $mnt_flow_ns = array('بلاغ', 'تنفيذ', 'فحص', 'إغلاق');
     $mnt_ci = array_search($st, $mnt_flow_ns, true);
     if ($st === 'ملغى') {
-        $mnt_next_step = 'أمرٌ ملغى — دورتُه انتهت بلا خطوةٍ تالية';
+        $mnt_next_step = 'أمر ملغى — دورته انتهت بلا خطوة تالية';
     } elseif ($st === 'إغلاق') {
-        $mnt_next_step = 'الأمرُ مُقفَل — اكتملت الدورة';
+        $mnt_next_step = 'الأمر مقفل — اكتملت الدورة';
     } elseif ($st === 'قطعة منتظرة') {
-        $mnt_next_step = 'وصولُ القطعةِ المنتظرةِ ثم استئنافُ التنفيذ';
+        $mnt_next_step = 'وصول القطعة المنتظرة ثم استئناف التنفيذ';
     } elseif ($mnt_ci !== false && isset($mnt_flow_ns[$mnt_ci + 1])) {
-        $mnt_next_step = 'الانتقالُ إلى مرحلةِ «' . $mnt_flow_ns[$mnt_ci + 1] . '»';
+        $mnt_next_step = 'الانتقال إلى مرحلة «' . $mnt_flow_ns[$mnt_ci + 1] . '»';
     } else {
-        $mnt_next_step = 'التشخيصُ ثم التنفيذُ ثم الإقفال';
+        $mnt_next_step = 'التشخيص ثم التنفيذ ثم الإقفال';
     }
     echo ems_next_step($mnt_next_step);
     ?>
@@ -663,12 +663,12 @@ function mnt_state_class($st) {
                     <div class="form-group"><label for="emsf_305_d0790">جهة التكلفة</label>
                         <select name="cost_party" id="emsf_305_d0790"><option value="">— اختر —</option><?php foreach ($cost_parties as $c) echo mnt_opt($c, $c, $order['cost_party'] === $c); ?></select>
                     </div>
-                    <div class="form-group"><label for="emsf_306_0537e">المورّد / الورشة الخارجية</label>
+                    <div class="form-group"><label for="emsf_306_0537e">المورد / الورشة الخارجية</label>
                         <select name="vendor_id" id="emsf_306_0537e"><option value="">— داخلي —</option>
                             <?php foreach ($vendors as $v) echo mnt_opt($v['id'], $v['name'], intval($order['vendor_id']) === intval($v['id'])); ?>
                         </select>
                     </div>
-                    <div class="form-group"><label for="emsf_307_be5cd">اسم الورشة (نصّي)</label>
+                    <div class="form-group"><label for="emsf_307_be5cd">اسم الورشة (نصي)</label>
                         <input type="text" name="workshop" aria-label="اسم الورشة" value="<?php echo htmlspecialchars((string) $order['workshop']); ?>" placeholder="ورشة داخلية / خارجية" id="emsf_307_be5cd">
                     </div>
                     <div class="form-group"><label for="emsf_308_28dd4">الفني المسؤول</label>
@@ -696,8 +696,8 @@ function mnt_state_class($st) {
                     <div class="form-group"><label for="emsf_312_bfc5e">وقت انتهاء العمل</label>
                         <input type="datetime-local" name="work_end" aria-label="وقت انتهاء العمل" value="<?php echo $order['work_end'] ? str_replace(' ', 'T', substr((string) $order['work_end'], 0, 16)) : ''; ?>" id="emsf_312_bfc5e">
                     </div>
-                    <div class="form-group"><label for="emsf_313_fb56e">ساعات التوقّف</label>
-                        <input type="number" step="0.01" name="downtime_hours" aria-label="ساعات التوقّف" value="<?php echo htmlspecialchars((string) $order['downtime_hours']); ?>" id="emsf_313_fb56e">
+                    <div class="form-group"><label for="emsf_313_fb56e">ساعات التوقف</label>
+                        <input type="number" step="0.01" name="downtime_hours" aria-label="ساعات التوقف" value="<?php echo htmlspecialchars((string) $order['downtime_hours']); ?>" id="emsf_313_fb56e">
                     </div>
                     <div class="form-group"><label for="emsf_314_5a15b">السبب الجذري <span class="mnt-req-hint">(للإغلاق)</span></label>
                         <select name="root_cause_id" id="emsf_314_5a15b"><option value="">— اختر —</option>
@@ -724,7 +724,7 @@ function mnt_state_class($st) {
 
             <div class="form-actions">
                 <button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ بيانات الأمر</button>
-                <button type="button" class="btn-secondary" id="collapseOrderForm"><i class="fas fa-chevron-up"></i> طيّ النموذج</button>
+                <button type="button" class="btn-secondary" id="collapseOrderForm"><i class="fas fa-chevron-up"></i> طي النموذج</button>
             </div>
         </div></div>
     </form>
@@ -742,7 +742,7 @@ function mnt_state_class($st) {
     <?php if (!$st_locked && $can_edit): ?>
     <!-- مفاتيح تفعيل بنود التكلفة: لوحتا العمالة/القطع مخفيّتان حتى يُفعّلهما المستخدم -->
     <div class="card mnt-cost-toggles"><div class="card-body">
-        <div class="mnt-toggles-head"><i class="fas fa-sliders"></i> بنود التكلفة <span class="mnt-toggles-hint">(اختيارية — فعّل ما يلزم فقط، ويمكن حفظ الأمر بدونها)</span></div>
+        <div class="mnt-toggles-head"><i class="fas fa-sliders"></i> بنود التكلفة <span class="mnt-toggles-hint">(اختيارية — فعل ما يلزم فقط، ويمكن حفظ الأمر بدونها)</span></div>
         <div class="mnt-toggles-grid">
             <label class="mnt-toggle<?php echo !empty($labor_rows) ? ' is-on' : ''; ?>" id="laborToggleWrap">
                 <span class="mnt-switch"><input type="checkbox" id="toggleLaborSection" aria-label="تفعيل أسطر العمالة"<?php echo !empty($labor_rows) ? ' checked' : ''; ?>><span class="mnt-switch-track"></span></span>
@@ -750,7 +750,7 @@ function mnt_state_class($st) {
             </label>
             <label class="mnt-toggle<?php echo !empty($part_rows) ? ' is-on' : ''; ?>" id="partsToggleWrap">
                 <span class="mnt-switch"><input type="checkbox" id="togglePartsSection" aria-label="تفعيل أسطر قطع الغيار"<?php echo !empty($part_rows) ? ' checked' : ''; ?>><span class="mnt-switch-track"></span></span>
-                <span class="mnt-toggle-text"><span class="mnt-toggle-title"><i class="fas fa-gears"></i> تكليف أسطر قطع غيار</span><span class="mnt-toggle-sub">إضافة القطع المُستبدلة وكمياتها وتكلفتها</span></span>
+                <span class="mnt-toggle-text"><span class="mnt-toggle-title"><i class="fas fa-gears"></i> تكليف أسطر قطع غيار</span><span class="mnt-toggle-sub">إضافة القطع المستبدلة وكمياتها وتكلفتها</span></span>
             </label>
         </div>
     </div></div>
@@ -780,7 +780,7 @@ function mnt_state_class($st) {
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                        <div class="form-group"><label for="emsf_318_c412b">الدور</label><input type="text" name="labor_role_display" placeholder="يُحدّد تلقائياً من الموظف" readonly id="emsf_318_c412b"></div>
+                        <div class="form-group"><label for="emsf_318_c412b">الدور</label><input type="text" name="labor_role_display" placeholder="يحدد تلقائيا من الموظف" readonly id="emsf_318_c412b"></div>
                         <div class="form-group"><label for="emsf_319_8ad2a">الساعات</label><input type="number" step="0.01" name="hours" value="0" id="emsf_319_8ad2a"></div>
                         <div class="form-group"><label for="emsf_320_14024">تكلفة الساعة</label><input type="number" step="0.01" name="hourly_rate" value="0" id="emsf_320_14024"></div>
                     </div>
@@ -827,7 +827,7 @@ function mnt_state_class($st) {
                         <div class="form-group"><label for="emsf_322_bc710">التصنيف</label><input type="text" name="category" id="emsf_322_bc710"></div>
                         <div class="form-group"><label for="emsf_323_21085">الكمية</label><input type="number" step="0.01" name="quantity" value="1" id="emsf_323_21085"></div>
                         <div class="form-group"><label for="emsf_324_bd761">سعر الوحدة</label><input type="number" step="0.01" name="unit_cost" value="0" id="emsf_324_bd761"></div>
-                        <div class="form-group"><label>مكوّن رئيسي؟</label><label class="mnt-major-chk"><input type="checkbox" name="is_major_component" value="1" aria-label="مكوّن رئيسي"><span>نعم، مكوّن رئيسي</span></label></div>
+                        <div class="form-group"><label>مكون رئيسي؟</label><label class="mnt-major-chk"><input type="checkbox" name="is_major_component" value="1" aria-label="مكون رئيسي"><span>نعم، مكون رئيسي</span></label></div>
                     </div>
                     <div class="mnt-line-actions">
                         <button type="submit" class="btn-primary"><i class="fas fa-plus"></i> إضافة السطر</button>
@@ -877,9 +877,9 @@ function mnt_state_class($st) {
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     // UXW-01 ⑫: قائمةُ الأوامر — خطوةُ الدورةِ الثابتةُ المعروفة
-    echo ems_next_step('التشخيصُ ثم التنفيذُ ثم الإقفال');
+    echo ems_next_step('التشخيص ثم التنفيذ ثم الإقفال');
 ?>
-<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('mnt_order', 'نظرةٌ عامة'); ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('mnt_order', 'نظرة عامة'); ?>
     <div class="mnt-bell-wrap">
         <span class="mnt-bell" title="أوامر صيانة تلقائية مفتوحة">
             <i class="fas fa-bell"></i>
@@ -901,11 +901,11 @@ function mnt_state_class($st) {
     while ($wq && ($wx = $wq->fetch_assoc())) { $wp_rows[] = $wx; }
     if ($wp_rows): ?>
     <div class="card mnt-wp-card"><div class="card-body">
-        <strong><i class="fa fa-gears"></i> قطعٌ منتظرة (<?php echo count($wp_rows); ?>)</strong> —
+        <strong><i class="fa fa-gears"></i> قطع منتظرة (<?php echo count($wp_rows); ?>)</strong> —
         <?php foreach ($wp_rows as $w): ?>
             <a href="orders.php?id=<?php echo intval($w['id']); ?>" class="badge badge-warning mnt-wp-badge"
                ><?php echo htmlspecialchars($w['code'] . ' · ' . ($w['eq_name'] ?: ''))
-                . ' — ' . intval($w['days_waiting']) . ' يومًا'; ?></a>
+                . ' — ' . intval($w['days_waiting']) . ' يوما'; ?></a>
         <?php endforeach; ?>
     </div></div>
     <?php endif; ?>
@@ -923,7 +923,7 @@ function mnt_state_class($st) {
                     </select>
                 </div>
                 <div class="form-group"><label for="emsf_325_0674f">المعدة <span class="mnt-req-hint">(تحت الصيانة في المشروع)</span></label>
-                    <select name="equipment_id" class="mnt-eq" data-selected="" id="emsf_325_0674f"><option value="">— اختر المشروع أولاً —</option></select>
+                    <select name="equipment_id" class="mnt-eq" data-selected="" id="emsf_325_0674f"><option value="">— اختر المشروع أولا —</option></select>
                 </div>
                 <div class="form-group"><label for="emsf_326_61f69">المصدر</label>
                     <select name="source" id="emsf_326_61f69"><?php foreach ($sources as $s) echo mnt_opt($s, $s, $s === 'بلاغ'); ?></select>
@@ -950,7 +950,7 @@ function mnt_state_class($st) {
        فترةٌ · مقارنةٌ · حالةٌ · تعمّق. كانت البطاقاتُ الأربعُ تحمل عنوانًا وقيمةً
        فقط، فالرقمُ بلا مقامٍ ولا زمنٍ ولا بابٍ يُفتح منه. العقدُ هنا مُصرَّحٌ
        صفًّا صفًّا، والمقارنةُ تُعلَن «غيرَ معلَنةٍ» صراحةً بدلَ إيهامِ وجودها. */
-    $mnt_scope = 'كلُّ الأوامرِ في نطاقِ شركتك';
+    $mnt_scope = 'كل الأوامر في نطاق شركتك';
     $mnt_kpis = array(
         array('إجمالي الأوامر', (string) $stats['total'], 'أمر', 'fa-wrench', 'neutral', '?status='),
         array('أوامر مفتوحة', (string) $stats['open'], 'أمر', 'fa-spinner', 'warn', '?status=open'),
@@ -994,9 +994,9 @@ function mnt_state_class($st) {
                     <th class="ems-fn-th" data-fn="1">تاريخ الفتح</th>
                     <th class="ems-fn-th" data-fn="1">الموقع</th>
                     <th class="ems-fn-th" data-fn="1">التشخيص الفني</th>
-                    <th class="ems-fn-th" data-fn="1">قراءة العدّاد</th>
+                    <th class="ems-fn-th" data-fn="1">قراءة العداد</th>
                     <th class="ems-fn-th" data-fn="1">الأولوية</th>
-                    <th class="ems-fn-th" data-fn="1">الفني المكلَّف</th>
+                    <th class="ems-fn-th" data-fn="1">الفني المكلف</th>
                     <th class="ems-fn-th" data-fn="1">تكلفة القطع</th>
                     <th class="ems-fn-th" data-fn="1">الطرف المتحمل</th>
                     <th class="ems-fn-th" data-fn="1">ساعات التوقف</th>
@@ -1005,14 +1005,14 @@ function mnt_state_class($st) {
                     <th class="ems-fn-th" data-fn="1">أصدره</th>
                     <th class="ems-fn-th none" data-fn="1">اعتمده</th>
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                    <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                    <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
                     <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
                     <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
                     <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
                     <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-                    <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+                    <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
                     <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
-                    <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
+                    <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
                     <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
                     <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
                     <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
@@ -1096,10 +1096,10 @@ function mnt_state_class($st) {
                         // بعينه لا رابطٌ عامٌّ لقائمة البلاغات
                         if (!empty($row['src_ticket_id'])) {
                             echo "<td><a href='../Tickets/ticket_form.php?id=" . intval($row['src_ticket_id'])
-                               . "' title='بلاغُ هذا الأمر بعينه'><i class='fas fa-tower-observation'></i> "
+                               . "' title='بلاغ هذا الأمر بعينه'><i class='fas fa-tower-observation'></i> "
                                . htmlspecialchars((string) $row['src_ticket_no']) . "</a></td>";
                         } else {
-                            echo "<td><span class='text-muted' title='أمرٌ بلا بلاغ مصدر'>—</span></td>";
+                            echo "<td><span class='text-muted' title='أمر بلا بلاغ مصدر'>—</span></td>";
                         }
                         echo "</tr>";
                     }
@@ -1192,13 +1192,13 @@ function mnt_state_class($st) {
                         { label: 'نوع الصيانة', value: d.maint_type, icon: 'fas fa-screwdriver-wrench' },
                         { label: 'الأولوية', value: d.priority, icon: 'fas fa-fire' },
                         { label: 'جهة التكلفة', value: d.cost_party, icon: 'fas fa-scale-balanced' },
-                        { label: 'المورّد/الورشة', value: d.vendor || d.workshop, icon: 'fas fa-truck' },
+                        { label: 'المورد/الورشة', value: d.vendor || d.workshop, icon: 'fas fa-truck' },
                         { label: 'الفني', value: d.tech, icon: 'fas fa-user-gear' },
                         { label: 'المشرف', value: d.sup, icon: 'fas fa-user-tie' },
                         { label: 'نوع العطل', value: d.failure, icon: 'fas fa-triangle-exclamation' },
                         { label: 'السبب الجذري', value: d.root, icon: 'fas fa-magnifying-glass' },
                         { label: 'نتيجة الفحص', value: d.inspection, icon: 'fas fa-clipboard-check' },
-                        { label: 'ساعات التوقّف', value: d.downtime, icon: 'fas fa-hourglass-half' },
+                        { label: 'ساعات التوقف', value: d.downtime, icon: 'fas fa-hourglass-half' },
                         { label: 'تكلفة العمالة', value: d.labor, icon: 'fas fa-user-gear' },
                         { label: 'تكلفة القطع', value: d.parts, icon: 'fas fa-gears' },
                         { label: 'تكلفة خارجية', value: d.external, icon: 'fas fa-money-bill' },
@@ -1213,7 +1213,7 @@ function mnt_state_class($st) {
                           empty: 'لا توجد أسطر عمالة' },
                         { title: 'أسطر القطع', icon: 'fas fa-gears',
                           pills: [ { label: 'عدد الأسطر', value: parts.length }, { label: 'إجمالي القطع', value: d.parts } ],
-                          table: { columns: ['اسم القطعة', 'الفئة', 'الكمية', 'تكلفة الوحدة', 'الإجمالي', 'مكوّن رئيسي'], rows: parts },
+                          table: { columns: ['اسم القطعة', 'الفئة', 'الكمية', 'تكلفة الوحدة', 'الإجمالي', 'مكون رئيسي'], rows: parts },
                           empty: 'لا توجد أسطر قطع' }
                     ]
                 });
@@ -1250,7 +1250,7 @@ function mnt_state_class($st) {
             e.preventDefault();
             var fd = new FormData(this); fd.append('ajax','1');
             postLine(new URLSearchParams(fd)).then(function(res){
-                if(!res.success){ alert(res.message || 'تعذّر الإضافة'); return; }
+                if(!res.success){ alert(res.message || 'تعذر الإضافة'); return; }
                 var l = res.line;
                 var row = '<tr data-line="'+l.id+'">'
                     + '<td>'+esc(l.emp||'—')+'</td><td>'+esc(l.role||'')+'</td><td>'+esc(l.hours)+'</td>'
@@ -1271,7 +1271,7 @@ function mnt_state_class($st) {
             e.preventDefault();
             var fd = new FormData(this); fd.append('ajax','1');
             postLine(new URLSearchParams(fd)).then(function(res){
-                if(!res.success){ alert(res.message || 'تعذّر الإضافة'); return; }
+                if(!res.success){ alert(res.message || 'تعذر الإضافة'); return; }
                 var l = res.line;
                 var major = (l.is_major==1 || l.is_major===true) ? '<i class="fas fa-star mnt-star"></i>' : '—';
                 var row = '<tr data-line="'+l.id+'">'
@@ -1293,7 +1293,7 @@ function mnt_state_class($st) {
         var orderId = ($('#laborForm input[name=order_id]').val() || $('#partForm input[name=order_id]').val() || $('input[name=id]').val());
         var body = new URLSearchParams({ ajax:'1', action:(kind==='labor'?'del_labor':'del_part'), order_id: orderId, line_id: lineId });
         postLine(body).then(function(res){
-            if(!res.success){ alert(res.message || 'تعذّر الحذف'); return; }
+            if(!res.success){ alert(res.message || 'تعذر الحذف'); return; }
             var $tr = $btn.closest('tr'); var $tbody = $tr.closest('tbody'); $tr.remove();
             setTotals(res.totals);
             bumpCounts();
@@ -1346,7 +1346,7 @@ function mnt_state_class($st) {
         if (!$cb.length) return;
         $cb.on('change', function(){
             if (!this.checked && $(tableSel + ' tbody tr').length > 0) {
-                alert('يوجد أسطر مُسجّلة في هذا البند. احذفها أولاً لإلغاء التكليف.');
+                alert('يوجد أسطر مسجلة في هذا البند. احذفها أولا لإلغاء التكليف.');
                 this.checked = true; return;
             }
             mntToggleSection(kind, this.checked, true);
@@ -1381,8 +1381,8 @@ function mnt_state_class($st) {
         if (!$eq.length) return;
         var projectId = $proj.val();
         var current = $eq.val() || $eq.attr('data-selected') || '';
-        if (!projectId) { $eq.html('<option value="">— اختر المشروع أولاً —</option>'); return; }
-        $eq.html('<option value="">جارٍ التحميل…</option>');
+        if (!projectId) { $eq.html('<option value="">— اختر المشروع أولا —</option>'); return; }
+        $eq.html('<option value="">جار التحميل…</option>');
         var url = '/ems/Maintenance/get_project_equipment.php?project_id=' + encodeURIComponent(projectId) + (current ? '&include_id=' + encodeURIComponent(current) : '');
         fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
             .then(function(r){ return r.json(); })
@@ -1397,7 +1397,7 @@ function mnt_state_class($st) {
                 });
                 $eq.html(opts);
             })
-            .catch(function(){ $eq.html('<option value="">تعذّر تحميل المعدات</option>'); });
+            .catch(function(){ $eq.html('<option value="">تعذر تحميل المعدات</option>'); });
     }
     // عند تغيير المشروع: حمّل معدات الصيانة التابعة له (المُحدّد مسبقاً يبقى عبر data-selected)
     $(document).on('change', '.mnt-proj', function(){ mntLoadProjectEquipment($(this)); });

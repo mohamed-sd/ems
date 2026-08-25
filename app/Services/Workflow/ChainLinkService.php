@@ -38,18 +38,18 @@ class ChainLinkService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'contract_id' => null, 'existing' => false);
         $quotationId = (int) $quotationId;
-        if ($quotationId <= 0) { $out['code'] = 422; $out['reason'] = 'CHN-422: عرضٌ غيرُ صالح'; return $out; }
+        if ($quotationId <= 0) { $out['code'] = 422; $out['reason'] = 'CHN-422: عرض غير صالح'; return $out; }
 
         $q = null;
         try {
             $q = $gate->selectOne('quotations', array('where' => array('id' => $quotationId)));
         } catch (\Throwable $t) { $q = null; }
-        if (!$q) { $out['code'] = 404; $out['reason'] = 'CHN-404: العرضُ غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!$q) { $out['code'] = 404; $out['reason'] = 'CHN-404: العرض غير موجود في نطاقك'; return $out; }
 
         /* ◆ الأبُ يجب أن يكون **مقبولًا**: عقدٌ من عرضٍ مسودةٍ التزامٌ بلا قبول */
         if ((string) $q['state'] !== 'مقبول') {
             $out['code'] = 422;
-            $out['reason'] = 'CHN-422: العرضُ «' . $q['state'] . '» — ولا يولّد عقدًا إلا المقبول';
+            $out['reason'] = 'CHN-422: العرض «' . $q['state'] . '» — ولا يولد عقدا إلا المقبول';
             return $out;
         }
 
@@ -62,7 +62,7 @@ class ChainLinkService
         if ($ex) {
             $out['ok'] = true; $out['code'] = 200; $out['existing'] = true;
             $out['contract_id'] = (int) $ex['id'];
-            $out['reason'] = 'العرضُ ولّد العقدَ #' . (int) $ex['id'] . ' سلفًا — لا توليدَ ثانٍ';
+            $out['reason'] = 'العرض ولد العقد #' . (int) $ex['id'] . ' سلفا — لا توليد ثان';
             return $out;
         }
 
@@ -82,7 +82,7 @@ class ChainLinkService
         }
         if ($projectId <= 0) {
             $out['code'] = 422;
-            $out['reason'] = 'CHN-422: لا مشروعَ يُسند إليه العقد — والعقدُ لا يقوم بلا مشروع';
+            $out['reason'] = 'CHN-422: لا مشروع يسند إليه العقد — والعقد لا يقوم بلا مشروع';
             return $out;
         }
 
@@ -102,14 +102,14 @@ class ChainLinkService
                 'price_currency_contract' => isset($q['currency']) ? $q['currency'] : null,
             ));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'CHN-422: تعذّر التوليد: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'CHN-422: تعذر التوليد: ' . $t->getMessage(); return $out;
         }
 
         self::audit($conn, $companyId, $actor, 'contracts', 'from_quotation', $newId,
             array(), array('quotation_id' => $quotationId, 'contract_status' => 'مسودة'));
 
         $out['ok'] = true; $out['code'] = 200; $out['contract_id'] = $newId;
-        $out['reason'] = 'وُلّد العقدُ المسودةُ #' . $newId . ' من العرضِ #' . $quotationId;
+        $out['reason'] = 'ولد العقد المسودة #' . $newId . ' من العرض #' . $quotationId;
         return $out;
     }
 
@@ -122,16 +122,16 @@ class ChainLinkService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'rfq_id' => null, 'existing' => false);
         $requestId = (int) $requestId;
-        if ($requestId <= 0) { $out['code'] = 422; $out['reason'] = 'CHN-422: طلبٌ غيرُ صالح'; return $out; }
+        if ($requestId <= 0) { $out['code'] = 422; $out['reason'] = 'CHN-422: طلب غير صالح'; return $out; }
 
         $r = null;
         try { $r = $gate->selectOne('proc_request', array('where' => array('id' => $requestId))); }
         catch (\Throwable $t) { $r = null; }
-        if (!$r) { $out['code'] = 404; $out['reason'] = 'CHN-404: الطلبُ غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!$r) { $out['code'] = 404; $out['reason'] = 'CHN-404: الطلب غير موجود في نطاقك'; return $out; }
 
         if (!self::requestApproved($r)) {
             $out['code'] = 422;
-            $out['reason'] = 'CHN-422: الطلبُ «' . (string) $r['state'] . '» — ولا يُشتقُّ منه طلبُ عروضٍ إلا المعتمد';
+            $out['reason'] = 'CHN-422: الطلب «' . (string) $r['state'] . '» — ولا يشتق منه طلب عروض إلا المعتمد';
             return $out;
         }
 
@@ -141,7 +141,7 @@ class ChainLinkService
         catch (\Throwable $t) { $ex = null; }
         if ($ex) {
             $out['ok'] = true; $out['code'] = 200; $out['existing'] = true; $out['rfq_id'] = (int) $ex['id'];
-            $out['reason'] = 'للطلبِ طلبُ عروضٍ قائمٌ #' . (int) $ex['id'];
+            $out['reason'] = 'للطلب طلب عروض قائم #' . (int) $ex['id'];
             return $out;
         }
 
@@ -152,18 +152,18 @@ class ChainLinkService
                 'rfq_no'     => $no,
                 'request_id' => $requestId,
                 'title'      => mb_substr(trim((string) $title) !== '' ? (string) $title
-                                          : ('طلبُ عروضٍ عن الطلب #' . $requestId), 0, 160),
+                                          : ('طلب عروض عن الطلب #' . $requestId), 0, 160),
                 'state'      => 'draft',
                 'created_by' => (int) $actor ?: null,
             ));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'CHN-422: تعذّر الاشتقاق: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'CHN-422: تعذر الاشتقاق: ' . $t->getMessage(); return $out;
         }
         self::audit($conn, $companyId, $actor, 'supplier_rfqs', 'from_request', $newId,
             array(), array('request_id' => $requestId, 'rfq_no' => $no));
 
         $out['ok'] = true; $out['code'] = 200; $out['rfq_id'] = $newId;
-        $out['reason'] = 'اشتُقَّ طلبُ العروضِ #' . $newId . ' من الطلبِ المعتمد #' . $requestId;
+        $out['reason'] = 'اشتق طلب العروض #' . $newId . ' من الطلب المعتمد #' . $requestId;
         return $out;
     }
 
@@ -176,12 +176,12 @@ class ChainLinkService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'order_id' => null, 'existing' => false);
         $awardId = (int) $awardId;
-        if ($awardId <= 0) { $out['code'] = 422; $out['reason'] = 'CHN-422: ترسيةٌ غيرُ صالحة'; return $out; }
+        if ($awardId <= 0) { $out['code'] = 422; $out['reason'] = 'CHN-422: ترسية غير صالحة'; return $out; }
 
         $a = null;
         try { $a = $gate->selectOne('rfq_awards', array('where' => array('id' => $awardId))); }
         catch (\Throwable $t) { $a = null; }
-        if (!$a) { $out['code'] = 404; $out['reason'] = 'CHN-404: الترسيةُ غيرُ موجودةٍ في نطاقك'; return $out; }
+        if (!$a) { $out['code'] = 404; $out['reason'] = 'CHN-404: الترسية غير موجودة في نطاقك'; return $out; }
 
         $rfq = null;
         try { $rfq = $gate->selectOne('supplier_rfqs', array('where' => array('id' => (int) $a['rfq_id']))); }
@@ -191,7 +191,7 @@ class ChainLinkService
             /* ◆ **والقادحُ في القاعدةِ يردُّ أمرًا بلا طلب** — فيُقال السببُ هنا
                  قبل أن يقع الخطأُ، لا بعد أن يرتدَّ الإدراج. */
             $out['code'] = 422;
-            $out['reason'] = 'CHN-422: طلبُ العروضِ بلا طلبِ شراءٍ أب — ولا أمرَ شراءٍ بلا طلب';
+            $out['reason'] = 'CHN-422: طلب العروض بلا طلب شراء أب — ولا أمر شراء بلا طلب';
             return $out;
         }
 
@@ -201,7 +201,7 @@ class ChainLinkService
         catch (\Throwable $t) { $ex = null; }
         if ($ex) {
             $out['ok'] = true; $out['code'] = 200; $out['existing'] = true; $out['order_id'] = (int) $ex['id'];
-            $out['reason'] = 'للترسيةِ أمرُ شراءٍ قائمٌ #' . (int) $ex['id'];
+            $out['reason'] = 'للترسية أمر شراء قائم #' . (int) $ex['id'];
             return $out;
         }
 
@@ -218,13 +218,13 @@ class ChainLinkService
                 'created_by'  => (int) $actor ?: null,
             ));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'CHN-422: تعذّر التوليد: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'CHN-422: تعذر التوليد: ' . $t->getMessage(); return $out;
         }
         self::audit($conn, $companyId, $actor, 'proc_order', 'from_award', $newId,
             array(), array('award_id' => $awardId, 'rfq_id' => (int) $a['rfq_id'], 'request_id' => $reqId));
 
         $out['ok'] = true; $out['code'] = 200; $out['order_id'] = $newId;
-        $out['reason'] = 'وُلّدت مسودةُ أمرِ الشراءِ #' . $newId . ' عن الترسيةِ #' . $awardId;
+        $out['reason'] = 'ولدت مسودة أمر الشراء #' . $newId . ' عن الترسية #' . $awardId;
         return $out;
     }
 
@@ -244,11 +244,11 @@ class ChainLinkService
         $doc    = isset($a['doc_ref']) ? trim((string) $a['doc_ref']) : '';
         $kind   = isset($a['source_type']) ? trim((string) $a['source_type']) : 'penalty';
 
-        if ($person <= 0)  { $out['code'] = 422; $out['reason'] = 'CHN-422: الشخصُ إلزامي'; return $out; }
-        if ($amount <= 0)  { $out['code'] = 422; $out['reason'] = 'CHN-422: مبلغُ الخصمِ يجب أن يكون موجبًا'; return $out; }
+        if ($person <= 0)  { $out['code'] = 422; $out['reason'] = 'CHN-422: الشخص إلزامي'; return $out; }
+        if ($amount <= 0)  { $out['code'] = 422; $out['reason'] = 'CHN-422: مبلغ الخصم يجب أن يكون موجبا'; return $out; }
         if ($doc === '')   {
             $out['code'] = 422;
-            $out['reason'] = 'CHN-422: لا اقتراحَ خصمٍ بلا مستندٍ مؤيّد — والقاعدةُ تردُّه بقادح';
+            $out['reason'] = 'CHN-422: لا اقتراح خصم بلا مستند مؤيد — والقاعدة ترده بقادح';
             return $out;
         }
 
@@ -273,13 +273,13 @@ class ChainLinkService
                 'created_by'       => (int) $actor ?: null,
             ));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'CHN-422: تعذّر الاقتراح: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'CHN-422: تعذر الاقتراح: ' . $t->getMessage(); return $out;
         }
         self::audit($conn, $companyId, $actor, 'fin_dues', 'propose', $newId,
             array(), array('settlement_state' => 'pending', 'amount' => $amount, 'doc_ref' => $doc));
 
         $out['ok'] = true; $out['code'] = 200; $out['deduction_id'] = $newId;
-        $out['reason'] = 'اقتُرح الخصمُ #' . $newId . ' بحالة «مقترح» — ولا يصير نافذًا إلا بالاعتماد';
+        $out['reason'] = 'اقترح الخصم #' . $newId . ' بحالة «مقترح» — ولا يصير نافذا إلا بالاعتماد';
         return $out;
     }
 

@@ -47,35 +47,35 @@ class SupplierDocumentService
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'doc_id' => null);
         $supplierId = (int) $supplierId;
         if (!self::supplierOf($gate, $supplierId)) {
-            $out['code'] = 404; $out['reason'] = 'الموردُ غيرُ موجودٍ في نطاقك'; return $out;
+            $out['code'] = 404; $out['reason'] = 'المورد غير موجود في نطاقك'; return $out;
         }
 
         $type = isset($args['doc_type']) ? trim((string) $args['doc_type']) : '';
         if (!in_array($type, self::SUPPLIER_DOC_TYPES, true)) {
             $out['code'] = 422;
-            $out['reason'] = 'نوعُ وثيقةٍ خارج وثائق المورد: ' . implode(' · ', self::SUPPLIER_DOC_TYPES);
+            $out['reason'] = 'نوع وثيقة خارج وثائق المورد: ' . implode(' · ', self::SUPPLIER_DOC_TYPES);
             return $out;
         }
         $no = isset($args['doc_no']) ? trim((string) $args['doc_no']) : '';
         if ($no === '') {
-            $out['code'] = 422; $out['reason'] = 'رقمُ الوثيقة إلزامي — «وثيقةٌ بلا رقمٍ لا تُراجَع»'; return $out;
+            $out['code'] = 422; $out['reason'] = 'رقم الوثيقة إلزامي — «وثيقة بلا رقم لا تراجع»'; return $out;
         }
         $expiry = isset($args['expiry_date']) ? trim((string) $args['expiry_date']) : '';
         if ($expiry !== '' && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $expiry)) {
-            $out['code'] = 422; $out['reason'] = 'تاريخُ الانتهاء بصيغة Y-m-d أو يُترك فارغًا'; return $out;
+            $out['code'] = 422; $out['reason'] = 'تاريخ الانتهاء بصيغة Y-m-d أو يترك فارغا'; return $out;
         }
         // **وثيقةٌ نظاميةٌ بلا تاريخِ انتهاءٍ مرفوضة**: التنبيهُ الآليُّ بلا
         // تاريخٍ وعدٌ لا يُنفَّذ (§5.1-① يشترط «بتواريخ صلاحيتها»).
         if ($expiry === '' && in_array($type, self::REQUIRED_DOC_TYPES, true)) {
             $out['code'] = 422;
-            $out['reason'] = '«' . $type . '» **يلزمها تاريخُ صلاحية** — «تنبيهٌ آليٌّ قبل الانتهاء» '
-                           . 'بلا تاريخٍ وعدٌ لا يُنفَّذ (UX-05 §5.1-①)';
+            $out['reason'] = '«' . $type . '» **يلزمها تاريخ صلاحية** — «تنبيه آلي قبل الانتهاء» '
+                           . 'بلا تاريخ وعد لا ينفذ (UX-05 §5.1-①)';
             return $out;
         }
         $alert = (isset($args['alert_days']) && trim((string) $args['alert_days']) !== '')
                  ? (int) $args['alert_days'] : 30;
         if ($alert <= 0) {
-            $out['code'] = 422; $out['reason'] = 'مهلةُ التنبيه أيامٌ موجبة'; return $out;
+            $out['code'] = 422; $out['reason'] = 'مهلة التنبيه أيام موجبة'; return $out;
         }
 
         try {
@@ -100,9 +100,9 @@ class SupplierDocumentService
             ));
         } catch (\Throwable $t) {
             if (strpos($t->getMessage(), 'Duplicate') !== false) {
-                $out['code'] = 409; $out['reason'] = 'للمورد وثيقةٌ بهذا النوع والرقم (UQ)'; return $out;
+                $out['code'] = 409; $out['reason'] = 'للمورد وثيقة بهذا النوع والرقم (UQ)'; return $out;
             }
-            $out['code'] = 422; $out['reason'] = 'تعذّر الحفظ: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر الحفظ: ' . $t->getMessage(); return $out;
         }
 
         self::audit($conn, $companyId, $actor, 'equipment_documents', 'create', (int) $out['doc_id'],
@@ -164,20 +164,20 @@ class SupplierDocumentService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '');
         $sup = self::supplierOf($gate, (int) $supplierId);
-        if (!$sup) { $out['code'] = 404; $out['reason'] = 'الموردُ غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!$sup) { $out['code'] = 404; $out['reason'] = 'المورد غير موجود في نطاقك'; return $out; }
 
         $acc = isset($args['bank_account_no']) ? trim((string) $args['bank_account_no']) : '';
         $doc = isset($args['bank_doc_ref']) ? trim((string) $args['bank_doc_ref']) : '';
         $bank = isset($args['bank_name']) ? trim((string) $args['bank_name']) : '';
 
         if ($acc === '') {
-            $out['code'] = 422; $out['reason'] = 'رقمُ الحساب إلزاميٌّ للتوثيق'; return $out;
+            $out['code'] = 422; $out['reason'] = 'رقم الحساب إلزامي للتوثيق'; return $out;
         }
         // ── «الحساب البنكي **الموثَّق**» — توثيقٌ بلا مستندٍ دعوى ───────────
         if ($doc === '') {
             $out['code'] = 422;
-            $out['reason'] = '**توثيقُ الحساب يلزمه مستند** (شهادةٌ بنكيةٌ أو شيكٌ ملغًى) — '
-                           . 'و«الموثَّق» بلا مستندٍ دعوى (UX-05 §5.1-①)';
+            $out['reason'] = '**توثيق الحساب يلزمه مستند** (شهادة بنكية أو شيك ملغى) — '
+                           . 'و«الموثق» بلا مستند دعوى (UX-05 §5.1-①)';
             return $out;
         }
 
@@ -192,7 +192,7 @@ class SupplierDocumentService
                 'bank_verified_by' => (int) $actor ?: null,
             ), array('id' => (int) $supplierId));
         } catch (\Throwable $t) {
-            $out['code'] = 422; $out['reason'] = 'تعذّر التوثيق: ' . $t->getMessage(); return $out;
+            $out['code'] = 422; $out['reason'] = 'تعذر التوثيق: ' . $t->getMessage(); return $out;
         }
 
         self::audit($conn, $companyId, $actor, 'suppliers', 'verify_bank', (int) $supplierId,
@@ -221,14 +221,14 @@ class SupplierDocumentService
         if (!$sup) { return $out; }
 
         if ($sup['bank_verified_at'] === null) {
-            $out['reasons'][] = 'الحسابُ البنكيُّ **غيرُ موثَّق** — ودفعٌ إلى حسابٍ غيرِ موثَّقٍ خطرٌ لا إجراء';
+            $out['reasons'][] = 'الحساب البنكي **غير موثق** — ودفع إلى حساب غير موثق خطر لا إجراء';
         }
         $st = self::documentState($gate, (int) $supplierId, $asOf);
         foreach ($st['missing'] as $m) {
-            $out['reasons'][] = 'وثيقةٌ نظاميةٌ ناقصة: **' . $m . '**';
+            $out['reasons'][] = 'وثيقة نظامية ناقصة: **' . $m . '**';
         }
         foreach ($st['expired'] as $e) {
-            $out['reasons'][] = 'وثيقةٌ منتهية: **' . $e['doc_type'] . '** (' . $e['expiry_date'] . ')';
+            $out['reasons'][] = 'وثيقة منتهية: **' . $e['doc_type'] . '** (' . $e['expiry_date'] . ')';
         }
         $out['blocked'] = ($mode === 'enforce' && $out['reasons']);
         return $out;

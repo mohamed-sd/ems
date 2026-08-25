@@ -147,7 +147,7 @@ require_once __DIR__ . '/includes/layout_head.php';
             <div style="font-size:1.6rem;font-weight:800;color:#d6a700;">
                 <?php echo $plan['price'] > 0 ? number_format($plan['price'], 0) . ' $' : 'مجاني'; ?>
             </div>
-            <div style="font-size:0.78rem;color:rgba(255,255,255,0.5);margin-top:3px;">شهريًا</div>
+            <div style="font-size:0.78rem;color:rgba(255,255,255,0.5);margin-top:3px;">شهريا</div>
         </div>
 
         <!-- Plan limits -->
@@ -195,7 +195,7 @@ require_once __DIR__ . '/includes/layout_head.php';
                     </button>
                 </form>
                 <?php if ($co_count === 0): ?>
-                <form method="post" style="display:inline" onsubmit="return confirm('حذف الخطة نهائيًا؟')">
+                <form method="post" style="display:inline" onsubmit="return confirm('حذف الخطة نهائيا؟')">
                     <input type="hidden" name="csrf_token" value="<?php echo e($csrf); ?>">
                     <input type="hidden" name="action" value="delete">
                     <input type="hidden" name="del_id" value="<?php echo intval($plan['id']); ?>">
@@ -259,7 +259,7 @@ require_once __DIR__ . '/includes/layout_head.php';
                 <div class="form-group" style="display:flex;align-items:flex-end;padding-bottom:4px;">
                     <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;font-size:0.85rem;">
                         <input type="checkbox" name="is_active" id="fIsActive" value="1" checked style="width:16px;height:16px;">
-                        تفعيل الخطة فورًا
+                        تفعيل الخطة فورا
                     </label>
                 </div>
             </div>

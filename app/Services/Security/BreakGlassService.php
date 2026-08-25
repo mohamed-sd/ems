@@ -23,7 +23,7 @@ class BreakGlassService
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'ex_id' => 0, 'ticket_id' => 0);
         foreach (array('company_id', 'person_id', 'permission_code', 'scope_rule', 'reason', 'granted_by') as $k) {
-            if (empty($d[$k])) { $out['code'] = 422; $out['reason'] = "الحقل {$k} إلزامي — كسر الزجاج موثَّق بالكامل"; return $out; }
+            if (empty($d[$k])) { $out['code'] = 422; $out['reason'] = "الحقل {$k} إلزامي — كسر الزجاج موثق بالكامل"; return $out; }
         }
         $co = intval($d['company_id']);
         $pid = intval($d['person_id']);
@@ -44,7 +44,7 @@ class BreakGlassService
             $stmt->execute();
             $stmt->close();
             $out['code'] = 403;
-            $out['reason'] = 'كسر الزجاج لا يفتح «' . $guard['name_ar'] . '» — سياسته never تُقرأ ولا تُستثنى (S22)';
+            $out['reason'] = 'كسر الزجاج لا يفتح «' . $guard['name_ar'] . '» — سياسته never تقرأ ولا تستثنى (S22)';
             return $out;
         }
 
@@ -75,7 +75,7 @@ class BreakGlassService
             $conn->commit();
             PermissionResolver::rebuild($conn, $pid, $co);
             $out['ok'] = true; $out['code'] = 201; $out['ex_id'] = $exId; $out['ticket_id'] = $ticketId;
-            $out['reason'] = 'مُنح كسر زجاج #' . $exId . ' لمدة ' . $hours . ' ساعة — بمراجعة إلزامية خلال 48 ساعة وإلا سقط وصُعِّد';
+            $out['reason'] = 'منح كسر زجاج #' . $exId . ' لمدة ' . $hours . ' ساعة — بمراجعة إلزامية خلال 48 ساعة وإلا سقط وصعد';
             return $out;
         } catch (\Throwable $e) {
             $conn->rollback();
@@ -103,7 +103,7 @@ class BreakGlassService
             $conn->query("UPDATE permission_exceptions SET state = 'revoked' WHERE ex_id = {$id}");
             PositionService::audit($conn, intval($x['company_id']), intval($x['person_id']),
                 'revoked', $x['permission_code'], null,
-                'كسر زجاج بلا مراجعة خلال 48 ساعة — سقط آليًّا وصُعِّد (S23)', 0);
+                'كسر زجاج بلا مراجعة خلال 48 ساعة — سقط آليا وصعد (S23)', 0);
             $stmt = $conn->prepare(
                 "INSERT INTO fin_notifications (company_id, target_level, title, link)
                  VALUES (?, 'all', ?, 'admin/org_assignments.php')");
@@ -128,7 +128,7 @@ class BreakGlassService
         $stmt->execute();
         $ok = $stmt->affected_rows >= 0;
         $stmt->close();
-        return array('ok' => $ok, 'reason' => $ok ? 'رُوجع' : 'غير موجود');
+        return array('ok' => $ok, 'reason' => $ok ? 'روجع' : 'غير موجود');
     }
 
     /** أي حارس §7.2 تنتمي له الصلاحية؟ — بمطابقة بادئة الرمز. */

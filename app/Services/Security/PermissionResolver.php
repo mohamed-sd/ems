@@ -27,7 +27,7 @@ class PermissionResolver
             'amount_cap' => null, 'scope' => '', 'reason' => '');
         if ($scopeType === null || $scopeType === '' || $scopeId === null) {
             $out['code'] = 422;
-            $out['reason'] = 'الصلاحية بلا نطاق مرفوضة بنيويًّا (SEC-01 §4.2)';
+            $out['reason'] = 'الصلاحية بلا نطاق مرفوضة بنيويا (SEC-01 §4.2)';
             return $out;
         }
         $out['scope'] = $scopeType . ':' . $scopeId;
@@ -77,7 +77,7 @@ class PermissionResolver
 
         if ($denies) {
             $out['denies'] = $denies;
-            $out['reason'] = 'deny: المنع يغلب المنح دائمًا — من ' . $denies[0]['source_kind'] . ':' . $denies[0]['source_ref'];
+            $out['reason'] = 'deny: المنع يغلب المنح دائما — من ' . $denies[0]['source_kind'] . ':' . $denies[0]['source_ref'];
             return $out;
         }
         if (!$grants) {
@@ -94,7 +94,7 @@ class PermissionResolver
         $out['allowed'] = true;
         $out['sources'] = $grants;
         $out['amount_cap'] = $cap;
-        $out['reason'] = 'مُنحت من ' . count($grants) . ' مصدرًا — والنطاق تقاطع لا اتحاد';
+        $out['reason'] = 'منحت من ' . count($grants) . ' مصدرا — والنطاق تقاطع لا اتحاد';
         return $out;
     }
 

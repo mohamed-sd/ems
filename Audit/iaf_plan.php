@@ -24,17 +24,17 @@ $U13 = array(
     'icon'       => 'fa fa-calendar-check',
     'nature'     => 'document',
     'doc'        => 'IAF-01 §4-3 · IAF-0015',
-    'intro'      => 'خطةٌ مبنيةٌ على المخاطرِ معتمدةٌ من الجهةِ المشرفة',
-    'rule'       => 'IAF-0044: لا مهمةَ بلا خطةٍ ولا خطةَ بلا كونٍ رقابيٍّ ولا كونَ بلا ميثاق',
-    'empty_hint' => 'لا خطةَ معتمدةٌ بعدُ',
+    'intro'      => 'خطة مبنية على المخاطر معتمدة من الجهة المشرفة',
+    'rule'       => 'IAF-0044: لا مهمة بلا خطة ولا خطة بلا كون رقابي ولا كون بلا ميثاق',
+    'empty_hint' => 'لا خطة معتمدة بعد',
     'order'       => 'plan_year DESC',
 
     'actions'    => array(
         'approve' => array(
             'code'  => 'iaf.plan.approve',
-            'label' => 'اعتمادُ الخطةِ السنوية',
-            'rule'  => 'IAF-0044: لا خطةَ بلا كونٍ رقابيٍّ مبنيّ',
-            'fields' => array('plan_year' => 'سنةُ الخطة', 'title' => 'عنوانُ الخطة', 'basis' => 'الأساس'),
+            'label' => 'اعتماد الخطة السنوية',
+            'rule'  => 'IAF-0044: لا خطة بلا كون رقابي مبني',
+            'fields' => array('plan_year' => 'سنة الخطة', 'title' => 'عنوان الخطة', 'basis' => 'الأساس'),
             'run' => function ($conn, $co, $uid, $in) {
                 require_once __DIR__ . '/../app/Services/Audit/InternalAuditService.php';
                 return \App\Services\Audit\InternalAuditService::approvePlan($conn, array(
@@ -48,6 +48,6 @@ require __DIR__ . '/../includes/u13_screen_kit.php';
 /* حزمةُ الحالاتِ الدنيا (بوابة ٩): تحميلٌ وفراغٌ وخطأٌ — مخفيةٌ افتراضًا
    ويُظهرها منطقُ الشاشةِ عند حالِها. الدالةُ من ux_components التي تُحمِّلها القشرة. */
 if (function_exists('ems_states_bundle')) {
-    echo ems_states_bundle('لا خطةَ سنويةً معتمدةً بعدُ',
-                           'تُبنى الخطةُ على الكونِ الرقابيِّ ودرجاتِ خطرِه ثم تعتمدها الجهةُ المشرفة — ولا مهمةَ بلا خطة');
+    echo ems_states_bundle('لا خطة سنوية معتمدة بعد',
+                           'تبنى الخطة على الكون الرقابي ودرجات خطره ثم تعتمدها الجهة المشرفة — ولا مهمة بلا خطة');
 }

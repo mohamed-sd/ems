@@ -34,7 +34,7 @@ class PermissionExplainService
                 'source' => $src ? array(
                     'kind' => $src['source_kind'],
                     'ref' => $src['source_ref'],
-                    'note' => isset($src['note']) ? $src['note'] : 'المنع يغلب المنح دائمًا',
+                    'note' => isset($src['note']) ? $src['note'] : 'المنع يغلب المنح دائما',
                 ) : null,
                 'note' => $r['reason'],
             );

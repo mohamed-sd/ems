@@ -61,10 +61,10 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main ems-unified-page-shell">
     <?php
-    $header_title   = 'جهاتُ الاتصالِ والمفوَّضون';
+    $header_title   = 'جهات الاتصال والمفوضون';
     $header_icon    = 'fa fa-address-book';
     $header_actions = array();
-    $header_back    = array('href' => 'clients.php', 'class' => '', 'label' => 'سجلُّ العملاء');
+    $header_back    = array('href' => 'clients.php', 'class' => '', 'label' => 'سجل العملاء');
     include __DIR__ . '/../includes/page_header.php';
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
@@ -74,9 +74,9 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         /* ◆ **ولا يُصيَّر نموذجٌ بلا طرف**: صفٌّ بلا عميلٍ مرجعيٍّ يُكتَب ثم لا
              يُعرَف صاحبُه — فيُمنع الإدخالُ ويُشرَح السبب. */
         echo '<div class="card"><div class="card-body"><p class="pc-note">'
-           . '<strong>افتح هذا التبويبَ من ملفِّ عميلٍ بعينه</strong> — '
-           . 'جهةُ الاتصالِ تابعةٌ لعميلٍ، ولا تُسجَّل بلا طرفٍ مرجعيّ.'
-           . ' <a href="clients.php">سجلُّ العملاء</a></p></div></div>';
+           . '<strong>افتح هذا التبويب من ملف عميل بعينه</strong> — '
+           . 'جهة الاتصال تابعة لعميل، ولا تسجل بلا طرف مرجعي.'
+           . ' <a href="clients.php">سجل العملاء</a></p></div></div>';
     } else {
         $label = (string) (isset($client['legal_name']) && $client['legal_name'] !== ''
             ? $client['legal_name'] : (isset($client['client_name']) ? $client['client_name'] : ('#' . $CID)));

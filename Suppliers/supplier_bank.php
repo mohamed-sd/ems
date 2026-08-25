@@ -18,7 +18,7 @@ require_once '../includes/permissions_helper.php';
 
 // ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
 // كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
-require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('supplier', 'التأهيلُ والوثائقُ والحساب');
+require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('supplier', 'التأهيل والوثائق والحساب');
 // **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
 // الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
 if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
@@ -54,23 +54,23 @@ $COLS   = array (
   8 => 'مستند إثبات الحساب',
   9 => 'حالة التحقق',
   10 => 'تاريخ التحقق',
-  11 => 'محقِّق الحساب',
+  11 => 'محقق الحساب',
   12 => 'آخر سداد على الحساب',
   13 => 'درجة السرية',
   14 => 'الحالة',
   15 => 'الكيان',
-  16 => 'المُنشئ — الاسم والصفة',
+  16 => 'المنشئ — الاسم والصفة',
   17 => 'تاريخ الإنشاء',
-  18 => 'المعتمِد — الاسم والصفة',
+  18 => 'المعتمد — الاسم والصفة',
   19 => 'تاريخ الاعتماد',
   20 => 'مرجع التفويض',
   21 => 'المرجع الأب',
   22 => 'المرفق',
   23 => 'مفتاح منع التكرار',
   24 => 'درجة الأثر',
-  25 => 'معكوس بـ',
+  25 => 'معكوس ب',
   26 => 'عكس عن',
-  27 => 'سجل الاطّلاع',
+  27 => 'سجل الاطلاع',
 );
 $FIELDS = array (
   0 => 'رقم السجل',
@@ -84,11 +84,11 @@ $FIELDS = array (
   8 => 'مستند إثبات الحساب',
   9 => 'حالة التحقق',
   10 => 'تاريخ التحقق',
-  11 => 'محقِّق الحساب',
+  11 => 'محقق الحساب',
   12 => 'آخر سداد على الحساب',
   13 => 'درجة السرية',
   14 => 'الحالة',
-  15 => 'المعتمِد — الاسم والصفة',
+  15 => 'المعتمد — الاسم والصفة',
   16 => 'تاريخ الاعتماد',
   17 => 'مرجع التفويض',
   18 => 'المرجع الأب',
@@ -117,10 +117,10 @@ $FIELDS = array (
        الملغى يُحوَّل إلى قارئٍ، ولا يُحذف». */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 'add') {
     ems_gov_flash_redirect(basename(__FILE__),
-        'حساباتُ الموردين تُوثَّق من شاشةِ وثائقِ المورد لا تُكتب هنا — '
-        . 'فالحسابُ يلزمه مستندُ إثباتٍ ومحقِّقٌ مسجَّل ❌',
+        'حسابات الموردين توثق من شاشة وثائق المورد لا تكتب هنا — '
+        . 'فالحساب يلزمه مستند إثبات ومحقق مسجل ❌',
         'GOV-FAIL-409',
-        'افتحْ «وثائق المورد» واستعملْ فعلَ «توثيقُ الحساب البنكي»');
+        'افتح «وثائق المورد» واستعمل فعل «توثيق الحساب البنكي»');
     exit();
 }
 
@@ -136,12 +136,12 @@ $sql = "SELECT s.id, s.name AS supplier_name, s.bank_name, s.bank_account_no, s.
 $rs = $conn->query($sql);
 if ($rs === false) {
     /* الفشلُ يُعلَن برمزٍ ولا يلبس ثوبَ الخلوّ (CS-12) */
-    $__bankErr = 'SUP-500 · تعذّرت قراءةُ الحسابات — ' . $conn->error;
+    $__bankErr = 'SUP-500 · تعذرت قراءة الحسابات — ' . $conn->error;
 } else {
     while ($x = $rs->fetch_assoc()) {
         $rows[] = array(
             'id' => (int) $x['id'],
-            'status' => $x['bank_verified_at'] ? 'موثَّق' : 'مسجَّل',
+            'status' => $x['bank_verified_at'] ? 'موثق' : 'مسجل',
             'created_by_name' => (string) ($x['verifier_name'] ?? ''),
             'created_at' => (string) ($x['bank_verified_at'] ?? ''),
             'is_seed' => 0,
@@ -154,7 +154,7 @@ if ($rs === false) {
                 'IBAN'                   => (string) $x['bank_iban'],
                 'البنك'                  => (string) $x['bank_name'],
                 'مستند إثبات الحساب'     => (string) $x['bank_doc_ref'],
-                'حالة التحقق'            => $x['bank_verified_at'] ? 'موثَّق' : 'بانتظار التوثيق',
+                'حالة التحقق'            => $x['bank_verified_at'] ? 'موثق' : 'بانتظار التوثيق',
                 'تاريخ التحقق'           => (string) ($x['bank_verified_at'] ?? ''),
                 'محقِّق الحساب'          => (string) ($x['verifier_name'] ?? ''),
                 'المرجع الأب'            => 'مورد #' . (int) $x['id'],
@@ -170,7 +170,7 @@ $entityName = $govCtx['values']['entity'] ?? '—';
 function cmp03_cell($col, $row, $entityName) {
     $n = cmp03_screen_norm($col);
     if ($n === cmp03_screen_norm('الكيان')) { return $entityName; }
-    if ($n === cmp03_screen_norm('المُنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المُنشئة')) {
+    if ($n === cmp03_screen_norm('المنشئ — الاسم والصفة') || $n === cmp03_screen_norm('الجهة المنشئة')) {
         return $row['created_by_name'] ?: '—';
     }
     if ($n === cmp03_screen_norm('تاريخ الإنشاء')) { return $row['created_at']; }
@@ -185,7 +185,7 @@ function cmp03_screen_norm($s) {
     $s = str_replace(array('أ','إ','آ'), 'ا', $s);
     $s = str_replace('ة', 'ه', $s);
     $s = str_replace('ى', 'ي', $s);
-    return preg_replace('/[ًٌٍَُِّْ]/u', '', $s);
+    return preg_replace('/[]/u', '', $s);
 }
 
 $page_title = 'إيكوبيشن | حسابات الموردين البنكية';
@@ -210,8 +210,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
-    echo ems_next_step('توثيقُ الحسابِ بمستندِ إثباتٍ ومحقِّقٍ مسجَّلٍ — من شاشةِ «وثائق المورد»');
-    echo ems_states_bundle('لا حساباتٍ بنكيةً مسجَّلةً بعد', 'وثِّقِ الحسابَ من شاشةِ وثائقِ الموردِ فيظهر صفُّه هنا');
+    echo ems_next_step('توثيق الحساب بمستند إثبات ومحقق مسجل — من شاشة «وثائق المورد»');
+    echo ems_states_bundle('لا حسابات بنكية مسجلة بعد', 'وثق الحساب من شاشة وثائق المورد فيظهر صفه هنا');
     ?>
 
     <!-- فورم الإضافة الموحد (ems-forms) — مطويٌّ حتى زرِّ الرأس -->
@@ -244,7 +244,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="f9" maxlength="190" id="emsf_1415_6f320"></div>
                 <div class="form-group"><label for="emsf_1416_92db9">تاريخ التحقق</label>
                     <input type="date" name="f10" id="emsf_1416_92db9"></div>
-                <div class="form-group"><label for="emsf_1417_05bcb">محقِّق الحساب</label>
+                <div class="form-group"><label for="emsf_1417_05bcb">محقق الحساب</label>
                     <input type="text" name="f11" maxlength="190" id="emsf_1417_05bcb"></div>
                 <div class="form-group"><label for="emsf_1418_d5565">آخر سداد على الحساب</label>
                     <input type="text" name="f12" maxlength="190" id="emsf_1418_d5565"></div>
@@ -252,7 +252,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="f13" maxlength="190" id="emsf_1419_4c786"></div>
                 <div class="form-group"><label for="emsf_1420_52a30">الحالة</label>
                     <select name="f14" id="emsf_1420_52a30"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
-                <div class="form-group"><label for="emsf_1421_ea663">المعتمِد — الاسم والصفة</label>
+                <div class="form-group"><label for="emsf_1421_ea663">المعتمد — الاسم والصفة</label>
                     <input type="text" name="f15" maxlength="190" id="emsf_1421_ea663"></div>
                 <div class="form-group"><label for="emsf_1422_49476">تاريخ الاعتماد</label>
                     <input type="date" name="f16" id="emsf_1422_49476"></div>
@@ -287,27 +287,27 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th>مستند إثبات الحساب</th>
             <th>حالة التحقق</th>
             <th>تاريخ التحقق</th>
-            <th>محقِّق الحساب</th>
+            <th>محقق الحساب</th>
             <th>آخر سداد على الحساب</th>
             <th>درجة السرية</th>
             <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
             <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
             <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
             <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
             <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
             <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-            <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
-            <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
+            <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
+            <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
             <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
-            <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطّلاع</th>
+            <th class="ems-gov-th none" data-gov="view_log" data-slice="2" title="من قرأ البيان الحساس ومتى">سجل الاطلاع</th>
             </tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="28" class="text-center text-muted">لا بياناتَ بعدُ — أضف أول صفٍّ بزر «إضافة»</td></tr>
+                <tr><td colspan="28" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
                     <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>
@@ -319,7 +319,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <?php if (in_array($c, $SENSITIVE_COLS, true)
                               && !ems_may_see_field($conn, 'supplier.bank_account',
                                     'supplier_bank:' . (int) $r['id'], 'Suppliers/supplier_bank.php')): ?>
-                    <td class="ems-field-withheld" title="محجوبٌ — يحتاج منحةً فردية">—</td>
+                    <td class="ems-field-withheld" title="محجوب — يحتاج منحة فردية">—</td>
                     <?php else: ?>
                     <td<?php echo $v === '—' ? ' class="ems-gov-empty"' : ''; ?>><?php echo htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); ?></td>
                     <?php endif; ?>

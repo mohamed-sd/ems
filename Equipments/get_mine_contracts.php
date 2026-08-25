@@ -18,7 +18,7 @@ $is_super_admin = ($current_role === '-1');
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    echo json_encode(['success' => false, 'message' => 'معرّف الشركة غير متوفر']);
+    echo json_encode(['success' => false, 'message' => 'معرف الشركة غير متوفر']);
     exit;
 }
 
@@ -34,5 +34,5 @@ if ($mine_id <= 0) {
 // دائمًا ويعيد «خطأ في الاستعلام» لكل مستدعٍ (Oprators/Reports/الحركة...). أُبدل
 // برسالةٍ صادقة بنفس عقد الاستجابة حتى يُعاد تعريف رابط العقد↔المنجم؛ عندها
 // تُبنى القراءة عبر بوابة العزل (ems_tenant_db) لا استعلامًا خامًّا.
-echo json_encode(['success' => false, 'message' => 'ميزة عقود المنجم معلّقة (بنية المناجم أُزيلت من النظام)']);
+echo json_encode(['success' => false, 'message' => 'ميزة عقود المنجم معلقة (بنية المناجم أزيلت من النظام)']);
 ?>

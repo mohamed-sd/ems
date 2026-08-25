@@ -57,7 +57,7 @@ class ContractLifecycleActions
 
         $common = array(
             /* ① */ 'submit_negotiation' => array(
-                'label' => 'رفعٌ للتفاوض', 'from' => array($DRAFT), 'to' => $NEG,
+                'label' => 'رفع للتفاوض', 'from' => array($DRAFT), 'to' => $NEG,
                 'reverse' => 'return_draft'),
             /* ② */ 'approve' => array(
                 'label' => 'اعتماد', 'from' => array($NEG), 'to' => $APP,
@@ -65,34 +65,34 @@ class ContractLifecycleActions
             /* ③ */ 'sign' => array(
                 'label' => 'توقيع', 'from' => array($APP), 'to' => $SIG,
                 'reverse' => self::NO_REVERSE,
-                'why' => 'التوقيعُ واقعةٌ قانونيةٌ نافذة — تُنقض بفسخٍ موثَّقٍ لا برجوعٍ صامت'),
+                'why' => 'التوقيع واقعة قانونية نافذة — تنقض بفسخ موثق لا برجوع صامت'),
             /* ④ */ 'activate' => array(
                 'label' => 'إنفاذ', 'from' => array($SIG), 'to' => $EFF,
                 'reverse' => self::NO_REVERSE,
-                'why' => 'السريانُ واقعةٌ زمنيةٌ — ما وقع تحته من التزامٍ لا يُمحى بإرجاعِ الحالة'),
+                'why' => 'السريان واقعة زمنية — ما وقع تحته من التزام لا يمحى بإرجاع الحالة'),
             /* ⑤ */ 'start_running' => array(
-                'label' => 'بدءُ التنفيذ', 'from' => array($EFF), 'to' => $RUN,
+                'label' => 'بدء التنفيذ', 'from' => array($EFF), 'to' => $RUN,
                 'reverse' => self::NO_REVERSE,
-                'why' => 'التنفيذُ بدأ فعلًا — وإيقافُه تعليقٌ بسببٍ لا إنكارٌ لبدئه'),
+                'why' => 'التنفيذ بدأ فعلا — وإيقافه تعليق بسبب لا إنكار لبدئه'),
             /* ⑥ */ 'end' => array(
                 'label' => 'إنهاء', 'from' => array($EFF, $RUN, $AMD, $REN), 'to' => $END,
                 'reverse' => self::NO_REVERSE,
-                'why' => 'الإنهاءُ يُعالَج بتجديدٍ أو بعقدٍ جديدٍ — لا بإحياءِ عقدٍ انتهى'),
+                'why' => 'الإنهاء يعالج بتجديد أو بعقد جديد — لا بإحياء عقد انتهى'),
             /* ⑦ */ 'close' => array(
                 'label' => 'إقفال', 'from' => array($END), 'to' => $CLO,
                 'reverse' => self::NO_REVERSE,
-                'why' => 'الإقفالُ يلي تصفيةَ الالتزامات — ونقضُه يُعيد فتحَ ما سُوِّي'),
+                'why' => 'الإقفال يلي تصفية الالتزامات — ونقضه يعيد فتح ما سوي'),
             /* ⑧ */ 'settle' => array(
                 'label' => 'تصفية', 'from' => array($CLO), 'to' => $SET,
                 'reverse' => self::NO_REVERSE,
-                'why' => 'التصفيةُ حالةٌ نهائيةٌ بنصِّ الآلة — ولا انتقالَ منها البتّة'),
+                'why' => 'التصفية حالة نهائية بنص الآلة — ولا انتقال منها البتة'),
 
             /* أفعالُ العكسِ — مشروعةٌ في جدولِ الانتقالاتِ نفسِه */
             'return_draft' => array(
-                'label' => 'إعادةٌ لمسودة', 'from' => array($NEG), 'to' => $DRAFT,
+                'label' => 'إعادة لمسودة', 'from' => array($NEG), 'to' => $DRAFT,
                 'reverse' => 'submit_negotiation', 'is_reverse' => true),
             'return_negotiation' => array(
-                'label' => 'إعادةٌ للتفاوض', 'from' => array($APP), 'to' => $NEG,
+                'label' => 'إعادة للتفاوض', 'from' => array($APP), 'to' => $NEG,
                 'reverse' => 'approve', 'is_reverse' => true),
         );
 
@@ -138,16 +138,16 @@ class ContractLifecycleActions
         $out = array('ok' => false, 'code' => 422, 'reason' => '', 'action' => (string) $code);
         $reg = self::registry($kind);
         if (!isset($reg[$code])) {
-            $out['reason'] = 'CLA-422: فعلٌ غيرُ مُعلَنٍ في سجلِّ دورةِ الحياة — لا يُخمَّن';
+            $out['reason'] = 'CLA-422: فعل غير معلن في سجل دورة الحياة — لا يخمن';
             return $out;
         }
         $a = $reg[$code];
         $contractId = (int) $contractId;
-        if ($contractId <= 0) { $out['reason'] = 'CLA-422: عقدٌ غيرُ صالح'; return $out; }
+        if ($contractId <= 0) { $out['reason'] = 'CLA-422: عقد غير صالح'; return $out; }
 
         /* حقلٌ إلزاميٌّ مُعلَنٌ للفعل (سببُ التعليقِ مثلًا) */
         if (!empty($a['needs']) && $a['needs'] === 'note' && trim((string) $note) === '') {
-            $out['reason'] = 'CLA-422: «' . $a['label'] . '» يلزمه سببٌ مكتوب';
+            $out['reason'] = 'CLA-422: «' . $a['label'] . '» يلزمه سبب مكتوب';
             return $out;
         }
 
@@ -156,7 +156,7 @@ class ContractLifecycleActions
             $r = SupplierContractService::transition($conn, $gate, (int) $companyId,
                 $contractId, (string) $a['to'], (int) $version, (int) $actor);
             $out['ok'] = !empty($r['ok']); $out['code'] = (int) $r['code'];
-            $out['reason'] = $r['ok'] ? ('تمَّ «' . $a['label'] . '» — الحالةُ الآن ' . $r['state']) : $r['reason'];
+            $out['reason'] = $r['ok'] ? ('تم «' . $a['label'] . '» — الحالة الآن ' . $r['state']) : $r['reason'];
             return $out;
         }
 
@@ -183,8 +183,8 @@ class ContractLifecycleActions
             }
             if ($blk > 0) {
                 $out['code'] = 423;
-                $out['reason'] = 'CNOTE-423: ' . $blk . ' ملاحظةً حرجةً مفتوحةً تحجب التوقيع — '
-                               . 'تُغلق بمستندٍ ومعتمِدٍ أولًا («' . mb_substr($first, 0, 40) . '»)';
+                $out['reason'] = 'CNOTE-423: ' . $blk . ' ملاحظة حرجة مفتوحة تحجب التوقيع — '
+                               . 'تغلق بمستند ومعتمد أولا («' . mb_substr($first, 0, 40) . '»)';
                 return $out;
             }
         }
@@ -214,7 +214,7 @@ class ContractLifecycleActions
         }
         $out['ok'] = !empty($r['ok']); $out['code'] = (int) $r['code'];
         $out['reason'] = $r['ok']
-            ? ('تمَّ «' . $a['label'] . '» — الحالةُ الآن ' . (isset($r['to']) ? $r['to'] : ''))
+            ? ('تم «' . $a['label'] . '» — الحالة الآن ' . (isset($r['to']) ? $r['to'] : ''))
             : $r['reason'];
         return $out;
     }

@@ -46,16 +46,16 @@ include '../insidebar.php';
     $header_back = array('href' => 'contracts.php', 'class' => '',
                          'icon' => 'fas fa-arrow-right', 'label' => 'العقود');
     include('../includes/page_header.php');
-    ems_screen_about('بطاقةُ العقد الواحدة بتبويباتها السبعة — تجميعُ قراءاتٍ حيةٍ من مصادرها '
-        . 'القائمة بروابط أصلها: لا شاشاتٍ متفرقةً بعد اليوم.', array());
+    ems_screen_about('بطاقة العقد الواحدة بتبويباتها السبعة — تجميع قراءات حية من مصادرها '
+        . 'القائمة بروابط أصلها: لا شاشات متفرقة بعد اليوم.', array());
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا
-    echo ems_states_bundle('لا بياناتٍ في هذا التبويبِ من بطاقةِ العقد',
-                           'انتقل إلى تبويبٍ آخرَ من شريطِ التبويبات أو افتح المصدرَ الأصليَّ من رابطِه');
+    echo ems_states_bundle('لا بيانات في هذا التبويب من بطاقة العقد',
+                           'انتقل إلى تبويب آخر من شريط التبويبات أو افتح المصدر الأصلي من رابطه');
     ?>
 
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
-    <?php if (!$c): ems_state_empty('اختر عقدًا', 'إلى العقود', 'contracts.php'); ?>
+    <?php if (!$c): ems_state_empty('اختر عقدا', 'إلى العقود', 'contracts.php'); ?>
     <?php else: ?>
     <div class="card"><div class="card-body cc-head">
         <strong class="cc-title">عقد #<?php echo $cid; ?> —
@@ -86,11 +86,11 @@ include '../insidebar.php';
             // خطُّ الأساس (P-10) ودورةُ الحياة (P-11) — حالتان لا حالة
             $b = $conn->query("SELECT state FROM contract_baseline WHERE company_id={$co}
                                 AND contract_id={$cid} ORDER BY id DESC LIMIT 1")->fetch_assoc();
-            echo '<tr><th>خطُّ الأساس (P-10)</th><td>' . htmlspecialchars($b['state'] ?? 'غيرُ مفتوح')
+            echo '<tr><th>خط الأساس (P-10)</th><td>' . htmlspecialchars($b['state'] ?? 'غير مفتوح')
                . ' — <a href="contract_baseline.php">الشاشة ▸</a></td></tr>';
             $lc = $conn->query("SELECT COUNT(*) n FROM contract_lifecycle_events
                                  WHERE company_id={$co} AND contract_id={$cid}")->fetch_assoc();
-            echo '<tr><th>وقائعُ دورة الحياة (P-11)</th><td>' . intval($lc['n'])
+            echo '<tr><th>وقائع دورة الحياة (P-11)</th><td>' . intval($lc['n'])
                . ' — <a href="contract_lifecycle.php">الشاشة ▸</a></td></tr>';
             echo '</tbody></table></div>'
                . '<p><a class="btn-primary" href="contracts_details.php?id=' . $cid . '">التفاصيل الكاملة ▸</a></p>';
@@ -103,7 +103,7 @@ include '../insidebar.php';
                                 WHERE company_id={$co} AND contract_id={$cid}
                                   AND COALESCE(is_deleted,0)=0 ORDER BY line_no");
             while ($r && ($x = $r->fetch_assoc())) { $rows[] = $x; }
-            if (!$rows) { ems_state_empty('لا بنودَ بيعٍ — العقدُ قبل خط الأساس', 'افتح البنود', 'contract_lines.php?contract_id=' . $cid); break; }
+            if (!$rows) { ems_state_empty('لا بنود بيع — العقد قبل خط الأساس', 'افتح البنود', 'contract_lines.php?contract_id=' . $cid); break; }
             echo '<div class="table-container"><table class="alltables display cc-table" data-no-dt="1">'
                . '<thead><tr><th>بند</th><th>النموذج</th><th>الوصف</th><th>الكمية</th><th>مصدر سعر الصرف</th><th>الحال</th><th>السريان</th></tr></thead><tbody>';
             foreach ($rows as $x) {
@@ -132,7 +132,7 @@ include '../insidebar.php';
             ) as $pl) {
                 $x = $conn->query($pl[1])->fetch_assoc();
                 echo '<div class="alert alert-info cc-alert-split">'
-                   . '<span><strong>' . $pl[0] . ':</strong> ' . intval($x['n']) . ' سطرًا'
+                   . '<span><strong>' . $pl[0] . ':</strong> ' . intval($x['n']) . ' سطرا'
                    . ($x['f'] !== null ? (' (' . $x['f'] . ' → ' . $x['t'] . ')') : '') . '</span>'
                    . '<a href="' . $pl[2] . '?contract_id=' . $cid . '">الشاشة ▸</a></div>';
             }
@@ -156,7 +156,7 @@ include '../insidebar.php';
                                 WHERE c.company_id={$co} AND c.contract_id={$cid}
                                   AND COALESCE(c.is_deleted,0)=0 ORDER BY c.id DESC LIMIT 50");
             while ($r && ($x = $r->fetch_assoc())) { $rows[] = $x; }
-            if (!$rows) { ems_state_empty('لا مستخلصاتٍ بعدُ', 'إلى المستخلصات', 'claims.php'); break; }
+            if (!$rows) { ems_state_empty('لا مستخلصات بعد', 'إلى المستخلصات', 'claims.php'); break; }
             echo '<div class="table-container"><table class="alltables display cc-table" data-no-dt="1">'
                . '<thead><tr><th>مهلة اعتماد المستخلص</th><th>الفترة</th><th>الصافي</th><th>الحال</th><th>فاتورته</th><th></th></tr></thead><tbody>';
             foreach ($rows as $x) {
@@ -180,10 +180,10 @@ include '../insidebar.php';
                 $any = true;
                 echo '<div class="alert alert-info">' . htmlspecialchars($x['kind'] . ' (' . $x['nature'] . ') — '
                    . $x['amount'] . ' ' . $x['currency']
-                   . ($x['due_release_date'] !== null ? (' · ردُّه ' . $x['due_release_date']) : '')
+                   . ($x['due_release_date'] !== null ? (' · رده ' . $x['due_release_date']) : '')
                    . ' · ' . $x['state'])
                    . ((string)$x['nature'] === 'off_balance'
-                      ? ' <span class="badge badge-warning">خارج الميزانية — لا يظهر رقمًا</span>' : '')
+                      ? ' <span class="badge badge-warning">خارج الميزانية — لا يظهر رقما</span>' : '')
                    . '</div>';
             }
             $adv = $conn->query("SELECT COUNT(*) n, ROUND(COALESCE(SUM(amount),0),2) v
@@ -194,18 +194,18 @@ include '../insidebar.php';
                 $any = true;
                 require_once __DIR__ . '/advance_helpers.php';
                 $ab = advance_balance($gate, $cid);
-                echo '<div class="alert alert-info">المقدماتُ: ' . intval($adv['n']) . ' بمجموع '
+                echo '<div class="alert alert-info">المقدمات: ' . intval($adv['n']) . ' بمجموع '
                    . htmlspecialchars((string)$adv['v']) . ' — **المتبقي '
                    . htmlspecialchars((string)$ab['balance']) . '** (دفتر M-01)</div>';
             }
-            if (!$any) { ems_state_empty('لا ضماناتٍ ولا مقدماتٍ لهذا العقد', 'إلى الضمانات', 'contract_guarantees.php'); }
+            if (!$any) { ems_state_empty('لا ضمانات ولا مقدمات لهذا العقد', 'إلى الضمانات', 'contract_guarantees.php'); }
             break;
         case '7':
             $row = CBD::row($gate, $cid);
-            if (!$row['ok']) { ems_state_error('تعذّرت قراءةُ اللوحة'); break; }
+            if (!$row['ok']) { ems_state_error('تعذرت قراءة اللوحة'); break; }
             echo '<div class="cc-chips">';
-            foreach (array('planned' => 'المخطَّط', 'executed' => 'المنفَّذ',
-                           'billed' => 'المفوتَر', 'collected' => 'المحصَّل') as $k => $lbl) {
+            foreach (array('planned' => 'المخطَّط', 'executed' => 'المنفذ',
+                           'billed' => 'المفوتر', 'collected' => 'المحصل') as $k => $lbl) {
                 echo '<div class="badge badge-secondary cc-chip-lg">'
                    . $lbl . ': <strong>' . htmlspecialchars((string)$row[$k]) . '</strong></div>';
             }
@@ -219,8 +219,8 @@ include '../insidebar.php';
             $row = CBD::row($gate, $cid);
             if ($row['ok']) {
                 echo '<div class="cc-chips-mb">';
-                foreach (array('planned' => 'المخطَّط', 'executed' => 'المنفَّذ',
-                               'billed' => 'المفوتَر', 'collected' => 'المحصَّل') as $k => $lbl) {
+                foreach (array('planned' => 'المخطَّط', 'executed' => 'المنفذ',
+                               'billed' => 'المفوتر', 'collected' => 'المحصل') as $k => $lbl) {
                     echo '<div class="badge badge-secondary cc-chip">'
                        . $lbl . ': <strong>' . htmlspecialchars((string)$row[$k]) . '</strong></div>';
                 }
@@ -234,7 +234,7 @@ include '../insidebar.php';
                . '</div>';
             if (!empty($gap['empty_seats'])) {
                 echo '<div class="table-container"><table class="alltables display cc-table" data-no-dt="1">'
-                   . '<thead><tr><th>المقعد الفارغ</th><th>نوعه</th><th>دلالته — والمطالبة من العقد لا تُفترض</th></tr></thead><tbody>';
+                   . '<thead><tr><th>المقعد الفارغ</th><th>نوعه</th><th>دلالته — والمطالبة من العقد لا تفترض</th></tr></thead><tbody>';
                 foreach ($gap['empty_seats'] as $es) {
                     echo '<tr><td>#' . intval($es['seat_no']) . '</td><td>' . htmlspecialchars((string)$es['seat_kind'])
                        . '</td><td>' . htmlspecialchars((string)$es['implication']) . '</td></tr>';
@@ -247,10 +247,10 @@ include '../insidebar.php';
                   WHERE {TENANT_SCOPE} AND c2.contract_id = ? AND c2.seat_no IS NOT NULL
                     AND COALESCE(c2.is_deleted,0)=0 ORDER BY c2.seat_no", array($cid));
             if (empty($seats)) {
-                ems_state_empty('لا مقاعدَ معرَّفةً لهذا العقد بعد — تُعرَّف على حاويات المعدات (N-11)', 'إلى الحاويات', 'containers.php');
+                ems_state_empty('لا مقاعد معرفة لهذا العقد بعد — تعرف على حاويات المعدات (N-11)', 'إلى الحاويات', 'containers.php');
             } else {
                 echo '<div class="table-container"><table class="alltables display cc-table" data-no-dt="1">'
-                   . '<thead><tr><th>المقعد</th><th>المعدة</th><th>المُنشئ — الاسم والصفة</th><th>إلى</th><th>سبب الاستبدال</th><th>الصفة</th><th>السائقون</th>
+                   . '<thead><tr><th>المقعد</th><th>المعدة</th><th>المنشئ — الاسم والصفة</th><th>إلى</th><th>سبب الاستبدال</th><th>الصفة</th><th>السائقون</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">رقم العقد</th>
               <th class="ems-fn-th" data-fn="1">عملة التسعير</th>
@@ -265,11 +265,11 @@ include '../insidebar.php';
               <th class="ems-fn-th" data-fn="1">حق تعليق العمل</th>
               <th class="ems-fn-th" data-fn="1">شرط الإنهاء</th>
               <th class="ems-fn-th" data-fn="1">حالة الضريبة</th>
-              <th class="ems-fn-th" data-fn="1">ثبّتها</th>
+              <th class="ems-fn-th" data-fn="1">ثبتها</th>
               <th class="ems-fn-th" data-fn="1">تاريخ التثبيت</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               <th class="ems-gov-th none" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>

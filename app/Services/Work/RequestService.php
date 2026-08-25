@@ -107,11 +107,11 @@ class RequestService
     public static function submit(\mysqli $conn, array $a)
     {
         $type = self::typeOf($conn, (string) ($a['request_type_code'] ?? ''));
-        if (!$type) { return array('ok' => false, 'code' => 422, 'reason' => 'نوعُ طلبٍ خارج القاموس'); }
+        if (!$type) { return array('ok' => false, 'code' => 422, 'reason' => 'نوع طلب خارج القاموس'); }
         if ((string) $type['status'] !== 'active') {
-            return array('ok' => false, 'code' => 422, 'reason' => 'النوع ' . $type['code'] . ' ' . ($type['status'] === 'proposed' ? 'مقترحٌ ينتظر الاعتماد' : 'متقاعد'));
+            return array('ok' => false, 'code' => 422, 'reason' => 'النوع ' . $type['code'] . ' ' . ($type['status'] === 'proposed' ? 'مقترح ينتظر الاعتماد' : 'متقاعد'));
         }
-        foreach (array('company_id' => 'الكيان', 'requester_user_id' => 'المقدّم', 'title' => 'الموضوع') as $k => $l) {
+        foreach (array('company_id' => 'الكيان', 'requester_user_id' => 'المقدم', 'title' => 'الموضوع') as $k => $l) {
             if (empty($a[$k])) { return array('ok' => false, 'code' => 422, 'reason' => 'حقل إلزامي: ' . $l); }
         }
         if (empty($a['org_unit_id']) && empty($a['project_id']) && empty($a['site_id'])) {
@@ -163,7 +163,7 @@ class RequestService
                 $al->close();
                 $conn->query("UPDATE requests SET status = 'in_approval', current_holder_user_id = {$holder}, current_step = 1 WHERE id = " . intval($id));
                 WorkItemService::notifyUser($conn, $co, $holder,
-                    'خطوةُ اعتمادٍ تنتظر قرارك (' . $type['name_ar'] . ' · ' . $steps[0]['label'] . ')',
+                    'خطوة اعتماد تنتظر قرارك (' . $type['name_ar'] . ' · ' . $steps[0]['label'] . ')',
                     $ti, 'Portal/approvals_inbox.php', true, $by);
             }
         }
@@ -173,11 +173,11 @@ class RequestService
             if ($holder) {
                 $u = intval($holder);
                 $conn->query("UPDATE requests SET status = 'routed', current_holder_user_id = {$u}, current_step = 0 WHERE id = " . intval($id));
-                WorkItemService::notifyUser($conn, $co, $u, 'طلبٌ جديدٌ لإدارتك (' . $type['name_ar'] . ')', $ti,
+                WorkItemService::notifyUser($conn, $co, $u, 'طلب جديد لإدارتك (' . $type['name_ar'] . ')', $ti,
                     'Portal/my_requests.php?req=' . $id, true, $by);
             }
         }
-        WorkItemService::notifyUser($conn, $co, $ru, 'قُدّم طلبك ' . $no, $ti, 'Portal/my_requests.php?req=' . $id, false, $by);
+        WorkItemService::notifyUser($conn, $co, $ru, 'قدم طلبك ' . $no, $ti, 'Portal/my_requests.php?req=' . $id, false, $by);
         return array('ok' => true, 'code' => 200, 'id' => $id, 'request_no' => $no, 'holder' => $holder,
                      'steps' => count($steps));
     }
@@ -190,24 +190,24 @@ class RequestService
         $rq = self::fetch($conn, $requestId);
         if (!$rq) { return array('ok' => false, 'code' => 404, 'reason' => 'الطلب غير موجود'); }
         if (!in_array($rq['status'], array('submitted', 'routed', 'in_approval'), true)) {
-            return array('ok' => false, 'code' => 409, 'reason' => 'لا قرارَ على حالة ' . $rq['status']);
+            return array('ok' => false, 'code' => 409, 'reason' => 'لا قرار على حالة ' . $rq['status']);
         }
         $actor = intval($actorUserId);
         // فصل الواجبات: لا يعتمد المرءُ طلبَه (RB/SoD)
         if ($decision === 'approve' && $actor === intval($rq['requester_user_id'])) {
-            return array('ok' => false, 'code' => 403, 'reason' => 'لا اعتمادَ للذات — من قدَّم لا يعتمد');
+            return array('ok' => false, 'code' => 403, 'reason' => 'لا اعتماد للذات — من قدم لا يعتمد');
         }
         // القرارُ لحاملِ الخطوة وحدَه (SRC-04) — لا «لأي أحدٍ غير المقدّم»
         $holderNow = intval($rq['current_holder_user_id']);
         if ($holderNow > 0 && $actor !== $holderNow) {
             return array('ok' => false, 'code' => 403,
-                'reason' => 'القرارُ لحامل الخطوة الحالي (u' . $holderNow . ') — وأنت لست إياه');
+                'reason' => 'القرار لحامل الخطوة الحالي (u' . $holderNow . ') — وأنت لست إياه');
         }
         if (in_array($decision, array('reject', 'return'), true) && trim($note) === '') {
-            return array('ok' => false, 'code' => 422, 'reason' => 'السبب إلزاميٌّ للرفض والإعادة');
+            return array('ok' => false, 'code' => 422, 'reason' => 'السبب إلزامي للرفض والإعادة');
         }
         $map = array('approve' => 'approved', 'reject' => 'rejected', 'return' => 'returned');
-        if (!isset($map[$decision])) { return array('ok' => false, 'code' => 422, 'reason' => 'قرارٌ غير معروف'); }
+        if (!isset($map[$decision])) { return array('ok' => false, 'code' => 422, 'reason' => 'قرار غير معروف'); }
         $to = $map[$decision];
         $id = intval($rq['id']);
         $co = intval($rq['company_id']);
@@ -247,10 +247,10 @@ class RequestService
                     $conn->query("UPDATE requests SET current_holder_user_id = {$nu}, current_step = {$ns}
                                    WHERE id = {$id} AND status = 'in_approval'");
                     WorkItemService::notifyUser($conn, $co, $nu,
-                        'خطوةُ اعتمادٍ تنتظر قرارك (' . $next['label'] . ') — ' . $no,
+                        'خطوة اعتماد تنتظر قرارك (' . $next['label'] . ') — ' . $no,
                         (string) $rq['title'], 'Portal/approvals_inbox.php', true, $actor);
                     WorkItemService::notifyUser($conn, $co, intval($rq['requester_user_id']),
-                        'اجتاز طلبُك الخطوة ' . $stepNo . ' وانتقل إلى: ' . $next['label'],
+                        'اجتاز طلبك الخطوة ' . $stepNo . ' وانتقل إلى: ' . $next['label'],
                         (string) $rq['title'], 'Portal/my_requests.php?req=' . $id, false, $actor);
                     return array('ok' => true, 'code' => 200, 'status' => 'in_approval', 'next_step' => $ns);
                 }
@@ -285,12 +285,12 @@ class RequestService
                     'org_unit_id' => intval($rq['org_unit_id']) ?: 1,
                     'project_id' => intval($rq['project_id']) ?: 0, 'site_id' => intval($rq['site_id']) ?: 0,
                     'title' => 'تنفيذ ' . (($type['name_ar'] ?? 'طلب')) . ' — ' . $no,
-                    'deliverable' => (string) ($type['deliverable'] ?? 'مخرَج الطلب'),
+                    'deliverable' => (string) ($type['deliverable'] ?? 'مخرج الطلب'),
                     'evidence_required' => 'صف الرد التسعة على ' . $no,
                     'due_at' => date('Y-m-d H:i:s', time() + 48 * 3600),
                     'priority' => 'P2', 'created_by' => $actor, 'parent_ref' => $no,
                 ));
-                WorkItemService::notifyUser($conn, $co, $eu, 'طلبٌ معتمدٌ ينتظر تنفيذك — ' . $no,
+                WorkItemService::notifyUser($conn, $co, $eu, 'طلب معتمد ينتظر تنفيذك — ' . $no,
                     (string) $rq['title'], 'Portal/my_requests.php?req=' . $id, true, $actor);
             }
 
@@ -313,7 +313,7 @@ class RequestService
                         'occurred_at'     => gmdate('Y-m-d H:i:s'),
                         'created_by'      => intval($actor) ?: 1,
                         'idempotency_key' => 'exec_approval:req:' . $id . ':' . gmdate('YmdHis'),
-                        'notes'           => 'اعتمادٌ تنفيذيٌّ نهائي — ' . $no,
+                        'notes'           => 'اعتماد تنفيذي نهائي — ' . $no,
                         'payload'         => array(
                             'request_id'   => $id,
                             'request_no'   => $no,
@@ -327,9 +327,9 @@ class RequestService
             } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'RequestService exec fact #'); error_log('RequestService exec fact #' . $id . ': ' . $t->getMessage()); }
         }
 
-        $msg = array('approved' => 'اعتُمد طلبُك — والخطوةُ التالية التنفيذ',
-                     'rejected' => 'رُفض طلبُك — والسبب: ' . $note,
-                     'returned' => 'أُعيد طلبُك لاستكمال: ' . $note);
+        $msg = array('approved' => 'اعتمد طلبك — والخطوة التالية التنفيذ',
+                     'rejected' => 'رفض طلبك — والسبب: ' . $note,
+                     'returned' => 'أعيد طلبك لاستكمال: ' . $note);
         WorkItemService::notifyUser($conn, $co, intval($rq['requester_user_id']), $msg[$to],
             (string) $rq['title'], 'Portal/my_requests.php?req=' . $id, $to === 'returned', $actor);
         return array('ok' => true, 'code' => 200, 'status' => $to);
@@ -351,12 +351,12 @@ class RequestService
         $holderNow = intval($rq['current_holder_user_id']);
         if ($holderNow > 0 && intval($actorUserId) !== $holderNow) {
             return array('ok' => false, 'code' => 403,
-                'reason' => 'التنفيذُ لحامل الطلب الحالي (u' . $holderNow . ')');
+                'reason' => 'التنفيذ لحامل الطلب الحالي (u' . $holderNow . ')');
         }
         foreach (array('decision' => '① القرار', 'result_doc_ref' => '⑦ المستند الناتج',
                        'executed_summary' => '⑧ التنفيذ الذي تم') as $k => $l) {
             if (trim((string) ($nine[$k] ?? '')) === '') {
-                return array('ok' => false, 'code' => 422, 'reason' => 'الردُّ ناقص — ' . $l . ' إلزامي (WF-05)');
+                return array('ok' => false, 'code' => 422, 'reason' => 'الرد ناقص — ' . $l . ' إلزامي (WF-05)');
             }
         }
         $id = intval($rq['id']);
@@ -381,7 +381,7 @@ class RequestService
         $conn->query("UPDATE requests SET status = 'closed', executed_at = NOW(), closed_at = NOW(),
                              current_holder_user_id = NULL WHERE id = {$id}");
         WorkItemService::notifyUser($conn, $co, intval($rq['requester_user_id']),
-            'نُفِّذ طلبُك — والمستندُ الناتج: ' . $doc, (string) $rq['title'], $ol, false, $actor);
+            'نفذ طلبك — والمستند الناتج: ' . $doc, (string) $rq['title'], $ol, false, $actor);
         // إنجاز المنفِّذ (الورقة 11: «طلبٌ نُفِّذ وأُغلق»)
         AchievementService::derive($conn, array(
             'company_id' => $co, 'source_kind' => 'request', 'source_ref' => (string) ($rq['request_no'] ?: $id),
@@ -400,17 +400,17 @@ class RequestService
         $actor = intval($actorUserId);
         if ($actor !== intval($rq['requester_user_id']) && $actor !== intval($rq['current_holder_user_id'])) {
             return array('ok' => false, 'code' => 403,
-                'reason' => 'الإلغاءُ لمقدِّم الطلب أو حامله الحالي وحدهما');
+                'reason' => 'الإلغاء لمقدم الطلب أو حامله الحالي وحدهما');
         }
         if (in_array((string) $rq['status'], array('closed', 'cancelled'), true)) {
-            return array('ok' => false, 'code' => 409, 'reason' => 'لا إلغاءَ لطلبٍ ' . $rq['status']);
+            return array('ok' => false, 'code' => 409, 'reason' => 'لا إلغاء لطلب ' . $rq['status']);
         }
         $id = intval($rq['id']);
         $co = intval($rq['company_id']);
         $conn->query("UPDATE requests SET status = 'cancelled', status_reason = '" .
             $conn->real_escape_string(mb_substr($reason, 0, 300)) . "' WHERE id = {$id}");
         AchievementService::reverseForSource($conn, $co, 'request',
-            (string) ($rq['request_no'] ?: $id), 'أُلغي الطلب: ' . $reason, intval($actorUserId));
+            (string) ($rq['request_no'] ?: $id), 'ألغي الطلب: ' . $reason, intval($actorUserId));
         return array('ok' => true, 'code' => 200);
     }
 

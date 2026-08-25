@@ -32,13 +32,13 @@ $role = strval($_SESSION['user']['role'] ?? '');
 // قراءةً فقط (FIN-26: ملكية الشاشة للحوكمة والدور 26 يطالعها — DEC-01 ②)
 $gov_write = ($role === '-1' || in_array($role, array('1', '19'), true));
 if (!$gov_write && $role !== EMS_ROLE_FINANCING_MGR) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'باب الحوكمة خلف صلاحيته ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
+    ems_gov_flash_redirect('../main/dashboard.php', 'باب الحوكمة خلف صلاحيته ❌', 'GOV-PERM-403', 'اطلب المنحة من مدير الصلاحيات إن كانت ضمن عملك');
 }
 $co = ems_scope_company($conn);
 
 $msg = ''; $err = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$gov_write) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'الدور قارئ هنا: الكتابة لملّاك الشاشة (1 · 19) ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
+    ems_gov_flash_redirect('../main/dashboard.php', 'الدور قارئ هنا: الكتابة لملاك الشاشة (1 · 19) ❌', 'GOV-PERM-403', 'اطلب المنحة من مدير الصلاحيات إن كانت ضمن عملك');
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $op = strval($_POST['op'] ?? '');
@@ -64,13 +64,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $vt = ($_POST['valid_to'] ?? '') !== '' ? strval($_POST['valid_to']) : null;
         $doc = trim(strval($_POST['doc_ref'] ?? ''));
         if ($pid <= 0 || $eid <= 0 || $doc === '') {
-            $err = 'المفوَّض والكيان والمستند إلزامية — لا تفويض شفوي';
+            $err = 'المفوض والكيان والمستند إلزامية — لا تفويض شفوي';
         } elseif (!in_array($type, array('general', 'financial', 'contractual', 'banking', 'operational'), true)) {
             $err = 'نوع التفويض من القائمة';
         } else {
             $st = $conn->prepare("INSERT INTO signing_authorities (company_id, person_id, entity_id, auth_type, amount_cap, currency, valid_from, valid_to, doc_ref, state) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'active')");
             $st->bind_param('iiisdssss', $co, $pid, $eid, $type, $cap, $cur, $vf, $vt, $doc);
-            if ($st->execute()) { $msg = 'تفويض #' . $st->insert_id . ' نافذ — وكل اعتماد سيوقَّع بمرجعه'; }
+            if ($st->execute()) { $msg = 'تفويض #' . $st->insert_id . ' نافذ — وكل اعتماد سيوقع بمرجعه'; }
             else { $err = 'تعذّر: ' . $st->error; }
             $st->close();
         }
@@ -105,17 +105,17 @@ include '../insidebar.php';
     $header_actions = array();
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا تفويضَ بالتوقيعِ مسجَّلٌ لهذا الكيان', 'أنشئْ أولَ تفويضٍ من نموذجِ «تفويضٌ عام» أو عيِّنْ مديرَ الحركةِ أسفلَ الشاشة');
-    ems_screen_about('لا اعتماد بلا تفويض نافذ ساري — والتفويض بالصفة والكيان معًا لا بالشخص وحده، '
-        . 'وينتهي بانتهاء مدته آليًّا. تفويض الحركة (DEC-01 ①) سقفه نطاقي لا نقدي: مواقع لا مبالغ، '
-        . 'لأنه يعتمد وقوع الواقعة لا قيمتها — والنائب بمرجع أصيله وبمدة مكتوبة إلزامًا.',
-        array('المنتهي خلال 30 يومًا بشارة', 'النائب لا يكون مفتوح المدة'));
+    echo ems_states_bundle('لا تفويض بالتوقيع مسجل لهذا الكيان', 'أنشئْ أولَ تفويضٍ من نموذجِ «تفويضٌ عام» أو عيِّنْ مديرَ الحركةِ أسفلَ الشاشة');
+    ems_screen_about('لا اعتماد بلا تفويض نافذ ساري — والتفويض بالصفة والكيان معا لا بالشخص وحده، '
+        . 'وينتهي بانتهاء مدته آليا. تفويض الحركة (DEC-01 ①) سقفه نطاقي لا نقدي: مواقع لا مبالغ، '
+        . 'لأنه يعتمد وقوع الواقعة لا قيمتها — والنائب بمرجع أصيله وبمدة مكتوبة إلزاما.',
+        array('المنتهي خلال 30 يوما بشارة', 'النائب لا يكون مفتوح المدة'));
     if ($msg !== '') { echo '<div class="alert alert-success">' . htmlspecialchars($msg) . '</div>'; }
     if ($err !== '') { echo '<div class="alert alert-danger">' . htmlspecialchars($err) . '</div>'; }
     ?>
     <div class="card"><div class="card-body">
         <div class="table-container"><table class="alltables display gov-sig-table" data-no-dt="1">
-        <thead><tr><th>#</th><th>المفوَّض</th><th>الكيان المفوِّض</th><th>نوع التفويض</th><th>السقف المالي</th><th>نطاق التفويض</th><th>نيابة عن</th><th>المدة</th><th>مستند التفويض</th><th>الحالة</th>
+        <thead><tr><th>#</th><th>المفوض</th><th>الكيان المفوض</th><th>نوع التفويض</th><th>السقف المالي</th><th>نطاق التفويض</th><th>نيابة عن</th><th>المدة</th><th>مستند التفويض</th><th>الحالة</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">رقم التفويض</th>
               <th class="ems-fn-th" data-fn="1">صفته</th>
@@ -125,12 +125,12 @@ include '../insidebar.php';
               <th class="ems-fn-th" data-fn="1">جهة التصديق</th>
               <th class="ems-fn-th" data-fn="1">أصدره</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
+              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-              <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+              <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
               <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
               </tr></thead><tbody>
@@ -147,7 +147,7 @@ include '../insidebar.php';
             <td><?php echo $a['scope_type'] === 'site' ? 'الموقع #' . intval($a['scope_id']) : ($a['auth_type'] === 'operational' ? 'كل المواقع' : '—'); ?></td>
             <td><?php echo !empty($a['delegated_from_auth_id']) ? 'الأصيل #' . intval($a['delegated_from_auth_id']) : '—'; ?></td>
             <td><?php echo htmlspecialchars($a['valid_from'] . ' → ' . ($a['valid_to'] ?: 'مفتوح'));
-                if ($expSoon) { echo ' <span class="badge badge-warning">ينتهي خلال ' . intval($left) . ' يومًا</span>'; } ?></td>
+                if ($expSoon) { echo ' <span class="badge badge-warning">ينتهي خلال ' . intval($left) . ' يوما</span>'; } ?></td>
             <td><small><?php echo htmlspecialchars((string) $a['doc_ref']); ?></small></td>
             <td><span class="badge badge-<?php echo $a['state'] === 'active' ? 'success' : 'secondary'; ?>"><?php echo htmlspecialchars($a['state']); ?></span></td>
         </tr>
@@ -161,21 +161,21 @@ include '../insidebar.php';
         <form method="post" class="ems-form gov-sig-grid">
         <?= csrf_field() ?>
             <input type="hidden" name="op" value="movement">
-            <input type="number" name="person_id" placeholder="users.id للمعيَّن *" required aria-label="users.id للمعيَّن">
-            <select name="entity_id" aria-label="الكيانُ المفوِّضُ لمدير الحركة" required>
-                <option value="">— الكيان المفوِّض *</option>
+            <input type="number" name="person_id" placeholder="users.id للمعين *" required aria-label="users.id للمعين">
+            <select name="entity_id" aria-label="الكيان المفوض لمدير الحركة" required>
+                <option value="">— الكيان المفوض *</option>
                 <?php foreach ($entities as $e): ?>
                 <option value="<?php echo intval($e['entity_id']); ?>"><?php echo htmlspecialchars($e['legal_name']); ?></option>
                 <?php endforeach; ?>
             </select>
-            <select name="site_id" aria-label="نطاقُ التفويض: موقعٌ بعينه أو كلُّ المواقع">
+            <select name="site_id" aria-label="نطاق التفويض: موقع بعينه أو كل المواقع">
                 <option value="">كل المواقع (الأصيل)</option>
                 <?php foreach ($sites as $s): ?>
                 <option value="<?php echo intval($s['id']); ?>"><?php echo htmlspecialchars($s['name']); ?></option>
                 <?php endforeach; ?>
             </select>
             <input type="number" name="delegated_from" placeholder="نيابة عن تفويض # (للنائب)" aria-label="نيابة عن تفويض # (للنائب)">
-            <input type="date" name="valid_from" aria-label="بدايةُ سريانِ التفويض" value="<?php echo date('Y-m-d'); ?>" required>
+            <input type="date" name="valid_from" aria-label="بداية سريان التفويض" value="<?php echo date('Y-m-d'); ?>" required>
             <input type="date" name="valid_to" title="إلزامي للنائب — لا نيابة مفتوحة المدة" aria-label="إلزامي للنائب — لا نيابة مفتوحة المدة">
             <input type="text" name="doc_ref" placeholder="مستند التعيين *" required aria-label="مستند التعيين">
             <button class="btn-primary" type="submit">تعيين — والسلسلة لا تتوقف بغيابه</button>
@@ -187,21 +187,21 @@ include '../insidebar.php';
         <form method="post" class="ems-form gov-sig-grid">
         <?= csrf_field() ?>
             <input type="hidden" name="op" value="general">
-            <input type="number" name="person_id" placeholder="users.id للمفوَّض *" required aria-label="users.id للمفوَّض">
-            <select name="entity_id" aria-label="الكيانُ المفوِّضُ في التفويضِ العام" required>
-                <option value="">— الكيان المفوِّض *</option>
+            <input type="number" name="person_id" placeholder="users.id للمفوض *" required aria-label="users.id للمفوض">
+            <select name="entity_id" aria-label="الكيان المفوض في التفويض العام" required>
+                <option value="">— الكيان المفوض *</option>
                 <?php foreach ($entities as $e): ?>
                 <option value="<?php echo intval($e['entity_id']); ?>"><?php echo htmlspecialchars($e['legal_name']); ?></option>
                 <?php endforeach; ?>
             </select>
-            <select name="auth_type" aria-label="نوعُ التفويض: ماليٌّ أو تعاقديٌّ أو بنكيٌّ أو عام">
+            <select name="auth_type" aria-label="نوع التفويض: مالي أو تعاقدي أو بنكي أو عام">
                 <option value="financial">مالي</option><option value="contractual">تعاقدي</option>
                 <option value="banking">بنكي</option><option value="general">عام</option>
             </select>
             <input type="number" step="0.01" name="amount_cap" placeholder="السقف المالي" aria-label="السقف المالي">
             <input type="text" name="currency" placeholder="العملة (USD…)" aria-label="العملة (USD…)">
-            <input type="date" name="valid_from" aria-label="بدايةُ سريانِ التفويض" value="<?php echo date('Y-m-d'); ?>" required>
-            <input type="date" name="valid_to" aria-label="نهايةُ سريانِ التفويض — يُترك خاليًا للمفتوح">
+            <input type="date" name="valid_from" aria-label="بداية سريان التفويض" value="<?php echo date('Y-m-d'); ?>" required>
+            <input type="date" name="valid_to" aria-label="نهاية سريان التفويض — يترك خاليا للمفتوح">
             <input type="text" name="doc_ref" placeholder="مستند التفويض *" required aria-label="مستند التفويض">
             <button class="btn-primary gov-sig-span4" type="submit">إنشاء التفويض</button>
         </form>

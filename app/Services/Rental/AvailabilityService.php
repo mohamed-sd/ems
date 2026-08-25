@@ -151,7 +151,7 @@ class AvailabilityService
             if (!isset($agg[$key])) {
                 $agg[$key] = array(
                     'type_id' => $key,
-                    'type_name' => ($r['type_name'] !== null && $r['type_name'] !== '') ? $r['type_name'] : 'غير مصنَّفة',
+                    'type_name' => ($r['type_name'] !== null && $r['type_name'] !== '') ? $r['type_name'] : 'غير مصنفة',
                     'total' => 0, 'free' => 0, 'busy' => 0,
                 );
             }

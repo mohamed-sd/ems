@@ -45,7 +45,7 @@ if (!$is_super_admin && empty($__pp['can_view'])) {
     exit();
 }
 if (!$is_super_admin && $_SERVER['REQUEST_METHOD'] === 'POST' && empty($__pp['can_add']) && empty($__pp['can_edit'])) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'غير مصرح بالكتابة في هذه الشاشة ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
+    ems_gov_flash_redirect('../main/dashboard.php', 'غير مصرح بالكتابة في هذه الشاشة ❌', 'GOV-PERM-403', 'اطلب المنحة من مدير الصلاحيات إن كانت ضمن عملك');
 }
 $COLS   = array (
   0 => 'الكيان',
@@ -60,11 +60,11 @@ $COLS   = array (
   9 => 'تاريخ البدء المخطط',
   10 => 'المدة',
   11 => 'المعدات المطلوبة',
-  12 => 'المشغّلون المطلوبون',
+  12 => 'المشغلون المطلوبون',
   13 => 'مصدر المعدات',
   14 => 'احتياج التمويل',
   15 => 'مركز التكلفة',
-  16 => 'مدير الموقع المعيَّن',
+  16 => 'مدير الموقع المعين',
   17 => 'صلاحياته',
   18 => 'إفادة التشغيل',
   19 => 'إفادة المبيعات',
@@ -72,9 +72,9 @@ $COLS   = array (
   21 => 'إفادة المالية',
   22 => 'إفادة الأسطول',
   23 => 'إفادة التمويل',
-  24 => 'المعتمِد — الاسم والصفة',
+  24 => 'المعتمد — الاسم والصفة',
   25 => 'تاريخ الاعتماد',
-  26 => 'المُنشئ — الاسم والصفة',
+  26 => 'المنشئ — الاسم والصفة',
   27 => 'مرجع التفويض',
   28 => 'تاريخ الإنشاء',
   29 => 'المرجع الأب',
@@ -120,7 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
             if ($in[$col] === '') { $missing[] = $lbl; }
         }
         if ($missing) {
-            ems_gov_flash_redirect(basename(__FILE__), 'BR-CEO-03: لا يُعرض قرارُ الفتح — الإفادات الناقصة: ' . implode(' · ', $missing) . ' ❌', 'GOV-FAIL-409', '');
+            ems_gov_flash_redirect(basename(__FILE__), 'BR-CEO-03: لا يعرض قرار الفتح — الإفادات الناقصة: ' . implode(' · ', $missing) . ' ❌', 'GOV-FAIL-409', '');
             exit();
         }
     }
@@ -164,14 +164,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
             $__q->execute();
             $__rs = $__q->get_result();
             if ($__rs && ($__row = $__rs->fetch_assoc())) {
-                $__ref = ' — الصفُّ القائم #' . (int) $__row['id'] . ' (' . $__row['status'] . ')';
+                $__ref = ' — الصف القائم #' . (int) $__row['id'] . ' (' . $__row['status'] . ')';
             }
             $__q->close();
         }
     }
     ems_gov_flash_redirect(basename(__FILE__),
-        $ok ? 'حُفظ الصف ✅'
-            : ($__dup ? ('رقمُ القرار «' . $in['decision_no'] . '» مسجَّلٌ سلفًا — لم يُنشأ صفٌّ ثانٍ' . $__ref . ' ❌')
+        $ok ? 'حفظ الصف ✅'
+            : ($__dup ? ('رقم القرار «' . $in['decision_no'] . '» مسجل سلفا — لم ينشأ صف ثان' . $__ref . ' ❌')
                       : 'تعذر الحفظ ❌'),
         $ok ? 'GOV-OK-200' : ($__dup ? 'GOV-FAIL-409' : 'GOV-OK-200'), '');
     exit();
@@ -187,10 +187,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     $goBack = function ($m) { ems_gov_flash_redirect(basename(__FILE__), $m, 'GOV-INFO-200', ''); exit(); };
     $actorRole = strval($_SESSION['user']['role'] ?? '');
     if (!$is_super_admin && $actorRole !== '9') {
-        ems_gov_flash_redirect('../main/dashboard.php', 'اعتمادُ فتح المشروع قرارُ الإدارة التنفيذية وحدها ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
+        ems_gov_flash_redirect('../main/dashboard.php', 'اعتماد فتح المشروع قرار الإدارة التنفيذية وحدها ❌', 'GOV-PERM-403', 'اطلب المنحة من مدير الصلاحيات إن كانت ضمن عملك');
     }
     $rowId = intval($_POST['row'] ?? 0);
-    if ($rowId <= 0) { $goBack('اختر قرارًا للاعتماد ❌'); }
+    if ($rowId <= 0) { $goBack('اختر قرارا للاعتماد ❌'); }
 
     $st = $conn->prepare("SELECT * FROM exec_project_charters WHERE id = ?"
         . ($is_super_admin && $company_id <= 0 ? '' : ' AND company_id = ?'));
@@ -199,9 +199,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     $st->execute();
     $row = $st->get_result()->fetch_assoc();
     $st->close();
-    if (!$row) { $goBack('القرارُ غير موجودٍ في نطاقك ❌'); }
+    if (!$row) { $goBack('القرار غير موجود في نطاقك ❌'); }
     if (in_array((string) $row['status'], array('مفتوح', 'مغلق'), true)) {
-        $goBack('القرارُ ' . $row['status'] . ' سلفًا — لا قرارَ على قرار (BR-CEO-08) ❌');
+        $goBack('القرار ' . $row['status'] . ' سلفا — لا قرار على قرار (BR-CEO-08) ❌');
     }
 
     // BR-CEO-03: الإفادات الخمس كاملةً قبل القرار — والناقص يُسمّى
@@ -210,7 +210,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
         if (trim((string) ($row[$col] ?? '')) === '') { $missing[] = $lbl; }
     }
     if ($missing) {
-        $goBack('BR-CEO-03: لا يُعتمد الفتح — الإفادات الناقصة: ' . implode(' · ', $missing) . ' ❌');
+        $goBack('BR-CEO-03: لا يعتمد الفتح — الإفادات الناقصة: ' . implode(' · ', $missing) . ' ❌');
     }
 
     $rowCo = (int) $row['company_id'];
@@ -277,12 +277,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
             array('status' => 'مفتوح', 'project_id' => $projectId, 'cost_center_id' => $ccId,
                   'cost_center' => $ccCode, 'approver_name' => $apprName, 'approval_date' => $apprDate),
             array('company_id' => $rowCo, 'user_id' => $uid,
-                  'note' => 'فتحُ مشروعٍ بالأثرِ الخماسي — قرار ' . (string) ($row['decision_no'] ?? '')));
+                  'note' => 'فتح مشروع بالأثر الخماسي — قرار ' . (string) ($row['decision_no'] ?? '')));
 
         $conn->commit();
     } catch (\Throwable $t) {
         $conn->rollback();
-        $goBack('تعذر الأثرُ الخماسي — أُلغي القرارُ كاملًا: ' . $t->getMessage() . ' ❌');
+        $goBack('تعذر الأثر الخماسي — ألغي القرار كاملا: ' . $t->getMessage() . ' ❌');
     }
 
     // ⑤ حجزُ الموارد: مهمةُ متابعةٍ ملزمةٌ بمهلةٍ على المعدات والمشغّلين المطلوبين
@@ -298,7 +298,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
             'deliverable' => 'حجز: ' . (string) ($row['equipment_needed'] ?? '—')
                            . ' · ' . (string) ($row['operators_needed'] ?? '—')
                            . ' (المصدر: ' . (string) ($row['equipment_source'] ?? '—') . ')',
-            'evidence_required' => 'تخصيصات المعدات والمشغّلين على مواقع المشروع #' . $projectId,
+            'evidence_required' => 'تخصيصات المعدات والمشغلين على مواقع المشروع #' . $projectId,
             'due_at' => date('Y-m-d H:i:s', strtotime('+7 days')),
             'priority' => 'P1', 'created_by' => $uid, 'parent_ref' => 'EXPC-' . $rowId,
         ));
@@ -319,7 +319,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
                 'occurred_at'     => gmdate('Y-m-d H:i:s'),
                 'created_by'      => $uid ?: 1,
                 'idempotency_key' => 'project_charter:EXPC-' . $rowId,
-                'notes'           => 'فتحُ مشروع: ' . $pname . ' (' . (string) $row['decision_no'] . ')',
+                'notes'           => 'فتح مشروع: ' . $pname . ' (' . (string) $row['decision_no'] . ')',
                 'payload'         => array(
                     'charter_ref'  => 'EXPC-' . $rowId,
                     'decision_no'  => (string) $row['decision_no'],
@@ -332,7 +332,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
             ));
         } catch (\Throwable $t) { error_log('charter fact #' . $rowId . ': ' . $t->getMessage()); }
     }
-    $goBack('فُتح المشروع #' . $projectId . ' بمركز تكلفته ' . $ccCode . ' و' . count($siteNames) . ' موقعًا ✅');
+    $goBack('فتح المشروع #' . $projectId . ' بمركز تكلفته ' . $ccCode . ' و' . count($siteNames) . ' موقعا ✅');
 }
 
 /* ── القراءة: صفوف الكيان من الجدول الأصلي ──────────────────────────────── */
@@ -379,7 +379,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = false;
     include '../includes/page_header.php';
     // حزمةُ الحالاتِ الدنيا (بوابة ٩) — مخفيةٌ افتراضًا ويُظهرها منطقُ الشاشة
-    echo ems_states_bundle('لا قراراتِ فتحِ مشاريعَ بعدُ', 'أضف ميثاقَ المشروعِ الأولَ بزرِّ «إضافة» — والفتحُ يُعتمد بعد اكتمالِ الإفاداتِ الخمس');
+    echo ems_states_bundle('لا قرارات فتح مشاريع بعد', 'أضف ميثاق المشروع الأول بزر «إضافة» — والفتح يعتمد بعد اكتمال الإفادات الخمس');
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
@@ -415,7 +415,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="f9" maxlength="190" id="emsf_1214_d724e"></div>
                 <div class="form-group"><label for="emsf_1215_7b8c5">المعدات المطلوبة</label>
                     <input type="text" name="f10" maxlength="190" id="emsf_1215_7b8c5"></div>
-                <div class="form-group"><label for="emsf_1216_86054">المشغّلون المطلوبون</label>
+                <div class="form-group"><label for="emsf_1216_86054">المشغلون المطلوبون</label>
                     <input type="text" name="f11" maxlength="190" id="emsf_1216_86054"></div>
                 <div class="form-group"><label for="emsf_1217_3aeff">مصدر المعدات</label>
                     <input type="text" name="f12" maxlength="190" id="emsf_1217_3aeff"></div>
@@ -423,7 +423,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="f13" maxlength="190" id="emsf_1218_e3383"></div>
                 <div class="form-group"><label for="emsf_1219_6fd80">مركز التكلفة</label>
                     <input type="text" name="f14" maxlength="190" id="emsf_1219_6fd80"></div>
-                <div class="form-group"><label for="emsf_1220_fc83c">مدير الموقع المعيَّن</label>
+                <div class="form-group"><label for="emsf_1220_fc83c">مدير الموقع المعين</label>
                     <input type="text" name="f15" maxlength="190" id="emsf_1220_fc83c"></div>
                 <div class="form-group"><label for="emsf_1221_aece1">صلاحياته</label>
                     <input type="text" name="f16" maxlength="190" id="emsf_1221_aece1"></div>
@@ -439,7 +439,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="f21" maxlength="190" id="emsf_1226_cec0d"></div>
                 <div class="form-group"><label for="emsf_1227_c1eb4">إفادة التمويل</label>
                     <input type="text" name="f22" maxlength="190" id="emsf_1227_c1eb4"></div>
-                <div class="form-group"><label for="emsf_1228_0c41f">المعتمِد — الاسم والصفة</label>
+                <div class="form-group"><label for="emsf_1228_0c41f">المعتمد — الاسم والصفة</label>
                     <input type="text" name="f23" maxlength="190" id="emsf_1228_0c41f"></div>
                 <div class="form-group"><label for="emsf_1229_ae2f2">تاريخ الاعتماد</label>
                     <input type="date" name="f24" id="emsf_1229_ae2f2"></div>
@@ -473,7 +473,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5><i class="fa fa-folder-open"></i> اعتماد الفتح — الأثر الخماسي: مشروع · مركز تكلفة · مواقع · مدير · حجز</h5>
         </div><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label for="emsf_1231_3ccda">القرار المكتمل إفاداتُه الخمس</label>
+                <div class="form-group"><label for="emsf_1231_3ccda">القرار المكتمل إفاداته الخمس</label>
                     <select name="row" required id="emsf_1231_3ccda">
                         <?php foreach ($charterable as $d):
                             $lbl = 'EXPC-' . intval($d['id'])
@@ -495,7 +495,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="table-responsive">
         <table class="alltables display" id="project_charterTable">
             <thead><tr>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
             <th>رقم القرار</th>
             <th>اسم المشروع</th>
             <th>العميل</th>
@@ -507,11 +507,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th>تاريخ البدء المخطط</th>
             <th>المدة</th>
             <th>المعدات المطلوبة</th>
-            <th>المشغّلون المطلوبون</th>
+            <th>المشغلون المطلوبون</th>
             <th>مصدر المعدات</th>
             <th>احتياج التمويل</th>
             <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
-            <th>مدير الموقع المعيَّن</th>
+            <th>مدير الموقع المعين</th>
             <th>صلاحياته</th>
             <th>إفادة التشغيل</th>
             <th>إفادة المبيعات</th>
@@ -519,17 +519,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th>إفادة المالية</th>
             <th class="ems-fn-th none" data-fn="1">إفادة الأسطول</th>
             <th class="ems-fn-th none" data-fn="1">إفادة التمويل</th>
-            <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
+            <th class="ems-gov-th none" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
             <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
-            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
+            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
             <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-            <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولَّد عنه — خيط التتبع">المرجع الأب</th>
+            <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
             <th class="ems-gov-th none" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
             </tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="31" class="text-center text-muted">لا بياناتَ بعدُ — أضف أول صفٍّ بزر «إضافة»</td></tr>
+                <tr><td colspan="31" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
                     <?php foreach (array_keys($COLS) as $i): $v = m00_cell_at($i, $r, $entityName, $COLDB); ?>

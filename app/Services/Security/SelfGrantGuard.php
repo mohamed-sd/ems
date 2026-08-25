@@ -19,7 +19,7 @@ class SelfGrantGuard
         if (intval($granterPersonId) === intval($granteePersonId)) {
             self::record($conn, intval($companyId), intval($granterPersonId), $ref, 'self_grant');
             return array('ok' => false, 'code' => 403,
-                'reason' => 'لا يمنح أحد نفسه صلاحية — ولو كان مدير الصلاحيات (403 بنيويًّا · حارس never)');
+                'reason' => 'لا يمنح أحد نفسه صلاحية — ولو كان مدير الصلاحيات (403 بنيويا · حارس never)');
         }
         return array('ok' => true, 'code' => 200, 'reason' => '');
     }
@@ -32,7 +32,7 @@ class SelfGrantGuard
         if (intval($approverPersonId) === intval($createdByPersonId)) {
             self::record($conn, intval($companyId), intval($approverPersonId), $ref, 'self_approval');
             return array('ok' => false, 'code' => 403,
-                'reason' => 'لا يعتمد المرء ما أنشأه — 403 بنيويًّا (حارس never)');
+                'reason' => 'لا يعتمد المرء ما أنشأه — 403 بنيويا (حارس never)');
         }
         return array('ok' => true, 'code' => 200, 'reason' => '');
     }
