@@ -87,6 +87,44 @@ while ($rr && ($x = mysqli_fetch_assoc($rr))) {
     if ($of !== '' && $nf !== '' && $of !== $nf) { $mergeInto[$of] = $nf; }
 }
 
+/* ── الخفضُ إلى تبويبٍ في الأب: بابٌ رابعٌ بالشرطَينِ أنفسِهما (RPR-W03) ─────
+   ◆ **الثغرةُ التي يسدُّها** — وقعت فعلًا: `Equipments/equipment_sourcing.php`
+     و`Equipments/equipment_documents.php` خُفضا تبويبَين في أبيهما (RPR-W03
+     §٤-١-٥: `child of …` ⇒ تبويبٌ لا بندُ قائمة)، فاختفى ملفّاهما من سايدبارِ
+     الدورِ 3. **والوصولُ لم ينقص حرفًا**: شريطُ رحلةِ الكيانِ في
+     `Equipments/equipments.php` يحملهما، **وهو حاضرٌ في سايدبارِ الدورِ نفسِه**.
+   ◆ **ولا يُصرَّح بـ`nav_redirects`**: ذاك جدولُ تحويلٍ **حيٍّ** يقرؤه
+     `includes/route_redirect.php` — فصفٌّ فيه يجعل فتحَ التبويبِ مباشرةً يقفز
+     إلى الأب، أي **يقتل التبويبَ الذي يُفترض أن يحفظه**. فالإعلانُ في سجلِّ
+     الإخفاءِ (`gov_nav_hidden_log`) والوراثةُ من سجلِّ تبويباتِ الكيانات.
+   ◆ **والشرطانِ هما هما**: ① إعلانٌ في القاعدةِ لهذا الدورِ بعينِه
+     (`doc_code='RPR-W03'` و`reachable='TAB_IN_PARENT'` — والوسمُ الثاني يعني
+     أنَّ الدورَ كان **يرى** البندَ مُصيَّرًا، فالصفُّ النشِطُ غيرُ المُصيَّرِ
+     يُوسَم `NOT_RENDERED` ولا يُحتَجُّ به) · ② والأبُ **حاضرٌ فعلًا في سايدبارِ
+     الدورِ نفسِه** وقتَ القياس. فالإعلانُ وحدَه لا يكفي. */
+$tabDemoted = array();   // role_id => [file_lc => true]
+$td = @mysqli_query($conn, "SELECT role_id, LOWER(route) rt FROM gov_nav_hidden_log
+                             WHERE doc_code = 'RPR-W03' AND reachable = 'TAB_IN_PARENT'");
+while ($td && ($x = mysqli_fetch_assoc($td))) {
+    $f = strtolower(preg_replace('/[?#].*$/u', '', preg_replace('~^(\.\./)+~', '', trim($x['rt']))));
+    if ($f !== '') { $tabDemoted[(int) $x['role_id']][$f] = true; }
+}
+/* والأبُ يُقرأ من مصدرِه الواحد `includes/entity_tabs.php` لا يُنسخ هنا */
+$tabParent = array();    // child_file_lc => parent_file_lc
+if (is_file(__DIR__ . '/../includes/entity_tabs.php')) {
+    require_once __DIR__ . '/../includes/entity_tabs.php';
+    if (function_exists('ems_entity_tabs_registry')) {
+        foreach (ems_entity_tabs_registry() as $ent) {
+            $parent = '';
+            foreach ($ent['tabs'] as $route) {
+                if ($route === '') { continue; }
+                if ($parent === '') { $parent = strtolower($route); continue; }
+                $tabParent[strtolower($route)] = $parent;
+            }
+        }
+    }
+}
+
 /* ══ سجلُّ الإزالةِ المصرَّحةِ بعزلِ الإدارات — بالدورِ لا بالمساحةِ اسمًا ══════
    ◆ يُقرأ من `gov_space_appearances` عبرَ `gov_space_roles`، فالربطُ **مقيسٌ**
      (تقاطعُ المساراتِ المُصيَّرة) لا مطابقةَ أسماءٍ عربيةٍ تختلف بحرف.
@@ -185,6 +223,13 @@ foreach (uxp_root_roles() as $rid) {
            ◆ **والتصريحُ مقيَّدٌ بالمساحةِ لا مطلق**: ما أُزيل من مساحةٍ ولم يُسجَّل
              ممنوعًا فيها **يبقى فقدًا غيرَ مصرَّحٍ ويُرسِّب** — فلا يصير هذا البابُ
              غطاءً لكلِّ اختفاء. */
+        /* خفضٌ إلى تبويبٍ في أبٍ حاضرٍ في الدورِ نفسِه — البابُ الرابع (RPR-W03) */
+        if (!isset($nowF[$f]) && isset($tabDemoted[$rid][mb_strtolower($f)])
+            && isset($tabParent[mb_strtolower($f)])
+            && isset($nowF[$tabParent[mb_strtolower($f)]])) {
+            $absorbedHere += $P['n'];
+            continue;
+        }
         if (!isset($nowF[$f]) && isset($forbiddenBySpace[$rid][mb_strtolower($f)])) {
             $isolatedHere += $P['n'];
             continue;

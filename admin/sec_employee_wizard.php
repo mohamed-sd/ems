@@ -79,12 +79,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['wz_action']) && $can_
         // ⑩ الإرسال — الشخص يُنشأ إن كان جديدًا، والمنح الذاتي محجوب
         $personId = intval($_POST['person_id'] ?? 0);
         if ($personId === 0 && strval($_POST['full_name'] ?? '') !== '') {
-            $stmt = $conn->prepare('INSERT INTO persons (full_name) VALUES (?)');
+            // ── RPR-W03 §٤-٢/§٤-٤ — الشخصُ يُنشأ بكيانِه وبمفتاحِه الأمّ ──────────
+            // كان السطرُ `INSERT INTO persons (full_name)` وحدَه: بلا `company_id`
+            // (‏DEC-OPEN-03) وبلا وصلٍ بـ`Person_ID` المالكِ (`employees.id`) — فكان
+            // هذا المعالجُ **مصنعَ المعرّفِ البديل**: ١٠١ صفَّ هويةٍ بمعرّفٍ مستقلٍّ
+            // (`PERS-nnnnn`) لإنسانٍ له مفتاحٌ أمٌّ سلفًا. والمفتاحُ هنا يُختار من
+            // سجلِّ الموظفينَ ولا يُكتب اسمًا حرًّا؛ فإن لم يُختَر فالصفُّ **صفُّ
+            // هويةٍ مُعلَنٌ** (`IDENTITY_ONLY`) لا صفُّ قوًى عاملة.
+            $empId = intval($_POST['link_employee_id'] ?? 0);
+            $pClass = $empId > 0 ? 'WORKFORCE' : 'IDENTITY_ONLY';
+            if ($empId > 0) {
+                // المفتاحُ يُتحقَّق في كيانِ الجلسةِ — ولا يُقبل رقمٌ من الطلبِ كما هو
+                $chk = $conn->prepare('SELECT id FROM employees WHERE id = ? AND company_id = ? LIMIT 1');
+                $chk->bind_param('ii', $empId, $company_id);
+                $chk->execute();
+                if (!$chk->get_result()->fetch_row()) { $empId = 0; $pClass = 'IDENTITY_ONLY'; }
+                $chk->close();
+            }
+            if ($empId > 0) {
+                $dup = $conn->prepare('SELECT person_id FROM persons WHERE employee_id = ? LIMIT 1');
+                $dup->bind_param('i', $empId);
+                $dup->execute();
+                if ($row = $dup->get_result()->fetch_row()) {
+                    // موصولٌ سلفًا: يُعاد استعمالُ الصفِّ ولا يُنشأ ثانٍ للحقيقةِ نفسِها
+                    $personId = intval($row[0]);
+                }
+                $dup->close();
+            }
+            if ($personId === 0) {
+            $stmt = $conn->prepare('INSERT INTO persons (full_name, company_id, employee_id, person_class, w3_link_rule)
+                                    VALUES (?, ?, ?, ?, \'WIZARD_EXPLICIT_LINK\')');
             $fn = strval($_POST['full_name']);
-            $stmt->bind_param('s', $fn);
-            $stmt->execute();
+            $eidBind = $empId > 0 ? $empId : null;
+            $stmt->bind_param('siis', $fn, $company_id, $eidBind, $pClass);
+            if (!$stmt->execute()) {
+                $stmt->close();
+                ems_gov_redirect("Location: sec_employee_wizard.php?msg=" . rawurlencode('تعذّر إنشاء الشخص — الكيان والمفتاح الأم شرطان ❌'));
+                exit();
+            }
             $personId = intval($conn->insert_id);
             $stmt->close();
+            }
             $stmt = $conn->prepare('INSERT INTO person_relationships (person_id, company_id, relation_code, valid_from) VALUES (?, ?, ?, ?)');
             $stmt->bind_param('iiss', $personId, $company_id, $d['relation_code'], $d['valid_from']);
             $stmt->execute();
@@ -111,7 +146,15 @@ $titles = $qa("SELECT title_code, name FROM job_titles WHERE active=1 ORDER BY i
 $units = $qa("SELECT unit_id, name_ar FROM org_units WHERE company_id={$company_id} AND active=1");
 $sitesList = $qa("SELECT id, name FROM sites WHERE company_id={$company_id} AND is_deleted=0 ORDER BY name");
 $usersList = $qa("SELECT id, name FROM users WHERE company_id={$company_id} ORDER BY name");
-$personsList = $qa("SELECT person_id, full_name FROM persons WHERE active=1 ORDER BY person_id DESC LIMIT 100");
+// RPR-W03: قائمةُ الأشخاصِ **محصورةٌ بالكيان** — كانت تقرأ كلَّ الكيانات
+// (`WHERE active=1` وحدَه) فتعرض أشخاصَ كيانٍ آخرَ في معالجِ هذا الكيان.
+$personsList = $qa("SELECT person_id, full_name FROM persons
+                     WHERE active=1 AND company_id={$company_id} ORDER BY person_id DESC LIMIT 100");
+// المفتاحُ الأمُّ Person_ID — موظّفو الكيانِ الذين لا صفَّ هويةٍ لهم بعد
+$linkEmployees = $qa("SELECT e.id, e.name FROM employees e
+                       WHERE e.company_id={$company_id}
+                         AND NOT EXISTS (SELECT 1 FROM persons p WHERE p.employee_id = e.id)
+                       ORDER BY e.name LIMIT 500");
 $assignments = $qa("SELECT a.asg_id, t.name_ar FROM org_assignments a JOIN org_assignment_types t ON t.type_code=a.assignment_type_code WHERE a.company_id={$company_id} AND a.state='active' LIMIT 100");
 
 $page_title = 'إيكوبيشن | معالج إعداد الموظف';
@@ -160,6 +203,11 @@ function wz_step($n, $title) { echo '<h5 class="sec-wz-step"><span class="badge 
                 <select name="person_id" id="emsf_1991_7a2c4"><option value="0">— جديد —</option>
                     <?php foreach ($personsList as $p) { echo '<option value="' . intval($p['person_id']) . '">' . htmlspecialchars($p['full_name']) . '</option>'; } ?></select></div>
             <div class="form-group"><label for="emsf_1992_f9f7a">الاسم الكامل (للجديد)</label><input type="text" name="full_name" id="emsf_1992_f9f7a"></div>
+            <?php /* RPR-W03: المفتاحُ الأمُّ Person_ID — بلا وصلٍ يصير الصفُّ «صفَّ هويةٍ» مُعلَنًا لا صفَّ قوًى عاملة */ ?>
+            <div class="form-group"><label for="emsf_w3_link">الموظّف في السجلِّ الأمّ (Person_ID)</label>
+                <select name="link_employee_id" id="emsf_w3_link"><option value="0">— صفُّ هويةٍ فقط (بلا موظّف) —</option>
+                    <?php foreach ($linkEmployees as $e) { echo '<option value="' . intval($e['id']) . '">' . htmlspecialchars($e['name']) . '</option>'; } ?></select>
+                <small>الشخصُ الجديدُ بلا موظّفٍ يُسجَّل <code>IDENTITY_ONLY</code> — ولا يُنشأ معرّفٌ ثانٍ لموظّفٍ له صفُّ هويةٍ سلفًا.</small></div>
             <div class="form-group"><label for="emsf_1993_4bb1a">نوع العلاقة *</label>
                 <select name="relation_code" required id="emsf_1993_4bb1a"><?php foreach ($relations as $x) { echo '<option value="' . htmlspecialchars($x['code']) . '">' . htmlspecialchars($x['name_ar']) . '</option>'; } ?></select></div>
         </div>
