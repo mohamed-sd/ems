@@ -273,6 +273,85 @@ class PostingService
     }
 
     /** ──────────────────────────────────────────────────────────────────
+     * ③-ج تثبيتُ قيدٍ على **طلبِ اعترافٍ مقبول** (‏RPR-W11 · §48)
+     * ────────────────────────────────────────────────────────────────────
+     * ◆ **ولماذا هنا لا في خدمةِ الدورة**: `GAP-27` يحصر كتّابَ دفترِ القيدِ في
+     *   كاتبٍ واحدٍ معتمَدٍ وقائمةِ استثناءاتٍ مُعلَنة، **ويُرسِّب عند ظهورِ كاتبٍ
+     *   جديدٍ صامت**. فمسارُ §48 يمرُّ من هنا ولا يُضيف كاتبًا خامسًا.
+     *
+     * ◆ **والفرقُ عن `postApproved`**: ذاك يشتقُّ الحسابَين من `ACCOUNT_MAP`
+     *   لواقعةٍ آليّة؛ وهذا **يتلقّى الأسطرَ صريحةً** من قرارِ الماليّةِ على طلبِ
+     *   اعترافٍ بعينِه. حبّتانِ مختلفتانِ ⇒ مدخلانِ، والكاتبُ واحد.
+     *
+     * ⛔ **ولا يقرّر هذا النداءُ شيئًا**: الحوكمةُ (‏طلبٌ مقبولٌ · فترةٌ مفتوحةٌ ·
+     *   من قرّر لا يرحّل) تقع في `AccountingCycleService` قبلَ النداء؛ وهنا
+     *   **التوازنُ والكتابةُ وحدَهما** — فلا يُزدَوَج حكمٌ في موضعَين.
+     */
+    public static function postFromRecognition($gate, array $req, array $lines, $periodId, $actor)
+    {
+        $debit = 0.0; $credit = 0.0;
+        foreach ($lines as $l) {
+            $debit  += (float) (isset($l['debit']) ? $l['debit'] : 0);
+            $credit += (float) (isset($l['credit']) ? $l['credit'] : 0);
+        }
+        if (count($lines) < 2) {
+            return array('ok' => false, 'code' => 'ENTRY_NEEDS_TWO_LINES', 'detail' => 'القيد سطران على الاقل');
+        }
+        if (abs($debit - $credit) > 0.005 || $debit <= 0) {
+            return array('ok' => false, 'code' => 'ENTRY_UNBALANCED',
+                         'detail' => 'مجموع المدين لا يساوي مجموع الدائن');
+        }
+        $actor = (int) $actor; $periodId = (int) $periodId;
+        $rate = (float) (isset($req['fx_rate']) ? $req['fx_rate'] : 1);
+        if ($rate <= 0) { $rate = 1; }
+
+        $entryId = 0;
+        $gate->runInTransaction(function ($g) use (&$entryId, $req, $lines, $periodId, $actor,
+                                                    $debit, $credit, $rate) {
+            $entryId = (int) $g->insert('fin_journal_entries', array(
+                'entry_no'      => 'W11-' . substr(sha1('e' . (int) $req['id'] . microtime(true)), 0, 10),
+                'event_id'      => (int) (isset($req['event_id']) ? $req['event_id'] : 0),
+                'posting_date'  => date('Y-m-d'),
+                'txn_date'      => date('Y-m-d'),
+                'currency'      => (string) $req['currency'],
+                'fx_rate'       => $rate,
+                /* الأساسُ من مجموعِ القيدِ لا من مبلغِ الطلب — `ck_je_fx_pair` */
+                'base_amount'   => round($debit * $rate, 2),
+                'total_debit'   => $debit,
+                'total_credit'  => $credit,
+                'memo'          => 'تثبيت طلب اعتراف ' . (string) $req['request_no'],
+                'state'         => 'posted',
+                'posted_by'     => $actor,
+                'posted_at'     => date('Y-m-d H:i:s'),
+                'created_by'    => $actor,
+                'period_code'   => (string) $periodId,
+                /* والقيدُ يحمل حوكمتَه معه — `chk_manual_journal_governed` */
+                'manual_kind'      => 'recognition_request',
+                'approval_ref'     => 'REC:' . (string) $req['request_no'] . ':'
+                                      . (int) (isset($req['decided_by']) ? $req['decided_by'] : 0),
+                'manual_gov_state' => 'GOVERNED',
+                'source_doc_ref'   => (string) $req['source_module'] . ':' . (string) $req['source_ref'],
+                'recognition_request_id' => (int) $req['id'],
+                'entity_scope'  => 'SINGLE_ENTITY',
+            ));
+            if ($entryId <= 0) { throw new \RuntimeException('PostingService: فشل إدراج قيد الاعتراف'); }
+            foreach ($lines as $l) {
+                $g->insert('fin_journal_lines', array(
+                    'entry_id'   => $entryId,
+                    'account_id' => (int) (isset($l['account_id']) ? $l['account_id'] : 0),
+                    'debit'      => (float) (isset($l['debit']) ? $l['debit'] : 0),
+                    'credit'     => (float) (isset($l['credit']) ? $l['credit'] : 0),
+                    'memo'       => (string) (isset($l['memo']) ? $l['memo'] : ''),
+                ));
+            }
+        }, 'W11 تثبيت قيد على طلب اعتراف');
+
+        if ($entryId <= 0) { return array('ok' => false, 'code' => 'ENTRY_NOT_WRITTEN', 'detail' => ''); }
+        return array('ok' => true, 'code' => 'OK', 'entry_id' => $entryId,
+                     'total_debit' => $debit, 'total_credit' => $credit);
+    }
+
+    /** ──────────────────────────────────────────────────────────────────
      * ③-ب PostingFailed ⇐ RetryPending — إعادةُ ما رسب بعدَ زوالِ سببِه
      * ────────────────────────────────────────────────────────────────────
      * الرسوبُ ليس حكمًا نهائيًّا: واقعةٌ رسبت لغيابِ خريطةِ حسابٍ ثم أُضيفت

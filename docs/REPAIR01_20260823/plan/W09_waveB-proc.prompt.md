@@ -51,7 +51,7 @@ php tools/_uxw_probe.php "SELECT requirement_id,unit,surface,grain,source_of_tru
 > الأرقامُ مقيسةٌ لحظةَ التوليد. أعِدْ `php tools/repair01_plan_gen.php` إن مرّ وقتٌ طويل.
 
 ## ٣-ب · حاجبٌ على هذه المرحلة
-- **DEC-OPEN-15** — ⛔ **مفتوحٌ ويمنع فتحَ البوّابة** · `Blocker_Type = STRUCTURAL`
+- **DEC-OPEN-15** — ✔ حُسم — تابعْ · `Blocker_Type = STRUCTURAL`
   - السؤال: ما فئات الأصناف التي تحمل أعلام Lot/Serial/Expiry؟
   - الأثر: أعلامُ Lot/Serial/Expiry تحدّد سلوكَ الصنفِ وبنيتَه لا قيمتَه
   - الأسطحُ المتأثّرة: دليل الأصناف

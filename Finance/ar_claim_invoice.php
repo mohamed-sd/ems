@@ -231,4 +231,38 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php endforeach; ?>
     </tbody>
   </table>
+
+  <?php /* ── ACC-08 · بنود فاتورة العميل — سجلٌّ تابعٌ في شاشةِ أبيه لا سطحٌ مستقلّ.
+       ◆ **كلُّ بندٍ بسطرِه**: الوصفُ والكميّةُ والسعرُ والضريبة — والإجمالياتُ تُشتقُّ للأمّ.
+       ◆ والقراءةُ عبرَ بوّابةِ المستأجرِ فلا يظهر بندٌ من كيانٍ آخر. */
+  $__w11_lines = array();
+  try { $__w11_lines = $gate->select('acc_invoice_line',
+            array('orderBy' => 'invoice_id DESC, line_no', 'limit' => 400)); }
+  catch (\Throwable $t) { error_log('ar_claim_invoice lines: ' . $t->getMessage()); }
+  ?>
+  <h5 class="mt-4">بنود فواتير العملاء</h5>
+  <table class="table table-striped" data-no-dt>
+    <thead><tr>
+      <th>الفاتورة</th><th>البند</th><th>الوصف</th><th>الكمية</th><th>سعر الوحدة</th>
+      <th>الاجمالي قبل الضريبة</th><th>رمز الضريبة</th><th>الضريبة</th><th>اجمالي البند</th>
+    </tr></thead>
+    <tbody>
+    <?php if (empty($__w11_lines)): ?>
+      <tr><td colspan="9" class="text-center text-muted">لا بنود مسجلة على فواتير العملاء</td></tr>
+    <?php endif; ?>
+    <?php foreach ($__w11_lines as $__l): ?>
+      <tr>
+        <td>#<?= (int) $__l['invoice_id'] ?></td>
+        <td><?= (int) $__l['line_no'] ?></td>
+        <td><?= htmlspecialchars((string) $__l['description'], ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= number_format((float) $__l['qty'], 3) ?></td>
+        <td><?= number_format((float) $__l['unit_price'], 2) ?></td>
+        <td><?= number_format((float) $__l['subtotal'], 2) ?></td>
+        <td><?= htmlspecialchars((string) $__l['tax_code'], ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= number_format((float) $__l['tax_amount'], 2) ?></td>
+        <td><?= number_format((float) $__l['line_total'], 2) ?></td>
+      </tr>
+    <?php endforeach; ?>
+    </tbody>
+  </table>
 </div>

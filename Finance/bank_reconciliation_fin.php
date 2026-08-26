@@ -10,6 +10,7 @@ if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/fin_helpers.php';
+require_once __DIR__ . '/../includes/w7_codes.php';
 
 $ctx = fin_ctx();
 $is_super_admin = $ctx['is_super']; $company_id = $ctx['company_id']; $current_user_id = $ctx['user_id'];
@@ -523,6 +524,36 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
     </div></div>
     <?php endif; ?>
+
+  <?php /* ── TRS-16 · بنودُ فروقِ المطابقةِ البنكيّة — **ولا فرقَ مدفونٌ في حقل**:
+       كلُّ فرقٍ سطرٌ بنوعِه وسببِه ومسؤولِه وإجرائه حتّى الإغلاق. والجلسةُ
+       لا تُقفَل وفيها فرقٌ مفتوح (`BANK_CLOSE_WITH_OPEN_DIFF`). */
+  $__w11_diffs = array();
+  try { $__w11_diffs = fin_gate($is_super_admin)->select('tre_recon_difference',
+            array('orderBy' => 'id DESC', 'limit' => 400)); }
+  catch (\Throwable $t) { error_log('bank_reconciliation diffs: ' . $t->getMessage()); }
+  ?>
+  <h5 class="mt-4">بنود فروق المطابقة البنكية</h5>
+  <div class="table-wrap"><table class="data-table">
+    <thead><tr>
+      <th>الكشف</th><th>النوع</th><th>السبب</th><th>المبلغ</th>
+      <th>المسؤول</th><th>الاجراء</th><th>الحالة</th><th>وقت الفتح</th>
+    </tr></thead>
+    <tbody>
+    <?php foreach ($__w11_diffs as $__d): ?>
+      <tr>
+        <td>#<?= (int) $__d['statement_id'] ?></td>
+        <td><?= htmlspecialchars(ems_w7_ar((string) $__d['diff_kind'], $conn)) ?></td>
+        <td><?= htmlspecialchars((string) $__d['cause']) ?></td>
+        <td><?= number_format((float) $__d['amount'], 2) ?></td>
+        <td><?= htmlspecialchars((string) $__d['responsible_role']) ?></td>
+        <td><?= htmlspecialchars((string) $__d['action_taken']) ?></td>
+        <td><?= htmlspecialchars(ems_w7_ar((string) $__d['state'], $conn)) ?></td>
+        <td><?= htmlspecialchars((string) $__d['opened_at']) ?></td>
+      </tr>
+    <?php endforeach; ?>
+    </tbody>
+  </table></div>
 </div>
 
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>

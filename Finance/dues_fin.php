@@ -10,6 +10,7 @@ if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/fin_helpers.php';
+require_once __DIR__ . '/../includes/w7_codes.php';
 
 $ctx = fin_ctx();
 $is_super_admin = $ctx['is_super']; $company_id = $ctx['company_id']; $current_user_id = $ctx['user_id'];
@@ -380,6 +381,33 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
         <?php endif; // نهاية قسم ذمم العملاء (المالية فقط) ?>
     </div></div>
+
+  <?php /* ── ACC-10 · بنودُ استحقاقِ المورد — **كلُّ بندٍ بمرجعِه في بوّابتِه**:
+       سطرُ المطابقةِ الثلاثيّةِ أو بندُ الإقفالِ التعاقديّ. وبندٌ بلا بوّابةٍ
+       يرفضه `CHECK` في القاعدةِ لا في الشاشة. */
+  $__w11_acc = array();
+  try { $__w11_acc = fin_gate($is_super_admin)->select('acc_supplier_accrual_line',
+            array('orderBy' => 'due_id DESC, line_no', 'limit' => 400)); }
+  catch (\Throwable $t) { error_log('dues_fin accrual lines: ' . $t->getMessage()); }
+  ?>
+  <h5 class="mt-4">بنود استحقاق المورد</h5>
+  <div class="table-wrap"><table class="data-table">
+    <thead><tr>
+      <th>الاستحقاق</th><th>البند</th><th>البوابة</th><th>المرجع</th><th>الوصف</th><th>المبلغ</th>
+    </tr></thead>
+    <tbody>
+    <?php foreach ($__w11_acc as $__a): ?>
+      <tr>
+        <td>#<?= (int) $__a['due_id'] ?></td>
+        <td><?= (int) $__a['line_no'] ?></td>
+        <td><?= htmlspecialchars(ems_w7_ar((string) $__a['gate_kind'], $conn)) ?></td>
+        <td><?= htmlspecialchars((string) $__a['gate_ref']) ?></td>
+        <td><?= htmlspecialchars((string) $__a['description']) ?></td>
+        <td><?= number_format((float) $__a['amount'], 2) ?></td>
+      </tr>
+    <?php endforeach; ?>
+    </tbody>
+  </table></div>
 </div>
 
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
