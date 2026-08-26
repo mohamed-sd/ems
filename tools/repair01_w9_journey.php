@@ -123,6 +123,14 @@ $sweep = function () use ($conn) {
         "DELETE FROM proc_request WHERE code LIKE 'W9J-%'",
         /* حركاتُ المخزنِ موسومةٌ بنصِّ الملاحظةِ لا بالرمز */
         "DELETE FROM proc_stock_move WHERE note LIKE 'W09 %'",
+        /* ⚠ **وقيدُ الجودةِ يُكنَس أيضًا**: كلُّ رحلةٍ تترك سطرًا في
+             `proc_track_gap` لأنَّ صنفَها اختياريُّ التتبّعِ بلا بيانات —
+             وهو سلوكٌ صحيحٌ في التشغيلِ وأثرٌ في الفحص. وتشغيلٌ متكرِّرٌ
+             راكم مئةً وعشرةَ صفوفٍ في القاعدةِ الحيّة، فصار أثرُ فاحصٍ
+             يُقرَأ واقعًا تشغيليًّا في شاشةِ جودةِ البيانات.
+           ◆ **والكنسُ بالعائلةِ لا بالجولة**: الوسمُ `W9J-` وما بلا مرجعٍ
+             (‏من تشغيلاتٍ سبقت وصلَ المرجعِ بالنداء). */
+        "DELETE FROM proc_track_gap WHERE op_ref LIKE 'W9J-%' OR COALESCE(op_ref,'') = ''",
         /* والمشتقّاتُ تُفرَغ لتُعاد من الحركاتِ الحيّةِ وحدَها */
         "DELETE FROM proc_wh_close WHERE period_ym <> '' AND closed_by > 0 AND close_value <> 0
             AND warehouse_id IN (SELECT id FROM proc_warehouse) AND state = 'closed'
@@ -715,6 +723,7 @@ foreach (array('proc_rfq', 'proc_package', 'proc_transfer', 'proc_count_session'
     $left += (int) $one("SELECT COUNT(*) FROM `$t` WHERE code LIKE 'W9J-%'");
 }
 $left += (int) $one("SELECT COUNT(*) FROM proc_stock_move WHERE note LIKE 'W09 %'");
+$left += (int) $one("SELECT COUNT(*) FROM proc_track_gap WHERE op_ref LIKE 'W9J-%'");
 
 printf("رحلةُ التوريد: عابرٌ %d/%d · مستهلكونَ متمايزون %d · بلا أثرٍ تجاريٍّ مقيسٍ %d\n",
     $pass, $total, $cons, $noEff);
