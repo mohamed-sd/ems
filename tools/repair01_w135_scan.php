@@ -63,8 +63,12 @@ $line('2d', 'مجهولٌ مُعلَنٌ يُرفع للمالك',
 
 /* ── ③ التقاطعاتُ الحرِجةُ الخمسة (البنود 4-8) ──────────────────────────── */
 echo "\n③ تقاطعاتٌ حرِجةٌ — حكمُها مسجَّلٌ قبل W14\n";
-$xAll  = $n("SELECT COUNT(*) FROM repair01_screen_registry WHERE owner_code IN ($TEN)");
-$xKind = $n("SELECT COUNT(*) FROM repair01_screen_registry WHERE owner_code IN ($TEN) AND surface_kind <> ''");
+/* ⚠ **المقامُ كان يشمل الأشباحَ المتقاعدة** — ومئةٌ وتسعةٌ منها بلا ملفٍّ على
+     القرص، فسؤالُها «أمصدرٌ أم إسقاط» سؤالٌ عن شيءٍ لا وجودَ له.
+     **ومقامٌ يشمل ما لا يقبل الحكمَ يجعل الخضرةَ مستحيلةً بالبناء.** */
+$LIVE  = "ownership_verdict NOT IN ('', 'RETIRE')";
+$xAll  = $n("SELECT COUNT(*) FROM repair01_screen_registry WHERE owner_code IN ($TEN) AND $LIVE");
+$xKind = $n("SELECT COUNT(*) FROM repair01_screen_registry WHERE owner_code IN ($TEN) AND $LIVE AND surface_kind <> ''");
 $line('3a', 'سطحٌ متقاطعٌ مُصنَّفٌ مصدرًا أو إسقاطًا', $xKind, $xAll);
 $r = @$conn->query("SELECT owner_code, COUNT(*) a, SUM(surface_kind = 'PROJECTION') p
                       FROM repair01_screen_registry WHERE owner_code IN ($TEN)
@@ -123,9 +127,13 @@ $line('7b', 'سطحٌ ماليٌّ مُصنَّفٌ لتسييجِ دَينِه'
 
 /* ── ⑧ منهجُ الأشباح (البند 17) ─────────────────────────────────────────── */
 echo "\n⑧ منهجُ الأشباح\n";
-$ghost = $n("SELECT COUNT(*) FROM repair01_screen_registry WHERE ghost_verdict = 'MOVED_TO_TARGET_GAPS'");
-$line('8a', 'شبحٌ له قرارٌ من الستّةِ بسببِه',
-      $n("SELECT COUNT(*) FROM repair01_target_gaps WHERE ghost_disposition <> ''"), $ghost, "المقام $ghost");
+/* ⚠ **المقامُ دفترُ الفجواتِ نفسُه لا عدّادُ الأشباحِ في السجل**: الأوّلُ 334
+     صفًّا والثاني 160 — والقياسُ بينهما يعطي «334 من 160» وهو رقمٌ لا يقابل
+     شيئًا. **ورقمانِ متجاورانِ لا يُصالَحان يُخفيان ما يُظهرانه.** */
+$gapAll = $n("SELECT COUNT(*) FROM repair01_target_gaps");
+$line('8a', 'صفُّ فجوةٍ له قرارٌ من الستّةِ بسببِه',
+      $n("SELECT COUNT(*) FROM repair01_target_gaps WHERE ghost_disposition <> ''"), $gapAll,
+      'منها أشباحُ السجلّ ' . $n("SELECT COUNT(*) FROM repair01_screen_registry WHERE ghost_verdict = 'MOVED_TO_TARGET_GAPS'"));
 
 /* ── ⑨ حدودُ W14 (البنود 36-47) ─────────────────────────────────────────── */
 echo "\n⑨ حدودُ الرابعةَ عشرة\n";
