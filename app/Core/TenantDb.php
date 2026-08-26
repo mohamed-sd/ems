@@ -43,6 +43,8 @@ class TenantDb
 
     /** @var \mysqli */
     private $conn;
+    /** @var array<string,string> مفتاحُ الأبِ الأساسيُّ لكلِّ جدولٍ — يُقرأ مرّةً */
+    private static $parentKeyCache = array();
     /** @var TenantContext */
     private $ctx;
     /** @var bool وضع القراءة العابرة للشركات (super admin، مُسجَّل) */
@@ -1025,13 +1027,47 @@ class TenantDb
             return;
         }
         $this->requireTenant($table);
+        // REPAIR01 W13: مفتاحُ الأبِ ليس `id` دائمًا. ستةٌ وعشرون ابنًا مسجَّلًا
+        // أبوهم بمفتاحٍ آخر (rec_applications.app_id · ticket_workstreams.ws_id …)،
+        // وتثبيتُ الاسمِ `id` هنا كان يجعل إدراجَهم عبرَ البوابة مستحيلًا بخطأ
+        // "Unknown column 'id'" لا بمنعٍ مقصود. فالمفتاحُ يُقرأ من المخطَّط،
+        // ولمن أبوه `id` يبقى السلوكُ كما كان حرفًا.
+        $parentKey = $this->parentKeyOf($parent, isset($def['parentKey']) ? $def['parentKey'] : '');
+        $this->assertIdent($parentKey);
         $res = $this->run(
-            'SELECT 1 FROM `' . $parent . '` WHERE `id` = ? AND `company_id` = ? LIMIT 1',
+            'SELECT 1 FROM `' . $parent . '` WHERE `' . $parentKey . '` = ? AND `company_id` = ? LIMIT 1',
             array(intval($data[$fk]), $this->ctx->companyId())
         );
         if (!($res instanceof \mysqli_result) || $res->num_rows === 0) {
             $this->deny('child insert: parent not owned by tenant', $table . '.' . $fk . '=' . intval($data[$fk]));
         }
+    }
+
+    /**
+     * مفتاحُ الأبِ الأساسيّ: المُعلَنُ في السجلِّ إن أُعلن، وإلّا المقروءُ من
+     * المخطَّط، وإلّا `id`. والقراءةُ تُخزَّن لمرّةٍ واحدةٍ لكلِّ جدولٍ في الطلب.
+     */
+    private function parentKeyOf($parent, $declared = '')
+    {
+        if (is_string($declared) && $declared !== '') { return $declared; }
+        if (isset(self::$parentKeyCache[$parent])) { return self::$parentKeyCache[$parent]; }
+        $key = 'id';
+        $st = @$this->conn->prepare(
+            'SELECT COLUMN_NAME FROM information_schema.COLUMNS
+              WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_KEY = ?
+              ORDER BY ORDINAL_POSITION LIMIT 1');
+        if ($st) {
+            $pri = 'PRI';
+            $st->bind_param('ss', $parent, $pri);
+            if ($st->execute()) {
+                $res = $st->get_result();
+                $row = $res ? $res->fetch_row() : null;
+                if ($row && is_string($row[0]) && $row[0] !== '') { $key = $row[0]; }
+            }
+            $st->close();
+        }
+        self::$parentKeyCache[$parent] = $key;
+        return $key;
     }
 
     private function assertIdent($name)

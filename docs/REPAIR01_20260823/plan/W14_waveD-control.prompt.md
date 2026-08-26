@@ -64,7 +64,7 @@ php tools/_uxw_probe.php "SELECT requirement_id,unit,surface,grain,source_of_tru
 > الأرقامُ مقيسةٌ لحظةَ التوليد. أعِدْ `php tools/repair01_plan_gen.php` إن مرّ وقتٌ طويل.
 
 ## ٣-ب · حاجبٌ على هذه المرحلة
-- **DEC-OPEN-16** — ⛔ **مفتوحٌ ويمنع فتحَ البوّابة** · `Blocker_Type = STRUCTURAL`
+- **DEC-OPEN-16** — ✔ حُسم — تابعْ · `Blocker_Type = STRUCTURAL`
   - السؤال: هل تدخل التحقيقات في نطاق المراجعة الداخلية أم تبقى عند الحوكمة؟
   - الأثر: ملكيّةُ التحقيقات تحدّد أيَّ إدارةٍ تملك ج06 و ح07-3 — بنيةُ المستهدَف
   - الأسطحُ المتأثّرة: ج06 · ح07-3

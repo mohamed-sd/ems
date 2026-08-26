@@ -941,6 +941,24 @@ class TenantRegistry
             'parent' => 'ticket_workstreams', 'fk' => 'ws_id'),
         'ticket_communications' => array('type' => self::T_CHILD, 'soft' => false,
             'parent' => 'tickets', 'fk' => 'tk_id'),
+        // ── REPAIR01 · W13 (هجرة 2027_12_01): الاطراف الاربعة ودورة الموظف ──
+        // الاطراف الاربعة وسجلات البلاغ التابعة: كل منها يحمل company_id غير
+        // قابل للعدم، فتصنيفها T_TENANT لا T_CHILD — العزل بعمودها هي.
+        'tkt_party' => array('type' => self::T_TENANT, 'soft' => false),
+        'tkt_subject_type' => array('type' => self::T_TENANT, 'soft' => false),
+        'tkt_routing_history' => array('type' => self::T_TENANT, 'soft' => false),
+        'tkt_assignment_history' => array('type' => self::T_TENANT, 'soft' => false),
+        'tkt_resolution_action' => array('type' => self::T_TENANT, 'soft' => false),
+        'tkt_verification' => array('type' => self::T_TENANT, 'soft' => false),
+        'tkt_reopen' => array('type' => self::T_TENANT, 'soft' => false),
+        'hr_employee_document' => array('type' => self::T_TENANT, 'soft' => false),
+        'hr_onboarding_item' => array('type' => self::T_TENANT, 'soft' => false),
+        'hr_job_movement' => array('type' => self::T_TENANT, 'soft' => false),
+        'hr_training_record' => array('type' => self::T_TENANT, 'soft' => false),
+        'hr_performance_review' => array('type' => self::T_TENANT, 'soft' => false),
+        'hr_disciplinary_case' => array('type' => self::T_TENANT, 'soft' => false),
+        'hr_disciplinary_stage' => array('type' => self::T_TENANT, 'soft' => false),
+        'hr_benefit_enrollment' => array('type' => self::T_TENANT, 'soft' => false),
     );
 
     /** تعريف جدولٍ أو null إن لم يكن مسجَّلًا. */
