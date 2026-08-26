@@ -77,10 +77,33 @@ $canon = array();
 $r = q($conn, "SELECT route, canonical_ar, owner_dept, status FROM nav_canonical");
 while ($r && $x = $r->fetch_assoc()) { $canon[strtolower(repair01_w2_norm_route($x['route']))] = $x; }
 
-/* جسرُ المسمّياتِ الحيّةِ إلى الرموزِ المعيارية */
-$cross = array();
-$r = q($conn, "SELECT legacy_name, canonical_code FROM repair01_dept_crosswalk");
-while ($r && $x = $r->fetch_assoc()) { $cross[trim($x['legacy_name'])] = $x['canonical_code']; }
+/* جسرُ المسمّياتِ الحيّةِ إلى الرموزِ المعيارية
+   ⛔ **والوحدةُ المشقوقةُ تُستثنى من هذه الخريطة** (‏RPR-W10 · `W10-D-03`):
+      مفتاحُها اسمٌ حيٌّ **مكرَّرٌ صفَّين** في الجسر (‏شقٌّ أيمنُ وشقٌّ أيسر)، وخريطةٌ
+      بمفتاحِ الاسمِ تجعل آخرَ صفٍّ يدهس أوّلَه — **فيصير الشقُّ محسومًا بترتيبِ
+      الصفوفِ لا بمعناه**، وهو ما أسند واحدًا وخمسينَ سطحًا إلى الشقِّ الخطأ صامتًا.
+      والحلُّ الصحيحُ في `repair01_w10_split` سطحًا سطحًا بقاعدةٍ ومرساة. */
+$cross = array(); $splitNames = array();
+$r = q($conn, "SELECT legacy_name, canonical_code, verdict FROM repair01_dept_crosswalk");
+while ($r && $x = $r->fetch_assoc()) {
+    $nm = trim($x['legacy_name']);
+    if ($x['verdict'] === 'SPLIT') { $splitNames[$nm] = true; continue; }
+    $cross[$nm] = $x['canonical_code'];
+}
+/* حلُّ الشقِّ من دفترِ W10 — والغيابُ يترك المالكَ للقاعدةِ التالية لا يخمّنه */
+$w10Split = array();
+$hasSplit = q($conn, "SHOW TABLES LIKE 'repair01_w10_split'");
+if ($hasSplit && $hasSplit->num_rows > 0) {
+    $r = q($conn, "SELECT route, resolved_code FROM repair01_w10_split WHERE route <> ''");
+    while ($r && $x = $r->fetch_assoc()) {
+        $w10Split[strtolower(repair01_w2_norm_route($x['route']))] = $x['resolved_code'];
+    }
+}
+/** رمزُ الإدارةِ من اسمٍ حيٍّ — والمشقوقُ يُحَلُّ بمسارِه لا باسمِه */
+$resolveDept = function ($nm, $routeKey) use (&$cross, &$splitNames, &$w10Split, &$deptByName) {
+    if (isset($splitNames[$nm])) { return $w10Split[$routeKey] ?? ''; }
+    return $cross[$nm] ?? ($deptByName[$nm] ?? '');
+};
 $deptByName = array();
 $r = q($conn, "SELECT canonical_code, name_ar FROM repair01_departments");
 while ($r && $x = $r->fetch_assoc()) { $deptByName[trim($x['name_ar'])] = $x['canonical_code']; }
@@ -180,7 +203,7 @@ foreach ($keys as $k) {
     /* ب) السجلُّ المعياريُّ للتنقّلِ يسمّي إدارةً مالكة */
     if (isset($canon[$lc]) && trim((string) $canon[$lc]['owner_dept']) !== '') {
         $nm = trim($canon[$lc]['owner_dept']);
-        $code = $cross[$nm] ?? ($deptByName[$nm] ?? '');
+        $code = $resolveDept($nm, $lc);
         if ($code !== '') {
             $U[$k]['owner_code'] = $code; $U[$k]['owner_role'] = $nm;
             $U[$k]['owner_rule'] = 'NAV_CANONICAL_OWNER';
@@ -197,7 +220,7 @@ foreach ($keys as $k) {
         }
         if (count($spaces) === 1) {
             $nm = key($spaces);
-            $code = $cross[$nm] ?? ($deptByName[$nm] ?? '');
+            $code = $resolveDept($nm, $lc);
             if ($code !== '') {
                 $U[$k]['owner_code'] = $code; $U[$k]['owner_role'] = $nm;
                 $U[$k]['owner_rule'] = 'NAV_SOLE_ROLE_SPACE';

@@ -232,6 +232,35 @@ if (!function_exists('ems_screen_about_auto')) {
                     if ($name === '') { $name = trim((string) $d['title_ar']); }
                 }
                 $st->close();
+
+                /* ── نطاقُ الشاشةِ بعد شقِّ الوحدة (RPR-W10) ───────────────────
+                   ⚠ **الاسمُ في `nav09_file_map` اسمٌ حيٌّ لوحدةٍ صارت وحدتَين**،
+                     ودهسُه في الجدولِ يكسر كلَّ رابطٍ يشير إليه. **فالجسرُ يترجم
+                     عند العرضِ ولا يستبدل عند التخزين**: يُقرأ المؤشِّرُ كما هو،
+                     ويُعرَض الشقُّ الذي يملك هذه الشاشةَ بعينِها.
+                   ◆ وغيابُ صفٍّ في الجسرِ يُبقي الاسمَ الحيَّ كما كان — فالوصلُ
+                     يضيف معنًى ولا ينزع أحدَه. */
+                if ($dept !== '') {
+                    $svc = dirname(__DIR__) . '/app/Services/Governance/DeptSplitService.php';
+                    if (is_file($svc)) {
+                        require_once $svc;
+                        $tr = \App\Services\Governance\DeptSplitService::translateLegacy(
+                            $conn, 'nav09_file_map', $rel, $dept);
+                        if (!empty($tr['code'])) {
+                            $st = $conn->prepare("SELECT name_ar FROM repair01_departments
+                                                   WHERE canonical_code = ? LIMIT 1");
+                            if ($st) {
+                                $st->bind_param('s', $tr['code']);
+                                $st->execute();
+                                if ($n2 = $st->get_result()->fetch_assoc()) {
+                                    $nm2 = trim((string) $n2['name_ar']);
+                                    if ($nm2 !== '') { $dept = $nm2; }
+                                }
+                                $st->close();
+                            }
+                        }
+                    }
+                }
             } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'التعريف إرشاد — لا يسقط الشاشة'); /* التعريفُ إرشادٌ — لا يُسقط الشاشة */ }
 
             if ($name === '') { $name = basename($rel, '.php'); }
