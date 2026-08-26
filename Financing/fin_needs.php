@@ -1,0 +1,79 @@
+<?php
+/**
+ * Financing/fin_needs.php — فرص واحتياجات التمويل (RPR-W12)
+ * ───────────────────────────────────────────────────────────────────────────
+ * حاجة تمويلية واحدة بمبررها — ومن رفعها لا يعتمدها.
+ *
+ * ◆ **الحبّةُ `Legal Entity`** (‏`DEC-OPEN-03`): القراءةُ تمرُّ ببوّابةِ المستأجرِ
+ *   التي تحقن الكيانَ — فلا صفَّ من كيانٍ آخرَ يظهر.
+ *
+ * ◆ **والسطحُ سجلُّ قراءةٍ لا كاتبُ حكم**: القرارُ يُتَّخذ في `FinancingCycleService`
+ *   بحارسِه ورمزِ ردِّه، والشاشةُ تعرض ما وقع. (‏المتطلَّب FIN-04)
+ */
+require_once __DIR__ . '/../includes/session_bootstrap.php';
+session_start();
+if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
+include '../config.php';
+include '../includes/permissions_helper.php';
+require_once __DIR__ . '/w12_view.php';
+
+$ctx = w12_ctx();
+$is_super = $ctx['is_super'];
+$company_id = $ctx['company_id'];
+if (!$is_super && $company_id <= 0) {
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة', 'GOV-SCOPE-403', '');
+    exit();
+}
+
+$perms = w12_perms($conn, 'Financing/fin_needs.php', $is_super);
+if (empty($perms['can_view'])) {
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض هذه الشاشة', 'GOV-PERM-403', '');
+    exit();
+}
+
+$rows = w12_rows($is_super, 'fin_funding_need',
+                 array('orderBy' => 'id DESC', 'limit' => 400));
+
+$page_title = 'إيكوبيشن | فرص واحتياجات التمويل';
+require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(isset($perms) ? $perms : null);
+include '../inheader.php';
+include '../insidebar.php';
+require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
+?>
+<div class="main ems-unified-page-shell">
+    <?php $header_title = 'فرص واحتياجات التمويل'; $header_icon = 'fa fa-lightbulb'; $header_actions = array();
+    $header_back = array('href' => 'financing_board.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'لوحة المحفظة');
+    include('../includes/page_header.php'); ?>
+
+    <div class="ems-stat-cards">
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">عدد الاحتياجات</div></div>
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= ems_w12_count($rows, "state", "approved") ?></div><div class="ems-stat-label">معتمدة</div></div>
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= ems_w12_count($rows, "state", "submitted") ?></div><div class="ems-stat-label">قيد الاعتماد</div></div>
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= ems_w12_num(ems_w12_sumf($rows, "amount_needed")) ?></div><div class="ems-stat-label">اجمالي المطلوب</div></div>
+    </div>
+
+    <?php require_once __DIR__ . '/../includes/ux_components.php';
+    echo ems_states_bundle('لا احتياجات تمويلية مسجلة', 'الحاجة تسبق العرض والعرض يسبق العقد'); ?>
+
+    <div class="table-wrap"><table class="data-table">
+        <thead><tr><th>كود الحاجة</th><th>الموضوع</th><th>الادارة الطالبة</th><th>الغرض</th><th>المبلغ المطلوب</th><th>العملة</th><th>مطلوب بحلول</th><th>الرافع</th><th>المعتمد</th><th>الحالة</th></tr></thead>
+        <tbody>
+        <?php if ($rows): foreach ($rows as $r): ?>
+            <tr>
+                    <td><?= htmlspecialchars((string) $r["need_code"]) ?></td>
+                    <td><?= htmlspecialchars((string) $r["title"]) ?></td>
+                    <td><?= htmlspecialchars((string) $r["requester_dept"]) ?></td>
+                    <td><?= ems_w12_state((string) $r["purpose"]) ?></td>
+                    <td><?= ems_w12_num($r["amount_needed"]) ?></td>
+                    <td><?= htmlspecialchars((string) $r["currency"]) ?></td>
+                    <td><?= htmlspecialchars((string) $r["needed_by"]) ?></td>
+                    <td><?= (int) $r["raised_by"] ?></td>
+                    <td><?= (int) $r["approved_by"] ?></td>
+                    <td><?= ems_w12_state((string) $r["state"]) ?></td>
+            </tr>
+        <?php endforeach; endif; ?>
+        </tbody>
+    </table></div>
+</div>
+</body></html>

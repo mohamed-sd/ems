@@ -455,4 +455,201 @@ class FinancingService
         $stmt->close();
         return array('ok' => $done, 'code' => $done ? 200 : 404, 'reason' => $done ? 'أغلق بقراره ومستنده' : 'غير موجود أو مغلق');
     }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       RPR-W12 — منافذُ المجالِ المقيَّدِ لدورةِ الإقفالاتِ الثلاثة
+       ══════════════════════════════════════════════════════════════════════
+       ◆ **بابٌ واحدٌ للمجالِ المقيَّدِ لا بابان**: `financing_operations` و
+         `financing_installments` و`financing_deviations` جداولُ **مقيَّدةٌ**
+         في سجلِّ البوّابة (`T_RESTRICTED` · N-15) — تُقرأ وتُكتب من هذه الخدمةِ
+         وحدَها بمستدعٍ مخوَّل. و`FinancingCycleService` **يفوّض إليها ولا
+         يفتح بابًا ثانيًا** — كما نقلت W11 كتابةَ الدفترِ إلى كاتبِه المعتمَدِ
+         بدل استثناءٍ خامس (`GAP-27`).
+       ◆ **وكلُّ نداءٍ هنا مقيَّدٌ بـ`company_id`** — فالعزلُ بانضباطِ هذا الملفِّ
+         وهو المخاطرةُ المسجَّلةُ في `docs/raw_query_exceptions.json`، لا مخاطرةٌ
+         جديدةٌ يفتحها ملفٌّ غيرُ مسجَّل.
+       ══════════════════════════════════════════════════════════════════════ */
+
+    /** ربطُ العمليةِ بعقدِها — أثرُ توقيعِ العقد */
+    public static function linkOperationContract(\mysqli $conn, $companyId, $opId, $contractId)
+    {
+        $stmt = $conn->prepare("UPDATE financing_operations SET contract_id = ?
+                                 WHERE company_id = ? AND op_id = ?");
+        if (!$stmt) { return 0; }
+        $c = intval($contractId); $co = intval($companyId); $o = intval($opId);
+        $stmt->bind_param('iii', $c, $co, $o);
+        $stmt->execute();
+        $n = $stmt->affected_rows; $stmt->close();
+        return $n;
+    }
+
+    /** ختمُ أقساطِ فترةٍ بإقفالِها التعاقديّ — فلا يُقرأ قسطٌ في فترتَين */
+    public static function sealInstallmentsForPeriod(\mysqli $conn, $companyId, $opId, $closeId, $from, $to)
+    {
+        $stmt = $conn->prepare(
+            "UPDATE financing_installments i
+               JOIN financing_operations o ON o.op_id = i.op_id
+                SET i.contract_close_id = ?
+              WHERE o.company_id = ? AND i.op_id = ? AND i.due_date BETWEEN ? AND ?");
+        if (!$stmt) { return 0; }
+        $c = intval($closeId); $co = intval($companyId); $o = intval($opId);
+        $f = (string) $from; $t = (string) $to;
+        $stmt->bind_param('iiiss', $c, $co, $o, $f, $t);
+        $stmt->execute();
+        $n = $stmt->affected_rows; $stmt->close();
+        return $n;
+    }
+
+    /** إنزالُ الرصيدِ القائمِ بقيمةِ المنفَّذ — والرصيدُ لا ينزل تحت الصفر */
+    public static function applyExecutedPayment(\mysqli $conn, $companyId, $opId, $amount)
+    {
+        $stmt = $conn->prepare(
+            "UPDATE financing_operations
+                SET outstanding_balance = GREATEST(0, outstanding_balance - ?)
+              WHERE company_id = ? AND op_id = ?");
+        if (!$stmt) { return null; }
+        $a = (float) $amount; $co = intval($companyId); $o = intval($opId);
+        $stmt->bind_param('dii', $a, $co, $o);
+        $stmt->execute();
+        $stmt->close();
+        $q = $conn->prepare("SELECT outstanding_balance FROM financing_operations
+                              WHERE company_id = ? AND op_id = ?");
+        if (!$q) { return null; }
+        $q->bind_param('ii', $co, $o);
+        $q->execute();
+        $row = $q->get_result()->fetch_row();
+        $q->close();
+        return $row ? (float) $row[0] : null;
+    }
+
+    /**
+     * إعادةُ احتسابِ المخصَّصِ على قسطٍ وحالتِه — **مشتقٌّ من سطورِ التخصيصِ
+     * لا مكتوبٌ بيد**، والقسطُ يُقفَل بتغطيتِه لا بدعوى.
+     */
+    public static function recomputeInstallmentAllocation(\mysqli $conn, $companyId, $instId)
+    {
+        $co = intval($companyId); $i = intval($instId);
+        $q = $conn->prepare(
+            "SELECT i.amount_total, COALESCE(SUM(a.amount), 0)
+               FROM financing_installments i
+               JOIN financing_operations o ON o.op_id = i.op_id
+               LEFT JOIN fin_payment_allocation a
+                      ON a.installment_id = i.inst_id AND a.company_id = o.company_id
+              WHERE o.company_id = ? AND i.inst_id = ?
+              GROUP BY i.inst_id, i.amount_total");
+        if (!$q) { return null; }
+        $q->bind_param('ii', $co, $i);
+        $q->execute();
+        $row = $q->get_result()->fetch_row();
+        $q->close();
+        if (!$row) { return null; }
+        $total = (float) $row[0]; $alloc = (float) $row[1];
+        $state = ($alloc >= $total - 0.005 && $total > 0) ? 'paid' : null;
+        if ($state !== null) {
+            $u = $conn->prepare("UPDATE financing_installments SET allocated_amount = ?, state = ?
+                                  WHERE inst_id = ?");
+            if (!$u) { return null; }
+            $u->bind_param('dsi', $alloc, $state, $i);
+        } else {
+            $u = $conn->prepare("UPDATE financing_installments SET allocated_amount = ? WHERE inst_id = ?");
+            if (!$u) { return null; }
+            $u->bind_param('di', $alloc, $i);
+        }
+        $u->execute();
+        $u->close();
+        return array('allocated' => $alloc, 'total' => $total, 'state' => $state);
+    }
+
+    /** إقفالُ العمليةِ بإقفالِها النهائيّ — فتقرأ العمليةُ ختامَها */
+    public static function closeOperationByFinal(\mysqli $conn, $companyId, $opId, $finalCloseId)
+    {
+        $stmt = $conn->prepare("UPDATE financing_operations
+                                   SET final_close_id = ?, state = 'closed'
+                                 WHERE company_id = ? AND op_id = ?");
+        if (!$stmt) { return 0; }
+        $f = intval($finalCloseId); $co = intval($companyId); $o = intval($opId);
+        $stmt->bind_param('iii', $f, $co, $o);
+        $stmt->execute();
+        $n = $stmt->affected_rows; $stmt->close();
+        return $n;
+    }
+
+    /** استحقاقاتٌ مفتوحةٌ لعملية — مقيسةٌ لا مُدَّعاة */
+    public static function openDuesCount(\mysqli $conn, $companyId, $opId)
+    {
+        $stmt = $conn->prepare(
+            "SELECT COUNT(*) FROM financing_installments i
+               JOIN financing_operations o ON o.op_id = i.op_id
+              WHERE o.company_id = ? AND i.op_id = ?
+                AND i.state IN ('scheduled','due','overdue')");
+        if (!$stmt) { return 0; }
+        $co = intval($companyId); $o = intval($opId);
+        $stmt->bind_param('ii', $co, $o);
+        $stmt->execute();
+        $row = $stmt->get_result()->fetch_row();
+        $stmt->close();
+        return $row ? (int) $row[0] : 0;
+    }
+
+    /** انحرافاتٌ حاجبةٌ مفتوحةٌ لموضوعٍ — والحجبُ يُقاس من الصفوف */
+    public static function openBlockingDeviations(\mysqli $conn, $companyId, $subjectLike = null)
+    {
+        $co = intval($companyId);
+        if ($subjectLike === null) {
+            $stmt = $conn->prepare("SELECT COUNT(*) FROM financing_deviations
+                                     WHERE company_id = ? AND state = 'open' AND final_close_block = 1");
+            if (!$stmt) { return 0; }
+            $stmt->bind_param('i', $co);
+        } else {
+            $stmt = $conn->prepare("SELECT COUNT(*) FROM financing_deviations
+                                     WHERE company_id = ? AND state = 'open' AND final_close_block = 1
+                                       AND subject_ref LIKE ?");
+            if (!$stmt) { return 0; }
+            $like = '%' . (string) $subjectLike . '%';
+            $stmt->bind_param('is', $co, $like);
+        }
+        $stmt->execute();
+        $row = $stmt->get_result()->fetch_row();
+        $stmt->close();
+        return $row ? (int) $row[0] : 0;
+    }
+
+    /** آخرُ إقفالٍ دوريٍّ لعملية — مرجعُ الإقفالِ النهائيِّ لا بديلُه */
+    public static function lastPeriodicClose(\mysqli $conn, $companyId, $opId)
+    {
+        $stmt = $conn->prepare(
+            "SELECT id, close_principal, close_profit, contract_period_no
+               FROM fin_contract_close
+              WHERE company_id = ? AND op_id = ?
+              ORDER BY contract_period_no DESC LIMIT 1");
+        if (!$stmt) { return null; }
+        $co = intval($companyId); $o = intval($opId);
+        $stmt->bind_param('ii', $co, $o);
+        $stmt->execute();
+        $row = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+        return $row ?: null;
+    }
+
+    /** رفعُ انحرافٍ من دورةِ التمويل — والرافعُ لا يُكتب في حقلِ الحاسم */
+    public static function raiseDeviation(\mysqli $conn, $companyId, array $row)
+    {
+        $stmt = $conn->prepare(
+            "INSERT INTO financing_deviations
+                (company_id, dev_type, subject_ref, description, priority, required_doc,
+                 state, final_close_block)
+             VALUES (?, ?, ?, ?, ?, ?, 'open', ?)");
+        if (!$stmt) { return 0; }
+        $co = intval($companyId);
+        $t = (string) (isset($row['dev_type']) ? $row['dev_type'] : 'payment_gap');
+        $s = (string) (isset($row['subject_ref']) ? $row['subject_ref'] : '');
+        $d = (string) (isset($row['description']) ? $row['description'] : '');
+        $p = (string) (isset($row['priority']) ? $row['priority'] : 'normal');
+        $r = (string) (isset($row['required_doc']) ? $row['required_doc'] : '');
+        $b = (int) (isset($row['final_close_block']) ? $row['final_close_block'] : 1);
+        $stmt->bind_param('isssssi', $co, $t, $s, $d, $p, $r, $b);
+        $stmt->execute();
+        $id = $stmt->insert_id; $stmt->close();
+        return (int) $id;
+    }
 }

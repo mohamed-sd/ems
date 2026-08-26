@@ -599,6 +599,27 @@ class TenantRegistry
         'tre_petty_expense' => array('type' => self::T_TENANT, 'soft' => false),
         'tre_cash_count' => array('type' => self::T_TENANT, 'soft' => false),
         'tre_cash_count_line' => array('type' => self::T_TENANT, 'soft' => false),
+        // REPAIR01 · W12 (هجرة 2027_11_30): التمويلُ والممولون — الإقفالاتُ الثلاثةُ
+        // كياناتٌ متمايزةٌ (تعاقديٌّ · شهريٌّ · نهائيّ) وطبقتا الدفعِ منفصلتان.
+        // كلُّها بياناتُ مستأجرٍ تحمل company_id غير قابلٍ للعدم (DEC-OPEN-03):
+        // لا اتفاقيةَ ولا عقدَ ولا إقفالَ ولا أمرَ دفعٍ بلا كيانٍ قانونيّ.
+        // والبنودُ تحمل company_id بنفسها فتُعزل مباشرةً لا عبر أبيها.
+        'fin_financier_contact' => array('type' => self::T_TENANT, 'soft' => false),
+        'fin_financier_document' => array('type' => self::T_TENANT, 'soft' => false),
+        'fin_ref_list' => array('type' => self::T_TENANT, 'soft' => false),
+        'fin_funding_need' => array('type' => self::T_TENANT, 'soft' => false),
+        'fin_funding_offer' => array('type' => self::T_TENANT, 'soft' => false),
+        'fin_precontract_review' => array('type' => self::T_TENANT, 'soft' => false),
+        'fin_finance_contract' => array('type' => self::T_TENANT, 'soft' => false),
+        'fin_contract_term' => array('type' => self::T_TENANT, 'soft' => false),
+        'fin_contract_covenant' => array('type' => self::T_TENANT, 'soft' => false),
+        'fin_contract_close' => array('type' => self::T_TENANT, 'soft' => false),
+        'fin_monthly_close' => array('type' => self::T_TENANT, 'soft' => false),
+        'fin_final_close' => array('type' => self::T_TENANT, 'soft' => false),
+        'fin_close_link' => array('type' => self::T_TENANT, 'soft' => false),
+        'fin_payment_order' => array('type' => self::T_TENANT, 'soft' => false),
+        'fin_legacy_payment_aggregate' => array('type' => self::T_TENANT, 'soft' => false),
+        'fin_payment_allocation' => array('type' => self::T_TENANT, 'soft' => false),
         'products' => array('type' => self::T_TENANT, 'soft' => true),
         'project' => array('type' => self::T_TENANT, 'soft' => true),
         'quotations' => array('type' => self::T_TENANT, 'soft' => true),
