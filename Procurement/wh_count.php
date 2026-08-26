@@ -177,4 +177,50 @@ echo ems_states_bundle('لا أصناف للجرد في هذا الاختيار'
     <?php endforeach; ?>
     </tbody>
   </table>
+
+  <?php /* ── RPR-W09 · WH-15 · WH-16 ─────────────────────────────────────────
+       **الجردُ كان بلا جلسةٍ تُحفظ**: هذه الشاشةُ كانت تستعلم `proc_item`
+       و`proc_warehouse` وحدَهما، وتكتب تسويةً مباشرةً في `proc_stock_move` —
+       فلا رأسَ جلسةٍ ولا عادَّ ولا مراجعَ ولا معتمِد، **و«جلسةُ جردٍ × مخزن»
+       في `WH-15` بلا كيانٍ يحملها**. وأُضيف `proc_count_session` وبنودُه،
+       والفرقُ **لا يُقفل بلا قرارِ تسويةٍ مُسبَّب** (`COUNT_DIFF_WITHOUT_SETTLEMENT`).
+       والدفتريُّ في البندِ **مشتقٌّ من الحركاتِ لا مكتوبٌ من العادّ**. */ ?>
+  <?php
+  $__w9ses = array(); $__w9lines = array(); $__w9open = 0;
+  try {
+      $__g9 = ems_tenant_db();
+      $__w9ses = $__g9->select('proc_count_session', array('orderBy' => 'id DESC', 'limit' => 100));
+      foreach ($__w9ses as $__s) {
+          foreach ($__g9->select('proc_count_line', array('where' => array('session_id' => (int) $__s['id']), 'limit' => 500)) as $__l) {
+              $__w9lines[] = $__l + array('ses' => (string) $__s['code']);
+              if (abs((float) $__l['qty_diff']) > 0.0001
+                  && (trim((string) $__l['settle_action']) === '' || trim((string) $__l['settle_why']) === '')) { $__w9open++; }
+          }
+      }
+  } catch (\Throwable $__t) { error_log('wh_count w9 sessions: ' . $__t->getMessage()); }
+  ?>
+  <h3 class="ems-section-title">جلسات الجرد المسجلة</h3>
+  <div class="ems-stat-cards">
+    <div class="ems-stat-card"><div class="ems-stat-value"><?= count($__w9ses) ?></div><div class="ems-stat-label">جلسات جرد</div></div>
+    <div class="ems-stat-card"><div class="ems-stat-value"><?= count($__w9lines) ?></div><div class="ems-stat-label">بنود مجرودة</div></div>
+    <div class="ems-stat-card"><div class="ems-stat-value"><?= $__w9open ?></div><div class="ems-stat-label">فروق بلا قرار تسوية</div></div>
+  </div>
+  <div class="table-wrap"><table class="data-table">
+    <thead><tr><th>رمز الجلسة</th><th>نوع الجرد</th><th>تاريخ الجرد</th><th>البنود</th><th>بنود بفرق</th><th>قيمة الفرق</th><th>الحالة</th></tr></thead>
+    <tbody>
+    <?php if ($__w9ses): foreach ($__w9ses as $__s): ?>
+      <tr>
+        <td><?= htmlspecialchars((string) $__s['code'], ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= htmlspecialchars((string) $__s['count_kind'], ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= htmlspecialchars((string) $__s['count_date'], ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= intval($__s['line_count']) ?></td>
+        <td><?= intval($__s['diff_count']) ?></td>
+        <td><?= htmlspecialchars(number_format((float) $__s['diff_value'], 2), ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= htmlspecialchars((string) $__s['state'], ENT_QUOTES, 'UTF-8') ?></td>
+      </tr>
+    <?php endforeach; else: ?>
+      <tr><td colspan="7">لا جلسات جرد مسجلة بعد</td></tr>
+    <?php endif; ?>
+    </tbody>
+  </table></div>
 </div>

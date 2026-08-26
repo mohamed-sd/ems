@@ -116,6 +116,34 @@ include '../insidebar.php';
     </div></div>
 </div>
 
+<?php /* ── RPR-W09 · WH-01 ────────────────────────────────────────────────────
+     **لوحةُ المخازنِ لم تكن تقرأ الحركة**: كانت تقرأ العهدَ والصرفَ والأصنافَ
+     وسنداتِ الإدخال — **ولا تمسُّ `proc_stock_move`** وهو مصدرُ كلِّ رصيد.
+     فمؤشّرُ الحركةِ في `WH-01` كان مشتقًّا من المستنداتِ لا من الحركاتِ نفسِها،
+     وهما يتفرّقان عند أوّلِ تسويةِ جردٍ لا مستندَ لها. */ ?>
+<?php
+$__w9mv = array('in' => 0.0, 'out' => 0.0, 'adj' => 0.0, 'n' => 0);
+try {
+    $__g9 = ems_tenant_db();
+    foreach ($__g9->select('proc_stock_move', array('orderBy' => 'id DESC', 'limit' => 2000)) as $__m9) {
+        $__w9mv['n']++;
+        $__k9 = (string) $__m9['move_type'];
+        if ($__k9 === 'in') { $__w9mv['in'] += (float) $__m9['qty']; }
+        elseif ($__k9 === 'out') { $__w9mv['out'] += (float) $__m9['qty']; }
+        else { $__w9mv['adj'] += (float) $__m9['qty']; }
+    }
+} catch (\Throwable $__e9) { error_log('warehouse_board w9: ' . $__e9->getMessage()); }
+?>
+<div class="main ems-unified-page-shell">
+  <h3 class="ems-section-title">حركة المخزن المقيسة</h3>
+  <div class="ems-stat-cards">
+    <div class="ems-stat-card"><div class="ems-stat-value"><?= intval($__w9mv['n']) ?></div><div class="ems-stat-label">حركات مسجلة</div></div>
+    <div class="ems-stat-card"><div class="ems-stat-value"><?= htmlspecialchars(number_format($__w9mv['in'], 2), ENT_QUOTES, 'UTF-8') ?></div><div class="ems-stat-label">إجمالي الوارد</div></div>
+    <div class="ems-stat-card"><div class="ems-stat-value"><?= htmlspecialchars(number_format($__w9mv['out'], 2), ENT_QUOTES, 'UTF-8') ?></div><div class="ems-stat-label">إجمالي المنصرف</div></div>
+    <div class="ems-stat-card"><div class="ems-stat-value"><?= htmlspecialchars(number_format($__w9mv['adj'], 2), ENT_QUOTES, 'UTF-8') ?></div><div class="ems-stat-label">إجمالي التسويات</div></div>
+  </div>
+</div>
+
 <style>
     /* UXW-01 ①②: أصنافٌ محلَّ الأنماطِ الموضعيةِ — والألوانُ برموزِ اللوحةِ بقيمِها الاحتياطية */
     .proc-wb-chips { display: flex; gap: 14px; flex-wrap: wrap; }

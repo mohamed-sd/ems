@@ -209,6 +209,40 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div></div>
 </div>
 
+<?php /* ── RPR-W09 · WH-06 ────────────────────────────────────────────────────
+     **الرصيدُ كان رقمًا واحدًا بلا بُعدِ حالة**: حبّةُ `WH-06` «صنفٌ × مخزنٌ ×
+     **حالة**»، وجمعُ التالفِ والمحجورِ مع الصالحِ في رقمٍ واحدٍ يجعل «المتاحَ»
+     كذبًا **يُصرَف عليه**. وأُضيف `proc_stock_state` سطرًا لكلِّ حالةٍ **مشتقًّا
+     من الحركات** بقاعدةِ اشتقاقٍ مكتوبةٍ في الصفِّ نفسِه، والبوّابةُ `W9-17`
+     تعيد اشتقاقَه وتقارنه بالمخزَّن. */ ?>
+<?php
+$__w9st = array();
+try {
+    $__g9 = ems_tenant_db();
+    $__w9st = $__g9->select('proc_stock_state', array('orderBy' => 'item_id, warehouse_id, state_key', 'limit' => 500));
+} catch (\Throwable $__e9) { error_log('stock_proc w9: ' . $__e9->getMessage()); }
+?>
+<div class="main ems-unified-page-shell">
+  <h3 class="ems-section-title">أرصدة المخزون بحالاتها</h3>
+  <div class="table-wrap"><table class="data-table">
+    <thead><tr><th>الصنف</th><th>المخزن</th><th>الحالة</th><th>الكمية</th><th>قاعدة الاشتقاق</th><th>حسبت في</th></tr></thead>
+    <tbody>
+    <?php if ($__w9st): foreach ($__w9st as $__s9): ?>
+      <tr>
+        <td><?= intval($__s9['item_id']) ?></td>
+        <td><?= intval($__s9['warehouse_id']) ?></td>
+        <td><?= htmlspecialchars((string) $__s9['state_key'], ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= htmlspecialchars(number_format((float) $__s9['qty'], 3), ENT_QUOTES, 'UTF-8') ?></td>
+        <td><small><?= htmlspecialchars((string) $__s9['derive_rule'], ENT_QUOTES, 'UTF-8') ?></small></td>
+        <td><?= htmlspecialchars((string) $__s9['computed_at'], ENT_QUOTES, 'UTF-8') ?></td>
+      </tr>
+    <?php endforeach; else: ?>
+      <tr><td colspan="6">لا أسطر رصيد بحالاتها بعد. تشتق عند أول حركة إدخال أو صرف</td></tr>
+    <?php endif; ?>
+    </tbody>
+  </table></div>
+</div>
+
 <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>

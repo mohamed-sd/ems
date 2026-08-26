@@ -456,5 +456,49 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div></div>
 </div>
 
+<?php /* ── RPR-W09 · PRC-15 ────────────────────────────────────────────────────
+     **المطابقةُ كانت في رأسِ الأمرِ وحدَه**: `proc_order.match_state` و
+     `invoice_no` عمودان في الرأس، فالأمرُ **بفاتورتَين لا موضعَ لثانيتِه**.
+     وحبّةُ `PRC-15` «مطابقةٌ × فاتورةٌ × أمر». وأُضيف `proc_invoice_match`
+     بمبلغِ الأمرِ **مشتقًّا من بنودِه** ومبلغِ الاستلامِ **من المقبولِ لا الوارد**،
+     والفرقُ خارجَ عتبةِ السجلِّ **لا يمرُّ بلا قرارٍ مُسبَّب**. */ ?>
+<?php
+$__w9m = array(); $__w9var = 0;
+try {
+    $__g9 = ems_tenant_db();
+    $__w9m = $__g9->select('proc_invoice_match', array('orderBy' => 'id DESC', 'limit' => 300));
+    foreach ($__w9m as $__x9) { if ((int) $__x9['within_tol'] === 0) { $__w9var++; } }
+} catch (\Throwable $__e9) { error_log('po_match w9: ' . $__e9->getMessage()); }
+?>
+<div class="main ems-unified-page-shell">
+  <h3 class="ems-section-title">سجل المطابقة الثلاثية</h3>
+  <div class="ems-stat-cards">
+    <div class="ems-stat-card"><div class="ems-stat-value"><?= count($__w9m) ?></div><div class="ems-stat-label">مطابقات مسجلة</div></div>
+    <div class="ems-stat-card"><div class="ems-stat-value"><?= $__w9var ?></div><div class="ems-stat-label">خارج عتبة السماح</div></div>
+  </div>
+  <div class="table-wrap"><table class="data-table">
+    <thead><tr><th>الأمر</th><th>رقم الفاتورة</th><th>تاريخها</th><th>مبلغ الفاتورة</th><th>مبلغ الأمر</th><th>مبلغ الاستلام</th><th>فرق الفاتورة عن الأمر</th><th>ضمن السماح</th><th>الحكم</th><th>قرار الفرق</th><th>سبب القرار</th></tr></thead>
+    <tbody>
+    <?php if ($__w9m): foreach ($__w9m as $__x9): ?>
+      <tr>
+        <td><?= intval($__x9['order_id']) ?></td>
+        <td><?= htmlspecialchars((string) $__x9['invoice_no'], ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= htmlspecialchars((string) $__x9['invoice_date'], ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= htmlspecialchars(number_format((float) $__x9['invoice_amount'], 2), ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= htmlspecialchars(number_format((float) $__x9['po_amount'], 2), ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= htmlspecialchars(number_format((float) $__x9['grn_amount'], 2), ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= htmlspecialchars(number_format((float) $__x9['var_invoice_po'], 2), ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= ((int) $__x9['within_tol'] === 1 ? 'نعم' : 'لا') ?></td>
+        <td><?= htmlspecialchars((string) $__x9['verdict'], ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= htmlspecialchars((string) $__x9['var_decision'], ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= htmlspecialchars((string) $__x9['var_reason'], ENT_QUOTES, 'UTF-8') ?></td>
+      </tr>
+    <?php endforeach; else: ?>
+      <tr><td colspan="11">لا مطابقات مسجلة بعد</td></tr>
+    <?php endif; ?>
+    </tbody>
+  </table></div>
+</div>
+
 </body>
 </html>

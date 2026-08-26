@@ -138,4 +138,53 @@ echo ems_states_bundle('لا تحويلات بين المخازن بعد',
           <td><?= htmlspecialchars($m2['note'], ENT_QUOTES, 'UTF-8') ?></td></tr>
     <?php endforeach; ?></tbody>
   </table>
+
+  <?php /* ── RPR-W09 · WH-13 · WH-14 ─────────────────────────────────────────
+       **التحويلُ كان بلا أمرٍ يحمله**: هذه الشاشةُ كانت تكتب في
+       `proc_stock_move` مباشرةً — خصمٌ من مخزنٍ وإضافةٌ إلى آخرَ في لحظةٍ
+       واحدة. فلا **مرسَلٌ غيرُ مستلَم**، ولا رصيدَ طريقٍ، ولا فرقَ استلامٍ
+       يُقاس، ولا مَن أرسل غيرُ مَن استلم. و«أمرُ تحويلٍ × مخزنَين» في `WH-13`
+       بلا كيانٍ يحمله. وأُضيف `proc_transfer` وبنودُه، و`sendTransfer`
+       تخصم لحظةَ الإرسالِ و`receiveTransfer` تضيف لحظةَ الاستلامِ وتردُّ
+       `SAME_ACTOR_SEND_AND_RECEIVE` و`TRANSFER_VARIANCE_WITHOUT_REASON`. */ ?>
+  <?php
+  $__w9trf = array(); $__w9tl = 0; $__w9var = 0; $__w9transit = 0;
+  try {
+      $__g9 = ems_tenant_db();
+      $__w9trf = $__g9->select('proc_transfer', array('orderBy' => 'id DESC', 'limit' => 100));
+      foreach ($__w9trf as $__t9) {
+          if ((string) $__t9['state'] === 'in_transit') { $__w9transit++; }
+          foreach ($__g9->select('proc_transfer_line', array('where' => array('transfer_id' => (int) $__t9['id']), 'limit' => 300)) as $__l9) {
+              $__w9tl++;
+              if (abs((float) $__l9['qty_variance']) > 0.0001) { $__w9var++; }
+          }
+      }
+  } catch (\Throwable $__e9) { error_log('wh_transfer w9: ' . $__e9->getMessage()); }
+  ?>
+  <h3 class="ems-section-title">أوامر التحويل بين المخازن</h3>
+  <div class="ems-stat-cards">
+    <div class="ems-stat-card"><div class="ems-stat-value"><?= count($__w9trf) ?></div><div class="ems-stat-label">أوامر تحويل</div></div>
+    <div class="ems-stat-card"><div class="ems-stat-value"><?= $__w9transit ?></div><div class="ems-stat-label">في الطريق</div></div>
+    <div class="ems-stat-card"><div class="ems-stat-value"><?= $__w9tl ?></div><div class="ems-stat-label">بنود محولة</div></div>
+    <div class="ems-stat-card"><div class="ems-stat-value"><?= $__w9var ?></div><div class="ems-stat-label">بنود بفرق استلام</div></div>
+  </div>
+  <div class="table-wrap"><table class="data-table">
+    <thead><tr><th>رمز الأمر</th><th>من مخزن</th><th>إلى مخزن</th><th>السبب</th><th>أرسل في</th><th>استلم في</th><th>في الطريق</th><th>الحالة</th></tr></thead>
+    <tbody>
+    <?php if ($__w9trf): foreach ($__w9trf as $__t9): ?>
+      <tr>
+        <td><?= htmlspecialchars((string) $__t9['code'], ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= intval($__t9['from_wh_id']) ?></td>
+        <td><?= intval($__t9['to_wh_id']) ?></td>
+        <td><?= htmlspecialchars((string) $__t9['reason'], ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= htmlspecialchars((string) $__t9['sent_at'], ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= htmlspecialchars((string) $__t9['received_at'], ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= htmlspecialchars(number_format((float) $__t9['in_transit_qty'], 3), ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= htmlspecialchars((string) $__t9['state'], ENT_QUOTES, 'UTF-8') ?></td>
+      </tr>
+    <?php endforeach; else: ?>
+      <tr><td colspan="8">لا أوامر تحويل مسجلة بعد</td></tr>
+    <?php endif; ?>
+    </tbody>
+  </table></div>
 </div>

@@ -413,6 +413,53 @@ function proc_rc_line_row($conn, $is_super_admin, $company_id, $line = null)
     </div></div>
 </div>
 
+<?php /* ── RPR-W09 · WH-12 ────────────────────────────────────────────────────
+     **شاشةُ العهدِ لم تكن تقرأ دفترَ العهد**: كانت تقرأ `proc_receipt_custody`
+     — وهو **سندُ استلامٍ من مورد** — ولا تمسُّ `proc_custody` الذي هو دفترُ
+     العهدةِ الشخصيّةِ بمرتجَعِها ومستهلَكِها. وحبّةُ `WH-12` «عهدةٌ × مستلِمٌ
+     بمرتجَعِها»، فالمرتجَعُ والمتبقّي لم يكن لهما سطحٌ يعرضهما.
+     **والمتبقّي مشتقٌّ**: المصروفُ ناقصَ المرتجَعِ ناقصَ المستهلَك. */ ?>
+<?php
+$__w9c = array(); $__w9out = 0.0; $__w9ret = 0.0; $__w9con = 0.0;
+try {
+    $__g9 = ems_tenant_db();
+    $__w9c = $__g9->select('proc_custody', array('orderBy' => 'id DESC', 'limit' => 300));
+    foreach ($__w9c as $__x9) {
+        $__w9out += (float) $__x9['qty_issued'];
+        $__w9ret += (float) $__x9['qty_returned'];
+        $__w9con += (float) $__x9['qty_consumed'];
+    }
+} catch (\Throwable $__e9) { error_log('receipt_custody w9: ' . $__e9->getMessage()); }
+?>
+<div class="main ems-unified-page-shell">
+  <h3 class="ems-section-title">دفتر العهد والمرتجعات</h3>
+  <div class="ems-stat-cards">
+    <div class="ems-stat-card"><div class="ems-stat-value"><?= count($__w9c) ?></div><div class="ems-stat-label">أسطر عهدة</div></div>
+    <div class="ems-stat-card"><div class="ems-stat-value"><?= htmlspecialchars(number_format($__w9out, 2), ENT_QUOTES, 'UTF-8') ?></div><div class="ems-stat-label">مصروف بالعهدة</div></div>
+    <div class="ems-stat-card"><div class="ems-stat-value"><?= htmlspecialchars(number_format($__w9ret, 2), ENT_QUOTES, 'UTF-8') ?></div><div class="ems-stat-label">مرتجع</div></div>
+    <div class="ems-stat-card"><div class="ems-stat-value"><?= htmlspecialchars(number_format($__w9out - $__w9ret - $__w9con, 2), ENT_QUOTES, 'UTF-8') ?></div><div class="ems-stat-label">متبقي في العهدة</div></div>
+  </div>
+  <div class="table-wrap"><table class="data-table">
+    <thead><tr><th>الصنف</th><th>المستلم</th><th>تاريخ التسليم</th><th>مصروف</th><th>مرتجع</th><th>مستهلك</th><th>المتبقي</th><th>الحالة</th></tr></thead>
+    <tbody>
+    <?php if ($__w9c): foreach ($__w9c as $__x9): $__rem = (float) $__x9['qty_issued'] - (float) $__x9['qty_returned'] - (float) $__x9['qty_consumed']; ?>
+      <tr>
+        <td><?= htmlspecialchars((string) $__x9['item_name'], ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= htmlspecialchars((string) $__x9['holder_name'], ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= htmlspecialchars((string) $__x9['transfer_date'], ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= htmlspecialchars(number_format((float) $__x9['qty_issued'], 3), ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= htmlspecialchars(number_format((float) $__x9['qty_returned'], 3), ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= htmlspecialchars(number_format((float) $__x9['qty_consumed'], 3), ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= htmlspecialchars(number_format($__rem, 3), ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= htmlspecialchars((string) $__x9['state'], ENT_QUOTES, 'UTF-8') ?></td>
+      </tr>
+    <?php endforeach; else: ?>
+      <tr><td colspan="8">لا أسطر عهدة مسجلة بعد</td></tr>
+    <?php endif; ?>
+    </tbody>
+  </table></div>
+</div>
+
 <style>
     /* UXW-01 ②: أصنافٌ محلَّ الأنماطِ الموضعيةِ التي كانت مبثوثةً في الوسوم */
     .proc-rc-line { align-items: end; margin-bottom: 8px; }
