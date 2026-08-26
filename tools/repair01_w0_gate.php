@@ -212,6 +212,21 @@ gate($pass, $fail, $lines, 'G0-12', 'كلُّ متطلَّبٍ مُسنَدٌ إ
     ($reqTot > 0 && $reqNull === 0 && $reqStages >= 10),
     "متطلَّبات $reqTot · بلا مرحلة $reqNull · مراحلُ مأهولة $reqStages", "$reqTot · 0 · ≥10");
 
+/* ── G0-13 المعتمَدُ يحمل نصَّ حكمِه — لا حالتَه وحدَها ──
+     ⚠ **عطبٌ وقع فعلًا**: `DEC-OPEN-15` صار `APPROVED` و`blocking_level=NONE`
+     وحقلُ حكمِه `—` — فالمخزنُ يقول «معتمَدٌ» ولا يقول **بماذا**، وجوابُ
+     المالكِ يعيش في ملفٍّ على القرصِ وحدَه. و`G0-02` و`G0-03` يفحصان
+     **حالةَ** القرارِ ولا يفحصان **مضمونَه**، فمرّا خضراوَين على قرارٍ أجوف.
+     ⛔ والمخزنُ حكمٌ والوثيقةُ إسقاط — فالحكمُ يُقاس هنا لا يُقرأ هناك. */
+$appTot  = (int) one($conn, "SELECT COUNT(*) FROM repair01_decisions WHERE status='APPROVED'");
+$appVoid = (int) one($conn, "SELECT COUNT(*) FROM repair01_decisions
+                              WHERE status='APPROVED'
+                                AND (owner_decision IS NULL
+                                     OR TRIM(owner_decision) IN ('', '—', '-', 'لا', 'n/a'))");
+gate($pass, $fail, $lines, 'G0-13', 'كلُّ قرارٍ معتمَدٍ يحمل نصَّ حكمِه',
+    ($appTot > 0 && $appVoid === 0),
+    "معتمَدٌ $appTot · بلا نصِّ حكمٍ $appVoid", "$appTot · 0");
+
 /* ── الطباعة ── */
 echo "\n═══════════ بوّابةُ المرحلةِ صفر — REPAIR01 ═══════════\n";
 foreach ($lines as $l) { echo $l . "\n"; }

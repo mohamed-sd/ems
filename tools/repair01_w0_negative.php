@@ -73,6 +73,13 @@ $cases = array(
     array('G0-09', "محوُ مرجعِ خليّةٍ من صفّ",
         "UPDATE repair01_ownership SET src_ref='' WHERE id=(SELECT MIN(id) FROM (SELECT id FROM repair01_ownership) z)",
         null),
+    /* ⚠ **الكسرُ من زاويةٍ لا يحرسها مخطَّطٌ**: العمودُ `TEXT` بلا `CHECK`، فلو
+         كان الحاجبُ أعمى لعبرَ الجوفُ صامتًا كما عبرَ فعلًا في `DEC-OPEN-15`.
+         والقيمةُ المكسورُ بها `—` هي القيمةُ الواقعيّةُ التي وُجدت لا قيمةٌ
+         مصطنَعةٌ — فالكسرُ يُعيد إنتاجَ العطبِ نفسِه لا شبيهًا له. */
+    array('G0-13', "قرارٌ معتمَدٌ يُفرَّغ من نصِّ حكمِه",
+        "UPDATE repair01_decisions SET owner_decision='—' WHERE decision_id='DEC-OPEN-12'",
+        null /* يُرجَع بالقيمةِ الملتقَطةِ قبلًا */),
 );
 
 /* التقاطُ ما نحتاج إرجاعَه بالقيمة */
@@ -82,6 +89,9 @@ if ($r && ($x = $r->fetch_row())) { $sha09 = $x[0]; }
 $ownMin = null; $ownSrc = null;
 $r = $conn->query("SELECT id, src_ref FROM repair01_ownership ORDER BY id LIMIT 1");
 if ($r && ($x = $r->fetch_assoc())) { $ownMin = $x['id']; $ownSrc = $x['src_ref']; }
+$dec12 = null;
+$r = $conn->query("SELECT owner_decision FROM repair01_decisions WHERE decision_id='DEC-OPEN-12'");
+if ($r && ($x = $r->fetch_row())) { $dec12 = $x[0]; }
 $ghostId = null;
 $r = $conn->query("SELECT id FROM repair01_surfaces WHERE on_disk=0 ORDER BY id LIMIT 1");
 if ($r && ($x = $r->fetch_row())) { $ghostId = $x[0]; }
@@ -93,6 +103,7 @@ foreach ($cases as $c) {
     if ($want === 'G0-08') { $break = "UPDATE repair01_surfaces SET on_disk=1 WHERE id=" . (int) $ghostId; $restore = "UPDATE repair01_surfaces SET on_disk=0 WHERE id=" . (int) $ghostId; }
     if ($want === 'G0-09') { $break = "UPDATE repair01_ownership SET src_ref='' WHERE id=" . (int) $ownMin; $restore = "UPDATE repair01_ownership SET src_ref='" . $conn->real_escape_string($ownSrc) . "' WHERE id=" . (int) $ownMin; }
     if ($want === 'G0-01') { $restore = "UPDATE repair01_source_files SET sha256='" . $conn->real_escape_string($sha09) . "' WHERE file_no='09'"; }
+    if ($want === 'G0-13') { $restore = "UPDATE repair01_decisions SET owner_decision='" . $conn->real_escape_string($dec12) . "' WHERE decision_id='DEC-OPEN-12'"; }
 
     if ($conn->query($break) === false) { printf("  ⚠ %-8s تعذّر الكسر: %s\n", $want, $conn->error); continue; }
     list($code, $failed) = run_gate($PHP, $GATE);
