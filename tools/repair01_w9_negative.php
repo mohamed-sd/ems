@@ -188,19 +188,68 @@ $CASES = array(
          VALUES ('SCR-W9NG','w9neg.php','Neg/w9neg.php','DEP-16',1,'NEG','W9NEG')",
         "DELETE FROM repair01_screen_registry WHERE origin='NEG'"),
 
-    /* ⚠ الزاويةُ المكشوفةُ هنا **حذفُ بندٍ مؤجَّل** لا تفريغُ حقلٍ يحرسه
-         `chk_w9df_full` — فالسجلُّ ينقص عن المُعلَنِ في الشيفرةِ ويسقط القفل. */
-    array('W9-24', 'حذفُ بندٍ مؤجَّلٍ فينقص السجلُّ عن المُعلَن',
-        "DELETE FROM repair01_w9_deferred WHERE defer_key='" . $esc($dfKey) . "'",
-        'APPLY'),
+    /* ⚠ **القفلُ يعمل في الاتّجاهَين، والكسرُ يتبع الجهةَ القائمة.**
+         قبل جوابِ `DEC-OPEN-15` كانت الجهةُ «مفتوحٌ ببنودٍ منتظرة»، فكان
+         الكسرُ حذفَ بندٍ أو رفعَ استهلاكِه. وبعد الجوابِ صارت الجهةُ «مُغلَقٌ
+         ببنودٍ مستهلَكة» — فذانِك الكسرانِ لم يعودا يُسقطانه (‏صفرٌ غيرُ
+         مستهلَكٍ يبقى صفرًا). والزاويتانِ الحيّتانِ الآن:
+         ① نكضُ استهلاكِ بندٍ والحاجبُ مُغلَق ⇒ مؤجَّلٌ باقٍ بلا سبب.
+         ② إعادةُ فتحِ الحاجبِ والبنودُ مستهلَكة ⇒ إعلانٌ متقادم. */
+    array('W9-24', 'نكضُ استهلاكِ بندٍ والحاجبُ مُغلَق',
+        "UPDATE repair01_w9_deferred SET consumed=0 WHERE defer_key='" . $esc($dfKey) . "'",
+        "UPDATE repair01_w9_deferred SET consumed=1 WHERE defer_key='" . $esc($dfKey) . "'"),
 
-    array('W9-24', 'رفعُ الاستهلاكِ عن بندٍ مؤجَّلٍ والحاجبُ ما زال مفتوحًا',
-        "UPDATE repair01_w9_deferred SET consumed=1 WHERE defer_key='" . $esc($dfKey) . "'",
-        "UPDATE repair01_w9_deferred SET consumed=0 WHERE defer_key='" . $esc($dfKey) . "'"),
+    array('W9-24', 'إعادةُ فتحِ الحاجبِ وبنودُه مستهلَكةٌ فيتقادم الإعلان',
+        "UPDATE repair01_decisions SET status='NEEDS_OWNER_DECISION' WHERE decision_id='DEC-OPEN-15'",
+        "UPDATE repair01_decisions SET status='APPROVED' WHERE decision_id='DEC-OPEN-15'"),
 
     array('W9-25', 'نزعُ عتبةٍ تحتاجها الرحلةُ فلا تنعقد',
         "DELETE FROM repair01_w9_thresholds WHERE threshold_key='PRC_DIRECT_PURCHASE_CAP'",
         'APPLY'),
+
+    /* ── حواجبُ سياسةِ التتبّعِ بعد جوابِ DEC-OPEN-15 ─────────────────── */
+    array('W9-26', 'إنشاءُ نسخةٍ ثانيةٍ ساريةٍ لنطاقٍ واحدٍ فتتداخل',
+        "INSERT INTO proc_track_policy
+            (company_id, scope_kind, scope_key, version, effective_from, effective_to,
+             lot, serial, mfg_date, expiry, warranty, expiry_enforce, issue_policy, requalify,
+             override_authority, why, strict_why, decision_ref)
+         SELECT company_id, scope_kind, scope_key, version + 100, effective_from, NULL,
+                lot, serial, mfg_date, expiry, warranty, expiry_enforce, issue_policy, requalify,
+                override_authority, why, strict_why, 'W9NEG'
+           FROM proc_track_policy WHERE decision_ref = 'DEC-OPEN-15' LIMIT 1",
+        "DELETE FROM proc_track_policy WHERE decision_ref='W9NEG'"),
+
+    /* ⚠ حقولُ السياسةِ الثلاثةُ يحرسها `CHECK` صفًّا صفًّا، فكسرُها من زاويتِه
+         يُردُّ ولا يختبر شيئًا. والزاويةُ الحيّةُ **تطابقُ صفَّين**: دورُ
+         المعتمِدِ يجب أن يساويَ سلطةَ السياسةِ — وهو قيدٌ لا يُعبَّر عنه في
+         `CHECK` أصلًا. وأمينُ المخزنِ لا يمدّد الصلاحيةَ من عنده. */
+    array('W9-27', 'تجاوزُ صلاحيةٍ بدورٍ يخالف سلطةَ السياسة',
+        "INSERT INTO proc_expiry_override
+            (company_id, item_id, op_kind, op_ref, requested_by, approver_role, reason)
+         VALUES (" . $company . ", " . $itemX . ", 'ISSUE', 'W9NEG', 0,
+                 'امين المخزن', 'تمديد من عندي')",
+        "DELETE FROM proc_expiry_override WHERE op_ref='W9NEG'"),
+
+    /* ⚠ **حاجبُ سلوكٍ يُكسَر بالسلوكِ لا بصفّ**: نُشدِّد خاصيّةً إلى `REQUIRED`
+         بسياسةِ صنفٍ، فيصير النقصُ الاختياريُّ منعًا — و`W9-28` يستدعي فعلًا
+         ويقيس أنَّ الحكمَ صار `block`. وبلا هذا الكسرِ يبقى الحاجبُ يقرأ
+         نيّةً لا سلوكًا. */
+    array('W9-28', 'تشديدُ خاصيّةٍ الى الزاميّةٍ فيصير نقصُها منعًا',
+        "INSERT INTO proc_track_policy
+            (company_id, scope_kind, scope_key, version, effective_from, effective_to,
+             lot, serial, mfg_date, expiry, warranty, expiry_enforce, issue_policy, requalify,
+             override_authority, why, strict_why, decision_ref)
+         VALUES (NULL,'ITEM','" . $itemX . "',900,'2000-01-01',NULL,
+                 'REQUIRED','OFF','OFF','OFF','OFF','WARNING','FIFO','DISABLED',
+                 '','كسر متعمد','كسر متعمد','W9NEG')",
+        'W9NEG_STRICT'),
+
+    /* ⚠ `chk_gap_what` يحرس وصفَ النقصِ فكسرُه عبث. والزاويةُ الحيّةُ **صنفٌ
+         بلا حكمِ نطاقٍ محلول** — وهو ما لا يستطيع `CHECK` أن يوجبه لأنّه
+         مشتقٌّ من سجلٍّ آخر. */
+    array('W9-30', 'نزعُ حكمِ النطاقِ المحلولِ عن صنف',
+        "UPDATE proc_item SET policy_scope='' WHERE id=" . $itemX,
+        'W9NEG_STRICT'),
 );
 
 $done = 0; $blind = 0; $skipped = 0;
@@ -228,6 +277,14 @@ foreach ($CASES as $c) {
     if ($restore === 'CODE_RESTORE') {
         file_put_contents($PSVC, $pOrig);
         if ((string) file_get_contents($PSVC) !== $pOrig) { printf("  ⛔ %-8s فشلَ إرجاعُ الملفّ\n", $want); $blind++; }
+    } elseif ($restore === 'W9NEG_STRICT') {
+        /* الإرجاعُ **بحذفِ التشديدِ ثمَّ إعادةِ حلِّ الصنف** — فالعمودُ المحلولُ
+           مشتقٌّ، وحذفُ السياسةِ وحدَها يترك الصنفَ على درجةٍ متقادمة. */
+        $conn->query("DELETE FROM proc_track_policy WHERE decision_ref='W9NEG'");
+        $o = array(); $cc = 0;
+        exec('"' . $PHP . '" "' . $ROOT . '/tools/repair01_w9_resume.php" 2>&1', $o, $cc);
+        $lvl = (string) $one("SELECT track_lot_level FROM proc_item WHERE id = " . (int) $itemX);
+        if ($lvl === 'REQUIRED') { printf("  ⛔ %-8s فشلَ إرجاعُ درجةِ الصنف\n", $want); $blind++; }
     } elseif ($restore === 'APPLY') {
         /* العتبةُ تُعاد ببناءِ أداتِها لا بصفٍّ مكتوبٍ يدًا */
         $o = array(); $cc = 0;

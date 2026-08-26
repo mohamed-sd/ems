@@ -7,12 +7,13 @@
  * المخزنِ ← عهدةٌ ومرتجَع ← تحويلٌ بين مخزنَين ← جردٌ بقرارِ تسويةٍ ←
  * إقفالٌ شهريٌّ **بمعادلةٍ تنطبق**.
  *
- * ◆ **وأعلامُ التتبّعِ مبنيّةٌ خامدةً** (`DEC-OPEN-15` مؤجَّلٌ بأمرِ المالك ·
- *   2026-08-26): `requireTracking` تقرأ `proc_item.track_lot/serial/expiry`
- *   وتردُّ `TRACKING_REQUIRED_FOR_ITEM` حين يحمل الصنفُ علمًا ولا تُقدَّم
- *   بياناتُه. **وما دام `proc_item_track_rule` خاويًا فلا صنفَ يحمل علمًا**،
- *   فالبوّابةُ حاضرةٌ ولا تعترض أحدًا. ولحظةَ يُجيب المالكُ تُبذَر القواعدُ
- *   فتشتعل البوّابةُ نفسُها بلا سطرِ شيفرةٍ جديد. ⛔ **ولا فئةَ مُخمَّنةٌ هنا.**
+ * ◆ **وسياسةُ التتبّعِ أُجيبت وأُعيد تشكيلُها** (`DEC-OPEN-15` · 2026-08-26):
+ *   كانت أعلامًا ثنائيّةً خامدةً، وصارت **ثلاثيّةً بمستويَين** يحلُّها
+ *   `TrackingPolicyService` — فئةٌ افتراضًا ثمَّ صنفٌ تخصيصًا، بثماني خصائصَ
+ *   ونسخٍ مؤرَّخة. و`requireTracking` تعيد **ثلاثةَ أحكام**: `REQUIRED` ناقصٌ
+ *   يُردّ · `OPTIONAL` ناقصٌ **يمضي ويُسجَّل قيدَ جودة** · `OFF` لا يُطلَب.
+ *   ⛔ **ولا يمنع نقصُ اختياريٍّ مهما كثر** — «لا منعَ للاستلامِ ولا الصرفِ
+ *   ولا التحويلِ ولا الجرد». ⛔ ولا فئةَ مكتوبةٌ في هذا الملفّ.
  *
  * ◆ **وحالةُ الرصيدِ بُعدٌ لا وصف** (`WH-06`): الصالحُ والمحجوزُ والمحجورُ
  *   والتالفُ **لا تُجمع في رقمٍ واحد** — وجمعُها يجعل «المتاحَ» كذبًا يُصرَف
@@ -132,51 +133,68 @@ class WarehouseCycleService
         );
     }
 
-    /**
-     * **البوّابةُ الخامدة**: صنفٌ يحمل علمًا ولا بياناتِ تتبّعٍ معه ⇒ يُردّ.
-     * وما دام لا صنفَ يحمل علمًا، لا يعترض أحدًا — والبنيةُ مع ذلك قائمةٌ
-     * ومفحوصةٌ سلبيًّا، فلا تُكتشف يومَ الجوابِ ناقصة.
-     */
-    public static function requireTracking(TenantDb $gate, $itemId, array $line)
+    /* ══════════════════════════════════════════════════════════════════════
+       ◆ **أُعيد تشكيلُها بجوابِ المالك** (`DEC-OPEN-15` · 2026-08-26)
+       ══════════════════════════════════════════════════════════════════════
+       كانت تقرأ **عَلَمًا ثنائيًّا** وتردُّ حين يحمله الصنفُ ولا تُقدَّم بياناتُه.
+       والجوابُ يوجب **ثلاثةَ أحكامٍ لا حكمَين**:
+         · `REQUIRED` ناقصٌ ⇒ **يُردّ**.
+         · `OPTIONAL` ناقصٌ ⇒ **يمضي** ويُسجَّل في `proc_track_gap` قيدَ جودة.
+         · `OFF` ⇒ لا يُطلَب أصلًا.
+       ⛔ **ولا يمنع نقصُ اختياريٍّ مهما كثر** — نصُّ القرار: «لا أريد منعَ
+          الاستلامِ ولا الصرفِ ولا التحويلِ ولا الجرد».
+       ◆ والحكمُ **تاريخيّ**: بالسياسةِ الساريةِ لحظةَ العمليّةِ لا اليوم.
+       ══════════════════════════════════════════════════════════════════════ */
+    public static function requireTracking(TenantDb $gate, $itemId, array $line,
+                                           $opKind = 'RECEIPT', $opRef = '', $onDate = null)
     {
-        $f = self::trackingFlags($gate, $itemId);
-        $missing = array();
-        if ($f['lot'] && trim((string) (isset($line['lot_no']) ? $line['lot_no'] : '')) === '') { $missing[] = 'الدفعة'; }
-        if ($f['serial'] && trim((string) (isset($line['serial_no']) ? $line['serial_no'] : '')) === '') { $missing[] = 'الرقم التسلسلي'; }
-        if ($f['expiry'] && trim((string) (isset($line['expiry_date']) ? $line['expiry_date'] : '')) === '') { $missing[] = 'تاريخ الصلاحية'; }
-        if ($missing) {
-            /* ⛔ **لا زخرفةَ ولا نقطتَين في نصٍّ مُصيَّر** (‏قاعدةُ نقاءِ الواجهة
-                 ③ و⑥): النقطةُ الوسطى `·` زينةٌ يعُدُّها `UI-02` دَينًا،
-                 والنقطتانِ ممنوعتان. فالفاصلُ واوٌ والعبارةُ جملةٌ تامّة. */
-            return self::fail('TRACKING_REQUIRED_FOR_ITEM',
-                'الصنف يوجب بيانات تتبع ناقصة وهي ' . implode(' و', $missing));
+        $svc = __DIR__ . '/TrackingPolicyService.php';
+        if (\is_file($svc)) { require_once $svc; }
+        if (!\class_exists('\App\Services\Warehouse\TrackingPolicyService')) {
+            /* ⛔ **بلا خدمةِ سياسةٍ لا تخمين** — الغيابُ يُعلَن ولا يُبتلع */
+            return self::fail('TRACKING_POLICY_SERVICE_MISSING', 'خدمة سياسة التتبع غير محملة');
         }
-        return self::done(array('flags' => $f));
+        $v = \App\Services\Warehouse\TrackingPolicyService::checkOperation($gate, $itemId, $line, $onDate);
+
+        if ($v['verdict'] === 'block') { return self::fail($v['code'], $v['detail']); }
+        if ($v['verdict'] === 'gap') {
+            \App\Services\Warehouse\TrackingPolicyService::logGap(
+                $gate, $itemId, $opKind, (string) $opRef, $v['missing']);
+            return self::done(array('policy' => $v['policy'], 'gap' => $v['missing'], 'note' => $v['detail']));
+        }
+        return self::done(array('policy' => $v['policy'], 'gap' => array()));
     }
 
     /**
      * **بوّابةُ المنتهي** — سياسةُ الانتهاءِ من قاعدةِ الفئةِ لا من الشيفرة.
      * خامدةٌ أيضًا: بلا قاعدةٍ لا `track_expiry`، وبلا علمٍ لا فحص.
      */
-    public static function expiryGate(TenantDb $gate, $itemId, $expiryDate, $today = null)
+    /* ══════════════════════════════════════════════════════════════════════
+       ◆ **ثلاثةُ مستوياتِ إنفاذٍ لا مستويان** (`DEC-OPEN-15` ⑫):
+         · `WARNING`           ينبّه ويمضي — افتراضُ المرحلةِ الحالية.
+         · `APPROVAL_REQUIRED` لا يمضي إلّا باعتمادِ **دورِ السياسة** وبسببٍ مكتوب.
+         · `HARD_BLOCK`        لا يمضي مطلقًا.
+       ⛔ **وأمينُ المخزنِ لا يمدّد الصلاحيةَ من عنده** (⑬) — الدورُ المخوَّلُ
+          يُقرَأ من `override_authority` في السياسةِ لا من دورِ المنفِّذ.
+       ══════════════════════════════════════════════════════════════════════ */
+    public static function expiryGate(TenantDb $gate, $itemId, $expiryDate, $today = null, array $ctx = array())
     {
-        $f = self::trackingFlags($gate, $itemId);
-        if (!$f['expiry']) { return self::done(array('checked' => false)); }
-        $it = $gate->selectOne('proc_item', array('where' => array('id' => (int) $itemId)));
-        $ruleKey = $it ? (string) $it['track_rule_ref'] : '';
-        if ($ruleKey === '') {
-            return self::fail('TRACK_FLAG_WITHOUT_RULE', 'علم بلا قاعدة مصدر — الاشتقاق ناقص');
+        $svc = __DIR__ . '/TrackingPolicyService.php';
+        if (\is_file($svc)) { require_once $svc; }
+        if (!\class_exists('\App\Services\Warehouse\TrackingPolicyService')) {
+            return self::fail('TRACKING_POLICY_SERVICE_MISSING', 'خدمة سياسة التتبع غير محملة');
         }
-        $rule = $gate->selectOne('proc_item_track_rule', array('where' => array('rule_key' => $ruleKey)));
-        if (!$rule) { return self::fail('TRACK_RULE_NOT_FOUND', ''); }
-        $d = $today !== null ? (string) $today : date('Y-m-d');
-        if ((string) $expiryDate !== '' && (string) $expiryDate < $d) {
-            if ((string) $rule['expiry_policy'] === 'BLOCK') {
-                return self::fail('EXPIRED_ITEM_ISSUE_BLOCKED', 'الصنف منتهي الصلاحية والقاعدة تمنع صرفه');
-            }
-            return self::done(array('checked' => true, 'warn' => true, 'policy' => (string) $rule['expiry_policy']));
-        }
-        return self::done(array('checked' => true, 'warn' => false));
+        $v = \App\Services\Warehouse\TrackingPolicyService::expiryVerdict(
+            $gate, $itemId, $expiryDate, $ctx, $today);
+
+        if ($v['verdict'] === 'block') { return self::fail($v['code'], $v['detail']); }
+        return self::done(array(
+            'checked' => ((string) $v['policy']['expiry'] !== 'OFF'),
+            'warn'    => ($v['verdict'] === 'warn'),
+            'override' => ($v['verdict'] === 'approved_override'),
+            'enforce' => (string) $v['policy']['expiry_enforce'],
+            'note'    => (string) $v['detail'],
+        ));
     }
 
     /* ══════════════════════════════════════════════════════════════════════
@@ -208,7 +226,7 @@ class WarehouseCycleService
         }
 
         /* ⛔ **بوّابةُ التتبّعِ قبل الكتابة** — خامدةٌ اليوم وحيّةٌ بالبناء */
-        $tr = self::requireTracking($gate, $itemId, $line);
+        $tr = self::requireTracking($gate, $itemId, $line, 'RECEIPT', (string) $rc['code']);
         if (!$tr['ok']) { return $tr; }
 
         $lineId = 0;
@@ -355,7 +373,9 @@ class WarehouseCycleService
                 }
             }
             /* بوّابةُ الانتهاءِ — خامدةٌ حتّى تُبذَر قواعدُ الفئات */
-            $eg = self::expiryGate($gate, $itemId, (string) (isset($ln['expiry_date']) ? $ln['expiry_date'] : ''));
+            $eg = self::expiryGate($gate, $itemId, (string) (isset($ln['expiry_date']) ? $ln['expiry_date'] : ''), null,
+                array('approver_role' => (string) (isset($ln['approver_role']) ? $ln['approver_role'] : ''),
+                      'override_reason' => (string) (isset($ln['override_reason']) ? $ln['override_reason'] : '')));
             if (!$eg['ok']) { return $eg; }
         }
 

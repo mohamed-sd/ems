@@ -328,6 +328,149 @@ gate('W9-24', 'المؤجَّلُ مسجَّلٌ ومقفولٌ في الاتّ�
      . " · بنودٌ مؤجَّلةٌ $dfAll · غيرُ مستهلَكةٍ $dfOpen · ناقصةٌ $dfBad"
      . " · إثباتُ الانتظارِ مقيسٌ $probeLive من $dfOpen");
 
+/* ══ W9-26 · سياسةُ التتبّعِ بمستويَين ونسخٍ لا تتداخل ═════════════════
+   ◆ **جوابُ `DEC-OPEN-15`**: الفئةُ تعطي افتراضًا والصنفُ يخصّصه، ولكلِّ
+     سياسةٍ نسخةٌ وتاريخُ سريان. و**نسختانِ ساريتانِ في يومٍ واحدٍ لنطاقٍ واحد**
+     تجعلان الحلَّ يعتمد ترتيبَ الصفوف — وهو عطبُ W10 نفسُه. */
+$polN   = (int) $one("SELECT COUNT(*) FROM proc_track_policy");
+$polCat = (int) $one("SELECT COUNT(*) FROM proc_track_policy WHERE scope_kind = 'CATEGORY'");
+$polNoWhy = (int) $one("SELECT COUNT(*) FROM proc_track_policy
+                         WHERE COALESCE(why,'') = '' OR COALESCE(decision_ref,'') = ''");
+$polNoFrom = (int) $one("SELECT COUNT(*) FROM proc_track_policy
+                          WHERE effective_from IS NULL OR effective_from = '0000-00-00'");
+/* تداخلُ النسخِ — نطاقٌ واحدٌ بنسختَينِ ساريتَينِ اليوم */
+$polOverlap = (int) $one("SELECT COUNT(*) FROM (
+        SELECT scope_kind, scope_key, COUNT(*) c FROM proc_track_policy
+         WHERE effective_from <= CURDATE()
+           AND (effective_to IS NULL OR effective_to >= CURDATE())
+         GROUP BY scope_kind, scope_key HAVING c > 1) t");
+gate('W9-26', 'سياسةُ التتبّعِ بمستويَين ونسخٍ لا تتداخل',
+     $polN > 0 && $polCat > 0 && $polNoWhy === 0 && $polNoFrom === 0 && $polOverlap === 0,
+     "سياساتٌ $polN · افتراضُ فئةٍ $polCat · بلا عذرٍ أو مرجعٍ $polNoWhy"
+     . " · بلا تاريخِ سريانٍ $polNoFrom · نسختانِ ساريتانِ لنطاقٍ واحدٍ $polOverlap");
+
+/* ══ W9-27 · الإلزامُ قرارٌ مُسبَّبٌ والتجاوزُ بسلطةٍ لا بأحد ═══════════ */
+$strictNoWhy = (int) $one("SELECT COUNT(*) FROM proc_track_policy
+                            WHERE (lot='REQUIRED' OR serial='REQUIRED' OR mfg_date='REQUIRED'
+                                   OR expiry='REQUIRED' OR warranty='REQUIRED')
+                              AND COALESCE(strict_why,'') = ''");
+$apprNoAuth = (int) $one("SELECT COUNT(*) FROM proc_track_policy
+                           WHERE expiry_enforce = 'APPROVAL_REQUIRED'
+                             AND COALESCE(override_authority,'') = ''");
+$fefoNoExp = (int) $one("SELECT COUNT(*) FROM proc_track_policy
+                          WHERE issue_policy = 'FEFO' AND expiry = 'OFF'");
+$ovrNoReason = (int) $one("SELECT COUNT(*) FROM proc_expiry_override
+                            WHERE COALESCE(reason,'') = '' OR COALESCE(approver_role,'') = ''");
+/* ⚠ **بُعدٌ لا يستطيعه المخطَّط**: القيودُ الثلاثةُ أعلاه يحرسها `CHECK` صفًّا
+     صفًّا، فحاجبٌ يعيد فحصَها وحدَها **أعمى بالبناء** (‏درسُ W02). والقيدُ
+     الذي لا يُعبَّر عنه في `CHECK` هو **التطابقُ بين صفَّين**: دورُ المعتمِدِ
+     في التجاوزِ يجب أن يساويَ سلطةَ السياسةِ الساريةِ للصنفِ — وأمينُ المخزنِ
+     لا يمدّد الصلاحيةَ من عنده (‏القاعدةُ ⑬). */
+$ovrWrongRole = array();
+$rq = $conn->query("SELECT o.id, o.item_id, o.approver_role, i.category
+                      FROM proc_expiry_override o
+                      LEFT JOIN proc_item i ON i.id = o.item_id");
+while ($rq && $x = $rq->fetch_assoc()) {
+    $auth = (string) $one("SELECT override_authority FROM proc_track_policy
+                            WHERE scope_kind='ITEM' AND scope_key='" . (int) $x['item_id'] . "'
+                              AND effective_from <= CURDATE()
+                              AND (effective_to IS NULL OR effective_to >= CURDATE())
+                            ORDER BY version DESC LIMIT 1");
+    if ($auth === '') {
+        $auth = (string) $one("SELECT override_authority FROM proc_track_policy
+                                WHERE scope_kind='CATEGORY' AND scope_key='" . $esc((string) $x['category']) . "'
+                                  AND effective_from <= CURDATE()
+                                  AND (effective_to IS NULL OR effective_to >= CURDATE())
+                                ORDER BY version DESC LIMIT 1");
+    }
+    if (trim($auth) === '' || trim($auth) !== trim((string) $x['approver_role'])) {
+        $ovrWrongRole[] = (int) $x['id'];
+    }
+}
+gate('W9-27', 'الإلزامُ مُسبَّبٌ والتجاوزُ بسلطةِ السياسةِ لا بدورِ المنفِّذ',
+     $strictNoWhy === 0 && $apprNoAuth === 0 && $fefoNoExp === 0 && $ovrNoReason === 0
+     && count($ovrWrongRole) === 0,
+     "إلزامٌ بلا سببٍ $strictNoWhy · اعتمادٌ بلا سلطةٍ $apprNoAuth"
+     . " · صرفٌ بالصلاحيةِ وتتبّعُها معطَّلٌ $fefoNoExp · تجاوزٌ بلا سببٍ أو دورٍ $ovrNoReason"
+     . ' · دورُ معتمِدٍ يخالف سلطةَ السياسةِ ' . count($ovrWrongRole));
+
+/* ══ W9-28 · الاختياريُّ لا يمنع — والقاعدةُ تُقاس لا تُدَّعى ══════════
+   ⚠ **هذا حاجبُ سلوكٍ لا حاجبُ بنية**: يُشغَّل `checkOperation` فعلًا على كلِّ
+     صنفٍ بخاصيّةٍ اختياريّةٍ **ببياناتٍ خاوية**، ويُشترط أن يكون الحكمُ `gap`
+     لا `block`. فنصُّ القرار «لا منعَ للاستلامِ ولا الصرف» **يُثبَت بالاستدعاءِ
+     لا بقراءةِ شيفرة**. */
+$optBlocked = array(); $optTested = 0;
+require_once $ROOT . '/app/Services/Warehouse/TrackingPolicyService.php';
+require_once $ROOT . '/app/Core/TenantGateException.php';
+require_once $ROOT . '/app/Core/TenantRegistry.php';
+require_once $ROOT . '/app/Core/TenantContext.php';
+require_once $ROOT . '/app/Core/TenantDb.php';
+$rq = $conn->query("SELECT id, company_id FROM proc_item
+                     WHERE COALESCE(is_deleted,0)=0
+                       AND (track_lot_level='OPTIONAL' OR track_serial_level='OPTIONAL'
+                            OR track_mfg_level='OPTIONAL' OR track_expiry_level='OPTIONAL'
+                            OR track_warranty_level='OPTIONAL')
+                       AND track_lot_level <> 'REQUIRED' AND track_serial_level <> 'REQUIRED'
+                       AND track_mfg_level <> 'REQUIRED' AND track_expiry_level <> 'REQUIRED'
+                       AND track_warranty_level <> 'REQUIRED' LIMIT 200");
+while ($rq && $x = $rq->fetch_assoc()) {
+    $optTested++;
+    try {
+        $g = new \App\Core\TenantDb($conn,
+            \App\Core\TenantContext::forSystem((int) $x['company_id'], 0, '', true));
+        $v = \App\Services\Warehouse\TrackingPolicyService::checkOperation($g, (int) $x['id'], array());
+        if ($v['verdict'] === 'block') { $optBlocked[] = (int) $x['id']; }
+    } catch (\Throwable $t) { $optBlocked[] = (int) $x['id'] . ' (خطأ)'; }
+}
+$optDecl = (int) $one("SELECT COUNT(*) FROM repair01_w9_decisions
+                        WHERE decision_id = 'W9-D-11' AND COALESCE(rationale,'') <> ''");
+gate('W9-28', 'الاختياريُّ لا يمنع — مقيسًا بالاستدعاءِ لا بالدعوى',
+     count($optBlocked) === 0 && ($optTested > 0 || $optDecl > 0),
+     "أصنافٌ اختباريّةٌ مُستدعاةٌ $optTested · مُنعت بنقصٍ اختياريٍّ " . count($optBlocked)
+     . ($optTested === 0 ? ' · خلاءٌ مُعلَنٌ في W9-D-11 ' . ($optDecl ? '✔' : '**لا**') : '')
+     . (count($optBlocked) ? ' ⇐ ' . implode('، ', array_slice($optBlocked, 0, 3)) : ''));
+
+/* ══ W9-29 · سلسلةُ ارتدادِ الصرفِ لا تتوقّف ══════════════════════════ */
+/* ⚠ **المقامُ من الأصنافِ لا من سجلِّ الحالات**: `proc_stock_state` مشتقٌّ
+     تكنسه الرحلةُ فيصير صفرًا، فيُخضِرُّ الحاجبُ على تطابقِ لا شيء. والدالّةُ
+     تعمل بلا دفعاتٍ أصلًا (‏تعيد `QUANTITY`) — فالمقامُ الصادقُ هو الصنفُ
+     في مخزنٍ قائم. */
+$fbBad = array(); $fbTested = 0;
+$rq = $conn->query("SELECT i.id, i.company_id,
+                           (SELECT w.id FROM proc_warehouse w
+                             WHERE w.company_id = i.company_id AND COALESCE(w.is_deleted,0)=0
+                             ORDER BY w.id LIMIT 1) AS warehouse_id
+                      FROM proc_item i
+                     WHERE COALESCE(i.is_deleted,0)=0
+                     HAVING warehouse_id IS NOT NULL LIMIT 60");
+while ($rq && $x = $rq->fetch_assoc()) {
+    $fbTested++;
+    try {
+        $g = new \App\Core\TenantDb($conn,
+            \App\Core\TenantContext::forSystem((int) $x['company_id'], 0, '', true));
+        $s = \App\Services\Warehouse\TrackingPolicyService::suggestIssueOrder(
+            $g, (int) $x['id'], (int) $x['warehouse_id']);
+        if (!in_array((string) $s['applied'], array('FEFO', 'FIFO', 'MANUAL', 'QUANTITY'), true)
+            || trim((string) $s['why']) === '') { $fbBad[] = (int) $x['id']; }
+    } catch (\Throwable $t) { $fbBad[] = (int) $x['id'] . ' (خطأ)'; }
+}
+gate('W9-29', 'سلسلةُ ارتدادِ الصرفِ تعيد قاعدةً مسمّاةً دائمًا',
+     count($fbBad) === 0,
+     "حالاتٌ مُستدعاةٌ $fbTested · بلا قاعدةٍ مسمّاةٍ أو بلا سببٍ " . count($fbBad));
+
+/* ══ W9-30 · قيدُ الجودةِ سجلٌّ لا حاجب ════════════════════════════════ */
+$gapNoWhat = (int) $one("SELECT COUNT(*) FROM proc_track_gap
+                          WHERE COALESCE(missing,'') = '' OR COALESCE(op_kind,'') = ''");
+$reqNoDoc = (int) $one("SELECT COUNT(*) FROM proc_requalification
+                         WHERE new_expiry IS NOT NULL
+                           AND (COALESCE(tech_doc_ref,'') = '' OR approved_by = 0)");
+$itemNoScope = (int) $one("SELECT COUNT(*) FROM proc_item
+                            WHERE COALESCE(is_deleted,0)=0 AND COALESCE(policy_scope,'') = ''");
+gate('W9-30', 'قيدُ الجودةِ سجلٌّ لا حاجبٌ والتأهيلُ بمستندِه',
+     $gapNoWhat === 0 && $reqNoDoc === 0 && $itemNoScope === 0,
+     "قيدُ جودةٍ بلا وصفٍ $gapNoWhat · تأهيلٌ بتاريخٍ جديدٍ بلا مستندٍ $reqNoDoc"
+     . " · صنفٌ بلا حكمِ نطاقٍ محلولٍ $itemNoScope");
+
 /* ══ W9-25 · رحلةُ التوريدِ تعبر ولا تترك أثرًا ════════════════════════ */
 $jOut = array(); $jCode = 1;
 @exec('"' . PHP_BINARY . '" "' . $ROOT . '/tools/repair01_w9_journey.php" 2>&1', $jOut, $jCode);
@@ -356,7 +499,19 @@ foreach ($rows as $x) {
 echo str_repeat('─', 120) . "\n";
 printf("W9 gate: %d/%d  ·  أمرٌ بلا سندٍ %d  ·  مفردةٌ مخترَعة %d  ·  مؤجَّلٌ غيرُ مستهلَك %d  ·  رحلةٌ %d/%d\n",
     $pass, $pass + $fail, count($noBasis), $invented, $dfOpen, $jPass, $jTotal);
-echo 'الحكم: ' . ($fail === 0
-        ? "خضراءُ المبنيِّ ✔  ·  ⛔ **والمرحلةُ مفتوحةٌ**: $dfOpen بندًا مؤجَّلًا بـDEC-OPEN-15 — لا إعلانَ إغلاق\n"
-        : "ساقطة ✘\n");
+/* ◆ **الحكمُ يتبع القياسَ لا العكس**: ما دام بندٌ مؤجَّلٌ غيرَ مستهلَكٍ فالمرحلةُ
+     مفتوحةٌ ولو كانت كلُّ الحواجبِ خضراء. ولحظةَ يُجاب الحاجبُ وتُستهلَك بنودُه
+     **يصير الحكمُ مُغلَقًا** — والتناقضُ («مفتوحةٌ بصفرِ بندٍ مؤجَّل») عطبُ سردٍ
+     لا عطبُ قياس، وقد وقع فعلًا فأُصلح. */
+if ($fail !== 0) {
+    echo "الحكم: ساقطة ✘\n";
+} elseif ($dfOpen > 0) {
+    echo "الحكم: خضراءُ المبنيِّ ✔  ·  ⛔ **والمرحلةُ مفتوحةٌ**: $dfOpen بندًا مؤجَّلًا"
+       . " بـDEC-OPEN-15 — لا إعلانَ إغلاق\n";
+} elseif ($blockOpen > 0) {
+    echo "الحكم: خضراءُ المبنيِّ ✔  ·  ⛔ **والحاجبُ DEC-OPEN-15 ما زال مفتوحًا** — لا إعلانَ إغلاق\n";
+} else {
+    echo "الحكم: مُغلَقة ✔  ·  DEC-OPEN-15 مُجابٌ ومُغلَق · وبنودُ التأجيلِ الثلاثةُ"
+       . " استُهلكت بإثباتٍ مقيس\n";
+}
 exit($fail === 0 ? 0 : 1);

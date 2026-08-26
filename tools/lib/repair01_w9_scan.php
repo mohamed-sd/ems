@@ -258,6 +258,32 @@ function repair01_w9_new_surfaces()
               'owner' => 'DEP-17', 'role' => 'أمين المخزن', 'sibling' => 'Procurement/wh_count.php',
               'req' => 'WH-18', 'doc' => 'سطر اقفال شهري متوازن',
               'next' => 'ترحيل الرصيد الى المالية', 'cons' => 'المخازن والمالية', 'fin' => 'نعم'),
+
+        /* ── أسطحُ جوابِ `DEC-OPEN-15` (2026-08-26) ──────────────────────────
+           ◆ **«المرونةُ في الإعداداتِ لا في الكود»** (‏القاعدةُ ㉗): سياسةُ
+             التتبّعِ سطحٌ تديره الإدارةُ المخوَّلةُ لا تعديلٌ برمجيّ.
+           ◆ **والجودةُ تُقاس ولا تحجب** (‏㉚ و㉛): سطحُ النِّسَبِ **مؤشِّرُ نضجٍ**
+             لا حاجبَ تشغيل. */
+        array('route' => 'Procurement/proc_track_policy.php', 'ar' => 'سياسة تتبع الأصناف',
+              'icon' => 'fa fa-sliders', 'group' => 'التأسيس المرجعي', 'sort' => 4,
+              'owner' => 'DEP-17', 'role' => 'أمين المخزن', 'sibling' => 'Procurement/items_proc.php',
+              'req' => 'WH-03', 'doc' => 'سياسة تتبع بنسختها وتاريخ سريانها',
+              'next' => 'حل السياسة على الاصناف', 'cons' => 'المخازن والمشتريات والصيانة', 'fin' => 'لا'),
+        array('route' => 'Procurement/wh_lots.php', 'ar' => 'سجل الدفعات',
+              'icon' => 'fa fa-layer-group', 'group' => 'دورة الاستلام', 'sort' => 6,
+              'owner' => 'DEP-17', 'role' => 'أمين المخزن', 'sibling' => 'Procurement/wh_receipt.php',
+              'req' => 'WH-05', 'doc' => 'سطر دفعة بكميتها وتواريخها',
+              'next' => 'ترتيب الصرف بالصلاحية', 'cons' => 'المخازن والجودة', 'fin' => 'لا'),
+        array('route' => 'Procurement/wh_serials.php', 'ar' => 'سجل الأرقام التسلسلية',
+              'icon' => 'fa fa-barcode', 'group' => 'دورة الاستلام', 'sort' => 7,
+              'owner' => 'DEP-17', 'role' => 'أمين المخزن', 'sibling' => 'Procurement/wh_receipt.php',
+              'req' => 'WH-05', 'doc' => 'سطر قطعة بدورة حياتها',
+              'next' => 'ربط القطعة باصلها وعهدتها', 'cons' => 'المخازن والصيانة والاسطول', 'fin' => 'لا'),
+        array('route' => 'Procurement/wh_track_quality.php', 'ar' => 'جودة بيانات التتبع',
+              'icon' => 'fa fa-chart-simple', 'group' => 'الرقابة والإقفال', 'sort' => 19,
+              'owner' => 'DEP-17', 'role' => 'أمين المخزن', 'sibling' => 'Procurement/wh_count.php',
+              'req' => 'WH-03', 'doc' => 'سطر مؤشر نضج مشتق',
+              'next' => 'رفع سياسة صنف الى الالزام عند النضج', 'cons' => 'المخازن والقيادة', 'fin' => 'لا'),
     );
 }
 
@@ -294,33 +320,44 @@ function repair01_w9_entity_types()
    ══════════════════════════════════════════════════════════════════════════ */
 function repair01_w9_deferred_rows()
 {
+    /* ⚠ **استعلامُ الإثباتِ تغيَّر مع جوابِ المالكِ — والتغييرُ مُعلَنٌ لا صامت.**
+       ═════════════════════════════════════════════════════════════════════
+       كُتبت هذه الاستعلاماتُ أوّلَ مرّةٍ على بنيةِ W09: عَلَمٌ ثنائيٌّ في
+       `proc_item_track_rule`. وجوابُ `DEC-OPEN-15` (2026-08-26) **استبدل
+       الشكلَ**: ثلاثيٌّ في `proc_track_policy` بمستويَين وثماني خصائص.
+       فالاستعلامُ القديمُ يقيس جدولًا لم يعد يحمل الحقيقة — **وإبقاؤه يجعل
+       البندَ ينتظر إلى الأبد**، وهو عمًى لا تشدُّد.
+       ⛔ **والجديدُ ليس تخفيفًا**: كلُّ استعلامٍ هنا **صفرٌ قبل الجوابِ
+       وغيرُ صفرٍ بعده** — يقيس أنَّ الانتظارَ انتهى فعلًا لا أنّه أُعلن منتهيًا. */
     return array(
         array(
             'defer_key' => 'W9-DEF-01',
             'requirement_id' => 'WH-03',
             'blocked_by' => 'DEC-OPEN-15',
-            'part_built' => 'اعمدة الاعلام الثلاثة في proc_item مع track_rule_ref · وسجل proc_item_track_rule بقيوده الثلاثة · ودالة trackingFlags تقرا الاعلام من الصنف وحده',
-            'part_waiting' => 'اسناد فئات الاصناف الى الاعلام: اي فئة تحمل دفعة واي فئة تحمل رقما تسلسليا واي فئة تحمل تاريخ صلاحية. وهي صفوف سجل لا تغيير مخطط',
-            'resume_step' => 'ابذر صفا في proc_item_track_rule لكل فئة اجاب عنها المالك بسببها ومرجع القرار ثم اشتق اعلام proc_item من القاعدة واملا track_rule_ref ثم ارفع consumed',
-            'probe_sql' => 'SELECT COUNT(*) FROM proc_item_track_rule',
+            'part_built' => 'سجل proc_track_policy بمستويي الفئة والصنف وثماني خصائص ونسخ مؤرخة · واعمدة الدرجة الثلاثية في proc_item محلولة من السجل · ودالة resolve تحل بالاسبقية والتاريخ معا',
+            'part_waiting' => 'افتراضات الفئات نفسها: اي درجة لكل خاصية في كل فئة. وهي صفوف سجل لا تغيير مخطط',
+            'resume_step' => 'ابذر صفا في proc_track_policy لكل فئة من جدول جواب المالك بنسختها وتاريخ سريانها ثم حل السياسة الى اعمدة كل صنف بـmaterialize ثم ارفع consumed',
+            'probe_sql' => "SELECT COUNT(*) FROM proc_track_policy WHERE scope_kind = 'CATEGORY'",
         ),
         array(
             'defer_key' => 'W9-DEF-02',
             'requirement_id' => 'WH-05',
             'blocked_by' => 'DEC-OPEN-15',
-            'part_built' => 'اعمدة lot_no و serial_no و expiry_date في proc_receipt_line · وبوابة requireTracking ترد TRACKING_REQUIRED_FOR_ITEM حين يحمل الصنف علما ولا تقدم بياناته',
-            'part_waiting' => 'اشتعال البوابة عمليا — فهي اليوم لا تعترض احدا لان لا صنف يحمل علما. ولا يمارسها احد حتى تبذر الفئات',
-            'resume_step' => 'بعد بذر الفئات شغل رحلة استلام لصنف يحمل علما بلا بيانات تتبع وتحقق ان الرد TRACKING_REQUIRED_FOR_ITEM ثم ارفع consumed',
-            'probe_sql' => 'SELECT COUNT(*) FROM proc_item WHERE track_lot = 1 OR track_serial = 1 OR track_expiry = 1',
+            'part_built' => 'اعمدة lot_no و serial_no و expiry_date و mfg_date و warranty_until في بند سند الادخال · وكيانا proc_lot و proc_serial · وسجل proc_track_gap قيد جودة لا حاجب عمل · وcheckOperation بثلاثة احكام تمر وتسجل وتمنع',
+            'part_waiting' => 'اشتعال المسار عمليا — فما دام لا صنف يحمل درجة غير معطلة لا يسجل نقص ولا يقاس اكتمال',
+            'resume_step' => 'بعد بذر الفئات تحقق ان صنفا واحدا على الاقل يحمل درجة غير معطلة ثم شغل رحلة استلام بلا بيانات تتبع وتحقق ان الحكم gap لا block ثم ارفع consumed',
+            'probe_sql' => "SELECT COUNT(*) FROM proc_item WHERE track_lot_level <> 'OFF'"
+                         . " OR track_serial_level <> 'OFF' OR track_mfg_level <> 'OFF'"
+                         . " OR track_expiry_level <> 'OFF' OR track_warranty_level <> 'OFF'",
         ),
         array(
             'defer_key' => 'W9-DEF-03',
             'requirement_id' => 'WH-10',
             'blocked_by' => 'DEC-OPEN-15',
-            'part_built' => 'بوابة expiryGate تقرا expiry_policy و issue_order من قاعدة الفئة وترد EXPIRED_ITEM_ISSUE_BLOCKED على سياسة المنع',
-            'part_waiting' => 'سياسة المنتهي نفسها: منع كامل ام تنبيه بتجاوز باعتماد ومن يملكه · وترتيب الصرف: الاقدم صلاحية اجباريا ام باختيار امين المخزن',
-            'resume_step' => 'املا expiry_policy و issue_order في كل قاعدة فئة تحمل علم الصلاحية ثم جرب صرف صنف منتهي وتحقق من الرد ثم ارفع consumed',
-            'probe_sql' => 'SELECT COUNT(*) FROM proc_item_track_rule WHERE track_expiry = 1',
+            'part_built' => 'expiryVerdict بثلاثة مستويات انفاذ · وsuggestIssueOrder بسلسلة ارتداد FEFO ثم FIFO ثم الكمية · وproc_expiry_override يوجب دور السياسة لا دور المنفذ · وproc_requalification بدورة اعادة التاهيل',
+            'part_waiting' => 'سياسة المنتهي نفسها ومن يملك تجاوزها وترتيب الصرف لكل فئة',
+            'resume_step' => 'املا expiry_enforce و issue_policy و override_authority في كل سياسة فئة تتبع صلاحيتها ثم جرب صرف منتهي وتحقق من الحكم ثم ارفع consumed',
+            'probe_sql' => "SELECT COUNT(*) FROM proc_track_policy WHERE expiry <> 'OFF'",
         ),
     );
 }

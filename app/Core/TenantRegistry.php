@@ -540,6 +540,19 @@ class TenantRegistry
         // الرؤوسُ بحذفٍ ناعمٍ لأنّها مستنداتٌ يُرجَع إليها، والأبناءُ والمشتقّاتُ
         // بلا حذفٍ ناعمٍ لأنّها تُعاد بناؤها من أبيها أو من الحركات.
         // و`proc_item_track_rule` سجلُّ تهيئةٍ لا مستند — فلا حذفَ ناعمَ فيه.
+        // DEC-OPEN-15 (2026-08-26): سياسةُ تتبّعِ الصنفِ وكياناتُها.
+        // السياسةُ نفسُها سجلُّ تهيئةٍ بنسخٍ مؤرَّخةٍ فلا حذفَ ناعمَ فيها — النسخةُ
+        // تُقفَل بـeffective_to لا تُحذف. والدفعةُ والرقمُ التسلسليُّ كيانا تتبّعٍ
+        // يُرجَع إليهما بعد الصرفِ فيبقيان. وقيدُ الجودةِ سجلُّ قياسٍ لا مستند.
+        'proc_expiry_override' => array('type' => self::T_TENANT, 'soft' => false),
+        'proc_lot' => array('type' => self::T_TENANT, 'soft' => false),
+        'proc_requalification' => array('type' => self::T_TENANT, 'soft' => false),
+        'proc_serial' => array('type' => self::T_TENANT, 'soft' => false),
+        'proc_track_gap' => array('type' => self::T_TENANT, 'soft' => false),
+        // كتالوج: صفٌّ عامٌّ لكلِّ الكيانات (company_id=NULL) وصفوفٌ لكلِّ شركة —
+        // فالقراءةُ «العامُّ أو المِلكيّ» والتعديلُ على المِلكيِّ وحدَه. وT_TENANT
+        // كان يحجب الصفَّ العامَّ عن الكيانِ فيعود الحلُّ NONE على سياسةٍ مبذورة.
+        'proc_track_policy' => array('type' => self::T_CATALOG, 'soft' => false),
         'proc_award' => array('type' => self::T_TENANT, 'soft' => false),
         'proc_count_line' => array('type' => self::T_TENANT, 'soft' => false),
         'proc_count_session' => array('type' => self::T_TENANT, 'soft' => true),

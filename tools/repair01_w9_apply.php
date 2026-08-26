@@ -645,15 +645,30 @@ printf("  عقودُ أثرٍ مكتوبة %d\n\n", count($EV));
    ⑧ المؤجَّلُ — موضعُ السؤالِ المفتوحِ محفوظًا
    ═══════════════════════════════════════════════════════════════════════════ */
 echo "⑧ المؤجَّلُ بحاجبٍ مفتوح ──────────────────────────────────────\n";
+/* ⚠ **`consumed` يعيش خارجَ الشيفرةِ فيُلتقَط قبل المسحِ ويُعاد بعد الإدراج.**
+     ═════════════════════════════════════════════════════════════════════
+     الاستهلاكُ **واقعةٌ يكتبها `repair01_w9_resume.php` بإثباتٍ مقيس**، لا
+     قيمةٌ في مصفوفةٍ هنا. ومسحُ الجدولِ وإعادةُ بنائه بـ`consumed=0` **يُرجع
+     الحاجبَ المُغلَقَ مفتوحًا** ويُسقط `W9-24` — وهو العطبُ نفسُه الذي أهلك
+     أحكامَ W01 حين مسحَها `repair01_ingest` وأعاد بناءَها من لقطةٍ مجمَّدة.
+     فالنصُّ يُعاد اشتقاقُه من المكتبة، **والواقعةُ تبقى.** */
+$keepConsumed = array();
+$rk = $conn->query("SELECT defer_key, consumed, consumed_at FROM repair01_w9_deferred WHERE consumed = 1");
+while ($rk && $kx = $rk->fetch_assoc()) { $keepConsumed[$kx['defer_key']] = (string) $kx['consumed_at']; }
+
 $W("DELETE FROM repair01_w9_deferred");
 foreach (repair01_w9_deferred_rows() as $d) {
+    $done = isset($keepConsumed[$d['defer_key']]) ? 1 : 0;
+    $at   = $done ? "'" . $esc($keepConsumed[$d['defer_key']]) . "'" : 'NULL';
     $W("INSERT INTO repair01_w9_deferred
-        (defer_key,requirement_id,blocked_by,part_built,part_waiting,resume_step,probe_sql,consumed)
+        (defer_key,requirement_id,blocked_by,part_built,part_waiting,resume_step,probe_sql,
+         consumed,consumed_at)
         VALUES ('" . $esc($d['defer_key']) . "','" . $esc($d['requirement_id']) . "',
                 '" . $esc($d['blocked_by']) . "','" . $esc($d['part_built']) . "',
                 '" . $esc($d['part_waiting']) . "','" . $esc($d['resume_step']) . "',
-                '" . $esc($d['probe_sql']) . "',0)");
+                '" . $esc($d['probe_sql']) . "'," . $done . "," . $at . ")");
 }
+if ($keepConsumed) { printf("  ↷ استهلاكٌ محفوظٌ عبرَ إعادةِ البناء %d\n", count($keepConsumed)); }
 $dfN = (int) $one("SELECT COUNT(*) FROM repair01_w9_deferred WHERE consumed = 0");
 printf("  بنودٌ مؤجَّلةٌ بحاجبِها %d · الحاجب DEC-OPEN-15\n\n", $dfN);
 

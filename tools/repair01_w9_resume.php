@@ -2,24 +2,26 @@
 /**
  * tools/repair01_w9_resume.php — استئنافُ ما أُجِّل بـ`DEC-OPEN-15`
  * ═══════════════════════════════════════════════════════════════════════════
- * ◆ **يُشغَّل حين يُجيب المالكُ عن السؤالِ المحفوظ** في
- *   `docs/REPAIR01_20260823/open/DEC-OPEN-15.md`. ويفعل ثلاثةً بالترتيب:
- *   ① يبذر قواعدَ الفئاتِ في `proc_item_track_rule` من ملفِّ الجواب.
- *   ② يشتقُّ أعلامَ `proc_item` من القواعدِ ويملأ `track_rule_ref`.
- *   ③ يرفع `consumed` عن بنودِ التأجيلِ التي صار إثباتُ انتظارِها كاذبًا.
+ * ◆ **يُشغَّل حين يُجيب المالكُ** عن السؤالِ المحفوظِ في
+ *   `docs/REPAIR01_20260823/open/DEC-OPEN-15.md`. ويفعل أربعةً بالترتيب:
+ *   ① يبذر **سياساتِ الفئاتِ** من جدولِ الافتراضاتِ في ملفِّ الجواب.
+ *   ② يحلُّ السياسةَ إلى أعمدةِ كلِّ صنفٍ (‏فئةٌ ⇐ صنفٌ ⇐ جذر).
+ *   ③ يبذر حالةَ **الرصيدِ الموروثِ** لكلِّ صنفٍ له رصيدٌ بلا تتبّع.
+ *   ④ يستهلك بنودَ التأجيلِ **بإثباتٍ مقيسٍ لا بدعوى**، ويغلق الحاجب.
  *
- * ◆ **ولا فئةَ مُخمَّنةٌ هنا**: الأداةُ تقرأ ملفَّ الجوابِ ولا تخترع سطرًا.
- *   وبلا ملفٍّ **لا تكتب شيئًا** وتخرج برمزٍ غيرِ صفر.
+ * ◆ **ولا فئةَ مُخمَّنةٌ هنا**: الأداةُ تقرأ **جدولَ الافتراضاتِ** في ملفِّ
+ *   الجواب. وبلا ملفٍّ **لا تكتب شيئًا** وتخرج برمزٍ غيرِ صفر.
  *
- * ◆ **صيغةُ ملفِّ الجواب** — سطرٌ لكلِّ فئةٍ داخلَ كتلةٍ محاطةٍ بـ```:
- *   `الفئة | lot,serial,expiry | BLOCK او WARN_OVERRIDE | FEFO او FIFO او FREE | السبب`
- *   والحقلُ الثاني قائمةُ الأعلامِ المفصولةُ بفاصلة، وما بعدَه يلزم للصلاحيةِ وحدَها.
+ * ◆ **صيغةُ الجدولِ المقروء** — صفٌّ لكلِّ فئةٍ بتسعةِ حقولٍ مفصولةٍ بـ`|`:
+ *   `الفئة | الدفعة | التسلسلي | التصنيع | الصلاحية | الضمان | الانفاذ | الصرف | التاهيل`
+ *   والقيمُ `OFF/OPTIONAL/REQUIRED` للخمسِ الأولى، و`WARNING/APPROVAL_REQUIRED/HARD_BLOCK`
+ *   للإنفاذ، و`FIFO/FEFO/MANUAL` للصرف، و`ENABLED/DISABLED` للتأهيل.
  *
  * ⛔ **ولا يُغلَق التأجيلُ إلّا بإثباتٍ مقيس**: البندُ يُستهلَك حين يصير
  *   `probe_sql` **غيرَ صفريّ** — لا حين يُقال إنّه نُفِّذ.
  *
- * التشغيل: php tools/repair01_w9_resume.php --answer=<ملف> [--report]
- * الخروج : 0 استُؤنف · 1 لا ملفَّ جوابٍ أو لم يكتمل
+ * التشغيل: php tools/repair01_w9_resume.php [--answer=<ملف>] [--report]
+ * الخروج : 0 استُؤنف كاملًا · 1 لا ملفَّ جوابٍ أو لم يكتمل
  * ═══════════════════════════════════════════════════════════════════════════
  */
 if (php_sapi_name() !== 'cli') { exit("CLI فقط\n"); }
@@ -29,15 +31,16 @@ define('EMS_CLI', true);
 
 $ROOT = dirname(__DIR__);
 require_once $ROOT . '/tools/lib/repair01_w9_scan.php';
-require_once $ROOT . '/includes/env.php';
-$host = ems_env('DB_HOST'); $port = 3306;
-if (strpos($host, ':') !== false) { list($host, $port) = explode(':', $host); $port = (int) $port; }
-mysqli_report(MYSQLI_REPORT_OFF);
-$u = ems_env('DB_MIGRATOR_USER') ?: ems_env('DB_USER');
-$p = ems_env('DB_MIGRATOR_USER') ? ems_env('DB_MIGRATOR_PASS') : ems_env('DB_PASS');
-$conn = new mysqli($host, $u, $p, ems_env('DB_NAME'), $port);
-if ($conn->connect_errno) { exit("تعذّر الاتصال: {$conn->connect_error}\n"); }
+require_once $ROOT . '/app/Services/Warehouse/TrackingPolicyService.php';
+require_once $ROOT . '/config.php';
+if (!isset($conn) || !($conn instanceof mysqli)) { exit("تعذّر الاتصال بالقاعدة\n"); }
 $conn->set_charset('utf8mb4');
+while (ob_get_level()) { ob_end_clean(); }
+require_once $ROOT . '/app/Core/TenantGateException.php';
+require_once $ROOT . '/app/Core/TenantRegistry.php';
+require_once $ROOT . '/app/Core/TenantContext.php';
+require_once $ROOT . '/app/Core/TenantDb.php';
+use App\Services\Warehouse\TrackingPolicyService as TPS;
 
 $REPORT = in_array('--report', $argv, true);
 $esc = function ($s) use ($conn) { return $conn->real_escape_string((string) $s); };
@@ -49,70 +52,209 @@ if ($answer === '') { $answer = $ROOT . '/docs/REPAIR01_20260823/open/DEC-OPEN-1
 if (!is_file($answer)) {
     echo "✘ لا ملفَّ جوابٍ في: $answer\n";
     echo "  السؤالُ ما زال مفتوحًا — انظرْ docs/REPAIR01_20260823/open/DEC-OPEN-15.md\n";
-    echo "  ⛔ ولا تُبذَر فئةٌ بلا جوابِ المالك.\n";
+    echo "  ⛔ ولا تُبذَر سياسةٌ بلا جوابِ المالك.\n";
     exit(1);
 }
 
-echo "══ استئنافُ ما أُجِّل بـDEC-OPEN-15 ══\n\n";
+echo "══ استئنافُ ما أُجِّل بـDEC-OPEN-15 ══\n";
+echo ($REPORT ? "  وضعُ التقرير: يقرأ ولا يكتب\n\n" : "\n");
 
-/* ═══ ① بذرُ قواعدِ الفئاتِ من ملفِّ الجواب ═══════════════════════════════ */
-echo "① قواعدُ الفئاتِ من ملفِّ الجواب ──────────────────────────────\n";
-$lines = file($answer, FILE_IGNORE_NEW_LINES);
-$seeded = 0; $bad = array(); $i = 0;
-foreach ($lines as $ln) {
+$company = (int) $one("SELECT company_id FROM proc_item WHERE COALESCE(is_deleted,0)=0
+                        GROUP BY company_id ORDER BY COUNT(*) DESC LIMIT 1");
+if ($company <= 0) { echo "✘ لا كيانَ ذا أصناف\n"; exit(1); }
+$G = new \App\Core\TenantDb($conn, \App\Core\TenantContext::forSystem($company, 0, '', true));
+$TODAY = (string) $one("SELECT CURDATE()");
+
+/* ═══ ⓪ مزامنةُ دفترِ التأجيلِ مع مصدرِه — والتغييرُ مُعلَنٌ لا صامت ═══════
+   ⚠ **جوابُ المالكِ استبدل الشكلَ فاستبدلت استعلاماتُ الإثبات**: القديمةُ تقيس
+     `proc_item_track_rule` (‏عَلَمٌ ثنائيّ) والحقيقةُ صارت في `proc_track_policy`
+     (‏ثلاثيٌّ بمستويَين). وإبقاءُ القديمِ يجعل البندَ ينتظر إلى الأبدِ على
+     جدولٍ لم يعد يحمل الجواب — **عمًى لا تشدُّد**. والجديدُ صفرٌ قبل الجوابِ
+     وغيرُ صفرٍ بعده، فهو إثباتٌ لا تخفيف. والفروقُ تُطبَع صراحةً هنا. */
+echo "⓪ مزامنةُ دفترِ التأجيلِ مع مصدرِه ─────────────────────────────\n";
+$syncN = 0;
+foreach (repair01_w9_deferred_rows() as $d) {
+    $cur = (string) $one("SELECT probe_sql FROM repair01_w9_deferred
+                           WHERE defer_key = '" . $esc($d['defer_key']) . "'");
+    if ($cur === (string) $d['probe_sql']) { continue; }
+    echo '  ⇄ ' . $d['defer_key'] . " — استعلامُ الإثباتِ يُستبدَل\n";
+    echo '      قديم: ' . mb_substr($cur, 0, 88) . "\n";
+    echo '      جديد: ' . mb_substr((string) $d['probe_sql'], 0, 88) . "\n";
+    if (!$REPORT) {
+        $conn->query("UPDATE repair01_w9_deferred
+                         SET part_built   = '" . $esc($d['part_built']) . "',
+                             part_waiting = '" . $esc($d['part_waiting']) . "',
+                             resume_step  = '" . $esc($d['resume_step']) . "',
+                             probe_sql    = '" . $esc($d['probe_sql']) . "'
+                       WHERE defer_key = '" . $esc($d['defer_key']) . "'");
+    }
+    $syncN++;
+}
+printf("  بنودٌ زُومنت %d\n\n", $syncN);
+
+/* ═══ ① بذرُ سياساتِ الفئاتِ من جدولِ الجواب ═════════════════════════════ */
+echo "① سياساتُ الفئاتِ من جدولِ الجواب ─────────────────────────────\n";
+$LV = array('OFF', 'OPTIONAL', 'REQUIRED');
+$EN = array('WARNING', 'APPROVAL_REQUIRED', 'HARD_BLOCK');
+$IS = array('FIFO', 'FEFO', 'MANUAL');
+$RQ = array('ENABLED', 'DISABLED');
+
+$live = array();
+$r = $conn->query("SELECT DISTINCT category FROM proc_item
+                    WHERE COALESCE(is_deleted,0)=0 AND COALESCE(category,'') <> ''");
+while ($r && $x = $r->fetch_row()) { $live[trim($x[0])] = true; }
+
+$seeded = 0; $skipped = array(); $unknown = array();
+foreach (file($answer, FILE_IGNORE_NEW_LINES) as $ln) {
     $ln = trim($ln);
-    if ($ln === '' || strpos($ln, '|') === false || strpos($ln, '#') === 0) { continue; }
-    $f = array_map('trim', explode('|', $ln));
-    if (count($f) < 5) { continue; }
-    list($cat, $flags, $policy, $order, $why) = array($f[0], strtolower($f[1]), strtoupper($f[2]),
-                                                      strtoupper($f[3]), $f[4]);
-    if ($cat === '' || $why === '') { $bad[] = $ln; continue; }
-    $lot = (strpos($flags, 'lot') !== false) ? 1 : 0;
-    $ser = (strpos($flags, 'serial') !== false) ? 1 : 0;
-    $exp = (strpos($flags, 'expiry') !== false) ? 1 : 0;
-    if ($lot + $ser + $exp === 0) { $bad[] = $ln . ' (بلا علمٍ واحد)'; continue; }
-    if ($exp === 1 && ($policy === '' || $order === '')) { $bad[] = $ln . ' (صلاحيةٌ بلا سياسةٍ أو ترتيب)'; continue; }
-    $i++;
-    $key = 'TR-' . str_pad((string) $i, 3, '0', STR_PAD_LEFT);
-    $sql = "INSERT INTO proc_item_track_rule
-            (rule_key, company_id, category, track_lot, track_serial, track_expiry,
-             expiry_policy, issue_order, why, decision_ref, is_active)
-            VALUES ('" . $esc($key) . "',0,'" . $esc($cat) . "',$lot,$ser,$exp,
-                    '" . $esc($exp ? $policy : '') . "','" . $esc($exp ? $order : '') . "',
-                    '" . $esc($why) . "','DEC-OPEN-15',1)
-            ON DUPLICATE KEY UPDATE track_lot=VALUES(track_lot), track_serial=VALUES(track_serial),
-              track_expiry=VALUES(track_expiry), expiry_policy=VALUES(expiry_policy),
-              issue_order=VALUES(issue_order), why=VALUES(why), is_active=1";
-    if ($REPORT) { echo "  ↷ $cat ⇐ lot=$lot serial=$ser expiry=$exp\n"; $seeded++; continue; }
-    if ($conn->query($sql) === true) { echo "  ✔ $cat ⇐ lot=$lot serial=$ser expiry=$exp\n"; $seeded++; }
-    else { echo '  ✘ ' . $cat . ' — ' . $conn->error . "\n"; $bad[] = $cat; }
-}
-printf("  قواعدُ مبذورة %d · مرفوضةٌ %d%s\n\n", $seeded, count($bad),
-    $bad ? ' ⇐ ' . implode('، ', array_slice($bad, 0, 2)) : '');
-if ($seeded === 0) { echo "✘ لا قاعدةَ واحدةً في ملفِّ الجواب — لا استئناف\n"; exit(1); }
+    if ($ln === '' || strpos($ln, '|') === false) { continue; }
+    $f = array_map('trim', array_filter(explode('|', $ln), function ($v) { return trim($v) !== ''; }));
+    $f = array_values($f);
+    if (count($f) !== 9) { continue; }
+    list($cat, $lot, $ser, $mfg, $exp, $war, $enf, $iss, $req) = $f;
+    if (!in_array($lot, $LV, true) || !in_array($ser, $LV, true) || !in_array($mfg, $LV, true)
+        || !in_array($exp, $LV, true) || !in_array($war, $LV, true)
+        || !in_array($enf, $EN, true) || !in_array($iss, $IS, true) || !in_array($req, $RQ, true)) {
+        continue;   /* سطرُ ترويسةٍ أو نصٌّ لا صفُّ سياسة */
+    }
+    if (!isset($live[$cat])) { $unknown[] = $cat; continue; }
 
-/* ═══ ② اشتقاقُ أعلامِ الصنفِ من قاعدةِ فئتِه ═══════════════════════════ */
-echo "② اشتقاقُ أعلامِ الأصنافِ من القواعد ───────────────────────────\n";
+    /* ⛔ **`FEFO` توجب تتبّعَ الصلاحية** — والقيدُ يمنعه في المخطَّطِ أيضًا */
+    if ($iss === 'FEFO' && $exp === 'OFF') {
+        $skipped[] = $cat . ' (صرفٌ بالصلاحيةِ وتتبّعُها معطَّل)'; continue;
+    }
+    $strict = ($lot === 'REQUIRED' || $ser === 'REQUIRED' || $mfg === 'REQUIRED'
+               || $exp === 'REQUIRED' || $war === 'REQUIRED');
+    $strictWhy = $strict ? 'رفعٌ الى الالزام بجواب المالك في DEC-OPEN-15 لهذه الفئة بعينها' : '';
+    $auth = ($enf === 'APPROVAL_REQUIRED') ? 'المسؤول الفني المختص بحسب نوع الصنف' : '';
+    $why = 'افتراض الفئة من جواب المالك 2026-08-26 — وضع الانتقال يبدا مرنا ويتدرج';
+
+    /* ⚠ **نسخةٌ جديدةٌ تُقفل سابقتَها** — وإلّا سرَت نسختانِ في يومٍ واحدٍ فصار
+         الحلُّ يعتمد ترتيبَ الصفوف. وقع فعلًا: تشغيلانِ متتاليانِ أنشآ اثنَي
+         عشرَ صفًّا لستِّ فئاتٍ كلُّها سارية، فضبطَه `W9-26`.
+       ◆ **والإقفالُ لا حذف**: السابقةُ تبقى بسجلِّها لأنَّ حركةً وقعت في
+         سريانِها تُحاسَب بها — «لا نطبّق القاعدةَ الجديدةَ بأثرٍ رجعيّ». */
+    $same = (string) $one("SELECT id FROM proc_track_policy
+                            WHERE scope_kind='CATEGORY' AND scope_key='" . $esc($cat) . "'
+                              AND lot='" . $esc($lot) . "' AND serial='" . $esc($ser) . "'
+                              AND mfg_date='" . $esc($mfg) . "' AND expiry='" . $esc($exp) . "'
+                              AND warranty='" . $esc($war) . "' AND expiry_enforce='" . $esc($enf) . "'
+                              AND issue_policy='" . $esc($iss) . "' AND requalify='" . $esc($req) . "'
+                              AND (effective_to IS NULL OR effective_to >= CURDATE())
+                            LIMIT 1");
+    if ($same !== '') {
+        printf("  ↷ %-14s سياسةٌ مطابقةٌ ساريةٌ سلفًا — لا نسخةَ جديدة\n", $cat);
+        $seeded++; continue;
+    }
+    $ver = (int) $one("SELECT COALESCE(MAX(version),0)+1 FROM proc_track_policy
+                        WHERE scope_kind='CATEGORY' AND scope_key='" . $esc($cat) . "'");
+    if (!$REPORT && $ver > 1) {
+        $conn->query("UPDATE proc_track_policy
+                         SET effective_to = DATE_SUB('" . $esc($TODAY) . "', INTERVAL 1 DAY)
+                       WHERE scope_kind='CATEGORY' AND scope_key='" . $esc($cat) . "'
+                         AND effective_to IS NULL");
+    }
+    if ($REPORT) {
+        printf("  ↷ %-14s lot=%-8s ser=%-8s mfg=%-8s exp=%-8s war=%-8s %s %s %s\n",
+            $cat, $lot, $ser, $mfg, $exp, $war, $enf, $iss, $req);
+        $seeded++; continue;
+    }
+    $ok = $conn->query("INSERT INTO proc_track_policy
+        (company_id, scope_kind, scope_key, version, effective_from, effective_to,
+         lot, serial, mfg_date, expiry, warranty, expiry_enforce, issue_policy, requalify,
+         override_authority, why, strict_why, decision_ref, changed_by, approved_by)
+        VALUES (NULL,'CATEGORY','" . $esc($cat) . "'," . $ver . ",'" . $esc($TODAY) . "',NULL,
+                '" . $esc($lot) . "','" . $esc($ser) . "','" . $esc($mfg) . "','" . $esc($exp) . "',
+                '" . $esc($war) . "','" . $esc($enf) . "','" . $esc($iss) . "','" . $esc($req) . "',
+                '" . $esc($auth) . "','" . $esc($why) . "','" . $esc($strictWhy) . "','DEC-OPEN-15',0,0)");
+    if ($ok) {
+        printf("  ✔ %-14s lot=%-8s ser=%-8s mfg=%-8s exp=%-8s war=%-8s %s %s %s · نسخة %d\n",
+            $cat, $lot, $ser, $mfg, $exp, $war, $enf, $iss, $req, $ver);
+        $seeded++;
+    } else {
+        echo '  ✘ ' . $cat . ' — ' . $conn->error . "\n";
+        $skipped[] = $cat;
+    }
+}
+printf("  فئاتٌ مبذورة %d · مردودةٌ %d%s · خارجَ الدليلِ الحيِّ %d%s\n\n",
+    $seeded, count($skipped), $skipped ? ' ⇐ ' . implode('، ', array_slice($skipped, 0, 2)) : '',
+    count($unknown), $unknown ? ' ⇐ ' . implode('، ', array_slice(array_unique($unknown), 0, 3)) : '');
+if ($seeded === 0) { echo "✘ لا سياسةَ واحدةً قُرئت من ملفِّ الجواب — لا استئناف\n"; exit(1); }
+
+/* ═══ ② حلُّ السياسةِ إلى أعمدةِ كلِّ صنف ══════════════════════════════ */
+echo "② حلُّ السياسةِ على الأصناف ───────────────────────────────────\n";
+/* ⚠ **الحلُّ يمرُّ على كلِّ كيانٍ لا على كيانِ السياقِ وحدَه**: `proc_item`
+     جدولُ مستأجِرٍ والبوّابةُ تعزله، فحلقةٌ ببوّابةِ كيانٍ واحدٍ تترك أصنافَ
+     البقيّةِ بلا سياسة — وقعت فعلًا: عشرةٌ من أحدٍ وعشرين. */
+$resolved = 0; $byLevel = array();
 if (!$REPORT) {
-    $conn->query("UPDATE proc_item SET track_lot=0, track_serial=0, track_expiry=0, track_rule_ref=''");
-    $conn->query("UPDATE proc_item i
-                    JOIN proc_item_track_rule r ON r.category = i.category AND r.is_active = 1
-                                                AND (r.company_id = 0 OR r.company_id = i.company_id)
-                     SET i.track_lot = r.track_lot, i.track_serial = r.track_serial,
-                         i.track_expiry = r.track_expiry, i.track_rule_ref = r.rule_key");
+    $cos = array();
+    $rc = $conn->query("SELECT DISTINCT company_id FROM proc_item WHERE COALESCE(is_deleted,0)=0");
+    while ($rc && $x = $rc->fetch_row()) { $cos[] = (int) $x[0]; }
+    foreach ($cos as $co) {
+        $Gc = new \App\Core\TenantDb($conn, \App\Core\TenantContext::forSystem($co, 0, '', true));
+        foreach ($Gc->select('proc_item', array('limit' => 5000)) as $it) {
+            $p = TPS::materialize($Gc, (int) $it['id'], $TODAY);
+            $resolved++;
+            $k = $p['scope'] . ':' . $p['lot'] . '/' . $p['serial'] . '/' . $p['expiry'];
+            $byLevel[$k] = isset($byLevel[$k]) ? $byLevel[$k] + 1 : 1;
+        }
+    }
+    printf("  كياناتٌ مُرَّ عليها %d\n", count($cos));
 }
-$flagged = (int) $one("SELECT COUNT(*) FROM proc_item
-                        WHERE track_lot=1 OR track_serial=1 OR track_expiry=1");
-$noRule  = (int) $one("SELECT COUNT(*) FROM proc_item
-                        WHERE (track_lot=1 OR track_serial=1 OR track_expiry=1)
-                          AND COALESCE(track_rule_ref,'') = ''");
-printf("  أصنافٌ بعلمٍ %d · علمٌ بلا قاعدةٍ %d\n\n", $flagged, $noRule);
+$reqN = (int) $one("SELECT COUNT(*) FROM proc_item
+                     WHERE track_lot_level='REQUIRED' OR track_serial_level='REQUIRED'
+                        OR track_mfg_level='REQUIRED' OR track_expiry_level='REQUIRED'
+                        OR track_warranty_level='REQUIRED'");
+$optN = (int) $one("SELECT COUNT(*) FROM proc_item
+                     WHERE track_lot_level='OPTIONAL' OR track_serial_level='OPTIONAL'
+                        OR track_mfg_level='OPTIONAL' OR track_expiry_level='OPTIONAL'
+                        OR track_warranty_level='OPTIONAL'");
+$noPol = (int) $one("SELECT COUNT(*) FROM proc_item WHERE COALESCE(policy_scope,'') IN ('','NONE')");
+printf("  أصنافٌ حُلَّت %d · بخاصيّةٍ اختياريّةٍ %d · بخاصيّةٍ إلزاميّةٍ %d · بلا سياسةٍ %d\n",
+    $resolved, $optN, $reqN, $noPol);
+foreach ($byLevel as $k => $n) { printf("    %-34s %d\n", $k, $n); }
+echo "\n";
 
-/* ═══ ③ استهلاكُ بنودِ التأجيلِ — بإثباتٍ مقيسٍ لا بدعوى ═══════════════ */
-echo "③ استهلاكُ بنودِ التأجيل ──────────────────────────────────────\n";
+/* ═══ ③ الرصيدُ الموروثُ — لا يُخترَع له تتبّع ═══════════════════════════ */
+echo "③ الرصيدُ الموروثُ غيرُ المتتبَّع ──────────────────────────────\n";
+$legacyN = 0; $legacyQty = 0.0;
+if (!$REPORT) {
+    $r = $conn->query("SELECT s.id, s.item_id, s.warehouse_id, s.qty
+                         FROM proc_stock_state s
+                        WHERE s.state_key = 'GOOD' AND s.qty > 0");
+    $rows = array();
+    while ($r && $x = $r->fetch_assoc()) { $rows[] = $x; }
+    foreach ($rows as $x) {
+        $it = $G->selectOne('proc_item', array('where' => array('id' => (int) $x['item_id'])));
+        if (!$it) { continue; }
+        $tracked = ((string) $it['track_lot_level'] !== 'OFF' || (string) $it['track_serial_level'] !== 'OFF');
+        if (!$tracked) { continue; }
+        $lotQty = 0.0;
+        foreach ($G->select('proc_lot', array('where' => array(
+            'item_id' => (int) $x['item_id'], 'warehouse_id' => (int) $x['warehouse_id']))) as $l) {
+            $lotQty += (float) $l['qty_available'];
+        }
+        $legacy = (float) $x['qty'] - $lotQty;
+        if ($legacy <= 0.0001) { continue; }
+        $ex = $G->selectOne('proc_stock_state', array('where' => array(
+            'item_id' => (int) $x['item_id'], 'warehouse_id' => (int) $x['warehouse_id'],
+            'state_key' => 'LEGACY_UNTRACKED')));
+        $data = array('item_id' => (int) $x['item_id'], 'warehouse_id' => (int) $x['warehouse_id'],
+            'state_key' => 'LEGACY_UNTRACKED', 'qty' => $legacy,
+            'derive_rule' => 'الرصيد الصالح ناقص ما تغطيه دفعات مسجلة — موروث لا يخترع له تتبع');
+        if ($ex) { $G->update('proc_stock_state', $data, array('id' => (int) $ex['id'])); }
+        else { $G->insert('proc_stock_state', $data); }
+        $legacyN++; $legacyQty += $legacy;
+    }
+}
+printf("  أسطرُ رصيدٍ موروثٍ %d · كميّتُه %s\n\n", $legacyN, number_format($legacyQty, 3));
+
+/* ═══ ④ استهلاكُ التأجيلِ وإغلاقُ الحاجب ════════════════════════════════ */
+echo "④ استهلاكُ بنودِ التأجيل ──────────────────────────────────────\n";
 $consumed = 0; $still = 0;
-$r = $conn->query("SELECT defer_key, probe_sql FROM repair01_w9_deferred WHERE consumed = 0");
 $pend = array();
+$r = $conn->query("SELECT defer_key, probe_sql FROM repair01_w9_deferred WHERE consumed = 0");
 while ($r && $x = $r->fetch_assoc()) { $pend[] = $x; }
 foreach ($pend as $x) {
     $v = repair01_w9_one($conn, (string) $x['probe_sql']);
@@ -130,12 +272,19 @@ foreach ($pend as $x) {
 }
 printf("  استُهلك %d · باقٍ %d\n\n", $consumed, $still);
 
-/* ═══ ④ إغلاقُ الحاجبِ في سجلِّ القرارات ═════════════════════════════ */
 if ($still === 0 && !$REPORT) {
-    echo "④ إغلاقُ الحاجب ──────────────────────────────────────────────\n";
-    $conn->query("UPDATE repair01_decisions SET status = 'APPROVED'
+    echo "⑤ إغلاقُ الحاجب ──────────────────────────────────────────────\n";
+    /* ⚠ **محوران لا محور** (‏على نمطِ `DEC-OPEN-12`: المحاورُ تُفصل ولا تُدمَج):
+         · `blocking_level` **حالةٌ**: أيحجب الآن؟ — و`G0-03` يشترط `NONE`
+           لكلِّ معتمَد، فالمُجابُ لا يحجب.
+         · `blocker_type` **تصنيفٌ دائم**: أكان سؤالًا بنيويًّا أم عتبةً؟ —
+           و`G0-11` يشترط أن يحمله كلُّ `DEC-OPEN` أبدًا، فالجوابُ لا يمحو
+           أنَّ السؤالَ كان بنيويًّا.
+         ⛔ ورفعُ الاثنَين معًا يُسقط `G0-11` — وقع فعلًا فأُصلح. */
+    $conn->query("UPDATE repair01_decisions
+                     SET status = 'APPROVED', blocking_level = 'NONE'
                    WHERE decision_id = 'DEC-OPEN-15'");
-    echo "  ✔ DEC-OPEN-15 صار معتمَدًا\n\n";
+    echo "  ✔ DEC-OPEN-15 معتمَدٌ ودرجةُ حجبِه رُفعت · وصنفُه البنيويُّ باقٍ تصنيفًا\n\n";
 }
 
 echo "───────────────────────────────────────────────────────────────\n";
