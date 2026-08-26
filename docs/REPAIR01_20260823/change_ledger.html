@@ -1,0 +1,298 @@
+<title>دفتر تغييرات إنجاز</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+:root{
+  --paper:#F6F4EF;      /* ورقُ دفترٍ دافئ */
+  --card:#FFFFFF;
+  --line:#E2DDD2;
+  --line-soft:#EDE9E0;
+  --ink:#1A1815;
+  --ink-2:#4A453C;
+  --muted:#7C7466;
+  --teal:#0F5A63;       /* اللونُ الحاكم — فولاذٌ مائيّ */
+  --teal-soft:#E3EFF0;
+  --k-new:#146B52;   --k-new-bg:#E2F0EA;
+  --k-fix:#8A4A12;   --k-fix-bg:#F6EADD;
+  --k-ren:#8C6510;   --k-ren-bg:#F7EFD8;
+  --k-hid:#5B5A63;   --k-hid-bg:#EAE9EC;
+  --k-lnk:#25497F;   --k-lnk-bg:#E4EAF4;
+  --shadow:0 1px 2px rgba(26,24,21,.05), 0 8px 24px -14px rgba(26,24,21,.22);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#15140F; --card:#1D1B16; --line:#332F26; --line-soft:#28241D;
+    --ink:#F0EDE4; --ink-2:#C4BDAE; --muted:#8D8577;
+    --teal:#6FC0C8; --teal-soft:#12312F;
+    --k-new:#7FCFA9; --k-new-bg:#12291F;
+    --k-fix:#DFA36B; --k-fix-bg:#2C1E12;
+    --k-ren:#DEBE68; --k-ren-bg:#2B2411;
+    --k-hid:#ADA9B4; --k-hid-bg:#242327;
+    --k-lnk:#93B3E4; --k-lnk-bg:#161F2E;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -16px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#15140F; --card:#1D1B16; --line:#332F26; --line-soft:#28241D;
+  --ink:#F0EDE4; --ink-2:#C4BDAE; --muted:#8D8577;
+  --teal:#6FC0C8; --teal-soft:#12312F;
+  --k-new:#7FCFA9; --k-new-bg:#12291F;
+  --k-fix:#DFA36B; --k-fix-bg:#2C1E12;
+  --k-ren:#DEBE68; --k-ren-bg:#2B2411;
+  --k-hid:#ADA9B4; --k-hid-bg:#242327;
+  --k-lnk:#93B3E4; --k-lnk-bg:#161F2E;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -16px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; direction:rtl; background:var(--paper); color:var(--ink);
+  font-family:"IBM Plex Sans Arabic",system-ui,"Segoe UI",sans-serif;
+  font-size:15px; line-height:1.7; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 clamp(16px,4vw,36px) 72px}
+
+/* ── الترويسة ─────────────────────────────────────────── */
+header{padding:clamp(38px,7vw,68px) 0 26px}
+.eyebrow{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:11.5px;letter-spacing:.14em;color:var(--teal);
+  text-transform:uppercase;margin:0 0 14px;display:flex;gap:10px;align-items:center
+}
+.eyebrow::after{content:"";flex:1;height:1px;background:var(--line)}
+h1{
+  font-family:"Readex Pro",system-ui,sans-serif;font-weight:500;
+  font-size:clamp(30px,5.2vw,46px);line-height:1.22;margin:0 0 12px;
+  letter-spacing:-.01em;text-wrap:balance
+}
+.lede{max-width:62ch;color:var(--ink-2);font-size:16.5px;margin:0 0 6px;font-weight:300}
+.lede strong{font-weight:600;color:var(--ink)}
+
+/* ── شريطُ الأرقام ────────────────────────────────────── */
+.rail{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:1px;
+  background:var(--line);border:1px solid var(--line);border-radius:12px;
+  overflow:hidden;margin:30px 0 8px;box-shadow:var(--shadow)
+}
+.stat{background:var(--card);padding:16px 18px 15px;display:flex;flex-direction:column;gap:3px}
+.stat .n{
+  font-family:"Readex Pro",sans-serif;font-weight:600;font-size:30px;line-height:1;
+  font-variant-numeric:tabular-nums;letter-spacing:-.02em
+}
+.stat .l{font-size:12.5px;color:var(--muted);font-weight:400}
+.stat.is-total{background:var(--teal-soft)}
+.stat.is-total .n{color:var(--teal)}
+.stat[data-k="new"]    .n{color:var(--k-new)}
+.stat[data-k="fixed"]  .n{color:var(--k-fix)}
+.stat[data-k="renamed"].n,.stat[data-k="renamed"] .n{color:var(--k-ren)}
+.stat[data-k="hidden"] .n{color:var(--k-hid)}
+.stat[data-k="linked"] .n{color:var(--k-lnk)}
+
+.note{
+  font-size:13px;color:var(--muted);margin:14px 0 0;padding-inline-start:14px;
+  border-inline-start:2px solid var(--line);max-width:74ch
+}
+
+/* ── الموجات ──────────────────────────────────────────── */
+.waves{margin:34px 0 0}
+.waves h2,.tablewrap h2{
+  font-family:"Readex Pro",sans-serif;font-weight:500;font-size:15px;
+  letter-spacing:.02em;margin:0 0 12px;color:var(--ink-2)
+}
+.wavebar{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:10px}
+.wv{
+  background:var(--card);border:1px solid var(--line);border-radius:10px;
+  padding:11px 13px 12px;display:flex;flex-direction:column;gap:7px
+}
+.wv .top{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.wv .id{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--muted);letter-spacing:.05em}
+.wv .n{font-family:"Readex Pro",sans-serif;font-weight:600;font-size:19px;
+  color:var(--teal);font-variant-numeric:tabular-nums;line-height:1}
+.wv .fill{height:3px;border-radius:2px;background:var(--line-soft);overflow:hidden}
+.wv .fill i{display:block;height:100%;background:var(--teal);border-radius:2px}
+
+/* ── العُدَّة ──────────────────────────────────────────── */
+.tools{
+  display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+  margin:38px 0 14px;padding:14px;background:var(--card);
+  border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)
+}
+.search{
+  flex:1 1 240px;min-width:0;padding:9px 13px;border-radius:8px;
+  border:1px solid var(--line);background:var(--paper);color:var(--ink);
+  font-family:inherit;font-size:14.5px
+}
+.search:focus-visible{outline:2px solid var(--teal);outline-offset:1px}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{
+  border:1px solid var(--line);background:var(--card);color:var(--ink-2);
+  padding:6px 13px;border-radius:999px;cursor:pointer;font-family:inherit;
+  font-size:13px;transition:background .13s,border-color .13s,color .13s
+}
+.chip:hover{border-color:var(--teal)}
+.chip:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.chip[aria-pressed="true"]{background:var(--teal);border-color:var(--teal);color:#fff}
+:root[data-theme="dark"] .chip[aria-pressed="true"],
+:root:not([data-theme="light"]) .chip[aria-pressed="true"]{color:#0C1A1C}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]) .chip[aria-pressed="true"]{color:#fff}
+}
+.count{font-size:13px;color:var(--muted);margin-inline-start:auto;white-space:nowrap;
+  font-variant-numeric:tabular-nums}
+
+/* ── الجدول ───────────────────────────────────────────── */
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;
+  background:var(--card);box-shadow:var(--shadow)}
+table{border-collapse:collapse;width:100%;min-width:660px}
+thead th{
+  position:sticky;top:0;z-index:2;background:var(--card);
+  text-align:start;font-family:"Readex Pro",sans-serif;font-weight:500;
+  font-size:12.5px;letter-spacing:.03em;color:var(--muted);
+  padding:13px 16px;border-bottom:1px solid var(--line);white-space:nowrap
+}
+tbody td{padding:14px 16px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover td{background:var(--paper)}
+td.page{font-weight:500;min-width:190px}
+td.dept{color:var(--ink-2);white-space:nowrap;font-size:14px}
+td.chg{color:var(--ink-2);font-size:14px;line-height:1.65;max-width:56ch}
+.tag{
+  display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;
+  padding:2px 7px;border-radius:5px;margin-inline-end:8px;vertical-align:1px;
+  letter-spacing:.04em
+}
+tr[data-k="new"]     td.page{box-shadow:inset -3px 0 0 var(--k-new)}
+tr[data-k="fixed"]   td.page{box-shadow:inset -3px 0 0 var(--k-fix)}
+tr[data-k="renamed"] td.page{box-shadow:inset -3px 0 0 var(--k-ren)}
+tr[data-k="hidden"]  td.page{box-shadow:inset -3px 0 0 var(--k-hid)}
+tr[data-k="linked"]  td.page{box-shadow:inset -3px 0 0 var(--k-lnk)}
+.tag[data-k="new"]    {background:var(--k-new-bg);color:var(--k-new)}
+.tag[data-k="fixed"]  {background:var(--k-fix-bg);color:var(--k-fix)}
+.tag[data-k="renamed"]{background:var(--k-ren-bg);color:var(--k-ren)}
+.tag[data-k="hidden"] {background:var(--k-hid-bg);color:var(--k-hid)}
+.tag[data-k="linked"] {background:var(--k-lnk-bg);color:var(--k-lnk)}
+.empty{padding:44px 16px;text-align:center;color:var(--muted)}
+
+footer{margin-top:30px;font-size:12.5px;color:var(--muted);
+  border-top:1px solid var(--line);padding-top:16px;max-width:78ch}
+footer code{font-family:"IBM Plex Mono",monospace;font-size:12px;
+  background:var(--line-soft);padding:1px 6px;border-radius:4px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<header>
+  <p class="eyebrow">REPAIR01 · W01 — W09</p>
+  <h1>ما تغيَّر في الشاشاتِ والسايدبار</h1>
+  <p class="lede">
+    ستٌّ وسبعون تغييرًا مقيسًا من السجلِّ الحيِّ بين <strong>٢٣ أغسطس</strong> و<strong>٢٦ أغسطس ٢٠٢٦</strong>.
+    كلُّ صفٍّ هنا مصدرُه جدولٌ في القاعدةِ لا سردٌ في وثيقة.
+  </p>
+</header>
+
+<div class="rail" id="rail"></div>
+
+<p class="note">
+  ما سبق ٢٣ أغسطس ليس من هذه الحملةِ ولا يُعَدُّ فيها. سجلُّ إخفاءِ السايدبار
+  وحدَه يحمل ١١٥ صفًّا سابقًا من حملةٍ أخرى، وضمُّها هنا كان سيضاعف الرقمَ بلا وجه.
+</p>
+
+<section class="waves">
+  <h2>التوزيع على الموجات</h2>
+  <div class="wavebar" id="wavebar"></div>
+</section>
+
+<div class="tools">
+  <input class="search" id="q" type="search" placeholder="ابحث في اسم الصفحة أو الإدارة أو التغيير" aria-label="بحث">
+  <div class="chips" id="chips"></div>
+  <span class="count" id="count"></span>
+</div>
+
+<section class="tablewrap">
+  <table>
+    <thead><tr><th>اسم الصفحة</th><th>الإدارة</th><th>التغيير</th></tr></thead>
+    <tbody id="tb"></tbody>
+  </table>
+</section>
+
+<footer>
+  مولَّدٌ من <code>tools/repair01_change_report.php</code> — يقرأ
+  <code>repair01_screen_registry</code> و<code>nav_canonical</code> و<code>gov_nav_hidden_log</code>
+  و<code>repair01_w{8,9}_fixes</code>. أعِدْ تشغيلَه بعد كلِّ موجةٍ ليبقى الرقمُ حيًّا.
+</footer>
+</div>
+
+<script>
+const ROWS = [{"p":"إسناد الأصل وحركته","d":"إدارة الأسطول","c":"شاشة جديدة بنيت في الموجة W05 وربطت بمجموعة دورة حركة الأصل","w":"W05","k":"new"},{"p":"خروج الأصل","d":"إدارة الأسطول","c":"شاشة جديدة بنيت في الموجة W05 وربطت بمجموعة دورة خروج الأصل","w":"W05","k":"new"},{"p":"طلب إدخال الأصل","d":"إدارة الأسطول","c":"شاشة جديدة بنيت في الموجة W05 وربطت بمجموعة دورة دخول الأصل","w":"W05","k":"new"},{"p":"الجاهزية والملخص الشهري","d":"إدارة الأسطول","c":"شاشة جديدة بنيت في الموجة W05 وربطت بمجموعة الرقابة الفنية على الأصل","w":"W05","k":"new"},{"p":"حق الاستخدام التشغيلي","d":"إدارة الأسطول","c":"شاشة جديدة بنيت في الموجة W05 وربطت بمجموعة دورة دخول الأصل","w":"W05","k":"new"},{"p":"لوحة الاحتياج والتغطية","d":"القوى التشغيلية","c":"شاشة جديدة بنيت في الموجة W05 وربطت بمجموعة الاحتياج والتغطية","w":"W05","k":"new"},{"p":"استقبال البلاغات الفنية","d":"إدارة الصيانة","c":"شاشة جديدة بنيت في الموجة W07 وربطت بمجموعة دورة العطل","w":"W07","k":"new"},{"p":"العناية اليومية والتشحيم","d":"إدارة الصيانة","c":"شاشة جديدة بنيت في الموجة W07 وربطت بمجموعة الوقائية","w":"W07","k":"new"},{"p":"الإصلاح الخارجي ومطالبات الضمان","d":"إدارة الصيانة","c":"شاشة جديدة بنيت في الموجة W07 وربطت بمجموعة دورة العطل","w":"W07","k":"new"},{"p":"مؤشرات الصيانة الدورية","d":"إدارة الصيانة","c":"شاشة جديدة بنيت في الموجة W07 وربطت بمجموعة التقارير","w":"W07","k":"new"},{"p":"طلبات صرف القطع","d":"إدارة الصيانة","c":"شاشة جديدة بنيت في الموجة W07 وربطت بمجموعة دورة العطل","w":"W07","k":"new"},{"p":"سجل إعادة الإصلاح","d":"إدارة الصيانة","c":"شاشة جديدة بنيت في الموجة W07 وربطت بمجموعة الإقفال والجاهزية","w":"W07","k":"new"},{"p":"إقفال أمر الترحيل","d":"النقل والترحيل","c":"شاشة جديدة بنيت في الموجة W07 وربطت بمجموعة الإقفال والتكلفة","w":"W07","k":"new"},{"p":"مطالبات التلف والحوادث","d":"النقل والترحيل","c":"شاشة جديدة بنيت في الموجة W07 وربطت بمجموعة دورة الترحيل","w":"W07","k":"new"},{"p":"تقرير أوامر الترحيل","d":"النقل والترحيل","c":"شاشة جديدة بنيت في الموجة W07 وربطت بمجموعة الإقفال والتكلفة","w":"W07","k":"new"},{"p":"تجهيز المغادرة والتسليم الأصلي","d":"النقل والترحيل","c":"شاشة جديدة بنيت في الموجة W07 وربطت بمجموعة دورة الترحيل","w":"W07","k":"new"},{"p":"مراحل الرحلة","d":"النقل والترحيل","c":"شاشة جديدة بنيت في الموجة W07 وربطت بمجموعة دورة الترحيل","w":"W07","k":"new"},{"p":"محضر المقارنة والترسية","d":"إدارة المشتريات التشغيلية","c":"شاشة جديدة بنيت في الموجة W09 وربطت بمجموعة العروض والترسية","w":"W09","k":"new"},{"p":"متابعة التوريد والاستلام","d":"إدارة المشتريات التشغيلية","c":"شاشة جديدة بنيت في الموجة W09 وربطت بمجموعة الأمر والتوريد","w":"W09","k":"new"},{"p":"عروض الموردين المستلمة","d":"إدارة المشتريات التشغيلية","c":"شاشة جديدة بنيت في الموجة W09 وربطت بمجموعة العروض والترسية","w":"W09","k":"new"},{"p":"تجميع الطلبات وخطة الشراء","d":"إدارة المشتريات التشغيلية","c":"شاشة جديدة بنيت في الموجة W09 وربطت بمجموعة الطلب والتجميع","w":"W09","k":"new"},{"p":"استثناءات الشراء وتعديلات الأوامر","d":"إدارة المشتريات التشغيلية","c":"شاشة جديدة بنيت في الموجة W09 وربطت بمجموعة الأمر والتوريد","w":"W09","k":"new"},{"p":"طلب العروض ودعوات الموردين","d":"إدارة المشتريات التشغيلية","c":"شاشة جديدة بنيت في الموجة W09 وربطت بمجموعة العروض والترسية","w":"W09","k":"new"},{"p":"تقييم أداء التوريد","d":"إدارة المشتريات التشغيلية","c":"شاشة جديدة بنيت في الموجة W09 وربطت بمجموعة المطابقة والإقفال","w":"W09","k":"new"},{"p":"ضوابط المواد الخطرة والمتفجرات","d":"إدارة المخازن","c":"شاشة جديدة بنيت في الموجة W09 وربطت بمجموعة دورة الاستلام","w":"W09","k":"new"},{"p":"طلبات الصرف الواردة","d":"إدارة المخازن","c":"شاشة جديدة بنيت في الموجة W09 وربطت بمجموعة دورة الصرف","w":"W09","k":"new"},{"p":"الإقفال الشهري للمخازن","d":"إدارة المخازن","c":"شاشة جديدة بنيت في الموجة W09 وربطت بمجموعة الرقابة والإقفال","w":"W09","k":"new"},{"p":"سجل المخازن وأنواعها","d":"إدارة المخازن","c":"سطح قائم ربط بالسجل المعياري لاول مرة فصار له اسم ومجموعة وترتيب","w":"W09","k":"linked"},{"p":"ما ينتظر اعتمادي","d":"الحوكمة والالتزام","c":"اعادة تسمية سجلت في الموجة W06 والاسم السابق إضافاتُ المالك","w":"W06","k":"renamed"},{"p":"سجل المطالبات والتسليم للمالية","d":"المبيعات والعقود","c":"اعادة تسمية سجلت في الموجة W06 والاسم السابق المستخلصات","w":"W06","k":"renamed"},{"p":"سجل عقود المشاريع","d":"المبيعات والعقود","c":"اعادة تسمية سجلت في الموجة W06 والاسم السابق عقود العملاء","w":"W06","k":"renamed"},{"p":"الجزاءات والحوافز التعاقدية","d":"المبيعات والعقود","c":"اعادة تسمية سجلت في الموجة W06 والاسم السابق احتساب الجزاءات والحوافز","w":"W06","k":"renamed"},{"p":"شروط تعديل السعر","d":"المبيعات والعقود","c":"اعادة تسمية سجلت في الموجة W06 والاسم السابق شروط تعديل السعر","w":"W06","k":"renamed"},{"p":"مطابقة بيانات العميل","d":"المبيعات والعقود","c":"اعادة تسمية سجلت في الموجة W06 والاسم السابق إضافاتُ المالك","w":"W06","k":"renamed"},{"p":"كشف التايم شيت للعميل","d":"المبيعات والعقود","c":"اعادة تسمية سجلت في الموجة W06 والاسم السابق إضافاتُ المالك","w":"W06","k":"renamed"},{"p":"ميزانية الإدارة المالية","d":"المالية والخزينة","c":"اعادة تسمية سجلت في الموجة W06 والاسم السابق ميزانية إدارتي \/ الميزانية والانحراف","w":"W06","k":"renamed"},{"p":"ذمم الموردين والمستحقات","d":"المالية والخزينة","c":"اعادة تسمية سجلت في الموجة W06 والاسم السابق ذمم الموردين والمستحقات","w":"W06","k":"renamed"},{"p":"انحرافات التمويل في السداد والملكية والتوثيق","d":"التمويل والملكية","c":"اعادة تسمية سجلت في الموجة W06 والاسم السابق انحرافات التمويل — السداد والملكية والتوثيق","w":"W06","k":"renamed"},{"p":"حصص الملكية في الأصول","d":"التمويل والملكية","c":"اعادة تسمية سجلت في الموجة W06 والاسم السابق ملّاك الأسطول \/ حصص الملكية في الأصول","w":"W06","k":"renamed"},{"p":"تصنيف قواعد المنع للالتزام والامتثال","d":"الحوكمة والالتزام","c":"اعادة تسمية سجلت في الموجة W06 والاسم السابق تصنيف قواعد المنع","w":"W06","k":"renamed"},{"p":"لوحة الدور الشخصية","d":"مساحة العمل الشخصية","c":"اعادة تسمية سجلت في الموجة W06 والاسم السابق الرئيسية","w":"W06","k":"renamed"},{"p":"التقارير والتحليلات الشخصية","d":"مساحة العمل الشخصية","c":"اعادة تسمية سجلت في الموجة W06 والاسم السابق الرئيسية","w":"W06","k":"renamed"},{"p":"إسناد المعدات للوحدات","d":"إدارة التشغيل","c":"اعادة تسمية سجلت في الموجة W06 والاسم السابق الوحدات التعاقدية المرقَّمة","w":"W06","k":"renamed"},{"p":"لوحة المشتريات","d":"إدارة المشتريات التشغيلية","c":"اعادة تسمية سجلت في الموجة W06 والاسم السابق لوحة الإدارة","w":"W06","k":"renamed"},{"p":"لوحة المستودعات","d":"إدارة المشتريات التشغيلية","c":"اعادة تسمية سجلت في الموجة W06 والاسم السابق لوحة الإدارة","w":"W06","k":"renamed"},{"p":"تصنيف قواعد المنع للظهور وضبط البوابة","d":"الحوكمة والالتزام","c":"اعادة تسمية سجلت في الموجة W06 والاسم السابق تصنيف قواعد المنع","w":"W06","k":"renamed"},{"p":"خطة معدات المورد المتعهد بها","d":"إدارة الموردين","c":"اعادة تسمية سجلت في الموجة W06 والاسم السابق نعطيه حصتَهحصتُه من عقدِ العميلِ ثم توزيعُها على معداته","w":"W06","k":"renamed"},{"p":"الترشيح ومراجعة التعاقد","d":"إدارة الموردين","c":"اعادة تسمية سجلت في الموجة W06 والاسم السابق —","w":"W06","k":"renamed"},{"p":"تسليم الحصص بين الموردين","d":"إدارة الموردين","c":"اعادة تسمية سجلت في الموجة W06 والاسم السابق تسليمُ الحصص بين الموردين","w":"W06","k":"renamed"},{"p":"البيانات المرجعية ومصادر القدرة","d":"إدارة الموردين","c":"اعادة تسمية سجلت في الموجة W06 والاسم السابق طاقة المورد وجاهزيته ومهلة الإحلال","w":"W06","k":"renamed"},{"p":"تصفية إنهاء عقد مورد","d":"إدارة الموردين","c":"اعادة تسمية سجلت في الموجة W06 والاسم السابق تصفية إنهاء عقد مورد \/ تصفية إنهاء عقد المورد","w":"W06","k":"renamed"},{"p":"قواعد التحميل والجزاءات على المورد","d":"إدارة الموردين","c":"اعادة تسمية سجلت في الموجة W06 والاسم السابق قواعد التحميل والجزاءات على المورد","w":"W06","k":"renamed"},{"p":"اعتماد الوحدات والأداء المعتمد","d":"إدارة الموردين","c":"اعادة تسمية سجلت في الموجة W06 والاسم السابق إضافاتُ المالك","w":"W06","k":"renamed"},{"p":"حوكمة تسجيل التايم شيت والإنتاج","d":"الحوكمة والالتزام","c":"اعادة تسمية سجلت في الموجة W06 والاسم السابق تسجيل الوحدات \/ تسجيل التايم شيت والإنتاج","w":"W06","k":"renamed"},{"p":"سجل العقود الموحد","d":"مكتب الرئيس التنفيذي والنواب","c":"اعادة تسمية سجلت في الموجة W06 والاسم السابق سجل العقود الموحّد","w":"W06","k":"renamed"},{"p":"الترشيح ومراجعة التعاقد","d":"إدارة الموردين","c":"بند سايدبار عطل بعذر مكتوب في السجل والسبب QUICK_TILE ومرجع الوثيقة owner:2026-08-23:role2_q","w":"W02","k":"hidden"},{"p":"التسويات وكشف الحساب","d":"المالية والخزينة","c":"بند سايدبار عطل بعذر مكتوب في السجل والسبب QUICK_TILE ومرجع الوثيقة owner:2026-08-23:role2_q","w":"W02","k":"hidden"},{"p":"سجل الحصص والتغطية التعاقدية","d":"المالية والخزينة","c":"بند سايدبار عطل بعذر مكتوب في السجل والسبب QUICK_TILE ومرجع الوثيقة owner:2026-08-23:role2_q","w":"W02","k":"hidden"},{"p":"سجل الموردين","d":"إدارة الموردين","c":"بند سايدبار عطل بعذر مكتوب في السجل والسبب QUICK_TILE ومرجع الوثيقة owner:2026-08-23:role2_q","w":"W02","k":"hidden"},{"p":"سجل عقود الموردين","d":"إدارة الموردين","c":"بند سايدبار عطل بعذر مكتوب في السجل والسبب QUICK_TILE ومرجع الوثيقة owner:2026-08-23:role2_q","w":"W02","k":"hidden"},{"p":"اعتماد الوحدات والأداء المعتمد","d":"إدارة الموردين","c":"بند سايدبار عطل بعذر مكتوب في السجل والسبب QUICK_TILE ومرجع الوثيقة owner:2026-08-23:role2_q","w":"W02","k":"hidden"},{"p":"وثائق المعدات والمشغّلين","d":"إدارة الأسطول","c":"بند سايدبار عطل بعذر مكتوب في السجل والسبب NOT_RENDERED ومرجع الوثيقة RPR-W03","w":"W03","k":"hidden"},{"p":"وثائق المعدات والمشغّلين","d":"إدارة الأسطول","c":"بند سايدبار عطل بعذر مكتوب في السجل والسبب TAB_IN_PARENT ومرجع الوثيقة RPR-W03","w":"W03","k":"hidden"},{"p":"مصدر المعدة ونمط تملّكها","d":"إدارة الأسطول","c":"بند سايدبار عطل بعذر مكتوب في السجل والسبب NOT_RENDERED ومرجع الوثيقة RPR-W03","w":"W03","k":"hidden"},{"p":"مصدر المعدة ونمط تملّكها","d":"إدارة الأسطول","c":"بند سايدبار عطل بعذر مكتوب في السجل والسبب TAB_IN_PARENT ومرجع الوثيقة RPR-W03","w":"W03","k":"hidden"},{"p":"مصدر المعدة ونمط تملّكها","d":"غير مسندة","c":"بند سايدبار عطل بعذر مكتوب في السجل والسبب TAB_IN_PARENT ومرجع الوثيقة RPR-W03","w":"W03","k":"hidden"},{"p":"مصدر المعدة ونمط تملّكها","d":"غير مسندة","c":"بند سايدبار عطل بعذر مكتوب في السجل والسبب NOT_RENDERED ومرجع الوثيقة RPR-W03","w":"W03","k":"hidden"},{"p":"الجرد ومعالجة الفروقات","d":"إدارة المخازن","c":"شاشة قائمة اصلحت في W09 والكاشف WH-15 والعمل وصل شاشة الجرد بجلسة الجرد وبنودها — كانت تستعلم proc_item و proc_warehouse وحدهما وتكتب تسوية مباشرة في الحركات","w":"W09","k":"fixed"},{"p":"التحويل بين المخازن","d":"إدارة المخازن","c":"شاشة قائمة اصلحت في W09 والكاشف WH-13 والعمل وصل شاشة التحويل بامر التحويل وبنوده — كانت تكتب في proc_stock_move مباشرة","w":"W09","k":"fixed"},{"p":"أرصدة المخزون بحالاتها","d":"إدارة المشتريات التشغيلية","c":"شاشة قائمة اصلحت في W09 والكاشف WH-06 والعمل وصل شاشة الارصدة ببعد الحالة","w":"W09","k":"fixed"},{"p":"مطابقة الفاتورة بالأمر والاستلام","d":"إدارة المشتريات التشغيلية","c":"شاشة قائمة اصلحت في W09 والكاشف PRC-15 والعمل وصل شاشة المطابقة بسجل المطابقة الثلاثية","w":"W09","k":"fixed"},{"p":"لوحة المستودعات","d":"إدارة المشتريات التشغيلية","c":"شاشة قائمة اصلحت في W09 والكاشف WH-01 والعمل وصل لوحة المخازن بحركة المخزن نفسها","w":"W09","k":"fixed"},{"p":"الاستلام المؤقت","d":"إدارة المشتريات التشغيلية","c":"شاشة قائمة اصلحت في W09 والكاشف WH-12 والعمل وصل شاشة العهد بدفتر العهد proc_custody — كانت تقرا سند الاستلام من المورد وحده","w":"W09","k":"fixed"},{"p":"return_to_service.php","d":"غير مسندة","c":"شاشة قائمة اصلحت في W07 والكاشف MNT-14 والعطب كانت ميتة تستعلم عمودا لا وجود له فتقول لا اوامر منجزة دائما","w":"W07","k":"fixed"},{"p":"تصاريح المسار والحمولة","d":"النقل والترحيل","c":"شاشة قائمة اصلحت في W07 والكاشف TRP-05 والعطب كانت تعرض مخزنا غير الذي يمنع المغادرة فالتصريح المنتهي يعرض ساريا","w":"W07","k":"fixed"},{"p":"متابعة الرحلات في الطريق","d":"النقل والترحيل","c":"شاشة قائمة اصلحت في W07 والكاشف TRP-07 والعطب وصلت بمراحل الرحلة الجديدة","w":"W07","k":"fixed"}];
+
+const KINDS = {
+  new:     'شاشة جديدة',
+  fixed:   'شاشة أصلحت',
+  renamed: 'إعادة تسمية',
+  hidden:  'بند عطل',
+  linked:  'ربط بالسجل'
+};
+const KIND_ORDER = ['new','fixed','renamed','hidden','linked'];
+
+/* شريطُ الأرقام */
+const counts = {};
+ROWS.forEach(r => counts[r.k] = (counts[r.k] || 0) + 1);
+document.getElementById('rail').innerHTML =
+  KIND_ORDER.filter(k => counts[k]).map(k =>
+    `<div class="stat" data-k="${k}"><span class="n">${counts[k]}</span><span class="l">${KINDS[k]}</span></div>`
+  ).join('') +
+  `<div class="stat is-total"><span class="n">${ROWS.length}</span><span class="l">مجموع التغييرات</span></div>`;
+
+/* شريطُ الموجات — العرضُ بالنسبةِ لأنّ التسلسلَ زمنيٌّ حقيقيّ */
+const waves = {};
+ROWS.forEach(r => waves[r.w] = (waves[r.w] || 0) + 1);
+const wk = Object.keys(waves).sort();
+const wmax = Math.max(...wk.map(w => waves[w]));
+document.getElementById('wavebar').innerHTML = wk.map(w => `
+  <div class="wv">
+    <div class="top"><span class="id">${w}</span><span class="n">${waves[w]}</span></div>
+    <div class="fill"><i style="width:${Math.round(waves[w] / wmax * 100)}%"></i></div>
+  </div>`).join('');
+
+/* الترشيح */
+let active = null;
+const chips = document.getElementById('chips');
+chips.innerHTML = KIND_ORDER.filter(k => counts[k]).map(k =>
+  `<button class="chip" data-k="${k}" aria-pressed="false">${KINDS[k]}</button>`
+).join('');
+
+const tb = document.getElementById('tb');
+const q  = document.getElementById('q');
+const cn = document.getElementById('count');
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function render(){
+  const term = q.value.trim();
+  const list = ROWS.filter(r =>
+    (!active || r.k === active) &&
+    (!term || (r.p + ' ' + r.d + ' ' + r.c + ' ' + r.w).includes(term))
+  );
+  cn.textContent = list.length === ROWS.length
+    ? `${ROWS.length} تغييرًا`
+    : `${list.length} من ${ROWS.length}`;
+  tb.innerHTML = list.length ? list.map(r => `
+    <tr data-k="${r.k}">
+      <td class="page">${esc(r.p)}</td>
+      <td class="dept">${esc(r.d)}</td>
+      <td class="chg"><span class="tag" data-k="${r.k}">${r.w}</span>${esc(r.c)}</td>
+    </tr>`).join('')
+    : `<tr><td class="empty" colspan="3">لا تغيير يطابق هذا الترشيح</td></tr>`;
+}
+
+chips.addEventListener('click', e => {
+  const b = e.target.closest('.chip'); if (!b) return;
+  active = (active === b.dataset.k) ? null : b.dataset.k;
+  chips.querySelectorAll('.chip').forEach(c =>
+    c.setAttribute('aria-pressed', String(c.dataset.k === active)));
+  render();
+});
+q.addEventListener('input', render);
+render();
+</script>
