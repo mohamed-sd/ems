@@ -406,12 +406,31 @@ $ownChk = repair01_w13_check_exists($conn, 'hr_disciplinary_case', 'chk_hrdc_own
 $iafChk = repair01_w13_check_exists($conn, 'hr_disciplinary_case', 'chk_hrdc_iaf');
 $structOpen = (int) $one("SELECT COUNT(*) FROM repair01_decisions
                            WHERE blocker_type = 'STRUCTURAL' AND status = 'NEEDS_OWNER_DECISION'");
-gate('W13-22', 'جوابُ DEC-OPEN-16 مكتوبٌ ومطبَّقٌ بثلاثِ إداراتٍ وتكليفٍ موثَّق',
+/* ⚠ **الرسوُّ كان على كلمةٍ في نصٍّ حُرّ** — كان يشترط ورودَ `IAF` و`DEP-08`
+     حرفًا في `owner_decision`. وهذا يقلب المعادلةَ: **يصير نصُّ المالكِ مطالَبًا
+     بأن يطابق الكاشف** بدل أن يقيس الكاشفُ ما نفَّذَته الشيفرة. ووقع فعلًا:
+     أمرُ المالكِ المكتوب 2026-08-26 حسم المسألةَ بثلاثِ إداراتٍ **ولم يكتب
+     الرمزَ اللاتينيَّ `IAF`** — فأحمرَّ الحاجبُ على جوابٍ صحيح.
+   ◆ **فالرسوُّ صار على المخطَّطِ نفسِه**: نصُّ قيدِ القاعدةِ يُقرأ من
+     `information_schema` ويُشترط أن يحصر المالكَ في الثلاثة. وهذا يقيس
+     **ما يُنفَّذ** لا ما يُكتب.
+   ◆ **وشرطٌ ثالثٌ من أمرِ المالك (البند 11)**: `OWNER_APPROVED` لا يُقبَل بلا
+     **مرجعِ جوابٍ بدليل** — ومرجعٌ يشير إلى موضعِ السؤالِ في المصنَّفِ ليس
+     جوابًا. وغيابُ هذا الشرطِ هو ما سمح بأن يُكتب قرارٌ نيابةً عن المالك. */
+$ownClause = (string) $one("SELECT CHECK_CLAUSE FROM information_schema.CHECK_CONSTRAINTS
+                             WHERE CONSTRAINT_SCHEMA = DATABASE()
+                               AND CONSTRAINT_NAME = 'chk_hrdc_owner'");
+$threeDept = (mb_strpos($ownClause, 'DEP-07') !== false
+           && mb_strpos($ownClause, 'DEP-08') !== false
+           && mb_strpos($ownClause, 'IAF') !== false);
+$d16Ref = $d16 ? (string) $one("SELECT src_ref FROM repair01_decisions WHERE decision_id = 'DEC-OPEN-16'") : '';
+$refOk  = ($d16Ref !== '' && !preg_match('~^\d+\s*›~u', $d16Ref));
+gate('W13-22', 'جوابُ DEC-OPEN-16 بمرجعٍ يُثبته ومطبَّقٌ بثلاثِ إداراتٍ وتكليفٍ موثَّق',
      $d16 && (string) $d16['status'] === 'APPROVED' && (string) $d16['blocking_level'] === 'NONE'
-     && mb_strpos((string) $d16['owner_decision'], 'DEP-08') !== false
-     && mb_strpos((string) $d16['owner_decision'], 'IAF') !== false && $ownChk && $iafChk,
+     && $refOk && $threeDept && $ownChk && $iafChk,
      'الحالة ' . ($d16 ? $d16['status'] : 'مفقود')
-     . ' · قيدُ الإداراتِ الثلاث ' . ($ownChk ? 'حيّ' : 'مفقود')
+     . ' · مرجعٌ يسمّي الجوابَ ' . ($refOk ? 'نعم' : 'لا — يشير إلى موضعِ السؤال')
+     . ' · قيدُ الإداراتِ الثلاث ' . ($threeDept ? 'يحصرها' : 'لا يحصرها')
      . ' · قيدُ تكليفِ المراجعةِ الداخلية ' . ($iafChk ? 'حيّ' : 'مفقود')
      . " · حاجبٌ بنيويٌّ مفتوحٌ بعده $structOpen");
 

@@ -119,6 +119,7 @@ $thKey     = 'TKT_ESCALATION_MAX_LEVEL';
 $thWhy     = (string) $one("SELECT why FROM repair01_w13_thresholds WHERE threshold_key = '$thKey'");
 $d05Status = (string) $one("SELECT status FROM repair01_decisions WHERE decision_id = 'DEC-OPEN-05'");
 $d16Ans    = (string) $one("SELECT owner_decision FROM repair01_decisions WHERE decision_id = 'DEC-OPEN-16'");
+$d16Ref = (string) $one("SELECT src_ref FROM repair01_decisions WHERE decision_id = 'DEC-OPEN-16'");
 $decWhy    = (string) $one("SELECT rationale FROM repair01_w13_decisions WHERE decision_id = 'W13-D-01'");
 $d06Rows   = (int) $one("SELECT scope_rows FROM repair01_w13_decisions WHERE decision_id = 'W13-D-06'");
 $d11Rows   = (int) $one("SELECT scope_rows FROM repair01_w13_decisions WHERE decision_id = 'W13-D-11'");
@@ -243,10 +244,16 @@ $CASES = array(
         "UPDATE repair01_w13_thresholds SET decision_ref = 'DEC-OPEN-05'
            WHERE threshold_key = 'TKT_VERIFY_WINDOW_CRITICAL_H'"),
 
-    array('W13-22', 'نزعُ ذكرِ المراجعةِ الداخليةِ من جوابِ ملكيّةِ التحقيقات',
-        "UPDATE repair01_decisions SET owner_decision = 'التحقيق عند الموارد البشرية وحدها'
+    /* ⚠ **زاويةُ الكسرِ نُقلت**: كانت تنزع كلمةً من النصِّ الحُرّ — وهي زاويةٌ
+         لم يعد الحاجبُ يرسو عليها بعدَ أن صار يقرأ **قيدَ القاعدةِ والمرجع**.
+         وكسرٌ من زاويةٍ لا يحرسها الحاجبُ **يقرأ عمًى لم يقع**.
+       ◆ **فالكسرُ صار يصيب العطبَ الحقيقيَّ نفسَه**: يُعاد المرجعُ إلى الإشارةِ
+         إلى **موضعِ السؤالِ** في المصنَّفِ — وهو الحالُ الذي كان عليه الصفُّ
+         حين كُتب قرارٌ نيابةً عن المالك. */
+    array('W13-22', 'إرجاعُ مرجعِ القرارِ إلى موضعِ السؤالِ بدلَ الجواب',
+        "UPDATE repair01_decisions SET src_ref = '09 › OWNER_DECISIONS_MASTER › ص110'
            WHERE decision_id = 'DEC-OPEN-16'",
-        "UPDATE repair01_decisions SET owner_decision = '" . $esc($d16Ans) . "'
+        "UPDATE repair01_decisions SET src_ref = '" . $esc($d16Ref) . "'
            WHERE decision_id = 'DEC-OPEN-16'"),
 
     /* ⚠ **وحمولةُ الكسرِ تُصمَّم على القيدِ القائمِ لا عليه**: `ck_deduction_src`
