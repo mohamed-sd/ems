@@ -1,0 +1,365 @@
+[
+    {
+        "no": 1,
+        "title": "سجل الموردين",
+        "group": "التأسيس",
+        "verdict": "EXACT",
+        "target": "Suppliers\/suppliers.php",
+        "why": "الاسمُ المعياريُّ مطابقٌ حرفًا",
+        "score": 100
+    },
+    {
+        "no": 2,
+        "title": "جهات الاتصال والمفوضون",
+        "group": "التأسيس",
+        "verdict": "EXACT",
+        "target": "Suppliers\/supplier_contacts.php",
+        "why": "الاسمُ المعياريُّ مطابقٌ حرفًا",
+        "score": 100
+    },
+    {
+        "no": 3,
+        "title": "التأهيل القانوني والائتماني",
+        "group": "التأسيس",
+        "verdict": "BUILD",
+        "target": "",
+        "targetLabel": "",
+        "why": "اسم 0% · حبّة 50% · جداول 0%",
+        "score": 15
+    },
+    {
+        "no": 4,
+        "title": "معدات المورد المتاحة — Equipment Pool",
+        "group": "التأسيس",
+        "verdict": "DOUBT",
+        "target": "Suppliers\/equipment_plan.php",
+        "targetLabel": "خطة معدات المورد المتعهد بها",
+        "why": "اسم 29% · حبّة 50% · جداول 0%",
+        "score": 31
+    },
+    {
+        "no": 5,
+        "title": "احتياجات التغطية",
+        "group": "التعاقد",
+        "verdict": "BUILD",
+        "target": "",
+        "targetLabel": "",
+        "why": "اسم 0% · حبّة 25% · جداول 0%",
+        "score": 8
+    },
+    {
+        "no": 6,
+        "title": "الترشيح ومراجعة التعاقد",
+        "group": "التعاقد",
+        "verdict": "EXACT",
+        "target": "Suppliers\/rfq_requests.php",
+        "why": "الاسمُ المعياريُّ مطابقٌ حرفًا",
+        "score": 100
+    },
+    {
+        "no": 7,
+        "title": "عروض الموردين والتفاوض",
+        "group": "التعاقد",
+        "verdict": "BUILD",
+        "target": "",
+        "targetLabel": "",
+        "why": "اسم 20% · حبّة 40% · جداول 0%",
+        "score": 23
+    },
+    {
+        "no": 8,
+        "title": "سجل عقود الموردين",
+        "group": "التعاقد",
+        "verdict": "EXACT",
+        "target": "Suppliers\/supplierscontracts.php",
+        "why": "الاسمُ المعياريُّ مطابقٌ حرفًا",
+        "score": 100
+    },
+    {
+        "no": 9,
+        "title": "بنود عقود الموردين",
+        "group": "التعاقد",
+        "verdict": "EXACT",
+        "target": "Suppliers\/supplier_contract_lines.php",
+        "why": "الاسمُ المعياريُّ مطابقٌ حرفًا",
+        "score": 100
+    },
+    {
+        "no": 10,
+        "title": "مصفوفة المسؤوليات والتكاليف",
+        "group": "التعاقد",
+        "verdict": "BUILD",
+        "target": "",
+        "targetLabel": "",
+        "why": "اسم 0% · حبّة 33% · جداول 0%",
+        "score": 10
+    },
+    {
+        "no": 11,
+        "title": "الخانات المكافئة وتوزيع الحصص",
+        "group": "التشغيل",
+        "verdict": "BUILD",
+        "target": "",
+        "targetLabel": "",
+        "why": "اسم 17% · حبّة 14% · جداول 0%",
+        "score": 13
+    },
+    {
+        "no": 12,
+        "title": "حصص الموردين والوحدات التعاقدية",
+        "group": "التشغيل",
+        "verdict": "BUILD",
+        "target": "",
+        "targetLabel": "",
+        "why": "اسم 40% · حبّة 0% · جداول 0%",
+        "score": 22
+    },
+    {
+        "no": 13,
+        "title": "سجل تسليم الخانات",
+        "group": "التشغيل",
+        "verdict": "BUILD",
+        "target": "",
+        "targetLabel": "",
+        "why": "اسم 20% · حبّة 14% · جداول 0%",
+        "score": 15
+    },
+    {
+        "no": 14,
+        "title": "توزيع الوحدات التعاقدية على المعدات",
+        "group": "التشغيل",
+        "verdict": "BUILD",
+        "target": "",
+        "targetLabel": "",
+        "why": "اسم 0% · حبّة 80% · جداول 0%",
+        "score": 24
+    },
+    {
+        "no": 15,
+        "title": "الجاهزية والإحلال والاحتياط",
+        "group": "التشغيل",
+        "verdict": "BUILD",
+        "target": "",
+        "targetLabel": "",
+        "why": "اسم 0% · حبّة 29% · جداول 0%",
+        "score": 9
+    },
+    {
+        "no": 16,
+        "title": "مستهدفات الموردين",
+        "group": "التشغيل",
+        "verdict": "BUILD",
+        "target": "",
+        "targetLabel": "",
+        "why": "اسم 25% · حبّة 50% · جداول 0%",
+        "score": 29
+    },
+    {
+        "no": 17,
+        "title": "الأداء والوحدات المعتمدة",
+        "group": "التشغيل",
+        "verdict": "REUSE",
+        "target": "Suppliers\/unit_statement_supplier.php",
+        "targetLabel": "اعتماد الوحدات والأداء المعتمد",
+        "why": "اسم 75% · حبّة 80% · جداول 0%",
+        "score": 65
+    },
+    {
+        "no": 18,
+        "title": "قياس التغطية والعجز والفائض",
+        "group": "التشغيل",
+        "verdict": "BUILD",
+        "target": "",
+        "targetLabel": "",
+        "why": "اسم 0% · حبّة 43% · جداول 0%",
+        "score": 13
+    },
+    {
+        "no": 19,
+        "title": "النيابية والسلف والخصومات",
+        "group": "المالية",
+        "verdict": "BUILD",
+        "target": "",
+        "targetLabel": "",
+        "why": "اسم 0% · حبّة 40% · جداول 0%",
+        "score": 12
+    },
+    {
+        "no": 20,
+        "title": "استحقاقات الموردين",
+        "group": "المالية",
+        "verdict": "DOUBT",
+        "target": "Suppliers\/supplier_advances.php",
+        "targetLabel": "سلفيات الموردين",
+        "why": "اسم 33% · حبّة 40% · جداول 0%",
+        "score": 30
+    },
+    {
+        "no": 21,
+        "title": "الإقفال التعاقدي للوحدات التعاقدية",
+        "group": "المالية",
+        "verdict": "BUILD",
+        "target": "",
+        "targetLabel": "",
+        "why": "اسم 0% · حبّة 71% · جداول 0%",
+        "score": 21
+    },
+    {
+        "no": 22,
+        "title": "التسويات وكشف الحساب",
+        "group": "المالية",
+        "verdict": "BUILD",
+        "target": "",
+        "targetLabel": "",
+        "why": "اسم 20% · حبّة 33% · جداول 0%",
+        "score": 21
+    },
+    {
+        "no": 23,
+        "title": "طلبات الدفع وحالة الصرف",
+        "group": "المالية",
+        "verdict": "BUILD",
+        "target": "",
+        "targetLabel": "",
+        "why": "اسم 0% · حبّة 67% · جداول 0%",
+        "score": 20
+    },
+    {
+        "no": 24,
+        "title": "تخصيص الدفع على الإقفالات",
+        "group": "المالية",
+        "verdict": "BUILD",
+        "target": "",
+        "targetLabel": "",
+        "why": "اسم 0% · حبّة 50% · جداول 0%",
+        "score": 15
+    },
+    {
+        "no": 25,
+        "title": "أعمار الأرصدة والالتزامات",
+        "group": "المالية",
+        "verdict": "BUILD",
+        "target": "",
+        "targetLabel": "",
+        "why": "اسم 0% · حبّة 50% · جداول 0%",
+        "score": 15
+    },
+    {
+        "no": 26,
+        "title": "المخالفات والجزاءات",
+        "group": "الحوكمة",
+        "verdict": "EXACT",
+        "target": "Suppliers\/supplier_violations.php",
+        "why": "الاسمُ المعياريُّ مطابقٌ حرفًا",
+        "score": 100
+    },
+    {
+        "no": 27,
+        "title": "تقييم المورد والأداء",
+        "group": "الحوكمة",
+        "verdict": "REUSE",
+        "target": "Suppliers\/supplier_evaluation.php",
+        "targetLabel": "تقييم المورد الدوري",
+        "why": "اسم 50% · حبّة 50% · جداول 0%",
+        "score": 43
+    },
+    {
+        "no": 28,
+        "title": "الملاحق والتصفية والإغلاق",
+        "group": "الحوكمة",
+        "verdict": "BUILD",
+        "target": "",
+        "targetLabel": "",
+        "why": "اسم 17% · حبّة 40% · جداول 0%",
+        "score": 21
+    },
+    {
+        "no": 29,
+        "title": "مصادر القدرة والتكامل",
+        "group": "الحوكمة",
+        "verdict": "DOUBT",
+        "target": "Suppliers\/supplier_capacity.php",
+        "targetLabel": "البيانات المرجعية ومصادر القدرة",
+        "why": "اسم 40% · حبّة 40% · جداول 0%",
+        "score": 34
+    },
+    {
+        "no": 30,
+        "title": "لوحة إدارة الموردين",
+        "group": "اللوحة — خارج الدورة",
+        "verdict": "EXACT",
+        "target": "Suppliers\/supplier_board.php",
+        "why": "الاسمُ المعياريُّ مطابقٌ حرفًا",
+        "score": 100
+    },
+    {
+        "no": 31,
+        "title": "القوائم المرجعية",
+        "group": "المرجعيات",
+        "verdict": "BUILD",
+        "target": "",
+        "targetLabel": "",
+        "why": "اسم 20% · حبّة 25% · جداول 0%",
+        "score": 19
+    },
+    {
+        "no": 32,
+        "title": "سجل المستندات والضمانات",
+        "group": "المرجعيات",
+        "verdict": "BUILD",
+        "target": "",
+        "targetLabel": "",
+        "why": "اسم 0% · حبّة 67% · جداول 0%",
+        "score": 20
+    },
+    {
+        "no": 33,
+        "title": "قاموس قواعد الاستنتاج",
+        "group": "المرجعيات",
+        "verdict": "BUILD",
+        "target": "",
+        "targetLabel": "",
+        "why": "اسم 0% · حبّة 67% · جداول 0%",
+        "score": 20
+    },
+    {
+        "no": 34,
+        "title": "القاموس وخريطة الترحيل",
+        "group": "المرجعيات",
+        "verdict": "BUILD",
+        "target": "",
+        "targetLabel": "",
+        "why": "اسم 0% · حبّة 33% · جداول 0%",
+        "score": 10
+    },
+    {
+        "no": 35,
+        "title": "تتبع التعبئة والترحيل",
+        "group": "المرجعيات",
+        "verdict": "BUILD",
+        "target": "",
+        "targetLabel": "",
+        "why": "اسم 0% · حبّة 50% · جداول 0%",
+        "score": 15
+    },
+    {
+        "no": 36,
+        "title": "خريطة الترحيل",
+        "group": "المرجعيات",
+        "verdict": "BUILD",
+        "target": "",
+        "targetLabel": "",
+        "why": "اسم 0% · حبّة 50% · جداول 0%",
+        "score": 15
+    },
+    {
+        "no": 37,
+        "title": "تقرير المراجعة والقبول",
+        "group": "المرجعيات",
+        "verdict": "BUILD",
+        "target": "",
+        "targetLabel": "",
+        "why": "اسم 0% · حبّة 25% · جداول 0%",
+        "score": 8
+    }
+]
