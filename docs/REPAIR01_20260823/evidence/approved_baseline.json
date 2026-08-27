@@ -1,6 +1,6 @@
 {
     "meaning": "قرارٌ اعتُمد مرّةً لا يعود منتظِرًا — سقّاطةُ مجموعةٍ لا عدّ",
-    "count": 95,
+    "count": 96,
     "approved": [
         "DEC-ACC-01",
         "DEC-ACC-02",
@@ -47,6 +47,7 @@
         "DEC-OPEN-12",
         "DEC-OPEN-15",
         "DEC-OPEN-16",
+        "DEC-OPEN-17",
         "DEC-OPEN-18",
         "DEC-OPS-01",
         "DEC-ORG-01",
