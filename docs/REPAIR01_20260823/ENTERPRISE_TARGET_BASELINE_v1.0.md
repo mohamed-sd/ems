@@ -6,15 +6,15 @@
 
 | الحقل | القيمة |
 |---|---|
-| `Baseline ID` | `ETB-c8dc29a7-20260827-005212` |
+| `Baseline ID` | `ETB-f8b6da6a-20260827-010731` |
 | `Version` | `ENTERPRISE-TARGET-BASELINE-v1.0` |
 | **`State`** | **`ISSUED_AWAITING_OWNER`** |
 | `Snapshot ID` | `SNAP-02224261-20260827-145545` |
-| `Commit Hash` | `c8dc29a766acf8868fc9706a64afd79a56c4194d` |
+| `Commit Hash` | `f8b6da6ab5a24d3dabb6ae943a2a808955d66f3d` |
 | الطبقاتُ العابرة | 8 من 8 |
 | حكمُ المراجعةِ المستقلّة | `CONCERN` (`REDESIGN` 0 · `CONCERN` 1) |
 | `Owner Stamp` | **لم يُختَم بعد — وهو قرارُ المالك** |
-| `Issued At` | 2026-08-27 03:52:12 |
+| `Issued At` | 2026-08-27 04:07:31 |
 
 **لماذا هذه الحالة:** الثمانية عبرت والمراجعة المستقلة بلا REDESIGN - والاعتماد ختم مالك لا نتيجة اداة · والقبول البشري محور تاسع لم يعبره انسان بعد فلا يعلن مقبولا
 
