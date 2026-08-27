@@ -959,6 +959,57 @@ class TenantRegistry
         'hr_disciplinary_case' => array('type' => self::T_TENANT, 'soft' => false),
         'hr_disciplinary_stage' => array('type' => self::T_TENANT, 'soft' => false),
         'hr_benefit_enrollment' => array('type' => self::T_TENANT, 'soft' => false),
+        // ── REPAIR01 · W14 (هجرة 2027_12_03): ثلاثة نطاقات لا محرك واحد ──
+        // كل جدول هنا يحمل company_id غير قابل للعدم (قرار المالك الاول:
+        // Multi Entity by Design) فتصنيفه T_TENANT لا T_CHILD - العزل بعموده هو.
+        // والانحراف مملوك لادارته التشغيلية والرقابة تقرؤه بمرجعه لا تنسخه.
+        'ctl_classification_rule' => array('type' => self::T_TENANT, 'soft' => false),
+        'ctl_deviation' => array('type' => self::T_TENANT, 'soft' => false),
+        // الحوكمة والالتزام - الخط الثاني (DEP-08)
+        'gov_policy' => array('type' => self::T_TENANT, 'soft' => false),
+        'gov_obligation' => array('type' => self::T_TENANT, 'soft' => false),
+        'gov_compliance_due' => array('type' => self::T_TENANT, 'soft' => false),
+        'gov_filing' => array('type' => self::T_TENANT, 'soft' => false),
+        'gov_conflict_disclosure' => array('type' => self::T_TENANT, 'soft' => false),
+        'gov_related_party' => array('type' => self::T_TENANT, 'soft' => false),
+        'gov_gift_disclosure' => array('type' => self::T_TENANT, 'soft' => false),
+        'gov_conduct_ack' => array('type' => self::T_TENANT, 'soft' => false),
+        'gov_sod_conflict' => array('type' => self::T_TENANT, 'soft' => false),
+        'gov_integrity_report' => array('type' => self::T_TENANT, 'soft' => false),
+        'gov_investigation' => array('type' => self::T_TENANT, 'soft' => false),
+        'gov_breach' => array('type' => self::T_TENANT, 'soft' => false),
+        'gov_corrective_action' => array('type' => self::T_TENANT, 'soft' => false),
+        'gov_audit_followup' => array('type' => self::T_TENANT, 'soft' => false),
+        'gov_committee' => array('type' => self::T_TENANT, 'soft' => false),
+        'gov_request_type' => array('type' => self::T_TENANT, 'soft' => false),
+        // ادارة المخاطر - الخط الثاني المستقل (DEP-09)
+        'rsk_taxonomy' => array('type' => self::T_TENANT, 'soft' => false),
+        'rsk_trigger' => array('type' => self::T_TENANT, 'soft' => false),
+        'rsk_event' => array('type' => self::T_TENANT, 'soft' => false),
+        'rsk_closure' => array('type' => self::T_TENANT, 'soft' => false),
+        // المراجعة الداخلية - الخط الثالث المستقل (IAF)
+        'iaf_program' => array('type' => self::T_TENANT, 'soft' => false),
+        'iaf_evidence_request' => array('type' => self::T_TENANT, 'soft' => false),
+        'iaf_sample' => array('type' => self::T_TENANT, 'soft' => false),
+        'iaf_function_risk' => array('type' => self::T_TENANT, 'soft' => false),
+        // ── وعائلة المراجعة الداخلية القائمة كانت خارج السجل كلها (W14-F-14) ──
+        // احد عشر جدولا حيا لكل منها company_id غير قابل للعدم ولم يكن اي منها
+        // مسجلا، فكل كتابة فيها كانت تمر خارج بوابة العزل. والتسجيل اضافة لا
+        // تخفيف: النوع T_TENANT بعمودها هي، ولا يمس صف قائم.
+        'iaf_charter' => array('type' => self::T_TENANT, 'soft' => false),
+        'iaf_universe' => array('type' => self::T_TENANT, 'soft' => false),
+        'iaf_plan' => array('type' => self::T_TENANT, 'soft' => false),
+        'iaf_independence' => array('type' => self::T_TENANT, 'soft' => false),
+        'iaf_engagements' => array('type' => self::T_TENANT, 'soft' => false),
+        'iaf_workpapers' => array('type' => self::T_TENANT, 'soft' => false),
+        'iaf_findings' => array('type' => self::T_TENANT, 'soft' => false),
+        'iaf_access_log' => array('type' => self::T_TENANT, 'soft' => false),
+        'iaf_quality_reviews' => array('type' => self::T_TENANT, 'soft' => false),
+        'iaf_authorities' => array('type' => self::T_TENANT, 'soft' => false),
+        'iaf_competencies' => array('type' => self::T_TENANT, 'soft' => false),
+        // ── وسلاليم الاعتماد كذلك: تقرأ في محرك الاعتماد وتعرض في سطح W14 ──
+        'gov_ladders' => array('type' => self::T_TENANT, 'soft' => false),
+        'gov_ladder_steps' => array('type' => self::T_TENANT, 'soft' => false),
     );
 
     /** تعريف جدولٍ أو null إن لم يكن مسجَّلًا. */

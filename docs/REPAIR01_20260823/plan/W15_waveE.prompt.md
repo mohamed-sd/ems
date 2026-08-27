@@ -57,7 +57,7 @@ php tools/_uxw_probe.php "SELECT requirement_id,unit,surface,grain,source_of_tru
 > الأرقامُ مقيسةٌ لحظةَ التوليد. أعِدْ `php tools/repair01_plan_gen.php` إن مرّ وقتٌ طويل.
 
 ## ٣-ب · حاجبٌ على هذه المرحلة
-- **DEC-OPEN-17** — ⛔ **مفتوحٌ ويمنع فتحَ البوّابة** · `Blocker_Type = STRUCTURAL`
+- **DEC-OPEN-17** — ✔ حُسم — تابعْ · `Blocker_Type = STRUCTURAL`
   - السؤال: من يملك Entity Routing Registry وكتالوج أنواع الطلب؟
   - الأثر: مالكُ Entity Routing Registry يحدّد بنيةَ «طلباتي» — مساحةُ العمل تعتمد عليه
   - الأسطحُ المتأثّرة: ت02-0 · س04
