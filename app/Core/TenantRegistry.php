@@ -97,6 +97,12 @@ class TenantRegistry
         'scr_workshop' => array('type' => self::T_TENANT, 'soft' => false),
         'ems_processed_events' => array('type' => self::T_GLOBAL, 'soft' => false),
         'exec_approvals' => array('type' => self::T_TENANT, 'soft' => false),
+        /* RPR-W15 — عائلتانِ من مكتبِ الرئيسِ كانتا **خارجَ السجلِّ** والمخطَّطُ
+           يضمن فيهما `company_id` غيرَ قابلٍ للعدم: أي أنَّ المخطَّطَ كان يضمن ما
+           لم يكن السجلُّ يعرفه، فلا تُقرآنِ عبرَ البوّابةِ أصلًا. **والتسجيلُ
+           إضافةٌ لا تخفيف** — بعمودِهما هما ولا يُمَسُّ صفٌّ قائم. */
+        'exec_assignments' => array('type' => self::T_TENANT, 'soft' => false),
+        'exec_audit_reports' => array('type' => self::T_TENANT, 'soft' => false),
         'exec_board_snapshots' => array('type' => self::T_TENANT, 'soft' => false),
         'exec_contract_signings' => array('type' => self::T_TENANT, 'soft' => false),
         'exec_decisions' => array('type' => self::T_TENANT, 'soft' => false),
@@ -981,6 +987,12 @@ class TenantRegistry
         'gov_corrective_action' => array('type' => self::T_TENANT, 'soft' => false),
         'gov_audit_followup' => array('type' => self::T_TENANT, 'soft' => false),
         'gov_committee' => array('type' => self::T_TENANT, 'soft' => false),
+        /* RPR-W15 — سجلّا السلطةِ والتفويضِ يحملانِ `company_id` غيرَ قابلٍ للعدمِ
+           في المخطَّطِ وكانا **خارجَ السجلّ**: المخطَّطُ يضمن ما لم يكن السجلُّ
+           يعرفه، فلا يُقرآنِ عبرَ البوّابةِ أصلًا — وهما مصدرا حسمِ السلطة.
+           ⛔ **والتسجيلُ إضافةٌ لا تخفيف** ولا يُمَسُّ صفٌّ قائم. */
+        'gov_authority_limits' => array('type' => self::T_TENANT, 'soft' => false),
+        'gov_delegations' => array('type' => self::T_TENANT, 'soft' => false),
         'gov_request_type' => array('type' => self::T_TENANT, 'soft' => false),
         // ادارة المخاطر - الخط الثاني المستقل (DEP-09)
         'rsk_taxonomy' => array('type' => self::T_TENANT, 'soft' => false),

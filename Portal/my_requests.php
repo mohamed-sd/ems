@@ -32,7 +32,44 @@ if (!$is_super_admin && empty($__pp['can_view'])) {
 /* ── الأفعال ─────────────────────────────────────────────────────────────── */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $act = (string) ($_POST['action'] ?? '');
+
+    /* ══ RPR-W15 · «مساحةُ عملي Launcher + Projection ولا تصير Owner» ═════════
+         نصُّ قرارِ المالكِ الثالثِ حرفًا. وكان هذا السطحُ **يخزّن حقيقةَ الطلبِ
+         عندَه** في مخزنٍ عامٍّ، فيكسر مصدرَ الحقيقة: طلبُ الإجازةِ ليس عند
+         الموارد، وطلبُ الصيانةِ ليس عند الصيانة.
+         ◆ والآن: كلُّ نوعٍ **نافذٍ في السجلِّ المركزيِّ** `gov_request_type`
+           يُطلَق بـ`RequestLauncher` **فيُنشَأ عند مالكِه** بخدمةِ مالكِه —
+           والحالةُ تُعرَض إسقاطًا بمرجعٍ حيّ.
+         ⛔ **ولا يُقبل النوعُ المسجَّلُ في المخزنِ العامّ** بعد اليوم؛ وما فيه
+           من صفوفٍ سابقةٍ **دَينٌ معدودٌ** في `Enterprise Debt Closure`. */
+    if ($act === 'rq_launch') {
+        require_once __DIR__ . '/../app/Services/Workspace/RequestLauncher.php';
+        $__payload = isset($_POST['payload']) && is_array($_POST['payload']) ? $_POST['payload'] : array();
+        $__res = \App\Services\Workspace\RequestLauncher::launch(
+            $conn,
+            array('id' => $uid, 'company_id' => $company_id,
+                  'role' => strval($_SESSION['user']['role'] ?? ''),
+                  'gate' => ems_tenant_db()),
+            (string) ($_POST['type_code'] ?? ''),
+            $__payload
+        );
+        $msg = $__res['verdict'] === \App\Services\Workspace\RequestLauncher::OK
+            ? ('أنشئ الطلب عند إدارته المالكة')
+            : ($__res['why'] . ' ❌');
+        ems_gov_flash_redirect('my_requests.php', $msg, 'GOV-INFO-200', '');
+        exit();
+    }
+
     if ($act === 'rq_submit') {
+        /* النوعُ المسجَّلُ في السجلِّ المركزيِّ يُطلَق ولا يُخزَّن هنا. */
+        require_once __DIR__ . '/../app/Services/Workspace/RequestLauncher.php';
+        $__t = \App\Services\Workspace\RequestLauncher::type(
+            ems_tenant_db(), $company_id, (string) ($_POST['type_code'] ?? ''));
+        if ($__t !== null && (string) $__t['state'] === 'active') {
+            ems_gov_flash_redirect('my_requests.php',
+                'هذا النوع ينشأ عند إدارته المالكة ولا يخزن هنا', 'GOV-FAIL-409', '');
+            exit();
+        }
         $r = RQ::submit($conn, array(
             'company_id' => $company_id ?: intval($_POST['company_id'] ?? 0),
             'request_type_code' => (string) ($_POST['type_code'] ?? ''),
@@ -65,6 +102,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ems_gov_flash_redirect('my_requests.php', $msg, 'GOV-INFO-200', '');
     exit();
 }
+
+/* ══ RPR-W15 · الإسقاطُ الحيُّ لطلباتِ صاحبِ الحساب ══════════════════════════
+     مروحةُ دخولٍ على جداولِ المُلّاكِ بعمودِ صاحبِ الطلبِ المسجَّلِ في السجلِّ
+     المركزيّ — ⛔ **ولا نسخةَ محلّيّةً ولا فهرسَ مخزَّن**. وتعديلُ الحالةِ عند
+     المالكِ ينعكس هنا في القراءةِ التالية بلا مزامنة. */
+require_once __DIR__ . '/../app/Services/Workspace/RequestLauncher.php';
+$w15Catalogue = array();
+$w15Projected = array();
+try {
+    $w15Gate = ems_tenant_db();
+    if ($is_super_admin && $company_id <= 0) { $w15Gate = $w15Gate->forAllTenants('w15 my requests super view'); }
+    $w15Catalogue = \App\Services\Workspace\RequestLauncher::catalogue($w15Gate, $company_id);
+    $w15Projected = \App\Services\Workspace\RequestLauncher::projection(
+        $conn, $w15Gate,
+        array('id' => $uid, 'company_id' => $company_id,
+              'role' => strval($_SESSION['user']['role'] ?? '')));
+} catch (\Throwable $t) { error_log('w15 my_requests projection: ' . $t->getMessage()); }
 
 /* ── القراءة: طلباتي + ما ينتظر معالجتي ─────────────────────────────────── */
 $types = array();
@@ -171,6 +225,57 @@ include '../insidebar.php';
                 <div class="mrq-step"><span class="badge <?php echo $s['ok'] ? 'bg-success' : 'bg-danger'; ?>"><?php echo $i + 1; ?></span>
                     <strong><?php echo htmlspecialchars($s['q']); ?></strong> — <?php echo htmlspecialchars($s['a']); ?></div>
             <?php endforeach; ?>
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <?php /* ══ RPR-W15 · إطلاقُ طلبٍ يملك النطاقُ تعريفَه ═══════════════════
+             النوعُ من السجلِّ المركزيّ، والسجلُّ يُنشأ **عند إدارتِه المالكة**،
+             وهذه الشاشةُ تعرض حالتَه ولا تخزّنها. */ ?>
+    <?php if ($w15Catalogue): ?>
+    <div class="card mrq-card">
+        <div class="card-header"><strong><i class="fas fa-paper-plane"></i> إطلاق طلب ينشأ عند إدارته المالكة</strong></div>
+        <div class="card-body">
+            <form method="post" class="mrq-newform">
+                <?= csrf_field() ?>
+                <input type="hidden" name="action" value="rq_launch">
+                <div class="mrq-w280"><label class="mrq-lbl" for="w15_type">نوع الطلب</label>
+                    <select name="type_code" class="form-control" required id="w15_type">
+                        <option value="">— اختر —</option>
+                        <?php foreach ($w15Catalogue as $t): ?>
+                        <option value="<?php echo htmlspecialchars($t['type_code']); ?>">
+                            <?php echo htmlspecialchars($t['name_ar']); ?></option>
+                        <?php endforeach; ?>
+                    </select></div>
+                <div class="mrq-f1"><label class="mrq-lbl" for="w15_note">التفاصيل</label>
+                    <input name="payload[description]" class="form-control" maxlength="500" id="w15_note"></div>
+                <div class="mrq-f1"><label class="mrq-lbl" for="w15_from">من تاريخ</label>
+                    <input type="date" name="payload[date_from]" class="form-control" id="w15_from"></div>
+                <div class="mrq-f1"><label class="mrq-lbl" for="w15_to">إلى تاريخ</label>
+                    <input type="date" name="payload[date_to]" class="form-control" id="w15_to"></div>
+                <button class="btn btn-primary"><i class="fas fa-paper-plane"></i> إطلاق</button>
+            </form>
+            <div class="mrq-hint">الطلب ينشأ في سجل الإدارة المالكة وحالته تعرض هنا كما هي عندها.</div>
+        </div>
+    </div>
+
+    <div class="card mrq-card">
+        <div class="card-header"><strong><i class="fas fa-list"></i> طلباتي عند إداراتها (<?php echo count($w15Projected); ?>)</strong></div>
+        <div class="card-body">
+            <div class="table-wrap"><table class="data-table mrq-table">
+                <thead><tr><th>النوع</th><th>الإدارة المالكة</th><th>الرقم عند مالكه</th><th>الحالة</th><th>التاريخ</th></tr></thead>
+                <tbody>
+                <?php foreach ($w15Projected as $p): ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($p['type_name']); ?></td>
+                        <td><?php echo htmlspecialchars($p['owner_dept']); ?></td>
+                        <td><?php echo (int) $p['row_id']; ?></td>
+                        <td><?php echo htmlspecialchars($p['state']); ?></td>
+                        <td><?php echo htmlspecialchars($p['created_at']); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table></div>
         </div>
     </div>
     <?php endif; ?>

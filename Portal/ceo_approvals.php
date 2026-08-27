@@ -15,6 +15,7 @@ if (!isset($_SESSION['user'])) {
 }
 include '../config.php';
 require_once '../includes/permissions_helper.php';
+require_once __DIR__ . '/../includes/w15_view.php';
 
 // ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
 // كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
@@ -151,9 +152,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 'decide') {
     $goBack = function ($m) { ems_gov_flash_redirect(basename(__FILE__), $m, 'GOV-INFO-200', ''); exit(); };
     $actorRole = strval($_SESSION['user']['role'] ?? '');
-    if (!$is_super_admin && $actorRole !== '9') {
-        ems_gov_flash_redirect('../main/dashboard.php', 'الاعتماد الأعلى قرار الإدارة التنفيذية وحدها ❌', 'GOV-PERM-403', 'اطلب المنحة من مدير الصلاحيات إن كانت ضمن عملك');
-    }
     $rowId    = intval($_POST['row'] ?? 0);
     $decision = trim((string) ($_POST['decision'] ?? ''));
     $reason   = trim((string) ($_POST['reason'] ?? ''));
@@ -185,11 +183,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
         'اعتماد تنفيذي ' . (string) ($row['request_no'] ?? ('#' . $rowId)), $company_id);
     if ($__sa !== null) { $goBack($__sa['reason']); }
 
+    /* ══ RPR-W15 · «القرارُ يمرُّ بمحرّكِ الاعتمادِ نفسِه» (‏قيدُ المالك §٢) ═══
+         كان الحارسُ هنا **رقمَ دورٍ مكتوبًا في الشيفرة** (`role !== '9'`)،
+         وكان `authority_ref` **عبارةً مخترَعةً** حين يخلو الصفُّ منها.
+         ◆ والآن السلطةُ تُحسَم من سجلِّها بالسلسلةِ كاملةً — قاعدةُ السلطةِ
+           ثمّ مصفوفةُ الاعتمادِ بالقيمة — والمرجعُ **رمزُ القاعدةِ التي
+           أجازت** لا عبارةٌ عامّة. ⛔ **ولا رقمَ دورٍ ولا رقمَ عتبةٍ في شيفرة.**
+         ◆ **وحارسُ اعتمادِ الذاتِ يبقى فوقَه** ولا يُستبدَل به. */
+    require_once __DIR__ . '/../app/Services/Exec/ExecDecisionRouter.php';
+    $__actor = array('id' => $uid, 'company_id' => $company_id, 'role' => $actorRole);
+    $__route = \App\Services\Exec\ExecDecisionRouter::route($conn, $__actor, array(
+        'action_key'    => 'exec_financial_approval',
+        'owner_service' => 'Portal/ceo_approvals.php',
+        'state'         => (string) ($row['status'] ?? ''),
+        'prepared_by'   => (int) ($row['created_by'] ?? 0),
+        'amount'        => isset($row['amount']) ? $row['amount'] : null,
+        'event_type'    => 'any',
+    ));
+    if (!$is_super_admin && $__route['verdict'] !== \App\Services\Exec\ExecDecisionRouter::ROUTED) {
+        ems_gov_flash_redirect('../main/dashboard.php',
+            'لا سلطة لهذا القرار — ' . ($__route['why'] !== '' ? $__route['why'] : $__route['verdict']) . ' ❌',
+            'GOV-PERM-403', 'اطلب المنحة من مدير الصلاحيات إن كانت ضمن عملك');
+        exit();
+    }
+
     $actorName = (trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid)) . ' (الإدارة التنفيذية)';
     $decisionReason = ($reason !== '') ? $reason : ($decision === 'اعتماد' ? 'اعتماد مطلق' : (string) ($row['decision_reason'] ?? ''));
     if ($decision === 'تأجيل') { $decisionReason = trim('مؤجل إلى ' . $until . ($reason !== '' ? ' — ' . $reason : '')); }
     $decisionDate = date('Y-m-d');
-    $authorityRef = trim((string) ($row['authority_ref'] ?? '')) !== '' ? (string) $row['authority_ref'] : 'سلطة أصلية';
+    $authorityRef = trim((string) ($row['authority_ref'] ?? '')) !== ''
+        ? (string) $row['authority_ref']
+        : (string) $__route['authority_rule'];
     $newStatus = $OPTS[$decision];
 
     // التأجيلُ يبقي أعمدةَ القرار فارغةً (يُعاد بتُّه لاحقًا) — وقادحُ القاعدة
@@ -358,7 +382,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     foreach ($rows as $r) {
         if (in_array((string) $r['status'], array('مسودة', 'قيد المراجعة', 'مؤجل'), true)) { $decidable[] = $r; }
     }
-    $canDecide = $is_super_admin || strval($_SESSION['user']['role'] ?? '') === '9';
+    /* RPR-W15: ظهورُ زرِّ الفعلِ من سجلِّ السلطةِ لا من رقمِ دورٍ مكتوب —
+       والواجهةُ لا تعرض ما يردُّه الخادم. (قيدُ المالك §٤) */
+    $canDecide = $is_super_admin || w15_may($conn, array('id' => $uid,
+        'company_id' => $company_id, 'role' => strval($_SESSION['user']['role'] ?? '')),
+        'exec_financial_approval');
     if ($canDecide && $decidable): ?>
     <form method="post" action="" class="allforms allforms-visible" id="cmp03DecideForm">
         <?= csrf_field() ?>

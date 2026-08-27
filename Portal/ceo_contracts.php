@@ -16,6 +16,7 @@ if (!isset($_SESSION['user'])) {
 }
 include '../config.php';
 require_once '../includes/permissions_helper.php';
+require_once __DIR__ . '/../includes/w15_view.php';
 
 // ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
 // كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
@@ -169,15 +170,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
  * موحَّد · حاوية · التزامٌ بالمروحة) ويُنشر ContractSigned من نقطة الخنق. */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 'sign') {
     $goBack = function ($m) { ems_gov_flash_redirect(basename(__FILE__), $m, 'GOV-INFO-200', ''); exit(); };
+    /* ══ RPR-W15 · السلطةُ من سجلِّها لا من رقمِ دورٍ مكتوب (‏قيدُ المالك §٢·§٤)
+         كان الحارسُ `role !== '9'` والمرجعُ الافتراضيُّ عبارةً مخترَعة.
+         والآن يُحسمانِ من محرّكِ الاعتمادِ نفسِه — ⛔ ولا رقمَ دورٍ في شيفرة. */
+    require_once __DIR__ . '/../app/Services/Exec/ExecDecisionRouter.php';
     $actorRole = strval($_SESSION['user']['role'] ?? '');
-    if (!$is_super_admin && $actorRole !== '9') {
-        ems_gov_flash_redirect('../main/dashboard.php', 'التوقيع على العقود قرار الإدارة التنفيذية وحدها — BR-CEO-01 ❌', 'GOV-PERM-403', 'اطلب المنحة من مدير الصلاحيات إن كانت ضمن عملك');
-    }
     $rowId = intval($_POST['row'] ?? 0);
     $authorityRef = trim((string) ($_POST['authority_ref'] ?? ''));
     $linkContract = intval($_POST['link_contract'] ?? 0);
     if ($rowId <= 0) { $goBack('اختر صفا للتوقيع ❌'); }
-    if ($authorityRef === '') { $authorityRef = 'سلطة أصلية'; }
+
+    $__actor = array('id' => $uid, 'company_id' => $company_id, 'role' => $actorRole);
+    $__route = \App\Services\Exec\ExecDecisionRouter::route($conn, $__actor, array(
+        'action_key'    => 'exec_contract_signing',
+        'owner_service' => 'Portal/ceo_contracts.php',
+        'state'         => '',
+        'prepared_by'   => 0,
+    ));
+    if (!$is_super_admin && $__route['verdict'] !== \App\Services\Exec\ExecDecisionRouter::ROUTED) {
+        ems_gov_flash_redirect('../main/dashboard.php',
+            'لا سلطة للتوقيع — ' . ($__route['why'] !== '' ? $__route['why'] : $__route['verdict']) . ' ❌',
+            'GOV-PERM-403', 'اطلب المنحة من مدير الصلاحيات إن كانت ضمن عملك');
+        exit();
+    }
+    if ($authorityRef === '') { $authorityRef = (string) $__route['authority_rule']; }
 
     $st = $conn->prepare("SELECT * FROM exec_contract_signings WHERE id = ?"
         . ($is_super_admin && $company_id <= 0 ? '' : ' AND company_id = ?'));
@@ -448,7 +464,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     foreach ($rows as $r) {
         if ($r['signing_date'] === null && !in_array((string) $r['status'], array('ملغي', 'موقوف'), true)) { $signable[] = $r; }
     }
-    $canSign = $is_super_admin || strval($_SESSION['user']['role'] ?? '') === '9';
+    /* RPR-W15: ظهورُ زرِّ الفعلِ من سجلِّ السلطةِ لا من رقمِ دورٍ مكتوب —
+       والواجهةُ لا تعرض ما يردُّه الخادم. (قيدُ المالك §٤) */
+    $canSign = $is_super_admin || w15_may($conn, array('id' => $uid,
+        'company_id' => $company_id, 'role' => strval($_SESSION['user']['role'] ?? '')),
+        'exec_contract_signing');
     if ($canSign && $signable): ?>
     <form method="post" action="" class="allforms allforms-visible" id="cmp03SignForm">
         <?= csrf_field() ?>

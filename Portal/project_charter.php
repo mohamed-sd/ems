@@ -16,6 +16,7 @@ if (!isset($_SESSION['user'])) {
 }
 include '../config.php';
 require_once '../includes/permissions_helper.php';
+require_once __DIR__ . '/../includes/w15_view.php';
 
 // ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
 // كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
@@ -219,42 +220,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
     $sitesText = trim((string) ($row['sites_text'] ?? ''));
     $actorName = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
 
+    /* ══ RPR-W15 · «الرؤيةُ لا تساوي السلطة» (‏قيدُ المالك §٢) ═══════════════
+       كان هذا السطحُ **يكتب في ثلاثةِ جداولِ إداراتٍ مباشرةً** — `project`
+       و`fin_cost_centers` و`sites` — وهو عينُ ما نهى عنه المالك: «لا يُبنى في
+       مساحةِ القيادةِ زرُّ فعلٍ يكتب في جدولِ إدارةٍ مباشرةً».
+
+       ◆ والآن: **السلطةُ تُحسَم أوّلًا** بـ`ExecDecisionRouter` بالسلسلةِ
+         كاملةً (‏سلطةٌ ثمّ فصلُ واجباتٍ ثمّ حالة)، **ثمّ يُسلَّم التوليدُ
+         لخدمةِ مالكِه** `ProjectOpeningService` عند إدارةِ التشغيل.
+       ◆ **ولا قرارَ بلا مرجعِ سلطة** — والخدمةُ تردُّ بلا مرجع.
+       ⛔ ولا يُكتب من هنا صفٌّ في جدولِ إدارةٍ أخرى. */
+    require_once __DIR__ . '/../app/Services/Exec/ScopeEngine.php';
+    require_once __DIR__ . '/../app/Services/Exec/ExecDecisionRouter.php';
+    require_once __DIR__ . '/../app/Services/Operations/ProjectOpeningService.php';
+
+    $__actor = array('id' => $uid, 'company_id' => $rowCo,
+                     'role' => strval($_SESSION['user']['role'] ?? ''));
+    $__route = \App\Services\Exec\ExecDecisionRouter::route($conn, $__actor, array(
+        'action_key'    => 'project_charter_open',
+        'owner_service' => 'App\\Services\\Operations\\ProjectOpeningService::open',
+        'state'         => (string) ($row['status'] ?? ''),
+        'prepared_by'   => (int) ($row['created_by'] ?? 0),
+    ));
+    if ($__route['verdict'] !== \App\Services\Exec\ExecDecisionRouter::ROUTED) {
+        $goBack('لا يعتمد الفتح: ' . ($__route['why'] !== '' ? $__route['why'] : $__route['verdict']));
+    }
+
     $conn->begin_transaction();
     try {
-        // ① المشروع
-        $st = $conn->prepare("INSERT INTO project
-            (company_id, name, client, location, project_code, total, status, created_by)
-            VALUES (?, ?, ?, ?, ?, '0', 1, ?)");
-        $st->bind_param('issssi', $rowCo, $pname, $client, $sitesText, $row['decision_no'], $uid);
-        if (!$st->execute()) { throw new \RuntimeException('project: ' . $st->error); }
-        $projectId = (int) $conn->insert_id;
-        $st->close();
-
-        // ② مركز التكلفة — رمزُ القرار إن لم يُحدَّد رمزٌ سلفًا
-        $ccCode = trim((string) ($row['cost_center'] ?? '')) ?: ('CC-PRJ-' . $rowId);
-        $ccName = 'مركز تكلفة ' . $pname;
-        $st = $conn->prepare("INSERT INTO fin_cost_centers
-            (company_id, code, name, center_type, owner_module, level, active, created_by)
-            VALUES (?, ?, ?, 'cost', 'projects', 0, 1, ?)");
-        $st->bind_param('issi', $rowCo, $ccCode, $ccName, $uid);
-        if (!$st->execute()) { throw new \RuntimeException('cost_center: ' . $st->error); }
-        $ccId = (int) $conn->insert_id;
-        $st->close();
-
-        // ③ المواقع — من نص «الموقع أو المواقع» مفصولًا بالنقطة الوسيطة
-        $siteNames = array_values(array_filter(array_map('trim', preg_split('/[·,]+/u', $sitesText))));
-        if (!$siteNames) { $siteNames = array($pname); }
-        $st = $conn->prepare("INSERT INTO sites
-            (company_id, project_id, name, site_kind, status, is_default)
-            VALUES (?, ?, ?, 'site', 1, ?)");
-        $siteIds = array();
-        foreach ($siteNames as $k => $sn) {
-            $isDef = $k === 0 ? 1 : 0;
-            $st->bind_param('iisi', $rowCo, $projectId, $sn, $isDef);
-            if (!$st->execute()) { throw new \RuntimeException('site: ' . $st->error); }
-            $siteIds[] = (int) $conn->insert_id;
+        $__gate = ems_tenant_db();
+        $__res = \App\Services\Operations\ProjectOpeningService::open($__gate, array(
+            'company_id'       => $rowCo,
+            'project_name'     => $pname,
+            'client'           => $client,
+            'sites_text'       => $sitesText,
+            'project_code'     => (string) $row['decision_no'],
+            'cost_center_code' => trim((string) ($row['cost_center'] ?? '')) ?: ('CC-PRJ-' . $rowId),
+            'actor_id'         => $uid,
+            'authority_ref'    => $__route['authority_rule'],
+        ));
+        if ($__res['verdict'] !== \App\Services\Operations\ProjectOpeningService::OK) {
+            throw new \RuntimeException('owner service: ' . $__res['why']);
         }
-        $st->close();
+        $projectId = (int) $__res['project_id'];
+        $ccId      = (int) $__res['cost_center_id'];
+        $siteIds   = $__res['site_ids'];
+        $ccCode    = trim((string) ($row['cost_center'] ?? '')) ?: ('CC-PRJ-' . $rowId);
 
         // ⑤ القرار نفسه: مفتوحٌ بمرجعَي التوليد — ④ التعيينُ في عمودَي المدير
         // وصلاحياتِه (قائمان في الصف) والقادحُ يصونهما بعد الفتح
@@ -464,7 +475,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         }
         if ($complete) { $charterable[] = $r; }
     }
-    $canCharter = $is_super_admin || strval($_SESSION['user']['role'] ?? '') === '9';
+    /* RPR-W15: ظهورُ زرِّ الفعلِ من سجلِّ السلطةِ لا من رقمِ دورٍ مكتوب —
+       والواجهةُ لا تعرض ما يردُّه الخادم. (قيدُ المالك §٤) */
+    $canCharter = $is_super_admin || w15_may($conn, array('id' => $uid,
+        'company_id' => $company_id, 'role' => strval($_SESSION['user']['role'] ?? '')),
+        'project_charter_open');
     if ($canCharter && $charterable): ?>
     <form method="post" action="" class="allforms allforms-visible" id="cmp03CharterForm">
         <?= csrf_field() ?>

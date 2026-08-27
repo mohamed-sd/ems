@@ -297,4 +297,35 @@ class TicketRouter
         }
         return null;
     }
+
+    /**
+     * نقطةُ الإنشاءِ التي يناديها مُطلِقُ الطلبات (RPR-W15).
+     *
+     * ◆ **النطاقُ يملك تعريفَ طلبِه** (‏القرار ③): البلاغُ يُنشَأ **في سجلِّ
+     *   البلاغاتِ** `tickets` — و«طلباتي» تُطلِقه ولا تخزّنه.
+     * ◆ **والتوجيهُ والأولويّةُ والسرّيّةُ كلُّها من قواعدِ نطاقِ البلاغات** —
+     *   والمُطلِقُ لا يقرّر شيئًا منها.
+     */
+    public static function createFromLauncher(\mysqli $conn, array $ctx, array $payload)
+    {
+        $requester = isset($ctx['requester_id']) ? (int) $ctx['requester_id'] : 0;
+        if ($requester <= 0) { return array('ok' => false, 'row_id' => 0, 'why' => 'لا بلاغ بلا صاحب'); }
+
+        $res = self::create($conn, array(
+            'company_id'          => isset($ctx['company_id']) ? (int) $ctx['company_id'] : 0,
+            'type_code'           => isset($payload['type_code']) ? (string) $payload['type_code'] : '',
+            'ticket_type_id'      => isset($payload['ticket_type_id']) ? (int) $payload['ticket_type_id'] : 0,
+            'reporter_person_id'  => $requester,
+            'description'         => isset($payload['description']) ? (string) $payload['description'] : '',
+            'operational_summary' => isset($payload['operational_summary']) ? (string) $payload['operational_summary'] : '',
+            'priority'            => isset($payload['priority']) ? (string) $payload['priority'] : '',
+            'context'             => isset($payload['context']) && is_array($payload['context'])
+                                     ? $payload['context'] : array(),
+        ));
+        if (empty($res['ok'])) {
+            return array('ok' => false, 'row_id' => 0,
+                         'why' => isset($res['reason']) ? (string) $res['reason'] : 'ردته خدمة المالك');
+        }
+        return array('ok' => true, 'row_id' => (int) $res['tk_id'], 'why' => '');
+    }
 }

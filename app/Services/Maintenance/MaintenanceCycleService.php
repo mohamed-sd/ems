@@ -713,4 +713,41 @@ class MaintenanceCycleService
             ));
         } catch (\Throwable $t) { return null; }
     }
+
+    /**
+     * نقطةُ الإنشاءِ التي يناديها مُطلِقُ الطلبات (RPR-W15).
+     *
+     * ◆ **النطاقُ يملك تعريفَ طلبِه** (‏القرار ③): طلبُ الصيانةِ يُنشَأ **في
+     *   سجلِّ الصيانةِ** `mnt_breakdown` — و«طلباتي» تُطلِقه ولا تخزّنه.
+     * ◆ **والكتابةُ تقع هنا عند المالكِ** لا في المُطلِق، فحاجبُ «كتابةٌ من
+     *   مساحةِ الموجة» يبقى صفرًا وهو عينُ ما أمر به المالك.
+     */
+    public static function createFromLauncher(\mysqli $conn, array $ctx, array $payload)
+    {
+        $requester = isset($ctx['requester_id']) ? (int) $ctx['requester_id'] : 0;
+        $eq = isset($payload['equipment_id']) ? (int) $payload['equipment_id'] : 0;
+        if ($requester <= 0) { return array('ok' => false, 'row_id' => 0, 'why' => 'لا طلب بلا صاحب'); }
+        if ($eq <= 0) { return array('ok' => false, 'row_id' => 0, 'why' => 'لا طلب صيانة بلا معدة'); }
+
+        $gate = (isset($ctx['gate']) && $ctx['gate'] !== null) ? $ctx['gate'] : \ems_tenant_db();
+        $code = (isset($payload['code']) && trim((string) $payload['code']) !== '')
+            ? (string) $payload['code']
+            : ('WS-' . $requester . '-' . $eq . '-' . date('YmdHis'));
+        $res = self::receiveBreakdown($gate, array(
+            'code'            => $code,
+            'equipment_id'    => $eq,
+            'project_id'      => isset($payload['project_id']) ? (int) $payload['project_id'] : 0,
+            'reported_by'     => $requester,
+            'reporter_dept'   => isset($payload['reporter_dept']) ? (string) $payload['reporter_dept'] : '',
+            'report_datetime' => isset($payload['report_datetime']) ? (string) $payload['report_datetime'] : self::now(),
+            'severity'        => isset($payload['severity']) ? (string) $payload['severity'] : '',
+            'is_stopped'      => !empty($payload['is_stopped']) ? 1 : 0,
+            'description'     => isset($payload['description']) ? (string) $payload['description'] : '',
+        ));
+        if (empty($res['ok'])) {
+            return array('ok' => false, 'row_id' => 0,
+                         'why' => isset($res['reason']) ? (string) $res['reason'] : 'ردته خدمة المالك');
+        }
+        return array('ok' => true, 'row_id' => (int) $res['breakdown_id'], 'why' => '');
+    }
 }

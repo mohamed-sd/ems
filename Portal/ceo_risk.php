@@ -94,8 +94,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
          قرارَه «محسومًا» بنفسِه. والحقلُ في النموذجِ ليس حارسًا: الطلبُ يُصنَع
          بأداةٍ خارجَ المتصفح. فالحكمُ **في الخادم**، والرفضُ برمزٍ محكومٍ
          (`GOV-DECIDE-403`) لا برسالةٍ حرّة. */
+    /* ◆ RPR-W15: كان الحسمُ يُقاس بـ**رقمِ دورٍ مكتوبٍ في الشيفرة** (`=== '9'`).
+         والآن يُقاس بسلطةٍ مسجَّلةٍ في سجلِّها عبرَ محرّكِ الاعتمادِ نفسِه —
+         `Role + Scope` لا رقمٌ. ⛔ **ولا رقمَ دورٍ في شيفرة**، والحكمُ نفسُه
+         لا يتغيّر: من لا سلطةَ له لا يحسم. */
+    require_once __DIR__ . '/../includes/w15_view.php';
     $__DECISIVE = array('محسوم', 'معتمد', 'نافذ', 'مقفل');
-    $__mayDecide = $is_super_admin || strval($_SESSION['user']['role'] ?? '') === '9';
+    $__mayDecide = $is_super_admin
+        || w15_may($conn, array('id' => $uid, 'company_id' => $company_id,
+                                'role' => strval($_SESSION['user']['role'] ?? '')),
+                   'exec_decision_settle');
     if (!$__mayDecide && in_array($status, $__DECISIVE, true)) {
         require_once __DIR__ . '/../includes/audit_trail.php';
         ems_audit_change($conn, 'governance', 'exec_decisions', 'decide_refused', 0,

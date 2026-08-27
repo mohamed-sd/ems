@@ -108,25 +108,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
         exit();
     }
 
-    $creator = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
-    // الفارغ NULL من هنا لا NULLIF في SQL — خلطُ الترتيبات على اتصال الويب يرفضها
-    foreach ($in as $k => $v) { if ($v === '') { $in[$k] = null; } }
-    $st = $conn->prepare("INSERT INTO exec_board_snapshots
-        (company_id, period, active_contracts, portfolio_value, recognized_revenue,
-         collection, overdue_receivables, expected_cashflow, financing_commitments,
-         working_equipment, readiness_pct, approved_units, margin_pct,
-         open_risks, pending_approvals, last_updated, status, is_seed, created_by, created_by_name)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'معتمد', 0, ?, ?)");
-    $st->bind_param('isssssssssssssssis',
-        $company_id, $in['period'], $in['active_contracts'], $in['portfolio_value'],
-        $in['recognized_revenue'], $in['collection'], $in['overdue_receivables'],
-        $in['expected_cashflow'], $in['financing_commitments'], $in['working_equipment'],
-        $in['readiness_pct'], $in['approved_units'], $in['margin_pct'],
-        $in['open_risks'], $in['pending_approvals'], $in['last_updated'], $uid, $creator);
-    $ok = $st->execute();
-    $dup = !$ok && $conn->errno === 1062;
-    $st->close();
-    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حفظت اللقطة ✅' : ($dup ? 'لقطة هذه الفترة موجودة — الفترة الواحدة لقطة واحدة ❌' : 'تعذر الحفظ ❌'), 'GOV-OK-200', '');
+    /* ══ RPR-W15 · «القراءةُ بمرجعٍ حيٍّ لا بنسخٍ دوريّ» (‏قيدُ المالك §١) ═════
+         كان الباقي من الحقولِ — الفترةُ والعقودُ العاملةُ والجاهزيّةُ والوحداتُ
+         المعتمَدةُ — **يُخزَّن لقطةً دوريّة**، وقد رُفضت مؤشراتُه الماليّةُ
+         التسعةُ في جولةٍ سابقة. **واللقطةُ نفسُها هي العطب**: رقمٌ يُنسَخ
+         لحظةَ الحفظِ يتفرّق عن مصدرِه في اللحظةِ التالية، **والقيادةُ تعرض
+         ما تملكه الإداراتُ لا نسخةً منه**.
+         ◆ فالكتابةُ **مغلقةٌ كلُّها** والمحاولةُ تُسجَّل أثرًا يُراجَع.
+         ◆ **ولا يُحذف صفٌّ قائم** — الواحدُ والثلاثون باقيةٌ مُعلَنةً بعددِها
+           في مخرَجاتِ المرحلة. */
+    require_once __DIR__ . '/../includes/audit_trail.php';
+    ems_audit_change($conn, 'governance', 'exec_board_snapshots', 'snapshot_write_refused', 0,
+        array(), array('period' => (string) ($in['period'] ?? '')),
+        array('company_id' => (int) $company_id, 'user_id' => (int) $uid,
+              'note' => 'RPR-W15: لوحة القيادة قراءة حية ولا تخزن لقطة'));
+    ems_gov_flash_redirect(basename(__FILE__),
+        'GOV-KPI-409: لوحة القيادة تقرأ من مصادرها لحظة العرض ولا تحفظ لقطة ❌',
+        'GOV-FAIL-409', 'افتح الرقم من مصدره عند إدارته المالكة');
     exit();
 }
 
