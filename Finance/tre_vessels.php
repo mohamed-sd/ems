@@ -60,7 +60,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا صناديق مسجلة', 'كل صندوق بامينه وعملته ورصيده الافتتاحي'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_tre_vessels')); ?>
+    <table id="emsList_tre_vessels" class="data-table">
         <thead><tr><th>الرمز</th><th>الاسم</th><th>العملة</th><th>الامين</th><th>الموقع</th><th>الرصيد الافتتاحي</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

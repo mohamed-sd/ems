@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا حركات وظيفية', 'الحركة قرار بموجبه لا تعديل صامت للمنصب'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_hr_job_movements')); ?>
+    <table id="emsList_hr_job_movements" class="data-table">
         <thead><tr><th>الموظف</th><th>نوع الحركة</th><th>المنصب السابق</th><th>المنصب الجديد</th><th>تاريخ السريان</th><th>مرجع القرار</th><th>طالب الحركة</th><th>معتمد الحركة</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

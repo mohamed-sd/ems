@@ -103,7 +103,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="ems-form-actions"><button type="submit" class="add-btn"><i class="fas fa-save"></i> منح</button></div>
     </form>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_asset_use_rights')); ?>
+    <table id="emsList_asset_use_rights" class="data-table">
         <thead><tr><th>إجراءات</th><th>الأصل</th><th>الحائز</th><th>الصفة</th><th>الحصة ٪</th>
             <th>من</th><th>إلى</th><th>مجموع المتزامن ٪</th><th>حكم التزامن</th><th>مصدر القياس</th><th>المستند</th></tr></thead>
         <tbody>

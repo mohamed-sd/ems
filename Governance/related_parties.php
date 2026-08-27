@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا أطراف ذات علاقة', 'الطرف سطر بتعامله لا اسم في ملاحظة'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_related_parties')); ?>
+    <table id="emsList_related_parties" class="data-table">
         <thead><tr><th>رقم الطرف</th><th>اسم الطرف</th><th>صفة العلاقة</th><th>مرجع التعامل</th><th>قيمة التعامل</th><th>الإفصاح</th><th>بين كيانات المجموعة</th><th>نوع المعاملة</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

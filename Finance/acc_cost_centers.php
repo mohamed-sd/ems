@@ -60,7 +60,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا مراكز تكلفة', 'المالية تملك الشجرة ولا تجمع تكلفة بلا مركز'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_acc_cost_centers')); ?>
+    <table id="emsList_acc_cost_centers" class="data-table">
         <thead><tr><th>الرمز</th><th>الاسم</th><th>النوع</th><th>المستوى</th><th>المسار</th><th>الجهة المالكة</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

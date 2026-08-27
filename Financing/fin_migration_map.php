@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا سطور تاريخية مرحلة', 'الطبقة التاريخية توسم ولا تخلط بنموذج المستقبل'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_fin_migration_map')); ?>
+    <table id="emsList_fin_migration_map" class="data-table">
         <thead><tr><th>العملية</th><th>الطبقة</th><th>الفترة كما وردت</th><th>المدفوع مجمعا</th><th>عدد صفوف الدفتر</th><th>العملة</th><th>الحجية</th><th>مرجع الصف الأصلي</th><th>قابل للتخصيص</th><th>حالة البيانات</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا أوامر دفع مسجلة', 'امر الدفع يطلب ويعتمد وينفذ بيدين لا بيد'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_fin_payment_orders')); ?>
+    <table id="emsList_fin_payment_orders" class="data-table">
         <thead><tr><th>كود أمر الدفع</th><th>الطبقة</th><th>العملية</th><th>الممول</th><th>تاريخ الطلب</th><th>الطالب</th><th>المبلغ المطلوب</th><th>المبلغ المعتمد</th><th>المعتمد</th><th>تاريخ التنفيذ</th><th>المبلغ المنفذ</th><th>طريقة السداد</th><th>المرجع البنكي</th><th>مرجع الخزينة</th><th>طلب الاعتراف</th><th>حالة المطابقة</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

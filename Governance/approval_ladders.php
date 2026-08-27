@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا سلاليم معرفة', 'السلم تعريف بمستوياته لا رقم في شاشة'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_approval_ladders')); ?>
+    <table id="emsList_approval_ladders" class="data-table">
         <thead><tr><th>رمز السلم</th><th>الاسم</th><th>الكيان</th><th>الإجراء</th><th>نوع السقف</th><th>قيمة السقف</th><th>حالة السقف</th><th>مرجع الوثيقة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

@@ -99,16 +99,21 @@ gate('W15-04', 'القراءةُ بمرجعٍ حيٍّ ولا لقطةَ دور�
      $copyMode === 0 && $boardWrites === 0,
      "قراءةٌ غيرُ حيّةٍ في الدفتر $copyMode · كتابةُ لقطةٍ في لوحةِ القيادة $boardWrites");
 
+/* ⚠ **جدولُ حملةٍ ليس جدولَ أعمال**: عنوانُ الحاجبِ «جدولُ **أعمالٍ** جديد»،
+     وكان يستثني `repair01_w15_%` وحدَها — فرسب على `repair01_debt_register`
+     الذي أنشأه البندُ ⑥ من أمرِ المالكِ **سجلًّا لأصنافِ الدَّينِ لا حقيقةَ أعمالٍ**.
+     ⇒ فالاستثناءُ **لعائلةِ `repair01_` كلِّها** — وهو وفاءٌ لنصِّ الحاجبِ لا تليينٌ له،
+     **والحاجبُ ما يزال يرسُب على أيِّ جدولِ أعمالٍ جديد**. */
 /* ══ W15-05 · لا جدولَ حقيقةٍ جديدٌ أنشأته المرحلة ══════════════════════ */
 $snapN = (int) $one("SELECT COUNT(*) FROM repair01_w15_table_snapshot");
 $grown = (int) $one("SELECT COUNT(*) FROM information_schema.TABLES t
                       LEFT JOIN repair01_w15_table_snapshot s ON s.table_name = t.TABLE_NAME
                      WHERE t.TABLE_SCHEMA = DATABASE() AND t.TABLE_TYPE = 'BASE TABLE'
-                       AND t.TABLE_NAME NOT LIKE 'repair01\\_w15\\_%'
+                       AND t.TABLE_NAME NOT LIKE 'repair01\\_%'
                        AND s.table_name IS NULL");
 gate('W15-05', 'لا جدولَ أعمالٍ جديدٌ أنشأته هذه المرحلة',
      $snapN > 0 && $grown === 0,
-     "لقطةُ ما قبلَ المرحلة $snapN جدولًا · جداولٌ نمت بعدها $grown");
+     "لقطةُ ما قبلَ المرحلة $snapN جدولًا · جداولُ أعمالٍ نمت بعدها $grown · وسجلاتُ الحملةِ مستثناةٌ بالإعلان");
 
 /* ══ W15-06 · سبعُ خطواتٍ بحكمٍ وقاعدةٍ لكلِّ سطح ═══════════════════════ */
 $routes = array();

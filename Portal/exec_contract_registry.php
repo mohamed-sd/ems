@@ -59,7 +59,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا عقود مسجلة', 'السجل نافذة قراءة فوق سجلات مالكيها'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_exec_contract_registry')); ?>
+    <table id="emsList_exec_contract_registry" class="data-table">
         <thead><tr><th>رقم العقد</th><th>الطرف الآخر</th><th>تاريخ التوقيع</th><th>البداية</th><th>النهاية</th><th>العملة</th><th>مرجع سلطة التوقيع</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

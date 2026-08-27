@@ -113,7 +113,9 @@ while ($r && ($x = $r->fetch_row())) {
     $b = basename($x[0]);
     if (!isset($idx[$b])) { continue; }
     $growth++;
-    if (strpos(file_get_contents($idx[$b]), 'ems-filters') === false) { $noFilter++; }
+    $cc = (string) file_get_contents($idx[$b]);
+    /* مكوّنٌ مستدعًى أو ترميزٌ بالبنيةِ الموثَّقة — كلاهما فلترٌ معياريّ */
+    if (strpos($cc, 'ems_filter_box') === false && strpos($cc, 'ems-filters') === false) { $noFilter++; }
 }
 $item('◆', 'سطحُ نموٍّ بلا صندوقِ فلترة', $noFilter, "من $growth · رصدُ الحملةِ لا نصُّ الأمر");
 

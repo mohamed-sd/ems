@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا إقرارات مسجلة', 'الإقرار سطر بدليله لا خانة اختيار'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_conduct_acknowledgements')); ?>
+    <table id="emsList_conduct_acknowledgements" class="data-table">
         <thead><tr><th>الموظف</th><th>إصدار المدونة</th><th>السياسة</th><th>الموعد</th><th>تاريخ الإقرار</th><th>الدليل</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

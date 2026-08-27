@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا اسطر مسير', 'السطر مكون باسمه لا رقم مجمع بلا سند'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_payroll_lines')); ?>
+    <table id="emsList_payroll_lines" class="data-table">
         <thead><tr><th>المسير</th><th>الموظف</th><th>العقد</th><th>نوع السطر</th><th>المكون</th><th>طريقة الاحتساب</th><th>الكمية</th><th>المعدل</th><th>المبلغ</th><th>حالة الاحتساب</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

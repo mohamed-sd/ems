@@ -60,7 +60,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا طلبات اعادة فتح', 'اعادة الفتح استثناء محكوم لا فعل عادي'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_acc_reopen_governance')); ?>
+    <table id="emsList_acc_reopen_governance" class="data-table">
         <thead><tr><th>الرقم</th><th>الفترة</th><th>المبرر</th><th>من تاريخ</th><th>الى تاريخ</th><th>الوحدات</th><th>قاعدة الصلاحية</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

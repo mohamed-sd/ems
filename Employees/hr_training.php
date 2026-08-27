@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا سجلات تدريب', 'التدريب سطر بصلاحيته لا شهادة بلا تاريخ'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_hr_training')); ?>
+    <table id="emsList_hr_training" class="data-table">
         <thead><tr><th>الموظف</th><th>رمز البرنامج</th><th>البرنامج</th><th>نوع التدريب</th><th>الزامي</th><th>تاريخ الاكتمال</th><th>مرجع الشهادة</th><th>صالح حتى</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

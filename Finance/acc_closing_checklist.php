@@ -60,7 +60,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا بنود في قائمة الاقفال', 'البند الناقص يحجب الاقفال ما لم يوثق استثناؤه'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_acc_closing_checklist')); ?>
+    <table id="emsList_acc_closing_checklist" class="data-table">
         <thead><tr><th>الفترة</th><th>البند</th><th>الزامي</th><th>الحالة</th><th>يحجب الاقفال</th><th>سبب الاستثناء</th><th>تاريخ الاكتمال</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

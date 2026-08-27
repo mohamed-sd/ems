@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا اقفالات شهرية', 'الشهري شهر تقويمي بحده ولا يقبل فترة تعاقدية'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_fin_monthly_close')); ?>
+    <table id="emsList_fin_monthly_close" class="data-table">
         <thead><tr><th>كود الاقفال</th><th>العملية</th><th>الممول</th><th>الشهر المحاسبي</th><th>بداية الشهر</th><th>نهاية الشهر</th><th>اقفالات تعاقدية بالشهر</th><th>رصيد أول الشهر</th><th>المستحق بالشهر</th><th>المدفوع بالشهر</th><th>المخصص بالشهر</th><th>غير المخصص</th><th>المتأخر بالشهر</th><th>رصيد آخر الشهر</th><th>مطابقة كشف الممول</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

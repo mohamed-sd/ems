@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا متابعات مسجلة', 'المتابعة خطة إدارة لا نتيجة مراجعة'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_audit_followup')); ?>
+    <table id="emsList_audit_followup" class="data-table">
         <thead><tr><th>رقم المتابعة</th><th>الملاحظة</th><th>مصدر الملاحظة</th><th>خطة الإدارة</th><th>الإدارة المسؤولة</th><th>مهلة الخطة</th><th>مرات التكرار</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

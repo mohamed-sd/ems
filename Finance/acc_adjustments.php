@@ -60,7 +60,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا قيود تسوية', 'كل تسوية بمستند اساسها وبسببها المكتوب'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_acc_adjustments')); ?>
+    <table id="emsList_acc_adjustments" class="data-table">
         <thead><tr><th>الرقم</th><th>النوع</th><th>الفترة</th><th>الحساب</th><th>المبلغ</th><th>العملة</th><th>مستند الاساس</th><th>يعكس في التالية</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

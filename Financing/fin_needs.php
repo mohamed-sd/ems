@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا احتياجات تمويلية مسجلة', 'الحاجة تسبق العرض والعرض يسبق العقد'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_fin_needs')); ?>
+    <table id="emsList_fin_needs" class="data-table">
         <thead><tr><th>كود الحاجة</th><th>الموضوع</th><th>الادارة الطالبة</th><th>الغرض</th><th>المبلغ المطلوب</th><th>العملة</th><th>مطلوب بحلول</th><th>الرافع</th><th>المعتمد</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

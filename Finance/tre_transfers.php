@@ -60,7 +60,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا اوامر تحويل', 'الوعاء لا يحول الى نفسه ولا تحويل بلا قاعدة صلاحية'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_tre_transfers')); ?>
+    <table id="emsList_tre_transfers" class="data-table">
         <thead><tr><th>الرقم</th><th>من وعاء</th><th>الى وعاء</th><th>المبلغ</th><th>العملة</th><th>قاعدة الصلاحية</th><th>السبب</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

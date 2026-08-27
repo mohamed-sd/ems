@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا انواع محل بلاغ', 'محل البلاغ نوع بسجله المرجعي لا نص حر'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_tkt_subject_types')); ?>
+    <table id="emsList_tkt_subject_types" class="data-table">
         <thead><tr><th>رمز النوع</th><th>النوع</th><th>صنف الكيان</th><th>السجل المرجعي</th><th>مفتاح السجل</th><th>الادارة المالكة</th><th>مفعل</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

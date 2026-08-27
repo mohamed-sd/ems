@@ -128,7 +128,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="ems-form-actions"><button type="submit" class="add-btn"><i class="fas fa-save"></i> حفظ</button></div>
     </form>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_asset_intake')); ?>
+    <table id="emsList_asset_intake" class="data-table">
         <thead><tr>
             <th>إجراءات</th><th>رقم الطلب</th><th>الحالة</th><th>قاعدة الحالة</th><th>الإدارة الطالبة</th>
             <th>المصدر</th><th>وقائع التحقق</th><th>أوامر التفتيش</th><th>الأصل</th><th>سبب الرفض</th>

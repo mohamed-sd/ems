@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا بنود تهيئة', 'البند سطر بحالته لا خانة اختيار بلا اثر'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_hr_onboarding')); ?>
+    <table id="emsList_hr_onboarding" class="data-table">
         <thead><tr><th>الموظف</th><th>رمز البند</th><th>البند</th><th>الزامي</th><th>الحالة</th><th>مستند الاستثناء</th><th>سند العهدة</th><th>تاريخ الانجاز</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

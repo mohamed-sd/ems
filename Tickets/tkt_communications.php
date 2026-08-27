@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا وقائع تواصل', 'التواصل سطر بقناته لا مكالمة بلا اثر'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_tkt_communications')); ?>
+    <table id="emsList_tkt_communications" class="data-table">
         <thead><tr><th>البلاغ</th><th>الشخص</th><th>القناة</th><th>النص</th><th>التاريخ والوقت</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

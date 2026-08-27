@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا بنود مسجلة', 'كل بند سطر بمرجعه في مستند العقد'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_fin_contract_terms')); ?>
+    <table id="emsList_fin_contract_terms" class="data-table">
         <thead><tr><th>العقد</th><th>البند</th><th>القيمة</th><th>رقم البند في المستند</th><th>ملزم</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

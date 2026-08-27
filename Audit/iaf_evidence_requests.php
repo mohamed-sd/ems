@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا طلبات أدلة', 'الطلب سطر بمهلته لا رسالة'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_iaf_evidence_requests')); ?>
+    <table id="emsList_iaf_evidence_requests" class="data-table">
         <thead><tr><th>رقم الطلب</th><th>المهمة</th><th>الجهة الخاضعة</th><th>المطلوب</th><th>المهلة</th><th>تاريخ التزويد</th><th>أيام التأخر</th><th>مستوى التصعيد</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

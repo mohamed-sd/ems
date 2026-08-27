@@ -60,7 +60,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا جولات ميزان', 'الميزان مشتق من القيود المنشورة ولا يعدل فيه شيء'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_acc_trial_balance')); ?>
+    <table id="emsList_acc_trial_balance" class="data-table">
         <thead><tr><th>الفترة</th><th>مرجع الجولة</th><th>مجموع المدين</th><th>مجموع الدائن</th><th>متوازن</th><th>عدد القيود</th><th>عدد الاسطر</th><th>وقت الجولة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

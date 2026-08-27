@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا تعريفات مسجلة', 'التعريف مرجع الشاشة لا تعليق في شيفرة'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_fin_ref_dictionary')); ?>
+    <table id="emsList_fin_ref_dictionary" class="data-table">
         <thead><tr><th>القائمة</th><th>الرمز</th><th>الحقل</th><th>التعريف</th><th>الجهة المالكة</th><th>نشط</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

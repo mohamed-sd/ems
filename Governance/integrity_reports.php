@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا بلاغات مسجلة', 'البلاغ سطر برمزه لا اسم يعرض'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_integrity_reports')); ?>
+    <table id="emsList_integrity_reports" class="data-table">
         <thead><tr><th>رقم البلاغ</th><th>القناة</th><th>هوية محجوبة</th><th>الموضوع</th><th>تاريخ الاستلام</th><th>تاريخ الفرز</th><th>أحيل إلى</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

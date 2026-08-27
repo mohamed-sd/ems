@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا قضايا تاديبية', 'القضية عملية بمراحلها لا حقل خصم في المسير'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_hr_disciplinary')); ?>
+    <table id="emsList_hr_disciplinary" class="data-table">
         <thead><tr><th>رقم القضية</th><th>الموظف</th><th>تاريخ الواقعة</th><th>الواقعة</th><th>المبلغ</th><th>المحقق</th><th>الادارة المالكة للتحقيق</th><th>مستند التكليف</th><th>نوع القرار</th><th>مرجع القرار</th><th>مصدر القرار</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

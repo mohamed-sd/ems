@@ -158,7 +158,10 @@ $filterDebt = function () use ($conn, $idx) {
                         WHERE origin REGEXP '^W[0-9]+$' AND on_disk = 1");
     while ($r && ($x = $r->fetch_row())) {
         $b = basename($x[0]);
-        if (isset($idx[$b]) && strpos((string) @file_get_contents($idx[$b]), 'ems-filters') === false) { $n++; }
+        if (!isset($idx[$b])) { continue; }
+        $cc = (string) @file_get_contents($idx[$b]);
+        /* مكوّنٌ مستدعًى أو ترميزٌ بالبنيةِ الموثَّقة — كلاهما فلترٌ معياريّ */
+        if (strpos($cc, 'ems_filter_box') === false && strpos($cc, 'ems-filters') === false) { $n++; }
     }
     return $n;
 };

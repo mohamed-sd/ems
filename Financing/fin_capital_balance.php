@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا أرصدة قائمة', 'الرصيد يشتق من الاقفالات التعاقدية ولا يكتب بيد'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_fin_capital_balance')); ?>
+    <table id="emsList_fin_capital_balance" class="data-table">
         <thead><tr><th>العملية</th><th>الممول</th><th>الفترة التعاقدية</th><th>أصل افتتاحي</th><th>أصل مستحق</th><th>المخصص</th><th>أصل قائم</th><th>عائد قائم</th><th>العملة</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

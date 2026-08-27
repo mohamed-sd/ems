@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا دورات تحقق', 'الاغلاق دورة بتحققها لا زر يغلق بلا شاهد'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_tkt_verification')); ?>
+    <table id="emsList_tkt_verification" class="data-table">
         <thead><tr><th>البلاغ</th><th>رقم الدورة</th><th>الاولوية</th><th>ادارة المعالجة</th><th>المعالج</th><th>تاريخ المعالجة</th><th>نافذة التحقق بالساعات</th><th>صفة المتحقق</th><th>المتحقق</th><th>تاريخ التحقق</th><th>المغلق</th><th>تاريخ الاغلاق</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

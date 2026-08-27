@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا وقائع تصعيد', 'التصعيد سلم بمستوياته لا تنبيه يمر بلا اثر'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_tkt_escalation')); ?>
+    <table id="emsList_tkt_escalation" class="data-table">
         <thead><tr><th>مسار العمل</th><th>مستوى التصعيد</th><th>محفز التصعيد</th><th>المصعد اليه</th><th>التاريخ والوقت</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

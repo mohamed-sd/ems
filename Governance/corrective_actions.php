@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا إجراءات مسجلة', 'الإجراء سطر بمهلته لا نية مكتوبة'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_corrective_actions')); ?>
+    <table id="emsList_corrective_actions" class="data-table">
         <thead><tr><th>رقم الإجراء</th><th>الإجراء</th><th>المصدر</th><th>مرجع المصدر</th><th>الإدارة المالكة</th><th>المسؤول</th><th>المهلة</th><th>دليل الإغلاق</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

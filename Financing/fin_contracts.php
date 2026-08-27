@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا عقود تمويل مسجلة', 'العقد يفتح العملية ويولد جدول الاقساط'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_fin_contracts')); ?>
+    <table id="emsList_fin_contracts" class="data-table">
         <thead><tr><th>كود العقد</th><th>الممول</th><th>العملية</th><th>نموذج التمويل</th><th>اصل التمويل</th><th>العملة</th><th>تاريخ التوقيع</th><th>البداية</th><th>النهاية</th><th>عدد الفترات التعاقدية</th><th>مستند العقد</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

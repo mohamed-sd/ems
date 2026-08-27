@@ -80,7 +80,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         'هذه الأرقام مؤشرات نضج تقرأ وتتابع. ولا يمنع أي منها استلاما ولا صرفا'); ?>
 
     <h3 class="ems-section-title">نسب اكتمال البيانات</h3>
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_wh_track_quality')); ?>
+    <table id="emsList_wh_track_quality" class="data-table">
         <thead><tr><th>المؤشر</th><th>العدد</th><th>النسبة من الدليل</th></tr></thead>
         <tbody>
         <?php foreach ($METRICS as $m): ?>

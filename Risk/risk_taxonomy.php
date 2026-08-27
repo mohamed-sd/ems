@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا عقد تصنيف', 'التصنيف شجرة معتمدة لا قائمة تكتب'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_risk_taxonomy')); ?>
+    <table id="emsList_risk_taxonomy" class="data-table">
         <thead><tr><th>رمز العقدة</th><th>العائلة</th><th>الفئة</th><th>النوع</th><th>العقدة الأم</th><th>المستوى</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا بيانات قوى عاملة', 'التقرير مشتق لا يكتب فيه سطر'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_hr_workforce_report')); ?>
+    <table id="emsList_hr_workforce_report" class="data-table">
         <thead><tr><th>كود الموظف</th><th>الاسم</th><th>التصنيف الوظيفي</th><th>فئة العامل</th><th>المشروع</th><th>تاريخ المباشرة</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

@@ -60,7 +60,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا جلسات جرد', 'الجرد بلجنة والفرق يعالج فورا لا يدفن'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_tre_cash_count')); ?>
+    <table id="emsList_tre_cash_count" class="data-table">
         <thead><tr><th>الرقم</th><th>الصندوق</th><th>النوع</th><th>الرصيد الدفتري</th><th>الرصيد المعدود</th><th>الفرق</th><th>حجم اللجنة</th><th>معالجة الفرق</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا تقييمات', 'التقييم دورة بمعاييرها لا رقم يكتب بلا مرجع'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_hr_performance')); ?>
+    <table id="emsList_hr_performance" class="data-table">
         <thead><tr><th>الموظف</th><th>دورة التقييم</th><th>مرجع المعايير</th><th>الدرجة</th><th>المقيم</th><th>المراجع</th><th>تاريخ الاعتماد</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

@@ -59,7 +59,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا طلبات تعيين قيادي', 'الطلب يصل بإفصاحه لا بدونه'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_exec_leadership_appointments')); ?>
+    <table id="emsList_exec_leadership_appointments" class="data-table">
         <thead><tr><th>رقم الطلب</th><th>المرشح</th><th>المسمى</th><th>النطاق</th><th>حالة التعارض</th><th>من</th><th>إلى</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

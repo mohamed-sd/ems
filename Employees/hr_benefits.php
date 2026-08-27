@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا اشتراكات مزايا', 'الميزة اشتراك بحصتيه ومرجعه في المسير'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_hr_benefits')); ?>
+    <table id="emsList_hr_benefits" class="data-table">
         <thead><tr><th>الموظف</th><th>رمز الميزة</th><th>الميزة</th><th>مقدم الخدمة</th><th>حصة صاحب العمل</th><th>حصة الموظف</th><th>العملة</th><th>ساري من</th><th>مرجع مكون المسير</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

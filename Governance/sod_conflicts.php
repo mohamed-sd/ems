@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا تعارضات معرفة', 'التعارض قاعدة تعرف مرة لا ملاحظة عابرة'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_sod_conflicts')); ?>
+    <table id="emsList_sod_conflicts" class="data-table">
         <thead><tr><th>رمز التعارض</th><th>التعارض</th><th>الطرف الأول</th><th>الطرف الثاني</th><th>الدور المكتشف</th><th>المستخدم المكتشف</th><th>الاستثناء</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

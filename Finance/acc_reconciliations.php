@@ -60,7 +60,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا جلسات مطابقة', 'الجلسة لا تقفل وفيها فرق مفتوح'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_acc_reconciliations')); ?>
+    <table id="emsList_acc_reconciliations" class="data-table">
         <thead><tr><th>الفترة</th><th>الحساب الرقابي</th><th>المصدر التفصيلي</th><th>رصيد الدفتر</th><th>رصيد المصدر</th><th>الفرق</th><th>فروق مفتوحة</th><th>الحالة</th><th>تاريخ الاقفال</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا سياسات مسجلة', 'السياسة إصدار بمالكه لا نص متداول'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_policies')); ?>
+    <table id="emsList_policies" class="data-table">
         <thead><tr><th>رقم السياسة</th><th>الإصدار</th><th>العنوان</th><th>المجال</th><th>الإدارة المالكة</th><th>تاريخ النفاذ</th><th>موعد المراجعة</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

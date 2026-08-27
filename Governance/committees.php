@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا لجان مسجلة', 'اللجنة تشكيل بميثاقه لا اسم في محضر'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_committees')); ?>
+    <table id="emsList_committees" class="data-table">
         <thead><tr><th>رمز اللجنة</th><th>الاسم</th><th>الاختصاص</th><th>الميثاق</th><th>رئيس اللجنة</th><th>عدد الأعضاء</th><th>دورية الانعقاد</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

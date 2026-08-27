@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا برامج مسجلة', 'البرنامج خطوات بأهدافها لا قائمة مهام'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_iaf_audit_programs')); ?>
+    <table id="emsList_iaf_audit_programs" class="data-table">
         <thead><tr><th>رقم البرنامج</th><th>الخطوة</th><th>المهمة</th><th>الهدف</th><th>أسلوب الاختبار</th><th>المجتمع</th><th>حجم العينة</th><th>منهجية السحب</th><th>المنفذ</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

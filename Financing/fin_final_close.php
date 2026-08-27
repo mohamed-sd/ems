@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا اقفالات نهائية', 'النهائي يقرا اخر اقفال دوري ولا يحل محله'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_fin_final_close')); ?>
+    <table id="emsList_fin_final_close" class="data-table">
         <thead><tr><th>كود الاقفال</th><th>العملية</th><th>الممول</th><th>تاريخ الطلب</th><th>تاريخ الاقفال</th><th>آخر اقفال دوري</th><th>المتبقي من الأصل</th><th>المتبقي من العائد</th><th>استحقاقات مفتوحة</th><th>انحرافات حاجبة</th><th>نقل الملكية</th><th>مستند الملكية</th><th>إخلاء الطرف</th><th>تسوية مبكرة</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

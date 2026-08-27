@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا مستندات مسجلة', 'المستند سطر بصلاحيته لا مرفق بلا تاريخ'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_hr_employee_documents')); ?>
+    <table id="emsList_hr_employee_documents" class="data-table">
         <thead><tr><th>الموظف</th><th>نوع المستند</th><th>رقم المستند</th><th>تاريخ الاصدار</th><th>تاريخ الانتهاء</th><th>الزامي</th><th>مرجع الملف</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

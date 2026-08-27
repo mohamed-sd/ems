@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا مراحل مسجلة', 'المرحلة سطر بنتيجتها لا حالة تدهس سابقتها'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_rec_stages')); ?>
+    <table id="emsList_rec_stages" class="data-table">
         <thead><tr><th>رقم الواقعة</th><th>الترشح</th><th>المرحلة السابقة</th><th>المرحلة التالية</th><th>المقيم</th><th>التاريخ والوقت</th><th>الملاحظة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا سطور تخصيص', 'التخصيص يبدأ من امر دفع منفذ'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_fin_payment_allocation')); ?>
+    <table id="emsList_fin_payment_allocation" class="data-table">
         <thead><tr><th>أمر الدفع</th><th>القسط</th><th>صنف الاقفال</th><th>الاقفال</th><th>المكون</th><th>المبلغ</th><th>المخصص</th><th>تاريخ التخصيص</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

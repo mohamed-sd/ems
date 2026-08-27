@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا إفصاحات هدايا', 'الإفصاح سطر بقراره لا خانة تعليم'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_gifts_hospitality')); ?>
+    <table id="emsList_gifts_hospitality" class="data-table">
         <thead><tr><th>رقم الإفصاح</th><th>المفصح</th><th>النوع</th><th>الجهة المانحة</th><th>القيمة التقديرية</th><th>العملة</th><th>القرار</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

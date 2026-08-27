@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا طلبات ترشح', 'الترشح سطر تحت شاغره لا حقل في الشاغر'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_rec_applications')); ?>
+    <table id="emsList_rec_applications" class="data-table">
         <thead><tr><th>رقم الترشح</th><th>الشاغر</th><th>اسم المرشح</th><th>الهاتف</th><th>المرحلة</th><th>موعد المقابلة</th><th>درجة الاختبار</th><th>مرجع العرض</th><th>رقم الموظف بعد التعيين</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

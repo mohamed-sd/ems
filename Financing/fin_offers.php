@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا عروض تمويل مسجلة', 'العرض يقابل حاجة معتمدة ومن ممول مؤهل'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_fin_offers')); ?>
+    <table id="emsList_fin_offers" class="data-table">
         <thead><tr><th>كود العرض</th><th>الاصدار</th><th>الممول</th><th>نموذج التمويل</th><th>اصل التمويل</th><th>العملة</th><th>نسبة العائد</th><th>المدة بالاشهر</th><th>فترة السماح</th><th>مستند العرض</th><th>ساري حتى</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

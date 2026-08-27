@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا وقائع اعادة فتح', 'اعادة الفتح واقعة بسببها لا حالة تنقلب صامتة'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_tkt_reopen')); ?>
+    <table id="emsList_tkt_reopen" class="data-table">
         <thead><tr><th>البلاغ</th><th>التسلسل</th><th>الدورة السابقة</th><th>سبب اعادة الفتح</th><th>التفصيل</th><th>طالب اعادة الفتح</th><th>العودة الى ادارة</th><th>التاريخ والوقت</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

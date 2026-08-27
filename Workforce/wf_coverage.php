@@ -71,7 +71,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا سطور تغطية مشتقة بعد', 'الاشتقاق يجري من احتياج المشروع والمتوفر الجاهز — ولا يدخل من هنا'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_wf_coverage')); ?>
+    <table id="emsList_wf_coverage" class="data-table">
         <thead><tr><th>#</th><th>المشروع</th><th>الفئة التشغيلية</th><th>المطلوب</th><th>المتوفر</th>
             <th>العجز المشتق</th><th>الفائض المشتق</th><th>الحالة المشتقة</th>
             <th>العجز المعلن</th><th>الحالة المعلنة</th><th>حكم الفارق</th><th>قاعدة الاشتقاق</th></tr></thead>

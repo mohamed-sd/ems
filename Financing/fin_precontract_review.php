@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا مراجعات مسجلة', 'لا توقيع عقد قبل اجازة المراجعة'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_fin_precontract_review')); ?>
+    <table id="emsList_fin_precontract_review" class="data-table">
         <thead><tr><th>كود المراجعة</th><th>العرض</th><th>راي القانوني</th><th>راي المالية</th><th>راي المخاطر</th><th>الحكم</th><th>سبب الحجب</th><th>المقرر</th><th>تاريخ القرار</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

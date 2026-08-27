@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا استحقاقات قائمة', 'الاستحقاق يشتق من جدول الاقساط ومن ما خصص عليه'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_fin_financier_dues')); ?>
+    <table id="emsList_fin_financier_dues" class="data-table">
         <thead><tr><th>العملية</th><th>رقم القسط</th><th>تاريخ الاستحقاق</th><th>اصل</th><th>عائد</th><th>اجمالي القسط</th><th>المخصص</th><th>العملة</th><th>الاقفال التعاقدي</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

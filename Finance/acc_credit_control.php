@@ -60,7 +60,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا حدود ائتمانية مسجلة', 'الحد يعتمد بقاعدة صلاحية ولا بيع فوقه بلا اعتماد'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_acc_credit_control')); ?>
+    <table id="emsList_acc_credit_control" class="data-table">
         <thead><tr><th>العميل</th><th>الحد</th><th>العملة</th><th>التعرض القائم</th><th>عند التجاوز</th><th>قاعدة الصلاحية</th><th>سبب الحد</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

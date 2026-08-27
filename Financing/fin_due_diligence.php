@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا وثائق تاهيل مسجلة', 'التاهيل شرط سابق لفتح باب العروض'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_fin_due_diligence')); ?>
+    <table id="emsList_fin_due_diligence" class="data-table">
         <thead><tr><th>الممول</th><th>نوع الوثيقة</th><th>مرجع الوثيقة</th><th>تاريخ الاصدار</th><th>تاريخ الانتهاء</th><th>المحقق</th><th>تاريخ التحقق</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

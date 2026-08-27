@@ -59,7 +59,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا قرارات قيد المتابعة', 'المتابعة تجمع بمرجعها ولا تنشئ سجلا ثانيا'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_exec_actions_followup')); ?>
+    <table id="emsList_exec_actions_followup" class="data-table">
         <thead><tr><th>رقم القرار</th><th>المصدر</th><th>الموضوع</th><th>الإدارة المكلفة</th><th>المهلة</th><th>موعد المتابعة</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

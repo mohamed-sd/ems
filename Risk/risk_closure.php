@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا إغلاقات مسجلة', 'الإغلاق إثبات بدليله لا قرار صامت'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_risk_closure')); ?>
+    <table id="emsList_risk_closure" class="data-table">
         <thead><tr><th>رقم الإغلاق</th><th>الخطر</th><th>أساس الإغلاق</th><th>إعادة التقييم</th><th>الدليل</th><th>المقترح</th><th>المعتمد</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

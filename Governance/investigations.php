@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا تحقيقات مسجلة', 'التحقيق ملف بتكليفه لا محضر متداول'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_investigations')); ?>
+    <table id="emsList_investigations" class="data-table">
         <thead><tr><th>رقم التحقيق</th><th>النوع</th><th>الإدارة المالكة</th><th>المصدر</th><th>التكليف المكتوب</th><th>المحقق</th><th>التنحي عن</th><th>أحيل إلى</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

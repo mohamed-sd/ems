@@ -60,7 +60,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا عهد نثرية', 'لا تجديد قبل تسوية العهدة السابقة'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_tre_petty_cash')); ?>
+    <table id="emsList_tre_petty_cash" class="data-table">
         <thead><tr><th>الرقم</th><th>الامين</th><th>حد العهدة</th><th>العملة</th><th>المصروف</th><th>تاريخ الفتح</th><th>السقف الزمني</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

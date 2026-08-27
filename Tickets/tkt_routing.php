@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا وقائع توجيه', 'التوجيه واقعة بقاعدتها لا احالة يدوية بلا سبب'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_tkt_routing')); ?>
+    <table id="emsList_tkt_routing" class="data-table">
         <thead><tr><th>البلاغ</th><th>التسلسل</th><th>نوع التوجيه</th><th>من ادارة</th><th>الى ادارة</th><th>قاعدة التوجيه</th><th>سبب التصحيح</th><th>الموجه</th><th>تاريخ التوجيه</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

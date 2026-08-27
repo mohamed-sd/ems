@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا ملاحظات مسجلة', 'اللوحة قراءة مشتقة لا شاشة إدخال'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_iaf_overview')); ?>
+    <table id="emsList_iaf_overview" class="data-table">
         <thead><tr><th>رقم الملاحظة</th><th>الملاحظة</th><th>الجهة الخاضعة</th><th>الدرجة</th><th>مهلة المعالجة</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

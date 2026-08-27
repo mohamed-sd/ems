@@ -59,7 +59,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا توقفات مسجلة', 'التوقف صف بنوعه وساعاته لا خلاصة'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_exec_daily_stops')); ?>
+    <table id="emsList_exec_daily_stops" class="data-table">
         <thead><tr><th>اليوم</th><th>المشروع</th><th>المعدة</th><th>نوع التوقف</th><th>الساعات</th><th>الطرف المسؤول</th><th>أثر الالتزام</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

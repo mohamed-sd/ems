@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا التزامات مسجلة', 'الالتزام سطر بجهته ودوريته لا تذكرة'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_obligations')); ?>
+    <table id="emsList_obligations" class="data-table">
         <thead><tr><th>رقم الالتزام</th><th>الالتزام</th><th>الجهة</th><th>الدورية</th><th>الإدارة المالكة</th><th>الاستحقاق التالي</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

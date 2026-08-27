@@ -59,7 +59,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا إنابات مسجلة', 'الإنابة مدة بنطاقها لا صفة دائمة'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_exec_delegations')); ?>
+    <table id="emsList_exec_delegations" class="data-table">
         <thead><tr><th>رقم الإنابة</th><th>صاحب الإنابة</th><th>النائب</th><th>من</th><th>إلى</th><th>السبب</th><th>تاريخ الإلغاء</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

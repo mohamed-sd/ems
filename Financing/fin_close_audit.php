@@ -56,7 +56,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا روابط اقفال مسجلة', 'الشهري يضم التعاقدي والنهائي يقرأ آخر دوري'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_fin_close_audit')); ?>
+    <table id="emsList_fin_close_audit" class="data-table">
         <thead><tr><th>صنف الأب</th><th>الأب</th><th>صنف الابن</th><th>الابن</th><th>قاعدة الربط</th><th>السبب</th><th>التاريخ</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>

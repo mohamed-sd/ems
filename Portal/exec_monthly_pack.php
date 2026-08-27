@@ -59,7 +59,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا إقفالات شهرية بعد', 'الحزمة تتجمع من إقفالات الإدارات'); ?>
 
-    <div class="table-wrap"><table class="data-table">
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_exec_monthly_pack')); ?>
+    <table id="emsList_exec_monthly_pack" class="data-table">
         <thead><tr><th>الشهر</th><th>رقم الإقفال</th><th>الكيان</th><th>الرصيد الافتتاحي</th><th>المستحق</th><th>المسدد</th><th>الرصيد الختامي</th><th>الحالة</th></tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>
