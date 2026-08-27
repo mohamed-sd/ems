@@ -155,7 +155,7 @@ printf("\n  التصنيف: SOURCE=%d · PROJECTION=%d · بلا تصنيف=%d\n
 $dup = 0;
 if (!$REPORT) {
     $q = $conn->query("SELECT COUNT(*) FROM (
-        SELECT LOWER(screen_file) f FROM repair01_screen_registry
+        SELECT LOWER(COALESCE(NULLIF(route,''), screen_file)) f FROM repair01_screen_registry
          WHERE surface_kind = 'SOURCE' GROUP BY f HAVING COUNT(DISTINCT owner_code) > 1) z");
     $dup = $q ? (int) $q->fetch_row()[0] : -1;
     printf("  حقيقةٌ SOURCE في إدارتَين: %d (يجب 0)\n", $dup);

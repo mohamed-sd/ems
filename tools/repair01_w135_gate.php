@@ -62,8 +62,16 @@ $G('G1', 'النطاقُ التنظيميّ — سبعَ عشرةَ إدارةً
 $live   = "ownership_verdict NOT IN ('', 'RETIRE')";
 $xAll   = $n("SELECT COUNT(*) FROM repair01_screen_registry WHERE owner_code IN ($TEN) AND $live");
 $xUnres = $n("SELECT COUNT(*) FROM repair01_screen_registry WHERE owner_code IN ($TEN) AND $live AND surface_kind = ''");
-$dup    = $n("SELECT COUNT(*) FROM (SELECT LOWER(screen_file) f FROM repair01_screen_registry
-               WHERE surface_kind = 'SOURCE' GROUP BY f HAVING COUNT(DISTINCT owner_code) > 1) z");
+/* ⚠ **الهويّةُ المسارُ لا اسمُ الملفّ**: `Equipments/select_project.php` و
+     `Oprators/select_project.php` **ملفّانِ مختلفانِ في مجلَّدَين**، والمقارنةُ
+     بالاسمِ تراهما حقيقةً واحدةً في إدارتَين. **ومقياسٌ يوحّد ما هو متعدّدٌ
+     يخترع تكرارًا لا وجودَ له** — وهو ثالثُ ظهورٍ لهذا النمطِ في الحملة.
+     فالمقارنةُ **بالمسارِ الكاملِ حيث وُجد** وإلّا بالاسمِ لما لا مسارَ له. */
+$dup    = $n("SELECT COUNT(*) FROM (
+               SELECT LOWER(COALESCE(NULLIF(route,''), screen_file)) f
+                 FROM repair01_screen_registry
+                WHERE surface_kind = 'SOURCE'
+                GROUP BY f HAVING COUNT(DISTINCT owner_code) > 1) z");
 $unk    = $n("SELECT COUNT(*) FROM repair01_screen_registry WHERE ownership_verdict = 'UNKNOWN'");
 $G('G2', 'مصدرُ الحقيقةِ في التقاطعاتِ الستّة',
    ($xUnres === 0 && $dup === 0 && $unk === 0),

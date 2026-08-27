@@ -51,7 +51,7 @@ $item('4',  'سياسةُ صلاحيةٍ ناقصة',
 $item('5',  'مالكٌ مجهول',
     $n("SELECT COUNT(*) FROM repair01_screen_registry WHERE COALESCE(owner_code,'') = '' AND $LIVE"));
 $item('6',  'مصدرٌ مكرَّرٌ لحقيقةٍ واحدة',
-    $n("SELECT COUNT(*) FROM (SELECT LOWER(screen_file) f FROM repair01_screen_registry
+    $n("SELECT COUNT(*) FROM (SELECT LOWER(COALESCE(NULLIF(route,''), screen_file)) f FROM repair01_screen_registry
          WHERE surface_kind = 'SOURCE' GROUP BY f HAVING COUNT(DISTINCT owner_code) > 1) z"));
 $item('7',  'شاشةٌ يتيمةٌ بلا حكمِ ملكيّة',
     $n("SELECT COUNT(*) FROM repair01_screen_registry WHERE COALESCE(ownership_verdict,'') = '' AND $LIVE"));
@@ -74,7 +74,7 @@ $pair = function ($a, $b, $ownerOfTruth) use ($n, $LIVE) {
                   AND (surface_kind = ''
                        OR (surface_kind = 'SOURCE' AND owner_code <> '$ownerOfTruth'
                            AND LOWER(screen_file) IN (SELECT f FROM (
-                               SELECT LOWER(screen_file) f FROM repair01_screen_registry
+                               SELECT LOWER(COALESCE(NULLIF(route,''), screen_file)) f FROM repair01_screen_registry
                                 WHERE owner_code = '$ownerOfTruth' AND surface_kind = 'SOURCE') z)))");
 };
 $item('10', 'تداخلُ الموارد والقوى — غيرُ محسوم', $pair('DEP-07', 'DEP-13', 'DEP-07'));

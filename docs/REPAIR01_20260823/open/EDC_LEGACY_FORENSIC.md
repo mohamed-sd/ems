@@ -24,7 +24,7 @@
 
 | الملفّ | يكتب؟ | جداولُ يكتبها | يناديه | ملاحة | أدوارٌ تراه | حارس | الحكمُ ولماذا |
 |---|---|---|---:|---:|---:|---|---|
-| `C:/wamp64/www/ems/Tickets/admin_close.php` | **نعم** | `tickets` · `ticket_events` · `ticket_workstreams` | 5 | 2 | 1 | SELF_EARLY | **سطحُ كتابةٍ** — نصُّ القرار: مراجعةٌ فرديّةٌ إلزاميّةٌ قبل أيِّ تقاعد |
+| `C:/wamp64/www/ems/Tickets/admin_close.php` | **نعم** | `tickets` · `ticket_events` · `ticket_workstreams` | 6 | 2 | 1 | SELF_EARLY | **سطحُ كتابةٍ** — نصُّ القرار: مراجعةٌ فرديّةٌ إلزاميّةٌ قبل أيِّ تقاعد |
 | `C:/wamp64/www/ems/Equipments/equipments_drivers.php` | **نعم** | — | 10 | 0 | 3 | SELF_EARLY | **سطحُ كتابةٍ** — نصُّ القرار: مراجعةٌ فرديّةٌ إلزاميّةٌ قبل أيِّ تقاعد |
 | `C:/wamp64/www/ems/Tickets/intake_classify.php` | **نعم** | `tickets` · `ticket_events` | 5 | 2 | 1 | SELF_EARLY | **سطحُ كتابةٍ** — نصُّ القرار: مراجعةٌ فرديّةٌ إلزاميّةٌ قبل أيِّ تقاعد |
 | `C:/wamp64/www/ems/movement/move_oprators.php` | **نعم** | — | 38 | 0 | 4 | SELF_EARLY | **سطحُ كتابةٍ** — نصُّ القرار: مراجعةٌ فرديّةٌ إلزاميّةٌ قبل أيِّ تقاعد |
