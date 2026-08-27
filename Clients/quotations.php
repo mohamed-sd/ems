@@ -400,6 +400,7 @@ function quo_state_tone($state)
     }
 }
 ?>
+<?php /* شريط رحلة الكيان — بالمسار لا بالاسم، فالاسم يسكن السجل وحده */ echo ems_entity_tabs_for('Clients/quotations.php'); ?>
 
 <div class="main quo-main ems-unified-page-shell ems-doc-cycle">
 
@@ -417,6 +418,9 @@ function quo_state_tone($state)
     // ح-09 · نموذج + تصدير + استيراد (الإطار الموحّد)
     foreach (ems_excel_header_actions('quotations', 'عروض الأسعار', $can_add) as $__xl) { $header_actions[] = $__xl; }
     include('../includes/page_header.php');
+
+/* شريط رحلة الكيان الموحد — UXW-01 8-2 */
+require_once __DIR__ . '/../includes/entity_tabs.php';
     // UXW-01 ⑫: شاشةُ دورةٍ اعتماديةٍ تنطق بحالتِها الحية (مسودة · مقدم · مقبول · مرفوض) — فتُعلن خطوتَها التالية
     echo ems_next_step('العرض يقدم للعميل فيقبل أو يرفض — وقبوله يولد عقدا مسودة يحمل مرجعه');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا

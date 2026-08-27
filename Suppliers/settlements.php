@@ -210,6 +210,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 $sft_family = 'settlement'; $sft_active = 'settlement';
 include __DIR__ . '/../includes/sales_family_tabs.php';
 ?>
+<?php /* شريط رحلة الكيان — بالمسار لا بالاسم، فالاسم يسكن السجل وحده */ echo ems_entity_tabs_for('Suppliers/settlements.php'); ?>
 
 <div class="main sup-settlements-main ems-unified-page-shell">
     <?php
@@ -218,6 +219,9 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
     $header_actions = array();
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+
+/* شريط رحلة الكيان الموحد — UXW-01 8-2 */
+require_once __DIR__ . '/../includes/entity_tabs.php';
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     echo ems_states_bundle('لا تسوية مورد مولدة بعد', 'اختر المورد والفترة من نموذج «تسوية جديدة» واضغط «ولد التسوية» — البنود تجلب من مصادرها');
     ?>

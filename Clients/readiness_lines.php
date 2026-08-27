@@ -382,6 +382,7 @@ include("../inheader.php");
 include('../insidebar.php');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<?php /* شريط رحلة الكيان — بالمسار لا بالاسم، فالاسم يسكن السجل وحده */ echo ems_entity_tabs_for('Clients/readiness_lines.php'); ?>
 
 <div class="main rdl-main ems-unified-page-shell">
 
@@ -781,6 +782,9 @@ include('../includes/page_header.php');
             name: $(this).data('name'), state: $(this).data('state'), source: $(this).data('source'),
             required: $(this).data('required'), available: $(this).data('available'), gap: $(this).data('gap')
         });
+
+/* شريط رحلة الكيان الموحد — UXW-01 8-2 */
+require_once __DIR__ . '/../includes/entity_tabs.php';
     });
 
     // ── عرض التفاصيل عبر EmsDetailsModal الموحد ──
