@@ -1,0 +1,4834 @@
+[
+    {
+        "no": 1,
+        "group": "التأسيس",
+        "title": "سجل الموردين",
+        "purpose": "السجل الكنسي (الرقم الدائم 1–30 نافذ بدليل v4؛ كل صف مورد)",
+        "grain": "مورد واحد",
+        "source": "مصدر الحقيقة: إدارة الموردين · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Master",
+        "declared": 31,
+        "fields": [
+            {
+                "name": "رقم المورد · Supplier_ID",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "التسلسل الزمني للتعامل ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "الاسم القانوني",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الاسم المختصر",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المرادف القديم · SUQ",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تصنيف المورد",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نوع المورد (مصدر)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مصدر القيد",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "فئة مصدر القدرة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نمط التعاقد ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "طبيعة المورد (مالك\/وسيط)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة المورد",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تاريخ آخر نشاط تشغيلي ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "تاريخ آخر حركة مالية ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "أشهر منذ آخر نشاط ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "دليل آخر نشاط ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "أساس الحالة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "تاريخ أول تعامل ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "الدولة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المدينة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "السجل التجاري",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الرقم الضريبي",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نماذج التعامل ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "العملات المتعامل بها ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "عدد الحصص ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "عدد المعدات المسندة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "حالة التأهيل (م03) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "التصنيف الاستراتيجي (م20) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "مستوى الحجية",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "مصدر التوثيق",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 2,
+        "group": "التأسيس",
+        "title": "جهات الاتصال والمفوضون",
+        "purpose": "سجل استكمال المفوضين — 44 صفا (حالة صريحة لكل مورد)",
+        "grain": "جهة اتصال\/مفوض واحد",
+        "source": "مصدر الحقيقة: إدارة الموردين · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Child Register",
+        "declared": 16,
+        "fields": [
+            {
+                "name": "رقم الجهة · Contact_ID",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "رقم المورد",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "اسم المورد (بحث)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "الاسم",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الصفة\/الدور",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نوع التفويض",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مستند التفويض",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "سريان التفويض من",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "إلى",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الهاتف الأساسي",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "هاتف بديل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "البريد",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة جهة الاتصال",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الحجية",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "حالة البيانات",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 3,
+        "group": "التأسيس",
+        "title": "التأهيل القانوني والائتماني",
+        "purpose": "سجل استكمال التأهيل والائتمان KYC — 44 صفا",
+        "grain": "سجل تأهيل قانوني وائتماني واحد لمورد",
+        "source": "مصدر الحقيقة: الموردون+المالية · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Child Register",
+        "declared": 26,
+        "fields": [
+            {
+                "name": "رقم القيد · Qual_ID",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "رقم المورد",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "اسم المورد (بحث)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "نوع الوثيقة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رقم الوثيقة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "جهة الإصدار",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تاريخ الإصدار",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تاريخ الانتهاء",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة التحقق",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تاريخ التحقق",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المتحقق",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "اسم البنك",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الفرع",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رقم الحساب",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "اسم صاحب الحساب",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مطابقة الاسم للمورد؟",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "علم حساب طرف ثالث",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مستند تفويض الطرف الثالث",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حد التعامل الشهري $",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حد التعامل ج.س",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "شروط سداد افتراضية",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "التصنيف الائتماني الداخلي",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "أساس التصنيف",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مستوى الحجية",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "حالة البيانات",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 4,
+        "group": "التأسيس",
+        "title": "معدات المورد المتاحة — Equipment Pool",
+        "purpose": "المعدات المقدمة تحت عقد المورد — المورد مالك قدرة تعاقدية لا مالك أصل بالضرورة",
+        "grain": "معدة مقدمة تحت عقد المورد واحدة",
+        "source": "مصدر الحقيقة: الأسطول · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Master — ملكية الأسطول",
+        "declared": 34,
+        "fields": [
+            {
+                "name": "كود المعدة · Equipment_ID",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "التسلسل الزمني للإسناد ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "رقم المورد",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "اسم المورد (بحث)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "نوع الآلية\/البند",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "بادئة النوع",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رقم اللوحة (كما ورد)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رمز اللوحة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رقم اللوحة (رقمي)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رقم الشاسي",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "سنة الصنع",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الملكية",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المالك القانوني للمعدة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "هاتف المالك",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "صفة المورد تجاه المعدة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مستند حق التقديم (نوع\/رقم\/تاريخ\/جهة)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة التحقق من الصفة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تاريخ التحقق",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المتحقق",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مخاطر الصفة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "وسم «لا ترسمل»",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة المعدة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تاريخ أول إسناد ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "تاريخ آخر إسناد ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "أشهر منذ آخر نشاط ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "عدد الوحدات التعاقدية التي خدمها ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "آخر عميل خدمه ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "أساس حالة المعدة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "علم تعارض الحالة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "تاريخ الحالة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "معدة مساندة؟",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مرادفات أكواد قديمة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مصدر التوثيق",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 5,
+        "group": "التعاقد",
+        "title": "احتياجات التغطية",
+        "purpose": "جانب الطلب — قراءة مقيدة (كل صف حاوية×نوع)",
+        "grain": "دورة التزام × نوع — جانب الطلب (قراءة مقيدة من المبيعات)",
+        "source": "مصدر الحقيقة: منظومة المبيعات (قراءة) · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Derived View — قراءة الطلب",
+        "declared": 32,
+        "fields": [
+            {
+                "name": "رقم الاحتياج · Need_ID",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "كود العقد",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "رقم العقد (تسلسل العميل)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "رقم العميل",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "اسم العميل (بحث)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "نموذج العمل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مفتاح دورة الالتزام · Key",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "رقم التجديد (دورة الالتزام)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نوع دورة الالتزام",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نوع الآلية\/البند",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "وحدة القياس",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "خانات العميل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "أساس الوحدة الشهري",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "أشهر دورة الالتزام",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "سعة دورة الالتزام (المستهدف)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المستهدف المنقضي ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "سعر بيع الوحدة (قراءة) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "السريان التعاقدي من",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "إلى",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة توزيع الاحتياج (مصدر)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المغطى بعقود الموردين ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "فجوة التغطية ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "حالة الاحتياج",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Σ حصص الموردين (حي) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "علم تجاوز التوزيع ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "فحص الوحدات التعاقدية (مصدر)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "خانات الموردين (مصدر)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "منفذ دورة الالتزام (مصدر) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "نسبة تحقق دورة الالتزام (مصدر) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة عقد العميل (قراءة من المبيعات) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "النهاية التنفيذية لعقد العميل ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            }
+        ]
+    },
+    {
+        "no": 6,
+        "group": "التعاقد",
+        "title": "الترشيح ومراجعة التعاقد",
+        "purpose": "150 قيد ترشيح رجعي (توثيق أثر) + بوابة الترشيح المستقبلية",
+        "grain": "قيد ترشيح\/مراجعة تعاقد واحد",
+        "source": "مصدر الحقيقة: الموردون+الحوكمة · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Transaction",
+        "declared": 27,
+        "fields": [
+            {
+                "name": "رقم الترشيح · Nom_ID",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "رقم الاحتياج",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "كود العقد",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "رقم المورد",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "اسم المورد (بحث)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "نوع الآلية\/البند",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "كود المعدة المعروضة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "السعر المعروض",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "العملة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تاريخ العرض",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "فحص التأهيل القانوني",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "فحص الحساب البنكي",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "فحص تعارض المصالح",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "فحص السقف الائتماني",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "فحص الهامش (ضمن الحد)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "فحص توافق الحصة مع الاحتياج",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "استثناء معتمد (مرجع)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "جاهزية التوقيع",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المنشئ",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "المراجع",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "المعتمد",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "تاريخ المراجعة",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "حالة الترشيح",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "سبب الاختيار\/الاستبعاد",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "كود عقد المورد الناتج",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "حالة البيانات",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 7,
+        "group": "التعاقد",
+        "title": "عروض الموردين والتفاوض",
+        "purpose": "العرض الفائز التاريخي لكل عقد (150) بطبقة Versioning — عروض المنافسين لا تخترع",
+        "grain": "عرض مورد واحد بطبقة إصدارات",
+        "source": "مصدر الحقيقة: إدارة الموردين · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Transaction",
+        "declared": 31,
+        "fields": [
+            {
+                "name": "كود العرض · SupOffer_ID",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "كود عقد المورد (الناتج)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "رقم المورد",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "اسم المورد (بحث)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "نموذج العمل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "صفة العرض",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رقم النسخة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "النسخة الأساس",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "ما الذي تغير عن سابقتها",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "من اقترح التغيير",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تاريخ التغيير",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة التفاوض",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "أنواع البنود المعروضة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "عدد البنود ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "إجمالي الحصة الشهرية المعروضة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "أدنى سعر وحدة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "أعلى سعر وحدة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "العملة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "شروط السداد المعروضة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "موقع التنفيذ",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تاريخ العرض",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "العرض يسبق ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "عروض منافسة قورنت",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الضمانات المطلوبة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Record_Basis",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Derivation_Rule",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Confidence",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Needs_Review",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "حالة البيانات",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "المصدر",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 8,
+        "group": "التعاقد",
+        "title": "سجل عقود الموردين",
+        "purpose": "رأس العلاقات التعاقدية — يقرأ دائما مفصلا بالحجية: عقد موقع · سجل تشغيلي · علاقة مستنتجة · حسبة مختلفة",
+        "grain": "عقد مورد واحد",
+        "source": "مصدر الحقيقة: إدارة الموردين · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Transaction — رأس تعاقدي",
+        "declared": 45,
+        "fields": [
+            {
+                "name": "كود عقد المورد · Sup_Contract_ID",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "التسلسل الزمني للعقد ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "رقم المورد",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "اسم المورد (بحث)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "كود العقد (العميل)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "رقم العميل",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "اسم العميل (بحث)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "نموذج العمل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رقم عقد المورد (رتبة الانضمام) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "تسلسل عقد المورد بالشركة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مفتاح دورة الالتزام · Key",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "استثناء تسوية فقط؟",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مرجع اعتماد الاستثناء",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "توقيع الوثيقة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "البداية التعاقدية (مستنتجة) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "النهاية التعاقدية (مستنتجة) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "أساس استنتاج المدة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "البداية التنفيذية ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "النهاية التنفيذية ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "تاريخ الانضمام (أول يوم عمل) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "حالة العقد",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "أساس حالة العقد ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "تعارض مع حالة عقد العميل ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "تكييف الوثيقة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مستوى الحجية",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "العملة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "شروط السداد",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "موقع التنفيذ\/المنجم",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "القيمة الشهرية التعاقدية ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "قيمة العقد التقديرية ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "عدد البنود ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "عدد الوحدات التعاقدية المسندة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "نسخة العقد الحالية",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مرجع آخر ملحق (م21)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة الإغلاق ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "علم انتهاء قبل عقد العميل ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "حلقات الحجية المتوفرة (من 20) ◄",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "نسبة اكتمال الملف المستندي ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "الحلقات المفقودة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "حالة البيانات",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المنشئ",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "المراجع",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "المعتمد",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "تاريخ الاعتماد الداخلي",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            }
+        ]
+    },
+    {
+        "no": 9,
+        "group": "التعاقد",
+        "title": "بنود عقود الموردين",
+        "purpose": "البنود: النوع والحصة والسعر الغالب من الاستحقاقات",
+        "grain": "بند عقد مورد واحد",
+        "source": "مصدر الحقيقة: إدارة الموردين · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Child Register",
+        "declared": 31,
+        "fields": [
+            {
+                "name": "رقم البند · SupLine_ID",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "كود عقد المورد",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "رقم المورد",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "اسم المورد (بحث)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "رقم بند عقد العميل المقابل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نموذج العمل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نوع الآلية\/البند",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "وحدة القياس",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الحصة الشهرية المتعاقدة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "سعر الوحدة الأساسي",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "سعر الوحدة الإضافي",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "سعر السداد ≤15 يوما",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "سعر السداد 15–45",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "سعر السداد >45",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المبلغ الشهري الأساسي",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "عدد الورديات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "العملة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "سريان التركيبة من",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "إلى",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Pricing_Model",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Billing_UOM",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Minimum_Qty (أساس الوحدة التعاقدية)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Minimum_Period",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Guaranteed_Qty",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Threshold_Qty",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Shortfall_Bearer",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Pricing_Reference",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "النسخة السعرية",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة البند",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مصدر السعر\/الحجية",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 10,
+        "group": "التعاقد",
+        "title": "مصفوفة المسؤوليات والتكاليف",
+        "purpose": "مصفوفة المسؤوليات العريضة: كل عقد صف واحد وكل بند التزام عمود ▼ — القيمة تحدد الملتزم (المورد\/الشركة\/العميل\/مشترك\/مسكوت عنه)",
+        "grain": "عقد واحد × مصفوفة المسؤوليات (كل التزام عمود ▼)",
+        "source": "مصدر الحقيقة: إدارة الموردين · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Child Register — مصفوفة",
+        "declared": 27,
+        "fields": [
+            {
+                "name": "كود عقد المورد · Sup_Contract_ID",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "رقم المورد",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "اسم المورد (بحث)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "نموذج العمل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تكييف الوثيقة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مستوى الحجية",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "الوقود ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "الزيوت ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "الصيانة ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "قطع الغيار ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "المشغل (السائق) ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "السكن والإعاشة ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "ترحيل الذهاب ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "ترحيل العودة ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "الضرر ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "الانتظار ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "التوقف ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "العطل ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "التأمين ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "المخالفات ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "عدد البنود المحددة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "حالة تعبئة المصفوفة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "المرجع (نص العقد\/الملحق)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المعبئ",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تاريخ التعبئة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة البيانات",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 11,
+        "group": "التشغيل",
+        "title": "الخانات المكافئة وتوزيع الحصص",
+        "purpose": "الطبقة التي تسبق الوحدة التعاقدية والمعدة معا: تحسب الوحدات التعاقدية المكافئة لكل مورد (متوسط منفذه الشهري ÷ أساس الوحدة التعاقدية بحسب نوع المعدة) ثم توزع خانات دورة الالتزام أعدادا صحيحة بطريقة أكبر البواقي بحيث يطابق مجموعها خانات دورة الالتزام بالضبط · وما زاد عن الاستحقاق يسجل احتياطيا · ومن يقل استحقاقه عن نصف خانة يدرج احتياطيا أو يجمع مع نظرائه في خانة مشتركة تقاس عليهم مجتمعين · وكل تعديل في الحصص مؤرخ وغير رجعي",
+        "grain": "مورد × حاوية × نوع آلية — سطر استحقاق وتوزيع واحد",
+        "source": "مصدر الحقيقة: مصدر الحقيقة: المنفذ من التايم شيت المعتمد (11 التشغيل) للاستحقاق · وقرار التوزيع عند إدارة الموردين · المالك: إدارة الموردين — والحصة تقاس بالوحدات التعاقدية لا بالآليات · والمبدأ الحاكم: الحصة تقاس بالوحدات التعاقدية لا بالآليات — لا يعني الشركة كم آلية وفر المورد بل ما حققه من مستهدف خاناته، وهذا يفصل المسؤولية التعاقدية عن الوسيلة التشغيلية · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Derived + قرار توزيع",
+        "declared": 20,
+        "fields": [
+            {
+                "name": "معرف سطر التوزيع",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "مفتاح دورة الالتزام السنوية ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "رقم المورد ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "اسم المورد ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "نوع الآلية\/البند ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "أساس الوحدة التعاقدية الشهري ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "متوسط المنفذ الشهري ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "الوحدات التعاقدية المكافئة (الاستحقاق) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "الوحدات التعاقدية الممنوحة (أعدادا صحيحة)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "فارق أكبر البواقي ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "آليات زائدة عن الوحدات التعاقدية ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "تصنيف المورد ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "عضو خانة مشتركة؟ ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "نسبة المساهمة في الوحدة التعاقدية المشتركة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "آلات تعاقدية = المستهدف ÷ أساس الوحدة التعاقدية ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "آلات واقعية = المستهدف ÷ إنتاجية آلة المورد ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "الفرق بين التعاقدي والواقعي ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "ساري من تاريخ",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مرجع قرار التوزيع",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة التوزيع ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            }
+        ]
+    },
+    {
+        "no": 12,
+        "group": "التشغيل",
+        "title": "حصص الموردين والوحدات التعاقدية",
+        "purpose": "175 خانة (154 بمورد + 21 متناوبة S0) بهامش كل خانة",
+        "grain": "وحدة تعاقدية واحدة بحصتها وهامشها",
+        "source": "مصدر الحقيقة: إدارة الموردين · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Transaction — رأس التوزيع",
+        "declared": 50,
+        "fields": [
+            {
+                "name": "كود الوحدة التعاقدية · Slot_ID",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "التسلسل الزمني للوحدة التعاقدية ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "رقم العميل",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "نموذج العمل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رقم العقد",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "رقم التجديد (دورة الالتزام)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مفتاح دورة الالتزام · Key",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "رقم المورد",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "اسم المورد (بحث)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "كود عقد المورد",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "نوع الآلية\/البند",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "وحدة القياس",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نوع الوحدة التعاقدية",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "التصنيف (استمرارية)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "عدد الوحدات التعاقدية للآلية",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الدور المستنتج",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "أساس الوحدة التعاقدية الشهري ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "أشهر عقد المورد بدورة الالتزام (كما ورد)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "أشهر منقضية ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "أشهر دورة الالتزام (إجمالي) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "وحدات-شهر ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "حصة المورد ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "المستهدف الشهري",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المعدات الأساسية المطلوبة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الأساسية المتاحة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "الاحتياطية ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "فجوة الأساسية ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "أساسية نشطة (حي) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "علم عجز معدات ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "نسبة تغطية المعدات ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "الاعتماد على الاحتياطي ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "المنفذ ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "نسبة التحقق ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "سريان الحصة من",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "إلى",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "سعر وحدة المورد (م08) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "سعر بيع الوحدة (قراءة) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "هامش الوحدة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "علم هامش سالب ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "حالة الوحدة التعاقدية",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الحجية",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "إجمالي التزام العميل (مصدر)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نسبة الحصة من الالتزام ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "العجز \/ الفائض ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "كود العقد (قراءة) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "عملة البيع (قراءة) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "ملاءمة عملة الهامش ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "علم حصة جارية بلا نشاط ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "آخر نشاط بالوحدة التعاقدية ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            }
+        ]
+    },
+    {
+        "no": 13,
+        "group": "التشغيل",
+        "title": "سجل تسليم الخانات",
+        "purpose": "الوحدة التعاقدية تسلم ولا تقسم: الدائمون يأخذون خانات ثابتة والمتبقي خانات متناوبة تسند بفترات مؤرخة · تشغل الوحدة التعاقدية من تاريخ دخول المورد إلى تاريخ خروجه ثم يتسلمها بديله من تاريخ دخوله · والمتناوب يقاس على مستهدف فترته فقط (أساس الوحدة التعاقدية × أشهر إشغاله) · وإن اجتمع أكثر من متناوب على خانة في شهر قيسوا مجتمعين ووزع الفائض أو العجز بنسبة مساهمة كل · وأربعة حقول لا تترك: الوحدة التعاقدية · المورد · من تاريخ · إلى تاريخ",
+        "grain": "خانة × مورد × فترة إشغال — سطر إشغال واحد بتاريخيه",
+        "source": "مصدر الحقيقة: مصدر الحقيقة: قرار الإسناد وتاريخا الدخول والخروج · المالك: إدارة الموردين · النوع: سجل إشغال — ولا تترك خانة شاغرة إلا بتوثيق شغورها بتاريخيه · وأربعة حقول لا تترك في كل تسليم: الوحدة التعاقدية · المورد · من تاريخ · إلى تاريخ · ولا تداخل آليات بين خانتين في وقت واحد ولا في الوحدة التعاقدية الواحدة · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Transaction",
+        "declared": 20,
+        "fields": [
+            {
+                "name": "معرف الإشغال",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "كود الوحدة التعاقدية (بادئة النوع + تسلسل) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "مفتاح دورة الالتزام السنوية ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "نوع الآلية\/البند ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "رقم المورد",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "اسم المورد ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "نوع الإشغال ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "من تاريخ",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "إلى تاريخ",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "أشهر الإشغال ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "مستهدف الفترة (أساس الوحدة التعاقدية × أشهر الإشغال) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "المنفذ في الفترة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "تحقق الفترة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "المورد المسلم ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "المورد المتسلم ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "شغور موثق؟ ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "مبرر الشغور",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نسبة المساهمة عند اجتماع متناوبين ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "مرجع القرار",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة الإشغال ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            }
+        ]
+    },
+    {
+        "no": 14,
+        "group": "التشغيل",
+        "title": "توزيع الوحدات التعاقدية على المعدات",
+        "purpose": "570 إسنادا — Resource Assignment بكامل بيانات النشاط",
+        "grain": "إسناد معدة واحد على وحدة تعاقدية",
+        "source": "مصدر الحقيقة: الأسطول+الموردون · الطبقة التي قبل المعدة هي الوحدة التعاقدية: لا إسناد آلية إلا داخل خانة مسندة لحصة مورد — والسلسلة الحاكمة خمس طبقات: عقد العميل ← التزام نوع المعدة ← حصة المورد (الوحدات التعاقدية) ← آليات المورد ← تكليف المشغل (تكليف تشغيلي لا حصة) · ولا تداخل آليات بين خانتين في وقت واحد · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Transaction",
+        "declared": 35,
+        "fields": [
+            {
+                "name": "رقم الإسناد · Assign_ID",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "كود الوحدة التعاقدية · Slot_ID",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "كود عقد المورد",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "رقم المورد",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "كود المعدة · Equipment_ID",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نوع الآلية\/البند",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رقم اللوحة (كما ورد)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رمز اللوحة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "رقم اللوحة (رقمي) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "نوع الوحدة التعاقدية",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مفتاح دورة الالتزام · Key",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "رقم العميل",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "اسم العميل (بحث)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "نموذج العمل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رقم الآلية في عقد العميل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رقم الآلية في عقد المورد",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "من",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "إلى",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نوع الإسناد",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الدور (أساسية\/احتياطية)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "سبب التغيير",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مرجع حدث الجاهزية (م12)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "أشهر النشاط ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "أيام العمل ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "المنفذ بوحدة الحصة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "ساعات المورد الكلية ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "ساعات الاتفاق الشهرية",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الموقع (المنجم)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الاستمرارية",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الوضع التشغيلي",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مستحق المورد $ (مرجعي) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "عقد المورد (كما بالمصدر)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "عدد إسنادات الآلية ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "حالة الإسناد",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 15,
+        "group": "التشغيل",
+        "title": "الجاهزية والإحلال والاحتياط",
+        "purpose": "76 واقعة دخول\/خروج وعضوية متناوبة (التاريخ لا يمحى)",
+        "grain": "واقعة دخول\/خروج جاهزية أو عضوية تناوب واحدة",
+        "source": "مصدر الحقيقة: العمليات · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Event Register",
+        "declared": 20,
+        "fields": [
+            {
+                "name": "رقم الحدث · Event_ID",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "مفتاح دورة الالتزام · Key",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "كود الوحدة التعاقدية · Slot_ID",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "اختبار الانتماء ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "نموذج العمل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رقم الشهر",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "التاريخ",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الحدث",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نوع الوحدة التعاقدية",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رقم المورد",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "اسم المورد (بحث)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "كود المعدة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الطرف المقابل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "من الاحتياطي؟",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "القيمة قبل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "القيمة بعد",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "اسم المستند ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "تاريخ المستند ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "مستند\/مرجع (كما ورد)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 16,
+        "group": "التشغيل",
+        "title": "مستهدفات الموردين",
+        "purpose": "المستهدف الشهري من السريان التعاقدي — يشمل أشهر الصفر (لا تحيز بقاء)",
+        "grain": "مستهدف شهري واحد — مشتق من السريان التعاقدي",
+        "source": "مصدر الحقيقة: مشتق من م10 · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Derived View",
+        "declared": 21,
+        "fields": [
+            {
+                "name": "رقم السطر",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "كود الوحدة التعاقدية · Slot_ID",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رقم المورد",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "اسم المورد (بحث)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "كود عقد المورد",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "نموذج العمل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نوع الآلية\/البند",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رقم الشهر",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "من",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "إلى",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "وحدة القياس",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "خانات الشهر",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "قيمة الوحدة التعاقدية (الجزئي أيامه\/30)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مستهدف الشهر ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "المنفذ بالشهر ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "نسبة تحقق الشهر ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "علم شهر بلا تنفيذ ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "المستهدف المنقضي ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "نسخة الخطة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مصدر المستهدف",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 17,
+        "group": "التشغيل",
+        "title": "الأداء والوحدات المعتمدة",
+        "purpose": "1,210 قيد أداء: المنفذ والتسويات بوحدات النماذج الثلاثة",
+        "grain": "قيد أداء معتمد واحد: وحدة × شهر",
+        "source": "مصدر الحقيقة: العمليات←اعتماد · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Periodic Register",
+        "declared": 44,
+        "fields": [
+            {
+                "name": "رقم السطر",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "كود الوحدة التعاقدية · Slot_ID",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "كود عقد المورد",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "رقم المورد",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "اسم المورد (بحث)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "نموذج العمل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رقم الشهر",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "من",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "إلى",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "وحدة القياس",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نوع الآلية\/البند",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رمز الآلية (مصدر)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رقم اللوحة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "ساعات الاتفاق (متعاقد)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "أطنان متفق عليها",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "أمتار متفق عليها",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المنفذ (الأساس) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "ساعات أساسية (مصدر) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "أطنان ويست ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "أطنان خام ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "أمتار تفجير ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "أمتار G.C ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "مضافة عمل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مستند المضافة عمل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مضافة تعطل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مضافة استعداد",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مستند المضافة استعداد",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مخصومة — استعداد",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مخصومة — عمل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "سبب الخصم",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مرجع قرار الخصم",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "معتمد التسوية",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الساعات الفعلية ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "الساعات الكلية ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "صافي وحدات المورد المعتمدة ◄",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "منجزة العميل (قراءة) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "تاريخ الاعتماد",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "مصدر البيان",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "طريقة الربط بالحصة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة المورد وقت القيد",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المنشئ",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "المراجع",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "المعتمد",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            }
+        ]
+    },
+    {
+        "no": 18,
+        "group": "التشغيل",
+        "title": "قياس التغطية والعجز والفائض",
+        "purpose": "أهم مقياس في النظام: لكل شهر ونوع — مجموع عجز المقصرين ومجموع فائض المتجاوزين ونسبة التغطية بينهما · وحين تبلغ التغطية صفرا فتلك أخطر إشارة: كل الموردين عجزوا في الشهر نفسه ولم يبق من يغطي · وفجوة التغطية تظهر دائما ولا تخفى ولا تجمل",
+        "grain": "حاوية × نوع آلية × شهر — سطر تغطية واحد مشتق",
+        "source": "مصدر الحقيقة: مصدر الحقيقة: المستهدفات من الحصص والمنفذ من التايم شيت المعتمد · المالك: إدارة الموردين قياسا · النوع: مشتق — لا إدخال · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Derived",
+        "declared": 17,
+        "fields": [
+            {
+                "name": "معرف السطر ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "مفتاح دورة الالتزام السنوية ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "رقم دورة الالتزام الشهرية ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "نوع الآلية\/البند ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "سعة دورة الالتزام الشهرية ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "مجموع مستهدفات الوحدات التعاقدية ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "مجموع المنفذ ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "نسبة التحقق ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "مجموع عجز المقصرين ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "مجموع فائض المتجاوزين ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "نسبة التغطية بينهما ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "عدد الموردين العاجزين ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "عدد المتجاوزين ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "أشهر متتالية بلا تغطية ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "فجوة التغطية النهائية ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "إشارة إنذار ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "مرجع الخطر المتفرع ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            }
+        ]
+    },
+    {
+        "no": 19,
+        "group": "المالية",
+        "title": "النيابية والسلف والخصومات",
+        "purpose": "قالب مهيأ — لا وقائع نيابية بالمصدر الحالي (بانتظار تفكيك بيان الأستاذ)",
+        "grain": "واقعة نيابية\/سلفة\/خصم واحدة",
+        "source": "مصدر الحقيقة: الموردون+المالية · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Transaction",
+        "declared": 25,
+        "fields": [
+            {
+                "name": "رقم الواقعة · OnBehalf_ID",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "التاريخ",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رقم المورد",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "اسم المورد (بحث)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "كود عقد المورد",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "كود الوحدة التعاقدية\/المعدة (إن وجد)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نوع الواقعة النيابية",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "كود المشغل E###",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الوصف",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المبلغ",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "العملة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Provided_By",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Paid_By",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Economic_Cost_Bearer",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "قابل للاسترداد؟",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المستند\/الإثبات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "معتمد الصرف",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة السلسلة النيابية",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مرجع التسوية الخاصمة (م17)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المبلغ المسترد ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "المتبقي ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "نص المصدر (بيان الأستاذ)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Source_Row_Ref",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "حالة البيانات",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 20,
+        "group": "المالية",
+        "title": "استحقاقات الموردين",
+        "purpose": "1,210 استحقاقا بمكوناته الست والخصومات والإجماليين $\/ج.س",
+        "grain": "استحقاق شهري واحد لمورد بمكوناته",
+        "source": "مصدر الحقيقة: مشتق · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Derived View — استحقاق",
+        "declared": 36,
+        "fields": [
+            {
+                "name": "رقم الاستحقاق · Entitle_ID",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "الفترة (شهر)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رقم المورد",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "اسم المورد (بحث)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "كود عقد المورد",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "رقم البند",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "وحدة القياس",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مفتاح الشهر",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نوع الآلية\/البند",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الوحدات المعتمدة ◄",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "الاتفاق الشهري $",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "سعر الساعة $ (مطبق)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "سعر الإضافية $ (مطبق)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "سعر الساعة ج.س (مطبق)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "سعر طن ويست (مطبق)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "سعر طن خام (مطبق)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "سعر متر تفجير (مطبق)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "سعر متر G.C (مطبق)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مستحق الساعات $ ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "مستحق الساعات ج.س ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "مبلغ الإضافية $ ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "مستحق الأطنان $ ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "مستحق تفجير $ ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "مستحق G.C $ ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "(−) الخصومات ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "إجمالي الاستحقاق $ ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "إجمالي الاستحقاق ج.س ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "المستلم الكلي $ (مصدر) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "المتبقي $ (مصدر) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "المتبقي ج.س (مصدر) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "حالة الاستحقاق",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تاريخ الإثبات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مرجع الأداء (م14)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مصدر السعر",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "البيان (مصدر)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 21,
+        "group": "المالية",
+        "title": "الإقفال التعاقدي للوحدات التعاقدية",
+        "purpose": "إقفال دورة الوحدة التعاقدية التعاقدية — عقد × خانة × فترة سريان × عملة (175) مقابل المنفذ المعتمد",
+        "grain": "إقفال تعاقدي واحد: عقد × وحدة × فترة سريان × عملة",
+        "source": "مصدر الحقيقة: مشتق (م10+م14) · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Periodic Register",
+        "declared": 34,
+        "fields": [
+            {
+                "name": "كود الإقفال التعاقدي · SlotClose_ID",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "كود الوحدة التعاقدية · Slot_ID",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "كود عقد المورد",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "رقم المورد",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "اسم المورد (بحث)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "نموذج العمل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نوع الآلية\/البند",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "وحدة القياس",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نوع الفترة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "بداية الفترة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نهاية الفترة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "شهر نهاية الفترة (وسم) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "أشهر الفترة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "الأساس الشهري المتعاقد ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "المتعاقد عليه للفترة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "المنفذ المعتمد بالفترة ◄",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "الفجوة\/الفائض ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "نسبة التحقق ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "أشهر بها أداء ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "آخر نشاط بالوحدة التعاقدية ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "سعر وحدة المورد (م08) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "العملة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "قيمة الفترة التقديرية ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "حالة الوحدة التعاقدية (م10)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة الإقفال التعاقدي ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "مرجع الإقفال الشهري (م17)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المنشئ",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "المراجع",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "المعتمد",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "تاريخ الاعتماد",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Record_Basis",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Derivation_Rule",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "حالة البيانات",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 22,
+        "group": "المالية",
+        "title": "التسويات وكشف الحساب",
+        "purpose": "الإقفال الشهري وكشف الحساب — مورد × شهر × عملة بترحيل رصيد حي",
+        "grain": "إقفال شهري\/كشف حساب: مورد × شهر × عملة",
+        "source": "مصدر الحقيقة: مشتق+اعتماد · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Periodic Register",
+        "declared": 22,
+        "fields": [
+            {
+                "name": "رقم الإقفال · Settle_ID",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "رقم المورد",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "اسم المورد (بحث)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "العملة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الشهر",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مفتاح الشهر",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رصيد افتتاحي ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "استحقاق الشهر ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "(−) مستردات نيابية (م15) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "(−) سلف ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "(−) جزاءات (م19) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "(±) تسويات معتمدة أخرى",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "صافي مستحق الشهر Net_Payable ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "المدفوع خلال الشهر ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "رصيد ختامي ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "حالة الإقفال",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المنشئ",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "المراجع",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "المعتمد",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "تاريخ الاعتماد",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "مراجع البنود الخاصمة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 23,
+        "group": "المالية",
+        "title": "طلبات الدفع وحالة الصرف",
+        "purpose": "906 دفعية تاريخية (حالة الصرف: مصروف) بمرجع تسويتها",
+        "grain": "طلب دفع\/دفعة واحدة",
+        "source": "مصدر الحقيقة: الموردون؛الصرف قراءة · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Transaction",
+        "declared": 32,
+        "fields": [
+            {
+                "name": "رقم الطلب · PayReq_ID",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "التاريخ",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رقم المورد",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "الجهة المستفيدة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "طريقة الدفع",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "اسم البنك",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رقم الحساب",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "اسم صاحب الحساب",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "علم طرف ثالث",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مرجع تفويض الطرف الثالث (م03)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "العميل\/المشروع",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نظام التقسيم",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مرجع التسوية (م17)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المستلم ج.س (لاستحقاق الجنيه)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المستلم بالجنيه (مدولر)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "سعر الصرف (مصدره وتاريخه)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المستلم الكلي $ ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "مفتاح شهر الصرف",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "شهر الاستحقاق المسدد (كما ورد)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الإقفال المخصص ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "حالة التخصيص",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة الطلب",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة الصرف (قراءة) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "تاريخ الصرف ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "مرجع الصرف ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "سياق الآلية (إن ورد)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "طبيعة الدفعة (مستخرجة) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "البيان (مصدر)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المنشئ",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "المراجع",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "المعتمد",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            }
+        ]
+    },
+    {
+        "no": 24,
+        "group": "المالية",
+        "title": "تخصيص الدفع على الإقفالات",
+        "purpose": "Payment Allocation: 1,002 سطر تخصيص (مباشر 445 + FIFO قاعدة مالك)",
+        "grain": "سطر تخصيص دفعة واحد على إقفال",
+        "source": "مصدر الحقيقة: المالية (قاعدة مالك للتخصيص) · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Child Register",
+        "declared": 10,
+        "fields": [
+            {
+                "name": "رقم التخصيص",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "رقم طلب الدفع",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رقم المورد",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "رقم الإقفال (م17)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "العملة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المبلغ المخصص",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تاريخ التخصيص",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "قاعدة التخصيص",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة البيانات",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "علم تجاوز صافي الشهر ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            }
+        ]
+    },
+    {
+        "no": 25,
+        "group": "المالية",
+        "title": "أعمار الأرصدة والالتزامات",
+        "purpose": "الرصيد القائم لكل مورد × عملة بشرائح التقادم (44) — نظير طبقة التدفق بالتمويل",
+        "grain": "مورد × عملة × شريحة تقادم",
+        "source": "مصدر الحقيقة: مشتق (م16+م18) · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Derived View — Aging",
+        "declared": 22,
+        "fields": [
+            {
+                "name": "كود الرصيد · Aging_ID",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "التسلسل الزمني للمورد ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "رقم المورد",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "اسم المورد (بحث)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "العملة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "إجمالي الاستحقاق ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "إجمالي المدفوع ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "الرصيد القائم ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "آخر شهر حركة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "عمر الرصيد (يوما) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "شريحة العمر ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "حالة الرصيد ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "حالة المورد (م01) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "التزام قادم ≤30 يوما",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "التزام قادم 31–60",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "التزام قادم 61–90",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "إجراء التحصيل\/السداد المقترح",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المسؤول",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Record_Basis",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Derivation_Rule",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "حالة البيانات",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 26,
+        "group": "الحوكمة",
+        "title": "المخالفات والجزاءات",
+        "purpose": "قالب مهيأ — لا مخالفات بالمصدر الحالي",
+        "grain": "مخالفة\/جزاء واحد",
+        "source": "مصدر الحقيقة: الحوكمة · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Exception Register",
+        "declared": 16,
+        "fields": [
+            {
+                "name": "رقم القيد",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "التاريخ",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رقم المورد",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "اسم المورد (بحث)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "كود عقد المورد",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "نوع الجزاء\/المطالبة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الوصف",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المرجع التعاقدي (بند)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المبلغ\/الأثر",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "العملة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الحالة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "القرار",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "معتمد القرار",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مرجع الخصم بالتسوية (م17)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة البيانات",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 27,
+        "group": "الحوكمة",
+        "title": "تقييم المورد والأداء",
+        "purpose": "ملف مخاطر المورد Supplier Risk Profile — مشتقات حية + تقييم نوعي",
+        "grain": "تقييم دوري واحد — ملف مخاطر المورد",
+        "source": "مصدر الحقيقة: إدارة الموردين · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Periodic Register — تقييم",
+        "declared": 29,
+        "fields": [
+            {
+                "name": "رقم المورد",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "اسم المورد (بحث)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "الفترة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "عقود نشطة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "عقود منتهية بلا إغلاق ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "حصص (خانات) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "معدات مسندة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "انكشاف الاستحقاق $ ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "المدفوع $ ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "الرصيد المستحق $ ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "نسبة التركز من محفظة الاستحقاق ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "Σ المستهدف (تجميعي عبر الوحدات) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "Σ المنفذ (تجميعي) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "نسبة تحقق الحصص ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "Σ مخصومة — عمل (ساعات) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "معدل الخصومات ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "نسبة معدات غير متحقق الصفة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "موردون بديلون لأضيق نوع ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "عقود تنتهي قبل عقد العميل ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "تصنيف المخاطرة المركب ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "درجة المخاطرة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "الالتزام بالمواعيد %",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "جودة المعدات (1–5)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الاستجابة للبلاغات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "التصنيف الاستراتيجي",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "ملاحظات الأداء",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المقيم",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تاريخ التقييم",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة الاعتماد",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 28,
+        "group": "الحوكمة",
+        "title": "الملاحق والتصفية والإغلاق",
+        "purpose": "وقائع التغيير التعاقدي المستنتجة: ملاحق سعر · تجديدات · إنهاءات (كنظام المبيعات 17)",
+        "grain": "واقعة ملحق أو تصفية أو إغلاق واحدة",
+        "source": "مصدر الحقيقة: العقود · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Event Register",
+        "declared": 12,
+        "fields": [
+            {
+                "name": "رقم القيد",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "كود عقد المورد",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "نوع وثيقة الإغلاق",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رقم النسخة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "ما الذي تغير",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "سريان من",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تاريخ التوقيع",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الحالة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مرجع تسوية الإغلاق (م17)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "إخلاء الطرف",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المستند",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 29,
+        "group": "الحوكمة",
+        "title": "مصادر القدرة والتكامل",
+        "purpose": "31 سطرا: العقود النشطة EXTERNAL + سطر FINANCED معلن الحالة",
+        "grain": "سطر تكامل مصدر قدرة واحد",
+        "source": "مصدر الحقيقة: تكامل · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Reference",
+        "declared": 11,
+        "fields": [
+            {
+                "name": "رقم السطر",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "مصدر القدرة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المرجع (كود عقد مورد \/ كود أصل)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نوع الآلية\/البند",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الطاقة الشهرية",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "وحدة القياس",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تكلفة الوحدة (قراءة) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "نظام المصدر",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الحالة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة البيانات",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "ملاحظة الفصل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 30,
+        "group": "اللوحة — خارج الدورة",
+        "title": "لوحة إدارة الموردين",
+        "purpose": "لوحة حية بصيغ مشتقة بالكامل — صفر إدخال",
+        "grain": "مؤشر لوحة واحد — مشتق",
+        "source": "مصدر الحقيقة: مشتق كليا · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Dashboard",
+        "declared": 5,
+        "fields": [
+            {
+                "name": "المؤشر",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "القيمة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "المعادلة\/المصدر",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الفترة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "ملاحظة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 31,
+        "group": "المرجعيات",
+        "title": "القوائم المرجعية",
+        "purpose": "القوائم الموحدة + قوائم القيم الفعلية من المصدر",
+        "grain": "قائمة مرجعية واحدة (كل قائمة عمود)",
+        "source": "مصدر الحقيقة: الحوكمة · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Reference",
+        "declared": 47,
+        "fields": [
+            {
+                "name": "نموذج العمل",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "وحدة القياس",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "العملة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نوع الآلية\/البند",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "بادئة النوع",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تصنيف المورد",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "فئة مصدر القدرة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "طبيعة المورد",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة المورد",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "أساس اشتقاق الحالة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نوع التفويض",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نوع الوثيقة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة التحقق",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نوع الوحدة التعاقدية",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "التصنيف (استمرارية)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الدور (أساسية\/احتياطية)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نوع الإسناد",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الحدث",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة العقد",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تكييف الوثيقة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مستوى الحجية",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "حجية الحصة (المصدر)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "كود الالتزام",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "أطراف الثلاثية",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "طرف الالتزام (م09)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "قابل للاسترداد؟",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نوع الواقعة النيابية",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة السلسلة النيابية",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة الاستحقاق",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة التسوية",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نظام التقسيم",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "طريقة الدفع",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة الطلب",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة الصرف",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نوع الجزاء\/المطالبة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نوع وثيقة الإغلاق",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "التصنيف الاستراتيجي",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مصدر القدرة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "قرار الترحيل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "جاهزية التوقيع",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نتيجة الفحص",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة الحصة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الوضع التشغيلي",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الاستمرارية",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "طريقة الربط بالحصة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "طبيعة علاقة المورد بالمعدة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "معالجة الاستعداد والتوقف (قاعدة)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 32,
+        "group": "المرجعيات",
+        "title": "سجل المستندات والضمانات",
+        "purpose": "سجل موحد لوثائق التأهيل والعقود ووثائق التغيير والإغلاق (432)",
+        "grain": "مستند أو ضمان واحد",
+        "source": "مصدر الحقيقة: الموردون+القانوني · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Child Register — مستندات",
+        "declared": 12,
+        "fields": [
+            {
+                "name": "كود المستند · Doc_ID",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "نوع المستند",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المرجع",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رقم المورد",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "اسم المورد (بحث)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "النطاق (عقد\/مورد)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الحالة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تاريخ الانتهاء",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Record_Basis",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "المصدر",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة البيانات",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 33,
+        "group": "المرجعيات",
+        "title": "قاموس قواعد الاستنتاج",
+        "purpose": "القواعد الحاكمة لكل قيمة مشتقة بالمنظومة (12 قاعدة) — نظير قاموس المبيعات",
+        "grain": "قاعدة استنتاج واحدة",
+        "source": "مصدر الحقيقة: هندسة النظم · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Reference",
+        "declared": 7,
+        "fields": [
+            {
+                "name": "كود القاعدة",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "الحقل\/المخرج",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "القيم الممكنة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "قاعدة الاشتقاق",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الشيت المطبق فيه",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "القيد\/التحذير",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تصنيف الحجية",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            }
+        ]
+    },
+    {
+        "no": 34,
+        "group": "المرجعيات",
+        "title": "القاموس وخريطة الترحيل",
+        "purpose": "تعريف حقول الشيوت المعبأة ومصادرها وقراراتها",
+        "grain": "تعريف حقل واحد",
+        "source": "مصدر الحقيقة: هندسة النظم · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Reference",
+        "declared": 12,
+        "fields": [
+            {
+                "name": "الاسم التقني",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "التسمية العربية",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الكيان",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الشيت",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نوع البيانات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "إلزامي؟",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المفتاح",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "القيم المسموحة (قائمة م24)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مصدر الحقيقة\/المالك",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة البيانات",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "تصنيف الفراغ (ما يعنيه الفراغ) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 35,
+        "group": "المرجعيات",
+        "title": "تتبع التعبئة والترحيل",
+        "purpose": "أثر الترحيل: 14 تحويلا موثقا بأعداد الصفوف",
+        "grain": "تحويل ترحيل موثق واحد",
+        "source": "مصدر الحقيقة: هندسة النظم · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Reference",
+        "declared": 14,
+        "fields": [
+            {
+                "name": "رقم القيد",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "ملف المصدر",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "شيت المصدر",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "العمود",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Source_Row_Ref",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "الكيان الهدف",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الشيت الهدف",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "معرف السجل الهدف",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "قرار الترحيل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "التحويل المطبق",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة الترحيل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تاريخ الترحيل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المدقق",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "ملاحظة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 36,
+        "group": "المرجعيات",
+        "title": "خريطة الترحيل",
+        "purpose": "مصير كل عمود مصدري (158) + مصدر كل حقل هدف — فصل الخريطة عن القاموس",
+        "grain": "عمود مصدري واحد ومصيره",
+        "source": "مصدر الحقيقة: هندسة النظم · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Reference",
+        "declared": 7,
+        "fields": [
+            {
+                "name": "#",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "الاتجاه",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "ملف\/شيت المصدر",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "العمود\/الحقل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الوجهة\/المصدر",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "قرار الترحيل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "ملاحظة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 37,
+        "group": "المرجعيات",
+        "title": "تقرير المراجعة والقبول",
+        "purpose": "قبل\/بعد · اختبارات القبول 19 · اختبارات التكامل 14 · اكتمال البيانات عمودا بعمود",
+        "grain": "بند مراجعة\/قبول واحد",
+        "source": "مصدر الحقيقة: هندسة النظم · الإدارة المالكة: إدارة الموردين · نوع الشاشة: Derived View — تقرير",
+        "declared": 5,
+        "fields": [
+            {
+                "name": "القسم",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "البند",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "القيمة\/النتيجة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الحالة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "ملاحظة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    }
+]
