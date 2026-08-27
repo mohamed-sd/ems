@@ -59,8 +59,23 @@ $live     = repair01_w2_live_screens($ROOT);
 /* مقامُ الشاشاتِ المُعادُ اشتقاقُه — ثلاثةُ مصادرَ لا واحد */
 $universe = array();     /* مفتاحٌ بحروفٍ صغيرة ⇐ [route, on_disk] */
 $ghostFiles = array();
+/* ⚠ **أداةٌ واحدةٌ بنطاقَين**: `repair01_w2_php_files()` يستثني `vendor/`
+     و`storage/` و`api/` … **والمقامُ المبنيُّ من `repair01_surfaces` لا
+     يستثني شيئًا**. فدخلت تسعةُ صفوفٍ من `vendor/phpoffice` مقامًا لا
+     يراها الفاحصُ، **فظهر فرقٌ لا سببَ له في الواقع**: ملفٌّ «على القرصِ
+     وغيرُ موسوم» وهو **صنفُ مكتبةٍ لا شاشة**.
+   ⇒ **والمقامُ يُقيَّد بنطاقِ الأداةِ نفسِها** ⛔ لا بنطاقٍ ثانٍ يتفرّق عنه. */
+$SKIPD = repair01_w2_skip_dirs();
+$inScope = function ($path) use ($SKIPD) {
+    $rel = ltrim(strtr((string) $path, '\\', '/'), '/');
+    foreach ($SKIPD as $sd) {
+        if (strpos($rel, $sd) === 0 || strpos($rel, '/' . $sd) !== false) { return false; }
+    }
+    return true;
+};
 $r = $conn->query("SELECT DISTINCT screen_file, disk_path, on_disk FROM repair01_surfaces");
 while ($r && $x = $r->fetch_assoc()) {
+    if (!$inScope($x['disk_path'])) { continue; }
     if ((int) $x['on_disk'] === 1) {
         $rt = repair01_w2_norm_route($x['disk_path']);
         $universe[strtolower($rt)] = array($rt, 1);
@@ -165,9 +180,16 @@ gate('W2-05', 'المالكُ بمصدرٍ أو بقرارٍ قائم', $danglin
      'قراراتٌ مُشارٌ إليها ' . count($ptr) . " · معلَّقةٌ في الهواء $dangling · بلا مصدرٍ ولا قرارٍ $noOwnerSrc");
 
 /* ══ W2-06 · الشبحُ محسومٌ كلُّه بحكمٍ وعذرٍ مكتوب ═══════════════════════ */
-$ghostReg   = (int) scalarq($conn, "SELECT COUNT(*) FROM repair01_screen_registry WHERE on_disk = 0");
-$ghostNoV   = (int) scalarq($conn, "SELECT COUNT(*) FROM repair01_screen_registry
-                                     WHERE on_disk = 0 AND (ghost_verdict = '' OR ghost_why = '')");
+/* ⚠ **والنطاقُ يُطبَّق على الطرفَين**: قيَّدتُ المقامَ بنطاقِ الأداةِ أعلاه
+     **وتركتُ عدَّ الأشباحِ بلا قيد** — فبقي طرفانِ يُقاسان بمسطرتَين.
+     ⇒ **ومقارنةٌ بين مقامَين مختلفَي النطاقِ فرقُها مصنوعٌ لا حقيقيّ.** */
+$ghostReg = 0; $ghostNoV = 0;
+$gq = $conn->query("SELECT route, ghost_verdict, ghost_why FROM repair01_screen_registry WHERE on_disk = 0");
+while ($gq && ($gy = $gq->fetch_assoc())) {
+    if (!$inScope($gy['route'])) { continue; }
+    $ghostReg++;
+    if ((string) $gy['ghost_verdict'] === '' || (string) $gy['ghost_why'] === '') { $ghostNoV++; }
+}
 $ghostOnDsk = 0;
 foreach ($regGhost as $k => $x) { if (isset($universe[$k])) { $ghostOnDsk++; } }
 gate('W2-06', 'الشبحُ محسومٌ بحكمٍ وعذر', $ghostReg === count($ghostFiles) && $ghostNoV === 0 && $ghostOnDsk === 0,

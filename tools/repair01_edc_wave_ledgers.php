@@ -38,8 +38,22 @@ $conn->set_charset('utf8mb4');
 $REPORT = in_array('--report', $argv, true);
 $e = function ($s) use ($conn) { return $conn->real_escape_string((string) $s); };
 
+/* ⚠ **وقائمةُ موجاتٍ صلبةٌ تتقادم كما يتقادم رقمٌ صلب**: كتبتُ `(3,4,5,7)`
+     لأنّها ما احمرَّ يومَها — ثمَّ احمرَّ `W8` للسببِ نفسِه **ولم تره الأداةُ**.
+     ⇒ **فالدفاترُ تُكتشَف من المخطَّطِ لا تُكتب في المتن.** */
+$WAVES = array();
+$wq = $conn->query("SELECT TABLE_NAME FROM information_schema.TABLES
+                     WHERE TABLE_SCHEMA = DATABASE()
+                       AND TABLE_NAME REGEXP '^repair01_w[0-9]+_sidebar$'");
+while ($wq && ($wy = $wq->fetch_row())) {
+    if (preg_match('~^repair01_w([0-9]+)_sidebar$~', $wy[0], $wm)) { $WAVES[] = (int) $wm[1]; }
+}
+sort($WAVES);
+printf("دفاترُ الموجاتِ المكتشَفة: %s
+", implode(' · ', $WAVES));
+
 $tot = 0;
-foreach (array(3, 4, 5, 7) as $w) {
+foreach ($WAVES as $w) {
     $tbl = "repair01_w{$w}_sidebar";
     $lib = $ROOT . "/tools/lib/repair01_w{$w}_scan.php";
     if (is_file($lib)) { require_once $lib; }
