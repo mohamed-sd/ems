@@ -100,8 +100,17 @@ $C = array(
     WHERE owner_code IN ('DEP-03','DEP-06') AND surface_kind = '' AND $LIVE",
   'MAJOR', 'W12', 'DEP-06', 'CROSS_DOMAIN_UNRESOLVED = 0',
   'الخزينة تنفذ الدفع والتمويل يقرر'),
+ /* ⚠ **والمقياسُ كان يعدُّ غيرَ ما يشترطه معيارُ الخروج** (‏كُشف في W16):
+      المعيارُ «كلُّ تبويبٍ يُحكم على حدة **بقرارٍ مسجَّل**»، والاستعلامُ كان
+      يعدُّ **التبويباتِ نفسَها** — فرقمُه ٥٧ أبدًا **ولا يبلغ صفرًا إلّا بحذفِ
+      تبويب**، وهو نقيضُ حكمِ المالك. ⇒ **فالمقياسُ يُصلَح ليقيسَ ما نصَّ عليه
+      المعيار**: تبويبٌ **بلا قرارٍ مسجَّلٍ في دفترِ المرحلة**. **وهو تشديدٌ لا
+      تليين**: القديمُ لم يكن يرتفع أبدًا، **والجديدُ يرتفع لحظةَ يفقد تبويبٌ
+      حكمَه** — ⛔ والدمجُ لم يُنفَّذ ولم يُخفَ بندٌ واحد. */
  array('DC-13', 'تبويباتٌ لم تُدمَج في أبيها',
-  "SELECT COUNT(*) FROM repair01_screen_registry WHERE ownership_verdict = 'TAB_CHILD' AND on_disk = 1",
+  "SELECT COUNT(*) FROM repair01_screen_registry t
+     LEFT JOIN repair01_w16_tabs w ON w.screen_file = t.screen_file AND w.dept_code = t.owner_code
+    WHERE t.ownership_verdict = 'TAB_CHILD' AND t.on_disk = 1 AND w.screen_file IS NULL",
   'MINOR', 'W16', 'DEP-08', 'كل تبويب يحكم على حدة بقرار مسجل',
   'حكم المالك: لا نضحي بالصلاحية من اجل سايدبار انظف — والثمانية والخمسون تحكم فرادى'),
  array('DC-14', 'أشباحٌ بلا قرارٍ من الستّة',
@@ -121,21 +130,31 @@ $C = array(
   "SELECT COUNT(*) FROM repair01_screen_registry WHERE ownership_verdict = 'LEGACY' AND on_disk = 1",
   'MINOR', 'W13.5', 'DEP-08', 'LEGACY_PENDING_FORENSIC = 0',
   'القرار الخامس — التحليل الجنائي بار بعة عشر نقطة'),
+ /* ⚠ **وفراغُ `measure_sql` لم يكن إعلانًا بل عمًى** (‏كُشف في W16 · `CH-02`):
+      الصنفُ كان يُقاس **بفرعٍ مخبوءٍ في هذه الأداةِ وحدَها**، فلا يستطيع أحدٌ
+      إعادةَ قياسِه من السجلّ، **وصفرُه كان صفرًا من مقامٍ مجهول**. والجردُ
+      الحاجبُ لم يسأل «أثمَّ صنفٌ بلا مقياس؟» فمرَّ.
+   ⇒ **والمقياسُ صورتان لا واحدة**: استعلامٌ حين يكفي، **وأمرُ مسحِ كودٍ حين
+      يكون المقياسُ ملفّيًّا** — وكلاهما مسجَّلٌ يُعاد تشغيلُه. */
  array('DC-18', 'سطحُ نموٍّ بلا صندوقِ فلترة',
-  '',   /* ⛔ يُقاس ملفّيًّا لا باستعلام — والفراغُ إعلانُ ذلك لا إهمالُه */
+  '',   /* المقياسُ ملفّيٌّ — فهو في `measure_tool` أدناه لا في استعلام */
   'MINOR', 'W16', 'DEP-08', 'ELIGIBLE_LIST_SURFACES_WITHOUT_CANONICAL_FILTER = 0',
-  'حكم المالك: مكون فلترة معياري واحد يبنى مرة لا مئة وسبع نسخ'),
+  'حكم المالك: مكون فلترة معياري واحد يبنى مرة لا مئة وسبع نسخ',
+  'php tools/repair01_edc_filter_eligibility.php --count'),
 );
 
 if ($SEED) {
     foreach ($C as $c) {
         list($code, $nm, $sql, $lvl, $wave, $own, $exit, $rule) = $c;
+        $tool = isset($c[8]) ? $c[8] : '';
         $conn->query("INSERT INTO repair01_debt_register
-            (class_code, class_name_ar, measure_sql, blocking_level, assigned_wave,
+            (class_code, class_name_ar, measure_sql, measure_tool, blocking_level, assigned_wave,
              debt_owner, exit_criteria, owner_ruling)
-            VALUES ('" . $e($code) . "', '" . $e($nm) . "', '" . $e($sql) . "', '" . $e($lvl) . "',
+            VALUES ('" . $e($code) . "', '" . $e($nm) . "', '" . $e($sql) . "', '" . $e($tool) . "',
+                    '" . $e($lvl) . "',
                     '" . $e($wave) . "', '" . $e($own) . "', '" . $e($exit) . "', '" . $e($rule) . "')
             ON DUPLICATE KEY UPDATE measure_sql = VALUES(measure_sql),
+                measure_tool = VALUES(measure_tool),
                 blocking_level = VALUES(blocking_level), assigned_wave = VALUES(assigned_wave),
                 debt_owner = VALUES(debt_owner), exit_criteria = VALUES(exit_criteria),
                 owner_ruling = VALUES(owner_ruling)");
@@ -199,8 +218,23 @@ $rows = array(); $tot = 0; $blk = 0; $vac = array();
 $q = $conn->query("SELECT * FROM repair01_debt_register ORDER BY
                      FIELD(blocking_level, 'BLOCKING', 'MAJOR', 'MINOR', 'INFORMATIONAL'), class_code");
 while ($q && ($x = $q->fetch_assoc())) {
-    if ((string) $x['measure_sql'] === '') { $n = $filterDebt(); }
-    else { $r2 = @$conn->query($x['measure_sql']); $n = $r2 ? (int) $r2->fetch_row()[0] : -1; }
+    /* ◆ **المقياسُ يُقرأ من السجلِّ لا من فرعٍ مخبوءٍ في الأداة** (‏W16 · `CH-02`):
+       استعلامٌ إن وُجد، وإلّا **أمرُ مسحِ كودٍ مسجَّلٌ يُشغَّل ويُقرأ عددُه**،
+       وإلّا **`-1` غيرُ مقيسٍ** ⛔ **لا صفرًا** — فصفرٌ بلا مقياسٍ دعوى. */
+    if ((string) $x['measure_sql'] !== '') {
+        $r2 = @$conn->query($x['measure_sql']); $n = $r2 ? (int) $r2->fetch_row()[0] : -1;
+    } elseif ((string) $x['measure_tool'] !== '') {
+        /* الأمرُ مسجَّلٌ نسبيًّا إلى جذرِ المستودعِ فيُطلَق بمسارِه الكامل */
+        $parts = preg_split('~\s+~', trim(preg_replace('~^php\s+~i', '', $x['measure_tool'])));
+        $script = $ROOT . '/' . array_shift($parts);
+        $cmd = '"' . PHP_BINARY . '" "' . $script . '"' . ($parts ? ' ' . implode(' ', $parts) : '');
+        $out = array(); $rc = 0;
+        exec($cmd . ' 2>&1', $out, $rc);
+        $last = trim((string) end($out));
+        $n = ($rc === 0 && is_numeric($last)) ? (int) $last : -1;
+    } else {
+        $n = -1;
+    }
     $conn->query("UPDATE repair01_debt_register SET measured_count = $n, measured_at = NOW()
                    WHERE class_code = '" . $e($x['class_code']) . "'");
     /* والصفرُ يُمحَّص: أهو إغلاقٌ أم مفردةٌ ميتة؟ */

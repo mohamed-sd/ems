@@ -410,8 +410,13 @@ gate('W15-28', 'كلُّ مؤجَّلٍ ببيانِ ما بُني رغمَه',
 /* ══ W15-29 · سلامةُ قرارِ المالك — صفرُ اعتمادٍ مفترَض ════════════════ */
 $assumed = (int) $one("SELECT COUNT(*) FROM repair01_decision_audit
                         WHERE verdict = 'SYSTEM_ASSUMED_APPROVAL'");
+/* ⚠ **وهذا السطرُ كان يسأل عمودًا لا وجودَ له** (`owner_answer_ref`) — فيسقط
+   الاستعلامُ ويعود `null` **فيُطبَع 0 أبدًا**. والرقمُ ليس شرطَ عبورٍ هنا، لكنّه
+   **يُقرأ في مخرَجِ البوّابةِ اطمئنانًا كاذبًا**. كشفَه تحدّي W16 (`CH-04`)
+   بمطابقةِ كلِّ عمودٍ مذكورٍ على `information_schema`. **والاسمُ الحيُّ للعمود
+   `owner_decision_reference`** — والمقيسُ به عددٌ حقيقيٌّ يُعلَن ولا يُدَّعى صفرًا. */
 $apprNoRef = (int) $one("SELECT COUNT(*) FROM repair01_decisions
-                          WHERE status = 'APPROVED' AND COALESCE(owner_answer_ref,'') = ''");
+                          WHERE status = 'APPROVED' AND COALESCE(owner_decision_reference,'') = ''");
 gate('W15-29', 'صفرُ اعتمادٍ مفترَضٍ نيابةً عن المالك',
      $assumed === 0,
      "اعتمادٌ مفترَضٌ $assumed · معتمَدٌ بلا مرجعِ جواب $apprNoRef");
