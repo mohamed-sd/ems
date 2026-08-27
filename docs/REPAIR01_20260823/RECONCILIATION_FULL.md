@@ -6,13 +6,13 @@
 
 | الحقل | القيمة |
 |---|---|
-| `Snapshot ID` | `SNAP-bcfa30da-20260827-141155` |
-| `Commit Hash` | `bcfa30dab8ffc9c225cc81d924f0b246d009a7d8` |
+| `Snapshot ID` | `SNAP-02224261-20260827-145545` |
+| `Commit Hash` | `022242613d7c9799fe50e30b406f31af08d15a63` |
 | `Schema Version` | `917T/14539C` |
 | `Registry Version` | 783 صفًّا |
 | `Config Baseline` | `fdbd3e82c07b3044` |
-| `Frozen At` | 2026-08-27 14:11:55 |
-| `Measured At` | 2026-08-27 14:12:08 |
+| `Frozen At` | 2026-08-27 14:55:45 |
+| `Measured At` | 2026-08-27 14:55:57 |
 | **مطابقةُ البصمة** | ✔ مطابقةٌ للمختومِ حرفًا |
 
 ## الشروطُ الثلاثةُ المنصوصةُ للإغلاق
