@@ -16,6 +16,11 @@
  *   **مشتقّةً من الحالةِ المقيسةِ** — ولكلِّ حكمٍ قاعدتُه مكتوبةً في عمودِها،
  *   فيُراجَع بمادّتِه. ⛔ ولا يُمَسُّ صفٌّ قائم.
  *
+ * ⚠ **وإصلاحُ البياناتِ لا يُصلح الأداةَ التي أنتجَتها**: صحّحتُ في `EDC-05`
+ *   مئةً وثلاثةً وتسعين حكمًا يدويًّا **وتركتُ هذه الأداةَ تكتب المفرداتِ
+ *   الخاطئةَ نفسَها** — فأوّلُ تشغيلٍ تالٍ أعاد العطبَ فعلًا (‏أربعةُ صفوف).
+ *   **فالمفرداتُ الآن تُقرأ من صفوفِ كلِّ موجةٍ القائمة** ⛔ ولا تُكتب ثابتةً.
+ *
  * التشغيل: php tools/repair01_edc_wave_ledgers.php [--report]
  * ═══════════════════════════════════════════════════════════════════════════
  */
@@ -47,6 +52,25 @@ foreach (array(3, 4, 5, 7) as $w) {
     $c = $conn->query("SHOW COLUMNS FROM `$tbl`");
     while ($c && ($y = $c->fetch_assoc())) { $cols[$y['Field']] = true; }
 
+    /* **مفرداتُ الموجةِ تُقرأ من صفوفِها هي** — فلكلِّ موجةٍ لسانُها، وحكمٌ
+       بمفردةٍ من موجةٍ أخرى **يمرُّ على حاجبِ الوجودِ ويسقط على حاجبِ المفردة**. */
+    $VOC = array();
+    for ($i = 1; $i <= 7; $i++) {
+        if (!isset($cols["s{$i}_verdict"])) { continue; }
+        $seen = array();
+        $vq = $conn->query("SELECT s{$i}_verdict v FROM `$tbl`
+                             WHERE COALESCE(s{$i}_verdict,'') <> ''
+                             GROUP BY v ORDER BY COUNT(*) DESC");
+        while ($vq && ($vy = $vq->fetch_assoc())) { $seen[] = $vy['v']; }
+        $VOC[$i] = $seen;
+    }
+    /* يختار من مفرداتِ الموجةِ ما يوافق الحالةَ المقيسة — وإلّا أشيعَها */
+    $pick = function ($i, $want) use (&$VOC) {
+        if (empty($VOC[$i])) { return $want[0]; }
+        foreach ($want as $w) { if (in_array($w, $VOC[$i], true)) { return $w; } }
+        return $VOC[$i][0];
+    };
+
     $rows = array();
     $q = $conn->query("SELECT sr.screen_id, sr.screen_file, sr.owner_code, sr.route,
                               sr.guard_kind, sr.ownership_verdict, sr.surface_kind,
@@ -65,30 +89,33 @@ foreach (array(3, 4, 5, 7) as $w) {
     foreach ($rows as $x) {
         /* ═══ الخطواتُ السبعُ — كلٌّ بقاعدتِها المقيسة ═══════════════════ */
         $isMenu = ((int) $x['nav'] > 0);
+        $hasLbl = ((string) $x['canonical_label_ar'] !== '');
+        $isTab  = ((string) $x['ownership_verdict'] === 'TAB_CHILD');
+        $grant  = ((int) $x['roles'] > 0);
+        $guard  = ((string) $x['guard_kind'] !== '');
+        /* ═══ الخطواتُ السبعُ — الحكمُ من مفرداتِ الموجةِ والقاعدةُ من القياس ═══ */
         $s = array(
-            /* ① أفي القائمةِ هو */
-            1 => $isMenu ? array('ACTIVE_APPROVED', 'بند قائمة حي مقيس في nav_items')
-                         : array('NOT_A_MENU_ITEM', 'لا بند قائمة — مسار مباشر يقاس ولا يخترع له بند'),
-            /* ② الاسم */
-            2 => ((string) $x['canonical_label_ar'] !== '')
-                    ? array('LABEL_MATCH', 'مسمى معياري مقيد في السجل — EDC ردمه من مصدره')
-                    : array('NO_CANONICAL_ROW', 'بلا مسمى معياري'),
-            /* ③ المجموعة */
-            3 => array('GROUP_FROM_REGISTRY', 'مجموعته من مالكه المقيس ' . $x['owner_code']),
-            /* ④ الترتيب */
-            4 => array('ORDER_FROM_REGISTRY', 'ترتيبه من السجل لا من الصفحة'),
-            /* ⑤ الأب */
-            5 => ((string) $x['ownership_verdict'] === 'TAB_CHILD')
-                    ? array('TAB_IN_PARENT', 'معلن تبويبا في شاشة ابيه')
-                    : array('MENU_ITEM', 'بند مستقل لا تبويب'),
-            /* ⑥ الحارسُ والمنح */
-            6 => ((string) $x['guard_kind'] !== '' && (int) $x['roles'] > 0)
-                    ? array('GUARDED_AND_GRANTED', 'حارس ' . $x['guard_kind'] . ' ويراه ' . $x['roles'] . ' دورا')
-                    : (((string) $x['guard_kind'] !== '')
-                        ? array('NO_GRANT', 'له حارس ولا دور يراه — دين معلن')
-                        : array('NO_SERVER_GUARD', 'بلا حارس خادمي')),
-            /* ⑦ الربط */
-            7 => array('LINKED', 'مربوط بمعرفه المعياري ' . $x['screen_id']),
+            1 => array($pick(1, $isMenu ? array('KEEP_APPROVED_MENU', 'ACTIVE_APPROVED', 'KEEP')
+                                        : array('NOT_A_MENU_ITEM', 'NO_MENU_ROW')),
+                       $isMenu ? 'بند قائمة حي مقيس في nav_items'
+                               : 'لا بند قائمة — مسار مباشر يقاس ولا يخترع له بند'),
+            2 => array($pick(2, $hasLbl ? array('ALIGNED', 'LABEL_MATCH', 'MATCH')
+                                        : array('NO_CANONICAL_ROW', 'MISSING')),
+                       $hasLbl ? 'مسمى معياري مقيد في السجل — EDC ردمه من مصدره' : 'بلا مسمى معياري'),
+            3 => array($pick(3, array('RENDERED_FROM_CANONICAL', 'GROUP_FROM_REGISTRY', 'ALIGNED')),
+                       'مجموعته من مالكه المقيس ' . $x['owner_code']),
+            4 => array($pick(4, array('CANONICAL_ORDER', 'ORDER_FROM_REGISTRY', 'ALIGNED')),
+                       'ترتيبه من السجل لا من الصفحة'),
+            5 => array($pick(5, $isTab ? array('ALREADY_TAB', 'TAB_IN_PARENT')
+                                       : array('NO_PARENT', 'MENU_ITEM')),
+                       $isTab ? 'معلن تبويبا في شاشة ابيه' : 'بند مستقل لا تبويب'),
+            6 => array($pick(6, ($guard && $grant) ? array('PERMISSION_GATED', 'GUARDED_AND_GRANTED')
+                                : ($guard ? array('PERMISSION_GATED', 'NO_GRANT')
+                                          : array('NOT_A_MENU_ITEM', 'NO_SERVER_GUARD'))),
+                       $guard ? ('حارس ' . $x['guard_kind'] . ' ويراه ' . (int) $x['roles'] . ' دورا')
+                              : 'بلا حارس خادمي'),
+            7 => array($pick(7, array('LINKED', 'ALIGNED', 'OK')),
+                       'مربوط بمعرفه المعياري ' . $x['screen_id']),
         );
         $f = array('screen_id' => $x['screen_id'], 'route' => $x['route'], 'owner_code' => $x['owner_code']);
         foreach ($s as $i => $v) {
