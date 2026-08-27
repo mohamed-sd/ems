@@ -498,16 +498,31 @@ if ($ISSUE) {
        الإغلاق · `W16-F-11`): لقطتان في اليومِ نفسِه ترتيبُ ساعتِهما يقدّم الأقدمَ،
        فيَختم الأساسُ لقطةً لا تمثّله. ⇒ **المفتوحةُ أوّلًا، ثمَّ لقطةُ الالتزامِ
        الحاليِّ بعينِه**، وإلّا فلا إصدار. */
-    $commit = trim((string) shell_exec('git -C ' . escapeshellarg($ROOT) . ' rev-parse HEAD 2>&1'));
-    $snap = (string) $one("SELECT snapshot_id FROM repair01_freeze_snapshot
-                            WHERE released_at IS NULL ORDER BY frozen_at DESC LIMIT 1");
+    /* ◆ **واللقطةُ تُختار بتاريخِ الالتزامِ لا بساعةِ الحائط**: `frozen_at` يخون
+       حين تقع لقطتان في يومٍ واحد فتسبق ساعةُ الأقدمِ ساعةَ الأحدث (`W16-F-11`
+       و`W16-F-12`). ⇒ **المفتوحةُ أوّلًا**، ثمَّ **أقربُ لقطةٍ مختومةٍ إلى الرأسِ
+       في شجرةِ الالتزامات** — والمسافةُ تُقاس بـ`git rev-list --count`.
+       ◆ **والالتزامُ يؤخَذ من اللقطةِ نفسِها** لا مقروءًا على حدة — فالتطابقُ
+       بينهما **بنيويٌّ لا مأمولٌ**، والحاجبُ `W16-21` يُعيد التحقُّقَ منه. */
+    $head = trim((string) shell_exec('git -C ' . escapeshellarg($ROOT) . ' rev-parse HEAD 2>&1'));
+    $snap = ''; $commit = '';
+    $r = $conn->query("SELECT snapshot_id, commit_hash FROM repair01_freeze_snapshot
+                        WHERE released_at IS NULL ORDER BY frozen_at DESC LIMIT 1");
+    if ($r && $r->num_rows) { $x = $r->fetch_assoc(); $snap = $x['snapshot_id']; $commit = $x['commit_hash']; }
     if ($snap === '') {
-        $snap = (string) $one("SELECT snapshot_id FROM repair01_freeze_snapshot
-                                WHERE commit_hash = '" . $esc($commit) . "'
-                                ORDER BY frozen_at DESC LIMIT 1");
+        $best = PHP_INT_MAX;
+        $q = $conn->query("SELECT snapshot_id, commit_hash FROM repair01_freeze_snapshot");
+        while ($q && ($x = $q->fetch_assoc())) {
+            $o = array(); $rc = 0;
+            exec('git -C ' . escapeshellarg($ROOT) . ' rev-list --count '
+                 . escapeshellarg($x['commit_hash'] . '..' . $head) . ' 2>&1', $o, $rc);
+            if ($rc !== 0) { continue; }                 /* التزامٌ لا يعرفه المستودع */
+            $d = (int) trim((string) implode('', $o));
+            if ($d < $best) { $best = $d; $snap = $x['snapshot_id']; $commit = $x['commit_hash']; }
+        }
     }
     if ($snap === '' || $commit === '') {
-        exit("⛔ لا لقطةَ لهذا الالتزامِ ولا نافذةَ مفتوحة — والأساسُ لا يُختَم بلقطةٍ لا تمثّله\n");
+        exit("⛔ لا لقطةَ مختومةٌ يبلغها الرأس — والأساسُ لا يُختَم بلقطةٍ لا تمثّله\n");
     }
 
     /* ⛔ **والحالةُ تُشتقُّ من المقيسِ لا تُختار**: الثمانيةُ كلُّها + صفرُ REDESIGN
