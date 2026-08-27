@@ -268,7 +268,14 @@ $diskIdx = array();
 $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($ROOT, FilesystemIterator::SKIP_DOTS));
 foreach ($it as $fo) {
     $p = $fo->getPathname();
-    if (strpos($p, DIRECTORY_SEPARATOR . '.git') !== false || strpos($p, 'node_modules') !== false) { continue; }
+    /* ⚠ **`vendor/` كان يدخل**: صنفانِ من `phpoffice/phpspreadsheet` سُجِّلا
+         شاشتَين حيَّتَين بمالكٍ ومسمًّى عربيٍّ و`DOMAIN_SOURCE` — أي **مصدرَي
+         حقيقةٍ للإهلاكِ والدفع** — وهما `Depreciation.php` و`Payments.php`.
+         **وهما اللذان جعلا «مصدرًا مكرَّرًا» يبدو حقيقيًّا**، والمالكُ اشترط
+         قياسَ الحبّةِ قبل إثباتِ التكرار — فأثبت القياسُ أنَّ التكرارَ لم يكن. */
+    if (strpos($p, DIRECTORY_SEPARATOR . '.git') !== false
+        || strpos($p, 'node_modules') !== false
+        || strpos(strtr($p, DIRECTORY_SEPARATOR, '/'), '/vendor/') !== false) { continue; }
     if (substr($p, -4) !== '.php') { continue; }
     $bn = strtolower(basename($p));
     if (!isset($diskIdx[$bn])) { $diskIdx[$bn] = str_replace($ROOT . DIRECTORY_SEPARATOR, '', $p); }

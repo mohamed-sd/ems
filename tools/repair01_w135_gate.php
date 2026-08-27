@@ -73,10 +73,20 @@ $dup    = $n("SELECT COUNT(*) FROM (
                 WHERE surface_kind = 'SOURCE'
                 GROUP BY f HAVING COUNT(DISTINCT owner_code) > 1) z");
 $unk    = $n("SELECT COUNT(*) FROM repair01_screen_registry WHERE ownership_verdict = 'UNKNOWN'");
+/* ⚠ **صنفُ مكتبةٍ سُجِّل مصدرَ حقيقة**: `repair01_ingest` لم يستثنِ `vendor/`،
+     فدخل `Depreciation.php` و`Payments.php` من `phpoffice/phpspreadsheet`
+     **شاشتَين حيَّتَين بمسمًّى عربيٍّ وحكمِ `DOMAIN_SOURCE`** — وهما اللذان
+     **جعلا `Duplicate Source` يبدو حقيقيًّا** في الإهلاكِ والدفع. وقياسُ
+     الحبّةِ الذي أمر به المالكُ **أثبت أنَّ التكرارَ لم يكن أصلًا**.
+     والاختبارُ السالبُ `tests/w135_vendor_not_a_screen.php` يُثبت رسوبَه. */
+$vend   = $n("SELECT COUNT(*) FROM repair01_screen_registry
+                WHERE on_disk = 1 AND ownership_verdict NOT IN ('RETIRE')
+                  AND (route LIKE 'vendor/%' OR route LIKE '%/vendor/%'
+                       OR route LIKE 'node_modules/%' OR route LIKE '%/node_modules/%')");
 $G('G2', 'مصدرُ الحقيقةِ في التقاطعاتِ الستّة',
-   ($xUnres === 0 && $dup === 0 && $unk === 0),
-   "أسطحُ التقاطعِ $xAll · غيرُ محسومٍ $xUnres · حقيقةٌ في إدارتَين $dup · مجهولٌ $unk",
-   'UNRESOLVED_CRITICAL_SOT = 0 · 0 · 0');
+   ($xUnres === 0 && $dup === 0 && $unk === 0 && $vend === 0),
+   "أسطحُ التقاطعِ $xAll · غيرُ محسومٍ $xUnres · حقيقةٌ في إدارتَين $dup · مجهولٌ $unk · صنفُ مكتبةٍ مسجَّلٌ سطحًا $vend",
+   'UNRESOLVED_CRITICAL_SOT = 0 · 0 · 0 · 0');
 
 /* ══ G3 · سلامةُ قرارِ المالك ═════════════════════════════════════════════ */
 $appr    = $n("SELECT COUNT(*) FROM repair01_decisions WHERE status = 'APPROVED'");
