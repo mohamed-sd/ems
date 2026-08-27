@@ -6,16 +6,16 @@
 
 | الحقل | القيمة |
 |---|---|
-| `Snapshot ID` | `SNAP-c004baaa-20260827133556` |
-| `Commit Hash` | `c004baaaf67b55dbad8760e90dd737260fc429ef` |
+| `Snapshot ID` | `SNAP-43e4e598-20260827134552` |
+| `Commit Hash` | `43e4e598b35d4d4b2f0d5182124488e496990dcc` |
 | `Branch` | `repair01/w01-ownership` |
 | `Schema Version` | `916T/14528C` |
 | `Registry Version` | 783 صفًّا |
-| `Measured At` | 2026-08-27 13:35:56 ← 2026-08-27 13:37:49 |
+| `Measured At` | 2026-08-27 13:45:52 ← 2026-08-27 13:47:59 |
 | `Tool Version` | `repair01_regression_run.php` |
 | **ثباتُ البصمة** | ✔ ثابتةٌ من البدءِ إلى الختام |
 
-**نجح 21 · رسب 3 · عطبٌ في التشغيل 0 · المجموع 24**
+**نجح 23 · رسب 1 · عطبٌ في التشغيل 0 · المجموع 24**
 
 
 ## بوّاباتُ الموجات
@@ -29,15 +29,15 @@
 | `tools/repair01_w135_gate.php` | ✔ | الحكم: **عبرت السبعةُ — والمرحلةُ الرابعةَ عشرةَ تبدأ** ✔ |
 | `tools/repair01_w13_gate.php` | ✔ | الحكم: خضراء ✔ |
 | `tools/repair01_w14_gate.php` | ✔ | الحكم: خضراء ✔ |
-| `tools/repair01_w15_gate.php` | ✘ رسب | الحكم: خضراء ✔ |
+| `tools/repair01_w15_gate.php` | ✔ | الحكم: خضراء ✔ |
 | `tools/repair01_w1_gate.php` | ✔ | الحكم: خضراء ✔ |
-| `tools/repair01_w2_gate.php` | ✘ رسب | الحكم: حمراء ✘ |
+| `tools/repair01_w2_gate.php` | ✔ | الحكم: خضراء ✔ |
 | `tools/repair01_w3_gate.php` | ✔ | الحكم: خضراء ✔ |
 | `tools/repair01_w4_gate.php` | ✔ | الحكم: خضراء ✔ |
 | `tools/repair01_w5_gate.php` | ✔ | الحكم: خضراء ✔ |
 | `tools/repair01_w6_gate.php` | ✔ | الحكم: خضراء ✔ |
 | `tools/repair01_w7_gate.php` | ✔ | الحكم: خضراء ✔ |
-| `tools/repair01_w8_gate.php` | ✘ رسب | الحكم: حمراء ✘ (1 ساقطة) |
+| `tools/repair01_w8_gate.php` | ✔ | الحكم: خضراء ✔ |
 | `tools/repair01_w9_gate.php` | ✔ | الحكم: مُغلَقة ✔  ·  DEC-OPEN-15 مُجابٌ ومُغلَق · وبنودُ التأجيلِ الثلاثةُ استُهلكت بإثباتٍ مقيس |
 
 ## حواجبُ الحملة
@@ -50,7 +50,7 @@
 
 | الأداة | الحكم | الدليل |
 |---|---|---|
-| `tools/u12_debt_ratchet.php` | ✔ | 🟢 السقّاطةُ سليمة — لا دَينَ زاد. وهذا هو إنفاذُ L4 لـUI-DEF-11 وUI-DEF-12. |
+| `tools/u12_debt_ratchet.php` | ✘ رسب | 🟢 السقّاطةُ سليمة — لا دَينَ زاد. وهذا هو إنفاذُ L4 لـUI-DEF-11 وUI-DEF-12. |
 
 ## حواجبُ الواجهة
 

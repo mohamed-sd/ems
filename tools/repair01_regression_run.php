@@ -92,10 +92,17 @@ foreach ($FAM as $fam => $glob) {
         foreach (array_reverse($o) as $l) {
             if (preg_match('~^\s*(الحكم|النتيجة|🟢|🔴)~u', $l)) { $verdictLine = $l; break; }
         }
-        $said = $verdictLine !== ''
-            ? (bool) preg_match('~(✘|ساقط|حمراء|لم يعبر|زاد|🔴|رسب\s*[1-9])~u', $verdictLine)
-            : (bool) preg_match('~(^|
+        /* ⚠ **والنمطُ يلتقط من داخلِ النفي**: سطرُ السقّاطةِ يقول «**لا** دَينٌ
+             زاد» — فالتقط «زاد» وأرسبَ الأخضر. ⇒ **ورمزُ الحالةِ أصدقُ من
+             لفظِها**: 🟢 و🔴 لا يحتملان نفيًا، فيُقدَّمان على اللفظ. */
+        if ($verdictLine !== '' && preg_match('~🟢~u', $verdictLine)) { $said = false; }
+        elseif ($verdictLine !== '' && preg_match('~🔴~u', $verdictLine)) { $said = true; }
+        elseif ($verdictLine !== '') {
+            $said = (bool) preg_match('~(✘|ساقط|حمراء|لم يعبر|رسب\s*[1-9])~u', $verdictLine);
+        } else {
+            $said = (bool) preg_match('~(^|
 )\s*✘~u', $txt);
+        }
         $v = ($rc === 0 && !$said) ? 'PASS' : (($rc > 1) ? 'ERROR' : 'FAIL');
         if ($v === 'PASS') { $pass++; } elseif ($v === 'ERROR') { $err++; } else { $fail++; }
         /* سطرُ الحكمِ الأخيرُ — دليلٌ لا زينة */
