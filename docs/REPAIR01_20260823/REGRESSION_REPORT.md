@@ -6,16 +6,16 @@
 
 | الحقل | القيمة |
 |---|---|
-| `Snapshot ID` | `SNAP-e5e2d768-20260827135048` |
-| `Commit Hash` | `e5e2d7680204db324431b5cbd9110dcff69ff928` |
+| `Snapshot ID` | `SNAP-5c186484-20260827042012` |
+| `Commit Hash` | `5c18648431f48ca3d5591307ad301a00c57b4f7a` |
 | `Branch` | `repair01/w01-ownership` |
-| `Schema Version` | `916T/14528C` |
+| `Schema Version` | `927T/14633C` |
 | `Registry Version` | 783 صفًّا |
-| `Measured At` | 2026-08-27 13:50:48 ← 2026-08-27 13:52:42 |
+| `Measured At` | 2026-08-27 04:20:12 ← 2026-08-27 04:21:43 |
 | `Tool Version` | `repair01_regression_run.php` |
 | **ثباتُ البصمة** | ✔ ثابتةٌ من البدءِ إلى الختام |
 
-**نجح 24 · رسب 0 · عطبٌ في التشغيل 0 · المجموع 24**
+**نجح 25 · رسب 0 · عطبٌ في التشغيل 0 · المجموع 25**
 
 
 ## بوّاباتُ الموجات
@@ -30,6 +30,7 @@
 | `tools/repair01_w13_gate.php` | ✔ | الحكم: خضراء ✔ |
 | `tools/repair01_w14_gate.php` | ✔ | الحكم: خضراء ✔ |
 | `tools/repair01_w15_gate.php` | ✔ | الحكم: خضراء ✔ |
+| `tools/repair01_w16_gate.php` | ✔ | الحكم: خضراء ✔ |
 | `tools/repair01_w1_gate.php` | ✔ | الحكم: خضراء ✔ |
 | `tools/repair01_w2_gate.php` | ✔ | الحكم: خضراء ✔ |
 | `tools/repair01_w3_gate.php` | ✔ | الحكم: خضراء ✔ |
