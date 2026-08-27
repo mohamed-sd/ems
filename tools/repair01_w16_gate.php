@@ -289,9 +289,12 @@ gate('W16-20', 'كلُّ مقياسِ صنفٍ يعمل الآن ويعيد عد
 
 /* ══ W16-21 · سجلُّ الإصدارِ ببصمةِ لقطةٍ والتزامٍ قائمَين ═══════════ */
 $blN = (int) $one("SELECT COUNT(*) FROM repair01_w16_baseline");
+/* ⛔ **ولقطةٌ قائمةٌ لا تكفي — يجب أن تكون لقطةَ هذا الالتزامِ بعينِه**: وإلّا
+   خَتَم الأساسُ نسخةً لا تمثّله، وهو ما وقع فعلًا حين اختِيرت اللقطةُ بالوقتِ
+   لا بالالتزام (`W16-F-11`). فالمطابقةُ على `commit_hash` لا على الوجودِ وحدَه. */
 $blSnapBad = (int) $one("SELECT COUNT(*) FROM repair01_w16_baseline b
                           LEFT JOIN repair01_freeze_snapshot s ON s.snapshot_id = b.snapshot_id
-                         WHERE s.snapshot_id IS NULL");
+                         WHERE s.snapshot_id IS NULL OR s.commit_hash <> b.commit_hash");
 $blCommit = (string) $one("SELECT commit_hash FROM repair01_w16_baseline ORDER BY issued_at DESC LIMIT 1");
 $blKnown = 0;
 if ($blCommit !== '') {
