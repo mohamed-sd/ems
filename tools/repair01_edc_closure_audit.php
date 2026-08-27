@@ -128,10 +128,30 @@ if ($red === 0) {
 }
 
 if ($MD) {
-    $s = $conn->query("SELECT * FROM repair01_freeze_snapshot ORDER BY frozen_at DESC LIMIT 1")->fetch_assoc();
+    /* ⚠ **وكان الختمُ يأخذ آخرَ لقطةٍ بـ`frozen_at` لا اللقطةَ التي قِيس فيها**
+       (‏كُشف في W16): لقطتان في اليومِ نفسِه — واحدةٌ عند 14:55 وأخرى عند 04:11 —
+       **فترتيبُ الوقتِ يقدّم الأقدمَ إن سبقت ساعتُه**، فيخرج التقريرُ **يزعم لقطةً
+       لم يُقَس فيها**، وهو نفسُ ما يمنعه البندُ ⑬.
+       ⇒ **فالنافذةُ المفتوحةُ أولًا**: هذه الأداةُ تُشغَّل داخلَها، والمفتوحةُ
+       واحدةٌ بحكمِ `repair01_freeze.php` نفسِه. وإن لم تكن ثمَّ نافذةٌ **يُعلَن ذلك
+       في الوثيقةِ نصًّا** ⛔ ولا يُنسَب التقريرُ إلى لقطةٍ مغلقةٍ صامتًا. */
+    $s = null; $windowOpen = true;
+    $r = $conn->query("SELECT * FROM repair01_freeze_snapshot WHERE released_at IS NULL
+                        ORDER BY frozen_at DESC LIMIT 1");
+    if ($r && $r->num_rows) { $s = $r->fetch_assoc(); }
+    if ($s === null) {
+        $windowOpen = false;
+        $r = $conn->query("SELECT * FROM repair01_freeze_snapshot ORDER BY released_at DESC, frozen_at DESC LIMIT 1");
+        $s = ($r && $r->num_rows) ? $r->fetch_assoc() : array(
+            'snapshot_id' => '—', 'commit_hash' => '—', 'schema_version' => '—');
+    }
     $o  = "# جردُ ما يحجب الإغلاق — البندُ ⑪\n\n";
     $o .= "> ⛔ **مولَّدٌ من تشغيلٍ حيّ**: `php tools/repair01_edc_closure_audit.php --md`\n";
-    $o .= "> **ولكلِّ مقياسٍ مقامُه** — فصفرٌ من مقامٍ مجهولٍ لا يُثبت شيئًا.\n\n";
+    $o .= "> **ولكلِّ مقياسٍ مقامُه** — فصفرٌ من مقامٍ مجهولٍ لا يُثبت شيئًا.\n";
+    $o .= $windowOpen
+        ? "> **وقِيس داخلَ نافذةِ اللقطةِ أدناه** — لا مُنسَبًا إليها بعد إغلاقِها.\n\n"
+        : "> ⚠ **ولا نافذةَ قياسٍ مفتوحةً حينَ شُغِّل** — واللقطةُ أدناه **آخرُ ما فُكّ**،\n"
+        . "> فالتقريرُ **لا يُنسَب إليها** وإنّما تُذكَر للسياقِ وحدَه.\n\n";
     $o .= "| اللقطة | `{$s['snapshot_id']}` |\n|---|---|\n";
     $o .= "| `Commit Hash` | `{$s['commit_hash']}` |\n";
     $o .= "| `Schema Version` | `{$s['schema_version']}` |\n";
