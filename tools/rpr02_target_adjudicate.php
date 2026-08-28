@@ -226,6 +226,23 @@ if ($APPLY && $noWit === 0) {
                      GROUP BY 1 HAVING COUNT(*) > 1) t")->fetch_row()[0];
     printf("  ✔ أُعيدت القراءة: محكومٌ %d · حكمٌ بلا شاهدٍ %d · **سطحٌ يطالِب به هدفان %d**\n",
            $back, $bad, $dupClaim);
+    /* ⛔ **وفضاءُ الفصلِ يُكتب أيضًا**: هدفٌ بلا حكمٍ وبلا مرشَّحاتٍ مكتوبةٍ
+         يُعاد اشتقاقُ فضائه في كلِّ جلسة — **والمُشتقُّ يتغيّر والمكتوبُ يُحتجُّ
+         به**. فيُقيَّد المرشَّحون بأسمائهم ومعرِّفاتِهم وباللقطةِ التي قيسوا
+         فيها. ⛔ ولا يُقرأ هذا حكمًا — عمودُ `verdict` يبقى فارغًا. */
+    $sp = 0;
+    foreach ($still as $t) {
+        $c = isset($space[$t['target_uid']]) ? $space[$t['target_uid']] : array();
+        $txt = 'فضاءُ فصلٍ محصورٌ على لقطة ' . $sid . ' — أسطحُ نطاقِه غيرُ المُطالَبِ بها ('
+             . count($c) . '): ' . mb_substr(implode(' · ', $c), 0, 330);
+        if (!$conn->query("UPDATE repair01_target_universe
+              SET match_witness = '" . $e($txt) . "'
+            WHERE target_uid = '" . $e($t['target_uid']) . "' AND verdict IS NULL")) {
+            exit("✘ تعذّر فضاءُ {$t['target_uid']}: {$conn->error}\n");
+        }
+        $sp++;
+    }
+    printf("  ✔ قُيِّد فضاءُ الفصلِ لـ**%d** هدفٍ بلا حكم — ولا يُقرأ حكمًا\n", $sp);
 } elseif ($APPLY) {
     echo "\n  ⛔ **لم يُكتب شيء** — حكمٌ بلا شاهدٍ لا يُثبَّت\n";
 }
