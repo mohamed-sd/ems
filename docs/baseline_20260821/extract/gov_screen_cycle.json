@@ -882,6 +882,24 @@
         "stage_kind": "canonical"
     },
     {
+        "id": "2120",
+        "company_id": "0",
+        "dept_name": "إدارة التشغيل",
+        "layer_name": "دورة الإدارة",
+        "stage_order": "0",
+        "stage_name": "التخطيط والتوزيع",
+        "group_name": "التخطيط والتوزيع",
+        "screen_title": "الخطة الشهرية للتشغيل",
+        "screen_file": "Operations\/monthly_plan.php",
+        "inputs_note": "مُسجَّلٌ بربطِ الملاحة — RPR-02 §٦ الخطوة ⑦",
+        "output_doc": "",
+        "resp_role": "إدارة التشغيل",
+        "next_state": "",
+        "consumers": "—",
+        "fin_impact": "لا — سطحُ قراءةٍ في دورةِ إدارتِه",
+        "stage_kind": "contextual"
+    },
+    {
         "id": "414",
         "company_id": "0",
         "dept_name": "إدارة التشغيل",
@@ -2214,6 +2232,24 @@
         "stage_kind": "canonical"
     },
     {
+        "id": "2205",
+        "company_id": "0",
+        "dept_name": "إدارة الصيانة",
+        "layer_name": "دورة العطل",
+        "stage_order": "10",
+        "stage_name": "دورة العطل",
+        "group_name": "دورة العطل",
+        "screen_title": "طلبات صرف القطع",
+        "screen_file": "part_requests.php",
+        "inputs_note": "متطلبات: MNT-10",
+        "output_doc": "طلب صرف قطع",
+        "resp_role": "مسؤول الصيانة",
+        "next_state": "صرف المخازن بسنده",
+        "consumers": "المخازن والمالية",
+        "fin_impact": "نعم",
+        "stage_kind": "canonical"
+    },
+    {
         "id": "696",
         "company_id": "0",
         "dept_name": "إدارة الصيانة",
@@ -2431,6 +2467,24 @@
     },
     {
         "id": "828",
+        "company_id": "0",
+        "dept_name": "إدارة الصيانة",
+        "layer_name": "دورة العطل",
+        "stage_order": "11",
+        "stage_name": "دورة العطل",
+        "group_name": "دورة العطل",
+        "screen_title": "الإصلاح الخارجي ومطالبات الضمان",
+        "screen_file": "external_repairs.php",
+        "inputs_note": "متطلبات: MNT-11",
+        "output_doc": "امر احالة خارجية او مطالبة ضمان",
+        "resp_role": "مسؤول الصيانة",
+        "next_state": "استلام العمل الخارجي",
+        "consumers": "الموردون والمالية",
+        "fin_impact": "نعم",
+        "stage_kind": "canonical"
+    },
+    {
+        "id": "2206",
         "company_id": "0",
         "dept_name": "إدارة الصيانة",
         "layer_name": "دورة العطل",
@@ -2682,6 +2736,24 @@
         "stage_kind": "canonical"
     },
     {
+        "id": "2207",
+        "company_id": "0",
+        "dept_name": "إدارة الصيانة",
+        "layer_name": "الوقائية",
+        "stage_order": "13",
+        "stage_name": "الوقائية",
+        "group_name": "الوقائية",
+        "screen_title": "العناية اليومية والتشحيم",
+        "screen_file": "daily_care.php",
+        "inputs_note": "متطلبات: MNT-13",
+        "output_doc": "سطر عناية يومية منفذ",
+        "resp_role": "مسؤول الصيانة",
+        "next_state": "بلاغ متفرع عند نتيجة غير طبيعية",
+        "consumers": "الصيانة والتشغيل",
+        "fin_impact": "لا",
+        "stage_kind": "canonical"
+    },
+    {
         "id": "698",
         "company_id": "0",
         "dept_name": "إدارة الصيانة",
@@ -2916,6 +2988,24 @@
         "stage_kind": "canonical"
     },
     {
+        "id": "2208",
+        "company_id": "0",
+        "dept_name": "إدارة الصيانة",
+        "layer_name": "الإقفال والجاهزية",
+        "stage_order": "15",
+        "stage_name": "الإقفال والجاهزية",
+        "group_name": "الإقفال والجاهزية",
+        "screen_title": "سجل إعادة الإصلاح",
+        "screen_file": "repeat_repairs.php",
+        "inputs_note": "متطلبات: MNT-15",
+        "output_doc": "ملف تحليل السبب الجذري",
+        "resp_role": "مسؤول الصيانة",
+        "next_state": "قرار اغلاق التحليل",
+        "consumers": "الصيانة والمخاطر والموردون",
+        "fin_impact": "لا",
+        "stage_kind": "canonical"
+    },
+    {
         "id": "699",
         "company_id": "0",
         "dept_name": "إدارة الصيانة",
@@ -3133,6 +3223,24 @@
     },
     {
         "id": "831",
+        "company_id": "0",
+        "dept_name": "إدارة الصيانة",
+        "layer_name": "التقارير",
+        "stage_order": "16",
+        "stage_name": "التقارير",
+        "group_name": "التقارير",
+        "screen_title": "مؤشرات الصيانة الدورية",
+        "screen_file": "mnt_kpis.php",
+        "inputs_note": "متطلبات: MNT-16",
+        "output_doc": "سطر مؤشر مشتق",
+        "resp_role": "مسؤول الصيانة",
+        "next_state": "قراءة القيادة والمخاطر",
+        "consumers": "القيادة والمخاطر",
+        "fin_impact": "لا",
+        "stage_kind": "canonical"
+    },
+    {
+        "id": "2209",
         "company_id": "0",
         "dept_name": "إدارة الصيانة",
         "layer_name": "التقارير",
@@ -3655,6 +3763,24 @@
     },
     {
         "id": "826",
+        "company_id": "0",
+        "dept_name": "إدارة الصيانة",
+        "layer_name": "دورة العطل",
+        "stage_order": "4",
+        "stage_name": "دورة العطل",
+        "group_name": "دورة العطل",
+        "screen_title": "استقبال البلاغات الفنية",
+        "screen_file": "breakdown_intake.php",
+        "inputs_note": "متطلبات: MNT-04",
+        "output_doc": "بلاغ فني مستلم",
+        "resp_role": "مسؤول الصيانة",
+        "next_state": "فتح امر عمل على البلاغ",
+        "consumers": "الصيانة والمخاطر",
+        "fin_impact": "لا",
+        "stage_kind": "canonical"
+    },
+    {
+        "id": "2204",
         "company_id": "0",
         "dept_name": "إدارة الصيانة",
         "layer_name": "دورة العطل",
@@ -4392,7 +4518,43 @@
         "stage_kind": "canonical"
     },
     {
+        "id": "2224",
+        "company_id": "0",
+        "dept_name": "إدارة المخازن",
+        "layer_name": "الرقابة والإقفال",
+        "stage_order": "18",
+        "stage_name": "الرقابة والإقفال",
+        "group_name": "الرقابة والإقفال",
+        "screen_title": "الإقفال الشهري للمخازن",
+        "screen_file": "wh_month_close.php",
+        "inputs_note": "متطلبات: WH-18",
+        "output_doc": "سطر اقفال شهري متوازن",
+        "resp_role": "أمين المخزن",
+        "next_state": "ترحيل الرصيد الى المالية",
+        "consumers": "المخازن والمالية",
+        "fin_impact": "نعم",
+        "stage_kind": "canonical"
+    },
+    {
         "id": "1120",
+        "company_id": "0",
+        "dept_name": "إدارة المخازن",
+        "layer_name": "الرقابة والإقفال",
+        "stage_order": "19",
+        "stage_name": "الرقابة والإقفال",
+        "group_name": "الرقابة والإقفال",
+        "screen_title": "جودة بيانات التتبع",
+        "screen_file": "wh_track_quality.php",
+        "inputs_note": "متطلبات: WH-03",
+        "output_doc": "سطر مؤشر نضج مشتق",
+        "resp_role": "أمين المخزن",
+        "next_state": "رفع سياسة صنف الى الالزام عند النضج",
+        "consumers": "المخازن والقيادة",
+        "fin_impact": "لا",
+        "stage_kind": "canonical"
+    },
+    {
+        "id": "2228",
         "company_id": "0",
         "dept_name": "إدارة المخازن",
         "layer_name": "الرقابة والإقفال",
@@ -4590,6 +4752,24 @@
         "stage_kind": "canonical"
     },
     {
+        "id": "2225",
+        "company_id": "0",
+        "dept_name": "إدارة المخازن",
+        "layer_name": "التأسيس المرجعي",
+        "stage_order": "4",
+        "stage_name": "التأسيس المرجعي",
+        "group_name": "التأسيس المرجعي",
+        "screen_title": "سياسة تتبع الأصناف",
+        "screen_file": "proc_track_policy.php",
+        "inputs_note": "متطلبات: WH-03",
+        "output_doc": "سياسة تتبع بنسختها وتاريخ سريانها",
+        "resp_role": "أمين المخزن",
+        "next_state": "حل السياسة على الاصناف",
+        "consumers": "المخازن والمشتريات والصيانة",
+        "fin_impact": "لا",
+        "stage_kind": "canonical"
+    },
+    {
         "id": "535",
         "company_id": "0",
         "dept_name": "إدارة المخازن",
@@ -4717,6 +4897,24 @@
     },
     {
         "id": "1118",
+        "company_id": "0",
+        "dept_name": "إدارة المخازن",
+        "layer_name": "دورة الاستلام",
+        "stage_order": "6",
+        "stage_name": "دورة الاستلام",
+        "group_name": "دورة الاستلام",
+        "screen_title": "سجل الدفعات",
+        "screen_file": "wh_lots.php",
+        "inputs_note": "متطلبات: WH-05",
+        "output_doc": "سطر دفعة بكميتها وتواريخها",
+        "resp_role": "أمين المخزن",
+        "next_state": "ترتيب الصرف بالصلاحية",
+        "consumers": "المخازن والجودة",
+        "fin_impact": "لا",
+        "stage_kind": "canonical"
+    },
+    {
+        "id": "2226",
         "company_id": "0",
         "dept_name": "إدارة المخازن",
         "layer_name": "دورة الاستلام",
@@ -5274,6 +5472,42 @@
         "stage_kind": "canonical"
     },
     {
+        "id": "2222",
+        "company_id": "0",
+        "dept_name": "إدارة المخازن",
+        "layer_name": "دورة الاستلام",
+        "stage_order": "7",
+        "stage_name": "دورة الاستلام",
+        "group_name": "دورة الاستلام",
+        "screen_title": "ضوابط المواد الخطرة والمتفجرات",
+        "screen_file": "wh_hazmat.php",
+        "inputs_note": "متطلبات: WH-07",
+        "output_doc": "سطر ضوابط صنف خطر",
+        "resp_role": "أمين المخزن",
+        "next_state": "بوابة صرف بتصريح",
+        "consumers": "المخازن والسلامة",
+        "fin_impact": "لا",
+        "stage_kind": "canonical"
+    },
+    {
+        "id": "2227",
+        "company_id": "0",
+        "dept_name": "إدارة المخازن",
+        "layer_name": "دورة الاستلام",
+        "stage_order": "7",
+        "stage_name": "دورة الاستلام",
+        "group_name": "دورة الاستلام",
+        "screen_title": "سجل الأرقام التسلسلية",
+        "screen_file": "wh_serials.php",
+        "inputs_note": "متطلبات: WH-05",
+        "output_doc": "سطر قطعة بدورة حياتها",
+        "resp_role": "أمين المخزن",
+        "next_state": "ربط القطعة باصلها وعهدتها",
+        "consumers": "المخازن والصيانة والاسطول",
+        "fin_impact": "لا",
+        "stage_kind": "canonical"
+    },
+    {
         "id": "543",
         "company_id": "0",
         "dept_name": "إدارة المخازن",
@@ -5796,6 +6030,24 @@
         "stage_kind": "canonical"
     },
     {
+        "id": "2223",
+        "company_id": "0",
+        "dept_name": "إدارة المخازن",
+        "layer_name": "دورة الصرف",
+        "stage_order": "8",
+        "stage_name": "دورة الصرف",
+        "group_name": "دورة الصرف",
+        "screen_title": "طلبات الصرف الواردة",
+        "screen_file": "wh_issue_requests.php",
+        "inputs_note": "متطلبات: WH-08 · WH-09",
+        "output_doc": "طلب صرف معتمد",
+        "resp_role": "أمين المخزن",
+        "next_state": "سند صرف من المخزن",
+        "consumers": "المخازن والجهة الطالبة",
+        "fin_impact": "نعم",
+        "stage_kind": "canonical"
+    },
+    {
         "id": "81",
         "company_id": "0",
         "dept_name": "إدارة المخاطر المؤسسية",
@@ -6012,7 +6264,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "2003",
+        "id": "2303",
         "company_id": "0",
         "dept_name": "إدارة المخاطر المؤسسية",
         "layer_name": "التأسيس المرجعي",
@@ -6030,7 +6282,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "2004",
+        "id": "2304",
         "company_id": "0",
         "dept_name": "إدارة المخاطر المؤسسية",
         "layer_name": "السجل والتقييم",
@@ -6048,7 +6300,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "2005",
+        "id": "2305",
         "company_id": "0",
         "dept_name": "إدارة المخاطر المؤسسية",
         "layer_name": "القرار والإغلاق",
@@ -6120,7 +6372,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "2006",
+        "id": "2306",
         "company_id": "0",
         "dept_name": "إدارة المخاطر المؤسسية",
         "layer_name": "القرار والإغلاق",
@@ -6840,6 +7092,24 @@
         "stage_kind": "canonical"
     },
     {
+        "id": "2218",
+        "company_id": "0",
+        "dept_name": "إدارة المشتريات التشغيلية",
+        "layer_name": "العروض والترسية",
+        "stage_order": "10",
+        "stage_name": "العروض والترسية",
+        "group_name": "العروض والترسية",
+        "screen_title": "محضر المقارنة والترسية",
+        "screen_file": "proc_award_minutes.php",
+        "inputs_note": "متطلبات: PRC-10",
+        "output_doc": "محضر ترسية معتمد",
+        "resp_role": "مسؤول المشتريات",
+        "next_state": "اصدار امر الشراء على المحضر",
+        "consumers": "المشتريات والمالية والمراجعة",
+        "fin_impact": "نعم",
+        "stage_kind": "canonical"
+    },
+    {
         "id": "841",
         "company_id": "0",
         "dept_name": "إدارة المشتريات التشغيلية",
@@ -7327,6 +7597,24 @@
     },
     {
         "id": "1111",
+        "company_id": "0",
+        "dept_name": "إدارة المشتريات التشغيلية",
+        "layer_name": "الأمر والتوريد",
+        "stage_order": "13",
+        "stage_name": "الأمر والتوريد",
+        "group_name": "الأمر والتوريد",
+        "screen_title": "استثناءات الشراء وتعديلات الأوامر",
+        "screen_file": "proc_po_amendments.php",
+        "inputs_note": "متطلبات: PRC-13",
+        "output_doc": "سطر تعديل بمساره الحوكمي",
+        "resp_role": "مسؤول المشتريات",
+        "next_state": "اعتماد التعديل او رده",
+        "consumers": "المشتريات والمالية والمراجعة",
+        "fin_impact": "نعم",
+        "stage_kind": "canonical"
+    },
+    {
+        "id": "2219",
         "company_id": "0",
         "dept_name": "إدارة المشتريات التشغيلية",
         "layer_name": "الأمر والتوريد",
@@ -7848,6 +8136,24 @@
         "stage_kind": "canonical"
     },
     {
+        "id": "2220",
+        "company_id": "0",
+        "dept_name": "إدارة المشتريات التشغيلية",
+        "layer_name": "الأمر والتوريد",
+        "stage_order": "14",
+        "stage_name": "الأمر والتوريد",
+        "group_name": "الأمر والتوريد",
+        "screen_title": "متابعة التوريد والاستلام",
+        "screen_file": "proc_delivery_track.php",
+        "inputs_note": "متطلبات: PRC-14",
+        "output_doc": "سطر متابعة توريد",
+        "resp_role": "مسؤول المشتريات",
+        "next_state": "سند ادخال المخزن",
+        "consumers": "المشتريات والمخازن",
+        "fin_impact": "لا",
+        "stage_kind": "canonical"
+    },
+    {
         "id": "843",
         "company_id": "0",
         "dept_name": "إدارة المشتريات التشغيلية",
@@ -8335,6 +8641,24 @@
     },
     {
         "id": "1113",
+        "company_id": "0",
+        "dept_name": "إدارة المشتريات التشغيلية",
+        "layer_name": "المطابقة والإقفال",
+        "stage_order": "16",
+        "stage_name": "المطابقة والإقفال",
+        "group_name": "المطابقة والإقفال",
+        "screen_title": "تقييم أداء التوريد",
+        "screen_file": "proc_supplier_eval.php",
+        "inputs_note": "متطلبات: PRC-16",
+        "output_doc": "سطر تقييم مشتق",
+        "resp_role": "مسؤول المشتريات",
+        "next_state": "قراءة لجنة التاهيل",
+        "consumers": "المشتريات والقيادة",
+        "fin_impact": "لا",
+        "stage_kind": "canonical"
+    },
+    {
+        "id": "2221",
         "company_id": "0",
         "dept_name": "إدارة المشتريات التشغيلية",
         "layer_name": "المطابقة والإقفال",
@@ -9000,6 +9324,24 @@
         "stage_kind": "canonical"
     },
     {
+        "id": "2215",
+        "company_id": "0",
+        "dept_name": "إدارة المشتريات التشغيلية",
+        "layer_name": "الطلب والتجميع",
+        "stage_order": "4",
+        "stage_name": "الطلب والتجميع",
+        "group_name": "الطلب والتجميع",
+        "screen_title": "تجميع الطلبات وخطة الشراء",
+        "screen_file": "proc_packages.php",
+        "inputs_note": "متطلبات: PRC-04 · PRC-05",
+        "output_doc": "حزمة شراء معتمدة",
+        "resp_role": "مسؤول المشتريات",
+        "next_state": "اصدار طلب عروض على الحزمة",
+        "consumers": "المشتريات والمالية",
+        "fin_impact": "لا",
+        "stage_kind": "canonical"
+    },
+    {
         "id": "509",
         "company_id": "0",
         "dept_name": "إدارة المشتريات التشغيلية",
@@ -9576,6 +9918,24 @@
         "stage_kind": "canonical"
     },
     {
+        "id": "2216",
+        "company_id": "0",
+        "dept_name": "إدارة المشتريات التشغيلية",
+        "layer_name": "العروض والترسية",
+        "stage_order": "6",
+        "stage_name": "العروض والترسية",
+        "group_name": "العروض والترسية",
+        "screen_title": "طلب العروض ودعوات الموردين",
+        "screen_file": "proc_rfq.php",
+        "inputs_note": "متطلبات: PRC-06 · PRC-07",
+        "output_doc": "طلب عروض ودعوات مرسلة",
+        "resp_role": "مسؤول المشتريات",
+        "next_state": "استلام العروض ثم فتح المظاريف",
+        "consumers": "المشتريات والموردون",
+        "fin_impact": "لا",
+        "stage_kind": "canonical"
+    },
+    {
         "id": "513",
         "company_id": "0",
         "dept_name": "إدارة المشتريات التشغيلية",
@@ -10135,6 +10495,24 @@
     },
     {
         "id": "1109",
+        "company_id": "0",
+        "dept_name": "إدارة المشتريات التشغيلية",
+        "layer_name": "العروض والترسية",
+        "stage_order": "8",
+        "stage_name": "العروض والترسية",
+        "group_name": "العروض والترسية",
+        "screen_title": "عروض الموردين المستلمة",
+        "screen_file": "proc_offers.php",
+        "inputs_note": "متطلبات: PRC-08 · PRC-09",
+        "output_doc": "عرض مورد مسجل ببنوده",
+        "resp_role": "مسؤول المشتريات",
+        "next_state": "المقارنة ومحضر الترسية",
+        "consumers": "المشتريات ولجنة الترسية",
+        "fin_impact": "لا",
+        "stage_kind": "canonical"
+    },
+    {
+        "id": "2217",
         "company_id": "0",
         "dept_name": "إدارة المشتريات التشغيلية",
         "layer_name": "العروض والترسية",
@@ -11232,7 +11610,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1705",
+        "id": "2255",
         "company_id": "0",
         "dept_name": "التمويل والملكية",
         "layer_name": "المالية",
@@ -11250,7 +11628,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1706",
+        "id": "2256",
         "company_id": "0",
         "dept_name": "التمويل والملكية",
         "layer_name": "المالية",
@@ -11268,7 +11646,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1707",
+        "id": "2257",
         "company_id": "0",
         "dept_name": "التمويل والملكية",
         "layer_name": "المالية",
@@ -11286,7 +11664,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1708",
+        "id": "2258",
         "company_id": "0",
         "dept_name": "التمويل والملكية",
         "layer_name": "المالية",
@@ -11304,7 +11682,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1709",
+        "id": "2259",
         "company_id": "0",
         "dept_name": "التمويل والملكية",
         "layer_name": "المالية",
@@ -11502,7 +11880,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1697",
+        "id": "2247",
         "company_id": "0",
         "dept_name": "التمويل والملكية",
         "layer_name": "التأسيس",
@@ -11520,7 +11898,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1710",
+        "id": "2260",
         "company_id": "0",
         "dept_name": "التمويل والملكية",
         "layer_name": "المالية",
@@ -11538,7 +11916,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1711",
+        "id": "2261",
         "company_id": "0",
         "dept_name": "التمويل والملكية",
         "layer_name": "الحوكمة",
@@ -11556,7 +11934,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1712",
+        "id": "2262",
         "company_id": "0",
         "dept_name": "التمويل والملكية",
         "layer_name": "المرجعيات",
@@ -11574,7 +11952,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1713",
+        "id": "2263",
         "company_id": "0",
         "dept_name": "التمويل والملكية",
         "layer_name": "المرجعيات",
@@ -11592,7 +11970,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1714",
+        "id": "2264",
         "company_id": "0",
         "dept_name": "التمويل والملكية",
         "layer_name": "التقارير",
@@ -11700,7 +12078,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1698",
+        "id": "2248",
         "company_id": "0",
         "dept_name": "التمويل والملكية",
         "layer_name": "التأسيس",
@@ -11790,7 +12168,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1699",
+        "id": "2249",
         "company_id": "0",
         "dept_name": "التمويل والملكية",
         "layer_name": "الدورة",
@@ -11880,7 +12258,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1700",
+        "id": "2250",
         "company_id": "0",
         "dept_name": "التمويل والملكية",
         "layer_name": "الدورة",
@@ -11916,7 +12294,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1701",
+        "id": "2251",
         "company_id": "0",
         "dept_name": "التمويل والملكية",
         "layer_name": "الدورة",
@@ -11952,7 +12330,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1702",
+        "id": "2252",
         "company_id": "0",
         "dept_name": "التمويل والملكية",
         "layer_name": "التعاقد",
@@ -11970,7 +12348,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1703",
+        "id": "2253",
         "company_id": "0",
         "dept_name": "التمويل والملكية",
         "layer_name": "التعاقد",
@@ -11988,7 +12366,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1704",
+        "id": "2254",
         "company_id": "0",
         "dept_name": "التمويل والملكية",
         "layer_name": "التعاقد",
@@ -12096,7 +12474,7 @@
         "stage_kind": "contextual"
     },
     {
-        "id": "1986",
+        "id": "2286",
         "company_id": "0",
         "dept_name": "الحوكمة والالتزام",
         "layer_name": "اللوحة",
@@ -12348,7 +12726,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1991",
+        "id": "2291",
         "company_id": "0",
         "dept_name": "الحوكمة والالتزام",
         "layer_name": "الأدوار والصلاحيات",
@@ -12366,7 +12744,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1992",
+        "id": "2292",
         "company_id": "0",
         "dept_name": "الحوكمة والالتزام",
         "layer_name": "الأدوار والصلاحيات",
@@ -12384,7 +12762,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1993",
+        "id": "2293",
         "company_id": "0",
         "dept_name": "الحوكمة والالتزام",
         "layer_name": "الأدوار والصلاحيات",
@@ -12402,7 +12780,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1994",
+        "id": "2294",
         "company_id": "0",
         "dept_name": "الحوكمة والالتزام",
         "layer_name": "الأدوار والصلاحيات",
@@ -12420,7 +12798,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1995",
+        "id": "2295",
         "company_id": "0",
         "dept_name": "الحوكمة والالتزام",
         "layer_name": "الأدوار والصلاحيات",
@@ -12438,7 +12816,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1996",
+        "id": "2296",
         "company_id": "0",
         "dept_name": "الحوكمة والالتزام",
         "layer_name": "الاستثناء والرقابة",
@@ -12564,7 +12942,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1987",
+        "id": "2287",
         "company_id": "0",
         "dept_name": "الحوكمة والالتزام",
         "layer_name": "الكيان والتفويض",
@@ -12582,7 +12960,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1997",
+        "id": "2297",
         "company_id": "0",
         "dept_name": "الحوكمة والالتزام",
         "layer_name": "الاستثناء والرقابة",
@@ -12600,7 +12978,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1998",
+        "id": "2298",
         "company_id": "0",
         "dept_name": "الحوكمة والالتزام",
         "layer_name": "الاستثناء والرقابة",
@@ -12618,7 +12996,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1999",
+        "id": "2299",
         "company_id": "0",
         "dept_name": "الحوكمة والالتزام",
         "layer_name": "الاستثناء والرقابة",
@@ -12636,7 +13014,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "2000",
+        "id": "2300",
         "company_id": "0",
         "dept_name": "الحوكمة والالتزام",
         "layer_name": "الاستثناء والرقابة",
@@ -12654,7 +13032,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "2001",
+        "id": "2301",
         "company_id": "0",
         "dept_name": "الحوكمة والالتزام",
         "layer_name": "الاستثناء والرقابة",
@@ -12672,7 +13050,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "2002",
+        "id": "2302",
         "company_id": "0",
         "dept_name": "الحوكمة والالتزام",
         "layer_name": "الأنظمة المرجعية",
@@ -12708,7 +13086,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1988",
+        "id": "2288",
         "company_id": "0",
         "dept_name": "الحوكمة والالتزام",
         "layer_name": "الكيان والتفويض",
@@ -12780,7 +13158,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1989",
+        "id": "2289",
         "company_id": "0",
         "dept_name": "الحوكمة والالتزام",
         "layer_name": "الكيان والتفويض",
@@ -13068,7 +13446,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1990",
+        "id": "2290",
         "company_id": "0",
         "dept_name": "الحوكمة والالتزام",
         "layer_name": "المستندات والالتزام",
@@ -14112,7 +14490,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1416",
+        "id": "2236",
         "company_id": "0",
         "dept_name": "المالية والخزينة",
         "layer_name": "اللوحة",
@@ -14202,7 +14580,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1421",
+        "id": "2241",
         "company_id": "0",
         "dept_name": "المالية والخزينة",
         "layer_name": "دورة الصرف",
@@ -14382,7 +14760,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1422",
+        "id": "2242",
         "company_id": "0",
         "dept_name": "المالية والخزينة",
         "layer_name": "دورة الصرف",
@@ -14580,7 +14958,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1423",
+        "id": "2243",
         "company_id": "0",
         "dept_name": "المالية والخزينة",
         "layer_name": "دورة الصرف",
@@ -14724,7 +15102,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1410",
+        "id": "2230",
         "company_id": "0",
         "dept_name": "المالية والخزينة",
         "layer_name": "الذمم المدينة",
@@ -14742,7 +15120,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1424",
+        "id": "2244",
         "company_id": "0",
         "dept_name": "المالية والخزينة",
         "layer_name": "الرقابة والإقفال",
@@ -14760,7 +15138,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1411",
+        "id": "2231",
         "company_id": "0",
         "dept_name": "المالية والخزينة",
         "layer_name": "التسويات والمحاسبة العامة",
@@ -14778,7 +15156,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1425",
+        "id": "2245",
         "company_id": "0",
         "dept_name": "المالية والخزينة",
         "layer_name": "الرقابة والإقفال",
@@ -14796,7 +15174,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1426",
+        "id": "2246",
         "company_id": "0",
         "dept_name": "المالية والخزينة",
         "layer_name": "الرقابة والإقفال",
@@ -14850,7 +15228,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1417",
+        "id": "2237",
         "company_id": "0",
         "dept_name": "المالية والخزينة",
         "layer_name": "التأسيس",
@@ -14868,7 +15246,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1412",
+        "id": "2232",
         "company_id": "0",
         "dept_name": "المالية والخزينة",
         "layer_name": "التسويات والمحاسبة العامة",
@@ -14886,7 +15264,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1413",
+        "id": "2233",
         "company_id": "0",
         "dept_name": "المالية والخزينة",
         "layer_name": "الإقفال",
@@ -14904,7 +15282,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1414",
+        "id": "2234",
         "company_id": "0",
         "dept_name": "المالية والخزينة",
         "layer_name": "الإقفال",
@@ -14922,7 +15300,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1415",
+        "id": "2235",
         "company_id": "0",
         "dept_name": "المالية والخزينة",
         "layer_name": "الإقفال",
@@ -15120,7 +15498,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1409",
+        "id": "2229",
         "company_id": "0",
         "dept_name": "المالية والخزينة",
         "layer_name": "التأسيس المرجعي",
@@ -15894,7 +16272,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1418",
+        "id": "2238",
         "company_id": "0",
         "dept_name": "المالية والخزينة",
         "layer_name": "دورة القبض",
@@ -16218,7 +16596,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1419",
+        "id": "2239",
         "company_id": "0",
         "dept_name": "المالية والخزينة",
         "layer_name": "دورة القبض",
@@ -16308,7 +16686,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1420",
+        "id": "2240",
         "company_id": "0",
         "dept_name": "المالية والخزينة",
         "layer_name": "دورة الصرف",
@@ -17406,7 +17784,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "2007",
+        "id": "2307",
         "company_id": "0",
         "dept_name": "المراجع الداخلي المستقل",
         "layer_name": "اللوحة",
@@ -17424,7 +17802,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "2008",
+        "id": "2308",
         "company_id": "0",
         "dept_name": "المراجع الداخلي المستقل",
         "layer_name": "تنفيذ المهمة وأدلتها",
@@ -17442,7 +17820,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "2009",
+        "id": "2309",
         "company_id": "0",
         "dept_name": "المراجع الداخلي المستقل",
         "layer_name": "تنفيذ المهمة وأدلتها",
@@ -17460,7 +17838,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "2010",
+        "id": "2310",
         "company_id": "0",
         "dept_name": "المراجع الداخلي المستقل",
         "layer_name": "تنفيذ المهمة وأدلتها",
@@ -17478,7 +17856,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "2011",
+        "id": "2311",
         "company_id": "0",
         "dept_name": "المراجع الداخلي المستقل",
         "layer_name": "الحوكمة والضوابط",
@@ -17586,7 +17964,7 @@
         "stage_kind": "contextual"
     },
     {
-        "id": "1757",
+        "id": "2265",
         "company_id": "0",
         "dept_name": "الموارد البشرية",
         "layer_name": "اللوحة",
@@ -17694,7 +18072,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1762",
+        "id": "2270",
         "company_id": "0",
         "dept_name": "الموارد البشرية",
         "layer_name": "التوظيف والتعاقد",
@@ -17712,7 +18090,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1763",
+        "id": "2271",
         "company_id": "0",
         "dept_name": "الموارد البشرية",
         "layer_name": "الدوام والإجازات",
@@ -17730,7 +18108,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1764",
+        "id": "2272",
         "company_id": "0",
         "dept_name": "الموارد البشرية",
         "layer_name": "الدوام والإجازات",
@@ -17748,7 +18126,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1765",
+        "id": "2273",
         "company_id": "0",
         "dept_name": "الموارد البشرية",
         "layer_name": "الدوام والإجازات",
@@ -17766,7 +18144,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1766",
+        "id": "2274",
         "company_id": "0",
         "dept_name": "الموارد البشرية",
         "layer_name": "الاستحقاق والصرف",
@@ -17802,7 +18180,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1767",
+        "id": "2275",
         "company_id": "0",
         "dept_name": "الموارد البشرية",
         "layer_name": "الاستحقاق والصرف",
@@ -17820,7 +18198,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1768",
+        "id": "2276",
         "company_id": "0",
         "dept_name": "الموارد البشرية",
         "layer_name": "التقارير",
@@ -18018,7 +18396,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1758",
+        "id": "2266",
         "company_id": "0",
         "dept_name": "الموارد البشرية",
         "layer_name": "التوظيف والتعاقد",
@@ -18090,7 +18468,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1759",
+        "id": "2267",
         "company_id": "0",
         "dept_name": "الموارد البشرية",
         "layer_name": "التوظيف والتعاقد",
@@ -18216,7 +18594,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1760",
+        "id": "2268",
         "company_id": "0",
         "dept_name": "الموارد البشرية",
         "layer_name": "التوظيف والتعاقد",
@@ -18270,7 +18648,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1761",
+        "id": "2269",
         "company_id": "0",
         "dept_name": "الموارد البشرية",
         "layer_name": "التوظيف والتعاقد",
@@ -18702,6 +19080,24 @@
         "stage_kind": "canonical"
     },
     {
+        "id": "2212",
+        "company_id": "0",
+        "dept_name": "النقل والترحيل",
+        "layer_name": "دورة الترحيل",
+        "stage_order": "10",
+        "stage_name": "دورة الترحيل",
+        "group_name": "دورة الترحيل",
+        "screen_title": "مطالبات التلف والحوادث",
+        "screen_file": "transfer_damage_claims.php",
+        "inputs_note": "متطلبات: TRP-10",
+        "output_doc": "ملف مطالبة تلف",
+        "resp_role": "مسؤول النقل والترحيل",
+        "next_state": "قرار التسوية",
+        "consumers": "المالية والموردون والمخاطر",
+        "fin_impact": "نعم",
+        "stage_kind": "canonical"
+    },
+    {
         "id": "703",
         "company_id": "0",
         "dept_name": "النقل والترحيل",
@@ -18936,6 +19332,24 @@
         "stage_kind": "canonical"
     },
     {
+        "id": "2213",
+        "company_id": "0",
+        "dept_name": "النقل والترحيل",
+        "layer_name": "الإقفال والتكلفة",
+        "stage_order": "12",
+        "stage_name": "الإقفال والتكلفة",
+        "group_name": "الإقفال والتكلفة",
+        "screen_title": "إقفال أمر الترحيل",
+        "screen_file": "transfer_closure.php",
+        "inputs_note": "متطلبات: TRP-12",
+        "output_doc": "محضر اقفال امر الترحيل",
+        "resp_role": "مسؤول النقل والترحيل",
+        "next_state": "احالة التكلفة للمالية",
+        "consumers": "المالية والخزينة",
+        "fin_impact": "نعم",
+        "stage_kind": "canonical"
+    },
+    {
         "id": "704",
         "company_id": "0",
         "dept_name": "النقل والترحيل",
@@ -19153,6 +19567,24 @@
     },
     {
         "id": "836",
+        "company_id": "0",
+        "dept_name": "النقل والترحيل",
+        "layer_name": "الإقفال والتكلفة",
+        "stage_order": "13",
+        "stage_name": "الإقفال والتكلفة",
+        "group_name": "الإقفال والتكلفة",
+        "screen_title": "تقرير أوامر الترحيل",
+        "screen_file": "transfer_orders_report.php",
+        "inputs_note": "متطلبات: TRP-13",
+        "output_doc": "سطر تقرير فترة",
+        "resp_role": "مسؤول النقل والترحيل",
+        "next_state": "قراءة القيادة والمالية",
+        "consumers": "القيادة والمالية",
+        "fin_impact": "لا",
+        "stage_kind": "canonical"
+    },
+    {
+        "id": "2214",
         "company_id": "0",
         "dept_name": "النقل والترحيل",
         "layer_name": "الإقفال والتكلفة",
@@ -19692,6 +20124,24 @@
         "stage_kind": "canonical"
     },
     {
+        "id": "2210",
+        "company_id": "0",
+        "dept_name": "النقل والترحيل",
+        "layer_name": "دورة الترحيل",
+        "stage_order": "6",
+        "stage_name": "دورة الترحيل",
+        "group_name": "دورة الترحيل",
+        "screen_title": "تجهيز المغادرة والتسليم الأصلي",
+        "screen_file": "transfer_origin_handover.php",
+        "inputs_note": "متطلبات: TRP-06",
+        "output_doc": "محضر تسليم اصلي واذن مغادرة",
+        "resp_role": "مسؤول النقل والترحيل",
+        "next_state": "بدء المرحلة الاولى",
+        "consumers": "النقل والسلامة",
+        "fin_impact": "لا",
+        "stage_kind": "canonical"
+    },
+    {
         "id": "701",
         "company_id": "0",
         "dept_name": "النقل والترحيل",
@@ -19926,6 +20376,24 @@
         "stage_kind": "canonical"
     },
     {
+        "id": "2211",
+        "company_id": "0",
+        "dept_name": "النقل والترحيل",
+        "layer_name": "دورة الترحيل",
+        "stage_order": "7",
+        "stage_name": "دورة الترحيل",
+        "group_name": "دورة الترحيل",
+        "screen_title": "مراحل الرحلة",
+        "screen_file": "transfer_trip_legs.php",
+        "inputs_note": "متطلبات: TRP-07",
+        "output_doc": "سطر مرحلة بمبدئها ومنتهاها",
+        "resp_role": "مسؤول النقل والترحيل",
+        "next_state": "تسليم المرحلة للتالية",
+        "consumers": "النقل والتشغيل",
+        "fin_impact": "لا",
+        "stage_kind": "canonical"
+    },
+    {
         "id": "607",
         "company_id": "0",
         "dept_name": "مركز البلاغات",
@@ -20142,7 +20610,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1769",
+        "id": "2277",
         "company_id": "0",
         "dept_name": "مركز البلاغات",
         "layer_name": "دورة البلاغ",
@@ -20160,7 +20628,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1770",
+        "id": "2278",
         "company_id": "0",
         "dept_name": "مركز البلاغات",
         "layer_name": "دورة البلاغ",
@@ -20178,7 +20646,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1771",
+        "id": "2279",
         "company_id": "0",
         "dept_name": "مركز البلاغات",
         "layer_name": "السجلات التابعة",
@@ -20196,7 +20664,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1772",
+        "id": "2280",
         "company_id": "0",
         "dept_name": "مركز البلاغات",
         "layer_name": "السجلات التابعة",
@@ -20214,7 +20682,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1773",
+        "id": "2281",
         "company_id": "0",
         "dept_name": "مركز البلاغات",
         "layer_name": "السجلات التابعة",
@@ -20232,7 +20700,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1774",
+        "id": "2282",
         "company_id": "0",
         "dept_name": "مركز البلاغات",
         "layer_name": "السجلات التابعة",
@@ -20250,7 +20718,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1775",
+        "id": "2283",
         "company_id": "0",
         "dept_name": "مركز البلاغات",
         "layer_name": "السجلات التابعة",
@@ -20268,7 +20736,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1776",
+        "id": "2284",
         "company_id": "0",
         "dept_name": "مركز البلاغات",
         "layer_name": "السجلات التابعة",
@@ -20322,7 +20790,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "1777",
+        "id": "2285",
         "company_id": "0",
         "dept_name": "مركز البلاغات",
         "layer_name": "دورة البلاغ",
@@ -20700,7 +21168,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "2119",
+        "id": "2329",
         "company_id": "0",
         "dept_name": "مساحة العمل الشخصية",
         "layer_name": "عملي اليومي",
@@ -20934,7 +21402,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "2102",
+        "id": "2312",
         "company_id": "0",
         "dept_name": "مكتب الرئيس التنفيذي والنواب",
         "layer_name": "التقارير الدورية",
@@ -20952,7 +21420,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "2103",
+        "id": "2313",
         "company_id": "0",
         "dept_name": "مكتب الرئيس التنفيذي والنواب",
         "layer_name": "التقارير الدورية",
@@ -20970,7 +21438,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "2104",
+        "id": "2314",
         "company_id": "0",
         "dept_name": "مكتب الرئيس التنفيذي والنواب",
         "layer_name": "التقارير الدورية",
@@ -20988,7 +21456,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "2105",
+        "id": "2315",
         "company_id": "0",
         "dept_name": "مكتب الرئيس التنفيذي والنواب",
         "layer_name": "التقارير الدورية",
@@ -21006,7 +21474,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "2106",
+        "id": "2316",
         "company_id": "0",
         "dept_name": "مكتب الرئيس التنفيذي والنواب",
         "layer_name": "التقارير الدورية",
@@ -21078,7 +21546,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "2107",
+        "id": "2317",
         "company_id": "0",
         "dept_name": "مكتب الرئيس التنفيذي والنواب",
         "layer_name": "صناديق القرار",
@@ -21096,7 +21564,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "2108",
+        "id": "2318",
         "company_id": "0",
         "dept_name": "مكتب الرئيس التنفيذي والنواب",
         "layer_name": "صناديق القرار",
@@ -21114,7 +21582,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "2109",
+        "id": "2319",
         "company_id": "0",
         "dept_name": "مكتب الرئيس التنفيذي والنواب",
         "layer_name": "صناديق القرار",
@@ -21132,7 +21600,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "2111",
+        "id": "2321",
         "company_id": "0",
         "dept_name": "مكتب الرئيس التنفيذي والنواب",
         "layer_name": "صناديق القرار",
@@ -21150,7 +21618,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "2110",
+        "id": "2320",
         "company_id": "0",
         "dept_name": "مكتب الرئيس التنفيذي والنواب",
         "layer_name": "صناديق القرار",
@@ -21168,7 +21636,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "2112",
+        "id": "2322",
         "company_id": "0",
         "dept_name": "مكتب الرئيس التنفيذي والنواب",
         "layer_name": "صناديق القرار",
@@ -21186,7 +21654,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "2113",
+        "id": "2323",
         "company_id": "0",
         "dept_name": "مكتب الرئيس التنفيذي والنواب",
         "layer_name": "صناديق القرار",
@@ -21294,7 +21762,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "2114",
+        "id": "2324",
         "company_id": "0",
         "dept_name": "مكتب الرئيس التنفيذي والنواب",
         "layer_name": "القرار والحوكمة العليا",
@@ -21312,7 +21780,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "2115",
+        "id": "2325",
         "company_id": "0",
         "dept_name": "مكتب الرئيس التنفيذي والنواب",
         "layer_name": "القرار والحوكمة العليا",
@@ -21330,7 +21798,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "2116",
+        "id": "2326",
         "company_id": "0",
         "dept_name": "مكتب الرئيس التنفيذي والنواب",
         "layer_name": "القرار والحوكمة العليا",
@@ -21348,7 +21816,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "2117",
+        "id": "2327",
         "company_id": "0",
         "dept_name": "مكتب الرئيس التنفيذي والنواب",
         "layer_name": "القرار والحوكمة العليا",
@@ -21438,7 +21906,7 @@
         "stage_kind": "canonical"
     },
     {
-        "id": "2118",
+        "id": "2328",
         "company_id": "0",
         "dept_name": "مكتب الرئيس التنفيذي والنواب",
         "layer_name": "المتابعة",

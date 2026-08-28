@@ -4100,8 +4100,8 @@
         "roles_nav": {
             "إدارة المالية": [
                 {
-                    "group": "الذمم المدينة",
-                    "order": 140,
+                    "group": "دورة القبض",
+                    "order": 35,
                     "perm": "Contracts\/collections.php"
                 }
             ],
@@ -7811,7 +7811,7 @@
             "ادارة الموارد البشرية": [
                 {
                     "group": "الاستحقاق والصرف",
-                    "order": 190,
+                    "order": 18,
                     "perm": "Employees\/hr_benefits.php"
                 }
             ],
@@ -7905,8 +7905,8 @@
             ],
             "ادارة الموارد البشرية": [
                 {
-                    "group": "اللوحة — خارج الدورة",
-                    "order": 10,
+                    "group": "اللوحة",
+                    "order": 0,
                     "perm": "Employees\/hr_board.php"
                 }
             ]
@@ -7959,7 +7959,7 @@
             "ادارة الموارد البشرية": [
                 {
                     "group": "الدوام والإجازات",
-                    "order": 170,
+                    "order": 16,
                     "perm": "Employees\/hr_disciplinary.php"
                 }
             ]
@@ -8012,7 +8012,7 @@
             "ادارة الموارد البشرية": [
                 {
                     "group": "التوظيف والتعاقد",
-                    "order": 80,
+                    "order": 7,
                     "perm": "Employees\/hr_employee_documents.php"
                 }
             ]
@@ -8065,7 +8065,7 @@
             "ادارة الموارد البشرية": [
                 {
                     "group": "التوظيف والتعاقد",
-                    "order": 120,
+                    "order": 11,
                     "perm": "Employees\/hr_job_movements.php"
                 }
             ]
@@ -8118,7 +8118,7 @@
             "ادارة الموارد البشرية": [
                 {
                     "group": "التوظيف والتعاقد",
-                    "order": 90,
+                    "order": 8,
                     "perm": "Employees\/hr_onboarding.php"
                 }
             ]
@@ -8171,7 +8171,7 @@
             "ادارة الموارد البشرية": [
                 {
                     "group": "الدوام والإجازات",
-                    "order": 160,
+                    "order": 15,
                     "perm": "Employees\/hr_performance.php"
                 }
             ]
@@ -8224,7 +8224,7 @@
             "ادارة الموارد البشرية": [
                 {
                     "group": "الدوام والإجازات",
-                    "order": 150,
+                    "order": 14,
                     "perm": "Employees\/hr_training.php"
                 }
             ]
@@ -13083,7 +13083,7 @@
             "إدارة المالية": [
                 {
                     "group": "التسويات والمحاسبة العامة",
-                    "order": 170,
+                    "order": 17,
                     "perm": "Finance\/acc_adjustments.php"
                 }
             ],
@@ -13351,7 +13351,7 @@
             "إدارة المالية": [
                 {
                     "group": "الإقفال",
-                    "order": 220,
+                    "order": 22,
                     "perm": "Finance\/acc_closing_checklist.php"
                 }
             ],
@@ -13432,7 +13432,7 @@
             "إدارة المالية": [
                 {
                     "group": "التأسيس المرجعي",
-                    "order": 30,
+                    "order": 3,
                     "perm": "Finance\/acc_cost_centers.php"
                 }
             ],
@@ -13527,7 +13527,7 @@
             "إدارة المالية": [
                 {
                     "group": "الذمم المدينة",
-                    "order": 150,
+                    "order": 15,
                     "perm": "Finance\/acc_credit_control.php"
                 }
             ],
@@ -13709,7 +13709,7 @@
             "إدارة المالية": [
                 {
                     "group": "التسويات والمحاسبة العامة",
-                    "order": 200,
+                    "order": 20,
                     "perm": "Finance\/acc_reconciliations.php"
                 }
             ],
@@ -13790,7 +13790,7 @@
             "إدارة المالية": [
                 {
                     "group": "الإقفال",
-                    "order": 250,
+                    "order": 25,
                     "perm": "Finance\/acc_reopen_governance.php"
                 }
             ],
@@ -14034,7 +14034,7 @@
             "إدارة المالية": [
                 {
                     "group": "الإقفال",
-                    "order": 210,
+                    "order": 21,
                     "perm": "Finance\/acc_trial_balance.php"
                 }
             ],
@@ -23083,8 +23083,8 @@
         "roles_nav": {
             "إدارة المالية": [
                 {
-                    "group": "الإقفال",
-                    "order": 230,
+                    "group": "التأسيس المرجعي",
+                    "order": 14,
                     "perm": "Finance\/periods_fin.php"
                 }
             ],
@@ -23552,7 +23552,7 @@
             "أمين الخزينة": [
                 {
                     "group": "دورة القبض",
-                    "order": 70,
+                    "order": 7,
                     "perm": "Finance\/tre_allocations.php"
                 }
             ],
@@ -23972,7 +23972,7 @@
             "أمين الخزينة": [
                 {
                     "group": "الرقابة والإقفال",
-                    "order": 180,
+                    "order": 18,
                     "perm": "Finance\/tre_cash_count.php"
                 }
             ],
@@ -24095,7 +24095,7 @@
             "أمين الخزينة": [
                 {
                     "group": "دورة الصرف",
-                    "order": 100,
+                    "order": 10,
                     "perm": "Finance\/tre_cash_moves.php"
                 }
             ],
@@ -24283,7 +24283,7 @@
             "أمين الخزينة": [
                 {
                     "group": "دورة الصرف",
-                    "order": 120,
+                    "order": 12,
                     "perm": "Finance\/tre_fx_deals.php"
                 }
             ],
@@ -24371,7 +24371,7 @@
             "أمين الخزينة": [
                 {
                     "group": "الرقابة والإقفال",
-                    "order": 150,
+                    "order": 15,
                     "perm": "Finance\/tre_guarantees.php"
                 }
             ],
@@ -24480,7 +24480,7 @@
             "أمين الخزينة": [
                 {
                     "group": "دورة القبض",
-                    "order": 60,
+                    "order": 6,
                     "perm": "Finance\/tre_instruments.php"
                 }
             ],
@@ -24574,8 +24574,8 @@
             ],
             "أمين الخزينة": [
                 {
-                    "group": "اللوحة — خارج الدورة",
-                    "order": 10,
+                    "group": "اللوحة",
+                    "order": 1,
                     "perm": "Finance\/tre_liquidity_board.php"
                 }
             ],
@@ -25003,7 +25003,7 @@
             "أمين الخزينة": [
                 {
                     "group": "الرقابة والإقفال",
-                    "order": 170,
+                    "order": 17,
                     "perm": "Finance\/tre_petty_cash.php"
                 }
             ],
@@ -25204,7 +25204,7 @@
             "أمين الخزينة": [
                 {
                     "group": "دورة الصرف",
-                    "order": 110,
+                    "order": 11,
                     "perm": "Finance\/tre_transfers.php"
                 }
             ],
@@ -25392,7 +25392,7 @@
             "أمين الخزينة": [
                 {
                     "group": "التأسيس",
-                    "order": 20,
+                    "order": 2,
                     "perm": "Finance\/tre_vessels.php"
                 }
             ],
@@ -26521,7 +26521,7 @@
             "إدارة التمويل": [
                 {
                     "group": "المالية",
-                    "order": 200,
+                    "order": 20,
                     "perm": "Financing\/fin_capital_balance.php"
                 }
             ]
@@ -26657,7 +26657,7 @@
             "إدارة التمويل": [
                 {
                     "group": "التقارير",
-                    "order": 280,
+                    "order": 28,
                     "perm": "Financing\/fin_close_audit.php"
                 }
             ]
@@ -26703,7 +26703,7 @@
             "إدارة التمويل": [
                 {
                     "group": "المالية",
-                    "order": 150,
+                    "order": 15,
                     "perm": "Financing\/fin_contract_close.php"
                 }
             ]
@@ -26763,7 +26763,7 @@
             "إدارة التمويل": [
                 {
                     "group": "التعاقد",
-                    "order": 80,
+                    "order": 8,
                     "perm": "Financing\/fin_contract_terms.php"
                 }
             ]
@@ -26823,7 +26823,7 @@
             "إدارة التمويل": [
                 {
                     "group": "التعاقد",
-                    "order": 70,
+                    "order": 7,
                     "perm": "Financing\/fin_contracts.php"
                 }
             ]
@@ -26883,7 +26883,7 @@
             "إدارة التمويل": [
                 {
                     "group": "التعاقد",
-                    "order": 90,
+                    "order": 9,
                     "perm": "Financing\/fin_covenants.php"
                 }
             ]
@@ -26911,8 +26911,7 @@
         ],
         "name_ar": "وثائق التأهيل والعناية الواجبة",
         "names_all": [
-            "وثائق التأهيل والعناية الواجبة",
-            "وثائق التأهيل والعناية"
+            "وثائق التأهيل والعناية الواجبة"
         ],
         "owner_dept": "إدارة التمويل والممولين",
         "owner_basis": "CONSENSUS",
@@ -26944,7 +26943,7 @@
             "إدارة التمويل": [
                 {
                     "group": "التأسيس",
-                    "order": 30,
+                    "order": 3,
                     "perm": "Financing\/fin_due_diligence.php"
                 }
             ]
@@ -26990,7 +26989,7 @@
             "إدارة التمويل": [
                 {
                     "group": "الحوكمة",
-                    "order": 240,
+                    "order": 24,
                     "perm": "Financing\/fin_final_close.php"
                 }
             ]
@@ -27018,8 +27017,7 @@
         ],
         "name_ar": "جهات اتصال الممولين والمفوضين",
         "names_all": [
-            "جهات اتصال الممولين والمفوضين",
-            "جهات اتصال الممولين والمفوض"
+            "جهات اتصال الممولين والمفوضين"
         ],
         "owner_dept": "إدارة التمويل والممولين",
         "owner_basis": "CONSENSUS",
@@ -27051,7 +27049,7 @@
             "إدارة التمويل": [
                 {
                     "group": "التأسيس",
-                    "order": 20,
+                    "order": 2,
                     "perm": "Financing\/fin_financier_contacts.php"
                 }
             ]
@@ -27097,7 +27095,7 @@
             "إدارة التمويل": [
                 {
                     "group": "المالية",
-                    "order": 140,
+                    "order": 14,
                     "perm": "Financing\/fin_financier_dues.php"
                 }
             ]
@@ -27125,8 +27123,7 @@
         ],
         "name_ar": "خريطة الترحيل ومصفوفة التسوية",
         "names_all": [
-            "خريطة الترحيل ومصفوفة التسوية",
-            "خريطة الترحيل ومصفوفة التسو"
+            "خريطة الترحيل ومصفوفة التسوية"
         ],
         "owner_dept": "إدارة التمويل والممولين",
         "owner_basis": "CONSENSUS",
@@ -27144,7 +27141,7 @@
             "إدارة التمويل": [
                 {
                     "group": "المرجعيات",
-                    "order": 270,
+                    "order": 27,
                     "perm": "Financing\/fin_migration_map.php"
                 }
             ]
@@ -27261,8 +27258,7 @@
         ],
         "name_ar": "الإقفالات الشهرية وكشف الحساب",
         "names_all": [
-            "الإقفالات الشهرية وكشف الحساب",
-            "الإقفالات الشهرية وكشف الحس"
+            "الإقفالات الشهرية وكشف الحساب"
         ],
         "owner_dept": "إدارة التمويل والممولين",
         "owner_basis": "CONSENSUS",
@@ -27280,7 +27276,7 @@
             "إدارة التمويل": [
                 {
                     "group": "المالية",
-                    "order": 160,
+                    "order": 16,
                     "perm": "Financing\/fin_monthly_close.php"
                 }
             ]
@@ -27326,7 +27322,7 @@
             "إدارة التمويل": [
                 {
                     "group": "الدورة",
-                    "order": 40,
+                    "order": 4,
                     "perm": "Financing\/fin_needs.php"
                 }
             ]
@@ -27372,7 +27368,7 @@
             "إدارة التمويل": [
                 {
                     "group": "الدورة",
-                    "order": 50,
+                    "order": 5,
                     "perm": "Financing\/fin_offers.php"
                 }
             ]
@@ -27418,7 +27414,7 @@
             "إدارة التمويل": [
                 {
                     "group": "المالية",
-                    "order": 180,
+                    "order": 18,
                     "perm": "Financing\/fin_payment_allocation.php"
                 }
             ]
@@ -27464,7 +27460,7 @@
             "إدارة التمويل": [
                 {
                     "group": "المالية",
-                    "order": 170,
+                    "order": 17,
                     "perm": "Financing\/fin_payment_orders.php"
                 }
             ]
@@ -27510,7 +27506,7 @@
             "إدارة التمويل": [
                 {
                     "group": "الدورة",
-                    "order": 60,
+                    "order": 6,
                     "perm": "Financing\/fin_precontract_review.php"
                 }
             ]
@@ -27556,7 +27552,7 @@
             "إدارة التمويل": [
                 {
                     "group": "المرجعيات",
-                    "order": 260,
+                    "order": 26,
                     "perm": "Financing\/fin_ref_dictionary.php"
                 }
             ]
@@ -28461,63 +28457,63 @@
         "roles_nav": {
             "ادارة التشغيل": [
                 {
-                    "group": "دورة حركة الأصل",
+                    "group": "دورة الأصل الحركة",
                     "order": 30,
                     "perm": "Fleet\/asset_assignments.php"
                 }
             ],
             "ادارة الاسطول": [
                 {
-                    "group": "دورة حركة الأصل",
+                    "group": "دورة الأصل الحركة",
                     "order": 30,
                     "perm": "Fleet\/asset_assignments.php"
                 }
             ],
             "إدارة الموقع": [
                 {
-                    "group": "دورة حركة الأصل",
+                    "group": "دورة الأصل الحركة",
                     "order": 30,
                     "perm": "Fleet\/asset_assignments.php"
                 }
             ],
             "مشرف - مشاريع": [
                 {
-                    "group": "دورة حركة الأصل",
+                    "group": "دورة الأصل الحركة",
                     "order": 30,
                     "perm": "Fleet\/asset_assignments.php"
                 }
             ],
             "مشرف موردين": [
                 {
-                    "group": "دورة حركة الأصل",
+                    "group": "دورة الأصل الحركة",
                     "order": 30,
                     "perm": "Fleet\/asset_assignments.php"
                 }
             ],
             "مشرف اسطول": [
                 {
-                    "group": "دورة حركة الأصل",
+                    "group": "دورة الأصل الحركة",
                     "order": 30,
                     "perm": "Fleet\/asset_assignments.php"
                 }
             ],
             "مشغل اسطول": [
                 {
-                    "group": "دورة حركة الأصل",
+                    "group": "دورة الأصل الحركة",
                     "order": 30,
                     "perm": "Fleet\/asset_assignments.php"
                 }
             ],
             "ادارة الصيانة": [
                 {
-                    "group": "دورة حركة الأصل",
+                    "group": "دورة الأصل الحركة",
                     "order": 30,
                     "perm": "Fleet\/asset_assignments.php"
                 }
             ],
             "مشرف صيانة": [
                 {
-                    "group": "دورة حركة الأصل",
+                    "group": "دورة الأصل الحركة",
                     "order": 30,
                     "perm": "Fleet\/asset_assignments.php"
                 }
@@ -28587,63 +28583,63 @@
         "roles_nav": {
             "ادارة التشغيل": [
                 {
-                    "group": "دورة خروج الأصل",
+                    "group": "دورة الأصل الخروج",
                     "order": 50,
                     "perm": "Fleet\/asset_exit.php"
                 }
             ],
             "ادارة الاسطول": [
                 {
-                    "group": "دورة خروج الأصل",
+                    "group": "دورة الأصل الخروج",
                     "order": 50,
                     "perm": "Fleet\/asset_exit.php"
                 }
             ],
             "إدارة الموقع": [
                 {
-                    "group": "دورة خروج الأصل",
+                    "group": "دورة الأصل الخروج",
                     "order": 50,
                     "perm": "Fleet\/asset_exit.php"
                 }
             ],
             "مشرف - مشاريع": [
                 {
-                    "group": "دورة خروج الأصل",
+                    "group": "دورة الأصل الخروج",
                     "order": 50,
                     "perm": "Fleet\/asset_exit.php"
                 }
             ],
             "مشرف موردين": [
                 {
-                    "group": "دورة خروج الأصل",
+                    "group": "دورة الأصل الخروج",
                     "order": 50,
                     "perm": "Fleet\/asset_exit.php"
                 }
             ],
             "مشرف اسطول": [
                 {
-                    "group": "دورة خروج الأصل",
+                    "group": "دورة الأصل الخروج",
                     "order": 50,
                     "perm": "Fleet\/asset_exit.php"
                 }
             ],
             "مشغل اسطول": [
                 {
-                    "group": "دورة خروج الأصل",
+                    "group": "دورة الأصل الخروج",
                     "order": 50,
                     "perm": "Fleet\/asset_exit.php"
                 }
             ],
             "ادارة الصيانة": [
                 {
-                    "group": "دورة خروج الأصل",
+                    "group": "دورة الأصل الخروج",
                     "order": 50,
                     "perm": "Fleet\/asset_exit.php"
                 }
             ],
             "مشرف صيانة": [
                 {
-                    "group": "دورة خروج الأصل",
+                    "group": "دورة الأصل الخروج",
                     "order": 50,
                     "perm": "Fleet\/asset_exit.php"
                 }
@@ -28745,84 +28741,84 @@
         "roles_nav": {
             "ادارة التشغيل": [
                 {
-                    "group": "دورة دخول الأصل",
+                    "group": "دورة الأصل الدخول",
                     "order": 10,
                     "perm": "Fleet\/asset_intake.php"
                 }
             ],
             "ادارة الاسطول": [
                 {
-                    "group": "ب · دخول الأصل",
-                    "order": 30,
+                    "group": "دورة الأصل الدخول",
+                    "order": 10,
                     "perm": "Fleet\/asset_intake.php"
                 }
             ],
             "ادارة الموارد البشرية": [
                 {
-                    "group": "دورة دخول الأصل",
+                    "group": "دورة الأصل الدخول",
                     "order": 10,
                     "perm": "Fleet\/asset_intake.php"
                 }
             ],
             "إدارة الموقع": [
                 {
-                    "group": "دورة دخول الأصل",
+                    "group": "دورة الأصل الدخول",
                     "order": 10,
                     "perm": "Fleet\/asset_intake.php"
                 }
             ],
             "مشرف - مشاريع": [
                 {
-                    "group": "دورة دخول الأصل",
+                    "group": "دورة الأصل الدخول",
                     "order": 10,
                     "perm": "Fleet\/asset_intake.php"
                 }
             ],
             "مشرف اسطول": [
                 {
-                    "group": "دورة دخول الأصل",
+                    "group": "دورة الأصل الدخول",
                     "order": 10,
                     "perm": "Fleet\/asset_intake.php"
                 }
             ],
             "مشغل اسطول": [
                 {
-                    "group": "دورة دخول الأصل",
+                    "group": "دورة الأصل الدخول",
                     "order": 10,
                     "perm": "Fleet\/asset_intake.php"
                 }
             ],
             "ادارة الصيانة": [
                 {
-                    "group": "دورة دخول الأصل",
+                    "group": "دورة الأصل الدخول",
                     "order": 10,
                     "perm": "Fleet\/asset_intake.php"
                 }
             ],
             "مشرف صيانة": [
                 {
-                    "group": "دورة دخول الأصل",
+                    "group": "دورة الأصل الدخول",
                     "order": 10,
                     "perm": "Fleet\/asset_intake.php"
                 }
             ],
             "إدارة النقل والترحيل": [
                 {
-                    "group": "دورة دخول الأصل",
+                    "group": "دورة الأصل الدخول",
                     "order": 10,
                     "perm": "Fleet\/asset_intake.php"
                 }
             ],
             "إدارة التمويل": [
                 {
-                    "group": "دورة دخول الأصل",
+                    "group": "دورة الأصل الدخول",
                     "order": 10,
                     "perm": "Fleet\/asset_intake.php"
                 }
             ],
             "القوى التشغيلية": [
                 {
-                    "group": "دورة دخول الأصل",
+                    "group": "دورة الأصل الدخول",
                     "order": 10,
                     "perm": "Fleet\/asset_intake.php"
                 }
@@ -28892,63 +28888,63 @@
         "roles_nav": {
             "ادارة التشغيل": [
                 {
-                    "group": "الرقابة الفنية على الأصل",
+                    "group": "دورة الأصل الرقابة الفنية",
                     "order": 40,
                     "perm": "Fleet\/asset_readiness.php"
                 }
             ],
             "ادارة الاسطول": [
                 {
-                    "group": "الرقابة الفنية على الأصل",
+                    "group": "دورة الأصل الرقابة الفنية",
                     "order": 40,
                     "perm": "Fleet\/asset_readiness.php"
                 }
             ],
             "إدارة الموقع": [
                 {
-                    "group": "الرقابة الفنية على الأصل",
+                    "group": "دورة الأصل الرقابة الفنية",
                     "order": 40,
                     "perm": "Fleet\/asset_readiness.php"
                 }
             ],
             "مشرف - مشاريع": [
                 {
-                    "group": "الرقابة الفنية على الأصل",
+                    "group": "دورة الأصل الرقابة الفنية",
                     "order": 40,
                     "perm": "Fleet\/asset_readiness.php"
                 }
             ],
             "مشرف موردين": [
                 {
-                    "group": "الرقابة الفنية على الأصل",
+                    "group": "دورة الأصل الرقابة الفنية",
                     "order": 40,
                     "perm": "Fleet\/asset_readiness.php"
                 }
             ],
             "مشرف اسطول": [
                 {
-                    "group": "الرقابة الفنية على الأصل",
+                    "group": "دورة الأصل الرقابة الفنية",
                     "order": 40,
                     "perm": "Fleet\/asset_readiness.php"
                 }
             ],
             "مشغل اسطول": [
                 {
-                    "group": "الرقابة الفنية على الأصل",
+                    "group": "دورة الأصل الرقابة الفنية",
                     "order": 40,
                     "perm": "Fleet\/asset_readiness.php"
                 }
             ],
             "ادارة الصيانة": [
                 {
-                    "group": "الرقابة الفنية على الأصل",
+                    "group": "دورة الأصل الرقابة الفنية",
                     "order": 40,
                     "perm": "Fleet\/asset_readiness.php"
                 }
             ],
             "مشرف صيانة": [
                 {
-                    "group": "الرقابة الفنية على الأصل",
+                    "group": "دورة الأصل الرقابة الفنية",
                     "order": 40,
                     "perm": "Fleet\/asset_readiness.php"
                 }
@@ -29050,84 +29046,84 @@
         "roles_nav": {
             "ادارة التشغيل": [
                 {
-                    "group": "دورة دخول الأصل",
+                    "group": "دورة الأصل الدخول",
                     "order": 20,
                     "perm": "Fleet\/asset_use_rights.php"
                 }
             ],
             "ادارة الاسطول": [
                 {
-                    "group": "ب · دخول الأصل",
-                    "order": 90,
+                    "group": "دورة الأصل الدخول",
+                    "order": 20,
                     "perm": "Fleet\/asset_use_rights.php"
                 }
             ],
             "ادارة الموارد البشرية": [
                 {
-                    "group": "دورة دخول الأصل",
+                    "group": "دورة الأصل الدخول",
                     "order": 20,
                     "perm": "Fleet\/asset_use_rights.php"
                 }
             ],
             "إدارة الموقع": [
                 {
-                    "group": "دورة دخول الأصل",
+                    "group": "دورة الأصل الدخول",
                     "order": 20,
                     "perm": "Fleet\/asset_use_rights.php"
                 }
             ],
             "مشرف - مشاريع": [
                 {
-                    "group": "دورة دخول الأصل",
+                    "group": "دورة الأصل الدخول",
                     "order": 20,
                     "perm": "Fleet\/asset_use_rights.php"
                 }
             ],
             "مشرف اسطول": [
                 {
-                    "group": "دورة دخول الأصل",
+                    "group": "دورة الأصل الدخول",
                     "order": 20,
                     "perm": "Fleet\/asset_use_rights.php"
                 }
             ],
             "مشغل اسطول": [
                 {
-                    "group": "دورة دخول الأصل",
+                    "group": "دورة الأصل الدخول",
                     "order": 20,
                     "perm": "Fleet\/asset_use_rights.php"
                 }
             ],
             "ادارة الصيانة": [
                 {
-                    "group": "دورة دخول الأصل",
+                    "group": "دورة الأصل الدخول",
                     "order": 20,
                     "perm": "Fleet\/asset_use_rights.php"
                 }
             ],
             "مشرف صيانة": [
                 {
-                    "group": "دورة دخول الأصل",
+                    "group": "دورة الأصل الدخول",
                     "order": 20,
                     "perm": "Fleet\/asset_use_rights.php"
                 }
             ],
             "إدارة النقل والترحيل": [
                 {
-                    "group": "دورة دخول الأصل",
+                    "group": "دورة الأصل الدخول",
                     "order": 20,
                     "perm": "Fleet\/asset_use_rights.php"
                 }
             ],
             "إدارة التمويل": [
                 {
-                    "group": "دورة دخول الأصل",
+                    "group": "دورة الأصل الدخول",
                     "order": 20,
                     "perm": "Fleet\/asset_use_rights.php"
                 }
             ],
             "القوى التشغيلية": [
                 {
-                    "group": "دورة دخول الأصل",
+                    "group": "دورة الأصل الدخول",
                     "order": 20,
                     "perm": "Fleet\/asset_use_rights.php"
                 }
@@ -33940,7 +33936,7 @@
             "ادارة الصيانة": [
                 {
                     "group": "الوقائية",
-                    "order": 130,
+                    "order": 13,
                     "perm": "Maintenance\/daily_care.php"
                 }
             ],
@@ -34179,7 +34175,7 @@
             "ادارة الصيانة": [
                 {
                     "group": "دورة العطل",
-                    "order": 110,
+                    "order": 11,
                     "perm": "Maintenance\/external_repairs.php"
                 }
             ],
@@ -34762,7 +34758,7 @@
             "ادارة الصيانة": [
                 {
                     "group": "التقارير",
-                    "order": 160,
+                    "order": 16,
                     "perm": "Maintenance\/mnt_kpis.php"
                 }
             ],
@@ -35598,7 +35594,7 @@
             "ادارة الصيانة": [
                 {
                     "group": "الإقفال والجاهزية",
-                    "order": 150,
+                    "order": 15,
                     "perm": "Maintenance\/repeat_repairs.php"
                 }
             ],
@@ -37611,15 +37607,25 @@
         "on_disk": 1,
         "sources": [
             "disk",
+            "apps",
             "nav"
         ],
         "name_ar": "الخطة الشهرية للتشغيل",
         "names_all": [
             "الخطة الشهرية للتشغيل"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
-        "workspaces": [],
+        "owner_dept": "ادارة التشغيل",
+        "owner_basis": "CONSENSUS",
+        "workspaces": [
+            {
+                "space": "ادارة التشغيل",
+                "kind": "DEPARTMENT",
+                "tab": "التخطيط والتوزيع",
+                "cls": "OWNED",
+                "decision": "CONFIRMED",
+                "owner_kind": "BUSINESS_DEPARTMENT"
+            }
+        ],
         "roles_nav": {
             "ادارة التشغيل": [
                 {
@@ -46224,7 +46230,7 @@
         "roles_nav": {
             "إدارة المشتريات": [
                 {
-                    "group": "اللوحة — خارج الدورة",
+                    "group": "اللوحة خارج الدورة",
                     "order": 10,
                     "perm": "Procurement\/dashboard_proc.php"
                 }
@@ -47192,7 +47198,7 @@
             "إدارة المشتريات": [
                 {
                     "group": "العروض والترسية",
-                    "order": 100,
+                    "order": 10,
                     "perm": "Procurement\/proc_award_minutes.php"
                 }
             ]
@@ -47238,7 +47244,7 @@
             "إدارة المشتريات": [
                 {
                     "group": "الأمر والتوريد",
-                    "order": 140,
+                    "order": 14,
                     "perm": "Procurement\/proc_delivery_track.php"
                 }
             ],
@@ -47298,7 +47304,7 @@
             "إدارة المشتريات": [
                 {
                     "group": "العروض والترسية",
-                    "order": 80,
+                    "order": 8,
                     "perm": "Procurement\/proc_offers.php"
                 }
             ]
@@ -47379,7 +47385,7 @@
             "إدارة المشتريات": [
                 {
                     "group": "الطلب والتجميع",
-                    "order": 40,
+                    "order": 4,
                     "perm": "Procurement\/proc_packages.php"
                 }
             ],
@@ -47432,7 +47438,7 @@
             "إدارة المشتريات": [
                 {
                     "group": "الأمر والتوريد",
-                    "order": 130,
+                    "order": 13,
                     "perm": "Procurement\/proc_po_amendments.php"
                 }
             ],
@@ -47573,7 +47579,7 @@
             "إدارة المشتريات": [
                 {
                     "group": "المطابقة والإقفال",
-                    "order": 160,
+                    "order": 16,
                     "perm": "Procurement\/proc_supplier_eval.php"
                 }
             ]
@@ -48897,7 +48903,7 @@
             "أمين المستودع": [
                 {
                     "group": "دورة الاستلام",
-                    "order": 70,
+                    "order": 7,
                     "perm": "Procurement\/wh_hazmat.php"
                 }
             ]
@@ -49020,7 +49026,7 @@
             "أمين المستودع": [
                 {
                     "group": "دورة الصرف",
-                    "order": 80,
+                    "order": 8,
                     "perm": "Procurement\/wh_issue_requests.php"
                 }
             ]
@@ -49119,7 +49125,7 @@
             "أمين المستودع": [
                 {
                     "group": "الرقابة والإقفال",
-                    "order": 180,
+                    "order": 18,
                     "perm": "Procurement\/wh_month_close.php"
                 }
             ]
@@ -52733,7 +52739,7 @@
             "إدارة المخاطر": [
                 {
                     "group": "القرار والإغلاق",
-                    "order": 120,
+                    "order": 51,
                     "perm": "Risk\/risk_closure.php"
                 }
             ],
@@ -54780,7 +54786,7 @@
             "إدارة المخاطر": [
                 {
                     "group": "القرار والإغلاق",
-                    "order": 100,
+                    "order": 49,
                     "perm": "Risk\/risk_escalations.php"
                 }
             ],
@@ -58711,8 +58717,7 @@
         ],
         "name_ar": "بنود عقد المورد",
         "names_all": [
-            "بنود عقد المورد",
-            "بنود عقود الموردين"
+            "بنود عقد المورد"
         ],
         "owner_dept": "إدارة الموردين",
         "owner_basis": "CONSENSUS",
@@ -62175,7 +62180,7 @@
         "roles_nav": {
             "إدارة البلاغات": [
                 {
-                    "group": "اللوحة",
+                    "group": "السجلات التابعة",
                     "order": 31,
                     "perm": "Tickets\/ticket_sla_config.php"
                 }
@@ -63158,14 +63163,14 @@
         "roles_nav": {
             "الإدارة التنفيذية": [
                 {
-                    "group": "السجلات التابعة",
+                    "group": "دورة البلاغ",
                     "order": 35,
                     "perm": "Tickets\/tkt_assignment.php"
                 }
             ],
             "إدارة البلاغات": [
                 {
-                    "group": "السجلات التابعة",
+                    "group": "دورة البلاغ",
                     "order": 35,
                     "perm": "Tickets\/tkt_assignment.php"
                 }
@@ -63476,14 +63481,14 @@
         "roles_nav": {
             "الإدارة التنفيذية": [
                 {
-                    "group": "السجلات التابعة",
+                    "group": "دورة البلاغ",
                     "order": 34,
                     "perm": "Tickets\/tkt_routing.php"
                 }
             ],
             "إدارة البلاغات": [
                 {
-                    "group": "السجلات التابعة",
+                    "group": "دورة البلاغ",
                     "order": 34,
                     "perm": "Tickets\/tkt_routing.php"
                 }
@@ -63529,15 +63534,15 @@
         "roles_nav": {
             "الإدارة التنفيذية": [
                 {
-                    "group": "دورة البلاغ",
+                    "group": "اللوحة",
                     "order": 32,
                     "perm": "Tickets\/tkt_subject_types.php"
                 }
             ],
             "إدارة البلاغات": [
                 {
-                    "group": "دورة البلاغ",
-                    "order": 30,
+                    "group": "اللوحة",
+                    "order": 32,
                     "perm": "Tickets\/tkt_subject_types.php"
                 }
             ]
@@ -63582,14 +63587,14 @@
         "roles_nav": {
             "الإدارة التنفيذية": [
                 {
-                    "group": "دورة البلاغ",
+                    "group": "السجلات التابعة",
                     "order": 40,
                     "perm": "Tickets\/tkt_verification.php"
                 }
             ],
             "إدارة البلاغات": [
                 {
-                    "group": "دورة البلاغ",
+                    "group": "السجلات التابعة",
                     "order": 40,
                     "perm": "Tickets\/tkt_verification.php"
                 }
@@ -65171,7 +65176,7 @@
             "إدارة النقل والترحيل": [
                 {
                     "group": "الإقفال والتكلفة",
-                    "order": 120,
+                    "order": 12,
                     "perm": "Transport\/transfer_closure.php"
                 }
             ]
@@ -65272,7 +65277,7 @@
             "إدارة النقل والترحيل": [
                 {
                     "group": "دورة الترحيل",
-                    "order": 100,
+                    "order": 10,
                     "perm": "Transport\/transfer_damage_claims.php"
                 }
             ]
@@ -65818,7 +65823,7 @@
             "إدارة النقل والترحيل": [
                 {
                     "group": "الإقفال والتكلفة",
-                    "order": 130,
+                    "order": 13,
                     "perm": "Transport\/transfer_orders_report.php"
                 }
             ]
@@ -65923,7 +65928,7 @@
             "إدارة النقل والترحيل": [
                 {
                     "group": "دورة الترحيل",
-                    "order": 60,
+                    "order": 6,
                     "perm": "Transport\/transfer_origin_handover.php"
                 }
             ],
@@ -66048,8 +66053,7 @@
         ],
         "name_ar": "طلبات الترحيل",
         "names_all": [
-            "طلبات الترحيل",
-            "طلب الترحيل"
+            "طلبات الترحيل"
         ],
         "owner_dept": "النقل والترحيل",
         "owner_basis": "RULING",
@@ -67460,7 +67464,7 @@
             "ادارة الموارد البشرية": [
                 {
                     "group": "التقارير",
-                    "order": 240,
+                    "order": 23,
                     "perm": "Workforce\/hr_workforce_report.php"
                 }
             ]
@@ -67820,7 +67824,7 @@
             "ادارة الموارد البشرية": [
                 {
                     "group": "الاستحقاق والصرف",
-                    "order": 220,
+                    "order": 21,
                     "perm": "Workforce\/payroll_lines.php"
                 }
             ],
@@ -68293,7 +68297,7 @@
             "ادارة الموارد البشرية": [
                 {
                     "group": "التوظيف والتعاقد",
-                    "order": 50,
+                    "order": 4,
                     "perm": "Workforce\/rec_applications.php"
                 }
             ],
@@ -68346,7 +68350,7 @@
             "ادارة الموارد البشرية": [
                 {
                     "group": "التوظيف والتعاقد",
-                    "order": 60,
+                    "order": 5,
                     "perm": "Workforce\/rec_stages.php"
                 }
             ],

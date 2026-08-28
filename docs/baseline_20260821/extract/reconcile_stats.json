@@ -5,7 +5,7 @@
     "cron": 24,
     "registry_no_disk": 0,
     "disk_not_in_any_registry": 61,
-    "owner_unknown": 84,
+    "owner_unknown": 83,
     "owner_conflicts": 13,
     "with_stage": 272,
     "fields_total": 14609,

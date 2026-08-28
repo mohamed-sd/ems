@@ -1,7 +1,7 @@
 [
     {
-        "id": "1337",
-        "unit": "إدارة الموردين",
+        "id": "3348",
+        "unit": "DEP-02",
         "surface_name": "جهات الاتصال والمفوضون",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -16,8 +16,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1338",
-        "unit": "إدارة الموردين",
+        "id": "3349",
+        "unit": "DEP-02",
         "surface_name": "التأهيل القانوني والائتماني",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -32,8 +32,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1339",
-        "unit": "إدارة الموردين",
+        "id": "3350",
+        "unit": "DEP-02",
         "surface_name": "احتياجات التغطية",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -48,8 +48,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1340",
-        "unit": "إدارة الموردين",
+        "id": "3351",
+        "unit": "DEP-02",
         "surface_name": "الترشيح ومراجعة التعاقد",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -64,8 +64,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1341",
-        "unit": "إدارة الموردين",
+        "id": "3352",
+        "unit": "DEP-02",
         "surface_name": "مصفوفة المسؤوليات والتكاليف",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -80,8 +80,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1342",
-        "unit": "إدارة الموردين",
+        "id": "3353",
+        "unit": "DEP-02",
         "surface_name": "الخانات المكافئة وتوزيع الحصص",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -96,8 +96,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1343",
-        "unit": "إدارة الموردين",
+        "id": "3354",
+        "unit": "DEP-02",
         "surface_name": "الأداء والوحدات المعتمدة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -112,8 +112,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1344",
-        "unit": "إدارة الموردين",
+        "id": "3355",
+        "unit": "DEP-02",
         "surface_name": "النيابية والسلف والخصومات",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -128,8 +128,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1345",
-        "unit": "إدارة الموردين",
+        "id": "3356",
+        "unit": "DEP-02",
         "surface_name": "الإقفال التعاقدي للوحدات التعاقدية",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -144,8 +144,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1346",
-        "unit": "إدارة الموردين",
+        "id": "3357",
+        "unit": "DEP-02",
         "surface_name": "التسويات وكشف الحساب",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -160,8 +160,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1347",
-        "unit": "إدارة الموردين",
+        "id": "3358",
+        "unit": "DEP-02",
         "surface_name": "طلبات الدفع وحالة الصرف",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -176,8 +176,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1348",
-        "unit": "إدارة الموردين",
+        "id": "3359",
+        "unit": "DEP-02",
         "surface_name": "تخصيص الدفع على الإقفالات",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -192,8 +192,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1349",
-        "unit": "إدارة الموردين",
+        "id": "3360",
+        "unit": "DEP-02",
         "surface_name": "أعمار الأرصدة والالتزامات",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -208,8 +208,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1350",
-        "unit": "إدارة الموردين",
+        "id": "3361",
+        "unit": "DEP-02",
         "surface_name": "الملاحق والتصفية والإغلاق",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -224,8 +224,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1351",
-        "unit": "إدارة الموردين",
+        "id": "3362",
+        "unit": "DEP-02",
         "surface_name": "مصادر القدرة والتكامل",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -240,8 +240,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1352",
-        "unit": "إدارة الموردين",
+        "id": "3363",
+        "unit": "DEP-02",
         "surface_name": "القوائم المرجعية",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -256,8 +256,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1353",
-        "unit": "إدارة الموردين",
+        "id": "3364",
+        "unit": "DEP-02",
         "surface_name": "سجل المستندات والضمانات",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -272,8 +272,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1354",
-        "unit": "إدارة الموردين",
+        "id": "3365",
+        "unit": "DEP-02",
         "surface_name": "قاموس قواعد الاستنتاج",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -288,8 +288,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1355",
-        "unit": "إدارة الموردين",
+        "id": "3366",
+        "unit": "DEP-02",
         "surface_name": "القاموس وخريطة الترحيل",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -304,8 +304,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1356",
-        "unit": "إدارة الموردين",
+        "id": "3367",
+        "unit": "DEP-02",
         "surface_name": "تتبع التعبئة والترحيل",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -320,8 +320,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1357",
-        "unit": "إدارة الموردين",
+        "id": "3368",
+        "unit": "DEP-02",
         "surface_name": "خريطة الترحيل",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -336,8 +336,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1358",
-        "unit": "إدارة الموردين",
+        "id": "3369",
+        "unit": "DEP-02",
         "surface_name": "تقرير المراجعة والقبول",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -352,8 +352,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1359",
-        "unit": "إدارة الأسطول",
+        "id": "3370",
+        "unit": "DEP-04",
         "surface_name": "طلب إدخال الأصل",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -368,8 +368,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1360",
-        "unit": "إدارة الأسطول",
+        "id": "3371",
+        "unit": "DEP-04",
         "surface_name": "التحقق من المصدر",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -384,8 +384,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1361",
-        "unit": "إدارة الأسطول",
+        "id": "3372",
+        "unit": "DEP-04",
         "surface_name": "بطاقة التفتيش",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -400,8 +400,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1362",
-        "unit": "إدارة الأسطول",
+        "id": "3373",
+        "unit": "DEP-04",
         "surface_name": "كرت الأصل",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -416,8 +416,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1363",
-        "unit": "إدارة الأسطول",
+        "id": "3374",
+        "unit": "DEP-04",
         "surface_name": "مستندات الأصل",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -432,8 +432,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1364",
-        "unit": "إدارة الأسطول",
+        "id": "3375",
+        "unit": "DEP-04",
         "surface_name": "التفعيل وإعادة الخدمة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -448,8 +448,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1365",
-        "unit": "إدارة الأسطول",
+        "id": "3376",
+        "unit": "DEP-04",
         "surface_name": "التخصيص على الوحدات",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -464,8 +464,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1366",
-        "unit": "إدارة الأسطول",
+        "id": "3377",
+        "unit": "DEP-04",
         "surface_name": "حركة الموقع والمشروع",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -480,8 +480,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1367",
-        "unit": "إدارة الأسطول",
+        "id": "3378",
+        "unit": "DEP-04",
         "surface_name": "سجل تغير الحالة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -496,8 +496,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1368",
-        "unit": "إدارة الأسطول",
+        "id": "3379",
+        "unit": "DEP-04",
         "surface_name": "الملخص التشغيلي الشهري",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -512,8 +512,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1369",
-        "unit": "إدارة الأسطول",
+        "id": "3380",
+        "unit": "DEP-04",
         "surface_name": "الخروج المؤقت",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -528,8 +528,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1370",
-        "unit": "إدارة الأسطول",
+        "id": "3381",
+        "unit": "DEP-04",
         "surface_name": "الخروج الدائم",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -544,8 +544,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1371",
-        "unit": "إدارة الأسطول",
+        "id": "3382",
+        "unit": "DEP-04",
         "surface_name": "التضاربات بين المصادر",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -560,8 +560,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1372",
-        "unit": "إدارة الأسطول",
+        "id": "3383",
+        "unit": "DEP-04",
         "surface_name": "النقاط غير المحسومة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -576,8 +576,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1373",
-        "unit": "إدارة الأسطول",
+        "id": "3384",
+        "unit": "DEP-04",
         "surface_name": "مرجع العمر الإنتاجي بالساعات",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -592,8 +592,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1374",
-        "unit": "إدارة الأسطول",
+        "id": "3385",
+        "unit": "DEP-04",
         "surface_name": "نطاقات حق الاستخدام",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -608,8 +608,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1375",
-        "unit": "إدارة الأسطول",
+        "id": "3386",
+        "unit": "DEP-04",
         "surface_name": "مصالحة مطابقة الأكواد",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -624,8 +624,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1376",
-        "unit": "إدارة الأسطول",
+        "id": "3387",
+        "unit": "DEP-04",
         "surface_name": "مصالحة الأسطول بالملاك",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -640,8 +640,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1377",
-        "unit": "إدارة الأسطول",
+        "id": "3388",
+        "unit": "DEP-04",
         "surface_name": "القوائم المرجعية",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -656,8 +656,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1378",
-        "unit": "إدارة الأسطول",
+        "id": "3389",
+        "unit": "DEP-04",
         "surface_name": "مصفوفة التكامل",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -672,8 +672,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1379",
-        "unit": "إدارة الأسطول",
+        "id": "3390",
+        "unit": "DEP-04",
         "surface_name": "مصفوفة بنية الشيتات",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -688,8 +688,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1380",
-        "unit": "إدارة الأسطول",
+        "id": "3391",
+        "unit": "DEP-04",
         "surface_name": "تقرير المراجعة العكسية",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -704,8 +704,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1381",
-        "unit": "مكتب الرئيس التنفيذي والنواب",
+        "id": "3392",
+        "unit": "EX-CEO",
         "surface_name": "التقرير اليومي التنفيذي",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -720,8 +720,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1382",
-        "unit": "مكتب الرئيس التنفيذي والنواب",
+        "id": "3393",
+        "unit": "EX-CEO",
         "surface_name": "تفصيل توقفات اليوم",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -736,8 +736,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1383",
-        "unit": "مكتب الرئيس التنفيذي والنواب",
+        "id": "3394",
+        "unit": "EX-CEO",
         "surface_name": "انحرافات وقرارات اليوم",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -752,8 +752,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1384",
-        "unit": "مكتب الرئيس التنفيذي والنواب",
+        "id": "3395",
+        "unit": "EX-CEO",
         "surface_name": "التقرير الأسبوعي التنفيذي",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -768,8 +768,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1385",
-        "unit": "مكتب الرئيس التنفيذي والنواب",
+        "id": "3396",
+        "unit": "EX-CEO",
         "surface_name": "جميع الطلبات المرفوعة إليّ",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -784,8 +784,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1386",
-        "unit": "مكتب الرئيس التنفيذي والنواب",
+        "id": "3397",
+        "unit": "EX-CEO",
         "surface_name": "تجاوزات الخطوط الحمراء",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -800,8 +800,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1387",
-        "unit": "مكتب الرئيس التنفيذي والنواب",
+        "id": "3398",
+        "unit": "EX-CEO",
         "surface_name": "الاستثناءات الحرجة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -816,8 +816,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1388",
-        "unit": "مكتب الرئيس التنفيذي والنواب",
+        "id": "3399",
+        "unit": "EX-CEO",
         "surface_name": "قيادة الأزمات والطوارئ",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -832,8 +832,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1389",
-        "unit": "مكتب الرئيس التنفيذي والنواب",
+        "id": "3400",
+        "unit": "EX-CEO",
         "surface_name": "متابعة القرارات التنفيذية",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -848,8 +848,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1390",
-        "unit": "مكتب الرئيس التنفيذي والنواب",
+        "id": "3401",
+        "unit": "EX-DVP",
         "surface_name": "لوحة القيادة — Deputy Executive Dashboard",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -864,8 +864,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1391",
-        "unit": "مكتب الرئيس التنفيذي والنواب",
+        "id": "3402",
+        "unit": "EX-DVP",
         "surface_name": "الإدارات — نطاقي والشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -880,8 +880,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1392",
-        "unit": "مكتب الرئيس التنفيذي والنواب",
+        "id": "3403",
+        "unit": "EX-DVP",
         "surface_name": "التقرير اليومي — Deputy Daily Report",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -896,8 +896,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1393",
-        "unit": "مكتب الرئيس التنفيذي والنواب",
+        "id": "3404",
+        "unit": "EX-DVP",
         "surface_name": "التقرير الأسبوعي — Deputy Weekly Performance Review",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -912,8 +912,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1394",
-        "unit": "مكتب الرئيس التنفيذي والنواب",
+        "id": "3405",
+        "unit": "EX-DVP",
         "surface_name": "التقرير الشهري — Deputy Monthly Review",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -928,8 +928,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1395",
-        "unit": "مكتب الرئيس التنفيذي والنواب",
+        "id": "3406",
+        "unit": "EX-DVP",
         "surface_name": "صندوق الاعتمادات — Unified Deputy Approval Inbox",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -944,8 +944,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1396",
-        "unit": "مكتب الرئيس التنفيذي والنواب",
+        "id": "3407",
+        "unit": "EX-DVP",
         "surface_name": "الاستثناءات والخطوط الحمراء ضمن صلاحيتي",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -960,8 +960,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1397",
-        "unit": "مكتب الرئيس التنفيذي والنواب",
+        "id": "3408",
+        "unit": "EX-DVP",
         "surface_name": "التصعيدات — Escalations within Scope",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -976,8 +976,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1398",
-        "unit": "مكتب الرئيس التنفيذي والنواب",
+        "id": "3409",
+        "unit": "EX-DVP",
         "surface_name": "متابعة القرارات — Deputy Actions Follow-up",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -992,8 +992,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1399",
-        "unit": "مكتب الرئيس التنفيذي والنواب",
+        "id": "3410",
+        "unit": "EX-DVP",
         "surface_name": "الإنابات والتفويضات",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1008,8 +1008,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1400",
-        "unit": "التمويل والملكية",
+        "id": "3411",
+        "unit": "DEP-03",
         "surface_name": "جهات اتصال الممولين والمفوض",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1024,8 +1024,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1401",
-        "unit": "التمويل والملكية",
+        "id": "3412",
+        "unit": "DEP-03",
         "surface_name": "وثائق التأهيل والعناية",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1040,8 +1040,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1402",
-        "unit": "التمويل والملكية",
+        "id": "3413",
+        "unit": "DEP-03",
         "surface_name": "مراجعة ما قبل التعاقد",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1056,8 +1056,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1403",
-        "unit": "التمويل والملكية",
+        "id": "3414",
+        "unit": "DEP-03",
         "surface_name": "بنود وشروط التمويل",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1072,8 +1072,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1404",
-        "unit": "التمويل والملكية",
+        "id": "3415",
+        "unit": "DEP-03",
         "surface_name": "مصفوفة الالتزامات التمويلية",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1088,8 +1088,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1405",
-        "unit": "التمويل والملكية",
+        "id": "3416",
+        "unit": "DEP-03",
         "surface_name": "استحقاقات الممول",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1104,8 +1104,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1406",
-        "unit": "التمويل والملكية",
+        "id": "3417",
+        "unit": "DEP-03",
         "surface_name": "الإقفالات التعاقدية",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1120,8 +1120,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1407",
-        "unit": "التمويل والملكية",
+        "id": "3418",
+        "unit": "DEP-03",
         "surface_name": "الإقفالات الشهرية وكشف الحس",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1136,8 +1136,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1408",
-        "unit": "التمويل والملكية",
+        "id": "3419",
+        "unit": "DEP-03",
         "surface_name": "تخصيص السداد على الأقساط",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1152,8 +1152,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1409",
-        "unit": "التمويل والملكية",
+        "id": "3420",
+        "unit": "DEP-03",
         "surface_name": "رصيد رأس المال والعائد",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1168,8 +1168,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1410",
-        "unit": "التمويل والملكية",
+        "id": "3421",
+        "unit": "DEP-03",
         "surface_name": "الانحرافات والمتأخرات",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1184,8 +1184,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1411",
-        "unit": "التمويل والملكية",
+        "id": "3422",
+        "unit": "DEP-03",
         "surface_name": "إقفال التمويل",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1200,8 +1200,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1412",
-        "unit": "التمويل والملكية",
+        "id": "3423",
+        "unit": "DEP-03",
         "surface_name": "خريطة الترحيل ومصفوفة التسو",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1216,8 +1216,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1413",
-        "unit": "الحوكمة والالتزام",
+        "id": "3424",
+        "unit": "DEP-08",
         "surface_name": "سجل السياسات — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1232,8 +1232,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1414",
-        "unit": "الحوكمة والالتزام",
+        "id": "3425",
+        "unit": "DEP-08",
         "surface_name": "سجل الالتزامات التنظيمية — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1248,8 +1248,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1415",
-        "unit": "الحوكمة والالتزام",
+        "id": "3426",
+        "unit": "DEP-08",
         "surface_name": "تقويم الامتثال — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1264,8 +1264,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1416",
-        "unit": "الحوكمة والالتزام",
+        "id": "3427",
+        "unit": "DEP-08",
         "surface_name": "تضارب المصالح — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1280,8 +1280,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1417",
-        "unit": "الحوكمة والالتزام",
+        "id": "3428",
+        "unit": "DEP-08",
         "surface_name": "الأطراف ذات العلاقة — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1296,8 +1296,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1418",
-        "unit": "الحوكمة والالتزام",
+        "id": "3429",
+        "unit": "DEP-08",
         "surface_name": "الهدايا والضيافة — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1312,8 +1312,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1419",
-        "unit": "الحوكمة والالتزام",
+        "id": "3430",
+        "unit": "DEP-08",
         "surface_name": "إقرارات مدونة السلوك — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1328,8 +1328,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1420",
-        "unit": "الحوكمة والالتزام",
+        "id": "3431",
+        "unit": "DEP-08",
         "surface_name": "بلاغات النزاهة المحمية — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1344,8 +1344,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1421",
-        "unit": "الحوكمة والالتزام",
+        "id": "3432",
+        "unit": "DEP-08",
         "surface_name": "التحقيقات — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1360,8 +1360,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1422",
-        "unit": "الحوكمة والالتزام",
+        "id": "3433",
+        "unit": "DEP-08",
         "surface_name": "سجل الإخلالات — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1376,8 +1376,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1423",
-        "unit": "الحوكمة والالتزام",
+        "id": "3434",
+        "unit": "DEP-08",
         "surface_name": "الإجراءات التصحيحية — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1392,8 +1392,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1424",
-        "unit": "الحوكمة والالتزام",
+        "id": "3435",
+        "unit": "DEP-08",
         "surface_name": "متابعة نتائج المراجعة — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1408,8 +1408,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1425",
-        "unit": "الحوكمة والالتزام",
+        "id": "3436",
+        "unit": "DEP-08",
         "surface_name": "اللجان وحوكمة الاجتماعات — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1424,8 +1424,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1426",
-        "unit": "المبيعات والعقود",
+        "id": "3437",
+        "unit": "DEP-01",
         "surface_name": "سجل المشاريع",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1440,8 +1440,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1427",
-        "unit": "المبيعات والعقود",
+        "id": "3438",
+        "unit": "DEP-01",
         "surface_name": "بنود العروض",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1456,8 +1456,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1428",
-        "unit": "المبيعات والعقود",
+        "id": "3439",
+        "unit": "DEP-01",
         "surface_name": "التفاوض ومراجعات العرض",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1472,8 +1472,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1429",
-        "unit": "المبيعات والعقود",
+        "id": "3440",
+        "unit": "DEP-01",
         "surface_name": "سجل عقود المشاريع",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1488,8 +1488,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1430",
-        "unit": "المبيعات والعقود",
+        "id": "3441",
+        "unit": "DEP-01",
         "surface_name": "خط الأساس والمستهدفات",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1504,8 +1504,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1431",
-        "unit": "المبيعات والعقود",
+        "id": "3442",
+        "unit": "DEP-01",
         "surface_name": "الحاويات الشهرية والفاقد",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1520,8 +1520,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1432",
-        "unit": "المبيعات والعقود",
+        "id": "3443",
+        "unit": "DEP-01",
         "surface_name": "قاموس البيانات",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1536,8 +1536,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1433",
-        "unit": "المبيعات والعقود",
+        "id": "3444",
+        "unit": "DEP-01",
         "surface_name": "خريطة الترحيل",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1552,8 +1552,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1434",
-        "unit": "المبيعات والعقود",
+        "id": "3445",
+        "unit": "DEP-01",
         "surface_name": "تقرير المراجعة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1568,8 +1568,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1435",
-        "unit": "المبيعات والعقود",
+        "id": "3446",
+        "unit": "DEP-01",
         "surface_name": "قاموس قواعد الاستنتاج",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1584,8 +1584,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1436",
-        "unit": "المبيعات والعقود",
+        "id": "3447",
+        "unit": "DEP-01",
         "surface_name": "سجل تتبع القيم الرجعية",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1600,8 +1600,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1437",
-        "unit": "المبيعات والعقود",
+        "id": "3448",
+        "unit": "DEP-01",
         "surface_name": "تقرير اكتمال البيانات",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1616,8 +1616,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1438",
-        "unit": "المالية والخزينة",
+        "id": "3449",
+        "unit": "DEP-05",
         "surface_name": "التقويم المحاسبي للفترات — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1632,8 +1632,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1439",
-        "unit": "المالية والخزينة",
+        "id": "3450",
+        "unit": "DEP-05",
         "surface_name": "الرقابة الائتمانية وحدود العملاء — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1648,8 +1648,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1440",
-        "unit": "المالية والخزينة",
+        "id": "3451",
+        "unit": "DEP-05",
         "surface_name": "محاسبة الأصول الثابتة والإهلاك — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1664,8 +1664,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1441",
-        "unit": "المالية والخزينة",
+        "id": "3452",
+        "unit": "DEP-05",
         "surface_name": "مطابقات الحسابات — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1680,8 +1680,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1442",
-        "unit": "المالية والخزينة",
+        "id": "3453",
+        "unit": "DEP-06",
         "surface_name": "صف الدفع المعتمد — Approved Payment Queue",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1696,8 +1696,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1443",
-        "unit": "المالية والخزينة",
+        "id": "3454",
+        "unit": "DEP-06",
         "surface_name": "التحويلات بين الحسابات — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1712,8 +1712,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1444",
-        "unit": "المالية والخزينة",
+        "id": "3455",
+        "unit": "DEP-06",
         "surface_name": "تنفيذ عمليات الصرف الأجنبي — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1728,8 +1728,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1445",
-        "unit": "المالية والخزينة",
+        "id": "3456",
+        "unit": "DEP-06",
         "surface_name": "التسهيلات البنكية — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1744,8 +1744,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1446",
-        "unit": "المالية والخزينة",
+        "id": "3457",
+        "unit": "DEP-06",
         "surface_name": "خطابات الضمان والاعتمادات المستندية — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1760,8 +1760,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1447",
-        "unit": "المالية والخزينة",
+        "id": "3458",
+        "unit": "DEP-06",
         "surface_name": "عهد النثرية وتسويتها",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1776,8 +1776,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1448",
-        "unit": "المالية والخزينة",
+        "id": "3459",
+        "unit": "DEP-06",
         "surface_name": "الجرد النقدي للخزائن — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1792,8 +1792,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1449",
-        "unit": "الموارد البشرية",
+        "id": "3460",
+        "unit": "DEP-07",
         "surface_name": "الهيكل الوظيفي والمناصب — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1808,8 +1808,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1450",
-        "unit": "الموارد البشرية",
+        "id": "3461",
+        "unit": "DEP-07",
         "surface_name": "خطة القوى العاملة — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1824,8 +1824,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1451",
-        "unit": "الموارد البشرية",
+        "id": "3462",
+        "unit": "DEP-07",
         "surface_name": "مستندات الموظف — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1840,8 +1840,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1452",
-        "unit": "الموارد البشرية",
+        "id": "3463",
+        "unit": "DEP-07",
         "surface_name": "التهيئة والمباشرة — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1856,8 +1856,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1453",
-        "unit": "الموارد البشرية",
+        "id": "3464",
+        "unit": "DEP-07",
         "surface_name": "الحركات الوظيفية — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1872,8 +1872,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1454",
-        "unit": "الموارد البشرية",
+        "id": "3465",
+        "unit": "DEP-07",
         "surface_name": "التدريب والكفاءة — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1888,8 +1888,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1455",
-        "unit": "الموارد البشرية",
+        "id": "3466",
+        "unit": "DEP-07",
         "surface_name": "تقييم الأداء الوظيفي — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1904,8 +1904,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1456",
-        "unit": "الموارد البشرية",
+        "id": "3467",
+        "unit": "DEP-07",
         "surface_name": "القضايا التأديبية والتحقيق",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1920,8 +1920,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1457",
-        "unit": "الموارد البشرية",
+        "id": "3468",
+        "unit": "DEP-07",
         "surface_name": "المزايا والتأمينات — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1936,8 +1936,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1458",
-        "unit": "الموارد البشرية",
+        "id": "3469",
+        "unit": "DEP-07",
         "surface_name": "السلف والقروض — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1952,8 +1952,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1459",
-        "unit": "الموارد البشرية",
+        "id": "3470",
+        "unit": "DEP-07",
         "surface_name": "أسطر مسيّر الرواتب",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1968,8 +1968,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1460",
-        "unit": "إدارة الموقع",
+        "id": "3471",
+        "unit": "DEP-12",
         "surface_name": "سجل المواقع وحدودها",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -1984,8 +1984,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1461",
-        "unit": "إدارة الموقع",
+        "id": "3472",
+        "unit": "DEP-12",
         "surface_name": "تجهيز الموقع والجاهزية — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -2000,8 +2000,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1462",
-        "unit": "إدارة الموقع",
+        "id": "3473",
+        "unit": "DEP-12",
         "surface_name": "محضر تسليم واستلام الورديات",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -2016,8 +2016,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1463",
-        "unit": "إدارة الموقع",
+        "id": "3474",
+        "unit": "DEP-12",
         "surface_name": "طلبات تغيير الحالة ومعالجة المتعثر",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -2032,8 +2032,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1464",
-        "unit": "إدارة الموقع",
+        "id": "3475",
+        "unit": "DEP-12",
         "surface_name": "بنود طلب الموقع",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -2048,8 +2048,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1465",
-        "unit": "إدارة الموقع",
+        "id": "3476",
+        "unit": "DEP-12",
         "surface_name": "دفعات استلام طلب الموقع",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -2064,8 +2064,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1466",
-        "unit": "إدارة الموقع",
+        "id": "3477",
+        "unit": "DEP-12",
         "surface_name": "تقرير إقفال يوم الموقع",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -2080,8 +2080,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1467",
-        "unit": "إدارة الموقع",
+        "id": "3478",
+        "unit": "DEP-12",
         "surface_name": "الإيقاف المؤقت للموقع — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -2096,8 +2096,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1468",
-        "unit": "إدارة الموقع",
+        "id": "3479",
+        "unit": "DEP-12",
         "surface_name": "إغلاق الموقع وتسريحه — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -2112,8 +2112,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1469",
-        "unit": "مركز البلاغات",
+        "id": "3480",
+        "unit": "DEP-10",
         "surface_name": "مصفوفة SLA للبلاغات",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -2128,8 +2128,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1470",
-        "unit": "مركز البلاغات",
+        "id": "3481",
+        "unit": "DEP-10",
         "surface_name": "كتالوج أنواع محل البلاغ",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -2144,8 +2144,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1471",
-        "unit": "مركز البلاغات",
+        "id": "3482",
+        "unit": "DEP-10",
         "surface_name": "سجل التوجيه — Routing History",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -2160,8 +2160,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1472",
-        "unit": "مركز البلاغات",
+        "id": "3483",
+        "unit": "DEP-10",
         "surface_name": "سجل الإسناد — Assignment History",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -2176,8 +2176,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1473",
-        "unit": "مركز البلاغات",
+        "id": "3484",
+        "unit": "DEP-10",
         "surface_name": "إجراءات المعالجة — Resolution Actions",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -2192,8 +2192,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1474",
-        "unit": "مركز البلاغات",
+        "id": "3485",
+        "unit": "DEP-10",
         "surface_name": "سجل التواصل — Communications",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -2208,8 +2208,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1475",
-        "unit": "مركز البلاغات",
+        "id": "3486",
+        "unit": "DEP-10",
         "surface_name": "التصعيد — Escalation",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -2224,8 +2224,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1476",
-        "unit": "مركز البلاغات",
+        "id": "3487",
+        "unit": "DEP-10",
         "surface_name": "إعادة الفتح — Reopening",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -2240,8 +2240,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1477",
-        "unit": "مركز البلاغات",
+        "id": "3488",
+        "unit": "DEP-10",
         "surface_name": "التحقق والإغلاق — Resolved → Verification → Closure",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -2256,8 +2256,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1478",
-        "unit": "إدارة المخازن",
+        "id": "3489",
+        "unit": "DEP-17",
         "surface_name": "سند الإدخال والفحص",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -2272,8 +2272,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1479",
-        "unit": "إدارة المخازن",
+        "id": "3490",
+        "unit": "DEP-17",
         "surface_name": "ضوابط المواد الخطرة والمتفجرات",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -2288,8 +2288,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1480",
-        "unit": "إدارة المخازن",
+        "id": "3491",
+        "unit": "DEP-17",
         "surface_name": "بنود طلب الصرف الوارد",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -2304,8 +2304,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1481",
-        "unit": "إدارة المخازن",
+        "id": "3492",
+        "unit": "DEP-17",
         "surface_name": "سند الصرف",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -2320,8 +2320,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1482",
-        "unit": "إدارة المخازن",
+        "id": "3493",
+        "unit": "DEP-17",
         "surface_name": "بنود سند الصرف",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -2336,8 +2336,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1483",
-        "unit": "إدارة المخازن",
+        "id": "3494",
+        "unit": "DEP-17",
         "surface_name": "حدود الطلب وإعادة التزويد",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -2352,8 +2352,8 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1484",
-        "unit": "إدارة المخازن",
+        "id": "3495",
+        "unit": "DEP-17",
         "surface_name": "الإقفال الشهري للمخازن",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
@@ -2368,9 +2368,9 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1485",
-        "unit": "القوى التشغيلية",
-        "surface_name": "احتياج المشروع من القوى",
+        "id": "3496",
+        "unit": "DEP-14",
+        "surface_name": "أوامر التفتيش الواردة من الأسطول",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
         "src_ref": "10 › 04_مستهدف_غير_مبني › ص153",
@@ -2384,9 +2384,9 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1486",
-        "unit": "القوى التشغيلية",
-        "surface_name": "تصنيف الفئات التشغيلية — Workforce Taxonomy",
+        "id": "3497",
+        "unit": "DEP-14",
+        "surface_name": "تقطيع مسؤولية التوقف",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
         "src_ref": "10 › 04_مستهدف_غير_مبني › ص154",
@@ -2400,9 +2400,9 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1487",
-        "unit": "القوى التشغيلية",
-        "surface_name": "مصفوفة التأهيل والجاهزية",
+        "id": "3498",
+        "unit": "DEP-14",
+        "surface_name": "طلب صرف القطع لأمر العمل",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
         "src_ref": "10 › 04_مستهدف_غير_مبني › ص155",
@@ -2416,9 +2416,9 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1488",
-        "unit": "القوى التشغيلية",
-        "surface_name": "التخصيص للمشروع",
+        "id": "3499",
+        "unit": "DEP-14",
+        "surface_name": "الإصلاح الخارجي ومطالبات الضمان — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
         "src_ref": "10 › 04_مستهدف_غير_مبني › ص156",
@@ -2432,9 +2432,9 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1489",
-        "unit": "القوى التشغيلية",
-        "surface_name": "التسوية ونهاية التخصيص",
+        "id": "3500",
+        "unit": "DEP-14",
+        "surface_name": "العناية اليومية والتشحيم — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
         "src_ref": "10 › 04_مستهدف_غير_مبني › ص157",
@@ -2448,9 +2448,9 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1490",
-        "unit": "إدارة الصيانة",
-        "surface_name": "أوامر التفتيش الواردة من الأسطول",
+        "id": "3501",
+        "unit": "DEP-14",
+        "surface_name": "الإقفال وشهادة إعادة الخدمة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
         "src_ref": "10 › 04_مستهدف_غير_مبني › ص158",
@@ -2464,9 +2464,9 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1491",
-        "unit": "إدارة الصيانة",
-        "surface_name": "طلب صرف القطع لأمر العمل",
+        "id": "3502",
+        "unit": "DEP-13",
+        "surface_name": "احتياج المشروع من القوى",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
         "src_ref": "10 › 04_مستهدف_غير_مبني › ص159",
@@ -2480,9 +2480,9 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1492",
-        "unit": "إدارة الصيانة",
-        "surface_name": "الإصلاح الخارجي ومطالبات الضمان — بحسب انطباق الشركة",
+        "id": "3503",
+        "unit": "DEP-13",
+        "surface_name": "تصنيف الفئات التشغيلية — Workforce Taxonomy",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
         "src_ref": "10 › 04_مستهدف_غير_مبني › ص160",
@@ -2496,9 +2496,9 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1493",
-        "unit": "إدارة الصيانة",
-        "surface_name": "العناية اليومية والتشحيم — بحسب انطباق الشركة",
+        "id": "3504",
+        "unit": "DEP-13",
+        "surface_name": "مصفوفة التأهيل والجاهزية",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
         "src_ref": "10 › 04_مستهدف_غير_مبني › ص161",
@@ -2512,9 +2512,9 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1494",
-        "unit": "إدارة الصيانة",
-        "surface_name": "الإقفال وشهادة إعادة الخدمة",
+        "id": "3505",
+        "unit": "DEP-13",
+        "surface_name": "التخصيص للمشروع",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
         "src_ref": "10 › 04_مستهدف_غير_مبني › ص162",
@@ -2528,9 +2528,9 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1495",
-        "unit": "النقل والترحيل",
-        "surface_name": "تجهيز المغادرة والتسليم الأصلي — بحسب انطباق الشركة",
+        "id": "3506",
+        "unit": "DEP-13",
+        "surface_name": "التسوية ونهاية التخصيص",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
         "src_ref": "10 › 04_مستهدف_غير_مبني › ص163",
@@ -2544,9 +2544,9 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1496",
-        "unit": "النقل والترحيل",
-        "surface_name": "مراحل الرحلة — Trip Legs",
+        "id": "3507",
+        "unit": "DEP-15",
+        "surface_name": "تجهيز المغادرة والتسليم الأصلي — بحسب انطباق الشركة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
         "src_ref": "10 › 04_مستهدف_غير_مبني › ص164",
@@ -2560,9 +2560,9 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1497",
-        "unit": "النقل والترحيل",
-        "surface_name": "محضر الاستلام وقراءة العدّاد",
+        "id": "3508",
+        "unit": "DEP-15",
+        "surface_name": "مراحل الرحلة — Trip Legs",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
         "src_ref": "10 › 04_مستهدف_غير_مبني › ص165",
@@ -2576,9 +2576,9 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1498",
-        "unit": "النقل والترحيل",
-        "surface_name": "بنود تكلفة الرحلة",
+        "id": "3509",
+        "unit": "DEP-15",
+        "surface_name": "محضر الاستلام وقراءة العدّاد",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
         "src_ref": "10 › 04_مستهدف_غير_مبني › ص166",
@@ -2592,9 +2592,9 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1499",
-        "unit": "النقل والترحيل",
-        "surface_name": "تقرير أوامر الترحيل",
+        "id": "3510",
+        "unit": "DEP-15",
+        "surface_name": "بنود تكلفة الرحلة",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
         "src_ref": "10 › 04_مستهدف_غير_مبني › ص167",
@@ -2608,9 +2608,9 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1500",
-        "unit": "إدارة المشتريات التشغيلية",
-        "surface_name": "بنود طلب الشراء",
+        "id": "3511",
+        "unit": "DEP-15",
+        "surface_name": "تقرير أوامر الترحيل",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
         "src_ref": "10 › 04_مستهدف_غير_مبني › ص168",
@@ -2624,9 +2624,9 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1501",
-        "unit": "إدارة المشتريات التشغيلية",
-        "surface_name": "تجميع الطلبات وخطة الشراء",
+        "id": "3512",
+        "unit": "DEP-16",
+        "surface_name": "بنود طلب الشراء",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
         "src_ref": "10 › 04_مستهدف_غير_مبني › ص169",
@@ -2640,9 +2640,9 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1502",
-        "unit": "إدارة المشتريات التشغيلية",
-        "surface_name": "أعضاء حزمة التجميع",
+        "id": "3513",
+        "unit": "DEP-16",
+        "surface_name": "تجميع الطلبات وخطة الشراء",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
         "src_ref": "10 › 04_مستهدف_غير_مبني › ص170",
@@ -2656,9 +2656,9 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1503",
-        "unit": "إدارة المشتريات التشغيلية",
-        "surface_name": "دعوات الموردين للعروض",
+        "id": "3514",
+        "unit": "DEP-16",
+        "surface_name": "أعضاء حزمة التجميع",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
         "src_ref": "10 › 04_مستهدف_غير_مبني › ص171",
@@ -2672,9 +2672,9 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1504",
-        "unit": "إدارة المشتريات التشغيلية",
-        "surface_name": "تقييم أداء التوريد",
+        "id": "3515",
+        "unit": "DEP-16",
+        "surface_name": "دعوات الموردين للعروض",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
         "src_ref": "10 › 04_مستهدف_غير_مبني › ص172",
@@ -2688,9 +2688,9 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1505",
-        "unit": "إدارة المخاطر المؤسسية",
-        "surface_name": "تصنيف المخاطر — Taxonomy",
+        "id": "3516",
+        "unit": "DEP-16",
+        "surface_name": "تقييم أداء التوريد",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
         "src_ref": "10 › 04_مستهدف_غير_مبني › ص173",
@@ -2704,9 +2704,9 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1506",
-        "unit": "إدارة المخاطر المؤسسية",
-        "surface_name": "أحداث المخاطر والخسائر — Risk\/Loss Events",
+        "id": "3517",
+        "unit": "DEP-09",
+        "surface_name": "تصنيف المخاطر — Taxonomy",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
         "src_ref": "10 › 04_مستهدف_غير_مبني › ص174",
@@ -2720,9 +2720,9 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1507",
-        "unit": "إدارة المخاطر المؤسسية",
-        "surface_name": "تقييم المخاطر",
+        "id": "3518",
+        "unit": "DEP-09",
+        "surface_name": "أحداث المخاطر والخسائر — Risk\/Loss Events",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
         "src_ref": "10 › 04_مستهدف_غير_مبني › ص175",
@@ -2736,9 +2736,9 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1508",
-        "unit": "إدارة المخاطر المؤسسية",
-        "surface_name": "الضوابط — Controls",
+        "id": "3519",
+        "unit": "DEP-09",
+        "surface_name": "تقييم المخاطر",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
         "src_ref": "10 › 04_مستهدف_غير_مبني › ص176",
@@ -2752,9 +2752,9 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1509",
-        "unit": "مساحة العمل الشخصية",
-        "surface_name": "بلاغاتي",
+        "id": "3520",
+        "unit": "DEP-09",
+        "surface_name": "الضوابط — Controls",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
         "src_ref": "10 › 04_مستهدف_غير_مبني › ص177",
@@ -2768,9 +2768,9 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1510",
-        "unit": "المراجع الداخلي المستقل",
-        "surface_name": "مخاطر وظيفة المراجعة",
+        "id": "3521",
+        "unit": "WS-MY",
+        "surface_name": "بلاغاتي",
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
         "src_ref": "10 › 04_مستهدف_غير_مبني › ص178",
@@ -2784,7 +2784,23 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1511",
+        "id": "3522",
+        "unit": "IAF",
+        "surface_name": "مخاطر وظيفة المراجعة",
+        "built_counterpart": "—",
+        "verdict": "Build — يُبنى بموضعه من الدورة",
+        "src_ref": "10 › 04_مستهدف_غير_مبني › ص179",
+        "origin_stage": "",
+        "origin_note": "",
+        "wave_stage": "",
+        "split_code": "",
+        "split_rule": "",
+        "split_why": "",
+        "ghost_disposition": "MERGE",
+        "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
+    },
+    {
+        "id": "3523",
         "unit": "DEP-05",
         "surface_name": "فحص الموازنة والالتزام (acc_budget_check.php)",
         "built_counterpart": "",
@@ -2800,7 +2816,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1512",
+        "id": "3524",
         "unit": "DEP-05",
         "surface_name": "توزيع مراكز التكلفة (acc_cost_alloc.php)",
         "built_counterpart": "",
@@ -2816,7 +2832,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1513",
+        "id": "3525",
         "unit": "DEP-05",
         "surface_name": "ميزانية إدارتي (acc_dept_budget.php)",
         "built_counterpart": "",
@@ -2832,7 +2848,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1514",
+        "id": "3526",
         "unit": "DEP-05",
         "surface_name": "مراجعة المستندات (acc_docs_check.php)",
         "built_counterpart": "",
@@ -2848,7 +2864,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1515",
+        "id": "3527",
         "unit": "DEP-05",
         "surface_name": "المعاملات الواردة من الإدارات (acc_inbox.php)",
         "built_counterpart": "",
@@ -2864,7 +2880,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1516",
+        "id": "3528",
         "unit": "DEP-05",
         "surface_name": "عملي اليوم — محاسب الإدارة (acc_myday.php)",
         "built_counterpart": "",
@@ -2880,7 +2896,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1517",
+        "id": "3529",
         "unit": "DEP-05",
         "surface_name": "المعاملات المعادة (acc_returned.php)",
         "built_counterpart": "",
@@ -2896,7 +2912,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1518",
+        "id": "3530",
         "unit": "DEP-05",
         "surface_name": "الأحداث المالية في نطاقي (acc_scope_events.php)",
         "built_counterpart": "",
@@ -2912,7 +2928,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1519",
+        "id": "3531",
         "unit": "DEP-05",
         "surface_name": "تقارير تخصصي المحاسبي (acc_spec_reports.php)",
         "built_counterpart": "",
@@ -2928,7 +2944,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1520",
+        "id": "3532",
         "unit": "DEP-05",
         "surface_name": "المعالجة المحاسبية المقترحة (acc_treatment.php)",
         "built_counterpart": "",
@@ -2944,7 +2960,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1521",
+        "id": "3533",
         "unit": "DEP-05",
         "surface_name": "انحرافات الموازنة (acc_variance.php)",
         "built_counterpart": "",
@@ -2960,7 +2976,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1522",
+        "id": "3534",
         "unit": "DEP-08",
         "surface_name": "أنماط تفعيل المزايا (activation.php)",
         "built_counterpart": "",
@@ -2976,7 +2992,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1523",
+        "id": "3535",
         "unit": "DEP-07",
         "surface_name": "السلف والعهد المالية (advances.php)",
         "built_counterpart": "Workforce\/employee_advances.php",
@@ -2992,7 +3008,7 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1524",
+        "id": "3536",
         "unit": "DEP-05",
         "surface_name": "توليد التزامات عقد المورد (ap_oblig_gen.php)",
         "built_counterpart": "",
@@ -3008,7 +3024,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1525",
+        "id": "3537",
         "unit": "DEP-05",
         "surface_name": "جدول استحقاقات العميل (ar_accrual_sched.php)",
         "built_counterpart": "",
@@ -3024,7 +3040,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1526",
+        "id": "3538",
         "unit": "DEP-08",
         "surface_name": "المعاونون والنيابة المؤقتة (assistants.php)",
         "built_counterpart": "",
@@ -3040,7 +3056,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1527",
+        "id": "3539",
         "unit": "DEP-08",
         "surface_name": "سجل التدقيق والاطّلاع (audit.php)",
         "built_counterpart": "",
@@ -3056,7 +3072,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1528",
+        "id": "3540",
         "unit": "DEP-06",
         "surface_name": "المطابقة البنكية (bank_recon.php)",
         "built_counterpart": "",
@@ -3072,7 +3088,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1529",
+        "id": "3541",
         "unit": "DEP-06",
         "surface_name": "التدفق النقدي والتنبؤ (cash_forecast.php)",
         "built_counterpart": "",
@@ -3088,7 +3104,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1530",
+        "id": "3542",
         "unit": "DEP-16",
         "surface_name": "ميزانية المشتريات المركزية المجمَّعة (central_proc_budget.php)",
         "built_counterpart": "",
@@ -3104,7 +3120,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1531",
+        "id": "3543",
         "unit": "EX-CEO",
         "surface_name": "موافقات التكليف على المسميات القيادية (ceo_appointments.php)",
         "built_counterpart": "",
@@ -3120,7 +3136,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1532",
+        "id": "3544",
         "unit": "EX-CEO",
         "surface_name": "تقارير المراجعة الداخلية — الرئيس (ceo_audit_inbox.php)",
         "built_counterpart": "",
@@ -3136,7 +3152,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1533",
+        "id": "3545",
         "unit": "EX-CEO",
         "surface_name": "الاعتمادات المالية العليا — الرئيس (ceo_fin_approvals.php)",
         "built_counterpart": "",
@@ -3152,7 +3168,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1534",
+        "id": "3546",
         "unit": "EX-CEO",
         "surface_name": "المسائل المحجوزة للرئيس التنفيذي (ceo_reserved.php)",
         "built_counterpart": "",
@@ -3168,7 +3184,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1535",
+        "id": "3547",
         "unit": "DEP-05",
         "surface_name": "لوحة المدير المالي (cfo_board.php)",
         "built_counterpart": "",
@@ -3184,7 +3200,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1536",
+        "id": "3548",
         "unit": "DEP-05",
         "surface_name": "دليل الحسابات ومراكز التكلفة (coa.php)",
         "built_counterpart": "",
@@ -3200,7 +3216,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1537",
+        "id": "3549",
         "unit": "DEP-05",
         "surface_name": "التكاليف والربحية بالمركز (cost_report.php)",
         "built_counterpart": "",
@@ -3216,7 +3232,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1538",
+        "id": "3550",
         "unit": "DEP-05",
         "surface_name": "الاستحقاقات والمخصصات (ctrl_accruals.php)",
         "built_counterpart": "",
@@ -3232,7 +3248,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1539",
+        "id": "3551",
         "unit": "DEP-05",
         "surface_name": "لوحة رئيس الحسابات (ctrl_board.php)",
         "built_counterpart": "",
@@ -3248,7 +3264,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1540",
+        "id": "3552",
         "unit": "DEP-05",
         "surface_name": "مراجعة محاضر الجرد النقدي (ctrl_cash_count.php)",
         "built_counterpart": "",
@@ -3264,7 +3280,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1541",
+        "id": "3553",
         "unit": "DEP-05",
         "surface_name": "تقويم الإقفال (ctrl_close_calendar.php)",
         "built_counterpart": "",
@@ -3280,7 +3296,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1542",
+        "id": "3554",
         "unit": "DEP-05",
         "surface_name": "قائمة فحص الإقفال (ctrl_close_checklist.php)",
         "built_counterpart": "",
@@ -3296,7 +3312,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1543",
+        "id": "3555",
         "unit": "DEP-05",
         "surface_name": "الاستثناءات المحاسبية (ctrl_exceptions.php)",
         "built_counterpart": "",
@@ -3312,7 +3328,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1544",
+        "id": "3556",
         "unit": "DEP-05",
         "surface_name": "فروق العملات (ctrl_fx_diff.php)",
         "built_counterpart": "",
@@ -3328,7 +3344,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1545",
+        "id": "3557",
         "unit": "DEP-05",
         "surface_name": "القيود غير المرتبطة بمصدر (ctrl_je_orphan.php)",
         "built_counterpart": "",
@@ -3344,7 +3360,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1546",
+        "id": "3558",
         "unit": "DEP-05",
         "surface_name": "طابور مراجعة القيود (ctrl_je_queue.php)",
         "built_counterpart": "",
@@ -3360,7 +3376,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1547",
+        "id": "3559",
         "unit": "DEP-05",
         "surface_name": "القيود عالية المخاطر (ctrl_je_risky.php)",
         "built_counterpart": "",
@@ -3376,7 +3392,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1548",
+        "id": "3560",
         "unit": "DEP-05",
         "surface_name": "تقارير جودة المحاسبة (ctrl_quality.php)",
         "built_counterpart": "",
@@ -3392,7 +3408,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1549",
+        "id": "3561",
         "unit": "DEP-05",
         "surface_name": "مراجعة المطابقات البنكية (ctrl_recon_review.php)",
         "built_counterpart": "",
@@ -3408,7 +3424,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1550",
+        "id": "3562",
         "unit": "DEP-05",
         "surface_name": "سجل إعادة فتح الفترات (ctrl_reopen_log.php)",
         "built_counterpart": "",
@@ -3424,7 +3440,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1551",
+        "id": "3563",
         "unit": "DEP-05",
         "surface_name": "القوائم المالية (ctrl_statements.php)",
         "built_counterpart": "",
@@ -3440,7 +3456,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1552",
+        "id": "3564",
         "unit": "DEP-05",
         "surface_name": "ميزان المراجعة (ctrl_trial_balance.php)",
         "built_counterpart": "",
@@ -3456,7 +3472,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1553",
+        "id": "3565",
         "unit": "DEP-14",
         "surface_name": "العهد والمرتجعات (custody.php)",
         "built_counterpart": "",
@@ -3472,7 +3488,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1554",
+        "id": "3566",
         "unit": "DEP-05",
         "surface_name": "زمن دورة الطلبات (cycle_time.php)",
         "built_counterpart": "",
@@ -3488,7 +3504,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1555",
+        "id": "3567",
         "unit": "EX-CEO",
         "surface_name": "التفويض بالتوقيع (delegations.php)",
         "built_counterpart": "",
@@ -3504,7 +3520,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1556",
+        "id": "3568",
         "unit": "DEP-04",
         "surface_name": "سياسات الإهلاك المعتمدة (dep_profiles.php)",
         "built_counterpart": "",
@@ -3520,7 +3536,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1557",
+        "id": "3569",
         "unit": "DEP-04",
         "surface_name": "توزيع المعدات والمشغّلين (distribution.php)",
         "built_counterpart": "",
@@ -3536,7 +3552,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1558",
+        "id": "3570",
         "unit": "DEP-07",
         "surface_name": "عقود الموظفين (emp_contracts.php)",
         "built_counterpart": "Employees\/employee_contracts.php",
@@ -3552,7 +3568,7 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1559",
+        "id": "3571",
         "unit": "DEP-08",
         "surface_name": "سجل الشركات والكيانات (entities.php)",
         "built_counterpart": "",
@@ -3568,7 +3584,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1560",
+        "id": "3572",
         "unit": "DEP-07",
         "surface_name": "وثائق المعدات والمشغّلين (equip_docs.php)",
         "built_counterpart": "Equipments\/equipment_documents.php",
@@ -3584,7 +3600,7 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1561",
+        "id": "3573",
         "unit": "DEP-04",
         "surface_name": "قراءات العدّادات (equip_meters.php)",
         "built_counterpart": "",
@@ -3600,7 +3616,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1562",
+        "id": "3574",
         "unit": "DEP-04",
         "surface_name": "موديلات المعدات ومواصفاتها (equip_models.php)",
         "built_counterpart": "",
@@ -3616,7 +3632,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1563",
+        "id": "3575",
         "unit": "DEP-04",
         "surface_name": "أنواع المعدات وفئاتها (equip_types.php)",
         "built_counterpart": "",
@@ -3632,7 +3648,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1564",
+        "id": "3576",
         "unit": "DEP-04",
         "surface_name": "تصنيف الأعطال وأسبابها (failures.php)",
         "built_counterpart": "",
@@ -3648,7 +3664,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1565",
+        "id": "3577",
         "unit": "DEP-05",
         "surface_name": "تنبيهات الاستحقاقات والالتزامات (fin_alerts.php)",
         "built_counterpart": "",
@@ -3664,7 +3680,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1566",
+        "id": "3578",
         "unit": "DEP-05",
         "surface_name": "اختبار قابلية التجنب للعقود (fin_avoid_test.php)",
         "built_counterpart": "",
@@ -3680,7 +3696,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1567",
+        "id": "3579",
         "unit": "DEP-05",
         "surface_name": "سجل الارتباطات التعاقدية والإفصاح (fin_commitments.php)",
         "built_counterpart": "",
@@ -3696,7 +3712,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1568",
+        "id": "3580",
         "unit": "DEP-05",
         "surface_name": "توزيع تكلفة التمويل على المشاريع (fin_cost.php)",
         "built_counterpart": "",
@@ -3712,7 +3728,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1569",
+        "id": "3581",
         "unit": "DEP-05",
         "surface_name": "تصنيف بيانات الشاشات الرباعي (fin_data_class.php)",
         "built_counterpart": "",
@@ -3728,7 +3744,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1570",
+        "id": "3582",
         "unit": "DEP-03",
         "surface_name": "انحرافات التمويل — السداد والملكية والتوثيق (fin_deviations.php)",
         "built_counterpart": "Financing\/deviations.php",
@@ -3744,7 +3760,7 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1571",
+        "id": "3583",
         "unit": "DEP-03",
         "surface_name": "الخروج غير المسجَّل من الملكية (fin_exit.php)",
         "built_counterpart": "Financing\/asset_disposal.php",
@@ -3760,7 +3776,7 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1572",
+        "id": "3584",
         "unit": "DEP-03",
         "surface_name": "عقود تمويل بلا حركة (fin_idle.php)",
         "built_counterpart": "Financing\/deviations.php?view=v649001",
@@ -3776,7 +3792,7 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1573",
+        "id": "3585",
         "unit": "DEP-05",
         "surface_name": "توزيع التخصصات والنطاقات (fin_mgr_assign.php)",
         "built_counterpart": "",
@@ -3792,7 +3808,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1574",
+        "id": "3586",
         "unit": "DEP-05",
         "surface_name": "لوحة مدير الإدارة المالية (fin_mgr_board.php)",
         "built_counterpart": "",
@@ -3808,7 +3824,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1575",
+        "id": "3587",
         "unit": "DEP-03",
         "surface_name": "عمليات التمويل (fin_ops.php)",
         "built_counterpart": "Financing\/operation_profile.php",
@@ -3824,7 +3840,7 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1576",
+        "id": "3588",
         "unit": "DEP-05",
         "surface_name": "مصفوفة شروط الاعتراف بالمعيار (fin_recognition.php)",
         "built_counterpart": "",
@@ -3840,7 +3856,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1577",
+        "id": "3589",
         "unit": "EX-CEO",
         "surface_name": "القوائم المالية (fin_statements.php)",
         "built_counterpart": "",
@@ -3856,7 +3872,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1578",
+        "id": "3590",
         "unit": "DEP-05",
         "surface_name": "سجل المُطلِقات المالية الخمسة والثلاثين (fin_triggers.php)",
         "built_counterpart": "",
@@ -3872,7 +3888,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1579",
+        "id": "3591",
         "unit": "DEP-03",
         "surface_name": "فروق السداد والاستحقاق (fin_variance.php)",
         "built_counterpart": "Financing\/deviations.php?view=v08c5c1",
@@ -3888,7 +3904,7 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1580",
+        "id": "3592",
         "unit": "DEP-03",
         "surface_name": "سجل الممولين (financiers.php)",
         "built_counterpart": "Financing\/financiers_registry.php",
@@ -3904,7 +3920,7 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1581",
+        "id": "3593",
         "unit": "DEP-04",
         "surface_name": "ملّاك الأسطول (fleet_owners.php)",
         "built_counterpart": "",
@@ -3920,7 +3936,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1582",
+        "id": "3594",
         "unit": "DEP-12",
         "surface_name": "صرف الوقود اليومي للمعدات (fuel_issue.php)",
         "built_counterpart": "",
@@ -3936,7 +3952,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1583",
+        "id": "3595",
         "unit": "DEP-12",
         "surface_name": "استلام الوقود من العميل (fuel_receipt.php)",
         "built_counterpart": "",
@@ -3952,7 +3968,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1584",
+        "id": "3596",
         "unit": "DEP-12",
         "surface_name": "مطابقة كميات الوقود (fuel_reconcile.php)",
         "built_counterpart": "",
@@ -3968,7 +3984,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1585",
+        "id": "3597",
         "unit": "DEP-05",
         "surface_name": "سعر الصرف اليومي (fx_daily.php)",
         "built_counterpart": "",
@@ -3984,7 +4000,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1586",
+        "id": "3598",
         "unit": "DEP-05",
         "surface_name": "أسعار الصرف (fx_rates.php)",
         "built_counterpart": "",
@@ -4000,7 +4016,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1587",
+        "id": "3599",
         "unit": "IAF",
         "surface_name": "حوكمة المراجعة الداخلية (gov_dept_iaf.php)",
         "built_counterpart": "",
@@ -4016,7 +4032,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1588",
+        "id": "3600",
         "unit": "DEP-08",
         "surface_name": "خطوات السلالم المسجَّلة (gov_ladder_steps.php)",
         "built_counterpart": "",
@@ -4032,7 +4048,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1589",
+        "id": "3601",
         "unit": "DEP-08",
         "surface_name": "سلاليم الاعتماد وتعريفها (gov_ladders.php)",
         "built_counterpart": "",
@@ -4048,7 +4064,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1590",
+        "id": "3602",
         "unit": "IAF",
         "surface_name": "خطط المعالجة والمتابعة (iaf_actions.php)",
         "built_counterpart": "",
@@ -4064,7 +4080,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1591",
+        "id": "3603",
         "unit": "IAF",
         "surface_name": "لوحة رئيس المراجعة الداخلية (iaf_board.php)",
         "built_counterpart": "Audit\/iaf_overview.php",
@@ -4080,7 +4096,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1592",
+        "id": "3604",
         "unit": "IAF",
         "surface_name": "طلبات الأدلة (iaf_evidence.php)",
         "built_counterpart": "",
@@ -4096,7 +4112,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1593",
+        "id": "3605",
         "unit": "IAF",
         "surface_name": "الملاحظات المتأخرة والتصعيد (iaf_overdue.php)",
         "built_counterpart": "",
@@ -4112,7 +4128,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1594",
+        "id": "3606",
         "unit": "IAF",
         "surface_name": "برامج المراجعة (iaf_programs.php)",
         "built_counterpart": "Audit\/iaf_audit_programs.php",
@@ -4128,7 +4144,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1595",
+        "id": "3607",
         "unit": "IAF",
         "surface_name": "العينات ونتائج الاختبارات (iaf_samples.php)",
         "built_counterpart": "Audit\/iaf_test_samples.php",
@@ -4144,7 +4160,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1596",
+        "id": "3608",
         "unit": "IAF",
         "surface_name": "سجل الاطلاع الحساس للمراجعين (iaf_sensitive_log.php)",
         "built_counterpart": "",
@@ -4160,7 +4176,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1597",
+        "id": "3609",
         "unit": "DEP-05",
         "surface_name": "صرف مواد من المخزن (issue.php)",
         "built_counterpart": "",
@@ -4176,7 +4192,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1598",
+        "id": "3610",
         "unit": "DEP-14",
         "surface_name": "كتالوج الأصناف والقطع الحرجة (items.php)",
         "built_counterpart": "",
@@ -4192,7 +4208,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1599",
+        "id": "3611",
         "unit": "DEP-05",
         "surface_name": "القيود اليومية (journal.php)",
         "built_counterpart": "",
@@ -4208,7 +4224,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1600",
+        "id": "3612",
         "unit": "DEP-11",
         "surface_name": "متابعة الرحلات الذهبية (journey_tracker.php)",
         "built_counterpart": "",
@@ -4224,7 +4240,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1601",
+        "id": "3613",
         "unit": "DEP-07",
         "surface_name": "الإجازات والغياب (leaves.php)",
         "built_counterpart": "Workforce\/worker_leave_absence.php",
@@ -4240,7 +4256,7 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1602",
+        "id": "3614",
         "unit": "DEP-08",
         "surface_name": "التراخيص والكفالات (licenses.php)",
         "built_counterpart": "",
@@ -4256,7 +4272,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1603",
+        "id": "3615",
         "unit": "DEP-05",
         "surface_name": "مخصص الصيانة والعمرات (maint_provision.php)",
         "built_counterpart": "",
@@ -4272,7 +4288,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1604",
+        "id": "3616",
         "unit": "EX-CEO",
         "surface_name": "هامش الربح للعقد والواقعة (margin.php)",
         "built_counterpart": "",
@@ -4288,7 +4304,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1605",
+        "id": "3617",
         "unit": "DEP-11",
         "surface_name": "مساحة عملي — أربعة صناديق (my_workspace_v2.php)",
         "built_counterpart": "",
@@ -4304,7 +4320,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1606",
+        "id": "3618",
         "unit": "DEP-07",
         "surface_name": "تكليف المشغّل على المعدة (op_assign.php)",
         "built_counterpart": "Employees\/equipment_operators.php",
@@ -4320,7 +4336,7 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1607",
+        "id": "3619",
         "unit": "DEP-07",
         "surface_name": "خصومات المشغّلين المقترحة (op_deduct.php)",
         "built_counterpart": "Workforce\/proposed_deductions.php",
@@ -4336,7 +4352,7 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1608",
+        "id": "3620",
         "unit": "DEP-07",
         "surface_name": "سجل المشغّلين (operators.php)",
         "built_counterpart": "Oprators\/oprators.php",
@@ -4352,7 +4368,7 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1609",
+        "id": "3621",
         "unit": "DEP-11",
         "surface_name": "غرفة عمليات المواقع (ops_room.php)",
         "built_counterpart": "",
@@ -4368,7 +4384,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1610",
+        "id": "3622",
         "unit": "DEP-05",
         "surface_name": "ذمم الموردين والمستحقات (payables.php)",
         "built_counterpart": "",
@@ -4384,7 +4400,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1611",
+        "id": "3623",
         "unit": "DEP-05",
         "surface_name": "مسيّر الرواتب (payroll.php)",
         "built_counterpart": "",
@@ -4400,7 +4416,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1612",
+        "id": "3624",
         "unit": "DEP-05",
         "surface_name": "إقفال الفترة المحاسبية (period_close.php)",
         "built_counterpart": "",
@@ -4416,7 +4432,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1613",
+        "id": "3625",
         "unit": "DEP-16",
         "surface_name": "أوامر الشراء (po.php)",
         "built_counterpart": "",
@@ -4432,7 +4448,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1614",
+        "id": "3626",
         "unit": "DEP-11",
         "surface_name": "طلبات الشراء (pr.php)",
         "built_counterpart": "",
@@ -4448,7 +4464,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1615",
+        "id": "3627",
         "unit": "DEP-04",
         "surface_name": "خطط الصيانة الوقائية (preventive.php)",
         "built_counterpart": "",
@@ -4464,7 +4480,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1616",
+        "id": "3628",
         "unit": "DEP-04",
         "surface_name": "جاهزية المعدات للتشغيل (readiness.php)",
         "built_counterpart": "",
@@ -4480,7 +4496,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1617",
+        "id": "3629",
         "unit": "DEP-05",
         "surface_name": "ذمم العملاء وأعمارها (receivables.php)",
         "built_counterpart": "",
@@ -4496,7 +4512,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1618",
+        "id": "3630",
         "unit": "DEP-07",
         "surface_name": "التوظيف من الشاغر إلى المباشرة (recruitment.php)",
         "built_counterpart": "Workforce\/recruitment_pipeline.php",
@@ -4512,7 +4528,7 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1619",
+        "id": "3631",
         "unit": "DEP-08",
         "surface_name": "مركز التقارير (reports_index.php)",
         "built_counterpart": "",
@@ -4528,7 +4544,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1620",
+        "id": "3632",
         "unit": "DEP-16",
         "surface_name": "طلب العروض ومقارنتها (rfq.php)",
         "built_counterpart": "",
@@ -4544,7 +4560,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1621",
+        "id": "3633",
         "unit": "DEP-09",
         "surface_name": "لوحة المخاطر المؤسسية (risk_dashboard.php)",
         "built_counterpart": "",
@@ -4560,7 +4576,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1622",
+        "id": "3634",
         "unit": "IAF",
         "surface_name": "مخاطر المراجعة الداخلية (risk_dept_iaf.php)",
         "built_counterpart": "",
@@ -4576,7 +4592,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1623",
+        "id": "3635",
         "unit": "DEP-09",
         "surface_name": "مخاطر الإدارة (risk_dept_view.php)",
         "built_counterpart": "",
@@ -4592,7 +4608,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1624",
+        "id": "3636",
         "unit": "DEP-09",
         "surface_name": "مؤشرات المخاطر والضوابط (risk_kri.php)",
         "built_counterpart": "",
@@ -4608,7 +4624,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1625",
+        "id": "3637",
         "unit": "DEP-09",
         "surface_name": "ملف الخطر (risk_profile.php)",
         "built_counterpart": "",
@@ -4624,7 +4640,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1626",
+        "id": "3638",
         "unit": "DEP-09",
         "surface_name": "إجراءات المعالجة (risk_treatment.php)",
         "built_counterpart": "",
@@ -4640,7 +4656,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1627",
+        "id": "3639",
         "unit": "DEP-03",
         "surface_name": "حصص الملكية في الأصول (shares.php)",
         "built_counterpart": "Financing\/owners_registry.php",
@@ -4656,7 +4672,7 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1628",
+        "id": "3640",
         "unit": "DEP-12",
         "surface_name": "مؤشرات الورديات المشتقة (shift_metrics.php)",
         "built_counterpart": "",
@@ -4672,7 +4688,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1629",
+        "id": "3641",
         "unit": "DEP-12",
         "surface_name": "لوحة محاسب الموقع (site_acc_board.php)",
         "built_counterpart": "",
@@ -4688,7 +4704,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1630",
+        "id": "3642",
         "unit": "DEP-12",
         "surface_name": "عهدة الموقع والصرف منها (site_custody.php)",
         "built_counterpart": "",
@@ -4704,7 +4720,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1631",
+        "id": "3643",
         "unit": "DEP-12",
         "surface_name": "تصفية العهدة (site_custody_settle.php)",
         "built_counterpart": "",
@@ -4720,7 +4736,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1632",
+        "id": "3644",
         "unit": "DEP-12",
         "surface_name": "صرف مشتريات ميدانية من العهدة (site_custody_spend.php)",
         "built_counterpart": "",
@@ -4736,7 +4752,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1633",
+        "id": "3645",
         "unit": "DEP-12",
         "surface_name": "قرار الاستعداد أو التعطل (standby_decide.php)",
         "built_counterpart": "",
@@ -4752,7 +4768,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1634",
+        "id": "3646",
         "unit": "DEP-05",
         "surface_name": "أرصدة المخزون بحالاتها (stock.php)",
         "built_counterpart": "",
@@ -4768,7 +4784,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1635",
+        "id": "3647",
         "unit": "DEP-11",
         "surface_name": "التوقفات وتحديد المتحمل (stops.php)",
         "built_counterpart": "",
@@ -4784,7 +4800,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1636",
+        "id": "3648",
         "unit": "DEP-02",
         "surface_name": "معدات المورد ومالكوها (supplier_equip.php)",
         "built_counterpart": "",
@@ -4800,7 +4816,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1637",
+        "id": "3649",
         "unit": "DEP-02",
         "surface_name": "دفتر استهلاك حصص الموردين (quota_ledger.php)",
         "built_counterpart": "",
@@ -4816,7 +4832,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1638",
+        "id": "3650",
         "unit": "DEP-02",
         "surface_name": "أداء الموردين وجاهزيتهم (supplier_perf.php)",
         "built_counterpart": "",
@@ -4832,7 +4848,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1639",
+        "id": "3651",
         "unit": "DEP-10",
         "surface_name": "إعدادات البلاغات — الأنواع والمهل والتصعيد (ticket_config.php)",
         "built_counterpart": "Tickets\/ticket_types_config.php",
@@ -4848,7 +4864,7 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1640",
+        "id": "3652",
         "unit": "DEP-10",
         "surface_name": "مهل البلاغات وتصعيدها (ticket_escalate.php)",
         "built_counterpart": "Tickets\/ticket_escalation_config.php",
@@ -4864,7 +4880,7 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1641",
+        "id": "3653",
         "unit": "DEP-08",
         "surface_name": "أبلغ عن مشكلة من هذه الشاشة (ticket_open.php)",
         "built_counterpart": "",
@@ -4880,7 +4896,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1642",
+        "id": "3654",
         "unit": "DEP-10",
         "surface_name": "البلاغات الدورية المولَّدة (ticket_periodic.php)",
         "built_counterpart": "Tickets\/ticket_recurrence.php",
@@ -4896,7 +4912,7 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1643",
+        "id": "3655",
         "unit": "DEP-14",
         "surface_name": "البلاغات المتكررة وسببها الجذري (ticket_recur.php)",
         "built_counterpart": "",
@@ -4912,7 +4928,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1644",
+        "id": "3656",
         "unit": "DEP-10",
         "surface_name": "تصنيف البلاغ وتوجيهه آليًّا (ticket_route.php)",
         "built_counterpart": "Tickets\/intake_classify.php",
@@ -4928,7 +4944,7 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1645",
+        "id": "3657",
         "unit": "DEP-14",
         "surface_name": "تحويل البلاغ وتفريعه لمسارات (ticket_split.php)",
         "built_counterpart": "",
@@ -4944,7 +4960,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1646",
+        "id": "3658",
         "unit": "DEP-10",
         "surface_name": "بلاغات المركز (tickets.php)",
         "built_counterpart": "Tickets\/tickets_list.php",
@@ -4960,7 +4976,7 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1647",
+        "id": "3659",
         "unit": "DEP-08",
         "surface_name": "بلاغات إدارتي (tickets_dept.php)",
         "built_counterpart": "",
@@ -4976,7 +4992,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1648",
+        "id": "3660",
         "unit": "DEP-08",
         "surface_name": "وضع التدريب وسيناريوهاته (training_mode.php)",
         "built_counterpart": "",
@@ -4992,7 +5008,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1649",
+        "id": "3661",
         "unit": "DEP-05",
         "surface_name": "إقفال الأمر وتحميل تكلفته (transfer_cost.php)",
         "built_counterpart": "",
@@ -5008,7 +5024,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1650",
+        "id": "3662",
         "unit": "DEP-04",
         "surface_name": "أوامر الترحيل (transfer_ord.php)",
         "built_counterpart": "",
@@ -5024,7 +5040,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1651",
+        "id": "3663",
         "unit": "DEP-11",
         "surface_name": "طلبات الترحيل (transfer_req.php)",
         "built_counterpart": "",
@@ -5040,7 +5056,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1652",
+        "id": "3664",
         "unit": "DEP-15",
         "surface_name": "تعرفة الترحيل وقواعد التحميل (transfer_tariff.php)",
         "built_counterpart": "",
@@ -5056,7 +5072,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1653",
+        "id": "3665",
         "unit": "DEP-15",
         "surface_name": "متابعة الرحلات في الطريق (transfer_track.php)",
         "built_counterpart": "",
@@ -5072,7 +5088,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1654",
+        "id": "3666",
         "unit": "DEP-06",
         "surface_name": "سجل الحسابات البنكية والتوقيعات (tre_bank_accounts.php)",
         "built_counterpart": "",
@@ -5088,7 +5104,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1655",
+        "id": "3667",
         "unit": "DEP-06",
         "surface_name": "لوحة الخزينة والبنوك (tre_board.php)",
         "built_counterpart": "Finance\/tre_liquidity_board.php",
@@ -5104,7 +5120,7 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "1656",
+        "id": "3668",
         "unit": "DEP-06",
         "surface_name": "الخزائن والصناديق (tre_cash_box.php)",
         "built_counterpart": "",
@@ -5120,7 +5136,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1657",
+        "id": "3669",
         "unit": "DEP-06",
         "surface_name": "توثيق التنفيذ والإشعارات (tre_exec_log.php)",
         "built_counterpart": "",
@@ -5136,7 +5152,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1658",
+        "id": "3670",
         "unit": "DEP-06",
         "surface_name": "السيولة والتدفق النقدي (tre_liquidity.php)",
         "built_counterpart": "",
@@ -5152,7 +5168,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1659",
+        "id": "3671",
         "unit": "DEP-06",
         "surface_name": "سندات القبض والتحصيل (tre_receipts.php)",
         "built_counterpart": "",
@@ -5168,7 +5184,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1660",
+        "id": "3672",
         "unit": "DEP-06",
         "surface_name": "الخزينة والصناديق (treasury.php)",
         "built_counterpart": "",
@@ -5184,7 +5200,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1661",
+        "id": "3673",
         "unit": "DEP-04",
         "surface_name": "إسناد المعدات للوحدات (unit_assign.php)",
         "built_counterpart": "",
@@ -5200,7 +5216,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1662",
+        "id": "3674",
         "unit": "DEP-11",
         "surface_name": "الاعتماد اليومي لرفع الوحدات (unit_daily_approve.php)",
         "built_counterpart": "",
@@ -5216,7 +5232,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1663",
+        "id": "3675",
         "unit": "DEP-11",
         "surface_name": "إدخال وحدات العمل اليومية (unit_entry.php)",
         "built_counterpart": "",
@@ -5232,7 +5248,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1664",
+        "id": "3676",
         "unit": "DEP-05",
         "surface_name": "الاعتماد المالي الأولي (unit_fin_prelim.php)",
         "built_counterpart": "",
@@ -5248,7 +5264,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1665",
+        "id": "3677",
         "unit": "DEP-01",
         "surface_name": "بوابة مدير المبيعات (unit_sales_gate.php)",
         "built_counterpart": "",
@@ -5264,7 +5280,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1666",
+        "id": "3678",
         "unit": "DEP-11",
         "surface_name": "كشف التايم شيت — المشغّل (unit_statement_worker.php)",
         "built_counterpart": "",
@@ -5280,7 +5296,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1667",
+        "id": "3679",
         "unit": "DEP-02",
         "surface_name": "اعتماد وحدات الموردين (unit_supplier_approve.php)",
         "built_counterpart": "",
@@ -5296,7 +5312,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1668",
+        "id": "3680",
         "unit": "DEP-11",
         "surface_name": "اعتماد وحدات المشغّلين (unit_workforce_approve.php)",
         "built_counterpart": "",
@@ -5312,7 +5328,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1669",
+        "id": "3681",
         "unit": "DEP-05",
         "surface_name": "متابعة انحراف المنفَّذ عن المخطط (variance.php)",
         "built_counterpart": "",
@@ -5328,7 +5344,7 @@
         "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
     },
     {
-        "id": "1670",
+        "id": "3682",
         "unit": "DEP-08",
         "surface_name": "من يرى ماذا ومكوّنات البوابة (visibility.php)",
         "built_counterpart": "",

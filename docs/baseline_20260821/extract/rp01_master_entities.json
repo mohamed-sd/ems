@@ -13,7 +13,7 @@
         "guard_kind": "TRIGGER",
         "guard_evidence": "جسٌّ وظيفيّ: إدراجُ صفٍّ بلا كيانٍ مُنع · إدراجُ قوًى بلا وصلٍ مُنع",
         "verdict": "DEC_OPEN_03_OK",
-        "measured_at": "2026-08-25 22:25:19",
+        "measured_at": "2026-08-28 19:06:03",
         "src_ref": "DEC-OPEN-03 · W03 §٤-٤"
     },
     {
@@ -30,7 +30,7 @@
         "guard_kind": "APP_ONLY",
         "guard_evidence": "information_schema.COLUMNS.IS_NULLABLE=YES",
         "verdict": "DEC_OPEN_03_OK",
-        "measured_at": "2026-08-25 22:25:19",
+        "measured_at": "2026-08-28 19:06:03",
         "src_ref": "DEC-OPEN-03 · W03 §٤-٤"
     },
     {
@@ -47,7 +47,7 @@
         "guard_kind": "NOT_NULL",
         "guard_evidence": "الجذر: الكيان نفسه — لا عمود كيان فيه",
         "verdict": "DEC_OPEN_03_OK",
-        "measured_at": "2026-08-25 22:25:19",
+        "measured_at": "2026-08-28 19:06:03",
         "src_ref": "DEC-OPEN-03 · W03 §٤-٤"
     },
     {
@@ -64,7 +64,7 @@
         "guard_kind": "APP_ONLY",
         "guard_evidence": "information_schema.COLUMNS.IS_NULLABLE=YES",
         "verdict": "DEC_OPEN_03_OK",
-        "measured_at": "2026-08-25 22:25:19",
+        "measured_at": "2026-08-28 19:06:03",
         "src_ref": "DEC-OPEN-03 · W03 §٤-٤"
     },
     {
@@ -81,7 +81,7 @@
         "guard_kind": "APP_ONLY",
         "guard_evidence": "information_schema.COLUMNS.IS_NULLABLE=YES",
         "verdict": "DEC_OPEN_03_OK",
-        "measured_at": "2026-08-25 22:25:19",
+        "measured_at": "2026-08-28 19:06:03",
         "src_ref": "DEC-OPEN-03 · W03 §٤-٤"
     },
     {
@@ -98,7 +98,7 @@
         "guard_kind": "NOT_NULL",
         "guard_evidence": "information_schema.COLUMNS.IS_NULLABLE=NO",
         "verdict": "DEC_OPEN_03_OK",
-        "measured_at": "2026-08-25 22:25:19",
+        "measured_at": "2026-08-28 19:06:03",
         "src_ref": "DEC-OPEN-03 · W03 §٤-٤"
     },
     {
@@ -115,7 +115,7 @@
         "guard_kind": "NOT_NULL",
         "guard_evidence": "information_schema.COLUMNS.IS_NULLABLE=NO",
         "verdict": "DEC_OPEN_03_OK",
-        "measured_at": "2026-08-25 22:25:19",
+        "measured_at": "2026-08-28 19:06:03",
         "src_ref": "DEC-OPEN-03 · W03 §٤-٤"
     },
     {
@@ -132,7 +132,7 @@
         "guard_kind": "NOT_NULL",
         "guard_evidence": "information_schema.COLUMNS.IS_NULLABLE=NO",
         "verdict": "DEC_OPEN_03_OK",
-        "measured_at": "2026-08-25 22:25:19",
+        "measured_at": "2026-08-28 19:06:03",
         "src_ref": "DEC-OPEN-03 · W03 §٤-٤"
     },
     {
@@ -149,7 +149,7 @@
         "guard_kind": "NOT_NULL",
         "guard_evidence": "information_schema.COLUMNS.IS_NULLABLE=NO",
         "verdict": "DEC_OPEN_03_OK",
-        "measured_at": "2026-08-25 22:25:19",
+        "measured_at": "2026-08-28 19:06:03",
         "src_ref": "DEC-OPEN-03 · W03 §٤-٤"
     }
 ]

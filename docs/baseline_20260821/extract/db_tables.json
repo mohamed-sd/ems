@@ -149,7 +149,7 @@
     {
         "TABLE_NAME": "activity_logs",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "58237",
+        "TABLE_ROWS": "59137",
         "col_count": "27",
         "has_company": "1"
     },
@@ -695,7 +695,7 @@
     {
         "TABLE_NAME": "ctl_classification_rule",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "4",
+        "TABLE_ROWS": "3",
         "col_count": "17",
         "has_company": "1"
     },
@@ -835,7 +835,7 @@
     {
         "TABLE_NAME": "ems_business_events",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "20972",
+        "TABLE_ROWS": "20971",
         "col_count": "37",
         "has_company": "1"
     },
@@ -856,7 +856,7 @@
     {
         "TABLE_NAME": "ems_event_deliveries",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "20992",
+        "TABLE_ROWS": "20991",
         "col_count": "20",
         "has_company": "1"
     },
@@ -884,7 +884,7 @@
     {
         "TABLE_NAME": "ems_job_queue",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "15099",
+        "TABLE_ROWS": "16052",
         "col_count": "23",
         "has_company": "1"
     },
@@ -1346,7 +1346,7 @@
     {
         "TABLE_NAME": "fin_contract_close",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "1",
+        "TABLE_ROWS": "0",
         "col_count": "34",
         "has_company": "1"
     },
@@ -1619,7 +1619,7 @@
     {
         "TABLE_NAME": "fin_notifications",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "8350",
+        "TABLE_ROWS": "8384",
         "col_count": "8",
         "has_company": "1"
     },
@@ -1780,7 +1780,7 @@
     {
         "TABLE_NAME": "fin_receivables",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "292",
+        "TABLE_ROWS": "289",
         "col_count": "23",
         "has_company": "1"
     },
@@ -2359,6 +2359,13 @@
         "has_company": "0"
     },
     {
+        "TABLE_NAME": "gov_migration_settlement",
+        "TABLE_TYPE": "BASE TABLE",
+        "TABLE_ROWS": "299",
+        "col_count": "10",
+        "has_company": "0"
+    },
+    {
         "TABLE_NAME": "gov_nav_hidden_log",
         "TABLE_TYPE": "BASE TABLE",
         "TABLE_ROWS": "135",
@@ -2494,7 +2501,7 @@
     {
         "TABLE_NAME": "gov_screen_cycle",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "1184",
+        "TABLE_ROWS": "1187",
         "col_count": "16",
         "has_company": "1"
     },
@@ -2529,7 +2536,7 @@
     {
         "TABLE_NAME": "gov_space_appearances",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "1141",
+        "TABLE_ROWS": "1177",
         "col_count": "20",
         "has_company": "0"
     },
@@ -2557,7 +2564,7 @@
     {
         "TABLE_NAME": "gov_target_nav",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "43",
+        "TABLE_ROWS": "39",
         "col_count": "9",
         "has_company": "0"
     },
@@ -2900,7 +2907,7 @@
     {
         "TABLE_NAME": "link_groups",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "1953",
+        "TABLE_ROWS": "1900",
         "col_count": "10",
         "has_company": "0"
     },
@@ -3089,7 +3096,7 @@
     {
         "TABLE_NAME": "nav_canonical",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "541",
+        "TABLE_ROWS": "540",
         "col_count": "36",
         "has_company": "0"
     },
@@ -3124,7 +3131,7 @@
     {
         "TABLE_NAME": "nav_items",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "2346",
+        "TABLE_ROWS": "2193",
         "col_count": "14",
         "has_company": "0"
     },
@@ -3453,7 +3460,7 @@
     {
         "TABLE_NAME": "personal_notifications",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "8716",
+        "TABLE_ROWS": "8892",
         "col_count": "13",
         "has_company": "1"
     },
@@ -3901,7 +3908,7 @@
     {
         "TABLE_NAME": "repair01_decisions",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "108",
+        "TABLE_ROWS": "125",
         "col_count": "25",
         "has_company": "0"
     },
@@ -3915,28 +3922,28 @@
     {
         "TABLE_NAME": "repair01_departments",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "21",
+        "TABLE_ROWS": "22",
         "col_count": "6",
         "has_company": "0"
     },
     {
         "TABLE_NAME": "repair01_dept_crosswalk",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "20",
+        "TABLE_ROWS": "21",
         "col_count": "6",
         "has_company": "0"
     },
     {
         "TABLE_NAME": "repair01_events",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "787",
+        "TABLE_ROWS": "782",
         "col_count": "21",
         "has_company": "0"
     },
     {
         "TABLE_NAME": "repair01_fields",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "7290",
+        "TABLE_ROWS": "7593",
         "col_count": "10",
         "has_company": "0"
     },
@@ -3950,7 +3957,7 @@
     {
         "TABLE_NAME": "repair01_key_alias",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "26",
+        "TABLE_ROWS": "27",
         "col_count": "16",
         "has_company": "0"
     },
@@ -3971,14 +3978,14 @@
     {
         "TABLE_NAME": "repair01_ownership",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "941",
+        "TABLE_ROWS": "968",
         "col_count": "15",
         "has_company": "0"
     },
     {
         "TABLE_NAME": "repair01_requirements",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "429",
+        "TABLE_ROWS": "433",
         "col_count": "11",
         "has_company": "0"
     },
@@ -4006,14 +4013,14 @@
     {
         "TABLE_NAME": "repair01_target_gaps",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "334",
+        "TABLE_ROWS": "335",
         "col_count": "14",
         "has_company": "0"
     },
     {
         "TABLE_NAME": "repair01_ui_labels",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "1548",
+        "TABLE_ROWS": "2293",
         "col_count": "18",
         "has_company": "0"
     },
@@ -4034,7 +4041,7 @@
     {
         "TABLE_NAME": "repair01_w10_journey",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "7647",
+        "TABLE_ROWS": "7565",
         "col_count": "11",
         "has_company": "0"
     },
@@ -4104,7 +4111,7 @@
     {
         "TABLE_NAME": "repair01_w11_journey",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "24513",
+        "TABLE_ROWS": "23240",
         "col_count": "14",
         "has_company": "1"
     },
@@ -4160,7 +4167,7 @@
     {
         "TABLE_NAME": "repair01_w12_journey",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "3222",
+        "TABLE_ROWS": "3281",
         "col_count": "14",
         "has_company": "1"
     },
@@ -4237,7 +4244,7 @@
     {
         "TABLE_NAME": "repair01_w13_nav_moves",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "33",
+        "TABLE_ROWS": "41",
         "col_count": "8",
         "has_company": "0"
     },
@@ -4398,7 +4405,7 @@
     {
         "TABLE_NAME": "repair01_w15_nav_moves",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "15",
+        "TABLE_ROWS": "17",
         "col_count": "7",
         "has_company": "0"
     },
@@ -4440,7 +4447,7 @@
     {
         "TABLE_NAME": "repair01_w15_states",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "56",
+        "TABLE_ROWS": "57",
         "col_count": "13",
         "has_company": "0"
     },
@@ -4594,7 +4601,7 @@
     {
         "TABLE_NAME": "repair01_w4_sidebar",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "26",
+        "TABLE_ROWS": "27",
         "col_count": "31",
         "has_company": "0"
     },
@@ -4629,7 +4636,7 @@
     {
         "TABLE_NAME": "repair01_w6_code_dict",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "459",
+        "TABLE_ROWS": "535",
         "col_count": "7",
         "has_company": "0"
     },
@@ -4657,7 +4664,7 @@
     {
         "TABLE_NAME": "repair01_w6_journey",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "4928",
+        "TABLE_ROWS": "4844",
         "col_count": "10",
         "has_company": "0"
     },
@@ -4671,7 +4678,7 @@
     {
         "TABLE_NAME": "repair01_w6_rewrite",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "8900",
+        "TABLE_ROWS": "8983",
         "col_count": "11",
         "has_company": "0"
     },
@@ -4713,7 +4720,7 @@
     {
         "TABLE_NAME": "repair01_w7_journey",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "7251",
+        "TABLE_ROWS": "6819",
         "col_count": "12",
         "has_company": "0"
     },
@@ -4727,7 +4734,7 @@
     {
         "TABLE_NAME": "repair01_w7_sidebar",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "32",
+        "TABLE_ROWS": "35",
         "col_count": "31",
         "has_company": "0"
     },
@@ -4790,7 +4797,7 @@
     {
         "TABLE_NAME": "repair01_w8_sidebar",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "67",
+        "TABLE_ROWS": "68",
         "col_count": "31",
         "has_company": "0"
     },
@@ -4839,7 +4846,7 @@
     {
         "TABLE_NAME": "repair01_w9_journey",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "7538",
+        "TABLE_ROWS": "6926",
         "col_count": "12",
         "has_company": "0"
     },
@@ -5063,7 +5070,7 @@
     {
         "TABLE_NAME": "role_permissions",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "3757",
+        "TABLE_ROWS": "3490",
         "col_count": "7",
         "has_company": "0"
     },
@@ -5126,7 +5133,7 @@
     {
         "TABLE_NAME": "schema_migrations",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "394",
+        "TABLE_ROWS": "703",
         "col_count": "8",
         "has_company": "0"
     },
@@ -5616,7 +5623,7 @@
     {
         "TABLE_NAME": "suppliers",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "75",
+        "TABLE_ROWS": "76",
         "col_count": "31",
         "has_company": "1"
     },
@@ -5903,7 +5910,7 @@
     {
         "TABLE_NAME": "task_assignments",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "6431",
+        "TABLE_ROWS": "6607",
         "col_count": "15",
         "has_company": "1"
     },
@@ -6092,7 +6099,7 @@
     {
         "TABLE_NAME": "timesheet",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "654",
+        "TABLE_ROWS": "655",
         "col_count": "60",
         "has_company": "1"
     },
@@ -6841,14 +6848,14 @@
     {
         "TABLE_NAME": "work_escalations",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "2986",
+        "TABLE_ROWS": "3159",
         "col_count": "13",
         "has_company": "1"
     },
     {
         "TABLE_NAME": "work_items",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "3461",
+        "TABLE_ROWS": "3597",
         "col_count": "41",
         "has_company": "1"
     },

@@ -4313,7 +4313,7 @@
         "guard_evidence": "insidebar.php ⇐ enforce_current_page_view_permission()",
         "w2_why": "الموازنة العامة (budget_master.php)",
         "src_ref": "live:gov_screen_cycle + 10 › 02_شاشة_بشاشة › ص459",
-        "updated_at": "2026-08-27 10:10:57",
+        "updated_at": "2026-08-28 19:09:05",
         "canonical_label_ar": "الموازنة العامة",
         "surface_kind": "PROJECTION",
         "ownership_verdict": "DOMAIN_SOURCE",
@@ -4322,9 +4322,9 @@
         "grain_ar": "",
         "source_of_truth": "",
         "state_model_ref": "",
-        "finance_debt_class": "",
-        "debt_owner": "",
-        "debt_wave": "",
+        "finance_debt_class": "PROJECTION",
+        "debt_owner": "DEP-05",
+        "debt_wave": "W13.5",
         "verdict_rule": "RPR-W15 §٤-٢ · إعادة ملكية من مكتب الرئيس إلى إدارتها | مسمى من nav_canonical APPROVED | سياسة من المنح الحي: 7 دورا",
         "verdict_at": "2026-08-27 08:38:32"
     },
@@ -4757,7 +4757,7 @@
         "guard_evidence": "enforce_current_page_view_permission()",
         "w2_why": "",
         "src_ref": "قياسٌ حيٌّ على القرص",
-        "updated_at": "2026-08-27 10:35:44",
+        "updated_at": "2026-08-28 19:09:05",
         "canonical_label_ar": "التسعير اليومي",
         "surface_kind": "SOURCE",
         "ownership_verdict": "DOMAIN_SOURCE",
@@ -4766,9 +4766,9 @@
         "grain_ar": "",
         "source_of_truth": "",
         "state_model_ref": "",
-        "finance_debt_class": "",
-        "debt_owner": "",
-        "debt_wave": "",
+        "finance_debt_class": "SOURCE",
+        "debt_owner": "DEP-05",
+        "debt_wave": "W13.5",
         "verdict_rule": "حي على القرص وينقصه مالك او حارس — دين معدود (البند 49) | مسمى من nav_canonical | سياسة من المنح الحي: 3 دورا | البند 18 — مجلد c:\/wamp64\/www\/ems\/finance بغلبة مطلقة 68 من 93 | EDC: صار له مالك وحارس فصار مصدر نطاقه",
         "verdict_at": "2026-08-27 00:58:05"
     },
@@ -9826,7 +9826,7 @@
         "guard_evidence": "",
         "w2_why": "القوائم المالية (fin_statements.php)",
         "src_ref": "live:gov_screen_cycle + 10 › 02_شاشة_بشاشة › ص463",
-        "updated_at": "2026-08-27 08:38:32",
+        "updated_at": "2026-08-28 19:09:05",
         "canonical_label_ar": "",
         "surface_kind": "",
         "ownership_verdict": "RETIRE",
@@ -9835,9 +9835,9 @@
         "grain_ar": "",
         "source_of_truth": "",
         "state_model_ref": "",
-        "finance_debt_class": "",
-        "debt_owner": "",
-        "debt_wave": "",
+        "finance_debt_class": "RETIRE",
+        "debt_owner": "DEP-05",
+        "debt_wave": "W13.5",
         "verdict_rule": "RPR-W15 §٤-٢ · إعادة ملكية مستهدف من مكتب الرئيس",
         "verdict_at": "2026-08-27 08:38:32"
     },
@@ -10825,7 +10825,7 @@
         "guard_evidence": "",
         "w2_why": "هامش الربح للعقد والواقعة (margin.php)",
         "src_ref": "live:gov_screen_cycle + 10 › 02_شاشة_بشاشة › ص464",
-        "updated_at": "2026-08-27 08:38:32",
+        "updated_at": "2026-08-28 19:09:05",
         "canonical_label_ar": "",
         "surface_kind": "",
         "ownership_verdict": "RETIRE",
@@ -10834,9 +10834,9 @@
         "grain_ar": "",
         "source_of_truth": "",
         "state_model_ref": "",
-        "finance_debt_class": "",
-        "debt_owner": "",
-        "debt_wave": "",
+        "finance_debt_class": "RETIRE",
+        "debt_owner": "DEP-05",
+        "debt_wave": "W13.5",
         "verdict_rule": "RPR-W15 §٤-٢ · إعادة ملكية مستهدف من مكتب الرئيس",
         "verdict_at": "2026-08-27 08:38:32"
     },
@@ -18652,7 +18652,7 @@
         "screen_file": "approval_lag_report.php",
         "route": "Reports\/approval_lag_report.php",
         "route_rule": "DISK_SCAN",
-        "owner_code": "DEP-05",
+        "owner_code": "EX-CEO",
         "owner_role": "مكتب الرئيس التنفيذي والنواب",
         "owner_rule": "W10_SPLIT:W10_PARENT_DEFAULT",
         "lifecycle": "LIVE_UNREGISTERED",
@@ -18669,7 +18669,7 @@
         "guard_evidence": "enforce_current_page_view_permission()",
         "w2_why": "",
         "src_ref": "قياسٌ حيٌّ على القرص",
-        "updated_at": "2026-08-27 10:10:58",
+        "updated_at": "2026-08-28 19:09:04",
         "canonical_label_ar": "الاعتمادات المتأخرة والوثائق",
         "surface_kind": "PROJECTION",
         "ownership_verdict": "DOMAIN_SOURCE",
@@ -18681,8 +18681,8 @@
         "finance_debt_class": "",
         "debt_owner": "",
         "debt_wave": "",
-        "verdict_rule": "RPR-W15 §٤-٢ · إعادة ملكية من مكتب الرئيس إلى إدارتها | مسمى من nav_canonical | سياسة من المنح الحي: 4 دورا",
-        "verdict_at": "2026-08-27 08:38:32"
+        "verdict_rule": "RPR-W15 §٤-٢ · إعادة ملكية من مكتب الرئيس إلى إدارتها",
+        "verdict_at": "2026-08-28 19:07:29"
     },
     {
         "screen_id": "SCR-0506",
@@ -18763,7 +18763,7 @@
         "screen_file": "daily_units_report.php",
         "route": "Reports\/daily_units_report.php",
         "route_rule": "DISK_SCAN",
-        "owner_code": "DEP-11",
+        "owner_code": "EX-CEO",
         "owner_role": "مكتب الرئيس التنفيذي والنواب",
         "owner_rule": "W10_SPLIT:W10_PARENT_DEFAULT",
         "lifecycle": "LIVE_UNREGISTERED",
@@ -18780,10 +18780,10 @@
         "guard_evidence": "insidebar.php ⇐ enforce_current_page_view_permission()",
         "w2_why": "",
         "src_ref": "قياسٌ حيٌّ على القرص",
-        "updated_at": "2026-08-27 11:55:10",
+        "updated_at": "2026-08-28 19:09:04",
         "canonical_label_ar": "سجل الوحدات اليومية",
         "surface_kind": "PROJECTION",
-        "ownership_verdict": "DOMAIN_PROJECTION",
+        "ownership_verdict": "DOMAIN_SOURCE",
         "action_guard": "",
         "permission_policy": "DOMAIN_PROJECTION_READ",
         "grain_ar": "",
@@ -18792,8 +18792,8 @@
         "finance_debt_class": "",
         "debt_owner": "",
         "debt_wave": "",
-        "verdict_rule": "RPR-W15 §٤-٢ · إعادة ملكية من مكتب الرئيس إلى إدارتها | مسمى من nav_canonical | سياسة من المنح الحي: 3 دورا | حكم المالك: التقرير الذي يجمع حقائق لا يملكها — اسقاط لا مصدر · والاسم يبقى · قياس: صفر كتابة | حكم المالك: التقرير الذي يجمع حقائ",
-        "verdict_at": "2026-08-27 11:55:10"
+        "verdict_rule": "RPR-W15 §٤-٢ · إعادة ملكية من مكتب الرئيس إلى إدارتها",
+        "verdict_at": "2026-08-28 19:07:29"
     },
     {
         "screen_id": "SCR-0509",
@@ -19022,7 +19022,7 @@
         "screen_file": "margin_report.php",
         "route": "Reports\/margin_report.php",
         "route_rule": "DISK_SCAN",
-        "owner_code": "DEP-05",
+        "owner_code": "EX-CEO",
         "owner_role": "مكتب الرئيس التنفيذي والنواب",
         "owner_rule": "W10_SPLIT:W10_PARENT_DEFAULT",
         "lifecycle": "LIVE_UNREGISTERED",
@@ -19039,7 +19039,7 @@
         "guard_evidence": "insidebar.php ⇐ enforce_current_page_view_permission()",
         "w2_why": "",
         "src_ref": "قياسٌ حيٌّ على القرص",
-        "updated_at": "2026-08-27 10:10:58",
+        "updated_at": "2026-08-28 19:09:04",
         "canonical_label_ar": "هامش الربح للعقد والواقعة",
         "surface_kind": "PROJECTION",
         "ownership_verdict": "DOMAIN_SOURCE",
@@ -19051,8 +19051,8 @@
         "finance_debt_class": "",
         "debt_owner": "",
         "debt_wave": "",
-        "verdict_rule": "RPR-W15 §٤-٢ · إعادة ملكية من مكتب الرئيس إلى إدارتها | مسمى من nav_canonical | سياسة من المنح الحي: 9 دورا",
-        "verdict_at": "2026-08-27 08:38:32"
+        "verdict_rule": "RPR-W15 §٤-٢ · إعادة ملكية من مكتب الرئيس إلى إدارتها",
+        "verdict_at": "2026-08-28 19:07:29"
     },
     {
         "screen_id": "SCR-0516",
@@ -19651,9 +19651,9 @@
         "screen_file": "risk_dept_ceo.php",
         "route": "Risk\/risk_dept_ceo.php",
         "route_rule": "SURFACE_DISK_PATH",
-        "owner_code": "DEP-09",
+        "owner_code": "EX-CEO",
         "owner_role": "مكتب الرئيس التنفيذي والنواب",
-        "owner_rule": "W01_SURFACE_REGISTER",
+        "owner_rule": "W10_SPLIT:W10_PARENT_DEFAULT",
         "lifecycle": "LIVE_REGISTERED",
         "lifecycle_rule": "IN_GOV_SCREEN_CYCLE",
         "parent_screen_id": "",
@@ -19668,7 +19668,7 @@
         "guard_evidence": "Risk\/dept_risk_space.php ⇐ enforce_current_page_view_permission()",
         "w2_why": "المخاطر المؤسسية (risk_dept_ceo.php)",
         "src_ref": "live:gov_screen_cycle + 10 › 02_شاشة_بشاشة › ص469",
-        "updated_at": "2026-08-27 10:10:58",
+        "updated_at": "2026-08-28 19:09:04",
         "canonical_label_ar": "المخاطر المؤسسية",
         "surface_kind": "PROJECTION",
         "ownership_verdict": "DOMAIN_SOURCE",
@@ -19680,8 +19680,8 @@
         "finance_debt_class": "",
         "debt_owner": "",
         "debt_wave": "",
-        "verdict_rule": "RPR-W15 §٤-٢ · إعادة ملكية من مكتب الرئيس إلى إدارتها | مسمى من gov_screen_cycle | سياسة من المنح الحي: 5 دورا",
-        "verdict_at": "2026-08-27 08:38:32"
+        "verdict_rule": "RPR-W15 §٤-٢ · إعادة ملكية من مكتب الرئيس إلى إدارتها",
+        "verdict_at": "2026-08-28 19:07:29"
     },
     {
         "screen_id": "SCR-0533",
@@ -27364,7 +27364,7 @@
         "guard_evidence": "الملف ينادي دالة حارسة في عدة مضمنة",
         "w2_why": "لوحة الحوكمة والالتزام (gov_board.php)",
         "src_ref": "RPR-W14 · المخاطر والحوكمة والمراجعة",
-        "updated_at": "2026-08-27 07:42:56",
+        "updated_at": "2026-08-28 19:07:25",
         "canonical_label_ar": "لوحة الحوكمة والالتزام",
         "surface_kind": "PROJECTION",
         "ownership_verdict": "DOMAIN_PROJECTION",
@@ -27377,7 +27377,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W14 §٢ · صنف السطح وحكم ملكيته معلنان في سجل الموجة لا مشتقان من اسم ملف",
-        "verdict_at": "2026-08-27 06:27:29"
+        "verdict_at": "2026-08-28 19:07:25"
     },
     {
         "screen_id": "SCR-0742",
@@ -27401,7 +27401,7 @@
         "guard_evidence": "الملف ينادي دالة حارسة في عدة مضمنة",
         "w2_why": "سجل السياسات (policies.php)",
         "src_ref": "RPR-W14 · المخاطر والحوكمة والمراجعة",
-        "updated_at": "2026-08-27 06:27:29",
+        "updated_at": "2026-08-28 19:07:25",
         "canonical_label_ar": "سجل السياسات",
         "surface_kind": "SOURCE",
         "ownership_verdict": "DOMAIN_SOURCE",
@@ -27414,7 +27414,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W14 §٢ · صنف السطح وحكم ملكيته معلنان في سجل الموجة لا مشتقان من اسم ملف",
-        "verdict_at": "2026-08-27 06:27:29"
+        "verdict_at": "2026-08-28 19:07:25"
     },
     {
         "screen_id": "SCR-0743",
@@ -27438,7 +27438,7 @@
         "guard_evidence": "الملف ينادي دالة حارسة في عدة مضمنة",
         "w2_why": "الالتزامات التنظيمية (obligations.php)",
         "src_ref": "RPR-W14 · المخاطر والحوكمة والمراجعة",
-        "updated_at": "2026-08-27 06:27:29",
+        "updated_at": "2026-08-28 19:07:25",
         "canonical_label_ar": "الالتزامات التنظيمية",
         "surface_kind": "SOURCE",
         "ownership_verdict": "DOMAIN_SOURCE",
@@ -27451,7 +27451,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W14 §٢ · صنف السطح وحكم ملكيته معلنان في سجل الموجة لا مشتقان من اسم ملف",
-        "verdict_at": "2026-08-27 06:27:29"
+        "verdict_at": "2026-08-28 19:07:25"
     },
     {
         "screen_id": "SCR-0744",
@@ -27475,7 +27475,7 @@
         "guard_evidence": "الملف ينادي دالة حارسة في عدة مضمنة",
         "w2_why": "تقويم الامتثال (compliance_calendar.php)",
         "src_ref": "RPR-W14 · المخاطر والحوكمة والمراجعة",
-        "updated_at": "2026-08-27 06:27:29",
+        "updated_at": "2026-08-28 19:07:25",
         "canonical_label_ar": "تقويم الامتثال",
         "surface_kind": "PROJECTION",
         "ownership_verdict": "DOMAIN_PROJECTION",
@@ -27488,7 +27488,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W14 §٢ · صنف السطح وحكم ملكيته معلنان في سجل الموجة لا مشتقان من اسم ملف",
-        "verdict_at": "2026-08-27 06:27:29"
+        "verdict_at": "2026-08-28 19:07:25"
     },
     {
         "screen_id": "SCR-0745",
@@ -27512,7 +27512,7 @@
         "guard_evidence": "الملف ينادي دالة حارسة في عدة مضمنة",
         "w2_why": "التقديمات النظامية (regulatory_filings.php)",
         "src_ref": "RPR-W14 · المخاطر والحوكمة والمراجعة",
-        "updated_at": "2026-08-27 06:27:29",
+        "updated_at": "2026-08-28 19:07:25",
         "canonical_label_ar": "التقديمات النظامية",
         "surface_kind": "SOURCE",
         "ownership_verdict": "DOMAIN_SOURCE",
@@ -27525,7 +27525,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W14 §٢ · صنف السطح وحكم ملكيته معلنان في سجل الموجة لا مشتقان من اسم ملف",
-        "verdict_at": "2026-08-27 06:27:29"
+        "verdict_at": "2026-08-28 19:07:25"
     },
     {
         "screen_id": "SCR-0746",
@@ -27549,7 +27549,7 @@
         "guard_evidence": "الملف ينادي دالة حارسة في عدة مضمنة",
         "w2_why": "فصل الواجبات المتعارضة (sod_conflicts.php)",
         "src_ref": "RPR-W14 · المخاطر والحوكمة والمراجعة",
-        "updated_at": "2026-08-27 06:27:29",
+        "updated_at": "2026-08-28 19:07:25",
         "canonical_label_ar": "فصل الواجبات المتعارضة",
         "surface_kind": "SOURCE",
         "ownership_verdict": "DOMAIN_SOURCE",
@@ -27562,7 +27562,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W14 §٢ · صنف السطح وحكم ملكيته معلنان في سجل الموجة لا مشتقان من اسم ملف",
-        "verdict_at": "2026-08-27 06:27:29"
+        "verdict_at": "2026-08-28 19:07:25"
     },
     {
         "screen_id": "SCR-0747",
@@ -27586,7 +27586,7 @@
         "guard_evidence": "الملف ينادي دالة حارسة في عدة مضمنة",
         "w2_why": "تضارب المصالح (conflict_disclosures.php)",
         "src_ref": "RPR-W14 · المخاطر والحوكمة والمراجعة",
-        "updated_at": "2026-08-27 06:27:29",
+        "updated_at": "2026-08-28 19:07:25",
         "canonical_label_ar": "تضارب المصالح",
         "surface_kind": "SOURCE",
         "ownership_verdict": "DOMAIN_SOURCE",
@@ -27599,7 +27599,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W14 §٢ · صنف السطح وحكم ملكيته معلنان في سجل الموجة لا مشتقان من اسم ملف",
-        "verdict_at": "2026-08-27 06:27:29"
+        "verdict_at": "2026-08-28 19:07:25"
     },
     {
         "screen_id": "SCR-0748",
@@ -27623,7 +27623,7 @@
         "guard_evidence": "الملف ينادي دالة حارسة في عدة مضمنة",
         "w2_why": "الأطراف ذات العلاقة (related_parties.php)",
         "src_ref": "RPR-W14 · المخاطر والحوكمة والمراجعة",
-        "updated_at": "2026-08-27 06:27:29",
+        "updated_at": "2026-08-28 19:07:25",
         "canonical_label_ar": "الأطراف ذات العلاقة",
         "surface_kind": "SOURCE",
         "ownership_verdict": "DOMAIN_SOURCE",
@@ -27636,7 +27636,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W14 §٢ · صنف السطح وحكم ملكيته معلنان في سجل الموجة لا مشتقان من اسم ملف",
-        "verdict_at": "2026-08-27 06:27:29"
+        "verdict_at": "2026-08-28 19:07:25"
     },
     {
         "screen_id": "SCR-0749",
@@ -27660,7 +27660,7 @@
         "guard_evidence": "الملف ينادي دالة حارسة في عدة مضمنة",
         "w2_why": "الهدايا والضيافة (gifts_hospitality.php)",
         "src_ref": "RPR-W14 · المخاطر والحوكمة والمراجعة",
-        "updated_at": "2026-08-27 06:27:30",
+        "updated_at": "2026-08-28 19:07:26",
         "canonical_label_ar": "الهدايا والضيافة",
         "surface_kind": "SOURCE",
         "ownership_verdict": "DOMAIN_SOURCE",
@@ -27673,7 +27673,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W14 §٢ · صنف السطح وحكم ملكيته معلنان في سجل الموجة لا مشتقان من اسم ملف",
-        "verdict_at": "2026-08-27 06:27:30"
+        "verdict_at": "2026-08-28 19:07:26"
     },
     {
         "screen_id": "SCR-0750",
@@ -27697,7 +27697,7 @@
         "guard_evidence": "الملف ينادي دالة حارسة في عدة مضمنة",
         "w2_why": "إقرارات مدونة السلوك (conduct_acknowledgements.php)",
         "src_ref": "RPR-W14 · المخاطر والحوكمة والمراجعة",
-        "updated_at": "2026-08-27 06:27:30",
+        "updated_at": "2026-08-28 19:07:26",
         "canonical_label_ar": "إقرارات مدونة السلوك",
         "surface_kind": "SOURCE",
         "ownership_verdict": "DOMAIN_SOURCE",
@@ -27710,7 +27710,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W14 §٢ · صنف السطح وحكم ملكيته معلنان في سجل الموجة لا مشتقان من اسم ملف",
-        "verdict_at": "2026-08-27 06:27:30"
+        "verdict_at": "2026-08-28 19:07:26"
     },
     {
         "screen_id": "SCR-0751",
@@ -27734,7 +27734,7 @@
         "guard_evidence": "الملف ينادي دالة حارسة في عدة مضمنة",
         "w2_why": "سلاليم الاعتماد (approval_ladders.php)",
         "src_ref": "RPR-W14 · المخاطر والحوكمة والمراجعة",
-        "updated_at": "2026-08-27 06:27:30",
+        "updated_at": "2026-08-28 19:07:26",
         "canonical_label_ar": "سلاليم الاعتماد",
         "surface_kind": "SOURCE",
         "ownership_verdict": "DOMAIN_SOURCE",
@@ -27747,7 +27747,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W14 §٢ · صنف السطح وحكم ملكيته معلنان في سجل الموجة لا مشتقان من اسم ملف",
-        "verdict_at": "2026-08-27 06:27:30"
+        "verdict_at": "2026-08-28 19:07:26"
     },
     {
         "screen_id": "SCR-0752",
@@ -27771,7 +27771,7 @@
         "guard_evidence": "الملف ينادي دالة حارسة في عدة مضمنة",
         "w2_why": "بلاغات النزاهة المحمية (integrity_reports.php)",
         "src_ref": "RPR-W14 · المخاطر والحوكمة والمراجعة",
-        "updated_at": "2026-08-27 06:27:30",
+        "updated_at": "2026-08-28 19:07:26",
         "canonical_label_ar": "بلاغات النزاهة المحمية",
         "surface_kind": "SOURCE",
         "ownership_verdict": "DOMAIN_SOURCE",
@@ -27784,7 +27784,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W14 §٢ · صنف السطح وحكم ملكيته معلنان في سجل الموجة لا مشتقان من اسم ملف",
-        "verdict_at": "2026-08-27 06:27:30"
+        "verdict_at": "2026-08-28 19:07:26"
     },
     {
         "screen_id": "SCR-0753",
@@ -27808,7 +27808,7 @@
         "guard_evidence": "الملف ينادي دالة حارسة في عدة مضمنة",
         "w2_why": "التحقيقات (investigations.php)",
         "src_ref": "RPR-W14 · المخاطر والحوكمة والمراجعة",
-        "updated_at": "2026-08-27 06:27:30",
+        "updated_at": "2026-08-28 19:07:26",
         "canonical_label_ar": "التحقيقات",
         "surface_kind": "SOURCE",
         "ownership_verdict": "DOMAIN_SOURCE",
@@ -27821,7 +27821,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W14 §٢ · صنف السطح وحكم ملكيته معلنان في سجل الموجة لا مشتقان من اسم ملف",
-        "verdict_at": "2026-08-27 06:27:30"
+        "verdict_at": "2026-08-28 19:07:26"
     },
     {
         "screen_id": "SCR-0754",
@@ -27845,7 +27845,7 @@
         "guard_evidence": "الملف ينادي دالة حارسة في عدة مضمنة",
         "w2_why": "سجل الإخلالات (breaches.php)",
         "src_ref": "RPR-W14 · المخاطر والحوكمة والمراجعة",
-        "updated_at": "2026-08-27 06:27:30",
+        "updated_at": "2026-08-28 19:07:26",
         "canonical_label_ar": "سجل الإخلالات",
         "surface_kind": "SOURCE",
         "ownership_verdict": "DOMAIN_SOURCE",
@@ -27858,7 +27858,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W14 §٢ · صنف السطح وحكم ملكيته معلنان في سجل الموجة لا مشتقان من اسم ملف",
-        "verdict_at": "2026-08-27 06:27:30"
+        "verdict_at": "2026-08-28 19:07:26"
     },
     {
         "screen_id": "SCR-0755",
@@ -27882,7 +27882,7 @@
         "guard_evidence": "الملف ينادي دالة حارسة في عدة مضمنة",
         "w2_why": "الإجراءات التصحيحية (corrective_actions.php)",
         "src_ref": "RPR-W14 · المخاطر والحوكمة والمراجعة",
-        "updated_at": "2026-08-27 06:27:30",
+        "updated_at": "2026-08-28 19:07:26",
         "canonical_label_ar": "الإجراءات التصحيحية",
         "surface_kind": "SOURCE",
         "ownership_verdict": "DOMAIN_SOURCE",
@@ -27895,7 +27895,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W14 §٢ · صنف السطح وحكم ملكيته معلنان في سجل الموجة لا مشتقان من اسم ملف",
-        "verdict_at": "2026-08-27 06:27:30"
+        "verdict_at": "2026-08-28 19:07:26"
     },
     {
         "screen_id": "SCR-0756",
@@ -27919,7 +27919,7 @@
         "guard_evidence": "الملف ينادي دالة حارسة في عدة مضمنة",
         "w2_why": "متابعة نتائج المراجعة (audit_followup.php)",
         "src_ref": "RPR-W14 · المخاطر والحوكمة والمراجعة",
-        "updated_at": "2026-08-27 06:27:30",
+        "updated_at": "2026-08-28 19:07:26",
         "canonical_label_ar": "متابعة نتائج المراجعة",
         "surface_kind": "PROJECTION",
         "ownership_verdict": "DOMAIN_PROJECTION",
@@ -27932,7 +27932,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W14 §٢ · صنف السطح وحكم ملكيته معلنان في سجل الموجة لا مشتقان من اسم ملف",
-        "verdict_at": "2026-08-27 06:27:30"
+        "verdict_at": "2026-08-28 19:07:26"
     },
     {
         "screen_id": "SCR-0757",
@@ -27956,7 +27956,7 @@
         "guard_evidence": "الملف ينادي دالة حارسة في عدة مضمنة",
         "w2_why": "اللجان وحوكمة الاجتماعات (committees.php)",
         "src_ref": "RPR-W14 · المخاطر والحوكمة والمراجعة",
-        "updated_at": "2026-08-27 06:27:30",
+        "updated_at": "2026-08-28 19:07:26",
         "canonical_label_ar": "اللجان وحوكمة الاجتماعات",
         "surface_kind": "SOURCE",
         "ownership_verdict": "DOMAIN_SOURCE",
@@ -27969,7 +27969,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W14 §٢ · صنف السطح وحكم ملكيته معلنان في سجل الموجة لا مشتقان من اسم ملف",
-        "verdict_at": "2026-08-27 06:27:30"
+        "verdict_at": "2026-08-28 19:07:26"
     },
     {
         "screen_id": "SCR-0758",
@@ -27993,7 +27993,7 @@
         "guard_evidence": "الملف ينادي دالة حارسة في عدة مضمنة",
         "w2_why": "تصنيف المخاطر (risk_taxonomy.php)",
         "src_ref": "RPR-W14 · المخاطر والحوكمة والمراجعة",
-        "updated_at": "2026-08-27 06:27:30",
+        "updated_at": "2026-08-28 19:07:26",
         "canonical_label_ar": "تصنيف المخاطر",
         "surface_kind": "SOURCE",
         "ownership_verdict": "DOMAIN_SOURCE",
@@ -28006,7 +28006,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W14 §٢ · صنف السطح وحكم ملكيته معلنان في سجل الموجة لا مشتقان من اسم ملف",
-        "verdict_at": "2026-08-27 06:27:30"
+        "verdict_at": "2026-08-28 19:07:26"
     },
     {
         "screen_id": "SCR-0759",
@@ -28030,7 +28030,7 @@
         "guard_evidence": "الملف ينادي دالة حارسة في عدة مضمنة",
         "w2_why": "أحداث المخاطر والخسائر (risk_events.php)",
         "src_ref": "RPR-W14 · المخاطر والحوكمة والمراجعة",
-        "updated_at": "2026-08-27 06:27:31",
+        "updated_at": "2026-08-28 19:07:26",
         "canonical_label_ar": "أحداث المخاطر والخسائر",
         "surface_kind": "SOURCE",
         "ownership_verdict": "DOMAIN_SOURCE",
@@ -28043,7 +28043,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W14 §٢ · صنف السطح وحكم ملكيته معلنان في سجل الموجة لا مشتقان من اسم ملف",
-        "verdict_at": "2026-08-27 06:27:31"
+        "verdict_at": "2026-08-28 19:07:26"
     },
     {
         "screen_id": "SCR-0760",
@@ -28067,7 +28067,7 @@
         "guard_evidence": "الملف ينادي دالة حارسة في عدة مضمنة",
         "w2_why": "تصعيدات المخاطر (risk_escalations.php)",
         "src_ref": "RPR-W14 · المخاطر والحوكمة والمراجعة",
-        "updated_at": "2026-08-27 06:27:31",
+        "updated_at": "2026-08-28 19:07:26",
         "canonical_label_ar": "تصعيدات المخاطر",
         "surface_kind": "SOURCE",
         "ownership_verdict": "DOMAIN_SOURCE",
@@ -28080,7 +28080,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W14 §٢ · صنف السطح وحكم ملكيته معلنان في سجل الموجة لا مشتقان من اسم ملف",
-        "verdict_at": "2026-08-27 06:27:31"
+        "verdict_at": "2026-08-28 19:07:26"
     },
     {
         "screen_id": "SCR-0761",
@@ -28104,7 +28104,7 @@
         "guard_evidence": "الملف ينادي دالة حارسة في عدة مضمنة",
         "w2_why": "سجل الإغلاق والأدلة (risk_closure.php)",
         "src_ref": "RPR-W14 · المخاطر والحوكمة والمراجعة",
-        "updated_at": "2026-08-27 06:27:31",
+        "updated_at": "2026-08-28 19:07:26",
         "canonical_label_ar": "سجل الإغلاق والأدلة",
         "surface_kind": "SOURCE",
         "ownership_verdict": "DOMAIN_SOURCE",
@@ -28117,7 +28117,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W14 §٢ · صنف السطح وحكم ملكيته معلنان في سجل الموجة لا مشتقان من اسم ملف",
-        "verdict_at": "2026-08-27 06:27:31"
+        "verdict_at": "2026-08-28 19:07:26"
     },
     {
         "screen_id": "SCR-0762",
@@ -28141,7 +28141,7 @@
         "guard_evidence": "الملف ينادي دالة حارسة في عدة مضمنة",
         "w2_why": "لوحة المراجعة الداخلية (iaf_overview.php)",
         "src_ref": "RPR-W14 · المخاطر والحوكمة والمراجعة",
-        "updated_at": "2026-08-27 06:27:31",
+        "updated_at": "2026-08-28 19:07:26",
         "canonical_label_ar": "لوحة المراجعة الداخلية",
         "surface_kind": "PROJECTION",
         "ownership_verdict": "AUDIT_ASSURANCE",
@@ -28154,7 +28154,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W14 §٢ · صنف السطح وحكم ملكيته معلنان في سجل الموجة لا مشتقان من اسم ملف",
-        "verdict_at": "2026-08-27 06:27:31"
+        "verdict_at": "2026-08-28 19:07:26"
     },
     {
         "screen_id": "SCR-0763",
@@ -28178,7 +28178,7 @@
         "guard_evidence": "الملف ينادي دالة حارسة في عدة مضمنة",
         "w2_why": "برامج المراجعة (iaf_audit_programs.php)",
         "src_ref": "RPR-W14 · المخاطر والحوكمة والمراجعة",
-        "updated_at": "2026-08-27 06:27:31",
+        "updated_at": "2026-08-28 19:07:26",
         "canonical_label_ar": "برامج المراجعة",
         "surface_kind": "SOURCE",
         "ownership_verdict": "AUDIT_ASSURANCE",
@@ -28191,7 +28191,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W14 §٢ · صنف السطح وحكم ملكيته معلنان في سجل الموجة لا مشتقان من اسم ملف",
-        "verdict_at": "2026-08-27 06:27:31"
+        "verdict_at": "2026-08-28 19:07:26"
     },
     {
         "screen_id": "SCR-0764",
@@ -28215,7 +28215,7 @@
         "guard_evidence": "الملف ينادي دالة حارسة في عدة مضمنة",
         "w2_why": "طلبات الأدلة (iaf_evidence_requests.php)",
         "src_ref": "RPR-W14 · المخاطر والحوكمة والمراجعة",
-        "updated_at": "2026-08-27 06:27:31",
+        "updated_at": "2026-08-28 19:07:26",
         "canonical_label_ar": "طلبات الأدلة",
         "surface_kind": "SOURCE",
         "ownership_verdict": "AUDIT_ASSURANCE",
@@ -28228,7 +28228,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W14 §٢ · صنف السطح وحكم ملكيته معلنان في سجل الموجة لا مشتقان من اسم ملف",
-        "verdict_at": "2026-08-27 06:27:31"
+        "verdict_at": "2026-08-28 19:07:26"
     },
     {
         "screen_id": "SCR-0765",
@@ -28252,7 +28252,7 @@
         "guard_evidence": "الملف ينادي دالة حارسة في عدة مضمنة",
         "w2_why": "العينات ونتائج الاختبارات (iaf_test_samples.php)",
         "src_ref": "RPR-W14 · المخاطر والحوكمة والمراجعة",
-        "updated_at": "2026-08-27 06:27:31",
+        "updated_at": "2026-08-28 19:07:26",
         "canonical_label_ar": "العينات ونتائج الاختبارات",
         "surface_kind": "SOURCE",
         "ownership_verdict": "AUDIT_ASSURANCE",
@@ -28265,7 +28265,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W14 §٢ · صنف السطح وحكم ملكيته معلنان في سجل الموجة لا مشتقان من اسم ملف",
-        "verdict_at": "2026-08-27 06:27:31"
+        "verdict_at": "2026-08-28 19:07:26"
     },
     {
         "screen_id": "SCR-0766",
@@ -28289,7 +28289,7 @@
         "guard_evidence": "الملف ينادي دالة حارسة في عدة مضمنة",
         "w2_why": "مخاطر وظيفة المراجعة (iaf_function_risks.php)",
         "src_ref": "RPR-W14 · المخاطر والحوكمة والمراجعة",
-        "updated_at": "2026-08-27 06:27:31",
+        "updated_at": "2026-08-28 19:07:26",
         "canonical_label_ar": "مخاطر وظيفة المراجعة",
         "surface_kind": "SOURCE",
         "ownership_verdict": "AUDIT_ASSURANCE",
@@ -28302,7 +28302,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W14 §٢ · صنف السطح وحكم ملكيته معلنان في سجل الموجة لا مشتقان من اسم ملف",
-        "verdict_at": "2026-08-27 06:27:31"
+        "verdict_at": "2026-08-28 19:07:26"
     },
     {
         "screen_id": "SCR-0767",
@@ -28326,7 +28326,7 @@
         "guard_evidence": "permissions_helper.php",
         "w2_why": "التقرير اليومي التنفيذي (exec_daily_report.php)",
         "src_ref": "RPR-W15 · المساحات والتقارير",
-        "updated_at": "2026-08-27 10:03:12",
+        "updated_at": "2026-08-28 19:07:29",
         "canonical_label_ar": "التقرير اليومي التنفيذي",
         "surface_kind": "PROJECTION",
         "ownership_verdict": "EXECUTIVE_PROJECTION",
@@ -28339,7 +28339,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W15 §١ · اسقاط لا مصدر - يقرأ site_day عند DEP-12",
-        "verdict_at": "2026-08-27 09:52:03"
+        "verdict_at": "2026-08-28 19:07:29"
     },
     {
         "screen_id": "SCR-0768",
@@ -28363,7 +28363,7 @@
         "guard_evidence": "permissions_helper.php",
         "w2_why": "تفصيل توقفات اليوم (exec_daily_stops.php)",
         "src_ref": "RPR-W15 · المساحات والتقارير",
-        "updated_at": "2026-08-27 09:52:03",
+        "updated_at": "2026-08-28 19:07:29",
         "canonical_label_ar": "تفصيل توقفات اليوم",
         "surface_kind": "PROJECTION",
         "ownership_verdict": "EXECUTIVE_PROJECTION",
@@ -28376,7 +28376,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W15 §١ · اسقاط لا مصدر - يقرأ ops_stop_register عند DEP-11",
-        "verdict_at": "2026-08-27 09:52:03"
+        "verdict_at": "2026-08-28 19:07:29"
     },
     {
         "screen_id": "SCR-0769",
@@ -28400,7 +28400,7 @@
         "guard_evidence": "permissions_helper.php",
         "w2_why": "انحرافات وقرارات اليوم (exec_daily_deviations.php)",
         "src_ref": "RPR-W15 · المساحات والتقارير",
-        "updated_at": "2026-08-27 09:52:03",
+        "updated_at": "2026-08-28 19:07:29",
         "canonical_label_ar": "انحرافات وقرارات اليوم",
         "surface_kind": "PROJECTION",
         "ownership_verdict": "EXECUTIVE_PROJECTION",
@@ -28413,7 +28413,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W15 §١ · اسقاط لا مصدر - يقرأ ctl_deviation عند DEP-11",
-        "verdict_at": "2026-08-27 09:52:03"
+        "verdict_at": "2026-08-28 19:07:29"
     },
     {
         "screen_id": "SCR-0770",
@@ -28437,7 +28437,7 @@
         "guard_evidence": "permissions_helper.php",
         "w2_why": "التقرير الأسبوعي التنفيذي (exec_weekly_report.php)",
         "src_ref": "RPR-W15 · المساحات والتقارير",
-        "updated_at": "2026-08-27 09:52:03",
+        "updated_at": "2026-08-28 19:07:29",
         "canonical_label_ar": "التقرير الأسبوعي التنفيذي",
         "surface_kind": "PROJECTION",
         "ownership_verdict": "EXECUTIVE_PROJECTION",
@@ -28450,7 +28450,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W15 §١ · اسقاط لا مصدر - يقرأ ops_stop_register عند DEP-11",
-        "verdict_at": "2026-08-27 09:52:03"
+        "verdict_at": "2026-08-28 19:07:29"
     },
     {
         "screen_id": "SCR-0771",
@@ -28474,7 +28474,7 @@
         "guard_evidence": "permissions_helper.php",
         "w2_why": "التقرير الشهري التنفيذي (exec_monthly_pack.php)",
         "src_ref": "RPR-W15 · المساحات والتقارير",
-        "updated_at": "2026-08-27 09:52:03",
+        "updated_at": "2026-08-28 19:07:29",
         "canonical_label_ar": "التقرير الشهري التنفيذي",
         "surface_kind": "PROJECTION",
         "ownership_verdict": "EXECUTIVE_PROJECTION",
@@ -28487,7 +28487,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W15 §١ · اسقاط لا مصدر - يقرأ fin_monthly_close عند DEP-05",
-        "verdict_at": "2026-08-27 09:52:03"
+        "verdict_at": "2026-08-28 19:07:29"
     },
     {
         "screen_id": "SCR-0772",
@@ -28511,7 +28511,7 @@
         "guard_evidence": "permissions_helper.php",
         "w2_why": "الطلبات المرفوعة إلى القيادة (exec_raised_requests.php)",
         "src_ref": "RPR-W15 · المساحات والتقارير",
-        "updated_at": "2026-08-27 09:52:03",
+        "updated_at": "2026-08-28 19:07:29",
         "canonical_label_ar": "الطلبات المرفوعة إلى القيادة",
         "surface_kind": "PROJECTION",
         "ownership_verdict": "EXECUTIVE_PROJECTION",
@@ -28524,7 +28524,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W15 §١ · اسقاط لا مصدر - يقرأ fin_requests عند DEP-05",
-        "verdict_at": "2026-08-27 09:52:03"
+        "verdict_at": "2026-08-28 19:07:29"
     },
     {
         "screen_id": "SCR-0773",
@@ -28548,7 +28548,7 @@
         "guard_evidence": "permissions_helper.php",
         "w2_why": "سجل العقود الموحد (exec_contract_registry.php)",
         "src_ref": "RPR-W15 · المساحات والتقارير",
-        "updated_at": "2026-08-27 09:52:03",
+        "updated_at": "2026-08-28 19:07:29",
         "canonical_label_ar": "سجل العقود الموحد",
         "surface_kind": "PROJECTION",
         "ownership_verdict": "EXECUTIVE_PROJECTION",
@@ -28561,7 +28561,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W15 §١ · اسقاط لا مصدر - يقرأ contracts عند DEP-01",
-        "verdict_at": "2026-08-27 09:52:03"
+        "verdict_at": "2026-08-28 19:07:29"
     },
     {
         "screen_id": "SCR-0774",
@@ -28585,7 +28585,7 @@
         "guard_evidence": "permissions_helper.php",
         "w2_why": "تجاوزات الخطوط الحمراء (exec_redline_breaches.php)",
         "src_ref": "RPR-W15 · المساحات والتقارير",
-        "updated_at": "2026-08-27 09:52:03",
+        "updated_at": "2026-08-28 19:07:29",
         "canonical_label_ar": "تجاوزات الخطوط الحمراء",
         "surface_kind": "PROJECTION",
         "ownership_verdict": "EXECUTIVE_PROJECTION",
@@ -28598,7 +28598,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W15 §١ · اسقاط لا مصدر - يقرأ exception_requests عند DEP-08",
-        "verdict_at": "2026-08-27 09:52:03"
+        "verdict_at": "2026-08-28 19:07:29"
     },
     {
         "screen_id": "SCR-0775",
@@ -28622,7 +28622,7 @@
         "guard_evidence": "permissions_helper.php",
         "w2_why": "الاستثناءات الحرجة (exec_critical_exceptions.php)",
         "src_ref": "RPR-W15 · المساحات والتقارير",
-        "updated_at": "2026-08-27 09:52:03",
+        "updated_at": "2026-08-28 19:07:29",
         "canonical_label_ar": "الاستثناءات الحرجة",
         "surface_kind": "PROJECTION",
         "ownership_verdict": "EXECUTIVE_PROJECTION",
@@ -28635,7 +28635,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W15 §١ · اسقاط لا مصدر - يقرأ exception_requests عند DEP-08",
-        "verdict_at": "2026-08-27 09:52:03"
+        "verdict_at": "2026-08-28 19:07:29"
     },
     {
         "screen_id": "SCR-0776",
@@ -28659,7 +28659,7 @@
         "guard_evidence": "permissions_helper.php",
         "w2_why": "المسائل المحجوزة (exec_reserved_matters.php)",
         "src_ref": "RPR-W15 · المساحات والتقارير",
-        "updated_at": "2026-08-27 09:52:03",
+        "updated_at": "2026-08-28 19:07:29",
         "canonical_label_ar": "المسائل المحجوزة",
         "surface_kind": "PROJECTION",
         "ownership_verdict": "EXECUTIVE_PROJECTION",
@@ -28672,7 +28672,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W15 §١ · اسقاط لا مصدر - يقرأ gov_policy عند DEP-08",
-        "verdict_at": "2026-08-27 09:52:03"
+        "verdict_at": "2026-08-28 19:07:29"
     },
     {
         "screen_id": "SCR-0777",
@@ -28696,7 +28696,7 @@
         "guard_evidence": "permissions_helper.php",
         "w2_why": "التصعيدات العليا (exec_escalations.php)",
         "src_ref": "RPR-W15 · المساحات والتقارير",
-        "updated_at": "2026-08-27 09:52:03",
+        "updated_at": "2026-08-28 19:07:29",
         "canonical_label_ar": "التصعيدات العليا",
         "surface_kind": "PROJECTION",
         "ownership_verdict": "EXECUTIVE_PROJECTION",
@@ -28709,7 +28709,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W15 §١ · اسقاط لا مصدر - يقرأ ticket_escalations عند DEP-10",
-        "verdict_at": "2026-08-27 09:52:03"
+        "verdict_at": "2026-08-28 19:07:29"
     },
     {
         "screen_id": "SCR-0778",
@@ -28733,7 +28733,7 @@
         "guard_evidence": "permissions_helper.php",
         "w2_why": "قيادة الأزمات والطوارئ (exec_crisis_command.php)",
         "src_ref": "RPR-W15 · المساحات والتقارير",
-        "updated_at": "2026-08-27 09:52:03",
+        "updated_at": "2026-08-28 19:07:30",
         "canonical_label_ar": "قيادة الأزمات والطوارئ",
         "surface_kind": "PROJECTION",
         "ownership_verdict": "EXECUTIVE_PROJECTION",
@@ -28746,7 +28746,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W15 §١ · اسقاط لا مصدر - يقرأ exec_decisions عند EX-CEO",
-        "verdict_at": "2026-08-27 09:52:03"
+        "verdict_at": "2026-08-28 19:07:30"
     },
     {
         "screen_id": "SCR-0779",
@@ -28770,7 +28770,7 @@
         "guard_evidence": "permissions_helper.php",
         "w2_why": "القرارات الاستراتيجية (exec_strategic_decisions.php)",
         "src_ref": "RPR-W15 · المساحات والتقارير",
-        "updated_at": "2026-08-27 09:52:03",
+        "updated_at": "2026-08-28 19:07:30",
         "canonical_label_ar": "القرارات الاستراتيجية",
         "surface_kind": "PROJECTION",
         "ownership_verdict": "EXECUTIVE_PROJECTION",
@@ -28783,7 +28783,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W15 §١ · اسقاط لا مصدر - يقرأ exec_decisions عند EX-CEO",
-        "verdict_at": "2026-08-27 09:52:03"
+        "verdict_at": "2026-08-28 19:07:30"
     },
     {
         "screen_id": "SCR-0780",
@@ -28807,7 +28807,7 @@
         "guard_evidence": "permissions_helper.php",
         "w2_why": "موافقات التعيين في المسميات القيادية (exec_leadership_appointments.php)",
         "src_ref": "RPR-W15 · المساحات والتقارير",
-        "updated_at": "2026-08-27 09:52:03",
+        "updated_at": "2026-08-28 19:07:30",
         "canonical_label_ar": "موافقات التعيين في المسميات القيادية",
         "surface_kind": "PROJECTION",
         "ownership_verdict": "EXECUTIVE_PROJECTION",
@@ -28820,7 +28820,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W15 §١ · اسقاط لا مصدر - يقرأ exec_assignments عند DEP-07",
-        "verdict_at": "2026-08-27 09:52:03"
+        "verdict_at": "2026-08-28 19:07:30"
     },
     {
         "screen_id": "SCR-0781",
@@ -28844,7 +28844,7 @@
         "guard_evidence": "permissions_helper.php",
         "w2_why": "قرارات الاجتماعات (exec_meeting_decisions.php)",
         "src_ref": "RPR-W15 · المساحات والتقارير",
-        "updated_at": "2026-08-27 09:52:03",
+        "updated_at": "2026-08-28 19:07:30",
         "canonical_label_ar": "قرارات الاجتماعات",
         "surface_kind": "PROJECTION",
         "ownership_verdict": "EXECUTIVE_PROJECTION",
@@ -28857,7 +28857,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W15 §١ · اسقاط لا مصدر - يقرأ exec_decisions عند EX-CEO",
-        "verdict_at": "2026-08-27 09:52:03"
+        "verdict_at": "2026-08-28 19:07:30"
     },
     {
         "screen_id": "SCR-0782",
@@ -28881,7 +28881,7 @@
         "guard_evidence": "permissions_helper.php",
         "w2_why": "متابعة القرارات التنفيذية (exec_actions_followup.php)",
         "src_ref": "RPR-W15 · المساحات والتقارير",
-        "updated_at": "2026-08-27 09:52:03",
+        "updated_at": "2026-08-28 19:07:30",
         "canonical_label_ar": "متابعة القرارات التنفيذية",
         "surface_kind": "PROJECTION",
         "ownership_verdict": "EXECUTIVE_PROJECTION",
@@ -28894,7 +28894,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W15 §١ · اسقاط لا مصدر - يقرأ exec_decisions عند EX-CEO",
-        "verdict_at": "2026-08-27 09:52:03"
+        "verdict_at": "2026-08-28 19:07:30"
     },
     {
         "screen_id": "SCR-0783",
@@ -28918,7 +28918,7 @@
         "guard_evidence": "permissions_helper.php",
         "w2_why": "الإنابات والتفويضات (exec_delegations.php)",
         "src_ref": "RPR-W15 · المساحات والتقارير",
-        "updated_at": "2026-08-27 09:52:03",
+        "updated_at": "2026-08-28 19:07:30",
         "canonical_label_ar": "الإنابات والتفويضات",
         "surface_kind": "PROJECTION",
         "ownership_verdict": "EXECUTIVE_PROJECTION",
@@ -28931,7 +28931,7 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W15 §١ · اسقاط لا مصدر - يقرأ gov_delegations عند DEP-08",
-        "verdict_at": "2026-08-27 09:52:03"
+        "verdict_at": "2026-08-28 19:07:30"
     },
     {
         "screen_id": "SCR-0784",
@@ -28955,7 +28955,7 @@
         "guard_evidence": "permissions_helper.php",
         "w2_why": "بلاغاتي (my_reports.php)",
         "src_ref": "RPR-W15 · المساحات والتقارير",
-        "updated_at": "2026-08-27 09:52:03",
+        "updated_at": "2026-08-28 19:07:30",
         "canonical_label_ar": "بلاغاتي",
         "surface_kind": "PROJECTION",
         "ownership_verdict": "EXECUTIVE_PROJECTION",
@@ -28968,6 +28968,6 @@
         "debt_owner": "",
         "debt_wave": "",
         "verdict_rule": "RPR-W15 §١ · اسقاط لا مصدر - يقرأ tickets عند DEP-10",
-        "verdict_at": "2026-08-27 09:52:03"
+        "verdict_at": "2026-08-28 19:07:30"
     }
 ]

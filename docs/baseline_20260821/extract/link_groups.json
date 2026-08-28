@@ -349,7 +349,7 @@
     },
     {
         "id": "5614",
-        "name": "اللوحة — خارج الدورة",
+        "name": "اللوحة خارج الدورة",
         "group_code": null,
         "owner_role_id": "1",
         "icon": "fa fa-folder",
@@ -481,7 +481,7 @@
     },
     {
         "id": "4097",
-        "name": "دورة دخول الأصل",
+        "name": "دورة الأصل الدخول",
         "group_code": "n9o_w5_fleet_asset_intake_r1",
         "owner_role_id": "1",
         "icon": "fa fa-truck-ramp-box",
@@ -493,7 +493,7 @@
     },
     {
         "id": "4109",
-        "name": "دورة دخول الأصل",
+        "name": "دورة الأصل الدخول",
         "group_code": "n9o_w5_fleet_asset_use_rights_r1",
         "owner_role_id": "1",
         "icon": "fa fa-handshake",
@@ -529,7 +529,7 @@
     },
     {
         "id": "4121",
-        "name": "دورة حركة الأصل",
+        "name": "دورة الأصل الحركة",
         "group_code": "n9o_w5_fleet_asset_assignments_r1",
         "owner_role_id": "1",
         "icon": "fa fa-map-location-dot",
@@ -541,7 +541,7 @@
     },
     {
         "id": "4130",
-        "name": "الرقابة الفنية على الأصل",
+        "name": "دورة الأصل الرقابة الفنية",
         "group_code": "n9o_w5_fleet_asset_readiness_r1",
         "owner_role_id": "1",
         "icon": "fa fa-gauge-high",
@@ -553,7 +553,7 @@
     },
     {
         "id": "4139",
-        "name": "دورة خروج الأصل",
+        "name": "دورة الأصل الخروج",
         "group_code": "n9o_w5_fleet_asset_exit_r1",
         "owner_role_id": "1",
         "icon": "fa fa-right-from-bracket",
@@ -1213,7 +1213,7 @@
     },
     {
         "id": "5596",
-        "name": "اللوحة — خارج الدورة",
+        "name": "اللوحة خارج الدورة",
         "group_code": null,
         "owner_role_id": "2",
         "icon": "fa fa-folder",
@@ -1837,7 +1837,7 @@
     },
     {
         "id": "4122",
-        "name": "دورة حركة الأصل",
+        "name": "دورة الأصل الحركة",
         "group_code": "n9o_w5_fleet_asset_assignments_r3",
         "owner_role_id": "3",
         "icon": "fa fa-map-location-dot",
@@ -1849,7 +1849,7 @@
     },
     {
         "id": "4131",
-        "name": "الرقابة الفنية على الأصل",
+        "name": "دورة الأصل الرقابة الفنية",
         "group_code": "n9o_w5_fleet_asset_readiness_r3",
         "owner_role_id": "3",
         "icon": "fa fa-gauge-high",
@@ -1861,7 +1861,7 @@
     },
     {
         "id": "4140",
-        "name": "دورة خروج الأصل",
+        "name": "دورة الأصل الخروج",
         "group_code": "n9o_w5_fleet_asset_exit_r3",
         "owner_role_id": "3",
         "icon": "fa fa-right-from-bracket",
@@ -1873,7 +1873,7 @@
     },
     {
         "id": "5599",
-        "name": "أ · التعريف والسياسات",
+        "name": "أ التعريف والسياسات",
         "group_code": null,
         "owner_role_id": "3",
         "icon": "fa fa-folder",
@@ -1885,7 +1885,7 @@
     },
     {
         "id": "5600",
-        "name": "ب · دخول الأصل",
+        "name": "ب دخول الأصل",
         "group_code": null,
         "owner_role_id": "3",
         "icon": "fa fa-folder",
@@ -1897,7 +1897,7 @@
     },
     {
         "id": "5601",
-        "name": "ج · دخول التشغيل",
+        "name": "ج دخول التشغيل",
         "group_code": null,
         "owner_role_id": "3",
         "icon": "fa fa-folder",
@@ -1909,7 +1909,7 @@
     },
     {
         "id": "5602",
-        "name": "د · الحركة والاستخدام",
+        "name": "د الحركة والاستخدام",
         "group_code": null,
         "owner_role_id": "3",
         "icon": "fa fa-folder",
@@ -1921,7 +1921,7 @@
     },
     {
         "id": "5603",
-        "name": "ه · الرقابة الفنية",
+        "name": "ه الرقابة الفنية",
         "group_code": null,
         "owner_role_id": "3",
         "icon": "fa fa-folder",
@@ -1933,7 +1933,7 @@
     },
     {
         "id": "5604",
-        "name": "و · الخروج",
+        "name": "و الخروج",
         "group_code": null,
         "owner_role_id": "3",
         "icon": "fa fa-folder",
@@ -1945,7 +1945,7 @@
     },
     {
         "id": "5605",
-        "name": "ز · الاستثناءات والقرارات",
+        "name": "ز الاستثناءات والقرارات",
         "group_code": null,
         "owner_role_id": "3",
         "icon": "fa fa-folder",
@@ -1957,7 +1957,7 @@
     },
     {
         "id": "5606",
-        "name": "ح · المخرجات",
+        "name": "ح المخرجات",
         "group_code": null,
         "owner_role_id": "3",
         "icon": "fa fa-folder",
@@ -1969,7 +1969,7 @@
     },
     {
         "id": "5607",
-        "name": "اللوحة — خارج الدورة",
+        "name": "اللوحة خارج الدورة",
         "group_code": null,
         "owner_role_id": "3",
         "icon": "fa fa-folder",
@@ -1993,7 +1993,7 @@
     },
     {
         "id": "5608",
-        "name": "ط · المرجعيات والمصالحة",
+        "name": "ط المرجعيات والمصالحة",
         "group_code": null,
         "owner_role_id": "3",
         "icon": "fa fa-folder",
@@ -2017,7 +2017,7 @@
     },
     {
         "id": "4098",
-        "name": "دورة دخول الأصل",
+        "name": "دورة الأصل الدخول",
         "group_code": "n9o_w5_fleet_asset_intake_r3",
         "owner_role_id": "3",
         "icon": "fa fa-truck-ramp-box",
@@ -2029,7 +2029,7 @@
     },
     {
         "id": "4110",
-        "name": "دورة دخول الأصل",
+        "name": "دورة الأصل الدخول",
         "group_code": "n9o_w5_fleet_asset_use_rights_r3",
         "owner_role_id": "3",
         "icon": "fa fa-handshake",
@@ -2521,7 +2521,7 @@
     },
     {
         "id": "5611",
-        "name": "اللوحة — خارج الدورة",
+        "name": "اللوحة خارج الدورة",
         "group_code": null,
         "owner_role_id": "4",
         "icon": "fa fa-folder",
@@ -2869,7 +2869,7 @@
     },
     {
         "id": "4099",
-        "name": "دورة دخول الأصل",
+        "name": "دورة الأصل الدخول",
         "group_code": "n9o_w5_fleet_asset_intake_r4",
         "owner_role_id": "4",
         "icon": "fa fa-truck-ramp-box",
@@ -2881,7 +2881,7 @@
     },
     {
         "id": "4111",
-        "name": "دورة دخول الأصل",
+        "name": "دورة الأصل الدخول",
         "group_code": "n9o_w5_fleet_asset_use_rights_r4",
         "owner_role_id": "4",
         "icon": "fa fa-handshake",
@@ -3445,7 +3445,7 @@
     },
     {
         "id": "5620",
-        "name": "اللوحة — خارج الدورة",
+        "name": "اللوحة خارج الدورة",
         "group_code": null,
         "owner_role_id": "6",
         "icon": "fa fa-folder",
@@ -3613,7 +3613,7 @@
     },
     {
         "id": "4100",
-        "name": "دورة دخول الأصل",
+        "name": "دورة الأصل الدخول",
         "group_code": "n9o_w5_fleet_asset_intake_r6",
         "owner_role_id": "6",
         "icon": "fa fa-truck-ramp-box",
@@ -3625,7 +3625,7 @@
     },
     {
         "id": "4112",
-        "name": "دورة دخول الأصل",
+        "name": "دورة الأصل الدخول",
         "group_code": "n9o_w5_fleet_asset_use_rights_r6",
         "owner_role_id": "6",
         "icon": "fa fa-handshake",
@@ -3649,7 +3649,7 @@
     },
     {
         "id": "4123",
-        "name": "دورة حركة الأصل",
+        "name": "دورة الأصل الحركة",
         "group_code": "n9o_w5_fleet_asset_assignments_r6",
         "owner_role_id": "6",
         "icon": "fa fa-map-location-dot",
@@ -3661,7 +3661,7 @@
     },
     {
         "id": "4132",
-        "name": "الرقابة الفنية على الأصل",
+        "name": "دورة الأصل الرقابة الفنية",
         "group_code": "n9o_w5_fleet_asset_readiness_r6",
         "owner_role_id": "6",
         "icon": "fa fa-gauge-high",
@@ -3673,7 +3673,7 @@
     },
     {
         "id": "4141",
-        "name": "دورة خروج الأصل",
+        "name": "دورة الأصل الخروج",
         "group_code": "n9o_w5_fleet_asset_exit_r6",
         "owner_role_id": "6",
         "icon": "fa fa-right-from-bracket",
@@ -4297,7 +4297,7 @@
     },
     {
         "id": "4101",
-        "name": "دورة دخول الأصل",
+        "name": "دورة الأصل الدخول",
         "group_code": "n9o_w5_fleet_asset_intake_r7",
         "owner_role_id": "7",
         "icon": "fa fa-truck-ramp-box",
@@ -4309,7 +4309,7 @@
     },
     {
         "id": "4113",
-        "name": "دورة دخول الأصل",
+        "name": "دورة الأصل الدخول",
         "group_code": "n9o_w5_fleet_asset_use_rights_r7",
         "owner_role_id": "7",
         "icon": "fa fa-handshake",
@@ -4333,7 +4333,7 @@
     },
     {
         "id": "4124",
-        "name": "دورة حركة الأصل",
+        "name": "دورة الأصل الحركة",
         "group_code": "n9o_w5_fleet_asset_assignments_r7",
         "owner_role_id": "7",
         "icon": "fa fa-map-location-dot",
@@ -4345,7 +4345,7 @@
     },
     {
         "id": "4133",
-        "name": "الرقابة الفنية على الأصل",
+        "name": "دورة الأصل الرقابة الفنية",
         "group_code": "n9o_w5_fleet_asset_readiness_r7",
         "owner_role_id": "7",
         "icon": "fa fa-gauge-high",
@@ -4357,7 +4357,7 @@
     },
     {
         "id": "4142",
-        "name": "دورة خروج الأصل",
+        "name": "دورة الأصل الخروج",
         "group_code": "n9o_w5_fleet_asset_exit_r7",
         "owner_role_id": "7",
         "icon": "fa fa-right-from-bracket",
@@ -4897,7 +4897,7 @@
     },
     {
         "id": "4125",
-        "name": "دورة حركة الأصل",
+        "name": "دورة الأصل الحركة",
         "group_code": "n9o_w5_fleet_asset_assignments_r8",
         "owner_role_id": "8",
         "icon": "fa fa-map-location-dot",
@@ -4909,7 +4909,7 @@
     },
     {
         "id": "4134",
-        "name": "الرقابة الفنية على الأصل",
+        "name": "دورة الأصل الرقابة الفنية",
         "group_code": "n9o_w5_fleet_asset_readiness_r8",
         "owner_role_id": "8",
         "icon": "fa fa-gauge-high",
@@ -4921,7 +4921,7 @@
     },
     {
         "id": "4143",
-        "name": "دورة خروج الأصل",
+        "name": "دورة الأصل الخروج",
         "group_code": "n9o_w5_fleet_asset_exit_r8",
         "owner_role_id": "8",
         "icon": "fa fa-right-from-bracket",
@@ -5749,7 +5749,7 @@
     },
     {
         "id": "4878",
-        "name": "دورة البلاغ",
+        "name": "اللوحة",
         "group_code": "n9o_w13_scr0732_r9",
         "owner_role_id": "9",
         "icon": "fa fa-diagram-project",
@@ -5773,7 +5773,7 @@
     },
     {
         "id": "4882",
-        "name": "السجلات التابعة",
+        "name": "دورة البلاغ",
         "group_code": "n9o_w13_scr0734_r9",
         "owner_role_id": "9",
         "icon": "fa fa-route",
@@ -5785,7 +5785,7 @@
     },
     {
         "id": "4884",
-        "name": "السجلات التابعة",
+        "name": "دورة البلاغ",
         "group_code": "n9o_w13_scr0735_r9",
         "owner_role_id": "9",
         "icon": "fa fa-user-check",
@@ -5845,7 +5845,7 @@
     },
     {
         "id": "4894",
-        "name": "دورة البلاغ",
+        "name": "السجلات التابعة",
         "group_code": "n9o_w13_scr0740_r9",
         "owner_role_id": "9",
         "icon": "fa fa-circle-check",
@@ -6073,7 +6073,7 @@
     },
     {
         "id": "4126",
-        "name": "دورة حركة الأصل",
+        "name": "دورة الأصل الحركة",
         "group_code": "n9o_w5_fleet_asset_assignments_r10",
         "owner_role_id": "10",
         "icon": "fa fa-map-location-dot",
@@ -6085,7 +6085,7 @@
     },
     {
         "id": "4135",
-        "name": "الرقابة الفنية على الأصل",
+        "name": "دورة الأصل الرقابة الفنية",
         "group_code": "n9o_w5_fleet_asset_readiness_r10",
         "owner_role_id": "10",
         "icon": "fa fa-gauge-high",
@@ -6097,7 +6097,7 @@
     },
     {
         "id": "4144",
-        "name": "دورة خروج الأصل",
+        "name": "دورة الأصل الخروج",
         "group_code": "n9o_w5_fleet_asset_exit_r10",
         "owner_role_id": "10",
         "icon": "fa fa-right-from-bracket",
@@ -6145,7 +6145,7 @@
     },
     {
         "id": "4102",
-        "name": "دورة دخول الأصل",
+        "name": "دورة الأصل الدخول",
         "group_code": "n9o_w5_fleet_asset_intake_r10",
         "owner_role_id": "10",
         "icon": "fa fa-truck-ramp-box",
@@ -6157,7 +6157,7 @@
     },
     {
         "id": "4114",
-        "name": "دورة دخول الأصل",
+        "name": "دورة الأصل الدخول",
         "group_code": "n9o_w5_fleet_asset_use_rights_r10",
         "owner_role_id": "10",
         "icon": "fa fa-handshake",
@@ -6637,7 +6637,7 @@
     },
     {
         "id": "4127",
-        "name": "دورة حركة الأصل",
+        "name": "دورة الأصل الحركة",
         "group_code": "n9o_w5_fleet_asset_assignments_r11",
         "owner_role_id": "11",
         "icon": "fa fa-map-location-dot",
@@ -6649,7 +6649,7 @@
     },
     {
         "id": "4136",
-        "name": "الرقابة الفنية على الأصل",
+        "name": "دورة الأصل الرقابة الفنية",
         "group_code": "n9o_w5_fleet_asset_readiness_r11",
         "owner_role_id": "11",
         "icon": "fa fa-gauge-high",
@@ -6661,7 +6661,7 @@
     },
     {
         "id": "4145",
-        "name": "دورة خروج الأصل",
+        "name": "دورة الأصل الخروج",
         "group_code": "n9o_w5_fleet_asset_exit_r11",
         "owner_role_id": "11",
         "icon": "fa fa-right-from-bracket",
@@ -6685,7 +6685,7 @@
     },
     {
         "id": "4103",
-        "name": "دورة دخول الأصل",
+        "name": "دورة الأصل الدخول",
         "group_code": "n9o_w5_fleet_asset_intake_r11",
         "owner_role_id": "11",
         "icon": "fa fa-truck-ramp-box",
@@ -6697,7 +6697,7 @@
     },
     {
         "id": "4115",
-        "name": "دورة دخول الأصل",
+        "name": "دورة الأصل الدخول",
         "group_code": "n9o_w5_fleet_asset_use_rights_r11",
         "owner_role_id": "11",
         "icon": "fa fa-handshake",
@@ -7069,7 +7069,7 @@
     },
     {
         "id": "5589",
-        "name": "اللوحة — خارج الدورة",
+        "name": "اللوحة خارج الدورة",
         "group_code": null,
         "owner_role_id": "12",
         "icon": "fa fa-folder",
@@ -7681,7 +7681,7 @@
     },
     {
         "id": "4128",
-        "name": "دورة حركة الأصل",
+        "name": "دورة الأصل الحركة",
         "group_code": "n9o_w5_fleet_asset_assignments_r13",
         "owner_role_id": "13",
         "icon": "fa fa-map-location-dot",
@@ -7693,7 +7693,7 @@
     },
     {
         "id": "4137",
-        "name": "الرقابة الفنية على الأصل",
+        "name": "دورة الأصل الرقابة الفنية",
         "group_code": "n9o_w5_fleet_asset_readiness_r13",
         "owner_role_id": "13",
         "icon": "fa fa-gauge-high",
@@ -7705,7 +7705,7 @@
     },
     {
         "id": "4146",
-        "name": "دورة خروج الأصل",
+        "name": "دورة الأصل الخروج",
         "group_code": "n9o_w5_fleet_asset_exit_r13",
         "owner_role_id": "13",
         "icon": "fa fa-right-from-bracket",
@@ -7717,7 +7717,7 @@
     },
     {
         "id": "5632",
-        "name": "اللوحة — خارج الدورة",
+        "name": "اللوحة خارج الدورة",
         "group_code": null,
         "owner_role_id": "13",
         "icon": "fa fa-folder",
@@ -7861,7 +7861,7 @@
     },
     {
         "id": "4104",
-        "name": "دورة دخول الأصل",
+        "name": "دورة الأصل الدخول",
         "group_code": "n9o_w5_fleet_asset_intake_r13",
         "owner_role_id": "13",
         "icon": "fa fa-truck-ramp-box",
@@ -7873,7 +7873,7 @@
     },
     {
         "id": "4116",
-        "name": "دورة دخول الأصل",
+        "name": "دورة الأصل الدخول",
         "group_code": "n9o_w5_fleet_asset_use_rights_r13",
         "owner_role_id": "13",
         "icon": "fa fa-handshake",
@@ -8221,7 +8221,7 @@
     },
     {
         "id": "4129",
-        "name": "دورة حركة الأصل",
+        "name": "دورة الأصل الحركة",
         "group_code": "n9o_w5_fleet_asset_assignments_r14",
         "owner_role_id": "14",
         "icon": "fa fa-map-location-dot",
@@ -8233,7 +8233,7 @@
     },
     {
         "id": "4138",
-        "name": "الرقابة الفنية على الأصل",
+        "name": "دورة الأصل الرقابة الفنية",
         "group_code": "n9o_w5_fleet_asset_readiness_r14",
         "owner_role_id": "14",
         "icon": "fa fa-gauge-high",
@@ -8245,7 +8245,7 @@
     },
     {
         "id": "4147",
-        "name": "دورة خروج الأصل",
+        "name": "دورة الأصل الخروج",
         "group_code": "n9o_w5_fleet_asset_exit_r14",
         "owner_role_id": "14",
         "icon": "fa fa-right-from-bracket",
@@ -8437,7 +8437,7 @@
     },
     {
         "id": "4105",
-        "name": "دورة دخول الأصل",
+        "name": "دورة الأصل الدخول",
         "group_code": "n9o_w5_fleet_asset_intake_r14",
         "owner_role_id": "14",
         "icon": "fa fa-truck-ramp-box",
@@ -8449,7 +8449,7 @@
     },
     {
         "id": "4117",
-        "name": "دورة دخول الأصل",
+        "name": "دورة الأصل الدخول",
         "group_code": "n9o_w5_fleet_asset_use_rights_r14",
         "owner_role_id": "14",
         "icon": "fa fa-handshake",
@@ -9577,7 +9577,7 @@
     },
     {
         "id": "5635",
-        "name": "اللوحة — خارج الدورة",
+        "name": "اللوحة خارج الدورة",
         "group_code": null,
         "owner_role_id": "16",
         "icon": "fa fa-folder",
@@ -10129,7 +10129,7 @@
     },
     {
         "id": "5609",
-        "name": "اللوحة — خارج الدورة",
+        "name": "اللوحة خارج الدورة",
         "group_code": null,
         "owner_role_id": "17",
         "icon": "fa fa-folder",
@@ -10722,7 +10722,7 @@
         "owner_role_id": "17",
         "icon": "fa fa-scale-balanced",
         "display_order": "623",
-        "stage_no": "6",
+        "stage_no": "8",
         "stage_title": "سادسا القيود والدفاتر",
         "is_active": "1",
         "stage_desc": null
@@ -10734,7 +10734,7 @@
         "owner_role_id": "17",
         "icon": "fa fa-code-compare",
         "display_order": "623",
-        "stage_no": "6",
+        "stage_no": "8",
         "stage_title": "سادسا القيود والدفاتر",
         "is_active": "1",
         "stage_desc": null
@@ -14905,7 +14905,7 @@
     },
     {
         "id": "5610",
-        "name": "اللوحة — خارج الدورة",
+        "name": "اللوحة خارج الدورة",
         "group_code": null,
         "owner_role_id": "21",
         "icon": "fa fa-folder",
@@ -16981,7 +16981,7 @@
     },
     {
         "id": "5634",
-        "name": "اللوحة — خارج الدورة",
+        "name": "اللوحة خارج الدورة",
         "group_code": null,
         "owner_role_id": "23",
         "icon": "fa fa-folder",
@@ -17041,7 +17041,7 @@
     },
     {
         "id": "4106",
-        "name": "دورة دخول الأصل",
+        "name": "دورة الأصل الدخول",
         "group_code": "n9o_w5_fleet_asset_intake_r23",
         "owner_role_id": "23",
         "icon": "fa fa-truck-ramp-box",
@@ -17053,7 +17053,7 @@
     },
     {
         "id": "4118",
-        "name": "دورة دخول الأصل",
+        "name": "دورة الأصل الدخول",
         "group_code": "n9o_w5_fleet_asset_use_rights_r23",
         "owner_role_id": "23",
         "icon": "fa fa-handshake",
@@ -17449,7 +17449,7 @@
     },
     {
         "id": "4879",
-        "name": "دورة البلاغ",
+        "name": "اللوحة",
         "group_code": "n9o_w13_scr0732_r24",
         "owner_role_id": "24",
         "icon": "fa fa-diagram-project",
@@ -17473,7 +17473,7 @@
     },
     {
         "id": "4883",
-        "name": "السجلات التابعة",
+        "name": "دورة البلاغ",
         "group_code": "n9o_w13_scr0734_r24",
         "owner_role_id": "24",
         "icon": "fa fa-route",
@@ -17485,7 +17485,7 @@
     },
     {
         "id": "4885",
-        "name": "السجلات التابعة",
+        "name": "دورة البلاغ",
         "group_code": "n9o_w13_scr0735_r24",
         "owner_role_id": "24",
         "icon": "fa fa-user-check",
@@ -17545,7 +17545,7 @@
     },
     {
         "id": "4895",
-        "name": "دورة البلاغ",
+        "name": "السجلات التابعة",
         "group_code": "n9o_w13_scr0740_r24",
         "owner_role_id": "24",
         "icon": "fa fa-circle-check",
@@ -17569,7 +17569,7 @@
     },
     {
         "id": "5613",
-        "name": "اللوحة — خارج الدورة",
+        "name": "اللوحة خارج الدورة",
         "group_code": null,
         "owner_role_id": "24",
         "icon": "fa fa-folder",
@@ -17761,7 +17761,7 @@
     },
     {
         "id": "4928",
-        "name": "اللوحة",
+        "name": "السجلات التابعة",
         "group_code": "n9o_w13_scr0601_r24",
         "owner_role_id": "24",
         "icon": "fa fa-folder",
@@ -17857,7 +17857,7 @@
     },
     {
         "id": "5636",
-        "name": "اللوحة — خارج الدورة",
+        "name": "اللوحة خارج الدورة",
         "group_code": null,
         "owner_role_id": "25",
         "icon": "fa fa-folder",
@@ -18313,7 +18313,7 @@
     },
     {
         "id": "5598",
-        "name": "اللوحة — خارج الدورة",
+        "name": "اللوحة خارج الدورة",
         "group_code": null,
         "owner_role_id": "26",
         "icon": "fa fa-folder",
@@ -18565,7 +18565,7 @@
     },
     {
         "id": "4107",
-        "name": "دورة دخول الأصل",
+        "name": "دورة الأصل الدخول",
         "group_code": "n9o_w5_fleet_asset_intake_r26",
         "owner_role_id": "26",
         "icon": "fa fa-truck-ramp-box",
@@ -18577,7 +18577,7 @@
     },
     {
         "id": "4119",
-        "name": "دورة دخول الأصل",
+        "name": "دورة الأصل الدخول",
         "group_code": "n9o_w5_fleet_asset_use_rights_r26",
         "owner_role_id": "26",
         "icon": "fa fa-handshake",
@@ -19165,7 +19165,7 @@
     },
     {
         "id": "5627",
-        "name": "اللوحة — خارج الدورة",
+        "name": "اللوحة خارج الدورة",
         "group_code": null,
         "owner_role_id": "27",
         "icon": "fa fa-folder",
@@ -19393,7 +19393,7 @@
     },
     {
         "id": "4108",
-        "name": "دورة دخول الأصل",
+        "name": "دورة الأصل الدخول",
         "group_code": "n9o_w5_fleet_asset_intake_r27",
         "owner_role_id": "27",
         "icon": "fa fa-truck-ramp-box",
@@ -19405,7 +19405,7 @@
     },
     {
         "id": "4120",
-        "name": "دورة دخول الأصل",
+        "name": "دورة الأصل الدخول",
         "group_code": "n9o_w5_fleet_asset_use_rights_r27",
         "owner_role_id": "27",
         "icon": "fa fa-handshake",
@@ -19746,7 +19746,7 @@
         "owner_role_id": "28",
         "icon": "fa fa-bolt",
         "display_order": "4",
-        "stage_no": "2",
+        "stage_no": "3",
         "stage_title": "ثانيا السجل والتقييم",
         "is_active": "1",
         "stage_desc": null
@@ -19849,7 +19849,7 @@
     },
     {
         "id": "5612",
-        "name": "اللوحة — خارج الدورة",
+        "name": "اللوحة خارج الدورة",
         "group_code": null,
         "owner_role_id": "28",
         "icon": "fa fa-folder",
