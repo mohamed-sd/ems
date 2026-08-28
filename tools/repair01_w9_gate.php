@@ -32,6 +32,10 @@ mysqli_report(MYSQLI_REPORT_OFF);
 $conn = new mysqli($host, ems_env('DB_USER'), ems_env('DB_PASS'), ems_env('DB_NAME'), $port);
 if ($conn->connect_errno) { exit("تعذّر الاتصال: {$conn->connect_error}\n"); }
 $conn->set_charset('utf8mb4');
+/* مرساةُ الطورِ صفرِ — **حقيقةٌ مسجَّلةٌ لا ثابتٌ حرفيّ** (RPR-AMD01) */
+require_once __DIR__ . '/lib/repair01_w00_anchor.php';
+$W00 = w00_anchors($conn);
+
 
 $esc = function ($s) use ($conn) { return $conn->real_escape_string((string) $s); };
 $one = function ($sql) use ($conn) { return repair01_w9_one($conn, $sql); };
@@ -296,14 +300,24 @@ $unstamped = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry
 $gapOrig = (int) $one("SELECT COUNT(*) FROM repair01_target_gaps WHERE COALESCE(origin_stage,'') = ''");
 $gapW02  = (int) $one("SELECT COUNT(*) FROM repair01_target_gaps WHERE origin_stage = 'W02'");
 gate('W9-23', 'أساسُ المراحلِ السابقةِ لم يُمَسّ',
-     $decN === 108 && $srcN === 13 && $surfN === 664 && $baseN === 651 && $unstamped === 0
-     && $gapOrig === 174 && $gapW02 === 160,
+     $decN === $W00['decisions'] && $srcN === $W00['source_files'] && $surfN === $W00['surfaces'] && $baseN === $W00['registry_base'] && $unstamped === 0
+     && $gapOrig === $W00['gaps_original'] && $gapW02 === 160,
      "قرارات $decN · مصادر $srcN · أسطح $surfN · أساسُ السجلّ $baseN · نموٌّ مختومٌ $growN"
      . " · بلا ختمٍ $unstamped · فجواتٌ أصليّة $gapOrig · منقولةٌ في W02 $gapW02");
 
 /* ══ W9-24 · المؤجَّلُ مسجَّلٌ ومقفولٌ في الاتّجاهَين ══════════════════ */
+/* ⚠ **«مفتوحٌ» ليست «حاجبةً»** (AMD-01 ملحق §ج · 2026-08-28): كان المقياسُ
+     `status <> 'APPROVED'` — أي **حالةَ القرارِ لا صفتَه**. ووثيقةُ التعديلِ
+     تحسم أنَّ `DEC-OPEN-15` **آليّتُه محسومةٌ سلفًا** بـ`DEC-WH-01` (‏`APPROVED`
+     — التتبّعُ بحسبِ دليلِ الأصناف) **والمفتوحُ القيمُ لا الآلية**، وتأمر صراحةً:
+     *«ولا تُدرج واحدًا منها حاجزًا على RPR-02»*.
+     ⇒ فالسؤالُ صار **أحاجبٌ هو؟** لا **أمفتوحٌ هو؟** — ويُقرأ من تصنيفِه.
+     ⛔ **والقفلُ في الاتّجاهَين باقٍ بحرفِه**: لو صُنِّف قرارٌ `حاجز إنفاذ` وهو
+     مفتوحٌ، لزمت الصفوفُ المؤجَّلةُ كاملةً غيرَ مستهلَكةٍ كما كانت. */
 $blockOpen = (int) $one("SELECT COUNT(*) FROM repair01_decisions
-                          WHERE decision_id = 'DEC-OPEN-15' AND status <> 'APPROVED'");
+                          WHERE decision_id = 'DEC-OPEN-15' AND status <> 'APPROVED'
+                            AND (COALESCE(blocker_type,'') = 'حاجز إنفاذ'
+                              OR blocking_level IN ('STRUCTURAL_TARGET_BLOCKER','READY_TO_BUILD_BLOCKER'))");
 $dfAll = (int) $one("SELECT COUNT(*) FROM repair01_w9_deferred");
 $dfOpen = (int) $one("SELECT COUNT(*) FROM repair01_w9_deferred WHERE consumed = 0");
 $dfBad = (int) $one("SELECT COUNT(*) FROM repair01_w9_deferred

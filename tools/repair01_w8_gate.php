@@ -33,6 +33,10 @@ require_once $ROOT . '/tools/lib/repair01_w8_contracts.php';
 require_once $ROOT . '/config.php';
 if (!isset($conn) || !($conn instanceof mysqli)) { exit("تعذّر الاتصال بالقاعدة\n"); }
 $conn->set_charset('utf8mb4');
+/* مرساةُ الطورِ صفرِ — **حقيقةٌ مسجَّلةٌ لا ثابتٌ حرفيّ** (RPR-AMD01) */
+require_once __DIR__ . '/lib/repair01_w00_anchor.php';
+$W00 = w00_anchors($conn);
+
 while (ob_get_level()) { ob_end_clean(); }
 
 $PASS = 0; $FAIL = 0; $LINES = array();
@@ -302,7 +306,7 @@ $unst = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry WHERE origin =
 $gapsO = (int) $one("SELECT COUNT(*) FROM repair01_target_gaps WHERE origin_stage = ''");
 $evStudy = (int) $one("SELECT COUNT(*) FROM repair01_events WHERE contract_stage = ''");
 gate('W8-18', 'أساسُ المراحلِ السابقةِ لم يُمَسّ',
-     $dec === 108 && $srcF === 13 && $surf === 664 && $base === 651 && $unst === 0 && $gapsO === 174,
+     $dec === $W00['decisions'] && $srcF === $W00['source_files'] && $surf === $W00['surfaces'] && $base === $W00['registry_base'] && $unst === 0 && $gapsO === $W00['gaps_original'],
      "قرارات $dec · مصادر $srcF · أسطح $surf · أساسُ السجلّ $base · نموٌّ مختومٌ $grow · بلا ختمٍ $unst"
      . " · فجواتٌ أصليّة $gapsO · أحداثُ الدراسة $evStudy");
 

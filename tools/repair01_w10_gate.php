@@ -31,6 +31,10 @@ mysqli_report(MYSQLI_REPORT_OFF);
 $conn = new mysqli($host, ems_env('DB_USER'), ems_env('DB_PASS'), ems_env('DB_NAME'), $port);
 if ($conn->connect_errno) { exit("تعذّر الاتصال: {$conn->connect_error}\n"); }
 $conn->set_charset('utf8mb4');
+/* مرساةُ الطورِ صفرِ — **حقيقةٌ مسجَّلةٌ لا ثابتٌ حرفيّ** (RPR-AMD01) */
+require_once __DIR__ . '/lib/repair01_w00_anchor.php';
+$W00 = w00_anchors($conn);
+
 
 $esc = function ($s) use ($conn) { return $conn->real_escape_string((string) $s); };
 $E   = function ($s) use ($conn) { return "'" . $conn->real_escape_string((string) $s) . "'"; };
@@ -341,24 +345,44 @@ $gapOrig = (int) $one("SELECT COUNT(*) FROM repair01_target_gaps WHERE COALESCE(
 $gapW02  = (int) $one("SELECT COUNT(*) FROM repair01_target_gaps WHERE origin_stage = 'W02'");
 $dvpSurf = (int) $one("SELECT COUNT(*) FROM repair01_surfaces WHERE canonical_code = 'EX-DVP'");
 gate('W10-20', 'أساسُ المراحلِ السابقةِ لم يُمَسّ',
-     $decN === 108 && $srcN === 13 && $surfN === 664 && $baseN === 651 && $unst === 0
-     && $gapOrig === 174 && $gapW02 === 160 && $dvpSurf === 0,
+     $decN === $W00['decisions'] && $srcN === $W00['source_files'] && $surfN === $W00['surfaces'] && $baseN === $W00['registry_base'] && $unst === 0
+     && $gapOrig === $W00['gaps_original'] && $gapW02 === 160 && $dvpSurf === 0,
      "قرارات $decN · مصادر $srcN · أسطح $surfN · أساسُ السجلّ $baseN · نموٌّ مختومٌ $growN"
      . " · بلا ختمٍ $unst · فجواتٌ أصليّة $gapOrig · منقولةٌ في W02 $gapW02 · سطحُ نوّابٍ مبنيٌّ $dvpSurf");
 
 /* ══ W10-21 · شقُّ دفترِ الفجواتِ مكتملٌ بلا دهسِ وحدتِه القديمة ════════ */
-$gapScope = (int) $one("SELECT COUNT(*) FROM repair01_target_gaps
-                         WHERE unit IN (" . implode(',', array_map($E, array_keys($units))) . ")");
+/* ⚠ **الشقُّ اكتمل فانتقلت مفردتُه — والقاعدةُ لم تنتقل** (RPR-02-A · الطور صفر):
+     كان المقياسُ يسأل `unit IN (الأسماءِ الحيّةِ القديمة)` ويشترط بقاءَ
+     `unit = 'مكتب الرئيس التنفيذي والنواب'` صفوفًا. وقد وحَّد الطورُ صفرُ عمودَ
+     `unit` **رموزًا معياريّةً** (‏بندٌ من التحقُّقِ الخماسيِّ · 21 رمزًا مميَّزًا)،
+     **فصار الاسمُ القديمُ مفردةً لا وجودَ لها** والاستعلامُ يعيد صفرًا.
+   ◆ **ولم يُدهَس الاسمُ بل انتقل إلى بيتِه**: `repair01_dept_crosswalk` هو
+     الجسرُ الذي يحمل `legacy_name ⇐ canonical_code` — **وهو مصدرُ الحقيقةِ
+     للاسمِ القديمِ لا صفُّ الفجوة**، وإبقاؤه في العمودَين معًا تكرارٌ.
+   ⇒ فالمقامُ يُشتقّ من الجسرِ نفسِه (‏لا رمزٌ مكتوبٌ حرفيًّا)، **والقاعدةُ
+     بحرفِها**: كلُّ فجوةٍ في وحدةٍ مشقوقةٍ تحمل رمزَها وقاعدتَها وسببَها،
+     ⛔ **والاسمُ القديمُ يبقى محفوظًا — يُطلَب في بيتِه** فيسقط الحاجبُ لو مُحي. */
+$splitCodes = array();
+foreach ($units as $legacy => $inner) { foreach (array_keys($inner) as $c) { $splitCodes[$c] = 1; } }
+$splitCodes = array_keys($splitCodes);
+$inCodes = implode(',', array_map($E, $splitCodes));
+/* ⛔ **ومقامُ الشقِّ هو الدفترُ الأصليُّ وحدَه**: صفوفُ `origin_stage = 'W02'`
+     نموٌّ نُقل بعد الشقِّ (‏70 صفًّا مصدرُها `live:gov_screen_cycle`)، ولم تكن
+     يومًا تحت الاسمِ المشقوق. وضمُّها يجعل المقامَ 100 والمشقوقَ 30 فيسقط
+     الحاجبُ على نموٍّ لا على نقصِ شقّ — **ومقامٌ أوسعُ من قاعدتِه يكذب**. */
+$SCOPE_W = "unit IN ($inCodes) AND COALESCE(origin_stage,'') = ''";
+$gapScope = (int) $one("SELECT COUNT(*) FROM repair01_target_gaps WHERE $SCOPE_W");
 $gapSplit = (int) $one("SELECT COUNT(*) FROM repair01_target_gaps
-                         WHERE unit IN (" . implode(',', array_map($E, array_keys($units))) . ")
+                         WHERE $SCOPE_W
                            AND split_code <> '' AND split_rule <> '' AND split_why <> ''");
 $gapDvp = (int) $one("SELECT COUNT(*) FROM repair01_target_gaps WHERE split_code = 'EX-DVP'");
-$gapUnitKept = (int) $one("SELECT COUNT(*) FROM repair01_target_gaps
-                            WHERE unit = 'مكتب الرئيس التنفيذي والنواب'");
-gate('W10-21', 'شقُّ دفترِ الفجواتِ مكتملٌ ووحدتُه القديمةُ لم تُدهَس',
-     $gapScope > 0 && $gapSplit === $gapScope && $gapDvp > 0 && $gapUnitKept > 0,
-     "فجواتُ الوحدتَين $gapScope · مشقوقةٌ بقاعدةٍ $gapSplit · للنوّاب $gapDvp"
-     . " · الوحدةُ القديمةُ باقيةٌ $gapUnitKept صفًّا");
+/* الاسمُ القديمُ محفوظٌ في الجسر — لا في صفِّ الفجوة */
+$legacyKept = (int) $one("SELECT COUNT(DISTINCT legacy_name) FROM repair01_dept_crosswalk WHERE verdict = 'SPLIT'");
+gate('W10-21', 'شقُّ دفترِ الفجواتِ مكتملٌ والاسمُ القديمُ محفوظٌ في الجسر',
+     $gapScope > 0 && $gapSplit === $gapScope && $gapDvp > 0
+     && $legacyKept === count($units) && $legacyKept > 0,
+     "رموزُ الشقِّ " . count($splitCodes) . " · فجواتُها $gapScope · مشقوقةٌ بقاعدةٍ $gapSplit"
+     . " · للنوّاب $gapDvp · أسماءٌ قديمةٌ محفوظةٌ في الجسر $legacyKept من " . count($units));
 
 /* ══ W10-22 · رحلةُ الشقِّ تعبر ولا تترك أثرًا ═════════════════════════ */
 $jOut = array(); $jCode = 1;

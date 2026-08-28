@@ -23,6 +23,10 @@ require_once $ROOT . '/config.php';
 while (ob_get_level()) { ob_end_clean(); }
 $conn = $GLOBALS['conn'];
 $conn->set_charset('utf8mb4');
+/* مرساةُ الطورِ صفرِ — **حقيقةٌ مسجَّلةٌ لا ثابتٌ حرفيّ** (RPR-AMD01) */
+require_once __DIR__ . '/lib/repair01_w00_anchor.php';
+$W00 = w00_anchors($conn);
+
 $DIR = $ROOT . '/docs/REPAIR01_20260823/';
 
 $pass = 0; $fail = 0; $lines = array();
@@ -44,7 +48,7 @@ foreach ($onDiskFiles as $f) {
     if (hash_file('sha256', $f) === $rows[$bn]) { $srcOk++; } else { $srcBad++; }
 }
 gate($pass, $fail, $lines, 'G0-01', 'تجميدُ المصدر (تجزئةٌ مُعادة)',
-    ($srcOk === 13 && $srcBad === 0 && $srcMissing === 0),
+    ($srcOk === $W00['source_files'] && $srcBad === 0 && $srcMissing === 0),
     "مطابق $srcOk · مُبدَّل $srcBad · غيرُ مسجَّل $srcMissing", '13 · 0 · 0');
 
 /* ── G0-02 القرارات: المقامُ والتوزيع ── */
@@ -71,19 +75,50 @@ if (!$known) {   /* أوّلُ تشغيلٍ — يُبذَر خطُّ الأسا
     $known = $aprSet; $seeded = true;
 }
 $regressed = array_values(array_diff($known, $aprSet));   /* اعتُمد ثمّ عاد منتظِرًا */
+/* ── الخروجُ المأذونُ يُعلَن ولا يُسكَت عنه (RPR-AMD01) ────────────────────
+     السقّاطةُ تُحسن رصدَ الارتداد، **لكنّها لا تفرّق بين ارتدادٍ صامتٍ وخروجٍ
+     أمر به المالكُ في حزمةٍ اعتمدها**. وقد وقع الثاني: الحزمةُ المحدَّثةُ أعادت
+     `DEC-OPEN-15` منتظِرًا. ⇒ فالخروجُ يُقبَل **إن حمل إذنَه مكتوبًا** في
+     `released` — بسببٍ ومرجعٍ وتاريخ. ⛔ **وخروجٌ بلا إذنٍ يبقى ارتدادًا يُسقِط**،
+     ⛔ **والحاجبُ لا يكتب `released` بنفسِه أبدًا** (‏يكتبه
+     `repair01_approved_release.php` بيدٍ تُبدي سببَها) — فحاجبٌ يأذن لنفسِه
+     ليس حاجبًا. */
+$released = (is_array($j ?? null) && isset($j['released']) && is_array($j['released'])) ? $j['released'] : array();
+$excused = array(); $unexcused = array();
+foreach ($regressed as $id) {
+    $ok = isset($released[$id]) && is_array($released[$id])
+       && trim((string) ($released[$id]['why'] ?? '')) !== ''
+       && trim((string) ($released[$id]['ref'] ?? '')) !== '';
+    if ($ok) { $excused[] = $id; } else { $unexcused[] = $id; }
+}
+$regressed = $unexcused;
 $fresh     = array_values(array_diff($aprSet, $known));   /* اعتُمد حديثًا — تقدُّم */
 if (!$regressed && ($fresh || $seeded)) {   /* التقدُّمُ يُثبَّت فلا يُنقَض */
+    /* ⛔ **المجموعةُ تُوحَّد ولا تُستبدَل** — وهذا عطبٌ أحدثه إذنُ الخروجِ نفسُه
+         وأُصلح باختبارٍ سالب: كانت الكتابةُ `approved = $aprSet`، وهي تساوي
+         الاتّحادَ ما دام لا ارتدادَ (فالمقيسُ عندئذٍ أشملُ من المحفوظ). فلمّا
+         صار الخروجُ المأذونُ **يُفرِغ `$regressed`**، صارت الكتابةُ **تُنقِص**
+         المجموعةَ وتمحو من خرج — فتنسى السقّاطةُ أنّه اعتُمد أصلًا، **ويمرُّ
+         سحبُ الإذنِ أخضرَ**. وقِيس ذلك حقنًا: سُحب الإذنُ فلم يتحرّك العدّاد.
+         ⇒ الاتّحادُ يُبقي «اعتُمد مرّةً» حقيقةً دائمة، **فيظلُّ الإذنُ مطلوبًا
+         في كلِّ تشغيلٍ لاحق** — ولو سُحب سقط الحاجبُ كما يجب.
+       ⛔ **و`released` يبقى** — سجلُّ الأذونِ لا حالةٌ تُستهلَك. */
+    $keep = array_values(array_unique(array_merge($known, $aprSet)));
+    sort($keep);
     @file_put_contents($BASE_F, json_encode(array(
         'meaning' => 'قرارٌ اعتُمد مرّةً لا يعود منتظِرًا — سقّاطةُ مجموعةٍ لا عدّ',
-        'count' => count($aprSet), 'approved' => $aprSet,
+        'count' => count($keep), 'approved' => $keep,
+        'released' => $released,
     ), JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
 }
 gate($pass, $fail, $lines, 'G0-02', 'المعتمَدُ مقفلُ الاتّجاه (مجموعةً)',
-    ($dTot === 108 && ($dApr + $dNeed) === 108 && !$regressed),
-    "$dTot = معتمد $dApr + منتظر $dNeed · مرتدٌّ " . count($regressed)
+    ($dTot === $W00['decisions'] && ($dApr + $dNeed) === $W00['decisions'] && !$regressed),
+    "$dTot = معتمد $dApr + منتظر $dNeed · مرتدٌّ بلا إذنٍ " . count($regressed)
     . (count($regressed) ? ' ⇐ ' . implode('، ', array_slice($regressed, 0, 3)) : '')
+    . ' · خارجٌ بإذنٍ مكتوبٍ ' . count($excused)
+    . (count($excused) ? ' ⇐ ' . implode('، ', array_slice($excused, 0, 3)) : '')
     . ' · جديدُ الاعتماد ' . count($fresh),
-    '108 · المجموع 108 · مرتدّ 0');
+    $W00['decisions'] . ' · المجموع ' . $W00['decisions'] . ' · مرتدٌّ بلا إذنٍ 0');
 
 /* ── G0-03 اتّساقُ الحجب: لا معتمدٌ حاجب، ولا منتظرٌ بلا تصنيف ── */
 $badA = (int) one($conn, "SELECT COUNT(*) FROM repair01_decisions WHERE status='APPROVED' AND blocking_level<>'NONE'");
@@ -102,8 +137,9 @@ $cfg = (int) one($conn, "SELECT COUNT(*) FROM repair01_decisions WHERE blocking_
    العتباتِ الاثنتَي عشرةَ ثابتٌ لأنّه صفةُ القرارِ لا حالتُه. */
 $HARD_CEILING = 4;
 gate($pass, $fail, $lines, 'G0-04', 'الحاجبُ الصلبُ يَنقص ولا يزيد',
-    ($hard <= $HARD_CEILING && $cfg === 12),
-    "حاجبٌ صلبٌ مفتوح $hard (سقفٌ $HARD_CEILING) · إعدادٌ مؤجَّل $cfg", '≤ 4 · 12');
+    ($hard <= $HARD_CEILING && $cfg === $W00['config_pending']),
+    "حاجبٌ صلبٌ مفتوح $hard (سقفٌ $HARD_CEILING) · إعدادٌ مؤجَّل $cfg",
+    '≤ ' . $HARD_CEILING . ' · ' . $W00['config_pending']);
 
 /* ── G0-05 الترقيم: 01..17 متّصلٌ بلا ثغرةٍ ولا تكرار ── */
 $ord = array();
@@ -112,8 +148,9 @@ while ($x = $r->fetch_row()) { $ord[] = (int) $x[0]; }
 $outside = (int) one($conn, "SELECT COUNT(*) FROM repair01_departments WHERE sector='OUTSIDE' AND display_order IS NULL");
 $contig = ($ord === range(1, 17));
 gate($pass, $fail, $lines, 'G0-05', 'ترقيمُ الإدارات 01..17',
-    ($contig && $outside === 4),
-    "متسلسل " . ($contig ? 'نعم' : 'لا') . " (" . count($ord) . ") · خارجَ التسلسل $outside", 'نعم (17) · 4');
+    ($contig && $outside === $W00['departments_outside']),
+    "متسلسل " . ($contig ? 'نعم' : 'لا') . " (" . count($ord) . ") · خارجَ التسلسل $outside",
+    'نعم (17) · ' . $W00['departments_outside']);
 
 /* ── G0-06 الجسر: كلُّ مسمّى حيٍّ له مقابل ── */
 $live = array();
@@ -150,7 +187,7 @@ gate($pass, $fail, $lines, 'G0-07', 'أساسُ الأسطح محفوظٌ في �
 /* المقامُ القديمُ يبقى مطبوعًا للسياق */
 /* لقطةُ الدراسةِ نفسُها مجمَّدةٌ عند مقامِها — لا تنمو ولا تنقص */
 gate($pass, $fail, $lines, 'G0-07b', 'لقطةُ الدراسةِ مجمَّدةٌ عند مقامِها',
-    ($sN === 664), "أسطحُ الدراسة $sN", '664');
+    ($sN === $W00['surfaces']), "أسطحُ الدراسة $sN", (string) $W00['surfaces']);
 
 /* ── G0-08 الشبح: مسحٌ عوديٌّ حيٌّ لا قراءةُ عمود ── */
 $diskIdx = array();
@@ -194,13 +231,22 @@ $openTyped = (int) one($conn, "SELECT COUNT(*) FROM repair01_decisions WHERE dec
 $struct    = (int) one($conn, "SELECT COUNT(*) FROM repair01_decisions WHERE blocker_type='STRUCTURAL'");
 $thresh    = (int) one($conn, "SELECT COUNT(*) FROM repair01_decisions WHERE blocker_type='THRESHOLD'");
 $gateBlock = (int) one($conn, "SELECT COUNT(*) FROM repair01_decisions WHERE blocker_type='STRUCTURAL' AND status='NEEDS_OWNER_DECISION'");
-/* THRESHOLD لا يجوز أن يمنع: أيُّ عتبةٍ موسومةٍ حاجبًا بنيويًّا خطأُ تصنيف */
+/* ما هو **قيمةٌ** لا يجوز أن يحجب بنيويًّا: عتبةٌ موسومةٌ حاجبًا بنيويًّا خطأُ تصنيف.
+   ⚠ **والمفردةُ اتّسعت ولم تُخفَّف القاعدة** (AMD-01 §ج · 2027_12_10): صار للعمودِ
+     محوران — `STRUCTURAL`/`THRESHOLD` (‏محورُ RPR-PATCH-01 للسبعةِ المعتمَدة) و
+     مفرداتُ `AMD-01` الثلاثُ للأحدَ عشرَ المنتظِرة. **فالسؤالُ نفسُه يُسأل على
+     المفردتَين معًا**، ومقياسُ «كلُّ `DEC-OPEN` مصنَّف» هو `$openTyped` نفسُه
+     الذي كان يقيسه `$struct + $thresh` في عالمِ القيمتَين. ⛔ ولا يُسقَط شرطٌ. */
 $badThresh = (int) one($conn, "SELECT COUNT(*) FROM repair01_decisions
-                               WHERE blocker_type='THRESHOLD' AND blocking_level='STRUCTURAL_TARGET_BLOCKER'");
+                               WHERE blocker_type IN ('THRESHOLD','قيمة تضبط')
+                                 AND blocking_level='STRUCTURAL_TARGET_BLOCKER'");
+$amd = (int) one($conn, "SELECT COUNT(*) FROM repair01_decisions
+                          WHERE blocker_type IN ('حاجز إنفاذ','قيمة تضبط','محسوم آلية ومفتوح قيمة')");
 gate($pass, $fail, $lines, 'G0-11', 'محورُ الحجبِ مصنَّفٌ ومتّسق',
-    ($openTot === 18 && $openTyped === 18 && $struct + $thresh === 18 && $badThresh === 0),
-    "DEC-OPEN $openTot مصنَّفٌ $openTyped · STRUCTURAL $struct · THRESHOLD $thresh · عتبةٌ موسومةٌ بنيويّةً $badThresh",
-    '18 · 18 · مجموعُهما 18 · 0');
+    ($openTot === 18 && $openTyped === 18 && $struct + $thresh + $amd === 18 && $badThresh === 0),
+    "DEC-OPEN $openTot مصنَّفٌ $openTyped · STRUCTURAL $struct · THRESHOLD $thresh"
+    . " · بمفرداتِ AMD-01 $amd · قيمةٌ موسومةٌ بنيويّةً $badThresh",
+    '18 · 18 · مجموعُها 18 · 0');
 
 /* ── G0-12 إسنادُ المراحل: لا متطلَّبَ بلا مرحلة ──
      الإسنادُ يعيش خارجَ الإكسل، فإعادةُ الاستيعابِ قد تمحوه صامتًا وتُولَّد

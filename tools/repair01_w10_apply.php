@@ -157,7 +157,7 @@ arsort($byRule); foreach ($byRule as $r2 => $n) { printf("     %-34s %d\n", $r2,
 
 /* ══ ④ تطبيقُ الشقِّ على الدفترَين ═════════════════════════════════════ */
 echo "\n④ تطبيقُ الشقِّ على الدفترَين\n";
-$appS = 0; $appR = 0;
+$appS = 0; $appR = 0; $skipDecided = array();
 if (!$DRY) {
     foreach ($res as $k => $v) {
         if ((int) $v['in_surfaces'] === 1 && $v['surf_code_before'] !== $v['resolved_code']) {
@@ -168,6 +168,17 @@ if (!$DRY) {
             $appS++;
         }
         if ((int) $v['in_registry'] === 1 && $v['reg_code_before'] !== $v['resolved_code']) {
+            /* ⛔ **الاشتقاقُ لا يدهس القرارَ المسجَّل** (RPR-AMD01): حكمت
+                 `W15 §٤-٢` في أربعةِ أسطحٍ بعينِها أنَّ مالكَها إدارتُها لا
+                 مكتبَ الرئيس (`SCR-0505` · `SCR-0508` · `SCR-0515` · `SCR-0532`)،
+                 وشقُّ W10 يُعيد اشتقاقَها `EX-CEO` في كلِّ تشغيل. فكانت السلسلةُ
+                 تتأرجح: **W10 تُعيدها و`W15` تردُّها ولا تبلغ نقطةَ ثبات** —
+                 وقِيس ذلك حقنًا بتتبُّعِ الأربعةِ موجةً موجة.
+               ⇒ **ما حُكم فيه بقاعدةٍ مكتوبةٍ يُصان**، وما عداه يُشتقّ كما كان،
+                 **والدفترُ يسجّل التخطّي فلا يصمُت عنه.** */
+            $decided = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry
+                                    WHERE screen_id = " . $E($k) . " AND verdict_rule LIKE 'RPR-W15%'");
+            if ($decided > 0) { $skipDecided[] = $k; continue; }
             $q("UPDATE repair01_screen_registry SET owner_code = " . $E($v['resolved_code'])
                . ", owner_rule = " . $E(mb_substr('W10_SPLIT:' . $v['split_rule'], 0, 46))
                . " WHERE screen_id = " . $E($k));

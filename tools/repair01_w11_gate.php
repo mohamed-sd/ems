@@ -28,6 +28,10 @@ mysqli_report(MYSQLI_REPORT_OFF);
 $conn = new mysqli($host, ems_env('DB_USER'), ems_env('DB_PASS'), ems_env('DB_NAME'), $port);
 if ($conn->connect_errno) { exit("تعذّر الاتصال: {$conn->connect_error}\n"); }
 $conn->set_charset('utf8mb4');
+/* مرساةُ الطورِ صفرِ — **حقيقةٌ مسجَّلةٌ لا ثابتٌ حرفيّ** (RPR-AMD01) */
+require_once __DIR__ . '/lib/repair01_w00_anchor.php';
+$W00 = w00_anchors($conn);
+
 
 $esc = function ($s) use ($conn) { return $conn->real_escape_string((string) $s); };
 $one = function ($sql) use ($conn) { return repair01_w11_one($conn, $sql); };
@@ -364,7 +368,7 @@ $gWild = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry
 $t0 = (int) $one("SELECT COUNT(*) FROM repair01_target_gaps WHERE origin_stage = ''");
 $e0 = (int) $one("SELECT COUNT(*) FROM repair01_events WHERE contract_stage = ''");
 gate('W11-26', 'أساسُ المراحلِ السابقةِ لم يُمَسّ',
-     $d0 === 108 && $s0 === 13 && $u0 === 664 && $g0 === 651 && $gWild === 0 && $t0 === 174 && $e0 === 632,
+     $d0 === $W00['decisions'] && $s0 === $W00['source_files'] && $u0 === $W00['surfaces'] && $g0 === $W00['registry_base'] && $gWild === 0 && $t0 === $W00['gaps_original'] && $e0 === $W00['events_study'],
      "قرارات $d0 · مصادر $s0 · أسطح $u0 · أساسُ السجلّ $g0 · نموٌّ مختومٌ $gNew"
      . " · نموٌّ بلا ختمٍ $gWild · فجواتٌ أصليّة $t0 · أحداثُ الدراسة $e0");
 

@@ -30,6 +30,10 @@ mysqli_report(MYSQLI_REPORT_OFF);
 $conn = new mysqli($host, ems_env('DB_USER'), ems_env('DB_PASS'), ems_env('DB_NAME'), $port);
 if ($conn->connect_errno) { exit("تعذّر الاتصال: {$conn->connect_error}\n"); }
 $conn->set_charset('utf8mb4');
+/* مرساةُ الطورِ صفرِ — **حقيقةٌ مسجَّلةٌ لا ثابتٌ حرفيّ** (RPR-AMD01) */
+require_once __DIR__ . '/lib/repair01_w00_anchor.php';
+$W00 = w00_anchors($conn);
+
 
 $esc = function ($s) use ($conn) { return $conn->real_escape_string((string) $s); };
 $one = function ($sql) use ($conn) { return repair01_w12_one($conn, $sql); };
@@ -396,9 +400,10 @@ while ($rg && $g = $rg->fetch_assoc()) {
 $ghosts = (int) $one("SELECT COUNT(*) FROM repair01_surfaces WHERE on_disk = 0");
 $gapsOrig = (int) $one("SELECT COUNT(*) FROM repair01_target_gaps WHERE origin_stage = ''");
 gate('W12-26', 'فجواتُ النطاقِ موفّاةٌ بملفٍّ قائمٍ والأشباحُ لم تُمَسّ',
-     $gapN > 0 && $gapFilled === $gapN && count($gapBad) === 0 && $ghosts === 257 && $gapsOrig === 174,
+     $gapN > 0 && $gapFilled === $gapN && count($gapBad) === 0
+     && $ghosts === $W00['surfaces_ghost'] && $gapsOrig === $W00['gaps_original'],
      "فجواتُ النطاقِ $gapN · موفّاةٌ $gapFilled · بلا موفٍّ " . count($gapBad)
-     . " · أشباحٌ $ghosts (يجب 257) · فجواتٌ أصليّةٌ $gapsOrig (يجب 174)"
+     . " · أشباحٌ $ghosts (يجب " . $W00['surfaces_ghost'] . ") · فجواتٌ أصليّةٌ $gapsOrig (يجب " . $W00['gaps_original'] . ")"
      . (count($gapBad) ? ' ⇐ ' . implode('، ', $gapBad) : ''));
 
 /* ══ W12-27 · لا رمزٌ يُعرَض خامًّا — القاموسُ يغطّي قيمَ النطاق ═══════ */

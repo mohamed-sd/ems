@@ -28,6 +28,10 @@ require_once $ROOT . '/tools/lib/repair01_debt_scan.php';
 require_once $ROOT . '/config.php';
 if (!isset($conn) || !($conn instanceof mysqli)) { exit("تعذّر الاتصال بالقاعدة\n"); }
 $conn->set_charset('utf8mb4');
+/* مرساةُ الطورِ صفرِ — **حقيقةٌ مسجَّلةٌ لا ثابتٌ حرفيّ** (RPR-AMD01) */
+require_once __DIR__ . '/lib/repair01_w00_anchor.php';
+$W00 = w00_anchors($conn);
+
 
 $PASS = 0; $FAIL = 0; $LINES = array();
 function gate($code, $title, $ok, $detail)
@@ -202,7 +206,7 @@ $noWave  = (int) scalarq($conn, "SELECT COUNT(*) FROM repair01_target_gaps
 $orig    = (int) scalarq($conn, "SELECT COUNT(*) FROM repair01_target_gaps WHERE origin_stage = ''");
 $toMove  = (int) scalarq($conn, "SELECT COUNT(*) FROM repair01_screen_registry
                                   WHERE on_disk = 0 AND ghost_verdict = 'MOVED_TO_TARGET_GAPS'");
-gate('W2-07', 'المنقولُ بموجتِه والأصلُ سليم', $moved === $toMove && $noWave === 0 && $orig === 174,
+gate('W2-07', 'المنقولُ بموجتِه والأصلُ سليم', $moved === $toMove && $noWave === 0 && $orig === $W00['gaps_original'],
      "منقولٌ $moved من $toMove · بلا موجةٍ $noWave · الفجواتُ الأصليّةُ $orig (يجب 174)");
 
 /* ══ W2-08 · صفرُ بندِ قائمةٍ يدويٍّ في القشرة ═══════════════════════════ */
@@ -293,7 +297,7 @@ $u0 = (int) scalarq($conn, "SELECT COUNT(*) FROM repair01_surfaces");
 $f0 = (int) scalarq($conn, "SELECT COUNT(*) FROM repair01_ownership WHERE classification = 'FORBIDDEN'");
 $w1 = (int) scalarq($conn, "SELECT COUNT(*) FROM repair01_ownership WHERE classification = 'FORBIDDEN' AND w1_verdict IS NULL");
 $cc = (int) scalarq($conn, "SELECT COUNT(*) FROM repair01_surfaces WHERE canonical_code IS NULL OR canonical_code = ''");
-gate('W2-13', 'مخزنُ W00/W01 لم يُمَسّ', $d0 === 108 && $s0 === 13 && $u0 === 664 && $f0 === 265 && $w1 === 0 && $cc === 0,
+gate('W2-13', 'مخزنُ W00/W01 لم يُمَسّ', $d0 === $W00['decisions'] && $s0 === $W00['source_files'] && $u0 === $W00['surfaces'] && $f0 === $W00['ownership_forbidden'] && $w1 === 0 && $cc === 0,
      "قرارات $d0 · مصادر $s0 · أسطح $u0 · محرَّم $f0 · بلا حكمِ W01 $w1 · بلا رمزٍ $cc");
 
 /* ══ W2-14 · الاستثناءُ مُعلَنٌ لا صامت ══════════════════════════════════

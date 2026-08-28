@@ -34,6 +34,10 @@ if (strpos($host, ':') !== false) { list($host, $port) = explode(':', $host); $p
 $conn = new mysqli($host, ems_env('DB_USER'), ems_env('DB_PASS'), ems_env('DB_NAME'), $port);
 if ($conn->connect_errno) { exit("تعذّر الاتصال: {$conn->connect_error}\n"); }
 $conn->set_charset('utf8mb4');
+/* مرساةُ الطورِ صفرِ — **حقيقةٌ مسجَّلةٌ لا ثابتٌ حرفيّ** (RPR-AMD01) */
+require_once __DIR__ . '/lib/repair01_w00_anchor.php';
+$W00 = w00_anchors($conn);
+
 
 function q1(mysqli $c, $sql) { $r = $c->query($sql); if (!$r) { return null; } $x = $r->fetch_row(); return $x ? $x[0] : null; }
 
@@ -149,9 +153,19 @@ gate('W1-09', 'شقُّ المالية: المجموعُ = المقامُ وشق
 /* ── W1-10 · شقُّ الرئاسة: لا سطحَ نوّابٍ مُدَّعًى مبنيًّا ─────────────────── */
 $dvp   = (int) q1($conn, "SELECT COUNT(*) FROM repair01_surfaces WHERE canonical_code='EX-DVP'");
 $ceo   = (int) q1($conn, "SELECT COUNT(*) FROM repair01_surfaces WHERE canonical_code='EX-CEO'");
-$gaps  = (int) q1($conn, "SELECT COUNT(*) FROM repair01_target_gaps WHERE unit='مكتب الرئيس التنفيذي والنواب'");
+/* ⚠ **المفردةُ تحرّكت والقاعدةُ لم تتحرّك** (RPR-02-A · الطور صفر): كان المقياسُ
+     `unit='مكتب الرئيس التنفيذي والنواب'` — **بالاسمِ الحيِّ القديم**. وقد وحَّد
+     الطورُ صفرُ لغةَ `repair01_target_gaps.unit` **رموزًا معياريّةً** (‏21 رمزًا
+     مميَّزًا · بندٌ من التحقُّقِ الخماسيّ)، فصار الاسمُ القديمُ **مفردةً لا وجودَ
+     لها** — واستعلامُها يعيد صفرًا يُقرأ «لا فجوةَ للنوّاب» وهو أخضرُ كاذبٌ في
+     الاتّجاهِ الآخر. ⛔ **فلا يُقاس بمفردةٍ غيرِ موجودة**: يُتحقَّق من وجودِ
+     الرمزِ أوّلًا، ثمَّ يُقاس عليه. والقاعدةُ نفسُها: **النوّابُ فجوةٌ لا بناء**. */
+$dvpTok = (int) q1($conn, "SELECT COUNT(*) FROM repair01_target_gaps WHERE unit = 'EX-DVP'");
+$ceoTok = (int) q1($conn, "SELECT COUNT(*) FROM repair01_target_gaps WHERE unit = 'EX-CEO'");
+$gaps   = $dvpTok;
 gate('W1-10', 'شقُّ الرئاسة: النوّابُ فجوةٌ لا بناء',
-     $dvp === 0 && $ceo > 0 && $gaps > 0, "EX-CEO {$ceo} · EX-DVP {$dvp} · فجواتُ المكتبِ {$gaps}");
+     $dvp === 0 && $ceo > 0 && $dvpTok > 0 && $ceoTok > 0,
+     "EX-CEO أسطحٌ {$ceo} · EX-DVP أسطحٌ {$dvp} · فجواتُ النوّابِ {$dvpTok} · فجواتُ الرئيسِ {$ceoTok}");
 
 /* ── W1-11 · السقّاطةُ أربعةَ عشرَ سجلًّا · الثمانيةُ مقيسةٌ لا مُفترَضة ──── */
 $rp   = repair01_debt_measure($ROOT, $conn);
@@ -183,7 +197,7 @@ gate('W1-12', 'السقّاطةُ موصولةٌ بخطّافِ الالتزام
 $dec = (int) q1($conn, "SELECT COUNT(*) FROM repair01_decisions");
 $sf  = (int) q1($conn, "SELECT COUNT(*) FROM repair01_source_files");
 gate('W1-13', 'مخزنُ W00 لم يُمَسَّ بهذه المرحلة',
-     $dec === 108 && $sf === 13 && $srAll === 664 && $fbAll === 265,
+     $dec === $W00['decisions'] && $sf === $W00['source_files'] && $srAll === $W00['surfaces'] && $fbAll === $W00['ownership_forbidden'],
      "قرارات {$dec} · مصادر {$sf} · أسطح {$srAll} · محرَّم {$fbAll}");
 
 echo implode("\n", $LINES), "\n";

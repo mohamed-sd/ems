@@ -106,14 +106,23 @@ gate('W15-04', 'القراءةُ بمرجعٍ حيٍّ ولا لقطةَ دور�
      **والحاجبُ ما يزال يرسُب على أيِّ جدولِ أعمالٍ جديد**. */
 /* ══ W15-05 · لا جدولَ حقيقةٍ جديدٌ أنشأته المرحلة ══════════════════════ */
 $snapN = (int) $one("SELECT COUNT(*) FROM repair01_w15_table_snapshot");
+/* ⚠ **والنموُّ يُعلَن بجولتِه لا يُستثنى بنمط** (RPR-AMD01): جولةٌ أخرى تُنشئ
+     جداولَها بحقٍّ فتظهر هنا نموًّا لـ`W15` وهي ليست منها — وقِيس **26 جدولًا**
+     كلُّها من مجالِ الموردين (`sup_*`) وتسويةِ الهجرة، **وصفرٌ منها من `W15`**.
+   ⛔ **وتوسيعُ نمطِ الاستبعادِ يُسكِت الحاجبَ عن كلِّ نموٍّ قادمٍ بالجملة** وهو
+     تليينٌ لا إصلاح. فالمُعلَنُ وحدَه يُستثنى — في `repair01_w15_table_exempt`
+     **بجولتِه وسببِه** — **والحاجبُ يسقط على غيرِ المُعلَنِ كما كان.** */
 $grown = (int) $one("SELECT COUNT(*) FROM information_schema.TABLES t
                       LEFT JOIN repair01_w15_table_snapshot s ON s.table_name = t.TABLE_NAME
+                      LEFT JOIN repair01_w15_table_exempt   x ON x.table_name = t.TABLE_NAME
                      WHERE t.TABLE_SCHEMA = DATABASE() AND t.TABLE_TYPE = 'BASE TABLE'
                        AND t.TABLE_NAME NOT LIKE 'repair01\\_%'
-                       AND s.table_name IS NULL");
+                       AND s.table_name IS NULL AND x.table_name IS NULL");
+$exempt = (int) $one("SELECT COUNT(*) FROM repair01_w15_table_exempt");
 gate('W15-05', 'لا جدولَ أعمالٍ جديدٌ أنشأته هذه المرحلة',
      $snapN > 0 && $grown === 0,
-     "لقطةُ ما قبلَ المرحلة $snapN جدولًا · جداولُ أعمالٍ نمت بعدها $grown · وسجلاتُ الحملةِ مستثناةٌ بالإعلان");
+     "لقطةُ ما قبلَ المرحلة $snapN جدولًا · نموٌّ غيرُ مُعلَنٍ $grown · مُعلَنٌ بجولتِه $exempt"
+     . " · وسجلاتُ الحملةِ مستثناةٌ بالإعلان");
 
 /* ══ W15-06 · سبعُ خطواتٍ بحكمٍ وقاعدةٍ لكلِّ سطح ═══════════════════════ */
 $routes = array();

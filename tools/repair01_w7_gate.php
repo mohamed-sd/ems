@@ -35,6 +35,10 @@ require_once $ROOT . '/tools/lib/repair01_w7_contracts.php';
 require_once $ROOT . '/config.php';
 if (!isset($conn) || !($conn instanceof mysqli)) { exit("تعذّر الاتصال بالقاعدة\n"); }
 $conn->set_charset('utf8mb4');
+/* مرساةُ الطورِ صفرِ — **حقيقةٌ مسجَّلةٌ لا ثابتٌ حرفيّ** (RPR-AMD01) */
+require_once __DIR__ . '/lib/repair01_w00_anchor.php';
+$W00 = w00_anchors($conn);
+
 while (ob_get_level()) { ob_end_clean(); }
 
 $PASS = 0; $FAIL = 0; $LINES = array();
@@ -407,8 +411,8 @@ $e5 = (int) $one("SELECT COUNT(*) FROM repair01_events WHERE contract_stage = 'W
 $e7 = (int) $one("SELECT COUNT(*) FROM repair01_events WHERE contract_stage = 'W07'");
 $k0 = (int) $one("SELECT COUNT(*) FROM repair01_key_registry");
 gate('W7-19', 'أساسُ المراحلِ السابقةِ لم يُمَسّ',
-     $d0 === 108 && $s0 === 13 && $u0 === 664 && $g0 === 651 && $gWild === 0
-     && $t0 === 174 && $e0 === 632 && $e3 === 13 && $e4 === 3 && $e5 === 9 && $k0 === 13 && $e7 > 0,
+     $d0 === $W00['decisions'] && $s0 === $W00['source_files'] && $u0 === $W00['surfaces'] && $g0 === $W00['registry_base'] && $gWild === 0
+     && $t0 === $W00['gaps_original'] && $e0 === $W00['events_study'] && $e3 === 13 && $e4 === 3 && $e5 === 9 && $k0 === 13 && $e7 > 0,
      "قرارات $d0 · مصادر $s0 · أسطح $u0 · أساسُ السجلّ $g0 · نموٌّ مختومٌ $gNew · بلا ختمٍ $gWild"
      . " · فجواتٌ $t0 · أحداثُ الدراسة $e0 · عقود W03 $e3 · W04 $e4 · W05 $e5 · W07 $e7 · مفاتيح $k0");
 

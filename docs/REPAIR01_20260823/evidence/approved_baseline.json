@@ -1,6 +1,6 @@
 {
     "meaning": "قرارٌ اعتُمد مرّةً لا يعود منتظِرًا — سقّاطةُ مجموعةٍ لا عدّ",
-    "count": 96,
+    "count": 115,
     "approved": [
         "DEC-ACC-01",
         "DEC-ACC-02",
@@ -21,6 +21,11 @@
         "DEC-ENT-08",
         "DEC-ENT-09",
         "DEC-ENT-10",
+        "DEC-FAIL-01",
+        "DEC-FAIL-02",
+        "DEC-FAIL-03",
+        "DEC-FAIL-04",
+        "DEC-FAIL-05",
         "DEC-FIN-01",
         "DEC-FIN-02",
         "DEC-FIN-03",
@@ -37,6 +42,9 @@
         "DEC-HR-03",
         "DEC-HR-04",
         "DEC-HR-05",
+        "DEC-INV-01",
+        "DEC-INV-02",
+        "DEC-INV-03",
         "DEC-MNT-01",
         "DEC-MNT-02",
         "DEC-MNT-03",
@@ -45,6 +53,8 @@
         "DEC-MY-03",
         "DEC-OPEN-03",
         "DEC-OPEN-12",
+        "DEC-OPEN-13",
+        "DEC-OPEN-14",
         "DEC-OPEN-15",
         "DEC-OPEN-16",
         "DEC-OPEN-17",
@@ -65,6 +75,7 @@
         "DEC-PRC-02",
         "DEC-PRC-03",
         "DEC-PRC-04",
+        "DEC-ROUTE-01",
         "DEC-RSK-01",
         "DEC-RSK-02",
         "DEC-RSK-03",
@@ -78,6 +89,14 @@
         "DEC-SITE-03",
         "DEC-SUP-01",
         "DEC-SUP-02",
+        "DEC-SURF-01",
+        "DEC-SURF-02",
+        "DEC-SURF-03",
+        "DEC-SURF-04",
+        "DEC-SURF-05",
+        "DEC-SURF-06",
+        "DEC-SURF-07",
+        "DEC-SURF-08",
         "DEC-TKT-01",
         "DEC-TKT-02",
         "DEC-TKT-03",
@@ -98,5 +117,12 @@
         "DEC-WRK-01",
         "DEC-WRK-02",
         "DEC-WRK-03"
-    ]
+    ],
+    "released": {
+        "DEC-OPEN-15": {
+            "why": "الحزمةُ الشاملةُ المحدَّثةُ أعادته منتظِرًا — والمفتوحُ قائمةُ الفئاتِ لا الآلية؛ فآليّتُه محسومةٌ بـDEC-WH-01 (APPROVED)",
+            "ref": "AMD-01 ملحق §ج · RPR-02-A · مصنَّف 09 · السجلات المؤسسية والقرارات",
+            "at": "2026-08-28 20:04:43"
+        }
+    }
 }

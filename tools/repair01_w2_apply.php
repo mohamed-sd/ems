@@ -454,11 +454,38 @@ foreach ($keys as $k) {
               '" . esc($conn, $u['title']) . "','" . esc($conn, $u['src_ref']) . "')
       ON DUPLICATE KEY UPDATE
         screen_file=VALUES(screen_file), route=VALUES(route), route_rule=VALUES(route_rule),
-        owner_code=VALUES(owner_code), owner_role=VALUES(owner_role), owner_rule=VALUES(owner_rule),
+        /* ⛔ **الاشتقاقُ لا يدهس القرار** (RPR-AMD01): مصفوفةُ الدراسةِ تُدرِج
+             السطحَ الواحدَ تحت أكثرَ من إدارةٍ **عمدًا** (‏ظهورٌ في مساحةٍ لا
+             مِلكيّة · م ١١٤)، وهذه الكتلةُ تختار أحدَها بأسبقيّةٍ آليّة. وقد
+             حكمت `W15 §٤-٢` في **11 سطحًا** بعينِها أنَّ مالكَها إدارتُها لا
+             مكتبُ الرئيس (*«إنجازي سطحُ مساحةٍ شخصيّةٍ لا سطحَ قيادة»* ·
+             *«القوائمُ الماليّةُ تملكها الإدارةُ المالية»*) وسجّلت النقلةَ في
+             `repair01_w15_nav_moves`.
+             ⇒ فكانت W02 تُعيدها `EX-CEO` في كلِّ تشغيل و`W15` تردُّها، **فلا
+             تبلغ السلسلةُ نقطةَ ثبات**: قِيس 31 صفًّا يتأرجح بين التشغيلَين.
+           ⛔ **فالحكمُ المسجَّلُ يُصان والباقي يُشتقّ** — والحاجبُ لا يضعف:
+             سطحٌ بلا حكمٍ مسجَّلٍ يأخذ اشتقاقَ W02 كما كان. */
+        /* ⚠ **والعلامةُ هي القاعدةُ المسجَّلةُ لا صنفُ الحكم**: قُيِّد الحارسُ
+             أوّلًا بـ`ownership_verdict='DOMAIN_SOURCE'`، **فأفلت منه شبحان**
+             (`fin_statements.php` · `margin.php`) صنفُهما `RETIRE` وقد نقلت
+             `W15` ملكيّتَهما أيضًا — فظلَّا يتأرجحان. وقِيس ذلك حقنًا: تشغيلُ
+             W02 يعيدهما `EX-CEO` وحدَهما. ⇒ **المُعوَّلُ عليه `verdict_rule`** —
+             فهو أثرُ القرارِ المكتوبِ أيًّا كان صنفُ الحكم. */
+        owner_code = IF(verdict_rule LIKE 'RPR-W15%', owner_code, VALUES(owner_code)),
+        owner_role=VALUES(owner_role), owner_rule=VALUES(owner_rule),
         lifecycle=VALUES(lifecycle), lifecycle_rule=VALUES(lifecycle_rule),
         parent_screen_id=VALUES(parent_screen_id), parent_rule=VALUES(parent_rule),
         visibility_class=VALUES(visibility_class), visibility_rule=VALUES(visibility_rule),
-        on_disk=VALUES(on_disk), origin=VALUES(origin),
+        on_disk=VALUES(on_disk),
+        /* ⛔ **ختمُ النموِّ حقيقةٌ تاريخيّةٌ لا اشتقاقٌ من حالِ القرصِ اليوم**
+             (RPR-AMD01). كان `origin=VALUES(origin)` — و«الكونُ» أعلاه يمنح
+             `DISK` لكلِّ ملفٍّ حيٍّ بلا صفِّ سطح. فحين تُعاد W02 **بعد** أن بنت
+             موجةٌ لاحقةٌ ملفَّاتِها، يجدها المسحُ على القرصِ فيدهس ختمَها:
+             قِيس ٢٠٢٦-٠٨-٢٨ أنَّ **18 صفًّا فقدت `origin='W11'` وصارت `DISK`**،
+             فارتفع مقامُ الأساسِ 651 ⇒ 669 وسقط `W3-14` و`W8-18` و`W11-26`…
+             ⇒ **ما خُتم بموجةٍ يبقى مختومًا**، وما لا ختمَ له يأخذ اشتقاقَ W02.
+             والحاجبُ لا يضعف: الصفُّ الجديدُ يُشتقّ كما كان. */
+        origin = IF(origin REGEXP '^W[0-9]{2}$', origin, VALUES(origin)),
         ghost_verdict=VALUES(ghost_verdict), ghost_why=VALUES(ghost_why),
         guard_kind=VALUES(guard_kind), guard_evidence=VALUES(guard_evidence),
         w2_why=VALUES(w2_why), src_ref=VALUES(src_ref)";
