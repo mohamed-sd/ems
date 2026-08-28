@@ -471,7 +471,16 @@ foreach ($keys as $k) {
              `W15` ملكيّتَهما أيضًا — فظلَّا يتأرجحان. وقِيس ذلك حقنًا: تشغيلُ
              W02 يعيدهما `EX-CEO` وحدَهما. ⇒ **المُعوَّلُ عليه `verdict_rule`** —
              فهو أثرُ القرارِ المكتوبِ أيًّا كان صنفُ الحكم. */
-        owner_code = IF(verdict_rule LIKE 'RPR-W15%', owner_code, VALUES(owner_code)),
+        /* ⛔ **والاشتقاقُ الجاهلُ لا يمحو المعلوم**: صفُّ «الكونِ» القادمُ من مسحِ
+             القرصِ يحمل `owner_code = ''` (‏فالقرصُ لا يعرف مالكًا)، فكانت W02
+             **تُفرِغ مالكَ كلِّ سطحِ نموٍّ** كتبته موجةٌ لاحقة. ثمَّ تعيده تلك
+             الموجةُ في آخرِ الجولة — **فدفترُ كلِّ موجةٍ كُتب قبلَها يقرأ نطاقًا
+             أضيقَ من نطاقِ حاجبِها**: قِيس `W3-09` ‏69 في الدفتر و83 في الاشتقاق.
+             ⇒ **الفراغُ لا يدهس قيمة**؛ والصفُّ الذي لا مالكَ له يأخذ الفراغَ
+             كما كان، فلا يضعف الحاجب. */
+        owner_code = IF(verdict_rule LIKE 'RPR-W15%'
+                        OR (VALUES(owner_code) = '' AND owner_code <> ''),
+                        owner_code, VALUES(owner_code)),
         owner_role=VALUES(owner_role), owner_rule=VALUES(owner_rule),
         lifecycle=VALUES(lifecycle), lifecycle_rule=VALUES(lifecycle_rule),
         parent_screen_id=VALUES(parent_screen_id), parent_rule=VALUES(parent_rule),

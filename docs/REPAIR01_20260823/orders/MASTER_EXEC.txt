@@ -1,0 +1,699 @@
+أمر التنفيذ الشامل النهائي لبرنامج إصلاح نظام إنجاز
+إلى: منفذ برنامج إصلاح نظام إنجازالحالة: إلزامي ونافذ فورًاالغاية: استكمال جميع أعمال الإصلاح المتبقية في النظام، ومراجعة ما سبق تنفيذه عكسيًا مقابل الحزمة الحاكمة، وتصحيح أي انحراف أو نقص أو تنفيذ خاطئ، ثم استكمال السايدبار والشاشات والتكامل والإنفاذ والاختبارات حتى الوصول إلى أساس تشغيلي مؤسسي قابل للاعتماد.
+أولا — المراجع الحاكمة
+اعمل من هذه اللحظة على أساس ثلاثة أوامر مترابطة:
+1. AMD-01
+هو أمر إدارة التنفيذ واستعادة الاستمرارية.
+يحكم:
+ترتيب سلطة النصوص
+مراجعة القرارات المفتوحة
+مراجعة المتطلبات
+تصنيف الحواجز
+إزالة الحواجز غير الصحيحة
+سجل الاستئناف
+استمرار التنفيذ
+المراجعة العكسية قبل الإغلاق
+2. RPR-02 v2.3
+هو أمر إغلاق مطابقة المعمارية والسايدبار والشاشات.
+يحكم:
+Target Universe
+Screen ID reconciliation
+Sidebar
+Grain
+Fields
+Parent Child
+Source of Truth
+Ownership
+Workflow position
+State Machine
+Local guards
+Screen-level negative tests
+Migration governance
+Target gaps and surplus disposition
+3. RPR-03
+هو أمر التكامل والإنفاذ والجاهزية التشغيلية.
+يحكم:
+Event Consumers
+Business Effects
+Consumer Health
+Approval Enforcement
+Permission Engine
+E2E Human Journeys
+Finance posting lineage
+Backup Restore Fresh Install
+Golden Screens
+Responsive and Accessibility
+Production Readiness
+ولا تعتبر أي واحدة منها بديلًا عن الأخريين.
+ثانيا — إلغاء أي فهم سابق يحصر العمل في المبيعات أو إدارة واحدة
+يُعتبر منسوخًا أي أمر سابق فُهم منه أن:
+يبدأ الإصلاح من إدارة المبيعات ولا ينتقل إلى غيرها حتى اكتمالها
+أو أن:
+وجود حاجز في إدارة واحدة يوقف برنامج الإصلاح كله.
+القاعدة الحاكمة من الآن:
+الحاجز يوقف المتطلب أو النطاق أو المسار الذي ينطبق عليه فقط ولا يوقف البرنامج كله.
+ويجوز العمل على عدة إدارات أو مسارات في الوقت نفسه إذا لم توجد بينها تبعية تمنع ذلك.
+لا تعيد أي إدارة من الصفر.
+ابدأ من:
+أول متطلب مفتوح متحقق منه في سجل الاستئناف المصادق عليه.
+ثالثا — لا تبدأ بالبرمجة قبل التحقق من حالة المشروع
+قبل كتابة أي سطر جديد:
+تحقق من:
+AMD-01 النافذ
+RPR-02 v2.3
+RPR-03
+آخر سجل قرارات مالك
+الفرع الحالي
+Current HEAD
+Schema Version
+Screen Registry Version
+Migration Ledger
+Working Tree
+ولا تعتمد أي أرقام من لقطة تاريخية باعتبارها الحالة الحالية دون إعادة القياس.
+كل قياس رسمي يجب أن يحمل:
+Snapshot ID
+Exact Commit Hash
+Schema Version
+Registry Version
+Measurement Tool Version
+Timestamp
+ولا تخلط أرقامًا من لقطتين مختلفتين.
+رابعا — نظف الشجرة ثم جمد اللقطة
+راجع كل Modified أو Untracked item.
+ولا تحذف شيئًا بلا مراجعة.
+صنف كل عنصر إلى:
+عمل صحيح يلتزم
+Artifact قياس يوثق
+عمل غير صالح يرفع للمراجعة قبل الحذف
+ثم:
+Working Tree = Clean
+بعدها فقط يبدأ القياس الرسمي.
+ولا قياس أثناء البناء.
+ولا بناء أثناء نافذة القياس.
+خامسا — نفذ AMD-01 أولا لاستعادة نقطة التحكم
+المرحلة 1 — توحيد المصادر الحاكمة
+كوّن:
+Governing Source Index
+وحدد:
+المصدر
+الإصدار
+نطاقه
+ما نسخه
+ما بقي نافذًا
+التعارضات
+المطلوب:
+UNRESOLVED_GOVERNING_CONFLICT = 0
+ولا تختَر بين نصين متعارضين باجتهاد.
+المرحلة 2 — المراجعة العكسية للقرارات
+راجع كل قرار Open أو Pending أو Needs Owner Decision.
+وصنفه إلى:
+OPEN_VALID
+ALREADY_DECIDED
+SUPERSEDED
+CONFIG_PENDING
+WRONG_BLOCKER_CLASS
+CONFLICT
+ولا يبقى قرار مفتوح بلا حكم ومرجع.
+ولا تسأل المالك عن قرار سبق حسمه.
+سادسا — طبّق درجات الحجب كما هي
+كل قرار مفتوح يجب أن يحمل درجة واحدة فقط:
+STRUCTURAL_BLOCKER
+يوقف التصميم والتنفيذ المتأثرين.
+BUILD_BLOCKER
+يمنع بناء معاملة أو قدرة محددة.
+ENFORCEMENT_BLOCKER
+المحرك يبنى لكن لا يفعل المنع.
+UAT_BLOCKER
+لا يمنع البناء لكنه يمنع القبول النهائي.
+GO_LIVE_BLOCKER
+يمنع الإصدار فقط.
+CONFIG_PENDING
+لا يمنع التصميم ولا بناء المحرك.
+ويتحول إلى حاجز فقط عندما تصل العملية إلى المرحلة التي تحتاج تلك القيمة.
+لا تكتب أي قيمة مالية أو زمنية من عندك في الكود.
+سابعا — المراجعة العكسية لكل المتطلبات
+لا تعتمد حالة Requirement القديمة.
+لكل Requirement في الحزمة حدد حالته الفعلية:
+EVIDENCE_CLOSED
+نفذ وأغلق بعقد الإثبات المناسب لنوعه.
+IMPLEMENTED_NOT_VERIFIED
+موجود لكنه لم يثبت.
+PARTIALLY_IMPLEMENTED
+منفذ جزئيًا.
+INCORRECTLY_IMPLEMENTED
+موجود لكنه يخالف Target.
+NOT_IMPLEMENTED
+غير منفذ.
+NOT_APPLICABLE
+خرج بقرار أو قاعدة انطباق معتمدة.
+ولا تعتبر:
+وجود الكود = إغلاق.
+ثامنا — استخدم عقد الإثبات الصحيح لكل نوع
+لا تستخدم نفس شروط الإثبات لكل Requirement.
+المتطلب البنيوي أو Metadata
+يحتاج:
+reconciliation حتمي
+Evidence
+regression or negative test إذا انطبق
+المعاملة
+تحتاج:
+Positive path
+Negative path
+State Machine
+SoD
+Authority
+Human verification عند الانطباق
+Event أو Integration
+يحتاج:
+Event emitted
+Consumer received
+Intended effect occurred
+Idempotency
+Retry or compensation
+Projection أو Report
+يحتاج:
+Source lineage
+permission
+field visibility
+rendered verification
+E2E Journey
+تحتاج:
+مستخدمين حقيقيين
+أدوار مختلفة
+Cross-domain handoff
+final intended effect
+تاسعا — أسقط كل قرار على كامل أثره
+أنشئ:
+Decision Impact Register
+ولكل قرار حدد أثره على:
+الوثائق
+الإدارات
+الشاشات
+الحقول
+Grain
+Source of Truth
+البيانات
+الصلاحيات
+State Machines
+Approvals
+Events
+Integrations
+Tests
+Migration
+ولا تعتبر القرار مغلقًا إذا بقي صحيحًا في سجل القرارات وخاطئًا في ملف أو شاشة أو اختبار آخر.
+عاشرا — أزل الحواجز غير الصحيحة
+ارفع فورًا:
+G0 عن Metadata Reconciliation
+Config values التي عوملت كBuild Blockers
+قرارات حسمت ولم يحدث سجلها
+UAT أو Golden Screen في مرحلة ليست مرحلتها
+أي قرار منسوخ ما زال يمنع Domain
+ولا تستخدم Exception لتجاوز قاعدة لا تنطبق أصلًا.
+صحح Applicability Rule نفسها.
+الحادي عشر — أنشئ سجل الاستئناف المؤقت
+في بداية العمل أنشئ:
+RESUME_REGISTER_PROVISIONAL
+لـ21 نطاقًا:
+DEP-01 إلى DEP-17
+EX-CEO
+EX-DVP
+WS-MY
+IAF
+ويحتوي لكل نطاق:
+آخر Requirement مغلق بالدليل
+أول Requirement مفتوح
+Blocker الحالي
+Blocker Class
+هل الحاجز صحيح
+Resume From
+Next Action
+هذا السجل للرؤية فقط وليس للحكم النهائي.
+الثاني عشر — أنشئ سجل استئناف القدرات المنصية
+سجل مستقل عن الإدارات.
+يشمل على الأقل:
+Approval Engine
+Request Routing
+Enterprise Search
+Screen Registry
+Permission Capability
+Security Capability
+Event Infrastructure
+Shared Documents or Notifications عند وجودها
+ولا تعتبر PLATFORM إدارة رقم 22.
+ولكل قدرة:
+Technical Owner
+Policy Owner
+Last Closed
+First Open
+Blocker
+Resume Point
+Next Action
+الثالث عشر — بعد مراجعة القرارات والمتطلبات أعد توليد سجل الاستئناف
+بعد اكتمال المراحل 1 إلى 5 من AMD:
+أنشئ:
+RESUME_REGISTER_VALIDATED
+وهو وحده يصبح Source of Truth للاستمرار.
+أي عمل تم مؤقتًا اعتمادًا على السجل الأول يجب إعادة التحقق منه.
+ولا يبقى أي نطاق:
+بلا Resume Point.
+الرابع عشر — من هذه النقطة يبدأ التنفيذ المستمر
+بعد اعتماد سجل الاستئناف:
+لا تنتظر أمرًا جديدًا من المالك لتنفيذ Next Action غير المحجوب.
+تعمل بالدورة التالية:
+VERIFY→ RESUME→ IMPLEMENT→ TEST→ EVIDENCE→ UPDATE→ NEXT
+ولا ترسل:
+انتهيت هل أبدأ التالي؟
+طالما أن:
+Next Requirement معروف وغير محجوب.
+الخامس عشر — نفذ RPR-02 لإغلاق المعمارية والسايدبار والشاشات
+ابدأ وفق ترتيب RPR-02 الحاكم.
+1. Migration Gate
+ثبت أن أي Migration جديدة لا تسجل نفسها:
+FAIL
+وسوِّ الهجرات التاريخية بحيث:
+UNRECONCILED_MIGRATIONS = 0
+وهذا العمل يملكه RPR-02.
+إذا أغلق بالدليل، RPR-03 يتحقق منه ولا يعيده.
+السادس عشر — وحّد Target Universe
+لا تقارن Count مع Count.
+ادمج:
+Targets في ملفات Excel
+Ghost Targets في النظام
+في:
+Unified Target Universe
+بمعرف Canonical واحد لكل Target.
+لا Target مكرر بسبب وجوده في مصدرين.
+السابع عشر — نفذ Screen ID Reconciliation
+كل Target ينتهي إلى حكم واحد:
+MATCHED
+MERGED_INTO
+TAB_CHILD
+PROJECTION
+NOT_BUILT
+NOT_APPLICABLE
+RETIRED_TARGET
+ولا تعتمد نسبة Coverage بالعدد المجرد.
+المقياسان منفصلان:
+Target Decision Closure
+كل Target له حكم.
+Target Realization
+كم Target منطبقًا تحقق فعليًا.
+الثامن عشر — راجع كل Target من المبني إلى المصمم
+المبدأ:
+Built → Target
+وليس:
+Target → هل يوجد شيء يشبهه؟
+للشاشات المصدرية والمعاملات الحرجة استخدم أسئلة RPR-02 الخمسة عشر كاملة.
+التاسع عشر — فرز الفائض قبل بناء الناقص
+أي Surplus Surface يصنف:
+Critical Surplus
+مثل:
+Duplicate Source
+Unknown Writer
+Wrong Domain Writer
+Security bypass
+يصحح قبل بناء أي Target جديد فوقه.
+Benign Legacy Surplus
+مثل:
+Read-only report
+old projection
+old tab
+old route
+يمكن أن يدخل Cleanup لاحق مع حكم موثق.
+العشرون — صحح السايدبار قبل الشاشات
+لكل إدارة:
+الاسم
+المجموعة
+ترتيب المجموعة
+ترتيب الشاشة
+Parent/Tab
+Visibility
+Route
+Role scope
+بحسب:
+Business Lifecycle
+لا تاريخ الإضافة.
+الحادي والعشرون — افصل دليل الإدارات عن دليل الأدوار
+لدينا:
+Canonical Department Sidebar
+17 إدارة + 4 رموز خارج التعداد.
+ولدينا:
+Rendered Role Sidebar
+لأدوار مثل:
+مدير مخازن
+أمين مستودع
+مدير مالي
+فني
+مشرف
+مدير موقع
+ولا يجب أن يتساوى عدد الأدوار مع عدد الإدارات.
+الثاني والعشرون — صحح كل شاشة وفق RPR-02
+طبق خطوات التصحيح الثماني عشرة كاملة حسب انطباقها:
+Grain
+Parent/Child
+Field order
+Ownership
+Missing fields
+Imported fields
+Derived fields
+Source reference
+Documents
+Approval engine
+Audit block
+State machine
+Workflow bridge
+Permissions
+Controlled lists and validations
+Events
+Exception/correction
+UI language and screen-level human verification
+ولا تعلن PASS إذا كان هناك Gap مسمى.
+الثالث والعشرون — Source of Truth
+لكل حقيقة أعمال:
+Canonical Owner واحد.
+يجوز أن تظهر في أي عدد من الإدارات كProjection.
+لكن لا يجوز:
+إنشاؤها أو تعديلها من Sourceين مستقلين.
+قبل إغلاق RPR-02 يجب أن يصبح:
+Unknown Write Owner = 0
+Duplicate Canonical Source = 0
+Cross Domain Direct Write = 0
+الرابع والعشرون — جسر الشاشة مع دورة العمل
+كل شاشة ينطبق عليها Workflow يجب أن تحمل:
+Screen ID → Workflow Stage
+صراحة.
+لا تعتمد على:
+الاسم
+Route
+inference
+والشاشة التي لا ينطبق عليها Workflow تحمل:
+Applicability Reason
+بدل اختراع مرحلة لها.
+الخامس والعشرون — لا تعتبر فحص RPR-02 إثباتًا لتكامل النظام
+RPR-02 يثبت:
+الشاشة تستدعي الحارس الصحيح
+transition مربوط بالمحرك
+event hook موجود
+source reference صحيح
+local negative test يعمل
+ولا يثبت:
+أن المحرك المركزي نفسه موحد ونافذ عبر المؤسسة.
+ذلك في RPR-03.
+السادس والعشرون — أغلق معيار قبول RPR-02
+لا تنتقل إلى إغلاق طبقة المطابقة حتى تحقق المقاييس الستة عشر الواردة في الوثيقة.
+وأعد إصدار قسم المقام بعد المصالحة بالمعرفات.
+لا تعتمد 82.6% الحالية باعتبارها الرقم النهائي.
+السابع والعشرون — لا يتوقف البرنامج عند RPR-02
+عند إغلاق RPR-02:
+لا تنتظر أمرًا جديدًا.
+أعد Baseline لـRPR-03 على Snapshot الجديد.
+ولا تستخدم أرقام BL-20260828 كحالة راهنة.
+هي Historical Baseline فقط.
+الثامن والعشرون — ابدأ مسارات RPR-03 المستقلة دون انتظار بعضها
+نفذ RPR-03 عبر ستة Tracks.
+Track A — Platform Recovery
+verify Migration Gate remains closed
+backup
+restore
+fresh install
+rebuild
+يبدأ فورًا.
+Track B — Event Integration
+classify events
+business consumers
+FX consumer
+consumer health
+dead letters
+retry
+idempotency
+compensation
+يبدأ فورًا.
+Track C — Permissions
+single permission decision point
+direct URL bypass tests
+field visibility
+PLATFORM justification
+يبدأ فورًا.
+Track D — Approval Enforcement
+ابدأ:
+approval engine
+routing
+role resolution
+دون انتظار القيم.
+تتوقف فقط عند:
+Shadow Window / Enforcement
+إذا لم تصدر الحدود العددية اللازمة.
+ولا تعتبر المسار كله متوقفًا.
+Track E — Human Journeys
+اختبر ما لا يعتمد على Enforcement فورًا.
+والإغلاق النهائي بعد نفاذ الاعتماد.
+Track F — Production Readiness
+manual journals
+golden screens
+accessibility
+responsive
+monitoring
+release evidence
+وفق Dependencies.
+التاسع والعشرون — Event Consumers
+لا تجعل كل 58 Event بحاجة Consumer أعمال.
+صنف:
+BUSINESS
+AUDIT
+RETIRED
+كل Business Event الذي يحتاج أثرًا يجب أن يملك:
+Active Consumer Contract
+وكل Contract يحتوي:
+payload
+idempotency key
+retry
+failure behavior
+audit effect
+والقبول ليس وصول الرسالة.
+بل:
+Intended Business Effect occurred.
+الثلاثون — Consumer Health
+يجب أن تعرف لكل Consumer:
+Last processed event
+Lag
+Error state
+Stalled status
+Alert
+Replay capability
+والقبول:
+Critical Stalled Consumers = 0
+ولا يبقى FX Consumer متوقفًا.
+الحادي والثلاثون — الرسائل الميتة
+كل Dead Letter يجب أن تنتهي إلى حكم:
+Replay
+Compensate
+Close with reason
+ولا:
+Dead Letter بلا حكم.
+الثاني والثلاثون — Approval Enforcement
+التسلسل:
+values issued
+shadow window
+measure four metrics
+remediate
+enforce
+monitor early production behavior
+ولا تفعل Enforcement قبل Shadow.
+ولا توقف بناء المحرك بسبب تأخر القيم.
+الثالث والثلاثون — الصلاحيات
+مصدر قرار واحد.
+القائمة تشتق منه.
+الخادم يستدعيه.
+ولا يوجد:
+Menu says denyserver says allow
+أو العكس.
+اختبر:
+Direct URL
+Unauthorized Action
+Field hiding
+expired delegation
+SoD
+الرابع والثلاثون — الرحلات البشرية الست
+نفذ على الأقل:
+Revenue
+Supplier
+Procurement
+Downtime
+Workforce
+Executive Decision
+بمستخدمين حقيقيين.
+وحيث يحتاج SoD:
+أشخاص مختلفون
+لا أدوار متعددة في حساب واحد.
+الخامس والثلاثون — مصفوفة تغطية الإدارات
+الرحلات الست ليست Coverage كاملة وحدها.
+أنشئ:
+Domain Journey Coverage Matrix
+لكل:
+DEP-01..17
+EX-CEO
+EX-DVP
+WS-MY
+IAF
+حدد:
+Journey
+inbound handoff
+outbound handoff
+source transaction
+final evidence
+ولا يبقى Domain منطبق بلا Journey أو N/A معتمد.
+السادس والثلاثون — القيود المالية
+System-generated journal
+يجب أن يحمل:
+Source Event أو Source Transaction.
+Manual Journal
+يجب أن يحمل:
+Origin Type
+Supporting Document
+Reason
+Prepared By
+Approved By
+Period
+Audit Reference
+ولا يصنف القيد استثناء فقط لأنه يدوي.
+الاستثناء:
+قيد يدوي بلا مصدر أو مبرر أو اعتماد.
+السابع والثلاثون — Fresh Install وBackup وRestore
+أعد الاختبار على المخطط الحالي.
+لا تعتمد أدلة Schema قديم.
+أثبت:
+Fresh Install
+Backup
+Restore
+PITR إذا كان ضمن المتطلب
+data integrity after restore
+actual recovery time
+actual recovery point
+الثامن والثلاثون — Golden Screens
+لا تعتمد Screen قبل:
+Journey
+negative path
+permission check
+real user evidence
+الهدف:
+10/10 Accepted
+التاسع والثلاثون — Responsive and Accessibility
+نفذ:
+Automated structural scan
+على كل surface مؤهل للعرض.
+ثم:
+Manual deep review
+للـ10 Golden Screens على:
+desktop
+tablet
+mobile
+keyboard
+contrast
+usability
+ولا تعتبر العشرة دليلا وحيدا على كل الواجهة.
+الأربعون — المراقبة
+قبل Production Baseline:
+consumer health active
+scheduler health active
+event transport alert active
+dead-letter monitoring active
+approval gate monitoring active
+ويجب أن تكون:
+Critical scheduler failures = 0
+الحادي والأربعون — لا توقف Track بسبب حاجز في Track آخر
+هذه قاعدة غير قابلة للتجاوز.
+إذا توقف Track D بسبب قيم اعتماد:
+استمر في A وB وC وأي جزء من E لا يعتمد عليه.
+ولا تعلن:
+RPR-03 متوقف.
+قل:
+Track D blocked at stage X.
+ثم استمر.
+الثاني والأربعون — لا تعود للمالك إلا في الحالات الحقيقية
+يُرفع للمالك فقط:
+Structural decision
+Build decision
+Governing-text conflict
+true business decision absent after full search
+ولا يُرفع:
+سؤال سبق حسمه
+Config value قبل مرحلتها
+Naming محسوم من Target
+Metadata reconciliation
+measured difference
+technical remediation داخل قرار معماري محسوم
+الثالث والأربعون — اكتشاف P0 خارج النطاق
+إذا ظهر P0 جديد:
+لا تتجاهله.
+ولا تصلحه باجتهاد إذا كان خارج Scope.
+سجله وصنفه.
+إذا كان يفسد:
+Snapshot integrity
+Source of Truth
+Security
+Data integrity
+فأوقف القياس المتأثر فقط حتى يُحسم.
+لا توقف البرنامج كله.
+الرابع والأربعون — تحديث Resume Register باستمرار
+بعد كل دفعة معتبرة:
+حدث:
+Last Closed
+First Open
+Blocker
+Evidence
+Next Action
+ولا تعتمد على ذاكرة المحادثة.
+Resume Register هو سجل استمرار العمل.
+الخامس والأربعون — المراجعة العكسية قبل كل إغلاق
+قبل إعلان أي:
+Requirement
+Domain
+Wave
+RPR
+مغلقًا:
+ارجع إلى ملفه الحاكم.
+وتحقق:
+هل نُفذ كما طلب؟
+لا يكفي:
+يوجد كود.
+ولا:
+الشاشة تفتح.
+ولا:
+التقرير يقول PASS.
+السادس والأربعون — معيار الإغلاق النهائي لهذه الجولة
+لا تصدر:
+Owner Approved Production Baseline
+إلا بعد:
+AMD-01
+كل معايير القبول = صفر حيث المطلوب صفر.
+RPR-02
+جميع معايير المطابقة الستة عشر مغلقة.
+RPR-03
+جميع المقاييس التسعة عشر مغلقة أو لها Owner-approved documented disposition وفق ما تسمح به الوثيقة.
+ولا يوجد:
+Unknown Source Owner
+Duplicate Source
+Direct cross-domain write
+unresolved migration
+critical stalled consumer
+unresolved security bypass
+untested critical journey
+stale restore evidence
+unexplained red readiness axis
+السابع والأربعون — التسلسل النهائي للبرنامج
+من الآن وحتى الإغلاق:
+AMD-01 Control and Reconciliation→ Validated Resume Registers→ RPR-02 Architecture Conformance→ Complete missing and incorrect screens→ RPR-02 Acceptance→ RPR-03 Rebaseline→ Parallel Runtime Tracks→ Cross-domain Human Journeys→ Production Readiness Evidence→ Final Reverse Audit→ Owner Approved Production Baseline
+ولا توجد مرحلة اسمها:
+توقف وانتظر تعليمات
+إلا إذا وصل التنفيذ إلى:
+حاجز حقيقي موثق لا يمكن تجاوزه ضمن نوعه.
+الحكم التنفيذي النهائي
+المطلوب من هذه اللحظة ليس إرسال تقارير متتالية تخبرني أين توقف العمل.
+المطلوب هو:
+استعادة البرنامج كاملًا من الحزمة، مراجعة ما نُفذ عكسيًا، تثبيت الصحيح، تصحيح الخاطئ، استكمال الناقص، وتحديث نقطة الاستئناف باستمرار، ثم مواصلة التنفيذ تلقائيًا حتى إغلاق RPR-02 وRPR-03 ومعايير الجاهزية.
+المالك يتدخل فقط في:
+القرارات الحقيقية.
+أما:
+المعمارية المحسومةوالقياسوالمصالحةوالتصحيح الفنيوالاستمرار بين المتطلبات غير المحجوبة
+فهي مسؤولية المنفذ ولا تحتاج إذنًا جديدًا في كل مرة.
+ابدأ من AMD-01، لا من المبيعات.ابدأ من الحقيقة الحالية، لا من ذاكرة آخر جلسة.ولا تتوقف عند أول حاجز؛ أوقف ما يحجبه فقط واستمر في بقية البرنامج حتى الإغلاق.
