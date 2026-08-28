@@ -71,7 +71,7 @@ $add('state_snapshot', "`state_snapshot` VARCHAR(48) NOT NULL DEFAULT ''
 
 /* ⛔ **والقاعدةُ الصلبةُ تُؤجَّل حتى يصدق المحتوى** — الدرسُ نفسُه من
      `2027_12_14`: قاعدةٌ فوقَ خرقٍ قائمٍ إمّا تُرَدّ وإمّا تُغري بملءِ الفراغ.
-     وتُقفل في `2027_12_17` بعد تشغيلِ `amd01_phase3_requirements.php --apply`. */
+     وتُقفل في `2027_12_18` بعد تشغيلِ `amd01_phase3_requirements.php --apply`. */
 
 $r = $conn->query("SELECT COUNT(*) FROM repair01_requirements");
 printf("\n  متطلباتٌ في الدفتر: **%d** · وكلُّها بلا حكمٍ بعد\n", (int) $r->fetch_row()[0]);
