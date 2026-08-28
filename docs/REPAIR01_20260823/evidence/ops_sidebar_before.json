@@ -1,0 +1,450 @@
+{
+    "role": 1,
+    "uid": 4,
+    "positions": [
+        {
+            "group": "مساحتي",
+            "section": "مساحتي",
+            "label": "الرئيسية",
+            "href": "..\/main\/role_board.php"
+        },
+        {
+            "group": "مساحتي",
+            "section": "مساحتي",
+            "label": "المراسلات",
+            "href": "..\/chats\/index.php"
+        },
+        {
+            "group": "مساحتي",
+            "section": "مساحتي",
+            "label": "إنجاز الإدارة",
+            "href": "..\/Portal\/dept_achievement.php"
+        },
+        {
+            "group": "مساحتي",
+            "section": "مساحتي",
+            "label": "بوابتي",
+            "href": "..\/Portal\/my_portal.php"
+        },
+        {
+            "group": "مساحتي",
+            "section": "مساحتي",
+            "label": "مساحة عملي",
+            "href": "..\/main\/my_workspace.php"
+        },
+        {
+            "group": "مساحتي",
+            "section": "ما ينتظرني",
+            "label": "ما ينتظر اعتمادي",
+            "href": "..\/Approvals\/hours_approval.php"
+        },
+        {
+            "group": "مساحتي",
+            "section": "ما ينتظرني",
+            "label": "موافقات إدارتي",
+            "href": "..\/FinRequests\/dept_inbox.php"
+        },
+        {
+            "group": "مساحتي",
+            "section": "ما ينتظرني",
+            "label": "لوحة الإسناد اليومي",
+            "href": "..\/Approvals\/attribution_board.php"
+        },
+        {
+            "group": "مساحتي",
+            "section": "ما ينتظرني",
+            "label": "صندوق موافقاتي وما ينتظر يدي",
+            "href": "..\/Approvals\/requests.php"
+        },
+        {
+            "group": "مساحتي",
+            "section": "المركز التنفيذي",
+            "label": "مهامي",
+            "href": "..\/Portal\/my_tasks.php"
+        },
+        {
+            "group": "مساحتي",
+            "section": "المركز التنفيذي",
+            "label": "إنجازي",
+            "href": "..\/Portal\/my_achievement.php"
+        },
+        {
+            "group": "التشغيل اليومي",
+            "section": "التشغيل اليومي",
+            "label": "تسجيل التايم شيت والإنتاج",
+            "href": "..\/Timesheet\/view_timesheet.php"
+        },
+        {
+            "group": "التشغيل اليومي",
+            "section": "التشغيل اليومي",
+            "label": "بلاغاتي",
+            "href": "..\/Portal\/my_reports.php"
+        },
+        {
+            "group": "التشغيل اليومي",
+            "section": "التشغيل اليومي",
+            "label": "طلبات الترحيل",
+            "href": "..\/Transport\/transfer_requests.php"
+        },
+        {
+            "group": "التشغيل اليومي",
+            "section": "التشغيل اليومي",
+            "label": "أوامر الصيانة",
+            "href": "..\/Maintenance\/orders.php"
+        },
+        {
+            "group": "التشغيل اليومي",
+            "section": "التشغيل اليومي",
+            "label": "تصحيح الوحدات بالسلسلة الثلاثية",
+            "href": "..\/Operations\/unit_correction.php"
+        },
+        {
+            "group": "التشغيل اليومي",
+            "section": "التخطيط وتخصيص الموارد",
+            "label": "تكليف المشغل على المعدة",
+            "href": "..\/Operations\/distribution_space.php"
+        },
+        {
+            "group": "التشغيل اليومي",
+            "section": "التخطيط وتخصيص الموارد",
+            "label": "إسناد المعدات للوحدات",
+            "href": "..\/Operations\/containers.php"
+        },
+        {
+            "group": "التشغيل اليومي",
+            "section": "التنفيذ اليومي",
+            "label": "الإنتاج والقياس",
+            "href": "..\/Operations\/production.php"
+        },
+        {
+            "group": "التشغيل اليومي",
+            "section": "التنفيذ اليومي",
+            "label": "التوقفات وتحديد المتحمل",
+            "href": "..\/Operations\/stops_unattributed.php"
+        },
+        {
+            "group": "التشغيل اليومي",
+            "section": "الانحرافات وإقفال الفترة",
+            "label": "الأداء الشهري للوحدة",
+            "href": "..\/Operations\/unit_perf.php"
+        },
+        {
+            "group": "التشغيل اليومي",
+            "section": "الانحرافات وإقفال الفترة",
+            "label": "الإقفال الشهري للوحدة",
+            "href": "..\/Operations\/monthly_close.php"
+        },
+        {
+            "group": "العقود والعملاء",
+            "section": "العقود والعملاء",
+            "label": "الجزاءات والحوافز التعاقدية",
+            "href": "..\/Contracts\/penalties.php"
+        },
+        {
+            "group": "العقود والعملاء",
+            "section": "العقود والعملاء",
+            "label": "سجل عقود المشاريع",
+            "href": "..\/Contracts\/contracts.php"
+        },
+        {
+            "group": "العقود والعملاء",
+            "section": "العقود والعملاء",
+            "label": "توزيع وحدات المورد على معداته",
+            "href": "..\/Operations\/equipment_quota.php"
+        },
+        {
+            "group": "العقود والعملاء",
+            "section": "العقود والعملاء",
+            "label": "سجل المطالبات والتسليم للمالية",
+            "href": "..\/Contracts\/claims.php"
+        },
+        {
+            "group": "العقود والعملاء",
+            "section": "العقود والعملاء",
+            "label": "الأعمال غير المفوترة",
+            "href": "..\/Operations\/unbilled.php"
+        },
+        {
+            "group": "المعدات والأسطول",
+            "section": "المعدات والأسطول",
+            "label": "طلب إدخال الأصل",
+            "href": "..\/Fleet\/asset_intake.php"
+        },
+        {
+            "group": "المعدات والأسطول",
+            "section": "المعدات والأسطول",
+            "label": "إسناد الأصل وحركته",
+            "href": "..\/Fleet\/asset_assignments.php"
+        },
+        {
+            "group": "الموظفون والمشغلون",
+            "section": "الموظفون والمشغلون",
+            "label": "لوحة الموارد البشرية",
+            "href": "..\/Employees\/hr_board.php"
+        },
+        {
+            "group": "الموظفون والمشغلون",
+            "section": "الموظفون والمشغلون",
+            "label": "مستندات الموظف",
+            "href": "..\/Employees\/hr_employee_documents.php"
+        },
+        {
+            "group": "الموظفون والمشغلون",
+            "section": "الموظفون والمشغلون",
+            "label": "التهيئة والمباشرة",
+            "href": "..\/Employees\/hr_onboarding.php"
+        },
+        {
+            "group": "الموظفون والمشغلون",
+            "section": "الموظفون والمشغلون",
+            "label": "الحركات الوظيفية",
+            "href": "..\/Employees\/hr_job_movements.php"
+        },
+        {
+            "group": "الموظفون والمشغلون",
+            "section": "الموظفون والمشغلون",
+            "label": "التدريب والكفاءة",
+            "href": "..\/Employees\/hr_training.php"
+        },
+        {
+            "group": "الموظفون والمشغلون",
+            "section": "الموظفون والمشغلون",
+            "label": "تقييم الأداء الوظيفي",
+            "href": "..\/Employees\/hr_performance.php"
+        },
+        {
+            "group": "الموظفون والمشغلون",
+            "section": "الموظفون والمشغلون",
+            "label": "القضايا التأديبية والتحقيق",
+            "href": "..\/Employees\/hr_disciplinary.php"
+        },
+        {
+            "group": "الموظفون والمشغلون",
+            "section": "الموظفون والمشغلون",
+            "label": "تقرير القوى العاملة",
+            "href": "..\/Workforce\/hr_workforce_report.php"
+        },
+        {
+            "group": "الموردون والمشتريات",
+            "section": "الموردون والمشتريات",
+            "label": "تجميع الطلبات وخطة الشراء",
+            "href": "..\/Procurement\/proc_packages.php"
+        },
+        {
+            "group": "الموردون والمشتريات",
+            "section": "الموردون والمشتريات",
+            "label": "طلب العروض ودعوات الموردين",
+            "href": "..\/Procurement\/proc_rfq.php"
+        },
+        {
+            "group": "الموردون والمشتريات",
+            "section": "الموردون والمشتريات",
+            "label": "طلبات الشراء",
+            "href": "..\/Procurement\/requests_proc.php"
+        },
+        {
+            "group": "المالية والمحاسبة",
+            "section": "المالية والمحاسبة",
+            "label": "سجل الأدوات المالية",
+            "href": "..\/Finance\/tre_instruments.php"
+        },
+        {
+            "group": "المالية والمحاسبة",
+            "section": "المالية والمحاسبة",
+            "label": "تخصيص التحصيل على الفواتير",
+            "href": "..\/Finance\/tre_allocations.php"
+        },
+        {
+            "group": "المالية والمحاسبة",
+            "section": "المالية والمحاسبة",
+            "label": "صف الدفع المعتمد",
+            "href": "..\/Finance\/tre_payment_queue.php"
+        },
+        {
+            "group": "المالية والمحاسبة",
+            "section": "المالية والمحاسبة",
+            "label": "حركة الخزينة والصناديق",
+            "href": "..\/Finance\/tre_cash_moves.php"
+        },
+        {
+            "group": "المالية والمحاسبة",
+            "section": "المالية والمحاسبة",
+            "label": "التحويلات بين الحسابات",
+            "href": "..\/Finance\/tre_transfers.php"
+        },
+        {
+            "group": "المالية والمحاسبة",
+            "section": "المالية والمحاسبة",
+            "label": "عهد النثرية وتسويتها",
+            "href": "..\/Finance\/tre_petty_cash.php"
+        },
+        {
+            "group": "المالية والمحاسبة",
+            "section": "المالية والمحاسبة",
+            "label": "الجرد النقدي للخزائن",
+            "href": "..\/Finance\/tre_cash_count.php"
+        },
+        {
+            "group": "المالية والمحاسبة",
+            "section": "المالية والمحاسبة",
+            "label": "ميزانية إدارة التمويل",
+            "href": "..\/Finance\/budget_dept.php"
+        },
+        {
+            "group": "المالية والمحاسبة",
+            "section": "المالية والمحاسبة",
+            "label": "طلباتي المالية",
+            "href": "..\/FinRequests\/request_form.php"
+        },
+        {
+            "group": "الخزينة والتمويل",
+            "section": "الخزينة والتمويل",
+            "label": "جهات اتصال الممولين والمفوضين",
+            "href": "..\/Financing\/fin_financier_contacts.php"
+        },
+        {
+            "group": "الخزينة والتمويل",
+            "section": "الخزينة والتمويل",
+            "label": "وثائق التأهيل والعناية الواجبة",
+            "href": "..\/Financing\/fin_due_diligence.php"
+        },
+        {
+            "group": "الخزينة والتمويل",
+            "section": "الخزينة والتمويل",
+            "label": "سجل عقود التمويل",
+            "href": "..\/Financing\/fin_contracts.php"
+        },
+        {
+            "group": "الخزينة والتمويل",
+            "section": "الخزينة والتمويل",
+            "label": "بنود وشروط التمويل",
+            "href": "..\/Financing\/fin_contract_terms.php"
+        },
+        {
+            "group": "الخزينة والتمويل",
+            "section": "الخزينة والتمويل",
+            "label": "مصفوفة الالتزامات التمويلية",
+            "href": "..\/Financing\/fin_covenants.php"
+        },
+        {
+            "group": "الحوكمة والتدقيق",
+            "section": "الحوكمة والتدقيق",
+            "label": "لوحة الحوكمة والالتزام",
+            "href": "..\/Governance\/gov_board.php"
+        },
+        {
+            "group": "الحوكمة والتدقيق",
+            "section": "الحوكمة والتدقيق",
+            "label": "سجل الشركات والكيانات",
+            "href": "..\/Governance\/entities_registry.php"
+        },
+        {
+            "group": "الحوكمة والتدقيق",
+            "section": "الحوكمة والتدقيق",
+            "label": "سجل السياسات",
+            "href": "..\/Governance\/policies.php"
+        },
+        {
+            "group": "الحوكمة والتدقيق",
+            "section": "الحوكمة والتدقيق",
+            "label": "الالتزامات التنظيمية",
+            "href": "..\/Governance\/obligations.php"
+        },
+        {
+            "group": "الحوكمة والتدقيق",
+            "section": "الحوكمة والتدقيق",
+            "label": "تقويم الامتثال",
+            "href": "..\/Governance\/compliance_calendar.php"
+        },
+        {
+            "group": "الحوكمة والتدقيق",
+            "section": "الحوكمة والتدقيق",
+            "label": "التفويض بالتوقيع",
+            "href": "..\/Governance\/signing_authority.php"
+        },
+        {
+            "group": "الحوكمة والتدقيق",
+            "section": "الحوكمة والتدقيق",
+            "label": "التقديمات النظامية",
+            "href": "..\/Governance\/regulatory_filings.php"
+        },
+        {
+            "group": "المخاطر والبلاغات",
+            "section": "المخاطر والبلاغات",
+            "label": "صندوق بلاغات الإدارة",
+            "href": "..\/Tickets\/tickets_list.php?tab=dept"
+        },
+        {
+            "group": "المخاطر والبلاغات",
+            "section": "المخاطر والبلاغات",
+            "label": "مساحة مخاطر الإدارة",
+            "href": "..\/Risk\/dept_risk_space.php"
+        },
+        {
+            "group": "التقارير والتحليلات",
+            "section": "التقارير والتحليلات",
+            "label": "الاعتمادات المتأخرة والوثائق",
+            "href": "..\/Reports\/approval_lag_report.php"
+        },
+        {
+            "group": "التقارير والتحليلات",
+            "section": "التقارير والتحليلات",
+            "label": "لوحة مدير التشغيل",
+            "href": "..\/admin\/ops_manager_board.php"
+        },
+        {
+            "group": "التقارير والتحليلات",
+            "section": "التقارير والتحليلات",
+            "label": "غرفة عمليات المواقع",
+            "href": "..\/Operations\/operations_room.php"
+        },
+        {
+            "group": "التقارير والتحليلات",
+            "section": "التقارير والتحليلات",
+            "label": "أرصدة المخزون بحالاتها",
+            "href": "..\/Procurement\/stock_proc.php"
+        },
+        {
+            "group": "التقارير والتحليلات",
+            "section": "التقارير والتحليلات",
+            "label": "تقويم الأسطول والحجز",
+            "href": "..\/Operations\/fleet_calendar.php"
+        },
+        {
+            "group": "التقارير والتحليلات",
+            "section": "التقارير والتحليلات",
+            "label": "استغلال الأسطول ومردوده",
+            "href": "..\/Operations\/fleet_utilization.php"
+        },
+        {
+            "group": "التقارير والتحليلات",
+            "section": "التقارير والتحليلات",
+            "label": "مركز تقارير الحوكمة",
+            "href": "..\/emsreports\/index.php"
+        },
+        {
+            "group": "الإعدادات",
+            "section": "الإعدادات",
+            "label": "أنماط تفعيل المزايا",
+            "href": "..\/Governance\/activation_patterns.php"
+        },
+        {
+            "group": "الإعدادات",
+            "section": "الإعدادات",
+            "label": "التكليفات التنظيمية",
+            "href": "..\/admin\/org_assignments.php"
+        },
+        {
+            "group": "الإعدادات",
+            "section": "الإعدادات",
+            "label": "أذون الزيارة والمركبات الخارجية",
+            "href": "..\/admin\/org_permits.php"
+        },
+        {
+            "group": "الإعدادات",
+            "section": "الإعدادات",
+            "label": "إدارة المعاونين",
+            "href": "..\/main\/project_users.php"
+        }
+    ]
+}

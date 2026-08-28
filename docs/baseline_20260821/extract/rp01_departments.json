@@ -1,0 +1,170 @@
+[
+    {
+        "canonical_code": "IAF",
+        "display_order": null,
+        "name_ar": "المراجعة الداخلية",
+        "sector": "OUTSIDE",
+        "parent_code": null,
+        "note": "Independent Assurance Function — ترفع للمالك · الحوكمةُ لا تعدّل نتيجتَها"
+    },
+    {
+        "canonical_code": "WS-MY",
+        "display_order": null,
+        "name_ar": "مساحة عملي",
+        "sector": "OUTSIDE",
+        "parent_code": null,
+        "note": "Personal Workspace — إسقاطٌ ومُطلِقُ طلباتٍ لا مصدرَ حقيقة"
+    },
+    {
+        "canonical_code": "EX-CEO",
+        "display_order": null,
+        "name_ar": "الرئيس التنفيذي",
+        "sector": "OUTSIDE",
+        "parent_code": null,
+        "note": "Executive Workspace — خارجَ الـ17"
+    },
+    {
+        "canonical_code": "EX-DVP",
+        "display_order": null,
+        "name_ar": "نواب الرئيس",
+        "sector": "OUTSIDE",
+        "parent_code": null,
+        "note": "Deputy_Role \/ Scope — خارجَ الـ17"
+    },
+    {
+        "canonical_code": "DEP-01",
+        "display_order": "1",
+        "name_ar": "إدارة المبيعات التعاقدية والعقود",
+        "sector": "CORPORATE",
+        "parent_code": null,
+        "note": ""
+    },
+    {
+        "canonical_code": "DEP-02",
+        "display_order": "2",
+        "name_ar": "إدارة الموردين",
+        "sector": "CORPORATE",
+        "parent_code": null,
+        "note": ""
+    },
+    {
+        "canonical_code": "DEP-03",
+        "display_order": "3",
+        "name_ar": "إدارة التمويل والممولين",
+        "sector": "CORPORATE",
+        "parent_code": null,
+        "note": ""
+    },
+    {
+        "canonical_code": "DEP-04",
+        "display_order": "4",
+        "name_ar": "إدارة الأسطول والأصول",
+        "sector": "CORPORATE",
+        "parent_code": null,
+        "note": ""
+    },
+    {
+        "canonical_code": "DEP-05",
+        "display_order": "5",
+        "name_ar": "الإدارة المالية",
+        "sector": "CORPORATE",
+        "parent_code": null,
+        "note": "تعترف وتقيّد — GL · AR\/AP · إقفال · قوائم"
+    },
+    {
+        "canonical_code": "DEP-06",
+        "display_order": "6",
+        "name_ar": "إدارة الخزينة",
+        "sector": "CORPORATE",
+        "parent_code": null,
+        "note": "تقبض وتصرف وتنفّذ — بنوك · سيولة · نثرية"
+    },
+    {
+        "canonical_code": "DEP-07",
+        "display_order": "7",
+        "name_ar": "إدارة الموارد البشرية",
+        "sector": "CORPORATE",
+        "parent_code": null,
+        "note": ""
+    },
+    {
+        "canonical_code": "DEP-08",
+        "display_order": "8",
+        "name_ar": "إدارة الحوكمة والالتزام",
+        "sector": "CORPORATE",
+        "parent_code": null,
+        "note": ""
+    },
+    {
+        "canonical_code": "DEP-09",
+        "display_order": "9",
+        "name_ar": "إدارة المخاطر",
+        "sector": "CORPORATE",
+        "parent_code": null,
+        "note": "أربعُ عائلات: تشغيلي · رأسمالي · تعاقدي · توريد"
+    },
+    {
+        "canonical_code": "DEP-10",
+        "display_order": "10",
+        "name_ar": "إدارة البلاغات",
+        "sector": "CORPORATE",
+        "parent_code": null,
+        "note": "Enterprise_Orchestration_Function=Yes · تملك دورةَ التذكرة لا تنفيذَ الحلّ"
+    },
+    {
+        "canonical_code": "DEP-11",
+        "display_order": "11",
+        "name_ar": "إدارة التشغيل",
+        "sector": "OPERATIONAL",
+        "parent_code": null,
+        "note": "رأسُ القطاع التشغيلي"
+    },
+    {
+        "canonical_code": "DEP-12",
+        "display_order": "12",
+        "name_ar": "إدارة الموقع",
+        "sector": "OPERATIONAL",
+        "parent_code": "DEP-11",
+        "note": "أدنى طبقةٍ إدارية · وتحتها فريقُ المنجم Operational Team لا إدارة"
+    },
+    {
+        "canonical_code": "DEP-13",
+        "display_order": "13",
+        "name_ar": "إدارة القوى التشغيلية",
+        "sector": "OPERATIONAL",
+        "parent_code": "DEP-11",
+        "note": ""
+    },
+    {
+        "canonical_code": "DEP-14",
+        "display_order": "14",
+        "name_ar": "إدارة الصيانة",
+        "sector": "OPERATIONAL",
+        "parent_code": "DEP-11",
+        "note": ""
+    },
+    {
+        "canonical_code": "DEP-15",
+        "display_order": "15",
+        "name_ar": "إدارة النقل والترحيل",
+        "sector": "OPERATIONAL",
+        "parent_code": "DEP-11",
+        "note": ""
+    },
+    {
+        "canonical_code": "DEP-16",
+        "display_order": "16",
+        "name_ar": "إدارة المشتريات",
+        "sector": "OPERATIONAL",
+        "parent_code": "DEP-11",
+        "note": "الوظائفُ الاستراتيجية Group داخلها لا إدارةٌ مركزية"
+    },
+    {
+        "canonical_code": "DEP-17",
+        "display_order": "17",
+        "name_ar": "إدارة المخازن",
+        "sector": "OPERATIONAL",
+        "parent_code": "DEP-11",
+        "note": ""
+    }
+]

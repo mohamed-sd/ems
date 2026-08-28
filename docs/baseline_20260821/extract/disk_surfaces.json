@@ -14,7 +14,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 906,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Approvals\/approval_api.php",
@@ -48,7 +48,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 558,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Approvals\/hours_approval.php",
@@ -65,7 +65,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 1871,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Approvals\/hours_approval_followup.php",
@@ -82,7 +82,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 1026,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Approvals\/hours_approval_handler.php",
@@ -99,7 +99,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 536,
-        "mtime": "2026-08-15"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Approvals\/requests.php",
@@ -116,7 +116,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 577,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Audit\/iaf_access_log.php",
@@ -133,7 +133,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 33,
-        "mtime": "2026-08-09"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Audit\/iaf_action_plans.php",
@@ -150,7 +150,24 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 49,
-        "mtime": "2026-08-11"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Audit\/iaf_audit_programs.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 83,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Audit\/iaf_authorities.php",
@@ -167,7 +184,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 34,
-        "mtime": "2026-08-09"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Audit\/iaf_charter.php",
@@ -184,7 +201,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 52,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Audit\/iaf_closure.php",
@@ -201,7 +218,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 34,
-        "mtime": "2026-08-09"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Audit\/iaf_competencies.php",
@@ -218,7 +235,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 34,
-        "mtime": "2026-08-09"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Audit\/iaf_engagements.php",
@@ -235,7 +252,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 54,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Audit\/iaf_escalations.php",
@@ -252,7 +269,24 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 34,
-        "mtime": "2026-08-09"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Audit\/iaf_evidence_requests.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 82,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Audit\/iaf_findings.php",
@@ -269,7 +303,24 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 76,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Audit\/iaf_function_risks.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 81,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Audit\/iaf_independence.php",
@@ -286,7 +337,24 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 54,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Audit\/iaf_overview.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 79,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Audit\/iaf_plan.php",
@@ -303,7 +371,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 54,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Audit\/iaf_quality.php",
@@ -320,7 +388,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 39,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Audit\/iaf_reports.php",
@@ -337,7 +405,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 39,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Audit\/iaf_responses.php",
@@ -354,7 +422,24 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 49,
-        "mtime": "2026-08-11"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Audit\/iaf_test_samples.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 82,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Audit\/iaf_universe.php",
@@ -371,7 +456,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 54,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Audit\/iaf_workpapers.php",
@@ -388,7 +473,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 48,
-        "mtime": "2026-08-11"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Clients\/activities.php",
@@ -405,7 +490,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 908,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Clients\/client_contacts.php",
@@ -422,7 +507,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 88,
-        "mtime": "2026-08-23"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Clients\/client_profile.php",
@@ -439,7 +524,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 1425,
-        "mtime": "2026-08-22"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Clients\/clients.php",
@@ -456,7 +541,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 1558,
-        "mtime": "2026-08-22"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Clients\/commercial_risks.php",
@@ -473,7 +558,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 925,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Clients\/contract_amendments.php",
@@ -489,8 +574,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 835,
-        "mtime": "2026-08-19"
+        "lines": 836,
+        "mtime": "2026-08-25"
     },
     {
         "path": "Clients\/contract_commitments.php",
@@ -506,8 +591,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 1092,
-        "mtime": "2026-08-19"
+        "lines": 1093,
+        "mtime": "2026-08-25"
     },
     {
         "path": "Clients\/contract_events.php",
@@ -523,8 +608,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 795,
-        "mtime": "2026-08-22"
+        "lines": 796,
+        "mtime": "2026-08-25"
     },
     {
         "path": "Clients\/pricelists.php",
@@ -540,8 +625,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 787,
-        "mtime": "2026-08-21"
+        "lines": 788,
+        "mtime": "2026-08-25"
     },
     {
         "path": "Clients\/products.php",
@@ -557,8 +642,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 772,
-        "mtime": "2026-08-21"
+        "lines": 773,
+        "mtime": "2026-08-25"
     },
     {
         "path": "Clients\/quotation_lines.php",
@@ -575,7 +660,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 168,
-        "mtime": "2026-08-22"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Clients\/quotation_negotiation.php",
@@ -592,7 +677,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 165,
-        "mtime": "2026-08-22"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Clients\/quotations.php",
@@ -608,8 +693,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 911,
-        "mtime": "2026-08-22"
+        "lines": 916,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Clients\/rate_books.php",
@@ -626,7 +711,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 529,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Clients\/readiness_lines.php",
@@ -642,8 +727,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 844,
-        "mtime": "2026-08-22"
+        "lines": 849,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Clients\/tenders.php",
@@ -659,8 +744,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 854,
-        "mtime": "2026-08-21"
+        "lines": 855,
+        "mtime": "2026-08-25"
     },
     {
         "path": "Clients\/units_of_measure.php",
@@ -676,8 +761,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 674,
-        "mtime": "2026-08-21"
+        "lines": 675,
+        "mtime": "2026-08-25"
     },
     {
         "path": "Contracts\/advance_helpers.php",
@@ -694,7 +779,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 368,
-        "mtime": "2026-08-01"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Contracts\/claim_helpers.php",
@@ -710,8 +795,8 @@
         "thead": 0,
         "form": 0,
         "deprecated_mark": 0,
-        "lines": 1224,
-        "mtime": "2026-08-11"
+        "lines": 1238,
+        "mtime": "2026-08-25"
     },
     {
         "path": "Contracts\/claims.php",
@@ -728,7 +813,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 862,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Contracts\/client_statement.php",
@@ -745,7 +830,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 200,
-        "mtime": "2026-08-22"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Contracts\/collections.php",
@@ -762,7 +847,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 454,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Contracts\/commercial_board.php",
@@ -779,7 +864,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 243,
-        "mtime": "2026-08-23"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Contracts\/contract_actions_handler.php",
@@ -796,7 +881,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 651,
-        "mtime": "2026-08-06"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Contracts\/contract_baseline.php",
@@ -813,7 +898,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 300,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Contracts\/contract_card.php",
@@ -830,7 +915,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 324,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Contracts\/contract_coverage.php",
@@ -847,7 +932,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 306,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Contracts\/contract_guarantees.php",
@@ -864,7 +949,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 314,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Contracts\/contract_lifecycle.php",
@@ -881,7 +966,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 298,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Contracts\/contract_lines.php",
@@ -898,7 +983,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 332,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Contracts\/contract_monthly_plan.php",
@@ -915,7 +1000,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 292,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Contracts\/contract_obligations.php",
@@ -932,7 +1017,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 648,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Contracts\/contract_payment_schedule.php",
@@ -949,7 +1034,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 435,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Contracts\/contract_resource_plan.php",
@@ -966,7 +1051,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 346,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Contracts\/contract_sites.php",
@@ -983,7 +1068,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 272,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Contracts\/contractequipments_handler.php",
@@ -1016,8 +1101,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 1920,
-        "mtime": "2026-08-19"
+        "lines": 1921,
+        "mtime": "2026-08-25"
     },
     {
         "path": "Contracts\/contracts_details.php",
@@ -1034,7 +1119,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 1989,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Contracts\/cron_price_adjustment.php",
@@ -1051,7 +1136,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 63,
-        "mtime": "2026-08-15"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Contracts\/get_contract_equipments.php",
@@ -1102,7 +1187,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 486,
-        "mtime": "2026-08-11"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Contracts\/penalties.php",
@@ -1118,8 +1203,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 485,
-        "mtime": "2026-08-17"
+        "lines": 496,
+        "mtime": "2026-08-25"
     },
     {
         "path": "Contracts\/plan_actual_link.php",
@@ -1136,7 +1221,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 291,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Contracts\/price_terms.php",
@@ -1153,7 +1238,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 488,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Contracts\/tax_invoices.php",
@@ -1170,7 +1255,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 266,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Contracts\/unit_client_match.php",
@@ -1187,7 +1272,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 125,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Contracts\/unit_statement_client.php",
@@ -1204,7 +1289,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 74,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Contracts\/update_contract_details.php",
@@ -1238,7 +1323,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 266,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Employees\/employee_contract_actions_handler.php",
@@ -1272,7 +1357,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 1724,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Employees\/employee_contracts_details.php",
@@ -1289,7 +1374,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 2425,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Employees\/employee_equipment_history.php",
@@ -1306,7 +1391,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 196,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Employees\/employee_profile.php",
@@ -1323,7 +1408,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 839,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Employees\/employee_roles.php",
@@ -1340,7 +1425,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 253,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Employees\/employees.php",
@@ -1357,7 +1442,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 1262,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Employees\/equipment_operators.php",
@@ -1374,7 +1459,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 310,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Employees\/get_employee_contract_equipments.php",
@@ -1408,7 +1493,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 120,
-        "mtime": "2026-08-11"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Employees\/get_mine_contracts.php",
@@ -1445,6 +1530,142 @@
         "mtime": "2026-08-06"
     },
     {
+        "path": "Employees\/hr_benefits.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 83,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Employees\/hr_board.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 79,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Employees\/hr_disciplinary.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 85,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Employees\/hr_employee_documents.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 81,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Employees\/hr_job_movements.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 82,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Employees\/hr_onboarding.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 81,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Employees\/hr_performance.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 81,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Employees\/hr_training.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 82,
+        "mtime": "2026-08-27"
+    },
+    {
         "path": "Employees\/job_titles.php",
         "class": "SCREEN",
         "generator": "",
@@ -1459,7 +1680,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 251,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Employees\/showcontractemployee.php",
@@ -1476,7 +1697,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 198,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Equipments\/approve_card.php",
@@ -1493,7 +1714,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 62,
-        "mtime": "2026-08-13"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Equipments\/asset_recon.php",
@@ -1510,7 +1731,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 242,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Equipments\/code_bridge.php",
@@ -1527,7 +1748,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 254,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Equipments\/equipment_card_fields.php",
@@ -1544,7 +1765,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 224,
-        "mtime": "2026-08-11"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Equipments\/equipment_child_save.php",
@@ -1561,7 +1782,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 212,
-        "mtime": "2026-08-02"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Equipments\/equipment_documents.php",
@@ -1578,7 +1799,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 328,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Equipments\/equipment_profile.php",
@@ -1595,7 +1816,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 1260,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Equipments\/equipment_sourcing.php",
@@ -1612,7 +1833,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 277,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Equipments\/equipments.php",
@@ -1629,7 +1850,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 1455,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Equipments\/equipments_drivers.php",
@@ -1646,7 +1867,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 1732,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Equipments\/equipments_fleet.php",
@@ -1663,7 +1884,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 1904,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Equipments\/equipments_types.php",
@@ -1680,7 +1901,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 277,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Equipments\/fin_assets.php",
@@ -1697,7 +1918,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 279,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Equipments\/fleet_depreciation_profiles.php",
@@ -1714,7 +1935,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 464,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Equipments\/fleet_failures.php",
@@ -1731,7 +1952,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 434,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Equipments\/fleet_file.php",
@@ -1765,7 +1986,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 818,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Equipments\/get_contract_stats.php",
@@ -1782,7 +2003,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 192,
-        "mtime": "2026-08-02"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Equipments\/get_equipment_details.php",
@@ -1816,7 +2037,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 39,
-        "mtime": "2026-08-02"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Equipments\/get_model_data.php",
@@ -1833,7 +2054,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 70,
-        "mtime": "2026-08-02"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Equipments\/gov_dept_flt.php",
@@ -1850,7 +2071,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 55,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Equipments\/manage_failure_codes.php",
@@ -1867,7 +2088,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 622,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Equipments\/meter_readings.php",
@@ -1884,7 +2105,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 314,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Equipments\/select_project.php",
@@ -1901,7 +2122,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 317,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "FinRequests\/_finreq_helpers.php",
@@ -1918,7 +2139,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 1043,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "FinRequests\/accountant_desk.php",
@@ -1935,7 +2156,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 168,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "FinRequests\/cycle_time_board.php",
@@ -1952,7 +2173,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 278,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "FinRequests\/dept_inbox.php",
@@ -1969,7 +2190,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 147,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "FinRequests\/effect_map.php",
@@ -1986,7 +2207,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 338,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "FinRequests\/finance_gateway.php",
@@ -2003,7 +2224,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 276,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "FinRequests\/my_requests.php",
@@ -2020,7 +2241,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 32,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-24"
     },
     {
         "path": "FinRequests\/request_actions.php",
@@ -2037,7 +2258,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 659,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "FinRequests\/request_form.php",
@@ -2054,7 +2275,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 886,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "FinRequests\/requests_reports.php",
@@ -2071,7 +2292,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 286,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "FinRequests\/routing_admin.php",
@@ -2088,7 +2309,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 202,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/_board_decisions.php",
@@ -2105,7 +2326,24 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 47,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Finance\/acc_adjustments.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 86,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Finance\/acc_approval_chain.php",
@@ -2122,7 +2360,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 33,
-        "mtime": "2026-08-09"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/acc_backflow.php",
@@ -2139,7 +2377,58 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 47,
-        "mtime": "2026-08-09"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Finance\/acc_closing_checklist.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 84,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Finance\/acc_cost_centers.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 84,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Finance\/acc_credit_control.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 85,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Finance\/acc_my_day.php",
@@ -2156,7 +2445,41 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 35,
-        "mtime": "2026-08-09"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Finance\/acc_reconciliations.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 86,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Finance\/acc_reopen_governance.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 85,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Finance\/acc_routing_matrix.php",
@@ -2173,7 +2496,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 34,
-        "mtime": "2026-08-09"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/acc_specializations.php",
@@ -2190,7 +2513,24 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 34,
-        "mtime": "2026-08-09"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Finance\/acc_trial_balance.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 85,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Finance\/accountants_fin.php",
@@ -2207,7 +2547,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 219,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/accounts_fin.php",
@@ -2224,7 +2564,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 283,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/approvals_inbox.php",
@@ -2241,7 +2581,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 158,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/ar_accrual_gen.php",
@@ -2258,7 +2598,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 175,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/ar_claim_invoice.php",
@@ -2274,8 +2614,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 235,
-        "mtime": "2026-08-21"
+        "lines": 269,
+        "mtime": "2026-08-26"
     },
     {
         "path": "Finance\/ar_completion_cert.php",
@@ -2292,7 +2632,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 177,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/asset_hours_link.php",
@@ -2309,7 +2649,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 108,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/assets_fin.php",
@@ -2326,7 +2666,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 239,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/bank_reconciliation_fin.php",
@@ -2342,8 +2682,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 546,
-        "mtime": "2026-08-19"
+        "lines": 577,
+        "mtime": "2026-08-26"
     },
     {
         "path": "Finance\/budget_dept.php",
@@ -2360,7 +2700,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 95,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/budget_form_fin.php",
@@ -2377,7 +2717,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 427,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/budget_master.php",
@@ -2394,7 +2734,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 79,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/cash_forecast_fin.php",
@@ -2411,7 +2751,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 252,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/cfo_daily_board_fin.php",
@@ -2428,7 +2768,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 190,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/cost_report_fin.php",
@@ -2445,7 +2785,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 282,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/cron_depreciation_fin.php",
@@ -2462,7 +2802,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 108,
-        "mtime": "2026-08-15"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/cron_finance_fin.php",
@@ -2479,7 +2819,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 100,
-        "mtime": "2026-08-16"
+        "mtime": "2026-08-24"
     },
     {
         "path": "Finance\/cron_obligation_alerts.php",
@@ -2496,7 +2836,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 207,
-        "mtime": "2026-08-15"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/cron_periodic_fin.php",
@@ -2513,7 +2853,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 86,
-        "mtime": "2026-08-15"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/ctrl_authority_limits.php",
@@ -2530,7 +2870,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 34,
-        "mtime": "2026-08-09"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/ctrl_dept_propagation.php",
@@ -2547,7 +2887,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 34,
-        "mtime": "2026-08-09"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/ctrl_doc_registry.php",
@@ -2564,7 +2904,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 34,
-        "mtime": "2026-08-09"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/ctrl_doc_variance.php",
@@ -2581,7 +2921,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 34,
-        "mtime": "2026-08-09"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/ctrl_quality_kpis.php",
@@ -2598,7 +2938,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 34,
-        "mtime": "2026-08-09"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/ctrl_role_migration.php",
@@ -2615,7 +2955,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 33,
-        "mtime": "2026-08-09"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/ctrl_supervision.php",
@@ -2632,7 +2972,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 34,
-        "mtime": "2026-08-09"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/currencies_fin.php",
@@ -2649,7 +2989,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 396,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/daily_pricing_fin.php",
@@ -2666,7 +3006,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 421,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/depr_run.php",
@@ -2683,7 +3023,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 101,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/dues_fin.php",
@@ -2699,8 +3039,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 424,
-        "mtime": "2026-08-22"
+        "lines": 452,
+        "mtime": "2026-08-26"
     },
     {
         "path": "Finance\/entitlement.php",
@@ -2717,7 +3057,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 279,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/entitlement_gate.php",
@@ -2734,7 +3074,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 233,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/events_list_fin.php",
@@ -2751,7 +3091,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 565,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/executive_dashboard_fin.php",
@@ -2768,7 +3108,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 186,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/fin_analysis_actions.php",
@@ -2785,7 +3125,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 250,
-        "mtime": "2026-08-08"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/fin_cashflow_stmt.php",
@@ -2802,7 +3142,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 70,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/fin_contract_margin.php",
@@ -2819,7 +3159,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 86,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/fin_early_warning.php",
@@ -2836,7 +3176,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 95,
-        "mtime": "2026-08-22"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/fin_equity_stmt.php",
@@ -2853,7 +3193,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 71,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/fin_helpers.php",
@@ -2870,7 +3210,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 1545,
-        "mtime": "2026-08-22"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/fin_m10_actions.php",
@@ -2887,7 +3227,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 192,
-        "mtime": "2026-08-08"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/fin_posting_matrix.php",
@@ -2904,7 +3244,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 70,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/fin_project_pl.php",
@@ -2921,7 +3261,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 89,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/fin_ratio_detail.php",
@@ -2938,7 +3278,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 92,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/fin_ratio_targets.php",
@@ -2955,7 +3295,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 79,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/fin_ratios.php",
@@ -2972,7 +3312,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 105,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/fin_unit_economics.php",
@@ -2989,7 +3329,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 74,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/financial_statements_fin.php",
@@ -3006,7 +3346,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 190,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/funding_fin.php",
@@ -3023,7 +3363,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 238,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/gov_dept_fin.php",
@@ -3040,7 +3380,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 75,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/import_events_fin.php",
@@ -3057,7 +3397,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 263,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/journal_form_fin.php",
@@ -3074,7 +3414,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 512,
-        "mtime": "2026-08-22"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/maintenance_provision_fin.php",
@@ -3091,7 +3431,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 205,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/management_accounting_fin.php",
@@ -3108,7 +3448,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 232,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/ob_commitments.php",
@@ -3125,7 +3465,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 42,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/ob_contingent.php",
@@ -3142,7 +3482,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 42,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/ob_due_soon.php",
@@ -3159,7 +3499,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 43,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/ob_horizon.php",
@@ -3176,7 +3516,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 44,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/ob_overdue.php",
@@ -3193,7 +3533,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 38,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/ob_register.php",
@@ -3210,7 +3550,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 60,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/ob_schedule.php",
@@ -3227,7 +3567,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 42,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/operator_pay_fin.php",
@@ -3244,7 +3584,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 224,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/operator_pay_policies_fin.php",
@@ -3261,7 +3601,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 434,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/payments_fin.php",
@@ -3278,7 +3618,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 357,
-        "mtime": "2026-08-22"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/periodic_events_fin.php",
@@ -3295,7 +3635,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 287,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/periods_fin.php",
@@ -3312,7 +3652,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 360,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/supplier_statement_fin.php",
@@ -3329,7 +3669,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 336,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/tax_fin.php",
@@ -3346,7 +3686,24 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 236,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Finance\/tre_allocations.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 85,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Finance\/tre_authority_caps.php",
@@ -3363,7 +3720,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 33,
-        "mtime": "2026-08-09"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/tre_beneficiary.php",
@@ -3380,7 +3737,41 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 195,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Finance\/tre_cash_count.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 86,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Finance\/tre_cash_moves.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 86,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Finance\/tre_cycle_stages.php",
@@ -3397,7 +3788,75 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 35,
-        "mtime": "2026-08-09"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Finance\/tre_fx_deals.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 86,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Finance\/tre_guarantees.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 86,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Finance\/tre_instruments.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 85,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Finance\/tre_liquidity_board.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 85,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Finance\/tre_pay_batch.php",
@@ -3414,7 +3873,41 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 197,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Finance\/tre_payment_queue.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 83,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Finance\/tre_petty_cash.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 85,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Finance\/tre_sod_matrix.php",
@@ -3431,7 +3924,24 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 34,
-        "mtime": "2026-08-09"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Finance\/tre_transfers.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 85,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Finance\/tre_unit_roles.php",
@@ -3448,7 +3958,24 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 34,
-        "mtime": "2026-08-09"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Finance\/tre_vessels.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 84,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Finance\/unit_fin_final.php",
@@ -3465,7 +3992,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 208,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/unit_records_fin.php",
@@ -3482,7 +4009,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 538,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Finance\/variance_monitor_fin.php",
@@ -3499,7 +4026,24 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 285,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Finance\/w11_view.php",
+        "class": "INCLUDE",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 0,
+        "header": 0,
+        "bootstrap": 0,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 0,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 118,
+        "mtime": "2026-08-26"
     },
     {
         "path": "Financing\/asset_disposal.php",
@@ -3516,7 +4060,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 149,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Financing\/cost_allocation.php",
@@ -3533,7 +4077,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 111,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Financing\/deviations.php",
@@ -3550,7 +4094,24 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 207,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Financing\/fin_capital_balance.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 83,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Financing\/fin_changes.php",
@@ -3567,7 +4128,177 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 280,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Financing\/fin_close_audit.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 80,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Financing\/fin_contract_close.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 90,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Financing\/fin_contract_terms.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 78,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Financing\/fin_contracts.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 85,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Financing\/fin_covenants.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 84,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Financing\/fin_due_diligence.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 81,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Financing\/fin_final_close.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 88,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Financing\/fin_financier_contacts.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 83,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Financing\/fin_financier_dues.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 83,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Financing\/fin_migration_map.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 83,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Financing\/fin_models.php",
@@ -3584,7 +4315,126 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 302,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Financing\/fin_monthly_close.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 89,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Financing\/fin_needs.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 83,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Financing\/fin_offers.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 85,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Financing\/fin_payment_allocation.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 81,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Financing\/fin_payment_orders.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 90,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Financing\/fin_precontract_review.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 82,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Financing\/fin_ref_dictionary.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 79,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Financing\/financiers_registry.php",
@@ -3601,7 +4451,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 151,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Financing\/financing_board.php",
@@ -3618,7 +4468,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 193,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Financing\/financing_operation_new.php",
@@ -3635,7 +4485,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 160,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Financing\/gov_dept_cap.php",
@@ -3652,7 +4502,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 55,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Financing\/installments.php",
@@ -3669,7 +4519,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 198,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Financing\/operation_profile.php",
@@ -3686,7 +4536,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 292,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Financing\/owners_registry.php",
@@ -3703,7 +4553,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 140,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Financing\/ownership_links.php",
@@ -3720,7 +4570,109 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 284,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Financing\/w12_view.php",
+        "class": "INCLUDE",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 0,
+        "header": 0,
+        "bootstrap": 0,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 0,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 111,
+        "mtime": "2026-08-26"
+    },
+    {
+        "path": "Fleet\/asset_assignments.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 1,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 153,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Fleet\/asset_exit.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 1,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 154,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Fleet\/asset_intake.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 1,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 233,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Fleet\/asset_readiness.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 101,
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Fleet\/asset_use_rights.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 1,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 137,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Fleet\/cron_doc_expiry_escalation.php",
@@ -3737,7 +4689,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 57,
-        "mtime": "2026-08-15"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Fleet\/readiness_board.php",
@@ -3754,7 +4706,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 114,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Fleet\/readiness_cert.php",
@@ -3771,7 +4723,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 116,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Governance\/access_review.php",
@@ -3788,7 +4740,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 261,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Governance\/activation_patterns.php",
@@ -3805,7 +4757,41 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 165,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Governance\/approval_ladders.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 81,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Governance\/audit_followup.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 81,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Governance\/auth_grants.php",
@@ -3822,7 +4808,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 157,
-        "mtime": "2026-08-20"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Governance\/auth_profiles.php",
@@ -3839,7 +4825,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 99,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Governance\/authority_caps.php",
@@ -3856,7 +4842,24 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 204,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Governance\/breaches.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 83,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Governance\/break_glass.php",
@@ -3873,7 +4876,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 250,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Governance\/bus_board.php",
@@ -3890,7 +4893,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 94,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Governance\/bus_deliveries.php",
@@ -3907,7 +4910,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 101,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Governance\/bus_outbox.php",
@@ -3924,7 +4927,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 98,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Governance\/canonical_names.php",
@@ -3941,7 +4944,92 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 263,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Governance\/committees.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 81,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Governance\/compliance_calendar.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 79,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Governance\/conduct_acknowledgements.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 80,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Governance\/conflict_disclosures.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 81,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Governance\/corrective_actions.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 82,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Governance\/cron_permissions.php",
@@ -3958,7 +5046,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 94,
-        "mtime": "2026-08-15"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Governance\/design_system.php",
@@ -3975,7 +5063,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 154,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Governance\/doc_types.php",
@@ -3992,7 +5080,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 258,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Governance\/dr_restore.php",
@@ -4009,7 +5097,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 103,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Governance\/entities_registry.php",
@@ -4026,7 +5114,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 183,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Governance\/exceptions.php",
@@ -4043,7 +5131,41 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 286,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Governance\/gifts_hospitality.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 81,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Governance\/gov_board.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 80,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Governance\/gov_dept.php",
@@ -4060,7 +5182,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 84,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Governance\/gov_dept_gov.php",
@@ -4077,7 +5199,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 67,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Governance\/gov_dept_sal.php",
@@ -4094,7 +5216,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 47,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Governance\/gov_dept_sup.php",
@@ -4111,7 +5233,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 46,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Governance\/gov_m14_actions.php",
@@ -4128,7 +5250,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 181,
-        "mtime": "2026-08-12"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Governance\/gov_reports.php",
@@ -4145,7 +5267,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 306,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Governance\/guard_denials.php",
@@ -4162,7 +5284,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 228,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Governance\/guards.php",
@@ -4179,7 +5301,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 270,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Governance\/impersonations.php",
@@ -4196,7 +5318,41 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 175,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Governance\/integrity_reports.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 81,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Governance\/investigations.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 82,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Governance\/job_queue.php",
@@ -4213,7 +5369,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 98,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Governance\/job_schedule.php",
@@ -4230,7 +5386,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 97,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Governance\/licenses_guarantees.php",
@@ -4247,7 +5403,24 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 253,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Governance\/obligations.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 80,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Governance\/ownership_grants.php",
@@ -4264,7 +5437,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 227,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Governance\/perm_explain.php",
@@ -4281,7 +5454,24 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 322,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Governance\/policies.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 81,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Governance\/portal_users.php",
@@ -4298,7 +5488,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 270,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Governance\/read_log.php",
@@ -4315,7 +5505,41 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 237,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Governance\/regulatory_filings.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 81,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Governance\/related_parties.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 82,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Governance\/security_log.php",
@@ -4332,7 +5556,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 613,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Governance\/sensitive_fields.php",
@@ -4349,7 +5573,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 253,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Governance\/signing_authority.php",
@@ -4366,7 +5590,24 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 214,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Governance\/sod_conflicts.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 81,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Governance\/state_machines.php",
@@ -4383,7 +5624,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 262,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Governance\/tech_gov_center.php",
@@ -4400,7 +5641,24 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 189,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Maintenance\/breakdown_intake.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 98,
+        "mtime": "2026-08-25"
     },
     {
         "path": "Maintenance\/breakdowns.php",
@@ -4420,6 +5678,23 @@
         "mtime": "2026-08-02"
     },
     {
+        "path": "Maintenance\/daily_care.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 91,
+        "mtime": "2026-08-25"
+    },
+    {
         "path": "Maintenance\/dashboard_mnt.php",
         "class": "SCREEN",
         "generator": "",
@@ -4434,7 +5709,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 144,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Maintenance\/equipment_hours_preventive.php",
@@ -4451,7 +5726,24 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 115,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Maintenance\/external_repairs.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 93,
+        "mtime": "2026-08-25"
     },
     {
         "path": "Maintenance\/failure_report.php",
@@ -4468,7 +5760,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 132,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Maintenance\/get_breakdown_count.php",
@@ -4519,7 +5811,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 42,
-        "mtime": "2026-08-14"
+        "mtime": "2026-08-24"
     },
     {
         "path": "Maintenance\/gov_dept_mnt.php",
@@ -4536,7 +5828,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 55,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Maintenance\/inspections.php",
@@ -4553,7 +5845,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 1226,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Maintenance\/master_data.php",
@@ -4570,7 +5862,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 298,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Maintenance\/mnt_helpers.php",
@@ -4587,7 +5879,24 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 535,
-        "mtime": "2026-08-01"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Maintenance\/mnt_kpis.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 96,
+        "mtime": "2026-08-25"
     },
     {
         "path": "Maintenance\/orders.php",
@@ -4604,7 +5913,24 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 1425,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Maintenance\/part_requests.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 91,
+        "mtime": "2026-08-25"
     },
     {
         "path": "Maintenance\/preventive_plans.php",
@@ -4621,7 +5947,24 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 696,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Maintenance\/repeat_repairs.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 96,
+        "mtime": "2026-08-25"
     },
     {
         "path": "Maintenance\/return_to_service.php",
@@ -4637,8 +5980,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 130,
-        "mtime": "2026-08-18"
+        "lines": 192,
+        "mtime": "2026-08-25"
     },
     {
         "path": "Maintenance\/workshop.php",
@@ -4655,7 +5998,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 272,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Operations\/attendance.php",
@@ -4672,7 +6015,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 283,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Operations\/containers.php",
@@ -4689,7 +6032,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 570,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Operations\/cron_asset_reconciliation.php",
@@ -4706,7 +6049,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 111,
-        "mtime": "2026-08-16"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Operations\/cron_capacity_rollup.php",
@@ -4723,7 +6066,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 44,
-        "mtime": "2026-08-16"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Operations\/cron_container_gate_report.php",
@@ -4740,7 +6083,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 98,
-        "mtime": "2026-08-15"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Operations\/cron_fin_posting.php",
@@ -4757,7 +6100,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 117,
-        "mtime": "2026-08-16"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Operations\/cron_job_worker.php",
@@ -4774,7 +6117,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 94,
-        "mtime": "2026-08-15"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Operations\/cron_org_assignments.php",
@@ -4791,7 +6134,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 33,
-        "mtime": "2026-08-15"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Operations\/cron_rotation_transfer.php",
@@ -4808,7 +6151,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 56,
-        "mtime": "2026-08-15"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Operations\/cron_unit_chain_sla.php",
@@ -4825,7 +6168,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 82,
-        "mtime": "2026-08-15"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Operations\/cron_unit_chain_weekly.php",
@@ -4842,7 +6185,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 59,
-        "mtime": "2026-08-15"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Operations\/cron_wfm_engine.php",
@@ -4859,7 +6202,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 324,
-        "mtime": "2026-08-15"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Operations\/daily_plan.php",
@@ -4876,7 +6219,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 344,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Operations\/distribution_space.php",
@@ -4893,7 +6236,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 140,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Operations\/equipment_quota.php",
@@ -4910,7 +6253,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 290,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Operations\/fleet_calendar.php",
@@ -4927,7 +6270,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 454,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Operations\/fleet_utilization.php",
@@ -4944,7 +6287,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 225,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Operations\/gov_dept_ops.php",
@@ -4961,7 +6304,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 55,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Operations\/gov_dept_sit.php",
@@ -4978,7 +6321,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 55,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Operations\/monthly_close.php",
@@ -4995,7 +6338,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 303,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Operations\/monthly_plan.php",
@@ -5012,7 +6355,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 118,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Operations\/operations_room.php",
@@ -5029,7 +6372,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 174,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Operations\/production.php",
@@ -5046,7 +6389,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 294,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Operations\/shift_entry.php",
@@ -5063,7 +6406,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 506,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Operations\/shift_log.php",
@@ -5080,7 +6423,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 267,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Operations\/site_gate_equip.php",
@@ -5097,7 +6440,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 265,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Operations\/site_gate_person.php",
@@ -5114,7 +6457,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 266,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Operations\/site_shift_plan.php",
@@ -5131,7 +6474,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 265,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Operations\/site_work_calendar.php",
@@ -5148,7 +6491,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 265,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Operations\/sites_board.php",
@@ -5165,7 +6508,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 139,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Operations\/stops_unattributed.php",
@@ -5182,7 +6525,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 164,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Operations\/swap_request.php",
@@ -5199,7 +6542,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 237,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Operations\/unbilled.php",
@@ -5216,7 +6559,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 301,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Operations\/unit_correction.php",
@@ -5233,7 +6576,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 190,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Operations\/unit_perf.php",
@@ -5250,7 +6593,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 312,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Opportunities\/client_need_rfq.php",
@@ -5267,7 +6610,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 180,
-        "mtime": "2026-08-22"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Opportunities\/opportunities.php",
@@ -5284,7 +6627,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 1285,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Oprators\/get_contract_stats.php",
@@ -5369,7 +6712,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 1881,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Oprators\/select_project.php",
@@ -5386,7 +6729,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 409,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Portal\/approvals_inbox.php",
@@ -5403,7 +6746,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 186,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Portal\/business_models.php",
@@ -5420,7 +6763,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 255,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Portal\/ceo_approvals.php",
@@ -5436,8 +6779,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 482,
-        "mtime": "2026-08-19"
+        "lines": 510,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Portal\/ceo_assignments.php",
@@ -5454,7 +6797,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 61,
-        "mtime": "2026-08-09"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Portal\/ceo_audit_reports.php",
@@ -5471,7 +6814,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 33,
-        "mtime": "2026-08-09"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Portal\/ceo_board.php",
@@ -5487,8 +6830,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 354,
-        "mtime": "2026-08-18"
+        "lines": 352,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Portal\/ceo_contracts.php",
@@ -5504,8 +6847,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 559,
-        "mtime": "2026-08-19"
+        "lines": 579,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Portal\/ceo_reports.php",
@@ -5522,7 +6865,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 340,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Portal\/ceo_risk.php",
@@ -5538,8 +6881,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 382,
-        "mtime": "2026-08-19"
+        "lines": 390,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Portal\/contract_review.php",
@@ -5556,7 +6899,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 266,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Portal\/dept_achievement.php",
@@ -5573,7 +6916,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 162,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Portal\/dept_board.php",
@@ -5590,7 +6933,296 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 472,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Portal\/exec_actions_followup.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 83,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Portal\/exec_contract_registry.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 84,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Portal\/exec_crisis_command.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 84,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Portal\/exec_critical_exceptions.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 83,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Portal\/exec_daily_deviations.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 84,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Portal\/exec_daily_report.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 82,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Portal\/exec_daily_stops.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 84,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Portal\/exec_delegations.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 83,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Portal\/exec_escalations.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 81,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Portal\/exec_leadership_appointments.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 84,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Portal\/exec_meeting_decisions.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 84,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Portal\/exec_monthly_pack.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 84,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Portal\/exec_raised_requests.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 85,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Portal\/exec_redline_breaches.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 84,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Portal\/exec_reserved_matters.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 83,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Portal\/exec_strategic_decisions.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 84,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Portal\/exec_weekly_report.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 82,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Portal\/founding_mode.php",
@@ -5607,7 +7239,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 250,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Portal\/gov_dept_ceo.php",
@@ -5624,7 +7256,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 58,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Portal\/journey_action.php",
@@ -5641,7 +7273,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 35,
-        "mtime": "2026-08-06"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Portal\/my_achievement.php",
@@ -5658,7 +7290,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 171,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Portal\/my_certificate.php",
@@ -5675,7 +7307,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 201,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Portal\/my_evaluation.php",
@@ -5692,7 +7324,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 232,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Portal\/my_kpi.php",
@@ -5709,7 +7341,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 187,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Portal\/my_portal.php",
@@ -5726,7 +7358,24 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 217,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Portal\/my_reports.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 87,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Portal\/my_requests.php",
@@ -5742,8 +7391,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 296,
-        "mtime": "2026-08-18"
+        "lines": 401,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Portal\/my_tasks.php",
@@ -5760,7 +7409,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 342,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Portal\/notifications.php",
@@ -5777,7 +7426,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 189,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Portal\/portal_elements.php",
@@ -5794,7 +7443,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 153,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Portal\/project_charter.php",
@@ -5810,8 +7459,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 565,
-        "mtime": "2026-08-19"
+        "lines": 580,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Portal\/release_stamp.php",
@@ -5828,7 +7477,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 275,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Portal\/visibility_audit.php",
@@ -5845,7 +7494,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 110,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Portal\/visibility_keys.php",
@@ -5862,7 +7511,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 187,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Portal\/visibility_simulator.php",
@@ -5879,7 +7528,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 178,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Portal\/workspace.php",
@@ -5896,7 +7545,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 198,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Procurement\/_board_waiting.php",
@@ -5913,7 +7562,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 49,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Procurement\/consumption_rate.php",
@@ -5930,7 +7579,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 284,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Procurement\/dashboard_proc.php",
@@ -5947,7 +7596,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 349,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Procurement\/gov_dept_inv.php",
@@ -5964,7 +7613,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 55,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Procurement\/gov_dept_prc.php",
@@ -5981,7 +7630,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 55,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Procurement\/issue_proc.php",
@@ -5998,7 +7647,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 554,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Procurement\/items_proc.php",
@@ -6015,7 +7664,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 432,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Procurement\/master_data_proc.php",
@@ -6032,7 +7681,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 409,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Procurement\/orders_proc.php",
@@ -6049,7 +7698,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 711,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Procurement\/po_match.php",
@@ -6065,8 +7714,42 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 452,
-        "mtime": "2026-08-19"
+        "lines": 505,
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Procurement\/proc_award_minutes.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 105,
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Procurement\/proc_delivery_track.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 100,
+        "mtime": "2026-08-25"
     },
     {
         "path": "Procurement\/proc_helpers.php",
@@ -6083,7 +7766,109 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 941,
-        "mtime": "2026-08-06"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Procurement\/proc_offers.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 127,
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Procurement\/proc_packages.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 115,
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Procurement\/proc_po_amendments.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 124,
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Procurement\/proc_rfq.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 124,
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Procurement\/proc_supplier_eval.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 97,
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Procurement\/proc_track_policy.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 147,
+        "mtime": "2026-08-26"
     },
     {
         "path": "Procurement\/receipt_custody_proc.php",
@@ -6099,8 +7884,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 455,
-        "mtime": "2026-08-22"
+        "lines": 502,
+        "mtime": "2026-08-25"
     },
     {
         "path": "Procurement\/reordering_proc.php",
@@ -6117,7 +7902,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 326,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Procurement\/requests_proc.php",
@@ -6133,8 +7918,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 683,
-        "mtime": "2026-08-22"
+        "lines": 692,
+        "mtime": "2026-08-25"
     },
     {
         "path": "Procurement\/rfq_compare_award.php",
@@ -6151,7 +7936,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 253,
-        "mtime": "2026-08-22"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Procurement\/stock_proc.php",
@@ -6167,8 +7952,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 220,
-        "mtime": "2026-08-19"
+        "lines": 254,
+        "mtime": "2026-08-25"
     },
     {
         "path": "Procurement\/supplier_card_proc.php",
@@ -6185,7 +7970,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 261,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Procurement\/suppliers_proc.php",
@@ -6202,7 +7987,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 286,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Procurement\/warehouse_board.php",
@@ -6218,8 +8003,8 @@
         "thead": 1,
         "form": 0,
         "deprecated_mark": 0,
-        "lines": 132,
-        "mtime": "2026-08-18"
+        "lines": 160,
+        "mtime": "2026-08-25"
     },
     {
         "path": "Procurement\/warehouses.php",
@@ -6236,7 +8021,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 108,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Procurement\/wh_count.php",
@@ -6252,8 +8037,76 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 181,
-        "mtime": "2026-08-19"
+        "lines": 227,
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Procurement\/wh_hazmat.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 96,
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Procurement\/wh_issue_requests.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 126,
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Procurement\/wh_lots.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 114,
+        "mtime": "2026-08-26"
+    },
+    {
+        "path": "Procurement\/wh_month_close.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 100,
+        "mtime": "2026-08-25"
     },
     {
         "path": "Procurement\/wh_receipt.php",
@@ -6270,7 +8123,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 160,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Procurement\/wh_returns.php",
@@ -6287,7 +8140,41 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 153,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Procurement\/wh_serials.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 129,
+        "mtime": "2026-08-26"
+    },
+    {
+        "path": "Procurement\/wh_track_quality.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 120,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Procurement\/wh_transfer.php",
@@ -6303,8 +8190,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 142,
-        "mtime": "2026-08-19"
+        "lines": 191,
+        "mtime": "2026-08-25"
     },
     {
         "path": "Projects\/oprationprojects.php",
@@ -6355,7 +8242,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 216,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Projects\/projects.php",
@@ -6372,7 +8259,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 1066,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Projects\/sites.php",
@@ -6389,7 +8276,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 342,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Reports\/approval_lag_report.php",
@@ -6406,7 +8293,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 203,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Reports\/contract_report.php",
@@ -6423,7 +8310,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 380,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Reports\/contractall.php",
@@ -6440,7 +8327,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 409,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Reports\/daily_units_report.php",
@@ -6457,7 +8344,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 107,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Reports\/deliy.php",
@@ -6474,7 +8361,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 216,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Reports\/deriver.php",
@@ -6491,7 +8378,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 242,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Reports\/driverAndsupplerscontract.php",
@@ -6508,7 +8395,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 242,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Reports\/equipments_reports.php",
@@ -6525,7 +8412,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 206,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Reports\/exceptions_report.php",
@@ -6542,7 +8429,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 86,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Reports\/get_mine_contracts.php",
@@ -6559,7 +8446,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 55,
-        "mtime": "2026-08-02"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Reports\/guard_denials_report.php",
@@ -6576,7 +8463,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 92,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Reports\/margin_report.php",
@@ -6593,7 +8480,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 163,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Reports\/new_reports.php",
@@ -6610,7 +8497,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 227,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Reports\/projects_reports.php",
@@ -6627,7 +8514,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 207,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Reports\/reports.php",
@@ -6644,7 +8531,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 244,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Reports\/timesheet_reports.php",
@@ -6661,7 +8548,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 224,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Reports\/timesheetdeliy.php",
@@ -6678,7 +8565,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 284,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Risk\/_legacy_view_panel.php",
@@ -6695,7 +8582,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 51,
-        "mtime": "2026-08-11"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Risk\/_risk_authority.php",
@@ -6746,7 +8633,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 170,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Risk\/dept_risk_space.php",
@@ -6763,7 +8650,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 210,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Risk\/gov_dept_rsk.php",
@@ -6780,7 +8667,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 273,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Risk\/risk_acceptance.php",
@@ -6797,7 +8684,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 153,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Risk\/risk_actions.php",
@@ -6814,7 +8701,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 589,
-        "mtime": "2026-08-15"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Risk\/risk_appetite.php",
@@ -6831,7 +8718,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 63,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Risk\/risk_assessment.php",
@@ -6848,7 +8735,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 175,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Risk\/risk_board.php",
@@ -6865,7 +8752,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 138,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Risk\/risk_card.php",
@@ -6882,7 +8769,24 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 289,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Risk\/risk_closure.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 81,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Risk\/risk_committee.php",
@@ -6899,7 +8803,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 193,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Risk\/risk_control_verify.php",
@@ -6916,7 +8820,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 215,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Risk\/risk_controls.php",
@@ -6933,7 +8837,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 197,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Risk\/risk_dept_cap.php",
@@ -6950,7 +8854,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 33,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Risk\/risk_dept_ceo.php",
@@ -6967,7 +8871,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 35,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Risk\/risk_dept_crp.php",
@@ -6984,7 +8888,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 33,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Risk\/risk_dept_fin.php",
@@ -7001,7 +8905,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 33,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Risk\/risk_dept_flt.php",
@@ -7018,7 +8922,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 33,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Risk\/risk_dept_gov.php",
@@ -7035,7 +8939,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 31,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Risk\/risk_dept_hrm.php",
@@ -7052,7 +8956,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 33,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Risk\/risk_dept_inv.php",
@@ -7069,7 +8973,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 33,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Risk\/risk_dept_mnt.php",
@@ -7086,7 +8990,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 33,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Risk\/risk_dept_ops.php",
@@ -7103,7 +9007,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 33,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Risk\/risk_dept_prc.php",
@@ -7120,7 +9024,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 33,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Risk\/risk_dept_sal.php",
@@ -7137,7 +9041,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 32,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Risk\/risk_dept_sit.php",
@@ -7154,7 +9058,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 33,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Risk\/risk_dept_sup.php",
@@ -7171,7 +9075,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 31,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Risk\/risk_dept_trp.php",
@@ -7188,7 +9092,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 33,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Risk\/risk_dept_wrk.php",
@@ -7205,7 +9109,41 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 33,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Risk\/risk_escalations.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 80,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Risk\/risk_events.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 83,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Risk\/risk_field.php",
@@ -7222,7 +9160,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 338,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Risk\/risk_incidents.php",
@@ -7239,7 +9177,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 192,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Risk\/risk_kris.php",
@@ -7256,7 +9194,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 96,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Risk\/risk_register.php",
@@ -7273,7 +9211,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 266,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Risk\/risk_reports.php",
@@ -7290,7 +9228,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 191,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Risk\/risk_reviews.php",
@@ -7307,7 +9245,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 76,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Risk\/risk_settings.php",
@@ -7324,7 +9262,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 225,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Risk\/risk_signals.php",
@@ -7341,7 +9279,24 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 191,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Risk\/risk_taxonomy.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 80,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Risk\/risk_treatments.php",
@@ -7358,7 +9313,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 186,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Risk\/risk_units.php",
@@ -7375,7 +9330,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 164,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Settings\/change_password.php",
@@ -7392,7 +9347,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 396,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Settings\/guard_classification.php",
@@ -7409,7 +9364,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 147,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Settings\/modules.php",
@@ -7426,7 +9381,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 655,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Settings\/role_permissions.php",
@@ -7443,7 +9398,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 1037,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Settings\/roles.php",
@@ -7460,7 +9415,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 387,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Settings\/settings.php",
@@ -7477,7 +9432,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 340,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Suppliers\/equipment_plan.php",
@@ -7494,7 +9449,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 131,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Suppliers\/get_mine_contracts.php",
@@ -7562,7 +9517,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 117,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Suppliers\/rfq_requests.php",
@@ -7579,7 +9534,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 397,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Suppliers\/settlements.php",
@@ -7595,8 +9550,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 534,
-        "mtime": "2026-08-22"
+        "lines": 538,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Suppliers\/shares_coverage.php",
@@ -7613,7 +9568,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 135,
-        "mtime": "2026-08-22"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Suppliers\/showcontractsuppliers.php",
@@ -7630,7 +9585,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 177,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Suppliers\/sup_handover.php",
@@ -7647,7 +9602,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 246,
-        "mtime": "2026-08-22"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Suppliers\/supplier_advances.php",
@@ -7664,7 +9619,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 296,
-        "mtime": "2026-08-22"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Suppliers\/supplier_bank.php",
@@ -7681,7 +9636,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 354,
-        "mtime": "2026-08-22"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Suppliers\/supplier_board.php",
@@ -7698,7 +9653,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 181,
-        "mtime": "2026-08-22"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Suppliers\/supplier_capacity.php",
@@ -7715,7 +9670,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 368,
-        "mtime": "2026-08-22"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Suppliers\/supplier_closure.php",
@@ -7732,7 +9687,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 312,
-        "mtime": "2026-08-22"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Suppliers\/supplier_contacts.php",
@@ -7749,7 +9704,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 90,
-        "mtime": "2026-08-23"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Suppliers\/supplier_contract_actions_handler.php",
@@ -7783,7 +9738,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 608,
-        "mtime": "2026-08-22"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Suppliers\/supplier_documents.php",
@@ -7800,7 +9755,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 324,
-        "mtime": "2026-08-22"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Suppliers\/supplier_entitlements.php",
@@ -7817,7 +9772,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 174,
-        "mtime": "2026-08-23"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Suppliers\/supplier_evaluation.php",
@@ -7834,7 +9789,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 345,
-        "mtime": "2026-08-22"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Suppliers\/supplier_profile.php",
@@ -7851,7 +9806,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 350,
-        "mtime": "2026-08-22"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Suppliers\/supplier_rules.php",
@@ -7868,7 +9823,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 342,
-        "mtime": "2026-08-22"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Suppliers\/supplier_violations.php",
@@ -7885,7 +9840,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 222,
-        "mtime": "2026-08-22"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Suppliers\/suppliers.php",
@@ -7902,7 +9857,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 843,
-        "mtime": "2026-08-22"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Suppliers\/suppliers_details.php",
@@ -7919,7 +9874,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 252,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Suppliers\/supplierscontracts.php",
@@ -7936,7 +9891,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 2052,
-        "mtime": "2026-08-22"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Suppliers\/supplierscontracts_details.php",
@@ -7953,7 +9908,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 2261,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Suppliers\/unit_statement_supplier.php",
@@ -7970,7 +9925,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 180,
-        "mtime": "2026-08-22"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Tickets\/admin_close.php",
@@ -7987,7 +9942,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 275,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Tickets\/cron_tickets.php",
@@ -8004,7 +9959,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 224,
-        "mtime": "2026-08-15"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Tickets\/dept_inbox.php",
@@ -8021,7 +9976,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 30,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-24"
     },
     {
         "path": "Tickets\/dept_inbox_map.php",
@@ -8072,7 +10027,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 58,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Tickets\/inquiry.php",
@@ -8089,7 +10044,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 111,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Tickets\/intake_classify.php",
@@ -8106,7 +10061,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 153,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Tickets\/my_tickets.php",
@@ -8123,7 +10078,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 111,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Tickets\/ticket_categories_config.php",
@@ -8140,7 +10095,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 230,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Tickets\/ticket_close.php",
@@ -8157,7 +10112,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 172,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Tickets\/ticket_contextual_open.php",
@@ -8174,7 +10129,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 160,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Tickets\/ticket_dashboard.php",
@@ -8191,7 +10146,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 485,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Tickets\/ticket_escalation_config.php",
@@ -8208,7 +10163,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 192,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Tickets\/ticket_form.php",
@@ -8225,7 +10180,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 990,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Tickets\/ticket_kpi.php",
@@ -8242,7 +10197,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 105,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Tickets\/ticket_recurrence.php",
@@ -8259,7 +10214,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 222,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Tickets\/ticket_sla_config.php",
@@ -8276,7 +10231,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 212,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Tickets\/ticket_types_config.php",
@@ -8293,7 +10248,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 303,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Tickets\/ticket_workstreams_board.php",
@@ -8310,7 +10265,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 180,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Tickets\/tickets_list.php",
@@ -8327,7 +10282,58 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 407,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Tickets\/tkt_assignment.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 82,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Tickets\/tkt_communications.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 78,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Tickets\/tkt_escalation.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 78,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Tickets\/tkt_helpers.php",
@@ -8344,7 +10350,109 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 956,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Tickets\/tkt_parties.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 81,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Tickets\/tkt_reopen.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 81,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Tickets\/tkt_resolution_actions.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 81,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Tickets\/tkt_routing.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 82,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Tickets\/tkt_subject_types.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 80,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Tickets\/tkt_verification.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 86,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Tickets\/watchtower.php",
@@ -8361,7 +10469,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 136,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Timesheet\/_ts_journey.php",
@@ -8378,7 +10486,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 228,
-        "mtime": "2026-08-01"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Timesheet\/aprovment.php",
@@ -8395,7 +10503,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 142,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Timesheet\/get_contract_hours.php",
@@ -8463,7 +10571,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 83,
-        "mtime": "2026-08-02"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Timesheet\/get_timesheet.php",
@@ -8497,7 +10605,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 212,
-        "mtime": "2026-08-06"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Timesheet\/get_timesheet_failures.php",
@@ -8531,7 +10639,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 3260,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Timesheet\/timesheet_details.php",
@@ -8548,7 +10656,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 1372,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Timesheet\/timesheet_type.php",
@@ -8565,7 +10673,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 110,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Timesheet\/ts_driver_filter.php",
@@ -8599,7 +10707,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 1304,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Transport\/cron_transfer.php",
@@ -8616,7 +10724,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 141,
-        "mtime": "2026-08-15"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Transport\/gov_dept_trp.php",
@@ -8633,7 +10741,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 55,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Transport\/transfer_arrival.php",
@@ -8650,7 +10758,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 149,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Transport\/transfer_close_cost.php",
@@ -8667,7 +10775,24 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 192,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Transport\/transfer_closure.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 95,
+        "mtime": "2026-08-25"
     },
     {
         "path": "Transport\/transfer_cost_rules_config.php",
@@ -8684,7 +10809,24 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 293,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Transport\/transfer_damage_claims.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 95,
+        "mtime": "2026-08-25"
     },
     {
         "path": "Transport\/transfer_dashboard.php",
@@ -8701,7 +10843,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 279,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Transport\/transfer_fleet.php",
@@ -8718,7 +10860,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 271,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Transport\/transfer_in_transit.php",
@@ -8734,8 +10876,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 119,
-        "mtime": "2026-08-19"
+        "lines": 157,
+        "mtime": "2026-08-25"
     },
     {
         "path": "Transport\/transfer_order_form.php",
@@ -8752,7 +10894,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 795,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Transport\/transfer_orders_list.php",
@@ -8769,7 +10911,41 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 233,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Transport\/transfer_orders_report.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 90,
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Transport\/transfer_origin_handover.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 93,
+        "mtime": "2026-08-25"
     },
     {
         "path": "Transport\/transfer_permits.php",
@@ -8785,8 +10961,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 264,
-        "mtime": "2026-08-19"
+        "lines": 280,
+        "mtime": "2026-08-25"
     },
     {
         "path": "Transport\/transfer_requests.php",
@@ -8803,7 +10979,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 303,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Transport\/transfer_tariffs.php",
@@ -8820,7 +10996,24 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 396,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Transport\/transfer_trip_legs.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 94,
+        "mtime": "2026-08-25"
     },
     {
         "path": "Transport\/transfer_types_config.php",
@@ -8837,7 +11030,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 260,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Transport\/trs_helpers.php",
@@ -8854,7 +11047,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 628,
-        "mtime": "2026-08-15"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Transport\/trs_locations_config.php",
@@ -8871,7 +11064,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 338,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Workforce\/contract_registry.php",
@@ -8888,7 +11081,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 1058,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Workforce\/deductions.php",
@@ -8905,7 +11098,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 647,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Workforce\/employee_advances.php",
@@ -8922,7 +11115,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 309,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Workforce\/employee_settlements.php",
@@ -8939,7 +11132,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 488,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Workforce\/final_settlement.php",
@@ -8956,7 +11149,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 394,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Workforce\/gov_dept_hrm.php",
@@ -8973,7 +11166,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 58,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Workforce\/gov_dept_wrk.php",
@@ -8990,7 +11183,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 58,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Workforce\/housing_units.php",
@@ -9007,7 +11200,24 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 171,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Workforce\/hr_workforce_report.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 80,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Workforce\/op_codes.php",
@@ -9024,7 +11234,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 248,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Workforce\/op_monthly.php",
@@ -9041,7 +11251,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 274,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Workforce\/op_qual.php",
@@ -9058,7 +11268,24 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 258,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Workforce\/payroll_lines.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 83,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Workforce\/payroll_runs.php",
@@ -9075,7 +11302,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 598,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Workforce\/project_contracts.php",
@@ -9092,7 +11319,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 295,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Workforce\/proposed_deductions.php",
@@ -9109,7 +11336,41 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 160,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Workforce\/rec_applications.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 82,
+        "mtime": "2026-08-27"
+    },
+    {
+        "path": "Workforce\/rec_stages.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 80,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Workforce\/recruitment_pipeline.php",
@@ -9126,7 +11387,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 238,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Workforce\/rotation.php",
@@ -9143,7 +11404,24 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 302,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
+    },
+    {
+        "path": "Workforce\/wf_coverage.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 102,
+        "mtime": "2026-08-27"
     },
     {
         "path": "Workforce\/worker_contract.php",
@@ -9160,7 +11438,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 277,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Workforce\/worker_evaluation.php",
@@ -9177,7 +11455,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 301,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Workforce\/worker_leave_absence.php",
@@ -9194,7 +11472,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 183,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Workforce\/worker_movement.php",
@@ -9211,7 +11489,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 253,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Workforce\/worker_register.php",
@@ -9228,7 +11506,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 553,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Workforce\/worker_settlement.php",
@@ -9245,7 +11523,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 241,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Workforce\/worker_worklog.php",
@@ -9262,7 +11540,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 150,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "Workforce\/workforce_requirement.php",
@@ -9279,7 +11557,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 198,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "admin\/audit_log.php",
@@ -9296,7 +11574,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 213,
-        "mtime": "2026-08-11"
+        "mtime": "2026-08-25"
     },
     {
         "path": "admin\/bus_monitor.php",
@@ -9313,7 +11591,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 171,
-        "mtime": "2026-07-16"
+        "mtime": "2026-08-25"
     },
     {
         "path": "admin\/companies.php",
@@ -9330,7 +11608,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 633,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "admin\/companies\/action.php",
@@ -9347,7 +11625,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 619,
-        "mtime": "2026-07-16"
+        "mtime": "2026-08-25"
     },
     {
         "path": "admin\/companies\/view.php",
@@ -9364,7 +11642,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 560,
-        "mtime": "2026-08-11"
+        "mtime": "2026-08-25"
     },
     {
         "path": "admin\/cron_backup.php",
@@ -9381,7 +11659,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 46,
-        "mtime": "2026-08-15"
+        "mtime": "2026-08-24"
     },
     {
         "path": "admin\/csrf_monitor.php",
@@ -9398,7 +11676,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 282,
-        "mtime": "2026-07-07"
+        "mtime": "2026-08-25"
     },
     {
         "path": "admin\/dashboard.php",
@@ -9415,7 +11693,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 238,
-        "mtime": "2026-08-11"
+        "mtime": "2026-08-25"
     },
     {
         "path": "admin\/forgot_password.php",
@@ -9432,7 +11710,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 107,
-        "mtime": "2026-08-13"
+        "mtime": "2026-08-25"
     },
     {
         "path": "admin\/includes\/auth.php",
@@ -9449,7 +11727,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 245,
-        "mtime": "2026-05-10"
+        "mtime": "2026-08-25"
     },
     {
         "path": "admin\/includes\/db_tools.php",
@@ -9466,7 +11744,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 606,
-        "mtime": "2026-08-02"
+        "mtime": "2026-08-25"
     },
     {
         "path": "admin\/includes\/layout_foot.php",
@@ -9500,7 +11778,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 489,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-24"
     },
     {
         "path": "admin\/index.php",
@@ -9534,7 +11812,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 331,
-        "mtime": "2026-08-13"
+        "mtime": "2026-08-25"
     },
     {
         "path": "admin\/logout.php",
@@ -9568,7 +11846,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 601,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "admin\/ops_manager_board.php",
@@ -9585,7 +11863,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 230,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "admin\/org_assignments.php",
@@ -9602,7 +11880,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 293,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "admin\/org_permits.php",
@@ -9619,7 +11897,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 249,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "admin\/org_structure.php",
@@ -9636,7 +11914,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 123,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "admin\/perm_system.php",
@@ -9653,7 +11931,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 285,
-        "mtime": "2026-08-05"
+        "mtime": "2026-08-25"
     },
     {
         "path": "admin\/permissions\/index.php",
@@ -9670,7 +11948,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 462,
-        "mtime": "2026-08-11"
+        "mtime": "2026-08-25"
     },
     {
         "path": "admin\/permissions\/link_groups.php",
@@ -9687,7 +11965,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 529,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "admin\/permissions\/modules.php",
@@ -9704,7 +11982,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 774,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "admin\/permissions\/nav_items.php",
@@ -9721,7 +11999,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 404,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "admin\/permissions\/role_permissions.php",
@@ -9738,7 +12016,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 813,
-        "mtime": "2026-08-11"
+        "mtime": "2026-08-25"
     },
     {
         "path": "admin\/permissions\/roles.php",
@@ -9755,7 +12033,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 474,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-24"
     },
     {
         "path": "admin\/permissions\/screen_guide.php",
@@ -9772,7 +12050,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 521,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "admin\/plans.php",
@@ -9789,7 +12067,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 304,
-        "mtime": "2026-08-13"
+        "mtime": "2026-08-25"
     },
     {
         "path": "admin\/reports_permissions.php",
@@ -9806,7 +12084,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 337,
-        "mtime": "2026-08-11"
+        "mtime": "2026-08-25"
     },
     {
         "path": "admin\/reset_password.php",
@@ -9823,7 +12101,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 141,
-        "mtime": "2026-08-13"
+        "mtime": "2026-08-25"
     },
     {
         "path": "admin\/sec_employee_wizard.php",
@@ -9839,8 +12117,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 240,
-        "mtime": "2026-08-18"
+        "lines": 288,
+        "mtime": "2026-08-25"
     },
     {
         "path": "admin\/sec_governance.php",
@@ -9857,7 +12135,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 321,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     },
     {
         "path": "admin\/settings.php",
@@ -9874,7 +12152,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 524,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "admin\/setup_once.php",
@@ -9891,7 +12169,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 175,
-        "mtime": "2026-07-16"
+        "mtime": "2026-08-25"
     },
     {
         "path": "admin\/subscriptions\/requests.php",
@@ -9908,7 +12186,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 743,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "admin\/support\/view.php",
@@ -9959,7 +12237,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 549,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "api\/controllers\/auth.php",
@@ -9976,7 +12254,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 183,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-24"
     },
     {
         "path": "api\/controllers\/board.php",
@@ -9993,7 +12271,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 270,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "api\/controllers\/employees.php",
@@ -10010,7 +12288,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 107,
-        "mtime": "2026-08-01"
+        "mtime": "2026-08-25"
     },
     {
         "path": "api\/controllers\/lists.php",
@@ -10044,7 +12322,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 374,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "api\/controllers\/periods.php",
@@ -10061,7 +12339,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 59,
-        "mtime": "2026-08-01"
+        "mtime": "2026-08-25"
     },
     {
         "path": "api\/controllers\/sync.php",
@@ -10078,7 +12356,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 226,
-        "mtime": "2026-06-25"
+        "mtime": "2026-08-25"
     },
     {
         "path": "api\/controllers\/timesheet.php",
@@ -10095,7 +12373,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 1069,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "api\/index.php",
@@ -10112,7 +12390,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 256,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "company\/auth.php",
@@ -10129,7 +12407,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 432,
-        "mtime": "2026-07-16"
+        "mtime": "2026-08-25"
     },
     {
         "path": "company\/forgot_password.php",
@@ -10146,7 +12424,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 70,
-        "mtime": "2026-08-13"
+        "mtime": "2026-08-25"
     },
     {
         "path": "company\/home.php",
@@ -10163,7 +12441,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 73,
-        "mtime": "2026-08-13"
+        "mtime": "2026-08-25"
     },
     {
         "path": "company\/login.php",
@@ -10180,7 +12458,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 405,
-        "mtime": "2026-08-13"
+        "mtime": "2026-08-25"
     },
     {
         "path": "company\/logout.php",
@@ -10214,7 +12492,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 1472,
-        "mtime": "2026-08-13"
+        "mtime": "2026-08-25"
     },
     {
         "path": "company\/request_subscription.php",
@@ -10231,7 +12509,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 379,
-        "mtime": "2026-08-13"
+        "mtime": "2026-08-25"
     },
     {
         "path": "company\/reset_password.php",
@@ -10248,7 +12526,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 42,
-        "mtime": "2026-08-13"
+        "mtime": "2026-08-25"
     },
     {
         "path": "company\/team.php",
@@ -10265,7 +12543,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 529,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "config.php",
@@ -10282,7 +12560,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 638,
-        "mtime": "2026-08-22"
+        "mtime": "2026-08-25"
     },
     {
         "path": "cron_events.php",
@@ -10299,7 +12577,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 279,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "cron_jobs.php",
@@ -10316,7 +12594,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 135,
-        "mtime": "2026-08-16"
+        "mtime": "2026-08-25"
     },
     {
         "path": "cron_proc_replenish.php",
@@ -10333,7 +12611,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 70,
-        "mtime": "2026-08-06"
+        "mtime": "2026-08-25"
     },
     {
         "path": "cron_requests.php",
@@ -10350,7 +12628,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 253,
-        "mtime": "2026-07-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "excel.php",
@@ -10367,7 +12645,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 174,
-        "mtime": "2026-08-20"
+        "mtime": "2026-08-25"
     },
     {
         "path": "index.php",
@@ -10384,7 +12662,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 1383,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "inheader.php",
@@ -10401,7 +12679,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 257,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "insidebar.php",
@@ -10417,8 +12695,8 @@
         "thead": 0,
         "form": 0,
         "deprecated_mark": 0,
-        "lines": 949,
-        "mtime": "2026-08-17"
+        "lines": 841,
+        "mtime": "2026-08-25"
     },
     {
         "path": "login.php",
@@ -10435,7 +12713,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 603,
-        "mtime": "2026-08-13"
+        "mtime": "2026-08-25"
     },
     {
         "path": "logout.php",
@@ -10469,7 +12747,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 418,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "main\/check_username_availability.php",
@@ -10503,7 +12781,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 1061,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "main\/global_search.php",
@@ -10520,7 +12798,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 544,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "main\/glossary.php",
@@ -10537,7 +12815,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 79,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "main\/my_workspace.php",
@@ -10554,7 +12832,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 191,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "main\/profile.php",
@@ -10571,7 +12849,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 585,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "main\/project_users.php",
@@ -10588,7 +12866,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 1089,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "main\/role_board.php",
@@ -10605,7 +12883,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 143,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-25"
     },
     {
         "path": "main\/soon.php",
@@ -10622,7 +12900,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 98,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "main\/user_profile.php",
@@ -10639,7 +12917,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 169,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "main\/users.php",
@@ -10656,7 +12934,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 1139,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "movement\/add_drivers.php",
@@ -10673,7 +12951,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 1538,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "movement\/client_tree.php",
@@ -10690,7 +12968,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 800,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "movement\/delete_equipment_driver.php",
@@ -10707,7 +12985,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 138,
-        "mtime": "2026-08-02"
+        "mtime": "2026-08-25"
     },
     {
         "path": "movement\/map_page.php",
@@ -10724,7 +13002,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 673,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-25"
     },
     {
         "path": "movement\/move_oprators.php",
@@ -10741,7 +13019,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 1718,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "movement\/movement_operations.php",
@@ -10758,7 +13036,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 1846,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "movement\/project_drivers.php",
@@ -10775,7 +13053,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 1153,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-25"
     },
     {
         "path": "movement\/save_equipment_drivers.php",
@@ -10792,7 +13070,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 256,
-        "mtime": "2026-08-06"
+        "mtime": "2026-08-25"
     },
     {
         "path": "movement\/update_operation_shift_type.php",
@@ -10860,7 +13138,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 104,
-        "mtime": "2026-08-01"
+        "mtime": "2026-08-25"
     },
     {
         "path": "scripts\/csrf_readiness.php",
@@ -10877,7 +13155,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 100,
-        "mtime": "2026-08-08"
+        "mtime": "2026-08-25"
     },
     {
         "path": "scripts\/md_to_pdf_html.php",
@@ -10911,7 +13189,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 63,
-        "mtime": "2026-08-01"
+        "mtime": "2026-08-25"
     },
     {
         "path": "scripts\/tkt_sla_backfill.php",
@@ -10928,7 +13206,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 74,
-        "mtime": "2026-08-08"
+        "mtime": "2026-08-25"
     },
     {
         "path": "user_capacities.php",
@@ -10945,6 +13223,6 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 244,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-25"
     }
 ]

@@ -1,0 +1,1982 @@
+[
+    {
+        "domain_code": "DEP-01",
+        "axis_key": "ACCEPTANCE",
+        "num": "0",
+        "den": "27",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "صفر بحكم اقترانه: القبول البشري صفر في كل نطاق والاقتران بصفر صفر - ولا يتوقف هذا الصفر على محور الاختبار غير المقيس",
+        "measured_at": "2026-08-27 04:31:27"
+    },
+    {
+        "domain_code": "DEP-01",
+        "axis_key": "DATA",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس باعلان - لا اداة لجاهزية البيانات في هذه الحملة",
+        "measured_at": "2026-08-27 04:31:27"
+    },
+    {
+        "domain_code": "DEP-01",
+        "axis_key": "FIELD",
+        "num": "27",
+        "den": "27",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:27"
+    },
+    {
+        "domain_code": "DEP-01",
+        "axis_key": "HUMAN_UAT",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "لا محطة مسجلة لهذا النطاق في رحلة الاثبات",
+        "measured_at": "2026-08-27 04:31:27"
+    },
+    {
+        "domain_code": "DEP-01",
+        "axis_key": "INTEGRATION",
+        "num": "7",
+        "den": "46",
+        "den_name": "احداث النطاق في سجل الاحداث",
+        "verdict": "MEASURED",
+        "note": "واحداث بلا وحدة قابلة للنسبة معلنة بعددها: 72",
+        "measured_at": "2026-08-27 04:31:27"
+    },
+    {
+        "domain_code": "DEP-01",
+        "axis_key": "NAVIGATION",
+        "num": "45",
+        "den": "45",
+        "den_name": "اسطح النطاق الحية في السجل المعياري",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:27"
+    },
+    {
+        "domain_code": "DEP-01",
+        "axis_key": "STRUCTURAL",
+        "num": "23",
+        "den": "27",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:27"
+    },
+    {
+        "domain_code": "DEP-01",
+        "axis_key": "TEST",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس بحبة المتطلب: لا دفتر رحلة من 13 يحمل معرف متطلب - والتغطية الالية قائمة: 70698 محطة عابرة من 71012 ولكنها لا تنسب الى نطاق",
+        "measured_at": "2026-08-27 04:31:27"
+    },
+    {
+        "domain_code": "DEP-01",
+        "axis_key": "WORKFLOW",
+        "num": "0",
+        "den": "27",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "وانتقالات الموجات غير المنسوبة الى نطاق معلنة بعددها: 93 كيانا في دفاتر الموجات",
+        "measured_at": "2026-08-27 04:31:27"
+    },
+    {
+        "domain_code": "DEP-02",
+        "axis_key": "ACCEPTANCE",
+        "num": "0",
+        "den": "37",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "صفر بحكم اقترانه: القبول البشري صفر في كل نطاق والاقتران بصفر صفر - ولا يتوقف هذا الصفر على محور الاختبار غير المقيس",
+        "measured_at": "2026-08-27 04:31:27"
+    },
+    {
+        "domain_code": "DEP-02",
+        "axis_key": "DATA",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس باعلان - لا اداة لجاهزية البيانات في هذه الحملة",
+        "measured_at": "2026-08-27 04:31:27"
+    },
+    {
+        "domain_code": "DEP-02",
+        "axis_key": "FIELD",
+        "num": "37",
+        "den": "37",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:27"
+    },
+    {
+        "domain_code": "DEP-02",
+        "axis_key": "HUMAN_UAT",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "لا محطة مسجلة لهذا النطاق في رحلة الاثبات",
+        "measured_at": "2026-08-27 04:31:27"
+    },
+    {
+        "domain_code": "DEP-02",
+        "axis_key": "INTEGRATION",
+        "num": "3",
+        "den": "42",
+        "den_name": "احداث النطاق في سجل الاحداث",
+        "verdict": "MEASURED",
+        "note": "واحداث بلا وحدة قابلة للنسبة معلنة بعددها: 72",
+        "measured_at": "2026-08-27 04:31:27"
+    },
+    {
+        "domain_code": "DEP-02",
+        "axis_key": "NAVIGATION",
+        "num": "23",
+        "den": "23",
+        "den_name": "اسطح النطاق الحية في السجل المعياري",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:27"
+    },
+    {
+        "domain_code": "DEP-02",
+        "axis_key": "STRUCTURAL",
+        "num": "34",
+        "den": "37",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:27"
+    },
+    {
+        "domain_code": "DEP-02",
+        "axis_key": "TEST",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس بحبة المتطلب: لا دفتر رحلة من 13 يحمل معرف متطلب - والتغطية الالية قائمة: 70698 محطة عابرة من 71012 ولكنها لا تنسب الى نطاق",
+        "measured_at": "2026-08-27 04:31:27"
+    },
+    {
+        "domain_code": "DEP-02",
+        "axis_key": "WORKFLOW",
+        "num": "0",
+        "den": "37",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "وانتقالات الموجات غير المنسوبة الى نطاق معلنة بعددها: 93 كيانا في دفاتر الموجات",
+        "measured_at": "2026-08-27 04:31:27"
+    },
+    {
+        "domain_code": "DEP-03",
+        "axis_key": "ACCEPTANCE",
+        "num": "0",
+        "den": "28",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "صفر بحكم اقترانه: القبول البشري صفر في كل نطاق والاقتران بصفر صفر - ولا يتوقف هذا الصفر على محور الاختبار غير المقيس",
+        "measured_at": "2026-08-27 04:31:27"
+    },
+    {
+        "domain_code": "DEP-03",
+        "axis_key": "DATA",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس باعلان - لا اداة لجاهزية البيانات في هذه الحملة",
+        "measured_at": "2026-08-27 04:31:27"
+    },
+    {
+        "domain_code": "DEP-03",
+        "axis_key": "FIELD",
+        "num": "28",
+        "den": "28",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:27"
+    },
+    {
+        "domain_code": "DEP-03",
+        "axis_key": "HUMAN_UAT",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "لا محطة مسجلة لهذا النطاق في رحلة الاثبات",
+        "measured_at": "2026-08-27 04:31:27"
+    },
+    {
+        "domain_code": "DEP-03",
+        "axis_key": "INTEGRATION",
+        "num": "10",
+        "den": "49",
+        "den_name": "احداث النطاق في سجل الاحداث",
+        "verdict": "MEASURED",
+        "note": "واحداث بلا وحدة قابلة للنسبة معلنة بعددها: 72",
+        "measured_at": "2026-08-27 04:31:27"
+    },
+    {
+        "domain_code": "DEP-03",
+        "axis_key": "NAVIGATION",
+        "num": "32",
+        "den": "32",
+        "den_name": "اسطح النطاق الحية في السجل المعياري",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:27"
+    },
+    {
+        "domain_code": "DEP-03",
+        "axis_key": "STRUCTURAL",
+        "num": "28",
+        "den": "28",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:27"
+    },
+    {
+        "domain_code": "DEP-03",
+        "axis_key": "TEST",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس بحبة المتطلب: لا دفتر رحلة من 13 يحمل معرف متطلب - والتغطية الالية قائمة: 70698 محطة عابرة من 71012 ولكنها لا تنسب الى نطاق",
+        "measured_at": "2026-08-27 04:31:27"
+    },
+    {
+        "domain_code": "DEP-03",
+        "axis_key": "WORKFLOW",
+        "num": "0",
+        "den": "28",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "وانتقالات الموجات غير المنسوبة الى نطاق معلنة بعددها: 93 كيانا في دفاتر الموجات",
+        "measured_at": "2026-08-27 04:31:27"
+    },
+    {
+        "domain_code": "DEP-04",
+        "axis_key": "ACCEPTANCE",
+        "num": "0",
+        "den": "42",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "صفر بحكم اقترانه: القبول البشري صفر في كل نطاق والاقتران بصفر صفر - ولا يتوقف هذا الصفر على محور الاختبار غير المقيس",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-04",
+        "axis_key": "DATA",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس باعلان - لا اداة لجاهزية البيانات في هذه الحملة",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-04",
+        "axis_key": "FIELD",
+        "num": "42",
+        "den": "42",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:27"
+    },
+    {
+        "domain_code": "DEP-04",
+        "axis_key": "HUMAN_UAT",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "لا محطة مسجلة لهذا النطاق في رحلة الاثبات",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-04",
+        "axis_key": "INTEGRATION",
+        "num": "10",
+        "den": "39",
+        "den_name": "احداث النطاق في سجل الاحداث",
+        "verdict": "MEASURED",
+        "note": "واحداث بلا وحدة قابلة للنسبة معلنة بعددها: 72",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-04",
+        "axis_key": "NAVIGATION",
+        "num": "37",
+        "den": "37",
+        "den_name": "اسطح النطاق الحية في السجل المعياري",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:27"
+    },
+    {
+        "domain_code": "DEP-04",
+        "axis_key": "STRUCTURAL",
+        "num": "32",
+        "den": "42",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:27"
+    },
+    {
+        "domain_code": "DEP-04",
+        "axis_key": "TEST",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس بحبة المتطلب: لا دفتر رحلة من 13 يحمل معرف متطلب - والتغطية الالية قائمة: 70698 محطة عابرة من 71012 ولكنها لا تنسب الى نطاق",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-04",
+        "axis_key": "WORKFLOW",
+        "num": "0",
+        "den": "42",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "وانتقالات الموجات غير المنسوبة الى نطاق معلنة بعددها: 93 كيانا في دفاتر الموجات",
+        "measured_at": "2026-08-27 04:31:27"
+    },
+    {
+        "domain_code": "DEP-05",
+        "axis_key": "ACCEPTANCE",
+        "num": "0",
+        "den": "25",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "صفر بحكم اقترانه: القبول البشري صفر في كل نطاق والاقتران بصفر صفر - ولا يتوقف هذا الصفر على محور الاختبار غير المقيس",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-05",
+        "axis_key": "DATA",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس باعلان - لا اداة لجاهزية البيانات في هذه الحملة",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-05",
+        "axis_key": "FIELD",
+        "num": "25",
+        "den": "25",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-05",
+        "axis_key": "HUMAN_UAT",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "لا محطة مسجلة لهذا النطاق في رحلة الاثبات",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-05",
+        "axis_key": "INTEGRATION",
+        "num": "9",
+        "den": "45",
+        "den_name": "احداث النطاق في سجل الاحداث",
+        "verdict": "MEASURED",
+        "note": "واحداث بلا وحدة قابلة للنسبة معلنة بعددها: 72",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-05",
+        "axis_key": "NAVIGATION",
+        "num": "94",
+        "den": "94",
+        "den_name": "اسطح النطاق الحية في السجل المعياري",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-05",
+        "axis_key": "STRUCTURAL",
+        "num": "25",
+        "den": "25",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-05",
+        "axis_key": "TEST",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس بحبة المتطلب: لا دفتر رحلة من 13 يحمل معرف متطلب - والتغطية الالية قائمة: 70698 محطة عابرة من 71012 ولكنها لا تنسب الى نطاق",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-05",
+        "axis_key": "WORKFLOW",
+        "num": "0",
+        "den": "25",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "وانتقالات الموجات غير المنسوبة الى نطاق معلنة بعددها: 93 كيانا في دفاتر الموجات",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-06",
+        "axis_key": "ACCEPTANCE",
+        "num": "0",
+        "den": "18",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "صفر بحكم اقترانه: القبول البشري صفر في كل نطاق والاقتران بصفر صفر - ولا يتوقف هذا الصفر على محور الاختبار غير المقيس",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-06",
+        "axis_key": "DATA",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس باعلان - لا اداة لجاهزية البيانات في هذه الحملة",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-06",
+        "axis_key": "FIELD",
+        "num": "18",
+        "den": "18",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-06",
+        "axis_key": "HUMAN_UAT",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "لا محطة مسجلة لهذا النطاق في رحلة الاثبات",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-06",
+        "axis_key": "INTEGRATION",
+        "num": "4",
+        "den": "44",
+        "den_name": "احداث النطاق في سجل الاحداث",
+        "verdict": "MEASURED",
+        "note": "واحداث بلا وحدة قابلة للنسبة معلنة بعددها: 72",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-06",
+        "axis_key": "NAVIGATION",
+        "num": "22",
+        "den": "22",
+        "den_name": "اسطح النطاق الحية في السجل المعياري",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-06",
+        "axis_key": "STRUCTURAL",
+        "num": "18",
+        "den": "18",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-06",
+        "axis_key": "TEST",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس بحبة المتطلب: لا دفتر رحلة من 13 يحمل معرف متطلب - والتغطية الالية قائمة: 70698 محطة عابرة من 71012 ولكنها لا تنسب الى نطاق",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-06",
+        "axis_key": "WORKFLOW",
+        "num": "0",
+        "den": "18",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "وانتقالات الموجات غير المنسوبة الى نطاق معلنة بعددها: 93 كيانا في دفاتر الموجات",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-07",
+        "axis_key": "ACCEPTANCE",
+        "num": "0",
+        "den": "24",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "صفر بحكم اقترانه: القبول البشري صفر في كل نطاق والاقتران بصفر صفر - ولا يتوقف هذا الصفر على محور الاختبار غير المقيس",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-07",
+        "axis_key": "DATA",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس باعلان - لا اداة لجاهزية البيانات في هذه الحملة",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-07",
+        "axis_key": "FIELD",
+        "num": "24",
+        "den": "24",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-07",
+        "axis_key": "HUMAN_UAT",
+        "num": "0",
+        "den": "1",
+        "den_name": "محطات رحلة الاثبات المسجلة لهذا النطاق",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-07",
+        "axis_key": "INTEGRATION",
+        "num": "6",
+        "den": "43",
+        "den_name": "احداث النطاق في سجل الاحداث",
+        "verdict": "MEASURED",
+        "note": "واحداث بلا وحدة قابلة للنسبة معلنة بعددها: 72",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-07",
+        "axis_key": "NAVIGATION",
+        "num": "35",
+        "den": "35",
+        "den_name": "اسطح النطاق الحية في السجل المعياري",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-07",
+        "axis_key": "STRUCTURAL",
+        "num": "24",
+        "den": "24",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-07",
+        "axis_key": "TEST",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس بحبة المتطلب: لا دفتر رحلة من 13 يحمل معرف متطلب - والتغطية الالية قائمة: 70698 محطة عابرة من 71012 ولكنها لا تنسب الى نطاق",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-07",
+        "axis_key": "WORKFLOW",
+        "num": "0",
+        "den": "24",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "وانتقالات الموجات غير المنسوبة الى نطاق معلنة بعددها: 93 كيانا في دفاتر الموجات",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-08",
+        "axis_key": "ACCEPTANCE",
+        "num": "0",
+        "den": "31",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "صفر بحكم اقترانه: القبول البشري صفر في كل نطاق والاقتران بصفر صفر - ولا يتوقف هذا الصفر على محور الاختبار غير المقيس",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-08",
+        "axis_key": "DATA",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس باعلان - لا اداة لجاهزية البيانات في هذه الحملة",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-08",
+        "axis_key": "FIELD",
+        "num": "31",
+        "den": "31",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-08",
+        "axis_key": "HUMAN_UAT",
+        "num": "0",
+        "den": "1",
+        "den_name": "محطات رحلة الاثبات المسجلة لهذا النطاق",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-08",
+        "axis_key": "INTEGRATION",
+        "num": "11",
+        "den": "49",
+        "den_name": "احداث النطاق في سجل الاحداث",
+        "verdict": "MEASURED",
+        "note": "واحداث بلا وحدة قابلة للنسبة معلنة بعددها: 72",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-08",
+        "axis_key": "NAVIGATION",
+        "num": "72",
+        "den": "72",
+        "den_name": "اسطح النطاق الحية في السجل المعياري",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-08",
+        "axis_key": "STRUCTURAL",
+        "num": "31",
+        "den": "31",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-08",
+        "axis_key": "TEST",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس بحبة المتطلب: لا دفتر رحلة من 13 يحمل معرف متطلب - والتغطية الالية قائمة: 70698 محطة عابرة من 71012 ولكنها لا تنسب الى نطاق",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-08",
+        "axis_key": "WORKFLOW",
+        "num": "17",
+        "den": "31",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "وانتقالات الموجات غير المنسوبة الى نطاق معلنة بعددها: 93 كيانا في دفاتر الموجات",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-09",
+        "axis_key": "ACCEPTANCE",
+        "num": "0",
+        "den": "13",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "صفر بحكم اقترانه: القبول البشري صفر في كل نطاق والاقتران بصفر صفر - ولا يتوقف هذا الصفر على محور الاختبار غير المقيس",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-09",
+        "axis_key": "DATA",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس باعلان - لا اداة لجاهزية البيانات في هذه الحملة",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-09",
+        "axis_key": "FIELD",
+        "num": "13",
+        "den": "13",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-09",
+        "axis_key": "HUMAN_UAT",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "لا محطة مسجلة لهذا النطاق في رحلة الاثبات",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-09",
+        "axis_key": "INTEGRATION",
+        "num": "6",
+        "den": "34",
+        "den_name": "احداث النطاق في سجل الاحداث",
+        "verdict": "MEASURED",
+        "note": "واحداث بلا وحدة قابلة للنسبة معلنة بعددها: 72",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-09",
+        "axis_key": "NAVIGATION",
+        "num": "25",
+        "den": "25",
+        "den_name": "اسطح النطاق الحية في السجل المعياري",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-09",
+        "axis_key": "STRUCTURAL",
+        "num": "13",
+        "den": "13",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-09",
+        "axis_key": "TEST",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس بحبة المتطلب: لا دفتر رحلة من 13 يحمل معرف متطلب - والتغطية الالية قائمة: 70698 محطة عابرة من 71012 ولكنها لا تنسب الى نطاق",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-09",
+        "axis_key": "WORKFLOW",
+        "num": "4",
+        "den": "13",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "وانتقالات الموجات غير المنسوبة الى نطاق معلنة بعددها: 93 كيانا في دفاتر الموجات",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-10",
+        "axis_key": "ACCEPTANCE",
+        "num": "0",
+        "den": "11",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "صفر بحكم اقترانه: القبول البشري صفر في كل نطاق والاقتران بصفر صفر - ولا يتوقف هذا الصفر على محور الاختبار غير المقيس",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-10",
+        "axis_key": "DATA",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس باعلان - لا اداة لجاهزية البيانات في هذه الحملة",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-10",
+        "axis_key": "FIELD",
+        "num": "11",
+        "den": "11",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-10",
+        "axis_key": "HUMAN_UAT",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "لا محطة مسجلة لهذا النطاق في رحلة الاثبات",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-10",
+        "axis_key": "INTEGRATION",
+        "num": "9",
+        "den": "32",
+        "den_name": "احداث النطاق في سجل الاحداث",
+        "verdict": "MEASURED",
+        "note": "واحداث بلا وحدة قابلة للنسبة معلنة بعددها: 72",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-10",
+        "axis_key": "NAVIGATION",
+        "num": "28",
+        "den": "28",
+        "den_name": "اسطح النطاق الحية في السجل المعياري",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-10",
+        "axis_key": "STRUCTURAL",
+        "num": "11",
+        "den": "11",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-10",
+        "axis_key": "TEST",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس بحبة المتطلب: لا دفتر رحلة من 13 يحمل معرف متطلب - والتغطية الالية قائمة: 70698 محطة عابرة من 71012 ولكنها لا تنسب الى نطاق",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-10",
+        "axis_key": "WORKFLOW",
+        "num": "0",
+        "den": "11",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "وانتقالات الموجات غير المنسوبة الى نطاق معلنة بعددها: 93 كيانا في دفاتر الموجات",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-11",
+        "axis_key": "ACCEPTANCE",
+        "num": "0",
+        "den": "12",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "صفر بحكم اقترانه: القبول البشري صفر في كل نطاق والاقتران بصفر صفر - ولا يتوقف هذا الصفر على محور الاختبار غير المقيس",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-11",
+        "axis_key": "DATA",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس باعلان - لا اداة لجاهزية البيانات في هذه الحملة",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-11",
+        "axis_key": "FIELD",
+        "num": "12",
+        "den": "12",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-11",
+        "axis_key": "HUMAN_UAT",
+        "num": "0",
+        "den": "1",
+        "den_name": "محطات رحلة الاثبات المسجلة لهذا النطاق",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-11",
+        "axis_key": "INTEGRATION",
+        "num": "2",
+        "den": "25",
+        "den_name": "احداث النطاق في سجل الاحداث",
+        "verdict": "MEASURED",
+        "note": "واحداث بلا وحدة قابلة للنسبة معلنة بعددها: 72",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-11",
+        "axis_key": "NAVIGATION",
+        "num": "19",
+        "den": "19",
+        "den_name": "اسطح النطاق الحية في السجل المعياري",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-11",
+        "axis_key": "STRUCTURAL",
+        "num": "10",
+        "den": "12",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-11",
+        "axis_key": "TEST",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس بحبة المتطلب: لا دفتر رحلة من 13 يحمل معرف متطلب - والتغطية الالية قائمة: 70698 محطة عابرة من 71012 ولكنها لا تنسب الى نطاق",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-11",
+        "axis_key": "WORKFLOW",
+        "num": "0",
+        "den": "12",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "وانتقالات الموجات غير المنسوبة الى نطاق معلنة بعددها: 93 كيانا في دفاتر الموجات",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-12",
+        "axis_key": "ACCEPTANCE",
+        "num": "0",
+        "den": "19",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "صفر بحكم اقترانه: القبول البشري صفر في كل نطاق والاقتران بصفر صفر - ولا يتوقف هذا الصفر على محور الاختبار غير المقيس",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-12",
+        "axis_key": "DATA",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس باعلان - لا اداة لجاهزية البيانات في هذه الحملة",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-12",
+        "axis_key": "FIELD",
+        "num": "19",
+        "den": "19",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-12",
+        "axis_key": "HUMAN_UAT",
+        "num": "0",
+        "den": "1",
+        "den_name": "محطات رحلة الاثبات المسجلة لهذا النطاق",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-12",
+        "axis_key": "INTEGRATION",
+        "num": "3",
+        "den": "25",
+        "den_name": "احداث النطاق في سجل الاحداث",
+        "verdict": "MEASURED",
+        "note": "واحداث بلا وحدة قابلة للنسبة معلنة بعددها: 72",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-12",
+        "axis_key": "NAVIGATION",
+        "num": "9",
+        "den": "9",
+        "den_name": "اسطح النطاق الحية في السجل المعياري",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-12",
+        "axis_key": "STRUCTURAL",
+        "num": "9",
+        "den": "19",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-12",
+        "axis_key": "TEST",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس بحبة المتطلب: لا دفتر رحلة من 13 يحمل معرف متطلب - والتغطية الالية قائمة: 70698 محطة عابرة من 71012 ولكنها لا تنسب الى نطاق",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-12",
+        "axis_key": "WORKFLOW",
+        "num": "0",
+        "den": "19",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "وانتقالات الموجات غير المنسوبة الى نطاق معلنة بعددها: 93 كيانا في دفاتر الموجات",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-13",
+        "axis_key": "ACCEPTANCE",
+        "num": "0",
+        "den": "17",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "صفر بحكم اقترانه: القبول البشري صفر في كل نطاق والاقتران بصفر صفر - ولا يتوقف هذا الصفر على محور الاختبار غير المقيس",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-13",
+        "axis_key": "DATA",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس باعلان - لا اداة لجاهزية البيانات في هذه الحملة",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-13",
+        "axis_key": "FIELD",
+        "num": "17",
+        "den": "17",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-13",
+        "axis_key": "HUMAN_UAT",
+        "num": "0",
+        "den": "4",
+        "den_name": "محطات رحلة الاثبات المسجلة لهذا النطاق",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-13",
+        "axis_key": "INTEGRATION",
+        "num": "0",
+        "den": "25",
+        "den_name": "احداث النطاق في سجل الاحداث",
+        "verdict": "MEASURED",
+        "note": "واحداث بلا وحدة قابلة للنسبة معلنة بعددها: 72",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-13",
+        "axis_key": "NAVIGATION",
+        "num": "21",
+        "den": "21",
+        "den_name": "اسطح النطاق الحية في السجل المعياري",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-13",
+        "axis_key": "STRUCTURAL",
+        "num": "16",
+        "den": "17",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-13",
+        "axis_key": "TEST",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس بحبة المتطلب: لا دفتر رحلة من 13 يحمل معرف متطلب - والتغطية الالية قائمة: 70698 محطة عابرة من 71012 ولكنها لا تنسب الى نطاق",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-13",
+        "axis_key": "WORKFLOW",
+        "num": "0",
+        "den": "17",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "وانتقالات الموجات غير المنسوبة الى نطاق معلنة بعددها: 93 كيانا في دفاتر الموجات",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-14",
+        "axis_key": "ACCEPTANCE",
+        "num": "0",
+        "den": "16",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "صفر بحكم اقترانه: القبول البشري صفر في كل نطاق والاقتران بصفر صفر - ولا يتوقف هذا الصفر على محور الاختبار غير المقيس",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-14",
+        "axis_key": "DATA",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس باعلان - لا اداة لجاهزية البيانات في هذه الحملة",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-14",
+        "axis_key": "FIELD",
+        "num": "16",
+        "den": "16",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-14",
+        "axis_key": "HUMAN_UAT",
+        "num": "0",
+        "den": "2",
+        "den_name": "محطات رحلة الاثبات المسجلة لهذا النطاق",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-14",
+        "axis_key": "INTEGRATION",
+        "num": "9",
+        "den": "31",
+        "den_name": "احداث النطاق في سجل الاحداث",
+        "verdict": "MEASURED",
+        "note": "واحداث بلا وحدة قابلة للنسبة معلنة بعددها: 72",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-14",
+        "axis_key": "NAVIGATION",
+        "num": "15",
+        "den": "15",
+        "den_name": "اسطح النطاق الحية في السجل المعياري",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-14",
+        "axis_key": "STRUCTURAL",
+        "num": "16",
+        "den": "16",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-14",
+        "axis_key": "TEST",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس بحبة المتطلب: لا دفتر رحلة من 13 يحمل معرف متطلب - والتغطية الالية قائمة: 70698 محطة عابرة من 71012 ولكنها لا تنسب الى نطاق",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-14",
+        "axis_key": "WORKFLOW",
+        "num": "0",
+        "den": "16",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "وانتقالات الموجات غير المنسوبة الى نطاق معلنة بعددها: 93 كيانا في دفاتر الموجات",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-15",
+        "axis_key": "ACCEPTANCE",
+        "num": "0",
+        "den": "13",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "صفر بحكم اقترانه: القبول البشري صفر في كل نطاق والاقتران بصفر صفر - ولا يتوقف هذا الصفر على محور الاختبار غير المقيس",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-15",
+        "axis_key": "DATA",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس باعلان - لا اداة لجاهزية البيانات في هذه الحملة",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-15",
+        "axis_key": "FIELD",
+        "num": "13",
+        "den": "13",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-15",
+        "axis_key": "HUMAN_UAT",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "لا محطة مسجلة لهذا النطاق في رحلة الاثبات",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-15",
+        "axis_key": "INTEGRATION",
+        "num": "7",
+        "den": "30",
+        "den_name": "احداث النطاق في سجل الاحداث",
+        "verdict": "MEASURED",
+        "note": "واحداث بلا وحدة قابلة للنسبة معلنة بعددها: 72",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-15",
+        "axis_key": "NAVIGATION",
+        "num": "20",
+        "den": "20",
+        "den_name": "اسطح النطاق الحية في السجل المعياري",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-15",
+        "axis_key": "STRUCTURAL",
+        "num": "13",
+        "den": "13",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-15",
+        "axis_key": "TEST",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس بحبة المتطلب: لا دفتر رحلة من 13 يحمل معرف متطلب - والتغطية الالية قائمة: 70698 محطة عابرة من 71012 ولكنها لا تنسب الى نطاق",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-15",
+        "axis_key": "WORKFLOW",
+        "num": "0",
+        "den": "13",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "وانتقالات الموجات غير المنسوبة الى نطاق معلنة بعددها: 93 كيانا في دفاتر الموجات",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-16",
+        "axis_key": "ACCEPTANCE",
+        "num": "0",
+        "den": "16",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "صفر بحكم اقترانه: القبول البشري صفر في كل نطاق والاقتران بصفر صفر - ولا يتوقف هذا الصفر على محور الاختبار غير المقيس",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-16",
+        "axis_key": "DATA",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس باعلان - لا اداة لجاهزية البيانات في هذه الحملة",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-16",
+        "axis_key": "FIELD",
+        "num": "16",
+        "den": "16",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-16",
+        "axis_key": "HUMAN_UAT",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "لا محطة مسجلة لهذا النطاق في رحلة الاثبات",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-16",
+        "axis_key": "INTEGRATION",
+        "num": "0",
+        "den": "28",
+        "den_name": "احداث النطاق في سجل الاحداث",
+        "verdict": "MEASURED",
+        "note": "واحداث بلا وحدة قابلة للنسبة معلنة بعددها: 72",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-16",
+        "axis_key": "NAVIGATION",
+        "num": "25",
+        "den": "25",
+        "den_name": "اسطح النطاق الحية في السجل المعياري",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-16",
+        "axis_key": "STRUCTURAL",
+        "num": "16",
+        "den": "16",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-16",
+        "axis_key": "TEST",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس بحبة المتطلب: لا دفتر رحلة من 13 يحمل معرف متطلب - والتغطية الالية قائمة: 70698 محطة عابرة من 71012 ولكنها لا تنسب الى نطاق",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-16",
+        "axis_key": "WORKFLOW",
+        "num": "0",
+        "den": "16",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "وانتقالات الموجات غير المنسوبة الى نطاق معلنة بعددها: 93 كيانا في دفاتر الموجات",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-17",
+        "axis_key": "ACCEPTANCE",
+        "num": "0",
+        "den": "18",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "صفر بحكم اقترانه: القبول البشري صفر في كل نطاق والاقتران بصفر صفر - ولا يتوقف هذا الصفر على محور الاختبار غير المقيس",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-17",
+        "axis_key": "DATA",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس باعلان - لا اداة لجاهزية البيانات في هذه الحملة",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-17",
+        "axis_key": "FIELD",
+        "num": "18",
+        "den": "18",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-17",
+        "axis_key": "HUMAN_UAT",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "لا محطة مسجلة لهذا النطاق في رحلة الاثبات",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-17",
+        "axis_key": "INTEGRATION",
+        "num": "0",
+        "den": "33",
+        "den_name": "احداث النطاق في سجل الاحداث",
+        "verdict": "MEASURED",
+        "note": "واحداث بلا وحدة قابلة للنسبة معلنة بعددها: 72",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-17",
+        "axis_key": "NAVIGATION",
+        "num": "13",
+        "den": "13",
+        "den_name": "اسطح النطاق الحية في السجل المعياري",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-17",
+        "axis_key": "STRUCTURAL",
+        "num": "18",
+        "den": "18",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-17",
+        "axis_key": "TEST",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس بحبة المتطلب: لا دفتر رحلة من 13 يحمل معرف متطلب - والتغطية الالية قائمة: 70698 محطة عابرة من 71012 ولكنها لا تنسب الى نطاق",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "DEP-17",
+        "axis_key": "WORKFLOW",
+        "num": "0",
+        "den": "18",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "وانتقالات الموجات غير المنسوبة الى نطاق معلنة بعددها: 93 كيانا في دفاتر الموجات",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "EX-CEO",
+        "axis_key": "ACCEPTANCE",
+        "num": "0",
+        "den": "26",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "صفر بحكم اقترانه: القبول البشري صفر في كل نطاق والاقتران بصفر صفر - ولا يتوقف هذا الصفر على محور الاختبار غير المقيس",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "EX-CEO",
+        "axis_key": "DATA",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس باعلان - لا اداة لجاهزية البيانات في هذه الحملة",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "EX-CEO",
+        "axis_key": "FIELD",
+        "num": "26",
+        "den": "26",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "EX-CEO",
+        "axis_key": "HUMAN_UAT",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "لا محطة مسجلة لهذا النطاق في رحلة الاثبات",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "EX-CEO",
+        "axis_key": "INTEGRATION",
+        "num": "3",
+        "den": "37",
+        "den_name": "احداث النطاق في سجل الاحداث",
+        "verdict": "MEASURED",
+        "note": "واحداث بلا وحدة قابلة للنسبة معلنة بعددها: 72",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "EX-CEO",
+        "axis_key": "NAVIGATION",
+        "num": "33",
+        "den": "33",
+        "den_name": "اسطح النطاق الحية في السجل المعياري",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "EX-CEO",
+        "axis_key": "STRUCTURAL",
+        "num": "25",
+        "den": "26",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "EX-CEO",
+        "axis_key": "TEST",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس بحبة المتطلب: لا دفتر رحلة من 13 يحمل معرف متطلب - والتغطية الالية قائمة: 70698 محطة عابرة من 71012 ولكنها لا تنسب الى نطاق",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "EX-CEO",
+        "axis_key": "WORKFLOW",
+        "num": "16",
+        "den": "26",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "وانتقالات الموجات غير المنسوبة الى نطاق معلنة بعددها: 93 كيانا في دفاتر الموجات",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "EX-DVP",
+        "axis_key": "ACCEPTANCE",
+        "num": "0",
+        "den": "12",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "صفر بحكم اقترانه: القبول البشري صفر في كل نطاق والاقتران بصفر صفر - ولا يتوقف هذا الصفر على محور الاختبار غير المقيس",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "EX-DVP",
+        "axis_key": "DATA",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس باعلان - لا اداة لجاهزية البيانات في هذه الحملة",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "EX-DVP",
+        "axis_key": "FIELD",
+        "num": "12",
+        "den": "12",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "EX-DVP",
+        "axis_key": "HUMAN_UAT",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "لا محطة مسجلة لهذا النطاق في رحلة الاثبات",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "EX-DVP",
+        "axis_key": "INTEGRATION",
+        "num": "0",
+        "den": "9",
+        "den_name": "احداث النطاق في سجل الاحداث",
+        "verdict": "MEASURED",
+        "note": "واحداث بلا وحدة قابلة للنسبة معلنة بعددها: 72",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "EX-DVP",
+        "axis_key": "NAVIGATION",
+        "num": "1",
+        "den": "1",
+        "den_name": "اسطح النطاق الحية في السجل المعياري",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "EX-DVP",
+        "axis_key": "STRUCTURAL",
+        "num": "12",
+        "den": "12",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "EX-DVP",
+        "axis_key": "TEST",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس بحبة المتطلب: لا دفتر رحلة من 13 يحمل معرف متطلب - والتغطية الالية قائمة: 70698 محطة عابرة من 71012 ولكنها لا تنسب الى نطاق",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "EX-DVP",
+        "axis_key": "WORKFLOW",
+        "num": "8",
+        "den": "12",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "وانتقالات الموجات غير المنسوبة الى نطاق معلنة بعددها: 93 كيانا في دفاتر الموجات",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "IAF",
+        "axis_key": "ACCEPTANCE",
+        "num": "0",
+        "den": "17",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "صفر بحكم اقترانه: القبول البشري صفر في كل نطاق والاقتران بصفر صفر - ولا يتوقف هذا الصفر على محور الاختبار غير المقيس",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "IAF",
+        "axis_key": "DATA",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس باعلان - لا اداة لجاهزية البيانات في هذه الحملة",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "IAF",
+        "axis_key": "FIELD",
+        "num": "17",
+        "den": "17",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "IAF",
+        "axis_key": "HUMAN_UAT",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "لا محطة مسجلة لهذا النطاق في رحلة الاثبات",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "IAF",
+        "axis_key": "INTEGRATION",
+        "num": "6",
+        "den": "31",
+        "den_name": "احداث النطاق في سجل الاحداث",
+        "verdict": "MEASURED",
+        "note": "واحداث بلا وحدة قابلة للنسبة معلنة بعددها: 72",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "IAF",
+        "axis_key": "NAVIGATION",
+        "num": "21",
+        "den": "21",
+        "den_name": "اسطح النطاق الحية في السجل المعياري",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "IAF",
+        "axis_key": "STRUCTURAL",
+        "num": "17",
+        "den": "17",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "IAF",
+        "axis_key": "TEST",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس بحبة المتطلب: لا دفتر رحلة من 13 يحمل معرف متطلب - والتغطية الالية قائمة: 70698 محطة عابرة من 71012 ولكنها لا تنسب الى نطاق",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "IAF",
+        "axis_key": "WORKFLOW",
+        "num": "5",
+        "den": "17",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "وانتقالات الموجات غير المنسوبة الى نطاق معلنة بعددها: 93 كيانا في دفاتر الموجات",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "PLATFORM",
+        "axis_key": "ACCEPTANCE",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "صفر بحكم اقترانه: القبول البشري صفر في كل نطاق والاقتران بصفر صفر - ولا يتوقف هذا الصفر على محور الاختبار غير المقيس",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "PLATFORM",
+        "axis_key": "DATA",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس باعلان - لا اداة لجاهزية البيانات في هذه الحملة",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "PLATFORM",
+        "axis_key": "FIELD",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "لا مقام لهذا النطاق في هذا المحور",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "PLATFORM",
+        "axis_key": "HUMAN_UAT",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "لا محطة مسجلة لهذا النطاق في رحلة الاثبات",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "PLATFORM",
+        "axis_key": "INTEGRATION",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "واحداث بلا وحدة قابلة للنسبة معلنة بعددها: 72",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "PLATFORM",
+        "axis_key": "NAVIGATION",
+        "num": "12",
+        "den": "12",
+        "den_name": "اسطح النطاق الحية في السجل المعياري",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "PLATFORM",
+        "axis_key": "STRUCTURAL",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "لا مقام لهذا النطاق في هذا المحور",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "PLATFORM",
+        "axis_key": "TEST",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس بحبة المتطلب: لا دفتر رحلة من 13 يحمل معرف متطلب - والتغطية الالية قائمة: 70698 محطة عابرة من 71012 ولكنها لا تنسب الى نطاق",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "PLATFORM",
+        "axis_key": "WORKFLOW",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "وانتقالات الموجات غير المنسوبة الى نطاق معلنة بعددها: 93 كيانا في دفاتر الموجات",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "WS-MY",
+        "axis_key": "ACCEPTANCE",
+        "num": "0",
+        "den": "7",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "صفر بحكم اقترانه: القبول البشري صفر في كل نطاق والاقتران بصفر صفر - ولا يتوقف هذا الصفر على محور الاختبار غير المقيس",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "WS-MY",
+        "axis_key": "DATA",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس باعلان - لا اداة لجاهزية البيانات في هذه الحملة",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "WS-MY",
+        "axis_key": "FIELD",
+        "num": "7",
+        "den": "7",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "WS-MY",
+        "axis_key": "HUMAN_UAT",
+        "num": "0",
+        "den": "3",
+        "den_name": "محطات رحلة الاثبات المسجلة لهذا النطاق",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "WS-MY",
+        "axis_key": "INTEGRATION",
+        "num": "1",
+        "den": "5",
+        "den_name": "احداث النطاق في سجل الاحداث",
+        "verdict": "MEASURED",
+        "note": "واحداث بلا وحدة قابلة للنسبة معلنة بعددها: 72",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "WS-MY",
+        "axis_key": "NAVIGATION",
+        "num": "21",
+        "den": "21",
+        "den_name": "اسطح النطاق الحية في السجل المعياري",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "WS-MY",
+        "axis_key": "STRUCTURAL",
+        "num": "7",
+        "den": "7",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "WS-MY",
+        "axis_key": "TEST",
+        "num": "-1",
+        "den": "-1",
+        "den_name": "",
+        "verdict": "NOT_MEASURED",
+        "note": "غير مقيس بحبة المتطلب: لا دفتر رحلة من 13 يحمل معرف متطلب - والتغطية الالية قائمة: 70698 محطة عابرة من 71012 ولكنها لا تنسب الى نطاق",
+        "measured_at": "2026-08-27 04:31:28"
+    },
+    {
+        "domain_code": "WS-MY",
+        "axis_key": "WORKFLOW",
+        "num": "1",
+        "den": "7",
+        "den_name": "متطلبات النطاق في سجل المتطلبات",
+        "verdict": "MEASURED",
+        "note": "وانتقالات الموجات غير المنسوبة الى نطاق معلنة بعددها: 93 كيانا في دفاتر الموجات",
+        "measured_at": "2026-08-27 04:31:28"
+    }
+]

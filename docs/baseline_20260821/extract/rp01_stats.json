@@ -1,0 +1,15 @@
+{
+    "rp01_rows": 783,
+    "disk_surfaces": 778,
+    "mine_rows": 758,
+    "rp01_ghost_target": 160,
+    "rp01_asbuilt": 623,
+    "matched_route": 619,
+    "matched_basename": 2,
+    "rp01_not_on_disk": 2,
+    "disk_not_in_rp01": 103,
+    "rp01_owner_missing": 0,
+    "fields_linked_to_rp01": 14608,
+    "fields_unlinked": 1,
+    "fields_total": 14609
+}

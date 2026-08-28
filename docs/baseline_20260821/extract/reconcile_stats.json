@@ -1,13 +1,13 @@
 {
-    "registry_rows": 626,
-    "on_disk_screens": 458,
+    "registry_rows": 758,
+    "on_disk_screens": 590,
     "handlers": 81,
     "cron": 24,
     "registry_no_disk": 0,
-    "disk_not_in_any_registry": 62,
-    "owner_unknown": 83,
+    "disk_not_in_any_registry": 61,
+    "owner_unknown": 84,
     "owner_conflicts": 13,
     "with_stage": 272,
-    "fields_total": 13185,
+    "fields_total": 14609,
     "gpi_unknown_route": 3
 }

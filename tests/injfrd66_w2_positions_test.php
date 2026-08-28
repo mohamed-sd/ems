@@ -40,32 +40,34 @@ foreach (array(12, 2) as $rid) {
     }
 }
 
-/* req => [role, route, القسمُ المستهدف, الرأسُ المتوقَّع, الرأسُ الممنوع] */
+/* ══ تحوُّلُ النموذجِ (RPR-OPS-02): المجموعةُ المُعلَنةُ **رأسٌ لا قسمٌ تحتَ رأس**
+     ◆ كان الشاهدُ يتوقَّع طبقتَين: رأسًا من التصنيفِ الاثنَي عشرَ المشترك، وتحتَه
+       قسمًا باسمِ مجموعةِ المرجع — لأنَّ رأسَ الطيِّ مفتاحُه المسارُ فلا يحمل
+       مجموعةً لكلِّ دور. **وقد صار يحملها**: مَن أعلن جدولَه المستهدَفَ صارت
+       مجموعاتُه أبوابَه، والعنوانُ الفرعيُّ يسقط عنها فلا يُقرأ الاسمُ مرّتين.
+     ◆ **والمقصودُ لم يتغيَّر**: «البندُ في المجموعةِ التي ينصُّ عليها المرجع» —
+       فيُقاس على الرأسِ بعدَ أن كان على القسم، **وتوقُّعٌ واحدٌ لا اثنان**.
+     ⛔ ولم يُلمَس السالبُ ②: «لم يعد تحت الرأسِ الممنوع» يبقى كما هو حرفًا.
+   req => [role, route, المجموعةُ المنصوصةُ في المرجع, الرأسُ الممنوع] */
 $CASES = array(
-    array('SAL-03', 12, 'projects/projects.php',           'إدارة العملاء والفرص',      'العقود والعملاء',     'التشغيل اليومي'),
-    array('SUP-05',  2, 'contracts/contract_coverage.php', 'الاحتياج والتعاقد',          'الموردون والمشتريات', 'التقارير والتحليلات'),
-    array('SUP-11',  2, 'suppliers/shares_coverage.php',   'الحصص والتغطية والأداء',    'الموردون والمشتريات', 'التقارير والتحليلات'),
-    array('SAL-21', 12, 'clients/products.php',            'البيانات المرجعية والتقارير', 'التقارير والتحليلات', 'العقود والعملاء'),
+    array('SAL-03', 12, 'projects/projects.php',           'إدارة العملاء والفرص',        'التشغيل اليومي'),
+    array('SUP-05',  2, 'contracts/contract_coverage.php', 'الاحتياج والتعاقد',            'التقارير والتحليلات'),
+    array('SUP-11',  2, 'suppliers/shares_coverage.php',   'الحصص والتغطية والأداء',      'التقارير والتحليلات'),
+    array('SAL-21', 12, 'clients/products.php',            'البيانات المرجعية والتقارير',  'العقود والعملاء'),
 );
 
-echo "① إيجابيٌّ — القسمُ المستهدفُ والرأسُ الصحيح:\n";
+echo "① إيجابيٌّ — البندُ في بابِ المجموعةِ التي ينصُّ عليها المرجع:\n";
 foreach ($CASES as $c) {
-    list($req, $rid, $route, $wantSec, $wantHead, ) = $c;
+    list($req, $rid, $route, $wantGroup, ) = $c;
     $p = $byRole[$rid][$route] ?? null;
     if (!$p) { $fail++; printf("   ✘ %s — «%s» غيرُ مُصيَّرٍ للدورِ %d\n", $req, $route, $rid); continue; }
-    $okSec  = ($p['section'] === $wantSec);
-    $okHead = ($p['group']   === $wantHead);
-    if ($okSec && $okHead) { $pass++; printf("   ✔ %s  «%s» ⇐ رأسُ «%s» · قسمُ «%s»\n", $req, $p['label'], $p['group'], $p['section']); }
-    else {
-        $fail++;
-        printf("   ✘ %s  رأسٌ «%s» (المتوقَّع «%s») · قسمٌ «%s» (المتوقَّع «%s»)\n",
-            $req, $p['group'], $wantHead, $p['section'], $wantSec);
-    }
+    if ($p['group'] === $wantGroup) { $pass++; printf("   ✔ %s  «%s» ⇐ بابُ «%s»\n", $req, $p['label'], $p['group']); }
+    else { $fail++; printf("   ✘ %s  بابٌ «%s» (المنصوصُ «%s»)\n", $req, $p['group'], $wantGroup); }
 }
 
 echo "\n② سالبٌ — خرج من الموضعِ الذي يمنعه المرجعُ نصًّا:\n";
 foreach ($CASES as $c) {
-    list($req, $rid, $route, , , $forbidHead) = $c;
+    list($req, $rid, $route, , $forbidHead) = $c;
     $p = $byRole[$rid][$route] ?? null;
     if (!$p) { continue; }
     if ($p['group'] !== $forbidHead) { $pass++; printf("   ✔ %s  لم يعد تحت «%s»\n", $req, $forbidHead); }

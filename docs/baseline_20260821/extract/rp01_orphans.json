@@ -1,0 +1,414 @@
+[
+    {
+        "path": "Approvals\/approval_api.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Approvals\/hours_approval_handler.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Contracts\/contract_actions_handler.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Contracts\/contractequipments_handler.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Contracts\/cron_price_adjustment.php",
+        "class": "CRON"
+    },
+    {
+        "path": "Contracts\/get_contract_equipments.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Contracts\/get_equipments.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Contracts\/update_contract_details.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Employees\/employee_contract_actions_handler.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Employees\/get_employee_contract_equipments.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Employees\/get_employee_data.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Employees\/get_mine_contracts.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Employees\/get_project_hours.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Equipments\/approve_card.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Equipments\/equipment_card_fields.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Equipments\/equipment_child_save.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Equipments\/get_contract_stats.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Equipments\/get_equipment_details.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Equipments\/get_mine_contracts.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Equipments\/get_model_data.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "FinRequests\/request_actions.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Finance\/cron_depreciation_fin.php",
+        "class": "CRON"
+    },
+    {
+        "path": "Finance\/cron_finance_fin.php",
+        "class": "CRON"
+    },
+    {
+        "path": "Finance\/cron_obligation_alerts.php",
+        "class": "CRON"
+    },
+    {
+        "path": "Finance\/cron_periodic_fin.php",
+        "class": "CRON"
+    },
+    {
+        "path": "Finance\/fin_analysis_actions.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Finance\/fin_helpers.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Finance\/fin_m10_actions.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Fleet\/cron_doc_expiry_escalation.php",
+        "class": "CRON"
+    },
+    {
+        "path": "Governance\/cron_permissions.php",
+        "class": "CRON"
+    },
+    {
+        "path": "Governance\/gov_m14_actions.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Maintenance\/get_breakdown_count.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Maintenance\/get_open_orders_count.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Maintenance\/get_project_equipment.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Operations\/cron_asset_reconciliation.php",
+        "class": "CRON"
+    },
+    {
+        "path": "Operations\/cron_capacity_rollup.php",
+        "class": "CRON"
+    },
+    {
+        "path": "Operations\/cron_container_gate_report.php",
+        "class": "CRON"
+    },
+    {
+        "path": "Operations\/cron_fin_posting.php",
+        "class": "CRON"
+    },
+    {
+        "path": "Operations\/cron_job_worker.php",
+        "class": "CRON"
+    },
+    {
+        "path": "Operations\/cron_org_assignments.php",
+        "class": "CRON"
+    },
+    {
+        "path": "Operations\/cron_rotation_transfer.php",
+        "class": "CRON"
+    },
+    {
+        "path": "Operations\/cron_unit_chain_sla.php",
+        "class": "CRON"
+    },
+    {
+        "path": "Operations\/cron_unit_chain_weekly.php",
+        "class": "CRON"
+    },
+    {
+        "path": "Operations\/cron_wfm_engine.php",
+        "class": "CRON"
+    },
+    {
+        "path": "Oprators\/get_contract_stats.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Oprators\/get_contract_suppliers.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Oprators\/get_mine_contracts.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Portal\/journey_action.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Reports\/get_mine_contracts.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Risk\/risk_actions.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Suppliers\/get_mine_contracts.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Suppliers\/get_project_hours.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Suppliers\/get_supplier_contract_equipments.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Suppliers\/supplier_contract_actions_handler.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Tickets\/cron_tickets.php",
+        "class": "CRON"
+    },
+    {
+        "path": "Tickets\/get_tickets_count.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Timesheet\/get_contract_hours.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Timesheet\/get_failure_codes.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Timesheet\/get_timesheet.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Timesheet\/get_timesheet_data.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Timesheet\/get_timesheet_failures.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Transport\/cron_transfer.php",
+        "class": "CRON"
+    },
+    {
+        "path": "admin\/companies\/action.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "admin\/cron_backup.php",
+        "class": "CRON"
+    },
+    {
+        "path": "admin\/dashboard.php",
+        "class": "ENTRY"
+    },
+    {
+        "path": "admin\/forgot_password.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "admin\/includes\/auth.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "admin\/login.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "admin\/logout.php",
+        "class": "ENTRY"
+    },
+    {
+        "path": "admin\/managers.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "admin\/permissions\/index.php",
+        "class": "ENTRY"
+    },
+    {
+        "path": "admin\/permissions\/link_groups.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "admin\/permissions\/nav_items.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "admin\/permissions\/role_permissions.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "admin\/permissions\/screen_guide.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "admin\/plans.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "admin\/reset_password.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "admin\/settings.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "admin\/subscriptions\/requests.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "admin\/support\/view.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "admin\/update_permission_quick.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "api\/bootstrap.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "api\/index.php",
+        "class": "ENTRY"
+    },
+    {
+        "path": "company\/forgot_password.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "company\/login.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "company\/logout.php",
+        "class": "ENTRY"
+    },
+    {
+        "path": "company\/register.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "company\/request_subscription.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "company\/team.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "config.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "cron_events.php",
+        "class": "CRON"
+    },
+    {
+        "path": "cron_jobs.php",
+        "class": "CRON"
+    },
+    {
+        "path": "cron_proc_replenish.php",
+        "class": "CRON"
+    },
+    {
+        "path": "cron_requests.php",
+        "class": "CRON"
+    },
+    {
+        "path": "excel.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "index.php",
+        "class": "ENTRY"
+    },
+    {
+        "path": "inheader.php",
+        "class": "SCREEN"
+    },
+    {
+        "path": "login.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "logout.php",
+        "class": "ENTRY"
+    },
+    {
+        "path": "main\/check_username_availability.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "movement\/save_equipment_drivers.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "movement\/update_operation_shift_type.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "movement\/update_shift_type.php",
+        "class": "HANDLER"
+    }
+]

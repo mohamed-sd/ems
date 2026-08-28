@@ -20,7 +20,7 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 $D = $ROOT . '/docs/baseline_20260821/extract/';
 function j($f) { global $D; return json_decode((string) file_get_contents($D . $f . '.json'), true) ?: array(); }
 
-$SNAP = 'BL-20260823-eaf25a2c';
+$SNAP = 'BL-20260828-b5a2cc7f';
 $reg = j('screen_registry');
 $fields = j('field_registry');
 $cycle = j('gov_screen_cycle');
@@ -32,6 +32,12 @@ $fclass = j('gov_field_class');
 $stats = j('reconcile_stats');
 $statusM = j('status_metrics');
 $conflicts = j('reconcile_conflicts');
+$rp01 = j('rp01_reconciled');
+$rp01dep = j('rp01_departments');
+$rp01stat = j('rp01_stats');
+$rp01orph = j('rp01_orphans');
+$rpBySid = array(); foreach ($rp01 as $x) { $rpBySid[$x['screen_id']] = $x; }
+$rpByRoute = array(); foreach ($rp01 as $x) { if ($x['route'] !== '') { $rpByRoute[mb_strtolower($x['route'])] = $x; } }
 
 $regByRoute = array();
 foreach ($reg as $r) { $regByRoute[$r['route']] = $r; }
@@ -69,7 +75,7 @@ function meta_rows($ws, $title)
 {
     global $SNAP;
     $ws->setCellValue('A1', $title);
-    $ws->setCellValue('A2', 'اللقطة: ' . $SNAP . ' · تاريخ القياس: 2026-08-23 06:34→07:10 · المصدر: استخراج حي (كود + قاعدة + Git) — لا صيغ: كل قيمة قياسٌ بلحظته · اللقطة السابقة في historical/');
+    $ws->setCellValue('A2', 'اللقطة: ' . $SNAP . ' · تاريخ القياس: 2026-08-28 12:01→12:50 · المصدر: استخراج حي (كود + قاعدة + Git) — لا صيغ: كل قيمة قياسٌ بلحظته · اللقطة السابقة في historical/');
     $ws->getStyle('A1')->getFont()->setBold(true)->setSize(13)->setName('Arial');
     $ws->getStyle('A2')->getFont()->setSize(9)->setItalic(true)->setName('Arial');
 }
@@ -98,6 +104,81 @@ $sumRows = array(
 $ws->fromArray($sumRows, null, 'A4');
 put_head($ws, 4, $sumRows[0], $HDR_FILL);
 foreach (array('A' => 42, 'B' => 14, 'C' => 90) as $c => $w) { $ws->getColumnDimension($c)->setWidth($w); }
+
+/* ════ 01A_OFFICIAL_REGISTRY — السجل الرسمي (العمود الفقري للمعرّفات) ═══ */
+$ws = mk_sheet($wb, '01A_OFFICIAL_REGISTRY');
+meta_rows($ws, 'السجل الرسمي repair01_screen_registry — Screen_ID و Department_ID مصدرهما النظام نفسه · 783 صفًّا منها 160 هدفًا غير مبنيّ');
+$cols = array('Screen_ID', 'Department_ID', 'الإدارة المالكة', 'قاعدة الملكية', 'الاسم القانوني',
+    'Route', 'الملف', 'As-Built؟', 'دورة الحياة', 'قاعدة دورة الحياة', 'صنف الظهور', 'قاعدة الظهور',
+    'نوع السطح', 'نوع الحارس', 'شاهد الحارس', 'سياسة الصلاحية', 'حكم الملكية', 'مصدر الحقيقة',
+    'على القرص (مقيس)', 'طريقة المطابقة', 'تصنيف القرص', 'حيثيات الحكم', 'المرجع');
+put_head($ws, 4, $cols, $HDR_FILL);
+$rows = array();
+foreach ($rp01 as $r) {
+    $rows[] = array($r['screen_id'], $r['department_id'], $r['department_name'], $r['owner_rule'],
+        $r['name_ar'], $r['route'], $r['screen_file'],
+        $r['is_asbuilt'] ? 'نعم' : 'لا — هدف GHOST_TARGET',
+        $r['lifecycle'], $r['lifecycle_rule'], $r['visibility_class'], $r['visibility_rule'],
+        $r['surface_kind'], $r['guard_kind'], $r['guard_evidence'], $r['permission_policy'],
+        $r['ownership_verdict'], $r['source_of_truth'],
+        $r['on_disk_measured'] ? 'نعم' : 'لا', $r['disk_match'], $r['disk_class'],
+        $r['verdict_rule'], $r['src_ref']);
+}
+$ws->fromArray($rows, null, 'A5');
+$ws->freezePane('A5');
+
+/* ════ 08_RP01_RECONCILE — مصالحة السجل الرسمي بالقرص ═══════════════════ */
+$ws = mk_sheet($wb, '08_RP01_RECONCILE');
+meta_rows($ws, 'مصالحة السجل الرسمي × القرص — الفروق تُعدّ وتُسمّى ولا تُطوى');
+$cols = array('البند', 'العدد', 'المقام/البيان');
+put_head($ws, 4, $cols, $HDR_FILL);
+$recRows = array(
+    array('صفوف السجل الرسمي', $rp01stat['rp01_rows'], 'repair01_screen_registry'),
+    array('منها As-Built', $rp01stat['rp01_asbuilt'], 'من ' . $rp01stat['rp01_rows']),
+    array('منها هدف غير مبنيّ (GHOST_TARGET)', $rp01stat['rp01_ghost_target'], 'من ' . $rp01stat['rp01_rows'] . ' — **تُستبعد من كل حكم As-Built**'),
+    array('طابقت القرص بالمسار', $rp01stat['matched_route'], 'من ' . $rp01stat['rp01_asbuilt']),
+    array('طابقت باسم الملف', $rp01stat['matched_basename'], 'من ' . $rp01stat['rp01_asbuilt']),
+    array('As-Built بلا ملف على القرص', $rp01stat['rp01_not_on_disk'], 'من ' . $rp01stat['rp01_asbuilt'] . ' — كلاهما ملفَّا مكتبة vendor مسجَّلان خطأً (FINDING)'),
+    array('أسطح قرص خارج السجل الرسمي', $rp01stat['disk_not_in_rp01'], 'من ' . $rp01stat['disk_surfaces'] . ' — أغلبها معالجات وكرون: فرقُ نطاقٍ لا فجوة'),
+    array('شاشة رسمية بلا مالك', $rp01stat['rp01_owner_missing'], 'من ' . $rp01stat['rp01_rows'] . ' — **صفر**'),
+    array('حقول مرتبطة بمعرّف رسمي', $rp01stat['fields_linked_to_rp01'], 'من ' . $rp01stat['fields_total']),
+    array('حقول بلا ارتباط', $rp01stat['fields_unlinked'], 'من ' . $rp01stat['fields_total']),
+    array('الإدارات القانونية', count($rp01dep), 'repair01_departments — DEP-01..17 + IAF · WS-MY · EX-CEO · EX-DVP'),
+);
+$ws->fromArray($recRows, null, 'A5');
+foreach (array('A' => 44, 'B' => 12, 'C' => 92) as $c => $w) { $ws->getColumnDimension($c)->setWidth($w); }
+$r0 = 5 + count($recRows) + 2;
+$ws->setCellValue('A' . $r0, 'أسطح القرص خارج السجل الرسمي — القائمة الكاملة');
+$ws->getStyle('A' . $r0)->getFont()->setBold(true);
+put_head($ws, $r0 + 1, array('المسار', 'التصنيف', 'ملاحظة'), $HDR_FILL);
+$orows = array();
+foreach ($rp01orph as $o) {
+    $orows[] = array($o['path'], $o['class'],
+        $o['class'] === 'SCREEN' ? 'شاشة — تستحق تسجيلًا' : 'خارج نطاق السجل (السجل يغطي الشاشات لا المعالجات)');
+}
+$ws->fromArray($orows, null, 'A' . ($r0 + 2));
+
+/* ════ 09_DEPARTMENTS — الإدارات القانونية ═════════════════════════════ */
+$ws = mk_sheet($wb, '09_DEPARTMENTS');
+meta_rows($ws, 'الإدارات القانونية — Department_ID المعتمد في النظام (repair01_departments)');
+put_head($ws, 4, array('Department_ID', 'الاسم', 'القطاع', 'الترتيب', 'الأب', 'شاشات As-Built', 'شاشات هدف', 'ملاحظة'), $HDR_FILL);
+$cnt = array(); $gcnt = array();
+foreach ($rp01 as $r) {
+    if ($r['is_asbuilt']) { $cnt[$r['department_id']] = ($cnt[$r['department_id']] ?? 0) + 1; }
+    else { $gcnt[$r['department_id']] = ($gcnt[$r['department_id']] ?? 0) + 1; }
+}
+$drows = array();
+foreach ($rp01dep as $d) {
+    $drows[] = array($d['canonical_code'], $d['name_ar'], $d['sector'], $d['display_order'],
+        $d['parent_code'] ?: '—', $cnt[$d['canonical_code']] ?? 0, $gcnt[$d['canonical_code']] ?? 0, $d['note']);
+}
+/* رموز مالكين ظهرت في السجل وليست في جدول الإدارات */
+foreach ($cnt as $code => $n) {
+    $known = false;
+    foreach ($rp01dep as $d) { if ($d['canonical_code'] === $code) { $known = true; break; } }
+    if (!$known) { $drows[] = array($code, 'NEEDS_REVIEW — رمز مالك خارج جدول الإدارات', '', '', '', $n, $gcnt[$code] ?? 0, 'يستحق حسمًا'); }
+}
+$ws->fromArray($drows, null, 'A5');
 
 /* ════ 01_SCREEN_REGISTRY ════════════════════════════════════════════ */
 $ws = mk_sheet($wb, '01_SCREEN_REGISTRY');
@@ -137,13 +218,16 @@ $ws->freezePane('A5');
 /* ════ 02_FIELD_REGISTRY ═════════════════════════════════════════════ */
 $ws = mk_sheet($wb, '02_FIELD_REGISTRY');
 meta_rows($ws, 'سجل الحقول — كل حقل/عمود مستخرَج استخراجًا ساكنًا من الشاشات + أعمدة U13 من gov_field_class');
-$cols = array('Field_ID', 'Screen_ID', 'Route', 'النوع', 'التسمية العربية', 'Technical_Name', 'نوع الإدخال',
+$cols = array('Field_ID', 'Screen_ID', 'Official_Screen_ID', 'Department_ID', 'Route', 'النوع', 'التسمية العربية', 'Technical_Name', 'نوع الإدخال',
     'مجموعة العمود', 'مخفي افتراضًا', 'Required', 'ReadOnly', 'قسم النموذج', 'DC_Code', 'حساس', 'ملاحظة');
 put_head($ws, 4, $cols, $HDR_FILL);
 $rows = array();
 foreach ($fields as $f) {
     $rows[] = array(
-        $f['field_id'], $f['screen_id'], $f['route'], $f['kind'], $f['label_ar'],
+        $f['field_id'], $f['screen_id'],
+        $f['rp01_screen_id'] ?? 'NEEDS_REVIEW',
+        isset($rpByRoute[mb_strtolower($f['route'])]) ? $rpByRoute[mb_strtolower($f['route'])]['department_id'] : 'NEEDS_REVIEW',
+        $f['route'], $f['kind'], $f['label_ar'],
         $f['technical'] === null ? 'NEEDS_REVIEW' : $f['technical'],
         $f['input_type'], $f['col_group'], $f['hidden_default'] === 1 ? 'نعم' : '',
         $f['required'] === 1 ? 'نعم' : '', $f['readonly'] === 1 ? 'نعم' : '',

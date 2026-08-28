@@ -53,6 +53,23 @@ $FORBIDDEN = array(
 require_once $ROOT . '/includes/conv_form_detect.php';
 $CONVERSATIONAL = ems_conv_pattern();
 
+/* ── المواضعُ المُعلَنةُ لكلِّ دور — سندُ `U3` المكتوب ────────────────────────
+   ◆ **العطبُ الذي أُصلح** (RPR-OPS-02): `U3` كان يقيس **تطابقَ الرأسِ** فيحكم
+     على كلِّ اختلافٍ بأنّه انحراف. ولمّا صارت مجموعاتُ `gov_target_nav` أبوابًا
+     لأصحابِها رسبت **تسعةُ مساراتٍ كلُّها بسندٍ مكتوب**: «ما ينتظر اعتمادي»
+     في بابِ «الاعتماد والمطابقة» لدى الدورِ الذي أعلنه، وفي «مساحتي» لمن لم
+     يُعلن. ⇒ **والحكمُ يُقاس بالسندِ لا بالتطابق**: موضعٌ يشهد له صفٌّ في
+     `gov_target_nav` **مواضعةٌ مسجَّلةٌ لا انحراف**، وما بقي بلا سندٍ يُحاسَب
+     كما كان حرفًا — فيبقى للبوّابةِ نابُها على الانحرافِ الحقيقيّ.
+   ⛔ **ولا يُخفى المُعلَن**: يُعَدُّ ويُعرَض في سطرٍ خاصٍّ به. */
+$declPlace = array();
+$__dq = @mysqli_query($conn, "SELECT role_id, route, group_ar FROM gov_target_nav");
+while ($__dq && ($__dx = mysqli_fetch_assoc($__dq))) {
+    $__b = mb_strtolower(uxuiNavBaseRoute($__dx['route']));
+    if ($__b === '') { continue; }
+    $declPlace[(int) $__dx['role_id']][$__b] = (string) $__dx['group_ar'];
+}
+
 $matrix = uxp_matrix($ROOT);
 $roles = uxp_root_roles();
 $roleNames = array();
@@ -141,15 +158,28 @@ foreach ($byRoute as $lc => $info) { if ($info['status'] === 'NO_ROW') { $u1[] =
 /* ── U2/U3: تعدُّدُ الاسمِ/المجموعةِ للمسارِ الواحد — إنفاذٌ على APPROVED ──
    الأصلُ يُحاسَب على اسمِه المعياريِّ الواحد؛ والمدخلُ الثاني (مرساة/منظر)
    على ثباتِ اسمِه هو — فبند ٧ يجيز له اسمَ قسمِه لا اسمًا ثانيًا للأصل */
-$u2_appr = array(); $u2_pend = array(); $u3_appr = array(); $u3_pend = array();
+$u2_appr = array(); $u2_pend = array(); $u3_appr = array(); $u3_pend = array(); $u3_decl = array();
 foreach ($byRoute as $lc => $info) {
     if (count($info['labels']) > 1) {
         $line = $lc . ' ⇐ ' . implode(' ⁄ ', array_keys($info['labels']));
         if ($info['status'] === 'APPROVED') { $u2_appr[] = $line; } else { $u2_pend[] = $line; }
     }
     if (count($info['groups']) > 1) {
-        $line = $lc . ' ⇐ ' . implode(' ⁄ ', array_keys($info['groups']));
-        if ($info['status'] === 'APPROVED') { $u3_appr[] = $line; } else { $u3_pend[] = $line; }
+        /* الرأسُ الذي يشهد له إعلانُ ذلك الدورِ يخرج من الحساب — ويُعَدُّ وحدَه */
+        $bare = array(); $declared = array();
+        foreach ($info['groups'] as $gname => $rids) {
+            foreach (array_keys($rids) as $rid) {
+                if (isset($declPlace[(int) $rid][$lc]) && $declPlace[(int) $rid][$lc] === $gname) {
+                    $declared[$gname] = true;
+                } else { $bare[$gname] = true; }
+            }
+        }
+        if (!empty($declared)) { $u3_decl[] = $lc . ' ⇐ ' . implode(' ⁄ ', array_keys($declared))
+            . ' (‏مُعلَنٌ بجدولٍ مستهدَف) · وبلا إعلان: ' . (count($bare) ? implode(' ⁄ ', array_keys($bare)) : '—'); }
+        if (count($bare) > 1) {
+            $line = $lc . ' ⇐ ' . implode(' ⁄ ', array_keys($bare));
+            if ($info['status'] === 'APPROVED') { $u3_appr[] = $line; } else { $u3_pend[] = $line; }
+        }
     }
 }
 foreach ($byVariant as $vk => $info) {
@@ -251,7 +281,11 @@ echo "════ بواباتُ جولةِ الواجهة UXUI-01 — النص
 echo "  النطاق: " . count($roles) . " دورًا جذريًّا · " . count($all) . " موضعًا · " . count($byRoute) . " مسارًا فريدًا\n";
 uxg_line('U1', 'مسارٌ مُصيَّرٌ بلا صفٍّ في المصفوفة', count($u1), null, $fails, $ENFORCE, $u1);
 uxg_line('U2', 'مسارٌ APPROVED باسمَين', count($u2_appr), count($u2_pend), $fails, $ENFORCE, $u2_appr);
-uxg_line('U3', 'مسارٌ APPROVED بمجموعتَين', count($u3_appr), count($u3_pend), $fails, $ENFORCE, $u3_appr);
+uxg_line('U3', 'مسارٌ APPROVED بمجموعتَين بلا سندٍ مكتوب', count($u3_appr), count($u3_pend), $fails, $ENFORCE, $u3_appr);
+if (!empty($u3_decl)) {
+    printf("      ◆ خبرٌ (خارجَ الحكم): **%d مسارًا بابُه من جدولِ إدارتِه المستهدَف** — موضعٌ مسجَّلٌ لا انحراف:\n", count($u3_decl));
+    foreach ($u3_decl as $s) { echo "         · {$s}\n"; }
+}
 uxg_line('U4', 'مصطلحٌ ممنوعٌ أو تبويبٌ محادثيٌّ مُصيَّر', count($u4), count($u4_pend), $fails, $ENFORCE, $u4);
 uxg_line('U5', "مجموعةٌ مُصيَّرةٌ بلا رابطٍ (المقام {$shellTotal} غلافًا)", count($emptyGroups), null, $fails, $ENFORCE, $emptyGroups);
 uxg_line('U6', 'اسمٌ APPROVED أطولُ من ستِّ كلمات', count($u6_appr), count($u6_pend), $fails, $ENFORCE, $u6_appr);

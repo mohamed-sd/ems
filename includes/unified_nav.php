@@ -606,7 +606,12 @@ function uxuiCanonicalMap($conn) {
  *   ضمنَ تصنيفٍ سقفُه اثنتا عشرةَ مجموعةً مشتركةً بين الأدوارِ التسعةَ عشر.
  *   فمجموعتانِ مستهدفتانِ تنهاران على رأسٍ واحد.
  *
- * ◆ **والحلُّ الأقلُّ تدخّلًا**: الطبقةُ الثانيةُ للسايدبار — **القسمُ الفرعيُّ**
+ * ⚠ **وما دونَه تاريخُ الطبقةِ لا وصفُها اليوم** (RPR-OPS-02): بدأت قسمًا
+ *   فرعيًّا تحتَ رأسِ التصنيف، **ثمَّ صارت المجموعةُ المُعلَنةُ رأسَ الطيِّ نفسَه**
+ *   لمن أعلن — انظر بناءَ `$declHead` في `printEmsTenGroupNav`.
+ *
+ * ◆ **والحلُّ الأقلُّ تدخّلًا** (الطبقةُ الأولى، وما زال يسري لمن لا إعلانَ له):
+ *   الطبقةُ الثانيةُ للسايدبار — **القسمُ الفرعيُّ**
  *   (`nav-subhead`) — **لكلِّ دورٍ سلفًا**، والمُصيِّرُ يدعمها منذ 2026-08-17
  *   («عشرُ رؤوسٍ للتوجُّهِ وأقسامٌ للمسح»). فتُحمَل المجموعاتُ المستهدفةُ عليها
  *   بلا مساسٍ بسقفِ التصنيفِ ولا بالأدوارِ الأخرى.
@@ -619,15 +624,33 @@ function uxuiCanonicalMap($conn) {
  * ◆ قراءةٌ خالصةٌ ومحفوظةٌ ساكنًا — والجدولُ الغائبُ يعني «لا إعلان» فيبقى
  *   السلوكُ السابقُ حرفًا (fail-open للعرض كنظائرِه في هذا الملف).
  */
+/* ◆ **والإعلانُ يحمل الترتيبَ كما يحمل الاسمَ** (RPR-OPS-01): مفتاحُ الجدولِ
+     `role_id`+`group_no`+`item_no` — **فالرتبةُ منصوصةٌ فيه** ومع ذلك كان
+     المُصيِّرُ يقرأ `group_ar` وحدَه ويرتّب بـ`nav_canonical.sort_no`، **وهو
+     مفتاحُه المسارُ لا الدور**. فورقةُ الدليلِ تقول «ترتيبُها في هذا الشيت هو
+     ترتيبُها في الـSidebar» ولا سبيلَ إلى إنفاذِه: أيُّ ضبطٍ عالميٍّ للرتبةِ
+     يُعيد ترتيبَ التسعةَ عشرَ دورًا لأجلِ دورٍ واحد.
+   ⇒ **الرتبةُ المُعلَنةُ تسري على المُعلَنِ وحدَه**، ومن لا صفَّ له في الجدولِ
+     يبقى على `sort_no` حرفًا. ويعود الصفُّ الآن مصفوفةً `g` (القسم) و`o`
+     (الرتبة) — والمستهلكُ الوحيدُ حلقةُ التصييرِ أدناه. */
 function uxuiDeclaredSections($conn, $roleId) {
     static $byRole = array();
     $rid = (int) $roleId;
     if (isset($byRole[$rid])) { return $byRole[$rid]; }
     $byRole[$rid] = array();
-    $res = @mysqli_query($conn, "SELECT route, group_ar FROM gov_target_nav WHERE role_id = {$rid}");
+    $res = @mysqli_query($conn, "SELECT route, group_ar, group_no, item_no
+                                   FROM gov_target_nav WHERE role_id = {$rid}");
     if ($res) {
         while ($row = mysqli_fetch_assoc($res)) {
-            $byRole[$rid][uxuiNavBaseRoute($row['route'])] = (string) $row['group_ar'];
+            /* `GAP:` علامةُ منصوصٍ بلا شاشةٍ حيّة — يُقاس في الجدولِ ولا يُصيَّر */
+            if (strncmp((string) $row['route'], 'GAP:', 4) === 0) { continue; }
+            $base = uxuiNavBaseRoute($row['route']);
+            if ($base === '') { continue; }
+            $byRole[$rid][$base] = array(
+                'g' => (string) $row['group_ar'],
+                'n' => (int) $row['group_no'],
+                'o' => ((int) $row['group_no'] * 1000) + (int) $row['item_no'],
+            );
         }
     }
     return $byRole[$rid];
@@ -852,6 +875,40 @@ function printEmsTenGroupNav($conn, $items, $uxMap, $uxCurMap, $basePrefix, $bad
         ? uxuiDeclaredSections($conn, (int) $GLOBALS['__uxui_cur_role'])
         : array();
 
+    /* ══ الأبواب: المجموعةُ المُعلَنةُ رأسُ طيٍّ لا عنوانًا تحتَ رأسٍ غيرِها ════
+       ◆ **المقيسُ قبلَ الحكم**: `nav_route_group` مفتاحُه المسارُ وحدَه (472 صفًّا
+         بلا `role_id`) ضمنَ تصنيفٍ سقفُه اثنتا عشرةَ مجموعةً مشتركةً بين
+         الأدوارِ التسعةَ عشر — **فمجموعتانِ مستهدفتانِ تنهاران على رأسٍ واحد**.
+         ولذلك حُملت مجموعاتُ الدليلِ أوّلًا على `nav-subhead`: تظهر بأسمائها
+         **لكن تحتَ رأسٍ ليس اسمَها** («التخطيط والتوزيع» داخلَ «التشغيل
+         اليومي»)، ودورةُ الإدارةِ تُقرأ درجةً أخفضَ من دورةِ منصّةٍ عامّة.
+       ◆ **والقرارُ الآن**: مَن أعلن جدولَه المستهدَفَ في `gov_target_nav`
+         **صارت مجموعاتُه أبوابَه** — رأسَ طيٍّ باسمِها وأيقونتِها وترتيبِها
+         (`group_no`)، والعنوانُ الفرعيُّ يسقط عنها فلا يُقرأ الاسمُ مرّتين.
+       ⛔ **ولا يسري إلّا على المُعلَن**: من لا صفَّ له في الجدولِ يبقى على
+         التصنيفِ الاثنَي عشرَ حرفًا — خمسةَ عشرَ دورًا لا تُمَسّ.
+       ◆ **و«مساحتي» تبقى أوّلًا**: فيها المرساتان («الرئيسية» و«المراسلات»)
+         وهما بنصِّ الدستورِ §6 أولُ ما يُرى — فالأبوابُ المُعلَنةُ تليها. */
+    $declHead = array();                        /* group_no => رمزُ البابِ المُعلَن */
+    if (!empty($declSec)) {
+        require_once __DIR__ . '/nav_icon_map.php';
+        $gn = array();
+        foreach ($declSec as $d) { $gn[(int) $d['n']] = (string) $d['g']; }
+        ksort($gn);
+        $head = array(); $tail = $tax;
+        if (isset($tax[$anchorHomeCode = (isset($tax['MINE']) ? 'MINE' : key($tax))])) {
+            $head[$anchorHomeCode] = $tax[$anchorHomeCode];
+            unset($tail[$anchorHomeCode]);
+        }
+        foreach ($gn as $no => $name) {
+            $code = 'DECL' . $no;
+            $declHead[$no] = $code;
+            $head[$code] = array('code' => $code, 'name_ar' => $name,
+                'icon' => ems_nav_stage_icon($no, $name), 'sort_no' => $no, 'open_default' => 0);
+        }
+        $tax = $head + $tail;
+    }
+
     /* مرساتا كلِّ سايدبار — اسمٌ واحدٌ وموضعٌ واحدٌ في كلِّ إدارة */
     $ANCHOR_LABEL = array('main/role_board.php' => 'الرئيسية', 'chats/index.php' => 'المراسلات');
 
@@ -905,15 +962,36 @@ function printEmsTenGroupNav($conn, $items, $uxMap, $uxCurMap, $basePrefix, $bad
              وهي **لكلِّ دورٍ** فتُحمَل عليها المجموعاتُ الستُّ المستهدفةُ التي
              يعجز عنها رأسُ الطيِّ (مفتاحُه المسارُ لا الدور). ولا يسري هذا إلا
              على المُعلَن: من لا صفَّ له في الجدولِ يبقى على سلوكِه السابقِ حرفًا. */
+        /* ⚠ **والمتغايرُ يفوز بالموضعِ فيحمل قسمَه القديمَ معه**: لـ
+             `Operations/distribution_space.php` أربعةُ صفوفٍ (‏أساسٌ و`?view=`
+             و`#2` و`#3`)، و`?view=` رتبتُه أصغرُ فيُصيَّر أوّلًا **ويبتلع حارسُ
+             التكرارِ الأساسَ المُعلَن** — فظهر البندُ تحتَ «التخطيط وتخصيص
+             الموارد» لا تحتَ المُعلَنِ «التخطيط والتوزيع».
+           ⇒ **القسمُ والرتبةُ يسريان على المتغايرِ أيضًا** — فهويّةُ الشاشةِ
+             مسارُها الأساس. ⛔ **والاسمُ وحدَه يبقى للمتغاير**: هو مدخلٌ ثانٍ
+             مقصودٌ وله تسميتُه (وفرضُ الاسمِ المعياريِّ عليه أسقط رابطًا في
+             الدور ٢٤ حين صار توأمان باسمٍ واحد). */
         $isDecl = 0;
-        if (!$isVariant && isset($declSec[$base])) { $section = $declSec[$base]; $isDecl = 1; }
+        if (isset($declSec[$base])) { $section = $declSec[$base]['g']; $isDecl = 1; }
         /* والمرساتانِ تسبقان كلَّ شيءٍ داخلَ «مساحتي» — بلا قسمٍ وبأصغرِ ترتيب */
         if (!$isVariant && isset($ANCHOR_ORDER[$base])) { $section = ''; }
         $sort = $c ? (int) $c['sort_no'] : ($cur ? (int) $cur['cur_order'] : 999);
+        /* والرتبةُ المُعلَنةُ تغلب `sort_no` — لأنَّ الأخيرَ مفتاحُه المسارُ لا الدور */
+        if ($isDecl) { $sort = $declSec[$base]['o']; }
         if (!$isVariant && isset($ANCHOR_ORDER[$base])) { $sort = $ANCHOR_ORDER[$base]; }
         $lvl  = $c ? (int) $c['level_no'] : 0;
 
-        if (isset($rgMap[$base])) { $code = $rgMap[$base]; }
+        /* ◆ **والبابُ المُعلَنُ يغلب تثبيتَ المسار**: `nav_route_group` مفتاحُه
+             المسارُ فيصلح للمنصّةِ ولا يصلح لدورةِ إدارةٍ بعينِها. ولذلك ينتقل
+             `Approvals/hours_approval.php` من «مساحتي» (‏تثبيتٌ `PIN` عامٌّ)
+             إلى بابِ «الاعتماد والمطابقة» في الإدارةِ التي أعلنته — **ويبقى
+             في «مساحتي» لكلِّ دورٍ لم يُعلن**. والعنوانُ الفرعيُّ يسقط لأنَّ
+             الرأسَ صار يحمله. */
+        if ($isDecl && isset($declHead[$declSec[$base]['n']])) {
+            $code = $declHead[$declSec[$base]['n']];
+            $section = '';
+        }
+        elseif (isset($rgMap[$base])) { $code = $rgMap[$base]; }
         else { list($code, ) = ems_nav_group_for_route($base, $lvl, $section); }
         if (!isset($tax[$code])) { $code = isset($tax['DAILY']) ? 'DAILY' : key($tax); }
 

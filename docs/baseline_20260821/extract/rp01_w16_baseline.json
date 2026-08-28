@@ -1,0 +1,17 @@
+[
+    {
+        "baseline_id": "ETB-5c186484-20260827-013107",
+        "version": "ENTERPRISE-TARGET-BASELINE-v1.0",
+        "state": "ISSUED_AWAITING_OWNER",
+        "snapshot_id": "SNAP-5c186484-20260827-042001",
+        "commit_hash": "5c18648431f48ca3d5591307ad301a00c57b4f7a",
+        "layers_pass": "8",
+        "layers_total": "8",
+        "challenge_verdict": "CONCERN",
+        "redesign_count": "0",
+        "concern_count": "1",
+        "owner_ref": "",
+        "issued_at": "2026-08-27 04:31:07",
+        "why": "الثمانية عبرت والمراجعة المستقلة بلا REDESIGN - والاعتماد ختم مالك لا نتيجة اداة · والقبول البشري محور تاسع لم يعبره انسان بعد فلا يعلن مقبولا"
+    }
+]

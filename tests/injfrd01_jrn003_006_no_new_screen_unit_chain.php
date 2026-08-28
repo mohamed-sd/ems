@@ -99,6 +99,21 @@ if ($firstSha === '' || strpos($firstSha, 'fatal') !== false) {
      وهذا **تصحيحُ مدًى لا تخفيفُ شاهد**: ما وقع داخلَ الجولةِ يبقى محاسَبًا
      كما كان، وما بعدَها يُحاسَب بشاهدِ حملتِه هو. */
 $lastSha = $__log ? $__log[0] : '';
+/* ◆ **والعضويةُ حقيقةٌ مسجَّلةٌ لا مطابقةُ نصّ** (RPR-0 · 2026-08-28):
+     `--grep` يلتقط **أيَّ التزامٍ يذكر اسمَ الحزمة** ولو إشارةً عابرة. وقد وقع:
+     التزامُ `RPR-0` ذكر الاسمَ في سياقِ تسجيلِ فجوةٍ في دفترِ الحزمة، **فصار
+     `lastSha`** — فامتدَّ المدى إلى حملةٍ أخرى وعُدَّت ١٣٤ شاشةً من `REPAIR01`
+     كأنّها أُنشئت في هذه الجولة. **وهو عينُ عطبِ «المدى بلا نهاية» عائدًا من
+     بابٍ آخر**: أُغلق طرفُه ثمَّ صار طرفُه نفسُه يتحرّك.
+   ◆ **فيُقرأ المدى من `RANGE.json` إن وُجد** — والنصُّ يبقى احتياطًا لا أصلًا. */
+$__rangeFile = $ROOT . '/docs/sources/INJ-FRD-REM-01/RANGE.json';
+if (is_file($__rangeFile)) {
+    $__r = json_decode((string) file_get_contents($__rangeFile), true);
+    if (is_array($__r) && !empty($__r['first']) && !empty($__r['last'])) {
+        $firstSha = (string) $__r['first'];
+        $lastSha  = (string) $__r['last'];
+    }
+}
 $range = ($lastSha !== '' && $lastSha !== $firstSha)
     ? $firstSha . '..' . $lastSha
     : $firstSha . '..HEAD';
