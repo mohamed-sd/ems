@@ -80,22 +80,27 @@ $r = $conn->query("SELECT requirement_id, unit, surface, grain, wave FROM repair
                     ORDER BY requirement_id");
 while ($x = $r->fetch_assoc()) { $reqs[] = $x; }
 
-/* مقابلُ الاسمِ في الكونَين — ⛔ والمطابقةُ اسميّةٌ ويُعلَن أنّها كذلك */
-$gapBy = array();
-$r = $conn->query("SELECT surface_name, COUNT(*) n FROM repair01_target_gaps GROUP BY 1");
-while ($x = $r->fetch_assoc()) { $gapBy[$x['surface_name']] = (int) $x['n']; }
-
-$builtBy = array();
-$r = $conn->query("SELECT canonical_label_ar lbl,
-                          MAX(surface_kind) kind, COUNT(*) n
-                     FROM repair01_screen_registry
-                    WHERE canonical_label_ar <> ''
-                      AND lifecycle IN ('LIVE_REGISTERED','LIVE_UNREGISTERED')
-                    GROUP BY 1");
-while ($x = $r->fetch_assoc()) { $builtBy[$x['lbl']] = $x; }
-
-$KIND2TYPE = array('SOURCE' => 'TRANSACTION', 'PROJECTION' => 'PROJECTION_REPORT');
-
+/* ═══ المصدرُ الواحد: كونُ الأهدافِ الموحَّد ═══════════════════════════════
+   ◆ **ولا يُعاد اشتقاقُ المطابقةِ هنا**: كانت هذه الأداةُ تُطابق بالاسمِ من
+     عندِها، و`rpr02_target_universe.php` يُطابق من عندِه — **عدّادان في
+     ملفَّين يتفرّقان حتمًا** (‏الدرسُ `counter-parity-two-readers`). ⇒ القارئُ
+     واحدٌ الآن: `repair01_target_universe` وحدَه، **والحكمُ يتبع حكمَ الكون**.
+   ⛔ **وهدفٌ بلا حكمٍ في الكونِ يبقى بلا حالةٍ هنا** — ولا يُترجَم غيابُ الحكمِ
+     إلى `NOT_IMPLEMENTED`. */
+$UNI = array();
+$r = $conn->query("SELECT requirement_id, verdict, screen_id, gap_id, match_method,
+                          verdict_witness, match_witness
+                     FROM repair01_target_universe WHERE requirement_id <> ''");
+while ($x = $r->fetch_assoc()) { $UNI[$x['requirement_id']] = $x; }
+if (!$UNI) {
+    exit("⛔ **كونُ الأهدافِ غيرُ مبنيّ** — شغِّلْ أوّلًا:\n"
+       . "   php tools/rpr02_target_universe.php --apply\n");
+}
+/* نوعُ السطحِ من الدليلِ المعماريّ — لمن طوبق سطحُه وحدَه */
+$kindOf = array();
+$r = $conn->query("SELECT screen_id, surface_kind FROM repair01_screen_registry
+                    WHERE surface_kind <> ''");
+while ($x = $r->fetch_assoc()) { $kindOf[$x['screen_id']] = $x['surface_kind']; }
 $out = array();
 $cnt = array('EVIDENCE_CLOSED' => 0, 'IMPLEMENTED_NOT_VERIFIED' => 0,
              'PARTIALLY_IMPLEMENTED' => 0, 'INCORRECTLY_IMPLEMENTED' => 0,
@@ -103,34 +108,33 @@ $cnt = array('EVIDENCE_CLOSED' => 0, 'IMPLEMENTED_NOT_VERIFIED' => 0,
 $unmatched = 0; $typed = 0; $untyped = 0;
 
 foreach ($reqs as $q) {
-    $s = $q['surface'];
-    $inGap = isset($gapBy[$s]);
-    $inBuilt = isset($builtBy[$s]);
-    if (!$inGap && !$inBuilt) {
+    $id = $q['requirement_id'];
+    $u  = isset($UNI[$id]) ? $UNI[$id] : null;
+    if ($u === null || $u['verdict'] === null) {
         $unmatched++;
         $out[] = array($q, null, null, 'UNMATCHED_PENDING_RECONCILIATION',
-            'لا مقابلَ لاسمِه في الكونَين — **وغيابُ الاسمِ ليس غيابَ السطح** (`RPR-02` §٤·١)');
+            ($u === null
+              ? 'لا صفَّ له في كونِ الأهدافِ الموحَّد'
+              : 'في الكونِ بلا حكمٍ بعد (' . $u['match_method'] . ') — ' . $u['match_witness']));
         continue;
     }
-    if ($inGap && $inBuilt) {
-        $state = 'PARTIALLY_IMPLEMENTED';
-        $ev = 'اسمُه في الكونَين معًا: هدفٌ لم يُبنَ (' . $gapBy[$s] . ') وسطحٌ حيٌّ ('
-            . $builtBy[$s]['n'] . ')';
-    } elseif ($inGap) {
+    if ($u['verdict'] === 'NOT_BUILT') {
         $state = 'NOT_IMPLEMENTED';
-        $ev = 'صفٌّ في `repair01_target_gaps` — هدفٌ لم يُبنَ (' . $gapBy[$s] . ')';
-    } else {
-        /* ⛔ **وجودُ الكودِ ليس إغلاقًا** — فالحيُّ يقف عند «منفَّذٌ ولم يُثبت» */
+        $ev = 'حكمُ الكون `NOT_BUILT` · ' . $u['verdict_witness'];
+    } elseif ($u['verdict'] === 'MATCHED') {
+        /* ⛔ **وجودُ الكودِ ليس إغلاقًا** — الحيُّ يقف عند «منفَّذٌ ولم يُثبت» */
         $state = 'IMPLEMENTED_NOT_VERIFIED';
-        $ev = 'سطحٌ حيٌّ في السجل (' . $builtBy[$s]['n'] . ') **وبلا عقدِ إثباتٍ مستوفًى**';
+        $ev = 'حكمُ الكون `MATCHED` **وبلا عقدِ إثباتٍ مستوفًى** · ' . $u['verdict_witness'];
+    } else {
+        $state = 'PARTIALLY_IMPLEMENTED';
+        $ev = 'حكمُ الكون `' . $u['verdict'] . '` · ' . $u['verdict_witness'];
     }
-    $kind = $inBuilt ? (string) $builtBy[$s]['kind'] : '';
+    $kind = ($u['screen_id'] !== '' && isset($kindOf[$u['screen_id']])) ? $kindOf[$u['screen_id']] : '';
     $type = isset($KIND2TYPE[$kind]) ? $KIND2TYPE[$kind] : null;
     if ($type === null) { $untyped++; } else { $typed++; }
     $cnt[$state]++;
-    $out[] = array($q, $state, $type, 'MATCHED_BY_NAME', $ev);
+    $out[] = array($q, $state, $type, 'MATCHED_BY_ID', $ev);
 }
-
 /* ⛔ **السالبُ يكسر مفردةً فريدة** */
 if ($SELF) { $unmatched++; }
 
