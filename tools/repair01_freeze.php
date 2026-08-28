@@ -7,7 +7,7 @@
  * رسميّةٍ تُستخدم لإصدارِ `Baseline` أو تقريرِ إغلاق».
  *
  * ◆ **والتجميدُ لا يُعلَن بل يُستحَقّ** — فثلاثةُ شروطٍ تُقاس قبلَه:
- *   ① شجرةٌ مُلزَمةٌ نظيفة · ② انحدارٌ أخضرُ كاملٌ ببصمةٍ ثابتة ·
+ *   ① شجرةٌ مُلزَمةٌ نظيفة · ② انحدارٌ **يُشغَّل الآنَ**: أخضرُ للأساسِ · مختومُ الإحصاءِ للتشخيص ·
  *   ③ **لا لقطةَ مفتوحةً سابقة** — فنافذتان مفتوحتان معًا تجعلان «أيَّ لقطةٍ
  *      يمثّلها التقرير» سؤالًا بلا جواب.
  *
@@ -15,7 +15,8 @@
  *   للنظام** — هو تسجيلُ حالتِه.
  *
  * التشغيل:
- *   php tools/repair01_freeze.php --purpose="..."     ← يُجمّد
+ *   php tools/repair01_freeze.php --purpose="..."     ← يُجمّد أساسًا — يشترط الخضرة
+ *   php … --purpose="..." --kind=diagnostic          ← نافذةٌ تشخيصيّةٌ تختم الحمرةَ بأسمائها
  *   php tools/repair01_freeze.php --status            ← يُخبر
  *   php tools/repair01_freeze.php --release --why="…" ← يفكّ بسببٍ مكتوب
  * ═══════════════════════════════════════════════════════════════════════════
@@ -36,6 +37,13 @@ $arg = function ($k) use ($argv) {
 };
 $STATUS  = in_array('--status', $argv, true);
 $RELEASE = in_array('--release', $argv, true);
+/* نوعُ النافذة — والافتراضُ الأشدُّ `BASELINE` */
+$kindArg = strtolower((string) $arg('kind'));
+$DIAG    = ($kindArg === 'diagnostic');
+if ($kindArg !== '' && !in_array($kindArg, array('baseline', 'diagnostic'), true)) {
+    exit("⛔ نوعٌ غيرُ معروف: `$kindArg` — والمعروفُ `baseline` أو `diagnostic`\n");
+}
+$KIND = $DIAG ? 'DIAGNOSTIC' : 'BASELINE';
 
 $git = function ($a) use ($ROOT) {
     $o = array(); exec('git -C ' . escapeshellarg($ROOT) . ' ' . $a . ' 2>&1', $o);
@@ -92,14 +100,48 @@ $chk($open === null, 'لا نافذةَ قياسٍ مفتوحةً سلفًا',
 $dirty = ($git('status --porcelain') !== '');
 $chk(!$dirty, 'الشجرةُ مُلزَمةٌ نظيفة', $dirty ? '**متّسخة** — واللقطةُ لا تُثبت ما لم يُلزَم' : '');
 
-/* ② انحدارٌ أخضرُ كامل — يُشغَّل الآن ولا يُصدَّق عن تقريرٍ سابق */
+/* ② الانحدارُ — يُشغَّل الآنَ دائمًا · وحكمُه بنوعِ النافذة
+   ═══════════════════════════════════════════════════════════════════════
+   ◆ **نافذتان لا نافذةٌ واحدة** — و`AMD-01` المرحلة ٥ يحكم: *«ولا تستخدمْ
+     استثناءً لتجاوزِ قاعدةٍ لا تنطبق أصلًا — صحِّحْ قاعدةَ الانطباقِ نفسَها»*.
+     فالنصُّ الدستوريُّ (البند ⑬) يمنع **التعديلَ أثناءَ** النافذة، **ولا يشترط
+     الخضرةَ لدخولِها**. والخضرةُ شرطُ **إصدارِ أساسٍ معتمَد** لا شرطُ **قياسٍ
+     تشخيصيّ** يُفتح ليقيسَ حمرةً قائمة.
+   ⛔ **ولولا التصحيحُ لصار الشرطُ حاجزًا دائريًّا**: `MASTER_EXEC` §٢ يوجب
+     تجميدًا قبل أيِّ قياس، وهذه الأداةُ تشترط خضرةً قبل التجميد، والخضرةُ
+     تحتاج عملًا يُبنى على قياس. فلا مخرجَ من الدائرةِ إلّا بتصحيحِ الانطباق.
+   ◆ **والتصحيحُ يشدُّ ولا يُرخي**: التشخيصيّةُ **تختم الإحصاءَ في اللقطةِ
+     نفسِها بأسماءِ الساقطين**. فاليومَ تُجمَّد لقطةٌ ولا تحمل عن الانحدارِ
+     حرفًا؛ وبعدَه **لا يدّعي تقريرٌ خضرةً يكذّبها ختمُ لقطتِه**.
+   ◆ **والافتراضُ يبقى الأشدَّ**: من لم يُعلن `--kind=diagnostic` خضع للشرطِ
+     القديمِ كما كان. */
 $o = array(); $rc = 0;
 exec('"' . PHP_BINARY . '" ' . escapeshellarg($ROOT . '/tools/repair01_regression_run.php') . ' 2>&1', $o, $rc);
-$sum = '';
-foreach ($o as $l) { if (strpos($l, 'نجح') !== false) { $sum = trim($l); } }
+$sum = ''; $red = array();
+foreach ($o as $l) {
+    if (strpos($l, 'نجح') !== false) { $sum = trim($l); }
+    /* أسماءُ الساقطين — تُلتقط من سطرِ الحكمِ لا من عدٍّ مجرَّد */
+    if (mb_strpos($l, '✘') !== false && preg_match('~tools/([A-Za-z0-9_]+)\.php~', $l, $m)) {
+        $red[$m[1]] = 1;
+    }
+}
+$redList = implode(' · ', array_keys($red));
 /* ⛔ **ولا يُقرأ التقريرُ المكتوبُ بدل التشغيل**: ملفٌّ على القرصِ قد يكون من
      التزامٍ سابق، **ولقطةٌ تستند إلى قياسٍ قديمٍ تختم حالةً لم تعد قائمة**. */
-$chk($rc === 0, 'الانحدارُ الشاملُ أخضرُ **مُشغَّلًا الآنَ لا مقروءًا من ملفّ**', $sum);
+if ($DIAG) {
+    /* ⛔ **والتشخيصُ لا يعني تصديقَ أيِّ مخرَج**: لا بدَّ أن يُنتج المُشغِّلُ
+         إحصاءً مقروءًا — فمُشغِّلٌ انهار بلا سطرِ حصيلةٍ ليس قياسًا. */
+    $chk($sum !== '', 'الانحدارُ **شُغِّل الآنَ وأنتج إحصاءً مقروءًا** — والحكمُ عليه لا به', $sum);
+    if ($redList !== '') {
+        echo "     ◆ **الساقطون يُختمون في اللقطةِ بأسمائهم** — ولا تقريرٌ عنها يدّعي خضرة:\n";
+        echo "       $redList\n";
+    }
+} else {
+    $chk($rc === 0, 'الانحدارُ الشاملُ أخضرُ **مُشغَّلًا الآنَ لا مقروءًا من ملفّ**', $sum);
+}
+$census = ($sum !== '' ? preg_replace('~\*\*~', '', $sum) : 'لا إحصاء')
+        . ($redList !== '' ? ' · الساقطون: ' . $redList : ' · لا ساقط');
+if (mb_strlen($census) > 500) { $census = mb_substr($census, 0, 497) . '…'; }
 
 if ($fail) {
     echo "\n⛔ **لم يُجمَّد** — والتجميدُ لا يُعلَن بل يُستحَقّ.\n";
@@ -156,10 +198,11 @@ $sid = 'SNAP-' . substr($commit, 0, 8) . '-' . date('Ymd-His');
 
 $ok = $conn->query("INSERT INTO repair01_freeze_snapshot
     (snapshot_id, commit_hash, branch, schema_version, registry_rows, config_baseline,
-     measurement_tool_version, frozen_at, frozen_by, purpose)
+     measurement_tool_version, frozen_at, frozen_by, purpose, window_kind, regression_census)
     VALUES ('" . $e($sid) . "', '" . $e($commit) . "', '" . $e($branch) . "',
             '" . $e($tbl . 'T/' . $col . 'C') . "', $reg, '" . $e($cfg) . "',
-            '" . $e($mtv) . "', NOW(), 'repair01_freeze.php', '" . $e($purpose) . "')");
+            '" . $e($mtv) . "', NOW(), 'repair01_freeze.php', '" . $e($purpose) . "',
+            '" . $e($KIND) . "', '" . $e($census) . "')");
 if (!$ok) { exit("✘ " . $conn->error . "\n"); }
 
 echo "\n────────────────────────────────────────────────────────────\n";
@@ -170,5 +213,7 @@ printf("   `Registry Version` %d صفًّا\n", $reg);
 printf("   `Config Baseline`  %s (%d مفتاحَ بيئةٍ · PHP %s)\n", $cfg, count($keys), PHP_VERSION);
 printf("   `Measure Tool Ver` %s\n", $mtv);
 printf("   `Frozen At`        %s\n", date('Y-m-d H:i:s'));
+printf("   `Window Kind`      %s\n", $KIND);
+printf("   `Regression`       %s\n", $census);
 printf("   `Purpose`          %s\n", $purpose);
 echo "\n⛔ **نافذةُ القياسِ مفتوحةٌ الآن — والتعديلُ ممنوعٌ حتّى تُفَكّ بسببٍ مكتوب.**\n";
