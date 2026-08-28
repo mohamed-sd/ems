@@ -7,12 +7,12 @@
 
 | المفردة | القيمة |
 |---|---|
-| `Snapshot ID` | `SNAP-6dd833b1-20260829-020705` |
-| `Exact Commit Hash` | `6dd833b1696c378d8a7029cf674fb6a0eb652cf6` |
+| `Snapshot ID` | `SNAP-5bdf98b7-20260829-021315` |
+| `Exact Commit Hash` | `5bdf98b7a69333dd11305068ddffb63aa79305fb` |
 | `Schema Version` | `956T/15293C` |
 | `Registry Version` | **783** |
-| `Measurement Tool Version` | `MT-e1d48a6d9810/1112` |
-| `Timestamp` | 2026-08-29 02:07:05 |
+| `Measurement Tool Version` | `MT-3ec68ac19306/1112` |
+| `Timestamp` | 2026-08-29 02:13:15 |
 | `Window Kind` | `DIAGNOSTIC` |
 | `Regression Census` | نجح 17 · رسب 8 · عطبٌ في التشغيل 0 · المجموع 25 · الساقطون: repair01_w135_gate · repair01_w13_gate · repair01_w14_gate · repair01_w16_gate · repair01_w6_gate · repair01_w7_gate · repair01_w8_gate |
 
@@ -34,7 +34,7 @@
 | والفاشلُ | 26 | **26** | = | — |
 | الذهبيّاتُ المسجَّلة | 10 | **10** | = | — |
 | منها معتمَدةٌ | 0 | **0** | = | الأمرُ يقول «10/10 معلَّقة» — والمعتمَدُ صفر |
-| لقطاتُ التجميد | 6 | **9** | **+3** | — |
+| لقطاتُ التجميد | 6 | **10** | **+4** | — |
 
 **مطابقٌ 13 · مختلفٌ 2 · المقام 15**
 
