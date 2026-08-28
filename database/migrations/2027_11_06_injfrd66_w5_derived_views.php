@@ -1,6 +1,8 @@
 <?php
 /**
  * 2027_11_06_injfrd66_w5_derived_views.php
+ *
+ * @migration-objects: view:v_supplier_qualification, view:v_supplier_targets_monthly
  *   الموجةُ ⑤ — منظرانِ مشتقّانِ يُخرجان `SUP-03` و`SUP-14` من «غيرِ محسوم»
  * ═══════════════════════════════════════════════════════════════════════════
  * ◆ **منظرانِ لا جدولان** — وهذا قرارُ نصٍّ لا ذوق:

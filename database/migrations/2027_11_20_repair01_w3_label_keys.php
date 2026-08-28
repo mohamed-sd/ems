@@ -1,6 +1,8 @@
 <?php
 /**
  * 2027_11_20_repair01_w3_label_keys.php
+ *
+ * @migration-objects: col:scr_production.site_id, col:scr_unit_perf.equipment_id, col:scr_site_shift_plan.operator_employee_id, idx:scr_production.ix_w3_site_id, idx:scr_unit_perf.ix_w3_equipment_id, idx:scr_site_shift_plan.ix_w3_operator_employee_id
  * ═══════════════════════════════════════════════════════════════════════════
  * REPAIR01 · W03 — **مفتاحُ الحقيقةِ الأمِّ في الجداولِ التي تعرّفها بنصّ**.
  *

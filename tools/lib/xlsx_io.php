@@ -170,3 +170,90 @@ function xlsx_write($path, array $edits, $outPath = null)
     if (!@rename($tmp, $outPath)) { @copy($tmp, $outPath); @unlink($tmp); }
     return $written;
 }
+
+/**
+ * يُلحق صفوفًا في آخرِ ورقة. $rows = array(array(colIndex => 'نص', …), …)
+ * ═══════════════════════════════════════════════════════════════════════════
+ * ◆ **ولماذا دالّةٌ ثانيةٌ لا توسيعُ `xlsx_write()`**: تلك تكتب في خليّةٍ قائمةٍ
+ *   **وترفع استثناءً إن لم تُوجد** — وهو حارسُها المقصود: «الكتابةُ في العدمِ
+ *   صمتٌ يُقرأ نجاحًا». **فإلحاقُ صفٍّ جديدٍ ليس حالةَ خطأٍ فيها بل عملٌ آخر**،
+ *   وخلطُهما يُسقط ذلك الحارس.
+ *
+ * ◆ **والخلايا `inlineStr`** كما في `xlsx_write()` — فلا تُلمَس جداولُ النصِّ
+ *   المشترك، **ولا يتغيّر نصُّ خليّةٍ أخرى تشاركها**.
+ *
+ * ⛔ **ولا يُلحَق صفٌّ برقمٍ قائم**: يبدأ الترقيمُ بعدَ أقصى صفٍّ في الورقة،
+ *   **ويُتحقَّق أنَّ العددَ المكتوبَ يطابق المطلوب** — فإلحاقٌ صامتٌ ناقصٌ
+ *   يُقرأ نجاحًا وهو نقص.
+ *
+ * @return int عددُ الصفوفِ المُلحَقةِ فعلًا
+ */
+function xlsx_append_rows($path, $sheetName, array $rows, $outPath = null)
+{
+    if (!$rows) { return 0; }
+    $outPath = $outPath ?: $path;
+    $z = new ZipArchive();
+    if ($z->open($path) !== true) { throw new RuntimeException('تعذّر فتحُ المصنَّف'); }
+
+    $names = array(); $rels = array();
+    $d = new DOMDocument(); $d->loadXML($z->getFromName('xl/workbook.xml'));
+    foreach ($d->getElementsByTagName('sheet') as $sh) {
+        $names[$sh->getAttribute('name')] = $sh->getAttributeNS(
+            'http://schemas.openxmlformats.org/officeDocument/2006/relationships', 'id');
+    }
+    $d = new DOMDocument(); $d->loadXML($z->getFromName('xl/_rels/workbook.xml.rels'));
+    foreach ($d->getElementsByTagName('Relationship') as $r) {
+        $rels[$r->getAttribute('Id')] = ltrim(str_replace('/xl/', '', $r->getAttribute('Target')), '/');
+    }
+    $entries = array();
+    for ($i = 0; $i < $z->numFiles; $i++) { $entries[$z->getNameIndex($i)] = $z->getFromIndex($i); }
+    $z->close();
+
+    if (!isset($names[$sheetName])) { throw new RuntimeException("ورقةٌ غيرُ موجودة: {$sheetName}"); }
+    $file = 'xl/' . $rels[$names[$sheetName]];
+    if (!isset($entries[$file])) { throw new RuntimeException("ملفُّ ورقةٍ مفقود: {$file}"); }
+    $xml = $entries[$file];
+
+    /* أقصى رقمِ صفٍّ قائمٍ — فالإلحاقُ بعدَه لا فوقَه */
+    $maxRow = 0;
+    if (preg_match_all('~<row[^>]*\sr="(\d+)"~', $xml, $m)) {
+        foreach ($m[1] as $n) { $maxRow = max($maxRow, (int) $n); }
+    }
+    if ($maxRow === 0) { throw new RuntimeException('ورقةٌ بلا صفوفٍ — لا يُلحَق بها'); }
+
+    $chunk = '';
+    $n = $maxRow;
+    foreach ($rows as $cells) {
+        $n++;
+        $chunk .= '<row r="' . $n . '">';
+        ksort($cells);
+        foreach ($cells as $ci => $val) {
+            if ($val === null || $val === '') { continue; }
+            $ref = xlsx_col_letter((int) $ci) . $n;
+            $esc = htmlspecialchars((string) $val, ENT_QUOTES | ENT_XML1, 'UTF-8');
+            $chunk .= '<c r="' . $ref . '" t="inlineStr"><is><t xml:space="preserve">'
+                . $esc . '</t></is></c>';
+        }
+        $chunk .= '</row>';
+    }
+
+    if (strpos($xml, '</sheetData>') === false) { throw new RuntimeException('لا `sheetData` في الورقة'); }
+    $xml = preg_replace('~</sheetData>~', $chunk . '</sheetData>', $xml, 1);
+
+    /* ⛔ **ومدى الورقةِ المُعلَنُ يُوسَّع** — فمدًى يقف دون الصفوفِ الجديدةِ
+         يجعل بعضَ القرّاءِ لا يراها، **فتُكتب ولا تُقرأ**. */
+    $xml = preg_replace_callback('~(<dimension\s+ref=")([A-Z]+)(\d+):([A-Z]+)(\d+)(")~',
+        function ($m) use ($n) { return $m[1] . $m[2] . $m[3] . ':' . $m[4] . $n . $m[6]; }, $xml, 1);
+
+    $entries[$file] = $xml;
+
+    $tmp = $outPath . '.tmp';
+    $z2 = new ZipArchive();
+    if ($z2->open($tmp, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+        throw new RuntimeException('تعذّر إنشاءُ الأرشيف');
+    }
+    foreach ($entries as $en => $data) { $z2->addFromString($en, $data); }
+    $z2->close();
+    if (!@rename($tmp, $outPath)) { @copy($tmp, $outPath); @unlink($tmp); }
+    return count($rows);
+}
