@@ -130,6 +130,17 @@ printf("  `Snapshot ID` %s · `Commit` %s · `MT` %s\n",
 printf("  حواجبُ الموجاتِ: %d مُشغَّلًا · **الساقطُ %d**: %s\n",
        count($GATES), count($redGates), implode(' · ', array_keys($redGates)));
 
+/* ⛔ **والعابرُ الساقطُ يحجب كلَّ نطاقٍ حتى يُثبَت خلافُه**: حاجبٌ لا يذكر
+     رمزًا في نصِّه ليس حاجبًا لا يمسُّ أحدًا — بل حاجبًا **يمسُّ الجميع**.
+     وقد قرأَ أوّلُ إصدارٍ غيابَ الذكرِ «لا حاجز»، فظهرت `DEP-14` بلا حاجزٍ
+     و`w7_gate` (‏الصيانةُ والنقل) ساقط. ⇒ **يُعرض العابرُ في كلِّ سطرٍ**،
+     ⛔ ولا يُنسب إلى نطاقٍ بعينِه بالتخمينِ أيضًا — فالنسبةُ تبقى مُعلَنةً
+     «عابر» ولا تُقرأ إسنادًا. */
+$crossRed = array();
+foreach ($redGates as $n => $g) {
+    if (!$g['scopes']) { $crossRed[] = str_replace('repair01_', '', $n); }
+}
+
 $rows = array(); $noResume = 0;
 foreach ($SCOPES as $code) {
     $reqN  = isset($reqPer[$code]) ? $reqPer[$code]['n'] : 0;
@@ -142,17 +153,24 @@ foreach ($SCOPES as $code) {
     foreach ($redGates as $n => $g) {
         if (in_array($code, $g['scopes'], true)) { $mine[] = str_replace('repair01_', '', $n); }
     }
-    $blocker = $mine ? implode(' · ', $mine) : '—';
+    $crossTxt = $crossRed ? 'عابرٌ: ' . implode(' · ', $crossRed) : '';
+    $blocker = trim(($mine ? implode(' · ', $mine) : '')
+                    . ($mine && $crossTxt ? '  +  ' : '') . $crossTxt);
+    if ($blocker === '') { $blocker = '—'; }
     /* الدرجةُ من الستِّ — §٣ */
-    $degree  = $mine ? 'BUILD_BLOCKER' : ($gapN > 0 ? 'BUILD_BLOCKER' : 'CONFIG_PENDING');
-    $valid   = $mine ? 'نعم — حاجبٌ ساقطٌ مقيسٌ الآن' : ($gapN > 0 ? 'نعم — أهدافٌ لم تُبنَ' : 'لا حاجزَ مقيس');
+    $degree  = ($mine || $crossRed || $gapN > 0) ? 'BUILD_BLOCKER' : 'CONFIG_PENDING';
+    $valid   = $mine ? 'نعم — حاجبٌ ساقطٌ يذكر النطاقَ بنصِّه'
+             : ($crossRed ? 'نعم — حاجبٌ عابرٌ ساقطٌ يشمله ولا يخصُّه'
+             : ($gapN > 0 ? 'نعم — أهدافٌ لم تُبنَ' : 'لا حاجزَ مقيس'));
     $resume  = $gapN > 0
         ? 'أوّلُ هدفٍ غيرِ مبنيٍّ بترتيبِ الدفتر: «' . $first . '»'
         : 'لا هدفَ غيرَ مبنيٍّ — الاستئنافُ بالمراجعةِ العكسيّة';
     $next    = $mine
         ? 'شغِّلْ ' . $mine[0] . ' واقرأْ حاجبَه الساقطَ بعينِه'
+        : ($crossRed
+        ? 'شغِّلْ ' . $crossRed[0] . ' (عابر) واقرأْ حاجبَه الساقطَ بعينِه'
         : ($gapN > 0 ? 'احكمْ على «' . $first . '» بواحدٍ من أحكامِ `RPR-02` §٤·٢ السبعة'
-                     : 'راجِعْ عكسيًّا مقابلَ ملفِّ الإدارة');
+                     : 'راجِعْ عكسيًّا مقابلَ ملفِّ الإدارة'));
     if ($resume === '') { $noResume++; }
     $rows[] = array($code, isset($NAME[$code]) ? $NAME[$code] : '—',
                     $reqN, $surfN, $gapN, $LASTCLOSED, $first,
@@ -169,10 +187,7 @@ foreach ($rows as $x) {
 }
 
 echo "\n  ── عابرٌ لا يُنسب إلى نطاق ──\n";
-$cross = array();
-foreach ($redGates as $n => $g) {
-    if (!$g['scopes']) { $cross[] = str_replace('repair01_', '', $n); }
-}
+$cross = $crossRed;
 printf("     حواجبُ عابرةٌ ساقطة: %s\n", $cross ? implode(' · ', $cross) : 'لا شيء');
 printf("     **أسطحٌ بلا مالكٍ مقرَّر: %d** (منها حيٌّ مسجَّلٌ %d) — و`RPR-02` §١٢ يشترط صفرًا\n",
        $ownerlessN, $ownerlessLive);
