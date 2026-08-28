@@ -101,6 +101,11 @@ $kindOf = array();
 $r = $conn->query("SELECT screen_id, surface_kind FROM repair01_screen_registry
                     WHERE surface_kind <> ''");
 while ($x = $r->fetch_assoc()) { $kindOf[$x['screen_id']] = $x['surface_kind']; }
+/* خريطةُ نوعِ السطحِ ⇐ نوعِ المتطلب — `AMD-01` §٣·١
+   ⛔ **ولا يُختار النوعُ بالاجتهاد**: `SOURCE` سطحٌ مصدريٌّ يكتب حقيقةً ⇒ معاملة ·
+      و`PROJECTION` يعرض من مالكٍ آخر ⇒ إسقاطٌ وتقرير. وما لا سطحَ له لا نوعَ له. */
+$KIND2TYPE = array('SOURCE' => 'TRANSACTION', 'PROJECTION' => 'PROJECTION_REPORT');
+
 $out = array();
 $cnt = array('EVIDENCE_CLOSED' => 0, 'IMPLEMENTED_NOT_VERIFIED' => 0,
              'PARTIALLY_IMPLEMENTED' => 0, 'INCORRECTLY_IMPLEMENTED' => 0,
