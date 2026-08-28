@@ -20,7 +20,7 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 $D = $ROOT . '/docs/baseline_20260821/extract/';
 function j($f) { global $D; return json_decode((string) file_get_contents($D . $f . '.json'), true) ?: array(); }
 
-$SNAP = 'BL-20260828-b5a2cc7f';
+$SNAP = 'BL-20260828c-96a640e1+WT';
 $reg = j('screen_registry');
 $fields = j('field_registry');
 $cycle = j('gov_screen_cycle');
@@ -62,9 +62,17 @@ function mk_sheet($wb, $title)
     $ws->getDefaultRowDimension()->setRowHeight(-1);
     return $ws;
 }
+function zn(array $rows)
+{
+    foreach ($rows as $i => $r) {
+        if (is_array($r)) { foreach ($r as $j => $v) { if ($v === '') { $rows[$i][$j] = null; } } }
+        elseif ($r === '') { $rows[$i] = null; }
+    }
+    return $rows;
+}
 function put_head($ws, $row, $cols, $fill)
 {
-    $ws->fromArray($cols, null, 'A' . $row);
+    $ws->fromArray(zn($cols), null, 'A' . $row, true);
     $last = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(count($cols));
     $rng = 'A' . $row . ':' . $last . $row;
     $ws->getStyle($rng)->getFont()->setBold(true)->setName('Arial')->setSize(10)->getColor()->setARGB('FFFFFFFF');
@@ -75,7 +83,7 @@ function meta_rows($ws, $title)
 {
     global $SNAP;
     $ws->setCellValue('A1', $title);
-    $ws->setCellValue('A2', 'اللقطة: ' . $SNAP . ' · تاريخ القياس: 2026-08-28 12:01→12:50 · المصدر: استخراج حي (كود + قاعدة + Git) — لا صيغ: كل قيمة قياسٌ بلحظته · اللقطة السابقة في historical/');
+    $ws->setCellValue('A2', 'اللقطة: ' . $SNAP . ' · تاريخ القياس: 2026-08-28 21:25→22:10 · المصدر: استخراج حي (كود + قاعدة + Git) — لا صيغ: كل قيمة قياسٌ بلحظته · اللقطة السابقة في historical/');
     $ws->getStyle('A1')->getFont()->setBold(true)->setSize(13)->setName('Arial');
     $ws->getStyle('A2')->getFont()->setSize(9)->setItalic(true)->setName('Arial');
 }
@@ -101,7 +109,7 @@ $sumRows = array(
     array('أفعال القاموس', $statusM['action_dict_total'], 'nav09_action_map'),
     array('أفعال موثَّقة الحارس', $statusM['action_guard_verified'], 'من ' . $statusM['action_dict_total']),
 );
-$ws->fromArray($sumRows, null, 'A4');
+$ws->fromArray(zn($sumRows), null, 'A4', true);
 put_head($ws, 4, $sumRows[0], $HDR_FILL);
 foreach (array('A' => 42, 'B' => 14, 'C' => 90) as $c => $w) { $ws->getColumnDimension($c)->setWidth($w); }
 
@@ -124,7 +132,7 @@ foreach ($rp01 as $r) {
         $r['on_disk_measured'] ? 'نعم' : 'لا', $r['disk_match'], $r['disk_class'],
         $r['verdict_rule'], $r['src_ref']);
 }
-$ws->fromArray($rows, null, 'A5');
+$ws->fromArray(zn($rows), null, 'A5', true);
 $ws->freezePane('A5');
 
 /* ════ 08_RP01_RECONCILE — مصالحة السجل الرسمي بالقرص ═══════════════════ */
@@ -145,7 +153,7 @@ $recRows = array(
     array('حقول بلا ارتباط', $rp01stat['fields_unlinked'], 'من ' . $rp01stat['fields_total']),
     array('الإدارات القانونية', count($rp01dep), 'repair01_departments — DEP-01..17 + IAF · WS-MY · EX-CEO · EX-DVP'),
 );
-$ws->fromArray($recRows, null, 'A5');
+$ws->fromArray(zn($recRows), null, 'A5', true);
 foreach (array('A' => 44, 'B' => 12, 'C' => 92) as $c => $w) { $ws->getColumnDimension($c)->setWidth($w); }
 $r0 = 5 + count($recRows) + 2;
 $ws->setCellValue('A' . $r0, 'أسطح القرص خارج السجل الرسمي — القائمة الكاملة');
@@ -156,7 +164,7 @@ foreach ($rp01orph as $o) {
     $orows[] = array($o['path'], $o['class'],
         $o['class'] === 'SCREEN' ? 'شاشة — تستحق تسجيلًا' : 'خارج نطاق السجل (السجل يغطي الشاشات لا المعالجات)');
 }
-$ws->fromArray($orows, null, 'A' . ($r0 + 2));
+$ws->fromArray(zn($orows), null, 'A' . ($r0 + 2), true);
 
 /* ════ 09_DEPARTMENTS — الإدارات القانونية ═════════════════════════════ */
 $ws = mk_sheet($wb, '09_DEPARTMENTS');
@@ -178,7 +186,7 @@ foreach ($cnt as $code => $n) {
     foreach ($rp01dep as $d) { if ($d['canonical_code'] === $code) { $known = true; break; } }
     if (!$known) { $drows[] = array($code, 'NEEDS_REVIEW — رمز مالك خارج جدول الإدارات', '', '', '', $n, $gcnt[$code] ?? 0, 'يستحق حسمًا'); }
 }
-$ws->fromArray($drows, null, 'A5');
+$ws->fromArray(zn($drows), null, 'A5', true);
 
 /* ════ 01_SCREEN_REGISTRY ════════════════════════════════════════════ */
 $ws = mk_sheet($wb, '01_SCREEN_REGISTRY');
@@ -212,7 +220,7 @@ foreach ($reg as $r) {
         implode(',', $r['sources']), implode(' | ', $r['known_issue']),
     );
 }
-$ws->fromArray($rows, null, 'A5');
+$ws->fromArray(zn($rows), null, 'A5', true);
 $ws->freezePane('A5');
 
 /* ════ 02_FIELD_REGISTRY ═════════════════════════════════════════════ */
@@ -235,7 +243,7 @@ foreach ($fields as $f) {
         ($f['technical'] === 'NEEDS_REVIEW') ? 'المحاذاة الموضعية تعذّرت — يلزم توثيق يدوي' : '',
     );
 }
-$ws->fromArray($rows, null, 'A5');
+$ws->fromArray(zn($rows), null, 'A5', true);
 $ws->freezePane('A5');
 
 /* ════ 03_ROLE_SCREEN_MATRIX ═════════════════════════════════════════ */
@@ -259,7 +267,7 @@ foreach ($matrix as $route => $byRole) {
     foreach (array_keys($roleNames) as $rid) { $row[] = isset($byRole[$rid]) ? '✓' : ''; }
     $rows[] = $row;
 }
-$ws->fromArray($rows, null, 'A5');
+$ws->fromArray(zn($rows), null, 'A5', true);
 $ws->freezePane('C5');
 
 /* ════ 04_ROLE_FIELD_MATRIX ══════════════════════════════════════════ */
@@ -275,7 +283,7 @@ foreach ($sens as $s) {
         $s['from_visible_to'], $s['policy_masking'], $s['log_views_flag'], $s['exportable_flag'],
         $s['basis_statutory'], $s['status'], $enforced);
 }
-$ws->fromArray($rows, null, 'A5');
+$ws->fromArray(zn($rows), null, 'A5', true);
 
 /* ════ 05_WORKFLOW_MATRIX ════════════════════════════════════════════ */
 $ws = mk_sheet($wb, '05_WORKFLOW_MATRIX');
@@ -297,7 +305,7 @@ foreach ($cycle as $c) {
         $c['next_state'], $c['consumers'], $c['fin_impact']);
 }
 usort($rows, fn($a, $b) => array($a[0], $a[2]) <=> array($b[0], $b[2]));
-$ws->fromArray($rows, null, 'A5');
+$ws->fromArray(zn($rows), null, 'A5', true);
 $ws->freezePane('A5');
 
 /* ════ 06_CROSS_DEPARTMENT_ACCESS ════════════════════════════════════ */
@@ -314,7 +322,7 @@ foreach ($apps as $a) {
     $rows[] = array($a['space_ar'], $a['space_kind'], $a['tab_ar'], $a['screen_ar'], $route, $sid,
         $a['owner_dept_ar'], $a['owner_kind'], $a['cls'], $a['decision'], $a['basis'], $a['spaces_count']);
 }
-$ws->fromArray($rows, null, 'A5');
+$ws->fromArray(zn($rows), null, 'A5', true);
 $ws->freezePane('A5');
 
 /* ════ 07_UNRESOLVED ═════════════════════════════════════════════════ */
@@ -353,7 +361,7 @@ foreach ($apps as $a) {
 }
 $rows[] = array('حقول بلا اسم تقني', '', 'FIELD_REGISTRY', 'المحاذاة الموضعية تعذّرت في 336 جدولًا من 582 — الحقول موسومة NEEDS_REVIEW', 'توثيق يدوي تدريجي');
 $rows[] = array('بنود ملفات شخصية لمسار مجهول', '', 'gov_profile_items', $stats['gpi_unknown_route'] . ' بنود item_ref لا يطابق أي مسار في السجل', 'تصحيح البنود');
-$ws->fromArray($rows, null, 'A5');
+$ws->fromArray(zn($rows), null, 'A5', true);
 $ws->freezePane('A5');
 
 /* ════ أوراق الإدارات ════════════════════════════════════════════════ */
@@ -387,7 +395,7 @@ foreach ($byDept as $dept => $items) {
             $c ? $c['fin_impact'] : '',
             $r ? implode(' · ', array_keys($r['roles_nav'])) : '',
             $L['migration_state'], ($L['problems'] !== '—') ? $L['problems'] : '');
-        $ws->fromArray(array($scrRow), null, 'A' . $rowN);
+        $ws->fromArray(zn(array($scrRow)), null, 'A' . $rowN, true);
         $ws->getStyle('A' . $rowN . ':Q' . $rowN)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB($SCR_FILL);
         $ws->getStyle('A' . $rowN . ':Q' . $rowN)->getFont()->setBold(true)->setName('Arial')->setSize(9);
         $rowN++;
@@ -401,7 +409,7 @@ foreach ($byDept as $dept => $items) {
                     ($f['is_sensitive'] === 1 || $f['is_sensitive'] === '1') ? 'حساس' : '', '', '', '', '');
             }
             if ($frows) {
-                $ws->fromArray($frows, null, 'A' . $rowN);
+                $ws->fromArray(zn($frows), null, 'A' . $rowN, true);
                 $rowN += count($frows);
             }
         }
