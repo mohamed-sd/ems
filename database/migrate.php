@@ -513,11 +513,29 @@ function cmd_up(mysqli $conn, $dryRun)
         }
     }
 
+    /* ⛔ **سكربتُ التراجعِ لا يدخل طابورَ التقدُّم** — والخطرُ حيٌّ لا نظريّ:
+         `_down.php` يطابق عُرفَ التسميةِ `YYYY_MM_DD_*.php` فيراه المسحُ ترحيلًا
+         معلَّقًا، **ولو شُغِّل `up` لأسقط جداولَ حيّة**. وقد وقع ذلك عمليًّا:
+         كلُّ دفعةٍ تُنتج سكربتاتِ تراجعٍ تُدخلها الطابورَ حتى تُسوّى في
+         `gov_migration_settlement` — **فالأمانُ كان بالتسويةِ لا بالبناء**.
+       ◆ **والاستثناءُ هنا لا يُخفيها**: `migrate_scan_files()` يبقى يراها كما
+         هي، فبوّابةُ المصالحةِ تسألُ عنها وتُلزمها بحكم. ⛔ **الاستبعادُ من
+         التنفيذِ لا من الرؤية** — ومن يُخفيها عن المسحِ يُسكت حاجبَها.
+       ⛔ **ولا يُستبعد ملفٌّ سُجِّل تطبيقُه فعلًا**: لو أُطلق `_down` يومًا
+         وقُيِّد `applied` فإخفاؤه يكذب على الدفتر. فالاستبعادُ للمعلَّقِ وحدَه. */
+    $downSkipped = array();
     $queue = array();
     foreach ($files as $f) {
-        if (!isset($tracked[$f]) || $tracked[$f]['status'] === 'failed') {
-            $queue[] = $f;
+        if (isset($tracked[$f]) && $tracked[$f]['status'] !== 'failed') { continue; }
+        if (preg_match('/_down\.(php|sql)$/i', $f) && !isset($tracked[$f])) {
+            $downSkipped[] = $f;
+            continue;
         }
+        $queue[] = $f;
+    }
+    if ($downSkipped) {
+        echo "⛔ استُبعد من الطابور " . count($downSkipped) . " سكربتَ تراجعٍ — يُشغَّل بذاته لا بـ`up`:\n";
+        foreach ($downSkipped as $f) { echo "     · {$f}\n"; }
     }
 
     if (empty($queue)) {
