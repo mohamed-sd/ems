@@ -4,10 +4,10 @@
 
 | المفردة | القيمة |
 |---|---|
-| `Commit Hash` | `b5a2cc7f14c61abcef4790fa6343d716b04500fd` |
+| `Commit Hash` | `c8680ebb5213d6b18456a11bfa76eba4a7175521` |
 | `Schema Version` | 953T |
 | `Registry Version` | 783 |
-| `Measured At` | 2026-08-28 13:41:54 |
+| `Measured At` | 2026-08-28 14:31:44 |
 | `Tool Version` | `repair01_migration_gate.php v1.0` |
 | `Snapshot ID` | `UNFROZEN` |
 
