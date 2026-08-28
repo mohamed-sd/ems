@@ -202,9 +202,18 @@ foreach ($managed as $f => $ext) {
             'عُرفُ `_down`' => true,
             /* ◆ **والتراجعُ يُسقط أكثرَ من جدولٍ ومنظر**: قيدًا وزنادًا ومفتاحًا
                  أجنبيًّا — و`w3_person_guard_down` يُسقط `CONSTRAINT` و`TRIGGER`
-                 فحسب، **فنمطٌ يقتصر على الجداولِ يرسُبه ظلمًا**. */
-            'يحمل جملةَ إسقاط' => (bool) preg_match(
-                '/DROP\s+(TABLE|VIEW|INDEX|COLUMN|CONSTRAINT|TRIGGER|FOREIGN\s+KEY|PRIMARY\s+KEY|CHECK)/i', $src),
+                 فحسب، **فنمطٌ يقتصر على الجداولِ يرسُبه ظلمًا**.
+               ◆ **وثالثةٌ وقعت في هذه الجولة**: `w00_reanchor_..._down` **لا
+                 يُسقط شيئًا أصلًا** — يردُّ **قيمةَ مرساةٍ** بـ`UPDATE`. فرسَب
+                 `ROLLBACK_UNPROVEN` 2/3 **وهو تراجعٌ صحيحٌ تامّ**.
+                 ⇒ **والقاعدةُ لا تنطبق فتُصحَّح**: المطلوبُ «يحمل جملةَ تراجعٍ»
+                 لا «يحمل جملةَ إسقاط» — والتراجعُ عن هجرةِ بياناتٍ **بياناتٌ
+                 تُردّ** لا بنيةٌ تُسقَط. ⛔ ولا يُضعِّف هذا الشرط: سكربتٌ بلا
+                 `DROP` ولا `UPDATE/DELETE/INSERT` **يبقى راسبًا** — فهو لا
+                 يتراجع عن شيء. */
+            'يحمل جملةَ تراجع' => (bool) preg_match(
+                '/DROP\s+(TABLE|VIEW|INDEX|COLUMN|CONSTRAINT|TRIGGER|FOREIGN\s+KEY|PRIMARY\s+KEY|CHECK)'
+              . '|UPDATE\s+[`\w]|DELETE\s+FROM\s+[`\w]|INSERT\s+(?:IGNORE\s+)?INTO\s+[`\w]/i', $src),
             'له أصلٌ أمامَ معروف' => (isset($managed[$fwdName]) || isset($ledger[$fwdName])),
         );
         $found = count(array_filter($chk));
@@ -214,7 +223,7 @@ foreach ($managed as $f => $ext) {
             'kind' => 'DISK_NOT_LEDGERED',
             'ruling' => $verified ? 'ROLLBACK_SCRIPT_NOT_APPLIED' : 'ROLLBACK_UNPROVEN',
             'evidence' => 'سكربتُ تراجعٍ — أُثبت بنيويًّا ' . $found . '/' . count($chk)
-                . ' (عُرفُ الاسمِ · جملةُ الإسقاطِ · وجودُ أصلِه `' . $fwdName . '`)'
+                . ' (عُرفُ الاسمِ · جملةُ التراجعِ · وجودُ أصلِه `' . $fwdName . '`)'
                 . ($miss ? ' · والمتخلِّفُ: ' . implode(' · ', $miss) : '')
                 . ' — ويُقيَّد `baseline` ليخرج من طابورِ `up` ولا يُنفَّذ',
             'verified' => $verified,
