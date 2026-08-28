@@ -31,7 +31,23 @@ $DRY = in_array('--dry', $argv, true);
 $DIR = $ROOT . '/docs/REPAIR01_20260823/';
 $STAMP = '2026-08-23 00:00:00';
 
+/* ═══ نطاقُ التشغيل (RPR-02-A · 2026-08-28) ═══════════════════════════════
+   `--scope=all` (الأصل) يعيد بناءَ العشرةِ كلِّها ومنها `repair01_surfaces`
+   **من الجدولِ الحيِّ `gov_screen_cycle`**. وقِيس يومَ ٢٠٢٦-٠٨-٢٨ أنّ الحيَّ
+   صار **١١٩٩ صفًّا** والمُستوعَبَ **٦٦٤** — ففارقُ **٥٣٥** يدخل دفعةً واحدةً
+   داخلَ نافذةِ قياسٍ مجمَّدة، وهو ما تمنعه م ١٠٨؛ ويمحو معه ٦٦٤ رمزًا معياريًّا
+   و٦٦٤ معرِّفَ شاشةٍ كتبتها W01/W02.
+   فـ`--scope=design` يعيد بناءَ **طبقةِ التصميمِ من المصنَّفاتِ وحدَها**
+   ويترك `repair01_surfaces` كما هي — لأنّ مصدرَها حيٌّ لا مصنَّف، وتحريكُه
+   تحريكُ مقامٍ لا تصحيحُ حقيقة. */
+$SCOPE = 'all';
+foreach ($argv as $a) { if (strpos($a, '--scope=') === 0) { $SCOPE = substr($a, 8); } }
+if (!in_array($SCOPE, array('all', 'design'), true)) { exit("نطاقٌ مجهول: $SCOPE — المسموح: all · design\n"); }
+
 function r01_q($conn, $sql) {
+    /* ⚠ **`--dry` كان علمًا ميّتًا**: يُعلَن في السطر ٣٠ ولا يُقرأ في موضع،
+         فالتجربةُ كانت تكتب. وعلمٌ يَعِد بلا كتابةٍ ثم يكتب أخطرُ من غيابِه. */
+    if (!empty($GLOBALS['DRY']) && preg_match('/^\s*(INSERT|UPDATE|DELETE|REPLACE|TRUNCATE|ALTER|DROP)\b/i', $sql)) { return true; }
     if ($conn->query($sql) === false) { fwrite(STDERR, "SQL: {$conn->error}\n  " . mb_substr($sql, 0, 200) . "\n"); return false; }
     return true;
 }
@@ -59,7 +75,9 @@ if ($stagesApplied > 0 && !in_array('--reset', $argv, true)) {
       . "   إعادةُ الاستيعابِ الآن تمحو أحكامَ W01 وفجواتِ W02 وعقودَ W03…W05،\n"
       . "   وتسحب نموَّ المراحلِ إلى لقطةِ الدراسةِ المجمَّدةِ فتفسدها.\n\n"
       . "   ◆ لتعديلِ قرارٍ: حدّثْ `repair01_decisions` مباشرةً — لا تُعِدِ الاستيعاب.\n"
-      . "   ◆ ولإعادةِ التأسيسِ فعلًا: `php tools/repair01_ingest.php --reset`\n"
+      . "   ◆ ولتحديثِ **طبقةِ التصميمِ** من مصنَّفاتٍ مُستبدَلةٍ بلا مساسٍ بالأسطح:\n"
+      . "       `php tools/repair01_ingest.php --reset --scope=design`\n"
+      . "   ◆ ولإعادةِ التأسيسِ الكاملِ فعلًا: `php tools/repair01_ingest.php --reset`\n"
       . "     ثمّ `repair01_w1_apply` … `repair01_w5_apply` بالترتيب، ثمّ البوّاباتُ كلُّها.\n");
     exit(2);
 }
@@ -223,13 +241,18 @@ $DEPTS = array(
     array('EX-DVP', null, 'نواب الرئيس',                    'OUTSIDE',     null, 'Deputy_Role / Scope — خارجَ الـ17'),
     array('WS-MY',  null, 'مساحة عملي',                     'OUTSIDE',     null, 'Personal Workspace — إسقاطٌ ومُطلِقُ طلباتٍ لا مصدرَ حقيقة'),
     array('IAF',    null, 'المراجعة الداخلية',              'OUTSIDE',     null, 'Independent Assurance Function — ترفع للمالك · الحوكمةُ لا تعدّل نتيجتَها'),
+    /* RPR-02-A §٤·٠ — **رمزٌ منصّيٌّ مشترك**: RPR-02 v2.3 §٣ يُدرجه في جدولِ
+       المقامِ صفًّا بـ١٢ سطحًا حيًّا و«يستحق تبريرًا لا حسمًا»، ولم يكن مسجَّلًا
+       هنا — فبقيت اثنتا عشرةَ سطحًا **بلا بيتٍ في كلِّ تجميع**. وتسجيلُه
+       قطاعُه `OUTSIDE` لأنّه ليس إدارةً بل سطحٌ تخدمه الإداراتُ كلُّها. */
+    array('PLATFORM', null, 'المنصّة المشتركة',             'OUTSIDE',     null, 'رمزٌ منصّيٌّ مشترك — الأسطحُ التي تخدم كلَّ الإداراتِ بإسقاطٍ معلَّمٍ بالنطاق · لا إدارةً ولا مصدرَ حقيقة'),
 );
 foreach ($DEPTS as $d) {
     r01_q($conn, "INSERT INTO repair01_departments (canonical_code,display_order,name_ar,sector,parent_code,note) VALUES ("
         . "'" . r01_e($conn, $d[0]) . "'," . ($d[1] === null ? 'NULL' : (int) $d[1]) . ",'" . r01_e($conn, $d[2]) . "','" . $d[3] . "',"
         . ($d[4] === null ? 'NULL' : "'" . r01_e($conn, $d[4]) . "'") . ",'" . r01_e($conn, $d[5]) . "')");
 }
-$report['③ الإدارات'] = count($DEPTS) . " رمزًا (17 إدارةً + 4 خارجَ التسلسل)";
+$report['③ الإدارات'] = count($DEPTS) . " رمزًا (17 إدارةً + 5 خارجَ التسلسل · منها PLATFORM)";
 
 /* ═══ ④ الجسرُ إلى المسمّياتِ الحيّة ═══ */
 r01_q($conn, "DELETE FROM repair01_dept_crosswalk");
@@ -296,6 +319,15 @@ while ($x = $rq->fetch_assoc()) {
     elseif (!isset($canon[$x['legacy_name']])) { $canon[$x['legacy_name']] = $x['canonical_code']; }
 }
 
+/* RPR-02-A — مصدرُ هذه الكتلةِ **حيٌّ لا مصنَّف**، فلا شأنَ لها باستبدالِ
+   الحزمة. وإعادةُ بنائها اليومَ تُدخل ٥٣٥ صفًّا نمت في `gov_screen_cycle`
+   بعد التجميد، وتمحو الرمزَ المعياريَّ ومعرِّفَ الشاشةِ اللذَين كتبتهما
+   W01/W02 على ٦٦٤ صفًّا. فتُتخطّى بنطاقِ التصميمِ صراحةً ويُعلَن التخطّي. */
+if ($SCOPE === 'design') {
+    $govN = (int) $conn->query("SELECT COUNT(*) FROM gov_screen_cycle")->fetch_row()[0];
+    $srfN = (int) $conn->query("SELECT COUNT(*) FROM repair01_surfaces")->fetch_row()[0];
+    $report['⑤ الأسطح'] = "تُخطّيت بنطاقِ التصميم — باقيةٌ $srfN صفًّا · والحيُّ $govN (فارقٌ " . ($govN - $srfN) . ")";
+} else {
 r01_q($conn, "DELETE FROM repair01_surfaces");
 $nS = 0; $ghost = 0; $unsplit = 0;
 $rs = $conn->query("SELECT dept_name, layer_name, stage_order, stage_name, group_name, screen_title, screen_file,
@@ -319,8 +351,23 @@ while ($x = $rs->fetch_assoc()) {
     $nS++;
 }
 $report['⑤ الأسطح'] = "$nS صفًّا · شبحٌ (بلا ملفّ) $ghost · بلا رمزٍ معياريٍّ بسببِ الشقّ $unsplit";
+}
 
-/* ═══ ⑥ الفجواتُ المستهدفة ═══ */
+/* ═══ ⑥ الفجواتُ المستهدفة ═══
+   ⚠ **الجدولُ ليس مصنَّفًا خالصًا**: W02 نقل إليه ١٦٠ سطحًا من خانةِ المبنيّ،
+   وW10 كتب `split_code` وW12 كتب `built_counterpart` وW135 كتب
+   `ghost_disposition`. والمسحُ الشاملُ يمحو ذلك كلَّه صامتًا. فيُلتقَط النموُّ
+   قبلَ المسحِ ويُعاد بعدَ الإدراج — على غرارِ ما يفعله ⑦ بـ`stage_no`. */
+$keepRows = array();     /* صفوفٌ لا مصدرَ لها في المصنَّف — تُعاد كما هي */
+$keepCols = array();     /* أعمدةُ المراحلِ على صفوفِ المصنَّف — بمفتاحِ (unit|surface) */
+$STAGE_COLS = array('origin_stage','origin_note','wave_stage','split_code','split_rule','split_why','ghost_disposition','disposition_why','built_counterpart');
+$rk = $conn->query("SELECT * FROM repair01_target_gaps");
+if ($rk) {
+    while ($x = $rk->fetch_assoc()) {
+        if (strpos($x['src_ref'], '10 › 04_') !== 0) { $keepRows[] = $x; continue; }
+        $keepCols[$x['src_ref']] = $x;
+    }
+}
 r01_q($conn, "DELETE FROM repair01_target_gaps");
 $nG = 0;
 foreach ($w10['04_مستهدف_غير_مبني'] as $ri => $r) {
@@ -332,7 +379,60 @@ foreach ($w10['04_مستهدف_غير_مبني'] as $ri => $r) {
         . r01_e($conn, r01_cell($r, 3)) . "','10 › 04_مستهدف_غير_مبني › ص" . ($ri + 1) . "')");
     $nG++;
 }
-$report['⑥ فجواتٌ مستهدفة'] = "$nG سطحًا";
+/* إعادةُ الصفوفِ غيرِ المصنَّفيّة */
+$nBack = 0;
+foreach ($keepRows as $x) {
+    $k = array(); $v = array();
+    foreach ($x as $ck => $cv) {
+        if ($ck === 'id') { continue; }
+        $k[] = "`$ck`"; $v[] = ($cv === null) ? 'NULL' : "'" . r01_e($conn, $cv) . "'";
+    }
+    if (r01_q($conn, "INSERT INTO repair01_target_gaps (" . implode(',', $k) . ") VALUES (" . implode(',', $v) . ")")) { $nBack++; }
+}
+/* إعادةُ أعمدةِ المراحلِ على صفوفِ المصنَّف */
+$nCols = 0; $nOrphan = 0;
+foreach ($keepCols as $sref => $x) {
+    $set = array();
+    foreach ($STAGE_COLS as $c) {
+        if (!array_key_exists($c, $x) || $x[$c] === null || $x[$c] === '') { continue; }
+        $set[] = "`$c`='" . r01_e($conn, $x[$c]) . "'";
+    }
+    if (!$set) { continue; }
+    if (r01_q($conn, "UPDATE repair01_target_gaps SET " . implode(',', $set)
+        . " WHERE src_ref='" . r01_e($conn, $sref) . "'")) {
+        if ($conn->affected_rows > 0) { $nCols += $conn->affected_rows; } else { $nOrphan++; }
+    }
+}
+$report['⑥ فجواتٌ مستهدفة'] = "$nG سطحًا من المصنَّف · $nBack صفًّا مُعادًا من نموِّ المراحل · $nCols صفًّا أُعيدت أعمدتُه"
+    . ($nOrphan ? " · ⛔ **بلا مرساة: $nOrphan**" : ' · صفرُ يتيم');
+
+/* ═══ ⑥-ب توحيدُ لغةِ `unit` على الرمزِ المعياريّ ═══
+   ⛔ **عمودٌ بلغتَين يُضاعف كلَّ تجميع**: قِيس ٣٣٤ صفًّا بـ٣٥ قيمةً مميَّزةً —
+   ١٧٤ بالاسمِ الحيِّ القديمِ و١٦٠ بالرمز، فالإدارةُ الواحدةُ تُعَدُّ إدارتَين.
+   والتوحيدُ **بالجسرِ لا بالتخمين**: `MAP`/`RECLASSIFY` تُحسم بالرمزِ مباشرةً،
+   و`SPLIT` تُحسم بـ`split_code` الذي كتبته W10 بقاعدةٍ موثَّقة — وما لا يُحسم
+   **يُترك كما هو ويُعلَن**، فالتخمينُ أسوأُ من لغتَين. */
+$xwMap = array(); $xwSplit = array();
+$rx = $conn->query("SELECT legacy_name, canonical_code, verdict FROM repair01_dept_crosswalk");
+while ($x = $rx->fetch_assoc()) {
+    if ($x['verdict'] === 'SPLIT') { $xwSplit[$x['legacy_name']] = 1; }
+    elseif (!isset($xwMap[$x['legacy_name']])) { $xwMap[$x['legacy_name']] = $x['canonical_code']; }
+}
+$uniMapped = 0; $uniSplit = 0; $uniLeft = 0; $uniLeftNames = array();
+$rg = $conn->query("SELECT id, unit, split_code FROM repair01_target_gaps WHERE unit NOT REGEXP '^(DEP-[0-9]{2}|EX-CEO|EX-DVP|IAF|WS-MY|PLATFORM)$'");
+$pend = array();
+while ($x = $rg->fetch_assoc()) { $pend[] = $x; }
+foreach ($pend as $x) {
+    $to = '';
+    if (isset($xwMap[$x['unit']])) { $to = $xwMap[$x['unit']]; $uniMapped++; }
+    elseif (isset($xwSplit[$x['unit']]) && $x['split_code'] !== '' && $x['split_code'] !== null) { $to = $x['split_code']; $uniSplit++; }
+    if ($to === '') { $uniLeft++; $uniLeftNames[$x['unit']] = 1; continue; }
+    r01_q($conn, "UPDATE repair01_target_gaps SET unit='" . r01_e($conn, $to) . "' WHERE id=" . (int) $x['id']);
+}
+$distinctNow = (int) $conn->query("SELECT COUNT(DISTINCT unit) FROM repair01_target_gaps")->fetch_row()[0];
+$report['⑥-ب لغةُ الوحدة'] = "بالجسر $uniMapped · بالشقِّ الموثَّق $uniSplit · بلا حسمٍ $uniLeft"
+    . ($uniLeftNames ? ' (' . implode(' · ', array_keys($uniLeftNames)) . ')' : '')
+    . " · COUNT(DISTINCT unit) = $distinctNow";
 
 /* ═══ ⑦ المتطلَّبات ═══
    ⚠ `stage_no` إسنادٌ **يعيش خارجَ الإكسل** — يضعه `repair01_stage_assign.php`.
@@ -379,7 +479,22 @@ foreach ($wb09['02_تتبع_الحقول'] as $ri => $r) {
 }
 $report['⑧ الحقول'] = "$nF";
 
-/* ═══ ⑨ الأحداث ═══ */
+/* ═══ ⑨ الأحداث ═══
+   ⚠ **الجدولُ ليس مصنَّفًا خالصًا**: W10…W15 تُدخل أحداثًا مشتقّةً، وW03…W05
+   تكتب عقودَها في `trigger_rule` و`min_payload` و`consumer_list` و`contract_*`.
+   وقِيس في الجولةِ الأولى من RPR-02-A أنَّ المسحَ الشاملَ أتلف **142 صفًّا**
+   مشتقًّا (774 ← 632) — فأُصلحت الأداةُ لا المخرَج. */
+$keepEvRows = array();
+$keepEvCols = array();
+$EV_STAGE_COLS = array('trigger_rule','min_payload','consumer_list','consumer_effect','preconditions','failure_policy','compensation','contract_status','contract_rule','contract_stage');
+$re = $conn->query("SELECT * FROM repair01_events");
+if ($re) {
+    while ($x = $re->fetch_assoc()) {
+        if (strpos($x['src_ref'], '09 › 03_') !== 0) { $keepEvRows[] = $x; continue; }
+        $keepEvCols[$x['src_ref']] = $x;
+    }
+}
+$evBefore = ($re ? count($keepEvRows) : 0);
 r01_q($conn, "DELETE FROM repair01_events");
 $nE = 0;
 foreach ($wb09['03_الأحداث_والآثار'] as $ri => $r) {
@@ -392,9 +507,43 @@ foreach ($wb09['03_الأحداث_والآثار'] as $ri => $r) {
         . r01_e($conn, r01_cell($r, 8)) . "','09 › 03_الأحداث_والآثار › ص" . ($ri + 1) . "')");
     $nE++;
 }
-$report['⑨ الأحداث'] = "$nE";
+/* إعادةُ الصفوفِ المشتقّةِ كما هي */
+$evBack = 0;
+foreach ($keepEvRows as $x) {
+    $k = array(); $v = array();
+    foreach ($x as $ck => $cv) {
+        if ($ck === 'id') { continue; }
+        $k[] = "`$ck`"; $v[] = ($cv === null) ? 'NULL' : "'" . r01_e($conn, $cv) . "'";
+    }
+    if (r01_q($conn, "INSERT INTO repair01_events (" . implode(',', $k) . ") VALUES (" . implode(',', $v) . ")")) { $evBack++; }
+}
+/* إعادةُ أعمدةِ العقودِ على صفوفِ المصنَّف — بمرساةِ `src_ref` (‏632/632 مميَّزة) */
+$evCols = 0; $evOrphan = 0;
+foreach ($keepEvCols as $sref => $x) {
+    $set = array();
+    foreach ($EV_STAGE_COLS as $c) {
+        if (!array_key_exists($c, $x) || $x[$c] === null || $x[$c] === '' || $x[$c] === 'NONE') { continue; }
+        $set[] = "`$c`='" . r01_e($conn, $x[$c]) . "'";
+    }
+    if (!$set) { continue; }
+    if (r01_q($conn, "UPDATE repair01_events SET " . implode(',', $set) . " WHERE src_ref='" . r01_e($conn, $sref) . "'")) {
+        if ($conn->affected_rows > 0) { $evCols += $conn->affected_rows; } else { $evOrphan++; }
+    }
+}
+$report['⑨ الأحداث'] = "$nE من المصنَّف · $evBack صفًّا مشتقًّا مُعادًا · $evCols صفًّا أُعيدت عقودُه"
+    . ($evOrphan ? " · ⛔ **بلا مرساة: $evOrphan**" : ' · صفرُ يتيم');
 
-/* ═══ ⑩ الملكيّة ═══ */
+/* ═══ ⑩ الملكيّة ═══
+   ⚠ **أحكامُ W01 تسكن هذا الجدولَ ولا تسكن المصنَّف**: `w1_verdict` و`w1_rule`
+   و`w1_reason` و`w1_evidence` و`w1_at` تكتبها `repair01_w1_apply.php`، والمسحُ
+   يمحوها صامتًا فيعبر التراجعُ إلى المرحلةِ التالية. فتُلتقَط بمفتاحِها
+   الطبيعيِّ (الدور · الشاشة · المسار · التصنيف) وتُعاد بعدَ الإدراج، ويُعلَن
+   العدُّ قبلَ وبعد — فما لم يُعَدْ يظهر رقمًا لا صمتًا. */
+$keepW1 = array();
+$rw = $conn->query("SELECT space_role, screen, route, classification, w1_verdict, w1_rule, w1_reason, w1_evidence, w1_at
+                    FROM repair01_ownership WHERE w1_verdict IS NOT NULL");
+if ($rw) { while ($x = $rw->fetch_assoc()) { $keepW1[$x['space_role'] . "\x1f" . $x['screen'] . "\x1f" . $x['route'] . "\x1f" . $x['classification']] = $x; } }
+$w1Before = count($keepW1);
 r01_q($conn, "DELETE FROM repair01_ownership");
 $nO = 0;
 foreach ($w10['05_التداخلات_والملكية'] as $ri => $r) {
@@ -407,7 +556,20 @@ foreach ($w10['05_التداخلات_والملكية'] as $ri => $r) {
         . '10 › 05_التداخلات_والملكية › ص' . ($ri + 1) . "')");
     $nO++;
 }
-$report['⑩ الملكيّة'] = "$nO";
+/* إعادةُ أحكامِ W01 بمفتاحِها الطبيعيّ */
+$w1Back = 0; $w1Lost = 0;
+foreach ($keepW1 as $k => $x) {
+    $ok = r01_q($conn, "UPDATE repair01_ownership SET w1_verdict='" . r01_e($conn, $x['w1_verdict']) . "',"
+        . "w1_rule='" . r01_e($conn, $x['w1_rule']) . "',w1_reason='" . r01_e($conn, $x['w1_reason']) . "',"
+        . "w1_evidence='" . r01_e($conn, $x['w1_evidence']) . "',"
+        . "w1_at=" . ($x['w1_at'] === null ? 'NULL' : "'" . r01_e($conn, $x['w1_at']) . "'")
+        . " WHERE space_role='" . r01_e($conn, $x['space_role']) . "' AND screen='" . r01_e($conn, $x['screen']) . "'"
+        . " AND route='" . r01_e($conn, $x['route']) . "' AND classification='" . r01_e($conn, $x['classification']) . "'");
+    if ($ok && $conn->affected_rows > 0) { $w1Back += $conn->affected_rows; } else { $w1Lost++; }
+}
+$w1After = (int) $conn->query("SELECT COUNT(*) FROM repair01_ownership WHERE w1_verdict IS NOT NULL")->fetch_row()[0];
+$report['⑩ الملكيّة'] = "$nO صفًّا · أحكامُ W01 قبل $w1Before ← بعد $w1After"
+    . ($w1Lost ? " · ⛔ **بلا مرساةٍ بعد الإدراج: $w1Lost**" : " · صفرُ فقدٍ");
 
 /* ═══ التقرير ═══ */
 echo "\n════════ استيعابُ REPAIR01 ════════\n";
