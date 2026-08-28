@@ -53,9 +53,10 @@ if ($STATUS) {
     echo "\n═══ حالُ التجميد ═══\n";
     if (!$open) { echo "  ◆ **لا نافذةَ مفتوحة** — البناءُ مسموح.\n"; exit(0); }
     printf("  ⛔ **نافذةٌ مفتوحة**: %s\n", $open['snapshot_id']);
-    printf("     الالتزام %s · المخطَّط %s · السجل %d · الإعداد %s\n",
+    printf("     الالتزام %s · المخطَّط %s · السجل %d · الإعداد %s · MT %s\n",
         substr($open['commit_hash'], 0, 8), $open['schema_version'],
-        $open['registry_rows'], $open['config_baseline']);
+        $open['registry_rows'], $open['config_baseline'],
+        isset($open['measurement_tool_version']) ? $open['measurement_tool_version'] : '-');
     printf("     جُمِّدت %s · الغرض: %s\n", $open['frozen_at'], $open['purpose']);
     echo "  ⛔ **ولا يُعدَّل النظامُ حتّى تُفَكَّ بسببٍ مكتوب.**\n";
     exit(0);
@@ -122,14 +123,43 @@ if (is_file($envFile)) {
 }
 sort($keys);
 $cfg = substr(sha1(implode(',', $keys) . '|' . PHP_VERSION), 0, 16);
+/* ── السادسةُ: بصمةُ عُدّةِ القياس ─────────────────────────────────────────
+   ◆ **ما تجيبه**: `MASTER_EXEC` §٢② يوجب `Measurement Tool Version` سادسةً،
+     و`RPR-02` §١٠ يعلّل: «أدواتُ القياسِ نفسُها موثَّقةٌ في المستودع فيُعرَف ما
+     الذي قاس». **فلقطتان ببصمةِ التزامٍ واحدةٍ وعُدّتَين مختلفتَين تُنتجان
+     رقمَين** — وبلا هذا العمودِ يصير الفرقُ سؤالًا بلا جواب.
+   ⛔ **ولا تكفي بصمةُ الالتزام**: هي تُثبت أنَّ العُدّةَ لم تتغيّر، ولا تقول أيَّ
+     عُدّةٍ قاست ولا كم ملفًّا فيها — وتقاريرُ القياسِ تُقتبس منفصلةً عن شجرتِها
+     فيبقى الرقمُ بلا نسب.
+   ◆ **والمقامُ مطبوعٌ لا مُدَّعًى**: عددُ الملفّاتِ يُكتب بجانبِ البصمة، فبصمةٌ
+     على صفرِ ملفٍّ تُفضح بنفسِها ولا تمرُّ خضراءَ صامتة. */
+$toolFiles = array();
+foreach (array('tools', 'tests') as $dir) {
+    $base = $ROOT . '/' . $dir;
+    if (!is_dir($base)) { continue; }
+    $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($base,
+        FilesystemIterator::SKIP_DOTS));
+    foreach ($it as $f) {
+        if (!$f->isFile() || strtolower($f->getExtension()) !== 'php') { continue; }
+        $rel = str_replace(DIRECTORY_SEPARATOR, '/', substr($f->getPathname(), strlen($ROOT) + 1));
+        $toolFiles[$rel] = sha1_file($f->getPathname());
+    }
+}
+/* ⛔ **وعُدّةٌ فارغةٌ لا تُختم**: بصمةُ لا شيءٍ ثابتةٌ وتبدو سليمة. */
+if (!$toolFiles) { exit("⛔ **صفرُ ملفِّ عُدّةٍ مقيس** — ولا تُختم لقطةٌ بعُدّةٍ لا وجودَ لها\n"); }
+ksort($toolFiles);
+$mtvParts = array();
+foreach ($toolFiles as $k => $v) { $mtvParts[] = $k . ':' . $v; }
+$mtv = 'MT-' . substr(sha1(implode("\n", $mtvParts)), 0, 12) . '/' . count($toolFiles);
+
 $sid = 'SNAP-' . substr($commit, 0, 8) . '-' . date('Ymd-His');
 
 $ok = $conn->query("INSERT INTO repair01_freeze_snapshot
     (snapshot_id, commit_hash, branch, schema_version, registry_rows, config_baseline,
-     frozen_at, frozen_by, purpose)
+     measurement_tool_version, frozen_at, frozen_by, purpose)
     VALUES ('" . $e($sid) . "', '" . $e($commit) . "', '" . $e($branch) . "',
             '" . $e($tbl . 'T/' . $col . 'C') . "', $reg, '" . $e($cfg) . "',
-            NOW(), 'repair01_freeze.php', '" . $e($purpose) . "')");
+            '" . $e($mtv) . "', NOW(), 'repair01_freeze.php', '" . $e($purpose) . "')");
 if (!$ok) { exit("✘ " . $conn->error . "\n"); }
 
 echo "\n────────────────────────────────────────────────────────────\n";
@@ -138,6 +168,7 @@ printf("   `Commit Hash`      %s (%s)\n", $commit, $branch);
 printf("   `Schema Version`   %dT/%dC\n", $tbl, $col);
 printf("   `Registry Version` %d صفًّا\n", $reg);
 printf("   `Config Baseline`  %s (%d مفتاحَ بيئةٍ · PHP %s)\n", $cfg, count($keys), PHP_VERSION);
+printf("   `Measure Tool Ver` %s\n", $mtv);
 printf("   `Frozen At`        %s\n", date('Y-m-d H:i:s'));
 printf("   `Purpose`          %s\n", $purpose);
 echo "\n⛔ **نافذةُ القياسِ مفتوحةٌ الآن — والتعديلُ ممنوعٌ حتّى تُفَكّ بسببٍ مكتوب.**\n";
