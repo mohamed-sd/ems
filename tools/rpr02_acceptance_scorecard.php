@@ -89,12 +89,32 @@ $add('تحقّق الأهداف — المتحقِّق ÷ المنطبق', 'يُ
    `gov_field_class` **لا يغطّي إلّا ٤٤ سطحًا من ٦٢١** ومفتاحُه سبيكةٌ
    (`acc_my_day`) لا تطابق مسارًا ولا ملفًّا. ⇒ فالمطابقةُ محجوبةٌ على **قياسِ
    حقولِ المبنيِّ من الأثرِ نفسِه** كما قيست الحبّة، لا على مفتاحٍ مفقود. */
+/* ✔ **والحاجزُ ارتفع** بـ`rpr02_field_measure.php` (§٧ الخطوة ٥): الطرفُ المبنيُّ
+   صار **مقيسًا من الأثرِ نفسِه** بخمسةِ روافدَ — `<label>` و`<th>` و`name=`
+   و`gov_field_class` للأسطحِ المولَّدةِ (بسبيكتِها المصرَّحةِ في ملفِّها) وحقولِ
+   الفعلِ في عقدِ `u13`. ⛔ **ولا يُترك نصُّ حاجزٍ مرفوعٍ في تقرير**. */
 $fDes = $tbl('repair01_fields')  ? (int) $one("SELECT COUNT(*) FROM repair01_fields")  : 0;
-$fCls = $tbl('gov_field_class')  ? (int) $one("SELECT COUNT(DISTINCT screen_code) FROM gov_field_class WHERE active = 1") : 0;
-$add('مطابقة حقول كل سطح مطابَق لملفه', '100٪', 'BLOCKED', '—',
-     "دفترُ الحقولِ التصميميُّ **$fDes** حقلًا على ٤٣٣ هدفًا · والجانبُ المبنيُّ "
-   . "`gov_field_class` **لا يغطّي إلّا $fCls سطحًا من $liveN** ومفتاحُه سبيكةٌ لا مسار. "
-   . '⇒ `blocked at stage: قياسُ حقولِ المبنيِّ من الأثرِ نفسِه (§٧ الخطوة ٥)`');
+if ($tbl('repair01_field_measure')
+    && (int) $one("SELECT COUNT(*) FROM repair01_field_measure") > 0) {
+    $fmN   = (int) $one("SELECT COUNT(*) FROM repair01_field_measure");
+    $fmApp = (int) $one("SELECT COALESCE(SUM(design_applicable),0) FROM repair01_field_measure");
+    $fmHit = (int) $one("SELECT COALESCE(SUM(matched),0) FROM repair01_field_measure");
+    $fmAud = (int) $one("SELECT COALESCE(SUM(design_audit),0) FROM repair01_field_measure");
+    $fmNv  = (int) $one("SELECT COUNT(*) FROM repair01_field_measure WHERE vocab_terms = 0");
+    $add('مطابقة حقول كل سطح مطابَق لملفه', '100٪', 'MEASURED',
+         ($fmApp ? round($fmHit * 100 / $fmApp, 1) : 0) . '٪',
+         "$fmHit من $fmApp حقلٍ منطبقٍ على **$fmN** سطحًا مطابَقًا — مقيسًا من الأثرِ بـ`rpr02_field_measure.php` · "
+       . "و`AUDIT` **$fmAud** خارجَ المقامِ بنصِّ §٧ الخطوة ١١ (إلحاقية) · "
+       . "و**$fmNv** سطحًا خلا أثرُه من مفردةٍ فحمل شاهدَ عجزِه (`NO_VOCAB`/`REDIRECTOR`) ولم يُكتب صفرًا. "
+       . "⛔ **وهذا قياسُ حضورٍ لا قياسُ نوعٍ ولا ترتيب**");
+} else {
+    $fCls = $tbl('gov_field_class') ? (int) $one("SELECT COUNT(DISTINCT screen_code) FROM gov_field_class WHERE active = 1") : 0;
+    $add('مطابقة حقول كل سطح مطابَق لملفه', '100٪', 'BLOCKED', '—',
+         "دفترُ الحقولِ التصميميُّ **$fDes** حقلًا على ٤٣٣ هدفًا · والجانبُ المبنيُّ "
+       . "`gov_field_class` **لا يغطّي إلّا $fCls سطحًا من $liveN** ومفتاحُه سبيكةٌ لا مسار. "
+       . '⇒ `blocked at stage: قياسُ حقولِ المبنيِّ من الأثرِ نفسِه (§٧ الخطوة ٥)` '
+       . '— **شغِّلْ `php tools/rpr02_field_measure.php --apply`**');
+}
 
 /* ═══ ٤ · مطابقةُ آلةِ الحالةِ لكلِّ معاملة ══════════════════════════════ */
 $txn = (int) $one("SELECT COUNT(*) FROM $LIVE AND grain_cardinality IN ('ROW','LINE')");
