@@ -68,6 +68,20 @@ $BRIDGE_WHY = 'عمودُ `affected_screens` مفرداتٌ حرّةٌ لا مع
             . ' مفردةً فريدةً · تشبه `SCR-nnnn`: ' . $asScr . ' · تشبه رمزَ نطاق: ' . $asUnit
             . ' ⇒ لا جسرَ من القرارِ إلى الشاشةِ بالمعرِّف';
 
+/* ⛔ **وسببُ الحجبِ ليس واحدًا لكلِّ محور** — وكتابتُه واحدًا كذبٌ مريح:
+     · **سبعةُ محاورَ لا عمودَ لها في المصدرِ الحاكمِ أصلًا**. وقِيس ذلك في
+       المصدرِ نفسِه: ورقةُ `OWNER_DECISIONS_MASTER` في «٠٩ · السجلات
+       المؤسسية والقرارات.xlsx» **سبعةَ عشرَ عمودًا** ليس فيها حقولٌ ولا
+       حبّةٌ ولا مصدرُ حقيقةٍ ولا بيانٌ ولا صلاحياتٌ ولا أحداثٌ ولا تكامل.
+       ⇒ فالحجبُ **غيابُ قرارِ مالكٍ لا عجزُ جسر**، ولا يُرفع ببناءِ أداة.
+     · و`DEPARTMENTS` حجبُها مطابقةُ اسمٍ وقد سدَّ الجسرُ أكثرَها.
+     · و`SCREENS` حجبُها الجسرُ إلى المعرِّف. */
+$NO_SOURCE_AXES = array('FIELDS','GRAIN','SOURCE_OF_TRUTH','DATA','PERMISSIONS',
+                        'EVENTS','INTEGRATIONS');
+$NO_SOURCE_WHY = '**لا عمودَ لهذا المحورِ في المصدرِ الحاكم**: `OWNER_DECISIONS_MASTER` '
+               . 'في «٠٩ · السجلات المؤسسية والقرارات.xlsx» سبعةَ عشرَ عمودًا ليس فيها هذا المحور '
+               . '⇒ غيابُ قرارِ مالكٍ لا عجزُ جسرٍ — ولا يُرفع ببناءِ أداةٍ ولا يُملأ بنصٍّ مؤلَّف';
+
 /* ═══ ② أسماءُ الإداراتِ — جسرٌ قائمٌ يُستعمل ═════════════════════════════ */
 $dept = array();
 $r = $conn->query("SELECT canonical_code, name_ar FROM repair01_departments");
@@ -137,11 +151,15 @@ while ($d = $r->fetch_assoc()) {
             $rows[] = array($d['decision_id'], $ax, $map[$ax][0], $map[$ax][1], 'PROJECTED', '');
             $proj++;
         } else {
-            $why = ($ax === 'DEPARTMENTS')
-                 ? 'مجالُ القرارِ «' . $d['domain'] . '» لا يطابق اسمَ إدارةٍ في الجدول'
-                   . ($bridgeReady ? ' · **ولا الجسرُ حلَّ له نطاقًا**: مفرداتُه بلا بادئةٍ معرَّفةٍ في الدستور' : '')
-                   . ' — ولا يُخمَّن'
-                 : $BRIDGE_WHY;
+            if ($ax === 'DEPARTMENTS') {
+                $why = 'مجالُ القرارِ «' . $d['domain'] . '» لا يطابق اسمَ إدارةٍ في الجدول'
+                     . ($bridgeReady ? ' · **ولا الجسرُ حلَّ له نطاقًا**: مفرداتُه بلا بادئةٍ معرَّفةٍ في الدستور' : '')
+                     . ' — ولا يُخمَّن';
+            } elseif (in_array($ax, $NO_SOURCE_AXES, true)) {
+                $why = $NO_SOURCE_WHY;
+            } else {
+                $why = $BRIDGE_WHY;
+            }
             $rows[] = array($d['decision_id'], $ax, null, '', 'NEEDS_ADJUDICATION', $why);
             $need++;
         }
@@ -174,7 +192,22 @@ foreach ($AXES as $ax) {
 }
 printf("\n  **مُسقَطٌ %d · محجوبٌ %d · محجوبٌ بلا سبب %d · مُسقَطٌ بلا مصدر %d**\n",
        $proj, $need, $noWhy, $noSrc);
-echo "\n  ⛔ **والحجبُ سببُه مقيس**: " . $BRIDGE_WHY . "\n";
+/* **والحجبُ ثلاثةُ أسبابٍ لا سببٌ واحد** — ويُعرض كلٌّ بعددِه، فسببٌ واحدٌ
+   لتسعِ مئةٍ يُخفي أنَّ أكثرَها **لا يُرفع ببناءِ أداةٍ أصلًا**. */
+$byWhy = array();
+foreach ($rows as $x) {
+    if ($x[4] !== 'NEEDS_ADJUDICATION') { continue; }
+    $k = in_array($x[1], $NO_SOURCE_AXES, true) ? 'NO_SOURCE_COLUMN'
+       : (($x[1] === 'DEPARTMENTS') ? 'DOMAIN_NAME_MISMATCH' : 'ID_BRIDGE');
+    $byWhy[$k] = isset($byWhy[$k]) ? $byWhy[$k] + 1 : 1;
+}
+echo "\n  ── أسبابُ الحجبِ بأعدادِها ──\n";
+printf("     `NO_SOURCE_COLUMN`      %4d — سبعةُ محاورَ **لا عمودَ لها في المصدرِ الحاكم** ⇒ غيابُ قرارِ مالكٍ لا عجزُ جسر\n",
+       isset($byWhy['NO_SOURCE_COLUMN']) ? $byWhy['NO_SOURCE_COLUMN'] : 0);
+printf("     `DOMAIN_NAME_MISMATCH`  %4d — مجالُ القرارِ لا يطابق اسمَ إدارةٍ ولا حلَّ له الجسرُ نطاقًا\n",
+       isset($byWhy['DOMAIN_NAME_MISMATCH']) ? $byWhy['DOMAIN_NAME_MISMATCH'] : 0);
+printf("     `ID_BRIDGE`             %4d — %s\n",
+       isset($byWhy['ID_BRIDGE']) ? $byWhy['ID_BRIDGE'] : 0, $BRIDGE_WHY);
 
 if ($APPLY && $noWhy === 0 && $noSrc === 0) {
     $conn->query("DELETE FROM repair01_decision_impact");
@@ -202,9 +235,19 @@ $byDec = array();
 foreach ($rows as $x) { if ($x[4] === 'PROJECTED') { $byDec[$x[0]] = (isset($byDec[$x[0]]) ? $byDec[$x[0]] : 0) + 1; } }
 foreach ($byDec as $v) { if ($v === 14) { $fullDec++; } }
 printf("**قرارٌ حاكمٌ أُسقط على كلِّ ما يتأثّر: %d من %d** — و`AMD-01` §٨ يشترط الكلّ\n", $fullDec, $decN);
+/* ⛔ **والحاجزُ يُسمّى بأغلبِه لا بأوّلِ ما خطر** — فالمرحلةُ كانت تُعلن
+     حجبَها بـ«جسرِ المعرِّفات» وقد صار **صفرًا**، والباقي أغلبُه ممّا لا
+     تُصلحه أداة. وصفٌّ متقادمٌ في تقريرٍ يناقض صدرَه. */
+$domWhy = 'NO_SOURCE_COLUMN'; $domN = isset($byWhy['NO_SOURCE_COLUMN']) ? $byWhy['NO_SOURCE_COLUMN'] : 0;
+foreach ($byWhy as $k => $v) { if ($v > $domN) { $domWhy = $k; $domN = $v; } }
+$STAGE = array(
+    'NO_SOURCE_COLUMN'     => 'سبعةُ محاورَ لا عمودَ لها في `OWNER_DECISIONS_MASTER` — **قرارُ مالكٍ غائبٌ لا أداةٌ ناقصة**',
+    'DOMAIN_NAME_MISMATCH' => 'مطابقةُ مجالِ القرارِ باسمِ الإدارة',
+    'ID_BRIDGE'            => 'جسرُ مفرداتِ الأثرِ إلى `screen_id`',
+);
 echo $fullDec === $decN
     ? "🟢 **المرحلةُ الرابعةُ مستوفيةٌ لقبولِها**\n"
-    : "◆ `Track AMD-01 phase 4 blocked at stage: جسرُ مفرداتِ الأثرِ إلى `screen_id`` —\n"
+    : '◆ `Track AMD-01 phase 4 blocked at stage: ' . $STAGE[$domWhy] . '` — بـ' . $domN . " خليّةً\n"
     . "  ⛔ **ولا تُملأ المحاورُ بنصٍّ مؤلَّفٍ ليكتمل العدد**: سجلُّ أثرٍ مخترَعٌ يُغلق\n"
     . "  القرارَ كذبًا، وسجلٌّ ناقصٌ مُعلَنٌ يُبقيه مفتوحًا صادقًا.\n";
 
