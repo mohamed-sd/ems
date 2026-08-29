@@ -1,6 +1,6 @@
 # `AMD-01` المرحلة ٤ — `Decision Impact Register`
 
-> ⛔ **مولَّدٌ من تشغيلٍ حيّ**: `php tools/amd01_phase4_impact.php --md` · اللقطة `SNAP-ca01620e-20260829-204432`
+> ⛔ **مولَّدٌ من تشغيلٍ حيّ**: `php tools/amd01_phase4_impact.php --md` · اللقطة `SNAP-c1fd2fce-20260829-205434`
 
 ## نصّان بعددَين — والأعلى يحكم
 
