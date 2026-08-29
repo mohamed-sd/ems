@@ -251,7 +251,15 @@ if ($tbl('repair01_canonical_source')) {
            . " · والباقي **$csX** عبورُ إداراتٍ **يحتاج عقدًا لا ترجيحًا** (‏وهو بعينِه مقامُ **#١١**)"
            . " و**$csT** تعادلٌ داخلَ إدارةٍ واحدة. ⛔ **وترجيحُ أحدِ الكاتبَين هنا يُخفي #١١ ولا يحلُّها**";
 }
-$dupTruth = $dupTruth - $csRes;
+/* ✔ **ومن ليس كاتبًا لا يُعدُّ مصدرًا**: `rpr02_cross_contract.php` يقيس جُملَ
+   الكتابةِ الخامّةِ في مدى السطحِ الخاصّ، فسطحٌ **يُصرِّح بجدولِه ولا يكتب عليه**
+   (`X0`) ليس طرفًا في ازدواجِ مصدر — ولولا هذا التمييزُ لَعُدَّ التصريحُ كتابةً. */
+$cxNot = 0;
+if ($tbl('repair01_cross_contract')) {
+    $cxNot = (int) $one("SELECT COUNT(DISTINCT entity) FROM repair01_cross_contract
+                           WHERE entity_verdict = 'NOT_A_DUPLICATE'");
+}
+$dupTruth = $dupTruth - $csRes - $cxNot;
 $add('حقيقة واحدة لها مصدران', 'صفر', 'MEASURED', (string) $dupTruth,
      'كيانٌ **يملكه** أكثرُ من واجهةٍ حيّةٍ بحبّةِ سجلٍّ — أعلاها: ' . ($dupEx === '' ? '—' : $dupEx)
    . ' · والمقامُ `OWN_FACT` وحدَه ⇒ **الكيانُ المكتوبُ من كِيتٍ مشتركٍ لا يُعدُّ مصدرًا ثانيًا**' . $csWit . '. **فُتح بقياسِ الحبّة**');
@@ -264,9 +272,27 @@ $cross = (int) $one("SELECT COUNT(*) FROM (
                WHERE on_disk = 1 AND ownership_verdict <> 'RETIRE'
                  AND grain_entity <> '' AND grain_cardinality IN ('ROW','LINE') AND grain_fact_scope = 'OWN_FACT'
                GROUP BY grain_entity HAVING COUNT(DISTINCT owner_code) > 1) t");
-$add('كتابة تعبر حدود إدارة بلا عقد', 'صفر', 'MEASURED', (string) $cross,
-     'كيانٌ تكتبه إدارتان فأكثرُ بحبّةِ سجلٍّ — ⛔ **والعقدُ غيرُ مقيسٍ بعدُ**، '
-   . 'فالرقمُ **سقفُ الخرقِ لا الخرقُ**: منه ما له عقدٌ مُعلَنٌ لم يُسجَّل. **فُتح بقياسِ الحبّة**');
+/* ✔ **والعقدُ صار مقيسًا** — ولا يُترك نصُّ «غيرُ مقيسٍ» في تقرير. */
+if ($tbl('repair01_cross_contract')
+    && (int) $one("SELECT COUNT(*) FROM repair01_cross_contract") > 0) {
+    $cxB = (int) $one("SELECT COUNT(DISTINCT entity) FROM repair01_cross_contract
+                         WHERE entity_verdict = 'DIRECT_WRITE_BREACH' AND owner_code <> ''");
+    $cxC = (int) $one("SELECT COUNT(DISTINCT entity) FROM repair01_cross_contract
+                         WHERE entity_verdict = 'CONTRACTED'");
+    $cxR = (int) $one("SELECT COUNT(*) FROM repair01_cross_contract WHERE writer_verdict = 'X2_RAW_DIRECT'");
+    $cxM = (int) $one("SELECT COUNT(*) FROM repair01_cross_contract WHERE writer_verdict = 'X1_SERVICE_MEDIATED'");
+    $cxZ = (int) $one("SELECT COUNT(*) FROM repair01_cross_contract WHERE writer_verdict = 'X0_NO_MEASURED_WRITE'");
+    $cross = $cross - $cxNot;
+    $add('كتابة تعبر حدود إدارة بلا عقد', 'صفر', 'MEASURED', (string) $cross,
+         "كيانٌ تكتبه إدارتان فأكثرُ — **والعقدُ صار مقيسًا** بـ`rpr02_cross_contract.php`: "
+       . "كاتبٌ بكتابةٍ خامّةٍ **$cxR** · بخدمةٍ أو ناشرٍ بلا خامٍّ **$cxM** · مُصرِّحٌ بلا كتابةٍ **$cxZ** (‏ليس كاتبًا). "
+       . "وكياناتٌ **بعقدٍ مقيس $cxC** ⇒ ⛔ **صفرُ عبورٍ متعاقَدٍ عليه في الشجرةِ كلِّها**، "
+       . "وكلُّ عبورٍ حقيقيٍّ يكتب خامًّا. **فالرقمُ صار خرقًا مقيسًا لا سقفَ خرق**");
+} else {
+    $add('كتابة تعبر حدود إدارة بلا عقد', 'صفر', 'MEASURED', (string) $cross,
+         'كيانٌ تكتبه إدارتان فأكثرُ بحبّةِ سجلٍّ — ⛔ **والعقدُ غيرُ مقيسٍ بعدُ**، '
+       . 'فالرقمُ **سقفُ الخرقِ لا الخرقُ** — **شغِّلْ `php tools/rpr02_cross_contract.php --apply`**');
+}
 
 /* ═══ ١٢ · هجراتٌ غيرُ مصالَحةٍ مع الدفتر ════════════════════════════════ */
 $mig = 0; $migWit = 'لا جدولَ تسويةٍ';
