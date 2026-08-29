@@ -239,9 +239,22 @@ $dupEx = (string) $one("SELECT GROUP_CONCAT(e SEPARATOR ' · ') FROM (
                      AND grain_entity <> '' AND grain_cardinality IN ('ROW','LINE') AND grain_fact_scope = 'OWN_FACT'
                    GROUP BY grain_entity HAVING COUNT(*) > 1
                    ORDER BY COUNT(*) DESC LIMIT 5) t");
+/* ✔ **والمحسومُ بقياسٍ يخرج من المقام** — `rpr02_canonical_source.php` يحكم
+   بأربعِ قواعدَ ويكتب المصدرَ القانونيَّ بشاهدِه. ⛔ **والخارجُ محسومٌ لا مُقصًى**:
+   `resolved=1` يوجب `canonical_screen` بقاعدةٍ صلبةٍ في القاعدةِ نفسِها. */
+$csRes = 0; $csWit = '';
+if ($tbl('repair01_canonical_source')) {
+    $csRes = (int) $one("SELECT COUNT(*) FROM repair01_canonical_source WHERE resolved = 1");
+    $csX   = (int) $one("SELECT COUNT(*) FROM repair01_canonical_source WHERE rule_code = 'N3_CROSS_OWNER_NEEDS_CONTRACT'");
+    $csT   = (int) $one("SELECT COUNT(*) FROM repair01_canonical_source WHERE rule_code = 'N4_TIE_DECLARED'");
+    $csWit = " · وحُسم **$csRes** بمصدرٍ قانونيٍّ مسمًّى (`N1` هويّةُ اسمِ الأثر · `N2` المُعلِنُ يغلب المُستنتَج)"
+           . " · والباقي **$csX** عبورُ إداراتٍ **يحتاج عقدًا لا ترجيحًا** (‏وهو بعينِه مقامُ **#١١**)"
+           . " و**$csT** تعادلٌ داخلَ إدارةٍ واحدة. ⛔ **وترجيحُ أحدِ الكاتبَين هنا يُخفي #١١ ولا يحلُّها**";
+}
+$dupTruth = $dupTruth - $csRes;
 $add('حقيقة واحدة لها مصدران', 'صفر', 'MEASURED', (string) $dupTruth,
      'كيانٌ **يملكه** أكثرُ من واجهةٍ حيّةٍ بحبّةِ سجلٍّ — أعلاها: ' . ($dupEx === '' ? '—' : $dupEx)
-   . ' · والمقامُ `OWN_FACT` وحدَه ⇒ **الكيانُ المكتوبُ من كِيتٍ مشتركٍ لا يُعدُّ مصدرًا ثانيًا**. **فُتح بقياسِ الحبّة**');
+   . ' · والمقامُ `OWN_FACT` وحدَه ⇒ **الكيانُ المكتوبُ من كِيتٍ مشتركٍ لا يُعدُّ مصدرًا ثانيًا**' . $csWit . '. **فُتح بقياسِ الحبّة**');
 
 /* ═══ ١١ · كتابةٌ تعبر حدودَ إدارةٍ بلا عقد ══════════════════════════════
    مالكُ الكيانِ = الإدارةُ التي تكتبه بأقلِّ عددِ أسطحٍ… لا. **مالكُه = مالكُ
