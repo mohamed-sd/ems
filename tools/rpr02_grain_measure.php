@@ -274,9 +274,18 @@ $multi = array(); $unres = array(); $noTbl = array(); $upd = 0;
 $AR = array('ROW' => 'سجلٌّ واحدٌ في ', 'LINE' => 'بندٌ واحدٌ في ',
             'LIVE_READ' => 'قراءةٌ حيّةٌ من ', 'LIST' => 'قائمةُ قراءةٍ من ', 'NONE' => '');
 
+/* ⛔ **والطبقةُ تصير عمودًا لا نثرًا** — كانت تُكتب في الشاهدِ وحدَه
+   (`[OWN]`/`[SHARED_KIT]` · `INFRA_ONLY`)، **فقرأتها لوحةُ §١٢ بـ`LIKE` أو لم
+   تقرأها**. ومقياسٌ على **شكلِ عبارةٍ** يسقط بتغييرِ صياغةٍ واحدة.
+   ◆ **و`grain_fact_scope` خلاصةُ حكمٍ لا طبقةٌ خام**: `G1`/`G1B` **يُعلن فيهما
+     السطحُ جدولَه في ملفِّه**، فالطبقةُ لا أثرَ لها فيهما — **والمُعلَنُ ذاتيًّا
+     خاصٌّ ولو قيست جداولُه من كِيت**. */
+$scopeStat = array('OWN_FACT' => 0, 'SHARED_KIT' => 0, 'INFRA_ONLY' => 0, 'NONE' => 0);
+
 foreach ($rows as $s) {
     $path = $PATH[$s['screen_id']];
     $ent = ''; $cd = 'NONE'; $rule = ''; $wit = ''; $mult = 0;
+    $tier = 'NONE'; $infraOnly = false;
 
     if ($path === '') {
         $stat['NONE_PATH']++; $unres[] = $s['screen_id'] . ' · ' . $s['screen_file'];
@@ -297,7 +306,7 @@ foreach ($rows as $s) {
         $gOwn = grain_tables($srcOwn, $KNOWN);
         $gAll = grain_tables($srcAll, $KNOWN);
         $g    = $gOwn;
-        $tier = 'OWN';
+        $tier = 'OWN';   /* يُكتب عمودًا في نهايةِ الدورة */
         if (!$gOwn['w'] && !$gOwn['r'] && ($gAll['w'] || $gAll['r'])) { $g = $gAll; $tier = 'SHARED_KIT'; }
         $src  = ($tier === 'OWN') ? $srcOwn : $srcAll;
 
@@ -333,7 +342,6 @@ foreach ($rows as $s) {
             foreach ($g['r'] as $t => $n) { if (in_array($t, $INFRA, true)) { $inf[$t] = $n; } else { $biz[$t] = $n; } }
             $rBiz = $biz; $rInf = $inf;
 
-            $infraOnly = false;
             $W = $wBiz; if (!$W) { $W = $wInf; $infraOnly = (bool) $wInf; }
             $R = $rBiz; if (!$R) { $R = $rInf; $infraOnly = $infraOnly || (bool) $rInf; }
 
@@ -386,6 +394,14 @@ foreach ($rows as $s) {
 
     $meas = ($ent === '') ? '' : $AR[$cd] . $ent;
     $card[$cd]++;
+    /* **الخلاصة**: مُعلَنٌ ذاتيًّا ⇒ خاصٌّ دائمًا · وبنيةٌ صِرفةٌ ⇒ ليست حقيقةَ أعمالٍ ·
+       وما عداهما بطبقتِه. ⛔ **وعليها وحدَها تُقاس #٩ و#١٠ و#١١** لا على `grain_entity` عاريًا. */
+    if ($ent === '') { $scope = 'NONE'; }
+    elseif ($infraOnly) { $scope = 'INFRA_ONLY'; }
+    elseif (in_array($rule, array('G1_CMP03_DECLARED', 'G1B_SELF_DECLARED'), true)) { $scope = 'OWN_FACT'; }
+    elseif ($tier === 'SHARED_KIT') { $scope = 'SHARED_KIT'; }
+    else { $scope = 'OWN_FACT'; }
+    $scopeStat[$scope]++;
 
     if ($APPLY) {
         $conn->query("UPDATE repair01_screen_registry SET
@@ -394,7 +410,9 @@ foreach ($rows as $s) {
             grain_measured    = '" . $e($meas) . "',
             grain_rule        = '" . $e($rule) . "',
             grain_witness     = '" . $e(mb_substr($wit . ' · لقطة ' . $sid, 0, 395)) . "',
-            grain_multi       = " . (int) $mult . "
+            grain_multi       = " . (int) $mult . ",
+            grain_tier        = '" . $e($tier) . "',
+            grain_fact_scope  = '" . $e($scope) . "'
           WHERE screen_id = '" . $e($s['screen_id']) . "'");
         $upd++;
     }

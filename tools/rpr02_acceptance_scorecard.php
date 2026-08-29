@@ -213,27 +213,35 @@ $add('تطابق ترتيب السايدبار ومجموعاته مع المل�
    . $navLive . ' — والتفصيلُ في `rpr02_s6_sidebar.php`');
 
 /* ═══ ٩ · أسطحٌ تكتب ومالكُ حقيقتِها مجهول ═══════════════════════════════ */
-$wUnk = (int) $one("SELECT COUNT(*) FROM $LIVE AND grain_cardinality IN ('ROW','LINE')
-                      AND grain_entity <> '' AND source_of_truth = ''");
+/* ⛔ **والمقامُ `OWN_FACT` وحدَه**: `rpr02_grain_measure.php` يفرّق الخاصَّ من
+   المشتركِ ويكتب الخلاصةَ في `grain_fact_scope`. وسطحٌ كيانُه من **كِيتٍ مشترك**
+   لا يكتب حقيقةً يملكها، و`INFRA_ONLY` ليست حقيقةَ أعمالٍ أصلًا — و§٥·٩ تقول
+   «لكلِّ **حقيقةِ أعمالٍ** مالكٌ قانونيٌّ واحد». **وعدُّها خرقًا هو بعينِه الخرقُ
+   الكاذبُ الذي أزاله المقياسُ داخلَ نفسِه ثمَّ عاد هنا طبقةً أعلى.** */
+$wAll  = (int) $one("SELECT COUNT(*) FROM $LIVE AND grain_cardinality IN ('ROW','LINE') AND grain_entity <> ''");
+$wFact = (int) $one("SELECT COUNT(*) FROM $LIVE AND grain_cardinality IN ('ROW','LINE') AND grain_entity <> '' AND grain_fact_scope = 'OWN_FACT'");
+$wUnk  = (int) $one("SELECT COUNT(*) FROM $LIVE AND grain_cardinality IN ('ROW','LINE')
+                      AND grain_entity <> '' AND grain_fact_scope = 'OWN_FACT' AND source_of_truth = ''");
 $add('أسطح تكتب ومالك حقيقتها مجهول', 'صفر', 'MEASURED', (string) $wUnk,
-     "أسطحٌ حبّتُها `ROW`/`LINE` (‏تكتب) وكيانُها مقيسٌ **و`source_of_truth` فارغ** — "
-   . 'وهذا المقياسُ **فُتح بقياسِ الحبّة**، فقبلَه لم يكن يُعرف مَن يكتب');
+     "أسطحٌ تكتب **حقيقةَ أعمالٍ تملكها** (`grain_fact_scope='OWN_FACT'`) و`source_of_truth` فارغ — "
+   . "والمقامُ **$wFact** من $wAll سطحَ كتابة؛ و" . ($wAll - $wFact) . " مستبعَدٌ **كيانُه من كِيتٍ مشتركٍ أو بنيةٍ صِرفة** "
+   . '(‏`ems_post_idempotency` · `guard_denials` …) — ⛔ **ونسبتُه إلى السطحِ خرقٌ كاذب**. **فُتح بقياسِ الحبّة**');
 
 /* ═══ ١٠ · حقيقةٌ واحدةٌ لها مصدران ══════════════════════════════════════ */
 $dupTruth = (int) $one("SELECT COUNT(*) FROM (
                   SELECT grain_entity FROM repair01_screen_registry
                    WHERE on_disk = 1 AND ownership_verdict <> 'RETIRE'
-                     AND grain_entity <> '' AND grain_cardinality IN ('ROW','LINE')
+                     AND grain_entity <> '' AND grain_cardinality IN ('ROW','LINE') AND grain_fact_scope = 'OWN_FACT'
                    GROUP BY grain_entity HAVING COUNT(*) > 1) t");
 $dupEx = (string) $one("SELECT GROUP_CONCAT(e SEPARATOR ' · ') FROM (
                   SELECT grain_entity e FROM repair01_screen_registry
                    WHERE on_disk = 1 AND ownership_verdict <> 'RETIRE'
-                     AND grain_entity <> '' AND grain_cardinality IN ('ROW','LINE')
+                     AND grain_entity <> '' AND grain_cardinality IN ('ROW','LINE') AND grain_fact_scope = 'OWN_FACT'
                    GROUP BY grain_entity HAVING COUNT(*) > 1
                    ORDER BY COUNT(*) DESC LIMIT 5) t");
 $add('حقيقة واحدة لها مصدران', 'صفر', 'MEASURED', (string) $dupTruth,
-     'كيانٌ تكتبه أكثرُ من واجهةٍ حيّةٍ بحبّةِ سجلٍّ — أعلاها: ' . ($dupEx === '' ? '—' : $dupEx)
-   . ' · **فُتح بقياسِ الحبّة**');
+     'كيانٌ **يملكه** أكثرُ من واجهةٍ حيّةٍ بحبّةِ سجلٍّ — أعلاها: ' . ($dupEx === '' ? '—' : $dupEx)
+   . ' · والمقامُ `OWN_FACT` وحدَه ⇒ **الكيانُ المكتوبُ من كِيتٍ مشتركٍ لا يُعدُّ مصدرًا ثانيًا**. **فُتح بقياسِ الحبّة**');
 
 /* ═══ ١١ · كتابةٌ تعبر حدودَ إدارةٍ بلا عقد ══════════════════════════════
    مالكُ الكيانِ = الإدارةُ التي تكتبه بأقلِّ عددِ أسطحٍ… لا. **مالكُه = مالكُ
@@ -241,7 +249,7 @@ $add('حقيقة واحدة لها مصدران', 'صفر', 'MEASURED', (string)
 $cross = (int) $one("SELECT COUNT(*) FROM (
               SELECT grain_entity FROM repair01_screen_registry
                WHERE on_disk = 1 AND ownership_verdict <> 'RETIRE'
-                 AND grain_entity <> '' AND grain_cardinality IN ('ROW','LINE')
+                 AND grain_entity <> '' AND grain_cardinality IN ('ROW','LINE') AND grain_fact_scope = 'OWN_FACT'
                GROUP BY grain_entity HAVING COUNT(DISTINCT owner_code) > 1) t");
 $add('كتابة تعبر حدود إدارة بلا عقد', 'صفر', 'MEASURED', (string) $cross,
      'كيانٌ تكتبه إدارتان فأكثرُ بحبّةِ سجلٍّ — ⛔ **والعقدُ غيرُ مقيسٍ بعدُ**، '

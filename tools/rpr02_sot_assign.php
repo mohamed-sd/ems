@@ -89,8 +89,16 @@ if ((!$col || !$col->num_rows) && $APPLY) {
 }
 
 /* ═══ ④ الكتّابُ لكلِّ كيان — من الحبّةِ المقيسة ══════════════════════════ */
+/* ⛔ **والكاتبُ لا يُعدُّ كاتبًا لمجرّدِ أنَّ `grain_entity` غيرُ فارغ**:
+   `rpr02_grain_measure.php` يفرّق **الخاصَّ من المشترك** ويكتب الخلاصةَ في
+   `grain_fact_scope`. وسطحٌ كيانُه من **كِيتٍ مشترك** (`ems_post_idempotency` ·
+   `guard_denials`) **لا يكتب حقيقةَ أعمالٍ يملكها** — ونسبتُها إليه هي بعينِها
+   الخرقُ الكاذبُ الذي أزاله المقياسُ داخلَ نفسِه ثمَّ عاد هنا طبقةً أعلى.
+   ◆ و`INFRA_ONLY` **ليست حقيقةَ أعمالٍ أصلًا** — و§٥·٩ تقول «لكلِّ **حقيقةِ
+     أعمالٍ** مالكٌ قانونيٌّ واحد». ⇒ فالمقامُ `OWN_FACT` وحدَه. */
 $LIVE = "repair01_screen_registry WHERE on_disk = 1 AND ownership_verdict <> 'RETIRE'";
-$WR   = "AND grain_cardinality IN ('ROW','LINE') AND grain_entity <> ''";
+$WR   = "AND grain_cardinality IN ('ROW','LINE') AND grain_entity <> ''
+         AND grain_fact_scope = 'OWN_FACT'";
 $writers = array();
 $r = $conn->query("SELECT grain_entity, COUNT(*) n FROM $LIVE $WR GROUP BY grain_entity");
 while ($x = $r->fetch_row()) { $writers[$x[0]] = (int) $x[1]; }
@@ -152,6 +160,23 @@ if ($LIST) {
 
 /* ═══ ⑥ التثبيت ══════════════════════════════════════════════════════════ */
 if ($APPLY) {
+    /* ⛔ **وتضييقُ المقامِ يوجب سحبَ ما كُتب خارجَه** — وإلّا بقيت قيمةٌ
+       عُيِّنت بقاعدةٍ لم تعُدْ تنطبق، **وذاك أسوأُ من الفراغِ**: فراغٌ يُعلن
+       نفسَه، وقيمةٌ متقادمةٌ تُقرأ حقًّا. ⇒ يُسحب ما وسمه هذا المقياسُ وحدَه
+       (`SOLE_WRITER`/`DUPLICATE_SOURCE`) ولم يعُدْ في `OWN_FACT`.
+       ⛔ **و`PRE_W17_DECLARED` لا يُمَسّ** — قيمةٌ من موجةٍ سابقةٍ بقرارِها. */
+    $ret = (int) $conn->query("SELECT COUNT(*) FROM repair01_screen_registry
+            WHERE sot_rule IN ('SOLE_WRITER','DUPLICATE_SOURCE')
+              AND (grain_fact_scope <> 'OWN_FACT'
+                   OR grain_cardinality NOT IN ('ROW','LINE'))")->fetch_row()[0];
+    if ($ret > 0) {
+        $conn->query("UPDATE repair01_screen_registry
+            SET source_of_truth = '', sot_rule = '', sot_witness = '', sot_snapshot = ''
+          WHERE sot_rule IN ('SOLE_WRITER','DUPLICATE_SOURCE')
+            AND (grain_fact_scope <> 'OWN_FACT'
+                 OR grain_cardinality NOT IN ('ROW','LINE'))");
+        printf("\n  ⚠ **سُحب تعيينُ %d سطحٍ** خرج من المقامِ بتصحيحِ مدى الحقيقة — ولا يُترك رقمٌ متقادم\n", $ret);
+    }
     $n = 0; $m = 0;
     foreach ($plan as $x) {
         $set = ($x['rule'] === 'SOLE_WRITER')
