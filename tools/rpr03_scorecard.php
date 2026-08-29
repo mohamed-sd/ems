@@ -141,10 +141,14 @@ $platVerdict = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry
 $platLegacy  = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry WHERE owner_code = 'PLATFORM'");
 $platReg     = $tbl('repair01_platform_capabilities')
              ? (int) $one("SELECT COUNT(*) FROM repair01_platform_capabilities") : 0;
-$plat = $platVerdict + $platLegacy;
+$psB = $tbl('repair01_platform_surface')
+     ? (int) $one("SELECT COUNT(*) FROM repair01_platform_surface WHERE bind_rule <> 'P3_UNBOUND_DECLARED'") : 0;
+$psA = $tbl('repair01_platform_surface')
+     ? (int) $one("SELECT COUNT(*) FROM repair01_platform_surface WHERE approval_state = 'APPROVED'") : 0;
+$plat = $platVerdict + $platLegacy - $psA;
 $add('أسطحُ `PLATFORM` بلا تبريرٍ منصّيٍّ معتمَد', 'صفر', '١٢ تحتاج مراجعة', $plat,
      "أسطحٌ حكمُ ملكيّتِها `PLATFORM_SHARED` **$platVerdict** · وبرمزِ المالكِ القديمِ **$platLegacy** "
-   . "· وسجلُّ القدراتِ المنصّيّةِ فيه **$platReg** ⇒ **لا واحدةَ مسجَّلةٌ بمعرِّفِها وقاعدةِ ظهورِها**. "
+   . "· **ومسجَّلةٌ بمعرِّفِها وقاعدةِ ظهورِها $psB** · ومعتمَدٌ **$psA** (‏والتسجيلُ ليس اعتمادًا). "
    . '⛔ **وكان يُقرأ صفرًا** بـ`owner_code=\'PLATFORM\'` بعد نقلِ الرمزِ — '
    . '**صفرٌ من مفردةٍ لا وجودَ لها**، لا إنجازٌ. والقارئُ الآن هو قارئُ `RPR-02` #١٣ نفسُه');
 

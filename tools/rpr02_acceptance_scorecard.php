@@ -308,10 +308,31 @@ $add('هجرات غير مصالَحة مع الدفتر', 'صفر', 'MEASURED',
 $plat = (int) $one("SELECT COUNT(*) FROM $LIVE AND ownership_verdict = 'PLATFORM_SHARED'");
 $platReg = $tbl('repair01_platform_capabilities')
          ? (int) $one("SELECT COUNT(*) FROM repair01_platform_capabilities") : 0;
-$add('شاشة PLATFORM بلا تبرير منصّي معتمد', 'صفر', 'MEASURED', (string) $plat,
-     "أسطحٌ `PLATFORM_SHARED` حيّةٌ **$plat** · وسجلُّ المنصّةِ فيه **$platReg** قدرةً ⇒ "
-   . '**لا واحدةَ منها مسجَّلةٌ بمعرِّفِها وقاعدةِ ظهورِها** (§٤·٤ الشرط الرابع)، '
-   . 'فالأربعةُ مجتمعةً غيرُ مستوفاةٍ ولا واحدةٌ تُعفى');
+/* ⛔ **والعددُ لا ينخفض بالتسجيل** — المقياسُ يشترط تبريرًا **معتمَدًا**،
+   والتسجيلُ يرفع **جهلَ السبب** لا يُغني عن الاعتماد. **وما تغيّر هو طبيعةُ
+   الباقي**: كان عملَ تحليلٍ فصار فعلَ اعتماد. */
+if ($tbl('repair01_platform_surface')
+    && (int) $one("SELECT COUNT(*) FROM repair01_platform_surface") > 0) {
+    $psN  = (int) $one("SELECT COUNT(*) FROM repair01_platform_surface");
+    $psB  = (int) $one("SELECT COUNT(*) FROM repair01_platform_surface
+                         WHERE bind_rule <> 'P3_UNBOUND_DECLARED'");
+    $psA  = (int) $one("SELECT COUNT(*) FROM repair01_platform_surface WHERE approval_state = 'APPROVED'");
+    $psS  = (int) $one("SELECT COUNT(*) FROM repair01_platform_surface WHERE bind_rule = 'P1_DECLARED_SCOPE_OWNER'");
+    $psC  = (int) $one("SELECT COUNT(DISTINCT capability_code) FROM repair01_platform_surface
+                         WHERE capability_code <> ''");
+    $add('شاشة PLATFORM بلا تبرير منصّي معتمد', 'صفر', 'MEASURED', (string) ($plat - $psA),
+         "أسطحٌ `PLATFORM_SHARED` حيّةٌ **$plat** — **ومسجَّلةٌ الآن بمعرِّفِها وقاعدةِ ظهورِها $psB من $psN** "
+       . "بـ`rpr02_platform_register.php`: منها **$psS** مالكُها **نطاقٌ مُعلَنٌ** (‏فـ`PLATFORM_SHARED` فيها "
+       . "**صفةُ ظهورٍ عابرٍ للأدوارِ لا فراغُ ملكيّة**) والباقي مربوطٌ بـ**$psC** قدرةً من ثمانِ `AMD-01` §٤·٧. "
+       . "⛔ **والتسجيلُ ليس اعتمادًا**: معتمَدٌ **$psA** — و§٤·٤ يشترط `معتمَدًا`. "
+       . '⇒ **فالباقي فعلُ اعتمادٍ لا عملُ تحليل**');
+} else {
+    $add('شاشة PLATFORM بلا تبرير منصّي معتمد', 'صفر', 'MEASURED', (string) $plat,
+         "أسطحٌ `PLATFORM_SHARED` حيّةٌ **$plat** · وسجلُّ المنصّةِ فيه **$platReg** قدرةً ⇒ "
+       . '**لا واحدةَ منها مسجَّلةٌ بمعرِّفِها وقاعدةِ ظهورِها** (§٤·٤ الشرط الرابع)، '
+       . 'فالأربعةُ مجتمعةً غيرُ مستوفاةٍ ولا واحدةٌ تُعفى '
+       . '— **شغِّلْ `php tools/rpr02_platform_register.php --apply`**');
+}
 
 /* ═══ ١٤ · ملفُّ مكتبةٍ مسجَّلٌ شاشةً — وقاعدةٌ مانعةٌ مفعَّلة ═══════════ */
 /* ⛔ **والمفتاحُ يُقاس قبلَ أن يُصدَّق صفرُه**: `screen_file` يحمل **اسمَ الملفِّ
