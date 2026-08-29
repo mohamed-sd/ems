@@ -391,25 +391,14 @@ if ($LIST) {
 
 /* ═══ ⑨ التثبيت ══════════════════════════════════════════════════════════ */
 if ($APPLY) {
-    $conn->query("CREATE TABLE IF NOT EXISTS repair01_field_measure (
-        id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-        screen_id VARCHAR(12) NOT NULL,
-        target_uid VARCHAR(12) NOT NULL,
-        requirement_id VARCHAR(48) NOT NULL,
-        unit VARCHAR(12) NOT NULL DEFAULT '',
-        artifact_path VARCHAR(255) NOT NULL DEFAULT '',
-        vocab_terms INT NOT NULL DEFAULT 0,
-        design_total INT NOT NULL DEFAULT 0,
-        design_audit INT NOT NULL DEFAULT 0,
-        design_applicable INT NOT NULL DEFAULT 0,
-        matched INT NOT NULL DEFAULT 0,
-        missing_sample VARCHAR(500) NOT NULL DEFAULT '',
-        witness VARCHAR(500) NOT NULL DEFAULT '',
-        snapshot_id VARCHAR(48) NOT NULL DEFAULT '',
-        measured_at DATETIME NULL,
-        UNIQUE KEY uq_screen (screen_id),
-        KEY ix_snap (snapshot_id)
-      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+    /* ⛔ **والعُدّةُ لا تُنشئ جدولًا** — `ems_app` بلا `CREATE` **بحقٍّ لا بعطب**،
+       والمخطَّطُ يتغيّر بهجرةٍ مسجَّلةٍ في الدفتر. وجدولٌ يُولد من أداةِ قياسٍ
+       **يُرسِب المقياسَ #١٢** (`UNRECONCILED_MIGRATIONS = 0`) بمولودٍ خارجَ الدفتر. */
+    $has = $conn->query("SHOW TABLES LIKE 'repair01_field_measure'");
+    if (!$has || !$has->num_rows) {
+        exit("⛔ **`repair01_field_measure` غيرُ موجود** — والعُدّةُ لا تُنشئ مخطَّطًا.\n"
+           . "   شغِّلْ: php database/migrations/2028_01_01_rpr02_field_measure.php\n");
+    }
     $conn->query("DELETE FROM repair01_field_measure");
     $n = 0;
     foreach ($out as $o) {
