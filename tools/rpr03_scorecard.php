@@ -167,7 +167,9 @@ $add('شاشاتٌ ذهبيّةٌ معتمَدة', '١٠ من ١٠', 'صفر', $
 $scanRc = $rc('rpr03_structural_scan.php');
 $add('مسحٌ بنيويٌّ آليٌّ للأسطحِ القابلةِ للعرض', 'منفَّذ', 'غيرُ منفَّذ',
      $scanRc === 0 ? 0 : 1,
-     '**منفَّذٌ على ٦١١ سطحًا مُصيَّرًا** · وعيوبٌ بنيويّةٌ مرصودة ٢ (‏صورةٌ بلا `alt`)');
+     ($scanRc === 0 ? '**منفَّذ** — ' : '⛔ **لم يُنفَّذ** (‏رمزُ خروجٍ ' . $scanRc . ') — ')
+   . 'على ٦١١ سطحًا مُصيَّرًا · وعيوبٌ بنيويّةٌ مرصودة ٢ (‏صورةٌ بلا `alt`) · '
+   . '⛔ **والصفرُ هنا «نُفِّذ» لا «صفرُ عيب»** — والعيوبُ رقمٌ ثانٍ لا يُخلط به');
 $add('مراجعةٌ يدويّةٌ عميقةٌ للذهبيّاتِ العشر', '١٠ من ١٠', 'صفر', null,
      '⛔ **غيرُ مقيس** — تحتاج مراجعةً بشريّة');
 
@@ -188,12 +190,26 @@ $fxBehind = (int) $one("SELECT COUNT(*) FROM ems_event_consumers c
 $add('مستهلكون حرجون متوقّفون', 'صفر', '١', $fxBehind, '`fx` حرجٌ بنصِّ الأمرِ لا بعتبة');
 
 /* ⑲ جدولةُ المهامّ */
-$sched = null;
-if ($tbl('ems_job_queue')) {
-    $sched = (int) $one("SELECT COUNT(*) FROM ems_job_queue WHERE status='failed'");
+/* ⛔ **صفرٌ من عمودٍ لا وجودَ له**: كان يُقرأ `ems_job_queue.status` **والعمودُ
+     اسمُه `state`** — فيسقط الاستعلامُ ويعود `null` ثمَّ يُقسر عددًا **فيُطبع
+     صفرًا**. أخضرُ كاذبٌ من مفردةٍ غيرِ موجودة. والصوابُ قارئان مقيسان:
+     ① `ems_job_queue.state` في حالاتِ الفشلِ الثلاث · ② و**عاملٌ تجاوز مهلةَ
+     إنذارِه المُعلَنةَ في `ems_job_schedule.alert_after_seconds`** — والمهلةُ
+     **مُعلَنةٌ في الجدولِ لكلِّ عاملٍ** فلا تُخترَع عتبةٌ من عندِ المنفِّذ. */
+$sched = null; $schedWit = '⛔ **غيرُ مقيس**';
+if ($tbl('ems_job_queue') && $tbl('ems_job_schedule')) {
+    $qFail = (int) $one("SELECT COUNT(*) FROM ems_job_queue WHERE state IN ('failed','dead','dlq')");
+    $stall = (int) $one("SELECT COUNT(*) FROM ems_job_schedule
+                          WHERE is_active = 1 AND last_success_at IS NOT NULL
+                            AND TIMESTAMPDIFF(SECOND, last_success_at, NOW()) > alert_after_seconds");
+    $never = (int) $one("SELECT COUNT(*) FROM ems_job_schedule
+                          WHERE is_active = 1 AND last_success_at IS NULL");
+    $sched = $qFail + $stall + $never;
+    $schedWit = "صفُّ مهامٍّ فاشلٌ/ميّت **$qFail** (`ems_job_queue.state`) · وعاملٌ تجاوز "
+              . "**مهلةَ إنذارِه المُعلَنة** **$stall** · وعاملٌ لم ينجح قطُّ **$never** "
+              . '(`ems_job_schedule`) — ⛔ والمهلةُ **مُعلَنةٌ لكلِّ عاملٍ في الجدولِ** لا مخترَعةً هنا';
 }
-$add('إخفاقاتٌ حرجةٌ في جدولةِ المهامّ', 'صفر', 'غيرُ مقيس', $sched,
-     $sched === null ? '⛔ **غيرُ مقيس**' : 'من `ems_job_queue.status = failed`');
+$add('إخفاقاتٌ حرجةٌ في جدولةِ المهامّ', 'صفر', 'غيرُ مقيس', $sched, $schedWit);
 
 /* ⛔ **السالبُ يكسر مفردةً فريدة**: يُدَّعى قياسُ ما لم يُقَس */
 if ($SELF) { $M[8][3] = 0; }
