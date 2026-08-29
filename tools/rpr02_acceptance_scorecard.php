@@ -127,10 +127,45 @@ $add('جسر معرّف الشاشة بمرحلة دورة العمل', '100٪ �
    . 'و§٧ الخطوة ١٣ تشترط الوصلَ **بمعرِّفِ الشاشةِ صراحةً لا بالمسارِ ولا بالاسم**');
 
 /* ═══ ٨ · تطابقُ ترتيبِ السايدبارِ ومجموعاتِه مع الملفّ ═══════════════════ */
-$sbSpec = $tbl('repair01_w4_sidebar') ? (int) $one("SELECT COUNT(*) FROM repair01_w4_sidebar") : 0;
-$add('تطابق ترتيب السايدبار ومجموعاته مع الملف', '100٪', 'BLOCKED', '—',
-     "بيانُ السايدبارِ التصميميُّ **$sbSpec** صفًّا · **و§٦ لم يُنفَّذ بعد** — "
-   . 'ولا يُقاس تطابقٌ قبلَ التصحيح. `blocked at stage: RPR-02 §٦ السايدبار قبل الشاشات`');
+/* **صار مقيسًا بـ`rpr02_s6_sidebar.php`** — والمقامُ البنودُ الحيّةُ المُصيَّرة.
+   ⛔ ولا يُخلط «موضعٌ» بـ«شاشة»: البندُ يتكرَّر بعددِ الأدوارِ التي تراه. */
+$navLive = (int) $one("SELECT COUNT(*) FROM nav_items WHERE active = 1");
+$grpOk = 0; $ordOk = 0;
+$rr = $conn->query("SELECT n.route, n.sort_order, n.role_id, n.group_id, g.name gname,
+                           c.group_name cgroup, c.sort_no
+                      FROM nav_items n
+                      LEFT JOIN link_groups g ON g.id = n.group_id
+                      LEFT JOIN nav_canonical c ON LOWER(TRIM(BOTH '/' FROM c.route)) = LOWER(TRIM(BOTH '/' FROM n.route))
+                     WHERE n.active = 1");
+$nrm = function ($s) {
+    $s = preg_replace('~[\x{064B}-\x{0652}\x{0670}\x{0640}]~u', '', (string) $s);
+    $s = preg_replace('~[\x{0622}\x{0623}\x{0625}]~u', "\u{0627}", $s);
+    $s = preg_replace('~\x{0629}~u', "\u{0647}", $s);
+    return trim(preg_replace('~\s+~u', ' ', $s));
+};
+$grpTot = 0; $bucket = array();
+while ($x = $rr->fetch_assoc()) {
+    if ($x['cgroup'] !== null && trim((string) $x['cgroup']) !== '') {
+        $grpTot++;
+        if ($nrm($x['gname']) === $nrm($x['cgroup'])) { $grpOk++; }
+    }
+    if ($x['sort_no'] !== null && (int) $x['sort_no'] > 0) {
+        $bucket[$x['role_id'] . '|' . (int) $x['group_id']][] =
+            array((int) $x['sort_order'], (int) $x['sort_no'], (string) $x['route']);
+    }
+}
+$ordTot = 0;
+foreach ($bucket as $rows2) {
+    $a = $rows2; $b = $rows2;
+    usort($a, function ($p, $q2) { return $p[0] === $q2[0] ? strcmp($p[2], $q2[2]) : $p[0] - $q2[0]; });
+    usort($b, function ($p, $q2) { return $p[1] === $q2[1] ? strcmp($p[2], $q2[2]) : $p[1] - $q2[1]; });
+    foreach ($a as $pos => $z) { $ordTot++; if ($b[$pos][2] === $z[2]) { $ordOk++; } }
+}
+$sbPct = ($grpTot + $ordTot) ? round(($grpOk + $ordOk) * 100 / ($grpTot + $ordTot), 1) : 0;
+$add('تطابق ترتيب السايدبار ومجموعاته مع الملف', '100٪', 'MEASURED', $sbPct . '٪',
+     "المجموعةُ تطابق المعتمَدَ في **$grpOk من $grpTot** · والترتيبُ **$ordOk من $ordTot** "
+   . '(‏مقارنةً **ترتيبيّةً داخلَ المجموعةِ لا قيمةً لقيمة**) · المقامُ بنودٌ حيّةٌ مُصيَّرةٌ '
+   . $navLive . ' — والتفصيلُ في `rpr02_s6_sidebar.php`');
 
 /* ═══ ٩ · أسطحٌ تكتب ومالكُ حقيقتِها مجهول ═══════════════════════════════ */
 $wUnk = (int) $one("SELECT COUNT(*) FROM $LIVE AND grain_cardinality IN ('ROW','LINE')
