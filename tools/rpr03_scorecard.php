@@ -124,10 +124,29 @@ foreach ($o as $l) {
 $add('مساراتُ قرارِ الصلاحية', 'واحد', 'مساران · ٨٧ قارئًا', $permRc,
      'وقارئون مستقلّون: **' . ($permReaders === null ? '؟' : $permReaders) . '**');
 
-/* ⑧ أسطحُ المنصّة */
-$plat = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry WHERE owner_code='PLATFORM'");
+/* ⑧ أسطحُ المنصّة
+   ⛔ **أخضرُ كاذبٌ صُحِّح**: كان يُقاس بـ`owner_code = 'PLATFORM'` فأعطى **صفرًا**
+      — لا لأنَّ الأسطحَ عولجت بل لأنَّ **الرمزَ نفسَه نُقل** من
+      `repair01_departments` في ٢٠٢٦-٠٨-٢٨ (`moved_why`: عدُّ المقاماتِ وجد
+      اثنَين فاسدَين)، **فبقي المقياسُ يسأل عن مفردةٍ لا وجودَ لها**.
+      وهذا بعينِه «صفرٌ من مفردةٍ لا وجودَ لها» — ⛔ **والصفرُ الذي يجيء بانقراضِ
+      رمزِه ليس إنجازًا بل انطفاءُ مقياس**.
+   ◆ **والقارئُ يُوحَّد مع لوحةِ `RPR-02` #١٣** — فعدّادان لسؤالٍ واحدٍ في
+      ملفَّين يتفرّقان، وقد تفرَّقا فعلًا: هذه صفرٌ وتلك ثلاثون.
+   ◆ **وحارسُ المفردة**: إن عاد `owner_code='PLATFORM'` إلى الظهورِ فالمقياسُ
+      يجمع الاثنين ولا يُسقط أحدَهما. */
+$platVerdict = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry
+                            WHERE ownership_verdict = 'PLATFORM_SHARED'
+                              AND on_disk = 1");
+$platLegacy  = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry WHERE owner_code = 'PLATFORM'");
+$platReg     = $tbl('repair01_platform_capabilities')
+             ? (int) $one("SELECT COUNT(*) FROM repair01_platform_capabilities") : 0;
+$plat = $platVerdict + $platLegacy;
 $add('أسطحُ `PLATFORM` بلا تبريرٍ منصّيٍّ معتمَد', 'صفر', '١٢ تحتاج مراجعة', $plat,
-     'والرمزُ نُقل إلى سجلٍّ مستقلٍّ (`2027_12_20`)');
+     "أسطحٌ حكمُ ملكيّتِها `PLATFORM_SHARED` **$platVerdict** · وبرمزِ المالكِ القديمِ **$platLegacy** "
+   . "· وسجلُّ القدراتِ المنصّيّةِ فيه **$platReg** ⇒ **لا واحدةَ مسجَّلةٌ بمعرِّفِها وقاعدةِ ظهورِها**. "
+   . '⛔ **وكان يُقرأ صفرًا** بـ`owner_code=\'PLATFORM\'` بعد نقلِ الرمزِ — '
+   . '**صفرٌ من مفردةٍ لا وجودَ لها**، لا إنجازٌ. والقارئُ الآن هو قارئُ `RPR-02` #١٣ نفسُه');
 
 /* ⑨ الرحلاتُ البشرية */
 $add('رحلاتٌ بشريّةٌ كاملةٌ بمسارِها السالب', '٦ من ٦', 'صفر', null,
