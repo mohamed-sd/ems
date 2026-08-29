@@ -65,7 +65,7 @@ $LIVE = "on_disk = 1 AND ownership_verdict <> 'RETIRE'";
 $liveN = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry WHERE $LIVE");
 $rows = array();
 $r = $q("SELECT screen_id, screen_file, route, owner_code, canonical_label_ar,
-                grain_entity, grain_cardinality, guard_kind, source_of_truth,
+                grain_entity, grain_cardinality, grain_fact_scope, guard_kind, source_of_truth,
                 ownership_verdict, ghost_verdict, ghost_why
            FROM repair01_screen_registry
           WHERE $LIVE
@@ -80,6 +80,7 @@ $dual = array(); $foreign = array();
 $r = $q("SELECT grain_entity, COUNT(*) n, COUNT(DISTINCT owner_code) u
            FROM repair01_screen_registry
           WHERE $LIVE AND grain_entity <> '' AND grain_cardinality IN ('ROW','LINE')
+            AND grain_fact_scope = 'OWN_FACT'
           GROUP BY grain_entity");
 while ($x = $r->fetch_assoc()) {
     if ((int) $x['n'] > 1) { $dual[$x['grain_entity']] = (int) $x['n']; }
@@ -106,7 +107,12 @@ $CRIT = array('DUAL_SOURCE' => 0, 'FOREIGN_WRITER' => 0, 'GUARD_BYPASS' => 0,
 $critical = array(); $benign = array(); $inherited = 0;
 foreach ($rows as $s) {
     $why = array();
-    $writes = in_array($s['grain_cardinality'], array('ROW', 'LINE'), true) && $s['grain_entity'] !== '';
+    /* ⛔ **والكاتبُ من يكتب حقيقةً يملكها** — `grain_fact_scope='OWN_FACT'`.
+       فسطحٌ كيانُه من **كِيتٍ مشتركٍ** أو **بنيةٍ صِرفةٍ** ليس كاتبَ حقيقةِ أعمال،
+       وعدُّه حرجًا **هو بعينِه الخرقُ الكاذبُ** الذي أزاله قياسُ الحبّةِ داخلَ نفسِه
+       (‏٢٦٥ خرقًا كاذبًا) ثمَّ عاد في اللوحةِ وهنا. **والقاعدةُ واحدةٌ في المواضعِ كلِّها.** */
+    $writes = in_array($s['grain_cardinality'], array('ROW', 'LINE'), true)
+           && $s['grain_entity'] !== '' && $s['grain_fact_scope'] === 'OWN_FACT';
     if ($writes && isset($dual[$s['grain_entity']]))    { $why[] = 'DUAL_SOURCE';    $CRIT['DUAL_SOURCE']++; }
     if ($writes && isset($foreign[$s['grain_entity']])) { $why[] = 'FOREIGN_WRITER'; $CRIT['FOREIGN_WRITER']++; }
     if ($writes && trim((string) $s['guard_kind']) === '')      { $why[] = 'GUARD_BYPASS';  $CRIT['GUARD_BYPASS']++; }
