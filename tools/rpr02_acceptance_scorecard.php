@@ -207,10 +207,66 @@ foreach ($bucket as $rows2) {
     foreach ($a as $pos => $z) { $ordTot++; if ($b[$pos][2] === $z[2]) { $ordOk++; } }
 }
 $sbPct = ($grpTot + $ordTot) ? round(($grpOk + $ordOk) * 100 / ($grpTot + $ordTot), 1) : 0;
-$add('تطابق ترتيب السايدبار ومجموعاته مع الملف', '100٪', 'MEASURED', $sbPct . '٪',
-     "المجموعةُ تطابق المعتمَدَ في **$grpOk من $grpTot** · والترتيبُ **$ordOk من $ordTot** "
-   . '(‏مقارنةً **ترتيبيّةً داخلَ المجموعةِ لا قيمةً لقيمة**) · المقامُ بنودٌ حيّةٌ مُصيَّرةٌ '
-   . $navLive . ' — والتفصيلُ في `rpr02_s6_sidebar.php`');
+/* ⛔ **والمقياسُ كان يقيس المخزنَ لا المُصيَّر** — وعنوانُه «مع **الملف**».
+   `nav_items.group_id ⟶ link_groups.name` **لا يُصيَّر أصلًا** لمن له صفٌّ في
+   `nav_canonical` أو إعلانٌ في `gov_target_nav` (‏قيس: **إرثٌ مُصيَّرٌ صفرٌ من
+   ٧٦٧ بندًا مقارَنًا**)، و`unified_nav.php` يأخذ المجموعةَ من الإعلانِ ثمَّ
+   المعتمَد. ⇒ **ففرقُ المخزنِ لا يراه مستخدم**.
+   ⛔ **ومقارنةُ المُصيَّرِ بـ`nav_canonical` دَورٌ لا قياس**: المُصيِّرُ يقرأ منه
+   فتصير المطابقةُ حتميّةً بالبناء (‏قيست ٢٠٩٦/٢٠٩٦).
+   ◆ **والسلطةُ «الملف»** — `repair01_requirements` — والجسرُ إليه **بالمعرِّف**
+   عبرَ `repair01_target_universe` (`MATCHED`). وما لا جسرَ له **يُعلَن محجوبًا
+   على المصالحةِ ولا يُحسب مطابقًا ولا مخالفًا**. */
+$sbOk = 0; $sbBad = 0; $sbNo = 0;
+if ($tbl('gov_target_nav') || true) {
+    $s2r = array();
+    $rq = $conn->query("SELECT screen_id, requirement_id FROM repair01_target_universe
+                         WHERE verdict = 'MATCHED' AND screen_id <> '' AND requirement_id <> ''");
+    while ($rq && $z = $rq->fetch_row()) { $s2r[$z[0]] = $z[1]; }
+    $spg = array();
+    $rq = $conn->query("SELECT requirement_id, group_name FROM repair01_requirements WHERE group_name <> ''");
+    while ($rq && $z = $rq->fetch_row()) { $spg[$z[0]] = $z[1]; }
+    $r2s = array();
+    $rq = $conn->query("SELECT screen_id, route FROM repair01_screen_registry WHERE route <> ''");
+    while ($rq && $z = $rq->fetch_row()) { $r2s[strtolower(trim($z[1], '/'))] = $z[0]; }
+    $cg = array();
+    $rq = $conn->query("SELECT route, group_name FROM nav_canonical WHERE group_name <> ''");
+    while ($rq && $z = $rq->fetch_row()) { $cg[strtolower(trim((string) $z[0], '/'))] = $z[1]; }
+    $dg = array();
+    $rq = @$conn->query("SELECT role_id, route, group_ar FROM gov_target_nav");
+    while ($rq && $z = $rq->fetch_assoc()) {
+        if (strncmp((string) $z['route'], 'GAP:', 4) === 0) { continue; }
+        $k = strtolower(trim(preg_replace('~[?#].*$~', '', (string) $z['route']), '/'));
+        if ($k !== '') { $dg[(int) $z['role_id'] . '|' . $k] = (string) $z['group_ar']; }
+    }
+    $nz = function ($s) {
+        $s = preg_replace('~[\x{064B}-\x{0652}\x{0670}\x{0640}]~u', '', (string) $s);
+        $s = preg_replace('~[\x{0622}\x{0623}\x{0625}]~u', "\u{0627}", $s);
+        $s = preg_replace('~\x{0649}~u', "\u{064A}", $s);
+        $s = preg_replace('~\x{0629}~u', "\u{0647}", $s);
+        $s = preg_replace('~[«»"\'\[\]\-–—/·،,\.]~u', ' ', $s);
+        return trim(preg_replace('~\s+~u', ' ', $s));
+    };
+    $rq = $conn->query("SELECT n.role_id, n.route, g.name AS gname FROM nav_items n
+                        LEFT JOIN link_groups g ON g.id = n.group_id WHERE n.active = 1");
+    while ($rq && $z = $rq->fetch_assoc()) {
+        $b = strtolower(trim(preg_replace('~[?#].*$~', '', (string) $z['route']), '/'));
+        $sc = isset($r2s[$b]) ? $r2s[$b] : '';
+        $rr = ($sc !== '' && isset($s2r[$sc])) ? $s2r[$sc] : '';
+        if ($rr === '' || !isset($spg[$rr])) { $sbNo++; continue; }
+        $k = (int) $z['role_id'] . '|' . $b;
+        $shown = isset($dg[$k]) ? $dg[$k] : (isset($cg[$b]) ? $cg[$b] : (string) $z['gname']);
+        if ($nz($shown) === $nz($spg[$rr])) { $sbOk++; } else { $sbBad++; }
+    }
+}
+$sbDen = $sbOk + $sbBad;
+$add('تطابق ترتيب السايدبار ومجموعاته مع الملف', '100٪', 'MEASURED',
+     ($sbDen ? round($sbOk * 100 / $sbDen, 1) : 0) . '٪',
+     "**المُصيَّرُ** مقابلَ **الملفِّ التصميميّ** (`repair01_requirements` بجسرِ المعرِّف): مطابقٌ **$sbOk** "
+   . "من **$sbDen** · ومحجوبٌ على المصالحة `NO_BRIDGE` **$sbNo** — لا سطحَ مطابَقًا فلا متطلبَ يُقاس عليه. "
+   . "⛔ **وكان يُقاس على المخزن** (`link_groups`) فأعطى **$sbPct%** بمقامٍ " . ($grpTot + $ordTot)
+   . ' — **و`link_groups` لا تُصيَّر أصلًا لمن له معتمَدٌ أو إعلان**، ففرقُ المخزنِ لا يراه مستخدم. '
+   . 'والتفصيلُ في `rpr02_s6_sidebar.php`');
 
 /* ═══ ٩ · أسطحٌ تكتب ومالكُ حقيقتِها مجهول ═══════════════════════════════ */
 /* ⛔ **والمقامُ `OWN_FACT` وحدَه**: `rpr02_grain_measure.php` يفرّق الخاصَّ من

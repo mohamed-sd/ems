@@ -266,6 +266,63 @@ if ($SELF) {
     exit($fail ? 1 : 0);
 }
 
+/* ═══ ③·ب المُصيَّرُ مقابلَ **الملفِّ التصميميّ** — وهو سؤالُ §٥·٦ حرفًا ══════
+   ⛔ **والخطواتُ السبعُ أعلاه تقيس المخزنَ لا المُصيَّر** — وهذا عطبٌ مقيسٌ لا
+      تقدير: `nav_items.group_id ⟶ link_groups.name` **لا يُصيَّر أصلًا** حين
+      يكون للمسارِ صفٌّ في `nav_canonical` أو إعلانٌ في `gov_target_nav`؛
+      و`includes/unified_nav.php` يأخذ الاسمَ من `canonical_ar` متى كان
+      `APPROVED` (‏سطر ٩٤٢..٩٤٥) والمجموعةَ من الإعلانِ ثمَّ المعتمَد.
+      ⇒ **فقياسُ المخزنِ يُنتج فرقًا لا يراه مستخدم**.
+   ⛔ **ومقارنةُ المُصيَّرِ بـ`nav_canonical` دَورٌ لا قياس**: المُصيِّرُ يقرأ منه،
+      فالمطابقةُ تُصبح حتميّةً بالبناءِ لا مقيسة (‏قيست: **٢٠٩٦/٢٠٩٦**).
+   ◆ **والسلطةُ في §٥·٦ هي «الملف»** — `repair01_requirements` — والجسرُ إليه
+      **بالمعرِّفِ لا بالاسم**: المسارُ ⇐ `screen_id` ⇐ `repair01_target_universe`
+      (`MATCHED`) ⇐ `requirement_id`. ⛔ **وما لا جسرَ له لا يُحكَم عليه**:
+      يُعدُّ `NO_BRIDGE` **محجوبًا على المصالحة**، لا مطابقًا ولا مخالفًا.
+   ◆ **و`$specGroup`/`$specOrder` كانتا تُحمَّلان ولا تُستعملان** — الملفُّ
+      يُقرأ ثمَّ يُهمَل، والحكمُ يقع على المصفوفةِ الوسيطة. */
+$scr2req = array();
+$r = $q("SELECT screen_id, requirement_id FROM repair01_target_universe
+          WHERE verdict = 'MATCHED' AND screen_id <> '' AND requirement_id <> ''");
+while ($x = $r->fetch_row()) { $scr2req[$x[0]] = $x[1]; }
+$specByReq = array();
+$r = $q("SELECT requirement_id, unit, group_name, surface, seq FROM repair01_requirements");
+while ($x = $r->fetch_assoc()) { $specByReq[$x['requirement_id']] = $x; }
+$declByRole = array();
+$r = @$conn->query("SELECT role_id, route, group_ar, group_no, item_no FROM gov_target_nav");
+if ($r) {
+    while ($x = $r->fetch_assoc()) {
+        if (strncmp((string) $x['route'], 'GAP:', 4) === 0) { continue; }
+        $k = strtolower(trim(preg_replace('~[?#].*$~', '', (string) $x['route']), '/'));
+        if ($k === '') { continue; }
+        $declByRole[(int) $x['role_id']][$k] = array('g' => (string) $x['group_ar'],
+            'o' => ((int) $x['group_no'] * 1000) + (int) $x['item_no']);
+    }
+}
+$F = array('ok' => 0, 'bad' => 0, 'nobridge' => 0, 'nogroup' => 0);
+$Frt = array(); $Fex = array(); $Fsrc = array('DECL' => 0, 'CANON' => 0, 'LEGACY' => 0);
+foreach ($items as $it) {
+    $rid = (int) $it['role_id'];
+    $b   = strtolower(trim(preg_replace('~[?#].*$~', '', (string) $it['route']), '/'));
+    $scr = isset($byRoute[$b]) ? $byRoute[$b] : null;
+    $rq  = ($scr && isset($scr2req[$scr['screen_id']])) ? $scr2req[$scr['screen_id']] : '';
+    if ($rq === '' || !isset($specByReq[$rq])) { $F['nobridge']++; continue; }
+    $sp = $specByReq[$rq];
+    if (trim((string) $sp['group_name']) === '') { $F['nogroup']++; continue; }
+    $dc = isset($declByRole[$rid][$b]) ? $declByRole[$rid][$b] : null;
+    $cn = isset($canon[$b]) ? $canon[$b] : null;
+    if ($dc) { $shown = $dc['g']; $Fsrc['DECL']++; }
+    elseif ($cn && trim((string) $cn['group_name']) !== '') { $shown = $cn['group_name']; $Fsrc['CANON']++; }
+    else { $shown = (string) $it['group_name']; $Fsrc['LEGACY']++; }
+    if ($norm($shown) === $norm($sp['group_name'])) { $F['ok']++; }
+    else {
+        $F['bad']++; $Frt[$b] = 1;
+        if (count($Fex) < 10) {
+            $Fex[] = $b . ' مُصيَّرٌ «' . $shown . '» · والملفُّ «' . $sp['group_name'] . '» [' . $sp['unit'] . ']';
+        }
+    }
+}
+
 /* ═══ ④ العرض ═══════════════════════════════════════════════════════════ */
 $TITLE = array(
     1 => 'عطِّل ما ليس في الملف بعذرٍ مكتوبٍ ومرجع',
@@ -298,6 +355,23 @@ if ($LIST) {
         foreach ($S[$i]['ex'] as $x) { echo "     · $x\n"; }
     }
 }
+/* ── المُصيَّرُ مقابلَ الملفّ — سؤالُ §٥·٦ حرفًا ── */
+$Fden = $F['ok'] + $F['bad'];
+echo "\n  ══ المُصيَّرُ مقابلَ **الملفِّ التصميميّ** — وهو سؤالُ §٥·٦ حرفًا ══\n";
+printf("     مطابقٌ **%d** · مخالفٌ **%d** (مساراتٌ فريدةٌ %d) · والمقامُ المقارَنُ %d\n",
+       $F['ok'], $F['bad'], count($Frt), $Fden);
+printf("     ⛔ محجوبٌ على المصالحة `NO_BRIDGE` **%d** — لا سطحَ مطابَقًا فلا متطلبَ يُقاس عليه\n", $F['nobridge']);
+printf("     ◆ والملفُّ بلا مجموعةٍ لهذا المتطلب: %d\n", $F['nogroup']);
+printf("     ◆ مصدرُ المجموعةِ المُصيَّرة: إعلانٌ %d · معتمَدٌ %d · إرثٌ %d\n",
+       $Fsrc['DECL'], $Fsrc['CANON'], $Fsrc['LEGACY']);
+if ($Fex) {
+    echo "\n     ── شواهدُ ──\n";
+    foreach ($Fex as $x) { echo "       · $x\n"; }
+}
+echo "\n  ⛔ **والخطواتُ السبعُ أعلاه تقيس المخزنَ لا المُصيَّر** — و`link_groups`\n";
+echo "     لا تُصيَّر أصلًا لمن له صفٌّ معتمَدٌ أو إعلان (‏إرثٌ مُصيَّر: "
+   . $Fsrc['LEGACY'] . " من " . $Fden . "). ⇒ **فرقُ المخزنِ لا يراه مستخدم.**\n";
+echo "  ⛔ **ومقارنةُ المُصيَّرِ بـ`nav_canonical` دَورٌ لا قياس** — المُصيِّرُ يقرأ منه.\n";
 echo "\n  ⛔ **وهذا يقيس ولا يصحّح** — والتصحيحُ يمسّ ملاحةً حيّةً يراها المستخدمون،\n";
 echo "     فيُبنى على هذا السجلِّ بعد قراءتِه لا قبلَها.\n";
 
