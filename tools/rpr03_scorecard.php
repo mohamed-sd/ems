@@ -199,7 +199,22 @@ $fxBehind = (int) $one("SELECT COUNT(*) FROM ems_event_consumers c
                          WHERE c.consumer = 'fx'
                            AND EXISTS(SELECT 1 FROM ems_business_events e
                                        WHERE e.id > c.cursor_event_id)");
-$add('مستهلكون حرجون متوقّفون', 'صفر', '١', $fxBehind, '`fx` حرجٌ بنصِّ الأمرِ لا بعتبة');
+/* ⛔ **و«متوقّف» ليست «يتيم»** — والفرقُ يقلب العلاج: المتوقّفُ يُستأنَف،
+     واليتيمُ **لا معالجَ له في الشيفرة أصلًا** فلن يتحرّك مهما مضى. وقِيس:
+     `cron_events.php` يسجّل بـ`register()` **مستهلكَين فقط** (`finance`
+     و`finance_routing`)، و`fx` ليس منهما ⇒ **صفٌّ يتيمٌ لا عاملٌ متعثِّر**.
+     والأمرُ يصفه «قائمًا ومتوقّفًا ستةَ عشرَ يومًا» — **والمقيسُ يقول غيرَه**،
+     ⛔ فيُعرض الفرقُ ولا يُسكَت عنه (§٢·١: خطُّ الأساسِ تاريخٌ لا حالة). */
+$registered = array();
+if (is_file($ROOT . '/cron_events.php')) {
+    $cronSrc = (string) @file_get_contents($ROOT . '/cron_events.php');
+    if (preg_match_all("~->register\(\s*'([a-z0-9_]+)'~i", $cronSrc, $rm)) { $registered = $rm[1]; }
+}
+$orphan = in_array('fx', $registered, true) ? 'له معالجٌ مسجَّل' : '**يتيمٌ — لا `register()` له في `cron_events.php`**';
+$add('مستهلكون حرجون متوقّفون', 'صفر', '١', $fxBehind,
+     '`fx` حرجٌ بنصِّ الأمرِ لا بعتبة · وحالُه المقيسة: ' . $orphan
+   . ' (‏المسجَّلون: ' . (count($registered) ? implode(' · ', $registered) : 'لا أحد') . ') '
+   . '⇒ ⛔ **العلاجُ توصيلُ معالجٍ أو تقاعدٌ بحكمٍ — لا استئنافُ عامل**');
 
 /* ⑲ جدولةُ المهامّ */
 /* ⛔ **صفرٌ من عمودٍ لا وجودَ له**: كان يُقرأ `ems_job_queue.status` **والعمودُ
