@@ -92,8 +92,20 @@ $maxId = (int) $one("SELECT COALESCE(MAX(id),0) FROM ems_business_events");
 $behind = (int) $one("SELECT COUNT(*) FROM ems_event_consumers c
                        WHERE EXISTS(SELECT 1 FROM ems_business_events e
                                      WHERE e.id > c.cursor_event_id)");
-$add('مستهلكٌ متوقّفٌ بلا إنذار', 'صفر', '١ متوقّفٌ ١٦ يومًا', $behind,
-     '**والإنذارُ نفسُه لم يُبنَ** — فكلُّ متأخِّرٍ بلا إنذار');
+/* ⛔ **والمقياسُ «بلا إنذار» لا «متأخِّر»** — والصفةُ تُقاس ولا تُفترض:
+     الإنذارُ **مبنيٌّ وموصولٌ** (`EventDispatcher::alertStalledConsumers()`
+     يُنادى في `cron_events.php` · `GAP-07`)، ووسمُه `[BUS-STALL:<المستهلك>]`
+     في `fin_notifications`. فالسؤالُ: **أيُّ متأخِّرٍ لم يُرفَع له وسمُه**.
+     ⛔ ولا يُكتب «الإنذارُ لم يُبنَ» بعدَ أن بُني — صفٌّ متقادمٌ في تقرير. */
+$noAlert = (int) $one("SELECT COUNT(*) FROM ems_event_consumers c
+                        WHERE EXISTS(SELECT 1 FROM ems_business_events e
+                                      WHERE e.id > c.cursor_event_id)
+                          AND NOT EXISTS(SELECT 1 FROM fin_notifications n
+                                          WHERE n.title LIKE CONCAT('[BUS-STALL:', c.consumer, ']%'))");
+$add('مستهلكٌ متوقّفٌ بلا إنذار', 'صفر', '١ متوقّفٌ ١٦ يومًا', $noAlert,
+     'متأخِّرون **' . $behind . '** · ومنهم **بلا وسمِ `[BUS-STALL:…]` مرفوعٍ له: ' . $noAlert . '** — '
+   . 'والإنذارُ **مبنيٌّ وموصولٌ** في `cron_events.php` (`GAP-07`)، ⛔ **لكنَّ دورةَ الأحداثِ نفسَها '
+   . 'من العمّالِ المتعثِّرين** فلا تصل النداءَ');
 
 /* ⑤ و⑥ الاعتماد */
 $add('نافذةُ ظلٍّ للاعتمادِ مقيسةٌ بمقاييسِها الأربعة', 'منفَّذة', 'صفر', null,

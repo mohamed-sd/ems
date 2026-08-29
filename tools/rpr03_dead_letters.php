@@ -65,6 +65,30 @@ while ($x = $r->fetch_assoc()) { $dead[] = $x; }
 $burst = array();
 foreach ($dead as $d) { $burst[$d['event_key']] = (isset($burst[$d['event_key']]) ? $burst[$d['event_key']] : 0) + 1; }
 
+/* ═══ ②·ب **السببُ محفوظٌ — لكنْ في مكانٍ آخر** ═══════════════════════════
+     قيل هنا «سببُ الفشلِ غيرُ محفوظ» لأنَّ `ems_event_dead_letter` فارغٌ
+     و`last_error` خالٍ. **وذاك صحيحٌ عن ذلك الجدولِ وحدَه**. والقياسُ الأوسعُ
+     يقول غيرَه: `ems_event_deliveries` فيه ستٌّ وعشرون صفًّا `state='dlq'`
+     **ولكلٍّ منها `consumer`**، وذلك المستهلكُ **معطَّلٌ بسببٍ مكتوبٍ مسجَّلٍ**
+     في `event_consumers.inactive_reason`.
+     ⇒ فالسببُ **قرارٌ مسجَّلٌ على بُعدِ وصلةٍ واحدة**، لا مفقود. ومن قرأ
+       جدولًا واحدًا وأعلن الغيابَ **قاس ما لم يبحث فيه**.
+     ◆ **والحكمُ عندئذٍ ليس تخمينًا**: المستهلكُ الذي عُطِّل لأنَّه **ليس
+       مستهلكَ ناقلٍ أصلًا** أو **لا طريقةَ له** لم يكن ليُحدث أثرًا لو نجح
+       ⇒ `CLOSE_WITH_REASON` بنصِّ قرارِ تعطيلِه شاهدًا.
+     ⛔ **وما لا يُوصَل إلى قرارٍ مسجَّلٍ يبقى `NEEDS_ADJUDICATION`** — ولا
+        يُغلق بالقياسِ على إخوتِه. */
+$dlqBy = array();
+$r = $conn->query("SELECT d.event_id, d.consumer,
+                          (SELECT c.inactive_reason FROM event_consumers c
+                            WHERE c.consumer_key = d.consumer AND c.active = 0
+                              AND COALESCE(c.inactive_reason,'') <> '' LIMIT 1) AS why,
+                          (SELECT MAX(c2.produces) FROM event_consumers c2
+                            WHERE c2.consumer_key = d.consumer) AS produces
+                     FROM ems_event_deliveries d
+                    WHERE d.state = 'dlq'");
+if ($r) { while ($x = $r->fetch_assoc()) { $dlqBy[(int) $x['event_id']] = $x; } }
+
 $rows = array(); $ruled = 0; $need = 0;
 foreach ($dead as $d) {
     $k = $d['event_key'];
@@ -72,12 +96,25 @@ foreach ($dead as $d) {
         . ' · سُلِّم بنجاحٍ ' . (int) $d['delivered_ok'] . ' وفشل ' . (int) $d['delivered_failed']
         . ' · رايةُ `in_dlq` ' . ((int) $d['in_dlq'] ? 'مرفوعة' : 'مخفوضة')
         . ' · وقعت ' . $d['created_at'];
-    /* ⛔ **ولا حكمَ بلا سبب** — والسببُ غيرُ محفوظ */
-    $rul = 'NEEDS_ADJUDICATION';
-    $reason = $causeKept ? '' : 'سببُ الفشلِ غيرُ محفوظ: `ems_event_dead_letter` فارغٌ '
-            . '(' . $dlqRows . ' صفًّا) ولا `last_error` يُقرأ ⇒ لا يُميَّز عطبٌ عابرٌ '
-            . 'من أثرٍ ناقصٍ من لا-أثر';
-    $need++;
+    $hit = isset($dlqBy[(int) $d['id']]) ? $dlqBy[(int) $d['id']] : null;
+
+    if ($hit && trim((string) $hit['why']) !== '') {
+        $rul = 'CLOSE_WITH_REASON';
+        $reason = 'المستهلكُ «' . $hit['consumer'] . '» معطَّلٌ بقرارٍ مسجَّلٍ: '
+                . mb_substr((string) $hit['why'], 0, 240)
+                . ' ⇒ لم يكن ليُحدث أثرًا لو نجح، فلا إعادةَ ولا تعويض';
+        $ev .= ' · الوصلة: `ems_event_deliveries.state=dlq` ⇐ `consumer=' . $hit['consumer']
+             . '` ⇐ `event_consumers.inactive_reason` · صنفُ إنتاجِه `'
+             . ((string) $hit['produces'] === '' ? '—' : $hit['produces']) . '`';
+        $ruled++;
+    } else {
+        $rul = 'NEEDS_ADJUDICATION';
+        $reason = 'لا صفَّ `dlq` في `ems_event_deliveries` لهذا الحدث، أو مستهلكُه '
+                . 'بلا قرارِ تعطيلٍ مكتوب ⇒ لا سببَ مسجَّلًا يُبنى عليه حكم';
+        $need++;
+    }
+    /* ⛔ **السالبُ يكسر مفردةً فريدة**: حكمٌ يُنزع سببُه */
+    if ($SELF && $rul === 'CLOSE_WITH_REASON' && $ruled === 1) { $reason = ''; }
     $rows[] = array((int) $d['id'], $k, $rul, $reason, $ev);
 }
 
@@ -96,11 +133,17 @@ echo ($flagged > 0 && $dlqRows === 0)
     ? "     ⛔ **الرايةُ ترفع والجدولُ خالٍ** — ولا يُصدَّق أحدُهما بإسكاتِ الآخر\n"
     : "     ✔ متّسقان\n";
 
-echo "\n  ── لماذا لا يُحكَم الآن ──\n";
+echo "\n  ── والسببُ محفوظٌ — لكنْ في مكانٍ آخر ──\n";
 echo "     `Replay` يفترض **عطبًا عابرًا** · و`Compensate` يفترض **أثرًا وقع ناقصًا** ·\n";
 echo "     و`Close` يفترض **أنّه لا أثرَ مقصودًا** — وثلاثتُها تحتاج أن يُعرَف ما الذي فشل.\n";
-echo "     ⛔ **والحكمُ بلا سببٍ تخمينٌ يُغلق ملفًّا ولا يُصلح شيئًا** (§١٢).\n";
-echo "     ⇒ `Track RPR-03 ب blocked at stage: سببُ الفشلِ غيرُ محفوظ`\n";
+printf("     و`ems_event_deliveries` فيه **%d** صفًّا `state='dlq'` بمستهلكِه — **وذلك المستهلكُ\n", count($dlqBy));
+echo "     معطَّلٌ بقرارٍ مكتوبٍ مسجَّلٍ** في `event_consumers.inactive_reason`.\n";
+echo "     ⇒ فالسببُ **قرارٌ مسجَّلٌ على بُعدِ وصلةٍ واحدة** لا مفقود — ومن قرأ جدولًا\n";
+echo "       واحدًا وأعلن الغيابَ **قاس ما لم يبحث فيه**.\n";
+printf("     ✔ **حُكم بالسببِ المسجَّل: %d** · ⛔ وبقي بلا سببٍ مسجَّل: **%d**\n", $ruled, $need);
+if ($need > 0) { echo "     ⇒ `Track RPR-03 ب blocked at stage: سببُ الفشلِ غيرُ مسجَّلٍ لهذه وحدَها`\n"; }
+echo "     ⛔ **والحكمُ بلا سببٍ تخمينٌ يُغلق ملفًّا ولا يُصلح شيئًا** (§١٢) — فما لم\n";
+echo "       يُوصَل إلى قرارٍ مسجَّلٍ لا يُغلق بالقياسِ على إخوتِه.\n";
 
 if ($APPLY) {
     $conn->query("DELETE FROM rpr03_event_dead_letter_rulings");
@@ -126,12 +169,21 @@ printf("**رسالةٌ ميتةٌ بلا حكمٍ منفَّذ: %d من %d** —
 
 if ($SELF) {
     echo "\n═══ الاختبارُ السالب ═══\n";
-    /* ادُّعي أنَّ السببَ محفوظٌ — فيجب أن يسقط سببُ الحجبِ من السجل */
-    $wouldReason = $causeKept ? '' : 'سببُ الفشلِ غيرُ محفوظ';
-    echo ($wouldReason === '')
-        ? "🟢 **حين ادُّعي حفظُ السبب سقط نصُّ الحجب — فالفاحصُ يقرأ الجدولَ لا يفترضه**\n"
-        : "✘ **بقي نصُّ الحجبِ رغمَ الادّعاء** — فالفاحصُ لا يقرأ شيئًا\n";
-    exit(($wouldReason === '') ? 0 : 1);
+    /* ⛔ **والكاسرُ يكسر التمييزَ لا يدّعي حالًا**: نُزع سببُ **حكمٍ واحدٍ**
+       أُغلق (`CLOSE_WITH_REASON` الأوّل) — فيجب أن يظهر «حكمٌ بلا سببٍ = ١».
+       والفحصُ القديمُ كان يقلب رايةَ `$causeKept` وهي لم تعد تحكم شيئًا بعد
+       أن صار السببُ يُقرأ من `event_consumers` — **فمرَّ أخضرَ على لا شيء**. */
+    $blank = 0; $closed = 0;
+    foreach ($rows as $x) {
+        if ($x[2] === 'CLOSE_WITH_REASON') { $closed++; if (trim($x[3]) === '') { $blank++; } }
+    }
+    $fail = 0;
+    if ($closed < 1) { echo "  X لا حكمَ إغلاقٍ واحدًا — لا شيءَ يُكسر\n"; $fail++; }
+    if ($blank !== 1) { echo "  X نُزع سببُ حكمٍ واحدٍ والمرصودُ $blank\n"; $fail++; }
+    echo $fail
+        ? "✘ **الفاحصُ لا يرصد حكمًا نُزع سببُه**\n"
+        : "🟢 **العدّادُ تحرَّك بحكمٍ نُزع سببُه — والسببُ يُقرأ من `event_consumers` لا يُفترض**\n";
+    exit($fail ? 1 : 0);
 }
 
 if ($MD) {
