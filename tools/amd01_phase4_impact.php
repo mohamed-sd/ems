@@ -86,6 +86,26 @@ $AXES = array('DOCUMENTS','DEPARTMENTS','SCREENS','FIELDS','GRAIN','SOURCE_OF_TR
               'DATA','PERMISSIONS','STATE_MACHINES','APPROVALS','EVENTS',
               'INTEGRATIONS','TESTS','MIGRATION');
 
+/* ═══ ③·ب الجسرُ حين يُبنى — والمجالُ الحرُّ لا يكفي وحدَه ═══════════════
+     `DEPARTMENTS` كانت تُشتقّ من `domain` وحدَه، **و`domain` نصٌّ حرٌّ لا
+     يطابق اسمَ إدارةٍ في ثمانين قرارًا**. و`amd01_impact_bridge.php` يحلُّ
+     مفرداتِ الأثرِ إلى `unit_code` بلُغْزٍ **منتزَعٍ من الدستور**، فيصير
+     للقرارِ نطاقٌ مقيسٌ حتى إن أبى مجالُه المطابقة.
+     ⛔ **والجسرُ مصدرٌ ثانٍ لا بديلٌ عن الأوّل**: يُسمّى في `impact_source`
+        كي يُعرف أيُّهما قال، ولا يُخلط المشتقُّ من المجالِ بالمحلولِ من الجسر. */
+$bridgeUnit = array(); $bridgeScreen = array(); $bridgeReady = false;
+$chk = $conn->query("SHOW TABLES LIKE 'repair01_decision_screen_bridge'");
+if ($chk && $chk->num_rows) {
+    $b = $conn->query("SELECT decision_id, resolution, unit_code, screen_id
+                         FROM repair01_decision_screen_bridge
+                        WHERE resolution IN ('SCREEN','UNIT')");
+    while ($x = $b->fetch_assoc()) {
+        if ($x['unit_code']   !== '') { $bridgeUnit[$x['decision_id']][$x['unit_code']] = 1; }
+        if ($x['screen_id']   !== '') { $bridgeScreen[$x['decision_id']][$x['screen_id']] = 1; }
+    }
+    $bridgeReady = count($bridgeUnit) > 0 || count($bridgeScreen) > 0;
+}
+
 $rows = array(); $proj = 0; $need = 0;
 $r = $conn->query("SELECT decision_id, domain, affected_documents, affected_screens,
                           affected_rules, migration_impact, code_impact, evidence
@@ -102,13 +122,25 @@ while ($d = $r->fetch_assoc()) {
         'DEPARTMENTS' => array($codes ? implode(' · ', $codes) : '',
                                'repair01_departments.name_ar × repair01_decisions.domain'),
     );
+    /* الجسرُ يسدُّ ما أبى المجالُ — ويُسمّى مصدرًا مستقلًّا */
+    if (trim((string) $map['DEPARTMENTS'][0]) === '' && !empty($bridgeUnit[$d['decision_id']])) {
+        $map['DEPARTMENTS'] = array(implode(' · ', array_keys($bridgeUnit[$d['decision_id']])),
+                                    'repair01_decision_screen_bridge.unit_code (T2 · لُغْز الدستور)');
+    }
+    if (!empty($bridgeScreen[$d['decision_id']])) {
+        $map['SCREENS'] = array(implode(' · ', array_keys($bridgeScreen[$d['decision_id']]))
+                              . ' ⟵ ' . $d['affected_screens'],
+                                'repair01_decision_screen_bridge.screen_id (T1) + affected_screens');
+    }
     foreach ($AXES as $ax) {
         if (isset($map[$ax]) && trim((string) $map[$ax][0]) !== '') {
             $rows[] = array($d['decision_id'], $ax, $map[$ax][0], $map[$ax][1], 'PROJECTED', '');
             $proj++;
         } else {
             $why = ($ax === 'DEPARTMENTS')
-                 ? 'مجالُ القرارِ «' . $d['domain'] . '» لا يطابق اسمَ إدارةٍ في الجدول — ولا يُخمَّن'
+                 ? 'مجالُ القرارِ «' . $d['domain'] . '» لا يطابق اسمَ إدارةٍ في الجدول'
+                   . ($bridgeReady ? ' · **ولا الجسرُ حلَّ له نطاقًا**: مفرداتُه بلا بادئةٍ معرَّفةٍ في الدستور' : '')
+                   . ' — ولا يُخمَّن'
                  : $BRIDGE_WHY;
             $rows[] = array($d['decision_id'], $ax, null, '', 'NEEDS_ADJUDICATION', $why);
             $need++;
