@@ -222,14 +222,20 @@ $add('شاشة PLATFORM بلا تبرير منصّي معتمد', 'صفر', 'MEA
    . 'فالأربعةُ مجتمعةً غيرُ مستوفاةٍ ولا واحدةٌ تُعفى');
 
 /* ═══ ١٤ · ملفُّ مكتبةٍ مسجَّلٌ شاشةً — وقاعدةٌ مانعةٌ مفعَّلة ═══════════ */
+/* ⛔ **والمفتاحُ يُقاس قبلَ أن يُصدَّق صفرُه**: `screen_file` يحمل **اسمَ الملفِّ
+   وحدَه** (`Payments.php`) لا مسارَه، فالبحثُ فيه عن `vendor/` **صفرٌ من مفردةٍ
+   لا وجودَ لها** — أخضرُ كاذبٌ بامتياز. والمسارُ في `route`، وبه يظهر الصفّان
+   ثمَّ يُصفّيهما حكمُ `RETIRE` المسجَّل ⇒ **صفرٌ صادقٌ عن مقامٍ حقيقيٍّ اثنين**. */
+$vendAll = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry WHERE route LIKE 'vendor/%'");
 $vend = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry
-                     WHERE screen_file LIKE '%vendor/%' AND ownership_verdict <> 'RETIRE'");
+                     WHERE route LIKE 'vendor/%' AND ownership_verdict <> 'RETIRE'");
 $rule = (int) $one("SELECT COUNT(*) FROM information_schema.CHECK_CONSTRAINTS
                      WHERE CONSTRAINT_SCHEMA = DATABASE() AND CONSTRAINT_NAME LIKE '%vendor%'");
 $barTool = is_file($ROOT . '/tools/repair01_w2_gate.php') || is_file($ROOT . '/tools/rpr02a_gates.php');
 $add('ملف مكتبة مسجَّل شاشةً — وقاعدة مانعة مفعَّلة', 'صفر · مفعَّلة', 'MEASURED',
      $vend . ' · ' . (($rule > 0 || $barTool) ? 'حاجبٌ قائم' : 'لا قاعدة'),
-     "ملفّاتُ `vendor/` غيرُ الموسومةِ `RETIRE`: **$vend** (‏والمسجَّلةُ `RETIRE` حكمٌ مسجَّلٌ لا عطب) · "
+     "ملفّاتُ `vendor/` **بالمسارِ لا باسمِ الملفّ**: $vendAll · وغيرُ الموسومةِ `RETIRE`: **$vend** "
+   . '(‏والموسومةُ حكمٌ مسجَّلٌ في §١١ لا عطبٌ مفتوح) · '
    . 'قيدُ مخطَّطٍ باسمِ المكتبة: ' . $rule . ' · حاجبٌ في العُدّة: ' . ($barTool ? 'نعم' : 'لا'));
 
 /* ═══ ١٥ · أهدافٌ خرجت من المقامِ بلا مرجعِ قرارِ مالك ═══════════════════ */

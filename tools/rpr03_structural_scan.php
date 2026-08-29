@@ -69,14 +69,15 @@ function ems_reaches_shell($file, $ROOT, $depth = 0, &$seen = array())
 }
 
 $rows = array();
-$r = $conn->query("SELECT screen_id, screen_file, route FROM repair01_screen_registry
+$r = $conn->query("SELECT screen_id, screen_file, route, ownership_verdict
+                     FROM repair01_screen_registry
                     WHERE lifecycle IN ('LIVE_REGISTERED','LIVE_UNREGISTERED')
                       AND screen_file <> '' ORDER BY screen_id");
 while ($x = $r->fetch_assoc()) { $rows[] = $x; }
 
 $scanned = 0; $json = 0; $unresolved = 0; $byName = 0;
 $noShell = array(); $noAlt = array(); $noLabel = array();
-$vendorReg = array(); $apiCtl = array();
+$vendorReg = array(); $vendorRuled = array(); $apiCtl = array();
 $tables = 0; $wrapHints = 0;
 
 foreach ($rows as $s) {
@@ -104,7 +105,15 @@ foreach ($rows as $s) {
            وهو مقياسٌ مستقلٌّ في `RPR-02` §١٢ (`GAP-67`). ⛔ فلا يُبتلع هنا.
          · `api/` وحدةُ تحكُّمٍ تردُّ بيانًا لا صفحة. */
     $rel = ltrim(str_replace('\\', '/', (string) $s['route']), '/');
-    if (strpos($rel, 'vendor/') === 0) { $vendorReg[] = $s['screen_id'] . ' · ' . $rel; $scanned--; continue; }
+    if (strpos($rel, 'vendor/') === 0) {
+        /* ⛔ **والحكمُ المسجَّلُ يُقرأ قبلَ أن يُعلَن عيب**: ملفُّ المكتبةِ الموسومُ
+           `RETIRE` **حكمٌ صادرٌ في `RPR-02` §١١ (`GAP-67`) لا عطبٌ مفتوح**.
+           ولو أُعلن هنا عيبًا لتناقض عدّادان على مفردةٍ واحدة — وذاك عطبُ
+           قراءةٍ لا عطبُ نظام ([[counter-parity-two-readers]]). */
+        if ((string) $s['ownership_verdict'] === 'RETIRE') { $vendorRuled[] = $s['screen_id'] . ' · ' . $rel; }
+        else { $vendorReg[] = $s['screen_id'] . ' · ' . $rel; }
+        $scanned--; continue;
+    }
     if (strpos($rel, 'api/') === 0)    { $apiCtl[] = $s['screen_id'] . ' · ' . $rel; $scanned--; continue; }
     $seen = array();
     if (!ems_reaches_shell($path, $ROOT, 0, $seen)) { $noShell[] = $s['screen_id'] . ' · ' . $s['route']; }
@@ -140,6 +149,11 @@ printf("  حُلَّت بالاسمِ لا بالمسار: %d ⛔ (‏١٥ اس�
 printf("  ◆ خارجَ المقامِ بحكمِه: **ملفُّ مكتبةٍ مسجَّلٌ شاشةً %d** ⛔ (`RPR-02` §١٢ · `GAP-67`)"
      . " · وحدةُ تحكُّمِ `api` %d\n", count($vendorReg), count($apiCtl));
 foreach ($vendorReg as $x) { echo "       ⛔ " . $x . "\n"; }
+if ($vendorRuled) {
+    printf("  ◆ **وملفُّ مكتبةٍ بحكمٍ مسجَّلٍ `RETIRE`: %d** — حكمٌ صادرٌ (`RPR-02` §١١ · `GAP-67`) لا عطبٌ مفتوح\n",
+           count($vendorRuled));
+    foreach ($vendorRuled as $x) { echo "       ✔ " . $x . "\n"; }
+}
 echo "\n";
 printf("  ① منفذُ العرضِ واللغةُ والاتجاه — عبرَ قشرةِ المستند\n");
 printf("     **بلا قشرة: %d** من %d\n", count($noShell), $scanned);
