@@ -129,9 +129,27 @@ $add('مطابقة آلة الحالة لكل معاملة', '100٪', 'MEASURED'
 $negFiles = glob($ROOT . '/tools/*negative*.php');
 $negN = $negFiles ? count($negFiles) : 0;
 $sodN = $tbl('repair01_w4_decisions') ? (int) $one("SELECT COUNT(*) FROM repair01_w4_decisions") : 0;
-$add('اختبار سالب لفصل الواجبات الحرج', '100٪', 'BLOCKED', '—',
-     "فواحصُ سالبةٌ على القرص **$negN** · **ولا سجلَّ يربط فاحصًا بفصلِ واجباتٍ بعينِه** ⇒ "
-   . 'العددُ لا يصلح بسطًا ولا مقامًا. `blocked at stage: سجلُّ فصلِ الواجباتِ الحرجِ بمعرِّفاتِه`');
+/* ✔ **والحاجزُ ارتفع** بـ`rpr02_sod_test_registry.php`: المقامُ صار مقيسًا من
+   جداولِ `repair01_w*_sod` العشرةِ بمفتاحِ `process_key` — **والعشرون كانت بسطًا
+   موهومًا لمقامٍ غيرِ موجود**. ⛔ ولا يُترك نصُّ حاجزٍ مرفوعٍ في تقرير. */
+if ($tbl('repair01_sod_test_registry')
+    && (int) $one("SELECT COUNT(*) FROM repair01_sod_test_registry") > 0) {
+    $sdN  = (int) $one("SELECT COUNT(*) FROM repair01_sod_test_registry");
+    $sdB  = (int) $one("SELECT COUNT(*) FROM repair01_sod_test_registry WHERE bound = 1");
+    $sdAb = (int) $one("SELECT COUNT(*) FROM repair01_sod_test_registry WHERE enforced_kind = 'ABSENT'");
+    $sdPr = (int) $one("SELECT COUNT(*) FROM repair01_sod_test_registry WHERE enforced_kind = 'PROSE'");
+    $add('اختبار سالب لفصل الواجبات الحرج', '100٪', 'MEASURED',
+         ($sdN ? round($sdB * 100 / $sdN, 1) : 0) . '٪',
+         "$sdB من **$sdN** فصلَ واجبٍ حرجٍ يذكره فاحصٌ سالبٌ أو حاجبٌ بمعرِّفِه — والفواحصُ على القرص **$negN** "
+       . 'وكانت **بسطًا موهومًا لمقامٍ غيرِ موجود**. '
+       . "و`enforced_by` **لا يصلح مفتاحًا**: `PROSE` $sdPr · `ABSENT` $sdAb (W6·W15 بلا عمودٍ أصلًا) "
+       . '⇒ فالمفتاحُ `process_key`. ⛔ **وهذا ادّعاءُ حراسةٍ لا إثباتُ حمرة**');
+} else {
+    $add('اختبار سالب لفصل الواجبات الحرج', '100٪', 'BLOCKED', '—',
+         "فواحصُ سالبةٌ على القرص **$negN** · **ولا سجلَّ يربط فاحصًا بفصلِ واجباتٍ بعينِه** ⇒ "
+       . 'العددُ لا يصلح بسطًا ولا مقامًا. `blocked at stage: سجلُّ فصلِ الواجباتِ الحرجِ بمعرِّفاتِه` '
+       . '— **شغِّلْ `php tools/rpr02_sod_test_registry.php --apply`**');
+}
 
 /* ═══ ٦ · مرجعُ مصدرٍ صريحٌ لكلِّ إسقاطٍ منطبق ═══════════════════════════ */
 $prj = (int) $one("SELECT COUNT(*) FROM $LIVE AND surface_kind = 'PROJECTION'");
