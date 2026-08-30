@@ -289,10 +289,27 @@ if (is_file($ROOT . '/cron_events.php')) {
     if (preg_match_all("~->register\(\s*'([a-z0-9_]+)'~i", $cronSrc, $rm)) { $registered = $rm[1]; }
 }
 $orphan = in_array('fx', $registered, true) ? 'له معالجٌ مسجَّل' : '**يتيمٌ — لا `register()` له في `cron_events.php`**';
+/* ⛔ **و`fx` ليس وحدَه** — والمقياسُ يسمّيه حرجًا بنصِّ الأمر، **لكنَّ المقيسَ
+   يقول إنَّ الناقلَ كلَّه ساكن**: مؤشِّراتُ المستهلكين الأربعةِ كلُّها متأخِّرةٌ
+   عن آخرِ حدث. ⇒ **يُعرض تأخُّرُ كلٍّ بعددِه** كي لا يُقرأ «واحدٌ متوقّف»
+   على أنَّ البقيّةَ تسير. */
+$busMax = (int) $one("SELECT COALESCE(MAX(id),0) FROM ems_business_events");
+$busLag = array();
+$rr = $conn->query("SELECT consumer, cursor_event_id FROM ems_event_consumers ORDER BY cursor_event_id DESC");
+while ($rr && $z = $rr->fetch_assoc()) {
+    $busLag[] = '`' . $z['consumer'] . '` ' . number_format($busMax - (int) $z['cursor_event_id']);
+}
+$busWit = $busLag
+    ? ' · ⛔ **والناقلُ كلُّه ساكنٌ لا `fx` وحدَه** — تأخُّرُ كلِّ مستهلكٍ عن آخرِ حدثٍ ('
+      . number_format($busMax) . '): ' . implode(' · ', $busLag)
+      . ' ⇒ **فأقلُّهم تأخُّرًا متأخِّرٌ بعشراتِ الآلاف**، و«واحدٌ حرجٌ متوقّف» لا تصف الحال'
+    : '';
 $add('مستهلكون حرجون متوقّفون', 'صفر', '١', $fxBehind,
      '`fx` حرجٌ بنصِّ الأمرِ لا بعتبة · وحالُه المقيسة: ' . $orphan
    . ' (‏المسجَّلون: ' . (count($registered) ? implode(' · ', $registered) : 'لا أحد') . ') '
-   . '⇒ ⛔ **العلاجُ توصيلُ معالجٍ أو تقاعدٌ بحكمٍ — لا استئنافُ عامل**');
+   . '⇒ ⛔ **العلاجُ توصيلُ معالجٍ أو تقاعدٌ بحكمٍ — لا استئنافُ عامل**'
+   . ' ◆ و`FxRevaluationService` و`FxSettlementService` **موجودان على القرص** — فالناقصُ **التوصيلُ لا البناء**, ⛔ **وتوصيلُه يُشغِّل ترحيلًا ماليًّا فلا يُفعَّل بلا قرار**'
+   . $busWit);
 
 /* ⑲ جدولةُ المهامّ */
 /* ⛔ **صفرٌ من عمودٍ لا وجودَ له**: كان يُقرأ `ems_job_queue.status` **والعمودُ
