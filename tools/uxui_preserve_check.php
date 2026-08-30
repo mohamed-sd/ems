@@ -195,6 +195,29 @@ foreach (uxp_root_roles() as $rid) {
         $k = upc_key($p['href'], $p['label']);
         $now[$k] = isset($now[$k]) ? $now[$k] + 1 : 1;
     }
+    /* ══ البابُ الخامس: مُنِع بقالبٍ نافذٍ — من المصدرِ الذي يقرؤه المُصيِّرُ ══
+       ◆ طبقةُ قوالبِ GOV-AUTH-01 سجلٌّ محكومٌ («لا شاشةَ خارجَ القالب» — قرارُ
+         المالك 2026-08-17)، والمُصيِّرُ صار يحجب رابطًا بابُه مردودٌ بالقالبِ
+         (RPR-03 §٦). فغيابُه هنا **إنفاذُ سجلٍّ لا فقدٌ صامت** — ويُقاس من
+         حالةِ قالبِ مستخدمِ القياسِ نفسِه (الجلسةُ بعد التصييرِ تحمله) لا من
+         قائمةٍ في الكود. ومتى ردَّ المالكُ البندَ للقالبِ (OA-TEMPLATE-15)
+         عاد الرابطُ وخرج من هذا البابِ وحدَه. */
+    $tplDeniedHere = array();
+    if (function_exists('unifiedNavTemplateState')) {
+        $__tplR = unifiedNavTemplateState($conn);
+        if (!empty($__tplR['covered'])) {
+            $__tq = @mysqli_query($conn, "SELECT LOWER(n.route) rt, m.code
+                                            FROM nav_items n JOIN modules m ON m.id = n.module_id
+                                           WHERE n.role_id = " . (int) $rid . " AND n.active = 1
+                                             AND n.permission_code IS NOT NULL AND n.permission_code <> ''");
+            while ($__tq && ($__tx = mysqli_fetch_assoc($__tq))) {
+                if (!isset($__tplR['allowed'][(string) $__tx['code']])) {
+                    $f0 = strtolower(preg_replace('/[?#].*$/u', '', preg_replace('~^(\.\./)+~', '', trim($__tx['rt']))));
+                    if ($f0 !== '') { $tplDeniedHere[$f0] = true; }
+                }
+            }
+        }
+    }
     $p = isset($pre[$rid]) ? $pre[$rid] : array();
     $cntPre = array_sum($p); $cntNow = array_sum($now);
     $totPre += $cntPre; $totNow += $cntNow;
@@ -202,7 +225,7 @@ foreach (uxp_root_roles() as $rid) {
     $preF = array(); $nowF = array();
     foreach ($p as $k => $c)   { list($f, $l) = explode('||', $k, 2); $preF[$f]['labels'][$l] = ($preF[$f]['labels'][$l] ?? 0) + $c; $preF[$f]['n'] = ($preF[$f]['n'] ?? 0) + $c; }
     foreach ($now as $k => $c) { list($f, $l) = explode('||', $k, 2); $nowF[$f]['labels'][$l] = ($nowF[$f]['labels'][$l] ?? 0) + $c; $nowF[$f]['n'] = ($nowF[$f]['n'] ?? 0) + $c; }
-    $missing = array(); $renamedHere = 0; $mergedHere = 0; $absorbedHere = 0; $isolatedHere = 0; $quickHere = 0;
+    $missing = array(); $renamedHere = 0; $mergedHere = 0; $absorbedHere = 0; $isolatedHere = 0; $quickHere = 0; $tplHere = 0;
     foreach ($preF as $f => $P) {
         /* ملفٌّ اختفى من الدور = فقدٌ صريح — إلا أن يكون **ذاب في وارثٍ مُعلَنٍ
            حاضرٍ في الدورِ نفسِه**: الإعلانُ من nav_redirects والحضورُ مقيسٌ الآن. */
@@ -232,6 +255,12 @@ foreach (uxp_root_roles() as $rid) {
         }
         if (!isset($nowF[$f]) && isset($forbiddenBySpace[$rid][mb_strtolower($f)])) {
             $isolatedHere += $P['n'];
+            continue;
+        }
+        /* مُنِع بقالبٍ نافذٍ — إنفاذُ سجلِّ GOV-AUTH-01 (البابُ الخامس أعلاه) */
+        if (!isset($nowF[$f]) && isset($tplDeniedHere[mb_strtolower($f)])) {
+            $isolatedHere += $P['n'];   /* المقامُ نفسُه: إزالةٌ مصرَّحةٌ بسجلٍّ */
+            $tplHere      += $P['n'];
             continue;
         }
         if (!isset($nowF[$f]) && isset($quickMoved[$rid][mb_strtolower($f)])) {
@@ -268,6 +297,7 @@ foreach (uxp_root_roles() as $rid) {
     echo ($ok ? '  ✔' : '  ✗') . " دور {$rid}: قبل={$cntPre} · بعد={$cntNow}"
         . ($absorbedHere ? " · ذاب في وارثٍ مُعلَنٍ حاضر={$absorbedHere}" : '')
         . ($isolatedHere ? " · **أُزيل بعزلٍ مصرَّحٍ={$isolatedHere}**" : '')
+        . ($tplHere ? " · **مُنِع بقالبٍ نافذٍ={$tplHere}**" : '')
         . ($quickHere ? " · **نُقل إلى بلاطةٍ={$quickHere}**" : '')
         . ($renamedHere ? " · أُعيدت تسميتُه بالسجل={$renamedHere}" : '')
         . ($mergedHere ? " · توأمٌ مندمجٌ باسمٍ واحد={$mergedHere}" : '')

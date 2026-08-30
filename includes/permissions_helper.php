@@ -295,6 +295,45 @@ function check_delete_permission($conn, $module_id, $message = '❌ لا توج�
  * echo $perms['can_edit'] ? '✅' : '❌';  // تعديل
  * echo $perms['can_delete'] ? '✅' : '❌';// حذف
  */
+/**
+ * حالةُ قالبِ المستخدمِ الحاليِّ (GOV-AUTH-01) — قارئُ طبقةِ المصدرِ للتصيير.
+ *
+ * تُطابق دلالةَ get_module_permissions حرفًا: التغطيةُ = منحةٌ نافذةٌ واحدةٌ
+ * فأكثرُ لقالبٍ نشطٍ؛ والمسموحُ = أكوادُ الشاشاتِ التي MAX(allow)=1 عبر قوالبِه
+ * (فمنعُ قالبٍ يغلبه سماحُ آخرَ — عينُ MAX هناك). سلامةُ الفشل: أيُّ خللٍ في
+ * القراءةِ ⇒ غيرُ مغطًّى، فيبقى العرضُ على المنحِ القائمِ والحارسُ في الوجهة.
+ * والمخبأُ بهويّةِ المستخدمِ لا بالوجودِ المجرَّد — فمجسّاتُ القياسِ تُصيِّر
+ * أدوارًا عدّةً في عمليّةٍ واحدةٍ مبدِّلةً الجلسةَ، ومخبأٌ ساكنٌ أعمى يُلبس
+ * الجميعَ قالبَ أوّلِهم.
+ *
+ * @return array{covered:bool, allowed:array<string,1>}
+ */
+function ems_template_nav_state($conn) {
+    static $cache = array();
+    $uid = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
+    $role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
+    if (isset($cache[$uid])) { return $cache[$uid]; }
+    $st = array('covered' => false, 'allowed' => array());
+    if ($uid <= 0 || $role === '-1') { $cache[$uid] = $st; return $st; }
+    $q = @mysqli_query($conn,
+        "SELECT i.item_ref, MAX(i.allow) mx
+           FROM gov_authority_grants g
+           JOIN gov_role_profiles p ON p.profile_id = g.profile_id AND p.state = 'active'
+           LEFT JOIN gov_profile_items i ON i.profile_id = p.profile_id AND i.item_kind = 'screen'
+          WHERE g.user_id = " . $uid . " AND g.revoked_at IS NULL
+            AND (g.valid_to IS NULL OR g.valid_to > NOW())
+          GROUP BY i.item_ref");
+    if (!$q) { $cache[$uid] = $st; return $st; }
+    while ($x = mysqli_fetch_assoc($q)) {
+        $st['covered'] = true;                       /* صفٌّ واحدٌ = منحةٌ نافذةٌ لقالبٍ نشط */
+        if ($x['item_ref'] !== null && (int) $x['mx'] === 1) {
+            $st['allowed'][(string) $x['item_ref']] = 1;
+        }
+    }
+    $cache[$uid] = $st;
+    return $st;
+}
+
 function get_module_permissions($conn, $module_id) {
     if (!isset($_SESSION['user']) || !isset($_SESSION['user']['role'])) {
         return [

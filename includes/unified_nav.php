@@ -64,6 +64,25 @@ function unifiedNavEnabled($roleId, $csv = null) {
 }
 
 /**
+ * حالةُ قالبِ المستخدمِ الحاليِّ (GOV-AUTH-01) — للتصييرِ لا للحراسة.
+ *
+ * القارئُ الفعليُّ في طبقةِ المصدرِ `permissions_helper.php`
+ * (`ems_template_nav_state`) — فالمحرّكُ لا يقرأ جدولَ صلاحيةٍ بنفسِه،
+ * وهذا الغلافُ يضمن تحميلَ المُساعِدِ ويُبقي اسمَ النداءِ القائم.
+ *
+ * @return array{covered:bool, allowed:array<string,1>}
+ */
+function unifiedNavTemplateState($conn) {
+    if (!function_exists('ems_template_nav_state')) {
+        require_once __DIR__ . '/permissions_helper.php';
+    }
+    if (!function_exists('ems_template_nav_state')) {
+        return array('covered' => false, 'allowed' => array());
+    }
+    return ems_template_nav_state($conn);
+}
+
+/**
  * عناصر الدور الظاهرة: تبعيةٌ (active=1) × صلاحية (can_view=1 أو بلا فحص).
  * استعلامٌ واحد — الرابطُ الميت مستبعدٌ بنيويًّا لا برأي الشاشة.
  */
@@ -79,9 +98,11 @@ function getUnifiedNavItems($conn, $roleId) {
     $doorOrder = implode(',', array_map(function ($d) { return "'" . $d . "'"; },
         array_keys(unifiedNavDoors())));
     $sql = "SELECT n.door, n.group_id, n.label_ar, n.route, n.icon, n.sort_order,
-                   n.counter_source, g.name AS group_name,
+                   n.counter_source, n.permission_code, m.code AS module_code,
+                   g.name AS group_name,
                    g.stage_no, g.stage_title, g.stage_desc, g.display_order AS group_order
             FROM nav_items n
+            LEFT JOIN modules m ON m.id = n.module_id
             LEFT JOIN link_groups g ON g.id = n.group_id AND g.is_active = 1
             WHERE n.role_id = {$roleId} AND n.active = 1
               AND (
@@ -95,6 +116,21 @@ function getUnifiedNavItems($conn, $roleId) {
     $items = array();
     $res = mysqli_query($conn, $sql);
     if ($res) { while ($row = mysqli_fetch_assoc($res)) { $items[] = $row; } }
+
+    /* ── RPR-03 §٦ — طبقةُ قوالبِ GOV-AUTH-01 في قرارِ الظهورِ نفسِه ─────────
+       المغطّى بقالبٍ نافذٍ يُحكَم بقالبِه حصرًا (دلالةُ get_module_permissions
+       حرفًا: «لا شاشةَ خارجَ القالب») — فرابطٌ يمنعه القالبُ لا يُصيَّر أصلًا،
+       بدل أن يظهرَ ويُردَّ بابُه. استعلامان مجمَّعان للمستخدمِ لا نداءٌ لكلِّ
+       رابطٍ — وغيرُ المغطّى على المنحِ القائمِ كما هو. */
+    $tpl = unifiedNavTemplateState($conn);
+    if ($tpl['covered']) {
+        $items = array_values(array_filter($items, function ($it) use ($tpl) {
+            $pc = isset($it['permission_code']) ? trim((string) $it['permission_code']) : '';
+            if ($pc === '') { return true; }               /* بلا فحصٍ — حارسُه في وجهتِه */
+            $code = (string) ($it['module_code'] ?? '');
+            return $code !== '' && isset($tpl['allowed'][$code]);
+        }));
+    }
 
     // H-20: سايدبارُ المشرف الخارجي «أضيقُ عمدًا» (UX-05 §4) — الجلسةُ
     // المقيَّدةُ بمورد تُرشَّح عناصرُها لقائمة البوابة (إخفاءٌ لا حذفُ منح).
@@ -1036,6 +1072,21 @@ function printEmsTenGroupNav($conn, $items, $uxMap, $uxCurMap, $basePrefix, $bad
                                                              AND p.`role_id` = n.`role_id` AND p.`can_view` = 1)");
         while ($__pq2 && ($__pr2 = mysqli_fetch_assoc($__pq2))) {
             $navDisabled[uxuiNavBaseRoute($__pr2['route'])] = true;
+        }
+        /* والمُنَعُ **بالقالبِ** يُعلَّم كما يُعلَّم المُنَعُ بالمنحِ — الثقبُ
+           نفسُه من البابِ الثالث: بندٌ رشَّحته طبقةُ القوالبِ أعلاه لا يجوز
+           أن تعيدَ هذه الحلقةُ اصطناعَه من السجلّ. */
+        $__tpl2 = unifiedNavTemplateState($conn);
+        if ($__tpl2['covered']) {
+            $__tq2 = @mysqli_query($conn, "SELECT n.`route`, m.`code` FROM `nav_items` n
+                                            JOIN `modules` m ON m.`id` = n.`module_id`
+                                            WHERE n.`role_id` = " . $__rid2 . " AND n.`active` = 1
+                                              AND n.`permission_code` IS NOT NULL AND n.`permission_code` <> ''");
+            while ($__tq2 && ($__tr2 = mysqli_fetch_assoc($__tq2))) {
+                if (!isset($__tpl2['allowed'][(string) $__tr2['code']])) {
+                    $navDisabled[uxuiNavBaseRoute($__tr2['route'])] = true;
+                }
+            }
         }
     }
 
