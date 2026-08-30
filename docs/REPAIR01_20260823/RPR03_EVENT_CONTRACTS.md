@@ -1,6 +1,6 @@
 # `RPR-03` §٤·٢ — عقدُ المستهلكِ الفعّال
 
-> ⛔ **مولَّدٌ من تشغيلٍ حيّ**: `php tools/rpr03_business_event_contracts.php --md` · اللقطة `—(بلا نافذة)`
+> ⛔ **مولَّدٌ من تشغيلٍ حيّ**: `php tools/rpr03_business_event_contracts.php --md` · اللقطة `SNAP-bff0b8b8-20260830-075131`
 
 ## ① حقولُ العقدِ الخمسةُ في المخزن
 
