@@ -90,7 +90,7 @@ if ($tbl('rpr03_event_classification')) {
    · وحدثان من الثلاثةِ والعشرين **لهما أثرٌ مقيَّدٌ عند المُنتِجِ** في `fin_event_links`.
    ⇒ **فالقراءةُ ليست «لم يُبنَ مستهلك» بل «بُني وعُلِّق على مفردةٍ ميّتة»** — والعلاجُ
      **مصالحةُ المفردتَين** لا كتابةُ مستهلكين جددٍ فوقَ قائمين لا يسمعون. */
-$vDead = 0; $vProd = 0; $vSpoken = 0;
+$vDead = 0; $vProd = 0; $vProdMost = 0; $vSpoken = 0;
 if ($tbl('event_consumers') && $tbl('ems_business_events')) {
     $vSpoken = (int) $one("SELECT COUNT(DISTINCT event_key) FROM ems_business_events");
     $vDead = (int) $one("SELECT COUNT(*) FROM event_consumers e
@@ -99,11 +99,31 @@ if ($tbl('event_consumers') && $tbl('ems_business_events')) {
                             AND NOT EXISTS(SELECT 1 FROM ems_business_events b
                                              WHERE b.event_key = e.event_name)");
     if ($tbl('fin_event_links')) {
-        $vProd = (int) $one("SELECT COUNT(*) FROM rpr03_event_classification k
-                              WHERE k.classification = 'BUSINESS'
-                                AND EXISTS(SELECT 1 FROM fin_event_links l
-                                             JOIN ems_business_events b ON b.id = l.event_id
-                                            WHERE b.event_key = k.event_key)");
+        /* ⛔ **سؤالان لا سؤال** — و`rpr03_consumer_vocabulary.php` يسأل الثاني:
+           · **أثرٌ في واقعةٍ واحدةٍ على الأقلّ** — يقول «الطريقُ مطروق».
+           · **وأثرٌ لأغلبِ وقائعِه** — يقول «الطريقُ **هو** الطريق».
+           والفرقُ بينهما هو الفرقُ بين تجربةٍ عابرةٍ ومسارٍ عامل، **فيُعرضان معًا**. */
+        /* ⛔ **و`fin_event_links` يُكتب بعُرفَي ربطٍ لا بعُرفٍ واحد** — مقيسًا:
+           ١٠٬٤١٧ صفًّا بـ`event_id` و١٠٬٥١٩ بـ`parent_ref`. **وأيُّ الطريقَين وحدَه
+           يُضلِّل**: `revenue.unit.recognized` — **أعلى أحداثِ الأعمالِ حجمًا
+           (٥٬١٩٩ واقعة)** — أثرُه مقيَّدٌ بـ`parent_ref` **وصفرٌ بـ`event_id`**.
+           ⇒ **فالقراءةُ اتّحادُ الطريقَين**، وقارئٌ بطريقٍ واحدٍ يُسقط أهمَّها. */
+        $vK = "CASE b.entity_type WHEN 'timesheet' THEN 'timesheet'
+                    WHEN 'fin_unit_record' THEN 'unit_record'
+                    WHEN 'unit_record' THEN 'unit_record' ELSE 'event' END";
+        $vAny = "EXISTS(SELECT 1 FROM fin_event_links l
+                          WHERE l.event_id = b.id
+                             OR (l.parent_ref = b.entity_id AND l.parent_kind = $vK))";
+        $vProd = (int) $one("SELECT COUNT(*) FROM (
+              SELECT b.event_key FROM ems_business_events b
+                JOIN rpr03_event_classification k ON k.event_key = b.event_key
+               WHERE k.classification = 'BUSINESS'
+               GROUP BY b.event_key HAVING SUM($vAny) > 0) t");
+        $vProdMost = (int) $one("SELECT COUNT(*) FROM (
+              SELECT b.event_key FROM ems_business_events b
+                JOIN rpr03_event_classification k ON k.event_key = b.event_key
+               WHERE k.classification = 'BUSINESS'
+               GROUP BY b.event_key HAVING SUM($vAny) * 2 > COUNT(*)) t");
     }
 }
 /* ⛔ **حارسُ مفردة**: لو أخطأ اسمُ عمودٍ لَعاد الاستعلامُ صفرًا **فقُرئ نجاحًا**
@@ -115,7 +135,7 @@ if ($vSpoken === 0) {
 } else {
     $vNote = " · ⛔ **والعطبُ ليس غيابَ مستهلك**: اشتراكاتُ الأثرِ مبنيّةٌ و**$vDead منها معلَّقٌ على مفردةٍ لم تُنطق قطّ**"
            . " (‏المنطوقُ فعلًا $vSpoken مفردةً) ⇒ **بُني وعُلِّق على مفردةٍ ميّتة**، والعلاجُ **مصالحةُ المفردتَين**"
-           . " لا كتابةُ مستهلكين جددٍ فوقَ قائمين لا يسمعون. ◆ و**$vProd** من المقامِ له **أثرٌ مقيَّدٌ عند المُنتِج**"
+           . " لا كتابةُ مستهلكين جددٍ فوقَ قائمين لا يسمعون. ◆ و**$vProd** من المقامِ له **أثرٌ مقيَّدٌ عند المُنتِج** في واقعةٍ واحدةٍ فأكثرَ، **و$vProdMost لأغلبِ وقائعِه**"
            . ' — ولا يُقرأ ذلك عقدًا: §٤·٢ يوجب الخمسةَ في المستهلك. ⛔ **ولا يُقترح ربطُ اسمٍ باسمٍ** — حكمُ أعمالٍ لا تشابهُ حروف';
 }
 $add('أحداثُ أعمالٍ بلا عقدِ مستهلكٍ فعّال', 'صفر', '١١ من ١١', $bizNoContract,
