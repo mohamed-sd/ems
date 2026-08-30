@@ -92,18 +92,37 @@ $unitCode = function ($unit) use ($U2C) {
     return preg_match('~^\d{2}$~', $p) ? 'DEP-' . $p : (string) $unit;
 };
 
-/* المبنيُّ الحيُّ — مفتاحُه الاسمُ المطبَّع + المالك */
-$live = array(); $liveAny = array(); $liveRows = array();
-$r = $conn->query("SELECT screen_id, owner_code, canonical_label_ar, surface_kind
+/* المبنيُّ الحيُّ — مفتاحُه الاسمُ المطبَّع + المالك.
+   ⛔ **والمُحوِّلُ ليس شاشةً** (`guard_kind='REDIRECT'` — حكمُ W02 المسجَّلُ):
+   لا يدخل حوضَ المطابقةِ سطحًا، بل **تُتبَع وجهتُه المقيسةُ من شيفرتِه**
+   (`ems_route_redirect` يعلنها نصًّا) فيُنسَب اسمُه إلى سطحِ الوجهةِ الحيِّ.
+   فمطابقةُ «طلباتي» تحطُّ على الشاشةِ المدموجةِ لا على بابِها القديم. */
+$live = array(); $liveAny = array(); $liveRows = array(); $byRoute = array(); $convs = array();
+$r = $conn->query("SELECT screen_id, owner_code, canonical_label_ar, surface_kind, guard_kind, route
                      FROM repair01_screen_registry
                     WHERE canonical_label_ar <> ''
                       AND lifecycle IN ('LIVE_REGISTERED','LIVE_UNREGISTERED')");
 while ($x = $r->fetch_assoc()) {
     $n = $norm($x['canonical_label_ar']);
     if ($n === '') { continue; }
+    if ((string) $x['guard_kind'] === 'REDIRECT') { $convs[] = $x; continue; }
     $live[$x['owner_code'] . '|' . $n] = $x;
     if (!isset($liveAny[$n])) { $liveAny[$n] = $x; }
     $liveRows[] = array($x['owner_code'], $n, $x['canonical_label_ar'], $x['screen_id']);
+    $byRoute[strtolower((string) $x['route'])] = $x;
+}
+foreach ($convs as $cv) {
+    $src = (string) @file_get_contents($ROOT . '/' . $cv['route']);
+    if (!preg_match("~ems_route_redirect\s*\([^,]+,\s*'([^']+)'\s*,\s*'([^']+)~", $src, $m)) { continue; }
+    $dest = dirname($m[1]) . '/' . preg_replace('~[?#].*$~', '', $m[2]);
+    $dest = strtolower(str_replace('\\', '/', $dest));
+    if (!isset($byRoute[$dest])) { continue; }
+    $to = $byRoute[$dest];
+    $to = array_merge($to, array('via_conv' => $cv['screen_id'] . ' «' . $cv['canonical_label_ar'] . '» (' . $cv['route'] . ')'));
+    $n = $norm($cv['canonical_label_ar']);
+    /* اسمُ المُحوِّلِ يُنسَب لوجهتِه — ولا يزاحم اسمًا حيًّا قائمًا بنفسِه */
+    if (!isset($live[$cv['owner_code'] . '|' . $n])) { $live[$cv['owner_code'] . '|' . $n] = $to; }
+    if (!isset($liveAny[$n])) { $liveAny[$n] = $to; }
 }
 
 /* دفترُ الأهدافِ غيرِ المبنيّة — والمفتاحُ المركَّبُ يُفكّ */
@@ -155,11 +174,12 @@ while ($x = $r->fetch_assoc()) {
         $row['source'] = 'BOTH';
         $row['scr'] = $L['screen_id'];
         $row['method'] = isset($live[$code . '|' . $n]) ? 'EXACT_UNIT' : 'EXACT_ANY';
-        $row['mwit'] = 'اسمٌ مطبَّعٌ يطابق سطحًا حيًّا: ' . $L['screen_id'] . ' «' . $L['canonical_label_ar'] . '»';
+        $row['mwit'] = 'اسمٌ مطبَّعٌ يطابق سطحًا حيًّا: ' . $L['screen_id'] . ' «' . $L['canonical_label_ar'] . '»'
+                     . (isset($L['via_conv']) ? ' — عبر مُحوِّلٍ مقصودٍ وجهتُه معلنةٌ في شيفرتِه: ' . $L['via_conv'] : '');
         /* ⛔ **الحكمُ القاطعُ وحدَه**: مطابقةٌ تامّةٌ لسطحٍ حيّ */
         $row['verdict'] = 'MATCHED';
         $row['vwit'] = 'مطابقةٌ تامّةٌ بالاسمِ المطبَّعِ لسطحٍ حيٍّ في السجلِّ الرسميّ — الشاهدُ `'
-                     . $L['screen_id'] . '` · لقطة ' . $sid;
+                     . $L['screen_id'] . '`' . (isset($L['via_conv']) ? ' (وجهةُ المُحوِّلِ ' . $L['via_conv'] . ')' : '') . ' · لقطة ' . $sid;
         $verd['MATCHED']++;
     } elseif ($G !== null) {
         $row['source'] = 'BOTH';
