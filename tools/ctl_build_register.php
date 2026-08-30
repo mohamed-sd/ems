@@ -215,15 +215,28 @@ if (!$has) {
    ترفض مسارًا نشطًا بلا صفٍّ في `gov_space_appearances` («الانفتاحُ
    الافتراضيُّ مستهلَك»)، والهجاءُ يُنسخ من صفوفِ الجارِ حرفًا — ⛔ فهجاءٌ
    ثالثٌ مفردةٌ جديدةٌ في عمودٍ محكوم. */
+/* ⛔ **النسخُ كاملُ الأعمدةِ** — `id` بلا توليدٍ ذاتيٍّ فإدخالٌ ناقصُه يسقط
+   صامتًا (قِيس في FLEET-30 فسقطت الخطوةُ كلُّها ٤ مرّاتٍ بلا سطرِ خطأ). */
 $spN = 0;
-$sq = $conn->query("SELECT space_ar, cls FROM gov_space_appearances WHERE route = '" . $e($sibling) . "'");
-while ($sq && ($sz = $sq->fetch_assoc())) {
-    $dup = $one("SELECT COUNT(*) FROM gov_space_appearances
-                  WHERE route = '" . $e($route) . "' AND space_ar = '" . $e($sz['space_ar']) . "'");
-    if ((int) $dup > 0) { continue; }
-    $ok = $conn->query("INSERT INTO gov_space_appearances (route, space_ar, cls)
-            VALUES ('" . $e($route) . "', '" . $e($sz['space_ar']) . "', '" . $e($sz['cls']) . "')");
-    if ($ok) { $spN++; }
+$spCols = array();
+$sq = $conn->query("SHOW COLUMNS FROM gov_space_appearances");
+while ($sq && ($sz = $sq->fetch_assoc())) { $spCols[] = $sz['Field']; }
+$already = (int) $one("SELECT COUNT(*) FROM gov_space_appearances WHERE route = '" . $e($route) . "'");
+if ($already === 0 && $spCols) {
+    $sel = array();
+    foreach ($spCols as $co) {
+        if ($co === 'id') { $sel[] = '@ctlnid := @ctlnid + 1'; }
+        elseif ($co === 'route') { $sel[] = "'" . $e($route) . "'"; }
+        elseif ($co === 'screen_ar') { $sel[] = "'" . $e($label) . "'"; }
+        elseif ($co === 'basis') { $sel[] = "CONCAT('نُسخ ملفُّ ظهورِ الجارِ مع البناء — " . $e($req) . " · ', `basis`)"; }
+        else { $sel[] = "`$co`"; }
+    }
+    $conn->query('SET @ctlnid = (SELECT MAX(id) FROM gov_space_appearances)');
+    $ok = $conn->query("INSERT INTO gov_space_appearances (`" . implode('`,`', $spCols) . "`)
+            SELECT " . implode(',', $sel) . " FROM gov_space_appearances
+             WHERE route = '" . $e($sibling) . "'");
+    if (!$ok) { $conn->query('ROLLBACK'); exit("✘ appearances: {$conn->error}\n"); }
+    $spN = $conn->affected_rows;
 }
 /* ⑪ **صفُّ الدورةِ — بما هو حقٌّ وحدَه**: قراءةٌ مشتقّةٌ لا تُنشئ حالةً —
    يُكتب المدخلُ الحقيقيُّ (مصدرُها) واسمُ المرحلةِ من مجموعةِ الملفِّ، وتُترك
