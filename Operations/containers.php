@@ -38,25 +38,15 @@ if (!$is_super && $company_id <= 0) {
     ems_gov_flash_redirect('../main/dashboard.php', 'الحساب غير مرتبط بشركة', 'GOV-INFO-200', ''); exit();
 }
 
-// ── صلاحيةٌ صارمة: الوحدةُ بكودها، وغيابُها منعٌ لا إذن ─────────────────────
-$MODULE = 'Operations/containers.php';
-$can_view = $can_manage = false;
+// ── صلاحيةٌ من المصدرِ الواحدِ (RPR-03 §٦): القراءةُ المستقلّةُ كانت تقفز
+//    طبقةَ قوالبِ GOV-AUTH-01 فيفترق المساران — check_page_permissions يمرّ
+//    بها كلِّها ويحفظ الدلالةَ نفسَها (can_add = إدارةُ الحاويات) ────────────
+$pp = check_page_permissions($conn, 'Operations/containers.php');
+$can_view   = !empty($pp['can_view']);
+$can_manage = !empty($pp['can_add']);
 if ($is_super) { $can_view = $can_manage = true; }
-else {
-    $st = $conn->prepare("SELECT rp.can_view, rp.can_add FROM role_permissions rp
-                            JOIN modules m ON m.id = rp.module_id
-                           WHERE m.code = ? AND rp.role_id = ? LIMIT 1");
-    $rid = intval($role);
-    $st->bind_param('si', $MODULE, $rid);
-    $st->execute();
-    if ($row = $st->get_result()->fetch_assoc()) {
-        $can_view   = (intval($row['can_view']) === 1);
-        $can_manage = (intval($row['can_add']) === 1);
-    }
-    $st->close();
-}
 if (!$can_view) {
-    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض حاويات العقود ❌', 'GOV-PERM-403', ''); exit();
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض حاويات العقود', 'GOV-PERM-403', ''); exit();
 }
 
 $gate = ems_tenant_db();

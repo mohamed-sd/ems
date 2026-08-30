@@ -201,17 +201,13 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
          إخفاءٌ بـCSS ليس منعًا: الرقمُ يبقى في المصدرِ يقرؤه كلُّ من فتح
          «عرضَ المصدر». فبطاقتا الساعاتِ (المتعاقَدُ عليه والمُشغَّلُ فعلًا) —
          وهما أساسُ الفوترة — **لا تُصيَّران أصلًا** لمن لا يملك عرضَ مصدرِهما. */
+    /* توحيدُ مسارِ القرار (RPR-03 §٦): القراءةُ المستقلّةُ كانت تقفز طبقةَ
+       القوالبِ فيفترق المساران — المصدرُ الواحدُ يجيب السؤالَ نفسَه */
     $__mayOpen = function ($code) use ($conn) {
         $role = isset($_SESSION['user']['role']) ? (string) $_SESSION['user']['role'] : '';
         if ($role === '-1') { return true; }
-        $st = $conn->prepare('SELECT 1 FROM role_permissions rp JOIN modules m ON m.id = rp.module_id
-                               WHERE m.code = ? AND rp.role_id = ? AND rp.can_view = 1 LIMIT 1');
-        $rid = (int) $role;
-        $st->bind_param('si', $code, $rid);
-        $st->execute();
-        $found = (bool) $st->get_result()->fetch_row();
-        $st->close();
-        return $found;
+        $p0 = check_page_permissions($conn, (string) $code);
+        return !empty($p0['can_view']);
     };
     $__mayHours     = $__mayOpen('Timesheet/view_timesheet.php');
     $__mayContracts = $__mayOpen('Suppliers/supplierscontracts.php');

@@ -60,18 +60,14 @@ if (!function_exists('ems_proc_may_finance_approve')) {
         static $cache = null;
         if ($cache !== null) { return $cache; }
         if (strval($_SESSION['user']['role'] ?? '') === '-1') { return $cache = true; }
-        $role = intval($_SESSION['user']['role'] ?? 0);
-        if ($role <= 0) { return $cache = false; }
-        $st = $conn->prepare("SELECT 1 FROM role_permissions rp JOIN modules m ON m.id = rp.module_id
-                               WHERE rp.role_id = ? AND rp.can_edit = 1
-                                 AND m.code IN ('Finance/approvals_inbox.php', 'FinRequests/requests.php')
-                               LIMIT 1");
-        if (!$st) { return $cache = false; }
-        $st->bind_param('i', $role);
-        $st->execute();
-        $cache = (bool) $st->get_result()->fetch_row();
-        $st->close();
-        return $cache;
+        /* توحيدُ مسارِ القرار (RPR-03 §٦): السؤالُ «أيملك تحريرَ صندوقِ
+           الماليّةِ؟» يُجاب من المصدرِ الواحدِ بطبقاتِه لا بقراءةٍ مستقلّةٍ
+           تقفز القوالبَ — والدلالةُ محفوظةٌ حرفًا (can_edit لأحدِ البابين) */
+        foreach (array('Finance/approvals_inbox.php', 'FinRequests/requests.php') as $code0) {
+            $p0 = check_page_permissions($conn, $code0);
+            if (!empty($p0['can_edit'])) { return $cache = true; }
+        }
+        return $cache = false;
     }
 }
 
