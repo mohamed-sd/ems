@@ -45,6 +45,13 @@ $e = function ($x) use ($conn) { return $conn->real_escape_string((string) $x); 
 $APPLY = in_array('--apply', $argv, true);
 $MD    = in_array('--md', $argv, true);
 $SELF  = in_array('--selftest', $argv, true);
+/* ⚠ **وحدُّ القراءةِ يغلب تسلسلَ الملفّ** — وقد قيسَ الأثرُ بعدَ التطبيقِ فسقطت
+   `U9` (‏«قسمٌ مقروءٌ بعشرةِ عناصرَ فأكثر» · حدُّ ف٧-٢ تسعة): محاذاةُ **الترتيبِ**
+   بتسلسلِ الملفِّ **تُعيد توزيعَ البنودِ على رؤوسِ الطيّ**، فبلغ قسمٌ عندَ دورٍ
+   واحدٍ أحدَ عشرَ عنصرًا. ⛔ **ونصّانِ حاكمانِ يتعارضان**: §٥·٦ يأمر بترتيبِ
+   الملفّ، وف٧-٢ يحدُّ القسمَ المقروءَ بتسعة. ⇒ **يُطبَّق ما لا يتعارض**
+   (‏المجموعاتُ) **ويُوقَف ما يحجبه وحدَه** (‏الترتيبُ) ويُرفع التعارض. */
+$GONLY = in_array('--groups-only', $argv, true);
 
 /* ═══ ① التطبيعُ — نفسُه في المقياسِ والمحاذاة، ولا نسختان تتفرّقان ══════ */
 function sa_norm($s)
@@ -125,13 +132,15 @@ while ($q && ($z = $q->fetch_assoc())) { $spec[$key($z['route'])] = $z; }
 /* ═══ ⑤ المقارنةُ والخطّة ════════════════════════════════════════════════ */
 $plan = array(); $byUnit = array();
 $stat = array('match' => 0, 'GROUP' => 0, 'ORDER' => 0, 'GROUP_AND_ORDER' => 0,
-              'declared' => 0, 'no_canon' => 0);
+              'declared' => 0, 'no_canon' => 0, 'held' => 0);
 foreach ($spec as $k => $sp) {
     $shown = isset($declared[$k]) ? $declared[$k]
            : (isset($canon[$k]) ? (string) $canon[$k]['group_name']
               : (isset($legacy[$k]) ? $legacy[$k] : ''));
     $curOrd = isset($canon[$k]) ? (int) $canon[$k]['sort_no'] : 0;
     $kind = sa_kind($shown, $sp['group_name'], $curOrd, (int) $sp['seq']);
+    if ($GONLY && $kind === 'GROUP_AND_ORDER') { $kind = 'GROUP'; }
+    if ($GONLY && $kind === 'ORDER') { $stat['held']++; continue; }
     if ($kind === '') { $stat['match']++; continue; }
     /* ⛔ **والمُعلَنُ لا يُمَسّ** — تغييرُ المعتمَدِ تحته لا يُرى */
     if (isset($declared[$k])) { $stat['declared']++; continue; }
@@ -167,6 +176,8 @@ printf("  `ORDER`            يُحاذى  **%4d**\n", $stat['ORDER']);
 printf("  `GROUP_AND_ORDER`  يُحاذى  **%4d**\n", $stat['GROUP_AND_ORDER']);
 printf("  ⛔ مُعلَنٌ في `gov_target_nav` لا يُمَسّ  **%4d**\n", $stat['declared']);
 printf("  ⛔ بلا صفٍّ معتمَدٍ يُكتب فيه          **%4d**\n", $stat['no_canon']);
+if ($GONLY) { printf("  ⚠ ترتيبٌ مُوقَفٌ بتعارضِ ف٧-٢ (‏قسمٌ يبلغ عشرةً)  **%4d**
+", $stat['held']); }
 printf("\n  ⇒ **يُحاذى %d مسارًا** على %d إدارةً\n", count($plan), count($byUnit));
 
 /* ═══ ⑦ المعاينةُ — أثرٌ للمراجعةِ لا بوّابةُ إذن ═════════════════════════ */
@@ -182,6 +193,8 @@ if ($MD || $APPLY) {
     $o .= "| يُحاذى — ترتيبًا | " . $stat['ORDER'] . " |\n";
     $o .= "| يُحاذى — مجموعةً وترتيبًا | " . $stat['GROUP_AND_ORDER'] . " |\n";
     $o .= "| ⛔ مُعلَنٌ في `gov_target_nav` **لا يُمَسّ** | " . $stat['declared'] . " |\n";
+    if ($GONLY) { $o .= "| ⚠ ترتيبٌ **مُوقَفٌ** بتعارضِ ف٧-٢ | " . $stat['held'] . " |
+"; }
     $o .= "| ⛔ بلا صفٍّ معتمَدٍ يُكتب فيه | " . $stat['no_canon'] . " |\n\n";
     $o .= "⛔ **والمُعلَنُ لا يُمَسّ**: الإعلانُ في `gov_target_nav` **يغلب المعتمَدَ في التصيير**، ";
     $o .= "فتغييرُ المعتمَدِ تحته **لا يراه مستخدمٌ** ويُنتج فرقًا في المخزنِ وحدَه.\n\n";
