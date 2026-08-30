@@ -240,8 +240,11 @@ if ($APPLY) {
     }
     $bad = (int) $conn->query("SELECT COUNT(*) FROM gov_screen_cycle
                                 WHERE bridge_rule <> '' AND bridge_witness = ''")->fetch_row()[0];
+    /* ⛔ **وعدّادُ التسرُّبِ يسأل عن قواعدِ الحسمِ لا عن قاعدةٍ بعينِها** — وإلّا
+       عدَّ القاعدةَ الرابعةَ تسرُّبًا وهي حسمٌ بشاهدٍ ثانٍ مقيس. */
     $leak = (int) $conn->query("SELECT COUNT(*) FROM gov_screen_cycle
-                                 WHERE bridge_rule <> 'BASENAME_UNIQUE' AND screen_id <> ''")->fetch_row()[0];
+                                 WHERE bridge_rule NOT IN ('BASENAME_UNIQUE','PATH_OR_SCOPE_RESOLVED')
+                                   AND screen_id <> ''")->fetch_row()[0];
     printf("\n  ✔ جُسِر **%d** صفًّا · صفٌّ بلا شاهدٍ %d · **معرِّفٌ في صفٍّ ملتبسٍ %d**\n", $n, $bad, $leak);
 }
 
