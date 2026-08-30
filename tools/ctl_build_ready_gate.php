@@ -65,7 +65,7 @@ if ($r && ($x = $r->fetch_row())) { $decUnattributed = (int) $x[0]; }
 /* ═══ ② الأهدافُ غيرُ المبنيّةِ بمتطلباتِها ══════════════════════════════ */
 $rows = array();
 $r = $conn->query("SELECT u.target_uid, u.unit, u.name_ar, u.requirement_id, u.verdict,
-                          r.grain, r.source_of_truth, r.requirement_type, r.group_name, r.seq
+                          r.grain, r.grain_entity, r.sm_model_ref, r.source_of_truth, r.requirement_type, r.group_name, r.seq
                      FROM repair01_target_universe u
                      LEFT JOIN repair01_requirements r ON r.requirement_id = u.requirement_id
                     WHERE u.verdict = 'NOT_BUILT'");
@@ -120,8 +120,22 @@ function br_judge(array $x, array $affectedUnits)
     if (!$hasReq) { $blk[] = 'NO_REQUIREMENT_MAPPING'; }
     if ($hasReq && (trim((string) $x['grain']) === '' || (string) $x['grain'] === 'NEEDS_SOURCE')) { $blk[] = 'GRAIN_NEEDS_SOURCE'; }
     if ($hasReq && trim((string) $x['source_of_truth']) === '') { $blk[] = 'SOURCE_OF_TRUTH_MISSING'; }
-    /* الكيانُ القانونيُّ — للمعاملاتِ وحدَها؛ ⛔ ولا يُشتقُّ من نصٍّ حرّ */
-    if ($rt === 'TRANSACTION') { $blk[] = 'ENTITY_UNNAMED'; }
+    /* الكيانُ القانونيُّ — للمعاملاتِ وحدَها؛ ⛔ ولا يُشتقُّ من نصٍّ حرٍّ في
+       البوّابةِ: يُقرأ من قناةِ الدفترِ المحكومةِ `grain_entity` (سُمّي بأداةِ
+       `ctl_entity_name` من عمودِ الحبّةِ بشاهدِ موضعِه) — وفراغُها حاجب */
+    $ge = isset($x['grain_entity']) ? trim((string) $x['grain_entity']) : '';
+    if ($rt === 'TRANSACTION') {
+        if ($ge === '') { $blk[] = 'ENTITY_UNNAMED'; }
+        else { $wit[] = 'كيانُ الحبّةِ «' . $ge . '» من قناةِ الدفترِ المحكومة'; }
+        /* شرطُ النوعِ الثاني (أمرُ الضبطِ ④): معاملةٌ لا تُبنى قبل ربطِها
+           بآلةِ حالتِها المحكومةِ من الدليلِ — ⛔ ولا تُختلَق آلةٌ عند البناء.
+           القناةُ: `sm_model_ref` في الدفترِ (يملؤها مسارُ ربطِ النماذجِ من
+           عناوينِ الدليلِ كنظيرِ `rpr02_state_model_bind` للمبنيّ) — وفراغُها
+           حاجبٌ تنفيذيٌّ مسمًّى لا سببُ توقّف */
+        $smr = isset($x['sm_model_ref']) ? trim((string) $x['sm_model_ref']) : '';
+        if ($smr === '') { $blk[] = 'SM_MODEL_UNBOUND'; }
+        else { $wit[] = 'آلةُ الحالةِ من الدليل: ' . $smr; }
+    }
     /* أثرُ القرار */
     $di = isset($affectedUnits[$x['unit']]) ? 'AFFECTED_PENDING' : 'NOT_AFFECTED';
     if ($di === 'AFFECTED_PENDING') {
