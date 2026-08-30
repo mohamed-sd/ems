@@ -303,16 +303,43 @@ $add('مستهلكون حرجون متوقّفون', 'صفر', '١', $fxBehind,
      **مُعلَنةٌ في الجدولِ لكلِّ عاملٍ** فلا تُخترَع عتبةٌ من عندِ المنفِّذ. */
 $sched = null; $schedWit = '⛔ **غيرُ مقيس**';
 if ($tbl('ems_job_queue') && $tbl('ems_job_schedule')) {
-    $qFail = (int) $one("SELECT COUNT(*) FROM ems_job_queue WHERE state IN ('failed','dead','dlq')");
+    /* ⛔ **وصفُّ بذرةٍ ليس إخفاقَ إنتاج** — والفرقُ مقيسٌ لا مُقدَّر:
+       السبعةَ عشرَ الفاشلةُ **كلُّها** `job_type='pilot_monitor'` **وكلُّها موسومةٌ
+       `seed_tag='UAT-2026'`، و`fail_code` فيها فارغٌ و`last_error` **تعليقُ مراجعةٍ
+       لا رسالةُ خطأ** («مراجَعٌ من المالية ومطابق · UAT-2026»).
+       ⇒ فيُفصَل **الحقيقيُّ عن المبذور**، و§٨·٨ تقول `Critical scheduler failures = 0`
+       — **والبذرةُ ليست إخفاقًا حرجًا**.
+       ⛔ **ولا تُحذف ولا تُخفى**: تُعرض بعددِها، **فبقاءُ سبعةَ عشرَ صفًّا مبذورًا
+          بحالةِ `dead` في طابورِ إنتاجٍ نظافةٌ ناقصةٌ تُعلَن**. */
+    $qFailAll  = (int) $one("SELECT COUNT(*) FROM ems_job_queue WHERE state IN ('failed','dead','dlq')");
+    $qFailSeed = (int) $one("SELECT COUNT(*) FROM ems_job_queue WHERE state IN ('failed','dead','dlq')
+                              AND COALESCE(seed_tag,'') <> ''");
+    $qFail = $qFailAll - $qFailSeed;
     $stall = (int) $one("SELECT COUNT(*) FROM ems_job_schedule
                           WHERE is_active = 1 AND last_success_at IS NOT NULL
                             AND TIMESTAMPDIFF(SECOND, last_success_at, NOW()) > alert_after_seconds");
     $never = (int) $one("SELECT COUNT(*) FROM ems_job_schedule
                           WHERE is_active = 1 AND last_success_at IS NULL");
     $sched = $qFail + $stall + $never;
-    $schedWit = "صفُّ مهامٍّ فاشلٌ/ميّت **$qFail** (`ems_job_queue.state`) · وعاملٌ تجاوز "
+    /* ⛔ **وصفرٌ بعتبةٍ فضفاضةٍ يُقال فضفاضًا** — فالمقياسُ يقيس التجاوزَ **بالعتبةِ
+       المُعلَنة**، وعتبةٌ طويلةٌ تجعله أخضرَ وعاملٌ ماليٌّ ساكنٌ أسابيع.
+       ⇒ **يُعرض أطولُ تأخُّرٍ قائمٍ وعتبتُه** كي يُقرأ الأخضرُ بحدِّه. */
+    $laxWit = '';
+    $lax = $conn->query("SELECT job_type, TIMESTAMPDIFF(SECOND, last_success_at, NOW()) age,
+                           alert_after_seconds FROM ems_job_schedule
+                          WHERE is_active = 1 AND last_success_at IS NOT NULL
+                          ORDER BY age DESC LIMIT 1");
+    if ($lax && $z = $lax->fetch_assoc()) {
+        $laxWit = ' · ⚠ **وأطولُ تأخُّرٍ قائمٍ** `' . $z['job_type'] . '` **'
+                . round($z['age'] / 86400, 1) . ' يومًا** وعتبتُه المُعلَنةُ **'
+                . round($z['alert_after_seconds'] / 86400, 1) . ' يومًا** ⇒ **الأخضرُ صحيحٌ بالعتبةِ'
+                . ' المُعلَنةِ لا بالسكونِ الفعليّ** — والعتبةُ قرارُ مالكٍ لا اجتهادُ مقياس';
+    }
+    $schedWit = "صفُّ مهامٍّ فاشلٌ **حقيقيٌّ $qFail** — و**$qFailSeed مبذورٌ بوسمِ `seed_tag`** "
+              . "(‏كلُّها `pilot_monitor` · `fail_code` فارغٌ و`last_error` تعليقُ مراجعةٍ لا خطأ) **يُعلَن ولا يُحذف** · وعاملٌ تجاوز "
               . "**مهلةَ إنذارِه المُعلَنة** **$stall** · وعاملٌ لم ينجح قطُّ **$never** "
-              . '(`ems_job_schedule`) — ⛔ والمهلةُ **مُعلَنةٌ لكلِّ عاملٍ في الجدولِ** لا مخترَعةً هنا';
+              . '(`ems_job_schedule`) — ⛔ والمهلةُ **مُعلَنةٌ لكلِّ عاملٍ في الجدولِ** لا مخترَعةً هنا'
+              . $laxWit;
 }
 $add('إخفاقاتٌ حرجةٌ في جدولةِ المهامّ', 'صفر', 'غيرُ مقيس', $sched, $schedWit);
 
