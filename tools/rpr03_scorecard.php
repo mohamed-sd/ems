@@ -257,14 +257,24 @@ $add('تمرينُ استعادةٍ على المخطَّطِ الحالي', 'ن
 $add('تثبيتٌ من الصفرِ على المخطَّطِ الحالي', 'ناجح', 'دليلٌ متقادم', null,
      '⛔ **غيرُ مقيس**');
 
-/* ⑭ الذهبيّات */
-$gold = null; $goldOk = null;
+/* ⑭ الذهبيّات — **مقياسانِ لا مقياسٌ** (أمرُ الضبطِ §٣): حراسةٌ وقبول.
+   ⛔ **فخلطُهما يقلب المعنى**: `PREMATURE=0` حراسةٌ خضراءُ اليومَ (لا شاشةَ
+   اعتُمدت قبل رحلتِها)، و`ACCEPTED=0/10` بابٌ مفتوحٌ ينتظر الرحلةَ البشريّةَ
+   والمسارَ السالبَ والمراجعةَ اليدويّة — **وقراءةُ الأوّلِ إنجازًا للثاني هي
+   بعينُها «الأخضرُ المتناقض» الذي يمنعه الأمر.** */
+$gold = null; $goldOk = null; $premature = null;
 if ($tbl('gov_golden_approvals')) {
     $gold = (int) $one("SELECT COUNT(*) FROM gov_golden_approvals");
     $goldOk = (int) $one("SELECT COUNT(*) FROM gov_golden_approvals WHERE state='APPROVED'");
+    /* اعتمادٌ سابقٌ لأوانِه = صفٌّ `APPROVED` بلا أساسِ اعتمادٍ مكتمل */
+    $premature = (int) $one("SELECT COUNT(*) FROM gov_golden_approvals
+                              WHERE state = 'APPROVED'
+                                AND (screen_file = '' OR test_account = '' OR role_id <= 0)");
 }
-$add('شاشاتٌ ذهبيّةٌ معتمَدة', '١٠ من ١٠', 'صفر', $goldOk,
-     'المسجَّلةُ **' . ($gold === null ? '؟' : $gold) . '**');
+$add('شاشاتٌ ذهبيّةٌ معتمَدة (`GOLDEN_SCREENS_ACCEPTED`)', '١٠ من ١٠', 'صفر', $goldOk,
+     'المسجَّلةُ **' . ($gold === null ? '؟' : $gold) . '** · **وحراسةُ `PREMATURE_GOLDEN_ACCEPTANCE` = '
+   . ($premature === null ? '؟' : $premature) . '** (‏معتمَدٌ بلا أساسٍ مكتمل — مقياسُ حراسةٍ مستقلٌّ) '
+   . '⛔ **ولا يُقرأ صفرُ الحراسةِ قبولًا**: القبولُ لا يُغلق إلّا بالرحلةِ البشريّةِ والمسارِ السالبِ والمراجعةِ اليدويّة');
 
 /* ⑮ و⑯ الاستجابةُ وإتاحةُ الوصول */
 /* المسحُ البنيويُّ — `rpr03_structural_scan.php` · والمقياسُ «منفَّذ» لا «صفرُ عيب» */
@@ -377,7 +387,27 @@ if ($tbl('ems_job_queue') && $tbl('ems_job_schedule')) {
               . '(`ems_job_schedule`) — ⛔ والمهلةُ **مُعلَنةٌ لكلِّ عاملٍ في الجدولِ** لا مخترَعةً هنا'
               . $laxWit;
 }
-$add('إخفاقاتٌ حرجةٌ في جدولةِ المهامّ', 'صفر', 'غيرُ مقيس', $sched, $schedWit);
+/* ⛔ **قارئان كانا يتفرّقان** (أمرُ الضبطِ §٣): هذا الصفُّ يقرأ **الطابورَ**
+   فيُخرج صفرًا، و`rpr03_scheduler_entrypoints.php` يقرأ **المداخلَ** (‏مهامَّ
+   `EMS_*` مقابلَ عمّالِ الدفتر) فيُخرج **تسعةَ إخفاقات** — «مغلقٌ ومحجوبٌ في
+   الوقتِ نفسِه». ⇒ **حالةٌ واحدةٌ من ثلاثٍ لا غير**: `CLOSED` (‏القارئان صفر)
+   · `OPEN` (‏إخفاقٌ علاجُه بيدِ المنفِّذ) · `BLOCKED` (‏إخفاقٌ علاجُه قرارُ
+   مالكٍ مرفوع). والمداخلُ تُقرأ من عُدّتِها لا تُعاد. */
+$entry = null;
+$eo = array(); $erc = 0;
+@exec('"' . PHP_BINARY . '" ' . escapeshellarg($ROOT . '/tools/rpr03_scheduler_entrypoints.php') . ' 2>&1', $eo, $erc);
+if (preg_match('~إخفاقاتُ مدخلٍ مقيسة:\s*(\d+)~u', implode("\n", $eo), $em)) { $entry = (int) $em[1]; }
+$schedState = 'CLOSED';
+if ($sched !== null && $sched > 0) { $schedState = 'OPEN'; }
+if ($entry !== null && $entry > 0) { $schedState = 'BLOCKED'; }
+$add('إخفاقاتٌ حرجةٌ في جدولةِ المهامّ', 'صفر · CLOSED', 'غيرُ مقيس',
+     ($sched === null && $entry === null) ? null : max((int) $sched, 0) + max((int) $entry, 0),
+     '**الحالةُ الواحدة: `' . $schedState . '`** — قارئان مفصولان: الطابورُ **' . ($sched === null ? '؟' : $sched)
+   . '** والمداخلُ **' . ($entry === null ? '⛔ لم تُقرأ' : $entry) . '** '
+   . ($schedState === 'BLOCKED'
+      ? '(‏عاملُ الدفترِ غيرُ مجدولٍ ومهمّةٌ تشير لمدخلٍ متقاعد — **جدولتُه تغييرُ بيئةٍ وتصريفُه أثرٌ ماليٌّ ⇒ قرارُ مالكٍ #١٨ المرفوع**) · '
+      : '· ')
+   . $schedWit);
 
 /* ⛔ **السالبُ يكسر مفردةً فريدة**: يُدَّعى قياسُ ما لم يُقَس */
 if ($SELF) { $M[8][3] = 0; }
