@@ -167,7 +167,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
             <div class="ems-filter-item">
                 <label>صفة النيابة</label>
-                <input type="text" value="<?= htmlspecialchars($deputyRole) ?>" readonly>
+                <input type="text" aria-label="صفة النيابة" value="<?= htmlspecialchars($deputyRole) ?>" readonly>
             </div>
         </form>
     </div>

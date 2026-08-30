@@ -75,7 +75,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
             <div class="ems-filter-item">
                 <label>صفة النطاق</label>
-                <input type="text" value="<?= htmlspecialchars($scopeLabel) ?>" readonly>
+                <input type="text" aria-label="صفة النطاق" value="<?= htmlspecialchars($scopeLabel) ?>" readonly>
             </div>
         </form>
     </div>

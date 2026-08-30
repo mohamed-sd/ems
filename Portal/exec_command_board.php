@@ -74,7 +74,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
             <div class="ems-filter-item">
                 <label>النطاق</label>
-                <input type="text" value="الشركة، والنزول لمشروع او موقع من رابط كل مؤشر" readonly>
+                <input type="text" aria-label="النطاق" value="الشركة، والنزول لمشروع او موقع من رابط كل مؤشر" readonly>
             </div>
         </form>
     </div>

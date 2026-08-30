@@ -118,13 +118,21 @@ foreach ($rows as $s) {
     $seen = array();
     if (!ems_reaches_shell($path, $ROOT, 0, $seen)) { $noShell[] = $s['screen_id'] . ' · ' . $s['route']; }
 
-    preg_match_all('~<img\b[^>]*>~i', $src, $mg);
-    foreach ($mg[0] as $tag) { if (!preg_match('~\balt=~i', $tag)) { $noAlt[] = $s['screen_id']; break; } }
+    /* ⛔ **وسمٌ يحتضن كتلةَ PHP يُبتر عند `?>` فيضيع ما بعدها** — قِيس:
+       `<img src="<?php echo … ?>" alt="…">` عُدَّ بلا `alt` كذبًا (سطحان
+       زائفان). فتُحيَّد كتلُ PHP قبل فحوصِ البنيةِ — بطولٍ محفوظٍ كي لا
+       تنزاح الأسطر. */
+    $flat = preg_replace_callback('~<\?(?:php|=)?[\s\S]*?(?:\?>|$)~', function ($m0) {
+        return str_repeat('x', strlen($m0[0]));
+    }, $src);
 
-    preg_match_all('~<input\b[^>]*>~i', $src, $mi);
+    preg_match_all('~<img\b[^>]*>~i', $flat, $mg);
+    foreach ($mg[0] as $tag) { if (!preg_match('~\balt=~i', $tag)) { $noAlt[] = $s['screen_id'] . ' · ' . $rel; break; } }
+
+    preg_match_all('~<input\b[^>]*>~i', $flat, $mi);
     foreach ($mi[0] as $tag) {
         if (preg_match('~type=["\'](hidden|submit|button|reset)~i', $tag)) { continue; }
-        if (!preg_match('~(aria-label|placeholder|\bid=)~i', $tag)) { $noLabel[] = $s['screen_id']; break; }
+        if (!preg_match('~(aria-label|placeholder|\bid=)~i', $tag)) { $noLabel[] = $s['screen_id'] . ' · ' . $rel; break; }
     }
 
     preg_match_all('~<table\b~i', $src, $mt);
@@ -159,7 +167,9 @@ printf("  ① منفذُ العرضِ واللغةُ والاتجاه — عبر
 printf("     **بلا قشرة: %d** من %d\n", count($noShell), $scanned);
 foreach (array_slice($noShell, 0, 8) as $x) { echo "        ⛔ " . $x . "\n"; }
 printf("  ② تسمياتٌ مفقودةٌ في الحقولِ المرئيّة: **%d** سطحًا\n", count($noLabel));
+foreach (array_slice($noLabel, 0, 8) as $x) { echo "        ⛔ " . $x . "\n"; }
 printf("  ③ صورةٌ بلا `alt`: **%d** سطحًا\n", count($noAlt));
+foreach (array_slice($noAlt, 0, 8) as $x) { echo "        ⛔ " . $x . "\n"; }
 printf("  ④ تجاوزُ الإطار: جداولٌ %d · مؤشراتُ لفٍّ أفقيّ %d\n", $tables, $wrapHints);
 echo "     ◆ **وهذا مؤشِّرٌ لا حكم**: اللفُّ قد يأتي من ورقةِ نمطٍ مشتركةٍ لا من السطح،\n";
 echo "       ⛔ فلا يُرفع إلى عيبٍ بلا تصييرٍ حيّ — و`RPR-03` §٩ يجعل الطبقةَ الثانيةَ يدويّة.\n";
