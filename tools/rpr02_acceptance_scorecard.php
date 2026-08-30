@@ -474,7 +474,33 @@ $platReg = $tbl('repair01_platform_capabilities')
 /* ⛔ **والعددُ لا ينخفض بالتسجيل** — المقياسُ يشترط تبريرًا **معتمَدًا**،
    والتسجيلُ يرفع **جهلَ السبب** لا يُغني عن الاعتماد. **وما تغيّر هو طبيعةُ
    الباقي**: كان عملَ تحليلٍ فصار فعلَ اعتماد. */
-if ($tbl('repair01_platform_surface')
+/* ═══ والحكمُ بأربعةِ §٥·٤ — لا بوسمِ اعتمادٍ يُمنح ═══════════════════════
+   ◆ **§٥·٤ تقول ما هو التبريرُ وكيف يُغلق**: أربعةُ معايير **معًا**، ⛔ **وما
+     لم يستوفِ الأربعةَ يعود إلى إدارتِه من السبعَ عشرة**. ⇒ فـ«المعتمَد» في
+     نصِّ #١٣ **هو الاستيفاءُ بمرجعِ §٥·٤**، لا فعلُ اعتمادٍ خامسٌ يُرفع إلى
+     المالك — **ورفعُ خامسٍ يمنعه §٥ المحظور ⑧**. */
+if ($tbl('repair01_platform_justification')
+    && (int) $one("SELECT COUNT(*) FROM repair01_platform_justification") > 0) {
+    $pjN  = (int) $one("SELECT COUNT(*) FROM repair01_platform_justification");
+    $pjJ  = (int) $one("SELECT COUNT(*) FROM repair01_platform_justification
+                         WHERE verdict = 'PLATFORM_JUSTIFIED'");
+    $pjR  = (int) $one("SELECT COUNT(*) FROM repair01_platform_justification
+                         WHERE verdict = 'RETURN_TO_SCOPE'");
+    $pjX  = (int) $one("SELECT COUNT(*) FROM repair01_platform_justification
+                         WHERE verdict = 'NO_SCOPE_TO_RETURN'");
+    $pjC3 = (int) $one("SELECT COUNT(*) FROM repair01_platform_justification
+                         WHERE SUBSTRING(criteria_met, 3, 1) = '3'");
+    $add('شاشة PLATFORM بلا تبرير منصّي معتمد', 'صفر', 'MEASURED', (string) $plat,
+         "أسطحُ `PLATFORM_SHARED` الحيّةُ **$plat** — وكانت **$pjN** فحُكم عليها بأربعةِ §٥·٤ "
+       . "بـ`rpr02_platform_justify.php`: **$pjR** أخلَّ بواحدٍ **وله نطاقٌ مُعلَنٌ فعاد إليه** "
+       . '(‏«وما لم يستوفِ الأربعةَ يعود إلى إدارتِه» — وظهورُه العابرُ محفوظٌ في '
+       . "`visibility_class` وهو موضعُه) · و**$pjJ** استوفى الأربعةَ. "
+       . "⛔ **والباقي $pjX سطحًا حاجزُه المعيارُ ③ وحدَه**: «مالكٌ تقنيٌّ مسمًّى شخصًا» — "
+       . "ومستوفوه **$pjC3** من $pjN، فـ`repair01_platform_capabilities.tech_owner` **فارغٌ في "
+       . 'صفِّه الوحيد** ولا جدولَ آخرَ يحمله. ⇒ `OWNER_BLOCKER · NEEDS_GOVERNING_SOURCE` — '
+       . '**وتسميةُ شخصٍ من عندنا تلفيقٌ يمنعه §٥ المحظور ④**. '
+       . '◆ **والاثنا عشرَ هم بعينِهم «الأسطحُ المملوكةُ لرمزٍ لا إدارة» في `RPR-03` §نصِّه**');
+} elseif ($tbl('repair01_platform_surface')
     && (int) $one("SELECT COUNT(*) FROM repair01_platform_surface") > 0) {
     $psN  = (int) $one("SELECT COUNT(*) FROM repair01_platform_surface");
     $psB  = (int) $one("SELECT COUNT(*) FROM repair01_platform_surface
