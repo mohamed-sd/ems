@@ -84,8 +84,43 @@ if ($tbl('rpr03_event_classification')) {
                                          AND e.consumer_class NOT LIKE '%GovernanceWatch%')");
     $bizNoContract = $bizN - $eff;
 }
+/* ◆ **وقارئان لسؤالٍ واحدٍ يتفرّقان إن لم يُوحَّدا**: `rpr03_consumer_vocabulary.php`
+   يقيس الوجهَ الآخرَ من العطبِ نفسِه، **وحكمُه يُنقل هنا كي لا يُقرأ الرقمُ وجهًا واحدًا**:
+   · اشتراكاتُ الأثرِ (`write`) **مبنيّةٌ** — لكنَّها **معلَّقةٌ على مفرداتٍ لم تُنطق قطّ**.
+   · وحدثان من الثلاثةِ والعشرين **لهما أثرٌ مقيَّدٌ عند المُنتِجِ** في `fin_event_links`.
+   ⇒ **فالقراءةُ ليست «لم يُبنَ مستهلك» بل «بُني وعُلِّق على مفردةٍ ميّتة»** — والعلاجُ
+     **مصالحةُ المفردتَين** لا كتابةُ مستهلكين جددٍ فوقَ قائمين لا يسمعون. */
+$vDead = 0; $vProd = 0; $vSpoken = 0;
+if ($tbl('event_consumers') && $tbl('ems_business_events')) {
+    $vSpoken = (int) $one("SELECT COUNT(DISTINCT event_key) FROM ems_business_events");
+    $vDead = (int) $one("SELECT COUNT(*) FROM event_consumers e
+                          WHERE e.active = 1 AND e.produces = 'write'
+                            AND e.consumer_class NOT LIKE '%GovernanceWatch%'
+                            AND NOT EXISTS(SELECT 1 FROM ems_business_events b
+                                             WHERE b.event_key = e.event_name)");
+    if ($tbl('fin_event_links')) {
+        $vProd = (int) $one("SELECT COUNT(*) FROM rpr03_event_classification k
+                              WHERE k.classification = 'BUSINESS'
+                                AND EXISTS(SELECT 1 FROM fin_event_links l
+                                             JOIN ems_business_events b ON b.id = l.event_id
+                                            WHERE b.event_key = k.event_key)");
+    }
+}
+/* ⛔ **حارسُ مفردة**: لو أخطأ اسمُ عمودٍ لَعاد الاستعلامُ صفرًا **فقُرئ نجاحًا**
+   — وقد وقع ذلك فعلًا في أوّلِ كتابةِ هذا الشاهد (`event_type` بدل `event_key`).
+   ⇒ فالمنطوقُ صفرٌ **يُبطل الشاهدَ ولا يُعرض رقمًا**. */
+if ($vSpoken === 0) {
+    $vNote = ' · ⛔ **شاهدُ المفرداتِ مُعطَّل**: `ems_business_events` قُرئ صفرَ مفردةٍ منطوقة —'
+           . ' **وذاك عطبُ قراءةٍ لا حقيقةُ مخزن**، فلا يُعرض منه رقم';
+} else {
+    $vNote = " · ⛔ **والعطبُ ليس غيابَ مستهلك**: اشتراكاتُ الأثرِ مبنيّةٌ و**$vDead منها معلَّقٌ على مفردةٍ لم تُنطق قطّ**"
+           . " (‏المنطوقُ فعلًا $vSpoken مفردةً) ⇒ **بُني وعُلِّق على مفردةٍ ميّتة**، والعلاجُ **مصالحةُ المفردتَين**"
+           . " لا كتابةُ مستهلكين جددٍ فوقَ قائمين لا يسمعون. ◆ و**$vProd** من المقامِ له **أثرٌ مقيَّدٌ عند المُنتِج**"
+           . ' — ولا يُقرأ ذلك عقدًا: §٤·٢ يوجب الخمسةَ في المستهلك. ⛔ **ولا يُقترح ربطُ اسمٍ باسمٍ** — حكمُ أعمالٍ لا تشابهُ حروف';
+}
 $add('أحداثُ أعمالٍ بلا عقدِ مستهلكٍ فعّال', 'صفر', '١١ من ١١', $bizNoContract,
-     'المقامُ صار **' . ($bizN === null ? '؟' : $bizN) . '** بعد إعادةِ التصنيف');
+     'المقامُ صار **' . ($bizN === null ? '؟' : $bizN) . '** بعد إعادةِ التصنيف'
+   . $vNote);
 
 /* ④ مستهلكٌ متوقّفٌ بلا إنذار */
 $maxId = (int) $one("SELECT COALESCE(MAX(id),0) FROM ems_business_events");
