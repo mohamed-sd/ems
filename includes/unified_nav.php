@@ -1007,13 +1007,35 @@ function printEmsTenGroupNav($conn, $items, $uxMap, $uxCurMap, $basePrefix, $bad
          نفسُها — فسدُّ الثقبِ في المُهيِّئِ وحدَه لا يكفي: قِيس أن ستةَ روابطَ
          معطَّلةٍ ظلَّت تُصيَّر بعدَ سدِّه هناك، ومصدرُها هذه الحلقة.
          ⇐ يُستثنى المعطَّلُ صراحةً — والاصطناعُ يبقى لما **لا صفَّ له إطلاقًا**. */
+    /* ══ RPR-02 §٦ س٦ — **وثقبُ الصلاحيةِ من الشكلِ نفسِه** (2026-08-30) ══════
+       ◆ **العطبُ المقيس**: `$items` لا تحمل إلّا ما **جاز فحصَ الصلاحيةِ** في
+         `getUnifiedNavItems` (`permission_code IS NULL OR EXISTS role_permissions
+         … can_view = 1`). فالبندُ الذي **مُنع بالصلاحيةِ** لا يُعلَّم في
+         `$covered`، **فتعيد هذه الحلقةُ اصطناعَه من السجلّ** — ويظهر لمن لا
+         منحَ له. ⇐ **وهو ثقبُ تجاوزٍ لا زلّةُ عرض**: فحصٌ يُلتَفُّ عليه من بابٍ
+         ثانٍ، والاستثناءُ كان للمعطَّلِ (`active = 0`) وحدَه.
+       ◆ **والمقيسُ عند الكشفِ حالةٌ واحدة**: دور ٢٨ · `Portal/my_tasks.php`
+         (‏سُدَّ رمزُه في س٦ فمُنع، ثمَّ عاد من هنا) — ولا ثانيةَ لها في النظامِ
+         كلِّه. ⛔ **وواحدةٌ تكفي**: القاعدةُ تُسدُّ لا الحالة.
+       ⇒ **يُستثنى المُنَعُ بالصلاحيةِ كما يُستثنى المعطَّل** — والاصطناعُ يبقى
+         لغرضِه: ما **لا صفَّ له إطلاقًا** (الثوابتُ الصلبةُ القديمة). */
     $navDisabled = array();
     if (isset($GLOBALS['__uxui_cur_role'])) {
+        $__rid2 = (int) $GLOBALS['__uxui_cur_role'];
         $__dq2 = @mysqli_query($conn, "SELECT `route` FROM `nav_items`
-                                        WHERE `role_id` = " . (int) $GLOBALS['__uxui_cur_role'] . "
+                                        WHERE `role_id` = " . $__rid2 . "
                                           AND `active` = 0");
         while ($__dq2 && ($__dr2 = mysqli_fetch_assoc($__dq2))) {
             $navDisabled[uxuiNavBaseRoute($__dr2['route'])] = true;
+        }
+        $__pq2 = @mysqli_query($conn, "SELECT n.`route` FROM `nav_items` n
+                                        WHERE n.`role_id` = " . $__rid2 . " AND n.`active` = 1
+                                          AND n.`permission_code` IS NOT NULL AND n.`permission_code` <> ''
+                                          AND NOT EXISTS (SELECT 1 FROM `role_permissions` p
+                                                           WHERE p.`module_id` = n.`module_id`
+                                                             AND p.`role_id` = n.`role_id` AND p.`can_view` = 1)");
+        while ($__pq2 && ($__pr2 = mysqli_fetch_assoc($__pq2))) {
+            $navDisabled[uxuiNavBaseRoute($__pr2['route'])] = true;
         }
     }
 
