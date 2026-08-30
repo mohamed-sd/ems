@@ -69,12 +69,30 @@ function cb_norm($s)
      واحدًا · أو ② إدارةُ الصفِّ (`dept_name`) تُحلُّ إلى رمزٍ يطابق مالكَ
      **مرشَّحٍ واحدٍ لا غير**. ⛔ **ومرشَّحان يطابقان ⇒ يبقى ملتبسًا**:
      شاهدٌ يُبقي اثنين ليس شاهدًا. */
+/* ◆ **③ وواجهةُ البرمجةِ ليست محطّةَ عملٍ** — صفُّ الدورةِ يحمل **عنوانَ شاشةٍ
+     ومستندًا ناتجًا ودورًا يعتمد**، أي **محطّةً يقف عندها إنسان**؛ وملفٌّ تحتَ
+     `api/` نقطةُ نداءٍ برمجيّةٌ لا يقف عندها أحد. ⇒ **يُستبعَد من المرشَّحين
+     بمسارِه المسجَّلِ لا باسمِه**. ⛔ **ولا يُستبعَد إلّا إن بقي مرشَّحٌ واحدٌ
+     غيرُه**: لو كان المرشَّحون كلُّهم واجهاتِ برمجةٍ لبقي الالتباسُ كما هو —
+     فالقاعدةُ **تُميّز ولا تختار**. */
+function cb_not_api($cand, $meta)
+{
+    $keep = array();
+    foreach ($cand as $sc) {
+        $r = isset($meta[$sc]) ? strtolower(trim(str_replace(chr(92), '/', (string) $meta[$sc]['route']), '/')) : '';
+        if (strncmp($r, 'api/', 4) !== 0) { $keep[] = $sc; }
+    }
+    return $keep ? $keep : $cand;
+}
 function cb_disambiguate($cand, $meta, $byPath, $DEPTN, $rawFile, $deptName)
 {
     $p = strtolower(trim(str_replace(chr(92), '/', (string) $rawFile), '/'));
     if ($p !== '' && strpos($p, '/') !== false && isset($byPath[$p]) && count($byPath[$p]) === 1) {
         return array($byPath[$p][0], 'PATH');
     }
+    $noApi = cb_not_api($cand, $meta);
+    if (count($noApi) === 1 && count($noApi) < count($cand)) { return array($noApi[0], 'NOT_API'); }
+    $cand = $noApi;
     $code = '';
     $dn = cb_norm($deptName);
     if ($dn !== '' && isset($DEPTN[$dn])) { $code = $DEPTN[$dn]; }
@@ -166,7 +184,11 @@ while ($x = $r->fetch_assoc()) {
              . (strncmp($how4, 'SCOPE:', 6) === 0
                 ? 'إدارةُ الصفِّ «' . trim((string) $x['dept_name']) . '» تُحلُّ إلى `'
                   . substr($how4, 6) . '` **وتطابق مالكَ مرشَّحٍ واحدٍ لا غير**'
-                : 'مسارُ الصفِّ الكاملُ (‏مجلَّدًا واسمًا) يطابق سطحًا واحدًا')
+                : ($how4 === 'NOT_API'
+                   ? '**واجهةُ البرمجةِ ليست محطّةَ عملٍ** — صفُّ الدورةِ يحمل عنوانَ شاشةٍ '
+                     . 'ومستندًا ناتجًا ودورًا يعتمد، وملفٌّ تحتَ `api/` لا يقف عنده إنسان '
+                     . '⇒ استُبعد بمسارِه المسجَّلِ فبقي مرشَّحٌ واحد'
+                   : 'مسارُ الصفِّ الكاملُ (‏مجلَّدًا واسمًا) يطابق سطحًا واحدًا'))
              . ' ⇒ `' . $sidv . '`. ⛔ **ومرشَّحان يطابقان يبقيان ملتبسَين**: '
              . 'شاهدٌ يُبقي اثنَين ليس شاهدًا · لقطة ' . $sid;
         $rows[] = array((int) $x['id'], $b, $rule, $sidv, $wit);
