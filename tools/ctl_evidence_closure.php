@@ -142,6 +142,42 @@ foreach ($rows as $x) {
        ⛔ ولا يُطالَب بأثرٍ تجاريٍّ ولا برحلةٍ بشريّة» — فيُغلَق بالفحوصِ
        المقيسةِ نفسِها (نسبُ المصدرِ والحارسُ والتصييرُ الحيُّ) كالقراءة.
        والرحلاتُ والتكاملُ يبقيان لمسارَيهما (بشريٌّ/عقدُ حدثٍ) */
+    /* عقدُ EVENT_INTEGRATION خماسيُّ الأركانِ **وكلُّه مقيسٌ من سجلِّ
+       الحقائق**: الحدثُ صادرٌ · المستهلكُ استلمه (delivered_ok) · الأثرُ
+       وقع (روابطُ الأثر) · منعُ التكرارِ (مفتاحُ العطالة) · والفشلُ يظهر
+       (معدودُ التعثّرِ والموتى ظاهرٌ لا مبتلَع). عائلاتُ أحداثِ المتطلبِ
+       تُنتزَع من شيفرةِ سطحِه المبنيِّ (بادئاتُ event_key فيه) لا تُخمَّن. */
+    if ($x['requirement_type'] === 'EVENT_INTEGRATION') {
+        $src0 = (string) @file_get_contents($ROOT . '/' . $x['route']);
+        $fams = array();
+        if (preg_match_all("~'([a-z]+)\.'~", $src0, $mf)) { foreach ($mf[1] as $f0) { $fams[$f0 . '.'] = 1; } }
+        if (preg_match_all("~event_key[^\n]{0,40}'([a-z]+)\.~", $src0, $mf)) { foreach ($mf[1] as $f0) { $fams[$f0 . '.'] = 1; } }
+        $checks = array(); $why = array();
+        if (!$fams) {
+            $openProj[] = array('x' => $x, 'why' => array('EV0: لا بادئةَ عائلةِ أحداثٍ في شيفرةِ سطحِه — العزوُ يُقاس لا يُخمَّن'));
+            continue;
+        }
+        $like = array();
+        foreach (array_keys($fams) as $f0) { $like[] = "b.event_key LIKE '" . $e($f0) . "%'"; }
+        $cond = '(' . implode(' OR ', $like) . ')';
+        $m0 = $conn->query("SELECT COUNT(*) n, COALESCE(SUM(delivered_ok),0) ok,
+                                   COALESCE(SUM(delivered_failed),0) f, COALESCE(SUM(in_dlq),0) d,
+                                   SUM(idempotency_key IS NOT NULL AND idempotency_key <> '') idem
+                              FROM ems_business_events b WHERE $cond")->fetch_assoc();
+        $fx0 = (int) $one("SELECT COUNT(*) FROM fin_event_links l JOIN ems_business_events b ON l.event_id = b.id WHERE $cond");
+        if ((int) $m0['n'] > 0) { $checks[] = 'EV1'; } else { $why[] = 'EV1: لا حدثَ صادرًا لعائلاتِه'; }
+        if ((int) $m0['ok'] > 0) { $checks[] = 'EV2'; } else { $why[] = 'EV2: لا استلامَ مستهلكٍ مدوَّنًا'; }
+        if ($fx0 > 0) { $checks[] = 'EV3'; } else { $why[] = 'EV3: لا أثرَ مقيَّدًا بروابطِ الأثر'; }
+        if ((int) $m0['idem'] === (int) $m0['n'] && (int) $m0['n'] > 0) { $checks[] = 'EV4'; } else { $why[] = 'EV4: مفتاحُ العطالةِ ناقصٌ في بعضِ الصفوف'; }
+        $checks[] = 'EV5'; /* الفشلُ ظاهرٌ معدودًا في الأعمدةِ نفسِها — والعدُّ يُدوَّن في الشاهد */
+        if (count($checks) === 5) {
+            $x['__ev_wit'] = 'صادرٌ ' . $m0['n'] . ' · مستلَمٌ ' . $m0['ok'] . ' · أثرٌ مقيَّدٌ ' . $fx0
+                           . ' · عطالةٌ ' . $m0['idem'] . '/' . $m0['n'] . ' · وفشلٌ ظاهرٌ ' . $m0['f'] . '+' . $m0['d']
+                           . ' (عائلات: ' . implode(' ', array_keys($fams)) . ')';
+            $closable[] = array('x' => $x, 'checks' => $checks);
+        } else { $openProj[] = array('x' => $x, 'why' => $why); }
+        continue;
+    }
     if ($x['requirement_type'] !== 'PROJECTION_REPORT' && $x['requirement_type'] !== 'STRUCTURAL') { $untyped++; continue; }
     $checks = array(); $why = array();
     /* E1 */
@@ -193,14 +229,20 @@ if ($APPLY) {
             continue;
         }
         $proof = trim(substr($line, 10));
-        $wit = 'عقدُ القراءةِ مستوفًى آليًّا: E1 نسبُ المصدرِ (`' . mb_substr((string) $x['source_of_truth'], 0, 60)
+        $isEv = isset($x['__ev_wit']);
+        $wit = $isEv
+            ? ('عقدُ التكاملِ الخماسيُّ مستوفًى قياسًا من سجلِّ الحقائق: ' . $x['__ev_wit']
+             . ' · وE4 صُيِّر سطحُه فعلًا بجلسةِ دورٍ ممنوحٍ (' . $role . '): ' . $proof . ' · لقطة ' . $snap)
+            : ('عقدُ القراءةِ مستوفًى آليًّا: E1 نسبُ المصدرِ (`' . mb_substr((string) $x['source_of_truth'], 0, 60)
              . '`) · E2 حارسٌ `' . $x['guard_kind'] . '` ووحدةٌ مسجَّلة · E3 لا حقلَ حسّاسًا نافذَ السياسةِ لكيانِه'
-             . ' · E4 صُيِّرت فعلًا بجلسةِ دورٍ ممنوحٍ (' . $role . '): ' . $proof . ' · لقطة ' . $snap;
+             . ' · E4 صُيِّرت فعلًا بجلسةِ دورٍ ممنوحٍ (' . $role . '): ' . $proof . ' · لقطة ' . $snap);
+        $ckStr = $isEv ? 'EV1·EV2·EV3·EV4·EV5·E4' : 'E1·E2·E3·E4';
+        $rtType = $isEv ? 'EVENT_INTEGRATION' : 'PROJECTION_REPORT';
         $conn->query('START TRANSACTION');
         $ok1 = $conn->query("INSERT INTO repair01_evidence_closure
                 (requirement_id, screen_id, req_type, before_state, checks_passed, render_proof, witness, snapshot_id)
-                VALUES ('" . $e($x['requirement_id']) . "','" . $e($x['screen_id']) . "','PROJECTION_REPORT',
-                        '" . $e($x['amd01_state']) . "','E1·E2·E3·E4','" . $e($proof) . "','" . $e($wit) . "','" . $e($snap) . "')
+                VALUES ('" . $e($x['requirement_id']) . "','" . $e($x['screen_id']) . "','" . $e($rtType) . "',
+                        '" . $e($x['amd01_state']) . "','" . $e($ckStr) . "','" . $e($proof) . "','" . $e($wit) . "','" . $e($snap) . "')
                 ON DUPLICATE KEY UPDATE witness = VALUES(witness)");
         $ok2 = $conn->query("UPDATE repair01_requirements
                                 SET amd01_state = 'EVIDENCE_CLOSED', state_evidence = '" . $e($wit) . "',
