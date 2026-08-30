@@ -55,6 +55,36 @@ function cb_rule($nCand)
     if ($nCand > 1)   { return 'AMBIGUOUS_DECLARED'; }
     return 'NO_LIVE_SURFACE';
 }
+/* تطبيعُ اسمِ الإدارةِ — كي يُقارَن اسمٌ بآخرَ لا شكلٌ بشكل */
+function cb_norm($s)
+{
+    $s = preg_replace('~[\x{0640}\x{064B}-\x{0652}]~u', '', (string) $s);
+    $s = str_replace(array('أ','إ','آ','ى','ة','ؤ','ئ'), array('ا','ا','ا','ي','ه','و','ي'), $s);
+    $s = preg_replace('~^\s*(اداره|ادارة)\s+~u', '', $s);
+    $s = preg_replace('~[^\p{Arabic}\p{L}\p{N}]+~u', ' ', $s);
+    return trim(preg_replace('~\s+~u', ' ', $s));
+}
+/* ◆ **C4 · `PATH_OR_SCOPE_RESOLVED`** — الملتبسُ بالاسمِ **يُحسم بشاهدٍ ثانٍ
+     مقيسٍ لا بترجيح**: ① مسارُ الصفِّ الكاملُ (‏مجلَّدًا واسمًا) يطابق سطحًا
+     واحدًا · أو ② إدارةُ الصفِّ (`dept_name`) تُحلُّ إلى رمزٍ يطابق مالكَ
+     **مرشَّحٍ واحدٍ لا غير**. ⛔ **ومرشَّحان يطابقان ⇒ يبقى ملتبسًا**:
+     شاهدٌ يُبقي اثنين ليس شاهدًا. */
+function cb_disambiguate($cand, $meta, $byPath, $DEPTN, $rawFile, $deptName)
+{
+    $p = strtolower(trim(str_replace(chr(92), '/', (string) $rawFile), '/'));
+    if ($p !== '' && strpos($p, '/') !== false && isset($byPath[$p]) && count($byPath[$p]) === 1) {
+        return array($byPath[$p][0], 'PATH');
+    }
+    $code = '';
+    $dn = cb_norm($deptName);
+    if ($dn !== '' && isset($DEPTN[$dn])) { $code = $DEPTN[$dn]; }
+    if ($code === '') { return array('', ''); }
+    $hit = array();
+    foreach ($cand as $sc) {
+        if (isset($meta[$sc]) && (string) $meta[$sc]['owner_code'] === $code) { $hit[] = $sc; }
+    }
+    return (count($hit) === 1) ? array($hit[0], 'SCOPE:' . $code) : array('', '');
+}
 
 /* ═══ ① الاختبارُ السالبُ — يُصيب الأطرافَ الثلاثةَ ولا يمرُّ بمفردةٍ فريدة ═══ */
 if ($SELF) {
@@ -92,25 +122,56 @@ if ((!$col || !$col->num_rows) && $APPLY) {
 /* ═══ ③ المرشَّحون لكلِّ اسمِ ملفّ ════════════════════════════════════════ */
 $LIVE = "repair01_screen_registry WHERE on_disk = 1 AND ownership_verdict <> 'RETIRE'";
 $byBase = array(); $meta = array();
-$r = $conn->query("SELECT screen_id, screen_file, route, canonical_label_ar,
+$r = $conn->query("SELECT screen_id, screen_file, route, canonical_label_ar, owner_code,
                           grain_cardinality, grain_fact_scope FROM $LIVE");
 while ($x = $r->fetch_assoc()) {
     $b = strtolower(basename((string) $x['screen_file']));
     $byBase[$b][] = $x['screen_id'];
     $meta[$x['screen_id']] = $x;
 }
+/* ◆ **ومجلَّدُ المسارِ يفرّق ما لا يفرّقه الاسمُ المجرَّد**: `index.php` ثلاثةٌ
+   بأسمائها **وواحدةٌ بمسارِها** — و`gov_screen_cycle.screen_file` قد يحمل
+   مجلَّدًا. ⇒ فهرسٌ ثانٍ بالمسارِ المُطبَّع. */
+$byPath = array();
+foreach ($meta as $sc => $x) {
+    $p = strtolower(trim(str_replace(chr(92), '/', (string) $x['route']), '/'));
+    if ($p !== '') { $byPath[$p][] = $sc; }
+}
+/* اسمُ الإدارةِ إلى رمزِها — للفرزِ حين يلتبس الاسم */
+$DEPTN = array();
+$q = @$conn->query("SELECT canonical_code, name_ar FROM repair01_departments");
+while ($q && ($z = $q->fetch_row())) { $DEPTN[cb_norm($z[1])] = $z[0]; }
 
-$rows = array(); $stat = array('C1' => 0, 'C2' => 0, 'C3' => 0);
+$rows = array(); $stat = array('C1' => 0, 'C2' => 0, 'C3' => 0, 'C4' => 0);
 $bound = array(); $ambNames = array();
-$r = $conn->query("SELECT id, screen_file, stage_name, stage_kind FROM gov_screen_cycle ORDER BY id");
+$r = $conn->query("SELECT id, screen_file, stage_name, stage_kind, dept_name FROM gov_screen_cycle ORDER BY id");
 while ($x = $r->fetch_assoc()) {
     $b = strtolower(basename((string) $x['screen_file']));
     $cand = isset($byBase[$b]) ? $byBase[$b] : array();
     $rule = cb_rule(count($cand));
     $sidv = ($rule === 'BASENAME_UNIQUE') ? $cand[0] : '';
+    $how4 = '';
+    if ($rule === 'AMBIGUOUS_DECLARED') {
+        list($d, $how4) = cb_disambiguate($cand, $meta, $byPath, $DEPTN,
+                                          $x['screen_file'], $x['dept_name']);
+        if ($d !== '') { $rule = 'PATH_OR_SCOPE_RESOLVED'; $sidv = $d; }
+    }
     if ($rule === 'BASENAME_UNIQUE') { $stat['C1']++; $bound[$sidv] = 1; }
+    elseif ($rule === 'PATH_OR_SCOPE_RESOLVED') { $stat['C4']++; $bound[$sidv] = 1; }
     elseif ($rule === 'AMBIGUOUS_DECLARED') { $stat['C2']++; $ambNames[$b] = count($cand); }
     else { $stat['C3']++; }
+    if ($rule === 'PATH_OR_SCOPE_RESOLVED') {
+        $wit = 'C4 · اسمُ الملفِّ `' . $b . '` يطابق **' . count($cand) . '** أسطحٍ، '
+             . '**وحُسم بشاهدٍ ثانٍ مقيسٍ لا بترجيح**: '
+             . (strncmp($how4, 'SCOPE:', 6) === 0
+                ? 'إدارةُ الصفِّ «' . trim((string) $x['dept_name']) . '» تُحلُّ إلى `'
+                  . substr($how4, 6) . '` **وتطابق مالكَ مرشَّحٍ واحدٍ لا غير**'
+                : 'مسارُ الصفِّ الكاملُ (‏مجلَّدًا واسمًا) يطابق سطحًا واحدًا')
+             . ' ⇒ `' . $sidv . '`. ⛔ **ومرشَّحان يطابقان يبقيان ملتبسَين**: '
+             . 'شاهدٌ يُبقي اثنَين ليس شاهدًا · لقطة ' . $sid;
+        $rows[] = array((int) $x['id'], $b, $rule, $sidv, $wit);
+        continue;
+    }
     $wit = ($rule === 'BASENAME_UNIQUE')
         ? 'C1 · اسمُ الملفِّ `' . $b . '` يُحلُّ إلى **سطحٍ حيٍّ واحدٍ لا غير** (`' . $sidv
           . '`) ⇒ الوصلُ بالمعرِّفِ لا بالاسم · لقطة ' . $sid
@@ -144,10 +205,13 @@ foreach ($cls as $lbl => $w) {
 /* ═══ ⑤ العرض ════════════════════════════════════════════════════════════ */
 echo "\n═══ `RPR-02` #٧ — جسرُ دورةِ العملِ إلى معرِّفِ الشاشة ═══\n";
 printf("  اللقطة: %s · صفوفُ دورةِ العمل: **%d**\n\n", $sid, count($rows));
-echo "  ── القواعدُ الثلاث ──\n";
+echo "  ── القواعدُ الأربع ──
+";
 printf("     C1 `BASENAME_UNIQUE`     %4d صفًّا — يُحلُّ إلى سطحٍ واحدٍ ⇒ **يُكتب المعرِّف**\n", $stat['C1']);
 printf("     C2 `AMBIGUOUS_DECLARED`  %4d صفًّا على %d اسمًا — ⛔ **يبقى بلا معرِّف**\n",
        $stat['C2'], count($ambNames));
+printf("     C4 `PATH_OR_SCOPE_RESOLVED` %2d صفًّا — الملتبسُ حُسم بمسارٍ أو بإدارةٍ مطابقةٍ لمالكٍ واحد
+", $stat['C4']);
 printf("     C3 `NO_LIVE_SURFACE`     %4d صفًّا — سطحٌ غيرُ قائمٍ · يُعلَن ولا يُحذف\n", $stat['C3']);
 if ($ambNames) {
     echo "\n     ── الملتبسُ بأسمائه ──\n";
