@@ -138,7 +138,11 @@ foreach ($rows as $x) {
         if (trim((string) $x['state_model_ref']) !== '') { $tx['sm']++; }
         continue;
     }
-    if ($x['requirement_type'] !== 'PROJECTION_REPORT') { $untyped++; continue; }
+    /* عقدُ STRUCTURAL نصُّه: «مصالحةٌ قاطعةٌ بالمعرِّف · ودليلٌ مقيس ·
+       ⛔ ولا يُطالَب بأثرٍ تجاريٍّ ولا برحلةٍ بشريّة» — فيُغلَق بالفحوصِ
+       المقيسةِ نفسِها (نسبُ المصدرِ والحارسُ والتصييرُ الحيُّ) كالقراءة.
+       والرحلاتُ والتكاملُ يبقيان لمسارَيهما (بشريٌّ/عقدُ حدثٍ) */
+    if ($x['requirement_type'] !== 'PROJECTION_REPORT' && $x['requirement_type'] !== 'STRUCTURAL') { $untyped++; continue; }
     $checks = array(); $why = array();
     /* E1 */
     if (trim((string) $x['source_of_truth']) !== '') { $checks[] = 'E1'; }

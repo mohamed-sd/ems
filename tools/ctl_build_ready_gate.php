@@ -110,7 +110,15 @@ function br_judge(array $x, array $affectedUnits)
     }
     if ($rt === 'TRANSACTION') { $sm = 'YES'; $wf = 'YES'; $wit[] = 'sm/wf=YES: معاملة'; }
     elseif ($rt === 'PROJECTION_REPORT') { $sm = 'NO'; $wf = 'NO'; $wit[] = 'sm/wf=NO: قراءةٌ لا معاملة — عدمُ الانطباقِ مسجَّلٌ لا مُفترَض'; }
-    else { $sm = 'UNDETERMINED'; $wf = 'UNDETERMINED'; $blk[] = 'REQUIREMENT_TYPE_MISSING'; }
+    elseif ($rt === 'STRUCTURAL') { $sm = 'NO'; $wf = 'NO'; $wit[] = 'sm/wf=NO: بنيويٌّ/مرجعيٌّ — تعريفُ بيتٍ لا حركةَ حالة (عقدُ STRUCTURAL)'; }
+    elseif ($rt === 'EVENT_INTEGRATION') { $sm = 'NO'; $wf = 'NO'; $wit[] = 'sm/wf=NO: تكاملُ أحداثٍ — إثباتُه بعقدِ الحدثِ والمستهلكِ لا بآلةِ شاشة'; }
+    elseif ($rt === 'CROSS_JOURNEY') { $sm = 'NO'; $wf = 'NO'; $wit[] = 'sm/wf=NO: رحلةٌ عابرةُ نطاقاتٍ — الآلاتُ آلاتُ محطّاتِها وإثباتُها بشريٌّ بعقدِها'; }
+    else {
+        /* ⛔ **البوّابةُ عمِيت عن الأنواعِ الثلاثةِ المصنَّفةِ حديثًا** فحجبتها
+           حجبَ المجهولِ (قِيس: العدّادُ 160 وغيرُ المصنَّفِ صفر) — الفروعُ
+           أعلاه تعرّفها الآن، وهذا الفرعُ للمجهولِ حقًّا وحدَه */
+        $sm = 'UNDETERMINED'; $wf = 'UNDETERMINED'; $blk[] = 'REQUIREMENT_TYPE_MISSING';
+    }
     /* والقراءةُ المصمَّمةُ في قائمةٍ realization لها وإن خلا النوعُ الأصليّ */
     if ($real === 'UNDECIDED' && $rt === 'PROJECTION_REPORT') { $real = 'PROJECTION_REPORT';
         $k0 = array_search('REALIZATION_TYPE_UNDECIDED', $blk, true);
