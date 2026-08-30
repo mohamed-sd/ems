@@ -18,6 +18,8 @@ if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
     enforce_current_page_view_permission($conn, '../main/dashboard.php');
 }
 require_once __DIR__ . '/tkt_helpers.php';
+// مرحلة الرأس تُكتب بباب مجال البلاغات وحده (§5·9) — لا بجملة خام في الشاشة
+require_once dirname(__DIR__) . '/app/Services/Tickets/TicketStateService.php';
 
 $ctx = tkt_ctx();
 $company_id = $ctx['company_id'];
@@ -46,13 +48,8 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['classify_tk']
         mysqli_stmt_close($ot);
         $owner = $orow ? intval($orow['owner_role_id']) : 0;
 
-        $st = mysqli_prepare($conn, "UPDATE tickets
-                                        SET category_id = ?, ticket_type_id = ?, stage = 'routed',
-                                            owner_role_id = COALESCE(NULLIF(?, 0), owner_role_id)
-                                      WHERE id = ? AND company_id = ? AND stage IN ('new','classified')");
-        mysqli_stmt_bind_param($st, 'iiiii', $cat, $typ, $owner, $tid, $company_id);
-        mysqli_stmt_execute($st);
-        if (mysqli_stmt_affected_rows($st) > 0) {
+        $rt = \App\Services\Tickets\TicketStateService::classifyAndRoute($conn, $tid, $company_id, $cat, $typ, $owner);
+        if ($rt['changed'] > 0) {
             mysqli_query($conn, "INSERT INTO ticket_events (company_id, ticket_id, event_type, body, actor_user_id, new_value)
                                  VALUES ($company_id, $tid, 'reclassified', 'صنف من شاشة الاستقبال ووجه للإدارة المختصة', $uid, 'routed')");
             // المهلة تُحسب عند التوجيه إن لم تكن حُسبت عند الإنشاء

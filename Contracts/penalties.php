@@ -132,22 +132,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['pen_action'])) {
                 'entity_id' => $__ent, 'amount' => $__amt,
             ));
             if (empty($__sig['ok']) && (int) $__sig['code'] === 409) {
-                $__esc = $conn->prepare("INSERT INTO exec_approvals
-                    (company_id, request_no, received_date, doc_type, document, requesting_dept,
-                     raise_reason, amount, currency, status, source_kind, created_by, created_by_name)
-                    VALUES (?, ?, CURDATE(), 'إعفاء غرامة', ?, 'المالية والخزينة',
-                            ?, ?, 'USD', 'قيد المراجعة', 'escalation', ?, ?)");
-                if ($__esc) {
-                    $__rq = 'ESC-PEN-' . $__aid . '-' . date('ymdHis');
-                    $__doc = 'إعفاء غرامة #' . $__aid;
-                    $__why = 'تجاوز سقف التفويض للإعفاء — ' . $__sig['reason'];
-                    $__amtS = (string) $__amt;
-                    $__nm = 'طالب الإعفاء #' . (int) $uid;
-                    $__uidI = (int) $uid;
-                    $__esc->bind_param('sssssis', $__rq, $__doc, $__why, $__amtS, $__uidI, $__nm);
-                    $__esc->execute();
-                    $__esc->close();
-                }
+                /* صندوقُ الاعتمادِ الأعلى ملكُ مساحةِ القيادة — والتصعيدُ ببابِه
+                   لا بجملةٍ خامّةٍ من إدارةِ العقود (§5·9 · RPR-02 #11). */
+                require_once dirname(__DIR__) . '/app/Services/Exec/ExecApprovalInbox.php';
+                \App\Services\Exec\ExecApprovalInbox::escalate($conn, array(
+                    'company_id'      => (int) $company_id,
+                    'request_no'      => 'ESC-PEN-' . $__aid . '-' . date('ymdHis'),
+                    'doc_type'        => 'إعفاء غرامة',
+                    'document'        => 'إعفاء غرامة #' . $__aid,
+                    'requesting_dept' => 'المالية والخزينة',
+                    'raise_reason'    => 'تجاوز سقف التفويض للإعفاء — ' . $__sig['reason'],
+                    'amount'          => (string) $__amt,
+                    'currency'        => 'USD',
+                    'status'          => 'قيد المراجعة',
+                    'source_kind'     => 'escalation',
+                    'created_by'      => (int) $uid,
+                    'created_by_name' => 'طالب الإعفاء #' . (int) $uid,
+                ));
                 pen_back('PEN-CAP-409: ' . $__sig['reason'] . ' — **رفع الإعفاء لصندوق الاعتماد الأعلى** ⤴',
                     $c, $f, $t);
             }

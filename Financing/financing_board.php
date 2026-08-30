@@ -25,8 +25,11 @@ if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
 }
 require_once __DIR__ . '/../includes/screen_contract.php';
 require_once dirname(__DIR__) . '/app/Core/OwnershipDomainGuard.php';
+// سجل الاطّلاع مملوك لمجال الأمن (SEC-21) — والكتابة تمرّ ببابه لا بجملة خام
+require_once dirname(__DIR__) . '/app/Services/Security/SensitiveFieldGuard.php';
 
 use App\Core\OwnershipDomainGuard;
+use App\Services\Security\SensitiveFieldGuard;
 
 $company_id = intval($_SESSION['user']['company_id'] ?? 0);
 $role = strval($_SESSION['user']['role'] ?? '');
@@ -47,12 +50,8 @@ $financiers = $opsActive = $devOpen = 0;
 $balances = array();
 $due30 = array();
 if ($granted) {
-    // سطر اطّلاع — فتح اللوحة قراءةً لبيانات المجال المقيَّد
-    $st = $conn->prepare("INSERT INTO sensitive_read_log (person_id, element_code, subject_type, subject_id, ip, result) VALUES (?, 'ownership.financing_board', 'screen', 214, ?, 'allowed')");
-    $ip = strval($_SERVER['REMOTE_ADDR'] ?? 'cli');
-    $st->bind_param('is', $uid, $ip);
-    $st->execute();
-    $st->close();
+    // سطر اطّلاع — فتح اللوحة قراءةً لبيانات المجال المقيَّد (بباب مجال الأمن)
+    SensitiveFieldGuard::logScreenRead($conn, $uid, 'ownership.financing_board', 214);
 
     $financiers = intval($conn->query(
         "SELECT COUNT(DISTINCT r.entity_id) c FROM entity_roles r

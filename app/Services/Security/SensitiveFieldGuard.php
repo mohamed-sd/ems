@@ -113,4 +113,30 @@ class SensitiveFieldGuard
         $stmt->execute();
         $stmt->close();
     }
+
+    /**
+     * سطر اطّلاع على **شاشة** — فتحُ سطحٍ في مجال مقيَّد قراءةً (FIN-01 §1.1).
+     * ───────────────────────────────────────────────────────────────────────
+     * الباب الوحيد لهذا السجل: كانت شاشتا التمويل تكتبان الصف بجملة INSERT
+     * خام في ملفَّيهما، فصار للسجل مُنشئان مستقلَّان — وهو ما تمنعه §5·9.
+     * والسجل مملوك لمجال الأمن (SEC-21) لا لإدارة التمويل، فالكتابة تمرّ به.
+     *
+     * @param string $elementCode رمز العنصر المطَّلَع عليه (ownership.<screen>)
+     * @param int    $screenId    رقم الشاشة في سجل الشاشات
+     */
+    public static function logScreenRead(\mysqli $conn, $personId, $elementCode, $screenId, $ip = '')
+    {
+        if ($ip === '') { $ip = strval(isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'cli'); }
+        $stmt = $conn->prepare(
+            "INSERT INTO sensitive_read_log (person_id, element_code, subject_type, subject_id, ip, result)
+             VALUES (?, ?, 'screen', ?, ?, 'allowed')");
+        if (!$stmt) { return; }
+        $personId = intval($personId);
+        $screenId = intval($screenId);
+        $elementCode = (string) $elementCode;
+        $ip = (string) $ip;
+        $stmt->bind_param('isis', $personId, $elementCode, $screenId, $ip);
+        $stmt->execute();
+        $stmt->close();
+    }
 }

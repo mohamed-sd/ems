@@ -245,22 +245,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'e21_d
                 'created_by_person_id' => (int) $req['created_by'],
             ));
             if (empty($__sig['ok']) && (int) $__sig['code'] === 409) {
-                $__esc = $conn->prepare("INSERT INTO exec_approvals
-                    (company_id, request_no, received_date, doc_type, document, requesting_dept,
-                     raise_reason, amount, currency, status, source_kind, created_by, created_by_name)
-                    VALUES (?, ?, CURDATE(), 'طلب شراء', ?, 'المشتريات التشغيلية',
-                            ?, ?, 'USD', 'قيد المراجعة', 'escalation', ?, ?)");
-                if ($__esc) {
-                    $__rq = 'ESC-PR-' . $rid . '-' . date('ymdHis');
-                    $__doc = 'طلب شراء ' . (string) ($req['code'] ?? ('#' . $rid));
-                    $__why = 'تجاوز سقف المشتريات — ' . $__sig['reason'];
-                    $__amt = (string) $__total;
-                    $__nm  = 'معتمد المشتريات #' . (int) $current_user_id;
-                    $__uidI = (int) $current_user_id;
-                    $__esc->bind_param('sssssis', $__rq, $__doc, $__why, $__amt, $__uidI, $__nm);
-                    $__esc->execute();
-                    $__esc->close();
-                }
+                /* صندوقُ الاعتمادِ الأعلى ملكُ مساحةِ القيادة — والتصعيدُ ببابِه
+                   لا بجملةٍ خامّةٍ من إدارةِ المشتريات (§5·9 · RPR-02 #11). */
+                require_once dirname(__DIR__) . '/app/Services/Exec/ExecApprovalInbox.php';
+                \App\Services\Exec\ExecApprovalInbox::escalate($conn, array(
+                    'company_id'      => (int) $company_id,
+                    'request_no'      => 'ESC-PR-' . $rid . '-' . date('ymdHis'),
+                    'doc_type'        => 'طلب شراء',
+                    'document'        => 'طلب شراء ' . (string) ($req['code'] ?? ('#' . $rid)),
+                    'requesting_dept' => 'المشتريات التشغيلية',
+                    'raise_reason'    => 'تجاوز سقف المشتريات — ' . $__sig['reason'],
+                    'amount'          => (string) $__total,
+                    'currency'        => 'USD',
+                    'status'          => 'قيد المراجعة',
+                    'source_kind'     => 'escalation',
+                    'created_by'      => (int) $current_user_id,
+                    'created_by_name' => 'معتمد المشتريات #' . (int) $current_user_id,
+                ));
                 ems_gov_flash_redirect('requests_proc.php',
                     'PROC-CAP-409: ' . $__sig['reason'] . ' — **رفع الطلب إلى صندوق اعتماد نائب المالية** ⤴',
                     'GOV-FAIL-409', 'الاعتماد داخل الإدارة لا يتجاوز سقفها');

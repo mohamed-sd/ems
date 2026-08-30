@@ -125,4 +125,53 @@ class AssetHoursService
         );
         return max(0, $conn->affected_rows);
     }
+
+    /* ── سطرُ المصالحةِ مملوكٌ لهذه الخدمةِ وحدَها ────────────────────────────
+       كانت `DepreciationRunService` تكتب على `asset_hour_reconciliations`
+       مباشرةً، فصار للسطرِ مُنشئان مستقلَّان — وهو ما تمنعه §٥·٩. **والقرارُ
+       يبقى هناك** (‏أيُّ سطرٍ يُهلَك وبأيِّ مبلغٍ وبأيِّ قيد) — **والكتابةُ
+       تعود إلى مالكِ السطر**. ⛔ ولا يُغيَّر شرطٌ ولا عمودٌ: الجملتان هما هما. */
+
+    /** تثبيتُ إهلاكِ الفترةِ على سطرِ مصالحة — ولا يُصيب إلّا معدّةَ الشركة. */
+    public static function postDepreciation(\mysqli $conn, $recId, $amount, $journalRef)
+    {
+        $st = $conn->prepare(
+            "UPDATE `asset_hour_reconciliations`
+                SET `depreciation_amount` = ?, `hours_undepreciated` = 0,
+                    `journal_ref` = ?
+              WHERE `rec_id` = ? AND `owner_type` = 'company'"
+        );
+        if (!$st) { return array('ok' => false, 'changed' => 0, 'reason' => $conn->error); }
+        $amt = (float) $amount; $ref = (string) $journalRef; $rid = (int) $recId;
+        $st->bind_param('dsi', $amt, $ref, $rid);
+        $ok = $st->execute();
+        $n  = $st->affected_rows;
+        $st->close();
+        return array('ok' => (bool) $ok, 'changed' => $n);
+    }
+
+    /** عكسُ إهلاكٍ مثبَّت — بمرجعِه وسببِه ومَن عكسه، والسطرُ يعود «مُفسَّرًا». */
+    public static function reverseDepreciation(\mysqli $conn, $recId, $ref, $reason, $actorId)
+    {
+        $st = $conn->prepare(
+            "UPDATE `asset_hour_reconciliations`
+                SET `depr_reversed_amount` = COALESCE(`depr_reversed_amount`,0) + `depreciation_amount`,
+                    `depr_reversal_ref`    = ?,
+                    `depr_reversed_at`     = NOW(),
+                    `depreciation_amount`  = NULL,
+                    `hours_undepreciated`  = `hours_from_shifts`,
+                    `explanation`          = CONCAT('[', ?, '] ', ?),
+                    `explained_by`         = ?,
+                    `explained_at`         = NOW(),
+                    `state`                = 'explained'
+              WHERE `rec_id` = ? AND `depreciation_amount` IS NOT NULL"
+        );
+        if (!$st) { return array('ok' => false, 'changed' => 0, 'reason' => $conn->error); }
+        $r1 = (string) $ref; $r2 = (string) $reason; $ac = (int) $actorId; $rid = (int) $recId;
+        $st->bind_param('sssii', $r1, $r1, $r2, $ac, $rid);
+        $ok = $st->execute();
+        $n  = $st->affected_rows;
+        $st->close();
+        return array('ok' => (bool) $ok, 'changed' => $n);
+    }
 }

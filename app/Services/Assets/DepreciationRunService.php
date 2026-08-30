@@ -14,6 +14,11 @@
 
 namespace App\Services\Assets;
 
+/* ⛔ **وسطرُ المصالحةِ ليس ملكَ هذه الخدمة** — `AssetHoursService` تُنشئه
+   وتملكه (§٥·٩: مالكٌ قانونيٌّ واحدٌ لكلِّ حقيقة). فالقرارُ هنا (‏أيُّ سطرٍ
+   يُهلَك وبأيِّ مبلغٍ وبأيِّ مرجع) **والكتابةُ ببابِ مالكِه**. */
+require_once __DIR__ . '/AssetHoursService.php';
+
 class DepreciationRunService
 {
     /**
@@ -40,12 +45,6 @@ class DepreciationRunService
         $res = $rows->get_result();
 
         $posted = 0; $skipSup = 0; $skipRate = 0; $already = 0;
-        $upd = $conn->prepare(
-            "UPDATE `asset_hour_reconciliations`
-                SET `depreciation_amount` = ?, `hours_undepreciated` = 0,
-                    `journal_ref` = ?
-              WHERE `rec_id` = ? AND `owner_type` = 'company'"
-        );
 
         while ($r = $res->fetch_assoc()) {
             // ◆ معدةُ الموردِ لا تُهلَك عندنا — والقيدُ يرفضها أيضًا لو مُرِّرت
@@ -59,11 +58,10 @@ class DepreciationRunService
             $amount = round((float) $r['hours_from_shifts'] * $rate, 2);
             $ref = 'DEPR-' . $period . '-' . (int) $r['rec_id'];
             $rid = (int) $r['rec_id'];
-            $upd->bind_param('dsi', $amount, $ref, $rid);
-            if ($upd->execute() && $conn->affected_rows === 1) { $posted++; }
+            $w = AssetHoursService::postDepreciation($conn, $rid, $amount, $ref);
+            if ($w['ok'] && $w['changed'] === 1) { $posted++; }
         }
         $rows->close();
-        $upd->close();
 
         return array(
             'ok' => true, 'posted' => $posted,
@@ -98,25 +96,12 @@ class DepreciationRunService
 
         $amount = (float) $row['depreciation_amount'];
         $ref = 'REV-DEPR-' . $recId . '-' . date('YmdHis');
-        $u = $conn->prepare(
-            "UPDATE `asset_hour_reconciliations`
-                SET `depr_reversed_amount` = COALESCE(`depr_reversed_amount`,0) + `depreciation_amount`,
-                    `depr_reversal_ref`    = ?,
-                    `depr_reversed_at`     = NOW(),
-                    `depreciation_amount`  = NULL,
-                    `hours_undepreciated`  = `hours_from_shifts`,
-                    `explanation`          = CONCAT('[', ?, '] ', ?),
-                    `explained_by`         = ?,
-                    `explained_at`         = NOW(),
-                    `state`                = 'explained'
-              WHERE `rec_id` = ? AND `depreciation_amount` IS NOT NULL"
-        );
-        $u->bind_param('sssii', $ref, $ref, $reason, $actor, $recId);
-        $u->execute();
-        $n = $conn->affected_rows;
-        $err = $u->error;
-        $u->close();
-        if ($n !== 1) { return array('ok' => false, 'reason' => $err !== '' ? $err : 'لم يتغير شيء'); }
+        $w = AssetHoursService::reverseDepreciation($conn, $recId, $ref, $reason, $actor);
+        $n = (int) $w['changed'];
+        if ($n !== 1) {
+            return array('ok' => false,
+                'reason' => (isset($w['reason']) && $w['reason'] !== '') ? $w['reason'] : 'لم يتغير شيء');
+        }
 
         return array('ok' => true, 'reason' => 'عكس بمرجعه', 'reversed' => $amount, 'ref' => $ref);
     }

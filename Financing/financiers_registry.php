@@ -23,8 +23,11 @@ if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
 }
 require_once __DIR__ . '/../includes/screen_contract.php';
 require_once dirname(__DIR__) . '/app/Core/OwnershipDomainGuard.php';
+// سجل الاطّلاع مملوك لمجال الأمن (SEC-21) — والكتابة تمرّ ببابه لا بجملة خام
+require_once dirname(__DIR__) . '/app/Services/Security/SensitiveFieldGuard.php';
 
 use App\Core\OwnershipDomainGuard;
+use App\Services\Security\SensitiveFieldGuard;
 
 $company_id = intval($_SESSION['user']['company_id'] ?? 0);
 $role = strval($_SESSION['user']['role'] ?? '');
@@ -44,11 +47,7 @@ if (!$granted) {
 $canTerms = ($role === '-1') || OwnershipDomainGuard::hasGrant($conn, $co, $uid, OwnershipDomainGuard::PERM_TERMS);
 
 // سطر اطّلاع — فتح السجل قراءة لبيانات الملكية
-$st = $conn->prepare("INSERT INTO sensitive_read_log (person_id, element_code, subject_type, subject_id, ip, result) VALUES (?, 'ownership.financiers_registry', 'screen', 210, ?, 'allowed')");
-$ip = strval($_SERVER['REMOTE_ADDR'] ?? 'cli');
-$st->bind_param('is', $uid, $ip);
-$st->execute();
-$st->close();
+SensitiveFieldGuard::logScreenRead($conn, $uid, 'ownership.financiers_registry', 210);
 
 $rows = $conn->query(
     "SELECT e.entity_id, e.legal_name, e.base_currency, e.state,

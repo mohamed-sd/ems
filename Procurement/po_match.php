@@ -135,21 +135,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'resol
                  وقيمتِه وسببِه، ثم يُبلَّغ المُرسِلُ أنَّ طلبَه صُعِّد لا أنه ضاع. */
             $__esc = 0;
             require_once __DIR__ . '/../includes/audit_trail.php';
-            $__eq = $conn->prepare(
-                'INSERT INTO exec_approvals (company_id, request_no, received_date, doc_type, document,
-                                             raise_reason, amount, status, created_by)
-                 VALUES (?, ?, CURDATE(), ?, ?, ?, ?, ?, ?)');
-            if ($__eq) {
-                $__dt  = 'po_variance';
-                $__doc = 'PO#' . $rid;
-                $__rn  = 'ESC-POV-' . $rid . '-' . (int) $current_user_id;
-                $__stt = 'pending';
-                $__nt  = 'تصعيد آلي: فرق مطابقة فوق سقف المرسل — ' . $__sig['reason'];
-                $__cid = (int) $company_id; $__uid2 = (int) $current_user_id;
-                $__eq->bind_param('issssdsi', $__cid, $__rn, $__dt, $__doc, $__nt, $__var, $__stt, $__uid2);
-                if ($__eq->execute()) { $__esc = (int) $conn->insert_id; }
-                $__eq->close();
-            }
+            /* صندوقُ الاعتمادِ الأعلى ملكُ مساحةِ القيادة — والتصعيدُ ببابِه
+               لا بجملةٍ خامّةٍ من إدارةِ المشتريات (§5·9 · RPR-02 #11). */
+            require_once dirname(__DIR__) . '/app/Services/Exec/ExecApprovalInbox.php';
+            $__r = \App\Services\Exec\ExecApprovalInbox::escalate($conn, array(
+                'company_id'   => (int) $company_id,
+                'request_no'   => 'ESC-POV-' . $rid . '-' . (int) $current_user_id,
+                'doc_type'     => 'po_variance',
+                'document'     => 'PO#' . $rid,
+                'raise_reason' => 'تصعيد آلي: فرق مطابقة فوق سقف المرسل — ' . $__sig['reason'],
+                'amount'       => $__var,
+                'status'       => 'pending',
+                'created_by'   => (int) $current_user_id,
+            ));
+            $__esc = (int) $__r['id'];
             ems_audit_change($conn, 'procurement', 'po_match', 'cap_escalate', $rid,
                 array('actor_cap' => 'below'), array('amount' => $__var, 'escalation_id' => $__esc),
                 array('company_id' => (int) $company_id, 'user_id' => (int) $current_user_id));

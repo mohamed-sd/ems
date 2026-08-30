@@ -194,4 +194,47 @@ class TicketStateService
         }
         return array('ok' => true, 'code' => 200, 'reason' => 'الرأس مغلق — كل الإلزامية مغلقة');
     }
+
+    /* ── مرحلة الرأس: باب واحد ───────────────────────────────────────────────
+       كانت شاشتا «الإقفال الإداري» و«التصنيف والتوجيه» تكتبان stage على tickets
+       بجملة UPDATE خام في ملفَّيهما، فصار للرأس ثلاثة مُنشئين مستقلّين —
+       وهو ما تمنعه §5·9 (مالك قانوني واحد لكل حقيقة). الحكم (من يجوز له،
+       ومتى) يبقى في الشاشة لأنه سياستها؛ **الكتابة** وحدها تمرّ من هنا. */
+
+    /** إلغاء إداري لرأس البلاغ — والشرط في الجملة لا في المستدعي. */
+    public static function adminCancel(\mysqli $conn, $tkId, $duplicateOf = 0)
+    {
+        $tkId = intval($tkId);
+        $dup  = intval($duplicateOf);
+        $ok = $conn->query("UPDATE tickets SET stage = 'cancelled'"
+            . ($dup > 0 ? ", duplicate_of_ticket_id = {$dup}" : '')
+            . " WHERE id = {$tkId}");
+        return array('ok' => (bool) $ok, 'changed' => $conn->affected_rows);
+    }
+
+    /** نقض الإلغاء الإداري — لا يردّ إلا ما هو ملغى، والمرحلة السابقة من الأثر. */
+    public static function revertAdminCancel(\mysqli $conn, $tkId, $prevStage)
+    {
+        $tkId = intval($tkId);
+        $ok = $conn->query("UPDATE tickets SET stage = '" . $conn->real_escape_string((string) $prevStage)
+            . "' WHERE id = {$tkId} AND stage = 'cancelled'");
+        return array('ok' => (bool) $ok, 'changed' => $conn->affected_rows);
+    }
+
+    /** تصنيف الرأس وتوجيهه — النوع يحدّد الإدارة المالكة والمرحلة تصير «محالة». */
+    public static function classifyAndRoute(\mysqli $conn, $tkId, $companyId, $categoryId, $typeId, $ownerRoleId)
+    {
+        $st = $conn->prepare("UPDATE tickets
+                                 SET category_id = ?, ticket_type_id = ?, stage = 'routed',
+                                     owner_role_id = COALESCE(NULLIF(?, 0), owner_role_id)
+                               WHERE id = ? AND company_id = ? AND stage IN ('new','classified')");
+        if (!$st) { return array('ok' => false, 'changed' => 0); }
+        $cat = intval($categoryId); $typ = intval($typeId); $own = intval($ownerRoleId);
+        $tk  = intval($tkId);       $co  = intval($companyId);
+        $st->bind_param('iiiii', $cat, $typ, $own, $tk, $co);
+        $st->execute();
+        $n = $st->affected_rows;
+        $st->close();
+        return array('ok' => true, 'changed' => $n);
+    }
 }

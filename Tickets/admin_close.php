@@ -18,6 +18,8 @@ if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
     enforce_current_page_view_permission($conn, '../main/dashboard.php');
 }
 require_once __DIR__ . '/tkt_helpers.php';
+// مرحلة الرأس تُكتب بباب مجال البلاغات وحده (§5·9) — لا بجملة خام في الشاشة
+require_once dirname(__DIR__) . '/app/Services/Tickets/TicketStateService.php';
 
 $ctx = tkt_ctx();
 $company_id = $ctx['company_id'];
@@ -65,8 +67,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['aclose_tk']))
         elseif (in_array($t['stage'], array('done', 'closed'), true)) { $msg = 'منجز — يغلق بمساره لا إداريا (403)'; }
         else {
             mysqli_begin_transaction($conn);
-            $ok1 = mysqli_query($conn, "UPDATE tickets SET stage = 'cancelled'" .
-                   ($dup > 0 ? ", duplicate_of_ticket_id = $dup" : '') . " WHERE id = $tid");
+            $ok1 = \App\Services\Tickets\TicketStateService::adminCancel($conn, $tid, $dup)['ok'];
             $ok2 = mysqli_query($conn, "UPDATE ticket_workstreams SET state = 'admin_closed', closed_at = NOW()
                                         WHERE tk_id = $tid AND state NOT IN ('closed','admin_closed')");
             $ok3 = mysqli_query($conn, "INSERT INTO ticket_events (company_id, ticket_id, event_type, body, actor_user_id)
@@ -134,8 +135,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['areverse_tk']
                 $msg = 'TKT-409-NOTRACE: لا أثر تدقيق يحمل المرحلة السابقة — فلا يخمن إلى أين يرد (409)';
             } else {
                 mysqli_begin_transaction($conn);
-                $u1 = mysqli_query($conn, "UPDATE tickets SET stage = '"
-                        . mysqli_real_escape_string($conn, $prev) . "' WHERE id = $rid AND stage = 'cancelled'");
+                $u1 = \App\Services\Tickets\TicketStateService::revertAdminCancel($conn, $rid, $prev)['ok'];
                 $u2 = mysqli_query($conn, "INSERT INTO ticket_events (company_id, ticket_id, event_type, body, actor_user_id)
                         VALUES ($company_id, $rid, 'admin_closed', '"
                         . mysqli_real_escape_string($conn, 'نقض الإغلاق الإداري — أعيد إلى «' . $prev . '»: ' . $rwhy)
