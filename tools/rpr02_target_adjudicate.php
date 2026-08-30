@@ -444,8 +444,16 @@ if (in_array('--list', $argv, true)) {
     foreach ($ruled as $uid => $v) {
         printf("   %s  %-12s %s\n", $uid, $v[0], mb_substr($v[2], 0, 230));
     }
-    echo "\n  ── بقي بلا حكم ──\n";
-    foreach ($still as $t) { printf("   %s  %s · %s\n", $t['target_uid'], $t['unit'], $t['name_ar']); }
+    /* ⛔ **وسببُ كلٍّ كان يُحسب ولا يُطبع** — والصدرُ يقول «وسببُ كلٍّ مسمًّى»
+       فيقرأ القارئُ وعدًا لا يجد له وفاءً، **ويظنُّ الأربعةَ عشرَ صمتًا وهي
+       محسوبةٌ بأسبابِها**. ⇒ يُطبع `$leftWhy` كاملًا — فالحاجزُ يُقرأ لا يُظنّ. */
+    echo "\n  ── بقي بلا حكم · **وسببُ كلٍّ مقيسٌ مكتوب** ──\n";
+    foreach ($still as $t) {
+        printf("   %s  %s · %s\n", $t['target_uid'], $t['unit'], $t['name_ar']);
+        if (isset($leftWhy[$t['target_uid']]) && $leftWhy[$t['target_uid']] !== '') {
+            echo '      ↳ ' . $leftWhy[$t['target_uid']] . "\n";
+        }
+    }
 }
 
 /* ── الحاجزُ الذي كان · وحالُه اليوم ──
