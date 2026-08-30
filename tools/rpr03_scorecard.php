@@ -249,11 +249,24 @@ $manualBad = (int) $one("SELECT COUNT(*) FROM fin_journal_entries
 $add('قيودٌ يدويّةٌ بلا مصدرٍ ولا مبرِّرٍ ولا اعتماد', 'صفر', 'غيرُ مصنَّف', $manualBad,
      '**بالمعيارِ الموجب** (‏نقصُ أحدِ السبعة) — والضيّقةُ تُعطي صفرًا وهو أخضرُ كاذب');
 
-/* ⑫ و⑬ الاستعادةُ والتثبيت */
-$add('تمرينُ استعادةٍ على المخطَّطِ الحالي', 'ناجحٌ بمحضرِه', 'دليلٌ متقادم', null,
-     '⛔ **غيرُ مقيس** — والدليلُ أُثبت على ٦٣٩ جدولًا والنظامُ اليومَ '
-     . (int) $one("SELECT COUNT(*) FROM information_schema.TABLES
-                    WHERE TABLE_SCHEMA=DATABASE() AND TABLE_TYPE='BASE TABLE'"));
+/* ⑫ و⑬ الاستعادةُ والتثبيت — ⑫ يُقرأ من سجلِّ التمارين `dr_drills` لا من
+   نصٍّ مجمَّدٍ: آخرُ تمرينِ استعادةٍ كاملةٍ ناجحٍ بمحضرِه، وتقادمُه يُعلَن
+   بعمرِه (لا عتبةَ مخترعةً — العمرُ رقمٌ والحكمُ للمالك) */
+$dr = null;
+$q = @$conn->query("SELECT drill_no, verdict, finished_at, evidence_path,
+                           TIMESTAMPDIFF(DAY, finished_at, NOW()) age_days
+                      FROM dr_drills WHERE drill_kind = 'full_restore'
+                     ORDER BY finished_at DESC LIMIT 1");
+if ($q && ($z = $q->fetch_assoc())) { $dr = $z; }
+$liveTables = (int) $one("SELECT COUNT(*) FROM information_schema.TABLES
+                           WHERE TABLE_SCHEMA=DATABASE() AND TABLE_TYPE='BASE TABLE'");
+$add('تمرينُ استعادةٍ على المخطَّطِ الحالي', 'ناجحٌ بمحضرِه',
+     $dr === null ? 'دليلٌ متقادم' : ($dr['verdict'] . ' منذ ' . (int) $dr['age_days'] . ' يومًا'),
+     $dr !== null && $dr['verdict'] === 'pass' ? 0 : null,
+     $dr === null
+       ? ('⛔ **غيرُ مقيس** — لا تمرينَ استعادةٍ كاملةٍ في السجلِّ والنظامُ اليومَ ' . $liveTables . ' جدولًا')
+       : ('آخرُ تمرينٍ **' . $dr['drill_no'] . '** بحكمِ **' . $dr['verdict'] . '** في ' . $dr['finished_at']
+        . ' · محضرُه ' . $dr['evidence_path'] . ' · والنظامُ اليومَ ' . $liveTables . ' جدولًا'));
 $add('تثبيتٌ من الصفرِ على المخطَّطِ الحالي', 'ناجح', 'دليلٌ متقادم', null,
      '⛔ **غيرُ مقيس**');
 
