@@ -77,6 +77,48 @@ $q = $conn->query("SELECT nc.route, nc.canonical_ar, nc.current_label, nc.status
                     ORDER BY nc.route");
 while ($q && ($x = $q->fetch_assoc())) { $rows[] = $x; }
 
+/* ⛔ **والمقامُ كان المخزنَ وحدَه — ومسارٌ مُصيَّرٌ بلا صفِّ تسميةٍ ألبتّة لا
+   يدخله أصلًا.** وهو **أسوأُ من `PENDING_OWNER`**: ذاك يُعلن نفسَه في السجلِّ
+   وينتظر كلمةً، وهذا **معروضٌ للمستخدمِ اليومَ ولا أحدَ يعلم أنّه بلا اعتماد**
+   — ⇒ فيمرُّ في مصالحةِ الأسماءِ بلا حكم، **ويُعَدُّ في المقياسِ #١٦ ولا يُعَدُّ
+   في مقامِ أداتِه**: عدّادٌ وعارضٌ يتفرّقان.
+   ◆ **فالمقامُ صار المُصيَّرَ**: كلُّ مسارٍ حيٍّ في `nav_items` النشطةِ بلا صفِّ
+     تسميةٍ يُضَمُّ بصفٍّ افتراضيٍّ **مُعلَنًا لا مخترَعًا** (`canonical_ar` فارغٌ
+     ⇒ يسقط في `TRUE_NAMING_DECISION` بقاعدةِ ⓒ نفسِها). ⛔ **ولا يُخترع له
+     اسمٌ معياريٌّ من الاسمِ المعروض** — فذاك يعتمد ما لم يُعتمَد. */
+$have = array();
+foreach ($rows as $x) { $have[strtolower(trim((string) $x['route'], '/'))] = 1; }
+$q = $conn->query("SELECT LOWER(TRIM(BOTH '/' FROM r.route)) rt FROM nav_canonical r");
+while ($q && ($z = $q->fetch_row())) { $have[$z[0]] = 1; }
+$q = $conn->query("SELECT DISTINCT n.route
+                     FROM nav_items n WHERE n.active = 1 AND n.route <> ''
+                      AND n.route NOT LIKE '%?%' AND n.route NOT LIKE '%#%'");
+$orphan = array();
+while ($q && ($z = $q->fetch_row())) {
+    $b = strtolower(trim((string) $z[0], '/'));
+    if ($b === '' || isset($have[$b])) { continue; }
+    $orphan[$b] = (string) $z[0];
+}
+foreach ($orphan as $b => $raw) {
+    $s = null;
+    $sq = $conn->query("SELECT screen_id, owner_code, surface_kind, on_disk, ownership_verdict,
+                               canonical_label_ar
+                          FROM repair01_screen_registry
+                         WHERE LOWER(TRIM(BOTH '/' FROM route)) = '" . $e($b) . "' LIMIT 1");
+    if ($sq) { $s = $sq->fetch_assoc(); }
+    $rows[] = array(
+        'route' => $raw, 'canonical_ar' => '', 'status' => 'NO_CANONICAL_ROW',
+        'current_label' => $s ? (string) $s['canonical_label_ar'] : '',
+        'owner_dept' => '', 'group_name' => '', 'nature' => '',
+        'screen_id' => $s ? $s['screen_id'] : null,
+        'owner_code' => $s ? $s['owner_code'] : '',
+        'surface_kind' => $s ? $s['surface_kind'] : '',
+        'on_disk' => $s ? (int) $s['on_disk'] : 0,
+        'ownership_verdict' => $s ? $s['ownership_verdict'] : '',
+        'canonical_label_ar' => $s ? (string) $s['canonical_label_ar'] : '',
+    );
+}
+
 /* ═══ ② الحكمُ — أضيقُ أوّلًا ═══════════════════════════════════════════════ */
 $B = array('CANONICAL_FROM_APPROVED_SOURCE' => array(), 'SAME_MEANING_FORMAT_ONLY' => array(),
            'IDENTITY_CONFLICT' => array(), 'TRUE_NAMING_DECISION' => array(),
@@ -117,7 +159,15 @@ foreach ($rows as $x) {
         continue;
     }
     /* ⓒ لا اسمَ معياريًّا أصلًا ⇒ قرارُ تسميةٍ حقيقيّ */
-    if ($canon === '') { $B['TRUE_NAMING_DECISION'][] = array($x, 'لا اسمَ معياريًّا مسجَّلًا'); continue; }
+    if ($canon === '') {
+        $B['TRUE_NAMING_DECISION'][] = array($x,
+            ((string) $x['status'] === 'NO_CANONICAL_ROW')
+              ? 'مُصيَّرٌ للمستخدمِ اليومَ **بلا صفِّ تسميةٍ ألبتّة** — لا اسمَ حاكمًا يُقاس عليه'
+                . (trim((string) $x['current_label']) !== ''
+                   ? ' · والمعروضُ «' . $x['current_label'] . '» ⛔ **ولا يُعتمد بأنّه معروض**' : '')
+              : 'لا اسمَ معياريًّا مسجَّلًا');
+        continue;
+    }
     /* ⓓ يطابق المعروضَ حرفًا ⇒ اعتمادٌ آليّ */
     if ($live === '' || $canon === $live) {
         $B['CANONICAL_FROM_APPROVED_SOURCE'][] = array($x, 'المعياريُّ يطابق المعروضَ حرفًا');
