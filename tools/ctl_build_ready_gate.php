@@ -218,6 +218,13 @@ if ($APPLY) {
         $n++;
     }
     $conn->query('COMMIT');
+    /* نسخةُ التمريرةِ إلى سجلِّ التاريخِ — قِيس غيابُه في مصالحةِ «الثامنة»:
+       البوّابةُ تُكتب فوقيًّا فلا يُجاب «مَن كان جاهزًا عند لقطةِ كذا» بدليل */
+    @$conn->query("INSERT INTO repair01_build_ready_history
+            (gated_run, snapshot_id, target_uid, requirement_id, build_ready, build_blocker)
+            SELECT NOW(), snapshot_id, target_uid, COALESCE(requirement_id,''), build_ready,
+                   LEFT(COALESCE(build_blocker,''), 400)
+              FROM repair01_build_ready");
     printf("\n  ✔ كُتب **%d** صفًّا في `repair01_build_ready` · جاهزٌ للبناءِ **%d**\n", $n, $stat['YES']);
 }
 

@@ -79,7 +79,7 @@ $cur = array();
 foreach ($xml as $ln) {
     $ln = trim($ln);
     if ($ln === '') {
-        if (isset($cur['name']) && strpos($cur['name'], 'EMS_') !== false) { $tasks[] = $cur; }
+        if (isset($cur['name']) && stripos($cur['name'], 'EMS') !== false) { $tasks[] = $cur; }
         $cur = array(); continue;
     }
     $p = strpos($ln, ':');
@@ -90,7 +90,7 @@ foreach ($xml as $ln) {
     if ($k === 'Last Result' || $k === 'آخر نتيجة') { $cur['rc'] = $v; }
     if ($k === 'Last Run Time' || $k === 'آخر وقت تشغيل') { $cur['last'] = $v; }
 }
-if (isset($cur['name']) && strpos($cur['name'], 'EMS_') !== false) { $tasks[] = $cur; }
+if (isset($cur['name']) && stripos($cur['name'], 'EMS') !== false) { $tasks[] = $cur; }
 
 /* ═══ ③ الحكمُ لكلِّ مهمّة ════════════════════════════════════════════════ */
 $E1 = array(); $E2 = array(); $ok = array(); $scriptsRun = array();
