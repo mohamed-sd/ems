@@ -156,8 +156,17 @@ echo "     ⛔ **ولا يُشتقّ نوعٌ لمتطلبٍ لم يُطابَق
 
 if ($APPLY) {
     $n = 0;
+    /* ⛔ **الاستيعابُ لا يدهس حكمَ الإغلاقِ بالدليل** — وقع فرُصد (2026-08-30):
+       إعادةُ الاشتقاقِ ردَّت اثنتي عشرةَ `EVIDENCE_CLOSED` إلى «منفَّذٍ لم
+       يُثبت» ودليلُها قائمٌ في `repair01_evidence_closure`. فالإغلاقُ بالدليلِ
+       **فعلٌ لاحقٌ بسجلِّه الخاصِّ** فوق حالةِ الاشتقاقِ — يُشتقُّ ما دونه
+       ويُحفظ هو ([[repair01-w01-ownership]] · [[registry-rule-vs-value]]). */
+    $closed = array();
+    $cq = @$conn->query("SELECT requirement_id FROM repair01_evidence_closure");
+    while ($cq && ($cz = $cq->fetch_row())) { $closed[$cz[0]] = 1; }
     foreach ($out as $x) {
         list($q, $state, $type, $ident, $ev) = $x;
+        if (isset($closed[$q['requirement_id']])) { continue; }
         $contract = ($type !== null && isset($CONTRACT[$type])) ? $CONTRACT[$type] : '';
         $ok = $conn->query("UPDATE repair01_requirements
               SET amd01_state = " . ($state === null ? 'NULL' : "'" . $e($state) . "'") . ",
