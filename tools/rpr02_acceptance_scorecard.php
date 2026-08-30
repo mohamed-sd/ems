@@ -395,7 +395,21 @@ if ($tbl('repair01_cross_contract')) {
     $cxNot = (int) $one("SELECT COUNT(DISTINCT entity) FROM repair01_cross_contract
                            WHERE entity_verdict = 'NOT_A_DUPLICATE'");
 }
-$dupTruth = $dupTruth - $csRes - $cxNot;
+/* ⛔ **والطرحُ الحسابيُّ يكذب حين تتقاطع المجموعتان** — وقد كذب: `csRes`
+   (‏المحسومُ بقاعدةٍ) و`cxNot` (‏غيرُ المكرَّرِ بعدَ إسقاطِ `X0`) **يشتركان في
+   كياناتٍ بعينِها**، فطرحُهما معًا طرَح الكيانَ مرّتَين وأنتج **−٣**. ⛔ **ورقمٌ
+   سالبٌ ليس «أفضلَ من صفر» بل عطبُ عدٍّ يُخفي بقيّةً حقيقية.** ⇒ يُقاس
+   **بفرقِ المجموعاتِ** لا بالطرح: كيانٌ مكرَّرٌ **ليس** محسومًا **ولا** خارجًا. */
+$dupOpen = (int) $one("SELECT COUNT(*) FROM (
+                  SELECT grain_entity e FROM repair01_screen_registry
+                   WHERE on_disk = 1 AND ownership_verdict <> 'RETIRE'
+                     AND grain_entity <> '' AND grain_cardinality IN ('ROW','LINE')
+                     AND grain_fact_scope = 'OWN_FACT'
+                   GROUP BY grain_entity HAVING COUNT(*) > 1) t
+                 WHERE t.e NOT IN (SELECT entity FROM repair01_canonical_source WHERE resolved = 1)
+                   AND t.e NOT IN (SELECT entity FROM repair01_cross_contract
+                                    WHERE entity_verdict = 'NOT_A_DUPLICATE')");
+$dupTruth = $dupOpen;
 $add('حقيقة واحدة لها مصدران', 'صفر', 'MEASURED', (string) $dupTruth,
      'كيانٌ **يملكه** أكثرُ من واجهةٍ حيّةٍ بحبّةِ سجلٍّ — أعلاها: ' . ($dupEx === '' ? '—' : $dupEx)
    . ' · والمقامُ `OWN_FACT` وحدَه ⇒ **الكيانُ المكتوبُ من كِيتٍ مشتركٍ لا يُعدُّ مصدرًا ثانيًا**' . $csWit . '. **فُتح بقياسِ الحبّة**');
@@ -422,7 +436,16 @@ if ($tbl('repair01_cross_contract')
        بعينِه العبورُ المتعاقَدُ عليه**، وإبقاؤه في العددِ يقيس العبورَ لا
        العبورَ-بلا-عقد. ⇒ يُطرح كما يُطرح `NOT_A_DUPLICATE`، **وشاهدُ كلٍّ في
        `repair01_cross_contract.witness`**. */
-    $cross = $cross - $cxNot - $cxC;
+    /* ⛔ **وبفرقِ المجموعاتِ لا بالطرح** — للسببِ نفسِه في #١٠: كيانٌ يعبر
+       حدَّ إدارةٍ **وليس** متعاقَدًا عليه **ولا** خارجًا من التكرارِ أصلًا. */
+    $cross = (int) $one("SELECT COUNT(*) FROM (
+                  SELECT grain_entity e FROM repair01_screen_registry
+                   WHERE on_disk = 1 AND ownership_verdict <> 'RETIRE'
+                     AND grain_entity <> '' AND grain_cardinality IN ('ROW','LINE')
+                     AND grain_fact_scope = 'OWN_FACT'
+                   GROUP BY grain_entity HAVING COUNT(DISTINCT owner_code) > 1) t
+                 WHERE t.e NOT IN (SELECT entity FROM repair01_cross_contract
+                                    WHERE entity_verdict IN ('NOT_A_DUPLICATE','CONTRACTED'))");
     $add('كتابة تعبر حدود إدارة بلا عقد', 'صفر', 'MEASURED', (string) $cross,
          "كيانٌ تكتبه إدارتان فأكثرُ — **والعقدُ صار مقيسًا** بـ`rpr02_cross_contract.php`: "
        . "كاتبٌ بكتابةٍ خامّةٍ **$cxR** · بخدمةٍ أو ناشرٍ بلا خامٍّ **$cxM** · مُصرِّحٌ بلا كتابةٍ **$cxZ** (‏ليس كاتبًا). "

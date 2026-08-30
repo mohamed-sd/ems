@@ -55,11 +55,18 @@ $SELF  = in_array('--selftest', $argv, true);
      **فالمُوجَّهُ إليه يعرف من أين تُستقى الحقيقةُ كما يعرفها المالك**.
    ⛔ **وهذا ليس ترجيحًا بلا مُرجِّح**: المُرجِّحُ حُسم في مقياسِ #١٠ بقاعدتِه
      (`N1`/`N2`/`N5`) — وهنا يُنقَل حكمُه لا يُخترَع. **وما لم يُحسم يبقى فارغًا.** */
-function sot_rule_for($writersOfEntity, $canonicalResolved = false)
+/* ◆ **S3 · `NOT_A_CREATOR`** — وسطحٌ **يُصرِّح بالجدولِ في ملفِّه ولا يكتب عليه
+     جملةً واحدةً** (`X0_NO_MEASURED_WRITE` في `repair01_cross_contract`) **ليس
+     مُنشئًا ولا معدِّلًا**، فلا يدخل في نزاعِ «مَن المالك» أصلًا. ⇒ مصدرُ حقيقتِه
+     هو الكيانُ نفسُه **مملوكًا في موضعِه** — والشاهدُ يقول إنّه غيرُ كاتب.
+   ⛔ **وهذا ليس إعفاءً**: الحكمُ مقيسٌ بالأثرِ (‏صفرُ جملةِ كتابةٍ في مداه
+     الخاصِّ وصفرُ بابٍ كاتب) لا مأخوذٌ بالدعوى. */
+function sot_rule_for($writersOfEntity, $canonicalResolved = false, $notACreator = false)
 {
     if ($writersOfEntity <= 0) { return ''; }
     if ($writersOfEntity === 1) { return 'SOLE_WRITER'; }
-    return $canonicalResolved ? 'CANONICAL_RESOLVED' : 'DUPLICATE_SOURCE';
+    if ($canonicalResolved) { return 'CANONICAL_RESOLVED'; }
+    return $notACreator ? 'NOT_A_CREATOR' : 'DUPLICATE_SOURCE';
 }
 
 /* ═══ ② الاختبارُ السالبُ — يُصيب الطرفَين ولا يمرُّ بمفردةٍ فريدة ═══════ */
@@ -73,6 +80,11 @@ if ($SELF) {
     if (sot_rule_for(2, false) !== 'DUPLICATE_SOURCE')  { echo "  X غيرُ المحسومِ عُدَّ محسومًا\n"; $fail++; }
     /* ⛔ **والحسمُ لا يُنشئ كاتبًا**: صفرُ كتّابٍ محسومٌ يبقى بلا قاعدة */
     if (sot_rule_for(0, true) !== '') { echo "  X الحسمُ أنتج قاعدةً بلا كاتب\n"; $fail++; }
+    /* **S3 يُصيب الطرفَين**: غيرُ الكاتبِ يُعرَف، والكاتبُ الخامُّ لا يمرُّ به */
+    if (sot_rule_for(2, false, true) !== 'NOT_A_CREATOR')      { echo "  X غيرُ الكاتبِ لم يُعرَف\n"; $fail++; }
+    if (sot_rule_for(2, false, false) !== 'DUPLICATE_SOURCE')  { echo "  X الكاتبُ عُدَّ غيرَ كاتب\n"; $fail++; }
+    /* ⛔ **والحسمُ أقوى**: كيانٌ محسومٌ لا يُنزَل إلى `NOT_A_CREATOR` */
+    if (sot_rule_for(2, true, true) !== 'CANONICAL_RESOLVED')  { echo "  X الحسمُ غُلِب بغيرِ الكاتب\n"; $fail++; }
     /* ⛔ **الكاسر**: صفرُ كتّابٍ لا يُنتج قاعدةً — ولو أنتج لَعُيِّن مصدرٌ لكيانٍ
        لا يكتبه أحدٌ، **وذاك أخضرُ كاذبٌ يُغلق #٩ بلا سطرٍ مبنيّ**. */
     if (sot_rule_for(0) !== '') { echo "  X صفرُ كتّابٍ أنتج قاعدةً\n"; $fail++; }
@@ -128,14 +140,31 @@ $q = @$conn->query("SELECT entity, canonical_screen, rule_code FROM repair01_can
                      WHERE resolved = 1 AND canonical_screen <> ''");
 while ($q && $z = $q->fetch_assoc()) { $canon[$z['entity']] = $z; }
 
-$stat = array('sole' => 0, 'dup' => 0, 'already' => 0, 'dupEnt' => 0, 'canon' => 0);
+/* وحكمُ عقدِ الكتابةِ لكلِّ سطح — ⛔ **مقيسًا لا مُدَّعًى**: `X0` تعني صفرَ
+   جملةِ كتابةٍ في مداه الخاصِّ وصفرَ بابٍ يكتب الكيان. */
+$ccv = array();
+$q = @$conn->query("SELECT screen_id, entity, writer_verdict FROM repair01_cross_contract");
+while ($q && $z = $q->fetch_assoc()) { $ccv[$z['screen_id'] . '|' . $z['entity']] = $z['writer_verdict']; }
+
+$stat = array('sole' => 0, 'dup' => 0, 'already' => 0, 'dupEnt' => 0, 'canon' => 0, 'notw' => 0);
 $plan = array(); $dupBy = array();
 foreach ($rows as $x) {
     $n = isset($writers[$x['grain_entity']]) ? $writers[$x['grain_entity']] : 0;
     $rc = isset($canon[$x['grain_entity']]);
-    $rule = sot_rule_for($n, $rc);
+    $k  = $x['screen_id'] . '|' . $x['grain_entity'];
+    $nw = isset($ccv[$k]) && $ccv[$k] === 'X0_NO_MEASURED_WRITE';
+    $rule = sot_rule_for($n, $rc, $nw);
     if (trim((string) $x['source_of_truth']) !== '') { $stat['already']++; continue; }
-    if ($rule === 'CANONICAL_RESOLVED') {
+    if ($rule === 'NOT_A_CREATOR') {
+        $stat['notw']++;
+        $plan[] = array('id' => $x['screen_id'], 'ent' => $x['grain_entity'], 'rule' => $rule,
+            'wit' => 'S3 `NOT_A_CREATOR` · الكيانُ `' . $x['grain_entity'] . '` منسوبٌ إلى هذا السطحِ '
+                   . '**بتصريحِه في ملفِّه**، **ولا جملةَ كتابةٍ واحدةً عليه في مداه الخاصِّ ولا بابَ '
+                   . 'خدمةٍ يكتبه** (`X0_NO_MEASURED_WRITE` في `repair01_cross_contract`) ⇒ '
+                   . '**فليس مُنشئًا ولا معدِّلًا**، ولا يدخل في نزاعِ «مَن المالك». ومصدرُ حقيقتِه '
+                   . 'الكيانُ نفسُه **مملوكًا في موضعِه**. ⛔ **والحكمُ مقيسٌ بالأثرِ لا مأخوذٌ بالدعوى** · '
+                   . 'مالكُه `' . ($x['owner_code'] === '' ? '—' : $x['owner_code']) . '` · لقطة ' . $sid);
+    } elseif ($rule === 'CANONICAL_RESOLVED') {
         $c = $canon[$x['grain_entity']];
         $stat['canon']++;
         $plan[] = array('id' => $x['screen_id'], 'ent' => $x['grain_entity'], 'rule' => $rule,
@@ -206,6 +235,7 @@ printf("     وكياناتٌ مكتوبةٌ متمايزة: %d\n\n", count($wri
 echo "  ── القاعدةُ الواحدة ──\n";
 printf("     `CANONICAL_RESOLVED` **%4d** سطحًا — كيانٌ محسومُ المصدرِ في #١٠ ⇒ **يُنقَل حكمُه**
 ", $stat['canon']);
+printf("     `NOT_A_CREATOR`     **%4d** سطحًا — يُصرِّح ولا يكتب (`X0`) ⇒ **ليس طرفًا في نزاعِ الملكيّة**\n", $stat['notw']);
 printf("     `SOLE_WRITER`      **%4d** سطحًا — كيانٌ بكاتبٍ واحدٍ ⇒ **يُكتب مصدرُ حقيقتِه**\n", $stat['sole']);
 printf("     `DUPLICATE_SOURCE` **%4d** سطحًا على **%d** كيانًا — ⛔ **لا يُعيَّن ويبقى فارغًا**\n",
        $stat['dup'], $stat['dupEnt']);
@@ -237,14 +267,14 @@ if ($APPLY) {
        (`SOLE_WRITER`/`DUPLICATE_SOURCE`) ولم يعُدْ في `OWN_FACT`.
        ⛔ **و`PRE_W17_DECLARED` لا يُمَسّ** — قيمةٌ من موجةٍ سابقةٍ بقرارِها. */
     $ret = (int) $conn->query("SELECT COUNT(*) FROM repair01_screen_registry
-            WHERE ((sot_rule IN ('SOLE_WRITER','DUPLICATE_SOURCE','CANONICAL_RESOLVED')
+            WHERE ((sot_rule IN ('SOLE_WRITER','DUPLICATE_SOURCE','CANONICAL_RESOLVED','NOT_A_CREATOR')
                     AND (grain_fact_scope <> 'OWN_FACT' OR grain_cardinality NOT IN ('ROW','LINE')))
                 OR (sot_rule = 'PROJECTION_READ'
                     AND (grain_fact_scope <> 'OWN_FACT' OR grain_cardinality IN ('ROW','LINE'))))")->fetch_row()[0];
     if ($ret > 0) {
         $conn->query("UPDATE repair01_screen_registry
             SET source_of_truth = '', sot_rule = '', sot_witness = '', sot_snapshot = ''
-          WHERE ((sot_rule IN ('SOLE_WRITER','DUPLICATE_SOURCE','CANONICAL_RESOLVED')
+          WHERE ((sot_rule IN ('SOLE_WRITER','DUPLICATE_SOURCE','CANONICAL_RESOLVED','NOT_A_CREATOR')
                   AND (grain_fact_scope <> 'OWN_FACT' OR grain_cardinality NOT IN ('ROW','LINE')))
               OR (sot_rule = 'PROJECTION_READ'
                     AND (grain_fact_scope <> 'OWN_FACT' OR grain_cardinality IN ('ROW','LINE'))))");
@@ -252,7 +282,7 @@ if ($APPLY) {
     }
     $n = 0; $m = 0;
     foreach ($plan as $x) {
-        $set = in_array($x['rule'], array('SOLE_WRITER', 'CANONICAL_RESOLVED'), true)
+        $set = in_array($x['rule'], array('SOLE_WRITER', 'CANONICAL_RESOLVED', 'NOT_A_CREATOR'), true)
              ? "source_of_truth = '" . $e($x['ent']) . "', "
              : '';
         $ok = $conn->query("UPDATE repair01_screen_registry
