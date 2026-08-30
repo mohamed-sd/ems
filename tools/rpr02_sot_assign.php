@@ -141,8 +141,15 @@ $stat['dupEnt'] = count($dupBy);
    ⛔ **ولا يُؤخذ إلّا من `OWN_FACT`** — فكيانٌ جاء من **كِيتٍ مشتركٍ** هو جدولُ
      العُدّةِ لا مصدرُ هذا الإسقاط، **ونسبتُه إليه تُعطي مرجعًا كاذبًا**: وذاك
      أسوأُ من غيابِ المرجع، لأنَّ الغائبَ يُعلن نفسَه والكاذبَ يُقرأ صحيحًا. */
+/* ⛔ **وسطحُ إسقاطٍ بحبّةِ `ROW`/`LINE` كاتبٌ لا قارئ** — و**قد أخطأتُ فيه**:
+   كُتب له `PROJECTION_READ` («يستقي من E») وهو **يكتب E**، فخرج من مقامِ #٩
+   وخفضه **٢٢ ⇒ ١٥ زورًا** بسبعةِ أسطح. ⇒ فالإسقاطُ هنا **قارئٌ بحبّتِه**
+   (`LIVE_READ`/`LIST`) لا بصنفِ سطحِه، **والكاتبُ يُحكم عليه بقواعدِ الكتابة**.
+   ◆ **والصنفُ لا يُغني عن الحبّة**: `surface_kind` إعلانٌ، و`grain_cardinality`
+     **مقيسٌ من الأثر** — وحين يختلفان **فالمقيسُ أولى**. */
 $PRJ = "repair01_screen_registry WHERE on_disk = 1 AND ownership_verdict <> 'RETIRE'
-        AND surface_kind = 'PROJECTION' AND grain_entity <> ''";
+        AND surface_kind = 'PROJECTION' AND grain_entity <> ''
+        AND grain_cardinality NOT IN ('ROW','LINE')";
 $prjPlan = array(); $pst = array('ok' => 0, 'skip' => 0, 'already' => 0);
 $r = $conn->query("SELECT screen_id, canonical_label_ar, owner_code, grain_entity,
                           grain_fact_scope, source_of_truth
@@ -198,13 +205,15 @@ if ($APPLY) {
     $ret = (int) $conn->query("SELECT COUNT(*) FROM repair01_screen_registry
             WHERE ((sot_rule IN ('SOLE_WRITER','DUPLICATE_SOURCE')
                     AND (grain_fact_scope <> 'OWN_FACT' OR grain_cardinality NOT IN ('ROW','LINE')))
-                OR (sot_rule = 'PROJECTION_READ' AND grain_fact_scope <> 'OWN_FACT'))")->fetch_row()[0];
+                OR (sot_rule = 'PROJECTION_READ'
+                    AND (grain_fact_scope <> 'OWN_FACT' OR grain_cardinality IN ('ROW','LINE'))))")->fetch_row()[0];
     if ($ret > 0) {
         $conn->query("UPDATE repair01_screen_registry
             SET source_of_truth = '', sot_rule = '', sot_witness = '', sot_snapshot = ''
           WHERE ((sot_rule IN ('SOLE_WRITER','DUPLICATE_SOURCE')
                   AND (grain_fact_scope <> 'OWN_FACT' OR grain_cardinality NOT IN ('ROW','LINE')))
-              OR (sot_rule = 'PROJECTION_READ' AND grain_fact_scope <> 'OWN_FACT'))");
+              OR (sot_rule = 'PROJECTION_READ'
+                    AND (grain_fact_scope <> 'OWN_FACT' OR grain_cardinality IN ('ROW','LINE'))))");
         printf("\n  ⚠ **سُحب تعيينُ %d سطحٍ** خرج من المقامِ بتصحيحِ مدى الحقيقة — ولا يُترك رقمٌ متقادم\n", $ret);
     }
     $n = 0; $m = 0;
