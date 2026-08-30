@@ -125,11 +125,33 @@ foreach (array('W03', 'W04', 'W05') as $w) {
     $f = $ROOT . '/docs/REPAIR01_20260823/plan/' . $w . '_STATE_MACHINES.md';
     $src = (string) @file_get_contents($f);
     if ($src === '') { continue; }
-    if (!preg_match_all('~^##[^\n]*?`([a-z_][a-z0-9_]*)\.[a-z_][a-z0-9_]*`~mu', $src, $m)) { continue; }
-    foreach ($m[1] as $k) {
-        $k = strtolower($k);
+    if (preg_match_all('~^##[^\n]*?`([a-z_][a-z0-9_]*)\.[a-z_][a-z0-9_]*`~mu', $src, $m)) {
+        foreach ($m[1] as $k) {
+            $k = strtolower($k);
+            if (isset($models[$k])) { continue; }
+            $models[$k] = $w; $trans[$k] = 0; $forbid[$k] = 0;
+        }
+    }
+    /* ⚠ **وعنوانٌ من الدرجةِ الثالثةِ قد يحمل آلةً كاملةً** — والقراءةُ كانت
+       تلتقط `##` وحدَه بصيغةِ `` `جدول.عمود` ``، فسقط `persons` (‏W03 §٦-أ:
+       «سجلُّ الهويةِ `persons`») **وله آلةٌ مؤلَّفةٌ تامّة**: حالاتٌ وانتقالاتٌ
+       مسموحةٌ وممنوعةٌ صراحةً ومالكُ انتقالٍ وقاعدةُ تصحيح.
+       ⇒ **صفرٌ سببُه جسرٌ لا يقرأ درجةَ عنوانٍ ليس غيابَ آلة** ([[finish-round-closure]]).
+       ⛔ **ولا يُقبَل مجرَّدُ ذِكرٍ**: كتلةُ العنوانِ يجب أن تحمل **الأركانَ
+          الثلاثةَ معًا** — «الحالات» و«الانتقالاتُ المسموحة» و«مالكُ الانتقال»
+          — وإلّا فهي إحالةٌ أو خبرٌ لا تأليف. **والمرجعُ الأجوفُ أسوأُ من غيابِه**:
+          فـ«مخازنُ CMP-03» في W04 §٩ تذكر ثمانيةَ جداولٍ **وتؤجّلها إلى W07**،
+          ولو قُبل الذِّكرُ لارتفع المقياسُ بثمانيةِ مراجعَ جوفاء. */
+    foreach (preg_split('~^(?=###?\s)~mu', $src) as $blk) {
+        if (!preg_match('~^###\s[^\n]*?`([a-z_][a-z0-9_]{2,})`~u', $blk, $mm)) { continue; }
+        $k = strtolower($mm[1]);
         if (isset($models[$k])) { continue; }
+        if (strpos($blk, 'الحالات') === false
+            || strpos($blk, 'الانتقالاتُ المسموحة') === false
+            || strpos($blk, 'مالكُ الانتقال') === false) { continue; }
         $models[$k] = $w; $trans[$k] = 0; $forbid[$k] = 0;
+        $trans[$k] += preg_match_all('~⇒|→~u', $blk);
+        $forbid[$k] += (strpos($blk, 'الممنوعةُ صراحةً') !== false) ? 1 : 0;
     }
     /* عدُّ الانتقالاتِ من صفوفِ الجدولِ في الوثيقة — شاهدٌ لا زينة */
     foreach (explode("\n## ", $src) as $blk) {
