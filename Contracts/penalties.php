@@ -50,18 +50,15 @@ $can_view = $can_assess = $can_approve = false;
 if ($is_super_admin) {
     $can_view = $can_assess = $can_approve = true;
 } else {
-    $st = $conn->prepare("SELECT rp.can_view, rp.can_add, rp.can_edit
-                            FROM role_permissions rp JOIN modules m ON m.id = rp.module_id
-                           WHERE m.code = ? AND rp.role_id = ? LIMIT 1");
-    $rid = intval($current_role);
-    $st->bind_param('si', $MODULE_CODE, $rid);
-    $st->execute();
-    if ($row = $st->get_result()->fetch_assoc()) {
-        $can_view    = (intval($row['can_view']) === 1);
-        $can_assess  = (intval($row['can_add'])  === 1);  // الاحتسابُ والمراجعة — المبيعات
-        $can_approve = (intval($row['can_edit']) === 1);  // الإجازةُ والإعفاء — المالية
-    }
-    $st->close();
+    /* `RPR-03` §٦ — **المسارُ الواحد**: القرارُ من `check_page_permissions()`
+           لا من استعلامٍ خاصٍّ بهذا الملفّ. **والفرقُ طبقةُ القوالب**
+           (`GOV-AUTH-01`): القراءةُ الخامّةُ لا ترى القالبَ النافذَ، فتُخفى
+           الشاشةُ من السايدبارِ وتُفتح بالرابطِ المباشر.
+        ⛔ **وفرعُ السوبر أدمن أعلاه لم يُمَسّ** — والأسماءُ كما كانت. */
+    $__perm = check_page_permissions($conn, $MODULE_CODE);
+    $can_view = (bool) $__perm['can_view'];
+    $can_assess = (bool) $__perm['can_add'];  // الاحتسابُ والمراجعة — المبيعات
+    $can_approve = (bool) $__perm['can_edit'];  // الإجازةُ والإعفاء — المالية
 }
 if (!$can_view) {
     ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض الجزاءات ❌', 'GOV-PERM-403', ''); exit();

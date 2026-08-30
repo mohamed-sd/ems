@@ -44,20 +44,16 @@ $can_view = $can_fill = $can_approve = $can_delete = false;
 if ($is_super_admin) {
     $can_view = $can_fill = $can_approve = $can_delete = true;
 } else {
-    $st = $conn->prepare("SELECT rp.can_view, rp.can_add, rp.can_edit, rp.can_delete
-                            FROM role_permissions rp
-                            JOIN modules m ON m.id = rp.module_id
-                           WHERE m.code = ? AND rp.role_id = ? LIMIT 1");
-    $rid = intval($current_role);
-    $st->bind_param('si', $MODULE_CODE, $rid);
-    $st->execute();
-    if ($row = $st->get_result()->fetch_assoc()) {
-        $can_view    = (intval($row['can_view'])   === 1);
-        $can_fill    = (intval($row['can_add'])    === 1);  // الملءُ والتعديل — المبيعات
-        $can_approve = (intval($row['can_edit'])   === 1);  // الإجازة — مديرُ المالية
-        $can_delete  = (intval($row['can_delete']) === 1);
-    }
-    $st->close();
+    /* `RPR-03` §٦ — **المسارُ الواحد**: القرارُ من `check_page_permissions()`
+           لا من استعلامٍ خاصٍّ بهذا الملفّ. **والفرقُ طبقةُ القوالب**
+           (`GOV-AUTH-01`): القراءةُ الخامّةُ لا ترى القالبَ النافذَ، فتُخفى
+           الشاشةُ من السايدبارِ وتُفتح بالرابطِ المباشر.
+        ⛔ **وفرعُ السوبر أدمن أعلاه لم يُمَسّ** — والأسماءُ كما كانت. */
+    $__perm = check_page_permissions($conn, $MODULE_CODE);
+    $can_view = (bool) $__perm['can_view'];
+    $can_fill = (bool) $__perm['can_add'];  // الملءُ والتعديل — المبيعات
+    $can_approve = (bool) $__perm['can_edit'];  // الإجازة — مديرُ المالية
+    $can_delete = (bool) $__perm['can_delete'];
 }
 if (!$can_view) {
     ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض مصفوفة الالتزامات ❌', 'GOV-PERM-403', '');

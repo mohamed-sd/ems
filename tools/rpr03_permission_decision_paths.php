@@ -50,8 +50,19 @@ if ($r && $r->num_rows) { $snap = $r->fetch_assoc(); }
 $sid = $snap ? $snap['snapshot_id'] : '—(بلا نافذة)';
 
 /* ═══ النطاقُ يُعلَن ═══════════════════════════════════════════════════════ */
+/* ⚠ **وبابان أُضيفا بسببِهما المكتوب — ويُعرض ما خرج بعددِه أدناه**:
+   ◆ **`/database/migrations/`** — سكربتُ هجرةٍ **يُشغَّل مرّةً بيدِ مُرحِّلٍ**،
+     وليس مسارَ قرارٍ في نظامٍ يعمل: لا جلسةَ فيه ولا مستخدمَ يُقرَّر له.
+     ⇒ هو من صنفِ `/tools/` المستثنى سلفًا بالنصِّ نفسِه («عُدّةُ القياسِ ليست
+     نظامًا يُقاس»)، **وإبقاؤه يُحصي تاريخًا لا سلوكًا**.
+   ◆ **`/app/Services/Security/`** — طبقةُ **المصدرِ الواحدِ نفسِه**
+     (`PermissionResolver` · `PermSourceService` · `PermissionTemplateService`):
+     **هي التي تقرأ الجداولَ لتقرّر**، تمامًا كـ`includes/permissions_helper.php`
+     المستثنى بالاسم. ⇒ **عدُّ المصدرِ مسارًا ثانيًا يجعل الواحدَ اثنَين أبدًا**.
+   ⛔ **والاستثناءُ لا يمتدُّ إلى شاشةٍ حيّة**: كلُّ ما تحتَ شجرةِ الشاشاتِ يبقى
+     في المقامِ ويُسمّى باسمِه. */
 $SKIP = array('/vendor/', '/storage/backups/', '/node_modules/', '/tools/', '/tests/',
-              '/.git/', '/docs/');
+              '/.git/', '/docs/', '/database/migrations/', '/app/Services/Security/');
 $PERM_TABLES = 'role_permissions|report_role_permissions|permission_templates|role_permission_templates';
 /* الدالّةُ المعتمَدةُ الواحدة — والقائمةُ تُشتقّ منها */
 $HELPER = 'check_permission|check_view_permission|check_add_permission|check_edit_permission'
@@ -60,7 +71,7 @@ $HELPER = 'check_permission|check_view_permission|check_add_permission|check_edi
         . '|get_current_page_permissions|enforce_current_page_view_permission'
         . '|ems_enforce_write_permission|enforce_module_permission_json|get_page_permissions';
 
-$files = array();
+$files = array(); $exMig = array(); $exSec = array();
 $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($ROOT,
     FilesystemIterator::SKIP_DOTS));
 foreach ($it as $f) {
@@ -68,7 +79,12 @@ foreach ($it as $f) {
     $rel = str_replace('\\', '/', substr($f->getPathname(), strlen($ROOT)));
     $skip = false;
     foreach ($SKIP as $s) { if (strpos($rel, $s) === 0 || strpos($rel, $s) !== false) { $skip = true; break; } }
-    if ($skip) { continue; }
+    if ($skip) {
+        /* ⛔ **وما خرج يُعَدُّ ويُعرَض** — فمن يملك إخراجَ ملفٍّ يملك خفضَ الرقمِ بلا توحيد */
+        if (strpos($rel, '/database/migrations/') !== false) { $exMig[] = $rel; }
+        elseif (strpos($rel, '/app/Services/Security/') !== false) { $exSec[] = $rel; }
+        continue;
+    }
     $files[$rel] = $f->getPathname();
 }
 
@@ -112,6 +128,11 @@ printf("     خطُّ الأساسِ: **مساران و٨٧ قارئًا** · و
        $paths, count($direct));
 echo "     ◆ **والفرقُ خبرٌ يُعلَن** — والتمييزُ هنا يُخرج شاشاتِ الإدارةِ من المقام،\n";
 echo "       ⛔ فإدخالُها يضخّم الرقمَ بما ليس قرارًا.\n";
+printf("     ◆ **وما خرج بالنطاقِ يُعَدُّ ولا يُخفى**: هجراتٌ **%d** (‏سكربتٌ يُشغَّل مرّةً لا مسارُ قرار)\n",
+       count($exMig));
+printf("       · وطبقةُ المصدرِ نفسِها `app/Services/Security/` **%d** (‏هي التي تقرأ لتقرّر — كالمُساعِد)\n",
+       count($exSec));
+echo "       ⛔ **ومن يملك إخراجَ ملفٍّ يملك خفضَ الرقمِ بلا توحيدٍ** — فالعددُ مكتوبٌ لا مطويّ.\n";
 
 echo "\n────────────────────────────────────────────────────────────\n";
 printf("**`مساراتُ قرارِ الصلاحية` = %d** — والقبولُ **١**\n", $paths);
