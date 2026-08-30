@@ -45,7 +45,10 @@ $SELF = in_array('--selftest', $argv, true);
 /** أإغلاقٌ بالدليلِ هو؟ — ⛔ **و«منفَّذٌ ولم يُثبت» ليس إغلاقًا**. */
 function rv_is_closed($state)
 {
-    return in_array((string) $state, array('IMPLEMENTED_VERIFIED', 'VERIFIED_CLOSED'), true);
+    /* `EVIDENCE_CLOSED` هي حالةُ الإغلاقِ التي يكتبها مسارُ أمرِ الضبطِ §٥
+       (`ctl_evidence_closure`) بعقدِ إثباتٍ رباعيِّ الفحوص — والاسمان الأقدمان
+       يبقيان مقبولَين لو وُجدا في سجلٍّ سابق */
+    return in_array((string) $state, array('EVIDENCE_CLOSED', 'IMPLEMENTED_VERIFIED', 'VERIFIED_CLOSED'), true);
 }
 /** أمنفَّذٌ بلا إثبات؟ — يُعرض بصفتِه لا يُخلط بالمغلق. */
 function rv_is_unverified($state)
