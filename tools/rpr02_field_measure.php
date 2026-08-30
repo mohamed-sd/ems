@@ -277,7 +277,7 @@ $SHARED = array();
 foreach ($fanin as $f => $n) { if ($n >= 2 && !isset($own[$f])) { $SHARED[$f] = $n; } }
 
 /* ═══ ⑦ القياسُ سطحًا سطحًا ══════════════════════════════════════════════ */
-$out = array();
+$out = array(); $BYTYPE = array();
 $tot = array('des' => 0, 'audit' => 0, 'appl' => 0, 'hit' => 0,
              'F1' => 0, 'F2' => 0, 'F3' => 0, 'F4' => 0, 'F5' => 0,
              'full' => 0, 'novocab' => 0, 'redir' => 0, 'u13' => 0);
@@ -337,10 +337,15 @@ foreach ($bridge as $b) {
     $nAud = 0; $nApp = 0; $nHit = 0; $miss = array();
     foreach ($dl as $f) {
         $tot['des']++;
-        if ($f['field_type'] === 'AUDIT') { $nAud++; $tot['audit']++; continue; }
-        $nApp++;
+        /* ⛔ **والنوعُ يُعدُّ ولو خرج من المقام** — فمن يملك إخراجَ نوعٍ يملك رفعَ
+           النسبة، **والتفكيكُ يكشف ما يُخفيه الجمع**: ستُّ خطواتٍ في §٧ تسأل
+           عن ستّةِ أنواعٍ، ونسبةٌ واحدةٌ لها **تُخفي أيَّها يحتاج عملًا**. */
+        $ft = (string) $f['field_type'];
+        if (!isset($BYTYPE[$ft])) { $BYTYPE[$ft] = array('app' => 0, 'hit' => 0); }
+        if ($f['field_type'] === 'AUDIT') { $nAud++; $tot['audit']++; $BYTYPE[$ft]['app']++; continue; }
+        $nApp++; $BYTYPE[$ft]['app']++;
         $h = fm_hit(fm_tok($f['field_name'], $FM_STOP), $bagTok, $bagStr, fm_norm($f['field_name']));
-        if ($h !== '') { $nHit++; } else { $miss[] = $f['field_name']; }
+        if ($h !== '') { $nHit++; $BYTYPE[$ft]['hit']++; } else { $miss[] = $f['field_name']; }
     }
     if ($slug !== '' && $nGfc > 0) { $tot['u13']++; }
     if ($redir) { $tot['redir']++; }
@@ -374,6 +379,32 @@ printf("     المقامُ المنطبق                        %5d\n", $tot['
 printf("     **المطابَقُ في الأثر                   %5d ⇒ %s%%**\n", $tot['hit'], $pc);
 printf("     أسطحٌ طوبقت حقولُها كاملةً              %5d من %d\n", $tot['full'], count($out));
 printf("     أسطحٌ خلا أثرُها من مفردةٍ (`NO_VOCAB`)  %5d — بشاهدِ عجزِها لا بصفرٍ مسكوتٍ عنه\n", $tot['novocab']);
+
+/* ⛔ **ستُّ خطواتٍ لا خطوةٌ واحدة** — و§٧ تسأل عن كلِّ نوعٍ في موضعِه، ونسبةٌ
+ واحدةٌ لستَّةِ أسئلةٍ **تُخفي أيَّها يحتاج عملًا**. */
+$FM_STEP = array(
+    'BUSINESS_INPUT'    => 'الخطوة ٥ · الحقولُ الناقصة',
+    'IMPORTED_READONLY' => 'الخطوة ٦ · الحقولُ المستوردة',
+    'DERIVED'           => 'الخطوة ٧ · الحقولُ المشتقّة',
+    'REFERENCE'         => 'الخطوة ٥ · مرجعٌ في نموذج',
+    'FK_INHERITED'      => 'الخطوة ٢ · الأبُ والابن',
+    'PARENT_INHERITED'  => 'الخطوة ٢ · الأبُ والابن',
+    'PK_GENERATED'      => 'يولّده النظامُ ولا يُحرَّر — بنصِّ الملفّ',
+    'AUDIT'             => 'الخطوة ١١ · إلحاقيّة — خارجَ المقام',
+    'SNAPSHOT'          => 'لقطةُ قيمةٍ محفوظة',
+);
+echo "
+  ── والمقامُ مفكَّكًا: ستُّ خطواتٍ لا خطوةٌ واحدة ──
+";
+uasort($BYTYPE, function ($a, $b) { return $b['app'] - $a['app']; });
+foreach ($BYTYPE as $ft => $v) {
+    printf("     %-20s %5d ⇒ %5d · %5s%%  %s
+", $ft, $v['app'], $v['hit'],
+           $v['app'] ? round($v['hit'] * 100 / $v['app'], 1) : 0,
+           isset($FM_STEP[$ft]) ? $FM_STEP[$ft] : '—');
+}
+echo "  ⛔ **ولا يُخرَج نوعٌ من المقامِ هنا** — الإخراجُ قرارُ عرضٍ بنصٍّ يُذكر لا حذفٌ في المخزن
+";
 
 if ($LIST) {
     echo "\n  ── أدنى عشرةِ أسطحٍ تغطيةً ──\n";
@@ -422,6 +453,21 @@ if ($APPLY) {
              . "','" . $e(mb_substr($wit, 0, 500)) . "','" . $e($sid) . "',NOW())");
         if (!$ok) { exit("✘ تعذّر تثبيتُ {$o['screen_id']}: {$conn->error}\n"); }
         $n++;
+    }
+    $hasT = $conn->query("SHOW TABLES LIKE 'repair01_field_measure_type'");
+    if ($hasT && $hasT->num_rows) {
+        $conn->query("DELETE FROM repair01_field_measure_type");
+        foreach ($BYTYPE as $ft => $v) {
+            $stp = isset($FM_STEP[$ft]) ? $FM_STEP[$ft] : '';
+            $w = 'مقيسٌ من الأثرِ على الأسطحِ المطابَقةِ — ' . $v['hit'] . ' من ' . $v['app']
+               . ' · وسؤالُه في §٧: ' . ($stp === '' ? 'غيرُ مسمًّى' : $stp) . ' · لقطة ' . $sid;
+            $conn->query("INSERT INTO repair01_field_measure_type
+                  (field_type,step_ref,applicable,matched,witness,snapshot_id,measured_at)
+                VALUES ('" . $e($ft) . "','" . $e($stp) . "'," . (int) $v['app'] . ","
+                 . (int) $v['hit'] . ",'" . $e(mb_substr($w, 0, 400)) . "','" . $e($sid) . "',NOW())");
+        }
+        printf("  ✔ فُكِّك المقامُ إلى **%d** نوعًا في `repair01_field_measure_type`
+", count($BYTYPE));
     }
     $bad = (int) $conn->query("SELECT COUNT(*) FROM repair01_field_measure WHERE witness = ''")->fetch_row()[0];
     printf("\n  ✔ ثُبِّت **%d** سطحًا في `repair01_field_measure` · صفٌّ بلا شاهدٍ %d\n", $n, $bad);
