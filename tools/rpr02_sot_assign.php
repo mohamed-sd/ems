@@ -133,6 +133,31 @@ foreach ($rows as $x) {
 }
 $stat['dupEnt'] = count($dupBy);
 
+/* ═══ ④·ب الإسقاطاتُ — مرجعُ المصدرِ الصريحُ (#٦ · §٧ الخطوة ٨) ════════════
+   ◆ **والسؤالُ مختلفٌ عن سؤالِ الكاتب**: الكاتبُ يُسأل «أأنت مالكُ هذه الحقيقة؟»
+     والإسقاطُ يُسأل «**من أين تستقي**؟». والعمودُ واحدٌ لأنَّ المعنى واحد:
+     **مصدرُ الحقيقةِ التي يعرضها هذا السطح** — و`sot_rule` يفرّق الحالَين.
+   ◆ **والجوابُ مقيسٌ سلفًا**: `grain_entity` للإسقاطِ **هو الجدولُ الذي يقرأ منه**.
+   ⛔ **ولا يُؤخذ إلّا من `OWN_FACT`** — فكيانٌ جاء من **كِيتٍ مشتركٍ** هو جدولُ
+     العُدّةِ لا مصدرُ هذا الإسقاط، **ونسبتُه إليه تُعطي مرجعًا كاذبًا**: وذاك
+     أسوأُ من غيابِ المرجع، لأنَّ الغائبَ يُعلن نفسَه والكاذبَ يُقرأ صحيحًا. */
+$PRJ = "repair01_screen_registry WHERE on_disk = 1 AND ownership_verdict <> 'RETIRE'
+        AND surface_kind = 'PROJECTION' AND grain_entity <> ''";
+$prjPlan = array(); $pst = array('ok' => 0, 'skip' => 0, 'already' => 0);
+$r = $conn->query("SELECT screen_id, canonical_label_ar, owner_code, grain_entity,
+                          grain_fact_scope, source_of_truth
+                     FROM $PRJ ORDER BY screen_id");
+while ($x = $r->fetch_assoc()) {
+    if (trim((string) $x['source_of_truth']) !== '') { $pst['already']++; continue; }
+    if ($x['grain_fact_scope'] !== 'OWN_FACT') { $pst['skip']++; continue; }
+    $pst['ok']++;
+    $prjPlan[] = array('id' => $x['screen_id'], 'ent' => $x['grain_entity'], 'rule' => 'PROJECTION_READ',
+        'wit' => 'P1 `PROJECTION_READ` · سطحُ **إسقاطٍ** يقرأ `' . $x['grain_entity']
+               . '` — والكيانُ مقيسٌ **من مصدرِ السطحِ الخاصِّ** (`OWN_FACT`) لا من كِيتٍ مشترك ⇒ '
+               . '**فمرجعُ مصدرِه صريحٌ مقيسٌ لا مُعلَن**. ⛔ **وهذا يقول من أين يستقي لا أنّه يملك** · '
+               . 'مالكُه `' . ($x['owner_code'] === '' ? '—' : $x['owner_code']) . '` · لقطة ' . $sid);
+}
+
 /* ═══ ⑤ العرض ════════════════════════════════════════════════════════════ */
 echo "\n═══ `RPR-02` §٥·٩ — مصدرُ الحقيقةِ بقاعدةِ الكاتبِ الوحيد ═══\n";
 printf("  اللقطة: %s · أسطحُ كتابةٍ بكيانٍ مقيس: **%d**\n\n", $sid, count($rows));
@@ -148,6 +173,11 @@ $before = $stat['sole'] + $stat['dup'];
 printf("  ⇒ المقياسُ **#٩ %d ⇒ %d** · والباقي **هو بعينِه مقامُ #١٠** بأسطحِه\n",
        $before, $stat['dup']);
 echo "  ◆ **فبقيّةُ #٩ و#١٠ عطبٌ واحدٌ يُعدُّ مرّتَين** — وإغلاقُ #١٠ يُغلقهما معًا\n";
+
+echo "\n  ── الإسقاطاتُ · مرجعُ المصدرِ الصريح (#٦ · §٧ الخطوة ٨) ──\n";
+printf("     `PROJECTION_READ` **%4d** — يقرأ كيانًا مقيسًا **من مصدرِه الخاصّ** ⇒ **يُكتب**\n", $pst['ok']);
+printf("     كيانُه من كِيتٍ مشتركٍ    %4d — ⛔ **لا يُكتب**: مرجعٌ كاذبٌ أسوأُ من غيابِه\n", $pst['skip']);
+printf("     قائمٌ سلفًا بمرجعٍ        %4d — لا يُدهَس\n", $pst['already']);
 
 if ($LIST) {
     echo "\n  ── الكياناتُ متعدّدةُ الكتّاب ──\n";
@@ -166,15 +196,15 @@ if ($APPLY) {
        (`SOLE_WRITER`/`DUPLICATE_SOURCE`) ولم يعُدْ في `OWN_FACT`.
        ⛔ **و`PRE_W17_DECLARED` لا يُمَسّ** — قيمةٌ من موجةٍ سابقةٍ بقرارِها. */
     $ret = (int) $conn->query("SELECT COUNT(*) FROM repair01_screen_registry
-            WHERE sot_rule IN ('SOLE_WRITER','DUPLICATE_SOURCE')
-              AND (grain_fact_scope <> 'OWN_FACT'
-                   OR grain_cardinality NOT IN ('ROW','LINE'))")->fetch_row()[0];
+            WHERE ((sot_rule IN ('SOLE_WRITER','DUPLICATE_SOURCE')
+                    AND (grain_fact_scope <> 'OWN_FACT' OR grain_cardinality NOT IN ('ROW','LINE')))
+                OR (sot_rule = 'PROJECTION_READ' AND grain_fact_scope <> 'OWN_FACT'))")->fetch_row()[0];
     if ($ret > 0) {
         $conn->query("UPDATE repair01_screen_registry
             SET source_of_truth = '', sot_rule = '', sot_witness = '', sot_snapshot = ''
-          WHERE sot_rule IN ('SOLE_WRITER','DUPLICATE_SOURCE')
-            AND (grain_fact_scope <> 'OWN_FACT'
-                 OR grain_cardinality NOT IN ('ROW','LINE'))");
+          WHERE ((sot_rule IN ('SOLE_WRITER','DUPLICATE_SOURCE')
+                  AND (grain_fact_scope <> 'OWN_FACT' OR grain_cardinality NOT IN ('ROW','LINE')))
+              OR (sot_rule = 'PROJECTION_READ' AND grain_fact_scope <> 'OWN_FACT'))");
         printf("\n  ⚠ **سُحب تعيينُ %d سطحٍ** خرج من المقامِ بتصحيحِ مدى الحقيقة — ولا يُترك رقمٌ متقادم\n", $ret);
     }
     $n = 0; $m = 0;
@@ -190,6 +220,20 @@ if ($APPLY) {
         if (!$ok) { exit("✘ تعذّر تعيينُ {$x['id']}: {$conn->error}\n"); }
         if ($x['rule'] === 'SOLE_WRITER') { $n++; } else { $m++; }
     }
+    $pn = 0;
+    foreach ($prjPlan as $x) {
+        $ok2 = $conn->query("UPDATE repair01_screen_registry
+              SET source_of_truth = '" . $e($x['ent']) . "',
+                  sot_rule = '" . $e($x['rule']) . "',
+                  sot_witness = '" . $e(mb_substr($x['wit'], 0, 500)) . "',
+                  sot_snapshot = '" . $e($sid) . "'
+            WHERE screen_id = '" . $e($x['id']) . "'");
+        if (!$ok2) { exit("✘ تعذّر مرجعُ {$x['id']}: {$conn->error}
+"); }
+        $pn++;
+    }
+    if ($pn) { printf("  ✔ كُتب مرجعُ مصدرِ **%d** إسقاطٍ بشاهدِه
+", $pn); }
     $bad = (int) $conn->query("SELECT COUNT(*) FROM repair01_screen_registry
                                 WHERE source_of_truth <> '' AND sot_witness = ''")->fetch_row()[0];
     $now = (int) $conn->query("SELECT COUNT(*) FROM $LIVE $WR
