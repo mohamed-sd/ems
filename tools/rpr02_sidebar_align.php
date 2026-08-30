@@ -53,6 +53,22 @@ $SELF  = in_array('--selftest', $argv, true);
    (‏المجموعاتُ) **ويُوقَف ما يحجبه وحدَه** (‏الترتيبُ) ويُرفع التعارض. */
 $GONLY = in_array('--groups-only', $argv, true);
 
+/* ⛔ **موقوفٌ بتعارضِ نصَّين حاكمَين — مقيسًا لا مظنونًا** ═════════════════
+   §٥·٦ يأمر بأن تطابق مجموعةُ السايدبارِ الملفَّ التصميميّ · و**ف٧-٢**
+   (قرارُ المالك) يحدُّ **القسمَ المقروءَ بتسعةِ عناصر**. وقد طُبِّقت المحاذاةُ
+   فسقطت `U9`: دور ١٣ «التشغيل اليومي ▸ التشغيل اليومي» = **١١ عنصرًا**.
+   ◆ **والسببُ عُزل بالتجربةِ لا بالظنّ**: رُدَّ المساران أدناه وحدَهما فعادت
+     البوّابةُ خضراءَ — **فهما المسبِّبان بعينِهما**. ومجموعتاهما في الملفِّ
+     (`التأسيس` · `اللوحة — خارج الدورة`) **لا رأسَ طيٍّ لهما عند دور ١٣**،
+     فيسقط بندُهما في القسمِ الافتراضيِّ فينتفخ.
+   ⇒ **يُوقَف ما يحجبه وحدَه** (‏أمرُ الإنهاءِ §٠·٣ الحالة ٢) ويُرفع التعارضُ،
+   ⛔ **ولا يُبنى رأسُ طيٍّ جديدٌ من عندنا**: رؤوسُ الطيِّ محدودةٌ بعشرةٍ لكلِّ
+     إدارةٍ بقرارِ المالكِ نفسِه، **فإضافةُ رأسٍ قرارُ بنيةٍ لا تصحيحُ محاذاة**. */
+$HOLD = array(
+    'maintenance/workshop.php'      => 'U9 · ف٧-٢: يدفع قسمَ دور ١٣ إلى ١١ عنصرًا — ولا رأسَ طيٍّ لمجموعتِه',
+    'maintenance/dashboard_mnt.php' => 'U9 · ف٧-٢: يدفع قسمَ دور ١٣ إلى ١١ عنصرًا — ولا رأسَ طيٍّ لمجموعتِه',
+);
+
 /* ═══ ① التطبيعُ — نفسُه في المقياسِ والمحاذاة، ولا نسختان تتفرّقان ══════ */
 function sa_norm($s)
 {
@@ -132,7 +148,8 @@ while ($q && ($z = $q->fetch_assoc())) { $spec[$key($z['route'])] = $z; }
 /* ═══ ⑤ المقارنةُ والخطّة ════════════════════════════════════════════════ */
 $plan = array(); $byUnit = array();
 $stat = array('match' => 0, 'GROUP' => 0, 'ORDER' => 0, 'GROUP_AND_ORDER' => 0,
-              'declared' => 0, 'no_canon' => 0, 'held' => 0);
+              'declared' => 0, 'no_canon' => 0, 'held' => 0, 'blocked' => 0);
+$blockedList = array();
 foreach ($spec as $k => $sp) {
     $shown = isset($declared[$k]) ? $declared[$k]
            : (isset($canon[$k]) ? (string) $canon[$k]['group_name']
@@ -142,6 +159,7 @@ foreach ($spec as $k => $sp) {
     if ($GONLY && $kind === 'GROUP_AND_ORDER') { $kind = 'GROUP'; }
     if ($GONLY && $kind === 'ORDER') { $stat['held']++; continue; }
     if ($kind === '') { $stat['match']++; continue; }
+    if (isset($HOLD[$k])) { $stat['blocked']++; $blockedList[$k] = $HOLD[$k]; continue; }
     /* ⛔ **والمُعلَنُ لا يُمَسّ** — تغييرُ المعتمَدِ تحته لا يُرى */
     if (isset($declared[$k])) { $stat['declared']++; continue; }
     if (!isset($canon[$k]))   { $stat['no_canon']++; continue; }
@@ -176,6 +194,8 @@ printf("  `ORDER`            يُحاذى  **%4d**\n", $stat['ORDER']);
 printf("  `GROUP_AND_ORDER`  يُحاذى  **%4d**\n", $stat['GROUP_AND_ORDER']);
 printf("  ⛔ مُعلَنٌ في `gov_target_nav` لا يُمَسّ  **%4d**\n", $stat['declared']);
 printf("  ⛔ بلا صفٍّ معتمَدٍ يُكتب فيه          **%4d**\n", $stat['no_canon']);
+if ($stat['blocked']) { printf("  ⛔ مُوقَفٌ بتعارضِ ف٧-٢ (‏قسمٌ يبلغ عشرةً)   **%4d**
+", $stat['blocked']); }
 if ($GONLY) { printf("  ⚠ ترتيبٌ مُوقَفٌ بتعارضِ ف٧-٢ (‏قسمٌ يبلغ عشرةً)  **%4d**
 ", $stat['held']); }
 printf("\n  ⇒ **يُحاذى %d مسارًا** على %d إدارةً\n", count($plan), count($byUnit));

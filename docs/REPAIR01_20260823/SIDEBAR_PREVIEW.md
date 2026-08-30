@@ -1,6 +1,6 @@
 # معاينةُ السايدبار — قبل/بعد بالملفِّ التصميميّ
 
-> ⛔ **مولَّدٌ من تشغيلٍ حيّ**: `php tools/rpr02_sidebar_align.php --md` · اللقطة `SNAP-4b6946f0-20260830-104139`
+> ⛔ **مولَّدٌ من تشغيلٍ حيّ**: `php tools/rpr02_sidebar_align.php --md` · اللقطة `SNAP-9e999bbb-20260830-105416`
 > ◆ **والمعاينةُ أثرٌ للمراجعةِ اللاحقةِ لا بوّابةُ إذن** (أمرُ الإنهاءِ §٣) — **والتراجعُ بهجرةٍ عكسيّةٍ** من `repair01_sidebar_align` نفسِه.
 
 ## المقام
@@ -8,10 +8,10 @@
 | المفردة | العدد |
 |---|---:|
 | مساراتٌ مجسورةٌ بالملفِّ التصميميّ | **200** |
-| مطابقٌ سلفًا | 49 |
-| يُحاذى — مجموعةً | 1 |
-| يُحاذى — ترتيبًا | 93 |
-| يُحاذى — مجموعةً وترتيبًا | 40 |
+| مطابقٌ سلفًا | 50 |
+| يُحاذى — مجموعةً | 0 |
+| يُحاذى — ترتيبًا | 131 |
+| يُحاذى — مجموعةً وترتيبًا | 0 |
 | ⛔ مُعلَنٌ في `gov_target_nav` **لا يُمَسّ** | 11 |
 | ⛔ بلا صفٍّ معتمَدٍ يُكتب فيه | 6 |
 
@@ -21,26 +21,26 @@
 
 | المسار | المجموعةُ قبل | المجموعةُ بعد | الترتيبُ قبل | بعد |
 |---|---|---|---:|---:|
-| `opportunities/client_need_rfq.php` | العروض والتسعير | خط الأنابيب | 205 | 6 |
-| `clients/quotation_lines.php` | العروض والتسعير | العرض والتفاوض | 202 | 8 |
-| `clients/quotation_negotiation.php` | العروض والتسعير | العرض والتفاوض | 203 | 9 |
+| `opportunities/client_need_rfq.php` | خط الأنابيب | خط الأنابيب | 205 | 6 |
+| `clients/quotation_lines.php` | العرض والتفاوض | العرض والتفاوض | 202 | 8 |
+| `clients/quotation_negotiation.php` | العرض والتفاوض | العرض والتفاوض | 203 | 9 |
 
 ## 02 إدارة الموردين
 
 | المسار | المجموعةُ قبل | المجموعةُ بعد | الترتيبُ قبل | بعد |
 |---|---|---|---:|---:|
-| `suppliers/equipment_plan.php` | ملف المورد وتأهيله | التأسيس | 150 | 4 |
-| `suppliers/supplier_contract_lines.php` | تعاقد الموردين وتسويتهم | التعاقد | 150 | 9 |
-| `suppliers/supplier_violations.php` | تعاقد الموردين وتسويتهم | الحوكمة | 155 | 26 |
-| `suppliers/supplier_evaluation.php` | تقييم الأداء والإنهاء | الحوكمة | 700 | 27 |
-| `suppliers/supplier_board.php` | تعاقد الموردين وتسويتهم | اللوحة — خارج الدورة (Overview) | 101 | 30 |
+| `suppliers/equipment_plan.php` | التأسيس | التأسيس | 150 | 4 |
+| `suppliers/supplier_contract_lines.php` | التعاقد | التعاقد | 150 | 9 |
+| `suppliers/supplier_violations.php` | الحوكمة | الحوكمة | 155 | 26 |
+| `suppliers/supplier_evaluation.php` | الحوكمة | الحوكمة | 700 | 27 |
+| `suppliers/supplier_board.php` | اللوحة — خارج الدورة (Overview) | اللوحة — خارج الدورة (Overview) | 101 | 30 |
 
 ## 04 إدارة الأسطول والأصول
 
 | المسار | المجموعةُ قبل | المجموعةُ بعد | الترتيبُ قبل | بعد |
 |---|---|---|---:|---:|
-| `fleet/asset_intake.php` | دورة الأصل الدخول | ب · دخول الأصل | 10 | 3 |
-| `fleet/asset_use_rights.php` | دورة الأصل الدخول | ب · دخول الأصل | 20 | 9 |
+| `fleet/asset_intake.php` | ب · دخول الأصل | ب · دخول الأصل | 10 | 3 |
+| `fleet/asset_use_rights.php` | ب · دخول الأصل | ب · دخول الأصل | 20 | 9 |
 
 ## 05 الإدارة المالية
 
@@ -50,16 +50,15 @@
 | `finance/dues_fin.php` | الذمم الدائنة | الذمم الدائنة | 750 | 9 |
 | `finance/journal_form_fin.php` | القيد والدفتر | القيد والدفتر | 1150 | 11 |
 | `finrequests/effect_map.php` | القيد والدفتر | القيد والدفتر | 1400 | 13 |
-| `contracts/collections.php` | دورة القبض | الذمم المدينة | 150 | 14 |
+| `contracts/collections.php` | الذمم المدينة | الذمم المدينة | 150 | 14 |
 | `finance/tax_fin.php` | التسويات والمحاسبة العامة | التسويات والمحاسبة العامة | 1150 | 18 |
-| `finance/periods_fin.php` | التأسيس المرجعي | الإقفال | 1150 | 23 |
+| `finance/periods_fin.php` | الإقفال | الإقفال | 1150 | 23 |
 | `finance/financial_statements_fin.php` | الإقفال | الإقفال | 1150 | 24 |
 
 ## 06 إدارة الخزينة
 
 | المسار | المجموعةُ قبل | المجموعةُ بعد | الترتيبُ قبل | بعد |
 |---|---|---|---:|---:|
-| `finance/tre_liquidity_board.php` | اللوحة | اللوحة — خارج الدورة (Overview) | 1 | 1 |
 | `finance/tre_beneficiary.php` | التأسيس | التأسيس | 760 | 3 |
 | `finance/tre_pay_batch.php` | دورة الصرف | دورة الصرف | 770 | 9 |
 | `finance/bank_reconciliation_fin.php` | الرقابة والإقفال | الرقابة والإقفال | 750 | 13 |
@@ -68,7 +67,7 @@
 
 | المسار | المجموعةُ قبل | المجموعةُ بعد | الترتيبُ قبل | بعد |
 |---|---|---|---:|---:|
-| `employees/hr_board.php` | اللوحة | اللوحة — خارج الدورة (Overview) | 0 | 1 |
+| `employees/hr_board.php` | اللوحة — خارج الدورة (Overview) | اللوحة — خارج الدورة (Overview) | 0 | 1 |
 | `workforce/recruitment_pipeline.php` | التوظيف والتعاقد | التوظيف والتعاقد | 3 | 4 |
 | `workforce/rec_applications.php` | التوظيف والتعاقد | التوظيف والتعاقد | 4 | 5 |
 | `workforce/rec_stages.php` | التوظيف والتعاقد | التوظيف والتعاقد | 5 | 6 |
@@ -92,14 +91,14 @@
 
 | المسار | المجموعةُ قبل | المجموعةُ بعد | الترتيبُ قبل | بعد |
 |---|---|---|---:|---:|
-| `governance/gov_board.php` | اللوحة | اللوحة — خارج الدورة (Overview) | 0 | 1 |
+| `governance/gov_board.php` | اللوحة — خارج الدورة (Overview) | اللوحة — خارج الدورة (Overview) | 0 | 1 |
 | `governance/entities_registry.php` | الكيان والتفويض | الكيان والتفويض | 1 | 2 |
 | `governance/policies.php` | الكيان والتفويض | الكيان والتفويض | 2 | 3 |
 | `governance/compliance_calendar.php` | الكيان والتفويض | الكيان والتفويض | 4 | 5 |
 | `governance/signing_authority.php` | الكيان والتفويض | الكيان والتفويض | 5 | 6 |
 | `governance/licenses_guarantees.php` | المستندات والالتزام | المستندات والالتزام | 6 | 7 |
 | `governance/regulatory_filings.php` | المستندات والالتزام | المستندات والالتزام | 7 | 8 |
-| `settings/roles.php` | الهيكل والأدوار | الأدوار والصلاحيات | 210 | 9 |
+| `settings/roles.php` | الأدوار والصلاحيات | الأدوار والصلاحيات | 210 | 9 |
 | `governance/conflict_disclosures.php` | الأدوار والصلاحيات | الأدوار والصلاحيات | 14 | 10 |
 | `governance/related_parties.php` | الأدوار والصلاحيات | الأدوار والصلاحيات | 15 | 11 |
 | `governance/gifts_hospitality.php` | الأدوار والصلاحيات | الأدوار والصلاحيات | 16 | 12 |
@@ -133,40 +132,38 @@
 
 | المسار | المجموعةُ قبل | المجموعةُ بعد | الترتيبُ قبل | بعد |
 |---|---|---|---:|---:|
-| `tickets/tkt_subject_types.php` | اللوحة | دورة البلاغ | 32 | 5 |
-| `tickets/ticket_form.php` | استقبال البلاغات | دورة البلاغ | 350 | 6 |
-| `tickets/tkt_routing.php` | دورة البلاغ | السجلات التابعة | 34 | 7 |
-| `tickets/tkt_assignment.php` | دورة البلاغ | السجلات التابعة | 35 | 8 |
+| `tickets/tkt_subject_types.php` | دورة البلاغ | دورة البلاغ | 32 | 5 |
+| `tickets/ticket_form.php` | دورة البلاغ | دورة البلاغ | 350 | 6 |
+| `tickets/tkt_routing.php` | السجلات التابعة | السجلات التابعة | 34 | 7 |
+| `tickets/tkt_assignment.php` | السجلات التابعة | السجلات التابعة | 35 | 8 |
 | `tickets/tkt_resolution_actions.php` | السجلات التابعة | السجلات التابعة | 36 | 9 |
 | `tickets/tkt_communications.php` | السجلات التابعة | السجلات التابعة | 37 | 10 |
 | `tickets/tkt_escalation.php` | السجلات التابعة | السجلات التابعة | 38 | 11 |
 | `tickets/tkt_reopen.php` | السجلات التابعة | السجلات التابعة | 39 | 12 |
-| `tickets/tkt_verification.php` | السجلات التابعة | دورة البلاغ | 40 | 13 |
+| `tickets/tkt_verification.php` | دورة البلاغ | دورة البلاغ | 40 | 13 |
 
 ## 11 إدارة التشغيل
 
 | المسار | المجموعةُ قبل | المجموعةُ بعد | الترتيبُ قبل | بعد |
 |---|---|---|---:|---:|
-| `workforce/worker_worklog.php` | التقارير والتحليلات | الانحراف والاستثناء | 900 | 10 |
+| `workforce/worker_worklog.php` | الانحراف والاستثناء | الانحراف والاستثناء | 900 | 10 |
 
 ## 12 إدارة الموقع
 
 | المسار | المجموعةُ قبل | المجموعةُ بعد | الترتيبُ قبل | بعد |
 |---|---|---|---:|---:|
-| `operations/site_gate_equip.php` | البيانات المرجعية والإعدادات | التأسيس | 704 | 4 |
+| `operations/site_gate_equip.php` | التأسيس | التأسيس | 704 | 4 |
 
 ## 13 إدارة القوى التشغيلية
 
 | المسار | المجموعةُ قبل | المجموعةُ بعد | الترتيبُ قبل | بعد |
 |---|---|---|---:|---:|
-| `workforce/housing_units.php` | التكليف على المعدات | الأداء والتسوية | 571 | 16 |
+| `workforce/housing_units.php` | الأداء والتسوية | الأداء والتسوية | 571 | 16 |
 
 ## 14 إدارة الصيانة
 
 | المسار | المجموعةُ قبل | المجموعةُ بعد | الترتيبُ قبل | بعد |
 |---|---|---|---:|---:|
-| `maintenance/dashboard_mnt.php` | الصيانة الوقائية | اللوحة — خارج الدورة (Overview) | 450 | 1 |
-| `maintenance/workshop.php` | البيانات المرجعية والإعدادات | التأسيس | 500 | 3 |
 | `maintenance/external_repairs.php` | دورة العطل | دورة العطل | 11 | 12 |
 | `maintenance/daily_care.php` | الوقائية | الوقائية | 13 | 14 |
 | `maintenance/repeat_repairs.php` | الإقفال والجاهزية | الإقفال والجاهزية | 15 | 16 |
@@ -176,32 +173,32 @@
 
 | المسار | المجموعةُ قبل | المجموعةُ بعد | الترتيبُ قبل | بعد |
 |---|---|---|---:|---:|
-| `transport/transfer_requests.php` | أوامر الترحيل | دورة الترحيل | 250 | 2 |
-| `transport/transfer_fleet.php` | البيانات المرجعية والإعدادات | التأسيس | 410 | 3 |
-| `transport/transfer_permits.php` | البيانات المرجعية والإعدادات | دورة الترحيل | 400 | 5 |
+| `transport/transfer_requests.php` | دورة الترحيل | دورة الترحيل | 250 | 2 |
+| `transport/transfer_fleet.php` | التأسيس | التأسيس | 410 | 3 |
+| `transport/transfer_permits.php` | دورة الترحيل | دورة الترحيل | 400 | 5 |
 
 ## 16 إدارة المشتريات
 
 | المسار | المجموعةُ قبل | المجموعةُ بعد | الترتيبُ قبل | بعد |
 |---|---|---|---:|---:|
-| `procurement/dashboard_proc.php` | التقارير والتحليلات | اللوحة — خارج الدورة (Overview) | 900 | 1 |
-| `procurement/requests_proc.php` | الطلبات وحدود المخزون | الطلب والتجميع | 350 | 2 |
-| `procurement/orders_proc.php` | الطلبات وحدود المخزون | الأمر والتوريد | 350 | 11 |
-| `procurement/po_match.php` | الاستلام والمطابقة | المطابقة والإقفال | 610 | 15 |
+| `procurement/dashboard_proc.php` | اللوحة — خارج الدورة (Overview) | اللوحة — خارج الدورة (Overview) | 900 | 1 |
+| `procurement/requests_proc.php` | الطلب والتجميع | الطلب والتجميع | 350 | 2 |
+| `procurement/orders_proc.php` | الأمر والتوريد | الأمر والتوريد | 350 | 11 |
+| `procurement/po_match.php` | المطابقة والإقفال | المطابقة والإقفال | 610 | 15 |
 
 ## 17 إدارة المخازن
 
 | المسار | المجموعةُ قبل | المجموعةُ بعد | الترتيبُ قبل | بعد |
 |---|---|---|---:|---:|
-| `procurement/stock_proc.php` | الطلبات وحدود المخزون | دورة الاستلام | 350 | 6 |
-| `procurement/wh_transfer.php` | الاستلام | دورة الصرف | 240 | 13 |
-| `procurement/wh_count.php` | الجرد | الرقابة والإقفال | 400 | 15 |
+| `procurement/stock_proc.php` | دورة الاستلام | دورة الاستلام | 350 | 6 |
+| `procurement/wh_transfer.php` | دورة الصرف | دورة الصرف | 240 | 13 |
+| `procurement/wh_count.php` | الرقابة والإقفال | الرقابة والإقفال | 400 | 15 |
 
 ## AS المراجعة الداخلية المستقلة
 
 | المسار | المجموعةُ قبل | المجموعةُ بعد | الترتيبُ قبل | بعد |
 |---|---|---|---:|---:|
-| `audit/iaf_overview.php` | اللوحة | اللوحة — خارج الدورة (Overview) | 60 | 1 |
+| `audit/iaf_overview.php` | اللوحة — خارج الدورة (Overview) | اللوحة — خارج الدورة (Overview) | 60 | 1 |
 | `audit/iaf_charter.php` | الميثاق والخطة | الميثاق والخطة | 61 | 2 |
 | `audit/iaf_universe.php` | الميثاق والخطة | الميثاق والخطة | 62 | 3 |
 | `audit/iaf_plan.php` | الميثاق والخطة | الميثاق والخطة | 63 | 4 |
@@ -231,7 +228,7 @@
 | `portal/exec_escalations.php` | صناديق القرار | صناديق القرار | 28 | 17 |
 | `portal/exec_crisis_command.php` | صناديق القرار | صناديق القرار | 29 | 18 |
 | `portal/exec_strategic_decisions.php` | القرار والحوكمة العليا | القرار والحوكمة العليا | 31 | 19 |
-| `portal/project_charter.php` | التأسيس والهيكل المؤسسي | القرار والحوكمة العليا | 32 | 20 |
+| `portal/project_charter.php` | القرار والحوكمة العليا | القرار والحوكمة العليا | 32 | 20 |
 | `portal/exec_leadership_appointments.php` | القرار والحوكمة العليا | القرار والحوكمة العليا | 35 | 23 |
 | `portal/exec_meeting_decisions.php` | القرار والحوكمة العليا | القرار والحوكمة العليا | 37 | 25 |
 | `portal/exec_actions_followup.php` | القرار والحوكمة العليا | القرار والحوكمة العليا | 40 | 26 |
@@ -246,8 +243,8 @@
 
 | المسار | المجموعةُ قبل | المجموعةُ بعد | الترتيبُ قبل | بعد |
 |---|---|---|---:|---:|
-| `portal/my_achievement.php` | المركز التنفيذي | مساحتي الشخصية | 51 | 1 |
-| `portal/my_portal.php` | مركز العمل | مساحتي الشخصية | 52 | 2 |
-| `finrequests/my_requests.php` | المركز التنفيذي | عملي اليومي | 3 | 4 |
+| `portal/my_achievement.php` | مساحتي الشخصية | مساحتي الشخصية | 51 | 1 |
+| `portal/my_portal.php` | مساحتي الشخصية | مساحتي الشخصية | 52 | 2 |
+| `finrequests/my_requests.php` | عملي اليومي | عملي اليومي | 3 | 4 |
 | `portal/my_reports.php` | عملي اليومي | عملي اليومي | 53 | 5 |
 
