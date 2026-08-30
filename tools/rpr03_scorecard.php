@@ -267,8 +267,19 @@ $add('تمرينُ استعادةٍ على المخطَّطِ الحالي', 'ن
        ? ('⛔ **غيرُ مقيس** — لا تمرينَ استعادةٍ كاملةٍ في السجلِّ والنظامُ اليومَ ' . $liveTables . ' جدولًا')
        : ('آخرُ تمرينٍ **' . $dr['drill_no'] . '** بحكمِ **' . $dr['verdict'] . '** في ' . $dr['finished_at']
         . ' · محضرُه ' . $dr['evidence_path'] . ' · والنظامُ اليومَ ' . $liveTables . ' جدولًا'));
-$add('تثبيتٌ من الصفرِ على المخطَّطِ الحالي', 'ناجح', 'دليلٌ متقادم', null,
-     '⛔ **غيرُ مقيس**');
+$fi = null;
+$q = @$conn->query("SELECT drill_no, verdict, finished_at, target_point,
+                           TIMESTAMPDIFF(DAY, finished_at, NOW()) age_days
+                      FROM dr_drills WHERE drill_kind = 'fresh_install'
+                     ORDER BY finished_at DESC LIMIT 1");
+if ($q && ($z = $q->fetch_assoc())) { $fi = $z; }
+$add('تثبيتٌ من الصفرِ على المخطَّطِ الحالي', 'ناجح',
+     $fi === null ? 'دليلٌ متقادم' : ($fi['verdict'] . ' منذ ' . (int) $fi['age_days'] . ' يومًا'),
+     $fi !== null && $fi['verdict'] === 'pass' ? 0 : null,
+     $fi === null
+       ? '⛔ **غيرُ مقيس** — لا تمرينَ تثبيتٍ من الصفرِ في السجلّ'
+       : ('آخرُ تمرينٍ **' . $fi['drill_no'] . '** بحكمِ **' . $fi['verdict'] . '** في ' . $fi['finished_at']
+        . ' على ' . $fi['target_point'] . ' — والقناةُ الشرعيّةُ المثبِّتُ نفسُه (محلِّلُه يستوعب الزنادَ بلا DELIMITER)'));
 
 /* ⑭ الذهبيّات — **مقياسانِ لا مقياسٌ** (أمرُ الضبطِ §٣): حراسةٌ وقبول.
    ⛔ **فخلطُهما يقلب المعنى**: `PREMATURE=0` حراسةٌ خضراءُ اليومَ (لا شاشةَ
