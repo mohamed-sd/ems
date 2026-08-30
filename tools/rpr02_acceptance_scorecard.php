@@ -117,13 +117,60 @@ if ($tbl('repair01_field_measure')
 }
 
 /* ═══ ٤ · مطابقةُ آلةِ الحالةِ لكلِّ معاملة ══════════════════════════════ */
-$txn = (int) $one("SELECT COUNT(*) FROM $LIVE AND grain_cardinality IN ('ROW','LINE')");
+/* ⛔ **والمقامُ والبسطُ كلاهما كان خطأً** — والمقيسُ يشهد:
+   · **المقام**: `ROW`/`LINE` بلا `grain_fact_scope` يضمُّ **٧٧** سطحًا كيانُها من
+     كِيتٍ مشتركٍ أو بنيةٍ صِرفة — **وتلك ليست معاملات**.
+   · **والبسط**: الثمانيةَ عشرَ التي تحمل `state_model_ref` **كلُّها** أسطحُ
+     بوّابةٍ تنفيذيّةٍ كيانُها المقيسُ `guard_denials` **من كِيتٍ مشترك**
+     (`SHARED_KIT`) ⇒ **ولا واحدةَ منها معاملةٌ بحبّتِها**.
+   ⇒ فالمقيسُ على المعاملاتِ الحقيقيّةِ **صفرٌ من ١٣١**، والثمانيةَ عشرَ **إعلانُ
+     موجةٍ على أسطحٍ لم تُقَسْ معاملاتٍ**. ⛔ **وثمانيةٌ وعشرون بالعشرِ كانت
+     تُقرأ تقدُّمًا وهي نسبةُ غيرِ المعاملاتِ إلى غيرِها.**
+   ◆ **و§٧ الخطوة ١٢ تقول «لا حقلَ حالةٍ حرّ»** — وذاك **يُقاس من المخطَّط**:
+     عمودُ الحالةِ `ENUM` محكومٌ، و`VARCHAR`/`TINYINT` حرّ. */
+$txn   = (int) $one("SELECT COUNT(*) FROM $LIVE AND grain_cardinality IN ('ROW','LINE')
+                       AND grain_fact_scope = 'OWN_FACT'");
+$txnAll = (int) $one("SELECT COUNT(*) FROM $LIVE AND grain_cardinality IN ('ROW','LINE')");
 $txnSM = (int) $one("SELECT COUNT(*) FROM $LIVE AND grain_cardinality IN ('ROW','LINE')
-                       AND state_model_ref <> ''");
+                       AND grain_fact_scope = 'OWN_FACT' AND state_model_ref <> ''");
+$txnSMx = (int) $one("SELECT COUNT(*) FROM $LIVE AND grain_cardinality IN ('ROW','LINE')
+                        AND grain_fact_scope <> 'OWN_FACT' AND state_model_ref <> ''");
+/* حكمُ حقلِ الحالةِ في كياناتِ المعاملات — من `information_schema` */
+$smEnum = 0; $smFree = 0; $smNone = 0;
+$entL = array();
+$rq = $conn->query("SELECT DISTINCT grain_entity FROM $LIVE AND grain_cardinality IN ('ROW','LINE')
+                      AND grain_fact_scope = 'OWN_FACT' AND grain_entity <> ''");
+while ($rq && $z = $rq->fetch_row()) { $entL[$z[0]] = array(); }
+if ($entL) {
+    $rq = $conn->query("SELECT TABLE_NAME, COLUMN_NAME, DATA_TYPE FROM information_schema.COLUMNS
+                         WHERE TABLE_SCHEMA = DATABASE()");
+    while ($rq && $z = $rq->fetch_assoc()) {
+        if (isset($entL[$z['TABLE_NAME']])) { $entL[$z['TABLE_NAME']][] = $z; }
+    }
+    /* ⛔ **الاسمُ الدقيقُ لا الاحتواء**: `status_reason` سببٌ لا حالة */
+    foreach ($entL as $tname => $cols) {
+        $cand = array();
+        foreach ($cols as $cc) {
+            $nn = strtolower($cc['COLUMN_NAME']);
+            if (in_array($nn, array('status','state','stage','phase'), true)
+                || preg_match('~_(status|state|stage|phase)$~', $nn)) { $cand[] = $cc; }
+        }
+        if (!$cand) { $smNone++; continue; }
+        $isEnum = false;
+        foreach ($cand as $cc) { if (strtolower($cc['DATA_TYPE']) === 'enum') { $isEnum = true; break; } }
+        if ($isEnum) { $smEnum++; } else { $smFree++; }
+    }
+}
+$smDen = $smEnum + $smFree;
 $add('مطابقة آلة الحالة لكل معاملة', '100٪', 'MEASURED',
      ($txn ? round($txnSM * 100 / $txn, 1) : 0) . '٪',
-     "$txnSM من $txn سطحَ معاملةٍ (حبّةٌ `ROW`/`LINE`) يحمل `state_model_ref` — "
-   . '⛔ **وحملُ المرجعِ ليس مطابقةَ الآلة**: هذا قياسُ وجودٍ لا قياسُ تطابق');
+     "**$txnSM من $txn** سطحَ معاملةٍ حقيقيّةٍ (`OWN_FACT` بحبّةِ `ROW`/`LINE`) يحمل `state_model_ref`. "
+   . "⛔ **و$txnSMx سطحًا تحمله وكيانُها من كِيتٍ مشتركٍ** (‏`guard_denials`) ⇒ **ليست معاملاتٍ بحبّتِها**، "
+   . "وكانت تُقرأ بسطًا على مقامٍ $txnAll فتُعطي ٨٫٧٪. "
+   . "◆ **وحكمُ الحقلِ مقيسٌ من المخطَّط** (§٧ الخطوة ١٢ «لا حقلَ حالةٍ حرّ»): "
+   . "كياناتُ معاملاتٍ **" . count($entL) . "** — محكومٌ `ENUM` **$smEnum** · **حرٌّ $smFree** (‏المستهدَفُ صفر) · "
+   . "وبلا حقلِ حالةٍ $smNone ⇒ المحكومُ " . ($smDen ? round($smEnum * 100 / $smDen, 1) : 0) . '٪ من ' . $smDen
+   . '. ⛔ **وحملُ المرجعِ ليس مطابقةَ الآلة**');
 
 /* ═══ ٥ · اختبارٌ سالبٌ لفصلِ الواجباتِ الحرج ═══════════════════════════ */
 $negFiles = glob($ROOT . '/tools/*negative*.php');
