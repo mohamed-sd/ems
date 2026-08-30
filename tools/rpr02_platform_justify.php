@@ -189,6 +189,7 @@ foreach ($rows as $x) {
 
     $plan[] = array('id' => $x['screen_id'], 'label' => $x['canonical_label_ar'], 'v' => $v,
                     'scope' => $x['owner_code'], 'roles' => $roles, 'wit' => $wit,
+                    'kind' => ($c2 ? 'DOMAIN_PROJECTION' : 'DOMAIN_SOURCE'),
                     'c' => ($c1 ? '1' : '·') . ($c2 ? '2' : '·') . ($c3 ? '3' : '·') . ($c4 ? '4' : '·'));
 }
 
@@ -235,10 +236,17 @@ if ($APPLY) {
              . $e($sid) . "',NOW())");
         if (!$ok) { exit("✘ تعذّر تثبيتُ {$x['id']}: {$conn->error}\n"); }
         $n++;
-        /* ⛔ **والعودةُ إلى النطاقِ فعلٌ لا وسمٌ** — §٥·٤ تأمر بها نصًّا */
+        /* ⛔ **والعودةُ إلى النطاقِ فعلٌ لا وسمٌ** — §٥·٤ تأمر بها نصًّا.
+           ◆ **وحكمُ الملكيّةِ صِنفٌ لا رمزُ إدارة**: `ownership_verdict` قائمةٌ
+             مغلقةٌ من الأصناف (‏`chk_w135_ownv`) و**الإدارةُ مكتوبةٌ سلفًا في
+             `owner_code`** — فالعودةُ تعني **نزعَ صفةِ المنصّةِ** عن الحكمِ لا
+             حشوَ رمزِ إدارةٍ في عمودِ صنف. ⛔ **وقد كتبتُ الرمزَ أوّلًا فردَّتني
+             القاعدةُ الصلبةُ في القاعدةِ نفسِها** — وهي تعمل كما وُضعت.
+           ◆ **والصنفُ مقيسٌ لا مختار**: مَن يملك حقيقةَ أعمالٍ بحبّةِ سجلٍّ
+             `DOMAIN_SOURCE`، ومَن لا يملك `DOMAIN_PROJECTION`. */
         if ($x['v'] === 'RETURN_TO_SCOPE') {
             $u = $conn->query("UPDATE repair01_screen_registry
-                  SET ownership_verdict = '" . $e($x['scope']) . "',
+                  SET ownership_verdict = '" . $e($x['kind']) . "',
                       verdict_rule = 'RPR02_S54_RETURN_TO_SCOPE',
                       verdict_at = NOW()
                 WHERE screen_id = '" . $e($x['id']) . "' AND ownership_verdict = 'PLATFORM_SHARED'");
