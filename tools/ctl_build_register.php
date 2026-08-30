@@ -80,7 +80,10 @@ $r = $conn->query("SELECT rp.role_id, rp.can_view, rp.can_add, rp.can_edit, rp.c
                     WHERE m.code = '" . $e($sibling) . "'");
 while ($r && ($x = $r->fetch_assoc())) { $roles[] = $x; }
 if (!$roles) { exit("⛔ الجارُ بلا منحٍ واحدٍ — لا يصلح مصدرَ نسخ\n"); }
-$door = $sib['door'] !== null && $sib['door'] !== '' ? $sib['door'] : 'DAILY';
+/* بابُ القراءةِ المشتقّةِ `REP` لا `DAILY` — صفُّ المصفوفةِ (⑨) يصرِّح
+   «4 — التقارير والتحليلات» فبابُ الرابطِ يطابقه، و`DAILY` المكتظُّ رسَّب
+   U9 (قِيس في VP-02: قسمُ الدورِ 13 اليوميُّ 9 ⇒ 10 فانكسر حدُّ ف٧-٢) */
+$door = $sib['door'] !== null && $sib['door'] !== '' ? $sib['door'] : 'REP';
 
 $newSid = 'SCR-' . str_pad((string) (1 + (int) substr((string) $one("SELECT MAX(screen_id) FROM repair01_screen_registry"), 4)), 4, '0', STR_PAD_LEFT);
 $dGroup = (string) $rq['group_name'];
@@ -95,8 +98,10 @@ if (!$APPLY) { echo "\n  ⛔ معاينةٌ — والتطبيقُ بـ--apply\n
 /* ═══ الكتابةُ السباعيّة ═════════════════════════════════════════════════ */
 $conn->query('START TRANSACTION');
 $mid = 1 + (int) $one("SELECT MAX(id) FROM modules");
+/* جارٌ بلا دورِ مالكٍ يُنسَخ NULL لا صفرًا — صفرٌ يكسر قيدَ FK نحو roles */
+$ownSql = $sib['owner_role_id'] === null ? 'NULL' : (string) (int) $sib['owner_role_id'];
 $ok = $conn->query("INSERT INTO modules (id, name, code, owner_role_id, icon, display_order, owner_dept_note)
-        VALUES ($mid, '" . $e($label) . "', '" . $e($route) . "', " . (int) $sib['owner_role_id'] . ",
+        VALUES ($mid, '" . $e($label) . "', '" . $e($route) . "', $ownSql,
                 '" . $e($icon) . "', $dSeq, '" . $e($rq['unit'] . ' · ' . $req) . "')");
 if (!$ok) { $conn->query('ROLLBACK'); exit("✘ modules: {$conn->error}\n"); }
 foreach ($roles as $x) {
@@ -164,11 +169,18 @@ $navN = 0;
 foreach ($roles as $x) {
     if ((int) $x['can_view'] !== 1) { continue; }
     $rid0 = (int) $x['role_id'];
+    /* دورٌ موسومٌ «مدمج» قرارُ دمجٍ نافذٌ — لا يرث رابطًا جديدًا (قِيس في
+       VP-02: الدورُ 5 صفرُ مستخدمين ورث رابطًا واحدًا فرسَب حاجبُ ⑪ النحافة) */
+    $merged = $one("SELECT COUNT(*) FROM roles WHERE id = $rid0 AND name LIKE '%مدمج%'");
+    if ((int) $merged > 0) { continue; }
     $gid = $one("SELECT id FROM link_groups WHERE owner_role_id = $rid0 AND is_active = 1
                   AND name = '" . $e($dGroup) . "' LIMIT 1");
     if ($gid === null) {
-        $okg = $conn->query("INSERT INTO link_groups (name, owner_role_id, icon, display_order, is_active)
-                VALUES ('" . $e($dGroup) . "', $rid0, 'fa fa-folder', $dSeq, 1)");
+        /* مجموعةٌ جديدةٌ بلا مرحلةٍ يسقط رابطُها في رأسِ المرحلةِ الافتراضيّةِ
+           المكتظِّ (قِيس في VP-02: قسمُ الدورِ 13 بلغ 10 فرسَب U9) — فتُولد
+           برأسِ طيٍّ باسمِها هي، ورقمُ مرحلتِها مؤخَّرٌ كي لا يزاحم القائم */
+        $okg = $conn->query("INSERT INTO link_groups (name, owner_role_id, icon, display_order, is_active, stage_no, stage_title)
+                VALUES ('" . $e($dGroup) . "', $rid0, 'fa fa-folder', $dSeq, 1, 90, '" . $e($dGroup) . "')");
         if (!$okg) { $conn->query('ROLLBACK'); exit("✘ group: {$conn->error}\n"); }
         $gid = $conn->insert_id;
     }
@@ -179,6 +191,14 @@ foreach ($roles as $x) {
     if (!$ok) { $conn->query('ROLLBACK'); exit("✘ nav: {$conn->error}\n"); }
     $navN++;
 }
+/* رأسُ الطيِّ المُصيَّرُ من `nav_route_group` (مفتاحُه المسارُ وحدَه) —
+   ومسارٌ بلا صفٍّ يسقط في رأسِ «التشغيل اليومي» المكتظِّ فيُرسِّب U9
+   (قِيس في VP-02). والقراءةُ المشتقّةُ بابُها `REPORTS` كما يصرِّح صفُّ
+   المصفوفةِ «4 — التقارير والتحليلات». */
+$ok = $conn->query("INSERT INTO nav_route_group (route, group_code, basis)
+        VALUES ('" . $e($route) . "', 'REPORTS', '" . $e('BUILD_LANE · ' . $req . ' · قراءة مشتقة') . "')
+        ON DUPLICATE KEY UPDATE basis = VALUES(basis)");
+if (!$ok) { $conn->query('ROLLBACK'); exit("✘ route_group: {$conn->error}\n"); }
 $wit = 'BUILD_LANE · بُني من الملفِّ التصميميِّ (' . $req . ' · ' . $rq['unit'] . ') بعد بوّابةِ BUILD_READY '
      . 'وحقولُه من `repair01_fields` — والرأسُ يذكر المعرِّفَ حرفًا · لقطة ' . $snap;
 $ok = $conn->query("UPDATE repair01_target_universe
@@ -237,6 +257,24 @@ if ($already === 0 && $spCols) {
              WHERE route = '" . $e($sibling) . "'");
     if (!$ok) { $conn->query('ROLLBACK'); exit("✘ appearances: {$conn->error}\n"); }
     $spN = $conn->affected_rows;
+    /* جارٌ بلا صفِّ ظهورٍ أصلًا — والصفرُ الصادقُ يُرسِّب NF-24 («مسارٌ نشِطٌ
+       خارجَ سجلِّ التصنيف» — قِيس في VP-02): يُصنَّف المسارُ بنفسِه من
+       الورقةِ صفًّا واحدًا OWNED لمساحةِ وحدتِه، والهجاءُ هجاءُ المخزنِ الحيّ */
+    if ($spN === 0) {
+        $SPACE_BY_UNIT = array('E1 مساحة الرئيس التنفيذي' => 'الرئيس التنفيذي', 'E2 مساحة النواب' => 'نواب الرئيس');
+        $spaceAr = isset($SPACE_BY_UNIT[(string) $rq['unit']]) ? $SPACE_BY_UNIT[(string) $rq['unit']] : (string) $rq['unit'];
+        $nid2 = 1 + (int) $one("SELECT MAX(id) FROM gov_space_appearances");
+        $ok = $conn->query("INSERT INTO gov_space_appearances
+                (id, space_ar, space_kind, tab_ar, screen_ar, route, owner_dept_ar, owner_kind, src_class,
+                 src_ownership, src_decision, src_note, spaces_count, cls, ownership, decision, basis, rule_step, view_fields, updated_at)
+                VALUES ($nid2, '" . $e($spaceAr) . "', 'DEPARTMENT', '', '" . $e($label) . "', '" . $e($route) . "',
+                        '" . $e($spaceAr) . "', 'BUSINESS_DEPARTMENT', 'BUILD_LANE', 'VALID', 'CONFIRMED',
+                        'سطح قراءة مشتق بني من الملف التصميمي - لا ادخال', 1, 'OWNED', 'VALID', 'CONFIRMED',
+                        '" . $e('بُني من الملفِّ التصميميِّ — ' . $req . ' (' . $rq['unit'] . ') · المساحةُ هي المالكةُ في السجلِّ المعياريِّ ولا جارَ له صفُّ ظهورٍ يُنسخ') . "',
+                        1, '', NOW())");
+        if (!$ok) { $conn->query('ROLLBACK'); exit("✘ appearances_self: {$conn->error}\n"); }
+        $spN = 1;
+    }
 }
 /* ⑪ **صفُّ الدورةِ — بما هو حقٌّ وحدَه**: قراءةٌ مشتقّةٌ لا تُنشئ حالةً —
    يُكتب المدخلُ الحقيقيُّ (مصدرُها) واسمُ المرحلةِ من مجموعةِ الملفِّ، وتُترك
@@ -247,6 +285,18 @@ $cz = $conn->query("SELECT dept_name FROM gov_screen_cycle
                      WHERE screen_file = '" . $e(basename($sibling)) . "' OR screen_id =
                            (SELECT screen_id FROM repair01_screen_registry WHERE route = '" . $e($sibling) . "')
                      LIMIT 1")->fetch_assoc();
+/* جارٌ بلا صفِّ دورةٍ يُسقِط الخطوةَ فيرتدُّ RP-01/RP-02 (قِيس في VP-02) —
+   فيُؤخذ اسمُ الإدارةِ من هجاءِ العمودِ الحيِّ لوحدةِ الورقة، لا يُخترَع */
+if (!$cz) {
+    $CYCLE_DEPT_BY_UNIT = array('E1 مساحة الرئيس التنفيذي' => 'مكتب الرئيس التنفيذي والنواب',
+                                'E2 مساحة النواب' => 'مكتب الرئيس التنفيذي والنواب');
+    if (isset($CYCLE_DEPT_BY_UNIT[(string) $rq['unit']])) {
+        $dn0 = $CYCLE_DEPT_BY_UNIT[(string) $rq['unit']];
+        if ((int) $one("SELECT COUNT(*) FROM gov_screen_cycle WHERE dept_name = '" . $e($dn0) . "'") > 0) {
+            $cz = array('dept_name' => $dn0); /* هجاءٌ حيٌّ مثبَتُ الوجودِ وحدَه يمرّ */
+        }
+    }
+}
 if ($cz && (int) $one("SELECT COUNT(*) FROM gov_screen_cycle WHERE screen_file = '" . $e($file) . "'") === 0) {
     $ok = $conn->query("INSERT INTO gov_screen_cycle
             (company_id, dept_name, layer_name, stage_order, stage_name, group_name, screen_title,
