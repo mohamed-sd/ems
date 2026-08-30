@@ -69,8 +69,9 @@ if (!function_exists('ems_finance_nav_links')) {
     /**
      * روابط شاشات المالية الممنوحة للأدوار التشغيلية (قرار 2026-07-17):
      * السايدبار مملوكيٌّ (owner_role_id=17) فلا يعرضها لغير عائلة المالية —
-     * هنا تُشتق من role_permissions مباشرةً (can_view=1) فيصل كل دورٍ لما
-     * مُنح له عرضًا. أدوار المالية (17-22) يغطيها dynamic_nav فلا تُكرَّر.
+     * التعدادُ من role_permissions (can_view=1) وقرارُ الظهورِ من المصدرِ
+     * الواحدِ check_page_permissions (RPR-03 §٦) — فلا يظهر رابطٌ تمنعه
+     * طبقةُ القوالب. أدوار المالية (17-22) يغطيها dynamic_nav فلا تُكرَّر.
      *
      * @return array من code => array('label','icon')
      */
@@ -98,7 +99,12 @@ if (!function_exists('ems_finance_nav_links')) {
             $q->execute();
             $res = $q->get_result();
             while ($m = $res->fetch_assoc()) {
-                $out[strval($m['code'])] = array('label' => strval($m['name']), 'icon' => strval($m['icon']));
+                $code = strval($m['code']);
+                if (function_exists('check_page_permissions')) {
+                    $pp = check_page_permissions($conn, $code);
+                    if (empty($pp['can_view'])) { continue; }
+                }
+                $out[$code] = array('label' => strval($m['name']), 'icon' => strval($m['icon']));
             }
             $q->close();
         } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'القائمة الجانبية لا تتعطل بأي فشل هنا');

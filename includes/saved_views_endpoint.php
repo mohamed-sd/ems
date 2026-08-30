@@ -45,15 +45,19 @@ if ($screen === '' || strpos($screen, '..') !== false
     sv_out(false, null, 'مسار شاشة غير صالح', 422);
 }
 
-/* ◆ صلاحيةُ عرضِ الشاشةِ المعنيّة شرطٌ للقراءةِ والكتابةِ معًا. */
+/* ◆ صلاحيةُ عرضِ الشاشةِ المعنيّة شرطٌ للقراءةِ والكتابةِ معًا — والقرارُ من
+   المصدرِ الواحدِ (RPR-03 §٦) فيمرُّ بطبقةِ القوالبِ أيضًا. المطابقةُ حرفيّةٌ
+   أولًا كي لا تلتقط مطابقةُ المُساعِدِ التقريبيّةُ وحدةً شبيهةً لمسارٍ غيرِ
+   مسجَّلٍ — فغيرُ المسجَّلِ يُرفَض كما كان. */
 $allowed = ((string) $role === '-1');
 if (!$allowed) {
-    $st = $conn->prepare(
-        'SELECT 1 FROM role_permissions rp JOIN modules m ON m.id = rp.module_id
-          WHERE m.code = ? AND rp.role_id = ? AND rp.can_view = 1 LIMIT 1');
+    $st = $conn->prepare('SELECT 1 FROM modules WHERE code = ? LIMIT 1');
     if ($st) {
-        $st->bind_param('si', $screen, $role);
-        if ($st->execute() && $st->get_result()->fetch_row()) { $allowed = true; }
+        $st->bind_param('s', $screen);
+        if ($st->execute() && $st->get_result()->fetch_row()) {
+            $pp = check_page_permissions($conn, $screen);
+            $allowed = !empty($pp['can_view']);
+        }
         $st->close();
     }
 }

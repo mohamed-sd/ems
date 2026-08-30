@@ -34,22 +34,17 @@ if (!$is_super_admin && $company_id <= 0) {
 }
 
 $MODULE_CODE = 'user_capacities.php';
+// ── صلاحيةٌ من المصدرِ الواحدِ (RPR-03 §٦): القراءةُ المستقلّةُ كانت تقفز
+//    طبقةَ قوالبِ GOV-AUTH-01 فيفترق المساران — check_page_permissions يمرّ
+//    بها كلِّها، وcan_edit يبقى بوابةَ الاشتقاقِ والتجميدِ نفسَها ─────────────
+require_once __DIR__ . '/includes/permissions_helper.php';
 $can_view = $can_edit = false;
 if ($is_super_admin) {
     $can_view = $can_edit = true;
 } else {
-    $st = $conn->prepare("SELECT rp.can_view, rp.can_edit
-                            FROM role_permissions rp
-                            JOIN modules m ON m.id = rp.module_id
-                           WHERE m.code = ? AND rp.role_id = ? LIMIT 1");
-    $rid = intval($current_role);
-    $st->bind_param('si', $MODULE_CODE, $rid);
-    $st->execute();
-    if ($row = $st->get_result()->fetch_assoc()) {
-        $can_view = (intval($row['can_view']) === 1);
-        $can_edit = (intval($row['can_edit']) === 1);
-    }
-    $st->close();
+    $pp = check_page_permissions($conn, $MODULE_CODE);
+    $can_view = !empty($pp['can_view']);
+    $can_edit = !empty($pp['can_edit']);
 }
 // كلُّ مسجَّلٍ يرى **صفاتِه هو** ولو لم يُمنح الموديول — البوابةُ شخصية
 $can_view = $can_view || $uid > 0;
