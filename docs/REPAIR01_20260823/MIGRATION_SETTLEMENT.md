@@ -4,12 +4,12 @@
 
 | المفردة | القيمة |
 |---|---|
-| `Commit Hash` | `c8680ebb5213d6b18456a11bfa76eba4a7175521` |
-| `Schema Version` | 953T |
+| `Commit Hash` | `f35909ccc6911623fc163784e520d06b046fcf84` |
+| `Schema Version` | 970T |
 | `Registry Version` | 783 |
-| `Measured At` | 2026-08-28 14:31:45 |
+| `Measured At` | 2026-08-30 11:29:36 |
 | `Tool Version` | `repair01_migration_settle.php v1.0` |
-| `Snapshot ID` | `UNFROZEN` |
+| `Snapshot ID` | `SNAP-f35909cc-20260830-112737` |
 | الوضع | قياسٌ فقط — لا يكتب |
 
 ## ١ · الأحكامُ بمقاماتِها
