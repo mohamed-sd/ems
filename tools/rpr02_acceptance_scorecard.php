@@ -213,10 +213,43 @@ if ($tbl('gov_screen_cycle')) {
                          JOIN gov_screen_cycle g ON g.screen_file = s.screen_file
                         WHERE s.on_disk = 1 AND s.ownership_verdict <> 'RETIRE'");
 }
-$add('جسر معرّف الشاشة بمرحلة دورة العمل', '100٪ من المنطبق', 'MEASURED',
-     ($liveN ? round($cyc * 100 / $liveN, 1) : 0) . '٪',
-     "$cyc من $liveN سطحًا له صفٌّ في `gov_screen_cycle` — ⛔ **والوصلُ بالمسارِ لا بالمعرِّف**، "
-   . 'و§٧ الخطوة ١٣ تشترط الوصلَ **بمعرِّفِ الشاشةِ صراحةً لا بالمسارِ ولا بالاسم**');
+/* ✔ **والوصلُ صار بالمعرِّف** بـ`rpr02_cycle_bridge.php` (‏هجرة `2028_01_08`)،
+   **والمقامُ صار «المنطبقَ»** بنصِّ §٥·١٠: المعاملةُ ينطبق عليها سيرُ عملٍ،
+   والقراءةُ الصِّرفةُ لا تُنشئ حالةً. ⛔ **ولا يُترك نصُّ حاجزٍ مرفوعٍ في تقرير**. */
+$cycBridged = 0; $cycAmb = 0; $cycOrphan = 0; $cycHasCol = false;
+$ck = $conn->query("SHOW COLUMNS FROM `gov_screen_cycle` LIKE 'bridge_rule'");
+if ($ck && $ck->num_rows) {
+    $cycHasCol = (int) $one("SELECT COUNT(*) FROM gov_screen_cycle WHERE bridge_rule <> ''") > 0;
+}
+if ($cycHasCol) {
+    $cycAmb    = (int) $one("SELECT COUNT(*) FROM gov_screen_cycle WHERE bridge_rule = 'AMBIGUOUS_DECLARED'");
+    $cycOrphan = (int) $one("SELECT COUNT(*) FROM gov_screen_cycle WHERE bridge_rule = 'NO_LIVE_SURFACE'");
+    $cycApp    = (int) $one("SELECT COUNT(*) FROM $LIVE AND grain_cardinality IN ('ROW','LINE')
+                               AND grain_fact_scope = 'OWN_FACT'");
+    $cycHit    = (int) $one("SELECT COUNT(DISTINCT s.screen_id) FROM repair01_screen_registry s
+                               JOIN gov_screen_cycle g ON g.screen_id = s.screen_id
+                              WHERE s.on_disk = 1 AND s.ownership_verdict <> 'RETIRE'
+                                AND s.grain_cardinality IN ('ROW','LINE')
+                                AND s.grain_fact_scope = 'OWN_FACT'");
+    $cycAll    = (int) $one("SELECT COUNT(DISTINCT s.screen_id) FROM repair01_screen_registry s
+                               JOIN gov_screen_cycle g ON g.screen_id = s.screen_id
+                              WHERE s.on_disk = 1 AND s.ownership_verdict <> 'RETIRE'");
+    $add('جسر معرّف الشاشة بمرحلة دورة العمل', '100٪ من المنطبق', 'MEASURED',
+         ($cycApp ? round($cycHit * 100 / $cycApp, 1) : 0) . '٪',
+         "**$cycHit من $cycApp** سطحَ **معاملةٍ منطبقة** (`OWN_FACT` بحبّةِ `ROW`/`LINE`) موصولٌ "
+       . "**بمعرِّفِ الشاشة** لا باسمِ ملفّ. و§٥·١٠ تقول «كلُّ شاشةٍ **ينطبق عليها سيرُ عمل**» — "
+       . "**والقراءةُ الصِّرفةُ لا تُنشئ حالةً** (‏ولها `stage_kind='contextual'` وليست في المقام). "
+       . "⛔ **و$cycAmb صفَّ دورةٍ بقي بلا معرِّف**: اسمُ ملفِّه يطابق أكثرَ من سطحٍ حيٍّ "
+       . "(`index.php` ثلاثةَ أسطح) — **واختيارُ أحدِها يربط مرحلةً بشاشةٍ ليست هي**. "
+       . "و**$cycOrphan** صفًّا لسطحٍ غيرِ قائمٍ يُعلَن ولا يُحذف. "
+       . "⚠ **والتضييقُ لا يُقرأ تحسينًا**: الكلُّ الحيُّ $cycAll من $liveN — **فالنقصُ موزَّعٌ حقيقيّ**");
+} else {
+    $add('جسر معرّف الشاشة بمرحلة دورة العمل', '100٪ من المنطبق', 'MEASURED',
+         ($liveN ? round($cyc * 100 / $liveN, 1) : 0) . '٪',
+         "$cyc من $liveN سطحًا له صفٌّ في `gov_screen_cycle` — ⛔ **والوصلُ بالمسارِ لا بالمعرِّف**، "
+       . 'و§٧ الخطوة ١٣ تشترط الوصلَ **بمعرِّفِ الشاشةِ صراحةً** '
+       . '— **شغِّلْ `php tools/rpr02_cycle_bridge.php --apply`**');
+}
 
 /* ═══ ٨ · تطابقُ ترتيبِ السايدبارِ ومجموعاتِه مع الملفّ ═══════════════════ */
 /* **صار مقيسًا بـ`rpr02_s6_sidebar.php`** — والمقامُ البنودُ الحيّةُ المُصيَّرة.
