@@ -113,6 +113,99 @@ foreach (glob($ROOT . '/docs/REPAIR01_20260823/plan/W*_STATE_MACHINES.md') as $f
     }
 }
 
+/* ═══ R7 — مقيسٌ من شيفرةِ السطحِ المطابق ═══════════════════════════════
+   السطحُ الذي حكم الكونُ أنّه هو المتطلبَ **يتعامل مع جدولِه فعلًا** —
+   فتُعَدُّ قراءاتُه وكتاباتُه على جداولِ المستأجِرِ ويُجسَر الغالبُ لآلتِه
+   بقواعدِ الجسرِ الثلاثِ المثبتةِ. وحارسان فوق العدّ:
+   ① عتبةُ وزنٍ (≥3 — قراءةُ بوّابةٍ صريحةٌ لا ذكرٌ عابر) وغلبةٌ مضاعفةٌ
+     على الوصيف، ② **حقُّ نقضٍ عائليٌّ معلَن**: جدولُ عائلةٍ أجنبيّةٍ عن
+     بادئةِ المتطلبِ إصابةُ بحثٍ عرَضيّةٌ تُنقَض (قِيس: شاشةُ الموظفين
+     تقرأ الموردين قراءةَ تحقّقٍ فكاد HR-07 يُعزى لآلةِ الموردين). */
+$models = array();
+foreach (array('w6', 'w7', 'w8', 'w9', 'w10', 'w11', 'w12', 'w13', 'w14', 'w15') as $w0) {
+    $q0 = @$conn->query("SELECT DISTINCT entity FROM repair01_{$w0}_states");
+    while ($q0 && ($z0 = $q0->fetch_row())) { $models[strtolower(trim((string) $z0[0]))] = strtoupper($w0); }
+}
+$FAMOK = array(
+ 'suppliers' => array('SUP', 'PRC'), 'supplier_' => array('SUP'), 'settlements' => array('SUP', 'ACC', 'TRS'),
+ 'contracts' => array('SAL', 'CEO', 'VP'), 'opportunities' => array('SAL'), 'quotations' => array('SAL'),
+ 'claims' => array('SAL', 'ACC'), 'mnt_' => array('MNT', 'FLEET'), 'trp_' => array('TRP'),
+ 'transfer_' => array('TRP'), 'tre_' => array('TRS'), 'fin_' => array('ACC', 'TRS', 'FIN'),
+ 'acc_' => array('ACC'), 'bank_' => array('TRS', 'ACC'), 'proc_' => array('PRC', 'WH'),
+ 'hr_' => array('HR'), 'tkt_' => array('TKT'), 'tickets' => array('TKT'), 'gov_' => array('GOV'),
+ 'exec_' => array('CEO', 'VP'), 'site_' => array('SITE', 'OPS'), 'unit_' => array('SITE', 'OPS'),
+ 'ops_' => array('OPS', 'SITE'), 'daily_' => array('OPS'), 'wf_' => array('WRK'),
+ 'asset_' => array('FLEET', 'MNT'), 'ui_' => array(),
+);
+$famOk = function ($ent, $req) use ($FAMOK) {
+    $pfx = strtoupper(substr($req, 0, strpos($req, '-')));
+    foreach ($FAMOK as $tp => $fams) {
+        if (strpos($ent, $tp) === 0) { return in_array($pfx, $fams, true); }
+    }
+    return true; /* جدولٌ خارجَ الخريطةِ لا يُنقَض — يبقى لحارسِ الوزن */
+};
+$smb = function ($t) use ($models) {
+    $t = strtolower(trim((string) $t)); if ($t === '') { return null; }
+    if (isset($models[$t])) { return $t; }
+    if (substr($t, -2) === 'es' && isset($models[substr($t, 0, -2)])) { return substr($t, 0, -2); }
+    if (substr($t, -1) === 's' && isset($models[substr($t, 0, -1)])) { return substr($t, 0, -1); }
+    if (isset($models[$t . 's'])) { return $t . 's'; }
+    return null;
+};
+$r = $conn->query("SELECT q.requirement_id, g.route
+                     FROM repair01_requirements q
+                     JOIN repair01_target_universe u ON u.requirement_id = q.requirement_id AND u.verdict IN ('MATCHED','MERGED_INTO')
+                     JOIN repair01_screen_registry g ON g.screen_id = u.screen_id
+                    WHERE q.requirement_type = 'TRANSACTION' AND (q.sm_model_ref IS NULL OR q.sm_model_ref = '')
+                      AND g.route <> ''");
+$codeHits = array(); $codeAmb = array();
+while ($x = $r->fetch_assoc()) {
+    $f = $ROOT . '/' . $x['route'];
+    if (!is_file($f)) { continue; }
+    $src = (string) file_get_contents($f);
+    $tabs = array();
+    if (preg_match_all("~->select\\(\\s*'([a-z_][a-z0-9_]+)'~", $src, $m)) {
+        foreach ($m[1] as $t) { $tabs[$t] = (isset($tabs[$t]) ? $tabs[$t] : 0) + 3; }
+    }
+    if (preg_match_all('~(?:FROM|INTO|UPDATE)\s+`?([a-z_][a-z0-9_]{3,})`?~i', $src, $m)) {
+        foreach ($m[1] as $t) { $t = strtolower($t); $tabs[$t] = (isset($tabs[$t]) ? $tabs[$t] : 0) + 1; }
+    }
+    $req = (string) $x['requirement_id'];
+    $hits = array();
+    foreach ($tabs as $t => $n) {
+        $mk = $smb($t);
+        if ($mk === null) { continue; }
+        if (!$famOk($mk, $req)) { continue; }
+        $hits[$mk] = (isset($hits[$mk]) ? $hits[$mk] : 0) + $n;
+    }
+    if (!$hits) { continue; }
+    arsort($hits); $keys = array_keys($hits);
+    if ($hits[$keys[0]] < 3) { continue; }
+    if (count($hits) > 1 && $hits[$keys[0]] < 2 * $hits[$keys[1]]) { $codeAmb[$req] = 1; continue; }
+    if (isset($codeHits[$req]) && $codeHits[$req][0] !== $keys[0]) { $codeAmb[$req] = 1; unset($codeHits[$req]); continue; }
+    if (!isset($codeHits[$req])) { $codeHits[$req] = array($keys[0], $hits[$keys[0]], (string) $x['route']); }
+}
+foreach ($codeHits as $req => $h) {
+    if (isset($codeAmb[$req])) { continue; }
+    $offer($req, strtoupper($models[$h[0]]) . '_STATES#' . $h[0],
+           'R7: قِيس من شيفرةِ السطحِ المطابقِ ' . $h[2] . ' — تعاملُه الغالبُ (وزن ' . $h[1] . ') على جدولِ `'
+           . $h[0] . '` المجسورِ لآلتِه، بعتبةِ وزنٍ وحقِّ نقضٍ عائليّ', 'SCREEN_CODE');
+}
+
+/* ═══ R6 — دفترُ العزوِ المؤلَّفُ الملتزَم ═══════════════════════════════
+   `plan/SM_ATTRIBUTION.md` — تأليفُ عزوٍ صفًّا صفًّا بنصَّي الطرفَين حيث
+   موضوعُ الآلةِ هو الحبّةُ عينُها أو ابنُها المباشر، ملتزَمٌ للمراجعةِ
+   والنقض — فهو المرجعُ الصريحُ لغيرِ المبنيّ. */
+$attr = (string) @file_get_contents($ROOT . '/docs/REPAIR01_20260823/plan/SM_ATTRIBUTION.md');
+if ($attr !== '' && preg_match_all('~^\|\s*(' . $REQRE . ')\s*\|[^|]*\|\s*`([A-Z0-9_]+#[a-z0-9_]+)`~mu', $attr, $ma, PREG_SET_ORDER)) {
+    foreach ($ma as $row) {
+        $req = $row[1];
+        if (!isset($tx[$req])) { continue; }
+        $offer($req, $row[count($row) - 1],
+               'R6: دفترُ العزوِ المؤلَّفُ SM_ATTRIBUTION.md — صفُّ ' . $req . ' بعلّتِه البيِّنةِ ونصَّي طرفَيه', 'AUTHORED_DOC');
+    }
+}
+
 /* ═══ R2 — الأثرُ الرجعيُّ عبر سجلِّ الشاشاتِ للمبنيّ ═══════════════════ */
 $r = $conn->query("SELECT u.requirement_id, u.screen_id, g.route, g.state_model_ref
                      FROM repair01_target_universe u
