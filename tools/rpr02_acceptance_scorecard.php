@@ -499,9 +499,30 @@ $add('أهداف خرجت من المقام بلا مرجع قرار مالك', 
 $navBad = 0; $navWit = 'لا سجلَّ تسمياتٍ معياريّ';
 if ($tbl('nav_canonical')) {
     $navTot = (int) $one("SELECT COUNT(*) FROM nav_canonical");
-    $navBad = (int) $one("SELECT COUNT(*) FROM nav_canonical WHERE COALESCE(status,'') <> 'APPROVED'");
-    $navWit = "غيرُ `APPROVED` **$navBad** من $navTot في `nav_canonical` — "
-            . '⛔ **وهذا قياسُ السجلِّ لا قياسُ المعروض**: الاسمُ يُصيَّر من أربعةِ مصادرَ بترجيح';
+    /* ✔ **وصار قياسَ المعروضِ لا قياسَ السجلّ** — والفرقُ ليس في العددِ بل في
+       **تركيبتِه**: صفُّ `MERGED` في السجلِّ **لا يُصيَّر أصلًا** فليس اسمًا معروضًا،
+       ومسارٌ مُصيَّرٌ **بلا صفِّ تسميةٍ ألبتّة** لا يظهر في عدِّ السجلِّ وهو معروضٌ
+       بلا اعتماد. ⇒ **فالعدُّ على المُصيَّرِ يُصيب مَن يراه المستخدم**.
+       ◆ و**صيغُ العرضِ** (`?view=`/`?tab=`) تحتفظ بوسمِها بقرارِ المُصيِّرِ نفسِه
+         (`$isVariant`) ⇒ **لا تُحاسَب على تسميةٍ معتمدةٍ لأساسٍ غيرِها**. */
+    $navStore = (int) $one("SELECT COUNT(*) FROM nav_canonical WHERE COALESCE(status,'') <> 'APPROVED'");
+    $cn2 = array();
+    $rr2 = $conn->query("SELECT route, status FROM nav_canonical");
+    while ($rr2 && $z = $rr2->fetch_assoc()) { $cn2[strtolower(trim((string) $z['route'], '/'))] = $z['status']; }
+    $navBad = 0; $navPend = 0; $navNoRow = 0; $navVar = 0; $navRt = array();
+    $rr2 = $conn->query("SELECT route FROM nav_items WHERE active = 1");
+    while ($rr2 && $z = $rr2->fetch_row()) {
+        $raw = (string) $z[0];
+        if (strpbrk($raw, '#?') !== false) { $navVar++; continue; }
+        $b = strtolower(trim(preg_replace('~[?#].*$~', '', $raw), '/'));
+        if (!isset($cn2[$b])) { $navBad++; $navNoRow++; $navRt[$b] = 1; continue; }
+        if ($cn2[$b] !== 'APPROVED') { $navBad++; $navPend++; $navRt[$b] = 1; }
+    }
+    $navWit = "**بنودٌ مُصيَّرةٌ** باسمٍ غيرِ معتمَد: **$navBad** على " . count($navRt) . " مسارًا — "
+            . "منها **$navPend** تسميتُها `PENDING_OWNER` (‏**فعلُ اعتمادٍ**) و**$navNoRow** **بلا صفِّ تسميةٍ ألبتّة** (‏فجوةُ سجلّ). "
+            . "و$navVar صيغةَ عرضٍ (`?view=`) تحتفظ بوسمِها **بقرارِ المُصيِّرِ نفسِه** فلا تُحاسَب. "
+            . "⛔ **وكان يُقاس على السجلِّ فيعطي $navStore من $navTot** — والفرقُ في التركيبةِ لا العدد: "
+            . 'صفُّ `MERGED` **لا يُصيَّر** ومسارٌ **بلا صفٍّ** لا يظهر في عدِّ السجلِّ وهو معروضٌ بلا اعتماد';
 }
 $add('اسم معروض غير معتمد', 'صفر', 'MEASURED', (string) $navBad, $navWit);
 
