@@ -399,10 +399,20 @@ gate('W15-26', 'أساسُ السجلِّ 651 لم يُمَسّ والنموُّ
      "الأساسُ $base · نموٌّ بلا ختمٍ $unstamped · أسطحُ W15 $w15N");
 
 /* ══ W15-27 · سقّاطةُ السطحِ الجديد — اثنا عشرَ حقلًا ═══════════════════ */
+/* ⚠ **و`state_model_ref` يُطلَب من المعاملةِ وحدَها** — وقد كان يُطلَب من كلِّ
+   سطحٍ: فسطحُ عرضٍ لا يملك حقيقةً بحبّةِ سجلٍّ **لا آلةَ حالةٍ له يشير إليها**،
+   ومطالبتُه بمرجعٍ **تصنع مرجعًا أجوفَ يُقرأ خُضرةً وهو فراغ**. وقد كان
+   ثمانيةَ عشرَ سطحًا من `W15` تحمله وكيانُها من **كِيتٍ مشترك** — فسُحبت
+   بتصحيحِ #٤ (`rpr02_state_model_bind`)، **وسحبُها تصحيحٌ لا نقص**.
+   ⇒ فالحقلُ يُشترط حيث تُشترط آلةُ الحالة: `OWN_FACT` بحبّةِ `ROW`/`LINE`.
+   ⛔ **ولا تُعاد قيمةٌ متقادمةٌ لتخضرَّ بوّابة** — العطبُ في شرطِ البوّابة. */
 $RATCH = array('screen_id','canonical_label_ar','owner_code','surface_kind','route','lifecycle',
-               'guard_kind','action_guard','permission_policy','grain_ar','source_of_truth','state_model_ref');
+               'guard_kind','action_guard','permission_policy','grain_ar','source_of_truth');
 $cond = array();
 foreach ($RATCH as $c) { $cond[] = "COALESCE(`$c`,'') = ''"; }
+$cond[] = "(COALESCE(`state_model_ref`,'') = ''
+            AND `grain_fact_scope` = 'OWN_FACT'
+            AND `grain_cardinality` IN ('ROW','LINE'))";
 $ratchBad = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry
                          WHERE origin = 'W15' AND (" . implode(' OR ', $cond) . ")");
 gate('W15-27', 'كلُّ سطحٍ جديدٍ بالحقولِ الاثنَي عشرَ كاملة',
