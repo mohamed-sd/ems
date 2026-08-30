@@ -137,8 +137,32 @@ foreach ($gateFiles as $g) {
     }
 }
 
+/* ═══ ⑤·ب مدخلاتُ `VALIDATION_STATUS` — أمرُ الضبطِ §١ ═══════════════════
+   ⛔ **«لا يُعامَل الجميعُ مصادَقًا عليه وفجواتُ م٣ وم٤ مفتوحة»** — فلكلِّ
+   نطاقٍ حالةٌ من ثلاث، ولا يبلغ `VALIDATED` إلّا مَن **ثبت** أنَّ متطلباتِه
+   خارجَ الفجواتِ غيرِ المحسومةِ وأنَّ كلَّ قرارٍ مؤثِّرٍ عليه أُسقط أثرُه. */
+$m3Units = array();   /* نطاقٌ فيه هدفٌ من الأربعةَ عشرَ المحجوبة */
+$q = $conn->query("SELECT DISTINCT unit FROM repair01_target_universe WHERE verdict IS NULL OR verdict = ''");
+while ($q && ($z = $q->fetch_row())) { $m3Units[(string) $z[0]] = 1; }
+$decByUnit = array(); $decPendingByUnit = array();
+$q = @$conn->query("SELECT d.decision_id, d.impact unit_code,
+                           (SELECT COUNT(*) FROM repair01_decision_impact p
+                             WHERE p.decision_id = d.decision_id AND p.status = 'NEEDS_ADJUDICATION') pend
+                      FROM repair01_decision_impact d
+                     WHERE d.axis = 'DEPARTMENTS' AND d.status = 'PROJECTED'");
+while ($q && ($z = $q->fetch_assoc())) {
+    $u0 = trim((string) $z['unit_code']);
+    $decByUnit[$u0] = (isset($decByUnit[$u0]) ? $decByUnit[$u0] : 0) + 1;
+    if ((int) $z['pend'] > 0) { $decPendingByUnit[$u0] = (isset($decPendingByUnit[$u0]) ? $decPendingByUnit[$u0] : 0) + 1; }
+}
+$decUnattributed = 0;
+$q = @$conn->query("SELECT COUNT(*) FROM repair01_decision_impact
+                     WHERE axis = 'DEPARTMENTS' AND status = 'NEEDS_ADJUDICATION'");
+if ($q && ($z = $q->fetch_row())) { $decUnattributed = (int) $z[0]; }
+
 /* ═══ ⑥ السجلُّ ══════════════════════════════════════════════════════════ */
-$reg = array(); $stat = array('closed' => 0, 'unver' => 0, 'noreq' => 0, 'staleGate' => 0);
+$reg = array(); $stat = array('closed' => 0, 'unver' => 0, 'noreq' => 0, 'staleGate' => 0,
+                              'VALIDATED' => 0, 'PARTIALLY_VALIDATED' => 0, 'BLOCKED' => 0);
 foreach ($scopes as $code => $nm) {
     $rows = isset($byCode[$code]) ? $byCode[$code] : array();
     $lastClosed = ''; $lastEv = ''; $firstOpen = ''; $nClosed = 0; $nUnver = 0; $nOpen = 0;
@@ -172,8 +196,28 @@ foreach ($scopes as $code => $nm) {
                  : 'لا حاجبَ يذكره بنصِّه');
     if (!$falling && $mine) { $stat['staleGate']++; }
 
+    /* ── `VALIDATION_STATUS` — أمرُ الضبطِ §١ · ثلاثُ حالاتٍ لا رابعة ──────
+       ⛔ **والبرهانُ موجبٌ لا سلبيّ**: `VALIDATED` تشترط **إثباتَ** خلوِّ
+       النطاقِ من فجوتَي م٣ وم٤ — و**٤٤ قرارًا لم تُحسم إدارتُه أصلًا**
+       (`DOMAIN_NAME_MISMATCH`) فلا يُثبَت لأيِّ نطاقٍ أنّها لا تعنيه.
+       ⇒ فما دامت الـ٤٤ قائمةً **لا يبلغ نطاقٌ `VALIDATED`** — وهذا حكمُ
+       القاعدةِ لا تشدُّدُ أداة. والنطاقاتُ غيرُ المتأثرةِ **تستمرُّ** —
+       فالحالةُ وصفُ صدقٍ لا بابُ إيقاف. */
+    $vWhy = array();
+    if ($falling) { $vWhy[] = 'حاجبٌ ساقطٌ حيًّا: ' . implode(' · ', $falling); }
+    if (isset($m3Units[$code])) { $vWhy[] = 'فيه هدفٌ من أهدافِ م٣ الأربعةَ عشرَ المحجوبة'; }
+    if (isset($decPendingByUnit[$code])) {
+        $vWhy[] = 'عليه ' . $decPendingByUnit[$code] . ' قرارًا مُسنَدًا إليه بمحاورَ لم تُسقَط (م٤)';
+    }
+    if ($decUnattributed > 0) {
+        $vWhy[] = $decUnattributed . ' قرارًا بلا إدارةٍ محسومةٍ — لا يُثبَت أنّها لا تعنيه';
+    }
+    $vStatus = $falling ? 'BLOCKED' : ($vWhy ? 'PARTIALLY_VALIDATED' : 'VALIDATED');
+    $stat[$vStatus]++;
+
     $reg[] = array(
         'code' => $code, 'name' => $nm, 'req' => count($rows),
+        'vstatus' => $vStatus, 'vwhy' => implode(' · ', $vWhy),
         'closed' => $nClosed, 'unver' => $nUnver, 'open' => $nOpen,
         'lastClosed' => ($lastClosed !== '' ? $lastClosed : '**لا مغلقَ بالدليلِ بعد**'),
         'lastEv' => ($lastEv !== '' ? $lastEv : '—'),
@@ -193,11 +237,16 @@ printf("  اللقطة %s · الالتزام %s\n", $sid, substr($commit, 0, 8)
 printf("  نطاقاتٌ: **%d** · بمتطلباتٍ في الدفتر %d · **بلا متطلبٍ %d**\n",
        count($reg), count($reg) - $stat['noreq'], $stat['noreq']);
 printf("  نطاقٌ فيه مغلقٌ بالدليل: **%d** · فيه منفَّذٌ لم يُثبت: **%d**\n", $stat['closed'], $stat['unver']);
-printf("  ⚠ نطاقٌ حاجزُه **متقادمٌ** (‏حواجبُه خضراءُ الآن): **%d**\n\n", $stat['staleGate']);
-printf("  %-9s %-30s %5s %6s %6s %5s  %s\n", 'الرمز', 'الاسم', 'مطلب', 'مغلق', 'لم‑يُثبت', 'مفتوح', 'الحاجز');
+printf("  ⚠ نطاقٌ حاجزُه **متقادمٌ** (‏حواجبُه خضراءُ الآن): **%d**\n", $stat['staleGate']);
+printf("  `VALIDATION_STATUS` (أمرُ الضبطِ §١): VALIDATED **%d** · PARTIALLY **%d** · BLOCKED **%d**\n",
+       $stat['VALIDATED'], $stat['PARTIALLY_VALIDATED'], $stat['BLOCKED']);
+printf("  ⛔ وسقفُ الجميعِ `PARTIALLY` ما دامت **%d** قرارًا بلا إدارةٍ محسومة — برهانُ الخلوِّ موجبٌ لا سلبيّ\n\n",
+       $decUnattributed);
+printf("  %-9s %-24s %-9s %5s %6s %6s %5s  %s\n", 'الرمز', 'الاسم', 'الحالة', 'مطلب', 'مغلق', 'لم‑يُثبت', 'مفتوح', 'الحاجز');
 foreach ($reg as $x) {
-    printf("  %-9s %-30s %5d %6d %6d %5d  %s\n", $x['code'], mb_substr($x['name'], 0, 28),
-           $x['req'], $x['closed'], $x['unver'], $x['open'], mb_substr($x['blocker'], 0, 34));
+    printf("  %-9s %-24s %-9s %5d %6d %6d %5d  %s\n", $x['code'], mb_substr($x['name'], 0, 22),
+           ($x['vstatus'] === 'PARTIALLY_VALIDATED' ? 'PARTIAL' : $x['vstatus']),
+           $x['req'], $x['closed'], $x['unver'], $x['open'], mb_substr($x['blocker'], 0, 30));
 }
 echo "\n  ⛔ **وأصحّةُ الحاجزِ من التشغيلِ لا من السجل** — فحاجبٌ صار أخضرَ\n";
 echo "    **حاجزٌ متقادمٌ يُبقي النطاقَ مغلقًا كذبًا**.\n";
@@ -216,16 +265,29 @@ if ($MD) {
     $o .= "**وخلطُه بالمغلقِ يُغلق نطاقًا بلا دليل**.\n\n";
     $o .= "⛔ **وأصحّةُ الحاجزِ من التشغيلِ لا من السجل**: كلُّ حاجبٍ يذكر النطاقَ بنصِّه ";
     $o .= "**شُغِّل الآن** — فحاجبٌ صار أخضرَ **حاجزٌ متقادمٌ يُبقي النطاقَ مغلقًا كذبًا**.\n\n";
-    $o .= "| النطاق | الاسم | مطلب | مغلقٌ بالدليل | منفَّذٌ لم يُثبت | مفتوح | آخرُ مغلقٍ بالدليل | أوّلُ مفتوح | الحاجز | أصحيح؟ | نقطةُ الاستئناف | الإجراءُ التالي |\n";
-    $o .= "|---|---|---:|---:|---:|---:|---|---|---|---|---|---|\n";
+    $o .= "## `VALIDATION_STATUS` — أمرُ الضبطِ §١ · ⛔ لا يُعامَل الجميعُ مصادَقًا وفجواتُ م٣/م٤ مفتوحة\n\n";
+    $o .= "**البرهانُ موجب**: `VALIDATED` تشترط **إثباتَ** خلوِّ النطاقِ من الفجواتِ غيرِ المحسومةِ ";
+    $o .= "وإسقاطَ كلِّ قرارٍ مؤثِّرٍ عليه. **و" . $decUnattributed . " قرارًا لم تُحسم إدارتُه أصلًا** ";
+    $o .= "(`DOMAIN_NAME_MISMATCH`) فلا يُثبَت لأيِّ نطاقٍ أنّها لا تعنيه ⇒ **سقفُ الجميعِ اليومَ ";
+    $o .= "`PARTIALLY_VALIDATED`** حتى تُحسم — وهذا حكمُ القاعدةِ لا تشدُّدُ أداة. ";
+    $o .= "**والحالةُ وصفُ صدقٍ لا بابُ إيقاف**: النطاقُ غيرُ المحجوبِ يستمرُّ بنقطتِه.\n\n";
+    $o .= '`VALIDATED` **' . $stat['VALIDATED'] . '** · `PARTIALLY_VALIDATED` **' . $stat['PARTIALLY_VALIDATED']
+        . '** · `BLOCKED` **' . $stat['BLOCKED'] . "**\n\n";
+    $o .= "| النطاق | الاسم | `VALIDATION_STATUS` | لماذا (مقيسًا) | مطلب | مغلقٌ بالدليل | منفَّذٌ لم يُثبت | مفتوح | آخرُ مغلقٍ بالدليل | أوّلُ مفتوح | الحاجز | أصحيح؟ | نقطةُ الاستئناف | الإجراءُ التالي |\n";
+    $o .= "|---|---|---|---|---:|---:|---:|---:|---|---|---|---|---|---|\n";
     foreach ($reg as $x) {
-        $o .= '| `' . $x['code'] . '` | ' . $x['name'] . ' | ' . $x['req'] . ' | ' . $x['closed']
+        $o .= '| `' . $x['code'] . '` | ' . $x['name'] . ' | **`' . $x['vstatus'] . '`** | '
+            . ($x['vwhy'] !== '' ? $x['vwhy'] : '—')
+            . ' | ' . $x['req'] . ' | ' . $x['closed']
             . ' | ' . $x['unver'] . ' | ' . $x['open'] . ' | ' . $x['lastClosed'] . ' | '
             . $x['firstOpen'] . ' | `' . $x['blocker'] . '` | ' . $x['valid'] . ' | '
             . $x['resume'] . ' | ' . $x['next'] . " |\n";
     }
     $o .= "\n## الخلاصة\n\n| المفردة | العدد |\n|---|---:|\n";
     $o .= "| نطاقات | **" . count($reg) . "** |\n";
+    $o .= "| `VALIDATED` | " . $stat['VALIDATED'] . " |\n";
+    $o .= "| `PARTIALLY_VALIDATED` | **" . $stat['PARTIALLY_VALIDATED'] . "** |\n";
+    $o .= "| `BLOCKED` | " . $stat['BLOCKED'] . " |\n";
     $o .= "| بلا متطلبٍ في الدفتر | " . $stat['noreq'] . " |\n";
     $o .= "| فيه مغلقٌ بالدليل | " . $stat['closed'] . " |\n";
     $o .= "| فيه منفَّذٌ لم يُثبت | " . $stat['unver'] . " |\n";
