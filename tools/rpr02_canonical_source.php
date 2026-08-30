@@ -91,8 +91,18 @@ $ents = array();
 $r = $conn->query("SELECT grain_entity e, COUNT(*) n FROM $LIVE GROUP BY e HAVING n > 1 ORDER BY n DESC, e");
 while ($x = $r->fetch_row()) { $ents[$x[0]] = (int) $x[1]; }
 
+/* شاهدُ العقدِ المقيسِ — إن وُجد. ⛔ **ولا يُختلق حين يغيب**: بلا صفوفٍ لا `N5`. */
+$ccBy = null;
+$q = @$conn->query("SELECT entity, screen_id, owner_code, writer_verdict FROM repair01_cross_contract");
+if ($q && $q->num_rows) {
+    $ccBy = array();
+    while ($x = $q->fetch_assoc()) {
+        $ccBy[$x['entity']][] = array('sc' => $x['screen_id'], 'own' => $x['owner_code'],
+                                      'v' => $x['writer_verdict']);
+    }
+}
 $rows = array();
-$stat = array('N1' => 0, 'N2' => 0, 'N3' => 0, 'N4' => 0);
+$stat = array('N1' => 0, 'N2' => 0, 'N5' => 0, 'N3' => 0, 'N4' => 0);
 foreach ($ents as $ent => $n) {
     $w = array();
     $q = $conn->query("SELECT screen_id, canonical_label_ar, owner_code, grain_rule, route
@@ -135,6 +145,34 @@ foreach ($ents as $ent => $n) {
         $stat['N2']++;
         continue;
     }
+    /* ═══ N5 — الكاتبُ الحقيقيُّ الوحيدُ بعدَ قياسِ العقد ═══════════════════
+       ◆ **وهذه ليست قاعدةً جديدةً بل `S1` نفسُها بعدَ أن صار الكاتبُ مقيسًا**:
+         §٥·٩ تعرّف المالكَ القانونيَّ بأنّه **مَن يُنشئ ويعدّل**. وقبلَ قياسِ
+         العقدِ كان «الكاتبُ» = مَن نُسب إليه الكيانُ في السجل — وفيهم مَن
+         **يصرّح ولا يكتب** (`X0`) ومَن **يمرُّ ببابِ الخدمةِ المالكة** (`X1`).
+         ⇒ فإذا بقي **واحدٌ** يُنشئ ويعدّل بجملةٍ خامّةٍ (`X2`) وسائرُهم `X0`/`X1`
+         **فهو المالكُ بالتعريفِ لا بالترجيح**، وسائرُهم إسقاطاتٌ تُوجَّه إليه.
+       ⛔ **ولا تُطبَّق إلّا على شاهدٍ مقيسٍ قائم**: صفوفُ `repair01_cross_contract`
+         لهذا الكيان. وبلا شاهدٍ لا حسم. */
+    if ($ccBy !== null && isset($ccBy[$ent])) {
+        $x2 = array(); $x1 = 0; $x0 = 0;
+        foreach ($ccBy[$ent] as $cw) {
+            if ($cw['v'] === 'X2_RAW_DIRECT')           { $x2[] = $cw; }
+            elseif ($cw['v'] === 'X1_SERVICE_MEDIATED') { $x1++; }
+            else                                        { $x0++; }
+        }
+        if (count($x2) === 1 && ($x1 + $x0) > 0) {
+            $rows[] = array($ent, $n, $nOwn, 'N5_SOLE_MEASURED_CREATOR', $x2[0]['sc'],
+                $x2[0]['own'], $list, 1,
+                'N5 · بعدَ قياسِ عقدِ الكتابة (`rpr02_cross_contract`): كاتبٌ خامٌّ **واحدٌ** '
+              . '`' . $x2[0]['sc'] . '` (‏`' . ($x2[0]['own'] === '' ? '—' : $x2[0]['own']) . '`) '
+              . 'و**' . $x1 . '** يمرُّ ببابٍ مسمًّى (`X1`) و**' . $x0 . '** يصرّح ولا يكتب (`X0`) ⇒ '
+              . '**فهو مَن يُنشئ ويعدّل** بتعريفِ §٥·٩ لا بترجيحٍ · الكتّاب: ' . $list
+              . ' · لقطة ' . $sid);
+            $stat['N5']++;
+            continue;
+        }
+    }
     /* N3 — عبورُ إدارات: لا يُحسم بقياس */
     if ($nOwn > 1) {
         $rows[] = array($ent, $n, $nOwn, 'N3_CROSS_OWNER_NEEDS_CONTRACT', '', '', $list, 0,
@@ -157,12 +195,13 @@ foreach ($ents as $ent => $n) {
 
 /* ═══ ⑤ العرض ════════════════════════════════════════════════════════════ */
 $N = count($rows);
-$res = $stat['N1'] + $stat['N2'];
+$res = $stat['N1'] + $stat['N2'] + $stat['N5'];
 echo "\n═══ `RPR-02` §٥·٩ — المصدرُ القانونيُّ للحقيقةِ المكرَّرة ═══\n";
 printf("  اللقطة: %s · كياناتٌ يكتبها أكثرُ من سطحٍ (`OWN_FACT`): **%d**\n\n", $sid, $N);
-echo "  ── القواعدُ الأربع ──\n";
+echo "  ── القواعدُ الخمس ──\n";
 printf("     N1 `ARTIFACT_NAME_IDENTITY`     %2d — اسمُ الأثرِ هو اسمُ الكيان ⇒ **يُحسم**\n", $stat['N1']);
 printf("     N2 `DECLARED_OVER_INFERRED`     %2d — المُعلِنُ يغلب المُستنتَج ⇒ **يُحسم**\n", $stat['N2']);
+printf("     N5 `SOLE_MEASURED_CREATOR`      %2d — كاتبٌ خامٌّ واحدٌ بعدَ قياسِ العقد ⇒ **يُحسم**\n", $stat['N5']);
 printf("     N3 `CROSS_OWNER_NEEDS_CONTRACT` %2d — إدارتان فأكثرُ ⇒ ⛔ **عقدٌ لا قياس** (‏= #١١)\n", $stat['N3']);
 printf("     N4 `TIE_DECLARED`               %2d — إدارةٌ واحدةٌ بلا مُرجِّحٍ ⇒ **يُعلَن مفتوحًا**\n", $stat['N4']);
 printf("\n  ⇒ **حُسم %d · بقي %d** — والمقياسُ **#١٠ %d ⇒ %d**\n", $res, $N - $res, $N, $N - $res);

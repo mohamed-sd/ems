@@ -418,7 +418,11 @@ if ($tbl('repair01_cross_contract')
     $cxR = (int) $one("SELECT COUNT(*) FROM repair01_cross_contract WHERE writer_verdict = 'X2_RAW_DIRECT'");
     $cxM = (int) $one("SELECT COUNT(*) FROM repair01_cross_contract WHERE writer_verdict = 'X1_SERVICE_MEDIATED'");
     $cxZ = (int) $one("SELECT COUNT(*) FROM repair01_cross_contract WHERE writer_verdict = 'X0_NO_MEASURED_WRITE'");
-    $cross = $cross - $cxNot;
+    /* ⛔ **والمقياسُ اسمُه «بلا عقد»** — فكيانٌ حُكم عليه `CONTRACTED` **هو
+       بعينِه العبورُ المتعاقَدُ عليه**، وإبقاؤه في العددِ يقيس العبورَ لا
+       العبورَ-بلا-عقد. ⇒ يُطرح كما يُطرح `NOT_A_DUPLICATE`، **وشاهدُ كلٍّ في
+       `repair01_cross_contract.witness`**. */
+    $cross = $cross - $cxNot - $cxC;
     $add('كتابة تعبر حدود إدارة بلا عقد', 'صفر', 'MEASURED', (string) $cross,
          "كيانٌ تكتبه إدارتان فأكثرُ — **والعقدُ صار مقيسًا** بـ`rpr02_cross_contract.php`: "
        . "كاتبٌ بكتابةٍ خامّةٍ **$cxR** · بخدمةٍ أو ناشرٍ بلا خامٍّ **$cxM** · مُصرِّحٌ بلا كتابةٍ **$cxZ** (‏ليس كاتبًا). "

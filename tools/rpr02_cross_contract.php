@@ -54,8 +54,47 @@ $CHROME = array('config.php','session_bootstrap.php','inheader.php','insidebar.p
                 'csrf.php','csrf_helper.php','auth.php','ems_action_guard.php');
 
 /* ═══ ① القياسان مفصولان — كي يُختبرا وحدَهما ════════════════════════════ */
+/* ⛔ **والتعليقُ ليس كتابةً** — وقد كان يُعَدُّ: ثلاثةُ أسطحٍ تحمل في **شرحِ
+   إصلاحِها** عبارةَ `INSERT INTO exec_approvals` تحكي ما **كان** قبلَ الإصلاح،
+   فعُدَّت جملةَ كتابةٍ قائمة. ⇒ **والشاهدُ الذي يصف الماضيَ يُقرأ حاضرًا** ما لم
+   يُنزَع التعليقُ قبلَ العدّ. */
+function cc_strip_comments($src)
+{
+    $out = ''; $n = strlen($src); $i = 0; $st = 0; $q = '';
+    while ($i < $n) {
+        $c = $src[$i]; $d = ($i + 1 < $n) ? $src[$i + 1] : '';
+        if ($st === 0) {
+            if ($c === '/' && $d === '*') { $st = 1; $i += 2; continue; }
+            if (($c === '/' && $d === '/') || $c === '#') { $st = 2; $i += ($c === '#') ? 1 : 2; continue; }
+            if ($c === '"' || $c === "'") { $st = 3; $q = $c; $out .= $c; $i++; continue; }
+            $out .= $c; $i++; continue;
+        }
+        if ($st === 1) { if ($c === '*' && $d === '/') { $st = 0; $i += 2; $out .= ' '; continue; } $i++; continue; }
+        if ($st === 2) { if ($c === "\n") { $st = 0; $out .= "\n"; } $i++; continue; }
+        if ($c === chr(92)) { $out .= $c . $d; $i += 2; continue; }
+        $out .= $c;
+        if ($c === $q) { $st = 0; }
+        $i++;
+    }
+    return $out;
+}
+/* ⛔ **والبابُ ليس الغرفةَ** — وهذا أثقلُ عطبٍ كان في هذا المقياس: مدى السطحِ
+   «الخاصُّ» يشمل اشتمالاتِه غيرَ المشتركة، **وخدمةُ المجالِ التي لا يستعملها
+   إلّا سطحٌ واحدٌ تسقط داخلَه** (‏تفرُّعُها = ١ فلا تُعَدُّ مشتركة). ⇒ فجملةُ
+   الكتابةِ **داخلَ الخدمةِ نفسِها** تُقرأ «كتابةً خامّةً للسطح»، **والحكمُ يصير
+   دالّةً على عددِ مستهلكي الخدمةِ لا على مسارِ الكتابة**: الخدمةُ الواحدةُ تعطي
+   `X2` لمستهلكِها الأوّلِ و`X1` للثاني بلا أن يتغيّر سطرٌ فيها. ⇒ **وطبقةُ
+   الخدمةِ المُعلَنةُ في الدستور** (`app/Services/**` · `app/Core/**` — `ADR-15`)
+   **هي البابُ بتعريفِها**، فتُستثنى من «الغرفة» ويُعَدُّ الخامُّ في كودِ السطحِ
+   وحدَه — **والبابُ يُسمّى ويُعدُّ بابًا لا خرقًا**. */
+function cc_is_door($path)
+{
+    $u = strtolower(str_replace(chr(92), '/', (string) $path));
+    return (strpos($u, '/app/services/') !== false) || (strpos($u, '/app/core/') !== false);
+}
 function cc_raw_writes($src, $entity)
 {
+    $src = cc_strip_comments($src);
     return (int) preg_match_all('~\b(?:INSERT\s+(?:IGNORE\s+)?INTO|REPLACE\s+INTO|UPDATE|DELETE\s+FROM)\s+`?'
         . preg_quote($entity, '~') . '`?\b~i', $src);
 }
@@ -111,6 +150,36 @@ if ($SELF) {
         echo "  X المفردةُ الفريدةُ رُصدت كتابةً\n"; $fail++;
     }
     if (cc_gates('$x = 1;')) { echo "  X بابٌ رُصد في نصٍّ بلا خدمة\n"; $fail++; }
+    /* ⛔ **والتعليقُ ليس كتابةً** — والاختبارُ يُصيب الطرفَين */
+    if (cc_raw_writes("// كان INSERT INTO zzq_cmt_probe قبلَ الإصلاح\n", 'zzq_cmt_probe') !== 0) {
+        echo "  X تعليقُ سطرٍ عُدَّ كتابةً\n"; $fail++;
+    }
+    if (cc_raw_writes("/* INSERT INTO zzq_cmt_probe */", 'zzq_cmt_probe') !== 0) {
+        echo "  X تعليقُ كتلةٍ عُدَّ كتابةً\n"; $fail++;
+    }
+    if (cc_raw_writes("# INSERT INTO zzq_cmt_probe\n", 'zzq_cmt_probe') !== 0) {
+        echo "  X تعليقُ المربّعِ عُدَّ كتابةً\n"; $fail++;
+    }
+    /* **الكاسر**: جملةٌ حيّةٌ داخلَ سلسلةٍ فيها شرطةُ قسمةٍ لا تُنزَع */
+    if (cc_raw_writes('$q = "INSERT INTO zzq_cmt_probe (a) VALUES (1)";', 'zzq_cmt_probe') !== 1) {
+        echo "  X الجملةُ الحيّةُ في سلسلةٍ نُزعت مع التعليق\n"; $fail++;
+    }
+    if (cc_raw_writes("\$q = 'a//b'; UPDATE zzq_cmt_probe SET x=1;", 'zzq_cmt_probe') !== 1) {
+        echo "  X شرطتا قسمةٍ داخلَ سلسلةٍ فتحتا تعليقًا\n"; $fail++;
+    }
+    /* ⛔ **والبابُ ليس الغرفةَ** */
+    if (!cc_is_door('C:/wamp64/www/ems/app/Services/Tickets/TicketRouter.php')) {
+        echo "  X طبقةُ الخدمةِ لم تُعرَف بابًا\n"; $fail++;
+    }
+    if (!cc_is_door('C:' . chr(92) . 'wamp64' . chr(92) . 'www' . chr(92) . 'ems' . chr(92) . 'app' . chr(92) . 'Core' . chr(92) . 'EventPublisher.php')) {
+        echo "  X مسارُ ويندوزَ للبابِ لم يُعرَف\n"; $fail++;
+    }
+    if (cc_is_door('C:/wamp64/www/ems/Tickets/admin_close.php')) {
+        echo "  X سطحٌ عاديٌّ عُدَّ بابًا\n"; $fail++;
+    }
+    if (cc_is_door('C:/wamp64/www/ems/tools/zzq_unique_probe_service.php')) {
+        echo "  X ملفٌّ خارجَ الطبقةِ عُدَّ بابًا باسمِه\n"; $fail++;
+    }
     echo $fail ? "\nX الفحصُ الذاتيُّ سقط بـ$fail\n"
                : "\n🟢 الفحصُ الذاتيُّ تامٌّ — والكتابةُ تُميَّز عن القراءةِ والاسمُ الجزئيُّ لا يمرّ\n";
     exit($fail ? 1 : 0);
@@ -163,9 +232,12 @@ foreach ($PATH as $k => $p) {
 $SHARED = array();
 foreach ($fanin as $f => $n) { if ($n >= 2 && !isset($own[$f])) { $SHARED[$f] = $n; } }
 
+/* ⇒ **الغرفةُ والبابُ يعودان مفصولَين**: `room` كودُ السطحِ نفسِه (‏وما يشتمله
+   ممّا ليس طبقةَ خدمة) — وفيه يُعَدُّ الخامُّ · و`doors` ملفّاتُ طبقةِ الخدمةِ
+   في مداه — ومنها يُقرأ **اسمُ البابِ الذي يكتب الكيان**. */
 function cc_own_source($p, $ROOT, $CHROME, $SHARED)
 {
-    $rp = realpath($p); if (!$rp) { return array('', array()); }
+    $rp = realpath($p); if (!$rp) { return array('', array(), '', array()); }
     $q = array(array($rp, 0)); $vis = array($rp => 1); $set = array($rp);
     while ($q) {
         list($cur, $d) = array_shift($q);
@@ -175,19 +247,38 @@ function cc_own_source($p, $ROOT, $CHROME, $SHARED)
             $vis[$nx] = 1; $set[] = $nx; $q[] = array($nx, $d + 1);
         }
     }
-    $acc = ''; $files = array();
+    $acc = ''; $files = array(); $dacc = ''; $dfiles = array();
     foreach ($set as $f) {
         $s = (string) @file_get_contents($f);
         if ($s === '') { continue; }
+        if (cc_is_door($f)) { $dacc .= "\n" . $s; $dfiles[] = $f; continue; }
         $acc .= "\n" . $s; $files[] = basename($f);
     }
-    return array($acc, $files);
+    return array($acc, $files, $dacc, $dfiles);
+}
+/* **اسمُ البابِ الكاتب**: ملفُّ طبقةِ خدمةٍ في المدى **يحمل جملةَ كتابةٍ على
+   الكيانِ نفسِه** ⇒ اسمُ صنفِه هو البابُ المسمّى. ⛔ **ولا يُسمّى بابًا ما لا
+   يكتب**: خدمةٌ في المدى لا تمسُّ الكيانَ ليست بابَه. */
+function cc_writing_doors($dfiles, $entity)
+{
+    $out = array();
+    foreach ($dfiles as $f) {
+        $s = (string) @file_get_contents($f);
+        if ($s === '' || cc_raw_writes($s, $entity) === 0) { continue; }
+        $out[preg_replace('~\.php$~i', '', basename($f))] = 1;
+    }
+    return array_keys($out);
 }
 
 /* ═══ ⑤ الكياناتُ غيرُ المحسومةِ في سجلِّ المصدرِ القانونيّ ═══════════════ */
+/* ⛔ **والمدى كلُّ كيانٍ مكرَّرٍ لا غيرُ المحسومِ وحدَه** — وكان يقتصر على
+   `resolved = 0`، **فصار الشاهدُ يختفي بمجرَّدِ أن يُحسَم الكيانُ به**: يقرأ
+   `rpr02_canonical_source` عقدَ الكتابةِ فيَحسِم، فيُسقِط هذا المقياسُ صفَّه،
+   فيعود الحسمُ بلا سندٍ في التشغيلةِ التالية — **تذبذبٌ لا نقطةَ ثباتٍ له**.
+   ⇒ فيُقاس **كلُّ** مكرَّرٍ ويبقى شاهدُه قائمًا بعدَ الحسم. */
 $ents = array();
 $r = @$conn->query("SELECT entity, rule_code, owners, writers FROM repair01_canonical_source
-                     WHERE resolved = 0 ORDER BY rule_code, entity");
+                     ORDER BY rule_code, entity");
 if (!$r) { exit("⛔ **`repair01_canonical_source` غيرُ موجود** — شغِّلْ `rpr02_canonical_source.php --apply` أوّلًا.\n"); }
 while ($x = $r->fetch_assoc()) { $ents[] = $x; }
 
@@ -204,11 +295,16 @@ foreach ($ents as $E) {
         $sc = $w[0]; $s = $reg[$sc];
         $p = isset($PATH[$sc]) ? $PATH[$sc] : '';
         if ($p === '') { continue; }
-        list($src, $files) = cc_own_source($p, $ROOT, $CHROME, $SHARED);
+        list($src, $files, $dsrc, $dfiles) = cc_own_source($p, $ROOT, $CHROME, $SHARED);
         $raw   = cc_raw_writes($src, $ent);
-        $gates = cc_gates($src);
+        $wdoor = cc_writing_doors($dfiles, $ent);
+        $gates = array_values(array_unique(array_merge($wdoor, cc_gates($src))));
+        /* ⛔ **ولا يُسمّى وسيطًا مَن ذكر خدمةً لا تكتب الكيان** — كان `X1` يُمنح
+           لمجرَّدِ ورودِ اسمٍ ينتهي بـ`Service` في المصدر، **وذاك إعلانٌ لا مسار**.
+           ⇒ فالوساطةُ تُشترط ببابٍ **يكتب هذا الكيانَ بعينِه** (`$wdoor`)، ومَن
+           لا يكتب ولا يمرُّ ببابٍ كاتبٍ **ليس كاتبًا** (`X0`). */
         if ($raw > 0)        { $v = 'X2_RAW_DIRECT'; $stat['X2']++; }
-        elseif ($gates)      { $v = 'X1_SERVICE_MEDIATED'; $stat['X1']++; }
+        elseif ($wdoor)      { $v = 'X1_SERVICE_MEDIATED'; $stat['X1']++; }
         else                 { $v = 'X0_NO_MEASURED_WRITE'; $stat['X0']++; }
         $wit = ($v === 'X2_RAW_DIRECT')
             ? 'X2 · **' . $raw . '** جملةَ كتابةٍ خامّةٍ على `' . $ent . '` في مدى `' . $sc
@@ -225,7 +321,8 @@ foreach ($ents as $E) {
                  . 'ازدواجِ مصدر · لقطة ' . $sid);
         $rows[] = array($ent, $E['rule_code'], $sc, $s['owner_code'], $s['grain_rule'],
                         $raw, implode(' · ', array_slice($gates, 0, 4)), $v, $wit);
-        $byEnt[$ent][] = array('v' => $v, 'own' => $s['owner_code'], 'sc' => $sc, 'raw' => $raw);
+        $byEnt[$ent][] = array('v' => $v, 'own' => $s['owner_code'], 'sc' => $sc,
+                               'raw' => $raw, 'door' => $wdoor);
     }
 }
 
@@ -244,6 +341,19 @@ foreach ($byEnt as $ent => $ws) {
     } elseif (!$rawOwners) {
         $entVerdict[$ent] = array('CONTRACTED',
             'كلُّ كتّابِه **يمرّون ببابٍ مسمًّى** وصفرُ كتابةٍ خامّة ⇒ **العبورُ بعقدٍ مقيس**');
+    } elseif (count($rawOwners) === 1) {
+        /* ⛔ **وإدارةٌ واحدةٌ تكتب كيانَها خامًّا ليست «عبورَ حدود»** — وهذا
+           المقياسُ اسمُه بنصِّه *«كتابةٌ **تعبر حدودَ إدارةٍ** بلا عقد»*. فحين
+           تكون **كلُّ** الكتابةِ الخامّةِ تحت إدارةٍ واحدةٍ وسائرُ الكتّابِ
+           يمرّون ببابٍ مسمًّى ⇒ **لا حدَّ عُبِر**: المالكُ يكتب فِعلَه والعابرُ
+           متعاقِد. ⛔ **وعدُّه خرقًا يخلط §٥·٩ (‏مصدرٌ واحد) بـ#١١ (‏عبورُ حدٍّ)**
+           — وذاك بعينُه ازدواجُ العدِّ الذي يحذّر منه الأمر. ◆ **وازدواجُ المصدرِ
+           داخلَ الإدارةِ الواحدةِ يبقى مفتوحًا في #١٠ ولا يُطوى هنا.** */
+        $ro = array_keys($rawOwners);
+        $entVerdict[$ent] = array('CONTRACTED',
+            'الكتابةُ الخامّةُ كلُّها تحت **إدارةٍ واحدة** (' . ($ro[0] === '' ? '— بلا مالكٍ مسجَّل' : $ro[0])
+          . ') وسائرُ كتّابِه ببابٍ مسمًّى ⇒ **لا حدَّ إدارةٍ عُبِر**'
+          . ($ro[0] === '' ? ' · ⚠ **ومالكُ الكاتبِ الخامِّ غيرُ مسجَّلٍ** فالعبورُ غيرُ مُثبَتٍ لا منفيٌّ بالدليل' : ''));
     } else {
         $entVerdict[$ent] = array('DIRECT_WRITE_BREACH',
             '**' . count($rawOwners) . '** إدارةً تكتبه خامًّا (' . implode(' · ', array_map(
