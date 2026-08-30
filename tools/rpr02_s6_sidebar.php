@@ -84,9 +84,21 @@ $N = count($items);
 /* السجلُّ المبنيُّ بمسارِه — الجسرُ من الرابطِ إلى السطح */
 $byRoute = array();
 $r = $q("SELECT screen_id, route, screen_file, owner_code, canonical_label_ar,
-                          parent_screen_id, guard_kind, ownership_verdict, on_disk
+                          parent_screen_id, parent_rule, guard_kind, ownership_verdict, on_disk
                      FROM repair01_screen_registry WHERE route <> ''");
 while ($x = $r->fetch_assoc()) { $byRoute[strtolower(trim($x['route'], '/'))] = $x; }
+
+/* السجلُّ بمعرِّفِه — **والأبُ يُطلب بمعرِّفِه لا بمساره**: أبٌ بلا مسارٍ مبنيٍّ
+   بعدُ له صفٌّ في السجلِّ ومعرِّفٌ، فالبحثُ بالمسارِ وحدَه يُيتِّمه زورًا. */
+$byId = array();
+$r = $q("SELECT screen_id, route, owner_code, parent_screen_id, parent_rule, on_disk
+           FROM repair01_screen_registry");
+while ($x = $r->fetch_assoc()) { $byId[$x['screen_id']] = $x; }
+
+/* **مصادرُ الأبِ المُعلَنة** — سجلُّ تبويباتِ الكياناتِ وعذرُ الإخفاءِ المسجَّل.
+   ⛔ وما عداهما (`ANCHOR_MENU_PARENT` · `ANCHOR_SCREEN_PARENT`) **استنباطٌ من
+      رابطٍ في صفحةٍ** لا إعلانُ بنية — وهو «أبٌ ليس أبَه المعماريّ» بعينِه. */
+$PARENT_DECLARED = array('ENTITY_TABS_REGISTRY' => 1, 'HIDDEN_LOG_TAB_IN_PARENT' => 1);
 
 /* **التسميةُ المعتمدةُ وموضعُها** — و`nav_canonical` تحمل الأربعةَ معًا:
    الاسمَ (`canonical_ar`) والمجموعةَ (`group_name`) والترتيبَ (`sort_no`)
@@ -121,6 +133,7 @@ while ($x = $r->fetch_row()) {
 /* ═══ ② الخطواتُ السبعُ — حكمٌ لكلِّ بندٍ في كلِّ خطوة ═══════════════════ */
 $S = array();
 for ($i = 1; $i <= 7; $i++) { $S[$i] = array('ok' => 0, 'bad' => 0, 'na' => 0, 'ex' => array(), 'rt' => array()); }
+$S[5]['cross'] = 0; $S[5]['crossRt'] = array();   /* خبرٌ لا حكم — أبٌ معماريٌّ عابرٌ للإدارات */
 $ord = array();
 
 foreach ($items as $it) {
@@ -205,17 +218,38 @@ foreach ($items as $it) {
             array((int) $it['sort_order'], (int) $cn['sort_no'], $it['route']);
         $S[4]['ok']++;   /* يُعاد حسمُه بعد الفرزِ الترتيبيّ */
     } else { $S[4]['na']++; }
-    /* س٥ — الأبُ والتبويب */
+    /* س٥ — الأبُ والتبويب · **بنصِّ الأمرِ حرفًا**: §٦ *«صحِّحْ علاقاتِ الأبِ
+       والتبويبِ — **ولا دمجَ في أبٍ ليس أبَه المعماريّ**»*.
+       ⛔ **وكان يُقاس «أبٌ من إدارتِه» — وهو شرطٌ لا وجودَ له في الأمر**، وأنتج
+          **١١٥** موضعًا حمراءَ على ١٨ مسارًا كلُّها `ENTITY_TABS_REGISTRY`:
+          تبويباتُ **بطاقةِ الكيان**، وهي عابرةٌ للإداراتِ **بالتصميم** (ربحيّةُ
+          المشروعِ تبويبٌ ماليٌّ في بطاقةِ مشروعٍ تجاريّة). ⇒ **«معماريّ» ليس
+          «إداريًّا»** ([[entity-profile-card-system]]).
+       ◆ **والقاعدةُ الحاكمةُ مُنفَّذةً**: الأبُ **مُعلَنٌ في سجلِّ التبويباتِ**
+          (`ENTITY_TABS_REGISTRY` أو `HIDDEN_LOG_TAB_IN_PARENT`) · **وله صفٌّ**
+          في السجل · **وليس الشاشةَ نفسَها** · **ومبنيٌّ على القرص**.
+          ⇒ فالمردودُ **أبٌ مستنبَطٌ من رابطٍ** (`ANCHOR_*` — ٣٢ صفًّا في
+          السجلّ) أو أبٌ يتيمٌ أو غيرُ مبنيّ: **وهذه هي «أبٌ ليس أبَه المعماريّ»**.
+       ◆ **والعابرُ للإداراتِ يبقى مقيسًا ومُعلَنًا خبرًا** أدناه — فلا يختفي
+          رقمٌ تغيَّر معناه، ولا يُقرأ تغييرُ محلِّ القياسِ إخفاءً لمخالفة. */
     if (!$scr) { $S[5]['na']++; }
     elseif ($scr['parent_screen_id'] === '') { $S[5]['ok']++; }
     else {
-        $p = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry
-                          WHERE screen_id = '" . $conn->real_escape_string($scr['parent_screen_id']) . "'
-                            AND owner_code = '" . $conn->real_escape_string($scr['owner_code']) . "'");
-        if ($p > 0) { $S[5]['ok']++; }
-        else {
+        $par = isset($byId[$scr['parent_screen_id']]) ? $byId[$scr['parent_screen_id']] : null;
+        $err = '';
+        if (!$par)                                            { $err = 'أبٌ لا صفَّ له في السجل'; }
+        elseif ($scr['parent_screen_id'] === $scr['screen_id']) { $err = 'أبٌ هو الشاشةُ نفسُها'; }
+        elseif (!isset($PARENT_DECLARED[$scr['parent_rule']])) {
+            $err = 'أبٌ **مستنبَطٌ** لا مُعلَن (`' . ($scr['parent_rule'] !== '' ? $scr['parent_rule'] : 'بلا قاعدة') . '`)';
+        } elseif ((int) $par['on_disk'] !== 1)                 { $err = 'أبٌ غيرُ مبنيٍّ على القرص'; }
+        if ($err === '') {
+            $S[5]['ok']++;
+            if ($par['owner_code'] !== $scr['owner_code']) {
+                $S[5]['cross']++; $S[5]['crossRt'][$rt] = $scr['owner_code'] . ' ⇐ ' . $par['owner_code'];
+            }
+        } else {
             $S[5]['bad']++; $S[5]['rt'][$rt] = 1;
-            if (count($S[5]['ex']) < 8) { $S[5]['ex'][] = $scr['screen_id'] . ' أبوه ' . $scr['parent_screen_id'] . ' من إدارةٍ أخرى'; }
+            if (count($S[5]['ex']) < 8) { $S[5]['ex'][] = $scr['screen_id'] . ' أبوه ' . $scr['parent_screen_id'] . ' — ' . $err; }
         }
     }
 
@@ -281,9 +315,72 @@ if ($SELF) {
     if (isset($byRoute[$probe])) { echo "  X مسارٌ وهميٌّ وُجد في السجلّ\n"; $fail++; }
     /* ولو كان `$byRoute` فارغًا لسقط كلُّ شيءٍ ومرَّ الفحصُ أخضرَ كاذبًا */
     if (count($byRoute) < 100) { echo '  X جسرُ المساراتِ ' . count($byRoute) . " صفًّا — مصفاةٌ عمياء\n"; $fail++; }
+    /* ⛔ **وحكمُ س٥ الجديدُ يجب أن يكون له ما يمسكه** — وإلّا فقاعدةٌ بلا صيد:
+       سجلُّ الأسطحِ يحمل **٣٢ أبًا مستنبَطًا** (`ANCHOR_*`)، فلو صار أحدُها
+       بندًا حيًّا لسقط في س٥. ولو كانت القائمةُ فارغةً لكان الأخضرُ بلا معنى. */
+    $anch = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry
+                         WHERE parent_screen_id <> '' AND parent_rule LIKE 'ANCHOR%'");
+    if ($anch === 0) { echo "  X لا أبَ مستنبَطًا في السجلِّ ألبتّة — حكمُ س٥ بلا ما يمسكه\n"; $fail++; }
+    else { echo "  ◆ حكمُ س٥ له ما يمسكه: **$anch** أبًا مستنبَطًا (`ANCHOR_*`) في السجل\n"; }
     echo $fail ? "\nX الفحصُ الذاتيُّ سقط بـ$fail\n"
                : "\n🟢 الفحصُ الذاتيُّ تامٌّ — سبعُ خطواتٍ مجموعُها المقامُ نفسُه، والجسرُ ليس أعمى\n";
     exit($fail ? 1 : 0);
+}
+
+/* ═══ ③·أ **إثباتُ الحاجبِ بحركةِ عدّاد** — §٥ القاعدة ٣ ════════════════════
+   ⛔ **وحاجبٌ لم تتحرَّكْ حالتُه ليس مُثبَتًا**: يُكسر أبُ سطحٍ حيٍّ واحدٍ داخلَ
+   **معاملةٍ تُلغى**، فيُقاس س٥ فيرتفع بمقدارِ مواضعِ ذلك المسار، ثمَّ تُلغى
+   المعاملةُ فيعود. ⛔ **ولا كتابةَ تبقى**: `ROLLBACK` لا حذفٌ يدويّ. */
+if (in_array('--prove-s5', $argv, true)) {
+    $base = $S[5]['bad'];
+    $victim = null;
+    foreach ($items as $it) {
+        $k = strtolower(trim((string) $it['route'], '/'));
+        if (!isset($byRoute[$k])) { $k = preg_replace('~[?#].*$~', '', $k); }
+        if (isset($byRoute[$k]) && $byRoute[$k]['parent_screen_id'] !== '') { $victim = $byRoute[$k]; break; }
+    }
+    if (!$victim) { exit("  X لا سطحَ حيًّا بأبٍ — لا يمكن إثباتُ الحكم\n"); }
+    $pos = 0;
+    foreach ($items as $it) {
+        $k = strtolower(trim((string) $it['route'], '/'));
+        if (!isset($byRoute[$k])) { $k = preg_replace('~[?#].*$~', '', $k); }
+        if (isset($byRoute[$k]) && $byRoute[$k]['screen_id'] === $victim['screen_id']) { $pos++; }
+    }
+    echo "\n═══ إثباتُ حكمِ س٥ بحركةِ عدّاد ═══\n";
+    printf("  الأساسُ: س٥ يحتاج **%d** · والضحيّةُ `%s` (%s) بـ**%d** موضعًا حيًّا\n",
+           $base, $victim['screen_id'], $victim['route'], $pos);
+    $conn->query('START TRANSACTION');
+    $conn->query("UPDATE repair01_screen_registry SET parent_screen_id = 'SCR-zzq99'
+                   WHERE screen_id = '" . $conn->real_escape_string($victim['screen_id']) . "'");
+    /* يُعاد الحكمُ وحدَه — بالقراءةِ نفسِها لا بأداةٍ ثانيةٍ تتفرّق */
+    $byId2 = array();
+    $rr = $conn->query("SELECT screen_id, owner_code, parent_screen_id, parent_rule, on_disk FROM repair01_screen_registry");
+    while ($rr && ($x = $rr->fetch_assoc())) { $byId2[$x['screen_id']] = $x; }
+    $byRoute2 = array();
+    $rr = $conn->query("SELECT screen_id, route, owner_code, parent_screen_id, parent_rule, on_disk
+                          FROM repair01_screen_registry WHERE route <> ''");
+    while ($rr && ($x = $rr->fetch_assoc())) { $byRoute2[strtolower(trim($x['route'], '/'))] = $x; }
+    $bad2 = 0;
+    foreach ($items as $it) {
+        $k = strtolower(trim((string) $it['route'], '/'));
+        if (!isset($byRoute2[$k])) { $k = preg_replace('~[?#].*$~', '', $k); }
+        if (!isset($byRoute2[$k])) { continue; }
+        $s = $byRoute2[$k];
+        if ($s['parent_screen_id'] === '') { continue; }
+        $p = isset($byId2[$s['parent_screen_id']]) ? $byId2[$s['parent_screen_id']] : null;
+        if (!$p || $s['parent_screen_id'] === $s['screen_id']
+            || !isset($PARENT_DECLARED[$s['parent_rule']]) || (int) $p['on_disk'] !== 1) { $bad2++; }
+    }
+    $conn->query('ROLLBACK');
+    $after = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry
+                          WHERE screen_id = '" . $conn->real_escape_string($victim['screen_id']) . "'
+                            AND parent_screen_id = '" . $conn->real_escape_string($victim['parent_screen_id']) . "'");
+    printf("  بكسرِ الأبِ: س٥ يحتاج **%d** (‏الفرقُ %+d · والمتوقَّعُ %+d)\n", $bad2, $bad2 - $base, $pos);
+    printf("  بعدَ `ROLLBACK`: صفُّ الضحيّةِ عاد إلى أبِه الأصليِّ = %s\n", $after === 1 ? 'نعم' : '⛔ لا');
+    $good = ($bad2 - $base === $pos) && $after === 1;
+    echo $good ? "\n🟢 **الحكمُ مُثبَتٌ**: العدّادُ تحرَّك بكسرِ أبٍ واحدٍ ثمَّ عاد — وليس أخضرَ كاذبًا\n"
+               : "\nX **الحكمُ لم يُثبَت** — لم يتحرَّكِ العدّادُ كما يجب أو لم يعُدِ الصفّ\n";
+    exit($good ? 0 : 1);
 }
 
 /* ═══ ③·ب المُصيَّرُ مقابلَ **الملفِّ التصميميّ** — وهو سؤالُ §٥·٦ حرفًا ══════
@@ -367,6 +464,13 @@ for ($i = 1; $i <= 7; $i++) {
 $needTot = 0;
 for ($i = 1; $i <= 7; $i++) { $needTot += $S[$i]['bad']; }
 printf("\n  **مواضعُ تحتاج تصحيحًا في الخطواتِ السبع مجتمعةً: %d**\n", $needTot);
+/* ── خبرٌ خارجَ الحكم: الأبُ المعماريُّ العابرُ للإدارات (بطاقةُ الكيان) ── */
+printf("\n  ◆ **خبرٌ (خارجَ حكمِ س٥)**: أبٌ معماريٌّ **من إدارةٍ أخرى** — %d موضعًا على %d مسارًا.\n",
+       $S[5]['cross'], count($S[5]['crossRt']));
+echo "     وهي تبويباتُ **بطاقةِ الكيان** وعبورُها الإداراتِ **بالتصميم** — والأمرُ يقول\n";
+echo "     «ولا دمجَ في أبٍ ليس أبَه **المعماريّ**» ⛔ **ولا يشترط إدارتَه**.\n";
+$ci = 0;
+foreach ($S[5]['crossRt'] as $k => $v) { echo "       · $k ($v)\n"; if (++$ci >= 6) { break; } }
 
 if ($LIST) {
     for ($i = 1; $i <= 7; $i++) {
