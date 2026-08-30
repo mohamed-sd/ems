@@ -87,6 +87,28 @@ while ($x = $r->fetch_assoc()) {
     if ((int) $x['u'] > 1) { $foreign[$x['grain_entity']] = (int) $x['u']; }
 }
 
+/* ⛔ **وعدّادٌ وعارضٌ في ملفَّين يتفرّقان** — وقد تفرّقا هنا: هذان المعياران
+   هما **بعينُهما** المقياسان #١٠ و#١١، وقد صارا يُقرآن بحكمٍ مسجَّلٍ بشاهدِه
+   (`repair01_canonical_source` · `repair01_cross_contract`) بعدَ قياسِ عقدِ
+   الكتابة. **فقراءةُ العددِ الخامِّ هنا تُبقي حرجًا حُسم هناك** — ويصير
+   السطحُ الواحدُ «حرجًا» في أداةٍ و«محسومًا» في أخرى بلا سببٍ إلّا أنَّ
+   الأداتَين تقرآن مصدرَين. ⇒ **يُطرح المحسومُ من الحرجِ ويُعلَن عددُه.** */
+$resolved = array(); $notDup = array(); $contracted = array();
+$q = @$conn->query("SELECT entity FROM repair01_canonical_source WHERE resolved = 1");
+while ($q && ($z = $q->fetch_row())) { $resolved[$z[0]] = 1; }
+$q = @$conn->query("SELECT DISTINCT entity, entity_verdict FROM repair01_cross_contract");
+while ($q && ($z = $q->fetch_assoc())) {
+    if ($z['entity_verdict'] === 'NOT_A_DUPLICATE') { $notDup[$z['entity']] = 1; }
+    if ($z['entity_verdict'] === 'CONTRACTED')      { $contracted[$z['entity']] = 1; }
+}
+$dropDual = 0; $dropForeign = 0;
+foreach (array_keys($dual) as $en) {
+    if (isset($resolved[$en]) || isset($notDup[$en])) { unset($dual[$en]); $dropDual++; }
+}
+foreach (array_keys($foreign) as $en) {
+    if (isset($notDup[$en]) || isset($contracted[$en])) { unset($foreign[$en]); $dropForeign++; }
+}
+
 /* ═══ ③ الفحصُ الذاتيّ ═══════════════════════════════════════════════════ */
 if ($SELF) {
     $fail = 0;
@@ -95,7 +117,17 @@ if ($SELF) {
     if ($surplus > $liveN) { echo "  X الفائضُ $surplus أكبرُ من الحيِّ $liveN\n"; $fail++; }
     /* **الكاسرُ**: كيانٌ لا وجودَ له يجب ألّا يُحكَم بمصدرَين */
     if (isset($dual['zzq_unique_entity_probe'])) { echo "  X كيانٌ وهميٌّ حُكم بمصدرَين\n"; $fail++; }
-    if (count($dual) < 1) { echo "  X صفرُ كيانٍ بمصدرَين — والمقياسُ لا يميّز\n"; $fail++; }
+    /* ⛔ **وكان هنا شرطٌ يقول «صفرُ كيانٍ بمصدرَين ⇒ المقياسُ لا يميّز»** —
+       **وهو أخضرُ كاذبٌ مقلوب**: يرسُب حين يُصلَح العطبُ فعلًا. والاختبارُ
+       السالبُ يُختبر **ببنيةٍ مصنوعةٍ لا بحالةِ الشجرةِ الحيّة** (‏وإلّا صار
+       سقوطُه دالًّا على البيانات لا على الأداة). ⇒ يُختبر **قانونُ الإسقاط**
+       وحدَه بمفرداتٍ فريدةٍ لا ترد إلّا هنا. */
+    $tDual = array('zzq_probe_open' => 2, 'zzq_probe_resolved' => 3);
+    $tRes  = array('zzq_probe_resolved' => 1);
+    foreach (array_keys($tDual) as $en) { if (isset($tRes[$en])) { unset($tDual[$en]); } }
+    if (!isset($tDual['zzq_probe_open']))     { echo "  X المفتوحُ أُسقط مع المحسوم\n"; $fail++; }
+    if (isset($tDual['zzq_probe_resolved']))  { echo "  X المحسومُ بقي حرجًا\n"; $fail++; }
+    if (count($tDual) !== 1)                  { echo "  X عدُّ المتبقّي بعدَ الإسقاطِ خطأ\n"; $fail++; }
     echo $fail ? "\nX الفحصُ الذاتيُّ سقط بـ$fail\n"
                : "\n🟢 الفحصُ الذاتيُّ تامٌّ — المقامُ محصورٌ والمعاييرُ تميّز\n";
     exit($fail ? 1 : 0);
@@ -142,6 +174,10 @@ $TXT = array(
     'CODE_NOT_DEPT'  => 'ملكيّتُه رمزُ منصّةٍ لا إدارة',
 );
 foreach ($CRIT as $k => $v) { printf("     %-16s %4d — %s\n", $k, $v, $TXT[$k]); }
+printf("\n  ◆ **وطُرح المحسومُ بحكمٍ مسجَّلٍ بشاهدِه**: كياناتٌ خرجت من `DUAL_SOURCE` **%d**\n", $dropDual);
+printf("     ومن `FOREIGN_WRITER` **%d** — بـ`repair01_canonical_source` و`repair01_cross_contract`\n", $dropForeign);
+echo "     ⛔ **وهذان المعياران هما بعينُهما #١٠ و#١١** — وقراءةُ العددِ الخامِّ هنا\n";
+echo "     كانت تُبقي حرجًا حُسم هناك: **عدّادٌ وعارضٌ في ملفَّين يتفرّقان**\n";
 printf("\n  ◆ وأحكامٌ موروثةٌ في سجلِّهم على الفائضِ: **%d** — ⛔ **`INHERITED_UNREVIEWED`\n", $inherited);
 echo "     ولا تُعدُّ مقبولةً بمجرَّدِ وجودِها** (§٨: «راجعْ أحكامَهم واقبلها أو ارفضها بمبرِّر»)\n";
 
