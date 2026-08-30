@@ -296,7 +296,7 @@ foreach ($bridge as $b) {
     $sc = $b['screen_id'];
     $p  = isset($PATH[$sc]) ? $PATH[$sc] : '';
     $bagStr = array(); $bagTok = array(); $vocab = 0; $files = array();
-    $slug = ''; $redir = false; $nGfc = 0; $nAct = 0;
+    $slug = ''; $redir = false; $nGfc = 0; $nAct = 0; $kitFallback = 0;
     /* **الرافدُ الخاصُّ أوّلًا**: عقدُ السطحِ نفسِه — سبيكتُه وحقولُ أفعالِه.
        ⛔ ويُقرأ من **ملفِّ السطحِ وحدَه** لا من مداه، فالعقدُ خاصٌّ لا مشترك. */
     if ($p !== '') {
@@ -328,19 +328,51 @@ foreach ($bridge as $b) {
                 $vis[$nx] = 1; $set[] = $nx; $q[] = array($nx, $d + 1);
             }
         }
-        foreach ($set as $f) {
-            $src = (string) @file_get_contents($f);
-            if ($src === '') { continue; }
-            $files[] = basename($f);
-            $x = fm_extract($src);
-            foreach (array('F1','F2','F3') as $k) {
-                $tot[$k] += count($x[$k]);
-                foreach ($x[$k] as $v) {
-                    $vocab++;
-                    $nv = fm_norm($v);
-                    if ($nv !== '') { $bagStr[$nv] = 1; }
-                    foreach (fm_tok($v, $FM_STOP) as $t) { $bagTok[$t] = 1; }
+        $harvest = function ($files0) use (&$files, &$tot, &$vocab, &$bagStr, &$bagTok, $FM_STOP) {
+            foreach ($files0 as $f) {
+                $src = (string) @file_get_contents($f);
+                if ($src === '') { continue; }
+                $files[] = basename($f);
+                $x = fm_extract($src);
+                foreach (array('F1','F2','F3') as $k) {
+                    $tot[$k] += count($x[$k]);
+                    foreach ($x[$k] as $v) {
+                        $vocab++;
+                        $nv = fm_norm($v);
+                        if ($nv !== '') { $bagStr[$nv] = 1; }
+                        foreach (fm_tok($v, $FM_STOP) as $t) { $bagTok[$t] = 1; }
+                    }
                 }
+            }
+        };
+        $harvest($set);
+        /* ══ **الرافدُ الاحتياطيُّ — للعاجزِ وحدَه** (RPR-02 §٧·٥ · 2026-08-30) ══
+           ◆ **العطبُ المقيس**: خمسةُ أسطحٍ خرجت `NO_VOCAB` — **صفرُ مفردةٍ في
+             أثرِها كلِّه** — وشاهدُها نفسُه يقول «عجزُ قياسٍ مُعلَنٌ لا صفرُ حقول».
+             وسببُها واحد: تصييرُها كلُّه في **عُدَّةٍ مشتركة**
+             (`Clients/client_contacts.php` ⇐ `includes/party_contacts_view.php`،
+             وتُصرِّح بذلك في ترويستِها: «المنطقُ والتصييرُ في عُدَّةٍ مشتركةٍ مع
+             سطحِ المورد»). **والعُدَّةُ مُقصاةٌ فيبقى السطحُ بلا مفردةٍ فيُقرأ
+             صفرًا** — ⛔ **وصفرٌ من مفردةٍ لا وجودَ لها أخضرُ كاذبٌ مقلوب**
+             ([[measure-token-must-exist]]).
+           ◆ **والإقصاءُ نفسُه صحيحٌ في محلِّه**: عُدَّةٌ يشتملها سطحان **لا تُنشئ
+             ملكيّةً ولا حبّة** ([[grain-measure-shared-kit-trap]]). **لكنَّ
+             الحقلَ ليس الملكيّة**: حقلٌ تُصيِّره العُدَّةُ **يراه المستخدمُ على
+             هذا السطحِ فعلًا** — فإقصاؤه يقيس الشكلَ لا المبنيّ.
+           ⛔ **ولا يُوسَّع الرافدُ إلى القادرِ**: يُقرأ **فقط** حين خلا أثرُ
+             السطحِ من كلِّ مفردة — فلا تُنتفخ مطابقةُ سطحٍ له مفرداتُه، ولا
+             تُوزَّع مفرداتُ عُدَّةٍ على مئةِ سطحٍ يشتملونها.
+           ⛔ **والقاعدةُ لا تُمَسّ**: المُوسَّعُ **مادّةُ الأثرِ** لا قاعدةُ القبول. */
+        if ($vocab === 0) {
+            $kits = array();
+            foreach ($set as $f) {
+                foreach (fm_includes($f, $ROOT, $CHROME) as $nx) {
+                    if (isset($SHARED[$nx])) { $kits[$nx] = 1; }
+                }
+            }
+            if ($kits) {
+                $harvest(array_keys($kits));
+                $kitFallback = count($kits);
             }
         }
     }
@@ -449,7 +481,8 @@ if ($APPLY) {
                ? 'REDIRECTOR · الأثرُ `' . $o['path'] . '` **مسارٌ مُحوِّلٌ لا شاشة** (`route_redirect`) '
                  . '⇒ حقولُ السطحِ في وجهتِه لا فيه — **والسجلُّ يشير إلى المُحوِّلِ لا إلى الوجهة** · لقطة ' . $sid
                : 'NO_VOCAB · الأثرُ `' . $o['path'] . '` لا يحمل `<label>` ولا `<th>` ولا `name=` ولا سبيكةَ `u13` '
-                 . '⇒ الحقولُ مُصيَّرةٌ من جافاسكربت أو من عُدّةٍ مشتركة — **عجزُ قياسٍ مُعلَنٌ لا صفرُ حقول** · لقطة ' . $sid)
+                 . '⇒ الحقولُ مُصيَّرةٌ من جافاسكربت — **عجزُ قياسٍ مُعلَنٌ لا صفرُ حقول**. '
+                 . '◆ **وعُدَّتُه المشتركةُ قُرئت احتياطًا** (‏الرافدُ الاحتياطيُّ للعاجزِ وحدَه) **فلم تُنتج مفردةً** · لقطة ' . $sid)
             : 'قيست من الأثرِ `' . $o['path'] . '` عبرَ ' . $o['files'] . ' ملفًّا · مفرداتٌ '
               . $o['vocab'] . ' · طوبق ' . $o['hit'] . ' من ' . $o['appl']
               . ' حقلٍ منطبقٍ (و`AUDIT` ' . $o['audit'] . ' خارجَ المقامِ بنصِّ §٧ ١١) · لقطة ' . $sid;
