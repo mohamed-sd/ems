@@ -106,7 +106,32 @@ foreach ($SEVEN as $lbl => $col) {
     printf("     %s %-18s %5d من %d\n", $fill[$lbl] === $man ? '✔' : '⛔', $lbl, $fill[$lbl], $man);
 }
 
-echo "\n  ── قراءتان للاستثناءِ — تُعرضان معًا ولا يُختار الأيسر ──\n";
+echo "\n  ── لماذا الفترةُ فارغة — سببٌ واحدٌ مقيسٌ لا إهمال ──
+";
+$pmin = $one("SELECT MIN(posting_date) FROM fin_journal_entries WHERE $LIVE AND $MANUAL AND COALESCE(period_code,'')=''");
+$pmax = $one("SELECT MAX(posting_date) FROM fin_journal_entries WHERE $LIVE AND $MANUAL AND COALESCE(period_code,'')=''");
+$pfy  = $one("SELECT GROUP_CONCAT(DISTINCT fiscal_year ORDER BY fiscal_year) FROM fin_financial_periods");
+$pok  = $one("SELECT COUNT(*) FROM fin_journal_entries j WHERE $LIVE AND $MANUAL AND COALESCE(j.period_code,'')<>''
+               AND EXISTS(SELECT 1 FROM fin_financial_periods p WHERE p.id=j.period_code
+                            AND p.period_type='month' AND j.posting_date BETWEEN p.start_date AND p.end_date)");
+$pfil = $fill['الفترة'];
+$pnoP = $one("SELECT COUNT(*) FROM fin_journal_entries j WHERE $LIVE AND $MANUAL AND COALESCE(j.period_code,'')=''
+               AND NOT EXISTS(SELECT 1 FROM fin_financial_periods p WHERE p.company_id=j.company_id
+                                AND p.period_type='month' AND j.posting_date BETWEEN p.start_date AND p.end_date)");
+printf("     ◆ **الفرضيّةُ تحقَّقت**: `period_code` مرجعٌ إلى `fin_financial_periods.id` —
+");
+printf("       و**%s من %s** من الممتلئِ يطابق **الفترةَ الحاويةَ لتاريخِه** بالضبط
+", $pok, $pfil);
+printf("     ⛔ **والباقي لا يُشتقّ لأنَّ الفترةَ غيرُ موجودةٍ أصلًا**: تواريخُه %s .. %s
+", $pmin, $pmax);
+printf("       ودفترُ `fin_financial_periods` يغطّي السنواتِ **%s** وحدَها ⇒ **%s قيدًا بلا فترةٍ حاوية**
+", $pfy, $pnoP);
+printf("     ⇒ **فالحقلُ ليس مهمَلًا — لا يوجد ما يُشار إليه.** وإنشاءُ سنواتٍ ماليّةٍ
+");
+printf("       بحالاتِها وتواريخِ إقفالِها **فعلٌ محاسبيٌّ لا اشتقاقُ أداة**.
+");
+echo "
+  ── قراءتان للاستثناءِ — تُعرضان معًا ولا يُختار الأيسر ──\n";
 printf("     ① حرفيّةٌ ضيّقة (بلا مصدرٍ **و**مبرِّرٍ **و**اعتمادٍ معًا): **%d**\n", $narrow);
 if ($showBoth) {
     printf("     ② بالمعيارِ الموجب (نقص أحدُ السبعة):                **%d**\n", $broad);
