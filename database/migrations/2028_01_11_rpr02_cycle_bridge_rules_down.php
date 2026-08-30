@@ -35,3 +35,10 @@ $ok = $conn->query("ALTER TABLE `gov_screen_cycle`
      OR (`bridge_rule` <> 'BASENAME_UNIQUE' AND `screen_id` = ''))");
 if (!$ok) { exit("✘ تعذّر ردُّ القيد: {$conn->error}\n"); }
 echo "  ✔ رُدَّ `chk_cyc_bridge` إلى نصِّه السابق\n";
+
+/* والصنفُ يعود بعدَ تفريغِ ما كُتب به — ⛔ ولا يُضيَّق على قيمةٍ قائمة */
+$okE = $conn->query("ALTER TABLE `gov_screen_cycle` MODIFY `bridge_rule`
+    ENUM('','BASENAME_UNIQUE','AMBIGUOUS_DECLARED','NO_LIVE_SURFACE')
+    NOT NULL DEFAULT ''");
+if (!$okE) { exit("✘ تعذّر ردُّ الصنف: {$conn->error}\n"); }
+echo "  ✔ رُدَّ صنفُ `bridge_rule` إلى أربعتِه\n";

@@ -35,6 +35,16 @@ if ($conn->connect_errno) { exit("تعذّر الاتصال: {$conn->connect_err
 $conn->set_charset('utf8mb4');
 
 @$conn->query("ALTER TABLE `gov_screen_cycle` DROP CONSTRAINT `chk_cyc_bridge`");
+
+/* ◆ **والصنفُ يسبق القيدَ**: `bridge_rule` قائمةٌ مغلقةٌ لا تعرف القاعدةَ
+   الرابعةَ — ⛔ **وقيدٌ يسمح بما لا يقبله العمودُ لا يعني شيئًا**، والصفُّ
+   يُردُّ عند أوّلِ كتابةٍ بحكمٍ لا وجودَ له في القائمة. */
+$okE = $conn->query("ALTER TABLE `gov_screen_cycle` MODIFY `bridge_rule`
+    ENUM('','BASENAME_UNIQUE','AMBIGUOUS_DECLARED','NO_LIVE_SURFACE','PATH_OR_SCOPE_RESOLVED')
+    NOT NULL DEFAULT '' COMMENT 'قاعدة الجسر — والمقياس يعلن ايتها حكمت'");
+if (!$okE) { exit("✘ تعذّر توسيعُ الصنف: {$conn->error}\n"); }
+echo "  ✔ `bridge_rule` صار يعرف القاعدةَ الرابعةَ\n";
+
 $ok = $conn->query("ALTER TABLE `gov_screen_cycle`
     ADD CONSTRAINT `chk_cyc_bridge` CHECK (
         (`bridge_rule` IN ('BASENAME_UNIQUE','PATH_OR_SCOPE_RESOLVED') AND `screen_id` <> '')
