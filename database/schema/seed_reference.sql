@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — البذرة المرجعية (طبقتان)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-01 02:37:25
+-- المصدر: equipation_manage · التوليد: 2026-09-01 02:54:04
 -- ① عالمية: بنية متنكرة في هيئة بيانات — بدونها لا تنقل ولا صلاحيات.
 -- ② مستأجرة: مرجعية تحمل company_id — القيمة علامة نائبة يحقنها المثبت:
 --    {{COMPANY_ID}}
@@ -725,7 +725,8 @@ INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `group_id`, `is_li
 (897,'تقرير المراجعة والقبول','Suppliers/supplier_review_report.php',2,NULL,0,0,'fa fa-square-check',37,'02 إدارة الموردين · SUP-37'),
 (898,'مصادر القدرة والتكامل','Suppliers/supplier_capacity_integration.php',2,NULL,0,0,'fa fa-plug',29,'02 إدارة الموردين · SUP-29'),
 (899,'مصفوفة بنية الشيتات','Fleet/fleet_schema_matrix.php',3,NULL,0,0,'fa fa-table-cells',41,'04 إدارة الأسطول والأصول · FLEET-41'),
-(900,'إسناد أمناء المخازن','Procurement/wh_custodians.php',16,NULL,0,0,'fa fa-user-shield',3,'DEP-17');
+(900,'إسناد أمناء المخازن','Procurement/wh_custodians.php',16,NULL,0,0,'fa fa-user-shield',3,'DEP-17'),
+(901,'التسهيلات البنكية','Finance/tre_facilities.php',21,NULL,0,0,'fa fa-building-columns',14,'DEP-06');
 
 -- ── role_permissions ──
 DELETE FROM `role_permissions`;
@@ -4765,7 +4766,8 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (9726,3,237,1,0,0,0),
 (9727,6,411,1,0,0,0),
 (9728,3,494,1,0,0,0),
-(9735,17,495,1,0,0,0);
+(9735,17,495,1,0,0,0),
+(9736,21,901,1,1,1,0);
 
 -- ── link_groups ──
 DELETE FROM `link_groups`;
@@ -10396,7 +10398,8 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (28881,27,'DAILY',5630,23,'تخصيص المعدات للمشروعات','Oprators/select_project.php','fa fa-file',4001,NULL,'Oprators/select_project.php',1,'2026-09-01 02:02:27','2026-09-01 02:02:27'),
 (28883,27,'DAILY',5631,56,'سجل الأحداث التشغيلية','Workforce/worker_worklog.php','fa fa-file',5001,NULL,'Workforce/worker_worklog.php',1,'2026-09-01 02:02:27','2026-09-01 02:02:27'),
 (28884,27,'DAILY',5631,54,'تسويات العاملين','Workforce/worker_settlement.php','fa fa-file',5002,NULL,'Workforce/worker_settlement.php',1,'2026-09-01 02:02:27','2026-09-01 02:02:27'),
-(28885,17,'DAILY',4387,495,'احتساب إهلاك الفترة','Finance/depr_run.php','fa fa-file',6003,NULL,'Finance/depr_run.php',1,'2026-09-01 02:36:45','2026-09-01 02:36:45');
+(28885,17,'DAILY',4387,495,'احتساب إهلاك الفترة','Finance/depr_run.php','fa fa-file',6003,NULL,'Finance/depr_run.php',1,'2026-09-01 02:36:45','2026-09-01 02:36:45'),
+(28886,21,'DAILY',4501,901,'التسهيلات البنكية','Finance/tre_facilities.php','fa fa-file',6002,NULL,'Finance/tre_facilities.php',1,'2026-09-01 02:49:30','2026-09-01 02:49:30');
 
 -- ── nav_canonical ──
 DELETE FROM `nav_canonical`;
@@ -10961,7 +10964,8 @@ INSERT INTO `nav_canonical` (`id`, `route`, `canonical_ar`, `canonical_en`, `lev
 (5050,'transport/transfer_order_form.php','أمر الترحيل',NULL,2,'العمليات','دوره الترحيل',2002,NULL,NULL,'APPROVED','APPROVED','CURRENT',NULL,'الدليل المعماري — NAVR (ورقة الإدارة · طبقة المواضع)','2026-08-31 18:28:30',NULL,1,'NAVIGATION_NAMING_POSITION',NULL,'اسم السجل المعياري ومجموعته وترتيبه من ورقة الدليل عبر nav_placements — NAVR',NULL,NULL,NULL,NULL,NULL,NULL,'2026-08-31 18:28:30',NULL,NULL,NULL,'SINGLE',NULL,'',NULL,'SCR-0618'),
 (5052,'risk/risk_dept_ceo.php','المخاطر المؤسسية',NULL,2,'العمليات','اللوحه — خارج الدوره',1001,NULL,NULL,'APPROVED','APPROVED','CURRENT',NULL,'الدليل المعماري — NAVR (ورقة الإدارة · طبقة المواضع)','2026-08-31 18:28:30',NULL,1,'NAVIGATION_NAMING_POSITION',NULL,'اسم السجل المعياري ومجموعته وترتيبه من ورقة الدليل عبر nav_placements — NAVR',NULL,NULL,NULL,NULL,NULL,NULL,'2026-08-31 18:28:30',NULL,NULL,NULL,'SINGLE',NULL,'',NULL,'SCR-0532'),
 (5055,'user_capacities.php','صفاتي والتبديل بينها',NULL,2,'العمليات','مساحتي الشخصية',-8997,NULL,NULL,'APPROVED','APPROVED','CURRENT',NULL,'مواصفة مساحة عملي (WS-MY) — NAVR','2026-08-31 21:37:03',NULL,1,'NAVIGATION_NAMING_POSITION',NULL,'ورقة WS-MY·6 عبر nav_placements — NAVR',NULL,NULL,NULL,NULL,NULL,NULL,'2026-08-31 21:37:03',NULL,NULL,NULL,'SINGLE',NULL,'',NULL,'SCR-0625'),
-(5056,'Procurement/wh_custodians.php','إسناد أمناء المخازن',NULL,2,'العمليات','التأسيس المرجعي',3,NULL,NULL,'APPROVED','APPROVED','DEPLOYED',NULL,'الدليل المعماري -3 · ورقة 17 · الشاشة 3 — GOV_EXEC (2026-09-01)',NULL,NULL,1,'NAVIGATION_NAMING_POSITION',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2026-09-01 00:26:16',NULL,NULL,NULL,'SINGLE',NULL,'',NULL,'');
+(5056,'Procurement/wh_custodians.php','إسناد أمناء المخازن',NULL,2,'العمليات','التأسيس المرجعي',3,NULL,NULL,'APPROVED','APPROVED','DEPLOYED',NULL,'الدليل المعماري -3 · ورقة 17 · الشاشة 3 — GOV_EXEC (2026-09-01)',NULL,NULL,1,'NAVIGATION_NAMING_POSITION',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2026-09-01 00:26:16',NULL,NULL,NULL,'SINGLE',NULL,'',NULL,''),
+(5057,'Finance/tre_facilities.php','التسهيلات البنكية',NULL,2,'العمليات','الرقابة والإقفال',14,NULL,NULL,'APPROVED','APPROVED','DEPLOYED',NULL,'الدليل -3 · ورقة 06 · الشاشة 14 — GOV_EXEC',NULL,NULL,1,'NAVIGATION_NAMING_POSITION',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2026-09-01 02:48:48',NULL,NULL,NULL,'SINGLE',NULL,'',NULL,'');
 
 -- ── equipments_types ──
 DELETE FROM `equipments_types`;

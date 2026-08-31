@@ -1,7 +1,7 @@
 {
     "meta": {
-        "snapshot": "3735d5ae",
-        "updated_at": "2026-08-31 23:40",
+        "snapshot": "99d9c87a",
+        "updated_at": "2026-08-31 23:59",
         "governing_order": "docs\/REPAIR01_20260823\/orders\/CLOSURE_SYSTEM.txt",
         "sprint_timeboxes": {
             "SPRINT-01": {
@@ -7314,10 +7314,10 @@
             "Estimated_Effort": "XL",
             "Evidence_Contract": "كل شاشة تبنى بنمط WH-03 الكامل (جدول بقيوده · شاشة بفعليها · التوصيل الكامل · البوابات خضر) وكل ادارة تبلغ §24 تدخل التحقق البشري فورا",
             "Next_Action": "استخراج Sprint من السجل واخذ اعلى الاهداف قيمة — 134 موضعا حاليا (لوحة DEPARTMENT_CONFORMANCE)",
-            "Current_Snapshot": "الباقي 92 موضعا بناء حقيقيا (اكبرها DEP-04 وDEP-12 وDEP-13 وEX-DVP) بترتيب السجل @ 3735d5ae",
-            "Last_Updated_Snapshot": "3735d5ae",
-            "Last_Evidence_Ref": "جولة الجسور المحكومة: +3 تاجيلات مستهلكة قلبت LIVE و9 جسور RULED_BRIDGE بادلتها — مواضع NOT_BUILT 104 ⇒ 92 والمطابق التام 6 ادارات @ 3735d5ae",
-            "Status_Changed_At": "2026-08-31 23:40 @ 3735d5ae",
+            "Current_Snapshot": "عدة التوصيل عممت gov_exec_screen_wire --spec=json وتعلمت درس قالب مستخدم الدور النافذ (FIN-G3) @ 99d9c87a",
+            "Last_Updated_Snapshot": "99d9c87a",
+            "Last_Evidence_Ref": "اول بناء حقيقي من الـ92: التسهيلات البنكية (tre_bank_facility · SCR-0818 · Finance\/tre_facilities.php) كاملة التوصيل — DEP-06 صارت مطابقة تامة (MATCH=7 ادارات) وNOT_BUILT=91 @ 99d9c87a",
+            "Status_Changed_At": "2026-08-31 23:59 @ 99d9c87a",
             "Final_Disposition": "",
             "Levels": {
                 "Decision": "DECIDED",

@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-01 02:37:25
--- الجداول: 998 · المناظير: 28
+-- المصدر: equipation_manage · التوليد: 2026-09-01 02:54:04
+-- الجداول: 999 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -22146,6 +22146,38 @@ CREATE TABLE `transfer_types` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_type_code` (`company_id`,`code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: tre_bank_facility ──
+CREATE TABLE `tre_bank_facility` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'معرف التسهيل — يولده النظام',
+  `company_id` int(11) NOT NULL,
+  `bank_account_id` int(11) NOT NULL COMMENT 'البنك — من سجل الحسابات البنكية والعملة تشتق منه',
+  `facility_type` enum('جاري مدين','تمويل مرابحة','خطابات ضمان','اعتمادات مستندية','تمويل مشروع') NOT NULL,
+  `limit_amount` decimal(18,2) NOT NULL,
+  `aam_ref` varchar(60) DEFAULT NULL COMMENT 'مرجع اعتماد AAM-012 — يقيد عند نفاذ قيم السلم (OA-06)',
+  `used_amount` decimal(18,2) NOT NULL DEFAULT 0.00 COMMENT 'المستخدم — يحدث من حركات الاستخدام والسداد بمرجعها لا يدويا',
+  `used_src_ref` varchar(120) NOT NULL DEFAULT '' COMMENT 'مرجع اخر حركة حدثت المستخدم',
+  `collateral_ref` varchar(120) DEFAULT NULL COMMENT 'الضمانات المقدمة — مرجع سجل الضمانات',
+  `expiry_date` date NOT NULL,
+  `schedule_ref` varchar(120) DEFAULT NULL COMMENT 'جدول السداد — مرجع جدولته عند المالية',
+  `facility_state` enum('ساري','مستنفَد','قيد التجديد','منتهٍ','مجمَّد') NOT NULL DEFAULT 'ساري',
+  `state_note` varchar(300) DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `reviewed_by` int(11) DEFAULT NULL,
+  `approved_by` int(11) DEFAULT NULL,
+  `approved_at` datetime DEFAULT NULL,
+  `data_state` enum('حي','ملغي بمرجع') NOT NULL DEFAULT 'حي',
+  `src_ref` varchar(120) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  KEY `ix_tbf_bank` (`bank_account_id`,`facility_state`),
+  KEY `ix_tbf_co` (`company_id`,`expiry_date`),
+  CONSTRAINT `fk_tbf_bank` FOREIGN KEY (`bank_account_id`) REFERENCES `fin_bank_accounts` (`id`),
+  CONSTRAINT `chk_tbf_limit` CHECK (`limit_amount` > 0),
+  CONSTRAINT `chk_tbf_used` CHECK (`used_amount` >= 0 and `used_amount` <= `limit_amount`),
+  CONSTRAINT `chk_tbf_state_note` CHECK (`facility_state` in ('ساري','مستنفَد') or `state_note` is not null)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='DEP-06 شاشة 14: التسهيلات البنكية — تسهيل × بنك والمتاح يشتق (الحد - المستخدم)';
 
 -- ── Table: tre_beneficiaries ──
 CREATE TABLE `tre_beneficiaries` (
