@@ -86,7 +86,7 @@ foreach (array('exec_approvals', 'exec_decisions', 'assignments', 'role_assignme
 
 /* ⑦ الأدوارُ الماليةُ القديمة ──────────────────────────────────────────── */
 hdr('⑦ حاملو الأدوارِ الماليةِ القديمة');
-$u = q($db, "SELECT r.id, r.name_ar, COUNT(u.id) c FROM roles r LEFT JOIN users u ON u.role_id=r.id GROUP BY r.id ORDER BY r.id");
+$u = q($db, "SELECT r.id, r.name_ar, COUNT(u.id) c FROM roles r LEFT JOIN users u ON CAST(u.role AS SIGNED)=r.id GROUP BY r.id ORDER BY r.id");
 foreach ($u as $x) { if ((int) $x['c'] > 0) { printf("  %3d · %-42s %d مستخدمًا\n", $x['id'], $x['name_ar'], $x['c']); } }
 
 /* ⑧ جداولُ العقود ──────────────────────────────────────────────────────── */

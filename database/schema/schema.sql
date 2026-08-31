@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-01 00:31:17
--- الجداول: 997 · المناظير: 28
+-- المصدر: equipation_manage · التوليد: 2026-09-01 01:46:14
+-- الجداول: 998 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -7703,6 +7703,20 @@ CREATE TABLE `gov_dead_letter_rulings` (
   `ruled_at` datetime NOT NULL,
   PRIMARY KEY (`job_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FR-EVT-007 — لا رسالةَ ميتةً بلا قرارٍ ومالكٍ وسبب';
+
+-- ── Table: gov_decision_propagation ──
+CREATE TABLE `gov_decision_propagation` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `decision_id` varchar(32) NOT NULL,
+  `verdict` enum('RUNTIME_VERIFIED','RUNTIME_PRESENT','TARGET_PROPAGATED_BUILD_PENDING','BLOCKED_OWNER_VALUES','BLOCKED_ENVIRONMENT','UNPROPAGATED') NOT NULL,
+  `probe_kind` varchar(40) NOT NULL COMMENT 'TABLE_PROBE/ENGINE_FILE/REQ_LEDGER/MANUAL/…',
+  `probe_ref` varchar(400) NOT NULL COMMENT 'اسمُ الجدولِ/الملفِّ/الشاهدِ الذي سُبر',
+  `basis` varchar(500) NOT NULL,
+  `measured_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `snapshot_id` varchar(48) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_dec` (`decision_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GOV_EXEC §8: حكمُ نفاذِ كلِّ قرارٍ معتمدٍ بمجسِّه — APPROVED_DECISION_WITH_UNPROPAGATED_IMPACT يقاس منه';
 
 -- ── Table: gov_delegation_state ──
 CREATE TABLE `gov_delegation_state` (
@@ -23108,7 +23122,7 @@ CREATE TABLE `users` (
   `company_id` int(11) DEFAULT NULL COMMENT 'رقم الشركة',
   `employee_id` int(11) DEFAULT NULL COMMENT 'الموظف المرتبط بهذا الحساب',
   `supplier_entity_id` int(11) DEFAULT NULL COMMENT 'H-20: موردُ هذا الحساب — إلزامٌ وظيفيٌّ لدور مشرف الموردين (8)، والحارسُ يقرؤه حصرًا',
-  `role_id` int(11) DEFAULT NULL COMMENT 'رقم الصلاحية',
+  `role_id` int(11) DEFAULT NULL COMMENT 'اثري — الحاكم users.role (حكم sec01: يكتب ولا يقرا) · مردوم من الحاكم بهجرة 2028_02_08 · حذفه النهائي بمراجعة مالك',
   `position_id` int(11) DEFAULT NULL COMMENT 'جسر المنصب (ADR-07/K6) — nullable: NULL = السلوك القائم عبر role كما هو',
   `status` enum('active','inactive','suspended') NOT NULL DEFAULT 'active' COMMENT 'الحالة',
   `force_password_change` tinyint(1) NOT NULL DEFAULT 0,

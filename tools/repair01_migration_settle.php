@@ -208,11 +208,13 @@ foreach ($managed as $f => $ext) {
                  `ROLLBACK_UNPROVEN` 2/3 **وهو تراجعٌ صحيحٌ تامّ**.
                  ⇒ **والقاعدةُ لا تنطبق فتُصحَّح**: المطلوبُ «يحمل جملةَ تراجعٍ»
                  لا «يحمل جملةَ إسقاط» — والتراجعُ عن هجرةِ بياناتٍ **بياناتٌ
-                 تُردّ** لا بنيةٌ تُسقَط. ⛔ ولا يُضعِّف هذا الشرط: سكربتٌ بلا
-                 `DROP` ولا `UPDATE/DELETE/INSERT` **يبقى راسبًا** — فهو لا
-                 يتراجع عن شيء. */
+                 تُردّ** لا بنيةٌ تُسقَط، والتراجعُ عن `ALTER` جملةُ `ALTER`
+                 مقابلةٌ (كإزالةِ وسمِ عمودٍ). ⛔ ولا يُضعِّف هذا الشرط: سكربتٌ
+                 بلا `DROP` ولا `ALTER` ولا `UPDATE/DELETE/INSERT` **يبقى
+                 راسبًا** — فهو لا يتراجع عن شيء. */
             'يحمل جملةَ تراجع' => (bool) preg_match(
                 '/DROP\s+(TABLE|VIEW|INDEX|COLUMN|CONSTRAINT|TRIGGER|FOREIGN\s+KEY|PRIMARY\s+KEY|CHECK)'
+              . '|ALTER\s+TABLE\s+[`\w]'
               . '|UPDATE\s+[`\w]|DELETE\s+FROM\s+[`\w]|INSERT\s+(?:IGNORE\s+)?INTO\s+[`\w]/i', $src),
             'له أصلٌ أمامَ معروف' => (isset($managed[$fwdName]) || isset($ledger[$fwdName])),
         );

@@ -48,7 +48,7 @@ dump_q($db, 'role_permissions', 'SELECT * FROM role_permissions ORDER BY role_id
 dump_q($db, 'gov_profile_items', 'SELECT * FROM gov_profile_items ORDER BY id', $OUT);
 dump_q($db, 'gov_role_profiles', 'SELECT * FROM gov_role_profiles ORDER BY id', $OUT);
 dump_q($db, 'users_by_role', "SELECT r.id AS role_id, r.name AS role_name, COUNT(u.id) AS users_active
-    FROM roles r LEFT JOIN users u ON u.role_id = r.id AND u.is_deleted = 0
+    FROM roles r LEFT JOIN users u ON CAST(u.role AS SIGNED) = r.id AND u.is_deleted = 0
     GROUP BY r.id, r.name ORDER BY r.id", $OUT);
 
 /* الحقول والحساسية */
