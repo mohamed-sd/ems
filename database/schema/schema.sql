@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-30 23:51:54
--- الجداول: 984 · المناظير: 28
+-- المصدر: equipation_manage · التوليد: 2026-08-31 16:01:11
+-- الجداول: 987 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -2769,7 +2769,7 @@ CREATE TABLE `dr_drills` (
   `company_id` int(10) unsigned NOT NULL DEFAULT 1 COMMENT 'عمودُ العزل — TS-02',
   `entity_layer` enum('operations','contracting','holding') NOT NULL DEFAULT 'operations' COMMENT 'TS-03',
   `drill_no` varchar(32) NOT NULL COMMENT 'رقمُ المحضر',
-  `drill_kind` enum('pitr','full_restore','failover') NOT NULL DEFAULT 'pitr',
+  `drill_kind` enum('pitr','full_restore','failover','fresh_install') NOT NULL,
   `started_at` datetime(3) NOT NULL COMMENT 'بدءُ التجربة',
   `finished_at` datetime(3) DEFAULT NULL COMMENT 'نهايتُها — والفارقُ زمنُ الاستعادة',
   `target_point` datetime NOT NULL COMMENT 'PR-04: الدقيقةُ التي استُعيد إليها — لا نسخةٌ بل لحظة',
@@ -8721,9 +8721,9 @@ CREATE TABLE `gov_screen_cycle` (
   `next_state` varchar(255) NOT NULL DEFAULT '' COMMENT '⑤ الحالةُ التالية',
   `consumers` varchar(255) NOT NULL DEFAULT '' COMMENT '⑥ الإدارةُ المستهلكة',
   `fin_impact` varchar(160) NOT NULL DEFAULT '' COMMENT '⑦ الأثرُ الماليّ',
-  `stage_kind` enum('canonical','contextual') NOT NULL DEFAULT 'canonical' COMMENT 'NF-13 — canonical: مرحلةٌ قانونيةٌ في بيتِ الشاشة · contextual: قراءةٌ سياقيةٌ في إدارةٍ أخرى',
+  `stage_kind` enum('canonical','contextual','not_applicable') NOT NULL DEFAULT 'canonical' COMMENT 'NF-13 — canonical: مرحلة قانونية · contextual: قراءة سياقية · not_applicable: سبب عدم انطباق (5-10)',
   `screen_id` varchar(12) NOT NULL DEFAULT '' COMMENT 'معرف الشاشة — الوصل بالمعرف لا بالاسم (7-13)',
-  `bridge_rule` enum('','BASENAME_UNIQUE','AMBIGUOUS_DECLARED','NO_LIVE_SURFACE','PATH_OR_SCOPE_RESOLVED') NOT NULL DEFAULT '' COMMENT 'قاعدة الجسر — والمقياس يعلن ايتها حكمت',
+  `bridge_rule` enum('','BASENAME_UNIQUE','AMBIGUOUS_DECLARED','NO_LIVE_SURFACE','PATH_OR_SCOPE_RESOLVED','C5_AUTHORED','C5_NOT_APPLICABLE','C6_MANUAL_AMBIG') NOT NULL DEFAULT '' COMMENT 'قاعدة الجسر — والمقياس يعلن ايتها حكمت',
   `bridge_witness` varchar(400) NOT NULL DEFAULT '' COMMENT 'شاهد الحل او شاهد تعذره',
   `bridge_snapshot` varchar(48) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
@@ -8731,7 +8731,7 @@ CREATE TABLE `gov_screen_cycle` (
   KEY `ix_dept` (`dept_name`),
   KEY `ix_cyc_screen` (`screen_id`),
   KEY `ix_cyc_rule` (`bridge_rule`),
-  CONSTRAINT `chk_cyc_bridge` CHECK (`bridge_rule` in ('BASENAME_UNIQUE','PATH_OR_SCOPE_RESOLVED') and `screen_id` <> '' or `bridge_rule` not in ('BASENAME_UNIQUE','PATH_OR_SCOPE_RESOLVED') and `screen_id` = '')
+  CONSTRAINT `chk_cyc_bridge` CHECK (`bridge_rule` in ('BASENAME_UNIQUE','PATH_OR_SCOPE_RESOLVED','C5_AUTHORED','C5_NOT_APPLICABLE','C6_MANUAL_AMBIG') and `screen_id` <> '' or `bridge_rule` not in ('BASENAME_UNIQUE','PATH_OR_SCOPE_RESOLVED','C5_AUTHORED','C5_NOT_APPLICABLE','C6_MANUAL_AMBIG') and `screen_id` = '')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='UXW-01 §7-1 — مصفوفةُ التحققِ الحاكمةُ: عناصرُ الدورةِ السبعةُ لكلِّ شاشة';
 
 -- ── Table: gov_screen_path_map ──
@@ -13485,6 +13485,27 @@ CREATE TABLE `repair01_evidence_closure` (
   CONSTRAINT `chk_ec_checks` CHECK (`checks_passed` <> '')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='امر الضبط 5 · مسار الاغلاق بالدليل — سجل كل اغلاق بفحوصه وهو مصدر التراجع';
 
+-- ── Table: repair01_fc_states ──
+CREATE TABLE `repair01_fc_states` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `entity` varchar(64) NOT NULL,
+  `from_state` varchar(40) NOT NULL,
+  `to_state` varchar(40) NOT NULL,
+  `allowed` tinyint(1) NOT NULL DEFAULT 1,
+  `owner_role` varchar(96) NOT NULL DEFAULT '',
+  `precondition` varchar(400) NOT NULL DEFAULT '',
+  `official_doc` varchar(160) NOT NULL DEFAULT '',
+  `approval_gate` varchar(160) NOT NULL DEFAULT '',
+  `reopen_rule` varchar(300) NOT NULL DEFAULT '',
+  `correct_rule` varchar(300) NOT NULL DEFAULT '',
+  `forbid_why` varchar(400) NOT NULL DEFAULT '',
+  `src_ref` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_w15_state` (`entity`,`from_state`,`to_state`),
+  CONSTRAINT `chk_w15_state_forbid` CHECK (`allowed` = 1 or `forbid_why` <> ''),
+  CONSTRAINT `chk_w15_state_owner` CHECK (`allowed` = 0 or `owner_role` <> '')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W15 - الة حالة لكل كيان في النطاق';
+
 -- ── Table: repair01_field_measure ──
 CREATE TABLE `repair01_field_measure` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -13772,6 +13793,26 @@ CREATE TABLE `repair01_owner_actions` (
   CONSTRAINT `chk_oa_decided` CHECK (`status` <> 'DECIDED' or `decided_ref` <> '')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='امر الضبط 10 · OWNER_ACTION_REGISTER — قرار حقيقي مصنف لا طابور تنظيف';
 
+-- ── Table: repair01_owner_close ──
+CREATE TABLE `repair01_owner_close` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `screen_id` varchar(12) NOT NULL COMMENT 'السطح في repair01_screen_registry',
+  `route` varchar(200) NOT NULL,
+  `before_owner` varchar(12) NOT NULL DEFAULT '' COMMENT 'المالك قبل الاسناد (فارغ بقرار W2-D-01)',
+  `before_rule` varchar(48) NOT NULL DEFAULT '',
+  `after_owner` varchar(12) NOT NULL COMMENT 'المالك المسند او PLTF للقدرات المنصية',
+  `assign_rule` varchar(48) NOT NULL COMMENT 'قاعدة الاسناد FC3_*',
+  `witness` varchar(600) NOT NULL COMMENT 'الشاهد المقيس — ولا صف بلا شاهد',
+  `capability` varchar(32) NOT NULL DEFAULT '' COMMENT 'رمز القدرة المنصية لصفوف PLTF',
+  `snapshot_id` varchar(48) NOT NULL,
+  `applied_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_oc_screen` (`screen_id`),
+  CONSTRAINT `chk_oc_witness` CHECK (`witness` <> ''),
+  CONSTRAINT `chk_oc_after` CHECK (`after_owner` <> ''),
+  CONSTRAINT `chk_oc_rule` CHECK (`assign_rule` <> '')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FINAL_CLOSE 1-2 · اغلاق ملكية W2-D-01 المؤجلة بشاهد لكل سطح — وهو مصدر التراجع';
+
 -- ── Table: repair01_ownership ──
 CREATE TABLE `repair01_ownership` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -13881,6 +13922,32 @@ CREATE TABLE `repair01_platform_surface` (
   CONSTRAINT `chk_ps_approved` CHECK (`approval_state` = 'AWAITING_OWNER' or `owner_decision_ref` <> ''),
   CONSTRAINT `chk_ps_payload` CHECK (`bind_rule` = 'P1_DECLARED_SCOPE_OWNER' and `scope_code` <> '' or `bind_rule` = 'P2_CAPABILITY_BOUND' and `capability_code` <> '' or `bind_rule` = 'P3_UNBOUND_DECLARED')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='RPR-02 12-13 · ربط سطح المنصة بقدرته او نطاقه — بقاعدة وشاهد لكل سطح';
+
+-- ── Table: repair01_render_align ──
+CREATE TABLE `repair01_render_align` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `role_id` int(11) NOT NULL COMMENT 'الدور — الحاكم بمفتاح الدور',
+  `route` varchar(160) NOT NULL COMMENT 'المسار',
+  `requirement_id` varchar(40) NOT NULL DEFAULT '' COMMENT 'متطلب الملف المطابق بالجسر',
+  `had_row` tinyint(1) NOT NULL COMMENT '1=كان له اعلان قائم قبل المحاذاة',
+  `gt_id` int(11) DEFAULT NULL COMMENT 'صف الاعلان في gov_target_nav (القائم او المدرج)',
+  `before_group_ar` varchar(120) NOT NULL DEFAULT '' COMMENT 'مجموعة الاعلان قبل (للقائم)',
+  `before_group_no` int(11) NOT NULL DEFAULT 0,
+  `before_item_no` int(11) NOT NULL DEFAULT 0,
+  `after_group_ar` varchar(120) NOT NULL COMMENT 'مجموعة الملف التصميمي',
+  `after_group_no` int(11) NOT NULL,
+  `after_item_no` int(11) NOT NULL,
+  `rendered_before` varchar(220) NOT NULL COMMENT 'الراس والفرعي المصيران قبل — شاهد الشجرة لا الجدول',
+  `witness` varchar(600) NOT NULL COMMENT 'شاهد المحاذاة — ولا صف بلا شاهد',
+  `snapshot_id` varchar(48) NOT NULL COMMENT 'اللقطة',
+  `applied_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_ra_role_route` (`role_id`,`route`),
+  CONSTRAINT `chk_ra_witness` CHECK (`witness` <> ''),
+  CONSTRAINT `chk_ra_snapshot` CHECK (`snapshot_id` <> ''),
+  CONSTRAINT `chk_ra_rendered` CHECK (`rendered_before` <> ''),
+  CONSTRAINT `chk_ra_after` CHECK (`after_group_ar` <> '')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SIDEBAR_RENDER_FIX 4-3 · محاذاة المصير في الحاكم المثبت بحركة العداد — وهو مصدر التراجع';
 
 -- ── Table: repair01_requirements ──
 CREATE TABLE `repair01_requirements` (
