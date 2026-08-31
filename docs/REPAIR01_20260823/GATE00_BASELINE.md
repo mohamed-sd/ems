@@ -1,16 +1,16 @@
 # GATE-00 — ATOMIC REMEDIATION BASELINE
 
 > **الأمرُ الحاكم**: «الأمر المصحح النهائي لحوكمة واستكمال برنامج إصلاح إنجاز» §٣.
-> **Baseline_ID: `BL-20260831c-f592cdf9`** · نافذةُ القياس: 2026-08-31 · 20:40→20:50 (UTC+03).
+> **Baseline_ID: `BL-20260831d-aba54573`** · نافذةُ القياس: 2026-08-31 · 21:50→21:56 (UTC+03).
 
 ## التثبيت
 
 | البند | القيمة |
 |---|---|
-| Commit واحد | `f592cdf9` — الشجرةُ نظيفةٌ قبل التشغيلةِ الحاكمة، و`HEAD` لم يتغيّر أثناءها |
-| Database Snapshot واحدة | `equipation_manage` @ MariaDB 11.4.9 · منفذ 3307 — بصمةُ الحالة: 993 جدولًا · 812 هجرةً مقيَّدة · 21,555 واقعة |
-| Schema Version واحدة | آخرُ هجرةٍ `2028_02_02_navr_placement_model` (مسوّاةٌ بزوجِها) · بوابةُ الهجرات 4/4 |
-| Registry Versions واحدة | `screen_registry` 813 · `nav_placements` 374 · `nav_workspaces` 22 · `uxui_matrix` 3153 صفًّا |
+| Commit واحد | `aba54573` — الشجرةُ نظيفةٌ قبل التشغيلةِ الحاكمة، و`HEAD` لم يتغيّر أثناءها (أُعيد القصُّ بعد اكتمالِ NAVR البنيويِّ — انزياحُ حزمةِ f592cdf9 كشفته المراجعةُ العكسيّةُ وأُغلق بهذه) |
+| Database Snapshot واحدة | `equipation_manage` @ MariaDB 11.4.9 · منفذ 3307 — بصمةُ الحالة: 995 جدولًا · 816 هجرةً مقيَّدة · 21,555 واقعة |
+| Schema Version واحدة | آخرُ هجرةٍ `2028_02_04_navr_legacy_recon` (مسوّاةٌ بزوجِها) · بوابةُ الهجرات 4/4 |
+| Registry Versions واحدة | `screen_registry` 813 · `nav_placements` 412 · `nav_workspaces` 22 · `uxui_matrix` 3153 صفًّا |
 | Environment واحدة | WAMP محلي · Windows 11 Pro (كما في SNAPSHOT) |
 | نافذة قياس واحدة | تشغيلةٌ حاكمةٌ واحدةٌ متتابعة: dumps ← disk_scan ← reconcile ← field_extract ← compare+metrics |
 
@@ -31,10 +31,10 @@
 
 | المعيار | القيمة |
 |---|---|
-| `EVIDENCE_PACKAGE_COMMIT_COUNT` | **1** (`f592cdf9`) |
+| `EVIDENCE_PACKAGE_COMMIT_COUNT` | **1** (`aba54573`) |
 | `EVIDENCE_PACKAGE_DB_SNAPSHOT_COUNT` | **1** (النافذةُ الواحدةُ أعلاه — و`HEAD` ثابتٌ قبلها وبعدها) |
 | `STALE_CURRENT_SECTION_COUNT` | **0** — كلُّ رقمٍ تاريخيٍّ في الحزمةِ موسومٌ `HISTORICAL` بنصِّه أو محكومٌ بقاعدةِ قراءةٍ صريحةٍ في رأسِ وثيقتِه |
-| Baseline_ID موحَّد | **نعم** — الوثائقُ الثماني تحمل `BL-20260831c-f592cdf9` |
+| Baseline_ID موحَّد | **نعم** — الوثائقُ الثماني تحمل `BL-20260831d-aba54573` |
 
 ## أحكامُ §٣٠ — ما أثبتته الحزمةُ عن أعمالِ Sprint-01
 

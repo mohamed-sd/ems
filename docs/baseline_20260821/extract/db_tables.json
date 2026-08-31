@@ -149,7 +149,7 @@
     {
         "TABLE_NAME": "activity_logs",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "83896",
+        "TABLE_ROWS": "83926",
         "col_count": "27",
         "has_company": "1"
     },
@@ -891,7 +891,7 @@
     {
         "TABLE_NAME": "ems_job_queue",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "19082",
+        "TABLE_ROWS": "19136",
         "col_count": "23",
         "has_company": "1"
     },
@@ -1626,7 +1626,7 @@
     {
         "TABLE_NAME": "fin_notifications",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "8584",
+        "TABLE_ROWS": "8627",
         "col_count": "8",
         "has_company": "1"
     },
@@ -2359,6 +2359,13 @@
         "has_company": "1"
     },
     {
+        "TABLE_NAME": "gov_legacy_nav_recon",
+        "TABLE_TYPE": "BASE TABLE",
+        "TABLE_ROWS": "725",
+        "col_count": "9",
+        "has_company": "0"
+    },
+    {
         "TABLE_NAME": "gov_migration_ledger",
         "TABLE_TYPE": "BASE TABLE",
         "TABLE_ROWS": "649",
@@ -2368,7 +2375,7 @@
     {
         "TABLE_NAME": "gov_migration_settlement",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "342",
+        "TABLE_ROWS": "345",
         "col_count": "10",
         "has_company": "0"
     },
@@ -2921,7 +2928,7 @@
     {
         "TABLE_NAME": "link_groups",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "2973",
+        "TABLE_ROWS": "2974",
         "col_count": "10",
         "has_company": "0"
     },
@@ -3110,7 +3117,7 @@
     {
         "TABLE_NAME": "nav_canonical",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "540",
+        "TABLE_ROWS": "541",
         "col_count": "36",
         "has_company": "0"
     },
@@ -3145,7 +3152,7 @@
     {
         "TABLE_NAME": "nav_items",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "2638",
+        "TABLE_ROWS": "2661",
         "col_count": "14",
         "has_company": "0"
     },
@@ -3194,7 +3201,7 @@
     {
         "TABLE_NAME": "nav_lifecycle_groups",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "110",
+        "TABLE_ROWS": "118",
         "col_count": "7",
         "has_company": "0"
     },
@@ -3215,8 +3222,8 @@
     {
         "TABLE_NAME": "nav_placements",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "374",
-        "col_count": "10",
+        "TABLE_ROWS": "412",
+        "col_count": "11",
         "has_company": "0"
     },
     {
@@ -3234,6 +3241,13 @@
         "has_company": "0"
     },
     {
+        "TABLE_NAME": "nav_targets",
+        "TABLE_TYPE": "BASE TABLE",
+        "TABLE_ROWS": "412",
+        "col_count": "10",
+        "has_company": "0"
+    },
+    {
         "TABLE_NAME": "nav_workspaces",
         "TABLE_TYPE": "BASE TABLE",
         "TABLE_ROWS": "22",
@@ -3243,8 +3257,8 @@
     {
         "TABLE_NAME": "nav_ws_roles",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "17",
-        "col_count": "4",
+        "TABLE_ROWS": "18",
+        "col_count": "5",
         "has_company": "0"
     },
     {
@@ -7135,7 +7149,7 @@
     {
         "TABLE_NAME": "work_items",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "4014",
+        "TABLE_ROWS": "4122",
         "col_count": "41",
         "has_company": "1"
     },

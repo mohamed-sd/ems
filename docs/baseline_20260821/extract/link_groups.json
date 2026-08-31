@@ -5160,6 +5160,18 @@
         "stage_desc": null
     },
     {
+        "id": "6495",
+        "name": "مساحتي الشخصية",
+        "group_code": null,
+        "owner_role_id": "5",
+        "icon": "fa fa-user",
+        "display_order": "5",
+        "stage_no": "0",
+        "stage_title": "مساحتي الشخصية",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
         "id": "58",
         "name": "لوحة الإدارة",
         "group_code": "g1",
