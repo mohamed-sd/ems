@@ -143,6 +143,23 @@ function fm_extract($src)
     if (preg_match_all('~\b(?:aria-label|placeholder)\s*=\s*[\x22\x27]([^\x22\x27]+)[\x22\x27]~i', $src, $m)) {
         foreach ($m[1] as $t) { $t = trim(strip_tags($t)); if ($t !== '') { $lab[] = $t; } }
     }
+    /* ◆ **F7 · حقولُ نافذةِ التفاصيلِ الموحَّدة (FINAL_CLOSE ⑭)** — مبنيّةٌ
+         يراها المستخدمُ في `EmsDetailsModal` وتضيع على الأثرِ الساكن: تُعلَن
+         في ملفِّ السطحِ بنداءاتِ `ems_wf_field('الوسم', …)` أو ببناءاتِ
+         `label:` في حمولةِ المودال أو بأزواجِ `'label' => …, 'value' =>` —
+         **وسمُ حقلٍ مقرونٌ بقيمتِه لا زرٌّ ولا ترويسة** (فأزرارُ
+         `$header_actions` تحمل `label` بلا `value` فلا تدخل). */
+    if (preg_match_all('~ems_wf_field\s*\(\s*[\x22\x27]([^\x22\x27]+)[\x22\x27]~u', $src, $m)) {
+        foreach ($m[1] as $t) { $t = trim($t); if ($t !== '') { $lab[] = $t; } }
+    }
+    if (preg_match_all('~[\x22\x27]?label[\x22\x27]?\s*(?:=>|:)\s*[\x22\x27]([^\x22\x27]+)[\x22\x27]\s*,\s*[\x22\x27]?value[\x22\x27]?\s*(?:=>|:)~u', $src, $m)) {
+        foreach ($m[1] as $t) { $t = trim(strip_tags($t)); if ($t !== '') { $lab[] = $t; } }
+    }
+    if (preg_match_all('~EmsDetailsModal[\s\S]{0,4000}?~u', $src, $mDm) && strpos($src, 'EmsDetailsModal') !== false) {
+        if (preg_match_all('~\blabel\s*:\s*[\x22\x27]([^\x22\x27]+)[\x22\x27]~u', $src, $m)) {
+            foreach ($m[1] as $t) { $t = trim(strip_tags($t)); if ($t !== '') { $lab[] = $t; } }
+        }
+    }
     return array('F1' => $lab, 'F2' => $th, 'F3' => $nm);
 }
 /* **سبيكةُ `u13` مصرَّحةً في ملفِّ السطح** — الجسرُ إلى `gov_field_class`.
@@ -401,6 +418,14 @@ foreach ($bridge as $b) {
                    'audit' => $nAud, 'appl' => $nApp, 'hit' => $nHit, 'miss' => $miss,
                    'slug' => $slug, 'redir' => $redir, 'gfc' => $nGfc, 'act' => $nAct,
                    'path' => $p === '' ? '' : str_replace($ROOT . '/', '', $p));
+}
+
+/* ── FINAL_CLOSE ⑭: تفريغُ النقصِ كاملًا للتحليلِ والبناء — --dump=<ملف> ── */
+foreach ($argv as $a0) {
+    if (strpos($a0, '--dump=') === 0) {
+        file_put_contents(substr($a0, 7), json_encode($out, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+        echo "  ✔ فُرِّغ التفصيلُ إلى " . substr($a0, 7) . "\n";
+    }
 }
 
 /* ═══ ⑧ العرض ════════════════════════════════════════════════════════════ */
