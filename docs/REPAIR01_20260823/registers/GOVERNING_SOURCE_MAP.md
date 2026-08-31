@@ -32,6 +32,9 @@
 | OWNERSHIP | الملكية | TARGET_REGISTRY | أحكام `gov_ownership_rulings` (سجل القرارات الدائم) | الدليل (owner لكل ورقة) | Owner | `repair01_screen_registry.owner_code` | — (حوكمة) | شاهد ownership 3/3 | الحكم ← السجل | قائم | ACTIVE |
 | REPORTS | التقارير | GOVERNING_DOCUMENT | ورقات الدليل (مجموعات التقارير) | `PROJECTION` في السجل | Owner | placements (`PROJECTION`/MENU) | كالملاحة | METRICS | كالملاحة | 2026-08-31 | ACTIVE |
 | LEGACY-NAV | `gov_target_nav` القديم | **CURRENT_STATE_SNAPSHOT** (أُسقطت صلاحيّتُه Target) | — | — | — | — | قارئُ إرثٍ لغيرِ المغطَّى (مُعلَنًا · يُقاس `LEGACY_TARGET_RUNTIME_READ_COUNT`) | `LEGACY_NAV_RECONCILIATION` | لا يعتمد نفسَه | 2026-08-31 | RETIRING |
+| DECISIONS | قراراتُ المالكِ كلُّها | OWNER_DECISION | `09 › OWNER_DECISIONS_MASTER` (125: 114 معتمدًا · 11 بانتظارِ قيم) | `05_سجل_القرارات` | هو نفسُه | `OWNER_ACTION_REGISTER` | إسقاطُ كلِّ قرارٍ في طبقتِه (يُثبَت بـ`DECISION_PROPAGATION_REGISTER`) | سجلُّ الإسقاطِ + بوّاباتُ القرارات | القرارُ المعتمدُ يعلو الكلَّ (§٢) | 2026-09-01 | ACTIVE |
+| CONSTITUTION | المبادئُ والقواعد | GOVERNING_DOCUMENT | `03 › 00_الدستور_والمقامات` (المواد حتى م122) | ورقاتُ `A..J` | Owner | `CONSTITUTION_COMPLIANCE` | فحوصُ الامتثالِ الحيّةُ (البوّاباتُ والشهودُ الممثِّلون لموادِّه) | `CONSTITUTION_COMPLIANCE.md` | الدستورُ بعد القرارِ المعتمد (§٢) | 2026-09-01 | ACTIVE |
+| CURRENT-STATE | واقعُ النظامِ المبنيّ | **CURRENT_STATE_SNAPSHOT** | سجلُّ الشاشاتِ ولقطاتُ القياس (`BL-*`) | حزمةُ GATE-00 | — | — | **مرجعٌ يُقاس عليه لا هدف** (م115 · صفُّ J13) — يقترح كشفًا ولا يعتمد نفسَه | لقطاتُ `BL` الموثَّقة | لا يشتقُّ هدفًا | 2026-09-01 | ACTIVE |
 
 ## قاعدةُ §١٣ — لا `NO_SPEC` قبل استنفادِ مصادرِ النطاق
 
