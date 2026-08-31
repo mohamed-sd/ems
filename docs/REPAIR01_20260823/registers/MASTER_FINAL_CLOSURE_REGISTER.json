@@ -1,7 +1,7 @@
 {
     "meta": {
-        "snapshot": "a60f6d97",
-        "updated_at": "2026-08-31 22:46",
+        "snapshot": "9e30ff72",
+        "updated_at": "2026-08-31 23:15",
         "governing_order": "docs\/REPAIR01_20260823\/orders\/CLOSURE_SYSTEM.txt",
         "sprint_timeboxes": {
             "SPRINT-01": {
@@ -7314,10 +7314,10 @@
             "Estimated_Effort": "XL",
             "Evidence_Contract": "كل شاشة تبنى بنمط WH-03 الكامل (جدول بقيوده · شاشة بفعليها · التوصيل الكامل · البوابات خضر) وكل ادارة تبلغ §24 تدخل التحقق البشري فورا",
             "Next_Action": "استخراج Sprint من السجل واخذ اعلى الاهداف قيمة — 134 موضعا حاليا (لوحة DEPARTMENT_CONFORMANCE)",
-            "Current_Snapshot": "OPEN @ 909cf6a3",
-            "Last_Updated_Snapshot": "909cf6a3",
-            "Last_Evidence_Ref": "قياس pack12 @ 909cf6a3",
-            "Status_Changed_At": "2026-09-01 02:20 @ 909cf6a3",
+            "Current_Snapshot": "الباقي 104 موضعا بناء حقيقيا بترتيب السجل — وارتداد 153 حكما علم ان المرساة بلا شهادة بناء نطاق فحص لا برهان خدمة @ 9e30ff72",
+            "Last_Updated_Snapshot": "9e30ff72",
+            "Last_Evidence_Ref": "مصالحة المراسي الشاهدة: 60 هدفا حسم MERGED_INTO بشهادة بناء موجته (LIVE\/BUILT_*) — مواضع NOT_BUILT 134 ⇒ 104 والكون 291 ⇒ 228 @ 9e30ff72",
+            "Status_Changed_At": "2026-08-31 23:15 @ 9e30ff72",
             "Final_Disposition": "",
             "Levels": {
                 "Decision": "DECIDED",

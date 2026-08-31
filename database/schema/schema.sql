@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-01 01:46:14
+-- المصدر: equipation_manage · التوليد: 2026-09-01 02:12:14
 -- الجداول: 998 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
@@ -14351,7 +14351,7 @@ CREATE TABLE `repair01_target_universe` (
   `requirement_id` varchar(32) NOT NULL DEFAULT '' COMMENT 'من دفترنا',
   `screen_id` varchar(12) NOT NULL DEFAULT '' COMMENT 'من سجلهم',
   `gap_id` int(11) DEFAULT NULL COMMENT 'صف دفتر الاهداف غير المبنية',
-  `match_method` enum('EXACT_UNIT','EXACT_ANY','COMPOUND_SPLIT','CONTAINMENT_CANDIDATE','NONE') NOT NULL DEFAULT 'NONE' COMMENT 'كيف طوبق — ويعلن ولا يخفى',
+  `match_method` enum('EXACT_UNIT','EXACT_ANY','COMPOUND_SPLIT','CONTAINMENT_CANDIDATE','WAVE_ANCHOR','NONE') NOT NULL DEFAULT 'NONE' COMMENT 'طريق المطابقة — WAVE_ANCHOR: مرساة دفتر موجة مثبتة من القرص',
   `match_witness` varchar(400) NOT NULL DEFAULT '' COMMENT 'الشاهد المقيس على المطابقة',
   `verdict` enum('MATCHED','MERGED_INTO','TAB_CHILD','PROJECTION','NOT_BUILT','NOT_APPLICABLE','RETIRED_TARGET') DEFAULT NULL COMMENT 'احكام RPR-02 §4-2 السبعة — وفارغ يعني لم يحكم بعد',
   `verdict_witness` varchar(400) NOT NULL DEFAULT '' COMMENT 'مرجع الدليل ومصدر القرار — وحكم بلا شاهد لا يقبل',

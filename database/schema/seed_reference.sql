@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — البذرة المرجعية (طبقتان)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-01 01:46:14
+-- المصدر: equipation_manage · التوليد: 2026-09-01 02:12:14
 -- ① عالمية: بنية متنكرة في هيئة بيانات — بدونها لا تنقل ولا صلاحيات.
 -- ② مستأجرة: مرجعية تحمل company_id — القيمة علامة نائبة يحقنها المثبت:
 --    {{COMPANY_ID}}
@@ -4755,7 +4755,16 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (9716,11,899,1,0,0,0),
 (9717,27,55,1,1,1,1),
 (9718,1,56,1,0,0,0),
-(9719,25,900,1,1,1,0);
+(9719,25,900,1,1,1,0),
+(9720,27,9,1,0,0,0),
+(9721,27,23,1,0,0,0),
+(9722,27,48,1,0,0,0),
+(9723,27,54,1,0,0,0),
+(9724,27,56,1,0,0,0),
+(9725,3,210,1,0,0,0),
+(9726,3,237,1,0,0,0),
+(9727,6,411,1,0,0,0),
+(9728,3,494,1,0,0,0);
 
 -- ── link_groups ──
 DELETE FROM `link_groups`;
@@ -7756,7 +7765,10 @@ INSERT INTO `link_groups` (`id`, `name`, `group_code`, `owner_role_id`, `icon`, 
 (6492,'اللوحه — خارج الدوره',NULL,28,'fa fa-folder',91,90,'اللوحه — خارج الدوره',1,NULL),
 (6493,'اللوحه — خارج الدوره',NULL,24,'fa fa-folder',91,90,'اللوحه — خارج الدوره',1,NULL),
 (6494,'الاحتياج والتغطيه',NULL,27,'fa fa-folder',92,90,'الاحتياج والتغطيه',1,NULL),
-(6495,'مساحتي الشخصية',NULL,5,'fa fa-user',5,0,'مساحتي الشخصية',1,NULL);
+(6495,'مساحتي الشخصية',NULL,5,'fa fa-user',5,0,'مساحتي الشخصية',1,NULL),
+(6496,'هـ · الرقابة الفنية',NULL,3,'fa fa-folder',95,90,'هـ · الرقابة الفنية',1,NULL),
+(6497,'ز · الاستثناءات والقرارات',NULL,3,'fa fa-folder',97,90,'ز · الاستثناءات والقرارات',1,NULL),
+(6498,'اللوحة — خارج الدورة (Overview)',NULL,6,'fa fa-folder',91,90,'اللوحة — خارج الدورة (Overview)',1,NULL);
 
 -- ── nav_items ──
 DELETE FROM `nav_items`;
@@ -10367,7 +10379,22 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (28865,19,'DAILY',3651,182,'صفاتي والتبديل بينها','user_capacities.php','fa fa-id-badge',5,NULL,'user_capacities.php',1,'2026-08-31 21:37:03','2026-08-31 21:37:03'),
 (28866,20,'DAILY',3686,182,'صفاتي والتبديل بينها','user_capacities.php','fa fa-id-badge',5,NULL,'user_capacities.php',1,'2026-08-31 21:37:03','2026-08-31 21:37:03'),
 (28867,21,'DAILY',3721,182,'صفاتي والتبديل بينها','user_capacities.php','fa fa-id-badge',5,NULL,'user_capacities.php',1,'2026-08-31 21:37:03','2026-08-31 21:37:03'),
-(28868,22,'DAILY',3756,182,'صفاتي والتبديل بينها','user_capacities.php','fa fa-id-badge',5,NULL,'user_capacities.php',1,'2026-08-31 21:37:03','2026-08-31 21:37:03');
+(28868,22,'DAILY',3756,182,'صفاتي والتبديل بينها','user_capacities.php','fa fa-id-badge',5,NULL,'user_capacities.php',1,'2026-08-31 21:37:03','2026-08-31 21:37:03'),
+(28869,3,'DAILY',6496,405,'بطاقة المعدة','Equipments/equipment_profile.php','fa fa-file',5002,NULL,'Equipments/equipment_profile.php',1,'2026-09-01 02:01:48','2026-09-01 02:01:48'),
+(28870,3,'DAILY',6496,406,'تقرير الأعطال','Equipments/fleet_failures.php','fa fa-file',5003,NULL,'Equipments/fleet_failures.php',1,'2026-09-01 02:01:48','2026-09-01 02:01:48'),
+(28871,1,'DAILY',5615,412,'طلب تبديل','Operations/swap_request.php','fa fa-file',2004,NULL,'Operations/swap_request.php',1,'2026-09-01 02:01:48','2026-09-01 02:01:48'),
+(28872,6,'DAILY',5624,431,'تفاصيل الوحدة','Timesheet/timesheet_details.php','fa fa-file',5001,NULL,'Timesheet/timesheet_details.php',1,'2026-09-01 02:01:48','2026-09-01 02:01:48'),
+(28873,13,'DAILY',4246,197,'تقرير الأعطال (التصنيف الموحد)','Maintenance/failure_report.php','fa fa-file',4003,NULL,'Maintenance/failure_report.php',1,'2026-09-01 02:01:48','2026-09-01 02:01:48');
+INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `label_ar`, `route`, `icon`, `sort_order`, `counter_source`, `permission_code`, `active`, `created_at`, `updated_at`) VALUES
+(28874,3,'DAILY',6497,237,'طلبات الاستثناء','Governance/exceptions.php','fa fa-file',7001,NULL,'Governance/exceptions.php',1,'2026-09-01 02:02:27','2026-09-01 02:02:27'),
+(28875,3,'DAILY',6475,494,'ربط الأصل بساعات تشغيله','Finance/asset_hours_link.php','fa fa-file',10006,NULL,'Finance/asset_hours_link.php',1,'2026-09-01 02:02:27','2026-09-01 02:02:27'),
+(28876,3,'DAILY',6475,210,'سجل الممولين','Financing/financiers_registry.php','fa fa-file',10007,NULL,'Financing/financiers_registry.php',1,'2026-09-01 02:02:27','2026-09-01 02:02:27'),
+(28877,6,'DAILY',6498,411,'لوحة المواقع','Operations/sites_board.php','fa fa-file',1001,NULL,'Operations/sites_board.php',1,'2026-09-01 02:02:27','2026-09-01 02:02:27'),
+(28879,27,'DAILY',5628,48,'عقود العاملين','Workforce/worker_contract.php','fa fa-file',2004,NULL,'Workforce/worker_contract.php',1,'2026-09-01 02:02:27','2026-09-01 02:02:27'),
+(28880,27,'DAILY',5629,9,'شاشة التشغيل','Oprators/oprators.php','fa fa-file',3002,NULL,'Oprators/oprators.php',1,'2026-09-01 02:02:27','2026-09-01 02:02:27'),
+(28881,27,'DAILY',5630,23,'تخصيص المعدات للمشروعات','Oprators/select_project.php','fa fa-file',4001,NULL,'Oprators/select_project.php',1,'2026-09-01 02:02:27','2026-09-01 02:02:27'),
+(28883,27,'DAILY',5631,56,'سجل الأحداث التشغيلية','Workforce/worker_worklog.php','fa fa-file',5001,NULL,'Workforce/worker_worklog.php',1,'2026-09-01 02:02:27','2026-09-01 02:02:27'),
+(28884,27,'DAILY',5631,54,'تسويات العاملين','Workforce/worker_settlement.php','fa fa-file',5002,NULL,'Workforce/worker_settlement.php',1,'2026-09-01 02:02:27','2026-09-01 02:02:27');
 
 -- ── nav_canonical ──
 DELETE FROM `nav_canonical`;

@@ -171,11 +171,12 @@ foreach ($need as $bn => $x) {
         if ($conn->query($sql)) { $okC++; } else { $errs[] = 'cycle ' . $bn . ': ' . $conn->error; }
     }
     if ($x['miss_space']) {
+        /* الجدولُ بعدّادٍ يدويٍّ لا AUTO_INCREMENT — الإدراجُ بلا id يسقط على '0' مكرَّرًا */
         $sql = "INSERT INTO gov_space_appearances
-            (space_ar, space_kind, tab_ar, screen_ar, route, owner_dept_ar, owner_kind,
+            (id, space_ar, space_kind, tab_ar, screen_ar, route, owner_dept_ar, owner_kind,
              src_class, src_ownership, src_decision, src_note, spaces_count,
              cls, ownership, decision, basis, rule_step, view_fields, updated_at)
-            VALUES ('" . $e($x['space_ar']) . "', 'DEPARTMENT', '" . $e($x['group']) . "',
+            SELECT COALESCE(MAX(id),0)+1, '" . $e($x['space_ar']) . "', 'DEPARTMENT', '" . $e($x['group']) . "',
                     '" . $e($x['label']) . "', '" . $e($x['route']) . "',
                     '" . $e($x['space_ar']) . "', 'BUSINESS_DEPARTMENT',
                     'OWNED', 'VALID', 'CONFIRMED',
@@ -183,7 +184,7 @@ foreach ($need as $bn => $x) {
                     1, 'OWNED', 'VALID', 'CONFIRMED',
                     'المساحةُ هي المالكُ: السجلُّ الرسميُّ يُسند السطحَ إلى " . $e($x['owner_code'])
                     . " — وبندُ الملاحةِ يظهر في مساحتِه هو',
-                    1, '', NOW())";
+                    1, '', NOW() FROM gov_space_appearances";
         if ($conn->query($sql)) { $okS++; } else { $errs[] = 'space ' . $bn . ': ' . $conn->error; }
     }
 }
