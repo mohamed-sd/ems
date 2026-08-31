@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-31 16:01:11
--- الجداول: 987 · المناظير: 28
+-- المصدر: equipation_manage · التوليد: 2026-08-31 16:52:05
+-- الجداول: 988 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -3244,6 +3244,20 @@ CREATE TABLE `ems_business_events` (
   CONSTRAINT `chk_consumers` CHECK (`consumers_declared` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ADR-15: الجذر المحايد — سجل الحقائق المؤسسي append-only؛ القناة: EventPublisher حصرًا؛ الدفتر المالي إسقاطه الأول';
 
+-- ── Table: ems_delivery_key_quarantine ──
+CREATE TABLE `ems_delivery_key_quarantine` (
+  `id` bigint(20) unsigned NOT NULL,
+  `consumer` varchar(64) NOT NULL,
+  `consumer_key` varchar(64) NOT NULL,
+  `event_id` bigint(20) unsigned NOT NULL,
+  `outbox_id` bigint(20) unsigned NOT NULL,
+  `state` varchar(16) NOT NULL,
+  `seed_tag` varchar(32) DEFAULT NULL,
+  `quarantined_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `reason` varchar(200) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GAP-77: حجرُ صفوفِ تسليمٍ مفتاحُها نصٌّ بشريٌّ من بذرِ UAT — مؤرشَفةٌ قبلَ الحذفِ بسابقةِ GAP-09';
+
 -- ── Table: ems_event_consumers ──
 CREATE TABLE `ems_event_consumers` (
   `consumer` varchar(64) NOT NULL COMMENT 'اسم المستهلك المسجَّل (finance, analytics, …)',
@@ -3296,7 +3310,8 @@ CREATE TABLE `ems_event_deliveries` (
   CONSTRAINT `fk_evdeliv_event` FOREIGN KEY (`event_id`) REFERENCES `ems_business_events` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `chk_result` CHECK (`state` <> 'processed' or `result_ref` is not null),
   CONSTRAINT `chk_fail` CHECK (`state` not in ('failed','dlq') or `fail_code` is not null),
-  CONSTRAINT `chk_keypure_ems_event_deliveries_consumer` CHECK (`consumer`  not like '% %' and `consumer`  not like '%·%')
+  CONSTRAINT `chk_keypure_ems_event_deliveries_consumer` CHECK (`consumer`  not like '% %' and `consumer`  not like '%·%'),
+  CONSTRAINT `chk_evdeliv_key_machine` CHECK (`consumer_key`  not like '% %' and `consumer_key`  not like '%·%')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='K4: محاولات تسليمٍ جارية (تُحذف عند النجاح أو تنتقل للرسائل الميتة)';
 
 -- ── Table: ems_event_delivery_orphans ──

@@ -1,7 +1,7 @@
 # MASTER FINAL CLOSURE REGISTER — السجلُّ الجامعُ للإغلاقِ النهائيّ
 
 > **المخزنُ الحاكم:** `registers/MASTER_FINAL_CLOSURE_REGISTER.json` — وهذا إسقاطُه.
-> **اللقطة:** `cf1ea2a1` · **حُدِّث:** 2026-08-31 13:21
+> **اللقطة:** `ad1bf56f` · **حُدِّث:** 2026-08-31 17:25
 > **المصمَّمُ الحاكم:** `docs/REPAIR01_20260823/orders/CLOSURE_SYSTEM.txt`
 
 ## مقامُ الحالات — ⛔ ولا تُجمَع في نسبةٍ واحدة
@@ -10,12 +10,12 @@
 |---|---|
 | `BLOCKED_ENVIRONMENT` | 1 |
 | `BLOCKED_GOVERNING_SOURCE` | 1 |
-| `BLOCKED_OWNER` | 25 |
+| `BLOCKED_OWNER` | 26 |
 | `BLOCKED_UAT` | 3 |
-| `EVIDENCE_CLOSED` | 93 |
+| `EVIDENCE_CLOSED` | 96 |
 | `IMPLEMENTED_NOT_VERIFIED` | 23 |
 | `OPEN` | 10 |
-| **الجملة** | **156** |
+| **الجملة** | **160** |
 
 ## البنودُ غيرُ المغلقة — بحاجزِها وفعلِها التالي
 
@@ -66,6 +66,7 @@
 | `CL-OA-05` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | orders/CLOSURE_SYSTEM.txt §الوثيقة الرابعة | قرار مقام التايم شيت (يعرض بالتسعة المنصوصة في الأمر §4) @ 808a2c03 | ينتظر بوابته — ولا يحجب إلا نطاقه |
 | `CL-OA-06` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | orders/CLOSURE_SYSTEM.txt §الوثيقة الرابعة | قيم الاعتماد (حدود السلم) عند نافذة الظل @ 808a2c03 | ينتظر بوابته — ولا يحجب إلا نطاقه |
 | `CL-OA-07` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | registers/OWNER_ACTION_REGISTER.md | اعتماد الاصدار الهدف للكونين المؤجلين @ c60c09b7 | ينتظر بوابته — ولا يحجب إلا نطاقه |
+| `CL-GAP-63` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/baseline_20260821/FINDINGS.md F-H19 | نافذة ظل الاعتماد صفر تقييم — مرجعها CL-FR-APP-002/004 (BLOCKED_OWNER) وOA-06 قيم الاعتماد | تنتظر قيم الاعتماد (OA-06) ووقائع حية — والمحرك مبني (app001 11/11) |
 | `CL-GAP-03` | `OPEN` | P2 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
 | `CL-GAP-12` | `OPEN` | P2 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
 | `CL-GAP-14` | `OPEN` | P2 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
@@ -97,6 +98,7 @@
 | `CL-FR-DAT-002` |  |
 | `CL-FR-GOV-009` | tests/injfrd01_gov009_migration_ledger_gate.php 9/9 — بوابة 4/4 · غير مصالح=0 · السالب يرسب بالحقن · Commit=ec0aff80 @ ec0aff80 |
 | `CL-FR-GOV-015` | nine_channels 15/15 @ 747cfbe7 — ACTIVE_SENSITIVE_FIELD_BYPASS=0 والسالب مثبت @ 012c4db7 |
+| `CL-GAP-76` | CL-WORK-03 + tests/injfix01_scheduler_parity_proof.php 5/5 @ ad1bf56f |
 | `CL-WORK-04` | REQUIRED_SETTLEMENT_EFFECT_MISSING=0 مقيسا + settlement_proof 16/16 + eng01_bus_test 22/22 + rpr03_contract_register صفر مفردة بلا عقد @ 59136c85 |
 | `CL-WORK-05` | سقاطتان شدتا (permission 72⇒20 · extraction 77⇒36 بتمديد الاستخراج للعديات) ودينان جديدان سدا لا شدا (قارئ وهمي + ملكية cron_task) — الحزام 25⇒30/34 والمقامات ثابتة @ 59136c85 |
 | `CL-GAP-01` | tools/injfix01_gap_coverage.php @ 808a2c03 |
@@ -155,6 +157,8 @@
 | `CL-R2-T12` | tools/rpr02_acceptance_scorecard.php @ 808a2c03 |
 | `CL-R2-T14` | tools/rpr02_acceptance_scorecard.php @ 808a2c03 |
 | `CL-R2-T15` | tools/rpr02_acceptance_scorecard.php @ 808a2c03 |
+| `CL-GAP-56` | tools/injfix01_gap_coverage.php --negative + tools/injrev01_audit_align_reverse.php (DONE) @ ad1bf56f |
+| `CL-GAP-77` | tests/injfix01_consumer_key_hygiene_proof.php 5/5 + هجرة 2028_02_01 @ ad1bf56f |
 | `CL-GAP-31` | path_rulings 6/6 GAPV GAP-31 PASS @ 59136c85 |
 | `CL-FR-EVT-005` |  |
 | `CL-FR-EVT-007` |  |
