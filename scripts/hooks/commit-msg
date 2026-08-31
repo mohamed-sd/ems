@@ -1,0 +1,10 @@
+#!/bin/bash
+# G-CLAIM-01 — حاجبُ «لا نسبةَ بلا مقياس» (FINAL_CLOSE §1·1)
+# رسالةُ التزامٍ تحمل نسبةً لا يُخرجها المقياسُ حرفًا ⇒ تُرَدّ.
+PHP=/c/wamp64/bin/php/php8.3.28/php.exe
+[ -x "$PHP" ] || PHP=php
+"$PHP" tools/repair01_claim_gate.php "$1" || {
+    echo "G-CLAIM-01 ردَّ الرسالةَ — صحِّحِ النسبةَ إلى مُخرَجِ المقياسِ حرفًا"
+    exit 1
+}
+exit 0
