@@ -1,7 +1,7 @@
 # MASTER FINAL CLOSURE REGISTER — السجلُّ الجامعُ للإغلاقِ النهائيّ
 
 > **المخزنُ الحاكم:** `registers/MASTER_FINAL_CLOSURE_REGISTER.json` — وهذا إسقاطُه.
-> **اللقطة:** `1c3ed647` · **حُدِّث:** 2026-08-31 12:47
+> **اللقطة:** `c60c09b7` · **حُدِّث:** 2026-08-31 12:56
 > **المصمَّمُ الحاكم:** `docs/REPAIR01_20260823/orders/CLOSURE_SYSTEM.txt`
 
 ## مقامُ الحالات — ⛔ ولا تُجمَع في نسبةٍ واحدة
@@ -10,12 +10,12 @@
 |---|---|
 | `BLOCKED_ENVIRONMENT` | 1 |
 | `BLOCKED_GOVERNING_SOURCE` | 1 |
-| `BLOCKED_OWNER` | 22 |
+| `BLOCKED_OWNER` | 23 |
 | `BLOCKED_UAT` | 3 |
-| `EVIDENCE_CLOSED` | 84 |
+| `EVIDENCE_CLOSED` | 89 |
 | `IMPLEMENTED_NOT_VERIFIED` | 23 |
-| `OPEN` | 21 |
-| **الجملة** | **155** |
+| `OPEN` | 16 |
+| **الجملة** | **156** |
 
 ## البنودُ غيرُ المغلقة — بحاجزِها وفعلِها التالي
 
@@ -69,6 +69,7 @@
 | `CL-OA-04` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/REPAIR01_20260823/open/W135_OWNER_DECISIONS.md §③ · RPR-02 هدف 16 | اعتماد الأسماء المعروضة PENDING_OWNER (63 اسما + 2 مصيرة) @ 808a2c03 | ينتظر بوابته — ولا يحجب إلا نطاقه |
 | `CL-OA-05` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | orders/CLOSURE_SYSTEM.txt §الوثيقة الرابعة | قرار مقام التايم شيت (يعرض بالتسعة المنصوصة في الأمر §4) @ 808a2c03 | ينتظر بوابته — ولا يحجب إلا نطاقه |
 | `CL-OA-06` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | orders/CLOSURE_SYSTEM.txt §الوثيقة الرابعة | قيم الاعتماد (حدود السلم) عند نافذة الظل @ 808a2c03 | ينتظر بوابته — ولا يحجب إلا نطاقه |
+| `CL-OA-07` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | registers/OWNER_ACTION_REGISTER.md | اعتماد الاصدار الهدف للكونين المؤجلين @ c60c09b7 | ينتظر بوابته — ولا يحجب إلا نطاقه |
 | `CL-GAP-03` | `OPEN` | P2 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
 | `CL-GAP-12` | `OPEN` | P2 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
 | `CL-GAP-14` | `OPEN` | P2 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
@@ -85,11 +86,6 @@
 | `CL-R3-M06` | `IMPLEMENTED_NOT_VERIFIED` | P2 | — | docs/REPAIR01_20260823/RPR03_SCORECARD.md | رحلات اعتماد تحجب فعلا 14/14 — وضع monitor @ 808a2c03 |  |
 | `CL-R3-M09` | `BLOCKED_UAT` | P2 | UAT | docs/REPAIR01_20260823/RPR03_SCORECARD.md | رحلات بشرية كاملة بمسارها السالب 6/6 @ 808a2c03 |  |
 | `CL-R3-M16` | `BLOCKED_UAT` | P2 | UAT | docs/REPAIR01_20260823/RPR03_SCORECARD.md | مراجعة يدوية عميقة للذهبيات العشر @ 808a2c03 |  |
-| `CL-LG-OFFLINE` | `OPEN` | P2 | — | orders/CLOSURE_SYSTEM.txt §الوثيقة الثالثة | بلا مصير بعد @ 808a2c03 | مراجعة الكون وتسجيل المصير — ولا شيء يختفي بالصمت |
-| `CL-LG-INTEGRATION` | `OPEN` | P2 | — | orders/CLOSURE_SYSTEM.txt §الوثيقة الثالثة | بلا مصير بعد @ 808a2c03 | مراجعة الكون وتسجيل المصير — ولا شيء يختفي بالصمت |
-| `CL-LG-MULTIENTITY` | `OPEN` | P2 | — | orders/CLOSURE_SYSTEM.txt §الوثيقة الثالثة | بلا مصير بعد @ 808a2c03 | مراجعة الكون وتسجيل المصير — ولا شيء يختفي بالصمت |
-| `CL-LG-REVENUE` | `OPEN` | P2 | — | orders/CLOSURE_SYSTEM.txt §الوثيقة الثالثة | بلا مصير بعد @ 808a2c03 | مراجعة الكون وتسجيل المصير — ولا شيء يختفي بالصمت |
-| `CL-LG-OPARCH` | `OPEN` | P2 | — | orders/CLOSURE_SYSTEM.txt §الوثيقة الثالثة | بلا مصير بعد @ 808a2c03 | مراجعة الكون وتسجيل المصير — ولا شيء يختفي بالصمت |
 | `CL-GAP-21` | `OPEN` | P3 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
 | `CL-FR-GOV-004` | `IMPLEMENTED_NOT_VERIFIED` | P3 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ 808a2c03 |  |
 
@@ -179,5 +175,10 @@
 | `CL-R3-M17` | tools/rpr03_scorecard.php @ 808a2c03 |
 | `CL-R3-M18` | tools/rpr03_scorecard.php @ 808a2c03 |
 | `CL-R3-M19` | tools/rpr03_scorecard.php @ 808a2c03 |
+| `CL-LG-OFFLINE` | سجل الارث: مصير مسجل بدعمه المقيس وخطافاته — LEGACY_REQUIREMENT_WITHOUT_DISPOSITION=0 @ c60c09b7 |
+| `CL-LG-INTEGRATION` | سجل الارث: مصير مسجل بدعمه المقيس وخطافاته — LEGACY_REQUIREMENT_WITHOUT_DISPOSITION=0 @ c60c09b7 |
+| `CL-LG-MULTIENTITY` | سجل الارث: مصير مسجل بدعمه المقيس وخطافاته — LEGACY_REQUIREMENT_WITHOUT_DISPOSITION=0 @ c60c09b7 |
+| `CL-LG-REVENUE` | سجل الارث: مصير مسجل بدعمه المقيس وخطافاته — LEGACY_REQUIREMENT_WITHOUT_DISPOSITION=0 @ c60c09b7 |
+| `CL-LG-OPARCH` | سجل الارث: مصير مسجل بدعمه المقيس وخطافاته — LEGACY_REQUIREMENT_WITHOUT_DISPOSITION=0 @ c60c09b7 |
 | `CL-GAP-24` | path_rulings 6/6 — قارئ الوهمي الجديد (exec_indicator_engine) حول الى السلطة fin_financial_periods @ 59136c85 |
 | `CL-FR-DAT-004` |  |
