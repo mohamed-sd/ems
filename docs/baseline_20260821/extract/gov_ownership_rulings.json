@@ -490,6 +490,16 @@
         "decided_at": "2026-08-21 15:17:27"
     },
     {
+        "route": "cron_events_task.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=CRON · مدخلُ جدولةٍ يضبط EMS_JOB_WORKER ثم يضمّن cron_events.php حصرًا",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "CLOSURE_SYSTEM·WORK-05 · مدخلُ المهمةِ المجدولةِ — سطرُ دخولٍ بلا منطقٍ ولا تصييرٍ في مساحة، وحكمُه حكمُ cron_events.php نفسِه",
+        "decided_at": "2026-08-31 15:18:10"
+    },
+    {
         "route": "cron_events.php",
         "owner_before": "UNKNOWN",
         "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",

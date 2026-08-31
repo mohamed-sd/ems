@@ -95,8 +95,19 @@ if (!function_exists('ems_exec_indicator_axes')) {
         try { $nEquip = count($gate->select('equipments', array('columns' => array('id'), 'limit' => 5000))); }
         catch (\Throwable $t) { error_log('exec_engine equip: ' . $t->getMessage()); }
 
+        /* ◆ الإقفالُ الشهريُّ يُقرأ من سلطتِه `fin_financial_periods` لا من
+           جدولِ محاضرِ الإقفالِ الشاشيِّ — فالحكمُ المسجَّلُ (GAP-24 ·
+           gov_path_rulings) يسمّي ذاك NON_AUTHORITATIVE، وقارئُ إنتاجٍ جديدٌ
+           له يعيد فتحَ المسربِ (رصدَته سقّاطةُ path_rulings) — ولا يُكتب
+           اسمُه هنا حرفًا لأنَّ عدّادَ القرّاءِ يعدُّ الذِّكر. */
         $nCloseRows = 0;
-        try { $nCloseRows = count($gate->select('scr_monthly_close', array('columns' => array('id'), 'limit' => 5000))); }
+        try {
+            foreach ($gate->select('fin_financial_periods',
+                array('columns' => array('period_type', 'state'), 'limit' => 5000)) as $x0) {
+                if ((string) $x0['period_type'] !== 'month') { continue; }
+                if (in_array((string) $x0['state'], array('soft_closed', 'closed', 'locked'), true)) { $nCloseRows++; }
+            }
+        }
         catch (\Throwable $t) { error_log('exec_engine close: ' . $t->getMessage()); }
 
         $riskOpen = 0; $riskCrit = 0;
@@ -171,7 +182,7 @@ if (!function_exists('ems_exec_indicator_axes')) {
             )),
             array('axis' => 'التشغيل والانتاج', 'unit_code' => 'ops', 'owner' => 'التشغيل', 'items' => array(
                 $mk('الوحدات المعتمدة', $snapVal('approved_units'), 'وحدة', '', $trend('approved_units'), 'دوري', 'Timesheet/timesheet.php', $snapAt, 'من لقطة اقفال الفترة المعتمدة'),
-                $mk('محاضر الاقفال الشهري', number_format($nCloseRows), 'محضر', '', 'بلا سابقة تقاس', 'نشط', 'Operations/operations.php', $liveAt, 'عد سجل محاضر الاقفال الشهري التشغيلي'),
+                $mk('الفترات الشهرية المقفلة', number_format($nCloseRows), 'فترة', '', 'بلا سابقة تقاس', 'نشط', 'Operations/operations.php', $liveAt, 'عد الفترات الشهرية المقفلة من سجل الفترات المالية — السلطة المحكومة'),
             )),
             array('axis' => 'الربحية والهامش', 'unit_code' => 'finance', 'owner' => 'المالية والخزينة', 'items' => array(
                 $mk('هامش الربح', $snapVal('margin_pct'), 'نسبة', '', $trend('margin_pct'), 'دوري', 'Finance/reports.php', $snapAt, 'من لقطة اقفال الفترة المعتمدة'),

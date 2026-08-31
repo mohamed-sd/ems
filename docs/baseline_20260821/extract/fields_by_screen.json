@@ -1103,13 +1103,61 @@
     },
     {
         "route": "Audit\/iaf_access_log.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Audit\/iaf_action_plans.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Audit\/iaf_audit_programs.php",
@@ -1194,33 +1242,177 @@
     },
     {
         "route": "Audit\/iaf_authorities.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Audit\/iaf_charter.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Audit\/iaf_closure.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Audit\/iaf_competencies.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Audit\/iaf_engagements.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Audit\/iaf_escalations.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Audit\/iaf_evidence_requests.php",
@@ -1298,8 +1490,32 @@
     },
     {
         "route": "Audit\/iaf_findings.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Audit\/iaf_function_risks.php",
@@ -1370,8 +1586,32 @@
     },
     {
         "route": "Audit\/iaf_independence.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Audit\/iaf_overview.php",
@@ -1428,23 +1668,119 @@
     },
     {
         "route": "Audit\/iaf_plan.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Audit\/iaf_quality.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Audit\/iaf_reports.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Audit\/iaf_responses.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Audit\/iaf_test_samples.php",
@@ -1522,13 +1858,61 @@
     },
     {
         "route": "Audit\/iaf_universe.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Audit\/iaf_workpapers.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Clients\/activities.php",
@@ -1776,8 +2160,276 @@
     },
     {
         "route": "Clients\/client_contacts.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "إجراءات",
+                        "col_group": "",
+                        "th_class": "pc-actions-th",
+                        "hidden_default": 0,
+                        "technical": "id"
+                    },
+                    {
+                        "label_ar": "الاسم",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "contact_name"
+                    },
+                    {
+                        "label_ar": "الصفة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "job_title"
+                    },
+                    {
+                        "label_ar": "الهاتف",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "phone"
+                    },
+                    {
+                        "label_ar": "البريد",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "email"
+                    },
+                    {
+                        "label_ar": "رئيسية",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "is_primary"
+                    },
+                    {
+                        "label_ar": "مفوض بالتوقيع",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "is_signatory"
+                    },
+                    {
+                        "label_ar": "صفة التفويض",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "authority_kind"
+                    },
+                    {
+                        "label_ar": "مدى التفويض",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "authority_scope"
+                    },
+                    {
+                        "label_ar": "المستند",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "authority_doc_ref"
+                    },
+                    {
+                        "label_ar": "من",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "authority_from"
+                    },
+                    {
+                        "label_ar": "إلى",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "authority_to"
+                    },
+                    {
+                        "label_ar": "الحالة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "state"
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "csrf_token",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "جهات الاتصال —",
+                "is_system": 1,
+                "dup_count": 2
+            },
+            {
+                "name": "pc_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "جهات الاتصال —",
+                "is_system": 1,
+                "dup_count": 2
+            },
+            {
+                "name": "pc_id",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "جهات الاتصال —",
+                "is_system": 1,
+                "dup_count": 2
+            },
+            {
+                "name": "contact_name",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "job_title",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "phone",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "phone_alt",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "email",
+                "input_type": "email",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "state",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "is_primary",
+                "input_type": "checkbox",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "is_signatory",
+                "input_type": "checkbox",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "authority_kind",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "حجية التفويض ومداه — تلزم كل مفوض بالتوقيع",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "authority_doc_ref",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "حجية التفويض ومداه — تلزم كل مفوض بالتوقيع",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "authority_from",
+                "input_type": "date",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "حجية التفويض ومداه — تلزم كل مفوض بالتوقيع",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "authority_to",
+                "input_type": "date",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "حجية التفويض ومداه — تلزم كل مفوض بالتوقيع",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "authority_scope",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "حجية التفويض ومداه — تلزم كل مفوض بالتوقيع",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "note",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "حجية التفويض ومداه — تلزم كل مفوض بالتوقيع",
+                "is_system": 0,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Clients\/client_profile.php",
@@ -27338,13 +27990,61 @@
     },
     {
         "route": "Finance\/acc_approval_chain.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Finance\/acc_backflow.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Finance\/acc_closing_checklist.php",
@@ -27535,8 +28235,32 @@
     },
     {
         "route": "Finance\/acc_my_day.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Finance\/acc_reconciliations.php",
@@ -27681,13 +28405,61 @@
     },
     {
         "route": "Finance\/acc_routing_matrix.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Finance\/acc_specializations.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Finance\/acc_trial_balance.php",
@@ -31391,38 +32163,206 @@
     },
     {
         "route": "Finance\/ctrl_authority_limits.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Finance\/ctrl_dept_propagation.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Finance\/ctrl_doc_registry.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Finance\/ctrl_doc_variance.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Finance\/ctrl_quality_kpis.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Finance\/ctrl_role_migration.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Finance\/ctrl_supervision.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Finance\/currencies_fin.php",
@@ -36164,38 +37104,206 @@
     },
     {
         "route": "Finance\/ob_commitments.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Finance\/ob_contingent.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Finance\/ob_due_soon.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Finance\/ob_horizon.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Finance\/ob_overdue.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Finance\/ob_register.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Finance\/ob_schedule.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Finance\/operator_pay_fin.php",
@@ -38313,8 +39421,32 @@
     },
     {
         "route": "Finance\/tre_authority_caps.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Finance\/tre_beneficiary.php",
@@ -38642,8 +39774,32 @@
     },
     {
         "route": "Finance\/tre_cycle_stages.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Finance\/tre_fx_deals.php",
@@ -39212,8 +40368,32 @@
     },
     {
         "route": "Finance\/tre_sod_matrix.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Finance\/tre_transfers.php",
@@ -39284,8 +40464,32 @@
     },
     {
         "route": "Finance\/tre_unit_roles.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Finance\/tre_vessels.php",
@@ -66180,8 +67384,32 @@
     },
     {
         "route": "Portal\/ceo_assignments.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Portal\/ceo_assurance_box.php",
@@ -66329,8 +67557,32 @@
     },
     {
         "route": "Portal\/ceo_audit_reports.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Portal\/ceo_board.php",
@@ -91216,8 +92468,276 @@
     },
     {
         "route": "Suppliers\/supplier_contacts.php",
-        "tables": [],
-        "form_fields": []
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "إجراءات",
+                        "col_group": "",
+                        "th_class": "pc-actions-th",
+                        "hidden_default": 0,
+                        "technical": "id"
+                    },
+                    {
+                        "label_ar": "الاسم",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "contact_name"
+                    },
+                    {
+                        "label_ar": "الصفة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "job_title"
+                    },
+                    {
+                        "label_ar": "الهاتف",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "phone"
+                    },
+                    {
+                        "label_ar": "البريد",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "email"
+                    },
+                    {
+                        "label_ar": "رئيسية",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "is_primary"
+                    },
+                    {
+                        "label_ar": "مفوض بالتوقيع",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "is_signatory"
+                    },
+                    {
+                        "label_ar": "صفة التفويض",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "authority_kind"
+                    },
+                    {
+                        "label_ar": "مدى التفويض",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "authority_scope"
+                    },
+                    {
+                        "label_ar": "المستند",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "authority_doc_ref"
+                    },
+                    {
+                        "label_ar": "من",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "authority_from"
+                    },
+                    {
+                        "label_ar": "إلى",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "authority_to"
+                    },
+                    {
+                        "label_ar": "الحالة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "state"
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "csrf_token",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "جهات الاتصال —",
+                "is_system": 1,
+                "dup_count": 2
+            },
+            {
+                "name": "pc_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "جهات الاتصال —",
+                "is_system": 1,
+                "dup_count": 2
+            },
+            {
+                "name": "pc_id",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "جهات الاتصال —",
+                "is_system": 1,
+                "dup_count": 2
+            },
+            {
+                "name": "contact_name",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "job_title",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "phone",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "phone_alt",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "email",
+                "input_type": "email",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "state",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "is_primary",
+                "input_type": "checkbox",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "is_signatory",
+                "input_type": "checkbox",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "authority_kind",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "حجية التفويض ومداه — تلزم كل مفوض بالتوقيع",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "authority_doc_ref",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "حجية التفويض ومداه — تلزم كل مفوض بالتوقيع",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "authority_from",
+                "input_type": "date",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "حجية التفويض ومداه — تلزم كل مفوض بالتوقيع",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "authority_to",
+                "input_type": "date",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "حجية التفويض ومداه — تلزم كل مفوض بالتوقيع",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "authority_scope",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "حجية التفويض ومداه — تلزم كل مفوض بالتوقيع",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "note",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "حجية التفويض ومداه — تلزم كل مفوض بالتوقيع",
+                "is_system": 0,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Suppliers\/supplier_contract_events.php",

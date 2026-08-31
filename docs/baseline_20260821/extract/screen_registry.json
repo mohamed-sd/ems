@@ -866,8 +866,8 @@
         "nav09": null,
         "deprecated": 0,
         "known_issue": [],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0008",
@@ -937,8 +937,8 @@
         "nav09": null,
         "deprecated": 0,
         "known_issue": [],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0009",
@@ -1079,8 +1079,8 @@
         "nav09": null,
         "deprecated": 0,
         "known_issue": [],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0011",
@@ -1180,8 +1180,8 @@
         "known_issue": [
             "مستندٌ يُعتمد بلا مستندٍ رسميٍّ مسمًّى"
         ],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0012",
@@ -1251,8 +1251,8 @@
         "nav09": null,
         "deprecated": 0,
         "known_issue": [],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0013",
@@ -1322,8 +1322,8 @@
         "nav09": null,
         "deprecated": 0,
         "known_issue": [],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0014",
@@ -1423,8 +1423,8 @@
         "known_issue": [
             "مستندٌ يُعتمد بلا مستندٍ رسميٍّ مسمًّى"
         ],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0015",
@@ -1495,8 +1495,8 @@
         "nav09": null,
         "deprecated": 0,
         "known_issue": [],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0016",
@@ -1667,8 +1667,8 @@
         "known_issue": [
             "مستندٌ يُعتمد بلا مستندٍ رسميٍّ مسمًّى"
         ],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0018",
@@ -1839,8 +1839,8 @@
         "known_issue": [
             "مستندٌ يُعتمد بلا مستندٍ رسميٍّ مسمًّى"
         ],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0020",
@@ -2011,8 +2011,8 @@
         "known_issue": [
             "مستندٌ يُعتمد بلا مستندٍ رسميٍّ مسمًّى"
         ],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0022",
@@ -2112,8 +2112,8 @@
         "known_issue": [
             "مستندٌ يُعتمد بلا مستندٍ رسميٍّ مسمًّى"
         ],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0023",
@@ -2228,8 +2228,8 @@
         "known_issue": [
             "مستندٌ يُعتمد بلا مستندٍ رسميٍّ مسمًّى"
         ],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0024",
@@ -2299,8 +2299,8 @@
         "nav09": null,
         "deprecated": 0,
         "known_issue": [],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0025",
@@ -2471,8 +2471,8 @@
         "known_issue": [
             "مستندٌ يُعتمد بلا مستندٍ رسميٍّ مسمًّى"
         ],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0027",
@@ -2570,8 +2570,8 @@
         "nav09": null,
         "deprecated": 0,
         "known_issue": [],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0028",
@@ -2718,8 +2718,8 @@
         "nav09": null,
         "deprecated": 0,
         "known_issue": [],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 13,
+        "form_fields": 17
     },
     {
         "screen_id": "SCR-0030",
@@ -13789,8 +13789,8 @@
         "nav09": null,
         "deprecated": 0,
         "known_issue": [],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0137",
@@ -13883,8 +13883,8 @@
         "nav09": null,
         "deprecated": 0,
         "known_issue": [],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0138",
@@ -14324,8 +14324,8 @@
         "nav09": null,
         "deprecated": 0,
         "known_issue": [],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0142",
@@ -14598,8 +14598,8 @@
         "nav09": null,
         "deprecated": 0,
         "known_issue": [],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0145",
@@ -14676,8 +14676,8 @@
         "nav09": null,
         "deprecated": 0,
         "known_issue": [],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0146",
@@ -18316,8 +18316,8 @@
         "nav09": null,
         "deprecated": 0,
         "known_issue": [],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0169",
@@ -18394,8 +18394,8 @@
         "nav09": null,
         "deprecated": 0,
         "known_issue": [],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0170",
@@ -18472,8 +18472,8 @@
         "nav09": null,
         "deprecated": 0,
         "known_issue": [],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0171",
@@ -18551,8 +18551,8 @@
         "nav09": null,
         "deprecated": 0,
         "known_issue": [],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0172",
@@ -18629,8 +18629,8 @@
         "nav09": null,
         "deprecated": 0,
         "known_issue": [],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0173",
@@ -18707,8 +18707,8 @@
         "nav09": null,
         "deprecated": 0,
         "known_issue": [],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0174",
@@ -18785,8 +18785,8 @@
         "nav09": null,
         "deprecated": 0,
         "known_issue": [],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0175",
@@ -22473,8 +22473,8 @@
         "known_issue": [
             "شاشةٌ قارئةٌ في طبقةِ دورةِ الإدارة"
         ],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0205",
@@ -22604,8 +22604,8 @@
         "known_issue": [
             "مستندٌ يُعتمد بلا مستندٍ رسميٍّ مسمًّى"
         ],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0206",
@@ -22736,8 +22736,8 @@
         "known_issue": [
             "شاشةٌ قارئةٌ في طبقةِ دورةِ الإدارة"
         ],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0207",
@@ -22867,8 +22867,8 @@
         "known_issue": [
             "شاشةٌ قارئةٌ في طبقةِ دورةِ الإدارة"
         ],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0208",
@@ -22998,8 +22998,8 @@
         "known_issue": [
             "شاشةٌ قارئةٌ في طبقةِ دورةِ الإدارة"
         ],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0209",
@@ -23129,8 +23129,8 @@
         "known_issue": [
             "مستندٌ يُعتمد بلا مستندٍ رسميٍّ مسمًّى"
         ],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0210",
@@ -23258,8 +23258,8 @@
         "nav09": null,
         "deprecated": 0,
         "known_issue": [],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0211",
@@ -24488,8 +24488,8 @@
         "nav09": null,
         "deprecated": 0,
         "known_issue": [],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0220",
@@ -25225,8 +25225,8 @@
         "nav09": null,
         "deprecated": 0,
         "known_issue": [],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0224",
@@ -26452,8 +26452,8 @@
         "nav09": null,
         "deprecated": 0,
         "known_issue": [],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0232",
@@ -26741,8 +26741,8 @@
         "nav09": null,
         "deprecated": 0,
         "known_issue": [],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0234",
@@ -43548,8 +43548,8 @@
         "nav09": null,
         "deprecated": 0,
         "known_issue": [],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0414",
@@ -43689,8 +43689,8 @@
         "nav09": null,
         "deprecated": 0,
         "known_issue": [],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 1,
+        "form_fields": 1
     },
     {
         "screen_id": "SCR-0416",
@@ -65150,8 +65150,8 @@
         "nav09": null,
         "deprecated": 0,
         "known_issue": [],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 13,
+        "form_fields": 17
     },
     {
         "screen_id": "SCR-0597",
@@ -79919,8 +79919,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,

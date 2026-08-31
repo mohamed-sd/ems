@@ -1,42 +1,36 @@
 # MASTER FINAL CLOSURE REGISTER — السجلُّ الجامعُ للإغلاقِ النهائيّ
 
 > **المخزنُ الحاكم:** `registers/MASTER_FINAL_CLOSURE_REGISTER.json` — وهذا إسقاطُه.
-> **اللقطة:** `808a2c03` · **حُدِّث:** 2026-08-31 11:39
+> **اللقطة:** `59136c85` · **حُدِّث:** 2026-08-31 12:20
 > **المصمَّمُ الحاكم:** `docs/REPAIR01_20260823/orders/CLOSURE_SYSTEM.txt`
 
 ## مقامُ الحالات — ⛔ ولا تُجمَع في نسبةٍ واحدة
 
 | الحالة | العدد |
 |---|---|
+| `BLOCKED_ENVIRONMENT` | 1 |
 | `BLOCKED_GOVERNING_SOURCE` | 1 |
 | `BLOCKED_OWNER` | 22 |
 | `BLOCKED_UAT` | 2 |
-| `EVIDENCE_CLOSED` | 69 |
+| `EVIDENCE_CLOSED` | 78 |
 | `IMPLEMENTED_NOT_VERIFIED` | 23 |
-| `OPEN` | 38 |
+| `OPEN` | 28 |
 | **الجملة** | **155** |
 
 ## البنودُ غيرُ المغلقة — بحاجزِها وفعلِها التالي
 
 | Closure_ID | الحالة | الأولوية | الحاجز | المصدر | اللقطةُ الحالية | الفعلُ التالي |
 |---|---|---|---|---|---|---|
-| `CL-WORK-01` | `OPEN` | P0 | — | docs/REPAIR01_20260823/orders/CLOSURE_SYSTEM.txt | حماية مصدر العمل — REMOTE_HEAD=LOCAL_HEAD والوسوم والأسس @ 808a2c03 |  |
-| `CL-WORK-02` | `OPEN` | P0 | — | docs/REPAIR01_20260823/orders/CLOSURE_SYSTEM.txt | إغلاق GAP-10 — قناة المناظر المحفوظة نمطا والقنوات التسع @ 808a2c03 |  |
-| `CL-WORK-03` | `OPEN` | P0 | — | docs/REPAIR01_20260823/orders/CLOSURE_SYSTEM.txt | جدولة cron_events — من Wired إلى Exercised بنبض ومؤشر @ 808a2c03 |  |
+| `CL-WORK-01` | `BLOCKED_ENVIRONMENT` | P0 | — | docs/REPAIR01_20260823/orders/CLOSURE_SYSTEM.txt | محلي 59136c85 متقدم عن البعيد 96a640e1 — الدفع مسلم للمستخدم @ 59136c85 |  |
 | `CL-GAP-07` | `OPEN` | P0 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
-| `CL-GAP-10` | `OPEN` | P0 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
 | `CL-FR-APP-001` | `IMPLEMENTED_NOT_VERIFIED` | P0 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ 808a2c03 |  |
 | `CL-FR-APP-002` | `BLOCKED_OWNER` | P0 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ 808a2c03 |  |
 | `CL-FR-APP-004` | `BLOCKED_OWNER` | P0 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ 808a2c03 |  |
 | `CL-FR-DAT-001` | `BLOCKED_OWNER` | P0 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ 808a2c03 |  |
 | `CL-FR-GOV-009` | `OPEN` | P0 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=OPEN @ 808a2c03 |  |
 | `CL-FR-GOV-015` | `OPEN` | P0 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=OPEN @ 808a2c03 |  |
-| `CL-WORK-04` | `OPEN` | P1 | — | docs/REPAIR01_20260823/orders/CLOSURE_SYSTEM.txt | EFFECT_MISSING نمطا — عقد الأثر والاختبارات الستة @ 808a2c03 |  |
-| `CL-WORK-05` | `OPEN` | P1 | — | docs/REPAIR01_20260823/orders/CLOSURE_SYSTEM.txt | شد السقاطات الست خارج نافذة القياس بأساس مقترح ولقطة @ 808a2c03 |  |
-| `CL-GAP-11` | `OPEN` | P1 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
 | `CL-GAP-17` | `OPEN` | P1 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
 | `CL-GAP-18` | `OPEN` | P1 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
-| `CL-GAP-20` | `OPEN` | P1 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
 | `CL-GAP-23` | `OPEN` | P1 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
 | `CL-GAP-29` | `OPEN` | P1 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
 | `CL-FR-APP-005` | `IMPLEMENTED_NOT_VERIFIED` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ 808a2c03 |  |
@@ -86,7 +80,6 @@
 | `CL-GAP-14` | `OPEN` | P2 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
 | `CL-GAP-22` | `OPEN` | P2 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
 | `CL-GAP-26` | `OPEN` | P2 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
-| `CL-GAP-31` | `OPEN` | P2 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
 | `CL-GAP-32` | `OPEN` | P2 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
 | `CL-FR-SEC-005` | `BLOCKED_OWNER` | P2 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ 808a2c03 |  |
 | `CL-FR-FIN-008` | `IMPLEMENTED_NOT_VERIFIED` | P2 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ 808a2c03 |  |
@@ -104,15 +97,19 @@
 | `CL-LG-REVENUE` | `OPEN` | P2 | — | orders/CLOSURE_SYSTEM.txt §الوثيقة الثالثة | بلا مصير بعد @ 808a2c03 | مراجعة الكون وتسجيل المصير — ولا شيء يختفي بالصمت |
 | `CL-LG-OPARCH` | `OPEN` | P2 | — | orders/CLOSURE_SYSTEM.txt §الوثيقة الثالثة | بلا مصير بعد @ 808a2c03 | مراجعة الكون وتسجيل المصير — ولا شيء يختفي بالصمت |
 | `CL-GAP-21` | `OPEN` | P3 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
-| `CL-GAP-24` | `OPEN` | P3 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
 | `CL-FR-GOV-004` | `IMPLEMENTED_NOT_VERIFIED` | P3 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ 808a2c03 |  |
 
 ## المغلقُ بالدليل
 
 | Closure_ID | الدليل |
 |---|---|
+| `CL-WORK-02` | tests/injfix01_sensitive_fields_nine_channels_proof.php 15/15 والسالب يثبت العض @ 59136c85 |
+| `CL-WORK-03` | schtasks EMS_cron_events LastTaskResult=0 + storage/logs/cron_events.log نبض START/END + سالب الازدواج SKIP + مؤشرات عند الراس 17985 @ 59136c85 |
+| `CL-GAP-10` | tests/injfix01_sensitive_fields_nine_channels_proof.php 15/15 + سالب --negative=GAP-10 اثبت الرسوب @ 59136c85 |
 | `CL-FR-EVT-003` |  |
 | `CL-FR-DAT-002` |  |
+| `CL-WORK-04` | REQUIRED_SETTLEMENT_EFFECT_MISSING=0 مقيسا + settlement_proof 16/16 + eng01_bus_test 22/22 + rpr03_contract_register صفر مفردة بلا عقد @ 59136c85 |
+| `CL-WORK-05` | سقاطتان شدتا (permission 72⇒20 · extraction 77⇒36 بتمديد الاستخراج للعديات) ودينان جديدان سدا لا شدا (قارئ وهمي + ملكية cron_task) — الحزام 25⇒30/34 والمقامات ثابتة @ 59136c85 |
 | `CL-GAP-01` | tools/injfix01_gap_coverage.php @ 808a2c03 |
 | `CL-GAP-02` | tools/injfix01_gap_coverage.php @ 808a2c03 |
 | `CL-GAP-04` | tools/injfix01_gap_coverage.php @ 808a2c03 |
@@ -129,6 +126,8 @@
 | `CL-GAP-28` | tools/injfix01_gap_coverage.php @ 808a2c03 |
 | `CL-GAP-30` | tools/injfix01_gap_coverage.php @ 808a2c03 |
 | `CL-GAP-33` | tools/injfix01_gap_coverage.php @ 808a2c03 |
+| `CL-GAP-11` | permission_single_point_gate 7/7 بعد --retighten (72⇒20 قارئا) @ 59136c85 |
+| `CL-GAP-20` | ownership_ruling 3/3 — حكم NOT_APPLICABLE لمدخل cron_events_task في gov_ownership_rulings @ 59136c85 |
 | `CL-FR-SEC-001` |  |
 | `CL-FR-FIN-001` |  |
 | `CL-FR-EVT-001` |  |
@@ -160,6 +159,7 @@
 | `CL-R2-T12` | tools/rpr02_acceptance_scorecard.php @ 808a2c03 |
 | `CL-R2-T14` | tools/rpr02_acceptance_scorecard.php @ 808a2c03 |
 | `CL-R2-T15` | tools/rpr02_acceptance_scorecard.php @ 808a2c03 |
+| `CL-GAP-31` | path_rulings 6/6 GAPV GAP-31 PASS @ 59136c85 |
 | `CL-FR-EVT-005` |  |
 | `CL-FR-EVT-007` |  |
 | `CL-FR-GOV-001` |  |
@@ -179,4 +179,5 @@
 | `CL-R3-M17` | tools/rpr03_scorecard.php @ 808a2c03 |
 | `CL-R3-M18` | tools/rpr03_scorecard.php @ 808a2c03 |
 | `CL-R3-M19` | tools/rpr03_scorecard.php @ 808a2c03 |
+| `CL-GAP-24` | path_rulings 6/6 — قارئ الوهمي الجديد (exec_indicator_engine) حول الى السلطة fin_financial_periods @ 59136c85 |
 | `CL-FR-DAT-004` |  |

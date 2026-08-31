@@ -55,19 +55,32 @@ function ok($c, $l, &$p, &$f, $d = '') { if ($c) { $p++; echo "  ✔ {$l}" . ($d
 function sweep(mysqli $c, $family)
 {
     $like = $c->real_escape_string($family);
-    $c->query("DELETE FROM `fin_dues` WHERE `settlement_id` IN
+    /* ◆ **كنسٌ يبتلع فشلَه يترك يتيمًا يُقرأ عطبَ إنتاج** (CLOSURE_SYSTEM ·
+         WORK-04): `fin_financial_events.fk_ffe_root` يشير إلى
+         `ems_business_events` **بلا CASCADE** — فحذفُ الأبِ قبل المرآةِ يفشل
+         بالقيدِ، و`mysqli_report OFF` يبتلعه، فيبقى حدثُ العائلةِ حيًّا على
+         الناقلِ ويلتقطه `EffectLinkConsumer` بحقٍّ كـ`EFFECT_MISSING`
+         (الواقعةُ المرجعية: settlement#5512 · تسليم 28199). فالترتيبُ
+         **ابنًا-فأبًا** وكلُّ حذفٍ يُفحص مُرجَعُه — كنسٌ فاشلٌ يُسمّى فورًا. */
+    $del = function ($sql) use ($c) {
+        if (!$c->query($sql)) {
+            fwrite(STDERR, "⛔ كنسٌ فشل ولا يُبتلع: {$c->error}\n  ← {$sql}\n");
+            exit(1);
+        }
+    };
+    $del("DELETE FROM `fin_dues` WHERE `settlement_id` IN
                  (SELECT `id` FROM `settlements` WHERE `settlement_no` LIKE '{$like}%')");
-    $c->query("DELETE FROM `fin_requests` WHERE `source_ref` LIKE '{$like}%'");
+    $del("DELETE FROM `fin_requests` WHERE `source_ref` LIKE '{$like}%'");
     /* ◆ **الحدثُ يُكتب في مقامَين ويُكنس منهما معًا**: `EventPublisher` يُدرج في
          `ems_business_events` **و**`fin_financial_events`، والثاني هو مقامُ مؤشرِ
          المستهلكِ في `EventDispatcher::runConsumer`. وكنسُ الأولِ وحدَه يترك
          الثانيَ فيُخلّف **تأخُّرًا حقيقيًّا** في مستهلكَي الماليةِ يُشعل إنذارَ
          التعثُّر — أي أن جولةَ اختبارٍ تصنع العطبَ الذي يرصده فاحصٌ آخر. */
-    $c->query("DELETE FROM `ems_business_events`  WHERE `source_ref` LIKE '{$like}%'");
-    $c->query("DELETE FROM `fin_financial_events` WHERE `source_ref` LIKE '{$like}%'");
-    $c->query("DELETE FROM `settlement_lines` WHERE `settlement_id` IN
+    $del("DELETE FROM `fin_financial_events` WHERE `source_ref` LIKE '{$like}%'");
+    $del("DELETE FROM `ems_business_events`  WHERE `source_ref` LIKE '{$like}%'");
+    $del("DELETE FROM `settlement_lines` WHERE `settlement_id` IN
                  (SELECT `id` FROM `settlements` WHERE `settlement_no` LIKE '{$like}%')");
-    $c->query("DELETE FROM `settlements` WHERE `settlement_no` LIKE '{$like}%'");
+    $del("DELETE FROM `settlements` WHERE `settlement_no` LIKE '{$like}%'");
 }
 
 echo "════ سلامةُ التسويةِ عند الفشل — GAP-16 ════\n";
@@ -151,6 +164,10 @@ ok($q && (int) $q->fetch_row()[0] === 1, 'وحدثُ اعتمادٍ واحدٌ �
 sweep($conn, $FAMILY);
 $q = $conn->query("SELECT COUNT(*) FROM `settlements` WHERE `settlement_no` LIKE '{$FAMILY}%'");
 ok($q && (int) $q->fetch_row()[0] === 0, 'صفرُ أثرٍ باقٍ بعدَ الجولة', $pass, $fail);
+/* ◆ والأثرُ يشمل الناقلَ لا الجدولَ وحدَه — حدثٌ ناجٍ من الكنسِ يُقرأ غدًا
+     عطبَ إنتاجٍ باسمِ EFFECT_MISSING (درسُ 46485). */
+$q = $conn->query("SELECT COUNT(*) FROM `ems_business_events` WHERE `source_ref` LIKE '{$FAMILY}%'");
+ok($q && (int) $q->fetch_row()[0] === 0, 'وصفرُ حدثٍ ناجٍ على الناقلِ بعدَ الكنس', $pass, $fail);
 
 echo "───────────────────────────────────────────────────────────────\n";
 echo ($fail === 0 ? "✔" : "✘") . " النتيجة: نجح {$pass} · رسب {$fail}\n";

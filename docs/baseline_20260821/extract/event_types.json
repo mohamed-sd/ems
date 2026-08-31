@@ -286,6 +286,17 @@
         "last_at": "2026-08-15 17:43:00"
     },
     {
+        "category": "operational",
+        "event_key": "project.chartered",
+        "cnt": "21",
+        "delivered_ok_sum": "21",
+        "delivered_failed_sum": "0",
+        "dlq_sum": "0",
+        "training_cnt": "0",
+        "first_at": "2026-08-06 04:24:15",
+        "last_at": "2026-08-31 09:41:58"
+    },
+    {
         "category": "financial",
         "event_key": "finance.hour_recognized",
         "cnt": "17",
@@ -306,17 +317,6 @@
         "training_cnt": "0",
         "first_at": "2026-07-18 23:04:36",
         "last_at": "2026-08-06 06:07:45"
-    },
-    {
-        "category": "operational",
-        "event_key": "project.chartered",
-        "cnt": "11",
-        "delivered_ok_sum": "11",
-        "delivered_failed_sum": "0",
-        "dlq_sum": "0",
-        "training_cnt": "0",
-        "first_at": "2026-08-06 04:24:15",
-        "last_at": "2026-08-24 09:55:31"
     },
     {
         "category": "financial",
@@ -529,17 +529,6 @@
     },
     {
         "category": "financial",
-        "event_key": "settlement.approved",
-        "cnt": "2",
-        "delivered_ok_sum": "2",
-        "delivered_failed_sum": "0",
-        "dlq_sum": "0",
-        "training_cnt": "0",
-        "first_at": "2026-07-28 09:45:09",
-        "last_at": "2026-08-30 15:29:49"
-    },
-    {
-        "category": "financial",
         "event_key": "expense.maintenance.recorded",
         "cnt": "2",
         "delivered_ok_sum": "2",
@@ -603,6 +592,17 @@
         "training_cnt": "0",
         "first_at": "2026-07-28 15:56:06",
         "last_at": "2026-07-28 15:56:06"
+    },
+    {
+        "category": "financial",
+        "event_key": "settlement.approved",
+        "cnt": "1",
+        "delivered_ok_sum": "1",
+        "delivered_failed_sum": "0",
+        "dlq_sum": "0",
+        "training_cnt": "0",
+        "first_at": "2026-07-28 09:45:09",
+        "last_at": "2026-07-28 09:45:09"
     },
     {
         "category": "analytics",

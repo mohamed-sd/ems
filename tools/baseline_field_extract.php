@@ -28,6 +28,20 @@ foreach ($surfaces as $sf) {
     if ($sf['class'] !== 'SCREEN') { continue; }
     $rel = $sf['path'];
     $src = (string) file_get_contents($ROOT . '/' . $rel);
+    /* ◆ **تمديدُ NF-11 بشقِّه الأول المنصوص** (CLOSURE_SYSTEM · WORK-05):
+       شاشةٌ تصييرُها كلُّه في عُدّةٍ مشتركةٍ (`includes/*_kit.php` ·
+       `includes/*_view.php`) لا تحمل `<thead>` ولا `<form>` في ملفِّها —
+       فتُستخرَج حقولُها من عُدّتِها منسوبةً إليها لا تُعَدُّ «صفرَ حقل»
+       (الواقعةُ المرجعية: Clients/client_contacts.php ·
+       Suppliers/supplier_contacts.php — عُدّةُ party_contacts). ولا يُقلَب
+       تصنيفُ الماسحِ فتهتزَّ مقاماتُ بواباتٍ أخرى — المقامُ ثابت. */
+    if (strpos($src, '<thead') === false && !preg_match('/<form[\s>]/i', $src)
+        && preg_match_all('~includes/([a-z0-9_]+_(?:kit|view)\.php)~i', $src, $kitm)) {
+        foreach (array_unique($kitm[1]) as $kitFile) {
+            $kp = $ROOT . '/includes/' . $kitFile;
+            if (is_file($kp)) { $src .= "\n" . (string) file_get_contents($kp); }
+        }
+    }
     $screens++;
     $entry = array('route' => $rel, 'tables' => array(), 'form_fields' => array());
 
