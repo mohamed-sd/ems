@@ -1,0 +1,607 @@
+أمر الإغلاق والتنفيذ المعماري الموحد لنظام «إنجاز»
+النسخة المصححة الشاملة — أربع وثائق مترابطة داخل إطار تنفيذي واحد
+الحالة: نهائي للتنفيذالغرض: استكمال برنامج إصلاح إنجاز حتى الإغلاق المنضبط، من دون فقد أي فجوة حالية أو التزام معماري قديم، ومن دون تحويل الدين الكامل للنظام إلى قائمة يومية ضخمة تشل التنفيذ.المراجع الحاكمة: MASTER_EXEC · AMD-01 · RPR-02 v2.3 · RPR-03 · أوامر الضبط والاستئناف اللاحقة · الحزمة المؤسسية وقرارات المالك النافذة.
+المقدمة التنفيذية
+وصل برنامج إصلاح إنجاز إلى مرحلة يجب فيها الفصل بوضوح بين إدارة الدين الكامل للنظام وبين الأعمال القليلة التي يجب تنفيذها الآن.
+الحالة الحالية تثبت أن تقدمًا معماريًا وتشغيليًا حقيقيًا تحقق: سجل الشاشات والملكية أصبح أكثر نضجًا، دفتر الهجرات صمد عبر نمو كبير في المخطط، وبدأ استهلاك أحداث الأعمال بعد أن ظل صفرًا عبر عدة لقطات. ومع ذلك، لا يزال 23 من أصل 58 مفتاح حدث فقط موصولًا بمستهلك أعمال، وأول Delivery فعلي للمستهلك الجديد فشل باسم واضح بـEFFECT_MISSING، ما يعني أن الحالة الدقيقة هي: Wired نعم، Exercised بدأ، Verified لا. كما أن GAP-10 الأمني ما زال مفتوحًا، وcron_events.php غير مجدول، ونافذة ظل الاعتماد ما زالت صفرًا، والاعتماد البشري للشاشات الذهبية ما زال غير مغلق.
+ولذلك لا يعتمد هذا الأمر نموذج:
+كل ما بقي في النظام = قائمة تنفيذ واحدة.
+بل يعتمد أربعة مكونات مترابطة:
+MASTER FINAL CLOSURE REGISTERيحفظ الكون الكامل للدين والفجوات والمتطلبات والقرارات.
+EXECUTION SPRINT-01يعطي المنفذ عددًا محدودًا من الأعمال ذات الأثر الأعلى الآن.
+LEGACY REQUIREMENT DISPOSITION REGISTERيمنع ضياع الالتزامات القديمة التي لم تدخل موجة الإصلاح الحالية.
+OWNER ACTION REGISTERيحصر تدخل المالك في القرارات الحقيقية فقط، وفي الوقت الذي تصبح فيه مطلوبة.
+الوثائق الأربع لا تستبدل المعمارية السابقة، بل تحولها إلى نظام إغلاق مستمر قابل للتنفيذ.
+القواعد العليا الحاكمة للوثائق الأربع
+تطبق القواعد التالية على كل العمل:
+DECISION → IMPLEMENTATION → WIRING → EXERCISE → EVIDENCE → CLOSURE → CONTINUE
+ولا يعتبر:
+وجود الكود = إغلاقًا.
+وجود الشاشة = قبولًا.
+Wiring = Verification.
+Registry صحيح = UI صحيح.
+Consumer موصول = أثر أعمال مثبت.
+Ladder يقرأ = Approval Enforcement.
+Backup قديم = Backup صالح للمخطط الحالي.
+Report مرسل = Stop Signal.
+والقاعدة التنفيذية:
+الحاجز يمنع البند أو الهدف أو النطاق المتأثر فقط، ولا يوقف البرنامج كله.
+والتقارير:
+Milestone Reports وليست نقاط توقف.
+بعد كل تقرير يستمر العمل تلقائيًا في كل بند غير محجوب.
+الوثيقة الأولى
+MASTER FINAL CLOSURE REGISTER
+سجل الإغلاق النهائي الجامع
+1. الغرض
+هذا السجل هو مصدر الحقيقة الوحيد لما بقي من برنامج الإصلاح.
+لا يستخدم كقائمة مهام يومية، وإنما كمرجع دائم يجيب عن:
+ما الذي بقي؟
+لماذا بقي؟
+ما مصدره الحاكم؟
+هل هو خطأ أم دين تقني أم قرار مالك أم UAT؟
+ما الذي يعتمد عليه؟
+ماذا يحجب؟
+ما الدليل المطلوب لإغلاقه؟
+هل هو Release blocker أم Deferred؟
+ويجمع في مكان واحد:
+جميع GAP-*
+جميع FR-*
+Targets الخاصة بـRPR-02
+مقاييس RPR-03
+Owner Actions
+Regression Findings
+Current Release blockers
+Legacy architectural obligations
+2. WORK-00 — إنشاء السجل الجامع
+يبدأ التنفيذ بـ:
+WORK-00 — BOOTSTRAP MASTER FINAL CLOSURE REGISTER
+وهو عمل تأسيسي سريع لا يتحول إلى مشروع مستقل ولا يوقف Sprint-01.
+يتم فيه استيراد:
+GAP-01..77
+سجل FR-*
+RPR-02 Targets
+RPR-03 Metrics
+Owner Actions الحالية
+Legacy obligations المعروفة
+ولا يشترط حل جميع البنود قبل بدء الأعمال التنفيذية.
+القبول في WORK-00:
+كل بند معروف له صف في السجل أو مرجع واضح إلى سجل تابع.
+3. الحقول الإلزامية للسجل
+كل Closure Item يحمل على الأقل:
+Closure_ID
+Source_Document
+Source_ID
+Domain
+Target_ID إن انطبق
+Requirement_ID إن انطبق
+Current_Status
+Priority
+Execution_Rank
+Severity
+Release_Impact
+Applicability
+Business_Owner
+Technical_Owner
+Blocker_Class
+Required_By_Gate
+Depends_On
+Blocks
+Dependency_Type
+Dependency_Fanout
+Unlock_Value
+Estimated_Effort
+Evidence_Contract
+Next_Action
+Current_Snapshot
+Last_Updated_Snapshot
+Last_Evidence_Ref
+Status_Changed_At
+Final_Disposition
+4. قاعدة التحديث
+لا تتغير حالة أي بند بلا:
+Evidence_Snapshot_ID
+ويحدث السجل مع كل Snapshot جديدة.
+ولا يسمح بتغيير:
+OPEN → CLOSED
+بسبب تقرير وصفي أو حكم يدوي بلا Evidence.
+وعند ظهور Regression:
+لا يعدل تاريخ الإغلاق السابق، بل يفتح Finding جديدًا مرتبطًا به.
+5. الحالات التشغيلية
+الحالات المسموحة:
+OPEN
+IN_PROGRESS
+IMPLEMENTED_NOT_VERIFIED
+PARTIALLY_IMPLEMENTED
+BLOCKED_OWNER
+BLOCKED_GOVERNING_SOURCE
+BLOCKED_UAT
+BLOCKED_ENVIRONMENT
+REGRESSION
+EVIDENCE_CLOSED
+أما Final Dispositions المقبولة فهي فقط:
+EVIDENCE_CLOSED
+نفذ واستوفى عقد إثباته.
+NOT_APPLICABLE
+بمرجع حاكم.
+SUPERSEDED
+استبدل بتصميم أحدث.
+GOVERNED_DEFERRED
+أُجّل رسميًا إلى Release لاحق مع:
+Owner
+Target Release
+Reason
+Architectural hooks required now
+Risk of postponement
+ولا يقبل:
+UNKNOWNLATERTODOCLOSED بلا Evidence
+6. الفصل الإلزامي داخل السجل
+لكل بند ستة مستويات مستقلة:
+Decision
+هل الحكم محسوم؟
+Implementation
+هل الكود/السطح موجود؟
+Wiring
+هل وصل بالمحرك أو المستهلك أو السلطة المناسبة؟
+Exercise
+هل استخدم فعليًا؟
+Evidence
+هل تحقق الأثر المطلوب؟
+Closure
+هل استوفى معيار الإغلاق؟
+وهذا يمنع الخطأ التاريخي:
+Implemented = Closed
+7. Priority لا تساوي Execution Order
+كل بند يحمل:
+Priority
+P0 / P1 / P2 / P3
+لكن التنفيذ يملك أيضًا:
+Execution Rank
+بحيث يمكن تنفيذ Unlocker صغير بالتوازي مع P0 إذا كان لا يتداخل معه.
+مثال الحالة الحالية:
+GAP-10 أعلى أمنيًا، لكن جدولة cron_events.php Unlocker عالي الأثر التشغيلي؛ لذلك يمكن العمل عليهما بالتوازي بدل انتظار أحدهما الآخر.
+8. خوارزمية استخراج Sprint
+لا يختار المنفذ البنود يدويًا حسب راحته.
+يتم ترتيبها وفق:
+Severity
+Release Impact
+Security/Data Integrity
+Unlock Value
+Dependency Fan-out
+Estimated Effort
+Owner/Environment Dependency
+ويعطى وزن مرتفع للأعمال التي:
+كلفتها منخفضةأثرها مرتفعوتفتح عدة بنود تالية.
+9. دورية السجل
+يحدث السجل:
+بعد كل Snapshot
+بعد كل Sprint
+بعد كل Owner Decision
+بعد كل Regression
+بعد كل Build batch معتبر
+قبل أي Release decision
+ولا يوجد Current Closure Register بلا Snapshot حاكم.
+الوثيقة الثانية
+EXECUTION SPRINT-01
+أمر التنفيذ المباشر للمرحلة الحالية
+1. الحكم
+هذه الوثيقة وحدها هي:
+To-Do List التنفيذية الحالية.
+ولا تحتوي عشرات البنود.
+يبدأ Sprint-01 فورًا بعد Bootstrap السجل، ولا يحتاج أي من أعماله قرار أعمال أو سياسة من المالك.
+وإذا ظهر:
+Credential
+OS privilege
+remote access
+task-scheduler permission
+فهذا:
+ENVIRONMENT_ACTION
+وليس OWNER_DECISION.
+2. Timebox
+لكل Sprint:
+SPRINT_TIMEBOX
+يحدد عند البداية ويسجل في السجل.
+الهدف منه منع Sprint من التحول إلى مشروع مفتوح بلا نهاية.
+ينتهي Sprint عند:
+إغلاق أعماله
+أو
+بلوغ الـTimebox المحدد
+أيهما أسبق.
+عند انتهاء الـTimebox:
+يغلق ما اكتمل.
+يعاد قياس غير المكتمل.
+يعود إلى Master Register بحالته الفعلية.
+يسجل Next Action.
+يعاد ترتيب Sprint التالي.
+ولكن:
+انتهاء الوقت لا يخفض أولوية P0 ولا يسمح بتجاوزه.
+إذا بقي P0 مفتوحًا:
+يظل في مقدمة الترتيب ويستمر حسب أثره، مع عدم حجب الأعمال الأخرى التي لا تعتمد عليه.
+3. شكل العمل داخل Sprint-01
+لا يفتح سبعة Tracks.
+يستخدم:
+Primary Security Lane
+للـP0.
+Low-Conflict Unlocker Lane
+للأعمال الصغيرة عالية الفتح.
+Background Evidence/Test Lane
+للاختبارات والمصالحة.
+WORK-01 — حماية مصدر العمل
+الحالة الحالية تثبت أن الفرع بلا upstream ومتقدم بمئات الالتزامات عن origin/main.
+المطلوب:
+Push الفرع الحالي إلى Remote موثوق.
+Push جميع Tags.
+Push Baselines.
+تعريف upstream.
+Clone test من Remote.
+إثبات أن Remote Head يساوي Local Head.
+معيار القبول:
+REMOTE_HEAD = LOCAL_HEAD
+و:
+Tags وBaselines قابلة للاسترجاع من جهاز آخر.
+WORK-02 — إغلاق GAP-10 P0
+الحالة الحالية لا تشير إلى غياب الحارس نفسه، بل إلى أن قناة Saved/Stored Views تتجاوزه:
+8 ملفات في القناة
+1 يلمس Sensitive Field
+0 يمر بالمقرر
+0 Exemptions.
+لذلك فرضية العمل الابتدائية:
+العطب في Channel Integration/Bypass Path، لا في وجود SensitiveFieldGuard بحد ذاته.
+المطلوب:
+تتبع Saved View query/render path.
+تحديد نقطة تجاوز القرار المركزي.
+إصلاح القناة كنمط.
+عدم عمل Patch للشاشة الواحدة فقط.
+إعادة اختبار القنوات التسع.
+يجب فحص:
+Screen
+Stored Views
+Search
+Export
+API
+AJAX
+Direct URL
+Projection
+Field visibility
+معيار القبول:
+ACTIVE_SENSITIVE_FIELD_BYPASS = 0
+WORK-03 — جدولة cron_events.php
+الحالة الحالية:
+23/58 Event Key موصولة بمستهلك أعمال.
+Delivery واحد فقط وصل.
+Delivery الأول Failed.
+cron_events.php غير مجدول.
+المطلوب:
+إضافة Scheduler entry الصحيح.
+التأكد من PHP/runtime الصحيح.
+heartbeat.
+Last Result.
+عدم تشغيل مزدوج.
+تقدم Consumer cursor.
+مراقبة Stall.
+معيار القبول:
+Scheduler exists
+Last Result = 0
+heartbeat يتحرك
+consumers تتحرك
+duplicate scheduler invocation = 0
+مهم:
+جدولة المشغل تنقل الحالة من Wired إلى Exercised.
+ولا يقال:
+Verified
+إلا بعد تحقق الأثر التجاري.
+WORK-04 — إصلاح EFFECT_MISSING كنمط
+الحالة المرجعية:
+settlement.approved / settlement#5502
+فشل لأنه لم يجد Intended Effect.
+لا يُكتب استثناء لـ5502.
+المطلوب تحديد Contract:
+متى يجب أن ينتج settlement.approved أثرًا؟أين يوجد Mapping؟ما Source Entity؟ما Financial/Operational effect المطلوب؟
+ثم إصلاح النمط.
+الاختبارات:
+Positive
+الأثر الصحيح يقع.
+Missing Mapping
+يفشل صراحة.
+Duplicate Delivery
+Effect واحد.
+Retry
+يعمل.
+Partial Failure
+لا يترك Half State.
+Compensation
+يوجد Reversal/Completion عند الحاجة.
+معيار القبول المحلي:
+REQUIRED_SETTLEMENT_EFFECT_MISSING = 0
+ثم تستخدم القاعدة لبقية Business Events.
+WORK-05 — شد السقاطات الست
+لا تشد أي Ratchet أثناء نافذة القياس.
+بعدها:
+أثبت أن التغير Improvement فعلي.
+ثبت المقام.
+نفذ Negative Test.
+نفذ Regression Test.
+أنشئ Proposed Baseline.
+نفذ --retighten.
+أعد القياس.
+سجل Snapshot الجديدة.
+ولا Auto-Mutation للBaseline.
+ولا يُعلن مسبقًا:
+16/33 → 22/33.
+تعلن النتيجة الفعلية بعد القياس فقط.
+4. استقلال Sprint-01 عن المالك
+الأعمال الخمسة كلها:
+لا تحتاج قرار أعمال أو سياسة من المالك.
+ولا:
+حدود اعتماد
+Timesheet denominator
+UAT acceptance
+يمنع تنفيذها.
+أي عائق تقني يعالج تقنيًا.
+أي Environment privilege يوسم:
+BLOCKED_ENVIRONMENT
+ولا يرفع OWNER_DECISION.
+5. قبول Sprint-01
+عند إغلاق Sprint أو بلوغ Timebox، يصدر Snapshot واحدة تجيب:
+هل Remote محمي؟
+هل GAP-10 أغلق؟
+هل cron يعمل؟
+كم Event أصبح Exercised؟
+كم Business Effect أصبح Verified؟
+هل Settlement effect يعمل كنمط؟
+هل Ratchets أصبحت تقيس Regression حقيقيًا؟
+ما أعلى البنود التالية حسب Master Register؟
+ثم:
+EXECUTION SPRINT-02
+يولد من السجل الجامع.
+ولا ينتظر المنفذ سؤال:
+هل أكمل؟
+الوثيقة الثالثة
+LEGACY REQUIREMENT DISPOSITION REGISTER
+سجل مصير الالتزامات المعمارية القديمة
+1. الغرض
+الغرض ليس تنفيذ كل المتطلبات القديمة الآن.
+الغرض هو:
+منع سقوط أي التزام معماري دون حكم.
+ويشمل خصوصًا الالتزامات التي لم تكن محور RPR الحالية.
+2. الكون الذي يجب مراجعته
+Offline / Field
+PWA
+Service Worker
+IndexedDB
+Offline operations
+Delta Sync
+Conflict handling
+Version handling
+Offline write idempotency
+Weak-connectivity operation
+Integration
+Outbox
+Retry
+DLQ
+Compensation/Reversal
+Idempotency
+External API contracts
+Multi-Entity
+Multi-Company by Design
+entity-specific ledgers
+entity-specific bank accounts
+intercompany tagging
+reciprocal references
+consolidation readiness
+Customer Revenue
+ENT-03
+Billing
+Collection
+Debit/Credit Notes
+AR aging
+Customer statement
+Guaranteed minimum where contractual
+Operational Architecture
+multi-entity assignment/lending where applicable
+shared platform capabilities
+field/mobile execution
+minimum guarantee logic
+3. Final Disposition
+كل Legacy Requirement يأخذ واحدًا فقط من:
+CURRENT_RELEASE
+NEXT_RELEASE
+SUPERSEDED
+NOT_APPLICABLE
+ولا يقبل:
+غير موجود في RPR الحالي.
+4. Deferred Architecture Hooks
+إذا كان Requirement:
+NEXT_RELEASE
+فيجب تحديد ما يجب بناؤه الآن حتى لا نغلق الباب معماريًا.
+مثال Offline:
+لا نبني Offline Engine الآن إذا كان مؤجلًا.
+لكن لا نبني Transactions بطريقة تمنع لاحقًا:
+version numbers
+idempotency
+delta sync
+conflict resolution
+أي:
+التأجيل لا يعني إغلاق الباب.
+5. حقول السجل
+لكل Legacy Item:
+Requirement ID
+Original Source
+Original Intent
+Current Applicability
+Current Architecture Support
+Disposition
+Owner
+Target Release
+Architectural Hooks Needed Now
+Dependencies
+Risk of Deferral
+Decision Reference
+6. معيار إغلاق السجل
+ليس:
+كل Legacy Requirements مبنية.
+بل:
+LEGACY_REQUIREMENT_WITHOUT_DISPOSITION = 0
+أي أن كل التزام:
+نُفذأو أُجل بحكمأو نُسخأو أصبح غير منطبق.
+ولا شيء يختفي بالصمت.
+الوثيقة الرابعة
+OWNER ACTION REGISTER
+سجل ما يحتاج قرار المالك فعلا
+1. الغرض
+هذا السجل يمنع تحويل المالك إلى:
+مسؤول دعم تقني
+DBA
+Scheduler Admin
+مصنف آلاف القيود
+مصحح Tool
+UAT coordinator
+لا يدخل السجل إلا:
+Business / Policy / Config Decision حقيقي لا تحسمه الوثائق أو المعمارية أو الهندسة.
+2. ما لا يدخل Owner Register
+لا يدخل:
+Hash Algorithm
+Scheduler/Cron
+Technical naming
+Tool repair
+Migration correction
+Event classification
+Replay classification
+Bulk data cleanup
+Test Persona creation
+UAT scheduling
+Environment command
+Mapping حاكم يمكن اشتقاقه
+هذه:
+Engineering / Environment / UAT.
+3. ما يدخل
+Approval values
+مطلوبة عند:
+Required_By_Gate = Approval Shadow Window
+ولا تمنع بناء المحرك.
+Aggregation Window
+إذا كانت Config أعمال حقيقية.
+Timesheet denominator decision
+يجب أن يعرض القرار:
+المقام الأول
+المقام الثاني
+مصدر كل واحد
+المعنى التجاري
+أثر التاريخ
+Payroll impact
+Finance impact
+Supplier/Employee entitlement
+التوصية الفنية
+ولا تغير Legacy Data قبل القرار.
+Business access / naming
+فقط إذا كانت المراجع لا تحسم:
+Role visibility
+Business naming
+Business/Policy ownership
+4. حقول Owner Action
+كل صف:
+Owner_Action_ID
+Decision_Question
+Decision_Type
+Affected_Targets
+Affected_Domains
+What_It_Blocks
+Required_By_Gate
+Depends_On
+Options
+Impact_Of_Each_Option
+Technical_Recommendation
+Owner_Decision
+Decision_Date
+Propagation_Status
+5. Required by Gate لا Due Date مخترع
+لا يضع المنفذ تاريخًا من عنده.
+بل:
+القرار مطلوب قبل بوابة محددة.
+مثل:
+Approval values → Shadow Window.
+إذا أراد المالك تاريخًا:
+يضاف بعد اعتماده.
+6. Owner Action لا يصبح Global Blocker
+إذا قرار يحجب Target واحدًا:
+يحجب Target الواحد.
+إذا يحجب Track:
+يحجب Track.
+ولا يحجب البرنامج كله إلا إذا كان:
+Structural/Release-wide decision موثقًا.
+بروتوكول تشغيل الوثائق الأربع
+المرحلة 1 — Bootstrap
+أنشئ Master Register.
+ولا توقف Sprint أثناء ملئه.
+المرحلة 2 — Sprint
+استخرج فقط أعلى 5–8 أعمال.
+لا يفتح مبرمج واحد سبعة مجالات تطوير عميقة في الوقت نفسه.
+المرحلة 3 — Execute
+لكل بند:
+VerifyImplementWireExerciseEvidenceClose
+المرحلة 4 — Update
+حدث Master Register بالـSnapshot الجديدة.
+المرحلة 5 — Next Sprint
+استخرج Sprint جديدًا من السجل.
+لا من ذاكرة المبرمج.
+ولا من آخر رسالة.
+المرحلة 6 — Legacy
+أي التزام قديم يظهر:
+يدخل Legacy Register.
+ولا يقتحم Sprint تلقائيًا.
+المرحلة 7 — Owner
+أي قرار حقيقي فقط:
+يدخل Owner Register عند بوابته.
+معيار الإغلاق المرحلي
+لكل Sprint:
+SPRINT_ACCEPTANCE = 100%
+أي كل بند داخله:
+Evidence Closed
+أو أُعيد إلى Master Register بحالة واضحة عند انتهاء Timebox
+أو أصبح Blocked بحاجز حقيقي مسمى
+لكن لا يسمى:
+Closed
+إذا عاد مفتوحًا للسجل.
+معيار الإغلاق النهائي للنظام
+يبقى الهدف النهائي:
+OWNER_APPROVED_PRODUCTION_BASELINE
+ولا يصدر حتى:
+P0 = 0
+Governing conflicts = 0
+Security bypass = 0
+Applicable Target unresolved = 0
+Business Events التي تستلزم أثرًا = Verified
+Critical consumers stalled = 0
+unresolved DLQ = 0
+permission decision paths موحدة بحسب المعمارية
+Approval Shadow مكتملة
+Approval Enforcement ناجح
+Critical silent stations = 0
+Clean Clone = مطابق
+Backup/Restore/PITR = current schema
+Golden Screens = 10/10
+Human E2E = مقبول
+unsupported manual journals = 0
+Rendered Sidebar verification = PASS
+Current documentation stale sections = 0
+Remote source = verified
+Legacy Requirements كلها محكومة
+ولا تجمع هذه المقامات في Percentage واحدة.
+المطلوب من المبرمج فور استلام الوثيقة
+نفذ WORK-00.
+لا تجعل بناء السجل يؤخر Sprint.
+ابدأ Sprint-01 فورًا.
+Push Remote فورًا.
+اعمل على GAP-10 وcron بالتوازي حيث لا يوجد تعارض.
+أصلح EFFECT_MISSING كنمط.
+شد Ratchets خارج نافذة القياس.
+أعد Snapshot.
+استخرج Sprint-02 من Master Register.
+استمر دون انتظار رسالة جديدة.
+القاعدة الختامية
+هذا النظام لا يحتاج مزيدًا من القوائم الطويلة.
+يحتاج:
+دين كامل محفوظ في سجل+عدد قليل من الأعمال ينفذ الآن+التزامات قديمة لا تضيع+قرارات مالك لا تُطلب إلا عند بوابتها.
+وهكذا يتحول برنامج إصلاح إنجاز من:
+قائمة مشاكل تكبر مع كل جولة
+إلى:
+منظومة إغلاق تدير الدين وتسدده Sprint بعد Sprint حتى الوصول إلى Production Baseline حقيقية.
