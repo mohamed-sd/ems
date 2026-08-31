@@ -1,0 +1,36 @@
+أمر تنفيذي — المراجعة العكسية الشاملة والتصحيح المباشر استنادًا إلى الملفات الحاكمة
+الحالة: نافذ فورًا
+النطاق: نظام إنجاز كاملًا — الهيكل التنظيمي، السايدبار، الأدوار، الشاشات، الحقول، الصلاحيات، دورات العمل، الاعتمادات، الحالات، الأحداث، التقارير، القيادة، والحوكمة.
+الهدف: تنفيذ مراجعة عكسية كاملة من المصدر الحاكم إلى النظام الفعلي، مع تصحيح كل اختلاف أثناء المراجعة، وليس إعداد تقرير بالفجوات فقط.
+
+[النص الكامل كما ورد من المالك 2026-08-31 — الأقسام 1..25 والقاعدة الختامية.
+ الحزمة الحاكمة المرفقة: 01 · الدليل المعماري-3 · 02 · القيادة-1 · 03 · الدستور-3 · 09 · السجلات المؤسسية والقرارات-2
+ نُصّبت بأسمائها الحاكمة في docs/REPAIR01_20260823/ والقديم في _pkg_backup_20260831/
+ وفرقها المقيس في GOV_PACK_DIFF_20260831.md]
+
+1. المصادر الحاكمة: الدليل المعماري (الإدارات والدورات والمجموعات والترتيب والحبة والحقول) · القيادة (EX-CEO/EX-DVP ومصفوفة السلطة — لا NO_SPEC) · الدستور (المبادئ؛ الإدارة ≠ الدور ≠ النطاق ≠ الشاشة) · السجلات والقرارات (كل قرار معتمد ينعكس على كل المواضع المتأثرة).
+2. ترتيب السلطة: قرار معتمد ← الدستور ← الدليل ← القيادة في نطاقها ← المتطلبات ← الكود/القاعدة/السايدبار = Evidence of Current State فقط. تعارض فعلي = GOVERNING_SOURCE_CONFLICT ولا يحسم اجتهادًا — ولا يُرفع للمالك قبل البحث في جميع المصادر.
+3. الطبيعة: COMPARE → DIAGNOSE ROOT CAUSE → CORRECT → RENDER/EXERCISE → VERIFY → CLOSE → CONTINUE — التصحيح أثناء الجولة؛ يستثنى فقط قرار أعمال غائب أو مصدر مفقود أو صلاحية بيئة: يحجب البند المتأثر فقط.
+4. GOVERNING_SOURCE_MAP (GOVERNANCE_REFERENCE — NON-RUNTIME): لكل Universe/Target مصدره وصنفه ومرجع القرار والدستور والمعمارية والقيادة وEffective Source وConflict Status — TARGET_WITHOUT_GOVERNING_SOURCE = 0.
+5. الإدارات إدارة إدارة: الهوية (لا Role يتحول Department ولا إدارة موازية بلا حكم) · دورة العمل كما الملف · السايدبار (المجموعة والاسم والترتيب والشاشات وParent/Tab وMenu/Tab/Direct/Projection) · الأدوار (من يرى ماذا — ولا Role يحدد Lifecycle) · الشاشات (Target ID · Screen ID · Grain · Owner · Group · Sort · Visibility · Source of Truth · State Model · Approval · Events · Fields · Human Render) — وTarget من Current Release غير مبني: ابنه.
+6. القيادة: EXECUTIVE_WORKSPACE لا إدارة عادية — لوحات ותقارير وInbox وDecision/Approval surfaces وحدود التفويض ومصفوفة السلطة — Projection + Decision Surface ولا Transaction Source of Truth جديد.
+7. الدستور: مواده اختبارات امتثال — الفصل الرباعي · مصدر حقيقة واحد · الملكية · فصل الواجبات · لا تعديل حقيقة إدارة أخرى · Current vs History · Amendment بعد الاعتماد · القيم من السياسات · لا مصدر موازٍ — ولكل مخالفة: أصلح المتسبب.
+8. القرارات قرارًا قرارًا: أثر كل قرار على كل الطبقات وتحقق نفاذه — APPROVED_DECISION_WITH_UNPROPAGATED_IMPACT = 0 — ولا يقبل صحيح في Registry غير نافذ في Runtime.
+9. نموذج الملاحة: Screen Identity → Workspace → Lifecycle Group → Placement → Permission → Runtime Renderer — لا رجوع إلى Global route→group — STRUCTURAL_NAV_PASS = 17/17 وكل بالغة تدخل Human Verification فورًا.
+10. لا تخلط الشاشة بالموضع — Screen واحدة في أكثر من Workspace بلا نسخ.
+11. Target Lineage: قس أولًا ثم صحح حتى BUILT_SCREEN_WITHOUT_TARGET_LINEAGE = 0 — ولا تفترض الرقم قبل قياسه.
+12. كل شاشة من الداخل: Grain · 1:N⇒Child · ترتيب الحقول على Document Lifecycle · نزع الكتابة على حقيقة الغير · الحقول الناقصة · Imported=Read-only · Derived=محسوبة · المستندات · الاعتماد المركزي · Audit · State Machine · Field permissions.
+13. الأدوار والصلاحيات: User → Role/Profile → Workspace → Screen → Action → Field — Role≠Department · لا محركات مكررة · لا صلاحيات محلية · menu hidden مع URL مفتوح · field hidden مع Export/API ظاهر · لا fallback لمسار قديم — ولا تضحية بالصلاحية لجمال السايدبار.
+14. State Models: لكل Transaction حكم الحاجة ثم Model وVersion وStates وTransitions وGuards وApproval وEvents وAudit — BUILT_TRANSACTION_WITHOUT_REQUIRED_STATE_MODEL = 0.
+15. الأحداث: Producer · Classification · Subscription · Handler · Intended Effect · Retry · DLQ · Idempotency · Compensation · Evidence — وBusiness Event المطلوب أثره لا يغلق قبل VERIFIED.
+16. Approval: سلطة واحدة من (الدستور + القيادة + القرارات + المصفوفة) — لا logic محلي — ولا Enforcement قبل Shadow حيث تشترط — وبناء المحرك لا يتوقف على قيمة لم تحسم.
+17. Source of Truth لكل Domain: مالك واحد والباقي يقرأ/يسقط/يطلب — UNCONTRACTED_CROSS_DOMAIN_WRITE = 0.
+18. Current vs History: كل حركة/تخصيص/تغيير/تعديل/Amendment إلى سجل تاريخي ذري — ولا Overwrite بعد اعتماد.
+19. التقارير: لا Report مصدر حقيقة — ولكل Dashboard مصادره وتحويلاته وlineage وstale — والقيادة لا تكرر المعاملات.
+20. المقاييس: لكل مقياس السؤال والبسط والمقام وN/A والمصدر وSnapshot وPass — ولا نسبة خضراء بمقام لا يجيب السؤال.
+21. صحح أثناء الجولة كل واضح الحكم (Group/Order/Owner/Role/Placement/Field/Grain/Duplicate/Registry غير مقروء/Silent Fallback/State Model معروف/قرار غير مطبق) — وما يحتاج قرارًا: Owner Action واستمر.
+22. لا تعد ما ثبت بالدليل — يبقى Regression Gate.
+23. المخرجات — حزمة واحدة من Snapshot واحدة: GOVERNING_SOURCE_MAP · REVERSE_AUDIT_MASTER · DEPARTMENT_CONFORMANCE · EXECUTIVE_CONFORMANCE · CONSTITUTION_COMPLIANCE · DECISION_PROPAGATION_REGISTER · SIDEBAR_CONFORMANCE · ROLE_PERMISSION_CONFORMANCE · SCREEN_FIELD_CONFORMANCE · STATE_MODEL_CONFORMANCE · EVENT_INTEGRATION_CONFORMANCE · OPEN_OWNER_ACTIONS.
+24. إغلاق كل إدارة: UNEXPLAINED_TARGET=0 · CURRENT_RELEASE_TARGET_NOT_BUILT=0 · WRONG_WORKSPACE=0 · WRONG_GROUP=0 · WRONG_ORDER=0 · BUILT_NOT_RENDERED=0 · UNEXPLAINED_EXTRA=0 · ROLE_VISIBILITY_MISMATCH=0 · TARGET_WITHOUT_LINEAGE=0 · REQUIRED_FIELD_MISSING=0 · UNRULED_EXTRA_FIELD=0 · WRONG_FIELD_ORDER=0 · WRONG_OWNER=0 · REQUIRED_STATE_MODEL_MISSING=0 ⇒ DEPARTMENT_ARCHITECTURE_CONFORMANCE=100%.
+25. الإغلاق العام: 17/17 مطابقة لمصدرها · CEO/DVP لملف القيادة · الدستور بلا مخالفة · كل قرار مسقط · الأدوار منفصلة عن الإدارات · الشاشات والحقول صحيحة · السايدبار يعكس الدورة · Runtime يقرأ السلطات الصحيحة · ولا Target مشتق من Current دون حكم.
+القاعدة الختامية: اقرأ الحاكم ← ابنِ Effective Governing Target ← قارن ← السبب الجذري ← صحح كل ما له حكم ← أعد التصيير والاختبار ← أغلق بالدليل ← التالي تلقائيًا. التقرير ليس نقطة توقف. لا يُرفع للمالك إلا تعارض حقيقي أو قرار لم تحسمه المصادر.
