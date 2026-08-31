@@ -179,6 +179,15 @@ if ($tGroup['ni'] && $altGid > 0) {
                     . " WHERE id = " . (int) $tGroup['ni']['id'],
           'watch' => 'group', 'base' => $BG);
 }
+/* ⑧ عمودُ المجموعةِ الذي كتبت فيه اداةُ المحاذاة: nav_canonical.group_name */
+$ncg = $conn->query("SELECT group_name FROM nav_canonical WHERE LOWER(route) = '" . $e($B) . "' LIMIT 1")->fetch_assoc();
+if ($ncg !== null) {
+    $EXPS[] = array('n' => 8, 'store' => 'nav_canonical.group_name',
+          'set'    => "UPDATE nav_canonical SET group_name = '" . $e($altGroup) . "' WHERE LOWER(route) = '" . $e($B) . "'",
+          'revert' => "UPDATE nav_canonical SET group_name = '" . $e((string) $ncg['group_name'])
+                    . "' WHERE LOWER(route) = '" . $e($B) . "'",
+          'watch' => 'group', 'base' => $B);
+}
 /* ⑦ رأسُ طيِّ **غيرِ المُعلَنِ**: nav_route_group على هدفِ 1-2 (بلا صفِّ إعلان) */
 if ($t12['rg']) {
     $altCode12 = '';
