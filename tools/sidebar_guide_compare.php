@@ -60,6 +60,19 @@ foreach ($cards as $c) {
         'group' => $gn, 'name' => rpr02a_nz($c['name']), 'raw' => $c['name'], 'graw' => $c['group']);
 }
 
+/* ═══ ①ب مصدرُ نطاقِ القيادة (§١٣): EX-CEO/EX-DVP من ملفِّ القيادةِ لا NO_SPEC ═══ */
+$exCards = rpr02a_read_cards($ROOT . '/docs/REPAIR01_20260823/02 · القيادة.xlsx');
+$EX_REMAP = array('DEP-01' => 'EX-CEO', 'DEP-02' => 'EX-DVP');
+foreach ($exCards as $c) {
+    if (rpr02a_is_doc($c) || !isset($EX_REMAP[$c['code']])) { continue; }
+    $k = $EX_REMAP[$c['code']];
+    if (!isset($spec[$k])) { $spec[$k] = array('groups' => array(), 'screens' => array()); }
+    $gn = sgc_gz($c['group']);
+    if (!in_array($gn, $spec[$k]['groups'], true)) { $spec[$k]['groups'][] = $gn; }
+    $spec[$k]['screens'][] = array('i' => count($spec[$k]['screens']) + 1,
+        'group' => $gn, 'name' => rpr02a_nz($c['name']), 'raw' => $c['name'], 'graw' => $c['group']);
+}
+
 /* ═══ ② الجسرُ إدارة ⇒ دور — منطقُ repair01_guide_nav_apply.php حرفًا ═══ */
 $roles = array();
 $r = $conn->query('SELECT id, name FROM roles');
