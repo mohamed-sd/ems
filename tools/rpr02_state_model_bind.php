@@ -103,7 +103,8 @@ if (!$snap && $APPLY) { exit("⛔ **لا نافذةَ قياسٍ مفتوحة** 
 $sid = $snap ? $snap['snapshot_id'] : 'DRY';
 
 /* ═══ ④ آلاتُ الحالةِ المؤلَّفةُ — من جداولِ الموجاتِ لا من نصِّ وثيقة ════ */
-$WAVES = array('w6', 'w7', 'w8', 'w9', 'w10', 'w11', 'w12', 'w13', 'w14', 'w15');
+/* FINAL_CLOSE ⑬: موجةُ التأليفِ الختاميّةِ `fc` (rpr02_state_author.php) تُقرأ كأخواتِها */
+$WAVES = array('w6', 'w7', 'w8', 'w9', 'w10', 'w11', 'w12', 'w13', 'w14', 'w15', 'fc');
 $models = array(); $trans = array(); $forbid = array();
 foreach ($WAVES as $w) {
     $t = 'repair01_' . $w . '_states';
