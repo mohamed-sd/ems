@@ -453,7 +453,7 @@ function repair01_w14_anchors()
         'GOV-30' => array('route' => 'Governance/committees.php', 'probe' => 'gov_committee',
             'kind' => 'TABLE', 'step' => 29, 'domain' => 'DEP-08', 'line' => 'SECOND',
             'why' => 'اللجان النافذة بتشكيلها وصلاحياتها ودورية انعقادها'),
-        'GOV-31' => array('route' => 'Governance/dr_restore.php', 'probe' => 'RestoreDrillService',
+        'GOV-32' => array('route' => 'Governance/dr_restore.php', 'probe' => 'RestoreDrillService',
             'kind' => 'SERVICE', 'step' => 30, 'domain' => 'DEP-08', 'line' => 'SECOND',
             'why' => 'النسخة لا تصدق حتى تستعاد - التمرين الدوري بمحضر موقع'),
         /* ══ إدارةُ المخاطر · اللوحةُ خارجَ الدورة ══════════════════════ */

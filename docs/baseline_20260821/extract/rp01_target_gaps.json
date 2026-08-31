@@ -2790,9 +2790,9 @@
         "built_counterpart": "—",
         "verdict": "Build — يُبنى بموضعه من الدورة",
         "src_ref": "10 › 04_مستهدف_غير_مبني › ص179",
-        "origin_stage": "",
-        "origin_note": "",
-        "wave_stage": "",
+        "origin_stage": "W14",
+        "origin_note": "FC: توأم للفجوة 6834 (مخاطر المراجعة الداخلية risk_dept_iaf.php) — انضم لعائلة مراجعة W14 بوسمها كاخوته التسعة، وكان بلا وسم فيفسد مقام الفجوات الاصلية (175 بدل 174)",
+        "wave_stage": "W14",
         "split_code": "",
         "split_rule": "",
         "split_why": "",
@@ -2800,7 +2800,7 @@
         "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
     },
     {
-        "id": "3523",
+        "id": "6723",
         "unit": "DEP-05",
         "surface_name": "فحص الموازنة والالتزام (acc_budget_check.php)",
         "built_counterpart": "",
@@ -2812,11 +2812,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3524",
+        "id": "6724",
         "unit": "DEP-05",
         "surface_name": "توزيع مراكز التكلفة (acc_cost_alloc.php)",
         "built_counterpart": "",
@@ -2828,11 +2828,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3525",
+        "id": "6725",
         "unit": "DEP-05",
         "surface_name": "ميزانية إدارتي (acc_dept_budget.php)",
         "built_counterpart": "",
@@ -2844,11 +2844,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3526",
+        "id": "6726",
         "unit": "DEP-05",
         "surface_name": "مراجعة المستندات (acc_docs_check.php)",
         "built_counterpart": "",
@@ -2860,11 +2860,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3527",
+        "id": "6727",
         "unit": "DEP-05",
         "surface_name": "المعاملات الواردة من الإدارات (acc_inbox.php)",
         "built_counterpart": "",
@@ -2876,11 +2876,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3528",
+        "id": "6728",
         "unit": "DEP-05",
         "surface_name": "عملي اليوم — محاسب الإدارة (acc_myday.php)",
         "built_counterpart": "",
@@ -2892,11 +2892,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3529",
+        "id": "6729",
         "unit": "DEP-05",
         "surface_name": "المعاملات المعادة (acc_returned.php)",
         "built_counterpart": "",
@@ -2908,11 +2908,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3530",
+        "id": "6730",
         "unit": "DEP-05",
         "surface_name": "الأحداث المالية في نطاقي (acc_scope_events.php)",
         "built_counterpart": "",
@@ -2924,11 +2924,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3531",
+        "id": "6731",
         "unit": "DEP-05",
         "surface_name": "تقارير تخصصي المحاسبي (acc_spec_reports.php)",
         "built_counterpart": "",
@@ -2940,11 +2940,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3532",
+        "id": "6732",
         "unit": "DEP-05",
         "surface_name": "المعالجة المحاسبية المقترحة (acc_treatment.php)",
         "built_counterpart": "",
@@ -2956,11 +2956,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3533",
+        "id": "6733",
         "unit": "DEP-05",
         "surface_name": "انحرافات الموازنة (acc_variance.php)",
         "built_counterpart": "",
@@ -2972,11 +2972,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3534",
+        "id": "6734",
         "unit": "DEP-08",
         "surface_name": "أنماط تفعيل المزايا (activation.php)",
         "built_counterpart": "",
@@ -2988,11 +2988,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3535",
+        "id": "6735",
         "unit": "DEP-07",
         "surface_name": "السلف والعهد المالية (advances.php)",
         "built_counterpart": "Workforce\/employee_advances.php",
@@ -3004,11 +3004,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "MERGE",
-        "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3536",
+        "id": "6736",
         "unit": "DEP-05",
         "surface_name": "توليد التزامات عقد المورد (ap_oblig_gen.php)",
         "built_counterpart": "",
@@ -3020,11 +3020,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3537",
+        "id": "6737",
         "unit": "DEP-05",
         "surface_name": "جدول استحقاقات العميل (ar_accrual_sched.php)",
         "built_counterpart": "",
@@ -3036,11 +3036,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3538",
+        "id": "6738",
         "unit": "DEP-08",
         "surface_name": "المعاونون والنيابة المؤقتة (assistants.php)",
         "built_counterpart": "",
@@ -3052,11 +3052,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3539",
+        "id": "6739",
         "unit": "DEP-08",
         "surface_name": "سجل التدقيق والاطّلاع (audit.php)",
         "built_counterpart": "",
@@ -3068,11 +3068,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3540",
+        "id": "6740",
         "unit": "DEP-06",
         "surface_name": "المطابقة البنكية (bank_recon.php)",
         "built_counterpart": "",
@@ -3084,11 +3084,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3541",
+        "id": "6741",
         "unit": "DEP-06",
         "surface_name": "التدفق النقدي والتنبؤ (cash_forecast.php)",
         "built_counterpart": "",
@@ -3100,11 +3100,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3542",
+        "id": "6742",
         "unit": "DEP-16",
         "surface_name": "ميزانية المشتريات المركزية المجمَّعة (central_proc_budget.php)",
         "built_counterpart": "",
@@ -3116,11 +3116,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3543",
+        "id": "6743",
         "unit": "EX-CEO",
         "surface_name": "موافقات التكليف على المسميات القيادية (ceo_appointments.php)",
         "built_counterpart": "",
@@ -3128,15 +3128,15 @@
         "src_ref": "live:gov_screen_cycle + 10 › 02_شاشة_بشاشة › ص453",
         "origin_stage": "W02",
         "origin_note": "SCR-0220 · ceo_appointments.php",
-        "wave_stage": "W14",
+        "wave_stage": "W15",
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3544",
+        "id": "6744",
         "unit": "EX-CEO",
         "surface_name": "تقارير المراجعة الداخلية — الرئيس (ceo_audit_inbox.php)",
         "built_counterpart": "",
@@ -3144,15 +3144,15 @@
         "src_ref": "live:gov_screen_cycle + 10 › 02_شاشة_بشاشة › ص451",
         "origin_stage": "W02",
         "origin_note": "SCR-0221 · ceo_audit_inbox.php",
-        "wave_stage": "W14",
+        "wave_stage": "W15",
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3545",
+        "id": "6745",
         "unit": "EX-CEO",
         "surface_name": "الاعتمادات المالية العليا — الرئيس (ceo_fin_approvals.php)",
         "built_counterpart": "",
@@ -3160,15 +3160,15 @@
         "src_ref": "live:gov_screen_cycle + 10 › 02_شاشة_بشاشة › ص452",
         "origin_stage": "W02",
         "origin_note": "SCR-0222 · ceo_fin_approvals.php",
-        "wave_stage": "W14",
+        "wave_stage": "W15",
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3546",
+        "id": "6746",
         "unit": "EX-CEO",
         "surface_name": "المسائل المحجوزة للرئيس التنفيذي (ceo_reserved.php)",
         "built_counterpart": "",
@@ -3176,15 +3176,15 @@
         "src_ref": "live:gov_screen_cycle + 10 › 02_شاشة_بشاشة › ص454",
         "origin_stage": "W02",
         "origin_note": "SCR-0223 · ceo_reserved.php",
-        "wave_stage": "W14",
+        "wave_stage": "W15",
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3547",
+        "id": "6747",
         "unit": "DEP-05",
         "surface_name": "لوحة المدير المالي (cfo_board.php)",
         "built_counterpart": "",
@@ -3196,11 +3196,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3548",
+        "id": "6748",
         "unit": "DEP-05",
         "surface_name": "دليل الحسابات ومراكز التكلفة (coa.php)",
         "built_counterpart": "",
@@ -3212,11 +3212,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3549",
+        "id": "6749",
         "unit": "DEP-05",
         "surface_name": "التكاليف والربحية بالمركز (cost_report.php)",
         "built_counterpart": "",
@@ -3228,11 +3228,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3550",
+        "id": "6750",
         "unit": "DEP-05",
         "surface_name": "الاستحقاقات والمخصصات (ctrl_accruals.php)",
         "built_counterpart": "",
@@ -3244,11 +3244,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3551",
+        "id": "6751",
         "unit": "DEP-05",
         "surface_name": "لوحة رئيس الحسابات (ctrl_board.php)",
         "built_counterpart": "",
@@ -3260,11 +3260,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3552",
+        "id": "6752",
         "unit": "DEP-05",
         "surface_name": "مراجعة محاضر الجرد النقدي (ctrl_cash_count.php)",
         "built_counterpart": "",
@@ -3276,11 +3276,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3553",
+        "id": "6753",
         "unit": "DEP-05",
         "surface_name": "تقويم الإقفال (ctrl_close_calendar.php)",
         "built_counterpart": "",
@@ -3292,11 +3292,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3554",
+        "id": "6754",
         "unit": "DEP-05",
         "surface_name": "قائمة فحص الإقفال (ctrl_close_checklist.php)",
         "built_counterpart": "",
@@ -3308,11 +3308,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3555",
+        "id": "6755",
         "unit": "DEP-05",
         "surface_name": "الاستثناءات المحاسبية (ctrl_exceptions.php)",
         "built_counterpart": "",
@@ -3324,11 +3324,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3556",
+        "id": "6756",
         "unit": "DEP-05",
         "surface_name": "فروق العملات (ctrl_fx_diff.php)",
         "built_counterpart": "",
@@ -3340,11 +3340,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3557",
+        "id": "6757",
         "unit": "DEP-05",
         "surface_name": "القيود غير المرتبطة بمصدر (ctrl_je_orphan.php)",
         "built_counterpart": "",
@@ -3356,11 +3356,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3558",
+        "id": "6758",
         "unit": "DEP-05",
         "surface_name": "طابور مراجعة القيود (ctrl_je_queue.php)",
         "built_counterpart": "",
@@ -3372,11 +3372,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3559",
+        "id": "6759",
         "unit": "DEP-05",
         "surface_name": "القيود عالية المخاطر (ctrl_je_risky.php)",
         "built_counterpart": "",
@@ -3388,11 +3388,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3560",
+        "id": "6760",
         "unit": "DEP-05",
         "surface_name": "تقارير جودة المحاسبة (ctrl_quality.php)",
         "built_counterpart": "",
@@ -3404,11 +3404,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3561",
+        "id": "6761",
         "unit": "DEP-05",
         "surface_name": "مراجعة المطابقات البنكية (ctrl_recon_review.php)",
         "built_counterpart": "",
@@ -3420,11 +3420,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3562",
+        "id": "6762",
         "unit": "DEP-05",
         "surface_name": "سجل إعادة فتح الفترات (ctrl_reopen_log.php)",
         "built_counterpart": "",
@@ -3436,11 +3436,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3563",
+        "id": "6763",
         "unit": "DEP-05",
         "surface_name": "القوائم المالية (ctrl_statements.php)",
         "built_counterpart": "",
@@ -3452,11 +3452,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3564",
+        "id": "6764",
         "unit": "DEP-05",
         "surface_name": "ميزان المراجعة (ctrl_trial_balance.php)",
         "built_counterpart": "",
@@ -3468,11 +3468,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3565",
+        "id": "6765",
         "unit": "DEP-14",
         "surface_name": "العهد والمرتجعات (custody.php)",
         "built_counterpart": "",
@@ -3484,11 +3484,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3566",
+        "id": "6766",
         "unit": "DEP-05",
         "surface_name": "زمن دورة الطلبات (cycle_time.php)",
         "built_counterpart": "",
@@ -3500,11 +3500,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3567",
+        "id": "6767",
         "unit": "EX-CEO",
         "surface_name": "التفويض بالتوقيع (delegations.php)",
         "built_counterpart": "",
@@ -3512,15 +3512,15 @@
         "src_ref": "live:gov_screen_cycle + 10 › 02_شاشة_بشاشة › ص450",
         "origin_stage": "W02",
         "origin_note": "SCR-0244 · delegations.php",
-        "wave_stage": "W14",
+        "wave_stage": "W15",
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3568",
+        "id": "6768",
         "unit": "DEP-04",
         "surface_name": "سياسات الإهلاك المعتمدة (dep_profiles.php)",
         "built_counterpart": "",
@@ -3532,11 +3532,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3569",
+        "id": "6769",
         "unit": "DEP-04",
         "surface_name": "توزيع المعدات والمشغّلين (distribution.php)",
         "built_counterpart": "",
@@ -3548,11 +3548,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3570",
+        "id": "6770",
         "unit": "DEP-07",
         "surface_name": "عقود الموظفين (emp_contracts.php)",
         "built_counterpart": "Employees\/employee_contracts.php",
@@ -3564,11 +3564,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "MERGE",
-        "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3571",
+        "id": "6771",
         "unit": "DEP-08",
         "surface_name": "سجل الشركات والكيانات (entities.php)",
         "built_counterpart": "",
@@ -3580,11 +3580,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3572",
+        "id": "6772",
         "unit": "DEP-07",
         "surface_name": "وثائق المعدات والمشغّلين (equip_docs.php)",
         "built_counterpart": "Equipments\/equipment_documents.php",
@@ -3596,11 +3596,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "MERGE",
-        "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3573",
+        "id": "6773",
         "unit": "DEP-04",
         "surface_name": "قراءات العدّادات (equip_meters.php)",
         "built_counterpart": "",
@@ -3612,11 +3612,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3574",
+        "id": "6774",
         "unit": "DEP-04",
         "surface_name": "موديلات المعدات ومواصفاتها (equip_models.php)",
         "built_counterpart": "",
@@ -3628,11 +3628,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3575",
+        "id": "6775",
         "unit": "DEP-04",
         "surface_name": "أنواع المعدات وفئاتها (equip_types.php)",
         "built_counterpart": "",
@@ -3644,11 +3644,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3576",
+        "id": "6776",
         "unit": "DEP-04",
         "surface_name": "تصنيف الأعطال وأسبابها (failures.php)",
         "built_counterpart": "",
@@ -3660,11 +3660,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3577",
+        "id": "6777",
         "unit": "DEP-05",
         "surface_name": "تنبيهات الاستحقاقات والالتزامات (fin_alerts.php)",
         "built_counterpart": "",
@@ -3676,11 +3676,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3578",
+        "id": "6778",
         "unit": "DEP-05",
         "surface_name": "اختبار قابلية التجنب للعقود (fin_avoid_test.php)",
         "built_counterpart": "",
@@ -3692,11 +3692,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3579",
+        "id": "6779",
         "unit": "DEP-05",
         "surface_name": "سجل الارتباطات التعاقدية والإفصاح (fin_commitments.php)",
         "built_counterpart": "",
@@ -3708,11 +3708,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3580",
+        "id": "6780",
         "unit": "DEP-05",
         "surface_name": "توزيع تكلفة التمويل على المشاريع (fin_cost.php)",
         "built_counterpart": "",
@@ -3724,11 +3724,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3581",
+        "id": "6781",
         "unit": "DEP-05",
         "surface_name": "تصنيف بيانات الشاشات الرباعي (fin_data_class.php)",
         "built_counterpart": "",
@@ -3740,11 +3740,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3582",
+        "id": "6782",
         "unit": "DEP-03",
         "surface_name": "انحرافات التمويل — السداد والملكية والتوثيق (fin_deviations.php)",
         "built_counterpart": "Financing\/deviations.php",
@@ -3756,11 +3756,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "MERGE",
-        "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3583",
+        "id": "6783",
         "unit": "DEP-03",
         "surface_name": "الخروج غير المسجَّل من الملكية (fin_exit.php)",
         "built_counterpart": "Financing\/asset_disposal.php",
@@ -3772,11 +3772,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "MERGE",
-        "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3584",
+        "id": "6784",
         "unit": "DEP-03",
         "surface_name": "عقود تمويل بلا حركة (fin_idle.php)",
         "built_counterpart": "Financing\/deviations.php?view=v649001",
@@ -3788,11 +3788,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "MERGE",
-        "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3585",
+        "id": "6785",
         "unit": "DEP-05",
         "surface_name": "توزيع التخصصات والنطاقات (fin_mgr_assign.php)",
         "built_counterpart": "",
@@ -3804,11 +3804,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3586",
+        "id": "6786",
         "unit": "DEP-05",
         "surface_name": "لوحة مدير الإدارة المالية (fin_mgr_board.php)",
         "built_counterpart": "",
@@ -3820,11 +3820,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3587",
+        "id": "6787",
         "unit": "DEP-03",
         "surface_name": "عمليات التمويل (fin_ops.php)",
         "built_counterpart": "Financing\/operation_profile.php",
@@ -3836,11 +3836,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "MERGE",
-        "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3588",
+        "id": "6788",
         "unit": "DEP-05",
         "surface_name": "مصفوفة شروط الاعتراف بالمعيار (fin_recognition.php)",
         "built_counterpart": "",
@@ -3852,11 +3852,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3589",
+        "id": "6789",
         "unit": "EX-CEO",
         "surface_name": "القوائم المالية (fin_statements.php)",
         "built_counterpart": "",
@@ -3864,15 +3864,15 @@
         "src_ref": "live:gov_screen_cycle + 10 › 02_شاشة_بشاشة › ص463",
         "origin_stage": "W02",
         "origin_note": "SCR-0266 · fin_statements.php",
-        "wave_stage": "W14",
+        "wave_stage": "W15",
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3590",
+        "id": "6790",
         "unit": "DEP-05",
         "surface_name": "سجل المُطلِقات المالية الخمسة والثلاثين (fin_triggers.php)",
         "built_counterpart": "",
@@ -3884,11 +3884,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3591",
+        "id": "6791",
         "unit": "DEP-03",
         "surface_name": "فروق السداد والاستحقاق (fin_variance.php)",
         "built_counterpart": "Financing\/deviations.php?view=v08c5c1",
@@ -3900,11 +3900,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "MERGE",
-        "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3592",
+        "id": "6792",
         "unit": "DEP-03",
         "surface_name": "سجل الممولين (financiers.php)",
         "built_counterpart": "Financing\/financiers_registry.php",
@@ -3916,11 +3916,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "MERGE",
-        "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3593",
+        "id": "6793",
         "unit": "DEP-04",
         "surface_name": "ملّاك الأسطول (fleet_owners.php)",
         "built_counterpart": "",
@@ -3932,11 +3932,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3594",
+        "id": "6794",
         "unit": "DEP-12",
         "surface_name": "صرف الوقود اليومي للمعدات (fuel_issue.php)",
         "built_counterpart": "",
@@ -3948,11 +3948,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3595",
+        "id": "6795",
         "unit": "DEP-12",
         "surface_name": "استلام الوقود من العميل (fuel_receipt.php)",
         "built_counterpart": "",
@@ -3964,11 +3964,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3596",
+        "id": "6796",
         "unit": "DEP-12",
         "surface_name": "مطابقة كميات الوقود (fuel_reconcile.php)",
         "built_counterpart": "",
@@ -3980,11 +3980,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3597",
+        "id": "6797",
         "unit": "DEP-05",
         "surface_name": "سعر الصرف اليومي (fx_daily.php)",
         "built_counterpart": "",
@@ -3996,11 +3996,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3598",
+        "id": "6798",
         "unit": "DEP-05",
         "surface_name": "أسعار الصرف (fx_rates.php)",
         "built_counterpart": "",
@@ -4012,11 +4012,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3599",
+        "id": "6799",
         "unit": "IAF",
         "surface_name": "حوكمة المراجعة الداخلية (gov_dept_iaf.php)",
         "built_counterpart": "",
@@ -4024,15 +4024,15 @@
         "src_ref": "live:gov_screen_cycle + 10 › 02_شاشة_بشاشة › ص654",
         "origin_stage": "W02",
         "origin_note": "SCR-0276 · gov_dept_iaf.php",
-        "wave_stage": "W13",
+        "wave_stage": "W14",
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3600",
+        "id": "6800",
         "unit": "DEP-08",
         "surface_name": "خطوات السلالم المسجَّلة (gov_ladder_steps.php)",
         "built_counterpart": "",
@@ -4044,11 +4044,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3601",
+        "id": "6801",
         "unit": "DEP-08",
         "surface_name": "سلاليم الاعتماد وتعريفها (gov_ladders.php)",
         "built_counterpart": "",
@@ -4060,11 +4060,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3602",
+        "id": "6802",
         "unit": "IAF",
         "surface_name": "خطط المعالجة والمتابعة (iaf_actions.php)",
         "built_counterpart": "",
@@ -4072,15 +4072,15 @@
         "src_ref": "live:gov_screen_cycle + 10 › 02_شاشة_بشاشة › ص649",
         "origin_stage": "W02",
         "origin_note": "SCR-0279 · iaf_actions.php",
-        "wave_stage": "W13",
+        "wave_stage": "W14",
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3603",
+        "id": "6803",
         "unit": "IAF",
         "surface_name": "لوحة رئيس المراجعة الداخلية (iaf_board.php)",
         "built_counterpart": "Audit\/iaf_overview.php",
@@ -4088,15 +4088,15 @@
         "src_ref": "live:gov_screen_cycle + 10 › 02_شاشة_بشاشة › ص637",
         "origin_stage": "W02",
         "origin_note": "SCR-0280 · iaf_board.php",
-        "wave_stage": "W13",
+        "wave_stage": "W14",
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3604",
+        "id": "6804",
         "unit": "IAF",
         "surface_name": "طلبات الأدلة (iaf_evidence.php)",
         "built_counterpart": "",
@@ -4104,15 +4104,15 @@
         "src_ref": "live:gov_screen_cycle + 10 › 02_شاشة_بشاشة › ص647",
         "origin_stage": "W02",
         "origin_note": "SCR-0281 · iaf_evidence.php",
-        "wave_stage": "W13",
+        "wave_stage": "W14",
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3605",
+        "id": "6805",
         "unit": "IAF",
         "surface_name": "الملاحظات المتأخرة والتصعيد (iaf_overdue.php)",
         "built_counterpart": "",
@@ -4120,15 +4120,15 @@
         "src_ref": "live:gov_screen_cycle + 10 › 02_شاشة_بشاشة › ص639",
         "origin_stage": "W02",
         "origin_note": "SCR-0282 · iaf_overdue.php",
-        "wave_stage": "W13",
+        "wave_stage": "W14",
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3606",
+        "id": "6806",
         "unit": "IAF",
         "surface_name": "برامج المراجعة (iaf_programs.php)",
         "built_counterpart": "Audit\/iaf_audit_programs.php",
@@ -4136,15 +4136,15 @@
         "src_ref": "live:gov_screen_cycle + 10 › 02_شاشة_بشاشة › ص644",
         "origin_stage": "W02",
         "origin_note": "SCR-0283 · iaf_programs.php",
-        "wave_stage": "W13",
+        "wave_stage": "W14",
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3607",
+        "id": "6807",
         "unit": "IAF",
         "surface_name": "العينات ونتائج الاختبارات (iaf_samples.php)",
         "built_counterpart": "Audit\/iaf_test_samples.php",
@@ -4152,15 +4152,15 @@
         "src_ref": "live:gov_screen_cycle + 10 › 02_شاشة_بشاشة › ص648",
         "origin_stage": "W02",
         "origin_note": "SCR-0284 · iaf_samples.php",
-        "wave_stage": "W13",
+        "wave_stage": "W14",
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3608",
+        "id": "6808",
         "unit": "IAF",
         "surface_name": "سجل الاطلاع الحساس للمراجعين (iaf_sensitive_log.php)",
         "built_counterpart": "",
@@ -4168,15 +4168,15 @@
         "src_ref": "live:gov_screen_cycle + 10 › 02_شاشة_بشاشة › ص651",
         "origin_stage": "W02",
         "origin_note": "SCR-0285 · iaf_sensitive_log.php",
-        "wave_stage": "W13",
+        "wave_stage": "W14",
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3609",
+        "id": "6809",
         "unit": "DEP-05",
         "surface_name": "صرف مواد من المخزن (issue.php)",
         "built_counterpart": "",
@@ -4188,11 +4188,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3610",
+        "id": "6810",
         "unit": "DEP-14",
         "surface_name": "كتالوج الأصناف والقطع الحرجة (items.php)",
         "built_counterpart": "",
@@ -4204,11 +4204,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3611",
+        "id": "6811",
         "unit": "DEP-05",
         "surface_name": "القيود اليومية (journal.php)",
         "built_counterpart": "",
@@ -4220,11 +4220,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3612",
+        "id": "6812",
         "unit": "DEP-11",
         "surface_name": "متابعة الرحلات الذهبية (journey_tracker.php)",
         "built_counterpart": "",
@@ -4236,11 +4236,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3613",
+        "id": "6813",
         "unit": "DEP-07",
         "surface_name": "الإجازات والغياب (leaves.php)",
         "built_counterpart": "Workforce\/worker_leave_absence.php",
@@ -4252,11 +4252,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "MERGE",
-        "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3614",
+        "id": "6814",
         "unit": "DEP-08",
         "surface_name": "التراخيص والكفالات (licenses.php)",
         "built_counterpart": "",
@@ -4268,11 +4268,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3615",
+        "id": "6815",
         "unit": "DEP-05",
         "surface_name": "مخصص الصيانة والعمرات (maint_provision.php)",
         "built_counterpart": "",
@@ -4284,11 +4284,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3616",
+        "id": "6816",
         "unit": "EX-CEO",
         "surface_name": "هامش الربح للعقد والواقعة (margin.php)",
         "built_counterpart": "",
@@ -4296,15 +4296,15 @@
         "src_ref": "live:gov_screen_cycle + 10 › 02_شاشة_بشاشة › ص464",
         "origin_stage": "W02",
         "origin_note": "SCR-0293 · margin.php",
-        "wave_stage": "W14",
+        "wave_stage": "W15",
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3617",
+        "id": "6817",
         "unit": "DEP-11",
         "surface_name": "مساحة عملي — أربعة صناديق (my_workspace_v2.php)",
         "built_counterpart": "",
@@ -4316,11 +4316,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3618",
+        "id": "6818",
         "unit": "DEP-07",
         "surface_name": "تكليف المشغّل على المعدة (op_assign.php)",
         "built_counterpart": "Employees\/equipment_operators.php",
@@ -4332,11 +4332,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "MERGE",
-        "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3619",
+        "id": "6819",
         "unit": "DEP-07",
         "surface_name": "خصومات المشغّلين المقترحة (op_deduct.php)",
         "built_counterpart": "Workforce\/proposed_deductions.php",
@@ -4348,11 +4348,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "MERGE",
-        "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3620",
+        "id": "6820",
         "unit": "DEP-07",
         "surface_name": "سجل المشغّلين (operators.php)",
         "built_counterpart": "Oprators\/oprators.php",
@@ -4364,11 +4364,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "MERGE",
-        "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3621",
+        "id": "6821",
         "unit": "DEP-11",
         "surface_name": "غرفة عمليات المواقع (ops_room.php)",
         "built_counterpart": "",
@@ -4380,11 +4380,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3622",
+        "id": "6822",
         "unit": "DEP-05",
         "surface_name": "ذمم الموردين والمستحقات (payables.php)",
         "built_counterpart": "",
@@ -4396,11 +4396,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3623",
+        "id": "6823",
         "unit": "DEP-05",
         "surface_name": "مسيّر الرواتب (payroll.php)",
         "built_counterpart": "",
@@ -4412,11 +4412,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3624",
+        "id": "6824",
         "unit": "DEP-05",
         "surface_name": "إقفال الفترة المحاسبية (period_close.php)",
         "built_counterpart": "",
@@ -4428,11 +4428,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3625",
+        "id": "6825",
         "unit": "DEP-16",
         "surface_name": "أوامر الشراء (po.php)",
         "built_counterpart": "",
@@ -4444,11 +4444,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3626",
+        "id": "6826",
         "unit": "DEP-11",
         "surface_name": "طلبات الشراء (pr.php)",
         "built_counterpart": "",
@@ -4460,11 +4460,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3627",
+        "id": "6827",
         "unit": "DEP-04",
         "surface_name": "خطط الصيانة الوقائية (preventive.php)",
         "built_counterpart": "",
@@ -4476,11 +4476,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3628",
+        "id": "6828",
         "unit": "DEP-04",
         "surface_name": "جاهزية المعدات للتشغيل (readiness.php)",
         "built_counterpart": "",
@@ -4492,11 +4492,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3629",
+        "id": "6829",
         "unit": "DEP-05",
         "surface_name": "ذمم العملاء وأعمارها (receivables.php)",
         "built_counterpart": "",
@@ -4508,11 +4508,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3630",
+        "id": "6830",
         "unit": "DEP-07",
         "surface_name": "التوظيف من الشاغر إلى المباشرة (recruitment.php)",
         "built_counterpart": "Workforce\/recruitment_pipeline.php",
@@ -4524,11 +4524,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "MERGE",
-        "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3631",
+        "id": "6831",
         "unit": "DEP-08",
         "surface_name": "مركز التقارير (reports_index.php)",
         "built_counterpart": "",
@@ -4540,11 +4540,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3632",
+        "id": "6832",
         "unit": "DEP-16",
         "surface_name": "طلب العروض ومقارنتها (rfq.php)",
         "built_counterpart": "",
@@ -4556,11 +4556,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3633",
+        "id": "6833",
         "unit": "DEP-09",
         "surface_name": "لوحة المخاطر المؤسسية (risk_dashboard.php)",
         "built_counterpart": "",
@@ -4572,11 +4572,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3634",
+        "id": "6834",
         "unit": "IAF",
         "surface_name": "مخاطر المراجعة الداخلية (risk_dept_iaf.php)",
         "built_counterpart": "",
@@ -4584,15 +4584,15 @@
         "src_ref": "live:gov_screen_cycle + 10 › 02_شاشة_بشاشة › ص653",
         "origin_stage": "W02",
         "origin_note": "SCR-0311 · risk_dept_iaf.php",
-        "wave_stage": "W13",
+        "wave_stage": "W14",
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3635",
+        "id": "6835",
         "unit": "DEP-09",
         "surface_name": "مخاطر الإدارة (risk_dept_view.php)",
         "built_counterpart": "",
@@ -4604,11 +4604,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3636",
+        "id": "6836",
         "unit": "DEP-09",
         "surface_name": "مؤشرات المخاطر والضوابط (risk_kri.php)",
         "built_counterpart": "",
@@ -4620,11 +4620,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3637",
+        "id": "6837",
         "unit": "DEP-09",
         "surface_name": "ملف الخطر (risk_profile.php)",
         "built_counterpart": "",
@@ -4636,11 +4636,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3638",
+        "id": "6838",
         "unit": "DEP-09",
         "surface_name": "إجراءات المعالجة (risk_treatment.php)",
         "built_counterpart": "",
@@ -4652,11 +4652,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3639",
+        "id": "6839",
         "unit": "DEP-03",
         "surface_name": "حصص الملكية في الأصول (shares.php)",
         "built_counterpart": "Financing\/owners_registry.php",
@@ -4668,11 +4668,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "MERGE",
-        "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3640",
+        "id": "6840",
         "unit": "DEP-12",
         "surface_name": "مؤشرات الورديات المشتقة (shift_metrics.php)",
         "built_counterpart": "",
@@ -4684,11 +4684,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3641",
+        "id": "6841",
         "unit": "DEP-12",
         "surface_name": "لوحة محاسب الموقع (site_acc_board.php)",
         "built_counterpart": "",
@@ -4700,11 +4700,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3642",
+        "id": "6842",
         "unit": "DEP-12",
         "surface_name": "عهدة الموقع والصرف منها (site_custody.php)",
         "built_counterpart": "",
@@ -4716,11 +4716,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3643",
+        "id": "6843",
         "unit": "DEP-12",
         "surface_name": "تصفية العهدة (site_custody_settle.php)",
         "built_counterpart": "",
@@ -4732,11 +4732,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3644",
+        "id": "6844",
         "unit": "DEP-12",
         "surface_name": "صرف مشتريات ميدانية من العهدة (site_custody_spend.php)",
         "built_counterpart": "",
@@ -4748,11 +4748,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3645",
+        "id": "6845",
         "unit": "DEP-12",
         "surface_name": "قرار الاستعداد أو التعطل (standby_decide.php)",
         "built_counterpart": "",
@@ -4764,11 +4764,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3646",
+        "id": "6846",
         "unit": "DEP-05",
         "surface_name": "أرصدة المخزون بحالاتها (stock.php)",
         "built_counterpart": "",
@@ -4780,11 +4780,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3647",
+        "id": "6847",
         "unit": "DEP-11",
         "surface_name": "التوقفات وتحديد المتحمل (stops.php)",
         "built_counterpart": "",
@@ -4796,11 +4796,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3648",
+        "id": "6848",
         "unit": "DEP-02",
         "surface_name": "معدات المورد ومالكوها (supplier_equip.php)",
         "built_counterpart": "",
@@ -4812,11 +4812,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3649",
+        "id": "6849",
         "unit": "DEP-02",
         "surface_name": "دفتر استهلاك حصص الموردين (quota_ledger.php)",
         "built_counterpart": "",
@@ -4828,11 +4828,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3650",
+        "id": "6850",
         "unit": "DEP-02",
         "surface_name": "أداء الموردين وجاهزيتهم (supplier_perf.php)",
         "built_counterpart": "",
@@ -4844,11 +4844,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3651",
+        "id": "6851",
         "unit": "DEP-10",
         "surface_name": "إعدادات البلاغات — الأنواع والمهل والتصعيد (ticket_config.php)",
         "built_counterpart": "Tickets\/ticket_types_config.php",
@@ -4860,11 +4860,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "MERGE",
-        "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3652",
+        "id": "6852",
         "unit": "DEP-10",
         "surface_name": "مهل البلاغات وتصعيدها (ticket_escalate.php)",
         "built_counterpart": "Tickets\/ticket_escalation_config.php",
@@ -4876,11 +4876,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "MERGE",
-        "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3653",
+        "id": "6853",
         "unit": "DEP-08",
         "surface_name": "أبلغ عن مشكلة من هذه الشاشة (ticket_open.php)",
         "built_counterpart": "",
@@ -4892,11 +4892,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3654",
+        "id": "6854",
         "unit": "DEP-10",
         "surface_name": "البلاغات الدورية المولَّدة (ticket_periodic.php)",
         "built_counterpart": "Tickets\/ticket_recurrence.php",
@@ -4908,11 +4908,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "MERGE",
-        "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3655",
+        "id": "6855",
         "unit": "DEP-14",
         "surface_name": "البلاغات المتكررة وسببها الجذري (ticket_recur.php)",
         "built_counterpart": "",
@@ -4924,11 +4924,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3656",
+        "id": "6856",
         "unit": "DEP-10",
         "surface_name": "تصنيف البلاغ وتوجيهه آليًّا (ticket_route.php)",
         "built_counterpart": "Tickets\/intake_classify.php",
@@ -4940,11 +4940,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "MERGE",
-        "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3657",
+        "id": "6857",
         "unit": "DEP-14",
         "surface_name": "تحويل البلاغ وتفريعه لمسارات (ticket_split.php)",
         "built_counterpart": "",
@@ -4956,11 +4956,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3658",
+        "id": "6858",
         "unit": "DEP-10",
         "surface_name": "بلاغات المركز (tickets.php)",
         "built_counterpart": "Tickets\/tickets_list.php",
@@ -4972,11 +4972,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "MERGE",
-        "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3659",
+        "id": "6859",
         "unit": "DEP-08",
         "surface_name": "بلاغات إدارتي (tickets_dept.php)",
         "built_counterpart": "",
@@ -4988,11 +4988,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3660",
+        "id": "6860",
         "unit": "DEP-08",
         "surface_name": "وضع التدريب وسيناريوهاته (training_mode.php)",
         "built_counterpart": "",
@@ -5004,11 +5004,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3661",
+        "id": "6861",
         "unit": "DEP-05",
         "surface_name": "إقفال الأمر وتحميل تكلفته (transfer_cost.php)",
         "built_counterpart": "",
@@ -5020,11 +5020,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3662",
+        "id": "6862",
         "unit": "DEP-04",
         "surface_name": "أوامر الترحيل (transfer_ord.php)",
         "built_counterpart": "",
@@ -5036,11 +5036,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3663",
+        "id": "6863",
         "unit": "DEP-11",
         "surface_name": "طلبات الترحيل (transfer_req.php)",
         "built_counterpart": "",
@@ -5052,11 +5052,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3664",
+        "id": "6864",
         "unit": "DEP-15",
         "surface_name": "تعرفة الترحيل وقواعد التحميل (transfer_tariff.php)",
         "built_counterpart": "",
@@ -5068,11 +5068,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3665",
+        "id": "6865",
         "unit": "DEP-15",
         "surface_name": "متابعة الرحلات في الطريق (transfer_track.php)",
         "built_counterpart": "",
@@ -5084,11 +5084,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3666",
+        "id": "6866",
         "unit": "DEP-06",
         "surface_name": "سجل الحسابات البنكية والتوقيعات (tre_bank_accounts.php)",
         "built_counterpart": "",
@@ -5100,27 +5100,27 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3667",
+        "id": "6867",
         "unit": "DEP-06",
         "surface_name": "لوحة الخزينة والبنوك (tre_board.php)",
-        "built_counterpart": "Finance\/tre_liquidity_board.php",
+        "built_counterpart": "",
         "verdict": "Build — سطحٌ مستهدَفٌ لم يُبنَ قطّ (نُقل من خانةِ المبنيّ في W02)",
         "src_ref": "live:gov_screen_cycle + 10 › 02_شاشة_بشاشة › ص75",
         "origin_stage": "W02",
-        "origin_note": "SCR-0344 · tre_board.php | وُفِّيت في W11 بسطحٍ مبنيٍّ باسمِه: لوحة الخزينة والسيولة (Finance\/tre_liquidity_board.php). والفجوةُ اسمٌ مستهدَفٌ لا اسمُ ملفٍّ مُلزِم (سابقة W9-D-08).",
+        "origin_note": "SCR-0344 · tre_board.php",
         "wave_stage": "W11",
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "MERGE",
-        "disposition_why": "سطح قائم باسم اخر يوفيه — قيد في built_counterpart ولا يبنى له توام"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3668",
+        "id": "6868",
         "unit": "DEP-06",
         "surface_name": "الخزائن والصناديق (tre_cash_box.php)",
         "built_counterpart": "",
@@ -5132,11 +5132,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3669",
+        "id": "6869",
         "unit": "DEP-06",
         "surface_name": "توثيق التنفيذ والإشعارات (tre_exec_log.php)",
         "built_counterpart": "",
@@ -5148,11 +5148,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3670",
+        "id": "6870",
         "unit": "DEP-06",
         "surface_name": "السيولة والتدفق النقدي (tre_liquidity.php)",
         "built_counterpart": "",
@@ -5164,11 +5164,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3671",
+        "id": "6871",
         "unit": "DEP-06",
         "surface_name": "سندات القبض والتحصيل (tre_receipts.php)",
         "built_counterpart": "",
@@ -5180,11 +5180,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3672",
+        "id": "6872",
         "unit": "DEP-06",
         "surface_name": "الخزينة والصناديق (treasury.php)",
         "built_counterpart": "",
@@ -5196,11 +5196,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3673",
+        "id": "6873",
         "unit": "DEP-04",
         "surface_name": "إسناد المعدات للوحدات (unit_assign.php)",
         "built_counterpart": "",
@@ -5212,11 +5212,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3674",
+        "id": "6874",
         "unit": "DEP-11",
         "surface_name": "الاعتماد اليومي لرفع الوحدات (unit_daily_approve.php)",
         "built_counterpart": "",
@@ -5228,11 +5228,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3675",
+        "id": "6875",
         "unit": "DEP-11",
         "surface_name": "إدخال وحدات العمل اليومية (unit_entry.php)",
         "built_counterpart": "",
@@ -5244,11 +5244,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3676",
+        "id": "6876",
         "unit": "DEP-05",
         "surface_name": "الاعتماد المالي الأولي (unit_fin_prelim.php)",
         "built_counterpart": "",
@@ -5260,11 +5260,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3677",
+        "id": "6877",
         "unit": "DEP-01",
         "surface_name": "بوابة مدير المبيعات (unit_sales_gate.php)",
         "built_counterpart": "",
@@ -5276,11 +5276,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3678",
+        "id": "6878",
         "unit": "DEP-11",
         "surface_name": "كشف التايم شيت — المشغّل (unit_statement_worker.php)",
         "built_counterpart": "",
@@ -5292,11 +5292,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3679",
+        "id": "6879",
         "unit": "DEP-02",
         "surface_name": "اعتماد وحدات الموردين (unit_supplier_approve.php)",
         "built_counterpart": "",
@@ -5308,11 +5308,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3680",
+        "id": "6880",
         "unit": "DEP-11",
         "surface_name": "اعتماد وحدات المشغّلين (unit_workforce_approve.php)",
         "built_counterpart": "",
@@ -5324,11 +5324,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3681",
+        "id": "6881",
         "unit": "DEP-05",
         "surface_name": "متابعة انحراف المنفَّذ عن المخطط (variance.php)",
         "built_counterpart": "",
@@ -5340,11 +5340,11 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     },
     {
-        "id": "3682",
+        "id": "6882",
         "unit": "DEP-08",
         "surface_name": "من يرى ماذا ومكوّنات البوابة (visibility.php)",
         "built_counterpart": "",
@@ -5356,7 +5356,7 @@
         "split_code": "",
         "split_rule": "",
         "split_why": "",
-        "ghost_disposition": "BUILD",
-        "disposition_why": "مختوم بموجة قادمة — يبنى في موجته لا الان"
+        "ghost_disposition": "",
+        "disposition_why": ""
     }
 ]

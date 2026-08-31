@@ -20,7 +20,7 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 $D = $ROOT . '/docs/baseline_20260821/extract/';
 function j($f) { global $D; return json_decode((string) file_get_contents($D . $f . '.json'), true) ?: array(); }
 
-$SNAP = 'BL-20260828c-96a640e1+WT';
+$SNAP = 'BL-20260831-52f4fe37';
 $reg = j('screen_registry');
 $fields = j('field_registry');
 $cycle = j('gov_screen_cycle');
@@ -83,7 +83,7 @@ function meta_rows($ws, $title)
 {
     global $SNAP;
     $ws->setCellValue('A1', $title);
-    $ws->setCellValue('A2', 'اللقطة: ' . $SNAP . ' · تاريخ القياس: 2026-08-28 21:25→22:10 · المصدر: استخراج حي (كود + قاعدة + Git) — لا صيغ: كل قيمة قياسٌ بلحظته · اللقطة السابقة في historical/');
+    $ws->setCellValue('A2', 'اللقطة: ' . $SNAP . ' · تاريخ القياس: 2026-08-31 10:32→11:30 · المصدر: استخراج حي (كود + قاعدة + Git) — لا صيغ: كل قيمة قياسٌ بلحظته · اللقطة السابقة في historical/');
     $ws->getStyle('A1')->getFont()->setBold(true)->setSize(13)->setName('Arial');
     $ws->getStyle('A2')->getFont()->setSize(9)->setItalic(true)->setName('Arial');
 }

@@ -32,14 +32,6 @@
         "note": "Deputy_Role \/ Scope — خارجَ الـ17"
     },
     {
-        "canonical_code": "PLATFORM",
-        "display_order": null,
-        "name_ar": "المنصّة المشتركة",
-        "sector": "OUTSIDE",
-        "parent_code": null,
-        "note": "رمزٌ منصّيٌّ مشترك — الأسطحُ التي تخدم كلَّ الإداراتِ بإسقاطٍ معلَّمٍ بالنطاق · لا إدارةً ولا مصدرَ حقيقة"
-    },
-    {
         "canonical_code": "DEP-01",
         "display_order": "1",
         "name_ar": "إدارة المبيعات التعاقدية والعقود",

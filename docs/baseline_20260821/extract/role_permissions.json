@@ -1764,6 +1764,87 @@
         "can_delete": "0"
     },
     {
+        "id": "9472",
+        "role_id": "1",
+        "module_id": "870",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9482",
+        "role_id": "1",
+        "module_id": "872",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9486",
+        "role_id": "1",
+        "module_id": "874",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9514",
+        "role_id": "1",
+        "module_id": "876",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9546",
+        "role_id": "1",
+        "module_id": "881",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9555",
+        "role_id": "1",
+        "module_id": "882",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9595",
+        "role_id": "1",
+        "module_id": "889",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9622",
+        "role_id": "1",
+        "module_id": "890",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9708",
+        "role_id": "1",
+        "module_id": "899",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
         "id": "49",
         "role_id": "2",
         "module_id": "1",
@@ -3213,6 +3294,195 @@
         "can_delete": "0"
     },
     {
+        "id": "9477",
+        "role_id": "2",
+        "module_id": "870",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9483",
+        "role_id": "2",
+        "module_id": "872",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9487",
+        "role_id": "2",
+        "module_id": "874",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9515",
+        "role_id": "2",
+        "module_id": "876",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9551",
+        "role_id": "2",
+        "module_id": "881",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9556",
+        "role_id": "2",
+        "module_id": "882",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9558",
+        "role_id": "2",
+        "module_id": "883",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9567",
+        "role_id": "2",
+        "module_id": "884",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9573",
+        "role_id": "2",
+        "module_id": "885",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9582",
+        "role_id": "2",
+        "module_id": "886",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9591",
+        "role_id": "2",
+        "module_id": "887",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9596",
+        "role_id": "2",
+        "module_id": "889",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9623",
+        "role_id": "2",
+        "module_id": "890",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9650",
+        "role_id": "2",
+        "module_id": "892",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9659",
+        "role_id": "2",
+        "module_id": "893",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9668",
+        "role_id": "2",
+        "module_id": "894",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9677",
+        "role_id": "2",
+        "module_id": "895",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9686",
+        "role_id": "2",
+        "module_id": "896",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9695",
+        "role_id": "2",
+        "module_id": "897",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9704",
+        "role_id": "2",
+        "module_id": "898",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9713",
+        "role_id": "2",
+        "module_id": "899",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
         "id": "114",
         "role_id": "3",
         "module_id": "1",
@@ -4449,6 +4719,132 @@
         "id": "6761",
         "role_id": "3",
         "module_id": "869",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9471",
+        "role_id": "3",
+        "module_id": "870",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9488",
+        "role_id": "3",
+        "module_id": "874",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9516",
+        "role_id": "3",
+        "module_id": "876",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9545",
+        "role_id": "3",
+        "module_id": "881",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9560",
+        "role_id": "3",
+        "module_id": "883",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9597",
+        "role_id": "3",
+        "module_id": "889",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9624",
+        "role_id": "3",
+        "module_id": "890",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9652",
+        "role_id": "3",
+        "module_id": "892",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9661",
+        "role_id": "3",
+        "module_id": "893",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9670",
+        "role_id": "3",
+        "module_id": "894",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9679",
+        "role_id": "3",
+        "module_id": "895",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9688",
+        "role_id": "3",
+        "module_id": "896",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9697",
+        "role_id": "3",
+        "module_id": "897",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9707",
+        "role_id": "3",
+        "module_id": "899",
         "can_view": "1",
         "can_add": "0",
         "can_edit": "0",
@@ -5859,6 +6255,114 @@
         "can_delete": "0"
     },
     {
+        "id": "9489",
+        "role_id": "4",
+        "module_id": "874",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9517",
+        "role_id": "4",
+        "module_id": "876",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9563",
+        "role_id": "4",
+        "module_id": "883",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9570",
+        "role_id": "4",
+        "module_id": "884",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9598",
+        "role_id": "4",
+        "module_id": "889",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9625",
+        "role_id": "4",
+        "module_id": "890",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9655",
+        "role_id": "4",
+        "module_id": "892",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9664",
+        "role_id": "4",
+        "module_id": "893",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9673",
+        "role_id": "4",
+        "module_id": "894",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9682",
+        "role_id": "4",
+        "module_id": "895",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9691",
+        "role_id": "4",
+        "module_id": "896",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9700",
+        "role_id": "4",
+        "module_id": "897",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
         "id": "221",
         "role_id": "5",
         "module_id": "1",
@@ -6816,6 +7320,114 @@
         "id": "5954",
         "role_id": "5",
         "module_id": "712",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9490",
+        "role_id": "5",
+        "module_id": "874",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9518",
+        "role_id": "5",
+        "module_id": "876",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9564",
+        "role_id": "5",
+        "module_id": "883",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9571",
+        "role_id": "5",
+        "module_id": "884",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9599",
+        "role_id": "5",
+        "module_id": "889",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9626",
+        "role_id": "5",
+        "module_id": "890",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9656",
+        "role_id": "5",
+        "module_id": "892",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9665",
+        "role_id": "5",
+        "module_id": "893",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9674",
+        "role_id": "5",
+        "module_id": "894",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9683",
+        "role_id": "5",
+        "module_id": "895",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9692",
+        "role_id": "5",
+        "module_id": "896",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9701",
+        "role_id": "5",
+        "module_id": "897",
         "can_view": "1",
         "can_add": "0",
         "can_edit": "0",
@@ -8262,6 +8874,141 @@
         "can_delete": "0"
     },
     {
+        "id": "9473",
+        "role_id": "6",
+        "module_id": "870",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9491",
+        "role_id": "6",
+        "module_id": "874",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9519",
+        "role_id": "6",
+        "module_id": "876",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9547",
+        "role_id": "6",
+        "module_id": "881",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9562",
+        "role_id": "6",
+        "module_id": "883",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9569",
+        "role_id": "6",
+        "module_id": "884",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9600",
+        "role_id": "6",
+        "module_id": "889",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9627",
+        "role_id": "6",
+        "module_id": "890",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9654",
+        "role_id": "6",
+        "module_id": "892",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9663",
+        "role_id": "6",
+        "module_id": "893",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9672",
+        "role_id": "6",
+        "module_id": "894",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9681",
+        "role_id": "6",
+        "module_id": "895",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9690",
+        "role_id": "6",
+        "module_id": "896",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9699",
+        "role_id": "6",
+        "module_id": "897",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9709",
+        "role_id": "6",
+        "module_id": "899",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
         "id": "6",
         "role_id": "7",
         "module_id": "1",
@@ -9264,6 +10011,69 @@
         "id": "6750",
         "role_id": "7",
         "module_id": "869",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9474",
+        "role_id": "7",
+        "module_id": "870",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9503",
+        "role_id": "7",
+        "module_id": "874",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9531",
+        "role_id": "7",
+        "module_id": "876",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9548",
+        "role_id": "7",
+        "module_id": "881",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9612",
+        "role_id": "7",
+        "module_id": "889",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9639",
+        "role_id": "7",
+        "module_id": "890",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9710",
+        "role_id": "7",
+        "module_id": "899",
         "can_view": "1",
         "can_add": "0",
         "can_edit": "0",
@@ -10614,6 +11424,195 @@
         "id": "6759",
         "role_id": "8",
         "module_id": "869",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9478",
+        "role_id": "8",
+        "module_id": "870",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9484",
+        "role_id": "8",
+        "module_id": "872",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9504",
+        "role_id": "8",
+        "module_id": "874",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9532",
+        "role_id": "8",
+        "module_id": "876",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9552",
+        "role_id": "8",
+        "module_id": "881",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9557",
+        "role_id": "8",
+        "module_id": "882",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9559",
+        "role_id": "8",
+        "module_id": "883",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9568",
+        "role_id": "8",
+        "module_id": "884",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9577",
+        "role_id": "8",
+        "module_id": "885",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9586",
+        "role_id": "8",
+        "module_id": "886",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9593",
+        "role_id": "8",
+        "module_id": "887",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9613",
+        "role_id": "8",
+        "module_id": "889",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9640",
+        "role_id": "8",
+        "module_id": "890",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9651",
+        "role_id": "8",
+        "module_id": "892",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9660",
+        "role_id": "8",
+        "module_id": "893",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9669",
+        "role_id": "8",
+        "module_id": "894",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9678",
+        "role_id": "8",
+        "module_id": "895",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9687",
+        "role_id": "8",
+        "module_id": "896",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9696",
+        "role_id": "8",
+        "module_id": "897",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9706",
+        "role_id": "8",
+        "module_id": "898",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9714",
+        "role_id": "8",
+        "module_id": "899",
         "can_view": "1",
         "can_add": "0",
         "can_edit": "0",
@@ -12168,6 +13167,114 @@
         "can_delete": "0"
     },
     {
+        "id": "9485",
+        "role_id": "9",
+        "module_id": "873",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9492",
+        "role_id": "9",
+        "module_id": "874",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9513",
+        "role_id": "9",
+        "module_id": "875",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9520",
+        "role_id": "9",
+        "module_id": "876",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9541",
+        "role_id": "9",
+        "module_id": "877",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9542",
+        "role_id": "9",
+        "module_id": "878",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9543",
+        "role_id": "9",
+        "module_id": "879",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9544",
+        "role_id": "9",
+        "module_id": "880",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9594",
+        "role_id": "9",
+        "module_id": "888",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9601",
+        "role_id": "9",
+        "module_id": "889",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9628",
+        "role_id": "9",
+        "module_id": "890",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9649",
+        "role_id": "9",
+        "module_id": "891",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
         "id": "3123",
         "role_id": "10",
         "module_id": "5",
@@ -12882,6 +13989,69 @@
         "id": "6762",
         "role_id": "10",
         "module_id": "869",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9479",
+        "role_id": "10",
+        "module_id": "870",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9505",
+        "role_id": "10",
+        "module_id": "874",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9533",
+        "role_id": "10",
+        "module_id": "876",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9553",
+        "role_id": "10",
+        "module_id": "881",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9614",
+        "role_id": "10",
+        "module_id": "889",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9641",
+        "role_id": "10",
+        "module_id": "890",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9715",
+        "role_id": "10",
+        "module_id": "899",
         "can_view": "1",
         "can_add": "0",
         "can_edit": "0",
@@ -13989,6 +15159,132 @@
         "id": "6773",
         "role_id": "11",
         "module_id": "869",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9480",
+        "role_id": "11",
+        "module_id": "870",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9506",
+        "role_id": "11",
+        "module_id": "874",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9534",
+        "role_id": "11",
+        "module_id": "876",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9554",
+        "role_id": "11",
+        "module_id": "881",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9561",
+        "role_id": "11",
+        "module_id": "883",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9615",
+        "role_id": "11",
+        "module_id": "889",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9642",
+        "role_id": "11",
+        "module_id": "890",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9653",
+        "role_id": "11",
+        "module_id": "892",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9662",
+        "role_id": "11",
+        "module_id": "893",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9671",
+        "role_id": "11",
+        "module_id": "894",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9680",
+        "role_id": "11",
+        "module_id": "895",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9689",
+        "role_id": "11",
+        "module_id": "896",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9698",
+        "role_id": "11",
+        "module_id": "897",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9716",
+        "role_id": "11",
+        "module_id": "899",
         "can_view": "1",
         "can_add": "0",
         "can_edit": "0",
@@ -15525,6 +16821,114 @@
         "can_delete": "0"
     },
     {
+        "id": "9493",
+        "role_id": "12",
+        "module_id": "874",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9521",
+        "role_id": "12",
+        "module_id": "876",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9565",
+        "role_id": "12",
+        "module_id": "883",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9572",
+        "role_id": "12",
+        "module_id": "884",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9602",
+        "role_id": "12",
+        "module_id": "889",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9629",
+        "role_id": "12",
+        "module_id": "890",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9657",
+        "role_id": "12",
+        "module_id": "892",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9666",
+        "role_id": "12",
+        "module_id": "893",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9675",
+        "role_id": "12",
+        "module_id": "894",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9684",
+        "role_id": "12",
+        "module_id": "895",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9693",
+        "role_id": "12",
+        "module_id": "896",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9702",
+        "role_id": "12",
+        "module_id": "897",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
         "id": "2319",
         "role_id": "13",
         "module_id": "14",
@@ -16308,6 +17712,69 @@
         "can_delete": "0"
     },
     {
+        "id": "9475",
+        "role_id": "13",
+        "module_id": "870",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9494",
+        "role_id": "13",
+        "module_id": "874",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9522",
+        "role_id": "13",
+        "module_id": "876",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9549",
+        "role_id": "13",
+        "module_id": "881",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9603",
+        "role_id": "13",
+        "module_id": "889",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9630",
+        "role_id": "13",
+        "module_id": "890",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9711",
+        "role_id": "13",
+        "module_id": "899",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
         "id": "324",
         "role_id": "14",
         "module_id": "38",
@@ -17040,6 +18507,69 @@
         "id": "6753",
         "role_id": "14",
         "module_id": "869",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9476",
+        "role_id": "14",
+        "module_id": "870",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9507",
+        "role_id": "14",
+        "module_id": "874",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9535",
+        "role_id": "14",
+        "module_id": "876",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9550",
+        "role_id": "14",
+        "module_id": "881",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9616",
+        "role_id": "14",
+        "module_id": "889",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9643",
+        "role_id": "14",
+        "module_id": "890",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9712",
+        "role_id": "14",
+        "module_id": "899",
         "can_view": "1",
         "can_add": "0",
         "can_edit": "0",
@@ -18810,6 +20340,42 @@
         "can_delete": "0"
     },
     {
+        "id": "9495",
+        "role_id": "15",
+        "module_id": "874",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9523",
+        "role_id": "15",
+        "module_id": "876",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9604",
+        "role_id": "15",
+        "module_id": "889",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9631",
+        "role_id": "15",
+        "module_id": "890",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
         "id": "2320",
         "role_id": "16",
         "module_id": "14",
@@ -19533,6 +21099,105 @@
         "id": "6755",
         "role_id": "16",
         "module_id": "869",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9496",
+        "role_id": "16",
+        "module_id": "874",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9524",
+        "role_id": "16",
+        "module_id": "876",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9566",
+        "role_id": "16",
+        "module_id": "883",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9605",
+        "role_id": "16",
+        "module_id": "889",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9632",
+        "role_id": "16",
+        "module_id": "890",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9658",
+        "role_id": "16",
+        "module_id": "892",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9667",
+        "role_id": "16",
+        "module_id": "893",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9676",
+        "role_id": "16",
+        "module_id": "894",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9685",
+        "role_id": "16",
+        "module_id": "895",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9694",
+        "role_id": "16",
+        "module_id": "896",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9703",
+        "role_id": "16",
+        "module_id": "897",
         "can_view": "1",
         "can_add": "0",
         "can_edit": "0",
@@ -21096,6 +22761,78 @@
         "can_delete": "0"
     },
     {
+        "id": "9497",
+        "role_id": "17",
+        "module_id": "874",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9525",
+        "role_id": "17",
+        "module_id": "876",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9575",
+        "role_id": "17",
+        "module_id": "885",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9584",
+        "role_id": "17",
+        "module_id": "886",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9592",
+        "role_id": "17",
+        "module_id": "887",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9606",
+        "role_id": "17",
+        "module_id": "889",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9633",
+        "role_id": "17",
+        "module_id": "890",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9705",
+        "role_id": "17",
+        "module_id": "898",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
         "id": "3165",
         "role_id": "18",
         "module_id": "20",
@@ -22332,6 +24069,60 @@
         "id": "6765",
         "role_id": "18",
         "module_id": "869",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9508",
+        "role_id": "18",
+        "module_id": "874",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9536",
+        "role_id": "18",
+        "module_id": "876",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9576",
+        "role_id": "18",
+        "module_id": "885",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9585",
+        "role_id": "18",
+        "module_id": "886",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9617",
+        "role_id": "18",
+        "module_id": "889",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9644",
+        "role_id": "18",
+        "module_id": "890",
         "can_view": "1",
         "can_add": "0",
         "can_edit": "0",
@@ -23877,6 +25668,60 @@
         "can_delete": "0"
     },
     {
+        "id": "9509",
+        "role_id": "19",
+        "module_id": "874",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9537",
+        "role_id": "19",
+        "module_id": "876",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9574",
+        "role_id": "19",
+        "module_id": "885",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9583",
+        "role_id": "19",
+        "module_id": "886",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9618",
+        "role_id": "19",
+        "module_id": "889",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9645",
+        "role_id": "19",
+        "module_id": "890",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
         "id": "3186",
         "role_id": "20",
         "module_id": "20",
@@ -25254,6 +27099,60 @@
         "can_delete": "0"
     },
     {
+        "id": "9510",
+        "role_id": "20",
+        "module_id": "874",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9538",
+        "role_id": "20",
+        "module_id": "876",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9579",
+        "role_id": "20",
+        "module_id": "885",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9588",
+        "role_id": "20",
+        "module_id": "886",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9619",
+        "role_id": "20",
+        "module_id": "889",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9646",
+        "role_id": "20",
+        "module_id": "890",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
         "id": "3199",
         "role_id": "21",
         "module_id": "20",
@@ -26469,6 +28368,60 @@
         "can_delete": "0"
     },
     {
+        "id": "9511",
+        "role_id": "21",
+        "module_id": "874",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9539",
+        "role_id": "21",
+        "module_id": "876",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9580",
+        "role_id": "21",
+        "module_id": "885",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9589",
+        "role_id": "21",
+        "module_id": "886",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9620",
+        "role_id": "21",
+        "module_id": "889",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9647",
+        "role_id": "21",
+        "module_id": "890",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
         "id": "3213",
         "role_id": "22",
         "module_id": "20",
@@ -27657,6 +29610,60 @@
         "can_delete": "0"
     },
     {
+        "id": "9512",
+        "role_id": "22",
+        "module_id": "874",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9540",
+        "role_id": "22",
+        "module_id": "876",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9581",
+        "role_id": "22",
+        "module_id": "885",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9590",
+        "role_id": "22",
+        "module_id": "886",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9621",
+        "role_id": "22",
+        "module_id": "889",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9648",
+        "role_id": "22",
+        "module_id": "890",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
         "id": "2321",
         "role_id": "23",
         "module_id": "14",
@@ -28332,6 +30339,42 @@
         "can_delete": "0"
     },
     {
+        "id": "9498",
+        "role_id": "23",
+        "module_id": "874",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9526",
+        "role_id": "23",
+        "module_id": "876",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9607",
+        "role_id": "23",
+        "module_id": "889",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9634",
+        "role_id": "23",
+        "module_id": "890",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
         "id": "2322",
         "role_id": "24",
         "module_id": "14",
@@ -28908,6 +30951,42 @@
         "can_delete": "0"
     },
     {
+        "id": "9499",
+        "role_id": "24",
+        "module_id": "874",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9527",
+        "role_id": "24",
+        "module_id": "876",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9608",
+        "role_id": "24",
+        "module_id": "889",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9635",
+        "role_id": "24",
+        "module_id": "890",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
         "id": "2323",
         "role_id": "25",
         "module_id": "14",
@@ -29460,6 +31539,42 @@
         "id": "6756",
         "role_id": "25",
         "module_id": "869",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9500",
+        "role_id": "25",
+        "module_id": "874",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9528",
+        "role_id": "25",
+        "module_id": "876",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9609",
+        "role_id": "25",
+        "module_id": "889",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9636",
+        "role_id": "25",
+        "module_id": "890",
         "can_view": "1",
         "can_add": "0",
         "can_edit": "0",
@@ -30321,6 +32436,51 @@
         "can_delete": "0"
     },
     {
+        "id": "9481",
+        "role_id": "26",
+        "module_id": "871",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9501",
+        "role_id": "26",
+        "module_id": "874",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9529",
+        "role_id": "26",
+        "module_id": "876",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9610",
+        "role_id": "26",
+        "module_id": "889",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9637",
+        "role_id": "26",
+        "module_id": "890",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
         "id": "2325",
         "role_id": "27",
         "module_id": "14",
@@ -31008,6 +33168,60 @@
         "id": "6760",
         "role_id": "27",
         "module_id": "869",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9502",
+        "role_id": "27",
+        "module_id": "874",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9530",
+        "role_id": "27",
+        "module_id": "876",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9578",
+        "role_id": "27",
+        "module_id": "885",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9587",
+        "role_id": "27",
+        "module_id": "886",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9611",
+        "role_id": "27",
+        "module_id": "889",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
+        "id": "9638",
+        "role_id": "27",
+        "module_id": "890",
         "can_view": "1",
         "can_add": "0",
         "can_edit": "0",

@@ -9,6 +9,8 @@ if (!isset($_SESSION['user'])) {
 include '../config.php';
 require_once __DIR__ . '/../includes/excel_ui.php'; // ح-09 · أزرار Excel الموحّدة
 include '../includes/permissions_helper.php';
+// شريط رحلة الكيان الموحد — UXW-01 8-2 · يُضمُّ هنا لا بعدَ نداءِ دالتِه
+require_once __DIR__ . '/../includes/entity_tabs.php';
 
 // ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
 // كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
@@ -419,8 +421,6 @@ function quo_state_tone($state)
     foreach (ems_excel_header_actions('quotations', 'عروض الأسعار', $can_add) as $__xl) { $header_actions[] = $__xl; }
     include('../includes/page_header.php');
 
-/* شريط رحلة الكيان الموحد — UXW-01 8-2 */
-require_once __DIR__ . '/../includes/entity_tabs.php';
     // UXW-01 ⑫: شاشةُ دورةٍ اعتماديةٍ تنطق بحالتِها الحية (مسودة · مقدم · مقبول · مرفوض) — فتُعلن خطوتَها التالية
     echo ems_next_step('العرض يقدم للعميل فيقبل أو يرفض — وقبوله يولد عقدا مسودة يحمل مرجعه');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا

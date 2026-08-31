@@ -9,6 +9,7 @@
         "owner_decision": "Subledger Close Calendar ثم Reconciliation ثم Trial Balance ثم Final Period Close",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة ج",
@@ -24,7 +25,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-ACC-02",
@@ -36,6 +39,7 @@
         "owner_decision": "Transaction date rate عند الاعتراف الأول · Closing rate للأرصدة النقدية في تاريخ التقرير · Average rate كتقريب عند ملاءمته",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة ج · القيادة",
@@ -51,7 +55,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-ACC-03",
@@ -63,6 +69,7 @@
         "owner_decision": "Weighted Average للأصناف المتجانسة القابلة للاستبدال · Specific Identification للأصناف الفريدة عالية القيمة",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجات ب\/ج",
@@ -78,7 +85,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-ACC-04",
@@ -90,6 +99,7 @@
         "owner_decision": "ساعات الاستخدام من التشغيل\/الأسطول · وسياسة الإهلاك والقيمة والقيد لدى المالية",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجات أ\/ج",
@@ -105,7 +115,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-CEO-01",
@@ -117,6 +129,7 @@
         "owner_decision": "Emergency Executive Decision يجوز تسجيله لاحقًا ضمن نافذة توثيق ولا يتجاوز NON_WAIVABLE",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "القيادة",
@@ -132,7 +145,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-CEO-02",
@@ -144,6 +159,7 @@
         "owner_decision": "Reserved Authority للمالك في الموضوعات المحجوزة",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "القيادة",
@@ -159,7 +175,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-CEO-03",
@@ -171,6 +189,7 @@
         "owner_decision": "تظهر Projection\/Drill-Down ولا تُنسخ",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "القيادة · المصالحة",
@@ -186,7 +205,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-CEO-04",
@@ -198,6 +219,7 @@
         "owner_decision": "النواب بمحرك Deputy_Role \/ Scope",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "القيادة · الموجة هـ",
@@ -213,7 +235,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-CEO-05",
@@ -225,6 +249,7 @@
         "owner_decision": "الأسطح القيادية تُسجَّل رسميًّا في Screen Registry",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "القيادة · السجلات",
@@ -240,7 +265,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-ENT-01",
@@ -252,6 +279,7 @@
         "owner_decision": "Source of Truth واحد لكل حقيقة",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "كل الملفات",
@@ -267,7 +295,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-ENT-02",
@@ -279,6 +309,7 @@
         "owner_decision": "Wave ≠ Organizational Reporting Line",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "كل الملفات",
@@ -294,7 +325,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-ENT-03",
@@ -306,6 +339,7 @@
         "owner_decision": "كل علاقة 1:N ذرية",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "كل الملفات",
@@ -321,7 +355,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-ENT-04",
@@ -333,6 +369,7 @@
         "owner_decision": "كل Derived View صفر Business Input",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "كل الملفات",
@@ -348,7 +385,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-ENT-05",
@@ -360,6 +399,7 @@
         "owner_decision": "كل Business Event له Effect Contract مسجَّل",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الدستور · السجلات",
@@ -375,7 +415,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-ENT-06",
@@ -387,6 +429,7 @@
         "owner_decision": "كل Approval من AAM",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "القيادة · كل الملفات",
@@ -402,7 +445,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-ENT-07",
@@ -414,6 +459,7 @@
         "owner_decision": "كل Business Rule حرج ينفَّذ Server-Side",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الدستور",
@@ -429,7 +475,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-ENT-08",
@@ -441,6 +489,7 @@
         "owner_decision": "كل تصحيح بعد الاعتماد Event\/Version لا Overwrite",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "كل الملفات",
@@ -456,7 +505,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-ENT-09",
@@ -468,6 +519,7 @@
         "owner_decision": "كل رفض حرج يترك Audit Record",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الدستور · الحوكمة",
@@ -483,7 +535,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-ENT-10",
@@ -495,6 +549,7 @@
         "owner_decision": "كل Integration Failure ظاهر وقابل للـRetry\/Compensation",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الدستور · الحوكمة",
@@ -510,7 +565,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-FAIL-01",
@@ -522,6 +579,7 @@
         "owner_decision": "العطل يُقاس بثمانية أبعاد مستقلة لا تُدمج في درجة واحدة: شدة العطل الفني · مدة التوقف · الأثر التشغيلي (إنتاج وعقد والتزام) · قابلية المنع · التكرار · أداء الاستجابة · سبب التأخير · وسلسلة المسؤولية. والمعدّة آلة إيراد فالمقياس الحاكم أثر التوقّف لا جسامة العطل — والفرامل والتوجيه والرفع وأنظمة الإطفاء ومهمّات السلامة والهيكل الحامل حرِجة دائمًا، وأي عطل وقع معه حادث أو شبه حادث حرِج مهما بدا بسيطًا",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الدليل · الموجة أ",
@@ -537,7 +595,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-FAIL-02",
@@ -549,6 +609,7 @@
         "owner_decision": "التوقف يُقطَّع قطاعات زمنية بمالك لكل قطاع: زمن الإبلاغ على المشغّل · التشخيص على الصيانة · انتظار القطعة على المخازن أو المشتريات · النقل على النقل · انتظار الفني على الصيانة أو المورد · الإصلاح على المنفِّذ · وانتظار القرار على مالك القرار. ولا يُحمَّل زمن على جهة لم تملكه — والخط الزمني يسجّل توقيتات الواقعة من توقف المعدّة إلى عودتها للخدمة",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الدليل · الموجة أ · السجلات",
@@ -564,7 +625,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-FAIL-03",
@@ -576,6 +639,7 @@
         "owner_decision": "الساعة تبدأ من لحظة توقّف المعدّة لا من الإبلاغ ولا من استلام الصيانة — وزمن الإبلاغ يصير قطاعًا محسوبًا على المشغّل. وإلا انتقل التلاعب من الإصلاح إلى تأخير الإبلاغ",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الدليل · الموجة أ",
@@ -591,7 +655,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-FAIL-04",
@@ -603,6 +669,7 @@
         "owner_decision": "التوقف المخطّط (صيانة كبرى مجدولة) والاستعداد بسبب العميل (Standby المدفوع تعاقديًّا) يُستثنيان من محفّز الخطر مهما طالا — ويُصنَّفان بمحفّز منفصل إن لزم. وإلا امتلأ سجل المخاطر بما ليس خطرًا وفقد قيمته الإنذارية",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الدليل · الموجات أ\/د",
@@ -618,7 +685,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-FAIL-05",
@@ -630,6 +699,7 @@
         "owner_decision": "صاحب القطاع يُقرّ بزمنه · ومدير التشغيل يحكم عند التنازع · والحوكمة تفتح قضية عند تكرار التنازع فقط. وبلا مُحكِّم يتحول القياس إلى اتهام متبادل",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الدليل · الموجة أ",
@@ -645,7 +715,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-FIN-01",
@@ -657,6 +729,7 @@
         "owner_decision": "Target Payment Model يُفصل عن Legacy Aggregate من الآن",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة ج",
@@ -672,7 +745,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-FIN-02",
@@ -684,6 +759,7 @@
         "owner_decision": "التعثر لا يعلّق حق الاستخدام آليًّا",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة ج · الموجة أ",
@@ -699,7 +775,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-FIN-03",
@@ -711,6 +789,7 @@
         "owner_decision": "Contractual Close ≠ Monthly Close ≠ Final Close",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجات ب\/ج",
@@ -726,7 +805,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-FLEET-01",
@@ -738,6 +819,7 @@
         "owner_decision": "القراءة اليدوية مسار استثنائي موثَّق بأساسه وموقّعه",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة أ",
@@ -753,7 +835,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-FLEET-02",
@@ -765,6 +849,7 @@
         "owner_decision": "Asset Disposal يمر عبر AAM",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة أ · القيادة",
@@ -780,7 +865,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-FLEET-03",
@@ -792,6 +879,7 @@
         "owner_decision": "الساعات التشغيلية مصدرها الأسطول\/التشغيل",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الدليل · الموجات أ\/ج",
@@ -807,7 +895,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-FLEET-04",
@@ -819,6 +909,7 @@
         "owner_decision": "الإهلاك المالي وقيمته وسياسته مصدرهما المالية",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الدليل · الموجة ج",
@@ -834,7 +925,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-GOV-01",
@@ -846,6 +939,7 @@
         "owner_decision": "الحوكمة تملك سياسة الصلاحيات والتقنية تنفّذ",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة د",
@@ -861,7 +955,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-GOV-02",
@@ -873,6 +969,7 @@
         "owner_decision": "Internal Audit مستقلة عن Governance",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الدليل · الموجة د",
@@ -888,7 +985,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-GOV-03",
@@ -900,6 +999,7 @@
         "owner_decision": "Governance Case يُفتح فقط عند Policy\/Control\/Compliance breach",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة د",
@@ -915,7 +1015,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-GOV-04",
@@ -927,6 +1029,7 @@
         "owner_decision": "لا Risk Register موازٍ في الحوكمة",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة د",
@@ -942,7 +1045,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-HR-01",
@@ -954,6 +1059,7 @@
         "owner_decision": "Production Incentive مشتق آليًّا",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجات أ\/د",
@@ -969,7 +1075,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-HR-02",
@@ -981,6 +1089,7 @@
         "owner_decision": "الموارد تملكها — ولا Project Personnel Unit",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة د · الدليل",
@@ -996,7 +1105,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-HR-03",
@@ -1008,6 +1119,7 @@
         "owner_decision": "Payroll Run Header + Employee Lines",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة د",
@@ -1023,7 +1135,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-HR-04",
@@ -1035,6 +1149,7 @@
         "owner_decision": "Loan Header + Installment Lines",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة د",
@@ -1050,7 +1165,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-HR-05",
@@ -1062,6 +1179,7 @@
         "owner_decision": "Disciplinary Case منفصل عن Payroll Deduction والخصم بمرجع القرار",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة د",
@@ -1077,7 +1195,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-INV-01",
@@ -1089,6 +1209,7 @@
         "owner_decision": "السلوك الوظيفي (التغيّب · الإهمال · التقصير) ← 07 الموارد البشرية بدورة القضية التأديبية · والنزاهة (السرقة · الاحتيال · التلاعب بالسجلات · الرشوة · تضارب المصالح غير المفصَح عنه) ← 08 الحوكمة والالتزام · وكسر الضابط وتجاوز الصلاحية وخرق فصل الواجبات ← 08 الحوكمة · والمراجعة الداخلية لا تحقّق من تلقاء نفسها ولا اختصاص أصيل لها: تدخل بتكليف مكتوب من المالك لكل حالة بمداه وأجله ونطاقه. والواقعة الواحدة قد يكون لها مالكان: الحوكمة تملك التحقيق والنتيجة، والموارد تملك الأثر التأديبي بمرجع النتيجة — ولا يبدأ الأثر قبل صدورها",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الدليل · الموجة د · السجلات",
@@ -1104,7 +1225,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-INV-02",
@@ -1116,6 +1239,7 @@
         "owner_decision": "ملكية الحوكمة لإطار السياسة لا تمنعها من التحقيق في الالتزام بها — فذاك عملها. والتصعيد للمراجعة الداخلية بتكليف مكتوب في أربع حالات: أن يكون أحد موظفي الحوكمة موضوع القضية · أو رئيسها طرفًا · أو القرار محل التحقيق صادرًا منها · أو تعذّر توفير محقّق مستقل داخلها",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الدليل · الموجة د",
@@ -1131,7 +1255,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-INV-03",
@@ -1143,6 +1269,7 @@
         "owner_decision": "المشتبه به في الموارد ← التحقيق عند الحوكمة · وفي الحوكمة ← عند المراجعة الداخلية بتكليف · وفي المراجعة الداخلية ← جهة خارجية مستقلة بتكليف · وإن كان تنفيذيًّا كبيرًا أو الأثر جوهريًّا ← الواقعة محجوزة ترتفع للمالك ويُختار المحقّق بقراره. والمبدأ الجامع: لا يحقّق أحد في نفسه ولا فيمن يديره ولا فيمن يديره هو",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الدليل · القيادة · الموجة د",
@@ -1158,7 +1285,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-MNT-01",
@@ -1170,6 +1299,7 @@
         "owner_decision": "شهادة العودة إلزامية عندما خرج الأصل من Available أو عند Critical\/Safety Repair",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة أ",
@@ -1185,7 +1315,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-MNT-02",
@@ -1197,6 +1329,7 @@
         "owner_decision": "استقلال الفاحص\/المصدق في الحالات الحرجة والتعاقدية",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة أ",
@@ -1212,7 +1345,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-MNT-03",
@@ -1224,6 +1359,7 @@
         "owner_decision": "OEM هو Baseline — التقصير مسموح، والإطالة تتطلب مراجعة هندسية واعتمادًا",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة أ",
@@ -1239,7 +1375,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-MY-01",
@@ -1251,6 +1389,7 @@
         "owner_decision": "مساحة عملي لا تملك أي طلب Domain",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة هـ",
@@ -1266,7 +1405,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-MY-02",
@@ -1278,6 +1419,7 @@
         "owner_decision": "طلباتي = Unified Launcher + Projection",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة هـ",
@@ -1293,7 +1435,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-MY-03",
@@ -1305,6 +1449,7 @@
         "owner_decision": "نوع الطلب يحدد Target Department\/Screen من Registry مركزي",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة هـ · السجلات",
@@ -1320,7 +1465,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-OPEN-01",
@@ -1332,7 +1479,8 @@
         "owner_decision": "—",
         "status": "NEEDS_OWNER_DECISION",
         "blocking_level": "CONFIG_PENDING",
-        "blocker_type": "THRESHOLD",
+        "config_pending_stage": "نافذةُ الظلِّ ثمَّ الإنفاذ — `RPR-03` §٥ الخطوة ١: «وبلا رقمٍ واحدٍ منها لا تُشغَّل نافذةٌ ولا يُنفَّذ منع». وتصير `ENFORCEMENT_BLOCKER` عندها",
+        "blocker_type": "حاجز إنفاذ",
         "blocking_reason": "قاعدةُ AAM معروفةٌ والعتبةُ تُقرأ من Policy Registry — المحرّكُ يُبنى قابلَ الضبط",
         "affected_documents": "القيادة · الدستور · كل مسارات الاعتماد",
         "affected_screens": "ر06 · ر07 · مصفوفة AAM",
@@ -1347,7 +1495,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": "CONFIG_PENDING",
+        "amd01_verdict_ref": "RPR-03 §٥ · MASTER_EXEC §٤·٧ «بناءُ المحرِّكِ وصحّةُ التوجيهِ وتحديدُ الدورِ المعتمِدِ كلُّها تمضي الآن»"
     },
     {
         "decision_id": "DEC-OPEN-02",
@@ -1359,7 +1509,8 @@
         "owner_decision": "—",
         "status": "NEEDS_OWNER_DECISION",
         "blocking_level": "CONFIG_PENDING",
-        "blocker_type": "THRESHOLD",
+        "config_pending_stage": "نافذةُ الظلِّ ثمَّ الإنفاذ — `Split Guard` يُبنى قابلَ القراءةِ الآن، ويحجب عند قياسِ النافذة",
+        "blocker_type": "حاجز إنفاذ",
         "blocking_reason": "نافذةُ التجميعِ قيمةٌ تشغيلية — Split Guard يُبنى بقراءتها",
         "affected_documents": "القيادة",
         "affected_screens": "AAM-SPLIT",
@@ -1374,7 +1525,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": "CONFIG_PENDING",
+        "amd01_verdict_ref": "RPR-03 §٥ · MASTER_EXEC §٣ «ابنِ المحرِّكاتِ كلَّها الآنَ واتركْ مواضعَ القيمِ تُقرأ من سجلِّ السياسات»"
     },
     {
         "decision_id": "DEC-OPEN-03",
@@ -1386,6 +1539,7 @@
         "owner_decision": "إنجاز متعدّدُ الكيانات القانونيةِ معماريًّا (MULTI_ENTITY_BY_DESIGN). لكلِّ شركةٍ دفترٌ مستقلٌّ وإقفالٌ وقوائمُ مالية، وطبقةُ تجميعٍ للمجموعة موسومةٌ صراحةً. يجوز أن يبدأ نطاقُ التشغيلِ بإكوبيشن للتشغيل وحدَها دون تغييرِ المعمارية. القاعدة: لا إقفالَ ولا قيدَ ولا فاتورةَ ولا حسابَ بنكيَّ ولا ميزانيةَ ولا قائمةَ بلا Company_ID — والحبّةُ Legal Entity × Accounting Period لا System × Month.",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": "STRUCTURAL",
         "blocking_reason": "",
         "affected_documents": "الموجة ج · القيادة · الدليل",
@@ -1401,7 +1555,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-OPEN-04",
@@ -1413,7 +1569,8 @@
         "owner_decision": "—",
         "status": "NEEDS_OWNER_DECISION",
         "blocking_level": "CONFIG_PENDING",
-        "blocker_type": "THRESHOLD",
+        "config_pending_stage": "قبولُ الإسقاطاتِ والتقارير — `UAT_BLOCKER` عند التحقّقِ من عرضِ التقاريرِ لا قبلَه. وعملةُ العرضِ إعدادُ تقريرٍ لا بنيةَ دفتر",
+        "blocker_type": "قيمة تضبط",
         "blocking_reason": "عملةُ العرضِ إعدادُ تقريرٍ لا بنيةَ دفتر",
         "affected_documents": "الموجة ج · القيادة",
         "affected_screens": "م11 · ر05",
@@ -1428,7 +1585,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": "CONFIG_PENDING",
+        "amd01_verdict_ref": "RPR-02 §٥·٨ الخطوة ١٨ · RPR-03 §٩ الشاشاتُ الذهبيّة"
     },
     {
         "decision_id": "DEC-OPEN-05",
@@ -1440,6 +1599,7 @@
         "owner_decision": "—",
         "status": "NEEDS_OWNER_DECISION",
         "blocking_level": "CONFIG_PENDING",
+        "config_pending_stage": "تشغيلُ الإغلاقِ الآليِّ للبلاغ — `ENFORCEMENT_BLOCKER` عند تفعيلِ المؤقِّتِ لا عند بنائه",
         "blocker_type": "THRESHOLD",
         "blocking_reason": "مدّةُ نافذةِ التحقّق مؤقّتٌ يُقرأ من الإعداد",
         "affected_documents": "الموجة د",
@@ -1455,7 +1615,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": "CONFIG_PENDING",
+        "amd01_verdict_ref": "RPR-03 §٤·٢ عقدُ المستهلكِ · MASTER_EXEC §٣"
     },
     {
         "decision_id": "DEC-OPEN-06",
@@ -1467,7 +1629,8 @@
         "owner_decision": "—",
         "status": "NEEDS_OWNER_DECISION",
         "blocking_level": "CONFIG_PENDING",
-        "blocker_type": "THRESHOLD",
+        "config_pending_stage": "تشغيلُ سياسةِ النقدِ قبلَ الإنتاج — `GO_LIVE_BLOCKER`. **وهذا مثالُ `AMD-01` §٥ بعينِه**: «حدُّ النثرية: لا يمنع بناءَ محرِّكِ الخزينة · ويمنع تشغيلَ سياسةِ النقدِ قبل الإنتاج»",
+        "blocker_type": "قيمة تضبط",
         "blocking_reason": "حدُّ النثريةِ عتبةٌ رقميّةٌ في Registry",
         "affected_documents": "الموجة ج · الموجة أ",
         "affected_screens": "ز09 · ق08-3",
@@ -1482,7 +1645,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": "CONFIG_PENDING",
+        "amd01_verdict_ref": "AMD-01 §٥ — المثالُ المنصوصُ في جدولِ الدرجات"
     },
     {
         "decision_id": "DEC-OPEN-07",
@@ -1494,7 +1659,8 @@
         "owner_decision": "—",
         "status": "NEEDS_OWNER_DECISION",
         "blocking_level": "CONFIG_PENDING",
-        "blocker_type": "THRESHOLD",
+        "config_pending_stage": "إنفاذُ بوّابةِ الاعتمادِ في المشتريات — `ENFORCEMENT_BLOCKER` بعد نافذةِ الظلّ",
+        "blocker_type": "قيمة تضبط",
         "blocking_reason": "حدودُ الشراءِ المباشرِ عتباتٌ رقميّة",
         "affected_documents": "الموجة ب",
         "affected_screens": "ش07-3",
@@ -1509,7 +1675,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": "CONFIG_PENDING",
+        "amd01_verdict_ref": "RPR-03 §٥ · RPR-02 §٧ الخطوة ١٠ «ربطُ الاعتمادِ من محرّكِ السلطةِ لا منطقٍ محليّ»"
     },
     {
         "decision_id": "DEC-OPEN-08",
@@ -1521,7 +1689,8 @@
         "owner_decision": "—",
         "status": "NEEDS_OWNER_DECISION",
         "blocking_level": "CONFIG_PENDING",
-        "blocker_type": "THRESHOLD",
+        "config_pending_stage": "إنفاذُ التصعيدِ في المخاطر — `ENFORCEMENT_BLOCKER` عند تفعيلِ عتبةِ الشهيّة",
+        "blocker_type": "قيمة تضبط",
         "blocking_reason": "شهيّةُ المخاطرِ تسكن Appetite Registry",
         "affected_documents": "الموجة د · القيادة",
         "affected_screens": "خ ر09 · ر10",
@@ -1536,7 +1705,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": "CONFIG_PENDING",
+        "amd01_verdict_ref": "RPR-03 §٤·٢ الأثرُ التجاريّ · MASTER_EXEC §٣"
     },
     {
         "decision_id": "DEC-OPEN-09",
@@ -1548,7 +1719,8 @@
         "owner_decision": "—",
         "status": "NEEDS_OWNER_DECISION",
         "blocking_level": "CONFIG_PENDING",
-        "blocker_type": "THRESHOLD",
+        "config_pending_stage": "إنفاذُ توجيهِ الطلباتِ إلى صندوقِ الرئيس — `ENFORCEMENT_BLOCKER` عند تفعيلِ قاعدةِ الرفع",
+        "blocker_type": "قيمة تضبط",
         "blocking_reason": "قائمةُ الموضوعاتِ المحجوزة محتوى Registry لا بنية",
         "affected_documents": "القيادة",
         "affected_screens": "ر09-2",
@@ -1563,7 +1735,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": "CONFIG_PENDING",
+        "amd01_verdict_ref": "RPR-03 §٧ رحلةُ القرار · MASTER_EXEC §٤·٧ سجلُّ القدراتِ المنصّيّة"
     },
     {
         "decision_id": "DEC-OPEN-10",
@@ -1575,7 +1749,8 @@
         "owner_decision": "—",
         "status": "NEEDS_OWNER_DECISION",
         "blocking_level": "CONFIG_PENDING",
-        "blocker_type": "THRESHOLD",
+        "config_pending_stage": "إنفاذُ نافذةِ توثيقِ القرارِ العاجل — `ENFORCEMENT_BLOCKER` عند تفعيلِ المؤقِّت",
+        "blocker_type": "قيمة تضبط",
         "blocking_reason": "نافذةُ التوثيقِ مؤقّت",
         "affected_documents": "القيادة",
         "affected_screens": "ر15",
@@ -1590,7 +1765,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": "CONFIG_PENDING",
+        "amd01_verdict_ref": "RPR-03 §٧ رحلةُ القرار · MASTER_EXEC §٣"
     },
     {
         "decision_id": "DEC-OPEN-11",
@@ -1602,7 +1779,8 @@
         "owner_decision": "—",
         "status": "NEEDS_OWNER_DECISION",
         "blocking_level": "CONFIG_PENDING",
-        "blocker_type": "THRESHOLD",
+        "config_pending_stage": "إنفاذُ محرِّكِ التفويض — `ENFORCEMENT_BLOCKER`. **واختبارُ التفويضِ المنتهي** أحدُ خمسةِ اختباراتِ الصلاحيةِ فيصير `UAT_BLOCKER` عند قياسِها",
+        "blocker_type": "قيمة تضبط",
         "blocking_reason": "حدودُ التفويضِ ومدّتُه معاملانِ في Delegation Engine",
         "affected_documents": "القيادة · الحوكمة",
         "affected_screens": "ن12 · ح03",
@@ -1617,7 +1795,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": "CONFIG_PENDING",
+        "amd01_verdict_ref": "RPR-03 §٦ «واختبرْ: … التفويضَ المنتهي» · RPR-03 §٥"
     },
     {
         "decision_id": "DEC-OPEN-12",
@@ -1629,6 +1809,7 @@
         "owner_decision": "تصنيفُ الأعطالِ **لا يكون بمدّةِ التوقّفِ وحدَها** بل بأثرِ العطلِ ومخاطرِ إعادةِ المعدّةِ للخدمة. ثلاثُ درجاتِ سلامة: (١) **بسيط Minor** — لا يمسّ سلامةَ الأشخاصِ ولا التحكّمَ الآمن، ولا يؤدّي استمرارُ التشغيلِ معه إلى حادثٍ أو تلفٍ جسيم. إعادةُ الخدمة: إصلاحٌ + تحقّقٌ وظيفيّ، بواسطةِ الفنّيِّ المخوَّلِ وبلا شهادةِ إعادةِ خدمةٍ مستقلّة. (٢) **رئيسي Major** — يمسّ الجاهزيّةَ أو الأداءَ الأساسيَّ أو يقتضي إصلاحًا جوهريًّا\/استبدالَ مكوِّنٍ رئيسيّ، ولا يمثّل بذاته خطرَ سلامةٍ فوريًّا. إعادةُ الخدمة: إصلاحٌ + فحصٌ واختبارٌ + اعتمادُ الفنّيِّ أو المسؤولِ الفنّيِّ المخوَّل. (٣) **حرِجٌ للسلامة Safety-Critical** — يمكن أن يؤدّيَ استمرارُ التشغيلِ معه أو فشلُ إصلاحِه إلى إصابةٍ أو وفاةٍ أو فقدِ السيطرةِ أو حريقٍ أو انقلابٍ أو سقوطِ حمولةٍ أو حادثٍ جسيمٍ أو ضررٍ كبيرٍ بالمعدّةِ أو الموقع. إعادةُ الخدمة: **إيقافٌ ومنعُ تشغيل (Lockout\/Out of Service)** + إصلاحُ السبب + اختباراتٌ موثَّقة + **اعتمادُ Return-to-Service من مخوَّلٍ فنّيٍّ لا من المشغّلِ وحدَه**. ◆ ويُصنَّف تلقائيًّا حرِجًا كلُّ ما يمسّ أنظمةَ السلامةِ الأساسية **بحسبِ نوعِ المعدّة**: الفرامل · التوجيه · أنظمةُ التحكّمِ الحرجة · الرفعُ وتثبيتُ الأحمال · الحمايةُ والإيقافُ الطارئ · الإطفاءُ ومنعُ الحريق · وأيُّ مكوِّنٍ إنشائيٍّ أو ميكانيكيٍّ يؤدّي فشلُه إلى فقدِ السيطرةِ أو الانقلابِ أو سقوطِ جزءٍ أو حمولة. ◆ **وقائمةُ المكوِّناتِ ليست الحكمَ وحدَها** — قاعدةٌ عامّةٌ حاكمة: «أيُّ عطلٍ يرى الفنّيُّ أو مهندسُ الصيانةِ أو مسؤولُ السلامةِ أنّ استمرارَ التشغيلِ معه غيرُ آمنٍ يُصنَّف Safety-Critical حتّى تتمَّ مراجعتُه». ◆ **ومدّةُ التوقّفِ لا تغيّر تصنيفَ السلامةِ تلقائيًّا** — تبقى محورًا ثانيًا مستقلًّا للأثرِ التشغيليّ؛ فعطلٌ بسيطٌ يوقف معدّةً رئيسيّةً أيّامًا قد يكون مرتفعَ الأثرِ تشغيليًّا وليس حرِجًا للسلامة. ◆ **وأربعةُ أبعادٍ تُفصل ولا تُدمَج في حقلٍ واحد**: ① نوعُ العطل (كهربائي\/ميكانيكي\/هيدروليكي\/إطارات…) · ② خطورةُ السلامة (بسيط\/رئيسي\/حرِج) · ③ الأثرُ التشغيليّ (منخفض\/متوسّط\/مرتفع\/حرِج — يُحسب من زمنِ التوقّفِ وأهميّةِ المعدّةِ وأثرِها على الإنتاج) · ④ حالةُ الجاهزيّة (تعمل \/ تعمل بقيد \/ متوقّفة \/ محظور تشغيلها \/ جاهزة بعد الاعتماد). ◆ **والتصنيفُ قابلٌ للتهيئةِ بحسبِ نوعِ المعدّة** — الحفّارُ والقلّابُ والخرّامةُ واللودرُ والبلدوزرُ ليست لها المكوِّناتُ الحرجةُ نفسُها. ⛔ لا قائمةَ صلبةً واحدةً لكلِّ المعدّات.",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": "STRUCTURAL",
         "blocking_reason": "",
         "affected_documents": "الموجة أ",
@@ -1644,7 +1825,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-OPEN-13",
@@ -1656,6 +1839,7 @@
         "owner_decision": "العتبات: نصف ساعة للاستجابة الأولى · وثلاث ساعات للتشخيص · وأربع وعشرون ساعة تفتح محفّز خطر (باستثناء المخطط والاستعداد) · وثلاثة أيام تصعيد تنفيذي · وثلاثة تكرارات ترفع الدرجة وتفتح تحليل سبب جذري",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": "THRESHOLD",
         "blocking_reason": "",
         "affected_documents": "الموجة أ",
@@ -1671,7 +1855,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-OPEN-14",
@@ -1683,6 +1869,7 @@
         "owner_decision": "العتبة مركّبة: قيمة أو مدة أو تصنيف حرج — وتُقاس بالعتبات نفسها الواردة في تصنيف العطل والتوقف",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": "THRESHOLD",
         "blocking_reason": "",
         "affected_documents": "القيادة · الدستور",
@@ -1698,20 +1885,23 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-OPEN-15",
         "domain": "المخازن",
-        "question": "ما فئات الأصناف التي تحمل أعلام Lot\/Serial\/Expiry؟",
+        "question": "الآلية محسومة بـDEC-WH-01 (التتبع بحسب دليل الأصناف: Lot\/Serial\/Expiry) — والمطلوب قائمة الفئات لا الآلية.",
         "current_state": "القاعدة محسومة والفئات غير محددة",
         "options": "قائمة فئات معلنة · بحسب الصنف",
         "recommended": "قائمة فئات معلنة في دليل الأصناف",
         "owner_decision": "—",
         "status": "NEEDS_OWNER_DECISION",
-        "blocking_level": "READY_TO_BUILD_BLOCKER",
-        "blocker_type": "STRUCTURAL",
-        "blocking_reason": "أعلامُ Lot\/Serial\/Expiry تحدّد سلوكَ الصنفِ وبنيتَه لا قيمتَه",
+        "blocking_level": "CONFIG_PENDING",
+        "config_pending_stage": "تفعيلُ تتبّعِ الأصنافِ في المخازن — `ENFORCEMENT_BLOCKER` عند بذرِ قائمةِ الفئات. **والآليةُ محسومةٌ سلفًا** بـ`DEC-WH-01` والمفتوحُ قائمةُ الفئاتِ لا الآلية",
+        "blocker_type": "محسوم آلية ومفتوح قيمة",
+        "blocking_reason": "AMD-01 ملحق §ج — لا يقرأ فجوة معمارية: المحسوم آلية والمفتوح قيمة",
         "affected_documents": "الموجة ب",
         "affected_screens": "دليل الأصناف",
         "affected_rules": "Item Flags",
@@ -1725,7 +1915,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": "CONFIG_PENDING",
+        "amd01_verdict_ref": "AMD-01 ملحق §ج · DEC-WH-01 (APPROVED)"
     },
     {
         "decision_id": "DEC-OPEN-16",
@@ -1734,9 +1926,10 @@
         "current_state": "الحوكمة تملك Investigations نصًّا — ونطاق المراجعة غير مذكور",
         "options": "تبقى عند الحوكمة · بتكليف حالةً بحالة",
         "recommended": "بتكليف موثَّق حالةً بحالة ولا اختصاص أصيل",
-        "owner_decision": "المراجعة الداخلية لا اختصاص أصيل لها في التحقيق وتدخل بتكليف مكتوب لكل حالة — والتحقيقات عند الحوكمة أصلًا (DEC-INV-01\/02\/03)",
+        "owner_decision": "التحقيق اختصاص اصيل لمالك موضوعه: التاديبي للموارد البشرية DEP-07 والحوكمي للحوكمة والالتزام DEP-08. والمراجعة الداخلية IAF لا اختصاص اصيل لها في التحقيق - تدخل بتكليف موثق حالة بحالة، ولكل تكليف مستنده ومداه وتاريخه. وعمود investigation_owner_dept يقبل ثلاث قيم لا غير، وقيد chk_hrdc_iaf يرد تكليف المراجعة الداخلية بلا مستند تكليف. واستقلال المراجعة الداخلية محفوظ: من يراجع النظام لا يصير طرفا دائما في تحقيقاته.",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": "STRUCTURAL",
         "blocking_reason": "",
         "affected_documents": "الموجة د",
@@ -1746,13 +1939,15 @@
         "code_impact": "—",
         "evidence": "قرار المالك — جولة مراجعة الاستفسارات",
         "approved_by": "مالك إكوبيشن",
-        "approved_at": "2026-08-27",
-        "src_ref": "09 › OWNER_DECISIONS_MASTER › ص58",
+        "approved_at": "2026-08-26",
+        "src_ref": "owner\/OWNER_ORDER_20260826_W13_5.md › البنود 38-40: التحقيق اختصاص اصيل لمالك موضوعه (التاديبي HR-40 والحوكمي DEP-08) والمراجعة ضمان مستقل — Shared Information لا Shared Ownership",
         "decision_source": "",
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-OPEN-17",
@@ -1764,6 +1959,7 @@
         "owner_decision": "الحوكمة تملك حوكمة السجل وكل إدارة تسجّل أنواعها ومحرك الاعتماد يملك سلطة الاعتماد والنظام ينفّذ التوجيه (DEC-ROUTE-01)",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": "STRUCTURAL",
         "blocking_reason": "",
         "affected_documents": "السجلات · الموجات د\/هـ",
@@ -1779,7 +1975,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-OPEN-18",
@@ -1791,6 +1989,7 @@
         "owner_decision": "إعادةُ الترقيمِ المؤسسيِّ إلى 01..17 للإداراتِ المعتمدةِ فقط. القيادةُ التنفيذيةُ ومساحةُ عملي والمراجعةُ الداخليةُ برموزٍ خارجَ التسلسل (EX-CEO · EX-DVP · WS-MY · IAF). تُفصل المالية والخزينة إلى نطاقين مستقلَّين DEP-05 و DEP-06. ويُحتفظ بالمعرّفاتِ التقنيةِ القديمةِ عبر Crosswalk — ولا إعادةَ ترقيمٍ مدمِّرةٍ للمفاتيحِ التاريخية.",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": "STRUCTURAL",
         "blocking_reason": "",
         "affected_documents": "كل الملفات",
@@ -1806,7 +2005,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-OPS-01",
@@ -1818,6 +2019,7 @@
         "owner_decision": "لا تعديل رجعي بعد الاعتماد — Correction Event موسوم فقط",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة أ · الدليل",
@@ -1833,7 +2035,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-ORG-01",
@@ -1845,6 +2049,7 @@
         "owner_decision": "17 إدارة\/نطاقًا وظيفيًّا: المبيعات التعاقدية والعقود · الموردون · التمويل والممولون · الأسطول والأصول · المالية · الخزينة · الموارد البشرية · الحوكمة والالتزام · المخاطر · البلاغات · التشغيل · الموقع · القوى التشغيلية · الصيانة · النقل والترحيل · المشتريات · المخازن",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الدستور · الدليل · الموجات · السجلات",
@@ -1860,7 +2065,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-ORG-02",
@@ -1872,6 +2079,7 @@
         "owner_decision": "إدارة التشغيل رأس القطاع التشغيلي ويقودها مدير التشغيل، وتتبعه: الموقع · القوى · الصيانة · النقل · المشتريات · المخازن",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الدستور · الدليل",
@@ -1887,7 +2095,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-ORG-03",
@@ -1899,6 +2109,7 @@
         "owner_decision": "إدارة الموقع أدنى طبقة إدارية تشغيلية، وتحتها فريق المنجم\/الفريق الميداني",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الدستور · الموجة أ",
@@ -1914,7 +2125,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-ORG-04",
@@ -1926,6 +2139,7 @@
         "owner_decision": "فريق المنجم Operational Team وليس Department — يتكوّن بحسب المشروع من المشرفين والمهندسين والفنيين والمشغّلين والسائقين والعمال والمساعدين",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الدستور · الموجة أ",
@@ -1941,7 +2155,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-ORG-05",
@@ -1953,6 +2169,7 @@
         "owner_decision": "إدارة البلاغات = Department ووظيفتها Enterprise Orchestration & Follow-up — تملك دورة حياة البلاغ والمتابعة والتصعيد والإغلاق ولا تنفّذ نيابة عن المختصين",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الدليل · الدستور · الموجة د",
@@ -1968,7 +2185,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-ORG-06",
@@ -1980,6 +2199,7 @@
         "owner_decision": "القيادة التنفيذية العليا Executive Workspaces خارج تعداد الـ17 ويبقى ملفها مستقلًّا",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "ملف القيادة · الدستور",
@@ -1995,7 +2215,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-ORG-07",
@@ -2007,6 +2229,7 @@
         "owner_decision": "مساحة عملي Personal Workspace وليست إدارة",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الدليل · الموجة هـ",
@@ -2022,7 +2245,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-ORG-08",
@@ -2034,6 +2259,7 @@
         "owner_decision": "Internal Audit = Independent Assurance Function خارج الإدارات الـ17، ترفع حاليًا للمالك مباشرة، والمسار يستوعب لجنة مراجعة مستقبلًا بلا افتراض وجودها الآن",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الدليل · الموجة د · القيادة",
@@ -2049,7 +2275,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-ORG-09",
@@ -2061,6 +2289,7 @@
         "owner_decision": "لا إدارة HSE داخل إكوبيشن — وعناصر السلامة تبقى في مصادرها: سلامة المعدة (الأسطول\/الصيانة) · سلامة الموقع (الموقع\/التشغيل) · الحادث التشغيلي (مصدره) · أثر الخطر (المخاطر) · كسر السياسة (الحوكمة). وإن وُجد HSE في شركة المقاولات فهو نطاق شركة أخرى",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الدليل · الموجة د · الدستور",
@@ -2076,7 +2305,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-ORG-10",
@@ -2088,6 +2319,7 @@
         "owner_decision": "لا إدارة مشتريات مركزية — والوظائف الاستراتيجية (Strategic Sourcing · Framework Agreements · Category Management · High-Value Tendering) مجموعة وظائف داخل إدارة المشتريات",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الدليل · الموجة ب",
@@ -2103,7 +2335,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-ORG-11",
@@ -2115,6 +2349,7 @@
         "owner_decision": "لا وحدة مستقلة — الموارد تملك الشخص والعقد والمستندات والأجر والوضع القانوني · والقوى تملك الاحتياج والتخصيص والحركة والتواجد والتناوب والبديل والجاهزية · والموقع يملك التواجد الفعلي والسكن والإعاشة والوصول والمغادرة",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الدليل · الموجات أ\/د",
@@ -2130,7 +2365,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-PRC-01",
@@ -2142,6 +2379,7 @@
         "owner_decision": "حدود Direct Award من السياسة\/AAM لا Hardcode",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة ب · الحوكمة",
@@ -2157,7 +2395,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-PRC-02",
@@ -2169,6 +2409,7 @@
         "owner_decision": "Reorder Point ينشئ Draft PR فقط",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجات ب",
@@ -2184,7 +2425,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-PRC-03",
@@ -2196,6 +2439,7 @@
         "owner_decision": "Strategic Procurement Group داخل إدارة المشتريات",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الدليل · الموجة ب",
@@ -2211,7 +2455,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-PRC-04",
@@ -2223,6 +2469,7 @@
         "owner_decision": "Emergency \/ Sole Source \/ Direct Award لها Exception Workflow",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة ب",
@@ -2238,7 +2485,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-ROUTE-01",
@@ -2250,6 +2499,7 @@
         "owner_decision": "الحوكمة تملك حوكمة السجل (بنيته وقاعدة الإضافة والتعديل والإلغاء واعتماد كل نوع ومراجعته الدورية ومنع تكرار نوع بمالكين) · وكل إدارة تملك تعريف أنواع طلباتها وشاشتها المستقبِلة ومالك القرار فيها ومهلة المعالجة · ومحرك الاعتماد يملك سلطة الاعتماد لا الحوكمة ولا الإدارة · والنظام ينفّذ التوجيه المسجَّل. ولا نوع طلب بلا مالك مسمّى وشاشة مستقبِلة معلنة",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الدليل · الموجات د\/هـ",
@@ -2265,7 +2515,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-RSK-01",
@@ -2277,6 +2529,7 @@
         "owner_decision": "إدارة المخاطر إدارة مستقلة",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الدليل · الموجة د",
@@ -2292,7 +2545,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-RSK-02",
@@ -2304,6 +2559,7 @@
         "owner_decision": "التشغيلية · الرأسمالية (تمويل وموردون) · التعاقدية مع العملاء · المشتريات وسلاسل التوريد",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة د",
@@ -2319,7 +2575,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-RSK-03",
@@ -2331,6 +2589,7 @@
         "owner_decision": "Risk Appetite يُعتمد من Reserved Authority",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة د · القيادة",
@@ -2346,7 +2605,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-RSK-04",
@@ -2358,6 +2619,7 @@
         "owner_decision": "الرئيس يقبل المخاطر داخل حدود التفويض والشهية",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "القيادة · الموجة د",
@@ -2373,7 +2635,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-RSK-05",
@@ -2385,6 +2649,7 @@
         "owner_decision": "5×5 Risk Matrix مع Impact Dimensions حسب العائلة",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة د",
@@ -2400,7 +2665,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-RSK-06",
@@ -2412,6 +2679,7 @@
         "owner_decision": "Risk reads Source Events — لا سجلات تشغيلية مكررة",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة د",
@@ -2427,7 +2695,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-SAL-01",
@@ -2439,6 +2709,7 @@
         "owner_decision": "المطالبة المرحلية مسموحة فقط إذا سمح العقد بها",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة ب",
@@ -2454,7 +2725,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-SAL-02",
@@ -2466,6 +2739,7 @@
         "owner_decision": "AAM تحدد من يعتمد ولا تنشئ حقًّا تعاقديًّا غير موجود",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "القيادة · الموجة ب",
@@ -2481,7 +2755,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-SITE-01",
@@ -2493,6 +2769,7 @@
         "owner_decision": "Site × Day × Shift أو Day Header + Shift Child",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة أ",
@@ -2508,7 +2785,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-SITE-02",
@@ -2520,6 +2799,7 @@
         "owner_decision": "الموقع يملك السكن والإعاشة الفعلية",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة أ · الدليل",
@@ -2535,7 +2815,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-SITE-03",
@@ -2547,6 +2829,7 @@
         "owner_decision": "التبعية التنظيمية لا تُستنتج من موجات الإصلاح — الموجة تبعية فنية لا خط رفع",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "كل الملفات",
@@ -2562,7 +2845,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-SUP-01",
@@ -2574,6 +2859,7 @@
         "owner_decision": "البديل قد يُرشَّح آليًّا لكن الإحلال لا يتم آليًّا",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة ب",
@@ -2589,7 +2875,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-SUP-02",
@@ -2601,6 +2889,7 @@
         "owner_decision": "استحقاق المورد مستقل عن تحصيل العميل",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجات ب\/ج",
@@ -2616,7 +2905,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-SURF-01",
@@ -2628,6 +2919,7 @@
         "owner_decision": "كل سطح يُسجَّل مصدرَ حقيقة يحمل صراحةً: الحبّة (Business_Grain) · والإدارة المالكة (Owner_Domain) · والكيان المعياري (Canonical_Entity) · والمعرّف المعياري للسطح (Canonical_Screen_ID). وبوابة تكشف سطحين مصدرَي حقيقة لكيان وحبّة واحدة وتمنع إنشاء حالة جديدة — تُشغَّل ظلًّا وتُقاس ثم يُصلَح القديم ثم تُنفَّذ",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الدستور · كل الملفات",
@@ -2643,7 +2935,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-SURF-02",
@@ -2655,6 +2949,7 @@
         "owner_decision": "التقرير الذي يجمع أكثر من إدارة لا يصير مالكًا للحقائق التي يجمعها — يُصنَّف إسقاطًا مؤسسيًّا مشتركًا (PLATFORM_SHARED — Enterprise Reporting Projection) وتبقى كل حقيقة عند مالكها. ولا يُجبَر على مالك واحد من الإدارات التي يقرأ منها",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الدستور · الدليل",
@@ -2670,7 +2965,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-SURF-03",
@@ -2682,6 +2979,7 @@
         "owner_decision": "السطح الذي تحتاجه كل الإدارات يُبنى إسقاطًا موحّدًا واحدًا معلَّمًا بنطاق الإدارة والدور والمشروع — لا نسخة لكل إدارة. ومالكه إدارة الحقيقة وظهوره إسقاط بالنطاق. وهذا يمنع عودة تكرار الشاشات من أصله",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الدليل · الموجات د\/هـ",
@@ -2697,7 +2995,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-SURF-04",
@@ -2709,6 +3009,7 @@
         "owner_decision": "لا يُدمج سطح تبويبًا إلا بإثبات: الأب المعياري · حبّة الابن · نوع العلاقة · دورة حياة الابن · صلاحيته المستقلة · الرابط العميق · والحاجة للوصول المباشر ووجود سير عمل منفصل. وإن اختلفت صلاحية الابن وجب أن يدعم الأب تبويبات محروسة مستقلة — ولا تُضحّى الصلاحية لأجل ترتيب أجمل للسايدبار",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الدستور · الدليل",
@@ -2724,7 +3025,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-SURF-05",
@@ -2736,6 +3039,7 @@
         "owner_decision": "مكوّن فلترة مركزي واحد قابل للتهيئة يُستدعى في الأسطح المؤهَّلة (قائمة سجلات أو صف أو تقرير) — ولا يُوضع على استمارة فردية ولا لوحة ولا إعداد ثابت صغير لبلوغ عدد. ومعيار الإغلاق: كل الأسطح المؤهَّلة تحمل القدرة المعيارية، لا وضع صندوق على عدد معلوم",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الدستور · الدليل",
@@ -2751,7 +3055,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-SURF-06",
@@ -2763,6 +3069,7 @@
         "owner_decision": "يمنع تشغيل المصالحة ثلاثة: تكرار مصدر الحقيقة · وسطح يكتب ومالك حقيقته مجهول · ومسار كتابة يعبر حدود إدارة بلا عقد خدمة أو حدث معتمد. ولا يمنعها: سطح قارئ يتيم أو بلا اسم معروض — يُعلَن استثناءً أحمر ويُستثنى من المقام المغلق. ولا يصدر أساس معتمد وفيه مالك مجهول: فالفرق بين تشغيل المصالحة وإغلاقها فرق حاكم",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الدستور · تقارير المصالحة",
@@ -2778,7 +3085,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-SURF-07",
@@ -2790,6 +3099,7 @@
         "owner_decision": "لا تُلتقط لقطة المصالحة والبناء جارٍ: إمّا تُلتقط اللقطة وتُجمَّد ثم يجري البناء ويُعاد القياس، أو يُجمَّد البناء في نافذة القياس. وإلا خرجت مصالحة لا تطابق أي حالة فعلية — لا ما قبل ولا ما بعد",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الدستور",
@@ -2805,7 +3115,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-SURF-08",
@@ -2817,6 +3129,7 @@
         "owner_decision": "لا يُعرض للمستخدم اسم غير معتمد — إمّا معتمد أو لا يُعرض. والاسم المعروض بلا اعتماد عيب حوكمة لا تفصيل تسمية. وتمنع البوابة دخول أي متغيّر برمجي أو رمز تقني أو اسم ملف أو اسم جدول إلى حقل الاسم المعياري، ويُختبر الحارس سلبيًّا ويُبحث عن نظائر التسرّب",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الدستور · الدليل",
@@ -2832,7 +3145,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-TKT-01",
@@ -2844,6 +3159,7 @@
         "owner_decision": "إدارة البلاغات هي Source of Truth لدورة البلاغ",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة د",
@@ -2859,7 +3175,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-TKT-02",
@@ -2871,6 +3189,7 @@
         "owner_decision": "البلاغ لا يملك تنفيذ المعالجة — الكيان يُنشأ في إدارته",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة د",
@@ -2886,7 +3205,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-TKT-03",
@@ -2898,6 +3219,7 @@
         "owner_decision": "Reporter ≠ Subject ≠ Ticket Owner ≠ Resolution Owner",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة د",
@@ -2913,7 +3235,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-TKT-04",
@@ -2925,6 +3249,7 @@
         "owner_decision": "Routing\/Assignments\/Actions\/Communications Child Registers",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة د",
@@ -2940,7 +3265,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-TKT-05",
@@ -2952,6 +3279,7 @@
         "owner_decision": "Auto-Close فقط للبلاغات العادية وفق Verification Window",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة د",
@@ -2967,7 +3295,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-TKT-06",
@@ -2979,6 +3309,7 @@
         "owner_decision": "الحرجة والقانونية والمالية والحساسة لا تُغلق بالصمت",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة د",
@@ -2994,7 +3325,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-TKT-07",
@@ -3006,6 +3339,7 @@
         "owner_decision": "Entity Registry مركزي لكل أنواع Subject",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة د · السجلات",
@@ -3021,7 +3355,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-TRP-01",
@@ -3033,6 +3369,7 @@
         "owner_decision": "Trip Legs Child Register من الآن حتى لو كانت الرحلة بسيطة غالبًا",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة أ",
@@ -3048,7 +3385,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-TRP-02",
@@ -3060,6 +3399,7 @@
         "owner_decision": "التشغيل يصدر Movement Request\/Decision والنقل يملك Transport Order",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة أ",
@@ -3075,7 +3415,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-TRS-01",
@@ -3087,6 +3429,7 @@
         "owner_decision": "Maker-Checker لكل تحويل مصرفي خارجي",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة ج",
@@ -3102,7 +3445,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-TRS-02",
@@ -3114,6 +3459,7 @@
         "owner_decision": "Petty Cash فقط ضمن حد سياسة",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة ج",
@@ -3129,7 +3475,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-TRS-03",
@@ -3141,6 +3489,7 @@
         "owner_decision": "Payment Request مصدره الإدارة المستحقة والخزينة تنفّذ Approved Payment",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجات ب\/ج",
@@ -3156,7 +3505,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-TRS-04",
@@ -3168,6 +3519,7 @@
         "owner_decision": "Receipt Allocation Child عند توزيع تحصيل على عدة فواتير",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة ج",
@@ -3183,7 +3535,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-VP-01",
@@ -3195,6 +3549,7 @@
         "owner_decision": "التفويض الجزئي المؤقت مسموح بحدود ومدة وسجل حوكمة",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "القيادة · الموجة د",
@@ -3210,7 +3565,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-WH-01",
@@ -3222,6 +3579,7 @@
         "owner_decision": "Lot\/Serial\/Expiry حسب Item Master",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة ب",
@@ -3237,7 +3595,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-WH-02",
@@ -3249,6 +3609,7 @@
         "owner_decision": "المخزن يملك Custody Register",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجات أ\/ب",
@@ -3264,7 +3625,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-WH-03",
@@ -3276,6 +3639,7 @@
         "owner_decision": "Requested vs Approved vs Issued على مستوى Lines",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة ب",
@@ -3291,7 +3655,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-WRK-01",
@@ -3303,6 +3669,7 @@
         "owner_decision": "HR Position Catalog منفصل عن Operational Capability Catalog",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجات أ\/د",
@@ -3318,7 +3685,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-WRK-02",
@@ -3330,6 +3699,7 @@
         "owner_decision": "التصعيد عند غياب البديل يتم حسب أثر الإنتاج\/SLA\/Criticality",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجة أ",
@@ -3345,7 +3715,9 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     },
     {
         "decision_id": "DEC-WRK-03",
@@ -3357,6 +3729,7 @@
         "owner_decision": "لا تكرار Person Master داخل القوى — تُقرأ من الموارد بالمفتاح",
         "status": "APPROVED",
         "blocking_level": "NONE",
+        "config_pending_stage": "",
         "blocker_type": null,
         "blocking_reason": "",
         "affected_documents": "الموجات أ\/د",
@@ -3372,6 +3745,8 @@
         "owner_decision_reference": "",
         "recorded_by": "",
         "evidence_ref": "",
-        "effective_from": null
+        "effective_from": null,
+        "amd01_verdict": null,
+        "amd01_verdict_ref": ""
     }
 ]

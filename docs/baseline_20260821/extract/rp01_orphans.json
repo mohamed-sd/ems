@@ -364,6 +364,10 @@
         "class": "CRON"
     },
     {
+        "path": "cron_events_task.php",
+        "class": "CRON"
+    },
+    {
         "path": "cron_jobs.php",
         "class": "CRON"
     },

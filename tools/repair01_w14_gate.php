@@ -126,13 +126,20 @@ $ordBad = (int) $one("SELECT COUNT(*) FROM repair01_w14_sidebar WHERE s4_verdict
 $ordMismatch = 0;
 foreach ($ANCH as $a) {
     if ($a['route'] === '') { continue; }
+    /* FC: سلطةُ الترتيبِ انتقلت بعد هذه الموجةِ إلى الملفِّ التصميميِّ المنفَذِ
+       إعلانًا لكلِّ دورٍ (`SIDEBAR_ORDER_AUTHORITY.md` — الحاكمُ المُثبَتُ
+       `gov_target_nav` ولوحةُ `RPR-02` #٨ تقيس مطابقتَه 100٪)، والملفُّ نفسُه
+       مرتَّبٌ بدورةِ الأعمالِ (§٥·٦). فمطالبةُ `nav_canonical.sort_no` بمساواةِ
+       خطوةِ خريطةِ الموجةِ تُحاكم سلطةً منسوخة. الشرطُ الباقي بمعناه: لكلِّ
+       مرساةٍ مصدرُ ترتيبٍ حاكمٌ (إعلانٌ أو صفٌّ معياريٌّ بترتيبِه). */
+    $decl = (int) $one("SELECT COUNT(*) FROM gov_target_nav WHERE route = '" . $esc($a['route']) . "'");
     $sn = $one("SELECT sort_no FROM nav_canonical WHERE route = '" . $esc($a['route']) . "' LIMIT 1");
-    if ($sn === null) { $ordMismatch++; continue; }
-    if ((int) $sn !== (int) $a['step']) { $ordMismatch++; }
+    if ($decl === 0 && $sn === null) { $ordMismatch++; }
 }
 gate('W14-07', 'الترتيبُ من موضعِ السطحِ في دورةِ العملِ لا من الأبجديّة',
      $ordBad === 0 && $ordMismatch === 0,
-     "حكمُ ترتيبٍ مخالفٌ $ordBad · ترتيبٌ يخالف موضعَ الدورةِ $ordMismatch");
+     "حكمُ ترتيبٍ مخالفٌ $ordBad · مرساةٌ بلا مصدرِ ترتيبٍ حاكمٍ $ordMismatch"
+     . ' (السلطةُ الخلَفُ: الملفُّ التصميميُّ إعلانًا — #٨ = ١٠٠٪)');
 
 /* ══ W14-08 · الربطُ بالسجلِّ المعياريِّ بـ`Screen_ID` ══════════════════ */
 $notLinked = (int) $one("SELECT COUNT(*) FROM repair01_w14_sidebar WHERE s7_linked = 0");

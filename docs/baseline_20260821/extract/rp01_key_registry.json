@@ -16,7 +16,7 @@
         "company_column": "company_id",
         "is_master": "1",
         "measured_rows": "219",
-        "measured_at": "2026-08-28 19:06:02",
+        "measured_at": "2026-08-29 01:54:38",
         "src_ref": "W03 › §٤-٢ › المفتاح 5"
     },
     {
@@ -36,7 +36,7 @@
         "company_column": "",
         "is_master": "1",
         "measured_rows": "2",
-        "measured_at": "2026-08-28 19:06:02",
+        "measured_at": "2026-08-29 01:54:38",
         "src_ref": "W03 › §٤-٢ › المفتاح 1"
     },
     {
@@ -56,7 +56,7 @@
         "company_column": "company_id",
         "is_master": "0",
         "measured_rows": "22",
-        "measured_at": "2026-08-28 19:06:02",
+        "measured_at": "2026-08-29 01:54:39",
         "src_ref": "W03 › §٤-٢ › المفتاح 10"
     },
     {
@@ -76,7 +76,7 @@
         "company_column": "company_id",
         "is_master": "1",
         "measured_rows": "373",
-        "measured_at": "2026-08-28 19:06:02",
+        "measured_at": "2026-08-29 01:54:39",
         "src_ref": "W03 › §٤-٢ › المفتاح 6"
     },
     {
@@ -96,7 +96,7 @@
         "company_column": "company_id",
         "is_master": "1",
         "measured_rows": "125",
-        "measured_at": "2026-08-28 19:06:02",
+        "measured_at": "2026-08-29 01:54:38",
         "src_ref": "W03 › §٤-٢ › المفتاح 2"
     },
     {
@@ -116,7 +116,7 @@
         "company_column": "company_id",
         "is_master": "1",
         "measured_rows": "20",
-        "measured_at": "2026-08-28 19:06:02",
+        "measured_at": "2026-08-29 01:54:39",
         "src_ref": "W03 › §٤-٢ › المفتاح 8"
     },
     {
@@ -136,7 +136,7 @@
         "company_column": "company_id",
         "is_master": "1",
         "measured_rows": "121",
-        "measured_at": "2026-08-28 19:06:02",
+        "measured_at": "2026-08-29 01:54:38",
         "src_ref": "W03 › §٤-٢ › المفتاح 3"
     },
     {
@@ -156,7 +156,7 @@
         "company_column": "company_id",
         "is_master": "0",
         "measured_rows": "66",
-        "measured_at": "2026-08-28 19:06:02",
+        "measured_at": "2026-08-29 01:54:39",
         "src_ref": "W03 › §٤-٢ › المفتاح 13"
     },
     {
@@ -176,7 +176,7 @@
         "company_column": "company_id",
         "is_master": "0",
         "measured_rows": "654",
-        "measured_at": "2026-08-28 19:06:02",
+        "measured_at": "2026-08-29 01:54:39",
         "src_ref": "W03 › §٤-٢ › المفتاح 9"
     },
     {
@@ -196,7 +196,7 @@
         "company_column": "company_id",
         "is_master": "0",
         "measured_rows": "20",
-        "measured_at": "2026-08-28 19:06:02",
+        "measured_at": "2026-08-29 01:54:39",
         "src_ref": "W03 › §٤-٢ › المفتاح 12"
     },
     {
@@ -216,7 +216,7 @@
         "company_column": "company_id",
         "is_master": "0",
         "measured_rows": "20",
-        "measured_at": "2026-08-28 19:06:02",
+        "measured_at": "2026-08-29 01:54:39",
         "src_ref": "W03 › §٤-٢ › المفتاح 11"
     },
     {
@@ -236,7 +236,7 @@
         "company_column": "company_id",
         "is_master": "1",
         "measured_rows": "542",
-        "measured_at": "2026-08-28 19:06:02",
+        "measured_at": "2026-08-29 01:54:38",
         "src_ref": "W03 › §٤-٢ › المفتاح 4"
     },
     {
@@ -256,7 +256,7 @@
         "company_column": "company_id",
         "is_master": "1",
         "measured_rows": "87",
-        "measured_at": "2026-08-28 19:06:02",
+        "measured_at": "2026-08-29 01:54:39",
         "src_ref": "W03 › §٤-٢ › المفتاح 7"
     }
 ]

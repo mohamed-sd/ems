@@ -354,7 +354,7 @@
         "recon_verdict": "1:1 مطابقة مباشرة",
         "src_ref": "live:gov_screen_cycle + 10 › 02_شاشة_بشاشة › ص457",
         "canon_rule": "SPLIT_EXEC_CEO",
-        "canon_why": "سجل العقود الموحد تملكه إدارة العقود",
+        "canon_why": "أسطحُ النوّابِ التسعةَ عشرَ كلُّها في repair01_target_gaps بلا مقابلٍ مبنيّ — فالمبنيُّ كلُّه للرئيس",
         "role_source": "",
         "role_why": "",
         "screen_id": "SCR-0628"
@@ -618,7 +618,7 @@
         "recon_verdict": "N:1 تجزئة أدق",
         "src_ref": "live:gov_screen_cycle + 10 › 02_شاشة_بشاشة › ص468",
         "canon_rule": "SPLIT_EXEC_CEO",
-        "canon_why": "المخاطر التجارية تعرض في سجل المخاطر عند مالكه",
+        "canon_why": "أسطحُ النوّابِ التسعةَ عشرَ كلُّها في repair01_target_gaps بلا مقابلٍ مبنيّ — فالمبنيُّ كلُّه للرئيس",
         "role_source": "",
         "role_why": "",
         "screen_id": "SCR-0037"
@@ -627,7 +627,7 @@
         "id": "2683",
         "screen_file": "risk_dept_ceo.php",
         "dept_legacy": "مكتب الرئيس التنفيذي والنواب",
-        "canonical_code": "EX-CEO",
+        "canonical_code": "DEP-09",
         "screen_title": "المخاطر المؤسسية (risk_dept_ceo.php)",
         "layer_name": "المرجع والإدارة",
         "stage_order": "5",
@@ -641,8 +641,8 @@
         "disk_path": "Risk\\risk_dept_ceo.php",
         "recon_verdict": "N:1 تجزئة أدق",
         "src_ref": "live:gov_screen_cycle + 10 › 02_شاشة_بشاشة › ص469",
-        "canon_rule": "W10_PARENT_DEFAULT",
-        "canon_why": "لم يطابق مفردةً ولا وَرِث توأمًا ولا عائلةً — فيبقى مع الشقِّ الأمِّ بنصِّ الجسر، مُعلَنًا بعددِه لا صامتًا",
+        "canon_rule": "W15_OWNER_RETURN",
+        "canon_why": "لوحة المخاطر تملكها إدارة المخاطر والقيادة تقرؤها",
         "role_source": "",
         "role_why": "",
         "screen_id": "SCR-0532"
@@ -4341,7 +4341,7 @@
         "canon_why": "تنفيذُ الدفعِ والسداد — «تنفيذ التحصيل والصرف»",
         "role_source": "",
         "role_why": "",
-        "screen_id": "SCR-0626"
+        "screen_id": "SCR-0785"
     },
     {
         "id": "2838",
@@ -4941,7 +4941,7 @@
         "canon_why": "اعترافٌ وقيدٌ وإقفالٌ وقوائم — خارجَ قاعدةِ الخزينة",
         "role_source": "",
         "role_why": "",
-        "screen_id": "SCR-0627"
+        "screen_id": "SCR-0786"
     },
     {
         "id": "2863",
@@ -6429,7 +6429,7 @@
         "canon_why": "الجسرُ يربط المسمّى الحيَّ «الموارد البشرية» برمزٍ واحدٍ بلا شقّ",
         "role_source": "",
         "role_why": "",
-        "screen_id": "SCR-0626"
+        "screen_id": "SCR-0785"
     },
     {
         "id": "2925",
@@ -7653,7 +7653,7 @@
         "canon_why": "الجسرُ يربط المسمّى الحيَّ «التمويل والملكية» برمزٍ واحدٍ بلا شقّ",
         "role_source": "",
         "role_why": "",
-        "screen_id": "SCR-0627"
+        "screen_id": "SCR-0786"
     },
     {
         "id": "2976",
@@ -8037,7 +8037,7 @@
         "canon_why": "الجسرُ يربط المسمّى الحيَّ «التمويل والملكية» برمزٍ واحدٍ بلا شقّ",
         "role_source": "",
         "role_why": "",
-        "screen_id": "SCR-0626"
+        "screen_id": "SCR-0785"
     },
     {
         "id": "2992",
@@ -9573,7 +9573,7 @@
         "canon_why": "الجسرُ يربط المسمّى الحيَّ «إدارة الأسطول» برمزٍ واحدٍ بلا شقّ",
         "role_source": "",
         "role_why": "",
-        "screen_id": "SCR-0627"
+        "screen_id": "SCR-0786"
     },
     {
         "id": "3056",
@@ -10845,7 +10845,7 @@
         "canon_why": "الجسرُ يربط المسمّى الحيَّ «إدارة التشغيل» برمزٍ واحدٍ بلا شقّ",
         "role_source": "",
         "role_why": "",
-        "screen_id": "SCR-0626"
+        "screen_id": "SCR-0785"
     },
     {
         "id": "3109",
@@ -12261,7 +12261,7 @@
         "canon_why": "الجسرُ يربط المسمّى الحيَّ «إدارة المشتريات التشغيلية» برمزٍ واحدٍ بلا شقّ",
         "role_source": "",
         "role_why": "",
-        "screen_id": "SCR-0626"
+        "screen_id": "SCR-0785"
     },
     {
         "id": "3168",
@@ -13461,7 +13461,7 @@
         "canon_why": "الجسرُ يربط المسمّى الحيَّ «النقل والترحيل» برمزٍ واحدٍ بلا شقّ",
         "role_source": "",
         "role_why": "",
-        "screen_id": "SCR-0626"
+        "screen_id": "SCR-0785"
     },
     {
         "id": "3218",

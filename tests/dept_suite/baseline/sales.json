@@ -1,0 +1,1444 @@
+{
+    "dept": "sales",
+    "dept_ar": "إدارة المبيعات التعاقدية والعقود",
+    "at": "2026-08-31 09:31:32",
+    "mode": "full",
+    "screens": {
+        "Clients\/clients.php": {
+            "label": "سجل العملاء",
+            "group": "العملاء",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 594 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "PASS",
+                    "note": "صفٌّ أُنشئ فعلًا في `clients` (id=4551)"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "PASS",
+                    "note": "القيمةُ تغيّرت فعلًا في القاعدة"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "PASS",
+                    "note": "الصفُّ زال فعلًا (أو وُسِم محذوفًا)"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "PASS",
+                    "note": "رمزٌ مكسورٌ لم يُنشئ صفًّا — الحارسُ حيّ"
+                }
+            ]
+        },
+        "Clients\/products.php": {
+            "label": "كتالوج الخدمات وبنود البيع",
+            "group": "البيانات المرجعية",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 165 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "PASS",
+                    "note": "صفٌّ أُنشئ فعلًا في `products` (id=31)"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "PASS",
+                    "note": "القيمةُ تغيّرت فعلًا في القاعدة"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "PASS",
+                    "note": "الصفُّ زال فعلًا (أو وُسِم محذوفًا)"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "PASS",
+                    "note": "رمزٌ مكسورٌ لم يُنشئ صفًّا — الحارسُ حيّ"
+                }
+            ]
+        },
+        "Clients\/pricelists.php": {
+            "label": "قوائم التسعير المعتمدة",
+            "group": "البيانات المرجعية",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 169 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "PASS",
+                    "note": "صفٌّ أُنشئ فعلًا في `pricelists` (id=29)"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "PASS",
+                    "note": "القيمةُ تغيّرت فعلًا في القاعدة"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "PASS",
+                    "note": "الصفُّ زال فعلًا (أو وُسِم محذوفًا)"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "PASS",
+                    "note": "رمزٌ مكسورٌ لم يُنشئ صفًّا — الحارسُ حيّ"
+                }
+            ]
+        },
+        "Clients\/units_of_measure.php": {
+            "label": "وحدات القياس والتحويل",
+            "group": "البيانات المرجعية",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 120 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "PASS",
+                    "note": "صفٌّ أُنشئ فعلًا في `units_of_measure` (id=19)"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "PASS",
+                    "note": "القيمةُ تغيّرت فعلًا في القاعدة"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "PASS",
+                    "note": "الصفُّ زال فعلًا (أو وُسِم محذوفًا)"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "PASS",
+                    "note": "رمزٌ مكسورٌ لم يُنشئ صفًّا — الحارسُ حيّ"
+                }
+            ]
+        },
+        "Clients\/rate_books.php": {
+            "label": "دفتر الأسعار بالشرائح",
+            "group": "البيانات المرجعية",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 119 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "PASS",
+                    "note": "صفٌّ أُنشئ فعلًا في `rate_books` (id=26)"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "PASS",
+                    "note": "القيمةُ تغيّرت فعلًا في القاعدة"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "لا حذفَ في هذا السطح"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "PASS",
+                    "note": "رمزٌ مكسورٌ لم يُنشئ صفًّا — الحارسُ حيّ"
+                }
+            ]
+        },
+        "Opportunities\/opportunities.php": {
+            "label": "سجل الفرص البيعية",
+            "group": "الفرصة",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 265 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "PASS",
+                    "note": "صفٌّ أُنشئ فعلًا في `opportunities` (id=1500)"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "PASS",
+                    "note": "القيمةُ تغيّرت فعلًا في القاعدة"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "PASS",
+                    "note": "الصفُّ زال فعلًا (أو وُسِم محذوفًا)"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "PASS",
+                    "note": "رمزٌ مكسورٌ لم يُنشئ صفًّا — الحارسُ حيّ"
+                }
+            ]
+        },
+        "Clients\/quotations.php": {
+            "label": "سجل العروض",
+            "group": "العرض",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 719 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "PASS",
+                    "note": "صفٌّ أُنشئ فعلًا في `quotations` (id=186)"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "PASS",
+                    "note": "القيمةُ تغيّرت فعلًا في القاعدة"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "PASS",
+                    "note": "الصفُّ زال فعلًا (أو وُسِم محذوفًا)"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "PASS",
+                    "note": "رمزٌ مكسورٌ لم يُنشئ صفًّا — الحارسُ حيّ"
+                }
+            ]
+        },
+        "Clients\/quotation_lines.php": {
+            "label": "بنود العروض",
+            "group": "العرض",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 82 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "PASS",
+                    "note": "صفٌّ أُنشئ فعلًا في `sal_quotation_lines` (id=9)"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "لا تعديلَ في هذا السطح"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "لا حذفَ في هذا السطح"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "PASS",
+                    "note": "رمزٌ مكسورٌ لم يُنشئ صفًّا — الحارسُ حيّ"
+                }
+            ]
+        },
+        "Clients\/quotation_negotiation.php": {
+            "label": "التفاوض ومراجعات العرض",
+            "group": "العرض",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 79 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "PASS",
+                    "note": "صفٌّ أُنشئ فعلًا في `sal_quotation_revisions` (id=13)"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "لا تعديلَ في هذا السطح"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "لا حذفَ في هذا السطح"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "PASS",
+                    "note": "رمزٌ مكسورٌ لم يُنشئ صفًّا — الحارسُ حيّ"
+                }
+            ]
+        },
+        "Opportunities\/client_need_rfq.php": {
+            "label": "احتياج العميل وطلب العرض",
+            "group": "الفرصة",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 74 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Clients\/tenders.php": {
+            "label": "المناقصات",
+            "group": "الفرصة",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 188 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "PASS",
+                    "note": "صفٌّ أُنشئ فعلًا في `tenders` (id=28)"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "PASS",
+                    "note": "القيمةُ تغيّرت فعلًا في القاعدة"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "PASS",
+                    "note": "الصفُّ زال فعلًا (أو وُسِم محذوفًا)"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "PASS",
+                    "note": "رمزٌ مكسورٌ لم يُنشئ صفًّا — الحارسُ حيّ"
+                }
+            ]
+        },
+        "Clients\/readiness_lines.php": {
+            "label": "مراجعة ما قبل التعاقد",
+            "group": "العرض",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 185 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "PASS",
+                    "note": "صفٌّ أُنشئ فعلًا في `readiness_lines` (id=43)"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "PASS",
+                    "note": "القيمةُ تغيّرت فعلًا في القاعدة"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "PASS",
+                    "note": "الصفُّ زال فعلًا (أو وُسِم محذوفًا)"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "PASS",
+                    "note": "رمزٌ مكسورٌ لم يُنشئ صفًّا — الحارسُ حيّ"
+                }
+            ]
+        },
+        "Clients\/activities.php": {
+            "label": "الأنشطة والمتابعات",
+            "group": "الفرصة",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 208 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "PASS",
+                    "note": "صفٌّ أُنشئ فعلًا في `activities` (id=31)"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "PASS",
+                    "note": "القيمةُ تغيّرت فعلًا في القاعدة"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "PASS",
+                    "note": "الصفُّ زال فعلًا (أو وُسِم محذوفًا)"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "PASS",
+                    "note": "رمزٌ مكسورٌ لم يُنشئ صفًّا — الحارسُ حيّ"
+                }
+            ]
+        },
+        "Clients\/client_contacts.php": {
+            "label": "جهات اتصال العملاء",
+            "group": "العملاء",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 79 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "PASS",
+                    "note": "صفٌّ أُنشئ فعلًا في `party_contacts` (id=14)"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "PASS",
+                    "note": "القيمةُ تغيّرت فعلًا في القاعدة"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "PASS",
+                    "note": "الصفُّ زال فعلًا (أو وُسِم محذوفًا)"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "PASS",
+                    "note": "رمزٌ مكسورٌ لم يُنشئ صفًّا — الحارسُ حيّ"
+                }
+            ]
+        },
+        "Clients\/client_profile.php": {
+            "label": "بطاقة العميل",
+            "group": "العملاء",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 91 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "movement\/client_tree.php": {
+            "label": "شجرة حسابات العميل",
+            "group": "العملاء",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 79 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Projects\/projects.php": {
+            "label": "سجل المشاريع",
+            "group": "العملاء",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 612 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "PASS",
+                    "note": "صفٌّ أُنشئ فعلًا في `project` (id=992967)"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "PASS",
+                    "note": "القيمةُ تغيّرت فعلًا في القاعدة"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "PASS",
+                    "note": "الصفُّ زال فعلًا (أو وُسِم محذوفًا)"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "PASS",
+                    "note": "رمزٌ مكسورٌ لم يُنشئ صفًّا — الحارسُ حيّ"
+                }
+            ]
+        },
+        "Clients\/contract_events.php": {
+            "label": "سجل حركة العقد",
+            "group": "العقد",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 179 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "PASS",
+                    "note": "صفٌّ أُنشئ فعلًا في `contract_events` (id=28)"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "PASS",
+                    "note": "القيمةُ تغيّرت فعلًا في القاعدة"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "PASS",
+                    "note": "الصفُّ زال فعلًا (أو وُسِم محذوفًا)"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "PASS",
+                    "note": "رمزٌ مكسورٌ لم يُنشئ صفًّا — الحارسُ حيّ"
+                }
+            ]
+        },
+        "Clients\/contract_commitments.php": {
+            "label": "التزامات العقود",
+            "group": "العقد",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 800 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "PASS",
+                    "note": "صفٌّ أُنشئ فعلًا في `contract_commitments` (id=2148)"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "PASS",
+                    "note": "القيمةُ تغيّرت فعلًا في القاعدة"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "PASS",
+                    "note": "الصفُّ زال فعلًا (أو وُسِم محذوفًا)"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "PASS",
+                    "note": "رمزٌ مكسورٌ لم يُنشئ صفًّا — الحارسُ حيّ"
+                }
+            ]
+        },
+        "Clients\/contract_amendments.php": {
+            "label": "ملاحق العقود وتجديداتها",
+            "group": "العقد",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 630 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "لا إضافةَ في هذا السطح"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "لا تعديلَ في هذا السطح"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "لا حذفَ في هذا السطح"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "لا اختبارَ سالبًا معرَّفًا لهذا السطح"
+                }
+            ]
+        },
+        "Contracts\/contract_obligations.php": {
+            "label": "مصفوفة التزامات العقد",
+            "group": "العقد",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 121 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "PASS",
+                    "note": "صفٌّ أُنشئ فعلًا في `contract_obligations` (id=2614)"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "PASS",
+                    "note": "القيمةُ تغيّرت فعلًا في القاعدة"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "PASS",
+                    "note": "الصفُّ زال فعلًا (أو وُسِم محذوفًا)"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "PASS",
+                    "note": "رمزٌ مكسورٌ لم يُنشئ صفًّا — الحارسُ حيّ"
+                }
+            ]
+        },
+        "Contracts\/contract_guarantees.php": {
+            "label": "ضمانات العقد",
+            "group": "العقد",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 136 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "PASS",
+                    "note": "صفٌّ أُنشئ فعلًا في `contract_guarantees` (id=797)"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "PASS",
+                    "note": "القيمةُ تغيّرت فعلًا في القاعدة"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "لا حذفَ في هذا السطح"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "PASS",
+                    "note": "رمزٌ مكسورٌ لم يُنشئ صفًّا — الحارسُ حيّ"
+                }
+            ]
+        },
+        "Contracts\/contract_lines.php": {
+            "label": "بنود عقد العميل وقيمته",
+            "group": "العقد",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 141 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "PASS",
+                    "note": "صفٌّ أُنشئ فعلًا في `client_contract_lines` (id=3744)"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "PASS",
+                    "note": "القيمةُ تغيّرت فعلًا في القاعدة"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "لا حذفَ في هذا السطح"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "PASS",
+                    "note": "رمزٌ مكسورٌ لم يُنشئ صفًّا — الحارسُ حيّ"
+                }
+            ]
+        },
+        "Contracts\/contract_baseline.php": {
+            "label": "خط أساس العقد",
+            "group": "العقد",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 125 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Contracts\/contract_lifecycle.php": {
+            "label": "اقتصاد دورة حياة العقد",
+            "group": "العقد",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 135 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Contracts\/contract_monthly_plan.php": {
+            "label": "الجدول الشهري للعقد",
+            "group": "العقد",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 147 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Contracts\/contract_payment_schedule.php": {
+            "label": "خطة دفع العقد",
+            "group": "العقد",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 137 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Contracts\/contract_resource_plan.php": {
+            "label": "خطة موارد العقد",
+            "group": "العقد",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 237 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Contracts\/contract_sites.php": {
+            "label": "نطاقات العقد التشغيلية",
+            "group": "العقد",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 163 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Contracts\/price_terms.php": {
+            "label": "شروط تعديل السعر",
+            "group": "العقد",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 117 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Contracts\/penalties.php": {
+            "label": "الجزاءات والحوافز التعاقدية",
+            "group": "العقد",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 107 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Contracts\/plan_actual_link.php": {
+            "label": "ربط الخطة بالفعلي",
+            "group": "العقد",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 125 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Contracts\/contracts_details.php": {
+            "label": "ملف عقد المشروع",
+            "group": "العقد",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 149 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Contracts\/contract_coverage.php": {
+            "label": "احتياجات التغطية",
+            "group": "العقد",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 77 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Contracts\/commercial_board.php": {
+            "label": "اللوحة التجارية للعقود",
+            "group": "لوحات وتقارير",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 93 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Contracts\/unit_client_match.php": {
+            "label": "مطابقة بيانات العميل",
+            "group": "المطالبة",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 74 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Contracts\/unit_statement_client.php": {
+            "label": "كشف التايم شيت للعميل",
+            "group": "المطالبة",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 81 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Operations\/unbilled.php": {
+            "label": "الأعمال غير المفوترة",
+            "group": "المطالبة",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 125 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Operations\/equipment_quota.php": {
+            "label": "توزيع وحدات المورد على معداته",
+            "group": "التشغيل",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "DENY",
+                    "note": "رُدَّ بحارسٍ إلى dashboard.php"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                }
+            ]
+        },
+        "Operations\/sites_board.php": {
+            "label": "لوحة المواقع",
+            "group": "التشغيل",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "DENY",
+                    "note": "رُدَّ بحارسٍ إلى dashboard.php"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                }
+            ]
+        },
+        "Operations\/swap_request.php": {
+            "label": "طلب تبديل",
+            "group": "التشغيل",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "DENY",
+                    "note": "رُدَّ بحارسٍ إلى dashboard.php"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "لا وجودَ لهذه العمليةِ في السطح"
+                }
+            ]
+        },
+        "Portal\/business_models.php": {
+            "label": "نماذج العمل ووحدات القياس",
+            "group": "البيانات المرجعية",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 109 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Governance\/gov_dept_sal.php": {
+            "label": "حوكمة المبيعات والعقود",
+            "group": "لوحات وتقارير",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 90 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Risk\/risk_dept_sal.php": {
+            "label": "مخاطر المبيعات والعقود",
+            "group": "لوحات وتقارير",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 76 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Reports\/contract_report.php": {
+            "label": "تقرير العقد",
+            "group": "لوحات وتقارير",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 86 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        },
+        "Reports\/contractall.php": {
+            "label": "تقرير كل العقود",
+            "group": "لوحات وتقارير",
+            "ops": [
+                {
+                    "op": "VIEW",
+                    "status": "PASS",
+                    "note": "HTTP 200 · 86 ك.ب"
+                },
+                {
+                    "op": "ADD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "EDIT",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "DELETE",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                },
+                {
+                    "op": "GUARD",
+                    "status": "NA",
+                    "note": "سطحُ قراءةٍ لا كتابةَ فيه"
+                }
+            ]
+        }
+    },
+    "fixtures": {
+        "CLIENT": 4550,
+        "PROJECT": 992966,
+        "OPPORTUNITY": 1499,
+        "QUOTATION": 185,
+        "CONTRACT": 7290,
+        "SITE": 1152,
+        "LINE": 3744
+    },
+    "residue_after": 0
+}

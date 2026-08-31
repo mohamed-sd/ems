@@ -8,6 +8,8 @@ if (!isset($_SESSION['user'])) {
 
 include '../config.php';
 include '../includes/permissions_helper.php';
+// شريط رحلة الكيان الموحد — UXW-01 8-2 · يُضمُّ هنا لا داخلَ كتلةِ جافاسكربت
+require_once __DIR__ . '/../includes/entity_tabs.php';
 
 // ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
 // كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
@@ -782,9 +784,6 @@ include('../includes/page_header.php');
             name: $(this).data('name'), state: $(this).data('state'), source: $(this).data('source'),
             required: $(this).data('required'), available: $(this).data('available'), gap: $(this).data('gap')
         });
-
-/* شريط رحلة الكيان الموحد — UXW-01 8-2 */
-require_once __DIR__ . '/../includes/entity_tabs.php';
     });
 
     // ── عرض التفاصيل عبر EmsDetailsModal الموحد ──
