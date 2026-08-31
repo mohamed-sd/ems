@@ -1,7 +1,7 @@
 # MASTER FINAL CLOSURE REGISTER — السجلُّ الجامعُ للإغلاقِ النهائيّ
 
 > **المخزنُ الحاكم:** `registers/MASTER_FINAL_CLOSURE_REGISTER.json` — وهذا إسقاطُه.
-> **اللقطة:** `ad1bf56f` · **حُدِّث:** 2026-08-31 17:25
+> **اللقطة:** `b0d2c3e9` · **حُدِّث:** 2026-08-31 19:30
 > **المصمَّمُ الحاكم:** `docs/REPAIR01_20260823/orders/CLOSURE_SYSTEM.txt`
 
 ## مقامُ الحالات — ⛔ ولا تُجمَع في نسبةٍ واحدة
@@ -11,11 +11,11 @@
 | `BLOCKED_ENVIRONMENT` | 1 |
 | `BLOCKED_GOVERNING_SOURCE` | 1 |
 | `BLOCKED_OWNER` | 26 |
-| `BLOCKED_UAT` | 3 |
-| `EVIDENCE_CLOSED` | 96 |
+| `BLOCKED_UAT` | 4 |
+| `EVIDENCE_CLOSED` | 107 |
 | `IMPLEMENTED_NOT_VERIFIED` | 23 |
-| `OPEN` | 10 |
-| **الجملة** | **160** |
+| `OPEN` | 11 |
+| **الجملة** | **173** |
 
 ## البنودُ غيرُ المغلقة — بحاجزِها وفعلِها التالي
 
@@ -26,6 +26,8 @@
 | `CL-FR-APP-002` | `BLOCKED_OWNER` | P0 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ 808a2c03 |  |
 | `CL-FR-APP-004` | `BLOCKED_OWNER` | P0 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ 808a2c03 |  |
 | `CL-FR-DAT-001` | `BLOCKED_OWNER` | P0 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ 808a2c03 |  |
+| `CL-NAVR-CONFORM` | `OPEN` | P1 | — | أمر المالك: إصلاح نموذج الملاحة من الجذور (2026-08-31) | EXACT_DEPARTMENT_NAV_CONFORMANCE=0/17 — البقية حملة صقل ادارة-ادارة: BUILT_NOT_RENDERED=30 | فض الثلاثين حالة-حالة (منح/جسر/حكم) ثم المجموعات والترتيب — بالخوارزمي |
+| `CL-NAVR-HUMAN` | `BLOCKED_UAT` | P1 | UAT | أمر المالك: إصلاح نموذج الملاحة من الجذور (2026-08-31) | Human Render Verification بدور حقيقي لكل ادارة — لا يعلن Sidebar PASS قبله @ b0d2c3e9 | جولة تحقق بشري بعد بلوغ EXACT=17/17 |
 | `CL-GAP-23` | `BLOCKED_UAT` | P1 | — | tools/injfix01_gap_coverage.php | الحاجز بشري لا هندسي — يغلق بجولة UAT @ 1c3ed647 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
 | `CL-GAP-29` | `OPEN` | P1 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
 | `CL-FR-APP-005` | `IMPLEMENTED_NOT_VERIFIED` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ 808a2c03 |  |
@@ -91,6 +93,12 @@
 | Closure_ID | الدليل |
 |---|---|
 | `CL-WORK-02` | tests/injfix01_sensitive_fields_nine_channels_proof.php 15/15 والسالب يثبت العض @ 59136c85 |
+| `CL-NAVR-01` | SIDEBAR_GUIDE_COMPARE.md + WHY @ 7e366870/b0d2c3e9 @ b0d2c3e9 |
+| `CL-NAVR-02` | NAVR_ROOT_AUDIT.md §③ + NAVR_METRICS @ b0d2c3e9 |
+| `CL-NAVR-04` | هجرة 2028_02_02 + بوابة الهجرات 4/4 + DR-2026-0006 @ b0d2c3e9 |
+| `CL-NAVR-05` | navr_import_guide + sidebar_guide_compare @ b0d2c3e9 |
+| `CL-NAVR-06` | NAVR_METRICS.md @ b0d2c3e9 |
+| `CL-NAVR-07` | navr_import_guide --apply + navr_wire_missing --apply @ b0d2c3e9 |
 | `CL-WORK-03` | schtasks EMS_cron_events LastTaskResult=0 + storage/logs/cron_events.log نبض START/END + سالب الازدواج SKIP + مؤشرات عند الراس 17985 @ 59136c85 |
 | `CL-GAP-07` | bus_stall_alarm_proof 11/11 — العدة حوكيت بتسجيل الانتاج كاملا (fx موصول) واليتم يثبت بمجس اصطناعي @ 747cfbe7 |
 | `CL-GAP-10` | tests/injfix01_sensitive_fields_nine_channels_proof.php 15/15 + سالب --negative=GAP-10 اثبت الرسوب @ 59136c85 |
@@ -99,6 +107,10 @@
 | `CL-FR-GOV-009` | tests/injfrd01_gov009_migration_ledger_gate.php 9/9 — بوابة 4/4 · غير مصالح=0 · السالب يرسب بالحقن · Commit=ec0aff80 @ ec0aff80 |
 | `CL-FR-GOV-015` | nine_channels 15/15 @ 747cfbe7 — ACTIVE_SENSITIVE_FIELD_BYPASS=0 والسالب مثبت @ 012c4db7 |
 | `CL-GAP-76` | CL-WORK-03 + tests/injfix01_scheduler_parity_proof.php 5/5 @ ad1bf56f |
+| `CL-NAVR-03` | NAVR_ROOT_AUDIT.md §①§② @ b0d2c3e9 |
+| `CL-NAVR-08` | nav_placements placement_type=NOT_BUILT @ b0d2c3e9 |
+| `CL-NAVR-09` | nav_workspaces.ruling + NAVR_ROOT_AUDIT §⑤ @ b0d2c3e9 |
+| `CL-NAVR-10` | sidebar_guide_compare (المصنف خارج المقام) + NAVR_METRICS @ b0d2c3e9 |
 | `CL-WORK-04` | REQUIRED_SETTLEMENT_EFFECT_MISSING=0 مقيسا + settlement_proof 16/16 + eng01_bus_test 22/22 + rpr03_contract_register صفر مفردة بلا عقد @ 59136c85 |
 | `CL-WORK-05` | سقاطتان شدتا (permission 72⇒20 · extraction 77⇒36 بتمديد الاستخراج للعديات) ودينان جديدان سدا لا شدا (قارئ وهمي + ملكية cron_task) — الحزام 25⇒30/34 والمقامات ثابتة @ 59136c85 |
 | `CL-GAP-01` | tools/injfix01_gap_coverage.php @ 808a2c03 |
@@ -159,6 +171,7 @@
 | `CL-R2-T15` | tools/rpr02_acceptance_scorecard.php @ 808a2c03 |
 | `CL-GAP-56` | tools/injfix01_gap_coverage.php --negative + tools/injrev01_audit_align_reverse.php (DONE) @ ad1bf56f |
 | `CL-GAP-77` | tests/injfix01_consumer_key_hygiene_proof.php 5/5 + هجرة 2028_02_01 @ ad1bf56f |
+| `CL-NAVR-11` | NAVR_PATTERN_SCAN.md @ b0d2c3e9 |
 | `CL-GAP-31` | path_rulings 6/6 GAPV GAP-31 PASS @ 59136c85 |
 | `CL-FR-EVT-005` |  |
 | `CL-FR-EVT-007` |  |

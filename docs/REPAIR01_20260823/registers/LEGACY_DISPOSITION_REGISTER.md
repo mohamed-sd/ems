@@ -1,7 +1,7 @@
 # LEGACY REQUIREMENT DISPOSITION REGISTER — سجلُّ مصيرِ الالتزاماتِ القديمة
 
 > القبول: `LEGACY_REQUIREMENT_WITHOUT_DISPOSITION = 0` — ولا شيءَ يختفي بالصمت.
-> **اللقطة:** `ad1bf56f`
+> **اللقطة:** `b0d2c3e9`
 
 | ID | الكون | المصير | الخطّافاتُ المعماريّةُ الآن | مرجعُ القرار |
 |---|---|---|---|---|

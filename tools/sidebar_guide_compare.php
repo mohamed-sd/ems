@@ -239,13 +239,34 @@ foreach ($ORDER as $code) {
     }
 
     /* — ② الشاشات: الوجودُ والترتيبُ الكلّيُّ على تسلسلِ الدليلِ — */
+    /* ◆ NAVR (المطلوب ١٠): **التصنيفُ قبل المقام** — تبويبُ كيانٍ (`TAB_CHILD`)
+       وإسقاطُ منظرٍ (`PROJECTION`) ليسا بندَي قائمةٍ فلا يدخلان مقامَ
+       «مبنيٌّ ولا بندَ له». التصنيفُ من طبقةِ المواضعِ (`nav_placements`)
+       المستورَدةِ من الورقةِ — لا من اجتهادِ هذه الأداة. */
+    static $navrPtype = null;
+    if ($navrPtype === null) {
+        $navrPtype = array();
+        $pq = $conn->query("SELECT workspace_id, target_ref, placement_type FROM nav_placements WHERE active = 1");
+        while ($pq && ($px = $pq->fetch_assoc())) {
+            if (preg_match('~^([A-Z0-9\-]+)·(\d+)·~u', $px['target_ref'], $pm)) {
+                $navrPtype[$pm[1]][(int) $pm[2]] = $px['placement_type'];
+            }
+        }
+    }
     $sTotal = count($S['screens']);
     $found = array(); $notRendered = array(); $wrongGroup = array(); $renamed = array();
+    $classifiedOut = array();
     foreach ($S['screens'] as $si => $sc) {
         $pi = ($matches[$si] >= 0) ? $matches[$si] : (isset($paired[$si]) ? $paired[$si] : -1);
         if ($pi < 0) {
             $st = isset($reqState[$sc['name']]) ? $reqState[$sc['name']] : '';
             $sc['state'] = ($st === '') ? 'NO_REQ_ROW' : $st;
+            $pt = isset($navrPtype[$code][$sc['i']]) ? $navrPtype[$code][$sc['i']] : '';
+            if ($pt === 'TAB_CHILD' || $pt === 'PROJECTION' || $pt === 'DIRECT_ONLY' || $pt === 'UTILITY') {
+                $sc['ptype'] = $pt;
+                $classifiedOut[] = $sc;
+                continue;
+            }
             $notRendered[] = $sc;
             continue;
         }
@@ -303,7 +324,7 @@ foreach ($ORDER as $code) {
         'gMissing' => $gMissingReal, 'gEmptyByBuild' => $gEmptyByBuild,
         'specGroupsInRender' => $specGroupsInRender,
         'renderGroups' => $renderGroups, 'unbuilt' => $unbuilt, 'builtMissing' => $builtMissing,
-        'renamed' => $renamed,
+        'renamed' => $renamed, 'classifiedOut' => $classifiedOut,
         'wrongGroup' => $wrongGroup, 'outOfOrder' => $outOfOrder, 'extra' => $extra,
         'inOrder' => $inOrder, 'found' => count($found));
 }
@@ -369,6 +390,11 @@ foreach ($ORDER as $code) {
     if ($d['gEmptyByBuild']) { $md .= '◇ **مجموعاتُ دليلٍ كلُّ شاشاتِها غيرُ مبنيّةٍ** (غيابُ بناءٍ لا سايدبار): ' . implode(' · ', $d['gEmptyByBuild']) . "\n\n"; }
     $ext = array_values(array_diff($d['renderGroups'], $S['groups']));
     if ($ext) { $md .= '◆ **أبوابٌ مُصيَّرةٌ خارجَ الدليل** (' . count($ext) . '): ' . implode(' · ', $ext) . "\n\n"; }
+    if (!empty($d['classifiedOut'])) {
+        $md .= '○ **مصنَّفٌ خارجَ مقامِ السايدبار** (المطلوب ١٠ — تبويبُ كيانٍ/إسقاطٌ لا بندُ قائمة) (' . count($d['classifiedOut']) . "):\n\n";
+        foreach ($d['classifiedOut'] as $sc) { $md .= '  - ' . $sc['i'] . '. ' . $sc['raw'] . ' — `' . $sc['ptype'] . "`\n"; }
+        $md .= "\n";
+    }
     if ($d['builtMissing']) {
         $md .= '⛔ **شاشةٌ مبنيّةٌ (بحالةِ دفترِها) ولا بندَ لها في سايدبارِ الدور** (' . count($d['builtMissing']) . "):\n\n";
         foreach ($d['builtMissing'] as $sc) { $md .= '  - ' . $sc['i'] . '. ' . $sc['raw'] . ' — [' . $sc['graw'] . '] · حالة `' . $sc['state'] . "`\n"; }
@@ -416,3 +442,46 @@ $m = isset($tally['MATCH']) ? $tally['MATCH'] : 0; $x = isset($tally['MISMATCH']
 printf("مطابق %d · غير مطابق %d · بلا دور %d · بلا ورقة %d ⇒ %s\n",
     $m, $x, isset($tally['NO_ROLE']) ? $tally['NO_ROLE'] : 0,
     isset($tally['NO_SPEC']) ? $tally['NO_SPEC'] : 0, $path);
+
+/* ═══ ⑧ NAVR — المقاييسُ العشرةُ المنفصلة (أمرُ المالك: لا نسبةَ Sidebar واحدة) ═══ */
+$one = function ($sql) use ($conn) { $q = $conn->query($sql); $r = $q ? $q->fetch_row() : null; return $r ? (int) $r[0] : 0; };
+$plTotal = $one("SELECT COUNT(*) FROM nav_placements WHERE active = 1");
+$plBuilt = $one("SELECT COUNT(*) FROM nav_placements WHERE active = 1 AND route IS NOT NULL");
+$plMenu  = $one("SELECT COUNT(*) FROM nav_placements WHERE active = 1 AND placement_type = 'MENU_ITEM' AND route IS NOT NULL");
+$classifiedAgg = 0; $exactDeps = 0; $applicableDeps = 0;
+foreach ($detail as $code0 => $d0) {
+    $classifiedAgg += count($d0['classifiedOut']);
+    if (strpos($code0, 'DEP-') === 0 || $code0 === 'IAF') {
+        $applicableDeps++;
+        if (!$d0['gMissing'] && !$d0['builtMissing'] && !$d0['outOfOrder'] && !$d0['wrongGroup']) { $exactDeps++; }
+    }
+}
+$roleVisDen = $one("SELECT COUNT(*) FROM nav_placements p
+    JOIN nav_ws_roles wr ON wr.workspace_id = p.workspace_id AND wr.binding = 'PRIMARY'
+    WHERE p.active = 1 AND p.placement_type = 'MENU_ITEM' AND p.route IS NOT NULL");
+$roleVisOk = $one("SELECT COUNT(DISTINCT p.id) FROM nav_placements p
+    JOIN nav_ws_roles wr ON wr.workspace_id = p.workspace_id AND wr.binding = 'PRIMARY'
+    JOIN modules m ON m.code = p.route COLLATE utf8mb4_unicode_ci
+    JOIN role_permissions rp ON rp.module_id = m.id AND rp.role_id = wr.role_id AND rp.can_view = 1
+    WHERE p.active = 1 AND p.placement_type = 'MENU_ITEM' AND p.route IS NOT NULL");
+$fallback = $one("SELECT COALESCE(SUM(hits),0) FROM gov_nav_findings WHERE kind = 'GLOBAL_FALLBACK'");
+$tdc = $one("SELECT COUNT(*) FROM gov_target_nav WHERE doc_code LIKE 'RENDER-ALIGN%'");
+$builtNotRendered = $agg['builtMissing'];
+$groupConf = $agg['found'] - $agg['wrongGroup'];
+$mx = "# NAVR — المقاييسُ العشرةُ المنفصلة\n\n"
+    . "> ⛔ مولَّدٌ من التشغيلةِ نفسِها التي ولّدت `SIDEBAR_GUIDE_COMPARE.md` @ `" . $snap . "` · " . date('Y-m-d H:i') . "\n"
+    . "> ⛔ **ولا تُجمع في نسبةٍ واحدة** — كلُّ مقياسٍ بمقامِه.\n\n"
+    . "| المقياس | القيمة | المقام والقراءة |\n|---|---|---|\n"
+    . "| `TARGET_BUILD_COVERAGE` | **{$plBuilt}/{$plTotal}** | مواضعُ الدليلِ المربوطةُ بشاشةٍ مبنيّة — والباقي `NOT_BUILT` بموضعِه المستهدَفِ المسجَّل |\n"
+    . "| `RENDERED_TARGET_COVERAGE` | **{$agg['found']}/" . ($agg['found'] + $agg['builtMissing']) . "** | المُصيَّرُ من أهدافِ بنودِ القائمةِ المبنيّة (بعد استبعادِ التصنيف) |\n"
+    . "| `BUILT_NOT_RENDERED` | **{$builtNotRendered}** | مبنيٌّ بدفترِه ولا بندَ في سايدبارِ دورِه — عطبٌ يُعالَج |\n"
+    . "| `GROUP_CONFORMANCE` | **{$groupConf}/{$agg['found']}** | المُصيَّرُ في مجموعةِ دليلِه |\n"
+    . "| `ORDER_CONFORMANCE` | **{$agg['inOrder']}/{$agg['found']}** | المُصيَّرُ في ترتيبِ دليلِه (LCS) |\n"
+    . "| `ROLE_VISIBILITY_CONFORMANCE` | **{$roleVisOk}/{$roleVisDen}** | موضعُ قائمةٍ مبنيٌّ لدورِ مساحتِه صلاحيةُ عرضِه قائمة |\n"
+    . "| `GROUP_HEADER_COVERAGE` | **{$agg['gLcs']}/" . ($agg['gTotal'] - $agg['gEmpty']) . "** | رؤوسُ مجموعاتِ الدليلِ الظاهرةُ (المقامُ بعد استبعادِ ما كلُّ شاشاتِه غيرُ مبنيّة) |\n"
+    . "| `EXACT_DEPARTMENT_NAV_CONFORMANCE` | **{$exactDeps}/{$applicableDeps}** | إداراتٌ مطابقةٌ تمامًا فيما بُني (الهدفُ النهائيُّ 100٪) |\n"
+    . "| `GLOBAL_FALLBACK_COUNT` | **{$fallback}** | سقوطُ مساحةِ أعمالٍ للتصنيفِ العامّ — الهدف 0 (من `gov_nav_findings`) |\n"
+    . "| `TARGET_DERIVED_FROM_CURRENT_COUNT` | **{$tdc}** | صفوفُ `gov_target_nav` المؤلَّفةُ من التصيير (`RENDER-ALIGN`) — طبقةٌ ساقطةُ الصلاحيّةِ كهدفٍ، والحاكمُ `nav_placements` من الورقة |\n"
+    . "\nمصنَّفٌ خارجَ مقامِ السايدبار (تبويب/إسقاط — المطلوب ١٠): **{$classifiedAgg}** هدفًا.\n";
+file_put_contents($ROOT . '/docs/REPAIR01_20260823/NAVR_METRICS.md', $mx);
+echo "⇒ docs/REPAIR01_20260823/NAVR_METRICS.md\n";
