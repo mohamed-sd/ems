@@ -8002,5 +8002,17 @@
         "icon": "fa fa-table-cells",
         "display_order": "41",
         "owner_dept_note": "04 إدارة الأسطول والأصول · FLEET-41"
+    },
+    {
+        "id": "900",
+        "name": "إسناد أمناء المخازن",
+        "code": "Procurement\/wh_custodians.php",
+        "owner_role_id": "16",
+        "group_id": null,
+        "is_link": "0",
+        "is_quick": "0",
+        "icon": "fa fa-user-shield",
+        "display_order": "3",
+        "owner_dept_note": "DEP-17"
     }
 ]

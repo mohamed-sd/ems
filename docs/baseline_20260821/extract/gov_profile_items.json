@@ -32040,6 +32040,18 @@
         "seeded_from": "role_permissions:13"
     },
     {
+        "item_id": "5573",
+        "company_id": "0",
+        "profile_id": "106",
+        "item_kind": "screen",
+        "item_ref": "Procurement\/wh_custodians.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "GOV_EXEC — نمط جار الشاشة wh_hazmat"
+    },
+    {
         "item_id": "5474",
         "company_id": "4",
         "profile_id": "106",
@@ -33060,6 +33072,18 @@
         "seeded_from": "role_permissions:16"
     },
     {
+        "item_id": "5574",
+        "company_id": "0",
+        "profile_id": "115",
+        "item_kind": "screen",
+        "item_ref": "Procurement\/wh_custodians.php",
+        "allow": "1",
+        "can_add": "1",
+        "can_edit": "1",
+        "can_delete": "0",
+        "seeded_from": "GOV_EXEC — نمط جار الشاشة wh_hazmat"
+    },
+    {
         "item_id": "5494",
         "company_id": "4",
         "profile_id": "115",
@@ -33910,6 +33934,18 @@
         "can_edit": "1",
         "can_delete": "0",
         "seeded_from": "role_permissions:25"
+    },
+    {
+        "item_id": "5575",
+        "company_id": "0",
+        "profile_id": "120",
+        "item_kind": "screen",
+        "item_ref": "Procurement\/wh_custodians.php",
+        "allow": "1",
+        "can_add": "1",
+        "can_edit": "1",
+        "can_delete": "1",
+        "seeded_from": "GOV_EXEC — نمط جار الشاشة wh_hazmat"
     },
     {
         "item_id": "5504",

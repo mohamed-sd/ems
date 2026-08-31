@@ -3,7 +3,7 @@
 > **التصنيف: `GOVERNANCE_REFERENCE — NON-RUNTIME`** — مرجعٌ حوكميٌّ يحدّد من أين
 > تستمدّ الأهدافُ قراراتِها. **ليست** Runtime Authority ولا Transaction SoT،
 > **ولا يقرؤها Runtime أثناء المعاملة** — فلا تخضع لمعيارِ Production Reader (المادة ٢).
-> **Baseline_ID:** `BL-20260831d-aba54573` · بأمرِ الحوكمةِ الموحَّد §١١–§١٣.
+> **Baseline_ID:** `BL-20260901-15ba9f3c` · بأمرِ الحوكمةِ الموحَّد §١١–§١٣.
 
 ## مفرداتُ Authority_Class (§١١)
 

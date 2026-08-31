@@ -101,7 +101,7 @@ foreach ($spec as $code => $S) {
 /* EX-DVP بلا دورٍ حيّ — Finding كحكم DEP-08 */
 if ($APPLY) {
     $conn->query("INSERT INTO gov_nav_findings (kind, role_id, workspace_id, detail)
-        VALUES ('NO_ROLE_BINDING', NULL, 'EX-DVP',
+        VALUES ('NO_ROLE_BINDING', 0, 'EX-DVP',
                 'مساحةٌ تنفيذيّةٌ بمواضعِ ملفِّ القيادةِ بلا دورِ نوّابٍ حيٍّ — الربطُ متى أُنشئ الدور (حكم §٢٧)')
         ON DUPLICATE KEY UPDATE hits = hits + 1, last_seen = NOW()");
 }

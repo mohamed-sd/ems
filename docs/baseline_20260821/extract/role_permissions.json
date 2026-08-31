@@ -31590,6 +31590,15 @@
         "can_delete": "0"
     },
     {
+        "id": "9719",
+        "role_id": "25",
+        "module_id": "900",
+        "can_view": "1",
+        "can_add": "1",
+        "can_edit": "1",
+        "can_delete": "0"
+    },
+    {
         "id": "3228",
         "role_id": "26",
         "module_id": "12",

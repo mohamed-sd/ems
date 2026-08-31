@@ -20,7 +20,7 @@
                 "outcome": "FR-GOV-007/010/012/014 + DR-2026-0004 · M11 وGOV-008 للمالك"
             }
         },
-        "baseline_id": "BL-20260831d-aba54573"
+        "baseline_id": "BL-20260901-15ba9f3c"
     },
     "items": {
         "CL-GAP-01": {
@@ -7207,6 +7207,47 @@
                 "Evidence": "?",
                 "Closure": "?"
             }
+        },
+        "CL-GOV3-WH03": {
+            "Closure_ID": "CL-GOV3-WH03",
+            "Source_Document": "docs/REPAIR01_20260823/orders/GOV_EXEC.txt",
+            "Source_ID": "GOV_EXEC §5 · محور 1",
+            "Domain": "المخازن",
+            "Target_ID": "WH-03",
+            "Requirement_ID": "WH-03",
+            "Current_Status": "IMPLEMENTED_NOT_VERIFIED",
+            "Priority": "P1",
+            "Execution_Rank": 890,
+            "Severity": "MEDIUM",
+            "Release_Impact": "NON_BLOCKING",
+            "Applicability": "APPLICABLE",
+            "Business_Owner": "المالك",
+            "Technical_Owner": "المنفِّذ",
+            "Blocker_Class": "—",
+            "Required_By_Gate": "—",
+            "Depends_On": [],
+            "Blocks": [],
+            "Dependency_Type": "—",
+            "Dependency_Fanout": 0,
+            "Unlock_Value": "HIGH",
+            "Estimated_Effort": "M",
+            "Evidence_Contract": "جولة استخدام حية على الشاشة (اسناد + اقفال بتسليم وبلا تسليم بحدثه) ثم تحقق بشري لمساحة DEP-17",
+            "Next_Action": "تشغيل جولة استخدام حية ثم رفع الحالة VERIFIED — والتحقق البشري للمساحة عند جولة HUMAN_NAV",
+            "Current_Snapshot": "IMPLEMENTED_NOT_VERIFIED @ 15ba9f3c",
+            "Last_Updated_Snapshot": "15ba9f3c",
+            "Last_Evidence_Ref": "commit 15ba9f3c · SCR-0817 · proc_wh_custodian · W9 30/30 · MATCH_BUILT=19 @ BL-20260901-15ba9f3c",
+            "Status_Changed_At": "2026-09-01 01:05 @ 15ba9f3c",
+            "Final_Disposition": "",
+            "Levels": {
+                "Decision": "DECIDED",
+                "Implementation": "BUILT",
+                "Wiring": "WIRED",
+                "Exercise": "?",
+                "Evidence": "?",
+                "Closure": "?"
+            },
+            "Item_Title": "شاشة «اسناد امناء المخازن» (WH-03 الجديد بالحزمة -3) بنيت ووصلت كاملة",
+            "Authority_Class": "GOVERNING_DOCUMENT"
         }
     },
     "owner": {

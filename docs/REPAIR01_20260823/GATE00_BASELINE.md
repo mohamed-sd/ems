@@ -1,16 +1,16 @@
 # GATE-00 — ATOMIC REMEDIATION BASELINE
 
 > **الأمرُ الحاكم**: «الأمر المصحح النهائي لحوكمة واستكمال برنامج إصلاح إنجاز» §٣.
-> **Baseline_ID: `BL-20260831d-aba54573`** · نافذةُ القياس: 2026-08-31 · 21:50→21:56 (UTC+03).
+> **Baseline_ID: `BL-20260901-15ba9f3c`** · نافذةُ القياس: 2026-09-01 · 00:55→01:00 (UTC+03).
 
 ## التثبيت
 
 | البند | القيمة |
 |---|---|
-| Commit واحد | `aba54573` — الشجرةُ نظيفةٌ قبل التشغيلةِ الحاكمة، و`HEAD` لم يتغيّر أثناءها (أُعيد القصُّ بعد اكتمالِ NAVR البنيويِّ — انزياحُ حزمةِ f592cdf9 كشفته المراجعةُ العكسيّةُ وأُغلق بهذه) |
-| Database Snapshot واحدة | `equipation_manage` @ MariaDB 11.4.9 · منفذ 3307 — بصمةُ الحالة: 995 جدولًا · 816 هجرةً مقيَّدة · 21,555 واقعة |
-| Schema Version واحدة | آخرُ هجرةٍ `2028_02_04_navr_legacy_recon` (مسوّاةٌ بزوجِها) · بوابةُ الهجرات 4/4 |
-| Registry Versions واحدة | `screen_registry` 813 · `nav_placements` 412 · `nav_workspaces` 22 · `uxui_matrix` 3153 صفًّا |
+| Commit واحد | `15ba9f3c` — الشجرةُ نظيفةٌ قبل التشغيلةِ الحاكمة (قُصَّت بعد نصبِ الحزمةِ الحاكمةِ -3 ومصالحةِ WH-* وبناءِ الشاشةِ الجديدة — أمرُ GOV_EXEC) |
+| Database Snapshot واحدة | `equipation_manage` @ MariaDB 11.4.9 · منفذ 3307 — بصمةُ الحالة: 997 جدولًا · 820 صفَّ دفترِ هجرات · 21,555 واقعة |
+| Schema Version واحدة | آخرُ هجرةٍ `2028_02_06_wh_custodian_assign` (مسوّاةٌ بزوجِها) · بوابةُ الهجرات 4/4 |
+| Registry Versions واحدة | `screen_registry` 814 · `nav_placements` 413 · `nav_workspaces` 22 · `uxui_matrix` 3155 صفًّا |
 | Environment واحدة | WAMP محلي · Windows 11 Pro (كما في SNAPSHOT) |
 | نافذة قياس واحدة | تشغيلةٌ حاكمةٌ واحدةٌ متتابعة: dumps ← disk_scan ← reconcile ← field_extract ← compare+metrics |
 
@@ -31,10 +31,10 @@
 
 | المعيار | القيمة |
 |---|---|
-| `EVIDENCE_PACKAGE_COMMIT_COUNT` | **1** (`aba54573`) |
+| `EVIDENCE_PACKAGE_COMMIT_COUNT` | **1** (`15ba9f3c`) |
 | `EVIDENCE_PACKAGE_DB_SNAPSHOT_COUNT` | **1** (النافذةُ الواحدةُ أعلاه — و`HEAD` ثابتٌ قبلها وبعدها) |
 | `STALE_CURRENT_SECTION_COUNT` | **0** — كلُّ رقمٍ تاريخيٍّ في الحزمةِ موسومٌ `HISTORICAL` بنصِّه أو محكومٌ بقاعدةِ قراءةٍ صريحةٍ في رأسِ وثيقتِه |
-| Baseline_ID موحَّد | **نعم** — الوثائقُ الثماني تحمل `BL-20260831d-aba54573` |
+| Baseline_ID موحَّد | **نعم** — الوثائقُ الثماني تحمل `BL-20260901-15ba9f3c` |
 
 ## أحكامُ §٣٠ — ما أثبتته الحزمةُ عن أعمالِ Sprint-01
 

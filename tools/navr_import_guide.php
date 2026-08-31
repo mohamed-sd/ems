@@ -79,10 +79,17 @@ foreach ($spec as $code => $S) {
             $tot['roles']++;
         }
     } elseif ($APPLY) {
-        $conn->query("INSERT INTO gov_nav_findings (kind, role_id, workspace_id, detail)
-            VALUES ('NO_ROLE_BINDING', NULL, '" . $conn->real_escape_string($code) . "',
-                    'مساحةٌ بورقةِ دليلٍ بلا دورٍ حيٍّ — فجوةُ دورٍ لا فجوةُ ملاحة (حكم NAVR_ROOT_AUDIT §⑤)')
-            ON DUPLICATE KEY UPDATE hits = hits + 1, last_seen = NOW()");
+        /* المساحةُ الشخصيّةُ بلا PRIMARY بحكمِها — لا كشفَ عليها. وrole_id=0
+           لا NULL: مفتاحُ التفرّدِ (kind,role,ws) لا يمسك NULL فيتوالد الصفُّ
+           كلَّ تشغيلةٍ بدل أن يتحرّك عدّادُ hits. */
+        $kw = $conn->query("SELECT kind FROM nav_workspaces WHERE workspace_id = '" . $conn->real_escape_string($code) . "'");
+        $kwr = $kw ? $kw->fetch_row() : null;
+        if ($kwr === null || (string) $kwr[0] !== 'PERSONAL') {
+            $conn->query("INSERT INTO gov_nav_findings (kind, role_id, workspace_id, detail)
+                VALUES ('NO_ROLE_BINDING', 0, '" . $conn->real_escape_string($code) . "',
+                        'مساحةٌ بورقةِ دليلٍ بلا دورٍ حيٍّ — فجوةُ دورٍ لا فجوةُ ملاحة (حكم NAVR_ROOT_AUDIT §⑤)')
+                ON DUPLICATE KEY UPDATE hits = hits + 1, last_seen = NOW()");
+        }
     }
 
     /* ── مجموعاتُ الدورةِ بترتيبِ الورقة ─────────────────────────────────── */

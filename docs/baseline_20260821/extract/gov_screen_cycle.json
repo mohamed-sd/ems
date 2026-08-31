@@ -9284,6 +9284,28 @@
         "bridge_snapshot": ""
     },
     {
+        "id": "4719",
+        "company_id": "0",
+        "dept_name": "إدارة المخازن",
+        "layer_name": "التأسيس المرجعي",
+        "stage_order": "3",
+        "stage_name": "التأسيس المرجعي",
+        "group_name": "التأسيس المرجعي",
+        "screen_title": "إسناد أمناء المخازن",
+        "screen_file": "wh_custodians.php",
+        "inputs_note": "متطلبات: WH-03",
+        "output_doc": "سطر إسناد أمين بفترته ونطاقه",
+        "resp_role": "إدارة المخازن",
+        "next_state": "تصفية كل حركة بنطاق أمينها",
+        "consumers": "المخازن والحوكمة",
+        "fin_impact": "لا",
+        "stage_kind": "canonical",
+        "screen_id": "SCR-0817",
+        "bridge_rule": "BASENAME_UNIQUE",
+        "bridge_witness": "C1 · اسمُ الملفِّ wh_custodians.php يُحلُّ إلى سطحٍ حيٍّ واحدٍ لا غير (SCR-0817) ⇒ الوصلُ بالمعرِّفِ لا بالاسم · لقطة SNAP-govexec-4a214b8b",
+        "bridge_snapshot": "SNAP-govexec-4a214b8b"
+    },
+    {
         "id": "533",
         "company_id": "0",
         "dept_name": "إدارة المخازن",

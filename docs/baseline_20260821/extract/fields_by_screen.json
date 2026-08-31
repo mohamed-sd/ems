@@ -81030,6 +81030,257 @@
         ]
     },
     {
+        "route": "Procurement\/wh_custodians.php",
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "معرف الاسناد",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "id"
+                    },
+                    {
+                        "label_ar": "المخزن",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "name"
+                    },
+                    {
+                        "label_ar": "مرجع الشخص",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "employee_code"
+                    },
+                    {
+                        "label_ar": "اسم الامين",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "name"
+                    },
+                    {
+                        "label_ar": "نوع الاسناد",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "assign_type"
+                    },
+                    {
+                        "label_ar": "الوردية",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "shift_name"
+                    },
+                    {
+                        "label_ar": "من تاريخ",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "date_from"
+                    },
+                    {
+                        "label_ar": "الى تاريخ",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "date_to"
+                    },
+                    {
+                        "label_ar": "نطاق الصلاحية",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "perm_scope"
+                    },
+                    {
+                        "label_ar": "مرجع محضر التسليم",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "handover_ref"
+                    },
+                    {
+                        "label_ar": "النافذ اليوم",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "__active_today"
+                    },
+                    {
+                        "label_ar": "حالة الاسناد",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "assign_state"
+                    },
+                    {
+                        "label_ar": "المنشئ",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "created_by"
+                    },
+                    {
+                        "label_ar": "تاريخ الانشاء",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "created_at"
+                    },
+                    {
+                        "label_ar": "حالة البيانات",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "data_state"
+                    },
+                    {
+                        "label_ar": "مرجع المصدر",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "src_ref"
+                    },
+                    {
+                        "label_ar": "الاجراء",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "assign_state"
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "warehouse_id",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "اسناد جديد",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "employee_id",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "اسناد جديد",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "assign_type",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "اسناد جديد",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "shift_name",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "اسناد جديد",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "date_from",
+                "input_type": "date",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "اسناد جديد",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "date_to",
+                "input_type": "date",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "اسناد جديد",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "perm_scope",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "اسناد جديد",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "wh",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "اسناد جديد",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "close_id",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "اسناد جديد",
+                "is_system": 1,
+                "dup_count": 1
+            },
+            {
+                "name": "close_mode",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "اسناد جديد",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "handover_ref",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "اسناد جديد",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "close_note",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "اسناد جديد",
+                "is_system": 0,
+                "dup_count": 1
+            }
+        ]
+    },
+    {
         "route": "Procurement\/wh_hazmat.php",
         "tables": [
             {
