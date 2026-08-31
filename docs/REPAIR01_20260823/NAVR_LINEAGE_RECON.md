@@ -7,9 +7,9 @@
 | بنسبِ هدفٍ (`target_id` عبر موضعِ مساحتِه) | **206** | ✔ السلسلةُ كاملة |
 | `UTILITY_ANCHOR` | **89** | مراسي الدستورِ والأدواتُ الشخصيّةُ — خارجَ ورقةِ الدورةِ بإعلانِها (N/A مفسَّر) |
 | `FINREQ_GATEWAY` | **35** | بوّابةُ الطلباتِ الماليّةِ — مشتقّةٌ من جدولِ التوجيهِ D05 لا من ورقةِ إدارة (N/A مفسَّر) |
-| `BORROWED_VIEW` | **326** | استعارةُ عرضٍ — الشاشةُ **منسوبةٌ في مساحةِ مالكِها** وتُعرض هنا سياقيًّا (N/A مفسَّر) |
+| `BORROWED_VIEW` | **338** | استعارةُ عرضٍ — الشاشةُ **منسوبةٌ في مساحةِ مالكِها** وتُعرض هنا سياقيًّا (N/A مفسَّر) |
 | `TAXONOMY_LEGACY` | **626** | ⚠ بندٌ إرثيٌّ خارجَ كلِّ ورقةٍ — **Finding يقترح** (إضافةً للورقةِ أو تقاعدًا) ولا يعتمد نفسَه |
-| **المعادلة** | **1282 = 206 + 1076** | `UNEXPLAINED = 0` — كلُّ Without مصنَّفٌ أعلاه |
+| **المعادلة** | **1294 = 206 + 1088** | `UNEXPLAINED = 0` — كلُّ Without مصنَّفٌ أعلاه |
 
 ## TAXONOMY_LEGACY (626)
 
@@ -640,12 +640,14 @@
 - IAF · Portal/ceo_audit_reports.php («تقارير المراجعة الداخلية»)
 - IAF · Portal/ceo_assignments.php («موافقات التكليف»)
 
-## BORROWED_VIEW (326)
+## BORROWED_VIEW (338)
 
+- DEP-01 · user_capacities.php («صفاتي والتبديل بينها»)
 - DEP-01 · Suppliers/supplier_contract_units.php («حصص الموردين والوحدات التعاقدية»)
 - DEP-01 · Suppliers/supplier_qualification.php («التأهيل القانوني والائتماني»)
 - DEP-01 · Portal/vp_departments.php («الإدارات نطاقي والشركة»)
 - DEP-01 · Portal/vp_pending_actions.php («المطلوب مني»)
+- DEP-02 · user_capacities.php («صفاتي والتبديل بينها»)
 - DEP-02 · Fleet/asset_full_history.php («تاريخ المعدة الكامل»)
 - DEP-02 · Fleet/asset_hours_reference.php («مرجع ساعات التشغيل للإهلاك»)
 - DEP-02 · Portal/vp_departments.php («الإدارات نطاقي والشركة»)
@@ -677,6 +679,7 @@
 - DEP-03 · Portal/vp_pending_actions.php («المطلوب مني»)
 - DEP-04 · Maintenance/breakdown_intake.php («استقبال البلاغات الفنية»)
 - DEP-04 · Approvals/hours_approval.php («ما ينتظر اعتمادي»)
+- DEP-04 · user_capacities.php («صفاتي والتبديل بينها»)
 - DEP-04 · Transport/transfer_origin_handover.php («تجهيز المغادرة والتسليم الأصلي»)
 - DEP-04 · Maintenance/part_requests.php («طلبات صرف القطع»)
 - DEP-04 · Maintenance/external_repairs.php («الإصلاح الخارجي ومطالبات الضمان»)
@@ -690,6 +693,7 @@
 - DEP-05 · Finance/tre_liquidity_board.php («لوحة الخزينة والسيولة»)
 - DEP-05 · Finance/tre_vessels.php («الحسابات البنكية والصناديق»)
 - DEP-05 · Maintenance/breakdown_intake.php («استقبال البلاغات الفنية»)
+- DEP-05 · user_capacities.php («صفاتي والتبديل بينها»)
 - DEP-05 · Finance/tre_instruments.php («سجل الأدوات المالية»)
 - DEP-05 · Finance/tre_allocations.php («تخصيص التحصيل على الفواتير»)
 - DEP-05 · Operations/monthly_close.php («الإقفال الشهري للوحدة»)
@@ -728,6 +732,7 @@
 - DEP-05 · Portal/vp_pending_actions.php («المطلوب مني»)
 - DEP-06 · Finance/acc_cost_centers.php («مراكز التكلفة»)
 - DEP-06 · Maintenance/breakdown_intake.php («استقبال البلاغات الفنية»)
+- DEP-06 · user_capacities.php («صفاتي والتبديل بينها»)
 - DEP-06 · Operations/monthly_close.php («الإقفال الشهري للوحدة»)
 - DEP-06 · Procurement/wh_issue_requests.php («طلبات الصرف الواردة»)
 - DEP-06 · Maintenance/part_requests.php («طلبات صرف القطع»)
@@ -762,6 +767,7 @@
 - DEP-06 · Portal/vp_departments.php («الإدارات نطاقي والشركة»)
 - DEP-06 · Portal/vp_pending_actions.php («المطلوب مني»)
 - DEP-07 · Workforce/workforce_requirement.php («احتياج القوى والتخطيط»)
+- DEP-07 · user_capacities.php («صفاتي والتبديل بينها»)
 - DEP-07 · Finance/tre_instruments.php («سجل الأدوات المالية»)
 - DEP-07 · Finance/tre_allocations.php («تخصيص التحصيل على الفواتير»)
 - DEP-07 · Finance/tre_payment_queue.php («صف الدفع المعتمد»)
@@ -784,11 +790,13 @@
 - DEP-07 · Suppliers/supplier_qualification.php («التأهيل القانوني والائتماني»)
 - DEP-07 · Portal/vp_departments.php («الإدارات نطاقي والشركة»)
 - DEP-07 · Portal/vp_pending_actions.php («المطلوب مني»)
+- DEP-10 · user_capacities.php («صفاتي والتبديل بينها»)
 - DEP-10 · Portal/vp_departments.php («الإدارات نطاقي والشركة»)
 - DEP-10 · Portal/vp_pending_actions.php («المطلوب مني»)
 - DEP-11 · Procurement/requests_proc.php («طلبات الشراء»)
 - DEP-11 · Maintenance/breakdown_intake.php («استقبال البلاغات الفنية»)
 - DEP-11 · admin/org_structure.php («الهيكل التنظيمي والمسميات»)
+- DEP-11 · user_capacities.php («صفاتي والتبديل بينها»)
 - DEP-11 · Procurement/proc_rfq.php («طلب العروض ودعوات الموردين»)
 - DEP-11 · Finance/tre_instruments.php («سجل الأدوات المالية»)
 - DEP-11 · Finance/tre_allocations.php («تخصيص التحصيل على الفواتير»)
@@ -847,6 +855,7 @@
 - DEP-11 · Portal/vp_pending_actions.php («المطلوب مني»)
 - DEP-12 · Procurement/requests_proc.php («طلبات الشراء»)
 - DEP-12 · Maintenance/breakdown_intake.php («استقبال البلاغات الفنية»)
+- DEP-12 · user_capacities.php («صفاتي والتبديل بينها»)
 - DEP-12 · Transport/transfer_requests.php («طلبات الترحيل»)
 - DEP-12 · Procurement/proc_rfq.php («طلب العروض ودعوات الموردين»)
 - DEP-12 · Procurement/wh_issue_requests.php («طلبات الصرف الواردة»)
@@ -890,6 +899,7 @@
 - DEP-13 · Portal/vp_departments.php («الإدارات نطاقي والشركة»)
 - DEP-13 · Portal/vp_pending_actions.php («المطلوب مني»)
 - DEP-14 · Procurement/requests_proc.php («طلبات الشراء»)
+- DEP-14 · user_capacities.php («صفاتي والتبديل بينها»)
 - DEP-14 · Procurement/proc_rfq.php («طلب العروض ودعوات الموردين»)
 - DEP-14 · Procurement/stock_proc.php («أرصدة المخزون بحالاتها»)
 - DEP-14 · Procurement/wh_issue_requests.php («طلبات الصرف الواردة»)
@@ -906,6 +916,7 @@
 - DEP-14 · Fleet/asset_exit.php («خروج الأصل»)
 - DEP-14 · Portal/vp_departments.php («الإدارات نطاقي والشركة»)
 - DEP-14 · Portal/vp_pending_actions.php («المطلوب مني»)
+- DEP-15 · user_capacities.php («صفاتي والتبديل بينها»)
 - DEP-15 · Finance/tre_instruments.php («سجل الأدوات المالية»)
 - DEP-15 · Finance/tre_allocations.php («تخصيص التحصيل على الفواتير»)
 - DEP-15 · Finance/tre_payment_queue.php («صف الدفع المعتمد»)
@@ -919,6 +930,7 @@
 - DEP-15 · Finance/tre_pay_batch.php («دفعات الدفع والتنفيذ»)
 - DEP-15 · Portal/vp_departments.php («الإدارات نطاقي والشركة»)
 - DEP-15 · Portal/vp_pending_actions.php («المطلوب مني»)
+- DEP-16 · user_capacities.php («صفاتي والتبديل بينها»)
 - DEP-16 · Finance/tre_instruments.php («سجل الأدوات المالية»)
 - DEP-16 · Procurement/stock_proc.php («أرصدة المخزون بحالاتها»)
 - DEP-16 · Procurement/wh_hazmat.php («ضوابط المواد الخطرة والمتفجرات»)

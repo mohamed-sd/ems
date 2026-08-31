@@ -581,6 +581,28 @@ $withLin = $one("SELECT COUNT(DISTINCT LOWER(SUBSTRING_INDEX(REPLACE(n.route,'..
     JOIN nav_placements p ON LOWER(p.route) = LOWER(SUBSTRING_INDEX(REPLACE(n.route,'../',''),'?',1))
         AND p.active = 1 AND p.target_id IS NOT NULL
     WHERE n.active = 1");
+/* §١١: غيرُ المنسوبِ يُصنَّف بقواعدِ مصالحةِ النسبِ نفسِها (navr_lineage_report) —
+   والبسطُ الرسميُّ «بلا نسبٍ **ولا تصنيف**» فيُفحص صفرُه لا يُدَّعى */
+$linCls = array('UTILITY_ANCHOR' => 0, 'FINREQ_GATEWAY' => 0, 'BORROWED_VIEW' => 0, 'TAXONOMY_LEGACY' => 0);
+$plAnyLin = array();
+$qLin = $conn->query("SELECT LOWER(route) r FROM nav_placements WHERE active = 1 AND route IS NOT NULL AND target_id IS NOT NULL");
+while ($xLin = $qLin->fetch_assoc()) { $plAnyLin[$xLin['r']] = true; }
+$UTIL_LIN = array('main/role_board.php', 'chats/index.php', 'main/profile.php', 'main/soon.php', 'main/user_profile.php');
+$qLin = $conn->query("SELECT DISTINCT LOWER(SUBSTRING_INDEX(REPLACE(n.route,'../',''),'?',1)) b
+    FROM nav_items n JOIN nav_ws_roles wr ON wr.role_id = n.role_id AND wr.binding = 'PRIMARY'
+    JOIN nav_workspaces w ON w.workspace_id = wr.workspace_id AND w.kind = 'DEPARTMENT'
+    LEFT JOIN nav_placements p ON LOWER(p.route) = LOWER(SUBSTRING_INDEX(REPLACE(n.route,'../',''),'?',1))
+        AND p.active = 1 AND p.target_id IS NOT NULL
+    WHERE n.active = 1 AND p.route IS NULL");
+while ($xLin = $qLin->fetch_assoc()) {
+    $b = trim(preg_replace('~#.*$~', '', $xLin['b']), '/');   // لاحقةُ '#n' تمييزُ بندٍ لا ملفًّا آخر
+    if ($b === '' || substr($b, -4) !== '.php') { continue; }
+    if (in_array($b, $UTIL_LIN, true) || strpos($b, 'portal/my_') === 0 || strpos($b, 'portal/notifications') === 0) { $linCls['UTILITY_ANCHOR']++; }
+    elseif (strpos($b, 'finrequests/') === 0) { $linCls['FINREQ_GATEWAY']++; }
+    elseif (isset($plAnyLin[$b])) { $linCls['BORROWED_VIEW']++; }
+    else { $linCls['TAXONOMY_LEGACY']++; }
+}
+$linUnexplained = ($appDen - $withLin) - array_sum($linCls);
 $structPass = $exactDeps; $humanPass = 0;
 $builtNotRendered = $agg['builtMissing'];
 $groupConf = $agg['found'] - $agg['wrongGroup'];
@@ -605,7 +627,7 @@ $mx = "# NAVR — المقاييسُ العشرةُ المنفصلة\n\n"
     . "| `STRUCTURAL_NAV_PASS` | **{$structPass}/{$applicableDeps}** | إداراتٌ بلغت المطابقةَ البنيويّةَ — **وكلُّ بالغةٍ تدخل HUMAN_NAV_VERIFICATION فورًا** (§٢٦: لا انتظارَ 17/17) |\n"
     . "| `HUMAN_NAV_PASS` | **{$humanPass}/{$structPass}** من المؤهَّلات | التحقُّقُ البشريُّ بدورٍ حقيقيٍّ — وDEP-08 عند أهليّتِها `BLOCKED_ROLE_BINDING` لا PASS مزوَّر (§٢٧) |\n"
     . "| `LEGACY_TARGET_RUNTIME_READ_COUNT` | **{$legacyRead}** | مساحةُ أعمالٍ مهاجرةٌ ما زال تصييرُها يقرأ سلطةَ الإرث — الهدف 0 (§٢١) |\n"
-    . "| `BUILT_SCREEN_WITHOUT_TARGET_LINEAGE` | **" . ($appDen - $withLin) . "** (المقام {$appDen} · بنسبٍ {$withLin}) | Baseline §١٠: بنودُ قوائمِ المساحاتِ المهاجرةِ بلا نسبِ هدفٍ (`target_id`) — **قياسُ أساسٍ لا هدفُ إغلاقٍ بعد**؛ وغيرُ المنسوبِ أدواتٌ ومراسٍ وبنودٌ خارجَ الورقةِ تُصالَح تباعًا |\n"
+    . "| `BUILT_SCREEN_WITHOUT_TARGET_LINEAGE` | **{$linUnexplained}** (المقام {$appDen} = بنسبٍ {$withLin} + مصنَّفٍ " . array_sum($linCls) . ") | §١١: بلا نسبٍ **ولا تصنيفِ مصالحةٍ** — الهدف 0. والمصنَّفُ بأحكامِه: أداةُ دستورٍ {$linCls['UTILITY_ANCHOR']} · بوّابةٌ ماليّةٌ مشتقّة {$linCls['FINREQ_GATEWAY']} · استعارةٌ منسوبةٌ عند مالكِها {$linCls['BORROWED_VIEW']} · إرثيٌّ يقترح بقرار (CL-NAVR-LEG626) {$linCls['TAXONOMY_LEGACY']} |\n"
     . "| `UNEXPLAINED_METRIC_EXCLUSION` | **0** | كلُّ استبعادٍ في هذه اللوحةِ مكتوبُ السببِ في خانتِه (§٨ من أمرِ الحوكمة) |\n"
     . "\nمصنَّفٌ خارجَ مقامِ السايدبار (تبويب/إسقاط — المطلوب ١٠): **{$classifiedAgg}** هدفًا.\n"
     . "\n> **معادلةُ النسب (§١٠)**: Applicable {$appDen} = With {$withLin} + Without " . ($appDen - $withLin)

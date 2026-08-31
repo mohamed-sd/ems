@@ -17,6 +17,7 @@ mb_internal_encoding('UTF-8');
 mysqli_report(MYSQLI_REPORT_OFF);
 $ROOT = str_replace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__));
 require_once $ROOT . '/includes/env.php';
+date_default_timezone_set((string) ems_env('EMS_APP_TIMEZONE', 'Africa/Cairo'));
 $host = ems_env('DB_HOST'); $port = 3306;
 if (strpos($host, ':') !== false) { list($host, $port) = explode(':', $host); $port = (int) $port; }
 $u = ems_env('DB_MIGRATOR_USER') ?: ems_env('DB_USER');
