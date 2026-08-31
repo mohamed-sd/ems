@@ -1,7 +1,7 @@
 # MASTER FINAL CLOSURE REGISTER — السجلُّ الجامعُ للإغلاقِ النهائيّ
 
 > **المخزنُ الحاكم:** `registers/MASTER_FINAL_CLOSURE_REGISTER.json` — وهذا إسقاطُه.
-> **اللقطة:** `59136c85` · **حُدِّث:** 2026-08-31 12:20
+> **اللقطة:** `1c3ed647` · **حُدِّث:** 2026-08-31 12:47
 > **المصمَّمُ الحاكم:** `docs/REPAIR01_20260823/orders/CLOSURE_SYSTEM.txt`
 
 ## مقامُ الحالات — ⛔ ولا تُجمَع في نسبةٍ واحدة
@@ -11,10 +11,10 @@
 | `BLOCKED_ENVIRONMENT` | 1 |
 | `BLOCKED_GOVERNING_SOURCE` | 1 |
 | `BLOCKED_OWNER` | 22 |
-| `BLOCKED_UAT` | 2 |
-| `EVIDENCE_CLOSED` | 78 |
+| `BLOCKED_UAT` | 3 |
+| `EVIDENCE_CLOSED` | 84 |
 | `IMPLEMENTED_NOT_VERIFIED` | 23 |
-| `OPEN` | 28 |
+| `OPEN` | 21 |
 | **الجملة** | **155** |
 
 ## البنودُ غيرُ المغلقة — بحاجزِها وفعلِها التالي
@@ -22,16 +22,11 @@
 | Closure_ID | الحالة | الأولوية | الحاجز | المصدر | اللقطةُ الحالية | الفعلُ التالي |
 |---|---|---|---|---|---|---|
 | `CL-WORK-01` | `BLOCKED_ENVIRONMENT` | P0 | — | docs/REPAIR01_20260823/orders/CLOSURE_SYSTEM.txt | محلي 59136c85 متقدم عن البعيد 96a640e1 — الدفع مسلم للمستخدم @ 59136c85 |  |
-| `CL-GAP-07` | `OPEN` | P0 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
-| `CL-FR-APP-001` | `IMPLEMENTED_NOT_VERIFIED` | P0 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ 808a2c03 |  |
+| `CL-FR-APP-001` | `IMPLEMENTED_NOT_VERIFIED` | P0 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | الحاجز وقائع حية لا هندسة — يمارس بالاستخدام ثم يغلق @ 747cfbe7 |  |
 | `CL-FR-APP-002` | `BLOCKED_OWNER` | P0 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ 808a2c03 |  |
 | `CL-FR-APP-004` | `BLOCKED_OWNER` | P0 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ 808a2c03 |  |
 | `CL-FR-DAT-001` | `BLOCKED_OWNER` | P0 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ 808a2c03 |  |
-| `CL-FR-GOV-009` | `OPEN` | P0 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=OPEN @ 808a2c03 |  |
-| `CL-FR-GOV-015` | `OPEN` | P0 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=OPEN @ 808a2c03 |  |
-| `CL-GAP-17` | `OPEN` | P1 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
-| `CL-GAP-18` | `OPEN` | P1 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
-| `CL-GAP-23` | `OPEN` | P1 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
+| `CL-GAP-23` | `BLOCKED_UAT` | P1 | — | tools/injfix01_gap_coverage.php | الحاجز بشري لا هندسي — يغلق بجولة UAT @ 1c3ed647 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
 | `CL-GAP-29` | `OPEN` | P1 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
 | `CL-FR-APP-005` | `IMPLEMENTED_NOT_VERIFIED` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ 808a2c03 |  |
 | `CL-FR-APP-007` | `IMPLEMENTED_NOT_VERIFIED` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ 808a2c03 |  |
@@ -64,7 +59,6 @@
 | `CL-FR-GOV-010` | `OPEN` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=OPEN @ 808a2c03 |  |
 | `CL-FR-GOV-012` | `OPEN` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=OPEN @ 808a2c03 |  |
 | `CL-FR-GOV-014` | `OPEN` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=OPEN @ 808a2c03 |  |
-| `CL-FR-GOV-016` | `OPEN` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=OPEN @ 808a2c03 |  |
 | `CL-R2-T13` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/REPAIR01_20260823/RPR02_TARGET_UNIVERSE.md | شاشة PLATFORM بلا تبرير منصي معتمد = 0 (المقيس 12) @ 808a2c03 |  |
 | `CL-R2-T16` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/REPAIR01_20260823/RPR02_TARGET_UNIVERSE.md | اسم معروض غير معتمد = 0 (المقيس 3 منها 2 PENDING_OWNER) @ 808a2c03 |  |
 | `CL-R3-M08` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/REPAIR01_20260823/RPR03_SCORECARD.md | أسطح PLATFORM بلا تبرير = 0 (المقيس 12) @ 808a2c03 |  |
@@ -105,9 +99,12 @@
 |---|---|
 | `CL-WORK-02` | tests/injfix01_sensitive_fields_nine_channels_proof.php 15/15 والسالب يثبت العض @ 59136c85 |
 | `CL-WORK-03` | schtasks EMS_cron_events LastTaskResult=0 + storage/logs/cron_events.log نبض START/END + سالب الازدواج SKIP + مؤشرات عند الراس 17985 @ 59136c85 |
+| `CL-GAP-07` | bus_stall_alarm_proof 11/11 — العدة حوكيت بتسجيل الانتاج كاملا (fx موصول) واليتم يثبت بمجس اصطناعي @ 747cfbe7 |
 | `CL-GAP-10` | tests/injfix01_sensitive_fields_nine_channels_proof.php 15/15 + سالب --negative=GAP-10 اثبت الرسوب @ 59136c85 |
 | `CL-FR-EVT-003` |  |
 | `CL-FR-DAT-002` |  |
+| `CL-FR-GOV-009` | tests/injfrd01_gov009_migration_ledger_gate.php 9/9 — بوابة 4/4 · غير مصالح=0 · السالب يرسب بالحقن · Commit=ec0aff80 @ ec0aff80 |
+| `CL-FR-GOV-015` | nine_channels 15/15 @ 747cfbe7 — ACTIVE_SENSITIVE_FIELD_BYPASS=0 والسالب مثبت @ 012c4db7 |
 | `CL-WORK-04` | REQUIRED_SETTLEMENT_EFFECT_MISSING=0 مقيسا + settlement_proof 16/16 + eng01_bus_test 22/22 + rpr03_contract_register صفر مفردة بلا عقد @ 59136c85 |
 | `CL-WORK-05` | سقاطتان شدتا (permission 72⇒20 · extraction 77⇒36 بتمديد الاستخراج للعديات) ودينان جديدان سدا لا شدا (قارئ وهمي + ملكية cron_task) — الحزام 25⇒30/34 والمقامات ثابتة @ 59136c85 |
 | `CL-GAP-01` | tools/injfix01_gap_coverage.php @ 808a2c03 |
@@ -127,6 +124,8 @@
 | `CL-GAP-30` | tools/injfix01_gap_coverage.php @ 808a2c03 |
 | `CL-GAP-33` | tools/injfix01_gap_coverage.php @ 808a2c03 |
 | `CL-GAP-11` | permission_single_point_gate 7/7 بعد --retighten (72⇒20 قارئا) @ 59136c85 |
+| `CL-GAP-17` | scheduler_parity 5/5 — المدخل الغلاف يجدول عامله قياسا بحل التضمين درجة @ 1c3ed647 |
+| `CL-GAP-18` | injexec01_migration_ledger_gate 3/3 — الانزياحان اعلنا بسببيهما الموثقين (تعليق اعفاء 747cfbe7 · تاليف لاحق 0bbed277) @ 1c3ed647 |
 | `CL-GAP-20` | ownership_ruling 3/3 — حكم NOT_APPLICABLE لمدخل cron_events_task في gov_ownership_rulings @ 59136c85 |
 | `CL-FR-SEC-001` |  |
 | `CL-FR-FIN-001` |  |
@@ -145,6 +144,7 @@
 | `CL-FR-DAT-006` |  |
 | `CL-FR-GOV-002` |  |
 | `CL-FR-EVT-008` |  |
+| `CL-FR-GOV-016` | permission_gate 7/7 + extraction 2/2 @ 747cfbe7 — صفر سقاطة راسبة على تحسن @ 012c4db7 |
 | `CL-R2-T01` | tools/rpr02_acceptance_scorecard.php @ 808a2c03 |
 | `CL-R2-T02` | tools/rpr02_acceptance_scorecard.php @ 808a2c03 |
 | `CL-R2-T03` | tools/rpr02_acceptance_scorecard.php @ 808a2c03 |

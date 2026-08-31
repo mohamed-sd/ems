@@ -83,6 +83,17 @@ $onDisk = array_map('basename', glob($ROOT . '/cron_*.php'));
 sort($onDisk);
 $scheduled = array();
 foreach ($tasks as $t) { if ($t['script'] !== '—') { $scheduled[$t['script']] = true; } }
+/* ◆ **المدخلُ الغلافُ يجدول عاملَه** (FINAL_CLOSE ⑩ · CLOSURE_SYSTEM WORK-03):
+   `EMS_cron_events` ينفّذ `cron_events_task.php` وهو بابُ دخولٍ يضبط
+   `EMS_JOB_WORKER` ثم يضمّن `cron_events.php` — فالعاملُ المضمَّنُ من مهمّةٍ
+   مجدولةٍ **مجدولٌ عبرَها قياسًا**: يُحلُّ التضمينُ درجةً واحدةً من نصِّ
+   الغلافِ المجدولِ نفسِه، لا بقائمةِ استثناءٍ في الفاحص. */
+foreach (array_keys($scheduled) as $s) {
+    $src0 = (string) @file_get_contents($ROOT . '/' . $s);
+    if ($src0 !== '' && preg_match_all('~(?:require|include)(?:_once)?\s*(?:__DIR__\s*\.\s*)?[\'"]/?(cron_[A-Za-z0-9_]+\.php)[\'"]~', $src0, $wm)) {
+        foreach ($wm[1] as $w) { $scheduled[$w] = true; }
+    }
+}
 $unscheduled = array_values(array_diff($onDisk, array_keys($scheduled)));
 echo "  على القرص: " . implode(' · ', $onDisk) . "\n";
 ok(count($unscheduled) === 0, 'صفرُ عاملٍ على القرصِ بلا مهمةٍ مجدولة', $pass, $fail,

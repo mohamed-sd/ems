@@ -6,6 +6,7 @@
         "GAP-04",
         "GAP-05",
         "GAP-06",
+        "GAP-07",
         "GAP-08",
         "GAP-09",
         "GAP-10",
@@ -13,6 +14,7 @@
         "GAP-13",
         "GAP-15",
         "GAP-16",
+        "GAP-17",
         "GAP-19",
         "GAP-20",
         "GAP-24",
@@ -25,10 +27,8 @@
     ],
     "open": [
         "GAP-03 (P2)",
-        "GAP-07 (P0)",
         "GAP-12 (P2)",
         "GAP-14 (P2)",
-        "GAP-17 (P1)",
         "GAP-18 (P1)",
         "GAP-21 (P3)",
         "GAP-22 (P2)",
@@ -38,7 +38,7 @@
         "GAP-32 (P2)"
     ],
     "unverified": [],
-    "suite_green": 30,
+    "suite_green": 32,
     "suite_total": 34,
     "negative_belt": ""
 }
