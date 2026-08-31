@@ -136,6 +136,19 @@ $dispatcher->register(
     intval($maxRow[0])
 );
 
+// ═══ FINAL_CLOSE ⑨ · مستهلكُ صرفِ العملة (RPR-03 #18) ═════════════════════
+// كان صفُّ `fx` يتيمًا — مؤشِّرٌ بلا `register()` فلا يتحرّك أبدًا. والمعالجُ
+// **تحقُّقُ أثرٍ لا ترحيل**: محقَّقُ الأساسِ يمرّ · وناقصُه يُملأ من السعرِ
+// المسجَّلِ وحدَه · وما لا سعرَ له يفشل باسمِ سببِه إلى دورةِ الإعادةِ
+// فالرسائلِ الميتةِ بإنذارِها. التسجيلُ من مؤشِّرِه القائمِ (لا قفزَ فوق
+// المتراكم — 5054 حدثًا يُتحقَّق منها دفعاتٍ حتى اللحاق).
+require_once __DIR__ . '/app/Services/Bus/Consumers/FxRealizationConsumer.php';
+$dispatcher->register(
+    \App\Services\Bus\Consumers\FxRealizationConsumer::NAME,
+    \App\Services\Bus\Consumers\FxRealizationConsumer::handler(),
+    0 // يُتجاهَل لوجودِ صفِّ المؤشِّرِ القائم — والبدايةُ من حيث وقف
+);
+
 $stats = $dispatcher->runOnce();
 foreach ($stats as $consumer => $s) {
     echo "[events-cron " . date('Y-m-d H:i:s') . "] {$consumer}: processed={$s['processed']} failed={$s['failed']} dead_lettered={$s['dead_lettered']} cursor={$s['cursor']}\n";

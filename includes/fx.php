@@ -357,3 +357,57 @@ if (!function_exists('ems_fx_revalue_open_dues')) {
         return $out;
     }
 }
+
+/* ═══ FINAL_CLOSE ⑨ — قراءتا المستهلكِ بلا جلسة ═══════════════════════════
+   مستهلكُ `fx` (cron) يعمل بلا جلسةِ مستأجرٍ فلا يبلغ `scopedQuery` — فالعزلُ
+   هنا بعمودِ `company_id` من صفِّ الحدثِ نفسِه، والاستعلامُ مُهيَّأٌ حصرًا. */
+
+if (!function_exists('ems_fx_rate_for_company')) {
+    /** السعرُ المسجَّلُ النافذُ بتاريخٍ لكيانٍ بعينِه — من دفترِ التسعيرِ وحدَه */
+    function ems_fx_rate_for_company($conn, $companyId, $code, $date)
+    {
+        $st = $conn->prepare(
+            'SELECT rate_to_base FROM fin_fx_rates
+              WHERE company_id = ? AND currency_code = ? AND effective_from <= ?
+                AND COALESCE(is_deleted, 0) = 0
+              ORDER BY effective_from DESC LIMIT 1');
+        if (!$st) { return null; }
+        $cid = (int) $companyId;
+        $st->bind_param('iss', $cid, $code, $date);
+        $st->execute();
+        $st->bind_result($r);
+        $rate = $st->fetch() ? (float) $r : null;
+        $st->close();
+        return $rate;
+    }
+
+    /** عملةُ أساسِ الكيانِ من سجلِّه — لا من جلسة */
+    function ems_fx_base_for_company($conn, $companyId)
+    {
+        $cur = '';
+        $st = $conn->prepare('SELECT currency FROM admin_companies WHERE id = ? LIMIT 1');
+        if ($st) {
+            $cid = (int) $companyId;
+            $st->bind_param('i', $cid);
+            $st->execute();
+            $st->bind_result($c);
+            if ($st->fetch()) { $cur = trim((string) $c); }
+            $st->close();
+        }
+        return $cur;
+    }
+
+    /** تحقيقُ القيمةِ الأساسِ على حدثٍ ماليٍّ ناقصِها — بشرطِ IS NULL (عطالة) */
+    function ems_fx_realize_event_base($conn, $eventId, $rate, $baseAmount)
+    {
+        $st = $conn->prepare('UPDATE fin_financial_events
+                                 SET fx_rate = ?, base_amount = ?
+                               WHERE id = ? AND base_amount IS NULL');
+        if (!$st) { return false; }
+        $eid = (int) $eventId;
+        $st->bind_param('ddi', $rate, $baseAmount, $eid);
+        $ok = $st->execute();
+        $st->close();
+        return (bool) $ok;
+    }
+}

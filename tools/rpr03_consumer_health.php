@@ -67,8 +67,12 @@ $r = $conn->query("SELECT consumer, enabled, cursor_event_id, updated_at
                      FROM ems_event_consumers ORDER BY consumer");
 while ($x = $r->fetch_assoc()) {
     $cur = (int) $x['cursor_event_id'];
-    /* فجوةُ المؤشِّر: كم واقعةً بعدَه فعلًا — لا فرقُ معرِّفَين */
-    $behind = (int) $one("SELECT COUNT(*) FROM ems_business_events WHERE id > " . $cur);
+    /* فجوةُ المؤشِّر: كم واقعةً بعدَه فعلًا — لا فرقُ معرِّفَين.
+       ⛔ **والمقامُ ناقلُ الموزِّعِ نفسُه** (FINAL_CLOSE ⑨): المؤشِّراتُ معرِّفاتُ
+       `fin_financial_events` (منه يقرأ `EventDispatcher::runConsumer` بعقدِ
+       `event_key`) — وقياسُها على `ems_business_events` مقارنةُ دفترَين. */
+    $behind = (int) $one("SELECT COUNT(*) FROM fin_financial_events WHERE id > " . $cur
+                       . " AND event_key IS NOT NULL AND COALESCE(is_deleted,0) = 0");
     $idleDays = null;
     if ($x['updated_at'] !== null && $x['updated_at'] !== '') {
         $idleDays = (int) $one("SELECT DATEDIFF(NOW(), '" . $conn->real_escape_string($x['updated_at']) . "')");

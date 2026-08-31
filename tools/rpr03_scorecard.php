@@ -368,10 +368,17 @@ $add('رسائلُ ميتةٌ بلا حكم', 'صفر', '٢٦ بلا حكم', $d
      'قُيِّدت بأدلّتِها · **وسببُ الفشلِ غيرُ محفوظ** فالحكمُ متعذِّر');
 
 /* ⑱ المستهلكون الحرجون */
+/* ⛔ **مقامٌ مصحَّح (FINAL_CLOSE ⑨)**: كان يقارن مؤشِّرَ `fx` برأسِ
+     `ems_business_events` — **ومؤشِّراتُ الموزِّعِ معرِّفاتُ `fin_financial_events`**
+     (ناقلُه الفعليُّ في `EventDispatcher::runConsumer`) ⇒ مقارنةُ دفترَين
+     تُبقي المقياسَ أحمرَ أبدًا ولو لحق المستهلكُ رأسَ ناقلِه. فالتأخُّرُ
+     يُقاس على الناقلِ الذي يقرأ منه الموزِّعُ وبعقدِه (`event_key` موجود). */
 $fxBehind = (int) $one("SELECT COUNT(*) FROM ems_event_consumers c
-                         WHERE c.consumer = 'fx'
-                           AND EXISTS(SELECT 1 FROM ems_business_events e
-                                       WHERE e.id > c.cursor_event_id)");
+                         WHERE c.consumer = 'fx' AND c.enabled = 1
+                           AND EXISTS(SELECT 1 FROM fin_financial_events e
+                                       WHERE e.id > c.cursor_event_id
+                                         AND e.event_key IS NOT NULL
+                                         AND COALESCE(e.is_deleted, 0) = 0)");
 /* ⛔ **و«متوقّف» ليست «يتيم»** — والفرقُ يقلب العلاج: المتوقّفُ يُستأنَف،
      واليتيمُ **لا معالجَ له في الشيفرة أصلًا** فلن يتحرّك مهما مضى. وقِيس:
      `cron_events.php` يسجّل بـ`register()` **مستهلكَين فقط** (`finance`
@@ -388,22 +395,25 @@ $orphan = in_array('fx', $registered, true) ? 'له معالجٌ مسجَّل' :
    يقول إنَّ الناقلَ كلَّه ساكن**: مؤشِّراتُ المستهلكين الأربعةِ كلُّها متأخِّرةٌ
    عن آخرِ حدث. ⇒ **يُعرض تأخُّرُ كلٍّ بعددِه** كي لا يُقرأ «واحدٌ متوقّف»
    على أنَّ البقيّةَ تسير. */
-$busMax = (int) $one("SELECT COALESCE(MAX(id),0) FROM ems_business_events");
+/* ⛔ **والرأسُ من ناقلِ الموزِّعِ نفسِه** — كان يُقرأ من `ems_business_events`
+     (46,336) فتظهر تأخُّراتٌ بعشراتِ الآلافِ وهي فرقُ ترقيمِ دفترَين لا سكونًا. */
+$busMax = (int) $one("SELECT COALESCE(MAX(id),0) FROM fin_financial_events
+                       WHERE event_key IS NOT NULL AND COALESCE(is_deleted,0) = 0");
 $busLag = array();
 $rr = $conn->query("SELECT consumer, cursor_event_id FROM ems_event_consumers ORDER BY cursor_event_id DESC");
 while ($rr && $z = $rr->fetch_assoc()) {
-    $busLag[] = '`' . $z['consumer'] . '` ' . number_format($busMax - (int) $z['cursor_event_id']);
+    $busLag[] = '`' . $z['consumer'] . '` ' . number_format(max(0, $busMax - (int) $z['cursor_event_id']));
 }
 $busWit = $busLag
-    ? ' · ⛔ **والناقلُ كلُّه ساكنٌ لا `fx` وحدَه** — تأخُّرُ كلِّ مستهلكٍ عن آخرِ حدثٍ ('
+    ? ' · ◆ تأخُّرُ كلِّ مستهلكٍ عن رأسِ **ناقلِ الموزِّعِ** `fin_financial_events` ('
       . number_format($busMax) . '): ' . implode(' · ', $busLag)
-      . ' ⇒ **فأقلُّهم تأخُّرًا متأخِّرٌ بعشراتِ الآلاف**، و«واحدٌ حرجٌ متوقّف» لا تصف الحال'
     : '';
 $add('مستهلكون حرجون متوقّفون', 'صفر', '١', $fxBehind,
      '`fx` حرجٌ بنصِّ الأمرِ لا بعتبة · وحالُه المقيسة: ' . $orphan
-   . ' (‏المسجَّلون: ' . (count($registered) ? implode(' · ', $registered) : 'لا أحد') . ') '
-   . '⇒ ⛔ **العلاجُ توصيلُ معالجٍ أو تقاعدٌ بحكمٍ — لا استئنافُ عامل**'
-   . ' ◆ و`FxRevaluationService` و`FxSettlementService` **موجودان على القرص** — فالناقصُ **التوصيلُ لا البناء**, ⛔ **وتوصيلُه يُشغِّل ترحيلًا ماليًّا فلا يُفعَّل بلا قرار**'
+   . ' (‏المسجَّلون: ' . (count($registered) ? implode(' · ', $registered) : 'لا أحد') . ')'
+   . ' ◆ المعالجُ الموصولُ (`FxRealizationConsumer` — FINAL_CLOSE ⑨) **تحقُّقُ أثرٍ لا ترحيل**:'
+   . ' محقَّقُ الأساسِ يمرُّ · وناقصُه يُملأ من السعرِ المسجَّلِ وحدَه · وما لا سعرَ له يفشل'
+   . ' باسمِ `FX_RATE_MISSING` إلى الإعادةِ فالرسائلِ الميتة — ⛔ ولا قيدَ ولا `fin_fx_differences` بيدِه'
    . $busWit);
 
 /* ⑲ جدولةُ المهامّ */
