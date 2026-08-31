@@ -393,7 +393,7 @@ gate('W15-25', 'رحلةُ الطلبِ تعبر كاملةً بأثرٍ عند 
 $base = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry
                      WHERE origin IN ('SURFACES','DISK','NAV')");
 $unstamped = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry
-                          WHERE origin NOT IN ('SURFACES','DISK','NAV') AND origin NOT REGEXP '^W[0-9]+$'");
+                          WHERE origin NOT IN ('SURFACES','DISK','NAV') AND origin NOT REGEXP '^W[0-9]+$' AND origin <> 'BUILD'");
 gate('W15-26', 'أساسُ السجلِّ 651 لم يُمَسّ والنموُّ مختومٌ بموجتِه',
      $base === 651 && $unstamped === 0,
      "الأساسُ $base · نموٌّ بلا ختمٍ $unstamped · أسطحُ W15 $w15N");

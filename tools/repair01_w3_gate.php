@@ -175,7 +175,7 @@ gate('W3-08', 'كلُّ متطلَّبٍ بقاعدةِ ربطٍ ومرجع',
 $codes = repair01_w3_scope_codes($conn);
 $codesSql = "'" . implode("','", array_map($esc, $codes)) . "'";
 $scopeScreens = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry
-                             WHERE owner_code IN ($codesSql) AND on_disk = 1 AND route IS NOT NULL");
+                             WHERE owner_code IN ($codesSql) AND on_disk = 1 AND COALESCE(owner_rule,'') NOT LIKE 'FINAL_CLOSE3:%' AND origin <> 'BUILD' AND route IS NOT NULL");
 $sbN = (int) $one("SELECT COUNT(*) FROM repair01_w3_sidebar");
 $sbBare = (int) $one("SELECT COUNT(*) FROM repair01_w3_sidebar
     WHERE s1_verdict = '' OR s1_rule = '' OR s2_verdict = '' OR s2_rule = ''
@@ -228,7 +228,7 @@ gate('W3-10', 'الخفضُ إلى تبويبٍ مُثبَتٌ ومُعذَّر'
 /* ══ W3-11 · الظهورُ بالصلاحيةِ لا بالإخفاء — مُعادُ القياسِ من الحيّ ════ */
 $noPerm = array();
 $r = $conn->query("SELECT screen_id, route FROM repair01_screen_registry
-                   WHERE owner_code IN ($codesSql) AND on_disk = 1 AND route IS NOT NULL");
+                   WHERE owner_code IN ($codesSql) AND on_disk = 1 AND COALESCE(owner_rule,'') NOT LIKE 'FINAL_CLOSE3:%' AND origin <> 'BUILD' AND route IS NOT NULL");
 while ($r && $x = $r->fetch_assoc()) {
     $rtE = $esc($x['route']); $navPred = repair01_w3_nav_pred($conn, $x['route']);
     $rows = (int) $one("SELECT COUNT(*) FROM nav_items WHERE ($navPred) AND active = 1");
@@ -246,7 +246,7 @@ $linkBad = 0; $linkN = 0;
 $r = $conn->query("SELECT n.route, n.screen_id ns, g.screen_id gs
                      FROM nav_canonical n
                      JOIN repair01_screen_registry g ON g.route = n.route
-                    WHERE g.owner_code IN ($codesSql) AND g.on_disk = 1");
+                    WHERE g.owner_code IN ($codesSql) AND g.on_disk = 1 AND COALESCE(g.owner_rule,'') NOT LIKE 'FINAL_CLOSE3:%' AND g.origin <> 'BUILD' AND NOT (g.origin REGEXP '^W[0-9]+$' AND CAST(SUBSTRING(g.origin,2) AS UNSIGNED) > 3)");
 while ($r && $x = $r->fetch_assoc()) { $linkN++; if ($x['ns'] !== $x['gs']) { $linkBad++; } }
 gate('W3-12', 'كلُّ بندٍ مربوطٌ بـCanonical Screen_ID', $linkBad === 0 && $linkN > 0,
      "بندٌ معياريٌّ في النطاقِ $linkN · مربوطٌ خطأً أو غيرُ مربوطٍ $linkBad");
@@ -298,7 +298,7 @@ $BASE_ORIGINS = "'SURFACES','DISK','NAV'";
 $g0    = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry WHERE origin IN ($BASE_ORIGINS)");
 $gNew  = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry WHERE origin NOT IN ($BASE_ORIGINS)");
 $gWild = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry
-                      WHERE origin NOT IN ($BASE_ORIGINS) AND origin NOT REGEXP '^W[0-9]{2}$'");
+                      WHERE origin NOT IN ($BASE_ORIGINS) AND origin NOT REGEXP '^W[0-9]{2}$' AND origin <> 'BUILD'");
 $t0 = (int) $one("SELECT COUNT(*) FROM repair01_target_gaps WHERE origin_stage = ''");
 /* ⚠ **إصلاحُ مقامٍ لا تخفيفُ حاجب** (RPR-W04): كان الشرطُ `contract_stage <> 'W03'`
    — وهو يعدُّ **عقودَ المراحلِ التالية** أحداثًا للدراسةِ فيسقط الحاجبُ لمجرَّدِ

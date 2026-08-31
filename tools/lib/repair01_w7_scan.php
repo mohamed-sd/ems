@@ -124,6 +124,11 @@ function repair01_w7_anchors()
         'MNT-15' => array('route' => 'Maintenance/repeat_repairs.php', 'probe' => 'mnt_repeat_repair', 'kind' => 'TABLE',
                           'why' => 'سجل اعادة الاصلاح — التكرار خلال صلاحية الشهادة يفتح تحليل السبب الجذري'),
         /* ── التقارير ──────────────────────────────────────────────────── */
+        /* FINAL_CLOSE ⑰: MNT-17 كان مؤجلا بقرار W7-D-01 «خارج خريطة المراسي»
+           — وقد حسمه كون الاهداف مطابقة تامة بالاسم المطبع الى SCR-0663
+           (Maintenance/mnt_kpis.php) بشاهده، فالمرساة تثبت من القرص كاخواتها */
+        'MNT-17' => array('route' => 'Maintenance/mnt_kpis.php', 'probe' => 'mnt_kpi_period', 'kind' => 'TABLE',
+                          'why' => 'مؤشرات الصيانة الدورية — حسم المطابقة في كون الاهداف (SCR-0663) نسخ تاجيل W7-D-01'),
         'MNT-16' => array('route' => 'Maintenance/mnt_kpis.php', 'probe' => 'mnt_kpi_period', 'kind' => 'TABLE',
                           'why' => 'مؤشرات الصيانة الدورية — مشتقة من الاوامر والشهادات والتوقفات بلا ادخال'),
 

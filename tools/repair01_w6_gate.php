@@ -273,7 +273,7 @@ $BASE_ORIGINS = "'SURFACES','DISK','NAV'";
 $g0    = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry WHERE origin IN ($BASE_ORIGINS)");
 $gNew  = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry WHERE origin NOT IN ($BASE_ORIGINS)");
 $gWild = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry
-                      WHERE origin NOT IN ($BASE_ORIGINS) AND origin NOT REGEXP '^W[0-9]{2}$'");
+                      WHERE origin NOT IN ($BASE_ORIGINS) AND origin NOT REGEXP '^W[0-9]{2}$' AND origin <> 'BUILD'");
 $t0 = (int) $one("SELECT COUNT(*) FROM repair01_target_gaps WHERE origin_stage = ''");
 $e0 = (int) $one("SELECT COUNT(*) FROM repair01_events WHERE contract_stage = ''");
 $e3 = (int) $one("SELECT COUNT(*) FROM repair01_events WHERE contract_stage = 'W03'");

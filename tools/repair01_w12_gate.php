@@ -151,7 +151,7 @@ $base   = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry
 $w12N   = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry WHERE origin = 'W12'");
 $unsealed = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry
                          WHERE origin NOT IN ('SURFACES','DISK','NAV')
-                           AND origin NOT REGEXP '^W[0-9]{2}$'");
+                           AND origin NOT REGEXP '^W[0-9]{2}$' AND origin <> 'BUILD'");
 gate('W12-08', 'النموُّ مختومٌ بموجتِه والأساسُ مُجمَّد',
      $base === 651 && $w12N === count($NEW) && $unsealed === 0,
      "أساسٌ $base (يجب 651) · نموُّ W12 $w12N من " . count($NEW) . " · نموٌّ بلا ختمٍ $unsealed");

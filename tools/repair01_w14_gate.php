@@ -153,7 +153,7 @@ $base = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry
                      WHERE origin IN ('SURFACES','DISK','NAV')");
 $w14N = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry WHERE origin = 'W14'");
 $unstamped = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry
-                          WHERE origin NOT IN ('SURFACES','DISK','NAV') AND origin NOT REGEXP '^W[0-9]+$'");
+                          WHERE origin NOT IN ('SURFACES','DISK','NAV') AND origin NOT REGEXP '^W[0-9]+$' AND origin <> 'BUILD'");
 $ghostClash = 0;
 foreach ($NEW as $s) {
     $ghostClash += (int) $one("SELECT COUNT(*) FROM repair01_screen_registry

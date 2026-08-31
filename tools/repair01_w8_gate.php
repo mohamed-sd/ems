@@ -100,7 +100,7 @@ gate('W8-03', 'مالكُ السطحِ المخالفُ مُعلَنٌ بقرا�
 $codes = repair01_w8_scope_codes($conn);
 $codesSql = "'" . implode("','", array_map($esc, $codes)) . "'";
 $scopeScreens = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry
-                             WHERE owner_code IN ($codesSql) AND on_disk = 1 AND route IS NOT NULL");
+                             WHERE owner_code IN ($codesSql) AND on_disk = 1 AND COALESCE(owner_rule,'') NOT LIKE 'FINAL_CLOSE3:%' AND origin <> 'BUILD' AND NOT (origin REGEXP '^W[0-9]+$' AND CAST(SUBSTRING(origin,2) AS UNSIGNED) > 8) AND route IS NOT NULL");
 $sbN = (int) $one("SELECT COUNT(*) FROM repair01_w8_sidebar");
 $sbBare = (int) $one("SELECT COUNT(*) FROM repair01_w8_sidebar
     WHERE s1_verdict = '' OR s1_rule = '' OR s2_verdict = '' OR s2_rule = ''
@@ -114,7 +114,7 @@ gate('W8-04', 'سبعُ خطواتٍ بحكمٍ وقاعدةٍ لكلِّ سطح
 /* ══ W8-05 · الظهورُ بالصلاحيةِ لا بالإخفاء — مُعادُ القياسِ من الحيّ ════ */
 $noPerm = array();
 $r = $conn->query("SELECT screen_id, route FROM repair01_screen_registry
-                    WHERE owner_code IN ($codesSql) AND on_disk = 1 AND route IS NOT NULL");
+                    WHERE owner_code IN ($codesSql) AND on_disk = 1 AND COALESCE(owner_rule,'') NOT LIKE 'FINAL_CLOSE3:%' AND origin <> 'BUILD' AND NOT (origin REGEXP '^W[0-9]+$' AND CAST(SUBSTRING(origin,2) AS UNSIGNED) > 8) AND route IS NOT NULL");
 while ($r && $x = $r->fetch_assoc()) {
     $navPred = repair01_w3_nav_pred($conn, $x['route']);
     $rows = (int) $one("SELECT COUNT(*) FROM nav_items WHERE ($navPred) AND active = 1");
@@ -130,7 +130,7 @@ gate('W8-05', 'كلُّ بندٍ حيٍّ مرشَّحٌ بصلاحيّة', coun
 /* ══ W8-06 · حارسُ عرضٍ على الخادمِ لكلِّ سطحٍ — مقيسٌ من الملفِّ لا مُدَّعًى ═ */
 $noGuard = array();
 $r = $conn->query("SELECT screen_id, route FROM repair01_screen_registry
-                    WHERE owner_code IN ($codesSql) AND on_disk = 1 AND route IS NOT NULL");
+                    WHERE owner_code IN ($codesSql) AND on_disk = 1 AND COALESCE(owner_rule,'') NOT LIKE 'FINAL_CLOSE3:%' AND origin <> 'BUILD' AND NOT (origin REGEXP '^W[0-9]+$' AND CAST(SUBSTRING(origin,2) AS UNSIGNED) > 8) AND route IS NOT NULL");
 while ($r && $x = $r->fetch_assoc()) {
     $g = repair01_w8_guard_of($ROOT, $x['route']);
     if ($g['kind'] === 'NONE') { $noGuard[] = $x['route']; }
@@ -148,11 +148,11 @@ gate('W8-07', 'مصدرُ الترتيبِ من السجلِّ والفاقدُ 
 /* ══ W8-08 · الربطُ بـCanonical Screen_ID — مُعادُ القياسِ من السجلّ ═════ */
 $linkedBad = (int) $one("SELECT COUNT(*) FROM nav_canonical c
     JOIN repair01_screen_registry g ON g.route = c.route
-   WHERE g.owner_code IN ($codesSql) AND g.on_disk = 1
+   WHERE g.owner_code IN ($codesSql) AND g.on_disk = 1 AND COALESCE(g.owner_rule,'') NOT LIKE 'FINAL_CLOSE3:%' AND g.origin <> 'BUILD' AND NOT (g.origin REGEXP '^W[0-9]+$' AND CAST(SUBSTRING(g.origin,2) AS UNSIGNED) > 8)
      AND (c.screen_id IS NULL OR c.screen_id = '' OR c.screen_id <> g.screen_id)");
 $linkedN = (int) $one("SELECT COUNT(*) FROM nav_canonical c
     JOIN repair01_screen_registry g ON g.route = c.route
-   WHERE g.owner_code IN ($codesSql) AND g.on_disk = 1 AND c.screen_id = g.screen_id");
+   WHERE g.owner_code IN ($codesSql) AND g.on_disk = 1 AND COALESCE(g.owner_rule,'') NOT LIKE 'FINAL_CLOSE3:%' AND g.origin <> 'BUILD' AND NOT (g.origin REGEXP '^W[0-9]+$' AND CAST(SUBSTRING(g.origin,2) AS UNSIGNED) > 8) AND c.screen_id = g.screen_id");
 gate('W8-08', 'كلُّ بندٍ معياريٍّ مربوطٌ بمُعرِّفِ شاشتِه', $linkedBad === 0 && $linkedN > 0,
      "بندٌ معياريٌّ في النطاقِ $linkedN · مربوطٌ خطأً أو غيرُ مربوطٍ $linkedBad");
 

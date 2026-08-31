@@ -141,6 +141,10 @@ class UiPurity
         if ($forTech) { $s = preg_replace(self::RE_QUOTED, ' ', $s); }
         $s = preg_replace(self::RE_EMAIL, ' ', $s);
         $s = preg_replace(self::RE_BUSINESS_CODE, ' ', $s);
+        /* FINAL_CLOSE ⑰ — «هـ» الترتيبيّةُ (هاءٌ + تطويل) حرفُ تعدادٍ عربيٌّ
+           قائمٌ بذاتِه (أ·ب·ج·د·هـ·و) لا زخرفة: التطويلُ فيها جزءُ رسمِ
+           الحرفِ المفردِ، ونزعُه يقلبها ضميرًا. تُحجَب ككلمةٍ مفردةٍ فقط. */
+        $s = preg_replace('~(?<![\x{0621}-\x{064A}])\x{0647}\x{0640}(?![\x{0621}-\x{064A}\x{0640}])~u', 'ه', $s);
         return $s;
     }
 

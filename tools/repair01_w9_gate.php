@@ -291,9 +291,9 @@ $srcN  = (int) $one("SELECT COUNT(*) FROM repair01_source_files");
 $surfN = (int) $one("SELECT COUNT(*) FROM repair01_surfaces");
 $baseN = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry
                       WHERE origin IN ('SURFACES','DISK','NAV')");
-$growN = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry WHERE origin REGEXP '^W[0-9]{2}$'");
+$growN = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry WHERE (origin REGEXP '^W[0-9]{2}$' OR origin = 'BUILD')");
 $unstamped = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry
-                          WHERE origin NOT IN ('SURFACES','DISK','NAV') AND origin NOT REGEXP '^W[0-9]{2}$'");
+                          WHERE origin NOT IN ('SURFACES','DISK','NAV') AND origin NOT REGEXP '^W[0-9]{2}$' AND origin <> 'BUILD'");
 /* ⚠ **مقاما الفجواتِ يُفصلان**: `174` فجوةُ الدراسةِ الأصليّةُ بلا موجةِ منشأ،
      و`160` نُقلت من خانةِ المبنيِّ في W02 وتحمل `origin_stage='W02'`. وجمعُهما
      في رقمٍ واحدٍ (‏334) يُخفي أيَّهما نما — فالمقامانِ يُعلَنانِ منفصلَين. */

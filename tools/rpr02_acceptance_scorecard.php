@@ -340,6 +340,9 @@ if ($tbl('gov_target_nav') || true) {
         if ($k !== '') { $dg[(int) $z['role_id'] . '|' . $k] = (string) $z['group_ar']; }
     }
     $nz = function ($s) {
+        /* FINAL_CLOSE: حاشيةُ الملفِّ اللاتينيّةُ بين قوسين «(Overview)» شرحٌ
+           لا اسمُ عرضٍ — تُنزَع قبل المقارنةِ من الطرفَين */
+        $s = preg_replace('~\s*\(([A-Za-z0-9 /._-]+)\)~u', '', (string) $s);
         $s = preg_replace('~[\x{064B}-\x{0652}\x{0670}\x{0640}]~u', '', (string) $s);
         $s = preg_replace('~[\x{0622}\x{0623}\x{0625}]~u', "\u{0627}", $s);
         $s = preg_replace('~\x{0649}~u', "\u{064A}", $s);

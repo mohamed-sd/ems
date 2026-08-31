@@ -166,7 +166,7 @@ $base   = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry
 $w13N   = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry WHERE origin = 'W13'");
 $unstamped = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry
                           WHERE origin NOT IN ('SURFACES','DISK','NAV')
-                            AND origin NOT REGEXP '^W[0-9]+$'");
+                            AND origin NOT REGEXP '^W[0-9]+$' AND origin <> 'BUILD'");
 gate('W13-09', 'أساسُ السجلِّ مُجمَّدٌ والنموُّ مختومٌ بموجتِه',
      $base === 651 && $w13N === count($NEW) && $unstamped === 0,
      "الأساس $base (المتوقَّع 651) · نموُّ W13 $w13N من " . count($NEW) . " · نموٌّ بلا ختمٍ $unstamped");

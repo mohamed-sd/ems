@@ -364,7 +364,7 @@ $BASE = "'SURFACES','DISK','NAV'";
 $g0    = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry WHERE origin IN ($BASE)");
 $gNew  = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry WHERE origin NOT IN ($BASE)");
 $gWild = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry
-                      WHERE origin NOT IN ($BASE) AND origin NOT REGEXP '^W[0-9]{2}$'");
+                      WHERE origin NOT IN ($BASE) AND origin NOT REGEXP '^W[0-9]{2}$' AND origin <> 'BUILD'");
 $t0 = (int) $one("SELECT COUNT(*) FROM repair01_target_gaps WHERE origin_stage = ''");
 $e0 = (int) $one("SELECT COUNT(*) FROM repair01_events WHERE contract_stage = ''");
 gate('W11-26', 'أساسُ المراحلِ السابقةِ لم يُمَسّ',

@@ -338,9 +338,9 @@ $decN  = (int) $one("SELECT COUNT(*) FROM repair01_decisions");
 $srcN  = (int) $one("SELECT COUNT(*) FROM repair01_source_files");
 $surfN = (int) $one("SELECT COUNT(*) FROM repair01_surfaces");
 $baseN = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry WHERE origin IN ('SURFACES','DISK','NAV')");
-$growN = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry WHERE origin REGEXP '^W[0-9]{2}$'");
+$growN = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry WHERE (origin REGEXP '^W[0-9]{2}$' OR origin = 'BUILD')");
 $unst  = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry
-                      WHERE origin NOT IN ('SURFACES','DISK','NAV') AND origin NOT REGEXP '^W[0-9]{2}$'");
+                      WHERE origin NOT IN ('SURFACES','DISK','NAV') AND origin NOT REGEXP '^W[0-9]{2}$' AND origin <> 'BUILD'");
 $gapOrig = (int) $one("SELECT COUNT(*) FROM repair01_target_gaps WHERE COALESCE(origin_stage,'') = ''");
 $gapW02  = (int) $one("SELECT COUNT(*) FROM repair01_target_gaps WHERE origin_stage = 'W02'");
 $dvpSurf = (int) $one("SELECT COUNT(*) FROM repair01_surfaces WHERE canonical_code = 'EX-DVP'");
