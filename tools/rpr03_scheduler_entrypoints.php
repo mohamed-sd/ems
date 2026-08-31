@@ -117,8 +117,11 @@ while ($q && ($z = $q->fetch_assoc())) { $jobs[] = $z['job_type']; }
 $runnerScheduled = isset($scriptsRun['cron_jobs.php']);
 if (!$runnerScheduled) { foreach ($jobs as $j) { $E3[] = $j; } }
 
-/* ═══ ⑤ المستهلكون — الأثرُ الذي يقيس صدقَ الجدولة ═════════════════════ */
-$maxEv = (int) @$conn->query("SELECT COALESCE(MAX(id),0) FROM ems_business_events")->fetch_row()[0];
+/* ═══ ⑤ المستهلكون — الأثرُ الذي يقيس صدقَ الجدولة ═════════════════════
+   ⛔ **والرأسُ من ناقلِ الموزِّعِ نفسِه** (FINAL_CLOSE ⑨): المؤشِّراتُ معرِّفاتُ
+   `fin_financial_events` — وقياسُها على `ems_business_events` مقارنةُ دفترَين. */
+$maxEv = (int) @$conn->query("SELECT COALESCE(MAX(id),0) FROM fin_financial_events
+                               WHERE event_key IS NOT NULL AND COALESCE(is_deleted,0)=0")->fetch_row()[0];
 $cons = array();
 $q = @$conn->query("SELECT consumer, enabled, cursor_event_id, updated_at FROM ems_event_consumers");
 while ($q && ($z = $q->fetch_assoc())) {
