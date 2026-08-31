@@ -94,10 +94,17 @@ while ($x = $r->fetch_assoc()) {
 }
 
 /* ═══ ② الفرقُ من الشجرةِ المُصيَّرةِ لكلِّ دور ═══════════════════════════ */
+/* SIDEBAR_CLOSE ①: المدى كلُّ دورٍ له بنودٌ حيّةٌ — لا مستخدمو co4 وحدَهم،
+   فالدوران 11 و14 بلا مستخدمٍ ولم تبلغهما المحاذاةُ قطُّ (uid=0 يصيّرهما) */
 $roleUid = array();
+$r = $conn->query("SELECT DISTINCT role_id FROM nav_items WHERE active = 1 ORDER BY role_id");
+while ($x = $r->fetch_row()) { $roleUid[(int) $x[0]] = 0; }
 $r = $conn->query("SELECT CAST(u.role AS UNSIGNED) rid, MIN(u.id) uid FROM users u
                     WHERE u.company_id = 4 GROUP BY rid ORDER BY rid");
-while ($x = $r->fetch_assoc()) { $roleUid[(int) $x['rid']] = (int) $x['uid']; }
+while ($x = $r->fetch_assoc()) {
+    if (isset($roleUid[(int) $x['rid']])) { $roleUid[(int) $x['rid']] = (int) $x['uid']; }
+}
+unset($roleUid[5]);   /* مؤرشَفٌ بإثباتٍ حتى 2026-09-17 — يُستثنى كما في بوابةِ الحفظ */
 
 $plan = array(); $stat = array('mis' => 0, 'ok' => 0, 'nobridge' => 0);
 $role1Before = null;
