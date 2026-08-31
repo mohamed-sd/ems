@@ -727,6 +727,30 @@ function navrPlacementSections($conn, $roleId) {
     return $byRole[$rid];
 }
 
+/** تراكُبُ المساحةِ الشخصيّةِ `WS-MY` — لكلِّ الأدوار (ورقةُ «مساحة عملي»):
+ *  مجموعتاها بابانِ يليانِ بابَ المراسي (n سالبٌ فيتقدّمان مجموعاتِ الدورة)،
+ *  ولا تُدهَس بها إعلاناتُ مساحةِ الأعمالِ للمسارِ نفسِه. */
+function navrPersonalOverlay($conn) {
+    static $ov = null;
+    if ($ov !== null) { return $ov; }
+    $ov = array();
+    $res = @mysqli_query($conn, "SELECT p.route, g.label_ar, g.sort_no AS gno, p.sort_no AS ino
+                                   FROM nav_placements p
+                                   JOIN nav_lifecycle_groups g ON g.id = p.group_id AND g.active = 1
+                                  WHERE p.workspace_id = 'WS-MY' AND p.active = 1
+                                    AND p.placement_type = 'MENU_ITEM' AND p.route IS NOT NULL");
+    if ($res) {
+        while ($row = mysqli_fetch_assoc($res)) {
+            $base = uxuiNavBaseRoute($row['route']);
+            if ($base === '') { continue; }
+            $n = -10 + (int) $row['gno'];   /* -9 · -8: قبل مجموعاتِ الدورةِ وبعد المراسي */
+            $ov[$base] = array('g' => (string) $row['label_ar'], 'n' => $n,
+                'o' => ($n * 1000) + (int) $row['ino'], 'p' => 1);
+        }
+    }
+    return $ov;
+}
+
 function uxuiDeclaredSections($conn, $roleId) {
     static $byRole = array();
     $rid = (int) $roleId;
@@ -735,6 +759,8 @@ function uxuiDeclaredSections($conn, $roleId) {
     /* ── NAVR: طبقةُ المواضعِ تغلب متى وُجدت — والغيابُ يُقيَّد لا يُبتلع ── */
     if (!function_exists('ems_env') || strtolower((string) ems_env('EMS_NAV_WORKSPACE', 'on')) !== 'off') {
         list($pl, $ws) = navrPlacementSections($conn, $rid);
+        /* التراكُبُ الشخصيُّ يُكمِل ولا يدهس إعلانَ مساحةِ الأعمال */
+        foreach (navrPersonalOverlay($conn) as $b => $d) { if (!isset($pl[$b])) { $pl[$b] = $d; } }
         if (!empty($pl)) { $byRole[$rid] = $pl; return $pl; }
         if ($ws !== null) {
             navrRecordFinding($conn, 'EMPTY_WORKSPACE_PLACEMENTS', $rid, $ws,
