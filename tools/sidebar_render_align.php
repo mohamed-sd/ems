@@ -143,8 +143,90 @@ printf("  إعلانٌ قائمٌ يُصحَّح: %d · إعلانٌ جديدٌ 
 if ($APPLY) {
     $has = $conn->query("SHOW TABLES LIKE 'repair01_render_align'");
     if (!$has || !$has->num_rows) { exit("⛔ سجلُّ التراجعِ غيرُ موجودٍ — شغِّل الهجرةَ أوّلًا.\n"); }
+
+    /* ═══ ترقيمُ المجموعاتِ بمستوى الدورِ — ⛔ لا بمستوى الإدارة ═══════════
+       المُصيِّرُ يفرز الأقسامَ بـgroup_no داخل الدورِ كلِّه، فترقيمٌ لكلِّ
+       إدارةٍ على حدةٍ يُصادم الأرقامَ عبر الإداراتِ ويخلط الرؤوسَ (قيس:
+       سطحُ خزينةٍ صُيِّر تحت رأسِ أسطول). الاسمُ الواحدُ داخل الدورِ رقمٌ
+       واحدٌ: يبدأ من أرقامِ إعلاناتِ الورقةِ القائمةِ ويُكمل بعد أقصاها. */
+    $roleNo = array(); $roleNext = array();
+    $r0 = $conn->query("SELECT role_id, group_ar, group_no FROM gov_target_nav
+                         WHERE doc_code NOT LIKE 'RENDER-ALIGN%' ORDER BY role_id, group_no");
+    while ($r0 && ($z0 = $r0->fetch_assoc())) {
+        $rk = (int) $z0['role_id']; $gk = ra_norm((string) $z0['group_ar']);
+        if ($gk === '') { continue; }
+        if (!isset($roleNo[$rk][$gk])) { $roleNo[$rk][$gk] = (int) $z0['group_no']; }
+        $roleNext[$rk] = max(isset($roleNext[$rk]) ? $roleNext[$rk] : 0, (int) $z0['group_no']);
+    }
+    $numOf = function ($rid, $g) use (&$roleNo, &$roleNext) {
+        $gk = ra_norm($g);
+        if (!isset($roleNo[$rid][$gk])) {
+            $roleNext[$rid] = min(250, (isset($roleNext[$rid]) ? $roleNext[$rid] : 0) + 1);
+            $roleNo[$rid][$gk] = $roleNext[$rid];
+        }
+        return $roleNo[$rid][$gk];
+    };
+    /* كنسُ ما رُقِّم سابقًا بالإدارةِ — يُعاد ترقيمُه بمستوى الدور */
+    $r0 = $conn->query("SELECT id, role_id, group_ar FROM gov_target_nav
+                         WHERE doc_code LIKE 'RENDER-ALIGN%' ORDER BY role_id, group_no, item_no");
+    $fixedNo = 0;
+    while ($r0 && ($z0 = $r0->fetch_assoc())) {
+        $no = $numOf((int) $z0['role_id'], (string) $z0['group_ar']);
+        if ($conn->query("UPDATE gov_target_nav SET group_no = $no WHERE id = " . (int) $z0['id'])) {
+            $fixedNo += $conn->affected_rows;
+        }
+    }
+    if ($fixedNo) { printf("  ◆ أُعيد ترقيمُ %d إعلانًا قائمًا بمستوى الدور\n", $fixedNo); }
+
+    /* ═══ فكُّ تصادمِ الأرقامِ داخل الدورِ — حتى بين أوراقٍ متزاحمة ══════════
+       قيس: دورُ ٢ يحمل g2 لاسمَين («التعاقد» من ورقةٍ و«عملي اليومي» من
+       أخرى) والمُصيِّرُ يفرز بالرقمِ فيختلط الرأسان. الاسمُ الأسبقُ يُبقي
+       رقمَه واللاحقُ يُنقل لأوّلِ رقمٍ حرٍّ — وكلُّ صفٍّ يُمسُّ يُسجَّل في
+       سجلِّ التراجعِ قبل مسِّه. */
+    $collFixed = 0;
+    $r0 = $conn->query("SELECT role_id, group_no, group_ar FROM gov_target_nav
+                         ORDER BY role_id, group_no, id");
+    $byRoleNum = array();
+    while ($r0 && ($z0 = $r0->fetch_assoc())) {
+        $rk = (int) $z0['role_id']; $no = (int) $z0['group_no']; $gk = ra_norm((string) $z0['group_ar']);
+        if (!isset($byRoleNum[$rk][$no])) { $byRoleNum[$rk][$no] = $gk; }
+    }
+    $r0 = $conn->query("SELECT id, doc_code, role_id, route, group_no, group_ar, item_no
+                          FROM gov_target_nav ORDER BY role_id, group_no, id");
+    $moves = array();
+    $used = array();
+    foreach ($byRoleNum as $rk => $ns) { foreach ($ns as $no => $gk) { $used[$rk][$no] = 1; } }
+    while ($r0 && ($z0 = $r0->fetch_assoc())) {
+        $rk = (int) $z0['role_id']; $no = (int) $z0['group_no']; $gk = ra_norm((string) $z0['group_ar']);
+        if ($gk === '' || !isset($byRoleNum[$rk][$no]) || $byRoleNum[$rk][$no] === $gk) { continue; }
+        /* اسمٌ لاحقٌ على رقمٍ محجوزٍ لغيرِه */
+        if (!isset($moves[$rk][$gk])) {
+            $free = $no;
+            while (isset($used[$rk][$free])) { $free++; }
+            $used[$rk][$free] = 1;
+            $moves[$rk][$gk] = min(250, $free);
+        }
+        $newNo = $moves[$rk][$gk];
+        $conn->query("INSERT INTO repair01_render_align
+              (role_id, route, requirement_id, had_row, gt_id, before_group_ar, before_group_no,
+               before_item_no, after_group_ar, after_group_no, after_item_no, rendered_before,
+               witness, snapshot_id, applied_at)
+            VALUES ($rk, '" . $e((string) $z0['route']) . "', '', 1, " . (int) $z0['id'] . ",
+                    '" . $e((string) $z0['group_ar']) . "', $no, " . (int) $z0['item_no'] . ",
+                    '" . $e((string) $z0['group_ar']) . "', $newNo, " . (int) $z0['item_no'] . ",
+                    '" . $e('فك تصادم رقمي — الرقم ' . $no . ' محجوز لاسم اسبق في الدور') . "',
+                    '" . $e('اسمان على رقم واحد داخل الدور والمصير يفرز بالرقم — اللاحق ينقل لاول رقم حر (' . $z0['doc_code'] . ')') . "',
+                    '" . $e($sid) . "', NOW())
+            ON DUPLICATE KEY UPDATE witness = VALUES(witness)");
+        if ($conn->query("UPDATE gov_target_nav SET group_no = $newNo WHERE id = " . (int) $z0['id'])) {
+            $collFixed += $conn->affected_rows;
+        }
+    }
+    if ($collFixed) { printf("  ◆ فُكَّ تصادمُ %d صفًّا (اسمان على رقمٍ واحد)\n", $collFixed); }
+
     $n = 0;
     foreach ($plan as $x) {
+        $x['gno'] = $numOf((int) $x['rid'], $x['g_after']);
         $conn->query('START TRANSACTION');
         $decl = $x['decl'];
         if ($decl) {
@@ -154,9 +236,11 @@ if ($APPLY) {
                       item_no = " . (int) $x['ino'] . "
                 WHERE id = $gtId");
         } else {
+            /* قيدُ uq_tn الفريدُ (doc_code, route) بلا بُعدِ دورٍ — فرمزُ
+               المستندِ يحمل الدورَ: RENDER-ALIGN-R<n> */
             $ok1 = $conn->query("INSERT INTO gov_target_nav
                   (doc_code, role_id, group_no, group_ar, item_no, item_ar, route, note)
-                VALUES ('RENDER-ALIGN', " . (int) $x['rid'] . ", " . (int) $x['gno'] . ",
+                VALUES ('" . $e('RENDER-ALIGN-R' . (int) $x['rid']) . "', " . (int) $x['rid'] . ", " . (int) $x['gno'] . ",
                         '" . $e($x['g_after']) . "', " . (int) $x['ino'] . ",
                         '" . $e(mb_substr($x['label'], 0, 120)) . "', '" . $e($x['route']) . "',
                         '" . $e('محاذاة الملف التصميمي — SIDEBAR_RENDER_FIX §4·3 · ' . $x['req']) . "')");
@@ -175,7 +259,11 @@ if ($APPLY) {
                     '" . $e($x['g_after']) . "', " . (int) $x['gno'] . ", " . (int) $x['ino'] . ",
                     '" . $e(mb_substr($x['rb'], 0, 220)) . "', '" . $e($wit) . "', '" . $e($sid) . "', NOW())
             ON DUPLICATE KEY UPDATE witness = VALUES(witness)");
-        if (!$ok1 || !$ok2) { $conn->query('ROLLBACK'); exit("✘ {$conn->error}\n"); }
+        if (!$ok1 || !$ok2) {
+            $err = $conn->errno . ' ' . $conn->error;
+            $conn->query('ROLLBACK');
+            exit('✘ ' . ($ok1 ? 'سجلُّ التراجع' : 'gov_target_nav') . " ({$x['rid']} · {$x['route']} · gno={$x['gno']} ino={$x['ino']} g=«{$x['g_after']}»): $err\n");
+        }
         $conn->query('COMMIT');
         $n++;
     }

@@ -519,6 +519,25 @@ printf("     ⛔ محجوبٌ على المصالحة `NO_BRIDGE` **%d** — ل�
 printf("     ◆ والملفُّ بلا مجموعةٍ لهذا المتطلب: %d · وصفٌّ نشطٌ لا يُصيَّر: %d\n",
        $F['nogroup'], $F['notrendered']);
 echo "     ◆ **المُصيَّرُ هنا من الشجرةِ فعلًا** (عمليّةٌ نقيّةٌ لكلِّ دور — أمرُ SIDEBAR_RENDER_FIX §٤·٥)\n";
+/* §٤·٦ — المقاماتُ الثلاثةُ بمصدرِ كلٍّ: «عملًا» صفوفُ المخازنِ (بوسمِها) ·
+   «حاكمًا» المطابقةُ اعلاه من الشجرةِ · «تغطيةً» كم من الملفِّ ظاهرٌ فعلًا */
+$covSeen = array();
+foreach ($rendered as $rid0 => $bs) {
+    foreach ($bs as $b0 => $g0) {
+        $scr0 = isset($byRoute[$b0]) ? $byRoute[$b0] : null;
+        $rq0 = ($scr0 && isset($scr2req[$scr0['screen_id']])) ? $scr2req[$scr0['screen_id']] : '';
+        if ($rq0 !== '') { $covSeen[$rq0] = 1; }
+    }
+}
+$covDen = 0; $covNum = 0;
+foreach ($specByReq as $rq0 => $sp0) {
+    if (trim((string) $sp0['group_name']) === '') { continue; }
+    $covDen++;
+    if (isset($covSeen[$rq0])) { $covNum++; }
+}
+printf("     ◆ **المقاماتُ الثلاثة (§٤·٦)**: حاكمًا %s%% (من الشجرة) · تغطيةً %s%% (%d من %d متطلبَ ملفٍّ ظاهرٌ لدورٍ فأكثر) · وعملًا يبقى عدَّ صفوفِ مخزنٍ بوسمِه الصريحِ لا وصفًا للظهور\n",
+       $Fden ? round($F['ok'] * 100 / $Fden, 1) : 0,
+       $covDen ? round($covNum * 100 / $covDen, 1) : 0, $covNum, $covDen);
 if ($Fex) {
     echo "\n     ── شواهدُ ──\n";
     foreach ($Fex as $x) { echo "       · $x\n"; }

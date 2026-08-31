@@ -34,7 +34,7 @@ while ($q && ($x = $q->fetch_assoc())) {
         if ($ok) { $restored += $conn->affected_rows; }
     } else {
         $ok = $conn->query("DELETE FROM `gov_target_nav`
-                             WHERE `id` = " . (int) $x['gt_id'] . " AND `doc_code` = 'RENDER-ALIGN'");
+                             WHERE `id` = " . (int) $x['gt_id'] . " AND `doc_code` LIKE 'RENDER-ALIGN%'");
         if ($ok) { $deleted += $conn->affected_rows; }
     }
 }
