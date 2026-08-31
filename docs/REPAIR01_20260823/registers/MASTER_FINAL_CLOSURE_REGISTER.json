@@ -3869,7 +3869,7 @@
             "Unlock_Value": "LOW",
             "Estimated_Effort": "M",
             "Evidence_Contract": "شاهدٌ في حزامِ tests/injfrd01_belt.php",
-            "Next_Action": "",
+            "Next_Action": "شاهدُ حزامٍ يثبت أن قارئَ لقطاتِ التجميدِ يرتّب بمعرِّفِ اللقطةِ لا بـfrozen_at — الموضعان المُصلَحان 5c186484 و05a0010b · يدخل Sprint بترتيبِ السجلّ",
             "Current_Snapshot": "Closure_State=OPEN @ 808a2c03",
             "Last_Updated_Snapshot": "808a2c03",
             "Last_Evidence_Ref": "",
@@ -3882,7 +3882,8 @@
                 "Exercise": "?",
                 "Evidence": "?",
                 "Closure": "?"
-            }
+            },
+            "Item_Title": "ترتيبُ الحقائقِ بتاريخِ التزامٍ لا ساعةِ حائط (GAP-71)"
         },
         "CL-FR-GOV-012": {
             "Closure_ID": "CL-FR-GOV-012",
@@ -3947,7 +3948,7 @@
             "Unlock_Value": "LOW",
             "Estimated_Effort": "M",
             "Evidence_Contract": "شاهدٌ في حزامِ tests/injfrd01_belt.php",
-            "Next_Action": "",
+            "Next_Action": "شاهدُ حزامٍ يثبت أن مقامَ تقريرِ الفرقِ يُشتقّ من الجداولِ الممسوسةِ فعلًا لا من قائمةٍ مكتوبةٍ يدويًّا · يدخل Sprint بترتيبِ السجلّ",
             "Current_Snapshot": "Closure_State=OPEN @ 808a2c03",
             "Last_Updated_Snapshot": "808a2c03",
             "Last_Evidence_Ref": "",
@@ -3960,7 +3961,8 @@
                 "Exercise": "?",
                 "Evidence": "?",
                 "Closure": "?"
-            }
+            },
+            "Item_Title": "مقامُ تقريرِ قبل/بعد يشمل كلَّ ما يمسُّه الفعل (GAP-74)"
         },
         "CL-FR-GOV-014": {
             "Closure_ID": "CL-FR-GOV-014",

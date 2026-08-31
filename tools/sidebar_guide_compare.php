@@ -423,8 +423,9 @@ foreach ($ORDER as $code) {
 
 /* ═══ ⑦ التقرير ═══ */
 $snap = trim(shell_exec('git -C ' . escapeshellarg($ROOT) . ' rev-parse --short HEAD'));
+$navrBid = 'BL-' . date('Ymd') . '-' . $snap; // ختمٌ ذاتيٌّ: كلُّ إعادةِ توليدٍ تحمل معرِّفَ لقطتِها فلا تسقط ذرّيّةُ الحزمة
 $md = "# مقارنةُ السايدبارِ المُصيَّرِ بالدليلِ المعماريِّ — إدارةً إدارةً\n\n";
-$md .= "> ⛔ **مولَّدٌ من تشغيلٍ حيّ**: `php tools/sidebar_guide_compare.php` @ `" . $snap . "` · " . date('Y-m-d H:i') . "\n";
+$md .= "> ⛔ **مولَّدٌ من تشغيلٍ حيّ**: `php tools/sidebar_guide_compare.php` @ `" . $snap . "` · **Baseline_ID: `" . $navrBid . "`** · " . date('Y-m-d H:i') . "\n";
 $md .= "> **المرجع**: `docs/New folder/01 · الدليل المعماري-2.xlsx` — **مطابقٌ بايتًا** (md5 `58b9cb58…`)\n";
 $md .= "> لمصدرِ الحملةِ `docs/REPAIR01_20260823/01 · الدليل المعماري.xlsx` فالقياسُ عليهما واحد.\n";
 $md .= "> **والحيُّ مُصيَّرٌ بعمليّةٍ نقيّةٍ لكلِّ دور** (`uxp_render_role_html`) لا مقروءٌ من جدول.\n\n";
@@ -584,7 +585,7 @@ $structPass = $exactDeps; $humanPass = 0;
 $builtNotRendered = $agg['builtMissing'];
 $groupConf = $agg['found'] - $agg['wrongGroup'];
 $mx = "# NAVR — المقاييسُ العشرةُ المنفصلة\n\n"
-    . "> ⛔ مولَّدٌ من التشغيلةِ نفسِها التي ولّدت `SIDEBAR_GUIDE_COMPARE.md` @ `" . $snap . "` · " . date('Y-m-d H:i') . "\n"
+    . "> ⛔ مولَّدٌ من التشغيلةِ نفسِها التي ولّدت `SIDEBAR_GUIDE_COMPARE.md` @ `" . $snap . "` · **Baseline_ID: `" . $navrBid . "`** · " . date('Y-m-d H:i') . "\n"
     . "> ⛔ **ولا تُجمع في نسبةٍ واحدة** — كلُّ مقياسٍ بمقامِه.\n\n"
     . "| المقياس | القيمة | المقام والقراءة |\n|---|---|---|\n"
     . "| `TARGET_BUILD_COVERAGE` | **{$plBuilt}/{$plTotal}** | مواضعُ الدليلِ المربوطةُ بشاشةٍ مبنيّة — والباقي `NOT_BUILT` بموضعِه المستهدَفِ المسجَّل |\n"
