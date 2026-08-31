@@ -67,6 +67,21 @@ while ($x = $r->fetch_assoc()) {
 $specByReq = array();
 $r = $conn->query("SELECT requirement_id, unit, group_name, surface, seq FROM repair01_requirements");
 while ($x = $r->fetch_assoc()) { $specByReq[$x['requirement_id']] = $x; }
+/* قاعدتا القطعِ R1/R2 (SIDEBAR_CLOSE §٢②) — عينُ قواعدِ المقياسِ فلا يتفرّقان */
+$reqByFile = array(); $reqByName = array();
+foreach ($specByReq as $rq0 => $sp0) {
+    if (preg_match('~\(([A-Za-z0-9_./-]+\.php)\)~u', (string) $sp0['surface'], $mf)) {
+        $reqByFile[strtolower(basename($mf[1]))] = $rq0;
+    }
+    $nm0 = ra_norm(preg_replace('~\s*\([^)]*\)\s*$~u', '', (string) $sp0['surface']));
+    if ($nm0 === '') { continue; }
+    $reqByName[$nm0] = isset($reqByName[$nm0]) ? '__AMBIG__' : $rq0;
+}
+$canonNm = array();
+$r = @$conn->query("SELECT route, canonical_ar FROM nav_canonical WHERE status = 'APPROVED'");
+while ($r && ($x = $r->fetch_assoc())) {
+    $canonNm[strtolower(trim(preg_replace('~[?#].*$~', '', (string) $x['route']), '/'))] = (string) $x['canonical_ar'];
+}
 /* رتبةُ مجموعةِ الملفِّ داخل إدارتِها — من أدنى تسلسلٍ فيها (حتميٌّ من الملفّ) */
 $gRank = array();
 foreach ($specByReq as $sp) {
@@ -117,6 +132,14 @@ foreach ($roleUid as $rid => $uid) {
         if ($b === '' || $b === 'main/role_board.php' || $b === 'chats/index.php') { continue; }
         $scr = isset($byRoute[$b]) ? $byRoute[$b] : null;
         $rq  = ($scr && isset($scr2req[$scr['screen_id']])) ? $scr2req[$scr['screen_id']] : '';
+        if ($rq === '' && isset($reqByFile[strtolower(basename($b))])) {
+            $rq = $reqByFile[strtolower(basename($b))];                        /* R1 بالمسار حرفا */
+        }
+        if ($rq === '') {
+            $lbl0 = isset($canonNm[$b]) ? $canonNm[$b] : '';
+            $cand0 = ($lbl0 !== '' && isset($reqByName[ra_norm($lbl0)])) ? $reqByName[ra_norm($lbl0)] : '';
+            if ($cand0 !== '' && $cand0 !== '__AMBIG__') { $rq = $cand0; }     /* R2 بالاسم المعياري */
+        }
         if ($rq === '' || !isset($specByReq[$rq])) { $stat['nobridge']++; continue; }
         $sp = $specByReq[$rq];
         $g  = trim((string) $sp['group_name']);
@@ -129,7 +152,8 @@ foreach ($roleUid as $rid => $uid) {
         $stat['mis']++;
         $dk = $rid . '|' . $b;
         $decl = isset($declRows[$dk]) ? $declRows[$dk] : null;
-        $plan[$dk] = array('rid' => $rid, 'base' => $b, 'route' => (string) $scr['route'],
+        $plan[$dk] = array('rid' => $rid, 'base' => $b,
+            'route' => $scr !== null ? (string) $scr['route'] : $b,
             'req' => $rq, 'label' => (string) $p['l'],
             'g_after' => mb_substr($g, 0, 120),
             'gno' => isset($gNo[$sp['unit'] . '|' . $g]) ? $gNo[$sp['unit'] . '|' . $g] : 200,

@@ -23,11 +23,16 @@ $conn = $GLOBALS['conn'];
 $conn->set_charset('utf8mb4');
 $MD = in_array('--md', $argv, true);
 
-/* أدوارُ co4 الحيّةُ — بالمستخدمِ لا بالدورِ المجرَّد */
+/* المدى كلُّ دورٍ له بنودٌ حيّةٌ (SIDEBAR_CLOSE) — والمستخدمُ إن وُجد وإلا 0 */
 $roles = array();
+$r = $conn->query("SELECT DISTINCT role_id FROM nav_items WHERE active = 1 ORDER BY role_id");
+while ($x = $r->fetch_row()) { $roles[(int) $x[0]] = 0; }
 $r = $conn->query("SELECT CAST(u.role AS UNSIGNED) rid, MIN(u.id) uid FROM users u
                     WHERE u.company_id = 4 GROUP BY rid ORDER BY rid");
-while ($x = $r->fetch_assoc()) { $roles[(int) $x['rid']] = (int) $x['uid']; }
+while ($x = $r->fetch_assoc()) {
+    if (isset($roles[(int) $x['rid']])) { $roles[(int) $x['rid']] = (int) $x['uid']; }
+}
+unset($roles[5]);   /* مؤرشَفٌ بإثباتٍ حتى 2026-09-17 */
 
 $snapQ = $conn->query("SELECT snapshot_id FROM repair01_freeze_snapshot
                         WHERE released_at IS NULL ORDER BY frozen_at DESC LIMIT 1");
@@ -63,7 +68,8 @@ foreach ($roles as $rid => $uid) {
     foreach ($j['positions'] as $p) {
         if ($p['g'] !== $g) { $g = $p['g']; $md .= "**" . ($g === '' ? '(بلا مجموعة)' : $g) . "**\n\n"; }
         $i++;
-        $md .= $i . '. ' . $p['l'] . ' — `' . $p['h'] . "`\n";
+        $s0 = isset($p['s']) ? trim((string) $p['s']) : '';
+        $md .= $i . '. ' . $p['l'] . ($s0 !== '' ? ' ▸ ' . $s0 : '') . ' — `' . $p['h'] . "`\n";
     }
     $md .= "\n";
 }

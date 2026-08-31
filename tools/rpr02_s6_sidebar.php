@@ -405,6 +405,55 @@ while ($x = $r->fetch_row()) { $scr2req[$x[0]] = $x[1]; }
 $specByReq = array();
 $r = $q("SELECT requirement_id, unit, group_name, surface, seq FROM repair01_requirements");
 while ($x = $r->fetch_assoc()) { $specByReq[$x['requirement_id']] = $x; }
+
+/* ═══ SIDEBAR_CLOSE §٢② — قواعدُ القطعِ الثلاثُ ثم فضاءُ الفصلِ المحصور ═════
+   R1 بالمسارِ حرفًا: ملفُّ المتطلبِ المُفكَّكُ من سطحِه («الاسم (file.php)»)
+      يطابق ذيلَ المسار · R2 بالاسمِ المعياريِّ: `canonical_label_ar` او اسمُ
+      البندِ المُصيَّرُ يطابق اسمَ متطلبٍ وحيدٍ (والملتبسُ بأكثرَ لا يُجسَر) ·
+      R3 بالمعرِّفِ المسجَّل (الكونُ MATCHED — القائمةُ اعلاه).
+   وما بقي فضاءُ فصلٍ محصورٌ بشاهدِ قاعدتِه: تبويبُ ابنٍ (سجلُّ تبويباتِ
+   الكياناتِ) · مسارٌ متقاعدٌ (nav_redirects وارثُه حاضر) · سطحٌ منصّيٌّ
+   مشتركٌ (حكمُ الملكيّةِ في السجلِّ) · صيغةُ عرضٍ (?view=) · فائضٌ حميدٌ
+   (سطحٌ مسجَّلٌ لا يقابله متطلبٌ بعد الثلاث). ⛔ ولا جسرَ يُلفَّق. */
+$normA = $norm;
+$reqByFile = array(); $reqByName = array();
+foreach ($specByReq as $rq0 => $sp0) {
+    if (preg_match('~\(([A-Za-z0-9_./-]+\.php)\)~u', (string) $sp0['surface'], $mf)) {
+        $reqByFile[strtolower(basename($mf[1]))] = $rq0;
+    }
+    $nm0 = $normA(preg_replace('~\s*\([^)]*\)\s*$~u', '', (string) $sp0['surface']));
+    if ($nm0 === '') { continue; }
+    $reqByName[$nm0] = isset($reqByName[$nm0]) ? '__AMBIG__' : $rq0;
+}
+$canonName = array();
+$r = @$conn->query("SELECT route, canonical_ar FROM nav_canonical WHERE status = 'APPROVED'");
+while ($r && ($x = $r->fetch_assoc())) {
+    $canonName[strtolower(trim(preg_replace('~[?#].*$~', '', (string) $x['route']), '/'))] = (string) $x['canonical_ar'];
+}
+$tabChild = array();
+if (is_file(__DIR__ . '/../includes/entity_tabs.php')) {
+    require_once __DIR__ . '/../includes/entity_tabs.php';
+    if (function_exists('ems_entity_tabs_registry')) {
+        foreach (ems_entity_tabs_registry() as $ent0) {
+            $first = true;
+            foreach ($ent0['tabs'] as $t0) {
+                if ($t0 === '') { continue; }
+                if ($first) { $first = false; continue; }
+                $tabChild[strtolower($t0)] = 1;
+            }
+        }
+    }
+}
+$retired = array();
+$r = @$conn->query("SELECT old_route FROM nav_redirects WHERE active = 1");
+while ($r && ($x = $r->fetch_row())) {
+    $retired[strtolower(trim(preg_replace('~[?#].*$~', '', preg_replace('~^(\.\./)+~', '', (string) $x[0])), '/'))] = 1;
+}
+$platScr = array();
+$r = @$conn->query("SELECT route FROM repair01_screen_registry WHERE ownership_verdict = 'PLATFORM_SHARED'");
+while ($r && ($x = $r->fetch_row())) {
+    $platScr[strtolower(trim(preg_replace('~[?#].*$~', '', (string) $x[0]), '/'))] = 1;
+}
 $declByRole = array();
 $r = @$conn->query("SELECT role_id, route, group_ar, group_no, item_no FROM gov_target_nav");
 if ($r) {
@@ -423,10 +472,17 @@ if ($r) {
    بعمليّةٍ نقيّةٍ (`tools/lib/render_role_cli.php` — غلافُ
    `uxp_render_role_html`) ويُقرأ رأسُ كلِّ بندٍ منها حرفًا.
    «لا يُقاس سطحٌ بما في جدولِه — بل بما يظهر للمستخدمِ في جلستِه.» */
+/* SIDEBAR_CLOSE: المدى كلُّ دورٍ له بنودٌ حيّةٌ — والدوران 11 و14 بلا
+   مستخدمٍ يُصيَّران بجلسةِ uid=0 (كانا عميَين على المقياسِ فعُدَّت بنودُهما
+   المُصيَّرةُ فعلًا «غيرَ مُصيَّرةٍ» زورًا) */
 $roleUid = array();
+$r = $q("SELECT DISTINCT role_id FROM nav_items WHERE active = 1");
+while ($x = $r->fetch_row()) { $roleUid[(int) $x[0]] = 0; }
 $r = $q("SELECT CAST(u.role AS UNSIGNED) rid, MIN(u.id) uid FROM users u
           WHERE u.company_id = 4 GROUP BY rid");
-while ($x = $r->fetch_assoc()) { $roleUid[(int) $x['rid']] = (int) $x['uid']; }
+while ($x = $r->fetch_assoc()) {
+    if (isset($roleUid[(int) $x['rid']])) { $roleUid[(int) $x['rid']] = (int) $x['uid']; }
+}
 $rendered = array();   // rid => base => group
 $ridsSeen = array();
 foreach ($items as $it) { $ridsSeen[(int) $it['role_id']] = 1; }
@@ -451,15 +507,121 @@ foreach (array_keys($ridsSeen) as $rid0) {
    (صفُّ ملاحةٍ نشطٌ) — فبندُ ملفٍّ لا يُصيَّر **يُحسب على المقياسِ لا يُسقَط**. */
 $F = array('ok' => 0, 'bad' => 0, 'nobridge' => 0, 'nogroup' => 0, 'notrendered' => 0);
 $Frt = array(); $Fex = array();
+$CLS = array('R1_ROUTE' => 0, 'R2_NAME' => 0, 'TAB_CHILD' => 0, 'RETIRED' => 0,
+             'PLATFORM' => 0, 'VIEW_VARIANT' => 0, 'SURPLUS' => 0, 'UNJUDGED' => 0);
+$unj = array();
+/* منحُ العرضِ (دور|مسار) — لتسميةِ حاجزِ الصلاحيةِ قياسًا */
+$rpView = array();
+$r = @$conn->query("SELECT rp.role_id, LOWER(TRIM(TRAILING '/' FROM m.code)) c
+                      FROM role_permissions rp JOIN modules m ON m.id = rp.module_id
+                     WHERE rp.can_view = 1");
+while ($r && ($x = $r->fetch_assoc())) { $rpView[(int) $x['role_id'] . '|' . strtolower(trim((string) $x['c'], '/'))] = 1; }
+$NS = array('ARCHIVED' => 0, 'PERM_DENIED' => 0, 'FIN_GATE' => 0,
+             'SPACE_ISOLATED' => 0, 'QUICK_TILE' => 0, 'TAB_DEMOTED' => 0);
+/* حواجزُ مسجَّلةٌ تعتمدها بوّابةُ الحفظِ نفسُها — تُقرأ من سجلّاتِها حرفًا */
+$spcForb = array();
+$r = @$conn->query("SELECT r0.role_id, LOWER(a0.route) rt FROM gov_space_roles r0
+                      JOIN gov_space_appearances a0 ON a0.space_ar = r0.space_ar
+                     WHERE a0.cls = 'FORBIDDEN'");
+while ($r && ($x = $r->fetch_assoc())) {
+    $rt0 = strtolower(trim(preg_replace('~[?#].*$~', '', preg_replace('~^(\.\./)+~', '', (string) $x['rt'])), '/'));
+    $spcForb[(int) $x['role_id'] . '|' . $rt0] = 1;
+}
+$hidLog = array();
+$r = @$conn->query("SELECT role_id, LOWER(route) rt, reachable FROM gov_nav_hidden_log
+                     WHERE reachable IN ('QUICK_TILE','TAB_IN_PARENT')");
+while ($r && ($x = $r->fetch_assoc())) {
+    $k0 = (int) $x['role_id'] . '|' . strtolower(trim(preg_replace('~[?#].*$~', '', preg_replace('~^(\.\./)+~', '', (string) $x['rt'])), '/'));
+    $hidLog[$k0] = (string) $x['reachable'];
+}
+/* «مُنِع بقالبٍ نافذٍ» — حالةُ قالبِ مستخدمِ القياسِ لكلِّ دورٍ من المصدرِ
+   الواحدِ (دلالةُ get_module_permissions حرفًا — البابُ الخامسُ في بوّابةِ
+   الحفظِ نفسِها) */
+$NS['TEMPLATE_DENIED'] = 0;
+$NS['H20_PORTAL'] = 0;
+require_once __DIR__ . '/../app/Services/Portal/SupplierPortalGuard.php';
+$tplRole = array();   // rid => array('covered'=>bool,'allowed'=>[base=>1])
+foreach ($roleUid as $rid0 => $uid0) {
+    $st0 = array('covered' => false, 'allowed' => array());
+    if ($uid0 > 0) {
+        $q0 = @$conn->query("SELECT i.item_ref, MAX(i.allow) mx
+               FROM gov_authority_grants g
+               JOIN gov_role_profiles p ON p.profile_id = g.profile_id AND p.state = 'active'
+               LEFT JOIN gov_profile_items i ON i.profile_id = p.profile_id AND i.item_kind = 'screen'
+              WHERE g.user_id = " . (int) $uid0 . " AND g.revoked_at IS NULL
+                AND (g.valid_to IS NULL OR g.valid_to > NOW())
+              GROUP BY i.item_ref");
+        while ($q0 && ($z0 = $q0->fetch_assoc())) {
+            $st0['covered'] = true;
+            if ($z0['item_ref'] !== null && (int) $z0['mx'] === 1) {
+                $st0['allowed'][strtolower(trim((string) $z0['item_ref'], '/'))] = 1;
+            }
+        }
+    }
+    $tplRole[$rid0] = $st0;
+}
+$nsEx = array();
+$seenRB = array();
 foreach ($items as $it) {
     $rid = (int) $it['role_id'];
-    $b   = strtolower(trim(preg_replace('~[?#].*$~', '', (string) $it['route']), '/'));
+    $rawRt = (string) $it['route'];
+    $b   = strtolower(trim(preg_replace('~[?#].*$~', '', $rawRt), '/'));
+    /* صفّا ملاحةٍ لمسارٍ واحدٍ في الدورِ نفسِه بندٌ مُصيَّرٌ واحدٌ — والثاني
+       ليس غيابًا بل ازدواجَ عدٍّ (المُصيِّرُ يوحّدهما بحارسِ التكرار) */
+    if (isset($seenRB[$rid . '|' . $b])) { continue; }
+    $seenRB[$rid . '|' . $b] = 1;
     $scr = isset($byRoute[$b]) ? $byRoute[$b] : null;
     $rq  = ($scr && isset($scr2req[$scr['screen_id']])) ? $scr2req[$scr['screen_id']] : '';
-    if ($rq === '' || !isset($specByReq[$rq])) { $F['nobridge']++; continue; }
+    /* R1: ملفُ المتطلبِ المفكَّكُ يطابق ذيلَ المسار */
+    if ($rq === '' && isset($reqByFile[strtolower(basename($b))])) {
+        $rq = $reqByFile[strtolower(basename($b))];
+        $CLS['R1_ROUTE']++;
+    }
+    /* R2: الاسمُ المعياريُّ او المُصيَّرُ يطابق اسمَ متطلبٍ وحيد */
+    if ($rq === '') {
+        $lbl = isset($canonName[$b]) ? $canonName[$b] : '';
+        $cand = ($lbl !== '' && isset($reqByName[$normA($lbl)])) ? $reqByName[$normA($lbl)] : '';
+        if ($cand !== '' && $cand !== '__AMBIG__') { $rq = $cand; $CLS['R2_NAME']++; }
+    }
+    if ($rq === '' || !isset($specByReq[$rq])) {
+        /* فضاءُ الفصلِ المحصورُ — شاهدُ كلٍّ قاعدتُه المقيسة */
+        if (isset($tabChild[$b])) { $CLS['TAB_CHILD']++; }
+        elseif (isset($retired[$b])) { $CLS['RETIRED']++; }
+        elseif (isset($platScr[$b])) { $CLS['PLATFORM']++; }
+        elseif (strpos($rawRt, '?view=') !== false || strpos($rawRt, '&view=') !== false) { $CLS['VIEW_VARIANT']++; }
+        elseif ($scr !== null) { $CLS['SURPLUS']++; }
+        else { $CLS['UNJUDGED']++; if (count($unj) < 12) { $unj[$b] = 1; } }
+        $F['nobridge']++;
+        continue;
+    }
     $sp = $specByReq[$rq];
     if (trim((string) $sp['group_name']) === '') { $F['nogroup']++; continue; }
-    if (!isset($rendered[$rid][$b])) { $F['notrendered']++; $F['bad']++; $Frt[$b] = 1; continue; }
+    if (!isset($rendered[$rid][$b])) {
+        /* SIDEBAR_CLOSE §٢③: غيرُ المُصيَّرِ يُحسب على المقياسِ **إلا بحاجزٍ
+           مسمًّى** — والحاجزُ يُقاس لا يُفترض */
+        if ($rid === 5) { $NS['ARCHIVED']++; continue; }                     /* مؤرشَفٌ بإثباتٍ حتى 2026-09-17 */
+        if (trim((string) $it['permission_code']) !== '' && !isset($rpView[$rid . '|' . $b])) {
+            $NS['PERM_DENIED']++; continue;                                  /* «الظهورُ بالصلاحيةِ» — س٦ نفسُه */
+        }
+        if (stripos($b, 'financing/') === 0) { $NS['FIN_GATE']++; continue; } /* بوّابةُ المجالِ المقيَّد fail-closed */
+        if (isset($spcForb[$rid . '|' . $b])) { $NS['SPACE_ISOLATED']++; continue; }  /* عزلُ مساحةٍ مصرَّحٌ بسجلِّه */
+        if (isset($hidLog[$rid . '|' . $b])) {
+            if ($hidLog[$rid . '|' . $b] === 'QUICK_TILE') { $NS['QUICK_TILE']++; } else { $NS['TAB_DEMOTED']++; }
+            continue;                                                          /* سجلُّ الإخفاءِ المصرَّح */
+        }
+        if (isset($tplRole[$rid]) && $tplRole[$rid]['covered']
+            && trim((string) $it['permission_code']) !== ''
+            && !isset($tplRole[$rid]['allowed'][$b])) {
+            $NS['TEMPLATE_DENIED']++; continue;                                /* مُنِع بقالبٍ نافذٍ — GOV-AUTH-01 */
+        }
+        if (class_exists('\\App\\Services\\Portal\\SupplierPortalGuard')
+            && in_array((string) $rid, \App\Services\Portal\SupplierPortalGuard::RESTRICTED_ROLES, true)) {
+            $NS['H20_PORTAL']++; continue;    /* بوّابةُ المشرفِ الخارجيِّ «أضيقُ عمدًا» — UX-05 §4 */
+        }
+        $F['notrendered']++; $F['bad']++; $Frt[$b] = 1;
+        if (count($nsEx) < 12) { $nsEx[] = 'دور ' . $rid . ' · ' . $b; }
+        continue;
+    }
     $shownG = $rendered[$rid][$b]['g'];
     $shownS = $rendered[$rid][$b]['s'];
     /* مجموعةُ الملفِّ قد تُصيَّر عنوانًا فرعيًّا داخل رأسِ الطيِّ او رأسًا —
@@ -521,9 +683,20 @@ echo "     ⛔ **الاتجاهُ مُعلَنٌ (SIDEBAR_DIRECTION_FIX §٧): �
 echo "        ومقياسٌ لا يُعلن اتجاهَه لا يُعتمد.\n";
 printf("     مطابقٌ **%d** · مخالفٌ **%d** (منه غيرُ مُصيَّرٍ %d · مساراتٌ فريدةٌ %d) · والمقامُ ما في الملفِّ منطبقًا %d\n",
        $F['ok'], $F['bad'], $F['notrendered'], count($Frt), $Fden);
-printf("     ⛔ محجوبٌ على المصالحة `NO_BRIDGE` **%d** — لا سطحَ مطابَقًا فلا متطلبَ يُقاس عليه\n", $F['nobridge']);
-printf("     ◆ والملفُّ بلا مجموعةٍ لهذا المتطلب: %d · وصفٌّ نشطٌ لا يُصيَّر: %d\n",
+printf("     ◆ خارجَ المقامِ (كان `NO_BRIDGE` مبهمًا) **%d** — كلٌّ بحكمِه (SIDEBAR_CLOSE §٢②):\n", $F['nobridge']);
+printf("        جُسر بالمسارِ حرفًا R1: %d · بالاسمِ المعياريِّ R2: %d (دخلا المقامَ أعلاه)\n", $CLS['R1_ROUTE'], $CLS['R2_NAME']);
+printf("        تبويبُ ابنٍ: %d · مسارٌ متقاعدٌ بوارثٍ: %d · سطحٌ منصّيٌّ مشترك: %d · صيغةُ عرضٍ: %d\n",
+       $CLS['TAB_CHILD'], $CLS['RETIRED'], $CLS['PLATFORM'], $CLS['VIEW_VARIANT']);
+printf("        فائضٌ حميدٌ (سطحٌ مسجَّلٌ لا متطلبَ له بعد الثلاث): %d · ⛔ بلا حكمٍ: %d\n",
+       $CLS['SURPLUS'], $CLS['UNJUDGED']);
+if ($unj) { echo "        بلا حكم: " . implode(' · ', array_keys($unj)) . "\n"; }
+printf("     ◆ والملفُّ بلا مجموعةٍ لهذا المتطلب: %d · وصفٌّ نشطٌ لا يُصيَّر **بلا حاجزٍ مسمًّى**: %d\n",
        $F['nogroup'], $F['notrendered']);
+printf("     ◆ غيرُ مُصيَّرٍ **بحاجزٍ مسمًّى** (خارجَ المقام): مؤرشَفُ الدورِ 5: %d · الظهورُ بالصلاحيةِ (س٦): %d · بوّابةُ التمويل: %d · عزلُ مساحةٍ مصرَّح: %d · بلاطةٌ: %d · خُفض تبويبًا: %d\n",
+       $NS['ARCHIVED'], $NS['PERM_DENIED'], $NS['FIN_GATE'], $NS['SPACE_ISOLATED'], $NS['QUICK_TILE'], $NS['TAB_DEMOTED']);
+printf("        ومُنِع بقالبٍ نافذٍ (GOV-AUTH-01): %d · بوّابةُ المشرفِ الخارجيِّ الضيّقةُ عمدًا (UX-05 §4): %d\n",
+       $NS['TEMPLATE_DENIED'], $NS['H20_PORTAL']);
+if ($nsEx) { echo "        بلا حاجزٍ مسمًّى: " . implode(' · ', $nsEx) . "\n"; }
 echo "     ◆ **المُصيَّرُ هنا من الشجرةِ فعلًا** (عمليّةٌ نقيّةٌ لكلِّ دور — أمرُ SIDEBAR_RENDER_FIX §٤·٥)\n";
 /* §٤·٦ — المقاماتُ الثلاثةُ بمصدرِ كلٍّ: «عملًا» صفوفُ المخازنِ (بوسمِها) ·
    «حاكمًا» المطابقةُ اعلاه من الشجرةِ · «تغطيةً» كم من الملفِّ ظاهرٌ فعلًا */
