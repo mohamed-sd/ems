@@ -121,6 +121,9 @@ register_shutdown_function(function () {
         fwrite(STDERR, 'DBG last_error=' . ($le ? $le['message'] . ' @' . $le['file'] . ':' . $le['line'] : '—') . "\n");
         if ($len > 0) { fwrite(STDERR, substr($html, 0, 300) . "\n"); }
     }
+    /* FINAL_CLOSE ⑮ — تفريغُ الجسمِ لملفٍّ عند الطلب (تحقُّقُ الإقنعةِ بالتصيير) */
+    $dump = getenv('CTL_PROBE_BODY');
+    if ($dump) { @file_put_contents($dump, $html); }
     /* صفحةٌ حقيقيّةٌ = جسمٌ لا سطرُ رسالة — والعتبةُ ٢٠٤٨: أصغرُ قشرةٍ تفوقها */
     if ($len >= 2048) { echo 'STATUS:OK len=' . $len . ' sha=' . substr(sha1($html), 0, 12) . "\n"; }
     else { echo "STATUS:EMPTY len=$len\n"; }

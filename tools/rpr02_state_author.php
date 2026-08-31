@@ -76,7 +76,13 @@ $hasModel = function ($ent) use ($models) {
 /* ── كيانات الاسطح المعاملة بلا آلة ───────────────────────────────────── */
 $r = $conn->query("SELECT DISTINCT s.grain_entity ent, s.owner_code FROM repair01_screen_registry s
                     WHERE s.grain_fact_scope='OWN_FACT' AND s.grain_cardinality IN ('ROW','LINE')
-                      AND s.lifecycle LIKE 'LIVE%' AND s.grain_entity <> ''");
+                      AND s.lifecycle LIKE 'LIVE%' AND s.grain_entity <> ''
+                    UNION
+                   SELECT DISTINCT s.grain_entity ent, s.owner_code FROM repair01_screen_registry s
+                     JOIN repair01_target_universe u ON u.screen_id = s.screen_id AND u.verdict='MATCHED'
+                     JOIN repair01_requirements q ON q.requirement_id = u.requirement_id
+                                                 AND q.requirement_type = 'TRANSACTION'
+                    WHERE s.lifecycle LIKE 'LIVE%' AND s.grain_entity <> ''");
 $ents = array();
 while ($x = $r->fetch_assoc()) {
     $k = strtolower(trim($x['ent']));

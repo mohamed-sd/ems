@@ -83,6 +83,74 @@ function ec_probe($ROOT, $route, $role, $timeout = 20)
     return $line === '' ? 'STATUS:EMPTY len=0' : strtok($line, "\n");
 }
 
+/**
+ * FINAL_CLOSE ⑮ — تحقُّقُ الإقنعةِ **بالتصييرِ لا بمسحِ النصّ**:
+ * قيمٌ حسّاسةٌ حيّةٌ من كيانِ السطحِ تُصيَّر الشاشةُ لدورٍ ممنوحٍ عرضًا
+ * **غيرِ مخوَّلٍ بالسياسةِ** — فوجودُ قيمةٍ منها في الجسمِ خرقٌ يُبقي E3
+ * مفتوحًا، وغيابُها كلِّها تحقُّقُ قناعٍ مقيسٌ من الجلسةِ نفسِها.
+ */
+function ec_mask_verify($ROOT, mysqli $conn, $route, $ent)
+{
+    $e2 = function ($s) use ($conn) { return $conn->real_escape_string((string) $s); };
+    $pols = array();
+    $r = $conn->query("SELECT field_code, allowed_roles_json FROM sensitive_field_policies
+                        WHERE status = 'نافذة' AND field_code LIKE '" . $e2($ent) . ".%'");
+    while ($r && ($x = $r->fetch_assoc())) { $pols[] = $x; }
+    if (!$pols) { return array('ok' => true, 'wit' => 'لا سياسةَ نافذةً لكيانِه'); }
+    $allowed = array();
+    foreach ($pols as $p0) {
+        foreach ((array) json_decode((string) $p0['allowed_roles_json'], true) as $rl) { $allowed[(string) (int) $rl] = 1; }
+    }
+    /* دورٌ ممنوحٌ عرضًا وغيرُ مخوَّلٍ سياسةً وله مستخدمٌ حيّ */
+    $probeRole = 0;
+    $st = $conn->prepare("SELECT rp.role_id FROM role_permissions rp JOIN modules m ON m.id = rp.module_id
+                           WHERE m.code = ? AND rp.can_view = 1
+                             AND EXISTS(SELECT 1 FROM users us WHERE us.company_id = 4
+                                          AND CAST(us.role AS UNSIGNED) = rp.role_id)
+                           ORDER BY rp.role_id");
+    $st->bind_param('s', $route);
+    $st->execute();
+    $rs = $st->get_result();
+    while ($row = $rs->fetch_row()) {
+        if (!isset($allowed[(string) (int) $row[0]])) { $probeRole = (int) $row[0]; break; }
+    }
+    $st->close();
+    if ($probeRole === 0) {
+        return array('ok' => true, 'wit' => 'كلُّ الأدوارِ الممنوحةِ عرضًا مخوَّلةٌ بالسياسةِ — لا دورَ يُقنَّع له (شاهدُ خلوٍّ مقيس)');
+    }
+    /* قيمٌ حيّةٌ من الأعمدةِ الحسّاسة */
+    $needles = array();
+    foreach ($pols as $p0) {
+        $col = substr((string) $p0['field_code'], strlen($ent) + 1);
+        $q = @$conn->query("SELECT DISTINCT `" . $e2($col) . "` v FROM `" . $e2($ent) . "`
+                             WHERE `" . $e2($col) . "` IS NOT NULL AND LENGTH(`" . $e2($col) . "`) >= 5 LIMIT 3");
+        while ($q && ($z = $q->fetch_row())) { $needles[$col][] = (string) $z[0]; }
+    }
+    if (!array_filter($needles)) {
+        return array('ok' => true, 'wit' => 'لا قيمةَ حسّاسةً حيّةً تُقاس (الأعمدةُ فارغة) — خلوٌّ مقيس');
+    }
+    $tmp = sys_get_temp_dir() . '/ec_mask_' . getmypid() . '.html';
+    @unlink($tmp);
+    putenv('CTL_PROBE_BODY=' . $tmp);
+    $status = ec_probe($ROOT, $route, $probeRole);
+    putenv('CTL_PROBE_BODY');
+    $body = (string) @file_get_contents($tmp);
+    @unlink($tmp);
+    if (strpos($status, 'STATUS:OK') !== 0 || $body === '') {
+        return array('ok' => false, 'why' => 'تعذّر تصييرُ فحصِ القناعِ للدور ' . $probeRole . ' (' . $status . ')');
+    }
+    $leaks = array();
+    foreach ($needles as $col => $vals) {
+        foreach ($vals as $v) { if ($v !== '' && strpos($body, $v) !== false) { $leaks[] = $col; break; } }
+    }
+    if ($leaks) {
+        return array('ok' => false, 'why' => 'قيمةٌ حسّاسةٌ ظاهرةٌ لدورٍ غيرِ مخوَّل (' . $probeRole . '): ' . implode('·', $leaks));
+    }
+    $cols = implode('·', array_keys($needles));
+    return array('ok' => true,
+        'wit' => 'قناعٌ مثبَتٌ بالتصيير: الدورُ ' . $probeRole . ' (ممنوحٌ عرضًا غيرُ مخوَّلٍ سياسةً) لا يرى قيمَ ' . $cols . ' الحيّةَ في جسمِ الصفحة');
+}
+
 /** دورٌ ممنوحٌ `can_view` للمسارِ وله مستخدمٌ حيٌّ في co4 — أو صفر */
 function ec_viewer_role(mysqli $conn, $route)
 {
@@ -187,10 +255,14 @@ foreach ($rows as $x) {
     $mod = (int) $one("SELECT COUNT(*) FROM modules WHERE code = '" . $e($x['route']) . "'");
     if (trim((string) $x['guard_kind']) !== '' && $mod > 0) { $checks[] = 'E2'; }
     else { $why[] = 'E2: ' . ($mod > 0 ? 'حارسٌ فارغ' : 'لا وحدةَ مسجَّلةً للمسار'); }
-    /* E3 */
+    /* E3 — FINAL_CLOSE ⑮: حيث سياسةٌ نافذةٌ يُتحقَّق القناعُ بالتصييرِ لا بالمسح */
     $ent = strtolower(trim((string) $x['grain_entity']));
     if ($ent === '' || !isset($sensEnt[$ent])) { $checks[] = 'E3'; }
-    else { $why[] = 'E3: كيانُه `' . $ent . '` له حقولٌ حسّاسةٌ نافذةُ السياسة — تحقّقُ الإقنعةِ عينٌ لا مسح'; }
+    else {
+        $mv = ec_mask_verify($ROOT, $conn, (string) $x['route'], $ent);
+        if ($mv['ok']) { $checks[] = 'E3'; $x['__e3_wit'] = $mv['wit']; }
+        else { $why[] = 'E3: ' . $mv['why']; }
+    }
     if (count($checks) === 3) { $closable[] = array('x' => $x, 'checks' => $checks); }
     else { $openProj[] = array('x' => $x, 'why' => $why); }
 }
@@ -234,7 +306,8 @@ if ($APPLY) {
             ? ('عقدُ التكاملِ الخماسيُّ مستوفًى قياسًا من سجلِّ الحقائق: ' . $x['__ev_wit']
              . ' · وE4 صُيِّر سطحُه فعلًا بجلسةِ دورٍ ممنوحٍ (' . $role . '): ' . $proof . ' · لقطة ' . $snap)
             : ('عقدُ القراءةِ مستوفًى آليًّا: E1 نسبُ المصدرِ (`' . mb_substr((string) $x['source_of_truth'], 0, 60)
-             . '`) · E2 حارسٌ `' . $x['guard_kind'] . '` ووحدةٌ مسجَّلة · E3 لا حقلَ حسّاسًا نافذَ السياسةِ لكيانِه'
+             . '`) · E2 حارسٌ `' . $x['guard_kind'] . '` ووحدةٌ مسجَّلة · E3 '
+             . (isset($x['__e3_wit']) ? $x['__e3_wit'] : 'لا حقلَ حسّاسًا نافذَ السياسةِ لكيانِه')
              . ' · E4 صُيِّرت فعلًا بجلسةِ دورٍ ممنوحٍ (' . $role . '): ' . $proof . ' · لقطة ' . $snap);
         $ckStr = $isEv ? 'EV1·EV2·EV3·EV4·EV5·E4' : 'E1·E2·E3·E4';
         $rtType = $isEv ? 'EVENT_INTEGRATION' : 'PROJECTION_REPORT';
