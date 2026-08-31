@@ -149,7 +149,7 @@
     {
         "TABLE_NAME": "activity_logs",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "84068",
+        "TABLE_ROWS": "84098",
         "col_count": "27",
         "has_company": "1"
     },
@@ -1626,7 +1626,7 @@
     {
         "TABLE_NAME": "fin_notifications",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "8435",
+        "TABLE_ROWS": "8343",
         "col_count": "8",
         "has_company": "1"
     },
@@ -2142,6 +2142,13 @@
         "has_company": "0"
     },
     {
+        "TABLE_NAME": "gov_decision_propagation",
+        "TABLE_TYPE": "BASE TABLE",
+        "TABLE_ROWS": "114",
+        "col_count": "8",
+        "has_company": "0"
+    },
+    {
         "TABLE_NAME": "gov_delegations",
         "TABLE_TYPE": "BASE TABLE",
         "TABLE_ROWS": "0",
@@ -2375,14 +2382,14 @@
     {
         "TABLE_NAME": "gov_migration_settlement",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "347",
+        "TABLE_ROWS": "348",
         "col_count": "10",
         "has_company": "0"
     },
     {
         "TABLE_NAME": "gov_nav_findings",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "15",
+        "TABLE_ROWS": "2",
         "col_count": "8",
         "has_company": "0"
     },

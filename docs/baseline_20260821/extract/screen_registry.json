@@ -55063,8 +55063,8 @@
         "nav09": null,
         "deprecated": 0,
         "known_issue": [],
-        "table_columns": 0,
-        "form_fields": 0
+        "table_columns": 17,
+        "form_fields": 12
     },
     {
         "screen_id": "SCR-0499",

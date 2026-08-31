@@ -1,6 +1,6 @@
 # SIDEBAR_CONFORMANCE — مطابقةُ السايدبارِ للدورة (§9 · §10)
 
-> **Baseline_ID:** `BL-20260831-909cf6a3` · مولَّدٌ قياسًا حيًّا: `php tools/gov_exec_pack12.php` · 2026-08-31 22:37
+> **Baseline_ID:** `BL-20260901-13010626` · مولَّدٌ قياسًا حيًّا: `php tools/gov_exec_pack12.php` · 2026-09-01 01:41
 > حزمةُ GOV_EXEC §23 — **اثنتا عشرةَ وثيقةً من اللقطةِ الواحدة** ولا رقمَ منقولًا.
 
 السلسلةُ الحاكمة: `Screen Identity → Workspace → Lifecycle Group → Placement → Permission → Renderer` — والقياسُ التفصيليُّ إدارةً إدارةً في `SIDEBAR_GUIDE_COMPARE.md` و`NAVR_METRICS.md` **بلقطةِ هذه الحزمةِ نفسِها** (المصدرُ الواحدُ لا ينسخ نفسَه).

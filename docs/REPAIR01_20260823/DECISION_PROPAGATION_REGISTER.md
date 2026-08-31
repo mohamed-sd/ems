@@ -1,6 +1,6 @@
 # DECISION_PROPAGATION_REGISTER — نفاذُ قراراتِ المالكِ قرارًا قرارًا
 
-> **Baseline_ID:** `BL-20260831-07a21929` · أمرُ GOV_EXEC §8 — «لا يُقبل صحيحٌ في Registry غيرُ نافذٍ في Runtime».
+> **Baseline_ID:** `BL-20260901-13010626` · أمرُ GOV_EXEC §8 — «لا يُقبل صحيحٌ في Registry غيرُ نافذٍ في Runtime».
 > المولِّد: `tools/gov_exec_decision_propagation.php` والمخزنُ الحاكمُ `gov_decision_propagation` — **كلُّ حكمٍ بمجسٍّ نُفِّذ لا صُدِّق**.
 
 ## اللوحة
