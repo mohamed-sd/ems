@@ -132,9 +132,8 @@ $expiring = $qa("SELECT 'استثناء' kind, ex_id id, permission_code code, v
                 UNION ALL
                 SELECT 'تكليف', asg_id, assignment_type_code, CONCAT(valid_to,' 23:59') FROM org_assignments
                   WHERE company_id={$company_id} AND state='active' AND valid_to <= DATE_ADD(CURDATE(), INTERVAL 30 DAY) LIMIT 20");
-$orphans = $qa("SELECT DISTINCT rp.role_id, m.code FROM role_permissions rp
-                 LEFT JOIN modules m ON m.id = rp.module_id
-                WHERE m.id IS NULL LIMIT 10");
+/* FINAL_CLOSE ⑦: الأيتام من المصدر الواحد */
+$orphans = perm_orphan_rows($conn, 10);
 // ⑥ الإغلاق
 $cycles = $qa("SELECT c.cycle_id, c.period, c.state, c.due_at, u.name_ar unit_name,
                       (SELECT COUNT(*) FROM permission_review_lines l WHERE l.cycle_id=c.cycle_id AND l.decision IS NULL) open_lines
@@ -142,9 +141,7 @@ $cycles = $qa("SELECT c.cycle_id, c.period, c.state, c.due_at, u.name_ar unit_na
                 WHERE c.company_id={$company_id} ORDER BY c.cycle_id DESC LIMIT 10");
 $founding = $qa("SELECT mode, enabled, started_at, ends_at FROM founding_mode");
 // ⑧ الإعدادات
-$tplStats = $qa("SELECT t.tpl_kind, COUNT(*) total,
-                        SUM(EXISTS(SELECT 1 FROM permission_template_versions v WHERE v.tpl_id=t.tpl_id AND v.state='published')) published
-                   FROM permission_templates t GROUP BY t.tpl_kind");
+$tplStats = perm_template_kind_stats($conn);
 $guards = $qa("SELECT guard_code, name_ar, overridable FROM guard_override_policies ORDER BY FIELD(overridable,'never','break_glass_only','with_compensating_control')");
 $units = $qa("SELECT unit_id, name_ar FROM org_units WHERE company_id={$company_id} AND active=1");
 $usersList = $qa("SELECT id, name FROM users WHERE company_id={$company_id} ORDER BY name");

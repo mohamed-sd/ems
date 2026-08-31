@@ -107,7 +107,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'role_scope') {
                FROM users u
                LEFT JOIN nav_items ni ON ni.role_id = " . $scopeRoleId . " AND ni.active = 1
                LEFT JOIN link_groups lg ON lg.id = ni.group_id
-               LEFT JOIN role_permissions rp ON rp.module_id = ni.module_id AND rp.role_id = ni.role_id
+               " . perm_nav_left_join_sql('ni', 'rp') . "
               WHERE u.id = " . intval($_SESSION['user']['id']) . " AND {TENANT_SCOPE}
                 AND ni.id IS NOT NULL
                 AND (ni.permission_code IS NULL OR COALESCE(rp.can_view, 0) = 1)

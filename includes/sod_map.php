@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/permissions_helper.php'; // FINAL_CLOSE ⑦ — المصدر الواحد
 /**
  * includes/sod_map.php — خريطةُ فصل الواجبات: من الرمز المعنوي إلى الواقع الحي
  * ───────────────────────────────────────────────────────────────────────────
@@ -95,11 +96,8 @@ if (!function_exists('ems_sod_codes_of_role')) {
             if ($t['grade'] === 'absent' || $t['screen'] === null) { continue; }
             $flag = ems_sod_flag_of($t['action']);
             if ($flag === null) { continue; }
-            $e = mysqli_real_escape_string($conn, $t['screen']);
-            $r = mysqli_query($conn,
-                "SELECT rp.{$flag} f FROM role_permissions rp JOIN modules m ON m.id = rp.module_id
-                  WHERE m.code = '{$e}' AND rp.role_id = {$roleId} LIMIT 1");
-            if ($r && ($x = mysqli_fetch_assoc($r)) && (int) $x['f'] === 1) { $held[$code] = 1; }
+            // FINAL_CLOSE ⑦: القراءة من المصدر الواحد لا باستعلام خاص
+            if (perm_flag_for_screen($conn, $roleId, $t['screen'], $flag) === 1) { $held[$code] = 1; }
         }
         $cache[$roleId] = $held;
         return $held;

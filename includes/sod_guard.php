@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/permissions_helper.php'; // FINAL_CLOSE ⑦ — المصدر الواحد
 // شواهد المتطلبات (AC-E06-03 · موجة ٣): SCN-827
 /**
  * حارس فصل الواجبات عند المنح — includes/sod_guard.php (E-04 RB-04 · دَينُ «الوصل»)
@@ -35,11 +36,8 @@ if (!function_exists('ems_sod_codes_of_role_with')) {
                 if (!empty($flags[$flag])) { $held[$sodCode] = 1; }
                 continue;
             }
-            $e = mysqli_real_escape_string($conn, $t['screen']);
-            $q = mysqli_query($conn,
-                "SELECT rp.{$flag} f FROM role_permissions rp JOIN modules m ON m.id = rp.module_id
-                  WHERE m.code = '{$e}' AND rp.role_id = {$roleId} LIMIT 1");
-            if ($q && ($x = mysqli_fetch_assoc($q)) && (int) $x['f'] === 1) { $held[$sodCode] = 1; }
+            // FINAL_CLOSE ⑦: القراءة من المصدر الواحد لا باستعلام خاص
+            if (perm_flag_for_screen($conn, $roleId, $t['screen'], $flag) === 1) { $held[$sodCode] = 1; }
         }
         return $held;
     }

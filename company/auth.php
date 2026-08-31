@@ -146,36 +146,17 @@ function company_load_permissions($roleId) {
     }
 
     $rid = intval($roleId);
-    $stmt = @mysqli_prepare($GLOBALS['conn'],
-        'SELECT m.code, rp.can_view, rp.can_add, rp.can_edit, rp.can_delete
-         FROM role_permissions rp
-         INNER JOIN modules m ON rp.module_id = m.id
-         WHERE rp.role_id = ?'
-    );
-    if (!$stmt) {
-        return $permissions;
+    /* FINAL_CLOSE ⑦: تحميل صلاحيات الجلسة من المصدر الواحد لا باستعلام خاص */
+    require_once dirname(__DIR__) . '/includes/permissions_helper.php';
+    foreach (perm_all_for_role($GLOBALS['conn'], $rid) as $code => $p) {
+        if ($code === '') { continue; }
+        $permissions[$code] = array(
+            'can_view'   => intval($p['can_view']) === 1,
+            'can_add'    => intval($p['can_add']) === 1,
+            'can_edit'   => intval($p['can_edit']) === 1,
+            'can_delete' => intval($p['can_delete']) === 1
+        );
     }
-
-    mysqli_stmt_bind_param($stmt, 'i', $rid);
-    mysqli_stmt_execute($stmt);
-    $res = mysqli_stmt_get_result($stmt);
-
-    if ($res) {
-        while ($row = mysqli_fetch_assoc($res)) {
-            $code = isset($row['code']) ? $row['code'] : '';
-            if ($code === '') {
-                continue;
-            }
-            $permissions[$code] = array(
-                'can_view' => intval($row['can_view']) === 1,
-                'can_add' => intval($row['can_add']) === 1,
-                'can_edit' => intval($row['can_edit']) === 1,
-                'can_delete' => intval($row['can_delete']) === 1
-            );
-        }
-    }
-
-    mysqli_stmt_close($stmt);
     return $permissions;
 }
 

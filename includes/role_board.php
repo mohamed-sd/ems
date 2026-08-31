@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/permissions_helper.php'; // FINAL_CLOSE ⑦ — المصدر الواحد
 require_once __DIR__ . '/../includes/catch_log.php';
 /**
  * لوحة الدور — المكوّنات السبعة (UX-00 §7 · UX-01 §5)
@@ -505,7 +506,7 @@ function roleBoardAlerts($conn, $gate, $roleId)
         if ($rid === 15) {
             try {
                 $r = $conn->query("SELECT COUNT(*) FROM roles ro WHERE (ro.status='1' OR ro.status=1) AND ro.id <> -1
-                    AND NOT EXISTS (SELECT 1 FROM role_permissions p WHERE p.role_id = ro.id AND p.can_view = 1)
+                    AND NOT " . perm_role_any_view_exists_sql('ro.id') . "
                     AND NOT EXISTS (SELECT 1 FROM modules m WHERE m.owner_role_id = ro.id)");
                 $counts['role_no_screens'] = $r ? intval($r->fetch_row()[0]) : 0;
             } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'فشل يعامل بقيمة افتراضية — $counts[\'role_no_screens\'] = 0'); $counts['role_no_screens'] = 0; }
@@ -605,9 +606,7 @@ function roleBoardQuickActions($conn, $roleId, $userId, $limit = 3)
                       WHERE a.user_id = ? AND a.url LIKE CONCAT('%', n.route, '%')) AS uses
                FROM nav_items n
               WHERE n.role_id = ? AND n.active = 1 AND n.door = 'DAILY'
-                AND (n.permission_code IS NULL OR EXISTS (
-                      SELECT 1 FROM role_permissions p
-                       WHERE p.module_id = n.module_id AND p.role_id = n.role_id AND p.can_view = 1))
+                AND (n.permission_code IS NULL OR " . perm_nav_view_exists_sql('n') . ")
               ORDER BY uses DESC, n.sort_order ASC LIMIT " . intval($limit));
         $q->bind_param('ii', $uid, $rid);
         $q->execute();

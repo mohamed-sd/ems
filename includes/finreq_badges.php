@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/permissions_helper.php'; // FINAL_CLOSE ⑦ — المصدر الواحد
 require_once __DIR__ . '/../includes/catch_log.php';
 /**
  * شارات بوابة الطلب المالي D05 للقائمة الجانبية — عدّاداتٌ خفيفة معزولة بالبوابة:
@@ -87,18 +88,8 @@ if (!function_exists('ems_finance_nav_links')) {
         }
         try {
             $rid = intval($role);
-            $q = $conn->prepare(
-                "SELECT m.code, m.name, COALESCE(NULLIF(TRIM(m.icon), ''), 'fa fa-coins') AS icon
-                   FROM modules m
-                   JOIN role_permissions rp ON rp.module_id = m.id
-                  WHERE rp.role_id = ? AND rp.can_view = 1
-                    AND m.code LIKE 'Finance/%' AND m.is_link = '1'
-                  ORDER BY m.display_order ASC, m.id ASC"
-            );
-            $q->bind_param('i', $rid);
-            $q->execute();
-            $res = $q->get_result();
-            while ($m = $res->fetch_assoc()) {
+            /* FINAL_CLOSE ⑦: المودولات المرئية من المصدر الواحد */
+            foreach (perm_visible_modules_like($conn, $rid, 'Finance/%') as $m) {
                 $code = strval($m['code']);
                 if (function_exists('check_page_permissions')) {
                     $pp = check_page_permissions($conn, $code);
@@ -106,7 +97,6 @@ if (!function_exists('ems_finance_nav_links')) {
                 }
                 $out[$code] = array('label' => strval($m['name']), 'icon' => strval($m['icon']));
             }
-            $q->close();
         } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'القائمة الجانبية لا تتعطل بأي فشل هنا');
             // القائمة الجانبية لا تتعطل بأي فشلٍ هنا
         }

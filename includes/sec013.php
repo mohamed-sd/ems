@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/permissions_helper.php'; // FINAL_CLOSE ⑦ — المصدر الواحد
 /**
  * includes/sec013.php — محلّل أبعاد الصلاحية الأربعة (SEC-013 · E-04)
  * ───────────────────────────────────────────────────────────────────────────
@@ -37,15 +38,8 @@ if (!function_exists('ems_sec013_role_versions')) {
         $t = ems_role_title_key($roleId);
         if ($t) { $keys[] = $t; }
         if (!$keys) { return $cache[$roleId] = array(); }
-        $in = "'" . implode("','", array_map(function ($k) use ($conn) {
-            return $conn->real_escape_string($k); }, $keys)) . "'";
-        $vers = array();
-        $r = mysqli_query($conn,
-            "SELECT v.ver_id FROM permission_templates t
-              JOIN permission_template_versions v ON v.tpl_id = t.tpl_id AND v.state = 'published'
-             WHERE t.key_code IN ({$in}) AND t.active = 1");
-        while ($r && ($x = mysqli_fetch_row($r))) { $vers[] = intval($x[0]); }
-        return $cache[$roleId] = $vers;
+        // FINAL_CLOSE ⑦: نسخ القوالب المنشورة من المصدر الواحد
+        return $cache[$roleId] = perm_published_template_versions($conn, $keys);
     }
 }
 

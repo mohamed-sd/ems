@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/permissions_helper.php'; // FINAL_CLOSE ⑦ — المصدر الواحد
 /**
  * includes/dept_gov_space.php — مكوّنُ «حوكمة الإدارة» النطاقيُّ الواحد
  * ─────────────────────────────────────────────────────────────────────────
@@ -42,19 +43,9 @@ if ($rolesIn !== '') {
 }
 
 /* ② صلاحياتُ شاشاتِ الإدارة بالدور — من محرّك الصلاحيات لا وصفًا */
-$perms = array();
-$likes = array();
-foreach ($GOV_DEPT['module_like'] as $pfx) {
-    $likes[] = "mo.code LIKE '" . $conn->real_escape_string($pfx) . "%'";
-}
-if ($likes) {
-    $res = $conn->query("SELECT mo.code, mo.name, rp.role_id, rp.can_view, rp.can_add, rp.can_edit, rp.can_delete
-                           FROM role_permissions rp
-                           JOIN modules mo ON mo.id = rp.module_id
-                          WHERE (" . implode(' OR ', $likes) . ") AND rp.role_id IN ({$rolesIn})
-                          ORDER BY mo.code, rp.role_id");
-    if ($res) { while ($x = $res->fetch_assoc()) { $perms[$x['code']][(int) $x['role_id']] = $x; } }
-}
+/* FINAL_CLOSE ⑦: مصفوفة الأعلام من المصدر الواحد لا باستعلام خاص */
+$perms = perm_matrix_for_modules($conn, $GOV_DEPT['module_like'],
+    array_map('intval', explode(',', $rolesIn)));
 
 /* ③ فصلُ الواجباتِ المتعارضة — قياسٌ حيٌّ بعقود الإدارة (§9-3) */
 $sodBreaches = array();

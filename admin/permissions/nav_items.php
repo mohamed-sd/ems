@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../includes/permissions_helper.php'; // FINAL_CLOSE ⑦ — المصدر الواحد
 require_once __DIR__ . '/../includes/auth.php';
 super_admin_require_login();
 
@@ -177,8 +178,7 @@ $items = array();
 $stats = array('total' => 0, 'active' => 0, 'shown' => 0, 'perm_hidden' => 0, 'inactive' => 0);
 $q = $conn->prepare(
     "SELECT n.*, g.name AS group_name,
-            (SELECT p.can_view FROM role_permissions p
-             WHERE p.module_id = n.module_id AND p.role_id = n.role_id LIMIT 1) AS cv
+            " . perm_nav_view_select_sql('n') . " AS cv
      FROM nav_items n
      LEFT JOIN link_groups g ON g.id = n.group_id
      WHERE n.role_id = ?

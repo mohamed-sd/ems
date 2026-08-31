@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/permissions_helper.php'; // FINAL_CLOSE ⑦ — المصدر الواحد
 /**
  * includes/perm_explain_live.php — «لماذا أرى هذا؟ ولماذا لا أراه؟» فوق المصدر الحي
  * ───────────────────────────────────────────────────────────────────────────
@@ -44,10 +45,8 @@ if (!function_exists('ems_explain_screen_access')) {
 
         // ② أللدور صفُّ صلاحيةٍ عليها؟
         $mid = (int) $mod['id'];
-        $p = null;
-        $r = mysqli_query($conn, "SELECT can_view, can_add, can_edit, can_delete
-                                    FROM role_permissions WHERE role_id={$roleId} AND module_id={$mid} LIMIT 1");
-        if ($r && ($x = mysqli_fetch_assoc($r))) { $p = $x; }
+        // FINAL_CLOSE ⑦: القراءة من المصدر الواحد
+        $p = perm_row_for_module($conn, $roleId, $mid);
         $roleName = '';
         $r = mysqli_query($conn, "SELECT name FROM roles WHERE id={$roleId} LIMIT 1");
         if ($r && ($x = mysqli_fetch_assoc($r))) { $roleName = $x['name']; }

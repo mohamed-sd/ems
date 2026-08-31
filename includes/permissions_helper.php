@@ -1372,3 +1372,229 @@ if (!function_exists('ems_require_action')) {
         @file_put_contents($dir . '/action_guard.log', $line, FILE_APPEND);
     }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FINAL_CLOSE ⑦ · RPR-03 §٦ — قراءاتُ قرارِ الصلاحيةِ الموحَّدة
+   ─────────────────────────────────────────────────────────────────────────
+   «وحّدْ قرارَ الصلاحيةِ في مصدرٍ واحدٍ يُستدعى من الخادم — والقائمةُ تُشتقّ
+   منه لا تُبنى موازيةً له». كانت ستَّ عشرةَ قراءةً خامّةً لجداولِ الصلاحيةِ
+   متفرِّقةً في الشجرة — كلُّ واحدةٍ قارئُ قرارٍ مستقلٌّ يمكن أن يخالف أخاه.
+   فجُمعت هنا دوالَّ مسمّاةً: النصُّ الحاكمُ لجملةِ الظهورِ يُستدعى ولا يُنسخ،
+   والاستعلامُ يعيش في المصدرِ الواحدِ وحدَه.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+if (!function_exists('perm_nav_view_exists_sql')) {
+    /** جملةُ الظهورِ المعياريّة: بندُ ملاحةٍ يَظهر إن كان لدورِه can_view على
+     *  مودولِه — تُضمَّن في استعلاماتِ الملاحةِ ولا تُنسخ نصًّا. */
+    function perm_nav_view_exists_sql($alias = 'n')
+    {
+        return "EXISTS (SELECT 1 FROM role_permissions p"
+             . " WHERE p.module_id = {$alias}.module_id AND p.role_id = {$alias}.role_id"
+             . " AND p.can_view = 1)";
+    }
+
+    /** جملةُ «للدورِ أيُّ منحةِ عرضٍ» — للوحاتِ الفحص. $roleExpr تعبيرُ عمودٍ آمن. */
+    function perm_role_any_view_exists_sql($roleExpr)
+    {
+        return "EXISTS (SELECT 1 FROM role_permissions p WHERE p.role_id = {$roleExpr} AND p.can_view = 1)";
+    }
+
+    /** قيمةُ can_view لبندِ ملاحةٍ — تُضمَّن SELECT فرعيًّا في شاشاتِ الربط. */
+    function perm_nav_view_select_sql($alias = 'n')
+    {
+        return "(SELECT p.can_view FROM role_permissions p"
+             . " WHERE p.module_id = {$alias}.module_id AND p.role_id = {$alias}.role_id LIMIT 1)";
+    }
+
+    /** وصلةُ أعلامِ الصلاحيةِ لبندِ ملاحة — LEFT JOIN معياريّ. */
+    function perm_nav_left_join_sql($alias = 'ni', $as = 'rp')
+    {
+        return "LEFT JOIN role_permissions {$as} ON {$as}.module_id = {$alias}.module_id"
+             . " AND {$as}.role_id = {$alias}.role_id";
+    }
+
+    /** علَمٌ واحدٌ لدورٍ على شاشةٍ بكودِها (فحوصُ فصلِ الواجبات). */
+    function perm_flag_for_screen($conn, $roleId, $screenCode, $flag)
+    {
+        $flag = preg_replace('/[^a-z_]/', '', strtolower((string) $flag));
+        if (strpos($flag, 'can_') !== 0) { return null; }
+        $e = mysqli_real_escape_string($conn, (string) $screenCode);
+        $q = mysqli_query($conn,
+            "SELECT rp.{$flag} f FROM role_permissions rp JOIN modules m ON m.id = rp.module_id"
+            . " WHERE m.code = '{$e}' AND rp.role_id = " . (int) $roleId . " LIMIT 1");
+        if ($q && ($x = mysqli_fetch_assoc($q))) { return (int) $x['f']; }
+        return null;
+    }
+
+    /** صفُّ الصلاحيةِ الكاملُ لدورٍ على مودولٍ بمعرِّفِه. */
+    function perm_row_for_module($conn, $roleId, $moduleId)
+    {
+        $q = mysqli_query($conn, "SELECT can_view, can_add, can_edit, can_delete"
+            . " FROM role_permissions WHERE role_id = " . (int) $roleId
+            . " AND module_id = " . (int) $moduleId . " LIMIT 1");
+        if ($q && ($x = mysqli_fetch_assoc($q))) { return $x; }
+        return null;
+    }
+
+    /** ألدورِ صفٌّ في مركزِ تقاريرِ emsreports؟ */
+    function perm_role_has_report_center($conn, $roleId)
+    {
+        $q = @mysqli_query($conn, "SELECT 1 FROM report_role_permissions WHERE role_id = " . (int) $roleId . " LIMIT 1");
+        return ($q && mysqli_num_rows($q) > 0);
+    }
+
+    /** مصفوفةُ أعلامِ أدوارٍ على مودولاتٍ بأنماطِ كود — [code][role_id] = صف. */
+    function perm_matrix_for_modules($conn, array $codeLike, array $roleIds)
+    {
+        $out = array();
+        $likes = array();
+        foreach ($codeLike as $pfx) { $likes[] = "mo.code LIKE '" . mysqli_real_escape_string($conn, $pfx) . "%'"; }
+        $ids = array_map('intval', $roleIds);
+        if (!$likes || !$ids) { return $out; }
+        $q = mysqli_query($conn,
+            "SELECT mo.code, mo.name, rp.role_id, rp.can_view, rp.can_add, rp.can_edit, rp.can_delete"
+            . " FROM role_permissions rp JOIN modules mo ON mo.id = rp.module_id"
+            . " WHERE (" . implode(' OR ', $likes) . ") AND rp.role_id IN (" . implode(',', $ids) . ")"
+            . " ORDER BY mo.code, rp.role_id");
+        while ($q && ($x = mysqli_fetch_assoc($q))) { $out[$x['code']][(int) $x['role_id']] = $x; }
+        return $out;
+    }
+
+    /** المودولاتُ المرئيّةُ لدورٍ تحت نمطِ كودٍ (شاراتُ الطلباتِ الماليّة). */
+    function perm_visible_modules_like($conn, $roleId, $codeLike)
+    {
+        $rows = array();
+        $st = mysqli_prepare($conn,
+            "SELECT m.code, m.name, COALESCE(NULLIF(TRIM(m.icon), ''), 'fa fa-coins') AS icon"
+            . " FROM modules m JOIN role_permissions rp ON rp.module_id = m.id"
+            . " WHERE rp.role_id = ? AND rp.can_view = 1 AND m.code LIKE ? AND m.is_link = '1'"
+            . " ORDER BY m.display_order ASC, m.id ASC");
+        if (!$st) { return $rows; }
+        $rid = (int) $roleId;
+        mysqli_stmt_bind_param($st, 'is', $rid, $codeLike);
+        mysqli_stmt_execute($st);
+        $res = mysqli_stmt_get_result($st);
+        while ($res && ($x = mysqli_fetch_assoc($res))) { $rows[] = $x; }
+        return $rows;
+    }
+
+    /** عددُ منحِ العرضِ لدورٍ على أنماطِ أكواد (منافذُ الحوكمةِ الحاكمة). */
+    function perm_view_grant_count($conn, $roleId, array $codeLike)
+    {
+        $likes = array();
+        foreach ($codeLike as $pfx) { $likes[] = "m.code LIKE '" . mysqli_real_escape_string($conn, $pfx) . "%'"; }
+        if (!$likes) { return 0; }
+        $st = mysqli_prepare($conn,
+            "SELECT COUNT(*) FROM role_permissions rp JOIN modules m ON m.id = rp.module_id"
+            . " WHERE rp.role_id = ? AND rp.can_view = 1 AND (" . implode(' OR ', $likes) . ")");
+        if (!$st) { return 0; }
+        $rid = (int) $roleId;
+        mysqli_stmt_bind_param($st, 'i', $rid);
+        mysqli_stmt_execute($st);
+        mysqli_stmt_bind_result($st, $n);
+        mysqli_stmt_fetch($st);
+        mysqli_stmt_close($st);
+        return (int) $n;
+    }
+
+    /** نسخُ القوالبِ المنشورةُ لمفاتيحَ (SEC-013). */
+    function perm_published_template_versions($conn, array $keys)
+    {
+        if (!$keys) { return array(); }
+        $esc = array();
+        foreach ($keys as $k) { $esc[] = mysqli_real_escape_string($conn, $k); }
+        $in = "'" . implode("','", $esc) . "'";
+        $vers = array();
+        $r = mysqli_query($conn,
+            "SELECT v.ver_id FROM permission_templates t"
+            . " JOIN permission_template_versions v ON v.tpl_id = t.tpl_id AND v.state = 'published'"
+            . " WHERE t.key_code IN ({$in}) AND t.active = 1");
+        while ($r && ($x = mysqli_fetch_row($r))) { $vers[] = (int) $x[0]; }
+        return $vers;
+    }
+
+    /** صلاحياتُ الدورِ كاملةً بكودِ المودول (تحميلُ الجلسةِ عند الدخول). */
+    function perm_all_for_role($conn, $roleId)
+    {
+        $out = array();
+        $st = mysqli_prepare($conn,
+            "SELECT m.code, rp.can_view, rp.can_add, rp.can_edit, rp.can_delete"
+            . " FROM role_permissions rp INNER JOIN modules m ON rp.module_id = m.id"
+            . " WHERE rp.role_id = ?");
+        if (!$st) { return $out; }
+        $rid = (int) $roleId;
+        mysqli_stmt_bind_param($st, 'i', $rid);
+        mysqli_stmt_execute($st);
+        $res = mysqli_stmt_get_result($st);
+        while ($res && ($x = mysqli_fetch_assoc($res))) { $out[$x['code']] = $x; }
+        return $out;
+    }
+
+    /** أيتامُ الصلاحية: صفوفٌ على مودولٍ محذوف (لوحةُ حوكمةِ الأمان). */
+    function perm_orphan_rows($conn, $limit = 10)
+    {
+        $rows = array();
+        $q = mysqli_query($conn, "SELECT DISTINCT rp.role_id, m.code FROM role_permissions rp"
+            . " LEFT JOIN modules m ON m.id = rp.module_id"
+            . " WHERE m.id IS NULL LIMIT " . (int) $limit);
+        while ($q && ($x = mysqli_fetch_assoc($q))) { $rows[] = $x; }
+        return $rows;
+    }
+
+    /** إحصاءاتُ نظامِ الصلاحيةِ الحيّ والقوالب (لوحتا perm_system والحوكمة). */
+    function perm_system_counts($conn)
+    {
+        $one = function ($sql) use ($conn) {
+            $r = mysqli_query($conn, $sql);
+            if ($r && ($x = mysqli_fetch_row($r))) { return (int) $x[0]; }
+            return 0;
+        };
+        return array(
+            'live_rows'  => $one("SELECT COUNT(*) FROM role_permissions"),
+            'live_roles' => $one("SELECT COUNT(DISTINCT role_id) FROM role_permissions"),
+            'templates'  => $one("SELECT COUNT(*) FROM permission_templates"),
+        );
+    }
+
+    /** تفصيلُ القوالبِ بأنواعِها. */
+    function perm_template_breakdown($conn)
+    {
+        $rows = array();
+        $q = mysqli_query($conn,
+            "SELECT t.tpl_kind, COUNT(DISTINCT t.tpl_id) tpls, COUNT(tp.tp_id) items"
+            . " FROM permission_templates t"
+            . " LEFT JOIN permission_template_versions v ON v.tpl_id = t.tpl_id AND v.state='published'"
+            . " LEFT JOIN template_permissions tp ON tp.template_version_id = v.ver_id"
+            . " GROUP BY t.tpl_kind ORDER BY FIELD(t.tpl_kind,'relation','family','level','title','assignment')");
+        while ($q && ($x = mysqli_fetch_assoc($q))) { $rows[] = $x; }
+        return $rows;
+    }
+
+    /** أثقلُ قوالبِ المسمّياتِ بنودًا. */
+    function perm_top_title_templates($conn, $limit = 12)
+    {
+        $rows = array();
+        $q = mysqli_query($conn,
+            "SELECT t.key_code, COUNT(tp.tp_id) items"
+            . " FROM permission_templates t"
+            . " JOIN permission_template_versions v ON v.tpl_id = t.tpl_id AND v.state='published'"
+            . " JOIN template_permissions tp ON tp.template_version_id = v.ver_id"
+            . " WHERE t.tpl_kind='title'"
+            . " GROUP BY t.tpl_id ORDER BY items DESC LIMIT " . (int) $limit);
+        while ($q && ($x = mysqli_fetch_assoc($q))) { $rows[] = $x; }
+        return $rows;
+    }
+
+    /** إحصاءُ القوالبِ بنوعِها ومنشورِها (لوحةُ حوكمةِ الأمان). */
+    function perm_template_kind_stats($conn)
+    {
+        $rows = array();
+        $q = mysqli_query($conn,
+            "SELECT t.tpl_kind, COUNT(*) total,"
+            . " SUM(EXISTS(SELECT 1 FROM permission_template_versions v"
+            . " WHERE v.tpl_id=t.tpl_id AND v.state='published')) published"
+            . " FROM permission_templates t GROUP BY t.tpl_kind");
+        while ($q && ($x = mysqli_fetch_assoc($q))) { $rows[] = $x; }
+        return $rows;
+    }
+}

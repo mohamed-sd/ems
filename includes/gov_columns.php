@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/permissions_helper.php'; // FINAL_CLOSE ⑦ — المصدر الواحد
 // شواهد المتطلبات (AC-E06-03 · موجة ٣): IAM-005 · UXP-030 · UXP-036 · UXP-038 · UXP-072 · UXP-074 · UXP-077 · UXP-078 · UXP-079 · UXP-085 · UXP-093
 /**
  * includes/gov_columns.php — طبقة الحوكمة المشتركة (CMP-03 الموجات ②+③+④)
@@ -120,22 +121,10 @@ function ems_gov_slice_allowed($slice) {
         else {
             $max = 1;
             if (isset($GLOBALS['conn']) && $GLOBALS['conn'] instanceof mysqli && $role !== '') {
-                /* منفذٌ حاكمٌ = منحةُ قراءةٍ على مودولِ حوكمةٍ أو تدقيقٍ أو مالية */
-                $st = $GLOBALS['conn']->prepare(
-                    "SELECT COUNT(*) FROM role_permissions rp
-                       JOIN modules m ON m.id = rp.module_id
-                      WHERE rp.role_id = ? AND rp.can_view = 1
-                        AND (m.code LIKE 'Governance/%' OR m.code LIKE 'admin/%'
-                          OR m.code LIKE 'Audit/%'      OR m.code LIKE 'Finance/%')");
-                if ($st) {
-                    $rid = (int) $role;
-                    $st->bind_param('i', $rid);
-                    if ($st->execute()) {
-                        $row = $st->get_result()->fetch_row();
-                        if ($row && (int) $row[0] > 0) { $max = 3; }
-                    }
-                    $st->close();
-                }
+                /* منفذٌ حاكمٌ = منحةُ قراءةٍ على مودولِ حوكمةٍ أو تدقيقٍ أو مالية
+                   — FINAL_CLOSE ⑦: العد من المصدر الواحد */
+                if (perm_view_grant_count($GLOBALS['conn'], (int) $role,
+                        array('Governance/', 'admin/', 'Audit/', 'Finance/')) > 0) { $max = 3; }
             }
         }
     }

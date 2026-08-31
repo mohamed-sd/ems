@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php'; // FINAL_CLOSE ⑦ — المصدر الواحد
 /**
  * admin/perm_system.php — نظام الصلاحيات الجديد (SEC-01) · لوحة المدير الأعلى
  * ───────────────────────────────────────────────────────────────────────────
@@ -42,11 +43,13 @@ if (function_exists('ems_env')) { $ps_source = strtolower((string) ems_env('EMS_
 $ps_derived = ($ps_source === 'derived');
 
 // ── أرقام النظامين ────────────────────────────────────────────────────────
-$liveRows    = (int) ps_one($ps_conn, "SELECT COUNT(*) FROM role_permissions");
-$liveRoles   = (int) ps_one($ps_conn, "SELECT COUNT(DISTINCT role_id) FROM role_permissions");
+/* FINAL_CLOSE ⑦: أرقام النظام الحي من المصدر الواحد */
+$ps_counts   = perm_system_counts($ps_conn);
+$liveRows    = $ps_counts['live_rows'];
+$liveRoles   = $ps_counts['live_roles'];
 $liveModules = (int) ps_one($ps_conn, "SELECT COUNT(*) FROM modules");
 
-$tpl      = (int) ps_one($ps_conn, "SELECT COUNT(*) FROM permission_templates");
+$tpl      = $ps_counts['templates'];
 $tplPub   = (int) ps_one($ps_conn, "SELECT COUNT(*) FROM permission_template_versions WHERE state='published'");
 $tplItems = (int) ps_one($ps_conn, "SELECT COUNT(*) FROM template_permissions");
 $effective = (int) ps_one($ps_conn, "SELECT COUNT(*) FROM effective_permissions");
@@ -76,20 +79,8 @@ $phases = array(
 );
 
 // ── تفصيل القوالب ─────────────────────────────────────────────────────────
-$tplBreak = ps_rows($ps_conn,
-    "SELECT t.tpl_kind, COUNT(DISTINCT t.tpl_id) tpls, COUNT(tp.tp_id) items
-       FROM permission_templates t
-       LEFT JOIN permission_template_versions v ON v.tpl_id = t.tpl_id AND v.state='published'
-       LEFT JOIN template_permissions tp ON tp.template_version_id = v.ver_id
-      GROUP BY t.tpl_kind ORDER BY FIELD(t.tpl_kind,'relation','family','level','title','assignment')");
-
-$topTitles = ps_rows($ps_conn,
-    "SELECT t.key_code, COUNT(tp.tp_id) items
-       FROM permission_templates t
-       JOIN permission_template_versions v ON v.tpl_id = t.tpl_id AND v.state='published'
-       JOIN template_permissions tp ON tp.template_version_id = v.ver_id
-      WHERE t.tpl_kind='title'
-      GROUP BY t.tpl_id ORDER BY items DESC LIMIT 12");
+$tplBreak  = perm_template_breakdown($ps_conn);
+$topTitles = perm_top_title_templates($ps_conn, 12);
 
 // ── آخر الفروق (إن وُجدت) ─────────────────────────────────────────────────
 $diffRows = $diffs > 0

@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/permissions_helper.php'; // FINAL_CLOSE ⑦ — جملة الظهور من المصدر الواحد
 /**
  * المصيِّر الموحّد للسايدبار — بوابة UX-02 §9-④ · UX-01 §10.3
  * ─────────────────────────────────────────────────────────────────────────
@@ -107,10 +108,7 @@ function getUnifiedNavItems($conn, $roleId) {
             WHERE n.role_id = {$roleId} AND n.active = 1
               AND (
                     n.permission_code IS NULL
-                    OR EXISTS (
-                        SELECT 1 FROM role_permissions p
-                        WHERE p.module_id = n.module_id AND p.role_id = n.role_id AND p.can_view = 1
-                    )
+                    OR " . perm_nav_view_exists_sql('n') . "
                   )
             ORDER BY FIELD(n.door,{$doorOrder}), n.sort_order, n.id";
     $items = array();
@@ -1076,9 +1074,7 @@ function printEmsTenGroupNav($conn, $items, $uxMap, $uxCurMap, $basePrefix, $bad
         $__pq2 = @mysqli_query($conn, "SELECT n.`route` FROM `nav_items` n
                                         WHERE n.`role_id` = " . $__rid2 . " AND n.`active` = 1
                                           AND n.`permission_code` IS NOT NULL AND n.`permission_code` <> ''
-                                          AND NOT EXISTS (SELECT 1 FROM `role_permissions` p
-                                                           WHERE p.`module_id` = n.`module_id`
-                                                             AND p.`role_id` = n.`role_id` AND p.`can_view` = 1)");
+                                          AND NOT " . perm_nav_view_exists_sql('n'));
         while ($__pq2 && ($__pr2 = mysqli_fetch_assoc($__pq2))) {
             $navDisabled[uxuiNavBaseRoute($__pr2['route'])] = true;
         }

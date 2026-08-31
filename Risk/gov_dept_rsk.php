@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/permissions_helper.php'; // FINAL_CLOSE ⑦ — المصدر الواحد
 /**
  * Risk/gov_dept_rsk.php — حوكمة إدارة المخاطر المؤسسية (M-16 · الشاشة ٢٠)
  * ─────────────────────────────────────────────────────────────────────────
@@ -32,13 +33,8 @@ $res = $conn->query("SELECT u.id, u.username, u.name, u.role, u.status, r.name r
 while ($x = $res->fetch_assoc()) { $team[] = $x; }
 
 /* ② صلاحياتُ العشرين شاشةً بالدور — تُقرأ من محرّكِ الصلاحياتِ لا تُوصف */
-$perms = array();
-$res = $conn->query("SELECT mo.code, mo.name, rp.role_id, rp.can_view, rp.can_add, rp.can_edit, rp.can_delete
-                       FROM role_permissions rp
-                       JOIN modules mo ON mo.id = rp.module_id
-                      WHERE mo.code LIKE 'Risk/%' AND rp.role_id IN (28, 29, 30)
-                      ORDER BY mo.code, rp.role_id");
-while ($x = $res->fetch_assoc()) { $perms[$x['code']][(int) $x['role_id']] = $x; }
+/* FINAL_CLOSE ⑦: مصفوفة الأعلام من المصدر الواحد لا باستعلام خاص */
+$perms = perm_matrix_for_modules($conn, array('Risk/'), array(28, 29, 30));
 
 /* ③ فصلُ الواجباتِ المتعارضةِ (§9-3) — قياسٌ على الحساباتِ الحية.
    الزوجُ المتعارضُ الأولُ في هذه الإدارة: من يشغّل ضابطًا ثم يتحقق من ضابطِ نفسِه

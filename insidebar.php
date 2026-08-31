@@ -383,8 +383,8 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
       $__sb_is_super = isset($_SESSION['user']['role']) && strval($_SESSION['user']['role']) === '-1';
       $__sb_has_emsreports = $__sb_is_super;
       if (!$__sb_has_emsreports && isset($conn) && $__sb_role_id !== 0) {
-        $__sb_rr = @mysqli_query($conn, "SELECT 1 FROM report_role_permissions WHERE role_id = " . $__sb_role_id . " LIMIT 1");
-        $__sb_has_emsreports = ($__sb_rr && mysqli_num_rows($__sb_rr) > 0);
+        // FINAL_CLOSE ⑦: القراءة من المصدر الواحد
+        $__sb_has_emsreports = perm_role_has_report_center($conn, $__sb_role_id);
       }
       /* RPR-W02 §٤-٣: المسارُ والاسمُ من السجلِّ — والقرارُ (أيُّ مركزِ تقارير؟)
          يبقى هنا لأنَّه **صلاحيةٌ لا ظهور**؛ والظهورُ ليس صلاحيةً (§٣٦)، فما
