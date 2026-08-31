@@ -1,7 +1,7 @@
 # MASTER FINAL CLOSURE REGISTER — السجلُّ الجامعُ للإغلاقِ النهائيّ
 
 > **المخزنُ الحاكم:** `registers/MASTER_FINAL_CLOSURE_REGISTER.json` — وهذا إسقاطُه.
-> **اللقطة:** `c60c09b7` · **حُدِّث:** 2026-08-31 12:56
+> **اللقطة:** `cf1ea2a1` · **حُدِّث:** 2026-08-31 13:21
 > **المصمَّمُ الحاكم:** `docs/REPAIR01_20260823/orders/CLOSURE_SYSTEM.txt`
 
 ## مقامُ الحالات — ⛔ ولا تُجمَع في نسبةٍ واحدة
@@ -10,11 +10,11 @@
 |---|---|
 | `BLOCKED_ENVIRONMENT` | 1 |
 | `BLOCKED_GOVERNING_SOURCE` | 1 |
-| `BLOCKED_OWNER` | 23 |
+| `BLOCKED_OWNER` | 25 |
 | `BLOCKED_UAT` | 3 |
-| `EVIDENCE_CLOSED` | 89 |
+| `EVIDENCE_CLOSED` | 93 |
 | `IMPLEMENTED_NOT_VERIFIED` | 23 |
-| `OPEN` | 16 |
+| `OPEN` | 10 |
 | **الجملة** | **156** |
 
 ## البنودُ غيرُ المغلقة — بحاجزِها وفعلِها التالي
@@ -54,15 +54,11 @@
 | `CL-FR-NAV-004` | `IMPLEMENTED_NOT_VERIFIED` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ 808a2c03 |  |
 | `CL-FR-NAV-006` | `IMPLEMENTED_NOT_VERIFIED` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ 808a2c03 |  |
 | `CL-FR-APP-012` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ 808a2c03 |  |
-| `CL-FR-GOV-007` | `OPEN` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=OPEN @ 808a2c03 |  |
-| `CL-FR-GOV-008` | `OPEN` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=OPEN @ 808a2c03 |  |
-| `CL-FR-GOV-010` | `OPEN` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=OPEN @ 808a2c03 |  |
-| `CL-FR-GOV-012` | `OPEN` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=OPEN @ 808a2c03 |  |
-| `CL-FR-GOV-014` | `OPEN` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=OPEN @ 808a2c03 |  |
+| `CL-FR-GOV-008` | `BLOCKED_OWNER` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | محجوب على قرار المالك لا هندسة @ ba23a05a |  |
 | `CL-R2-T13` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/REPAIR01_20260823/RPR02_TARGET_UNIVERSE.md | شاشة PLATFORM بلا تبرير منصي معتمد = 0 (المقيس 12) @ 808a2c03 |  |
 | `CL-R2-T16` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/REPAIR01_20260823/RPR02_TARGET_UNIVERSE.md | اسم معروض غير معتمد = 0 (المقيس 3 منها 2 PENDING_OWNER) @ 808a2c03 |  |
 | `CL-R3-M08` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/REPAIR01_20260823/RPR03_SCORECARD.md | أسطح PLATFORM بلا تبرير = 0 (المقيس 12) @ 808a2c03 |  |
-| `CL-R3-M11` | `OPEN` | P1 | — | docs/REPAIR01_20260823/RPR03_SCORECARD.md | قيود يدوية بلا مصدر = 0 (المقيس 1644) @ 808a2c03 |  |
+| `CL-R3-M11` | `BLOCKED_OWNER` | P1 | — | docs/REPAIR01_20260823/RPR03_SCORECARD.md | محجوب على OA-08 — والمواضع بنيويا جاهزة والناقص الملء @ cf1ea2a1 |  |
 | `CL-OA-01` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/REPAIR01_20260823/open/DEC-OPEN-15.md | قوائم تتبع الأصناف الثلاث: Lot · Serial · Expiry @ 808a2c03 | ينتظر بوابته — ولا يحجب إلا نطاقه |
 | `CL-OA-02` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/REPAIR01_20260823/open/DEC-OPEN-16.md | من يملك التحقيق؟ (الحوكمة أم المراجعة الداخلية) @ 808a2c03 | ينتظر بوابته — ولا يحجب إلا نطاقه |
 | `CL-OA-03` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/REPAIR01_20260823/open/W135_OWNER_DECISIONS.md §② | من يملك Entity Routing Registry وكتالوج أنواع الطلب؟ @ 808a2c03 | ينتظر بوابته — ولا يحجب إلا نطاقه |
@@ -140,6 +136,10 @@
 | `CL-FR-DAT-006` |  |
 | `CL-FR-GOV-002` |  |
 | `CL-FR-EVT-008` |  |
+| `CL-FR-GOV-007` | gov007 witness 5/5 · Commit=ba23a05a @ ba23a05a |
+| `CL-FR-GOV-010` | gov010 witness 9/9 (سالب حي) · Commit=ba23a05a @ ba23a05a |
+| `CL-FR-GOV-012` | gov012 witness 6/6 — مناقض=0 من 13 والسالب يعض · Commit=bf99b4bc @ bf99b4bc |
+| `CL-FR-GOV-014` | gov014 witness 4/4 — بوابة 4/4 + DR-2026-0004 غير متقادم · Commit=bf99b4bc @ bf99b4bc |
 | `CL-FR-GOV-016` | permission_gate 7/7 + extraction 2/2 @ 747cfbe7 — صفر سقاطة راسبة على تحسن @ 012c4db7 |
 | `CL-R2-T01` | tools/rpr02_acceptance_scorecard.php @ 808a2c03 |
 | `CL-R2-T02` | tools/rpr02_acceptance_scorecard.php @ 808a2c03 |

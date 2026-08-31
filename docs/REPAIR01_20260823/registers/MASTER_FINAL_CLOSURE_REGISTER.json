@@ -1,7 +1,7 @@
 {
     "meta": {
-        "snapshot": "ba23a05a",
-        "updated_at": "2026-08-31 13:20",
+        "snapshot": "cf1ea2a1",
+        "updated_at": "2026-08-31 13:21",
         "governing_order": "docs\/REPAIR01_20260823\/orders\/CLOSURE_SYSTEM.txt"
     },
     "items": {
@@ -5082,7 +5082,7 @@
             "Domain": "RPR-03",
             "Target_ID": "M11",
             "Requirement_ID": "—",
-            "Current_Status": "OPEN",
+            "Current_Status": "BLOCKED_OWNER",
             "Priority": "P1",
             "Execution_Rank": 500,
             "Severity": "MEDIUM",
@@ -5100,10 +5100,10 @@
             "Estimated_Effort": "M",
             "Evidence_Contract": "tools\/rpr03_scorecard.php يبلغ المستهدف",
             "Next_Action": "",
-            "Current_Snapshot": "قيود يدوية بلا مصدر = 0 (المقيس 1644) @ 808a2c03",
-            "Last_Updated_Snapshot": "808a2c03",
-            "Last_Evidence_Ref": "tools\/rpr03_scorecard.php @ 808a2c03",
-            "Status_Changed_At": "2026-08-31 11:39 @ 808a2c03",
+            "Current_Snapshot": "محجوب على OA-08 — والمواضع بنيويا جاهزة والناقص الملء @ cf1ea2a1",
+            "Last_Updated_Snapshot": "cf1ea2a1",
+            "Last_Evidence_Ref": "rpr03_manual_entries: 1103 قيدا بلا فترة حاوية (الدفتر يغطي 2026 وحدها — انشاء السنوات فعل محاسبي OA-08) والمعتمد 0\/1644 لا يملا رجعيا @ cf1ea2a1",
+            "Status_Changed_At": "2026-08-31 13:21 @ cf1ea2a1",
             "Final_Disposition": "",
             "Levels": {
                 "Decision": "?",
@@ -6209,6 +6209,23 @@
             "Decision_Date": "",
             "Propagation_Status": "PENDING",
             "Source": "registers\/LEGACY_DISPOSITION_REGISTER.md"
+        },
+        "OA-08": {
+            "Owner_Action_ID": "OA-08",
+            "Decision_Question": "انشاء السنوات المالية التاريخية 2020-2025 بحالاتها وتواريخ اقفالها (فعل محاسبي يفك 1103 قيدا يدويا بلا فترة حاوية)",
+            "Decision_Type": "BUSINESS_ACCOUNTING_CONFIG",
+            "Affected_Targets": "RPR-03 M11",
+            "Affected_Domains": "RPR-03",
+            "What_It_Blocks": "CL-R3-M11 — حوكمة القيد اليدوي الارثي",
+            "Required_By_Gate": "unsupported manual journals = 0 (بوابة الاصدار)",
+            "Depends_On": "—",
+            "Options": "انشاء الفترات مقفلة تاريخيا او حكم PRE_GOVERNANCE موثق",
+            "Impact_Of_Each_Option": "الاولى تفك الفترة (541⇒1644 ملء) · الثانية تجمد القديم بحكم",
+            "Technical_Recommendation": "انشاء السنوات 2020-2025 بحالة locked وتواريخها الفعلية — والاعتماد الرجعي لا يملا (يبقى حكم PRE_GOVERNANCE للمعتمد)",
+            "Owner_Decision": "",
+            "Decision_Date": "",
+            "Propagation_Status": "PENDING",
+            "Source": "tools\/rpr03_manual_entries.php @ cf1ea2a1"
         }
     },
     "legacy": {
