@@ -1,7 +1,7 @@
 {
     "meta": {
-        "snapshot": "ec0aff80",
-        "updated_at": "2026-08-31 12:43",
+        "snapshot": "012c4db7",
+        "updated_at": "2026-08-31 12:44",
         "governing_order": "docs\/REPAIR01_20260823\/orders\/CLOSURE_SYSTEM.txt"
     },
     "items": {
@@ -3990,7 +3990,7 @@
             "Domain": "الحوكمة",
             "Target_ID": "GAP-10",
             "Requirement_ID": "FR-GOV-015",
-            "Current_Status": "OPEN",
+            "Current_Status": "EVIDENCE_CLOSED",
             "Priority": "P0",
             "Execution_Rank": 500,
             "Severity": "CRITICAL",
@@ -4009,10 +4009,10 @@
             "Evidence_Contract": "شاهدٌ في حزامِ tests\/injfrd01_belt.php",
             "Next_Action": "",
             "Current_Snapshot": "Closure_State=OPEN @ 808a2c03",
-            "Last_Updated_Snapshot": "808a2c03",
-            "Last_Evidence_Ref": "",
-            "Status_Changed_At": "2026-08-31 11:39 @ 808a2c03",
-            "Final_Disposition": "",
+            "Last_Updated_Snapshot": "012c4db7",
+            "Last_Evidence_Ref": "nine_channels 15\/15 @ 747cfbe7 — ACTIVE_SENSITIVE_FIELD_BYPASS=0 والسالب مثبت @ 012c4db7",
+            "Status_Changed_At": "2026-08-31 12:44 @ 012c4db7",
+            "Final_Disposition": "EVIDENCE_CLOSED",
             "Levels": {
                 "Decision": "?",
                 "Implementation": "?",
@@ -4029,7 +4029,7 @@
             "Domain": "الحوكمة",
             "Target_ID": "GAP-75",
             "Requirement_ID": "FR-GOV-016",
-            "Current_Status": "OPEN",
+            "Current_Status": "EVIDENCE_CLOSED",
             "Priority": "P1",
             "Execution_Rank": 500,
             "Severity": "HIGH",
@@ -4048,10 +4048,10 @@
             "Evidence_Contract": "شاهدٌ في حزامِ tests\/injfrd01_belt.php",
             "Next_Action": "",
             "Current_Snapshot": "Closure_State=OPEN @ 808a2c03",
-            "Last_Updated_Snapshot": "808a2c03",
-            "Last_Evidence_Ref": "",
-            "Status_Changed_At": "2026-08-31 11:39 @ 808a2c03",
-            "Final_Disposition": "",
+            "Last_Updated_Snapshot": "012c4db7",
+            "Last_Evidence_Ref": "permission_gate 7\/7 + extraction 2\/2 @ 747cfbe7 — صفر سقاطة راسبة على تحسن @ 012c4db7",
+            "Status_Changed_At": "2026-08-31 12:44 @ 012c4db7",
+            "Final_Disposition": "EVIDENCE_CLOSED",
             "Levels": {
                 "Decision": "?",
                 "Implementation": "?",
