@@ -1,7 +1,7 @@
 {
     "meta": {
-        "snapshot": "747cfbe7",
-        "updated_at": "2026-08-31 12:26",
+        "snapshot": "ec0aff80",
+        "updated_at": "2026-08-31 12:43",
         "governing_order": "docs\/REPAIR01_20260823\/orders\/CLOSURE_SYSTEM.txt"
     },
     "items": {
@@ -3756,7 +3756,7 @@
             "Domain": "الحوكمة",
             "Target_ID": "GAP-69",
             "Requirement_ID": "FR-GOV-009",
-            "Current_Status": "OPEN",
+            "Current_Status": "EVIDENCE_CLOSED",
             "Priority": "P0",
             "Execution_Rank": 500,
             "Severity": "CRITICAL",
@@ -3775,10 +3775,10 @@
             "Evidence_Contract": "شاهدٌ في حزامِ tests\/injfrd01_belt.php",
             "Next_Action": "",
             "Current_Snapshot": "Closure_State=OPEN @ 808a2c03",
-            "Last_Updated_Snapshot": "808a2c03",
-            "Last_Evidence_Ref": "",
-            "Status_Changed_At": "2026-08-31 11:39 @ 808a2c03",
-            "Final_Disposition": "",
+            "Last_Updated_Snapshot": "ec0aff80",
+            "Last_Evidence_Ref": "tests\/injfrd01_gov009_migration_ledger_gate.php 9\/9 — بوابة 4\/4 · غير مصالح=0 · السالب يرسب بالحقن · Commit=ec0aff80 @ ec0aff80",
+            "Status_Changed_At": "2026-08-31 12:43 @ ec0aff80",
+            "Final_Disposition": "EVIDENCE_CLOSED",
             "Levels": {
                 "Decision": "?",
                 "Implementation": "?",
