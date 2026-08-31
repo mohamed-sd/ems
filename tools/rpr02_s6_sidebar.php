@@ -416,8 +416,37 @@ if ($r) {
             'o' => ((int) $x['group_no'] * 1000) + (int) $x['item_no']);
     }
 }
-$F = array('ok' => 0, 'bad' => 0, 'nobridge' => 0, 'nogroup' => 0);
-$Frt = array(); $Fex = array(); $Fsrc = array('DECL' => 0, 'CANON' => 0, 'LEGACY' => 0);
+/* ⛔ **أمرُ SIDEBAR_RENDER_FIX §٤·٥ — «المُصيَّرُ» من الشجرةِ فعلًا لا من
+   محاكاةِ أسبقيّةٍ**: المحاكاةُ السابقةُ (إعلانٌ⇐معتمَدٌ⇐إرثٌ) أثبتت التجربةُ
+   ⑧ خطأَها — `nav_canonical.group_name` عمودٌ ميّتٌ تصييرًا ورأسُ غيرِ
+   المُعلَنِ من `nav_route_group` (التجربة ⑦). فتُصيَّر شجرةُ كلِّ دورٍ
+   بعمليّةٍ نقيّةٍ (`tools/lib/render_role_cli.php` — غلافُ
+   `uxp_render_role_html`) ويُقرأ رأسُ كلِّ بندٍ منها حرفًا.
+   «لا يُقاس سطحٌ بما في جدولِه — بل بما يظهر للمستخدمِ في جلستِه.» */
+$roleUid = array();
+$r = $q("SELECT CAST(u.role AS UNSIGNED) rid, MIN(u.id) uid FROM users u
+          WHERE u.company_id = 4 GROUP BY rid");
+while ($x = $r->fetch_assoc()) { $roleUid[(int) $x['rid']] = (int) $x['uid']; }
+$rendered = array();   // rid => base => group
+$ridsSeen = array();
+foreach ($items as $it) { $ridsSeen[(int) $it['role_id']] = 1; }
+foreach (array_keys($ridsSeen) as $rid0) {
+    if (!isset($roleUid[$rid0])) { continue; }
+    $o0 = array();
+    @exec('"' . PHP_BINARY . '" ' . escapeshellarg($ROOT . '/tools/lib/render_role_cli.php')
+        . ' ' . $rid0 . ' ' . $roleUid[$rid0] . ' 2>NUL', $o0);
+    $j0 = json_decode(implode('', $o0), true);
+    if (!is_array($j0)) { continue; }
+    foreach ($j0['positions'] as $p0) {
+        $b0 = strtolower(preg_replace('~[?#].*$~', '', preg_replace('~^(\.\./)+~', '', trim((string) $p0['h']))));
+        if ($b0 !== '' && !isset($rendered[$rid0][$b0])) {
+            $rendered[$rid0][$b0] = array('g' => (string) $p0['g'],
+                                          's' => isset($p0['s']) ? (string) $p0['s'] : '');
+        }
+    }
+}
+$F = array('ok' => 0, 'bad' => 0, 'nobridge' => 0, 'nogroup' => 0, 'notrendered' => 0);
+$Frt = array(); $Fex = array();
 foreach ($items as $it) {
     $rid = (int) $it['role_id'];
     $b   = strtolower(trim(preg_replace('~[?#].*$~', '', (string) $it['route']), '/'));
@@ -426,16 +455,18 @@ foreach ($items as $it) {
     if ($rq === '' || !isset($specByReq[$rq])) { $F['nobridge']++; continue; }
     $sp = $specByReq[$rq];
     if (trim((string) $sp['group_name']) === '') { $F['nogroup']++; continue; }
-    $dc = isset($declByRole[$rid][$b]) ? $declByRole[$rid][$b] : null;
-    $cn = isset($canon[$b]) ? $canon[$b] : null;
-    if ($dc) { $shown = $dc['g']; $Fsrc['DECL']++; }
-    elseif ($cn && trim((string) $cn['group_name']) !== '') { $shown = $cn['group_name']; $Fsrc['CANON']++; }
-    else { $shown = (string) $it['group_name']; $Fsrc['LEGACY']++; }
-    if ($norm($shown) === $norm($sp['group_name'])) { $F['ok']++; }
+    if (!isset($rendered[$rid][$b])) { $F['notrendered']++; continue; }
+    $shownG = $rendered[$rid][$b]['g'];
+    $shownS = $rendered[$rid][$b]['s'];
+    /* مجموعةُ الملفِّ قد تُصيَّر عنوانًا فرعيًّا داخل رأسِ الطيِّ او رأسًا —
+       والمطابقةُ تصحُّ على ايِّهما ظهرت فيه فعلًا */
+    $spn = $norm($sp['group_name']);
+    if ($spn === $norm($shownS) || $spn === $norm($shownG)) { $F['ok']++; }
     else {
         $F['bad']++; $Frt[$b] = 1;
         if (count($Fex) < 10) {
-            $Fex[] = $b . ' مُصيَّرٌ «' . $shown . '» · والملفُّ «' . $sp['group_name'] . '» [' . $sp['unit'] . ']';
+            $Fex[] = 'دور ' . $rid . ' · ' . $b . ' مُصيَّرٌ «' . $shownG . ($shownS !== '' ? ' ▸ ' . $shownS : '')
+                   . '» · والملفُّ «' . $sp['group_name'] . '» [' . $sp['unit'] . ']';
         }
     }
 }
@@ -485,9 +516,9 @@ echo "\n  ══ المُصيَّرُ مقابلَ **الملفِّ التصمي
 printf("     مطابقٌ **%d** · مخالفٌ **%d** (مساراتٌ فريدةٌ %d) · والمقامُ المقارَنُ %d\n",
        $F['ok'], $F['bad'], count($Frt), $Fden);
 printf("     ⛔ محجوبٌ على المصالحة `NO_BRIDGE` **%d** — لا سطحَ مطابَقًا فلا متطلبَ يُقاس عليه\n", $F['nobridge']);
-printf("     ◆ والملفُّ بلا مجموعةٍ لهذا المتطلب: %d\n", $F['nogroup']);
-printf("     ◆ مصدرُ المجموعةِ المُصيَّرة: إعلانٌ %d · معتمَدٌ %d · إرثٌ %d\n",
-       $Fsrc['DECL'], $Fsrc['CANON'], $Fsrc['LEGACY']);
+printf("     ◆ والملفُّ بلا مجموعةٍ لهذا المتطلب: %d · وصفٌّ نشطٌ لا يُصيَّر: %d\n",
+       $F['nogroup'], $F['notrendered']);
+echo "     ◆ **المُصيَّرُ هنا من الشجرةِ فعلًا** (عمليّةٌ نقيّةٌ لكلِّ دور — أمرُ SIDEBAR_RENDER_FIX §٤·٥)\n";
 if ($Fex) {
     echo "\n     ── شواهدُ ──\n";
     foreach ($Fex as $x) { echo "       · $x\n"; }

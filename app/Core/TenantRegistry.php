@@ -99,6 +99,7 @@ class TenantRegistry
         /* CTL2 — تاريخُ تمريراتِ بوّابةِ الجاهزيّة: بياناتُ قياسِ حوكمةٍ
            عابرةٌ للمستأجرين بطبيعتِها (قِيس غيابُه في مصالحةِ «الثامنة») */
         'repair01_build_ready_history' => array('type' => self::T_GLOBAL, 'soft' => false),
+        'repair01_render_align' => array('type' => self::T_GLOBAL, 'soft' => false),
         'exec_approvals' => array('type' => self::T_TENANT, 'soft' => false),
         /* RPR-W15 — عائلتانِ من مكتبِ الرئيسِ كانتا **خارجَ السجلِّ** والمخطَّطُ
            يضمن فيهما `company_id` غيرَ قابلٍ للعدم: أي أنَّ المخطَّطَ كان يضمن ما

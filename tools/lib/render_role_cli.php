@@ -38,4 +38,25 @@ foreach ($pos as $p) {
                                 'h' => (string) $p['href']);
 }
 foreach ($shells as $s) { $out['shells'][] = $s; }
+
+/* العنوانُ الفرعيُّ (nav-subhead) الأقربُ فوق كلِّ رابطٍ — فمجموعاتُ الملفِّ
+   التصميميِّ عناوينُ فرعيّةٌ داخل رؤوسِ الطيِّ لا الرؤوسُ نفسُها. يُمسح
+   HTML تسلسليًّا: رأسُ طيٍّ يصفّر الفرعيَّ، وفرعيٌّ يعلَّم، ورابطٌ يُنسب. */
+$sub = array(); $curSub = '';
+if (preg_match_all('~<li class="nav-subhead"[^>]*><span>(.*?)</span>|<span class="nav-group-name">(.*?)</span>|<a[^>]+href="([^"]+)"~su', $html, $mm, PREG_SET_ORDER)) {
+    foreach ($mm as $m) {
+        if (isset($m[3]) && $m[3] !== '') {
+            $b = strtolower(preg_replace('~[?#].*$~', '', preg_replace('~^(\.\./)+~', '', trim(html_entity_decode($m[3])))));
+            if ($b !== '' && !isset($sub[$b])) { $sub[$b] = $curSub; }
+        } elseif (isset($m[2]) && $m[2] !== '') {
+            $curSub = '';                                    /* رأسُ طيٍّ جديدٌ يصفّر الفرعيّ */
+        } elseif (isset($m[1]) && $m[1] !== '') {
+            $curSub = trim(html_entity_decode(strip_tags($m[1])));
+        }
+    }
+}
+foreach ($out['positions'] as $i => $p) {
+    $b = strtolower(preg_replace('~[?#].*$~', '', preg_replace('~^(\.\./)+~', '', trim((string) $p['h']))));
+    $out['positions'][$i]['s'] = isset($sub[$b]) ? $sub[$b] : '';
+}
 echo json_encode($out, JSON_UNESCAPED_UNICODE), "\n";
