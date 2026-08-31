@@ -674,7 +674,7 @@ function uxuiDeclaredSections($conn, $roleId) {
     $rid = (int) $roleId;
     if (isset($byRole[$rid])) { return $byRole[$rid]; }
     $byRole[$rid] = array();
-    $res = @mysqli_query($conn, "SELECT route, group_ar, group_no, item_no
+    $res = @mysqli_query($conn, "SELECT route, group_ar, group_no, item_no, doc_code
                                    FROM gov_target_nav WHERE role_id = {$rid}");
     if ($res) {
         while ($row = mysqli_fetch_assoc($res)) {
@@ -686,6 +686,10 @@ function uxuiDeclaredSections($conn, $roleId) {
                 'g' => (string) $row['group_ar'],
                 'n' => (int) $row['group_no'],
                 'o' => ((int) $row['group_no'] * 1000) + (int) $row['item_no'],
+                /* SIDEBAR_DIRECTION_FIX: إعلانُ الورقةِ وحدَه يُرقّى بابًا —
+                   وإعلانُ محاذاةِ الملفِّ (`RENDER-ALIGN%`) عنوانٌ فرعيٌّ
+                   داخل بابِ تصنيفِه، فلا تنفجر الأبوابُ بعددِ مجموعاتِ الملفّ */
+                'p' => (strncmp((string) $row['doc_code'], 'RENDER-ALIGN', 12) !== 0) ? 1 : 0,
             );
         }
     }
@@ -929,7 +933,12 @@ function printEmsTenGroupNav($conn, $items, $uxMap, $uxCurMap, $basePrefix, $bad
     if (!empty($declSec)) {
         require_once __DIR__ . '/nav_icon_map.php';
         $gn = array();
-        foreach ($declSec as $d) { $gn[(int) $d['n']] = (string) $d['g']; }
+        /* SIDEBAR_DIRECTION_FIX §٢-②: الترقيةُ بابًا لإعلانِ الورقةِ وحدَه —
+           فمجموعاتُ الملفِّ المُحاذاةُ عناوينُ فرعيّةٌ لا أبواب (٣٧ ⇒ ≤٢٠) */
+        foreach ($declSec as $d) {
+            if (empty($d['p'])) { continue; }
+            $gn[(int) $d['n']] = (string) $d['g'];
+        }
         ksort($gn);
         $head = array(); $tail = $tax;
         if (isset($tax[$anchorHomeCode = (isset($tax['MINE']) ? 'MINE' : key($tax))])) {

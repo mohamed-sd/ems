@@ -445,6 +445,10 @@ foreach (array_keys($ridsSeen) as $rid0) {
         }
     }
 }
+/* ⛔ **أمرُ SIDEBAR_DIRECTION_FIX §٣·٤ و§٧ — الاتجاهُ يُعلَن**:
+   **المصدرُ الملفُّ التصميميُّ والمُصحَّحُ الشجرةُ المُصيَّرة.**
+   البسطُ ما ظهر مطابقًا للملفِّ · والمقامُ ما في الملفِّ منطبقًا على الدورِ
+   (صفُّ ملاحةٍ نشطٌ) — فبندُ ملفٍّ لا يُصيَّر **يُحسب على المقياسِ لا يُسقَط**. */
 $F = array('ok' => 0, 'bad' => 0, 'nobridge' => 0, 'nogroup' => 0, 'notrendered' => 0);
 $Frt = array(); $Fex = array();
 foreach ($items as $it) {
@@ -455,7 +459,7 @@ foreach ($items as $it) {
     if ($rq === '' || !isset($specByReq[$rq])) { $F['nobridge']++; continue; }
     $sp = $specByReq[$rq];
     if (trim((string) $sp['group_name']) === '') { $F['nogroup']++; continue; }
-    if (!isset($rendered[$rid][$b])) { $F['notrendered']++; continue; }
+    if (!isset($rendered[$rid][$b])) { $F['notrendered']++; $F['bad']++; $Frt[$b] = 1; continue; }
     $shownG = $rendered[$rid][$b]['g'];
     $shownS = $rendered[$rid][$b]['s'];
     /* مجموعةُ الملفِّ قد تُصيَّر عنوانًا فرعيًّا داخل رأسِ الطيِّ او رأسًا —
@@ -513,8 +517,10 @@ if ($LIST) {
 /* ── المُصيَّرُ مقابلَ الملفّ — سؤالُ §٥·٦ حرفًا ── */
 $Fden = $F['ok'] + $F['bad'];
 echo "\n  ══ المُصيَّرُ مقابلَ **الملفِّ التصميميّ** — وهو سؤالُ §٥·٦ حرفًا ══\n";
-printf("     مطابقٌ **%d** · مخالفٌ **%d** (مساراتٌ فريدةٌ %d) · والمقامُ المقارَنُ %d\n",
-       $F['ok'], $F['bad'], count($Frt), $Fden);
+echo "     ⛔ **الاتجاهُ مُعلَنٌ (SIDEBAR_DIRECTION_FIX §٧): المصدرُ الملفُّ التصميميُّ والمُصحَّحُ الشجرةُ** —\n";
+echo "        ومقياسٌ لا يُعلن اتجاهَه لا يُعتمد.\n";
+printf("     مطابقٌ **%d** · مخالفٌ **%d** (منه غيرُ مُصيَّرٍ %d · مساراتٌ فريدةٌ %d) · والمقامُ ما في الملفِّ منطبقًا %d\n",
+       $F['ok'], $F['bad'], $F['notrendered'], count($Frt), $Fden);
 printf("     ⛔ محجوبٌ على المصالحة `NO_BRIDGE` **%d** — لا سطحَ مطابَقًا فلا متطلبَ يُقاس عليه\n", $F['nobridge']);
 printf("     ◆ والملفُّ بلا مجموعةٍ لهذا المتطلب: %d · وصفٌّ نشطٌ لا يُصيَّر: %d\n",
        $F['nogroup'], $F['notrendered']);
