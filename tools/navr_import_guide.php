@@ -105,6 +105,7 @@ foreach ($spec as $code => $S) {
 
     /* ── المواضع — بترتيبِ الورقةِ داخل كلِّ مجموعة ──────────────────────── */
     $sortInGroup = array();
+    $seenRefs = array();
     foreach ($S['screens'] as $sc) {
         list($sid, $route, $how) = navr_resolve_screen($conn, $code, $sc['name'], $bridge);
         $state = isset($reqState[$sc['name']]) ? $reqState[$sc['name']] : '';
@@ -122,6 +123,7 @@ foreach ($spec as $code => $S) {
         $g = $sc['group'];
         $sortInGroup[$g] = ($sortInGroup[$g] ?? 0) + 1;
         $tref = $code . '·' . $sc['i'] . '·' . mb_substr($sc['name'], 0, 120);
+        $seenRefs[] = $tref;
         /* §١٩: هويّةُ الهدفِ الثابتة — NT-<code>-<nnn> بترتيبِ الورقة */
         $tid = 'NT-' . $code . '-' . str_pad((string) $sc['i'], 3, '0', STR_PAD_LEFT);
         if (!$APPLY) { continue; }
@@ -164,13 +166,29 @@ foreach ($spec as $code => $S) {
             }
         }
     }
+
+    /* ── كنسُ الجيلِ المتقادم (§١٩): مفتاحُ target_ref يحمل ترتيبَ الورقةِ،
+       فإذا أعادت حزمةٌ جديدةٌ الترقيمَ بقيت مراجعُ الجيلِ السابقِ صفوفًا
+       يتيمةً تضاعف المساحة. تُكنس صفوفُ GUIDE-IMPORT التي لم ترها هذه
+       التشغيلةُ — **والمحكومُ بحكمٍ لاحقٍ (source_ref غير GUIDE) لا يُمسّ**. */
+    if ($APPLY && count($seenRefs) > 0) {
+        $escFn = function ($s) use ($conn) { return $conn->real_escape_string((string) $s); };
+        $inList = "'" . implode("','", array_map($escFn, $seenRefs)) . "'";
+        $conn->query("DELETE FROM nav_placements
+            WHERE workspace_id = '" . $escFn($code) . "'
+              AND source_ref LIKE 'GUIDE-IMPORT%'
+              AND target_ref NOT IN ($inList)");
+        if ($conn->affected_rows > 0) {
+            $tot['pl_swept'] = ($tot['pl_swept'] ?? 0) + $conn->affected_rows;
+        }
+    }
 }
 
 echo "\n── الحصيلة ──\n";
 printf("  مساحاتٌ بورقة: %d · روابطُ دورٍ PRIMARY: %d · مجموعاتُ دورة: %d\n",
     $tot['ws'], $tot['roles'], $tot['groups']);
-printf("  مواضع: جديدٌ %d · مُحدَّثٌ %d · محفوظٌ بحكمٍ لاحقٍ %d\n",
-    $tot['pl_new'], $tot['pl_upd'], $tot['kept_ruled']);
+printf("  مواضع: جديدٌ %d · مُحدَّثٌ %d · محفوظٌ بحكمٍ لاحقٍ %d · مكنوسُ جيلٍ متقادمٍ %d\n",
+    $tot['pl_new'], $tot['pl_upd'], $tot['kept_ruled'], isset($tot['pl_swept']) ? $tot['pl_swept'] : 0);
 printf("  التصنيف: MENU_ITEM %d · TAB_CHILD %d · PROJECTION %d · NOT_BUILT %d\n",
     $tot['menu'], $tot['tab'], $tot['proj'], $tot['not_built']);
 printf("  ◆ مبنيٌّ بدفترِه ولم يُجسَر بالاسم (يُسمّى لا يُبتلع): %d\n", $tot['unres_built']);

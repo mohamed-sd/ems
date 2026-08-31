@@ -54,7 +54,10 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
 <?php
 $header_icon = 'fa fa-warehouse';
 $header_title_html = htmlspecialchars('المخازن وأنواعها', ENT_QUOTES, 'UTF-8');
-$header_actions = array();
+$header_actions = array(
+    array('href' => 'wh_custodians.php', 'icon' => 'fa fa-user-shield', 'label' => 'اسناد امناء المخازن',
+          'title' => 'سجل الاسناد التابع لسجل المخازن، الامين النافذ اليوم يشتق منه'),
+);
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 /* حزمةُ الحالاتِ الدنيا (بوابة ٩): تحميلٌ وفراغٌ وخطأٌ — مخفيةٌ افتراضًا */

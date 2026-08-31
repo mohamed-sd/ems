@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-31 20:57:16
--- الجداول: 995 · المناظير: 28
+-- المصدر: equipation_manage · التوليد: 2026-09-01 00:31:17
+-- الجداول: 997 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -8677,6 +8677,22 @@ CREATE TABLE `gov_related_party` (
   CONSTRAINT `chk_grp_intercompany` CHECK (`intercompany_flag` = 0 or `from_legal_entity_id` > 0 and `to_legal_entity_id` > 0 and `counterparty_entity_id` > 0 and `transaction_type` <> '')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='W14 GOV-11 - الطرف ذو العلاقة وتعامله موسوما بين الكيانات منذ انشائه';
 
+-- ── Table: gov_req_id_recon ──
+CREATE TABLE `gov_req_id_recon` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `pack_ref` varchar(60) NOT NULL COMMENT 'مرجعُ نسخةِ الحزمةِ المسبِّبة',
+  `unit` varchar(160) NOT NULL,
+  `old_id` varchar(32) DEFAULT NULL COMMENT 'NULL لهدفٍ جديدٍ لا سلفَ له',
+  `new_id` varchar(32) NOT NULL,
+  `surface_norm` varchar(255) NOT NULL COMMENT 'الاسمُ المطبَّعُ — مفتاحُ المزاوجةِ لا الرقم',
+  `kind` enum('UNCHANGED','SHIFTED','NEW_TARGET') NOT NULL,
+  `basis` varchar(400) NOT NULL,
+  `reconciled_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_pack_new` (`pack_ref`,`new_id`),
+  KEY `ix_old` (`old_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='م 121: مصالحةُ معرِّفاتِ المتطلّباتِ بين نسخِ الحزمةِ — بالاسمِ المطبَّعِ والحكمُ يُرحَّل لا يُدهَس';
+
 -- ── Table: gov_request_type ──
 CREATE TABLE `gov_request_type` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -13043,6 +13059,35 @@ CREATE TABLE `proc_wh_close` (
   UNIQUE KEY `uq_whclose` (`company_id`,`warehouse_id`,`period_ym`),
   CONSTRAINT `chk_whc_period` CHECK (`period_ym` <> '')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='WH-18 شهر × مخزن - اقفال واحد';
+
+-- ── Table: proc_wh_custodian ──
+CREATE TABLE `proc_wh_custodian` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'معرف الاسناد — يولده النظام',
+  `company_id` int(11) NOT NULL,
+  `warehouse_id` int(11) NOT NULL COMMENT 'كود المخزن — موروث من الاب ويقفل',
+  `employee_id` int(11) NOT NULL COMMENT 'مرجع الشخص بالموارد — من سجل الموظفين',
+  `assign_type` enum('أساسي','بديل','مؤقت بالإنابة','مناوب بوردية') NOT NULL,
+  `shift_name` enum('لا تنطبق','صباحية','مسائية','ليلية') NOT NULL DEFAULT 'لا تنطبق',
+  `date_from` date NOT NULL,
+  `date_to` date DEFAULT NULL,
+  `perm_scope` enum('استلام وصرف وجرد وتحويل','استلام وصرف فقط','جرد فقط','قراءة') NOT NULL,
+  `handover_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع محضر التسليم — يشتق عند الاقفال بتسليم',
+  `assign_state` enum('نافذ','منتهٍ بتسليم','منتهٍ بلا تسليم') NOT NULL DEFAULT 'نافذ',
+  `close_note` varchar(300) DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `data_state` enum('حي','ملغي بمرجع') NOT NULL DEFAULT 'حي',
+  `src_ref` varchar(120) NOT NULL DEFAULT '' COMMENT 'مرجع المصدر — من اي بوابة او استيراد جاء الصف',
+  PRIMARY KEY (`id`),
+  KEY `ix_pwc_wh` (`warehouse_id`,`assign_state`,`date_from`),
+  KEY `ix_pwc_emp` (`employee_id`),
+  KEY `ix_pwc_co` (`company_id`),
+  CONSTRAINT `fk_pwc_emp` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`),
+  CONSTRAINT `fk_pwc_wh` FOREIGN KEY (`warehouse_id`) REFERENCES `proc_warehouse` (`id`),
+  CONSTRAINT `chk_pwc_period` CHECK (`date_to` is null or `date_to` >= `date_from`),
+  CONSTRAINT `chk_pwc_closed_has_note` CHECK (`assign_state` = 'نافذ' or `close_note` is not null)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='WH-03 (حزمة -3): اسناد امناء المخازن — مخزن × شخص × فترة، والنافذ اليوم يشتق ولا يكتب';
 
 -- ── Table: processed_operations ──
 CREATE TABLE `processed_operations` (

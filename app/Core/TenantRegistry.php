@@ -584,6 +584,9 @@ class TenantRegistry
         'proc_transfer' => array('type' => self::T_TENANT, 'soft' => true),
         'proc_transfer_line' => array('type' => self::T_TENANT, 'soft' => false),
         'proc_wh_close' => array('type' => self::T_TENANT, 'soft' => false),
+        // GOV_EXEC · الحزمة -3 (هجرة 2028_02_06): إسناد أمناء المخازن — سجل
+        // تابع بفترته لسجل المخازن (WH-03 الجديد) يحمل company_id بنفسه.
+        'proc_wh_custodian' => array('type' => self::T_TENANT, 'soft' => false),
         // REPAIR01 · W11 (هجرة 2027_11_29): دفاترُ الكيانات — الماليةُ والخزينة.
         // كلُّها بياناتُ مستأجرٍ تحمل company_id غير قابلٍ للعدم (DEC-OPEN-03):
         // لا إقفالَ ولا قيدَ ولا فاتورةَ ولا حسابَ بنكيَّ بلا كيانٍ قانونيّ.

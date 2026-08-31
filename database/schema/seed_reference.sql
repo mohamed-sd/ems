@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — البذرة المرجعية (طبقتان)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-31 20:57:16
+-- المصدر: equipation_manage · التوليد: 2026-09-01 00:31:17
 -- ① عالمية: بنية متنكرة في هيئة بيانات — بدونها لا تنقل ولا صلاحيات.
 -- ② مستأجرة: مرجعية تحمل company_id — القيمة علامة نائبة يحقنها المثبت:
 --    {{COMPANY_ID}}
@@ -724,7 +724,8 @@ INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `group_id`, `is_li
 (896,'خريطة ترحيل الموردين','Suppliers/supplier_migration_map.php',2,NULL,0,0,'fa fa-map',36,'02 إدارة الموردين · SUP-36'),
 (897,'تقرير المراجعة والقبول','Suppliers/supplier_review_report.php',2,NULL,0,0,'fa fa-square-check',37,'02 إدارة الموردين · SUP-37'),
 (898,'مصادر القدرة والتكامل','Suppliers/supplier_capacity_integration.php',2,NULL,0,0,'fa fa-plug',29,'02 إدارة الموردين · SUP-29'),
-(899,'مصفوفة بنية الشيتات','Fleet/fleet_schema_matrix.php',3,NULL,0,0,'fa fa-table-cells',41,'04 إدارة الأسطول والأصول · FLEET-41');
+(899,'مصفوفة بنية الشيتات','Fleet/fleet_schema_matrix.php',3,NULL,0,0,'fa fa-table-cells',41,'04 إدارة الأسطول والأصول · FLEET-41'),
+(900,'إسناد أمناء المخازن','Procurement/wh_custodians.php',16,NULL,0,0,'fa fa-user-shield',3,'DEP-17');
 
 -- ── role_permissions ──
 DELETE FROM `role_permissions`;
@@ -4753,7 +4754,8 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (9715,10,899,1,0,0,0),
 (9716,11,899,1,0,0,0),
 (9717,27,55,1,1,1,1),
-(9718,1,56,1,0,0,0);
+(9718,1,56,1,0,0,0),
+(9719,25,900,1,1,1,0);
 
 -- ── link_groups ──
 DELETE FROM `link_groups`;
@@ -7753,7 +7755,8 @@ INSERT INTO `link_groups` (`id`, `name`, `group_code`, `owner_role_id`, `icon`, 
 (6491,'التاسيس المرجعي',NULL,25,'fa fa-folder',92,90,'التاسيس المرجعي',1,NULL),
 (6492,'اللوحه — خارج الدوره',NULL,28,'fa fa-folder',91,90,'اللوحه — خارج الدوره',1,NULL),
 (6493,'اللوحه — خارج الدوره',NULL,24,'fa fa-folder',91,90,'اللوحه — خارج الدوره',1,NULL),
-(6494,'الاحتياج والتغطيه',NULL,27,'fa fa-folder',92,90,'الاحتياج والتغطيه',1,NULL);
+(6494,'الاحتياج والتغطيه',NULL,27,'fa fa-folder',92,90,'الاحتياج والتغطيه',1,NULL),
+(6495,'مساحتي الشخصية',NULL,5,'fa fa-user',5,0,'مساحتي الشخصية',1,NULL);
 
 -- ── nav_items ──
 DELETE FROM `nav_items`;
@@ -10341,7 +10344,30 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (28842,1,'DAILY',5616,308,'تسجيل التايم شيت والإنتاج في الموقع','Timesheet/timesheet.php','fa fa-file',3001,NULL,'Timesheet/timesheet.php',1,'2026-08-31 18:25:47','2026-08-31 18:25:47'),
 (28843,24,'DAILY',6493,457,'حوكمة مركز البلاغات','Tickets/gov_dept_crp.php','fa fa-file',1001,NULL,'Tickets/gov_dept_crp.php',1,'2026-08-31 18:25:47','2026-08-31 18:25:47'),
 (28844,27,'DAILY',6494,555,'لوحة الاحتياج والتغطية','Workforce/wf_coverage.php','fa fa-file',2002,NULL,'Workforce/wf_coverage.php',1,'2026-08-31 18:25:47','2026-08-31 18:25:47'),
-(28845,27,'DAILY',5628,55,'احتياج القوى والتخطيط','Workforce/workforce_requirement.php','fa fa-file',2001,NULL,'Workforce/workforce_requirement.php',1,'2026-08-31 19:06:49','2026-08-31 19:06:49');
+(28845,27,'DAILY',5628,55,'احتياج القوى والتخطيط','Workforce/workforce_requirement.php','fa fa-file',2001,NULL,'Workforce/workforce_requirement.php',1,'2026-08-31 19:06:49','2026-08-31 19:06:49'),
+(28846,1,'DAILY',3314,182,'صفاتي والتبديل بينها','user_capacities.php','fa fa-id-badge',5,NULL,'user_capacities.php',1,'2026-08-31 21:37:03','2026-08-31 21:37:03'),
+(28847,2,'DAILY',3436,182,'صفاتي والتبديل بينها','user_capacities.php','fa fa-id-badge',5,NULL,'user_capacities.php',1,'2026-08-31 21:37:03','2026-08-31 21:37:03'),
+(28848,3,'DAILY',3515,182,'صفاتي والتبديل بينها','user_capacities.php','fa fa-id-badge',5,NULL,'user_capacities.php',1,'2026-08-31 21:37:03','2026-08-31 21:37:03'),
+(28849,4,'DAILY',3559,182,'صفاتي والتبديل بينها','user_capacities.php','fa fa-id-badge',5,NULL,'user_capacities.php',1,'2026-08-31 21:37:03','2026-08-31 21:37:03'),
+(28850,5,'HOME',6495,182,'صفاتي والتبديل بينها','user_capacities.php','fa fa-id-badge',5,NULL,'user_capacities.php',0,'2026-08-31 21:37:03','2026-08-31 21:38:11'),
+(28851,6,'DAILY',3270,182,'صفاتي والتبديل بينها','user_capacities.php','fa fa-id-badge',5,NULL,'user_capacities.php',1,'2026-08-31 21:37:03','2026-08-31 21:37:03'),
+(28852,12,'DAILY',3411,182,'صفاتي والتبديل بينها','user_capacities.php','fa fa-id-badge',5,NULL,'user_capacities.php',1,'2026-08-31 21:37:03','2026-08-31 21:37:03'),
+(28853,13,'DAILY',3335,182,'صفاتي والتبديل بينها','user_capacities.php','fa fa-id-badge',5,NULL,'user_capacities.php',1,'2026-08-31 21:37:03','2026-08-31 21:37:03'),
+(28854,15,'DAILY',3825,182,'صفاتي والتبديل بينها','user_capacities.php','fa fa-id-badge',5,NULL,'user_capacities.php',1,'2026-08-31 21:37:03','2026-08-31 21:37:03'),
+(28855,16,'DAILY',3384,182,'صفاتي والتبديل بينها','user_capacities.php','fa fa-id-badge',5,NULL,'user_capacities.php',1,'2026-08-31 21:37:03','2026-08-31 21:37:03'),
+(28856,17,'DAILY',3581,182,'صفاتي والتبديل بينها','user_capacities.php','fa fa-id-badge',5,NULL,'user_capacities.php',1,'2026-08-31 21:37:03','2026-08-31 21:37:03'),
+(28857,23,'DAILY',3371,182,'صفاتي والتبديل بينها','user_capacities.php','fa fa-id-badge',5,NULL,'user_capacities.php',1,'2026-08-31 21:37:03','2026-08-31 21:37:03'),
+(28858,24,'DAILY',3811,182,'صفاتي والتبديل بينها','user_capacities.php','fa fa-id-badge',5,NULL,'user_capacities.php',1,'2026-08-31 21:37:03','2026-08-31 21:37:03'),
+(28859,7,'DAILY',3292,182,'صفاتي والتبديل بينها','user_capacities.php','fa fa-id-badge',5,NULL,'user_capacities.php',1,'2026-08-31 21:37:03','2026-08-31 21:37:03'),
+(28860,8,'DAILY',3464,182,'صفاتي والتبديل بينها','user_capacities.php','fa fa-id-badge',5,NULL,'user_capacities.php',1,'2026-08-31 21:37:03','2026-08-31 21:37:03'),
+(28861,10,'DAILY',3537,182,'صفاتي والتبديل بينها','user_capacities.php','fa fa-id-badge',5,NULL,'user_capacities.php',1,'2026-08-31 21:37:03','2026-08-31 21:37:03'),
+(28862,11,'DAILY',3950,182,'صفاتي والتبديل بينها','user_capacities.php','fa fa-id-badge',5,NULL,'user_capacities.php',1,'2026-08-31 21:37:03','2026-08-31 21:37:03'),
+(28863,14,'DAILY',3353,182,'صفاتي والتبديل بينها','user_capacities.php','fa fa-id-badge',5,NULL,'user_capacities.php',1,'2026-08-31 21:37:03','2026-08-31 21:37:03'),
+(28864,18,'DAILY',3616,182,'صفاتي والتبديل بينها','user_capacities.php','fa fa-id-badge',5,NULL,'user_capacities.php',1,'2026-08-31 21:37:03','2026-08-31 21:37:03'),
+(28865,19,'DAILY',3651,182,'صفاتي والتبديل بينها','user_capacities.php','fa fa-id-badge',5,NULL,'user_capacities.php',1,'2026-08-31 21:37:03','2026-08-31 21:37:03'),
+(28866,20,'DAILY',3686,182,'صفاتي والتبديل بينها','user_capacities.php','fa fa-id-badge',5,NULL,'user_capacities.php',1,'2026-08-31 21:37:03','2026-08-31 21:37:03'),
+(28867,21,'DAILY',3721,182,'صفاتي والتبديل بينها','user_capacities.php','fa fa-id-badge',5,NULL,'user_capacities.php',1,'2026-08-31 21:37:03','2026-08-31 21:37:03'),
+(28868,22,'DAILY',3756,182,'صفاتي والتبديل بينها','user_capacities.php','fa fa-id-badge',5,NULL,'user_capacities.php',1,'2026-08-31 21:37:03','2026-08-31 21:37:03');
 
 -- ── nav_canonical ──
 DELETE FROM `nav_canonical`;
@@ -10904,7 +10930,9 @@ INSERT INTO `nav_canonical` (`id`, `route`, `canonical_ar`, `canonical_en`, `lev
 (5048,'Fleet/fleet_schema_matrix.php','مصفوفة بنية الشيتات',NULL,2,'العمليات','ط · المرجعيات والمصالحة',41,NULL,NULL,'APPROVED','APPROVED','CURRENT',NULL,'الدليل المعماري — FLEET-41 (04 إدارة الأسطول والأصول)','2026-08-30 22:55:26',NULL,1,'NAVIGATION_NAMING_POSITION',NULL,'اسمُ السطحِ ومجموعتُه وتسلسلُه من الملفِّ التصميميِّ حرفًا — FLEET-41',NULL,NULL,NULL,NULL,NULL,NULL,'2026-08-30 22:55:26',NULL,NULL,NULL,'SINGLE',NULL,'',NULL,'SCR-0816'),
 (5049,'suppliers/supplier_entitlements.php','استحقاقات الموردين',NULL,2,'العمليات','التشغيل',3008,NULL,NULL,'APPROVED','APPROVED','CURRENT',NULL,'الدليل المعماري — NAVR (ورقة الإدارة · طبقة المواضع)','2026-08-31 18:28:30',NULL,1,'NAVIGATION_NAMING_POSITION',NULL,'اسم السجل المعياري ومجموعته وترتيبه من ورقة الدليل عبر nav_placements — NAVR',NULL,NULL,NULL,NULL,NULL,NULL,'2026-08-31 18:28:30',NULL,NULL,NULL,'SINGLE',NULL,'',NULL,'SCR-0578'),
 (5050,'transport/transfer_order_form.php','أمر الترحيل',NULL,2,'العمليات','دوره الترحيل',2002,NULL,NULL,'APPROVED','APPROVED','CURRENT',NULL,'الدليل المعماري — NAVR (ورقة الإدارة · طبقة المواضع)','2026-08-31 18:28:30',NULL,1,'NAVIGATION_NAMING_POSITION',NULL,'اسم السجل المعياري ومجموعته وترتيبه من ورقة الدليل عبر nav_placements — NAVR',NULL,NULL,NULL,NULL,NULL,NULL,'2026-08-31 18:28:30',NULL,NULL,NULL,'SINGLE',NULL,'',NULL,'SCR-0618'),
-(5052,'risk/risk_dept_ceo.php','المخاطر المؤسسية',NULL,2,'العمليات','اللوحه — خارج الدوره',1001,NULL,NULL,'APPROVED','APPROVED','CURRENT',NULL,'الدليل المعماري — NAVR (ورقة الإدارة · طبقة المواضع)','2026-08-31 18:28:30',NULL,1,'NAVIGATION_NAMING_POSITION',NULL,'اسم السجل المعياري ومجموعته وترتيبه من ورقة الدليل عبر nav_placements — NAVR',NULL,NULL,NULL,NULL,NULL,NULL,'2026-08-31 18:28:30',NULL,NULL,NULL,'SINGLE',NULL,'',NULL,'SCR-0532');
+(5052,'risk/risk_dept_ceo.php','المخاطر المؤسسية',NULL,2,'العمليات','اللوحه — خارج الدوره',1001,NULL,NULL,'APPROVED','APPROVED','CURRENT',NULL,'الدليل المعماري — NAVR (ورقة الإدارة · طبقة المواضع)','2026-08-31 18:28:30',NULL,1,'NAVIGATION_NAMING_POSITION',NULL,'اسم السجل المعياري ومجموعته وترتيبه من ورقة الدليل عبر nav_placements — NAVR',NULL,NULL,NULL,NULL,NULL,NULL,'2026-08-31 18:28:30',NULL,NULL,NULL,'SINGLE',NULL,'',NULL,'SCR-0532'),
+(5055,'user_capacities.php','صفاتي والتبديل بينها',NULL,2,'العمليات','مساحتي الشخصية',-8997,NULL,NULL,'APPROVED','APPROVED','CURRENT',NULL,'مواصفة مساحة عملي (WS-MY) — NAVR','2026-08-31 21:37:03',NULL,1,'NAVIGATION_NAMING_POSITION',NULL,'ورقة WS-MY·6 عبر nav_placements — NAVR',NULL,NULL,NULL,NULL,NULL,NULL,'2026-08-31 21:37:03',NULL,NULL,NULL,'SINGLE',NULL,'',NULL,'SCR-0625'),
+(5056,'Procurement/wh_custodians.php','إسناد أمناء المخازن',NULL,2,'العمليات','التأسيس المرجعي',3,NULL,NULL,'APPROVED','APPROVED','DEPLOYED',NULL,'الدليل المعماري -3 · ورقة 17 · الشاشة 3 — GOV_EXEC (2026-09-01)',NULL,NULL,1,'NAVIGATION_NAMING_POSITION',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2026-09-01 00:26:16',NULL,NULL,NULL,'SINGLE',NULL,'',NULL,'');
 
 -- ── equipments_types ──
 DELETE FROM `equipments_types`;
