@@ -168,6 +168,26 @@ $TBL = array();
 $q = $conn->query("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE()");
 while ($q && ($z = $q->fetch_row())) { $TBL[strtolower($z[0])] = 1; }
 
+/* ═══ الجسرُ الرابع M4 — سلسلةُ المتطلبِ الصريحة (⛔ وليس اسمًا رابعًا يُخترع):
+   المتطلبُ المطابقُ للسطحِ في الكونِ (`MATCHED`) رُبط بآلتِه بقناةِ مرجعٍ
+   صريحٍ محكومةٍ (`repair01_requirements.sm_model_ref` — ستُّ قنواتٍ كلُّها
+   استشهادٌ لا تسمية)، والأمرُ الحاكمُ يوجب التطبيقَ الرجعيَّ على المبنيّ.
+   فالسطحُ يرث مرجعَ متطلبِه **بالسلسلةِ لا بالاسم** — وشاهدُه يذكرها. */
+$reqChain = array();
+$q = $conn->query("SELECT u.screen_id, r.requirement_id, r.sm_model_ref
+                     FROM repair01_target_universe u
+                     JOIN repair01_requirements r ON r.requirement_id = u.requirement_id
+                    WHERE u.verdict = 'MATCHED' AND COALESCE(r.sm_model_ref,'') <> ''");
+while ($q && ($z = $q->fetch_assoc())) {
+    /* سطحٌ طابقه متطلبان مربوطان بآلتَين مختلفتَين = التباسٌ يُعلَن لا يُحسم */
+    $sidk = (string) $z['screen_id'];
+    if (isset($reqChain[$sidk]) && $reqChain[$sidk]['ref'] !== (string) $z['sm_model_ref']) {
+        $reqChain[$sidk] = array('ref' => '', 'req' => $reqChain[$sidk]['req'] . '+' . $z['requirement_id']);
+        continue;
+    }
+    $reqChain[$sidk] = array('ref' => (string) $z['sm_model_ref'], 'req' => (string) $z['requirement_id']);
+}
+
 /* ═══ ⑤ المدى — أسطحُ المعاملاتِ الحقيقيّة ══════════════════════════════ */
 $LIVE = "repair01_screen_registry WHERE on_disk = 1 AND ownership_verdict <> 'RETIRE'
          AND grain_cardinality IN ('ROW','LINE') AND grain_fact_scope = 'OWN_FACT'";
@@ -176,16 +196,33 @@ $q = $conn->query("SELECT screen_id, canonical_label_ar, owner_code, grain_entit
                      FROM $LIVE ORDER BY grain_entity, screen_id");
 while ($q && ($z = $q->fetch_assoc())) { $rows[] = $z; }
 
-$stat = array('M1_EXACT' => 0, 'M2_PLURAL' => 0, 'M3_SINGULAR' => 0, 'BACKLOG' => 0, 'NO_TABLE' => 0);
+$stat = array('M1_EXACT' => 0, 'M2_PLURAL' => 0, 'M3_SINGULAR' => 0, 'M4_CHAIN' => 0, 'BACKLOG' => 0, 'NO_TABLE' => 0);
 $plan = array(); $gapEnt = array(); $hitEnt = array();
+/* غلافُ الجسرِ الرابع — يُجرَّب حيث سقطت جسورُ الاسمِ الثلاثة */
+$m4 = function ($x) use (&$reqChain, &$stat, &$plan, $sid) {
+    $k = (string) $x['screen_id'];
+    if (!isset($reqChain[$k]) || $reqChain[$k]['ref'] === '') { return false; }
+    $ch = $reqChain[$k];
+    $stat['M4_CHAIN']++;
+    $plan[] = array('id' => $x['screen_id'], 'ref' => $ch['ref'],
+        'ent' => strtolower(trim((string) $x['grain_entity'])), 'rule' => 'M4_CHAIN',
+        'wit' => 'M4_CHAIN · متطلبُ هذا السطحِ المطابقُ في الكونِ (`' . $ch['req'] . '` — حكمُ '
+               . '`MATCHED` بشاهدِه) **مربوطٌ بآلتِه بقناةِ مرجعٍ صريحٍ محكومةٍ** '
+               . '(`repair01_requirements.sm_model_ref` = `' . $ch['ref'] . '` وشاهدُ قناتِه في '
+               . '`sm_witness`)، والأمرُ الحاكمُ يوجب التطبيقَ الرجعيَّ على المبنيِّ — '
+               . '**فالسطحُ يرث المرجعَ بالسلسلةِ لا بالاسم** · لقطة ' . $sid);
+    return true;
+};
 foreach ($rows as $x) {
     $ent = strtolower(trim((string) $x['grain_entity']));
     if ($ent === '' || !isset($TBL[$ent])) {
+        if ($m4($x)) { continue; }
         $stat['NO_TABLE']++;
         continue;
     }
     $b = sm_bridge($ent, $models);
     if ($b['rule'] === '') {
+        if ($m4($x)) { continue; }
         $stat['BACKLOG']++;
         $gapEnt[$ent] = isset($gapEnt[$ent]) ? $gapEnt[$ent] + 1 : 1;
         continue;
@@ -209,7 +246,7 @@ foreach ($rows as $x) {
 
 /* ═══ ⑥ العرض ════════════════════════════════════════════════════════════ */
 $N = count($rows);
-$bound = $stat['M1_EXACT'] + $stat['M2_PLURAL'] + $stat['M3_SINGULAR'];
+$bound = $stat['M1_EXACT'] + $stat['M2_PLURAL'] + $stat['M3_SINGULAR'] + $stat['M4_CHAIN'];
 echo "\n═══ `RPR-02` #٤ — ربطُ المعاملةِ بآلةِ حالتِها ═══\n";
 printf("  اللقطة: %s · أسطحُ المعاملاتِ الحقيقيّة: **%d**\n", $sid, $N);
 printf("  آلاتُ حالةٍ مؤلَّفةٌ في جداولِ الموجات: **%d** كيانًا\n\n", count($models));
@@ -217,6 +254,7 @@ echo "  ── قواعدُ الجسرِ الثلاث ──\n";
 printf("     M1 `EXACT`     %4d سطحًا — الاسمان متطابقان حرفًا\n", $stat['M1_EXACT']);
 printf("     M2 `PLURAL`    %4d سطحًا — الجدولُ جمعٌ والآلةُ مفردٌ\n", $stat['M2_PLURAL']);
 printf("     M3 `SINGULAR`  %4d سطحًا — الجدولُ مفردٌ والآلةُ جمعٌ\n", $stat['M3_SINGULAR']);
+printf("     M4 `CHAIN`     %4d سطحًا — يرث مرجعَ متطلبِه المطابقِ المربوطِ بقناةٍ صريحة\n", $stat['M4_CHAIN']);
 printf("     ⛔ `BACKLOG`   %4d سطحًا على **%d** كيانًا — **لا آلةَ مؤلَّفة**\n",
        $stat['BACKLOG'], count($gapEnt));
 printf("     ◆ كيانٌ لا جدولَ له %2d سطحًا — ⛔ **ولا يُربط بما لا وجودَ له**\n", $stat['NO_TABLE']);
