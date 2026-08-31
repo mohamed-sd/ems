@@ -1,0 +1,3350 @@
+[
+    {
+        "no": 1,
+        "group": "التأسيس",
+        "title": "سجل الممولين",
+        "purpose": "Master الممولين — 50 مرتبين بالأقدمية: الممول الأقدم أولا (أقدم",
+        "grain": "ممول واحد",
+        "source": "مصدر الحقيقة: إدارة التمويل · الإدارة المالكة: إدارة التمويل · نوع الشاشة: Master",
+        "declared": 30,
+        "fields": [
+            {
+                "name": "كود الممول · Financier_ID",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "رقم الممول بالمصدر (ل02) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "الاسم القانوني",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نوع الممول",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "التصنيف العلائقي",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "شريحة الأهمية",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الدولة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "السجل التجاري",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة التأهيل والعناية",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "العملات ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "نماذج التمويل المقبولة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "بداية العلاقة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "آخر نشاط ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "مدة العلاقة (سنة) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "حالة العلاقة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مدير العلاقة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "هاتف المسؤول",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "بريد المسؤول",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "اتفاقية إطارية",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "سقف التمويل المعتمد",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "عدد العمليات ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "رأس المال الممول $ ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "رأس المال الممول QAR ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "رأس المال الممول SDG ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "الرصيد القائم $ ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "الأرباح التعاقدية $ ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "الحجية",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "حالة البيانات",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Source_Row_Ref",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 2,
+        "group": "التأسيس",
+        "title": "جهات اتصال الممولين والمفوض",
+        "purpose": "Child 1:N — أدوار ومفوضون متعددون عبر الزمن (50 قيدا ابتدائيا)",
+        "grain": "جهة اتصال\/مفوض واحد عبر الزمن",
+        "source": "مصدر الحقيقة: إدارة التمويل · الإدارة المالكة: إدارة التمويل · نوع الشاشة: Child Register",
+        "declared": 12,
+        "fields": [
+            {
+                "name": "كود الجهة · FCNT",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "كود الممول",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "اسم الممول (بحث)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "الاسم",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الدور",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مفوض توقيع؟",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الهاتف",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "البريد",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "سريان من",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "إلى",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الحالة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة البيانات",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            }
+        ]
+    },
+    {
+        "no": 3,
+        "group": "التأسيس",
+        "title": "وثائق التأهيل والعناية",
+        "purpose": "Child 1:N — لكل وثيقة رقم وإصدار وانتهاء وحالة تحقق مستقلة (50 ق",
+        "grain": "وثيقة تأهيل وعناية واحدة",
+        "source": "مصدر الحقيقة: التمويل+المالية · الإدارة المالكة: إدارة التمويل · نوع الشاشة: Child Register",
+        "declared": 10,
+        "fields": [
+            {
+                "name": "كود الوثيقة · FKYC",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "كود الممول",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "اسم الممول (بحث)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "نوع الوثيقة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رقم الوثيقة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "جهة الإصدار",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تاريخ الإصدار",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تاريخ الانتهاء",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة التحقق",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة البيانات",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            }
+        ]
+    },
+    {
+        "no": 4,
+        "group": "الدورة",
+        "title": "فرص واحتياجات التمويل",
+        "purpose": "132 حاجة أعيد بناؤها رجعيا — لكل عملية تاريخية حاجة سبقتها",
+        "grain": "حاجة تمويلية واحدة",
+        "source": "مصدر الحقيقة: إدارة التمويل · الإدارة المالكة: إدارة التمويل · نوع الشاشة: Transaction",
+        "declared": 26,
+        "fields": [
+            {
+                "name": "كود الحاجة · FNEED",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "كود العملية الناتجة",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "Selected_Financier_ID ◄ — نتيجة لاحقة بعد العروض والاختيار",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "Requesting_Department — الإدارة الطالبة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Requested_By — الطالب",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Required_By_Date",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Priority ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "Need_Approval — اعتماد الحاجة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Approved_Amount ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "اسم الممول (بحث)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "الأصل المطلوب",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "كود العين",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "القيمة (من العملية)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "العملة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نموذج التمويل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Need_Date",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Need_Must_Precede",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المشروع\/عقد العميل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "سبب الحاجة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Record_Basis",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Derivation_Rule",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Confidence",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Needs_Review",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "حالة البيانات",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Source_Row_Ref",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 5,
+        "group": "الدورة",
+        "title": "عروض التمويل والتفاوض",
+        "purpose": "العرض الفائز والتفاوض — 132 عرضا بطبقة Versioning حقيقية (نسخة\/",
+        "grain": "عرض تمويل واحد بطبقة إصدارات",
+        "source": "مصدر الحقيقة: إدارة التمويل · الإدارة المالكة: إدارة التمويل · نوع الشاشة: Transaction",
+        "declared": 32,
+        "fields": [
+            {
+                "name": "كود العرض · FOFR",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "كود الحاجة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "كود العملية الناتجة",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "كود الممول",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "اسم الممول (بحث)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "صفة العرض",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رقم النسخة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "النسخة الأساس",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "ما الذي تغير عن سابقتها",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "من اقترح التغيير",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تاريخ التغيير",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة التفاوض",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نموذج التمويل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رأس المال",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "العملة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نسبة الأرباح %",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "قيمة الأرباح",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المقدم",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المدة (شهر)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "عدد الأقساط",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "قيمة القسط",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الضمانات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تاريخ العرض",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Offer_Must_Precede",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "عروض المنافسين",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Record_Basis",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Derivation_Rule",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Confidence",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Needs_Review",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "حالة البيانات",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Source_Row_Ref",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 6,
+        "group": "الدورة",
+        "title": "مراجعة ما قبل التعاقد",
+        "purpose": "132 سجل مراجعة رجعيا — واقعة الاختيار مثبتة والتفاصيل NEEDS_SOU",
+        "grain": "مراجعة ما قبل التعاقد واحدة",
+        "source": "مصدر الحقيقة: الحوكمة+القانوني · الإدارة المالكة: إدارة التمويل · نوع الشاشة: Transaction",
+        "declared": 22,
+        "fields": [
+            {
+                "name": "كود المراجعة · FPCR",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "مرجع الحاجة + العرض المختار + مسودة العقد ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "كود الممول",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "اسم الممول (بحث)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "واقعة الاختيار والتعاقد",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "أهلية الممول",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "اكتمال المستندات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مراجعة النموذج",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مراجعة رأس المال والعائد",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مراجعة السداد والملكية",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الضمانات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المعالجة المحاسبية المطلوبة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المراجع",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المعتمد",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Review_Must_Precede",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Record_Basis",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Derivation_Rule",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Confidence",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Needs_Review",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "حالة البيانات",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Source_Row_Ref",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 7,
+        "group": "التعاقد",
+        "title": "سجل عقود التمويل",
+        "purpose": "167 عقدا (132 ضمنيا DERIVED + 35 بلا حركة) — العقد كيان مستقل",
+        "grain": "عقد تمويل واحد",
+        "source": "مصدر الحقيقة: إدارة التمويل · الإدارة المالكة: إدارة التمويل · نوع الشاشة: Transaction",
+        "declared": 29,
+        "fields": [
+            {
+                "name": "كود العقد · FCON",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "مصدر العقد",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مرجع العقد بالمصدر ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "المرجع الخارجي (رقم عقد الممول)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الكيان المتعاقد (الشركة)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رقم النسخة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تاريخ التوقيع",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "كود الممول",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "اسم الممول (بحث)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "نموذج التمويل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "العملة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رأس المال",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "بداية العقد ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "آخر حركة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "المدة (شهر)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "النهاية التعاقدية ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "حالة المستند",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة المراجعة القانونية",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "حالة الاعتماد",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "من اعتمد",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تاريخ الاعتماد",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "مرجع آخر ملحق نافذ ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "آلية الإنهاء\/الإقفال",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "عدد العمليات تحته ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "حالة العقد ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "الحجية",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "حالة البيانات",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Source_Row_Ref",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 8,
+        "group": "التعاقد",
+        "title": "بنود وشروط التمويل",
+        "purpose": "مصفوفة شروط العقد — كل عقد صف واحد وكل بند تعاقدي عمود مستقل (16",
+        "grain": "عقد واحد — كل بند تعاقدي عمود",
+        "source": "مصدر الحقيقة: إدارة التمويل · الإدارة المالكة: إدارة التمويل · نوع الشاشة: Child Register",
+        "declared": 24,
+        "fields": [
+            {
+                "name": "كود العقد · FCON",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "كود العملية",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "كود الممول",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "اسم الممول (بحث)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "نموذج التمويل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "العملة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "سريان من ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "رأس المال",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نسبة المقدم %",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "قيمة المقدم",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نسبة الأرباح %",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "قيمة الأرباح التعاقدية",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رسوم إدارية",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رسوم تأمين",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المدة (شهر)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نظام الأقساط",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "عدد الأقساط",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "قيمة القسط",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تحويل الملكية في نهاية التمويل — التفصيل ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "حفظ مستندات الملكية — التفصيل ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "الحجية",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "حالة البيانات",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Source_Row_Ref",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 9,
+        "group": "التعاقد",
+        "title": "مصفوفة الالتزامات التمويلية",
+        "purpose": "نظير م09 — لكل عقد صف ولكل التزام معياري عمود ▼ (166×25): القيمة",
+        "grain": "عقد واحد × مصفوفة الالتزامات (كل التزام عمود ▼)",
+        "source": "مصدر الحقيقة: إدارة التمويل · الإدارة المالكة: إدارة التمويل · نوع الشاشة: Child Register — مصفوفة",
+        "declared": 37,
+        "fields": [
+            {
+                "name": "كود العقد · FCON",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "كود الممول · Financier_ID",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "اسم الممول (بحث)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "نموذج التمويل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مستوى الحجية",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "توفير رأس المال ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "توقيت إتاحة التمويل ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "اختيار الأصل ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "اختيار البائع ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "دفع قيمة الأصل للبائع ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "التسليم والاستلام ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "الفحص والقبول ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "تسجيل الأصل ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "الترخيص ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "التأمين ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "رسوم التأمين ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "الضرائب والرسوم ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "التشغيل ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "الصيانة ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "قطع الغيار ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "مخاطر الهلاك والتلف ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "حفظ مستندات الملكية ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "الضمانات والرهن ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "مسؤولية التعطل وعدم الانتفاع ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "تحويل الملكية في نهاية التمويل ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "التسوية المبكرة ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "رسوم التمويل الإدارية ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "الإخطارات ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "توفير المستندات ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "إجراءات الإقفال ▼",
+                "type": "CONTROLLED",
+                "behaviour": "إلزامي — من قائمة محكومة"
+            },
+            {
+                "name": "تفصيل الحسم (المرجع بسجل البنود) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "عدد الالتزامات المحسومة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "حالة اكتمال المصفوفة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "مرجع العقد\/المادة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المعبئ",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تاريخ التعبئة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة البيانات",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            }
+        ]
+    },
+    {
+        "no": 10,
+        "group": "التعاقد",
+        "title": "عمليات التمويل",
+        "purpose": "132 عملية — القلب · بنسبة اكتمال الدورة المستندية لكل عملية",
+        "grain": "عملية تمويل واحدة",
+        "source": "مصدر الحقيقة: إدارة التمويل · الإدارة المالكة: إدارة التمويل · نوع الشاشة: Transaction — القلب",
+        "declared": 43,
+        "fields": [
+            {
+                "name": "كود العملية · FOP",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "كود العملية بالمصدر (ل03) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "كود العقد · FCON ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "كود الممول",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "اسم الممول (بحث)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "نموذج التمويل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "النموذج الاقتصادي (المصدر)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "العملة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تصنيف العين",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نوع العين",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "كود العين",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "أول حركة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "آخر حركة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "رأس المال المعتمد",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "مصدر رأس المال",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "قيمة شراء العين",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نسبة الممول في الأصل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نسبة المقدم",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "قيمة المقدم",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "إضافة رأس مال",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رسوم إدارية",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رسوم تأمين",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نسبة الأرباح",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "قيمة الأرباح التعاقدية",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "APR (المصدر)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المدة (شهر)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نظام الأقساط",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "عدد الأقساط",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "قيمة القسط",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الاستحقاق بالدفتر",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الدفعات بالدفتر",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "صفوف الدفتر",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "عدد تغيرات العقد ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "حالة اكتمال البيانات (المصدر)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الحالة التشغيلية ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "الحجية",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "حالة البيانات",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Source_Row_Ref",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نسبة اكتمال الدورة المستندية ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "حلقات الدورة المفقودة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "Asset_Sourcing_Mode",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "استثناء التسلسل ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            }
+        ]
+    },
+    {
+        "no": 11,
+        "group": "الأصول",
+        "title": "الأصول الممولة",
+        "purpose": "55 عينا — علاقة التمويل فقط؛ الماستر بالأسطول",
+        "grain": "عين ممولة واحدة — علاقة التمويل فقط (الماستر بالأسطول)",
+        "source": "مصدر الحقيقة: الأسطول (قراءة) · الإدارة المالكة: إدارة التمويل · نوع الشاشة: Child Register — علاقة",
+        "declared": 28,
+        "fields": [
+            {
+                "name": "كود العين (المرحلي)",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "كود الأصل بالأسطول · Asset_ID",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "تصنيف العين",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نوع العين",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الوصف",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "العمليات ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "عدد العمليات ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "الممولون ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "عدد الممولين ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "أول حركة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "آخر حركة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "التكلفة الأصلية",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "القيمة الدفترية الصافية",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة الأصل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة التشغيل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "ساعات التشغيل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نوع الملكية بالسجل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الملكية المعتمدة",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "إجمالي الحصص المسجلة (المصدر)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نوع الخلل (المصدر)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "اللوحة (قراءة) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "الشاسيه (قراءة) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "المعالجة المحاسبية (المصدر)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الحجية",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "حالة البيانات",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Source_Row_Ref",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Asset_Sourcing_Mode",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            }
+        ]
+    },
+    {
+        "no": 12,
+        "group": "الأصول",
+        "title": "حصص الملكية وحق الانتفاع",
+        "purpose": "62 حصة زمنية بفحص تغطية حي — لا Snapshot",
+        "grain": "حصة ملكية\/انتفاع زمنية واحدة",
+        "source": "مصدر الحقيقة: إدارة التمويل · الإدارة المالكة: إدارة التمويل · نوع الشاشة: Child Register",
+        "declared": 21,
+        "fields": [
+            {
+                "name": "كود الحصة",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "كود العين",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "وصف الأصل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "معرف العقد (المصدر)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الممول\/المالك",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "النموذج",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "النسبة المسجلة %",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "النسبة المعتمدة %",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "من",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "إلى (المسجل)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "إلى (المعتمد)",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "سبب الانتهاء",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رأس المال",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مستند البيع\/السند",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حكم المصدر",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مجموع الحصص عبر الزمن (المصدر)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "فحص التغطية الحي ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "الحجية",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "حالة البيانات",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Source_Row_Ref",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 13,
+        "group": "المالية",
+        "title": "جدول الأقساط والاستحقاقات",
+        "purpose": "822 قسطا مولدا (65 عملية بقاعدة معلنة) + 67 NEEDS_SOURCE — Schedule ≠ Actual Payment",
+        "grain": "قسط واحد",
+        "source": "مصدر الحقيقة: مشتق + العقد · الإدارة المالكة: إدارة التمويل · نوع الشاشة: Child Register — جدول",
+        "declared": 20,
+        "fields": [
+            {
+                "name": "كود القسط · FINS",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "كود العملية",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "رقم القسط",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تاريخ الاستحقاق ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "Principal_Due ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "Return_Due ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "Fee_Due",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Total_Due ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "العملة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Days_Overdue (للأفق) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "حالة القسط ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "تفكيك الأصل\/العائد",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Record_Basis",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Derivation_Rule",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Confidence",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Needs_Review",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "حالة البيانات",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Source_Row_Ref",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "استثناء التسلسل ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            }
+        ]
+    },
+    {
+        "no": 14,
+        "group": "المالية",
+        "title": "استحقاقات الممول",
+        "purpose": "ماذا يستحق الممول الآن؟ — 132 مشتقا من الجدول\/الدفتر مقابل المد",
+        "grain": "استحقاق ممول واحد — مشتق",
+        "source": "مصدر الحقيقة: مشتق · الإدارة المالكة: إدارة التمويل · نوع الشاشة: Derived View",
+        "declared": 16,
+        "fields": [
+            {
+                "name": "كود الاستحقاق · FENT",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "كود العملية",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "كود الممول",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "اسم الممول (بحث)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "العملة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المستحق حتى الأفق ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "المدفوع (الدفتر)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "صافي المستحق غير المسدد ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "أساس الاحتساب",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Record_Basis",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Derivation_Rule",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Confidence",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Needs_Review",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "حالة البيانات",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Source_Row_Ref",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 15,
+        "group": "المالية",
+        "title": "الإقفالات التعاقدية",
+        "purpose": "إقفال دورة الاستحقاق وفق العقد — Financier × عملية × فترة تعاقدي",
+        "grain": "إقفال تعاقدي واحد: ممول × عملية × فترة تعاقدية",
+        "source": "مصدر الحقيقة: مشتق + اعتماد · الإدارة المالكة: إدارة التمويل · نوع الشاشة: Periodic Register",
+        "declared": 33,
+        "fields": [
+            {
+                "name": "Close_ID",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "FOP_ID",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "FCON_ID",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Financier_ID",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "العملة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نوع الفترة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "بداية الفترة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نهاية الفترة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "شهر نهاية الفترة (وسم) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "Monthly_Close_ID ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "رصيد أصل افتتاحي ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "رصيد عائد افتتاحي ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "أصل مستحق بالفترة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "عائد مستحق بالفترة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "إجمالي مستحق الفترة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رسوم مستحقة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تعديلات معتمدة ±",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مدفوعات مخصصة للفترة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "رصيد أصل ختامي ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "رصيد عائد ختامي ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "إجمالي الرصيد الختامي ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "المتأخر من الفترة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "أيام التأخير ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "الاستحقاق التالي ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "حالة الإقفال",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المنشئ",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "المراجع",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "المعتمد",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "تاريخ الاعتماد",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "مرجع كشف الحساب",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة البيانات",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "اختبار الترحيل ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            }
+        ]
+    },
+    {
+        "no": 16,
+        "group": "المالية",
+        "title": "الإقفالات الشهرية وكشف الحس",
+        "purpose": "نظير م17 — Financier × عملية × شهر ميلادي × عملة (873 شهرا): رص",
+        "grain": "إقفال شهري واحد: ممول × عملية × شهر × عملة",
+        "source": "مصدر الحقيقة: مشتق + اعتماد · الإدارة المالكة: إدارة التمويل · نوع الشاشة: Periodic Register",
+        "declared": 26,
+        "fields": [
+            {
+                "name": "Monthly_Close_ID",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "FOP_ID",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "FCON_ID",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Financier_ID",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "العملة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الشهر المحاسبي",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "بداية الشهر",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نهاية الشهر",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رصيد أول الشهر ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "عدد الإقفالات التعاقدية بالشهر ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "الإقفالات التعاقدية (مراجع) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "المستحق خلال الشهر ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "المدفوعات الفعلية خلال الشهر",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المخصص خلال الشهر ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "دفعات مقدمة\/غير مخصصة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "المتأخر خلال الشهر ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "رصيد آخر الشهر ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "اختبار الترحيل الشهري ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "مطابقة كشف الممول",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة الإقفال الشهري",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المعد",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المراجع",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "المعتمد",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "تاريخ الاعتماد",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "حالة البيانات",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 17,
+        "group": "المالية",
+        "title": "أوامر الدفع والسداد الفعلي",
+        "purpose": "طبقة مزدوجة: السداد التاريخي HISTORICAL_AGGREGATE + بنية أمر الد",
+        "grain": "أمر دفع\/سداد فعلي واحد",
+        "source": "مصدر الحقيقة: التمويل؛ الصرف قراءة — طبقة تاريخية Legacy\/Migration: الصفوف المجمعة التاريخية للقراءة فقط؛ وأمر الدفع التشغيلي المستقبلي يبنى صافي الGrain عند التنفيذ ولا يرث هذا المزج · الإدارة المالكة: إدارة التمويل · نوع الشاشة: Transaction",
+        "declared": 24,
+        "fields": [
+            {
+                "name": "كود السداد",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "كود العملية",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "العملة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المبلغ المدفوع (مجمع)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "عدد صفوف الدفتر",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الفترة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "كود أمر الدفع · FPAYO",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "معتمد الأمر",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المرجع البنكي",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "أمر الدفع",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الحجية",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "حالة البيانات",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Source_Row_Ref",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تاريخ الطلب",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المبلغ المطلوب",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المبلغ المعتمد",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "حالة الأمر",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "معتمد الأمر (مستقبلي)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تاريخ التنفيذ الفعلي",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المبلغ المنفذ",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "البنك\/طريقة السداد",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مرجع الخزينة\/المالية",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة المطابقة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 18,
+        "group": "المالية",
+        "title": "تخصيص السداد على الأقساط",
+        "purpose": "نظير م27 — Payment × قسط × إقفال تعاقدي × إقفال شهري × مكون (87",
+        "grain": "سطر تخصيص واحد: دفعة × قسط × إقفال",
+        "source": "مصدر الحقيقة: المالية (قاعدة مالك) · الإدارة المالكة: إدارة التمويل · نوع الشاشة: Child Register",
+        "declared": 16,
+        "fields": [
+            {
+                "name": "كود التخصيص · FALC2",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "Payment_ID",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "FOP_ID",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "FINS_ID",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Contractual_Close_ID ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "Monthly_Close_ID ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "نوع المكون",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "العملة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المبلغ المخصص",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Outstanding قبل ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "تاريخ التخصيص",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "قاعدة التخصيص",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "علم تجاوز ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "حالة البيانات",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "اختبار Σ لكل دفعة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "اختبار ≤ المستحق ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            }
+        ]
+    },
+    {
+        "no": 19,
+        "group": "المالية",
+        "title": "توزيع السداد",
+        "purpose": "132 توزيعا: أصل أولا ثم العائد بسقف التعاقدي — والفائض فوق الا",
+        "grain": "توزيع سداد واحد لعملية",
+        "source": "مصدر الحقيقة: المالية · الإدارة المالكة: إدارة التمويل · نوع الشاشة: Derived View",
+        "declared": 15,
+        "fields": [
+            {
+                "name": "كود التوزيع",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "كود العملية",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "العملة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المدفوع الكلي",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "إلى رأس المال ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "إلى العائد ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "إلى رسوم\/أخرى ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "فائض فوق الالتزام التعاقدي ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "غير مصنف (رأس مال غير محدد) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "قاعدة التوزيع",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "اختبار Σ=المدفوع ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "الحجية",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "حالة البيانات",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Source_Row_Ref",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 20,
+        "group": "المالية",
+        "title": "رصيد رأس المال والعائد",
+        "purpose": "Derived Ledger حي — صفر إدخال يدوي",
+        "grain": "سطر رصيد حي واحد لعملية — مشتق كليا",
+        "source": "مصدر الحقيقة: مشتق كليا · الإدارة المالكة: إدارة التمويل · نوع الشاشة: Derived View — دفتر حي",
+        "declared": 14,
+        "fields": [
+            {
+                "name": "كود العملية · FOP",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "كود الممول",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "اسم الممول (بحث)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "العملة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "رأس المال المعتمد ◄",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "المسدد من الأصل ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "المتبقي من الأصل ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "العائد التعاقدي ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "المدفوع للعائد ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "المتبقي من العائد ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "إجمالي المدفوع (الدفتر) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "إجمالي الالتزام المتبقي ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "آخر حركة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "الحالة المالية ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            }
+        ]
+    },
+    {
+        "no": 21,
+        "group": "الحوكمة",
+        "title": "تعديلات التمويل وإعادة الجد",
+        "purpose": "187 Version مؤرخة — لا Overwrite",
+        "grain": "نسخة تعديل\/إعادة جدولة مؤرخة واحدة",
+        "source": "مصدر الحقيقة: العقود · الإدارة المالكة: إدارة التمويل · نوع الشاشة: Event Register — نسخ مؤرخة",
+        "declared": 24,
+        "fields": [
+            {
+                "name": "كود التعديل",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "الكود المرحلي",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "كود العملية",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "اسم الممول (بحث)",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "نموذج التمويل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "العملة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "سريان من",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "إلى",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "صفوف الدفتر",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "استحقاق $ بالفترة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "استحقاق QAR",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "استحقاق SDG",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "البند المتغير",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "القيمة السابقة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "القيمة الجديدة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الأثر على الأقساط",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نسخة الجدول الناتجة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "سبب التغيير",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مستند التغيير",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "من اعتمده",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الحجية",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "حالة البيانات",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Source_Row_Ref",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 22,
+        "group": "الحوكمة",
+        "title": "الانحرافات والمتأخرات",
+        "purpose": "284 انحرافا بمفاتيح مهيكلة (FOP\/FCON\/Financier\/المبلغ\/الاكتشاف\/",
+        "grain": "انحراف\/متأخرة واحدة",
+        "source": "مصدر الحقيقة: الحوكمة · الإدارة المالكة: إدارة التمويل · نوع الشاشة: Exception Register",
+        "declared": 27,
+        "fields": [
+            {
+                "name": "كود الانحراف",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "نوع الانحراف",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الوصف",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الخطورة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الحالة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الإجراء المطلوب",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "القرار",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المستند",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تاريخ الإغلاق",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "FOP_ID",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "FCON_ID",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Financier_ID",
+                "type": "REFERENCE",
+                "behaviour": "ربط بمرجعه — لا إدخال حر"
+            },
+            {
+                "name": "FINS_ID",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Close_ID",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "العملة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المبلغ\/الفرق",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تاريخ الاستحقاق",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تاريخ الاكتشاف",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Days_Overdue",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Aging_Bucket",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Owner",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Due_Date للإجراء",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Resolution_Ref",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الحجية",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "حالة البيانات",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Source_Row_Ref",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 23,
+        "group": "الأصول",
+        "title": "انتقال الملكية والخروج",
+        "purpose": "131 واقعة — انتهاء الرصيد ≠ انتقال الملكية",
+        "grain": "واقعة انتقال ملكية أو خروج واحدة",
+        "source": "مصدر الحقيقة: إدارة الأصول · الإدارة المالكة: إدارة التمويل · نوع الشاشة: Event Register",
+        "declared": 20,
+        "fields": [
+            {
+                "name": "كود الانتقال",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "النطاق",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "FOP_ID ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "FCON_ID ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "Financier_ID ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "كود العين\/الآلية",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "ترتيب الانتقال",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "من (المالك السابق)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "إلى (المالك الجديد)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الحصة %",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "التاريخ ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "قيمة البيع",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "العملة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نوع الخروج",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المستند",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الاعتماد",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الحجية",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "حالة البيانات",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "Source_Row_Ref",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 24,
+        "group": "الحوكمة",
+        "title": "إقفال التمويل",
+        "purpose": "Final Closeout معمق (132) — طلب\/فعلي\/آخر إقفال دوري\/آخر دفعة\/ال",
+        "grain": "إقفال نهائي واحد لعملية",
+        "source": "مصدر الحقيقة: الحوكمة · الإدارة المالكة: إدارة التمويل · نوع الشاشة: Transaction — إقفال نهائي",
+        "declared": 20,
+        "fields": [
+            {
+                "name": "كود العملية · FOP",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "العملة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المتبقي من الأصل ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "المتبقي من العائد ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "استحقاقات مفتوحة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "انحرافات غير محسومة (مرجع ت22)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حكم الملكية (مرجع ت12\/ت23)",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تسوية مبكرة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "حالة الإقفال ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "ملاحظات",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تاريخ طلب الإقفال",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تاريخ الإقفال الفعلي",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "آخر إقفال دوري ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "آخر دفعة ومرجعها",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "اكتمال نقل الملكية",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مرجع مستند الملكية",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "إخلاء الطرف\/شهادة الإقفال",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المراجع",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "المعتمد",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            },
+            {
+                "name": "تاريخ الاعتماد",
+                "type": "AUDIT",
+                "behaviour": "كتلة تدقيق — يملؤها النظام\/الحوكمة"
+            }
+        ]
+    },
+    {
+        "no": 25,
+        "group": "اللوحة — خارج الدورة",
+        "title": "التقارير ولوحة المحفظة",
+        "purpose": "مؤشرات حية بالعملات — لا إدخال يدوي",
+        "grain": "مؤشر محفظة واحد — مشتق",
+        "source": "مصدر الحقيقة: مشتق كليا · الإدارة المالكة: إدارة التمويل · نوع الشاشة: Dashboard",
+        "declared": 3,
+        "fields": [
+            {
+                "name": "المؤشر",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "القيمة ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            },
+            {
+                "name": "المعادلة\/المصدر",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 26,
+        "group": "المرجعيات",
+        "title": "القوائم وقاموس البيانات",
+        "purpose": "Dropdowns من مصدر واحد + قاموس الحقول",
+        "grain": "قائمة أو تعريف حقل واحد",
+        "source": "مصدر الحقيقة: الحوكمة · سطح توثيق مرجعي لا يظهر بندا في السايدبار: يقرأ عند البناء والمراجعة، ويستثنى من مصالحة الملاحة ومن مقام أسطح دورة العمل — وبيته الحاكم على مستوى المؤسسة سجلات الترميم لا الإدارة · الإدارة المالكة: إدارة التمويل · نوع الشاشة: Documentation Artifact — خارج السايدبار",
+        "declared": 24,
+        "fields": [
+            {
+                "name": "USD",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "مرابحة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "CONFIRMED_DOCUMENT",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Open",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "High",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "SUPPLIER",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "على الشركة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "بنك",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نشط",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مكتمل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مطروحة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مستلم",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "معتمد",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "نافذ",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مستحق تاريخيا",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "Direct",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "إعادة جدولة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "على الممول",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مقفلة — مغطاة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "مؤهلة للإقفال",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الشيت",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الحقل",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "النوع",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "تصنيف الفراغ (ما يعنيه الفراغ) ◄",
+                "type": "DERIVED",
+                "behaviour": "آلي — للقراءة فقط"
+            }
+        ]
+    },
+    {
+        "no": 27,
+        "group": "المرجعيات",
+        "title": "خريطة الترحيل ومصفوفة التسو",
+        "purpose": "Legacy Mapping (434 عمودا قديما) + Sheet Reconciliation (بنية",
+        "grain": "عمود قديم\/سطر تسوية واحد",
+        "source": "مصدر الحقيقة: هندسة النظم · سطح توثيق مرجعي لا يظهر بندا في السايدبار: يقرأ عند البناء والمراجعة، ويستثنى من مصالحة الملاحة ومن مقام أسطح دورة العمل — وبيته الحاكم على مستوى المؤسسة سجلات الترميم لا الإدارة · الإدارة المالكة: إدارة التمويل · نوع الشاشة: Documentation Artifact — خارج السايدبار",
+        "declared": 7,
+        "fields": [
+            {
+                "name": "#",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "النطاق",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "المصدر\/الشيت السابق",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "العمود\/الوصف",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الوجهة\/القرار",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "التصنيف",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "ملاحظة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    },
+    {
+        "no": 28,
+        "group": "التقارير",
+        "title": "تقرير المراجعة والإغلاق",
+        "purpose": "أرقام الإغلاق ال15 · الاختبارات · تصنيف الفراغات · نسب اكتمال ا",
+        "grain": "بند مراجعة\/إغلاق واحد",
+        "source": "مصدر الحقيقة: هندسة النظم · سطح توثيق مرجعي لا يظهر بندا في السايدبار: يقرأ عند البناء والمراجعة، ويستثنى من مصالحة الملاحة ومن مقام أسطح دورة العمل — وبيته الحاكم على مستوى المؤسسة سجلات الترميم لا الإدارة · الإدارة المالكة: إدارة التمويل · نوع الشاشة: Documentation Artifact — خارج السايدبار",
+        "declared": 5,
+        "fields": [
+            {
+                "name": "القسم",
+                "type": "SYSTEM",
+                "behaviour": "مفتاح — يولده النظام"
+            },
+            {
+                "name": "البند",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "القيمة\/النتيجة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "الحالة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            },
+            {
+                "name": "ملاحظة",
+                "type": "INPUT",
+                "behaviour": "إدخال — إلزامه بسياسة SCR-DES-01"
+            }
+        ]
+    }
+]
