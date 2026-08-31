@@ -69,13 +69,20 @@ $st->close();
 ok($inserted, 'أُنشئ مستهلكٌ اصطناعيٌّ موقوفٌ عمدًا', $pass, $fail, "cursor=0 · آخرُ تقدُّمٍ قبلَ " . ($stallSecs + 600) . "s");
 if (!$inserted) { sweep($conn, $FAMILY); exit(1); }
 
-/* ── الموزّعُ بمعالجٍ مسجَّلٍ للمِجَسِّ ومعالجَي الإنتاج ────────────────────── */
+/* ── الموزّعُ بمعالجٍ مسجَّلٍ للمِجَسِّ ومعالجاتِ الإنتاج ──────────────────────
+   ◆ **المحاكاةُ تُطابق تسجيلَ الإنتاجِ كاملًا** (CLOSURE_SYSTEM · SPRINT-02):
+     النسخةُ السابقةُ سجّلت معالجَين ونسيت `fx` بعدما وُصل في الإنتاج
+     (FINAL_CLOSE ⑨) — **فقرأت الملتحقَ يتيمًا وأنذرت عنه خطأً**، وتناقض
+     الفحصان ③ و⑥ في الشاهدِ نفسِه. فاليتيمُ يُثبَت بمِجَسٍّ اصطناعيٍّ أدناه
+     لا بمستهلكِ إنتاجٍ تتقادم عنه العُدّة. */
 $d = new \App\Core\EventDispatcher($conn);
 $noop = function () { return true; };
 $d->register($PROBE, $noop, 0);
 $d->register('finance', $noop, 0);
 require_once $ROOT . '/app/Services/Finance/RoutingConsumer.php';
 $d->register(\App\Services\Finance\RoutingConsumer::NAME, $noop, 0);
+require_once $ROOT . '/app/Services/Bus/Consumers/FxRealizationConsumer.php';
+$d->register(\App\Services\Bus\Consumers\FxRealizationConsumer::NAME, $noop, 0);
 
 /* ── ② الكشف ─────────────────────────────────────────────────────────────── */
 $found = array();
@@ -128,10 +135,19 @@ $q = $conn->query("SELECT COUNT(*) FROM `fin_notifications` WHERE `title` LIKE '
 $total = $q ? (int) $q->fetch_row()[0] : -1;
 ok($total === 1, 'نداءٌ ثانٍ داخلَ الساعةِ لم يُكرّر الإنذار', $pass, $fail, "الإجمالي={$total} · الجولةُ الثانية={$again}");
 
-/* ── ⑥ الكشفُ الحيُّ لليتامى — الحالةُ التي فاتت النظامَ تسعةَ أيام ────────── */
+/* ── ⑥ كشفُ اليتيمِ — بمِجَسٍّ اصطناعيٍّ لا بمستهلكِ إنتاج ──────────────────
+   ◆ كان الشاهدُ يُثبت اليتمَ بـ`fx` الحيِّ — **وقد وُصل `fx` بمعالجِه في
+     الإنتاجِ (FINAL_CLOSE ⑨) فصار الشاهدُ يقيس تقادمَ عُدّتِه هو**. فاليتيمُ
+     يُصنع صنعًا: صفٌّ مُفعَّلٌ بلا معالجٍ مسجَّلٍ في هذا الموزّع — ويُكنس
+     بعائلةِ المِجَسِّ نفسِها. */
+$ORPHAN_PROBE = $PROBE . '_orphan';
+$st = $conn->prepare("INSERT INTO `ems_event_consumers` (`consumer`,`enabled`,`cursor_event_id`,`updated_at`) VALUES (?, 1, 0, ?)");
+$st->bind_param('ss', $ORPHAN_PROBE, $oldStamp);
+$st->execute();
+$st->close();
 $orphans = array();
 foreach ($d->stalledConsumers() as $s) { if ($s['kind'] === 'orphan') { $orphans[] = $s['consumer']; } }
-ok(in_array('fx', $orphans, true), 'كُشف اليتيمُ الحيُّ «fx» — صفٌّ مُفعَّلٌ بلا معالج', $pass, $fail,
+ok(in_array($ORPHAN_PROBE, $orphans, true), 'كُشف اليتيمُ — صفٌّ مُفعَّلٌ بلا معالجٍ مسجَّل', $pass, $fail,
    'اليتامى: ' . (count($orphans) ? implode(' · ', $orphans) : 'لا شيء'));
 
 /* ── الكنسُ واستيثاقُ عدمِ الأثر ──────────────────────────────────────────── */

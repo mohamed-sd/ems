@@ -172,6 +172,83 @@ function xlsx_write($path, array $edits, $outPath = null)
 }
 
 /**
+ * يكتب خليّةً **ويُنشئها إن كانت غائبةً** في صفٍّ قائم — بموضعِها العموديِّ الصحيح.
+ * ═══════════════════════════════════════════════════════════════════════════
+ * ◆ **ولماذا دالّةٌ ثالثةٌ لا تخفيفُ حارسِ `xlsx_write()`**: حارسُها «لا كتابةَ
+ *   في العدم» مقصودٌ لكتابةِ قيمةٍ يُفترض وجودُها. أمّا ملءُ عمودٍ اختياريٍّ
+ *   فارغٍ في صفٍّ قائمٍ (كخانةِ `Evidence_Status` عند أوّلِ إغلاقٍ) فعملٌ
+ *   مشروعٌ آخرُ — **ويرفض هو الآخرُ صفًّا غيرَ موجود**: الإنشاءُ للخليّةِ
+ *   لا للصفّ.
+ *
+ * @return int عددُ الخلايا المكتوبة (قائمةً أو مُنشأة)
+ */
+function xlsx_write_or_create($path, array $edits, $outPath = null)
+{
+    $outPath = $outPath ?: $path;
+    /* أوّلًا: ما وُجد يُكتب بالحارسةِ الأصلية — والغائبُ يُجمَع ويُنشأ */
+    $z = new ZipArchive();
+    if ($z->open($path) !== true) { throw new RuntimeException('تعذّر فتحُ المصنَّف'); }
+    $names = array(); $rels = array();
+    $d = new DOMDocument(); $d->loadXML($z->getFromName('xl/workbook.xml'));
+    foreach ($d->getElementsByTagName('sheet') as $sh) {
+        $names[$sh->getAttribute('name')] = $sh->getAttributeNS(
+            'http://schemas.openxmlformats.org/officeDocument/2006/relationships', 'id');
+    }
+    $d = new DOMDocument(); $d->loadXML($z->getFromName('xl/_rels/workbook.xml.rels'));
+    foreach ($d->getElementsByTagName('Relationship') as $r) {
+        $rels[$r->getAttribute('Id')] = ltrim(str_replace('/xl/', '', $r->getAttribute('Target')), '/');
+    }
+    $entries = array();
+    for ($i = 0; $i < $z->numFiles; $i++) { $entries[$z->getNameIndex($i)] = $z->getFromIndex($i); }
+    $z->close();
+
+    $colNum = function ($letters) {
+        $n = 0;
+        foreach (str_split($letters) as $ch) { $n = $n * 26 + (ord($ch) - 64); }
+        return $n;
+    };
+    $written = 0;
+    foreach ($edits as $sheet => $cells) {
+        if (!isset($names[$sheet])) { throw new RuntimeException("ورقةٌ غيرُ موجودة: {$sheet}"); }
+        $file = 'xl/' . $rels[$names[$sheet]];
+        $xml = $entries[$file];
+        foreach ($cells as $ref => $val) {
+            if (!preg_match('~^([A-Z]+)(\d+)$~', $ref, $rm)) { throw new RuntimeException("مرجعٌ فاسد: {$ref}"); }
+            $esc = htmlspecialchars((string) $val, ENT_QUOTES | ENT_XML1, 'UTF-8');
+            $new = '<c r="' . $ref . '" t="inlineStr"><is><t xml:space="preserve">' . $esc . '</t></is></c>';
+            $pat = '~<c r="' . preg_quote($ref, '~') . '"(?:\s[^>]*)?(?:/>|>.*?</c>)~su';
+            if (preg_match($pat, $xml)) { $xml = preg_replace($pat, $new, $xml, 1); $written++; continue; }
+            /* الخليّةُ غائبة — تُنشأ داخل صفِّها القائمِ بترتيبِ عمودِها */
+            $rowPat = '~(<row[^>]*\br="' . $rm[2] . '"[^>]*>)(.*?)(</row>)~su';
+            if (!preg_match($rowPat, $xml, $rw, PREG_OFFSET_CAPTURE)) {
+                throw new RuntimeException("صفٌّ غيرُ موجودٍ — الإنشاءُ للخليّةِ لا للصفّ: {$sheet}!{$ref}");
+            }
+            $body = $rw[2][0];
+            $target = $colNum($rm[1]);
+            $insertAt = strlen($body);
+            if (preg_match_all('~<c r="([A-Z]+)' . $rm[2] . '"~', $body, $cm, PREG_OFFSET_CAPTURE)) {
+                foreach ($cm[1] as $k => $cc) {
+                    if ($colNum($cc[0]) > $target) { $insertAt = $cm[0][$k][1]; break; }
+                }
+            }
+            $newBody = substr($body, 0, $insertAt) . $new . substr($body, $insertAt);
+            $xml = substr($xml, 0, $rw[2][1]) . $newBody . substr($xml, $rw[2][1] + strlen($body));
+            $written++;
+        }
+        $entries[$file] = $xml;
+    }
+    $tmp = $outPath . '.tmp';
+    $z2 = new ZipArchive();
+    if ($z2->open($tmp, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+        throw new RuntimeException('تعذّر إنشاءُ الأرشيف');
+    }
+    foreach ($entries as $n => $data) { $z2->addFromString($n, $data); }
+    $z2->close();
+    if (!@rename($tmp, $outPath)) { @copy($tmp, $outPath); @unlink($tmp); }
+    return $written;
+}
+
+/**
  * يُلحق صفوفًا في آخرِ ورقة. $rows = array(array(colIndex => 'نص', …), …)
  * ═══════════════════════════════════════════════════════════════════════════
  * ◆ **ولماذا دالّةٌ ثانيةٌ لا توسيعُ `xlsx_write()`**: تلك تكتب في خليّةٍ قائمةٍ

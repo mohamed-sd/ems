@@ -1,7 +1,7 @@
 {
     "meta": {
-        "snapshot": "59136c85",
-        "updated_at": "2026-08-31 12:20",
+        "snapshot": "747cfbe7",
+        "updated_at": "2026-08-31 12:26",
         "governing_order": "docs\/REPAIR01_20260823\/orders\/CLOSURE_SYSTEM.txt"
     },
     "items": {
@@ -675,7 +675,7 @@
             "Domain": "INJ-FIX-01",
             "Target_ID": "—",
             "Requirement_ID": "—",
-            "Current_Status": "OPEN",
+            "Current_Status": "EVIDENCE_CLOSED",
             "Priority": "P0",
             "Execution_Rank": 500,
             "Severity": "CRITICAL",
@@ -694,10 +694,10 @@
             "Evidence_Contract": "شاهدُ الفجوةِ يخضرُّ في الحزام",
             "Next_Action": "إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه",
             "Current_Snapshot": "شاهدُها أحمرُ @ 808a2c03",
-            "Last_Updated_Snapshot": "808a2c03",
-            "Last_Evidence_Ref": "",
-            "Status_Changed_At": "2026-08-31 11:39 @ 808a2c03",
-            "Final_Disposition": "",
+            "Last_Updated_Snapshot": "747cfbe7",
+            "Last_Evidence_Ref": "bus_stall_alarm_proof 11\/11 — العدة حوكيت بتسجيل الانتاج كاملا (fx موصول) واليتم يثبت بمجس اصطناعي @ 747cfbe7",
+            "Status_Changed_At": "2026-08-31 12:26 @ 747cfbe7",
+            "Final_Disposition": "EVIDENCE_CLOSED",
             "Levels": {
                 "Decision": "?",
                 "Implementation": "?",
@@ -1317,10 +1317,10 @@
             "Estimated_Effort": "M",
             "Evidence_Contract": "شاهدٌ في حزامِ tests\/injfrd01_belt.php",
             "Next_Action": "",
-            "Current_Snapshot": "Closure_State=IMPLEMENTED_NOT_CLOSED @ 808a2c03",
-            "Last_Updated_Snapshot": "808a2c03",
-            "Last_Evidence_Ref": "",
-            "Status_Changed_At": "2026-08-31 11:39 @ 808a2c03",
+            "Current_Snapshot": "الحاجز وقائع حية لا هندسة — يمارس بالاستخدام ثم يغلق @ 747cfbe7",
+            "Last_Updated_Snapshot": "747cfbe7",
+            "Last_Evidence_Ref": "app001_ladder_shadow 11\/11 — والنافذة الدنيا (500 قرار او 7 ايام) صفر مرصود حقيقي @ 747cfbe7",
+            "Status_Changed_At": "2026-08-31 12:26 @ 747cfbe7",
             "Final_Disposition": "",
             "Levels": {
                 "Decision": "?",
