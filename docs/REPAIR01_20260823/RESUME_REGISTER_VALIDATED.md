@@ -1,7 +1,7 @@
 # `RESUME_REGISTER_VALIDATED` — واحدٌ وعشرون نطاقًا
 
 > ⛔ **مولَّدٌ من تشغيلٍ حيّ**: `php tools/master_exec_resume_validated.php --md`
-> `Snapshot` `SNAP-77089c31-20260831-012955` · `Commit` `77089c31a9ec18ebdf8e86f84c3d7c5dd43867f2`
+> `Snapshot` `SNAP-20010260-20260831-035115` · `Commit` `2001026007c992986bc61092a9f8a1c38539f9a4`
 
 ## ما الذي جعله مصادَقًا بعد أن كان مؤقَّتًا
 
