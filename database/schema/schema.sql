@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-31 16:52:05
--- الجداول: 988 · المناظير: 28
+-- المصدر: equipation_manage · التوليد: 2026-08-31 18:39:55
+-- الجداول: 993 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -8378,6 +8378,20 @@ CREATE TABLE `gov_migration_settlement` (
   CONSTRAINT `chk_gms_owner_ref` CHECK (char_length(`owner_ref`) >= 6)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='أحكامُ الهجراتِ غيرِ المصالَحةِ مع الدفتر — RPR-02 §٩ · RPR-03 §٣·١';
 
+-- ── Table: gov_nav_findings ──
+CREATE TABLE `gov_nav_findings` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `kind` varchar(40) NOT NULL,
+  `role_id` int(11) DEFAULT NULL,
+  `workspace_id` varchar(24) DEFAULT NULL,
+  `detail` varchar(400) NOT NULL,
+  `hits` int(10) unsigned NOT NULL DEFAULT 1,
+  `first_seen` datetime NOT NULL DEFAULT current_timestamp(),
+  `last_seen` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_finding` (`kind`,`role_id`,`workspace_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='NAVR: BUSINESS_WORKSPACE_GLOBAL_FALLBACK وأخواتُها — Fail-visible لا سقوطًا صامتًا';
+
 -- ── Table: gov_nav_hidden_log ──
 CREATE TABLE `gov_nav_hidden_log` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -10827,6 +10841,21 @@ CREATE TABLE `nav_items_archive_views` (
   CONSTRAINT `chk_nav_items_module_or_code` CHECK (`permission_code` is null or `permission_code` = '' or `module_id` is not null and `module_id` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── Table: nav_lifecycle_groups ──
+CREATE TABLE `nav_lifecycle_groups` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `workspace_id` varchar(24) NOT NULL,
+  `group_key` varchar(150) NOT NULL COMMENT 'الاسمُ المطبَّعُ (navr_gz) — مفتاحُ المطابقة',
+  `label_ar` varchar(150) NOT NULL COMMENT 'اسمُ العرضِ كما في الورقة',
+  `sort_no` tinyint(3) unsigned NOT NULL,
+  `source_ref` varchar(190) NOT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_ws_group` (`workspace_id`,`group_key`),
+  UNIQUE KEY `uq_ws_sort` (`workspace_id`,`sort_no`),
+  CONSTRAINT `fk_nlg_ws` FOREIGN KEY (`workspace_id`) REFERENCES `nav_workspaces` (`workspace_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='NAVR: مجموعاتُ الدورةِ خاصّةٌ بالمساحة';
+
 -- ── Table: nav_pending_answers ──
 CREATE TABLE `nav_pending_answers` (
   `closure_id` int(10) unsigned NOT NULL,
@@ -10865,6 +10894,27 @@ CREATE TABLE `nav_pending_closure` (
   KEY `ix_dept_state` (`owner_dept`,`decision`,`due_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='UXUI-01: إغلاقُ المعلَّقِ بقاعدةِ ثلاثةِ أيامٍ — الصمتُ يعتمد المقترحَ ويبقى قابلًا للنقض';
 
+-- ── Table: nav_placements ──
+CREATE TABLE `nav_placements` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `workspace_id` varchar(24) NOT NULL,
+  `screen_id` varchar(12) DEFAULT NULL COMMENT 'SCR-#### متى كانت مبنيّةً مجسورة',
+  `route` varchar(160) DEFAULT NULL COMMENT 'مسارُ الشاشةِ المبنيّة — NULL لغيرِ المبنيّ',
+  `target_ref` varchar(190) NOT NULL COMMENT 'هويّةُ هدفِ الدليل: code·idx·الاسم',
+  `group_id` int(11) NOT NULL,
+  `sort_no` smallint(5) unsigned NOT NULL,
+  `placement_type` enum('MENU_ITEM','TAB_CHILD','DIRECT_ONLY','PROJECTION','UTILITY','NOT_BUILT') NOT NULL,
+  `source_ref` varchar(190) NOT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_ws_target` (`workspace_id`,`target_ref`),
+  KEY `ix_ws_grp_sort` (`workspace_id`,`group_id`,`sort_no`),
+  KEY `ix_route` (`route`),
+  KEY `fk_np_grp` (`group_id`),
+  CONSTRAINT `fk_np_grp` FOREIGN KEY (`group_id`) REFERENCES `nav_lifecycle_groups` (`id`),
+  CONSTRAINT `fk_np_ws` FOREIGN KEY (`workspace_id`) REFERENCES `nav_workspaces` (`workspace_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='NAVR: موضعُ الشاشةِ في مساحتِها — والصلاحياتُ طبقةٌ مستقلّةٌ لا تُخزَّن هنا';
+
 -- ── Table: nav_redirects ──
 CREATE TABLE `nav_redirects` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -10888,6 +10938,29 @@ CREATE TABLE `nav_route_group` (
   KEY `ix_nrg_group` (`group_code`),
   CONSTRAINT `fk_nrg_group` FOREIGN KEY (`group_code`) REFERENCES `nav_group_taxonomy` (`code`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='المسارُ ⇄ مجموعتُه الواحدة — والمشترَكُ بين الإداراتِ في مكانٍ واحدٍ دائمًا';
+
+-- ── Table: nav_workspaces ──
+CREATE TABLE `nav_workspaces` (
+  `workspace_id` varchar(24) NOT NULL,
+  `kind` enum('DEPARTMENT','EXECUTIVE','PERSONAL','PLATFORM_UTILITY') NOT NULL,
+  `name_ar` varchar(150) NOT NULL,
+  `dept_code` varchar(24) DEFAULT NULL,
+  `ruling` varchar(400) NOT NULL COMMENT 'حكمُ التصنيفِ مكتوبًا في الصفِّ نفسِه — لا يُخلط مقامٌ بلا حكم',
+  `source_ref` varchar(190) NOT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`workspace_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='NAVR: مساحاتُ العملِ — طبقةٌ كانت حقيقةً سياقيّةً بلا مخزن';
+
+-- ── Table: nav_ws_roles ──
+CREATE TABLE `nav_ws_roles` (
+  `workspace_id` varchar(24) NOT NULL,
+  `role_id` int(11) NOT NULL,
+  `binding` enum('PRIMARY','SECONDARY') NOT NULL DEFAULT 'PRIMARY',
+  `source_ref` varchar(190) NOT NULL,
+  PRIMARY KEY (`workspace_id`,`role_id`),
+  UNIQUE KEY `uq_role_binding` (`role_id`,`binding`),
+  CONSTRAINT `fk_wsr_ws` FOREIGN KEY (`workspace_id`) REFERENCES `nav_workspaces` (`workspace_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='NAVR: مساحةُ كلِّ دور — PRIMARY واحدة';
 
 -- ── Table: non_delegable_actions ──
 CREATE TABLE `non_delegable_actions` (

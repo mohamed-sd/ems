@@ -67,7 +67,26 @@ $__dq = @mysqli_query($conn, "SELECT role_id, route, group_ar FROM gov_target_na
 while ($__dq && ($__dx = mysqli_fetch_assoc($__dq))) {
     $__b = mb_strtolower(uxuiNavBaseRoute($__dx['route']));
     if ($__b === '') { continue; }
-    $declPlace[(int) $__dx['role_id']][$__b] = (string) $__dx['group_ar'];
+    $declPlace[(int) $__dx['role_id']][$__b][(string) $__dx['group_ar']] = true;
+}
+/* ◆ NAVR: **طبقةُ المواضعِ سندٌ مكتوبٌ بورقتِه** — `nav_placements` مستورَدةٌ
+   آليًّا من ورقةِ الدليلِ المعماريِّ لكلِّ إدارةٍ (`source_ref` يحملها)، فهي
+   المواضعةُ المسجَّلةُ الحاكمةُ بعد `gov_target_nav` المقلوبِ (قِيس 94٪ منه
+   `RENDER-ALIGN`). البوّابةُ تتعلّم المصدرَ الجديدَ ولا تحاسِب انحيازَه انحرافًا
+   — ودرسُ [[repair01-w02-registry-nav]] معكوسًا: حاجبٌ لا يعرف مخطَّطَه الجديدَ
+   يُرسِّب الإصلاحَ نفسَه. */
+$__dq = @mysqli_query($conn, "SELECT wr.role_id, p.route, g.label_ar
+                                FROM nav_placements p
+                                JOIN nav_lifecycle_groups g ON g.id = p.group_id AND g.active = 1
+                                JOIN nav_ws_roles wr ON wr.workspace_id = p.workspace_id AND wr.binding = 'PRIMARY'
+                               WHERE p.active = 1 AND p.route IS NOT NULL");
+while ($__dq && ($__dx = mysqli_fetch_assoc($__dq))) {
+    $__b = mb_strtolower(uxuiNavBaseRoute($__dx['route']));
+    if ($__b === '') { continue; }
+    /* مجموعةُ سنداتٍ لا قيمةٌ تُدهس: سجلُّ المصالحةِ قد يفصل عدةَ اهدافِ
+       دورةٍ الى شاشةٍ واحدةٍ فتتعدد مجموعاتُها المسنودةُ (قيس: fleet/asset_intake
+       باربعة اهدافٍ في مجموعتين — وقيمةٌ واحدةٌ كانت تتأرجح بترتيب الصفوف). */
+    $declPlace[(int) $__dx['role_id']][$__b][(string) $__dx['label_ar']] = true;
 }
 
 $matrix = uxp_matrix($ROOT);
@@ -169,7 +188,7 @@ foreach ($byRoute as $lc => $info) {
         $bare = array(); $declared = array();
         foreach ($info['groups'] as $gname => $rids) {
             foreach (array_keys($rids) as $rid) {
-                if (isset($declPlace[(int) $rid][$lc]) && $declPlace[(int) $rid][$lc] === $gname) {
+                if (isset($declPlace[(int) $rid][$lc][$gname])) {
                     $declared[$gname] = true;
                 } else { $bare[$gname] = true; }
             }

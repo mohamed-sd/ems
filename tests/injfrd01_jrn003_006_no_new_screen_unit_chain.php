@@ -69,7 +69,21 @@ function jrn_is_declared_tab(mysqli $db, $ROOT, $route)
     $st->execute();
     $n = (int) $st->get_result()->fetch_row()[0];
     $st->close();
-    return $n === 0;
+    if ($n === 0) { return true; }
+    /* ◆ NAVR: **تبويبٌ رُقّي بندَ قائمةٍ بسندِ الدليلِ ليس شاشةً أُنشئت**:
+       ورقةُ الدليلِ المعماريِّ قد تُدرج تبويبَ كيانٍ في دورةِ إدارتِه
+       (قِيس: Suppliers/supplier_entitlements.php في ورقةِ DEP-02) فيُربَط
+       بندُه من طبقةِ المواضعِ المستورَدةِ آليًّا — سندٌ مكتوبٌ بمصدرِه لا
+       بابٌ خلفيّ: يُقبل فقط ما لموضعِه صفُّ `GUIDE-IMPORT` قائمةً. */
+    $st = $db->prepare("SELECT COUNT(*) FROM nav_placements
+                         WHERE LOWER(route) = LOWER(?) AND placement_type = 'MENU_ITEM'
+                           AND active = 1 AND source_ref LIKE 'GUIDE-IMPORT%'");
+    if (!$st) { return false; }
+    $st->bind_param('s', $route);
+    $st->execute();
+    $g = (int) $st->get_result()->fetch_row()[0];
+    $st->close();
+    return $g > 0;
 }
 
 echo "══ FR-JRN-003 · FR-JRN-006 ══\n";

@@ -667,11 +667,75 @@ function uxuiCanonicalMap($conn) {
    ⇒ **الرتبةُ المُعلَنةُ تسري على المُعلَنِ وحدَه**، ومن لا صفَّ له في الجدولِ
      يبقى على `sort_no` حرفًا. ويعود الصفُّ الآن مصفوفةً `g` (القسم) و`o`
      (الرتبة) — والمستهلكُ الوحيدُ حلقةُ التصييرِ أدناه. */
+/* ═══ NAVR (أمرُ «إصلاح الملاحة من الجذور» 2026-08-31) — طبقةُ المواضعِ الحاكمة ═══
+ * ◆ المصدرُ الحاكمُ لمجموعاتِ دورةِ العملِ صار `nav_placements` (المستورَدُ آليًّا
+ *   من ورقةِ الدليلِ المعماريِّ لكلِّ إدارةٍ عبر `tools/navr_import_guide.php`) —
+ *   لا `gov_target_nav` الذي قِيس أنَّ 94٪ من صفوفِه أُلِّفت من التصييرِ القائمِ
+ *   (`RENDER-ALIGN`) فصار Target مولَّدًا من Current يقيس نفسَه.
+ * ◆ **ولا سقوطَ صامتًا** (BUSINESS_WORKSPACE_GLOBAL_FALLBACK=0): دورٌ مربوطٌ
+ *   بمساحةِ أعمالٍ ذاتِ مواضعَ لا يجوز أن يُصيَّر بالتصنيفِ العامِّ — وإن وقع
+ *   يُقيَّد Finding في `gov_nav_findings` ويُعلَن مرئيًّا في بيئةِ الاختبار
+ *   (`EMS_NAV_STRICT=on`). ودورٌ بلا مساحةٍ/مواضعَ يسلك سلوكَه السابقَ حرفًا
+ *   — **معلَنًا لا صامتًا** (المساحاتُ غيرُ المغطّاةِ مقيسةٌ في navr_metrics). */
+function navrRecordFinding($conn, $kind, $roleId, $wsId, $detail) {
+    $k = $conn->real_escape_string($kind);
+    $w = $wsId !== null ? "'" . $conn->real_escape_string($wsId) . "'" : 'NULL';
+    $r = $roleId !== null ? (int) $roleId : 'NULL';
+    $d = $conn->real_escape_string(mb_substr($detail, 0, 380));
+    @mysqli_query($conn, "INSERT INTO gov_nav_findings (kind, role_id, workspace_id, detail)
+        VALUES ('{$k}', {$r}, {$w}, '{$d}')
+        ON DUPLICATE KEY UPDATE hits = hits + 1, last_seen = NOW(), detail = VALUES(detail)");
+}
+
+/** أقسامُ طبقةِ المواضع لدورٍ: [map(base⇒{g,n,o,p}), workspace_id|null] */
+function navrPlacementSections($conn, $roleId) {
+    static $byRole = array();
+    $rid = (int) $roleId;
+    if (isset($byRole[$rid])) { return $byRole[$rid]; }
+    $byRole[$rid] = array(array(), null);
+    $q = @mysqli_query($conn, "SELECT wr.workspace_id
+                                 FROM nav_ws_roles wr
+                                 JOIN nav_workspaces w ON w.workspace_id = wr.workspace_id AND w.active = 1
+                                WHERE wr.role_id = {$rid} AND wr.binding = 'PRIMARY'
+                                  AND w.kind IN ('DEPARTMENT','EXECUTIVE') LIMIT 1");
+    if (!$q || !$q->num_rows) { return $byRole[$rid]; }
+    $ws = (string) $q->fetch_row()[0];
+    $byRole[$rid][1] = $ws;
+    $res = @mysqli_query($conn, "SELECT p.route, g.label_ar, g.sort_no AS gno, p.sort_no AS ino
+                                   FROM nav_placements p
+                                   JOIN nav_lifecycle_groups g ON g.id = p.group_id AND g.active = 1
+                                  WHERE p.workspace_id = '" . $conn->real_escape_string($ws) . "'
+                                    AND p.active = 1 AND p.placement_type = 'MENU_ITEM'
+                                    AND p.route IS NOT NULL");
+    if ($res) {
+        while ($row = mysqli_fetch_assoc($res)) {
+            $base = uxuiNavBaseRoute($row['route']);
+            if ($base === '') { continue; }
+            $byRole[$rid][0][$base] = array(
+                'g' => (string) $row['label_ar'],
+                'n' => (int) $row['gno'],
+                'o' => ((int) $row['gno'] * 1000) + (int) $row['ino'],
+                'p' => 1, /* مجموعةُ ورقةِ الدليلِ بابٌ دائمًا */
+            );
+        }
+    }
+    return $byRole[$rid];
+}
+
 function uxuiDeclaredSections($conn, $roleId) {
     static $byRole = array();
     $rid = (int) $roleId;
     if (isset($byRole[$rid])) { return $byRole[$rid]; }
     $byRole[$rid] = array();
+    /* ── NAVR: طبقةُ المواضعِ تغلب متى وُجدت — والغيابُ يُقيَّد لا يُبتلع ── */
+    if (!function_exists('ems_env') || strtolower((string) ems_env('EMS_NAV_WORKSPACE', 'on')) !== 'off') {
+        list($pl, $ws) = navrPlacementSections($conn, $rid);
+        if (!empty($pl)) { $byRole[$rid] = $pl; return $pl; }
+        if ($ws !== null) {
+            navrRecordFinding($conn, 'EMPTY_WORKSPACE_PLACEMENTS', $rid, $ws,
+                'مساحة مربوطة بلا مواضع قوائم مبنية صالحة، سقوط للمسار السابق يقاس ولا يبتلع');
+        }
+    }
     $res = @mysqli_query($conn, "SELECT route, group_ar, group_no, item_no, doc_code
                                    FROM gov_target_nav WHERE role_id = {$rid}");
     if ($res) {
@@ -1418,6 +1482,27 @@ function renderUnifiedNavigationV2($conn, $roleId, $basePrefix = '../', $badges 
     $tenTax = emsNavTaxonomy($conn);
     if (!empty($tenTax)) {
         $GLOBALS['__uxui_cur_role'] = (int) $roleId;
+        /* ── NAVR: حارسُ السقوطِ الكلّيّ — BUSINESS_WORKSPACE_GLOBAL_FALLBACK ──
+           دورٌ مربوطٌ بمساحةٍ لها مواضعُ MENU_ITEM ولا بندَ من بنودِه يقاطعها
+           ⇒ سيُصيَّر بالتصنيفِ العامِّ وهو عينُ السقوطِ الممنوع: يُقيَّد
+           Finding، وفي بيئةِ الاختبارِ (`EMS_NAV_STRICT=on`) يُعلَن مرئيًّا. */
+        list($navrPl, $navrWs) = navrPlacementSections($conn, (int) $roleId);
+        if ($navrWs !== null && !empty($navrPl)) {
+            $navrHit = 0;
+            foreach ($items as $navrIt) {
+                if (isset($navrPl[uxuiNavBaseRoute((string) $navrIt['route'])])) { $navrHit++; }
+            }
+            if ($navrHit === 0) {
+                navrRecordFinding($conn, 'GLOBAL_FALLBACK', (int) $roleId, $navrWs,
+                    'مواضع المساحة موجودة وصفر بند من بنود الدور يقاطعها، سقوط للتصنيف العام');
+                if (function_exists('ems_env') && strtolower((string) ems_env('EMS_NAV_STRICT', 'off')) === 'on') {
+                    /* بلا تشكيلٍ ولا رمزٍ ولا مفردةٍ تقنيّةٍ — نصُّ الشاشةِ الحيّةِ محكومٌ
+                       بسقّاطتَي UI-01/UI-02، والكشفُ الكاملُ في سجلِّ كشوفِ الملاحة */
+                    echo '<li class="nav-group-head" style="color:#b00020;font-weight:bold;">'
+                       . 'تعذر عرض ملاحة المساحة - سجل كشف معماري لهذا الدور</li>';
+                }
+            }
+        }
         return printEmsTenGroupNav(
             $conn, $items, uxuiCanonicalMap($conn), uxuiCurrentMap($conn, (int) $roleId),
             $basePrefix, $badges, $afterHome

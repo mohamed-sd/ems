@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — البذرة المرجعية (طبقتان)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-31 16:52:05
+-- المصدر: equipation_manage · التوليد: 2026-08-31 18:39:55
 -- ① عالمية: بنية متنكرة في هيئة بيانات — بدونها لا تنقل ولا صلاحيات.
 -- ② مستأجرة: مرجعية تحمل company_id — القيمة علامة نائبة يحقنها المثبت:
 --    {{COMPANY_ID}}
@@ -7741,7 +7741,17 @@ INSERT INTO `link_groups` (`id`, `name`, `group_code`, `owner_role_id`, `icon`, 
 (6481,'ط · المرجعيات والمصالحة',NULL,2,'fa fa-folder',41,90,'ط · المرجعيات والمصالحة',1,NULL),
 (6482,'ط · المرجعيات والمصالحة',NULL,8,'fa fa-folder',41,90,'ط · المرجعيات والمصالحة',1,NULL),
 (6483,'ط · المرجعيات والمصالحة',NULL,10,'fa fa-folder',41,90,'ط · المرجعيات والمصالحة',1,NULL),
-(6484,'ط · المرجعيات والمصالحة',NULL,11,'fa fa-folder',41,90,'ط · المرجعيات والمصالحة',1,NULL);
+(6484,'ط · المرجعيات والمصالحة',NULL,11,'fa fa-folder',41,90,'ط · المرجعيات والمصالحة',1,NULL),
+(6485,'الماليه',NULL,2,'fa fa-folder',94,90,'الماليه',1,NULL),
+(6486,'الحوكمه',NULL,2,'fa fa-folder',95,90,'الحوكمه',1,NULL),
+(6487,'اللوحه — خارج الدوره',NULL,2,'fa fa-folder',96,90,'اللوحه — خارج الدوره',1,NULL),
+(6488,'خط الانابيب',NULL,12,'fa fa-folder',92,90,'خط الانابيب',1,NULL),
+(6489,'دوره الترحيل',NULL,23,'fa fa-folder',92,90,'دوره الترحيل',1,NULL),
+(6490,'دوره البلاغ',NULL,24,'fa fa-folder',93,90,'دوره البلاغ',1,NULL),
+(6491,'التاسيس المرجعي',NULL,25,'fa fa-folder',92,90,'التاسيس المرجعي',1,NULL),
+(6492,'اللوحه — خارج الدوره',NULL,28,'fa fa-folder',91,90,'اللوحه — خارج الدوره',1,NULL),
+(6493,'اللوحه — خارج الدوره',NULL,24,'fa fa-folder',91,90,'اللوحه — خارج الدوره',1,NULL),
+(6494,'الاحتياج والتغطيه',NULL,27,'fa fa-folder',92,90,'الاحتياج والتغطيه',1,NULL);
 
 -- ── nav_items ──
 DELETE FROM `nav_items`;
@@ -10316,7 +10326,19 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (28828,2,'DAILY',6481,899,'مصفوفة بنية الشيتات','Fleet/fleet_schema_matrix.php','fa fa-table-cells',41,NULL,'Fleet/fleet_schema_matrix.php',1,'2026-08-30 22:55:26','2026-08-30 22:55:26'),
 (28829,8,'DAILY',6482,899,'مصفوفة بنية الشيتات','Fleet/fleet_schema_matrix.php','fa fa-table-cells',41,NULL,'Fleet/fleet_schema_matrix.php',1,'2026-08-30 22:55:26','2026-08-30 22:55:26'),
 (28830,10,'DAILY',6483,899,'مصفوفة بنية الشيتات','Fleet/fleet_schema_matrix.php','fa fa-table-cells',41,NULL,'Fleet/fleet_schema_matrix.php',1,'2026-08-30 22:55:26','2026-08-30 22:55:26'),
-(28831,11,'DAILY',6484,899,'مصفوفة بنية الشيتات','Fleet/fleet_schema_matrix.php','fa fa-table-cells',41,NULL,'Fleet/fleet_schema_matrix.php',1,'2026-08-30 22:55:26','2026-08-30 22:55:26');
+(28831,11,'DAILY',6484,899,'مصفوفة بنية الشيتات','Fleet/fleet_schema_matrix.php','fa fa-table-cells',41,NULL,'Fleet/fleet_schema_matrix.php',1,'2026-08-30 22:55:26','2026-08-30 22:55:26'),
+(28833,2,'DAILY',6485,537,'استحقاقات الموردين','Suppliers/supplier_entitlements.php','fa fa-file',4002,NULL,'Suppliers/supplier_entitlements.php',1,'2026-08-31 18:24:54','2026-08-31 18:24:54'),
+(28834,2,'DAILY',6486,531,'المخالفات والجزاءات','Suppliers/supplier_violations.php','fa fa-file',5001,NULL,'Suppliers/supplier_violations.php',1,'2026-08-31 18:24:54','2026-08-31 18:24:54'),
+(28835,2,'DAILY',6487,532,'لوحة إدارة الموردين','Suppliers/supplier_board.php','fa fa-file',6001,NULL,'Suppliers/supplier_board.php',1,'2026-08-31 18:24:54','2026-08-31 18:24:54'),
+(28836,12,'DAILY',6488,528,'احتياج العميل وطلب العرض','Opportunities/client_need_rfq.php','fa fa-file',2003,NULL,'Opportunities/client_need_rfq.php',1,'2026-08-31 18:24:54','2026-08-31 18:24:54'),
+(28837,12,'DAILY',5586,530,'التفاوض ومراجعات العرض','Clients/quotation_negotiation.php','fa fa-file',3003,NULL,'Clients/quotation_negotiation.php',1,'2026-08-31 18:24:54','2026-08-31 18:24:54'),
+(28838,23,'DAILY',6489,434,'أمر الترحيل','Transport/transfer_order_form.php','fa fa-file',2002,NULL,'Transport/transfer_order_form.php',1,'2026-08-31 18:24:54','2026-08-31 18:24:54'),
+(28839,24,'DAILY',6490,133,'تسجيل البلاغ','Tickets/ticket_form.php','fa fa-file',3003,NULL,'Tickets/ticket_form.php',1,'2026-08-31 18:24:54','2026-08-31 18:24:54'),
+(28840,25,'DAILY',6491,472,'سجل المخازن وأنواعها','Procurement/warehouses.php','fa fa-file',2001,NULL,'Procurement/warehouses.php',1,'2026-08-31 18:24:54','2026-08-31 18:24:54'),
+(28841,28,'RISK',6492,468,'المخاطر المؤسسية','Risk/risk_dept_ceo.php','fa fa-file',1001,NULL,'Risk/risk_dept_ceo.php',1,'2026-08-31 18:24:54','2026-08-31 18:24:54'),
+(28842,1,'DAILY',5616,308,'تسجيل التايم شيت والإنتاج في الموقع','Timesheet/timesheet.php','fa fa-file',3001,NULL,'Timesheet/timesheet.php',1,'2026-08-31 18:25:47','2026-08-31 18:25:47'),
+(28843,24,'DAILY',6493,457,'حوكمة مركز البلاغات','Tickets/gov_dept_crp.php','fa fa-file',1001,NULL,'Tickets/gov_dept_crp.php',1,'2026-08-31 18:25:47','2026-08-31 18:25:47'),
+(28844,27,'DAILY',6494,555,'لوحة الاحتياج والتغطية','Workforce/wf_coverage.php','fa fa-file',2002,NULL,'Workforce/wf_coverage.php',1,'2026-08-31 18:25:47','2026-08-31 18:25:47');
 
 -- ── nav_canonical ──
 DELETE FROM `nav_canonical`;
@@ -10738,7 +10760,7 @@ INSERT INTO `nav_canonical` (`id`, `route`, `canonical_ar`, `canonical_en`, `lev
 (1148,'Procurement/wh_hazmat.php','ضوابط المواد الخطرة والمتفجرات',NULL,2,'العمليات','دورة الاستلام',7,NULL,NULL,'APPROVED','APPROVED','DEPLOYED',NULL,'RPR-W09 · المشتريات والمخازن (2026-08-26)',NULL,NULL,1,'NAVIGATION_NAMING_POSITION',NULL,'دورةُ الإدارةِ المالكةِ في الحزمة',NULL,NULL,'ACTIVE',NULL,NULL,NULL,'2026-08-26 02:12:57',NULL,NULL,NULL,'SINGLE',NULL,'',NULL,'SCR-0676'),
 (1149,'Procurement/wh_issue_requests.php','طلبات الصرف الواردة',NULL,2,'العمليات','دورة الصرف',8,NULL,NULL,'APPROVED','APPROVED','DEPLOYED',NULL,'RPR-W09 · المشتريات والمخازن (2026-08-26)',NULL,NULL,1,'NAVIGATION_NAMING_POSITION',NULL,'دورةُ الإدارةِ المالكةِ في الحزمة',NULL,NULL,'ACTIVE',NULL,NULL,NULL,'2026-08-26 02:12:57',NULL,NULL,NULL,'SINGLE',NULL,'',NULL,'SCR-0677'),
 (1150,'Procurement/wh_month_close.php','الإقفال الشهري للمخازن',NULL,2,'العمليات','الرقابة والإقفال',18,NULL,NULL,'APPROVED','APPROVED','DEPLOYED',NULL,'RPR-W09 · المشتريات والمخازن (2026-08-26)',NULL,NULL,1,'NAVIGATION_NAMING_POSITION',NULL,'دورةُ الإدارةِ المالكةِ في الحزمة',NULL,NULL,'ACTIVE',NULL,NULL,NULL,'2026-08-26 02:12:57',NULL,NULL,NULL,'SINGLE',NULL,'',NULL,'SCR-0678'),
-(1171,'Procurement/warehouses.php','سجل المخازن وأنواعها',NULL,2,'العمليات','التأسيس المرجعي',2,NULL,NULL,'APPROVED','APPROVED','DEPLOYED',NULL,'RPR-W09 · ربط سطح النطاق بالسجل المعياري (2026-08-26)',NULL,NULL,1,'NAVIGATION_NAMING_POSITION',NULL,'التسمية المعيارية من repair01_requirements.surface',NULL,NULL,'ACTIVE',NULL,NULL,NULL,'2026-08-26 02:37:17',NULL,NULL,NULL,'',NULL,'',NULL,'SCR-0497'),
+(1171,'Procurement/warehouses.php','سجل المخازن وأنواعها',NULL,2,'العمليات','التاسيس المرجعي',2,NULL,NULL,'APPROVED','APPROVED','DEPLOYED',NULL,'RPR-W09 · ربط سطح النطاق بالسجل المعياري (2026-08-26)',NULL,NULL,1,'NAVIGATION_NAMING_POSITION',NULL,'التسمية المعيارية من repair01_requirements.surface',NULL,NULL,'ACTIVE',NULL,NULL,NULL,'2026-08-26 02:37:17',NULL,NULL,NULL,'',NULL,'',NULL,'SCR-0497'),
 (1422,'Procurement/proc_track_policy.php','سياسة تتبع الأصناف',NULL,2,'العمليات','التأسيس المرجعي',4,NULL,NULL,'APPROVED','APPROVED','DEPLOYED',NULL,'RPR-W09 · المشتريات والمخازن (2026-08-26)',NULL,NULL,1,'NAVIGATION_NAMING_POSITION',NULL,'دورةُ الإدارةِ المالكةِ في الحزمة',NULL,NULL,'ACTIVE',NULL,NULL,NULL,'2026-08-26 11:49:00',NULL,NULL,NULL,'SINGLE',NULL,'',NULL,'SCR-0679'),
 (1423,'Procurement/wh_lots.php','سجل الدفعات',NULL,2,'العمليات','دورة الاستلام',6,NULL,NULL,'APPROVED','APPROVED','DEPLOYED',NULL,'RPR-W09 · المشتريات والمخازن (2026-08-26)',NULL,NULL,1,'NAVIGATION_NAMING_POSITION',NULL,'دورةُ الإدارةِ المالكةِ في الحزمة',NULL,NULL,'ACTIVE',NULL,NULL,NULL,'2026-08-26 11:49:00',NULL,NULL,NULL,'SINGLE',NULL,'',NULL,'SCR-0680'),
 (1424,'Procurement/wh_serials.php','سجل الأرقام التسلسلية',NULL,2,'العمليات','دورة الاستلام',7,NULL,NULL,'APPROVED','APPROVED','DEPLOYED',NULL,'RPR-W09 · المشتريات والمخازن (2026-08-26)',NULL,NULL,1,'NAVIGATION_NAMING_POSITION',NULL,'دورةُ الإدارةِ المالكةِ في الحزمة',NULL,NULL,'ACTIVE',NULL,NULL,NULL,'2026-08-26 11:49:00',NULL,NULL,NULL,'SINGLE',NULL,'',NULL,'SCR-0681'),
@@ -10876,7 +10898,10 @@ INSERT INTO `nav_canonical` (`id`, `route`, `canonical_ar`, `canonical_en`, `lev
 (5045,'Suppliers/supplier_migration_map.php','خريطة ترحيل الموردين',NULL,2,'العمليات','المرجعيات',36,NULL,NULL,'APPROVED','APPROVED','CURRENT',NULL,'الدليل المعماري — SUP-36 (02 إدارة الموردين)','2026-08-30 22:55:25',NULL,1,'NAVIGATION_NAMING_POSITION',NULL,'اسمُ السطحِ ومجموعتُه وتسلسلُه من الملفِّ التصميميِّ حرفًا — SUP-36',NULL,NULL,NULL,NULL,NULL,NULL,'2026-08-30 22:55:25',NULL,NULL,NULL,'SINGLE',NULL,'',NULL,'SCR-0813'),
 (5046,'Suppliers/supplier_review_report.php','تقرير المراجعة والقبول',NULL,2,'العمليات','المرجعيات',37,NULL,NULL,'APPROVED','APPROVED','CURRENT',NULL,'الدليل المعماري — SUP-37 (02 إدارة الموردين)','2026-08-30 22:55:26',NULL,1,'NAVIGATION_NAMING_POSITION',NULL,'اسمُ السطحِ ومجموعتُه وتسلسلُه من الملفِّ التصميميِّ حرفًا — SUP-37',NULL,NULL,NULL,NULL,NULL,NULL,'2026-08-30 22:55:26',NULL,NULL,NULL,'SINGLE',NULL,'',NULL,'SCR-0814'),
 (5047,'Suppliers/supplier_capacity_integration.php','مصادر القدرة والتكامل',NULL,2,'العمليات','الحوكمة',29,NULL,NULL,'APPROVED','APPROVED','CURRENT',NULL,'الدليل المعماري — SUP-29 (02 إدارة الموردين)','2026-08-30 22:55:26',NULL,1,'NAVIGATION_NAMING_POSITION',NULL,'اسمُ السطحِ ومجموعتُه وتسلسلُه من الملفِّ التصميميِّ حرفًا — SUP-29',NULL,NULL,NULL,NULL,NULL,NULL,'2026-08-30 22:55:26',NULL,NULL,NULL,'SINGLE',NULL,'',NULL,'SCR-0815'),
-(5048,'Fleet/fleet_schema_matrix.php','مصفوفة بنية الشيتات',NULL,2,'العمليات','ط · المرجعيات والمصالحة',41,NULL,NULL,'APPROVED','APPROVED','CURRENT',NULL,'الدليل المعماري — FLEET-41 (04 إدارة الأسطول والأصول)','2026-08-30 22:55:26',NULL,1,'NAVIGATION_NAMING_POSITION',NULL,'اسمُ السطحِ ومجموعتُه وتسلسلُه من الملفِّ التصميميِّ حرفًا — FLEET-41',NULL,NULL,NULL,NULL,NULL,NULL,'2026-08-30 22:55:26',NULL,NULL,NULL,'SINGLE',NULL,'',NULL,'SCR-0816');
+(5048,'Fleet/fleet_schema_matrix.php','مصفوفة بنية الشيتات',NULL,2,'العمليات','ط · المرجعيات والمصالحة',41,NULL,NULL,'APPROVED','APPROVED','CURRENT',NULL,'الدليل المعماري — FLEET-41 (04 إدارة الأسطول والأصول)','2026-08-30 22:55:26',NULL,1,'NAVIGATION_NAMING_POSITION',NULL,'اسمُ السطحِ ومجموعتُه وتسلسلُه من الملفِّ التصميميِّ حرفًا — FLEET-41',NULL,NULL,NULL,NULL,NULL,NULL,'2026-08-30 22:55:26',NULL,NULL,NULL,'SINGLE',NULL,'',NULL,'SCR-0816'),
+(5049,'suppliers/supplier_entitlements.php','استحقاقات الموردين',NULL,2,'العمليات','التشغيل',3008,NULL,NULL,'APPROVED','APPROVED','CURRENT',NULL,'الدليل المعماري — NAVR (ورقة الإدارة · طبقة المواضع)','2026-08-31 18:28:30',NULL,1,'NAVIGATION_NAMING_POSITION',NULL,'اسم السجل المعياري ومجموعته وترتيبه من ورقة الدليل عبر nav_placements — NAVR',NULL,NULL,NULL,NULL,NULL,NULL,'2026-08-31 18:28:30',NULL,NULL,NULL,'SINGLE',NULL,'',NULL,'SCR-0578'),
+(5050,'transport/transfer_order_form.php','أمر الترحيل',NULL,2,'العمليات','دوره الترحيل',2002,NULL,NULL,'APPROVED','APPROVED','CURRENT',NULL,'الدليل المعماري — NAVR (ورقة الإدارة · طبقة المواضع)','2026-08-31 18:28:30',NULL,1,'NAVIGATION_NAMING_POSITION',NULL,'اسم السجل المعياري ومجموعته وترتيبه من ورقة الدليل عبر nav_placements — NAVR',NULL,NULL,NULL,NULL,NULL,NULL,'2026-08-31 18:28:30',NULL,NULL,NULL,'SINGLE',NULL,'',NULL,'SCR-0618'),
+(5052,'risk/risk_dept_ceo.php','المخاطر المؤسسية',NULL,2,'العمليات','اللوحه — خارج الدوره',1001,NULL,NULL,'APPROVED','APPROVED','CURRENT',NULL,'الدليل المعماري — NAVR (ورقة الإدارة · طبقة المواضع)','2026-08-31 18:28:30',NULL,1,'NAVIGATION_NAMING_POSITION',NULL,'اسم السجل المعياري ومجموعته وترتيبه من ورقة الدليل عبر nav_placements — NAVR',NULL,NULL,NULL,NULL,NULL,NULL,'2026-08-31 18:28:30',NULL,NULL,NULL,'SINGLE',NULL,'',NULL,'SCR-0532');
 
 -- ── equipments_types ──
 DELETE FROM `equipments_types`;
