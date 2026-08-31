@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — البذرة المرجعية (طبقتان)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-01 02:12:14
+-- المصدر: equipation_manage · التوليد: 2026-09-01 02:37:25
 -- ① عالمية: بنية متنكرة في هيئة بيانات — بدونها لا تنقل ولا صلاحيات.
 -- ② مستأجرة: مرجعية تحمل company_id — القيمة علامة نائبة يحقنها المثبت:
 --    {{COMPANY_ID}}
@@ -4764,7 +4764,8 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (9725,3,210,1,0,0,0),
 (9726,3,237,1,0,0,0),
 (9727,6,411,1,0,0,0),
-(9728,3,494,1,0,0,0);
+(9728,3,494,1,0,0,0),
+(9735,17,495,1,0,0,0);
 
 -- ── link_groups ──
 DELETE FROM `link_groups`;
@@ -10394,7 +10395,8 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (28880,27,'DAILY',5629,9,'شاشة التشغيل','Oprators/oprators.php','fa fa-file',3002,NULL,'Oprators/oprators.php',1,'2026-09-01 02:02:27','2026-09-01 02:02:27'),
 (28881,27,'DAILY',5630,23,'تخصيص المعدات للمشروعات','Oprators/select_project.php','fa fa-file',4001,NULL,'Oprators/select_project.php',1,'2026-09-01 02:02:27','2026-09-01 02:02:27'),
 (28883,27,'DAILY',5631,56,'سجل الأحداث التشغيلية','Workforce/worker_worklog.php','fa fa-file',5001,NULL,'Workforce/worker_worklog.php',1,'2026-09-01 02:02:27','2026-09-01 02:02:27'),
-(28884,27,'DAILY',5631,54,'تسويات العاملين','Workforce/worker_settlement.php','fa fa-file',5002,NULL,'Workforce/worker_settlement.php',1,'2026-09-01 02:02:27','2026-09-01 02:02:27');
+(28884,27,'DAILY',5631,54,'تسويات العاملين','Workforce/worker_settlement.php','fa fa-file',5002,NULL,'Workforce/worker_settlement.php',1,'2026-09-01 02:02:27','2026-09-01 02:02:27'),
+(28885,17,'DAILY',4387,495,'احتساب إهلاك الفترة','Finance/depr_run.php','fa fa-file',6003,NULL,'Finance/depr_run.php',1,'2026-09-01 02:36:45','2026-09-01 02:36:45');
 
 -- ── nav_canonical ──
 DELETE FROM `nav_canonical`;
