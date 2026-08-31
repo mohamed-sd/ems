@@ -711,10 +711,15 @@ function navrPlacementSections($conn, $roleId) {
         while ($row = mysqli_fetch_assoc($res)) {
             $base = uxuiNavBaseRoute($row['route']);
             if ($base === '') { continue; }
+            $o = ((int) $row['gno'] * 1000) + (int) $row['ino'];
+            /* مسارٌ له أكثرُ من موضعٍ في المساحةِ (الورقةُ تذكره في مجموعتين):
+               يُصيَّر مرّةً — **في أبكرِ موضعِه في الدورةِ** حتمًا، لا بآخرِ
+               كتابةٍ يتأرجح بترتيبِ الصفوف (درسُ asset_intake). */
+            if (isset($byRole[$rid][0][$base]) && $byRole[$rid][0][$base]['o'] <= $o) { continue; }
             $byRole[$rid][0][$base] = array(
                 'g' => (string) $row['label_ar'],
                 'n' => (int) $row['gno'],
-                'o' => ((int) $row['gno'] * 1000) + (int) $row['ino'],
+                'o' => $o,
                 'p' => 1, /* مجموعةُ ورقةِ الدليلِ بابٌ دائمًا */
             );
         }

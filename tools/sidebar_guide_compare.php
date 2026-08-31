@@ -177,10 +177,65 @@ foreach ($ORDER as $code) {
     }
 
     $S = $spec[$code];
-    /* — مطابقةُ كلِّ شاشةِ دليلٍ ببندٍ مُصيَّر: بالاسمِ ثمَّ بجسرِ السجلّ — */
+    /* — مطابقةُ كلِّ شاشةِ دليلٍ ببندٍ مُصيَّر: **بنسبِ الموضعِ أولًا** (NAVR
+       §١٩: `target_id` ⇒ route من طبقةِ الدليلِ نفسِها — أوثقُ من الاسم)
+       ثمَّ بالاسمِ ثمَّ بجسرِ السجلّ. وهدفٌ نسبُه إلى مسارٍ **استُهلك لهدفٍ
+       آخرَ** تخدمه الشاشةُ المشتركةُ نفسُها (سجلُّ المصالحةِ يفصل عدّةَ
+       أهدافٍ لشاشةٍ واحدة) — يُصنَّف مخدومًا لا مفقودًا (§٢٣). */
+    static $navrPlRoute = null;
+    if ($navrPlRoute === null) {
+        $navrPlRoute = array();
+        $pq2 = $conn->query("SELECT target_id, route FROM nav_placements
+                              WHERE active = 1 AND route IS NOT NULL AND target_id IS NOT NULL");
+        while ($pq2 && ($py = $pq2->fetch_assoc())) { $navrPlRoute[$py['target_id']] = strtolower($py['route']); }
+    }
+    $navrRoutePos = array();   /* route ⇒ position idx (لمطابقةِ المسار) */
+    foreach ($pos as $pi => $p) { if (!isset($navrRoutePos[$p['route']])) { $navrRoutePos[$p['route']] = $pi; } }
+    /* مفاتيحُ التصييرِ عبر rpr02a_route (بلا .php) — تُوازى مع مسارِ الموضع */
+    $navrPosByFull = array();
+    foreach ($pos as $pi => $p) { $navrPosByFull[$p['route']] = isset($navrPosByFull[$p['route']]) ? $navrPosByFull[$p['route']] : $pi; }
+
     $matches = array();        /* spec idx ⇒ position idx or -1 */
-    $usedPos = array();
+    $usedPos = array(); $usedRoute = array(); $sharedServed = array();
+    $navrExcl = array(); $navrTidRoute = array();
     foreach ($S['screens'] as $si => $sc) {
+        /* §٢٣: التصنيفُ **قبل** المزاوجة — هدفٌ غيرُ MENU_ITEM لا يدخل المطابقة */
+        $ptype0 = isset($navrPtype[$code][$sc['i']]) ? $navrPtype[$code][$sc['i']] : '';
+        if (in_array($ptype0, array('TAB_CHILD', 'PROJECTION', 'DIRECT_ONLY', 'UTILITY'), true)) {
+            $navrExcl[$si] = true; $matches[$si] = -1; continue;
+        }
+        $tid = 'NT-' . $code . '-' . str_pad((string) $sc['i'], 3, '0', STR_PAD_LEFT);
+        if (isset($navrPlRoute[$tid])) { $navrTidRoute[$si] = rpr02a_route($navrPlRoute[$tid]); }
+        $matches[$si] = -1;
+    }
+    /* ⓪أ نسبُ الموضعِ **واعيًا بالمجموعة**: عند تعدُّدِ أهدافِ الشاشةِ الواحدةِ
+       يأخذ البندَ المُصيَّرَ الهدفُ الذي مجموعتُه هي مجموعةُ البندِ نفسِها —
+       والباقون يُخدَمون بها (لا «غيرَ مجموعتِها» وهميًّا). */
+    foreach ($S['screens'] as $si => $sc) {
+        if (isset($navrExcl[$si]) || !isset($navrTidRoute[$si])) { continue; }
+        $plr = $navrTidRoute[$si];
+        foreach ($pos as $pi => $p) {
+            if (isset($usedPos[$pi]) || $p['route'] !== $plr) { continue; }
+            if ($p['g'] === $sc['group']) { $matches[$si] = $pi; $usedPos[$pi] = true; $usedRoute[$plr] = true; }
+            break;
+        }
+    }
+    /* ⓪ب بقيّةُ ذوي النسبِ: بالمسارِ أيًّا كانت مجموعتُه — والمستهلَكُ مسارُه مخدوم */
+    foreach ($S['screens'] as $si => $sc) {
+        if ($matches[$si] >= 0 || isset($navrExcl[$si]) || !isset($navrTidRoute[$si])) { continue; }
+        $plr = $navrTidRoute[$si];
+        $hit = -1;
+        foreach ($pos as $pi => $p) {
+            if ($p['route'] !== $plr) { continue; }
+            if (isset($usedPos[$pi])) { $sharedServed[$si] = $plr; break; }
+            $hit = $pi; break;
+        }
+        if ($hit < 0 && !isset($sharedServed[$si]) && isset($usedRoute[$plr])) { $sharedServed[$si] = $plr; }
+        if ($hit >= 0) { $matches[$si] = $hit; $usedPos[$hit] = true; $usedRoute[$plr] = true; }
+    }
+    /* ① الاسمُ ثم جسرُ السجلِّ — لغيرِ ذوي النسب */
+    foreach ($S['screens'] as $si => $sc) {
+        if ($matches[$si] >= 0 || isset($navrExcl[$si]) || isset($sharedServed[$si])) { continue; }
         $hit = -1;
         foreach ($pos as $pi => $p) {
             if (isset($usedPos[$pi])) { continue; }
@@ -197,7 +252,7 @@ foreach ($ORDER as $code) {
             }
         }
         $matches[$si] = $hit;
-        if ($hit >= 0) { $usedPos[$hit] = true; }
+        if ($hit >= 0) { $usedPos[$hit] = true; $usedRoute[$pos[$hit]['route']] = true; }
     }
 
     /* — ① المجموعات: ترتيبُ مجموعاتِ الدليلِ بين المُصيَّرِ — */
@@ -212,8 +267,13 @@ foreach ($ORDER as $code) {
     /* — ①ب مزاوجةُ الاسمِ المعتمَدِ المغاير: هدفٌ لم يطابق حرفًا يُزاوَج
          ببندٍ مُصيَّرٍ حرٍّ في مجموعةِ الدليلِ نفسِها بأعلى تقاطعِ مفرداتٍ ≥ 0.5 — */
     $paired = array();         /* spec idx ⇒ position idx */
+    $navrNoPair = array();     /* §٢٣: غيرُ MENU وغيرُ المبنيِّ لا يُزاوَجان بالاسم */
     foreach ($S['screens'] as $si => $sc) {
-        if ($matches[$si] >= 0) { continue; }
+        $pt0 = isset($navrPtype[$code][$sc['i']]) ? $navrPtype[$code][$sc['i']] : '';
+        if ($pt0 !== '' && $pt0 !== 'MENU_ITEM') { $navrNoPair[$si] = true; }
+    }
+    foreach ($S['screens'] as $si => $sc) {
+        if ($matches[$si] >= 0 || isset($navrNoPair[$si]) || isset($sharedServed[$si])) { continue; }
         $best = -1; $bo = 0.0;
         foreach ($pos as $pi => $p) {
             if (isset($usedPos[$pi])) { continue; }
@@ -227,7 +287,7 @@ foreach ($ORDER as $code) {
          وحيدٌ — «سجل الفرص البيعية» تحت رأسِ تصنيفٍ تُلتقط هنا وتُحسب
          في غيرِ مجموعتِها تلقائيًّا لا «مفقودةً» — */
     foreach ($S['screens'] as $si => $sc) {
-        if ($matches[$si] >= 0 || isset($paired[$si])) { continue; }
+        if ($matches[$si] >= 0 || isset($paired[$si]) || isset($navrNoPair[$si]) || isset($sharedServed[$si])) { continue; }
         $best = -1; $bo = 0.0; $second = 0.0;
         foreach ($pos as $pi => $p) {
             if (isset($usedPos[$pi])) { continue; }
@@ -259,6 +319,11 @@ foreach ($ORDER as $code) {
     foreach ($S['screens'] as $si => $sc) {
         $pi = ($matches[$si] >= 0) ? $matches[$si] : (isset($paired[$si]) ? $paired[$si] : -1);
         if ($pi < 0) {
+            if (isset($sharedServed[$si])) {
+                $sc['ptype'] = 'SHARED_SCREEN·' . $sharedServed[$si];
+                $classifiedOut[] = $sc;
+                continue;
+            }
             $st = isset($reqState[$sc['name']]) ? $reqState[$sc['name']] : '';
             $sc['state'] = ($st === '') ? 'NO_REQ_ROW' : $st;
             $pt = isset($navrPtype[$code][$sc['i']]) ? $navrPtype[$code][$sc['i']] : '';
@@ -280,9 +345,18 @@ foreach ($ORDER as $code) {
         if ($sc['state'] === 'NOT_IMPLEMENTED' || $sc['state'] === 'NO_REQ_ROW') { $unbuilt[] = $sc; }
         else { $builtMissing[] = $sc; }
     }
-    /* الترتيب: تسلسلُ مواضعِ الدليلِ مرتَّبًا بمواضعِ التصيير */
+    /* الترتيب: **رتبةُ الدليلِ القانونيّة** = (ترتيبُ المجموعةِ في الورقة، ثم
+       ورودُ الشاشةِ فيها) — لا رقمُ الصفِّ الخامُّ عبر المجموعات: الورقةُ نفسُها
+       غيرُ متّصلةِ الكتلِ (شاشةُ مجموعةٍ مبكرةٍ قد تَرِد بصفٍّ متأخّرٍ — قِيس في
+       ذممِ DEP-05 وأصولِ DEP-03) فمحاكمةُ الصفِّ الخامِّ تُرسِّب نيّةَ الورقةِ ذاتها. */
+    $gIdx = array_flip($S['groups']);
+    $canonKeys = array();
+    foreach ($S['screens'] as $si2 => $sc2) {
+        $canonKeys[$si2] = (isset($gIdx[$sc2['group']]) ? $gIdx[$sc2['group']] : 99) * 1000 + $sc2['i'];
+    }
+    $canonRank = $canonKeys; asort($canonRank); $canonRank = array_flip(array_keys($canonRank));
     usort($found, function ($a, $b) { return $a['pi'] - $b['pi']; });
-    $seq = array(); foreach ($found as $f) { $seq[] = $f['si']; }
+    $seq = array(); foreach ($found as $f) { $seq[] = $canonRank[$f['si']]; }
     $sorted = $seq; sort($sorted);
     $inOrder = lcs_len($sorted, $seq);        /* كم بندًا يقف في محلِّه من التسلسل */
     $outOfOrder = array();
@@ -294,7 +368,7 @@ foreach ($ORDER as $code) {
             if ($seq[$j] < $seq[$i] && $dp[$j] + 1 > $dp[$i]) { $dp[$i] = $dp[$j] + 1; $pv[$i] = $j; } } }
         $bi = 0; for ($i = 1; $i < $n; $i++) { if ($dp[$i] > $dp[$bi]) { $bi = $i; } }
         while ($bi >= 0) { $keep[$seq[$bi]] = true; $bi = $pv[$bi]; }
-        foreach ($found as $f) { if (!isset($keep[$f['si']])) { $outOfOrder[] = $f; } }
+        foreach ($found as $f) { if (!isset($keep[$canonRank[$f['si']]])) { $outOfOrder[] = $f; } }
     }
 
     /* — ③ بنودٌ مُصيَّرةٌ داخلَ مجموعاتِ الدليلِ ليست في الدليل — */
@@ -306,6 +380,11 @@ foreach ($ORDER as $code) {
 
     /* مجموعةُ دليلٍ غابت وكلُّ شاشاتِها غيرُ مبنيّة ⇒ غيابُ بناءٍ لا عطبُ سايدبار */
     $unbuiltNames = array(); foreach ($unbuilt as $u) { $unbuiltNames[$u['name']] = 1; }
+    /* §٢٣: مجموعةٌ كلُّ محتواها مصنَّفٌ خارجَ مقامِ السايدبار (تبويبات/إسقاطات/
+       مخدومٌ بشاشةٍ مشتركة) غيابُ رأسِها ليس عطبًا — تُستبعد من المقامِ كمثيلتِها
+       غيرِ المبنيّة (قِيس: «السجلات التابعة» في البلاغات كلُّها تبويباتُ كيان). */
+    foreach ($classifiedOut as $u) { $unbuiltNames[$u['name']] = 1; }
+    foreach ($sharedServed as $si2 => $x2) { $unbuiltNames[$S['screens'][$si2]['name']] = 1; }
     $gEmptyByBuild = array(); $gMissingReal = array();
     foreach ($gMissing as $gm) {
         $all = true;

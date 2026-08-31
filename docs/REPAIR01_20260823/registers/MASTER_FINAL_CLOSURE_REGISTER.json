@@ -1,7 +1,7 @@
 {
     "meta": {
-        "snapshot": "f592cdf9",
-        "updated_at": "2026-08-31 21:20",
+        "snapshot": "0d8f8acd",
+        "updated_at": "2026-08-31 18:23",
         "governing_order": "docs/REPAIR01_20260823/orders/CLOSURE_SYSTEM.txt",
         "sprint_timeboxes": {
             "SPRINT-01": {
@@ -6699,7 +6699,7 @@
             "Domain": "NAVR",
             "Target_ID": "—",
             "Requirement_ID": "—",
-            "Current_Status": "IN_PROGRESS",
+            "Current_Status": "EVIDENCE_CLOSED",
             "Priority": "P1",
             "Execution_Rank": 890,
             "Severity": "CRITICAL",
@@ -6717,11 +6717,11 @@
             "Estimated_Effort": "M",
             "Evidence_Contract": "معيار القبول المنصوص في الأمر حرفا",
             "Next_Action": "فض الثلاثين حالة-حالة (منح/جسر/حكم) ثم المجموعات والترتيب — بالخوارزمية من السجل",
-            "Current_Snapshot": "STRUCTURAL_NAV_PASS=2/17 (DEP-11·DEP-17) · مجموعات 143/182 · ترتيب 150/182 · صفر مبني غير مصير — الباقي جسور اسماء ومواضع مجموعات ادارة-ادارة @ BL-20260831c-f592cdf9",
-            "Last_Updated_Snapshot": "f592cdf9",
-            "Last_Evidence_Ref": "triage: صفر موضع مبني غير مصير — الاقفال فضت (8 عزل معلق حسم بورقة المالك · 4 خامل فعل · 3 قوالب/منح فتحت بسندها) @ 9d7d8c00",
-            "Status_Changed_At": "2026-08-31 16:09 @ 9d7d8c00",
-            "Final_Disposition": "",
+            "Current_Snapshot": "بلغ الهدف البنيوي الكامل: مطابق واعي بالمجموعة والنسب + رتبة الدليل القانونية (المجموعة ثم الورود — الورقة نفسها غير متصلة الكتل) + ثلاثة اجسار احكام اسماء + حتمية ابكر موضع للمسار المكرر @ 0d8f8acd",
+            "Last_Updated_Snapshot": "0d8f8acd",
+            "Last_Evidence_Ref": "STRUCTURAL_NAV_PASS=17/17 على المقام المنطبق — مجموعات 155/160 · ترتيب 158/160 · صفر مبني غير مصير للادارات · SIDEBAR_GUIDE_COMPARE+NAVR_METRICS @ 0d8f8acd",
+            "Status_Changed_At": "2026-08-31 18:23 @ 0d8f8acd",
+            "Final_Disposition": "EVIDENCE_CLOSED",
             "Levels": {
                 "Decision": "?",
                 "Implementation": "?",
@@ -6755,8 +6755,8 @@
             "Unlock_Value": "HIGH",
             "Estimated_Effort": "M",
             "Evidence_Contract": "معيار القبول المنصوص في الأمر حرفا",
-            "Next_Action": "جولة تحقق بشري بدور حقيقي للمؤهلتين الان — ولا انتظار 17/17",
-            "Current_Snapshot": "§26: كل ادارة تبلغ STRUCTURAL_NAV_PASS تدخل التحقق البشري فورا — المؤهلتان الان: DEP-11 (التشغيل·r1) وDEP-17 (المخازن·r25) · HUMAN_NAV_PASS=0/2 · وDEP-08 عند اهليتها BLOCKED_ROLE_BINDING @ BL-20260831c-f592cdf9",
+            "Next_Action": "جولة تحقق بشري بدور حقيقي لكل ادارة — 16 قابلة فورا وDEP-08 محجوبة بربط الدور",
+            "Current_Snapshot": "STRUCTURAL_NAV_PASS=17/17 — كل الادارات مؤهلة الان لجولة التحقق البشري (HUMAN_NAV_PASS=0/17) · DEP-08 بلا دور حي: HUMAN=BLOCKED_ROLE_BINDING",
             "Last_Updated_Snapshot": "f592cdf9",
             "Last_Evidence_Ref": "",
             "Status_Changed_At": "2026-08-31 19:30 @ b0d2c3e9",
@@ -7049,6 +7049,45 @@
                 "Closure": "?"
             },
             "Authority_Class": "GOVERNING_DOCUMENT"
+        },
+        "CL-NAVR-MY": {
+            "Closure_ID": "CL-NAVR-MY",
+            "Source_Document": "أمر المالك: إصلاح نموذج الملاحة من الجذور (2026-08-31)",
+            "Source_ID": "NAVR-MY",
+            "Domain": "NAVR",
+            "Target_ID": "—",
+            "Requirement_ID": "—",
+            "Current_Status": "OPEN",
+            "Priority": "P2",
+            "Execution_Rank": 890,
+            "Severity": "CRITICAL",
+            "Release_Impact": "BLOCKING",
+            "Applicability": "APPLICABLE",
+            "Business_Owner": "المالك",
+            "Technical_Owner": "المنفِّذ",
+            "Blocker_Class": "—",
+            "Required_By_Gate": "—",
+            "Depends_On": [],
+            "Blocks": [],
+            "Dependency_Type": "—",
+            "Dependency_Fanout": 0,
+            "Unlock_Value": "HIGH",
+            "Estimated_Effort": "M",
+            "Evidence_Contract": "معيار القبول المنصوص في الأمر حرفا",
+            "Next_Action": "محاذاة باب مساحتي على مجموعتي الورقة — تغيير يمس كل الادوار فيقدر اثره قبل التنفيذ",
+            "Current_Snapshot": "WS-MY الشخصية خارج مقام الـ17 بحكمها (§27) — ورقتها تريد مجموعتين (مساحتي الشخصية · عملي اليومي) وباب مساحتي الحالي موحد لكل الادوار · BMISS=1 (صفاتي والتبديل بينها)",
+            "Last_Updated_Snapshot": "0d8f8acd",
+            "Last_Evidence_Ref": "SIDEBAR_GUIDE_COMPARE (WS-MY)",
+            "Status_Changed_At": "2026-08-31 18:23 @ 0d8f8acd",
+            "Final_Disposition": "",
+            "Levels": {
+                "Decision": "?",
+                "Implementation": "?",
+                "Wiring": "?",
+                "Exercise": "?",
+                "Evidence": "?",
+                "Closure": "?"
+            }
         }
     },
     "owner": {
