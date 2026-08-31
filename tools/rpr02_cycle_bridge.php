@@ -160,10 +160,19 @@ $DEPTN = array();
 $q = @$conn->query("SELECT canonical_code, name_ar FROM repair01_departments");
 while ($q && ($z = $q->fetch_row())) { $DEPTN[cb_norm($z[1])] = $z[0]; }
 
-$rows = array(); $stat = array('C1' => 0, 'C2' => 0, 'C3' => 0, 'C4' => 0);
+$rows = array(); $stat = array('C1' => 0, 'C2' => 0, 'C3' => 0, 'C4' => 0, 'C5' => 0, 'C6' => 0);
 $bound = array(); $ambNames = array();
-$r = $conn->query("SELECT id, screen_file, stage_name, stage_kind, dept_name FROM gov_screen_cycle ORDER BY id");
+$r = $conn->query("SELECT id, screen_file, stage_name, stage_kind, dept_name, screen_id sid0, bridge_rule br0 FROM gov_screen_cycle ORDER BY id");
 while ($x = $r->fetch_assoc()) {
+    /* FINAL_CLOSE ⑫ — الحكمُ المخزونُ للتأليفِ والحسمِ اليدويِّ يُحترم ولا يُعاد
+       اشتقاقُه (درسُ «الاستيعابُ يدهس أحكامَ الموجات»): C5 صفٌّ مؤلَّفٌ بشاهدِه ·
+       C6 ملتبسٌ حُسم بالمُصيَّرِ بشاهدِه — كلاهما موصولٌ بمعرِّفِه. */
+    if (in_array((string) $x['br0'], array('C5_AUTHORED', 'C5_NOT_APPLICABLE'), true)) {
+        $stat['C5']++; $bound[(string) $x['sid0']] = 1; continue;
+    }
+    if ((string) $x['br0'] === 'C6_MANUAL_AMBIG') {
+        $stat['C6']++; $bound[(string) $x['sid0']] = 1; continue;
+    }
     $b = strtolower(basename((string) $x['screen_file']));
     $cand = isset($byBase[$b]) ? $byBase[$b] : array();
     $rule = cb_rule(count($cand));
@@ -230,6 +239,8 @@ printf("  اللقطة: %s · صفوفُ دورةِ العمل: **%d**\n\n", $si
 echo "  ── القواعدُ الأربع ──
 ";
 printf("     C1 `BASENAME_UNIQUE`     %4d صفًّا — يُحلُّ إلى سطحٍ واحدٍ ⇒ **يُكتب المعرِّف**\n", $stat['C1']);
+printf("     C5 `AUTHORED/NA`         %4d صفًّا — مؤلَّفٌ بمرحلةٍ أو بسببِ عدمِ انطباقٍ (FINAL_CLOSE ⑫)\n", $stat['C5']);
+printf("     C6 `MANUAL_AMBIG`        %4d صفًّا — ملتبسٌ حُسم بالمُصيَّرِ بشاهدِه\n", $stat['C6']);
 printf("     C2 `AMBIGUOUS_DECLARED`  %4d صفًّا على %d اسمًا — ⛔ **يبقى بلا معرِّف**\n",
        $stat['C2'], count($ambNames));
 printf("     C4 `PATH_OR_SCOPE_RESOLVED` %2d صفًّا — الملتبسُ حُسم بمسارٍ أو بإدارةٍ مطابقةٍ لمالكٍ واحد
