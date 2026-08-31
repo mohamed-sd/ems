@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-31 18:39:55
--- الجداول: 993 · المناظير: 28
+-- المصدر: equipation_manage · التوليد: 2026-08-31 20:57:16
+-- الجداول: 995 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -8326,6 +8326,21 @@ CREATE TABLE `gov_ladders` (
   CONSTRAINT `chk_ld_cap` CHECK (`cap_state` <> 'resolved' or `cap_kind` <> 'amount' or `cap_amount` is not null and `cap_currency` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='LAD-01: سلاليمُ الاعتماد — والسقفُ غيرُ المحسومِ يوقف السلّم';
 
+-- ── Table: gov_legacy_nav_recon ──
+CREATE TABLE `gov_legacy_nav_recon` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `gtn_id` int(11) NOT NULL COMMENT 'صف gov_target_nav المصالَح',
+  `role_id` int(11) NOT NULL,
+  `route` varchar(190) NOT NULL,
+  `group_ar` varchar(150) DEFAULT NULL,
+  `doc_code` varchar(40) DEFAULT NULL,
+  `verdict` enum('MATCHES_GOVERNING_TARGET','APPROVED_POST_GUIDE_ADDITION','VALID_UTILITY','DUPLICATE','CURRENT_ONLY_UNGOVERNED','SUPERSEDED') NOT NULL,
+  `basis` varchar(300) NOT NULL,
+  `reconciled_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_gtn` (`gtn_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='§٢٠: مصالحةُ إرثِ gov_target_nav — Current يقترح ولا يعتمد نفسَه';
+
 -- ── Table: gov_migration_ledger ──
 CREATE TABLE `gov_migration_ledger` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -10901,6 +10916,7 @@ CREATE TABLE `nav_placements` (
   `screen_id` varchar(12) DEFAULT NULL COMMENT 'SCR-#### متى كانت مبنيّةً مجسورة',
   `route` varchar(160) DEFAULT NULL COMMENT 'مسارُ الشاشةِ المبنيّة — NULL لغيرِ المبنيّ',
   `target_ref` varchar(190) NOT NULL COMMENT 'هويّةُ هدفِ الدليل: code·idx·الاسم',
+  `target_id` varchar(24) DEFAULT NULL,
   `group_id` int(11) NOT NULL,
   `sort_no` smallint(5) unsigned NOT NULL,
   `placement_type` enum('MENU_ITEM','TAB_CHILD','DIRECT_ONLY','PROJECTION','UTILITY','NOT_BUILT') NOT NULL,
@@ -10911,7 +10927,9 @@ CREATE TABLE `nav_placements` (
   KEY `ix_ws_grp_sort` (`workspace_id`,`group_id`,`sort_no`),
   KEY `ix_route` (`route`),
   KEY `fk_np_grp` (`group_id`),
+  KEY `ix_np_target` (`target_id`),
   CONSTRAINT `fk_np_grp` FOREIGN KEY (`group_id`) REFERENCES `nav_lifecycle_groups` (`id`),
+  CONSTRAINT `fk_np_target` FOREIGN KEY (`target_id`) REFERENCES `nav_targets` (`target_id`),
   CONSTRAINT `fk_np_ws` FOREIGN KEY (`workspace_id`) REFERENCES `nav_workspaces` (`workspace_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='NAVR: موضعُ الشاشةِ في مساحتِها — والصلاحياتُ طبقةٌ مستقلّةٌ لا تُخزَّن هنا';
 
@@ -10939,6 +10957,23 @@ CREATE TABLE `nav_route_group` (
   CONSTRAINT `fk_nrg_group` FOREIGN KEY (`group_code`) REFERENCES `nav_group_taxonomy` (`code`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='المسارُ ⇄ مجموعتُه الواحدة — والمشترَكُ بين الإداراتِ في مكانٍ واحدٍ دائمًا';
 
+-- ── Table: nav_targets ──
+CREATE TABLE `nav_targets` (
+  `target_id` varchar(24) NOT NULL COMMENT 'NT-<code>-<nnn> ثابتٌ منذ التعريف',
+  `source_doc` varchar(190) NOT NULL,
+  `sheet_code` varchar(24) NOT NULL,
+  `row_no` smallint(5) unsigned NOT NULL COMMENT 'صفُّ الورقةِ لحظةَ التعريف — نسبٌ لا مفتاحُ مطابقة',
+  `canonical_title` varchar(190) NOT NULL,
+  `workspace_id` varchar(24) NOT NULL,
+  `group_key` varchar(150) NOT NULL,
+  `target_order` smallint(5) unsigned NOT NULL,
+  `visibility_class` varchar(16) NOT NULL COMMENT 'MENU_ITEM/TAB_CHILD/PROJECTION/DIRECT_ONLY/UTILITY/NOT_BUILT',
+  `active` tinyint(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`target_id`),
+  UNIQUE KEY `uq_ws_order` (`workspace_id`,`sheet_code`,`target_order`),
+  CONSTRAINT `fk_nt_ws` FOREIGN KEY (`workspace_id`) REFERENCES `nav_workspaces` (`workspace_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='NAVR §١٩: هويّةُ هدفِ الملاحةِ الثابتة — واسمُ Excel نسبٌ لا مفتاح';
+
 -- ── Table: nav_workspaces ──
 CREATE TABLE `nav_workspaces` (
   `workspace_id` varchar(24) NOT NULL,
@@ -10957,8 +10992,9 @@ CREATE TABLE `nav_ws_roles` (
   `role_id` int(11) NOT NULL,
   `binding` enum('PRIMARY','SECONDARY') NOT NULL DEFAULT 'PRIMARY',
   `source_ref` varchar(190) NOT NULL,
+  `primary_role` int(11) GENERATED ALWAYS AS (if(`binding` = 'PRIMARY',`role_id`,NULL)) STORED,
   PRIMARY KEY (`workspace_id`,`role_id`),
-  UNIQUE KEY `uq_role_binding` (`role_id`,`binding`),
+  UNIQUE KEY `uq_one_primary` (`primary_role`),
   CONSTRAINT `fk_wsr_ws` FOREIGN KEY (`workspace_id`) REFERENCES `nav_workspaces` (`workspace_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='NAVR: مساحةُ كلِّ دور — PRIMARY واحدة';
 

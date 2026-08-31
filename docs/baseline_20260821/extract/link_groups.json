@@ -1944,6 +1944,42 @@
         "stage_desc": "التقييم الدوري وتصفية إنهاء العقد"
     },
     {
+        "id": "6485",
+        "name": "الماليه",
+        "group_code": null,
+        "owner_role_id": "2",
+        "icon": "fa fa-folder",
+        "display_order": "94",
+        "stage_no": "90",
+        "stage_title": "الماليه",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
+        "id": "6486",
+        "name": "الحوكمه",
+        "group_code": null,
+        "owner_role_id": "2",
+        "icon": "fa fa-folder",
+        "display_order": "95",
+        "stage_no": "90",
+        "stage_title": "الحوكمه",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
+        "id": "6487",
+        "name": "اللوحه — خارج الدوره",
+        "group_code": null,
+        "owner_role_id": "2",
+        "icon": "fa fa-folder",
+        "display_order": "96",
+        "stage_no": "90",
+        "stage_title": "اللوحه — خارج الدوره",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
         "id": "3948",
         "name": "إضافات المالك",
         "group_code": "n9o_extra_r2",
@@ -11254,6 +11290,18 @@
         "stage_title": "متابعة إدارتي",
         "is_active": "1",
         "stage_desc": "الملاحق والتجديدات وسجل حركة العقد ومراجعته"
+    },
+    {
+        "id": "6488",
+        "name": "خط الانابيب",
+        "group_code": null,
+        "owner_role_id": "12",
+        "icon": "fa fa-folder",
+        "display_order": "92",
+        "stage_no": "90",
+        "stage_title": "خط الانابيب",
+        "is_active": "1",
+        "stage_desc": null
     },
     {
         "id": "3947",
@@ -25104,6 +25152,18 @@
         "stage_desc": null
     },
     {
+        "id": "6489",
+        "name": "دوره الترحيل",
+        "group_code": null,
+        "owner_role_id": "23",
+        "icon": "fa fa-folder",
+        "display_order": "92",
+        "stage_no": "90",
+        "stage_title": "دوره الترحيل",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
         "id": "6216",
         "name": "الاعتمادات الواردة",
         "group_code": null,
@@ -25944,6 +26004,30 @@
         "stage_desc": null
     },
     {
+        "id": "6493",
+        "name": "اللوحه — خارج الدوره",
+        "group_code": null,
+        "owner_role_id": "24",
+        "icon": "fa fa-folder",
+        "display_order": "91",
+        "stage_no": "90",
+        "stage_title": "اللوحه — خارج الدوره",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
+        "id": "6490",
+        "name": "دوره البلاغ",
+        "group_code": null,
+        "owner_role_id": "24",
+        "icon": "fa fa-folder",
+        "display_order": "93",
+        "stage_no": "90",
+        "stage_title": "دوره البلاغ",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
         "id": "6232",
         "name": "الاعتمادات الواردة",
         "group_code": null,
@@ -26432,6 +26516,18 @@
         "display_order": "51",
         "stage_no": null,
         "stage_title": null,
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
+        "id": "6491",
+        "name": "التاسيس المرجعي",
+        "group_code": null,
+        "owner_role_id": "25",
+        "icon": "fa fa-folder",
+        "display_order": "92",
+        "stage_no": "90",
+        "stage_title": "التاسيس المرجعي",
         "is_active": "1",
         "stage_desc": null
     },
@@ -28320,6 +28416,18 @@
         "stage_desc": null
     },
     {
+        "id": "6494",
+        "name": "الاحتياج والتغطيه",
+        "group_code": null,
+        "owner_role_id": "27",
+        "icon": "fa fa-folder",
+        "display_order": "92",
+        "stage_no": "90",
+        "stage_title": "الاحتياج والتغطيه",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
         "id": "6279",
         "name": "الاعتمادات الواردة",
         "group_code": null,
@@ -29288,6 +29396,18 @@
         "display_order": "51",
         "stage_no": null,
         "stage_title": null,
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
+        "id": "6492",
+        "name": "اللوحه — خارج الدوره",
+        "group_code": null,
+        "owner_role_id": "28",
+        "icon": "fa fa-folder",
+        "display_order": "91",
+        "stage_no": "90",
+        "stage_title": "اللوحه — خارج الدوره",
         "is_active": "1",
         "stage_desc": null
     },

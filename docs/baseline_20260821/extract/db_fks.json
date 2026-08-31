@@ -61,14 +61,14 @@
     },
     {
         "TABLE_NAME": "admin_subscription_requests",
-        "COLUMN_NAME": "reviewed_by",
-        "REFERENCED_TABLE_NAME": "super_admins",
+        "COLUMN_NAME": "plan_id",
+        "REFERENCED_TABLE_NAME": "admin_subscription_plans",
         "REFERENCED_COLUMN_NAME": "id"
     },
     {
         "TABLE_NAME": "admin_subscription_requests",
-        "COLUMN_NAME": "plan_id",
-        "REFERENCED_TABLE_NAME": "admin_subscription_plans",
+        "COLUMN_NAME": "reviewed_by",
+        "REFERENCED_TABLE_NAME": "super_admins",
         "REFERENCED_COLUMN_NAME": "id"
     },
     {
@@ -115,13 +115,13 @@
     },
     {
         "TABLE_NAME": "assignment_reporting_lines",
-        "COLUMN_NAME": "asg_id",
+        "COLUMN_NAME": "reports_to_assignment_id",
         "REFERENCED_TABLE_NAME": "org_assignments",
         "REFERENCED_COLUMN_NAME": "asg_id"
     },
     {
         "TABLE_NAME": "assignment_reporting_lines",
-        "COLUMN_NAME": "reports_to_assignment_id",
+        "COLUMN_NAME": "asg_id",
         "REFERENCED_TABLE_NAME": "org_assignments",
         "REFERENCED_COLUMN_NAME": "asg_id"
     },
@@ -193,6 +193,12 @@
     },
     {
         "TABLE_NAME": "contracts",
+        "COLUMN_NAME": "site_id",
+        "REFERENCED_TABLE_NAME": "sites",
+        "REFERENCED_COLUMN_NAME": "id"
+    },
+    {
+        "TABLE_NAME": "contracts",
         "COLUMN_NAME": "project_id",
         "REFERENCED_TABLE_NAME": "project",
         "REFERENCED_COLUMN_NAME": "id"
@@ -204,21 +210,9 @@
         "REFERENCED_COLUMN_NAME": "id"
     },
     {
-        "TABLE_NAME": "contracts",
-        "COLUMN_NAME": "site_id",
-        "REFERENCED_TABLE_NAME": "sites",
-        "REFERENCED_COLUMN_NAME": "id"
-    },
-    {
         "TABLE_NAME": "contract_monthly_plan",
         "COLUMN_NAME": "line_id",
         "REFERENCED_TABLE_NAME": "client_contract_lines",
-        "REFERENCED_COLUMN_NAME": "id"
-    },
-    {
-        "TABLE_NAME": "contract_notes",
-        "COLUMN_NAME": "contract_id",
-        "REFERENCED_TABLE_NAME": "contracts",
         "REFERENCED_COLUMN_NAME": "id"
     },
     {
@@ -231,6 +225,12 @@
         "TABLE_NAME": "contract_notes",
         "COLUMN_NAME": "created_by",
         "REFERENCED_TABLE_NAME": "users",
+        "REFERENCED_COLUMN_NAME": "id"
+    },
+    {
+        "TABLE_NAME": "contract_notes",
+        "COLUMN_NAME": "contract_id",
+        "REFERENCED_TABLE_NAME": "contracts",
         "REFERENCED_COLUMN_NAME": "id"
     },
     {
@@ -277,14 +277,14 @@
     },
     {
         "TABLE_NAME": "contract_price_revisions",
-        "COLUMN_NAME": "term_id",
-        "REFERENCED_TABLE_NAME": "contract_price_terms",
+        "COLUMN_NAME": "amendment_id",
+        "REFERENCED_TABLE_NAME": "contract_amendments",
         "REFERENCED_COLUMN_NAME": "id"
     },
     {
         "TABLE_NAME": "contract_price_revisions",
-        "COLUMN_NAME": "amendment_id",
-        "REFERENCED_TABLE_NAME": "contract_amendments",
+        "COLUMN_NAME": "term_id",
+        "REFERENCED_TABLE_NAME": "contract_price_terms",
         "REFERENCED_COLUMN_NAME": "id"
     },
     {
@@ -325,12 +325,6 @@
     },
     {
         "TABLE_NAME": "daily_plan_lines",
-        "COLUMN_NAME": "equipment_container_id",
-        "REFERENCED_TABLE_NAME": "op_containers",
-        "REFERENCED_COLUMN_NAME": "id"
-    },
-    {
-        "TABLE_NAME": "daily_plan_lines",
         "COLUMN_NAME": "plan_id",
         "REFERENCED_TABLE_NAME": "daily_plans",
         "REFERENCED_COLUMN_NAME": "id"
@@ -338,6 +332,12 @@
     {
         "TABLE_NAME": "daily_plan_lines",
         "COLUMN_NAME": "operator_container_id",
+        "REFERENCED_TABLE_NAME": "op_containers",
+        "REFERENCED_COLUMN_NAME": "id"
+    },
+    {
+        "TABLE_NAME": "daily_plan_lines",
+        "COLUMN_NAME": "equipment_container_id",
         "REFERENCED_TABLE_NAME": "op_containers",
         "REFERENCED_COLUMN_NAME": "id"
     },
@@ -355,18 +355,6 @@
     },
     {
         "TABLE_NAME": "drivercontracts",
-        "COLUMN_NAME": "employee_id",
-        "REFERENCED_TABLE_NAME": "employees",
-        "REFERENCED_COLUMN_NAME": "id"
-    },
-    {
-        "TABLE_NAME": "drivercontracts",
-        "COLUMN_NAME": "project_contract_id",
-        "REFERENCED_TABLE_NAME": "contracts",
-        "REFERENCED_COLUMN_NAME": "id"
-    },
-    {
-        "TABLE_NAME": "drivercontracts",
         "COLUMN_NAME": "project_id",
         "REFERENCED_TABLE_NAME": "project",
         "REFERENCED_COLUMN_NAME": "id"
@@ -378,15 +366,21 @@
         "REFERENCED_COLUMN_NAME": "id"
     },
     {
-        "TABLE_NAME": "driver_contract_notes",
-        "COLUMN_NAME": "contract_id",
-        "REFERENCED_TABLE_NAME": "drivercontracts",
+        "TABLE_NAME": "drivercontracts",
+        "COLUMN_NAME": "employee_id",
+        "REFERENCED_TABLE_NAME": "employees",
         "REFERENCED_COLUMN_NAME": "id"
     },
     {
-        "TABLE_NAME": "employee_contracts",
-        "COLUMN_NAME": "project_id",
-        "REFERENCED_TABLE_NAME": "project",
+        "TABLE_NAME": "drivercontracts",
+        "COLUMN_NAME": "project_contract_id",
+        "REFERENCED_TABLE_NAME": "contracts",
+        "REFERENCED_COLUMN_NAME": "id"
+    },
+    {
+        "TABLE_NAME": "driver_contract_notes",
+        "COLUMN_NAME": "contract_id",
+        "REFERENCED_TABLE_NAME": "drivercontracts",
         "REFERENCED_COLUMN_NAME": "id"
     },
     {
@@ -399,6 +393,12 @@
         "TABLE_NAME": "employee_contracts",
         "COLUMN_NAME": "employee_id",
         "REFERENCED_TABLE_NAME": "employees",
+        "REFERENCED_COLUMN_NAME": "id"
+    },
+    {
+        "TABLE_NAME": "employee_contracts",
+        "COLUMN_NAME": "project_id",
+        "REFERENCED_TABLE_NAME": "project",
         "REFERENCED_COLUMN_NAME": "id"
     },
     {
@@ -547,14 +547,14 @@
     },
     {
         "TABLE_NAME": "fin_bank_statement_lines",
-        "COLUMN_NAME": "bank_account_id",
-        "REFERENCED_TABLE_NAME": "fin_bank_accounts",
+        "COLUMN_NAME": "matched_payment_id",
+        "REFERENCED_TABLE_NAME": "fin_payments",
         "REFERENCED_COLUMN_NAME": "id"
     },
     {
         "TABLE_NAME": "fin_bank_statement_lines",
-        "COLUMN_NAME": "matched_payment_id",
-        "REFERENCED_TABLE_NAME": "fin_payments",
+        "COLUMN_NAME": "bank_account_id",
+        "REFERENCED_TABLE_NAME": "fin_bank_accounts",
         "REFERENCED_COLUMN_NAME": "id"
     },
     {
@@ -583,14 +583,14 @@
     },
     {
         "TABLE_NAME": "fin_collection_allocations",
-        "COLUMN_NAME": "payment_id",
-        "REFERENCED_TABLE_NAME": "fin_payments",
+        "COLUMN_NAME": "receivable_id",
+        "REFERENCED_TABLE_NAME": "fin_receivables",
         "REFERENCED_COLUMN_NAME": "id"
     },
     {
         "TABLE_NAME": "fin_collection_allocations",
-        "COLUMN_NAME": "receivable_id",
-        "REFERENCED_TABLE_NAME": "fin_receivables",
+        "COLUMN_NAME": "payment_id",
+        "REFERENCED_TABLE_NAME": "fin_payments",
         "REFERENCED_COLUMN_NAME": "id"
     },
     {
@@ -649,13 +649,13 @@
     },
     {
         "TABLE_NAME": "fin_internal_allocations",
-        "COLUMN_NAME": "to_center_id",
+        "COLUMN_NAME": "from_center_id",
         "REFERENCED_TABLE_NAME": "fin_cost_centers",
         "REFERENCED_COLUMN_NAME": "id"
     },
     {
         "TABLE_NAME": "fin_internal_allocations",
-        "COLUMN_NAME": "from_center_id",
+        "COLUMN_NAME": "to_center_id",
         "REFERENCED_TABLE_NAME": "fin_cost_centers",
         "REFERENCED_COLUMN_NAME": "id"
     },
@@ -679,14 +679,14 @@
     },
     {
         "TABLE_NAME": "fin_requests",
-        "COLUMN_NAME": "settlement_id",
-        "REFERENCED_TABLE_NAME": "settlements",
+        "COLUMN_NAME": "parent_request_id",
+        "REFERENCED_TABLE_NAME": "fin_requests",
         "REFERENCED_COLUMN_NAME": "id"
     },
     {
         "TABLE_NAME": "fin_requests",
-        "COLUMN_NAME": "parent_request_id",
-        "REFERENCED_TABLE_NAME": "fin_requests",
+        "COLUMN_NAME": "settlement_id",
+        "REFERENCED_TABLE_NAME": "settlements",
         "REFERENCED_COLUMN_NAME": "id"
     },
     {
@@ -871,12 +871,6 @@
     },
     {
         "TABLE_NAME": "monthly_performance_downtime",
-        "COLUMN_NAME": "obligation_id",
-        "REFERENCED_TABLE_NAME": "contract_obligations",
-        "REFERENCED_COLUMN_NAME": "id"
-    },
-    {
-        "TABLE_NAME": "monthly_performance_downtime",
         "COLUMN_NAME": "reason_code",
         "REFERENCED_TABLE_NAME": "stop_reason_codes",
         "REFERENCED_COLUMN_NAME": "code"
@@ -888,9 +882,33 @@
         "REFERENCED_COLUMN_NAME": "id"
     },
     {
+        "TABLE_NAME": "monthly_performance_downtime",
+        "COLUMN_NAME": "obligation_id",
+        "REFERENCED_TABLE_NAME": "contract_obligations",
+        "REFERENCED_COLUMN_NAME": "id"
+    },
+    {
+        "TABLE_NAME": "nav_lifecycle_groups",
+        "COLUMN_NAME": "workspace_id",
+        "REFERENCED_TABLE_NAME": "nav_workspaces",
+        "REFERENCED_COLUMN_NAME": "workspace_id"
+    },
+    {
         "TABLE_NAME": "nav_pending_answers",
         "COLUMN_NAME": "closure_id",
         "REFERENCED_TABLE_NAME": "nav_pending_closure",
+        "REFERENCED_COLUMN_NAME": "id"
+    },
+    {
+        "TABLE_NAME": "nav_placements",
+        "COLUMN_NAME": "workspace_id",
+        "REFERENCED_TABLE_NAME": "nav_workspaces",
+        "REFERENCED_COLUMN_NAME": "workspace_id"
+    },
+    {
+        "TABLE_NAME": "nav_placements",
+        "COLUMN_NAME": "group_id",
+        "REFERENCED_TABLE_NAME": "nav_lifecycle_groups",
         "REFERENCED_COLUMN_NAME": "id"
     },
     {
@@ -898,6 +916,12 @@
         "COLUMN_NAME": "group_code",
         "REFERENCED_TABLE_NAME": "nav_group_taxonomy",
         "REFERENCED_COLUMN_NAME": "code"
+    },
+    {
+        "TABLE_NAME": "nav_ws_roles",
+        "COLUMN_NAME": "workspace_id",
+        "REFERENCED_TABLE_NAME": "nav_workspaces",
+        "REFERENCED_COLUMN_NAME": "workspace_id"
     },
     {
         "TABLE_NAME": "operator_rotations",
@@ -973,14 +997,14 @@
     },
     {
         "TABLE_NAME": "pay_components",
-        "COLUMN_NAME": "contract_id",
-        "REFERENCED_TABLE_NAME": "employee_contracts",
+        "COLUMN_NAME": "cost_center_id",
+        "REFERENCED_TABLE_NAME": "fin_cost_centers",
         "REFERENCED_COLUMN_NAME": "id"
     },
     {
         "TABLE_NAME": "pay_components",
-        "COLUMN_NAME": "cost_center_id",
-        "REFERENCED_TABLE_NAME": "fin_cost_centers",
+        "COLUMN_NAME": "contract_id",
+        "REFERENCED_TABLE_NAME": "employee_contracts",
         "REFERENCED_COLUMN_NAME": "id"
     },
     {
@@ -1003,15 +1027,15 @@
     },
     {
         "TABLE_NAME": "permit_approval_actions",
-        "COLUMN_NAME": "rq_id",
-        "REFERENCED_TABLE_NAME": "permit_required_approvals",
-        "REFERENCED_COLUMN_NAME": "rq_id"
-    },
-    {
-        "TABLE_NAME": "permit_approval_actions",
         "COLUMN_NAME": "req_id",
         "REFERENCED_TABLE_NAME": "permit_requests",
         "REFERENCED_COLUMN_NAME": "req_id"
+    },
+    {
+        "TABLE_NAME": "permit_approval_actions",
+        "COLUMN_NAME": "rq_id",
+        "REFERENCED_TABLE_NAME": "permit_required_approvals",
+        "REFERENCED_COLUMN_NAME": "rq_id"
     },
     {
         "TABLE_NAME": "permit_requests",
@@ -1033,18 +1057,6 @@
     },
     {
         "TABLE_NAME": "person_positions",
-        "COLUMN_NAME": "relation_code",
-        "REFERENCED_TABLE_NAME": "hr_dictionaries",
-        "REFERENCED_COLUMN_NAME": "code"
-    },
-    {
-        "TABLE_NAME": "person_positions",
-        "COLUMN_NAME": "person_id",
-        "REFERENCED_TABLE_NAME": "persons",
-        "REFERENCED_COLUMN_NAME": "person_id"
-    },
-    {
-        "TABLE_NAME": "person_positions",
         "COLUMN_NAME": "level_code",
         "REFERENCED_TABLE_NAME": "hr_dictionaries",
         "REFERENCED_COLUMN_NAME": "code"
@@ -1054,6 +1066,18 @@
         "COLUMN_NAME": "family_code",
         "REFERENCED_TABLE_NAME": "hr_dictionaries",
         "REFERENCED_COLUMN_NAME": "code"
+    },
+    {
+        "TABLE_NAME": "person_positions",
+        "COLUMN_NAME": "relation_code",
+        "REFERENCED_TABLE_NAME": "hr_dictionaries",
+        "REFERENCED_COLUMN_NAME": "code"
+    },
+    {
+        "TABLE_NAME": "person_positions",
+        "COLUMN_NAME": "person_id",
+        "REFERENCED_TABLE_NAME": "persons",
+        "REFERENCED_COLUMN_NAME": "person_id"
     },
     {
         "TABLE_NAME": "person_relationships",
@@ -1447,18 +1471,6 @@
     },
     {
         "TABLE_NAME": "supplierscontracts",
-        "COLUMN_NAME": "project_id",
-        "REFERENCED_TABLE_NAME": "project",
-        "REFERENCED_COLUMN_NAME": "id"
-    },
-    {
-        "TABLE_NAME": "supplierscontracts",
-        "COLUMN_NAME": "merged_with",
-        "REFERENCED_TABLE_NAME": "supplierscontracts",
-        "REFERENCED_COLUMN_NAME": "id"
-    },
-    {
-        "TABLE_NAME": "supplierscontracts",
         "COLUMN_NAME": "supplier_id",
         "REFERENCED_TABLE_NAME": "suppliers",
         "REFERENCED_COLUMN_NAME": "id"
@@ -1467,6 +1479,18 @@
         "TABLE_NAME": "supplierscontracts",
         "COLUMN_NAME": "project_contract_id",
         "REFERENCED_TABLE_NAME": "contracts",
+        "REFERENCED_COLUMN_NAME": "id"
+    },
+    {
+        "TABLE_NAME": "supplierscontracts",
+        "COLUMN_NAME": "project_id",
+        "REFERENCED_TABLE_NAME": "project",
+        "REFERENCED_COLUMN_NAME": "id"
+    },
+    {
+        "TABLE_NAME": "supplierscontracts",
+        "COLUMN_NAME": "merged_with",
+        "REFERENCED_TABLE_NAME": "supplierscontracts",
         "REFERENCED_COLUMN_NAME": "id"
     },
     {
@@ -1483,14 +1507,14 @@
     },
     {
         "TABLE_NAME": "supplier_capacity",
-        "COLUMN_NAME": "contract_id",
-        "REFERENCED_TABLE_NAME": "supplier_contracts",
+        "COLUMN_NAME": "equipment_id",
+        "REFERENCED_TABLE_NAME": "equipments",
         "REFERENCED_COLUMN_NAME": "id"
     },
     {
         "TABLE_NAME": "supplier_capacity",
-        "COLUMN_NAME": "equipment_id",
-        "REFERENCED_TABLE_NAME": "equipments",
+        "COLUMN_NAME": "contract_id",
+        "REFERENCED_TABLE_NAME": "supplier_contracts",
         "REFERENCED_COLUMN_NAME": "id"
     },
     {
@@ -1501,24 +1525,18 @@
     },
     {
         "TABLE_NAME": "supplier_contracts",
-        "COLUMN_NAME": "client_contract_id",
-        "REFERENCED_TABLE_NAME": "contracts",
-        "REFERENCED_COLUMN_NAME": "id"
-    },
-    {
-        "TABLE_NAME": "supplier_contracts",
         "COLUMN_NAME": "supplier_id",
         "REFERENCED_TABLE_NAME": "suppliers",
         "REFERENCED_COLUMN_NAME": "id"
     },
     {
-        "TABLE_NAME": "supplier_contract_closures",
-        "COLUMN_NAME": "contract_id",
-        "REFERENCED_TABLE_NAME": "supplier_contracts",
+        "TABLE_NAME": "supplier_contracts",
+        "COLUMN_NAME": "client_contract_id",
+        "REFERENCED_TABLE_NAME": "contracts",
         "REFERENCED_COLUMN_NAME": "id"
     },
     {
-        "TABLE_NAME": "supplier_contract_lines",
+        "TABLE_NAME": "supplier_contract_closures",
         "COLUMN_NAME": "contract_id",
         "REFERENCED_TABLE_NAME": "supplier_contracts",
         "REFERENCED_COLUMN_NAME": "id"
@@ -1530,15 +1548,21 @@
         "REFERENCED_COLUMN_NAME": "id"
     },
     {
-        "TABLE_NAME": "supplier_contract_notes",
-        "COLUMN_NAME": "created_by",
-        "REFERENCED_TABLE_NAME": "users",
+        "TABLE_NAME": "supplier_contract_lines",
+        "COLUMN_NAME": "contract_id",
+        "REFERENCED_TABLE_NAME": "supplier_contracts",
         "REFERENCED_COLUMN_NAME": "id"
     },
     {
         "TABLE_NAME": "supplier_contract_notes",
         "COLUMN_NAME": "contract_id",
         "REFERENCED_TABLE_NAME": "supplierscontracts",
+        "REFERENCED_COLUMN_NAME": "id"
+    },
+    {
+        "TABLE_NAME": "supplier_contract_notes",
+        "COLUMN_NAME": "created_by",
+        "REFERENCED_TABLE_NAME": "users",
         "REFERENCED_COLUMN_NAME": "id"
     },
     {
@@ -1591,12 +1615,6 @@
     },
     {
         "TABLE_NAME": "tickets",
-        "COLUMN_NAME": "ticket_type_id",
-        "REFERENCED_TABLE_NAME": "ticket_types",
-        "REFERENCED_COLUMN_NAME": "id"
-    },
-    {
-        "TABLE_NAME": "tickets",
         "COLUMN_NAME": "sla_policy_id",
         "REFERENCED_TABLE_NAME": "ticket_sla_policies",
         "REFERENCED_COLUMN_NAME": "id"
@@ -1611,6 +1629,12 @@
         "TABLE_NAME": "tickets",
         "COLUMN_NAME": "category_id",
         "REFERENCED_TABLE_NAME": "ticket_categories",
+        "REFERENCED_COLUMN_NAME": "id"
+    },
+    {
+        "TABLE_NAME": "tickets",
+        "COLUMN_NAME": "ticket_type_id",
+        "REFERENCED_TABLE_NAME": "ticket_types",
         "REFERENCED_COLUMN_NAME": "id"
     },
     {
@@ -1711,12 +1735,6 @@
     },
     {
         "TABLE_NAME": "transfer_orders",
-        "COLUMN_NAME": "transfer_type_id",
-        "REFERENCED_TABLE_NAME": "transfer_types",
-        "REFERENCED_COLUMN_NAME": "id"
-    },
-    {
-        "TABLE_NAME": "transfer_orders",
         "COLUMN_NAME": "to_location_id",
         "REFERENCED_TABLE_NAME": "trs_locations",
         "REFERENCED_COLUMN_NAME": "id"
@@ -1731,6 +1749,12 @@
         "TABLE_NAME": "transfer_orders",
         "COLUMN_NAME": "from_location_id",
         "REFERENCED_TABLE_NAME": "trs_locations",
+        "REFERENCED_COLUMN_NAME": "id"
+    },
+    {
+        "TABLE_NAME": "transfer_orders",
+        "COLUMN_NAME": "transfer_type_id",
+        "REFERENCED_TABLE_NAME": "transfer_types",
         "REFERENCED_COLUMN_NAME": "id"
     },
     {
@@ -1795,6 +1819,12 @@
     },
     {
         "TABLE_NAME": "users",
+        "COLUMN_NAME": "employee_id",
+        "REFERENCED_TABLE_NAME": "employees",
+        "REFERENCED_COLUMN_NAME": "id"
+    },
+    {
+        "TABLE_NAME": "users",
         "COLUMN_NAME": "supplier_entity_id",
         "REFERENCED_TABLE_NAME": "suppliers",
         "REFERENCED_COLUMN_NAME": "id"
@@ -1803,12 +1833,6 @@
         "TABLE_NAME": "users",
         "COLUMN_NAME": "position_id",
         "REFERENCED_TABLE_NAME": "positions",
-        "REFERENCED_COLUMN_NAME": "id"
-    },
-    {
-        "TABLE_NAME": "users",
-        "COLUMN_NAME": "employee_id",
-        "REFERENCED_TABLE_NAME": "employees",
         "REFERENCED_COLUMN_NAME": "id"
     },
     {

@@ -207,6 +207,15 @@
         "can_delete": "0"
     },
     {
+        "id": "9718",
+        "role_id": "1",
+        "module_id": "56",
+        "can_view": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0"
+    },
+    {
         "id": "355",
         "role_id": "1",
         "module_id": "62",
@@ -32515,6 +32524,15 @@
         "can_add": "0",
         "can_edit": "0",
         "can_delete": "0"
+    },
+    {
+        "id": "9717",
+        "role_id": "27",
+        "module_id": "55",
+        "can_view": "1",
+        "can_add": "1",
+        "can_edit": "1",
+        "can_delete": "1"
     },
     {
         "id": "1576",

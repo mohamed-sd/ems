@@ -1,7 +1,7 @@
 # MASTER FINAL CLOSURE REGISTER — السجلُّ الجامعُ للإغلاقِ النهائيّ
 
 > **المخزنُ الحاكم:** `registers/MASTER_FINAL_CLOSURE_REGISTER.json` — وهذا إسقاطُه.
-> **اللقطة:** `b0d2c3e9` · **حُدِّث:** 2026-08-31 19:30
+> **اللقطة:** `f592cdf9` · **حُدِّث:** 2026-08-31 21:20
 > **المصمَّمُ الحاكم:** `docs/REPAIR01_20260823/orders/CLOSURE_SYSTEM.txt`
 
 ## مقامُ الحالات — ⛔ ولا تُجمَع في نسبةٍ واحدة
@@ -12,10 +12,11 @@
 | `BLOCKED_GOVERNING_SOURCE` | 1 |
 | `BLOCKED_OWNER` | 26 |
 | `BLOCKED_UAT` | 4 |
-| `EVIDENCE_CLOSED` | 107 |
+| `EVIDENCE_CLOSED` | 112 |
 | `IMPLEMENTED_NOT_VERIFIED` | 23 |
-| `OPEN` | 11 |
-| **الجملة** | **173** |
+| `IN_PROGRESS` | 1 |
+| `OPEN` | 12 |
+| **الجملة** | **180** |
 
 ## البنودُ غيرُ المغلقة — بحاجزِها وفعلِها التالي
 
@@ -26,8 +27,9 @@
 | `CL-FR-APP-002` | `BLOCKED_OWNER` | P0 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ 808a2c03 |  |
 | `CL-FR-APP-004` | `BLOCKED_OWNER` | P0 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ 808a2c03 |  |
 | `CL-FR-DAT-001` | `BLOCKED_OWNER` | P0 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ 808a2c03 |  |
-| `CL-NAVR-CONFORM` | `OPEN` | P1 | — | أمر المالك: إصلاح نموذج الملاحة من الجذور (2026-08-31) | EXACT_DEPARTMENT_NAV_CONFORMANCE=0/17 — البقية حملة صقل ادارة-ادارة: BUILT_NOT_RENDERED=30 | فض الثلاثين حالة-حالة (منح/جسر/حكم) ثم المجموعات والترتيب — بالخوارزمي |
-| `CL-NAVR-HUMAN` | `BLOCKED_UAT` | P1 | UAT | أمر المالك: إصلاح نموذج الملاحة من الجذور (2026-08-31) | Human Render Verification بدور حقيقي لكل ادارة — لا يعلن Sidebar PASS قبله @ b0d2c3e9 | جولة تحقق بشري بعد بلوغ EXACT=17/17 |
+| `CL-NAVR-CONFORM` | `IN_PROGRESS` | P1 | — | أمر المالك: إصلاح نموذج الملاحة من الجذور (2026-08-31) | STRUCTURAL_NAV_PASS=2/17 (DEP-11·DEP-17) · مجموعات 143/182 · ترتيب 150/182 · صفر مبني غير  | فض الثلاثين حالة-حالة (منح/جسر/حكم) ثم المجموعات والترتيب — بالخوارزمي |
+| `CL-NAVR-HUMAN` | `BLOCKED_UAT` | P1 | UAT | أمر المالك: إصلاح نموذج الملاحة من الجذور (2026-08-31) | §26: كل ادارة تبلغ STRUCTURAL_NAV_PASS تدخل التحقق البشري فورا — المؤهلتان الان: DEP-11 (ا | جولة تحقق بشري بدور حقيقي للمؤهلتين الان — ولا انتظار 17/17 |
+| `CL-NAVR-EX` | `OPEN` | P1 | — | امر الحوكمة الموحد النهائي (2026-08-31) | §13: مواضع EX-CEO/EX-DVP تستورد من ملف القيادة 02·القيادة.xlsx — NO_SPEC ازيلت واستبدلت PE | موسع استيراد يقرا ملف القيادة ويبني placements للمساحتين التنفيذيتين |
 | `CL-GAP-23` | `BLOCKED_UAT` | P1 | — | tools/injfix01_gap_coverage.php | الحاجز بشري لا هندسي — يغلق بجولة UAT @ 1c3ed647 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
 | `CL-GAP-29` | `OPEN` | P1 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
 | `CL-FR-APP-005` | `IMPLEMENTED_NOT_VERIFIED` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ 808a2c03 |  |
@@ -69,6 +71,7 @@
 | `CL-OA-06` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | orders/CLOSURE_SYSTEM.txt §الوثيقة الرابعة | قيم الاعتماد (حدود السلم) عند نافذة الظل @ 808a2c03 | ينتظر بوابته — ولا يحجب إلا نطاقه |
 | `CL-OA-07` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | registers/OWNER_ACTION_REGISTER.md | اعتماد الاصدار الهدف للكونين المؤجلين @ c60c09b7 | ينتظر بوابته — ولا يحجب إلا نطاقه |
 | `CL-GAP-63` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/baseline_20260821/FINDINGS.md F-H19 | نافذة ظل الاعتماد صفر تقييم — مرجعها CL-FR-APP-002/004 (BLOCKED_OWNER) وOA-06 قيم الاعتماد | تنتظر قيم الاعتماد (OA-06) ووقائع حية — والمحرك مبني (app001 11/11) |
+| `CL-NAVR-LINEAGE` | `OPEN` | P2 | — | امر الحوكمة الموحد النهائي (2026-08-31) | §10 Baseline مقيس لا مخترع: Applicable=480 · With=196 · Without=284 (ادوات ومراس وبنود خار | مصالحة الـ284 صنفا صنفا (اداة/مرساة/خارج الورقة) في سجل المصالحة |
 | `CL-GAP-03` | `OPEN` | P2 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
 | `CL-GAP-12` | `OPEN` | P2 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
 | `CL-GAP-14` | `OPEN` | P2 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
@@ -99,6 +102,7 @@
 | `CL-NAVR-05` | navr_import_guide + sidebar_guide_compare @ b0d2c3e9 |
 | `CL-NAVR-06` | NAVR_METRICS.md @ b0d2c3e9 |
 | `CL-NAVR-07` | navr_import_guide --apply + navr_wire_missing --apply @ b0d2c3e9 |
+| `CL-GATE-00` | GATE00_BASELINE.md @ f592cdf9 |
 | `CL-WORK-03` | schtasks EMS_cron_events LastTaskResult=0 + storage/logs/cron_events.log نبض START/END + سالب الازدواج SKIP + مؤشرات عند الراس 17985 @ 59136c85 |
 | `CL-GAP-07` | bus_stall_alarm_proof 11/11 — العدة حوكيت بتسجيل الانتاج كاملا (fx موصول) واليتم يثبت بمجس اصطناعي @ 747cfbe7 |
 | `CL-GAP-10` | tests/injfix01_sensitive_fields_nine_channels_proof.php 15/15 + سالب --negative=GAP-10 اثبت الرسوب @ 59136c85 |
@@ -111,6 +115,10 @@
 | `CL-NAVR-08` | nav_placements placement_type=NOT_BUILT @ b0d2c3e9 |
 | `CL-NAVR-09` | nav_workspaces.ruling + NAVR_ROOT_AUDIT §⑤ @ b0d2c3e9 |
 | `CL-NAVR-10` | sidebar_guide_compare (المصنف خارج المقام) + NAVR_METRICS @ b0d2c3e9 |
+| `CL-GOV-SRCMAP` | registers/GOVERNING_SOURCE_MAP.md @ f592cdf9 |
+| `CL-NAVR-CARD` | tests/navr_ws_cardinality_proof.php 5/5 + هجرة 2028_02_03 @ f592cdf9 |
+| `CL-NAVR-TID` | هجرة 2028_02_03 + navr_import_guide @ f592cdf9 |
+| `CL-NAVR-RECON` | tools/navr_legacy_reconcile.php + gov_legacy_nav_recon @ f592cdf9 |
 | `CL-WORK-04` | REQUIRED_SETTLEMENT_EFFECT_MISSING=0 مقيسا + settlement_proof 16/16 + eng01_bus_test 22/22 + rpr03_contract_register صفر مفردة بلا عقد @ 59136c85 |
 | `CL-WORK-05` | سقاطتان شدتا (permission 72⇒20 · extraction 77⇒36 بتمديد الاستخراج للعديات) ودينان جديدان سدا لا شدا (قارئ وهمي + ملكية cron_task) — الحزام 25⇒30/34 والمقامات ثابتة @ 59136c85 |
 | `CL-GAP-01` | tools/injfix01_gap_coverage.php @ 808a2c03 |

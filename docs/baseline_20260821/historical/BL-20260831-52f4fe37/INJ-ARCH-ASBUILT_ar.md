@@ -1,7 +1,6 @@
 # INJ-ARCH-ASBUILT — المعمارية الفعلية الحالية لمنصة إنجاز (As-Built)
 
-> **اللقطة:** `BL-20260831c-f592cdf9` (حزمة GATE-00 الذرّيّة · 2026-08-31 · 20:40→20:50) · [SNAPSHOT.md](SNAPSHOT.md)
-> ⛔ **قاعدة القراءة**: ما لم يُعَد قياسُه في حزمةِ `f592cdf9` من أرقامِ هذه الوثيقةِ فهو قياسُ لقطةِ الصباحِ `52f4fe37` ويُقرأ **HISTORICAL** — والحاضرُ الحاكمُ للملاحةِ [`NAVR_METRICS`](../REPAIR01_20260823/NAVR_METRICS.md) وللبرنامجِ السجلُّ الجامع. ودلتا المساء (CLOSURE_SYSTEM + NAVR) موجزة في رأسِ SNAPSHOT.
+> **اللقطة:** `BL-20260831-52f4fe37` · القياس: 2026-08-31 · 10:32→11:30 · التفصيل في [SNAPSHOT.md](SNAPSHOT.md)
 > **سبعُ لقطاتٍ سابقة** في [`historical/`](historical/) — أرقامها تاريخ.
 > **القاعدة:** وثيقة **ما هو مبني فعلًا** — لا Target. كل حكم مسنود إلى `ملف:سطر` أو استعلام منفَّذ على `equipation_manage` (MariaDB 11.4.9). ما تعذّر تحديده وُسم `UNKNOWN`/`NEEDS_REVIEW`.
 > **المعرّفات المشتركة:** `SCR-nnnn` و`DEP-nn` من `repair01_screen_registry`/`repair01_departments` (سجل النظام) · `FR-xxx-nnn` (سجل المتطلبات) · `CAP-xx` · `GAP-xx`.

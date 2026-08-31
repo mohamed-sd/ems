@@ -4,9 +4,9 @@
     "handlers": 81,
     "cron": 25,
     "registry_no_disk": 0,
-    "disk_not_in_any_registry": 61,
-    "owner_unknown": 83,
-    "owner_conflicts": 13,
+    "disk_not_in_any_registry": 58,
+    "owner_unknown": 80,
+    "owner_conflicts": 15,
     "with_stage": 272,
     "fields_total": 14999,
     "gpi_unknown_route": 3

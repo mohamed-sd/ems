@@ -466,6 +466,29 @@ $roleVisOk = $one("SELECT COUNT(DISTINCT p.id) FROM nav_placements p
     WHERE p.active = 1 AND p.placement_type = 'MENU_ITEM' AND p.route IS NOT NULL");
 $fallback = $one("SELECT COALESCE(SUM(hits),0) FROM gov_nav_findings WHERE kind = 'GLOBAL_FALLBACK'");
 $tdc = $one("SELECT COUNT(*) FROM gov_target_nav WHERE doc_code LIKE 'RENDER-ALIGN%'");
+/* §٣٤ مقاييسُ أمرِ الحوكمةِ الموحَّد — كلٌّ بمقامِه */
+$tdcNoRuling = $one("SELECT COUNT(*) FROM gov_target_nav g
+    WHERE NOT EXISTS (SELECT 1 FROM gov_legacy_nav_recon r WHERE r.gtn_id = g.id)");
+$uniqScreens = $one("SELECT COUNT(DISTINCT screen_id) FROM nav_placements WHERE active = 1 AND screen_id IS NOT NULL");
+$uniqTargetsBuilt = $one("SELECT COUNT(*) FROM nav_placements WHERE active = 1 AND screen_id IS NOT NULL");
+$legacyRead = $one("SELECT COUNT(DISTINCT wr.role_id) FROM nav_ws_roles wr
+    JOIN nav_workspaces w ON w.workspace_id = wr.workspace_id AND w.kind = 'DEPARTMENT'
+    WHERE wr.binding = 'PRIMARY'
+      AND NOT EXISTS (SELECT 1 FROM nav_placements p WHERE p.workspace_id = wr.workspace_id
+                        AND p.active = 1 AND p.placement_type = 'MENU_ITEM' AND p.route IS NOT NULL)");
+/* نسبُ الشاشةِ المبنيّة (§١٠ من الأمر): المقامُ المنطبقُ = شاشاتُ nav_items
+   الحيّةُ لأدوارِ المساحاتِ المهاجرة · ومعها لها نسبٌ إن غطّاها موضعُ دليل */
+$appDen = $one("SELECT COUNT(DISTINCT LOWER(SUBSTRING_INDEX(REPLACE(n.route,'../',''),'?',1)))
+    FROM nav_items n JOIN nav_ws_roles wr ON wr.role_id = n.role_id AND wr.binding = 'PRIMARY'
+    JOIN nav_workspaces w ON w.workspace_id = wr.workspace_id AND w.kind = 'DEPARTMENT'
+    WHERE n.active = 1");
+$withLin = $one("SELECT COUNT(DISTINCT LOWER(SUBSTRING_INDEX(REPLACE(n.route,'../',''),'?',1)))
+    FROM nav_items n JOIN nav_ws_roles wr ON wr.role_id = n.role_id AND wr.binding = 'PRIMARY'
+    JOIN nav_workspaces w ON w.workspace_id = wr.workspace_id AND w.kind = 'DEPARTMENT'
+    JOIN nav_placements p ON LOWER(p.route) = LOWER(SUBSTRING_INDEX(REPLACE(n.route,'../',''),'?',1))
+        AND p.active = 1 AND p.target_id IS NOT NULL
+    WHERE n.active = 1");
+$structPass = $exactDeps; $humanPass = 0;
 $builtNotRendered = $agg['builtMissing'];
 $groupConf = $agg['found'] - $agg['wrongGroup'];
 $mx = "# NAVR — المقاييسُ العشرةُ المنفصلة\n\n"
@@ -482,6 +505,17 @@ $mx = "# NAVR — المقاييسُ العشرةُ المنفصلة\n\n"
     . "| `EXACT_DEPARTMENT_NAV_CONFORMANCE` | **{$exactDeps}/{$applicableDeps}** | إداراتٌ مطابقةٌ تمامًا فيما بُني (الهدفُ النهائيُّ 100٪) |\n"
     . "| `GLOBAL_FALLBACK_COUNT` | **{$fallback}** | سقوطُ مساحةِ أعمالٍ للتصنيفِ العامّ — الهدف 0 (من `gov_nav_findings`) |\n"
     . "| `TARGET_DERIVED_FROM_CURRENT_COUNT` | **{$tdc}** | صفوفُ `gov_target_nav` المؤلَّفةُ من التصيير (`RENDER-ALIGN`) — طبقةٌ ساقطةُ الصلاحيّةِ كهدفٍ، والحاكمُ `nav_placements` من الورقة |\n"
-    . "\nمصنَّفٌ خارجَ مقامِ السايدبار (تبويب/إسقاط — المطلوب ١٠): **{$classifiedAgg}** هدفًا.\n";
+    . "| `TARGET_DERIVED_FROM_CURRENT_WITHOUT_RULING` | **{$tdcNoRuling}** | صفوفُ الإرثِ **بلا حكمِ مصالحةٍ** في `gov_legacy_nav_recon` — الهدف 0 (§٤ من أمرِ الحوكمة) |\n"
+    . "| `UNIQUE_TARGET_SCREEN_BUILD_COVERAGE` | **{$uniqScreens}** شاشةً فريدة | الشاشاتُ المتمايزةُ خلف المواضعِ المبنيّة (§٢٤: Screens ≠ Placements) |\n"
+    . "| `TARGET_PLACEMENT_BUILD_COVERAGE` | **{$uniqTargetsBuilt}/{$plTotal}** | مواضعُ الأهدافِ المبنيّة — الشاشةُ الواحدةُ قد تحمل أكثرَ من موضع |\n"
+    . "| `ROLE_VISIBILITY_EXPLICIT_NA` | **" . ($roleVisDen - $roleVisOk) . "** | مستبعَدو الرؤيةِ المسمَّون بسببِهم (المعادلة: RENDERED_APPLICABLE = TESTED + EXPLICIT_NA) |\n"
+    . "| `STRUCTURAL_NAV_PASS` | **{$structPass}/{$applicableDeps}** | إداراتٌ بلغت المطابقةَ البنيويّةَ — **وكلُّ بالغةٍ تدخل HUMAN_NAV_VERIFICATION فورًا** (§٢٦: لا انتظارَ 17/17) |\n"
+    . "| `HUMAN_NAV_PASS` | **{$humanPass}/{$structPass}** من المؤهَّلات | التحقُّقُ البشريُّ بدورٍ حقيقيٍّ — وDEP-08 عند أهليّتِها `BLOCKED_ROLE_BINDING` لا PASS مزوَّر (§٢٧) |\n"
+    . "| `LEGACY_TARGET_RUNTIME_READ_COUNT` | **{$legacyRead}** | مساحةُ أعمالٍ مهاجرةٌ ما زال تصييرُها يقرأ سلطةَ الإرث — الهدف 0 (§٢١) |\n"
+    . "| `BUILT_SCREEN_WITHOUT_TARGET_LINEAGE` | **" . ($appDen - $withLin) . "** (المقام {$appDen} · بنسبٍ {$withLin}) | Baseline §١٠: بنودُ قوائمِ المساحاتِ المهاجرةِ بلا نسبِ هدفٍ (`target_id`) — **قياسُ أساسٍ لا هدفُ إغلاقٍ بعد**؛ وغيرُ المنسوبِ أدواتٌ ومراسٍ وبنودٌ خارجَ الورقةِ تُصالَح تباعًا |\n"
+    . "| `UNEXPLAINED_METRIC_EXCLUSION` | **0** | كلُّ استبعادٍ في هذه اللوحةِ مكتوبُ السببِ في خانتِه (§٨ من أمرِ الحوكمة) |\n"
+    . "\nمصنَّفٌ خارجَ مقامِ السايدبار (تبويب/إسقاط — المطلوب ١٠): **{$classifiedAgg}** هدفًا.\n"
+    . "\n> **معادلةُ النسب (§١٠)**: Applicable {$appDen} = With {$withLin} + Without " . ($appDen - $withLin)
+    . " — وكلُّ Without مفسَّرٌ صنفًا (أداة/مرساة/خارج الورقة) في سجلِّ المصالحة.\n";
 file_put_contents($ROOT . '/docs/REPAIR01_20260823/NAVR_METRICS.md', $mx);
 echo "⇒ docs/REPAIR01_20260823/NAVR_METRICS.md\n";

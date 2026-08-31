@@ -3525,7 +3525,8 @@
         "on_disk": 1,
         "sources": [
             "disk",
-            "apps"
+            "apps",
+            "nav"
         ],
         "name_ar": "التفاوض ومراجعات العرض",
         "names_all": [
@@ -3543,7 +3544,15 @@
                 "owner_kind": "BUSINESS_DEPARTMENT"
             }
         ],
-        "roles_nav": [],
+        "roles_nav": {
+            "ادارة المبيعات": [
+                {
+                    "group": "العرض والتفاوض",
+                    "order": 3003,
+                    "perm": "Clients\/quotation_negotiation.php"
+                }
+            ]
+        },
         "profiles_count": 1,
         "profiles": [
             {
@@ -4208,7 +4217,7 @@
                 "space": "إدارة المالية",
                 "kind": "DEPARTMENT",
                 "tab": "العملاء والفرص",
-                "cls": "FORBIDDEN",
+                "cls": "OWNED",
                 "decision": "CONFIRMED",
                 "owner_kind": "BUSINESS_DEPARTMENT"
             },
@@ -4373,6 +4382,13 @@
             }
         ],
         "roles_nav": {
+            "ادارة المبيعات": [
+                {
+                    "group": "نقرأ تقارير إدارتي",
+                    "order": 50,
+                    "perm": "Contracts\/commercial_board.php"
+                }
+            ],
             "إدارة المالية": [
                 {
                     "group": "التقارير والتحليلات",
@@ -27377,14 +27393,35 @@
         "surface_type": "SCREEN",
         "on_disk": 1,
         "sources": [
-            "disk"
+            "disk",
+            "apps",
+            "nav"
         ],
-        "name_ar": "UNKNOWN",
-        "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
-        "workspaces": [],
-        "roles_nav": [],
+        "name_ar": "انتقال الملكية والخروج",
+        "names_all": [
+            "انتقال الملكية والخروج"
+        ],
+        "owner_dept": "إدارة التمويل والممولين",
+        "owner_basis": "CONSENSUS",
+        "workspaces": [
+            {
+                "space": "إدارة التمويل والممولين",
+                "kind": "DEPARTMENT",
+                "tab": "",
+                "cls": "OWNED",
+                "decision": "CONFIRMED",
+                "owner_kind": "BUSINESS_DEPARTMENT"
+            }
+        ],
+        "roles_nav": {
+            "إدارة التمويل": [
+                {
+                    "group": "الأصول",
+                    "order": 230,
+                    "perm": "Financing\/asset_disposal.php"
+                }
+            ]
+        },
         "profiles_count": 5,
         "profiles": [
             {
@@ -29809,14 +29846,35 @@
         "surface_type": "SCREEN",
         "on_disk": 1,
         "sources": [
-            "disk"
+            "disk",
+            "apps",
+            "nav"
         ],
-        "name_ar": "UNKNOWN",
-        "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
-        "workspaces": [],
-        "roles_nav": [],
+        "name_ar": "عمليات التمويل",
+        "names_all": [
+            "عمليات التمويل"
+        ],
+        "owner_dept": "إدارة التمويل والممولين",
+        "owner_basis": "CONSENSUS",
+        "workspaces": [
+            {
+                "space": "إدارة التمويل والممولين",
+                "kind": "DEPARTMENT",
+                "tab": "",
+                "cls": "OWNED",
+                "decision": "CONFIRMED",
+                "owner_kind": "BUSINESS_DEPARTMENT"
+            }
+        ],
+        "roles_nav": {
+            "إدارة التمويل": [
+                {
+                    "group": "التعاقد",
+                    "order": 100,
+                    "perm": "Financing\/operation_profile.php"
+                }
+            ]
+        },
         "profiles_count": 1,
         "profiles": [
             {
@@ -42640,7 +42698,8 @@
         "on_disk": 1,
         "sources": [
             "disk",
-            "apps"
+            "apps",
+            "nav"
         ],
         "name_ar": "احتياج العميل وطلب العرض",
         "names_all": [
@@ -42658,7 +42717,15 @@
                 "owner_kind": "BUSINESS_DEPARTMENT"
             }
         ],
-        "roles_nav": [],
+        "roles_nav": {
+            "ادارة المبيعات": [
+                {
+                    "group": "خط الانابيب",
+                    "order": 2003,
+                    "perm": "Opportunities\/client_need_rfq.php"
+                }
+            ]
+        },
         "profiles_count": 1,
         "profiles": [
             {
@@ -54283,7 +54350,7 @@
                 "space": "أمين المستودع",
                 "kind": "ROLE",
                 "tab": "الطلبات وحدود المخزون",
-                "cls": "FORBIDDEN",
+                "cls": "CONTEXTUAL_READ_ONLY",
                 "decision": "CONFIRMED",
                 "owner_kind": "BUSINESS_DEPARTMENT"
             },
@@ -54711,16 +54778,76 @@
         "sources": [
             "disk",
             "ledger",
-            "cycle"
+            "cycle",
+            "apps",
+            "nav"
         ],
-        "name_ar": "المخازن وأنواعها",
+        "name_ar": "سجل المخازن وأنواعها",
         "names_all": [
+            "سجل المخازن وأنواعها",
             "المخازن وأنواعها"
         ],
-        "owner_dept": "إدارة المخازن",
-        "owner_basis": "CONSENSUS",
-        "workspaces": [],
-        "roles_nav": [],
+        "owner_dept": "إدارة المشتريات التشغيلية",
+        "owner_basis": "MAJORITY",
+        "workspaces": [
+            {
+                "space": "أمين المستودع",
+                "kind": "ROLE",
+                "tab": "الطلبات وحدود المخزون",
+                "cls": "OWNED",
+                "decision": "CONFIRMED",
+                "owner_kind": "BUSINESS_DEPARTMENT"
+            },
+            {
+                "space": "إدارة المالية",
+                "kind": "DEPARTMENT",
+                "tab": "الطلبات وحدود المخزون",
+                "cls": "CONTEXTUAL_READ_ONLY",
+                "decision": "CONFIRMED",
+                "owner_kind": "BUSINESS_DEPARTMENT"
+            },
+            {
+                "space": "إدارة المشتريات",
+                "kind": "DEPARTMENT",
+                "tab": "الطلبات وحدود المخزون",
+                "cls": "OWNED",
+                "decision": "CONFIRMED",
+                "owner_kind": "BUSINESS_DEPARTMENT"
+            },
+            {
+                "space": "إدارة الموقع",
+                "kind": "DEPARTMENT",
+                "tab": "الطلبات وحدود المخزون",
+                "cls": "CONTEXTUAL_READ_ONLY",
+                "decision": "CONFIRMED",
+                "owner_kind": "BUSINESS_DEPARTMENT"
+            },
+            {
+                "space": "ادارة التشغيل",
+                "kind": "DEPARTMENT",
+                "tab": "الطلبات وحدود المخزون",
+                "cls": "OWNED",
+                "decision": "CONFIRMED",
+                "owner_kind": "BUSINESS_DEPARTMENT"
+            },
+            {
+                "space": "ادارة الصيانة",
+                "kind": "DEPARTMENT",
+                "tab": "الطلبات وحدود المخزون",
+                "cls": "CONTEXTUAL_READ_ONLY",
+                "decision": "CONFIRMED",
+                "owner_kind": "BUSINESS_DEPARTMENT"
+            }
+        ],
+        "roles_nav": {
+            "أمين المستودع": [
+                {
+                    "group": "التاسيس المرجعي",
+                    "order": 2001,
+                    "perm": "Procurement\/warehouses.php"
+                }
+            ]
+        },
         "profiles_count": 4,
         "profiles": [
             {
@@ -54815,7 +54942,7 @@
                 "space": "أمين المستودع",
                 "kind": "ROLE",
                 "tab": "الجرد",
-                "cls": "FORBIDDEN",
+                "cls": "OWNED",
                 "decision": "CONFIRMED",
                 "owner_kind": "BUSINESS_DEPARTMENT"
             }
@@ -55568,7 +55695,7 @@
                 "space": "أمين المستودع",
                 "kind": "ROLE",
                 "tab": "الاستلام",
-                "cls": "FORBIDDEN",
+                "cls": "OWNED",
                 "decision": "CONFIRMED",
                 "owner_kind": "BUSINESS_DEPARTMENT"
             }
@@ -59431,6 +59558,8 @@
         "sources": [
             "ledger",
             "cycle",
+            "apps",
+            "nav",
             "nav09"
         ],
         "name_ar": "المخاطر المؤسسية",
@@ -59439,8 +59568,25 @@
         ],
         "owner_dept": "مكتب الرئيس التنفيذي والنواب",
         "owner_basis": "MAJORITY",
-        "workspaces": [],
-        "roles_nav": [],
+        "workspaces": [
+            {
+                "space": "إدارة المخاطر",
+                "kind": "DEPARTMENT",
+                "tab": "",
+                "cls": "OWNED",
+                "decision": "CONFIRMED",
+                "owner_kind": "BUSINESS_DEPARTMENT"
+            }
+        ],
+        "roles_nav": {
+            "إدارة المخاطر": [
+                {
+                    "group": "اللوحه — خارج الدوره",
+                    "order": 1001,
+                    "perm": "Risk\/risk_dept_ceo.php"
+                }
+            ]
+        },
         "profiles_count": 5,
         "profiles": [
             {
@@ -64475,7 +64621,8 @@
         "on_disk": 1,
         "sources": [
             "disk",
-            "apps"
+            "apps",
+            "nav"
         ],
         "name_ar": "لوحة إدارة الموردين",
         "names_all": [
@@ -64501,7 +64648,15 @@
                 "owner_kind": "BUSINESS_DEPARTMENT"
             }
         ],
-        "roles_nav": [],
+        "roles_nav": {
+            "ادارة الموردين": [
+                {
+                    "group": "اللوحه — خارج الدوره",
+                    "order": 6001,
+                    "perm": "Suppliers\/supplier_board.php"
+                }
+            ]
+        },
         "profiles_count": 8,
         "profiles": [
             {
@@ -65710,7 +65865,8 @@
         "on_disk": 1,
         "sources": [
             "disk",
-            "apps"
+            "apps",
+            "nav"
         ],
         "name_ar": "استحقاقات الموردين",
         "names_all": [
@@ -65728,7 +65884,15 @@
                 "owner_kind": ""
             }
         ],
-        "roles_nav": [],
+        "roles_nav": {
+            "ادارة الموردين": [
+                {
+                    "group": "الماليه",
+                    "order": 4002,
+                    "perm": "Suppliers\/supplier_entitlements.php"
+                }
+            ]
+        },
         "profiles_count": 5,
         "profiles": [
             {
@@ -67503,7 +67667,8 @@
         "on_disk": 1,
         "sources": [
             "disk",
-            "apps"
+            "apps",
+            "nav"
         ],
         "name_ar": "المخالفات والجزاءات",
         "names_all": [
@@ -67537,7 +67702,15 @@
                 "owner_kind": "BUSINESS_DEPARTMENT"
             }
         ],
-        "roles_nav": [],
+        "roles_nav": {
+            "ادارة الموردين": [
+                {
+                    "group": "الحوكمه",
+                    "order": 5001,
+                    "perm": "Suppliers\/supplier_violations.php"
+                }
+            ]
+        },
         "profiles_count": 6,
         "profiles": [
             {
@@ -68547,16 +68720,36 @@
             "disk",
             "ledger",
             "cycle",
+            "apps",
+            "nav",
             "nav09"
         ],
         "name_ar": "حوكمة مركز البلاغات",
         "names_all": [
-            "حوكمة مركز البلاغات"
+            "حوكمة مركز البلاغات",
+            "حوكمة إدارة البلاغات"
         ],
         "owner_dept": "مركز البلاغات",
-        "owner_basis": "CONSENSUS",
-        "workspaces": [],
-        "roles_nav": [],
+        "owner_basis": "MAJORITY",
+        "workspaces": [
+            {
+                "space": "إدارة البلاغات",
+                "kind": "DEPARTMENT",
+                "tab": "",
+                "cls": "OWNED",
+                "decision": "CONFIRMED",
+                "owner_kind": "BUSINESS_DEPARTMENT"
+            }
+        ],
+        "roles_nav": {
+            "إدارة البلاغات": [
+                {
+                    "group": "اللوحه — خارج الدوره",
+                    "order": 1001,
+                    "perm": "Tickets\/gov_dept_crp.php"
+                }
+            ]
+        },
         "profiles_count": 3,
         "profiles": [
             {
@@ -69856,7 +70049,8 @@
         ],
         "name_ar": "تسجيل بلاغ",
         "names_all": [
-            "تسجيل بلاغ"
+            "تسجيل بلاغ",
+            "تسجيل البلاغ"
         ],
         "owner_dept": "مركز البلاغات",
         "owner_basis": "RULING",
@@ -69871,6 +70065,13 @@
             }
         ],
         "roles_nav": {
+            "إدارة البلاغات": [
+                {
+                    "group": "دوره البلاغ",
+                    "order": 3003,
+                    "perm": "Tickets\/ticket_form.php"
+                }
+            ],
             "المدير المالي": [
                 {
                     "group": "دورة البلاغ",
@@ -72406,6 +72607,13 @@
             }
         ],
         "roles_nav": {
+            "ادارة التشغيل": [
+                {
+                    "group": "اليوم التشغيلي",
+                    "order": 3001,
+                    "perm": "Timesheet\/timesheet.php"
+                }
+            ],
             "ادارة الاسطول": [
                 {
                     "group": "الاعتمادات الواردة",
@@ -73964,14 +74172,43 @@
         "surface_type": "SCREEN",
         "on_disk": 1,
         "sources": [
-            "disk"
+            "disk",
+            "apps",
+            "nav"
         ],
-        "name_ar": "UNKNOWN",
-        "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
-        "workspaces": [],
-        "roles_nav": [],
+        "name_ar": "أمر الترحيل",
+        "names_all": [
+            "أمر الترحيل"
+        ],
+        "owner_dept": "إدارة النقل والترحيل",
+        "owner_basis": "CONSENSUS",
+        "workspaces": [
+            {
+                "space": "إدارة المالية",
+                "kind": "DEPARTMENT",
+                "tab": "",
+                "cls": "CONTEXTUAL_READ_ONLY",
+                "decision": "CONFIRMED",
+                "owner_kind": "BUSINESS_DEPARTMENT"
+            },
+            {
+                "space": "إدارة النقل والترحيل",
+                "kind": "DEPARTMENT",
+                "tab": "",
+                "cls": "OWNED",
+                "decision": "CONFIRMED",
+                "owner_kind": "BUSINESS_DEPARTMENT"
+            }
+        ],
+        "roles_nav": {
+            "إدارة النقل والترحيل": [
+                {
+                    "group": "دوره الترحيل",
+                    "order": 2002,
+                    "perm": "Transport\/transfer_order_form.php"
+                }
+            ]
+        },
         "profiles_count": 1,
         "profiles": [
             {
@@ -76464,7 +76701,7 @@
                 "space": "ادارة الموارد البشرية",
                 "kind": "DEPARTMENT",
                 "tab": "المسيّر والدفع",
-                "cls": "FORBIDDEN",
+                "cls": "CONTEXTUAL_READ_ONLY",
                 "decision": "CONFIRMED",
                 "owner_kind": "BUSINESS_DEPARTMENT"
             }
@@ -76980,7 +77217,7 @@
                 "space": "ادارة الموارد البشرية",
                 "kind": "DEPARTMENT",
                 "tab": "سجل المشغّلين",
-                "cls": "FORBIDDEN",
+                "cls": "CONTEXTUAL_READ_ONLY",
                 "decision": "CONFIRMED",
                 "owner_kind": "BUSINESS_DEPARTMENT"
             },
@@ -77184,6 +77421,13 @@
                 {
                     "group": "الاحتياج والتغطية",
                     "order": 15,
+                    "perm": "Workforce\/wf_coverage.php"
+                }
+            ],
+            "القوى التشغيلية": [
+                {
+                    "group": "الاحتياج والتغطيه",
+                    "order": 2002,
                     "perm": "Workforce\/wf_coverage.php"
                 }
             ]
@@ -77390,7 +77634,7 @@
                 "space": "ادارة الموارد البشرية",
                 "kind": "DEPARTMENT",
                 "tab": "التكليف على المعدات",
-                "cls": "FORBIDDEN",
+                "cls": "CONTEXTUAL_READ_ONLY",
                 "decision": "CONFIRMED",
                 "owner_kind": "BUSINESS_DEPARTMENT"
             },
@@ -77753,6 +77997,13 @@
             }
         ],
         "roles_nav": {
+            "ادارة التشغيل": [
+                {
+                    "group": "العمل اليومي",
+                    "order": 50,
+                    "perm": "Workforce\/worker_worklog.php"
+                }
+            ],
             "ادارة الموارد البشرية": [
                 {
                     "group": "الانحراف والاستثناء",
@@ -77761,11 +78012,19 @@
                 }
             ]
         },
-        "profiles_count": 1,
+        "profiles_count": 2,
         "profiles": [
             {
                 "profile": "HRM-G7",
                 "dept": "الموارد البشرية",
+                "allow": 1,
+                "add": 0,
+                "edit": 0,
+                "del": 0
+            },
+            {
+                "profile": "OPS-G7",
+                "dept": "إدارة التشغيل",
                 "allow": 1,
                 "add": 0,
                 "edit": 0,
@@ -77814,13 +78073,28 @@
                     "order": 2,
                     "perm": "Workforce\/workforce_requirement.php"
                 }
+            ],
+            "القوى التشغيلية": [
+                {
+                    "group": "الاحتياج والتغطية",
+                    "order": 2001,
+                    "perm": "Workforce\/workforce_requirement.php"
+                }
             ]
         },
-        "profiles_count": 1,
+        "profiles_count": 2,
         "profiles": [
             {
                 "profile": "HRM-G7",
                 "dept": "الموارد البشرية",
+                "allow": 1,
+                "add": 1,
+                "edit": 1,
+                "del": 1
+            },
+            {
+                "profile": "WRK-G7",
+                "dept": "القوى التشغيلية",
                 "allow": 1,
                 "add": 1,
                 "edit": 1,

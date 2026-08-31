@@ -541,7 +541,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 1558,
-        "mtime": "2026-08-25"
+        "mtime": "2026-08-31"
     },
     {
         "path": "Clients\/commercial_risks.php",
@@ -694,7 +694,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 916,
-        "mtime": "2026-08-27"
+        "mtime": "2026-08-31"
     },
     {
         "path": "Clients\/rate_books.php",
@@ -727,8 +727,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 849,
-        "mtime": "2026-08-27"
+        "lines": 848,
+        "mtime": "2026-08-31"
     },
     {
         "path": "Clients\/tenders.php",
@@ -13103,7 +13103,7 @@
         "thead": 0,
         "form": 0,
         "deprecated_mark": 0,
-        "lines": 19,
+        "lines": 61,
         "mtime": "2026-08-31"
     },
     {

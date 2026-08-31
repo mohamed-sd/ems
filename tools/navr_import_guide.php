@@ -122,19 +122,31 @@ foreach ($spec as $code => $S) {
         $g = $sc['group'];
         $sortInGroup[$g] = ($sortInGroup[$g] ?? 0) + 1;
         $tref = $code . '·' . $sc['i'] . '·' . mb_substr($sc['name'], 0, 120);
+        /* §١٩: هويّةُ الهدفِ الثابتة — NT-<code>-<nnn> بترتيبِ الورقة */
+        $tid = 'NT-' . $code . '-' . str_pad((string) $sc['i'], 3, '0', STR_PAD_LEFT);
         if (!$APPLY) { continue; }
         if (empty($gid[$g])) { continue; }
+        $conn->query("INSERT INTO nav_targets
+                (target_id, source_doc, sheet_code, row_no, canonical_title, workspace_id, group_key, target_order, visibility_class)
+            VALUES ('" . $conn->real_escape_string($tid) . "', '01 · الدليل المعماري.xlsx',
+                    '" . $conn->real_escape_string($code) . "', " . (int) $sc['i'] . ",
+                    '" . $conn->real_escape_string(mb_substr($sc['raw'], 0, 180)) . "',
+                    '" . $conn->real_escape_string($code) . "', '" . $conn->real_escape_string($g) . "',
+                    " . (int) $sc['i'] . ", '" . $conn->real_escape_string($ptype) . "')
+            ON DUPLICATE KEY UPDATE canonical_title = VALUES(canonical_title),
+                group_key = VALUES(group_key), visibility_class = VALUES(visibility_class)");
 
         $esc = function ($s) use ($conn) { return $conn->real_escape_string((string) $s); };
         $sidSql = $sid !== null ? "'" . $esc($sid) . "'" : 'NULL';
         $rtSql  = $route !== null ? "'" . $esc($route) . "'" : 'NULL';
         $srcRef = $SRC . '·' . $how . '·' . mb_substr($why, 0, 60);
         $ok = $conn->query("INSERT INTO nav_placements
-                (workspace_id, screen_id, route, target_ref, group_id, sort_no, placement_type, source_ref)
-            VALUES ('" . $esc($code) . "', {$sidSql}, {$rtSql}, '" . $esc($tref) . "',
+                (workspace_id, screen_id, route, target_ref, target_id, group_id, sort_no, placement_type, source_ref)
+            VALUES ('" . $esc($code) . "', {$sidSql}, {$rtSql}, '" . $esc($tref) . "', '" . $esc($tid) . "',
                     " . (int) $gid[$g] . ", " . (int) $sortInGroup[$g] . ",
                     '" . $esc($ptype) . "', '" . $esc($srcRef) . "')
             ON DUPLICATE KEY UPDATE
+                target_id = VALUES(target_id),
                 screen_id = IF(source_ref LIKE 'GUIDE-IMPORT%', VALUES(screen_id), screen_id),
                 route = IF(source_ref LIKE 'GUIDE-IMPORT%', VALUES(route), route),
                 group_id = IF(source_ref LIKE 'GUIDE-IMPORT%', VALUES(group_id), group_id),

@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — البذرة المرجعية (طبقتان)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-31 18:39:55
+-- المصدر: equipation_manage · التوليد: 2026-08-31 20:57:16
 -- ① عالمية: بنية متنكرة في هيئة بيانات — بدونها لا تنقل ولا صلاحيات.
 -- ② مستأجرة: مرجعية تحمل company_id — القيمة علامة نائبة يحقنها المثبت:
 --    {{COMPANY_ID}}
@@ -4751,7 +4751,9 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_add`, `can_edit`, `can_delete`) VALUES
 (9714,8,899,1,0,0,0),
 (9715,10,899,1,0,0,0),
-(9716,11,899,1,0,0,0);
+(9716,11,899,1,0,0,0),
+(9717,27,55,1,1,1,1),
+(9718,1,56,1,0,0,0);
 
 -- ── link_groups ──
 DELETE FROM `link_groups`;
@@ -8108,7 +8110,7 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (745,17,'DAILY',6025,180,'اقتصاد دورة حياة العقد','Contracts/contract_lifecycle.php','fa fa-scale-unbalanced',51,NULL,'Contracts/contract_lifecycle.php',1,'2026-08-03 08:47:42','2026-08-30 12:12:01'),
 (746,19,'REC',6092,180,'اقتصاد دورة حياة العقد','Contracts/contract_lifecycle.php','fa fa-scale-unbalanced',48,NULL,'Contracts/contract_lifecycle.php',1,'2026-08-01 09:17:30','2026-08-30 12:12:01'),
 (747,20,'REC',6127,180,'اقتصاد دورة حياة العقد','Contracts/contract_lifecycle.php','fa fa-scale-unbalanced',79,NULL,'Contracts/contract_lifecycle.php',1,'2026-08-01 09:17:30','2026-08-30 11:54:28'),
-(752,12,'DAILY',4028,181,'اللوحة التجارية للعقود','Contracts/commercial_board.php','fa fa-chart-line',50,NULL,'Contracts/commercial_board.php',0,'2026-08-03 08:47:42','2026-08-22 02:39:52'),
+(752,12,'DAILY',4028,181,'اللوحة التجارية للعقود','Contracts/commercial_board.php','fa fa-chart-line',50,NULL,'Contracts/commercial_board.php',1,'2026-08-03 08:47:42','2026-08-31 19:06:49'),
 (753,17,'DAILY',6019,181,'اللوحة التجارية للعقود','Contracts/commercial_board.php','fa fa-chart-line',50,NULL,'Contracts/commercial_board.php',1,'2026-08-03 08:47:42','2026-08-30 11:54:28'),
 (754,19,'REC',6087,181,'اللوحة التجارية للعقود','Contracts/commercial_board.php','fa fa-chart-line',50,NULL,'Contracts/commercial_board.php',1,'2026-08-01 09:46:24','2026-08-30 12:12:01'),
 (755,20,'REC',6121,181,'اللوحة التجارية للعقود','Contracts/commercial_board.php','fa fa-chart-line',50,NULL,'Contracts/commercial_board.php',1,'2026-08-01 09:46:24','2026-08-30 12:12:01'),
@@ -8201,7 +8203,7 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (945,11,'APPR',95,158,'سلفيات الموردين','Suppliers/supplier_advances.php','fa fa-link',50,NULL,'Suppliers/supplier_advances.php',0,'2026-08-02 14:50:33','2026-08-15 11:32:59'),
 (946,11,'REC',5905,22,'سجل الموردين','Suppliers/suppliers.php','fa fa-link',50,NULL,'Suppliers/suppliers.php',1,'2026-08-02 14:50:33','2026-08-30 11:54:28'),
 (947,11,'REC',92,25,'سجل عقود الموردين','Suppliers/supplierscontracts.php','fa fa-link',50,NULL,'Suppliers/supplierscontracts.php',0,'2026-08-02 14:50:33','2026-08-23 00:29:10'),
-(948,1,'REP',24,56,'سجل الأحداث التشغيلية','Workforce/worker_worklog.php','fa fa-link',50,NULL,'Workforce/worker_worklog.php',0,'2026-08-02 14:50:33','2026-08-06 00:14:05'),
+(948,1,'REP',24,56,'سجل الأحداث التشغيلية','Workforce/worker_worklog.php','fa fa-link',50,NULL,'Workforce/worker_worklog.php',1,'2026-08-02 14:50:33','2026-08-31 19:06:49'),
 (951,1,'REP',24,34,'خريطة التشغيل اليومية','movement/map_page.php','fa fa-link',50,NULL,'movement/map_page.php',0,'2026-08-02 14:50:33','2026-08-06 00:14:05'),
 (952,4,'DAILY',43,30,'الورديات','movement/movement_operations.php','fa fa-link',50,NULL,'movement/movement_operations.php',0,'2026-08-02 14:50:33','2026-08-06 00:14:05'),
 (1255,1,'DAILY',2084,NULL,'لوحة المواقع','Operations/sites_board.php','fa fa-map',50,NULL,NULL,0,'2026-08-03 08:47:42','2026-08-03 13:35:06'),
@@ -8224,8 +8226,8 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (1321,6,'REC',251,NULL,'التوقفات بلا مسؤول','Reports/exceptions_report.php?focus=unattributed_stops','fa fa-link',30,NULL,NULL,0,'2026-08-02 18:49:34','2026-08-02 20:25:23'),
 (1323,2,'REC',384,20,'سجل عقود المشاريع','Contracts/contracts.php','fa fa-link',30,NULL,'Contracts/contracts.php',0,'2026-08-02 18:49:34','2026-08-23 00:29:10'),
 (1324,2,'REC',5684,22,'سجل الموردين','Suppliers/suppliers.php','fa fa-link',9,NULL,'Suppliers/suppliers.php',1,'2026-08-02 18:49:34','2026-08-30 12:12:01'),
-(1325,26,'DAILY',4843,NULL,'عمليات التمويل','Financing/operation_profile.php','fa fa-folder-open',100,NULL,NULL,0,'2026-08-03 08:47:42','2026-08-27 05:31:31'),
-(1330,26,'DAILY',3798,NULL,'انتقال الملكية والخروج','Financing/asset_disposal.php','fa fa-exchange-alt',230,NULL,NULL,0,'2026-08-03 08:47:42','2026-08-27 05:31:31'),
+(1325,26,'DAILY',4843,408,'عمليات التمويل','Financing/operation_profile.php','fa fa-folder-open',100,NULL,'Financing/operation_profile.php',1,'2026-08-03 08:47:42','2026-08-31 19:09:45'),
+(1330,26,'DAILY',3798,407,'انتقال الملكية والخروج','Financing/asset_disposal.php','fa fa-exchange-alt',230,NULL,'Financing/asset_disposal.php',1,'2026-08-03 08:47:42','2026-08-31 19:09:45'),
 (1334,24,'DAILY',3815,429,'الاستقبال والتصنيف لتوجيه البلاغات الجديدة','Tickets/intake_classify.php','fa fa-inbox',10,NULL,'Tickets/intake_classify.php',1,'2026-08-03 08:47:42','2026-08-25 19:34:30'),
 (1336,24,'DAILY',2104,NULL,'الاستفسار عن بلاغ متعثر','Tickets/inquiry.php','fa fa-search',50,NULL,NULL,0,'2026-08-03 08:47:42','2026-08-03 13:35:07'),
 (5960,1,'DAILY',5660,194,'تكليف المشغل على المعدة','Operations/distribution_space.php?view=va9e1b1','fa fa-circle-dot',17,NULL,'Operations/distribution_space.php',1,'2026-08-03 10:14:17','2026-08-30 12:12:01'),
@@ -10338,7 +10340,8 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (28841,28,'RISK',6492,468,'المخاطر المؤسسية','Risk/risk_dept_ceo.php','fa fa-file',1001,NULL,'Risk/risk_dept_ceo.php',1,'2026-08-31 18:24:54','2026-08-31 18:24:54'),
 (28842,1,'DAILY',5616,308,'تسجيل التايم شيت والإنتاج في الموقع','Timesheet/timesheet.php','fa fa-file',3001,NULL,'Timesheet/timesheet.php',1,'2026-08-31 18:25:47','2026-08-31 18:25:47'),
 (28843,24,'DAILY',6493,457,'حوكمة مركز البلاغات','Tickets/gov_dept_crp.php','fa fa-file',1001,NULL,'Tickets/gov_dept_crp.php',1,'2026-08-31 18:25:47','2026-08-31 18:25:47'),
-(28844,27,'DAILY',6494,555,'لوحة الاحتياج والتغطية','Workforce/wf_coverage.php','fa fa-file',2002,NULL,'Workforce/wf_coverage.php',1,'2026-08-31 18:25:47','2026-08-31 18:25:47');
+(28844,27,'DAILY',6494,555,'لوحة الاحتياج والتغطية','Workforce/wf_coverage.php','fa fa-file',2002,NULL,'Workforce/wf_coverage.php',1,'2026-08-31 18:25:47','2026-08-31 18:25:47'),
+(28845,27,'DAILY',5628,55,'احتياج القوى والتخطيط','Workforce/workforce_requirement.php','fa fa-file',2001,NULL,'Workforce/workforce_requirement.php',1,'2026-08-31 19:06:49','2026-08-31 19:06:49');
 
 -- ── nav_canonical ──
 DELETE FROM `nav_canonical`;

@@ -30336,6 +30336,18 @@
         "seeded_from": "ctl3_drift_sync:role_permissions:1"
     },
     {
+        "item_id": "5572",
+        "company_id": "0",
+        "profile_id": "97",
+        "item_kind": "screen",
+        "item_ref": "Workforce\/worker_worklog.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "NAVR: ورقة الدليل DEP-11·10 — قراءة سياقية لسجل الاحداث (الم"
+    },
+    {
         "item_id": "2448",
         "company_id": "0",
         "profile_id": "103",
@@ -36070,6 +36082,18 @@
         "can_edit": "0",
         "can_delete": "0",
         "seeded_from": "role_permissions:27"
+    },
+    {
+        "item_id": "5571",
+        "company_id": "0",
+        "profile_id": "142",
+        "item_kind": "screen",
+        "item_ref": "Workforce\/workforce_requirement.php",
+        "allow": "1",
+        "can_add": "1",
+        "can_edit": "1",
+        "can_delete": "1",
+        "seeded_from": "NAVR: ورقة الدليل DEP-13·2 — شاشة الإدارة المملوكة (منح مدير"
     },
     {
         "item_id": "2947",

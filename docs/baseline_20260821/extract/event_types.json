@@ -594,17 +594,6 @@
         "last_at": "2026-07-28 15:56:06"
     },
     {
-        "category": "financial",
-        "event_key": "settlement.approved",
-        "cnt": "1",
-        "delivered_ok_sum": "1",
-        "delivered_failed_sum": "0",
-        "dlq_sum": "0",
-        "training_cnt": "0",
-        "first_at": "2026-07-28 09:45:09",
-        "last_at": "2026-07-28 09:45:09"
-    },
-    {
         "category": "analytics",
         "event_key": "risk.appetite.compared",
         "cnt": "1",
@@ -614,6 +603,17 @@
         "training_cnt": "0",
         "first_at": "2026-08-08 12:19:23",
         "last_at": "2026-08-08 12:19:23"
+    },
+    {
+        "category": "financial",
+        "event_key": "settlement.approved",
+        "cnt": "1",
+        "delivered_ok_sum": "1",
+        "delivered_failed_sum": "0",
+        "dlq_sum": "0",
+        "training_cnt": "0",
+        "first_at": "2026-07-28 09:45:09",
+        "last_at": "2026-07-28 09:45:09"
     },
     {
         "category": "operational",
