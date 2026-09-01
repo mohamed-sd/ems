@@ -139,19 +139,29 @@ function grain_includes($rp, $ROOT, $CHROME)
    **فظهرت أحدَ عشرَ خرقًا كاذبًا بالجداولِ الأربعةِ نفسِها**. والحبّةُ ما
    يملكه السطحُ وحدَه ⇒ **ملفٌّ يبلغه سطحان فأكثرُ عُدّةٌ مشتركةٌ لا حبّة**،
    والعتبةُ ليست رقمًا مختارًا بل حدُّ التفرُّدِ نفسُه. */
-function grain_source($file, $ROOT, $CHROME, $depth, &$seen, &$files, $shared)
+function grain_source($file, $ROOT, $CHROME, $depth, &$seen, &$files, $shared, $skipApp = false)
 {
     if ($depth > 3) { return ''; }
     $rp = realpath($file);
     if (!$rp || isset($seen[$rp])) { return ''; }
     if ($depth > 0 && isset($shared[$rp])) { return ''; }
+    /* ◆ **ومحرّكُ المجالِ ليس حبّةَ الشاشة** — الدستورُ يقول «الخدمةُ تكتب
+         والشاشةُ تعرض»: شاشةٌ تنادي `app/Services/...` أو `app/Core/...`
+         تسجّل مستندَها، **والخدمةُ تفعل ما يلزم في دفاترِ مجالِها**. وعدُّ
+         جداولِ الخدمةِ حبّةً ثانيةً للشاشةِ يُنتج خرقًا كاذبًا — قِيس:
+         `activation_patterns` ⇐ `entity_ownership` من `EntityGovernanceService`،
+         و`rfq_compare_award` ⇐ `supplier_rfqs` من `RfqAwardService`.
+       ⛔ **وهذا إقصاءُ نسبةٍ لا إقصاءُ فحص**: الخدمةُ تُقاس في مجالِها
+         (‏`RP-05`/`RP-06` وسلاسلُ الاعتماد)، ولا تُنسَب حبّتُها إلى سطحٍ. */
+    if ($skipApp && $depth > 0
+        && strpos(str_replace(chr(92), '/', $rp), $ROOT . '/app/') === 0) { return ''; }
     $seen[$rp] = 1;
     $src = (string) @file_get_contents($rp);
     if ($src === '') { return ''; }
     $files[] = basename($rp);
     $acc = $src;
     foreach (grain_includes($rp, $ROOT, $CHROME) as $cp) {
-        $acc .= "\n" . grain_source($cp, $ROOT, $CHROME, $depth + 1, $seen, $files, $shared);
+        $acc .= "\n" . grain_source($cp, $ROOT, $CHROME, $depth + 1, $seen, $files, $shared, $skipApp);
     }
     return $acc;
 }
@@ -364,16 +374,24 @@ foreach ($rows as $s) {
            فمن المشترك (ويُسمّى الطبقةُ في الشاهد)، **وخرقُ «حبّتين» لا يُحكَم
            إلّا على الخاصّ** — لأنَّ نسبةَ جداولِ عُدّةٍ يشتملها أحدَ عشرَ سطحًا
            إلى كلِّ واحدٍ منها أنتجت ٢٦٥ خرقًا كاذبًا قبل هذا الفصل. */
+        /* وثلاثُ طبقاتٍ لا طبقتان: الخاصُّ بلا محرّكِ مجالِه، ثمَّ الخاصُّ
+             بمحرّكِه، ثمَّ المشترك. والكيانُ من الأولى إن أعطت — فالخدمةُ تكتب
+             دفاترَ مجالِها والشاشةُ تسجّل مستندَها، وعدُّ جداولِ الخدمةِ حبّةً
+             ثانيةً خرقٌ كاذب. ولا يُقصى المحرّكُ حين لا سواه: سطحٌ كلُّ جداولِه
+             من خدمتِه يبقى بحبّتِه منها، فالإقصاءُ يمنع النسبةَ الزائدةَ ولا
+             يُصفّر سطحًا. */
+        $seenE = array(); $filesE = array();
+        $srcEng = grain_source($path, $ROOT, $CHROME, 0, $seenE, $filesE, $SHARED, true);
         $seen = array(); $files = array();
         $srcOwn = grain_source($path, $ROOT, $CHROME, 0, $seen, $files, $SHARED);
         $seen2 = array(); $files2 = array(); $none = array();
         $srcAll = grain_source($path, $ROOT, $CHROME, 0, $seen2, $files2, $none);
+        $gEng = grain_tables($srcEng, $KNOWN);
         $gOwn = grain_tables($srcOwn, $KNOWN);
         $gAll = grain_tables($srcAll, $KNOWN);
-        $g    = $gOwn;
-        $tier = 'OWN';   /* يُكتب عمودًا في نهايةِ الدورة */
-        if (!$gOwn['w'] && !$gOwn['r'] && ($gAll['w'] || $gAll['r'])) { $g = $gAll; $tier = 'SHARED_KIT'; }
-        $src  = ($tier === 'OWN') ? $srcOwn : $srcAll;
+        if ($gEng['w'] || $gEng['r']) { $g = $gEng; $tier = 'OWN'; $src = $srcEng; }
+        elseif ($gOwn['w'] || $gOwn['r']) { $g = $gOwn; $tier = 'OWN'; $src = $srcOwn; }
+        else { $g = $gAll; $tier = 'SHARED_KIT'; $src = $srcAll; }
 
         /* **G1b · بيانُ السطحِ عن نفسِه** — العائلاتُ المولَّدةُ (`u13` وغيرُها)
            تُصيَّر بعُدّةٍ مشتركةٍ **وتُعلن جدولَها في ملفِّها**:
