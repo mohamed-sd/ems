@@ -1,0 +1,56 @@
+أمر تنفيذي — المراجعة العكسية والتصحيح الكامل للسايدبار والشاشات
+استنادًا إلى الدليل المعماري وملف القيادة · نافذ للتنفيذ
+النطاق: السايدبار، مساحات العمل، المجموعات، الشاشات، الأدوار والصلاحيات المرتبطة بالظهور، والتكوين الداخلي للشاشات المستهدفة.
+الهدف: جعل النظام الفعلي يطابق الملفات الحاكمة إدارةً إدارةً، ومجموعةً مجموعةً، وشاشةً شاشةً، مع تصحيح الاختلافات أثناء المراجعة وليس الاكتفاء بتقريرها.
+[الحزمة المرفقة 2026-09-01: 01·الدليل المعماري-4 · 02·القيادة-2 · 09·السجلات-3 · 05·الموجة ب-1
+ نُصّبت بأسمائها الحاكمة والقديم في _pkg_backup_20260901/ وفرقها في GOV_PACK_DIFF_20260901.md]
+
+1. الملفات الحاكمة: 01 مرجع الادارات ودورة العمل ومجموعات السايدبار وترتيبها والشاشات وترتيبها والحبة والملكية وSource of Truth والحقول وترتيبها المستندي وClassification — ولا يعاد تعريف هذا Target من السايدبار الحالي · 02 مرجع الرئيس والنواب وExecutive Workspaces واللوحات والInbox والتقارير الدورية ومساحات القرار والاعتمادات وRed-Line ومصفوفة السلطة — والرئيس والنواب Executive Workspaces لا ادارات تشغيلية · 09 مرجع الحسم المؤسسي ولكل Override: Decision_ID + Scope + Effective Date + Affected Target ولا يستخدم لتبرير الوضع الحالي · 05 التفاصيل الذرية في نطاقه (المبيعات والموردين والتعاقد والتوريد وState Models والحقول وفصل الواجبات والاحداث واثار الاعتماد) ولا يعيد ترتيب دورة الادارة اذا حسمها 01.
+
+2. قاعدة السلطة: قرار مؤسسي لاحق منطبق ← التصميم الحاكم في 01 او 02 حسب Workspace ← التفاصيل الذرية في 05 ← الكود والقاعدة والسايدبار الحالي = Current State فقط. ولا يجوز Current Sidebar ⇒ Target. واذا اختلف Current عن الملف: صحح Current، ولا تعدل الملف الا بقرار حاكم صريح.
+
+3. لقطة واحدة: Commit واحد وDatabase Snapshot واحدة وSchema Version واحدة وNavigation Registry Version واحدة ثم استخرج Current State — ولا تقارن ملفات مولدة من Commits مختلفة.
+
+4. Target Registry من الملفات نفسها باعمدة: Target_ID · Workspace_ID · Workspace_Type · Department_ID · Group_ID · Canonical_Group_Label · Group_Order · Target_Screen_ID · Canonical_Screen_Label · Screen_Order · Surface_Type · Grain · Owner · Source_of_Truth · Required_Roles · State_Model_Ref · Source_File · Source_Sheet · Source_Row. وTarget_ID ثابت قبل البناء وبعده. واي Rename يغير Label فقط ولا يغير Target ID او Screen ID. المعيار: TARGET_LINEAGE_BROKEN_BY_RENAME = 0.
+
+5. نموذج السايدبار قبل ترقيع الروابط: Screen Identity ← Workspace ← Lifecycle Group ← Placement ← Role/Profile Permission ← Runtime Renderer. ولا Route واحدة = Group عالمية واحدة اذا ظهرت الشاشة في سياقات مختلفة. ولا تربط Business Lifecycle بالدور: الدور يحدد هل يرى المستخدم الشاشة وماذا يفعل فيها، ولا يحدد اين تقع معماريا في دورة الادارة.
+
+6. المراجعة ادارة ادارة، ولا انتقال قبل نتيجة واضحة:
+   (أ) Workspace — الاسم الرسمي وDepartment ID ولا Role باسم ادارة ولا ادارة قديمة او مكررة ولا Utility/Position مصنفة Department.
+   (ب) مجموعات السايدبار — الاسم والترتيب وموقعها في الدورة وهل هي Lifecycle Group ام Landing/Utility، وصحح Runtime ليطابقها. يمنع: مجموعات عامة تحل محل دورة الادارة · Global Taxonomy صامتة · مجموعات زائدة بلا حكم · مجموعة ناقصة رغم وجود Screens مبنية فيها.
+
+7. مراجعة المسميات المهنية: التسميات النهائية في النسخ الجديدة هي Canonical Labels. ولا يقبل في الواجهة: اسم محرك داخلي · اختصار مبتور · Arabic+English mixed label · مصطلح تقني للمطور · اسم قديم استبدل في الملفات الجديدة. ويجب CURRENT_UI_LABEL = EFFECTIVE_CANONICAL_LABEL — لكن الاسم يتغير والمعرف لا. وانشئ UI_NAMING_CHANGELOG بكل تغيير: Current Label · Canonical Label · Source · Target ID · Screen ID · Reason.
+
+8. لا تعتبر كل Target عنصر Sidebar: صنف الى MENU_ITEM · TAB_CHILD · DIRECT_ONLY · PROJECTION · UTILITY · LANDING_PAGE · NOT_BUILT — ولا يظهر في السايدبار الا ما يجب ان يظهر فعلا. خصوصا Child Registers وادوات المصالحة التقنية والشاشات الداخلية وCapabilities وTabs وExecutive projections.
+
+9. الشاشات المبنية: تحقق لكل Target مبني من Workspace الصحيح والGroup الصحيحة وترتيب الشاشة والاسم وSurface Type والدور وParent/Tab والGrain والOwner وSource of Truth. مبنية ولا تظهر ⇒ اصلح Placement/Permission. في مجموعة خطأ ⇒ انقل Placement ولا تنشئ شاشة جديدة. مكررة ⇒ حافظ على Source Screen واحدة واستخدم اكثر من Placement عند الحاجة.
+
+10. الشاشات غير المبنية: NOT_BUILT ليست عطب Sidebar — لكن اذا كان Target من CURRENT_RELEASE فلا يجوز اعلان الادارة مكتملة قبل بنائه. المعيار CURRENT_RELEASE_TARGET_NOT_BUILT = 0. واما Next Release او N/A او Superseded فبحكم صريح.
+
+11. مراجعة الشاشة من الداخل لكل شاشة Current Release مقابل الملف: Grain (هل الصف الواحد يمثل الكيان الصحيح) · Fields (كل الحقول المطلوبة موجودة) · Field Order (يعكس Document Lifecycle) · Inputs (قابلة للتحرير فعلا) · Imported/Reference (قراءة فقط) · Derived (تحسب ولا يعاد ادخالها) · 1:N (تحولت الى Child Registers) · Current vs History (التاريخ منفصل عن Current Master) · Audit (التغييرات قابلة للتتبع) · Approval (المحرك المركزي) · State Machine (النموذج الصحيح).
+
+12. مراجعة الادوار والصلاحيات لكل Workspace: Role ← Screen ← Action ← Field. وتأكد ان Role ليس Department وDepartment ليست Role، والشاشات الظاهرة مناسبة للدور، وما لا يجب رؤيته مخفي فعلا، وDirect URL محروس، وExport/API لا يتجاوزان Field Visibility، ولا تضحية بالصلاحيات لجعل السايدبار مطابقا شكليا. المبدأ: Placement يحدد مكان الشاشة وPermission يحدد من يراها.
+
+13. القيادة مستقلة عن الادارات: لكل Surface في EX-CEO وEX-DVP: هل موجود؟ في المجموعة التنفيذية الصحيحة؟ ترتيبه صحيح؟ اسمه صحيح؟ Projection ام Decision Surface؟ يقرا من الادارة المالكة؟ لا ينشئ Source of Truth موازيا؟ صلاحيات القرار صحيحة؟ Limits/Delegations من المصدر الحاكم؟ ولا تنسخ شاشات الادارة الى القيادة اذا كان المطلوب Projection فقط.
+
+14. المبيعات والموردون والتعاقد والتوريد في نطاق 05: لا تكتف بمطابقة الاسم — راجع State Machine وApproval وSoD وEvents وField ownership وlifecycle transition وchild entities وnegative permission tests. واذا اختلف Shape العام عن 01 فـ01 يحكم Workspace/Group/Placement و05 يحكم التفاصيل الذرية داخل Target المنطبق.
+
+15. القرارات المؤسسية: راجع 09 بحثا عن اي قرار يؤثر على اسم او ملكية او دور او Placement او Screen او Field او State او Approval او Visibility. ولكل قرار معتمد: Decision ⇒ Impact Targets ⇒ Runtime. المعيار APPROVED_DECISION_WITH_UNPROPAGATED_UI_IMPACT = 0.
+
+16. لا تصحح Registry فقط: كل تغيير يجب اختباره في Rendered UI الفعلي وليس فقط في database table او nav registry او target registry. وبعد اصلاح كل ادارة: قم بتصيير السايدبار بدور حقيقي ثم تحقق بصريا وعمليا.
+
+17. Human Verification يبدأ مبكرا: كل ادارة تصل STRUCTURAL_PASS تدخل Human Verification فورا ولا تنتظر 17/17 — اختبر Login وWorkspace وGroup sequence وScreen sequence وLabels وhidden/visible screens وdirect URL وactual task navigation.
+
+18. مصفوفة المطابقة المطلوبة لكل ادارة: صف لكل Target باعمدة Target_ID · Workspace · Target_Group · Actual_Group · Target_Order · Actual_Order · Canonical_Label · Actual_Label · Surface_Type · Target_Role · Actual_Role · Screen_ID · Build_Status · Grain_Status · Field_Status · State_Model_Status · Final_Verdict. والاحكام المسموحة فقط: EXACT_MATCH · WRONG_GROUP · WRONG_ORDER · WRONG_LABEL · WRONG_ROLE_VISIBILITY · WRONG_SURFACE_TYPE · FIELD_MISMATCH · GRAIN_MISMATCH · NOT_BUILT · N/A · SUPERSEDED.
+
+19. مقاييس الاغلاق منفصلة — لا نسبة واحدة اسمها مطابقة السايدبار: TARGET_BUILD_COVERAGE · MENU_TARGET_COVERAGE · BUILT_NOT_RENDERED · GROUP_CONFORMANCE · ORDER_CONFORMANCE · LABEL_CONFORMANCE · ROLE_VISIBILITY_CONFORMANCE · FIELD_CONFORMANCE · GRAIN_CONFORMANCE · STATE_MODEL_CONFORMANCE · STRUCTURAL_DEPARTMENT_PASS · HUMAN_DEPARTMENT_PASS — وكل مقياس ببسطه ومقامه واستبعاده.
+
+20. معيار اغلاق الادارة: WRONG_GROUP=0 · WRONG_ORDER=0 · WRONG_LABEL=0 · BUILT_NOT_RENDERED=0 · UNEXPLAINED_EXTRA_MENU_ITEM=0 · ROLE_VISIBILITY_MISMATCH=0 · CURRENT_RELEASE_TARGET_NOT_BUILT=0 · TARGET_WITHOUT_LINEAGE=0 · GRAIN_MISMATCH=0 · REQUIRED_FIELD_MISSING=0 · UNRULED_EXTRA_FIELD=0 · WRONG_FIELD_ORDER=0 · REQUIRED_STATE_MODEL_MISSING=0 ⇒ DEPARTMENT_ARCHITECTURE_CONFORMANCE = 100%.
+
+21. معيار اغلاق القيادة: CEO targets مطابقة 100% · DVP targets مطابقة 100% · Executive grouping صحيح · Role visibility صحيح · Projection lineage صحيح · No duplicate transactional truth · Approval authority صحيح · Human verification ناجح.
+
+22. اسلوب التصحيح: READ TARGET ⇒ COMPARE ⇒ FIND ROOT CAUSE ⇒ CORRECT ⇒ RENDER ⇒ VERIFY ⇒ CLOSE. واي خطأ له حكم واضح في الملفات: صححه فورا. ولا تفتح سؤال مالك الا اذا كانت المصادر الحاكمة متعارضة حقيقة او القرار غير موجود.
+
+23. المخرجات النهائية بعد الجولة مع Snapshot واحدة موحدة: Department-by-Department Conformance Report · Executive Workspace Conformance Report · Sidebar Before/After Matrix · Role-Screen Matrix · Screen-Field Matrix · Naming Changelog · Targets Not Built · Unexplained Extras · Human Verification Results · Open Governing Conflicts فقط.
+
+القاعدة الختامية: هذه الجولة لا تهدف الى جعل السايدبار اجمل. الهدف ان يصبح السايدبار صورة مباشرة لدورة العمل المعتمدة، والشاشة صورة مباشرة للمستند او الكيان الذي تديره، والدور يرى فقط ما يخصه، والقيادة ترى اسقاطاتها الصحيحة، وكل ذلك مطابق للملفات الحاكمة لا للوضع القديم. صحح كل اختلاف قابل للحسم اثناء المراجعة، ولا تعتبر التقرير نقطة توقف.
