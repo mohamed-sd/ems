@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w13_view.php';
 
@@ -59,23 +60,27 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_tkt_assignment')); ?>
-    <table id="emsList_tkt_assignment" class="data-table">
-        <thead><tr><th>البلاغ</th><th>التسلسل</th><th>المكلف السابق</th><th>المكلف الجديد</th><th>ادارة المكلف</th><th>سبب التغيير</th><th>المسند</th><th>تاريخ الاسناد</th><th>وقت الاستلام</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= (int) $r["ticket_id"] ?></td>
-                    <td><?= (int) $r["seq_no"] ?></td>
-                    <td><?= (int) $r["from_person_id"] ?></td>
-                    <td><?= (int) $r["to_person_id"] ?></td>
-                    <td><?= ems_w13_txt($r["to_dept"]) ?></td>
-                    <td><?= ems_w13_txt($r["reason"]) ?></td>
-                    <td><?= (int) $r["assigned_by"] ?></td>
-                    <td><?= ems_w13_txt($r["assigned_at"]) ?></td>
-                    <td><?= ems_w13_txt($r["received_at"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف الإسناد' => 'g172',
+        'رقم البلاغ' => 'g173',
+        'تسلسل الإسناد' => 'g174',
+        'المكلف' => 'g175',
+        'صفة المكلف' => 'g176',
+        'وقت الإسناد' => 'g177',
+        'وقت الاستلام' => 'g178',
+        'سبب التغيير' => 'g179',
+        'حالة الإسناد' => 'g180',
+        'المنشئ' => 'g181',
+        'تاريخ الإنشاء' => 'g182',
+        'حالة البيانات' => 'g183',
+        'مرجع المصدر' => 'g184',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('tkt_assignment');
+    echo ems_w14_grid('emsList_tkt_assignment', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في تاريخ إسناد البلاغ'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

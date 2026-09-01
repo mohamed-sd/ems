@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w13_view.php';
 
@@ -59,19 +60,26 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_tkt_communications')); ?>
-    <table id="emsList_tkt_communications" class="data-table">
-        <thead><tr><th>البلاغ</th><th>الشخص</th><th>القناة</th><th>النص</th><th>التاريخ والوقت</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= (int) $r["tk_id"] ?></td>
-                    <td><?= (int) $r["person_id"] ?></td>
-                    <td><?= ems_w13_state((string) $r["channel"]) ?></td>
-                    <td><?= ems_w13_txt($r["note"]) ?></td>
-                    <td><?= ems_w13_txt($r["at"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف التواصل' => 'g143',
+        'رقم البلاغ' => 'g144',
+        'الاتجاه' => 'g145',
+        'الطرف' => 'g146',
+        'القناة' => 'g147',
+        'ملخص التواصل' => 'g148',
+        'ضمن مستوى السرية' => 'g149',
+        'وقت التواصل' => 'g150',
+        'المنشئ' => 'g151',
+        'تاريخ الإنشاء' => 'g152',
+        'حالة البيانات' => 'g153',
+        'مرجع المصدر' => 'g154',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('tkt_communications');
+    echo ems_w14_grid('emsList_tkt_communications', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في مراسلات البلاغ'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

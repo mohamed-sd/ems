@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w13_view.php';
 
@@ -59,22 +60,26 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_tkt_reopen')); ?>
-    <table id="emsList_tkt_reopen" class="data-table">
-        <thead><tr><th>البلاغ</th><th>التسلسل</th><th>الدورة السابقة</th><th>سبب اعادة الفتح</th><th>التفصيل</th><th>طالب اعادة الفتح</th><th>العودة الى ادارة</th><th>التاريخ والوقت</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= (int) $r["ticket_id"] ?></td>
-                    <td><?= (int) $r["seq_no"] ?></td>
-                    <td><?= (int) $r["prior_cycle_no"] ?></td>
-                    <td><?= ems_w13_state((string) $r["reopen_reason"]) ?></td>
-                    <td><?= ems_w13_txt($r["note"]) ?></td>
-                    <td><?= (int) $r["raised_by"] ?></td>
-                    <td><?= ems_w13_txt($r["back_to_dept"]) ?></td>
-                    <td><?= ems_w13_txt($r["raised_at"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف الإعادة' => 'g116',
+        'رقم البلاغ' => 'g117',
+        'تسلسل الإعادة' => 'g118',
+        'طالب الإعادة' => 'g119',
+        'سبب الإعادة' => 'g120',
+        'مرجع الإغلاق السابق' => 'g121',
+        'وقت الإعادة' => 'g122',
+        'المسار بعد الإعادة' => 'g123',
+        'المنشئ' => 'g124',
+        'تاريخ الإنشاء' => 'g125',
+        'حالة البيانات' => 'g126',
+        'مرجع المصدر' => 'g127',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('tkt_reopen');
+    echo ems_w14_grid('emsList_tkt_reopen', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في إعادة فتح البلاغ'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

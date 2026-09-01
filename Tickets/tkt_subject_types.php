@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w13_view.php';
 
@@ -59,21 +60,25 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_tkt_subject_types')); ?>
-    <table id="emsList_tkt_subject_types" class="data-table">
-        <thead><tr><th>رمز النوع</th><th>النوع</th><th>صنف الكيان</th><th>السجل المرجعي</th><th>مفتاح السجل</th><th>الادارة المالكة</th><th>مفعل</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= ems_w13_txt($r["type_code"]) ?></td>
-                    <td><?= ems_w13_txt($r["name_ar"]) ?></td>
-                    <td><?= ems_w13_state((string) $r["entity_kind"]) ?></td>
-                    <td><?= ems_w13_txt($r["ref_table"]) ?></td>
-                    <td><?= ems_w13_txt($r["ref_key"]) ?></td>
-                    <td><?= ems_w13_txt($r["owner_dept"]) ?></td>
-                    <td><?= (int) $r["active"] ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'كود النوع' => 'g161',
+        'اسم النوع' => 'g162',
+        'السجل المرجعي' => 'g163',
+        'مفتاح الربط' => 'g164',
+        'الإدارة المالكة' => 'g165',
+        'أمثلة' => 'g166',
+        'حالة النوع' => 'g167',
+        'المنشئ' => 'g168',
+        'تاريخ الإنشاء' => 'g169',
+        'حالة البيانات' => 'g170',
+        'مرجع المصدر' => 'g171',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('tkt_subject_types');
+    echo ems_w14_grid('emsList_tkt_subject_types', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في أنواع محل البلاغ المعتمدة'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

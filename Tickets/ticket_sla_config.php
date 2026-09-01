@@ -10,6 +10,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/tkt_helpers.php';
 
@@ -83,7 +84,35 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array();
     if ($can_add) { $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة سياسة'); }
     $header_back = array('href' => 'tickets_list.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
-    include('../includes/page_header.php');
+    include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف السطر' => 'g103',
+            'نوع البلاغ' => 'g104',
+            'الأولوية' => 'g105',
+            'الإدارة المسؤولة' => 'g106',
+            'Response SLA' => 'g107',
+            'Resolution SLA' => 'g108',
+            'سلم التصعيد' => 'g109',
+            'سريان المصفوفة' => 'g110',
+            'حالة السطر' => 'g111',
+            'المنشئ' => 'g112',
+            'تاريخ الإنشاء' => 'g113',
+            'حالة البيانات' => 'g114',
+            'مرجع المصدر' => 'g115',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('tkt_ticket_sla_config');
+        echo ems_w14_grid('emsList_tkt_ticket_sla_config', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في مصفوفة مهل المعالجة للبلاغات'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     echo ems_states_bundle('لا قواعد مهل (SLA) معرفة بعد', 'أضف أول قاعدة مهلة بزر الإضافة في رأس الشاشة');
     ?>

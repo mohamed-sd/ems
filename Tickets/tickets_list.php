@@ -19,6 +19,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/tkt_helpers.php';
 
@@ -172,7 +173,36 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         $header_actions[] = $__xlAction;
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
-    include('../includes/page_header.php');
+    include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف السطر' => 'g75',
+            'نطاق العرض' => 'g76',
+            'رقم البلاغ' => 'g77',
+            'تاريخ التسجيل' => 'g78',
+            'الفئة' => 'g79',
+            'الأولوية' => 'g80',
+            'محل البلاغ' => 'g81',
+            'المكلف' => 'g82',
+            'الكيان المنشأ في إدارتنا' => 'g83',
+            'مهلة SLA' => 'g84',
+            'المتبقي/التأخير' => 'g85',
+            'مستوى التصعيد' => 'g86',
+            'ينتظر تحققا؟' => 'g87',
+            'حالة البلاغ' => 'g88',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('tkt_tickets_list');
+        echo ems_w14_grid('emsList_tkt_tickets_list', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في صندوق بلاغات الإدارة'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     echo ems_states_bundle('لا بلاغات في هذا التبويب', 'بدل التبويب أو أزل الفلاتر — أو افتح بلاغا بزر «بلاغ جديد»');
     ?>

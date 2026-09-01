@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w13_view.php';
 
@@ -59,27 +60,30 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_tkt_verification')); ?>
-    <table id="emsList_tkt_verification" class="data-table">
-        <thead><tr><th>البلاغ</th><th>رقم الدورة</th><th>الاولوية</th><th>ادارة المعالجة</th><th>المعالج</th><th>تاريخ المعالجة</th><th>نافذة التحقق بالساعات</th><th>صفة المتحقق</th><th>المتحقق</th><th>تاريخ التحقق</th><th>المغلق</th><th>تاريخ الاغلاق</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= (int) $r["ticket_id"] ?></td>
-                    <td><?= (int) $r["cycle_no"] ?></td>
-                    <td><?= ems_w13_state((string) $r["priority_code"]) ?></td>
-                    <td><?= ems_w13_txt($r["resolved_dept"]) ?></td>
-                    <td><?= (int) $r["resolved_by"] ?></td>
-                    <td><?= ems_w13_txt($r["resolved_at"]) ?></td>
-                    <td><?= (int) $r["window_hours"] ?></td>
-                    <td><?= ems_w13_state((string) $r["verify_kind"]) ?></td>
-                    <td><?= (int) $r["verified_by"] ?></td>
-                    <td><?= ems_w13_txt($r["verified_at"]) ?></td>
-                    <td><?= (int) $r["closed_by"] ?></td>
-                    <td><?= ems_w13_txt($r["closed_at"]) ?></td>
-                    <td><?= ems_w13_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف الإغلاق' => 'g49',
+        'رقم البلاغ' => 'g50',
+        'ملخص المعالجة' => 'g51',
+        'Resolved في' => 'g52',
+        'نوع التحقق' => 'g53',
+        'تأكيد المبلغ' => 'g54',
+        'تقييم الرضا' => 'g55',
+        'نوع الإغلاق' => 'g56',
+        'البلاغ الأصل عند التكرار' => 'g57',
+        'سبب الإلغاء' => 'g58',
+        'وقت الإغلاق' => 'g59',
+        'حالة الإغلاق' => 'g60',
+        'المنشئ' => 'g61',
+        'تاريخ الإنشاء' => 'g62',
+        'حالة البيانات' => 'g63',
+        'مرجع المصدر' => 'g64',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('tkt_verification');
+    echo ems_w14_grid('emsList_tkt_verification', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في التحقق من المعالجة وإغلاق البلاغ'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

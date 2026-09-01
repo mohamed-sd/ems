@@ -57,9 +57,19 @@ foreach ($anchors as $a) {
 if ($pos === false) {
     /* ولا مرساةَ ترويسةٍ: فبعدَ فتحِ الغلافِ الموحَّد */
     $p0 = strpos($s, 'ems-unified-page-shell');
-    if ($p0 === false) { exit("x لا موضعَ إدراجٍ في " . $FILE . chr(10)); }
-    $pos = strpos($s, '>', $p0) + 1;
+    if ($p0 !== false) { $pos = strpos($s, '>', $p0) + 1; }
 }
+if ($pos === false) {
+    /* ◆ **ولا غلافَ في الملفِّ نفسِه**: أسطحٌ تُصيَّر كلَّها من عُدّةٍ مشتركةٍ
+         (`dept_gov_space`) فلا ترويسةَ فيها ولا وسمَ غلاف. **وحزمةُ الحالاتِ
+         الدنيا تقع داخلَ الصفحةِ يقينًا** — فهي المرساةُ الثالثة. */
+    $p0 = strpos($s, 'ems_states_bundle(');
+    if ($p0 !== false) {
+        $p1 = strpos($s, ');', $p0);
+        if ($p1 !== false) { $pos = strpos($s, chr(10), $p1); }
+    }
+}
+if ($pos === false) { exit("x لا موضعَ إدراجٍ في " . $FILE . chr(10)); }
 /* وإن كان الموضعُ داخلَ كتلةِ PHP، تُغلَق ثمَّ يُدرَج الترميزُ ثمَّ تُفتَح */
 $openTag  = strrpos(substr($s, 0, $pos), '<?php');
 $closeTag = strrpos(substr($s, 0, $pos), '?>');

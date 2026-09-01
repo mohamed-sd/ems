@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w13_view.php';
 
@@ -59,23 +60,29 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_tkt_routing')); ?>
-    <table id="emsList_tkt_routing" class="data-table">
-        <thead><tr><th>البلاغ</th><th>التسلسل</th><th>نوع التوجيه</th><th>من ادارة</th><th>الى ادارة</th><th>قاعدة التوجيه</th><th>سبب التصحيح</th><th>الموجه</th><th>تاريخ التوجيه</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= (int) $r["ticket_id"] ?></td>
-                    <td><?= (int) $r["seq_no"] ?></td>
-                    <td><?= ems_w13_state((string) $r["route_kind"]) ?></td>
-                    <td><?= ems_w13_txt($r["from_dept"]) ?></td>
-                    <td><?= ems_w13_txt($r["to_dept"]) ?></td>
-                    <td><?= ems_w13_txt($r["rule_ref"]) ?></td>
-                    <td><?= ems_w13_txt($r["reason"]) ?></td>
-                    <td><?= (int) $r["routed_by"] ?></td>
-                    <td><?= ems_w13_txt($r["routed_at"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف التوجيه' => 'g128',
+        'رقم البلاغ' => 'g129',
+        'تسلسل التوجيه' => 'g130',
+        'نوع التوجيه' => 'g131',
+        'من إدارة' => 'g132',
+        'إلى إدارة' => 'g133',
+        'التصنيف قبل' => 'g134',
+        'التصنيف بعد' => 'g135',
+        'سبب التصحيح' => 'g136',
+        'أثر المهلة' => 'g137',
+        'وقت التوجيه' => 'g138',
+        'المنشئ' => 'g139',
+        'تاريخ الإنشاء' => 'g140',
+        'حالة البيانات' => 'g141',
+        'مرجع المصدر' => 'g142',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('tkt_routing');
+    echo ems_w14_grid('emsList_tkt_routing', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في تاريخ توجيه البلاغ'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

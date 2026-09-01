@@ -11,6 +11,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 require_once __DIR__ . '/../includes/tenant_scope.php';   // نطاقُ الكيانِ من السياقِ لا من رقمٍ صلب
 require_once __DIR__ . '/../app/Services/Tickets/TicketRouter.php';
 require_once __DIR__ . '/../app/Services/Tickets/DuplicateDetector.php';
@@ -86,7 +87,43 @@ include '../insidebar.php';
     $header_title = 'بلاغ جديد — السياق محمول من ' . htmlspecialchars($ctx['screen'] ?? 'الشاشة');
     $header_icon = 'fa fa-bullhorn';
     $header_actions = array();
-    include('../includes/page_header.php');
+    include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم البلاغ' => 'g1',
+            'الشاشة المصدر' => 'g2',
+            'مسار الشاشة' => 'g3',
+            'مرجع السجل المفتوح' => 'g4',
+            'الإدارة المالكة للشاشة' => 'g5',
+            'المبلغ' => 'g6',
+            'صفته وقت الإبلاغ' => 'g7',
+            'وقت الإبلاغ' => 'g8',
+            'فئة المشكلة' => 'g9',
+            'طبيعتها' => 'g10',
+            'الأولوية المقترحة' => 'g11',
+            'وصف موجز' => 'g12',
+            'مرفق اختياري' => 'g13',
+            'تصنيف آلي مقترح' => 'g14',
+            'الإدارة المستقبلة' => 'g15',
+            'مصدر البلاغ' => 'g16',
+            'حالة البلاغ' => 'g17',
+            'المنشئ' => 'g18',
+            'تاريخ الإنشاء' => 'g19',
+            'حالة البيانات' => 'g20',
+            'مرجع المصدر' => 'g21',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('tkt_ticket_contextual_open');
+        echo ems_w14_grid('emsList_tkt_ticket_contextual_open', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الإبلاغ السياقي من داخل الشاشة'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
     ems_screen_about(
         'البلاغ يفتح من موضع المشكلة ويحمل سياقه كاملا — فلا تدخل حرفا مما يعرفه النظام. '
         . 'ثلاث نقرات (الفئة والنوع والأولوية) والوصف الحر، والنظام يوجه ويصعد آليا.',

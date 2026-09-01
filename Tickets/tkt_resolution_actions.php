@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w13_view.php';
 
@@ -59,22 +60,28 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_tkt_resolution_actions')); ?>
-    <table id="emsList_tkt_resolution_actions" class="data-table">
-        <thead><tr><th>البلاغ</th><th>التسلسل</th><th>الادارة المنفذة</th><th>المنفذ</th><th>الاجراء</th><th>مرجع شاشة الادارة</th><th>مستند الاجراء</th><th>تاريخ الاجراء</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= (int) $r["ticket_id"] ?></td>
-                    <td><?= (int) $r["seq_no"] ?></td>
-                    <td><?= ems_w13_txt($r["executor_dept"]) ?></td>
-                    <td><?= (int) $r["executor_person_id"] ?></td>
-                    <td><?= ems_w13_txt($r["action_ar"]) ?></td>
-                    <td><?= ems_w13_txt($r["dept_screen_ref"]) ?></td>
-                    <td><?= ems_w13_txt($r["dept_doc_ref"]) ?></td>
-                    <td><?= ems_w13_txt($r["acted_at"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف الإجراء' => 'g89',
+        'رقم البلاغ' => 'g90',
+        'تسلسل الإجراء' => 'g91',
+        'المكلف' => 'g92',
+        'الإجراء المتخذ' => 'g93',
+        'مرجع الإجراء في شاشة الإدارة' => 'g94',
+        'نتيجة الإجراء' => 'g95',
+        'سبب التعليق' => 'g96',
+        'مدة التعليق' => 'g97',
+        'وقت الإجراء' => 'g98',
+        'المنشئ' => 'g99',
+        'تاريخ الإنشاء' => 'g100',
+        'حالة البيانات' => 'g101',
+        'مرجع المصدر' => 'g102',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('tkt_resolution_actions');
+    echo ems_w14_grid('emsList_tkt_resolution_actions', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في إجراءات معالجة البلاغ'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

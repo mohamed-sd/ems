@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w13_view.php';
 
@@ -59,19 +60,24 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_tkt_escalation')); ?>
-    <table id="emsList_tkt_escalation" class="data-table">
-        <thead><tr><th>مسار العمل</th><th>مستوى التصعيد</th><th>محفز التصعيد</th><th>المصعد اليه</th><th>التاريخ والوقت</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= (int) $r["ws_id"] ?></td>
-                    <td><?= (int) $r["level"] ?></td>
-                    <td><?= ems_w13_state((string) $r["triggered_by"]) ?></td>
-                    <td><?= (int) $r["to_person_id"] ?></td>
-                    <td><?= ems_w13_txt($r["at"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف التصعيد' => 'g65',
+        'رقم البلاغ' => 'g66',
+        'المهلة الأصلية' => 'g67',
+        'التجاوز' => 'g68',
+        'المستوى' => 'g69',
+        'المخطر' => 'g70',
+        'وقت التصعيد' => 'g71',
+        'الاستجابة' => 'g72',
+        'وقت الاستجابة' => 'g73',
+        'حالة التصعيد' => 'g74',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('tkt_escalation');
+    echo ems_w14_grid('emsList_tkt_escalation', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في تصعيد البلاغ'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

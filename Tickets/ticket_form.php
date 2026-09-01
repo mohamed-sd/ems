@@ -20,6 +20,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/tkt_helpers.php';
 
@@ -495,7 +496,49 @@ if ($ticket) {
         // زر القائمة يكفي
     }
     $header_back = array('href' => 'tickets_list.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
-    include('../includes/page_header.php');
+    include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم البلاغ' => 'g22',
+            'وقت التسجيل' => 'g23',
+            'قناة التسجيل' => 'g24',
+            'Reporter_ID' => 'g25',
+            'Reporter_Name' => 'g26',
+            'Reporter_Department' => 'g27',
+            'Reporter_Entity' => 'g28',
+            'Reporter_Contact' => 'g29',
+            'Subject_Type' => 'g30',
+            'Subject_ID' => 'g31',
+            'Subject_Name' => 'g32',
+            'Subject_Owning_Department' => 'g33',
+            'الفئة' => 'g34',
+            'الطبيعة' => 'g35',
+            'الأولوية' => 'g36',
+            'مستوى السرية' => 'g37',
+            'وصف البلاغ' => 'g38',
+            'المرفقات' => 'g39',
+            'Ticket_Owner' => 'g40',
+            'Assigned_Department' => 'g41',
+            'Resolution_Owner' => 'g42',
+            'مهلة المعالجة' => 'g43',
+            'حالة البلاغ' => 'g44',
+            'المنشئ' => 'g45',
+            'تاريخ الإنشاء' => 'g46',
+            'حالة البيانات' => 'g47',
+            'مرجع المصدر' => 'g48',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('tkt_ticket_form');
+        echo ems_w14_grid('emsList_tkt_ticket_form', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في تسجيل البلاغ'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     echo ems_states_bundle('لا بلاغ بهذا الرقم — أو لم يسجل بعد', 'ارجع إلى قائمة البلاغات واختر بلاغا، أو سجل بلاغا جديدا من هذه الشاشة');
     ?>

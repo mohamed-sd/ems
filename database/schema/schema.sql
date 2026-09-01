@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-01 23:01:31
--- الجداول: 1135 · المناظير: 28
+-- المصدر: equipation_manage · التوليد: 2026-09-01 23:09:24
+-- الجداول: 1146 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -26237,6 +26237,30 @@ CREATE TABLE `timesheet_failure_hours` (
   KEY `idx_lookup_report` (`company_id`,`timesheet_date`,`equipment_id`,`failure_code_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── Table: tkt_assignment ──
+CREATE TABLE `tkt_assignment` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g172` varchar(190) DEFAULT NULL COMMENT 'معرف الإسناد',
+  `g173` varchar(190) DEFAULT NULL COMMENT 'رقم البلاغ',
+  `g174` varchar(190) DEFAULT NULL COMMENT 'تسلسل الإسناد',
+  `g175` varchar(190) DEFAULT NULL COMMENT 'المكلف',
+  `g176` varchar(190) DEFAULT NULL COMMENT 'صفة المكلف',
+  `g177` varchar(190) DEFAULT NULL COMMENT 'وقت الإسناد',
+  `g178` varchar(190) DEFAULT NULL COMMENT 'وقت الاستلام',
+  `g179` varchar(190) DEFAULT NULL COMMENT 'سبب التغيير',
+  `g180` varchar(190) DEFAULT NULL COMMENT 'حالة الإسناد',
+  `g181` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g182` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g183` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g184` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_844f20b2_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='TKT-08 - تاريخ إسناد البلاغ';
+
 -- ── Table: tkt_assignment_history ──
 CREATE TABLE `tkt_assignment_history` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -26257,6 +26281,67 @@ CREATE TABLE `tkt_assignment_history` (
   CONSTRAINT `chk_tka_person` CHECK (`to_person_id` > 0 and `to_person_id` <> `from_person_id`),
   CONSTRAINT `chk_tka_not_crp` CHECK (`to_dept` <> 'DEP-10' and `to_dept` <> '')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='W13 TKT-06 - كل تغيير مكلف سطر بسببه ولا مكلف بلا وقت استلام';
+
+-- ── Table: tkt_communications ──
+CREATE TABLE `tkt_communications` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g143` varchar(190) DEFAULT NULL COMMENT 'معرف التواصل',
+  `g144` varchar(190) DEFAULT NULL COMMENT 'رقم البلاغ',
+  `g145` varchar(190) DEFAULT NULL COMMENT 'الاتجاه',
+  `g146` varchar(190) DEFAULT NULL COMMENT 'الطرف',
+  `g147` varchar(190) DEFAULT NULL COMMENT 'القناة',
+  `g148` varchar(190) DEFAULT NULL COMMENT 'ملخص التواصل',
+  `g149` varchar(190) DEFAULT NULL COMMENT 'ضمن مستوى السرية',
+  `g150` varchar(190) DEFAULT NULL COMMENT 'وقت التواصل',
+  `g151` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g152` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g153` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g154` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_d20a9335_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='TKT-10 - مراسلات البلاغ';
+
+-- ── Table: tkt_dashboard_kpi ──
+CREATE TABLE `tkt_dashboard_kpi` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g155` varchar(190) DEFAULT NULL COMMENT 'معرف المؤشر',
+  `g156` varchar(190) DEFAULT NULL COMMENT 'المؤشر',
+  `g157` varchar(190) DEFAULT NULL COMMENT 'القيمة',
+  `g158` varchar(190) DEFAULT NULL COMMENT 'الوحدة',
+  `g159` varchar(190) DEFAULT NULL COMMENT 'الحالة',
+  `g160` varchar(190) DEFAULT NULL COMMENT 'آخر تحديث',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_fbcf747e_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='TKT-01 - لا سطر مسجل بعد في لوحة مركز البلاغات';
+
+-- ── Table: tkt_escalation ──
+CREATE TABLE `tkt_escalation` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g65` varchar(190) DEFAULT NULL COMMENT 'معرف التصعيد',
+  `g66` varchar(190) DEFAULT NULL COMMENT 'رقم البلاغ',
+  `g67` varchar(190) DEFAULT NULL COMMENT 'المهلة الأصلية',
+  `g68` varchar(190) DEFAULT NULL COMMENT 'التجاوز',
+  `g69` varchar(190) DEFAULT NULL COMMENT 'المستوى',
+  `g70` varchar(190) DEFAULT NULL COMMENT 'المخطر',
+  `g71` varchar(190) DEFAULT NULL COMMENT 'وقت التصعيد',
+  `g72` varchar(190) DEFAULT NULL COMMENT 'الاستجابة',
+  `g73` varchar(190) DEFAULT NULL COMMENT 'وقت الاستجابة',
+  `g74` varchar(190) DEFAULT NULL COMMENT 'حالة التصعيد',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_4598d5bf_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='TKT-11 - تصعيد البلاغ';
 
 -- ── Table: tkt_notifications ──
 CREATE TABLE `tkt_notifications` (
@@ -26317,6 +26402,18 @@ CREATE TABLE `tkt_reopen` (
   `raised_at` datetime NOT NULL DEFAULT current_timestamp(),
   `back_to_dept` varchar(12) NOT NULL,
   `src_ref` varchar(255) NOT NULL DEFAULT '',
+  `g116` varchar(190) DEFAULT NULL COMMENT 'معرف الإعادة',
+  `g117` varchar(190) DEFAULT NULL COMMENT 'رقم البلاغ',
+  `g118` varchar(190) DEFAULT NULL COMMENT 'تسلسل الإعادة',
+  `g119` varchar(190) DEFAULT NULL COMMENT 'طالب الإعادة',
+  `g120` varchar(190) DEFAULT NULL COMMENT 'سبب الإعادة',
+  `g121` varchar(190) DEFAULT NULL COMMENT 'مرجع الإغلاق السابق',
+  `g122` varchar(190) DEFAULT NULL COMMENT 'وقت الإعادة',
+  `g123` varchar(190) DEFAULT NULL COMMENT 'المسار بعد الإعادة',
+  `g124` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g125` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g126` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g127` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_tkro_seq` (`company_id`,`ticket_id`,`seq_no`),
   CONSTRAINT `chk_tkro_reason` CHECK (`reopen_reason` in ('REPORTER_OBJECTION','RECURRENCE')),
@@ -26343,6 +26440,57 @@ CREATE TABLE `tkt_resolution_action` (
   CONSTRAINT `chk_tra_action` CHECK (`action_ar` <> ''),
   CONSTRAINT `chk_tra_not_crp` CHECK (`executor_dept` <> 'DEP-10' and `executor_dept` <> '')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='W13 TKT-07 - كل اجراء سطر بمرجعه في شاشة الادارة المعالجة';
+
+-- ── Table: tkt_resolution_actions ──
+CREATE TABLE `tkt_resolution_actions` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g89` varchar(190) DEFAULT NULL COMMENT 'معرف الإجراء',
+  `g90` varchar(190) DEFAULT NULL COMMENT 'رقم البلاغ',
+  `g91` varchar(190) DEFAULT NULL COMMENT 'تسلسل الإجراء',
+  `g92` varchar(190) DEFAULT NULL COMMENT 'المكلف',
+  `g93` varchar(190) DEFAULT NULL COMMENT 'الإجراء المتخذ',
+  `g94` varchar(190) DEFAULT NULL COMMENT 'مرجع الإجراء في شاشة الإدارة',
+  `g95` varchar(190) DEFAULT NULL COMMENT 'نتيجة الإجراء',
+  `g96` varchar(190) DEFAULT NULL COMMENT 'سبب التعليق',
+  `g97` varchar(190) DEFAULT NULL COMMENT 'مدة التعليق',
+  `g98` varchar(190) DEFAULT NULL COMMENT 'وقت الإجراء',
+  `g99` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g100` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g101` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g102` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_0c3d6047_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='TKT-09 - إجراءات معالجة البلاغ';
+
+-- ── Table: tkt_routing ──
+CREATE TABLE `tkt_routing` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g128` varchar(190) DEFAULT NULL COMMENT 'معرف التوجيه',
+  `g129` varchar(190) DEFAULT NULL COMMENT 'رقم البلاغ',
+  `g130` varchar(190) DEFAULT NULL COMMENT 'تسلسل التوجيه',
+  `g131` varchar(190) DEFAULT NULL COMMENT 'نوع التوجيه',
+  `g132` varchar(190) DEFAULT NULL COMMENT 'من إدارة',
+  `g133` varchar(190) DEFAULT NULL COMMENT 'إلى إدارة',
+  `g134` varchar(190) DEFAULT NULL COMMENT 'التصنيف قبل',
+  `g135` varchar(190) DEFAULT NULL COMMENT 'التصنيف بعد',
+  `g136` varchar(190) DEFAULT NULL COMMENT 'سبب التصحيح',
+  `g137` varchar(190) DEFAULT NULL COMMENT 'أثر المهلة',
+  `g138` varchar(190) DEFAULT NULL COMMENT 'وقت التوجيه',
+  `g139` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g140` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g141` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g142` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_57145091_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='TKT-07 - تاريخ توجيه البلاغ';
 
 -- ── Table: tkt_routing_history ──
 CREATE TABLE `tkt_routing_history` (
@@ -26387,6 +26535,147 @@ CREATE TABLE `tkt_subject_type` (
   CONSTRAINT `chk_tkst_kind` CHECK (`entity_kind` in ('PERSON','ASSET','CONTRACT','SITE','ORG_UNIT','DOCUMENT'))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='W13 TKT-03 - كتالوج انواع محل البلاغ بسجله المرجعي';
 
+-- ── Table: tkt_subject_types ──
+CREATE TABLE `tkt_subject_types` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g161` varchar(190) DEFAULT NULL COMMENT 'كود النوع',
+  `g162` varchar(190) DEFAULT NULL COMMENT 'اسم النوع',
+  `g163` varchar(190) DEFAULT NULL COMMENT 'السجل المرجعي',
+  `g164` varchar(190) DEFAULT NULL COMMENT 'مفتاح الربط',
+  `g165` varchar(190) DEFAULT NULL COMMENT 'الإدارة المالكة',
+  `g166` varchar(190) DEFAULT NULL COMMENT 'أمثلة',
+  `g167` varchar(190) DEFAULT NULL COMMENT 'حالة النوع',
+  `g168` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g169` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g170` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g171` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_718e7822_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='TKT-05 - لا سطر مسجل بعد في أنواع محل البلاغ المعتمدة';
+
+-- ── Table: tkt_ticket_contextual_open ──
+CREATE TABLE `tkt_ticket_contextual_open` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g1` varchar(190) DEFAULT NULL COMMENT 'رقم البلاغ',
+  `g2` varchar(190) DEFAULT NULL COMMENT 'الشاشة المصدر',
+  `g3` varchar(190) DEFAULT NULL COMMENT 'مسار الشاشة',
+  `g4` varchar(190) DEFAULT NULL COMMENT 'مرجع السجل المفتوح',
+  `g5` varchar(190) DEFAULT NULL COMMENT 'الإدارة المالكة للشاشة',
+  `g6` varchar(190) DEFAULT NULL COMMENT 'المبلغ',
+  `g7` varchar(190) DEFAULT NULL COMMENT 'صفته وقت الإبلاغ',
+  `g8` varchar(190) DEFAULT NULL COMMENT 'وقت الإبلاغ',
+  `g9` varchar(190) DEFAULT NULL COMMENT 'فئة المشكلة',
+  `g10` varchar(190) DEFAULT NULL COMMENT 'طبيعتها',
+  `g11` varchar(190) DEFAULT NULL COMMENT 'الأولوية المقترحة',
+  `g12` varchar(190) DEFAULT NULL COMMENT 'وصف موجز',
+  `g13` varchar(190) DEFAULT NULL COMMENT 'مرفق اختياري',
+  `g14` varchar(190) DEFAULT NULL COMMENT 'تصنيف آلي مقترح',
+  `g15` varchar(190) DEFAULT NULL COMMENT 'الإدارة المستقبلة',
+  `g16` varchar(190) DEFAULT NULL COMMENT 'مصدر البلاغ',
+  `g17` varchar(190) DEFAULT NULL COMMENT 'حالة البلاغ',
+  `g18` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g19` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g20` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g21` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_22717b03_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='TKT-04 - الإبلاغ السياقي من داخل الشاشة';
+
+-- ── Table: tkt_ticket_form ──
+CREATE TABLE `tkt_ticket_form` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g22` varchar(190) DEFAULT NULL COMMENT 'رقم البلاغ',
+  `g23` varchar(190) DEFAULT NULL COMMENT 'وقت التسجيل',
+  `g24` varchar(190) DEFAULT NULL COMMENT 'قناة التسجيل',
+  `g25` varchar(190) DEFAULT NULL COMMENT 'Reporter_ID',
+  `g26` varchar(190) DEFAULT NULL COMMENT 'Reporter_Name',
+  `g27` varchar(190) DEFAULT NULL COMMENT 'Reporter_Department',
+  `g28` varchar(190) DEFAULT NULL COMMENT 'Reporter_Entity',
+  `g29` varchar(190) DEFAULT NULL COMMENT 'Reporter_Contact',
+  `g30` varchar(190) DEFAULT NULL COMMENT 'Subject_Type',
+  `g31` varchar(190) DEFAULT NULL COMMENT 'Subject_ID',
+  `g32` varchar(190) DEFAULT NULL COMMENT 'Subject_Name',
+  `g33` varchar(190) DEFAULT NULL COMMENT 'Subject_Owning_Department',
+  `g34` varchar(190) DEFAULT NULL COMMENT 'الفئة',
+  `g35` varchar(190) DEFAULT NULL COMMENT 'الطبيعة',
+  `g36` varchar(190) DEFAULT NULL COMMENT 'الأولوية',
+  `g37` varchar(190) DEFAULT NULL COMMENT 'مستوى السرية',
+  `g38` varchar(190) DEFAULT NULL COMMENT 'وصف البلاغ',
+  `g39` varchar(190) DEFAULT NULL COMMENT 'المرفقات',
+  `g40` varchar(190) DEFAULT NULL COMMENT 'Ticket_Owner',
+  `g41` varchar(190) DEFAULT NULL COMMENT 'Assigned_Department',
+  `g42` varchar(190) DEFAULT NULL COMMENT 'Resolution_Owner',
+  `g43` varchar(190) DEFAULT NULL COMMENT 'مهلة المعالجة',
+  `g44` varchar(190) DEFAULT NULL COMMENT 'حالة البلاغ',
+  `g45` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g46` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g47` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g48` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_f0b9380d_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='TKT-06 - تسجيل البلاغ';
+
+-- ── Table: tkt_ticket_sla_config ──
+CREATE TABLE `tkt_ticket_sla_config` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g103` varchar(190) DEFAULT NULL COMMENT 'معرف السطر',
+  `g104` varchar(190) DEFAULT NULL COMMENT 'نوع البلاغ',
+  `g105` varchar(190) DEFAULT NULL COMMENT 'الأولوية',
+  `g106` varchar(190) DEFAULT NULL COMMENT 'الإدارة المسؤولة',
+  `g107` varchar(190) DEFAULT NULL COMMENT 'Response SLA',
+  `g108` varchar(190) DEFAULT NULL COMMENT 'Resolution SLA',
+  `g109` varchar(190) DEFAULT NULL COMMENT 'سلم التصعيد',
+  `g110` varchar(190) DEFAULT NULL COMMENT 'سريان المصفوفة',
+  `g111` varchar(190) DEFAULT NULL COMMENT 'حالة السطر',
+  `g112` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g113` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g114` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g115` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_ba1d5019_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='TKT-03 - مصفوفة مهل المعالجة للبلاغات';
+
+-- ── Table: tkt_tickets_list ──
+CREATE TABLE `tkt_tickets_list` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g75` varchar(190) DEFAULT NULL COMMENT 'معرف السطر',
+  `g76` varchar(190) DEFAULT NULL COMMENT 'نطاق العرض',
+  `g77` varchar(190) DEFAULT NULL COMMENT 'رقم البلاغ',
+  `g78` varchar(190) DEFAULT NULL COMMENT 'تاريخ التسجيل',
+  `g79` varchar(190) DEFAULT NULL COMMENT 'الفئة',
+  `g80` varchar(190) DEFAULT NULL COMMENT 'الأولوية',
+  `g81` varchar(190) DEFAULT NULL COMMENT 'محل البلاغ',
+  `g82` varchar(190) DEFAULT NULL COMMENT 'المكلف',
+  `g83` varchar(190) DEFAULT NULL COMMENT 'الكيان المنشأ في إدارتنا',
+  `g84` varchar(190) DEFAULT NULL COMMENT 'مهلة SLA',
+  `g85` varchar(190) DEFAULT NULL COMMENT 'المتبقي/التأخير',
+  `g86` varchar(190) DEFAULT NULL COMMENT 'مستوى التصعيد',
+  `g87` varchar(190) DEFAULT NULL COMMENT 'ينتظر تحققا؟',
+  `g88` varchar(190) DEFAULT NULL COMMENT 'حالة البلاغ',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_4504509a_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='TKT-02 - صندوق بلاغات الإدارة';
+
 -- ── Table: tkt_verification ──
 CREATE TABLE `tkt_verification` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -26406,6 +26695,22 @@ CREATE TABLE `tkt_verification` (
   `state` varchar(20) NOT NULL DEFAULT 'resolved',
   `note` varchar(400) NOT NULL DEFAULT '',
   `src_ref` varchar(255) NOT NULL DEFAULT '',
+  `g49` varchar(190) DEFAULT NULL COMMENT 'معرف الإغلاق',
+  `g50` varchar(190) DEFAULT NULL COMMENT 'رقم البلاغ',
+  `g51` varchar(190) DEFAULT NULL COMMENT 'ملخص المعالجة',
+  `g52` varchar(190) DEFAULT NULL COMMENT 'Resolved في',
+  `g53` varchar(190) DEFAULT NULL COMMENT 'نوع التحقق',
+  `g54` varchar(190) DEFAULT NULL COMMENT 'تأكيد المبلغ',
+  `g55` varchar(190) DEFAULT NULL COMMENT 'تقييم الرضا',
+  `g56` varchar(190) DEFAULT NULL COMMENT 'نوع الإغلاق',
+  `g57` varchar(190) DEFAULT NULL COMMENT 'البلاغ الأصل عند التكرار',
+  `g58` varchar(190) DEFAULT NULL COMMENT 'سبب الإلغاء',
+  `g59` varchar(190) DEFAULT NULL COMMENT 'وقت الإغلاق',
+  `g60` varchar(190) DEFAULT NULL COMMENT 'حالة الإغلاق',
+  `g61` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g62` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g63` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g64` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_tkv_cycle` (`company_id`,`ticket_id`,`cycle_no`),
   CONSTRAINT `chk_tkv_state` CHECK (`state` in ('resolved','verification','verified','closed','reopened')),
