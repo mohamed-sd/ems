@@ -344,6 +344,39 @@ $sheets['10 DEP11_PILOT_UAT'] = $s;
 $idx[] = array('10', 'DEP11_PILOT_UAT', 'عشرُ نقاطِ §31 · و`HUMAN_UAT_PASS` معلَّق',
     '⛔ **ولا يُكتب «نجح» عن إنسانٍ لم يجرِّب**');
 
+/* ═══ 10-ب · بطاقاتُ §31 **لكلِّ مساحةٍ بلغت الأصفار** ═══════════════════════
+   ◆ **نصُّ المطلب**: «جهِّزْ مثلَها لكلِّ مساحةٍ تبلغ الأصفار، وسلِّمْها بسطرٍ
+     واحدٍ وامضِ» — فالبطاقةُ **تُعَدُّ ولا يُنتظَر حكمُها** (§35: لا توقّف).
+   ⛔ **ولا يُنتحَل حكمٌ بشريّ**: كلُّ صفٍّ يخرج `PENDING` بحرفِه، والعمودُ
+     الآليُّ يقول ما ثبت آليًّا **فقط** — وهو ليس بديلًا عن التجربة (§31). */
+$uatWs = array();
+foreach ($CF['metrics'] as $ws => $m) {
+    if ($m['EXACT_WORKSPACE_NAV_CONFORMANCE'] !== 'PASS') { continue; }
+    $uatWs[] = array($ws, $m);
+}
+$s = array(array('المساحة', 'الدورُ الممثِّل', 'قبل (‏الأساس)', 'بعد (‏دورةُ الإدارة)',
+                 'استرجاعُ الهدف', 'مجموعة/ترتيب/اسم', 'سقوطٌ حيّ', 'عابرٌ له بديلُ وصول',
+                 'نقاطُ §31 العشر', '`HUMAN_UAT_PASS`'));
+foreach ($uatWs as $u) {
+    list($ws, $m) = $u;
+    $bl = isset($BL['snapshot'][$ws]) ? $BL['snapshot'][$ws] : array('rendered' => null, 'role_id' => null, 'role_name' => '');
+    $cd = $rows("SELECT COUNT(*) c FROM nav_cross_domain_register WHERE consumer_workspace='"
+              . $conn->real_escape_string($ws) . "' AND access_path IS NOT NULL AND access_path <> ''");
+    $s[] = array($ws, $bl['role_id'] . ' · ' . $bl['role_name'],
+        $bl['rendered'], $m['NEW_LIFECYCLE'],
+        $m['TARGET_NAV_RECALL'] . '% (' . $m['TARGET_FOUND'] . '/' . $m['TARGET_TOTAL'] . ')',
+        $m['WRONG_GROUP'] . '/' . $m['WRONG_ORDER'] . '/' . $m['WRONG_LABEL'],
+        (int) $m['GLOBAL_FALLBACK_COUNT'] + (int) $m['LEGACY_FALLBACK_RENDER_COUNT'],
+        $cd[0]['c'],
+        'العشرُ كما في ورقة 10 — تُجرَّب بمستخدمٍ حقيقيٍّ في هذه المساحة',
+        '⃞ PENDING');
+}
+$sheets['10ب UAT_PER_WORKSPACE'] = $s;
+$idx[] = array('10ب', 'UAT_PER_WORKSPACE',
+    count($uatWs) . ' مساحةً بلغت أصفارَ §25 — لكلٍّ بطاقتُها',
+    '⛔ **تُسلَّم ولا يُنتظَر حكمُها** (§31 · §35) — و`HUMAN_DEPARTMENT_PASS` = 0/'
+        . count($uatWs));
+
 /* ═══ 11 · NAV_RETIREMENT_LEDGER (§33 · خمسُ مراحلَ وستُّ تبعيّات) ══════════ */
 $s = array(array('legacy_item_id', 'workspace', 'route', 'action', 'disposition',
                  'المرحلة (§33)', 'البديل', 'روابطُ داخليّةٌ في الشجرة', 'مفضّلات', 'مهامّ',

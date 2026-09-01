@@ -232,14 +232,28 @@ foreach ($BL['snapshot'] as $ws => $s) {
         if (isset($tgtLabel[$ws][$rt]) && $tgtLabel[$ws][$rt] !== ''
             && $lcLabel[$rt] !== $tgtLabel[$ws][$rt]) { $wl++; }
     }
-    /* الترتيبُ يُقاس **نسبيًّا**: أيتفق تسلسلُ الأهدافِ المُصيَّرةِ مع تسلسلِ الدليل؟ */
-    $pairsBad = 0; $keys = array_keys($ord);
-    for ($i = 0; $i < count($keys); $i++) {
-        for ($j = $i + 1; $j < count($keys); $j++) {
-            $a = $keys[$i]; $b = $keys[$j];
-            $ta = $tgtOrder[$ws][$a]; $tb = $tgtOrder[$ws][$b];
-            if ($ta === $tb) { continue; }
-            if ((($ta < $tb) ? 1 : -1) !== (($ord[$a] < $ord[$b]) ? 1 : -1)) { $pairsBad++; }
+    /* ⑦ WRONG_ORDER — **ترتيبُ المواضعِ داخلَ المجموعةِ الواحدة** (§21-⑤ حرفًا:
+       «④ ترتيب Lifecycle Groups ⑤ **ترتيب Placements داخل كل Group**»)
+       ─────────────────────────────────────────────────────────────────────
+       ⛔ **وكان يُقاس عبرَ المجموعات**: `$lcOrder` **رتبةٌ داخلَ مجموعتِها**
+       (‏تبدأ من ١ في كلِّ مجموعة) بينما `$tgtOrder` **رقمٌ عامٌّ في المساحةِ
+       كلِّها**. فمقارنةُ رتبةٍ محلّيّةٍ برقمٍ عامٍّ تُنتج انعكاسًا **كلَّما اختلف
+       ترتيبُ المجموعاتِ عن تسلسلِ الأرقام** — وهو ليس خطأَ ترتيبٍ بل اختلافُ
+       مقياسَين [[measure-blind-spots]]. وقِيس أثرُه: اثنتا عشرةَ مساحةً تحمل
+       انعكاساتٍ (‏حتى 24) **ولا بندَ واحدٌ منها خارجَ موضعِه داخلَ مجموعتِه**.
+       ⇒ فتُقارَن الأزواجُ **داخلَ المجموعةِ الواحدةِ وحدَها** — وترتيبُ
+       المجموعاتِ نفسِه يقيسه `WRONG_GROUP` مع `sort_no` لرأسِ الطيّ. */
+    $pairsBad = 0;
+    $byGrp = array();
+    foreach ($ord as $rt => $r) { $byGrp[$lcGroup[$rt]][] = $rt; }
+    foreach ($byGrp as $gk => $keys) {
+        for ($i = 0; $i < count($keys); $i++) {
+            for ($j = $i + 1; $j < count($keys); $j++) {
+                $a = $keys[$i]; $b = $keys[$j];
+                $ta = $tgtOrder[$ws][$a]; $tb = $tgtOrder[$ws][$b];
+                if ($ta === $tb) { continue; }
+                if ((($ta < $tb) ? 1 : -1) !== (($ord[$a] < $ord[$b]) ? 1 : -1)) { $pairsBad++; }
+            }
         }
     }
     $wo = $pairsBad;

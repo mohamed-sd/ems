@@ -77,8 +77,28 @@ while ($x = $r->fetch_assoc()) {
     $ws = (string) $x['workspace_id'];
     if ((string) $x['route'] !== '') {
         $k = $rt($x['route']);
-        $byWsRoute[$ws][$k] = $x;
-        $routeOwners[$k][$ws] = (string) $x['placement_type'];
+        /* ⚠ **مسارٌ له أكثرُ من صفٍّ في المساحةِ نفسِها — والأخيرُ كان يفوز** ═══
+           ◆ **المقيسُ**: `procurement/orders_proc` في `DEP-16` له صفَّان:
+             `MENU_ITEM` (‏بندُ دورةِ الإدارةِ في الورقة) و`TAB_CHILD` (‏يظهر
+             أيضًا تبويبًا داخلَ أبٍ). والإسنادُ بلا ترجيحٍ **يبقي آخرَ صفٍّ
+             قرأه المحرِّك**، فصار البندُ `TAB_CHILD` وحُجب عن السايدبار
+             (`NOT_A_SIDEBAR_TYPE`) — **فسقط هدفٌ من ورقةِ الدليلِ نفسِها**.
+             قِيس أثرُه: 17 هدفًا غائبًا في ستِّ مساحاتٍ (`DEP-17` نزل إلى 61.5٪).
+           ◆ **والحكمُ نصُّ §9**: `TAB_CHILD` **«تبويب/سجل تابع داخل Parent»** —
+             وصفٌ لمن **لا موضعَ قائمةٍ له**. فوجودُ صفِّ تبويبٍ **لا يُلغي**
+             بندَ قائمةٍ مُعلَنًا في الورقةِ نفسِها؛ الشاشةُ بندُ قائمةٍ **وأيضًا**
+             تبويبٌ في سياقٍ آخر.
+           ⇒ **فالترجيحُ صريحٌ وحتميّ**: `MENU_ITEM`/`LANDING_PAGE` يغلب ما سواه
+             — ولا يتأرجح الحكمُ بترتيبِ الصفوف (‏درسُ `asset_intake` نفسُه). */
+        $pt = (string) $x['placement_type'];
+        $isMenu = ($pt === 'MENU_ITEM' || $pt === 'LANDING_PAGE');
+        if (!isset($byWsRoute[$ws][$k])) { $byWsRoute[$ws][$k] = $x; }
+        else {
+            $prev = (string) $byWsRoute[$ws][$k]['placement_type'];
+            $prevMenu = ($prev === 'MENU_ITEM' || $prev === 'LANDING_PAGE');
+            if ($isMenu && !$prevMenu) { $byWsRoute[$ws][$k] = $x; }
+        }
+        if (!isset($routeOwners[$k][$ws]) || $isMenu) { $routeOwners[$k][$ws] = $pt; }
     }
     $tr = (string) $x['target_ref'];
     if ($tr !== '' && preg_match('~·\s*(\d+)\s*·\s*(.+)$~u', $tr, $m)) {

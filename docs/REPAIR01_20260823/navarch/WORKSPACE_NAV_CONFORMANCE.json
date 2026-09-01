@@ -12,7 +12,7 @@
             "UNAPPROVED_SECONDARY_PLACEMENT": 0,
             "ACTIVE_LEGACY_WITHOUT_DISPOSITION": 0,
             "WRONG_GROUP": 0,
-            "WRONG_ORDER": 2,
+            "WRONG_ORDER": 0,
             "WRONG_LABEL": 0,
             "GLOBAL_FALLBACK_COUNT": 0,
             "LEGACY_FALLBACK_RENDER_COUNT": 0,
@@ -32,7 +32,7 @@
             "MISSING_TARGETS": [],
             "EXTRA_ITEMS": [],
             "ADDITIONS_OUTSIDE_GUIDE": [],
-            "EXACT_WORKSPACE_NAV_CONFORMANCE": "FAIL"
+            "EXACT_WORKSPACE_NAV_CONFORMANCE": "PASS"
         },
         "DEP-02": {
             "TARGET_NAV_RECALL": 100,
@@ -45,7 +45,7 @@
             "UNAPPROVED_SECONDARY_PLACEMENT": 0,
             "ACTIVE_LEGACY_WITHOUT_DISPOSITION": 0,
             "WRONG_GROUP": 0,
-            "WRONG_ORDER": 4,
+            "WRONG_ORDER": 0,
             "WRONG_LABEL": 0,
             "GLOBAL_FALLBACK_COUNT": 0,
             "LEGACY_FALLBACK_RENDER_COUNT": 0,
@@ -65,7 +65,7 @@
             "MISSING_TARGETS": [],
             "EXTRA_ITEMS": [],
             "ADDITIONS_OUTSIDE_GUIDE": [],
-            "EXACT_WORKSPACE_NAV_CONFORMANCE": "FAIL"
+            "EXACT_WORKSPACE_NAV_CONFORMANCE": "PASS"
         },
         "DEP-03": {
             "TARGET_NAV_RECALL": 100,
@@ -78,7 +78,7 @@
             "UNAPPROVED_SECONDARY_PLACEMENT": 0,
             "ACTIVE_LEGACY_WITHOUT_DISPOSITION": 0,
             "WRONG_GROUP": 0,
-            "WRONG_ORDER": 15,
+            "WRONG_ORDER": 0,
             "WRONG_LABEL": 0,
             "GLOBAL_FALLBACK_COUNT": 0,
             "LEGACY_FALLBACK_RENDER_COUNT": 0,
@@ -98,20 +98,20 @@
             "MISSING_TARGETS": [],
             "EXTRA_ITEMS": [],
             "ADDITIONS_OUTSIDE_GUIDE": [],
-            "EXACT_WORKSPACE_NAV_CONFORMANCE": "FAIL"
+            "EXACT_WORKSPACE_NAV_CONFORMANCE": "PASS"
         },
         "DEP-04": {
-            "TARGET_NAV_RECALL": 86.2,
-            "TARGET_FOUND": 25,
+            "TARGET_NAV_RECALL": 100,
+            "TARGET_FOUND": 29,
             "TARGET_TOTAL": 29,
-            "PLACEMENT_PRECISION": 93.5,
+            "PLACEMENT_PRECISION": 98.7,
             "UNEXPLAINED_EXTRA_MENU_ITEM": 0,
             "APPROVED_ADDITION_OUTSIDE_GUIDE": 0,
             "PERMISSION_ONLY_RENDERED_ITEM": 0,
             "UNAPPROVED_SECONDARY_PLACEMENT": 0,
             "ACTIVE_LEGACY_WITHOUT_DISPOSITION": 0,
             "WRONG_GROUP": 0,
-            "WRONG_ORDER": 24,
+            "WRONG_ORDER": 0,
             "WRONG_LABEL": 0,
             "GLOBAL_FALLBACK_COUNT": 0,
             "LEGACY_FALLBACK_RENDER_COUNT": 0,
@@ -127,29 +127,24 @@
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
             "OLD_RENDERED": 77,
-            "NEW_LIFECYCLE": 25,
-            "MISSING_TARGETS": [
-                "fleet\/asset_intake",
-                "fleet\/asset_assignments",
-                "fleet\/asset_readiness",
-                "fleet\/asset_exit"
-            ],
+            "NEW_LIFECYCLE": 29,
+            "MISSING_TARGETS": [],
             "EXTRA_ITEMS": [],
             "ADDITIONS_OUTSIDE_GUIDE": [],
-            "EXACT_WORKSPACE_NAV_CONFORMANCE": "FAIL"
+            "EXACT_WORKSPACE_NAV_CONFORMANCE": "PASS"
         },
         "DEP-05": {
-            "TARGET_NAV_RECALL": 81,
-            "TARGET_FOUND": 17,
+            "TARGET_NAV_RECALL": 100,
+            "TARGET_FOUND": 21,
             "TARGET_TOTAL": 21,
-            "PLACEMENT_PRECISION": 96.4,
+            "PLACEMENT_PRECISION": 100,
             "UNEXPLAINED_EXTRA_MENU_ITEM": 0,
             "APPROVED_ADDITION_OUTSIDE_GUIDE": 0,
             "PERMISSION_ONLY_RENDERED_ITEM": 0,
             "UNAPPROVED_SECONDARY_PLACEMENT": 0,
             "ACTIVE_LEGACY_WITHOUT_DISPOSITION": 0,
             "WRONG_GROUP": 0,
-            "WRONG_ORDER": 19,
+            "WRONG_ORDER": 0,
             "WRONG_LABEL": 0,
             "GLOBAL_FALLBACK_COUNT": 0,
             "LEGACY_FALLBACK_RENDER_COUNT": 0,
@@ -165,29 +160,24 @@
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
             "OLD_RENDERED": 113,
-            "NEW_LIFECYCLE": 17,
-            "MISSING_TARGETS": [
-                "finance\/periods_fin",
-                "finance\/ar_claim_invoice",
-                "finance\/dues_fin",
-                "finance\/journal_form_fin"
-            ],
+            "NEW_LIFECYCLE": 21,
+            "MISSING_TARGETS": [],
             "EXTRA_ITEMS": [],
             "ADDITIONS_OUTSIDE_GUIDE": [],
-            "EXACT_WORKSPACE_NAV_CONFORMANCE": "FAIL"
+            "EXACT_WORKSPACE_NAV_CONFORMANCE": "PASS"
         },
         "DEP-06": {
-            "TARGET_NAV_RECALL": 93.8,
-            "TARGET_FOUND": 15,
+            "TARGET_NAV_RECALL": 100,
+            "TARGET_FOUND": 16,
             "TARGET_TOTAL": 16,
-            "PLACEMENT_PRECISION": 98.1,
+            "PLACEMENT_PRECISION": 99.1,
             "UNEXPLAINED_EXTRA_MENU_ITEM": 0,
             "APPROVED_ADDITION_OUTSIDE_GUIDE": 0,
             "PERMISSION_ONLY_RENDERED_ITEM": 0,
             "UNAPPROVED_SECONDARY_PLACEMENT": 0,
             "ACTIVE_LEGACY_WITHOUT_DISPOSITION": 0,
             "WRONG_GROUP": 0,
-            "WRONG_ORDER": 12,
+            "WRONG_ORDER": 0,
             "WRONG_LABEL": 0,
             "GLOBAL_FALLBACK_COUNT": 0,
             "LEGACY_FALLBACK_RENDER_COUNT": 0,
@@ -203,13 +193,11 @@
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
             "OLD_RENDERED": 109,
-            "NEW_LIFECYCLE": 15,
-            "MISSING_TARGETS": [
-                "finance\/bank_reconciliation_fin"
-            ],
+            "NEW_LIFECYCLE": 16,
+            "MISSING_TARGETS": [],
             "EXTRA_ITEMS": [],
             "ADDITIONS_OUTSIDE_GUIDE": [],
-            "EXACT_WORKSPACE_NAV_CONFORMANCE": "FAIL"
+            "EXACT_WORKSPACE_NAV_CONFORMANCE": "PASS"
         },
         "DEP-07": {
             "TARGET_NAV_RECALL": 100,
@@ -222,7 +210,7 @@
             "UNAPPROVED_SECONDARY_PLACEMENT": 0,
             "ACTIVE_LEGACY_WITHOUT_DISPOSITION": 0,
             "WRONG_GROUP": 0,
-            "WRONG_ORDER": 3,
+            "WRONG_ORDER": 0,
             "WRONG_LABEL": 0,
             "GLOBAL_FALLBACK_COUNT": 0,
             "LEGACY_FALLBACK_RENDER_COUNT": 0,
@@ -242,7 +230,7 @@
             "MISSING_TARGETS": [],
             "EXTRA_ITEMS": [],
             "ADDITIONS_OUTSIDE_GUIDE": [],
-            "EXACT_WORKSPACE_NAV_CONFORMANCE": "FAIL"
+            "EXACT_WORKSPACE_NAV_CONFORMANCE": "PASS"
         },
         "DEP-09": {
             "TARGET_NAV_RECALL": 100,
@@ -415,10 +403,10 @@
             "EXACT_WORKSPACE_NAV_CONFORMANCE": "PASS"
         },
         "DEP-14": {
-            "TARGET_NAV_RECALL": 93.8,
-            "TARGET_FOUND": 15,
+            "TARGET_NAV_RECALL": 100,
+            "TARGET_FOUND": 16,
             "TARGET_TOTAL": 16,
-            "PLACEMENT_PRECISION": 98.2,
+            "PLACEMENT_PRECISION": 100,
             "UNEXPLAINED_EXTRA_MENU_ITEM": 0,
             "APPROVED_ADDITION_OUTSIDE_GUIDE": 0,
             "PERMISSION_ONLY_RENDERED_ITEM": 0,
@@ -441,13 +429,11 @@
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
             "OLD_RENDERED": 58,
-            "NEW_LIFECYCLE": 15,
-            "MISSING_TARGETS": [
-                "maintenance\/work_orders"
-            ],
+            "NEW_LIFECYCLE": 16,
+            "MISSING_TARGETS": [],
             "EXTRA_ITEMS": [],
             "ADDITIONS_OUTSIDE_GUIDE": [],
-            "EXACT_WORKSPACE_NAV_CONFORMANCE": "FAIL"
+            "EXACT_WORKSPACE_NAV_CONFORMANCE": "PASS"
         },
         "DEP-15": {
             "TARGET_NAV_RECALL": 100,
@@ -460,7 +446,7 @@
             "UNAPPROVED_SECONDARY_PLACEMENT": 0,
             "ACTIVE_LEGACY_WITHOUT_DISPOSITION": 0,
             "WRONG_GROUP": 0,
-            "WRONG_ORDER": 4,
+            "WRONG_ORDER": 0,
             "WRONG_LABEL": 0,
             "GLOBAL_FALLBACK_COUNT": 0,
             "LEGACY_FALLBACK_RENDER_COUNT": 0,
@@ -480,20 +466,20 @@
             "MISSING_TARGETS": [],
             "EXTRA_ITEMS": [],
             "ADDITIONS_OUTSIDE_GUIDE": [],
-            "EXACT_WORKSPACE_NAV_CONFORMANCE": "FAIL"
+            "EXACT_WORKSPACE_NAV_CONFORMANCE": "PASS"
         },
         "DEP-16": {
-            "TARGET_NAV_RECALL": 70,
-            "TARGET_FOUND": 7,
+            "TARGET_NAV_RECALL": 100,
+            "TARGET_FOUND": 10,
             "TARGET_TOTAL": 10,
-            "PLACEMENT_PRECISION": 90.9,
+            "PLACEMENT_PRECISION": 96.4,
             "UNEXPLAINED_EXTRA_MENU_ITEM": 0,
             "APPROVED_ADDITION_OUTSIDE_GUIDE": 0,
             "PERMISSION_ONLY_RENDERED_ITEM": 0,
             "UNAPPROVED_SECONDARY_PLACEMENT": 0,
             "ACTIVE_LEGACY_WITHOUT_DISPOSITION": 0,
             "WRONG_GROUP": 0,
-            "WRONG_ORDER": 3,
+            "WRONG_ORDER": 0,
             "WRONG_LABEL": 0,
             "GLOBAL_FALLBACK_COUNT": 0,
             "LEGACY_FALLBACK_RENDER_COUNT": 0,
@@ -509,28 +495,24 @@
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
             "OLD_RENDERED": 56,
-            "NEW_LIFECYCLE": 7,
-            "MISSING_TARGETS": [
-                "procurement\/requests_proc",
-                "procurement\/proc_packages",
-                "procurement\/orders_proc"
-            ],
+            "NEW_LIFECYCLE": 10,
+            "MISSING_TARGETS": [],
             "EXTRA_ITEMS": [],
             "ADDITIONS_OUTSIDE_GUIDE": [],
-            "EXACT_WORKSPACE_NAV_CONFORMANCE": "FAIL"
+            "EXACT_WORKSPACE_NAV_CONFORMANCE": "PASS"
         },
         "DEP-17": {
-            "TARGET_NAV_RECALL": 61.5,
-            "TARGET_FOUND": 8,
+            "TARGET_NAV_RECALL": 100,
+            "TARGET_FOUND": 13,
             "TARGET_TOTAL": 13,
-            "PLACEMENT_PRECISION": 88.4,
+            "PLACEMENT_PRECISION": 100,
             "UNEXPLAINED_EXTRA_MENU_ITEM": 0,
             "APPROVED_ADDITION_OUTSIDE_GUIDE": 0,
             "PERMISSION_ONLY_RENDERED_ITEM": 0,
             "UNAPPROVED_SECONDARY_PLACEMENT": 0,
             "ACTIVE_LEGACY_WITHOUT_DISPOSITION": 0,
             "WRONG_GROUP": 0,
-            "WRONG_ORDER": 12,
+            "WRONG_ORDER": 0,
             "WRONG_LABEL": 0,
             "GLOBAL_FALLBACK_COUNT": 0,
             "LEGACY_FALLBACK_RENDER_COUNT": 0,
@@ -546,17 +528,11 @@
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
             "OLD_RENDERED": 43,
-            "NEW_LIFECYCLE": 8,
-            "MISSING_TARGETS": [
-                "procurement\/wh_receipt",
-                "procurement\/wh_issue_requests",
-                "procurement\/issue_proc",
-                "procurement\/wh_transfer",
-                "procurement\/wh_count"
-            ],
+            "NEW_LIFECYCLE": 13,
+            "MISSING_TARGETS": [],
             "EXTRA_ITEMS": [],
             "ADDITIONS_OUTSIDE_GUIDE": [],
-            "EXACT_WORKSPACE_NAV_CONFORMANCE": "FAIL"
+            "EXACT_WORKSPACE_NAV_CONFORMANCE": "PASS"
         },
         "EX-CEO": {
             "TARGET_NAV_RECALL": 100,
@@ -602,7 +578,7 @@
             "UNAPPROVED_SECONDARY_PLACEMENT": 0,
             "ACTIVE_LEGACY_WITHOUT_DISPOSITION": 0,
             "WRONG_GROUP": 0,
-            "WRONG_ORDER": 3,
+            "WRONG_ORDER": 0,
             "WRONG_LABEL": 0,
             "GLOBAL_FALLBACK_COUNT": 0,
             "LEGACY_FALLBACK_RENDER_COUNT": 0,
@@ -622,7 +598,7 @@
             "MISSING_TARGETS": [],
             "EXTRA_ITEMS": [],
             "ADDITIONS_OUTSIDE_GUIDE": [],
-            "EXACT_WORKSPACE_NAV_CONFORMANCE": "FAIL"
+            "EXACT_WORKSPACE_NAV_CONFORMANCE": "PASS"
         }
     }
 }
