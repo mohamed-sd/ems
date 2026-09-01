@@ -178,6 +178,15 @@ $gidFor = function ($ws, $route) use ($byWsRoute, $wsPrimaryRole, $declGroup, $l
     if (isset($byWsRoute[$ws][$route]) && $byWsRoute[$ws][$route]['gid'] !== null) {
         return (int) $byWsRoute[$ws][$route]['gid'];
     }
+    /* ②-أ **والشخصيُّ مجموعتُه من ورقةِ «مساحة عملي»** (§11): مواضعُ `WS-MY`
+       تُصيَّر طبقةً فوقَ كلِّ مساحةٍ، ورؤوسُها الفرعيّةُ («الملف الشخصي» ·
+       «العمل اليومي») **مجموعاتُ `WS-MY` نفسِها** لا مجموعاتُ الإدارةِ المضيفة.
+       ⛔ **وبدونِها يُسطَّح الشخصيُّ كتلةً واحدةً** فيُقرأ المسارُ الواحدُ تحتَ
+       رأسَين مختلفَين بين دورٍ مقلوبٍ وآخرَ لم يُقلَب — وهو ما ترصده بوّابةُ
+       `U3` حرفًا، وتتجاوز الكتلةُ حدَّ العشرةِ في `U9`. */
+    if (isset($byWsRoute['WS-MY'][$route]) && $byWsRoute['WS-MY'][$route]['gid'] !== null) {
+        return (int) $byWsRoute['WS-MY'][$route]['gid'];
+    }
     /* ② ثمَّ الجدولُ المستهدَفُ المنشورُ — **بشرطِ أن تكون المجموعةُ من هذه المساحة** */
     $rid = isset($wsPrimaryRole[$ws]) ? $wsPrimaryRole[$ws] : 0;
     if ($rid && isset($declGroup[$rid][$route])) {

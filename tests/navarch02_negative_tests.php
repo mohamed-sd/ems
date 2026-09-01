@@ -1,6 +1,6 @@
 <?php
 /**
- * tests/navarch02_negative_tests.php — الاختباراتُ السالبةُ الثمانيةُ (‏NAV-ARCH-02 §39)
+ * tests/navarch02_negative_tests.php — الاختباراتُ السالبةُ — ثمانيةُ §39 وحارسا §23 (‏NAV-ARCH-02)
  * ═══════════════════════════════════════════════════════════════════════════
  * ◆ **نصُّ §39**: ثمانيةُ إثباتاتٍ لا يُغلَق الطيّارُ بدونها. وكلُّها تسأل
  *   السؤالَ المعكوس: **«أيرفض المُصيِّرُ ما يجب أن يرفضه؟»** — فمُصيِّرٌ يقبل
@@ -203,6 +203,60 @@ chk($cdTot > 0 && $selfOwn === 0 && $multiOwn === 0,
     '`NT-08` شاشةٌ أجنبيّةٌ **لا تتحوّل إلى مملوكةٍ محليًّا بمجرّدِ ظهورِها**',
     'ظهوراتٌ عابرة: ' . $cdTot . ' · مالكُها = مستهلكُها: ' . $selfOwn
         . ' · مسارٌ بمالكَين: ' . $multiOwn . ' · §42');
+
+/* ═══ NT-09 · **عدَّاداتُ §23 حيّةٌ لا حقولٌ ميّتة** ═════════════════════════
+   ◆ **العطبُ الذي أوجبه**: `GLOBAL_FALLBACK_COUNT` و`LEGACY_FALLBACK_RENDER_COUNT`
+     كانا يُقرآنِ من حقلَين في `navarch_render()` **يُهيَّآنِ صفرًا ولا يُزادانِ
+     سطرًا واحدًا** — صفرٌ بنيويٌّ لا مقيس [[measure-token-must-exist]].
+   ◆ **والضِّلعان**: ① الدورُ **المقلوبُ** يعطي خمسةَ أصفارٍ ② والدورُ على
+     المسارِ القديمِ يعطي **أرقامًا موجبة** — فلو أعطى الاثنانِ صفرًا لكان
+     العدّادُ معطَّلًا لا السقوطُ منزوعًا. */
+$fbOf = function ($rid, $overlay = null) use ($ROOT) {
+    if ($overlay !== null) { putenv('EMS_ENV_OVERLAY=' . $overlay); }
+    else { putenv('EMS_ENV_OVERLAY'); }
+    $o = array();
+    @exec('"' . PHP_BINARY . '" ' . escapeshellarg($ROOT . '/tools/lib/render_role_cli.php')
+        . ' ' . (int) $rid . ' 2>NUL', $o);
+    $j = json_decode(implode("\n", $o), true);
+    return (is_array($j) && !empty($j['fallbacks'])) ? $j['fallbacks'] : null;
+};
+$offFile = sys_get_temp_dir() . '/navarch_nt09_' . getmypid() . '.env';
+file_put_contents($offFile, "EMS_NAV_ARCH=off\n");
+$fbOld = $fbOf(1, str_replace('\\', '/', $offFile));
+$onFile = sys_get_temp_dir() . '/navarch_nt09on_' . getmypid() . '.env';
+file_put_contents($onFile, "EMS_NAV_ARCH=DEP-11\n");
+$fbNew = $fbOf(1, str_replace('\\', '/', $onFile));
+@unlink($offFile); @unlink($onFile); putenv('EMS_ENV_OVERLAY');
+$sum = function ($a) { return $a === null ? -1 : array_sum($a); };
+chk($fbOld !== null && $fbNew !== null && $sum($fbOld) > 0 && $sum($fbNew) === 0,
+    '`NT-09` عدَّاداتُ السقوطِ الخمسُ **تتحرَّك على القديمِ وتصفر على الحاكم**',
+    'القديم: ' . $sum($fbOld) . ' حدثًا (' . ($fbOld === null ? '—'
+        : implode(' · ', array_map(function ($k, $v) { return $k . '=' . $v; },
+            array_keys($fbOld), array_values($fbOld)))) . ') · الحاكم: ' . $sum($fbNew));
+
+/* ═══ NT-10 · **المجموعةُ الافتراضيّةُ ممنوعةٌ بالمخطَّطِ لا بالحظّ** ══════════
+   ◆ §23-① يسمّي السقوطَ حرفًا: «إذا لم نجد Group ⇒ ضعها DAILY». وعدّادُه
+     `DEFAULT_GROUP_DAILY` يقرأ **صفرًا في أربعةٍ وثلاثين دورًا** — و⛔ صفرٌ
+     لا يُصدَّق حتى يُعرَف سببُه.
+   ◆ **والسببُ مخطَّطٌ لا حظّ**: القيدُ `fk_nrg_group` يربط
+     `nav_route_group.group_code` بـ`nav_group_taxonomy.code`، فلا يدخل رمزٌ
+     خارجَ التصنيفِ أصلًا — جُرِّب حيًّا فردَّته القاعدةُ برسالةِ القيد.
+   ⇒ فهذا الاختبارُ يحرس **القيدَ نفسَه**: إن سقط القيدُ عاد السقوطُ ممكنًا
+     ووجب أن يُعلَم. */
+$q = $conn->query("SELECT COUNT(*) c FROM information_schema.TABLE_CONSTRAINTS
+                    WHERE CONSTRAINT_SCHEMA = DATABASE()
+                      AND TABLE_NAME = 'nav_route_group'
+                      AND CONSTRAINT_NAME = 'fk_nrg_group'
+                      AND CONSTRAINT_TYPE = 'FOREIGN KEY'");
+$fk = $q ? (int) $q->fetch_assoc()['c'] : 0;
+$q = $conn->query("SELECT COUNT(*) c FROM nav_route_group r
+                    LEFT JOIN nav_group_taxonomy t ON t.code = r.group_code
+                   WHERE t.code IS NULL");
+$orphan = $q ? (int) $q->fetch_assoc()['c'] : -1;
+chk($fk === 1 && $orphan === 0,
+    '`NT-10` رمزُ مجموعةٍ خارجَ التصنيفِ **لا يدخل القاعدةَ** — فلا مجموعةَ افتراضيّة',
+    'القيد fk_nrg_group: ' . ($fk === 1 ? 'قائم' : '⛔ مفقود')
+        . ' · صفوفٌ يتيمةٌ خارجَ التصنيف: ' . $orphan . ' · §23-①');
 
 /* ═══ الحكم ════════════════════════════════════════════════════════════════ */
 $cleanup();

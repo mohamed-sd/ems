@@ -16,6 +16,14 @@
             "WRONG_LABEL": 0,
             "GLOBAL_FALLBACK_COUNT": 0,
             "LEGACY_FALLBACK_RENDER_COUNT": 0,
+            "FALLBACKS_MEASURED": {
+                "LEGACY_ITEMS_SOURCE": 0,
+                "GLOBAL_TAXONOMY": 0,
+                "ROUTE_DERIVED_GROUP": 0,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 0
+            },
+            "CUTOVER_DEPLOYED": false,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
@@ -41,6 +49,14 @@
             "WRONG_LABEL": 0,
             "GLOBAL_FALLBACK_COUNT": 0,
             "LEGACY_FALLBACK_RENDER_COUNT": 0,
+            "FALLBACKS_MEASURED": {
+                "LEGACY_ITEMS_SOURCE": 0,
+                "GLOBAL_TAXONOMY": 0,
+                "ROUTE_DERIVED_GROUP": 0,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 0
+            },
+            "CUTOVER_DEPLOYED": false,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
@@ -66,6 +82,14 @@
             "WRONG_LABEL": 0,
             "GLOBAL_FALLBACK_COUNT": 0,
             "LEGACY_FALLBACK_RENDER_COUNT": 0,
+            "FALLBACKS_MEASURED": {
+                "LEGACY_ITEMS_SOURCE": 0,
+                "GLOBAL_TAXONOMY": 0,
+                "ROUTE_DERIVED_GROUP": 0,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 0
+            },
+            "CUTOVER_DEPLOYED": false,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
@@ -91,6 +115,14 @@
             "WRONG_LABEL": 0,
             "GLOBAL_FALLBACK_COUNT": 0,
             "LEGACY_FALLBACK_RENDER_COUNT": 0,
+            "FALLBACKS_MEASURED": {
+                "LEGACY_ITEMS_SOURCE": 0,
+                "GLOBAL_TAXONOMY": 0,
+                "ROUTE_DERIVED_GROUP": 0,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 0
+            },
+            "CUTOVER_DEPLOYED": false,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
@@ -121,6 +153,14 @@
             "WRONG_LABEL": 0,
             "GLOBAL_FALLBACK_COUNT": 0,
             "LEGACY_FALLBACK_RENDER_COUNT": 0,
+            "FALLBACKS_MEASURED": {
+                "LEGACY_ITEMS_SOURCE": 0,
+                "GLOBAL_TAXONOMY": 0,
+                "ROUTE_DERIVED_GROUP": 0,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 0
+            },
+            "CUTOVER_DEPLOYED": false,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
@@ -151,6 +191,14 @@
             "WRONG_LABEL": 0,
             "GLOBAL_FALLBACK_COUNT": 0,
             "LEGACY_FALLBACK_RENDER_COUNT": 0,
+            "FALLBACKS_MEASURED": {
+                "LEGACY_ITEMS_SOURCE": 0,
+                "GLOBAL_TAXONOMY": 0,
+                "ROUTE_DERIVED_GROUP": 0,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 0
+            },
+            "CUTOVER_DEPLOYED": false,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
@@ -178,6 +226,14 @@
             "WRONG_LABEL": 0,
             "GLOBAL_FALLBACK_COUNT": 0,
             "LEGACY_FALLBACK_RENDER_COUNT": 0,
+            "FALLBACKS_MEASURED": {
+                "LEGACY_ITEMS_SOURCE": 0,
+                "GLOBAL_TAXONOMY": 0,
+                "ROUTE_DERIVED_GROUP": 0,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 0
+            },
+            "CUTOVER_DEPLOYED": false,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
@@ -203,6 +259,14 @@
             "WRONG_LABEL": 0,
             "GLOBAL_FALLBACK_COUNT": 0,
             "LEGACY_FALLBACK_RENDER_COUNT": 0,
+            "FALLBACKS_MEASURED": {
+                "LEGACY_ITEMS_SOURCE": 0,
+                "GLOBAL_TAXONOMY": 0,
+                "ROUTE_DERIVED_GROUP": 0,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 0
+            },
+            "CUTOVER_DEPLOYED": false,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
@@ -228,6 +292,14 @@
             "WRONG_LABEL": 0,
             "GLOBAL_FALLBACK_COUNT": 0,
             "LEGACY_FALLBACK_RENDER_COUNT": 0,
+            "FALLBACKS_MEASURED": {
+                "LEGACY_ITEMS_SOURCE": 0,
+                "GLOBAL_TAXONOMY": 0,
+                "ROUTE_DERIVED_GROUP": 0,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 0
+            },
+            "CUTOVER_DEPLOYED": false,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
@@ -253,6 +325,14 @@
             "WRONG_LABEL": 0,
             "GLOBAL_FALLBACK_COUNT": 0,
             "LEGACY_FALLBACK_RENDER_COUNT": 0,
+            "FALLBACKS_MEASURED": {
+                "LEGACY_ITEMS_SOURCE": 0,
+                "GLOBAL_TAXONOMY": 0,
+                "ROUTE_DERIVED_GROUP": 0,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 0
+            },
+            "CUTOVER_DEPLOYED": false,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
@@ -283,6 +363,14 @@
             "WRONG_LABEL": 0,
             "GLOBAL_FALLBACK_COUNT": 0,
             "LEGACY_FALLBACK_RENDER_COUNT": 0,
+            "FALLBACKS_MEASURED": {
+                "LEGACY_ITEMS_SOURCE": 0,
+                "GLOBAL_TAXONOMY": 0,
+                "ROUTE_DERIVED_GROUP": 0,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 0
+            },
+            "CUTOVER_DEPLOYED": false,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
@@ -308,6 +396,14 @@
             "WRONG_LABEL": 0,
             "GLOBAL_FALLBACK_COUNT": 0,
             "LEGACY_FALLBACK_RENDER_COUNT": 0,
+            "FALLBACKS_MEASURED": {
+                "LEGACY_ITEMS_SOURCE": 0,
+                "GLOBAL_TAXONOMY": 0,
+                "ROUTE_DERIVED_GROUP": 0,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 0
+            },
+            "CUTOVER_DEPLOYED": false,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
@@ -333,6 +429,14 @@
             "WRONG_LABEL": 0,
             "GLOBAL_FALLBACK_COUNT": 0,
             "LEGACY_FALLBACK_RENDER_COUNT": 0,
+            "FALLBACKS_MEASURED": {
+                "LEGACY_ITEMS_SOURCE": 0,
+                "GLOBAL_TAXONOMY": 0,
+                "ROUTE_DERIVED_GROUP": 0,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 0
+            },
+            "CUTOVER_DEPLOYED": false,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
@@ -360,6 +464,14 @@
             "WRONG_LABEL": 0,
             "GLOBAL_FALLBACK_COUNT": 0,
             "LEGACY_FALLBACK_RENDER_COUNT": 0,
+            "FALLBACKS_MEASURED": {
+                "LEGACY_ITEMS_SOURCE": 0,
+                "GLOBAL_TAXONOMY": 0,
+                "ROUTE_DERIVED_GROUP": 0,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 0
+            },
+            "CUTOVER_DEPLOYED": false,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
@@ -385,6 +497,14 @@
             "WRONG_LABEL": 0,
             "GLOBAL_FALLBACK_COUNT": 0,
             "LEGACY_FALLBACK_RENDER_COUNT": 0,
+            "FALLBACKS_MEASURED": {
+                "LEGACY_ITEMS_SOURCE": 0,
+                "GLOBAL_TAXONOMY": 0,
+                "ROUTE_DERIVED_GROUP": 0,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 0
+            },
+            "CUTOVER_DEPLOYED": false,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
@@ -414,6 +534,14 @@
             "WRONG_LABEL": 0,
             "GLOBAL_FALLBACK_COUNT": 0,
             "LEGACY_FALLBACK_RENDER_COUNT": 0,
+            "FALLBACKS_MEASURED": {
+                "LEGACY_ITEMS_SOURCE": 0,
+                "GLOBAL_TAXONOMY": 0,
+                "ROUTE_DERIVED_GROUP": 0,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 0
+            },
+            "CUTOVER_DEPLOYED": false,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
@@ -445,6 +573,14 @@
             "WRONG_LABEL": 0,
             "GLOBAL_FALLBACK_COUNT": 0,
             "LEGACY_FALLBACK_RENDER_COUNT": 0,
+            "FALLBACKS_MEASURED": {
+                "LEGACY_ITEMS_SOURCE": 0,
+                "GLOBAL_TAXONOMY": 0,
+                "ROUTE_DERIVED_GROUP": 0,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 0
+            },
+            "CUTOVER_DEPLOYED": false,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
@@ -470,6 +606,14 @@
             "WRONG_LABEL": 0,
             "GLOBAL_FALLBACK_COUNT": 0,
             "LEGACY_FALLBACK_RENDER_COUNT": 0,
+            "FALLBACKS_MEASURED": {
+                "LEGACY_ITEMS_SOURCE": 0,
+                "GLOBAL_TAXONOMY": 0,
+                "ROUTE_DERIVED_GROUP": 0,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 0
+            },
+            "CUTOVER_DEPLOYED": false,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,

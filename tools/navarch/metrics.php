@@ -126,11 +126,16 @@ $r = $conn->query("SELECT route FROM nav_placements WHERE active=1 AND workspace
 while ($x = $r->fetch_assoc()) { $personalRoutes[$nrm($x['route'])] = true; }
 
 /* ═══ ③ القياس ═════════════════════════════════════════════════════════════ */
+/* ما تقلبه `.env` فعلًا اليومَ — حقيقةُ **نشرٍ** لا حقيقةَ مطابقة */
+$deployFlag = function_exists('ems_env') ? trim((string) ems_env('EMS_NAV_ARCH', 'off')) : 'off';
+
 $M = array(); $ALL = array();
 foreach ($BL['snapshot'] as $ws => $s) {
     if ($s['rendered'] === null) { continue; }
     if ($onlyWs !== '' && $ws !== $onlyWs) { continue; }
     $rid = isset($wsRole[$ws]) ? $wsRole[$ws] : (int) $s['role_id'];
+    $deployedWs = (strtolower($deployFlag) === 'on')
+        || in_array($ws, array_map('trim', explode(',', $deployFlag)), true);
 
     $tg = isset($target[$ws]) ? $target[$ws] : array();
     $new = navarch_render($conn, $ws, $rid);
@@ -239,9 +244,38 @@ foreach ($BL['snapshot'] as $ws => $s) {
     }
     $wo = $pairsBad;
 
-    /* ⑨ GLOBAL_FALLBACK / LEGACY_FALLBACK — عدَّادا المُصيِّرِ الجديدِ نفسِه (§23) */
-    $gf = $new['counters']['global_fallback'];
-    $lf = $new['counters']['legacy_fallback'];
+    /* ⑨ GLOBAL_FALLBACK / LEGACY_FALLBACK — **من التصييرِ الحيِّ للإنتاج** (§23)
+       ─────────────────────────────────────────────────────────────────────────
+       ⛔ **وكانا يُقرآنِ من حقلَين ميّتَين**: `navarch_render()` تُهيِّئ
+       `global_fallback` و`legacy_fallback` صفرًا **ولا تزيدهما سطرٌ واحد** —
+       فصفرُهما بنيويٌّ لا مقيس، ورقمٌ لا يقدر أن يحمرَّ لا يحرس
+       [[measure-token-must-exist]]. والأدهى أنَّ السقوطَ يقع في **المُصيِّرِ
+       الإنتاجيّ** بينما القراءةُ من **الظلّ** [[render-not-store-rule]].
+       ⇒ فيُصيَّر دورُ المساحةِ **في عمليّةٍ نقيّةٍ** وتُقرأ عدَّاداتُ §23 الخمسُ
+       من `unified_nav.php` نفسِه حيث تقع:
+         `GLOBAL_FALLBACK_COUNT` = التصنيفُ العامُّ + استنتاجُ المجموعةِ من
+             المسارِ + المجموعةُ الافتراضيّة (§21 · §23-①·②·④)
+         `LEGACY_FALLBACK_RENDER_COUNT` = `nav_items` مصدرَ ظهورٍ + الظهورُ
+             المشتقُّ من الصلاحيّة (§21 · §23-③·⑤)
+       ◆ و`DEFAULT_GROUP_DAILY` صفرٌ **بحكمِ المخطَّطِ لا بحكمِ الحظّ**: القيدُ
+         `fk_nrg_group` يربط `nav_route_group.group_code` بـ`nav_group_taxonomy`
+         فلا يخرج رمزٌ عن التصنيف — ويحرسه `NT-09`. */
+    /* ◆ **والقياسُ في تهيئةِ المساحةِ نفسِها لا في تهيئةِ النشرِ**: §40 يسأل
+         «أتبلغ هذه المساحةُ المعايير؟» لا «أنُشرت؟». فيُصيَّر دورُها **والمفتاحُ
+         مفتوحٌ لها** بتراكبِ بيئةٍ مؤقّت — ⛔ ولا يُكتب في `.env` الحيّ.
+         **والنشرُ حقيقةٌ مستقلّةٌ تُعلَن**: `CUTOVER_DEPLOYED` أدناه يقول
+         أمقلوبةٌ هي فعلًا اليومَ أم لا — فلا يُقرأ «يبلغ المعايير» نشرًا. */
+    $ovF = sys_get_temp_dir() . '/navarch_fb_' . getmypid() . '.env';
+    file_put_contents($ovF, "EMS_NAV_ARCH=" . $ws . "\n");
+    putenv('EMS_ENV_OVERLAY=' . str_replace(DIRECTORY_SEPARATOR, '/', $ovF));
+    $fbOut = array(); @exec('"' . PHP_BINARY . '" '
+        . escapeshellarg($ROOT . '/tools/lib/render_role_cli.php') . ' ' . (int) $rid . ' 2>NUL', $fbOut);
+    putenv('EMS_ENV_OVERLAY'); @unlink($ovF);
+    $fbJ = json_decode(implode("\n", $fbOut), true);
+    $FB = (is_array($fbJ) && !empty($fbJ['fallbacks'])) ? $fbJ['fallbacks'] : null;
+    $gf = $FB === null ? -1 : ($FB['GLOBAL_TAXONOMY'] + $FB['ROUTE_DERIVED_GROUP']
+                               + $FB['DEFAULT_GROUP_DAILY']);
+    $lf = $FB === null ? -1 : ($FB['LEGACY_ITEMS_SOURCE'] + $FB['PERMISSION_DERIVED']);
 
     /* ⑩ PERSONAL / GLOBAL_SHELL محسوبَينِ إدارةً — يجب صفر (§26 · NT-06 · NT-07) */
     $pAsDept = 0; $gAsDept = 0;
@@ -271,6 +305,8 @@ foreach ($BL['snapshot'] as $ws => $s) {
         'WRONG_LABEL'                       => $wl,
         'GLOBAL_FALLBACK_COUNT'             => $gf,
         'LEGACY_FALLBACK_RENDER_COUNT'      => $lf,
+        'FALLBACKS_MEASURED'                => $FB,
+        'CUTOVER_DEPLOYED'                  => $deployedWs,
         'PERSONAL_ITEM_COUNTED_AS_DEPARTMENT'     => $pAsDept,
         'GLOBAL_SHELL_COUNTED_AS_DEPARTMENT'      => $gAsDept,
         'TARGET_LINEAGE_BROKEN'             => $lineage,

@@ -32,7 +32,12 @@ if ($role <= 0) { fwrite(STDERR, "دور مطلوب\n"); exit(2); }
 $html = uxp_render_role_html($conn, $role, $uid);
 $pos = uxp_parse_nav_html($html);
 $shells = uxp_nav_group_shells($html);
-$out = array('role' => $role, 'uid' => $uid, 'positions' => array(), 'shells' => array());
+/* §23 — **عدَّادا السقوطِ من المُصيِّرِ الإنتاجيِّ نفسِه** لا من الظلّ:
+   الصفرُ هنا يعني «لم يقع» مقيسًا، لا «حقلٌ لم يُزَد» [[measure-token-must-exist]]. */
+$out = array('role' => $role, 'uid' => $uid,
+             'fallbacks' => function_exists('ems_nav_fallback_counters')
+                 ? ems_nav_fallback_counters() : null,
+             'positions' => array(), 'shells' => array());
 foreach ($pos as $p) {
     $out['positions'][] = array('g' => (string) $p['group'], 'l' => (string) $p['label'],
                                 'h' => (string) $p['href']);

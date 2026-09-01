@@ -24,6 +24,52 @@ require_once __DIR__ . '/dynamic_nav.php';
 require_once __DIR__ . '/nav_icon_map.php';
 require_once __DIR__ . '/nav_groups.php';
 
+/* ══ NAV-ARCH-02 §23 — **عدَّادُ السقوطاتِ الخمسِ في المُصيِّرِ الإنتاجيِّ نفسِه** ══
+ * ───────────────────────────────────────────────────────────────────────────
+ * ◆ **العطبُ الذي أوجب هذا العدّاد**: `GLOBAL_FALLBACK_COUNT` و
+ *   `LEGACY_FALLBACK_RENDER_COUNT` كانا يُقرآنِ من حقلَين في
+ *   `navarch_render()` **يُهيَّآنِ صفرًا ولا يُزادانِ أبدًا** — فصفرُهما
+ *   **بنيويٌّ لا مقيس**: رقمٌ لا يقدر أن يحمرَّ لا يحرس شيئًا
+ *   [[measure-token-must-exist]]. والأخطرُ أنَّهما كانا يُقرآنِ من **الظلِّ**
+ *   بينما السقوطاتُ تقع في **الإنتاج** — قياسٌ لغيرِ المقروء
+ *   [[render-not-store-rule]].
+ *
+ * ◆ **فالعدُّ صار عند مواضعِ السقوطِ حرفًا** — الخمسةُ التي يأمر §23 بنزعِها:
+ *   ① `LEGACY_ITEMS_SOURCE`   — `nav_items` بالدورِ مصدرَ ظهورٍ (‏لا تفويضٍ).
+ *   ② `GLOBAL_TAXONOMY`       — التصنيفُ العامُّ `nav_group_taxonomy` بديلًا لدورةِ الإدارة.
+ *   ③ `ROUTE_DERIVED_GROUP`   — `nav_route_group`: المجموعةُ تُستنتَج من المسار.
+ *   ④ `DEFAULT_GROUP_DAILY`   — «إن لم نجد Group ⇒ ضعها DAILY» بحرفِه.
+ *   ⑤ `PERMISSION_DERIVED`    — بندٌ ظهر ولا موضعَ حاكمَ له في مساحةِ دورِه.
+ *
+ * ◆ **والعدُّ لا يمنع ولا يُخفي**: هذا الطورُ **قياسٌ** (§32) — والنزعُ
+ *   الفعليُّ مشروطٌ بـ§36، **وحاجزُه مُسمًّى**: ستةَ عشرَ دورًا لها صفوفُ
+ *   ملاحةٍ نشطةٌ **ولا ربطَ `PRIMARY` لها بمساحة**، فنزعُ المسارِ القديمِ
+ *   اليومَ يُفرِغ سايدباراتِها — وهو عينُ ما يمنعه §4 و§42.
+ */
+if (!function_exists('ems_nav_fallback')) {
+    /** يزيد عدّادَ سقوطٍ ويُرجِع قيمتَه — والصفرُ هنا **مقيسٌ** لا مُهيَّأ. */
+    function ems_nav_fallback($kind, $n = 1)
+    {
+        if (!isset($GLOBALS['__nav_fb'])) { $GLOBALS['__nav_fb'] = array(); }
+        if (!isset($GLOBALS['__nav_fb'][$kind])) { $GLOBALS['__nav_fb'][$kind] = 0; }
+        $GLOBALS['__nav_fb'][$kind] += (int) $n;
+        return $GLOBALS['__nav_fb'][$kind];
+    }
+}
+
+if (!function_exists('ems_nav_fallback_counters')) {
+    /** الخمسةُ بأسمائها — **مُهيَّأةٌ كلُّها** فلا يُقرأ غيابُ مفتاحٍ نجاحًا. */
+    function ems_nav_fallback_counters()
+    {
+        $base = array('LEGACY_ITEMS_SOURCE' => 0, 'GLOBAL_TAXONOMY' => 0,
+                      'ROUTE_DERIVED_GROUP' => 0, 'DEFAULT_GROUP_DAILY' => 0,
+                      'PERMISSION_DERIVED' => 0);
+        $got = isset($GLOBALS['__nav_fb']) ? $GLOBALS['__nav_fb'] : array();
+        foreach ($got as $k => $v) { $base[$k] = (int) $v; }
+        return $base;
+    }
+}
+
 /** الأبواب الثمانية (UX-00 §6 معدَّلًا بقرار DEC-01 ② الصريح — لا تنفيذ صامتًا).
  * HOME هو باب «① الرئيسية» الدستوري: عنصرٌ واحدٌ لكل دورٍ يفتح لوحتَه
  * (§7) — عامةً كانت أو مخصصةً — ويُطبع مسطّحًا قبل الأبواب لا داخل مجموعةٍ
@@ -114,6 +160,12 @@ function getUnifiedNavItems($conn, $roleId) {
     $items = array();
     $res = mysqli_query($conn, $sql);
     if ($res) { while ($row = mysqli_fetch_assoc($res)) { $items[] = $row; } }
+    /* §23-⑤ · **سقوطٌ ①**: `nav_items` بالدورِ **مصدرَ ظهور** — والمُصيِّرُ
+       الحاكمُ يقرؤها **مصدرَ تفويضٍ** فقط (‏‏`navarch_authorized_routes`).
+       فبلوغُ هذا السطرِ يعني أنَّ الظهورَ نشأ من صفِّ دورٍ لا من موضعٍ حاكم. */
+    if (function_exists('ems_nav_fallback') && !empty($items)) {
+        ems_nav_fallback('LEGACY_ITEMS_SOURCE', count($items));
+    }
 
     /* ── RPR-03 §٦ — طبقةُ قوالبِ GOV-AUTH-01 في قرارِ الظهورِ نفسِه ─────────
        المغطّى بقالبٍ نافذٍ يُحكَم بقالبِه حصرًا (دلالةُ get_module_permissions
@@ -980,6 +1032,11 @@ function emsNavTaxonomy($conn) {
                                    FROM nav_group_taxonomy ORDER BY sort_no");
     if (!$res) { return $tax; } /* لم تُبذر بعد = السلوكُ السابقُ حرفًا (fail-open) */
     while ($row = mysqli_fetch_assoc($res)) { $tax[$row['code']] = $row; }
+    /* §23-② · **سقوطٌ ②**: التصنيفُ العامُّ بديلًا لدورةِ الإدارةِ (§42 يحظره نصًّا:
+       «استخدام Global Taxonomy بدل دورة الادارة») — والمُصيِّرُ الحاكمُ لا يقرؤه. */
+    if (function_exists('ems_nav_fallback') && !empty($tax)) {
+        ems_nav_fallback('GLOBAL_TAXONOMY', count($tax));
+    }
     return $tax;
 }
 
@@ -990,6 +1047,12 @@ function emsNavRouteGroupMap($conn) {
     $map = array();
     $res = @mysqli_query($conn, "SELECT route, group_code FROM nav_route_group");
     if ($res) { while ($row = mysqli_fetch_assoc($res)) { $map[strtolower(trim($row['route']))] = $row['group_code']; } }
+    /* §23-④ · **سقوطٌ ③**: المجموعةُ **تُستنتَج من المسار** (§21: ⛔ `Route-derived
+       group inference`) — مفتاحُه المسارُ لا الدور، فمجموعتانِ لإدارتَين تنهارانِ
+       على رأسٍ واحد. والمُصيِّرُ الحاكمُ يأخذ المجموعةَ من صفِّ الموضعِ وحدَه. */
+    if (function_exists('ems_nav_fallback') && !empty($map)) {
+        ems_nav_fallback('ROUTE_DERIVED_GROUP', count($map));
+    }
     return $map;
 }
 
@@ -1193,11 +1256,37 @@ function printEmsTenGroupNav($conn, $items, $uxMap, $uxCurMap, $basePrefix, $bad
         }
         elseif (isset($rgMap[$base])) { $code = $rgMap[$base]; }
         else { list($code, ) = ems_nav_group_for_route($base, $lvl, $section); }
-        if (!isset($tax[$code])) { $code = isset($tax['DAILY']) ? 'DAILY' : key($tax); }
+        if (!isset($tax[$code])) {
+            /* §23-① · **سقوطٌ ④** بحرفِه: «إذا لم نجد Group ⇒ ضعها DAILY».
+               والمُصيِّرُ الحاكمُ **يحجب الموضعَ بلا رأسِ طيٍّ ويعُدُّه** (§35). */
+            if (function_exists('ems_nav_fallback')) { ems_nav_fallback('DEFAULT_GROUP_DAILY'); }
+            $code = isset($tax['DAILY']) ? 'DAILY' : key($tax);
+        }
 
         $rows[] = array('code' => $raw, 'name' => $name, 'icon' => $it['icon'],
                         'group' => $code, 'section' => $section, 'sort' => $sort,
                         'variant' => $isVariant ? 1 : 0, 'idx' => $idx, 'decl' => $isDecl);
+        /* §23-③ · **سقوطٌ ⑤ — «الدورُ يراها فتُعرَض»**: بندٌ يُصيَّر **ولا موضعَ
+           حاكمَ له في مساحةِ دورِه**، فسببُ ظهورِه الصلاحيّةُ وحدَها. وهو نصُّ
+           المعادلةِ الملغاةِ في §2 و§20 و§42 («اعتبار Permission سببًا للظهور»).
+           ⛔ **ولا يُمنَع هنا** — هذا الطورُ قياسٌ (§32)، والنزعُ بـ§36 وحاجزُه
+           مُسمًّى: ستةَ عشرَ دورًا بلا ربطِ مساحة. */
+        if (function_exists('ems_nav_fallback') && !isset($navarchPlacedSet)) {
+            $navarchPlacedSet = array();
+            if (function_exists('navarch_role_workspace') && isset($GLOBALS['__uxui_cur_role'])) {
+                $__ws = navarch_role_workspace($conn, (int) $GLOBALS['__uxui_cur_role']);
+                if ($__ws !== null) {
+                    $__q = @mysqli_query($conn, "SELECT route FROM nav_workspace_placements
+                                                  WHERE workspace_id = '"
+                                              . mysqli_real_escape_string($conn, $__ws) . "'
+                                                    AND status = 'ACTIVE'");
+                    while ($__q && ($__x = mysqli_fetch_row($__q))) { $navarchPlacedSet[$__x[0]] = true; }
+                }
+            }
+        }
+        if (function_exists('ems_nav_fallback') && !isset($navarchPlacedSet[$base])) {
+            ems_nav_fallback('PERMISSION_DERIVED');
+        }
     }
 
     /* ── ② ما يحمله السجلُّ ولا صفَّ تبعيةٍ له (الرئيسيةُ والمراسلاتُ لبعضِ
@@ -1262,7 +1351,12 @@ function printEmsTenGroupNav($conn, $items, $uxMap, $uxCurMap, $basePrefix, $bad
         if ($section === '— خارج التبويب') { $section = ''; }
         $code = isset($rgMap[$base]) ? $rgMap[$base]
               : current(ems_nav_group_for_route($base, (int) $uxMap[$base]['level_no'], $section));
-        if (!isset($tax[$code])) { $code = isset($tax['DAILY']) ? 'DAILY' : key($tax); }
+        if (!isset($tax[$code])) {
+            /* §23-① · **سقوطٌ ④** بحرفِه: «إذا لم نجد Group ⇒ ضعها DAILY».
+               والمُصيِّرُ الحاكمُ **يحجب الموضعَ بلا رأسِ طيٍّ ويعُدُّه** (§35). */
+            if (function_exists('ems_nav_fallback')) { ems_nav_fallback('DEFAULT_GROUP_DAILY'); }
+            $code = isset($tax['DAILY']) ? 'DAILY' : key($tax);
+        }
         $nameSyn = $cur['cur_label'];
         $sortSyn = (int) $cur['cur_order'];
         /* والمرساتانِ هنا أيضًا: دورٌ صفُّه معطَّلٌ في `nav_items` تُولَّد له

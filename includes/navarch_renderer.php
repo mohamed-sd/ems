@@ -128,8 +128,12 @@ if (!function_exists('navarch_render')) {
                 continue;
             }
             if ($type === 'PERSONAL') {
+                /* §11 — **ورأسُه الفرعيُّ من مجموعةِ `WS-MY`** لا من دورةِ المضيف؛
+                   وما لا مجموعةَ له يصعد إلى صدرِ «مساحتي» المكشوف. */
                 if ($inclShell) { $personal[] = array('route' => $route, 'label' => $p['canonical_label'],
-                                                      'sort_no' => (int) $p['sort_no']); }
+                                                      'sort_no' => (int) $p['sort_no'],
+                                                      'group' => (string) $p['group_label'],
+                                                      'group_sort' => (int) $p['group_sort']); }
                 continue;
             }
 
@@ -175,7 +179,10 @@ if (!function_exists('navarch_render')) {
             $rendered += count($g['items']);
         }
         usort($shell, function ($a, $b) { return $a['sort_no'] - $b['sort_no']; });
-        usort($personal, function ($a, $b) { return $a['sort_no'] - $b['sort_no']; });
+        usort($personal, function ($a, $b) {
+            if ($a['group_sort'] !== $b['group_sort']) { return $a['group_sort'] - $b['group_sort']; }
+            return $a['sort_no'] - $b['sort_no'];
+        });
 
         return array('workspace' => (string) $wsId, 'role_id' => (int) $roleId,
                      'groups' => array_values($groups), 'shell' => $shell, 'personal' => $personal,
@@ -314,11 +321,38 @@ if (!function_exists('navarch_print_sidebar')) {
                 : ems_nav_anchor_li($conn, 'CHATS', $basePrefix, 'id="sidebarChatLink"',
                       '<span id="nav-unread-badge" class="nav-count-badge" style="display:none;"></span>');
         }
+        /* §11 — الشخصيُّ برؤوسِ `WS-MY` الفرعيّة: المفردُ وبلا مجموعةٍ يصعد
+           إلى الصدرِ المكشوف، والباقي تحتَ عنوانِه — بالقاعدةِ نفسِها التي
+           يطبّقها المُصيِّرُ القديمُ (‏عنوانٌ لرابطٍ واحدٍ ضجيجٌ لا بناء). */
+        $pBuckets = array(); $pLead = array();
         foreach ($tree['personal'] as $p) {
             $rt = navarch_proper_route($conn, $p['route']);
             if ($rt === '') { continue; }
-            printNavLinkItem(array('code' => $rt, 'name' => $p['label'],
-                                   'icon' => ems_nav_icon_for($p['label'], $rt)), $basePrefix, $badges);
+            $g = trim((string) $p['group']);
+            if ($g === '') { $pLead[] = array($rt, $p['label']); }
+            else { $pBuckets[$g][] = array($rt, $p['label']); }
+        }
+        foreach ($pBuckets as $g => $ks) {
+            if (count($ks) >= 2) { continue; }
+            foreach ($ks as $k) { $pLead[] = $k; }
+            unset($pBuckets[$g]);
+        }
+        foreach ($pLead as $k) {
+            printNavLinkItem(array('code' => $k[0], 'name' => $k[1],
+                                   'icon' => ems_nav_icon_for($k[1], $k[0])), $basePrefix, $badges);
+        }
+        foreach ($pBuckets as $g => $ks) {
+            ob_start();
+            foreach ($ks as $k) {
+                printNavLinkItem(array('code' => $k[0], 'name' => $k[1],
+                                       'icon' => ems_nav_icon_for($k[1], $k[0])), $basePrefix, $badges);
+            }
+            $sub = ob_get_clean();
+            if (!ems_nav_group_has_link($sub)) { continue; }   /* لا عنوانَ بلا روابط */
+            echo '<li class="nav-subhead" aria-hidden="true"><span>'
+               . htmlspecialchars($g, ENT_QUOTES, 'UTF-8') . '</span></li>' . "
+";
+            echo $sub;
         }
         $mineBody = ob_get_clean();
 
