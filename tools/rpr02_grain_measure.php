@@ -371,6 +371,19 @@ foreach ($rows as $s) {
         if (preg_match('~[\'"]table[\'"]\s*=>\s*[\'"]([a-z][a-z0-9_]{2,})[\'"]~i', $own, $dm)) { $dTbl = strtolower($dm[1]); }
         if (preg_match('~[\'"]nature[\'"]\s*=>\s*[\'"]([a-z]+)[\'"]~i', $own, $nm)) { $dNat = strtolower($nm[1]); }
 
+        /* **G1c · سجلُّ الورقةِ المصرَّحُ في السطح** — `GOV_UI_FINISH` أضاف إلى
+           الأسطحِ المكتوبةِ بيدٍ **شبكةَ حقولِ ورقتِها** تقرأ جدولًا واحدًا
+           بنداءٍ مصرَّح: `ems_w14_guide_rows('T')`. **وذاك بيانُ السطحِ عن حبّتِه**
+           كما يبيّن `$U13` عن جدولِه.
+           ⛔ **وبلا هذه القاعدةِ يُقرأ السطحُ «يجمع حبّتَين»**: جدولُ عملِه
+           وجدولُ ورقتِه — وهو بيانٌ واحدٌ لا خرقان (قِيس: 6 ⇒ 26 بعدَ الإضافة).
+           ◆ **وترتيبُها ثالثةً مقصود**: سجلُّ `cmp03` أوّلًا ثمَّ `'table' =>`
+             (فالأبُ في سطحٍ له سجلٌّ ابنٌ يبقى الأبَ)، ثمَّ هذه. */
+        $gTbl = '';
+        if (preg_match('~ems_w14_guide_rows\(\s*.([a-z][a-z0-9_]{2,}).~i', $own, $gm)) {
+            $gTbl = strtolower($gm[1]);
+        }
+
         if (isset($CMP[$base]['table']) && $CMP[$base]['table'] !== '') {
             $ent  = $CMP[$base]['table'];
             $rule = 'G1_CMP03_DECLARED';
@@ -385,6 +398,12 @@ foreach ($rows as $s) {
             $cd   = grain_looks_line($ent) ? 'LINE'
                   : (($dNat === 'read') ? 'LIST' : 'ROW');
             $stat['G1B'] = isset($stat['G1B']) ? $stat['G1B'] + 1 : 1;
+        } elseif ($gTbl !== '') {
+            $ent  = $gTbl;
+            $rule = 'G1C_GUIDE_REGISTER';
+            $wit  = 'يُعلن السطحُ سجلَّ ورقتِه بنداءٍ مصرَّح: ems_w14_guide_rows(' . $ent . ') · مصدر ' . $base . ' [' . $tier . ']';
+            $cd   = grain_looks_line($ent) ? 'LINE' : 'ROW';
+            $stat['G1C'] = isset($stat['G1C']) ? $stat['G1C'] + 1 : 1;
         } else {
             $biz = array(); $inf = array();
             foreach ($g['w'] as $t => $n) { if (in_array($t, $INFRA, true)) { $inf[$t] = $n; } else { $biz[$t] = $n; } }
