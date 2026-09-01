@@ -1,7 +1,7 @@
 {
     "meta": {
-        "snapshot": "163b34b8",
-        "updated_at": "2026-09-01 07:44",
+        "snapshot": "f5448fe7",
+        "updated_at": "2026-09-01 07:53",
         "governing_order": "docs\/REPAIR01_20260823\/orders\/CLOSURE_SYSTEM.txt",
         "sprint_timeboxes": {
             "SPRINT-01": {
@@ -7314,10 +7314,10 @@
             "Estimated_Effort": "XL",
             "Evidence_Contract": "كل شاشة تبنى بنمط WH-03 الكامل (جدول بقيوده · شاشة بفعليها · التوصيل الكامل · البوابات خضر) وكل ادارة تبلغ §24 تدخل التحقق البشري فورا",
             "Next_Action": "استخراج Sprint من السجل واخذ اعلى الاهداف قيمة — 134 موضعا حاليا (لوحة DEPARTMENT_CONFORMANCE)",
-            "Current_Snapshot": "لا سجل ثالثا للانسان: سجل الافراد التشغيليين بني فوق equipment_operators بحكم W03 · وست حبات قائمة استكملت @ 163b34b8",
-            "Last_Updated_Snapshot": "163b34b8",
-            "Last_Evidence_Ref": "DEP-13 القوى التشغيلية اغلقت: 14 موضعا · TARGET_BUILD_COVERAGE 355\/413 ⇒ 369\/413 · RENDERED 242\/242 ⇒ 256\/256 · المطابق تماما 9 ⇒ 10 · برهان التصيير 16\/0 · الحقول 1503\/4652 ⇒ 1651\/4800 @ 163b34b8",
-            "Status_Changed_At": "2026-09-01 07:44 @ 163b34b8",
+            "Current_Snapshot": "عشرة جداول قائمة باعمدة مولدة باسم مبهم (c5 · offer_22): فارغة ولا كاتب لها فصححت التسمية — 100 عمود مسمى انشئ و100 مبهم اسقط، والعكس يعيدها بتعريفها الحرفي المنتزع من المخطط @ f5448fe7",
+            "Last_Updated_Snapshot": "f5448fe7",
+            "Last_Evidence_Ref": "DEP-02 الموردون اغلقت: 10 مواضع · TARGET_BUILD_COVERAGE 369\/413 ⇒ 379\/413 · RENDERED 256\/256 ⇒ 266\/266 · المطابق تماما 10 ⇒ 11 · برهان التصيير 12\/0 · الحقول 1651\/4800 ⇒ 1876\/5026 @ f5448fe7",
+            "Status_Changed_At": "2026-09-01 07:53 @ f5448fe7",
             "Final_Disposition": "",
             "Levels": {
                 "Decision": "DECIDED",

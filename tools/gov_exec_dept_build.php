@@ -239,15 +239,28 @@ if ($EMIT !== null) {
                   . "\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT "
                   . gdb_q($S['dept'] . ' — ' . $pl['title'] . ' · الحبة: ' . $pl['grain']);
             $down[] = "DROP TABLE IF EXISTS `{$pl['table']}`";
-        } elseif ($pl['add']) {
-            $parts = array();
+        } elseif ($pl['add'] || !empty($pl['drop_cols'])) {
+            $parts = array(); $dparts = array();
             foreach ($pl['add'] as $c) {
-                $parts[] = "ADD COLUMN `{$c['key']}` {$c['sql']} COMMENT " . gdb_q($c['label']);
+                $parts[]  = "ADD COLUMN `{$c['key']}` {$c['sql']} COMMENT " . gdb_q($c['label']);
+                $dparts[] = "DROP COLUMN `{$c['key']}`";
             }
-            $up[] = "ALTER TABLE `{$pl['table']}`\n    " . implode(",\n    ", $parts);
-            $dparts = array();
-            foreach ($pl['add'] as $c) { $dparts[] = "DROP COLUMN `{$c['key']}`"; }
-            $down[] = "ALTER TABLE `{$pl['table']}`\n    " . implode(",\n    ", $dparts);
+            /* ◆ **أعمدةٌ مولَّدةٌ باسمٍ مبهمٍ في موجةٍ سابقة** (`c5` · `offer_22`):
+                 تحمل حقلَ الورقةِ في تعليقِها ولا تحمله في اسمِها، فلا يُقرأ
+                 السطرُ بلا قاموس. والجدولُ **فارغٌ ولا كاتبَ له** فالتسميةُ
+                 تصحَّح: تُنشأ المسمّاةُ وتُسقَط المبهمة.
+                 ⛔ **والعكسُ يعيدها بتعريفِها الحرفيِّ** المنتزَعِ من المخطَّطِ
+                    وقتَ التوليد — فالتراجعُ يردُّ الشكلَ لا يقاربه. */
+            if (!empty($pl['drop_cols'])) {
+                $defs = gdb_col_defs($conn, $pl['table'], $pl['drop_cols']);
+                foreach ($pl['drop_cols'] as $dc) {
+                    if (!isset($defs[$dc])) { continue; }
+                    $parts[]  = "DROP COLUMN `{$dc}`";
+                    $dparts[] = "ADD COLUMN `{$dc}` " . $defs[$dc];
+                }
+            }
+            if ($parts) { $up[] = "ALTER TABLE `{$pl['table']}`\n    " . implode(",\n    ", $parts); }
+            if ($dparts) { $down[] = "ALTER TABLE `{$pl['table']}`\n    " . implode(",\n    ", $dparts); }
         }
     }
     $stamp = date('Y_m_d');
@@ -375,6 +388,27 @@ echo "═ تمَّ — أعد القياسَ: sidebar_guide_compare · rpr02_fie
 
 /* ═══ مولِّداتُ النصّ ═════════════════════════════════════════════════════ */
 function gdb_q($s) { return "'" . str_replace(array('\\', "'"), array('\\\\', "\\'"), (string) $s) . "'"; }
+
+/** تعريفُ العمودِ حرفًا من المخطَّط — ليردَّه العكسُ كما كان لا كما يُظنّ. */
+function gdb_col_defs(mysqli $conn, $table, array $cols)
+{
+    $out = array();
+    if (!$cols) { return $out; }
+    $in = array();
+    foreach ($cols as $c) { $in[] = "'" . $conn->real_escape_string($c) . "'"; }
+    $q = $conn->query("SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, COLUMN_COMMENT
+                         FROM information_schema.COLUMNS
+                        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '"
+                     . $conn->real_escape_string($table) . "' AND COLUMN_NAME IN (" . implode(',', $in) . ")");
+    while ($q && ($r = $q->fetch_assoc())) {
+        $d = $r['COLUMN_TYPE'] . ($r['IS_NULLABLE'] === 'YES' ? ' NULL' : ' NOT NULL');
+        if ($r['COLUMN_DEFAULT'] !== null) { $d .= " DEFAULT " . gdb_q($r['COLUMN_DEFAULT']); }
+        elseif ($r['IS_NULLABLE'] === 'YES') { $d .= ' DEFAULT NULL'; }
+        if ((string) $r['COLUMN_COMMENT'] !== '') { $d .= ' COMMENT ' . gdb_q($r['COLUMN_COMMENT']); }
+        $out[$r['COLUMN_NAME']] = $d;
+    }
+    return $out;
+}
 
 function gdb_screen_src($rel, $pl, $S)
 {
