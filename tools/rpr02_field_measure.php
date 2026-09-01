@@ -498,6 +498,47 @@ foreach ($argv as $a0) {
     }
 }
 
+/* ═══ ⑦-ب إفصاحٌ: مطابَقٌ يستند إلى رأسٍ مُعلَنٍ بلا مصدر ═══════════════════
+ * ◆ **السؤال**: `F2` يعُدُّ نصَّ `<th>` مفردةً في الأثر. وطبقةُ الأعمدةِ
+ *   المحقونةِ تُعلن رؤوسًا `data-fn` **بلا خليةٍ في المصدر**، و`ui-unification.js`
+ *   يحشوها وقتَ التشغيل: فإن لم يكن للرأسِ `data-fn-src` صارت **كلُّ** خليةٍ
+ *   فيه «—» ووُسم `data-ems-nosource` **وأُخفي ابتداءً** (بنصِّ الملفِّ نفسِه).
+ * ◆ فالحقلُ الذي لا يُطابَق إلّا بمثلِ هذا الرأسِ **مُعلَنٌ لا مبنيّ** — والعدُّ
+ *   بلا إفصاحٍ يجعل «مقيسًا من الأثر» يشمل ما لا يراه المستخدم.
+ * ◆ **المقيسُ**: 1724 رأسًا بلا مصدرٍ مقابلَ 6 موصولةٍ بـ`data-fn-src`.
+ * ⛔ **ولا يُطرح الرقمُ هنا ولا يُرخى الحاجب** — يُذكر **بندًا مسمًّى** بجانبه،
+ *   فالقارئُ يرى الكسرَ وحدَّه معًا. (وإخراجُه من المقامِ قرارُ مالكٍ لا أداة.)
+ * ═══════════════════════════════════════════════════════════════════════════ */
+$fmNorm = function ($x) {
+    $x = preg_replace('~[\x{064B}-\x{0652}\x{0640}]~u', '', (string) $x);
+    $x = str_replace(array('◄', '▼', 'أ', 'إ', 'آ', 'ة', 'ى'), array('', '', 'ا', 'ا', 'ا', 'ه', 'ي'), $x);
+    return trim(preg_replace('~\s+~u', ' ', $x));
+};
+$declaredOnly = 0; $declaredSurfaces = 0;
+foreach ($out as $row) {
+    $ap = isset($row['path']) ? (string) $row['path'] : '';
+    if ($ap === '') { continue; }
+    $full = (strpos($ap, ':') === 1) ? $ap : $ROOT . '/' . $ap;
+    if (!is_file($full)) { continue; }
+    $asrc = (string) file_get_contents($full);
+    if (!preg_match_all('~<th[^>]*data-fn=(?![^>]*data-fn-src)[^>]*>(.*?)</th>~is', $asrc, $bm)) { continue; }
+    $bareSet = array();
+    foreach ($bm[1] as $t) { $bareSet[$fmNorm(strip_tags($t))] = 1; }
+    $restTxt = preg_replace('~<th[^>]*data-fn=(?![^>]*data-fn-src)[^>]*>.*?</th>~is', '', $asrc);
+    $restTxt = $fmNorm(strip_tags($restTxt));
+    $missN = array();
+    foreach ((array) $row['miss'] as $mn) { $missN[$fmNorm($mn)] = 1; }
+    $k = 0;
+    $gfList = isset($des[$row['req']]) ? $des[$row['req']] : array();
+    foreach ($gfList as $gf) {
+        if ($gf['field_type'] === 'AUDIT') { continue; }
+        $n = $fmNorm($gf['field_name']);
+        if ($n === '' || isset($missN[$n])) { continue; }
+        if (isset($bareSet[$n]) && mb_strpos($restTxt, $n) === false) { $k++; }
+    }
+    if ($k) { $declaredOnly += $k; $declaredSurfaces++; }
+}
+
 /* ═══ ⑧ العرض ════════════════════════════════════════════════════════════ */
 $pc = $tot['appl'] ? round($tot['hit'] * 100 / $tot['appl'], 1) : 0;
 echo "\n═══ `RPR-02` §٧ الخطوة ٥ — حقولُ المبنيِّ مقيسةً من الأثر ═══\n";
@@ -520,6 +561,10 @@ printf("     **المطابَقُ في الأثر                   %5d ⇒ %s%%
 printf("     أسطحٌ طوبقت حقولُها كاملةً              %5d من %d\n", $tot['full'], count($out));
 printf("     أسطحٌ خلا أثرُها من مفردةٍ (`NO_VOCAB`)  %5d — بشاهدِ عجزِها لا بصفرٍ مسكوتٍ عنه\n", $tot['novocab']);
 
+printf("     ◆ ومنه **%d** حقلًا لا يُسنده إلّا رأسٌ مُعلَنٌ **بلا مصدر** (على %d سطحٍ) —\n"
+     . "       يُحشى «—» في كلِّ صفٍّ ويُخفى ابتداءً (`data-ems-nosource`)، فهو **مُعلَنٌ لا مبنيّ**.\n"
+     . "       ⇒ فالمبنيُّ يقينًا **%d** من %d. ⛔ ولا يُطرح من المقامِ هنا — الطرحُ قرارُ مالك.\n",
+       $declaredOnly, $declaredSurfaces, $tot['hit'] - $declaredOnly, $tot['appl']);
 /* ⛔ **ستُّ خطواتٍ لا خطوةٌ واحدة** — و§٧ تسأل عن كلِّ نوعٍ في موضعِه، ونسبةٌ
  واحدةٌ لستَّةِ أسئلةٍ **تُخفي أيَّها يحتاج عملًا**. */
 $FM_STEP = array(
@@ -641,6 +686,8 @@ if ($MD) {
     $o .= "| منها `AUDIT` (إلحاقيّةٌ بنصِّ §٧ ١١) | " . $tot['audit'] . " |\n";
     $o .= "| **المقامُ المنطبق** | **" . $tot['appl'] . "** |\n";
     $o .= "| **المطابَقُ في الأثر** | **" . $tot['hit'] . "** |\n";
+    $o .= "| منه مُسنَدٌ إلى رأسٍ مُعلَنٍ **بلا مصدر** (مُعلَنٌ لا مبنيّ) | " . $declaredOnly . " |\n";
+    $o .= "| **المبنيُّ يقينًا** | **" . ($tot['hit'] - $declaredOnly) . "** |\n";
     $o .= "| **النسبة** | **" . $pc . "%** |\n";
     $o .= "| أسطحٌ طوبقت كاملةً | " . $tot['full'] . " من " . count($out) . " |\n";
     $o .= "| أسطحٌ بلا مفرداتٍ (`NO_VOCAB`) | " . $tot['novocab'] . " |\n\n";

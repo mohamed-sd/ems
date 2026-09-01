@@ -214,7 +214,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th>معرف التسهيل</th><th>البنك</th><th>نوع التسهيل</th><th>حد التسهيل</th><th>العملة</th>
             <th>مرجع الاعتماد</th><th>المستخدم</th><th>المتاح</th><th>الضمانات المقدمة</th>
             <th>تاريخ الانتهاء</th><th>جدول السداد</th><th>حالة التسهيل</th>
-            <th>المنشئ</th><th>تاريخ الانشاء</th><th>حالة البيانات</th><th>مرجع المصدر</th>
+            <th>المنشئ</th><th>تاريخ الانشاء</th><th>المراجع</th><th>حالة البيانات</th><th>مرجع المصدر</th>
             <?php if (!empty($pp['can_edit'])): ?><th>الاجراء</th><?php endif; ?>
         </tr></thead>
         <tbody>
@@ -235,6 +235,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?= htmlspecialchars((string) $r['facility_state'], ENT_QUOTES, 'UTF-8') ?></td>
                 <td><?= intval($r['created_by']) ?></td>
                 <td><?= htmlspecialchars((string) $r['created_at'], ENT_QUOTES, 'UTF-8') ?></td>
+                <?php /* «المراجع» (TRS-14 §15): العمودُ `reviewed_by` كان مقيَّدًا في
+                         الجدولِ ولا يُصيَّر — فالنقصُ كان عرضًا لا بيانات. */ ?>
+                <td><?= ((int) ($r['reviewed_by'] ?? 0)) > 0 ? intval($r['reviewed_by']) : '—' ?></td>
                 <td><?= htmlspecialchars((string) $r['data_state'], ENT_QUOTES, 'UTF-8') ?></td>
                 <td><?= htmlspecialchars((string) $r['src_ref'], ENT_QUOTES, 'UTF-8') ?></td>
                 <?php if (!empty($pp['can_edit'])): ?>
