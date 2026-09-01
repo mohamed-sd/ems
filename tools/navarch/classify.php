@@ -135,6 +135,58 @@ while ($x = $r->fetch_assoc()) {
     $wsName[$x['workspace_id']] = (string) $x['name_ar'];
 }
 
+/* ①-ح **مجموعةُ دورةِ العملِ لموضعٍ لا صفَّ له في ورقةِ الدليل** (§8 · §21-④)
+   ───────────────────────────────────────────────────────────────────────────
+   ◆ **المقيسُ قبلَ الحكم**: `group_id` كان يُؤخذ من صفِّ `nav_placements` في
+     المساحةِ نفسِها وحدَه، **فواحدٌ وثلاثون موضعًا صالحًا للسايدبار خرج بلا
+     مجموعة** — ومُصيِّرُ §23-① يحجب الموضعَ بلا رأسِ طيٍّ (‏ولا مجموعةَ
+     افتراضيّة). ⇒ **شاشاتٌ مستعمَلةٌ تختفي بلا حكمٍ مكتوب** وهو ما يمنعه §4.
+   ◆ **والمجموعةُ تُقرأ من مصدرٍ حاكمٍ ثانٍ لا تُخترَع**: `gov_target_nav` —
+     جدولُ الإدارةِ المستهدَفُ المنشورُ بسندٍ (`REPAIR01-OPS-11` وأخواتِه) —
+     يحمل `group_ar` لكلِّ مسار. فإن طابقت مجموعتُه **رأسَ طيٍّ في دورةِ هذه
+     المساحةِ نفسِها** أُخذت، وإلّا **فلا تُؤخذ**.
+   ⛔ **ولا تُقبل مجموعةُ مساحةٍ أخرى**: «دورة الترحيل» رأسُ طيٍّ في `DEP-15`،
+     وحملُه إلى سايدبارِ `DEP-11` يجعل دورةَ إدارةٍ بندًا في دورةِ أخرى — وهو
+     نصُّ ما يمنعه §13 (`Consumer reads; Owner writes`).
+   ◆ **والمطابقةُ بالاسمِ المُسوّى**: `nav_lifecycle_groups.group_key` هو
+     `group_ar` مُسوّى (‏الهمزةُ والتاءُ المربوطة) — والمقارنةُ بـ`$nz` نفسِها. */
+$wsPrimaryRole = array();
+$r = $conn->query("SELECT workspace_id, role_id FROM nav_ws_roles WHERE binding = 'PRIMARY'");
+while ($x = $r->fetch_assoc()) { $wsPrimaryRole[$x['workspace_id']] = (int) $x['role_id']; }
+
+$lcGroupByKey = array();          /* ws ⇒ اسمٌ مُسوًّى ⇒ id */
+$r = $conn->query("SELECT id, workspace_id, group_key, label_ar FROM nav_lifecycle_groups WHERE active = 1");
+while ($x = $r->fetch_assoc()) {
+    $lcGroupByKey[$x['workspace_id']][$nz($x['group_key'])] = (int) $x['id'];
+    $lcGroupByKey[$x['workspace_id']][$nz($x['label_ar'])]  = (int) $x['id'];
+}
+
+$declGroup = array();             /* role ⇒ مسارٌ مُسوًّى ⇒ اسمُ المجموعةِ المُعلَن */
+$r = $conn->query("SELECT role_id, route, group_ar FROM gov_target_nav
+                    WHERE route IS NOT NULL AND route <> '' AND group_ar IS NOT NULL");
+while ($x = $r->fetch_assoc()) {
+    if (strncmp((string) $x['route'], 'GAP:', 4) === 0) { continue; }   /* منصوصٌ بلا شاشةٍ حيّة */
+    $k = $rt($x['route']);
+    if ($k !== '' && !isset($declGroup[(int) $x['role_id']][$k])) {
+        $declGroup[(int) $x['role_id']][$k] = (string) $x['group_ar'];
+    }
+}
+
+/** مجموعةُ دورةِ هذه المساحةِ لهذا المسار — أو `null` إن لم يحكمها مصدر. */
+$gidFor = function ($ws, $route) use ($byWsRoute, $wsPrimaryRole, $declGroup, $lcGroupByKey, $nz) {
+    /* ① ورقةُ الدليلِ أوّلًا — الصفُّ المبنيُّ في `nav_placements` لهذه المساحة */
+    if (isset($byWsRoute[$ws][$route]) && $byWsRoute[$ws][$route]['gid'] !== null) {
+        return (int) $byWsRoute[$ws][$route]['gid'];
+    }
+    /* ② ثمَّ الجدولُ المستهدَفُ المنشورُ — **بشرطِ أن تكون المجموعةُ من هذه المساحة** */
+    $rid = isset($wsPrimaryRole[$ws]) ? $wsPrimaryRole[$ws] : 0;
+    if ($rid && isset($declGroup[$rid][$route])) {
+        $key = $nz($declGroup[$rid][$route]);
+        if (isset($lcGroupByKey[$ws][$key])) { return (int) $lcGroupByKey[$ws][$key]; }
+    }
+    return null;
+};
+
 $ANCHOR = array('main/role_board' => 1, 'chats/index' => 1);
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -247,7 +299,31 @@ function navarch_rule($ws, $it, $layer, $ctx)
         if ($sc === 'SHARED_WORK_ITEM') {
             /* §12-هـ: استثناءٌ محكومٌ — سببٌ ومصدرٌ ونطاقٌ وتاريخٌ **واعتماد**.
                والاعتمادُ هنا قرارُ حوكمةٍ مسجَّلٌ في nav_canonical لا استنتاجٌ من دور. */
+            /* ══ **والاعتمادُ وحدَه لا يضع الشاشةَ في دورةِ إدارةٍ ليست دورتَها** ══
+               ◆ **المقيسُ**: خمسةَ عشرَ بندَ عملٍ مشتركٍ («طلب الترحيل» · «طلبات
+                 الشراء» · «صندوق موافقاتي») كُتبت `SECONDARY_APPROVED` في مساحاتٍ
+                 مستهلِكةٍ **لا رأسَ طيٍّ لها فيها**: مجموعتُها المُعلَنةُ («دورة
+                 الترحيل») رأسُ طيٍّ في مساحةِ **مالكِها**. فبقيت مواضعَ نشطةً
+                 بلا مجموعةٍ **يحجبها المُصيِّرُ صامتًا** (§23-①).
+               ◆ **و§12-ب يسمّي علاجَها حرفًا**: «يحتاج أن يطلب إجراء من الإدارة
+                 الأخرى ⇒ يستخدم `Request / Handoff`… **ولا تنقل له شاشات الإدارة
+                 المستلمة**» — وأمثلتُه نصًّا: **طلب شراء · طلب ترحيل**.
+               ⇒ فمن **لا رأسَ طيٍّ له في دورةِ هذه المساحةِ** يُحكَم
+                 `CONTEXTUAL_ACTION` (§9 · §12-ج): **لا يدخل السايدبار**،
+                 ⛔ **وبديلُ وصولِه مكتوبٌ لا مسكوتٌ عنه** (§4) — والصلاحيّةُ
+                 والمسارُ المباشرُ باقيانِ حرفًا (§22 · §42). */
+            $hasGrp = isset($gidFor) && $gidFor($ws, $route) !== null;
             $ok = $c && (string) $c['status'] === 'APPROVED';
+            if ($ok && !$hasGrp) {
+                return $V('CONTEXTUAL_ACTION', 'CONTEXTUALIZE', '', 'REQUEST_HANDOFF_S12B',
+                    $base . ' · space_class = SHARED_WORK_ITEM · ولا رأسَ طيٍّ لها في دورةِ '
+                          . $ws . ' — مجموعتُها المُعلَنةُ من دورةِ مالكِها',
+                    'NAV-ARCH-02 §12-ب — «طلب شراء · طلب ترحيل» تُطلب بـRequest/Handoff '
+                        . 'ولا تُنقل شاشةُ الإدارةِ المستلمةِ إلى سايدبارِ الطالب',
+                    'فعلٌ سياقيٌّ من سجلِّ الطلبِ نفسِه · ومبدِّلُ المساحاتِ إلى ' . $own
+                        . ' · والبحثُ · **والرابطُ المباشرُ يبقى نافذًا والصلاحيّةُ لم تُمَسّ (§22·§42)**',
+                    'B_REQUEST_HANDOFF', 'L1_ARCHITECTURE', false);
+            }
             return $V($ok ? 'SECONDARY_APPROVED' : '', $ok ? 'KEEP_SECONDARY' : 'ESCALATE', '',
                 $ok ? 'SECONDARY_APPROVED_S12E' : 'UNAPPROVED_SECONDARY_NEEDS_DECISION',
                 $base . ' · space_class = SHARED_WORK_ITEM · nav_canonical.status = '
@@ -346,6 +422,26 @@ function navarch_rule($ws, $it, $layer, $ctx)
                 'الشاشةُ البديلةُ في ورقةِ الإدارة', '', 'L1_ARCHITECTURE', false);
         }
         if ($v === 'MATCHES_GOVERNING_TARGET' || $v === 'APPROVED_POST_GUIDE_ADDITION') {
+            /* ══ **وصندوقُ العملِ المشتركِ ليس بندَ دورةِ إدارة** (§11) ═══════════
+               ◆ **المقيس**: «صندوق موافقاتي وما ينتظر يدي» (`Approvals/requests`)
+                 صُولح هدفًا في **أربعِ مساحاتٍ**، فكُتب `PRIMARY` في كلٍّ —
+                 **ولا رأسَ طيٍّ له في دورةِ أيٍّ منها**، فبقي موضعًا نشطًا
+                 يحجبه المُصيِّرُ صامتًا.
+               ◆ **و§11 يسمّي محلَّه**: صناديقُ «ما ينتظرني» **مساحةُ عملي**
+                 لا دورةُ الإدارة — وهو ما يفعله المُصيِّرُ القديمُ أصلًا
+                 (‏القسمُ المفروضُ «ما ينتظرني» داخلَ «مساحتي»).
+               ⇒ فما كان `SHARED_WORK_ITEM` **ولا مجموعةَ له في هذه الدورة**
+                 يُكتب `PERSONAL`: **يظهر في مِسمارِه ولا يُحتسَب إدارةً**
+                 (‏وهو ما يقيسه `NT-06`). ⛔ **ولا يختفي**: مساحةُ عملي مطبوعةٌ
+                 في سايدبارِ كلِّ مساحةٍ مقلوبة. */
+            if ($sc === 'SHARED_WORK_ITEM' && isset($gidFor) && $gidFor($ws, $route) === null) {
+                return $V('PERSONAL', 'MOVE_TO_WS_MY', '', 'SHARED_WORK_ITEM_TO_WS_MY_S11',
+                    'gov_legacy_nav_recon.verdict = ' . $v . ' · ' . $rc['doc_code']
+                        . ' · space_class = SHARED_WORK_ITEM · ولا رأسَ طيٍّ له في دورةِ ' . $ws,
+                    'NAV-ARCH-02 §11 — صناديقُ «ما ينتظرني» في «مساحة عملي» لا في دورةِ الإدارة',
+                    'مجموعةُ «مساحتي» في سايدبارِ هذه المساحةِ نفسِها — ظاهرٌ لا مخفيّ',
+                    '', 'L1_ARCHITECTURE', true);
+            }
             return $V('PRIMARY', 'KEEP_PRIMARY', 'CANONICAL_EQUIVALENT',
                 'RECONCILED_TO_TARGET_S16',
                 'gov_legacy_nav_recon.verdict = ' . $v . ' · ' . $rc['doc_code'] . ' · ' . $rc['basis'],
@@ -381,7 +477,7 @@ function navarch_rule($ws, $it, $layer, $ctx)
    ④ المرور
    ═══════════════════════════════════════════════════════════════════════════ */
 $ctx = compact('canon', 'redir', 'recon', 'dedup', 'hidden', 'byWsRoute', 'byWsName',
-               'tgtByWsTitle', 'routeAnyWs', 'wsType', 'wsName', 'nz');
+               'tgtByWsTitle', 'routeAnyWs', 'wsType', 'wsName', 'nz', 'gidFor');
 
 $rows = array(); $layerCnt = array(); $reasonCnt = array(); $ptCnt = array();
 foreach ($BL['snapshot'] as $ws => $s) {
@@ -522,7 +618,9 @@ foreach ($rows as $x) {
 
     if ($x['placement_type'] !== '') {
         $p   = isset($byWsRoute[$x['ws']][$x['route']]) ? $byWsRoute[$x['ws']][$x['route']] : null;
-        $gid = $p ? (int) $p['gid'] : null;
+        /* المجموعةُ من **ورقةِ الدليلِ ثمَّ الجدولِ المستهدَفِ المنشور** — ولا
+           تُؤخذ مجموعةُ مساحةٍ أخرى ولا تُصطنع افتراضيّةٌ (انظر `$gidFor`). */
+        $gid = $gidFor($x['ws'], $x['route']);
         $ap  = ($x['placement_type'] === 'SECONDARY_APPROVED') ? 'NAV-ARCH-02 §12-هـ · nav_canonical APPROVED' : null;
         $st  = ($x['action'] === 'ESCALATE') ? 'BLOCKED' : 'ACTIVE';
         $cb  = 'tools/navarch/classify.php@' . $BLID;

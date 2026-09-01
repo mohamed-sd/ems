@@ -74,6 +74,43 @@ while ($x = $r->fetch_assoc()) {
     $crossRuled[$x['w'] . '|' . $x['rt']] = ($x['approved_by'] === null ? '' : $x['approved_by']);
 }
 
+/* ═══ ②-ب **إضافةٌ معتمَدةٌ بقرارِ جولةٍ مكتوب** — مفردةُ التبريرِ الثالثةُ (§29) ═══
+   ⛔ **ولا يكفي مصدرٌ واحد**: يلزم **اقترانُ** حكمِ المصالحةِ `APPROVED_POST_GUIDE_ADDITION`
+   **مع** صفٍّ في جدولِ الإدارةِ المستهدَفِ يسمّي **مجموعةً من دورةِ هذه المساحةِ نفسِها**.
+   فمجموعةُ مساحةٍ أخرى لا تُبرِّر ظهورًا هنا (§13)، وحكمٌ بلا نشرٍ لا يضع موضعًا. */
+$approvedAddition = array();
+$reconOk = array();
+$r = $conn->query("SELECT route FROM gov_legacy_nav_recon
+                    WHERE verdict = 'APPROVED_POST_GUIDE_ADDITION'");
+while ($x = $r->fetch_assoc()) { $reconOk[$nrm($x['route'])] = true; }
+
+$wsPrimRole = array();
+$r = $conn->query("SELECT workspace_id, role_id FROM nav_ws_roles WHERE binding = 'PRIMARY'");
+while ($x = $r->fetch_assoc()) { $wsPrimRole[$x['workspace_id']] = (int) $x['role_id']; }
+
+$nzm = function ($s) {
+    $s = preg_replace('~[\x{064B}-\x{0652}\x{0640}]~u', '', (string) $s);
+    $s = str_replace(array('أ','إ','آ','ى','ة','ؤ','ئ'), array('ا','ا','ا','ي','ه','و','ي'), $s);
+    return trim(preg_replace('~\s+~u', ' ', $s));
+};
+$lcKey = array();
+$r = $conn->query("SELECT workspace_id, group_key, label_ar FROM nav_lifecycle_groups WHERE active = 1");
+while ($x = $r->fetch_assoc()) {
+    $lcKey[$x['workspace_id']][$nzm($x['group_key'])] = true;
+    $lcKey[$x['workspace_id']][$nzm($x['label_ar'])]  = true;
+}
+$r = $conn->query("SELECT role_id, route, group_ar FROM gov_target_nav
+                    WHERE route IS NOT NULL AND route <> '' AND group_ar IS NOT NULL");
+while ($x = $r->fetch_assoc()) {
+    if (strncmp((string) $x['route'], 'GAP:', 4) === 0) { continue; }
+    $k = $nrm($x['route']);
+    if ($k === '' || !isset($reconOk[$k])) { continue; }
+    foreach ($wsPrimRole as $w => $rid) {
+        if ($rid !== (int) $x['role_id']) { continue; }
+        if (isset($lcKey[$w][$nzm($x['group_ar'])])) { $approvedAddition[$w][$k] = true; }
+    }
+}
+
 /* كلُّ موضعٍ حاكمٍ مكتوبٍ — سواءٌ صُيِّر أم لم يُصيَّر (‏قشرةً كان أو شخصيًّا أو تبويبًا) */
 $placedAny = array();
 $r = $conn->query("SELECT workspace_id w, route rt FROM nav_workspace_placements");
@@ -131,11 +168,33 @@ foreach ($BL['snapshot'] as $ws => $s) {
     }
     $prec = count($seen) ? $withPlacement * 100 / count($seen) : 100;
 
-    /* ③ UNEXPLAINED_EXTRA_MENU_ITEM — مُصيَّرٌ في الدورةِ بلا هدفٍ ولا موضعٍ ثانويٍّ معتمَد */
-    $extra = array();
+    /* ③ UNEXPLAINED_EXTRA_MENU_ITEM — **مُصيَّرٌ في الدورةِ بلا مبرِّرٍ حاكم** (§29)
+       ─────────────────────────────────────────────────────────────────────────
+       ◆ **نصُّ §29 حرفًا**: «الهدف: **كل رابط معروض له `Placement` حاكم ومبرر**…
+         والمعيار هو `UNEXPLAINED_EXTRA = 0`» — ⛔ **وليس** «كلُّ رابطٍ في ورقةِ
+         الدليل»: §29 نفسُه يرفض فرضَ `Final Menu Count = 12`.
+       ◆ **والمقيسُ الذي كشف ضيقَ القارئ**: أربعُ شاشاتٍ في `DEP-11`
+         (`operations_room` · `distribution_space` · `view_timesheet` ·
+         `stops_unattributed`) **أقرَّها قرارُ جولةٍ مكتوبٌ** ونشرها جدولُ
+         الإدارةِ المستهدَفُ بمجموعتِها وترتيبِها — فهي **حاكمةٌ ومبرَّرة**
+         بنصِّ §29، ومع ذلك عدَّها القارئُ فائضًا لأنّه لا يعرف إلّا مفردتَين:
+         «في ورقةِ الدليل» أو `SECONDARY_APPROVED`.
+         ⇒ **مفردةُ تبريرٍ ثالثةٌ لا يقرؤها القارئُ تُنتج أحمرَ كاذبًا**
+         [[enum-vocabulary-consumers]] · [[measure-blind-spots]].
+       ◆ **والبارُ لا يُخفَّض**: المبرِّرُ الثالثُ **اقترانُ مصدرَين مكتوبَين**
+         لا واحدًا — ① حكمُ مصالحةٍ `APPROVED_POST_GUIDE_ADDITION` في
+         `gov_legacy_nav_recon` ② **و**صفٌّ في `gov_target_nav` لدورِ هذه
+         المساحةِ يسمّي **مجموعةً من دورتِها هي**. فموضعٌ يُعطى مجموعةً بلا
+         قرارٍ مكتوبٍ **يبقى فائضًا أحمرَ** — والمقياسُ يقدر أن يحمرَّ.
+       ⛔ **والسؤالُ لا يُطوى بهذا**: كونُها مبرَّرةً **لا يعني أنَّ الدليلَ
+         استوعبها** — ولذلك يخرج لها عدّادٌ مستقلٌّ باسمِه
+         (`APPROVED_ADDITION_OUTSIDE_GUIDE`) يُرفع في `OWNER_ACTION_REGISTER`
+         سؤالًا صريحًا (§17 · §34-L4): أتُدمَج في الدليلِ أم يُلغى قرارُ الجولة؟ */
+    $extra = array(); $outsideGuide = array();
     foreach ($lifecycle as $rt => $pt) {
         if (isset($tg[$rt])) { continue; }
         if ($pt === 'SECONDARY_APPROVED') { continue; }
+        if (isset($approvedAddition[$ws][$rt])) { $outsideGuide[] = $rt; continue; }
         $extra[] = $rt;
     }
 
@@ -203,6 +262,7 @@ foreach ($BL['snapshot'] as $ws => $s) {
         'TARGET_TOTAL'                      => count($tg),
         'PLACEMENT_PRECISION'               => round($prec, 1),
         'UNEXPLAINED_EXTRA_MENU_ITEM'       => count($extra),
+        'APPROVED_ADDITION_OUTSIDE_GUIDE'   => count($outsideGuide),
         'PERMISSION_ONLY_RENDERED_ITEM'     => $permOnly,
         'UNAPPROVED_SECONDARY_PLACEMENT'    => $secUnapproved,
         'ACTIVE_LEGACY_WITHOUT_DISPOSITION' => $legacyNoRule,
@@ -218,6 +278,7 @@ foreach ($BL['snapshot'] as $ws => $s) {
         'NEW_LIFECYCLE'                     => count($lifecycle),
         'MISSING_TARGETS'                   => $missing,
         'EXTRA_ITEMS'                       => $extra,
+        'ADDITIONS_OUTSIDE_GUIDE'           => $outsideGuide,
     );
     /* §25 — تسعةُ أصفارٍ لا ثمانية */
     $m['EXACT_WORKSPACE_NAV_CONFORMANCE'] =
@@ -235,13 +296,13 @@ echo "══ NAV-ARCH-02 §26 — المقاييسُ · الأساس {$BLID} ═
 echo "◆ **§24**: `TARGET_NAV_RECALL` هو الاسمُ الجديدُ لما كان يُسمَّى `Exact` —\n";
 echo "  وهو **استرجاعٌ لا مطابقة**؛ والمطابقةُ التامّةُ `EXACT_WORKSPACE_NAV_CONFORMANCE`\n";
 echo "  ولا تمرُّ إلّا بتسعةِ أصفار (§25).\n\n";
-printf("%-8s %6s %5s %5s %5s %5s %5s %5s %5s %5s %5s %5s %6s\n",
-    'المساحة', 'Recall', 'Prec', 'Extra', 'Perm', 'UnSec', 'NoRul', 'WGrp', 'WOrd', 'WLbl',
+printf("%-8s %6s %5s %5s %5s %5s %5s %5s %5s %5s %5s %5s %5s %6s\n",
+    'المساحة', 'Recall', 'Prec', 'Extra', 'Add+', 'Perm', 'UnSec', 'NoRul', 'WGrp', 'WOrd', 'WLbl',
     'Fall', 'Line', 'CONF');
 foreach ($M as $ws => $m) {
-    printf("%-8s %5.1f%% %4.0f%% %5d %5d %5d %5d %5d %5d %5d %5d %5d %6s\n", $ws,
+    printf("%-8s %5.1f%% %4.0f%% %5d %5d %5d %5d %5d %5d %5d %5d %5d %5d %6s\n", $ws,
         $m['TARGET_NAV_RECALL'], $m['PLACEMENT_PRECISION'], $m['UNEXPLAINED_EXTRA_MENU_ITEM'],
-        $m['PERMISSION_ONLY_RENDERED_ITEM'], $m['UNAPPROVED_SECONDARY_PLACEMENT'],
+        $m['APPROVED_ADDITION_OUTSIDE_GUIDE'], $m['PERMISSION_ONLY_RENDERED_ITEM'], $m['UNAPPROVED_SECONDARY_PLACEMENT'],
         $m['ACTIVE_LEGACY_WITHOUT_DISPOSITION'], $m['WRONG_GROUP'], $m['WRONG_ORDER'],
         $m['WRONG_LABEL'], $m['GLOBAL_FALLBACK_COUNT'] + $m['LEGACY_FALLBACK_RENDER_COUNT'],
         $m['TARGET_LINEAGE_BROKEN'], $m['EXACT_WORKSPACE_NAV_CONFORMANCE']);

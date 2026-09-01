@@ -1563,6 +1563,25 @@ function printEmsTenGroupNav($conn, $items, $uxMap, $uxCurMap, $basePrefix, $bad
 }
 
 function renderUnifiedNavigationV2($conn, $roleId, $basePrefix = '../', $badges = array(), $afterHome = '') {
+    /* ══ ⭐ NAV-ARCH-02 §20 — **مفتاحُ القلبِ إلى المُصيِّرِ الحاكم** ═══════════
+       ◆ **المعادلةُ الجديدةُ حرفًا**: `Rendered Sidebar = Active Workspace
+         Placements ∩ User Authorized Screens` — و⛔ **لا يجوز**
+         `Rendered Sidebar = All Authorized Screens` وهي معادلةُ ما تحتَ هذا
+         السطرِ حرفًا (`getUnifiedNavItems` تُرجع كلَّ صفوفِ الدورِ بشرطِ الصلاحيّة).
+       ◆ **والمفتاحُ `EMS_NAV_ARCH` افتراضُه `off`**: فما لم يُفتح **لا يتغيّر
+         سطرٌ واحدٌ في سايدبارِ أحد**، ويسلك النداءُ ما تحتَه بحرفِه.
+       ◆ **والردُّ للقديمِ متى لم يُنتج الحاكمُ بندًا** — فالقلبُ لا يُفرِغ
+         سايدبارًا (§35)، والكشفُ يُقيَّد في `gov_nav_findings` باسمِه. */
+    if (function_exists('ems_env')) {
+        require_once __DIR__ . '/navarch_renderer.php';
+        $navarchWs = navarch_cutover_workspace($conn, (int) $roleId);
+        if ($navarchWs !== null) {
+            $GLOBALS['__uxui_cur_role'] = (int) $roleId;
+            if (navarch_print_sidebar($conn, $navarchWs, (int) $roleId,
+                                      $basePrefix, $badges, $afterHome)) { return true; }
+        }
+    }
+
     $items = getUnifiedNavItems($conn, $roleId);
     if (empty($items)) { return false; }
     emsNavLandingAnchors($items);

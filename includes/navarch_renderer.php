@@ -182,3 +182,186 @@ if (!function_exists('navarch_render')) {
                      'rendered' => $rendered, 'blocked' => $blocked, 'counters' => $C);
     }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * ⭐ طورُ القلبِ (‏§20·§21·§22) — **وصلُ المُصيِّرِ الحاكمِ بالإنتاجِ بمفتاح**
+ * ───────────────────────────────────────────────────────────────────────────
+ * ◆ **والمُصيِّرُ أعلاه كان ظلًّا خالصًا** (§30): يُنتج شجرةً ولا يطبع وسمًا،
+ *   فلا شاشةَ حيّةٌ تستدعيه. وما دون طباعةٍ **لا يتغيّر سايدبارُ المستخدم**
+ *   [[render-not-store-rule]] — والفرقُ المقيسُ كان **تسعين رابطًا حيًّا مقابلَ
+ *   تسعةَ عشرَ موضعًا حاكمًا** في `DEP-11`.
+ *
+ * ◆ **والقلبُ بمفتاحٍ لا بقطعٍ مباشر** (‏على نمطِ `EMS_NAV_WORKSPACE` القائم):
+ *   `EMS_NAV_ARCH` في `.env` — **وافتراضُه `off`** أي المسارُ القديمُ حرفًا.
+ *   وقيمتُه إمّا `off` أو `on` (‏كلُّ المساحات) أو **قائمةَ مساحاتٍ بفواصل**
+ *   (`DEP-11`) — فيُقلَب الطيّارُ وحدَه ثمَّ يُعمَّم (§27 · §36).
+ *
+ * ◆ **ولا يُقلَب دورٌ بلا مساحةٍ ولا مواضع**: من لا ربطَ `PRIMARY` له في
+ *   `nav_ws_roles`، أو مساحتُه لا تُنتج بندَ دورةٍ واحدًا، **يسلك القديمَ
+ *   حرفًا** — فالقلبُ لا يُفرِغ سايدبارًا صامتًا (§35: احجبِ الموضعَ لا البرنامج).
+ *
+ * ◆ **والقشرةُ والشخصيُّ في مِسمارَيهما** (§10 · §11): المرساتان من
+ *   `nav_canonical.anchor_key` كما في المسارِ القديمِ حرفًا، ومواضعُ `WS-MY`
+ *   تحتَهما في مجموعةِ «مساحتي» — **ولا تدخل مقامَ دورةِ الإدارة**.
+ *
+ * ⛔ **و«اختفى من السايدبار» ليس «سُحبت صلاحيّتُه»** (§42): هذا الملفُّ
+ *   **لا يمسُّ منحةً ولا يُغلق مسارًا** — والرابطُ المباشرُ يعمل لمن يملك
+ *   الصلاحيّةَ والنطاق، وهو ما يُثبته `NT-01`-ب حيًّا.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+if (!function_exists('navarch_role_workspace')) {
+    /**
+     * مساحةُ الدورِ الحاكمة — الربطُ `PRIMARY` وحدَه (§6 · §21-②).
+     * ⛔ **ولا يُشتقُّ من الدورِ اسمُ مساحة**: من لا صفَّ له يرجع `null`.
+     */
+    function navarch_role_workspace($conn, $roleId)
+    {
+        static $byRole = array();
+        $rid = (int) $roleId;
+        if (array_key_exists($rid, $byRole)) { return $byRole[$rid]; }
+        $byRole[$rid] = null;
+        $q = @mysqli_query($conn, "SELECT wr.workspace_id
+                                     FROM nav_ws_roles wr
+                                     JOIN nav_workspaces w ON w.workspace_id = wr.workspace_id
+                                                          AND w.active = 1
+                                    WHERE wr.role_id = {$rid} AND wr.binding = 'PRIMARY'
+                                    LIMIT 1");
+        if ($q && ($x = mysqli_fetch_row($q))) { $byRole[$rid] = (string) $x[0]; }
+        return $byRole[$rid];
+    }
+}
+
+if (!function_exists('navarch_cutover_workspace')) {
+    /**
+     * هل يُصيَّر هذا الدورُ بالمُصيِّرِ الحاكم؟ ⇒ مُعرِّفُ مساحتِه، وإلّا `null`.
+     * `EMS_NAV_ARCH`: `off` (‏الافتراض) · `on` · قائمةُ مساحاتٍ بفواصل.
+     */
+    function navarch_cutover_workspace($conn, $roleId)
+    {
+        if (!function_exists('ems_env')) { return null; }
+        $flag = trim((string) ems_env('EMS_NAV_ARCH', 'off'));
+        if ($flag === '' || strtolower($flag) === 'off') { return null; }
+        $ws = navarch_role_workspace($conn, $roleId);
+        if ($ws === null) { return null; }
+        if (strtolower($flag) === 'on') { return $ws; }
+        foreach (explode(',', $flag) as $one) {
+            if (trim($one) === $ws) { return $ws; }
+        }
+        return null;
+    }
+}
+
+if (!function_exists('navarch_proper_route')) {
+    /**
+     * المسارُ **بحرفِه المعياريِّ** من `nav_canonical` — فصفُّ الموضعِ يخزّن
+     * المسارَ **مُسوًّى** (‏بلا لاحقةٍ وبأحرفٍ صغيرة) وهو مفتاحُ مطابقةٍ لا وجهة.
+     * ⛔ **ولا يُصطنع مسارٌ لا ملفَّ له**: ما لا صفَّ له ولا ملفَّ يرجع `''`
+     *   فيُحجَب بندُه — بدلَ رابطٍ مكسورٍ يقع عليه المستخدم.
+     */
+    function navarch_proper_route($conn, $norm)
+    {
+        static $map = null;
+        if ($map === null) {
+            $map = array();
+            $r = @mysqli_query($conn, "SELECT route FROM nav_canonical
+                                        WHERE route IS NOT NULL AND route <> ''");
+            while ($r && ($x = mysqli_fetch_row($r))) { $map[navarch_norm_route($x[0])] = (string) $x[0]; }
+        }
+        if (isset($map[$norm])) { return $map[$norm]; }
+        if (is_file(dirname(__DIR__) . '/' . $norm . '.php')) { return $norm . '.php'; }
+        return '';
+    }
+}
+
+if (!function_exists('navarch_print_sidebar')) {
+    /**
+     * **يطبع سايدبارَ المساحةِ من المواضعِ الحاكمةِ وحدَها** — بوسمِ المُصيِّرِ
+     * القديمِ نفسِه (`nav-group` · `nav-group-head` · `nav-group-items`)
+     * فلا يتغيّر شكلٌ ولا سلوكُ طيٍّ ولا مُعرِّفُ حفظِ حالةٍ في المتصفّح.
+     *
+     * @return bool هل طُبع شيء؟ (`false` ⇒ يسلك النداءُ المسارَ القديمَ حرفًا)
+     */
+    function navarch_print_sidebar($conn, $wsId, $roleId, $basePrefix = '../',
+                                   $badges = array(), $afterHome = '')
+    {
+        require_once __DIR__ . '/nav_icon_map.php';
+        require_once __DIR__ . '/nav_anchors.php';
+
+        $tree = navarch_render($conn, $wsId, $roleId);
+
+        /* ⛔ **مساحةٌ لا تُنتج بندَ دورةٍ واحدًا لا تُقلَب**: قلبٌ يُفرِغ سايدبارًا
+           عطبٌ لا إصلاح — يُردُّ للمسارِ القديمِ ويُقيَّد كشفٌ باسمِه (§35). */
+        if ($tree['rendered'] === 0) {
+            if (function_exists('navrRecordFinding')) {
+                navrRecordFinding($conn, 'CUTOVER_EMPTY_LIFECYCLE', (int) $roleId, $wsId,
+                    'المصير الحاكم لا ينتج بند دورة واحدا لهذه المساحة، رد للمسار القديم');
+            }
+            return false;
+        }
+
+        /* ── ① «مساحتي»: المرساتان (§10) ثمَّ مواضعُ `WS-MY` (§11) ───────────
+              وهي **خارجَ مقامِ دورةِ الإدارة** — يقيسها `NT-06` و`NT-07`. */
+        ob_start();
+        $aHome = ems_nav_anchor($conn, 'HOME');
+        if ($aHome !== null) {
+            printNavLinkItem(array('code' => $aHome['route'], 'name' => $aHome['label'],
+                                   'icon' => $aHome['icon']), $basePrefix, $badges);
+        }
+        $aChat = ems_nav_anchor($conn, 'CHATS');
+        if ($aChat !== null) {
+            ems_nav_mark_printed($aChat['route'] . '||' . $aChat['label']);
+            echo ($afterHome !== '') ? $afterHome
+                : ems_nav_anchor_li($conn, 'CHATS', $basePrefix, 'id="sidebarChatLink"',
+                      '<span id="nav-unread-badge" class="nav-count-badge" style="display:none;"></span>');
+        }
+        foreach ($tree['personal'] as $p) {
+            $rt = navarch_proper_route($conn, $p['route']);
+            if ($rt === '') { continue; }
+            printNavLinkItem(array('code' => $rt, 'name' => $p['label'],
+                                   'icon' => ems_nav_icon_for($p['label'], $rt)), $basePrefix, $badges);
+        }
+        $mineBody = ob_get_clean();
+
+        /* ── ② مجموعاتُ الدورةِ بترتيبِها الحاكمِ — ⛔ ولا مجموعةَ افتراضيّة ── */
+        $blocks = array();
+        if (ems_nav_group_has_link($mineBody)) {
+            $blocks[] = array('key' => 'g-mine', 'name' => 'مساحتي',
+                              'icon' => 'fa fa-user', 'body' => $mineBody, 'badge' => 0);
+        }
+        foreach ($tree['groups'] as $g) {
+            ob_start();
+            $bsum = 0;
+            foreach ($g['items'] as $i) {
+                $rt = navarch_proper_route($conn, $i['route']);
+                if ($rt === '') { continue; }
+                $bsum += printNavLinkItem(array('code' => $rt, 'name' => $i['label'],
+                                                'icon' => ems_nav_icon_for($i['label'], $rt)),
+                                          $basePrefix, $badges);
+            }
+            $body = ob_get_clean();
+            if (!ems_nav_group_has_link($body)) { continue; }   /* لا غلافَ لمجموعةٍ خلَت */
+            $blocks[] = array('key' => 'g-navarch-' . (int) $g['group_id'], 'name' => $g['label'],
+                              'icon' => ems_nav_stage_icon((int) $g['sort_no'], $g['label']),
+                              'body' => $body, 'badge' => $bsum);
+        }
+        if (empty($blocks)) { return false; }
+
+        /* ── ③ الطباعة: كلُّ مجموعةٍ مطويّةٌ أوّلَ زيارةٍ — قرارُ المالك 2026-08-17 */
+        foreach ($blocks as $B) {
+            $nm = htmlspecialchars($B['name'], ENT_QUOTES, 'UTF-8');
+            $badge = $B['badge'] > 0
+                ? ' <span class="nav-count-badge nav-group-badge">'
+                  . ($B['badge'] > 99 ? '99+' : $B['badge']) . '</span>' : '';
+            echo '<li class="nav-group" data-group-key="' . $B['key'] . '">' . "\n";
+            echo '  <button type="button" class="nav-group-head" aria-expanded="false"'
+               . ' aria-controls="navgrp-' . $B['key'] . '" aria-label="' . $nm . '" title="' . $nm . '">'
+               . '<i class="' . htmlspecialchars($B['icon'], ENT_QUOTES, 'UTF-8') . '" aria-hidden="true"></i> '
+               . '<span class="nav-group-name">' . $nm . '</span>' . $badge
+               . '<i class="fa fa-chevron-down nav-group-caret" aria-hidden="true"></i></button>' . "\n";
+            echo '  <ul class="nav-group-items" id="navgrp-' . $B['key'] . '">' . "\n";
+            echo $B['body'];
+            echo '  </ul>' . "\n" . '</li>' . "\n";
+        }
+        return true;
+    }
+}
