@@ -306,6 +306,27 @@ $tabStand = $conn->query("SELECT COUNT(*) FROM govui_target_registry g JOIN nav_
                            WHERE g.surface_type = 'TAB_CHILD' AND p.route IS NOT NULL AND p.route <> ''
                              AND (SELECT COUNT(*) FROM nav_placements q
                                    WHERE q.workspace_id = p.workspace_id AND LOWER(q.route) = LOWER(p.route)) = 1")->fetch_row()[0];
+/* ثلاثةُ بنودٍ تُقاس الآنَ لا تُنقَل — وكلُّها من أدواتِها في هذه التشغيلة */
+$SMS = "on_disk = 1 AND ownership_verdict <> 'RETIRE'
+        AND grain_cardinality IN ('ROW','LINE') AND grain_fact_scope = 'OWN_FACT'";
+$smGap = (int) $conn->query("SELECT COUNT(*) FROM repair01_screen_registry
+                              WHERE {$SMS} AND (state_model_ref IS NULL OR state_model_ref = '')")->fetch_row()[0];
+$smEnt = (int) $conn->query("SELECT COUNT(DISTINCT grain_entity) FROM repair01_screen_registry
+                              WHERE {$SMS} AND (state_model_ref IS NULL OR state_model_ref = '')")->fetch_row()[0];
+$fmOut = (string) shell_exec(escapeshellarg(PHP_BINARY) . ' '
+       . escapeshellarg($ROOT . '/tools/rpr02_field_measure.php') . ' 2>' . $NULLDEV);
+$declOnly = 0;
+foreach (explode(chr(10), $fmOut) as $__ln) {
+    if (mb_strpos($__ln, 'يُسنده') !== false && preg_match('~(\\d+)~', $__ln, $dm)) {
+        $declOnly = (int) $dm[1]; break;
+    }
+}
+$noBridge = 0;
+$mx = json_decode((string) @file_get_contents($ROOT . '/docs/REPAIR01_20260823/GOVUI_CONFORMANCE_MATRIX.json'), true);
+if (isset($mx['rows'])) {
+    foreach ($mx['rows'] as $rw) { if (end($rw) === 'FIELD_MISMATCH') { $noBridge++; } }
+}
+
 $md = "# ⑩ `Open Governing Conflicts`\n\n" . $HDR
     . "**§23 يطلب هذا وحدَه من التعارضات** — ⛔ ولا يُدرَج هنا ما له حكمٌ مكتوبٌ نافذ.\n\n"
     . "| # | التعارضُ أو الحاجز | المقيس | الحكمُ المطلوب |\n|---|---|---|---|\n"
@@ -314,6 +335,9 @@ $md = "# ⑩ `Open Governing Conflicts`\n\n" . $HDR
     . "| ③ | **`EX-DVP` بلا دورِ نوّابٍ حيّ** — اثنا عشرَ هدفًا موصولًا لا يُصيَّر | 12 هدفًا | ⛔ `OA-09` — إنشاءُ دورِ النوّابِ وربطُه بالمساحة |\n"
     . "| ④ | **`DEP-08` الحوكمةُ بلا دورٍ حيّ** — اثنان وثلاثون هدفًا | 32 هدفًا | ⛔ `BLOCKED_ROLE_BINDING` — إنشاءُ دورِ الحوكمة |\n"
     . "| ⑤ | **«خطة القوى العاملة» سطحُ تخطيطٍ لم يُبنَ** والشاشةُ الموصولةُ تقريرٌ | 1 هدفًا | ⛔ بناءٌ أو حكمُ `Next Release` صريح |\n"
+    . "| ⑥ | **آلاتُ حالةٍ لم تُؤلَّف بعد** — وستٌّ من ثمانِ بنودِ الآلةِ قرارُ أعمال | {$smGap} سطحًا على {$smEnt} كيانًا | ⛔ `BLOCKED_OWNER` — الدفترُ بأسمائه في `STATE_MODEL_BACKLOG.md` |\n"
+    . "| ⑦ | **رأسٌ مُعلَنٌ بلا مصدرِ خليّة** — يُحشى شرطةً ويُخفى ابتداءً | {$declOnly} حقلًا | ⛔ وصلُ المصدرِ أو طرحُه من المقام — **الطرحُ قرارُ مالك** |\n"
+    . "| ⑧ | **هدفٌ مبنيٌّ بلا زوجٍ (سطحٍ · متطلبٍ) مُعلَنٌ في الكون** — فحقولُه لا تُقاس | {$noBridge} أهدافٍ | ⛔ إتمامُ الجسرِ في `repair01_target_universe` بحكمٍ وشاهد |\n"
     . "\n**ولا تعارضَ بين الملفَّين الحاكمَين نفسِهما** — `01` و`02` لم يتنازعا على هدفٍ واحدٍ في هذه الجولة.\n";
 $w('10_OPEN_GOVERNING_CONFLICTS.md', $md);
 

@@ -99,6 +99,25 @@ while ($x = $r->fetch_assoc()) { $grpStore[(int) $x['id']] = $x['label_ar']; }
 $fld = array();
 $r = $conn->query("SELECT screen_id, matched, design_applicable FROM repair01_field_measure");
 while ($x = $r->fetch_assoc()) { $fld[$x['screen_id']] = array((int) $x['matched'], (int) $x['design_applicable']); }
+
+/* ── أحكامُ الكونِ المكتوبة: هدفٌ **دُمج أو أُسقط بحكمٍ وشاهد** ───────────────
+ * ◆ **العطبُ المصحَّح**: `repair01_field_measure` **لا تقيس إلّا `MATCHED`**
+ *   بنصِّها («فسطحٌ لم يُطابَق لا ملفَّ له يُقاس عليه»). فهدفٌ حكمُه
+ *   `MERGED_INTO` **لا صفَّ له في دفترِ الحقول**، وكانت المصفوفةُ تقرأ غيابَ
+ *   القياسِ **نقصًا في الحقول** فتحكم عليه `FIELD_MISMATCH`.
+ *   ⛔ **وذاك اتّهامٌ بما لم يُقَس** — وحقولُه مقيسةٌ فعلًا على السطحِ الذي
+ *   دُمج فيه. قِيس: 39 هدفًا كلُّها بهذا الحكم.
+ * ⇒ **والحكمُ الصحيحُ `N/A` بحكمٍ مكتوب** — وهو أحدُ الأحدَ عشرَ المسموحة،
+ *   ولا يُقبل إلّا **بشاهدٍ مسجَّلٍ في الكون**. */
+$ruled = array();
+$r = $conn->query("SELECT requirement_id, screen_id, verdict, verdict_witness
+                     FROM repair01_target_universe
+                    WHERE verdict IN ('MERGED_INTO','TAB_CHILD','PROJECTION','NOT_APPLICABLE','RETIRED_TARGET')
+                      AND verdict_witness <> ''");
+while ($r && $x = $r->fetch_assoc()) {
+    if ((string) $x['requirement_id'] !== '') { $ruled['R:' . $x['requirement_id']] = $x['verdict']; }
+    if ((string) $x['screen_id'] !== '')      { $ruled['S:' . $x['screen_id']]      = $x['verdict']; }
+}
 $grn = array();
 $r = $conn->query("SELECT screen_id, grain_entity, grain_multi, grain_measured FROM repair01_screen_registry");
 while ($x = $r->fetch_assoc()) { $grn[$x['screen_id']] = $x; }
@@ -174,7 +193,21 @@ foreach ($reg as $tid => $g) {
            وثلاثون منها بمسارٍ مستقلٍّ تُصيَّر بنودًا تحتَ تصنيفٍ عامّ — والحكمُ
            في ظهورِها مرفوعٌ بحاجزِ `OA-11` (نزعُ رابطٍ حيٍّ قرارُ مالك)، فلا
            يُحمَّل اسمُها ولا مجموعتُها حكمَ السايدبار. */
-        $v = ($gs === 'MULTI_GRAIN') ? 'GRAIN_MISMATCH' : (!$fOk ? 'FIELD_MISMATCH' : 'EXACT_MATCH');
+        /* وحتّى ابنُ التبويبِ لا يُتَّهم بنقصٍ لم يُقَس: إن كان حكمُ الكونِ
+           دمجًا أو تبويبًا بشاهدٍ فحقولُه تُقاس على سطحِ مرساتِه. */
+        if (!isset($fld[$sid]) && $sid !== '' && isset($ruled['S:' . $sid])) {
+            $v  = 'N/A';
+            $fs = '— بحكمِ الكونِ المكتوب: ' . $ruled['S:' . $sid] . ' — والحقولُ تُقاس على سطحِ المرساة';
+        } else {
+            $v = ($gs === 'MULTI_GRAIN') ? 'GRAIN_MISMATCH' : (!$fOk ? 'FIELD_MISMATCH' : 'EXACT_MATCH');
+        }
+    } elseif (!isset($fld[$sid]) && $sid !== ''
+              && (isset($ruled['S:' . $sid]) || (isset($g['requirement_id']) && isset($ruled['R:' . $g['requirement_id']])))) {
+        /* هدفٌ بحكمٍ مكتوبٍ في الكون (دمجٌ أو تبويبٌ أو إسقاط) — حقولُه تُقاس
+           على سطحِ مرساتِه، ولا يُتَّهم بنقصٍ لم يُقَس. */
+        $v = 'N/A';
+        $fs = '— بحكمِ الكونِ المكتوب: ' . (isset($ruled['S:' . $sid]) ? $ruled['S:' . $sid]
+              : $ruled['R:' . $g['requirement_id']]) . ' — والحقولُ تُقاس على سطحِ المرساة';
     } elseif ($rn === null) { $v = 'WRONG_ROLE_VISIBILITY'; }
     elseif (!$groupOk) { $v = 'WRONG_GROUP'; }
     elseif (rpr02a_nz($aLabel) !== rpr02a_nz($cLabel)) { $v = 'WRONG_LABEL'; }
