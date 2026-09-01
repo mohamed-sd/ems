@@ -1,6 +1,6 @@
 # بطاقةُ التحقّقِ البشريِّ — `DEP-10` إدارة البلاغات
 
-> **اللقطة**: `168011c0` · 2026-09-01 08:13 · **المصدرُ الحاكم**: `nav_placements` + `nav_lifecycle_groups` (ورقةُ «01 · الدليل المعماري»)
+> **اللقطة**: `9c39e08a` · 2026-09-01 14:03 · **المصدرُ الحاكم**: `nav_placements` + `nav_lifecycle_groups` (ورقةُ «01 · الدليل المعماري»)
 > ⛔ **الشجرةُ أدناه مأخوذةٌ من الحاكمِ لا من التصيير** — فإن خالفها ما تراه على الشاشةِ فالمخالفةُ عطبٌ يُسجَّل، لا فرقٌ يُسوّى في البطاقة.
 
 ## ① الدخول
@@ -13,18 +13,18 @@
 
 ## ② الشجرةُ المتوقَّعةُ — 3 مجموعةً · 13/13 مبنيّةً
 
-### 1. اللوحة — خارج الدورة (Overview)
+### 1. اللوحة — خارج الدورة
 
 | # | البند | المسار | الحال |
 |---|---|---|---|
 | 1 | لوحه مركز البلاغات | `tickets/gov_dept_crp.php` | ✔ مبنيّ |
-| 2 | مصفوفه SLA للبلاغات | `tickets/tkt_subject_types.php` | ✔ مبنيّ |
+| 2 | مصفوفه SLA للبلاغات | `Tickets/ticket_sla_config.php` | ✔ مبنيّ |
 
 ### 2. السجلات التابعة
 
 | # | البند | المسار | الحال |
 |---|---|---|---|
-| 1 | صندوق بلاغات الاداره | `tickets/ticket_sla_config.php` | ✔ مبنيّ |
+| 1 | صندوق بلاغات الاداره | `Tickets/tickets_list.php` | ✔ مبنيّ |
 | 2 | سجل التوجيه — Routing History | `tickets/tkt_routing.php` | ✔ مبنيّ |
 | 3 | سجل الاسناد — Assignment History | `tickets/tkt_assignment.php` | ✔ مبنيّ |
 | 4 | اجراءات المعالجه — Resolution Actions | `tickets/tkt_resolution_actions.php` | ✔ مبنيّ |
@@ -36,7 +36,7 @@
 
 | # | البند | المسار | الحال |
 |---|---|---|---|
-| 1 | الابلاغ السياقي من داخل الشاشه | `tickets/tkt_parties.php` | ✔ مبنيّ |
+| 1 | الابلاغ السياقي من داخل الشاشه | `Tickets/ticket_contextual_open.php` | ✔ مبنيّ |
 | 2 | كتالوج انواع محل البلاغ | `tickets/tkt_subject_types.php` | ✔ مبنيّ |
 | 3 | تسجيل البلاغ | `tickets/ticket_form.php` | ✔ مبنيّ |
 | 4 | التحقق والاغلاق — Resolved → Verification → Closure | `tickets/tkt_verification.php` | ✔ مبنيّ |
