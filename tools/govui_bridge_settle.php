@@ -87,6 +87,61 @@ foreach ($orphan as $o) {
         mb_substr($o['name_ar'], 0, 36), $o['screen_id'], $o['requirement_id'], $o['design_uid']);
 }
 
+/* ═══ ④ **الشاهدُ الثاني** — والاسمُ وحدَه لا يكفي ══════════════════════════
+   ◆ **العطبُ الذي وقع بهذه الأداةِ نفسِها**: رُبط `TGT-0046` «قرارات الهيكل
+     التنظيمي» بـ`SCR-0006` لأنَّ الاسمَ الحاكمَ يطابق حرفًا — **والشاشةُ
+     خريطةُ هيكلٍ لا سجلُّ قرارات**: صفرٌ من ثلاثةَ عشرَ حقلًا، ولا مفردةَ
+     «قرار» في تصييرِها. **فاسمٌ صحيحٌ على شاشةٍ خطأ** [[repair01-ops-sidebar-guide11]].
+   ◆ **فالقاعدةُ تُقسَّى ولا تُلغى**: الربطُ بالاسمِ يبقى **مقترَحًا** حتى
+     يُصدِّقه شاهدٌ ثانٍ — **حقلٌ واحدٌ على الأقلِّ من حقولِ الهدفِ مُصيَّرٌ في
+     السطح**. وصفرُ إصابةٍ يعني أنَّ السطحَ ليس هذا الهدف.
+   ⇒ `--verify` يفكُّ كلَّ ربطٍ بالاسمِ لم يُصدِّقْه القياس. */
+if (in_array('--verify', $argv, true)) {
+    $bad = array();
+    /* ◆ **والمعيارُ القياسُ لا عمودُ الطريقة**: `match_method` عمودٌ ضيّقُ
+     *   المفرداتِ فابتلع القيمةَ الجديدةَ صامتًا — فلو عُلِّق الحكمُ عليه
+     *   لَما رسَب شيءٌ أبدًا ([[measure-token-must-exist]]). فالسؤالُ يُوجَّه
+     *   إلى **الأثرِ المقيسِ نفسِه**: هدفٌ مربوطٌ بشاشةٍ وله حقولٌ منطبقةٌ
+     *   **وصفرُ إصابة** ⇒ الشاشةُ ليست هذا الهدف. */
+    $r = $conn->query("SELECT u.target_uid, u.unit, u.name_ar, u.screen_id, u.requirement_id,
+                              m.design_applicable, m.matched
+                         FROM repair01_target_universe u
+                         JOIN repair01_field_measure m ON m.target_uid = u.target_uid
+                        WHERE u.verdict = 'MATCHED' AND u.screen_id <> ''
+                          AND m.design_applicable > 0 AND m.matched = 0");
+    while ($x = $r->fetch_assoc()) { $bad[] = $x; }
+    printf("\n  ── تصديقُ الربطِ بالاسم ──\n  ربطٌ بالاسمِ لم يُصدِّقْه حقلٌ واحد: **%d**\n", count($bad));
+    foreach ($bad as $b) {
+        printf("     ✘ %-10s %-38s %s — صفرُ حقلٍ مُصيَّرٍ من حقولِ الهدف\n",
+            $b['unit'], mb_substr($b['name_ar'], 0, 36), $b['screen_id']);
+    }
+    if ($APPLY && $bad) {
+        $now2 = date('Y-m-d H:i:s');
+        foreach ($bad as $b) {
+            $w = 'رُبط بالاسمِ الحاكمِ ثمَّ **لم يُصدِّقْه حقلٌ واحدٌ من حقولِ الهدف** — '
+               . 'فالسطحُ ليس هذا الهدف. والهدفُ يعود `NOT_BUILT` (§10: '
+               . 'CURRENT_RELEASE_TARGET_NOT_BUILT يُسمّى ولا يُخفى) — govui_bridge_settle --verify';
+            $q = $conn->prepare("UPDATE repair01_target_universe
+                                    SET screen_id = '', verdict = 'NOT_BUILT', verdict_witness = ?,
+                                        match_method = 'LABEL_ONLY_UNPROVEN', match_witness = ?,
+                                        verdict_at = ?
+                                  WHERE target_uid = ?");
+            $q->bind_param('ssss', $w, $w, $now2, $b['target_uid']);
+            $q->execute(); $q->close();
+            /* ◆ **والقارئانِ لا يتفرَّقان**: مصفوفةُ §18 تقرأ `govui_target_registry`
+             *   لا الجسر — فلو صُحِّح أحدُهما وحدَه بقي الآخرُ يقول «مبنيّ»
+             *   [[two-registers-target-vs-built]]. */
+            $q2 = $conn->prepare("UPDATE govui_target_registry
+                                     SET target_screen_id = '', built_route = ''
+                                   WHERE canonical_screen_label = ? AND built_route <> ''");
+            $q2->bind_param('s', $b['name_ar']);
+            $q2->execute(); $q2->close();
+        }
+        printf("  ⇒ فُكَّ **%d** ربطًا غيرَ مصدَّق — في الجسرِ وسجلِّ الأهدافِ معًا\n", count($bad));
+    }
+    exit(0);
+}
+
 if (!$APPLY) { echo "\n  ◆ قياسٌ فقط — للتطبيق: `--apply`\n"; exit(0); }
 
 $now = date('Y-m-d H:i:s');
