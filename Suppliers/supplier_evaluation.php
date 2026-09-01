@@ -16,6 +16,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 require_once __DIR__ . '/../app/Services/Contract/SupplierEvaluationService.php';
 
 use App\Services\Contract\SupplierEvaluationService as SES;
@@ -129,7 +130,51 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     $header_actions = array();
     $header_back = array('href' => 'supplier_capacity.php', 'class' => '',
                          'icon' => 'fas fa-arrow-right', 'label' => 'الطاقة والجاهزية');
-    include('../includes/page_header.php');
+    include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> تقييم المورد والاداء بحقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم المورد' => 'c235',
+            'اسم المورد (بحث)' => 'c236',
+            'الفترة' => 'c237',
+            'عقود نشطة' => 'c238',
+            'عقود منتهية بلا إغلاق' => 'c239',
+            'حصص (خانات)' => 'c240',
+            'معدات مسندة' => 'c241',
+            'انكشاف الاستحقاق $' => 'c242',
+            'المدفوع $' => 'c243',
+            'الرصيد المستحق $' => 'c244',
+            'نسبة التركز من محفظة الاستحقاق' => 'c245',
+            'Σ المستهدف (تجميعي عبر الوحدات)' => 'c246',
+            'Σ المنفذ (تجميعي)' => 'c247',
+            'نسبة تحقق الحصص' => 'c248',
+            'Σ مخصومة عمل (ساعات)' => 'c249',
+            'معدل الخصومات' => 'c250',
+            'نسبة معدات غير متحقق الصفة' => 'c251',
+            'موردون بديلون لأضيق نوع' => 'c252',
+            'عقود تنتهي قبل عقد العميل' => 'c253',
+            'تصنيف المخاطرة المركب' => 'c254',
+            'درجة المخاطرة' => 'c255',
+            'الالتزام بالمواعيد %' => 'c256',
+            'جودة المعدات (1 5)' => 'c257',
+            'الاستجابة للبلاغات' => 'c258',
+            'التصنيف الاستراتيجي' => 'c259',
+            'ملاحظات الأداء' => 'c260',
+            'المقيم' => 'c261',
+            'تاريخ التقييم' => 'c262',
+            'حالة الاعتماد' => 'c263',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('supplier_evaluations');
+        echo ems_w14_grid('emsList_sup_eval', $GUIDE_COLS, $__gridRows, $D, 'لا تقييم مسجل بعد'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>';
     }

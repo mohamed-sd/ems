@@ -6,6 +6,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 
 // ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
@@ -283,7 +284,53 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         $header_actions[] = $__xlAction;
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
-    include('../includes/page_header.php');
+    include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل الموردين بحقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم المورد' => 'c1',
+            'التسلسل الزمني للتعامل' => 'c2',
+            'الاسم القانوني' => 'c3',
+            'الاسم المختصر' => 'c4',
+            'المرادف القديم' => 'c5',
+            'تصنيف المورد' => 'c6',
+            'نوع المورد (مصدر)' => 'supplier_type',
+            'مصدر القيد' => 'c7',
+            'فئة مصدر القدرة' => 'c8',
+            'نمط التعاقد' => 'c9',
+            'طبيعة المورد (مالك/وسيط)' => 'c10',
+            'حالة المورد' => 'c11',
+            'تاريخ آخر نشاط تشغيلي' => 'c12',
+            'تاريخ آخر حركة مالية' => 'c13',
+            'أشهر منذ آخر نشاط' => 'c14',
+            'دليل آخر نشاط' => 'c15',
+            'أساس الحالة' => 'c16',
+            'تاريخ أول تعامل' => 'c17',
+            'الدولة' => 'c18',
+            'المدينة' => 'c19',
+            'السجل التجاري' => 'c20',
+            'الرقم الضريبي' => 'tax_number',
+            'نماذج التعامل' => 'c21',
+            'العملات المتعامل بها' => 'c22',
+            'عدد الحصص' => 'c23',
+            'عدد المعدات المسندة' => 'c24',
+            'حالة التأهيل (م03)' => 'c25',
+            'التصنيف الاستراتيجي (م20)' => 'c26',
+            'مستوى الحجية' => 'c27',
+            'مصدر التوثيق' => 'c28',
+            'ملاحظات' => 'c29',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('suppliers');
+        echo ems_w14_grid('emsList_sup_register', $GUIDE_COLS, $__gridRows, $D, 'لا مورد مسجل بعد'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
     ?>
 <?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('supplier', 'البيانات'); ?>
 

@@ -47,6 +47,16 @@ foreach (array_slice($argv, 1) as $a) { if (substr($a, 0, 2) !== '--') { $UNIT =
 if ($UNIT === '' && !$ALL) { exit("الاستعمال: php tools/govui_finish_render.php <UNIT|--all> [--miss]\n"); }
 
 $PHP  = (defined('PHP_BINARY') && PHP_BINARY !== '') ? PHP_BINARY : 'php';
+/* ── معاملاتُ الطلبِ المُعلَنة ────────────────────────────────────────────────
+ * ◆ سطحٌ يشترط معاملًا في مساره يرتدُّ بدونه، **فيُقرأ محجوبًا وهو يُصيَّر**.
+ *   والمعاملُ **قرارُ بياناتٍ يُصرَّح في ملفٍّ** لا يُخمَّن في الأداة، فيُراجَع.
+ * ⛔ ولا يُختلق معرِّفٌ: القيمةُ تشير إلى صفٍّ قائمٍ في القاعدة. */
+$PARAMS = array();
+$__pf = $ROOT . '/docs/REPAIR01_20260823/render_params.json';
+if (is_file($__pf)) {
+    $__pj = json_decode((string) file_get_contents($__pf), true);
+    if (is_array($__pj)) { $PARAMS = $__pj; }
+}
 $NULL = (DIRECTORY_SEPARATOR === chr(92)) ? 'NUL' : '/dev/null';
 
 /* ── الجسرُ المُعلَن — الزوجُ (سطحٌ · متطلبٌ) مرّةً واحدةً، كما في المقياس ── */
@@ -144,7 +154,9 @@ foreach ($bridge as $b) {
         foreach ($viewers as $v0) {
             $cmd = escapeshellarg($PHP) . ' ' . escapeshellarg($ROOT . '/tools/u13_render_one.php')
                  . ' ' . escapeshellarg($route) . ' ' . escapeshellarg($v0['role'])
-                 . ' ' . (int) $v0['uid'] . ' ' . (int) $v0['co'] . ' --body 2>' . $NULL;
+                 . ' ' . (int) $v0['uid'] . ' ' . (int) $v0['co'] . ' --body'
+                 . (isset($PARAMS[$route]) ? ' ' . escapeshellarg('--get=' . $PARAMS[$route]) : '')
+                 . ' 2>' . $NULL;
             $b0 = (string) shell_exec($cmd);
             $nl = strpos($b0, chr(10));
             $b0 = ($nl === false) ? '' : substr($b0, $nl + 1);

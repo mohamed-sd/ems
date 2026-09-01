@@ -16,6 +16,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 
 $is_super_admin = ((isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '') === '-1');
@@ -64,6 +65,65 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'الاداء والوحدات المعتمدة: قيد اداء شهري واحد بمرجع تسويته المعتمدة'; $header_icon = 'fa fa-clipboard-check'; $header_actions = array();
     $header_back = array('href' => 'supplier_targets.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'مستهدفات الموردين');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> الاداء والوحدات المعتمدة بحقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم السطر' => 'c280',
+            'كود الوحدة التعاقدية' => 'c281',
+            'كود عقد المورد' => 'c282',
+            'رقم المورد' => 'c283',
+            'اسم المورد (بحث)' => 'c284',
+            'نموذج العمل' => 'c285',
+            'رقم الشهر' => 'c286',
+            'من' => 'c287',
+            'إلى' => 'c288',
+            'وحدة القياس' => 'c289',
+            'نوع الآلية/البند' => 'c290',
+            'رمز الآلية (مصدر)' => 'c291',
+            'رقم اللوحة' => 'c292',
+            'ساعات الاتفاق (متعاقد)' => 'c293',
+            'أطنان متفق عليها' => 'c294',
+            'أمتار متفق عليها' => 'c295',
+            'المنفذ (الأساس)' => 'c296',
+            'ساعات أساسية (مصدر)' => 'c297',
+            'أطنان ويست' => 'c298',
+            'أطنان خام' => 'c299',
+            'أمتار تفجير' => 'c300',
+            'أمتار G.C' => 'c301',
+            'مضافة عمل' => 'c302',
+            'مستند المضافة عمل' => 'c303',
+            'مضافة تعطل' => 'c304',
+            'مضافة استعداد' => 'c305',
+            'مستند المضافة استعداد' => 'c306',
+            'مخصومة استعداد' => 'c307',
+            'مخصومة عمل' => 'c308',
+            'سبب الخصم' => 'c309',
+            'مرجع قرار الخصم' => 'c310',
+            'معتمد التسوية' => 'c311',
+            'الساعات الفعلية' => 'c312',
+            'الساعات الكلية' => 'c313',
+            'صافي وحدات المورد المعتمدة' => 'c314',
+            'منجزة العميل (قراءة)' => 'c315',
+            'تاريخ الاعتماد' => 'c316',
+            'مصدر البيان' => 'c317',
+            'طريقة الربط بالحصة' => 'c318',
+            'حالة المورد وقت القيد' => 'c319',
+            'ملاحظات' => 'c320',
+            'المنشئ' => 'c321',
+            'المراجع' => 'c322',
+            'المعتمد' => 'c323',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('sup_performance_unit');
+        echo ems_w14_grid('emsList_sup_perf', $GUIDE_COLS, $__gridRows, $D, 'لا سطر اداء مسجل بعد'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
 
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= number_format($nE) ?></div><div class="ems-stat-label">قيود اداء معتمدة</div></div>

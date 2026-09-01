@@ -12,6 +12,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 require_once __DIR__ . '/../app/Services/Procurement/RFQService.php';
 
 use App\Services\Procurement\RFQService as RFQ;
@@ -146,7 +147,49 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array();
     $header_back = array('href' => '../main/dashboard.php', 'class' => '',
                          'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
-    include('../includes/page_header.php');
+    include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> الترشيح ومراجعة التعاقد بحقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم الترشيح' => 'c80',
+            'رقم الاحتياج' => 'c81',
+            'كود العقد' => 'c82',
+            'رقم المورد' => 'c83',
+            'اسم المورد (بحث)' => 'c84',
+            'نوع الآلية/البند' => 'c85',
+            'كود المعدة المعروضة' => 'c86',
+            'السعر المعروض' => 'c87',
+            'العملة' => 'c88',
+            'تاريخ العرض' => 'c89',
+            'فحص التأهيل القانوني' => 'c90',
+            'فحص الحساب البنكي' => 'c91',
+            'فحص تعارض المصالح' => 'c92',
+            'فحص السقف الائتماني' => 'c93',
+            'فحص الهامش (ضمن الحد)' => 'c94',
+            'فحص توافق الحصة مع الاحتياج' => 'c95',
+            'استثناء معتمد (مرجع)' => 'c96',
+            'جاهزية التوقيع' => 'c97',
+            'المنشئ' => 'c98',
+            'المراجع' => 'c99',
+            'المعتمد' => 'c100',
+            'تاريخ المراجعة' => 'c101',
+            'حالة الترشيح' => 'c102',
+            'سبب الاختيار/الاستبعاد' => 'c103',
+            'كود عقد المورد الناتج' => 'c104',
+            'حالة البيانات' => 'c105',
+            'ملاحظات' => 'c106',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('sup_rfq_review');
+        echo ems_w14_grid('emsList_sup_rfq', $GUIDE_COLS, $__gridRows, $D, 'لا ترشيح مسجل بعد'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
     if (isset($_GET['msg'])) { echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>'; }
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     echo ems_states_bundle('لا طلب عروض مفتوحا بعد', 'افتح طلبا من التزامات عقد العميل، أو عن طلب شراء معتمد من النموذج أعلاه');

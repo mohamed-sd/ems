@@ -16,6 +16,7 @@ session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/party_contacts_kit.php';
 require_once __DIR__ . '/../includes/party_contacts_view.php';
@@ -67,7 +68,38 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     $header_icon    = 'fa fa-address-book';
     $header_actions = array();
     $header_back    = array('href' => 'suppliers.php', 'class' => '', 'label' => 'سجل الموردين');
-    include __DIR__ . '/../includes/page_header.php';
+    include __DIR__ . '/../includes/page_header.php'; ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> جهات الاتصال والمفوضون بحقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم الجهة' => 'c30',
+            'رقم المورد' => 'c31',
+            'اسم المورد (بحث)' => 'c32',
+            'الاسم' => 'c33',
+            'الصفة/الدور' => 'c34',
+            'نوع التفويض' => 'c35',
+            'مستند التفويض' => 'c36',
+            'سريان التفويض من' => 'c37',
+            'إلى' => 'c38',
+            'الهاتف الأساسي' => 'c39',
+            'هاتف بديل' => 'c40',
+            'البريد' => 'c41',
+            'حالة جهة الاتصال' => 'c42',
+            'الحجية' => 'c43',
+            'حالة البيانات' => 'c44',
+            'ملاحظات' => 'c45',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('sup_contact_delegate');
+        echo ems_w14_grid('emsList_sup_contacts', $GUIDE_COLS, $__gridRows, $D, 'لا جهة اتصال مسجلة بعد'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }

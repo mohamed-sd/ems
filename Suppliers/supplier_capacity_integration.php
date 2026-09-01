@@ -15,6 +15,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 
 $is_super_admin = ((isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '') === '-1');
@@ -59,6 +60,32 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'مصادر القدرة والتكامل: كل نوع حدث بعده وحال تسليمه من سجل الحقائق'; $header_icon = 'fa fa-plug'; $header_actions = array();
     $header_back = array('href' => 'supplier_capacity.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'قدرات الموردين');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> مصادر القدرة والتكامل بحقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم السطر' => 'c264',
+            'مصدر القدرة' => 'c265',
+            'المرجع (كود عقد مورد / كود أصل)' => 'c266',
+            'نوع الآلية/البند' => 'c267',
+            'الطاقة الشهرية' => 'c268',
+            'وحدة القياس' => 'c269',
+            'تكلفة الوحدة (قراءة)' => 'c270',
+            'نظام المصدر' => 'c271',
+            'الحالة' => 'c272',
+            'حالة البيانات' => 'c273',
+            'ملاحظة الفصل' => 'c274',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('supplier_capacity');
+        echo ems_w14_grid('emsList_sup_capacity', $GUIDE_COLS, $__gridRows, $D, 'لا مصدر قدرة مسجل بعد'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
 
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= number_format($nEv) ?></div><div class="ems-stat-label">احداث قدرة وموردين</div></div>

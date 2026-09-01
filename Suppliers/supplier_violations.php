@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/post_contract.php';
 require_once __DIR__ . '/../app/Services/Align/CapabilityService.php';
@@ -136,7 +137,38 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
   ob_start(); ?><span class="badge"><?= $queueFail === '' ? count($rows) : '—' ?> مخالفة</span><?php
   $header_actions = array(array('raw' => trim((string) ob_get_clean())));
   $header_back = false;
-  include __DIR__ . '/../includes/page_header.php';
+  include __DIR__ . '/../includes/page_header.php'; ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> المخالفات والجزاءات بحقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم القيد' => 'c219',
+            'التاريخ' => 'c220',
+            'رقم المورد' => 'c221',
+            'اسم المورد (بحث)' => 'c222',
+            'كود عقد المورد' => 'c223',
+            'نوع الجزاء/المطالبة' => 'c224',
+            'الوصف' => 'c225',
+            'المرجع التعاقدي (بند)' => 'c226',
+            'المبلغ/الأثر' => 'c227',
+            'العملة' => 'c228',
+            'الحالة' => 'c229',
+            'القرار' => 'c230',
+            'معتمد القرار' => 'c231',
+            'مرجع الخصم بالتسوية (م17)' => 'c232',
+            'حالة البيانات' => 'c233',
+            'ملاحظات' => 'c234',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('sup_violations');
+        echo ems_w14_grid('emsList_sup_viol', $GUIDE_COLS, $__gridRows, $D, 'لا مخالفة مسجلة بعد'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
   echo ems_states_bundle('لا مخالفة مسجلة بعد',
       'المخالفة ترصد بوصف ودليل، ثم تعتمد بيد غير يد راصدها — وأثرها في التسوية');
   ?>

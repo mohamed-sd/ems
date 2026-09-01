@@ -137,7 +137,10 @@ foreach ($targets as $req) {
     $line = array();
     foreach ($top as $t => $n) { $line[] = $t . ' (' . $n . ')'; }
     echo "   المرشَّحون: " . implode(' · ', $line) . "\n";
-    if ($best === null || !isset($byTable[$best])) { echo "   ⛔ لا جدولَ مرشَّحًا\n"; continue; }
+    if ($best === null) { echo "   x لا جدولَ مرشَّحًا" . chr(10); continue; }
+    /* وجدولٌ لم يُنشأ بعدُ ليس عائقًا: المواصفةُ تُصرِّح `create` فتُبنى أعمدتُه
+       كلُّها من الورقة — وهو مسارُ `gov_exec_dept_build` نفسُه لسطحٍ بلا جدول. */
+    if (!isset($byTable[$best])) { $byTable[$best] = array(); }
 
     /* ── الخريطةُ المقترَحة: حقلُ الورقةِ ⇐ عمودُه المسمَّى ─────────────────── */
     $used = array(); $mapOut = array();
@@ -210,6 +213,8 @@ if ($EMITSPEC !== null) {
         if (!empty($pl['anchor'])) { $out .= "    'anchor' => '" . str_replace("'", "\'", $pl['anchor']) . "',\n"; }
         if (!empty($pl['rows']))   { $out .= "    'rows' => \"" . str_replace('"', '\\"', $pl['rows']) . "\",\n"; }
         $out .= "    'grid_id' => '" . $pl['grid_id'] . "', 'empty' => '" . str_replace("'", '', $pl['empty']) . "',\n";
+        if (!empty($pl['create'])) { $out .= "    'create' => true,\n"; }
+        if (!empty($pl['grain']))  { $out .= "    'grain' => '" . str_replace("'", '', $pl['grain']) . "',\n"; }
         $out .= "    'map' => array(\n";
         $firstBlank = true;
         foreach ($e['map'] as $lbl => $col) {

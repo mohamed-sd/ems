@@ -102,7 +102,7 @@ $cols = function ($t) use ($conn) {
 };
 
 /* ═══ ② الفحصُ — والمواصفةُ تُردُّ إن خالفت الورقةَ ═════════════════════ */
-$FAIL = 0; $adds = array(); $plans = array();
+$FAIL = 0; $adds = array(); $creates = array(); $plans = array();
 foreach ($S['screens'] as $sc) {
     foreach (array('req', 'route', 'table', 'grid_id', 'empty', 'map') as $k) {
         if (!isset($sc[$k])) { echo "  ✗ ناقصٌ في المواصفة: {$k}\n"; $FAIL++; continue 2; }
@@ -132,7 +132,8 @@ foreach ($S['screens'] as $sc) {
     }
     /* أعمدةٌ لا نظيرَ لها — تُجمَع للهجرة */
     $have_cols = $cols($sc['table']);
-    if (!$have_cols) { echo "  ✗ جدولٌ غيرُ موجود: {$sc['table']}\n"; $FAIL++; continue; }
+    $mkTable = !empty($sc['create']);
+    if (!$have_cols && !$mkTable) { echo "  x جدولٌ غيرُ موجود: {$sc['table']}" . chr(10); $FAIL++; continue; }
     $need_add = array();
     foreach ($sc['map'] as $lbl => $src) {
         $src = (string) $src;
@@ -154,7 +155,12 @@ foreach ($S['screens'] as $sc) {
             $FAIL++;
         }
     }
-    foreach ($need_add as $a0) { $adds[] = $a0; }
+    if ($mkTable && !$have_cols) {
+        $creates[] = array('table' => $sc['table'], 'req' => $sc['req'], 'cols' => $need_add,
+                           'grain' => isset($sc['grain']) ? $sc['grain'] : '');
+    } else {
+        foreach ($need_add as $a0) { $adds[] = $a0; }
+    }
     $plans[] = array('sc' => $sc, 'need' => $need, 'adds' => $need_add);
     printf("  ✔ [%s] %-42s حقولُ الورقةِ %2d · خريطةٌ %2d · أعمدةٌ تُضاف %d\n",
            $sc['req'], $sc['route'], count($need), count($sc['map']), count($need_add));
@@ -171,6 +177,34 @@ if ($EMIT !== null) {
         $up   = $ROOT . '/database/migrations/' . $date . '_' . $EMIT . '.php';
         $down = $ROOT . '/database/migrations/' . $date . '_' . $EMIT . '_down.php';
         $body = ''; $rev = '';
+        /* جدولٌ يُنشأ حين لا حبّةَ قائمةً تملك السطحَ — والبنيةُ بنيةُ
+           gov_exec_dept_build نفسُها: معرِّفٌ وعمودُ عزلٍ وأعمدةُ الورقةِ باسمِ
+           الحقلِ في تعليقِ كلٍّ. ولا يُنشأ جدولٌ لحبّةٍ يملكها جدولٌ قائم —
+           ذاك مصدرُ حقيقةٍ موازٍ يمنعه الدستور، والمواصفةُ تُصرِّح create عمدًا. */
+        foreach ($creates as $c0) {
+            $ddl = 'CREATE TABLE IF NOT EXISTS `' . $c0['table'] . '` ('
+                 . '`id` INT NOT NULL AUTO_INCREMENT,'
+                 . "`company_id` INT NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',";
+            foreach ($c0['cols'] as $cc) {
+                $ddl .= '`' . $cc['col'] . '` ' . $cc['type']
+                      . " COMMENT '" . str_replace("'", '', $cc['label']) . "',";
+            }
+            $ddl .= '`created_at` DATETIME NULL DEFAULT NULL,'
+                 .  '`created_by` INT NULL DEFAULT NULL,'
+                 .  '`updated_at` DATETIME NULL DEFAULT NULL,'
+                 .  'PRIMARY KEY (`id`),'
+                 .  'KEY `ix_' . substr(md5($c0['table']), 0, 8) . '_co` (`company_id`)'
+                 .  ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
+                 .  " COMMENT '" . $c0['req'] . ' - ' . str_replace("'", '', $c0['grain']) . "'";
+            $body .= '$sql = ' . var_export($ddl, true) . ';' . chr(10)
+                  .  'if ($conn->query($sql)) { echo ' . var_export('+ جدول ' . $c0['table'] . chr(10), true) . '; }' . chr(10)
+                  .  'else { echo ' . var_export('x ' . $c0['table'] . ': ', true) . ' . $conn->error . chr(10); }' . chr(10) . chr(10);
+            $rev  = '$r = $conn->query(' . var_export('SELECT COUNT(*) FROM `' . $c0['table'] . '`', true) . ');' . chr(10)
+                  . '$n = $r ? (int) $r->fetch_row()[0] : 0;' . chr(10)
+                  . 'if ($n > 0) { echo ' . var_export('ابقي ' . $c0['table'] . ' لبياناته: ', true) . ' . $n . chr(10); }' . chr(10)
+                  . 'elseif ($conn->query(' . var_export('DROP TABLE IF EXISTS `' . $c0['table'] . '`', true) . ')) { echo '
+                  . var_export('- جدول ' . $c0['table'] . chr(10), true) . '; }' . chr(10) . chr(10) . $rev;
+        }
         foreach ($adds as $a0) {
             $body .= "\$q = \$conn->query(\"SHOW COLUMNS FROM `{$a0['table']}` LIKE '{$a0['col']}'\");\n"
                   .  "if (\$q && \$q->num_rows) { echo \"= {$a0['table']}.{$a0['col']} قائمٌ سلفًا\\n\"; }\n"
@@ -261,7 +295,16 @@ if ($APPLY) {
             if (strpos($s2, $anchor) !== false) {
                 $s2 = str_replace($anchor, $anchor . "\n" . $inc, $s2);
             } else {
-                $s2 = preg_replace("~^(include '\.\./config\.php';)$~m", "$1\n" . $inc, $s2, 1);
+                /* ومرساةُ الاشتمالِ ثلاثُ صيغٍ لا واحدة: الشجرةُ تكتب
+                   include '../config.php'; وrequire_once '../config.php';
+                   وrequire_once __DIR__ . '/../config.php'. ومرساةٌ واحدةٌ تُسقط
+                   الاشتمالَ صامتًا فتموت الشاشةُ بـundefined function — وهو ما
+                   وقع في supplierscontracts.php مقيسًا. */
+                $done = 0;
+                $s2 = preg_replace(
+                    "~^((?:include|require|require_once)\s+(?:__DIR__\s*\.\s*)?'[^']*config\.php';)$~m",
+                    "$1" . chr(10) . $inc, $s2, 1, $done);
+                if (!$done) { echo "  x لا مرساةَ اشتمالٍ في {$rel} — اضفها بيد" . chr(10); }
             }
         }
         file_put_contents($path, str_replace("\n", $nl, $s2));

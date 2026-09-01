@@ -23,6 +23,7 @@ session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/entity_tabs.php';
 echo ems_entity_tabs('settlement', 'الاستحقاقات');
@@ -74,7 +75,58 @@ $dangling = 0;
     $header_icon    = 'fa fa-file-invoice-dollar';
     $header_actions = array();
     $header_back    = array('href' => 'settlements.php', 'class' => '', 'label' => 'التسويات وكشف الحساب');
-    include __DIR__ . '/../includes/page_header.php';
+    include __DIR__ . '/../includes/page_header.php'; ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> استحقاقات الموردين بحقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم الاستحقاق' => 'c183',
+            'الفترة (شهر)' => 'c184',
+            'رقم المورد' => 'c185',
+            'اسم المورد (بحث)' => 'c186',
+            'كود عقد المورد' => 'c187',
+            'رقم البند' => 'c188',
+            'وحدة القياس' => 'c189',
+            'مفتاح الشهر (YYYYMM)' => 'c190',
+            'نوع الآلية/البند' => 'c191',
+            'الوحدات المعتمدة' => 'c192',
+            'الاتفاق الشهري $' => 'c193',
+            'سعر الساعة $ (مطبق)' => 'c194',
+            'سعر الإضافية $ (مطبق)' => 'c195',
+            'سعر الساعة ج.س (مطبق)' => 'c196',
+            'سعر طن ويست (مطبق)' => 'c197',
+            'سعر طن خام (مطبق)' => 'c198',
+            'سعر متر تفجير (مطبق)' => 'c199',
+            'سعر متر G.C (مطبق)' => 'c200',
+            'مستحق الساعات $' => 'c201',
+            'مستحق الساعات ج.س' => 'c202',
+            'مبلغ الإضافية $' => 'c203',
+            'مستحق الأطنان $' => 'c204',
+            'مستحق تفجير $' => 'c205',
+            'مستحق G.C $' => 'c206',
+            '(−) الخصومات' => 'c207',
+            'إجمالي الاستحقاق $' => 'c208',
+            'إجمالي الاستحقاق ج.س' => 'c209',
+            'المستلم الكلي $ (مصدر)' => 'c210',
+            'المتبقي $ (مصدر)' => 'c211',
+            'المتبقي ج.س (مصدر)' => 'c212',
+            'حالة الاستحقاق' => 'c213',
+            'تاريخ الإثبات' => 'c214',
+            'مرجع الأداء (م14)' => 'c215',
+            'مصدر السعر' => 'c216',
+            'البيان (مصدر)' => 'c217',
+            'ملاحظات' => 'c218',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('sup_entitlement');
+        echo ems_w14_grid('emsList_sup_entitle', $GUIDE_COLS, $__gridRows, $D, 'لا استحقاق مسجل بعد'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
     ?>
 
     <div class="card"><div class="card-body">

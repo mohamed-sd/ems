@@ -18,6 +18,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 require_once __DIR__ . '/../app/Services/Contract/SupplierContractService.php';
 require_once __DIR__ . '/../app/Services/Contract/ContractStateMachine.php';
 
@@ -224,7 +225,53 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     }
     $header_back = array('href' => 'supplierscontracts.php', 'class' => '',
                          'icon' => 'fas fa-arrow-right', 'label' => 'عقود الموردين');
-    include('../includes/page_header.php');
+    include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> بنود عقود الموردين بحقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم البند' => 'c152',
+            'كود عقد المورد' => 'c153',
+            'رقم المورد' => 'c154',
+            'اسم المورد (بحث)' => 'c155',
+            'رقم بند عقد العميل المقابل' => 'c156',
+            'نموذج العمل' => 'c157',
+            'نوع الآلية/البند' => 'c158',
+            'وحدة القياس' => 'c159',
+            'الحصة الشهرية المتعاقدة' => 'c160',
+            'سعر الوحدة الأساسي' => 'c161',
+            'سعر الوحدة الإضافي' => 'c162',
+            'سعر السداد ≤15 يوما' => 'c163',
+            'سعر السداد 15 45' => 'c164',
+            'سعر السداد >45' => 'c165',
+            'المبلغ الشهري الأساسي' => 'c166',
+            'عدد الورديات' => 'c167',
+            'العملة' => 'c168',
+            'سريان التركيبة من' => 'c169',
+            'إلى' => 'c170',
+            'Pricing_Model' => 'c171',
+            'Billing_UOM' => 'c172',
+            'Minimum_Qty (أساس الوحدة التعاقدية)' => 'c173',
+            'Minimum_Period' => 'c174',
+            'Guaranteed_Qty' => 'c175',
+            'Threshold_Qty' => 'c176',
+            'Shortfall_Bearer' => 'c177',
+            'Pricing_Reference' => 'c178',
+            'النسخة السعرية' => 'c179',
+            'حالة البند' => 'c180',
+            'مصدر السعر/الحجية' => 'c181',
+            'ملاحظات' => 'c182',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('sup_contract_line');
+        echo ems_w14_grid('emsList_sup_lines', $GUIDE_COLS, $__gridRows, $D, 'لا بند عقد مسجل بعد'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>';
     }
