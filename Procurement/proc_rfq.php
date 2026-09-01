@@ -17,6 +17,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w7_codes.php';
 
@@ -60,6 +61,33 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'طلب العروض ودعوات الموردين'; $header_icon = 'fa fa-envelope-open-text'; $header_actions = array();
     $header_back = array('href' => 'proc_packages.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'حزم التجميع');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_prc_proc_rfq
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف الدعوة' => 'g112',
+            'معرف RFQ' => 'g113',
+            'رقم المورد' => 'g114',
+            'تاريخ الدعوة' => 'g115',
+            'تأكيد الاستلام' => 'g116',
+            'الاستجابة' => 'g117',
+            'مرجع العرض الوارد' => 'g118',
+            'حالة الدعوة' => 'g119',
+            'المنشئ' => 'g120',
+            'تاريخ الإنشاء' => 'g121',
+            'حالة البيانات' => 'g122',
+            'مرجع المصدر' => 'g123',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('prc_proc_rfq');
+        echo ems_w14_grid('emsList_prc_proc_rfq', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في دعوات الموردين للعروض'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
 
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">طلبات عروض</div></div>

@@ -16,6 +16,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w7_codes.php';
 
@@ -59,6 +60,82 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'عروض الموردين المستلمة'; $header_icon = 'fa fa-file-invoice'; $header_actions = array();
     $header_back = array('href' => 'proc_rfq.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'طلب العروض');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_prc_proc_offers
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف العرض' => 'g18',
+            'رقم طلب العروض' => 'g19',
+            'رقم المورد' => 'g20',
+            'اسم المورد' => 'g21',
+            'تاريخ الاستلام' => 'g22',
+            'قيمة العرض' => 'g23',
+            'العملة' => 'g24',
+            'مدة التوريد' => 'g25',
+            'شروط الدفع المعروضة' => 'g26',
+            'صلاحية العرض' => 'g27',
+            'التقييم الفني' => 'g28',
+            'ملاحظات الفحص' => 'g29',
+            'الترتيب المالي' => 'g30',
+            'حالة العرض' => 'g31',
+            'المنشئ' => 'g32',
+            'تاريخ الإنشاء' => 'g33',
+            'حالة البيانات' => 'g34',
+            'مرجع المصدر' => 'g35',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('prc_proc_offers');
+        echo ems_w14_grid('emsList_prc_proc_offers', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في عروض الموردين المستلمة'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <table id="emsList_prc_offers"></table>
+    </div></div></div>
+    <?php  ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <table id="emsList_prc_offer_compare"></table>
+    </div></div></div>
+    <?php  ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_prc_offer_compare
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف السطر' => 'g124',
+            'معرف العرض' => 'g125',
+            'مرجع بند الطلب' => 'g126',
+            'كود الصنف' => 'g127',
+            'سعر الوحدة المعروض' => 'g128',
+            'الكمية' => 'g129',
+            'مدة التوريد للبند' => 'g130',
+            'بديل مقترح؟' => 'g131',
+            'ملاحظة فنية' => 'g132',
+            'ترتيب البند ماليا' => 'g133',
+            'المنشئ' => 'g134',
+            'تاريخ الإنشاء' => 'g135',
+            'حالة البيانات' => 'g136',
+            'مرجع المصدر' => 'g137',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('prc_offer_compare');
+        echo ems_w14_grid('emsList_prc_offer_compare', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في عروض الموردين المستلمة'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
 
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">عروض مستلمة</div></div>

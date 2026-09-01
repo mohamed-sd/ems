@@ -13,6 +13,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w7_codes.php';
 
@@ -54,6 +55,73 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'تجميع الطلبات وخطة الشراء'; $header_icon = 'fa fa-layer-group'; $header_actions = array();
     $header_back = array('href' => 'requests_proc.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'طلبات الشراء');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_prc_proc_packages
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف الحزمة' => 'g64',
+            'فترة التجميع' => 'g65',
+            'نطاق الحزمة' => 'g66',
+            'الطلبات المضمومة' => 'g67',
+            'عدد البنود' => 'g68',
+            'التقدير الإجمالي' => 'g69',
+            'مبرر التمرير المنفرد' => 'g70',
+            'قناة الشراء' => 'g71',
+            'حالة الحزمة' => 'g72',
+            'المنشئ' => 'g73',
+            'تاريخ الإنشاء' => 'g74',
+            'حالة البيانات' => 'g75',
+            'مرجع المصدر' => 'g76',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('prc_proc_packages');
+        echo ems_w14_grid('emsList_prc_proc_packages', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في تجميع الطلبات وخطة الشراء'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <table id="emsList_prc_packages"></table>
+    </div></div></div>
+    <?php  ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <table id="emsList_prc_package_lines"></table>
+    </div></div></div>
+    <?php  ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_prc_package_lines
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف العضوية' => 'g157',
+            'معرف الحزمة' => 'g158',
+            'رقم طلب الشراء' => 'g159',
+            'بنود الطلب المشمولة' => 'g160',
+            'تاريخ الضم' => 'g161',
+            'حالة العضوية' => 'g162',
+            'المنشئ' => 'g163',
+            'تاريخ الإنشاء' => 'g164',
+            'حالة البيانات' => 'g165',
+            'مرجع المصدر' => 'g166',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('prc_package_lines');
+        echo ems_w14_grid('emsList_prc_package_lines', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في تجميع الطلبات وخطة الشراء'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
 
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">حزم التجميع</div></div>

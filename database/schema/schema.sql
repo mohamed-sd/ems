@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-01 23:15:27
--- الجداول: 1149 · المناظير: 28
+-- المصدر: equipation_manage · التوليد: 2026-09-01 23:24:03
+-- الجداول: 1161 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -15643,6 +15643,310 @@ CREATE TABLE `positions` (
   KEY `idx_positions_role` (`role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='K6/ADR-07: المناصب — طبقة الصلاحية على المنصب فوق الأدوار';
 
+-- ── Table: prc_dashboard_kpi ──
+CREATE TABLE `prc_dashboard_kpi` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g167` varchar(190) DEFAULT NULL COMMENT 'معرف المؤشر',
+  `g168` varchar(190) DEFAULT NULL COMMENT 'المؤشر KPI Catalog',
+  `g169` varchar(190) DEFAULT NULL COMMENT 'القيمة',
+  `g170` varchar(190) DEFAULT NULL COMMENT 'الوحدة',
+  `g171` varchar(190) DEFAULT NULL COMMENT 'الحالة',
+  `g172` varchar(190) DEFAULT NULL COMMENT 'آخر تحديث',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_877ad4d5_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='PRC-01 - لا سطر مسجل بعد في لوحة المشتريات';
+
+-- ── Table: prc_offer_compare ──
+CREATE TABLE `prc_offer_compare` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g124` varchar(190) DEFAULT NULL COMMENT 'معرف السطر',
+  `g125` varchar(190) DEFAULT NULL COMMENT 'معرف العرض',
+  `g126` varchar(190) DEFAULT NULL COMMENT 'مرجع بند الطلب',
+  `g127` varchar(190) DEFAULT NULL COMMENT 'كود الصنف',
+  `g128` varchar(190) DEFAULT NULL COMMENT 'سعر الوحدة المعروض',
+  `g129` varchar(190) DEFAULT NULL COMMENT 'الكمية',
+  `g130` varchar(190) DEFAULT NULL COMMENT 'مدة التوريد للبند',
+  `g131` varchar(190) DEFAULT NULL COMMENT 'بديل مقترح؟',
+  `g132` varchar(190) DEFAULT NULL COMMENT 'ملاحظة فنية',
+  `g133` varchar(190) DEFAULT NULL COMMENT 'ترتيب البند ماليا',
+  `g134` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g135` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g136` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g137` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_ef072d1b_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='PRC-09 - عروض الموردين المستلمة';
+
+-- ── Table: prc_orders_proc ──
+CREATE TABLE `prc_orders_proc` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g91` varchar(190) DEFAULT NULL COMMENT 'رقم الأمر',
+  `g92` varchar(190) DEFAULT NULL COMMENT 'تاريخ الأمر',
+  `g93` varchar(190) DEFAULT NULL COMMENT 'رقم المحضر',
+  `g94` varchar(190) DEFAULT NULL COMMENT 'رقم المورد',
+  `g95` varchar(190) DEFAULT NULL COMMENT 'عقد إطاري مرجعي',
+  `g96` varchar(190) DEFAULT NULL COMMENT 'عدد البنود تفصيلها ش07-2',
+  `g97` varchar(190) DEFAULT NULL COMMENT 'القيمة الإجمالية',
+  `g98` varchar(190) DEFAULT NULL COMMENT 'العملة',
+  `g99` varchar(190) DEFAULT NULL COMMENT 'وقت الدفع',
+  `g100` varchar(190) DEFAULT NULL COMMENT 'نوع الاستلام',
+  `g101` varchar(190) DEFAULT NULL COMMENT 'مكان التسليم',
+  `g102` varchar(190) DEFAULT NULL COMMENT 'تاريخ التوريد المتفق',
+  `g103` varchar(190) DEFAULT NULL COMMENT 'غرامة التأخير',
+  `g104` varchar(190) DEFAULT NULL COMMENT 'حالة الأمر',
+  `g105` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g106` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g107` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `g108` varchar(190) DEFAULT NULL COMMENT 'المعتمد',
+  `g109` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `g110` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g111` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_d3960121_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='PRC-11 - أوامر الشراء';
+
+-- ── Table: prc_package_lines ──
+CREATE TABLE `prc_package_lines` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g157` varchar(190) DEFAULT NULL COMMENT 'معرف العضوية',
+  `g158` varchar(190) DEFAULT NULL COMMENT 'معرف الحزمة',
+  `g159` varchar(190) DEFAULT NULL COMMENT 'رقم طلب الشراء',
+  `g160` varchar(190) DEFAULT NULL COMMENT 'بنود الطلب المشمولة',
+  `g161` varchar(190) DEFAULT NULL COMMENT 'تاريخ الضم',
+  `g162` varchar(190) DEFAULT NULL COMMENT 'حالة العضوية',
+  `g163` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g164` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g165` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g166` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_7b730486_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='PRC-05 - تجميع الطلبات وخطة الشراء';
+
+-- ── Table: prc_proc_award_minutes ──
+CREATE TABLE `prc_proc_award_minutes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g36` varchar(190) DEFAULT NULL COMMENT 'رقم المحضر',
+  `g37` varchar(190) DEFAULT NULL COMMENT 'رقم طلب العروض',
+  `g38` varchar(190) DEFAULT NULL COMMENT 'العروض المقارنة',
+  `g39` varchar(190) DEFAULT NULL COMMENT 'جدول المقارنة',
+  `g40` varchar(190) DEFAULT NULL COMMENT 'العرض المرسى عليه',
+  `g41` varchar(190) DEFAULT NULL COMMENT 'قيمة الترسية',
+  `g42` varchar(190) DEFAULT NULL COMMENT 'مبرر الاختيار',
+  `g43` varchar(190) DEFAULT NULL COMMENT 'تفصيل المبرر',
+  `g44` varchar(190) DEFAULT NULL COMMENT 'أعضاء اللجنة',
+  `g45` varchar(190) DEFAULT NULL COMMENT 'حالة الترسية',
+  `g46` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g47` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g48` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `g49` varchar(190) DEFAULT NULL COMMENT 'المعتمد',
+  `g50` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `g51` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g52` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_822112ff_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='PRC-10 - محضر المقارنة والترسية';
+
+-- ── Table: prc_proc_delivery_track ──
+CREATE TABLE `prc_proc_delivery_track` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g77` varchar(190) DEFAULT NULL COMMENT 'معرف السطر',
+  `g78` varchar(190) DEFAULT NULL COMMENT 'رقم الأمر',
+  `g79` varchar(190) DEFAULT NULL COMMENT 'نوع الحدث',
+  `g80` varchar(190) DEFAULT NULL COMMENT 'تاريخ الحدث',
+  `g81` varchar(190) DEFAULT NULL COMMENT 'الكمية المشمولة',
+  `g82` varchar(190) DEFAULT NULL COMMENT 'رقم سند الإدخال',
+  `g83` varchar(190) DEFAULT NULL COMMENT 'نتيجة الفحص',
+  `g84` varchar(190) DEFAULT NULL COMMENT 'أيام التأخير',
+  `g85` varchar(190) DEFAULT NULL COMMENT 'إخطار المورد',
+  `g86` varchar(190) DEFAULT NULL COMMENT 'حالة السطر',
+  `g87` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g88` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g89` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g90` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_0c02b020_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='PRC-14 - متابعة التوريد والاستلام';
+
+-- ── Table: prc_proc_offers ──
+CREATE TABLE `prc_proc_offers` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g18` varchar(190) DEFAULT NULL COMMENT 'معرف العرض',
+  `g19` varchar(190) DEFAULT NULL COMMENT 'رقم طلب العروض',
+  `g20` varchar(190) DEFAULT NULL COMMENT 'رقم المورد',
+  `g21` varchar(190) DEFAULT NULL COMMENT 'اسم المورد',
+  `g22` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاستلام',
+  `g23` varchar(190) DEFAULT NULL COMMENT 'قيمة العرض',
+  `g24` varchar(190) DEFAULT NULL COMMENT 'العملة',
+  `g25` varchar(190) DEFAULT NULL COMMENT 'مدة التوريد',
+  `g26` varchar(190) DEFAULT NULL COMMENT 'شروط الدفع المعروضة',
+  `g27` varchar(190) DEFAULT NULL COMMENT 'صلاحية العرض',
+  `g28` varchar(190) DEFAULT NULL COMMENT 'التقييم الفني',
+  `g29` varchar(190) DEFAULT NULL COMMENT 'ملاحظات الفحص',
+  `g30` varchar(190) DEFAULT NULL COMMENT 'الترتيب المالي',
+  `g31` varchar(190) DEFAULT NULL COMMENT 'حالة العرض',
+  `g32` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g33` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g34` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g35` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_4c0cbc81_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='PRC-08 - عروض الموردين المستلمة';
+
+-- ── Table: prc_proc_packages ──
+CREATE TABLE `prc_proc_packages` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g64` varchar(190) DEFAULT NULL COMMENT 'معرف الحزمة',
+  `g65` varchar(190) DEFAULT NULL COMMENT 'فترة التجميع',
+  `g66` varchar(190) DEFAULT NULL COMMENT 'نطاق الحزمة',
+  `g67` varchar(190) DEFAULT NULL COMMENT 'الطلبات المضمومة',
+  `g68` varchar(190) DEFAULT NULL COMMENT 'عدد البنود',
+  `g69` varchar(190) DEFAULT NULL COMMENT 'التقدير الإجمالي',
+  `g70` varchar(190) DEFAULT NULL COMMENT 'مبرر التمرير المنفرد',
+  `g71` varchar(190) DEFAULT NULL COMMENT 'قناة الشراء',
+  `g72` varchar(190) DEFAULT NULL COMMENT 'حالة الحزمة',
+  `g73` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g74` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g75` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g76` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_9bc3cc52_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='PRC-04 - تجميع الطلبات وخطة الشراء';
+
+-- ── Table: prc_proc_po_amendments ──
+CREATE TABLE `prc_proc_po_amendments` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g1` varchar(190) DEFAULT NULL COMMENT 'معرف السطر',
+  `g2` varchar(190) DEFAULT NULL COMMENT 'النوع',
+  `g3` varchar(190) DEFAULT NULL COMMENT 'رقم الأمر/الطلب',
+  `g4` varchar(190) DEFAULT NULL COMMENT 'المبرر',
+  `g5` varchar(190) DEFAULT NULL COMMENT 'قاعدة AAM المفعلة',
+  `g6` varchar(190) DEFAULT NULL COMMENT 'مسار الموافقة',
+  `g7` varchar(190) DEFAULT NULL COMMENT 'قرار الاعتماد',
+  `g8` varchar(190) DEFAULT NULL COMMENT 'الأثر المالي',
+  `g9` varchar(190) DEFAULT NULL COMMENT 'بنود متأثرة',
+  `g10` varchar(190) DEFAULT NULL COMMENT 'حالة السطر',
+  `g11` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g12` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g13` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `g14` varchar(190) DEFAULT NULL COMMENT 'المعتمد',
+  `g15` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `g16` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g17` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_5b30ae1f_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='PRC-13 - استثناءات الشراء وتعديلات الأوامر';
+
+-- ── Table: prc_proc_rfq ──
+CREATE TABLE `prc_proc_rfq` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g112` varchar(190) DEFAULT NULL COMMENT 'معرف الدعوة',
+  `g113` varchar(190) DEFAULT NULL COMMENT 'معرف RFQ',
+  `g114` varchar(190) DEFAULT NULL COMMENT 'رقم المورد',
+  `g115` varchar(190) DEFAULT NULL COMMENT 'تاريخ الدعوة',
+  `g116` varchar(190) DEFAULT NULL COMMENT 'تأكيد الاستلام',
+  `g117` varchar(190) DEFAULT NULL COMMENT 'الاستجابة',
+  `g118` varchar(190) DEFAULT NULL COMMENT 'مرجع العرض الوارد',
+  `g119` varchar(190) DEFAULT NULL COMMENT 'حالة الدعوة',
+  `g120` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g121` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g122` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g123` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_73ce9f60_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='PRC-07 - دعوات الموردين للعروض';
+
+-- ── Table: prc_proc_supplier_eval ──
+CREATE TABLE `prc_proc_supplier_eval` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g53` varchar(190) DEFAULT NULL COMMENT 'معرف السطر',
+  `g54` varchar(190) DEFAULT NULL COMMENT 'الفترة',
+  `g55` varchar(190) DEFAULT NULL COMMENT 'رقم المورد',
+  `g56` varchar(190) DEFAULT NULL COMMENT 'عدد الأوامر',
+  `g57` varchar(190) DEFAULT NULL COMMENT 'قيمتها',
+  `g58` varchar(190) DEFAULT NULL COMMENT 'الالتزام بالمواعيد',
+  `g59` varchar(190) DEFAULT NULL COMMENT 'متوسط التأخير',
+  `g60` varchar(190) DEFAULT NULL COMMENT 'نسبة رفض الفحص',
+  `g61` varchar(190) DEFAULT NULL COMMENT 'فروق المطابقة',
+  `g62` varchar(190) DEFAULT NULL COMMENT 'المؤشر المركب',
+  `g63` varchar(190) DEFAULT NULL COMMENT 'التصنيف الناتج',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_46381e7f_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='PRC-16 - تقييم أداء التوريد';
+
+-- ── Table: prc_requests ──
+CREATE TABLE `prc_requests` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g138` varchar(190) DEFAULT NULL COMMENT 'رقم الطلب',
+  `g139` varchar(190) DEFAULT NULL COMMENT 'تاريخ الطلب',
+  `g140` varchar(190) DEFAULT NULL COMMENT 'الجهة الطالبة',
+  `g141` varchar(190) DEFAULT NULL COMMENT 'مصدر الاحتياج',
+  `g142` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `g143` varchar(190) DEFAULT NULL COMMENT 'التصنيف التشغيلي',
+  `g144` varchar(190) DEFAULT NULL COMMENT 'الأولوية',
+  `g145` varchar(190) DEFAULT NULL COMMENT 'المشروع المحمل',
+  `g146` varchar(190) DEFAULT NULL COMMENT 'مركز التكلفة',
+  `g147` varchar(190) DEFAULT NULL COMMENT 'عدد البنود تفصيلها ش02-2',
+  `g148` varchar(190) DEFAULT NULL COMMENT 'التاريخ المطلوب',
+  `g149` varchar(190) DEFAULT NULL COMMENT 'التقدير المبدئي',
+  `g150` varchar(190) DEFAULT NULL COMMENT 'حالة الطلب',
+  `g151` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g152` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g153` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `g154` varchar(190) DEFAULT NULL COMMENT 'المعتمد',
+  `g155` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `g156` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_a10386e7_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='PRC-02 - لا سطر مسجل بعد في طلبات الشراء';
+
 -- ── Table: pricelists ──
 CREATE TABLE `pricelists` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -16195,6 +16499,25 @@ CREATE TABLE `proc_order` (
   `award_minute_id` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'محضر الترسية - امر بلا سند تنافسي يعلن',
   `direct_reason` varchar(500) NOT NULL DEFAULT '' COMMENT 'سبب الشراء المباشر - الزامي بلا محضر',
   `amend_count` int(11) NOT NULL DEFAULT 0 COMMENT 'مشتق من proc_po_amendment',
+  `g173` varchar(190) DEFAULT NULL COMMENT 'رقم المطابقة',
+  `g174` varchar(190) DEFAULT NULL COMMENT 'رقم المورد',
+  `g175` varchar(190) DEFAULT NULL COMMENT 'رقم الأمر',
+  `g176` varchar(190) DEFAULT NULL COMMENT 'سندات الإدخال',
+  `g177` varchar(190) DEFAULT NULL COMMENT 'قيمة الأمر',
+  `g178` varchar(190) DEFAULT NULL COMMENT 'قيمة المستلم',
+  `g179` varchar(190) DEFAULT NULL COMMENT 'تصنيف الفرق',
+  `g180` varchar(190) DEFAULT NULL COMMENT 'قيمة الفرق',
+  `g181` varchar(190) DEFAULT NULL COMMENT 'تفسير الفرق',
+  `g182` varchar(190) DEFAULT NULL COMMENT 'نتيجة المطابقة',
+  `g183` varchar(190) DEFAULT NULL COMMENT 'الإحالة للمالية',
+  `g184` varchar(190) DEFAULT NULL COMMENT 'حالة المطابقة',
+  `g185` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g186` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g187` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `g188` varchar(190) DEFAULT NULL COMMENT 'المعتمد',
+  `g189` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `g190` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g191` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
   PRIMARY KEY (`id`),
   KEY `idx_proc_order_company_state` (`company_id`,`state`),
   KEY `idx_proc_order_deleted` (`is_deleted`),

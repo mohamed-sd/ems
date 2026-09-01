@@ -10,6 +10,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/proc_helpers.php';
 
@@ -102,7 +103,28 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array();
     $header_actions[] = array('id' => 'toggleStats', 'class' => 'btn', 'title' => 'إظهار أو إخفاء التفاصيل', 'icon' => 'fas fa-eye', 'label' => 'إظهار التفاصيل', 'label_class' => 'proc-toggle-stats-text');
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
-    include('../includes/page_header.php');
+    include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_prc_dashboard_kpi
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف المؤشر' => 'g167',
+            'المؤشر KPI Catalog' => 'g168',
+            'القيمة' => 'g169',
+            'الوحدة' => 'g170',
+            'الحالة' => 'g171',
+            'آخر تحديث' => 'g172',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('prc_dashboard_kpi');
+        echo ems_w14_grid('emsList_prc_dashboard_kpi', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في لوحة المشتريات'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     echo ems_states_bundle('لا قطع حرجة مسجلة بعد',
         'حدد الصنف «قطعة حرجة» من شاشة الأصناف ليظهر هنا بحده الأدنى ومدة توريده');

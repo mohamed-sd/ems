@@ -19,6 +19,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 
 /* ── RPR-W02 §٤-٤ · CS-01 · RF-02 — الحارسُ فوقَ المعالجِ لا تحتَه ──────────
@@ -260,7 +261,43 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_icon  = 'fa fa-scale-balanced';
     $header_actions = array();
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
-    include('../includes/page_header.php');
+    include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_proc_order
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم المطابقة' => 'g173',
+            'رقم فاتورة المورد' => 'invoice_no',
+            'رقم المورد' => 'g174',
+            'رقم الأمر' => 'g175',
+            'سندات الإدخال' => 'g176',
+            'قيمة الفاتورة' => 'invoice_amount',
+            'قيمة الأمر' => 'g177',
+            'قيمة المستلم' => 'g178',
+            'تصنيف الفرق' => 'g179',
+            'قيمة الفرق' => 'g180',
+            'تفسير الفرق' => 'g181',
+            'نتيجة المطابقة' => 'g182',
+            'الإحالة للمالية' => 'g183',
+            'حالة المطابقة' => 'g184',
+            'المنشئ' => 'g185',
+            'تاريخ الإنشاء' => 'g186',
+            'المراجع' => 'g187',
+            'المعتمد' => 'g188',
+            'تاريخ الاعتماد' => 'g189',
+            'حالة البيانات' => 'g190',
+            'مرجع المصدر' => 'g191',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('proc_order');
+        echo ems_w14_grid('emsList_proc_order', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في مطابقة الفاتورة الثلاثية'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
     /* الدورةُ المستندية (بوابة ١٢): الخطوةُ التاليةُ بعد الاستلام — المطابقةُ ثم حسمُ الفرقِ إن ظهر */
     echo ems_next_step('تسجيل فاتورة المورد ومطابقتها — وحسم الفرق إن ظهر');
     /* حزمةُ الحالاتِ الدنيا (بوابة ٩): تحميلٌ وفراغٌ وخطأٌ — مخفيةٌ افتراضًا */

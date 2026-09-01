@@ -11,6 +11,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 require_once __DIR__ . '/../includes/ladder_gate.php';
 include '../includes/permissions_helper.php';
 
@@ -342,7 +343,41 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
         $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'طلب جديد');
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
-    include('../includes/page_header.php');
+    include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_prc_requests
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم الطلب' => 'g138',
+            'تاريخ الطلب' => 'g139',
+            'الجهة الطالبة' => 'g140',
+            'مصدر الاحتياج' => 'g141',
+            'مرجع المصدر' => 'g142',
+            'التصنيف التشغيلي' => 'g143',
+            'الأولوية' => 'g144',
+            'المشروع المحمل' => 'g145',
+            'مركز التكلفة' => 'g146',
+            'عدد البنود تفصيلها ش02-2' => 'g147',
+            'التاريخ المطلوب' => 'g148',
+            'التقدير المبدئي' => 'g149',
+            'حالة الطلب' => 'g150',
+            'المنشئ' => 'g151',
+            'تاريخ الإنشاء' => 'g152',
+            'المراجع' => 'g153',
+            'المعتمد' => 'g154',
+            'تاريخ الاعتماد' => 'g155',
+            'حالة البيانات' => 'g156',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('prc_requests');
+        echo ems_w14_grid('emsList_prc_requests', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في طلبات الشراء'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     echo ems_states_bundle('لا طلبات شراء مطابقة للفلاتر الحالية',
         'أضف طلبا جديدا من رأس الشاشة، أو ولد الاحتياج آليا من الصيانة وحدود إعادة الطلب');

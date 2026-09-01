@@ -17,6 +17,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w7_codes.php';
 
@@ -60,6 +61,38 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'استثناءات الشراء وتعديلات الأوامر'; $header_icon = 'fa fa-pen-to-square'; $header_actions = array();
     $header_back = array('href' => 'orders_proc.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'أوامر الشراء');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_prc_proc_po_amendments
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف السطر' => 'g1',
+            'النوع' => 'g2',
+            'رقم الأمر/الطلب' => 'g3',
+            'المبرر' => 'g4',
+            'قاعدة AAM المفعلة' => 'g5',
+            'مسار الموافقة' => 'g6',
+            'قرار الاعتماد' => 'g7',
+            'الأثر المالي' => 'g8',
+            'بنود متأثرة' => 'g9',
+            'حالة السطر' => 'g10',
+            'المنشئ' => 'g11',
+            'تاريخ الإنشاء' => 'g12',
+            'المراجع' => 'g13',
+            'المعتمد' => 'g14',
+            'تاريخ الاعتماد' => 'g15',
+            'حالة البيانات' => 'g16',
+            'مرجع المصدر' => 'g17',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('prc_proc_po_amendments');
+        echo ems_w14_grid('emsList_prc_proc_po_amendments', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في استثناءات الشراء وتعديلات الأوامر'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
 
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">تعديلات مسجلة</div></div>

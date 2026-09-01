@@ -17,6 +17,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w7_codes.php';
 
@@ -55,6 +56,32 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'تقييم أداء التوريد'; $header_icon = 'fa fa-ranking-star'; $header_actions = array();
     $header_back = array('href' => 'suppliers_proc.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'الموردون');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_prc_proc_supplier_eval
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف السطر' => 'g53',
+            'الفترة' => 'g54',
+            'رقم المورد' => 'g55',
+            'عدد الأوامر' => 'g56',
+            'قيمتها' => 'g57',
+            'الالتزام بالمواعيد' => 'g58',
+            'متوسط التأخير' => 'g59',
+            'نسبة رفض الفحص' => 'g60',
+            'فروق المطابقة' => 'g61',
+            'المؤشر المركب' => 'g62',
+            'التصنيف الناتج' => 'g63',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('prc_proc_supplier_eval');
+        echo ems_w14_grid('emsList_prc_proc_supplier_eval', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في تقييم أداء التوريد'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
 
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">أسطر تقييم</div></div>
