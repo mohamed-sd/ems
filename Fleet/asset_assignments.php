@@ -16,6 +16,7 @@ session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
+require_once __DIR__ . '/../includes/guide_label.php';
 require_once __DIR__ . '/../app/Services/Fleet/AssetLifecycleService.php';
 
 use App\Services\Fleet\AssetLifecycleService as ALS;
@@ -104,44 +105,113 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_asset_assignments')); ?>
+    <?php
+    /* ◆ **أعمدةُ الورقةِ حرفًا** (GOV_EXEC §12 · الهدف `FLEET-12` «التخصيص على
+         الوحدات»): الاسمُ ⇒ العمود في مصفوفةٍ واحدةٍ يقرؤها الرأسُ والخليّةُ معًا.
+       ◆ و«__»-البادئةُ قيمةٌ مُشتقّةٌ في الشاشةِ لا عمودٌ في الجدول. */
+    $GUIDE_COLS = array(
+        'رقم التخصيص' => 'assign_code',
+        'كود الأصل' => '__equip',
+        'مفتاح الوحدة' => 'unit_key',
+        'كود عقد العميل' => 'client_contract_ref',
+        'رقم العميل' => 'client_no',
+        'رقم المشروع' => '__project',
+        'نموذج العمل' => 'business_model',
+        'رقم الآلية في عقد العميل' => 'machine_no_contract',
+        'كود المعدة بالمشروع' => 'project_asset_code',
+        'صفة التخصيص' => 'assign_kind',
+        'مرجع التفعيل' => 'activation_ref',
+        'تاريخ بداية التخصيص' => 'valid_from',
+        'تاريخ نهاية التخصيص' => 'valid_to',
+        'سبب الإنهاء' => 'end_reason',
+        'الأصل البديل' => 'substitute_asset',
+        'مهلة الإحلال (يوم)' => 'replace_sla_days',
+        'أيام التوقف بين الأصلين' => 'gap_days',
+        'الساعات المنفذة' => 'executed_hours',
+        'المراجع' => 'reviewer',
+        'تاريخ الاعتماد' => 'approved_at',
+        'أساس السجل' => 'record_basis',
+        'مرجع المصدر' => 'src_ref',
+        'حالة البيانات' => 'data_state',
+        'الموقع' => '__site',
+        'الحالة' => 'state',
+        'مرجع القرار' => 'decision_ref',
+    );
+    ?>
     <table id="emsList_asset_assignments" class="data-table">
-        <thead><tr><th>إجراءات</th><th>الأصل</th><th>النوع</th><th>الموقع</th><th>المشروع</th>
-            <th>من</th><th>إلى</th><th>الحالة</th><th>سبب الإنهاء</th><th>مرجع القرار</th></tr></thead>
+        <thead><tr><th>إجراءات</th>
+            <?php foreach ($GUIDE_COLS as $__lbl => $__k): ?><th><?= htmlspecialchars(ems_guide_label($__lbl), ENT_QUOTES, 'UTF-8') ?></th><?php endforeach; ?>
+        </tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>
             <tr>
                 <td><div class="action-btns"><span class="action-btn" title="<?= htmlspecialchars((string) $r['state']) ?>"><i class="fas <?= $r['state'] === 'active' ? 'fa-circle-play' : 'fa-circle-stop' ?>"></i></span></div></td>
-                <td><?= htmlspecialchars(isset($equip[(int) $r['equipment_id']]) ? $equip[(int) $r['equipment_id']] : ('#' . (int) $r['equipment_id'])) ?></td>
-                <td><?= htmlspecialchars((string) $r['assign_kind']) ?></td>
-                <td><?= htmlspecialchars(isset($sites[(int) $r['site_id']]) ? $sites[(int) $r['site_id']] : '—') ?></td>
-                <td><?= htmlspecialchars(isset($projects[(int) $r['project_id']]) ? $projects[(int) $r['project_id']] : '—') ?></td>
-                <td><?= htmlspecialchars((string) $r['valid_from']) ?></td>
-                <td><?= htmlspecialchars((string) ($r['valid_to'] ?? '—')) ?></td>
-                <td><?= htmlspecialchars((string) $r['state']) ?></td>
-                <td><?= htmlspecialchars((string) $r['end_reason']) ?></td>
-                <td><?= htmlspecialchars((string) $r['decision_ref']) ?></td>
+                <?php foreach ($GUIDE_COLS as $__lbl => $__k):
+                    if ($__k === '__equip')        { $__v = isset($equip[(int) $r['equipment_id']]) ? $equip[(int) $r['equipment_id']] : ('#' . (int) $r['equipment_id']); }
+                    elseif ($__k === '__site')     { $__v = isset($sites[(int) $r['site_id']]) ? $sites[(int) $r['site_id']] : ''; }
+                    elseif ($__k === '__project')  { $__v = isset($projects[(int) $r['project_id']]) ? $projects[(int) $r['project_id']] : ''; }
+                    else                           { $__v = isset($r[$__k]) ? (string) $r[$__k] : ''; }
+                    if (trim((string) $__v) === '') { $__v = '—'; } ?>
+                <td<?= $__v === '—' ? ' class="ems-gov-empty"' : '' ?>><?= htmlspecialchars((string) $__v, ENT_QUOTES, 'UTF-8') ?></td>
+                <?php endforeach; ?>
             </tr>
         <?php endforeach; else: ?>
-            <tr><td colspan="10">لا إسنادات أصول بعد.</td></tr>
+            <tr><td colspan="<?= count($GUIDE_COLS) + 1 ?>">لا إسنادات أصول بعد.</td></tr>
         <?php endif; ?>
         </tbody></table></div>
 
     <div class="card-header"><h5><i class="fas fa-clock-rotate-left"></i> سجل حركة الأصول الحي — قراءة لا كتابة</h5></div>
+    <?php
+    /* ◆ الهدفُ الثاني لهذا السطح — `FLEET-13` «حركة الموقع والمشروع»: حبّتُه
+         **واقعةٌ لحظيّةٌ** لا مدّةٌ مفتوحةٌ كالتخصيص، فجدولُه سجلُّ الوقائع. */
+    $GUIDE_COLS_MOVE = array(
+        'رقم الحركة' => 'move_code',
+        'كود الأصل' => '__equip',
+        'تسلسل الحركة' => 'move_seq',
+        'تاريخ الحركة' => 'event_date',
+        'من موقع' => 'from_site',
+        'من مشروع' => 'from_project',
+        'من وحدة تعاقدية' => 'from_unit',
+        'إلى موقع' => 'to_site',
+        'إلى مشروع' => 'to_project',
+        'إلى وحدة تعاقدية' => 'to_unit',
+        'سبب الحركة' => 'move_reason',
+        'قراءة العداد عند المغادرة' => 'meter_at_depart',
+        'قراءة العداد عند الوصول' => 'meter_at_arrive',
+        'مرجع طلب الترحيل' => 'transfer_request_ref',
+        'مرجع أمر الترحيل' => 'transfer_order_ref',
+        'مرجع فحص ما قبل الحركة' => 'pre_move_check_ref',
+        'مرجع فحص ما بعد الحركة' => 'post_move_check_ref',
+        'أضرار أثناء النقل' => 'transit_damage',
+        'أيام خارج الخدمة' => 'out_of_service_days',
+        'المراجع' => 'reviewer',
+        'تاريخ الاعتماد' => 'approved_at',
+        'أساس السجل' => 'record_basis',
+        'مرجع المصدر' => 'src_ref',
+        'حالة البيانات' => 'data_state',
+        'نوع الواقعة' => 'event_type',
+        'ساعات العمل' => 'work_hours',
+        'ساعات التوقف' => 'down_hours',
+        'ملاحظة' => 'note',
+    );
+    ?>
     <div class="table-wrap"><table class="data-table">
-        <thead><tr><th>#</th><th>الأصل</th><th>التاريخ</th><th>نوع الواقعة</th><th>من</th><th>إلى</th><th>ساعات العمل</th><th>ساعات التوقف</th><th>ملاحظة</th></tr></thead>
+        <thead><tr><th>#</th>
+            <?php foreach ($GUIDE_COLS_MOVE as $__lbl => $__k): ?><th><?= htmlspecialchars(ems_guide_label($__lbl), ENT_QUOTES, 'UTF-8') ?></th><?php endforeach; ?>
+        </tr></thead>
         <tbody>
         <?php if ($hist): $n = 0; foreach ($hist as $h): $n++; ?>
             <tr><td><?= $n ?></td>
-                <td><?= htmlspecialchars(isset($equip[(int) $h['equipment_id']]) ? $equip[(int) $h['equipment_id']] : ('#' . (int) $h['equipment_id'])) ?></td>
-                <td><?= htmlspecialchars((string) $h['event_date']) ?></td>
-                <td><?= htmlspecialchars((string) $h['event_type']) ?></td>
-                <td><?= htmlspecialchars((string) ($h['from_value'] ?? '—')) ?></td>
-                <td><?= htmlspecialchars((string) ($h['to_value'] ?? '—')) ?></td>
-                <td><?= htmlspecialchars((string) ($h['work_hours'] ?? '0')) ?></td>
-                <td><?= htmlspecialchars((string) ($h['down_hours'] ?? '0')) ?></td>
-                <td><?= htmlspecialchars((string) ($h['note'] ?? '')) ?></td></tr>
+                <?php foreach ($GUIDE_COLS_MOVE as $__lbl => $__k):
+                    $__v = ($__k === '__equip')
+                         ? (isset($equip[(int) $h['equipment_id']]) ? $equip[(int) $h['equipment_id']] : ('#' . (int) $h['equipment_id']))
+                         : (isset($h[$__k]) ? (string) $h[$__k] : '');
+                    if (trim((string) $__v) === '') { $__v = '—'; } ?>
+                <td<?= $__v === '—' ? ' class="ems-gov-empty"' : '' ?>><?= htmlspecialchars((string) $__v, ENT_QUOTES, 'UTF-8') ?></td>
+                <?php endforeach; ?>
+            </tr>
         <?php endforeach; else: ?>
-            <tr><td colspan="9">لا وقائع حركة مسجلة.</td></tr>
+            <tr><td colspan="<?= count($GUIDE_COLS_MOVE) + 1 ?>">لا وقائع حركة مسجلة.</td></tr>
         <?php endif; ?>
         </tbody></table></div>
 </div>

@@ -186,6 +186,29 @@ function fm_u13_action_fields($src)
     }
     return $out;
 }
+/* **F8 · خريطةُ `$GUIDE_COLS` المصرَّحةُ في ملفِّ السطح** — اسمُ الحقلِ العربيُّ
+   ⇒ مفتاحُ العمود، في مصفوفةٍ واحدةٍ يقرؤها الرأسُ والخليّةُ معًا.
+   ◆ **العطبُ الذي ترفعه**: شاشةٌ تطبع رؤوسَها بحلقةٍ فوقَ خريطةٍ (وهو الصوابُ
+     هندسيًّا: الرأسُ والخليّةُ لا يتفرّقان) **لا يراها F2** لأنَّ `<th>` صارت
+     تعبيرَ PHP لا نصًّا. قِيس حيًّا: سطحٌ يعرض ثلاثةً وأربعين اسمًا في الصفحةِ
+     المُصيَّرةِ (28/28 و15/15 بفحصٍ عبرَ الشبكة) ونزل مقيسُه **واحدًا**.
+   ⛔ **والاسمُ مقيَّدٌ عمدًا** بـ`$GUIDE_COLS` وحدَه — لا أيِّ مصفوفةٍ بمفاتيحَ
+     عربيّة: فالمصرَّحُ باسمٍ معلومٍ عقدٌ، وما دونه تخمينٌ يفتح بابَ الإيجابِ الكاذب.
+   ◆ وهو رافدٌ من جنسِ `F5` حرفًا: تصريحٌ في ملفِّ السطحِ نفسِه لا في مداه. */
+function fm_guide_cols($src)
+{
+    $out = array();
+    /* ◆ **والسطحُ قد يخدم هدفَين فيحمل خريطتَين** (§24: `Screens ≠ Placements`)
+         — فتُقرأ كلُّ مصفوفةٍ اسمُها يبدأ بـ`$GUIDE_COLS` (‏`$GUIDE_COLS_MOVE`…)،
+         **ولا تُقرأ مصفوفةٌ أخرى** مهما كانت مفاتيحُها عربيّة. */
+    if (!preg_match_all('~\$GUIDE_COLS[A-Z0-9_]*\s*=\s*array\s*\((.*?)\n\s*\);~s', $src, $m)) { return $out; }
+    foreach ($m[1] as $blk) {
+        if (preg_match_all('~[\x27\x22]([^\x27\x22]*[\x{0600}-\x{06FF}][^\x27\x22]*)[\x27\x22]\s*=>~u', $blk, $mm)) {
+            foreach ($mm[1] as $v) { $v = trim($v); if ($v !== '') { $out[] = $v; } }
+        }
+    }
+    return $out;
+}
 /* **مسارٌ مُحوِّلٌ لا شاشة** — `route_redirect` يعني أنَّ الأثرَ ليس هنا */
 function fm_is_redirector($src)
 {
@@ -320,13 +343,13 @@ foreach ($fanin as $f => $n) { if ($n >= 2 && !isset($own[$f])) { $SHARED[$f] = 
 /* ═══ ⑦ القياسُ سطحًا سطحًا ══════════════════════════════════════════════ */
 $out = array(); $BYTYPE = array();
 $tot = array('des' => 0, 'audit' => 0, 'appl' => 0, 'hit' => 0,
-             'F1' => 0, 'F2' => 0, 'F3' => 0, 'F4' => 0, 'F5' => 0,
+             'F1' => 0, 'F2' => 0, 'F3' => 0, 'F4' => 0, 'F5' => 0, 'F8' => 0,
              'full' => 0, 'novocab' => 0, 'redir' => 0, 'u13' => 0);
 foreach ($bridge as $b) {
     $sc = $b['screen_id'];
     $p  = isset($PATH[$sc]) ? $PATH[$sc] : '';
     $bagStr = array(); $bagTok = array(); $vocab = 0; $files = array();
-    $slug = ''; $redir = false; $nGfc = 0; $nAct = 0; $kitFallback = 0;
+    $slug = ''; $redir = false; $nGfc = 0; $nAct = 0; $nGc = 0; $kitFallback = 0;
     /* **الرافدُ الخاصُّ أوّلًا**: عقدُ السطحِ نفسِه — سبيكتُه وحقولُ أفعالِه.
        ⛔ ويُقرأ من **ملفِّ السطحِ وحدَه** لا من مداه، فالعقدُ خاصٌّ لا مشترك. */
     if ($p !== '') {
@@ -346,6 +369,7 @@ foreach ($bridge as $b) {
             }
         }
         foreach (fm_u13_action_fields($ownSrc) as $v) { $nAct++; $tot['F5']++; $addBag($v); }
+        foreach (fm_guide_cols($ownSrc) as $v) { $nGc++; $tot['F8']++; $addBag($v); }
     }
     if ($p !== '') {
         $rp = realpath($p);
@@ -452,8 +476,8 @@ echo "     التصميميُّ `repair01_fields.requirement_id` · المبني
 printf("     ⇒ **صفرُ سطحٍ مطابَقٍ بلا طرفَين** — والمقامُ %d سطحًا لا 44\n\n", count($out));
 echo "  ── مفرداتُ الأثرِ المنتزَعة ──\n";
 printf("     F1 `<label>` %5d · F2 `<th>` %5d · F3 `name=` %5d\n", $tot['F1'], $tot['F2'], $tot['F3']);
-printf("     F4 `gov_field_class` %5d (على %d سطحٍ مولَّدٍ بسبيكتِه المصرَّحة) · F5 حقولُ الفعل %4d\n",
-       $tot['F4'], $tot['u13'], $tot['F5']);
+printf("     F4 `gov_field_class` %5d (على %d سطحٍ مولَّدٍ بسبيكتِه المصرَّحة) · F5 حقولُ الفعل %4d · F8 خريطةُ \$GUIDE_COLS %4d\n",
+       $tot['F4'], $tot['u13'], $tot['F5'], $tot['F8']);
 printf("     عُدَدٌ مشتركةٌ أُقصيت %d ملفًّا · ومسارٌ مُحوِّلٌ لا شاشةَ فيه %d\n\n", count($SHARED), $tot['redir']);
 echo "  ── المطابقة ──\n";
 printf("     حقولٌ تصميميّةٌ على المطابَقين          %5d\n", $tot['des']);

@@ -19,6 +19,7 @@ session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
+require_once __DIR__ . '/../includes/guide_label.php';
 require_once __DIR__ . '/../app/Services/Fleet/AssetLifecycleService.php';
 
 use App\Services\Fleet\AssetLifecycleService as ALS;
@@ -131,10 +132,55 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_asset_intake')); ?>
+    <?php
+    /* ◆ **أعمدةُ الورقةِ حرفًا** (GOV_EXEC §12): السطحُ يخدم أربعةَ أهدافٍ بأربعِ
+         حبّاتٍ — الطلبُ (`FLEET-03`) والتحقّقُ (`FLEET-04`) وأمرُ التفتيشِ
+         (`FLEET-05`) والتفعيلُ (`FLEET-11`). وهذه رؤوسُ الطلبِ والتفعيلِ معًا،
+         فحبّتُهما واحدةٌ: سطرُ الإدخالِ يُفعَّل. */
+    $GUIDE_COLS = array(
+        'رقم الطلب' => 'intake_no',
+        'تاريخ الطلب' => 'request_date',
+        'الإدارة الطالبة' => 'requested_dept',
+        'طالب الإدخال' => 'requester_name',
+        'مصدر الاحتياج' => 'need_source',
+        'مرجع عقد العميل' => 'client_contract_ref',
+        'رقم المشروع' => 'project_no',
+        'كود مصدر القدرة' => 'power_source_code',
+        'رمز التصنيف المطلوب' => 'requested_class',
+        'المواصفة المطلوبة' => 'requested_spec',
+        'العدد المطلوب' => 'requested_count',
+        'تاريخ الحاجة' => 'need_date',
+        'المبرر التشغيلي' => 'operational_justification',
+        'الأثر إن لم يلب' => 'impact_if_unmet',
+        'حالة الطلب' => '__state',
+        'سبب الرفض' => 'reject_reason',
+        'كود الأصل الناتج' => '__asset',
+        'رقم التفعيل' => 'activation_code',
+        'نوع الواقعة' => 'activation_kind',
+        'مرجع الفحص' => 'inspection_ref',
+        'مرجع أمر الصيانة' => 'work_order_ref',
+        'تاريخ التفعيل' => 'activation_date',
+        'قراءة العداد' => 'activation_meter',
+        'الموقع' => 'activation_site',
+        'المشروع' => 'activation_project',
+        'الحالة قبل' => 'state_before',
+        'الحالة بعد' => 'state_after',
+        'دليل الجاهزية' => 'readiness_evidence',
+        'أيام التوقف قبل التفعيل' => 'down_days_before',
+        'المراجع' => 'reviewer',
+        'تاريخ الاعتماد' => 'approved_at',
+        'أساس السجل' => 'record_basis',
+        'مرجع المصدر' => 'source_ref',
+        'حالة البيانات' => 'data_state',
+        'قاعدة الحالة' => 'state_rule',
+        'المصدر' => '__source',
+        'وقائع التحقق' => '__checks',
+        'أوامر التفتيش' => '__orders',
+    );
+    ?>
     <table id="emsList_asset_intake" class="data-table">
-        <thead><tr>
-            <th>إجراءات</th><th>رقم الطلب</th><th>الحالة</th><th>قاعدة الحالة</th><th>الإدارة الطالبة</th>
-            <th>المصدر</th><th>وقائع التحقق</th><th>أوامر التفتيش</th><th>الأصل</th><th>سبب الرفض</th>
+        <thead><tr><th>إجراءات</th>
+            <?php foreach ($GUIDE_COLS as $__lbl => $__k): ?><th><?= htmlspecialchars(ems_guide_label($__lbl), ENT_QUOTES, 'UTF-8') ?></th><?php endforeach; ?>
         </tr></thead><tbody>
         <?php if ($rows): foreach ($rows as $r): $iid = (int) $r['id'];
             $ck = isset($checks[$iid]) ? $checks[$iid] : array();
@@ -156,18 +202,120 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </form>
                     <?php endif; ?>
                 </div></td>
-                <td><strong><?= htmlspecialchars((string) $r['intake_no']) ?></strong></td>
-                <td><?= htmlspecialchars(isset($STATES[$r['state']]) ? $STATES[$r['state']] : (string) $r['state']) ?></td>
-                <td><small><?= htmlspecialchars((string) $r['state_rule']) ?></small></td>
-                <td><?= htmlspecialchars((string) $r['requested_dept']) ?></td>
-                <td><?= htmlspecialchars(isset($SOURCES[$r['source_type']]) ? $SOURCES[$r['source_type']] : (string) $r['source_type']) ?></td>
-                <td><?= count($ck) ?> (مجتازة <?= $passed ?>)</td>
-                <td><?= count($od) ?></td>
-                <td><?= htmlspecialchars((int) $r['equipment_id'] > 0 && isset($equip[(int) $r['equipment_id']]) ? $equip[(int) $r['equipment_id']] : '—') ?></td>
-                <td><?= htmlspecialchars((string) $r['reject_reason']) ?></td>
+                <?php foreach ($GUIDE_COLS as $__lbl => $__k):
+                    if ($__k === '__state')       { $__v = isset($STATES[$r['state']]) ? $STATES[$r['state']] : (string) $r['state']; }
+                    elseif ($__k === '__source')  { $__v = isset($SOURCES[$r['source_type']]) ? $SOURCES[$r['source_type']] : (string) $r['source_type']; }
+                    elseif ($__k === '__checks')  { $__v = count($ck) . ' (مجتازة ' . $passed . ')'; }
+                    elseif ($__k === '__orders')  { $__v = (string) count($od); }
+                    elseif ($__k === '__asset')   { $__v = ((int) $r['equipment_id'] > 0 && isset($equip[(int) $r['equipment_id']])) ? $equip[(int) $r['equipment_id']] : ''; }
+                    else                          { $__v = isset($r[$__k]) ? (string) $r[$__k] : ''; }
+                    if (trim((string) $__v) === '') { $__v = '—'; } ?>
+                <td<?= $__v === '—' ? ' class="ems-gov-empty"' : '' ?>><?php
+                    echo ($__k === 'intake_no')
+                        ? '<strong>' . htmlspecialchars((string) $__v, ENT_QUOTES, 'UTF-8') . '</strong>'
+                        : htmlspecialchars((string) $__v, ENT_QUOTES, 'UTF-8'); ?></td>
+                <?php endforeach; ?>
             </tr>
         <?php endforeach; else: ?>
-            <tr><td colspan="10">لا طلبات إدخال بعد.</td></tr>
+            <tr><td colspan="<?= count($GUIDE_COLS) + 1 ?>">لا طلبات إدخال بعد.</td></tr>
+        <?php endif; ?>
+        </tbody></table></div>
+
+    <?php
+    /* ◆ الهدفان الآخران لهذا السطح — حبّتاهما مستقلّتان عن الطلب:
+         `FLEET-04` واقعةُ التحقّقِ من المصدرِ · `FLEET-05` أمرُ التفتيش.
+       ⛔ **ولا تُدمَجان في جدولِ الطلب**: للطلبِ الواحدِ وقائعُ تحقّقٍ عدّةٌ
+         وأوامرُ تفتيشٍ عدّة — والدمجُ يخلط الأبَ بالابن (§12 «1:N ⇒ Child»). */
+    $GUIDE_COLS_CHECK = array(
+        'رقم التحقق' => 'check_code',
+        'رقم الطلب' => '__intake',
+        'تاريخ التحقق' => 'verified_at',
+        'المتحقق' => 'verified_by',
+        'كود مصدر القدرة' => 'power_source_code',
+        'الطرف المورد' => 'supplying_party',
+        'طبيعة الطرف' => 'party_nature',
+        'أثبتت الملكية؟' => 'ownership_proven',
+        'مرجع إثبات الملكية' => 'ownership_proof_ref',
+        'المستندات المطلوبة' => 'docs_required',
+        'المستندات المستلمة' => 'docs_received',
+        'المستندات الناقصة' => 'docs_missing',
+        'نسبة اكتمال المستندات' => 'docs_complete_pct',
+        'الشاسيه مطابق للمستند؟' => 'chassis_matches',
+        'الشاسيه مكرر بالسجل؟' => 'chassis_duplicate',
+        'نتيجة التحقق' => 'verify_result',
+        'التحفظات' => 'reservations',
+        'مرجع الاستثناء' => 'exception_ref',
+        'المراجع' => 'reviewer',
+        'تاريخ الاعتماد' => 'approved_at',
+        'أساس السجل' => 'record_basis',
+        'مرجع المصدر' => 'src_ref',
+        'حالة البيانات' => 'data_state',
+    );
+    $GUIDE_COLS_ORDER = array(
+        'رقم أمر التفتيش' => 'order_no',
+        'كود الأصل' => '__equipo',
+        'نوع التفتيش' => 'inspection_type',
+        'سبب إصدار الأمر' => 'issue_reason',
+        'مرجع الواقعة المسببة' => 'cause_event_ref',
+        'مصدر الأمر' => 'issuer_name',
+        'تاريخ إصدار الأمر' => 'issue_date',
+        'الموعد المستهدف' => 'due_date',
+        'الجهة المنفذة' => 'executor_party',
+        'المفتش المكلف' => 'assigned_inspector',
+        'الموقع المستهدف' => 'target_site',
+        'المشروع' => 'project_ref',
+        'الأولوية' => 'priority',
+        'نطاق التفتيش المطلوب' => 'inspection_scope',
+        'حالة الأمر' => 'state',
+        'رقم بطاقة التفتيش' => 'card_no',
+        'تاريخ التنفيذ الفعلي' => 'actual_exec_date',
+        'التأخير عن الموعد (يوم)' => 'delay_days',
+        'سبب الإلغاء' => 'cancel_reason',
+        'المراجع' => 'reviewer',
+        'تاريخ المراجعة' => 'review_date',
+        'تاريخ الاعتماد' => 'approved_at',
+        'أساس السجل' => 'record_basis',
+        'مرجع المصدر' => 'src_ref',
+        'حالة البيانات' => 'data_state',
+    );
+    $__allChecks = array(); foreach ($checks as $__iid => $__l) { foreach ($__l as $__c) { $__c['__iid'] = $__iid; $__allChecks[] = $__c; } }
+    $__allOrders = array(); foreach ($orders as $__iid => $__l) { foreach ($__l as $__o) { $__allOrders[] = $__o; } }
+    ?>
+    <div class="card-header"><h5><i class="fas fa-file-shield"></i> وقائع التحقق من المصدر (حبة مستقلة عن الطلب)</h5></div>
+    <div class="table-wrap"><table class="data-table">
+        <thead><tr><th>#</th>
+            <?php foreach ($GUIDE_COLS_CHECK as $__lbl => $__k): ?><th><?= htmlspecialchars(ems_guide_label($__lbl), ENT_QUOTES, 'UTF-8') ?></th><?php endforeach; ?>
+        </tr></thead><tbody>
+        <?php if ($__allChecks): $__n = 0; foreach ($__allChecks as $__c): $__n++; ?>
+            <tr><td><?= $__n ?></td>
+                <?php foreach ($GUIDE_COLS_CHECK as $__lbl => $__k):
+                    $__v = ($__k === '__intake') ? ('#' . (int) $__c['__iid']) : (isset($__c[$__k]) ? (string) $__c[$__k] : '');
+                    if (trim((string) $__v) === '') { $__v = '—'; } ?>
+                <td<?= $__v === '—' ? ' class="ems-gov-empty"' : '' ?>><?= htmlspecialchars((string) $__v, ENT_QUOTES, 'UTF-8') ?></td>
+                <?php endforeach; ?>
+            </tr>
+        <?php endforeach; else: ?>
+            <tr><td colspan="<?= count($GUIDE_COLS_CHECK) + 1 ?>">لا وقائع تحقق بعد.</td></tr>
+        <?php endif; ?>
+        </tbody></table></div>
+
+    <div class="card-header"><h5><i class="fas fa-clipboard-check"></i> أوامر التفتيش (حبة مستقلة عن الطلب)</h5></div>
+    <div class="table-wrap"><table class="data-table">
+        <thead><tr><th>#</th>
+            <?php foreach ($GUIDE_COLS_ORDER as $__lbl => $__k): ?><th><?= htmlspecialchars(ems_guide_label($__lbl), ENT_QUOTES, 'UTF-8') ?></th><?php endforeach; ?>
+        </tr></thead><tbody>
+        <?php if ($__allOrders): $__n = 0; foreach ($__allOrders as $__o): $__n++; ?>
+            <tr><td><?= $__n ?></td>
+                <?php foreach ($GUIDE_COLS_ORDER as $__lbl => $__k):
+                    $__v = ($__k === '__equipo')
+                         ? ((isset($__o['equipment_id']) && isset($equip[(int) $__o['equipment_id']])) ? $equip[(int) $__o['equipment_id']] : '')
+                         : (isset($__o[$__k]) ? (string) $__o[$__k] : '');
+                    if (trim((string) $__v) === '') { $__v = '—'; } ?>
+                <td<?= $__v === '—' ? ' class="ems-gov-empty"' : '' ?>><?= htmlspecialchars((string) $__v, ENT_QUOTES, 'UTF-8') ?></td>
+                <?php endforeach; ?>
+            </tr>
+        <?php endforeach; else: ?>
+            <tr><td colspan="<?= count($GUIDE_COLS_ORDER) + 1 ?>">لا أوامر تفتيش بعد.</td></tr>
         <?php endif; ?>
         </tbody></table></div>
 

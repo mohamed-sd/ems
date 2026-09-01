@@ -15,6 +15,7 @@ session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
+require_once __DIR__ . '/../includes/guide_label.php';
 require_once __DIR__ . '/../app/Services/Fleet/AssetLifecycleService.php';
 
 use App\Services\Fleet\AssetLifecycleService as ALS;
@@ -102,9 +103,63 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_asset_exit')); ?>
+    <?php
+    /* ◆ **أعمدةُ الورقةِ حرفًا** (GOV_EXEC §12): السطحُ يخدم هدفَين على حبّةٍ
+         واحدةٍ مميَّزةٍ بنوعِ الخروج — `FLEET-21` المؤقّت و`FLEET-22` الدائم.
+         فالرؤوسُ اتحادُ حقلَيهما، والصفُّ يعرض ما يخصُّ نوعَه ويترك ما لا يخصُّه «—».
+       ◆ و«__»-البادئةُ قيمةٌ تُشتقُّ في الشاشةِ لا عمودٌ في الجدول. */
+    $GUIDE_COLS = array(
+        'رقم الخروج' => 'exit_code',
+        'كود الأصل' => '__equip',
+        'نوع الخروج' => '__kind',
+        'تاريخ الخروج' => 'exit_date',
+        'قراءة العداد' => 'meter_reading',
+        'الجهة التي سحبت' => 'withdrawing_party',
+        'المبرر' => 'justification',
+        'مرجع القرار أو الإخطار' => 'decision_notice_ref',
+        'المدة المتوقعة (يوم)' => 'expected_days',
+        'تاريخ العودة المتوقع' => 'expected_return',
+        'تاريخ العودة الفعلي' => 'actual_return',
+        'مرجع إعادة الخدمة' => 'return_service_ref',
+        'أيام الخروج الفعلية' => 'actual_out_days',
+        'الانحراف عن المتوقع' => 'deviation_days',
+        'الأثر على الوحدة التعاقدية' => 'contract_unit_effect',
+        'أبلغ العميل؟' => 'client_notified',
+        'الأصل البديل' => 'substitute_asset',
+        'حالة الخروج' => 'state',
+        'رقم الاستبعاد' => 'disposal_code',
+        'تاريخ قرار الاستبعاد' => 'disposal_decision_date',
+        'تاريخ الخروج الفعلي' => 'actual_exit_date',
+        'طريقة الاستبعاد' => 'disposal_kind',
+        'سبب الاستبعاد' => 'disposal_reason',
+        'مرجع الحالة الفنية' => 'technical_state_ref',
+        'المشتري أو المستلم' => 'buyer_receiver',
+        'علاقة المشتري' => 'buyer_relation',
+        'قراءة العداد النهائية' => 'final_meter',
+        'صافي الحصيلة' => 'net_proceeds',
+        'العملة' => 'currency_ref',
+        'التكلفة (مرجع)' => 'cost_ref',
+        'مجمع الإهلاك (مرجع)' => 'accum_depr_ref',
+        'القيمة الدفترية (مرجع)' => 'book_value_ref',
+        'المكسب أو الخسارة' => 'gain_loss',
+        'مرجع محضر البيع' => 'sale_minutes_ref',
+        'مرجع القيد المحاسبي' => 'journal_ref',
+        'مرجع نقل الملكية' => 'title_transfer_ref',
+        'موافقة الملاك' => 'owners_approval',
+        'أخليت الوحدة التعاقدية؟' => 'unit_vacated',
+        'المراجع' => 'reviewer',
+        'تاريخ الاعتماد' => 'approved_at',
+        'أساس السجل' => 'record_basis',
+        'مرجع المصدر' => 'src_ref',
+        'حالة البيانات' => 'data_state',
+        'السبب' => 'reason_code',
+        'المرجع المالي' => 'finance_ref',
+    );
+    ?>
     <table id="emsList_asset_exit" class="data-table">
-        <thead><tr><th>إجراءات</th><th>الأصل</th><th>النوع</th><th>السبب</th><th>تاريخ الخروج</th>
-            <th>العودة المتوقعة</th><th>العودة الفعلية</th><th>الحالة</th><th>المرجع المالي</th></tr></thead>
+        <thead><tr><th>إجراءات</th>
+            <?php foreach ($GUIDE_COLS as $__lbl => $__k): ?><th><?= htmlspecialchars(ems_guide_label($__lbl), ENT_QUOTES, 'UTF-8') ?></th><?php endforeach; ?>
+        </tr></thead>
         <tbody>
         <?php if ($rows): foreach ($rows as $r): ?>
             <tr>
@@ -113,17 +168,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <a href="javascript:void(0)" class="action-btn edit w5-return" data-id="<?= (int) $r['id'] ?>" title="تسجيل العودة"><i class="fas fa-rotate-left"></i></a>
                     <?php endif; ?>
                 </div></td>
-                <td><?= htmlspecialchars(isset($equip[(int) $r['equipment_id']]) ? $equip[(int) $r['equipment_id']] : ('#' . (int) $r['equipment_id'])) ?></td>
-                <td><?= $r['exit_kind'] === 'permanent' ? 'دائم' : 'مؤقت' ?></td>
-                <td><?= htmlspecialchars((string) $r['reason_code']) ?></td>
-                <td><?= htmlspecialchars((string) $r['exit_date']) ?></td>
-                <td><?= htmlspecialchars((string) ($r['expected_return'] ?? '—')) ?></td>
-                <td><?= htmlspecialchars((string) ($r['actual_return'] ?? '—')) ?></td>
-                <td><?= htmlspecialchars((string) $r['state']) ?></td>
-                <td><?= htmlspecialchars((string) $r['finance_ref']) ?></td>
+                <?php foreach ($GUIDE_COLS as $__lbl => $__k):
+                    if ($__k === '__equip')     { $__v = isset($equip[(int) $r['equipment_id']]) ? $equip[(int) $r['equipment_id']] : ('#' . (int) $r['equipment_id']); }
+                    elseif ($__k === '__kind')  { $__v = ($r['exit_kind'] === 'permanent') ? 'دائم' : 'مؤقت'; }
+                    else                        { $__v = isset($r[$__k]) ? (string) $r[$__k] : ''; }
+                    if (trim((string) $__v) === '') { $__v = '—'; } ?>
+                <td<?= $__v === '—' ? ' class="ems-gov-empty"' : '' ?>><?= htmlspecialchars((string) $__v, ENT_QUOTES, 'UTF-8') ?></td>
+                <?php endforeach; ?>
             </tr>
         <?php endforeach; else: ?>
-            <tr><td colspan="9">لا وقائع خروج بعد.</td></tr>
+            <tr><td colspan="<?= count($GUIDE_COLS) + 1 ?>">لا وقائع خروج بعد.</td></tr>
         <?php endif; ?>
         </tbody></table></div>
 
