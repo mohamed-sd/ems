@@ -85,6 +85,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         $D = array();
         $__gridRows = ems_w14_guide_rows('mnt_daily_care');
         echo ems_w14_grid('emsList_mnt_daily_care', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في العناية اليومية والتشحيم'); /* /GUIDE_COLS */ ?>
+    <?php /* ④ نموذجُ الإضافةِ — **مشتقٌّ من الدليلِ لا مكتوب** (SILENT_DROP_FIX §2·2-④)
+         حقولُه من `repair01_fields` وأعمدتُه من `$GUIDE_COLS` أعلاه،
+         ⛔ ولا اسمَ حقلٍ يُكتب هنا — والقابلُ للإدخالِ ثلاثةُ أصنافٍ لا غير. */
+    require_once __DIR__ . '/../includes/w14_guide_form.php';
+    ems_w14_guide_form(array(
+        'surfaces' => array('العنايه اليوميه والتشحيم', 'العناية اليومية والتشحيم'),
+        'table'    => 'mnt_daily_care',
+        'cols'     => $GUIDE_COLS,
+        'screen'   => 'Maintenance/daily_care.php',
+    )); ?>
+
     </div></div></div>
     <?php  ?>
     <div class="ems-stat-cards">

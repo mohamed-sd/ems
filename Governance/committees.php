@@ -83,6 +83,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         },
         'chair' => function ($r) { return ems_w14_person($r['chair_person']); },
     );
-    echo ems_w14_grid('emsList_committees', $GUIDE_COLS, $rows, $D, 'لا لجان مسجلة'); /* /GUIDE_COLS */ ?></div>
+    echo ems_w14_grid('emsList_committees', $GUIDE_COLS, $rows, $D, 'لا لجان مسجلة'); /* /GUIDE_COLS */ ?>
+    <?php /* ④ نموذجُ الإضافةِ — **مشتقٌّ من الدليلِ لا مكتوب** (SILENT_DROP_FIX §2·2-④)
+         حقولُه من `repair01_fields` وأعمدتُه من `$GUIDE_COLS` أعلاه،
+         ⛔ ولا اسمَ حقلٍ يُكتب هنا — والقابلُ للإدخالِ ثلاثةُ أصنافٍ لا غير. */
+    require_once __DIR__ . '/../includes/w14_guide_form.php';
+    ems_w14_guide_form(array(
+        'surfaces' => array('اللجان وحوكمه الاجتماعات', 'اللجان وحوكمة الاجتماعات'),
+        'table'    => 'gov_committee',
+        'cols'     => $GUIDE_COLS,
+        'screen'   => 'Governance/committees.php',
+    )); ?>
+</div>
 </div>
 </body></html>

@@ -95,6 +95,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             return ((int) $r['retaliation_flag'] === 1) ? 'حماية من الانتقام مفعلة' : '';
         },
     );
-    echo ems_w14_grid('emsList_integrity_reports', $GUIDE_COLS, $rows, $D, 'لا بلاغات مسجلة'); /* /GUIDE_COLS */ ?></div>
+    echo ems_w14_grid('emsList_integrity_reports', $GUIDE_COLS, $rows, $D, 'لا بلاغات مسجلة'); /* /GUIDE_COLS */ ?>
+    <?php /* ④ نموذجُ الإضافةِ — **مشتقٌّ من الدليلِ لا مكتوب** (SILENT_DROP_FIX §2·2-④)
+         حقولُه من `repair01_fields` وأعمدتُه من `$GUIDE_COLS` أعلاه،
+         ⛔ ولا اسمَ حقلٍ يُكتب هنا — والقابلُ للإدخالِ ثلاثةُ أصنافٍ لا غير. */
+    require_once __DIR__ . '/../includes/w14_guide_form.php';
+    ems_w14_guide_form(array(
+        'surfaces' => array('بلاغات النزاهه المحميه', 'بلاغات النزاهة المحمية'),
+        'table'    => 'gov_integrity_report',
+        'cols'     => $GUIDE_COLS,
+        'screen'   => 'Governance/integrity_reports.php',
+    )); ?>
+</div>
 </div>
 </body></html>

@@ -1,9 +1,9 @@
 # شهادة بوابات التسليم — آخر عبور
 
-**التاريخ:** 2026-08-19 17:40 · **الحكم:** ✘ توقف عند ② التكامل: tools/e02_checks.php
+**التاريخ:** 2026-09-01 16:52 · **الحكم:** ✘ توقف عند ② التكامل: tools/act_checks.php
 
 ```
-════ بوابات التسليم الخمس — 2026-08-19 17:38 ════
+════ بوابات التسليم الخمس — 2026-09-01 16:48 ════
 
 ▌ البوابة ① — اختبار الوحدة (يشهد: المطوّر)
   ✔ tests/wfm_engine_test.php — ✔ صفّا خطوتين في approval_links (الأولى مختومة)
@@ -11,8 +11,8 @@
   ✔ tests/leg01_patterns34_test.php — ══ النتيجة: 16 ناجحة · 0 فاشلة ══
 
 ▌ البوابة ② — التكامل (يشهد: قائد التطوير)
-  ✔ tools/act_checks.php — ────────────────────────────────────────────────────────────
-الحكم: ✔ صفرٌ في الحاكمة — الدمجُ مسموح
+  ✘ tools/act_checks.php — ────────────────────────────────────────────────────────────
+الحكم: ✘ 1 فحصًا حاكمًا غيرَ صفري — الدمجُ ممنوع
   ✘ tools/e02_checks.php — ──────────────────────────────────────────────
 الحكم: ✘ 2 خرقًا — الدمجُ ممنوع
   ✔ tools/e05_checks.php — ──────────────────────────────────────────────────────
@@ -22,15 +22,15 @@
   ✘ tools/se03_ten_checks.php — المخالف: CK-04=5 ·
 ══════════════════════════════════════════════════════════════════════
   ✔ tools/fin01_posting_verify.php — ✔ الترحيلُ سليمٌ — صفرُ مخالفٍ في الثمانية
-  ✘ tools/uxw_visual_baseline.php — ✔ مطابق: main/user_profile.php
-✔ مطابق: Governance/authority_caps.php
-  ✘ tools/uxw_gates.php — ✗ مخالفات: 1
-  [١٠ فرق بصري] Portal__notifications.diff.txt — فرقٌ بصريٌّ غيرُ معتمدٍ — يُقبل بسببٍ مكتوبٍ أو يُصلَح
+  ✘ tools/uxw_visual_baseline.php — ✘ فرق: main/user_profile.php — كُتب main__user_profile.diff.txt (يعتمده --capture بعد توثيقِ السبب)
+✘ فرق: Governance/authority_caps.php — كُتب Governance__authority_caps.diff.txt (يعتمده --capture بعد توثيقِ السبب)
+  ✘ tools/uxw_gates.php — [١٠ فرق بصري] movement__project_drivers.diff.txt — فرقٌ بصريٌّ غيرُ معتمدٍ — يُقبل بسببٍ مكتوبٍ أو يُصلَح
+  [١٠ فرق بصري] user_capacities.diff.txt — فرقٌ بصريٌّ غيرُ معتمدٍ — يُقبل بسببٍ مكتوبٍ أو يُصلَح
   ✔ tools/govauth_checks.php — ✔ فحوصُ GOV-AUTH-01 نافذةُ النطاقِ مجتازة
-  ✘ tools/govauth_parity_probe.php — ✘ view	fin.deptmgr@equipation.sd (دور 19)	Finance/ob_due_soon.php	قائم=0 قالب=1
-  … و350 أخرى
-  ✔ tools/uxw_a11y_contrast.php — ════ فحصُ التضادِّ — أزواجُ المكوّناتِ المعلنة ════
-أزواجٌ مقيسة: 30 · مجتازة ≥4.5: 30 (100.0٪) · راسبة: 0 · معطَّلةٌ مستثناةٌ بنصِّ WCAG 1.4.3: 1 · متعذرُ الحلِّ (تدرجات/شفافيات): 65
+  ✘ tools/govauth_parity_probe.php — ✘ view	adminfree@gmail.com (دور 1)	fleet/open_points.php	قائم=0 قالب=1
+  … و2236 أخرى
+  ✘ tools/uxw_a11y_contrast.php — أزواجٌ مقيسة: 36 · مجتازة ≥4.5: 35 (97.2٪) · راسبة: 1 · معطَّلةٌ مستثناةٌ بنصِّ WCAG 1.4.3: 1 · متعذرُ الحلِّ (تدرجات/شفافيات): 60
+  ✗ 2.29:1  ems-states.css — .ems-file-tab.is-active  (bg var(--c-brand-gold-deep, #d4a500) / fg var(--white))
 
 ▌ البوابة ③ — لم تُفتح
 
@@ -39,5 +39,5 @@
 ▌ البوابة ⑤ — لم تُفتح
 
 ──────────────────────────────────────────────
-الحكم: ✘ توقّف عند: ② التكامل: tools/e02_checks.php — قفزُ البوابة يؤجّل العيبَ إلى الإنتاج
+الحكم: ✘ توقّف عند: ② التكامل: tools/act_checks.php — قفزُ البوابة يؤجّل العيبَ إلى الإنتاج
 ```

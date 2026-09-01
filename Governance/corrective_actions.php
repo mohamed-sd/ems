@@ -91,6 +91,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         },
         'assigner' => function ($r) { return ems_w14_person($r['assigned_by']); },
     );
-    echo ems_w14_grid('emsList_corrective_actions', $GUIDE_COLS, $rows, $D, 'لا إجراءات مسجلة'); /* /GUIDE_COLS */ ?></div>
+    echo ems_w14_grid('emsList_corrective_actions', $GUIDE_COLS, $rows, $D, 'لا إجراءات مسجلة'); /* /GUIDE_COLS */ ?>
+    <?php /* ④ نموذجُ الإضافةِ — **مشتقٌّ من الدليلِ لا مكتوب** (SILENT_DROP_FIX §2·2-④)
+         حقولُه من `repair01_fields` وأعمدتُه من `$GUIDE_COLS` أعلاه،
+         ⛔ ولا اسمَ حقلٍ يُكتب هنا — والقابلُ للإدخالِ ثلاثةُ أصنافٍ لا غير. */
+    require_once __DIR__ . '/../includes/w14_guide_form.php';
+    ems_w14_guide_form(array(
+        'surfaces' => array('الاجراءات التصحيحيه', 'الإجراءات التصحيحية'),
+        'table'    => 'gov_corrective_action',
+        'cols'     => $GUIDE_COLS,
+        'screen'   => 'Governance/corrective_actions.php',
+    )); ?>
+</div>
 </div>
 </body></html>

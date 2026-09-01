@@ -100,6 +100,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             return ($d !== '' && $p !== '') ? ($d . ' / ' . $p) : ($d !== '' ? $d : $p);
         },
     );
-    echo ems_w14_grid('emsList_gifts_hospitality', $GUIDE_COLS, $rows, $D, 'لا إفصاحات هدايا'); /* /GUIDE_COLS */ ?></div>
+    echo ems_w14_grid('emsList_gifts_hospitality', $GUIDE_COLS, $rows, $D, 'لا إفصاحات هدايا'); /* /GUIDE_COLS */ ?>
+    <?php /* ④ نموذجُ الإضافةِ — **مشتقٌّ من الدليلِ لا مكتوب** (SILENT_DROP_FIX §2·2-④)
+         حقولُه من `repair01_fields` وأعمدتُه من `$GUIDE_COLS` أعلاه،
+         ⛔ ولا اسمَ حقلٍ يُكتب هنا — والقابلُ للإدخالِ ثلاثةُ أصنافٍ لا غير. */
+    require_once __DIR__ . '/../includes/w14_guide_form.php';
+    ems_w14_guide_form(array(
+        'surfaces' => array('الهدايا والضيافه', 'الهدايا والضيافة'),
+        'table'    => 'gov_gift_disclosure',
+        'cols'     => $GUIDE_COLS,
+        'screen'   => 'Governance/gifts_hospitality.php',
+    )); ?>
+</div>
 </div>
 </body></html>

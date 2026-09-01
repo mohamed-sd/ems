@@ -1,0 +1,2268 @@
+{
+    "measured_at": "2026-09-01T17:04:14+03:00",
+    "snapshot": "07e5284d",
+    "source_of_truth": "repair01_fields (‏09 · 02_تتبع_الحقول) + $GUIDE_COLS في الشاشة + مخطَّطُ الجدول",
+    "ready": 29,
+    "blocked": 0,
+    "rows": [
+        {
+            "ws": "DEP-07",
+            "screen_id": "SCR-0729",
+            "route": "employees\/hr_benefits.php",
+            "label": "المزايا والتأمينات",
+            "table": "hr_benefits",
+            "guide_surface": "المزايا والتامينات",
+            "wired": true,
+            "generated_cols": [
+                "g150"
+            ],
+            "needs_sequence": [
+                "g150"
+            ],
+            "guide_fields": 14,
+            "not_enterable": 10,
+            "enterable": [
+                {
+                    "label": "نوع الميزة ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g152",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص5655"
+                },
+                {
+                    "label": "من تاريخ",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g156",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص5659"
+                },
+                {
+                    "label": "إلى تاريخ",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g157",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص5660"
+                },
+                {
+                    "label": "حالة السطر ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g159",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص5662"
+                }
+            ],
+            "unmapped": [],
+            "verdict": "READY"
+        },
+        {
+            "ws": "DEP-07",
+            "screen_id": "SCR-0723",
+            "route": "employees\/hr_employee_documents.php",
+            "label": "مستندات الموظف",
+            "table": "hr_employee_documents",
+            "guide_surface": "مستندات الموظف",
+            "wired": true,
+            "generated_cols": [
+                "g245"
+            ],
+            "needs_sequence": [
+                "g245"
+            ],
+            "guide_fields": 14,
+            "not_enterable": 6,
+            "enterable": [
+                {
+                    "label": "نوع المستند ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g247",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص5473"
+                },
+                {
+                    "label": "رقم المستند",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g248",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص5474"
+                },
+                {
+                    "label": "جهة الإصدار",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g249",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص5475"
+                },
+                {
+                    "label": "تاريخ الإصدار",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g250",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص5476"
+                },
+                {
+                    "label": "تاريخ الانتهاء",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g251",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص5477"
+                },
+                {
+                    "label": "إلزامي؟ ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g252",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص5478"
+                },
+                {
+                    "label": "المرفق",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g253",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص5479"
+                },
+                {
+                    "label": "حالة المستند ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g254",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص5480"
+                }
+            ],
+            "unmapped": [],
+            "verdict": "READY"
+        },
+        {
+            "ws": "DEP-07",
+            "screen_id": "SCR-0725",
+            "route": "employees\/hr_job_movements.php",
+            "label": "الحركات الوظيفية",
+            "table": "hr_job_movements",
+            "guide_surface": "الحركات الوظيفيه",
+            "wired": true,
+            "generated_cols": [
+                "g56"
+            ],
+            "needs_sequence": [
+                "g56"
+            ],
+            "guide_fields": 16,
+            "not_enterable": 11,
+            "enterable": [
+                {
+                    "label": "نوع الحركة ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g58",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص5536"
+                },
+                {
+                    "label": "تاريخ النفاذ",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g63",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص5541"
+                },
+                {
+                    "label": "حالة الحركة ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g64",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص5542"
+                },
+                {
+                    "label": "المراجع",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g67",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص5545"
+                },
+                {
+                    "label": "تاريخ الاعتماد",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g69",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص5547"
+                }
+            ],
+            "unmapped": [],
+            "verdict": "READY"
+        },
+        {
+            "ws": "DEP-07",
+            "screen_id": "SCR-0724",
+            "route": "employees\/hr_onboarding.php",
+            "label": "التهيئة والمباشرة",
+            "table": "hr_onboarding",
+            "guide_surface": "التهيئه والمباشره",
+            "wired": true,
+            "generated_cols": [
+                "g215"
+            ],
+            "needs_sequence": [
+                "g215"
+            ],
+            "guide_fields": 12,
+            "not_enterable": 9,
+            "enterable": [
+                {
+                    "label": "بند التهيئة ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g217",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص5487"
+                },
+                {
+                    "label": "النتيجة ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g220",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص5490"
+                },
+                {
+                    "label": "حالة البند ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g222",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص5492"
+                }
+            ],
+            "unmapped": [],
+            "verdict": "READY"
+        },
+        {
+            "ws": "DEP-07",
+            "screen_id": "SCR-0726",
+            "route": "employees\/hr_training.php",
+            "label": "التدريب والكفاءة",
+            "table": "hr_training",
+            "guide_surface": "التدريب والكفاءه",
+            "wired": true,
+            "generated_cols": [
+                "g136"
+            ],
+            "needs_sequence": [
+                "g136"
+            ],
+            "guide_fields": 14,
+            "not_enterable": 6,
+            "enterable": [
+                {
+                    "label": "البرنامج",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g138",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص5585"
+                },
+                {
+                    "label": "نوع التدريب ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g139",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص5586"
+                },
+                {
+                    "label": "الجهة",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g140",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص5587"
+                },
+                {
+                    "label": "تاريخ الإتمام",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g141",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص5588"
+                },
+                {
+                    "label": "النتيجة ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g142",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص5589"
+                },
+                {
+                    "label": "صلاحية الشهادة",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g143",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص5590"
+                },
+                {
+                    "label": "إلزامي؟ ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g144",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص5591"
+                },
+                {
+                    "label": "حالة السجل ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g145",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص5592"
+                }
+            ],
+            "unmapped": [],
+            "verdict": "READY"
+        },
+        {
+            "ws": "DEP-05",
+            "screen_id": "SCR-0684",
+            "route": "finance\/acc_credit_control.php",
+            "label": "الرقابة الائتمانية وحدود العملاء",
+            "table": "fina_acc_credit_control",
+            "guide_surface": "الرقابه الائتمانيه وحدود العملاء",
+            "wired": true,
+            "generated_cols": [
+                "g75"
+            ],
+            "needs_sequence": [
+                "g75"
+            ],
+            "guide_fields": 14,
+            "not_enterable": 10,
+            "enterable": [
+                {
+                    "label": "رقم العميل ◄",
+                    "type": "FK_INHERITED",
+                    "control": "select",
+                    "column": "g76",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "مفتاح موروث — يُختار ولا يُكتب",
+                    "src": "09 › 02_تتبع_الحقول › ص4933"
+                },
+                {
+                    "label": "الحد الائتماني المعتمد",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g77",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص4934"
+                },
+                {
+                    "label": "إجراء التجاوز ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g83",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص4940"
+                },
+                {
+                    "label": "حالة الحد ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g84",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص4941"
+                }
+            ],
+            "unmapped": [],
+            "verdict": "READY"
+        },
+        {
+            "ws": "DEP-06",
+            "screen_id": "SCR-0168",
+            "route": "finance\/tre_beneficiary.php",
+            "label": "سجل المستفيدين والتحقق",
+            "table": "tre_beneficiary",
+            "guide_surface": "سجل المستفيدين والتحقق",
+            "wired": true,
+            "generated_cols": [
+                "g202"
+            ],
+            "needs_sequence": [
+                "g202"
+            ],
+            "guide_fields": 14,
+            "not_enterable": 9,
+            "enterable": [
+                {
+                    "label": "رقم الحساب\/IBAN",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g205",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص5108"
+                },
+                {
+                    "label": "البنك",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g206",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص5109"
+                },
+                {
+                    "label": "وثيقة التحقق",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g207",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص5110"
+                },
+                {
+                    "label": "تاريخ التحقق",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g208",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص5111"
+                },
+                {
+                    "label": "حالة التحقق ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g211",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص5114"
+                }
+            ],
+            "unmapped": [],
+            "verdict": "READY"
+        },
+        {
+            "ws": "DEP-06",
+            "screen_id": "SCR-0697",
+            "route": "finance\/tre_fx_deals.php",
+            "label": "تنفيذ عمليات الصرف الأجنبي",
+            "table": "tre_fx_deals",
+            "guide_surface": "تنفيذ عمليات الصرف الاجنبي",
+            "wired": true,
+            "generated_cols": [
+                "g63"
+            ],
+            "needs_sequence": [
+                "g63"
+            ],
+            "guide_fields": 17,
+            "not_enterable": 11,
+            "enterable": [
+                {
+                    "label": "تاريخ التنفيذ",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g64",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص5252"
+                },
+                {
+                    "label": "العملة المشتراة ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g65",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص5253"
+                },
+                {
+                    "label": "العملة المدفوعة ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g66",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص5254"
+                },
+                {
+                    "label": "المبلغ المشترى",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g67",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص5255"
+                },
+                {
+                    "label": "سعر الصفقة",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g68",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص5256"
+                },
+                {
+                    "label": "حالة الصفقة ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g75",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص5263"
+                }
+            ],
+            "unmapped": [],
+            "verdict": "READY"
+        },
+        {
+            "ws": "DEP-06",
+            "screen_id": "SCR-0698",
+            "route": "finance\/tre_guarantees.php",
+            "label": "خطابات الضمان والاعتمادات المستندية",
+            "table": "tre_guarantees",
+            "guide_surface": "خطابات الضمان والاعتمادات المستنديه",
+            "wired": true,
+            "generated_cols": [
+                "g96"
+            ],
+            "needs_sequence": [
+                "g96"
+            ],
+            "guide_fields": 20,
+            "not_enterable": 13,
+            "enterable": [
+                {
+                    "label": "النوع ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g97",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص5304"
+                },
+                {
+                    "label": "القيمة",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g100",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص5307"
+                },
+                {
+                    "label": "تاريخ الإصدار",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g104",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص5311"
+                },
+                {
+                    "label": "تاريخ الانتهاء",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g105",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص5312"
+                },
+                {
+                    "label": "حالة الأداة ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g108",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص5315"
+                },
+                {
+                    "label": "المراجع",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g111",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص5318"
+                },
+                {
+                    "label": "تاريخ الاعتماد",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g113",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص5320"
+                }
+            ],
+            "unmapped": [],
+            "verdict": "READY"
+        },
+        {
+            "ws": "DEP-06",
+            "screen_id": "SCR-0692",
+            "route": "finance\/tre_instruments.php",
+            "label": "سجل الأدوات المالية",
+            "table": "tre_instruments",
+            "guide_surface": "سجل الادوات الماليه",
+            "wired": true,
+            "generated_cols": [
+                "g80"
+            ],
+            "needs_sequence": [
+                "g80"
+            ],
+            "guide_fields": 16,
+            "not_enterable": 9,
+            "enterable": [
+                {
+                    "label": "الاتجاه ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g81",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص5154"
+                },
+                {
+                    "label": "نوع الأداة ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g82",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص5155"
+                },
+                {
+                    "label": "رقم الأداة",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g83",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص5156"
+                },
+                {
+                    "label": "البنك المسحوب عليه",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g84",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص5157"
+                },
+                {
+                    "label": "قيمة الأداة",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g85",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص5158"
+                },
+                {
+                    "label": "تاريخ الاستحقاق",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g88",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص5161"
+                },
+                {
+                    "label": "حالة الأداة ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g91",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص5164"
+                }
+            ],
+            "unmapped": [],
+            "verdict": "READY"
+        },
+        {
+            "ws": "DEP-06",
+            "screen_id": "SCR-0696",
+            "route": "finance\/tre_transfers.php",
+            "label": "التحويلات بين الحسابات",
+            "table": "tre_transfers",
+            "guide_surface": "التحويلات بين الحسابات",
+            "wired": true,
+            "generated_cols": [
+                "g158"
+            ],
+            "needs_sequence": [
+                "g158"
+            ],
+            "guide_fields": 14,
+            "not_enterable": 10,
+            "enterable": [
+                {
+                    "label": "القيمة",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g161",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص5240"
+                },
+                {
+                    "label": "الغرض ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g163",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص5242"
+                },
+                {
+                    "label": "مرجع التنفيذ البنكي",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g165",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص5244"
+                },
+                {
+                    "label": "حالة التحويل ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g167",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص5246"
+                }
+            ],
+            "unmapped": [],
+            "verdict": "READY"
+        },
+        {
+            "ws": "DEP-08",
+            "screen_id": "SCR-0754",
+            "route": "governance\/breaches.php",
+            "label": "سجل الإخلالات",
+            "table": "gov_breach",
+            "guide_surface": "سجل الاخلالات",
+            "wired": true,
+            "generated_cols": [
+                "case_no"
+            ],
+            "needs_sequence": [
+                "case_no"
+            ],
+            "guide_fields": 14,
+            "not_enterable": 12,
+            "enterable": [
+                {
+                    "label": "مصدر الرصد ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "opened_basis",
+                    "arabized": true,
+                    "col_type": "varchar(32)",
+                    "null": "NO",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص6735"
+                },
+                {
+                    "label": "حالة الإخلال ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "state",
+                    "arabized": true,
+                    "col_type": "varchar(24)",
+                    "null": "NO",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص6742"
+                }
+            ],
+            "unmapped": [],
+            "verdict": "READY"
+        },
+        {
+            "ws": "DEP-08",
+            "screen_id": "SCR-0757",
+            "route": "governance\/committees.php",
+            "label": "اللجان وحوكمة الاجتماعات",
+            "table": "gov_committee",
+            "guide_surface": "اللجان وحوكمه الاجتماعات",
+            "wired": true,
+            "generated_cols": [
+                "committee_code"
+            ],
+            "needs_sequence": [
+                "committee_code"
+            ],
+            "guide_fields": 13,
+            "not_enterable": 8,
+            "enterable": [
+                {
+                    "label": "اسم اللجنة",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "name_ar",
+                    "arabized": false,
+                    "col_type": "varchar(200)",
+                    "null": "NO",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص6813"
+                },
+                {
+                    "label": "الاختصاص",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "mandate_ar",
+                    "arabized": false,
+                    "col_type": "varchar(600)",
+                    "null": "NO",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص6814"
+                },
+                {
+                    "label": "النصاب",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "quorum_key",
+                    "arabized": false,
+                    "col_type": "varchar(64)",
+                    "null": "NO",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص6817"
+                },
+                {
+                    "label": "دورية الانعقاد ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "meeting_cycle",
+                    "arabized": true,
+                    "col_type": "varchar(24)",
+                    "null": "NO",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص6818"
+                },
+                {
+                    "label": "حالة اللجنة ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "state",
+                    "arabized": true,
+                    "col_type": "varchar(24)",
+                    "null": "NO",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص6820"
+                }
+            ],
+            "unmapped": [],
+            "verdict": "READY"
+        },
+        {
+            "ws": "DEP-08",
+            "screen_id": "SCR-0750",
+            "route": "governance\/conduct_acknowledgements.php",
+            "label": "إقرارات مدونة السلوك",
+            "table": "gov_conduct_ack",
+            "guide_surface": "اقرارات مدونه السلوك",
+            "wired": true,
+            "generated_cols": [
+                "ack_no"
+            ],
+            "needs_sequence": [
+                "ack_no"
+            ],
+            "guide_fields": 10,
+            "not_enterable": 6,
+            "enterable": [
+                {
+                    "label": "رقم الموظف ◄",
+                    "type": "FK_INHERITED",
+                    "control": "select",
+                    "column": "employee_id",
+                    "arabized": false,
+                    "col_type": "int(11)",
+                    "null": "NO",
+                    "rule": "مفتاح موروث — يُختار ولا يُكتب",
+                    "src": "09 › 02_تتبع_الحقول › ص6563"
+                },
+                {
+                    "label": "قناة الإقرار ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "ack_channel",
+                    "arabized": false,
+                    "col_type": "varchar(24)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص6565"
+                },
+                {
+                    "label": "تاريخ الإقرار",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "acked_at",
+                    "arabized": false,
+                    "col_type": "datetime",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص6566"
+                },
+                {
+                    "label": "حالة الإقرار ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "state",
+                    "arabized": true,
+                    "col_type": "varchar(24)",
+                    "null": "NO",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص6567"
+                }
+            ],
+            "unmapped": [],
+            "verdict": "READY"
+        },
+        {
+            "ws": "DEP-08",
+            "screen_id": "SCR-0747",
+            "route": "governance\/conflict_disclosures.php",
+            "label": "تضارب المصالح",
+            "table": "gov_conflict_disclosure",
+            "guide_surface": "تضارب المصالح",
+            "wired": true,
+            "generated_cols": [
+                "disclosure_no"
+            ],
+            "needs_sequence": [
+                "disclosure_no"
+            ],
+            "guide_fields": 18,
+            "not_enterable": 11,
+            "enterable": [
+                {
+                    "label": "طبيعة التضارب ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "nature_ar",
+                    "arabized": false,
+                    "col_type": "varchar(400)",
+                    "null": "NO",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص6520"
+                },
+                {
+                    "label": "العلاقة",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "relation_ar",
+                    "arabized": false,
+                    "col_type": "varchar(200)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص6522"
+                },
+                {
+                    "label": "الضوابط المفروضة",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "controls_ar",
+                    "arabized": false,
+                    "col_type": "varchar(400)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص6525"
+                },
+                {
+                    "label": "حالة الإفصاح ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "state",
+                    "arabized": true,
+                    "col_type": "varchar(24)",
+                    "null": "NO",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص6527"
+                },
+                {
+                    "label": "تاريخ الاعتماد",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "approved_at",
+                    "arabized": false,
+                    "col_type": "datetime",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص6532"
+                }
+            ],
+            "unmapped": [
+                "قرار الحوكمة ▼ (REFERENCE ⇒ لا خريطة)",
+                "المراجع (BUSINESS_INPUT ⇒ لا خريطة)"
+            ],
+            "verdict": "READY"
+        },
+        {
+            "ws": "DEP-08",
+            "screen_id": "SCR-0755",
+            "route": "governance\/corrective_actions.php",
+            "label": "الإجراءات التصحيحية",
+            "table": "gov_corrective_action",
+            "guide_surface": "الاجراءات التصحيحيه",
+            "wired": true,
+            "generated_cols": [
+                "action_no"
+            ],
+            "needs_sequence": [
+                "action_no"
+            ],
+            "guide_fields": 15,
+            "not_enterable": 11,
+            "enterable": [
+                {
+                    "label": "مصدر الإجراء ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "source_kind",
+                    "arabized": true,
+                    "col_type": "varchar(24)",
+                    "null": "NO",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص6748"
+                },
+                {
+                    "label": "وصف الإجراء",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "title_ar",
+                    "arabized": false,
+                    "col_type": "varchar(255)",
+                    "null": "NO",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص6750"
+                },
+                {
+                    "label": "المهلة",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "due_date",
+                    "arabized": false,
+                    "col_type": "date",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص6753"
+                },
+                {
+                    "label": "حالة الإجراء ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "state",
+                    "arabized": true,
+                    "col_type": "varchar(24)",
+                    "null": "NO",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص6757"
+                }
+            ],
+            "unmapped": [],
+            "verdict": "READY"
+        },
+        {
+            "ws": "DEP-08",
+            "screen_id": "SCR-0749",
+            "route": "governance\/gifts_hospitality.php",
+            "label": "الهدايا والضيافة",
+            "table": "gov_gift_disclosure",
+            "guide_surface": "الهدايا والضيافه",
+            "wired": true,
+            "generated_cols": [
+                "gift_no"
+            ],
+            "needs_sequence": [
+                "gift_no"
+            ],
+            "guide_fields": 14,
+            "not_enterable": 9,
+            "enterable": [
+                {
+                    "label": "الاتجاه ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "direction",
+                    "arabized": false,
+                    "col_type": "varchar(24)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص6551"
+                },
+                {
+                    "label": "الوصف",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "description_ar",
+                    "arabized": false,
+                    "col_type": "varchar(400)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص6552"
+                },
+                {
+                    "label": "السياق",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "context_ar",
+                    "arabized": false,
+                    "col_type": "varchar(400)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص6555"
+                },
+                {
+                    "label": "حالة الإفصاح ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "state",
+                    "arabized": true,
+                    "col_type": "varchar(24)",
+                    "null": "NO",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص6557"
+                }
+            ],
+            "unmapped": [
+                "القرار ▼ (REFERENCE ⇒ لا خريطة)"
+            ],
+            "verdict": "READY"
+        },
+        {
+            "ws": "DEP-08",
+            "screen_id": "SCR-0752",
+            "route": "governance\/integrity_reports.php",
+            "label": "بلاغات النزاهة المحمية",
+            "table": "gov_integrity_report",
+            "guide_surface": "بلاغات النزاهه المحميه",
+            "wired": true,
+            "generated_cols": [
+                "report_no"
+            ],
+            "needs_sequence": [
+                "report_no"
+            ],
+            "guide_fields": 14,
+            "not_enterable": 9,
+            "enterable": [
+                {
+                    "label": "قناة الورود ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "channel",
+                    "arabized": true,
+                    "col_type": "varchar(24)",
+                    "null": "NO",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص6702"
+                },
+                {
+                    "label": "موضوع البلاغ ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "subject_ar",
+                    "arabized": false,
+                    "col_type": "varchar(400)",
+                    "null": "NO",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص6704"
+                },
+                {
+                    "label": "الوصف المقيَّد",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "description_ar",
+                    "arabized": false,
+                    "col_type": "varchar(600)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص6706"
+                },
+                {
+                    "label": "حالة البلاغ ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "state",
+                    "arabized": true,
+                    "col_type": "varchar(24)",
+                    "null": "NO",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص6710"
+                }
+            ],
+            "unmapped": [
+                "التقييم الأولي ▼ (REFERENCE ⇒ لا خريطة)"
+            ],
+            "verdict": "READY"
+        },
+        {
+            "ws": "DEP-08",
+            "screen_id": "SCR-0753",
+            "route": "governance\/investigations.php",
+            "label": "التحقيقات",
+            "table": "gov_investigation",
+            "guide_surface": "التحقيقات",
+            "wired": true,
+            "generated_cols": [
+                "inv_no"
+            ],
+            "needs_sequence": [
+                "inv_no"
+            ],
+            "guide_fields": 18,
+            "not_enterable": 9,
+            "enterable": [
+                {
+                    "label": "مصدر التحقيق ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "origin",
+                    "arabized": true,
+                    "col_type": "varchar(24)",
+                    "null": "NO",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص6716"
+                },
+                {
+                    "label": "نطاق التحقيق",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "scope_ar",
+                    "arabized": false,
+                    "col_type": "varchar(400)",
+                    "null": "NO",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص6719"
+                },
+                {
+                    "label": "مستوى السرية ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "confidentiality",
+                    "arabized": false,
+                    "col_type": "varchar(24)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص6720"
+                },
+                {
+                    "label": "المدة المقررة",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "due_period",
+                    "arabized": false,
+                    "col_type": "varchar(40)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص6721"
+                },
+                {
+                    "label": "النتيجة ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "conclusion_ar",
+                    "arabized": false,
+                    "col_type": "varchar(600)",
+                    "null": "NO",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص6722"
+                },
+                {
+                    "label": "التوصيات",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "recommendations_ar",
+                    "arabized": false,
+                    "col_type": "varchar(600)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص6723"
+                },
+                {
+                    "label": "حالة التحقيق ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "state",
+                    "arabized": true,
+                    "col_type": "varchar(24)",
+                    "null": "NO",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص6725"
+                },
+                {
+                    "label": "تاريخ الاعتماد",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "concluded_at",
+                    "arabized": false,
+                    "col_type": "datetime",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص6730"
+                }
+            ],
+            "unmapped": [
+                "المراجع (BUSINESS_INPUT ⇒ لا خريطة)"
+            ],
+            "verdict": "READY"
+        },
+        {
+            "ws": "DEP-08",
+            "screen_id": "SCR-0742",
+            "route": "governance\/policies.php",
+            "label": "سجل السياسات",
+            "table": "gov_policy",
+            "guide_surface": "سجل السياسات",
+            "wired": true,
+            "generated_cols": [
+                "policy_no"
+            ],
+            "needs_sequence": [
+                "policy_no"
+            ],
+            "guide_fields": 18,
+            "not_enterable": 10,
+            "enterable": [
+                {
+                    "label": "اسم السياسة",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "title_ar",
+                    "arabized": false,
+                    "col_type": "varchar(255)",
+                    "null": "NO",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص6406"
+                },
+                {
+                    "label": "النطاق ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "domain_ar",
+                    "arabized": false,
+                    "col_type": "varchar(120)",
+                    "null": "NO",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص6407"
+                },
+                {
+                    "label": "تاريخ النفاذ",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "effective_from",
+                    "arabized": false,
+                    "col_type": "date",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص6410"
+                },
+                {
+                    "label": "دورية المراجعة",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "review_periodicity",
+                    "arabized": false,
+                    "col_type": "varchar(24)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص6411"
+                },
+                {
+                    "label": "الوثيقة المرفقة",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "doc_ref",
+                    "arabized": false,
+                    "col_type": "varchar(120)",
+                    "null": "NO",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص6413"
+                },
+                {
+                    "label": "حالة السياسة ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "state",
+                    "arabized": true,
+                    "col_type": "varchar(24)",
+                    "null": "NO",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص6415"
+                },
+                {
+                    "label": "تاريخ الاعتماد",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "approved_at",
+                    "arabized": false,
+                    "col_type": "datetime",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص6420"
+                }
+            ],
+            "unmapped": [
+                "المراجع (BUSINESS_INPUT ⇒ لا خريطة)"
+            ],
+            "verdict": "READY"
+        },
+        {
+            "ws": "DEP-08",
+            "screen_id": "SCR-0745",
+            "route": "governance\/regulatory_filings.php",
+            "label": "التقديمات النظامية",
+            "table": "gov_filing",
+            "guide_surface": "التقديمات النظاميه",
+            "wired": true,
+            "generated_cols": [
+                "filing_no"
+            ],
+            "needs_sequence": [
+                "filing_no"
+            ],
+            "guide_fields": 14,
+            "not_enterable": 8,
+            "enterable": [
+                {
+                    "label": "نوع التقديم ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "filing_kind",
+                    "arabized": false,
+                    "col_type": "varchar(40)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص6490"
+                },
+                {
+                    "label": "الفترة المشمولة",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "period_label",
+                    "arabized": false,
+                    "col_type": "varchar(40)",
+                    "null": "NO",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص6493"
+                },
+                {
+                    "label": "الموعد النظامي",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "due_date",
+                    "arabized": false,
+                    "col_type": "date",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص6494"
+                },
+                {
+                    "label": "تاريخ التقديم الفعلي",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "submitted_at",
+                    "arabized": false,
+                    "col_type": "datetime",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص6495"
+                },
+                {
+                    "label": "إيصال\/مرجع التقديم",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "receipt_ref",
+                    "arabized": false,
+                    "col_type": "varchar(120)",
+                    "null": "NO",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص6496"
+                },
+                {
+                    "label": "حالة التقديم ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "state",
+                    "arabized": true,
+                    "col_type": "varchar(24)",
+                    "null": "NO",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص6498"
+                }
+            ],
+            "unmapped": [],
+            "verdict": "READY"
+        },
+        {
+            "ws": "DEP-08",
+            "screen_id": "SCR-0748",
+            "route": "governance\/related_parties.php",
+            "label": "الأطراف ذات العلاقة",
+            "table": "gov_related_party",
+            "guide_surface": "الاطراف ذات العلاقه",
+            "wired": true,
+            "generated_cols": [
+                "party_no"
+            ],
+            "needs_sequence": [
+                "party_no"
+            ],
+            "guide_fields": 13,
+            "not_enterable": 10,
+            "enterable": [
+                {
+                    "label": "اسم الطرف",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "party_name",
+                    "arabized": false,
+                    "col_type": "varchar(255)",
+                    "null": "NO",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص6536"
+                },
+                {
+                    "label": "نوع الصلة ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "relation_ar",
+                    "arabized": false,
+                    "col_type": "varchar(200)",
+                    "null": "NO",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص6537"
+                },
+                {
+                    "label": "حالة السطر ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "state",
+                    "arabized": true,
+                    "col_type": "varchar(24)",
+                    "null": "NO",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص6543"
+                }
+            ],
+            "unmapped": [],
+            "verdict": "READY"
+        },
+        {
+            "ws": "DEP-14",
+            "screen_id": "SCR-0661",
+            "route": "maintenance\/daily_care.php",
+            "label": "العناية اليومية والتشحيم",
+            "table": "mnt_daily_care",
+            "guide_surface": "العنايه اليوميه والتشحيم",
+            "wired": true,
+            "generated_cols": [
+                "g117"
+            ],
+            "needs_sequence": [
+                "g117"
+            ],
+            "guide_fields": 14,
+            "not_enterable": 8,
+            "enterable": [
+                {
+                    "label": "التاريخ",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g118",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص1605"
+                },
+                {
+                    "label": "كود المعدة ◄",
+                    "type": "FK_INHERITED",
+                    "control": "select",
+                    "column": "g119",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "مفتاح موروث — يُختار ولا يُكتب",
+                    "src": "09 › 02_تتبع_الحقول › ص1606"
+                },
+                {
+                    "label": "المهمة ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g120",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص1608"
+                },
+                {
+                    "label": "النتيجة ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g122",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص1610"
+                },
+                {
+                    "label": "ملاحظة غير طبيعية",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g123",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص1611"
+                },
+                {
+                    "label": "حالة السطر ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g124",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص1613"
+                }
+            ],
+            "unmapped": [],
+            "verdict": "READY"
+        },
+        {
+            "ws": "DEP-14",
+            "screen_id": "SCR-0660",
+            "route": "maintenance\/external_repairs.php",
+            "label": "الإصلاح الخارجي ومطالبات الضمان",
+            "table": "mnt_external_repairs",
+            "guide_surface": "الاصلاح الخارجي ومطالبات الضمان",
+            "wired": true,
+            "generated_cols": [
+                "g154"
+            ],
+            "needs_sequence": [
+                "g154"
+            ],
+            "guide_fields": 15,
+            "not_enterable": 10,
+            "enterable": [
+                {
+                    "label": "النوع ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g156",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص1573"
+                },
+                {
+                    "label": "مرجع العقد\/الضمان ◄",
+                    "type": "FK_INHERITED",
+                    "control": "select",
+                    "column": "g158",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "مفتاح موروث — يُختار ولا يُكتب",
+                    "src": "09 › 02_تتبع_الحقول › ص1575"
+                },
+                {
+                    "label": "نطاق العمل",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g159",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص1576"
+                },
+                {
+                    "label": "نتيجة المطالبة ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g162",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص1579"
+                },
+                {
+                    "label": "حالة السطر ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g164",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص1581"
+                }
+            ],
+            "unmapped": [],
+            "verdict": "READY"
+        },
+        {
+            "ws": "DEP-16",
+            "screen_id": "SCR-0671",
+            "route": "procurement\/proc_offers.php",
+            "label": "بنود عروض الموردين",
+            "table": "prc_proc_offers",
+            "guide_surface": "عروض الموردين المستلمه",
+            "wired": true,
+            "generated_cols": [
+                "g18"
+            ],
+            "needs_sequence": [
+                "g18"
+            ],
+            "guide_fields": 18,
+            "not_enterable": 9,
+            "enterable": [
+                {
+                    "label": "تاريخ الاستلام",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g22",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص3701"
+                },
+                {
+                    "label": "قيمة العرض",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g23",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص3702"
+                },
+                {
+                    "label": "العملة ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g24",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص3703"
+                },
+                {
+                    "label": "مدة التوريد",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g25",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص3704"
+                },
+                {
+                    "label": "شروط الدفع المعروضة",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g26",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص3705"
+                },
+                {
+                    "label": "صلاحية العرض",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g27",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص3706"
+                },
+                {
+                    "label": "التقييم الفني ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g28",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص3707"
+                },
+                {
+                    "label": "ملاحظات الفحص",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g29",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص3708"
+                },
+                {
+                    "label": "حالة العرض ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g31",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص3710"
+                }
+            ],
+            "unmapped": [],
+            "verdict": "READY"
+        },
+        {
+            "ws": "DEP-16",
+            "screen_id": "SCR-0669",
+            "route": "procurement\/proc_packages.php",
+            "label": "أعضاء حزمة التجميع",
+            "table": "prc_proc_packages",
+            "guide_surface": "تجميع الطلبات وخطه الشراء",
+            "wired": true,
+            "generated_cols": [
+                "g64"
+            ],
+            "needs_sequence": [
+                "g64"
+            ],
+            "guide_fields": 13,
+            "not_enterable": 8,
+            "enterable": [
+                {
+                    "label": "فترة التجميع",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g65",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص3649"
+                },
+                {
+                    "label": "نطاق الحزمة ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g66",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص3650"
+                },
+                {
+                    "label": "مبرر التمرير المنفرد",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g70",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص3654"
+                },
+                {
+                    "label": "قناة الشراء ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g71",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص3655"
+                },
+                {
+                    "label": "حالة الحزمة ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g72",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص3656"
+                }
+            ],
+            "unmapped": [],
+            "verdict": "READY"
+        },
+        {
+            "ws": "DEP-17",
+            "screen_id": "SCR-0677",
+            "route": "procurement\/wh_issue_requests.php",
+            "label": "بنود طلب الصرف الوارد",
+            "table": "wh_issue_request_lines",
+            "guide_surface": "بنود طلب الصرف الوارد",
+            "wired": true,
+            "generated_cols": [
+                "g67"
+            ],
+            "needs_sequence": [
+                "g67"
+            ],
+            "guide_fields": 12,
+            "not_enterable": 10,
+            "enterable": [
+                {
+                    "label": "الكمية المطلوبة",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g70",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص3979"
+                },
+                {
+                    "label": "حالة البند ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g74",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص3983"
+                }
+            ],
+            "unmapped": [],
+            "verdict": "READY"
+        },
+        {
+            "ws": "DEP-15",
+            "screen_id": "SCR-0666",
+            "route": "transport\/transfer_damage_claims.php",
+            "label": "مطالبات التلف والحوادث",
+            "table": "trp_transfer_damage_claims",
+            "guide_surface": "مطالبات التلف والحوادث",
+            "wired": true,
+            "generated_cols": [
+                "g97"
+            ],
+            "needs_sequence": [
+                "g97"
+            ],
+            "guide_fields": 18,
+            "not_enterable": 12,
+            "enterable": [
+                {
+                    "label": "المتسبب المرجَّح ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g101",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص2050"
+                },
+                {
+                    "label": "قيمة المطالبة المقدرة",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g102",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص2051"
+                },
+                {
+                    "label": "مسار المطالبة ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g104",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص2053"
+                },
+                {
+                    "label": "حالة المطالبة ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g107",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص2056"
+                },
+                {
+                    "label": "المراجع",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g110",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص2059"
+                },
+                {
+                    "label": "تاريخ الاعتماد",
+                    "type": "BUSINESS_INPUT",
+                    "control": "input",
+                    "column": "g112",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "خانة إدخال مفتوحة",
+                    "src": "09 › 02_تتبع_الحقول › ص2061"
+                }
+            ],
+            "unmapped": [],
+            "verdict": "READY"
+        },
+        {
+            "ws": "DEP-15",
+            "screen_id": "SCR-0664",
+            "route": "transport\/transfer_origin_handover.php",
+            "label": "تجهيز المغادرة والتسليم الأصلي",
+            "table": "trp_transfer_origin_handover",
+            "guide_surface": "تجهيز المغادره والتسليم الاصلي",
+            "wired": true,
+            "generated_cols": [
+                "g147"
+            ],
+            "needs_sequence": [
+                "g147"
+            ],
+            "guide_fields": 14,
+            "not_enterable": 11,
+            "enterable": [
+                {
+                    "label": "بند التجهيز ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g149",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص1986"
+                },
+                {
+                    "label": "النتيجة ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g151",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص1988"
+                },
+                {
+                    "label": "حالة البند ▼",
+                    "type": "REFERENCE",
+                    "control": "select",
+                    "column": "g156",
+                    "arabized": false,
+                    "col_type": "varchar(190)",
+                    "null": "YES",
+                    "rule": "قائمة محكومة من بيتها",
+                    "src": "09 › 02_تتبع_الحقول › ص1993"
+                }
+            ],
+            "unmapped": [],
+            "verdict": "READY"
+        }
+    ]
+}

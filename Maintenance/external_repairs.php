@@ -87,6 +87,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         $D = array();
         $__gridRows = ems_w14_guide_rows('mnt_external_repairs');
         echo ems_w14_grid('emsList_mnt_external_repairs', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الإصلاح الخارجي ومطالبات الضمان'); /* /GUIDE_COLS */ ?>
+    <?php /* ④ نموذجُ الإضافةِ — **مشتقٌّ من الدليلِ لا مكتوب** (SILENT_DROP_FIX §2·2-④)
+         حقولُه من `repair01_fields` وأعمدتُه من `$GUIDE_COLS` أعلاه،
+         ⛔ ولا اسمَ حقلٍ يُكتب هنا — والقابلُ للإدخالِ ثلاثةُ أصنافٍ لا غير. */
+    require_once __DIR__ . '/../includes/w14_guide_form.php';
+    ems_w14_guide_form(array(
+        'surfaces' => array('الاصلاح الخارجي ومطالبات الضمان', 'الإصلاح الخارجي ومطالبات الضمان'),
+        'table'    => 'mnt_external_repairs',
+        'cols'     => $GUIDE_COLS,
+        'screen'   => 'Maintenance/external_repairs.php',
+    )); ?>
+
     </div></div></div>
     <?php  ?>
     <div class="ems-stat-cards">

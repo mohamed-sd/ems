@@ -84,6 +84,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         $D = array();
         $__gridRows = ems_w14_guide_rows('trp_transfer_damage_claims');
         echo ems_w14_grid('emsList_trp_transfer_damage_claims', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في مطالبات التلف والحوادث'); /* /GUIDE_COLS */ ?>
+    <?php /* ④ نموذجُ الإضافةِ — **مشتقٌّ من الدليلِ لا مكتوب** (SILENT_DROP_FIX §2·2-④)
+         حقولُه من `repair01_fields` وأعمدتُه من `$GUIDE_COLS` أعلاه،
+         ⛔ ولا اسمَ حقلٍ يُكتب هنا — والقابلُ للإدخالِ ثلاثةُ أصنافٍ لا غير. */
+    require_once __DIR__ . '/../includes/w14_guide_form.php';
+    ems_w14_guide_form(array(
+        'surfaces' => array('مطالبات التلف والحوادث', 'مطالبات التلف والحوادث'),
+        'table'    => 'trp_transfer_damage_claims',
+        'cols'     => $GUIDE_COLS,
+        'screen'   => 'Transport/transfer_damage_claims.php',
+    )); ?>
+
     </div></div></div>
     <?php  ?>
     <div class="ems-stat-cards">

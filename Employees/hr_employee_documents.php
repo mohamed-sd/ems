@@ -82,6 +82,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     );
     $D = array();
     $__gridRows = ems_w14_guide_rows('hr_employee_documents');
-    echo ems_w14_grid('emsList_hr_employee_documents', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في مستندات الموظف'); /* /GUIDE_COLS */ ?></div>
+    echo ems_w14_grid('emsList_hr_employee_documents', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في مستندات الموظف'); /* /GUIDE_COLS */ ?>
+    <?php /* ④ نموذجُ الإضافةِ — **مشتقٌّ من الدليلِ لا مكتوب** (SILENT_DROP_FIX §2·2-④)
+         حقولُه من `repair01_fields` وأعمدتُه من `$GUIDE_COLS` أعلاه،
+         ⛔ ولا اسمَ حقلٍ يُكتب هنا — والقابلُ للإدخالِ ثلاثةُ أصنافٍ لا غير. */
+    require_once __DIR__ . '/../includes/w14_guide_form.php';
+    ems_w14_guide_form(array(
+        'surfaces' => array('مستندات الموظف', 'مستندات الموظف'),
+        'table'    => 'hr_employee_documents',
+        'cols'     => $GUIDE_COLS,
+        'screen'   => 'Employees/hr_employee_documents.php',
+    )); ?>
+</div>
 </div>
 </body></html>

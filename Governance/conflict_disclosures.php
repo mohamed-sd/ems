@@ -95,6 +95,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         'next_review' => function ($r) { return ems_w14_year_after($r['disclosed_at']); },
         'assessor' => function ($r) { return ems_w14_person($r['assessed_by']); },
     );
-    echo ems_w14_grid('emsList_conflict_disclosures', $GUIDE_COLS, $rows, $D, 'لا إفصاحات مسجلة'); /* /GUIDE_COLS */ ?></div>
+    echo ems_w14_grid('emsList_conflict_disclosures', $GUIDE_COLS, $rows, $D, 'لا إفصاحات مسجلة'); /* /GUIDE_COLS */ ?>
+    <?php /* ④ نموذجُ الإضافةِ — **مشتقٌّ من الدليلِ لا مكتوب** (SILENT_DROP_FIX §2·2-④)
+         حقولُه من `repair01_fields` وأعمدتُه من `$GUIDE_COLS` أعلاه،
+         ⛔ ولا اسمَ حقلٍ يُكتب هنا — والقابلُ للإدخالِ ثلاثةُ أصنافٍ لا غير. */
+    require_once __DIR__ . '/../includes/w14_guide_form.php';
+    ems_w14_guide_form(array(
+        'surfaces' => array('تضارب المصالح', 'تضارب المصالح'),
+        'table'    => 'gov_conflict_disclosure',
+        'cols'     => $GUIDE_COLS,
+        'screen'   => 'Governance/conflict_disclosures.php',
+    )); ?>
+</div>
 </div>
 </body></html>

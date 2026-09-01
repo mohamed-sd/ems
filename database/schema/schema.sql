@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-01 10:59:39
--- الجداول: 1234 · المناظير: 28
+-- المصدر: equipation_manage · التوليد: 2026-09-01 17:08:35
+-- الجداول: 1235 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -10827,6 +10827,23 @@ CREATE TABLE `gov_governing_screens` (
   UNIQUE KEY `uq_scr` (`company_id`,`screen_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='PROP-01 §4-1 ⑤ — سجلُّ الشاشاتِ الحاكمةِ الخاضعةِ لشرطِ التصنيف';
 
+-- ── Table: gov_guide_lists ──
+CREATE TABLE `gov_guide_lists` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `surface_key` varchar(190) NOT NULL COMMENT 'اسمُ السطحِ مُسوًّى — مفتاحُ المطابقة',
+  `surface_ar` varchar(190) NOT NULL COMMENT 'اسمُ السطحِ كما في الورقة',
+  `field_key` varchar(190) NOT NULL COMMENT 'اسمُ الحقلِ مُسوًّى',
+  `field_ar` varchar(190) NOT NULL COMMENT 'اسمُ الحقلِ كما في الورقة',
+  `value_ar` varchar(190) NOT NULL COMMENT 'المفردةُ القانونيةُ حرفًا — ⛔ لا تُترجَم',
+  `sort_no` smallint(5) unsigned NOT NULL DEFAULT 0 COMMENT 'ترتيبُها في الورقة',
+  `src_ref` varchar(255) NOT NULL COMMENT 'الملفُّ والورقةُ والبندُ والصف — ⛔ ولا قيمةَ بلا مرجعِ خليّة',
+  `active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_guide_list_value` (`surface_key`,`field_key`,`value_ar`),
+  KEY `ix_guide_list_field` (`surface_key`,`field_key`,`active`,`sort_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='قيمُ القوائمِ المحكومةِ من الدليلِ المعماريّ — SILENT_DROP_FIX §2·2-④';
+
 -- ── Table: gov_independent_reviews ──
 CREATE TABLE `gov_independent_reviews` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -15315,6 +15332,8 @@ CREATE TABLE `nav_ws_roles` (
   `binding` enum('PRIMARY','SECONDARY') NOT NULL DEFAULT 'PRIMARY',
   `source_ref` varchar(190) NOT NULL,
   `primary_role` int(11) GENERATED ALWAYS AS (if(`binding` = 'PRIMARY',`role_id`,NULL)) STORED,
+  `parent_role_id` int(11) DEFAULT NULL COMMENT 'دورُ الأمِّ الذي بُرِّر به الربطُ SECONDARY — من roles.parent_role_id',
+  `ruling` varchar(400) NOT NULL DEFAULT '' COMMENT 'حكمُ الربطِ مكتوبًا في الصفِّ نفسِه — ⛔ ولا صفَّ بلا حكم',
   PRIMARY KEY (`workspace_id`,`role_id`),
   UNIQUE KEY `uq_one_primary` (`primary_role`),
   CONSTRAINT `fk_wsr_ws` FOREIGN KEY (`workspace_id`) REFERENCES `nav_workspaces` (`workspace_id`)

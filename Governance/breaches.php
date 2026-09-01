@@ -93,6 +93,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             return trim((string) $r['investigation_no']) !== '' ? 'نعم' : 'لا';
         },
     );
-    echo ems_w14_grid('emsList_breaches', $GUIDE_COLS, $rows, $D, 'لا إخلالات مسجلة'); /* /GUIDE_COLS */ ?></div>
+    echo ems_w14_grid('emsList_breaches', $GUIDE_COLS, $rows, $D, 'لا إخلالات مسجلة'); /* /GUIDE_COLS */ ?>
+    <?php /* ④ نموذجُ الإضافةِ — **مشتقٌّ من الدليلِ لا مكتوب** (SILENT_DROP_FIX §2·2-④)
+         حقولُه من `repair01_fields` وأعمدتُه من `$GUIDE_COLS` أعلاه،
+         ⛔ ولا اسمَ حقلٍ يُكتب هنا — والقابلُ للإدخالِ ثلاثةُ أصنافٍ لا غير. */
+    require_once __DIR__ . '/../includes/w14_guide_form.php';
+    ems_w14_guide_form(array(
+        'surfaces' => array('سجل الاخلالات', 'سجل الإخلالات'),
+        'table'    => 'gov_breach',
+        'cols'     => $GUIDE_COLS,
+        'screen'   => 'Governance/breaches.php',
+    )); ?>
+</div>
 </div>
 </body></html>

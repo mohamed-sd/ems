@@ -74,6 +74,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         'مرجع المصدر' => 'src_ref',
     );
     $D = array();
-    echo ems_w14_grid('emsList_conduct_acknowledgements', $GUIDE_COLS, $rows, $D, 'لا إقرارات مسجلة'); /* /GUIDE_COLS */ ?></div>
+    echo ems_w14_grid('emsList_conduct_acknowledgements', $GUIDE_COLS, $rows, $D, 'لا إقرارات مسجلة'); /* /GUIDE_COLS */ ?>
+    <?php /* ④ نموذجُ الإضافةِ — **مشتقٌّ من الدليلِ لا مكتوب** (SILENT_DROP_FIX §2·2-④)
+         حقولُه من `repair01_fields` وأعمدتُه من `$GUIDE_COLS` أعلاه،
+         ⛔ ولا اسمَ حقلٍ يُكتب هنا — والقابلُ للإدخالِ ثلاثةُ أصنافٍ لا غير. */
+    require_once __DIR__ . '/../includes/w14_guide_form.php';
+    ems_w14_guide_form(array(
+        'surfaces' => array('اقرارات مدونه السلوك', 'إقرارات مدونة السلوك'),
+        'table'    => 'gov_conduct_ack',
+        'cols'     => $GUIDE_COLS,
+        'screen'   => 'Governance/conduct_acknowledgements.php',
+    )); ?>
+</div>
 </div>
 </body></html>

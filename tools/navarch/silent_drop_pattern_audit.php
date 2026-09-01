@@ -62,7 +62,7 @@ $SIG = array(
                            . '|kpi-card|kpi-box|metric-box|metrics-|tile-card)~i', '② بطاقاتُ الإحصاء'),
     'sec_filters'   => array('~filter-title|filter-body|filter-field|ems_filter_box\\('
                            . '|ems-filter-box|ems-filters|class=["\']filter["\']~i', '③ الفلاتر'),
-    'sec_form'      => array('~allforms|ems-form|u13-act~',         '④ نموذجُ الإضافة'),
+    'sec_form'      => array('~allforms|ems-form|u13-act|ems_w14_guide_form~', '④ نموذجُ الإضافة'),
     /* ثلاثةٌ لا تُنسى (§2·3) */
     'x_modal'       => array('~EmsDetailsModal~',                   'EmsDetailsModal'),
     /* ◆ **والجدولُ يُهيَّأُ مركزيًّا**: `assets/js/ui-unification.js::initializeMissingDataTables`

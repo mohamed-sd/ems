@@ -82,6 +82,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         'entity'    => function ($r) { return ems_w14_company($r['company_id']); },
         'submitter' => function ($r) { return ems_w14_person($r['submitted_by']); },
     );
-    echo ems_w14_grid('emsList_regulatory_filings', $GUIDE_COLS, $rows, $D, 'لا تقديمات مسجلة'); /* /GUIDE_COLS */ ?></div>
+    echo ems_w14_grid('emsList_regulatory_filings', $GUIDE_COLS, $rows, $D, 'لا تقديمات مسجلة'); /* /GUIDE_COLS */ ?>
+    <?php /* ④ نموذجُ الإضافةِ — **مشتقٌّ من الدليلِ لا مكتوب** (SILENT_DROP_FIX §2·2-④)
+         حقولُه من `repair01_fields` وأعمدتُه من `$GUIDE_COLS` أعلاه،
+         ⛔ ولا اسمَ حقلٍ يُكتب هنا — والقابلُ للإدخالِ ثلاثةُ أصنافٍ لا غير. */
+    require_once __DIR__ . '/../includes/w14_guide_form.php';
+    ems_w14_guide_form(array(
+        'surfaces' => array('التقديمات النظاميه', 'التقديمات النظامية'),
+        'table'    => 'gov_filing',
+        'cols'     => $GUIDE_COLS,
+        'screen'   => 'Governance/regulatory_filings.php',
+    )); ?>
+</div>
 </div>
 </body></html>

@@ -88,6 +88,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         $D = array();
         $__gridRows = ems_w14_guide_rows('wh_issue_request_lines');
         echo ems_w14_grid('emsList_wh_issue_request_lines', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في طلبات الصرف الواردة'); /* /GUIDE_COLS */ ?>
+    <?php /* ④ نموذجُ الإضافةِ — **مشتقٌّ من الدليلِ لا مكتوب** (SILENT_DROP_FIX §2·2-④)
+         حقولُه من `repair01_fields` وأعمدتُه من `$GUIDE_COLS` أعلاه،
+         ⛔ ولا اسمَ حقلٍ يُكتب هنا — والقابلُ للإدخالِ ثلاثةُ أصنافٍ لا غير. */
+    require_once __DIR__ . '/../includes/w14_guide_form.php';
+    ems_w14_guide_form(array(
+        'surfaces' => array('بنود طلب الصرف الوارد', 'بنود طلب الصرف الوارد'),
+        'table'    => 'wh_issue_request_lines',
+        'cols'     => $GUIDE_COLS,
+        'screen'   => 'Procurement/wh_issue_requests.php',
+    )); ?>
+
     </div></div></div>
     <?php  ?>
     <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،

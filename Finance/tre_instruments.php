@@ -88,6 +88,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     );
     $D = array();
     $__gridRows = ems_w14_guide_rows('tre_instruments');
-    echo ems_w14_grid('emsList_tre_instruments', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في سجل الأدوات المالية'); /* /GUIDE_COLS */ ?></div>
+    echo ems_w14_grid('emsList_tre_instruments', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في سجل الأدوات المالية'); /* /GUIDE_COLS */ ?>
+    <?php /* ④ نموذجُ الإضافةِ — **مشتقٌّ من الدليلِ لا مكتوب** (SILENT_DROP_FIX §2·2-④)
+         حقولُه من `repair01_fields` وأعمدتُه من `$GUIDE_COLS` أعلاه،
+         ⛔ ولا اسمَ حقلٍ يُكتب هنا — والقابلُ للإدخالِ ثلاثةُ أصنافٍ لا غير. */
+    require_once __DIR__ . '/../includes/w14_guide_form.php';
+    ems_w14_guide_form(array(
+        'surfaces' => array('سجل الادوات الماليه', 'سجل الأدوات المالية'),
+        'table'    => 'tre_instruments',
+        'cols'     => $GUIDE_COLS,
+        'screen'   => 'finance/tre_instruments.php',
+    )); ?>
+</div>
 </div>
 </body></html>

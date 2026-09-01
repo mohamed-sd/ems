@@ -86,6 +86,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             return ems_w14_num($v) . ' ' . trim((string) $r['deal_currency']);
         },
     );
-    echo ems_w14_grid('emsList_related_parties', $GUIDE_COLS, $rows, $D, 'لا أطراف ذات علاقة'); /* /GUIDE_COLS */ ?></div>
+    echo ems_w14_grid('emsList_related_parties', $GUIDE_COLS, $rows, $D, 'لا أطراف ذات علاقة'); /* /GUIDE_COLS */ ?>
+    <?php /* ④ نموذجُ الإضافةِ — **مشتقٌّ من الدليلِ لا مكتوب** (SILENT_DROP_FIX §2·2-④)
+         حقولُه من `repair01_fields` وأعمدتُه من `$GUIDE_COLS` أعلاه،
+         ⛔ ولا اسمَ حقلٍ يُكتب هنا — والقابلُ للإدخالِ ثلاثةُ أصنافٍ لا غير. */
+    require_once __DIR__ . '/../includes/w14_guide_form.php';
+    ems_w14_guide_form(array(
+        'surfaces' => array('الاطراف ذات العلاقه', 'الأطراف ذات العلاقة'),
+        'table'    => 'gov_related_party',
+        'cols'     => $GUIDE_COLS,
+        'screen'   => 'Governance/related_parties.php',
+    )); ?>
+</div>
 </div>
 </body></html>
