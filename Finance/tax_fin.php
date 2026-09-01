@@ -111,6 +111,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     include('../includes/page_header.php'); ?>
     <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
          فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (§2·2-③).
+         ⛔ ولا فلترَ يُخترَع: `ems_filter_box` يشتقُّ ضوابطَه من رؤوسِ
+         الجدولِ المُصيَّرِ نفسِه، ويخفي نفسَه إن غاب الجدول. */
+    require_once __DIR__ . '/../includes/ems_filter_box.php';
+    ems_filter_box(array('for' => '#emsList_fina_tax_fin')); ?>
     <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
     <div class="card-body"><div class="table-container">
         <?php /* GUIDE_COLS:govui_field_close

@@ -1,0 +1,2454 @@
+{
+    "measured_at": "2026-09-01T16:27:23+03:00",
+    "snapshot": "0fcaa85b",
+    "reference": "Clients\/clients.php",
+    "tokens": 15,
+    "complete": 28,
+    "partial": 41,
+    "not_on_disk": 0,
+    "rows": [
+        {
+            "route": "Portal\/vp_approval_inbox.php",
+            "ws": "EX-DVP",
+            "idx": 6,
+            "screen_id": "SCR-0806",
+            "label": "صندوق اعتمادات النائب",
+            "origin": "IN_58",
+            "type": "Transaction — محرك موحد",
+            "surface_kind": "PROJECTION",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PATTERN_COMPLETE",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "④ نموذجُ الإضافة",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "Portal\/vp_dashboard.php",
+            "ws": "EX-DVP",
+            "idx": 1,
+            "screen_id": "SCR-0793",
+            "label": "لوحة النائب",
+            "origin": "IN_58",
+            "type": "Dashboard — محرك موحد Deputy_Role\/Scope",
+            "surface_kind": "PROJECTION",
+            "via_kit": [
+                "includes\/page_header.php"
+            ],
+            "verdict": "PATTERN_COMPLETE",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "④ نموذجُ الإضافة",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "Portal\/vp_monthly_review.php",
+            "ws": "EX-DVP",
+            "idx": 5,
+            "screen_id": "SCR-0796",
+            "label": "المراجعة الشهرية للنائب",
+            "origin": "IN_58",
+            "type": "Derived",
+            "surface_kind": "PROJECTION",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PATTERN_COMPLETE",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "④ نموذجُ الإضافة",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "clients\/client_contacts.php",
+            "ws": "DEP-01",
+            "idx": 2,
+            "screen_id": "SCR-0034",
+            "label": "جهات اتصال العملاء",
+            "origin": "RESTORED",
+            "type": "Child Register",
+            "surface_kind": "PROJECTION",
+            "via_kit": [
+                "includes\/entity_tabs.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PATTERN_COMPLETE",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [],
+            "na": [
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "④ نموذجُ الإضافة",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "clients\/quotation_lines.php",
+            "ws": "DEP-01",
+            "idx": 8,
+            "screen_id": "SCR-0043",
+            "label": "بنود العروض",
+            "origin": "RESTORED",
+            "type": "Child Register",
+            "surface_kind": "PROJECTION",
+            "via_kit": [
+                "includes\/sales_family_tabs.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PATTERN_COMPLETE",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [],
+            "na": [
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "④ نموذجُ الإضافة",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "employees\/hr_benefits.php",
+            "ws": "DEP-07",
+            "idx": 19,
+            "screen_id": "SCR-0729",
+            "label": "المزايا والتأمينات",
+            "origin": "IN_58",
+            "type": "Transaction — Benefits\/Insurance",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "④ نموذجُ الإضافة"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "employees\/hr_employee_documents.php",
+            "ws": "DEP-07",
+            "idx": 8,
+            "screen_id": "SCR-0723",
+            "label": "مستندات الموظف",
+            "origin": "IN_58",
+            "type": "Child of ب03 — Employee Documents",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "④ نموذجُ الإضافة"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "employees\/hr_job_movements.php",
+            "ws": "DEP-07",
+            "idx": 12,
+            "screen_id": "SCR-0725",
+            "label": "الحركات الوظيفية",
+            "origin": "IN_58",
+            "type": "Transaction — Personnel Movements",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "④ نموذجُ الإضافة"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "employees\/hr_onboarding.php",
+            "ws": "DEP-07",
+            "idx": 9,
+            "screen_id": "SCR-0724",
+            "label": "التهيئة والمباشرة",
+            "origin": "IN_58",
+            "type": "Transaction",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "④ نموذجُ الإضافة"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "employees\/hr_performance.php",
+            "ws": "DEP-07",
+            "idx": 16,
+            "screen_id": "SCR-0727",
+            "label": "تقييم الأداء الوظيفي",
+            "origin": "IN_58",
+            "type": "Periodic — Performance Appraisal",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PATTERN_COMPLETE",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "④ نموذجُ الإضافة",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "employees\/hr_training.php",
+            "ws": "DEP-07",
+            "idx": 15,
+            "screen_id": "SCR-0726",
+            "label": "التدريب والكفاءة",
+            "origin": "IN_58",
+            "type": "Transaction — Training\/Competence",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "④ نموذجُ الإضافة"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "finance\/acc_credit_control.php",
+            "ws": "DEP-05",
+            "idx": 15,
+            "screen_id": "SCR-0684",
+            "label": "الرقابة الائتمانية وحدود العملاء",
+            "origin": "IN_58",
+            "type": "Reference — Credit Control",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "④ نموذجُ الإضافة"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "finance\/acc_reconciliations.php",
+            "ws": "DEP-05",
+            "idx": 20,
+            "screen_id": "SCR-0686",
+            "label": "مطابقات الحسابات",
+            "origin": "IN_58",
+            "type": "Periodic — Account Reconciliation",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PATTERN_COMPLETE",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "④ نموذجُ الإضافة",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "finance\/acc_trial_balance.php",
+            "ws": "DEP-05",
+            "idx": 21,
+            "screen_id": "SCR-0687",
+            "label": "ميزان المراجعة",
+            "origin": "IN_58",
+            "type": "Derived — Trial Balance",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PATTERN_COMPLETE",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "④ نموذجُ الإضافة",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "finance\/financial_statements_fin.php",
+            "ws": "DEP-05",
+            "idx": 24,
+            "screen_id": "SCR-0146",
+            "label": "القوائم المالية",
+            "origin": "IN_58",
+            "type": "Derived — Financial Statements",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "② بطاقاتُ الإحصاء"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "④ نموذجُ الإضافة",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "finance\/periods_fin.php",
+            "ws": "DEP-05",
+            "idx": 23,
+            "screen_id": "SCR-0164",
+            "label": "إقفال الفترة المحاسبية",
+            "origin": "SERVING_PARENT",
+            "type": "Periodic",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "③ الفلاتر",
+                "④ نموذجُ الإضافة",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "② بطاقاتُ الإحصاء"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "finance\/tax_fin.php",
+            "ws": "DEP-05",
+            "idx": 18,
+            "screen_id": "SCR-0166",
+            "label": "الضرائب والقيمة المضافة",
+            "origin": "IN_58",
+            "type": "Periodic — Tax\/VAT",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "③ الفلاتر",
+                "④ نموذجُ الإضافة",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "② بطاقاتُ الإحصاء"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "finance\/tre_beneficiary.php",
+            "ws": "DEP-06",
+            "idx": 3,
+            "screen_id": "SCR-0168",
+            "label": "سجل المستفيدين والتحقق",
+            "origin": "IN_58",
+            "type": "Reference — Beneficiary Verification",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "② بطاقاتُ الإحصاء",
+                "④ نموذجُ الإضافة"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "finance\/tre_cash_count.php",
+            "ws": "DEP-06",
+            "idx": 18,
+            "screen_id": "SCR-0700",
+            "label": "الجرد النقدي للخزائن",
+            "origin": "IN_58",
+            "type": "Periodic — Cash Counts",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PATTERN_COMPLETE",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "④ نموذجُ الإضافة",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "finance\/tre_fx_deals.php",
+            "ws": "DEP-06",
+            "idx": 12,
+            "screen_id": "SCR-0697",
+            "label": "تنفيذ عمليات الصرف الأجنبي",
+            "origin": "IN_58",
+            "type": "Transaction — FX Execution",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "④ نموذجُ الإضافة"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "finance\/tre_guarantees.php",
+            "ws": "DEP-06",
+            "idx": 15,
+            "screen_id": "SCR-0698",
+            "label": "خطابات الضمان والاعتمادات المستندية",
+            "origin": "IN_58",
+            "type": "Transaction — Guarantees\/LCs",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "④ نموذجُ الإضافة"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "finance\/tre_instruments.php",
+            "ws": "DEP-06",
+            "idx": 6,
+            "screen_id": "SCR-0692",
+            "label": "سجل الأدوات المالية",
+            "origin": "IN_58",
+            "type": "Transaction — Instrument Register",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "④ نموذجُ الإضافة"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "finance\/tre_transfers.php",
+            "ws": "DEP-06",
+            "idx": 11,
+            "screen_id": "SCR-0696",
+            "label": "التحويلات بين الحسابات",
+            "origin": "IN_58",
+            "type": "Transaction — Interbank Transfers",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "④ نموذجُ الإضافة"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "finrequests\/request_form.php",
+            "ws": "WS-MY",
+            "idx": 4,
+            "screen_id": "SCR-0195",
+            "label": "الطلبات المقدَّمة",
+            "origin": "RESTORED",
+            "type": "Decision View — Unified Request Launcher + My Requests Projection",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/page_header.php"
+            ],
+            "verdict": "PATTERN_COMPLETE",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "④ نموذجُ الإضافة",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "fleet\/asset_assignments.php",
+            "ws": "DEP-04",
+            "idx": 13,
+            "screen_id": "SCR-0654",
+            "label": "حركة الموقع والمشروع",
+            "origin": "SERVING_PARENT",
+            "type": "Transaction",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "③ الفلاتر",
+                "④ نموذجُ الإضافة",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "العُدّة · شبكةُ العرض",
+                "② بطاقاتُ الإحصاء"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "fleet\/asset_exit.php",
+            "ws": "DEP-04",
+            "idx": 22,
+            "screen_id": "SCR-0656",
+            "label": "الخروج الدائم",
+            "origin": "SERVING_PARENT",
+            "type": "Reference",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "③ الفلاتر",
+                "④ نموذجُ الإضافة",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "العُدّة · شبكةُ العرض",
+                "② بطاقاتُ الإحصاء"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "fleet\/asset_intake.php",
+            "ws": "DEP-04",
+            "idx": 4,
+            "screen_id": "SCR-0652",
+            "label": "التحقق من المصدر",
+            "origin": "SERVING_PARENT",
+            "type": "Transaction",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "③ الفلاتر",
+                "④ نموذجُ الإضافة",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "العُدّة · شبكةُ العرض",
+                "② بطاقاتُ الإحصاء"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "fleet\/asset_readiness.php",
+            "ws": "DEP-04",
+            "idx": 20,
+            "screen_id": "SCR-0655",
+            "label": "الجاهزية الشهرية",
+            "origin": "SERVING_PARENT",
+            "type": "Derived View",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/page_header.php"
+            ],
+            "verdict": "PATTERN_COMPLETE",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [],
+            "na": [
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "④ نموذجُ الإضافة",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "governance\/audit_followup.php",
+            "ws": "DEP-08",
+            "idx": 26,
+            "screen_id": "SCR-0756",
+            "label": "متابعة نتائج المراجعة",
+            "origin": "IN_58",
+            "type": "Transaction — Audit Findings Follow-up",
+            "surface_kind": "PROJECTION",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PATTERN_COMPLETE",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "④ نموذجُ الإضافة",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "governance\/breaches.php",
+            "ws": "DEP-08",
+            "idx": 24,
+            "screen_id": "SCR-0754",
+            "label": "سجل الإخلالات",
+            "origin": "IN_58",
+            "type": "Transaction — Breach Register",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "④ نموذجُ الإضافة"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "governance\/committees.php",
+            "ws": "DEP-08",
+            "idx": 30,
+            "screen_id": "SCR-0757",
+            "label": "اللجان وحوكمة الاجتماعات",
+            "origin": "IN_58",
+            "type": "Reference — Committees",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "④ نموذجُ الإضافة"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "governance\/compliance_calendar.php",
+            "ws": "DEP-08",
+            "idx": 5,
+            "screen_id": "SCR-0744",
+            "label": "تقويم الامتثال",
+            "origin": "IN_58",
+            "type": "Derived — Compliance Calendar",
+            "surface_kind": "PROJECTION",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PATTERN_COMPLETE",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "④ نموذجُ الإضافة",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "governance\/conduct_acknowledgements.php",
+            "ws": "DEP-08",
+            "idx": 13,
+            "screen_id": "SCR-0750",
+            "label": "إقرارات مدونة السلوك",
+            "origin": "IN_58",
+            "type": "Transaction — CoC Acknowledgements",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "④ نموذجُ الإضافة"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "governance\/conflict_disclosures.php",
+            "ws": "DEP-08",
+            "idx": 10,
+            "screen_id": "SCR-0747",
+            "label": "تضارب المصالح",
+            "origin": "IN_58",
+            "type": "Transaction — Conflict of Interest",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "④ نموذجُ الإضافة"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "governance\/corrective_actions.php",
+            "ws": "DEP-08",
+            "idx": 25,
+            "screen_id": "SCR-0755",
+            "label": "الإجراءات التصحيحية",
+            "origin": "IN_58",
+            "type": "Transaction — Corrective Actions",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "④ نموذجُ الإضافة"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "governance\/gifts_hospitality.php",
+            "ws": "DEP-08",
+            "idx": 12,
+            "screen_id": "SCR-0749",
+            "label": "الهدايا والضيافة",
+            "origin": "IN_58",
+            "type": "Transaction — Gifts & Hospitality",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "④ نموذجُ الإضافة"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "governance\/integrity_reports.php",
+            "ws": "DEP-08",
+            "idx": 22,
+            "screen_id": "SCR-0752",
+            "label": "بلاغات النزاهة المحمية",
+            "origin": "IN_58",
+            "type": "Transaction — Whistleblowing",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "④ نموذجُ الإضافة"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "governance\/investigations.php",
+            "ws": "DEP-08",
+            "idx": 23,
+            "screen_id": "SCR-0753",
+            "label": "التحقيقات",
+            "origin": "IN_58",
+            "type": "Transaction — Investigations",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "④ نموذجُ الإضافة"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "governance\/policies.php",
+            "ws": "DEP-08",
+            "idx": 3,
+            "screen_id": "SCR-0742",
+            "label": "سجل السياسات",
+            "origin": "IN_58",
+            "type": "Reference — Policy Register",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "④ نموذجُ الإضافة"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "governance\/regulatory_filings.php",
+            "ws": "DEP-08",
+            "idx": 8,
+            "screen_id": "SCR-0745",
+            "label": "التقديمات النظامية",
+            "origin": "IN_58",
+            "type": "Transaction — Regulatory Filings",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "④ نموذجُ الإضافة"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "governance\/related_parties.php",
+            "ws": "DEP-08",
+            "idx": 11,
+            "screen_id": "SCR-0748",
+            "label": "الأطراف ذات العلاقة",
+            "origin": "IN_58",
+            "type": "Reference — Related Parties",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "④ نموذجُ الإضافة"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "maintenance\/daily_care.php",
+            "ws": "DEP-14",
+            "idx": 14,
+            "screen_id": "SCR-0661",
+            "label": "العناية اليومية والتشحيم",
+            "origin": "IN_58",
+            "type": "Event — Daily Care & Lubrication",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "④ نموذجُ الإضافة"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "maintenance\/external_repairs.php",
+            "ws": "DEP-14",
+            "idx": 12,
+            "screen_id": "SCR-0660",
+            "label": "الإصلاح الخارجي ومطالبات الضمان",
+            "origin": "IN_58",
+            "type": "Transaction — External Repair & Warranty",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "④ نموذجُ الإضافة"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "maintenance\/work_orders.php",
+            "ws": "DEP-14",
+            "idx": 10,
+            "screen_id": "SCR-0904",
+            "label": "بنود أمر العمل",
+            "origin": "SERVING_PARENT",
+            "type": "Child of ص05",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/u13_screen_kit.php",
+                "includes\/u13_screen_kit_cols.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PATTERN_COMPLETE",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "④ نموذجُ الإضافة",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "portal\/exec_delegations.php",
+            "ws": "EX-DVP",
+            "idx": 12,
+            "screen_id": "SCR-0783",
+            "label": "الإنابات والتفويضات",
+            "origin": "RESTORED",
+            "type": "Transaction",
+            "surface_kind": "PROJECTION",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PATTERN_COMPLETE",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "④ نموذجُ الإضافة",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "portal\/exec_escalations.php",
+            "ws": "EX-DVP",
+            "idx": 9,
+            "screen_id": "SCR-0777",
+            "label": "التصعيدات العليا",
+            "origin": "RESTORED",
+            "type": "Exception",
+            "surface_kind": "PROJECTION",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PATTERN_COMPLETE",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "④ نموذجُ الإضافة",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "portal\/exec_financial_approvals.php",
+            "ws": "EX-DVP",
+            "idx": 7,
+            "screen_id": "SCR-0907",
+            "label": "الاعتمادات المالية",
+            "origin": "RESTORED",
+            "type": "Transaction",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/u13_screen_kit.php",
+                "includes\/u13_screen_kit_cols.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "④ نموذجُ الإضافة",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "العُدّة · شبكةُ العرض",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "portal\/exec_redline_breaches.php",
+            "ws": "EX-DVP",
+            "idx": 8,
+            "screen_id": "SCR-0774",
+            "label": "تجاوزات الخطوط الحمراء",
+            "origin": "RESTORED",
+            "type": "Exception",
+            "surface_kind": "PROJECTION",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PATTERN_COMPLETE",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "④ نموذجُ الإضافة",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "portal\/my_achievement.php",
+            "ws": "WS-MY",
+            "idx": 1,
+            "screen_id": "SCR-0465",
+            "label": "مؤشرات الإنجاز الشخصي",
+            "origin": "RESTORED",
+            "type": "Derived",
+            "surface_kind": "PROJECTION",
+            "via_kit": [
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "② بطاقاتُ الإحصاء"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "④ نموذجُ الإضافة",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "portal\/my_portal.php",
+            "ws": "WS-MY",
+            "idx": 2,
+            "screen_id": "SCR-0469",
+            "label": "البوابة الشخصية",
+            "origin": "RESTORED",
+            "type": "Derived",
+            "surface_kind": "PROJECTION",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PATTERN_COMPLETE",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "④ نموذجُ الإضافة",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "portal\/my_reports.php",
+            "ws": "WS-MY",
+            "idx": 5,
+            "screen_id": "SCR-0784",
+            "label": "البلاغات المسجَّلة",
+            "origin": "RESTORED",
+            "type": "Transaction",
+            "surface_kind": "PROJECTION",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PATTERN_COMPLETE",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "④ نموذجُ الإضافة",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "portal\/my_tasks.php",
+            "ws": "WS-MY",
+            "idx": 3,
+            "screen_id": "SCR-0471",
+            "label": "المهام المسنَدة",
+            "origin": "RESTORED",
+            "type": "Transaction",
+            "surface_kind": "PROJECTION",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "② بطاقاتُ الإحصاء"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "④ نموذجُ الإضافة",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "portal\/vp_actions_followup.php",
+            "ws": "EX-DVP",
+            "idx": 11,
+            "screen_id": "SCR-0808",
+            "label": "متابعة قرارات النائب",
+            "origin": "RESTORED",
+            "type": "Derived",
+            "surface_kind": "PROJECTION",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PATTERN_COMPLETE",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "④ نموذجُ الإضافة",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "portal\/vp_approval_inbox.php",
+            "ws": "EX-DVP",
+            "idx": 6,
+            "screen_id": "SCR-0806",
+            "label": "صندوق اعتمادات النائب",
+            "origin": "RESTORED",
+            "type": "Transaction — محرك موحد",
+            "surface_kind": "PROJECTION",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PATTERN_COMPLETE",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "④ نموذجُ الإضافة",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "portal\/vp_daily_report.php",
+            "ws": "EX-DVP",
+            "idx": 3,
+            "screen_id": "SCR-0794",
+            "label": "التقرير اليومي للنائب",
+            "origin": "RESTORED",
+            "type": "Derived — نفس محرك ر03",
+            "surface_kind": "PROJECTION",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PATTERN_COMPLETE",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "④ نموذجُ الإضافة",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "portal\/vp_dashboard.php",
+            "ws": "EX-DVP",
+            "idx": 1,
+            "screen_id": "SCR-0793",
+            "label": "لوحة النائب",
+            "origin": "RESTORED",
+            "type": "Dashboard — محرك موحد Deputy_Role\/Scope",
+            "surface_kind": "PROJECTION",
+            "via_kit": [
+                "includes\/page_header.php"
+            ],
+            "verdict": "PATTERN_COMPLETE",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "④ نموذجُ الإضافة",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "portal\/vp_departments.php",
+            "ws": "EX-DVP",
+            "idx": 2,
+            "screen_id": "SCR-0791",
+            "label": "الإدارات — نطاقي والشركة",
+            "origin": "RESTORED",
+            "type": "Derived — Deputy Departments Overview",
+            "surface_kind": "PROJECTION",
+            "via_kit": [
+                "includes\/page_header.php"
+            ],
+            "verdict": "PATTERN_COMPLETE",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "④ نموذجُ الإضافة",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "portal\/vp_monthly_review.php",
+            "ws": "EX-DVP",
+            "idx": 5,
+            "screen_id": "SCR-0796",
+            "label": "المراجعة الشهرية للنائب",
+            "origin": "RESTORED",
+            "type": "Derived",
+            "surface_kind": "PROJECTION",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PATTERN_COMPLETE",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "④ نموذجُ الإضافة",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "portal\/vp_pending_actions.php",
+            "ws": "EX-DVP",
+            "idx": 10,
+            "screen_id": "SCR-0807",
+            "label": "الإجراءات والقرارات المطلوبة مني",
+            "origin": "RESTORED",
+            "type": "Derived",
+            "surface_kind": "PROJECTION",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PATTERN_COMPLETE",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "④ نموذجُ الإضافة",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "portal\/vp_weekly_report.php",
+            "ws": "EX-DVP",
+            "idx": 4,
+            "screen_id": "SCR-0795",
+            "label": "مراجعة الأداء الأسبوعية",
+            "origin": "RESTORED",
+            "type": "Derived",
+            "surface_kind": "PROJECTION",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PATTERN_COMPLETE",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "④ نموذجُ الإضافة",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "procurement\/proc_offers.php",
+            "ws": "DEP-16",
+            "idx": 9,
+            "screen_id": "SCR-0671",
+            "label": "بنود عروض الموردين",
+            "origin": "SERVING_PARENT",
+            "type": "Child of ش05",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "④ نموذجُ الإضافة"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "procurement\/proc_packages.php",
+            "ws": "DEP-16",
+            "idx": 5,
+            "screen_id": "SCR-0669",
+            "label": "أعضاء حزمة التجميع",
+            "origin": "SERVING_PARENT",
+            "type": "Child of ش03",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "④ نموذجُ الإضافة"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "procurement\/wh_custodians.php",
+            "ws": "DEP-17",
+            "idx": 3,
+            "screen_id": "SCR-0817",
+            "label": "إسناد أمناء المخازن",
+            "origin": "RESTORED",
+            "type": "Child of خ02",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "④ نموذجُ الإضافة",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "العُدّة · شبكةُ العرض"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "procurement\/wh_issue_requests.php",
+            "ws": "DEP-17",
+            "idx": 10,
+            "screen_id": "SCR-0677",
+            "label": "بنود طلب الصرف الوارد",
+            "origin": "SERVING_PARENT",
+            "type": "Child of خ06",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "④ نموذجُ الإضافة"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "settings\/change_password.php",
+            "ws": "WS-MY",
+            "idx": 7,
+            "screen_id": "SCR-0557",
+            "label": "كلمة المرور والأمان الشخصي",
+            "origin": "RESTORED",
+            "type": "Transaction — بحسب انطباق الشركة",
+            "surface_kind": "PROJECTION",
+            "via_kit": [
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · القشرة",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "العُدّة · شبكةُ العرض",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "④ نموذجُ الإضافة",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "suppliers\/supplier_contacts.php",
+            "ws": "DEP-02",
+            "idx": 2,
+            "screen_id": "SCR-0575",
+            "label": "جهات الاتصال والمفوضون",
+            "origin": "RESTORED",
+            "type": "Child Register",
+            "surface_kind": "PROJECTION",
+            "via_kit": [
+                "includes\/entity_tabs.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PATTERN_COMPLETE",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [],
+            "na": [
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "④ نموذجُ الإضافة",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "transport\/transfer_damage_claims.php",
+            "ws": "DEP-15",
+            "idx": 10,
+            "screen_id": "SCR-0666",
+            "label": "مطالبات التلف والحوادث",
+            "origin": "IN_58",
+            "type": "Transaction — Damage\/Incident Claim",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "④ نموذجُ الإضافة"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "transport\/transfer_origin_handover.php",
+            "ws": "DEP-15",
+            "idx": 6,
+            "screen_id": "SCR-0664",
+            "label": "تجهيز المغادرة والتسليم الأصلي",
+            "origin": "IN_58",
+            "type": "Transaction",
+            "surface_kind": "SOURCE",
+            "via_kit": [
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "② بطاقاتُ الإحصاء",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "④ نموذجُ الإضافة"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "EmsDetailsModal"
+            ]
+        },
+        {
+            "route": "user_capacities.php",
+            "ws": "WS-MY",
+            "idx": 6,
+            "screen_id": "SCR-0625",
+            "label": "الصفات الوظيفية والتبديل بينها",
+            "origin": "RESTORED",
+            "type": "Reference — بحسب انطباق الشركة",
+            "surface_kind": "PROJECTION",
+            "via_kit": [
+                "includes\/ems_filter_box.php",
+                "includes\/page_header.php"
+            ],
+            "verdict": "PARTIAL",
+            "have": [
+                "العُدّة · مخزنُ الجلسة",
+                "العُدّة · التهيئة",
+                "العُدّة · عقدُ الشاشة",
+                "العُدّة · شبكةُ العرض",
+                "العُدّة · القشرة",
+                "① الجدول",
+                "③ الفلاتر",
+                "DataTable",
+                "عن الشاشة"
+            ],
+            "missing": [
+                "② بطاقاتُ الإحصاء"
+            ],
+            "na": [
+                "العُدّة · تبويبُ الكيان",
+                "العُدّة · الحقولُ الإضافية",
+                "العُدّة · زرُّ الإكسل",
+                "④ نموذجُ الإضافة",
+                "EmsDetailsModal"
+            ]
+        }
+    ]
+}
