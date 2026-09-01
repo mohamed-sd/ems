@@ -1,7 +1,7 @@
 # MASTER FINAL CLOSURE REGISTER — السجلُّ الجامعُ للإغلاقِ النهائيّ
 
 > **المخزنُ الحاكم:** `registers/MASTER_FINAL_CLOSURE_REGISTER.json` — وهذا إسقاطُه.
-> **اللقطة:** `3dcd5b78` · **حُدِّث:** 2026-09-01 16:40
+> **اللقطة:** `b0795c42` · **حُدِّث:** 2026-09-01 21:50
 > **المصمَّمُ الحاكم:** `docs/REPAIR01_20260823/orders/CLOSURE_SYSTEM.txt`
 
 ## مقامُ الحالات — ⛔ ولا تُجمَع في نسبةٍ واحدة
@@ -12,10 +12,10 @@
 | `BLOCKED_GOVERNING_SOURCE` | 3 |
 | `BLOCKED_OWNER` | 40 |
 | `BLOCKED_UAT` | 5 |
-| `EVIDENCE_CLOSED` | 122 |
+| `EVIDENCE_CLOSED` | 124 |
 | `IMPLEMENTED_NOT_VERIFIED` | 9 |
-| `IN_PROGRESS` | 2 |
-| `OPEN` | 14 |
+| `IN_PROGRESS` | 1 |
+| `OPEN` | 13 |
 | **الجملة** | **197** |
 
 ## البنودُ غيرُ المغلقة — بحاجزِها وفعلِها التالي
@@ -31,7 +31,6 @@
 | `CL-GOV3-WH03` | `IMPLEMENTED_NOT_VERIFIED` | P1 | — | docs/REPAIR01_20260823/orders/GOV_EXEC.txt | IMPLEMENTED_NOT_VERIFIED @ 15ba9f3c | تشغيل جولة استخدام حية ثم رفع الحالة VERIFIED — والتحقق البشري للمساحة |
 | `CL-GOV3-BUILD` | `IMPLEMENTED_NOT_VERIFIED` | P1 | — | docs/REPAIR01_20260823/orders/GOV_EXEC.txt | CURRENT_RELEASE_TARGET_NOT_BUILT صفر لكل مساحة بدور حي — والاثبات البشري وحده يفصل بين IMP | استخراج Sprint من السجل واخذ اعلى الاهداف قيمة — 134 موضعا حاليا (لوحة |
 | `CL-GOV3-FIELDS` | `IN_PROGRESS` | P1 | — | docs/REPAIR01_20260823/orders/GOV_EXEC.txt | والمقام صعد بدخول 90 سطحا جديدا الجسر — فخ المقام §20 معلن، ومفتاح الدفتر صحح الى (screen_ | ابدا بالادارات البانية سقف البنية (ترتيب السجل) — المقيس الحالي في SCR |
-| `CL-GOVUI-02` | `IN_PROGRESS` | P1 | — | docs/REPAIR01_20260823/orders/GOV_UI_EXEC.txt | جبهة الحقول — FIELD_CONFORMANCE على الدفتر المسوى @ efb30839 |  |
 | `CL-GAP-23` | `BLOCKED_UAT` | P1 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ efb30839 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
 | `CL-GAP-29` | `OPEN` | P1 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ efb30839 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
 | `CL-FR-APP-005` | `BLOCKED_OWNER` | P1 | BLOCKED_OWNER | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ efb30839 |  |
@@ -78,7 +77,6 @@
 | `CL-NAVR-LEG626` | `OPEN` | P2 | — | أمر المالك: إصلاح نموذج الملاحة من الجذور (2026-08-31) | 626 بند قائمة ارثيا خارج كل ورقة حاكمة (TAXONOMY_LEGACY في NAVR_LINEAGE_RECON) — كل منها F | فض الاقتراحات دفعات باولوية المساحات — والقرار الحاكم اضافة/تقاعد لا ا |
 | `CL-GOV3-PERMPATH` | `OPEN` | P2 | — | docs/REPAIR01_20260823/orders/GOV_EXEC.txt | OPEN @ 909cf6a3 | تصميم خطة القلب: القالب يصير المصدر الوحيد والقائم يشتق منه — ثم ظل ثم |
 | `CL-GOVUI-03` | `OPEN` | P2 | — | docs/REPAIR01_20260823/orders/GOV_UI_EXEC.txt | ارثي يصير بندا بلا قيد مصالحة فردي — حكم CL-NAVR-LEG626 صنفي @ efb30839 |  |
-| `CL-GOVUI-04` | `OPEN` | P2 | — | docs/REPAIR01_20260823/orders/GOV_UI_EXEC.txt | ستة اسطح تجمع حبتين — منها ثلاثة تحمل حكم GRAIN_MISMATCH @ efb30839 |  |
 | `CL-GAP-03` | `OPEN` | P2 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ efb30839 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
 | `CL-GAP-12` | `OPEN` | P2 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ efb30839 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
 | `CL-GAP-14` | `OPEN` | P2 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ efb30839 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
@@ -131,6 +129,7 @@
 | `CL-NAVR-EX` | navr_import_exec: 38 موضعا من ملف القيادة (EX-CEO 4 مجموعات 26 هدفا · EX-DVP 4 مجموعات 12) — وEX-CEO ربط بدوره 9 وصار مطابقا فيما بني 4/4 و21/21 · EX-DVP بلا دور حي Finding @ df5adb85 |
 | `CL-WORK-04` | REQUIRED_SETTLEMENT_EFFECT_MISSING=0 مقيسا + settlement_proof 16/16 + eng01_bus_test 22/22 + rpr03_contract_register صفر مفردة بلا عقد @ 59136c85 |
 | `CL-WORK-05` | سقاطتان شدتا (permission 72⇒20 · extraction 77⇒36 بتمديد الاستخراج للعديات) ودينان جديدان سدا لا شدا (قارئ وهمي + ملكية cron_task) — الحزام 25⇒30/34 والمقامات ثابتة @ 59136c85 |
+| `CL-GOVUI-02` | tools/rpr02_field_measure.php — 5470/5470 على القرص و363 سطحا مطابقا كاملا من 363 · وtools/govui_finish_render.php — 5444/5470 تصييرا حيا و360 سطحا تاما من 363 · والثلاثة بحواجب مسماة في render_ruled.json @ b0795c42 |
 | `CL-GAP-01` | tools/injfix01_gap_coverage.php @ 808a2c03 |
 | `CL-GAP-02` | tools/injfix01_gap_coverage.php @ 808a2c03 |
 | `CL-GAP-04` | tools/injfix01_gap_coverage.php @ 808a2c03 |
@@ -196,6 +195,7 @@
 | `CL-PAT-EVTSUBS` | GOVERNING_SOURCE_MAP (EVT-SUBS) + NAVR_PATTERN_SCAN §2 @ aba54573 |
 | `CL-PAT-USERROLE` | هجرة 2028_02_08 (ردم 34 + وسم اثري) + شاهد tests/gov_userrole_axis_proof.php 7/7 + قارئا القياس حولا للحاكم @ a60f6d97 |
 | `CL-PAT-DUPLABEL` | صفر اسم معتمد على مسارين — مقيس بـnav_canonical: خمسة ازواج حسمت باربع اعادات تسمية من ترويسة كل ملف وقيد دمج واحد (my_requests محول لا شاشة). وثلاثة منها كانت تواما حيا في سايدبار واحد (الادوار 26 و15 و9) ودور 15 استعاد رابطا كان يبتلعه حارس التكرار @ 06237f66 |
+| `CL-GOVUI-04` | tools/govui_metrics.php — GRAIN_CONFORMANCE 413/413 · يجمع حبتين 0 · وحكم الجمع الوحيد مسجل بنص الورقة في docs/REPAIR01_20260823/grain_rulings.json @ b0795c42 |
 | `CL-GOVUI-05` | TARGET_BUILD_COVERAGE 413/413 — بنيت خطة القوى العاملة (HR-03) بمواصفة dep07_hr_headcount وهجرتها 2028_03_10، وLABEL_CONFORMANCE صار بمقام لا استثناء فيه لغير المبني @ 06237f66 |
 | `CL-GAP-31` | path_rulings 6/6 GAPV GAP-31 PASS @ 59136c85 |
 | `CL-FR-EVT-005` |  |
