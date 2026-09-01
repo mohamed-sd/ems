@@ -6,7 +6,7 @@
  *   ومواصفتِه في `tools/specs/`. لا يُحرَّر يدويًّا — أعِد التوليد.
  *
  * الحبّة: سطرُ توزيعِ حصّةٍ لمورِّدٍ في دورةِ التزامٍ سنوية
- * المالك: إدارة الموردين · مصدرُ الحقيقة: sup_quota_supplier_unit
+ * المالك: إدارة الموردين · مصدرُ الحقيقة: sup_slot_allocation_quota
  * الأصل: ورقةُ «إدارة الموردين» — السطح «الخانات المكافئة وتوزيع الحصص»
  *
  * ◆ الأعمدةُ تُقرأ من `gov_field_class` — والحقلُ بلا صنفٍ لا يُصيَّر
@@ -15,7 +15,7 @@
 $U13 = array(
     'file'       => 'suppliers/supplier_quota_distribution.php',
     'screen'     => 'sup_quota_dist',
-    'table'      => 'sup_quota_supplier_unit',
+    'table'      => 'sup_slot_allocation_quota',
     'title'      => 'الخانات المكافئة وتوزيع الحصص',
     'icon'       => 'fa fa-scale-unbalanced',
     'nature'     => 'register',
@@ -47,7 +47,7 @@ $U13 = array(
                 if (!$row) { return array('ok' => false, 'reason' => 'لا حقلَ مملوءًا — السجلُّ لا يُفتح فارغًا'); }
                 $row['created_by'] = $uid;
                 try {
-                    ems_tenant_db()->insert('sup_quota_supplier_unit', $row);
+                    ems_tenant_db()->insert('sup_slot_allocation_quota', $row);
                 } catch (\Throwable $t) {
                     return array('ok' => false, 'reason' => 'قيدُ المخطّطِ ردَّ المدخلات — راجعْها');
                 }
@@ -55,11 +55,11 @@ $U13 = array(
                 if ($nid > 0) {
                     $code = 'SQD-' . str_pad((string) $nid, 5, '0', STR_PAD_LEFT);
                     try {
-                        ems_tenant_db()->update('sup_quota_supplier_unit',
+                        ems_tenant_db()->update('sup_slot_allocation_quota',
                             array('dist_row_code' => $code), array('id' => $nid));
                     } catch (\Throwable $t) { /* السطرُ مسجَّلٌ ومفتاحُه يُستكمل بمرورٍ لاحق */ }
                 }
-                return array('ok' => true, 'reason' => 'سُجِّل السطرُ في sup_quota_supplier_unit');
+                return array('ok' => true, 'reason' => 'سُجِّل السطرُ في sup_slot_allocation_quota');
             }),
     ),
 );
