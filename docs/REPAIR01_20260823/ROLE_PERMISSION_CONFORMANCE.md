@@ -1,6 +1,6 @@
 # ROLE_PERMISSION_CONFORMANCE — الأدوارُ والصلاحيات (§13)
 
-> **Baseline_ID:** `BL-20260901-168011c0` · مولَّدٌ قياسًا حيًّا: `php tools/gov_exec_pack12.php` · 2026-09-01 11:14
+> **Baseline_ID:** `BL-20260901-30bd5c74` · مولَّدٌ قياسًا حيًّا: `php tools/gov_exec_pack12.php` · 2026-09-01 11:42
 > حزمةُ GOV_EXEC §23 — **اثنتا عشرةَ وثيقةً من اللقطةِ الواحدة** ولا رقمَ منقولًا.
 
 السلسلة: `User → Role/Profile → Workspace → Screen → Action → Field` — والمغطّى بقالبٍ نافذٍ يُحكم بقالبِه **حصرًا** (GOV-AUTH-01).
