@@ -67,7 +67,7 @@ $nz = function ($s) {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* ①-أ مواضعُ الدليلِ: مساحة ⇒ مسار ⇒ [صنف, مجموعة, ترتيب] · ومالكُ كلِّ مسار */
-$byWsRoute = array(); $byWsName = array(); $routeOwners = array();
+$byWsRoute = array(); $byWsName = array(); $routeOwners = array(); $nameHasRoute = array();
 $r = $conn->query("SELECT p.workspace_id, p.route, p.target_ref, p.sort_no, p.placement_type,
                           p.screen_id, g.label_ar, g.sort_no gno, g.id gid
                      FROM nav_placements p
@@ -92,17 +92,39 @@ while ($x = $r->fetch_assoc()) {
              — ولا يتأرجح الحكمُ بترتيبِ الصفوف (‏درسُ `asset_intake` نفسُه). */
         $pt = (string) $x['placement_type'];
         $isMenu = ($pt === 'MENU_ITEM' || $pt === 'LANDING_PAGE');
+        /* ⚠ **وصفَّانِ من الصنفِ نفسِه — والترتيبُ يحسم** ══════════════════
+           ◆ **المقيس**: `governance/doc_types` في `DEP-08` له **هدفانِ
+             `MENU_ITEM`**: `·27` «سجل أنواع المستندات» و`·31` «سجل أنواع
+             الطلبات والتوجيه». فالترجيحُ بالصنفِ وحدَه **لا يفصل**، ويبقى
+             الفائزُ **آخرَ صفٍّ قرأه المحرِّك** — واستعلامٌ بلا `ORDER BY`
+             لا يضمن ترتيبًا، **فالاسمُ والرتبةُ يتأرجحان بين تشغيلَين**
+             وتُقرأ مخالفةُ اسمٍ ومخالفتا ترتيبٍ لا وجودَ لهما في الورقة.
+           ⇒ **والفاصلُ من الورقةِ نفسِها**: أصغرُ رتبةِ هدفٍ (`target_ref`
+             ‏«code·idx·name») تغلب — فالشاشةُ تُنسَب إلى **أوّلِ** هدفٍ
+             أعلنها، والثاني هدفٌ يخدمه المبنيُّ نفسُه لا بندَ قائمةٍ ثانٍ
+             [[counter-parity-two-readers]]. */
+        $ord = (preg_match('~·\s*(\d+)\s*·~u', (string) $x['target_ref'], $mo)) ? (int) $mo[1] : 9999;
+        $x['__ord'] = $ord;
         if (!isset($byWsRoute[$ws][$k])) { $byWsRoute[$ws][$k] = $x; }
         else {
             $prev = (string) $byWsRoute[$ws][$k]['placement_type'];
             $prevMenu = ($prev === 'MENU_ITEM' || $prev === 'LANDING_PAGE');
             if ($isMenu && !$prevMenu) { $byWsRoute[$ws][$k] = $x; }
+            elseif ($isMenu === $prevMenu
+                    && $ord < (int) $byWsRoute[$ws][$k]['__ord']) { $byWsRoute[$ws][$k] = $x; }
         }
         if (!isset($routeOwners[$k][$ws]) || $isMenu) { $routeOwners[$k][$ws] = $pt; }
     }
     $tr = (string) $x['target_ref'];
     if ($tr !== '' && preg_match('~·\s*(\d+)\s*·\s*(.+)$~u', $tr, $m)) {
         $byWsName[$ws][$nz($m[2])] = (int) $m[1];
+        /* ⛔ **وهدفٌ له مسارٌ مبنيٌّ لا يُطالَب باسمِه من شاشةٍ أخرى**:
+           `admin/sec_governance` اسمُه «فصل الواجبات المتعارضة» — **وهو اسمُ
+           هدفِ `DEP-08·16` الذي مسارُه `governance/sod_conflicts` مبنيٌّ
+           ومُصيَّر**. فمطابقةُ الاسمِ كانت تجعل الشاشتَين كلتيهما «بندَ دورةٍ»
+           لهدفٍ واحد ⇒ **فائضٌ غيرُ مبرَّرٍ يرصده §25**. والشاشةُ الثانيةُ
+           تمضي إلى سلّمِ §16/§18 فتُحكَم تكرارًا أو بديلًا بحكمٍ مكتوب. */
+        if ((string) $x['route'] !== '') { $nameHasRoute[$ws][$nz($m[2])] = $rt($x['route']); }
     }
 }
 
@@ -233,8 +255,13 @@ $ANCHOR = array('main/role_board' => 1, 'chats/index' => 1);
 $routeAnyWs = array();
 foreach ($routeOwners as $k => $wss) { $routeAnyWs[$k] = array_keys($wss)[0]; }
 
-$layerOf = function ($ws, $route, $label) use (&$byWsRoute, &$byWsName, $ANCHOR, &$routeAnyWs, $nz) {
-    if (isset($byWsRoute[$ws][$route]) || isset($byWsName[$ws][$nz($label)])) { return 'GUIDE'; }
+$layerOf = function ($ws, $route, $label) use (&$byWsRoute, &$byWsName, &$nameHasRoute,
+                                              $ANCHOR, &$routeAnyWs, $nz) {
+    if (isset($byWsRoute[$ws][$route])) { return 'GUIDE'; }
+    /* مطابقةُ الاسمِ تُقبَل **ما لم يكن للهدفِ مسارٌ مبنيٌّ آخر** (انظر أعلاه) */
+    if (isset($byWsName[$ws][$nz($label)])
+        && (!isset($nameHasRoute[$ws][$nz($label)])
+            || $nameHasRoute[$ws][$nz($label)] === $route)) { return 'GUIDE'; }
     if (isset($ANCHOR[$route]))                                               { return 'ANCHOR'; }
     if (isset($byWsRoute['WS-MY'][$route]))                                   { return 'PERSONAL'; }
     if (isset($routeAnyWs[$route]))                                           { return 'SHARED'; }
@@ -323,7 +350,17 @@ function navarch_rule($ws, $it, $layer, $ctx)
        ⛔ **والصنفُ يبقى `PERSONAL`** ولا تُضاف مفردةٌ إلى `placement_type`:
          مفردةٌ جديدةٌ تُسقط صفوفًا صامتةً عند كلِّ قارئٍ يعُدُّ القديمةَ بالاسم
          [[enum-vocabulary-consumers]] — **والحكمُ يُكتب في `reason_code`**. */
-    if ($layer === 'PERSONAL' || $sc === 'PERSONAL_SPACE') {
+    /* ⛔ **وورقةُ الدليلِ تسبق `space_class` ولو كانت ورقةَ إدارةٍ أخرى**:
+       R2 أعلاه يقرّر أنَّ الورقةَ مصدرٌ حاكمٌ و`space_class` تصنيفُ تشغيلٍ
+       مشتقّ — **والقاعدةُ نفسُها تسري حين يكون الصفُّ في ورقةِ مالكٍ آخر**.
+       ◆ **المقيس**: «صندوق بلاغات الإدارة» (`tickets/tickets_list`) و«الإبلاغ
+         السياقي» (`ticket_contextual_open`) لهما **صفَّا `MENU_ITEM` في ورقةِ
+         `DEP-10`** (‏رأسا الطيِّ 62 و63) — ومع ذلك كان `space_class` يخطفهما
+         إلى «مساحتي» في **ستَّ عشرةَ مساحةً**، فيُقرأ المسارُ الواحدُ تحتَ
+         رأسِ دورةِ مالكِه في `DEP-10` وتحتَ «مساحتي» في الباقي (‏ترصده `U3`).
+       ⇒ فما كان له مالكٌ في الدليلِ **يمضي إلى سلّمِ §12/§18** ويُحكَم هناك
+         بمالكِه، ⛔ **ولا يُسمّى شخصيًّا وهو صندوقُ إدارةٍ باسمِه**. */
+    if ($layer === 'PERSONAL' || ($sc === 'PERSONAL_SPACE' && $layer !== 'SHARED')) {
         $onSheet = ($layer === 'PERSONAL');
         return $V('PERSONAL', 'MOVE_TO_WS_MY', ($layer === 'LEGACY' ? 'PERSONAL' : ''),
             $onSheet ? 'PERSONAL_WS_MY_S11' : 'PERSONAL_SHORTCUT_S11',

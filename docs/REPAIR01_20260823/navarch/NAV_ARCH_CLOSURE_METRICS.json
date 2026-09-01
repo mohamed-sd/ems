@@ -1,5 +1,5 @@
 {
-    "measured_at": "2026-09-01T13:46:45+03:00",
+    "measured_at": "2026-09-01T14:14:05+03:00",
     "metrics": {
         "PLACEMENT_WITHOUT_GROUP": 0,
         "PLACEMENT_WITHOUT_RULING": 0,
@@ -7,7 +7,7 @@
     },
     "roles_bound": 35,
     "roles_total": 35,
-    "out_of_cycle_ruled": 186,
+    "out_of_cycle_ruled": 168,
     "unknown_types": [],
     "pass": true
 }

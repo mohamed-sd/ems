@@ -88,11 +88,25 @@ $rt = function ($s) {
     $s = preg_replace('~[?#].*$~', '', $s);
     return strtolower(trim(preg_replace('~\.php$~i', '', $s), '/'));
 };
+/* ◆ **ودورُ المساحةِ المُمثِّلُ `PRIMARY` ثمَّ `SECONDARY`** — بالقاعدةِ نفسِها
+     التي يفرزُ بها `navarch_role_workspace`.
+   ⛔ **والقصرُ على `PRIMARY` يُعمي الأساسَ عن مساحةٍ كلُّ أدوارِها فرعيّة**:
+     `WS-PLATFORM` دورُها الوحيدُ 15 «إدارة الصلاحيات» مربوطٌ `SECONDARY`
+     (‏لا إدارةَ أمَّ لها بالدليل) — فكان `role_id` يرجع `NULL` فلا تُصيَّر،
+     **فلا يكتب لها المُصنِّفُ موضعًا واحدًا**، فيردُّها المُصيِّرُ إلى المسارِ
+     القديمِ أبدًا. وهي وحدَها كانت تُبقي `U3` على مخالفتَين: مسارٌ يُقرأ تحتَ
+     «مساحتي» في ثمانيةَ عشرَ دورًا مقلوبًا وتحتَ تصنيفِ الإرثِ في دورٍ واحد.
+     ⇒ **عطبُ قارئٍ لا عطبُ بناء** [[measure-blind-spots]]. */
 $ws = array();
 $r = $conn->query("SELECT w.workspace_id, w.kind, w.name_ar, w.dept_code, w.active,
                           wr.role_id, ro.name rname
                      FROM nav_workspaces w
-                     LEFT JOIN nav_ws_roles wr ON wr.workspace_id = w.workspace_id AND wr.binding='PRIMARY'
+                     LEFT JOIN nav_ws_roles wr
+                            ON wr.workspace_id = w.workspace_id
+                           AND wr.role_id = (SELECT x.role_id FROM nav_ws_roles x
+                                              WHERE x.workspace_id = w.workspace_id
+                                              ORDER BY (x.binding = 'PRIMARY') DESC, x.role_id ASC
+                                              LIMIT 1)
                      LEFT JOIN roles ro ON ro.id = wr.role_id
                     ORDER BY w.workspace_id");
 while ($x = $r->fetch_assoc()) { $ws[$x['workspace_id']] = $x; }

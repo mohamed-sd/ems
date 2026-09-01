@@ -161,6 +161,89 @@ while ($mq && ($x = mysqli_fetch_assoc($mq))) {
     $quickMoved[(int) $x['role_id']][$x['rt']] = 1;
 }
 
+/* ══ **البابُ السادس — حكمُ `NAV-ARCH-02` §22** ═══════════════════════════
+   ◆ **نصُّ §22 حرفًا**: «`No Placement = No Sidebar Render` — حتى لو
+     `can_view = true`. **الصلاحيةُ تبقى صحيحة**، لكنَّ الشاشةَ لا تظهر في
+     Sidebar هذا الـWorkspace». فالمُصيِّرُ الحاكمُ **يُزيل بندًا بقرارٍ
+     معماريٍّ مسجَّل** — وهو ما تراه هذه البوّابةُ «فقدًا» لأنَّ أساسَها
+     القبليَّ لُقط قبلَ القلب.
+   ◆ **و§4 يشترط أربعةً لكلِّ إخفاء**: تصنيفٌ · بديلُ وصولٍ · دليلٌ · مصير.
+     وهي مكتوبةٌ صفًّا صفًّا في `nav_workspace_placements.reason_code` +
+     `governing_source`، وفي `nav_legacy_disposition` و`nav_cross_domain_register`.
+   ⛔ **والتصريحُ مقيَّدٌ بشرطَين معًا لا بأحدِهما** — وإلّا صار غطاءً لكلِّ
+     اختفاءٍ كما يحذّر البابانِ الثاني والثالث:
+     ① **دورُ البندِ مقلوبٌ فعلًا** (`navarch_cutover_workspace` يرجع مساحةً)
+        — فدورٌ لم يُقلَب لا عذرَ له، وفقدُه يُرسِّب كما كان.
+     ② **وللمسارِ حكمٌ مكتوبٌ في مساحةِ ذلك الدورِ بعينِها**: إمّا موضعٌ نشطٌ
+        بصنفٍ خارجَ السايدبار (§9)، أو صفُّ إرثٍ/عابرٍ يسمّي بديلَ وصولِه.
+     ⇒ فمسارٌ اختفى **بلا صفٍّ حاكمٍ في مساحتِه** يبقى فقدًا يُرسِّب. */
+/* ⛔ **ويُحمَّل المُصيِّرُ صراحةً**: `unified_nav.php` يستدعيه **عند التصييرِ
+   لا عند التضمين**، فحارسٌ يسأل `function_exists` قبلَه **يتخطّى البابَ كلَّه
+   صامتًا** فيُقرأ «صفرُ إزالةٍ مصرَّحة» وهو غيابُ قياسٍ لا غيابُ حكم
+   [[measure-token-must-exist]]. وإن تعذّر التحميلُ **يُعلَن ولا يُبتلَع**. */
+require_once $ROOT . '/includes/navarch_renderer.php';
+$navarchRuled = array();      /* role ⇒ مسارٌ صغيرٌ ⇒ 1 */
+if (!function_exists('navarch_cutover_workspace')) {
+    fwrite(STDERR, "⛔ تعذّر تحميلُ navarch_cutover_workspace — البابُ السادسُ لا يُقاس
+");
+} else {
+    $__rq = @mysqli_query($conn, "SELECT DISTINCT role_id FROM nav_ws_roles");
+    while ($__rq && ($__rx = mysqli_fetch_assoc($__rq))) {
+        $__rid = (int) $__rx['role_id'];
+        $__ws  = navarch_cutover_workspace($conn, $__rid);
+        if ($__ws === null) { continue; }                       /* ① لم يُقلَب */
+        $__wsE = mysqli_real_escape_string($conn, $__ws);
+        /* ② أحكامُ هذه المساحةِ بعينِها — بصنفٍ خارجَ السايدبار أو بحكمِ إرثٍ/عابر */
+        $__q = @mysqli_query($conn, "
+            SELECT LOWER(route) rt FROM nav_workspace_placements
+             WHERE workspace_id = '{$__wsE}' AND status = 'ACTIVE'
+               AND placement_type NOT IN ('PRIMARY','SECONDARY_APPROVED')
+               AND reason_code <> '' AND governing_source <> ''
+               AND route IS NOT NULL AND route <> ''
+            UNION
+            SELECT LOWER(current_route) rt FROM nav_legacy_disposition
+             WHERE current_workspace = '{$__wsE}' AND disposition <> ''
+               AND current_route IS NOT NULL AND current_route <> ''
+            UNION
+            SELECT LOWER(route) rt FROM nav_cross_domain_register
+             WHERE consumer_workspace = '{$__wsE}' AND access_path <> ''
+               AND route IS NOT NULL AND route <> ''");
+        while ($__q && ($__x = mysqli_fetch_assoc($__q))) {
+            $navarchRuled[$__rid][$__x['rt']] = 1;
+            $navarchRuled[$__rid][$__x['rt'] . '.php'] = 1;
+        }
+        /* ◆ **وحكمُ الدستورِ نفسِه بابٌ رابعٌ لهذا الباب**: `nav_canonical`
+             سجلٌّ حاكمٌ `APPROVED`، وفيه `retirement_status` و`merge_into`
+             و`view_of`. و`tickets/dept_inbox` محكومٌ فيه `MERGE_THEN_REDIRECT`
+             ⇐ «يُدمج في `tickets_list` تبويبًا **والملفُّ يبقى مُحوِّلًا**» —
+             فبديلُ الوصولِ مكتوبٌ في الحكمِ نفسِه (§4) والمسارُ ما يزال يفتح.
+           ⛔ **ولا يُقبَل إلّا حكمٌ صريحٌ**: `ACTIVE` بلا دمجٍ ولا تقاعدٍ
+             **ليس تصريحًا**، فيبقى فقدًا يُرسِّب. */
+        $__q = @mysqli_query($conn, "
+            SELECT LOWER(route) rt FROM nav_canonical
+             WHERE route IS NOT NULL AND route <> ''
+               AND (retirement_status IN ('MERGE_THEN_REDIRECT','RETIRE_AFTER_PROOF')
+                 OR (view_of IS NOT NULL AND view_of <> ''))");
+        while ($__q && ($__x = mysqli_fetch_assoc($__q))) {
+            $navarchRuled[$__rid][$__x['rt']] = 1;
+            $navarchRuled[$__rid][$__x['rt'] . '.php'] = 1;     /* الأساسُ القبليُّ يحمل اللاحقة */
+        }
+    }
+}
+
+/* ══ سجلُّ البنودِ المسحوبةِ سلفًا — `nav_items` كلُّها مطفأة ═══════════════ */
+$withdrawnItems = array();
+$__wq = @mysqli_query($conn, "SELECT LOWER(SUBSTRING_INDEX(route,'?',1)) rt,
+                                     SUM(active = 1) live, COUNT(*) tot
+                                FROM nav_items
+                               WHERE route IS NOT NULL AND route <> ''
+                               GROUP BY 1 HAVING live = 0 AND tot > 0");
+while ($__wq && ($__wx = mysqli_fetch_assoc($__wq))) {
+    $rtw = preg_replace('~^(\.\./)+~', '', $__wx['rt']);
+    $withdrawnItems[$rtw] = 1;
+    $withdrawnItems[preg_replace('~#.*$~', '', $rtw)] = 1;
+}
+
 /** هويةُ البند: (الملفُّ الأمُّ صغيرًا) + الاسمُ المعروض */
 function upc_key($href, $label)
 {
@@ -181,7 +264,7 @@ foreach ($lines as $l) {
 }
 
 /* ── الحاضرُ: التصييرُ الحيُّ نفسُه ── */
-$fails = 0; $totPre = 0; $totNow = 0; $renamed = 0; $merged = 0; $resurfaced = 0; $absorbed = 0; $isolated = 0; $recon = array();
+$fails = 0; $totPre = 0; $totNow = 0; $renamed = 0; $merged = 0; $resurfaced = 0; $absorbed = 0; $isolated = 0; $navarchTot = 0; $recon = array();
 echo "════ مصفوفةُ الحفظِ — بنودُ السايدبارِ الظاهرةُ قبلًا وبعدًا ════\n";
 foreach (uxp_root_roles() as $rid) {
     if (isset($archivedRoles[$rid])) {
@@ -225,7 +308,7 @@ foreach (uxp_root_roles() as $rid) {
     $preF = array(); $nowF = array();
     foreach ($p as $k => $c)   { list($f, $l) = explode('||', $k, 2); $preF[$f]['labels'][$l] = ($preF[$f]['labels'][$l] ?? 0) + $c; $preF[$f]['n'] = ($preF[$f]['n'] ?? 0) + $c; }
     foreach ($now as $k => $c) { list($f, $l) = explode('||', $k, 2); $nowF[$f]['labels'][$l] = ($nowF[$f]['labels'][$l] ?? 0) + $c; $nowF[$f]['n'] = ($nowF[$f]['n'] ?? 0) + $c; }
-    $missing = array(); $renamedHere = 0; $mergedHere = 0; $absorbedHere = 0; $isolatedHere = 0; $quickHere = 0; $tplHere = 0;
+    $missing = array(); $renamedHere = 0; $mergedHere = 0; $absorbedHere = 0; $isolatedHere = 0; $quickHere = 0; $tplHere = 0; $navarchHere = 0; $withdrawnHere = 0;
     foreach ($preF as $f => $P) {
         /* ملفٌّ اختفى من الدور = فقدٌ صريح — إلا أن يكون **ذاب في وارثٍ مُعلَنٍ
            حاضرٍ في الدورِ نفسِه**: الإعلانُ من nav_redirects والحضورُ مقيسٌ الآن. */
@@ -268,6 +351,29 @@ foreach (uxp_root_roles() as $rid) {
             $quickHere    += $P['n'];
             continue;
         }
+        /* حكمُ `NAV-ARCH-02` §22 — البابُ السادس (بشرطَيه أعلاه) */
+        if (!isset($nowF[$f]) && isset($navarchRuled[$rid][mb_strtolower($f)])) {
+            $isolatedHere += $P['n'];
+            $navarchHere  += $P['n'];
+            continue;
+        }
+        /* ══ **البابُ السابع — بندٌ كان يبعثه السقوطُ وحدَه** (§23) ═════════
+           ◆ **المقيس**: `equipments/equipment_sourcing` و`equipment_documents`
+             **صفرُ صفٍّ نشطٍ لهما في `nav_items` لأيِّ دور** — سُحبا بقرارِ
+             جولةٍ سابقةٍ حرفًا (`active = 0` في كلِّ صفوفِهما). ومع ذلك كانا
+             يظهران في التصييرِ القديم، لأنَّ **السقوطَ يبعثهما من
+             `gov_target_nav`/`nav_canonical` رغمَ إطفاءِ صفِّهما** — وهو عينُ
+             ما يأمر §23 بإزالته: «إذا route موجودة ⇒ أنشئ link».
+           ⇒ فاختفاؤهما بعدَ القلبِ **إنفاذُ قرارٍ قائمٍ لا فقدٌ جديد**،
+             والأساسُ القبليُّ لُقط قبلَ الإطفاء.
+           ⛔ **والشرطُ صارمٌ ومقيسٌ حيًّا**: صفرُ صفٍّ نشطٍ في `nav_items`
+             **لكلِّ الأدوارِ لا لهذا الدورِ وحدَه** — فبندٌ ما يزال نشطًا
+             لأيِّ دورٍ يبقى فقدًا يُرسِّب، ولا يصير هذا البابُ غطاءً. */
+        if (!isset($nowF[$f]) && isset($withdrawnItems[mb_strtolower($f)])) {
+            $isolatedHere  += $P['n'];
+            $withdrawnHere += $P['n'];
+            continue;
+        }
         if (!isset($nowF[$f])) { $missing[] = 'الملفُّ كلُّه: ' . $f; continue; }
         $N = $nowF[$f];
         $canonName = isset($canon[$f]) ? $canon[$f]['canon'] : null;
@@ -290,6 +396,7 @@ foreach (uxp_root_roles() as $rid) {
         }
     }
     $renamed += $renamedHere; $merged += $mergedHere; $resurfaced += count($added); $isolated += $isolatedHere;
+    $navarchTot += $navarchHere;
     $recon[$rid] = array("pre"=>$cntPre,"now"=>$cntNow,"abs"=>$absorbedHere,"mrg"=>$mergedHere,"iso"=>$isolatedHere,"add"=>count($added));
     $absorbed += $absorbedHere;
     $ok = empty($missing);
@@ -298,6 +405,8 @@ foreach (uxp_root_roles() as $rid) {
         . ($absorbedHere ? " · ذاب في وارثٍ مُعلَنٍ حاضر={$absorbedHere}" : '')
         . ($isolatedHere ? " · **أُزيل بعزلٍ مصرَّحٍ={$isolatedHere}**" : '')
         . ($tplHere ? " · **مُنِع بقالبٍ نافذٍ={$tplHere}**" : '')
+        . ($navarchHere ? " · **أُزيل بحكمِ NAV-ARCH-02 §22={$navarchHere}**" : '')
+        . ($withdrawnHere ? " · **مسحوبٌ سلفًا (nav_items مطفأة)={$withdrawnHere}**" : '')
         . ($quickHere ? " · **نُقل إلى بلاطةٍ={$quickHere}**" : '')
         . ($renamedHere ? " · أُعيدت تسميتُه بالسجل={$renamedHere}" : '')
         . ($mergedHere ? " · توأمٌ مندمجٌ باسمٍ واحد={$mergedHere}" : '')

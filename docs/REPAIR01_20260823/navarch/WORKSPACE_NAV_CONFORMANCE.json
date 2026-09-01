@@ -1,5 +1,5 @@
 {
-    "baseline_id": "NAB-8B35EC2C05",
+    "baseline_id": "NAB-BAC3823605",
     "metrics": {
         "DEP-01": {
             "TARGET_NAV_RECALL": 100,
@@ -23,7 +23,7 @@
                 "DEFAULT_GROUP_DAILY": 0,
                 "PERMISSION_DERIVED": 0
             },
-            "CUTOVER_DEPLOYED": false,
+            "CUTOVER_DEPLOYED": true,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
@@ -60,7 +60,7 @@
                 "DEFAULT_GROUP_DAILY": 0,
                 "PERMISSION_DERIVED": 0
             },
-            "CUTOVER_DEPLOYED": false,
+            "CUTOVER_DEPLOYED": true,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
@@ -95,7 +95,7 @@
                 "DEFAULT_GROUP_DAILY": 0,
                 "PERMISSION_DERIVED": 0
             },
-            "CUTOVER_DEPLOYED": false,
+            "CUTOVER_DEPLOYED": true,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
@@ -128,7 +128,7 @@
                 "DEFAULT_GROUP_DAILY": 0,
                 "PERMISSION_DERIVED": 0
             },
-            "CUTOVER_DEPLOYED": false,
+            "CUTOVER_DEPLOYED": true,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
@@ -166,7 +166,7 @@
                 "DEFAULT_GROUP_DAILY": 0,
                 "PERMISSION_DERIVED": 0
             },
-            "CUTOVER_DEPLOYED": false,
+            "CUTOVER_DEPLOYED": true,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
@@ -199,7 +199,7 @@
                 "DEFAULT_GROUP_DAILY": 0,
                 "PERMISSION_DERIVED": 0
             },
-            "CUTOVER_DEPLOYED": false,
+            "CUTOVER_DEPLOYED": true,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
@@ -232,12 +232,45 @@
                 "DEFAULT_GROUP_DAILY": 0,
                 "PERMISSION_DERIVED": 0
             },
-            "CUTOVER_DEPLOYED": false,
+            "CUTOVER_DEPLOYED": true,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
             "OLD_RENDERED": 70,
             "NEW_LIFECYCLE": 19,
+            "MISSING_TARGETS": [],
+            "EXTRA_ITEMS": [],
+            "ADDITIONS_OUTSIDE_GUIDE": [],
+            "EXACT_WORKSPACE_NAV_CONFORMANCE": "PASS"
+        },
+        "DEP-08": {
+            "TARGET_NAV_RECALL": 100,
+            "TARGET_FOUND": 31,
+            "TARGET_TOTAL": 31,
+            "PLACEMENT_PRECISION": 100,
+            "UNEXPLAINED_EXTRA_MENU_ITEM": 0,
+            "APPROVED_ADDITION_OUTSIDE_GUIDE": 0,
+            "PERMISSION_ONLY_RENDERED_ITEM": 0,
+            "UNAPPROVED_SECONDARY_PLACEMENT": 0,
+            "ACTIVE_LEGACY_WITHOUT_DISPOSITION": 0,
+            "WRONG_GROUP": 0,
+            "WRONG_ORDER": 0,
+            "WRONG_LABEL": 0,
+            "GLOBAL_FALLBACK_COUNT": 0,
+            "LEGACY_FALLBACK_RENDER_COUNT": 0,
+            "FALLBACKS_MEASURED": {
+                "LEGACY_ITEMS_SOURCE": 0,
+                "GLOBAL_TAXONOMY": 0,
+                "ROUTE_DERIVED_GROUP": 0,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 0
+            },
+            "CUTOVER_DEPLOYED": true,
+            "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
+            "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
+            "TARGET_LINEAGE_BROKEN": 0,
+            "OLD_RENDERED": 83,
+            "NEW_LIFECYCLE": 31,
             "MISSING_TARGETS": [],
             "EXTRA_ITEMS": [],
             "ADDITIONS_OUTSIDE_GUIDE": [],
@@ -265,7 +298,7 @@
                 "DEFAULT_GROUP_DAILY": 0,
                 "PERMISSION_DERIVED": 0
             },
-            "CUTOVER_DEPLOYED": false,
+            "CUTOVER_DEPLOYED": true,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
@@ -298,7 +331,7 @@
                 "DEFAULT_GROUP_DAILY": 0,
                 "PERMISSION_DERIVED": 0
             },
-            "CUTOVER_DEPLOYED": false,
+            "CUTOVER_DEPLOYED": true,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
@@ -331,7 +364,7 @@
                 "DEFAULT_GROUP_DAILY": 0,
                 "PERMISSION_DERIVED": 0
             },
-            "CUTOVER_DEPLOYED": false,
+            "CUTOVER_DEPLOYED": true,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
@@ -369,7 +402,7 @@
                 "DEFAULT_GROUP_DAILY": 0,
                 "PERMISSION_DERIVED": 0
             },
-            "CUTOVER_DEPLOYED": false,
+            "CUTOVER_DEPLOYED": true,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
@@ -402,7 +435,7 @@
                 "DEFAULT_GROUP_DAILY": 0,
                 "PERMISSION_DERIVED": 0
             },
-            "CUTOVER_DEPLOYED": false,
+            "CUTOVER_DEPLOYED": true,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
@@ -435,7 +468,7 @@
                 "DEFAULT_GROUP_DAILY": 0,
                 "PERMISSION_DERIVED": 0
             },
-            "CUTOVER_DEPLOYED": false,
+            "CUTOVER_DEPLOYED": true,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
@@ -468,7 +501,7 @@
                 "DEFAULT_GROUP_DAILY": 0,
                 "PERMISSION_DERIVED": 0
             },
-            "CUTOVER_DEPLOYED": false,
+            "CUTOVER_DEPLOYED": true,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
@@ -501,7 +534,7 @@
                 "DEFAULT_GROUP_DAILY": 0,
                 "PERMISSION_DERIVED": 0
             },
-            "CUTOVER_DEPLOYED": false,
+            "CUTOVER_DEPLOYED": true,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
@@ -534,7 +567,7 @@
                 "DEFAULT_GROUP_DAILY": 0,
                 "PERMISSION_DERIVED": 0
             },
-            "CUTOVER_DEPLOYED": false,
+            "CUTOVER_DEPLOYED": true,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
@@ -567,7 +600,7 @@
                 "DEFAULT_GROUP_DAILY": 0,
                 "PERMISSION_DERIVED": 0
             },
-            "CUTOVER_DEPLOYED": false,
+            "CUTOVER_DEPLOYED": true,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
@@ -600,7 +633,7 @@
                 "DEFAULT_GROUP_DAILY": 0,
                 "PERMISSION_DERIVED": 0
             },
-            "CUTOVER_DEPLOYED": false,
+            "CUTOVER_DEPLOYED": true,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,

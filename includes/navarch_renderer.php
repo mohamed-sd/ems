@@ -331,46 +331,62 @@ if (!function_exists('navarch_print_sidebar')) {
                 : ems_nav_anchor_li($conn, 'CHATS', $basePrefix, 'id="sidebarChatLink"',
                       '<span id="nav-unread-badge" class="nav-count-badge" style="display:none;"></span>');
         }
-        /* §11 — الشخصيُّ برؤوسِ `WS-MY` الفرعيّة: المفردُ وبلا مجموعةٍ يصعد
-           إلى الصدرِ المكشوف، والباقي تحتَ عنوانِه — بالقاعدةِ نفسِها التي
-           يطبّقها المُصيِّرُ القديمُ (‏عنوانٌ لرابطٍ واحدٍ ضجيجٌ لا بناء). */
+        $shellBody = ob_get_clean();
+
+        /* §11 — **ومجموعاتُ `WS-MY` رؤوسُ طيٍّ قائمةٌ بذاتِها لا أقسامٌ داخلَ
+           رأسٍ مصنوع** ═══════════════════════════════════════════════════════
+           ◆ **المقيسُ قبلَ الحكم**: كان الشخصيُّ كلُّه يُلَفُّ في رأسٍ واحدٍ
+             اسمُه «مساحتي» ومجموعتاه تحتَه **قسمَين**. فوقع عطبانِ مقيسان:
+             ① `U9` يقيس **القسمَ المقروء**، وصدرُ «مساحتي» المكشوفُ كان يضمُّ
+                المرساتَين والمختصراتِ معًا ⇒ **عشرةَ عناصرَ فأكثرَ في أحدَ عشرَ
+                دورًا** عند `on`.
+             ② `U3` يقيس **رأسَ الطيِّ لا القسم**: فمسارُ «مؤشرات الإنجاز
+                الشخصي» يُقرأ تحتَ «مساحتي» في دورٍ مقلوبٍ وتحتَ «الملف
+                الشخصي» في دورٍ لم يُقلَب ⇒ **مسارٌ واحدٌ برأسَين**.
+           ⭐ **والاسمُ الحاكمُ من ورقةِ `WS-MY` نفسِها**: «الملف الشخصي» ·
+             «العمل اليومي» — وهما `nav_lifecycle_groups` لِـ`WS-MY` (‏103·104).
+             فطبعُهما رأسَين **يقرأ المصدرَ**، ولفُّهما في «مساحتي» **يخترع
+             رأسًا ثالثًا لا وجودَ له في الدليل**.
+           ◆ **والمرساتانِ تخرجان من «مساحتي»** بنصِّ §10: «لا تعامل الرئيسية
+             والمراسلات كشاشات دورة عمل إدارة … ويفضل وضعهما في Global Rail
+             أو Top Section» — ⛔ **فهما ليستا شخصيّتَين أصلًا**.
+           ◆ **والمختصراتُ (§11 `PERSONAL_SHORTCUT`) تبقى تحتَ «مساحتي»** —
+             وهي اسمُ مساحةِ `WS-MY` الحاكمُ (`nav_workspaces.name_ar`)
+             لا اسمٌ مصنوع. */
         $pBuckets = array(); $pLead = array();
         foreach ($tree['personal'] as $p) {
             $rt = navarch_proper_route($conn, $p['route']);
             if ($rt === '') { continue; }
             $g = trim((string) $p['group']);
-            if ($g === '') { $pLead[] = array($rt, $p['label']); }
-            else { $pBuckets[$g][] = array($rt, $p['label']); }
+            if ($g === '') { $pLead[] = array($rt, $p['label'], 0); }
+            else { $pBuckets[$g][] = array($rt, $p['label'], (int) $p['group_sort']); }
         }
-        foreach ($pBuckets as $g => $ks) {
-            if (count($ks) >= 2) { continue; }
-            foreach ($ks as $k) { $pLead[] = $k; }
-            unset($pBuckets[$g]);
-        }
-        foreach ($pLead as $k) {
-            printNavLinkItem(array('code' => $k[0], 'name' => $k[1],
-                                   'icon' => ems_nav_icon_for($k[1], $k[0])), $basePrefix, $badges);
-        }
-        foreach ($pBuckets as $g => $ks) {
+
+        /* ── ② الكتل: القشرةُ ثمَّ مجموعتا الشخصيِّ ثمَّ المختصراتُ ثمَّ الدورة ── */
+        $blocks = array();
+        $mkBlock = function ($key, $name, $icon, $items) use ($basePrefix, $badges) {
             ob_start();
-            foreach ($ks as $k) {
+            foreach ($items as $k) {
                 printNavLinkItem(array('code' => $k[0], 'name' => $k[1],
                                        'icon' => ems_nav_icon_for($k[1], $k[0])), $basePrefix, $badges);
             }
-            $sub = ob_get_clean();
-            if (!ems_nav_group_has_link($sub)) { continue; }   /* لا عنوانَ بلا روابط */
-            echo '<li class="nav-subhead" aria-hidden="true"><span>'
-               . htmlspecialchars($g, ENT_QUOTES, 'UTF-8') . '</span></li>' . "
-";
-            echo $sub;
+            $body = ob_get_clean();
+            if (!ems_nav_group_has_link($body)) { return null; }   /* لا غلافَ لمجموعةٍ خلَت */
+            return array('key' => $key, 'name' => $name, 'icon' => $icon,
+                         'body' => $body, 'badge' => 0);
+        };
+        /* ترتيبٌ حتميٌّ برتبةِ المجموعةِ في ورقةِ `WS-MY` — لا بترتيبِ الظهور */
+        uksort($pBuckets, function ($a, $b) use ($pBuckets) {
+            $sa = $pBuckets[$a][0][2]; $sb = $pBuckets[$b][0][2];
+            return $sa === $sb ? strcmp($a, $b) : $sa - $sb;
+        });
+        foreach ($pBuckets as $g => $ks) {
+            $B = $mkBlock('g-wsmy-' . substr(sha1($g), 0, 8), $g, 'fa fa-user', $ks);
+            if ($B !== null) { $blocks[] = $B; }
         }
-        $mineBody = ob_get_clean();
-
-        /* ── ② مجموعاتُ الدورةِ بترتيبِها الحاكمِ — ⛔ ولا مجموعةَ افتراضيّة ── */
-        $blocks = array();
-        if (ems_nav_group_has_link($mineBody)) {
-            $blocks[] = array('key' => 'g-mine', 'name' => 'مساحتي',
-                              'icon' => 'fa fa-user', 'body' => $mineBody, 'badge' => 0);
+        if ($pLead) {
+            $B = $mkBlock('g-mine', 'مساحتي', 'fa fa-user', $pLead);
+            if ($B !== null) { $blocks[] = $B; }
         }
         foreach ($tree['groups'] as $g) {
             ob_start();
@@ -390,7 +406,10 @@ if (!function_exists('navarch_print_sidebar')) {
         }
         if (empty($blocks)) { return false; }
 
-        /* ── ③ الطباعة: كلُّ مجموعةٍ مطويّةٌ أوّلَ زيارةٍ — قرارُ المالك 2026-08-17 */
+        /* ── ③ الطباعة: القشرةُ العامّةُ أوّلًا **مكشوفةً خارجَ كلِّ رأسِ طيّ**
+           (§10: `Global Rail` / `Top Section`) — ثمَّ الكتلُ مطويّةً أوّلَ
+           زيارةٍ بقرارِ المالك 2026-08-17. */
+        echo $shellBody;
         foreach ($blocks as $B) {
             $nm = htmlspecialchars($B['name'], ENT_QUOTES, 'UTF-8');
             $badge = $B['badge'] > 0

@@ -66,26 +66,42 @@ $r = $conn->query("SELECT wr.workspace_id, wr.role_id FROM nav_ws_roles wr
                     WHERE wr.binding = 'PRIMARY'");
 while ($x = $r->fetch_assoc()) { $prim[(int) $x['role_id']] = $x['workspace_id']; }
 
-/* ⛔ **وحكمانِ مكتوبانِ لمن لا أبَ له في المخطَّط** — ولا ثالثَ لهما.
-   ◆ 15 «إدارة الصلاحيات» **خدمةُ منصّةٍ لا دورةُ إدارة**: تُدير الأدوارَ
-     والصلاحياتِ عبرَ الإداراتِ كلِّها، فمساحتُها `WS-PLATFORM` بنصِّ §6
-     (`PLATFORM_UTILITY` — خدمات المنصة المشتركة) [[permissions-manager-role]].
-   ◆ 32 «المدير المالي» **رأسُ الإدارةِ الماليّة** بلا أبٍ مسجَّل، وأمرُ
-     الجولةِ يسمّي إدارتَه `DEP-05` حرفًا في جدولِ §١·٤. */
+/* ⛔ **وثلاثةُ أحكامٍ مكتوبةٍ لمن لا أبَ له في المخطَّط** — ولا رابعَ لها،
+   وكلُّ حكمٍ مقيسٌ بمصدرِه لا مُستنتَجٌ من اسمِ الدور (‏الشرحُ عند كلٍّ أدناه):
+   5 ⇒ `DEP-12` باسمِ الدورِ نفسِه · 15 ⇒ `DEP-08` بتقاطعِ الصلاحيّةِ مع ورقتِها ·
+   32 ⇒ `DEP-05` بجدولِ §١·٤ من أمرِ الجولة. */
 $byRuling = array(
     /* ◆ 5 «إدارة الموقع (قديم — مدمج في 6)» **اسمُه يحمل حكمَه**: الدمجُ في
          الدورِ 6، والدورُ 6 مربوطٌ `PRIMARY` بـ`DEP-12`. صفرُ مستخدمٍ يحمله
          وصفرُ رابطٍ حيٍّ له — فالربطُ لا يُصيِّر شيئًا، لكنَّه يمنع دورًا
          ساكنًا من البقاءِ على المسارِ القديمِ أبدًا بعد بلوغِ `on`. */
     5  => array('DEP-12',      'اسمُ الدورِ في `roles` يحمل حكمَه: «إدارة الموقع (قديم — مدمج في 6)» — والدورُ 6 مربوطٌ PRIMARY بـDEP-12 · صفرُ مستخدمٍ وصفرُ رابطٍ حيّ'),
-    15 => array('WS-PLATFORM', 'NAV_ARCH_02_CLEAN §١·٤-٣ · §6 PLATFORM_UTILITY — خدمةُ منصّةٍ تعبر الإداراتِ ولا دورةَ إدارةٍ لها · roles.parent_role_id فارغ'),
+    /* ◆ 15 «إدارة الصلاحيات» ⇒ `DEP-08` «إدارة الحوكمة والالتزام» **بالقياسِ
+         لا بالاسم**: ورقةُ `DEP-08` في الدليلِ ترسم **31 بندَ دورةٍ** بستّةِ
+         رؤوسِ طيٍّ، **ولا دورَ يمثّلها** — وهو البندُ الثاني في سجلِّ ما رُفع
+         إلى المالكِ في الجولةِ السابقة. والدورُ 15 **مصرَّحٌ له بثلاثين من
+         الواحدِ والثلاثين**، والتالي له ثمانيةٌ فقط. وأكبرُ رؤوسِ طيِّه في
+         التصييرِ القديمِ «الحوكمة والتدقيق» حرفًا.
+       ⛔ **وليس هذا إنشاءَ إدارةٍ لوجودِ دور** (§6): `DEP-08` قائمةٌ في
+         `nav_workspaces` بورقةٍ كاملةٍ سلفًا — **الدورُ يُربَط بمساحةٍ قائمة**،
+         وهو عينُ ما يأمر به §6.
+       ◆ **و`PRIMARY` لأنَّ المساحةَ بلا رائد** — و`uq_one_primary` يضمن الوحدة.
+       ⛔ **و`WS-PLATFORM` تبقى بلا دورٍ**: لا ورقةَ لها في الدليلِ ولا دورةَ
+         عملٍ — فلا تُصيَّر، ولا يُخترَع لها هدفٌ (§17). */
+    15 => array('DEP-08', 'PRIMARY', 'ورقةُ DEP-08 في الدليلِ: 31 بندَ دورةٍ بستّةِ رؤوسٍ ولا دورَ يمثّلها · والدورُ 15 مصرَّحٌ له بـ30 منها (‏التالي 8) · §6: الدورُ يُربَط بمساحةٍ قائمةٍ ولا يُنشئها'),
     32 => array('DEP-05',      'NAV_ARCH_02_CLEAN §١·٤ جدولُ الأدوارِ الفرعيّة — «32 المدير الماليّ ⇒ DEP-05 المالية» · roles.parent_role_id فارغ'),
 );
 
 $ins = $conn->prepare(
     "INSERT INTO nav_ws_roles (workspace_id, role_id, binding, source_ref, parent_role_id, ruling)
-          VALUES (?, ?, 'SECONDARY', ?, ?, ?)
-     ON DUPLICATE KEY UPDATE parent_role_id = VALUES(parent_role_id), ruling = VALUES(ruling)");
+          VALUES (?, ?, ?, ?, ?, ?)
+     ON DUPLICATE KEY UPDATE binding = VALUES(binding),
+                             parent_role_id = VALUES(parent_role_id), ruling = VALUES(ruling)");
+
+/* ⛔ **وصفٌّ سابقٌ نُسخ حكمُه يُزال**: الدورُ 15 رُبط أوّلاً
+   بـ`WS-PLATFORM` ثمَّ قِيس أنَّ ورقتَه `DEP-08` — فيُحذف الرباطُ المنسوخ،
+   ⛔ ولا يبقى دورٌ بمساحتَين يتأرجح القارئُ بينهما. */
+$conn->query("DELETE FROM nav_ws_roles WHERE role_id = 15 AND workspace_id = 'WS-PLATFORM'");
 
 $n = 0; $skipped = array();
 $r = $conn->query("SELECT r.id, r.name, r.parent_role_id,
@@ -95,14 +111,17 @@ while ($x = $r->fetch_assoc()) {
     $rid = (int) $x['id'];
     if (isset($prim[$rid])) { continue; }                 /* له `PRIMARY` سلفًا */
     $par = (int) $x['parent_role_id'];
-    $ws = null; $ruling = ''; $parRef = null;
+    $ws = null; $ruling = ''; $parRef = null; $bind = 'SECONDARY';
 
     if ($par && isset($prim[$par])) {
         $ws = $prim[$par]; $parRef = $par;
         $ruling = 'roles.parent_role_id = ' . $par . ' — والأبُ مربوطٌ PRIMARY بـ' . $ws
                 . ' · §6: الأدوارُ تُربَط بمساحاتٍ قائمةٍ ولا تُنشئها';
     } elseif (isset($byRuling[$rid])) {
-        $ws = $byRuling[$rid][0]; $ruling = $byRuling[$rid][1];
+        $ws = $byRuling[$rid][0];
+        /* ثلاثيّةٌ ⇒ الوسطُ رباطٌ صريح */
+        if (count($byRuling[$rid]) === 3) { $bind = $byRuling[$rid][1]; $ruling = $byRuling[$rid][2]; }
+        else { $ruling = $byRuling[$rid][1]; }
     } else {
         /* ⛔ **ولا صفَّ بلا حكم**: من لا أبَ له ولا رابطَ حيًّا لا يُربَط،
            ويُسمّى هنا بسببِه — 5 «إدارة الموقع (قديم — مدمج في 6)» صفرُ رابط. */
@@ -111,8 +130,8 @@ while ($x = $r->fetch_assoc()) {
     }
     /* `source_ref` يحمل المصدرَ، و`ruling` يحمل الحكمَ نفسَه */
     $src = 'NAV_ARCH_02_CLEAN §١·٤ · roles.parent_role_id';
-    $ins->bind_param('sisis', $ws, $rid, $src, $parRef, $ruling);
-    if ($ins->execute()) { $n++; echo "+ دور {$rid} ⇒ {$ws} · أب=" . ($parRef ?: '—') . "\n"; }
+    $ins->bind_param('sissis', $ws, $rid, $bind, $src, $parRef, $ruling);
+    if ($ins->execute()) { $n++; echo "+ دور {$rid} ⇒ {$ws} · {$bind} · أب=" . ($parRef ?: '—') . "\n"; }
     else { echo "x دور {$rid}: " . $conn->error . "\n"; }
 }
 $ins->close();

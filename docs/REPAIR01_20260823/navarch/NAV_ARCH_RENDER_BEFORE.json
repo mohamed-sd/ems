@@ -1,0 +1,484 @@
+{
+    "flag": "off",
+    "at": "2026-09-01T13:57:25+03:00",
+    "roles": {
+        "1": {
+            "ws": "DEP-11",
+            "name": "ادارة التشغيل",
+            "links": 90,
+            "groups": 19,
+            "fallbacks": 809,
+            "fb_detail": {
+                "LEGACY_ITEMS_SOURCE": 145,
+                "GLOBAL_TAXONOMY": 12,
+                "ROUTE_DERIVED_GROUP": 557,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 95
+            }
+        },
+        "2": {
+            "ws": "DEP-02",
+            "name": "ادارة الموردين",
+            "links": 63,
+            "groups": 14,
+            "fallbacks": 701,
+            "fb_detail": {
+                "LEGACY_ITEMS_SOURCE": 66,
+                "GLOBAL_TAXONOMY": 12,
+                "ROUTE_DERIVED_GROUP": 557,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 66
+            }
+        },
+        "3": {
+            "ws": "DEP-04",
+            "name": "ادارة الاسطول",
+            "links": 77,
+            "groups": 19,
+            "fallbacks": 753,
+            "fb_detail": {
+                "LEGACY_ITEMS_SOURCE": 105,
+                "GLOBAL_TAXONOMY": 12,
+                "ROUTE_DERIVED_GROUP": 557,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 79
+            }
+        },
+        "4": {
+            "ws": "DEP-07",
+            "name": "ادارة الموارد البشرية",
+            "links": 70,
+            "groups": 13,
+            "fallbacks": 732,
+            "fb_detail": {
+                "LEGACY_ITEMS_SOURCE": 93,
+                "GLOBAL_TAXONOMY": 12,
+                "ROUTE_DERIVED_GROUP": 557,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 70
+            }
+        },
+        "6": {
+            "ws": "DEP-12",
+            "name": "إدارة الموقع",
+            "links": 75,
+            "groups": 17,
+            "fallbacks": 754,
+            "fb_detail": {
+                "LEGACY_ITEMS_SOURCE": 110,
+                "GLOBAL_TAXONOMY": 12,
+                "ROUTE_DERIVED_GROUP": 557,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 75
+            }
+        },
+        "7": {
+            "ws": "DEP-11",
+            "name": "مشرف - مشاريع",
+            "links": 74,
+            "groups": 13,
+            "fallbacks": 717,
+            "fb_detail": {
+                "LEGACY_ITEMS_SOURCE": 74,
+                "GLOBAL_TAXONOMY": 12,
+                "ROUTE_DERIVED_GROUP": 557,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 74
+            }
+        },
+        "8": {
+            "ws": "DEP-02",
+            "name": "مشرف موردين",
+            "links": 5,
+            "groups": 3,
+            "fallbacks": 666,
+            "fb_detail": {
+                "LEGACY_ITEMS_SOURCE": 92,
+                "GLOBAL_TAXONOMY": 12,
+                "ROUTE_DERIVED_GROUP": 557,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 5
+            }
+        },
+        "9": {
+            "ws": "EX-CEO",
+            "name": "الإدارة التنفيذية",
+            "links": 81,
+            "groups": 14,
+            "fallbacks": 727,
+            "fb_detail": {
+                "LEGACY_ITEMS_SOURCE": 79,
+                "GLOBAL_TAXONOMY": 12,
+                "ROUTE_DERIVED_GROUP": 557,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 79
+            }
+        },
+        "10": {
+            "ws": "DEP-04",
+            "name": "مشرف اسطول",
+            "links": 54,
+            "groups": 8,
+            "fallbacks": 683,
+            "fb_detail": {
+                "LEGACY_ITEMS_SOURCE": 58,
+                "GLOBAL_TAXONOMY": 12,
+                "ROUTE_DERIVED_GROUP": 557,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 56
+            }
+        },
+        "11": {
+            "ws": "DEP-04",
+            "name": "مشغل اسطول",
+            "links": 66,
+            "groups": 10,
+            "fallbacks": 700,
+            "fb_detail": {
+                "LEGACY_ITEMS_SOURCE": 66,
+                "GLOBAL_TAXONOMY": 12,
+                "ROUTE_DERIVED_GROUP": 557,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 65
+            }
+        },
+        "12": {
+            "ws": "DEP-01",
+            "name": "ادارة المبيعات",
+            "links": 41,
+            "groups": 12,
+            "fallbacks": 651,
+            "fb_detail": {
+                "LEGACY_ITEMS_SOURCE": 41,
+                "GLOBAL_TAXONOMY": 12,
+                "ROUTE_DERIVED_GROUP": 557,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 41
+            }
+        },
+        "13": {
+            "ws": "DEP-14",
+            "name": "ادارة الصيانة",
+            "links": 58,
+            "groups": 16,
+            "fallbacks": 702,
+            "fb_detail": {
+                "LEGACY_ITEMS_SOURCE": 75,
+                "GLOBAL_TAXONOMY": 12,
+                "ROUTE_DERIVED_GROUP": 557,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 58
+            }
+        },
+        "14": {
+            "ws": "DEP-14",
+            "name": "مشرف صيانة",
+            "links": 63,
+            "groups": 9,
+            "fallbacks": 699,
+            "fb_detail": {
+                "LEGACY_ITEMS_SOURCE": 65,
+                "GLOBAL_TAXONOMY": 12,
+                "ROUTE_DERIVED_GROUP": 557,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 65
+            }
+        },
+        "15": {
+            "ws": "WS-PLATFORM",
+            "name": "إدارة الصلاحيات",
+            "links": 83,
+            "groups": 11,
+            "fallbacks": 735,
+            "fb_detail": {
+                "LEGACY_ITEMS_SOURCE": 83,
+                "GLOBAL_TAXONOMY": 12,
+                "ROUTE_DERIVED_GROUP": 557,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 83
+            }
+        },
+        "16": {
+            "ws": "DEP-16",
+            "name": "إدارة المشتريات",
+            "links": 56,
+            "groups": 13,
+            "fallbacks": 693,
+            "fb_detail": {
+                "LEGACY_ITEMS_SOURCE": 69,
+                "GLOBAL_TAXONOMY": 12,
+                "ROUTE_DERIVED_GROUP": 557,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 55
+            }
+        },
+        "17": {
+            "ws": "DEP-05",
+            "name": "إدارة المالية",
+            "links": 113,
+            "groups": 19,
+            "fallbacks": 827,
+            "fb_detail": {
+                "LEGACY_ITEMS_SOURCE": 142,
+                "GLOBAL_TAXONOMY": 12,
+                "ROUTE_DERIVED_GROUP": 557,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 116
+            }
+        },
+        "18": {
+            "ws": "DEP-05",
+            "name": "محاسب الإدارة المالية",
+            "links": 111,
+            "groups": 11,
+            "fallbacks": 795,
+            "fb_detail": {
+                "LEGACY_ITEMS_SOURCE": 113,
+                "GLOBAL_TAXONOMY": 12,
+                "ROUTE_DERIVED_GROUP": 557,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 113
+            }
+        },
+        "19": {
+            "ws": "DEP-05",
+            "name": "مدير الإدارة المالية",
+            "links": 142,
+            "groups": 13,
+            "fallbacks": 859,
+            "fb_detail": {
+                "LEGACY_ITEMS_SOURCE": 145,
+                "GLOBAL_TAXONOMY": 12,
+                "ROUTE_DERIVED_GROUP": 557,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 145
+            }
+        },
+        "20": {
+            "ws": "DEP-05",
+            "name": "المراجع والمدقق المالي",
+            "links": 107,
+            "groups": 11,
+            "fallbacks": 787,
+            "fb_detail": {
+                "LEGACY_ITEMS_SOURCE": 109,
+                "GLOBAL_TAXONOMY": 12,
+                "ROUTE_DERIVED_GROUP": 557,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 109
+            }
+        },
+        "21": {
+            "ws": "DEP-06",
+            "name": "أمين الخزينة",
+            "links": 109,
+            "groups": 18,
+            "fallbacks": 791,
+            "fb_detail": {
+                "LEGACY_ITEMS_SOURCE": 111,
+                "GLOBAL_TAXONOMY": 12,
+                "ROUTE_DERIVED_GROUP": 557,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 111
+            }
+        },
+        "22": {
+            "ws": "DEP-05",
+            "name": "قارئ مالي",
+            "links": 105,
+            "groups": 11,
+            "fallbacks": 783,
+            "fb_detail": {
+                "LEGACY_ITEMS_SOURCE": 107,
+                "GLOBAL_TAXONOMY": 12,
+                "ROUTE_DERIVED_GROUP": 557,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 107
+            }
+        },
+        "23": {
+            "ws": "DEP-15",
+            "name": "إدارة النقل والترحيل",
+            "links": 48,
+            "groups": 12,
+            "fallbacks": 673,
+            "fb_detail": {
+                "LEGACY_ITEMS_SOURCE": 57,
+                "GLOBAL_TAXONOMY": 12,
+                "ROUTE_DERIVED_GROUP": 557,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 47
+            }
+        },
+        "24": {
+            "ws": "DEP-10",
+            "name": "إدارة البلاغات",
+            "links": 46,
+            "groups": 10,
+            "fallbacks": 667,
+            "fb_detail": {
+                "LEGACY_ITEMS_SOURCE": 49,
+                "GLOBAL_TAXONOMY": 12,
+                "ROUTE_DERIVED_GROUP": 557,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 49
+            }
+        },
+        "25": {
+            "ws": "DEP-17",
+            "name": "أمين المستودع",
+            "links": 43,
+            "groups": 14,
+            "fallbacks": 658,
+            "fb_detail": {
+                "LEGACY_ITEMS_SOURCE": 47,
+                "GLOBAL_TAXONOMY": 12,
+                "ROUTE_DERIVED_GROUP": 557,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 42
+            }
+        },
+        "26": {
+            "ws": "DEP-03",
+            "name": "إدارة التمويل",
+            "links": 73,
+            "groups": 17,
+            "fallbacks": 730,
+            "fb_detail": {
+                "LEGACY_ITEMS_SOURCE": 86,
+                "GLOBAL_TAXONOMY": 12,
+                "ROUTE_DERIVED_GROUP": 557,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 75
+            }
+        },
+        "27": {
+            "ws": "DEP-13",
+            "name": "القوى التشغيلية",
+            "links": 55,
+            "groups": 14,
+            "fallbacks": 699,
+            "fb_detail": {
+                "LEGACY_ITEMS_SOURCE": 75,
+                "GLOBAL_TAXONOMY": 12,
+                "ROUTE_DERIVED_GROUP": 557,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 55
+            }
+        },
+        "28": {
+            "ws": "DEP-09",
+            "name": "إدارة المخاطر",
+            "links": 41,
+            "groups": 12,
+            "fallbacks": 647,
+            "fb_detail": {
+                "LEGACY_ITEMS_SOURCE": 39,
+                "GLOBAL_TAXONOMY": 12,
+                "ROUTE_DERIVED_GROUP": 557,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 39
+            }
+        },
+        "29": {
+            "ws": "DEP-09",
+            "name": "محلل المخاطر",
+            "links": 29,
+            "groups": 4,
+            "fallbacks": 623,
+            "fb_detail": {
+                "LEGACY_ITEMS_SOURCE": 27,
+                "GLOBAL_TAXONOMY": 12,
+                "ROUTE_DERIVED_GROUP": 557,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 27
+            }
+        },
+        "30": {
+            "ws": "DEP-09",
+            "name": "مشرف المخاطر",
+            "links": 29,
+            "groups": 4,
+            "fallbacks": 626,
+            "fb_detail": {
+                "LEGACY_ITEMS_SOURCE": 30,
+                "GLOBAL_TAXONOMY": 12,
+                "ROUTE_DERIVED_GROUP": 557,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 27
+            }
+        },
+        "31": {
+            "ws": "DEP-05",
+            "name": "رئيس الحسابات",
+            "links": 28,
+            "groups": 6,
+            "fallbacks": 624,
+            "fb_detail": {
+                "LEGACY_ITEMS_SOURCE": 29,
+                "GLOBAL_TAXONOMY": 12,
+                "ROUTE_DERIVED_GROUP": 557,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 26
+            }
+        },
+        "32": {
+            "ws": "DEP-05",
+            "name": "المدير المالي",
+            "links": 5,
+            "groups": 2,
+            "fallbacks": 583,
+            "fb_detail": {
+                "LEGACY_ITEMS_SOURCE": 10,
+                "GLOBAL_TAXONOMY": 12,
+                "ROUTE_DERIVED_GROUP": 557,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 4
+            }
+        },
+        "33": {
+            "ws": "IAF",
+            "name": "المراجع الداخلي المستقل",
+            "links": 53,
+            "groups": 12,
+            "fallbacks": 674,
+            "fb_detail": {
+                "LEGACY_ITEMS_SOURCE": 54,
+                "GLOBAL_TAXONOMY": 12,
+                "ROUTE_DERIVED_GROUP": 557,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 51
+            }
+        },
+        "34": {
+            "ws": "DEP-05",
+            "name": "منفذ المدفوعات البنكية",
+            "links": 12,
+            "groups": 4,
+            "fallbacks": 591,
+            "fb_detail": {
+                "LEGACY_ITEMS_SOURCE": 11,
+                "GLOBAL_TAXONOMY": 12,
+                "ROUTE_DERIVED_GROUP": 557,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 11
+            }
+        },
+        "35": {
+            "ws": "DEP-05",
+            "name": "معد المطابقة البنكية",
+            "links": 12,
+            "groups": 4,
+            "fallbacks": 591,
+            "fb_detail": {
+                "LEGACY_ITEMS_SOURCE": 11,
+                "GLOBAL_TAXONOMY": 12,
+                "ROUTE_DERIVED_GROUP": 557,
+                "DEFAULT_GROUP_DAILY": 0,
+                "PERMISSION_DERIVED": 11
+            }
+        }
+    },
+    "total_links": 2117,
+    "total_fallbacks": 23950
+}

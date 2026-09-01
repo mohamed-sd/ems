@@ -45,20 +45,35 @@ $target = array(); $tgtGroup = array(); $tgtOrder = array(); $tgtLabel = array()
    الأخيرُ **مفتاحُ مطابقةٍ مُسوّى** («غرفه العمليات») لا اسمًا («غرفة العمليات»)،
    فقياسُ الاسمِ به يُنتج ثمانيَ مخالفاتٍ كلُّها همزةٌ وتاءٌ مربوطة —
    **رقمٌ يصف قارئَه لا مقروءَه** [[measure-blind-spots]] · [[nav-label-four-source-precedence]]. */
+/* ⛔ **ومسارٌ يخدم هدفَين في المساحةِ نفسِها — أيُّهما يحكم اسمَه ورتبتَه؟**
+   ◆ **المقيس**: `governance/doc_types` في `DEP-08` هدفانِ `MENU_ITEM`:
+     `·27` «سجل أنواع المستندات» و`·31` «سجل أنواع الطلبات والتوجيه».
+     والإسنادُ بلا ترجيحٍ يُبقي **آخرَ صفٍّ قرأه المحرِّك**، واستعلامٌ بلا
+     `ORDER BY` **لا يضمن ترتيبًا** ⇒ فمخالفةُ اسمٍ ومخالفتا ترتيبٍ تظهران
+     وتختفيان بين تشغيلَين — **رقمٌ يصف قارئَه لا مقروءَه**.
+   ⇒ **والفاصلُ من الورقةِ**: أصغرُ `target_order` يغلب — وهو الترجيحُ نفسُه
+     الذي يطبّقه `classify.php`، **فلا يتفرّق عدّادٌ وعارضٌ**
+     [[counter-parity-two-readers]]. */
 $r = $conn->query("SELECT p.workspace_id, p.route, p.sort_no, p.target_id, g.label_ar, g.sort_no gno,
-                          t.canonical_title
+                          t.canonical_title, t.target_order
                      FROM nav_placements p
                      LEFT JOIN nav_lifecycle_groups g ON g.id = p.group_id
                      LEFT JOIN nav_targets t ON t.target_id = p.target_id AND t.active = 1
                     WHERE p.active = 1 AND p.placement_type IN ('MENU_ITEM','LANDING_PAGE')
-                      AND p.route IS NOT NULL AND p.route <> ''");
+                      AND p.route IS NOT NULL AND p.route <> ''
+                    ORDER BY p.workspace_id,
+                             COALESCE(t.target_order, 9999) ASC, p.sort_no ASC, p.id ASC");
+$tgtSeen = array();
 while ($x = $r->fetch_assoc()) {
     $k = $nrm($x['route']);
-    $target[$x['workspace_id']][$k] = true;
-    $tgtGroup[$x['workspace_id']][$k] = (string) $x['label_ar'];
-    $tgtOrder[$x['workspace_id']][$k] = (int) $x['sort_no'];
+    $ws = $x['workspace_id'];
+    $target[$ws][$k] = true;
+    if (isset($tgtSeen[$ws][$k])) { continue; }   /* الأوّلُ رتبةً يحكم — والباقي يخدمه المبنيُّ نفسُه */
+    $tgtSeen[$ws][$k] = true;
+    $tgtGroup[$ws][$k] = (string) $x['label_ar'];
+    $tgtOrder[$ws][$k] = (int) $x['sort_no'];
     if ((string) $x['canonical_title'] !== '') {
-        $tgtLabel[$x['workspace_id']][$k] = trim((string) $x['canonical_title']);
+        $tgtLabel[$ws][$k] = trim((string) $x['canonical_title']);
     }
 }
 

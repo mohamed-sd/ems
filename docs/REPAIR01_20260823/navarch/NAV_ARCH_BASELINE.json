@@ -1,14 +1,14 @@
 {
-    "baseline_id": "NAB-8B35EC2C05",
-    "commit_hash": "73b9aaa1152456a2c349e92745ff4d949e60125e",
-    "worktree_clean": true,
+    "baseline_id": "NAB-BAC3823605",
+    "commit_hash": "88345fda38502f3934089974c9df0685786f3e4a",
+    "worktree_clean": false,
     "db_snapshot": {
-        "migration_set_hash": "e505111dd084c6a2452520a649a2d94afff10b42",
-        "applied_migrations": 711
+        "migration_set_hash": "307f4938dcc7ff07532abc7fcc90d3c72dade022",
+        "applied_migrations": 713
     },
     "navigation_registry_version": {
-        "hash": "7fec35930978b5f3c033dfd2de2bb7b877cbeec3",
-        "rows": 553
+        "hash": "4fcbcfaf1ceb051b06f59784b44f5257ef569d17",
+        "rows": 557
     },
     "nav_items_version": {
         "hash": "af6df10eb69b5c4bc9b0ecfdafd61093696b2ea9",
@@ -18,12 +18,12 @@
         "hash": "805e0bd8c6130b35aeb013ae5917c00959dec7b8",
         "rows": 4112
     },
-    "target_architecture_version": "nav_placements@7fec35930978",
-    "timestamp_utc": "2026-09-01T10:33:02Z",
+    "target_architecture_version": "nav_placements@4fcbcfaf1ceb",
+    "timestamp_utc": "2026-09-01T11:10:00Z",
     "timestamp_note": "ساعةُ حائطٍ للتوثيقِ لا لترتيبِ الحقائق — الترتيبُ بالبصمات",
     "workspaces": 22,
-    "workspaces_rendered": 18,
-    "total_rendered_links": 1192,
+    "workspaces_rendered": 19,
+    "total_rendered_links": 1275,
     "snapshot": {
         "DEP-01": {
             "role_id": 12,
@@ -3918,13 +3918,595 @@
             ]
         },
         "DEP-08": {
-            "role_id": null,
-            "role_name": null,
+            "role_id": 15,
+            "role_name": "إدارة الصلاحيات",
             "kind": "DEPARTMENT",
             "name_ar": "إدارة الحوكمة والالتزام",
             "active": 1,
-            "rendered": null,
-            "items": []
+            "rendered": 83,
+            "items": [
+                {
+                    "n": 1,
+                    "group": "مساحتي",
+                    "label": "الرئيسية",
+                    "route": "main\/role_board",
+                    "href": "..\/main\/role_board.php"
+                },
+                {
+                    "n": 2,
+                    "group": "مساحتي",
+                    "label": "المراسلات",
+                    "route": "chats\/index",
+                    "href": "..\/chats\/index.php"
+                },
+                {
+                    "n": 3,
+                    "group": "مساحتي",
+                    "label": "إنجاز الإدارة",
+                    "route": "portal\/dept_achievement",
+                    "href": "..\/Portal\/dept_achievement.php"
+                },
+                {
+                    "n": 4,
+                    "group": "مساحتي",
+                    "label": "مساحة عملي",
+                    "route": "main\/my_workspace",
+                    "href": "..\/main\/my_workspace.php"
+                },
+                {
+                    "n": 5,
+                    "group": "مساحتي",
+                    "label": "صندوق ما ينتظر اعتمادي",
+                    "route": "finance\/approvals_inbox",
+                    "href": "..\/Finance\/approvals_inbox.php"
+                },
+                {
+                    "n": 6,
+                    "group": "مساحتي",
+                    "label": "موافقات إدارتي",
+                    "route": "finrequests\/dept_inbox",
+                    "href": "..\/FinRequests\/dept_inbox.php"
+                },
+                {
+                    "n": 7,
+                    "group": "الملف الشخصي",
+                    "label": "مؤشرات الإنجاز الشخصي",
+                    "route": "portal\/my_achievement",
+                    "href": "..\/Portal\/my_achievement.php"
+                },
+                {
+                    "n": 8,
+                    "group": "الملف الشخصي",
+                    "label": "البوابة الشخصية",
+                    "route": "portal\/my_portal",
+                    "href": "..\/Portal\/my_portal.php"
+                },
+                {
+                    "n": 9,
+                    "group": "الملف الشخصي",
+                    "label": "الصفات الوظيفية والتبديل بينها",
+                    "route": "user_capacities",
+                    "href": "..\/user_capacities.php"
+                },
+                {
+                    "n": 10,
+                    "group": "العمل اليومي",
+                    "label": "المهام المسنَدة",
+                    "route": "portal\/my_tasks",
+                    "href": "..\/Portal\/my_tasks.php"
+                },
+                {
+                    "n": 11,
+                    "group": "العمل اليومي",
+                    "label": "الطلبات المقدَّمة",
+                    "route": "finrequests\/request_form",
+                    "href": "..\/FinRequests\/request_form.php"
+                },
+                {
+                    "n": 12,
+                    "group": "العمل اليومي",
+                    "label": "البلاغات المسجَّلة",
+                    "route": "portal\/my_reports",
+                    "href": "..\/Portal\/my_reports.php"
+                },
+                {
+                    "n": 13,
+                    "group": "اللوحة — خارج الدورة",
+                    "label": "لوحة الحوكمة والالتزام",
+                    "route": "governance\/gov_board",
+                    "href": "..\/Governance\/gov_board.php"
+                },
+                {
+                    "n": 14,
+                    "group": "الكيانات والتفويض بالتوقيع",
+                    "label": "سجل الشركات والكيانات",
+                    "route": "governance\/entities_registry",
+                    "href": "..\/Governance\/entities_registry.php"
+                },
+                {
+                    "n": 15,
+                    "group": "الكيانات والتفويض بالتوقيع",
+                    "label": "سجل السياسات",
+                    "route": "governance\/policies",
+                    "href": "..\/Governance\/policies.php"
+                },
+                {
+                    "n": 16,
+                    "group": "الكيانات والتفويض بالتوقيع",
+                    "label": "سجل الالتزامات التنظيمية",
+                    "route": "governance\/obligations",
+                    "href": "..\/Governance\/obligations.php"
+                },
+                {
+                    "n": 17,
+                    "group": "الكيانات والتفويض بالتوقيع",
+                    "label": "تقويم الامتثال",
+                    "route": "governance\/compliance_calendar",
+                    "href": "..\/Governance\/compliance_calendar.php"
+                },
+                {
+                    "n": 18,
+                    "group": "الكيانات والتفويض بالتوقيع",
+                    "label": "التفويض بالتوقيع",
+                    "route": "governance\/signing_authority",
+                    "href": "..\/Governance\/signing_authority.php"
+                },
+                {
+                    "n": 19,
+                    "group": "المستندات والالتزام النظامي",
+                    "label": "التراخيص والكفالات",
+                    "route": "governance\/licenses_guarantees",
+                    "href": "..\/Governance\/licenses_guarantees.php"
+                },
+                {
+                    "n": 20,
+                    "group": "المستندات والالتزام النظامي",
+                    "label": "التقديمات النظامية",
+                    "route": "governance\/regulatory_filings",
+                    "href": "..\/Governance\/regulatory_filings.php"
+                },
+                {
+                    "n": 21,
+                    "group": "الأدوار والصلاحيات",
+                    "label": "الأدوار وقوالب صلاحياتها",
+                    "route": "settings\/roles",
+                    "href": "..\/Settings\/roles.php"
+                },
+                {
+                    "n": 22,
+                    "group": "الأدوار والصلاحيات",
+                    "label": "تضارب المصالح",
+                    "route": "governance\/conflict_disclosures",
+                    "href": "..\/Governance\/conflict_disclosures.php"
+                },
+                {
+                    "n": 23,
+                    "group": "الأدوار والصلاحيات",
+                    "label": "الأطراف ذات العلاقة",
+                    "route": "governance\/related_parties",
+                    "href": "..\/Governance\/related_parties.php"
+                },
+                {
+                    "n": 24,
+                    "group": "الأدوار والصلاحيات",
+                    "label": "الهدايا والضيافة",
+                    "route": "governance\/gifts_hospitality",
+                    "href": "..\/Governance\/gifts_hospitality.php"
+                },
+                {
+                    "n": 25,
+                    "group": "الأدوار والصلاحيات",
+                    "label": "إقرارات مدونة السلوك",
+                    "route": "governance\/conduct_acknowledgements",
+                    "href": "..\/Governance\/conduct_acknowledgements.php"
+                },
+                {
+                    "n": 26,
+                    "group": "الأدوار والصلاحيات",
+                    "label": "تصنيف قواعد المنع",
+                    "route": "governance\/guards",
+                    "href": "..\/Governance\/guards.php"
+                },
+                {
+                    "n": 27,
+                    "group": "الأدوار والصلاحيات",
+                    "label": "فصل الواجبات المتعارضة",
+                    "route": "governance\/sod_conflicts",
+                    "href": "..\/Governance\/sod_conflicts.php"
+                },
+                {
+                    "n": 28,
+                    "group": "الأدوار والصلاحيات",
+                    "label": "صلاحية الطوارئ اللحظية",
+                    "route": "governance\/break_glass",
+                    "href": "..\/Governance\/break_glass.php"
+                },
+                {
+                    "n": 29,
+                    "group": "الأدوار والصلاحيات",
+                    "label": "سياسات الحقول الحساسة",
+                    "route": "governance\/sensitive_fields",
+                    "href": "..\/Governance\/sensitive_fields.php"
+                },
+                {
+                    "n": 30,
+                    "group": "الأدوار والصلاحيات",
+                    "label": "تفسير مصدر الصلاحية",
+                    "route": "governance\/perm_explain",
+                    "href": "..\/Governance\/perm_explain.php"
+                },
+                {
+                    "n": 31,
+                    "group": "الاستثناء والرقابة",
+                    "label": "سجل المحاولات الممنوعة",
+                    "route": "governance\/guard_denials",
+                    "href": "..\/Governance\/guard_denials.php"
+                },
+                {
+                    "n": 32,
+                    "group": "الاستثناء والرقابة",
+                    "label": "سلاليم الاعتماد وتعريفها",
+                    "route": "governance\/approval_ladders",
+                    "href": "..\/Governance\/approval_ladders.php"
+                },
+                {
+                    "n": 33,
+                    "group": "الاستثناء والرقابة",
+                    "label": "طلبات الاستثناء",
+                    "route": "governance\/exceptions",
+                    "href": "..\/Governance\/exceptions.php"
+                },
+                {
+                    "n": 34,
+                    "group": "الاستثناء والرقابة",
+                    "label": "بلاغات النزاهة المحمية",
+                    "route": "governance\/integrity_reports",
+                    "href": "..\/Governance\/integrity_reports.php"
+                },
+                {
+                    "n": 35,
+                    "group": "الاستثناء والرقابة",
+                    "label": "التحقيقات",
+                    "route": "governance\/investigations",
+                    "href": "..\/Governance\/investigations.php"
+                },
+                {
+                    "n": 36,
+                    "group": "الاستثناء والرقابة",
+                    "label": "سجل الإخلالات",
+                    "route": "governance\/breaches",
+                    "href": "..\/Governance\/breaches.php"
+                },
+                {
+                    "n": 37,
+                    "group": "الاستثناء والرقابة",
+                    "label": "الإجراءات التصحيحية",
+                    "route": "governance\/corrective_actions",
+                    "href": "..\/Governance\/corrective_actions.php"
+                },
+                {
+                    "n": 38,
+                    "group": "الاستثناء والرقابة",
+                    "label": "متابعة نتائج المراجعة",
+                    "route": "governance\/audit_followup",
+                    "href": "..\/Governance\/audit_followup.php"
+                },
+                {
+                    "n": 39,
+                    "group": "الأنظمة والقوائم المرجعية",
+                    "label": "مراقبة تدفق الأحداث ومعالجتها",
+                    "route": "governance\/bus_board",
+                    "href": "..\/Governance\/bus_board.php"
+                },
+                {
+                    "n": 40,
+                    "group": "الأنظمة والقوائم المرجعية",
+                    "label": "سجل أنواع المستندات",
+                    "route": "governance\/doc_types",
+                    "href": "..\/Governance\/doc_types.php"
+                },
+                {
+                    "n": 41,
+                    "group": "الأنظمة والقوائم المرجعية",
+                    "label": "أنماط تفعيل المزايا",
+                    "route": "governance\/activation_patterns",
+                    "href": "..\/Governance\/activation_patterns.php"
+                },
+                {
+                    "n": 42,
+                    "group": "الأنظمة والقوائم المرجعية",
+                    "label": "اللجان وحوكمة الاجتماعات",
+                    "route": "governance\/committees",
+                    "href": "..\/Governance\/committees.php"
+                },
+                {
+                    "n": 43,
+                    "group": "الأنظمة والقوائم المرجعية",
+                    "label": "تمرين الاستعادة ومحضره",
+                    "route": "governance\/dr_restore",
+                    "href": "..\/Governance\/dr_restore.php"
+                },
+                {
+                    "n": 44,
+                    "group": "التشغيل اليومي",
+                    "label": "قرارات الهيكل التنظيمي",
+                    "route": "portal\/ceo_org_decisions",
+                    "href": "..\/portal\/ceo_org_decisions.php"
+                },
+                {
+                    "n": 45,
+                    "group": "العقود والعملاء",
+                    "label": "سجل العقود",
+                    "route": "workforce\/contract_registry",
+                    "href": "..\/Workforce\/contract_registry.php"
+                },
+                {
+                    "n": 46,
+                    "group": "المالية والمحاسبة",
+                    "label": "ميزانية إدارة التمويل",
+                    "route": "finance\/budget_dept",
+                    "href": "..\/Finance\/budget_dept.php"
+                },
+                {
+                    "n": 47,
+                    "group": "المالية والمحاسبة",
+                    "label": "ميزانية الإدارة المالية",
+                    "route": "finance\/budget_form_fin",
+                    "href": "..\/Finance\/budget_form_fin.php"
+                },
+                {
+                    "n": 48,
+                    "group": "الخزينة والتمويل",
+                    "label": "علاقات الملكية بين الكيانات",
+                    "route": "financing\/ownership_links",
+                    "href": "..\/Financing\/ownership_links.php"
+                },
+                {
+                    "n": 49,
+                    "group": "الحوكمة والتدقيق",
+                    "label": "دورة المراجعة الدورية للصلاحيات",
+                    "route": "governance\/access_review",
+                    "href": "..\/Governance\/access_review.php"
+                },
+                {
+                    "n": 50,
+                    "group": "الحوكمة والتدقيق",
+                    "label": "مركز حوكمة الصلاحيات",
+                    "route": "admin\/sec_governance",
+                    "href": "..\/admin\/sec_governance.php"
+                },
+                {
+                    "n": 51,
+                    "group": "الحوكمة والتدقيق",
+                    "label": "فصل الواجبات المتعارضة",
+                    "route": "admin\/sec_governance",
+                    "href": "..\/admin\/sec_governance.php?view=v001c44"
+                },
+                {
+                    "n": 52,
+                    "group": "الحوكمة والتدقيق",
+                    "label": "سجل التدقيق والاطلاع",
+                    "route": "activitylogs\/activity_logs",
+                    "href": "..\/ActivityLogs\/activity_logs.php"
+                },
+                {
+                    "n": 53,
+                    "group": "الحوكمة والتدقيق",
+                    "label": "سجل الأمان",
+                    "route": "governance\/security_log",
+                    "href": "..\/Governance\/security_log.php"
+                },
+                {
+                    "n": 54,
+                    "group": "الحوكمة والتدقيق",
+                    "label": "حدود المبالغ",
+                    "route": "governance\/authority_caps",
+                    "href": "..\/Governance\/authority_caps.php"
+                },
+                {
+                    "n": 55,
+                    "group": "الحوكمة والتدقيق",
+                    "label": "جلسات النيابة",
+                    "route": "governance\/impersonations",
+                    "href": "..\/Governance\/impersonations.php"
+                },
+                {
+                    "n": 56,
+                    "group": "الحوكمة والتدقيق",
+                    "label": "منح الصلاحية",
+                    "route": "governance\/auth_grants",
+                    "href": "..\/Governance\/auth_grants.php"
+                },
+                {
+                    "n": 57,
+                    "group": "الحوكمة والتدقيق",
+                    "label": "مركز الحوكمة التقني",
+                    "route": "governance\/tech_gov_center",
+                    "href": "..\/Governance\/tech_gov_center.php"
+                },
+                {
+                    "n": 58,
+                    "group": "المخاطر والبلاغات",
+                    "label": "الإبلاغ السياقي من داخل الشاشة",
+                    "route": "tickets\/ticket_contextual_open",
+                    "href": "..\/Tickets\/ticket_contextual_open.php"
+                },
+                {
+                    "n": 59,
+                    "group": "المخاطر والبلاغات",
+                    "label": "صندوق بلاغات الإدارة",
+                    "route": "tickets\/tickets_list",
+                    "href": "..\/Tickets\/tickets_list.php?tab=dept"
+                },
+                {
+                    "n": 60,
+                    "group": "التقارير والتحليلات",
+                    "label": "لوحة النائب",
+                    "route": "portal\/vp_dashboard",
+                    "href": "..\/Portal\/vp_dashboard.php"
+                },
+                {
+                    "n": 61,
+                    "group": "التقارير والتحليلات",
+                    "label": "الإدارات — نطاقي والشركة",
+                    "route": "portal\/vp_departments",
+                    "href": "..\/Portal\/vp_departments.php"
+                },
+                {
+                    "n": 62,
+                    "group": "التقارير والتحليلات",
+                    "label": "صندوق اعتمادات النائب",
+                    "route": "portal\/vp_approval_inbox",
+                    "href": "..\/Portal\/vp_approval_inbox.php"
+                },
+                {
+                    "n": 63,
+                    "group": "التقارير والتحليلات",
+                    "label": "الإجراءات والقرارات المطلوبة مني",
+                    "route": "portal\/vp_pending_actions",
+                    "href": "..\/Portal\/vp_pending_actions.php"
+                },
+                {
+                    "n": 64,
+                    "group": "التقارير والتحليلات",
+                    "label": "مركز تقارير الحوكمة",
+                    "route": "emsreports\/index",
+                    "href": "..\/emsreports\/index.php"
+                },
+                {
+                    "n": 65,
+                    "group": "الإعدادات",
+                    "label": "الهيكل التنظيمي والمسميات",
+                    "route": "admin\/org_structure",
+                    "href": "..\/admin\/org_structure.php"
+                },
+                {
+                    "n": 66,
+                    "group": "الإعدادات",
+                    "label": "حسابات المستخدمين",
+                    "route": "main\/users",
+                    "href": "..\/main\/users.php"
+                },
+                {
+                    "n": 67,
+                    "group": "الإعدادات",
+                    "label": "التكليفات التنظيمية",
+                    "route": "admin\/org_assignments",
+                    "href": "..\/admin\/org_assignments.php"
+                },
+                {
+                    "n": 68,
+                    "group": "الإعدادات",
+                    "label": "المعاونون والنيابة المؤقتة",
+                    "route": "main\/all_assistants",
+                    "href": "..\/main\/all_assistants.php"
+                },
+                {
+                    "n": 69,
+                    "group": "الإعدادات",
+                    "label": "معالج إعداد الموظف",
+                    "route": "admin\/sec_employee_wizard",
+                    "href": "..\/admin\/sec_employee_wizard.php"
+                },
+                {
+                    "n": 70,
+                    "group": "الإعدادات",
+                    "label": "إدارة المعاونين",
+                    "route": "main\/project_users",
+                    "href": "..\/main\/project_users.php"
+                },
+                {
+                    "n": 71,
+                    "group": "الإعدادات",
+                    "label": "صفحات النظام والإدارات",
+                    "route": "settings\/modules",
+                    "href": "..\/Settings\/modules.php"
+                },
+                {
+                    "n": 72,
+                    "group": "الإعدادات",
+                    "label": "قوالب الصلاحيات",
+                    "route": "governance\/auth_profiles",
+                    "href": "..\/Governance\/auth_profiles.php"
+                },
+                {
+                    "n": 73,
+                    "group": "الإعدادات",
+                    "label": "حسابات بوابة الأطراف الخارجية",
+                    "route": "governance\/portal_users",
+                    "href": "..\/Governance\/portal_users.php"
+                },
+                {
+                    "n": 74,
+                    "group": "الإعدادات",
+                    "label": "سجل الأسماء المعتمدة",
+                    "route": "governance\/canonical_names",
+                    "href": "..\/Governance\/canonical_names.php"
+                },
+                {
+                    "n": 75,
+                    "group": "الإعدادات",
+                    "label": "حالات المستندات وانتقالاتها",
+                    "route": "governance\/state_machines",
+                    "href": "..\/Governance\/state_machines.php"
+                },
+                {
+                    "n": 76,
+                    "group": "الإعدادات",
+                    "label": "النظام التصميمي",
+                    "route": "governance\/design_system",
+                    "href": "..\/Governance\/design_system.php"
+                },
+                {
+                    "n": 77,
+                    "group": "الإعدادات",
+                    "label": "صندوق الأحداث الصادر",
+                    "route": "governance\/bus_outbox",
+                    "href": "..\/Governance\/bus_outbox.php"
+                },
+                {
+                    "n": 78,
+                    "group": "الإعدادات",
+                    "label": "تسليمات الأحداث وحالاتها",
+                    "route": "governance\/bus_deliveries",
+                    "href": "..\/Governance\/bus_deliveries.php"
+                },
+                {
+                    "n": 79,
+                    "group": "الإعدادات",
+                    "label": "طابور المهام",
+                    "route": "governance\/job_queue",
+                    "href": "..\/Governance\/job_queue.php"
+                },
+                {
+                    "n": 80,
+                    "group": "الإعدادات",
+                    "label": "جدولة المهام الدورية",
+                    "route": "governance\/job_schedule",
+                    "href": "..\/Governance\/job_schedule.php"
+                },
+                {
+                    "n": 81,
+                    "group": "الإعدادات",
+                    "label": "وضع التأسيس وإغلاقه",
+                    "route": "portal\/founding_mode",
+                    "href": "..\/Portal\/founding_mode.php"
+                },
+                {
+                    "n": 82,
+                    "group": "الإعدادات",
+                    "label": "بصمة الإصدار وتقرير النشر",
+                    "route": "portal\/release_stamp",
+                    "href": "..\/Portal\/release_stamp.php"
+                },
+                {
+                    "n": 83,
+                    "group": "الإعدادات",
+                    "label": "من يرى ماذا ومكونات البوابة",
+                    "route": "portal\/visibility_keys",
+                    "href": "..\/Portal\/visibility_keys.php"
+                }
+            ]
         },
         "DEP-09": {
             "role_id": 28,
