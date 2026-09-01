@@ -21,6 +21,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 
 $is_super_admin = ((isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '') === '-1');
@@ -123,60 +124,36 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div>
 
     <div class="table-container">
-        <table class="ems-data-table">
-            <thead>
-                <tr>
-                    <th>المورد</th>
-                    <th>الشهر</th>
-                    <th>الوحدات التعاقدية السارية</th>
-                    <th>مداها ومقدارها</th>
-                    <th>مستهدف الشهر</th>
-                    <th>المنفذ بالشهر</th>
-                    <th>نسبة التحقق</th>
-                    <th>شهر بلا تنفيذ؟</th>
-                    <th>المستهدف المنقضي للمورد</th>
-                    <th>مصدر المستهدف</th>
-                </tr>
-            </thead>
-            <tbody>
-            <?php foreach ($rows as $r0):
-                $sid0 = (int) $r0['supplier_id'];
-                $pm = (string) $r0['target_month'];
-                $tgt = (float) $r0['monthly_target'];
-                $e0 = isset($exec[$sid0][$pm]) ? $exec[$sid0][$pm] : 0.0;
-                $pct = $tgt > 0 ? round(100 * $e0 / $tgt, 1) : null;
-                $flag = ($pm < $thisMonth && $e0 <= 0);
-                $slotTxt = 'غير مسجلة'; $rangeTxt = 'غير منطبق';
-                if (isset($units[$sid0])) {
-                    $codes = array(); $lo = ''; $hi = ''; $sumU = 0.0;
-                    foreach ($units[$sid0] as $u0) {
-                        $codes[] = (string) $u0['container_no'];
-                        $sumU += (float) $u0['share_units'];
-                        if ($lo === '' || $u0['effective_from'] < $lo) { $lo = (string) $u0['effective_from']; }
-                        if ($hi === '' || (string) $u0['effective_to'] > $hi) { $hi = (string) $u0['effective_to']; }
-                    }
-                    $slotTxt = count($codes) . ': ' . implode('، ', array_slice($codes, 0, 3)) . (count($codes) > 3 ? '…' : '');
-                    $rangeTxt = 'من ' . $lo . ' الى ' . $hi . '، بمقدار ' . number_format($sumU, 1);
-                }
-            ?>
-                <tr>
-                    <td><?= htmlspecialchars((string) $r0['supplier_name']) ?></td>
-                    <td><?= htmlspecialchars($pm) ?></td>
-                    <td><?= htmlspecialchars($slotTxt) ?></td>
-                    <td><?= htmlspecialchars($rangeTxt) ?></td>
-                    <td><?= number_format($tgt, 1) ?></td>
-                    <td><?= number_format($e0, 1) ?></td>
-                    <td><?= $pct === null ? 'غير منطبق' : $pct . '%' ?></td>
-                    <td><?= $flag ? 'نعم' : 'لا' ?></td>
-                    <td><?= isset($elapsed[$sid0]) ? number_format($elapsed[$sid0], 1) : '0' ?></td>
-                    <td><?= htmlspecialchars((string) $r0['basis']) ?></td>
-                </tr>
-            <?php endforeach; ?>
-            <?php if (!$rows): ?>
-                <tr><td colspan="10">لا مستهدفات مشتقة بعد. المصدر منظور المستهدفات الشهرية من الحصص السارية</td></tr>
-            <?php endif; ?>
-            </tbody>
-        </table>
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم السطر' => 'id',
+            'كود الوحدة التعاقدية' => 'slot_id',
+            'رقم المورد' => 'no_supplier',
+            'اسم المورد (بحث)' => 'name_supplier',
+            'كود عقد المورد' => 'code_contract_supplier',
+            'نموذج العمل' => 'c6',
+            'نوع الآلية/البند' => 'type_line',
+            'رقم الشهر' => 'no_month',
+            'من' => 'c9',
+            'إلى' => 'c10',
+            'وحدة القياس' => 'c11',
+            'خانات الشهر' => 'slot_month',
+            'قيمة الوحدة التعاقدية (الجزئي أيامه/30)' => 'c13',
+            'مستهدف الشهر' => 'target_month',
+            'المنفذ بالشهر' => 'month',
+            'نسبة تحقق الشهر' => 'verify_month',
+            'علم شهر بلا تنفيذ' => 'month_17',
+            'المستهدف المنقضي' => 'target',
+            'نسخة الخطة' => 'c19',
+            'مصدر المستهدف' => 'source_target',
+            'ملاحظات' => 'notes',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('sup_target_supplier');
+        echo ems_w14_grid('emsList_sup_targets', $GUIDE_COLS, $__gridRows, $D, 'لا مستهدف مسجل بعد'); /* /GUIDE_COLS */ ?>
     </div>
 
     <div class="ems-note-box">

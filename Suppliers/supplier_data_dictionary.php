@@ -13,6 +13,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 
 $is_super_admin = ((isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '') === '-1');
@@ -63,21 +64,27 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div>
 
     <div class="table-container">
-        <table class="ems-data-table">
-            <thead><tr><th>الجدول</th><th>الحقل</th><th>النوع</th><th>القبول</th><th>التعليق المدون</th></tr></thead>
-            <tbody>
-            <?php foreach ($rows as $x0): ?>
-                <tr>
-                    <td><?= htmlspecialchars($x0['tbl']) ?></td>
-                    <td><?= htmlspecialchars($x0['col']) ?></td>
-                    <td><?= htmlspecialchars($x0['ty']) ?></td>
-                    <td><?= htmlspecialchars($x0['nn']) ?></td>
-                    <td><?= htmlspecialchars($x0['cm']) ?></td>
-                </tr>
-            <?php endforeach; ?>
-            <?php if (!$rows): ?><tr><td colspan="5">تعذرت قراءة المخطط</td></tr><?php endif; ?>
-            </tbody>
-        </table>
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'الاسم التقني' => 'name_technical',
+            'التسمية العربية' => 'c2',
+            'الكيان' => 'c3',
+            'الشيت' => 'c4',
+            'نوع البيانات' => 'type',
+            'إلزامي؟' => 'c6',
+            'المفتاح' => 'c7',
+            'القيم المسموحة (قائمة م24)' => 'c8',
+            'مصدر الحقيقة/المالك' => 'source_owner',
+            'حالة البيانات' => 'data_state',
+            'تصنيف الفراغ (ما يعنيه الفراغ)' => 'c11',
+            'ملاحظات' => 'notes',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('sup_dictionary_migration');
+        echo ems_w14_grid('emsList_sup_dict', $GUIDE_COLS, $__gridRows, $D, 'لا مفردة قاموس مسجلة بعد'); /* /GUIDE_COLS */ ?>
     </div>
 
     <div class="ems-note-box">

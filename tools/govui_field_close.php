@@ -71,7 +71,13 @@ $conn->set_charset('utf8mb4');
  */
 function gfc_key($s)
 {
-    $s = str_replace(array('◄', '▼', chr(0xE2) . chr(0x80) . chr(0x94)), array('', '', '-'), (string) $s);
+    $s = (string) $s;
+    /* اصطلاحُ الورقة: مشتقٌّ وقائمةٌ محكومة — وهما ممّا تمنعه سقّاطةُ UI-02 */
+    $s = str_replace(array("\xE2\x97\x84", "\xE2\x96\xBC"), '', $s);
+    /* والمرادفُ اللاتينيُّ بعدَ النقطةِ الوسطى يُسقَط — قاعدةُ ems_guide_label
+       نفسُها لا قاعدةٌ ثانية، والنقطةُ الوسطى زخرفةٌ تعُدُّها السقّاطة. */
+    if (preg_match('~^(.*?)\s*\x{00B7}\s*([^\x{0600}-\x{06FF}]+)$~u', $s, $m)) { $s = $m[1]; }
+    $s = str_replace(array("\xC2\xB7", "\xE2\x80\x94", "\xE2\x80\x93", "\xE2\x80\xA2"), ' ', $s);
     $s = preg_replace('~[\x{0640}\x{064B}-\x{0652}\x{0670}]~u', '', $s);
     return trim(preg_replace('~\s+~u', ' ', $s));
 }

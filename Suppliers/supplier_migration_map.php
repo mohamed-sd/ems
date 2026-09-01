@@ -12,6 +12,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 
 $is_super_admin = ((isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '') === '-1');
@@ -58,19 +59,22 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div>
 
     <div class="table-container">
-        <table class="ems-data-table">
-            <thead><tr><th>السجل المصدر</th><th>السجل الوجهة</th><th>عدد الصفوف</th></tr></thead>
-            <tbody>
-            <?php foreach ($map as $k0 => $n0): list($src, $dst) = explode('⇠', $k0); ?>
-                <tr>
-                    <td><?= htmlspecialchars($src) ?></td>
-                    <td><?= htmlspecialchars($dst) ?></td>
-                    <td><?= number_format($n0) ?></td>
-                </tr>
-            <?php endforeach; ?>
-            <?php if (!$map): ?><tr><td colspan="3">لا صفوف نسب بعد</td></tr><?php endif; ?>
-            </tbody>
-        </table>
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            '#' => 'id',
+            'الاتجاه' => 'c2',
+            'ملف/شيت المصدر' => 'source',
+            'العمود/الحقل' => 'c4',
+            'الوجهة/المصدر' => 'source_5',
+            'قرار الترحيل' => 'migration',
+            'ملاحظة' => 'c7',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('sup_migration');
+        echo ems_w14_grid('emsList_sup_migmap', $GUIDE_COLS, $__gridRows, $D, 'لا سطر خريطة ترحيل مسجل بعد'); /* /GUIDE_COLS */ ?>
     </div>
 
     <div class="ems-note-box">

@@ -18,6 +18,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 
 $is_super_admin = ((isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '') === '-1');
@@ -94,39 +95,47 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div>
 
     <div class="table-container">
-        <table class="ems-data-table">
-            <thead>
-                <tr>
-                    <th>رقم التسوية</th>
-                    <th>المورد</th>
-                    <th>الفترة</th>
-                    <th>الصافي المستحق</th>
-                    <th>الحالة</th>
-                    <th>طلب الدفع</th>
-                    <th>الاعتماد</th>
-                    <th>الصرف</th>
-                    <th>فعلها عند فاعله</th>
-                </tr>
-            </thead>
-            <tbody>
-            <?php foreach ($rows as $x0): ?>
-                <tr>
-                    <td><?= htmlspecialchars($x0['no']) ?></td>
-                    <td><?= htmlspecialchars($x0['sup']) ?></td>
-                    <td><?= htmlspecialchars($x0['per']) ?></td>
-                    <td><?= htmlspecialchars($x0['net']) ?></td>
-                    <td><?= htmlspecialchars($x0['state']) ?></td>
-                    <td><?= htmlspecialchars($x0['req']) ?></td>
-                    <td><?= htmlspecialchars($x0['appr']) ?></td>
-                    <td><?= htmlspecialchars($x0['paid']) ?></td>
-                    <td><a href="settlements.php?open=<?= $x0['sid'] ?>">دورة التسوية</a> و<a href="../Finance/payments_fin.php">صرف المالية</a></td>
-                </tr>
-            <?php endforeach; ?>
-            <?php if (!$rows): ?>
-                <tr><td colspan="9">لا تسويات مستحقة بالمرشح المختار</td></tr>
-            <?php endif; ?>
-            </tbody>
-        </table>
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم الطلب' => 'id',
+            'التاريخ' => 'date',
+            'رقم المورد' => 'no_supplier',
+            'الجهة المستفيدة' => 'c4',
+            'طريقة الدفع' => 'payment',
+            'اسم البنك' => 'name_bank',
+            'رقم الحساب' => 'no_account',
+            'اسم صاحب الحساب' => 'name_account',
+            'علم طرف ثالث' => 'c9',
+            'مرجع تفويض الطرف الثالث (م03)' => 'ref_delegation',
+            'العميل/المشروع' => 'project',
+            'نظام التقسيم' => 'c12',
+            'مرجع التسوية (م17)' => 'ref',
+            'المستلم ج.س (لاستحقاق الجنيه)' => 'c14',
+            'المستلم بالجنيه (مدولر)' => 'c15',
+            'سعر الصرف (مصدره وتاريخه)' => 'disburse_source_date',
+            'المستلم الكلي $' => 'c17',
+            'مفتاح شهر الصرف (YYYYMM)' => 'month_disburse',
+            'شهر الاستحقاق المسدد (كما ورد)' => 'month_entitlement',
+            'الإقفال المخصص' => 'closure',
+            'حالة التخصيص' => 'allocation',
+            'حالة الطلب' => 'c22',
+            'حالة الصرف (قراءة)' => 'disburse',
+            'تاريخ الصرف' => 'date_disburse',
+            'مرجع الصرف' => 'ref_disburse',
+            'سياق الآلية (إن ورد)' => 'c26',
+            'طبيعة الدفعة (مستخرجة)' => 'payment_27',
+            'البيان (مصدر)' => 'source',
+            'ملاحظات' => 'notes',
+            'المنشئ' => 'creator_name',
+            'المراجع' => 'reviewer_name',
+            'المعتمد' => 'approver_name',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('sup_payment_disburse');
+        echo ems_w14_grid('emsList_sup_payreq', $GUIDE_COLS, $__gridRows, $D, 'لا طلب دفع مسجل بعد'); /* /GUIDE_COLS */ ?>
     </div>
 
     <?= ems_w8_machine_panel($conn, 'settlements', 'آلة حالة التسوية المؤلفة في مرجعها الحاكم، تعرض حرفا ولا تؤلف هنا') ?>

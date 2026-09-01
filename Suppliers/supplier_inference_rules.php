@@ -13,6 +13,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 
 $is_super_admin = ((isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '') === '-1');
@@ -66,22 +67,22 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div>
 
     <div class="table-container">
-        <table class="ems-data-table">
-            <thead><tr><th>الكيان</th><th>الانتقال</th><th>الحكم</th><th>مالكه</th><th>قواعده المدونة</th><th>مرجع الصف</th></tr></thead>
-            <tbody>
-            <?php foreach ($rows as $x0): ?>
-                <tr>
-                    <td><?= htmlspecialchars($x0['ent']) ?></td>
-                    <td><?= htmlspecialchars($x0['move']) ?></td>
-                    <td><?= htmlspecialchars($x0['judg']) ?></td>
-                    <td><?= htmlspecialchars($x0['owner']) ?></td>
-                    <td><?= htmlspecialchars($x0['rules']) ?></td>
-                    <td><?= htmlspecialchars($x0['src']) ?></td>
-                </tr>
-            <?php endforeach; ?>
-            <?php if (!$rows): ?><tr><td colspan="6">مخزن قواعد الموجة فارغ</td></tr><?php endif; ?>
-            </tbody>
-        </table>
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'كود القاعدة' => 'code_rule',
+            'الحقل/المخرج' => 'c2',
+            'القيم الممكنة' => 'c3',
+            'قاعدة الاشتقاق' => 'c4',
+            'الشيت المطبق فيه' => 'c5',
+            'القيد/التحذير' => 'c6',
+            'تصنيف الحجية' => 'authority_class',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('sup_dictionary_rule_derivation');
+        echo ems_w14_grid('emsList_sup_rules', $GUIDE_COLS, $__gridRows, $D, 'لا قاعدة استنتاج مسجلة بعد'); /* /GUIDE_COLS */ ?>
     </div>
 
     <div class="ems-note-box">

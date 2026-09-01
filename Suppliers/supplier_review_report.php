@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 
 $is_super_admin = ((isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '') === '-1');
@@ -73,21 +74,20 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div>
 
     <div class="table-container">
-        <table class="ems-data-table">
-            <thead><tr><th>نوع البند</th><th>المرجع</th><th>البيان</th><th>الحكم</th><th>اللقطة</th></tr></thead>
-            <tbody>
-            <?php foreach ($rows as $x0): ?>
-                <tr>
-                    <td><?= htmlspecialchars($x0['kind']) ?></td>
-                    <td><?= htmlspecialchars($x0['ref']) ?></td>
-                    <td><?= htmlspecialchars(mb_substr($x0['item'], 0, 70)) ?></td>
-                    <td><?= htmlspecialchars($x0['verd']) ?></td>
-                    <td><?= htmlspecialchars($x0['snap']) ?></td>
-                </tr>
-            <?php endforeach; ?>
-            <?php if (!$rows): ?><tr><td colspan="5">لا بنود مراجعة بعد</td></tr><?php endif; ?>
-            </tbody>
-        </table>
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'القسم' => 'section',
+            'البند' => 'line',
+            'القيمة/النتيجة' => 'c3',
+            'الحالة' => 'c4',
+            'ملاحظة' => 'c5',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('sup_report_accept');
+        echo ems_w14_grid('emsList_sup_review', $GUIDE_COLS, $__gridRows, $D, 'لا بند مراجعة مسجل بعد'); /* /GUIDE_COLS */ ?>
     </div>
 
     <div class="ems-note-box">

@@ -13,6 +13,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 
 $is_super_admin = ((isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '') === '-1');
@@ -67,20 +68,29 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div>
 
     <div class="table-container">
-        <table class="ems-data-table">
-            <thead><tr><th>الوجهة</th><th>النسب المصدر</th><th>تاريخ التحويل</th><th>حالة الصف</th></tr></thead>
-            <tbody>
-            <?php foreach ($rows as $x0): ?>
-                <tr>
-                    <td><?= htmlspecialchars($x0['dst']) ?></td>
-                    <td><?= htmlspecialchars($x0['src']) ?></td>
-                    <td><?= htmlspecialchars($x0['at']) ?></td>
-                    <td><?= htmlspecialchars($x0['st']) ?></td>
-                </tr>
-            <?php endforeach; ?>
-            <?php if (!$rows): ?><tr><td colspan="4">لا تحويلات موثقة بنسبها بعد</td></tr><?php endif; ?>
-            </tbody>
-        </table>
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم القيد' => 'id',
+            'ملف المصدر' => 'source',
+            'شيت المصدر' => 'source_3',
+            'العمود' => 'c4',
+            'Source_Row_Ref' => 'source_row_ref',
+            'الكيان الهدف' => 'c6',
+            'الشيت الهدف' => 'c7',
+            'معرف السجل الهدف' => 'id_8',
+            'قرار الترحيل' => 'migration',
+            'التحويل المطبق' => 'c10',
+            'حالة الترحيل' => 'migration_11',
+            'تاريخ الترحيل' => 'date_migration',
+            'المدقق' => 'c13',
+            'ملاحظة' => 'c14',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('sup_trace_migration');
+        echo ems_w14_grid('emsList_sup_trace', $GUIDE_COLS, $__gridRows, $D, 'لا قيد تتبع مسجل بعد'); /* /GUIDE_COLS */ ?>
     </div>
 
     <div class="ems-note-box">

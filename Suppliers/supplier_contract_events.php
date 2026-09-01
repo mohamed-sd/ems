@@ -17,6 +17,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 
 $is_super_admin = ((isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '') === '-1');
@@ -86,33 +87,27 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div>
 
     <div class="table-container">
-        <table class="ems-data-table">
-            <thead>
-                <tr>
-                    <th>العقد</th>
-                    <th>المورد</th>
-                    <th>المدى</th>
-                    <th>النسخة والملاحق</th>
-                    <th>الحالة بآلتها</th>
-                    <th>ضمان الاداء</th>
-                </tr>
-            </thead>
-            <tbody>
-            <?php foreach ($rows as $x0): ?>
-                <tr>
-                    <td><?= htmlspecialchars($x0['ctr']) ?></td>
-                    <td><?= htmlspecialchars($x0['sup']) ?></td>
-                    <td><?= htmlspecialchars($x0['span']) ?></td>
-                    <td><?= htmlspecialchars($x0['ver']) ?></td>
-                    <td><?= htmlspecialchars($x0['state']) ?></td>
-                    <td><?= htmlspecialchars($x0['guar']) ?></td>
-                </tr>
-            <?php endforeach; ?>
-            <?php if (!$rows): ?>
-                <tr><td colspan="6">لا عقود موردين مسجلة بعد</td></tr>
-            <?php endif; ?>
-            </tbody>
-        </table>
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم القيد' => 'id',
+            'كود عقد المورد' => 'code_contract_supplier',
+            'نوع وثيقة الإغلاق' => 'type_close',
+            'رقم النسخة' => 'no',
+            'ما الذي تغير' => 'c5',
+            'سريان من' => 'c6',
+            'تاريخ التوقيع' => 'date',
+            'الحالة' => 'c8',
+            'مرجع تسوية الإغلاق (م17)' => 'ref_close',
+            'إخلاء الطرف' => 'c10',
+            'المستند' => 'doc',
+            'ملاحظات' => 'notes',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('sup_close');
+        echo ems_w14_grid('emsList_sup_events', $GUIDE_COLS, $__gridRows, $D, 'لا واقعة اغلاق مسجلة بعد'); /* /GUIDE_COLS */ ?>
     </div>
 
     <?= ems_w8_machine_panel($conn, 'supplier_contracts', 'آلة حالة عقد المورد الحاكمة للانهاء والاقفال والتصفية، تعرض حرفا من مرجعها') ?>

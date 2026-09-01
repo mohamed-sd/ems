@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 
 $is_super_admin = ((isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '') === '-1');
@@ -71,19 +72,62 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div>
 
     <div class="table-container">
-        <table class="ems-data-table">
-            <thead><tr><th>القائمة</th><th>موضعها الحي</th><th>عد القيم</th><th>القيم</th></tr></thead>
-            <tbody>
-            <?php foreach ($LISTS as $l0): ?>
-                <tr>
-                    <td><?= htmlspecialchars($l0[0]) ?></td>
-                    <td><?= htmlspecialchars($l0[1]) ?></td>
-                    <td><?= count($l0[2]) ?></td>
-                    <td><?= htmlspecialchars($l0[2] ? implode('، ', $l0[2]) : 'لا قيم بعد') ?></td>
-                </tr>
-            <?php endforeach; ?>
-            </tbody>
-        </table>
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'نموذج العمل' => 'business_model',
+            'وحدة القياس' => 'c2',
+            'العملة' => 'c3',
+            'نوع الآلية/البند' => 'type_line',
+            'بادئة النوع (v4)' => 'type',
+            'تصنيف المورد' => 'supplier',
+            'فئة مصدر القدرة' => 'source',
+            'طبيعة المورد' => 'supplier_8',
+            'حالة المورد' => 'supplier_9',
+            'أساس اشتقاق الحالة' => 'c10',
+            'نوع التفويض' => 'type_delegation',
+            'نوع الوثيقة' => 'type_12',
+            'حالة التحقق' => 'verify',
+            'نوع الوحدة التعاقدية' => 'type_14',
+            'التصنيف (استمرارية)' => 'c15',
+            'الدور (أساسية/احتياطية)' => 'role',
+            'نوع الإسناد' => 'type_17',
+            'الحدث' => 'c18',
+            'حالة العقد' => 'contract',
+            'تكييف الوثيقة' => 'c20',
+            'مستوى الحجية' => 'authority_level',
+            'حجية الحصة (المصدر)' => 'source_22',
+            'كود الالتزام' => 'code_obligation',
+            'أطراف الثلاثية' => 'c24',
+            'طرف الالتزام (م09)' => 'obligation',
+            'قابل للاسترداد؟' => 'c26',
+            'نوع الواقعة النيابية' => 'type_onbehalf',
+            'حالة السلسلة النيابية' => 'onbehalf',
+            'حالة الاستحقاق' => 'entitlement',
+            'حالة التسوية' => 'c30',
+            'نظام التقسيم' => 'c31',
+            'طريقة الدفع' => 'payment',
+            'حالة الطلب' => 'c33',
+            'حالة الصرف' => 'disburse',
+            'نوع الجزاء/المطالبة' => 'type_penalty',
+            'نوع وثيقة الإغلاق' => 'type_close',
+            'التصنيف الاستراتيجي' => 'c37',
+            'مصدر القدرة' => 'source_38',
+            'قرار الترحيل' => 'migration',
+            'جاهزية التوقيع' => 'c40',
+            'نتيجة الفحص' => 'c41',
+            'حالة الحصة' => 'c42',
+            'الوضع التشغيلي' => 'c43',
+            'الاستمرارية' => 'c44',
+            'طريقة الربط بالحصة' => 'c45',
+            'طبيعة علاقة المورد بالمعدة' => 'supplier_46',
+            'معالجة الاستعداد والتوقف (قاعدة)' => 'c47',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('sup_list_ref');
+        echo ems_w14_grid('emsList_sup_reflists', $GUIDE_COLS, $__gridRows, $D, 'لا قائمة مرجعية مسجلة بعد'); /* /GUIDE_COLS */ ?>
     </div>
 
     <div class="ems-note-box">

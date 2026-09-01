@@ -20,6 +20,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 
 $is_super_admin = ((isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '') === '-1');
@@ -120,43 +121,37 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div>
 
     <div class="table-container">
-        <table class="ems-data-table">
-            <thead>
-                <tr>
-                    <th>كود الرصيد</th>
-                    <th>رقم المورد</th>
-                    <th>اسم المورد</th>
-                    <th>العملة</th>
-                    <th>اجمالي الاستحقاق</th>
-                    <th>اجمالي المدفوع</th>
-                    <th>الرصيد القائم</th>
-                    <th>آخر شهر حركة</th>
-                    <th>عمر الرصيد</th>
-                    <th>شريحة العمر</th>
-                    <th>حالة الرصيد</th>
-                </tr>
-            </thead>
-            <tbody>
-            <?php foreach ($rows as $x0): ?>
-                <tr>
-                    <td><?= htmlspecialchars($x0['aid']) ?></td>
-                    <td><?= (int) $x0['sid'] ?></td>
-                    <td><?= htmlspecialchars($x0['name']) ?></td>
-                    <td><?= htmlspecialchars($x0['cur']) ?></td>
-                    <td><?= htmlspecialchars($x0['due']) ?></td>
-                    <td><?= htmlspecialchars($x0['paid']) ?></td>
-                    <td><?= htmlspecialchars($x0['open']) ?></td>
-                    <td><?= htmlspecialchars($x0['last']) ?></td>
-                    <td><?= htmlspecialchars($x0['age']) ?></td>
-                    <td><?= htmlspecialchars($x0['bucket']) ?></td>
-                    <td><?= htmlspecialchars($x0['state']) ?></td>
-                </tr>
-            <?php endforeach; ?>
-            <?php if (!$rows): ?>
-                <tr><td colspan="11">لا تسويات موردين معتمدة باتجاه الاستحقاق بعد</td></tr>
-            <?php endif; ?>
-            </tbody>
-        </table>
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'كود الرصيد' => 'id',
+            'التسلسل الزمني للمورد' => 'c2',
+            'رقم المورد' => 'no_supplier',
+            'اسم المورد (بحث)' => 'name_supplier',
+            'العملة' => 'c5',
+            'إجمالي الاستحقاق' => 'entitlement',
+            'إجمالي المدفوع' => 'c7',
+            'الرصيد القائم' => 'balance',
+            'آخر شهر حركة' => 'month',
+            'عمر الرصيد (يوما)' => 'balance_10',
+            'شريحة العمر' => 'c11',
+            'حالة الرصيد' => 'balance_12',
+            'حالة المورد (م01)' => 'supplier',
+            'التزام قادم ≤30 يوما' => 'c14',
+            'التزام قادم 31 60' => 'c15',
+            'التزام قادم 61 90' => 'c16',
+            'إجراء التحصيل/السداد المقترح' => 'c17',
+            'المسؤول' => 'c18',
+            'Record_Basis' => 'record_basis',
+            'Derivation_Rule' => 'derivation_rule',
+            'حالة البيانات' => 'data_state',
+            'ملاحظات' => 'notes',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('sup_aging_obligation');
+        echo ems_w14_grid('emsList_sup_aging', $GUIDE_COLS, $__gridRows, $D, 'لا رصيد مسجل بعد'); /* /GUIDE_COLS */ ?>
     </div>
 
     <div class="ems-note-box">

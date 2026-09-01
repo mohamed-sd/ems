@@ -19,6 +19,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 
 $is_super_admin = ((isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '') === '-1');
@@ -85,33 +86,41 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div>
 
     <div class="table-container">
-        <table class="ems-data-table">
-            <thead>
-                <tr>
-                    <th>سجل التأهيل</th>
-                    <th>المورد</th>
-                    <th>نوعه</th>
-                    <th>عناصر التأهيل باسمها</th>
-                    <th>التسجيل المالي</th>
-                    <th>الحكم القياسي</th>
-                </tr>
-            </thead>
-            <tbody>
-            <?php foreach ($rows as $x0): ?>
-                <tr>
-                    <td><?= htmlspecialchars($x0['ref']) ?></td>
-                    <td><?= htmlspecialchars($x0['sup']) ?></td>
-                    <td><?= htmlspecialchars($x0['kind']) ?></td>
-                    <td><?= htmlspecialchars($x0['items']) ?></td>
-                    <td><?= htmlspecialchars($x0['fin']) ?></td>
-                    <td><?= htmlspecialchars($x0['verdict']) ?></td>
-                </tr>
-            <?php endforeach; ?>
-            <?php if (!$rows): ?>
-                <tr><td colspan="6">لا موردين في السجل بعد</td></tr>
-            <?php endif; ?>
-            </tbody>
-        </table>
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم القيد' => 'id',
+            'رقم المورد' => 'no_supplier',
+            'اسم المورد (بحث)' => 'name_supplier',
+            'نوع الوثيقة' => 'type',
+            'رقم الوثيقة' => 'no',
+            'جهة الإصدار' => 'issue',
+            'تاريخ الإصدار' => 'date_issue',
+            'تاريخ الانتهاء' => 'date_expiry',
+            'حالة التحقق' => 'verify',
+            'تاريخ التحقق' => 'date_verify',
+            'المتحقق' => 'verifier',
+            'اسم البنك' => 'name_bank',
+            'الفرع' => 'branch',
+            'رقم الحساب' => 'no_account',
+            'اسم صاحب الحساب' => 'name_account',
+            'مطابقة الاسم للمورد؟' => 'name',
+            'علم حساب طرف ثالث' => 'account',
+            'مستند تفويض الطرف الثالث' => 'doc_delegation',
+            'حد التعامل الشهري $' => 'month',
+            'حد التعامل ج.س' => 'c20',
+            'شروط سداد افتراضية' => 'c21',
+            'التصنيف الائتماني الداخلي' => 'credit',
+            'أساس التصنيف' => 'c23',
+            'مستوى الحجية' => 'authority_level',
+            'حالة البيانات' => 'data_state',
+            'ملاحظات' => 'notes',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('sup_qualification_legal_credit');
+        echo ems_w14_grid('emsList_sup_qualification', $GUIDE_COLS, $__gridRows, $D, 'لا قيد تاهيل مسجل بعد'); /* /GUIDE_COLS */ ?>
     </div>
 
     <?= ems_w8_machine_panel($conn, 'suppliers', 'آلة حالة تأهيل المورد المؤلفة في مرجعها، تعرض حرفا') ?>

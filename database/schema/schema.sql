@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-01 21:06:20
+-- المصدر: equipation_manage · التوليد: 2026-09-01 21:31:27
 -- الجداول: 1053 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
@@ -21656,6 +21656,9 @@ CREATE TABLE `sup_aging_obligation` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `created_by` int(11) NOT NULL DEFAULT 0,
   `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp(),
+  `record_basis` varchar(190) DEFAULT NULL COMMENT 'Record_Basis',
+  `derivation_rule` varchar(190) DEFAULT NULL COMMENT 'Derivation_Rule',
+  `data_state` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
   PRIMARY KEY (`id`),
   KEY `ix_sup_aging_obligation_co` (`company_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -21867,6 +21870,8 @@ CREATE TABLE `sup_dictionary_migration` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `created_by` int(11) NOT NULL DEFAULT 0,
   `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp(),
+  `data_state` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `name_technical` varchar(160) DEFAULT NULL COMMENT 'الاسم التقني',
   PRIMARY KEY (`id`),
   KEY `ix_sup_dictionary_migration_co` (`company_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -21883,6 +21888,8 @@ CREATE TABLE `sup_dictionary_rule_derivation` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `created_by` int(11) NOT NULL DEFAULT 0,
   `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp(),
+  `authority_class` varchar(190) DEFAULT NULL COMMENT 'تصنيف الحجية',
+  `code_rule` varchar(60) DEFAULT NULL COMMENT 'كود القاعدة',
   PRIMARY KEY (`id`),
   KEY `ix_sup_dictionary_rule_deri_co` (`company_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -22004,6 +22011,8 @@ CREATE TABLE `sup_list_ref` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `created_by` int(11) NOT NULL DEFAULT 0,
   `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp(),
+  `authority_level` varchar(190) DEFAULT NULL COMMENT 'مستوى الحجية',
+  `business_model` varchar(160) DEFAULT NULL COMMENT 'نموذج العمل',
   PRIMARY KEY (`id`),
   KEY `ix_sup_list_ref_co` (`company_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -22196,6 +22205,9 @@ CREATE TABLE `sup_payment_disburse` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `created_by` int(11) NOT NULL DEFAULT 0,
   `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp(),
+  `creator_name` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `reviewer_name` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `approver_name` varchar(190) DEFAULT NULL COMMENT 'المعتمد',
   PRIMARY KEY (`id`),
   KEY `ix_sup_payment_disburse_co` (`company_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -22230,6 +22242,8 @@ CREATE TABLE `sup_qualification_legal_credit` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `created_by` int(11) NOT NULL DEFAULT 0,
   `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp(),
+  `authority_level` varchar(190) DEFAULT NULL COMMENT 'مستوى الحجية',
+  `data_state` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
   PRIMARY KEY (`id`),
   KEY `ix_sup_qualification_legal__co` (`company_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -22340,6 +22354,7 @@ CREATE TABLE `sup_report_accept` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `created_by` int(11) NOT NULL DEFAULT 0,
   `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp(),
+  `section` varchar(160) DEFAULT NULL COMMENT 'القسم',
   PRIMARY KEY (`id`),
   KEY `ix_sup_report_accept_co` (`company_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -22479,6 +22494,7 @@ CREATE TABLE `sup_trace_migration` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `created_by` int(11) NOT NULL DEFAULT 0,
   `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp(),
+  `source_row_ref` varchar(190) DEFAULT NULL COMMENT 'Source_Row_Ref',
   PRIMARY KEY (`id`),
   KEY `ix_sup_trace_migration_co` (`company_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
