@@ -126,17 +126,25 @@ $note = ($NOTE !== '' ? $NOTE . ' — ' : '')
       . ' · حي غائب عن البكر ' . count($missingInFresh)
       . ' · بكر زائد ' . count($extraInFresh);
 
+/* ◆ **بصمةُ مجموعةِ الهجراتِ وقتَ التمرين** — بها يُحكَم على التقادمِ بلا
+     ساعةِ حائطٍ ترجع. انظر رأسَ `tools/lib/migration_set_hash.php`. */
+require_once __DIR__ . '/lib/migration_set_hash.php';
+$msh = ems_migration_set_hash($conn);
+$note .= ' · بصمةُ مجموعةِ الهجرات ' . substr($msh['hash'], 0, 10) . ' على ' . $msh['count'] . ' هجرة';
+
 $st = $conn->prepare("INSERT INTO dr_drills
     (company_id, entity_layer, drill_no, drill_kind, started_at, finished_at, target_point,
      rpo_target_minutes, rpo_actual_minutes, rto_actual_seconds,
      rows_before, rows_after_expected_gone, rows_after_actual, verdict,
-     evidence_path, runbook_ref, operator_note, created_by, created_by_role, approved_at)
+     evidence_path, runbook_ref, operator_note, migration_set_hash,
+     created_by, created_by_role, approved_at)
     VALUES (1,'operations',?,'fresh_install',?,NOW(3),'0000-00-00 00:00:00',15,0,?,?,?,?,?,
-            ?, ?, ?, 0, 0, NOW())");
+            ?, ?, ?, ?, 0, 0, NOW())");
 $ev  = 'docs/REPAIR01_20260823/RESTORE_DRILL_20260830.md';
 $run = 'php tools/gov_exec_fresh_install_drill.php (database/install.php --db-name=' . $dbName . ')';
 $live_n = count($liveO); $fresh_n = count($fresh); $miss_n = count($missingInFresh);
-$st->bind_param('ssiiiissss', $drill, $startedAt, $rto, $live_n, $fresh_n, $miss_n, $verdict, $ev, $run, $note);
+$mshHash = $msh['hash'];
+$st->bind_param('ssiiiisssss', $drill, $startedAt, $rto, $live_n, $fresh_n, $miss_n, $verdict, $ev, $run, $note, $mshHash);
 if (!$st->execute()) { exit("⛔ قيدُ المحضر: {$conn->error}\n"); }
 $st->close();
 printf("  ✔ قُيِّد %s · الحكم: **%s** · زمنُ التثبيت %d ثانية\n", $drill, $verdict, $rto);

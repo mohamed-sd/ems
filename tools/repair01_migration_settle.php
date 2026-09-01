@@ -164,7 +164,11 @@ foreach (scandir($DIR) as $f) {
 }
 ksort($managed); ksort($unmanaged);
 $ledger = array();
-foreach ($rows("SELECT filename FROM schema_migrations") as $r) { $ledger[$r['filename']] = 1; }
+/* ◆ الحالةُ والساعةُ تُحملان معَ الاسم — فحكمُ «تراجعٌ نسخه أصلُه» يقرؤهما،
+     ومواضعُ `isset()` القديمةُ تبقى صحيحةً لأنَّ القيمةَ صارت مصفوفةً لا صفرًا. */
+foreach ($rows("SELECT filename, status, applied_at FROM schema_migrations") as $r) {
+    $ledger[$r['filename']] = array('status' => $r['status'], 'applied_at' => $r['applied_at']);
+}
 
 /* خريطةُ الحذفِ من تاريخِ `git` — تُبنى مرّةً */
 $delMap = array();
@@ -302,6 +306,37 @@ foreach ($managed as $f => $ext) {
     );
 }
 
+/* ── ①ـب سكربتُ تراجعٍ **في الدفترِ** نسخه أصلُه الأمام ─────────────────
+   ◆ **ثغرةٌ كشفها التشغيل**: الفرعُ ① لا ينظر إلّا فيما هو **خارجَ الدفتر**.
+     فسكربتُ تراجعٍ **شُغِّل فعلًا** (اختبارَ دورةٍ مثلًا) يقيّد نفسَه `applied`
+     ثمَّ **يُعاد تطبيقُ أصلِه الأمام** — فيبقى في الدفترِ بحالةٍ تقول
+     «نافذٌ» وأثرُه **مرفوعٌ**، ولا يمرُّ بأيِّ حكم. فيسلَم من كلِّ فرزٍ
+     وهو أكذبُ الصفوف.
+   ◆ **والدليلُ ترتيبُ الساعة**: أمامٌ طُبِّق **بعدَ** تراجعِه ⇒ التراجعُ
+     منسوخٌ وأثرُه ليس قائمًا ⇒ يُقيَّد `baseline` بحكمِه.
+   ⛔ **ولا يُحكَم بالاسمِ وحدَه**: إن لم يكن للأمامِ صفٌّ مطبَّقٌ **أحدثُ**
+     فالتراجعُ قد يكون نافذًا حقًّا — فيُترَك ولا يُمَسّ. */
+foreach ($ledger as $f => $st) {
+    if (!preg_match('/_down\.(php|sql)$/i', $f)) { continue; }
+    if (isset($plan[$f])) { continue; }
+    if (!isset($st['status']) || $st['status'] !== 'applied') { continue; }
+    $fwdName = preg_replace('/_down\.(php|sql)$/i', '.$1', $f);
+    if (!isset($ledger[$fwdName]) || $ledger[$fwdName]['status'] !== 'applied') { continue; }
+    $tDown = strtotime((string) $st['applied_at']);
+    $tFwd  = strtotime((string) $ledger[$fwdName]['applied_at']);
+    if (!$tDown || !$tFwd || $tFwd < $tDown) { continue; }
+    $plan[$f] = array(
+        'kind' => 'DISK_NOT_LEDGERED',
+        'ruling' => 'ROLLBACK_SCRIPT_NOT_APPLIED',
+        'evidence' => 'تراجعٌ شُغِّل ثمَّ نسخه أصلُه الأمامُ `' . $fwdName . '` — '
+            . 'التراجعُ ' . $st['applied_at'] . ' والأمامُ ' . $ledger[$fwdName]['applied_at']
+            . ' ⇒ أثرُ التراجعِ مرفوعٌ، فيُقيَّد `baseline` ولا يبقى «نافذًا» كذبًا',
+        'verified' => 1,
+        'checked' => 2, 'found' => 2,
+        'ledger_status' => 'baseline',
+    );
+}
+
 /* ── ② الدفترُ بلا ملفّ ────────────────────────────────────────────────── */
 foreach (array_keys($ledger) as $f) {
     if (isset($managed[$f]) || isset($unmanaged[$f])) { continue; }
@@ -328,7 +363,31 @@ foreach (array_keys($ledger) as $f) {
 }
 
 /* ── ③ خارجَ عُرفِ التسمية ─────────────────────────────────────────────── */
+/* ◆ **وحكمُ مالكٍ مقيَّدٌ سلفًا يغلب افتراضَ الأداة**: كان هذا الفرعُ يدهس كلَّ
+     صفٍّ باسمٍ خارجَ العُرفِ ويردُّه `UNMANAGED_NEEDS_OWNER` — **حتى لو كان
+     المالكُ قد حسمه فعلًا** بهجرةٍ كتبت `verified=1` بمرجعِ مالكٍ ودليل.
+     فيُمحى القرارُ ويُعاد السؤالُ إلى أوّلِه في كلِّ تشغيل.
+   ⛔ **فالمحسومُ بمرجعِ مالكٍ لا يُدهَس** — ويُعرَض كما هو. وما لا مرجعَ له
+     يبقى على الافتراضِ حتى يُحسَم. */
+$preRuled = array();
+foreach ($rows("SELECT filename, kind, ruling, evidence, verified, objects_checked, objects_found, owner_ref
+                  FROM gov_migration_settlement
+                 WHERE verified = 1 AND owner_ref IS NOT NULL AND owner_ref <> ''") as $r) {
+    $preRuled[$r['filename']] = $r;
+}
 foreach (array_keys($unmanaged) as $f) {
+    if (isset($preRuled[$f])) {
+        $pr = $preRuled[$f];
+        $plan[$f] = array(
+            'kind' => $pr['kind'],
+            'ruling' => $pr['ruling'],
+            'evidence' => $pr['evidence'],
+            'verified' => 1,
+            'checked' => (int) $pr['objects_checked'], 'found' => (int) $pr['objects_found'],
+            'ledger_status' => null,
+        );
+        continue;
+    }
     $isHelper = ($f === '_ledger.php');
     $plan[$f] = array(
         'kind' => 'UNMANAGED_NAME',

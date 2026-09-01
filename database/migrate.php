@@ -593,7 +593,7 @@ function cmd_up(mysqli $conn, $dryRun)
     return 0;
 }
 
-function cmd_mark_applied(mysqli $conn, $target)
+function cmd_mark_applied(mysqli $conn, $target, $reseal = false)
 {
     $files = migrate_scan_files();
     $tracked = migrate_fetch_tracked($conn);
@@ -614,11 +614,32 @@ function cmd_mark_applied(mysqli $conn, $target)
             fwrite(STDERR, "[migrate] الملف غير موجود في migrations/: {$target}\n");
             return 1;
         }
-        if (isset($tracked[$target])) {
+        if (isset($tracked[$target]) && !$reseal) {
             fwrite(STDERR, "[migrate] {$target} مسجَّل مسبقًا بحالة {$tracked[$target]['status']}.\n");
+            if ($tracked[$target]['checksum'] !== sha1_file(MIGRATE_DIR . '/' . $target)) {
+                fwrite(STDERR, "          ومحتواه تغيّر بعد التطبيق. إن كان التغيُّرُ توثيقًا لا سلوكًا\n");
+                fwrite(STDERR, "          فأعِدْ ختمَ بصمتِه صراحةً: mark-applied {$target} --reseal\n");
+            }
             return 1;
         }
         $list[] = $target;
+    }
+
+    /* ◆ إعادةُ الختم — لملفٍّ مطبَّقٍ تغيّر **نصُّه** لا **سلوكُه**.
+       ⛔ ولا تُمنح ضمنًا: البصمةُ حارسُ فسادٍ حقيقيّ، فالطلبُ صريحٌ بـ`--reseal`،
+       والقديمةُ والجديدةُ تُطبعان ليبقى الفعلُ مقروءًا في السجلّ. */
+    if ($reseal) {
+        foreach ($list as $f) {
+            $old = isset($tracked[$f]) ? $tracked[$f]['checksum'] : '—';
+            $new = sha1_file(MIGRATE_DIR . '/' . $f);
+            if ($old === $new) { echo "  = بصمةٌ مطابقةٌ أصلًا: {$f}\n"; continue; }
+            $st = isset($tracked[$f]) ? $tracked[$f]['status'] : 'baseline';
+            migrate_record($conn, $f, $new, $st, 0, null);
+            echo "  ✔ أُعيد ختمُ البصمة ({$st}): {$f}\n";
+            echo "      من {$old}\n      إلى {$new}\n";
+        }
+        echo "إعادةُ الختمِ تعني: أثرُ الملفِّ في القاعدةِ قائمٌ ولم يتغيّر — والمتغيّرُ نصُّه.\n";
+        return 0;
     }
 
     foreach ($list as $f) {
@@ -732,7 +753,7 @@ switch ($command) {
             fwrite(STDERR, "[migrate] حدّد اسم الملف أو --all-pending\n");
             exit(1);
         }
-        exit(cmd_mark_applied($conn, $argv[2]));
+        exit(cmd_mark_applied($conn, $argv[2], in_array('--reseal', $argv, true)));
     case 'baseline':
         exit(cmd_baseline($conn));
     case 'dump-schema':

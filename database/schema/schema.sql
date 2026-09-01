@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-01 19:34:17
--- الجداول: 1051 · المناظير: 28
+-- المصدر: equipation_manage · التوليد: 2026-09-01 09:37:05
+-- الجداول: 1052 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -3097,6 +3097,7 @@ CREATE TABLE `dr_drills` (
   `approved_by_role` smallint(5) unsigned DEFAULT NULL,
   `approved_at` datetime DEFAULT NULL,
   `seed_tag` varchar(32) DEFAULT NULL,
+  `migration_set_hash` char(40) DEFAULT NULL COMMENT 'SHA-1 لمجموعةِ الهجراتِ المطبَّقةِ وقتَ التمرين — تقادُمٌ بلا ساعةِ حائط',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_drill_no` (`company_id`,`drill_no`),
   KEY `ix_drill_time` (`company_id`,`started_at`),
@@ -4333,6 +4334,17 @@ CREATE TABLE `exec_audit_reports` (
   `received_at` datetime DEFAULT NULL COMMENT 'وقتُ وصولِه صندوقَ الرئيس',
   `read_at` datetime DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `engagement_id` int(11) DEFAULT NULL,
+  `report_kind` varchar(40) DEFAULT NULL,
+  `findings_by_grade` varchar(120) DEFAULT NULL,
+  `draft_date` date DEFAULT NULL,
+  `final_date` date DEFAULT NULL,
+  `reporting_line` varchar(80) DEFAULT NULL,
+  `distributed_to` varchar(255) DEFAULT NULL,
+  `report_attachment` varchar(255) DEFAULT NULL,
+  `report_state` varchar(40) DEFAULT NULL,
+  `reviewer` varchar(120) DEFAULT NULL,
+  `approved_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_rep` (`company_id`,`report_no`),
   KEY `ix_path` (`delivery_path`),
@@ -10081,6 +10093,23 @@ CREATE TABLE `governance_flags` (
   UNIQUE KEY `uq_gf_element_scope` (`element_code`,`scope_type`,`scope_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='LEG-01 §7: أعلام التفعيل لكل عنصر على الكيان والعقد — الافتراض النمط ① (كله مطفأ)';
 
+-- ── Table: govui_field_closure_log ──
+CREATE TABLE `govui_field_closure_log` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 1,
+  `batch` varchar(40) NOT NULL,
+  `action` varchar(16) NOT NULL,
+  `screen_code` varchar(64) NOT NULL,
+  `tbl` varchar(64) NOT NULL,
+  `field_key` varchar(64) NOT NULL,
+  `old_label` varchar(255) DEFAULT NULL,
+  `new_label` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `k_batch` (`batch`),
+  KEY `k_company` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 -- ── Table: govui_fields_pre_settle ──
 CREATE TABLE `govui_fields_pre_settle` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -10555,6 +10584,14 @@ CREATE TABLE `iaf_charter` (
   `state` enum('draft','approved','superseded') NOT NULL DEFAULT 'draft',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `charter_code` varchar(40) DEFAULT NULL,
+  `effective_date` date DEFAULT NULL,
+  `scope_of_work` text DEFAULT NULL,
+  `info_access_rights` text DEFAULT NULL,
+  `review_cycle` varchar(60) DEFAULT NULL,
+  `last_review_ref` varchar(80) DEFAULT NULL,
+  `attached_doc` varchar(255) DEFAULT NULL,
+  `reviewer` varchar(120) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_ch` (`company_id`,`version`),
   KEY `ix_state` (`state`)
@@ -10590,6 +10627,17 @@ CREATE TABLE `iaf_engagements` (
   `ended_at` date DEFAULT NULL,
   `state` enum('planned','fieldwork','reporting','closed') NOT NULL DEFAULT 'planned',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `engagement_source` varchar(40) DEFAULT NULL,
+  `objectives` text DEFAULT NULL,
+  `scope` text DEFAULT NULL,
+  `period_from` date DEFAULT NULL,
+  `period_to` date DEFAULT NULL,
+  `team_members` varchar(255) DEFAULT NULL,
+  `kickoff_notice_ref` varchar(80) DEFAULT NULL,
+  `opening_meeting` varchar(120) DEFAULT NULL,
+  `closing_meeting` varchar(120) DEFAULT NULL,
+  `reviewer` varchar(120) DEFAULT NULL,
+  `approved_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_eng` (`company_id`,`engagement_no`),
   KEY `ix_plan` (`plan_id`),
@@ -10655,6 +10703,17 @@ CREATE TABLE `iaf_findings` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `result_set_by_dept` varchar(12) NOT NULL DEFAULT '' COMMENT 'من وضع النتيجة - المراجعة وحدها',
   `result_closed_by_dept` varchar(12) NOT NULL DEFAULT '' COMMENT 'من اغلق النتيجة - المراجعة وحدها',
+  `classification` varchar(60) DEFAULT NULL,
+  `criteria` text DEFAULT NULL,
+  `condition_text` text DEFAULT NULL,
+  `estimated_effect` varchar(255) DEFAULT NULL,
+  `root_cause` text DEFAULT NULL,
+  `recommendation` text DEFAULT NULL,
+  `auditee_response` varchar(60) DEFAULT NULL,
+  `governance_capa_ref` varchar(120) DEFAULT NULL,
+  `repeat_from_prior` varchar(20) DEFAULT NULL,
+  `reviewer` varchar(120) DEFAULT NULL,
+  `approved_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_find` (`company_id`,`finding_no`),
   KEY `ix_state` (`company_id`,`state`,`severity`),
@@ -10696,6 +10755,13 @@ CREATE TABLE `iaf_independence` (
   `has_conflict` tinyint(1) NOT NULL DEFAULT 0,
   `conflict_note` varchar(400) NOT NULL DEFAULT '',
   `valid_until` date DEFAULT NULL,
+  `declaration_no` varchar(40) DEFAULT NULL,
+  `engagement_id` int(11) DEFAULT NULL,
+  `prior_work_in_scope` varchar(20) DEFAULT NULL,
+  `relation_to_auditee` varchar(60) DEFAULT NULL,
+  `independence_decision` varchar(40) DEFAULT NULL,
+  `substitute_auditor` varchar(120) DEFAULT NULL,
+  `declaration_state` varchar(40) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_ind` (`company_id`,`auditor_id`,`scope_ref`),
   KEY `ix_valid` (`company_id`,`valid_until`)
@@ -10713,6 +10779,15 @@ CREATE TABLE `iaf_plan` (
   `approved_at` datetime DEFAULT NULL,
   `state` enum('draft','approved','closed') NOT NULL DEFAULT 'draft',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `plan_item_no` varchar(40) DEFAULT NULL,
+  `area_code` varchar(40) DEFAULT NULL,
+  `engagement_kind` varchar(40) DEFAULT NULL,
+  `planned_quarter` varchar(20) DEFAULT NULL,
+  `estimated_days` decimal(6,1) DEFAULT NULL,
+  `assigned_auditor` varchar(120) DEFAULT NULL,
+  `plan_approval_ref` varchar(80) DEFAULT NULL,
+  `amended_by_decision` varchar(80) DEFAULT NULL,
+  `reviewer` varchar(120) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_plan` (`company_id`,`plan_year`),
   KEY `ix_charter` (`charter_id`)
@@ -10761,6 +10836,10 @@ CREATE TABLE `iaf_quality_reviews` (
   `next_due` date DEFAULT NULL,
   `created_by` int(10) unsigned NOT NULL DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `function_notes` text DEFAULT NULL,
+  `improvement_plan` text DEFAULT NULL,
+  `escalation_ref` varchar(120) DEFAULT NULL,
+  `review_state` varchar(40) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_q` (`company_id`,`review_no`),
   KEY `ix_when` (`company_id`,`reviewed_at`)
@@ -10804,6 +10883,13 @@ CREATE TABLE `iaf_universe` (
   `last_audited` date DEFAULT NULL,
   `active` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `unit_kind` varchar(40) DEFAULT NULL,
+  `erm_risk_ref` varchar(80) DEFAULT NULL,
+  `risk_rating` varchar(40) DEFAULT NULL,
+  `proposed_cycle` varchar(60) DEFAULT NULL,
+  `cycle_gap` varchar(60) DEFAULT NULL,
+  `inclusion_priority` varchar(40) DEFAULT NULL,
+  `unit_state` varchar(40) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_area` (`company_id`,`area_code`),
   KEY `ix_risk` (`company_id`,`risk_score`)
@@ -10820,6 +10906,15 @@ CREATE TABLE `iaf_workpapers` (
   `captured_at` datetime NOT NULL,
   `captured_by` int(10) unsigned NOT NULL,
   `frozen` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'غيرُ قابلةٍ للتعديلِ بعد الالتقاط',
+  `step_id` varchar(40) DEFAULT NULL,
+  `document_ref` varchar(120) DEFAULT NULL,
+  `conclusion` text DEFAULT NULL,
+  `reviewer_ref` varchar(120) DEFAULT NULL,
+  `review_date` date DEFAULT NULL,
+  `review_notes` text DEFAULT NULL,
+  `wp_state` varchar(40) DEFAULT NULL,
+  `reviewer` varchar(120) DEFAULT NULL,
+  `approved_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_wp` (`company_id`,`engagement_id`,`wp_ref`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='IAF-0037 — أوراقُ العملِ ونسخُ الأدلةِ المجمَّدة';
