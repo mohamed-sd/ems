@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-01 09:37:05
+-- المصدر: equipation_manage · التوليد: 2026-09-01 09:57:40
 -- الجداول: 1052 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
@@ -24511,6 +24511,7 @@ CREATE TABLE `tre_petty_expense` (
   `approved_at` datetime DEFAULT NULL COMMENT 'تاريخ الاعتماد',
   `data_state` varchar(255) DEFAULT NULL COMMENT 'حالة البيانات ▼',
   `src_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `invoice_ref` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `ix_pe` (`company_id`,`custody_id`,`state`),
   KEY `fk_pe_custody` (`custody_id`),
