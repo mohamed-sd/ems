@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-01 23:35:24
--- الجداول: 1171 · المناظير: 28
+-- المصدر: equipation_manage · التوليد: 2026-09-01 23:43:17
+-- الجداول: 1191 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -15057,6 +15057,105 @@ CREATE TABLE `ops_deviation_report` (
   KEY `ix_84896734_co` (`company_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='DEP-11 — تقرير الانحراف والتصعيد · الحبة: سطرُ انحرافٍ واحدٌ لمشروعٍ ومعدّةٍ في فترة';
 
+-- ── Table: ops_hours_approval ──
+CREATE TABLE `ops_hours_approval` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g64` varchar(190) DEFAULT NULL COMMENT 'معرف الدفعة',
+  `g65` varchar(190) DEFAULT NULL COMMENT 'يوم الاعتماد',
+  `g66` varchar(190) DEFAULT NULL COMMENT 'نطاق الدفعة',
+  `g67` varchar(190) DEFAULT NULL COMMENT 'عدد السجلات',
+  `g68` varchar(190) DEFAULT NULL COMMENT 'سجلات بتجاوز طاقة',
+  `g69` varchar(190) DEFAULT NULL COMMENT 'سجلات ناقصة السبب',
+  `g70` varchar(190) DEFAULT NULL COMMENT 'مرحلة الاعتماد',
+  `g71` varchar(190) DEFAULT NULL COMMENT 'معتمد الموقع',
+  `g72` varchar(190) DEFAULT NULL COMMENT 'معتمد الأطراف',
+  `g73` varchar(190) DEFAULT NULL COMMENT 'معتمد العقود',
+  `g74` varchar(190) DEFAULT NULL COMMENT 'نتيجة المطابقة',
+  `g75` varchar(190) DEFAULT NULL COMMENT 'سجلات مستثناة',
+  `g76` varchar(190) DEFAULT NULL COMMENT 'سبب الاستثناء',
+  `g77` varchar(190) DEFAULT NULL COMMENT 'قرار الدفعة',
+  `g78` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g79` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g80` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `g81` varchar(190) DEFAULT NULL COMMENT 'المعتمد',
+  `g82` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `g83` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g84` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_5f43faab_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='OPS-08 - اعتماد الوحدات';
+
+-- ── Table: ops_monthly_close ──
+CREATE TABLE `ops_monthly_close` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g85` varchar(190) DEFAULT NULL COMMENT 'معرف الإقفال',
+  `g86` varchar(190) DEFAULT NULL COMMENT 'شهر الإقفال',
+  `g87` varchar(190) DEFAULT NULL COMMENT 'أيام الشهر',
+  `g88` varchar(190) DEFAULT NULL COMMENT 'أيام معتمدة كاملا',
+  `g89` varchar(190) DEFAULT NULL COMMENT 'أيام ناقصة',
+  `g90` varchar(190) DEFAULT NULL COMMENT 'سجلات معلقة',
+  `g91` varchar(190) DEFAULT NULL COMMENT 'قرارات توقف مفتوحة',
+  `g92` varchar(190) DEFAULT NULL COMMENT 'إجمالي الوحدات المعتمدة',
+  `g93` varchar(190) DEFAULT NULL COMMENT 'إجمالي ساعات الفعلي',
+  `g94` varchar(190) DEFAULT NULL COMMENT 'إجمالي التوقف',
+  `g95` varchar(190) DEFAULT NULL COMMENT 'نسبة تحقق الخطة',
+  `g96` varchar(190) DEFAULT NULL COMMENT 'قائمة الاستثناءات المرحلة',
+  `g97` varchar(190) DEFAULT NULL COMMENT 'حالة الإقفال',
+  `g98` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g99` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g100` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `g101` varchar(190) DEFAULT NULL COMMENT 'المعتمد',
+  `g102` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `g103` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g104` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_7adb719f_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='OPS-12 - الإقفال الشهري للتشغيل';
+
+-- ── Table: ops_monthly_plan ──
+CREATE TABLE `ops_monthly_plan` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g39` varchar(190) DEFAULT NULL COMMENT 'معرف سطر الخطة',
+  `g40` varchar(190) DEFAULT NULL COMMENT 'شهر الخطة',
+  `g41` varchar(190) DEFAULT NULL COMMENT 'رقم المشروع',
+  `g42` varchar(190) DEFAULT NULL COMMENT 'اسم المشروع',
+  `g43` varchar(190) DEFAULT NULL COMMENT 'كود عقد العميل',
+  `g44` varchar(190) DEFAULT NULL COMMENT 'كود المعدة',
+  `g45` varchar(190) DEFAULT NULL COMMENT 'نوع المعدة',
+  `g46` varchar(190) DEFAULT NULL COMMENT 'نموذج العمل',
+  `g47` varchar(190) DEFAULT NULL COMMENT 'المستهدف التعاقدي',
+  `g48` varchar(190) DEFAULT NULL COMMENT 'مستهدف الخطة',
+  `g49` varchar(190) DEFAULT NULL COMMENT 'وحدة القياس',
+  `g50` varchar(190) DEFAULT NULL COMMENT 'أيام العمل المخططة',
+  `g51` varchar(190) DEFAULT NULL COMMENT 'ورديات اليوم',
+  `g52` varchar(190) DEFAULT NULL COMMENT 'الساعات المتاحة/وردية',
+  `g53` varchar(190) DEFAULT NULL COMMENT 'معامل الموسم',
+  `g54` varchar(190) DEFAULT NULL COMMENT 'المستهدف المعاير بالموسم',
+  `g55` varchar(190) DEFAULT NULL COMMENT 'مبرر الفارق عن التعاقدي',
+  `g56` varchar(190) DEFAULT NULL COMMENT 'حالة السطر',
+  `g57` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g58` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g59` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `g60` varchar(190) DEFAULT NULL COMMENT 'المعتمد',
+  `g61` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `g62` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g63` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_0413f280_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='OPS-03 - الخطة الشهرية للتشغيل';
+
 -- ── Table: ops_resource_move_order ──
 CREATE TABLE `ops_resource_move_order` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -15203,6 +15302,76 @@ CREATE TABLE `ops_stop_source` (
   KEY `ix_role` (`role`),
   KEY `ix_company` (`company_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W04 - قراءة كل سجل مصدر للواقعة نفسها بفارقها المسجل';
+
+-- ── Table: ops_timesheet ──
+CREATE TABLE `ops_timesheet` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g1` varchar(190) DEFAULT NULL COMMENT 'معرف السجل',
+  `g2` varchar(190) DEFAULT NULL COMMENT 'يوم التشغيل',
+  `g3` varchar(190) DEFAULT NULL COMMENT 'كود المعدة',
+  `g4` varchar(190) DEFAULT NULL COMMENT 'نوع المعدة',
+  `g5` varchar(190) DEFAULT NULL COMMENT 'المورد المقدم',
+  `g6` varchar(190) DEFAULT NULL COMMENT 'رقم المشروع',
+  `g7` varchar(190) DEFAULT NULL COMMENT 'وحدة عقد المشروع',
+  `g8` varchar(190) DEFAULT NULL COMMENT 'مفتاح الحاوية السنوية',
+  `g9` varchar(190) DEFAULT NULL COMMENT 'رقم الحاوية الشهرية',
+  `g10` varchar(190) DEFAULT NULL COMMENT 'كود الخانة ونوع الإشغال',
+  `g11` varchar(190) DEFAULT NULL COMMENT 'وسم خارج النافذة التعاقدية',
+  `g12` varchar(190) DEFAULT NULL COMMENT 'الموقع الحالي',
+  `g13` varchar(190) DEFAULT NULL COMMENT 'منطقة العمل',
+  `g14` varchar(190) DEFAULT NULL COMMENT 'كود المشغل',
+  `g15` varchar(190) DEFAULT NULL COMMENT 'الوردية',
+  `g16` varchar(190) DEFAULT NULL COMMENT 'نموذج العمل',
+  `g17` varchar(190) DEFAULT NULL COMMENT 'سبب تعديل الافتراضي',
+  `g18` varchar(190) DEFAULT NULL COMMENT 'الساعات المتاحة',
+  `g19` varchar(190) DEFAULT NULL COMMENT 'الكمية المنفذة',
+  `g20` varchar(190) DEFAULT NULL COMMENT 'وحدة القياس',
+  `g21` varchar(190) DEFAULT NULL COMMENT 'قراءة العداد أول الوردية',
+  `g22` varchar(190) DEFAULT NULL COMMENT 'قراءة العداد آخر الوردية',
+  `g23` varchar(190) DEFAULT NULL COMMENT 'ساعات العداد',
+  `g24` varchar(190) DEFAULT NULL COMMENT 'إجمالي الفعلي',
+  `g25` varchar(190) DEFAULT NULL COMMENT 'إجمالي الاستعداد',
+  `g26` varchar(190) DEFAULT NULL COMMENT 'إجمالي التوقف',
+  `g27` varchar(190) DEFAULT NULL COMMENT 'تجاوز الطاقة؟',
+  `g28` varchar(190) DEFAULT NULL COMMENT 'سبب التجاوز',
+  `g29` varchar(190) DEFAULT NULL COMMENT 'المرجع الميداني',
+  `g30` varchar(190) DEFAULT NULL COMMENT 'حالة المزامنة',
+  `g31` varchar(190) DEFAULT NULL COMMENT 'حالة السجل',
+  `g32` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g33` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g34` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `g35` varchar(190) DEFAULT NULL COMMENT 'المعتمد',
+  `g36` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `g37` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g38` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_34f1302c_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='OPS-06 - سجل ساعات التشغيل اليومي';
+
+-- ── Table: ops_worker_worklog ──
+CREATE TABLE `ops_worker_worklog` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g105` varchar(190) DEFAULT NULL COMMENT 'معرف الحدث',
+  `g106` varchar(190) DEFAULT NULL COMMENT 'وقت الحدث',
+  `g107` varchar(190) DEFAULT NULL COMMENT 'نوع الحدث',
+  `g108` varchar(190) DEFAULT NULL COMMENT 'مصدره',
+  `g109` varchar(190) DEFAULT NULL COMMENT 'المشروع',
+  `g110` varchar(190) DEFAULT NULL COMMENT 'الموقع',
+  `g111` varchar(190) DEFAULT NULL COMMENT 'المعدة',
+  `g112` varchar(190) DEFAULT NULL COMMENT 'ملخص الحدث',
+  `g113` varchar(190) DEFAULT NULL COMMENT 'مرجع السجل الأصلي',
+  `g114` varchar(190) DEFAULT NULL COMMENT 'درجة الأهمية',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_b71e0533_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='OPS-10 - سجل الأحداث التشغيلية';
 
 -- ── Table: org_assignment_types ──
 CREATE TABLE `org_assignment_types` (
@@ -21683,6 +21852,187 @@ CREATE TABLE `rsk_event` (
   CONSTRAINT `chk_rev_loss` CHECK (`event_kind` <> 'loss' or `loss_amount` is not null and `loss_currency` <> ''),
   CONSTRAINT `chk_rev_state` CHECK (`state` in ('recorded','assessed','linked','closed'))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='W14 RSK-04 - حدث الخطر يقرا مصدره بمرجعه ولا ينسخه';
+
+-- ── Table: rsk_risk_closure ──
+CREATE TABLE `rsk_risk_closure` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g70` varchar(190) DEFAULT NULL COMMENT 'معرف الإغلاق',
+  `g71` varchar(190) DEFAULT NULL COMMENT 'Risk_ID',
+  `g72` varchar(190) DEFAULT NULL COMMENT 'أساس الإغلاق',
+  `g73` varchar(190) DEFAULT NULL COMMENT 'مرجع إعادة التقييم الختامية',
+  `g74` varchar(190) DEFAULT NULL COMMENT 'المستوى المتبقي عند الإغلاق',
+  `g75` varchar(190) DEFAULT NULL COMMENT 'مرجع القبول الرسمي',
+  `g76` varchar(190) DEFAULT NULL COMMENT 'دليل الإغلاق',
+  `g77` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإغلاق',
+  `g78` varchar(190) DEFAULT NULL COMMENT 'إعادة فتح؟',
+  `g79` varchar(190) DEFAULT NULL COMMENT 'حالة الإغلاق',
+  `g80` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g81` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g82` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g83` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_989faf81_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='RSK-12 - سجل الإغلاق والأدلة';
+
+-- ── Table: rsk_risk_escalations ──
+CREATE TABLE `rsk_risk_escalations` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g57` varchar(190) DEFAULT NULL COMMENT 'معرف التصعيد',
+  `g58` varchar(190) DEFAULT NULL COMMENT 'Risk_ID',
+  `g59` varchar(190) DEFAULT NULL COMMENT 'مسبب التصعيد',
+  `g60` varchar(190) DEFAULT NULL COMMENT 'المستوى',
+  `g61` varchar(190) DEFAULT NULL COMMENT 'المخطر',
+  `g62` varchar(190) DEFAULT NULL COMMENT 'وقت التصعيد',
+  `g63` varchar(190) DEFAULT NULL COMMENT 'الاستجابة/القرار',
+  `g64` varchar(190) DEFAULT NULL COMMENT 'مرجع قيادة ر11',
+  `g65` varchar(190) DEFAULT NULL COMMENT 'حالة التصعيد',
+  `g66` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g67` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g68` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g69` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_bd690e24_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='RSK-10 - لا سطر مسجل بعد في تصعيدات المخاطر';
+
+-- ── Table: rsk_risk_events ──
+CREATE TABLE `rsk_risk_events` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g23` varchar(190) DEFAULT NULL COMMENT 'معرف الحدث',
+  `g24` varchar(190) DEFAULT NULL COMMENT 'Risk_ID',
+  `g25` varchar(190) DEFAULT NULL COMMENT 'مصدر الحدث',
+  `g26` varchar(190) DEFAULT NULL COMMENT 'مفتاح السجل الأصلي',
+  `g27` varchar(190) DEFAULT NULL COMMENT 'قراءة الحدث',
+  `g28` varchar(190) DEFAULT NULL COMMENT 'السبب من مصدره',
+  `g29` varchar(190) DEFAULT NULL COMMENT 'الجهة المتسببة',
+  `g30` varchar(190) DEFAULT NULL COMMENT 'المدة/الحجم',
+  `g31` varchar(190) DEFAULT NULL COMMENT 'الأثر الإنتاجي',
+  `g32` varchar(190) DEFAULT NULL COMMENT 'الأثر المالي',
+  `g33` varchar(190) DEFAULT NULL COMMENT 'الأثر التعاقدي',
+  `g34` varchar(190) DEFAULT NULL COMMENT 'تكرار السبب',
+  `g35` varchar(190) DEFAULT NULL COMMENT 'قاعدة الخطر المتحققة',
+  `g36` varchar(190) DEFAULT NULL COMMENT 'حالة الحدث',
+  `g37` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g38` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g39` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g40` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_198c9b12_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='RSK-04 - أحداث المخاطر والخسائر';
+
+-- ── Table: rsk_risk_register ──
+CREATE TABLE `rsk_risk_register` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g1` varchar(190) DEFAULT NULL COMMENT 'Risk_ID',
+  `g2` varchar(190) DEFAULT NULL COMMENT 'عنوان الخطر',
+  `g3` varchar(190) DEFAULT NULL COMMENT 'عقدة التصنيف',
+  `g4` varchar(190) DEFAULT NULL COMMENT 'العائلة',
+  `g5` varchar(190) DEFAULT NULL COMMENT 'مصدر التحديد',
+  `g6` varchar(190) DEFAULT NULL COMMENT 'مفتاح الحدث/السجل الأصلي',
+  `g7` varchar(190) DEFAULT NULL COMMENT 'الكيان المتأثر',
+  `g8` varchar(190) DEFAULT NULL COMMENT 'مرجع الكيان',
+  `g9` varchar(190) DEFAULT NULL COMMENT 'الوحدة التشغيلية المتأثرة',
+  `g10` varchar(190) DEFAULT NULL COMMENT 'وصف الخطر',
+  `g11` varchar(190) DEFAULT NULL COMMENT 'Risk_Owner',
+  `g12` varchar(190) DEFAULT NULL COMMENT 'تاريخ التحديد',
+  `g13` varchar(190) DEFAULT NULL COMMENT 'آخر تقييم',
+  `g14` varchar(190) DEFAULT NULL COMMENT 'المستوى المتبقي الحالي',
+  `g15` varchar(190) DEFAULT NULL COMMENT 'حالة الخطر',
+  `g16` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g17` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g18` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `g19` varchar(190) DEFAULT NULL COMMENT 'المعتمد',
+  `g20` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `g21` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g22` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_20c52e6e_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='RSK-03 - سجل المخاطر المؤسسي';
+
+-- ── Table: rsk_risk_reports ──
+CREATE TABLE `rsk_risk_reports` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g84` varchar(190) DEFAULT NULL COMMENT 'معرف السطر',
+  `g85` varchar(190) DEFAULT NULL COMMENT 'الدورية',
+  `g86` varchar(190) DEFAULT NULL COMMENT 'الفترة',
+  `g87` varchar(190) DEFAULT NULL COMMENT 'العائلة',
+  `g88` varchar(190) DEFAULT NULL COMMENT 'البند',
+  `g89` varchar(190) DEFAULT NULL COMMENT 'القيمة',
+  `g90` varchar(190) DEFAULT NULL COMMENT 'الاتجاه',
+  `g91` varchar(190) DEFAULT NULL COMMENT 'يستلزم قرارا؟',
+  `g92` varchar(190) DEFAULT NULL COMMENT 'مرجع الخطر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_4cbe85b4_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='RSK-13 - تقارير المخاطر الدورية';
+
+-- ── Table: rsk_risk_taxonomy ──
+CREATE TABLE `rsk_risk_taxonomy` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g93` varchar(190) DEFAULT NULL COMMENT 'كود العقدة',
+  `g94` varchar(190) DEFAULT NULL COMMENT 'العائلة',
+  `g95` varchar(190) DEFAULT NULL COMMENT 'الفئة',
+  `g96` varchar(190) DEFAULT NULL COMMENT 'نوع الخطر',
+  `g97` varchar(190) DEFAULT NULL COMMENT 'أمثلة نموذجية',
+  `g98` varchar(190) DEFAULT NULL COMMENT 'مصدر الحدث الأصلي',
+  `g99` varchar(190) DEFAULT NULL COMMENT 'مقياس الأثر المعتمد',
+  `g100` varchar(190) DEFAULT NULL COMMENT 'حالة العقدة',
+  `g101` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g102` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g103` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g104` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_56c5dfef_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='RSK-02 - تصنيف المخاطر';
+
+-- ── Table: rsk_risk_treatments ──
+CREATE TABLE `rsk_risk_treatments` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g41` varchar(190) DEFAULT NULL COMMENT 'معرف الإجراء',
+  `g42` varchar(190) DEFAULT NULL COMMENT 'Risk_ID',
+  `g43` varchar(190) DEFAULT NULL COMMENT 'مسار المعالجة',
+  `g44` varchar(190) DEFAULT NULL COMMENT 'وصف الإجراء',
+  `g45` varchar(190) DEFAULT NULL COMMENT 'المالك',
+  `g46` varchar(190) DEFAULT NULL COMMENT 'الإدارة المنفذة',
+  `g47` varchar(190) DEFAULT NULL COMMENT 'Due_Date',
+  `g48` varchar(190) DEFAULT NULL COMMENT 'المستوى المستهدف بعد الإجراء',
+  `g49` varchar(190) DEFAULT NULL COMMENT 'أيام التأخير',
+  `g50` varchar(190) DEFAULT NULL COMMENT 'دليل الإنجاز',
+  `g51` varchar(190) DEFAULT NULL COMMENT 'إعادة التقييم بعده',
+  `g52` varchar(190) DEFAULT NULL COMMENT 'حالة الإجراء',
+  `g53` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g54` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g55` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g56` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_4abc7987_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='RSK-07 - خطط معالجة المخاطر';
 
 -- ── Table: rsk_taxonomy ──
 CREATE TABLE `rsk_taxonomy` (
@@ -29373,6 +29723,212 @@ CREATE TABLE `wf_qualification_matrix` (
   PRIMARY KEY (`id`),
   KEY `ix_c408c457_co` (`company_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='DEP-13 — مصفوفة التأهيل والجاهزية · الحبة: قاعدةُ تأهيلٍ واحدةٌ لنوعٍ أو فئة';
+
+-- ── Table: wh_count ──
+CREATE TABLE `wh_count` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g79` varchar(190) DEFAULT NULL COMMENT 'معرف الجلسة',
+  `g80` varchar(190) DEFAULT NULL COMMENT 'المخزن',
+  `g81` varchar(190) DEFAULT NULL COMMENT 'أسلوب الجرد',
+  `g82` varchar(190) DEFAULT NULL COMMENT 'تاريخ الجرد',
+  `g83` varchar(190) DEFAULT NULL COMMENT 'لجنة الجرد',
+  `g84` varchar(190) DEFAULT NULL COMMENT 'عدد الأصناف المجرودة',
+  `g85` varchar(190) DEFAULT NULL COMMENT 'بنود الفروق تفصيلها خ10-2',
+  `g86` varchar(190) DEFAULT NULL COMMENT 'مرجع التحقيق',
+  `g87` varchar(190) DEFAULT NULL COMMENT 'حالة الجلسة',
+  `g88` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g89` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g90` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `g91` varchar(190) DEFAULT NULL COMMENT 'المعتمد',
+  `g92` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `g93` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g94` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_ba12c908_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='WH-16 - الجرد ومعالجة الفروقات';
+
+-- ── Table: wh_hazmat ──
+CREATE TABLE `wh_hazmat` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g1` varchar(190) DEFAULT NULL COMMENT 'معرف السطر',
+  `g2` varchar(190) DEFAULT NULL COMMENT 'كود الصنف',
+  `g3` varchar(190) DEFAULT NULL COMMENT 'فئة الخطورة',
+  `g4` varchar(190) DEFAULT NULL COMMENT 'التصريح النظامي',
+  `g5` varchar(190) DEFAULT NULL COMMENT 'موقع العزل',
+  `g6` varchar(190) DEFAULT NULL COMMENT 'أمين العهدة المخول',
+  `g7` varchar(190) DEFAULT NULL COMMENT 'تتبع الدفعة إلزامي؟',
+  `g8` varchar(190) DEFAULT NULL COMMENT 'سلطة الصرف',
+  `g9` varchar(190) DEFAULT NULL COMMENT 'رقابة مزدوجة؟',
+  `g10` varchar(190) DEFAULT NULL COMMENT 'قيد الصلاحية',
+  `g11` varchar(190) DEFAULT NULL COMMENT 'مسار الإتلاف',
+  `g12` varchar(190) DEFAULT NULL COMMENT 'حالة الضوابط',
+  `g13` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g14` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g15` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g16` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_39e4bacd_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='WH-08 - ضوابط المواد الخطرة والمتفجرات';
+
+-- ── Table: wh_issue_request_lines ──
+CREATE TABLE `wh_issue_request_lines` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g67` varchar(190) DEFAULT NULL COMMENT 'معرف البند',
+  `g68` varchar(190) DEFAULT NULL COMMENT 'رقم الطلب',
+  `g69` varchar(190) DEFAULT NULL COMMENT 'كود الصنف',
+  `g70` varchar(190) DEFAULT NULL COMMENT 'الكمية المطلوبة',
+  `g71` varchar(190) DEFAULT NULL COMMENT 'الكمية المعتمدة',
+  `g72` varchar(190) DEFAULT NULL COMMENT 'المصروف تراكميا',
+  `g73` varchar(190) DEFAULT NULL COMMENT 'المتبقي',
+  `g74` varchar(190) DEFAULT NULL COMMENT 'حالة البند',
+  `g75` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g76` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g77` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g78` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_b933b73a_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='WH-10 - لا سطر مسجل بعد في طلبات الصرف الواردة';
+
+-- ── Table: wh_issue_requests ──
+CREATE TABLE `wh_issue_requests` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g52` varchar(190) DEFAULT NULL COMMENT 'رقم الطلب',
+  `g53` varchar(190) DEFAULT NULL COMMENT 'تاريخ الورود',
+  `g54` varchar(190) DEFAULT NULL COMMENT 'الجهة الطالبة',
+  `g55` varchar(190) DEFAULT NULL COMMENT 'نوع الصرف',
+  `g56` varchar(190) DEFAULT NULL COMMENT 'المرجع الموجب',
+  `g57` varchar(190) DEFAULT NULL COMMENT 'فحص المرجع',
+  `g58` varchar(190) DEFAULT NULL COMMENT 'البنود المطلوبة',
+  `g59` varchar(190) DEFAULT NULL COMMENT 'فحص الرصيد',
+  `g60` varchar(190) DEFAULT NULL COMMENT 'الأولوية',
+  `g61` varchar(190) DEFAULT NULL COMMENT 'قرار المخزن',
+  `g62` varchar(190) DEFAULT NULL COMMENT 'حالة الطلب',
+  `g63` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g64` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g65` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g66` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_96fdd010_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='WH-09 - طلبات الصرف الواردة';
+
+-- ── Table: wh_month_close ──
+CREATE TABLE `wh_month_close` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g17` varchar(190) DEFAULT NULL COMMENT 'معرف الإقفال',
+  `g18` varchar(190) DEFAULT NULL COMMENT 'الشهر',
+  `g19` varchar(190) DEFAULT NULL COMMENT 'المخزن',
+  `g20` varchar(190) DEFAULT NULL COMMENT 'سندات إدخال الشهر',
+  `g21` varchar(190) DEFAULT NULL COMMENT 'سندات صرف الشهر',
+  `g22` varchar(190) DEFAULT NULL COMMENT 'تحويلات الشهر',
+  `g23` varchar(190) DEFAULT NULL COMMENT 'فروق جرد مسواة',
+  `g24` varchar(190) DEFAULT NULL COMMENT 'عهد مفتوحة مرحلة',
+  `g25` varchar(190) DEFAULT NULL COMMENT 'قيمة المخزون الختامية',
+  `g26` varchar(190) DEFAULT NULL COMMENT 'مطابقة المالية',
+  `g27` varchar(190) DEFAULT NULL COMMENT 'حالة الإقفال',
+  `g28` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g29` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g30` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `g31` varchar(190) DEFAULT NULL COMMENT 'المعتمد',
+  `g32` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `g33` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g34` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_71cd7d21_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='WH-19 - الإقفال الشهري للمخازن';
+
+-- ── Table: wh_stock_proc ──
+CREATE TABLE `wh_stock_proc` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g110` varchar(190) DEFAULT NULL COMMENT 'معرف السطر',
+  `g111` varchar(190) DEFAULT NULL COMMENT 'كود الصنف',
+  `g112` varchar(190) DEFAULT NULL COMMENT 'المخزن',
+  `g113` varchar(190) DEFAULT NULL COMMENT 'حالة الرصيد',
+  `g114` varchar(190) DEFAULT NULL COMMENT 'الكمية',
+  `g115` varchar(190) DEFAULT NULL COMMENT 'متوسط التكلفة',
+  `g116` varchar(190) DEFAULT NULL COMMENT 'القيمة',
+  `g117` varchar(190) DEFAULT NULL COMMENT 'آخر حركة',
+  `g118` varchar(190) DEFAULT NULL COMMENT 'تحت الحد الأدنى؟',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_aec1d7e4_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='WH-07 - أرصدة المخزون بحالاتها';
+
+-- ── Table: wh_transfer ──
+CREATE TABLE `wh_transfer` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g95` varchar(190) DEFAULT NULL COMMENT 'رقم الأمر',
+  `g96` varchar(190) DEFAULT NULL COMMENT 'تاريخ الأمر',
+  `g97` varchar(190) DEFAULT NULL COMMENT 'من مخزن',
+  `g98` varchar(190) DEFAULT NULL COMMENT 'إلى مخزن',
+  `g99` varchar(190) DEFAULT NULL COMMENT 'عدد البنود تفصيلها خ09-2',
+  `g100` varchar(190) DEFAULT NULL COMMENT 'مبرر التحويل',
+  `g101` varchar(190) DEFAULT NULL COMMENT 'وسيلة النقل',
+  `g102` varchar(190) DEFAULT NULL COMMENT 'سند الخروج',
+  `g103` varchar(190) DEFAULT NULL COMMENT 'سند الاستلام',
+  `g104` varchar(190) DEFAULT NULL COMMENT 'مطابقة الاستلام',
+  `g105` varchar(190) DEFAULT NULL COMMENT 'حالة الأمر',
+  `g106` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g107` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g108` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g109` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_f353830b_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='WH-14 - لا سطر مسجل بعد في التحويل بين المخازن';
+
+-- ── Table: wh_warehouses ──
+CREATE TABLE `wh_warehouses` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g35` varchar(190) DEFAULT NULL COMMENT 'كود المخزن',
+  `g36` varchar(190) DEFAULT NULL COMMENT 'اسم المخزن',
+  `g37` varchar(190) DEFAULT NULL COMMENT 'نوع المخزن',
+  `g38` varchar(190) DEFAULT NULL COMMENT 'الموقع',
+  `g39` varchar(190) DEFAULT NULL COMMENT 'الأمين النافذ اليوم',
+  `g40` varchar(190) DEFAULT NULL COMMENT 'أسلوب العهدة',
+  `g41` varchar(190) DEFAULT NULL COMMENT 'ترخيص خاص',
+  `g42` varchar(190) DEFAULT NULL COMMENT 'سعة التخزين',
+  `g43` varchar(190) DEFAULT NULL COMMENT 'ضوابط السلامة',
+  `g44` varchar(190) DEFAULT NULL COMMENT 'حالة المخزن',
+  `g45` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g46` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g47` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `g48` varchar(190) DEFAULT NULL COMMENT 'المعتمد',
+  `g49` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `g50` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g51` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_013bd2a4_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='WH-02 - سجل المخازن وأنواعها';
 
 -- ── Table: work_delegations ──
 CREATE TABLE `work_delegations` (

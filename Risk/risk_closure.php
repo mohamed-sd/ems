@@ -16,6 +16,7 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w14_view.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 
 $ctx = w14_ctx();
 $is_super = $ctx['is_super'];
@@ -59,22 +60,28 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_risk_closure')); ?>
-    <table id="emsList_risk_closure" class="data-table">
-        <thead><tr><th>رقم الإغلاق</th><th>الخطر</th><th>أساس الإغلاق</th><th>إعادة التقييم</th><th>الدليل</th><th>المقترح</th><th>المعتمد</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= ems_w14_txt($r["closure_no"]) ?></td>
-                    <td><?= ems_w14_txt($r["risk_code"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["closure_basis"]) ?></td>
-                    <td><?= ems_w14_txt($r["reassessment_ref"]) ?></td>
-                    <td><?= ems_w14_txt($r["evidence_ref"]) ?></td>
-                    <td><?= (int) $r["proposed_by"] ?></td>
-                    <td><?= (int) $r["approved_by"] ?></td>
-                    <td><?= ems_w14_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close:emsList_risk_closure
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف الإغلاق' => 'g70',
+        'Risk_ID' => 'g71',
+        'أساس الإغلاق' => 'g72',
+        'مرجع إعادة التقييم الختامية' => 'g73',
+        'المستوى المتبقي عند الإغلاق' => 'g74',
+        'مرجع القبول الرسمي' => 'g75',
+        'دليل الإغلاق' => 'g76',
+        'تاريخ الإغلاق' => 'g77',
+        'إعادة فتح؟' => 'g78',
+        'حالة الإغلاق' => 'g79',
+        'المنشئ' => 'g80',
+        'تاريخ الإنشاء' => 'g81',
+        'حالة البيانات' => 'g82',
+        'مرجع المصدر' => 'g83',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('rsk_risk_closure');
+    echo ems_w14_grid('emsList_risk_closure', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في سجل الإغلاق والأدلة'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

@@ -16,6 +16,7 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w14_view.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 
 $ctx = w14_ctx();
 $is_super = $ctx['is_super'];
@@ -59,21 +60,26 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_risk_taxonomy')); ?>
-    <table id="emsList_risk_taxonomy" class="data-table">
-        <thead><tr><th>رمز العقدة</th><th>العائلة</th><th>الفئة</th><th>النوع</th><th>العقدة الأم</th><th>المستوى</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= ems_w14_txt($r["node_code"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["family_code"]) ?></td>
-                    <td><?= ems_w14_txt($r["category_ar"]) ?></td>
-                    <td><?= ems_w14_txt($r["type_ar"]) ?></td>
-                    <td><?= ems_w14_txt($r["parent_code"]) ?></td>
-                    <td><?= (int) $r["depth_no"] ?></td>
-                    <td><?= ems_w14_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close:emsList_risk_taxonomy
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'كود العقدة' => 'g93',
+        'العائلة' => 'g94',
+        'الفئة' => 'g95',
+        'نوع الخطر' => 'g96',
+        'أمثلة نموذجية' => 'g97',
+        'مصدر الحدث الأصلي' => 'g98',
+        'مقياس الأثر المعتمد' => 'g99',
+        'حالة العقدة' => 'g100',
+        'المنشئ' => 'g101',
+        'تاريخ الإنشاء' => 'g102',
+        'حالة البيانات' => 'g103',
+        'مرجع المصدر' => 'g104',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('rsk_risk_taxonomy');
+    echo ems_w14_grid('emsList_risk_taxonomy', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في تصنيف المخاطر'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

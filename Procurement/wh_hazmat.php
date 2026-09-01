@@ -17,6 +17,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w7_codes.php';
 
@@ -54,6 +55,37 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'ضوابط المواد الخطرة والمتفجرات'; $header_icon = 'fa fa-triangle-exclamation'; $header_actions = array();
     $header_back = array('href' => 'items_proc.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'دليل الأصناف');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_wh_hazmat
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف السطر' => 'g1',
+            'كود الصنف' => 'g2',
+            'فئة الخطورة' => 'g3',
+            'التصريح النظامي' => 'g4',
+            'موقع العزل' => 'g5',
+            'أمين العهدة المخول' => 'g6',
+            'تتبع الدفعة إلزامي؟' => 'g7',
+            'سلطة الصرف' => 'g8',
+            'رقابة مزدوجة؟' => 'g9',
+            'قيد الصلاحية' => 'g10',
+            'مسار الإتلاف' => 'g11',
+            'حالة الضوابط' => 'g12',
+            'المنشئ' => 'g13',
+            'تاريخ الإنشاء' => 'g14',
+            'حالة البيانات' => 'g15',
+            'مرجع المصدر' => 'g16',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('wh_hazmat');
+        echo ems_w14_grid('emsList_wh_hazmat', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في ضوابط المواد الخطرة والمتفجرات'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
 
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">أصناف بضوابط</div></div>

@@ -15,6 +15,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 require_once __DIR__ . '/../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/screen_contract.php';
 
@@ -59,7 +60,39 @@ $header_actions = array(
           'title' => 'سجل الاسناد التابع لسجل المخازن، الامين النافذ اليوم يشتق منه'),
 );
 $header_back = false;
-include __DIR__ . '/../includes/page_header.php';
+include __DIR__ . '/../includes/page_header.php'; ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_wh_warehouses
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'كود المخزن' => 'g35',
+            'اسم المخزن' => 'g36',
+            'نوع المخزن' => 'g37',
+            'الموقع' => 'g38',
+            'الأمين النافذ اليوم' => 'g39',
+            'أسلوب العهدة' => 'g40',
+            'ترخيص خاص' => 'g41',
+            'سعة التخزين' => 'g42',
+            'ضوابط السلامة' => 'g43',
+            'حالة المخزن' => 'g44',
+            'المنشئ' => 'g45',
+            'تاريخ الإنشاء' => 'g46',
+            'المراجع' => 'g47',
+            'المعتمد' => 'g48',
+            'تاريخ الاعتماد' => 'g49',
+            'حالة البيانات' => 'g50',
+            'مرجع المصدر' => 'g51',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('wh_warehouses');
+        echo ems_w14_grid('emsList_wh_warehouses', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في سجل المخازن وأنواعها'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
 /* حزمةُ الحالاتِ الدنيا (بوابة ٩): تحميلٌ وفراغٌ وخطأٌ — مخفيةٌ افتراضًا */
 echo ems_states_bundle('لا مستودعات مسجلة بعد',
     'تعرف المستودعات وأنواعها من بيانات المشتريات المرجعية — فتظهر هنا فور تسجيلها');

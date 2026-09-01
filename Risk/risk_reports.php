@@ -9,6 +9,7 @@
  * والحقولُ الحساسةُ تُحجب من الخادمِ لا بأسلوبِ العرض (§6-3 · AC-06).
  */
 require_once __DIR__ . '/_risk_common.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 $__pp = risk_guard_screen($conn, $is_super_admin);
 
 require_once __DIR__ . '/../includes/screen_contract.php';
@@ -73,7 +74,31 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         'مرات التصدير' => count($exports),
         'المستبعَد بالصلاحية' => $blocked === '' ? 'لا شيء' : 'حقول حساسة',
     );
-    include('../includes/page_header.php');
+    include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_rsk_risk_reports
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف السطر' => 'g84',
+            'الدورية' => 'g85',
+            'الفترة' => 'g86',
+            'العائلة' => 'g87',
+            'البند' => 'g88',
+            'القيمة' => 'g89',
+            'الاتجاه' => 'g90',
+            'يستلزم قرارا؟' => 'g91',
+            'مرجع الخطر' => 'g92',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('rsk_risk_reports');
+        echo ems_w14_grid('emsList_rsk_risk_reports', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في تقارير المخاطر الدورية'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
     ems_screen_about(
         'تقارير الحصيلة بالوحدة والمستوى وفعالية الضوابط. والتصدير ليس قارئا لا يكتب: '
         . 'كل ملف يخرج يسجل تسعة بنود في سجل التصدير (§9-4).',

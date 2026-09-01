@@ -14,6 +14,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 require_once '../includes/permissions_helper.php';
 require_once '../includes/gov_columns.php';
 
@@ -144,6 +145,41 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 ?>
 <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main ems-unified-page-shell ems-doc-cycle" dir="rtl">
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_ops_monthly_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف الإقفال' => 'g85',
+            'شهر الإقفال' => 'g86',
+            'أيام الشهر' => 'g87',
+            'أيام معتمدة كاملا' => 'g88',
+            'أيام ناقصة' => 'g89',
+            'سجلات معلقة' => 'g90',
+            'قرارات توقف مفتوحة' => 'g91',
+            'إجمالي الوحدات المعتمدة' => 'g92',
+            'إجمالي ساعات الفعلي' => 'g93',
+            'إجمالي التوقف' => 'g94',
+            'نسبة تحقق الخطة' => 'g95',
+            'قائمة الاستثناءات المرحلة' => 'g96',
+            'حالة الإقفال' => 'g97',
+            'المنشئ' => 'g98',
+            'تاريخ الإنشاء' => 'g99',
+            'المراجع' => 'g100',
+            'المعتمد' => 'g101',
+            'تاريخ الاعتماد' => 'g102',
+            'حالة البيانات' => 'g103',
+            'مرجع المصدر' => 'g104',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('ops_monthly_close');
+        echo ems_w14_grid('emsList_ops_monthly_close', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الإقفال الشهري للتشغيل'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+
     <?php
     $header_title = 'الإقفال الشهري للوحدة';
     $header_icon = 'fa fa-lock';

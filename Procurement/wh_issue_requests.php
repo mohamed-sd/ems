@@ -18,6 +18,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w7_codes.php';
 
@@ -62,6 +63,63 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'طلبات الصرف الواردة'; $header_icon = 'fa fa-inbox'; $header_actions = array();
     $header_back = array('href' => 'issue_proc.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'سند الصرف');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_wh_issue_request_lines
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف البند' => 'g67',
+            'رقم الطلب' => 'g68',
+            'كود الصنف' => 'g69',
+            'الكمية المطلوبة' => 'g70',
+            'الكمية المعتمدة' => 'g71',
+            'المصروف تراكميا' => 'g72',
+            'المتبقي' => 'g73',
+            'حالة البند' => 'g74',
+            'المنشئ' => 'g75',
+            'تاريخ الإنشاء' => 'g76',
+            'حالة البيانات' => 'g77',
+            'مرجع المصدر' => 'g78',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('wh_issue_request_lines');
+        echo ems_w14_grid('emsList_wh_issue_request_lines', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في طلبات الصرف الواردة'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_wh_issue_requests
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم الطلب' => 'g52',
+            'تاريخ الورود' => 'g53',
+            'الجهة الطالبة' => 'g54',
+            'نوع الصرف' => 'g55',
+            'المرجع الموجب' => 'g56',
+            'فحص المرجع' => 'g57',
+            'البنود المطلوبة' => 'g58',
+            'فحص الرصيد' => 'g59',
+            'الأولوية' => 'g60',
+            'قرار المخزن' => 'g61',
+            'حالة الطلب' => 'g62',
+            'المنشئ' => 'g63',
+            'تاريخ الإنشاء' => 'g64',
+            'حالة البيانات' => 'g65',
+            'مرجع المصدر' => 'g66',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('wh_issue_requests');
+        echo ems_w14_grid('emsList_wh_issue_requests', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في طلبات الصرف الواردة'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
 
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">طلبات صرف واردة</div></div>

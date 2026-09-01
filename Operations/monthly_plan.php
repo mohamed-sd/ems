@@ -15,6 +15,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 require_once __DIR__ . '/../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/screen_contract.php';
 
@@ -64,7 +65,47 @@ $header_icon = 'fa fa-calendar-days';
 $header_title_html = htmlspecialchars('الخطة الشهرية للتشغيل', ENT_QUOTES, 'UTF-8');
 $header_actions = array();
 $header_back = false;
-include __DIR__ . '/../includes/page_header.php';
+include __DIR__ . '/../includes/page_header.php'; ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_ops_monthly_plan
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف سطر الخطة' => 'g39',
+            'شهر الخطة' => 'g40',
+            'رقم المشروع' => 'g41',
+            'اسم المشروع' => 'g42',
+            'كود عقد العميل' => 'g43',
+            'كود المعدة' => 'g44',
+            'نوع المعدة' => 'g45',
+            'نموذج العمل' => 'g46',
+            'المستهدف التعاقدي' => 'g47',
+            'مستهدف الخطة' => 'g48',
+            'وحدة القياس' => 'g49',
+            'أيام العمل المخططة' => 'g50',
+            'ورديات اليوم' => 'g51',
+            'الساعات المتاحة/وردية' => 'g52',
+            'معامل الموسم' => 'g53',
+            'المستهدف المعاير بالموسم' => 'g54',
+            'مبرر الفارق عن التعاقدي' => 'g55',
+            'حالة السطر' => 'g56',
+            'المنشئ' => 'g57',
+            'تاريخ الإنشاء' => 'g58',
+            'المراجع' => 'g59',
+            'المعتمد' => 'g60',
+            'تاريخ الاعتماد' => 'g61',
+            'حالة البيانات' => 'g62',
+            'مرجع المصدر' => 'g63',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('ops_monthly_plan');
+        echo ems_w14_grid('emsList_ops_monthly_plan', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الخطة الشهرية للتشغيل'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضيًا
 echo ems_states_bundle('لا صفوف خطة شهرية لهذا الكيان', 'سجل التشغيل الشهري في مصدره ثم عد لقراءة المقابلة');
 ?>

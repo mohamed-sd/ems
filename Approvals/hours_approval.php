@@ -18,6 +18,7 @@ if (!isset($_SESSION['user'])) {
 }
 
 require_once '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 
 $role           = strval($_SESSION['user']['role']);
 $user_id        = intval($_SESSION['user']['id']);
@@ -456,7 +457,43 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
       array('raw' => '<span class="badge bg-light text-dark border">فلتر نوع المعدة: ' . htmlspecialchars($equip_type_label) . '</span>'),
   );
   $header_back = array();
-  include('../includes/page_header.php');
+  include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_ops_hours_approval
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف الدفعة' => 'g64',
+            'يوم الاعتماد' => 'g65',
+            'نطاق الدفعة' => 'g66',
+            'عدد السجلات' => 'g67',
+            'سجلات بتجاوز طاقة' => 'g68',
+            'سجلات ناقصة السبب' => 'g69',
+            'مرحلة الاعتماد' => 'g70',
+            'معتمد الموقع' => 'g71',
+            'معتمد الأطراف' => 'g72',
+            'معتمد العقود' => 'g73',
+            'نتيجة المطابقة' => 'g74',
+            'سجلات مستثناة' => 'g75',
+            'سبب الاستثناء' => 'g76',
+            'قرار الدفعة' => 'g77',
+            'المنشئ' => 'g78',
+            'تاريخ الإنشاء' => 'g79',
+            'المراجع' => 'g80',
+            'المعتمد' => 'g81',
+            'تاريخ الاعتماد' => 'g82',
+            'حالة البيانات' => 'g83',
+            'مرجع المصدر' => 'g84',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('ops_hours_approval');
+        echo ems_w14_grid('emsList_ops_hours_approval', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في اعتماد الوحدات'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
   // TKT-15 · زر الإبلاغ السياقي — الاعتمادات (§2-⑥)
   require_once __DIR__ . '/../includes/report_button.php';
   ems_report_button(array('screen' => 'approvals'));

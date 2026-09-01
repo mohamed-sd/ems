@@ -313,7 +313,7 @@ if ($APPLY) {
                    وقع في supplierscontracts.php مقيسًا. */
                 $done = 0;
                 $s2 = preg_replace(
-                    "~^((?:include|require|require_once)\s+(?:__DIR__\s*\.\s*)?'[^']*config\.php';)$~m",
+                    "~^((?:include|require|require_once)\s+(?:__DIR__\s*\.\s*)?'[^']*(?:config|_common|session_bootstrap)\.php';)$~m",
                     "$1" . chr(10) . $inc, $s2, 1, $done);
                 if (!$done) { echo "  x لا مرساةَ اشتمالٍ في {$rel} — اضفها بيد" . chr(10); }
             }

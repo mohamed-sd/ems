@@ -16,6 +16,7 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w14_view.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 
 $ctx = w14_ctx();
 $is_super = $ctx['is_super'];
@@ -59,21 +60,27 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_risk_escalations')); ?>
-    <table id="emsList_risk_escalations" class="data-table">
-        <thead><tr><th>الخطر</th><th>سبب التصعيد</th><th>الجهة</th><th>آلي</th><th>المستلم</th><th>تاريخ الاستلام</th><th>تاريخ التصعيد</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= (int) $r["risk_id"] ?></td>
-                    <td><?= ems_w14_txt($r["reason_ar"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["to_authority"]) ?></td>
-                    <td><?= (int) $r["is_auto"] ?></td>
-                    <td><?= (int) $r["acknowledged_by"] ?></td>
-                    <td><?= ems_w14_txt($r["acknowledged_at"]) ?></td>
-                    <td><?= ems_w14_txt($r["created_at"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close:emsList_risk_escalations
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف التصعيد' => 'g57',
+        'Risk_ID' => 'g58',
+        'مسبب التصعيد' => 'g59',
+        'المستوى' => 'g60',
+        'المخطر' => 'g61',
+        'وقت التصعيد' => 'g62',
+        'الاستجابة/القرار' => 'g63',
+        'مرجع قيادة ر11' => 'g64',
+        'حالة التصعيد' => 'g65',
+        'المنشئ' => 'g66',
+        'تاريخ الإنشاء' => 'g67',
+        'حالة البيانات' => 'g68',
+        'مرجع المصدر' => 'g69',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('rsk_risk_escalations');
+    echo ems_w14_grid('emsList_risk_escalations', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في تصعيدات المخاطر'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

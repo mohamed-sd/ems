@@ -16,6 +16,7 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w14_view.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 
 $ctx = w14_ctx();
 $is_super = $ctx['is_super'];
@@ -59,24 +60,32 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_risk_events')); ?>
-    <table id="emsList_risk_events" class="data-table">
-        <thead><tr><th>رقم الحدث</th><th>الخطر</th><th>العائلة</th><th>نوع الحدث</th><th>المصدر</th><th>مرجع المصدر</th><th>الانحراف المرجعي</th><th>قيمة الخسارة</th><th>تاريخ الوقوع</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= ems_w14_txt($r["event_no"]) ?></td>
-                    <td><?= ems_w14_txt($r["risk_code"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["family_code"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["event_kind"]) ?></td>
-                    <td><?= ems_w14_txt($r["source_module"]) ?></td>
-                    <td><?= ems_w14_txt($r["source_ref"]) ?></td>
-                    <td><?= ems_w14_txt($r["deviation_no"]) ?></td>
-                    <td><?= ems_w14_num($r["loss_amount"]) ?></td>
-                    <td><?= ems_w14_txt($r["occurred_at"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close:emsList_risk_events
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف الحدث' => 'g23',
+        'Risk_ID' => 'g24',
+        'مصدر الحدث' => 'g25',
+        'مفتاح السجل الأصلي' => 'g26',
+        'قراءة الحدث' => 'g27',
+        'السبب من مصدره' => 'g28',
+        'الجهة المتسببة' => 'g29',
+        'المدة/الحجم' => 'g30',
+        'الأثر الإنتاجي' => 'g31',
+        'الأثر المالي' => 'g32',
+        'الأثر التعاقدي' => 'g33',
+        'تكرار السبب' => 'g34',
+        'قاعدة الخطر المتحققة' => 'g35',
+        'حالة الحدث' => 'g36',
+        'المنشئ' => 'g37',
+        'تاريخ الإنشاء' => 'g38',
+        'حالة البيانات' => 'g39',
+        'مرجع المصدر' => 'g40',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('rsk_risk_events');
+    echo ems_w14_grid('emsList_risk_events', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في أحداث المخاطر والخسائر'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

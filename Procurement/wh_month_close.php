@@ -16,6 +16,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w7_codes.php';
 
@@ -55,6 +56,39 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'الإقفال الشهري للمخازن'; $header_icon = 'fa fa-lock'; $header_actions = array();
     $header_back = array('href' => 'wh_count.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'الجرد والتسويات');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_wh_month_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف الإقفال' => 'g17',
+            'الشهر' => 'g18',
+            'المخزن' => 'g19',
+            'سندات إدخال الشهر' => 'g20',
+            'سندات صرف الشهر' => 'g21',
+            'تحويلات الشهر' => 'g22',
+            'فروق جرد مسواة' => 'g23',
+            'عهد مفتوحة مرحلة' => 'g24',
+            'قيمة المخزون الختامية' => 'g25',
+            'مطابقة المالية' => 'g26',
+            'حالة الإقفال' => 'g27',
+            'المنشئ' => 'g28',
+            'تاريخ الإنشاء' => 'g29',
+            'المراجع' => 'g30',
+            'المعتمد' => 'g31',
+            'تاريخ الاعتماد' => 'g32',
+            'حالة البيانات' => 'g33',
+            'مرجع المصدر' => 'g34',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('wh_month_close');
+        echo ems_w14_grid('emsList_wh_month_close', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الإقفال الشهري للمخازن'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
 
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">أسطر إقفال</div></div>
