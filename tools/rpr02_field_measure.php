@@ -206,7 +206,7 @@ $tot = array('des' => 0, 'audit' => 0, 'appl' => 0, 'hit' => 0,
 foreach ($bridge as $b) {
     $sc = $b['screen_id'];
     $p  = isset($PATH[$sc]) ? $PATH[$sc] : '';
-    $bagStr = array(); $bagTok = array(); $vocab = 0; $files = array();
+    $bagStr = array(); $bagTok = array(); $bagRaw = array(); $vocab = 0; $files = array();
     $slug = ''; $redir = false; $nGfc = 0; $nAct = 0; $nGc = 0; $kitFallback = 0;
     /* **الرافدُ الخاصُّ أوّلًا**: عقدُ السطحِ نفسِه — سبيكتُه وحقولُ أفعالِه.
        ⛔ ويُقرأ من **ملفِّ السطحِ وحدَه** لا من مداه، فالعقدُ خاصٌّ لا مشترك. */
@@ -214,8 +214,9 @@ foreach ($bridge as $b) {
         $ownSrc = (string) @file_get_contents($p);
         $redir  = fm_is_redirector($ownSrc);
         $slug   = fm_u13_slug($ownSrc);
-        $addBag = function ($v) use (&$bagStr, &$bagTok, &$vocab, $FM_STOP) {
+        $addBag = function ($v) use (&$bagStr, &$bagTok, &$bagRaw, &$vocab, $FM_STOP) {
             $vocab++;
+            $bagRaw[trim((string) $v)] = 1;
             $nv = fm_norm($v);
             if ($nv !== '') { $bagStr[$nv] = 1; }
             foreach (fm_tok($v, $FM_STOP) as $t) { $bagTok[$t] = 1; }
@@ -240,7 +241,7 @@ foreach ($bridge as $b) {
                 $vis[$nx] = 1; $set[] = $nx; $q[] = array($nx, $d + 1);
             }
         }
-        $harvest = function ($files0) use (&$files, &$tot, &$vocab, &$bagStr, &$bagTok, $FM_STOP) {
+        $harvest = function ($files0) use (&$files, &$tot, &$vocab, &$bagStr, &$bagTok, &$bagRaw, $FM_STOP) {
             foreach ($files0 as $f) {
                 $src = (string) @file_get_contents($f);
                 if ($src === '') { continue; }
@@ -250,6 +251,7 @@ foreach ($bridge as $b) {
                     $tot[$k] += count($x[$k]);
                     foreach ($x[$k] as $v) {
                         $vocab++;
+                        $bagRaw[trim((string) $v)] = 1;
                         $nv = fm_norm($v);
                         if ($nv !== '') { $bagStr[$nv] = 1; }
                         foreach (fm_tok($v, $FM_STOP) as $t) { $bagTok[$t] = 1; }
@@ -300,6 +302,10 @@ foreach ($bridge as $b) {
         if ($f['field_type'] === 'AUDIT') { $nAud++; $tot['audit']++; $BYTYPE[$ft]['app']++; continue; }
         $nApp++; $BYTYPE[$ft]['app']++;
         $h = fm_hit(fm_tok($f['field_name'], $FM_STOP), $bagTok, $bagStr, fm_norm($f['field_name']));
+        /* اسمٌ خلا من مفردةٍ تُقاس («#») — يُطابَق بنصِّه الخامِّ وحدَه */
+        if ($h === '' && fm_norm($f['field_name']) === '') {
+            $h = fm_literal_hit($f['field_name'], $bagRaw);
+        }
         if ($h !== '') { $nHit++; $BYTYPE[$ft]['hit']++; }
         else {
             $miss[] = $f['field_name'];

@@ -155,9 +155,10 @@ foreach ($bridge as $b) {
         if ($bytes < 2000) { $why = 'RENDER_EMPTY'; }
         else {
             $x = fm_extract($body);
-            $bagStr = array(); $bagTok = array();
+            $bagStr = array(); $bagTok = array(); $bagRaw = array();
             foreach (array('F1', 'F2', 'F3') as $k) {
                 foreach ($x[$k] as $v) {
+                    $bagRaw[trim((string) $v)] = 1;
                     $nv = fm_norm($v);
                     if ($nv !== '') { $bagStr[$nv] = 1; }
                     foreach (fm_tok($v, $FM_STOP) as $t) { $bagTok[$t] = 1; }
@@ -166,6 +167,9 @@ foreach ($bridge as $b) {
             foreach ($dl as $f) {
                 if ($f['field_type'] === 'AUDIT') { continue; }
                 $h = fm_hit(fm_tok($f['field_name'], $FM_STOP), $bagTok, $bagStr, fm_norm($f['field_name']));
+                if ($h === '' && fm_norm($f['field_name']) === '') {
+                    $h = fm_literal_hit($f['field_name'], $bagRaw);
+                }
                 if ($h !== '') { $hit++; } else { $miss[] = $f['field_name']; }
             }
         }
