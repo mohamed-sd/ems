@@ -269,7 +269,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="table-wrap"><table class="data-table">
         <thead><tr>
-            <th>معرف الاسناد</th><th>المخزن</th><th>مرجع الشخص</th><th>اسم الامين</th>
+            <th>معرف الاسناد</th><th>كود المخزن</th><th>المخزن</th><th>مرجع الشخص</th><th>اسم الامين</th>
             <th>نوع الاسناد</th><th>الوردية</th><th>من تاريخ</th><th>الى تاريخ</th>
             <th>نطاق الصلاحية</th><th>مرجع محضر التسليم</th><th>النافذ اليوم</th><th>حالة الاسناد</th>
             <th>المنشئ</th><th>تاريخ الانشاء</th><th>حالة البيانات</th><th>مرجع المصدر</th>
@@ -281,6 +281,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             $e = isset($emps[(int) $r['employee_id']]) ? $emps[(int) $r['employee_id']] : null; ?>
             <tr>
                 <td><?= intval($r['id']) ?></td>
+                <?php /* «كود المخزن» حقلٌ حاكمٌ في بطاقةِ WH-03 (‏PARENT_INHERITED) — والكودُ
+                        مقروءٌ سلفًا من `proc_warehouse` ولم يكن يُعرَض، فيُظهَر بجانبِ اسمِه. */ ?>
+                <td><?= htmlspecialchars($w ? (string) $w['code'] : '—', ENT_QUOTES, 'UTF-8') ?></td>
                 <td><?= htmlspecialchars($w ? (string) $w['name'] : ('رقم ' . intval($r['warehouse_id'])), ENT_QUOTES, 'UTF-8') ?></td>
                 <td><?= htmlspecialchars($e ? (string) $e['employee_code'] : ('رقم ' . intval($r['employee_id'])), ENT_QUOTES, 'UTF-8') ?></td>
                 <td><?= htmlspecialchars($e ? (string) $e['name'] : '', ENT_QUOTES, 'UTF-8') ?></td>

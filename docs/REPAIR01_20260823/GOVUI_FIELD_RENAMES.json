@@ -1,0 +1,14 @@
+{
+    "renamed_in_package": 19,
+    "actionable": [
+        {
+            "req": "SUP-15",
+            "seq": "14",
+            "old": "من الاحتياطي؟",
+            "new": "من إسناد بدور احتياطي؟",
+            "screen_id": "SCR-0879",
+            "path": "suppliers\/supplier_readiness_reserve.php",
+            "name": "الجاهزية والإحلال والاحتياط"
+        }
+    ]
+}

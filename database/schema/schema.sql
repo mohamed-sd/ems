@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-01 16:51:30
--- الجداول: 1049 · المناظير: 28
+-- المصدر: equipation_manage · التوليد: 2026-09-01 17:53:04
+-- الجداول: 1050 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -10160,6 +10160,22 @@ CREATE TABLE `govui_target_registry` (
   KEY `ix_gtr_surface` (`surface_type`),
   CONSTRAINT `chk_gtr_rule` CHECK (`surface_type` = '' or `surface_rule` <> '')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GOV_UI_EXEC §4 — سجلُّ الأهدافِ بتسعةَ عشرَ عمودًا من الملفَّين الحاكمَين';
+
+-- ── Table: govui_universe_log ──
+CREATE TABLE `govui_universe_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `target_uid` varchar(12) NOT NULL,
+  `requirement_id` varchar(48) NOT NULL,
+  `old_screen_id` varchar(12) NOT NULL DEFAULT '',
+  `new_screen_id` varchar(12) NOT NULL DEFAULT '',
+  `old_verdict` varchar(24) NOT NULL DEFAULT '',
+  `new_verdict` varchar(24) NOT NULL DEFAULT '',
+  `old_witness` varchar(400) NOT NULL DEFAULT '',
+  `witness` varchar(400) NOT NULL,
+  `changed_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_gul_t` (`target_uid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GOV_UI_EXEC: قيدُ رجوعِ جسرِ القياسِ بعدَ حكمِ الوصل';
 
 -- ── Table: govui_wiring_log ──
 CREATE TABLE `govui_wiring_log` (

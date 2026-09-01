@@ -177,7 +177,12 @@ function fm_u13_slug($src)
 function fm_u13_action_fields($src)
 {
     $out = array();
-    if (preg_match_all('~[\x27\x22]fields[\x27\x22]\s*=>\s*array\s*\((.*?)\)~s', $src, $mm)) {
+    /* ⛔ **والإغلاقُ بسطرِ الإغلاقِ لا بأوّلِ قوس** — عطبٌ مقيس: النمطُ الكسولُ
+       كان يقف عند أوّلِ قوسِ إغلاقٍ **داخلَ وسمٍ مقتبَس** («اسم المورد (بحث)» ·
+       «(كما ورد)» · «(حي)») فيبتر بقيّةَ الكتلةِ ويُسقط حقولَها من الأثر —
+       فتُقرأ ناقصةً وهي مبنيّةٌ مُسمّاة. والإغلاقُ الآن قوسٌ في صدرِ سطرِه،
+       **وهو اصطلاحُ `fm_guide_cols` نفسُه**. */
+    if (preg_match_all('~[\x27\x22]fields[\x27\x22]\s*=>\s*array\s*\((.*?)\n\s*\)~s', $src, $mm)) {
         foreach ($mm[1] as $blk) {
             if (preg_match_all('~=>\s*[\x27\x22]([^\x27\x22]+)[\x27\x22]~', $blk, $m2)) {
                 foreach ($m2[1] as $v) { $v = trim($v); if ($v !== '') { $out[] = $v; } }
@@ -431,7 +436,7 @@ foreach ($bridge as $b) {
         }
     }
     $dl = isset($des[$b['requirement_id']]) ? $des[$b['requirement_id']] : array();
-    $nAud = 0; $nApp = 0; $nHit = 0; $miss = array();
+    $nAud = 0; $nApp = 0; $nHit = 0; $miss = array(); $near = array();
     foreach ($dl as $f) {
         $tot['des']++;
         /* ⛔ **والنوعُ يُعدُّ ولو خرج من المقام** — فمن يملك إخراجَ نوعٍ يملك رفعَ
@@ -442,7 +447,35 @@ foreach ($bridge as $b) {
         if ($f['field_type'] === 'AUDIT') { $nAud++; $tot['audit']++; $BYTYPE[$ft]['app']++; continue; }
         $nApp++; $BYTYPE[$ft]['app']++;
         $h = fm_hit(fm_tok($f['field_name'], $FM_STOP), $bagTok, $bagStr, fm_norm($f['field_name']));
-        if ($h !== '') { $nHit++; $BYTYPE[$ft]['hit']++; } else { $miss[] = $f['field_name']; }
+        if ($h !== '') { $nHit++; $BYTYPE[$ft]['hit']++; }
+        else {
+            $miss[] = $f['field_name'];
+            /* ── **أقربُ وسمٍ في الأثرِ نفسِه** (GOV_UI_EXEC · محاذاةُ أسماءِ الحقول) ──
+               ◆ **لِمَ داخلَ هذه الأداة**: القربُ يجب أن يُقاس على **الحقيبةِ التي
+                 حكمت بالنقص** لا على حقيبةٍ ثانيةٍ تُبنى في أداةٍ أخرى، وإلّا
+                 اختلف الشاهدُ عن الحكم [[counter-parity-two-readers]].
+               ◆ **ولا يُغيّر حكمًا**: يسجّل مرشَّحًا للفرزِ البشريِّ فقط —
+                 والقبولُ يبقى (هويّة · احتواء · ثلثا المفردات). */
+            $dT = fm_tok($f['field_name'], $FM_STOP);
+            $best = ''; $bestS = 0.0;
+            if ($dT) {
+                foreach ($bagStr as $cand => $_) {
+                    $cT = fm_tok($cand, $FM_STOP);
+                    if (!$cT) { continue; }
+                    $sh = count(array_intersect($dT, $cT));
+                    if ($sh === 0) { continue; }
+                    /* ⛔ **ولا يُسمَّى المتغيّرُ `$sc`** — فهو معرِّفُ السطحِ في هذا
+                       النطاقِ، ودهسُه يكتب القربَ مكانَ المعرِّفِ في المخرَج
+                       [[config-shadows-pass-var]]. */
+                    $ovl = $sh / max(count($dT), count($cT));
+                    if ($ovl > $bestS) { $bestS = $ovl; $best = $cand; }
+                }
+            }
+            if ($best !== '' && $bestS >= 0.34) {
+                $near[] = array('field' => $f['field_name'], 'type' => $ft,
+                                'near' => $best, 'score' => round($bestS, 2));
+            }
+        }
     }
     if ($slug !== '' && $nGfc > 0) { $tot['u13']++; }
     if ($redir) { $tot['redir']++; }
@@ -452,7 +485,7 @@ foreach ($bridge as $b) {
     $out[] = array('screen_id' => $sc, 'target' => $b['target_uid'], 'req' => $b['requirement_id'],
                    'name' => isset($reg[$sc]) ? $reg[$sc]['canonical_label_ar'] : $b['name_ar'],
                    'unit' => $b['unit'], 'vocab' => $vocab, 'files' => count($files),
-                   'audit' => $nAud, 'appl' => $nApp, 'hit' => $nHit, 'miss' => $miss,
+                   'audit' => $nAud, 'appl' => $nApp, 'hit' => $nHit, 'miss' => $miss, 'near' => $near,
                    'slug' => $slug, 'redir' => $redir, 'gfc' => $nGfc, 'act' => $nAct,
                    'path' => $p === '' ? '' : str_replace($ROOT . '/', '', $p));
 }

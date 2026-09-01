@@ -212,7 +212,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="table-wrap"><table class="data-table">
         <thead><tr>
             <th>معرف التسهيل</th><th>البنك</th><th>نوع التسهيل</th><th>حد التسهيل</th><th>العملة</th>
-            <th>مرجع الاعتماد</th><th>المستخدم</th><th>المتاح</th><th>الضمانات</th>
+            <th>مرجع الاعتماد</th><th>المستخدم</th><th>المتاح</th><th>الضمانات المقدمة</th>
             <th>تاريخ الانتهاء</th><th>جدول السداد</th><th>حالة التسهيل</th>
             <th>المنشئ</th><th>تاريخ الانشاء</th><th>حالة البيانات</th><th>مرجع المصدر</th>
             <?php if (!empty($pp['can_edit'])): ?><th>الاجراء</th><?php endif; ?>

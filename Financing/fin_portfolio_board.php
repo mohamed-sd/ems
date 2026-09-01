@@ -96,7 +96,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <tr>
                     <th>المؤشر</th>
                     <th>القيمة</th>
-                    <th>المعادلة والمصدر</th>
+                    <th>المعادلة/المصدر</th>
                 </tr>
             </thead>
             <tbody>

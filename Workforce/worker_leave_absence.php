@@ -106,7 +106,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="field"><label for="emsf_1859_f0a3f">الحالة</label><select name="state" id="emsf_1859_f0a3f"><?php foreach($STATES as $s): ?><option value="<?= $s ?>"><?= $s ?></option><?php endforeach; ?></select></div>
             <div class="field"><label for="emsf_1860_cfebe">من</label><input type="date" name="date_from" id="emsf_1860_cfebe"></div>
             <div class="field"><label for="emsf_1861_517b0">إلى</label><input type="date" name="date_to" id="emsf_1861_517b0"></div>
-            <div class="field"><label for="emsf_1862_01550">البديل</label><select name="substitute_id" id="emsf_1862_01550"><option value="">—</option><?php foreach($workers as $wid=>$wn): ?><option value="<?= intval($wid) ?>"><?= htmlspecialchars($wn) ?></option><?php endforeach; ?></select></div>
+            <div class="field"><label for="emsf_1862_01550">البديل المكلف</label><select name="substitute_id" id="emsf_1862_01550"><option value="">—</option><?php foreach($workers as $wid=>$wn): ?><option value="<?= intval($wid) ?>"><?= htmlspecialchars($wn) ?></option><?php endforeach; ?></select></div>
             <div class="field"><label for="emsf_1863_63f44">أثر التغطية</label><select name="coverage_impact" id="emsf_1863_63f44"><option value="">—</option><option>مغطًّى</option><option>فجوة جزئية</option><option>فجوة حرجة</option></select></div>
             <div class="field"><label for="emsf_1864_da617">الاستحقاق القادم</label><input type="date" name="next_due_date" id="emsf_1864_da617"></div>
             <div class="field"><label for="emsf_1865_33bec">النتيجة</label><select name="outcome" id="emsf_1865_33bec"><option value="">—</option><option>عودة للعمل</option><option>تحويل لإجازة</option><option>إنهاء وتسوية</option></select></div>
@@ -115,7 +115,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="wf-la-actions"><button type="submit" class="add-btn"><i class="fas fa-save"></i> حفظ</button></div>
     </form>
     <div class="table-wrap wf-la-tablewrap"><table class="data-table wf-la-table">
-        <thead><tr><th>إجراءات</th><th>#</th><th>كود الموظف</th><th>التصنيف</th><th>نوع الإجازة</th><th>من تاريخ</th><th>إلى تاريخ</th><th>البديل المخصَّص</th><th>الحالة</th>
+        <thead><tr><th>إجراءات</th><th>#</th><th>كود الموظف</th><th>التصنيف</th><th>نوع الإجازة</th><th>من تاريخ</th><th>إلى تاريخ</th><th>البديل المكلف</th><th>الحالة</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">رقم الطلب</th>
               <th class="ems-fn-th" data-fn="1">تاريخ الطلب</th>
@@ -153,7 +153,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 ems_wf_field('النوع', $r['event_type'], 'fas fa-tag'),
                 ems_wf_field('من', $r['date_from'] ?: '-', 'fas fa-calendar-day'),
                 ems_wf_field('إلى', $r['date_to'] ?: '-', 'fas fa-calendar-xmark'),
-                ems_wf_field('البديل', $r['sname'] ?: '-', 'fas fa-user-shield'),
+                ems_wf_field('البديل المكلف', $r['sname'] ?: '-', 'fas fa-user-shield'),
                 ems_wf_field('أثر التغطية', $r['coverage_impact'] ?: '-', 'fas fa-shield-halved'),
                 ems_wf_field('نمط التناوب', $r['rotation_pattern'] ?: '-', 'fas fa-rotate'),
                 ems_wf_field('الاستحقاق القادم', $r['next_due_date'] ?: '-', 'fas fa-calendar-check'),
