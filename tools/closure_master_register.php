@@ -261,8 +261,8 @@ if (in_array('--bootstrap', $argv, true)) {
             'P1', 'HIGH', 690, 'tools/rpr02_field_measure.php — 2541/5420 · 101 سطحا مطابقا كاملا من 359'),
         'CL-GOVUI-03' => array('ارثي يصير بندا بلا قيد مصالحة فردي — حكم CL-NAVR-LEG626 صنفي', 'OPEN',
             'P2', 'MEDIUM', 520, 'govui_outputs/08_UNEXPLAINED_EXTRAS.md — 306 مسارا من 377 صنفا ارثيا'),
-        'CL-GOVUI-04' => array('ثلاثة اسطح تجمع حبتين — GRAIN_MISMATCH', 'OPEN',
-            'P2', 'MEDIUM', 510, 'tools/govui_metrics.php — GRAIN_CONFORMANCE 374/412'),
+        'CL-GOVUI-04' => array('ستة اسطح تجمع حبتين — منها ثلاثة تحمل حكم GRAIN_MISMATCH', 'OPEN',
+            'P2', 'MEDIUM', 510, 'tools/govui_metrics.php — GRAIN_CONFORMANCE 374/412 (grain_multi=1 في ستة) · ومصفوفة 18 تحكم على ثلاثة والباقي N/A بسبقه'),
         'CL-GOVUI-05' => array('خطة القوى العاملة سطح تخطيط لم يبن — والموصول تقرير', 'OPEN',
             'P2', 'MEDIUM', 505, 'govui_outputs/07_TARGETS_NOT_BUILT.md — TARGET_BUILD_COVERAGE 412/413'),
     );

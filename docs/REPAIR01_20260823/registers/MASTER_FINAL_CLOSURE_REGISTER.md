@@ -79,7 +79,7 @@
 | `CL-PAT-DUPLABEL` | `OPEN` | P2 | — | docs/REPAIR01_20260823/orders/GOV_EXEC.txt | OPEN @ 15ba9f3c | فرز الازواج الستة: (اغلاق البلاغ admin_close/ticket_close · المعدات fl |
 | `CL-GOV3-PERMPATH` | `OPEN` | P2 | — | docs/REPAIR01_20260823/orders/GOV_EXEC.txt | OPEN @ 909cf6a3 | تصميم خطة القلب: القالب يصير المصدر الوحيد والقائم يشتق منه — ثم ظل ثم |
 | `CL-GOVUI-03` | `OPEN` | P2 | — | docs/REPAIR01_20260823/orders/GOV_UI_EXEC.txt | ارثي يصير بندا بلا قيد مصالحة فردي — حكم CL-NAVR-LEG626 صنفي @ efb30839 |  |
-| `CL-GOVUI-04` | `OPEN` | P2 | — | docs/REPAIR01_20260823/orders/GOV_UI_EXEC.txt | ثلاثة اسطح تجمع حبتين — GRAIN_MISMATCH @ efb30839 |  |
+| `CL-GOVUI-04` | `OPEN` | P2 | — | docs/REPAIR01_20260823/orders/GOV_UI_EXEC.txt | ستة اسطح تجمع حبتين — منها ثلاثة تحمل حكم GRAIN_MISMATCH @ efb30839 |  |
 | `CL-GOVUI-05` | `OPEN` | P2 | — | docs/REPAIR01_20260823/orders/GOV_UI_EXEC.txt | خطة القوى العاملة سطح تخطيط لم يبن — والموصول تقرير @ efb30839 |  |
 | `CL-GAP-03` | `OPEN` | P2 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ efb30839 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
 | `CL-GAP-12` | `OPEN` | P2 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ efb30839 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
