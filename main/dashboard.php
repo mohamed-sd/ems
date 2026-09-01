@@ -592,23 +592,43 @@ echo ems_states_bundle('لا أرقام تشغيلية محسوبة لهذا ا�
   --d2-surface-quiet: var(--c-f8f9fa);
   --d2-line:          var(--c-e3e6ea);
   --d2-line-soft:     var(--c-eef0f3);
-  --d2-ink:           var(--c-1c1f23);
-  --d2-ink-soft:      var(--c-5b6570);
-  --d2-ink-faint:     var(--c-8b949e);
+  /* ⛔ **ولا يُكتب لونٌ حرفيًّا في تعليقٍ أيضًا**: ماسحُ VT-02 يقرأ التعليقَ
+       كما يقرأ الشيفرة، فاقتباسُ القيمةِ يُعَدُّ لونًا صلبًا — فيُذكَر الرمزُ.
+     ◆ **سلّمُ الحبرِ قِيس بمعادلةِ WCAG لا بالنظر** (بلاغُ المالك عن سياسةِ
+       الألوان). كان الخافتُ الرمزَ `--c-8b949e` فيعطي **3.08** على الأبيضِ و**2.82**
+       على سطحِ الصفحة — والحدُّ للنصِّ العاديِّ **4.5**. وهو مستعمَلٌ في ثمانيةَ
+       عشرَ موضعًا (الوحداتُ والفتراتُ والتسمياتُ وملاحظاتُ الرسوم) — فالعطبُ
+       واسعٌ لا هامشيّ، وأصابَ **أكثرَ النصِّ الثانويِّ في الشاشة**.
+     ◆ **والدرسُ**: لا يمكن أن تكون ثلاثُ درجاتِ رمادٍ على أبيضَ كلُّها فوقَ
+       4.5 **وتبقى متمايزةً بالعين**. فالتدرُّجُ الصحيحُ يُبنى **بالحجمِ
+       والوزنِ** لا بتفتيحِ النصِّ حتى يذوب. والثلاثةُ الآن: 16.54 · 5.93 ·
+       **4.83** — وكلُّها تمرّ.
+     ◆ و`--c-ink-500` **رمزٌ قائمٌ في اللوحةِ باسمٍ دلاليّ** — لا هيكسٌ جديد. */
+  --d2-ink:           var(--c-1c1f23);   /* 16.54 — العناوينُ والقيم */
+  --d2-ink-soft:      var(--c-5b6570);   /*  5.93 — المتنُ والتسميات */
+  --d2-ink-faint:     var(--c-ink-500);  /*  4.83 — الفتراتُ والوحدات (كان 3.08 🔴) */
   /* ◆ **الكهرمانيُّ لا البرتقاليّ** (قرار المالك): الجولةُ الأولى أخذت اللكنةَ
        من `--ux-accent` وهو var(--brand-orange) البرتقاليُّ لا الكهرمانيّ.
        والكهرمانيُّ مُعلَنٌ في كتلةِ الهويةِ نفسِها: var(--brand-amber).
      ◆ والدرجاتُ الأربعُ كلُّها **رموزٌ قائمةٌ في لوحةِ النظامِ** لا قيمٌ
        مؤلَّفة: العميقُ لونُ التمريرِ · الناعمُ خلفيةُ اللكنة · والحبرُ لونُ
        النصِّ عليها (وهو ما يحفظ التباينَ فلا يُقرأ الذهبيُّ على الذهبيّ). */
-  --d2-accent:        var(--brand-amber);
+  /* ◆ **الكهرمانيُّ ملءٌ لا حبر**: الرمزُ `--brand-amber` على الأبيضِ = **1.99** — دونَ حدِّ
+       مكوّنِ الواجهةِ (3.0) وأبعدَ من حدِّ النصّ. فيبقى للمساحاتِ المصمتةِ
+       (علامةُ القسمِ · خلفيةُ اللكنة) حيث الشكلُ يحمل المعنى، **وتُفصَل عنه
+       درجةٌ للأيقونةِ على سطحٍ فاتح**: `--c-brand-gold-ink` = **3.31** ✅ —
+       وهي ذهبيُّ العلامةِ نفسِه أعمقَ درجةً، رمزٌ قائمٌ لا لونٌ مؤلَّف.
+     ◆ وحتى لولا ذلك، فأيقوناتُ اللوحةِ كلُّها **مقترنةٌ بنصٍّ مجاور** فهي
+       زخرفيّةٌ بحكمِ المعيار — لكنَّ «مطابقٌ» شيءٌ و«مقروءٌ» شيءٌ آخر. */
+  --d2-accent:          var(--brand-amber);        /* 1.99 — ملءٌ ومساحةٌ فقط */
+  --d2-accent-on-light: var(--c-brand-gold-ink);   /* 3.31 — أيقونةٌ على فاتح */
   --d2-accent-strong: var(--c-brand-gold-deep);
   --d2-accent-soft:   var(--c-brand-gold-soft);
   --d2-accent-ink:    var(--c-brand-gold-ink-deep);
   --d2-state-err:     var(--c-dc2626);
   --d2-state-warn:    var(--c-d97706);
   --d2-state-ok:      var(--c-16a34a);
-  --d2-state-none:    var(--c-cbd2d9);
+  --d2-state-none:    var(--c-e3e6ea);   /* حافةُ «بلا حالة» = حدُّ البطاقةِ نفسُه — غيابُ الحالةِ غيابُ إشارةٍ لا إشارةٌ باهتة */
   --d2-r:             12px;   /* نصفُ قطرٍ واحدٌ للصفحةِ كلِّها (كان 12/18/20/22/30/35) */
   --d2-r-sm:          8px;
   --d2-sp-1: 4px; --d2-sp-2: 8px; --d2-sp-3: 12px; --d2-sp-4: 16px; --d2-sp-5: 20px;
@@ -702,7 +722,7 @@ html body.ems-site .ems-dash.main > .main_head .head-title{
 }
 html body.ems-site .ems-dash.main > .main_head .title-icon,
 html body.ems-site .ems-dash.main > .main_head .title-icon i{
-  color: var(--d2-accent);
+  color: var(--d2-accent-on-light);
   background: transparent;
   border: 0;
 }
@@ -893,7 +913,7 @@ html body.ems-site .ems-dash .shot-hex-icon{
   align-items: center;
   font-size: .88rem;
   line-height: 1;
-  color: var(--d2-accent);
+  color: var(--d2-accent-on-light);
   margin: 0;
   flex: none;
 }
@@ -1063,7 +1083,7 @@ html body.ems-site .ems-dash .shot-ops-head{ margin-bottom: var(--d2-sp-3); }
 html body.ems-site .ems-dash .shot-ops-title{
   font-size: .95rem; font-weight: 800; color: var(--d2-ink); margin: 0;
 }
-html body.ems-site .ems-dash .shot-ops-title i{ color: var(--d2-accent); }
+html body.ems-site .ems-dash .shot-ops-title i{ color: var(--d2-accent-on-light); }
 html body.ems-site .ems-dash .shot-ops-note{ font-size: .74rem; color: var(--d2-ink-faint); }
 html body.ems-site .ems-dash .shot-ops-box{
   background: var(--d2-surface-quiet);
@@ -1074,7 +1094,7 @@ html body.ems-site .ems-dash .shot-ops-box{
 html body.ems-site .ems-dash .shot-ops-box-title{
   font-size: .8rem; font-weight: 700; color: var(--d2-ink-soft); margin: 0 0 var(--d2-sp-2);
 }
-html body.ems-site .ems-dash .shot-ops-box-title i{ color: var(--d2-accent); }
+html body.ems-site .ems-dash .shot-ops-box-title i{ color: var(--d2-accent-on-light); }
 html body.ems-site .ems-dash .shot-ops-row{
   border-radius: var(--d2-r-sm);
   padding: var(--d2-sp-tight) var(--d2-sp-2);
