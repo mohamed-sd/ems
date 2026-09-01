@@ -4,6 +4,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../app/Services/Workforce/WorkerCategory.php';
 require_once __DIR__ . '/../app/Services/Workforce/PlanningService.php';
@@ -147,50 +148,30 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
         <div class="wr-form-actions"><button type="submit" class="add-btn"><i class="fas fa-save"></i> حفظ (يحسب المتوفر والعجز/الفائض)</button><a href="workforce_requirement.php" class="add-btn wr-cancel-btn"><i class="fas fa-times"></i> إلغاء</a></div>
     </form>
-    <div class="table-wrap wr-table-wrap"><table class="data-table wr-table-full">
-        <thead><tr><th>إجراءات</th><th>المشروع</th><th>الفئة</th><th>مطلوب</th><th>متوفر</th><th>عجز</th><th>فائض</th><th>الأولوية</th><th>المرحلة</th><th>الحالة</th>
-              <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
-              <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-              <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-              <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-              </tr></thead><tbody>
-        <?php $list = array();
-        try {
-            $list = $wr_gate->scopedQuery(array('scope'=>array('wr'=>'workforce_requirement'), 'enrich'=>array('p'=>'project')),
-                "SELECT wr.*, p.name AS pname FROM workforce_requirement wr LEFT JOIN project p ON p.id=wr.project_id WHERE 1=1 AND {TENANT_SCOPE} ORDER BY wr.id DESC");
-        } catch (\Throwable $t) { error_log('workforce_requirement.php list: ' . $t->getMessage()); }
-        $i=1; $WF_VIEW = []; if($list){ foreach($list as $r): $i++; $sc=($r['state']==='عجز')?'status-inactive':(($r['state']==='فائض')?'status-warning':'status-active');
-            $WF_VIEW[$r['id']] = ems_wf_view_payload('تفاصيل الاحتياج', 'fas fa-clipboard-list', [
-                ems_wf_field('المشروع', $r['pname'] ?: '-', 'fas fa-folder-open', ['size' => 'lg']),
-                ems_wf_field('الفئة', $r['worker_category'], 'fas fa-layer-group'),
-                ems_wf_field('المطلوب', intval($r['required_qty']), 'fas fa-list-ol'),
-                ems_wf_field('المتوفر', intval($r['available_qty']), 'fas fa-user-check'),
-                ems_wf_field('العجز', intval($r['shortage_qty']), 'fas fa-arrow-trend-down'),
-                ems_wf_field('الفائض', intval($r['surplus_qty']), 'fas fa-arrow-trend-up'),
-                ems_wf_field('وظيفة حرجة', intval($r['is_critical']) ? 'نعم' : 'لا', 'fas fa-triangle-exclamation'),
-                ems_wf_field('الأولوية', $r['priority'], 'fas fa-fire'),
-                ems_wf_field('مرحلة التلبية', $r['fulfillment_stage'], 'fas fa-diagram-project'),
-                ems_wf_field('تاريخ الحاجة', $r['need_date'] ?: '-', 'fas fa-calendar-day'),
-                ems_wf_field('الحالة', $r['state'], 'fas fa-flag', ['type' => 'status']),
-                ems_wf_field('المرشحون', $r['candidates_note'] ?: '-', 'fas fa-users', ['size' => 'full']),
-                ems_wf_field('ملاحظات', $r['notes'] ?: '-', 'fas fa-align-right', ['size' => 'full']),
-            ]); ?>
-            <tr><td><div class="action-btns">
-                <?= ems_wf_view_button($r['id']) ?>
-                <?php if($can_edit): ?><a href="workforce_requirement.php?edit=<?= intval($r['id']) ?>" class="action-btn edit"><i class="fas fa-edit"></i></a><?php endif; ?>
-                <?php if($can_delete): ?><a href="workforce_requirement.php?delete=<?= intval($r['id']) ?>" class="action-btn delete" onclick="return confirm('حذف؟')"><i class="fas fa-trash"></i></a><?php endif; ?>
-            </div></td>
-            <td><?= htmlspecialchars($r['pname'] ?: '-') ?></td><td><span class="badge badge-info"><?= htmlspecialchars($r['worker_category']) ?></span></td>
-            <td><?= intval($r['required_qty']) ?></td><td><?= intval($r['available_qty']) ?></td>
-            <td><?= intval($r['shortage_qty']) ?><?= intval($r['is_critical'])?' ⚠️':'' ?></td><td><?= intval($r['surplus_qty']) ?></td>
-            <td><?= htmlspecialchars($r['priority']) ?></td><td><?= htmlspecialchars($r['fulfillment_stage']) ?></td>
-            <td><span class="status-pill <?= $sc ?>"><?= htmlspecialchars($r['state']) ?></span></td></tr>
-        <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="10" class="wr-empty-cell">لا توجد سجلات بعد.</td></tr><?php endif; ?>
-        </tbody></table></div>
+    <?php /* GUIDE_COLS:govui_field_close:emsList_workforce_requirement
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف الاحتياج' => 'id',
+        'رقم المشروع' => 'project_id',
+        'كود عقد العميل' => 'client_contract_code',
+        'الموقع' => 'site_ref',
+        'الفئة التشغيلية' => 'worker_category',
+        'نوع المعدة المرتبط' => 'linked_equipment_type',
+        'العدد المطلوب' => 'required_qty',
+        'مستوى التأهيل المطلوب' => 'required_qualification_level',
+        'نمط الوردية' => 'shift_pattern',
+        'من تاريخ' => 'need_from_date',
+        'إلى تاريخ' => 'need_date',
+        'مصدر الاحتياج' => 'need_source_ref',
+        'حالة الاحتياج' => 'state',
+        'المراجع' => 'reviewer_name',
+        'تاريخ الاعتماد' => 'approved_on',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('workforce_requirement');
+    echo ems_w14_grid('emsList_workforce_requirement', $GUIDE_COLS, $__gridRows, $D, 'لا احتياج مسجل بعد'); /* /GUIDE_COLS */ ?></div>
 </div>
 <?php ems_wf_view_modal($WF_VIEW); ?>
 <script>(function(){var b=document.getElementById('toggleForm'),f=document.getElementById('rForm');if(b&&f)b.addEventListener('click',function(){f.classList.toggle("allforms-visible");});})();</script>

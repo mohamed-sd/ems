@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-01 09:40:22
+-- المصدر: equipation_manage · التوليد: 2026-09-01 10:30:21
 -- الجداول: 1233 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
@@ -25926,6 +25926,16 @@ CREATE TABLE `sup_dictionary_rule_derivation` (
   `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   `authority_class` varchar(190) DEFAULT NULL COMMENT 'تصنيف الحجية',
   `code_rule` varchar(60) DEFAULT NULL COMMENT 'كود القاعدة',
+  `rule_uid` varchar(190) DEFAULT NULL COMMENT 'معرف القاعدة',
+  `sheet_name` varchar(190) DEFAULT NULL COMMENT 'الشيت',
+  `field_or_record` varchar(190) DEFAULT NULL COMMENT 'الحقل/السجل',
+  `source_file` varchar(190) DEFAULT NULL COMMENT 'ملف المصدر',
+  `source_sheet` varchar(190) DEFAULT NULL COMMENT 'شيت المصدر',
+  `source_key` varchar(190) DEFAULT NULL COMMENT 'مفتاح المصدر',
+  `inference_rule` text DEFAULT NULL COMMENT 'قاعدة الاستنتاج',
+  `effective_authority_levels` varchar(190) DEFAULT NULL COMMENT 'مستويات الحجية الفعلية (محسوبة من سجل التتبع 24)',
+  `owner_rule` varchar(190) DEFAULT NULL COMMENT 'قاعدة المالك',
+  `trace_line_count` int(11) DEFAULT NULL COMMENT 'عدد أسطر التتبع',
   PRIMARY KEY (`id`),
   KEY `ix_sup_dictionary_rule_deri_co` (`company_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -31533,6 +31543,15 @@ CREATE TABLE `workforce_requirement` (
   `created_by` int(11) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `client_contract_code` varchar(190) DEFAULT NULL COMMENT 'كود عقد العميل',
+  `site_ref` varchar(190) DEFAULT NULL COMMENT 'الموقع',
+  `linked_equipment_type` varchar(190) DEFAULT NULL COMMENT 'نوع المعدة المرتبط',
+  `required_qualification_level` varchar(190) DEFAULT NULL COMMENT 'مستوى التأهيل المطلوب',
+  `shift_pattern` varchar(190) DEFAULT NULL COMMENT 'نمط الوردية',
+  `need_from_date` date DEFAULT NULL COMMENT 'من تاريخ',
+  `need_source_ref` varchar(190) DEFAULT NULL COMMENT 'مصدر الاحتياج',
+  `reviewer_name` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `approved_on` date DEFAULT NULL COMMENT 'تاريخ الاعتماد',
   PRIMARY KEY (`id`),
   KEY `idx_wr_company` (`company_id`),
   KEY `idx_wr_project` (`project_id`),

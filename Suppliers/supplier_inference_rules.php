@@ -67,18 +67,22 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div>
 
     <div class="table-container">
-        <?php /* GUIDE_COLS:govui_field_close
+        <?php /* GUIDE_COLS:govui_field_close:emsList_sup_rules
              الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
              والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
              ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
         $GUIDE_COLS = array(
-            'كود القاعدة' => 'code_rule',
-            'الحقل/المخرج' => 'c2',
-            'القيم الممكنة' => 'c3',
-            'قاعدة الاشتقاق' => 'c4',
-            'الشيت المطبق فيه' => 'c5',
-            'القيد/التحذير' => 'c6',
-            'تصنيف الحجية' => 'authority_class',
+            '#' => 'id',
+            'معرف القاعدة' => 'rule_uid',
+            'الشيت' => 'sheet_name',
+            'الحقل/السجل' => 'field_or_record',
+            'ملف المصدر' => 'source_file',
+            'شيت المصدر' => 'source_sheet',
+            'مفتاح المصدر' => 'source_key',
+            'قاعدة الاستنتاج' => 'inference_rule',
+            'مستويات الحجية الفعلية (محسوبة من سجل التتبع 24)' => 'effective_authority_levels',
+            'قاعدة المالك' => 'owner_rule',
+            'عدد أسطر التتبع' => 'trace_line_count',
         );
         $D = array();
         $__gridRows = ems_w14_guide_rows('sup_dictionary_rule_derivation');
