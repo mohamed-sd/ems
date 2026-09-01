@@ -15,6 +15,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/fin_helpers.php';
 require_once __DIR__ . '/w11_view.php';
@@ -63,23 +64,31 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_tre_fx_deals')); ?>
-    <table id="emsList_tre_fx_deals" class="data-table">
-        <thead><tr><th>الرقم</th><th>النوع</th><th>عملة البيع</th><th>عملة الشراء</th><th>مبلغ البيع</th><th>مبلغ الشراء</th><th>سعر الصفقة</th><th>سعر الجدول</th><th>المستند</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= htmlspecialchars((string) $r["deal_no"]) ?></td>
-                    <td><?= ((string) $r["deal_kind"] === "buy" ? "شراء" : "بيع") ?></td>
-                    <td><?= htmlspecialchars((string) $r["sell_currency"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["buy_currency"]) ?></td>
-                    <td><?= number_format((float) $r["sell_amount"], 2) ?></td>
-                    <td><?= number_format((float) $r["buy_amount"], 2) ?></td>
-                    <td><?= htmlspecialchars((string) $r["deal_rate"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["table_rate"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["doc_ref"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'رقم الصفقة' => 'g63',
+        'تاريخ التنفيذ' => 'g64',
+        'العملة المشتراة' => 'g65',
+        'العملة المدفوعة' => 'g66',
+        'المبلغ المشترى' => 'g67',
+        'سعر الصفقة' => 'g68',
+        'المكافئ' => 'g69',
+        'السعر المرجعي م09' => 'g70',
+        'الفرق عن المرجعي' => 'g71',
+        'جهة التنفيذ' => 'g72',
+        'الغرض' => 'g73',
+        'مرجع الحركة' => 'g74',
+        'حالة الصفقة' => 'g75',
+        'المنشئ' => 'g76',
+        'تاريخ الإنشاء' => 'g77',
+        'حالة البيانات' => 'g78',
+        'مرجع المصدر' => 'g79',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('tre_fx_deals');
+    echo ems_w14_grid('emsList_tre_fx_deals', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في تنفيذ عمليات الصرف الأجنبي'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

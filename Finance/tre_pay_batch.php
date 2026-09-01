@@ -13,6 +13,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/post_contract.php';
 require_once __DIR__ . '/../includes/ladder_gate.php';
@@ -125,7 +126,44 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   ob_start(); ?><span class="badge"><?= $queueFail === '' ? count($rows) : '—' ?> دفعة</span><?php
   $header_actions = array(array('raw' => trim((string) ob_get_clean())));
   $header_back = false;
-  include __DIR__ . '/../includes/page_header.php';
+  include __DIR__ . '/../includes/page_header.php'; ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم الأمر' => 'g22',
+            'رقم الطلب' => 'g23',
+            'فحص اكتمال الاعتماد' => 'g24',
+            'المستفيد' => 'g25',
+            'القيمة' => 'g26',
+            'العملة' => 'g27',
+            'الوعاء الصارف' => 'g28',
+            'فحص رصيد الوعاء' => 'g29',
+            'الموقع الأول' => 'g30',
+            'الموقع الثاني' => 'g31',
+            'فحص سريان التفويض' => 'g32',
+            'مرجع التنفيذ البنكي' => 'g33',
+            'تاريخ التنفيذ' => 'g34',
+            'انعكاس الذمم' => 'g35',
+            'حالة الأمر' => 'g36',
+            'المنشئ' => 'g37',
+            'تاريخ الإنشاء' => 'g38',
+            'المراجع' => 'g39',
+            'المعتمد' => 'g40',
+            'تاريخ الاعتماد' => 'g41',
+            'حالة البيانات' => 'g42',
+            'مرجع المصدر' => 'g43',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('tre_pay_batch');
+        echo ems_w14_grid('emsList_tre_pay_batch', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في أمر الدفع والتنفيذ'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
   echo ems_states_bundle('لا دفعة دفع مفتوحة بعد',
       'الدفعة تفتح ثم تجهز ثم تنفذ بمرجع حركة بنكي — بيد غير يد المعد');
   ?>

@@ -15,6 +15,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/fin_helpers.php';
 require_once __DIR__ . '/w11_view.php';
@@ -63,21 +64,33 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_tre_vessels')); ?>
-    <table id="emsList_tre_vessels" class="data-table">
-        <thead><tr><th>الرمز</th><th>الاسم</th><th>العملة</th><th>الامين</th><th>الموقع</th><th>الرصيد الافتتاحي</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= htmlspecialchars((string) $r["code"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["name"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["currency"]) ?></td>
-                    <td><?= (int) $r["custodian_id"] ?></td>
-                    <td><?= (int) $r["site_id"] ?></td>
-                    <td><?= number_format((float) $r["opening_balance"], 2) ?></td>
-                    <td><?= ((int) $r["is_active"] === 1 ? "نشط" : "موقوف") ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'كود الوعاء' => 'g44',
+        'اسم الوعاء' => 'g45',
+        'نوع الوعاء' => 'g46',
+        'البنك/الموقع' => 'g47',
+        'رقم الحساب' => 'g48',
+        'العملة' => 'g49',
+        'المفوضون بالتوقيع' => 'g50',
+        'مرجع التفويض' => 'g51',
+        'حد الصندوق' => 'g52',
+        'أمين الصندوق' => 'g53',
+        'الرصيد الدفتري' => 'g54',
+        'حالة الوعاء' => 'g55',
+        'المنشئ' => 'g56',
+        'تاريخ الإنشاء' => 'g57',
+        'المراجع' => 'g58',
+        'المعتمد' => 'g59',
+        'تاريخ الاعتماد' => 'g60',
+        'حالة البيانات' => 'g61',
+        'مرجع المصدر' => 'g62',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('tre_vessels');
+    echo ems_w14_grid('emsList_tre_vessels', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الحسابات البنكية والصناديق'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

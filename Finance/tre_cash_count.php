@@ -15,6 +15,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/fin_helpers.php';
 require_once __DIR__ . '/w11_view.php';
@@ -63,23 +64,29 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_tre_cash_count')); ?>
-    <table id="emsList_tre_cash_count" class="data-table">
-        <thead><tr><th>الرقم</th><th>الصندوق</th><th>النوع</th><th>الرصيد الدفتري</th><th>الرصيد المعدود</th><th>الفرق</th><th>حجم اللجنة</th><th>معالجة الفرق</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= htmlspecialchars((string) $r["count_no"]) ?></td>
-                    <td><?= (int) $r["box_id"] ?></td>
-                    <td><?= ((string) $r["count_kind"] === "surprise" ? "مفاجئ" : "دوري") ?></td>
-                    <td><?= number_format((float) $r["book_balance"], 2) ?></td>
-                    <td><?= number_format((float) $r["counted_balance"], 2) ?></td>
-                    <td><?= number_format((float) $r["difference"], 2) ?></td>
-                    <td><?= (int) $r["committee_size"] ?></td>
-                    <td><?= htmlspecialchars((string) $r["action_ref"]) ?></td>
-                    <td><?= ems_w11_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف الجلسة' => 'g172',
+        'الصندوق' => 'g173',
+        'نوع الجرد' => 'g174',
+        'تاريخ الجرد' => 'g175',
+        'لجنة الجرد' => 'g176',
+        'الرصيد الدفتري' => 'g177',
+        'العد الفعلي' => 'g178',
+        'الفرق' => 'action_ref',
+        'تفصيل الفئات النقدية' => 'g179',
+        'معالجة الفرق' => 'g180',
+        'حالة الجلسة' => 'g181',
+        'المنشئ' => 'g182',
+        'تاريخ الإنشاء' => 'g183',
+        'حالة البيانات' => 'g184',
+        'مرجع المصدر' => 'g185',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('tre_cash_count');
+    echo ems_w14_grid('emsList_tre_cash_count', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الجرد النقدي للخزائن'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

@@ -12,6 +12,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/post_contract.php';
 
@@ -124,7 +125,36 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   ob_start(); ?><span class="badge"><?= $queueFail === '' ? count($rows) : '—' ?> مستفيدا</span><?php
   $header_actions = array(array('raw' => trim((string) ob_get_clean())));
   $header_back = false;
-  include __DIR__ . '/../includes/page_header.php';
+  include __DIR__ . '/../includes/page_header.php'; ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف المستفيد' => 'g202',
+            'اسم المستفيد' => 'g203',
+            'نوع المستفيد' => 'g204',
+            'رقم الحساب/IBAN' => 'g205',
+            'البنك' => 'g206',
+            'وثيقة التحقق' => 'g207',
+            'تاريخ التحقق' => 'g208',
+            'محقق مستقل' => 'g209',
+            'تغيير حساب معلق؟' => 'g210',
+            'حالة التحقق' => 'g211',
+            'المنشئ' => 'g212',
+            'تاريخ الإنشاء' => 'g213',
+            'حالة البيانات' => 'g214',
+            'مرجع المصدر' => 'g215',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('tre_beneficiary');
+        echo ems_w14_grid('emsList_tre_beneficiary', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في سجل المستفيدين والتحقق'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
   echo ems_states_bundle('لا مستفيد مسجل بعد',
       'الحساب يسجل ثم يتحقق منه غير منشئه — ولا صرف إلى حساب غير متحقق');
   ?>

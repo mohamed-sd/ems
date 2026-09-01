@@ -15,6 +15,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/fin_helpers.php';
 require_once __DIR__ . '/w11_view.php';
@@ -63,20 +64,35 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_tre_payment_queue')); ?>
-    <table id="emsList_tre_payment_queue" class="data-table">
-        <thead><tr><th>الرقم</th><th>النوع</th><th>المبلغ</th><th>العملة</th><th>الحالة</th><th>الوقت</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= htmlspecialchars((string) $r["request_no"]) ?></td>
-                    <td><?= ems_w11_state((string) $r["request_type"]) ?></td>
-                    <td><?= number_format((float) $r["amount"], 2) ?></td>
-                    <td><?= htmlspecialchars((string) $r["currency"]) ?></td>
-                    <td><?= ems_w11_state((string) $r["state"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["created_at"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'رقم الطلب' => 'g1',
+        'تاريخ الطلب' => 'g2',
+        'الإدارة الطالبة' => 'g3',
+        'نوع المستفيد' => 'g4',
+        'المستفيد' => 'g5',
+        'الموجب المعتمد' => 'g6',
+        'فحص البوابة' => 'g7',
+        'قيمة الطلب' => 'g8',
+        'العملة' => 'g9',
+        'مصدر التمويل المستخدم' => 'g10',
+        'فحص إتاحة المصدر' => 'g11',
+        'طريقة الدفع' => 'g12',
+        'تاريخ الاستحقاق' => 'g13',
+        'حالة الطلب' => 'g14',
+        'المنشئ' => 'g15',
+        'تاريخ الإنشاء' => 'g16',
+        'المراجع' => 'g17',
+        'المعتمد' => 'g18',
+        'تاريخ الاعتماد' => 'g19',
+        'حالة البيانات' => 'g20',
+        'مرجع المصدر' => 'g21',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('tre_payment_queue');
+    echo ems_w14_grid('emsList_tre_payment_queue', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في مدفوعات معتمدة بانتظار التنفيذ'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

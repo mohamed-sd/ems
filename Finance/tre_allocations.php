@@ -15,6 +15,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/fin_helpers.php';
 require_once __DIR__ . '/w11_view.php';
@@ -63,22 +64,25 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_tre_allocations')); ?>
-    <table id="emsList_tre_allocations" class="data-table">
-        <thead><tr><th>سند القبض</th><th>الذمة</th><th>نوع الهدف</th><th>المبلغ</th><th>عملة السند</th><th>المبلغ بالاساس</th><th>اساس التخصيص</th><th>الوقت</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= (int) $r["payment_id"] ?></td>
-                    <td><?= (int) $r["receivable_id"] ?></td>
-                    <td><?= ems_w11_state((string) $r["target_kind"]) ?></td>
-                    <td><?= number_format((float) $r["amount"], 2) ?></td>
-                    <td><?= htmlspecialchars((string) $r["pay_currency"]) ?></td>
-                    <td><?= number_format((float) $r["base_amount"], 2) ?></td>
-                    <td><?= ems_w11_state((string) $r["basis"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["created_at"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف التخصيص' => 'g147',
+        'معرف التحصيل' => 'g148',
+        'رقم الفاتورة' => 'g149',
+        'قيمة الفاتورة' => 'g150',
+        'المخصص عليها' => 'g151',
+        'المتبقي بعده' => 'g152',
+        'حالة الفاتورة بعده' => 'g153',
+        'المنشئ' => 'g154',
+        'تاريخ الإنشاء' => 'g155',
+        'حالة البيانات' => 'g156',
+        'مرجع المصدر' => 'g157',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('tre_allocations');
+    echo ems_w14_grid('emsList_tre_allocations', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في تخصيص التحصيل على الفواتير'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

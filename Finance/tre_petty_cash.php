@@ -15,6 +15,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/fin_helpers.php';
 require_once __DIR__ . '/w11_view.php';
@@ -63,22 +64,31 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_tre_petty_cash')); ?>
-    <table id="emsList_tre_petty_cash" class="data-table">
-        <thead><tr><th>الرقم</th><th>الامين</th><th>حد العهدة</th><th>العملة</th><th>المصروف</th><th>تاريخ الفتح</th><th>السقف الزمني</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= htmlspecialchars((string) $r["custody_no"]) ?></td>
-                    <td><?= (int) $r["holder_id"] ?></td>
-                    <td><?= number_format((float) $r["ceiling_amount"], 2) ?></td>
-                    <td><?= htmlspecialchars((string) $r["currency"]) ?></td>
-                    <td><?= number_format((float) $r["spent_amount"], 2) ?></td>
-                    <td><?= htmlspecialchars((string) $r["opened_at"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["due_date"]) ?></td>
-                    <td><?= ems_w11_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف العهدة' => 'g116',
+        'أمين العهدة' => 'g117',
+        'الموقع' => 'g118',
+        'حد العهدة' => 'g119',
+        'تاريخ الفتح' => 'g120',
+        'السقف الزمني' => 'g121',
+        'المصروف الموثق' => 'g122',
+        'المستندات المرفقة' => 'g123',
+        'المتبقي' => 'g124',
+        'تاريخ التسوية' => 'g125',
+        'نتيجة التسوية' => 'g126',
+        'التجديد' => 'g127',
+        'حالة العهدة' => 'g128',
+        'المنشئ' => 'g129',
+        'تاريخ الإنشاء' => 'g130',
+        'حالة البيانات' => 'g131',
+        'مرجع المصدر' => 'g132',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('tre_petty_cash');
+    echo ems_w14_grid('emsList_tre_petty_cash', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في عهد النثرية وتسويتها'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

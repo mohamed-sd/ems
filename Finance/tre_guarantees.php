@@ -15,6 +15,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/fin_helpers.php';
 require_once __DIR__ . '/w11_view.php';
@@ -63,23 +64,34 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_tre_guarantees')); ?>
-    <table id="emsList_tre_guarantees" class="data-table">
-        <thead><tr><th>الرقم</th><th>النوع</th><th>المستفيد</th><th>التسهيل</th><th>المبلغ</th><th>العملة</th><th>تاريخ الاصدار</th><th>تاريخ الانتهاء</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= htmlspecialchars((string) $r["doc_no"]) ?></td>
-                    <td><?= ((string) $r["doc_kind"] === "letter_of_credit" ? "اعتماد مستندي" : "خطاب ضمان") ?></td>
-                    <td><?= htmlspecialchars((string) $r["beneficiary"]) ?></td>
-                    <td><?= (int) $r["facility_id"] ?></td>
-                    <td><?= number_format((float) $r["amount"], 2) ?></td>
-                    <td><?= htmlspecialchars((string) $r["currency"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["issued_at"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["expires_at"]) ?></td>
-                    <td><?= ems_w11_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف الأداة' => 'g96',
+        'النوع' => 'g97',
+        'المستفيد' => 'g98',
+        'العقد المرتبط' => 'g99',
+        'القيمة' => 'g100',
+        'العملة' => 'g101',
+        'نسبة الغطاء النقدي' => 'g102',
+        'التسهيل المستخدم' => 'g103',
+        'تاريخ الإصدار' => 'g104',
+        'تاريخ الانتهاء' => 'g105',
+        'التمديدات' => 'g106',
+        'مرجع ح04 النظامي' => 'g107',
+        'حالة الأداة' => 'g108',
+        'المنشئ' => 'g109',
+        'تاريخ الإنشاء' => 'g110',
+        'المراجع' => 'g111',
+        'المعتمد' => 'g112',
+        'تاريخ الاعتماد' => 'g113',
+        'حالة البيانات' => 'g114',
+        'مرجع المصدر' => 'g115',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('tre_guarantees');
+    echo ems_w14_grid('emsList_tre_guarantees', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في خطابات الضمان والاعتمادات المستندية'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

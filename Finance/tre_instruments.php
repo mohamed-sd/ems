@@ -15,6 +15,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/fin_helpers.php';
 require_once __DIR__ . '/w11_view.php';
@@ -63,22 +64,30 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_tre_instruments')); ?>
-    <table id="emsList_tre_instruments" class="data-table">
-        <thead><tr><th>الرقم</th><th>النوع</th><th>البنك</th><th>تاريخ الاستحقاق</th><th>المبلغ</th><th>العملة</th><th>الحالة</th><th>سبب الارتجاع</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= htmlspecialchars((string) $r["instrument_no"]) ?></td>
-                    <td><?= ems_w11_instr((string) $r["kind"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["bank_name"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["due_date"]) ?></td>
-                    <td><?= number_format((float) $r["amount"], 2) ?></td>
-                    <td><?= htmlspecialchars((string) $r["currency"]) ?></td>
-                    <td><?= ems_w11_state((string) $r["state"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["bounce_reason"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف الأداة' => 'g80',
+        'الاتجاه' => 'g81',
+        'نوع الأداة' => 'g82',
+        'رقم الأداة' => 'g83',
+        'البنك المسحوب عليه' => 'g84',
+        'قيمة الأداة' => 'g85',
+        'العملة' => 'g86',
+        'الطرف' => 'g87',
+        'تاريخ الاستحقاق' => 'g88',
+        'المرجع الموجب' => 'g89',
+        'الوعاء' => 'g90',
+        'حالة الأداة' => 'g91',
+        'المنشئ' => 'g92',
+        'تاريخ الإنشاء' => 'g93',
+        'حالة البيانات' => 'g94',
+        'مرجع المصدر' => 'g95',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('tre_instruments');
+    echo ems_w14_grid('emsList_tre_instruments', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في سجل الأدوات المالية'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

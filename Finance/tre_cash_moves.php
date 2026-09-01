@@ -15,6 +15,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/fin_helpers.php';
 require_once __DIR__ . '/w11_view.php';
@@ -63,23 +64,28 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_tre_cash_moves')); ?>
-    <table id="emsList_tre_cash_moves" class="data-table">
-        <thead><tr><th>الرقم</th><th>الوعاء</th><th>معرف الوعاء</th><th>الاتجاه</th><th>المبلغ</th><th>العملة</th><th>المرجع</th><th>فرق صرف</th><th>البيان</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= htmlspecialchars((string) $r["move_no"]) ?></td>
-                    <td><?= ems_w11_vessel((string) $r["vessel_kind"]) ?></td>
-                    <td><?= (int) $r["vessel_id"] ?></td>
-                    <td><?= ((string) $r["direction"] === "in" ? "وارد" : "صادر") ?></td>
-                    <td><?= number_format((float) $r["amount"], 2) ?></td>
-                    <td><?= htmlspecialchars((string) $r["currency"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["ref_kind"]) ?></td>
-                    <td><?= ((int) $r["is_fx_diff"] === 1 ? "نعم" : "لا") ?></td>
-                    <td><?= htmlspecialchars((string) $r["note"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف الحركة' => 'g133',
+        'التاريخ' => 'g134',
+        'الوعاء' => 'g135',
+        'نوع الحركة' => 'g136',
+        'القيمة' => 'g137',
+        'العملة' => 'g138',
+        'الوعاء المقابل' => 'g139',
+        'المرجع الموجب' => 'g140',
+        'الرصيد بعد الحركة' => 'g141',
+        'حالة الحركة' => 'g142',
+        'المنشئ' => 'g143',
+        'تاريخ الإنشاء' => 'g144',
+        'حالة البيانات' => 'g145',
+        'مرجع المصدر' => 'g146',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('tre_cash_moves');
+    echo ems_w14_grid('emsList_tre_cash_moves', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في حركة الخزينة والصناديق'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

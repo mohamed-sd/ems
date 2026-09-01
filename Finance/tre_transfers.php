@@ -15,6 +15,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/fin_helpers.php';
 require_once __DIR__ . '/w11_view.php';
@@ -63,22 +64,28 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_tre_transfers')); ?>
-    <table id="emsList_tre_transfers" class="data-table">
-        <thead><tr><th>الرقم</th><th>من وعاء</th><th>الى وعاء</th><th>المبلغ</th><th>العملة</th><th>قاعدة الصلاحية</th><th>السبب</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= htmlspecialchars((string) $r["transfer_no"]) ?></td>
-                    <td><?= ems_w11_vessel((string) $r["from_kind"]) . " " . (int) $r["from_id"] ?></td>
-                    <td><?= ems_w11_vessel((string) $r["to_kind"]) . " " . (int) $r["to_id"] ?></td>
-                    <td><?= number_format((float) $r["amount"], 2) ?></td>
-                    <td><?= htmlspecialchars((string) $r["currency"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["authority_rule_id"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["why"]) ?></td>
-                    <td><?= ems_w11_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'رقم التحويل' => 'g158',
+        'من وعاء' => 'g159',
+        'إلى وعاء' => 'g160',
+        'القيمة' => 'g161',
+        'العملة' => 'g162',
+        'الغرض' => 'g163',
+        'مرجع تفويض الموقع' => 'g164',
+        'مرجع التنفيذ البنكي' => 'g165',
+        'تأكيد الوصول' => 'g166',
+        'حالة التحويل' => 'g167',
+        'المنشئ' => 'g168',
+        'تاريخ الإنشاء' => 'g169',
+        'حالة البيانات' => 'g170',
+        'مرجع المصدر' => 'g171',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('tre_transfers');
+    echo ems_w14_grid('emsList_tre_transfers', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في التحويلات بين الحسابات'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

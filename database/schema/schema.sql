@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-01 22:44:01
--- الجداول: 1106 · المناظير: 28
+-- المصدر: equipation_manage · التوليد: 2026-09-01 22:54:05
+-- الجداول: 1119 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -26308,6 +26308,28 @@ CREATE TABLE `transfer_types` (
   UNIQUE KEY `uq_type_code` (`company_id`,`code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── Table: tre_allocations ──
+CREATE TABLE `tre_allocations` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g147` varchar(190) DEFAULT NULL COMMENT 'معرف التخصيص',
+  `g148` varchar(190) DEFAULT NULL COMMENT 'معرف التحصيل',
+  `g149` varchar(190) DEFAULT NULL COMMENT 'رقم الفاتورة',
+  `g150` varchar(190) DEFAULT NULL COMMENT 'قيمة الفاتورة',
+  `g151` varchar(190) DEFAULT NULL COMMENT 'المخصص عليها',
+  `g152` varchar(190) DEFAULT NULL COMMENT 'المتبقي بعده',
+  `g153` varchar(190) DEFAULT NULL COMMENT 'حالة الفاتورة بعده',
+  `g154` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g155` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g156` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g157` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_d74cd853_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='TRS-07 - تخصيص التحصيل على الفواتير';
+
 -- ── Table: tre_bank_facility ──
 CREATE TABLE `tre_bank_facility` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'معرف التسهيل — يولده النظام',
@@ -26340,6 +26362,33 @@ CREATE TABLE `tre_bank_facility` (
   CONSTRAINT `chk_tbf_state_note` CHECK (`facility_state` in ('ساري','مستنفَد') or `state_note` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='DEP-06 شاشة 14: التسهيلات البنكية — تسهيل × بنك والمتاح يشتق (الحد - المستخدم)';
 
+-- ── Table: tre_bank_reconciliation_fin ──
+CREATE TABLE `tre_bank_reconciliation_fin` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g186` varchar(190) DEFAULT NULL COMMENT 'معرف المطابقة',
+  `g187` varchar(190) DEFAULT NULL COMMENT 'الحساب البنكي',
+  `g188` varchar(190) DEFAULT NULL COMMENT 'الشهر',
+  `g189` varchar(190) DEFAULT NULL COMMENT 'رصيد الكشف البنكي',
+  `g190` varchar(190) DEFAULT NULL COMMENT 'رصيد الدفتر',
+  `g191` varchar(190) DEFAULT NULL COMMENT 'الفرق',
+  `g192` varchar(190) DEFAULT NULL COMMENT 'بنود الفروق',
+  `g193` varchar(190) DEFAULT NULL COMMENT 'سبب الفرق',
+  `g194` varchar(190) DEFAULT NULL COMMENT 'معالجة الفرق',
+  `g195` varchar(190) DEFAULT NULL COMMENT 'الفرق المتبقي',
+  `g196` varchar(190) DEFAULT NULL COMMENT 'مرفق الكشف',
+  `g197` varchar(190) DEFAULT NULL COMMENT 'حالة المطابقة',
+  `g198` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g199` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g200` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g201` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_5b4f706c_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='TRS-13 - المطابقة البنكية';
+
 -- ── Table: tre_beneficiaries ──
 CREATE TABLE `tre_beneficiaries` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -26364,6 +26413,31 @@ CREATE TABLE `tre_beneficiaries` (
   KEY `ix_ben_active` (`company_id`,`is_active`),
   CONSTRAINT `chk_ben_sod` CHECK (`verified_by` is null or `verified_by` <> `created_by`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='شرط سابق للموجة 7 — سجل المستفيدين والحسابات البنكية';
+
+-- ── Table: tre_beneficiary ──
+CREATE TABLE `tre_beneficiary` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g202` varchar(190) DEFAULT NULL COMMENT 'معرف المستفيد',
+  `g203` varchar(190) DEFAULT NULL COMMENT 'اسم المستفيد',
+  `g204` varchar(190) DEFAULT NULL COMMENT 'نوع المستفيد',
+  `g205` varchar(190) DEFAULT NULL COMMENT 'رقم الحساب/IBAN',
+  `g206` varchar(190) DEFAULT NULL COMMENT 'البنك',
+  `g207` varchar(190) DEFAULT NULL COMMENT 'وثيقة التحقق',
+  `g208` varchar(190) DEFAULT NULL COMMENT 'تاريخ التحقق',
+  `g209` varchar(190) DEFAULT NULL COMMENT 'محقق مستقل',
+  `g210` varchar(190) DEFAULT NULL COMMENT 'تغيير حساب معلق؟',
+  `g211` varchar(190) DEFAULT NULL COMMENT 'حالة التحقق',
+  `g212` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g213` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g214` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g215` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_8ba7d1df_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='TRS-03 - سجل المستفيدين والتحقق';
 
 -- ── Table: tre_cash_box ──
 CREATE TABLE `tre_cash_box` (
@@ -26403,6 +26477,20 @@ CREATE TABLE `tre_cash_count` (
   `action_ref` varchar(300) NOT NULL DEFAULT '' COMMENT 'معالجة الفرق فورا بمساره',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `g172` varchar(190) DEFAULT NULL COMMENT 'معرف الجلسة',
+  `g173` varchar(190) DEFAULT NULL COMMENT 'الصندوق',
+  `g174` varchar(190) DEFAULT NULL COMMENT 'نوع الجرد',
+  `g175` varchar(190) DEFAULT NULL COMMENT 'تاريخ الجرد',
+  `g176` varchar(190) DEFAULT NULL COMMENT 'لجنة الجرد',
+  `g177` varchar(190) DEFAULT NULL COMMENT 'الرصيد الدفتري',
+  `g178` varchar(190) DEFAULT NULL COMMENT 'العد الفعلي',
+  `g179` varchar(190) DEFAULT NULL COMMENT 'تفصيل الفئات النقدية',
+  `g180` varchar(190) DEFAULT NULL COMMENT 'معالجة الفرق',
+  `g181` varchar(190) DEFAULT NULL COMMENT 'حالة الجلسة',
+  `g182` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g183` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g184` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g185` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_cc_no` (`company_id`,`count_no`),
   KEY `ix_cc` (`company_id`,`box_id`,`state`),
@@ -26449,6 +26537,48 @@ CREATE TABLE `tre_cash_move` (
   CONSTRAINT `chk_move_ref` CHECK (`ref_kind` <> '' and `currency` <> '' and `amount` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='TRS-10 حركة × وعاء - سطر حركة موثق بمرجعه';
 
+-- ── Table: tre_cash_moves ──
+CREATE TABLE `tre_cash_moves` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g133` varchar(190) DEFAULT NULL COMMENT 'معرف الحركة',
+  `g134` varchar(190) DEFAULT NULL COMMENT 'التاريخ',
+  `g135` varchar(190) DEFAULT NULL COMMENT 'الوعاء',
+  `g136` varchar(190) DEFAULT NULL COMMENT 'نوع الحركة',
+  `g137` varchar(190) DEFAULT NULL COMMENT 'القيمة',
+  `g138` varchar(190) DEFAULT NULL COMMENT 'العملة',
+  `g139` varchar(190) DEFAULT NULL COMMENT 'الوعاء المقابل',
+  `g140` varchar(190) DEFAULT NULL COMMENT 'المرجع الموجب',
+  `g141` varchar(190) DEFAULT NULL COMMENT 'الرصيد بعد الحركة',
+  `g142` varchar(190) DEFAULT NULL COMMENT 'حالة الحركة',
+  `g143` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g144` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g145` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g146` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_f9715c5b_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='TRS-10 - حركة الخزينة والصناديق';
+
+-- ── Table: tre_dashboard_kpi ──
+CREATE TABLE `tre_dashboard_kpi` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g216` varchar(190) DEFAULT NULL COMMENT 'معرف المؤشر',
+  `g217` varchar(190) DEFAULT NULL COMMENT 'المؤشر KPI Catalog',
+  `g218` varchar(190) DEFAULT NULL COMMENT 'القيمة',
+  `g219` varchar(190) DEFAULT NULL COMMENT 'العملة',
+  `g220` varchar(190) DEFAULT NULL COMMENT 'الحالة',
+  `g221` varchar(190) DEFAULT NULL COMMENT 'آخر تحديث',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_70f799f1_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='TRS-01 - مؤشر سيولة واحد';
+
 -- ── Table: tre_fx_deal ──
 CREATE TABLE `tre_fx_deal` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -26472,6 +26602,34 @@ CREATE TABLE `tre_fx_deal` (
   CONSTRAINT `chk_fx_cur` CHECK (`sell_currency` <> '' and `buy_currency` <> '' and `sell_currency` <> `buy_currency`),
   CONSTRAINT `chk_fx_doc` CHECK (`doc_ref` <> '' and `deal_rate` > 0 and `deal_kind` <> '')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='TRS-12 صفقة صرف × عملتين - بسعر الصفقة الموثق';
+
+-- ── Table: tre_fx_deals ──
+CREATE TABLE `tre_fx_deals` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g63` varchar(190) DEFAULT NULL COMMENT 'رقم الصفقة',
+  `g64` varchar(190) DEFAULT NULL COMMENT 'تاريخ التنفيذ',
+  `g65` varchar(190) DEFAULT NULL COMMENT 'العملة المشتراة',
+  `g66` varchar(190) DEFAULT NULL COMMENT 'العملة المدفوعة',
+  `g67` varchar(190) DEFAULT NULL COMMENT 'المبلغ المشترى',
+  `g68` varchar(190) DEFAULT NULL COMMENT 'سعر الصفقة',
+  `g69` varchar(190) DEFAULT NULL COMMENT 'المكافئ',
+  `g70` varchar(190) DEFAULT NULL COMMENT 'السعر المرجعي م09',
+  `g71` varchar(190) DEFAULT NULL COMMENT 'الفرق عن المرجعي',
+  `g72` varchar(190) DEFAULT NULL COMMENT 'جهة التنفيذ',
+  `g73` varchar(190) DEFAULT NULL COMMENT 'الغرض',
+  `g74` varchar(190) DEFAULT NULL COMMENT 'مرجع الحركة',
+  `g75` varchar(190) DEFAULT NULL COMMENT 'حالة الصفقة',
+  `g76` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g77` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g78` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g79` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_f05221b3_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='TRS-12 - تنفيذ عمليات الصرف الأجنبي';
 
 -- ── Table: tre_guarantee ──
 CREATE TABLE `tre_guarantee` (
@@ -26498,6 +26656,37 @@ CREATE TABLE `tre_guarantee` (
   CONSTRAINT `chk_grt_ben` CHECK (`beneficiary` <> '' and `doc_kind` <> '' and `amount` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='TRS-15 خطاب او اعتماد × مستفيد - الاصدار على تسهيله';
 
+-- ── Table: tre_guarantees ──
+CREATE TABLE `tre_guarantees` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g96` varchar(190) DEFAULT NULL COMMENT 'معرف الأداة',
+  `g97` varchar(190) DEFAULT NULL COMMENT 'النوع',
+  `g98` varchar(190) DEFAULT NULL COMMENT 'المستفيد',
+  `g99` varchar(190) DEFAULT NULL COMMENT 'العقد المرتبط',
+  `g100` varchar(190) DEFAULT NULL COMMENT 'القيمة',
+  `g101` varchar(190) DEFAULT NULL COMMENT 'العملة',
+  `g102` varchar(190) DEFAULT NULL COMMENT 'نسبة الغطاء النقدي',
+  `g103` varchar(190) DEFAULT NULL COMMENT 'التسهيل المستخدم',
+  `g104` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإصدار',
+  `g105` varchar(190) DEFAULT NULL COMMENT 'تاريخ الانتهاء',
+  `g106` varchar(190) DEFAULT NULL COMMENT 'التمديدات',
+  `g107` varchar(190) DEFAULT NULL COMMENT 'مرجع ح04 النظامي',
+  `g108` varchar(190) DEFAULT NULL COMMENT 'حالة الأداة',
+  `g109` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g110` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g111` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `g112` varchar(190) DEFAULT NULL COMMENT 'المعتمد',
+  `g113` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `g114` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g115` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_f36f0aa1_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='TRS-15 - خطابات الضمان والاعتمادات المستندية';
+
 -- ── Table: tre_instrument ──
 CREATE TABLE `tre_instrument` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -26522,6 +26711,66 @@ CREATE TABLE `tre_instrument` (
   CONSTRAINT `chk_instr_kind` CHECK (`kind` <> '' and `currency` <> '' and `amount` > 0),
   CONSTRAINT `chk_instr_bounce` CHECK (`state` <> 'bounced' or `bounce_reason` <> '')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='TRS-06 اداة مالية × حالة - بدورتها من الاستلام الى التحصيل';
+
+-- ── Table: tre_instruments ──
+CREATE TABLE `tre_instruments` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g80` varchar(190) DEFAULT NULL COMMENT 'معرف الأداة',
+  `g81` varchar(190) DEFAULT NULL COMMENT 'الاتجاه',
+  `g82` varchar(190) DEFAULT NULL COMMENT 'نوع الأداة',
+  `g83` varchar(190) DEFAULT NULL COMMENT 'رقم الأداة',
+  `g84` varchar(190) DEFAULT NULL COMMENT 'البنك المسحوب عليه',
+  `g85` varchar(190) DEFAULT NULL COMMENT 'قيمة الأداة',
+  `g86` varchar(190) DEFAULT NULL COMMENT 'العملة',
+  `g87` varchar(190) DEFAULT NULL COMMENT 'الطرف',
+  `g88` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاستحقاق',
+  `g89` varchar(190) DEFAULT NULL COMMENT 'المرجع الموجب',
+  `g90` varchar(190) DEFAULT NULL COMMENT 'الوعاء',
+  `g91` varchar(190) DEFAULT NULL COMMENT 'حالة الأداة',
+  `g92` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g93` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g94` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g95` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_78d984d8_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='TRS-06 - سجل الأدوات المالية';
+
+-- ── Table: tre_pay_batch ──
+CREATE TABLE `tre_pay_batch` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g22` varchar(190) DEFAULT NULL COMMENT 'رقم الأمر',
+  `g23` varchar(190) DEFAULT NULL COMMENT 'رقم الطلب',
+  `g24` varchar(190) DEFAULT NULL COMMENT 'فحص اكتمال الاعتماد',
+  `g25` varchar(190) DEFAULT NULL COMMENT 'المستفيد',
+  `g26` varchar(190) DEFAULT NULL COMMENT 'القيمة',
+  `g27` varchar(190) DEFAULT NULL COMMENT 'العملة',
+  `g28` varchar(190) DEFAULT NULL COMMENT 'الوعاء الصارف',
+  `g29` varchar(190) DEFAULT NULL COMMENT 'فحص رصيد الوعاء',
+  `g30` varchar(190) DEFAULT NULL COMMENT 'الموقع الأول',
+  `g31` varchar(190) DEFAULT NULL COMMENT 'الموقع الثاني',
+  `g32` varchar(190) DEFAULT NULL COMMENT 'فحص سريان التفويض',
+  `g33` varchar(190) DEFAULT NULL COMMENT 'مرجع التنفيذ البنكي',
+  `g34` varchar(190) DEFAULT NULL COMMENT 'تاريخ التنفيذ',
+  `g35` varchar(190) DEFAULT NULL COMMENT 'انعكاس الذمم',
+  `g36` varchar(190) DEFAULT NULL COMMENT 'حالة الأمر',
+  `g37` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g38` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g39` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `g40` varchar(190) DEFAULT NULL COMMENT 'المعتمد',
+  `g41` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `g42` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g43` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_2cdb9220_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='TRS-09 - أمر الدفع والتنفيذ';
 
 -- ── Table: tre_pay_batch_lines ──
 CREATE TABLE `tre_pay_batch_lines` (
@@ -26570,6 +26819,66 @@ CREATE TABLE `tre_pay_batches` (
   CONSTRAINT `chk_tpb_sod` CHECK (`executed_by` is null or `executed_by` <> `prepared_by`),
   CONSTRAINT `chk_tpb_ref` CHECK (`executed_at` is null or `bank_ref` is not null and `bank_ref` <> '')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='عقدة 25 — دفعات الدفع والتنفيذ · تنفيذ نقدي ولا قيد';
+
+-- ── Table: tre_payment_queue ──
+CREATE TABLE `tre_payment_queue` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g1` varchar(190) DEFAULT NULL COMMENT 'رقم الطلب',
+  `g2` varchar(190) DEFAULT NULL COMMENT 'تاريخ الطلب',
+  `g3` varchar(190) DEFAULT NULL COMMENT 'الإدارة الطالبة',
+  `g4` varchar(190) DEFAULT NULL COMMENT 'نوع المستفيد',
+  `g5` varchar(190) DEFAULT NULL COMMENT 'المستفيد',
+  `g6` varchar(190) DEFAULT NULL COMMENT 'الموجب المعتمد',
+  `g7` varchar(190) DEFAULT NULL COMMENT 'فحص البوابة',
+  `g8` varchar(190) DEFAULT NULL COMMENT 'قيمة الطلب',
+  `g9` varchar(190) DEFAULT NULL COMMENT 'العملة',
+  `g10` varchar(190) DEFAULT NULL COMMENT 'مصدر التمويل المستخدم',
+  `g11` varchar(190) DEFAULT NULL COMMENT 'فحص إتاحة المصدر',
+  `g12` varchar(190) DEFAULT NULL COMMENT 'طريقة الدفع',
+  `g13` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاستحقاق',
+  `g14` varchar(190) DEFAULT NULL COMMENT 'حالة الطلب',
+  `g15` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g16` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g17` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `g18` varchar(190) DEFAULT NULL COMMENT 'المعتمد',
+  `g19` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `g20` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g21` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_373a1791_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='TRS-08 - مدفوعات معتمدة بانتظار التنفيذ';
+
+-- ── Table: tre_petty_cash ──
+CREATE TABLE `tre_petty_cash` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g116` varchar(190) DEFAULT NULL COMMENT 'معرف العهدة',
+  `g117` varchar(190) DEFAULT NULL COMMENT 'أمين العهدة',
+  `g118` varchar(190) DEFAULT NULL COMMENT 'الموقع',
+  `g119` varchar(190) DEFAULT NULL COMMENT 'حد العهدة',
+  `g120` varchar(190) DEFAULT NULL COMMENT 'تاريخ الفتح',
+  `g121` varchar(190) DEFAULT NULL COMMENT 'السقف الزمني',
+  `g122` varchar(190) DEFAULT NULL COMMENT 'المصروف الموثق',
+  `g123` varchar(190) DEFAULT NULL COMMENT 'المستندات المرفقة',
+  `g124` varchar(190) DEFAULT NULL COMMENT 'المتبقي',
+  `g125` varchar(190) DEFAULT NULL COMMENT 'تاريخ التسوية',
+  `g126` varchar(190) DEFAULT NULL COMMENT 'نتيجة التسوية',
+  `g127` varchar(190) DEFAULT NULL COMMENT 'التجديد',
+  `g128` varchar(190) DEFAULT NULL COMMENT 'حالة العهدة',
+  `g129` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g130` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g131` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g132` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_32b111df_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='TRS-17 - عهد النثرية وتسويتها';
 
 -- ── Table: tre_petty_custody ──
 CREATE TABLE `tre_petty_custody` (
@@ -26678,6 +26987,61 @@ CREATE TABLE `tre_transfer` (
   CONSTRAINT `chk_trf_self` CHECK (`from_kind` <> `to_kind` or `from_id` <> `to_id`),
   CONSTRAINT `chk_trf_full` CHECK (`authority_rule_id` <> '' and `why` <> '' and `amount` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='TRS-11 تحويل × وعاءين - امر تحويل واحد';
+
+-- ── Table: tre_transfers ──
+CREATE TABLE `tre_transfers` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g158` varchar(190) DEFAULT NULL COMMENT 'رقم التحويل',
+  `g159` varchar(190) DEFAULT NULL COMMENT 'من وعاء',
+  `g160` varchar(190) DEFAULT NULL COMMENT 'إلى وعاء',
+  `g161` varchar(190) DEFAULT NULL COMMENT 'القيمة',
+  `g162` varchar(190) DEFAULT NULL COMMENT 'العملة',
+  `g163` varchar(190) DEFAULT NULL COMMENT 'الغرض',
+  `g164` varchar(190) DEFAULT NULL COMMENT 'مرجع تفويض الموقع',
+  `g165` varchar(190) DEFAULT NULL COMMENT 'مرجع التنفيذ البنكي',
+  `g166` varchar(190) DEFAULT NULL COMMENT 'تأكيد الوصول',
+  `g167` varchar(190) DEFAULT NULL COMMENT 'حالة التحويل',
+  `g168` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g169` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g170` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g171` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_b0555693_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='TRS-11 - التحويلات بين الحسابات';
+
+-- ── Table: tre_vessels ──
+CREATE TABLE `tre_vessels` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g44` varchar(190) DEFAULT NULL COMMENT 'كود الوعاء',
+  `g45` varchar(190) DEFAULT NULL COMMENT 'اسم الوعاء',
+  `g46` varchar(190) DEFAULT NULL COMMENT 'نوع الوعاء',
+  `g47` varchar(190) DEFAULT NULL COMMENT 'البنك/الموقع',
+  `g48` varchar(190) DEFAULT NULL COMMENT 'رقم الحساب',
+  `g49` varchar(190) DEFAULT NULL COMMENT 'العملة',
+  `g50` varchar(190) DEFAULT NULL COMMENT 'المفوضون بالتوقيع',
+  `g51` varchar(190) DEFAULT NULL COMMENT 'مرجع التفويض',
+  `g52` varchar(190) DEFAULT NULL COMMENT 'حد الصندوق',
+  `g53` varchar(190) DEFAULT NULL COMMENT 'أمين الصندوق',
+  `g54` varchar(190) DEFAULT NULL COMMENT 'الرصيد الدفتري',
+  `g55` varchar(190) DEFAULT NULL COMMENT 'حالة الوعاء',
+  `g56` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g57` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g58` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `g59` varchar(190) DEFAULT NULL COMMENT 'المعتمد',
+  `g60` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `g61` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g62` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_ad45c5c8_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='TRS-02 - الحسابات البنكية والصناديق';
 
 -- ── Table: trp_closure ──
 CREATE TABLE `trp_closure` (
