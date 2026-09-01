@@ -531,10 +531,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <th> الساعات المتعاقد عليها</th>
                             <th> رقم الهاتف</th>
                             <th> الحالة</th>
-                            <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
-                            <th class="ems-fn-th" data-fn="1">الاسم القانوني</th>
-                            <th class="ems-fn-th" data-fn="1">نوع المورد</th>
-                            <th class="ems-fn-th" data-fn="1">طبيعة التعاقد</th>
+                            <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند.
+                                 ◆ الموصولُ بـ`data-fn-src` تطبعه الشاشةُ من `data-xf` على الصفّ.
+                                 ⛔ **ولا يُوصَل عمودٌ حسّاس**: «السجل التجاري» و«الرقم الضريبي»
+                                   و«الحساب البنكي» من أعمدةِ `suppliers` الحسّاسةِ التي يحرسها
+                                   حكمُ `INJFIX-SENSITIVE-EXEMPT` (مسٌّ تحقُّقًا لا بثًّا)، و`ems_xf_value()`
+                                   **لا تحجب شيئًا** — فبثُّها هنا كشفٌ. إظهارُها قرارُ مالكٍ بقناعٍ. -->
+                            <th class="ems-fn-th" data-fn="1" data-fn-src="legal_name">الاسم القانوني</th>
+                            <th class="ems-fn-th" data-fn="1" data-fn-src="supplier_type">نوع المورد</th>
+                            <th class="ems-fn-th" data-fn="1" data-fn-src="dealing_nature">طبيعة التعاقد</th>
                             <th class="ems-fn-th" data-fn="1">عدد عقود الوساطة</th>
                             <th class="ems-fn-th" data-fn="1">عدد عقود الملكية</th>
                             <th class="ems-fn-th" data-fn="1">نسبة الوساطة من عقوده</th>
@@ -609,7 +614,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 "data-financial_registration_status='" . htmlspecialchars((string) ($row['financial_registration_status'] ?? ''), ENT_QUOTES) . "' " .
                                 "data-status='" . $row['status'] . "'";
 
-                            echo "<tr>";
+                            /* ◆ XF-01: قيمُ الأعمدةِ الموصولةِ — مفاتيحُها أسماءُ `data-fn-src`
+                                 حرفًا، وكلُّها أعمدةٌ قائمةٌ في `s.*` وغيرُ حسّاسة. */
+                            echo "<tr data-xf=\"" . htmlspecialchars(json_encode(array(
+                                'legal_name'     => (string) ($row['name'] ?? ''),
+                                'supplier_type'  => (string) ($row['supplier_type'] ?? ''),
+                                'dealing_nature' => (string) ($row['dealing_nature'] ?? ''),
+                            ), JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8') . "\">";
 
                             $action_btns = "<td><div class='action-btns'>";
                             $action_btns .= "<a href='javascript:void(0)' class='viewBtn action-btn view' $data_attrs title='عرض التفاصيل'><i class='fas fa-eye'></i></a>";

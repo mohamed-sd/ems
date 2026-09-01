@@ -856,20 +856,25 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <th>عدد العقود</th>
                         <th>التصنيف</th>
                         <th>حالة الحساب</th>
-                        <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
-                        <th class="ems-fn-th" data-fn="1">الاسم الرباعي</th>
-                        <th class="ems-fn-th" data-fn="1">رقم الهوية</th>
-                        <th class="ems-fn-th" data-fn="1">تاريخ الميلاد</th>
-                        <th class="ems-fn-th" data-fn="1">الجنسية</th>
+                        <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند.
+                             ◆ الموصولُ بـ`data-fn-src` **تطبعه الشاشةُ** من `data-xf` على الصفّ،
+                               وما بقي بلا مصدرٍ يحشوه `ui-unification.js` «—» ويُخفيه.
+                             ⛔ ولا يُوصَل رأسٌ لا عمودَ له: «المؤهل» و«الإدارة» و«الموقع»
+                               و«الحساب البنكي» و«البنك» و«المستوى التنظيمي» **لا عمودَ لها في
+                               `employees`** — فوصلُها يُظهر شرطاتٍ باسمِ بيانات. -->
+                        <th class="ems-fn-th" data-fn="1" data-fn-src="full_name">الاسم الرباعي</th>
+                        <th class="ems-fn-th" data-fn="1" data-fn-src="identity_no">رقم الهوية</th>
+                        <th class="ems-fn-th" data-fn="1" data-fn-src="birth_date">تاريخ الميلاد</th>
+                        <th class="ems-fn-th" data-fn="1" data-fn-src="nationality">الجنسية</th>
                         <th class="ems-fn-th" data-fn="1">المؤهل</th>
-                        <th class="ems-fn-th" data-fn="1">تاريخ التعيين</th>
+                        <th class="ems-fn-th" data-fn="1" data-fn-src="start_date">تاريخ التعيين</th>
                         <th class="ems-fn-th" data-fn="1">الإدارة</th>
-                        <th class="ems-fn-th" data-fn="1">المسمى الوظيفي</th>
+                        <th class="ems-fn-th" data-fn="1" data-fn-src="job_title">المسمى الوظيفي</th>
                         <th class="ems-fn-th" data-fn="1">المستوى التنظيمي</th>
                         <th class="ems-fn-th" data-fn="1">الموقع</th>
                         <th class="ems-fn-th" data-fn="1">الحساب البنكي</th>
                         <th class="ems-fn-th" data-fn="1">البنك</th>
-                        <th class="ems-fn-th none" data-fn="1">حالة الخدمة</th>
+                        <th class="ems-fn-th none" data-fn="1" data-fn-src="service_state">حالة الخدمة</th>
                         <th class="ems-fn-th none" data-fn="1">سجله</th>
                         <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                         <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
@@ -977,6 +982,18 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                   . "data-supplier='"    . htmlspecialchars((string) ($row['supplier_name'] ?? ''), ENT_QUOTES) . "' "
                                   . "data-project='"     . htmlspecialchars((string) ($row['project_name'] ?? ''), ENT_QUOTES) . "' "
                                   . "data-empstatus='"   . htmlspecialchars((string) ($row['employee_status'] ?? ''), ENT_QUOTES) . "' "
+                                  /* ◆ XF-01: قيمُ الأعمدةِ الموصولةِ بـ`data-fn-src` — مفاتيحُها
+                                       أسماءُ المصدرِ في الرأسِ حرفًا، و`ui-unification.js` يطبعها
+                                       في موضعِ رأسِها. وكلُّ مفتاحٍ هنا **له عمودٌ في الاستعلام**. */
+                                  . 'data-xf="' . htmlspecialchars(json_encode(array(
+                                        'full_name'     => (string) ($row['name'] ?? ''),
+                                        'identity_no'   => (string) ($row['identity_number'] ?? ''),
+                                        'birth_date'    => (string) ($row['birth_date'] ?? ''),
+                                        'nationality'   => (string) ($row['nationality'] ?? ''),
+                                        'start_date'    => (string) ($row['start_date'] ?? ''),
+                                        'job_title'     => (string) ($row['job_title_name'] ?? ''),
+                                        'service_state' => (string) ($row['employee_status'] ?? ''),
+                                    ), JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8') . '" '
                                   . "data-empclass='"    . htmlspecialchars($cls_value, ENT_QUOTES) . "' "
                                   . "data-status='"      . htmlspecialchars($st_label, ENT_QUOTES) . "'";
 
