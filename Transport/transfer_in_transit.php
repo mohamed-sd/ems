@@ -87,7 +87,7 @@ echo ems_states_bundle('لا حركة في الطريق الآن', 'أكد ال�
 ?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
   <table class="table table-striped" data-no-dt>
-    <thead><tr><th>أمر الترحيل</th><th>من → إلى</th><th>المركبة</th><th>السائق</th><th>تاريخ المغادرة</th><th>منذ</th><th>إجراء</th>
+    <thead><tr><th>رقم الأمر</th><th>من → إلى</th><th>المركبة</th><th>السائق</th><th>تاريخ المغادرة</th><th>منذ</th><th>إجراء</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">رقم الرحلة</th>
               <th class="ems-fn-th" data-fn="1">وقت المغادرة</th>

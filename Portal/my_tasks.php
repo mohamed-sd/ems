@@ -248,6 +248,9 @@ include '../insidebar.php';
                 <th>رقم المهمة</th><th>العنوان والمخرج</th><th>المصدر</th><th>المستند المرتبط</th>
                 <th>النطاق</th><th>مسندها</th><th>المنفذ</th><th>المهلة</th><th>المتبقي</th>
                 <th>الأولوية</th><th>الحالة</th><th>الإجراء</th>
+                <!-- XF-01: «وقت الانجاز» عمود قائم في work_items (completed_at) لم يكن
+                     يصير، والحلقة تقرا كل اعمدة الجدول فالقيمة حاضرة. -->
+                <th class="ems-fn-th" data-fn="1" data-fn-src="completed_at">وقت الإنجاز</th>
                 <th class="ems-gov-th" data-gov="entity" data-slice="1">الكيان</th>
             </tr></thead>
             <tbody>
@@ -265,8 +268,12 @@ include '../insidebar.php';
                 if ($t['project_name']) { $scope[] = $t['project_name']; }
                 elseif ($t['org_unit_id']) { $scope[] = 'إدارة ' . $t['org_unit_id']; }
                 if ($t['site_id']) { $scope[] = 'موقع ' . $t['site_id']; }
+                /* XF-01: وسمُ الصفِّ يُطبَع من هذه الكتلةِ نفسِها — فلا تُشقُّ كتلةُ
+                   الـHTML بـ`<?php ?>` جديدٍ داخلَ الوسم (المقياسُ يعُدُّ المقاطع). */
+                echo '<tr data-xf="' . htmlspecialchars(json_encode(array(
+                    'completed_at' => (string) ($t['completed_at'] ?? ''),
+                ), JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8') . '">';
             ?>
-                <tr>
                     <td><code>WI-<?php echo $id; ?></code><br>
                         <a href="my_tasks.php?view=<?php echo $VIEW; ?>&explain=<?php echo $id; ?>" title="لماذا أرى هذا؟"
                            class="ems-wi-whylink"><i class="fas fa-circle-question"></i> لماذا؟</a></td>

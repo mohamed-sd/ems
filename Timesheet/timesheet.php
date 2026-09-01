@@ -792,7 +792,8 @@ if (isset($_SESSION['user']['role']) && strval($_SESSION['user']['role']) === "6
 $today_rows_query = "SELECT t.id, t.shift, t.date, t.executed_hours,
                       t.standby_hours, t.total_fault_hours, t.bucket_hours, t.jackhammer_hours,
                       t.extra_hours, t.dependence_hours, t.total_work_hours, t.status,
-                      e.code AS eq_code, e.name AS eq_name
+                      e.code AS eq_code, e.name AS eq_name,
+                      o.project_id AS project_no
                       FROM timesheet t
                       JOIN operations o ON t.operator = o.id
                       JOIN equipments e ON o.equipment = e.id
@@ -2066,6 +2067,9 @@ try {
             <th>الإجمالي</th>
             <th>الحالة</th>
             <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
+            <!-- XF-01: «رقم المشروع» كان خارج SELECT مع ان وصلة project مضمومة
+                 ومعلنة في scope — فاضيف o.project_id وحسب. -->
+            <th class="ems-fn-th" data-fn="1" data-fn-src="project_no">رقم المشروع</th>
             <th class="ems-fn-th" data-fn="1">رقم الصف</th>
             <th class="ems-fn-th" data-fn="1">الموقع</th>
             <th class="ems-fn-th" data-fn="1">العقد</th>
@@ -2116,7 +2120,9 @@ try {
               : "<span data-ems-c='ts-55'><i class='fas fa-moon'></i> مسائية</span>";
 
             $id = intval($row['id']);
-            echo "<tr>";
+            echo "<tr data-xf=\"" . htmlspecialchars(json_encode(array(
+              'project_no' => (string) ($row['project_no'] ?? ''),
+            ), JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8') . "\">";
             echo "<td><div data-ems-c='ts-66'>"
               . "<a href='javascript:void(0)' class='editBtn' data-id='" . $id . "' title='تعديل' data-ems-c='ts-67'><i class='fas fa-edit'></i></a>"
               . "<a href='delete_timesheet.php?id=" . $id . "' onclick='return confirm(\"هل أنت متأكد؟\")' title='حذف' data-ems-c='ts-68'><i class='fas fa-trash'></i></a>"
