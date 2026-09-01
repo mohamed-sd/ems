@@ -799,21 +799,23 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <!-- الحالة والإجراءات -->
               <th class="group-status"> الحالة</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
-              <th class="ems-fn-th none" data-fn="1">نموذج العمل</th>
+              <!-- XF-01: «نموذج التسعير» و«حالة خط الاساس» و«رقم التجديد» لا عمود لها في
+                   contracts (خط الاساس في جدوله المستقل) — فتبقى معلنة حتى تبنى. -->
+              <th class="ems-fn-th none" data-fn="1" data-fn-src="business_model">نموذج العمل</th>
               <th class="ems-fn-th none" data-fn="1">رمز النموذج</th>
               <th class="ems-fn-th none" data-fn="1">العقد الأساسي</th>
               <th class="ems-fn-th none" data-fn="1">رقم التجديد</th>
-              <th class="ems-fn-th none" data-fn="1">العميل</th>
-              <th class="ems-fn-th none" data-fn="1">تاريخ البدء</th>
-              <th class="ems-fn-th none" data-fn="1">تاريخ الانتهاء</th>
-              <th class="ems-fn-th none" data-fn="1">المدة بالأشهر</th>
+              <th class="ems-fn-th none" data-fn="1" data-fn-src="client">العميل</th>
+              <th class="ems-fn-th none" data-fn="1" data-fn-src="start_date">تاريخ البدء</th>
+              <th class="ems-fn-th none" data-fn="1" data-fn-src="end_date">تاريخ الانتهاء</th>
+              <th class="ems-fn-th none" data-fn="1" data-fn-src="months">المدة بالأشهر</th>
               <th class="ems-fn-th none" data-fn="1">نموذج التسعير</th>
               <th class="ems-fn-th none" data-fn="1">نوع القيمة</th>
               <th class="ems-fn-th none" data-fn="1">القيمة الموقعة</th>
-              <th class="ems-fn-th none" data-fn="1">عملة الفوترة</th>
+              <th class="ems-fn-th none" data-fn="1" data-fn-src="bill_currency">عملة الفوترة</th>
               <th class="ems-fn-th none" data-fn="1">عملة التحصيل</th>
               <th class="ems-fn-th none" data-fn="1">دورة التسوية</th>
-              <th class="ems-fn-th none" data-fn="1">مهلة السداد</th>
+              <th class="ems-fn-th none" data-fn="1" data-fn-src="grace_days">مهلة السداد</th>
               <th class="ems-fn-th none" data-fn="1">نسبة المقدم</th>
               <th class="ems-fn-th none" data-fn="1">شامل الضريبة؟</th>
               <th class="ems-fn-th none" data-fn="1">حالة خط الأساس</th>
@@ -1186,7 +1188,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 
 
-                echo "<tr>";
+                echo "<tr data-xf=\"" . htmlspecialchars(json_encode(array(
+                    'business_model' => (string) ($row['business_model'] ?? ''),
+                    'client'         => (string) ($row['client_name'] ?? ''),
+                    'start_date'     => (string) ($row['actual_start'] ?? ''),
+                    'end_date'       => (string) ($row['actual_end'] ?? ''),
+                    'months'         => (string) ($row['contract_duration_months'] ?? ''),
+                    'bill_currency'  => (string) ($row['price_currency_contract'] ?? ''),
+                    'grace_days'     => (string) ($row['grace_period_days'] ?? ''),
+                ), JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8') . "\">";
                 echo "<td class='group-status'>" . $actions_html . "</td>";
 
                 /* INJ-0001: حالةُ العقدِ ونقلُها — من آلةِ الحالةِ لا من نصٍّ حر.

@@ -561,7 +561,9 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
                     <th>الإجراءات</th><th>الكود</th><th>المورد</th><th>التصنيف</th><th>العملة</th>
                     <th>الإجمالي</th><th>الحالة</th><th>الاستلام/التأخر</th><th>مرجع الاعتماد المالي</th><th>أنشئ</th>
                     <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
-                    <th class="ems-fn-th" data-fn="1">رقم الأمر</th>
+                    <!-- XF-01: «الرقم الضريبي للمورد» لا يوصل — معرف ضريبي حساس لطرف ثالث.
+                         و«الاصناف» و«رقم قطعة المصنع» و«الكمية» و«سعر الوحدة» حبة سطر لا حبة امر. -->
+                    <th class="ems-fn-th" data-fn="1" data-fn-src="order_no">رقم الأمر</th>
                     <th class="ems-fn-th" data-fn="1">تاريخ الإصدار</th>
                     <th class="ems-fn-th" data-fn="1">الرقم الضريبي للمورد</th>
                     <th class="ems-fn-th" data-fn="1">مرجع الترسية</th>
@@ -569,13 +571,13 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
                     <th class="ems-fn-th" data-fn="1">رقم قطعة المصنع</th>
                     <th class="ems-fn-th" data-fn="1">الكمية</th>
                     <th class="ems-fn-th" data-fn="1">سعر الوحدة</th>
-                    <th class="ems-fn-th" data-fn="1">الإجمالي قبل الضريبة</th>
+                    <th class="ems-fn-th" data-fn="1" data-fn-src="base_amount">الإجمالي قبل الضريبة</th>
                     <th class="ems-fn-th" data-fn="1">نسبة الضريبة</th>
-                    <th class="ems-fn-th" data-fn="1">قيمة الضريبة</th>
-                    <th class="ems-fn-th" data-fn="1">وقت الدفع</th>
-                    <th class="ems-fn-th none" data-fn="1">نوع الاستلام</th>
+                    <th class="ems-fn-th" data-fn="1" data-fn-src="tax_amount">قيمة الضريبة</th>
+                    <th class="ems-fn-th" data-fn="1" data-fn-src="payment_time">وقت الدفع</th>
+                    <th class="ems-fn-th none" data-fn="1" data-fn-src="receipt_type">نوع الاستلام</th>
                     <th class="ems-fn-th none" data-fn="1">الوجهة</th>
-                    <th class="ems-fn-th none" data-fn="1">تاريخ التوريد المتفق</th>
+                    <th class="ems-fn-th none" data-fn="1" data-fn-src="agreed_delivery">تاريخ التوريد المتفق</th>
                     <th class="ems-fn-th none" data-fn="1">أصدره</th>
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                     <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
@@ -595,8 +597,11 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
                     // ترطيب ثنائي: الأوامر ثم أسماء الموردين بجلبٍ واحد (دلالة LEFT JOIN)
                     $gv = proc_gate($is_super_admin);
                     $order_rows = $gv->select('proc_order', array(
+                        /* XF-01: اضيفت payment_time وexpected_receipt_type وbase_amount
+                           وtax_amount لتصير رؤوسها بيانات لا شرطات. */
                         'columns' => array('id', 'code', 'op_classification', 'currency', 'total_amount', 'state', 'fin_approval_ref', 'created_at', 'supplier_id',
-                                           'received_pct', 'expected_delivery_date', 'final_receipt_at'),
+                                           'received_pct', 'expected_delivery_date', 'final_receipt_at',
+                                           'payment_time', 'expected_receipt_type', 'base_amount', 'tax_amount'),
                         'orderBy' => 'id DESC',
                     ));
                     $sup_names = array();
@@ -614,7 +619,14 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
                     { foreach ($order_rows as $row) {
                         $row['supplier_name'] = ($row['supplier_id'] !== null && isset($sup_names[intval($row['supplier_id'])]))
                             ? $sup_names[intval($row['supplier_id'])] : null;
-                        echo "<tr>";
+                        echo "<tr data-xf=\"" . htmlspecialchars(json_encode(array(
+                            'order_no'        => (string) ($row['code'] ?? ''),
+                            'base_amount'     => (string) ($row['base_amount'] ?? ''),
+                            'tax_amount'      => (string) ($row['tax_amount'] ?? ''),
+                            'payment_time'    => (string) ($row['payment_time'] ?? ''),
+                            'receipt_type'    => (string) ($row['expected_receipt_type'] ?? ''),
+                            'agreed_delivery' => (string) ($row['expected_delivery_date'] ?? ''),
+                        ), JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8') . "\">";
                         echo "<td><div class='action-btns'>";
                         if ($can_edit) {
                             echo "<a href='?edit_id=" . intval($row['id']) . "' class='action-btn edit' title='تعديل'><i class='fas fa-edit'></i></a>";
