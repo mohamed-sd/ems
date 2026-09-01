@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-02 07:04:00
--- الجداول: 1231 · المناظير: 28
+-- المصدر: equipation_manage · التوليد: 2026-09-01 09:40:22
+-- الجداول: 1233 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -11669,6 +11669,50 @@ CREATE TABLE `gov_stage_outputs` (
   UNIQUE KEY `uq_stage` (`role_id`,`stage_no`),
   KEY `ix_src` (`output_source`,`next_source`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='⑨ المستندُ الناتجُ والحالةُ التالية — ولكلِّ خانةٍ مصدرُها المعلَن';
+
+-- ── Table: gov_state_model_bind ──
+CREATE TABLE `gov_state_model_bind` (
+  `bind_id` varchar(28) NOT NULL,
+  `model_code` varchar(48) NOT NULL,
+  `screen_id` varchar(24) NOT NULL,
+  `route` varchar(190) NOT NULL,
+  `workspace_id` varchar(24) DEFAULT NULL,
+  `grain_entity` varchar(64) NOT NULL,
+  `bind_rule` varchar(190) NOT NULL COMMENT 'قاعدةُ الربطِ — ⛔ ولا رَبطَ بالاسمِ وحدَه (§14)',
+  `bind_witness` varchar(255) NOT NULL COMMENT 'الشاهدُ المقيس',
+  `confidence` enum('EXACT_ENTITY','ENTITY_ALIAS','ROUTE_TOKEN','OWNER_UNIT') NOT NULL COMMENT 'كيف طُوبِق — والأضعفُ يُعلَن لا يُخفى',
+  `created_at` datetime NOT NULL,
+  PRIMARY KEY (`bind_id`),
+  UNIQUE KEY `uq_screen` (`screen_id`),
+  KEY `ix_model` (`model_code`),
+  KEY `ix_route` (`route`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GOV_UI_EXEC §14 — ربطُ السطحِ بآلتِه بقاعدةٍ وشاهدٍ ودرجةِ ثقة';
+
+-- ── Table: gov_state_models ──
+CREATE TABLE `gov_state_models` (
+  `model_code` varchar(48) NOT NULL COMMENT 'SM-<موجة>-<كيان> — ثابتٌ لا يتغيّر بإعادةِ تسمية',
+  `wave` varchar(8) NOT NULL COMMENT '04..08',
+  `unit_ar` varchar(190) NOT NULL COMMENT 'عمود «الوحدة» — الإدارةُ المالكة',
+  `workspace_id` varchar(24) DEFAULT NULL COMMENT 'المساحةُ بعد الجسر',
+  `entity_code` varchar(64) NOT NULL COMMENT 'الشقُّ اللاتينيُّ من عمود «الكيان»',
+  `entity_ar` varchar(190) NOT NULL COMMENT 'عمود «الكيان» كاملًا',
+  `states_flow` text NOT NULL COMMENT '① الحالاتُ والانتقالاتُ المسموحة',
+  `forbidden` text NOT NULL COMMENT '② الانتقالاتُ الممنوعةُ ومُسبِّباتُها',
+  `transition_owner` text NOT NULL COMMENT '③ مَن يملك الانتقال — فصلُ الواجبات',
+  `preconditions` text NOT NULL COMMENT '④ الشرطُ المسبقُ لكلِّ انتقال',
+  `reopen_cancel` text NOT NULL COMMENT '⑤ إعادةُ الفتحِ/الإلغاء',
+  `approval_gate` varchar(190) NOT NULL DEFAULT 'محرّكُ الاعتمادِ المركزيّ' COMMENT '⑥ بوّابةُ الاعتماد — محرّكٌ قائمٌ يُشار إليه لا يُنسَخ',
+  `audit_channel` varchar(190) NOT NULL DEFAULT 'EventPublisher · ems_business_events' COMMENT '⑦ الأثرُ والتدقيق — قناةٌ قائمة',
+  `state_count` smallint(5) unsigned NOT NULL DEFAULT 0 COMMENT 'عددُ الحالاتِ المستخرَجة',
+  `source_file` varchar(190) NOT NULL,
+  `source_sheet` varchar(64) NOT NULL,
+  `source_row` smallint(5) unsigned NOT NULL,
+  `version` smallint(5) unsigned NOT NULL DEFAULT 1,
+  `created_at` datetime NOT NULL,
+  PRIMARY KEY (`model_code`),
+  KEY `ix_entity` (`entity_code`),
+  KEY `ix_ws` (`workspace_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GOV_UI_EXEC §14 — آلاتُ الحالةِ كما تُعرِّفها الملفاتُ الحاكمةُ وحدَها';
 
 -- ── Table: gov_target_nav ──
 CREATE TABLE `gov_target_nav` (

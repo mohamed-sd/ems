@@ -102,18 +102,38 @@ $rows[] = array('GRAIN_CONFORMANCE', $gn, $gd,
     'يجمع حبّتَين ' . $gMulti . ' · بلا حبّةٍ مقيسةٍ ' . $gNone
     . ' · وغيرُ المبنيِّ خارجَ المقام', 'govui_target_registry × rpr02_grain_measure');
 
-/* ⓪ STATE_MODEL_CONFORMANCE — والمقامُ **المطالَبُ** لا المبنيُّ كلُّه
-   ◆ «المطلوب» مقيسٌ لا مفترَض: سطحٌ حبّتُه سطرٌ أو بندٌ من حقيقةِ أعمالٍ
-     يملكُها (`grain_cardinality IN (ROW,LINE)` و`grain_fact_scope = OWN_FACT`) —
-     وهو مدى `rpr02_state_model_bind` حرفًا فلا مقامانِ لسؤالٍ واحد.
-   ⛔ ومرجعٌ أجوفٌ أسوأُ من غيابِه — فالبسطُ مرجعٌ مؤلَّفٌ لا خانةٌ ملأى. */
+/* ⓪ STATE_MODEL — **طبقتان، ومقامٌ مفروزٌ بالدليلِ لا مُقتَطَع**
+   ◆ **العطبُ المقيسُ في هذه الجولة**: البسطُ كان «`state_model_ref` غيرُ فارغ»
+     = 271/392 — و**المرجعُ فيها مؤشِّرُ جدولٍ لا نموذجُ حالة**: لا حالاتٍ ولا
+     انتقالاتٍ ولا ممنوعةً ولا مالكَ انتقالٍ ولا شرطًا مسبقًا.
+     و§14 يقول حرفًا: **«ولا تربطِ النموذجَ بالاسمِ وحدَه»** — والمحظورُ ④ في
+     §5: «المرجعُ الأجوفُ يُقرأ خُضرةً وهو فراغ». **فـ271 خضرةٌ كاذبة.**
+   ◆ **والمطلوبُ يُعرِّفه الملفُّ الحاكمُ لا الحبّة**: ورقةُ `08_آلات_الحالة`
+     في الموجاتِ الخمسِ تُعرِّف **62 آلةً** — فما قابلها **مطلوبٌ**، وما لا
+     **لا يوجب له ملفٌّ آلة**. والمقامُ الأوسعُ **يبقى مُعلَنًا مفروزًا**.
+   ⛔ **ولا يُقتَطَع مقامٌ صامتًا** — الثلاثةُ تُعَدُّ وتُسمّى في سطرٍ واحد. */
 $SMSCOPE = "repair01_screen_registry WHERE on_disk = 1 AND ownership_verdict <> 'RETIRE'
             AND grain_cardinality IN ('ROW','LINE') AND grain_fact_scope = 'OWN_FACT'";
-$sd = $one("SELECT COUNT(*) FROM $SMSCOPE");
-$sn = $one("SELECT COUNT(*) FROM $SMSCOPE AND state_model_ref <> ''");
-$rows[] = array('STATE_MODEL_CONFORMANCE', $sn, $sd,
-    'المقامُ أسطحُ المعاملاتِ الحقيقيّةُ وحدها (حبّةٌ سطرٌ/بندٌ وحقيقةٌ مملوكة) · والباقي بلا آلةٍ مؤلَّفةٍ — والتأليفُ حكمُ أعمالٍ لا قياس',
-    'rpr02_state_model_bind (المدى نفسُه)');
+$sd    = $one("SELECT COUNT(*) FROM $SMSCOPE");
+$sRef  = $one("SELECT COUNT(*) FROM $SMSCOPE AND state_model_ref <> ''");
+$gov   = $one("SELECT COUNT(*) FROM gov_state_model_bind");
+$govOk = $one("SELECT COUNT(*) FROM gov_state_model_bind b
+                JOIN gov_state_models m ON m.model_code = b.model_code
+               WHERE m.states_flow <> '' AND m.forbidden <> '' AND m.transition_owner <> ''
+                 AND m.preconditions <> '' AND m.reopen_cancel <> ''");
+$noState = $one("SELECT COUNT(*) FROM $SMSCOPE
+            AND screen_id NOT IN (SELECT screen_id FROM gov_state_model_bind)
+            AND grain_entity NOT IN (SELECT DISTINCT TABLE_NAME FROM information_schema.COLUMNS
+                                      WHERE TABLE_SCHEMA = DATABASE()
+                                        AND COLUMN_NAME REGEXP '(^|_)(status|state|stage|phase)($|_)')");
+$blk = $sd - $gov - $noState;
+$rows[] = array('STATE_MODEL_CONFORMANCE', $govOk, $gov,
+    'المطلوبُ = ما تُعرِّف له ورقةُ 08 آلةً (62 آلةً حاكمة) · والبسطُ آلةٌ '
+    . 'بحقولِها الخمسةِ لا مرجعٌ باسم · والمقامُ الأوسع ' . $sd . ' مفروزٌ: '
+    . $gov . ' مطلوب + ' . $blk . ' BLOCKED_OWNER + ' . $noState
+    . ' مرجعيٌّ بلا عمودِ حالة · (‏وسابقًا يُقاس ' . $sRef . '/' . $sd
+    . ' بمرجعٍ باسمٍ لا بنموذج)',
+    'gov_state_model_bind × gov_state_models · govui_state_author');
 
 /* ⑪ STRUCTURAL_DEPARTMENT_PASS */
 $rows[] = array('STRUCTURAL_DEPARTMENT_PASS', $grab('STRUCTURAL_NAV_PASS'), '',
