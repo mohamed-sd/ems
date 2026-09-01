@@ -377,9 +377,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <th>الإجراءات</th><th>رقم القيد</th><th>تاريخ القيد</th><th>مدين</th><th>دائن</th>
                     <th>التوازن</th><th>البيان</th><th>الحالة</th>
                     <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
-                    <th class="ems-fn-th" data-fn="1">الفترة</th>
-                    <th class="ems-fn-th" data-fn="1">المصدر</th>
-                    <th class="ems-fn-th" data-fn="1">المرجع</th>
+                    <!-- XF-01: حلقة القيود تقرا fin_journal_entries بلا قائمة اعمدة فكلها متاحة.
+                         وما بقي عاريا هنا حبة سطر (اسم الحساب والمعادل مدين ودائن) لا حبة
+                         قيد — وسطح البنود غير سطح القيد. -->
+                    <th class="ems-fn-th" data-fn="1" data-fn-src="period">الفترة</th>
+                    <th class="ems-fn-th" data-fn="1" data-fn-src="source_kind">المصدر</th>
+                    <th class="ems-fn-th" data-fn="1" data-fn-src="source_ref">المرجع</th>
                     <th class="ems-fn-th" data-fn="1">اسم الحساب</th>
                     <th class="ems-fn-th" data-fn="1">بند القائمة المالية</th>
                     <th class="ems-fn-th" data-fn="1">المشروع</th>
@@ -390,7 +393,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <th class="ems-fn-th" data-fn="1">نموذج العمل</th>
                     <th class="ems-fn-th" data-fn="1">المعادل مدين</th>
                     <th class="ems-fn-th" data-fn="1">المعادل دائن</th>
-                    <th class="ems-fn-th" data-fn="1">الوصف</th>
+                    <th class="ems-fn-th" data-fn="1" data-fn-src="memo">الوصف</th>
                     <th class="ems-fn-th none" data-fn="1">أعده</th>
                     <th class="ems-fn-th none" data-fn="1">راجعه</th>
                     <th class="ems-fn-th none" data-fn="1">نشره</th>
@@ -419,7 +422,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         $st = (string)$row['state'];
                         $st_label = $st === 'posted' ? 'مرحل' : ($st === 'reversed' ? 'معكوس' : 'مسودة');
                         $st_tone  = $st === 'posted' ? 'success' : ($st === 'reversed' ? 'dark' : 'secondary');
-                        echo "<tr>";
+                        echo "<tr data-xf=\"" . htmlspecialchars(json_encode(array(
+                            'period'      => (string) ($row['period_code'] ?? ''),
+                            'source_kind' => (string) ($row['manual_kind'] ?? ''),
+                            'source_ref'  => (string) ($row['source_doc_ref'] ?? ''),
+                            'memo'        => (string) ($row['memo'] ?? ''),
+                        ), JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8') . "\">";
                         echo "<td><div class='action-btns'>";
                         if ($can_edit && $st === 'draft') {
                             echo "<a href='?post_id=" . intval($row['id']) . "&_t=" . fin_action_token() . "' class='action-btn edit' title='ترحيل' onclick='return confirm(\"ترحيل القيد؟ لا يرحل غير المتوازن.\")'><i class='fas fa-check-double'></i></a>";

@@ -669,15 +669,17 @@ include('../insidebar.php'); ?>
               <th class="group-status"><i class="fas fa-info-circle"></i> الحالة</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th none" data-fn="1">كود الموظف</th>
-              <th class="ems-fn-th none" data-fn="1">فئة العقد</th>
-              <th class="ems-fn-th none" data-fn="1">نوع العقد</th>
+              <!-- XF-01: فئة العقد ونوعه وفترة تجربته في employee_contracts الموحد، والوصلة
+                   ec قائمة ومعلنة في enrich — فاضيفت اعمدتها الى SELECT وحسب. -->
+              <th class="ems-fn-th none" data-fn="1" data-fn-src="contract_category">فئة العقد</th>
+              <th class="ems-fn-th none" data-fn="1" data-fn-src="relation_type">نوع العقد</th>
               <th class="ems-fn-th none" data-fn="1">عقد المورد المرتبط</th>
-              <th class="ems-fn-th none" data-fn="1">تاريخ البدء</th>
+              <th class="ems-fn-th none" data-fn="1" data-fn-src="start_date">تاريخ البدء</th>
               <th class="ems-fn-th none" data-fn="1">تاريخ الانتهاء المخطط</th>
               <th class="ems-fn-th none" data-fn="1">محفزات الانتهاء الثلاثة</th>
               <th class="ems-fn-th none" data-fn="1">المحفز الواقع</th>
               <th class="ems-fn-th none" data-fn="1">تاريخ الانتهاء الفعلي</th>
-              <th class="ems-fn-th none" data-fn="1">فترة التجربة</th>
+              <th class="ems-fn-th none" data-fn="1" data-fn-src="probation_end">فترة التجربة</th>
               <th class="ems-fn-th none" data-fn="1">الراتب الأساسي</th>
               <th class="ems-fn-th none" data-fn="1">بدل الطبيعة</th>
               <th class="ems-fn-th none" data-fn="1">إجمالي الأجر</th>
@@ -940,7 +942,11 @@ include('../insidebar.php'); ?>
             ), "SELECT sc.*,
                       op.name AS project_name,
                       ec.employee_id AS employee_id,
-                      ec.state AS unified_state
+                      ec.state AS unified_state,
+                      ec.category AS ec_category,
+                      ec.relation_type AS ec_relation_type,
+                      ec.probation_end AS ec_probation_end,
+                      ec.start_date AS ec_start_date
                       FROM contracts sc
                       LEFT JOIN employee_contracts ec
                         ON ec.source_table = 'contracts' AND ec.source_id = sc.id
@@ -968,7 +974,12 @@ include('../insidebar.php'); ?>
               }
               $status = "<font color='" . $statusColor . "'>" . $statusText . "</font>";
 
-              echo "<tr>";
+              echo "<tr data-xf=\"" . htmlspecialchars(json_encode(array(
+                  'contract_category' => (string) ($row['ec_category'] ?? ''),
+                  'relation_type'     => (string) ($row['ec_relation_type'] ?? ''),
+                  'probation_end'     => (string) ($row['ec_probation_end'] ?? ''),
+                  'start_date'        => (string) ($row['ec_start_date'] ?? ''),
+              ), JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8') . "\">";
 
               $actions_html = "<div class='action-btns'>
                         <a href='javascript:void(0)' class='editBtn action-btn edit' title='تعديل'
