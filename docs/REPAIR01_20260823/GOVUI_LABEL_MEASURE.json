@@ -1,9 +1,9 @@
 {
     "metric": "LABEL_CONFORMANCE",
-    "numerator": 306,
-    "denominator": 306,
+    "numerator": 307,
+    "denominator": 307,
     "excluded": {
-        "NOT_BUILT": 1,
+        "NOT_BUILT": 0,
         "NOT_RENDERED": 0,
         "NO_LIVE_ROLE": 44,
         "TAB_ON_PARENT": 22,
@@ -39,8 +39,7 @@
             "TAB_ON_PARENT": 1
         },
         "DEP-07": {
-            "EXACT_MATCH": 18,
-            "NOT_BUILT": 1,
+            "EXACT_MATCH": 19,
             "TAB_SURFACE": 5
         },
         "DEP-08": {
@@ -3422,19 +3421,19 @@
             "canonical": "خطة القوى العاملة",
             "canonical_norm": "خطه القوي العامله",
             "stored_target": "خطة القوى العاملة",
-            "screen_id": "",
-            "route": "",
-            "ptype": "NOT_BUILT",
+            "screen_id": "SCR-0912",
+            "route": "employees\/hr_headcount_plan.php",
+            "ptype": "MENU_ITEM",
             "group_canonical": "التوظيف والتعاقد",
             "group_stored": "التوظيف والتعاقد",
-            "rendered": "",
-            "st_canon": "",
-            "st_canon_status": "",
-            "st_reg": "",
-            "st_navi": "",
-            "st_mod": "",
-            "share": "",
-            "verdict": "NOT_BUILT"
+            "rendered": "خطة القوى العاملة",
+            "st_canon": "خطة القوى العاملة",
+            "st_canon_status": "APPROVED",
+            "st_reg": "خطة القوى العاملة",
+            "st_navi": "خطة القوى العاملة",
+            "st_mod": "خطة القوى العاملة",
+            "share": "OWNER",
+            "verdict": "EXACT_MATCH"
         },
         {
             "ws": "DEP-07",

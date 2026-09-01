@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-01 17:53:04
--- الجداول: 1050 · المناظير: 28
+-- المصدر: equipation_manage · التوليد: 2026-09-01 19:15:54
+-- الجداول: 1051 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -10384,6 +10384,29 @@ CREATE TABLE `hr_employee_document` (
   CONSTRAINT `chk_hred_state` CHECK (`state` in ('valid','expiring','expired','replaced')),
   CONSTRAINT `chk_hred_mand` CHECK (`is_mandatory` = 0 or `expires_at` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='W13 HR-08 - كل مستند بصلاحيته والالزامي المنتهي يعلم الملف';
+
+-- ── Table: hr_headcount_plan ──
+CREATE TABLE `hr_headcount_plan` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0,
+  `plan_code` varchar(255) DEFAULT NULL COMMENT 'معرّف السطر',
+  `plan_year` smallint(6) DEFAULT NULL COMMENT 'السنة ◄',
+  `org_unit_ref` varchar(120) DEFAULT NULL COMMENT 'الوحدة التنظيمية ◄',
+  `category_ref` varchar(120) DEFAULT NULL COMMENT 'الفئة ▼',
+  `approved_headcount` int(11) DEFAULT NULL COMMENT 'العدد المعتمد',
+  `actual_headcount` int(11) DEFAULT NULL COMMENT 'الفعلي ◄',
+  `headcount_gap` int(11) DEFAULT NULL COMMENT 'الفجوة ◄',
+  `open_vacancies` int(11) DEFAULT NULL COMMENT 'شواغر مفتوحة ◄',
+  `off_plan_approved` int(11) DEFAULT NULL COMMENT 'خارج الخطة بموافقة ◄',
+  `row_state` varchar(80) DEFAULT NULL COMMENT 'حالة السطر ▼',
+  `data_state` varchar(255) DEFAULT NULL COMMENT 'حالة البيانات ▼',
+  `src_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_06ac83b6_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='DEP-07 — خطة القوى العاملة · الحبة: سطرُ خطةٍ واحدٌ: وحدةٌ تنظيميّةٌ × فئةٌ × سنة';
 
 -- ── Table: hr_job_movement ──
 CREATE TABLE `hr_job_movement` (
