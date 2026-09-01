@@ -644,6 +644,78 @@ foreach ($BL['snapshot'] as $ws => $s) {
     }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   ④-ب · **ممرُّ ورقةِ الدليل** — هدفٌ مبنيٌّ لا يمرُّ بالتصييرِ فلا موضعَ له
+   ═══════════════════════════════════════════════════════════════════════════
+   ◆ **العطبُ مقيسٌ لا مستنتَج** (`SILENT_DROP_SCAN` @ `5641f8c9`): مقامُ هذا
+     الملفِّ كلِّه `NAV_ARCH_BASELINE.snapshot` — أي **ما يُصيَّر اليومَ**. فورقةُ
+     الدليلِ تُقرأ لتصنيفِ الظاهرِ، **ولا يُسأل قطُّ عمّا في الورقةِ ولم يظهر**.
+     ⇒ فهدفٌ مبنيٌّ لا صفَّ له في `nav_items` — أو مساحتُه بلا دورٍ مربوطٍ
+     فتُقرأ `rendered = null` — **يسقط من السجلِّ الحاكمِ صامتًا**، ثمَّ يحجبه
+     §22 (`No Placement = No Sidebar Render`) فيختفي من الشاشةِ بلا حكمٍ مكتوب.
+   ◆ **المقيسُ حرفًا**: 413 ورقةَ دليلٍ لها مسارٌ، **23 منها بلا موضعٍ حاكم** —
+     و**مساحتانِ كاملتانِ صفرٌ**: `EX-DVP` (12) لأنَّ `nav_ws_roles` لا يحمل لها
+     صفًّا أصلًا، و`WS-MY` (7) للسببِ نفسِه. ⛔ **وهذا سقوطُ أداةٍ لا سقوطُ بناء**
+     [[fix-the-tool-not-the-output]].
+   ⭐ **والحكمُ من الورقةِ نفسِها لا من اجتهاد**: الصنفُ والمجموعةُ والترتيبُ
+     كلُّها من صفِّ `nav_placements` الحاكم — ⛔ ولا يُخترَع منها شيء.
+   ⛔ **ولا يدخل الممرَّ إلّا مبنيٌّ على القرص** (§3-⓪): مسارُ `GAP:` وصنفُ
+     `NOT_BUILT` وملفٌّ غيرُ موجودٍ **تخرج بحكمٍ مكتوبٍ لا بصمت**.
+   ⛔ **ولا يُخلط عدُّه بعدِّ التصيير**: الطبقاتُ الخمسُ تبقى مجاميعَ ما صُيِّر
+     وحدَه فلا يرسُب حارسُ الثباتِ على تحسُّن [[ratchet-guards-progress-not]]. */
+$L2P = array('MENU_ITEM' => 'PRIMARY', 'LANDING_PAGE' => 'PRIMARY',
+             'TAB_CHILD' => 'TAB_CHILD', 'DIRECT_ONLY' => 'DIRECT_ONLY',
+             'PROJECTION' => 'EXECUTIVE_PROJECTION', 'UTILITY' => 'UTILITY');
+$seenWsRoute = array();
+foreach ($rows as $x) { $seenWsRoute[$x['ws'] . '|' . $x['route']] = true; }
+
+$leafRows = array(); $leafSkip = array();
+$rL = $conn->query("SELECT p.workspace_id, p.screen_id, p.route, p.target_ref, p.sort_no,
+                           p.placement_type, p.group_id, s.canonical_label_ar
+                      FROM nav_placements p
+                 LEFT JOIN repair01_screen_registry s ON s.screen_id = p.screen_id
+                     WHERE p.active = 1 AND p.route IS NOT NULL AND p.route <> ''
+                  ORDER BY p.workspace_id, p.group_id, p.sort_no, p.id");
+while ($lf = $rL->fetch_assoc()) {
+    $ws = (string) $lf['workspace_id'];
+    if ($onlyWs !== '' && $ws !== $onlyWs) { continue; }
+    $raw = (string) $lf['route'];
+    if (strncmp($raw, 'GAP:', 4) === 0) { continue; }        /* منصوصٌ بلا شاشةٍ حيّة */
+    $k = $rt($raw);
+    if ($k === '' || isset($seenWsRoute[$ws . '|' . $k])) { continue; }
+    $lpt = (string) $lf['placement_type'];
+    if (!isset($L2P[$lpt])) {                                 /* NOT_BUILT وما يشبهه */
+        $leafSkip[] = array($ws, $raw, 'NOT_A_BUILT_TYPE:' . $lpt); continue;
+    }
+    if (!is_file($ROOT . '/' . $raw)) {                       /* §3-⓪ — ليس مبنيًّا حقًّا */
+        $leafSkip[] = array($ws, $raw, 'NOT_REALLY_BUILT:file_missing'); continue;
+    }
+    /* الاسمُ الحاكمُ: هدفُ الورقةِ أوّلًا (‏`code·idx·name`) ثمَّ سجلُّ الشاشات */
+    $idx = ''; $nm = '';
+    $tref = explode("·", (string) $lf['target_ref']);   /* `code·idx·الاسم` */
+    if (count($tref) >= 3) { $idx = trim($tref[1]); $nm = trim(implode("·", array_slice($tref, 2))); }
+    $label = (string) $lf['canonical_label_ar'] !== '' ? (string) $lf['canonical_label_ar'] : $nm;
+    /* ⭐ **و«مساحة عملي» صنفُها `PERSONAL` بنصِّ §11** ولو كان صفُّ الورقةِ
+       `MENU_ITEM` — فبنودُها ليست دورةَ إدارةٍ، والمفردةُ قائمةٌ لا تُستحدَث
+       [[enum-vocabulary-consumers]]. */
+    $pt = ($ws === 'WS-MY' && $L2P[$lpt] === 'PRIMARY') ? 'PERSONAL' : $L2P[$lpt];
+    $rc = ($pt === 'PERSONAL') ? 'PERSONAL_WS_MY_S11' : 'GUIDE_LEAF_WITHOUT_PLACEMENT_S22';
+    $leafRows[] = array(
+        'ws' => $ws, 'n' => (int) $lf['sort_no'], 'group' => '', 'label' => $label,
+        'route' => $k, 'layer' => 'GUIDE_LEAF', 'placement_type' => $pt,
+        'action' => 'KEEP_PRIMARY', 'disposition' => '', 'reason_code' => $rc,
+        'evidence' => 'nav_placements#' . $ws . ' · target_ref = ' . (string) $lf['target_ref']
+                    . ' · صنفُ الورقة ' . $lpt . ' · ' . $raw . ' موجودٌ على القرص',
+        'governing_source' => '01 · الدليل المعماري.xlsx · ورقة ' . $ws
+                    . ($idx !== '' ? ' · بند ' . $idx : '')
+                    . ' — NAV-ARCH-02 §8 · §22: هدفُ ورقةٍ مبنيٌّ يلزمه موضعٌ حاكم',
+        'access_path' => '', 'need_case' => '', 'level' => 'L1_ARCHITECTURE',
+        'rendered' => ($pt === 'PRIMARY' || $pt === 'SECONDARY_APPROVED'),
+        'screen_id' => (string) $lf['screen_id'], 'leaf_gid' => (int) $lf['group_id'],
+    );
+    $seenWsRoute[$ws . '|' . $k] = true;
+}
+
 /* ═══ ⑤ حارسُ الثبات: مجاميعُ الطبقاتِ يجب أن تطابقَ **القارئَ الثانيَ الحيَّ** ══
    ◆ **غرضُ الحارسِ**: طبقةٌ تُحسب بحسابَين — هذا الملفُ و`tools/sidebar_layer_map.php`
      — **يكذب أحدُهما إن اختلفا** [[counter-parity-two-readers]].
@@ -698,6 +770,17 @@ foreach ($ptCnt as $k => $v) { printf("     %-34s %4d\n", $k, $v); }
 echo "\n  ── رموزُ السببِ (§18) ──\n";
 arsort($reasonCnt);
 foreach ($reasonCnt as $k => $v) { printf("     %-42s %4d\n", $k, $v); }
+
+/* ══ ممرُّ ورقةِ الدليل: ما لم يُصَيَّر قطُّ — ويُعلَن مفصولًا عن طبقاتِ التصيير ══ */
+if ($leafRows || $leafSkip) {
+    $lpc = array();
+    foreach ($leafRows as $x) { $k = $x['ws']; $lpc[$k] = (isset($lpc[$k]) ? $lpc[$k] : 0) + 1; }
+    ksort($lpc);
+    printf("\n  ── ممرُّ ورقةِ الدليل (§8·§22): هدفٌ مبنيٌّ بلا موضعٍ — **%d** موضعًا يُستردُّ ──\n", count($leafRows));
+    foreach ($lpc as $w => $n) { printf("     %-10s %3d\n", $w, $n); }
+    foreach ($leafSkip as $sk) { printf("     ⛔ %-8s %-44s %s\n", $sk[0], mb_substr($sk[1], 0, 42), $sk[2]); }
+    $rows = array_merge($rows, $leafRows);
+}
 
 /* ═══ فائضُ الظهورِ: مسارٌ واحدٌ مرَّتَين في سايدبارِ مساحةٍ واحدة ══════════
    ◆ **ولا يُبتلَع بالمفتاحِ الفريد**: السجلُّ الحاكمُ مفتاحُه `(مساحة, مسار)`
@@ -762,6 +845,10 @@ $nP = $nC = $nL = 0;
 $errP = $errC = $errL = array();
 foreach ($rows as $x) {
     $sid = isset($canon[$x['route']]) ? (string) $canon[$x['route']]['screen_id'] : '';
+    /* ⛔ **وممرُّ الورقةِ هويّتُه من صفِّها لا من `nav_canonical`**: المسارُ الذي لم
+       يُصَيَّر قطُّ قد لا يكون له صفٌّ في المعياريّةِ أصلًا — وهويّةٌ تُترَك `NULL`
+       تكسر نسَبَ الهدفِ (`TARGET_LINEAGE_BROKEN`). */
+    if ($sid === '' && isset($x['screen_id'])) { $sid = (string) $x['screen_id']; }
     $sid = ($sid === '' ? null : $sid);
     $pid = 'WP-' . strtoupper(substr(sha1($x['ws'] . '|' . $x['route']), 0, 16));
 
@@ -770,6 +857,7 @@ foreach ($rows as $x) {
         /* المجموعةُ من **ورقةِ الدليلِ ثمَّ الجدولِ المستهدَفِ المنشور** — ولا
            تُؤخذ مجموعةُ مساحةٍ أخرى ولا تُصطنع افتراضيّةٌ (انظر `$gidFor`). */
         $gid = $gidFor($x['ws'], $x['route']);
+        if ($gid === null && isset($x['leaf_gid']) && $x['leaf_gid'] > 0) { $gid = (int) $x['leaf_gid']; }
         $ap  = ($x['placement_type'] === 'SECONDARY_APPROVED') ? 'NAV-ARCH-02 §12-هـ · nav_canonical APPROVED' : null;
         $st  = ($x['action'] === 'ESCALATE') ? 'BLOCKED' : 'ACTIVE';
         $cb  = 'tools/navarch/classify.php@' . $BLID;

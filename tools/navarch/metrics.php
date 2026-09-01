@@ -373,6 +373,39 @@ foreach ($M as $ws => $m) {
         $m['TARGET_LINEAGE_BROKEN'], $m['EXACT_WORKSPACE_NAV_CONFORMANCE']);
 }
 
+/* ═══ §26-ز · `TARGET_WITHOUT_PLACEMENT` — **المقياسُ الذي كان غائبًا** ═══
+   ◆ `TARGET_NAV_RECALL` مقامُه **مواضعُ الدليلِ المسجَّلة** لا **أهدافُ الدليلِ
+     نفسِها**: فهدفٌ لم يُنشأ له موضعٌ قطُّ يسقط من البسطِ والمقامِ معًا فتبقى
+     النسبةُ 100٪ **وهي عمياءُ عن غيابِه** [[measure-blind-spots]]. قِيس أثرُه
+     حرفًا: **58 هدفًا مبنيًّا بلا موضعٍ حاكم** ولوحةُ §26 كلُّها خضراء.
+   ⇒ **فالغيابُ يدخل اللوحةَ بمقياسٍ خاصٍّ به** — ومصدرُه المسحُ الحيُّ لا رقمٌ
+     منقول: `tools/navarch/silent_drop_scan.php`. ⛔ **ولا يُجمَع في نسبةٍ مع
+     غيرِه** (§5 · SILENT_DROP_FIX §5).
+   ⛔ **ولا يُقرأ من مخرَجٍ متقادم**: إن غاب الملفُّ أو غايرت لقطتُه لقطةَ هذا
+     التشغيلِ **يُعلَن «غيرُ مقيسٍ»** ولا يُكتب صفرٌ [[staleness-by-fact-not-clock]]. */
+$SNAP = trim((string) shell_exec('git -C ' . escapeshellarg($ROOT) . ' rev-parse --short HEAD'));
+$SDJ = $ROOT . '/docs/REPAIR01_20260823/navarch/SILENT_DROP_SCAN.json';
+$twp = null; $twpNote = 'مخرَجُ المسحِ غائبٌ — شغّل tools/navarch/silent_drop_scan.php';
+if (is_file($SDJ)) {
+    $sd = json_decode(file_get_contents($SDJ), true);
+    if (is_array($sd) && isset($sd['totals']['DROP'])) {
+        if ((string) $sd['snapshot'] === (string) $SNAP) {
+            $twp = (int) $sd['totals']['DROP']; $twpNote = '';
+        } else {
+            $twpNote = 'لقطةُ المسحِ `' . $sd['snapshot'] . '` لا تطابق `' . $SNAP . '`';
+        }
+    }
+}
+echo "\n── §26-ز · الغيابُ نفسُه مقياسًا ──\n";
+if ($twp === null) { echo "  ◆ **`TARGET_WITHOUT_PLACEMENT` غيرُ مقيسٍ** — {$twpNote}\n"; }
+else {
+    printf("  %s `TARGET_WITHOUT_PLACEMENT` = **%d** · و`GUIDE_TARGET_PLACED` = **%d** من %d هدفًا مبنيًّا\n",
+        ($twp === 0 ? '✔' : '✘'), $twp,
+        (int) $sd['totals']['OK'] + (int) $sd['totals']['SERVED'],
+        (int) $sd['totals']['T'] - (int) $sd['totals']['NB']);
+    echo "  ◆ **ولا تُجمع مع نسبِ اللوحةِ**: مقامُها الظهورُ ومقامُ هذه أهدافُ الورقة.\n";
+}
+
 /* §40 — معاييرُ الطيّارِ الاثنا عشرَ */
 $pilot = 'DEP-11';
 if (isset($M[$pilot])) {

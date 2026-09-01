@@ -1,741 +1,293 @@
 {
-    "snapshot": "8b43675b",
+    "snapshot": "943f0538",
     "totals": {
         "T": 413,
         "NB": 173,
-        "OK": 182,
-        "DROP": 58,
-        "ELSEWHERE": 0
+        "OK": 229,
+        "DROP": 0,
+        "ELSEWHERE": 0,
+        "SERVED": 11
     },
     "by_workspace": {
         "DEP-01": {
             "T": 20,
             "NB": 9,
-            "OK": 9,
-            "DROP": 2,
-            "EL": 0
+            "OK": 11,
+            "DROP": 0,
+            "EL": 0,
+            "SV": 0
         },
         "DEP-02": {
             "T": 31,
             "NB": 10,
-            "OK": 20,
-            "DROP": 1,
-            "EL": 0
+            "OK": 21,
+            "DROP": 0,
+            "EL": 0,
+            "SV": 0
         },
         "DEP-03": {
             "T": 25,
             "NB": 7,
             "OK": 18,
             "DROP": 0,
-            "EL": 0
+            "EL": 0,
+            "SV": 0
         },
         "DEP-04": {
             "T": 37,
             "NB": 24,
             "OK": 7,
-            "DROP": 6,
-            "EL": 0
+            "DROP": 0,
+            "EL": 0,
+            "SV": 6
         },
         "DEP-05": {
             "T": 25,
             "NB": 13,
-            "OK": 6,
-            "DROP": 6,
-            "EL": 0
+            "OK": 11,
+            "DROP": 0,
+            "EL": 0,
+            "SV": 1
         },
         "DEP-06": {
             "T": 18,
             "NB": 6,
-            "OK": 6,
-            "DROP": 6,
-            "EL": 0
+            "OK": 12,
+            "DROP": 0,
+            "EL": 0,
+            "SV": 0
         },
         "DEP-07": {
             "T": 24,
             "NB": 5,
-            "OK": 13,
-            "DROP": 6,
-            "EL": 0
+            "OK": 19,
+            "DROP": 0,
+            "EL": 0,
+            "SV": 0
         },
         "DEP-08": {
             "T": 32,
             "NB": 5,
-            "OK": 14,
-            "DROP": 13,
-            "EL": 0
+            "OK": 27,
+            "DROP": 0,
+            "EL": 0,
+            "SV": 0
         },
         "DEP-09": {
             "T": 13,
             "NB": 6,
             "OK": 7,
             "DROP": 0,
-            "EL": 0
+            "EL": 0,
+            "SV": 0
         },
         "DEP-10": {
             "T": 13,
             "NB": 5,
             "OK": 8,
             "DROP": 0,
-            "EL": 0
+            "EL": 0,
+            "SV": 0
         },
         "DEP-11": {
             "T": 12,
             "NB": 9,
             "OK": 3,
             "DROP": 0,
-            "EL": 0
+            "EL": 0,
+            "SV": 0
         },
         "DEP-12": {
             "T": 19,
             "NB": 18,
             "OK": 1,
             "DROP": 0,
-            "EL": 0
+            "EL": 0,
+            "SV": 0
         },
         "DEP-13": {
             "T": 17,
             "NB": 15,
             "OK": 2,
             "DROP": 0,
-            "EL": 0
+            "EL": 0,
+            "SV": 0
         },
         "DEP-14": {
             "T": 17,
             "NB": 7,
-            "OK": 7,
-            "DROP": 3,
-            "EL": 0
+            "OK": 9,
+            "DROP": 0,
+            "EL": 0,
+            "SV": 1
         },
         "DEP-15": {
             "T": 13,
             "NB": 2,
-            "OK": 9,
-            "DROP": 2,
-            "EL": 0
+            "OK": 11,
+            "DROP": 0,
+            "EL": 0,
+            "SV": 0
         },
         "DEP-16": {
             "T": 16,
             "NB": 3,
             "OK": 11,
-            "DROP": 2,
-            "EL": 0
+            "DROP": 0,
+            "EL": 0,
+            "SV": 2
         },
         "DEP-17": {
             "T": 19,
             "NB": 10,
-            "OK": 7,
-            "DROP": 2,
-            "EL": 0
+            "OK": 8,
+            "DROP": 0,
+            "EL": 0,
+            "SV": 1
         },
         "EX-CEO": {
             "T": 26,
             "NB": 6,
             "OK": 20,
             "DROP": 0,
-            "EL": 0
+            "EL": 0,
+            "SV": 0
         },
         "EX-DVP": {
             "T": 12,
             "NB": 3,
-            "OK": 0,
-            "DROP": 9,
-            "EL": 0
+            "OK": 9,
+            "DROP": 0,
+            "EL": 0,
+            "SV": 0
         },
         "IAF": {
             "T": 17,
             "NB": 3,
             "OK": 14,
             "DROP": 0,
-            "EL": 0
+            "EL": 0,
+            "SV": 0
         },
         "WS-MY": {
             "T": 7,
             "NB": 7,
             "OK": 0,
             "DROP": 0,
-            "EL": 0
+            "EL": 0,
+            "SV": 0
         }
     },
     "rows": [
-        [
-            "DEP-01",
-            2,
-            "التعريف بالعميل والمشروع",
-            "جهات اتصال العملاء",
-            "SCR-0034",
-            "client_contacts.php",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-01",
-            8,
-            "العرض والتفاوض",
-            "بنود العروض",
-            "SCR-0043",
-            "quotation_lines.php",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-02",
-            2,
-            "التأسيس",
-            "جهات الاتصال والمفوضون",
-            "SCR-0575",
-            "supplier_contacts.php",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
         [
             "DEP-04",
             4,
             "تسجيل الأصل ودخوله",
             "التحقق من المصدر",
-            "—",
-            "—",
+            "SCR-0652",
+            "fleet\/asset_intake.php",
             "IMPLEMENTED_NOT_VERIFIED",
-            "SILENT_DROP"
+            "SERVED_BY_SCR-0652"
         ],
         [
             "DEP-04",
             5,
             "تسجيل الأصل ودخوله",
             "أمر التفتيش",
-            "—",
-            "—",
+            "SCR-0652",
+            "fleet\/asset_intake.php",
             "IMPLEMENTED_NOT_VERIFIED",
-            "SILENT_DROP"
+            "SERVED_BY_SCR-0652"
         ],
         [
             "DEP-04",
             11,
             "إدخال الأصل للتشغيل",
             "التفعيل وإعادة الخدمة",
-            "—",
-            "—",
+            "SCR-0652",
+            "fleet\/asset_intake.php",
             "IMPLEMENTED_NOT_VERIFIED",
-            "SILENT_DROP"
+            "SERVED_BY_SCR-0652"
         ],
         [
             "DEP-04",
             13,
             "الحركة والاستخدام",
             "حركة الموقع والمشروع",
-            "—",
-            "—",
+            "SCR-0654",
+            "fleet\/asset_assignments.php",
             "EVIDENCE_CLOSED",
-            "SILENT_DROP"
+            "SERVED_BY_SCR-0654"
         ],
         [
             "DEP-04",
             20,
             "الرقابة الفنية والجاهزية",
             "الجاهزية الشهرية",
-            "—",
-            "—",
+            "SCR-0655",
+            "fleet\/asset_readiness.php",
             "EVIDENCE_CLOSED",
-            "SILENT_DROP"
+            "SERVED_BY_SCR-0655"
         ],
         [
             "DEP-04",
             22,
             "خروج الأصل من الخدمة",
             "الخروج الدائم",
-            "—",
-            "—",
+            "SCR-0656",
+            "fleet\/asset_exit.php",
             "IMPLEMENTED_NOT_VERIFIED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-05",
-            15,
-            "الذمم المدينة",
-            "الرقابة الائتمانية وحدود العملاء — بحسب انطباق الشركة",
-            "—",
-            "—",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-05",
-            18,
-            "التسويات والمحاسبة العامة",
-            "الضرائب والقيمة المضافة — بحسب انطباق الشركة",
-            "—",
-            "—",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-05",
-            20,
-            "التسويات والمحاسبة العامة",
-            "مطابقات الحسابات — بحسب انطباق الشركة",
-            "—",
-            "—",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-05",
-            21,
-            "الإقفال",
-            "ميزان المراجعة — بحسب انطباق الشركة",
-            "—",
-            "—",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
+            "SERVED_BY_SCR-0656"
         ],
         [
             "DEP-05",
             23,
             "الإقفال",
             "إقفال الفترة المحاسبية",
-            "—",
-            "—",
+            "SCR-0164",
+            "finance\/periods_fin.php",
             "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-05",
-            24,
-            "الإقفال",
-            "القوائم المالية — بحسب انطباق الشركة",
-            "—",
-            "—",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-06",
-            3,
-            "التأسيس",
-            "سجل المستفيدين والتحقق — بحسب انطباق الشركة",
-            "—",
-            "—",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-06",
-            6,
-            "دورة القبض",
-            "سجل الأدوات المالية — بحسب انطباق الشركة",
-            "—",
-            "—",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-06",
-            11,
-            "دورة الصرف",
-            "التحويلات بين الحسابات — بحسب انطباق الشركة",
-            "—",
-            "—",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-06",
-            12,
-            "دورة الصرف",
-            "تنفيذ عمليات الصرف الأجنبي — بحسب انطباق الشركة",
-            "—",
-            "—",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-06",
-            15,
-            "الرقابة والإقفال الشهري",
-            "خطابات الضمان والاعتمادات المستندية — بحسب انطباق الشركة",
-            "—",
-            "—",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-06",
-            18,
-            "الرقابة والإقفال الشهري",
-            "الجرد النقدي للخزائن — بحسب انطباق الشركة",
-            "—",
-            "—",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-07",
-            8,
-            "التوظيف والتعاقد",
-            "مستندات الموظف — بحسب انطباق الشركة",
-            "—",
-            "—",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-07",
-            9,
-            "التوظيف والتعاقد",
-            "التهيئة والمباشرة — بحسب انطباق الشركة",
-            "—",
-            "—",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-07",
-            12,
-            "التوظيف والتعاقد",
-            "الحركات الوظيفية — بحسب انطباق الشركة",
-            "—",
-            "—",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-07",
-            15,
-            "الدوام والإجازات",
-            "التدريب والكفاءة — بحسب انطباق الشركة",
-            "—",
-            "—",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-07",
-            16,
-            "الدوام والإجازات",
-            "تقييم الأداء الوظيفي — بحسب انطباق الشركة",
-            "—",
-            "—",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-07",
-            19,
-            "استحقاق الأجور وصرفها",
-            "المزايا والتأمينات — بحسب انطباق الشركة",
-            "—",
-            "—",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-08",
-            3,
-            "الكيانات والتفويض بالتوقيع",
-            "سجل السياسات — بحسب انطباق الشركة",
-            "—",
-            "—",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-08",
-            5,
-            "الكيانات والتفويض بالتوقيع",
-            "تقويم الامتثال — بحسب انطباق الشركة",
-            "—",
-            "—",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-08",
-            8,
-            "المستندات والالتزام النظامي",
-            "التقديمات النظامية — بحسب انطباق الشركة",
-            "—",
-            "—",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-08",
-            10,
-            "الأدوار والصلاحيات",
-            "تضارب المصالح — بحسب انطباق الشركة",
-            "—",
-            "—",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-08",
-            11,
-            "الأدوار والصلاحيات",
-            "الأطراف ذات العلاقة — بحسب انطباق الشركة",
-            "—",
-            "—",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-08",
-            12,
-            "الأدوار والصلاحيات",
-            "الهدايا والضيافة — بحسب انطباق الشركة",
-            "—",
-            "—",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-08",
-            13,
-            "الأدوار والصلاحيات",
-            "إقرارات مدونة السلوك — بحسب انطباق الشركة",
-            "—",
-            "—",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-08",
-            22,
-            "الاستثناء والرقابة",
-            "بلاغات النزاهة المحمية — بحسب انطباق الشركة",
-            "—",
-            "—",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-08",
-            23,
-            "الاستثناء والرقابة",
-            "التحقيقات — بحسب انطباق الشركة",
-            "—",
-            "—",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-08",
-            24,
-            "الاستثناء والرقابة",
-            "سجل الإخلالات — بحسب انطباق الشركة",
-            "—",
-            "—",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-08",
-            25,
-            "الاستثناء والرقابة",
-            "الإجراءات التصحيحية — بحسب انطباق الشركة",
-            "—",
-            "—",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-08",
-            26,
-            "الاستثناء والرقابة",
-            "متابعة نتائج المراجعة — بحسب انطباق الشركة",
-            "—",
-            "—",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-08",
-            30,
-            "الأنظمة والقوائم المرجعية",
-            "اللجان وحوكمة الاجتماعات — بحسب انطباق الشركة",
-            "—",
-            "—",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
+            "SERVED_BY_SCR-0164"
         ],
         [
             "DEP-14",
             10,
             "دورة العطل",
             "بنود أمر العمل",
-            "—",
-            "—",
+            "SCR-0904",
+            "maintenance\/work_orders.php",
             "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-14",
-            12,
-            "دورة العطل",
-            "الإصلاح الخارجي ومطالبات الضمان — بحسب انطباق الشركة",
-            "—",
-            "—",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-14",
-            14,
-            "الصيانة الوقائية",
-            "العناية اليومية والتشحيم — بحسب انطباق الشركة",
-            "—",
-            "—",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-15",
-            6,
-            "دورة الترحيل",
-            "تجهيز المغادرة والتسليم الأصلي — بحسب انطباق الشركة",
-            "—",
-            "—",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-15",
-            10,
-            "دورة الترحيل",
-            "مطالبات التلف والحوادث — بحسب انطباق الشركة",
-            "—",
-            "—",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
+            "SERVED_BY_SCR-0904"
         ],
         [
             "DEP-16",
             5,
             "طلبات الشراء وتجميعها",
             "أعضاء حزمة التجميع",
-            "—",
-            "—",
+            "SCR-0669",
+            "procurement\/proc_packages.php",
             "EVIDENCE_CLOSED",
-            "SILENT_DROP"
+            "SERVED_BY_SCR-0669"
         ],
         [
             "DEP-16",
             9,
             "عروض الموردين والترسية",
             "بنود عروض الموردين",
-            "—",
-            "—",
+            "SCR-0671",
+            "procurement\/proc_offers.php",
             "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "DEP-17",
-            3,
-            "التأسيس والقوائم المرجعية",
-            "إسناد أمناء المخازن",
-            "SCR-0817",
-            "wh_custodians.php",
-            "IMPLEMENTED_NOT_VERIFIED",
-            "SILENT_DROP"
+            "SERVED_BY_SCR-0671"
         ],
         [
             "DEP-17",
             10,
             "دورة الصرف",
             "بنود طلب الصرف الوارد",
-            "—",
-            "—",
+            "SCR-0677",
+            "procurement\/wh_issue_requests.php",
             "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "EX-DVP",
-            1,
-            "الرؤية بالنطاق",
-            "لوحة النائب",
-            "SCR-0793",
-            "vp_dashboard.php",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "EX-DVP",
-            2,
-            "الرؤية بالنطاق",
-            "الإدارات — نطاقي والشركة",
-            "SCR-0791",
-            "vp_departments.php",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "EX-DVP",
-            3,
-            "التقارير الدورية",
-            "التقرير اليومي للنائب",
-            "SCR-0794",
-            "vp_daily_report.php",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "EX-DVP",
-            4,
-            "التقارير الدورية",
-            "مراجعة الأداء الأسبوعية",
-            "SCR-0795",
-            "vp_weekly_report.php",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "EX-DVP",
-            5,
-            "التقارير الدورية",
-            "المراجعة الشهرية للنائب",
-            "SCR-0796",
-            "vp_monthly_review.php",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "EX-DVP",
-            6,
-            "صناديق القرار",
-            "صندوق اعتمادات النائب",
-            "SCR-0806",
-            "vp_approval_inbox.php",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "EX-DVP",
-            10,
-            "المتابعة",
-            "الإجراءات والقرارات المطلوبة مني",
-            "SCR-0807",
-            "vp_pending_actions.php",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "EX-DVP",
-            11,
-            "المتابعة",
-            "متابعة قرارات النائب",
-            "SCR-0808",
-            "vp_actions_followup.php",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
-        ],
-        [
-            "EX-DVP",
-            12,
-            "المتابعة",
-            "الإنابات والتفويضات",
-            "SCR-0783",
-            "exec_delegations.php",
-            "EVIDENCE_CLOSED",
-            "SILENT_DROP"
+            "SERVED_BY_SCR-0677"
         ]
     ]
 }
