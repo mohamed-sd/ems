@@ -1,7 +1,7 @@
 # MASTER FINAL CLOSURE REGISTER — السجلُّ الجامعُ للإغلاقِ النهائيّ
 
 > **المخزنُ الحاكم:** `registers/MASTER_FINAL_CLOSURE_REGISTER.json` — وهذا إسقاطُه.
-> **اللقطة:** `06237f66` · **حُدِّث:** 2026-09-01 16:15
+> **اللقطة:** `3dcd5b78` · **حُدِّث:** 2026-09-01 16:40
 > **المصمَّمُ الحاكم:** `docs/REPAIR01_20260823/orders/CLOSURE_SYSTEM.txt`
 
 ## مقامُ الحالات — ⛔ ولا تُجمَع في نسبةٍ واحدة
@@ -111,7 +111,7 @@
 | `CL-NAVR-07` | navr_import_guide --apply + navr_wire_missing --apply @ b0d2c3e9 |
 | `CL-GATE-00` | GATE00_BASELINE.md @ f592cdf9 |
 | `CL-WORK-03` | schtasks EMS_cron_events LastTaskResult=0 + storage/logs/cron_events.log نبض START/END + سالب الازدواج SKIP + مؤشرات عند الراس 17985 @ 59136c85 |
-| `CL-GOVUI-01` |  |
+| `CL-GOVUI-01` | الدفعتان مغلقتان على الدليل 60a8e3b2: LABEL_CONFORMANCE 307/307 وGROUP_CONFORMANCE 307/307 وGROUP_HEADER 108/108 وEXACT_DEPARTMENT_NAV 17/17 — وصفر اسم معتمد مكرر @ 3dcd5b78 |
 | `CL-GAP-07` | bus_stall_alarm_proof 11/11 — العدة حوكيت بتسجيل الانتاج كاملا (fx موصول) واليتم يثبت بمجس اصطناعي @ 747cfbe7 |
 | `CL-GAP-10` | tests/injfix01_sensitive_fields_nine_channels_proof.php 15/15 + سالب --negative=GAP-10 اثبت الرسوب @ 59136c85 |
 | `CL-FR-EVT-003` |  |

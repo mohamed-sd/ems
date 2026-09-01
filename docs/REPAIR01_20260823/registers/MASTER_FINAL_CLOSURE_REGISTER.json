@@ -1,7 +1,7 @@
 {
     "meta": {
-        "snapshot": "06237f66",
-        "updated_at": "2026-09-01 16:15",
+        "snapshot": "3dcd5b78",
+        "updated_at": "2026-09-01 16:40",
         "governing_order": "docs\/REPAIR01_20260823\/orders\/CLOSURE_SYSTEM.txt"
     },
     "items": {
@@ -7420,10 +7420,10 @@
             "Evidence_Contract": "tools\/govui_label_measure.php — 306\/306 · وصفر رابط نقص في 34 دورا",
             "Next_Action": "",
             "Current_Snapshot": "جبهة التسمية — LABEL_CONFORMANCE 306\/306 بالتصيير الحي @ efb30839",
-            "Last_Updated_Snapshot": "efb30839",
-            "Last_Evidence_Ref": "",
-            "Status_Changed_At": "2026-09-01 14:18 @ efb30839",
-            "Final_Disposition": "",
+            "Last_Updated_Snapshot": "3dcd5b78",
+            "Last_Evidence_Ref": "الدفعتان مغلقتان على الدليل 60a8e3b2: LABEL_CONFORMANCE 307\/307 وGROUP_CONFORMANCE 307\/307 وGROUP_HEADER 108\/108 وEXACT_DEPARTMENT_NAV 17\/17 — وصفر اسم معتمد مكرر @ 3dcd5b78",
+            "Status_Changed_At": "2026-09-01 16:40 @ 3dcd5b78",
+            "Final_Disposition": "EVIDENCE_CLOSED",
             "Levels": {
                 "Decision": "?",
                 "Implementation": "?",
