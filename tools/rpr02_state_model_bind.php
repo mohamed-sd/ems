@@ -214,6 +214,31 @@ $m4 = function ($x) use (&$reqChain, &$stat, &$plan, $sid) {
                . '**فالسطحُ يرث المرجعَ بالسلسلةِ لا بالاسم** · لقطة ' . $sid);
     return true;
 };
+/**
+ * أبُ الجدولِ إن كان له أبٌ **بآلةٍ مؤلَّفة** — بمفاتيحِ المخطَّطِ أو باللاحقة.
+ * ⛔ ولا يُرجَّح أبٌ بلا آلة: الوراثةُ تسمية حاكمٍ قائمٍ لا اختراعُ مرجع.
+ */
+function sm_parent_of($child, $models, $conn)
+{
+    static $fk = null;
+    if ($fk === null) {
+        $fk = array();
+        $q = @$conn->query("SELECT TABLE_NAME c, REFERENCED_TABLE_NAME p
+                              FROM information_schema.KEY_COLUMN_USAGE
+                             WHERE TABLE_SCHEMA = DATABASE() AND REFERENCED_TABLE_NAME IS NOT NULL");
+        while ($q && $z = $q->fetch_assoc()) { $fk[strtolower($z['c'])][strtolower($z['p'])] = 1; }
+    }
+    if (isset($fk[$child])) {
+        foreach (array_keys($fk[$child]) as $p) { if (isset($models[$p])) { return $p; } }
+    }
+    if (preg_match('~^(.+?)(_lines|_items|_details|_rows|_entries|_line|_item)$~', $child, $m)) {
+        foreach (array($m[1], $m[1] . 's', rtrim($m[1], 's')) as $c) {
+            if ($c !== '' && isset($models[$c])) { return $c; }
+        }
+    }
+    return '';
+}
+
 foreach ($rows as $x) {
     $ent = strtolower(trim((string) $x['grain_entity']));
     if ($ent === '' || !isset($TBL[$ent])) {
@@ -222,6 +247,24 @@ foreach ($rows as $x) {
         continue;
     }
     $b = sm_bridge($ent, $models);
+    /* **M5 · الابنُ يتبع آلةَ أبيه** — §٧ الخطوة ٢ («الأبُ والابن») وحكمُ §11
+       («‏1:N تتحول إلى Child Register»): سجلُّ بنودٍ **لا آلةَ حالةٍ له مستقلّةً**،
+       حالتُه حالةُ مستنده. فربطُه بآلةِ أبيه **ليس تلفيقًا** بل تسميةُ الحاكمِ
+       الحقيقيّ — ⛔ والمرجعُ يُصرِّح أنّه وراثةٌ لا تأليفٌ مستقلّ.
+       ⛔ **والبنوّةُ لا تُخترَع**: تُقرأ من مفاتيحِ المخطَّطِ الأجنبيّةِ أو من
+       لاحقةِ البنودِ على جِذعِ الأمّ — وهي قاعدةُ `rpr02_grain_measure` نفسُها. */
+    if ($b['rule'] === '' && $ent !== '') {
+        $par = sm_parent_of($ent, $models, $conn);
+        if ($par !== '') {
+            $stat['M5_CHILD'] = isset($stat['M5_CHILD']) ? $stat['M5_CHILD'] + 1 : 1;
+            $ref = $models[$par] . '_STATE_MACHINES#' . $par;
+            $plan[] = array('id' => $x['screen_id'], 'ref' => $ref, 'ent' => $ent, 'rule' => 'M5_CHILD',
+                'wit' => 'M5_CHILD · `' . $ent . '` سجلُّ بنودٍ لا مستندٌ مستقلّ — **حالتُه حالةُ أبيه** `'
+                       . $par . '` وآلتُه مؤلَّفةٌ في `repair01_' . strtolower($models[$par]) . '_states`. '
+                       . 'وهذا وراثةٌ مصرَّحةٌ لا تأليفٌ — و§٧ الخطوة ٢ تحكم بها. · لقطة ' . $sid);
+            continue;
+        }
+    }
     if ($b['rule'] === '') {
         if ($m4($x)) { continue; }
         $stat['BACKLOG']++;
@@ -247,7 +290,8 @@ foreach ($rows as $x) {
 
 /* ═══ ⑥ العرض ════════════════════════════════════════════════════════════ */
 $N = count($rows);
-$bound = $stat['M1_EXACT'] + $stat['M2_PLURAL'] + $stat['M3_SINGULAR'] + $stat['M4_CHAIN'];
+$bound = $stat['M1_EXACT'] + $stat['M2_PLURAL'] + $stat['M3_SINGULAR'] + $stat['M4_CHAIN']
+       + (isset($stat['M5_CHILD']) ? $stat['M5_CHILD'] : 0);
 echo "\n═══ `RPR-02` #٤ — ربطُ المعاملةِ بآلةِ حالتِها ═══\n";
 printf("  اللقطة: %s · أسطحُ المعاملاتِ الحقيقيّة: **%d**\n", $sid, $N);
 printf("  آلاتُ حالةٍ مؤلَّفةٌ في جداولِ الموجات: **%d** كيانًا\n\n", count($models));
