@@ -1,0 +1,13 @@
+{
+    "baseline_id": "NAB-5102AA8687",
+    "reader": "tools\/sidebar_layer_map.php",
+    "workspaces": 18,
+    "total": 1192,
+    "layers": {
+        "GUIDE": 342,
+        "ANCHOR": 36,
+        "PERSONAL": 88,
+        "SHARED": 325,
+        "LEGACY": 401
+    }
+}

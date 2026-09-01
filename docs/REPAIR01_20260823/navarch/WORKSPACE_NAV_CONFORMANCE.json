@@ -1,5 +1,5 @@
 {
-    "baseline_id": "NAB-8CD4A8954F",
+    "baseline_id": "NAB-5102AA8687",
     "metrics": {
         "DEP-01": {
             "TARGET_NAV_RECALL": 100,
@@ -237,7 +237,7 @@
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
-            "OLD_RENDERED": 89,
+            "OLD_RENDERED": 90,
             "NEW_LIFECYCLE": 12,
             "MISSING_TARGETS": [],
             "EXTRA_ITEMS": [],
@@ -283,7 +283,7 @@
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
-            "OLD_RENDERED": 54,
+            "OLD_RENDERED": 55,
             "NEW_LIFECYCLE": 17,
             "MISSING_TARGETS": [],
             "EXTRA_ITEMS": [],
@@ -394,29 +394,27 @@
             "EXACT_WORKSPACE_NAV_CONFORMANCE": "FAIL"
         },
         "EX-CEO": {
-            "TARGET_NAV_RECALL": 96.2,
-            "TARGET_FOUND": 25,
+            "TARGET_NAV_RECALL": 100,
+            "TARGET_FOUND": 26,
             "TARGET_TOTAL": 26,
-            "PLACEMENT_PRECISION": 98.8,
+            "PLACEMENT_PRECISION": 100,
             "UNEXPLAINED_EXTRA_MENU_ITEM": 0,
             "PERMISSION_ONLY_RENDERED_ITEM": 0,
             "UNAPPROVED_SECONDARY_PLACEMENT": 0,
             "ACTIVE_LEGACY_WITHOUT_DISPOSITION": 0,
             "WRONG_GROUP": 0,
-            "WRONG_ORDER": 8,
+            "WRONG_ORDER": 0,
             "WRONG_LABEL": 0,
             "GLOBAL_FALLBACK_COUNT": 0,
             "LEGACY_FALLBACK_RENDER_COUNT": 0,
             "PERSONAL_ITEM_COUNTED_AS_DEPARTMENT": 0,
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
-            "OLD_RENDERED": 80,
-            "NEW_LIFECYCLE": 25,
-            "MISSING_TARGETS": [
-                "portal\/ceo_org_decisions"
-            ],
+            "OLD_RENDERED": 81,
+            "NEW_LIFECYCLE": 26,
+            "MISSING_TARGETS": [],
             "EXTRA_ITEMS": [],
-            "EXACT_WORKSPACE_NAV_CONFORMANCE": "FAIL"
+            "EXACT_WORKSPACE_NAV_CONFORMANCE": "PASS"
         },
         "IAF": {
             "TARGET_NAV_RECALL": 100,

@@ -9,18 +9,15 @@
 
 | المعرِّف | القيمة |
 |---|---|
-| **`Baseline ID`** | **`NAB-8CD4A8954F`** |
-| `Commit Hash` | `fatal: ambiguous argument 'HEAD': unknown revision or path not in the working tree.
-Use '--' to separate paths from revisions, like this:
-'git <command> [<revision>...] -- [<file>...]'
-HEAD` |
-| شجرةُ العملِ نظيفة؟ | ◆ لا — فيها تغييرٌ غيرُ ملتزَم |
-| `DB Snapshot` (‏بصمةُ مجموعةِ الهجرات) | `32e94183d8c40e0a…` · 707 هجرةً مطبَّقة |
-| `Navigation Registry Version` | `02d39770b131a960…` · 553 صفًّا (‏مساحات + مجموعات + مواضع) |
-| `nav_items` النشطة (‏مصدرُ المُصيِّرِ القديم) | `e077bbc8f5ecda92…` · 2476 صفًّا |
-| `Role Permission Version` | `16306643069eb98e…` · 4111 منحةً |
-| `Target Architecture Version` | `nav_placements@02d39770b131` |
-| `Timestamp` (UTC) | `2026-09-01T06:03:39Z` |
+| **`Baseline ID`** | **`NAB-5102AA8687`** |
+| `Commit Hash` | `24fe96423678567327136c6b75a4fbfff4280fd7` |
+| شجرةُ العملِ نظيفة؟ | ✔ نعم |
+| `DB Snapshot` (‏بصمةُ مجموعةِ الهجرات) | `e505111dd084c6a2…` · 711 هجرةً مطبَّقة |
+| `Navigation Registry Version` | `7fec35930978b5f3…` · 553 صفًّا (‏مساحات + مجموعات + مواضع) |
+| `nav_items` النشطة (‏مصدرُ المُصيِّرِ القديم) | `af6df10eb69b5c4b…` · 2476 صفًّا |
+| `Role Permission Version` | `805e0bd8c6130b35…` · 4112 منحةً |
+| `Target Architecture Version` | `nav_placements@7fec35930978` |
+| `Timestamp` (UTC) | `2026-09-01T08:50:03Z` |
 
 ## المساحاتُ ولقطةُ سايدبارِ كلٍّ
 
@@ -36,17 +33,17 @@ HEAD` |
 | `DEP-08` | `DEPARTMENT` | إدارة الحوكمة والالتزام | — بلا ربطٍ `PRIMARY` | — |
 | `DEP-09` | `DEPARTMENT` | إدارة المخاطر | 28 · إدارة المخاطر | 41 |
 | `DEP-10` | `DEPARTMENT` | إدارة البلاغات | 24 · إدارة البلاغات | 46 |
-| `DEP-11` | `DEPARTMENT` | إدارة التشغيل | 1 · ادارة التشغيل | 89 |
+| `DEP-11` | `DEPARTMENT` | إدارة التشغيل | 1 · ادارة التشغيل | 90 |
 | `DEP-12` | `DEPARTMENT` | إدارة الموقع | 6 · إدارة الموقع | 75 |
-| `DEP-13` | `DEPARTMENT` | إدارة القوى التشغيلية | 27 · القوى التشغيلية | 54 |
+| `DEP-13` | `DEPARTMENT` | إدارة القوى التشغيلية | 27 · القوى التشغيلية | 55 |
 | `DEP-14` | `DEPARTMENT` | إدارة الصيانة | 13 · ادارة الصيانة | 58 |
 | `DEP-15` | `DEPARTMENT` | إدارة النقل والترحيل | 23 · إدارة النقل والترحيل | 48 |
 | `DEP-16` | `DEPARTMENT` | إدارة المشتريات التشغيلية | 16 · إدارة المشتريات | 56 |
 | `DEP-17` | `DEPARTMENT` | إدارة المخازن | 25 · أمين المستودع | 43 |
-| `EX-CEO` | `EXECUTIVE` | مساحة الرئيس التنفيذي | 9 · الإدارة التنفيذية | 80 |
+| `EX-CEO` | `EXECUTIVE` | مساحة الرئيس التنفيذي | 9 · الإدارة التنفيذية | 81 |
 | `EX-DVP` | `EXECUTIVE` | مساحة نائب الرئيس | — بلا ربطٍ `PRIMARY` | — |
 | `IAF` | `DEPARTMENT` | المراجعة الداخلية | 33 · المراجع الداخلي المستقل | 53 |
 | `WS-MY` | `PERSONAL` | مساحتي | — بلا ربطٍ `PRIMARY` | — |
 | `WS-PLATFORM` | `PLATFORM_UTILITY` | أدوات المنصة المشتركة | — بلا ربطٍ `PRIMARY` | — |
-| **المجموع** | | | **18 مساحةً مُصيَّرة** | **1189** |
+| **المجموع** | | | **18 مساحةً مُصيَّرة** | **1192** |
 

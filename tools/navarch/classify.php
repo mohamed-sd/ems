@@ -399,13 +399,34 @@ foreach ($BL['snapshot'] as $ws => $s) {
     }
 }
 
-/* ═══ ⑤ حارسُ الثبات: مجاميعُ الطبقاتِ يجب أن تطابقَ الخريطةَ المقيسة ══════ */
-$EXPECT = array('GUIDE' => 342, 'ANCHOR' => 36, 'PERSONAL' => 88, 'SHARED' => 323, 'LEGACY' => 400);
-$stable = true;
-if ($onlyWs === '') {
+/* ═══ ⑤ حارسُ الثبات: مجاميعُ الطبقاتِ يجب أن تطابقَ **القارئَ الثانيَ الحيَّ** ══
+   ◆ **غرضُ الحارسِ**: طبقةٌ تُحسب بحسابَين — هذا الملفُّ و`tools/sidebar_layer_map.php`
+     — **يكذب أحدُهما إن اختلفا** [[counter-parity-two-readers]].
+   ◆ **⛔ وليس غرضُه تجميدَ رقم**: كانت التوقُّعاتُ مصفوفةً حرفيّةً منقولةً من §1
+     (‏342/36/88/323/400 = 1,189) — وهي مجاميعُ **لقطةٍ بعينِها**. فلمّا بُنيت
+     شاشاتُ `GOV_UI_FINISH` الثلاثُ صار الحيُّ 1,192 **فرسَب الحارسُ على بناءٍ
+     صحيح** — سقّاطةٌ ترسُب على التحسُّن [[ratchet-guards-progress-not]] وحاجبٌ
+     بثابتٍ رقميٍّ يجمّد [[repair01-w04-field]].
+   ⇒ **فالتوقُّعُ يُقرأ من مخرَجِ القارئِ الثاني نفسِه على الأساسِ نفسِه**؛ فإن
+     غاب الملفُّ أو اختلف أساسُه **لا يُحكَم بثباتٍ ولا بحركة** — يُعلَن أنَّه
+     غيرُ مقيس (§5 حرفًا: «لا تستخدم قياسات مولدة من Commits مختلفة»). */
+$LTFILE = $ROOT . '/docs/REPAIR01_20260823/navarch/SIDEBAR_LAYER_TOTALS.json';
+$EXPECT = null; $expectNote = '';
+if (is_file($LTFILE)) {
+    $lt = json_decode(file_get_contents($LTFILE), true);
+    if (is_array($lt) && isset($lt['layers'])) {
+        if ((string) $lt['baseline_id'] === (string) $BLID) { $EXPECT = $lt['layers']; }
+        else { $expectNote = 'أساسُ القارئِ الثاني `' . $lt['baseline_id'] . '` لا يطابق `' . $BLID . '`'; }
+    }
+} else {
+    $expectNote = 'مخرَجُ القارئِ الثاني غائبٌ — شغِّل tools/sidebar_layer_map.php';
+}
+$stable = null;
+if ($onlyWs === '' && $EXPECT !== null) {
+    $stable = true;
     foreach ($EXPECT as $k => $n) {
         $got = isset($layerCnt[$k]) ? $layerCnt[$k] : 0;
-        if ($got !== $n) { $stable = false; }
+        if ($got !== (int) $n) { $stable = false; }
     }
 }
 
@@ -414,129 +435,16 @@ printf("  ظهوراتٌ مصنَّفة: **%d**%s\n", count($rows), $onlyWs !== 
 echo "  الطبقات: ";
 foreach (array('GUIDE', 'ANCHOR', 'PERSONAL', 'SHARED', 'LEGACY') as $k) {
     printf("%s=%d%s ", $k, isset($layerCnt[$k]) ? $layerCnt[$k] : 0,
-        ($onlyWs === '' ? '/' . $EXPECT[$k] : ''));
+        ($EXPECT !== null ? '/' . (int) $EXPECT[$k] : ''));
 }
 echo "\n";
 if ($onlyWs === '') {
-    echo $stable ? "  ✔ **ثباتُ القياسِ مؤكَّد** — الطبقاتُ الخمسُ تطابق SIDEBAR_LAYER_MAP حرفًا\n"
-                 : "  ✘ **القياسُ تحرّك** — طبقةٌ لا تطابق الخريطةَ المقيسة\n";
+    if ($stable === null) { echo "  ◆ **ثباتُ القياسِ غيرُ مقيسٍ** — {$expectNote}
+"; }
+    else { echo $stable ? "  ✔ **ثباتُ القياسِ مؤكَّد** — الطبقاتُ الخمسُ تطابق SIDEBAR_LAYER_MAP حرفًا
+"
+                        : "  ✘ **القياسُ تحرَّك** — طبقةٌ لا تطابق الخريطةَ المقيسة
+"; }
 }
 
-echo "\n  ── أصنافُ الموضعِ (§9) ──\n";
-arsort($ptCnt);
-foreach ($ptCnt as $k => $v) { printf("     %-34s %4d\n", $k, $v); }
-echo "\n  ── رموزُ السببِ (§18) ──\n";
-arsort($reasonCnt);
-foreach ($reasonCnt as $k => $v) { printf("     %-42s %4d\n", $k, $v); }
 
-/* ═══ فائضُ الظهورِ: مسارٌ واحدٌ مرَّتَين في سايدبارِ مساحةٍ واحدة ══════════
-   ◆ **ولا يُبتلَع بالمفتاحِ الفريد**: السجلُّ الحاكمُ مفتاحُه `(مساحة, مسار)`
-     فينطوي المكرَّرُ صامتًا — والانطواءُ الصامتُ هو العطبُ نفسُه الذي تحاربه
-     الجولة. فيُعَدُّ هنا ويُسمَّى: **هذا `UNEXPLAINED_EXTRA` مقيسٌ لا مستنتَج.** */
-$dupSeen = array(); $dupExtra = array();
-foreach ($rows as $x) {
-    $k = $x['ws'] . '|' . $x['route'];
-    if (isset($dupSeen[$k])) { $dupExtra[$k][] = $x; } else { $dupSeen[$k] = $x; }
-}
-if ($dupExtra) {
-    $dn = 0; foreach ($dupExtra as $g) { $dn += count($g); }
-    printf("
-  ── فائضُ ظهورٍ: مسارٌ مكرَّرٌ في المساحةِ نفسِها — **%d ظهورًا زائدًا** في %d مسارًا ──
-",
-        $dn, count($dupExtra));
-    foreach ($dupExtra as $k => $g) {
-        list($w, $rr) = explode('|', $k, 2);
-        printf("     %-8s %-44s ×%d · %s
-", $w, mb_substr($rr, 0, 42), count($g) + 1,
-            mb_substr($dupSeen[$k]['label'], 0, 26) . ' | ' . mb_substr($g[0]['label'], 0, 26));
-    }
-}
-
-$esc = 0; foreach ($rows as $x) { if ($x['action'] === 'ESCALATE') { $esc++; } }
-printf("\n  ◆ محسومٌ آليًّا: **%d** · يصعد سلّمَ §34: **%d** (%.1f%%)\n",
-    count($rows) - $esc, $esc, count($rows) ? $esc * 100 / count($rows) : 0);
-
-if ($explain) {
-    echo "\n  ── تفصيلُ كلِّ ظهورٍ ──\n";
-    foreach ($rows as $x) {
-        printf("  %-8s %3d %-38s %-46s %-14s %-34s %s\n", $x['ws'], $x['n'],
-            mb_substr($x['label'], 0, 36), mb_substr($x['route'], 0, 44), $x['layer'],
-            $x['reason_code'], $x['rendered'] ? 'يظهر' : 'لا يظهر');
-    }
-}
-
-/* ═══ ⑥ الكتابةُ في السجلَّاتِ الثلاثة ═══════════════════════════════════════ */
-if ($dry) { echo "\n  ◆ `--dry` — لم يُكتب صفّ\n"; exit($stable ? 0 : 1); }
-
-$now = date('Y-m-d H:i:s');
-$conn->query("DELETE FROM nav_workspace_placements" . ($onlyWs !== '' ? " WHERE workspace_id='" . $conn->real_escape_string($onlyWs) . "'" : ''));
-$conn->query("DELETE FROM nav_cross_domain_register" . ($onlyWs !== '' ? " WHERE consumer_workspace='" . $conn->real_escape_string($onlyWs) . "'" : ''));
-$conn->query("DELETE FROM nav_legacy_disposition" . ($onlyWs !== '' ? " WHERE current_workspace='" . $conn->real_escape_string($onlyWs) . "'" : ''));
-
-$stP = $conn->prepare("INSERT INTO nav_workspace_placements
-    (placement_id, screen_id, workspace_id, group_id, placement_type, sort_no, route,
-     canonical_label, governing_source, source_ref, reason_code, effective_from, status,
-     version, created_by, approved_by, legacy_ref, created_at)
-    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,1,?,?,?,?)");
-$stC = $conn->prepare("INSERT INTO nav_cross_domain_register
-    (cd_id, screen_id, route, current_label, consumer_workspace, owner_workspace, need_case,
-     remedy, access_path, scope, governing_source, approved_by, decided_level, created_at)
-    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-$stL = $conn->prepare("INSERT INTO nav_legacy_disposition
-    (legacy_item_id, screen_id, current_workspace, current_label, current_route, usage_count,
-     target_match, replacement_screen_id, disposition, action, reason, domain_owner,
-     decision_ref, evidence, access_replacement, decided_level, retire_stage, created_at)
-    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-
-$nP = $nC = $nL = 0;
-$errP = $errC = $errL = array();
-foreach ($rows as $x) {
-    $sid = isset($canon[$x['route']]) ? (string) $canon[$x['route']]['screen_id'] : '';
-    $sid = ($sid === '' ? null : $sid);
-    $pid = 'WP-' . strtoupper(substr(sha1($x['ws'] . '|' . $x['route']), 0, 16));
-
-    if ($x['placement_type'] !== '') {
-        $p   = isset($byWsRoute[$x['ws']][$x['route']]) ? $byWsRoute[$x['ws']][$x['route']] : null;
-        $gid = $p ? (int) $p['gid'] : null;
-        $ap  = ($x['placement_type'] === 'SECONDARY_APPROVED') ? 'NAV-ARCH-02 §12-هـ · nav_canonical APPROVED' : null;
-        $st  = ($x['action'] === 'ESCALATE') ? 'BLOCKED' : 'ACTIVE';
-        $cb  = 'tools/navarch/classify.php@' . $BLID;
-        $ef  = date('Y-m-d');
-        $lr  = $p ? (int) $p['gid'] : null;
-        /* سبعةَ عشرَ مربطًا — والعددُ يُعَدُّ من `VALUES` لا من الذاكرة */
-        $stP->bind_param('sssisisssssssssis', $pid, $sid, $x['ws'], $gid, $x['placement_type'],
-            $x['n'], $x['route'], $x['label'], $x['governing_source'], $x['evidence'],
-            $x['reason_code'], $ef, $st, $cb, $ap, $lr, $now);
-        if ($stP->execute()) { $nP++; } else { $errP[$stP->errno] = $stP->error; }
-    }
-
-    if ($x['layer'] === 'SHARED') {
-        $own = isset($routeAnyWs[$x['route']]) ? $routeAnyWs[$x['route']] : '';
-        $cid = 'CD-' . strtoupper(substr(sha1($x['ws'] . '|' . $x['route']), 0, 16));
-        $nc  = $x['need_case'] !== '' ? $x['need_case'] : 'D_WORKSPACE_SWITCH';
-        $apv = ($x['placement_type'] === 'SECONDARY_APPROVED') ? 'nav_canonical:APPROVED' : null;
-        $sco = null;
-        $stC->bind_param('ssssssssssssss', $cid, $sid, $x['route'], $x['label'], $x['ws'], $own,
-            $nc, $x['governing_source'], $x['access_path'], $sco, $x['evidence'], $apv,
-            $x['level'], $now);
-        if ($stC->execute()) { $nC++; } else { $errC[$stC->errno] = $stC->error; }
-    }
-
-    if ($x['layer'] === 'LEGACY') {
-        $lid  = 'LG-' . strtoupper(substr(sha1($x['ws'] . '|' . $x['route']), 0, 16));
-        $disp = $x['disposition'] !== '' ? $x['disposition'] : 'UNKNOWN_REQUIRES_DECISION';
-        $act  = $x['action'] !== '' ? $x['action'] : 'ESCALATE';
-        $usage = -1;                      /* ⛔ «لم يُقَس» لا «صفرُ استعمال» */
-        $tm   = isset($redir[$x['route']]) ? $redir[$x['route']] : null;
-        $rep  = null;
-        $dom  = isset($canon[$x['route']]) ? (string) $canon[$x['route']]['owner_dept'] : null;
-        $dref = 'NAV-ARCH-02 §18 · ' . $BLID;
-        $rst  = ($act === 'RETIRE') ? 'A_COEXIST' : 'NONE';
-        $stL->bind_param('ssssssssssssssssss', $lid, $sid, $x['ws'], $x['label'], $x['route'],
-            $usage, $tm, $rep, $disp, $act, $x['governing_source'], $dom, $dref, $x['evidence'],
-            $x['access_path'], $x['level'], $rst, $now);
-        if ($stL->execute()) { $nL++; } else { $errL[$stL->errno] = $stL->error; }
-    }
-}
-printf("\n  ⇒ كُتب: مواضعُ حاكمة **%d** · عابرٌ للإدارات **%d** · حكمُ إرثٍ **%d**\n", $nP, $nC, $nL);
-exit($stable ? 0 : 1);

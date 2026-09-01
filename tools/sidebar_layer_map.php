@@ -178,6 +178,32 @@ $sheets = array('00 الخلاصة' => $idx, '01 دليل الطبقات' => $le
 $xlsx = $ROOT . '/docs/REPAIR01_20260823/SIDEBAR_LAYER_MAP.xlsx';
 xlsx_create($xlsx, $sheets);
 
+/* ═══ ⑤ مجاميعُ الطبقاتِ **قارئًا ثانيًا مكتوبًا** — لا رقمًا مجمَّدًا ═════════
+   ◆ **المقيسُ قبلَ الحكم**: `tools/navarch/classify.php` كان يحرس ثباتَ طبقاتِه
+     بمصفوفةٍ حرفيّةٍ (‏342/36/88/323/400) منقولةٍ من §1 من الأمر — وهي مجاميعُ
+     **لقطةٍ بعينِها** (1,189 رابطًا). فلمّا بُنيت شاشاتُ `GOV_UI_FINISH` الثلاثُ
+     صار الحيُّ 1,192 و**رسَب الحارسُ على تحسُّنٍ مشروع** — وهو عينُ فخِّ
+     «حاجبُ مرحلةٍ بثابتٍ رقميٍّ يجمّد» [[repair01-w04-field]].
+   ◆ **وغرضُ الحارسِ يبقى كما هو**: أن **يتفق قارئان مستقلّان** على مجاميعِ
+     الطبقاتِ الخمس — فمن يحسبها مرّتَين بحسابَين يكذب أحدُهما
+     [[counter-parity-two-readers]]. فيُكتب حسابُ هذا الملفِّ **مع معرِّفِ
+     الأساسِ الذي قِيس عليه**، ويقرؤه المصنِّفُ فيقارن حسابَه بحسابِه.
+   ⛔ **والمقارنةُ تُلغى صراحةً إن اختلف الأساس** — فقياسان من لقطتَين لا
+     يتقارنان (§5 حرفًا: «لا تستخدم قياسات مولدة من Commits مختلفة»). */
+$blFile = $ROOT . '/docs/REPAIR01_20260823/navarch/NAV_ARCH_BASELINE.json';
+$blId   = is_file($blFile)
+    ? (string) json_decode(file_get_contents($blFile), true)['baseline_id'] : '';
+file_put_contents($ROOT . '/docs/REPAIR01_20260823/navarch/SIDEBAR_LAYER_TOTALS.json',
+    json_encode(array(
+        'baseline_id' => $blId,
+        'reader'      => 'tools/sidebar_layer_map.php',
+        'workspaces'  => count($sum),
+        'total'       => $grand['T'],
+        'layers'      => array('GUIDE' => $grand['GUIDE'], 'ANCHOR' => $grand['ANCHOR'],
+                               'PERSONAL' => $grand['PERSONAL'], 'SHARED' => $grand['SHARED'],
+                               'LEGACY' => $grand['LEGACY']),
+    ), JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+
 printf("مساحات %d · روابط %d · دليل %d · مرساة %d · شخصيّة %d · مستعارة %d · إرث %d\n=> %s\n",
     count($sum), $grand['T'], $grand['GUIDE'], $grand['ANCHOR'], $grand['PERSONAL'],
     $grand['SHARED'], $grand['LEGACY'], $xlsx);

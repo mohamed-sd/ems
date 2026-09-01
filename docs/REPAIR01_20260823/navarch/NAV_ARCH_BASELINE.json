@@ -1,29 +1,29 @@
 {
-    "baseline_id": "NAB-8CD4A8954F",
-    "commit_hash": "fatal: ambiguous argument 'HEAD': unknown revision or path not in the working tree.\nUse '--' to separate paths from revisions, like this:\n'git <command> [<revision>...] -- [<file>...]'\nHEAD",
-    "worktree_clean": false,
+    "baseline_id": "NAB-5102AA8687",
+    "commit_hash": "24fe96423678567327136c6b75a4fbfff4280fd7",
+    "worktree_clean": true,
     "db_snapshot": {
-        "migration_set_hash": "32e94183d8c40e0a06dbaee728bda5badf42bda9",
-        "applied_migrations": 707
+        "migration_set_hash": "e505111dd084c6a2452520a649a2d94afff10b42",
+        "applied_migrations": 711
     },
     "navigation_registry_version": {
-        "hash": "02d39770b131a9600a536f02346e0c46d1226c2b",
+        "hash": "7fec35930978b5f3c033dfd2de2bb7b877cbeec3",
         "rows": 553
     },
     "nav_items_version": {
-        "hash": "e077bbc8f5ecda92f70191e5c98098473165bd9e",
+        "hash": "af6df10eb69b5c4bc9b0ecfdafd61093696b2ea9",
         "rows": 2476
     },
     "role_permission_version": {
-        "hash": "16306643069eb98e65fb49af2758a556c54069b1",
-        "rows": 4111
+        "hash": "805e0bd8c6130b35aeb013ae5917c00959dec7b8",
+        "rows": 4112
     },
-    "target_architecture_version": "nav_placements@02d39770b131",
-    "timestamp_utc": "2026-09-01T06:03:39Z",
+    "target_architecture_version": "nav_placements@7fec35930978",
+    "timestamp_utc": "2026-09-01T08:50:03Z",
     "timestamp_note": "ساعةُ حائطٍ للتوثيقِ لا لترتيبِ الحقائق — الترتيبُ بالبصمات",
     "workspaces": 22,
     "workspaces_rendered": 18,
-    "total_rendered_links": 1189,
+    "total_rendered_links": 1192,
     "snapshot": {
         "DEP-01": {
             "role_id": 12,
@@ -4561,7 +4561,7 @@
             "kind": "DEPARTMENT",
             "name_ar": "إدارة التشغيل",
             "active": 1,
-            "rendered": 89,
+            "rendered": 90,
             "items": [
                 {
                     "n": 1,
@@ -4741,446 +4741,453 @@
                 {
                     "n": 26,
                     "group": "التشغيل اليومي",
+                    "label": "قرارات الهيكل التنظيمي",
+                    "route": "portal\/ceo_org_decisions",
+                    "href": "..\/portal\/ceo_org_decisions.php"
+                },
+                {
+                    "n": 27,
+                    "group": "التشغيل اليومي",
                     "label": "تسجيل التايم شيت والإنتاج",
                     "route": "timesheet\/view_timesheet",
                     "href": "..\/Timesheet\/view_timesheet.php"
                 },
                 {
-                    "n": 27,
+                    "n": 28,
                     "group": "التشغيل اليومي",
                     "label": "أوامر الصيانة",
                     "route": "maintenance\/orders",
                     "href": "..\/Maintenance\/orders.php"
                 },
                 {
-                    "n": 28,
+                    "n": 29,
                     "group": "التشغيل اليومي",
                     "label": "غرفة عمليات المواقع",
                     "route": "operations\/operations_room",
                     "href": "..\/Operations\/operations_room.php"
                 },
                 {
-                    "n": 29,
+                    "n": 30,
                     "group": "التشغيل اليومي",
                     "label": "تصحيح الوحدات بالسلسلة الثلاثية",
                     "route": "operations\/unit_correction",
                     "href": "..\/Operations\/unit_correction.php"
                 },
                 {
-                    "n": 30,
+                    "n": 31,
                     "group": "التشغيل اليومي",
                     "label": "الأداء الشهري للوحدة",
                     "route": "operations\/unit_perf",
                     "href": "..\/Operations\/unit_perf.php"
                 },
                 {
-                    "n": 31,
+                    "n": 32,
                     "group": "التشغيل اليومي",
                     "label": "طلب تبديل",
                     "route": "operations\/swap_request",
                     "href": "..\/Operations\/swap_request.php"
                 },
                 {
-                    "n": 32,
+                    "n": 33,
                     "group": "التشغيل اليومي",
                     "label": "طلب الترحيل",
                     "route": "transport\/transfer_requests",
                     "href": "..\/Transport\/transfer_requests.php"
                 },
                 {
-                    "n": 33,
+                    "n": 34,
                     "group": "التشغيل اليومي",
                     "label": "طلبات الترحيل",
                     "route": "transport\/transfer_requests",
                     "href": "..\/Transport\/transfer_requests.php#2"
                 },
                 {
-                    "n": 34,
+                    "n": 35,
                     "group": "التشغيل اليومي",
                     "label": "إسناد المعدات للوحدات",
                     "route": "operations\/containers",
                     "href": "..\/Operations\/containers.php"
                 },
                 {
-                    "n": 35,
+                    "n": 36,
                     "group": "التشغيل اليومي",
                     "label": "تكليف المشغل على المعدة",
                     "route": "operations\/distribution_space",
                     "href": "..\/Operations\/distribution_space.php"
                 },
                 {
-                    "n": 36,
+                    "n": 37,
                     "group": "التشغيل اليومي",
                     "label": "الإنتاج والقياس",
                     "route": "operations\/production",
                     "href": "..\/Operations\/production.php"
                 },
                 {
-                    "n": 37,
+                    "n": 38,
                     "group": "التشغيل اليومي",
                     "label": "التوقفات وتحديد المتحمل",
                     "route": "operations\/stops_unattributed",
                     "href": "..\/Operations\/stops_unattributed.php"
                 },
                 {
-                    "n": 38,
+                    "n": 39,
                     "group": "العقود والعملاء",
                     "label": "الجزاءات والحوافز التعاقدية",
                     "route": "contracts\/penalties",
                     "href": "..\/Contracts\/penalties.php"
                 },
                 {
-                    "n": 39,
+                    "n": 40,
                     "group": "العقود والعملاء",
                     "label": "سجل عقود المشاريع",
                     "route": "contracts\/contracts",
                     "href": "..\/Contracts\/contracts.php"
                 },
                 {
-                    "n": 40,
+                    "n": 41,
                     "group": "العقود والعملاء",
                     "label": "توزيع وحدات المورد على معداته",
                     "route": "operations\/equipment_quota",
                     "href": "..\/Operations\/equipment_quota.php"
                 },
                 {
-                    "n": 41,
+                    "n": 42,
                     "group": "العقود والعملاء",
                     "label": "المطالبات والتسليم للمالية",
                     "route": "contracts\/claims",
                     "href": "..\/Contracts\/claims.php"
                 },
                 {
-                    "n": 42,
+                    "n": 43,
                     "group": "العقود والعملاء",
                     "label": "الأعمال غير المفوترة",
                     "route": "operations\/unbilled",
                     "href": "..\/Operations\/unbilled.php"
                 },
                 {
-                    "n": 43,
+                    "n": 44,
                     "group": "الموظفون والمشغلون",
                     "label": "لوحة الموارد البشرية",
                     "route": "employees\/hr_board",
                     "href": "..\/Employees\/hr_board.php"
                 },
                 {
-                    "n": 44,
+                    "n": 45,
                     "group": "الموظفون والمشغلون",
                     "label": "مستندات الموظف",
                     "route": "employees\/hr_employee_documents",
                     "href": "..\/Employees\/hr_employee_documents.php"
                 },
                 {
-                    "n": 45,
+                    "n": 46,
                     "group": "الموظفون والمشغلون",
                     "label": "التهيئة والمباشرة",
                     "route": "employees\/hr_onboarding",
                     "href": "..\/Employees\/hr_onboarding.php"
                 },
                 {
-                    "n": 46,
+                    "n": 47,
                     "group": "الموظفون والمشغلون",
                     "label": "الحركات الوظيفية",
                     "route": "employees\/hr_job_movements",
                     "href": "..\/Employees\/hr_job_movements.php"
                 },
                 {
-                    "n": 47,
+                    "n": 48,
                     "group": "الموظفون والمشغلون",
                     "label": "التدريب والكفاءة",
                     "route": "employees\/hr_training",
                     "href": "..\/Employees\/hr_training.php"
                 },
                 {
-                    "n": 48,
+                    "n": 49,
                     "group": "الموظفون والمشغلون",
                     "label": "تقييم الأداء الوظيفي",
                     "route": "employees\/hr_performance",
                     "href": "..\/Employees\/hr_performance.php"
                 },
                 {
-                    "n": 49,
+                    "n": 50,
                     "group": "الموظفون والمشغلون",
                     "label": "القضايا التأديبية والتحقيق",
                     "route": "employees\/hr_disciplinary",
                     "href": "..\/Employees\/hr_disciplinary.php"
                 },
                 {
-                    "n": 50,
+                    "n": 51,
                     "group": "الموظفون والمشغلون",
                     "label": "تقرير القوى العاملة",
                     "route": "workforce\/hr_workforce_report",
                     "href": "..\/Workforce\/hr_workforce_report.php"
                 },
                 {
-                    "n": 51,
+                    "n": 52,
                     "group": "الموردون والمشتريات",
                     "label": "طلبات الشراء",
                     "route": "procurement\/requests_proc",
                     "href": "..\/Procurement\/requests_proc.php"
                 },
                 {
-                    "n": 52,
+                    "n": 53,
                     "group": "الموردون والمشتريات",
                     "label": "تجميع الطلبات وخطة الشراء",
                     "route": "procurement\/proc_packages",
                     "href": "..\/Procurement\/proc_packages.php"
                 },
                 {
-                    "n": 53,
+                    "n": 54,
                     "group": "الموردون والمشتريات",
                     "label": "دعوات الموردين للعروض",
                     "route": "procurement\/proc_rfq",
                     "href": "..\/Procurement\/proc_rfq.php"
                 },
                 {
-                    "n": 54,
+                    "n": 55,
                     "group": "المالية والمحاسبة",
                     "label": "سجل الأدوات المالية",
                     "route": "finance\/tre_instruments",
                     "href": "..\/Finance\/tre_instruments.php"
                 },
                 {
-                    "n": 55,
+                    "n": 56,
                     "group": "المالية والمحاسبة",
                     "label": "تخصيص التحصيل على الفواتير",
                     "route": "finance\/tre_allocations",
                     "href": "..\/Finance\/tre_allocations.php"
                 },
                 {
-                    "n": 56,
+                    "n": 57,
                     "group": "المالية والمحاسبة",
                     "label": "مدفوعات معتمدة بانتظار التنفيذ",
                     "route": "finance\/tre_payment_queue",
                     "href": "..\/Finance\/tre_payment_queue.php"
                 },
                 {
-                    "n": 57,
+                    "n": 58,
                     "group": "المالية والمحاسبة",
                     "label": "حركة الخزينة والصناديق",
                     "route": "finance\/tre_cash_moves",
                     "href": "..\/Finance\/tre_cash_moves.php"
                 },
                 {
-                    "n": 58,
+                    "n": 59,
                     "group": "المالية والمحاسبة",
                     "label": "التحويلات بين الحسابات",
                     "route": "finance\/tre_transfers",
                     "href": "..\/Finance\/tre_transfers.php"
                 },
                 {
-                    "n": 59,
+                    "n": 60,
                     "group": "المالية والمحاسبة",
                     "label": "عهد النثرية وتسويتها",
                     "route": "finance\/tre_petty_cash",
                     "href": "..\/Finance\/tre_petty_cash.php"
                 },
                 {
-                    "n": 60,
+                    "n": 61,
                     "group": "المالية والمحاسبة",
                     "label": "الجرد النقدي للخزائن",
                     "route": "finance\/tre_cash_count",
                     "href": "..\/Finance\/tre_cash_count.php"
                 },
                 {
-                    "n": 61,
+                    "n": 62,
                     "group": "المالية والمحاسبة",
                     "label": "ميزانية إدارة التمويل",
                     "route": "finance\/budget_dept",
                     "href": "..\/Finance\/budget_dept.php"
                 },
                 {
-                    "n": 62,
+                    "n": 63,
                     "group": "الخزينة والتمويل",
                     "label": "جهات اتصال الممولين والمفوض",
                     "route": "financing\/fin_financier_contacts",
                     "href": "..\/Financing\/fin_financier_contacts.php"
                 },
                 {
-                    "n": 63,
+                    "n": 64,
                     "group": "الخزينة والتمويل",
                     "label": "وثائق التأهيل والعناية",
                     "route": "financing\/fin_due_diligence",
                     "href": "..\/Financing\/fin_due_diligence.php"
                 },
                 {
-                    "n": 64,
+                    "n": 65,
                     "group": "الخزينة والتمويل",
                     "label": "سجل عقود التمويل",
                     "route": "financing\/fin_contracts",
                     "href": "..\/Financing\/fin_contracts.php"
                 },
                 {
-                    "n": 65,
+                    "n": 66,
                     "group": "الخزينة والتمويل",
                     "label": "بنود وشروط التمويل",
                     "route": "financing\/fin_contract_terms",
                     "href": "..\/Financing\/fin_contract_terms.php"
                 },
                 {
-                    "n": 66,
+                    "n": 67,
                     "group": "الخزينة والتمويل",
                     "label": "مصفوفة الالتزامات التمويلية",
                     "route": "financing\/fin_covenants",
                     "href": "..\/Financing\/fin_covenants.php"
                 },
                 {
-                    "n": 67,
+                    "n": 68,
                     "group": "الحوكمة والتدقيق",
                     "label": "لوحة الحوكمة والالتزام",
                     "route": "governance\/gov_board",
                     "href": "..\/Governance\/gov_board.php"
                 },
                 {
-                    "n": 68,
+                    "n": 69,
                     "group": "الحوكمة والتدقيق",
                     "label": "سجل الشركات والكيانات",
                     "route": "governance\/entities_registry",
                     "href": "..\/Governance\/entities_registry.php"
                 },
                 {
-                    "n": 69,
+                    "n": 70,
                     "group": "الحوكمة والتدقيق",
                     "label": "سجل السياسات",
                     "route": "governance\/policies",
                     "href": "..\/Governance\/policies.php"
                 },
                 {
-                    "n": 70,
+                    "n": 71,
                     "group": "الحوكمة والتدقيق",
                     "label": "سجل الالتزامات التنظيمية",
                     "route": "governance\/obligations",
                     "href": "..\/Governance\/obligations.php"
                 },
                 {
-                    "n": 71,
+                    "n": 72,
                     "group": "الحوكمة والتدقيق",
                     "label": "تقويم الامتثال",
                     "route": "governance\/compliance_calendar",
                     "href": "..\/Governance\/compliance_calendar.php"
                 },
                 {
-                    "n": 72,
+                    "n": 73,
                     "group": "الحوكمة والتدقيق",
                     "label": "التفويض بالتوقيع",
                     "route": "governance\/signing_authority",
                     "href": "..\/Governance\/signing_authority.php"
                 },
                 {
-                    "n": 73,
+                    "n": 74,
                     "group": "الحوكمة والتدقيق",
                     "label": "التقديمات النظامية",
                     "route": "governance\/regulatory_filings",
                     "href": "..\/Governance\/regulatory_filings.php"
                 },
                 {
-                    "n": 74,
+                    "n": 75,
                     "group": "المخاطر والبلاغات",
                     "label": "صندوق بلاغات الإدارة",
                     "route": "tickets\/tickets_list",
                     "href": "..\/Tickets\/tickets_list.php?tab=dept"
                 },
                 {
-                    "n": 75,
+                    "n": 76,
                     "group": "المخاطر والبلاغات",
                     "label": "مساحة مخاطر الإدارة",
                     "route": "risk\/dept_risk_space",
                     "href": "..\/Risk\/dept_risk_space.php"
                 },
                 {
-                    "n": 76,
+                    "n": 77,
                     "group": "التقارير والتحليلات",
                     "label": "أرصدة المخزون بحالاتها",
                     "route": "procurement\/stock_proc",
                     "href": "..\/Procurement\/stock_proc.php"
                 },
                 {
-                    "n": 77,
+                    "n": 78,
                     "group": "التقارير والتحليلات",
                     "label": "الاعتمادات المتأخرة والوثائق",
                     "route": "reports\/approval_lag_report",
                     "href": "..\/Reports\/approval_lag_report.php"
                 },
                 {
-                    "n": 78,
+                    "n": 79,
                     "group": "التقارير والتحليلات",
                     "label": "مركز تقارير الحوكمة",
                     "route": "emsreports\/index",
                     "href": "..\/emsreports\/index.php"
                 },
                 {
-                    "n": 79,
+                    "n": 80,
                     "group": "التقارير والتحليلات",
                     "label": "لوحة مدير التشغيل",
                     "route": "admin\/ops_manager_board",
                     "href": "..\/admin\/ops_manager_board.php"
                 },
                 {
-                    "n": 80,
+                    "n": 81,
                     "group": "التقارير والتحليلات",
                     "label": "لوحة النائب",
                     "route": "portal\/vp_dashboard",
                     "href": "..\/Portal\/vp_dashboard.php"
                 },
                 {
-                    "n": 81,
+                    "n": 82,
                     "group": "التقارير والتحليلات",
                     "label": "الإدارات — نطاقي والشركة",
                     "route": "portal\/vp_departments",
                     "href": "..\/Portal\/vp_departments.php"
                 },
                 {
-                    "n": 82,
+                    "n": 83,
                     "group": "التقارير والتحليلات",
                     "label": "صندوق اعتمادات النائب",
                     "route": "portal\/vp_approval_inbox",
                     "href": "..\/Portal\/vp_approval_inbox.php"
                 },
                 {
-                    "n": 83,
+                    "n": 84,
                     "group": "التقارير والتحليلات",
                     "label": "الإجراءات والقرارات المطلوبة مني",
                     "route": "portal\/vp_pending_actions",
                     "href": "..\/Portal\/vp_pending_actions.php"
                 },
                 {
-                    "n": 84,
+                    "n": 85,
                     "group": "التقارير والتحليلات",
                     "label": "طلب إدخال الأصل",
                     "route": "fleet\/asset_intake",
                     "href": "..\/Fleet\/asset_intake.php"
                 },
                 {
-                    "n": 85,
+                    "n": 86,
                     "group": "التقارير والتحليلات",
                     "label": "التخصيص على الوحدات",
                     "route": "fleet\/asset_assignments",
                     "href": "..\/Fleet\/asset_assignments.php"
                 },
                 {
-                    "n": 86,
+                    "n": 87,
                     "group": "الإعدادات",
                     "label": "أنماط تفعيل المزايا",
                     "route": "governance\/activation_patterns",
                     "href": "..\/Governance\/activation_patterns.php"
                 },
                 {
-                    "n": 87,
+                    "n": 88,
                     "group": "الإعدادات",
                     "label": "التكليفات التنظيمية",
                     "route": "admin\/org_assignments",
                     "href": "..\/admin\/org_assignments.php"
                 },
                 {
-                    "n": 88,
+                    "n": 89,
                     "group": "الإعدادات",
                     "label": "أذون الزيارة والمركبات الخارجية",
                     "route": "admin\/org_permits",
                     "href": "..\/admin\/org_permits.php"
                 },
                 {
-                    "n": 89,
+                    "n": 90,
                     "group": "الإعدادات",
                     "label": "إدارة المعاونين",
                     "route": "main\/project_users",
@@ -5729,7 +5736,7 @@
             "kind": "DEPARTMENT",
             "name_ar": "إدارة القوى التشغيلية",
             "active": 1,
-            "rendered": 54,
+            "rendered": 55,
             "items": [
                 {
                     "n": 1,
@@ -5930,180 +5937,187 @@
                 {
                     "n": 29,
                     "group": "التشغيل اليومي",
+                    "label": "قرارات الهيكل التنظيمي",
+                    "route": "portal\/ceo_org_decisions",
+                    "href": "..\/portal\/ceo_org_decisions.php"
+                },
+                {
+                    "n": 30,
+                    "group": "التشغيل اليومي",
                     "label": "الحضور والانصراف",
                     "route": "operations\/attendance",
                     "href": "..\/Operations\/attendance.php"
                 },
                 {
-                    "n": 30,
+                    "n": 31,
                     "group": "التشغيل اليومي",
                     "label": "سجل ساعات التشغيل اليومي",
                     "route": "timesheet\/timesheet",
                     "href": "..\/Timesheet\/timesheet.php"
                 },
                 {
-                    "n": 31,
+                    "n": 32,
                     "group": "التشغيل اليومي",
                     "label": "تكليف المشغل على المعدة",
                     "route": "operations\/distribution_space",
                     "href": "..\/Operations\/distribution_space.php"
                 },
                 {
-                    "n": 32,
+                    "n": 33,
                     "group": "التشغيل اليومي",
                     "label": "سجل الوردية",
                     "route": "operations\/shift_log",
                     "href": "..\/Operations\/shift_log.php"
                 },
                 {
-                    "n": 33,
+                    "n": 34,
                     "group": "الموظفون والمشغلون",
                     "label": "الأداء الشهري للمشغل",
                     "route": "workforce\/op_monthly",
                     "href": "..\/Workforce\/op_monthly.php"
                 },
                 {
-                    "n": 34,
+                    "n": 35,
                     "group": "الموظفون والمشغلون",
                     "label": "أرقام المشغلين الشاغرة",
                     "route": "workforce\/op_codes",
                     "href": "..\/Workforce\/op_codes.php"
                 },
                 {
-                    "n": 35,
+                    "n": 36,
                     "group": "الموظفون والمشغلون",
                     "label": "تأهيل المشغلين على أنواع المعدات",
                     "route": "workforce\/op_qual",
                     "href": "..\/Workforce\/op_qual.php"
                 },
                 {
-                    "n": 36,
+                    "n": 37,
                     "group": "الموظفون والمشغلون",
                     "label": "خصومات المشغلين المقترحة",
                     "route": "workforce\/proposed_deductions",
                     "href": "..\/Workforce\/proposed_deductions.php"
                 },
                 {
-                    "n": 37,
+                    "n": 38,
                     "group": "الموظفون والمشغلون",
                     "label": "التوظيف من الشاغر إلى المباشرة",
                     "route": "workforce\/recruitment_pipeline",
                     "href": "..\/Workforce\/recruitment_pipeline.php"
                 },
                 {
-                    "n": 38,
+                    "n": 39,
                     "group": "الموظفون والمشغلون",
                     "label": "طلبات الترشح",
                     "route": "workforce\/rec_applications",
                     "href": "..\/Workforce\/rec_applications.php"
                 },
                 {
-                    "n": 39,
+                    "n": 40,
                     "group": "الموظفون والمشغلون",
                     "label": "مراحل التوظيف",
                     "route": "workforce\/rec_stages",
                     "href": "..\/Workforce\/rec_stages.php"
                 },
                 {
-                    "n": 40,
+                    "n": 41,
                     "group": "الموظفون والمشغلون",
                     "label": "عقود المشاريع المؤقتة",
                     "route": "workforce\/project_contracts",
                     "href": "..\/Workforce\/project_contracts.php"
                 },
                 {
-                    "n": 41,
+                    "n": 42,
                     "group": "الموظفون والمشغلون",
                     "label": "الإجازات والغياب",
                     "route": "workforce\/worker_leave_absence",
                     "href": "..\/Workforce\/worker_leave_absence.php"
                 },
                 {
-                    "n": 42,
+                    "n": 43,
                     "group": "الموظفون والمشغلون",
                     "label": "خصومات المسيّر",
                     "route": "workforce\/deductions",
                     "href": "..\/Workforce\/deductions.php"
                 },
                 {
-                    "n": 43,
+                    "n": 44,
                     "group": "الموظفون والمشغلون",
                     "label": "دورات التناوب والإجازة الميدانية",
                     "route": "workforce\/rotation",
                     "href": "..\/Workforce\/rotation.php"
                 },
                 {
-                    "n": 44,
+                    "n": 45,
                     "group": "الموظفون والمشغلون",
                     "label": "تنقلات العاملين",
                     "route": "workforce\/worker_movement",
                     "href": "..\/Workforce\/worker_movement.php"
                 },
                 {
-                    "n": 45,
+                    "n": 46,
                     "group": "المالية والمحاسبة",
                     "label": "ميزانية إدارة التمويل",
                     "route": "finance\/budget_dept",
                     "href": "..\/Finance\/budget_dept.php"
                 },
                 {
-                    "n": 46,
+                    "n": 47,
                     "group": "المخاطر والبلاغات",
                     "label": "الإبلاغ السياقي من داخل الشاشة",
                     "route": "tickets\/ticket_contextual_open",
                     "href": "..\/Tickets\/ticket_contextual_open.php"
                 },
                 {
-                    "n": 47,
+                    "n": 48,
                     "group": "المخاطر والبلاغات",
                     "label": "صندوق بلاغات الإدارة",
                     "route": "tickets\/tickets_list",
                     "href": "..\/Tickets\/tickets_list.php?tab=dept"
                 },
                 {
-                    "n": 48,
+                    "n": 49,
                     "group": "المخاطر والبلاغات",
                     "label": "مساحة مخاطر الإدارة",
                     "route": "risk\/dept_risk_space",
                     "href": "..\/Risk\/dept_risk_space.php"
                 },
                 {
-                    "n": 49,
+                    "n": 50,
                     "group": "التقارير والتحليلات",
                     "label": "لوحة النائب",
                     "route": "portal\/vp_dashboard",
                     "href": "..\/Portal\/vp_dashboard.php"
                 },
                 {
-                    "n": 50,
+                    "n": 51,
                     "group": "التقارير والتحليلات",
                     "label": "الإدارات — نطاقي والشركة",
                     "route": "portal\/vp_departments",
                     "href": "..\/Portal\/vp_departments.php"
                 },
                 {
-                    "n": 51,
+                    "n": 52,
                     "group": "التقارير والتحليلات",
                     "label": "صندوق اعتمادات النائب",
                     "route": "portal\/vp_approval_inbox",
                     "href": "..\/Portal\/vp_approval_inbox.php"
                 },
                 {
-                    "n": 52,
+                    "n": 53,
                     "group": "التقارير والتحليلات",
                     "label": "الإجراءات والقرارات المطلوبة مني",
                     "route": "portal\/vp_pending_actions",
                     "href": "..\/Portal\/vp_pending_actions.php"
                 },
                 {
-                    "n": 53,
+                    "n": 54,
                     "group": "التقارير والتحليلات",
                     "label": "مركز تقارير الحوكمة",
                     "route": "emsreports\/index",
                     "href": "..\/emsreports\/index.php"
                 },
                 {
-                    "n": 54,
+                    "n": 55,
                     "group": "الإعدادات",
                     "label": "إدارة المعاونين",
                     "route": "main\/project_users",
@@ -7592,7 +7606,7 @@
             "kind": "EXECUTIVE",
             "name_ar": "مساحة الرئيس التنفيذي",
             "active": 1,
-            "rendered": 80,
+            "rendered": 81,
             "items": [
                 {
                     "n": 1,
@@ -7836,8 +7850,8 @@
                     "n": 35,
                     "group": "القرار والحوكمة العليا",
                     "label": "قرارات الهيكل التنظيمي",
-                    "route": "admin\/org_structure",
-                    "href": "..\/admin\/org_structure.php"
+                    "route": "portal\/ceo_org_decisions",
+                    "href": "..\/portal\/ceo_org_decisions.php"
                 },
                 {
                     "n": 36,
@@ -8129,26 +8143,33 @@
                 {
                     "n": 77,
                     "group": "الإعدادات",
+                    "label": "الهيكل التنظيمي والمسميات",
+                    "route": "admin\/org_structure",
+                    "href": "..\/admin\/org_structure.php"
+                },
+                {
+                    "n": 78,
+                    "group": "الإعدادات",
                     "label": "التكليفات التنظيمية",
                     "route": "admin\/org_assignments",
                     "href": "..\/admin\/org_assignments.php"
                 },
                 {
-                    "n": 78,
+                    "n": 79,
                     "group": "الإعدادات",
                     "label": "وضع التأسيس وإغلاقه",
                     "route": "portal\/founding_mode",
                     "href": "..\/Portal\/founding_mode.php"
                 },
                 {
-                    "n": 79,
+                    "n": 80,
                     "group": "الإعدادات",
                     "label": "بصمة الإصدار وتقرير النشر",
                     "route": "portal\/release_stamp",
                     "href": "..\/Portal\/release_stamp.php"
                 },
                 {
-                    "n": 80,
+                    "n": 81,
                     "group": "الإعدادات",
                     "label": "إدارة المعاونين",
                     "route": "main\/project_users",
