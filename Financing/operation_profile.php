@@ -9,6 +9,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 
 $company_id = intval($_SESSION['user']['company_id'] ?? 0);
@@ -52,7 +53,65 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_title_html = htmlspecialchars('ملف عملية التمويل — غير موجودة', ENT_QUOTES, 'UTF-8');
     $header_actions = array();
     $header_back = array('href' => 'financing_board.php', 'label' => 'رجوع');
-    include __DIR__ . '/../includes/page_header.php';
+    include __DIR__ . '/../includes/page_header.php'; ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> عمليات التمويل بحقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'كود العملية' => 'g211',
+            'كود العملية بالمصدر (ل03)' => 'g212',
+            'كود العقد' => 'g213',
+            'كود الممول' => 'g214',
+            'اسم الممول (بحث)' => 'g215',
+            'نموذج التمويل' => 'g216',
+            'النموذج الاقتصادي (المصدر)' => 'g217',
+            'العملة' => 'g218',
+            'تصنيف العين' => 'g219',
+            'نوع العين' => 'g220',
+            'كود العين' => 'g221',
+            'أول حركة' => 'g222',
+            'آخر حركة' => 'g223',
+            'رأس المال المعتمد' => 'g224',
+            'مصدر رأس المال' => 'g225',
+            'قيمة شراء العين' => 'purchase_value',
+            'نسبة الممول في الأصل' => 'g226',
+            'نسبة المقدم' => 'g227',
+            'قيمة المقدم' => 'g228',
+            'إضافة رأس مال' => 'g229',
+            'رسوم إدارية' => 'g230',
+            'رسوم تأمين' => 'g231',
+            'نسبة الأرباح' => 'g232',
+            'قيمة الأرباح التعاقدية' => 'g233',
+            'APR (المصدر)' => 'g234',
+            'المدة (شهر)' => 'g235',
+            'نظام الأقساط' => 'g236',
+            'عدد الأقساط' => 'g237',
+            'قيمة القسط' => 'g238',
+            'الاستحقاق بالدفتر' => 'g239',
+            'الدفعات بالدفتر' => 'g240',
+            'صفوف الدفتر' => 'g241',
+            'عدد تغيرات العقد' => 'g242',
+            'حالة اكتمال البيانات (المصدر)' => 'g243',
+            'الحالة التشغيلية' => 'g244',
+            'الحجية' => 'g245',
+            'حالة البيانات' => 'g246',
+            'Source_Row_Ref' => 'g247',
+            'ملاحظات' => 'g248',
+            'نسبة اكتمال الدورة المستندية' => 'g249',
+            'حلقات الدورة المفقودة' => 'g250',
+            'Asset_Sourcing_Mode' => 'g251',
+            'استثناء التسلسل' => 'g252',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('financing_operations');
+        echo ems_w14_grid('emsList_fin_ops', $GUIDE_COLS, $__gridRows, $D, 'لا عملية تمويل مسجلة بعد'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
     ?>
 <?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('financing', 'نظرة عامة'); ?>
     <div class="alert alert-warning">عملية غير موجودة — <a href="financing_board.php">العودة للوحة</a></div>

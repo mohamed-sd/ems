@@ -150,6 +150,9 @@ foreach ($S['screens'] as $sc) {
             continue;
         }
         $col = ($src[0] === '@') ? substr($src, 1) : $src;
+        /* وجدولٌ يُنشأ يحمل `id` و`company_id` بالبنيةِ لا بالمواصفة — فلا
+           يُطلَبان منها ولا يُعَدّان مفقودَين. */
+        if ($mkTable && !$have_cols && in_array($col, array('id', 'company_id', 'created_at', 'created_by', 'updated_at'), true)) { continue; }
         if (!isset($have_cols[$col])) {
             echo "  ✗ [{$sc['req']}] عمودٌ غيرُ موجود: {$sc['table']}.{$col} (للحقل {$lbl})\n";
             $FAIL++;

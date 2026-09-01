@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/w12_view.php';
 
@@ -59,25 +60,51 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_fin_covenants')); ?>
-    <table id="emsList_fin_covenants" class="data-table">
-        <thead><tr><th>العقد</th><th>الالتزام</th><th>الوصف</th><th>الطرف الملتزم</th><th>قاعدة القياس</th><th>العتبة المرجعية</th><th>الدورية</th><th>مستند الاثبات</th><th>مرجع الاخلال</th><th>مستند التنازل</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= (int) $r["contract_id"] ?></td>
-                    <td><?= ems_w12_state((string) $r["covenant_key"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["covenant_ar"]) ?></td>
-                    <td><?= ems_w12_state((string) $r["obligation_on"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["measure_rule"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["threshold_key"]) ?></td>
-                    <td><?= ems_w12_state((string) $r["frequency"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["evidence_doc"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["breach_ref"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["waiver_ref"]) ?></td>
-                    <td><?= ems_w12_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'كود العقد' => 'g174',
+        'كود الممول' => 'g175',
+        'اسم الممول (بحث)' => 'g176',
+        'نموذج التمويل' => 'g177',
+        'مستوى الحجية' => 'g178',
+        'توفير رأس المال' => 'g179',
+        'توقيت إتاحة التمويل' => 'g180',
+        'اختيار الأصل' => 'g181',
+        'اختيار البائع' => 'g182',
+        'دفع قيمة الأصل للبائع' => 'g183',
+        'التسليم والاستلام' => 'g184',
+        'الفحص والقبول' => 'g185',
+        'تسجيل الأصل' => 'g186',
+        'الترخيص' => 'g187',
+        'التأمين' => 'g188',
+        'رسوم التأمين' => 'g189',
+        'الضرائب والرسوم' => 'g190',
+        'التشغيل' => 'g191',
+        'الصيانة' => 'g192',
+        'قطع الغيار' => 'g193',
+        'مخاطر الهلاك والتلف' => 'g194',
+        'حفظ مستندات الملكية' => 'g195',
+        'الضمانات والرهن' => 'g196',
+        'مسؤولية التعطل وعدم الانتفاع' => 'g197',
+        'تحويل الملكية في نهاية التمويل' => 'g198',
+        'التسوية المبكرة' => 'g199',
+        'رسوم التمويل الإدارية' => 'g200',
+        'الإخطارات' => 'g201',
+        'توفير المستندات' => 'g202',
+        'إجراءات الإقفال' => 'g203',
+        'تفصيل الحسم (المرجع بسجل البنود)' => 'g204',
+        'عدد الالتزامات المحسومة' => 'g205',
+        'حالة اكتمال المصفوفة' => 'g206',
+        'مرجع العقد/المادة' => 'g207',
+        'المعبئ' => 'g208',
+        'تاريخ التعبئة' => 'g209',
+        'حالة البيانات' => 'g210',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('fin_contract_covenant');
+    echo ems_w14_grid('emsList_fin_covenants', $GUIDE_COLS, $__gridRows, $D, 'لا التزام تمويلي مسجل بعد'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/w12_view.php';
 
@@ -45,6 +46,45 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'أوامر الدفع والسداد الفعلي'; $header_icon = 'fa fa-money-check-dollar'; $header_actions = array();
     $header_back = array('href' => 'fin_financier_dues.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'استحقاقات الممول');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> اوامر الدفع والسداد الفعلي بحقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'كود السداد' => 'g327',
+            'كود العملية' => 'g328',
+            'العملة' => 'g329',
+            'المبلغ المدفوع (مجمع)' => 'g330',
+            'عدد صفوف الدفتر' => 'g331',
+            'الفترة' => 'g332',
+            'كود أمر الدفع' => 'g333',
+            'معتمد الأمر' => 'g334',
+            'المرجع البنكي' => 'g335',
+            'أمر الدفع' => 'g336',
+            'الحجية' => 'g337',
+            'حالة البيانات' => 'g338',
+            'Source_Row_Ref' => 'g339',
+            'ملاحظات' => 'g340',
+            'تاريخ الطلب' => 'g341',
+            'المبلغ المطلوب' => 'g342',
+            'المبلغ المعتمد' => 'g343',
+            'حالة الأمر' => 'g344',
+            'معتمد الأمر (مستقبلي)' => 'g345',
+            'تاريخ التنفيذ الفعلي' => 'g346',
+            'المبلغ المنفذ' => 'g347',
+            'البنك/طريقة السداد' => 'g348',
+            'مرجع الخزينة/المالية' => 'treasury_ref',
+            'حالة المطابقة' => 'g349',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('fin_payment_order');
+        echo ems_w14_grid('emsList_fin_orders', $GUIDE_COLS, $__gridRows, $D, 'لا امر دفع مسجل بعد'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
 
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">عدد أوامر الدفع</div></div>

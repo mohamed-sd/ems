@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/w12_view.php';
 
@@ -45,6 +46,54 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'الإقفالات التعاقدية'; $header_icon = 'fa fa-file-invoice'; $header_actions = array();
     $header_back = array('href' => 'installments.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'الأقساط ومواعيد السداد');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> الاقفالات التعاقدية بحقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'Close_ID' => 'g269',
+            'FOP_ID' => 'g270',
+            'FCON_ID' => 'close_code',
+            'Financier_ID' => 'g271',
+            'العملة' => 'g272',
+            'نوع الفترة' => 'g273',
+            'بداية الفترة' => 'g274',
+            'نهاية الفترة' => 'g275',
+            'شهر نهاية الفترة (وسم)' => 'g276',
+            'Monthly_Close_ID' => 'g277',
+            'رصيد أصل افتتاحي' => 'g278',
+            'رصيد عائد افتتاحي' => 'g279',
+            'أصل مستحق بالفترة' => 'g280',
+            'عائد مستحق بالفترة' => 'g281',
+            'إجمالي مستحق الفترة' => 'g282',
+            'رسوم مستحقة' => 'g283',
+            'تعديلات معتمدة ±' => 'g284',
+            'مدفوعات مخصصة للفترة' => 'g285',
+            'رصيد أصل ختامي' => 'g286',
+            'رصيد عائد ختامي' => 'g287',
+            'إجمالي الرصيد الختامي' => 'g288',
+            'المتأخر من الفترة' => 'g289',
+            'أيام التأخير' => 'g290',
+            'الاستحقاق التالي' => 'g291',
+            'حالة الإقفال' => 'g292',
+            'المنشئ' => 'g293',
+            'المراجع' => 'g294',
+            'المعتمد' => 'g295',
+            'تاريخ الاعتماد' => 'g296',
+            'مرجع كشف الحساب' => 'g297',
+            'حالة البيانات' => 'g298',
+            'ملاحظات' => 'g299',
+            'اختبار الترحيل (Opening=Closing السابق)' => 'g300',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('fin_contract_close');
+        echo ems_w14_grid('emsList_fin_cclose', $GUIDE_COLS, $__gridRows, $D, 'لا اقفال تعاقدي مسجل بعد'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
 
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">عدد الاقفالات التعاقدية</div></div>

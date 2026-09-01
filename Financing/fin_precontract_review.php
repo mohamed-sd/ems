@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/w12_view.php';
 
@@ -45,6 +46,43 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'مراجعة ما قبل التعاقد'; $header_icon = 'fa fa-clipboard-check'; $header_actions = array();
     $header_back = array('href' => 'fin_offers.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'عروض التمويل');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> مراجعة ما قبل التعاقد بحقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'كود المراجعة' => 'g101',
+            'مرجع الحاجة + العرض المختار + مسودة العقد' => 'g102',
+            'كود الممول' => 'g103',
+            'اسم الممول (بحث)' => 'client_name',
+            'واقعة الاختيار والتعاقد' => 'g104',
+            'أهلية الممول (KYC/سجل)' => 'g105',
+            'اكتمال المستندات' => 'g106',
+            'مراجعة النموذج' => 'g107',
+            'مراجعة رأس المال والعائد' => 'g108',
+            'مراجعة السداد والملكية' => 'g109',
+            'الضمانات' => 'g110',
+            'المعالجة المحاسبية المطلوبة' => 'g111',
+            'المراجع' => 'g112',
+            'المعتمد' => 'g113',
+            'Review_Must_Precede' => 'g114',
+            'Record_Basis' => 'g115',
+            'Derivation_Rule' => 'g116',
+            'Confidence' => 'g117',
+            'Needs_Review' => 'g118',
+            'حالة البيانات' => 'g119',
+            'Source_Row_Ref' => 'g120',
+            'ملاحظات' => 'notes',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('fin_precontract_review');
+        echo ems_w14_grid('emsList_fin_prereview', $GUIDE_COLS, $__gridRows, $D, 'لا مراجعة مسجلة بعد'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
 
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">عدد المراجعات</div></div>

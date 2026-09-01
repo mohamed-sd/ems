@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/w12_view.php';
 
@@ -45,6 +46,37 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'تخصيص السداد على الأقساط'; $header_icon = 'fa fa-arrows-split-up-and-left'; $header_actions = array();
     $header_back = array('href' => 'fin_payment_orders.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'أوامر الدفع والسداد الفعلي');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> تخصيص السداد على الاقساط بحقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'كود التخصيص' => 'g350',
+            'Payment_ID' => 'order_id',
+            'FOP_ID' => 'g351',
+            'FINS_ID' => 'g352',
+            'Contractual_Close_ID' => 'g353',
+            'Monthly_Close_ID' => 'g354',
+            'نوع المكون' => 'g355',
+            'العملة' => 'g356',
+            'المبلغ المخصص' => 'g357',
+            'Outstanding قبل' => 'g358',
+            'تاريخ التخصيص' => 'g359',
+            'قاعدة التخصيص' => 'g360',
+            'علم تجاوز' => 'g361',
+            'حالة البيانات' => 'g362',
+            'اختبار Σ لكل دفعة' => 'g363',
+            'اختبار ≤ المستحق' => 'g364',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('fin_payment_allocation');
+        echo ems_w14_grid('emsList_fin_alloc', $GUIDE_COLS, $__gridRows, $D, 'لا تخصيص سداد مسجل بعد'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
 
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">عدد سطور التخصيص</div></div>

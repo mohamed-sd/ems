@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/w12_view.php';
 
@@ -45,6 +46,35 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'رصيد رأس المال والعائد'; $header_icon = 'fa fa-chart-line'; $header_actions = array();
     $header_back = array('href' => 'fin_payment_allocation.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'تخصيص السداد على الأقساط');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> رصيد راس المال والعائد بحقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'كود العملية' => 'g365',
+            'كود الممول' => 'g366',
+            'اسم الممول (بحث)' => 'g367',
+            'العملة' => 'g368',
+            'رأس المال المعتمد' => 'g369',
+            'المسدد من الأصل' => 'g370',
+            'المتبقي من الأصل' => 'g371',
+            'العائد التعاقدي' => 'g372',
+            'المدفوع للعائد' => 'g373',
+            'المتبقي من العائد' => 'g374',
+            'إجمالي المدفوع (الدفتر)' => 'g375',
+            'إجمالي الالتزام المتبقي' => 'g376',
+            'آخر حركة' => 'g377',
+            'الحالة المالية' => 'g378',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('fin_capital_balance');
+        echo ems_w14_grid('emsList_fin_capital', $GUIDE_COLS, $__gridRows, $D, 'لا رصيد مسجل بعد'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
 
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= ems_w12_distinct($rows, "op_id") ?></div><div class="ems-stat-label">عمليات لها رصيد</div></div>

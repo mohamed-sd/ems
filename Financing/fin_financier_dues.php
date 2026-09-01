@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/w12_view.php';
 
@@ -45,6 +46,37 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'استحقاقات الممول'; $header_icon = 'fa fa-hand-holding-dollar'; $header_actions = array();
     $header_back = array('href' => 'installments.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'الأقساط ومواعيد السداد');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> استحقاقات الممول بحقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'كود الاستحقاق' => 'g253',
+            'كود العملية' => 'g254',
+            'كود الممول' => 'g255',
+            'اسم الممول (بحث)' => 'g256',
+            'العملة' => 'g257',
+            'المستحق حتى الأفق' => 'g258',
+            'المدفوع (الدفتر)' => 'g259',
+            'صافي المستحق غير المسدد' => 'g260',
+            'أساس الاحتساب' => 'g261',
+            'Record_Basis' => 'g262',
+            'Derivation_Rule' => 'g263',
+            'Confidence' => 'g264',
+            'Needs_Review' => 'g265',
+            'حالة البيانات' => 'g266',
+            'Source_Row_Ref' => 'g267',
+            'ملاحظات' => 'g268',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('fin_financier_due');
+        echo ems_w14_grid('emsList_fin_dues', $GUIDE_COLS, $__gridRows, $D, 'لا استحقاق مسجل بعد'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
 
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">عدد الاستحقاقات</div></div>

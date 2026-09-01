@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/w12_view.php';
 
@@ -45,6 +46,47 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'الإقفالات الشهرية وكشف الحساب'; $header_icon = 'fa fa-calendar-check'; $header_actions = array();
     $header_back = array('href' => 'fin_contract_close.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'الإقفالات التعاقدية');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> الاقفالات الشهرية وكشف الحساب بحقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'Monthly_Close_ID' => 'g301',
+            'FOP_ID' => 'g302',
+            'FCON_ID' => 'g303',
+            'Financier_ID' => 'g304',
+            'العملة' => 'g305',
+            'الشهر المحاسبي (Calendar Month)' => 'g306',
+            'بداية الشهر' => 'g307',
+            'نهاية الشهر' => 'g308',
+            'رصيد أول الشهر' => 'g309',
+            'عدد الإقفالات التعاقدية بالشهر' => 'g310',
+            'الإقفالات التعاقدية (مراجع)' => 'g311',
+            'المستحق خلال الشهر' => 'g312',
+            'المدفوعات الفعلية خلال الشهر' => 'g313',
+            'المخصص خلال الشهر' => 'g314',
+            'دفعات مقدمة/غير مخصصة' => 'g315',
+            'المتأخر خلال الشهر' => 'g316',
+            'رصيد آخر الشهر' => 'g317',
+            'اختبار الترحيل الشهري' => 'g318',
+            'مطابقة كشف الممول' => 'g319',
+            'حالة الإقفال الشهري' => 'g320',
+            'المعد' => 'g321',
+            'المراجع' => 'g322',
+            'المعتمد' => 'g323',
+            'تاريخ الاعتماد' => 'g324',
+            'حالة البيانات' => 'g325',
+            'ملاحظات' => 'g326',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('fin_monthly_close_stmt');
+        echo ems_w14_grid('emsList_fin_mclose', $GUIDE_COLS, $__gridRows, $D, 'لا اقفال شهري مسجل بعد'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
 
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">عدد الاقفالات الشهرية</div></div>

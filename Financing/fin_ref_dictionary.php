@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/w12_view.php';
 
@@ -45,6 +46,45 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'القوائم وقاموس البيانات'; $header_icon = 'fa fa-book'; $header_actions = array();
     $header_back = array('href' => 'fin_models.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'نماذج التمويل ومعالجتها');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> القوائم وقاموس البيانات بحقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'USD' => 'g419',
+            'مرابحة' => 'g420',
+            'CONFIRMED_DOCUMENT' => 'g421',
+            'Open' => 'g422',
+            'High' => 'g423',
+            'SUPPLIER' => 'g424',
+            'على الشركة' => 'g425',
+            'بنك' => 'g426',
+            'نشط' => 'g427',
+            'مكتمل' => 'g428',
+            'مطروحة' => 'g429',
+            'مستلم' => 'g430',
+            'معتمد' => 'g431',
+            'نافذ' => 'g432',
+            'مستحق تاريخيا' => 'g433',
+            'Direct' => 'g434',
+            'إعادة جدولة' => 'g435',
+            'على الممول' => 'g436',
+            'مقفلة مغطاة' => 'g437',
+            'مؤهلة للإقفال' => 'g438',
+            'الشيت' => 'g439',
+            'الحقل' => 'g440',
+            'النوع' => 'g441',
+            'تصنيف الفراغ (ما يعنيه الفراغ)' => 'g442',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('fin_ref_list');
+        echo ems_w14_grid('emsList_fin_ref', $GUIDE_COLS, $__gridRows, $D, 'لا مفردة مرجعية مسجلة بعد'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
 
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">عدد السطور</div></div>

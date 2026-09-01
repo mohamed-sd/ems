@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/w12_view.php';
 
@@ -59,26 +60,43 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_fin_contracts')); ?>
-    <table id="emsList_fin_contracts" class="data-table">
-        <thead><tr><th>كود العقد</th><th>الممول</th><th>العملية</th><th>نموذج التمويل</th><th>اصل التمويل</th><th>العملة</th><th>تاريخ التوقيع</th><th>البداية</th><th>النهاية</th><th>عدد الفترات التعاقدية</th><th>مستند العقد</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= htmlspecialchars((string) $r["contract_code"]) ?></td>
-                    <td><?= (int) $r["entity_id"] ?></td>
-                    <td><?= (int) $r["op_id"] ?></td>
-                    <td><?= htmlspecialchars((string) $r["model_code"]) ?></td>
-                    <td><?= ems_w12_num($r["principal"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["currency"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["signed_on"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["start_on"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["end_on"]) ?></td>
-                    <td><?= (int) $r["periods_total"] ?></td>
-                    <td><?= htmlspecialchars((string) $r["contract_doc_ref"]) ?></td>
-                    <td><?= ems_w12_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'كود العقد' => 'g121',
+        'مصدر العقد' => 'g122',
+        'مرجع العقد بالمصدر' => 'g123',
+        'المرجع الخارجي (رقم عقد الممول)' => 'g124',
+        'الكيان المتعاقد (الشركة)' => 'g125',
+        'رقم النسخة' => 'g126',
+        'تاريخ التوقيع' => 'g127',
+        'كود الممول' => 'g128',
+        'اسم الممول (بحث)' => 'g129',
+        'نموذج التمويل' => 'g130',
+        'العملة' => 'g131',
+        'رأس المال' => 'g132',
+        'بداية العقد' => 'g133',
+        'آخر حركة' => 'g134',
+        'المدة (شهر)' => 'g135',
+        'النهاية التعاقدية' => 'g136',
+        'حالة المستند' => 'g137',
+        'حالة المراجعة القانونية' => 'g138',
+        'حالة الاعتماد' => 'g139',
+        'من اعتمد' => 'g140',
+        'تاريخ الاعتماد' => 'g141',
+        'مرجع آخر ملحق نافذ' => 'g142',
+        'آلية الإنهاء/الإقفال' => 'g143',
+        'عدد العمليات تحته' => 'g144',
+        'حالة العقد' => 'g145',
+        'الحجية' => 'g146',
+        'حالة البيانات' => 'g147',
+        'Source_Row_Ref' => 'g148',
+        'ملاحظات' => 'g149',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('fin_finance_contract');
+    echo ems_w14_grid('emsList_fin_contracts', $GUIDE_COLS, $__gridRows, $D, 'لا عقد تمويل مسجل بعد'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

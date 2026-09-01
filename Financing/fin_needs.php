@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/w12_view.php';
 
@@ -59,24 +60,40 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_fin_needs')); ?>
-    <table id="emsList_fin_needs" class="data-table">
-        <thead><tr><th>كود الحاجة</th><th>الموضوع</th><th>الادارة الطالبة</th><th>الغرض</th><th>المبلغ المطلوب</th><th>العملة</th><th>مطلوب بحلول</th><th>الرافع</th><th>المعتمد</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= htmlspecialchars((string) $r["need_code"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["title"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["requester_dept"]) ?></td>
-                    <td><?= ems_w12_state((string) $r["purpose"]) ?></td>
-                    <td><?= ems_w12_num($r["amount_needed"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["currency"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["needed_by"]) ?></td>
-                    <td><?= (int) $r["raised_by"] ?></td>
-                    <td><?= (int) $r["approved_by"] ?></td>
-                    <td><?= ems_w12_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'كود الحاجة' => 'g43',
+        'كود العملية الناتجة' => 'g44',
+        'Selected_Financier_ID نتيجة لاحقة بعد العروض والاختيار' => 'g45',
+        'Requesting_Department الإدارة الطالبة' => 'g46',
+        'Requested_By الطالب' => 'g47',
+        'Required_By_Date' => 'g48',
+        'Priority' => 'g49',
+        'Need_Approval اعتماد الحاجة' => 'g50',
+        'Approved_Amount' => 'g51',
+        'اسم الممول (بحث)' => 'g52',
+        'الأصل المطلوب' => 'g53',
+        'كود العين' => 'g54',
+        'القيمة (من العملية)' => 'g55',
+        'العملة' => 'g56',
+        'نموذج التمويل' => 'g57',
+        'Need_Date' => 'g58',
+        'Need_Must_Precede' => 'g59',
+        'المشروع/عقد العميل' => 'g60',
+        'سبب الحاجة' => 'g61',
+        'Record_Basis' => 'g62',
+        'Derivation_Rule' => 'g63',
+        'Confidence' => 'g64',
+        'Needs_Review' => 'g65',
+        'حالة البيانات' => 'g66',
+        'Source_Row_Ref' => 'g67',
+        'ملاحظات' => 'g68',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('fin_funding_need');
+    echo ems_w14_grid('emsList_fin_needs', $GUIDE_COLS, $__gridRows, $D, 'لا حاجة تمويل مسجلة بعد'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

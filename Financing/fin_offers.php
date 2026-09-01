@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/w12_view.php';
 
@@ -59,26 +60,46 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_fin_offers')); ?>
-    <table id="emsList_fin_offers" class="data-table">
-        <thead><tr><th>كود العرض</th><th>الاصدار</th><th>الممول</th><th>نموذج التمويل</th><th>اصل التمويل</th><th>العملة</th><th>نسبة العائد</th><th>المدة بالاشهر</th><th>فترة السماح</th><th>مستند العرض</th><th>ساري حتى</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= htmlspecialchars((string) $r["offer_code"]) ?></td>
-                    <td><?= (int) $r["version_no"] ?></td>
-                    <td><?= (int) $r["entity_id"] ?></td>
-                    <td><?= htmlspecialchars((string) $r["model_code"]) ?></td>
-                    <td><?= ems_w12_num($r["principal"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["currency"]) ?></td>
-                    <td><?= ems_w12_num($r["profit_rate"]) ?></td>
-                    <td><?= (int) $r["tenor_months"] ?></td>
-                    <td><?= (int) $r["grace_months"] ?></td>
-                    <td><?= htmlspecialchars((string) $r["offer_doc_ref"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["valid_until"]) ?></td>
-                    <td><?= ems_w12_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'كود العرض' => 'g69',
+        'كود الحاجة' => 'g70',
+        'كود العملية الناتجة' => 'g71',
+        'كود الممول' => 'g72',
+        'اسم الممول (بحث)' => 'g73',
+        'صفة العرض' => 'g74',
+        'رقم النسخة' => 'g75',
+        'النسخة الأساس' => 'g76',
+        'ما الذي تغير عن سابقتها' => 'g77',
+        'من اقترح التغيير' => 'g78',
+        'تاريخ التغيير' => 'g79',
+        'حالة التفاوض' => 'g80',
+        'نموذج التمويل' => 'g81',
+        'رأس المال' => 'g82',
+        'العملة' => 'g83',
+        'نسبة الأرباح %' => 'g84',
+        'قيمة الأرباح' => 'g85',
+        'المقدم' => 'g86',
+        'المدة (شهر)' => 'g87',
+        'عدد الأقساط' => 'g88',
+        'قيمة القسط' => 'g89',
+        'الضمانات' => 'g90',
+        'تاريخ العرض' => 'g91',
+        'Offer_Must_Precede' => 'g92',
+        'عروض المنافسين' => 'g93',
+        'Record_Basis' => 'g94',
+        'Derivation_Rule' => 'g95',
+        'Confidence' => 'g96',
+        'Needs_Review' => 'g97',
+        'حالة البيانات' => 'g98',
+        'Source_Row_Ref' => 'g99',
+        'ملاحظات' => 'g100',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('fin_funding_offer');
+    echo ems_w14_grid('emsList_fin_offers', $GUIDE_COLS, $__gridRows, $D, 'لا عرض تمويل مسجل بعد'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

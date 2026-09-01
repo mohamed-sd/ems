@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/w12_view.php';
 
@@ -45,6 +46,41 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'إقفال التمويل'; $header_icon = 'fa fa-flag-checkered'; $header_actions = array();
     $header_back = array('href' => 'deviations.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'انحرافات التمويل');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> اقفال التمويل بحقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'كود العملية' => 'g399',
+            'العملة' => 'g400',
+            'المتبقي من الأصل' => 'g401',
+            'المتبقي من العائد' => 'g402',
+            'استحقاقات مفتوحة' => 'g403',
+            'انحرافات غير محسومة (مرجع ت22)' => 'g404',
+            'حكم الملكية (مرجع ت12/ت23)' => 'g405',
+            'تسوية مبكرة (FSET)' => 'g406',
+            'حالة الإقفال' => 'g407',
+            'ملاحظات' => 'g408',
+            'تاريخ طلب الإقفال' => 'g409',
+            'تاريخ الإقفال الفعلي' => 'g410',
+            'آخر إقفال دوري' => 'g411',
+            'آخر دفعة ومرجعها' => 'g412',
+            'اكتمال نقل الملكية' => 'g413',
+            'مرجع مستند الملكية' => 'g414',
+            'إخلاء الطرف/شهادة الإقفال' => 'g415',
+            'المراجع' => 'g416',
+            'المعتمد' => 'g417',
+            'تاريخ الاعتماد' => 'g418',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('fin_final_close');
+        echo ems_w14_grid('emsList_fin_fclose', $GUIDE_COLS, $__gridRows, $D, 'لا اقفال نهائي مسجل بعد'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
 
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">عدد الاقفالات النهائية</div></div>

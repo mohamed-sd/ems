@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/w12_view.php';
 
@@ -45,6 +46,33 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'جهات اتصال الممولين والمفوضين'; $header_icon = 'fa fa-address-book'; $header_actions = array();
     $header_back = array('href' => 'financiers_registry.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'سجل الممولين');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> جهات اتصال الممولين بحقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'كود الجهة' => 'g31',
+            'كود الممول' => 'g32',
+            'اسم الممول (بحث)' => 'g33',
+            'الاسم' => 'g34',
+            'الدور' => 'g35',
+            'مفوض توقيع؟' => 'g36',
+            'الهاتف' => 'g37',
+            'البريد' => 'g38',
+            'سريان من' => 'g39',
+            'إلى' => 'g40',
+            'الحالة' => 'g41',
+            'حالة البيانات' => 'g42',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('fin_financier_contact');
+        echo ems_w14_grid('emsList_fin_contacts', $GUIDE_COLS, $__gridRows, $D, 'لا جهة اتصال مسجلة بعد'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
 
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">عدد جهات الاتصال</div></div>
