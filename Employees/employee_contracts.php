@@ -672,6 +672,7 @@ include('../insidebar.php'); ?>
               <!-- XF-01: فئة العقد ونوعه وفترة تجربته في employee_contracts الموحد، والوصلة
                    ec قائمة ومعلنة في enrich — فاضيفت اعمدتها الى SELECT وحسب. -->
               <th class="ems-fn-th none" data-fn="1" data-fn-src="contract_category">فئة العقد</th>
+              <th class="ems-fn-th none" data-fn="1" data-fn-src="contract_state">حالة العقد</th>
               <th class="ems-fn-th none" data-fn="1" data-fn-src="relation_type">نوع العقد</th>
               <th class="ems-fn-th none" data-fn="1">عقد المورد المرتبط</th>
               <th class="ems-fn-th none" data-fn="1" data-fn-src="start_date">تاريخ البدء</th>
@@ -979,6 +980,7 @@ include('../insidebar.php'); ?>
                   'relation_type'     => (string) ($row['ec_relation_type'] ?? ''),
                   'probation_end'     => (string) ($row['ec_probation_end'] ?? ''),
                   'start_date'        => (string) ($row['ec_start_date'] ?? ''),
+                  'contract_state'    => (string) ($row['contract_status'] ?? ''),
               ), JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8') . "\">";
 
               $actions_html = "<div class='action-btns'>

@@ -824,6 +824,23 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="ems-fn-th none" data-fn="1">وقعه عنا</th>
               <th class="ems-fn-th none" data-fn="1">وقعه العميل</th>
               <th class="ems-fn-th none" data-fn="1">نسخة القاعدة المستعملة</th>
+              <!-- XF-01: التزامات العقد الاثنا عشر اعمدة قائمة في contracts (obl_*)
+                   لم تكن تصير اصلا — فالنقص كان عرضا لا بيانات.
+                   ⛔ و«الصيانة وقطع الغيار» و«النقل والتعبئة» لم تضافا: كل منهما
+                     حقل دليل واحد يقابله عمودان (obl_maintenance وobl_spare_parts ·
+                     obl_mobilization وobl_demobilization) — والجمع قرار لا وصل. -->
+              <th class="ems-fn-th none" data-fn="1" data-fn-src="obl_fuel">الوقود</th>
+              <th class="ems-fn-th none" data-fn="1" data-fn-src="obl_housing">السكن والإعاشة</th>
+              <th class="ems-fn-th none" data-fn="1" data-fn-src="obl_insurance">التأمين</th>
+              <th class="ems-fn-th none" data-fn="1" data-fn-src="obl_operators">المشغلون</th>
+              <th class="ems-fn-th none" data-fn="1" data-fn-src="obl_min_hours">الحد الأدنى للساعات</th>
+              <th class="ems-fn-th none" data-fn="1" data-fn-src="obl_operating_guarantee">ضمان التشغيل</th>
+              <th class="ems-fn-th none" data-fn="1" data-fn-src="obl_site_schedule">جدول عمل الموقع</th>
+              <th class="ems-fn-th none" data-fn="1" data-fn-src="obl_violation_deduction">خصم ساعات المخالفة</th>
+              <th class="ems-fn-th none" data-fn="1" data-fn-src="obl_unpaid_stoppage">التوقف غير المدفوع</th>
+              <th class="ems-fn-th none" data-fn="1" data-fn-src="obl_termination">الإنهاء</th>
+              <th class="ems-fn-th none" data-fn="1" data-fn-src="obl_renewal">التجديد</th>
+              <th class="ems-fn-th none" data-fn="1" data-fn-src="obl_governing_law">القانون الحاكم</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
               <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
@@ -1196,6 +1213,18 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     'months'         => (string) ($row['contract_duration_months'] ?? ''),
                     'bill_currency'  => (string) ($row['price_currency_contract'] ?? ''),
                     'grace_days'     => (string) ($row['grace_period_days'] ?? ''),
+                    'obl_fuel'                => (string) ($row['obl_fuel'] ?? ''),
+                    'obl_housing'             => (string) ($row['obl_housing'] ?? ''),
+                    'obl_insurance'           => (string) ($row['obl_insurance'] ?? ''),
+                    'obl_operators'           => (string) ($row['obl_operators'] ?? ''),
+                    'obl_min_hours'           => (string) ($row['obl_min_hours'] ?? ''),
+                    'obl_operating_guarantee' => (string) ($row['obl_operating_guarantee'] ?? ''),
+                    'obl_site_schedule'       => (string) ($row['obl_site_schedule'] ?? ''),
+                    'obl_violation_deduction' => (string) ($row['obl_violation_deduction'] ?? ''),
+                    'obl_unpaid_stoppage'     => (string) ($row['obl_unpaid_stoppage'] ?? ''),
+                    'obl_termination'         => (string) ($row['obl_termination'] ?? ''),
+                    'obl_renewal'             => (string) ($row['obl_renewal'] ?? ''),
+                    'obl_governing_law'       => (string) ($row['obl_governing_law'] ?? ''),
                 ), JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8') . "\">";
                 echo "<td class='group-status'>" . $actions_html . "</td>";
 
