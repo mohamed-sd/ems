@@ -1,7 +1,7 @@
 {
     "meta": {
-        "snapshot": "99d9c87a",
-        "updated_at": "2026-08-31 23:59",
+        "snapshot": "5c1af89e",
+        "updated_at": "2026-09-01 06:59",
         "governing_order": "docs\/REPAIR01_20260823\/orders\/CLOSURE_SYSTEM.txt",
         "sprint_timeboxes": {
             "SPRINT-01": {
@@ -7296,7 +7296,7 @@
             "Domain": "الحوكمة",
             "Target_ID": "NAV-PLACEMENTS-NOT-BUILT",
             "Requirement_ID": "—",
-            "Current_Status": "OPEN",
+            "Current_Status": "IN_PROGRESS",
             "Priority": "P1",
             "Execution_Rank": 890,
             "Severity": "HIGH",
@@ -7314,10 +7314,10 @@
             "Estimated_Effort": "XL",
             "Evidence_Contract": "كل شاشة تبنى بنمط WH-03 الكامل (جدول بقيوده · شاشة بفعليها · التوصيل الكامل · البوابات خضر) وكل ادارة تبلغ §24 تدخل التحقق البشري فورا",
             "Next_Action": "استخراج Sprint من السجل واخذ اعلى الاهداف قيمة — 134 موضعا حاليا (لوحة DEPARTMENT_CONFORMANCE)",
-            "Current_Snapshot": "عدة التوصيل عممت gov_exec_screen_wire --spec=json وتعلمت درس قالب مستخدم الدور النافذ (FIN-G3) @ 99d9c87a",
-            "Last_Updated_Snapshot": "99d9c87a",
-            "Last_Evidence_Ref": "اول بناء حقيقي من الـ92: التسهيلات البنكية (tre_bank_facility · SCR-0818 · Finance\/tre_facilities.php) كاملة التوصيل — DEP-06 صارت مطابقة تامة (MATCH=7 ادارات) وNOT_BUILT=91 @ 99d9c87a",
-            "Status_Changed_At": "2026-08-31 23:59 @ 99d9c87a",
+            "Current_Snapshot": "العدة المعممة الجديدة tools\/gov_exec_dept_build.php: مواصفة يدوية لكل ادارة + الاسم العربي يقرا من repair01_fields حرفا + هجرة بعكسها + gov_field_class + التوصيل الخماسي + ربط الموضع + القفل الثالث nav_items @ 5c1af89e",
+            "Last_Updated_Snapshot": "5c1af89e",
+            "Last_Evidence_Ref": "DEP-04 اغلقت بناء: 23 موضعا بنيت ووصلت وصيرت — TARGET_BUILD_COVERAGE 314\/413 ⇒ 337\/413 و RENDERED_TARGET_COVERAGE 201\/201 ⇒ 224\/224 و MATCH 7 ⇒ 8 ادارات · برهان التصيير 25\/0 (tests\/gov_exec_dept_render_proof.php) @ 5c1af89e",
+            "Status_Changed_At": "2026-09-01 06:59 @ 5c1af89e",
             "Final_Disposition": "",
             "Levels": {
                 "Decision": "DECIDED",
@@ -7337,7 +7337,7 @@
             "Domain": "الحوكمة",
             "Target_ID": "FIELD-CONFORMANCE",
             "Requirement_ID": "—",
-            "Current_Status": "OPEN",
+            "Current_Status": "IN_PROGRESS",
             "Priority": "P1",
             "Execution_Rank": 890,
             "Severity": "HIGH",
@@ -7355,10 +7355,10 @@
             "Estimated_Effort": "XL",
             "Evidence_Contract": "REQUIRED_FIELD_MISSING=0 و UNRULED_EXTRA_FIELD=0 و WRONG_FIELD_ORDER=0 لكل ادارة — بعدة rpr02_field_measure الموسعة على الدفتر المسوى",
             "Next_Action": "ابدا بالادارات البانية سقف البنية (ترتيب السجل) — المقيس الحالي في SCREEN_FIELD_CONFORMANCE",
-            "Current_Snapshot": "OPEN @ 909cf6a3",
-            "Last_Updated_Snapshot": "909cf6a3",
-            "Last_Evidence_Ref": "قياس pack12 @ 909cf6a3",
-            "Status_Changed_At": "2026-09-01 02:20 @ 909cf6a3",
+            "Current_Snapshot": "الحقول تصير من gov_field_class والاسم العربي من ورقة 02 تتبع الحقول حرفا — والحقل بلا صنف لا يصير (OBL-0052) @ 5c1af89e",
+            "Last_Updated_Snapshot": "5c1af89e",
+            "Last_Evidence_Ref": "مقياس rpr02_field_measure الحي: 891\/4039 ⇒ 1288\/4436 والاسطح المطابقة حقولها كاملة 1\/269 ⇒ 24\/292 — والمقام صعد لدخول 23 سطحا جديدا الجسر (فخ المقام §20) @ 5c1af89e",
+            "Status_Changed_At": "2026-09-01 06:59 @ 5c1af89e",
             "Final_Disposition": "",
             "Levels": {
                 "Decision": "DECIDED",

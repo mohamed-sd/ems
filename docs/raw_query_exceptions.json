@@ -4,8 +4,8 @@
     "built_from": "tools/lib/raw_query_scan.php — الماسحُ نفسُه الذي تقرأ به السقّاطة",
     "review_note": "دوريةُ المراجعةِ لا مصدرَ حاكمًا لها في الحزمةِ ولا في وثائقِ المواءمة — و§ثالثًا يمنع اختراعَ مدة. فالحقلُ NEEDS_GOVERNING_SOURCE.",
     "count": 607,
-    "owner_named": 257,
-    "owner_unknown": 350,
+    "owner_named": 259,
+    "owner_unknown": 348,
     "entries": {
         "ActivityLogs/activity_logs.php": {
             "owner": "ادارة التشغيل",
@@ -350,8 +350,8 @@
             "review_date": "NEEDS_GOVERNING_SOURCE"
         },
         "Equipments/equipment_profile.php": {
-            "owner": "NEEDS_GOVERNING_SOURCE",
-            "owner_source": "لا مسارَ في القوائمِ ولا إجماعَ في مجلَّدِه — لا يُنسَب لدورٍ بالتخمين",
+            "owner": "ادارة الاسطول",
+            "owner_source": "nav_items.route ⇒ modules.owner_role_id ⇒ roles.name",
             "reason": "موروثٌ قبلَ البوابة — والعقدُ الحاكمُ (docs/TENANT_GATE_CONTRACT_ar.md §1، إحالةً إلى R02 §3.4) ينصُّ أن الشاشاتِ القديمةَ تبقى على mysqli الخامِّ حتى دورِ هجرتِها. فالاستثناءُ مُعلَنٌ لا مُغفَل، والعزلُ فيه بانضباطِ المطوِّرِ لا بالبوابة — وهذا هو الخطرُ المسجَّل.",
             "review_date": "NEEDS_GOVERNING_SOURCE"
         },
@@ -380,8 +380,8 @@
             "review_date": "NEEDS_GOVERNING_SOURCE"
         },
         "Equipments/fleet_failures.php": {
-            "owner": "NEEDS_GOVERNING_SOURCE",
-            "owner_source": "لا مسارَ في القوائمِ ولا إجماعَ في مجلَّدِه — لا يُنسَب لدورٍ بالتخمين",
+            "owner": "ادارة الصيانة",
+            "owner_source": "nav_items.route ⇒ modules.owner_role_id ⇒ roles.name",
             "reason": "موروثٌ قبلَ البوابة — والعقدُ الحاكمُ (docs/TENANT_GATE_CONTRACT_ar.md §1، إحالةً إلى R02 §3.4) ينصُّ أن الشاشاتِ القديمةَ تبقى على mysqli الخامِّ حتى دورِ هجرتِها. فالاستثناءُ مُعلَنٌ لا مُغفَل، والعزلُ فيه بانضباطِ المطوِّرِ لا بالبوابة — وهذا هو الخطرُ المسجَّل.",
             "review_date": "NEEDS_GOVERNING_SOURCE"
         },
@@ -722,8 +722,8 @@
             "review_date": "NEEDS_GOVERNING_SOURCE"
         },
         "Financing/asset_disposal.php": {
-            "owner": "NEEDS_GOVERNING_SOURCE",
-            "owner_source": "لا مسارَ في القوائمِ ولا إجماعَ في مجلَّدِه — لا يُنسَب لدورٍ بالتخمين",
+            "owner": "ادارة الاسطول",
+            "owner_source": "nav_items.route ⇒ modules.owner_role_id ⇒ roles.name",
             "reason": "موروثٌ قبلَ البوابة — والعقدُ الحاكمُ (docs/TENANT_GATE_CONTRACT_ar.md §1، إحالةً إلى R02 §3.4) ينصُّ أن الشاشاتِ القديمةَ تبقى على mysqli الخامِّ حتى دورِ هجرتِها. فالاستثناءُ مُعلَنٌ لا مُغفَل، والعزلُ فيه بانضباطِ المطوِّرِ لا بالبوابة — وهذا هو الخطرُ المسجَّل.",
             "review_date": "NEEDS_GOVERNING_SOURCE"
         },
@@ -758,8 +758,8 @@
             "review_date": "NEEDS_GOVERNING_SOURCE"
         },
         "Financing/operation_profile.php": {
-            "owner": "NEEDS_GOVERNING_SOURCE",
-            "owner_source": "لا مسارَ في القوائمِ ولا إجماعَ في مجلَّدِه — لا يُنسَب لدورٍ بالتخمين",
+            "owner": "إدارة التمويل",
+            "owner_source": "nav_items.route ⇒ modules.owner_role_id ⇒ roles.name",
             "reason": "موروثٌ قبلَ البوابة — والعقدُ الحاكمُ (docs/TENANT_GATE_CONTRACT_ar.md §1، إحالةً إلى R02 §3.4) ينصُّ أن الشاشاتِ القديمةَ تبقى على mysqli الخامِّ حتى دورِ هجرتِها. فالاستثناءُ مُعلَنٌ لا مُغفَل، والعزلُ فيه بانضباطِ المطوِّرِ لا بالبوابة — وهذا هو الخطرُ المسجَّل.",
             "review_date": "NEEDS_GOVERNING_SOURCE"
         },
@@ -909,7 +909,7 @@
         },
         "Maintenance/failure_report.php": {
             "owner": "ادارة الصيانة",
-            "owner_source": "إجماعُ مالكي إخوتِه المسجَّلين في القوائم — مجلَّد maintenance",
+            "owner_source": "nav_items.route ⇒ modules.owner_role_id ⇒ roles.name",
             "reason": "موروثٌ قبلَ البوابة — والعقدُ الحاكمُ (docs/TENANT_GATE_CONTRACT_ar.md §1، إحالةً إلى R02 §3.4) ينصُّ أن الشاشاتِ القديمةَ تبقى على mysqli الخامِّ حتى دورِ هجرتِها. فالاستثناءُ مُعلَنٌ لا مُغفَل، والعزلُ فيه بانضباطِ المطوِّرِ لا بالبوابة — وهذا هو الخطرُ المسجَّل.",
             "review_date": "NEEDS_GOVERNING_SOURCE"
         },
@@ -1040,32 +1040,32 @@
             "review_date": "NEEDS_GOVERNING_SOURCE"
         },
         "Oprators/get_contract_stats.php": {
-            "owner": "ادارة الاسطول",
-            "owner_source": "إجماعُ مالكي إخوتِه المسجَّلين في القوائم — مجلَّد oprators",
+            "owner": "NEEDS_GOVERNING_SOURCE",
+            "owner_source": "لا مسارَ في القوائمِ ولا إجماعَ في مجلَّدِه — لا يُنسَب لدورٍ بالتخمين",
             "reason": "موروثٌ قبلَ البوابة — والعقدُ الحاكمُ (docs/TENANT_GATE_CONTRACT_ar.md §1، إحالةً إلى R02 §3.4) ينصُّ أن الشاشاتِ القديمةَ تبقى على mysqli الخامِّ حتى دورِ هجرتِها. فالاستثناءُ مُعلَنٌ لا مُغفَل، والعزلُ فيه بانضباطِ المطوِّرِ لا بالبوابة — وهذا هو الخطرُ المسجَّل.",
             "review_date": "NEEDS_GOVERNING_SOURCE"
         },
         "Oprators/get_contract_suppliers.php": {
-            "owner": "ادارة الاسطول",
-            "owner_source": "إجماعُ مالكي إخوتِه المسجَّلين في القوائم — مجلَّد oprators",
+            "owner": "NEEDS_GOVERNING_SOURCE",
+            "owner_source": "لا مسارَ في القوائمِ ولا إجماعَ في مجلَّدِه — لا يُنسَب لدورٍ بالتخمين",
             "reason": "موروثٌ قبلَ البوابة — والعقدُ الحاكمُ (docs/TENANT_GATE_CONTRACT_ar.md §1، إحالةً إلى R02 §3.4) ينصُّ أن الشاشاتِ القديمةَ تبقى على mysqli الخامِّ حتى دورِ هجرتِها. فالاستثناءُ مُعلَنٌ لا مُغفَل، والعزلُ فيه بانضباطِ المطوِّرِ لا بالبوابة — وهذا هو الخطرُ المسجَّل.",
             "review_date": "NEEDS_GOVERNING_SOURCE"
         },
         "Oprators/get_mine_contracts.php": {
-            "owner": "ادارة الاسطول",
-            "owner_source": "إجماعُ مالكي إخوتِه المسجَّلين في القوائم — مجلَّد oprators",
+            "owner": "NEEDS_GOVERNING_SOURCE",
+            "owner_source": "لا مسارَ في القوائمِ ولا إجماعَ في مجلَّدِه — لا يُنسَب لدورٍ بالتخمين",
             "reason": "موروثٌ قبلَ البوابة — والعقدُ الحاكمُ (docs/TENANT_GATE_CONTRACT_ar.md §1، إحالةً إلى R02 §3.4) ينصُّ أن الشاشاتِ القديمةَ تبقى على mysqli الخامِّ حتى دورِ هجرتِها. فالاستثناءُ مُعلَنٌ لا مُغفَل، والعزلُ فيه بانضباطِ المطوِّرِ لا بالبوابة — وهذا هو الخطرُ المسجَّل.",
             "review_date": "NEEDS_GOVERNING_SOURCE"
         },
         "Oprators/getoprator.php": {
-            "owner": "ادارة الاسطول",
-            "owner_source": "إجماعُ مالكي إخوتِه المسجَّلين في القوائم — مجلَّد oprators",
+            "owner": "NEEDS_GOVERNING_SOURCE",
+            "owner_source": "لا مسارَ في القوائمِ ولا إجماعَ في مجلَّدِه — لا يُنسَب لدورٍ بالتخمين",
             "reason": "موروثٌ قبلَ البوابة — والعقدُ الحاكمُ (docs/TENANT_GATE_CONTRACT_ar.md §1، إحالةً إلى R02 §3.4) ينصُّ أن الشاشاتِ القديمةَ تبقى على mysqli الخامِّ حتى دورِ هجرتِها. فالاستثناءُ مُعلَنٌ لا مُغفَل، والعزلُ فيه بانضباطِ المطوِّرِ لا بالبوابة — وهذا هو الخطرُ المسجَّل.",
             "review_date": "NEEDS_GOVERNING_SOURCE"
         },
         "Oprators/oprators.php": {
-            "owner": "ادارة الاسطول",
-            "owner_source": "إجماعُ مالكي إخوتِه المسجَّلين في القوائم — مجلَّد oprators",
+            "owner": "إدارة الموقع",
+            "owner_source": "nav_items.route ⇒ modules.owner_role_id ⇒ roles.name",
             "reason": "موروثٌ قبلَ البوابة — والعقدُ الحاكمُ (docs/TENANT_GATE_CONTRACT_ar.md §1، إحالةً إلى R02 §3.4) ينصُّ أن الشاشاتِ القديمةَ تبقى على mysqli الخامِّ حتى دورِ هجرتِها. فالاستثناءُ مُعلَنٌ لا مُغفَل، والعزلُ فيه بانضباطِ المطوِّرِ لا بالبوابة — وهذا هو الخطرُ المسجَّل.",
             "review_date": "NEEDS_GOVERNING_SOURCE"
         },
@@ -1238,8 +1238,8 @@
             "review_date": "NEEDS_GOVERNING_SOURCE"
         },
         "Procurement/warehouses.php": {
-            "owner": "NEEDS_GOVERNING_SOURCE",
-            "owner_source": "لا مسارَ في القوائمِ ولا إجماعَ في مجلَّدِه — لا يُنسَب لدورٍ بالتخمين",
+            "owner": "أمين المستودع",
+            "owner_source": "nav_items.route ⇒ modules.owner_role_id ⇒ roles.name",
             "reason": "موروثٌ قبلَ البوابة — والعقدُ الحاكمُ (docs/TENANT_GATE_CONTRACT_ar.md §1، إحالةً إلى R02 §3.4) ينصُّ أن الشاشاتِ القديمةَ تبقى على mysqli الخامِّ حتى دورِ هجرتِها. فالاستثناءُ مُعلَنٌ لا مُغفَل، والعزلُ فيه بانضباطِ المطوِّرِ لا بالبوابة — وهذا هو الخطرُ المسجَّل.",
             "review_date": "NEEDS_GOVERNING_SOURCE"
         },
@@ -1856,8 +1856,8 @@
             "review_date": "NEEDS_GOVERNING_SOURCE"
         },
         "Timesheet/timesheet_details.php": {
-            "owner": "NEEDS_GOVERNING_SOURCE",
-            "owner_source": "لا مسارَ في القوائمِ ولا إجماعَ في مجلَّدِه — لا يُنسَب لدورٍ بالتخمين",
+            "owner": "ادارة التشغيل",
+            "owner_source": "nav_items.route ⇒ modules.owner_role_id ⇒ roles.name",
             "reason": "موروثٌ قبلَ البوابة — والعقدُ الحاكمُ (docs/TENANT_GATE_CONTRACT_ar.md §1، إحالةً إلى R02 §3.4) ينصُّ أن الشاشاتِ القديمةَ تبقى على mysqli الخامِّ حتى دورِ هجرتِها. فالاستثناءُ مُعلَنٌ لا مُغفَل، والعزلُ فيه بانضباطِ المطوِّرِ لا بالبوابة — وهذا هو الخطرُ المسجَّل.",
             "review_date": "NEEDS_GOVERNING_SOURCE"
         },
@@ -1899,7 +1899,7 @@
         },
         "Transport/transfer_order_form.php": {
             "owner": "إدارة النقل والترحيل",
-            "owner_source": "إجماعُ مالكي إخوتِه المسجَّلين في القوائم — مجلَّد transport",
+            "owner_source": "nav_items.route ⇒ modules.owner_role_id ⇒ roles.name",
             "reason": "موروثٌ قبلَ البوابة — والعقدُ الحاكمُ (docs/TENANT_GATE_CONTRACT_ar.md §1، إحالةً إلى R02 §3.4) ينصُّ أن الشاشاتِ القديمةَ تبقى على mysqli الخامِّ حتى دورِ هجرتِها. فالاستثناءُ مُعلَنٌ لا مُغفَل، والعزلُ فيه بانضباطِ المطوِّرِ لا بالبوابة — وهذا هو الخطرُ المسجَّل.",
             "review_date": "NEEDS_GOVERNING_SOURCE"
         },
@@ -3505,7 +3505,7 @@
             "reason": "موروثٌ قبلَ البوابة — والعقدُ الحاكمُ (docs/TENANT_GATE_CONTRACT_ar.md §1، إحالةً إلى R02 §3.4) ينصُّ أن الشاشاتِ القديمةَ تبقى على mysqli الخامِّ حتى دورِ هجرتِها. فالاستثناءُ مُعلَنٌ لا مُغفَل، والعزلُ فيه بانضباطِ المطوِّرِ لا بالبوابة — وهذا هو الخطرُ المسجَّل.",
             "review_date": "NEEDS_GOVERNING_SOURCE"
         },
-        "includes/u13_screen_kit.php": {
+        "includes/u13_screen_kit_cols.php": {
             "owner": "NEEDS_GOVERNING_SOURCE",
             "owner_source": "لا مسارَ في القوائمِ ولا إجماعَ في مجلَّدِه — لا يُنسَب لدورٍ بالتخمين",
             "reason": "موروثٌ قبلَ البوابة — والعقدُ الحاكمُ (docs/TENANT_GATE_CONTRACT_ar.md §1، إحالةً إلى R02 §3.4) ينصُّ أن الشاشاتِ القديمةَ تبقى على mysqli الخامِّ حتى دورِ هجرتِها. فالاستثناءُ مُعلَنٌ لا مُغفَل، والعزلُ فيه بانضباطِ المطوِّرِ لا بالبوابة — وهذا هو الخطرُ المسجَّل.",
