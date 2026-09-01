@@ -49,6 +49,7 @@ while (ob_get_level()) { ob_end_clean(); }
 $conn = $GLOBALS['conn'];
 $conn->set_charset('utf8mb4');
 $e = function ($x) use ($conn) { return $conn->real_escape_string((string) $x); };
+grain_fk_parents($conn);   /* تُبنى خريطةُ البنوّةِ مرّةً من المخطَّطِ الحيّ */
 
 $APPLY = in_array('--apply', $argv, true);
 $MD    = in_array('--md', $argv, true);
@@ -77,6 +78,24 @@ function grain_tables($src, $known = null)
     }
     if (preg_match_all('~\b(?:FROM|JOIN)\s+`?([a-z][a-z0-9_]{2,})`?~i', $src, $m)) {
         foreach ($m[1] as $t) { $t = strtolower($t); $out['r'][$t] = isset($out['r'][$t]) ? $out['r'][$t] + 1 : 1; }
+    }
+    /* ══ **وبوّابةُ المستأجرِ طريقُ وصولٍ لا استثناءٌ منه** ══════════════════
+       ◆ **العطبُ المقيس**: كان الانتزاعُ يقرأ **`SQL` الخامَّ وحدَه**، وسياسةُ
+         الشجرةِ (`GAP-29` · `ADR-02`) تنقل الوصولَ إلى `ems_tenant_db()` —
+         فكلُّ سطحٍ **امتثل للسياسةِ** قُرئ «لا جدولَ فيه ولا في اشتمالاتِه»
+         وخرج بلا حبّة. **فالمقياسُ كان يعاقب الامتثالَ ويكافئ الخامَّ** —
+         انقلابٌ في القياسِ لا نقصٌ في المبنيّ.
+       ◆ **والصيغةُ المقروءةُ عقدُ البوّابةِ نفسُه**: أوّلُ وسيطٍ نصِّيٍّ في
+         `select|insert|update|delete|…` اسمُ الجدول، والقراءةُ تُميَّز من
+         الكتابةِ **بالفعلِ لا بالظنّ**.
+       ⛔ **ولا يتغيّر شرطُ القبول**: المرشَّحُ يبقى مصفًّى بالمخطَّطِ الحيِّ
+         أدناه — فاسمٌ لا وجودَ له في القاعدةِ لا يصير حبّةً. */
+    if (preg_match_all('~->\s*(select|insert|update|delete|count|exists|first|selectOne|fetchAll)\s*\(\s*[\x27\x22]([a-z][a-z0-9_]{2,})[\x27\x22]~i', $src, $m, PREG_SET_ORDER)) {
+        foreach ($m as $hit) {
+            $verb = strtolower($hit[1]); $t = strtolower($hit[2]);
+            $slot = in_array($verb, array('insert', 'update', 'delete'), true) ? 'w' : 'r';
+            $out[$slot][$t] = isset($out[$slot][$t]) ? $out[$slot][$t] + 1 : 1;
+        }
     }
     /* ⛔ **والمرشَّحُ لا يصير جدولًا بشكلِه بل بوجودِه في المخطَّط**:
        نصٌّ كـ«UPDATE failed» أو «company_id» أو «without» يطابق الشكلَ ولا
@@ -141,9 +160,34 @@ function grain_source($file, $ROOT, $CHROME, $depth, &$seen, &$files, $shared)
      ابنٌ بأحدِ وجهين: **لاحقةُ بنودٍ على جِذعِ الأمّ** (`x` ⇐ `x_lines`)،
      **أو اسمُ الأمِّ بادئةٌ للابنِ عند حدِّ شَرطة** (`timesheet` ⇐
      `timesheet_failure_hours`) — وهي عائلةُ حبّةٍ واحدةٍ لا حبّتان. */
+/** خريطةُ البنوّةِ من **مفاتيحِ المخطَّطِ الأجنبيّة** — تُبنى مرّةً وتُقرأ دائمًا.
+ *  ◆ **لماذا**: البنوّةُ بالاسمِ (`x` ⇒ `x_lines`) تمسك عائلاتٍ وتُخطئ أخرى:
+ *    `asset_source_check.intake_id ⇒ asset_intake` بنوّةٌ صريحةٌ في المخطَّطِ
+ *    ولا يجمعهما اسم. **والمخطَّطُ أصدقُ من عُرفِ التسمية** — و323 مفتاحًا
+ *    أجنبيًّا في القاعدةِ تحسم ما لا يحسمه الاسم.
+ *  ⛔ **ولا تُخترَع بنوّةٌ**: ما لا مفتاحَ له ولا اسمَ يجمعه يبقى حبّةً ثانيةً. */
+function grain_fk_parents($conn = null)
+{
+    static $map = null;
+    if ($map !== null) { return $map; }
+    $map = array();
+    if ($conn instanceof mysqli) {
+        $r = @$conn->query("SELECT LOWER(TABLE_NAME) c, LOWER(REFERENCED_TABLE_NAME) p
+                              FROM information_schema.KEY_COLUMN_USAGE
+                             WHERE TABLE_SCHEMA = DATABASE() AND REFERENCED_TABLE_NAME IS NOT NULL");
+        while ($r && ($x = $r->fetch_assoc())) {
+            if ($x['c'] === $x['p']) { continue; }
+            $map[$x['c']][$x['p']] = 1;
+        }
+    }
+    return $map;
+}
+
 function grain_is_child($child, $parent)
 {
     if ($child === $parent || $parent === '' || $child === '') { return false; }
+    $fk = grain_fk_parents();
+    if (isset($fk[$child][$parent])) { return true; }
     /* والبادئةُ تُقاس على الأمِّ جمعًا ومفردًا: `tickets` أمٌّ لـ`ticket_watchers`
        و`persons` أمٌّ لـ`person_relationships` — والجمعُ لا يقطع البنوّة. */
     if (strpos($child, $parent . '_') === 0) { return true; }
@@ -180,7 +224,14 @@ if ($SELF) {
     if (!grain_is_child('acc_invoices_lines', 'acc_invoices')) { echo "  X البنوّةُ لم تُقرأ\n"; $fail++; }
     if (grain_is_child('acc_invoices', 'proc_orders')) { echo "  X بنوّةٌ كاذبةٌ أُقرَّت\n"; $fail++; }
     if (!grain_is_child('ticket_watchers', 'tickets')) { echo "  X الجمعُ قطع البنوّةَ\n"; $fail++; }
-    if (grain_is_child('entity_roles', 'legal_entities')) { echo "  X بنوّةٌ كاذبةٌ بالجمع\n"; $fail++; }
+    /* ⭐ **الزوجُ القديمُ هنا كان `entity_roles`/`legal_entities`** على أنّه
+       «بنوّةٌ كاذبةٌ بالجمع» — وقِيس المخطَّطُ فإذا **مفتاحٌ أجنبيٌّ صريحٌ**
+       يربطهما (`fk_er_entity`: `entity_roles.entity_id ⇒ legal_entities`).
+       فالبنوّةُ **حقيقيّةٌ** وحكمُ الفحصِ كان مبنيًّا على الاسمِ وحدَه.
+       ⇒ فيُبدَّل بزوجٍ **لا مفتاحَ بينهما** (قِيس: صفر) فيبقى الفحصُ حارسًا
+       لِما وُضع له — أن لا يُنشئ الجمعُ بنوّةً — ويُضاف شاهدٌ للبنوّةِ بالمفتاح. */
+    if (grain_is_child('risk_events', 'legal_entities')) { echo "  X بنوّةٌ كاذبةٌ بالجمع\n"; $fail++; }
+    if (!grain_is_child('entity_roles', 'legal_entities')) { echo "  X بنوّةُ المفتاحِ الأجنبيِّ لم تُقرأ\n"; $fail++; }
     /* **الكاسرُ**: مفردةٌ لا ترد إلّا هنا — فلو مرَّ الفحصُ بها كان أخضرَ كاذبًا */
     $g = grain_tables('SELECT 1 FROM zzq_unique_probe_tbl');
     if (!isset($g['r']['zzq_unique_probe_tbl'])) { echo "  X المفردةُ الفريدةُ لم تُرصَد\n"; $fail++; }
