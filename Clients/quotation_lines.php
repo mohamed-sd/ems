@@ -10,6 +10,7 @@
  *   وتَثبت المفاتيح.
  */
 require_once __DIR__ . '/../includes/session_bootstrap.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
@@ -92,7 +93,46 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
   ob_start(); ?><span class="badge"><?= $queueFail === '' ? count($rows) : '—' ?> بندا · الإجمالي <?= number_format($sum, 2) ?> <?= htmlspecialchars($cur, ENT_QUOTES, 'UTF-8') ?></span><?php
   $header_actions = array(array('raw' => trim((string) ob_get_clean())));
   $header_back = false;
-  include __DIR__ . '/../includes/page_header.php';
+  include __DIR__ . '/../includes/page_header.php'; ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_sal_quotation_lines
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم البند' => 'g117',
+            'رقم العرض' => 'g118',
+            'مرجع العقد' => 'g119',
+            'نوع البند' => 'g120',
+            'نوع الخدمة' => 'g121',
+            'نوع المعدة/البند' => 'g122',
+            'نموذج العمل' => 'g123',
+            'عدد المعدات' => 'g124',
+            'أساس الوحدة الشهري' => 'g125',
+            'المدة (أشهر)' => 'g126',
+            'الكمية/المستهدف' => 'g127',
+            'وحدة القياس' => 'g128',
+            'سعر الوحدة' => 'g129',
+            'العملة' => 'g130',
+            'القيمة' => 'g131',
+            'سريان النسخة السعرية' => 'g132',
+            'أساس السعر' => 'g133',
+            'الضريبة كما وردت' => 'g134',
+            'نص السعر كما ورد بالمصدر' => 'g135',
+            'حالة البيانات' => 'g136',
+            'ملاحظات تجارية' => 'g137',
+            'مفتاح دورة الالتزام المصدر' => 'g138',
+            'مستوى الحجية' => 'g139',
+            'أساس القيمة الرجعية' => 'g140',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('sal_quotation_lines');
+        echo ems_w14_grid('emsList_sal_quotation_lines', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في بنود العروض'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
   echo ems_states_bundle('لا بند مسجل بعد',
       'البند يضاف إلى رأس عرض قائم — والإجمالي يحسب في الخدمة ويعرض ولا يدخل');
   ?>

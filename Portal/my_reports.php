@@ -14,6 +14,7 @@
  *   والموظّفُ صفوفَه — بالشيفرةِ نفسِها. ⛔ ولا ثلاثةَ أنظمة.
  */
 require_once __DIR__ . '/../includes/session_bootstrap.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
@@ -65,22 +66,24 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_my_reports')); ?>
-    <table id="emsList_my_reports" class="data-table">
-        <thead><tr><th>رقم البلاغ</th><th>تاريخ البلاغ</th><th>الملخص</th><th>الأولوية</th><th>المرحلة</th><th>مهلة الاستجابة</th><th>مهلة المعالجة</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= ems_w15_txt($r["ticket_no"]) ?></td>
-                    <td><?= ems_w15_txt($r["call_date"]) ?></td>
-                    <td><?= ems_w15_txt($r["operational_summary"]) ?></td>
-                    <td><?= ems_w15_state((string) $r["priority"]) ?></td>
-                    <td><?= ems_w15_state((string) $r["stage"]) ?></td>
-                    <td><?= ems_w15_txt($r["response_due_at"]) ?></td>
-                    <td><?= ems_w15_txt($r["resolution_due_at"]) ?></td>
-                    <td><?= ems_w15_state((string) $r["head_state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close:emsList_my_reports
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'رقم البلاغ' => 'g1',
+        'تاريخ التسجيل' => 'g2',
+        'الفئة' => 'g3',
+        'الطبيعة' => 'g4',
+        'ملخص البلاغ' => 'g5',
+        'الإدارة المعالجة' => 'g6',
+        'حالة البلاغ' => 'g7',
+        'ينتظر تأكيدي؟' => 'g8',
+        'تأكيد الإغلاق' => 'g9',
+        'تقييم الرضا' => 'g10',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('my_reports');
+    echo ems_w14_grid('emsList_my_reports', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في البلاغات المسجلة'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

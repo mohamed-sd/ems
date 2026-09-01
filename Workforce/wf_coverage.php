@@ -15,6 +15,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../app/Services/Fleet/AssetLifecycleService.php';
 
@@ -74,28 +75,24 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_wf_coverage')); ?>
-    <table id="emsList_wf_coverage" class="data-table">
-        <thead><tr><th>#</th><th>المشروع</th><th>الفئة التشغيلية</th><th>المطلوب</th><th>المتوفر</th>
-            <th>العجز المشتق</th><th>الفائض المشتق</th><th>الحالة المشتقة</th>
-            <th>العجز المعلن</th><th>الحالة المعلنة</th><th>حكم الفارق</th><th>قاعدة الاشتقاق</th></tr></thead>
-        <tbody>
-        <?php if ($rows): $i = 0; foreach ($rows as $r): $i++; $open = ($r['variance_rule'] === 'W5_COVERAGE_VARIANCE_OPEN'); ?>
-            <tr><td><?= $i ?></td>
-                <td><?= htmlspecialchars(isset($projects[(int) $r['project_id']]) ? $projects[(int) $r['project_id']] : '—') ?></td>
-                <td><?= htmlspecialchars((string) $r['worker_category']) ?></td>
-                <td><?= (int) $r['required_qty'] ?></td>
-                <td><?= (int) $r['available_qty'] ?></td>
-                <td><strong><?= (int) $r['gap_qty'] ?></strong></td>
-                <td><?= (int) $r['surplus_qty'] ?></td>
-                <td><?= htmlspecialchars(isset($STATE_AR[$r['coverage_state']]) ? $STATE_AR[$r['coverage_state']] : (string) $r['coverage_state']) ?></td>
-                <td><?= (int) $r['declared_gap'] ?></td>
-                <td><?= htmlspecialchars(isset($STATE_AR[$r['declared_state']]) ? $STATE_AR[$r['declared_state']] : (string) $r['declared_state']) ?></td>
-                <td><?= $open ? '<i class="fas fa-triangle-exclamation"></i> فارق مفتوح' : 'مطابق' ?></td>
-                <td><small><?= htmlspecialchars((string) $r['derivation_rule']) ?></small></td>
-            </tr>
-        <?php endforeach; else: ?>
-            <tr><td colspan="12">لا سطور تغطية مشتقة بعد.</td></tr>
-        <?php endif; ?>
-        </tbody></table></div>
+    <?php /* GUIDE_COLS:govui_field_close:emsList_wf_coverage
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف السطر' => 'g1',
+        'المشروع' => 'g2',
+        'الفئة' => 'g3',
+        'المطلوب' => 'g4',
+        'المتوفر الجاهز' => 'g5',
+        'المخصص' => 'g6',
+        'العجز' => 'g7',
+        'مسار السد' => 'g8',
+        'شاغر حرج؟' => 'g9',
+        'حالة السطر' => 'g10',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('wf_coverage_lines');
+    echo ems_w14_grid('emsList_wf_coverage', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في المطلوب مقابل المتوفر'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

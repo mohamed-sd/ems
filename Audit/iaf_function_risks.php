@@ -16,6 +16,7 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w14_view.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 
 $ctx = w14_ctx();
 $is_super = $ctx['is_super'];
@@ -59,22 +60,23 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_iaf_function_risks')); ?>
-    <table id="emsList_iaf_function_risks" class="data-table">
-        <thead><tr><th>رقم الخطر</th><th>النوع</th><th>الخطر</th><th>المستوى</th><th>المعالجة</th><th>خط الرفع</th><th>موعد المراجعة</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= ems_w14_txt($r["risk_no"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["risk_kind"]) ?></td>
-                    <td><?= ems_w14_txt($r["title_ar"]) ?></td>
-                    <td><?= ems_w14_txt($r["level_ar"]) ?></td>
-                    <td><?= ems_w14_txt($r["treatment_ar"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["reported_to"]) ?></td>
-                    <td><?= ems_w14_txt($r["review_due"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close:emsList_iaf_function_risks
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف السطر' => 'g46',
+        'Risk_ID بسجل المخاطر' => 'g47',
+        'نوع الخطر' => 'g48',
+        'الوصف' => 'g49',
+        'المستوى المتبقي' => 'g50',
+        'الضابط القائم' => 'g51',
+        'المعالجة' => 'g52',
+        'المالك' => 'g53',
+        'حالة الخطر' => 'g54',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('iaf_function_risks');
+    echo ems_w14_grid('emsList_iaf_function_risks', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في مخاطر وظيفة المراجعة'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

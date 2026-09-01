@@ -10,6 +10,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/trs_helpers.php';
 require_once __DIR__ . '/../includes/self_approval_guard.php';  // INJ-0323: من أنشأ لا يعتمد
@@ -429,7 +430,47 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         array('href' => 'transfer_orders_list.php', 'class' => '', 'icon' => 'fas fa-list', 'label' => 'القائمة'),
         array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع'),
     );
-    include('../includes/page_header.php');
+    include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_trp_transfer_order_form
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم الأمر' => 'g1',
+            'تاريخ الأمر' => 'g2',
+            'رقم الطلب' => 'g3',
+            'نوع الحمولة' => 'g4',
+            'كود المعدة' => 'g5',
+            'من موقع' => 'g6',
+            'إلى موقع' => 'g7',
+            'المسافة التقديرية' => 'g8',
+            'وسيلة النقل' => 'g9',
+            'الناقل' => 'g10',
+            'عقد الناقل' => 'g11',
+            'السائق' => 'g12',
+            'رخصة السائق سارية؟' => 'g13',
+            'المسار المقرر' => 'g14',
+            'تاريخ المغادرة المخطط' => 'g15',
+            'تاريخ الوصول المخطط' => 'g16',
+            'التصاريح المطلوبة' => 'g17',
+            'حالة الأمر' => 'g18',
+            'المنشئ' => 'g19',
+            'تاريخ الإنشاء' => 'g20',
+            'المراجع' => 'g21',
+            'المعتمد' => 'g22',
+            'تاريخ الاعتماد' => 'g23',
+            'حالة البيانات' => 'g24',
+            'مرجع المصدر' => 'g25',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('trp_transfer_order_form');
+        echo ems_w14_grid('emsList_trp_transfer_order_form', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في أمر الترحيل'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     echo ems_states_bundle('لا بيانات أمر ترحيل لعرضها بعد', 'املأ رأس الأمر واحفظه لتفتح تبويبات العناصر والتكاليف والتصاريح');
     ?>

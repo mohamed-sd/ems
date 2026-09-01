@@ -14,6 +14,7 @@ session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/party_contacts_kit.php';
 require_once __DIR__ . '/../includes/party_contacts_view.php';
@@ -65,7 +66,34 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     $header_icon    = 'fa fa-address-book';
     $header_actions = array();
     $header_back    = array('href' => 'clients.php', 'class' => '', 'label' => 'سجل العملاء');
-    include __DIR__ . '/../includes/page_header.php';
+    include __DIR__ . '/../includes/page_header.php'; ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_sal_client_contacts
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم جهة الاتصال' => 'g234',
+            'رقم العميل' => 'g235',
+            'اسم العميل (بحث)' => 'g236',
+            'الاسم' => 'g237',
+            'المسمى الوظيفي' => 'g238',
+            'الهاتف' => 'g239',
+            'البريد' => 'g240',
+            'دوره في القرار' => 'g241',
+            'الحالة' => 'g242',
+            'ملاحظات' => 'g243',
+            'حالة البيانات' => 'g244',
+            'أثر البحث في المصادر' => 'g245',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('sal_client_contacts');
+        echo ems_w14_grid('emsList_sal_client_contacts', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في جهات اتصال العملاء'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }

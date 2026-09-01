@@ -16,6 +16,7 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w14_view.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 
 $ctx = w14_ctx();
 $is_super = $ctx['is_super'];
@@ -59,24 +60,29 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_iaf_audit_programs')); ?>
-    <table id="emsList_iaf_audit_programs" class="data-table">
-        <thead><tr><th>رقم البرنامج</th><th>الخطوة</th><th>المهمة</th><th>الهدف</th><th>أسلوب الاختبار</th><th>المجتمع</th><th>حجم العينة</th><th>منهجية السحب</th><th>المنفذ</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= ems_w14_txt($r["program_no"]) ?></td>
-                    <td><?= (int) $r["step_no"] ?></td>
-                    <td><?= ems_w14_txt($r["engagement_no"]) ?></td>
-                    <td><?= ems_w14_txt($r["objective_ar"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["test_method"]) ?></td>
-                    <td><?= ems_w14_txt($r["population_ar"]) ?></td>
-                    <td><?= (int) $r["sample_size"] ?></td>
-                    <td><?= ems_w14_txt($r["sampling_basis"]) ?></td>
-                    <td><?= (int) $r["performer_id"] ?></td>
-                    <td><?= ems_w14_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close:emsList_iaf_audit_programs
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف الخطوة' => 'g17',
+        'معرف المهمة' => 'g18',
+        'تسلسل الخطوة' => 'g19',
+        'الهدف الرقابي' => 'g20',
+        'الضابط المختبر' => 'g21',
+        'أسلوب الاختبار' => 'g22',
+        'حجم العينة المخطط' => 'g23',
+        'المنفذ' => 'g24',
+        'النتيجة الأولية' => 'g25',
+        'مرجع ورقة العمل' => 'g26',
+        'حالة الخطوة' => 'g27',
+        'المنشئ' => 'g28',
+        'تاريخ الإنشاء' => 'g29',
+        'حالة البيانات' => 'g30',
+        'مرجع المصدر' => 'g31',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('iaf_audit_programs');
+    echo ems_w14_grid('emsList_iaf_audit_programs', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في برامج المراجعة'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

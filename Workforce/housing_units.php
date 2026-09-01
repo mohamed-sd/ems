@@ -4,6 +4,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../app/Services/Workforce/ViewModal.php';
 
@@ -70,6 +71,34 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if ($can_add) $header_actions[]=array('id'=>'toggleForm','class'=>'add-btn','icon'=>'fas fa-plus-circle','label'=>'وحدة سكن');
     $header_back=array('href'=>'worker_register.php','class'=>'','icon'=>'fas fa-arrow-right','label'=>'سجل العامل');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_wf_housing_units
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'كود الوحدة' => 'g11',
+            'الموقع' => 'g12',
+            'نوع الوحدة' => 'g13',
+            'السعة' => 'g14',
+            'المشغولة' => 'g15',
+            'الشاغرة' => 'g16',
+            'المشرف' => 'g17',
+            'حالة الصيانة' => 'g18',
+            'حالة الوحدة' => 'g19',
+            'المنشئ' => 'g20',
+            'تاريخ الإنشاء' => 'g21',
+            'حالة البيانات' => 'g22',
+            'مرجع المصدر' => 'g23',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('wf_housing_units');
+        echo ems_w14_grid('emsList_wf_housing_units', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في وحدات السكن والإعاشة'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
     <?php if (!empty($_GET['msg'])): $ok=strpos($_GET['msg'],'✅')!==false; ?>
         <div class="success-message <?= $ok?'is-success':'is-error' ?>"><i class="fas <?= $ok?'fa-check-circle':'fa-exclamation-circle' ?>"></i> <?= htmlspecialchars($_GET['msg']) ?></div>
     <?php endif; ?>

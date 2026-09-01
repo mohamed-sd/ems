@@ -300,9 +300,14 @@ if ($APPLY) {
               . gfc_key(str_replace("'", "", $sc['empty'])) . "'); " . GFC_END;
 
         $s2 = substr($s2, 0, $ls) . $blk . substr($s2, $j);
-        $inc = "require_once __DIR__ . '/../includes/w14_grid.php';";
+        /* ◆ **وعمقُ المسارِ يُحسب لا يُفترَض**: أسطحٌ في جذرِ الشجرةِ
+             (`user_capacities.php`) تشتمل `__DIR__ . '/includes/…'`، وافتراضُ
+             `'/../includes/…'` يرمي `Failed opening required` فتموت الشاشة. */
+        $depth = substr_count(trim($rel, '/'), '/');
+        $up    = $depth > 0 ? str_repeat('/..', $depth) : '';
+        $inc = "require_once __DIR__ . '" . $up . "/includes/w14_grid.php';";
         if (strpos($s2, 'w14_grid.php') === false) {
-            $anchor = "require_once __DIR__ . '/../includes/w14_view.php';";
+            $anchor = "require_once __DIR__ . '" . $up . "/includes/w14_view.php';";
             if (strpos($s2, $anchor) !== false) {
                 $s2 = str_replace($anchor, $anchor . "\n" . $inc, $s2);
             } else {

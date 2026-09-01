@@ -1,6 +1,7 @@
 <?php
 // تحميل الإعدادات والأمان
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 require_once '../includes/approval_workflow.php';
 require_once '../includes/permissions_helper.php';
 
@@ -416,7 +417,44 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         $header_actions[] = $__xlAction;
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
-    include('../includes/page_header.php');
+    include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_sal_projects
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم المشروع' => 'g212',
+            'رقم العميل' => 'g213',
+            'اسم العميل (بحث)' => 'g214',
+            'اسم المشروع' => 'g215',
+            'الوصف' => 'g216',
+            'الموقع (نطاق تنفيذ)' => 'g217',
+            'القطاع' => 'g218',
+            'حالة المشروع' => 'g219',
+            'تاريخ البداية' => 'g220',
+            'المسؤول التجاري' => 'g221',
+            'القيمة التقديرية ($)' => 'g222',
+            'القيمة التقديرية (ج.س)' => 'g223',
+            'عدد العقود' => 'g224',
+            'ملاحظات' => 'g225',
+            'كود المشروع لدى العميل' => 'g226',
+            'الإقليم/الولاية' => 'g227',
+            'تسلسل مشروع العميل' => 'g228',
+            'نوع الخدمة' => 'g229',
+            'نموذج العمل' => 'g230',
+            'أساس التسمية والحدود' => 'g231',
+            'قاعدة التجميع' => 'g232',
+            'مستوى الحجية' => 'g233',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('sal_projects');
+        echo ems_w14_grid('emsList_sal_projects', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في سجل المشاريع'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
     ?>
 <?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('project', 'نظرة عامة'); ?>
 

@@ -1,0 +1,135 @@
+<?php
+/**
+ * fields_iaf.php — مواصفةٌ مولَّدةٌ من `tools/govui_field_map_probe.php`
+ * ◆ الخريطةُ من **تعليقاتِ أعمدةِ المخطَّطِ نفسِها** لا من نسخٍ بيد.
+ * ⛔ وتُراجَع قبل التطبيق: عمودٌ اقتُرح بتغطيةٍ جزئيّةٍ قد يخطئ الحقل.
+ */
+return array(
+
+'dept' => 'IAF',
+'screens' => array(
+
+array(
+    'req' => 'IAF-08', 'route' => 'Audit/iaf_evidence_requests.php',
+    'table' => 'iaf_evidence_requests',
+    'anchor' => '<table id="emsList_iaf_evidence_requests"',
+    'rows' => "ems_w14_guide_rows('iaf_evidence_requests')",
+    'grid_id' => 'emsList_iaf_evidence_requests', 'empty' => 'لا سطر مسجل بعد في طلبات الأدلة',
+    'create' => true,
+    'grain' => 'طلبات الأدلة',
+    'map' => array(
+        'معرف الطلب' => '+g1:VARCHAR(190) NULL DEFAULT NULL',
+        'معرف المهمة' => '+g2:VARCHAR(190) NULL DEFAULT NULL',
+        'الجهة الخاضعة' => '+g3:VARCHAR(190) NULL DEFAULT NULL',
+        'الدليل المطلوب' => '+g4:VARCHAR(190) NULL DEFAULT NULL',
+        'مرجع المستند المتوقع' => '+g5:VARCHAR(190) NULL DEFAULT NULL',
+        'تاريخ الطلب' => '+g6:VARCHAR(190) NULL DEFAULT NULL',
+        'المهلة' => '+g7:VARCHAR(190) NULL DEFAULT NULL',
+        'تاريخ الاستلام' => '+g8:VARCHAR(190) NULL DEFAULT NULL',
+        'أيام التأخير' => '+g9:VARCHAR(190) NULL DEFAULT NULL',
+        'اكتمال الدليل' => '+g10:VARCHAR(190) NULL DEFAULT NULL',
+        'أثر النقص على المهمة' => '+g11:VARCHAR(190) NULL DEFAULT NULL',
+        'حالة الطلب' => '+g12:VARCHAR(190) NULL DEFAULT NULL',
+        'المنشئ' => '+g13:VARCHAR(190) NULL DEFAULT NULL',
+        'تاريخ الإنشاء' => '+g14:VARCHAR(190) NULL DEFAULT NULL',
+        'حالة البيانات' => '+g15:VARCHAR(190) NULL DEFAULT NULL',
+        'مرجع المصدر' => '+g16:VARCHAR(190) NULL DEFAULT NULL',
+    ),
+),
+
+array(
+    'req' => 'IAF-07', 'route' => 'Audit/iaf_audit_programs.php',
+    'table' => 'iaf_audit_programs',
+    'anchor' => '<table id="emsList_iaf_audit_programs"',
+    'rows' => "ems_w14_guide_rows('iaf_audit_programs')",
+    'grid_id' => 'emsList_iaf_audit_programs', 'empty' => 'لا سطر مسجل بعد في برامج المراجعة',
+    'create' => true,
+    'grain' => 'برامج المراجعة',
+    'map' => array(
+        'معرف الخطوة' => '+g17:VARCHAR(190) NULL DEFAULT NULL',
+        'معرف المهمة' => '+g18:VARCHAR(190) NULL DEFAULT NULL',
+        'تسلسل الخطوة' => '+g19:VARCHAR(190) NULL DEFAULT NULL',
+        'الهدف الرقابي' => '+g20:VARCHAR(190) NULL DEFAULT NULL',
+        'الضابط المختبر' => '+g21:VARCHAR(190) NULL DEFAULT NULL',
+        'أسلوب الاختبار' => '+g22:VARCHAR(190) NULL DEFAULT NULL',
+        'حجم العينة المخطط' => '+g23:VARCHAR(190) NULL DEFAULT NULL',
+        'المنفذ' => '+g24:VARCHAR(190) NULL DEFAULT NULL',
+        'النتيجة الأولية' => '+g25:VARCHAR(190) NULL DEFAULT NULL',
+        'مرجع ورقة العمل' => '+g26:VARCHAR(190) NULL DEFAULT NULL',
+        'حالة الخطوة' => '+g27:VARCHAR(190) NULL DEFAULT NULL',
+        'المنشئ' => '+g28:VARCHAR(190) NULL DEFAULT NULL',
+        'تاريخ الإنشاء' => '+g29:VARCHAR(190) NULL DEFAULT NULL',
+        'حالة البيانات' => '+g30:VARCHAR(190) NULL DEFAULT NULL',
+        'مرجع المصدر' => '+g31:VARCHAR(190) NULL DEFAULT NULL',
+    ),
+),
+
+array(
+    'req' => 'IAF-09', 'route' => 'Audit/iaf_test_samples.php',
+    'table' => 'iaf_test_samples',
+    'anchor' => '<table id="emsList_iaf_test_samples"',
+    'rows' => "ems_w14_guide_rows('iaf_test_samples')",
+    'grid_id' => 'emsList_iaf_test_samples', 'empty' => 'لا سطر مسجل بعد في العينات ونتائج الاختبارات',
+    'create' => true,
+    'grain' => 'العينات ونتائج الاختبارات',
+    'map' => array(
+        'معرف المفردة' => '+g32:VARCHAR(190) NULL DEFAULT NULL',
+        'معرف الخطوة' => '+g33:VARCHAR(190) NULL DEFAULT NULL',
+        'مرجع المفردة في مصدرها' => '+g34:VARCHAR(190) NULL DEFAULT NULL',
+        'المجتمع المسحوب منه' => '+g35:VARCHAR(190) NULL DEFAULT NULL',
+        'حجم المجتمع' => '+g36:VARCHAR(190) NULL DEFAULT NULL',
+        'أسلوب السحب' => '+g37:VARCHAR(190) NULL DEFAULT NULL',
+        'نتيجة الفحص' => '+g38:VARCHAR(190) NULL DEFAULT NULL',
+        'وصف الانحراف' => '+g39:VARCHAR(190) NULL DEFAULT NULL',
+        'قيمة الأثر' => '+g40:VARCHAR(190) NULL DEFAULT NULL',
+        'مرجع الملاحظة المتفرعة' => '+g41:VARCHAR(190) NULL DEFAULT NULL',
+        'المنشئ' => '+g42:VARCHAR(190) NULL DEFAULT NULL',
+        'تاريخ الإنشاء' => '+g43:VARCHAR(190) NULL DEFAULT NULL',
+        'حالة البيانات' => '+g44:VARCHAR(190) NULL DEFAULT NULL',
+        'مرجع المصدر' => '+g45:VARCHAR(190) NULL DEFAULT NULL',
+    ),
+),
+
+array(
+    'req' => 'IAF-17', 'route' => 'Audit/iaf_function_risks.php',
+    'table' => 'iaf_function_risks',
+    'anchor' => '<table id="emsList_iaf_function_risks"',
+    'rows' => "ems_w14_guide_rows('iaf_function_risks')",
+    'grid_id' => 'emsList_iaf_function_risks', 'empty' => 'لا سطر مسجل بعد في مخاطر وظيفة المراجعة',
+    'create' => true,
+    'grain' => 'مخاطر وظيفة المراجعة',
+    'map' => array(
+        'معرف السطر' => '+g46:VARCHAR(190) NULL DEFAULT NULL',
+        'Risk_ID بسجل المخاطر' => '+g47:VARCHAR(190) NULL DEFAULT NULL',
+        'نوع الخطر' => '+g48:VARCHAR(190) NULL DEFAULT NULL',
+        'الوصف' => '+g49:VARCHAR(190) NULL DEFAULT NULL',
+        'المستوى المتبقي' => '+g50:VARCHAR(190) NULL DEFAULT NULL',
+        'الضابط القائم' => '+g51:VARCHAR(190) NULL DEFAULT NULL',
+        'المعالجة' => '+g52:VARCHAR(190) NULL DEFAULT NULL',
+        'المالك' => '+g53:VARCHAR(190) NULL DEFAULT NULL',
+        'حالة الخطر' => '+g54:VARCHAR(190) NULL DEFAULT NULL',
+    ),
+),
+
+array(
+    'req' => 'IAF-01', 'route' => 'Audit/iaf_overview.php',
+    'table' => 'iaf_dashboard_kpi',
+    'anchor' => '<table id="emsList_iaf_overview"',
+    'rows' => "ems_w14_guide_rows('iaf_dashboard_kpi')",
+    'grid_id' => 'emsList_iaf_overview', 'empty' => 'لا سطر مسجل بعد في لوحة المراجعة الداخلية',
+    'create' => true,
+    'grain' => 'لا سطر مسجل بعد في لوحة المراجعة الداخلية',
+    'map' => array(
+        'معرف المؤشر' => '+g55:VARCHAR(190) NULL DEFAULT NULL',
+        'المؤشر KPI Catalog' => '+g56:VARCHAR(190) NULL DEFAULT NULL',
+        'الفترة' => '+g57:VARCHAR(190) NULL DEFAULT NULL',
+        'القيمة' => '+g58:VARCHAR(190) NULL DEFAULT NULL',
+        'المستهدف' => '+g59:VARCHAR(190) NULL DEFAULT NULL',
+        'الانحراف' => '+g60:VARCHAR(190) NULL DEFAULT NULL',
+        'الحالة' => '+g61:VARCHAR(190) NULL DEFAULT NULL',
+        'آخر تحديث' => '+g62:VARCHAR(190) NULL DEFAULT NULL',
+    ),
+),
+
+),
+);

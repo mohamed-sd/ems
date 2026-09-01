@@ -14,6 +14,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 require_once '../includes/permissions_helper.php';
 require_once '../includes/gov_columns.php';
 
@@ -128,6 +129,38 @@ include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main ems-unified-page-shell" dir="rtl">
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_site_gate_equip
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم الإذن' => 'g1',
+            'نوع الكيان' => 'g2',
+            'مرجع الكيان' => 'g3',
+            'اتجاه الحركة' => 'g4',
+            'وقت الحركة' => 'g5',
+            'كود الموقع' => 'g6',
+            'مرجع التخصيص الساري' => 'g7',
+            'مطابقة التخصيص' => 'g8',
+            'مرافق/سائق' => 'g9',
+            'الغرض' => 'g10',
+            'مصدر الإذن' => 'g11',
+            'واقعة بلا إذن؟' => 'g12',
+            'حالة الإذن' => 'g13',
+            'المنشئ' => 'g14',
+            'تاريخ الإنشاء' => 'g15',
+            'حالة البيانات' => 'g16',
+            'مرجع المصدر' => 'g17',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('site_gate_equip');
+        echo ems_w14_grid('emsList_site_gate_equip', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في أذون دخول وخروج المعدات والمشغلين'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+
     <?php
     $header_title = 'أذون دخول وخروج المعدات';
     $header_icon = 'fa fa-truck-moving';

@@ -8,6 +8,7 @@ if (!isset($_SESSION['user'])) {
 
 
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/extra_fields.php'; // XF-01 — طبقةُ البياناتِ الإضافيةِ المركزية
 
@@ -652,7 +653,51 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         $header_actions[] = $__xlAction;
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fa-solid fa-share', 'label' => '');
-    include('../includes/page_header.php');
+    include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_sal_clients
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم العميل' => 'g88',
+            'الاسم القانوني' => 'g89',
+            'الاسم المختصر' => 'g90',
+            'تصنيف العميل' => 'g91',
+            'أساس التصنيف' => 'g92',
+            'حالة العميل' => 'g93',
+            'القطاع' => 'g94',
+            'الدولة' => 'g95',
+            'المدينة/المنطقة' => 'g96',
+            'رقم التسجيل' => 'g97',
+            'الرقم الضريبي' => 'g98',
+            'مالك الحساب' => 'g99',
+            'مصدر التعرف' => 'g100',
+            'درجة الأولوية' => 'g101',
+            'التصنيف الائتماني' => 'g102',
+            'حد الائتمان ($)' => 'g103',
+            'حد الائتمان (ج.س)' => 'g104',
+            'شروط الدفع الافتراضية' => 'g105',
+            'تاريخ أول تعامل' => 'g106',
+            'عدد العقود' => 'g107',
+            'العقود الجارية' => 'g108',
+            'آخر نشاط تنفيذي' => 'g109',
+            'نماذج التعامل' => 'g110',
+            'ملاحظات' => 'g111',
+            'أنواع الخدمات' => 'g112',
+            'العملات المتعامل بها' => 'g113',
+            'دورية الفوترة بالمصدر' => 'g114',
+            'عدد المشاريع' => 'g115',
+            'مستوى حجية بيانات العميل' => 'g116',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('sal_clients');
+        echo ems_w14_grid('emsList_sal_clients', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في سجل العملاء'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
     ?>
 <?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('client', 'البيانات الأساسية'); ?>
 

@@ -28,6 +28,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/_finreq_helpers.php';
 
@@ -196,7 +197,36 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         $header_actions[] = array('href' => 'request_form.php', 'class' => 'add-btn', 'icon' => 'fa fa-list-check', 'label' => 'كل طلباتي');
     }
     $header_back    = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
-    include('../includes/page_header.php');
+    include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_my_requests
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم الطلب' => 'g47',
+            'تاريخ الطلب' => 'g48',
+            'نوع الطلب' => 'g49',
+            'تفاصيل الطلب' => 'g50',
+            'المرفق' => 'g51',
+            'الجهة المالكة للقرار' => 'g52',
+            'مسار الاعتماد' => 'g53',
+            'حالة الطلب' => 'g54',
+            'قرار الجهة' => 'g55',
+            'تاريخ القرار' => 'g56',
+            'المنشئ' => 'g57',
+            'تاريخ الإنشاء' => 'g58',
+            'حالة البيانات' => 'g59',
+            'مرجع المصدر' => 'g60',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('my_requests');
+        echo ems_w14_grid('emsList_my_requests', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الطلبات المقدمة'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
     // UXW-01 ⑫: شاشةُ دورةٍ مستندية — الخطوةُ التاليةُ من حالةِ الطلبِ الحيّةِ إن وُجدت،
     // وإلا سلّمُ الدورةِ الثابت.
     if ($is_record && $req['state'] === 'draft') {

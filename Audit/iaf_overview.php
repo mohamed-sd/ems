@@ -16,6 +16,7 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w14_view.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 
 $ctx = w14_ctx();
 $is_super = $ctx['is_super'];
@@ -59,20 +60,22 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_iaf_overview')); ?>
-    <table id="emsList_iaf_overview" class="data-table">
-        <thead><tr><th>رقم الملاحظة</th><th>الملاحظة</th><th>الجهة الخاضعة</th><th>الدرجة</th><th>مهلة المعالجة</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= ems_w14_txt($r["finding_no"]) ?></td>
-                    <td><?= ems_w14_txt($r["title"]) ?></td>
-                    <td><?= ems_w14_txt($r["auditee_dept"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["severity"]) ?></td>
-                    <td><?= ems_w14_txt($r["action_due"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close:emsList_iaf_overview
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف المؤشر' => 'g55',
+        'المؤشر KPI Catalog' => 'g56',
+        'الفترة' => 'g57',
+        'القيمة' => 'g58',
+        'المستهدف' => 'g59',
+        'الانحراف' => 'g60',
+        'الحالة' => 'g61',
+        'آخر تحديث' => 'g62',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('iaf_dashboard_kpi');
+    echo ems_w14_grid('emsList_iaf_overview', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في لوحة المراجعة الداخلية'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 
 $is_super_admin = ((isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '') === '-1');
@@ -62,6 +63,33 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'مصفوفة بنية الشيتات: كل شيت بمفتاحه ومفاتيحه الاجنبية وتعليقه من المخطط الحي'; $header_icon = 'fa fa-table-cells'; $header_actions = array();
     $header_back = array('href' => 'asset_full_history.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'تاريخ المعدة');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_flt_fleet_schema_matrix
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'الشيت' => 'g21',
+            'الاسم' => 'g22',
+            'الكتلة' => 'g23',
+            'Grain ماذا يمثل الصف؟' => 'g24',
+            'PK' => 'g25',
+            'FKs' => 'g26',
+            'مصدر الحقيقة' => 'g27',
+            'المالك' => 'g28',
+            'يسبقه' => 'g29',
+            'يليه' => 'g30',
+            'صفوف فعلية' => 'g31',
+            'الحكم' => 'g32',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('flt_fleet_schema_matrix');
+        echo ems_w14_grid('emsList_flt_fleet_schema_matrix', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في مصفوفة بنية الشيتات'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
 
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= number_format($nT) ?></div><div class="ems-stat-label">شيتات العائلة</div></div>

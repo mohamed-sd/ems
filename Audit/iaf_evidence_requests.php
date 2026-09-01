@@ -16,6 +16,7 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w14_view.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 
 $ctx = w14_ctx();
 $is_super = $ctx['is_super'];
@@ -59,23 +60,30 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_iaf_evidence_requests')); ?>
-    <table id="emsList_iaf_evidence_requests" class="data-table">
-        <thead><tr><th>رقم الطلب</th><th>المهمة</th><th>الجهة الخاضعة</th><th>المطلوب</th><th>المهلة</th><th>تاريخ التزويد</th><th>أيام التأخر</th><th>مستوى التصعيد</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= ems_w14_txt($r["request_no"]) ?></td>
-                    <td><?= ems_w14_txt($r["engagement_no"]) ?></td>
-                    <td><?= ems_w14_txt($r["auditee_dept"]) ?></td>
-                    <td><?= ems_w14_txt($r["item_ar"]) ?></td>
-                    <td><?= ems_w14_txt($r["due_date"]) ?></td>
-                    <td><?= ems_w14_txt($r["provided_at"]) ?></td>
-                    <td><?= (int) $r["delay_days"] ?></td>
-                    <td><?= (int) $r["escalation_level"] ?></td>
-                    <td><?= ems_w14_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close:emsList_iaf_evidence_requests
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف الطلب' => 'g1',
+        'معرف المهمة' => 'g2',
+        'الجهة الخاضعة' => 'g3',
+        'الدليل المطلوب' => 'g4',
+        'مرجع المستند المتوقع' => 'g5',
+        'تاريخ الطلب' => 'g6',
+        'المهلة' => 'g7',
+        'تاريخ الاستلام' => 'g8',
+        'أيام التأخير' => 'g9',
+        'اكتمال الدليل' => 'g10',
+        'أثر النقص على المهمة' => 'g11',
+        'حالة الطلب' => 'g12',
+        'المنشئ' => 'g13',
+        'تاريخ الإنشاء' => 'g14',
+        'حالة البيانات' => 'g15',
+        'مرجع المصدر' => 'g16',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('iaf_evidence_requests');
+    echo ems_w14_grid('emsList_iaf_evidence_requests', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في طلبات الأدلة'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

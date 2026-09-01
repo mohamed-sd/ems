@@ -15,6 +15,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../app/Services/Fleet/AssetLifecycleService.php';
 
@@ -106,28 +107,35 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_asset_use_rights')); ?>
-    <table id="emsList_asset_use_rights" class="data-table">
-        <thead><tr><th>إجراءات</th><th>الأصل</th><th>الحائز</th><th>الصفة</th><th>الحصة ٪</th>
-            <th>من</th><th>إلى</th><th>مجموع المتزامن ٪</th><th>حكم التزامن</th><th>مصدر القياس</th><th>المستند</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): $open = ($r['concurrency_rule'] === 'W5_CONCURRENT_CLAIM_OPEN'); ?>
-            <tr>
-                <td><div class="action-btns"><span class="action-btn" title="<?= htmlspecialchars((string) $r['concurrency_note']) ?>"><i class="fas <?= $open ? 'fa-triangle-exclamation' : 'fa-check' ?>"></i></span></div></td>
-                <td><?= htmlspecialchars(isset($equip[(int) $r['equipment_id']]) ? $equip[(int) $r['equipment_id']] : ('#' . (int) $r['equipment_id'])) ?></td>
-                <td><strong><?= htmlspecialchars((string) $r['holder_name']) ?></strong></td>
-                <td><?= htmlspecialchars(isset($KINDS[$r['holder_kind']]) ? $KINDS[$r['holder_kind']] : (string) $r['holder_kind']) ?></td>
-                <td><?= htmlspecialchars((string) $r['percent']) ?></td>
-                <td><?= htmlspecialchars((string) $r['valid_from']) ?></td>
-                <td><?= htmlspecialchars((string) ($r['valid_to'] ?? '—')) ?></td>
-                <td><?= htmlspecialchars((string) $r['concurrency_pct']) ?></td>
-                <td><?= htmlspecialchars((string) $r['concurrency_rule']) ?></td>
-                <td><small><?= htmlspecialchars((string) $r['source_register'] . ' ' . (string) $r['source_row_ref']) ?></small></td>
-                <td><?= htmlspecialchars((string) $r['doc_ref']) ?></td>
-            </tr>
-        <?php endforeach; else: ?>
-            <tr><td colspan="11">لا حقوق استخدام بعد.</td></tr>
-        <?php endif; ?>
-        </tbody></table></div>
+    <?php /* GUIDE_COLS:govui_field_close:emsList_asset_use_rights
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'كود الحصة' => 'g1',
+        'كود الأصل' => 'g2',
+        'الطرف المالك / صاحب حق الاستخدام' => 'g3',
+        'صفة الطرف' => 'g4',
+        'نسبة حق الاستخدام التشغيلي' => 'g5',
+        'تاريخ الاكتساب' => 'g6',
+        'تاريخ التخارج' => 'g7',
+        'المشتري عند التخارج' => 'g8',
+        'مرجع مستند الانتقال' => 'g9',
+        'مجموع الحصص المتزامنة' => 'g10',
+        'حالة التحقق' => 'g11',
+        'المنشئ' => 'g12',
+        'تاريخ الإنشاء' => 'g13',
+        'المراجع' => 'g14',
+        'المعتمد' => 'g15',
+        'تاريخ الاعتماد' => 'g16',
+        'أساس السجل' => 'g17',
+        'مرجع المصدر' => 'g18',
+        'حالة البيانات' => 'g19',
+        'ملاحظات' => 'g20',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('flt_asset_use_rights');
+    echo ems_w14_grid('emsList_asset_use_rights', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في حق الاستخدام التشغيلي'); /* /GUIDE_COLS */ ?></div>
 </div>
 <script>(function(){
     var t = document.getElementById('toggleForm'), f = document.getElementById('gForm');

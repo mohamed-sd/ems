@@ -10,6 +10,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 require_once __DIR__ . '/../app/Services/Portal/PortalFeedService.php';
 require_once __DIR__ . '/../app/Services/Portal/CapacityService.php';
 
@@ -109,7 +110,29 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         array('href' => 'my_evaluation.php', 'icon' => 'fa fa-user-check', 'label' => 'التقييم'),
         array('href' => '../user_capacities.php', 'icon' => 'fa fa-people-arrows', 'label' => 'مبدل المساحة'),
     );
-    include('../includes/page_header.php');
+    include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_my_portal
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف المكون' => 'g20',
+            'الحساب' => 'g21',
+            'الدور' => 'g22',
+            'المكون' => 'g23',
+            'محتواه الحي' => 'g24',
+            'مصدره' => 'g25',
+            'آخر تحديث' => 'g26',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('my_portal');
+        echo ems_w14_grid('emsList_my_portal', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في البوابة الشخصية'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
     // حزمةُ الحالاتِ الدنيا (بوابة ٩) — مخفيةٌ افتراضًا ويُظهرها منطقُ الشاشة
     echo ems_states_bundle('لا بطاقات بيانات في بوابتي بعد', 'بوابتي تتشكل بالصفة النشطة ومفاتيح الظهور — راجع الصفة أو مفاتيح العرض');
     ?>

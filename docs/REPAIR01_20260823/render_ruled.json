@@ -1,4 +1,5 @@
 {
   "Finance/cfo_daily_board_fin.php": "قرارُ المالك 2026-08-21 · roleBoardGenericConfig(17): لوحةُ الدورِ صارت «الرئيسية» فيُردُّ إليها حاملوها — والجسدُ يبقى مسارَ رجوع",
-  "Procurement/dashboard_proc.php": "قرارُ المالك 2026-08-21 · roleBoardRoute: لوحةُ دورِ المشترياتِ صارت «الرئيسية» فيُردُّ إليها حاملوها — والجسدُ يبقى مسارَ رجوع"
+  "Procurement/dashboard_proc.php": "قرارُ المالك 2026-08-21 · roleBoardRoute: لوحةُ دورِ المشترياتِ صارت «الرئيسية» فيُردُّ إليها حاملوها — والجسدُ يبقى مسارَ رجوع",
+  "Audit/iaf_reports.php": "حاجزٌ مقيسٌ · BLOCKED_PERMISSION_SHADOW: ثلاثةُ ادوار لها can_view في role_permissions ويردها الحارس الحي — الفرق طبقة القوالب، والحسم منح او قالب لا شيفرة"
 }

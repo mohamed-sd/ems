@@ -10,6 +10,7 @@
  * ◆ **ونوعُ الواقعةِ محكومٌ من قائمةٍ مغلقة** — لا نصَّ حرٌّ يُفسد التصنيف.
  */
 require_once __DIR__ . '/../includes/session_bootstrap.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
@@ -92,7 +93,42 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
   ob_start(); ?><span class="badge"><?= $queueFail === '' ? count($rows) : '—' ?> واقعة</span><?php
   $header_actions = array(array('raw' => trim((string) ob_get_clean())));
   $header_back = false;
-  include __DIR__ . '/../includes/page_header.php';
+  include __DIR__ . '/../includes/page_header.php'; ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_sal_quotation_negotiation
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم الواقعة' => 'g141',
+            'نوع السجل' => 'g142',
+            'رقم العرض' => 'g143',
+            'مرجع العقد' => 'g144',
+            'دورة الالتزام الجديدة' => 'g145',
+            'دورة الالتزام السابقة' => 'g146',
+            'نطاق المقارنة' => 'g147',
+            'التاريخ' => 'g148',
+            'نوع التغيير' => 'g149',
+            'قبل' => 'g150',
+            'بعد' => 'g151',
+            'الأثر التجاري' => 'g152',
+            'الوثيقة المرجعية' => 'g153',
+            'السبب/الدليل' => 'g154',
+            'الطرف الطالب' => 'g155',
+            'الحالة' => 'g156',
+            'ملاحظات' => 'g157',
+            'مفتاح دورة الالتزام المصدر' => 'g158',
+            'مستوى الحجية' => 'g159',
+            'أساس القيمة الرجعية' => 'g160',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('sal_quotation_negotiation');
+        echo ems_w14_grid('emsList_sal_quotation_negotiation', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في التفاوض ومراجعات العرض'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
   echo ems_states_bundle('لا واقعة تفاوض مسجلة بعد',
       'كل نسخة ووقائع تغييرها تسجل بنصها ومرجعها — فالسجل يقرأ بعد سنة ويفهم');
   ?>

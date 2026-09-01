@@ -7,6 +7,7 @@ if (!isset($_SESSION['user'])) {
 }
 
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 require_once __DIR__ . '/../includes/excel_ui.php'; // ح-09 · أزرار Excel الموحّدة
 include '../includes/permissions_helper.php';
 // شريط رحلة الكيان الموحد — UXW-01 8-2 · يُضمُّ هنا لا بعدَ نداءِ دالتِه
@@ -419,7 +420,48 @@ function quo_state_tone($state)
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fa-solid fa-share', 'label' => '');
     // ح-09 · نموذج + تصدير + استيراد (الإطار الموحّد)
     foreach (ems_excel_header_actions('quotations', 'عروض الأسعار', $can_add) as $__xl) { $header_actions[] = $__xl; }
-    include('../includes/page_header.php');
+    include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_sal_quotations
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم العرض الداخلي' => 'g186',
+            'رقم الفرصة' => 'g187',
+            'رقم الطلب' => 'g188',
+            'رقم العميل' => 'g189',
+            'اسم العميل (بحث)' => 'g190',
+            'رقم المشروع' => 'g191',
+            'رقم العرض الرسمي' => 'g192',
+            'تاريخ الإصدار' => 'g193',
+            'تاريخ الإرسال' => 'g194',
+            'أساس التاريخ' => 'g195',
+            'النسخة' => 'g196',
+            'نموذج العمل' => 'g197',
+            'العملة' => 'g198',
+            'مدة السريان' => 'g199',
+            'شروط الدفع/الفوترة' => 'g200',
+            'حالة العرض' => 'g201',
+            'رد العميل' => 'g202',
+            'حالة القرار' => 'g203',
+            'تاريخ القرار' => 'g204',
+            'قيمة العرض ($)' => 'g205',
+            'قيمة العرض (ج.س)' => 'g206',
+            'مرجع العقد الناتج' => 'g207',
+            'ملاحظات' => 'g208',
+            'مفتاح دورة الالتزام المصدر' => 'g209',
+            'مستوى الحجية' => 'g210',
+            'أساس القيمة الرجعية' => 'g211',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('sal_quotations');
+        echo ems_w14_grid('emsList_sal_quotations', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في سجل العروض'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
 
     // UXW-01 ⑫: شاشةُ دورةٍ اعتماديةٍ تنطق بحالتِها الحية (مسودة · مقدم · مقبول · مرفوض) — فتُعلن خطوتَها التالية
     echo ems_next_step('العرض يقدم للعميل فيقبل أو يرفض — وقبوله يولد عقدا مسودة يحمل مرجعه');

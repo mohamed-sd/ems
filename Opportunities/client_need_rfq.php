@@ -10,6 +10,7 @@
  * ◆ **ولا يُصدَر عرضٌ قبلَ رفعِ الاحتياج** — «وجودُ الأبِ لا يكفي».
  */
 require_once __DIR__ . '/../includes/session_bootstrap.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
@@ -106,7 +107,50 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
   ob_start(); ?><span class="badge"><?= $queueFail === '' ? count($rows) : '—' ?> احتياجا</span><?php
   $header_actions = array(array('raw' => trim((string) ob_get_clean())));
   $header_back = false;
-  include __DIR__ . '/../includes/page_header.php';
+  include __DIR__ . '/../includes/page_header.php'; ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_sal_client_need_rfq
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم الطلب' => 'g60',
+            'رقم العميل' => 'g61',
+            'اسم العميل (بحث)' => 'g62',
+            'رقم المشروع' => 'g63',
+            'رقم الفرصة' => 'g64',
+            'نوع الطلب' => 'g65',
+            'نطاق الطلب' => 'g66',
+            'الخدمة المطلوبة' => 'g67',
+            'نموذج العمل المطلوب' => 'g68',
+            'الوحدة' => 'g69',
+            'الكمية/الحجم المطلوب' => 'g70',
+            'أنواع الآليات المطلوبة' => 'g71',
+            'عدد الآليات' => 'g72',
+            'المدة (أشهر)' => 'g73',
+            'البداية المتوقعة' => 'g74',
+            'النهاية المتوقعة' => 'g75',
+            'أساس البداية المتوقعة' => 'g76',
+            'أساس النهاية المتوقعة' => 'g77',
+            'حالة بيانات التواريخ' => 'g78',
+            'المتطلبات التجارية الأساسية' => 'g79',
+            'تاريخ الاستلام' => 'g80',
+            'موعد الرد بالعرض' => 'g81',
+            'الحالة' => 'g82',
+            'مرجع العقد الناتج' => 'g83',
+            'ملاحظات' => 'g84',
+            'مفتاح دورة الالتزام المصدر' => 'g85',
+            'مستوى الحجية' => 'g86',
+            'أساس القيمة الرجعية' => 'g87',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('sal_client_need_rfq');
+        echo ems_w14_grid('emsList_sal_client_need_rfq', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في احتياج العميل وطلب العرض'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
   echo ems_states_bundle('لا احتياج مسجل بعد',
       'الاحتياج يسجل على فرصة مفتوحة ثم يرفع — وبه وحده يتاح إصدار العرض');
   ?>

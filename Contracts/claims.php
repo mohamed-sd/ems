@@ -16,6 +16,7 @@ session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/claim_helpers.php';
 require_once __DIR__ . '/note_helpers.php';      // M-02 — الإشعارُ الدائن/المدين
@@ -319,7 +320,47 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 /* شريطُ تبويباتِ العائلة — قرارُ وثيقةِ المواءمة (مكوّنٌ مركزيّ) */
 $sft_family = 'claim'; $sft_active = 'claim';
 include __DIR__ . '/../includes/sales_family_tabs.php';
-include('../includes/page_header.php');
+include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_sal_claims
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم المطالبة' => 'g161',
+            'مفتاح دورة الالتزام' => 'g162',
+            'كود العقد' => 'g163',
+            'رقم العميل' => 'g164',
+            'اسم العميل (بحث)' => 'g165',
+            'الفترة من' => 'g166',
+            'إلى' => 'g167',
+            'الكمية المنجزة المرجعية' => 'g168',
+            'الوحدة' => 'g169',
+            'الاستحقاق المحسوب ($)' => 'g170',
+            'الاستحقاق المحسوب (ج.س)' => 'g171',
+            'القيمة المطالب بها ($)' => 'g172',
+            'المطالب بها (ج.س)' => 'g173',
+            'مرجع القياس/المستخلص' => 'g174',
+            'حالة اعتماد العميل' => 'g175',
+            'تاريخ التسليم للمالية' => 'g176',
+            'مرجع الفاتورة' => 'g177',
+            'حالة المتابعة' => 'g178',
+            'ملاحظات' => 'g179',
+            'المفوتر للعميل ($)' => 'g180',
+            'مستحق غير مطالب به ($)' => 'g181',
+            'حالة التحصيل' => 'g182',
+            'أساس حالة التحصيل' => 'g183',
+            'دليل القياس/التسوية بالمصدر' => 'g184',
+            'مستوى الحجية' => 'g185',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('sal_claims');
+        echo ems_w14_grid('emsList_sal_claims', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في المطالبات والتسليم للمالية'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
     // TKT-15 · زر الإبلاغ السياقي — المستخلص والفاتورة (§2-⑦)
     require_once __DIR__ . '/../includes/report_button.php';
     ems_report_button(array('screen' => 'claims', 'contract_id' => $contract_id ?? null));

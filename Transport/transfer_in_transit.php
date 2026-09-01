@@ -7,6 +7,7 @@
  * المرحلةَ إلى arrived ويؤرّخ الوصولَ ويسجّل الحدث.
  */
 require_once __DIR__ . '/../includes/session_bootstrap.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
@@ -81,7 +82,36 @@ $header_title_html = htmlspecialchars('الحركة في الطريق', ENT_QUOT
 ob_start(); ?><span class="badge trs-it-count"><?= count($rows) ?> في الطريق</span><?php
 $header_actions = array(array('raw' => trim((string) ob_get_clean())));
 $header_back = false;
-include __DIR__ . '/../includes/page_header.php';
+include __DIR__ . '/../includes/page_header.php'; ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_trp_transfer_in_transit
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف الحدث' => 'g43',
+            'رقم الأمر' => 'g44',
+            'نوع الحدث' => 'g45',
+            'وقت الحدث' => 'g46',
+            'الموقع الجغرافي' => 'g47',
+            'قراءة عداد الناقل' => 'g48',
+            'ملاحظة الحدث' => 'g49',
+            'مرفق/صورة' => 'g50',
+            'مسجل دون اتصال؟' => 'g51',
+            'حالة السطر' => 'g52',
+            'المنشئ' => 'g53',
+            'تاريخ الإنشاء' => 'g54',
+            'حالة البيانات' => 'g55',
+            'مرجع المصدر' => 'g56',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('trp_transfer_in_transit');
+        echo ems_w14_grid('emsList_trp_transfer_in_transit', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في تتبع الرحلة وأحداثها'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
 echo ems_states_bundle('لا حركة في الطريق الآن', 'أكد المغادرة من أمر الترحيل لتظهر الرحلة في هذه الشاشة');
 ?>

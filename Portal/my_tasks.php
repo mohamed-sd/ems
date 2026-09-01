@@ -11,6 +11,7 @@
  * «لماذا أرى هذا؟» — سلسلة تفسير الظهور الخماسية (AC-WFM-13).
  */
 require_once __DIR__ . '/../includes/session_bootstrap.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
@@ -165,6 +166,31 @@ include '../insidebar.php';
 ?>
 <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main ems-unified-page-shell" dir="rtl">
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_my_tasks
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف المهمة' => 'g27',
+            'نوع المهمة' => 'g28',
+            'مصدر المهمة' => 'g29',
+            'الشاشة الأصلية' => 'g30',
+            'المرجع' => 'g31',
+            'مهلة المهمة' => 'g32',
+            'الأولوية' => 'g33',
+            'حالة المهمة' => 'g34',
+            'سبب التأجيل' => 'g35',
+            'وقت الإنجاز' => 'g36',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('my_tasks');
+        echo ems_w14_grid('emsList_my_tasks', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في المهام المسندة'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+
     <?php
     $header_title = 'مهامي';
     $header_icon = 'fa fa-list-check';

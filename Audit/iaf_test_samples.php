@@ -16,6 +16,7 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w14_view.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 
 $ctx = w14_ctx();
 $is_super = $ctx['is_super'];
@@ -59,23 +60,28 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_iaf_test_samples')); ?>
-    <table id="emsList_iaf_test_samples" class="data-table">
-        <thead><tr><th>رقم المفردة</th><th>البرنامج</th><th>الخطوة</th><th>مرجع المفردة</th><th>النتيجة</th><th>الاستثناء</th><th>المختبر</th><th>الملاحظة</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= ems_w14_txt($r["sample_no"]) ?></td>
-                    <td><?= ems_w14_txt($r["program_no"]) ?></td>
-                    <td><?= (int) $r["step_no"] ?></td>
-                    <td><?= ems_w14_txt($r["item_ref"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["test_result"]) ?></td>
-                    <td><?= ems_w14_txt($r["exception_ar"]) ?></td>
-                    <td><?= (int) $r["tested_by"] ?></td>
-                    <td><?= ems_w14_txt($r["finding_no"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close:emsList_iaf_test_samples
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف المفردة' => 'g32',
+        'معرف الخطوة' => 'g33',
+        'مرجع المفردة في مصدرها' => 'g34',
+        'المجتمع المسحوب منه' => 'g35',
+        'حجم المجتمع' => 'g36',
+        'أسلوب السحب' => 'g37',
+        'نتيجة الفحص' => 'g38',
+        'وصف الانحراف' => 'g39',
+        'قيمة الأثر' => 'g40',
+        'مرجع الملاحظة المتفرعة' => 'g41',
+        'المنشئ' => 'g42',
+        'تاريخ الإنشاء' => 'g43',
+        'حالة البيانات' => 'g44',
+        'مرجع المصدر' => 'g45',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('iaf_test_samples');
+    echo ems_w14_grid('emsList_iaf_test_samples', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في العينات ونتائج الاختبارات'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

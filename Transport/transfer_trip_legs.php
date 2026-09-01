@@ -11,6 +11,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w7_codes.php';
 
@@ -51,6 +52,38 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'مراحل الرحلة'; $header_icon = 'fa fa-route'; $header_actions = array();
     $header_back = array('href' => 'transfer_in_transit.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'الرحلات الجارية');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_trp_transfer_trip_legs
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف المرحلة' => 'g80',
+            'رقم الأمر' => 'g81',
+            'تسلسل المرحلة' => 'g82',
+            'من نقطة' => 'g83',
+            'إلى نقطة' => 'g84',
+            'الناقلة المكلفة' => 'g85',
+            'السائق' => 'g86',
+            'المسافة المقدرة' => 'g87',
+            'بدء المرحلة' => 'g88',
+            'انتهاء المرحلة' => 'g89',
+            'تسليم المرحلة للتالية' => 'g90',
+            'أحداث المرحلة' => 'g91',
+            'حالة المرحلة' => 'g92',
+            'المنشئ' => 'g93',
+            'تاريخ الإنشاء' => 'g94',
+            'حالة البيانات' => 'g95',
+            'مرجع المصدر' => 'g96',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('trp_transfer_trip_legs');
+        echo ems_w14_grid('emsList_trp_transfer_trip_legs', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في مراحل الرحلة'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">مراحل مسجلة</div></div>
         <div class="ems-stat-card"><div class="ems-stat-value"><?= $moving ?></div><div class="ems-stat-label">جارية الآن</div></div>

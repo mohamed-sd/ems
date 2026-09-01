@@ -10,6 +10,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w7_codes.php';
 
@@ -47,6 +48,31 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'تقرير أوامر الترحيل'; $header_icon = 'fa fa-file-lines'; $header_actions = array();
     $header_back = array('href' => 'transfer_dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'لوحة النقل والترحيل');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_trp_transfer_orders_report
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف السطر' => 'g161',
+            'الفترة' => 'g162',
+            'عدد الأوامر' => 'g163',
+            'منها مقفلة' => 'g164',
+            'متوسط زمن الرحلة' => 'g165',
+            'الالتزام بالمواعيد' => 'g166',
+            'حوادث وتلفيات' => 'g167',
+            'إجمالي التكلفة' => 'g168',
+            'تكلفة الكيلومتر' => 'g169',
+            'التوزيع بالوسيلة' => 'g170',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('trp_transfer_orders_report');
+        echo ems_w14_grid('emsList_trp_transfer_orders_report', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في تقرير أوامر الترحيل'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">فترات مشتقة</div></div>
         <div class="ems-stat-card"><div class="ems-stat-value"><?= $closed ?></div><div class="ems-stat-label">أوامر مقفلة</div></div>

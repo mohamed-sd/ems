@@ -12,6 +12,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w7_codes.php';
 
@@ -52,6 +53,39 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'مطالبات التلف والحوادث'; $header_icon = 'fa fa-triangle-exclamation'; $header_actions = array();
     $header_back = array('href' => 'transfer_arrival.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'محاضر الاستلام');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_trp_transfer_damage_claims
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم المطالبة' => 'g97',
+            'رقم الأمر' => 'g98',
+            'مرجع الواقعة' => 'g99',
+            'وصف التلف' => 'g100',
+            'المتسبب المرجح' => 'g101',
+            'قيمة المطالبة المقدرة' => 'g102',
+            'مستندات الإثبات' => 'g103',
+            'مسار المطالبة' => 'g104',
+            'قرار التسوية' => 'g105',
+            'قيمة التسوية' => 'g106',
+            'حالة المطالبة' => 'g107',
+            'المنشئ' => 'g108',
+            'تاريخ الإنشاء' => 'g109',
+            'المراجع' => 'g110',
+            'المعتمد' => 'g111',
+            'تاريخ الاعتماد' => 'g112',
+            'حالة البيانات' => 'g113',
+            'مرجع المصدر' => 'g114',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('trp_transfer_damage_claims');
+        echo ems_w14_grid('emsList_trp_transfer_damage_claims', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في مطالبات التلف والحوادث'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">مطالبات</div></div>
         <div class="ems-stat-card"><div class="ems-stat-value"><?= $amount ?></div><div class="ems-stat-label">قيمة المطالبات</div></div>

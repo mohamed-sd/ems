@@ -11,6 +11,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 require_once __DIR__ . '/../app/Services/Contract/CommercialBoardService.php';
 
 use App\Services\Contract\CommercialBoardService as CBD;
@@ -73,7 +74,27 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array();
     $header_back = array('href' => 'contract_lifecycle.php', 'class' => '',
                          'icon' => 'fas fa-arrow-right', 'label' => 'اقتصاد دورة الحياة');
-    include('../includes/page_header.php');
+    include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_sal_commercial_board
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'البيان' => 'g246',
+            'القيمة' => 'g247',
+            'الوحدة/العملة' => 'g248',
+            'ملاحظة' => 'g249',
+            'مصدر الرسم 1 نسبة التحقق التعاقدي حسب نموذج العمل' => 'g250',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('sal_commercial_board');
+        echo ems_w14_grid('emsList_sal_commercial_board', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في لوحة المبيعات'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
     if (isset($_GET['msg'])) { echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>'; }
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     echo ems_states_bundle('لا عقود نافذة في نافذة اللوحة الحالية',
