@@ -15,6 +15,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 require_once '../includes/permissions_helper.php';
 require_once '../includes/gov_columns.php';
 require_once __DIR__ . '/../includes/ux_components.php'; // UXW-01: حالات الشاشة الموحدة
@@ -191,39 +192,44 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-body">
         <div class="table-responsive">
-        <table class="alltables display" id="break_glassTable">
-            <thead><tr>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
-            <th>رقم الطلب</th>
-            <th>التاريخ والوقت</th>
-            <th>الطالب — الاسم والصفة</th>
-            <th>الصلاحية المطلوبة</th>
-            <th>الشاشة أو الفعل</th>
-            <th>سبب الطوارئ</th>
-            <th>الأثر المتوقع لو لم تمنح</th>
-            <th>الموافق الأول</th>
-            <th>الموافق الثاني</th>
-            <th>وقت المنح</th>
-            <th>مدة الصلاحية</th>
-            <th>وقت الانتهاء</th>
-            <th>عدد الأفعال المنفذة تحتها</th>
-            <th>تقرير المراجعة</th>
-            <th>تاريخ المراجعة</th>
-            <th>نتيجة المراجعة</th>
-            <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-            </tr></thead>
-            <tbody>
-            <?php if (!$rows): ?>
-                <tr><td colspan="18" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
-            <?php else: foreach ($rows as $r): ?>
-                <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
-                    <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>
-                    <td<?php echo $v === '—' ? ' class="ems-gov-empty"' : ''; ?>><?php echo htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); ?></td>
-                    <?php endforeach; ?>
-                </tr>
-            <?php endforeach; endif; ?>
-            </tbody>
-        </table>
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم المنح' => 'no_request',
+            'المستفيد' => 'requester_name_capacity_role',
+            'النطاق الممنوح' => 'permission_required',
+            'المبرر' => 'reason_emergency',
+            'مانح الصلاحية' => '#granter',
+            'من وقت' => 'time_grant',
+            'إلى وقت' => 'time_expiry',
+            'مدة المنح' => 'duration_permission',
+            'الأفعال المنفذة تحتها' => 'count_actions_executed_under_it',
+            'المراجعة اللاحقة' => '#review',
+            'نتيجة المراجعة' => 'result_review',
+            'حالة المنح' => 'status_label',
+            'المنشئ' => 'created_by_name',
+            'تاريخ الإنشاء' => 'created_at',
+            'المراجع' => 'approver_second',
+            'تاريخ الاعتماد' => 'date_review',
+        );
+    $D = array(
+        /* مانحُ الصلاحيةِ: الموافقُ الأوّلُ، ومعه الجهةُ البديلةُ إن لجئ إليها
+           (‏الطالبُ هو المعتمِدُ المعتاد) — فاليدُ الثانيةُ تُعلَن لا تُطوى. */
+        'granter' => function ($r) {
+            $a = trim((string) $r['approver_first']);
+            $b = trim((string) $r['alternate_authority']);
+            return ($a !== '' && $b !== '') ? ($a . ' / ' . $b) : ($a !== '' ? $a : $b);
+        },
+        'review' => function ($r) {
+            $t = trim((string) $r['report_review']);
+            $d = trim((string) $r['date_review']);
+            return ($t !== '' && $d !== '') ? ($t . ' / ' . $d) : ($t !== '' ? $t : $d);
+        },
+    );
+        $__gridRows = cmp03_store_raw($conn, $CANONICAL, ($is_super_admin && $company_id <= 0) ? 0 : $company_id);
+        echo ems_w14_grid('break_glassTable', $GUIDE_COLS, $__gridRows, $D, 'لا منح طوارئ مسجل بعد'); /* /GUIDE_COLS */ ?>
         </div>
     </div></div>
 </div>

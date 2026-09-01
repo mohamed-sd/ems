@@ -176,6 +176,41 @@ if (!function_exists('ems_w14_grid')) {
     }
 
     /**
+     * وقائعُ إنفاذِ قاعدةِ منعٍ — كم مرّةً منعت فعلًا.
+     * ◆ **من سجلِّ المحاولاتِ الممنوعةِ نفسِه** لا من عدّادٍ يُكتب بيد: عدّادٌ
+     *   وعارضٌ من مصدرَين يتفرّقان ([[counter-parity-two-readers]]).
+     * ⛔ ولا نصَّ استعلامٍ هنا — القراءةُ عبرَ بوّابةِ العزل (`GAP-29`).
+     */
+    function ems_w14_denial_count($guardCode)
+    {
+        static $map = null;
+        if ($map === null) {
+            $map = array();
+            try {
+                foreach (ems_tenant_db()->select('guard_denials', array('limit' => 20000)) as $d) {
+                    $k = trim((string) $d['guard_code']);
+                    if ($k === '') { continue; }
+                    $map[$k] = isset($map[$k]) ? $map[$k] + 1 : 1;
+                }
+            } catch (\Throwable $t) { error_log('ems_w14_denial_count: ' . $t->getMessage()); }
+        }
+        $k = trim((string) $guardCode);
+        return ($k !== '' && isset($map[$k])) ? (string) $map[$k] : '';
+    }
+
+    /**
+     * نقطةُ منتصفِ المدّةِ بين تاريخَين — لمراجعةِ منتصفِ المدّةِ المشتقّة.
+     * ◆ وموضعُها العُدّةُ لا الشاشة (سقّاطةُ `VT-07`: تنسيقُ تاريخٍ في سطحٍ حيّ).
+     */
+    function ems_w14_midpoint($from, $to)
+    {
+        $a = strtotime((string) $from);
+        $b = strtotime((string) $to);
+        if ($a === false || $b === false || $b <= $a) { return ''; }
+        return date('Y-m-d', (int) (($a + $b) / 2));
+    }
+
+    /**
      * تاريخٌ بعدَ سنةٍ من تاريخٍ — للمراجعةِ الدوريّةِ المشتقّة.
      * ◆ **وموضعُه العُدّةُ لا الشاشة**: سقّاطةُ `VT-07` تعُدُّ كلَّ استدعاءِ تنسيقِ
      *   تاريخٍ في شاشةٍ حيّة، **والاشتقاقُ مكانُه قاعدتُه لا سطحُه** — وهو

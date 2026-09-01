@@ -15,6 +15,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 require_once '../includes/permissions_helper.php';
 require_once '../includes/gov_columns.php';
 require_once __DIR__ . '/../includes/ux_components.php'; // UXW-01: حالات الشاشة الموحدة
@@ -208,42 +209,31 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-body">
         <div class="table-responsive">
-        <table class="alltables display" id="guardsTable">
-            <thead><tr>
-            <th>رمز الحارس</th>
-            <th>اسم الحماية</th>
-            <th>الصنف</th>
-            <th>سبب التصنيف</th>
-            <th>الشاشات المتأثرة</th>
-            <th>الأفعال الممنوعة</th>
-            <th>رسالة المنع</th>
-            <th>درجة الخطورة</th>
-            <th>الموافقات المطلوبة للاستثناء</th>
-            <th>حالة العلم</th>
-            <th>تاريخ قلب العلم</th>
-            <th>صنفها</th>
-            <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
-            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
-            <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
-            <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
-            <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-            <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
-            </tr></thead>
-            <tbody>
-            <?php if (!$rows): ?>
-                <tr><td colspan="21" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
-            <?php else: foreach ($rows as $r): ?>
-                <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
-                    <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>
-                    <td<?php echo $v === '—' ? ' class="ems-gov-empty"' : ''; ?>><?php echo htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); ?></td>
-                    <?php endforeach; ?>
-                </tr>
-            <?php endforeach; endif; ?>
-            </tbody>
-        </table>
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'كود القاعدة' => 'code_guard',
+            'اسم القاعدة' => 'name_protection',
+            'وصف المنع' => 'message_denial',
+            'الصنف' => 'category',
+            'حالة العلم' => 'state_flag',
+            'الشاشات المنفذة عليها' => 'screens_affected',
+            'مرجع الاستثناء المسموح' => 'exception_ref',
+            'وقائع الإنفاذ' => '#denials',
+            'حالة القاعدة' => 'status_label',
+            'المنشئ' => 'created_by_name',
+            'تاريخ الإنشاء' => 'created_at',
+            'مرجع المصدر' => 'authority_ref',
+        );
+    $D = array(
+        /* وقائعُ الإنفاذ: كم مرّةً منعت هذه القاعدةُ فعلًا — من سجلِّ المحاولاتِ
+           الممنوعةِ نفسِه، ⛔ لا من عدّادٍ يُكتب بيد. */
+        'denials' => function ($r) { return ems_w14_denial_count($r['code_guard']); },
+    );
+        $__gridRows = cmp03_store_raw($conn, $CANONICAL, ($is_super_admin && $company_id <= 0) ? 0 : $company_id);
+        echo ems_w14_grid('guardsTable', $GUIDE_COLS, $__gridRows, $D, 'لا قاعدة منع مسجلة بعد'); /* /GUIDE_COLS */ ?>
         </div>
     </div></div>
 </div>

@@ -15,6 +15,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 require_once '../includes/permissions_helper.php';
 require_once '../includes/gov_columns.php';
 
@@ -196,37 +197,42 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-body">
         <div class="table-responsive">
-        <table class="alltables display" id="sensitive_fieldsTable">
-            <thead><tr>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
-            <th>رقم السياسة</th>
-            <th>الجدول</th>
-            <th>الحقل</th>
-            <th>تصنيف الحساسية</th>
-            <th>سبب التصنيف</th>
-            <th>من يراه</th>
-            <th>سياسة الإخفاء</th>
-            <th>يسجل الاطلاع؟</th>
-            <th>يصدر؟</th>
-            <th>الأساس النظامي</th>
-            <th>تاريخ السريان</th>
-            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
-            <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
-            <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-            <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-            </tr></thead>
-            <tbody>
-            <?php if (!$rows): ?>
-                <tr><td colspan="16" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
-            <?php else: foreach ($rows as $r): ?>
-                <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
-                    <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>
-                    <td<?php echo $v === '—' ? ' class="ems-gov-empty"' : ''; ?>><?php echo htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); ?></td>
-                    <?php endforeach; ?>
-                </tr>
-            <?php endforeach; endif; ?>
-            </tbody>
-        </table>
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف السياسة' => 'no_policy',
+            'الحقل' => 'field_name',
+            'الاسم التقني للحقل' => 'field_key',
+            'الجدول أو الكيان المصدر' => 'table_name',
+            'مفتاح الربط مكتمل؟' => '#bound',
+            'حالة ربط السياسة' => '#bind_state',
+            'السطح المالك' => 'owner_screen',
+            'فئة الحساسية' => 'classification_sensitivity',
+            'قاعدة الإظهار' => 'policy_masking',
+            'الأدوار التي تراه كاملا' => 'from_visible_to',
+            'الأدوار التي تراه مقنعا' => 'masked_roles',
+            'يظهر في التصدير؟' => 'exportable_flag',
+            'مرجع الأساس النظامي' => 'basis_statutory',
+            'حالة السياسة' => 'status_label',
+            'المنشئ' => 'created_by_name',
+            'تاريخ الإنشاء' => 'created_at',
+        );
+    $D = array(
+        /* مفتاحُ الربطِ مكتملٌ حين يُعرَف الجدولُ والحقلُ التقنيُّ معًا —
+           فسياسةٌ بحقلٍ بلا جدولٍ لا تُنفَّذ على شيء. */
+        'bound' => function ($r) {
+            $ok = trim((string) $r['table_name']) !== '' && trim((string) $r['field_key']) !== '';
+            return $ok ? 'نعم' : 'لا';
+        },
+        'bind_state' => function ($r) {
+            $ok = trim((string) $r['table_name']) !== '' && trim((string) $r['field_key']) !== '';
+            return $ok ? 'مربوطة بمفتاح كامل' : 'بانتظار اكتمال المفتاح';
+        },
+    );
+        $__gridRows = cmp03_store_raw($conn, $CANONICAL, ($is_super_admin && $company_id <= 0) ? 0 : $company_id);
+        echo ems_w14_grid('sensitive_fieldsTable', $GUIDE_COLS, $__gridRows, $D, 'لا سياسة حقل حساس مسجلة بعد'); /* /GUIDE_COLS */ ?>
         </div>
     </div></div>
 </div>

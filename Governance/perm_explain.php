@@ -15,6 +15,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 require_once '../includes/permissions_helper.php';
 require_once '../includes/gov_columns.php';
 
@@ -265,37 +266,41 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-body">
         <div class="table-responsive">
-        <table class="alltables display" id="perm_explainTable">
-            <thead><tr>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
-            <th>الحساب</th>
-            <th>الشاشة</th>
-            <th>الفعل</th>
-            <th>النتيجة النهائية</th>
-            <th>مصدر المنح 1</th>
-            <th>حكمه</th>
-            <th>مصدر المنح 2</th>
-            <th>حكمه</th>
-            <th>مصدر المنع</th>
-            <th>حكمه</th>
-            <th>قاعدة الدمج المطبقة</th>
-            <th>النطاق الناتج</th>
-            <th>السقف الناتج</th>
-            <th>تاريخ الفحص</th>
-            <th>الفاحص</th>
-            </tr></thead>
-            <tbody>
-            <?php if (!$rows): ?>
-                <tr><td colspan="16" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
-            <?php else: foreach ($rows as $r): ?>
-                <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
-                    <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>
-                    <td<?php echo $v === '—' ? ' class="ems-gov-empty"' : ''; ?>><?php echo htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); ?></td>
-                    <?php endforeach; ?>
-                </tr>
-            <?php endforeach; endif; ?>
-            </tbody>
-        </table>
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف الاستعلام' => '#query_id',
+            'المستخدم' => 'account_ref',
+            'السطح/الفعل' => '#surface_action',
+            'النتيجة' => 'result_final',
+            'مصدر القرار الأول' => '#first_source',
+            'القالب المطبق' => 'grant_source_2',
+            'الدور' => 'role_ref',
+            'التفويض الساري' => 'delegation_ref',
+            'قاعدة المنع المطبقة' => 'source_denial',
+            'إصدار السياسة وقت القرار' => 'policy_version',
+            'وقت القرار' => 'date_check',
+            'مرجع سجل الرفض' => 'denial_log_ref',
+        );
+    $D = array(
+        /* معرّفُ الاستعلامِ مشتقٌّ من صفِّه — رقمٌ واحدٌ لا رقمان */
+        'query_id' => function ($r) { return 'PEX-' . str_pad((string) $r['id'], 5, '0', STR_PAD_LEFT); },
+        'surface_action' => function ($r) {
+            $s = trim((string) $r['screen_ref']);
+            $a = trim((string) $r['action_ref']);
+            return ($s !== '' && $a !== '') ? ($s . ' / ' . $a) : ($s !== '' ? $s : $a);
+        },
+        /* مصدرُ القرارِ الأوّلُ بحكمِه — فمصدرٌ بلا حكمٍ لا يفسّر شيئًا */
+        'first_source' => function ($r) {
+            $s = trim((string) $r['grant_source_1']);
+            $g = trim((string) $r['its_ruling']);
+            return ($s !== '' && $g !== '') ? ($s . ' (' . $g . ')') : ($s !== '' ? $s : $g);
+        },
+    );
+        $__gridRows = cmp03_store_raw($conn, $CANONICAL, ($is_super_admin && $company_id <= 0) ? 0 : $company_id);
+        echo ems_w14_grid('perm_explainTable', $GUIDE_COLS, $__gridRows, $D, 'لا استعلام تفسير مسجل بعد'); /* /GUIDE_COLS */ ?>
         </div>
     </div></div>
 </div>

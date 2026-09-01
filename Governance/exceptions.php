@@ -15,6 +15,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 require_once '../includes/permissions_helper.php';
 require_once '../includes/gov_columns.php';
 require_once __DIR__ . '/../includes/ux_components.php'; // UXW-01: حالات الشاشة الموحدة
@@ -221,45 +222,42 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-body">
         <div class="table-responsive">
-        <table class="alltables display" id="exceptionsTable">
-            <thead><tr>
-            <th>رقم الطلب</th>
-            <th>تاريخ الطلب</th>
-            <th>الحماية المستثناة</th>
-            <th>الإدارة الطالبة</th>
-            <th>سبب الاستثناء</th>
-            <th>المستندات المؤيدة</th>
-            <th>درجة الخطورة</th>
-            <th>الأثر المتوقع</th>
-            <th>النطاق</th>
-            <th>المدة من</th>
-            <th>المدة إلى</th>
-            <th>الموافقات المطلوبة</th>
-            <th>الموافقون</th>
-            <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-            <th>عدد مرات الاستعمال</th>
-            <th>تاريخ الانتهاء</th>
-            <th>قرار الإقفال</th>
-            <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
-            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
-            <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
-            <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-            <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
-            </tr></thead>
-            <tbody>
-            <?php if (!$rows): ?>
-                <tr><td colspan="24" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
-            <?php else: foreach ($rows as $r): ?>
-                <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
-                    <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>
-                    <td<?php echo $v === '—' ? ' class="ems-gov-empty"' : ''; ?>><?php echo htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); ?></td>
-                    <?php endforeach; ?>
-                </tr>
-            <?php endforeach; endif; ?>
-            </tbody>
-        </table>
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم الاستثناء' => 'no_request',
+            'تاريخ الطلب' => 'date_request',
+            'الطالب' => 'created_by_name',
+            'الإدارة' => 'dept_requesting',
+            'قاعدة المنع المستهدفة' => 'protection_exempted',
+            'المبرر' => 'reason_exception',
+            'درجة الخطورة' => 'grade_severity',
+            'من تاريخ' => 'period_from',
+            'إلى تاريخ' => 'period_to',
+            'المعتمد بحسب الخطورة' => '#approvers',
+            'شروط الاستثناء' => 'docs_supporting',
+            'مراجعة منتصف المدة' => '#midterm',
+            'حالة الاستثناء' => 'status_label',
+            'تاريخ الإنشاء' => 'created_at',
+            'المراجع' => 'approvers',
+            'تاريخ الاعتماد' => 'approved_date',
+            'مرجع المصدر' => 'authority_ref',
+        );
+    $D = array(
+        /* المعتمِدُ بحسبِ الخطورة: الموافقاتُ المطلوبةُ بدرجتِها — والدرجةُ
+           تحدّد العدد، فالحقلان يُقرآن معًا لا مفترقَين. */
+        'approvers' => function ($r) {
+            $q = trim((string) $r['approvals_required']);
+            $g = trim((string) $r['grade_severity']);
+            return ($q !== '' && $g !== '') ? ($q . ' (' . $g . ')') : ($q !== '' ? $q : '');
+        },
+        /* مراجعةُ منتصفِ المدّة: نقطةُ المنتصفِ بين بدءِ الاستثناءِ وانتهائه */
+        'midterm' => function ($r) { return ems_w14_midpoint($r['period_from'], $r['period_to']); },
+    );
+        $__gridRows = cmp03_store_raw($conn, $CANONICAL, ($is_super_admin && $company_id <= 0) ? 0 : $company_id);
+        echo ems_w14_grid('exceptionsTable', $GUIDE_COLS, $__gridRows, $D, 'لا طلب استثناء مسجل بعد'); /* /GUIDE_COLS */ ?>
         </div>
     </div></div>
 </div>

@@ -15,6 +15,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 require_once '../includes/permissions_helper.php';
 require_once '../includes/gov_columns.php';
 require_once __DIR__ . '/../includes/ux_components.php'; // UXW-01: حالات الشاشة الموحدة
@@ -199,39 +200,25 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-body">
         <div class="table-responsive">
-        <table class="alltables display" id="doc_typesTable">
-            <thead><tr>
-            <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
-            <th>كود النوع</th>
-            <th>اسم المستند</th>
-            <th>الإدارة المالكة</th>
-            <th>نمط الترقيم</th>
-            <th>بادئة الترقيم</th>
-            <th>دورية التسلسل</th>
-            <th>آلة الحالة المرتبطة</th>
-            <th>يحتاج اعتمادا؟</th>
-            <th>عدد حلقات الاعتماد</th>
-            <th>له أثر مالي؟</th>
-            <th>قابل للعكس؟</th>
-            <th>نمط العكس</th>
-            <th>مدة الحفظ النظامية</th>
-            <th>سياسة الأرشفة</th>
-            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
-            <th>تاريخ السريان</th>
-            <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-            </tr></thead>
-            <tbody>
-            <?php if (!$rows): ?>
-                <tr><td colspan="18" class="text-center text-muted">لا بيانات بعد — أضف أول صف بزر «إضافة»</td></tr>
-            <?php else: foreach ($rows as $r): ?>
-                <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
-                    <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>
-                    <td<?php echo $v === '—' ? ' class="ems-gov-empty"' : ''; ?>><?php echo htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); ?></td>
-                    <?php endforeach; ?>
-                </tr>
-            <?php endforeach; endif; ?>
-            </tbody>
-        </table>
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'كود النوع' => 'code_type',
+            'اسم نوع المستند' => 'name_doc',
+            'الإدارة المالكة' => 'dept_owning',
+            'نمط الترقيم' => 'pattern_numbering',
+            'دورية التسلسل' => 'periodicity_sequence',
+            'صيغة الرقم' => 'prefix_numbering',
+            'آخر رقم مولد' => 'last_number',
+            'حالة النوع' => 'status_label',
+            'المنشئ' => 'created_by_name',
+            'تاريخ الإنشاء' => 'created_at',
+        );
+        $D = array();
+        $__gridRows = cmp03_store_raw($conn, $CANONICAL, ($is_super_admin && $company_id <= 0) ? 0 : $company_id);
+        echo ems_w14_grid('doc_typesTable', $GUIDE_COLS, $__gridRows, $D, 'لا نوع مستند مسجل بعد'); /* /GUIDE_COLS */ ?>
         </div>
     </div></div>
 </div>

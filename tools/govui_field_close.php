@@ -207,7 +207,11 @@ if ($APPLY) {
             $j = $ends + strlen(GFC_END);
             $i = strrpos(substr($s2, 0, $i), '<?php');
         } else {
-            $i   = strpos($s2, '<table id="');
+            /* ومرساةُ الكتلةِ تُصرَّح حين لا تكون <table id=: أسرةُ CMP-03 تكتب
+               الصنفَ قبلَ المعرِّف. ولا يُخمَّن «أوّلُ جدولٍ» — فشاشةٌ فيها جدولان
+               يُدهَس أوّلُهما وهو ليس السجلّ. */
+            $anchor = isset($sc['anchor']) && $sc['anchor'] !== '' ? (string) $sc['anchor'] : '<table id="';
+            $i   = strpos($s2, $anchor);
             $j   = ($i === false) ? false : strpos($s2, '</table>', $i);
             if ($i === false || $j === false) { echo "  ✗ لا كتلةَ جدولٍ في {$rel}\n"; continue; }
             $j += strlen('</table>');
@@ -232,7 +236,16 @@ if ($APPLY) {
         $blk .= $ind . ");\n";
         if (!empty($sc['derive'])) { $blk .= rtrim($sc['derive'], "\n") . "\n"; }
         else { $blk .= $ind . "\$D = array();\n"; }
-        $blk .= $ind . "echo ems_w14_grid('" . $sc['grid_id'] . "', \$GUIDE_COLS, \$rows, \$D, '"
+        /* ◆ **ومصدرُ الصفوفِ يُصرَّح حين لا يكون `$rows`**: أسرةُ `CMP-03` تقرأ
+             حمولةً مفاتيحُها تسمياتٌ قديمة، والخريطةُ تربط اسمَ الورقةِ
+             **بالعمود** — فتُقرأ الصفوفُ بأعمدتِها (`cmp03_store_raw`).
+             ⛔ ولا تُمَسُّ الكتابة: نموذجُ الإضافةِ يبقى على خريطةِ السجلّ. */
+        $rowsExpr = isset($sc['rows']) && $sc['rows'] !== '' ? (string) $sc['rows'] : '$rows';
+        if ($rowsExpr !== '$rows') {
+            $blk .= $ind . '$__gridRows = ' . $rowsExpr . ";" . chr(10);
+            $rowsExpr = '$__gridRows';
+        }
+        $blk .= $ind . "echo ems_w14_grid('" . $sc['grid_id'] . "', \$GUIDE_COLS, " . $rowsExpr . ", \$D, '"
               . str_replace("'", "", $sc['empty']) . "'); " . GFC_END;
 
         $s2 = substr($s2, 0, $ls) . $blk . substr($s2, $j);

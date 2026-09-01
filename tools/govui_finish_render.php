@@ -92,17 +92,22 @@ $pickViewer = function ($route) use ($conn, &$viewerCache) {
         if ($m = $st->get_result()->fetch_assoc()) { $mid = (int) $m['id']; }
         $st->close();
     }
-    $out = null;
+    $out = array();
     if ($mid > 0) {
-        $q = $conn->query("SELECT rp.role_id, u.id uid, u.company_id
+        /* وكلُّ حاملي الصلاحيةِ لا أوّلُهم: صفُّ role_permissions يمنح، لكنَّ
+           الحارسَ الحيَّ قد يردُّ دورًا بعينِه لسببٍ آخر. فلو اكتُفي بأوّلِ دورٍ
+           لَقُرئ السطحُ «لا يُصيَّر» وهو يُصيَّر لغيرِه — حاجزٌ كاذبٌ عطبُه في
+           المُجَسِّ لا في الشاشة. */
+        $q = $conn->query("SELECT rp.role_id, MIN(u.id) uid, MIN(u.company_id) co
                              FROM role_permissions rp
                              JOIN users u ON u.role_id = rp.role_id
                             WHERE rp.module_id = " . $mid . " AND rp.can_view = 1
-                            ORDER BY rp.role_id, u.id LIMIT 1");
-        if ($q && $row = $q->fetch_assoc()) {
-            $out = array('role' => (string) $row['role_id'], 'uid' => (int) $row['uid'],
-                         'co' => (int) $row['company_id']);
+                            GROUP BY rp.role_id ORDER BY rp.role_id");
+        while ($q && $row = $q->fetch_assoc()) {
+            $out[] = array('role' => (string) $row['role_id'], 'uid' => (int) $row['uid'],
+                           'co' => (int) $row['co']);
         }
+        if (!$out) { $out = null; }
     }
     $viewerCache[$route] = $out;
     return $out;
@@ -126,20 +131,26 @@ foreach ($bridge as $b) {
     $appl = 0;
     foreach ($dl as $f) { if ($f['field_type'] !== 'AUDIT') { $appl++; } }
 
-    $why = ''; $hit = 0; $miss = array(); $bytes = 0; $viewer = null;
+    $why = ''; $hit = 0; $miss = array(); $bytes = 0; $usedRole = '';
+    $viewers = array();
     if ($route === '' || !is_file($ROOT . '/' . $route)) {
         $why = 'NO_ARTIFACT';
     } else {
-        $viewer = $pickViewer($route);
-        if ($viewer === null) { $why = 'NO_VIEWER_ROLE'; }
+        $viewers = $pickViewer($route);
+        if ($viewers === null) { $why = 'NO_VIEWER_ROLE'; $viewers = array(); }
     }
+    $body = '';
     if ($why === '') {
-        $cmd = escapeshellarg($PHP) . ' ' . escapeshellarg($ROOT . '/tools/u13_render_one.php')
-             . ' ' . escapeshellarg($route) . ' ' . escapeshellarg($viewer['role'])
-             . ' ' . (int) $viewer['uid'] . ' ' . (int) $viewer['co'] . ' --body 2>' . $NULL;
-        $body = (string) shell_exec($cmd);
-        $nl   = strpos($body, "\n");
-        $body = ($nl === false) ? '' : substr($body, $nl + 1);
+        foreach ($viewers as $v0) {
+            $cmd = escapeshellarg($PHP) . ' ' . escapeshellarg($ROOT . '/tools/u13_render_one.php')
+                 . ' ' . escapeshellarg($route) . ' ' . escapeshellarg($v0['role'])
+                 . ' ' . (int) $v0['uid'] . ' ' . (int) $v0['co'] . ' --body 2>' . $NULL;
+            $b0 = (string) shell_exec($cmd);
+            $nl = strpos($b0, chr(10));
+            $b0 = ($nl === false) ? '' : substr($b0, $nl + 1);
+            if (strlen($b0) > strlen($body)) { $body = $b0; $usedRole = $v0['role']; }
+            if (strlen($body) >= 2000) { break; }
+        }
         $bytes = strlen($body);
         if ($bytes < 2000) { $why = 'RENDER_EMPTY'; }
         else {
@@ -167,8 +178,7 @@ foreach ($bridge as $b) {
     $rows[] = array('unit' => $unit, 'sid' => $sc, 'req' => $b['requirement_id'],
                     'name' => isset($reg[$sc]) ? $reg[$sc]['canonical_label_ar'] : $b['name_ar'],
                     'route' => $route, 'appl' => $appl, 'hit' => $hit, 'miss' => $miss,
-                    'why' => $why, 'bytes' => $bytes,
-                    'role' => $viewer ? $viewer['role'] : '');
+                    'why' => $why, 'bytes' => $bytes, 'role' => $usedRole);
 }
 
 /* ── التفريغُ الكاملُ للبناء — --dump=<ملف> ─────────────────────────────── */

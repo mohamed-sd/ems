@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-01 20:32:03
+-- المصدر: equipation_manage · التوليد: 2026-09-01 20:48:32
 -- الجداول: 1053 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
@@ -19528,6 +19528,7 @@ CREATE TABLE `scr_doc_types` (
   `created_by_name` varchar(120) DEFAULT NULL COMMENT 'المُنشئ — الاسم والصفة',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `last_number` varchar(60) DEFAULT NULL COMMENT 'آخر رقم مولد',
   PRIMARY KEY (`id`),
   KEY `ix_doc_types_live` (`company_id`,`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة doc_types.php';
@@ -19813,6 +19814,7 @@ CREATE TABLE `scr_guards` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `approver_user_id` int(11) DEFAULT NULL COMMENT 'هويةُ المعتمِدِ من سلسلةِ الاعتماد — والاسمُ يُقرأ منها لا يُكتب',
+  `exception_ref` varchar(120) DEFAULT NULL COMMENT 'مرجع الاستثناء المسموح',
   PRIMARY KEY (`id`),
   KEY `ix_guards_live` (`company_id`,`status`),
   KEY `fk_scr_guards_approver` (`approver_user_id`),
@@ -20031,6 +20033,10 @@ CREATE TABLE `scr_perm_explain` (
   `created_by_name` varchar(120) DEFAULT NULL COMMENT 'المُنشئ — الاسم والصفة',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `role_ref` varchar(120) DEFAULT NULL COMMENT 'الدور',
+  `delegation_ref` varchar(120) DEFAULT NULL COMMENT 'التفويض الساري',
+  `policy_version` varchar(60) DEFAULT NULL COMMENT 'إصدار السياسة وقت القرار',
+  `denial_log_ref` varchar(120) DEFAULT NULL COMMENT 'مرجع سجل الرفض',
   PRIMARY KEY (`id`),
   KEY `ix_perm_explain_live` (`company_id`,`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة perm_explain.php';
@@ -20262,6 +20268,9 @@ CREATE TABLE `scr_sensitive_fields` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `approver_user_id` int(11) DEFAULT NULL COMMENT 'هويةُ المعتمِدِ من سلسلةِ الاعتماد — والاسمُ يُقرأ منها لا يُكتب',
+  `field_key` varchar(120) DEFAULT NULL COMMENT 'الاسم التقني للحقل',
+  `owner_screen` varchar(190) DEFAULT NULL COMMENT 'السطح المالك',
+  `masked_roles` varchar(300) DEFAULT NULL COMMENT 'الأدوار التي تراه مقنعا',
   PRIMARY KEY (`id`),
   KEY `ix_sensitive_fields_live` (`company_id`,`status`),
   KEY `fk_scr_sensitive_fields_approver` (`approver_user_id`),
