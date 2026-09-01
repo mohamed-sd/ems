@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-01 10:30:21
--- الجداول: 1233 · المناظير: 28
+-- المصدر: equipation_manage · التوليد: 2026-09-01 10:59:39
+-- الجداول: 1234 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -1565,6 +1565,34 @@ CREATE TABLE `capacity_shadow_diffs` (
   UNIQUE KEY `uq_shadow_daily` (`container_id`,`noted_on`),
   KEY `ix_shadow_day` (`company_id`,`noted_on`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CAP-01 · EMS_CAPACITY_SOURCE: فروقُ الظل بين العمود المخزَّن والدفتر — لا قلبَ قبل صفرِ فرقٍ ١٤ يومًا متصلة (نمطُ EMS_PERM_SOURCE)';
+
+-- ── Table: ceo_org_decisions ──
+CREATE TABLE `ceo_org_decisions` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `decision_no` varchar(64) DEFAULT NULL COMMENT 'رقم القرار',
+  `decision_date` date DEFAULT NULL COMMENT 'تاريخ القرار',
+  `decision_kind` varchar(190) DEFAULT NULL COMMENT 'نوع القرار',
+  `affected_unit` varchar(190) DEFAULT NULL COMMENT 'الوحدة المعنية',
+  `change_desc` text DEFAULT NULL COMMENT 'وصف التغيير',
+  `change_reason` text DEFAULT NULL COMMENT 'مبرر التغيير',
+  `admin_vp_review` varchar(190) DEFAULT NULL COMMENT 'مراجعة نائب الشؤون الإدارية',
+  `roles_perms_impact` text DEFAULT NULL COMMENT 'أثر على الأدوار والصلاحيات',
+  `effective_date` date DEFAULT NULL COMMENT 'تاريخ النفاذ',
+  `decision_doc` varchar(255) DEFAULT NULL COMMENT 'مرفق القرار',
+  `decision_state` varchar(64) DEFAULT NULL COMMENT 'حالة القرار',
+  `reviewer_name` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `approved_on` date DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `approved_by` int(11) DEFAULT NULL,
+  `data_state` varchar(64) DEFAULT NULL,
+  `src_ref` varchar(190) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_co` (`company_id`),
+  KEY `ix_date` (`decision_date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CEO-21 — قرارات الهيكل التنظيمي · حبة: قرار هيكلي واحد';
 
 -- ── Table: chain_objections ──
 CREATE TABLE `chain_objections` (

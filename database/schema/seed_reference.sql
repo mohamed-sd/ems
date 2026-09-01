@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — البذرة المرجعية (طبقتان)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-01 10:30:21
+-- المصدر: equipation_manage · التوليد: 2026-09-01 10:59:39
 -- ① عالمية: بنية متنكرة في هيئة بيانات — بدونها لا تنقل ولا صلاحيات.
 -- ② مستأجرة: مرجعية تحمل company_id — القيمة علامة نائبة يحقنها المثبت:
 --    {{COMPANY_ID}}
@@ -820,7 +820,8 @@ INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `group_id`, `is_li
 (992,'ملاحظات مراجعة الوثيقة قبل التوقيع','portal/exec_doc_review_notes.php',9,NULL,0,0,'fa fa-triangle-exclamation',4,'EX-CEO'),
 (993,'التكليفات والإنابات المؤقتة','portal/exec_temp_assignments.php',9,NULL,0,0,'fa fa-user-clock',4,'EX-CEO'),
 (994,'اجتماعات الإدارة العليا','portal/exec_leadership_meetings.php',9,NULL,0,0,'fa fa-users-line',6,'EX-CEO'),
-(995,'خطة القوى العاملة','employees/hr_headcount_plan.php',4,NULL,0,0,'fa fa-people-arrows',2,'DEP-07');
+(995,'خطة القوى العاملة','employees/hr_headcount_plan.php',4,NULL,0,0,'fa fa-people-arrows',2,'DEP-07'),
+(996,'قرارات الهيكل التنظيمي','portal/ceo_org_decisions.php',9,NULL,0,0,'fa fa-gavel',3,'EX-CEO');
 
 -- ── role_permissions ──
 DELETE FROM `role_permissions`;
@@ -4955,7 +4956,8 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (9827,9,992,1,1,1,0),
 (9828,9,993,1,1,1,0),
 (9829,9,994,1,1,1,0),
-(9830,4,995,1,1,1,0);
+(9830,4,995,1,1,1,0),
+(9831,9,996,1,1,1,0);
 
 -- ── link_groups ──
 DELETE FROM `link_groups`;
@@ -8356,7 +8358,7 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (829,1,'GOV',5657,213,'منح المجال المقيد','Governance/ownership_grants.php','fa fa-user-lock',5,NULL,'Governance/ownership_grants.php',1,'2026-08-01 21:13:11','2026-08-30 11:54:28'),
 (833,1,'DAILY',5651,215,'لوحة مدير التشغيل','admin/ops_manager_board.php','fa fa-tachometer-alt',50,NULL,'admin/ops_manager_board.php',1,'2026-08-03 08:47:42','2026-08-30 11:54:28'),
 (834,1,'DAILY',5648,216,'التكليفات التنظيمية','admin/org_assignments.php','fa fa-id-badge',40,NULL,'admin/org_assignments.php',1,'2026-08-03 08:47:42','2026-08-30 12:12:01'),
-(835,1,'DAILY',5648,217,'قرارات الهيكل التنظيمي','admin/org_structure.php','fa fa-sitemap',5,NULL,'admin/org_structure.php',1,'2026-08-03 08:47:42','2026-09-01 16:15:46'),
+(835,1,'DAILY',5648,217,'قرارات الهيكل التنظيمي','portal/ceo_org_decisions.php','fa fa-sitemap',5,NULL,'admin/org_structure.php',1,'2026-08-03 08:47:42','2026-09-01 10:57:05'),
 (836,1,'REC',5658,218,'أذون الزيارة والمركبات الخارجية','admin/org_permits.php','fa fa-key',95,NULL,'admin/org_permits.php',1,'2026-08-02 01:46:38','2026-08-30 12:12:01'),
 (840,6,'DAILY',5769,216,'التكليفات التنظيمية','admin/org_assignments.php','fa fa-id-badge',50,NULL,'admin/org_assignments.php',1,'2026-08-03 08:47:42','2026-08-30 11:54:28'),
 (844,15,'REC',5979,223,'معالج إعداد الموظف','admin/sec_employee_wizard.php','fa fa-user-plus',10,NULL,'admin/sec_employee_wizard.php',1,'2026-08-02 02:24:13','2026-08-30 12:12:01'),
@@ -8724,7 +8726,7 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (9266,9,'DAILY',5863,294,'مراجعة العقود وملاحظاتها','Portal/contract_review.php','fa fa-circle-dot',23,NULL,'Portal/contract_review.php',1,'2026-08-16 17:07:10','2026-08-30 11:54:28'),
 (9267,9,'DAILY',5863,151,'سجل العقود','Workforce/contract_registry.php','fa fa-circle-dot',24,NULL,'Workforce/contract_registry.php',1,'2026-08-16 17:07:10','2026-09-01 19:14:56'),
 (9268,9,'DAILY',5546,234,'قرار فتح مشروع — ميثاق المشروع','Portal/project_charter.php','fa fa-circle-dot',32,NULL,'Portal/project_charter.php',1,'2026-08-16 17:07:10','2026-09-01 16:15:46'),
-(9269,9,'DAILY',5864,217,'قرارات الهيكل التنظيمي','admin/org_structure.php','fa fa-circle-dot',16,NULL,'admin/org_structure.php',1,'2026-08-16 17:07:10','2026-09-01 16:15:46'),
+(9269,9,'DAILY',5864,217,'قرارات الهيكل التنظيمي','portal/ceo_org_decisions.php','fa fa-circle-dot',16,NULL,'admin/org_structure.php',1,'2026-08-16 17:07:10','2026-09-01 10:57:05'),
 (9270,9,'DAILY',5864,216,'التكليفات التنظيمية','admin/org_assignments.php','fa fa-circle-dot',33,NULL,'admin/org_assignments.php',1,'2026-08-16 17:07:10','2026-08-30 12:12:01'),
 (9271,9,'DAILY',5865,235,'المخاطر والقرارات العليا','Portal/ceo_risk.php','fa fa-circle-dot',17,NULL,'Portal/ceo_risk.php',1,'2026-08-16 17:07:10','2026-08-30 11:54:28'),
 (9272,9,'DAILY',5865,78,'المخاطر التجارية','Clients/commercial_risks.php','fa fa-circle-dot',18,NULL,'Clients/commercial_risks.php',1,'2026-08-16 17:07:10','2026-08-30 11:54:28'),
@@ -9130,7 +9132,7 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (9671,27,'DAILY',4903,317,'عقود المشاريع المؤقتة','Workforce/project_contracts.php','fa fa-circle-dot',10,NULL,'Workforce/project_contracts.php',1,'2026-08-16 17:07:11','2026-08-26 18:50:12'),
 (9672,27,'DAILY',3493,314,'أرقام المشغلين الشاغرة','Workforce/op_codes.php','fa fa-circle-dot',8,NULL,'Workforce/op_codes.php',1,'2026-08-16 17:07:11','2026-08-30 11:54:28'),
 (9673,27,'DAILY',4898,319,'التوظيف من الشاغر إلى المباشرة','Workforce/recruitment_pipeline.php','fa fa-circle-dot',3,NULL,'Workforce/recruitment_pipeline.php',1,'2026-08-16 17:07:11','2026-08-26 18:50:12'),
-(9674,27,'DAILY',6276,217,'قرارات الهيكل التنظيمي','admin/org_structure.php','fa fa-circle-dot',11,NULL,'admin/org_structure.php',1,'2026-08-16 17:07:11','2026-09-01 16:15:46'),
+(9674,27,'DAILY',6276,217,'قرارات الهيكل التنظيمي','portal/ceo_org_decisions.php','fa fa-circle-dot',11,NULL,'admin/org_structure.php',1,'2026-08-16 17:07:11','2026-09-01 10:57:05'),
 (9675,27,'DAILY',6276,216,'التكليفات التنظيمية','admin/org_assignments.php','fa fa-circle-dot',33,NULL,'admin/org_assignments.php',1,'2026-08-16 17:07:11','2026-08-30 12:12:01'),
 (9676,27,'DAILY',6277,316,'تأهيل المشغلين على أنواع المعدات','Workforce/op_qual.php','fa fa-circle-dot',12,NULL,'Workforce/op_qual.php',1,'2026-08-16 17:07:11','2026-08-30 11:54:28'),
 (9677,27,'DAILY',3499,141,'وثائق المعدات والمشغلين','Equipments/equipment_documents.php','fa fa-circle-dot',13,NULL,'Equipments/equipment_documents.php',0,'2026-08-16 17:07:11','2026-08-25 18:07:35'),
@@ -9639,7 +9641,7 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (10181,15,'DAILY',3832,124,'الأدوار وقوالب صلاحياتها','Settings/roles.php','fa fa-circle-dot',12,NULL,'Settings/roles.php',1,'2026-08-16 17:07:12','2026-08-16 17:07:12'),
 (10182,15,'DAILY',5985,241,'حسابات بوابة الأطراف الخارجية','Governance/portal_users.php','fa fa-circle-dot',16,NULL,'Governance/portal_users.php',1,'2026-08-16 17:07:12','2026-08-30 12:12:01'),
 (10183,15,'DAILY',5986,61,'المعاونون والنيابة المؤقتة','main/all_assistants.php','fa fa-circle-dot',14,NULL,'main/all_assistants.php',1,'2026-08-16 17:07:12','2026-08-30 11:54:28'),
-(10184,15,'DAILY',5985,217,'قرارات الهيكل التنظيمي','admin/org_structure.php','fa fa-circle-dot',11,NULL,'admin/org_structure.php',1,'2026-08-16 17:07:12','2026-09-01 16:15:46'),
+(10184,15,'DAILY',5985,217,'قرارات الهيكل التنظيمي','portal/ceo_org_decisions.php','fa fa-circle-dot',11,NULL,'admin/org_structure.php',1,'2026-08-16 17:07:12','2026-09-01 10:57:05'),
 (10185,15,'DAILY',5985,216,'التكليفات التنظيمية','admin/org_assignments.php','fa fa-circle-dot',33,NULL,'admin/org_assignments.php',1,'2026-08-16 17:07:12','2026-08-30 12:12:01'),
 (10186,15,'DAILY',5987,183,'من يرى ماذا ومكونات البوابة','Portal/visibility_keys.php','fa fa-circle-dot',17,NULL,'Portal/visibility_keys.php',1,'2026-08-16 17:07:12','2026-08-30 11:54:28'),
 (10187,15,'DAILY',5988,248,'صفحات النظام والإدارات','Settings/modules.php','fa fa-circle-dot',18,NULL,'Settings/modules.php',1,'2026-08-16 17:07:12','2026-08-30 11:54:28'),
@@ -11348,7 +11350,8 @@ INSERT INTO `nav_canonical` (`id`, `route`, `canonical_ar`, `canonical_en`, `lev
 (5148,'portal/exec_doc_review_notes.php','ملاحظات مراجعة الوثيقة قبل التوقيع',NULL,2,'2 — العمليات','صناديق القرار',4,NULL,NULL,'APPROVED','APPROVED','DEPLOYED',NULL,'01 · الدليل المعماري · ورقة مساحة الرئيس التنفيذي · ملاحظات مراجعة الوثيقة قبل التوقيع — GOV_EXEC',NULL,NULL,1,'NAVIGATION_NAMING_POSITION',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2026-09-01 11:12:34',NULL,NULL,NULL,'SINGLE',NULL,'',NULL,''),
 (5149,'portal/exec_temp_assignments.php','التكليفات والإنابات المؤقتة',NULL,2,'2 — العمليات','القرار والحوكمة العليا',4,NULL,NULL,'APPROVED','APPROVED','DEPLOYED',NULL,'01 · الدليل المعماري · ورقة مساحة الرئيس التنفيذي · التكليفات والإنابات المؤقتة — GOV_EXEC',NULL,NULL,1,'NAVIGATION_NAMING_POSITION',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2026-09-01 11:12:34',NULL,NULL,NULL,'SINGLE',NULL,'',NULL,''),
 (5150,'portal/exec_leadership_meetings.php','اجتماعات الإدارة العليا',NULL,2,'2 — العمليات','القرار والحوكمة العليا',6,NULL,NULL,'APPROVED','APPROVED','DEPLOYED',NULL,'01 · الدليل المعماري · ورقة مساحة الرئيس التنفيذي · اجتماعات الإدارة العليا — GOV_EXEC',NULL,NULL,1,'NAVIGATION_NAMING_POSITION',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2026-09-01 11:12:34',NULL,NULL,NULL,'SINGLE',NULL,'',NULL,''),
-(5151,'employees/hr_headcount_plan.php','خطة القوى العاملة',NULL,2,'2 — العمليات','التوظيف والتعاقد',2,NULL,NULL,'APPROVED','APPROVED','DEPLOYED',NULL,'01 · الدليل المعماري · ورقة إدارة الموارد البشرية · خطة القوى العاملة — بحسب انطباق الشركة — GOV_EXEC',NULL,NULL,1,'NAVIGATION_NAMING_POSITION',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2026-09-01 18:06:29',NULL,NULL,NULL,'SINGLE',NULL,'',NULL,'');
+(5151,'employees/hr_headcount_plan.php','خطة القوى العاملة',NULL,2,'2 — العمليات','التوظيف والتعاقد',2,NULL,NULL,'APPROVED','APPROVED','DEPLOYED',NULL,'01 · الدليل المعماري · ورقة إدارة الموارد البشرية · خطة القوى العاملة — بحسب انطباق الشركة — GOV_EXEC',NULL,NULL,1,'NAVIGATION_NAMING_POSITION',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2026-09-01 18:06:29',NULL,NULL,NULL,'SINGLE',NULL,'',NULL,''),
+(5152,'portal/ceo_org_decisions.php','قرارات الهيكل التنظيمي',NULL,2,'2 — العمليات','القرار والحوكمة العليا',3,NULL,NULL,'APPROVED','APPROVED','DEPLOYED',NULL,'01 · الدليل المعماري · ورقة مساحة الرئيس التنفيذي · قرارات الهيكل التنظيمي — GOV_EXEC',NULL,NULL,1,'NAVIGATION_NAMING_POSITION',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'2026-09-01 10:56:27',NULL,NULL,NULL,'SINGLE',NULL,'',NULL,'');
 
 -- ── equipments_types ──
 DELETE FROM `equipments_types`;
@@ -14540,6 +14543,23 @@ INSERT INTO `gov_field_class` (`id`, `company_id`, `screen_code`, `field_key`, `
 (10315,{{COMPANY_ID}},'hr_headcount_plan','row_state','حالة السطر ▼','DC-1',0,'GOV_EXEC-5',1,'2026-09-01 18:06:29','2026-09-01 18:06:29'),
 (10316,{{COMPANY_ID}},'hr_headcount_plan','created_at','تاريخ الإنشاء','DC-1',0,'GOV_EXEC-5',1,'2026-09-01 18:06:29','2026-09-01 18:06:29'),
 (10317,{{COMPANY_ID}},'hr_headcount_plan','data_state','حالة البيانات ▼','DC-1',0,'GOV_EXEC-5',1,'2026-09-01 18:06:29','2026-09-01 18:06:29'),
-(10318,{{COMPANY_ID}},'hr_headcount_plan','src_ref','مرجع المصدر','DC-1',0,'GOV_EXEC-5',1,'2026-09-01 18:06:29','2026-09-01 18:06:29');
+(10318,{{COMPANY_ID}},'hr_headcount_plan','src_ref','مرجع المصدر','DC-1',0,'GOV_EXEC-5',1,'2026-09-01 18:06:29','2026-09-01 18:06:29'),
+(10474,{{COMPANY_ID}},'ceo_org_decisions','decision_no','رقم القرار','DC-1',0,'GOV_EXEC-5',1,'2026-09-01 10:56:26','2026-09-01 10:56:26'),
+(10475,{{COMPANY_ID}},'ceo_org_decisions','decision_date','تاريخ القرار','DC-1',0,'GOV_EXEC-5',1,'2026-09-01 10:56:26','2026-09-01 10:56:26'),
+(10476,{{COMPANY_ID}},'ceo_org_decisions','decision_kind','نوع القرار ▼','DC-1',0,'GOV_EXEC-5',1,'2026-09-01 10:56:26','2026-09-01 10:56:26'),
+(10477,{{COMPANY_ID}},'ceo_org_decisions','affected_unit','الوحدة المعنية ◄','DC-1',0,'GOV_EXEC-5',1,'2026-09-01 10:56:26','2026-09-01 10:56:26'),
+(10478,{{COMPANY_ID}},'ceo_org_decisions','change_desc','وصف التغيير','DC-1',0,'GOV_EXEC-5',1,'2026-09-01 10:56:26','2026-09-01 10:56:26'),
+(10479,{{COMPANY_ID}},'ceo_org_decisions','change_reason','مبرر التغيير','DC-1',0,'GOV_EXEC-5',1,'2026-09-01 10:56:26','2026-09-01 10:56:26'),
+(10480,{{COMPANY_ID}},'ceo_org_decisions','admin_vp_review','مراجعة نائب الشؤون الإدارية ◄','DC-1',0,'GOV_EXEC-5',1,'2026-09-01 10:56:26','2026-09-01 10:56:26'),
+(10481,{{COMPANY_ID}},'ceo_org_decisions','roles_perms_impact','أثر على الأدوار والصلاحيات ◄','DC-1',0,'GOV_EXEC-5',1,'2026-09-01 10:56:26','2026-09-01 10:56:26'),
+(10482,{{COMPANY_ID}},'ceo_org_decisions','effective_date','تاريخ النفاذ','DC-1',0,'GOV_EXEC-5',1,'2026-09-01 10:56:27','2026-09-01 10:56:27'),
+(10483,{{COMPANY_ID}},'ceo_org_decisions','decision_doc','مرفق القرار','DC-1',0,'GOV_EXEC-5',1,'2026-09-01 10:56:27','2026-09-01 10:56:27'),
+(10484,{{COMPANY_ID}},'ceo_org_decisions','decision_state','حالة القرار ▼','DC-1',0,'GOV_EXEC-5',1,'2026-09-01 10:56:27','2026-09-01 10:56:27'),
+(10485,{{COMPANY_ID}},'ceo_org_decisions','created_at','تاريخ الإنشاء','DC-1',0,'GOV_EXEC-5',1,'2026-09-01 10:56:27','2026-09-01 10:56:27'),
+(10486,{{COMPANY_ID}},'ceo_org_decisions','reviewer_name','المراجع','DC-1',0,'GOV_EXEC-5',1,'2026-09-01 10:56:27','2026-09-01 10:56:27'),
+(10487,{{COMPANY_ID}},'ceo_org_decisions','approved_by','المعتمِد','DC-1',0,'GOV_EXEC-5',1,'2026-09-01 10:56:27','2026-09-01 10:56:27'),
+(10488,{{COMPANY_ID}},'ceo_org_decisions','approved_on','تاريخ الاعتماد','DC-3',0,'GOV_EXEC-5',1,'2026-09-01 10:56:27','2026-09-01 10:56:27'),
+(10489,{{COMPANY_ID}},'ceo_org_decisions','data_state','حالة البيانات ▼','DC-1',0,'GOV_EXEC-5',1,'2026-09-01 10:56:27','2026-09-01 10:56:27'),
+(10490,{{COMPANY_ID}},'ceo_org_decisions','src_ref','مرجع المصدر','DC-1',0,'GOV_EXEC-5',1,'2026-09-01 10:56:27','2026-09-01 10:56:27');
 
 SET FOREIGN_KEY_CHECKS = 1;
