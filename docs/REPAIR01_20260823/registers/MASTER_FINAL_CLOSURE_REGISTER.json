@@ -1,7 +1,7 @@
 {
     "meta": {
-        "snapshot": "f5448fe7",
-        "updated_at": "2026-09-01 07:53",
+        "snapshot": "07feb69b",
+        "updated_at": "2026-09-01 08:02",
         "governing_order": "docs\/REPAIR01_20260823\/orders\/CLOSURE_SYSTEM.txt",
         "sprint_timeboxes": {
             "SPRINT-01": {
@@ -7314,10 +7314,10 @@
             "Estimated_Effort": "XL",
             "Evidence_Contract": "كل شاشة تبنى بنمط WH-03 الكامل (جدول بقيوده · شاشة بفعليها · التوصيل الكامل · البوابات خضر) وكل ادارة تبلغ §24 تدخل التحقق البشري فورا",
             "Next_Action": "استخراج Sprint من السجل واخذ اعلى الاهداف قيمة — 134 موضعا حاليا (لوحة DEPARTMENT_CONFORMANCE)",
-            "Current_Snapshot": "عشرة جداول قائمة باعمدة مولدة باسم مبهم (c5 · offer_22): فارغة ولا كاتب لها فصححت التسمية — 100 عمود مسمى انشئ و100 مبهم اسقط، والعكس يعيدها بتعريفها الحرفي المنتزع من المخطط @ f5448fe7",
-            "Last_Updated_Snapshot": "f5448fe7",
-            "Last_Evidence_Ref": "DEP-02 الموردون اغلقت: 10 مواضع · TARGET_BUILD_COVERAGE 369\/413 ⇒ 379\/413 · RENDERED 256\/256 ⇒ 266\/266 · المطابق تماما 10 ⇒ 11 · برهان التصيير 12\/0 · الحقول 1651\/4800 ⇒ 1876\/5026 @ f5448fe7",
-            "Status_Changed_At": "2026-09-01 07:53 @ f5448fe7",
+            "Current_Snapshot": "مصفوفة الالتزامات حبتها العقد نفسه فبنيت فوق contracts لا فوق جدول ثان · وثمان حبات قائمة استكملت @ 07feb69b",
+            "Last_Updated_Snapshot": "07feb69b",
+            "Last_Evidence_Ref": "DEP-01 المبيعات التعاقدية اغلقت: 9 مواضع · TARGET_BUILD_COVERAGE 379\/413 ⇒ 388\/413 · RENDERED 266\/266 ⇒ 275\/275 · المطابق تماما 11 ⇒ 12 · برهان التصيير 11\/0 · الحقول 1876\/5026 ⇒ 2064\/5214 @ 07feb69b",
+            "Status_Changed_At": "2026-09-01 08:02 @ 07feb69b",
             "Final_Disposition": "",
             "Levels": {
                 "Decision": "DECIDED",
