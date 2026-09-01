@@ -81,21 +81,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // ═══ ⑦ العرض ═══
 $where = $is_super_admin ? '1=1' : ('company_id = ' . (int) $company_id);
-/* ◆ **الأعمدةُ حقولُ ورقةِ `GOV-32` بترتيبِها المستنديّ** (الأمرُ §11) —
-     والعُدّةُ المشتركةُ تطبع الخلايا **بموضعِها** لا بمفتاحِها، فترتيبُ
-     `SELECT` هو ترتيبُ `$COLS` حرفًا. ⛔ وعمودٌ يُزاد هنا بلا رأسِه هناك
-     يُزيح الجدولَ كلَّه — فهما يُحرَّران معًا.
+/* ◆ **خريطةُ حقولِ ورقةِ `GOV-32`** — اسمُ الحقلِ ⇐ تعبيرُ مصدرِه.
+     **يقرؤها الرأسُ والخليّةُ والاستعلامُ الثلاثةُ منها** (‏العُدّةُ المشتركةُ
+     تطبع الخلايا بموضعِها، فترتيبُ `SELECT` هو ترتيبُ الرؤوسِ حرفًا).
+     ⛔ فلا رأسٌ يُزاد بلا مصدرِ خليّتِه ولا العكس — والانزياحُ ممنوعٌ بالبنية.
    ◆ **والمشتقُّ يُحسب في القراءةِ لا يُخزَّن**: فجوةُ الزمنِ فرقُ المتحقَّقِ عن
      المستهدَف، ومصدرُ النسخةِ طرفا سجلِّ الثنائيات. */
+$GUIDE_COLS = array(
+    'رقم التمرين' => 'drill_no',
+    'دورة التمرين' => 'drill_cycle',
+    'نطاق الاستعادة' => 'drill_kind',
+    'مصدر النسخة' => "CONCAT_WS(' .. ', binlog_first_file, binlog_last_file)",
+    'بدء التنفيذ' => 'started_at',
+    'انتهاء التنفيذ' => 'finished_at',
+    'RTO المتحقق' => 'rto_actual_seconds',
+    'RTO المستهدف' => 'rto_target_seconds',
+    'RPO المتحقق' => 'rpo_actual_minutes',
+    'RPO المستهدف' => 'rpo_target_minutes',
+    'فجوة الزمن' => '(rto_actual_seconds - rto_target_seconds)',
+    'سلامة البيانات المستعادة' => 'data_integrity',
+    'محضر التمرين' => 'runbook_ref',
+    'ملاحظات وإجراءات' => 'operator_note',
+    'حالة التمرين' => 'verdict',
+    'المراجع' => 'reviewed_by',
+    'تاريخ الاعتماد' => 'approved_at',
+);
+$__sel = array(); $__i = 0;
+foreach ($GUIDE_COLS as $__lbl => $__expr) { $__sel[] = $__expr . ' AS c' . (++$__i); }
 $rows = $conn->query(
-    "SELECT drill_no, drill_cycle, drill_kind,
-            CONCAT_WS(' .. ', binlog_first_file, binlog_last_file) AS backup_src,
-            started_at, finished_at,
-            rto_actual_seconds, rto_target_seconds,
-            rpo_actual_minutes, rpo_target_minutes,
-            (rto_actual_seconds - rto_target_seconds) AS time_gap,
-            data_integrity, runbook_ref, operator_note, verdict,
-            reviewed_by, approved_at
+    "SELECT " . implode(', ', $__sel) . "
        FROM dr_drills WHERE {$where} ORDER BY id DESC LIMIT 100"
 );
 $logBin = $conn->query("SHOW VARIABLES LIKE 'log_bin'")->fetch_assoc();
@@ -107,12 +121,8 @@ $TILES = array(
     array('مدة الاحتفاظ (يوما)', round((float) $ret, 1)),
     array('أيام منذ آخر تجربة ناجحة', $days === null ? 'لم تجرب' : $days),
 );
-/* أسماءُ ورقةِ الدليلِ حرفًا — بلا اصطلاحِ التصنيفِ ولا تشكيل (سقّاطةُ UI-01/02) */
-$COLS = array('رقم التمرين', 'دورة التمرين', 'نطاق الاستعادة', 'مصدر النسخة',
-              'بدء التنفيذ', 'انتهاء التنفيذ', 'RTO المتحقق', 'RTO المستهدف',
-              'RPO المتحقق', 'RPO المستهدف', 'فجوة الزمن', 'سلامة البيانات المستعادة',
-              'محضر التمرين', 'ملاحظات وإجراءات', 'حالة التمرين',
-              'المراجع', 'تاريخ الاعتماد');
+/* الرؤوسُ من الخريطةِ نفسِها — ⛔ ولا قائمةَ ثانيةً تتفرّق عنها */
+$COLS = array_keys($GUIDE_COLS);
 $EMPTY_TITLE = 'لا محاضر استعادة مسجلة بعد';
 $EMPTY_HINT  = 'يسجل المحضر من هذه الشاشة بعد تنفيذ تجربة الاستعادة وفق دليل التشغيل';
 include __DIR__ . '/../includes/eng01_screen_view.php';
