@@ -15,6 +15,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/fin_helpers.php';
 require_once __DIR__ . '/w11_view.php';
@@ -63,21 +64,27 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_acc_closing_checklist')); ?>
-    <table id="emsList_acc_closing_checklist" class="data-table">
-        <thead><tr><th>الفترة</th><th>البند</th><th>الزامي</th><th>الحالة</th><th>يحجب الاقفال</th><th>سبب الاستثناء</th><th>تاريخ الاكتمال</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= (int) $r["period_id"] ?></td>
-                    <td><?= ems_w11_step((string) $r["step"]) ?></td>
-                    <td><?= ((int) $r["required"] === 1 ? "نعم" : "لا") ?></td>
-                    <td><?= ems_w11_item_state((string) $r["item_state"]) ?></td>
-                    <td><?= ((int) $r["blocks_close"] === 1 ? "نعم" : "لا") ?></td>
-                    <td><?= htmlspecialchars((string) $r["exception_reason"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["done_at"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف البند' => 'g103',
+        'الفترة' => 'g104',
+        'بند الفحص' => 'g105',
+        'المسؤول' => 'g106',
+        'مرجع الإنجاز' => 'g107',
+        'النتيجة' => 'g108',
+        'استثناء موثق' => 'g109',
+        'وقت الإنجاز' => 'g110',
+        'حالة البند' => 'g111',
+        'المنشئ' => 'g112',
+        'تاريخ الإنشاء' => 'g113',
+        'حالة البيانات' => 'g114',
+        'مرجع المصدر' => 'g115',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('fina_closing_checklist');
+    echo ems_w14_grid('emsList_acc_closing_checklist', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في قائمة إقفال الفترة'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

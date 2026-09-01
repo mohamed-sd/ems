@@ -8,6 +8,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/fin_helpers.php';
 require_once __DIR__ . '/../includes/w7_codes.php';
@@ -167,7 +168,41 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         $header_actions[] = array('id' => 'toggleRecv', 'class' => 'add-btn', 'icon' => 'fas fa-file-invoice', 'label' => 'إضافة ذمة عميل');
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
-    include('../includes/page_header.php');
+    include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف الاستحقاق' => 'g160',
+            'رقم فاتورة المورد' => 'g161',
+            'رقم المورد' => 'g162',
+            'مصدر الاستحقاق' => 'g163',
+            'مرجع المصدر' => 'g164',
+            'فحص البوابة' => 'g165',
+            'قيمة الاستحقاق' => 'g166',
+            'الضريبة' => 'g167',
+            'العملة' => 'g168',
+            'تاريخ الاستحقاق' => 'g169',
+            'المسدد' => 'g170',
+            'المتبقي' => 'g171',
+            'حالة الاستحقاق' => 'g172',
+            'المنشئ' => 'g173',
+            'تاريخ الإنشاء' => 'g174',
+            'المراجع' => 'g175',
+            'المعتمد' => 'g176',
+            'تاريخ الاعتماد' => 'g177',
+            'حالة البيانات' => 'g178',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('fina_dues');
+        echo ems_w14_grid('emsList_tre_payment_queue', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في فواتير الموردين والمستحقات'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
     // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     echo ems_states_bundle('لا مستحقات ولا ذمما مسجلة في هذا النطاق', 'أضف مستحقا بزر «إضافة مستحق» أو ذمة عميل بزر «إضافة ذمة عميل»');
     ?>

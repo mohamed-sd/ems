@@ -15,6 +15,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/fin_helpers.php';
 require_once __DIR__ . '/w11_view.php';
@@ -63,22 +64,28 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_acc_credit_control')); ?>
-    <table id="emsList_acc_credit_control" class="data-table">
-        <thead><tr><th>العميل</th><th>الحد</th><th>العملة</th><th>التعرض القائم</th><th>عند التجاوز</th><th>قاعدة الصلاحية</th><th>سبب الحد</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= (int) $r["customer_entity_id"] ?></td>
-                    <td><?= number_format((float) $r["limit_amount"], 2) ?></td>
-                    <td><?= htmlspecialchars((string) $r["currency"]) ?></td>
-                    <td><?= number_format((float) $r["exposure_amount"], 2) ?></td>
-                    <td><?= ((string) $r["breach_action"] === "block" ? "يحجب" : "يصعد") ?></td>
-                    <td><?= htmlspecialchars((string) $r["authority_rule_id"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["why"]) ?></td>
-                    <td><?= ((int) $r["is_active"] === 1 ? "نشط" : "موقوف") ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف السطر' => 'g75',
+        'رقم العميل' => 'g76',
+        'الحد الائتماني المعتمد' => 'g77',
+        'العملة' => 'g78',
+        'مرجع اعتماد الحد' => 'g79',
+        'المستهلك' => 'g80',
+        'المتاح' => 'g81',
+        'تجاوز؟' => 'g82',
+        'إجراء التجاوز' => 'g83',
+        'حالة الحد' => 'g84',
+        'المنشئ' => 'g85',
+        'تاريخ الإنشاء' => 'g86',
+        'حالة البيانات' => 'g87',
+        'مرجع المصدر' => 'g88',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('fina_acc_credit_control');
+    echo ems_w14_grid('emsList_acc_credit_control', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الرقابة الائتمانية وحدود العملاء'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

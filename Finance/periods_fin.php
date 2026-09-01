@@ -8,6 +8,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/fin_helpers.php';
 
@@ -190,7 +191,40 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array();
     if ($can_add) { $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'إنشاء فترة'); }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
-    include('../includes/page_header.php');
+    include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف الفترة' => 'g35',
+            'الشهر' => 'g36',
+            'قيود الفترة' => 'g37',
+            'قيود معلقة' => 'g38',
+            'مطابقة المخازن' => 'g39',
+            'مطابقة الخزينة' => 'g40',
+            'الإقفالات التشغيلية الواردة' => 'g41',
+            'فروق معالجة' => 'g42',
+            'قرار الإقفال' => 'g43',
+            'قرار إعادة الفتح' => 'g44',
+            'حالة الفترة' => 'g45',
+            'المنشئ' => 'g46',
+            'تاريخ الإنشاء' => 'g47',
+            'المراجع' => 'g48',
+            'المعتمد' => 'g49',
+            'تاريخ الاعتماد' => 'g50',
+            'حالة البيانات' => 'g51',
+            'مرجع المصدر' => 'g52',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('fina_periods_fin');
+        echo ems_w14_grid('emsList_fina_periods_fin', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في التقويم المحاسبي للفترات'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
     // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضيًا
     echo ems_states_bundle('لا فترات مالية منشأة بعد', 'أنشئ فترة بزر «إنشاء فترة» في رأس الشاشة ثم استوف قائمة إقفالها');
     ?>

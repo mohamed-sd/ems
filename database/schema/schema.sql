@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-01 22:54:05
--- الجداول: 1119 · المناظير: 28
+-- المصدر: equipation_manage · التوليد: 2026-09-01 23:01:31
+-- الجداول: 1135 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -8503,6 +8503,401 @@ CREATE TABLE `fin_units` (
   UNIQUE KEY `uq_fin_unit_code` (`company_id`,`code`),
   KEY `ix_fin_unit_deleted` (`is_deleted`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: fina_acc_adjustments ──
+CREATE TABLE `fina_acc_adjustments` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g1` varchar(190) DEFAULT NULL COMMENT 'معرف السطر',
+  `g2` varchar(190) DEFAULT NULL COMMENT 'الفترة',
+  `g3` varchar(190) DEFAULT NULL COMMENT 'النوع',
+  `g4` varchar(190) DEFAULT NULL COMMENT 'كود الحساب',
+  `g5` varchar(190) DEFAULT NULL COMMENT 'مركز التكلفة',
+  `g6` varchar(190) DEFAULT NULL COMMENT 'الأساس/المستند',
+  `g7` varchar(190) DEFAULT NULL COMMENT 'القيمة',
+  `g8` varchar(190) DEFAULT NULL COMMENT 'جدول الاستهلاك/العكس',
+  `g9` varchar(190) DEFAULT NULL COMMENT 'القيد المتولد',
+  `g10` varchar(190) DEFAULT NULL COMMENT 'قيد العكس التالي',
+  `g11` varchar(190) DEFAULT NULL COMMENT 'حالة السطر',
+  `g12` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g13` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g14` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `g15` varchar(190) DEFAULT NULL COMMENT 'المعتمد',
+  `g16` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `g17` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g18` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_36ac2c1c_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ACC-17 - الاستحقاقات والمقدَّمات والمخصصات';
+
+-- ── Table: fina_acc_cost_centers ──
+CREATE TABLE `fina_acc_cost_centers` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g116` varchar(190) DEFAULT NULL COMMENT 'كود المركز',
+  `g117` varchar(190) DEFAULT NULL COMMENT 'اسم المركز',
+  `g118` varchar(190) DEFAULT NULL COMMENT 'المركز الأب',
+  `g119` varchar(190) DEFAULT NULL COMMENT 'نوع المركز',
+  `g120` varchar(190) DEFAULT NULL COMMENT 'المرجع المربوط',
+  `g121` varchar(190) DEFAULT NULL COMMENT 'مسؤول المركز',
+  `g122` varchar(190) DEFAULT NULL COMMENT 'حالة المركز',
+  `g123` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g124` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g125` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g126` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_e506da6b_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ACC-03 - مراكز التكلفة';
+
+-- ── Table: fina_acc_credit_control ──
+CREATE TABLE `fina_acc_credit_control` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g75` varchar(190) DEFAULT NULL COMMENT 'معرف السطر',
+  `g76` varchar(190) DEFAULT NULL COMMENT 'رقم العميل',
+  `g77` varchar(190) DEFAULT NULL COMMENT 'الحد الائتماني المعتمد',
+  `g78` varchar(190) DEFAULT NULL COMMENT 'العملة',
+  `g79` varchar(190) DEFAULT NULL COMMENT 'مرجع اعتماد الحد',
+  `g80` varchar(190) DEFAULT NULL COMMENT 'المستهلك',
+  `g81` varchar(190) DEFAULT NULL COMMENT 'المتاح',
+  `g82` varchar(190) DEFAULT NULL COMMENT 'تجاوز؟',
+  `g83` varchar(190) DEFAULT NULL COMMENT 'إجراء التجاوز',
+  `g84` varchar(190) DEFAULT NULL COMMENT 'حالة الحد',
+  `g85` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g86` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g87` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g88` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_d2e6605f_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ACC-15 - الرقابة الائتمانية وحدود العملاء';
+
+-- ── Table: fina_acc_reopen_governance ──
+CREATE TABLE `fina_acc_reopen_governance` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g19` varchar(190) DEFAULT NULL COMMENT 'رقم الطلب',
+  `g20` varchar(190) DEFAULT NULL COMMENT 'الفترة المستهدفة',
+  `g21` varchar(190) DEFAULT NULL COMMENT 'مبرر إعادة الفتح',
+  `g22` varchar(190) DEFAULT NULL COMMENT 'الوحدات المفتوحة',
+  `g23` varchar(190) DEFAULT NULL COMMENT 'النطاق الزمني للفتح',
+  `g24` varchar(190) DEFAULT NULL COMMENT 'مرجع اعتماد AAM',
+  `g25` varchar(190) DEFAULT NULL COMMENT 'القيود الموسومة بعد الفتح',
+  `g26` varchar(190) DEFAULT NULL COMMENT 'إعادة الإقفال',
+  `g27` varchar(190) DEFAULT NULL COMMENT 'حالة الطلب',
+  `g28` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g29` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g30` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `g31` varchar(190) DEFAULT NULL COMMENT 'المعتمد',
+  `g32` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `g33` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g34` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_dabb06fe_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ACC-25 - حوكمة إعادة فتح الفترات';
+
+-- ── Table: fina_acc_trial_balance ──
+CREATE TABLE `fina_acc_trial_balance` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g53` varchar(190) DEFAULT NULL COMMENT 'معرف السطر',
+  `g54` varchar(190) DEFAULT NULL COMMENT 'الفترة',
+  `g55` varchar(190) DEFAULT NULL COMMENT 'كود الحساب',
+  `g56` varchar(190) DEFAULT NULL COMMENT 'اسم الحساب',
+  `g57` varchar(190) DEFAULT NULL COMMENT 'رصيد افتتاحي مدين',
+  `g58` varchar(190) DEFAULT NULL COMMENT 'رصيد افتتاحي دائن',
+  `g59` varchar(190) DEFAULT NULL COMMENT 'حركة مدينة',
+  `g60` varchar(190) DEFAULT NULL COMMENT 'حركة دائنة',
+  `g61` varchar(190) DEFAULT NULL COMMENT 'ختامي مدين',
+  `g62` varchar(190) DEFAULT NULL COMMENT 'ختامي دائن',
+  `g63` varchar(190) DEFAULT NULL COMMENT 'التوازن الكلي',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_79705fa9_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ACC-21 - ميزان المراجعة';
+
+-- ── Table: fina_closing_checklist ──
+CREATE TABLE `fina_closing_checklist` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g103` varchar(190) DEFAULT NULL COMMENT 'معرف البند',
+  `g104` varchar(190) DEFAULT NULL COMMENT 'الفترة',
+  `g105` varchar(190) DEFAULT NULL COMMENT 'بند الفحص',
+  `g106` varchar(190) DEFAULT NULL COMMENT 'المسؤول',
+  `g107` varchar(190) DEFAULT NULL COMMENT 'مرجع الإنجاز',
+  `g108` varchar(190) DEFAULT NULL COMMENT 'النتيجة',
+  `g109` varchar(190) DEFAULT NULL COMMENT 'استثناء موثق',
+  `g110` varchar(190) DEFAULT NULL COMMENT 'وقت الإنجاز',
+  `g111` varchar(190) DEFAULT NULL COMMENT 'حالة البند',
+  `g112` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g113` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g114` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g115` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_0bb75839_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ACC-22 - لا سطر مسجل بعد في قائمة إقفال الفترة';
+
+-- ── Table: fina_collections ──
+CREATE TABLE `fina_collections` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g143` varchar(190) DEFAULT NULL COMMENT 'معرف السطر',
+  `g144` varchar(190) DEFAULT NULL COMMENT 'رقم العميل',
+  `g145` varchar(190) DEFAULT NULL COMMENT 'رقم المشروع',
+  `g146` varchar(190) DEFAULT NULL COMMENT 'إجمالي الذمة',
+  `g147` varchar(190) DEFAULT NULL COMMENT 'شريحة العمر',
+  `g148` varchar(190) DEFAULT NULL COMMENT 'قيمة الشريحة',
+  `g149` varchar(190) DEFAULT NULL COMMENT 'حالة التحصيل',
+  `g150` varchar(190) DEFAULT NULL COMMENT 'إتاحة النقد للاستخدام',
+  `g151` varchar(190) DEFAULT NULL COMMENT 'آخر تحصيل',
+  `g152` varchar(190) DEFAULT NULL COMMENT 'إجراء المطالبة',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_dba465a3_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ACC-14 - ذمم العملاء وأعمارها';
+
+-- ── Table: fina_currencies ──
+CREATE TABLE `fina_currencies` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g200` varchar(190) DEFAULT NULL COMMENT 'معرف السطر',
+  `g201` varchar(190) DEFAULT NULL COMMENT 'العملة',
+  `g202` varchar(190) DEFAULT NULL COMMENT 'مقابل',
+  `g203` varchar(190) DEFAULT NULL COMMENT 'نوع السعر',
+  `g204` varchar(190) DEFAULT NULL COMMENT 'السعر',
+  `g205` varchar(190) DEFAULT NULL COMMENT 'تاريخ السريان',
+  `g206` varchar(190) DEFAULT NULL COMMENT 'المصدر/التوثيق',
+  `g207` varchar(190) DEFAULT NULL COMMENT 'حالة السطر',
+  `g208` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g209` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g210` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g211` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_b923439e_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ACC-06 - لا سطر مسجل بعد في أسعار الصرف';
+
+-- ── Table: fina_dashboard_kpi ──
+CREATE TABLE `fina_dashboard_kpi` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g153` varchar(190) DEFAULT NULL COMMENT 'معرف المؤشر',
+  `g154` varchar(190) DEFAULT NULL COMMENT 'المؤشر KPI Catalog',
+  `g155` varchar(190) DEFAULT NULL COMMENT 'القيمة',
+  `g156` varchar(190) DEFAULT NULL COMMENT 'الوحدة',
+  `g157` varchar(190) DEFAULT NULL COMMENT 'العملة',
+  `g158` varchar(190) DEFAULT NULL COMMENT 'الحالة',
+  `g159` varchar(190) DEFAULT NULL COMMENT 'آخر تحديث',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_b0436877_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ACC-01 - لا سطر مسجل بعد في لوحة المالية';
+
+-- ── Table: fina_dues ──
+CREATE TABLE `fina_dues` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g160` varchar(190) DEFAULT NULL COMMENT 'معرف الاستحقاق',
+  `g161` varchar(190) DEFAULT NULL COMMENT 'رقم فاتورة المورد',
+  `g162` varchar(190) DEFAULT NULL COMMENT 'رقم المورد',
+  `g163` varchar(190) DEFAULT NULL COMMENT 'مصدر الاستحقاق',
+  `g164` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `g165` varchar(190) DEFAULT NULL COMMENT 'فحص البوابة',
+  `g166` varchar(190) DEFAULT NULL COMMENT 'قيمة الاستحقاق',
+  `g167` varchar(190) DEFAULT NULL COMMENT 'الضريبة',
+  `g168` varchar(190) DEFAULT NULL COMMENT 'العملة',
+  `g169` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاستحقاق',
+  `g170` varchar(190) DEFAULT NULL COMMENT 'المسدد',
+  `g171` varchar(190) DEFAULT NULL COMMENT 'المتبقي',
+  `g172` varchar(190) DEFAULT NULL COMMENT 'حالة الاستحقاق',
+  `g173` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g174` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g175` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `g176` varchar(190) DEFAULT NULL COMMENT 'المعتمد',
+  `g177` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `g178` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_199f8e6e_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ACC-09 - لا سطر مسجل بعد في فواتير الموردين والمستحقات';
+
+-- ── Table: fina_effect_map ──
+CREATE TABLE `fina_effect_map` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g64` varchar(190) DEFAULT NULL COMMENT 'معرف السطر',
+  `g65` varchar(190) DEFAULT NULL COMMENT 'الواقعة الأصلية',
+  `g66` varchar(190) DEFAULT NULL COMMENT 'الإدارة المصدر',
+  `g67` varchar(190) DEFAULT NULL COMMENT 'الحدث الناشر',
+  `g68` varchar(190) DEFAULT NULL COMMENT 'قاعدة الأثر بمصفوفة التكامل',
+  `g69` varchar(190) DEFAULT NULL COMMENT 'القيد المتولد',
+  `g70` varchar(190) DEFAULT NULL COMMENT 'تاريخ القيد',
+  `g71` varchar(190) DEFAULT NULL COMMENT 'قيمة الأثر',
+  `g72` varchar(190) DEFAULT NULL COMMENT 'زمن التأخر بين الواقعة والقيد',
+  `g73` varchar(190) DEFAULT NULL COMMENT 'حالة الاتساق',
+  `g74` varchar(190) DEFAULT NULL COMMENT 'مرجع المعالجة',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_15a10a51_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ACC-13 - تتبّع الأثر من الواقعة إلى القيد';
+
+-- ── Table: fina_financial_statements_fin ──
+CREATE TABLE `fina_financial_statements_fin` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g212` varchar(190) DEFAULT NULL COMMENT 'معرف السطر',
+  `g213` varchar(190) DEFAULT NULL COMMENT 'الفترة',
+  `g214` varchar(190) DEFAULT NULL COMMENT 'القائمة',
+  `g215` varchar(190) DEFAULT NULL COMMENT 'البند',
+  `g216` varchar(190) DEFAULT NULL COMMENT 'القيمة',
+  `g217` varchar(190) DEFAULT NULL COMMENT 'فترة المقارنة',
+  `g218` varchar(190) DEFAULT NULL COMMENT 'التغير',
+  `g219` varchar(190) DEFAULT NULL COMMENT 'ملاحظة إفصاح',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_ec99e754_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ACC-24 - القوائم المالية';
+
+-- ── Table: fina_journal_form_fin ──
+CREATE TABLE `fina_journal_form_fin` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g179` varchar(190) DEFAULT NULL COMMENT 'رقم القيد',
+  `g180` varchar(190) DEFAULT NULL COMMENT 'تاريخ القيد',
+  `g181` varchar(190) DEFAULT NULL COMMENT 'المصدر',
+  `g182` varchar(190) DEFAULT NULL COMMENT 'مرجع الحدث',
+  `g183` varchar(190) DEFAULT NULL COMMENT 'الوصف',
+  `g184` varchar(190) DEFAULT NULL COMMENT 'عدد أسطر القيد تفصيلها م06-2',
+  `g185` varchar(190) DEFAULT NULL COMMENT 'إجمالي المدين',
+  `g186` varchar(190) DEFAULT NULL COMMENT 'إجمالي الدائن',
+  `g187` varchar(190) DEFAULT NULL COMMENT 'التوازن',
+  `g188` varchar(190) DEFAULT NULL COMMENT 'العملة',
+  `g189` varchar(190) DEFAULT NULL COMMENT 'سعر الصرف',
+  `g190` varchar(190) DEFAULT NULL COMMENT 'الفترة',
+  `g191` varchar(190) DEFAULT NULL COMMENT 'قيد عكسي ل',
+  `g192` varchar(190) DEFAULT NULL COMMENT 'حالة القيد',
+  `g193` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g194` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g195` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `g196` varchar(190) DEFAULT NULL COMMENT 'المعتمد',
+  `g197` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `g198` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g199` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_1bc14355_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ACC-11 - القيود اليومية';
+
+-- ── Table: fina_periods_fin ──
+CREATE TABLE `fina_periods_fin` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g35` varchar(190) DEFAULT NULL COMMENT 'معرف الفترة',
+  `g36` varchar(190) DEFAULT NULL COMMENT 'الشهر',
+  `g37` varchar(190) DEFAULT NULL COMMENT 'قيود الفترة',
+  `g38` varchar(190) DEFAULT NULL COMMENT 'قيود معلقة',
+  `g39` varchar(190) DEFAULT NULL COMMENT 'مطابقة المخازن',
+  `g40` varchar(190) DEFAULT NULL COMMENT 'مطابقة الخزينة',
+  `g41` varchar(190) DEFAULT NULL COMMENT 'الإقفالات التشغيلية الواردة',
+  `g42` varchar(190) DEFAULT NULL COMMENT 'فروق معالجة',
+  `g43` varchar(190) DEFAULT NULL COMMENT 'قرار الإقفال',
+  `g44` varchar(190) DEFAULT NULL COMMENT 'قرار إعادة الفتح',
+  `g45` varchar(190) DEFAULT NULL COMMENT 'حالة الفترة',
+  `g46` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g47` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g48` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `g49` varchar(190) DEFAULT NULL COMMENT 'المعتمد',
+  `g50` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `g51` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g52` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_6d3cc422_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ACC-23 - التقويم المحاسبي للفترات';
+
+-- ── Table: fina_reconciliations ──
+CREATE TABLE `fina_reconciliations` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g127` varchar(190) DEFAULT NULL COMMENT 'معرف المطابقة',
+  `g128` varchar(190) DEFAULT NULL COMMENT 'الفترة',
+  `g129` varchar(190) DEFAULT NULL COMMENT 'كود الحساب الرقابي',
+  `g130` varchar(190) DEFAULT NULL COMMENT 'رصيد الأستاذ',
+  `g131` varchar(190) DEFAULT NULL COMMENT 'رصيد المصدر التفصيلي',
+  `g132` varchar(190) DEFAULT NULL COMMENT 'المصدر',
+  `g133` varchar(190) DEFAULT NULL COMMENT 'الفرق',
+  `g134` varchar(190) DEFAULT NULL COMMENT 'بنود الفروق',
+  `g135` varchar(190) DEFAULT NULL COMMENT 'سبب الفرق',
+  `g136` varchar(190) DEFAULT NULL COMMENT 'معالجة الفرق',
+  `g137` varchar(190) DEFAULT NULL COMMENT 'الفرق المتبقي',
+  `g138` varchar(190) DEFAULT NULL COMMENT 'حالة المطابقة',
+  `g139` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g140` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g141` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g142` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_7512c9bb_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ACC-20 - لا سطر مسجل بعد في مطابقات الحسابات';
+
+-- ── Table: fina_tax_fin ──
+CREATE TABLE `fina_tax_fin` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g89` varchar(190) DEFAULT NULL COMMENT 'معرف الإقرار',
+  `g90` varchar(190) DEFAULT NULL COMMENT 'الفترة',
+  `g91` varchar(190) DEFAULT NULL COMMENT 'نوع الضريبة',
+  `g92` varchar(190) DEFAULT NULL COMMENT 'ضريبة المخرجات',
+  `g93` varchar(190) DEFAULT NULL COMMENT 'ضريبة المدخلات',
+  `g94` varchar(190) DEFAULT NULL COMMENT 'الصافي المستحق',
+  `g95` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاستحقاق النظامي',
+  `g96` varchar(190) DEFAULT NULL COMMENT 'مرجع التقديم بالحوكمة',
+  `g97` varchar(190) DEFAULT NULL COMMENT 'مرجع السداد بالخزينة',
+  `g98` varchar(190) DEFAULT NULL COMMENT 'حالة الإقرار',
+  `g99` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g100` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g101` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g102` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_41db7241_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ACC-18 - الضرائب والقيمة المضافة';
 
 -- ── Table: financed_assets ──
 CREATE TABLE `financed_assets` (

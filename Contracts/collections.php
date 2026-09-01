@@ -14,6 +14,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 require_once __DIR__ . '/../app/Services/Revenue/CollectionService.php';
 
 use App\Services\Revenue\CollectionService as COL;
@@ -136,7 +137,32 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array();
     $header_back = array('href' => 'client_statement.php', 'class' => '',
                          'icon' => 'fas fa-arrow-right', 'label' => 'كشف حساب العميل');
-    include('../includes/page_header.php');
+    include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف السطر' => 'g143',
+            'رقم العميل' => 'g144',
+            'رقم المشروع' => 'g145',
+            'إجمالي الذمة' => 'g146',
+            'شريحة العمر' => 'g147',
+            'قيمة الشريحة' => 'g148',
+            'حالة التحصيل' => 'g149',
+            'إتاحة النقد للاستخدام' => 'g150',
+            'آخر تحصيل' => 'g151',
+            'إجراء المطالبة' => 'g152',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('fina_collections');
+        echo ems_w14_grid('emsList_fina_collections', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في ذمم العملاء وأعمارها'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>';
     }

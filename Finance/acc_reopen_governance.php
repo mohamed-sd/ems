@@ -15,6 +15,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/fin_helpers.php';
 require_once __DIR__ . '/w11_view.php';
@@ -63,22 +64,30 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_acc_reopen_governance')); ?>
-    <table id="emsList_acc_reopen_governance" class="data-table">
-        <thead><tr><th>الرقم</th><th>الفترة</th><th>المبرر</th><th>من تاريخ</th><th>الى تاريخ</th><th>الوحدات</th><th>قاعدة الصلاحية</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= htmlspecialchars((string) $r["request_no"]) ?></td>
-                    <td><?= (int) $r["period_id"] ?></td>
-                    <td><?= htmlspecialchars((string) $r["justification"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["scope_from"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["scope_to"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["scope_units"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["authority_rule_id"]) ?></td>
-                    <td><?= ems_w11_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'رقم الطلب' => 'g19',
+        'الفترة المستهدفة' => 'g20',
+        'مبرر إعادة الفتح' => 'g21',
+        'الوحدات المفتوحة' => 'g22',
+        'النطاق الزمني للفتح' => 'g23',
+        'مرجع اعتماد AAM' => 'g24',
+        'القيود الموسومة بعد الفتح' => 'g25',
+        'إعادة الإقفال' => 'g26',
+        'حالة الطلب' => 'g27',
+        'المنشئ' => 'g28',
+        'تاريخ الإنشاء' => 'g29',
+        'المراجع' => 'g30',
+        'المعتمد' => 'g31',
+        'تاريخ الاعتماد' => 'g32',
+        'حالة البيانات' => 'g33',
+        'مرجع المصدر' => 'g34',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('fina_acc_reopen_governance');
+    echo ems_w14_grid('emsList_acc_reopen_governance', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في حوكمة إعادة فتح الفترات'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

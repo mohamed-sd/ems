@@ -15,6 +15,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/fin_helpers.php';
 require_once __DIR__ . '/w11_view.php';
@@ -63,23 +64,32 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_acc_adjustments')); ?>
-    <table id="emsList_acc_adjustments" class="data-table">
-        <thead><tr><th>الرقم</th><th>النوع</th><th>الفترة</th><th>الحساب</th><th>المبلغ</th><th>العملة</th><th>مستند الاساس</th><th>يعكس في التالية</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= htmlspecialchars((string) $r["adj_no"]) ?></td>
-                    <td><?= ems_w11_adj_kind((string) $r["adj_kind"]) ?></td>
-                    <td><?= (int) $r["period_id"] ?></td>
-                    <td><?= htmlspecialchars((string) $r["account_code"]) ?></td>
-                    <td><?= number_format((float) $r["amount"], 2) ?></td>
-                    <td><?= htmlspecialchars((string) $r["currency"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["basis_doc"]) ?></td>
-                    <td><?= ((int) $r["reverse_next"] === 1 ? "نعم" : "لا") ?></td>
-                    <td><?= ems_w11_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف السطر' => 'g1',
+        'الفترة' => 'g2',
+        'النوع' => 'g3',
+        'كود الحساب' => 'g4',
+        'مركز التكلفة' => 'g5',
+        'الأساس/المستند' => 'g6',
+        'القيمة' => 'g7',
+        'جدول الاستهلاك/العكس' => 'g8',
+        'القيد المتولد' => 'g9',
+        'قيد العكس التالي' => 'g10',
+        'حالة السطر' => 'g11',
+        'المنشئ' => 'g12',
+        'تاريخ الإنشاء' => 'g13',
+        'المراجع' => 'g14',
+        'المعتمد' => 'g15',
+        'تاريخ الاعتماد' => 'g16',
+        'حالة البيانات' => 'g17',
+        'مرجع المصدر' => 'g18',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('fina_acc_adjustments');
+    echo ems_w14_grid('emsList_acc_adjustments', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الاستحقاقات والمقدمات والمخصصات'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

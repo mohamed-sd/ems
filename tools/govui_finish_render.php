@@ -51,6 +51,17 @@ $PHP  = (defined('PHP_BINARY') && PHP_BINARY !== '') ? PHP_BINARY : 'php';
  * ◆ سطحٌ يشترط معاملًا في مساره يرتدُّ بدونه، **فيُقرأ محجوبًا وهو يُصيَّر**.
  *   والمعاملُ **قرارُ بياناتٍ يُصرَّح في ملفٍّ** لا يُخمَّن في الأداة، فيُراجَع.
  * ⛔ ولا يُختلق معرِّفٌ: القيمةُ تشير إلى صفٍّ قائمٍ في القاعدة. */
+/* ── أسطحٌ يردُّها حكمٌ مكتوبٌ لا عطب ─────────────────────────────────────────
+ * ◆ سطحٌ يُحوِّل بقرارِ مالكٍ مسجَّلٍ (لوحةُ دورٍ صارت «الرئيسية») **يُصيَّر
+ *   صفرًا بحقٍّ**. وقراءتُه «عطبًا» كذبٌ على السطح، وابتلاعُه كذبٌ على القارئ.
+ *   ⇒ **يُسمّى بحكمِه** ويبقى في المقامِ ظاهرًا بعدَده.
+ * ⛔ ولا يُكتب هنا حكمٌ بلا مرجعٍ: القيمةُ نصُّ القرارِ وتاريخُه. */
+$RULED = array();
+$__rf = $ROOT . '/docs/REPAIR01_20260823/render_ruled.json';
+if (is_file($__rf)) {
+    $__rj = json_decode((string) file_get_contents($__rf), true);
+    if (is_array($__rj)) { $RULED = $__rj; }
+}
 $PARAMS = array();
 $__pf = $ROOT . '/docs/REPAIR01_20260823/render_params.json';
 if (is_file($__pf)) {
@@ -164,7 +175,7 @@ foreach ($bridge as $b) {
             if (strlen($body) >= 2000) { break; }
         }
         $bytes = strlen($body);
-        if ($bytes < 2000) { $why = 'RENDER_EMPTY'; }
+        if ($bytes < 2000) { $why = isset($RULED[$route]) ? 'RULED_REDIRECT' : 'RENDER_EMPTY'; }
         else {
             $x = fm_extract($body);
             $bagStr = array(); $bagTok = array(); $bagRaw = array();
@@ -213,7 +224,9 @@ foreach ($rows as $r0) {
     printf("-- %s . %s . %s\n   %s  [دور %s . %d بايت]  %d/%d%s\n",
         $r0['unit'], $r0['sid'], $r0['name'], $r0['route'],
         $r0['role'] === '' ? '?' : $r0['role'],
-        $r0['bytes'], $r0['hit'], $r0['appl'], $r0['why'] === '' ? '' : ('  << ' . $r0['why']));
+        $r0['bytes'], $r0['hit'], $r0['appl'],
+        $r0['why'] === '' ? '' : ('  << ' . $r0['why']
+            . (isset($RULED[$r0['route']]) ? ' :: ' . $RULED[$r0['route']] : '')));
     if ($MISS) { foreach ($r0['miss'] as $m) { echo "      x " . $m . "\n"; } }
 }
 echo "\n";

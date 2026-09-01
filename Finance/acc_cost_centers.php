@@ -15,6 +15,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/fin_helpers.php';
 require_once __DIR__ . '/w11_view.php';
@@ -63,21 +64,25 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_acc_cost_centers')); ?>
-    <table id="emsList_acc_cost_centers" class="data-table">
-        <thead><tr><th>الرمز</th><th>الاسم</th><th>النوع</th><th>المستوى</th><th>المسار</th><th>الجهة المالكة</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= htmlspecialchars((string) $r["code"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["name"]) ?></td>
-                    <td><?= ((string) $r["center_type"] === "profit" ? "مركز ربحية" : "مركز تكلفة") ?></td>
-                    <td><?= (int) $r["level"] ?></td>
-                    <td><?= htmlspecialchars((string) $r["path"]) ?></td>
-                    <td><?= ems_w11_state((string) $r["owner_module"]) ?></td>
-                    <td><?= ((int) $r["active"] === 1 ? "نشط" : "موقوف") ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'كود المركز' => 'g116',
+        'اسم المركز' => 'g117',
+        'المركز الأب' => 'g118',
+        'نوع المركز' => 'g119',
+        'المرجع المربوط' => 'g120',
+        'مسؤول المركز' => 'g121',
+        'حالة المركز' => 'g122',
+        'المنشئ' => 'g123',
+        'تاريخ الإنشاء' => 'g124',
+        'حالة البيانات' => 'g125',
+        'مرجع المصدر' => 'g126',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('fina_acc_cost_centers');
+    echo ems_w14_grid('emsList_acc_cost_centers', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في مراكز التكلفة'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

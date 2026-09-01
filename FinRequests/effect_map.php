@@ -9,6 +9,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/_finreq_helpers.php';
 
@@ -115,7 +116,33 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_icon    = 'fa fa-diagram-project';
     $header_actions = array(array('href' => 'finance_gateway.php', 'class' => 'add-btn', 'icon' => 'fa fa-building-columns', 'label' => 'بوابة المالية'));
     $header_back    = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
-    include('../includes/page_header.php');
+    include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف السطر' => 'g64',
+            'الواقعة الأصلية' => 'g65',
+            'الإدارة المصدر' => 'g66',
+            'الحدث الناشر' => 'g67',
+            'قاعدة الأثر بمصفوفة التكامل' => 'g68',
+            'القيد المتولد' => 'g69',
+            'تاريخ القيد' => 'g70',
+            'قيمة الأثر' => 'g71',
+            'زمن التأخر بين الواقعة والقيد' => 'g72',
+            'حالة الاتساق' => 'g73',
+            'مرجع المعالجة' => 'g74',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('fina_effect_map');
+        echo ems_w14_grid('emsList_fina_effect_map', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في تتبع الأثر من الواقعة إلى القيد'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ)
     echo ems_states_bundle('لا خيط معروضا بعد', 'أدخل رقم الطلب أو الحدث أو كشف الوحدة ثم تتبع الخيط');
     ?>

@@ -8,6 +8,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/fin_helpers.php';
 
@@ -107,7 +108,36 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         $header_actions[] = array('id' => 'toggleTx', 'class' => 'add-btn', 'icon' => 'fas fa-receipt', 'label' => 'حركة ضريبية');
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
-    include('../includes/page_header.php');
+    include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف الإقرار' => 'g89',
+            'الفترة' => 'g90',
+            'نوع الضريبة' => 'g91',
+            'ضريبة المخرجات' => 'g92',
+            'ضريبة المدخلات' => 'g93',
+            'الصافي المستحق' => 'g94',
+            'تاريخ الاستحقاق النظامي' => 'g95',
+            'مرجع التقديم بالحوكمة' => 'g96',
+            'مرجع السداد بالخزينة' => 'g97',
+            'حالة الإقرار' => 'g98',
+            'المنشئ' => 'g99',
+            'تاريخ الإنشاء' => 'g100',
+            'حالة البيانات' => 'g101',
+            'مرجع المصدر' => 'g102',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('fina_tax_fin');
+        echo ems_w14_grid('emsList_fina_tax_fin', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الضرائب والقيمة المضافة'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
     // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضيًا
     echo ems_states_bundle('لا حركات ضريبية في هذه الفترة', 'سجل حركة بزر «حركة ضريبية» في رأس الشاشة، أو غير الفترة أعلاه');
     ?>

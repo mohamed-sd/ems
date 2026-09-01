@@ -15,6 +15,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/fin_helpers.php';
 require_once __DIR__ . '/w11_view.php';
@@ -63,22 +64,25 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_acc_trial_balance')); ?>
-    <table id="emsList_acc_trial_balance" class="data-table">
-        <thead><tr><th>الفترة</th><th>مرجع الجولة</th><th>مجموع المدين</th><th>مجموع الدائن</th><th>متوازن</th><th>عدد القيود</th><th>عدد الاسطر</th><th>وقت الجولة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= (int) $r["period_id"] ?></td>
-                    <td><?= htmlspecialchars((string) $r["run_ref"]) ?></td>
-                    <td><?= number_format((float) $r["total_debit"], 2) ?></td>
-                    <td><?= number_format((float) $r["total_credit"], 2) ?></td>
-                    <td><?= ((int) $r["balanced"] === 1 ? "نعم" : "لا") ?></td>
-                    <td><?= (int) $r["entry_count"] ?></td>
-                    <td><?= (int) $r["line_count"] ?></td>
-                    <td><?= htmlspecialchars((string) $r["run_at"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف السطر' => 'g53',
+        'الفترة' => 'g54',
+        'كود الحساب' => 'g55',
+        'اسم الحساب' => 'g56',
+        'رصيد افتتاحي مدين' => 'g57',
+        'رصيد افتتاحي دائن' => 'g58',
+        'حركة مدينة' => 'g59',
+        'حركة دائنة' => 'g60',
+        'ختامي مدين' => 'g61',
+        'ختامي دائن' => 'g62',
+        'التوازن الكلي' => 'g63',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('fina_acc_trial_balance');
+    echo ems_w14_grid('emsList_acc_trial_balance', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في ميزان المراجعة'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

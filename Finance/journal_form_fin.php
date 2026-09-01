@@ -11,6 +11,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/fin_helpers.php';
 
@@ -276,7 +277,43 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'إنشاء قيد');
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
-    include('../includes/page_header.php');
+    include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم القيد' => 'g179',
+            'تاريخ القيد' => 'g180',
+            'المصدر' => 'g181',
+            'مرجع الحدث' => 'g182',
+            'الوصف' => 'g183',
+            'عدد أسطر القيد تفصيلها م06-2' => 'g184',
+            'إجمالي المدين' => 'g185',
+            'إجمالي الدائن' => 'g186',
+            'التوازن' => 'g187',
+            'العملة' => 'g188',
+            'سعر الصرف' => 'g189',
+            'الفترة' => 'g190',
+            'قيد عكسي ل' => 'g191',
+            'حالة القيد' => 'g192',
+            'المنشئ' => 'g193',
+            'تاريخ الإنشاء' => 'g194',
+            'المراجع' => 'g195',
+            'المعتمد' => 'g196',
+            'تاريخ الاعتماد' => 'g197',
+            'حالة البيانات' => 'g198',
+            'مرجع المصدر' => 'g199',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('fina_journal_form_fin');
+        echo ems_w14_grid('emsList_fina_journal_form_fin', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في القيود اليومية'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
     // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضيًا
     echo ems_states_bundle('لا قيود يومية مسجلة بعد', 'أنشئ قيدا متوازنا (مدين = دائن) بزر «إنشاء قيد» في رأس الشاشة');
     ?>

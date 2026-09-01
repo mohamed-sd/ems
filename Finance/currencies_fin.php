@@ -22,6 +22,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 
 // ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
@@ -210,7 +211,34 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_icon  = 'fa fa-money-bill-transfer';
     $header_actions = array();
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
-    include('../includes/page_header.php');
+    include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف السطر' => 'g200',
+            'العملة' => 'g201',
+            'مقابل' => 'g202',
+            'نوع السعر' => 'g203',
+            'السعر' => 'g204',
+            'تاريخ السريان' => 'g205',
+            'المصدر/التوثيق' => 'g206',
+            'حالة السطر' => 'g207',
+            'المنشئ' => 'g208',
+            'تاريخ الإنشاء' => 'g209',
+            'حالة البيانات' => 'g210',
+            'مرجع المصدر' => 'g211',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('fina_currencies');
+        echo ems_w14_grid('emsList_sup_contract_line', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في أسعار الصرف'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     echo ems_states_bundle('لا عملات مسجلة بعد عملة الأساس', 'سجل عملة بنموذج «عملة جديدة» ثم أدخل سعر صرفها بتاريخ سريانه');
     ?>

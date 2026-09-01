@@ -15,6 +15,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/fin_helpers.php';
 require_once __DIR__ . '/w11_view.php';
@@ -63,23 +64,30 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_acc_reconciliations')); ?>
-    <table id="emsList_acc_reconciliations" class="data-table">
-        <thead><tr><th>الفترة</th><th>الحساب الرقابي</th><th>المصدر التفصيلي</th><th>رصيد الدفتر</th><th>رصيد المصدر</th><th>الفرق</th><th>فروق مفتوحة</th><th>الحالة</th><th>تاريخ الاقفال</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= (int) $r["period_id"] ?></td>
-                    <td><?= htmlspecialchars((string) $r["account_code"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["control_source"]) ?></td>
-                    <td><?= number_format((float) $r["gl_balance"], 2) ?></td>
-                    <td><?= number_format((float) $r["source_balance"], 2) ?></td>
-                    <td><?= number_format((float) $r["difference"], 2) ?></td>
-                    <td><?= (int) $r["open_diffs"] ?></td>
-                    <td><?= ems_w11_state((string) $r["state"]) ?></td>
-                    <td><?= htmlspecialchars((string) $r["closed_at"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف المطابقة' => 'g127',
+        'الفترة' => 'g128',
+        'كود الحساب الرقابي' => 'g129',
+        'رصيد الأستاذ' => 'g130',
+        'رصيد المصدر التفصيلي' => 'g131',
+        'المصدر' => 'g132',
+        'الفرق' => 'g133',
+        'بنود الفروق' => 'g134',
+        'سبب الفرق' => 'g135',
+        'معالجة الفرق' => 'g136',
+        'الفرق المتبقي' => 'g137',
+        'حالة المطابقة' => 'g138',
+        'المنشئ' => 'g139',
+        'تاريخ الإنشاء' => 'g140',
+        'حالة البيانات' => 'g141',
+        'مرجع المصدر' => 'g142',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('fina_reconciliations');
+    echo ems_w14_grid('emsList_acc_reconciliations', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في مطابقات الحسابات'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>
