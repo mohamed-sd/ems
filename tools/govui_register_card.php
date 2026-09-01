@@ -49,9 +49,13 @@ $anchors = array(
     "include __DIR__ . '/../includes/page_header.php';",
     "require_once __DIR__ . '/../includes/page_header.php';",
 );
+/* ◆ **والمرساةُ الأخيرةُ لا الأولى**: شاشةٌ ذاتُ عرضَين (تحريرٌ ثمَّ قائمة)
+     تكتب الترويسةَ مرّتَين، **وأوّلُهما فرعُ التحرير** الذي لا يُصيَّر إلّا
+     بمعرِّفِ سطرٍ في المسار. فالبطاقةُ فيه لا يراها أحدٌ — قِيس في
+     `preventive_plans.php`: الكتلةُ مكتوبةٌ والتصييرُ لا يحملها. */
 $pos = false;
 foreach ($anchors as $a) {
-    $p0 = strpos($s, $a);
+    $p0 = strrpos($s, $a);
     if ($p0 !== false) { $pos = $p0 + strlen($a); break; }
 }
 if ($pos === false) {
@@ -68,6 +72,13 @@ if ($pos === false) {
         $p1 = strpos($s, ');', $p0);
         if ($p1 !== false) { $pos = strpos($s, chr(10), $p1); }
     }
+}
+if ($pos === false) {
+    /* ◆ **والسطحُ المولَّدُ لا ترويسةَ فيه ولا غلاف**: عُدّةُ `u13_screen_kit`
+         تُصيِّره كلَّه من عقدِه. **فالسجلُّ الابنُ يُلحَق بعدَ العُدّة** — وهو
+         موضعُه الطبيعيُّ: الأبُ أوّلًا ثمَّ سجلُّ بنودِه. */
+    $p0 = strpos($s, "require __DIR__ . '/../includes/u13_screen_kit.php';");
+    if ($p0 !== false) { $pos = $p0 + strlen("require __DIR__ . '/../includes/u13_screen_kit.php';"); }
 }
 if ($pos === false) { exit("x لا موضعَ إدراجٍ في " . $FILE . chr(10)); }
 /* وإن كان الموضعُ داخلَ كتلةِ PHP، تُغلَق ثمَّ يُدرَج الترميزُ ثمَّ تُفتَح */

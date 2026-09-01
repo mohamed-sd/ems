@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/role_board.php';
 require_once __DIR__ . '/../includes/finreq_badges.php';
@@ -102,7 +103,36 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_title = 'لوحة إدارة الصيانة'; $header_icon = 'fa fa-gauge-high';
     $header_actions = array();
     $header_back = array('href' => '../Maintenance/orders.php', 'class' => '', 'icon' => 'fas fa-screwdriver-wrench', 'label' => 'أوامر الصيانة');
-    include('../includes/page_header.php');
+    include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <table id="emsList_mnt_dashboard_kpi"></table>
+    </div></div></div>
+    <?php  ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_mnt_dashboard_kpi
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف المؤشر' => 'g94',
+            'المؤشر KPI Catalog' => 'g95',
+            'القيمة' => 'g96',
+            'الوحدة' => 'g97',
+            'الحد المقبول' => 'g98',
+            'الحالة' => 'g99',
+            'آخر تحديث' => 'g100',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('mnt_dashboard_kpi');
+        echo ems_w14_grid('emsList_mnt_dashboard_kpi', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في لوحة الصيانة والجاهزية'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     echo ems_states_bundle('لا مؤشرات صيانة لهذا اليوم في نطاقك', 'افتح أوامر الصيانة أو الخطط الوقائية لتسجيل أول حركة تظهر هنا');
     ?>

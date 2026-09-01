@@ -12,6 +12,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w7_codes.php';
 
@@ -52,6 +53,39 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'مؤشرات الصيانة الدورية'; $header_icon = 'fa fa-chart-line'; $header_actions = array();
     $header_back = array('href' => 'dashboard_mnt.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'لوحة الصيانة');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <table id="emsList_mnt_kpis"></table>
+    </div></div></div>
+    <?php  ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_mnt_kpis
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف السطر' => 'g129',
+            'الفترة' => 'g130',
+            'النطاق' => 'g131',
+            'المعدة/النوع' => 'g132',
+            'عدد الأعطال' => 'g133',
+            'متوسط الزمن بين الأعطال' => 'g134',
+            'متوسط زمن الإصلاح' => 'g135',
+            'نسبة الجاهزية' => 'g136',
+            'أوامر الوقائية المنفذة' => 'g137',
+            'الالتزام بالوقائية' => 'g138',
+            'تكلفة الصيانة للساعة' => 'g139',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('mnt_kpis');
+        echo ems_w14_grid('emsList_mnt_kpis', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في مؤشرات الصيانة الدورية'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">أسطر مشتقة</div></div>
         <div class="ems-stat-card"><div class="ems-stat-value"><?= $mttr ?></div><div class="ems-stat-label">متوسط زمن الإصلاح</div></div>

@@ -14,6 +14,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 require_once '../includes/permissions_helper.php';
 require_once '../includes/gov_columns.php';
 
@@ -131,6 +132,44 @@ require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('mnt
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main ems-unified-page-shell" dir="rtl">
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <table id="emsList_mnt_workshop"></table>
+    </div></div></div>
+
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_mnt_workshop
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'كود القدرة' => 'g43',
+            'النوع' => 'g44',
+            'الاسم' => 'g45',
+            'الموقع' => 'g46',
+            'التخصصات' => 'g47',
+            'مستوى الفني' => 'g48',
+            'الشهادات وصلاحيتها' => 'g49',
+            'الطاقة اليومية (ساعات/أوامر)' => 'g50',
+            'متاح الآن؟' => 'g51',
+            'التبعية' => 'g52',
+            'مرجع العقد عند الخارجي' => 'g53',
+            'حالة القدرة' => 'g54',
+            'المنشئ' => 'g55',
+            'تاريخ الإنشاء' => 'g56',
+            'حالة البيانات' => 'g57',
+            'مرجع المصدر' => 'g58',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('mnt_workshop');
+        echo ems_w14_grid('emsList_mnt_workshop', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الورش والفنيون'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+
     <?php
     $header_title = 'الورش والفنيون';
     $header_icon = 'fa fa-toolbox';

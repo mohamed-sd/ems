@@ -8,6 +8,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/mnt_helpers.php';
 
@@ -281,7 +282,8 @@ function mnt_opt($value, $label, $selected) {
         array('tag' => 'a', 'href' => 'preventive_plans.php', 'class' => '', 'icon' => 'fas fa-list', 'label' => 'كل الخطط'),
         array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع'),
     );
-    include('../includes/page_header.php');
+    include('../includes/page_header.php'); ?>
+    <?php 
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     echo ems_states_bundle('لا مهام في هذه الخطة الوقائية بعد', 'أضف أول مهمة بزر «إضافة مهمة» في لوحة مهام الخطة');
     ?>
@@ -385,7 +387,47 @@ function mnt_opt($value, $label, $selected) {
         $header_actions[] = array('id' => 'togglePlanCreateForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus', 'label' => 'خطة جديدة');
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
-    include('../includes/page_header.php');
+    include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <table id="emsList_mnt_preventive_plans"></table>
+    </div></div></div>
+    <?php  ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_mnt_preventive_plans
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف السطر' => 'g76',
+            'كود المعدة' => 'g77',
+            'نوع المعدة' => 'g78',
+            'مصدر الفاصل' => 'g79',
+            'دورة الوقائية' => 'g80',
+            'فاصل الأصل المخصص' => 'g81',
+            'ساعات الدورة' => 'g82',
+            'قراءة آخر وقائية' => 'g83',
+            'قراءة العداد الحالية' => 'g84',
+            'المتبقي للاستحقاق' => 'g85',
+            'تاريخ الاستحقاق المتوقع' => 'g86',
+            'بنود الدورة القياسية' => 'g87',
+            'حالة الاستحقاق' => 'g88',
+            'رقم الأمر المتولد' => 'g89',
+            'المنشئ' => 'g90',
+            'تاريخ الإنشاء' => 'g91',
+            'حالة البيانات' => 'g92',
+            'مرجع المصدر' => 'g93',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('mnt_preventive_plans');
+        echo ems_w14_grid('emsList_mnt_preventive_plans', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الخطة الوقائية بالساعات'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     echo ems_states_bundle('لا خطط صيانة وقائية مسجلة بعد', 'أنشئ أول خطة بزر «خطة جديدة» في رأس الشاشة، وحدد أساس تكرارها ساعات أو زمنا');
 ?>

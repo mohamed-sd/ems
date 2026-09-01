@@ -15,6 +15,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 
 $is_super_admin = ((isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '') === '-1');
@@ -58,6 +59,70 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array(array('href' => '../Tickets/tickets_list.php', 'class' => 'ems-btn', 'icon' => 'fa fa-plus', 'label' => 'مركز البلاغات'));
     $header_back = array('href' => 'orders.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'أوامر العمل');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <table id="emsList_mnt_breakdown_intake"></table>
+    </div></div></div>
+    <?php  ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close:emsList_mnt_breakdown_intake
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف الاستقبال' => 'g1',
+            'رقم البلاغ' => 'g2',
+            'تاريخ البلاغ' => 'g3',
+            'المبلغ' => 'g4',
+            'كود المعدة' => 'g5',
+            'الموقع' => 'g6',
+            'وصف العطل' => 'g7',
+            'عقدة الشجرة المبدئية' => 'g8',
+            'درجة الخطورة' => 'g9',
+            'المعدة متوقفة؟' => 'g10',
+            'أثر الإيقاف' => 'g11',
+            'قرار الاستقبال' => 'g12',
+            'رقم طلب الفحص المتفرع' => 'g13',
+            'حالة الاستقبال' => 'g14',
+            'شدة العطل الفني' => 'g15',
+            'مدة التوقف' => 'g16',
+            'الأثر التشغيلي' => 'g17',
+            'قابلية المنع' => 'g18',
+            'التكرار' => 'g19',
+            'أداء الاستجابة' => 'g20',
+            'سبب التأخير' => 'g21',
+            'سلسلة المسؤولية' => 'g22',
+            'وقت توقف المعدة' => 'g23',
+            'وقت إبلاغ المشغل' => 'g24',
+            'وقت استلام الصيانة' => 'g25',
+            'وقت بدء التشخيص' => 'g26',
+            'وقت انتهاء التشخيص' => 'g27',
+            'وقت طلب القطعة' => 'g28',
+            'وقت توفر القطعة' => 'g29',
+            'وقت وصولها للموقع' => 'g30',
+            'وقت حضور الفني' => 'g31',
+            'وقت بدء الإصلاح' => 'g32',
+            'وقت انتهاء الإصلاح' => 'g33',
+            'وقت الاختبار' => 'g34',
+            'وقت التصديق' => 'g35',
+            'وقت عودة المعدة للخدمة' => 'g36',
+            'إجمالي التوقف' => 'g37',
+            'زمن الإصلاح الفعلي' => 'g38',
+            'المنشئ' => 'g39',
+            'تاريخ الإنشاء' => 'g40',
+            'حالة البيانات' => 'g41',
+            'مرجع المصدر' => 'g42',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('mnt_breakdown_intake');
+        echo ems_w14_grid('emsList_mnt_breakdown_intake', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في البلاغ الفني واستقبال العطل'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= $n ?></div><div class="ems-stat-label">بلاغات مستلمة</div></div>
         <div class="ems-stat-card"><div class="ems-stat-value"><?= $stopped ?></div><div class="ems-stat-label">أوقفت المعدة</div></div>

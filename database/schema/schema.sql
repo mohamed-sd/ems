@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-01 23:24:03
--- الجداول: 1161 · المناظير: 28
+-- المصدر: equipation_manage · التوليد: 2026-09-01 23:35:24
+-- الجداول: 1171 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -13435,6 +13435,59 @@ CREATE TABLE `mnt_breakdown` (
   KEY `idx_breakdown_deleted` (`is_deleted`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── Table: mnt_breakdown_intake ──
+CREATE TABLE `mnt_breakdown_intake` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g1` varchar(190) DEFAULT NULL COMMENT 'معرف الاستقبال',
+  `g2` varchar(190) DEFAULT NULL COMMENT 'رقم البلاغ',
+  `g3` varchar(190) DEFAULT NULL COMMENT 'تاريخ البلاغ',
+  `g4` varchar(190) DEFAULT NULL COMMENT 'المبلغ',
+  `g5` varchar(190) DEFAULT NULL COMMENT 'كود المعدة',
+  `g6` varchar(190) DEFAULT NULL COMMENT 'الموقع',
+  `g7` varchar(190) DEFAULT NULL COMMENT 'وصف العطل',
+  `g8` varchar(190) DEFAULT NULL COMMENT 'عقدة الشجرة المبدئية',
+  `g9` varchar(190) DEFAULT NULL COMMENT 'درجة الخطورة',
+  `g10` varchar(190) DEFAULT NULL COMMENT 'المعدة متوقفة؟',
+  `g11` varchar(190) DEFAULT NULL COMMENT 'أثر الإيقاف',
+  `g12` varchar(190) DEFAULT NULL COMMENT 'قرار الاستقبال',
+  `g13` varchar(190) DEFAULT NULL COMMENT 'رقم طلب الفحص المتفرع',
+  `g14` varchar(190) DEFAULT NULL COMMENT 'حالة الاستقبال',
+  `g15` varchar(190) DEFAULT NULL COMMENT 'شدة العطل الفني',
+  `g16` varchar(190) DEFAULT NULL COMMENT 'مدة التوقف',
+  `g17` varchar(190) DEFAULT NULL COMMENT 'الأثر التشغيلي',
+  `g18` varchar(190) DEFAULT NULL COMMENT 'قابلية المنع',
+  `g19` varchar(190) DEFAULT NULL COMMENT 'التكرار',
+  `g20` varchar(190) DEFAULT NULL COMMENT 'أداء الاستجابة',
+  `g21` varchar(190) DEFAULT NULL COMMENT 'سبب التأخير',
+  `g22` varchar(190) DEFAULT NULL COMMENT 'سلسلة المسؤولية',
+  `g23` varchar(190) DEFAULT NULL COMMENT 'وقت توقف المعدة',
+  `g24` varchar(190) DEFAULT NULL COMMENT 'وقت إبلاغ المشغل',
+  `g25` varchar(190) DEFAULT NULL COMMENT 'وقت استلام الصيانة',
+  `g26` varchar(190) DEFAULT NULL COMMENT 'وقت بدء التشخيص',
+  `g27` varchar(190) DEFAULT NULL COMMENT 'وقت انتهاء التشخيص',
+  `g28` varchar(190) DEFAULT NULL COMMENT 'وقت طلب القطعة',
+  `g29` varchar(190) DEFAULT NULL COMMENT 'وقت توفر القطعة',
+  `g30` varchar(190) DEFAULT NULL COMMENT 'وقت وصولها للموقع',
+  `g31` varchar(190) DEFAULT NULL COMMENT 'وقت حضور الفني',
+  `g32` varchar(190) DEFAULT NULL COMMENT 'وقت بدء الإصلاح',
+  `g33` varchar(190) DEFAULT NULL COMMENT 'وقت انتهاء الإصلاح',
+  `g34` varchar(190) DEFAULT NULL COMMENT 'وقت الاختبار',
+  `g35` varchar(190) DEFAULT NULL COMMENT 'وقت التصديق',
+  `g36` varchar(190) DEFAULT NULL COMMENT 'وقت عودة المعدة للخدمة',
+  `g37` varchar(190) DEFAULT NULL COMMENT 'إجمالي التوقف',
+  `g38` varchar(190) DEFAULT NULL COMMENT 'زمن الإصلاح الفعلي',
+  `g39` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g40` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g41` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g42` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_f684fa24_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='MNT-04 - البلاغ الفني واستقبال العطل';
+
 -- ── Table: mnt_daily_care ──
 CREATE TABLE `mnt_daily_care` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -13453,12 +13506,42 @@ CREATE TABLE `mnt_daily_care` (
   `created_by` int(11) DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `src_ref` varchar(190) NOT NULL DEFAULT '',
+  `g117` varchar(190) DEFAULT NULL COMMENT 'معرف السطر',
+  `g118` varchar(190) DEFAULT NULL COMMENT 'التاريخ',
+  `g119` varchar(190) DEFAULT NULL COMMENT 'كود المعدة',
+  `g120` varchar(190) DEFAULT NULL COMMENT 'المهمة',
+  `g121` varchar(190) DEFAULT NULL COMMENT 'المنفذ',
+  `g122` varchar(190) DEFAULT NULL COMMENT 'النتيجة',
+  `g123` varchar(190) DEFAULT NULL COMMENT 'ملاحظة غير طبيعية',
+  `g124` varchar(190) DEFAULT NULL COMMENT 'حالة السطر',
+  `g125` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g126` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g127` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g128` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_mdc` (`company_id`,`equipment_id`,`care_date`,`task_key`),
   KEY `ix_mdc_eq` (`equipment_id`,`care_date`),
   CONSTRAINT `chk_mdc_rule` CHECK (`state_rule` <> ''),
   CONSTRAINT `chk_mdc_abn` CHECK (`result` <> 'abnormal' or `abnormal_note` <> '')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='RPR-W07 MNT-13 - العناية اليومية والتشحيم';
+
+-- ── Table: mnt_dashboard_kpi ──
+CREATE TABLE `mnt_dashboard_kpi` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g94` varchar(190) DEFAULT NULL COMMENT 'معرف المؤشر',
+  `g95` varchar(190) DEFAULT NULL COMMENT 'المؤشر KPI Catalog',
+  `g96` varchar(190) DEFAULT NULL COMMENT 'القيمة',
+  `g97` varchar(190) DEFAULT NULL COMMENT 'الوحدة',
+  `g98` varchar(190) DEFAULT NULL COMMENT 'الحد المقبول',
+  `g99` varchar(190) DEFAULT NULL COMMENT 'الحالة',
+  `g100` varchar(190) DEFAULT NULL COMMENT 'آخر تحديث',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_6bc65acd_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='MNT-01 - لا سطر مسجل بعد في لوحة الصيانة والجاهزية';
 
 -- ── Table: mnt_diagnosis_request ──
 CREATE TABLE `mnt_diagnosis_request` (
@@ -13539,6 +13622,32 @@ CREATE TABLE `mnt_external_repair` (
   CONSTRAINT `chk_mer_ref` CHECK (`line_kind` <> 'warranty_claim' or `contract_ref` <> ''),
   CONSTRAINT `chk_mer_recv` CHECK (`state` not in ('received','closed') or `receipt_ref` <> '')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='RPR-W07 MNT-11 - الاصلاح الخارجي ومطالبات الضمان';
+
+-- ── Table: mnt_external_repairs ──
+CREATE TABLE `mnt_external_repairs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g154` varchar(190) DEFAULT NULL COMMENT 'معرف السطر',
+  `g155` varchar(190) DEFAULT NULL COMMENT 'رقم الأمر',
+  `g156` varchar(190) DEFAULT NULL COMMENT 'النوع',
+  `g157` varchar(190) DEFAULT NULL COMMENT 'الجهة الخارجية/المورد',
+  `g158` varchar(190) DEFAULT NULL COMMENT 'مرجع العقد/الضمان',
+  `g159` varchar(190) DEFAULT NULL COMMENT 'نطاق العمل',
+  `g160` varchar(190) DEFAULT NULL COMMENT 'التكلفة المقدرة',
+  `g161` varchar(190) DEFAULT NULL COMMENT 'التكلفة الفعلية',
+  `g162` varchar(190) DEFAULT NULL COMMENT 'نتيجة المطالبة',
+  `g163` varchar(190) DEFAULT NULL COMMENT 'محضر الاستلام',
+  `g164` varchar(190) DEFAULT NULL COMMENT 'حالة السطر',
+  `g165` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g166` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g167` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g168` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_abcddada_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='MNT-12 - الإصلاح الخارجي ومطالبات الضمان';
 
 -- ── Table: mnt_inspection ──
 CREATE TABLE `mnt_inspection` (
@@ -13656,6 +13765,28 @@ CREATE TABLE `mnt_kpi_period` (
   UNIQUE KEY `uq_mkp` (`company_id`,`period`,`scope_kind`,`scope_ref`),
   CONSTRAINT `chk_mkp_rule` CHECK (`derivation_rule` <> '' and `derived_from` <> '')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='RPR-W07 MNT-16 - مؤشرات الصيانة الدورية مشتقة بلا ادخال';
+
+-- ── Table: mnt_kpis ──
+CREATE TABLE `mnt_kpis` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g129` varchar(190) DEFAULT NULL COMMENT 'معرف السطر',
+  `g130` varchar(190) DEFAULT NULL COMMENT 'الفترة',
+  `g131` varchar(190) DEFAULT NULL COMMENT 'النطاق',
+  `g132` varchar(190) DEFAULT NULL COMMENT 'المعدة/النوع',
+  `g133` varchar(190) DEFAULT NULL COMMENT 'عدد الأعطال',
+  `g134` varchar(190) DEFAULT NULL COMMENT 'متوسط الزمن بين الأعطال',
+  `g135` varchar(190) DEFAULT NULL COMMENT 'متوسط زمن الإصلاح',
+  `g136` varchar(190) DEFAULT NULL COMMENT 'نسبة الجاهزية',
+  `g137` varchar(190) DEFAULT NULL COMMENT 'أوامر الوقائية المنفذة',
+  `g138` varchar(190) DEFAULT NULL COMMENT 'الالتزام بالوقائية',
+  `g139` varchar(190) DEFAULT NULL COMMENT 'تكلفة الصيانة للساعة',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_0e0723ff_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='MNT-17 - مؤشرات الصيانة الدورية';
 
 -- ── Table: mnt_lookup ──
 CREATE TABLE `mnt_lookup` (
@@ -13785,6 +13916,34 @@ CREATE TABLE `mnt_order_labor` (
   CONSTRAINT `fk_labor_order` FOREIGN KEY (`order_id`) REFERENCES `mnt_order` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── Table: mnt_order_line ──
+CREATE TABLE `mnt_order_line` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g1` varchar(190) DEFAULT NULL COMMENT 'معرف البند',
+  `g2` varchar(190) DEFAULT NULL COMMENT 'رقم الأمر',
+  `g3` varchar(190) DEFAULT NULL COMMENT 'تسلسل البند',
+  `g4` varchar(190) DEFAULT NULL COMMENT 'نوع البند',
+  `g5` varchar(190) DEFAULT NULL COMMENT 'كود الصنف',
+  `g6` varchar(190) DEFAULT NULL COMMENT 'الوصف',
+  `g7` varchar(190) DEFAULT NULL COMMENT 'الكمية المطلوبة',
+  `g8` varchar(190) DEFAULT NULL COMMENT 'الكمية المصروفة',
+  `g9` varchar(190) DEFAULT NULL COMMENT 'رقم سند الصرف',
+  `g10` varchar(190) DEFAULT NULL COMMENT 'جهة الخدمة الخارجية',
+  `g11` varchar(190) DEFAULT NULL COMMENT 'التكلفة',
+  `g12` varchar(190) DEFAULT NULL COMMENT 'ضمان مورد؟',
+  `g13` varchar(190) DEFAULT NULL COMMENT 'حالة البند',
+  `g14` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g15` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g16` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g17` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_5a85c35f_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='MNT-10 - بند واحد في امر عمل — سجل ابن';
+
 -- ── Table: mnt_order_part ──
 CREATE TABLE `mnt_order_part` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -13828,6 +13987,31 @@ CREATE TABLE `mnt_part_request` (
   CONSTRAINT `chk_mpr_issue` CHECK (`state` not in ('issued','partially_issued') or `issue_doc_ref` <> ''),
   CONSTRAINT `chk_mpr_rej` CHECK (`state` <> 'rejected' or `reject_reason` <> '')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='RPR-W07 MNT-10 - طلب صرف القطع لامر العمل - لا صرف لامر مقفل';
+
+-- ── Table: mnt_part_requests ──
+CREATE TABLE `mnt_part_requests` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g140` varchar(190) DEFAULT NULL COMMENT 'رقم الطلب',
+  `g141` varchar(190) DEFAULT NULL COMMENT 'رقم الأمر',
+  `g142` varchar(190) DEFAULT NULL COMMENT 'تاريخ الطلب',
+  `g143` varchar(190) DEFAULT NULL COMMENT 'المخزن',
+  `g144` varchar(190) DEFAULT NULL COMMENT 'البنود المطلوبة',
+  `g145` varchar(190) DEFAULT NULL COMMENT 'الأولوية',
+  `g146` varchar(190) DEFAULT NULL COMMENT 'مستلم العهدة',
+  `g147` varchar(190) DEFAULT NULL COMMENT 'رقم سند الصرف',
+  `g148` varchar(190) DEFAULT NULL COMMENT 'مطابقة الاستلام',
+  `g149` varchar(190) DEFAULT NULL COMMENT 'حالة الطلب',
+  `g150` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g151` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g152` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g153` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_71fdca74_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='MNT-11 - لا سطر مسجل بعد في طلب صرف القطع لأمر العمل';
 
 -- ── Table: mnt_plan ──
 CREATE TABLE `mnt_plan` (
@@ -13873,6 +14057,35 @@ CREATE TABLE `mnt_plan_task` (
   CONSTRAINT `fk_plantask_plan` FOREIGN KEY (`plan_id`) REFERENCES `mnt_plan` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── Table: mnt_preventive_plans ──
+CREATE TABLE `mnt_preventive_plans` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g76` varchar(190) DEFAULT NULL COMMENT 'معرف السطر',
+  `g77` varchar(190) DEFAULT NULL COMMENT 'كود المعدة',
+  `g78` varchar(190) DEFAULT NULL COMMENT 'نوع المعدة',
+  `g79` varchar(190) DEFAULT NULL COMMENT 'مصدر الفاصل',
+  `g80` varchar(190) DEFAULT NULL COMMENT 'دورة الوقائية',
+  `g81` varchar(190) DEFAULT NULL COMMENT 'فاصل الأصل المخصص',
+  `g82` varchar(190) DEFAULT NULL COMMENT 'ساعات الدورة',
+  `g83` varchar(190) DEFAULT NULL COMMENT 'قراءة آخر وقائية',
+  `g84` varchar(190) DEFAULT NULL COMMENT 'قراءة العداد الحالية',
+  `g85` varchar(190) DEFAULT NULL COMMENT 'المتبقي للاستحقاق',
+  `g86` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاستحقاق المتوقع',
+  `g87` varchar(190) DEFAULT NULL COMMENT 'بنود الدورة القياسية',
+  `g88` varchar(190) DEFAULT NULL COMMENT 'حالة الاستحقاق',
+  `g89` varchar(190) DEFAULT NULL COMMENT 'رقم الأمر المتولد',
+  `g90` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g91` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g92` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g93` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_d5747984_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='MNT-13 - الخطة الوقائية بالساعات';
+
 -- ── Table: mnt_repeat_repair ──
 CREATE TABLE `mnt_repeat_repair` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -13901,6 +14114,33 @@ CREATE TABLE `mnt_repeat_repair` (
   CONSTRAINT `chk_mrr_close` CHECK (`rca_state` <> 'closed' or `root_cause` <> '' and `decision_ar` <> ''),
   CONSTRAINT `chk_mrr_win` CHECK (`within_validity` = 0 or `days_since_cert` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='RPR-W07 MNT-15 - سجل اعادة الاصلاح وتحليل السبب الجذري';
+
+-- ── Table: mnt_repeat_repairs ──
+CREATE TABLE `mnt_repeat_repairs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g101` varchar(190) DEFAULT NULL COMMENT 'معرف الواقعة',
+  `g102` varchar(190) DEFAULT NULL COMMENT 'كود المعدة',
+  `g103` varchar(190) DEFAULT NULL COMMENT 'رقم الأمر الأصلي',
+  `g104` varchar(190) DEFAULT NULL COMMENT 'عقدة الشجرة',
+  `g105` varchar(190) DEFAULT NULL COMMENT 'تاريخ التكرار',
+  `g106` varchar(190) DEFAULT NULL COMMENT 'المدة منذ الشهادة',
+  `g107` varchar(190) DEFAULT NULL COMMENT 'ضمن صلاحية الشهادة؟',
+  `g108` varchar(190) DEFAULT NULL COMMENT 'تحليل السبب الجذري RCA',
+  `g109` varchar(190) DEFAULT NULL COMMENT 'رقم الأمر الجديد',
+  `g110` varchar(190) DEFAULT NULL COMMENT 'محفز RCA',
+  `g111` varchar(190) DEFAULT NULL COMMENT 'القرار',
+  `g112` varchar(190) DEFAULT NULL COMMENT 'حالة الواقعة',
+  `g113` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g114` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g115` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g116` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_44184061_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='MNT-16 - سجل إعادة الإصلاح';
 
 -- ── Table: mnt_return_cert ──
 CREATE TABLE `mnt_return_cert` (
@@ -13972,6 +14212,61 @@ CREATE TABLE `mnt_safety_rule` (
   CONSTRAINT `chk_msr_rule` CHECK (`rule_ref` <> ''),
   CONSTRAINT `chk_msr_cert` CHECK (`default_severity` <> 'safety_critical' or `requires_cert` = 1 and `requires_lockout` = 1 and `approver_kind` = 'technical_authority')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='RPR-W07 - تصنيف السلامة بحسب نوع المعدة والنظام - DEC-OPEN-12';
+
+-- ── Table: mnt_work_orders ──
+CREATE TABLE `mnt_work_orders` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g59` varchar(190) DEFAULT NULL COMMENT 'معرف البند',
+  `g60` varchar(190) DEFAULT NULL COMMENT 'رقم الأمر',
+  `g61` varchar(190) DEFAULT NULL COMMENT 'تسلسل البند',
+  `g62` varchar(190) DEFAULT NULL COMMENT 'نوع البند',
+  `g63` varchar(190) DEFAULT NULL COMMENT 'كود الصنف',
+  `g64` varchar(190) DEFAULT NULL COMMENT 'الوصف',
+  `g65` varchar(190) DEFAULT NULL COMMENT 'الكمية المطلوبة',
+  `g66` varchar(190) DEFAULT NULL COMMENT 'الكمية المصروفة',
+  `g67` varchar(190) DEFAULT NULL COMMENT 'رقم سند الصرف',
+  `g68` varchar(190) DEFAULT NULL COMMENT 'جهة الخدمة الخارجية',
+  `g69` varchar(190) DEFAULT NULL COMMENT 'التكلفة',
+  `g70` varchar(190) DEFAULT NULL COMMENT 'ضمان مورد؟',
+  `g71` varchar(190) DEFAULT NULL COMMENT 'حالة البند',
+  `g72` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g73` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g74` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g75` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_9ee20d1f_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='MNT-10 - أمر العمل';
+
+-- ── Table: mnt_workshop ──
+CREATE TABLE `mnt_workshop` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g43` varchar(190) DEFAULT NULL COMMENT 'كود القدرة',
+  `g44` varchar(190) DEFAULT NULL COMMENT 'النوع',
+  `g45` varchar(190) DEFAULT NULL COMMENT 'الاسم',
+  `g46` varchar(190) DEFAULT NULL COMMENT 'الموقع',
+  `g47` varchar(190) DEFAULT NULL COMMENT 'التخصصات',
+  `g48` varchar(190) DEFAULT NULL COMMENT 'مستوى الفني',
+  `g49` varchar(190) DEFAULT NULL COMMENT 'الشهادات وصلاحيتها',
+  `g50` varchar(190) DEFAULT NULL COMMENT 'الطاقة اليومية (ساعات/أوامر)',
+  `g51` varchar(190) DEFAULT NULL COMMENT 'متاح الآن؟',
+  `g52` varchar(190) DEFAULT NULL COMMENT 'التبعية',
+  `g53` varchar(190) DEFAULT NULL COMMENT 'مرجع العقد عند الخارجي',
+  `g54` varchar(190) DEFAULT NULL COMMENT 'حالة القدرة',
+  `g55` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g56` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g57` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g58` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_66f8f27b_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='MNT-03 - الورش والفنيون';
 
 -- ── Table: modules ──
 CREATE TABLE `modules` (
