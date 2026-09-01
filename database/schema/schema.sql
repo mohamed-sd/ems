@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-01 21:31:27
+-- المصدر: equipation_manage · التوليد: 2026-09-01 21:50:04
 -- الجداول: 1053 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
@@ -21627,6 +21627,11 @@ CREATE TABLE `sup_account` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `created_by` int(11) NOT NULL DEFAULT 0,
   `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp(),
+  `settle_no` varchar(190) DEFAULT NULL COMMENT 'رقم الإقفال',
+  `creator_name` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `reviewer_name` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `approver_name` varchar(190) DEFAULT NULL COMMENT 'المعتمد',
+  `approved_date` date DEFAULT NULL COMMENT 'تاريخ الاعتماد',
   PRIMARY KEY (`id`),
   KEY `ix_sup_account_co` (`company_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -22072,6 +22077,8 @@ CREATE TABLE `sup_need` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `created_by` int(11) NOT NULL DEFAULT 0,
   `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp(),
+  `need_no` varchar(190) DEFAULT NULL COMMENT 'رقم الاحتياج',
+  `obligation_gap` varchar(190) DEFAULT NULL COMMENT 'فجوة الالتزام',
   PRIMARY KEY (`id`),
   KEY `ix_sup_need_co` (`company_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

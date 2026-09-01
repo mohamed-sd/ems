@@ -25,6 +25,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 require_once __DIR__ . '/../includes/ladder_gate.php';
 require_once __DIR__ . '/../app/Services/Settlement/SettlementService.php';
 
@@ -206,7 +207,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 $sft_family = 'settlement'; $sft_active = 'settlement';
 include __DIR__ . '/../includes/sales_family_tabs.php';
 ?>
-<?php /* شريط رحلة الكيان — بالمسار لا بالاسم، فالاسم يسكن السجل وحده */ echo ems_entity_tabs_for('Suppliers/settlements.php'); ?>
+<?php /* شريط رحلة الكيان — بالمسار لا بالاسم، فالاسم يسكن السجل وحده.
+         والعُدّةُ تُشتمَل قبل ندائها: كانت تُشتمَل بعده بأحدَ عشرَ سطرًا
+         فتموت الشاشةُ كلُّها بـCall to undefined function لكلِّ دور. */
+require_once __DIR__ . '/../includes/entity_tabs.php';
+echo ems_entity_tabs_for('Suppliers/settlements.php'); ?>
 
 <div class="main sup-settlements-main ems-unified-page-shell">
     <?php
@@ -216,8 +221,7 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
 
-/* شريط رحلة الكيان الموحد — UXW-01 8-2 */
-require_once __DIR__ . '/../includes/entity_tabs.php';
+/* شريط رحلة الكيان الموحد — UXW-01 8-2 · اشتُمل أعلاه قبل ندائه */
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     echo ems_states_bundle('لا تسوية مورد مولدة بعد', 'اختر المورد والفترة من نموذج «تسوية جديدة» واضغط «ولد التسوية» — البنود تجلب من مصادرها');
     ?>
@@ -273,123 +277,37 @@ require_once __DIR__ . '/../includes/entity_tabs.php';
     <div class="card"><div class="card-body">
         <h5 class="sup-set-h5"><i class="fas fa-list"></i> التسويات</h5>
         <div class="sup-set-scroll">
-        <table class="table table-striped sup-set-table">
-            <thead><tr>
-                <th>رقم التسوية</th><th>المورد</th><th>الفترة</th>
-                <th>الأولي</th><th>تحميلات علينا</th><th>صافي الساعات المستحقة</th>
-                <th>الحالة</th><th>طلب الدفع</th><th>اعتراضات المورد</th><th></th>
-                <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
-                <th class="ems-fn-th" data-fn="1">العقد</th>
-                <th class="ems-fn-th" data-fn="1">الوحدة</th>
-                <th class="ems-fn-th" data-fn="1">الساعات المتعاقدة</th>
-                <th class="ems-fn-th" data-fn="1">الساعات المنفذة</th>
-                <th class="ems-fn-th" data-fn="1">العجز</th>
-                <th class="ems-fn-th" data-fn="1">التعطل المحمل على المورد</th>
-                <th class="ems-fn-th" data-fn="1">ساعات مخصومة بالتسوية</th>
-                <th class="ems-fn-th" data-fn="1">سعر الساعة</th>
-                <th class="ems-fn-th" data-fn="1">الاستحقاق قبل التسويات</th>
-                <th class="ems-fn-th" data-fn="1">تحميلات على المورد</th>
-                <th class="ems-fn-th" data-fn="1">جزاءات</th>
-                <th class="ems-fn-th" data-fn="1">حوافز</th>
-                <th class="ems-fn-th none" data-fn="1">صافي المستحق</th>
-                <th class="ems-fn-th none" data-fn="1">أعدها</th>
-                <th class="ems-fn-th none" data-fn="1">اعتمدها</th>
-                <th class="ems-fn-th none" data-fn="1">نسخة القاعدة المستعملة</th>
-                <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
-                <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
-                <th class="ems-gov-th none" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
-                <th class="ems-gov-th none" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-                <th class="ems-gov-th none" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-                <th class="ems-gov-th none" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-                <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس ب</th>
-                <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
-                <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليا">درجة الأثر</th>
-                <th class="ems-gov-th none" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
-                <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
-                <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
-                <th class="ems-gov-th none" data-gov="fx_rate" data-slice="3" title="سعر التحويل لعملة الدفاتر">سعر الصرف</th>
-                </tr></thead>
-            <tbody>
-            <?php if (!$settlements): ?>
-                <tr><td colspan="9" class="sup-set-empty-cell">
-                    لا تسوية بعد — ابدأ بتوليد واحدة من النموذج أعلاه.
-                </td></tr>
-            <?php endif; ?>
-            <?php foreach ($settlements as $s):
-                $net = (float) $s['net_amount'];
-                $isRecv = ((string) $s['net_direction'] === 'receivable');
-            ?>
-                <tr<?php echo (intval($s['id']) === $open) ? ' class="sup-set-row-open"' : ''; ?>>
-                    <td><code><?php echo htmlspecialchars((string) $s['settlement_no']); ?></code></td>
-                    <td><?php echo htmlspecialchars((string) $s['party_name']); ?></td>
-                    <td><?php echo htmlspecialchars($s['period_from'] . ' → ' . $s['period_to']); ?></td>
-                    <td><?php echo number_format((float) $s['gross_amount'], 2); ?></td>
-                    <td><?php echo number_format((float) $s['charges_amount'], 2); ?></td>
-                    <td>
-                        <strong class="<?php echo $isRecv ? 'sup-set-net-due' : 'sup-set-net-ok'; ?>">
-                            <?php echo number_format($net, 2) . ' ' . htmlspecialchars((string) $s['currency']); ?>
-                        </strong>
-                        <?php if ($isRecv): ?>
-                            <br><small class="sup-set-danger-note">دين على المورد</small>
-                        <?php endif; ?>
-                    </td>
-                    <td><span class="badge badge-secondary">
-                        <?php echo htmlspecialchars(isset($STATE_AR[$s['state']]) ? $STATE_AR[$s['state']] : (string) $s['state']); ?>
-                    </span></td>
-                    <td>
-                        <?php if (!empty($s['payment_request_id'])):
-                            $rq = isset($reqMap[intval($s['payment_request_id'])])
-                                  ? $reqMap[intval($s['payment_request_id'])] : null; ?>
-                            <a href="../FinRequests/request_form.php?id=<?php echo intval($s['payment_request_id']); ?>"
-                               title="افتح طلب الدفع ورحلته">
-                                <?php echo htmlspecialchars($rq !== null ? $rq : ('#' . intval($s['payment_request_id']))); ?> ↗
-                            </a>
-                        <?php elseif ($isRecv): ?>
-                            <small class="sup-set-muted">لا دفع — دين عليه</small>
-                        <?php else: ?>—<?php endif; ?>
-                    </td>
-                    <td>
-                        <?php if (intval($s['open_objections']) > 0): ?>
-                            <span class="badge badge-warning"><?php echo intval($s['open_objections']); ?></span>
-                        <?php else: ?>—<?php endif; ?>
-                    </td>
-                    <td class="sup-set-nowrap">
-                        <a class="btn btn-sm btn-secondary" href="?open=<?php echo intval($s['id']); ?>">البنود</a>
-                        <?php if ($can_edit && (string) $s['state'] === 'draft'): ?>
-                        <form action="" method="post" class="sup-set-inline-form">
-        <?= csrf_field() ?>
-                            <input type="hidden" name="action" value="submit">
-                            <input type="hidden" name="sid" value="<?php echo intval($s['id']); ?>">
-                            <button class="btn btn-sm btn-primary" type="submit">للمراجعة</button>
-                        </form>
-                        <?php endif; ?>
-                        <?php if ($can_approve && (string) $s['state'] === 'review'): ?>
-                        <form action="" method="post" class="sup-set-inline-form">
-        <?= csrf_field() ?>
-                            <input type="hidden" name="action" value="approve">
-                            <input type="hidden" name="sid" value="<?php echo intval($s['id']); ?>">
-                            <button class="btn btn-sm btn-primary" type="submit">إجازة</button>
-                        </form>
-                        <?php endif; ?>
-                        <?php // M-13 · استلامُ الفاتورة ومطابقتُها بالصافي المعتمد
-                        if ($can_edit && in_array((string) $s['state'],
-                                array('approved', 'payment_requested'), true)): ?>
-                        <a class="btn btn-sm btn-secondary" href="?open=<?php echo intval($s['id']); ?>&invoice=1">فاتورة</a>
-                        <?php endif; ?>
-                        <?php if ($can_approve && (string) $s['state'] === 'paid'): ?>
-                        <form action="" method="post" class="sup-set-inline-form"
-                              onsubmit="return confirm('الإقفال نهائي — والتصحيح بعده بعكس موثق لا بتعديل. متابعة؟');">
-        <?= csrf_field() ?>
-                            <input type="hidden" name="action" value="close">
-                            <input type="hidden" name="sid" value="<?php echo intval($s['id']); ?>">
-                            <button class="btn btn-sm btn-secondary" type="submit">إقفال</button>
-                        </form>
-                        <?php endif; ?>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-            </tbody>
-        </table>
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم الإقفال' => 'settle_no',
+            'رقم المورد' => 'no_supplier',
+            'اسم المورد (بحث)' => 'name_supplier',
+            'العملة' => 'c4',
+            'الشهر' => 'month',
+            'مفتاح الشهر (YYYYMM)' => 'month_6',
+            'رصيد افتتاحي' => 'balance',
+            'استحقاق الشهر' => 'entitlement_month',
+            '(−) مستردات نيابية (م15)' => 'onbehalf',
+            '(−) سلف' => 'advance',
+            '(−) جزاءات (م19)' => 'penalty',
+            '(±) تسويات معتمدة أخرى' => 'c12',
+            'صافي مستحق الشهر Net_Payable' => 'net_payable',
+            'المدفوع خلال الشهر' => 'month_14',
+            'رصيد ختامي' => 'balance_15',
+            'حالة الإقفال' => 'closure',
+            'المنشئ' => 'creator_name',
+            'المراجع' => 'reviewer_name',
+            'المعتمد' => 'approver_name',
+            'تاريخ الاعتماد' => 'approved_date',
+            'مراجع البنود الخاصمة' => 'line',
+            'ملاحظات' => 'notes',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('sup_account');
+        echo ems_w14_grid('emsList_sup_account', $GUIDE_COLS, $__gridRows, $D, 'لا اقفال حساب مسجل بعد'); /* /GUIDE_COLS */ ?>
         </div>
     </div></div>
 

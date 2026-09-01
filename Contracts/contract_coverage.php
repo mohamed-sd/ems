@@ -17,6 +17,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../app/Services/Capacity/SupplierPerformanceAggregator.php';
 require_once __DIR__ . '/../app/Services/Capacity/BalanceCalculator.php';
@@ -154,6 +155,53 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             التغطية مكتملة اليوم — صفر ساعات غير مغطاة
         <?php endif; ?>
     </div>
+
+    <!-- سجلُّ الاحتياجِ نفسُه بحقولِ ورقتِه (SUP-05): المستوياتُ الثلاثةُ أدناه
+         تحليلٌ مشتقٌّ منه، والورقةُ تطلب السجلَّ بحبّتِه لا التحليلَ وحدَه -->
+    <div class="card"><div class="card-header"><h5><i class="fas fa-clipboard-list"></i> سجل احتياجات التغطية</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم الاحتياج' => 'need_no',
+            'كود العقد' => 'code_contract',
+            'رقم العقد (تسلسل العميل)' => 'no_contract',
+            'رقم العميل' => 'no',
+            'اسم العميل (بحث)' => 'name',
+            'نموذج العمل' => 'c6',
+            'مفتاح دورة الالتزام' => 'key',
+            'رقم التجديد (دورة الالتزام)' => 'no_role_obligation',
+            'نوع دورة الالتزام' => 'type_role_obligation',
+            'نوع الآلية/البند' => 'type_line',
+            'وحدة القياس' => 'c11',
+            'خانات العميل' => 'slot',
+            'أساس الوحدة الشهري' => 'month',
+            'أشهر دورة الالتزام' => 'role_obligation',
+            'سعة دورة الالتزام (المستهدف)' => 'role_obligation_target',
+            'المستهدف المنقضي' => 'target',
+            'سعر بيع الوحدة (قراءة)' => 'c17',
+            'السريان التعاقدي من' => 'c18',
+            'إلى' => 'c19',
+            'حالة توزيع الاحتياج (مصدر)' => 'allocation_need_source',
+            'المغطى بعقود الموردين' => 'supplier',
+            'فجوة الالتزام' => 'obligation_gap',
+            'حالة الاحتياج' => 'need',
+            'Σ تخصيص حصص الموردين (حي)' => 'quota_supplier',
+            'علم تجاوز التوزيع' => 'allocation',
+            'فحص الوحدات التعاقدية (مصدر)' => 'unit_source',
+            'خانات الموردين (مصدر)' => 'slot_supplier_source',
+            'منفذ دورة الالتزام (مصدر)' => 'role_obligation_source',
+            'نسبة تحقق دورة الالتزام (مصدر)' => 'verify_role_obligation',
+            'ملاحظات' => 'notes',
+            'حالة عقد العميل (قراءة من المبيعات)' => 'contract',
+            'النهاية التنفيذية لعقد العميل' => 'c32',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('sup_need');
+        echo ems_w14_grid('emsList_sup_need', $GUIDE_COLS, $__gridRows, $D, 'لا احتياج تغطية مسجل بعد'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
 
     <!-- المستوى ① · التزاماتُ أنواع المعدات -->
     <div class="card"><div class="card-header"><h5><i class="fas fa-layer-group"></i> نوع المعدة — الالتزام والتغطية والفجوة</h5></div>
