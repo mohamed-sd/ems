@@ -9,15 +9,15 @@
 
 | المعرِّف | القيمة |
 |---|---|
-| **`Baseline ID`** | **`NAB-5102AA8687`** |
-| `Commit Hash` | `24fe96423678567327136c6b75a4fbfff4280fd7` |
+| **`Baseline ID`** | **`NAB-8B35EC2C05`** |
+| `Commit Hash` | `73b9aaa1152456a2c349e92745ff4d949e60125e` |
 | شجرةُ العملِ نظيفة؟ | ✔ نعم |
 | `DB Snapshot` (‏بصمةُ مجموعةِ الهجرات) | `e505111dd084c6a2…` · 711 هجرةً مطبَّقة |
 | `Navigation Registry Version` | `7fec35930978b5f3…` · 553 صفًّا (‏مساحات + مجموعات + مواضع) |
 | `nav_items` النشطة (‏مصدرُ المُصيِّرِ القديم) | `af6df10eb69b5c4b…` · 2476 صفًّا |
 | `Role Permission Version` | `805e0bd8c6130b35…` · 4112 منحةً |
 | `Target Architecture Version` | `nav_placements@7fec35930978` |
-| `Timestamp` (UTC) | `2026-09-01T08:50:03Z` |
+| `Timestamp` (UTC) | `2026-09-01T10:33:02Z` |
 
 ## المساحاتُ ولقطةُ سايدبارِ كلٍّ
 

@@ -170,9 +170,16 @@ while ($x = $r->fetch_assoc()) {
      نصُّ ما يمنعه §13 (`Consumer reads; Owner writes`).
    ◆ **والمطابقةُ بالاسمِ المُسوّى**: `nav_lifecycle_groups.group_key` هو
      `group_ar` مُسوّى (‏الهمزةُ والتاءُ المربوطة) — والمقارنةُ بـ`$nz` نفسِها. */
-$wsPrimaryRole = array();
-$r = $conn->query("SELECT workspace_id, role_id FROM nav_ws_roles WHERE binding = 'PRIMARY'");
-while ($x = $r->fetch_assoc()) { $wsPrimaryRole[$x['workspace_id']] = (int) $x['role_id']; }
+/* ◆ **وأدوارُ المساحةِ كلُّها لا الرائدُ وحدَه**: `gov_target_nav` يُعلِن
+     بالدورِ لا بالمساحة، **وستةَ عشرَ دورًا فرعيًّا** رُبطوا `SECONDARY`
+     بمساحاتِ إداراتِهم الأمِّ في هذه الجولة. فقراءةُ الرائدِ وحدَه تُعمي
+     المُصنِّفَ عن إعلاناتِ الفرعيّين — **وهي إعلاناتُ المساحةِ نفسِها**.
+     ⛔ **والترتيبُ حتميّ**: `PRIMARY` أوّلًا ثمَّ الفرعيّون بمُعرِّفِهم،
+     فلا يتأرجح ناتجٌ بين تشغيلَين [[counter-parity-two-readers]]. */
+$wsRoleList = array();
+$r = $conn->query("SELECT workspace_id, role_id FROM nav_ws_roles
+                    ORDER BY (binding = 'PRIMARY') DESC, role_id ASC");
+while ($x = $r->fetch_assoc()) { $wsRoleList[$x['workspace_id']][] = (int) $x['role_id']; }
 
 $lcGroupByKey = array();          /* ws ⇒ اسمٌ مُسوًّى ⇒ id */
 $r = $conn->query("SELECT id, workspace_id, group_key, label_ar FROM nav_lifecycle_groups WHERE active = 1");
@@ -193,7 +200,7 @@ while ($x = $r->fetch_assoc()) {
 }
 
 /** مجموعةُ دورةِ هذه المساحةِ لهذا المسار — أو `null` إن لم يحكمها مصدر. */
-$gidFor = function ($ws, $route) use ($byWsRoute, $wsPrimaryRole, $declGroup, $lcGroupByKey, $nz) {
+$gidFor = function ($ws, $route) use ($byWsRoute, $wsRoleList, $declGroup, $lcGroupByKey, $nz) {
     /* ① ورقةُ الدليلِ أوّلًا — الصفُّ المبنيُّ في `nav_placements` لهذه المساحة */
     if (isset($byWsRoute[$ws][$route]) && $byWsRoute[$ws][$route]['gid'] !== null) {
         return (int) $byWsRoute[$ws][$route]['gid'];
@@ -207,9 +214,11 @@ $gidFor = function ($ws, $route) use ($byWsRoute, $wsPrimaryRole, $declGroup, $l
     if (isset($byWsRoute['WS-MY'][$route]) && $byWsRoute['WS-MY'][$route]['gid'] !== null) {
         return (int) $byWsRoute['WS-MY'][$route]['gid'];
     }
-    /* ② ثمَّ الجدولُ المستهدَفُ المنشورُ — **بشرطِ أن تكون المجموعةُ من هذه المساحة** */
-    $rid = isset($wsPrimaryRole[$ws]) ? $wsPrimaryRole[$ws] : 0;
-    if ($rid && isset($declGroup[$rid][$route])) {
+    /* ② ثمَّ الجدولُ المستهدَفُ المنشورُ — **بشرطَين معًا**: أن يكون المُعلِنُ
+       دورًا **مربوطًا بهذه المساحة** (‏فالإعلانُ إعلانُها)، وأن يكون للاسمِ
+       **رأسُ طيٍّ في دورتِها هي** — ⛔ ولا تُقبل مجموعةُ مساحةٍ أخرى (§13). */
+    foreach (isset($wsRoleList[$ws]) ? $wsRoleList[$ws] : array() as $rid) {
+        if (!isset($declGroup[$rid][$route])) { continue; }
         $key = $nz($declGroup[$rid][$route]);
         if (isset($lcGroupByKey[$ws][$key])) { return (int) $lcGroupByKey[$ws][$key]; }
     }
@@ -295,14 +304,39 @@ function navarch_rule($ws, $it, $layer, $ctx)
             'سايدبارُ المساحةِ نفسِها', '', 'L1_ARCHITECTURE', true);
     }
 
-    /* ── R3 · الشخصيُّ ⇒ WS-MY (§11 · §18) — **بعدَ الدليلِ لا قبلَه** ─────── */
+    /* ── R3 · الشخصيُّ ⇒ WS-MY (§11 · §18) — **بعدَ الدليلِ لا قبلَه** ───────
+       ══ **وعضويّةُ «مساحة عملي» تُقرأ من ورقتِها لا من حقلِ تشغيل** ═══════
+       ◆ **المقيسُ حرفًا**: مئتانِ وأربعةَ عشرَ موضعًا كُتبت `PERSONAL`،
+         **ثمانيةٌ وثمانون منها في طبقةِ `WS-MY`** (‏لها صفٌّ في ورقةِ الدليل)
+         **ومئةٌ وستةٌ وعشرون بحقلِ `nav_canonical.space_class` وحدَه**.
+         وورقةُ `WS-MY` **ترسم سبعَ شاشاتٍ بمجموعتَيها** («الملف الشخصي» ·
+         «العمل اليومي») — ولا واحدةَ من المئةِ والستةِ والعشرين فيها.
+       ◆ **فمجموعتُها لا تُقرأ من مصدرٍ حاكم**، وإسنادُها إلى إحدى المجموعتَين
+         بالمعنى **اختراعٌ يمنعه §17**، وإسنادُها إلى مجموعةِ الإدارةِ المضيفةِ
+         **استعارةٌ يمنعها §13 و§42**. ⇒ وبلا مجموعةٍ **تُسطَّح «مساحتي» كتلةً
+         واحدةً** فتتجاوز حدَّ `U9` ويُقرأ المسارُ تحتَ رأسَين في `U3`.
+       ⭐ **و§11 يسمّي هذه الحالةَ بعينِها ويحكمها حرفًا**: «إذا تقرر الاحتفاظ
+         بShortcut شخصي داخل Sidebar الإدارة، يصنف: **`PERSONAL_SHORTCUT`
+         ولا يدخل في مقام دورة الإدارة**». ⇒ فهي **خارجَ مقامِ الدورةِ بحكمِ
+         الدستورِ نفسِه، ولا رأسَ طيٍّ يلزمها** — ⛔ **ولا تختفي**: المُصيِّرُ
+         يطبعها في مِسمارِ «مساحتي» (‏فرعُ `PERSONAL` قبلَ فحصِ المجموعة).
+       ⛔ **والصنفُ يبقى `PERSONAL`** ولا تُضاف مفردةٌ إلى `placement_type`:
+         مفردةٌ جديدةٌ تُسقط صفوفًا صامتةً عند كلِّ قارئٍ يعُدُّ القديمةَ بالاسم
+         [[enum-vocabulary-consumers]] — **والحكمُ يُكتب في `reason_code`**. */
     if ($layer === 'PERSONAL' || $sc === 'PERSONAL_SPACE') {
+        $onSheet = ($layer === 'PERSONAL');
         return $V('PERSONAL', 'MOVE_TO_WS_MY', ($layer === 'LEGACY' ? 'PERSONAL' : ''),
-            'PERSONAL_WS_MY_S11',
-            $layer === 'PERSONAL' ? 'له موضعٌ في ورقةِ WS-MY · nav_placements@WS-MY'
-                                  : 'nav_canonical.space_class = PERSONAL_SPACE',
-            'NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة',
-            'مساحةُ عملي WS-MY — تظهر لكلِّ دورٍ بحكمٍ قائم', '', 'L1_ARCHITECTURE', true);
+            $onSheet ? 'PERSONAL_WS_MY_S11' : 'PERSONAL_SHORTCUT_S11',
+            $onSheet ? 'له موضعٌ في ورقةِ WS-MY · nav_placements@WS-MY'
+                     : 'nav_canonical.space_class = PERSONAL_SPACE · ولا صفَّ له في ورقةِ WS-MY '
+                       . '(‏سبعُ شاشاتٍ بمجموعتَين) — فلا مجموعةَ تُقرأ له من مصدرٍ حاكم',
+            $onSheet ? 'NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة'
+                     : 'NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar '
+                       . 'الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»',
+            $onSheet ? 'مساحةُ عملي WS-MY — تظهر لكلِّ دورٍ بحكمٍ قائم'
+                     : 'مِسمارُ «مساحتي» في سايدبارِ هذه المساحةِ نفسِها — ظاهرٌ لا مخفيّ '
+                       . '(‏مختصرٌ شخصيٌّ خارجَ مقامِ الدورة)',
+            '', 'L1_ARCHITECTURE', true);
     }
 
     /* ── R4 · العابرُ للإدارات (§12) — نوعُ الاحتياجِ لا نقلُ الشاشة ───────── */
@@ -470,6 +504,55 @@ function navarch_rule($ws, $it, $layer, $ctx)
                     'NAV-ARCH-02 §11 — صناديقُ «ما ينتظرني» في «مساحة عملي» لا في دورةِ الإدارة',
                     'مجموعةُ «مساحتي» في سايدبارِ هذه المساحةِ نفسِها — ظاهرٌ لا مخفيّ',
                     '', 'L1_ARCHITECTURE', true);
+            }
+            /* ══ **والمصالحةُ لا تجعل الشاشةَ بندَ دورةٍ في مساحةٍ لا تملكها** ══
+               ◆ **المقيس**: `operations/distribution_space` صُولح `PRIMARY` في
+                 `DEP-13`، **ومالكُه `nav_canonical.owner_dept` = «إدارة التشغيل»
+                 = `DEP-11`** — وله هناك موضعٌ حاكمٌ برأسِ طيٍّ قائمٍ (65).
+                 فصفُّ `DEP-13` **نسخةٌ ثانيةٌ من حقيقةِ مالكٍ آخر**، وهو نصُّ
+                 ما يمنعه §13 (`Consumer reads; Owner writes`).
+               ⇒ **وحكمُه §18 حرفًا**: «Screen له Primary Placement في إدارة أخرى
+                 والظهور هنا سببه Permission فقط ⇒ لا يظهر في Workspace الحالية».
+               ⛔ **والصلاحيّةُ لم تُمَسّ** (§22 · §42): الرابطُ المباشرُ ومبدِّلُ
+                 المساحاتِ إلى المالكِ يعملان — وهو بديلُ الوصولِ المكتوبُ (§4). */
+            $ownWs = '';
+            foreach ($wsName as $wid => $wnm) {
+                if ($c && $nz((string) $c['owner_dept']) === $nz($wnm)) { $ownWs = $wid; break; }
+            }
+            /* ⛔ **والسؤالُ: أيَسَعُ مالكَه في دورتِه؟** لا «أله صفٌّ في ورقتِه؟»:
+               `operations/distribution_space` **إضافةٌ معتمَدةٌ بعدَ الدليل**
+               فلا صفَّ لها في `nav_placements`، ومع ذلك **يسَعُها `DEP-11`**
+               برأسِ طيٍّ حاكمٍ (65) من `gov_target_nav` بدورِه. فقياسُ
+               الملكيّةِ بورقةِ الدليلِ وحدَها **يقرأ صفرًا حيث يوجد موضع**
+               [[measure-blind-spots]] — والمقياسُ الصحيحُ `$gidFor` نفسُه. */
+            if ($ownWs !== '' && $ownWs !== $ws && $gidFor($ownWs, $route) !== null) {
+                return $V('', 'CONTEXTUALIZE', 'CROSS_DOMAIN', 'CROSS_WORKSPACE_PERMISSION_ONLY',
+                    'nav_canonical.owner_dept = ' . $c['owner_dept'] . ' = ' . $ownWs
+                        . ' · وله موضعٌ حاكمٌ هناك · وهذه ' . $wsName[$ws],
+                    'NAV-ARCH-02 §18 — موضعٌ أصيلٌ في إدارةٍ أخرى وظهورُه هنا بالصلاحيّةِ فقط · §13',
+                    'مبدِّلُ المساحاتِ إلى ' . $ownWs . ' · البحثُ · والرابطُ المباشرُ يبقى نافذًا (§22)',
+                    'D_WORKSPACE_SWITCH', 'L1_ARCHITECTURE', false);
+            }
+            /* ══ **وهدفٌ معتمَدٌ بلا رأسِ طيٍّ في دورتِه ليس بندَ دورة** ══════
+               ◆ **المقيس**: `operations/daily_plan` في `DEP-12` — مالكُه
+                 `DEP-12` نفسُها، **ومجموعتُه المُعلَنةُ «التخطيط والتوزيع»
+                 مُعلَنةٌ بدورِ `DEP-11`** (‏رأسُ طيٍّ قائمٌ هناك: 65) — فلا
+                 مصدرَ يسمّي له رأسًا في دورةِ `DEP-12`.
+               ⇒ **§18 آخرُ درجاتِه**: `TARGET_GAP_CANDIDATE` — «Legacy له وظيفة
+                 أعمال لا يقابلها Target». و§17 يمنع تعديلَ الدليلِ قبلَ سبعِ
+                 إثباتاتٍ واعتمادِ مالكِ المجال. ⛔ **والحجبُ للموضعِ لا للبرنامج**
+                 (§35)، **وبديلُ الوصولِ مكتوبٌ لا مسكوتٌ عنه** (§4). */
+            if ($gidFor($ws, $route) === null) {
+                return $V('', 'TARGET_GAP_REVIEW', 'TRUE_TARGET_GAP', 'TARGET_GAP_CANDIDATE_S18',
+                    'gov_legacy_nav_recon.verdict = ' . $v . ' · ' . $rc['doc_code']
+                        . ' · ولا رأسَ طيٍّ له في دورةِ ' . $ws
+                        . ' من أيِّ مصدرٍ حاكم (‏ورقةُ الدليلِ · ورقةُ WS-MY · '
+                        . 'gov_target_nav بدورٍ مربوطٍ بهذه المساحة)',
+                    'NAV-ARCH-02 §18 — «Legacy له وظيفة أعمال لا يقابلها Target ⇒ '
+                        . 'TARGET_GAP_CANDIDATE» · و§17 يمنع تعديلَ الدليلِ بلا سبعِ إثباتات',
+                    'الرابطُ المباشرُ (‏الصلاحيّةُ باقيةٌ — §22·§42) · البحثُ العامّ · '
+                        . 'ومبدِّلُ المساحات',
+                    '', 'L2_DOMAIN_OWNER', false);
             }
             return $V('PRIMARY', 'KEEP_PRIMARY', 'CANONICAL_EQUIVALENT',
                 'RECONCILED_TO_TARGET_S16',

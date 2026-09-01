@@ -1,6 +1,6 @@
 {
-    "baseline_id": "NAB-5102AA8687",
-    "commit_hash": "24fe96423678567327136c6b75a4fbfff4280fd7",
+    "baseline_id": "NAB-8B35EC2C05",
+    "commit_hash": "73b9aaa1152456a2c349e92745ff4d949e60125e",
     "worktree_clean": true,
     "db_snapshot": {
         "migration_set_hash": "e505111dd084c6a2452520a649a2d94afff10b42",
@@ -19,7 +19,7 @@
         "rows": 4112
     },
     "target_architecture_version": "nav_placements@7fec35930978",
-    "timestamp_utc": "2026-09-01T08:50:03Z",
+    "timestamp_utc": "2026-09-01T10:33:02Z",
     "timestamp_note": "ساعةُ حائطٍ للتوثيقِ لا لترتيبِ الحقائق — الترتيبُ بالبصمات",
     "workspaces": 22,
     "workspaces_rendered": 18,

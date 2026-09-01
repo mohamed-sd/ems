@@ -218,8 +218,16 @@ if (!function_exists('navarch_render')) {
 
 if (!function_exists('navarch_role_workspace')) {
     /**
-     * مساحةُ الدورِ الحاكمة — الربطُ `PRIMARY` وحدَه (§6 · §21-②).
+     * مساحةُ الدورِ الحاكمة — `PRIMARY` أوّلًا ثمَّ `SECONDARY` (§6 · §21-②).
      * ⛔ **ولا يُشتقُّ من الدورِ اسمُ مساحة**: من لا صفَّ له يرجع `null`.
+     *
+     * ◆ **والمقيسُ قبلَ الحكم**: `PRIMARY` وحدَه كان يربط **ثمانيةَ عشرَ دورًا
+     *   من خمسةٍ وثلاثين**، فستةَ عشرَ دورًا نشطًا يحملون **1,031 رابطًا**
+     *   يرجعون `null` — **فلا يُقلَبون أبدًا** مهما بلغ المفتاحُ `on`.
+     *   وهم كلُّهم أدوارٌ فرعيّةٌ داخلَ إداراتٍ قائمة (`roles.parent_role_id`)
+     *   لا إداراتٌ جديدة، و`binding='SECONDARY'` مفردةٌ قائمةٌ في المخطَّطِ
+     *   سلفًا. ⇒ **الترتيبُ حتميّ**: `PRIMARY` يغلب، ثمَّ `SECONDARY` بأصغرِ
+     *   مُعرِّفِ مساحةٍ — فلا يتأرجح قارئان على صفَّين.
      */
     function navarch_role_workspace($conn, $roleId)
     {
@@ -231,7 +239,9 @@ if (!function_exists('navarch_role_workspace')) {
                                      FROM nav_ws_roles wr
                                      JOIN nav_workspaces w ON w.workspace_id = wr.workspace_id
                                                           AND w.active = 1
-                                    WHERE wr.role_id = {$rid} AND wr.binding = 'PRIMARY'
+                                    WHERE wr.role_id = {$rid}
+                                      AND wr.binding IN ('PRIMARY','SECONDARY')
+                                    ORDER BY (wr.binding = 'PRIMARY') DESC, wr.workspace_id ASC
                                     LIMIT 1");
         if ($q && ($x = mysqli_fetch_row($q))) { $byRole[$rid] = (string) $x[0]; }
         return $byRole[$rid];

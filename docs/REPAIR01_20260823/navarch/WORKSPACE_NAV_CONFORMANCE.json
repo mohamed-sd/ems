@@ -1,5 +1,5 @@
 {
-    "baseline_id": "NAB-5102AA8687",
+    "baseline_id": "NAB-8B35EC2C05",
     "metrics": {
         "DEP-01": {
             "TARGET_NAV_RECALL": 100,
@@ -7,7 +7,7 @@
             "TARGET_TOTAL": 18,
             "PLACEMENT_PRECISION": 100,
             "UNEXPLAINED_EXTRA_MENU_ITEM": 0,
-            "APPROVED_ADDITION_OUTSIDE_GUIDE": 0,
+            "APPROVED_ADDITION_OUTSIDE_GUIDE": 3,
             "PERMISSION_ONLY_RENDERED_ITEM": 0,
             "UNAPPROVED_SECONDARY_PLACEMENT": 0,
             "ACTIVE_LEGACY_WITHOUT_DISPOSITION": 0,
@@ -28,10 +28,14 @@
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
             "OLD_RENDERED": 41,
-            "NEW_LIFECYCLE": 18,
+            "NEW_LIFECYCLE": 21,
             "MISSING_TARGETS": [],
             "EXTRA_ITEMS": [],
-            "ADDITIONS_OUTSIDE_GUIDE": [],
+            "ADDITIONS_OUTSIDE_GUIDE": [
+                "clients\/products",
+                "governance\/gov_dept_sal",
+                "risk\/risk_dept_sal"
+            ],
             "EXACT_WORKSPACE_NAV_CONFORMANCE": "PASS"
         },
         "DEP-02": {
@@ -40,7 +44,7 @@
             "TARGET_TOTAL": 28,
             "PLACEMENT_PRECISION": 96.7,
             "UNEXPLAINED_EXTRA_MENU_ITEM": 0,
-            "APPROVED_ADDITION_OUTSIDE_GUIDE": 0,
+            "APPROVED_ADDITION_OUTSIDE_GUIDE": 1,
             "PERMISSION_ONLY_RENDERED_ITEM": 0,
             "UNAPPROVED_SECONDARY_PLACEMENT": 0,
             "ACTIVE_LEGACY_WITHOUT_DISPOSITION": 0,
@@ -61,10 +65,12 @@
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
             "OLD_RENDERED": 63,
-            "NEW_LIFECYCLE": 28,
+            "NEW_LIFECYCLE": 29,
             "MISSING_TARGETS": [],
             "EXTRA_ITEMS": [],
-            "ADDITIONS_OUTSIDE_GUIDE": [],
+            "ADDITIONS_OUTSIDE_GUIDE": [
+                "risk\/risk_dept_sup"
+            ],
             "EXACT_WORKSPACE_NAV_CONFORMANCE": "PASS"
         },
         "DEP-03": {
@@ -106,7 +112,7 @@
             "TARGET_TOTAL": 29,
             "PLACEMENT_PRECISION": 98.7,
             "UNEXPLAINED_EXTRA_MENU_ITEM": 0,
-            "APPROVED_ADDITION_OUTSIDE_GUIDE": 0,
+            "APPROVED_ADDITION_OUTSIDE_GUIDE": 4,
             "PERMISSION_ONLY_RENDERED_ITEM": 0,
             "UNAPPROVED_SECONDARY_PLACEMENT": 0,
             "ACTIVE_LEGACY_WITHOUT_DISPOSITION": 0,
@@ -127,10 +133,15 @@
             "GLOBAL_SHELL_COUNTED_AS_DEPARTMENT": 0,
             "TARGET_LINEAGE_BROKEN": 0,
             "OLD_RENDERED": 77,
-            "NEW_LIFECYCLE": 29,
+            "NEW_LIFECYCLE": 33,
             "MISSING_TARGETS": [],
             "EXTRA_ITEMS": [],
-            "ADDITIONS_OUTSIDE_GUIDE": [],
+            "ADDITIONS_OUTSIDE_GUIDE": [
+                "equipments\/equipments_types",
+                "equipments\/fleet_models",
+                "equipments\/fleet_depreciation_profiles",
+                "equipments\/manage_failure_codes"
+            ],
             "EXACT_WORKSPACE_NAV_CONFORMANCE": "PASS"
         },
         "DEP-05": {
