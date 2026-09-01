@@ -987,6 +987,56 @@ function emsNavRouteGroupMap($conn) {
 }
 
 /**
+ * ══ طبقةُ **اسمِ السياق** (GOV_UI_EXEC §5) ═══════════════════════════════════
+ * ◆ **نصُّ الأمر**: «ولا Route واحدة = Group عالمية واحدة **اذا ظهرت الشاشة في
+ *   سياقات مختلفة**». والمقيسُ أنَّ شاشةً واحدةً قد يسمّيها الدليلُ **باسمَين
+ *   حاكمَين** في مساحتَين: `Contracts/collections.php` «التحصيلات الواردة» في
+ *   إدارةِ الخزينةِ و«ذمم العملاء وأعمارها» في الإدارةِ المالية.
+ * ◆ **والاسمُ العالميُّ لا يسع اثنَين**: `nav_canonical` مفتاحُه المسارُ، فأيُّهما
+ *   كُتب خالف الآخرَ. فيُقرأ اسمُ السياقِ من `nav_targets` — سجلِّ الهدفِ الذي
+ *   يحمل الاسمَ الحاكمَ **لكلِّ مساحةٍ على حِدة** — عبرَ مساحةِ الدورِ الحالي.
+ * ◆ ⛔ **ولا يسري إلّا على المتعدِّد**: مسارٌ في مساحةٍ واحدةٍ لا تمسُّه هذه
+ *   الطبقةُ إطلاقًا، فلا تُغيَّر تسميةٌ حُسمت في المخزنِ العالميِّ.
+ * @return array base-route ⇒ الاسمُ الحاكمُ في مساحةِ هذا الدور
+ */
+function emsNavContextLabelMap($conn, $roleId)
+{
+    static $cache = array();
+    $roleId = (int) $roleId;
+    if ($roleId <= 0) { return array(); }
+    if (isset($cache[$roleId])) { return $cache[$roleId]; }
+    $out = array();
+    $sql = "SELECT LOWER(p.route) AS rt, t.canonical_title
+              FROM nav_placements p
+              JOIN nav_targets   t ON t.target_id = p.target_id
+              JOIN nav_ws_roles  w ON w.workspace_id = p.workspace_id AND w.binding = 'PRIMARY'
+             WHERE w.role_id = {$roleId}
+               AND p.route IS NOT NULL AND p.route <> ''
+               AND LOWER(p.route) IN (
+                   SELECT rt2 FROM (
+                     SELECT LOWER(p2.route) AS rt2
+                       FROM nav_placements p2
+                       JOIN nav_targets t2 ON t2.target_id = p2.target_id
+                      WHERE p2.route IS NOT NULL AND p2.route <> ''
+                      GROUP BY LOWER(p2.route)
+                     HAVING COUNT(DISTINCT p2.workspace_id) > 1
+                        AND COUNT(DISTINCT t2.canonical_title) > 1
+                   ) d
+               )";
+    $res = @mysqli_query($conn, $sql);
+    if ($res) {
+        while ($row = mysqli_fetch_assoc($res)) {
+            $b = uxuiNavBaseRoute($row['rt']);
+            if ($b !== '' && trim((string) $row['canonical_title']) !== '') {
+                $out[$b] = trim((string) $row['canonical_title']);
+            }
+        }
+    }
+    $cache[$roleId] = $out;
+    return $out;
+}
+
+/**
  * تصييرُ القائمةِ كلِّها في عشرِ مجموعاتٍ — بلوكٌ واحدٌ لا بلوكان.
  *
  * @param array  $items     بنودُ الدورِ الظاهرةُ (بعدَ الصلاحيةِ والمساحة)
@@ -1061,6 +1111,7 @@ function printEmsTenGroupNav($conn, $items, $uxMap, $uxCurMap, $basePrefix, $bad
     $ANCHOR_ORDER = array('main/role_board.php' => -1000000, 'chats/index.php' => -999999);
 
     /* ── ① كلُّ بندٍ يُنسب: اسمُه · مجموعتُه · قسمُه · ترتيبُه ─────────────── */
+    $ctxLabel = emsNavContextLabelMap($conn, isset($GLOBALS['__uxui_cur_role']) ? $GLOBALS['__uxui_cur_role'] : 0);
     $rows = array();
     $covered = array();
     foreach ($items as $idx => $it) {
@@ -1077,7 +1128,11 @@ function printEmsTenGroupNav($conn, $items, $uxMap, $uxCurMap, $basePrefix, $bad
            الحاليَّ من السجل · ومن لا قياسَ current لدورِه يبقى على اسمِ صفِّه.
            (وفرضُ المعياريِّ على الأخيرِ أسقط رابطًا: توأمانِ صارا باسمٍ واحدٍ
             فابتلع حارسُ التكرارِ ثانيَهما — قِيس في الدور ٢٤.) */
+        /* GOV_UI_EXEC §5: اسمُ **السياق** يغلب العالميَّ متى كان المسارُ في
+           مساحتَين باسمَين حاكمَين — ولا يمسُّ سواه (انظر emsNavContextLabelMap). */
+        $ctxName = isset($ctxLabel[$base]) ? $ctxLabel[$base] : '';
         if ($isVariant) { $name = $it['label_ar']; }
+        elseif ($ctxName !== '') { $name = $ctxName; }
         elseif ($c && $c['status'] === 'APPROVED') { $name = $c['canonical_ar']; }
         elseif ($cur) { $name = $cur['cur_label']; }
         else { $name = $it['label_ar']; }

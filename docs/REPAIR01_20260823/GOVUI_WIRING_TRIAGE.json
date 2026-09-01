@@ -1,0 +1,269 @@
+[
+    {
+        "ws": "DEP-01",
+        "tid": "NT-DEP-01-002",
+        "kind": "BUILT_NOT_RENDERED",
+        "canonical": "جهات اتصال العملاء",
+        "rendered": "",
+        "route": "clients\/client_contacts.php",
+        "candidates": []
+    },
+    {
+        "ws": "DEP-01",
+        "tid": "NT-DEP-01-008",
+        "kind": "BUILT_NOT_RENDERED",
+        "canonical": "بنود العروض",
+        "rendered": "",
+        "route": "clients\/quotation_lines.php",
+        "candidates": [
+            "clients\/readiness_lines.php(0.50 · جاهزية العروض)"
+        ]
+    },
+    {
+        "ws": "DEP-02",
+        "tid": "NT-DEP-02-002",
+        "kind": "BUILT_NOT_RENDERED",
+        "canonical": "جهات الاتصال والمفوضون",
+        "rendered": "",
+        "route": "suppliers\/supplier_contacts.php",
+        "candidates": []
+    },
+    {
+        "ws": "DEP-02",
+        "tid": "NT-DEP-02-018",
+        "kind": "CROSSED:NT-DEP-02-020",
+        "canonical": "قياس التغطية والعجز والفائض",
+        "rendered": "استحقاقات الموردين",
+        "route": "suppliers\/supplier_entitlements.php",
+        "candidates": []
+    },
+    {
+        "ws": "DEP-02",
+        "tid": "NT-DEP-02-020",
+        "kind": "MENU_DUP",
+        "canonical": "استحقاقات الموردين",
+        "rendered": "استحقاقات الموردين",
+        "route": "suppliers\/supplier_entitlements.php",
+        "candidates": [
+            "suppliers\/supplier_advances.php(0.50 · سلفيات الموردين)"
+        ]
+    },
+    {
+        "ws": "DEP-04",
+        "tid": "NT-DEP-04-004",
+        "kind": "MENU_DUP",
+        "canonical": "التحقق من المصدر",
+        "rendered": "طلب إدخال الأصل",
+        "route": "fleet\/asset_intake.php",
+        "candidates": []
+    },
+    {
+        "ws": "DEP-04",
+        "tid": "NT-DEP-04-005",
+        "kind": "MENU_DUP",
+        "canonical": "أمر التفتيش",
+        "rendered": "طلب إدخال الأصل",
+        "route": "fleet\/asset_intake.php",
+        "candidates": []
+    },
+    {
+        "ws": "DEP-04",
+        "tid": "NT-DEP-04-011",
+        "kind": "MENU_DUP",
+        "canonical": "التفعيل وإعادة الخدمة",
+        "rendered": "طلب إدخال الأصل",
+        "route": "fleet\/asset_intake.php",
+        "candidates": []
+    },
+    {
+        "ws": "DEP-04",
+        "tid": "NT-DEP-04-013",
+        "kind": "MENU_DUP",
+        "canonical": "حركة الموقع والمشروع",
+        "rendered": "إسناد الأصل وحركته",
+        "route": "fleet\/asset_assignments.php",
+        "candidates": []
+    },
+    {
+        "ws": "DEP-04",
+        "tid": "NT-DEP-04-020",
+        "kind": "MENU_DUP",
+        "canonical": "الجاهزية الشهرية",
+        "rendered": "الجاهزية والملخص الشهري",
+        "route": "fleet\/asset_readiness.php",
+        "candidates": []
+    },
+    {
+        "ws": "DEP-04",
+        "tid": "NT-DEP-04-022",
+        "kind": "MENU_DUP",
+        "canonical": "الخروج الدائم",
+        "rendered": "خروج الأصل",
+        "route": "fleet\/asset_exit.php",
+        "candidates": []
+    },
+    {
+        "ws": "DEP-05",
+        "tid": "NT-DEP-05-004",
+        "kind": "CROSSED:NT-DEP-05-023",
+        "canonical": "التقويم المحاسبي للفترات — بحسب انطباق الشركة",
+        "rendered": "إقفال الفترة المحاسبية",
+        "route": "finance\/periods_fin.php",
+        "candidates": []
+    },
+    {
+        "ws": "DEP-05",
+        "tid": "NT-DEP-05-005",
+        "kind": "BUILT_NOT_RENDERED",
+        "canonical": "الميزانية والتقدير — بحسب انطباق الشركة",
+        "rendered": "",
+        "route": "finance\/budget_master.php",
+        "candidates": []
+    },
+    {
+        "ws": "DEP-05",
+        "tid": "NT-DEP-05-023",
+        "kind": "MENU_DUP",
+        "canonical": "إقفال الفترة المحاسبية",
+        "rendered": "إقفال الفترة المحاسبية",
+        "route": "finance\/periods_fin.php",
+        "candidates": []
+    },
+    {
+        "ws": "DEP-07",
+        "tid": "NT-DEP-07-003",
+        "kind": "CROSSED:NT-DEP-07-024",
+        "canonical": "خطة القوى العاملة — بحسب انطباق الشركة",
+        "rendered": "تقرير القوى العاملة",
+        "route": "workforce\/hr_workforce_report.php",
+        "candidates": []
+    },
+    {
+        "ws": "DEP-07",
+        "tid": "NT-DEP-07-020",
+        "kind": "BUILT_NOT_RENDERED",
+        "canonical": "السلف والقروض — بحسب انطباق الشركة",
+        "rendered": "",
+        "route": "workforce\/employee_advances.php",
+        "candidates": []
+    },
+    {
+        "ws": "DEP-07",
+        "tid": "NT-DEP-07-024",
+        "kind": "MENU_DUP",
+        "canonical": "تقرير القوى العاملة",
+        "rendered": "تقرير القوى العاملة",
+        "route": "workforce\/hr_workforce_report.php",
+        "candidates": []
+    },
+    {
+        "ws": "DEP-10",
+        "tid": "NT-DEP-10-003",
+        "kind": "CROSSED:NT-DEP-10-005",
+        "canonical": "مصفوفة مهل المعالجة للبلاغات",
+        "rendered": "كتالوج أنواع محل البلاغ",
+        "route": "tickets\/tkt_subject_types.php",
+        "candidates": []
+    },
+    {
+        "ws": "DEP-10",
+        "tid": "NT-DEP-10-005",
+        "kind": "MENU_DUP",
+        "canonical": "كتالوج أنواع محل البلاغ",
+        "rendered": "كتالوج أنواع محل البلاغ",
+        "route": "tickets\/tkt_subject_types.php",
+        "candidates": []
+    },
+    {
+        "ws": "DEP-14",
+        "tid": "NT-DEP-14-012",
+        "kind": "MENU_DUP",
+        "canonical": "الإصلاح الخارجي ومطالبات الضمان — بحسب انطباق الشركة",
+        "rendered": "الإصلاح الخارجي ومطالبات الضمان",
+        "route": "maintenance\/external_repairs.php",
+        "candidates": []
+    },
+    {
+        "ws": "DEP-14",
+        "tid": "NT-DEP-14-014",
+        "kind": "MENU_DUP",
+        "canonical": "العناية اليومية والتشحيم — بحسب انطباق الشركة",
+        "rendered": "العناية اليومية والتشحيم",
+        "route": "maintenance\/daily_care.php",
+        "candidates": []
+    },
+    {
+        "ws": "DEP-17",
+        "tid": "NT-DEP-17-001",
+        "kind": "BUILT_NOT_RENDERED",
+        "canonical": "لوحة المخازن",
+        "rendered": "",
+        "route": "procurement\/warehouse_board.php",
+        "candidates": [
+            "procurement\/master_data_proc.php(0.50 · المخازن وأنواعها)"
+        ]
+    },
+    {
+        "ws": "DEP-17",
+        "tid": "NT-DEP-17-003",
+        "kind": "BUILT_NOT_RENDERED",
+        "canonical": "إسناد أمناء المخازن",
+        "rendered": "",
+        "route": "procurement\/wh_custodians.php",
+        "candidates": []
+    },
+    {
+        "ws": "DEP-17",
+        "tid": "NT-DEP-17-004",
+        "kind": "BUILT_NOT_RENDERED",
+        "canonical": "دليل الأصناف",
+        "rendered": "",
+        "route": "procurement\/items_proc.php",
+        "candidates": []
+    },
+    {
+        "ws": "DEP-17",
+        "tid": "NT-DEP-17-005",
+        "kind": "BUILT_NOT_RENDERED",
+        "canonical": "سند الإدخال والفحص",
+        "rendered": "",
+        "route": "procurement\/wh_receipt.php",
+        "candidates": []
+    },
+    {
+        "ws": "DEP-17",
+        "tid": "NT-DEP-17-011",
+        "kind": "BUILT_NOT_RENDERED",
+        "canonical": "سند الصرف",
+        "rendered": "",
+        "route": "procurement\/issue_proc.php",
+        "candidates": []
+    },
+    {
+        "ws": "DEP-17",
+        "tid": "NT-DEP-17-013",
+        "kind": "BUILT_NOT_RENDERED",
+        "canonical": "العهد والمرتجعات",
+        "rendered": "",
+        "route": "procurement\/receipt_custody_proc.php",
+        "candidates": []
+    },
+    {
+        "ws": "DEP-17",
+        "tid": "NT-DEP-17-018",
+        "kind": "BUILT_NOT_RENDERED",
+        "canonical": "حدود الطلب وإعادة التزويد",
+        "rendered": "",
+        "route": "procurement\/reordering_proc.php",
+        "candidates": []
+    },
+    {
+        "ws": "WS-MY",
+        "tid": "NT-WS-MY-007",
+        "kind": "BUILT_NOT_RENDERED",
+        "canonical": "تغيير كلمة المرور والأمان الشخصي",
+        "rendered": "",
+        "route": "settings\/change_password.php",
+        "candidates": []
+    }
+]

@@ -1,0 +1,65 @@
+[
+    {
+        "ws": "DEP-09",
+        "tid": "NT-DEP-09-009",
+        "verdict": "WRONG_LABEL",
+        "canonical": "قبول المخاطر",
+        "cur_route": "risk\/risk_acceptance.php",
+        "cur_label": "القبول والاستثناءات",
+        "cur_sim": 0,
+        "candidates": [
+            [
+                0.5,
+                "Risk\/risk_committee.php",
+                "لجنة المخاطر"
+            ],
+            [
+                0.5,
+                "Risk\/risk_dept_ceo.php",
+                "المخاطر المؤسسية"
+            ],
+            [
+                0.5,
+                "Risk\/risk_dept_fin.php",
+                "المخاطر المالية"
+            ]
+        ]
+    },
+    {
+        "ws": "DEP-11",
+        "tid": "NT-DEP-11-006",
+        "verdict": "WRONG_LABEL",
+        "canonical": "التايم شيت اليومي",
+        "cur_route": "timesheet\/timesheet.php",
+        "cur_label": "تسجيل التايم شيت والإنتاج في الموقع",
+        "cur_sim": 0.33,
+        "candidates": [
+            [
+                0.5,
+                "Timesheet\/view_timesheet.php",
+                "تسجيل التايم شيت والإنتاج"
+            ],
+            [
+                0.4,
+                "Timesheet\/timesheet_type.php",
+                "حوكمة تسجيل التايم شيت والإنتاج"
+            ]
+        ]
+    },
+    {
+        "ws": "WS-MY",
+        "tid": "NT-WS-MY-004",
+        "verdict": "WRONG_LABEL",
+        "canonical": "طلباتي",
+        "cur_route": "finrequests\/request_form.php",
+        "cur_label": "طلباتي المالية",
+        "cur_sim": 0.5,
+        "candidates": [
+            [
+                1,
+                "FinRequests\/my_requests.php",
+                "طلباتي"
+            ]
+        ]
+    }
+]

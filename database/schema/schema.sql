@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-01 13:04:17
--- الجداول: 1044 · المناظير: 28
+-- المصدر: equipation_manage · التوليد: 2026-09-01 16:23:19
+-- الجداول: 1047 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -10080,6 +10080,54 @@ CREATE TABLE `governance_flags` (
   PRIMARY KEY (`flag_id`),
   UNIQUE KEY `uq_gf_element_scope` (`element_code`,`scope_type`,`scope_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='LEG-01 §7: أعلام التفعيل لكل عنصر على الكيان والعقد — الافتراض النمط ① (كله مطفأ)';
+
+-- ── Table: govui_label_log ──
+CREATE TABLE `govui_label_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `target_id` varchar(24) NOT NULL,
+  `store` varchar(64) NOT NULL COMMENT 'الجدولُ والعمودُ الذي كُتب',
+  `store_key` varchar(200) NOT NULL COMMENT 'مفتاحُ الصفِّ في مخزنِه',
+  `old_label` varchar(190) NOT NULL DEFAULT '',
+  `new_label` varchar(190) NOT NULL DEFAULT '',
+  `source_ref` varchar(190) NOT NULL COMMENT 'الملفُّ والورقةُ والصفُّ الحاكم',
+  `reason` varchar(190) NOT NULL DEFAULT '',
+  `changed_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_gll_t` (`target_id`),
+  KEY `ix_gll_store` (`store`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GOV_UI_EXEC §7 · UI_NAMING_CHANGELOG: كلُّ اسمٍ كُتب بقيمتِه السابقةِ وسندِه';
+
+-- ── Table: govui_space_fix_log ──
+CREATE TABLE `govui_space_fix_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `appearance_id` int(11) NOT NULL,
+  `space_ar` varchar(80) NOT NULL,
+  `route` varchar(190) NOT NULL,
+  `old_cls` varchar(32) NOT NULL,
+  `old_owner` varchar(120) NOT NULL,
+  `new_cls` varchar(32) NOT NULL,
+  `new_owner` varchar(120) NOT NULL,
+  `basis` varchar(255) NOT NULL,
+  `changed_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_gsfl_app` (`appearance_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GOV_UI_EXEC: قيدُ رجوعِ تصحيحِ منعِ السطحِ في مساحتِه المالكة';
+
+-- ── Table: govui_wiring_log ──
+CREATE TABLE `govui_wiring_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `target_id` varchar(24) NOT NULL,
+  `old_route` varchar(160) DEFAULT NULL,
+  `old_screen_id` varchar(12) DEFAULT NULL,
+  `old_type` varchar(16) NOT NULL DEFAULT '',
+  `new_route` varchar(160) DEFAULT NULL,
+  `new_screen_id` varchar(12) DEFAULT NULL,
+  `new_type` varchar(16) NOT NULL DEFAULT '',
+  `witness` varchar(400) NOT NULL,
+  `changed_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_gwl_t` (`target_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GOV_UI_EXEC §9: قيدُ رجوعِ أحكامِ الوصل';
 
 -- ── Table: guarantees ──
 CREATE TABLE `guarantees` (
