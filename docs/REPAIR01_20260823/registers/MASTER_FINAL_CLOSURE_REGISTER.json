@@ -1,7 +1,7 @@
 {
     "meta": {
-        "snapshot": "986cd866",
-        "updated_at": "2026-09-01 07:34",
+        "snapshot": "163b34b8",
+        "updated_at": "2026-09-01 07:44",
         "governing_order": "docs\/REPAIR01_20260823\/orders\/CLOSURE_SYSTEM.txt",
         "sprint_timeboxes": {
             "SPRINT-01": {
@@ -7314,10 +7314,10 @@
             "Estimated_Effort": "XL",
             "Evidence_Contract": "كل شاشة تبنى بنمط WH-03 الكامل (جدول بقيوده · شاشة بفعليها · التوصيل الكامل · البوابات خضر) وكل ادارة تبلغ §24 تدخل التحقق البشري فورا",
             "Next_Action": "استخراج Sprint من السجل واخذ اعلى الاهداف قيمة — 134 موضعا حاليا (لوحة DEPARTMENT_CONFORMANCE)",
-            "Current_Snapshot": "حبات قائمة استكملت: sites و site_day و site_day_shift · وسطحان يقران ولا يكتبان: ops_stop_register (التشغيل) و tre_petty_expense (الخزينة) @ 986cd866",
-            "Last_Updated_Snapshot": "986cd866",
-            "Last_Evidence_Ref": "DEP-12 الموقع اغلقت: 18 موضعا · TARGET_BUILD_COVERAGE 337\/413 ⇒ 355\/413 · RENDERED 224\/224 ⇒ 242\/242 · المطابق تماما 8 ⇒ 9 · برهان التصيير 20\/0 @ 986cd866",
-            "Status_Changed_At": "2026-09-01 07:34 @ 986cd866",
+            "Current_Snapshot": "لا سجل ثالثا للانسان: سجل الافراد التشغيليين بني فوق equipment_operators بحكم W03 · وست حبات قائمة استكملت @ 163b34b8",
+            "Last_Updated_Snapshot": "163b34b8",
+            "Last_Evidence_Ref": "DEP-13 القوى التشغيلية اغلقت: 14 موضعا · TARGET_BUILD_COVERAGE 355\/413 ⇒ 369\/413 · RENDERED 242\/242 ⇒ 256\/256 · المطابق تماما 9 ⇒ 10 · برهان التصيير 16\/0 · الحقول 1503\/4652 ⇒ 1651\/4800 @ 163b34b8",
+            "Status_Changed_At": "2026-09-01 07:44 @ 163b34b8",
             "Final_Disposition": "",
             "Levels": {
                 "Decision": "DECIDED",

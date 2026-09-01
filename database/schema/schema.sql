@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-01 10:34:24
--- الجداول: 1028 · المناظير: 28
+-- المصدر: equipation_manage · التوليد: 2026-09-01 10:44:13
+-- الجداول: 1035 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -3623,6 +3623,21 @@ CREATE TABLE `equipment_operators` (
   `notes` text DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `person_code` varchar(80) DEFAULT NULL COMMENT 'كود الفرد',
+  `person_name` varchar(255) DEFAULT NULL COMMENT 'الاسم ◄',
+  `wf_category` varchar(80) DEFAULT NULL COMMENT 'الفئة التشغيلية ▼',
+  `affiliation` varchar(80) DEFAULT NULL COMMENT 'التبعية ▼',
+  `distribution_track` varchar(80) DEFAULT NULL COMMENT 'مسار التوزيع ▼',
+  `qualified_equipment_types` varchar(255) DEFAULT NULL COMMENT 'أنواع المعدات المؤهَّل عليها ◄',
+  `current_site` varchar(255) DEFAULT NULL COMMENT 'الموقع الحالي ◄',
+  `current_allocation` varchar(255) DEFAULT NULL COMMENT 'التخصيص الحالي ◄',
+  `rotation_pattern` varchar(255) DEFAULT NULL COMMENT 'نمط التناوب ◄',
+  `reviewer` varchar(255) DEFAULT NULL COMMENT 'المراجع',
+  `approved_by` int(11) DEFAULT NULL COMMENT 'المعتمِد',
+  `approved_at` datetime DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `data_state` varchar(255) DEFAULT NULL COMMENT 'حالة البيانات ▼',
+  `src_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_by` int(11) DEFAULT NULL COMMENT 'المُنشئ',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_operator_employee` (`employee_id`),
   KEY `idx_operator_company` (`company_id`)
@@ -11708,6 +11723,20 @@ CREATE TABLE `operator_rotations` (
   `created_by` int(10) unsigned DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `cycle_code` varchar(255) DEFAULT NULL COMMENT 'معرّف الدورة',
+  `person_ref` varchar(80) DEFAULT NULL COMMENT 'كود الفرد ◄',
+  `rotation_pattern` varchar(80) DEFAULT NULL COMMENT 'نمط التناوب ▼',
+  `cycle_start_date` varchar(255) DEFAULT NULL COMMENT 'بداية الدورة',
+  `leave_start` varchar(255) DEFAULT NULL COMMENT 'بداية الإجازة',
+  `leave_end` varchar(255) DEFAULT NULL COMMENT 'نهاية الإجازة',
+  `leave_type` varchar(80) DEFAULT NULL COMMENT 'نوع الإجازة ▼',
+  `assigned_backup` varchar(255) DEFAULT NULL COMMENT 'البديل المكلَّف ◄',
+  `backup_qual_check` varchar(255) DEFAULT NULL COMMENT 'فحص تأهيل البديل ◄',
+  `swap_state` varchar(80) DEFAULT NULL COMMENT 'حالة التبادل ▼',
+  `coverage_effect` varchar(255) DEFAULT NULL COMMENT 'أثر التغطية ◄',
+  `cycle_state` varchar(80) DEFAULT NULL COMMENT 'حالة الدورة ▼',
+  `data_state` varchar(255) DEFAULT NULL COMMENT 'حالة البيانات ▼',
+  `src_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع المصدر',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_rotation` (`company_id`,`container_id`,`operator_employee_id`,`cycle_start`),
   KEY `ix_rotation_op` (`company_id`,`operator_employee_id`),
@@ -24161,6 +24190,27 @@ CREATE TABLE `waivers_reversals` (
   KEY `ix_wr_source` (`source_type`,`source_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GOV-01 §8: الإعفاء والعكس والتعليق والتخفيض — Insert-only ولا حذف للأصل أبدًا';
 
+-- ── Table: wf_category ──
+CREATE TABLE `wf_category` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0,
+  `category_code` varchar(80) DEFAULT NULL COMMENT 'كود الفئة',
+  `category_name` varchar(255) DEFAULT NULL COMMENT 'اسم الفئة',
+  `job_family` varchar(255) DEFAULT NULL COMMENT 'العائلة الوظيفية ◄',
+  `org_structure_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع الهيكل النافذ ◄',
+  `equipment_applies` varchar(80) DEFAULT NULL COMMENT 'تنطبق عليها معدة؟ ▼',
+  `matrix_requirements` varchar(255) DEFAULT NULL COMMENT 'متطلبات المصفوفة المرجعية ◄',
+  `title_examples` varchar(255) DEFAULT NULL COMMENT 'أمثلة مسميات',
+  `category_state` varchar(80) DEFAULT NULL COMMENT 'حالة الفئة ▼',
+  `data_state` varchar(255) DEFAULT NULL COMMENT 'حالة البيانات ▼',
+  `src_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_e2e7ea84_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='DEP-13 — تصنيف الفئات التشغيلية · الحبة: فئةٌ تشغيليةٌ واحدة';
+
 -- ── Table: wf_coverage ──
 CREATE TABLE `wf_coverage` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -24185,6 +24235,148 @@ CREATE TABLE `wf_coverage` (
   CONSTRAINT `chk_wfc_rule` CHECK (`derivation_rule` <> ''),
   CONSTRAINT `chk_wfc_var` CHECK (`variance_rule` <> '')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='WRK-03 المطلوب مقابل المتوفر - سطر فجوة مشتق والمدخل مراة بفارقها';
+
+-- ── Table: wf_dashboard_kpi ──
+CREATE TABLE `wf_dashboard_kpi` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0,
+  `kpi_id` varchar(60) DEFAULT NULL COMMENT 'معرّف المؤشر',
+  `kpi_ref` varchar(255) DEFAULT NULL COMMENT 'المؤشر ◄',
+  `category` varchar(255) DEFAULT NULL COMMENT 'الفئة ◄',
+  `value` decimal(18,2) DEFAULT NULL COMMENT 'القيمة ◄',
+  `uom` varchar(80) DEFAULT NULL COMMENT 'الوحدة ◄',
+  `state` varchar(255) DEFAULT NULL COMMENT 'الحالة ◄',
+  `updated_on` datetime DEFAULT NULL COMMENT 'آخر تحديث ◄',
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_2d391cea_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='DEP-13 — لوحة القوى التشغيلية · الحبة: مؤشرٌ واحدٌ من مؤشراتِ القوى';
+
+-- ── Table: wf_equipment_shift_assignment ──
+CREATE TABLE `wf_equipment_shift_assignment` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0,
+  `assignment_no` varchar(80) DEFAULT NULL COMMENT 'رقم التكليف',
+  `allocation_ref` varchar(80) DEFAULT NULL COMMENT 'رقم تخصيص المشروع ◄',
+  `person_ref` varchar(80) DEFAULT NULL COMMENT 'كود الفرد ◄',
+  `equipment_ref` varchar(80) DEFAULT NULL COMMENT 'كود المعدة ◄',
+  `equipment_type` varchar(255) DEFAULT NULL COMMENT 'نوع المعدة ◄',
+  `matrix_check` varchar(255) DEFAULT NULL COMMENT 'فحص المصفوفة ◄',
+  `shift` varchar(80) DEFAULT NULL COMMENT 'الوردية ▼',
+  `from_date` date DEFAULT NULL COMMENT 'من تاريخ',
+  `to_date` date DEFAULT NULL COMMENT 'إلى تاريخ',
+  `approved_backup` varchar(255) DEFAULT NULL COMMENT 'بديل معتمد ◄',
+  `end_reason` varchar(80) DEFAULT NULL COMMENT 'سبب الإنهاء ▼',
+  `assignment_state` varchar(80) DEFAULT NULL COMMENT 'حالة التكليف ▼',
+  `reviewer` varchar(255) DEFAULT NULL COMMENT 'المراجع',
+  `approved_by` int(11) DEFAULT NULL COMMENT 'المعتمِد',
+  `approved_at` datetime DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `data_state` varchar(255) DEFAULT NULL COMMENT 'حالة البيانات ▼',
+  `src_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_56f60216_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='DEP-13 — تخصيص المعدة والوردية · الحبة: تكليفُ فردٍ على معدّةٍ في وردية';
+
+-- ── Table: wf_field_incident ──
+CREATE TABLE `wf_field_incident` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0,
+  `incident_no` varchar(80) DEFAULT NULL COMMENT 'رقم الواقعة',
+  `incident_date` date DEFAULT NULL COMMENT 'التاريخ',
+  `person_ref` varchar(80) DEFAULT NULL COMMENT 'كود الفرد ◄',
+  `affiliation_ref` varchar(255) DEFAULT NULL COMMENT 'التبعية ◄',
+  `incident_type` varchar(80) DEFAULT NULL COMMENT 'نوع الواقعة ▼',
+  `incident_desc` varchar(500) DEFAULT NULL COMMENT 'وصف الواقعة',
+  `evidence_ref` varchar(255) DEFAULT NULL COMMENT 'الدليل/المرفق',
+  `referred_to` varchar(255) DEFAULT NULL COMMENT 'الإحالة إلى ◄',
+  `case_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع القضية ب08-0 ◄',
+  `supplier_settlement_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع تسوية المورد ◄',
+  `incident_state` varchar(80) DEFAULT NULL COMMENT 'حالة الواقعة ▼',
+  `data_state` varchar(255) DEFAULT NULL COMMENT 'حالة البيانات ▼',
+  `src_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_c2f0f2af_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='DEP-13 — وقائع الميدان والإحالة التأديبية · الحبة: واقعةُ ميدانٍ واحدةٌ على فردٍ واحد';
+
+-- ── Table: wf_nomination ──
+CREATE TABLE `wf_nomination` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0,
+  `nomination_no` varchar(255) DEFAULT NULL COMMENT 'معرّف الترشيح',
+  `requirement_ref` varchar(255) DEFAULT NULL COMMENT 'معرّف الاحتياج ◄',
+  `person_ref` varchar(80) DEFAULT NULL COMMENT 'كود الفرد ◄',
+  `category_ref` varchar(255) DEFAULT NULL COMMENT 'الفئة ◄',
+  `nomination_source` varchar(80) DEFAULT NULL COMMENT 'مصدر الترشيح ▼',
+  `prequal_check` varchar(255) DEFAULT NULL COMMENT 'فحص التأهيل المبدئي ◄',
+  `license_check` varchar(255) DEFAULT NULL COMMENT 'فحص الرخصة ◄',
+  `interview_result` varchar(255) DEFAULT NULL COMMENT 'نتيجة المقابلة/الاختبار',
+  `decision` varchar(500) DEFAULT NULL COMMENT 'القرار ▼',
+  `contract_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع التعاقد ◄',
+  `nomination_state` varchar(80) DEFAULT NULL COMMENT 'حالة الترشيح ▼',
+  `data_state` varchar(255) DEFAULT NULL COMMENT 'حالة البيانات ▼',
+  `src_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_abc68a16_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='DEP-13 — الترشيح والاختيار للتغطية · الحبة: ترشيحُ فردٍ واحدٍ على احتياجٍ واحد';
+
+-- ── Table: wf_project_allocation ──
+CREATE TABLE `wf_project_allocation` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0,
+  `allocation_no` varchar(80) DEFAULT NULL COMMENT 'رقم التخصيص',
+  `requirement_ref` varchar(255) DEFAULT NULL COMMENT 'معرّف الاحتياج المغطَّى ◄',
+  `person_ref` varchar(80) DEFAULT NULL COMMENT 'كود الفرد ◄',
+  `qualification_check` varchar(255) DEFAULT NULL COMMENT 'فحص التأهيل ◄',
+  `project_contract_check` varchar(255) DEFAULT NULL COMMENT 'فحص عقد المشروع ◄',
+  `project_ref` varchar(255) DEFAULT NULL COMMENT 'المشروع ◄',
+  `site_ref` varchar(255) DEFAULT NULL COMMENT 'الموقع ◄',
+  `from_date` date DEFAULT NULL COMMENT 'من تاريخ',
+  `to_date` date DEFAULT NULL COMMENT 'إلى تاريخ',
+  `housing_unit_ref` varchar(80) DEFAULT NULL COMMENT 'وحدة السكن ◄',
+  `allocation_state` varchar(80) DEFAULT NULL COMMENT 'حالة التخصيص ▼',
+  `reviewer` varchar(255) DEFAULT NULL COMMENT 'المراجع',
+  `approved_by` int(11) DEFAULT NULL COMMENT 'المعتمِد',
+  `approved_at` datetime DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `data_state` varchar(255) DEFAULT NULL COMMENT 'حالة البيانات ▼',
+  `src_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_69539f61_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='DEP-13 — التخصيص للمشروع · الحبة: تخصيصُ فردٍ واحدٍ لمشروعٍ واحدٍ في مدّة';
+
+-- ── Table: wf_qualification_matrix ──
+CREATE TABLE `wf_qualification_matrix` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0,
+  `rule_code` varchar(255) DEFAULT NULL COMMENT 'معرّف القاعدة',
+  `type_or_category` varchar(255) DEFAULT NULL COMMENT 'النوع/الفئة',
+  `min_proficiency` varchar(80) DEFAULT NULL COMMENT 'مستوى التأهيل الأدنى ▼',
+  `required_license` varchar(80) DEFAULT NULL COMMENT 'فئة الرخصة المطلوبة ▼',
+  `medical_required` varchar(80) DEFAULT NULL COMMENT 'فحص طبي مطلوب؟ ▼',
+  `recert_period` varchar(80) DEFAULT NULL COMMENT 'دورية إعادة الاعتماد',
+  `supervised_exception` varchar(80) DEFAULT NULL COMMENT 'استثناء بإشراف؟ ▼',
+  `rule_state` varchar(80) DEFAULT NULL COMMENT 'حالة القاعدة ▼',
+  `data_state` varchar(255) DEFAULT NULL COMMENT 'حالة البيانات ▼',
+  `src_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_c408c457_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='DEP-13 — مصفوفة التأهيل والجاهزية · الحبة: قاعدةُ تأهيلٍ واحدةٌ لنوعٍ أو فئة';
 
 -- ── Table: work_delegations ──
 CREATE TABLE `work_delegations` (
@@ -24361,6 +24553,14 @@ CREATE TABLE `worker_contract` (
   `created_by` int(11) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `row_code` varchar(255) DEFAULT NULL COMMENT 'معرّف السطر ◄',
+  `person_ref` varchar(80) DEFAULT NULL COMMENT 'كود الفرد ◄',
+  `project_contract_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع عقد المشروع ب05 ◄',
+  `project_ref` varchar(255) DEFAULT NULL COMMENT 'المشروع ◄',
+  `valid_from` date DEFAULT NULL COMMENT 'من ◄',
+  `valid_to` date DEFAULT NULL COMMENT 'إلى ◄',
+  `end_trigger` varchar(255) DEFAULT NULL COMMENT 'محفّز الانتهاء ◄',
+  `contract_state` varchar(255) DEFAULT NULL COMMENT 'حالة العقد ◄',
   PRIMARY KEY (`id`),
   KEY `idx_wc_worker` (`employee_id`),
   KEY `idx_wc_company` (`company_id`),
@@ -24390,6 +24590,16 @@ CREATE TABLE `worker_evaluation` (
   `created_by` int(11) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `row_code` varchar(255) DEFAULT NULL COMMENT 'معرّف السطر ◄',
+  `period_ref` varchar(255) DEFAULT NULL COMMENT 'الفترة ◄',
+  `person_ref` varchar(80) DEFAULT NULL COMMENT 'كود الفرد ◄',
+  `category_ref` varchar(255) DEFAULT NULL COMMENT 'الفئة ◄',
+  `approved_hours` decimal(12,2) DEFAULT NULL COMMENT 'ساعات معتمدة ◄',
+  `approved_units` decimal(18,3) DEFAULT NULL COMMENT 'وحدات معتمدة ◄',
+  `field_days` int(11) DEFAULT NULL COMMENT 'أيام ميدان ◄',
+  `shift_compliance` varchar(255) DEFAULT NULL COMMENT 'الالتزام بالوردية ◄',
+  `period_incidents` varchar(255) DEFAULT NULL COMMENT 'وقائع الفترة ◄',
+  `performance_index` decimal(8,2) DEFAULT NULL COMMENT 'مؤشر الأداء ◄',
   PRIMARY KEY (`id`),
   KEY `idx_we_worker` (`employee_id`),
   KEY `idx_we_company` (`company_id`),
@@ -24469,6 +24679,18 @@ CREATE TABLE `worker_movement` (
   `created_by` int(11) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `row_code` varchar(255) DEFAULT NULL COMMENT 'معرّف السطر',
+  `row_date` date DEFAULT NULL COMMENT 'التاريخ',
+  `person_ref` varchar(80) DEFAULT NULL COMMENT 'كود الفرد ◄',
+  `row_kind` varchar(80) DEFAULT NULL COMMENT 'نوع السطر ▼',
+  `presence_state` varchar(80) DEFAULT NULL COMMENT 'حالة التواجد ▼',
+  `span_from` varchar(80) DEFAULT NULL COMMENT 'من ◄',
+  `span_to` varchar(80) DEFAULT NULL COMMENT 'إلى ◄',
+  `transfer_order_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع أمر النقل ◄',
+  `site_presence` varchar(255) DEFAULT NULL COMMENT 'التواجد بالموقع ◄',
+  `row_state` varchar(80) DEFAULT NULL COMMENT 'حالة السطر ▼',
+  `data_state` varchar(255) DEFAULT NULL COMMENT 'حالة البيانات ▼',
+  `src_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع المصدر',
   PRIMARY KEY (`id`),
   KEY `idx_wm_worker` (`employee_id`),
   KEY `idx_wm_company` (`company_id`),
@@ -24496,6 +24718,12 @@ CREATE TABLE `worker_qualification` (
   `created_by` int(11) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `qual_code` varchar(255) DEFAULT NULL COMMENT 'معرّف التأهيل',
+  `certificate_no` varchar(80) DEFAULT NULL COMMENT 'رقم الشهادة',
+  `practical_test_result` varchar(255) DEFAULT NULL COMMENT 'نتيجة الاختبار العملي',
+  `qual_state` varchar(255) DEFAULT NULL COMMENT 'حالة التأهيل ◄',
+  `data_state` varchar(255) DEFAULT NULL COMMENT 'حالة البيانات ▼',
+  `src_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع المصدر',
   PRIMARY KEY (`id`),
   KEY `idx_wq_worker` (`employee_id`),
   KEY `idx_wq_company` (`company_id`),
@@ -24534,6 +24762,19 @@ CREATE TABLE `worker_settlement` (
   `created_by` int(11) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `settlement_no` varchar(80) DEFAULT NULL COMMENT 'رقم التسوية',
+  `allocation_ref` varchar(80) DEFAULT NULL COMMENT 'رقم التخصيص ◄',
+  `person_ref` varchar(80) DEFAULT NULL COMMENT 'كود الفرد ◄',
+  `end_reason` varchar(255) DEFAULT NULL COMMENT 'سبب الإنهاء ◄',
+  `housing_cleared` varchar(255) DEFAULT NULL COMMENT 'إخلاء السكن ◄',
+  `custody_returned` varchar(255) DEFAULT NULL COMMENT 'عُهد مردودة ◄',
+  `custody_pending` varchar(255) DEFAULT NULL COMMENT 'عُهد معلَّقة ◄',
+  `due_basis` varchar(255) DEFAULT NULL COMMENT 'أساس المستحق ◄',
+  `paying_party` varchar(255) DEFAULT NULL COMMENT 'جهة الصرف ◄',
+  `hr_clearance_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع تصفية الموارد ◄',
+  `settlement_state` varchar(80) DEFAULT NULL COMMENT 'حالة التسوية ▼',
+  `data_state` varchar(255) DEFAULT NULL COMMENT 'حالة البيانات ▼',
+  `src_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع المصدر',
   PRIMARY KEY (`id`),
   KEY `idx_ws_worker` (`employee_id`),
   KEY `idx_ws_company` (`company_id`),
