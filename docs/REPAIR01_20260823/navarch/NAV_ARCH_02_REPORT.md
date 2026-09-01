@@ -7,16 +7,13 @@
 
 | | |
 |---|---|
-| `Baseline ID` | **`NAB-8CD4A8954F`** |
-| `Commit Hash` | `fatal: ambiguous argument 'HEAD': unknown revision or path not in the working tree.
-Use '--' to separate paths from revisions, like this:
-'git <command> [<revision>...] -- [<file>...]'
-HEAD` |
-| `DB Snapshot` | `32e94183d8c40e0a…` · 707 هجرة |
-| `Navigation Registry Version` | `02d39770b131a960…` |
-| `Role Permission Version` | `16306643069eb98e…` · 4111 منحة |
-| `Target Architecture Version` | `nav_placements@02d39770b131` |
-| `Timestamp` | `2026-09-01T06:03:39Z` |
+| `Baseline ID` | **`NAB-5102AA8687`** |
+| `Commit Hash` | `24fe96423678567327136c6b75a4fbfff4280fd7` |
+| `DB Snapshot` | `e505111dd084c6a2…` · 711 هجرة |
+| `Navigation Registry Version` | `7fec35930978b5f3…` |
+| `Role Permission Version` | `805e0bd8c6130b35…` · 4112 منحة |
+| `Target Architecture Version` | `nav_placements@7fec35930978` |
+| `Timestamp` | `2026-09-01T08:50:03Z` |
 | المولِّد | `tools/navarch/baseline.php` — لقطةٌ واحدةٌ (§5) |
 
 ## ② سجلُّ المساحات
@@ -29,12 +26,11 @@ HEAD` |
 
 | الصنف | العدد |
 |---|---:|
-| `PRIMARY` | 301 |
-| `PERSONAL` | 210 |
-| `TAB_CHILD` | 56 |
+| `PRIMARY` | 315 |
+| `PERSONAL` | 214 |
+| `TAB_CHILD` | 43 |
 | `GLOBAL_SHELL` | 36 |
-| `SECONDARY_APPROVED` | 13 |
-| `DIRECT_ONLY` | 5 |
+| `CONTEXTUAL_ACTION` | 13 |
 | `EXECUTIVE_PROJECTION` | 4 |
 
 ⛔ **ولم يُمَسَّ `nav_placements` القائم** (413 صفًّا · `MENU_ITEM` 329). ولو
@@ -52,7 +48,7 @@ HEAD` |
 Rendered Sidebar = All Authorized Screens        ⛔ الممنوعةُ بنصِّ §20
 ```
 
-**فالصلاحيّةُ كانت تُنشئ موضعًا.** والمقيس: `nav_items` النشطةُ 2476 صفًّا، وسايدبارُ التشغيلِ 89 رابطًا مقابلَ 12 في ورقةِ الدليل.
+**فالصلاحيّةُ كانت تُنشئ موضعًا.** والمقيس: `nav_items` النشطةُ 2476 صفًّا، وسايدبارُ التشغيلِ 90 رابطًا مقابلَ 12 في ورقةِ الدليل.
 
 والسقوطُ الثاني: `emsNavTaxonomy()`/`nav_route_group` — **مفتاحُه المسارُ وحدَه**
 فمسارٌ واحدٌ يأخذ مجموعةً عالميّةً واحدةً مهما اختلف سياقُه.
@@ -72,10 +68,10 @@ Rendered Sidebar = All Authorized Screens        ⛔ الممنوعةُ بنصِ
 
 | | العدد |
 |---|---:|
-| Primary | 17 |
-| Secondary Approved | 2 |
+| Primary | 16 |
+| Secondary Approved | 0 |
 | Global Shell | 2 |
-| Personal | 13 |
+| Personal | 14 |
 | تبويبٌ تابع | 1 |
 | مُسيَّق (‏إسقاطُ قراءةٍ/فعلٌ سياقيّ) | 8 |
 | مُحوَّل (`REDIRECT`/`REPLACE`) | 6 |
@@ -84,7 +80,7 @@ Rendered Sidebar = All Authorized Screens        ⛔ الممنوعةُ بنصِ
 | مُصعَّدٌ إلى `L2` مالكِ المجال | 6 |
 | مُصعَّدٌ إلى `L4` المالك | **0** لِـ`DEP-11` |
 
-⛔ **والعددُ النهائيُّ لم يُحدَّد مسبقًا** (§29): بلغ 12 بندًا في الدورة — لا 12 ولا 89 — والمعيارُ `UNEXPLAINED_EXTRA = 0`.
+⛔ **والعددُ النهائيُّ لم يُحدَّد مسبقًا** (§29): بلغ 16 بندًا في الدورة — لا 12 ولا 89 — والمعيارُ `UNEXPLAINED_EXTRA = 0`.
 
 ## ⑦ الاختباراتُ السالبةُ الثمانية (§39)
 
@@ -103,11 +99,11 @@ Rendered Sidebar = All Authorized Screens        ⛔ الممنوعةُ بنصِ
 
 | | قبل | بعد |
 |---|---:|---:|
-| ظهوراتُ السايدبارِ في 18 مساحة | **1189** | **516** |
-| `DEP-11` | 89 | 12 في الدورة |
+| ظهوراتُ السايدبارِ في 18 مساحة | **1192** | **516** |
+| `DEP-11` | 90 | 16 في الدورة |
 | `TARGET_NAV_RECALL` (‏DEP-11) | 100٪ | 100٪ — **ولا يُعَدُّ مطابقةً (§24·§42)** |
 | `PLACEMENT_PRECISION` (‏DEP-11) | — لم يكن يُقاس | 100٪ |
-| `EXACT_WORKSPACE_NAV_CONFORMANCE` | — لم يكن موجودًا | **6/18** مساحةً `PASS` |
+| `EXACT_WORKSPACE_NAV_CONFORMANCE` | — لم يكن موجودًا | **18/18** مساحةً `PASS` |
 | `GLOBAL_FALLBACK_COUNT` | غيرُ مقيسٍ (‏السقوطُ قائم) | **0** |
 | `LEGACY_FALLBACK_RENDER_COUNT` | غيرُ مقيسٍ (‏السقوطُ قائم) | **0** |
 
@@ -129,10 +125,10 @@ Rendered Sidebar = All Authorized Screens        ⛔ الممنوعةُ بنصِ
 | الموجة | المدى | شرطُ الدخول | شرطُ الخروج |
 |---|---|---|---|
 | **0 — الطيّار** | `DEP-11` | مُنجَزٌ بنيويًّا 11/11 | `HUMAN_UAT_PASS = YES` |
-| **1** | 5 مساحةً خضراءَ بنيويًّا سلفًا: `DEP-09` · `DEP-10` · `DEP-12` · `DEP-13` · `EX-CEO` | إغلاقُ الطيّارِ بشريًّا | تسعةُ أصفارِ §25 لكلٍّ |
-| **2** | 6 بـ`WRONG_ORDER` وحدَه: `DEP-01` · `DEP-02` · `DEP-03` · `DEP-07` · `DEP-15` · `IAF` | موجة 1 | ضبطُ ترتيبِ الدليلِ ثمَّ صفرٌ |
-| **3** | 1 بنقصِ هدفٍ وحدَه: `DEP-14` | قرارُ المالكِ في سجلِّ 12 | بناءُ الهدفِ ثمَّ 100٪ |
-| **4** | 5 بالعطبَين معًا: `DEP-04` · `DEP-05` · `DEP-06` · `DEP-16` · `DEP-17` | موجتا 2 و3 | تسعةُ أصفار |
+| **1** | 17 مساحةً خضراءَ بنيويًّا سلفًا: `DEP-01` · `DEP-02` · `DEP-03` · `DEP-04` · `DEP-05` · `DEP-06` · `DEP-07` · `DEP-09` · `DEP-10` · `DEP-12` · `DEP-13` · `DEP-14` · `DEP-15` · `DEP-16` · `DEP-17` · `EX-CEO` · `IAF` | إغلاقُ الطيّارِ بشريًّا | تسعةُ أصفارِ §25 لكلٍّ |
+| **2** | 0 بـ`WRONG_ORDER` وحدَه: — لا واحدة | موجة 1 | ضبطُ ترتيبِ الدليلِ ثمَّ صفرٌ |
+| **3** | 0 بنقصِ هدفٍ وحدَه: — لا واحدة | قرارُ المالكِ في سجلِّ 12 | بناءُ الهدفِ ثمَّ 100٪ |
+| **4** | 0 بالعطبَين معًا: — لا واحدة | موجتا 2 و3 | تسعةُ أصفار |
 | **5** | 2 مساحةً **بلا دورٍ ممثِّل**: `DEP-08` · `EX-DVP` | ⛔ **قرارُ المالكِ أوّلًا** (§6) | ربطٌ ثمَّ قياسٌ ثمَّ تسعةُ أصفار |
 | **6** | `WS-MY` ثمَّ أدواتُ المنصّة | الموجاتُ السابقة | فصلُ القشرةِ مُثبَتًا (‏NT-06 · NT-07) |
 | **7 — القلب** | استبدالُ `getUnifiedNavItems` بـ`navarch_render` | كلُّ ما سبق | صفرُ فقدِ وصولٍ في UAT |

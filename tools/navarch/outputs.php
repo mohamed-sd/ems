@@ -414,21 +414,92 @@ foreach ($it as $f) {
 if ($scanned < 100) { fwrite(STDERR, "⛔ مقامُ المسحِ {$scanned} ملفًّا — كسرٌ في الماسح\n"); exit(1); }
 echo "  ◆ مسحُ التبعيّة: {$scanned} ملفًّا · " . count($needle) . " مسارًا\n";
 
+/* ═══ §33 — **تبعيّاتُ الإيقافِ الستُّ: ما يُقاس يُقاس، وما لا يُقاس يُسمّى** ═══
+ * ◆ **نصُّ §33**: «⛔ ولا تحذف Route تاريخية قبل فحص: bookmarks · internal
+ *   links · tasks · notifications · reports · integrations».
+ * ◆ **وكانت أربعٌ منها تخرج «— لم يُقَس»** — وهو إعلانٌ صادقٌ لكنّه يوقف
+ *   الدفتر. والمقيسُ الآن أنَّ **الإشعاراتِ والمهامَّ محفوظةٌ في جداولَ تحمل
+ *   وجهتَها نصًّا**، فتُفتَّش بدل أن تُعلَن مجهولة [[evidence-one-join-away]]:
+ *     `personal_notifications.link` (10,297) · `fin_notifications.link` (10,070)
+ *     `tkt_notifications.link_url` (50) · `trs_notifications.link_url` (20)
+ *     `task_templates` + `recurring_tasks` (‏قوالبُ المهامِّ ودوريّاتُها)
+ * ◆ **والمفضّلاتُ والتكاملاتُ تبقى «لا سجلَّ لها في هذه الشجرة»** — ⛔ وهذا
+ *   **ليس «صفرَ تبعيّة»**: غيابُ القياسِ ليس غيابَ استعمال (§32)، فلا يُبيح
+ *   إيقافَ مسار. [[evidence-one-join-away]]: «غيرُ محفوظ» بعد فحصِ جدولٍ
+ *   واحدٍ حكمٌ سابقٌ لأوانه — فيُعَدُّ ما فُتِّش ويُسمّى.
+ */
+$depTables = array(
+    array('personal_notifications', 'link',     'إشعارات'),
+    array('fin_notifications',      'link',     'إشعارات'),
+    array('tkt_notifications',      'link_url', 'إشعارات'),
+    array('trs_notifications',      'link_url', 'إشعارات'),
+    array('task_templates',         null,       'مهامّ'),
+);
+$depHits = array('إشعارات' => array(), 'مهامّ' => array());
+$depScanned = array('إشعارات' => 0, 'مهامّ' => 0);
+$depTablesOk = array();
+foreach ($depTables as $dt) {
+    list($tbl, $col, $kind) = $dt;
+    $q = $conn->query("SELECT COUNT(*) c FROM information_schema.TABLES
+                        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '" . $tbl . "'");
+    if (!$q || (int) $q->fetch_assoc()['c'] === 0) { continue; }
+    if ($col === null) {                       /* جدولٌ بلا عمودِ وجهةٍ — يُفتَّش نصُّه كلُّه */
+        $cols = array();
+        $r2 = $conn->query("SHOW COLUMNS FROM `" . $tbl . "`");
+        while ($r2 && ($x2 = $r2->fetch_assoc())) {
+            if (preg_match('~char|text~i', (string) $x2['Type'])) { $cols[] = '`' . $x2['Field'] . '`'; }
+        }
+        if (empty($cols)) { continue; }
+        $expr = 'CONCAT_WS(\' \',' . implode(',', $cols) . ')';
+    } else { $expr = '`' . $col . '`'; }
+    $depTablesOk[] = $tbl;
+    $r2 = $conn->query("SELECT {$expr} v FROM `" . $tbl . "` WHERE {$expr} IS NOT NULL AND {$expr} <> ''");
+    while ($r2 && ($x2 = $r2->fetch_row())) {
+        $depScanned[$kind]++;
+        $low = mb_strtolower((string) $x2[0]);
+        foreach ($needle as $rt => $_) {
+            if (strpos($low, $rt) !== false) {
+                $depHits[$kind][$rt] = (isset($depHits[$kind][$rt]) ? $depHits[$kind][$rt] : 0) + 1;
+            }
+        }
+    }
+}
+echo "  ◆ مسحُ التبعيّةِ في القاعدة: إشعاراتٌ " . $depScanned['إشعارات']
+   . " وجهةً · مهامُّ " . $depScanned['مهامّ'] . " صفًّا · جداولُ: "
+   . implode(' , ', $depTablesOk) . "\n";
+
+
+$freeToStop = 0;
 foreach ($retire as $l) {
-    $hits = isset($needle[$l['current_route']]) ? $needle[$l['current_route']] : -1;
-    $s[] = array($l['legacy_item_id'], $l['current_workspace'], $l['current_route'],
+    $rt   = $l['current_route'];
+    $hits = isset($needle[$rt]) ? $needle[$rt] : -1;
+    $nHit = isset($depHits['إشعارات'][$rt]) ? $depHits['إشعارات'][$rt] : 0;
+    $tHit = isset($depHits['مهامّ'][$rt])   ? $depHits['مهامّ'][$rt]   : 0;
+    /* ⛔ **والحكمُ لا يُبنى على المقيسِ وحدَه**: المفضّلاتُ والتكاملاتُ **لا سجلَّ
+       لهما في هذه الشجرة** — وغيابُ القياسِ ليس غيابَ استعمال (§32). فلا يُقال
+       «يجوز الإيقاف» بل «خلا المقيسُ ويبقى غيرُ المقيسِ حاجزًا». */
+    $blockers = array();
+    if ($hits > 0) { $blockers[] = 'روابطُ شجرةٍ: ' . $hits; }
+    if ($nHit > 0) { $blockers[] = 'إشعاراتٌ حيّة: ' . $nHit; }
+    if ($tHit > 0) { $blockers[] = 'مهامُّ/قوالبُ: ' . $tHit; }
+    if (empty($blockers)) { $freeToStop++; }
+    $s[] = array($l['legacy_item_id'], $l['current_workspace'], $rt,
         $l['action'], $l['disposition'], $l['retire_stage'],
         $l['target_match'] ? $l['target_match'] : '—',
-        $hits, '— لا سجلَّ مفضّلاتٍ في هذه الشجرة', '— لم يُقَس', '— لم يُقَس',
-        '— لم يُقَس', '— لم يُقَس',
-        ($hits === 0 ? 'يُدرَس — وستُّ التبعيّاتِ لم تُقَس كلُّها بعد'
-                     : 'لا — ' . $hits . ' ملفًّا يذكر المسار'),
+        $hits, '— لا سجلَّ مفضّلاتٍ في هذه الشجرة', $tHit, $nHit,
+        $hits, '— لا سجلَّ تكاملاتٍ في هذه الشجرة',
+        (empty($blockers)
+            ? '⛔ لا — خلا المقيسُ الأربعةُ، ويبقى **المفضّلاتُ والتكاملاتُ غيرَ مقيسَين** (§32)'
+            : '⛔ لا — ' . implode(' · ', $blockers)),
         $l['evidence']);
 }
 $sheets['11 RETIREMENT_LEDGER'] = $s;
 $idx[] = array('11', 'NAV_RETIREMENT_LEDGER',
-    count($retire) . ' بندًا للتقاعدِ/التحويل — **وكلُّها في المرحلةِ A أو NONE**',
-    '⛔ ولا يُحذَف مسارٌ قبلَ فحصِ التبعيّاتِ الستِّ (§33) — وأربعٌ منها **لم تُقَس بعد**');
+    count($retire) . ' بندًا للتقاعدِ/التحويل — **وكلُّها في المرحلةِ A أو NONE** · '
+        . 'خلا المقيسُ في ' . $freeToStop . ' منها',
+    '⛔ **وصفرُ مسارٍ أُوقف**: أربعٌ من الستِّ تُقاس الآن (‏روابطُ الشجرةِ · الإشعاراتُ '
+        . '· المهامُّ · التقارير)، و**المفضّلاتُ والتكاملاتُ لا سجلَّ لهما** — وغيابُ '
+        . 'القياسِ ليس غيابَ استعمال (§32)');
 
 /* ═══ 12 · OWNER_ACTION_REGISTER (§34-L4 · الحقيقيَّ وحدَه) ═════════════════ */
 $s = array(array('#', 'الحالةُ من §34-L4', 'الموضوع', 'لماذا لا يحسمها ما دونَه',
@@ -510,5 +581,8 @@ foreach ($sheets as $n => $r) { printf("  %-30s %5d صفًّا\n", $n, max(0, co
 echo "\n  ⇒ {$xlsx}\n";
 echo "  ◆ ملاحظتان تُعلَنانِ ولا تُطوَيان:\n";
 echo "     · `HUMAN_UAT_PASS` = **PENDING** — قرارٌ بشريٌّ لا يُنتحَل (‏ورقة 10).\n";
-echo "     · أربعٌ من تبعيّاتِ §33 الستِّ (‏مفضّلات · مهامّ · إشعارات · تكاملات)\n";
-echo "       **لم تُقَس** — فلا يُوقَف مسارٌ واحدٌ في هذه الجولة (‏ورقة 11).\n";
+echo "     · تبعيّاتُ §33: **أربعٌ تُقاس** (‏روابطُ الشجرةِ {$scanned} ملفًّا · إشعاراتٌ "
+   . number_format($depScanned['إشعارات']) . " وجهةً · المهامُّ · التقارير)\n";
+echo "       و**اثنتانِ لا سجلَّ لهما في هذه الشجرة** (‏المفضّلاتُ والتكاملات) —\n";
+echo "       ⛔ وغيابُ القياسِ **ليس غيابَ استعمال** (§32)، فلا يُبيح إيقافَ مسار.\n";
+echo "       ⇒ **وصفرُ مسارٍ أُوقف**: الأحدَ عشرَ والسبعون كلُّها في المرحلةِ A (‏ورقة 11).\n";

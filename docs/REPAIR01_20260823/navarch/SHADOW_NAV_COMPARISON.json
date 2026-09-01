@@ -1,14 +1,14 @@
 {
-    "baseline_id": "NAB-8CD4A8954F",
+    "baseline_id": "NAB-5102AA8687",
     "totals": {
-        "removed": 339,
-        "moved": 233,
-        "contextualized": 188,
-        "retained": 283,
+        "removed": 315,
+        "moved": 241,
+        "contextualized": 189,
+        "retained": 301,
         "redirected": 71,
         "needs_decision": 63,
-        "old": 1177,
-        "new": 516
+        "old": 1180,
+        "new": 542
     },
     "per_workspace": {
         "DEP-01": {
@@ -36,11 +36,11 @@
         "DEP-02": {
             "role": 2,
             "old": 61,
-            "new": 34,
+            "new": 35,
             "added": 0,
             "added_list": [],
-            "removed": 10,
-            "moved": 6,
+            "removed": 9,
+            "moved": 7,
             "contextualized": 0,
             "retained": 28,
             "redirected": 10,
@@ -48,7 +48,7 @@
             "blocked": {
                 "placements": 38,
                 "no_permission": 0,
-                "no_group": 2,
+                "no_group": 1,
                 "unapproved_secondary": 0,
                 "non_sidebar_type": 2,
                 "global_fallback": 0,
@@ -80,21 +80,21 @@
         "DEP-04": {
             "role": 3,
             "old": 77,
-            "new": 42,
+            "new": 47,
             "added": 0,
             "added_list": [],
-            "removed": 16,
-            "moved": 17,
+            "removed": 11,
+            "moved": 18,
             "contextualized": 7,
-            "retained": 25,
+            "retained": 29,
             "redirected": 3,
             "needs_decision": 9,
             "blocked": {
                 "placements": 53,
                 "no_permission": 0,
-                "no_group": 6,
+                "no_group": 4,
                 "unapproved_secondary": 0,
-                "non_sidebar_type": 5,
+                "non_sidebar_type": 2,
                 "global_fallback": 0,
                 "legacy_fallback": 0
             }
@@ -102,39 +102,17 @@
         "DEP-05": {
             "role": 17,
             "old": 112,
-            "new": 33,
+            "new": 37,
             "added": 0,
             "added_list": [],
-            "removed": 33,
+            "removed": 29,
             "moved": 16,
             "contextualized": 32,
-            "retained": 17,
+            "retained": 21,
             "redirected": 14,
             "needs_decision": 0,
             "blocked": {
                 "placements": 41,
-                "no_permission": 1,
-                "no_group": 1,
-                "unapproved_secondary": 0,
-                "non_sidebar_type": 6,
-                "global_fallback": 0,
-                "legacy_fallback": 0
-            }
-        },
-        "DEP-06": {
-            "role": 21,
-            "old": 108,
-            "new": 29,
-            "added": 0,
-            "added_list": [],
-            "removed": 40,
-            "moved": 14,
-            "contextualized": 26,
-            "retained": 15,
-            "redirected": 13,
-            "needs_decision": 0,
-            "blocked": {
-                "placements": 33,
                 "no_permission": 1,
                 "no_group": 0,
                 "unapproved_secondary": 0,
@@ -143,14 +121,36 @@
                 "legacy_fallback": 0
             }
         },
+        "DEP-06": {
+            "role": 21,
+            "old": 108,
+            "new": 30,
+            "added": 0,
+            "added_list": [],
+            "removed": 39,
+            "moved": 14,
+            "contextualized": 26,
+            "retained": 16,
+            "redirected": 13,
+            "needs_decision": 0,
+            "blocked": {
+                "placements": 33,
+                "no_permission": 1,
+                "no_group": 0,
+                "unapproved_secondary": 0,
+                "non_sidebar_type": 2,
+                "global_fallback": 0,
+                "legacy_fallback": 0
+            }
+        },
         "DEP-07": {
             "role": 4,
             "old": 70,
-            "new": 36,
+            "new": 37,
             "added": 0,
             "added_list": [],
-            "removed": 21,
-            "moved": 17,
+            "removed": 20,
+            "moved": 18,
             "contextualized": 6,
             "retained": 19,
             "redirected": 1,
@@ -158,9 +158,9 @@
             "blocked": {
                 "placements": 43,
                 "no_permission": 0,
-                "no_group": 2,
+                "no_group": 0,
                 "unapproved_secondary": 0,
-                "non_sidebar_type": 5,
+                "non_sidebar_type": 6,
                 "global_fallback": 0,
                 "legacy_fallback": 0
             }
@@ -211,12 +211,12 @@
         },
         "DEP-11": {
             "role": 1,
-            "old": 88,
-            "new": 27,
+            "old": 89,
+            "new": 32,
             "added": 0,
             "added_list": [],
-            "removed": 41,
-            "moved": 15,
+            "removed": 37,
+            "moved": 20,
             "contextualized": 8,
             "retained": 12,
             "redirected": 6,
@@ -224,9 +224,9 @@
             "blocked": {
                 "placements": 35,
                 "no_permission": 0,
-                "no_group": 7,
+                "no_group": 0,
                 "unapproved_secondary": 0,
-                "non_sidebar_type": 1,
+                "non_sidebar_type": 3,
                 "global_fallback": 0,
                 "legacy_fallback": 0
             }
@@ -246,20 +246,20 @@
             "blocked": {
                 "placements": 40,
                 "no_permission": 0,
-                "no_group": 3,
+                "no_group": 1,
                 "unapproved_secondary": 0,
-                "non_sidebar_type": 1,
+                "non_sidebar_type": 3,
                 "global_fallback": 0,
                 "legacy_fallback": 0
             }
         },
         "DEP-13": {
             "role": 27,
-            "old": 54,
+            "old": 55,
             "new": 32,
             "added": 0,
             "added_list": [],
-            "removed": 11,
+            "removed": 12,
             "moved": 15,
             "contextualized": 11,
             "retained": 17,
@@ -268,9 +268,9 @@
             "blocked": {
                 "placements": 35,
                 "no_permission": 1,
-                "no_group": 2,
+                "no_group": 1,
                 "unapproved_secondary": 0,
-                "non_sidebar_type": 0,
+                "non_sidebar_type": 1,
                 "global_fallback": 0,
                 "legacy_fallback": 0
             }
@@ -278,21 +278,21 @@
         "DEP-14": {
             "role": 13,
             "old": 57,
-            "new": 31,
+            "new": 32,
             "added": 0,
             "added_list": [],
-            "removed": 14,
+            "removed": 13,
             "moved": 16,
             "contextualized": 7,
-            "retained": 15,
+            "retained": 16,
             "redirected": 2,
             "needs_decision": 3,
             "blocked": {
                 "placements": 36,
                 "no_permission": 1,
-                "no_group": 2,
+                "no_group": 0,
                 "unapproved_secondary": 0,
-                "non_sidebar_type": 2,
+                "non_sidebar_type": 3,
                 "global_fallback": 0,
                 "legacy_fallback": 0
             }
@@ -322,21 +322,21 @@
         "DEP-16": {
             "role": 16,
             "old": 55,
-            "new": 23,
+            "new": 26,
             "added": 0,
             "added_list": [],
-            "removed": 21,
+            "removed": 18,
             "moved": 16,
             "contextualized": 5,
-            "retained": 7,
+            "retained": 10,
             "redirected": 2,
             "needs_decision": 4,
             "blocked": {
                 "placements": 30,
                 "no_permission": 1,
-                "no_group": 1,
+                "no_group": 0,
                 "unapproved_secondary": 0,
-                "non_sidebar_type": 5,
+                "non_sidebar_type": 3,
                 "global_fallback": 0,
                 "legacy_fallback": 0
             }
@@ -344,34 +344,34 @@
         "DEP-17": {
             "role": 25,
             "old": 43,
-            "new": 23,
+            "new": 28,
             "added": 0,
             "added_list": [],
-            "removed": 16,
+            "removed": 11,
             "moved": 15,
             "contextualized": 0,
-            "retained": 8,
+            "retained": 13,
             "redirected": 0,
             "needs_decision": 4,
             "blocked": {
                 "placements": 31,
                 "no_permission": 1,
-                "no_group": 2,
+                "no_group": 0,
                 "unapproved_secondary": 0,
-                "non_sidebar_type": 5,
+                "non_sidebar_type": 2,
                 "global_fallback": 0,
                 "legacy_fallback": 0
             }
         },
         "EX-CEO": {
             "role": 9,
-            "old": 80,
+            "old": 81,
             "new": 35,
             "added": 0,
             "added_list": [],
             "removed": 26,
             "moved": 9,
-            "contextualized": 13,
+            "contextualized": 14,
             "retained": 26,
             "redirected": 4,
             "needs_decision": 2,
@@ -930,12 +930,12 @@
             "route": "approvals\/requests",
             "label": "صندوق موافقاتي وما ينتظر يدي",
             "old_group": "مساحتي",
-            "new_group": "—",
-            "verdict": "removed",
-            "action": "PRIMARY",
-            "why": "RECONCILED_TO_TARGET_S16",
+            "new_group": "⌂ مساحةُ عملي",
+            "verdict": "moved",
+            "action": "PERSONAL",
+            "why": "SHARED_WORK_ITEM_TO_WS_MY_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §16 — له هدفٌ مطابقٌ أو إضافةٌ معتمَدةٌ بسندٍ مكتوبٍ سابقٍ لهذه الجولة"
+            "evidence": "NAV-ARCH-02 §11 — صناديقُ «ما ينتظرني» في «مساحة عملي» لا في دورةِ الإدارة"
         },
         {
             "ws": "DEP-02",
@@ -2540,10 +2540,10 @@
             "old_group": "مساحتي",
             "new_group": "—",
             "verdict": "removed",
-            "action": "SECONDARY_APPROVED",
-            "why": "SECONDARY_APPROVED_S12E",
+            "action": "CONTEXTUAL_ACTION",
+            "why": "REQUEST_HANDOFF_S12B",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §12-هـ — بندُ عملٍ مشتركٌ باعتمادٍ مسجَّلٍ في nav_canonical"
+            "evidence": "NAV-ARCH-02 §12-ب — «طلب شراء · طلب ترحيل» تُطلب بـRequest\/Handoff ولا تُنقل شاشةُ الإدارةِ المستلمةِ إلى سايدبارِ الطالب"
         },
         {
             "ws": "DEP-04",
@@ -2562,12 +2562,12 @@
             "route": "approvals\/requests",
             "label": "صندوق موافقاتي وما ينتظر يدي",
             "old_group": "مساحتي",
-            "new_group": "—",
-            "verdict": "removed",
-            "action": "PRIMARY",
-            "why": "RECONCILED_TO_TARGET_S16",
+            "new_group": "⌂ مساحةُ عملي",
+            "verdict": "moved",
+            "action": "PERSONAL",
+            "why": "SHARED_WORK_ITEM_TO_WS_MY_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §16 — له هدفٌ مطابقٌ أو إضافةٌ معتمَدةٌ بسندٍ مكتوبٍ سابقٍ لهذه الجولة"
+            "evidence": "NAV-ARCH-02 §11 — صناديقُ «ما ينتظرني» في «مساحة عملي» لا في دورةِ الإدارة"
         },
         {
             "ws": "DEP-04",
@@ -2670,12 +2670,12 @@
             "route": "fleet\/asset_intake",
             "label": "طلب إدخال الأصل",
             "old_group": "تسجيل الأصل ودخوله",
-            "new_group": "—",
-            "verdict": "removed",
-            "action": "DIRECT_ONLY",
-            "why": "DIRECT_ONLY_S9",
+            "new_group": "تسجيل الأصل ودخوله",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §9 — يفتح بالرابطِ والبحثِ والمهمّة"
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
         },
         {
             "ws": "DEP-04",
@@ -2730,12 +2730,12 @@
             "route": "fleet\/asset_assignments",
             "label": "التخصيص على الوحدات",
             "old_group": "إدخال الأصل للتشغيل",
-            "new_group": "—",
-            "verdict": "removed",
-            "action": "DIRECT_ONLY",
-            "why": "DIRECT_ONLY_S9",
+            "new_group": "إدخال الأصل للتشغيل",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §9 — يفتح بالرابطِ والبحثِ والمهمّة"
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
         },
         {
             "ws": "DEP-04",
@@ -2790,24 +2790,24 @@
             "route": "fleet\/asset_readiness",
             "label": "الملخص التشغيلي الشهري",
             "old_group": "الرقابة الفنية والجاهزية",
-            "new_group": "—",
-            "verdict": "removed",
-            "action": "DIRECT_ONLY",
-            "why": "DIRECT_ONLY_S9",
+            "new_group": "الرقابة الفنية والجاهزية",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §9 — يفتح بالرابطِ والبحثِ والمهمّة"
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
         },
         {
             "ws": "DEP-04",
             "route": "fleet\/asset_exit",
             "label": "الخروج المؤقت",
             "old_group": "خروج الأصل من الخدمة",
-            "new_group": "—",
-            "verdict": "removed",
-            "action": "DIRECT_ONLY",
-            "why": "DIRECT_ONLY_S9",
+            "new_group": "خروج الأصل من الخدمة",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §9 — يفتح بالرابطِ والبحثِ والمهمّة"
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
         },
         {
             "ws": "DEP-04",
@@ -3594,12 +3594,12 @@
             "route": "finance\/periods_fin",
             "label": "التقويم المحاسبي للفترات",
             "old_group": "التأسيس والقوائم المرجعية",
-            "new_group": "—",
-            "verdict": "removed",
-            "action": "DIRECT_ONLY",
-            "why": "DIRECT_ONLY_S9",
+            "new_group": "التأسيس والقوائم المرجعية",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §9 — يفتح بالرابطِ والبحثِ والمهمّة"
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
         },
         {
             "ws": "DEP-05",
@@ -3630,12 +3630,12 @@
             "route": "finance\/ar_claim_invoice",
             "label": "فواتير العملاء",
             "old_group": "الذمم المدينة",
-            "new_group": "—",
-            "verdict": "removed",
-            "action": "TAB_CHILD",
-            "why": "TAB_CHILD_S18",
+            "new_group": "الذمم المدينة",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §9 — تبويبٌ داخلَ أبٍ لا بندُ قائمةٍ مستقلّ"
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
         },
         {
             "ws": "DEP-05",
@@ -3666,12 +3666,12 @@
             "route": "finance\/dues_fin",
             "label": "فواتير الموردين والمستحقات",
             "old_group": "الذمم الدائنة",
-            "new_group": "—",
-            "verdict": "removed",
-            "action": "TAB_CHILD",
-            "why": "TAB_CHILD_S18",
+            "new_group": "الذمم الدائنة",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §9 — تبويبٌ داخلَ أبٍ لا بندُ قائمةٍ مستقلّ"
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
         },
         {
             "ws": "DEP-05",
@@ -3690,12 +3690,12 @@
             "route": "finance\/journal_form_fin",
             "label": "القيود اليومية",
             "old_group": "القيد والدفتر",
-            "new_group": "—",
-            "verdict": "removed",
-            "action": "TAB_CHILD",
-            "why": "TAB_CHILD_S18",
+            "new_group": "القيد والدفتر",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §9 — تبويبٌ داخلَ أبٍ لا بندُ قائمةٍ مستقلّ"
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
         },
         {
             "ws": "DEP-05",
@@ -3992,10 +3992,10 @@
             "old_group": "الموردون والمشتريات",
             "new_group": "—",
             "verdict": "removed",
-            "action": "SECONDARY_APPROVED",
-            "why": "SECONDARY_APPROVED_S12E",
+            "action": "CONTEXTUAL_ACTION",
+            "why": "REQUEST_HANDOFF_S12B",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §12-هـ — بندُ عملٍ مشتركٌ باعتمادٍ مسجَّلٍ في nav_canonical"
+            "evidence": "NAV-ARCH-02 §12-ب — «طلب شراء · طلب ترحيل» تُطلب بـRequest\/Handoff ولا تُنقل شاشةُ الإدارةِ المستلمةِ إلى سايدبارِ الطالب"
         },
         {
             "ws": "DEP-05",
@@ -5022,12 +5022,12 @@
             "route": "finance\/bank_reconciliation_fin",
             "label": "المطابقة البنكية",
             "old_group": "الرقابة والإقفال الشهري",
-            "new_group": "—",
-            "verdict": "removed",
-            "action": "TAB_CHILD",
-            "why": "TAB_CHILD_S18",
+            "new_group": "الرقابة والإقفال الشهري",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §9 — تبويبٌ داخلَ أبٍ لا بندُ قائمةٍ مستقلّ"
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
         },
         {
             "ws": "DEP-06",
@@ -6104,10 +6104,10 @@
             "old_group": "مساحتي",
             "new_group": "—",
             "verdict": "removed",
-            "action": "SECONDARY_APPROVED",
-            "why": "SECONDARY_APPROVED_S12E",
+            "action": "CONTEXTUAL_ACTION",
+            "why": "REQUEST_HANDOFF_S12B",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §12-هـ — بندُ عملٍ مشتركٌ باعتمادٍ مسجَّلٍ في nav_canonical"
+            "evidence": "NAV-ARCH-02 §12-ب — «طلب شراء · طلب ترحيل» تُطلب بـRequest\/Handoff ولا تُنقل شاشةُ الإدارةِ المستلمةِ إلى سايدبارِ الطالب"
         },
         {
             "ws": "DEP-07",
@@ -6126,12 +6126,12 @@
             "route": "approvals\/requests",
             "label": "صندوق موافقاتي وما ينتظر يدي",
             "old_group": "مساحتي",
-            "new_group": "—",
-            "verdict": "removed",
-            "action": "PRIMARY",
-            "why": "RECONCILED_TO_TARGET_S16",
+            "new_group": "⌂ مساحةُ عملي",
+            "verdict": "moved",
+            "action": "PERSONAL",
+            "why": "SHARED_WORK_ITEM_TO_WS_MY_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §16 — له هدفٌ مطابقٌ أو إضافةٌ معتمَدةٌ بسندٍ مكتوبٍ سابقٍ لهذه الجولة"
+            "evidence": "NAV-ARCH-02 §11 — صناديقُ «ما ينتظرني» في «مساحة عملي» لا في دورةِ الإدارة"
         },
         {
             "ws": "DEP-07",
@@ -7986,12 +7986,12 @@
             "route": "approvals\/requests",
             "label": "صندوق موافقاتي وما ينتظر يدي",
             "old_group": "مساحتي",
-            "new_group": "—",
-            "verdict": "removed",
-            "action": "PRIMARY",
-            "why": "RECONCILED_TO_TARGET_S16",
+            "new_group": "⌂ مساحةُ عملي",
+            "verdict": "moved",
+            "action": "PERSONAL",
+            "why": "SHARED_WORK_ITEM_TO_WS_MY_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §16 — له هدفٌ مطابقٌ أو إضافةٌ معتمَدةٌ بسندٍ مكتوبٍ سابقٍ لهذه الجولة"
+            "evidence": "NAV-ARCH-02 §11 — صناديقُ «ما ينتظرني» في «مساحة عملي» لا في دورةِ الإدارة"
         },
         {
             "ws": "DEP-11",
@@ -8211,11 +8211,23 @@
         },
         {
             "ws": "DEP-11",
-            "route": "timesheet\/view_timesheet",
-            "label": "تسجيل التايم شيت والإنتاج",
+            "route": "portal\/ceo_org_decisions",
+            "label": "قرارات الهيكل التنظيمي",
             "old_group": "التشغيل اليومي",
             "new_group": "—",
             "verdict": "removed",
+            "action": "D_WORKSPACE_SWITCH",
+            "why": "D_WORKSPACE_SWITCH",
+            "access": "مبدِّلُ المساحاتِ إلى EX-CEO · البحثُ · الرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "مملوكةٌ لـEX-CEO (مساحة الرئيس التنفيذي) · nav_placements@EX-CEO · بلا `space_class` مسجَّل"
+        },
+        {
+            "ws": "DEP-11",
+            "route": "timesheet\/view_timesheet",
+            "label": "تسجيل التايم شيت والإنتاج",
+            "old_group": "التشغيل اليومي",
+            "new_group": "اليوم التشغيلي",
+            "verdict": "moved",
             "action": "PRIMARY",
             "why": "RECONCILED_TO_TARGET_S16",
             "access": "—",
@@ -8238,8 +8250,8 @@
             "route": "operations\/operations_room",
             "label": "غرفة عمليات المواقع",
             "old_group": "التشغيل اليومي",
-            "new_group": "—",
-            "verdict": "removed",
+            "new_group": "اللوحة — خارج الدورة",
+            "verdict": "moved",
             "action": "PRIMARY",
             "why": "RECONCILED_TO_TARGET_S16",
             "access": "—",
@@ -8288,10 +8300,10 @@
             "old_group": "التشغيل اليومي",
             "new_group": "—",
             "verdict": "removed",
-            "action": "SECONDARY_APPROVED",
-            "why": "SECONDARY_APPROVED_S12E",
+            "action": "CONTEXTUAL_ACTION",
+            "why": "REQUEST_HANDOFF_S12B",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §12-هـ — بندُ عملٍ مشتركٌ باعتمادٍ مسجَّلٍ في nav_canonical"
+            "evidence": "NAV-ARCH-02 §12-ب — «طلب شراء · طلب ترحيل» تُطلب بـRequest\/Handoff ولا تُنقل شاشةُ الإدارةِ المستلمةِ إلى سايدبارِ الطالب"
         },
         {
             "ws": "DEP-11",
@@ -8310,8 +8322,8 @@
             "route": "operations\/distribution_space",
             "label": "تكليف المشغل على المعدة",
             "old_group": "التشغيل اليومي",
-            "new_group": "—",
-            "verdict": "removed",
+            "new_group": "التخطيط والتوزيع الشهري",
+            "verdict": "moved",
             "action": "PRIMARY",
             "why": "RECONCILED_TO_TARGET_S16",
             "access": "—",
@@ -8334,8 +8346,8 @@
             "route": "operations\/stops_unattributed",
             "label": "التوقفات وتحديد المتحمل",
             "old_group": "التشغيل اليومي",
-            "new_group": "—",
-            "verdict": "removed",
+            "new_group": "اليوم التشغيلي",
+            "verdict": "moved",
             "action": "PRIMARY",
             "why": "RECONCILED_TO_TARGET_S16",
             "access": "—",
@@ -8504,10 +8516,10 @@
             "old_group": "الموردون والمشتريات",
             "new_group": "—",
             "verdict": "removed",
-            "action": "SECONDARY_APPROVED",
-            "why": "SECONDARY_APPROVED_S12E",
+            "action": "CONTEXTUAL_ACTION",
+            "why": "REQUEST_HANDOFF_S12B",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §12-هـ — بندُ عملٍ مشتركٌ باعتمادٍ مسجَّلٍ في nav_canonical"
+            "evidence": "NAV-ARCH-02 §12-ب — «طلب شراء · طلب ترحيل» تُطلب بـRequest\/Handoff ولا تُنقل شاشةُ الإدارةِ المستلمةِ إلى سايدبارِ الطالب"
         },
         {
             "ws": "DEP-11",
@@ -9344,10 +9356,10 @@
             "old_group": "التشغيل اليومي",
             "new_group": "—",
             "verdict": "removed",
-            "action": "SECONDARY_APPROVED",
-            "why": "SECONDARY_APPROVED_S12E",
+            "action": "CONTEXTUAL_ACTION",
+            "why": "REQUEST_HANDOFF_S12B",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §12-هـ — بندُ عملٍ مشتركٌ باعتمادٍ مسجَّلٍ في nav_canonical"
+            "evidence": "NAV-ARCH-02 §12-ب — «طلب شراء · طلب ترحيل» تُطلب بـRequest\/Handoff ولا تُنقل شاشةُ الإدارةِ المستلمةِ إلى سايدبارِ الطالب"
         },
         {
             "ws": "DEP-12",
@@ -9536,10 +9548,10 @@
             "old_group": "الموردون والمشتريات",
             "new_group": "—",
             "verdict": "removed",
-            "action": "SECONDARY_APPROVED",
-            "why": "SECONDARY_APPROVED_S12E",
+            "action": "CONTEXTUAL_ACTION",
+            "why": "REQUEST_HANDOFF_S12B",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §12-هـ — بندُ عملٍ مشتركٌ باعتمادٍ مسجَّلٍ في nav_canonical"
+            "evidence": "NAV-ARCH-02 §12-ب — «طلب شراء · طلب ترحيل» تُطلب بـRequest\/Handoff ولا تُنقل شاشةُ الإدارةِ المستلمةِ إلى سايدبارِ الطالب"
         },
         {
             "ws": "DEP-12",
@@ -10196,10 +10208,22 @@
             "old_group": "التشغيل اليومي",
             "new_group": "—",
             "verdict": "removed",
-            "action": "SECONDARY_APPROVED",
-            "why": "SECONDARY_APPROVED_S12E",
+            "action": "CONTEXTUAL_ACTION",
+            "why": "REQUEST_HANDOFF_S12B",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §12-هـ — بندُ عملٍ مشتركٌ باعتمادٍ مسجَّلٍ في nav_canonical"
+            "evidence": "NAV-ARCH-02 §12-ب — «طلب شراء · طلب ترحيل» تُطلب بـRequest\/Handoff ولا تُنقل شاشةُ الإدارةِ المستلمةِ إلى سايدبارِ الطالب"
+        },
+        {
+            "ws": "DEP-13",
+            "route": "portal\/ceo_org_decisions",
+            "label": "قرارات الهيكل التنظيمي",
+            "old_group": "التشغيل اليومي",
+            "new_group": "—",
+            "verdict": "removed",
+            "action": "D_WORKSPACE_SWITCH",
+            "why": "D_WORKSPACE_SWITCH",
+            "access": "مبدِّلُ المساحاتِ إلى EX-CEO · البحثُ · الرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "مملوكةٌ لـEX-CEO (مساحة الرئيس التنفيذي) · nav_placements@EX-CEO · بلا `space_class` مسجَّل"
         },
         {
             "ws": "DEP-13",
@@ -10746,12 +10770,12 @@
             "route": "maintenance\/work_orders",
             "label": "أمر العمل",
             "old_group": "دورة العطل",
-            "new_group": "—",
-            "verdict": "removed",
-            "action": "TAB_CHILD",
-            "why": "TAB_CHILD_S18",
+            "new_group": "دورة العطل",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §9 — تبويبٌ داخلَ أبٍ لا بندُ قائمةٍ مستقلّ"
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
         },
         {
             "ws": "DEP-14",
@@ -10856,10 +10880,10 @@
             "old_group": "التشغيل اليومي",
             "new_group": "—",
             "verdict": "removed",
-            "action": "SECONDARY_APPROVED",
-            "why": "SECONDARY_APPROVED_S12E",
+            "action": "CONTEXTUAL_ACTION",
+            "why": "REQUEST_HANDOFF_S12B",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §12-هـ — بندُ عملٍ مشتركٌ باعتمادٍ مسجَّلٍ في nav_canonical"
+            "evidence": "NAV-ARCH-02 §12-ب — «طلب شراء · طلب ترحيل» تُطلب بـRequest\/Handoff ولا تُنقل شاشةُ الإدارةِ المستلمةِ إلى سايدبارِ الطالب"
         },
         {
             "ws": "DEP-14",
@@ -11000,10 +11024,10 @@
             "old_group": "الموردون والمشتريات",
             "new_group": "—",
             "verdict": "removed",
-            "action": "SECONDARY_APPROVED",
-            "why": "SECONDARY_APPROVED_S12E",
+            "action": "CONTEXTUAL_ACTION",
+            "why": "REQUEST_HANDOFF_S12B",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §12-هـ — بندُ عملٍ مشتركٌ باعتمادٍ مسجَّلٍ في nav_canonical"
+            "evidence": "NAV-ARCH-02 §12-ب — «طلب شراء · طلب ترحيل» تُطلب بـRequest\/Handoff ولا تُنقل شاشةُ الإدارةِ المستلمةِ إلى سايدبارِ الطالب"
         },
         {
             "ws": "DEP-14",
@@ -11922,24 +11946,24 @@
             "route": "procurement\/requests_proc",
             "label": "طلبات الشراء",
             "old_group": "طلبات الشراء وتجميعها",
-            "new_group": "—",
-            "verdict": "removed",
-            "action": "TAB_CHILD",
-            "why": "TAB_CHILD_S18",
+            "new_group": "طلبات الشراء وتجميعها",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §9 — تبويبٌ داخلَ أبٍ لا بندُ قائمةٍ مستقلّ"
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
         },
         {
             "ws": "DEP-16",
             "route": "procurement\/proc_packages",
             "label": "تجميع الطلبات وخطة الشراء",
             "old_group": "طلبات الشراء وتجميعها",
-            "new_group": "—",
-            "verdict": "removed",
-            "action": "TAB_CHILD",
-            "why": "TAB_CHILD_S18",
+            "new_group": "طلبات الشراء وتجميعها",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §9 — تبويبٌ داخلَ أبٍ لا بندُ قائمةٍ مستقلّ"
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
         },
         {
             "ws": "DEP-16",
@@ -11970,12 +11994,12 @@
             "route": "procurement\/orders_proc",
             "label": "أوامر الشراء",
             "old_group": "أمر الشراء والتوريد",
-            "new_group": "—",
-            "verdict": "removed",
-            "action": "TAB_CHILD",
-            "why": "TAB_CHILD_S18",
+            "new_group": "أمر الشراء والتوريد",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §9 — تبويبٌ داخلَ أبٍ لا بندُ قائمةٍ مستقلّ"
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
         },
         {
             "ws": "DEP-16",
@@ -12056,10 +12080,10 @@
             "old_group": "الموردون والمشتريات",
             "new_group": "—",
             "verdict": "removed",
-            "action": "SECONDARY_APPROVED",
-            "why": "SECONDARY_APPROVED_S12E",
+            "action": "CONTEXTUAL_ACTION",
+            "why": "REQUEST_HANDOFF_S12B",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §12-هـ — بندُ عملٍ مشتركٌ باعتمادٍ مسجَّلٍ في nav_canonical"
+            "evidence": "NAV-ARCH-02 §12-ب — «طلب شراء · طلب ترحيل» تُطلب بـRequest\/Handoff ولا تُنقل شاشةُ الإدارةِ المستلمةِ إلى سايدبارِ الطالب"
         },
         {
             "ws": "DEP-16",
@@ -12582,12 +12606,12 @@
             "route": "procurement\/wh_receipt",
             "label": "سند الإدخال والفحص",
             "old_group": "دورة الاستلام",
-            "new_group": "—",
-            "verdict": "removed",
-            "action": "TAB_CHILD",
-            "why": "TAB_CHILD_S18",
+            "new_group": "دورة الاستلام",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §9 — تبويبٌ داخلَ أبٍ لا بندُ قائمةٍ مستقلّ"
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
         },
         {
             "ws": "DEP-17",
@@ -12618,24 +12642,24 @@
             "route": "procurement\/wh_issue_requests",
             "label": "طلبات الصرف الواردة",
             "old_group": "دورة الصرف",
-            "new_group": "—",
-            "verdict": "removed",
-            "action": "TAB_CHILD",
-            "why": "TAB_CHILD_S18",
+            "new_group": "دورة الصرف",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §9 — تبويبٌ داخلَ أبٍ لا بندُ قائمةٍ مستقلّ"
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
         },
         {
             "ws": "DEP-17",
             "route": "procurement\/issue_proc",
             "label": "سند الصرف",
             "old_group": "دورة الصرف",
-            "new_group": "—",
-            "verdict": "removed",
-            "action": "TAB_CHILD",
-            "why": "TAB_CHILD_S18",
+            "new_group": "دورة الصرف",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §9 — تبويبٌ داخلَ أبٍ لا بندُ قائمةٍ مستقلّ"
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
         },
         {
             "ws": "DEP-17",
@@ -12654,24 +12678,24 @@
             "route": "procurement\/wh_transfer",
             "label": "التحويل بين المخازن",
             "old_group": "دورة الصرف",
-            "new_group": "—",
-            "verdict": "removed",
-            "action": "TAB_CHILD",
-            "why": "TAB_CHILD_S18",
+            "new_group": "دورة الصرف",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §9 — تبويبٌ داخلَ أبٍ لا بندُ قائمةٍ مستقلّ"
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
         },
         {
             "ws": "DEP-17",
             "route": "procurement\/wh_count",
             "label": "الجرد ومعالجة الفروقات",
             "old_group": "الرقابة والإقفال الشهري",
-            "new_group": "—",
-            "verdict": "removed",
-            "action": "TAB_CHILD",
-            "why": "TAB_CHILD_S18",
+            "new_group": "الرقابة والإقفال الشهري",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §9 — تبويبٌ داخلَ أبٍ لا بندُ قائمةٍ مستقلّ"
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
         },
         {
             "ws": "DEP-17",
@@ -12704,10 +12728,10 @@
             "old_group": "التشغيل اليومي",
             "new_group": "—",
             "verdict": "removed",
-            "action": "SECONDARY_APPROVED",
-            "why": "SECONDARY_APPROVED_S12E",
+            "action": "CONTEXTUAL_ACTION",
+            "why": "REQUEST_HANDOFF_S12B",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §12-هـ — بندُ عملٍ مشتركٌ باعتمادٍ مسجَّلٍ في nav_canonical"
+            "evidence": "NAV-ARCH-02 §12-ب — «طلب شراء · طلب ترحيل» تُطلب بـRequest\/Handoff ولا تُنقل شاشةُ الإدارةِ المستلمةِ إلى سايدبارِ الطالب"
         },
         {
             "ws": "DEP-17",
@@ -12716,10 +12740,10 @@
             "old_group": "الموردون والمشتريات",
             "new_group": "—",
             "verdict": "removed",
-            "action": "SECONDARY_APPROVED",
-            "why": "SECONDARY_APPROVED_S12E",
+            "action": "CONTEXTUAL_ACTION",
+            "why": "REQUEST_HANDOFF_S12B",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §12-هـ — بندُ عملٍ مشتركٌ باعتمادٍ مسجَّلٍ في nav_canonical"
+            "evidence": "NAV-ARCH-02 §12-ب — «طلب شراء · طلب ترحيل» تُطلب بـRequest\/Handoff ولا تُنقل شاشةُ الإدارةِ المستلمةِ إلى سايدبارِ الطالب"
         },
         {
             "ws": "DEP-17",
@@ -13347,7 +13371,7 @@
         },
         {
             "ws": "EX-CEO",
-            "route": "admin\/org_structure",
+            "route": "portal\/ceo_org_decisions",
             "label": "قرارات الهيكل التنظيمي",
             "old_group": "القرار والحوكمة العليا",
             "new_group": "القرار والحوكمة العليا",
@@ -13848,6 +13872,18 @@
             "why": "CROSS_DOMAIN",
             "access": "مبدِّلُ المساحاتِ إلى الإدارةِ المالكة · والرابطُ المباشرُ يبقى نافذًا",
             "evidence": "nav_canonical.owner_dept = مساحة العمل الشخصية · وهذه مساحة الرئيس التنفيذي"
+        },
+        {
+            "ws": "EX-CEO",
+            "route": "admin\/org_structure",
+            "label": "الهيكل التنظيمي والمسميات",
+            "old_group": "الإعدادات",
+            "new_group": "—",
+            "verdict": "contextualized",
+            "action": "CONTEXTUALIZE",
+            "why": "CROSS_DOMAIN",
+            "access": "مبدِّلُ المساحاتِ إلى الإدارةِ المالكة · والرابطُ المباشرُ يبقى نافذًا",
+            "evidence": "nav_canonical.owner_dept = الحوكمة والالتزام · وهذه مساحة الرئيس التنفيذي"
         },
         {
             "ws": "EX-CEO",
