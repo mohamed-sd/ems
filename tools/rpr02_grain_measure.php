@@ -206,7 +206,21 @@ function grain_looks_line($t)
    للسطح، وعدُّه حبّةً يُنتج خرقًا كاذبًا في «لا سطحَ يجمع حبّتين». */
 function grain_is_trail($t)
 {
-    return (bool) preg_match('~(_history|_audit|_log|_logs|_trail|_actions|_events|_denials|_notifications|_sequences)$~', $t);
+    if (preg_match('~(_history|_audit|_log|_logs|_trail|_actions|_events|_denials|_notifications|_sequences)$~', $t)) {
+        return true;
+    }
+    /* ◆ **وأثرُ المستندِ ليس حبّتَه**: السطحُ الذي يسجّل مستندَه ثمَّ **ينشر
+         أثرَه** (حركةُ مخزنٍ · ذمّةٌ · عهدةٌ · سلفةٌ · إشعار) لم يجمع حبّتَين —
+         حبّتُه مستندُه، والأثرُ **مفعولٌ به لا موضوع**. وهو حكمُ §٧ الخطوة ١١
+         نفسُه («المرجعُ إلحاقيّ») ممدودًا إلى دفاترِ الأثرِ المسمّاة.
+       ⛔ **والقائمةُ مغلقةٌ بأسمائها لا بنمطٍ مفتوح** — فدفترُ أثرٍ يُسمّى
+         ويُراجَع، ولا يُقصى جدولُ أعمالٍ بحجّةِ أنّه «أثر». */
+    static $EFFECT = array(
+        'proc_stock_move', 'proc_custody', 'fin_notifications', 'fin_dues',
+        'fin_receivables', 'fin_event_links', 'employee_advances', 'unit_effects',
+        'ems_business_events', 'fin_financial_events',
+    );
+    return in_array($t, $EFFECT, true);
 }
 
 /* ═══ ④ الاختبارُ السالبُ — بمفردةٍ فريدةٍ تكسر التمييزَ وحدَه ═══════════ */
