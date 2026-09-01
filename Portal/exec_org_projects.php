@@ -19,6 +19,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 
 $is_super_admin = ((isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '') === '-1');
@@ -160,6 +161,39 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'الادارات والمشروعات: بطاقة حالة واحدة قابلة للنزول لكل منهما'; $header_icon = 'fa fa-diagram-project'; $header_actions = array();
     $header_back = array('href' => 'exec_command_board.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'لوحة القيادة التنفيذية');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> الادارات والمشروعات بحقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف البطاقة' => 'g17',
+            'نوع البطاقة' => 'g18',
+            'Department_ID/Project_ID' => 'g19',
+            'الاسم' => 'g20',
+            'التبعية التنظيمية' => 'g21',
+            'Head المسؤول' => 'g22',
+            'Overall_Status' => 'g23',
+            'KPI_Status' => 'g24',
+            'Open_Requests' => 'g25',
+            'Pending_Approvals' => 'g26',
+            'Critical_Issues' => 'g27',
+            'Overdue_Actions' => 'g28',
+            'Budget_Status' => 'g29',
+            'Compliance_Status' => 'g30',
+            'Last_Daily_Report' => 'g31',
+            'Last_Weekly_Report' => 'g32',
+            'Last_Monthly_Close' => 'g33',
+            'رابط النزول' => 'g34',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('exec_org_project');
+        echo ems_w14_grid('emsList_exec_org_project', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الادارات والمشروعات'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
 
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= number_format($nD) ?></div><div class="ems-stat-label">ادارات نشطة</div></div>

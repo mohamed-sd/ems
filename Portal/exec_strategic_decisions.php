@@ -17,6 +17,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w15_view.php';
 
@@ -48,6 +49,51 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'القرارات الاستراتيجية'; $header_icon = 'fa fa-chess'; $header_actions = array();
     $header_back = array('href' => 'ceo_board.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'لوحة القيادة التنفيذية');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> القرارات الاستراتيجية بحقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'Decision_ID' => 'g271',
+            'الكيان' => 'g272',
+            'نوع القرار' => 'g273',
+            'Proposal_Source' => 'g274',
+            'Business_Case' => 'g275',
+            'الخيارات المطروحة' => 'g276',
+            'الخيار المختار' => 'g277',
+            'مبرر الاختيار' => 'g278',
+            'Financial_Impact' => 'g279',
+            'Risk_Assessment' => 'g280',
+            'Legal_Review_Status' => 'g281',
+            'Finance_Review_Status' => 'g282',
+            'Compliance_Review_Status' => 'g283',
+            'Risk_Review_Status' => 'g284',
+            'Relevant_Deputy_Recommendation' => 'g285',
+            'فحص اكتمال بوابة المراجعات' => 'g286',
+            'Recommendation' => 'g287',
+            'Decision' => 'g288',
+            'Effective_Date' => 'g289',
+            'Owner مرجع مالك التنفيذ' => 'g290',
+            'Milestones' => 'g291',
+            'Follow_Up' => 'g292',
+            'Closure' => 'g293',
+            'المنشئ' => 'g294',
+            'تاريخ الإنشاء' => 'g295',
+            'المراجع' => 'g296',
+            'المعتمد' => 'g297',
+            'تاريخ الاعتماد' => 'g298',
+            'حالة البيانات' => 'g299',
+            'مرجع المصدر' => 'g300',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('exec_strategic_decision');
+        echo ems_w14_grid('emsList_exec_strategic_decision', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في القرارات الاستراتيجية'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
 
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">عدد القرارات</div></div>

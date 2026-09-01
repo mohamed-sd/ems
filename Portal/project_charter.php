@@ -15,6 +15,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 require_once '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w15_view.php';
 
@@ -380,6 +381,56 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 ?>
 <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main ems-unified-page-shell" dir="rtl">
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> ميثاق المشروع بحقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم القرار' => 'decision_no',
+            'الكيان' => 'g301',
+            'اسم المشروع' => 'g302',
+            'رقم العميل' => 'g303',
+            'مرجع العقد' => 'g304',
+            'الموقع أو المواقع' => 'sites_text',
+            'نموذج العمل' => 'g305',
+            'وحدة العمل' => 'work_unit',
+            'الكمية المتعاقدة' => 'contracted_qty',
+            'تاريخ البدء المخطط' => 'planned_start',
+            'المدة' => 'g306',
+            'المعدات المطلوبة' => 'equipment_needed',
+            'المشغلون المطلوبون' => 'operators_needed',
+            'مصدر المعدات' => 'equipment_source',
+            'احتياج التمويل' => 'financing_need',
+            'مركز التكلفة' => 'cost_center',
+            'مدير الموقع المعين' => 'site_manager',
+            'صلاحياته الممنوحة' => 'g307',
+            'إفادة التشغيل' => 'cert_operations',
+            'إفادة المبيعات' => 'cert_sales',
+            'إفادة القوى' => 'cert_workforce',
+            'إفادة المالية' => 'cert_finance',
+            'إفادة الأسطول' => 'cert_fleet',
+            'إفادة التمويل' => 'cert_financing',
+            'اكتمال الإفادات الست' => 'g308',
+            'قرار الفتح' => 'g309',
+            'تاريخ القرار' => 'g310',
+            'حالة الميثاق' => 'g311',
+            'المنشئ' => 'g312',
+            'تاريخ الإنشاء' => 'g313',
+            'المراجع' => 'g314',
+            'المعتمد' => 'approver_name',
+            'تاريخ الاعتماد' => 'approval_date',
+            'حالة البيانات' => 'g315',
+            'مرجع المصدر' => 'g316',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('exec_project_charters');
+        echo ems_w14_grid('emsList_exec_project_charters', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في ميثاق المشروع'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+
     <?php
     $header_title = 'قرار فتح مشروع جديد';
     $header_icon = 'fa fa-folder-plus';

@@ -17,6 +17,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w15_view.php';
 
@@ -62,20 +63,39 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_exec_daily_report')); ?>
-    <table id="emsList_exec_daily_report" class="data-table">
-        <thead><tr><th>اليوم</th><th>المشروع</th><th>الموقع</th><th>الحالة</th><th>وقت الإقفال</th><th>ملاحظة الإقفال</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= ems_w15_txt($r["day_date"]) ?></td>
-                    <td><?= (int) $r["project_id"] ?></td>
-                    <td><?= (int) $r["site_id"] ?></td>
-                    <td><?= ems_w15_state((string) $r["state"]) ?></td>
-                    <td><?= ems_w15_txt($r["closed_at"]) ?></td>
-                    <td><?= ems_w15_txt($r["close_note"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف السطر' => 'g35',
+        'التاريخ' => 'g36',
+        'المشروع' => 'g37',
+        'الموقع' => 'g38',
+        'الخطة اليومية' => 'g39',
+        'المنفذ' => 'g40',
+        'نسبة الإنجاز' => 'g41',
+        'ساعات تشغيل المعدات' => 'g42',
+        'إجمالي ساعات التوقف' => 'g43',
+        'عدد أنواع التوقف تفصيلها ر03-2' => 'g44',
+        'المعدات العاملة' => 'g45',
+        'المعدات المتوقفة' => 'g46',
+        'الأعطال الحرجة' => 'g47',
+        'القوى الموجودة' => 'g48',
+        'النقص' => 'g49',
+        'إصابات مضيعة للوقت LTI' => 'g50',
+        'حوادث عالية الجهد HiPo' => 'g51',
+        'أحداث إيقاف العمل Stop-Work' => 'g52',
+        'الحوادث البيئية' => 'g53',
+        'البلاغات الحرجة' => 'g54',
+        'الترحيلات المهمة' => 'g55',
+        'المواد الحرجة' => 'g56',
+        'عدد القرارات المطلوبة تفصيلها ر03-3' => 'g57',
+        'عدد الانحرافات الحرجة تفصيلها ر03-3' => 'g58',
+        'رابط النزول للسجل الأصلي' => 'g59',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('exec_daily_report');
+    echo ems_w14_grid('emsList_exec_daily_report', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في التقرير اليومي التنفيذي'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

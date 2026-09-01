@@ -17,6 +17,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 
 $is_super_admin = ((isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '') === '-1');
@@ -86,6 +87,48 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'جميع الطلبات المرفوعة الي: صندوق موحد من كل الادارات والفعل عند فاعله'; $header_icon = 'fa fa-inbox'; $header_actions = array();
     $header_back = array('href' => 'ceo_board.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'لوحة الرئيس');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> جميع الطلبات المرفوعة بحقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'Request_ID' => 'g108',
+            'Source_Department' => 'g109',
+            'Source_Screen' => 'g110',
+            'Request_Type' => 'g111',
+            'Request_Title' => 'g112',
+            'Requested_By' => 'g113',
+            'Requested_Date' => 'g114',
+            'Amount' => 'g115',
+            'Currency' => 'g116',
+            'Project' => 'g117',
+            'Priority' => 'g118',
+            'Risk_Level' => 'g119',
+            'Previous_Approvals' => 'g120',
+            'سقف الإدارة المصدر' => 'g121',
+            'مقدار التجاوز عن السقف' => 'g122',
+            'سبب الرفع للأعلى' => 'g123',
+            'Current_Approval_Level' => 'g124',
+            'Required_By' => 'g125',
+            'Supporting_Documents' => 'g126',
+            'Recommendation' => 'g127',
+            'CEO_Decision' => 'g128',
+            'Decision_Conditions' => 'g129',
+            'Decision_Date' => 'g130',
+            'المنشئ' => 'g131',
+            'تاريخ الإنشاء' => 'g132',
+            'حالة البيانات' => 'g133',
+            'مرجع المصدر' => 'g134',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('exec_request_queue');
+        echo ems_w14_grid('emsList_exec_request_queue', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في جميع الطلبات المرفوعة'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
 
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= number_format(count($rows)) ?></div><div class="ems-stat-label">الوارد الموحد كله</div></div>

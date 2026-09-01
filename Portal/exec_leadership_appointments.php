@@ -17,6 +17,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w15_view.php';
 
@@ -48,6 +49,44 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'موافقات التعيين في المسميات القيادية'; $header_icon = 'fa fa-user-tie'; $header_actions = array();
     $header_back = array('href' => 'ceo_assignments.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'التكليفات والإنابات المؤقتة');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> موافقات التعيين القيادية بحقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم الطلب' => 'g317',
+            'نوع الطلب' => 'g318',
+            'المسمى القيادي من الهيكل' => 'g319',
+            'الوحدة التنظيمية' => 'g320',
+            'المرشح/المعني' => 'g321',
+            'مرجع الشخص بالموارد' => 'g322',
+            'سقف الاعتماد الممنوح' => 'g323',
+            'بدل التكليف' => 'g324',
+            'إفصاح طرف ذي علاقة' => 'g325',
+            'مراجعة الموارد البشرية' => 'g326',
+            'مراجعة الحوكمة' => 'g327',
+            'قاعدة AAM المفعلة' => 'g328',
+            'قرار الرئيس' => 'g329',
+            'مرجع الإحالة للسلطة المحجوزة' => 'g330',
+            'تاريخ النفاذ' => 'g331',
+            'حالة الطلب' => 'g332',
+            'المنشئ' => 'g333',
+            'تاريخ الإنشاء' => 'g334',
+            'المراجع' => 'g335',
+            'المعتمد' => 'g336',
+            'تاريخ الاعتماد' => 'g337',
+            'حالة البيانات' => 'g338',
+            'مرجع المصدر' => 'g339',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('exec_leadership_appointment');
+        echo ems_w14_grid('emsList_exec_leadership_appointment', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في موافقات التعيين القيادية'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
 
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">عدد الطلبات</div></div>

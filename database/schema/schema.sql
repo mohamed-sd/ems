@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-01 22:19:53
--- الجداول: 1068 · المناظير: 28
+-- المصدر: equipation_manage · التوليد: 2026-09-01 22:26:59
+-- الجداول: 1087 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -4219,6 +4219,29 @@ CREATE TABLE `exception_usages` (
   CONSTRAINT `fk_exu_req` FOREIGN KEY (`req_id`) REFERENCES `exception_requests` (`req_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GOV-01 §7-⑤: كل عبور باستثناء يُسجَّل — Insert-only';
 
+-- ── Table: exec_action_followup ──
+CREATE TABLE `exec_action_followup` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g355` varchar(190) DEFAULT NULL COMMENT 'Action_ID',
+  `g356` varchar(190) DEFAULT NULL COMMENT 'مصدر القرار',
+  `g357` varchar(190) DEFAULT NULL COMMENT 'المرجع الأصلي',
+  `g358` varchar(190) DEFAULT NULL COMMENT 'الموضوع',
+  `g359` varchar(190) DEFAULT NULL COMMENT 'الإدارة',
+  `g360` varchar(190) DEFAULT NULL COMMENT 'المسؤول',
+  `g361` varchar(190) DEFAULT NULL COMMENT 'Due_Date',
+  `g362` varchar(190) DEFAULT NULL COMMENT 'Priority',
+  `g363` varchar(190) DEFAULT NULL COMMENT 'Status',
+  `g364` varchar(190) DEFAULT NULL COMMENT 'أيام التأخير',
+  `g365` varchar(190) DEFAULT NULL COMMENT 'Evidence',
+  `g366` varchar(190) DEFAULT NULL COMMENT 'Closure',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_37e70378_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CEO-26 - قرار تنفيذي متابع';
+
 -- ── Table: exec_approvals ──
 CREATE TABLE `exec_approvals` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -4324,6 +4347,36 @@ CREATE TABLE `exec_assignments` (
   KEY `ix_role` (`role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='PROP-01 CEO-Y0121/0122 — سجلُّ موافقاتِ التكليفِ ولا سريانَ قبلَه';
 
+-- ── Table: exec_assurance_report ──
+CREATE TABLE `exec_assurance_report` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g216` varchar(190) DEFAULT NULL COMMENT 'معرف الوارد',
+  `g217` varchar(190) DEFAULT NULL COMMENT 'مرجع التقرير/الملاحظة',
+  `g218` varchar(190) DEFAULT NULL COMMENT 'نوع الوارد',
+  `g219` varchar(190) DEFAULT NULL COMMENT 'الجهة الخاضعة',
+  `g220` varchar(190) DEFAULT NULL COMMENT 'الرأي العام',
+  `g221` varchar(190) DEFAULT NULL COMMENT 'عدد الملاحظات الحرجة',
+  `g222` varchar(190) DEFAULT NULL COMMENT 'المتأخرة',
+  `g223` varchar(190) DEFAULT NULL COMMENT 'المتكررة',
+  `g224` varchar(190) DEFAULT NULL COMMENT 'التعرض المقدر',
+  `g225` varchar(190) DEFAULT NULL COMMENT 'توصية المراجعة',
+  `g226` varchar(190) DEFAULT NULL COMMENT 'قرار الرئيس',
+  `g227` varchar(190) DEFAULT NULL COMMENT 'المكلف بالتنفيذ',
+  `g228` varchar(190) DEFAULT NULL COMMENT 'مهلة التنفيذ',
+  `g229` varchar(190) DEFAULT NULL COMMENT 'مرجع المتابعة ر15',
+  `g230` varchar(190) DEFAULT NULL COMMENT 'حالة الوارد',
+  `g231` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g232` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g233` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g234` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_2164fadd_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CEO-16 - تقرير تاكيد مستقل واحد';
+
 -- ── Table: exec_audit_reports ──
 CREATE TABLE `exec_audit_reports` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -4360,6 +4413,33 @@ CREATE TABLE `exec_audit_reports` (
   KEY `ix_time` (`company_id`,`issued_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='PROP-01 CEO-Y0119 — تقاريرُ المراجعةِ تصل الرئيسَ غيرَ مفلترة';
 
+-- ── Table: exec_board_kpi ──
+CREATE TABLE `exec_board_kpi` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g1` varchar(190) DEFAULT NULL COMMENT 'معرف المؤشر',
+  `g2` varchar(190) DEFAULT NULL COMMENT 'الكيان',
+  `g3` varchar(190) DEFAULT NULL COMMENT 'المحور',
+  `g4` varchar(190) DEFAULT NULL COMMENT 'كود المؤشر KPI Catalog',
+  `g5` varchar(190) DEFAULT NULL COMMENT 'اسم المؤشر',
+  `g6` varchar(190) DEFAULT NULL COMMENT 'النطاق',
+  `g7` varchar(190) DEFAULT NULL COMMENT 'مرجع النطاق',
+  `g8` varchar(190) DEFAULT NULL COMMENT 'القيمة',
+  `g9` varchar(190) DEFAULT NULL COMMENT 'الوحدة/العملة',
+  `g10` varchar(190) DEFAULT NULL COMMENT 'المستهدف',
+  `g11` varchar(190) DEFAULT NULL COMMENT 'الانحراف',
+  `g12` varchar(190) DEFAULT NULL COMMENT 'الاتجاه',
+  `g13` varchar(190) DEFAULT NULL COMMENT 'الحالة',
+  `g14` varchar(190) DEFAULT NULL COMMENT 'الإدارة المالكة',
+  `g15` varchar(190) DEFAULT NULL COMMENT 'رابط النزول للمصدر',
+  `g16` varchar(190) DEFAULT NULL COMMENT 'آخر تحديث',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_f6c19be1_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CEO-01 - مؤشر واحد للوحة القيادة';
+
 -- ── Table: exec_board_snapshots ──
 CREATE TABLE `exec_board_snapshots` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -4389,6 +4469,34 @@ CREATE TABLE `exec_board_snapshots` (
   UNIQUE KEY `uq_board_period` (`company_id`,`period`,`is_seed`),
   KEY `ix_exbs_live` (`company_id`,`period`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-00 §8-2: لقطات المؤشرات العليا — الجدول الأصلي لشاشة ceo_board';
+
+-- ── Table: exec_contract_registry ──
+CREATE TABLE `exec_contract_registry` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g135` varchar(190) DEFAULT NULL COMMENT 'معرف السطر',
+  `g136` varchar(190) DEFAULT NULL COMMENT 'نوع العقد',
+  `g137` varchar(190) DEFAULT NULL COMMENT 'الإدارة المالكة',
+  `g138` varchar(190) DEFAULT NULL COMMENT 'مرجع العقد في مصدره',
+  `g139` varchar(190) DEFAULT NULL COMMENT 'الكيان',
+  `g140` varchar(190) DEFAULT NULL COMMENT 'الطرف الآخر',
+  `g141` varchar(190) DEFAULT NULL COMMENT 'القيمة',
+  `g142` varchar(190) DEFAULT NULL COMMENT 'العملة',
+  `g143` varchar(190) DEFAULT NULL COMMENT 'نموذج العمل',
+  `g144` varchar(190) DEFAULT NULL COMMENT 'سريان من',
+  `g145` varchar(190) DEFAULT NULL COMMENT 'إلى',
+  `g146` varchar(190) DEFAULT NULL COMMENT 'أيام حتى الانتهاء',
+  `g147` varchar(190) DEFAULT NULL COMMENT 'عدد الالتزامات الحرجة القائمة',
+  `g148` varchar(190) DEFAULT NULL COMMENT 'عدد الكفالات والضمانات المرتبطة',
+  `g149` varchar(190) DEFAULT NULL COMMENT 'حالة العقد',
+  `g150` varchar(190) DEFAULT NULL COMMENT 'مرجع التوقيع',
+  `g151` varchar(190) DEFAULT NULL COMMENT 'رابط النزول للسجل الأصلي',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_f1ddcff6_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CEO-12 - عقد واحد في السجل الموحد';
 
 -- ── Table: exec_contract_signings ──
 CREATE TABLE `exec_contract_signings` (
@@ -4453,6 +4561,145 @@ CREATE TABLE `exec_contract_signings` (
   CONSTRAINT `fk_exec_contract_signings_approver` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`),
   CONSTRAINT `chk_exec_contract_signings_approver_identity` CHECK (`created_at` < '2026-08-19 00:00:00' or `approver_name` is null or trim(`approver_name`) = '' or `approver_user_id` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-00 §8-2: سجل التوقيع — الجدول الأصلي لشاشة ceo_contracts';
+
+-- ── Table: exec_crisis_case ──
+CREATE TABLE `exec_crisis_case` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g250` varchar(190) DEFAULT NULL COMMENT 'Crisis_ID',
+  `g251` varchar(190) DEFAULT NULL COMMENT 'Type',
+  `g252` varchar(190) DEFAULT NULL COMMENT 'Severity',
+  `g253` varchar(190) DEFAULT NULL COMMENT 'Site/Project',
+  `g254` varchar(190) DEFAULT NULL COMMENT 'Declared_At',
+  `g255` varchar(190) DEFAULT NULL COMMENT 'Incident_Commander مرجع القائد',
+  `g256` varchar(190) DEFAULT NULL COMMENT 'People_Impact',
+  `g257` varchar(190) DEFAULT NULL COMMENT 'Operational_Impact',
+  `g258` varchar(190) DEFAULT NULL COMMENT 'Financial_Impact',
+  `g259` varchar(190) DEFAULT NULL COMMENT 'Legal_Regulatory_Impact',
+  `g260` varchar(190) DEFAULT NULL COMMENT 'مرجع الحدث الأصلي',
+  `g261` varchar(190) DEFAULT NULL COMMENT 'Immediate_Actions Decision Event',
+  `g262` varchar(190) DEFAULT NULL COMMENT 'Decisions_Required',
+  `g263` varchar(190) DEFAULT NULL COMMENT 'Next_Update_At',
+  `g264` varchar(190) DEFAULT NULL COMMENT 'External_Communication_Status',
+  `g265` varchar(190) DEFAULT NULL COMMENT 'Current_Status',
+  `g266` varchar(190) DEFAULT NULL COMMENT 'Stand_Down_Date',
+  `g267` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g268` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g269` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g270` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_e74ef9fc_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CEO-18 - حالة ازمة واحدة';
+
+-- ── Table: exec_critical_exception ──
+CREATE TABLE `exec_critical_exception` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g198` varchar(190) DEFAULT NULL COMMENT 'معرف البند',
+  `g199` varchar(190) DEFAULT NULL COMMENT 'رقم الاستثناء',
+  `g200` varchar(190) DEFAULT NULL COMMENT 'الإدارة المصدر',
+  `g201` varchar(190) DEFAULT NULL COMMENT 'قاعدة المنع/السياسة',
+  `g202` varchar(190) DEFAULT NULL COMMENT 'المبرر',
+  `g203` varchar(190) DEFAULT NULL COMMENT 'المدة المطلوبة',
+  `g204` varchar(190) DEFAULT NULL COMMENT 'رأي الحوكمة',
+  `g205` varchar(190) DEFAULT NULL COMMENT 'رأي النائب المختص',
+  `g206` varchar(190) DEFAULT NULL COMMENT 'التعرض المقدر',
+  `g207` varchar(190) DEFAULT NULL COMMENT 'Risk_Appetite_Status',
+  `g208` varchar(190) DEFAULT NULL COMMENT 'القرار',
+  `g209` varchar(190) DEFAULT NULL COMMENT 'قبول المخاطرة موثق؟',
+  `g210` varchar(190) DEFAULT NULL COMMENT 'شروط إضافية',
+  `g211` varchar(190) DEFAULT NULL COMMENT 'حالة البند',
+  `g212` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g213` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g214` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g215` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_f968f12d_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CEO-15 - استثناء حرج واحد';
+
+-- ── Table: exec_daily_deviation ──
+CREATE TABLE `exec_daily_deviation` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g69` varchar(190) DEFAULT NULL COMMENT 'معرف البند',
+  `g70` varchar(190) DEFAULT NULL COMMENT 'معرف سطر اليوم',
+  `g71` varchar(190) DEFAULT NULL COMMENT 'نوع البند',
+  `g72` varchar(190) DEFAULT NULL COMMENT 'المشروع',
+  `g73` varchar(190) DEFAULT NULL COMMENT 'الموقع',
+  `g74` varchar(190) DEFAULT NULL COMMENT 'الوصف',
+  `g75` varchar(190) DEFAULT NULL COMMENT 'المسؤول',
+  `g76` varchar(190) DEFAULT NULL COMMENT 'المرجع الأصلي',
+  `g77` varchar(190) DEFAULT NULL COMMENT 'الإجراء المقرر Decision Event',
+  `g78` varchar(190) DEFAULT NULL COMMENT 'موعد الحل Decision Event',
+  `g79` varchar(190) DEFAULT NULL COMMENT 'الحالة',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_029511dd_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CEO-05 - انحراف واحد في يوم';
+
+-- ── Table: exec_daily_report ──
+CREATE TABLE `exec_daily_report` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g35` varchar(190) DEFAULT NULL COMMENT 'معرف السطر',
+  `g36` varchar(190) DEFAULT NULL COMMENT 'التاريخ',
+  `g37` varchar(190) DEFAULT NULL COMMENT 'المشروع',
+  `g38` varchar(190) DEFAULT NULL COMMENT 'الموقع',
+  `g39` varchar(190) DEFAULT NULL COMMENT 'الخطة اليومية',
+  `g40` varchar(190) DEFAULT NULL COMMENT 'المنفذ',
+  `g41` varchar(190) DEFAULT NULL COMMENT 'نسبة الإنجاز',
+  `g42` varchar(190) DEFAULT NULL COMMENT 'ساعات تشغيل المعدات',
+  `g43` varchar(190) DEFAULT NULL COMMENT 'إجمالي ساعات التوقف',
+  `g44` varchar(190) DEFAULT NULL COMMENT 'عدد أنواع التوقف تفصيلها ر03-2',
+  `g45` varchar(190) DEFAULT NULL COMMENT 'المعدات العاملة',
+  `g46` varchar(190) DEFAULT NULL COMMENT 'المعدات المتوقفة',
+  `g47` varchar(190) DEFAULT NULL COMMENT 'الأعطال الحرجة',
+  `g48` varchar(190) DEFAULT NULL COMMENT 'القوى الموجودة',
+  `g49` varchar(190) DEFAULT NULL COMMENT 'النقص',
+  `g50` varchar(190) DEFAULT NULL COMMENT 'إصابات مضيعة للوقت LTI',
+  `g51` varchar(190) DEFAULT NULL COMMENT 'حوادث عالية الجهد HiPo',
+  `g52` varchar(190) DEFAULT NULL COMMENT 'أحداث إيقاف العمل Stop-Work',
+  `g53` varchar(190) DEFAULT NULL COMMENT 'الحوادث البيئية',
+  `g54` varchar(190) DEFAULT NULL COMMENT 'البلاغات الحرجة',
+  `g55` varchar(190) DEFAULT NULL COMMENT 'الترحيلات المهمة',
+  `g56` varchar(190) DEFAULT NULL COMMENT 'المواد الحرجة',
+  `g57` varchar(190) DEFAULT NULL COMMENT 'عدد القرارات المطلوبة تفصيلها ر03-3',
+  `g58` varchar(190) DEFAULT NULL COMMENT 'عدد الانحرافات الحرجة تفصيلها ر03-3',
+  `g59` varchar(190) DEFAULT NULL COMMENT 'رابط النزول للسجل الأصلي',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_d78d9fe3_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CEO-03 - تقرير يوم واحد';
+
+-- ── Table: exec_daily_stop ──
+CREATE TABLE `exec_daily_stop` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g60` varchar(190) DEFAULT NULL COMMENT 'معرف السطر',
+  `g61` varchar(190) DEFAULT NULL COMMENT 'معرف سطر اليوم',
+  `g62` varchar(190) DEFAULT NULL COMMENT 'المشروع',
+  `g63` varchar(190) DEFAULT NULL COMMENT 'الموقع',
+  `g64` varchar(190) DEFAULT NULL COMMENT 'نوع التوقف',
+  `g65` varchar(190) DEFAULT NULL COMMENT 'ساعات النوع',
+  `g66` varchar(190) DEFAULT NULL COMMENT 'مسؤول التوقف',
+  `g67` varchar(190) DEFAULT NULL COMMENT 'أثر الفوترة',
+  `g68` varchar(190) DEFAULT NULL COMMENT 'مرجع السجل الأصلي',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_7030b0b1_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CEO-04 - توقف واحد في يوم';
 
 -- ── Table: exec_decisions ──
 CREATE TABLE `exec_decisions` (
@@ -4543,6 +4790,66 @@ CREATE TABLE `exec_doc_review_note` (
   KEY `ix_20fd707a_co` (`company_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='EX-CEO — ملاحظات مراجعة الوثيقة قبل التوقيع · الحبة: ملاحظةُ مراجعةٍ واحدةٌ على وثيقةٍ قبلَ توقيعِها';
 
+-- ── Table: exec_escalation ──
+CREATE TABLE `exec_escalation` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g235` varchar(190) DEFAULT NULL COMMENT 'معرف التصعيد',
+  `g236` varchar(190) DEFAULT NULL COMMENT 'وقت الوصول',
+  `g237` varchar(190) DEFAULT NULL COMMENT 'مصدر التصعيد',
+  `g238` varchar(190) DEFAULT NULL COMMENT 'المرجع الأصلي',
+  `g239` varchar(190) DEFAULT NULL COMMENT 'المسار المقطوع',
+  `g240` varchar(190) DEFAULT NULL COMMENT 'ملخص الحالة',
+  `g241` varchar(190) DEFAULT NULL COMMENT 'الأثر الجاري',
+  `g242` varchar(190) DEFAULT NULL COMMENT 'القرار',
+  `g243` varchar(190) DEFAULT NULL COMMENT 'المكلف بالتنفيذ',
+  `g244` varchar(190) DEFAULT NULL COMMENT 'مهلة التنفيذ',
+  `g245` varchar(190) DEFAULT NULL COMMENT 'حالة التصعيد',
+  `g246` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g247` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g248` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g249` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_8d65183d_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CEO-17 - تصعيد واحد';
+
+-- ── Table: exec_leadership_appointment ──
+CREATE TABLE `exec_leadership_appointment` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g317` varchar(190) DEFAULT NULL COMMENT 'رقم الطلب',
+  `g318` varchar(190) DEFAULT NULL COMMENT 'نوع الطلب',
+  `g319` varchar(190) DEFAULT NULL COMMENT 'المسمى القيادي من الهيكل',
+  `g320` varchar(190) DEFAULT NULL COMMENT 'الوحدة التنظيمية',
+  `g321` varchar(190) DEFAULT NULL COMMENT 'المرشح/المعني',
+  `g322` varchar(190) DEFAULT NULL COMMENT 'مرجع الشخص بالموارد',
+  `g323` varchar(190) DEFAULT NULL COMMENT 'سقف الاعتماد الممنوح',
+  `g324` varchar(190) DEFAULT NULL COMMENT 'بدل التكليف',
+  `g325` varchar(190) DEFAULT NULL COMMENT 'إفصاح طرف ذي علاقة',
+  `g326` varchar(190) DEFAULT NULL COMMENT 'مراجعة الموارد البشرية',
+  `g327` varchar(190) DEFAULT NULL COMMENT 'مراجعة الحوكمة',
+  `g328` varchar(190) DEFAULT NULL COMMENT 'قاعدة AAM المفعلة',
+  `g329` varchar(190) DEFAULT NULL COMMENT 'قرار الرئيس',
+  `g330` varchar(190) DEFAULT NULL COMMENT 'مرجع الإحالة للسلطة المحجوزة',
+  `g331` varchar(190) DEFAULT NULL COMMENT 'تاريخ النفاذ',
+  `g332` varchar(190) DEFAULT NULL COMMENT 'حالة الطلب',
+  `g333` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g334` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g335` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `g336` varchar(190) DEFAULT NULL COMMENT 'المعتمد',
+  `g337` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `g338` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g339` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_ecf6d84c_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CEO-23 - موافقة تعيين واحدة';
+
 -- ── Table: exec_matter_opinions ──
 CREATE TABLE `exec_matter_opinions` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -4579,6 +4886,87 @@ CREATE TABLE `exec_meeting` (
   PRIMARY KEY (`id`),
   KEY `ix_8b8f0c80_co` (`company_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='EX-CEO — اجتماعات الإدارة العليا · الحبة: اجتماعُ إدارةٍ عليا واحدٌ';
+
+-- ── Table: exec_meeting_decision ──
+CREATE TABLE `exec_meeting_decision` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g340` varchar(190) DEFAULT NULL COMMENT 'Decision_ID',
+  `g341` varchar(190) DEFAULT NULL COMMENT 'Meeting_ID',
+  `g342` varchar(190) DEFAULT NULL COMMENT 'Topic',
+  `g343` varchar(190) DEFAULT NULL COMMENT 'Decision',
+  `g344` varchar(190) DEFAULT NULL COMMENT 'Owner مرجع مسؤول التنفيذ',
+  `g345` varchar(190) DEFAULT NULL COMMENT 'Department مرجع الإدارة',
+  `g346` varchar(190) DEFAULT NULL COMMENT 'Due_Date',
+  `g347` varchar(190) DEFAULT NULL COMMENT 'Priority',
+  `g348` varchar(190) DEFAULT NULL COMMENT 'Status',
+  `g349` varchar(190) DEFAULT NULL COMMENT 'Evidence يرفقه المنفذ',
+  `g350` varchar(190) DEFAULT NULL COMMENT 'Closed_Date',
+  `g351` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g352` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g353` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g354` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_e4c65084_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CEO-25 - قرار اجتماع واحد';
+
+-- ── Table: exec_monthly_pack ──
+CREATE TABLE `exec_monthly_pack` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g93` varchar(190) DEFAULT NULL COMMENT 'معرف السطر',
+  `g94` varchar(190) DEFAULT NULL COMMENT 'الشهر',
+  `g95` varchar(190) DEFAULT NULL COMMENT 'المحور',
+  `g96` varchar(190) DEFAULT NULL COMMENT 'البند',
+  `g97` varchar(190) DEFAULT NULL COMMENT 'الفعلي',
+  `g98` varchar(190) DEFAULT NULL COMMENT 'المستهدف',
+  `g99` varchar(190) DEFAULT NULL COMMENT 'الانحراف',
+  `g100` varchar(190) DEFAULT NULL COMMENT 'الاتجاه',
+  `g101` varchar(190) DEFAULT NULL COMMENT 'توقع الشهر الكامل',
+  `g102` varchar(190) DEFAULT NULL COMMENT 'Outlook 60/90 يوما',
+  `g103` varchar(190) DEFAULT NULL COMMENT 'Forecast vs Budget',
+  `g104` varchar(190) DEFAULT NULL COMMENT 'بند النظرة الأمامية',
+  `g105` varchar(190) DEFAULT NULL COMMENT 'مراجعة النائب المختص',
+  `g106` varchar(190) DEFAULT NULL COMMENT 'ملاحظة تنفيذية Decision Event',
+  `g107` varchar(190) DEFAULT NULL COMMENT 'القرار/الإجراء المتفرع',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_3d26094a_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CEO-07 - حزمة شهر واحد';
+
+-- ── Table: exec_org_project ──
+CREATE TABLE `exec_org_project` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g17` varchar(190) DEFAULT NULL COMMENT 'معرف البطاقة',
+  `g18` varchar(190) DEFAULT NULL COMMENT 'نوع البطاقة',
+  `g19` varchar(190) DEFAULT NULL COMMENT 'Department_ID/Project_ID',
+  `g20` varchar(190) DEFAULT NULL COMMENT 'الاسم',
+  `g21` varchar(190) DEFAULT NULL COMMENT 'التبعية التنظيمية',
+  `g22` varchar(190) DEFAULT NULL COMMENT 'Head المسؤول',
+  `g23` varchar(190) DEFAULT NULL COMMENT 'Overall_Status',
+  `g24` varchar(190) DEFAULT NULL COMMENT 'KPI_Status',
+  `g25` varchar(190) DEFAULT NULL COMMENT 'Open_Requests',
+  `g26` varchar(190) DEFAULT NULL COMMENT 'Pending_Approvals',
+  `g27` varchar(190) DEFAULT NULL COMMENT 'Critical_Issues',
+  `g28` varchar(190) DEFAULT NULL COMMENT 'Overdue_Actions',
+  `g29` varchar(190) DEFAULT NULL COMMENT 'Budget_Status',
+  `g30` varchar(190) DEFAULT NULL COMMENT 'Compliance_Status',
+  `g31` varchar(190) DEFAULT NULL COMMENT 'Last_Daily_Report',
+  `g32` varchar(190) DEFAULT NULL COMMENT 'Last_Weekly_Report',
+  `g33` varchar(190) DEFAULT NULL COMMENT 'Last_Monthly_Close',
+  `g34` varchar(190) DEFAULT NULL COMMENT 'رابط النزول',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_52bd7719_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CEO-02 - ادارة او مشروع واحد';
 
 -- ── Table: exec_project_charters ──
 CREATE TABLE `exec_project_charters` (
@@ -4619,6 +5007,22 @@ CREATE TABLE `exec_project_charters` (
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `authority_ref` varchar(120) DEFAULT NULL COMMENT 'سندُ صلاحيةِ معتمِدِ القرار',
   `approver_user_id` int(11) DEFAULT NULL COMMENT 'هويةُ المعتمِدِ من سلسلةِ الاعتماد — والاسمُ يُقرأ منها لا يُكتب',
+  `g301` varchar(190) DEFAULT NULL COMMENT 'الكيان',
+  `g302` varchar(190) DEFAULT NULL COMMENT 'اسم المشروع',
+  `g303` varchar(190) DEFAULT NULL COMMENT 'رقم العميل',
+  `g304` varchar(190) DEFAULT NULL COMMENT 'مرجع العقد',
+  `g305` varchar(190) DEFAULT NULL COMMENT 'نموذج العمل',
+  `g306` varchar(190) DEFAULT NULL COMMENT 'المدة',
+  `g307` varchar(190) DEFAULT NULL COMMENT 'صلاحياته الممنوحة',
+  `g308` varchar(190) DEFAULT NULL COMMENT 'اكتمال الإفادات الست',
+  `g309` varchar(190) DEFAULT NULL COMMENT 'قرار الفتح',
+  `g310` varchar(190) DEFAULT NULL COMMENT 'تاريخ القرار',
+  `g311` varchar(190) DEFAULT NULL COMMENT 'حالة الميثاق',
+  `g312` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g313` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g314` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `g315` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g316` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_exec_charter_no` (`company_id`,`decision_no`),
   KEY `ix_expc_live` (`company_id`,`status`,`planned_start`),
@@ -4627,6 +5031,177 @@ CREATE TABLE `exec_project_charters` (
   CONSTRAINT `fk_exec_project_charters_approver` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`),
   CONSTRAINT `chk_exec_project_charters_approver_identity` CHECK (`created_at` < '2026-08-19 00:00:00' or `approver_name` is null or trim(`approver_name`) = '' or `approver_user_id` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-00 §8-2: قرار فتح المشروع — الجدول الأصلي لشاشة project_charter';
+
+-- ── Table: exec_redline_breach ──
+CREATE TABLE `exec_redline_breach` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g152` varchar(190) DEFAULT NULL COMMENT 'Exception_ID',
+  `g153` varchar(190) DEFAULT NULL COMMENT 'Source_Department',
+  `g154` varchar(190) DEFAULT NULL COMMENT 'Source_Record',
+  `g155` varchar(190) DEFAULT NULL COMMENT 'Rule_Breached',
+  `g156` varchar(190) DEFAULT NULL COMMENT 'Red_Line_Type',
+  `g157` varchar(190) DEFAULT NULL COMMENT 'Severity',
+  `g158` varchar(190) DEFAULT NULL COMMENT 'Financial_Exposure',
+  `g159` varchar(190) DEFAULT NULL COMMENT 'Operational_Exposure',
+  `g160` varchar(190) DEFAULT NULL COMMENT 'Legal_Exposure',
+  `g161` varchar(190) DEFAULT NULL COMMENT 'Compliance_Exposure',
+  `g162` varchar(190) DEFAULT NULL COMMENT 'Waivability_Type',
+  `g163` varchar(190) DEFAULT NULL COMMENT 'Requested_Exception',
+  `g164` varchar(190) DEFAULT NULL COMMENT 'Business_Justification',
+  `g165` varchar(190) DEFAULT NULL COMMENT 'Department_Recommendation',
+  `g166` varchar(190) DEFAULT NULL COMMENT 'Deputy_Recommendation',
+  `g167` varchar(190) DEFAULT NULL COMMENT 'Escalation_To',
+  `g168` varchar(190) DEFAULT NULL COMMENT 'CEO_Decision',
+  `g169` varchar(190) DEFAULT NULL COMMENT 'Conditions',
+  `g170` varchar(190) DEFAULT NULL COMMENT 'Valid_From',
+  `g171` varchar(190) DEFAULT NULL COMMENT 'Valid_To',
+  `g172` varchar(190) DEFAULT NULL COMMENT 'Evidence',
+  `g173` varchar(190) DEFAULT NULL COMMENT 'Closure',
+  `g174` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g175` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g176` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g177` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_57018cf8_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CEO-13 - تجاوز خط احمر واحد';
+
+-- ── Table: exec_request_queue ──
+CREATE TABLE `exec_request_queue` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g108` varchar(190) DEFAULT NULL COMMENT 'Request_ID',
+  `g109` varchar(190) DEFAULT NULL COMMENT 'Source_Department',
+  `g110` varchar(190) DEFAULT NULL COMMENT 'Source_Screen',
+  `g111` varchar(190) DEFAULT NULL COMMENT 'Request_Type',
+  `g112` varchar(190) DEFAULT NULL COMMENT 'Request_Title',
+  `g113` varchar(190) DEFAULT NULL COMMENT 'Requested_By',
+  `g114` varchar(190) DEFAULT NULL COMMENT 'Requested_Date',
+  `g115` varchar(190) DEFAULT NULL COMMENT 'Amount',
+  `g116` varchar(190) DEFAULT NULL COMMENT 'Currency',
+  `g117` varchar(190) DEFAULT NULL COMMENT 'Project',
+  `g118` varchar(190) DEFAULT NULL COMMENT 'Priority',
+  `g119` varchar(190) DEFAULT NULL COMMENT 'Risk_Level',
+  `g120` varchar(190) DEFAULT NULL COMMENT 'Previous_Approvals',
+  `g121` varchar(190) DEFAULT NULL COMMENT 'سقف الإدارة المصدر',
+  `g122` varchar(190) DEFAULT NULL COMMENT 'مقدار التجاوز عن السقف',
+  `g123` varchar(190) DEFAULT NULL COMMENT 'سبب الرفع للأعلى',
+  `g124` varchar(190) DEFAULT NULL COMMENT 'Current_Approval_Level',
+  `g125` varchar(190) DEFAULT NULL COMMENT 'Required_By',
+  `g126` varchar(190) DEFAULT NULL COMMENT 'Supporting_Documents',
+  `g127` varchar(190) DEFAULT NULL COMMENT 'Recommendation',
+  `g128` varchar(190) DEFAULT NULL COMMENT 'CEO_Decision',
+  `g129` varchar(190) DEFAULT NULL COMMENT 'Decision_Conditions',
+  `g130` varchar(190) DEFAULT NULL COMMENT 'Decision_Date',
+  `g131` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g132` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g133` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g134` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_f069163a_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CEO-08 - طلب واحد مرفوع';
+
+-- ── Table: exec_reserved_matter ──
+CREATE TABLE `exec_reserved_matter` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g178` varchar(190) DEFAULT NULL COMMENT 'معرف المسألة',
+  `g179` varchar(190) DEFAULT NULL COMMENT 'نوع المسألة',
+  `g180` varchar(190) DEFAULT NULL COMMENT 'الأساس في وثائق الشركة',
+  `g181` varchar(190) DEFAULT NULL COMMENT 'السلطة المخولة',
+  `g182` varchar(190) DEFAULT NULL COMMENT 'هل تحال بالكامل أم برأي الرئيس؟',
+  `g183` varchar(190) DEFAULT NULL COMMENT 'مرجع الوارد',
+  `g184` varchar(190) DEFAULT NULL COMMENT 'الإدارة المصدر',
+  `g185` varchar(190) DEFAULT NULL COMMENT 'القيمة/الأثر',
+  `g186` varchar(190) DEFAULT NULL COMMENT 'رأي الرئيس المرفوع',
+  `g187` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإحالة',
+  `g188` varchar(190) DEFAULT NULL COMMENT 'قرار الجهة الحاكمة',
+  `g189` varchar(190) DEFAULT NULL COMMENT 'تاريخ القرار',
+  `g190` varchar(190) DEFAULT NULL COMMENT 'حالة المسألة',
+  `g191` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g192` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g193` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `g194` varchar(190) DEFAULT NULL COMMENT 'المعتمد',
+  `g195` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `g196` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g197` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_49d91b69_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CEO-14 - مسالة محجوزة واحدة';
+
+-- ── Table: exec_strategic_decision ──
+CREATE TABLE `exec_strategic_decision` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g271` varchar(190) DEFAULT NULL COMMENT 'Decision_ID',
+  `g272` varchar(190) DEFAULT NULL COMMENT 'الكيان',
+  `g273` varchar(190) DEFAULT NULL COMMENT 'نوع القرار',
+  `g274` varchar(190) DEFAULT NULL COMMENT 'Proposal_Source',
+  `g275` varchar(190) DEFAULT NULL COMMENT 'Business_Case',
+  `g276` varchar(190) DEFAULT NULL COMMENT 'الخيارات المطروحة',
+  `g277` varchar(190) DEFAULT NULL COMMENT 'الخيار المختار',
+  `g278` varchar(190) DEFAULT NULL COMMENT 'مبرر الاختيار',
+  `g279` varchar(190) DEFAULT NULL COMMENT 'Financial_Impact',
+  `g280` varchar(190) DEFAULT NULL COMMENT 'Risk_Assessment',
+  `g281` varchar(190) DEFAULT NULL COMMENT 'Legal_Review_Status',
+  `g282` varchar(190) DEFAULT NULL COMMENT 'Finance_Review_Status',
+  `g283` varchar(190) DEFAULT NULL COMMENT 'Compliance_Review_Status',
+  `g284` varchar(190) DEFAULT NULL COMMENT 'Risk_Review_Status',
+  `g285` varchar(190) DEFAULT NULL COMMENT 'Relevant_Deputy_Recommendation',
+  `g286` varchar(190) DEFAULT NULL COMMENT 'فحص اكتمال بوابة المراجعات',
+  `g287` varchar(190) DEFAULT NULL COMMENT 'Recommendation',
+  `g288` varchar(190) DEFAULT NULL COMMENT 'Decision',
+  `g289` varchar(190) DEFAULT NULL COMMENT 'Effective_Date',
+  `g290` varchar(190) DEFAULT NULL COMMENT 'Owner مرجع مالك التنفيذ',
+  `g291` varchar(190) DEFAULT NULL COMMENT 'Milestones',
+  `g292` varchar(190) DEFAULT NULL COMMENT 'Follow_Up',
+  `g293` varchar(190) DEFAULT NULL COMMENT 'Closure',
+  `g294` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g295` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g296` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `g297` varchar(190) DEFAULT NULL COMMENT 'المعتمد',
+  `g298` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `g299` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g300` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_21570c71_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CEO-19 - قرار استراتيجي واحد';
+
+-- ── Table: exec_weekly_report ──
+CREATE TABLE `exec_weekly_report` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g80` varchar(190) DEFAULT NULL COMMENT 'معرف السطر',
+  `g81` varchar(190) DEFAULT NULL COMMENT 'الأسبوع',
+  `g82` varchar(190) DEFAULT NULL COMMENT 'المحور',
+  `g83` varchar(190) DEFAULT NULL COMMENT 'المؤشر',
+  `g84` varchar(190) DEFAULT NULL COMMENT 'هذا الأسبوع',
+  `g85` varchar(190) DEFAULT NULL COMMENT 'الأسبوع السابق',
+  `g86` varchar(190) DEFAULT NULL COMMENT 'المستهدف',
+  `g87` varchar(190) DEFAULT NULL COMMENT 'الانحراف',
+  `g88` varchar(190) DEFAULT NULL COMMENT 'الاتجاه Trend',
+  `g89` varchar(190) DEFAULT NULL COMMENT 'توقع الأسبوع القادم Forecast',
+  `g90` varchar(190) DEFAULT NULL COMMENT 'التوقع مقابل الميزانية',
+  `g91` varchar(190) DEFAULT NULL COMMENT 'عدد القرارات غير المنفذة',
+  `g92` varchar(190) DEFAULT NULL COMMENT 'قرار الاجتماع المتفرع',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_e3d0079e_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CEO-06 - تقرير اسبوع واحد';
 
 -- ── Table: failure_codes ──
 CREATE TABLE `failure_codes` (

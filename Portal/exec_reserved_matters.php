@@ -17,6 +17,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w15_view.php';
 
@@ -48,6 +49,41 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'المسائل المحجوزة'; $header_icon = 'fa fa-lock'; $header_actions = array();
     $header_back = array('href' => 'ceo_board.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'لوحة القيادة التنفيذية');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> المسائل المحجوزة بحقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف المسألة' => 'g178',
+            'نوع المسألة' => 'g179',
+            'الأساس في وثائق الشركة' => 'g180',
+            'السلطة المخولة' => 'g181',
+            'هل تحال بالكامل أم برأي الرئيس؟' => 'g182',
+            'مرجع الوارد' => 'g183',
+            'الإدارة المصدر' => 'g184',
+            'القيمة/الأثر' => 'g185',
+            'رأي الرئيس المرفوع' => 'g186',
+            'تاريخ الإحالة' => 'g187',
+            'قرار الجهة الحاكمة' => 'g188',
+            'تاريخ القرار' => 'g189',
+            'حالة المسألة' => 'g190',
+            'المنشئ' => 'g191',
+            'تاريخ الإنشاء' => 'g192',
+            'المراجع' => 'g193',
+            'المعتمد' => 'g194',
+            'تاريخ الاعتماد' => 'g195',
+            'حالة البيانات' => 'g196',
+            'مرجع المصدر' => 'g197',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('exec_reserved_matter');
+        echo ems_w14_grid('emsList_exec_reserved_matter', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في المسائل المحجوزة'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
 
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">عدد الوثائق الحاكمة</div></div>

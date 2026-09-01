@@ -24,6 +24,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 
 $is_super_admin = ((isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '') === '-1');
@@ -144,6 +145,40 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'صندوق التأكيد المستقل: تقارير المراجعة الداخلية تصل القمة بلا وساطة'; $header_icon = 'fa fa-inbox'; $header_actions = array();
     $header_back = array('href' => 'ceo_board.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'لوحة الرئيس');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> صندوق التاكيد المستقل بحقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف الوارد' => 'g216',
+            'مرجع التقرير/الملاحظة' => 'g217',
+            'نوع الوارد' => 'g218',
+            'الجهة الخاضعة' => 'g219',
+            'الرأي العام' => 'g220',
+            'عدد الملاحظات الحرجة' => 'g221',
+            'المتأخرة' => 'g222',
+            'المتكررة' => 'g223',
+            'التعرض المقدر' => 'g224',
+            'توصية المراجعة' => 'g225',
+            'قرار الرئيس' => 'g226',
+            'المكلف بالتنفيذ' => 'g227',
+            'مهلة التنفيذ' => 'g228',
+            'مرجع المتابعة ر15' => 'g229',
+            'حالة الوارد' => 'g230',
+            'المنشئ' => 'g231',
+            'تاريخ الإنشاء' => 'g232',
+            'حالة البيانات' => 'g233',
+            'مرجع المصدر' => 'g234',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('exec_assurance_report');
+        echo ems_w14_grid('emsList_exec_assurance_report', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في صندوق التاكيد المستقل'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
 
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= number_format($nAll) ?></div><div class="ems-stat-label">الوارد كله، تقارير وملاحظات مصعدة</div></div>

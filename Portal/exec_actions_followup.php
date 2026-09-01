@@ -17,6 +17,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w15_view.php';
 
@@ -48,6 +49,33 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'متابعة القرارات التنفيذية'; $header_icon = 'fa fa-list-check'; $header_actions = array();
     $header_back = array('href' => 'exec_meeting_decisions.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'قرارات الاجتماعات');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> متابعة القرارات التنفيذية بحقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'Action_ID' => 'g355',
+            'مصدر القرار' => 'g356',
+            'المرجع الأصلي' => 'g357',
+            'الموضوع' => 'g358',
+            'الإدارة' => 'g359',
+            'المسؤول' => 'g360',
+            'Due_Date' => 'g361',
+            'Priority' => 'g362',
+            'Status' => 'g363',
+            'أيام التأخير' => 'g364',
+            'Evidence' => 'g365',
+            'Closure' => 'g366',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('exec_action_followup');
+        echo ems_w14_grid('emsList_exec_action_followup', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في متابعة القرارات التنفيذية'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
 
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">عدد القرارات المتابعة</div></div>

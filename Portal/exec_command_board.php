@@ -18,6 +18,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 
 $is_super_admin = ((isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '') === '-1');
@@ -53,6 +54,37 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'لوحة القيادة التنفيذية: مؤشر في محور في نطاق، وكل رقم بمعادلته ومصدره'; $header_icon = 'fa fa-gauge-high'; $header_actions = array();
     $header_back = array('href' => 'ceo_board.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'لوحة الرئيس');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> لوحة القيادة التنفيذية بحقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف المؤشر' => 'g1',
+            'الكيان' => 'g2',
+            'المحور' => 'g3',
+            'كود المؤشر KPI Catalog' => 'g4',
+            'اسم المؤشر' => 'g5',
+            'النطاق' => 'g6',
+            'مرجع النطاق' => 'g7',
+            'القيمة' => 'g8',
+            'الوحدة/العملة' => 'g9',
+            'المستهدف' => 'g10',
+            'الانحراف' => 'g11',
+            'الاتجاه' => 'g12',
+            'الحالة' => 'g13',
+            'الإدارة المالكة' => 'g14',
+            'رابط النزول للمصدر' => 'g15',
+            'آخر تحديث' => 'g16',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('exec_board_kpi');
+        echo ems_w14_grid('emsList_exec_board_kpi', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في لوحة القيادة التنفيذية'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
 
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= number_format($nAxes) ?></div><div class="ems-stat-label">محاور اللوحة</div></div>

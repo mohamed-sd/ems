@@ -17,6 +17,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w15_view.php';
 
@@ -48,6 +49,32 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'انحرافات وقرارات اليوم'; $header_icon = 'fa fa-triangle-exclamation'; $header_actions = array();
     $header_back = array('href' => 'exec_daily_report.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'التقرير اليومي التنفيذي');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> انحرافات وقرارات اليوم بحقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف البند' => 'g69',
+            'معرف سطر اليوم' => 'g70',
+            'نوع البند' => 'g71',
+            'المشروع' => 'g72',
+            'الموقع' => 'g73',
+            'الوصف' => 'g74',
+            'المسؤول' => 'g75',
+            'المرجع الأصلي' => 'g76',
+            'الإجراء المقرر Decision Event' => 'g77',
+            'موعد الحل Decision Event' => 'g78',
+            'الحالة' => 'g79',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('exec_daily_deviation');
+        echo ems_w14_grid('emsList_exec_daily_deviation', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في انحرافات وقرارات اليوم'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
 
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">عدد الانحرافات</div></div>

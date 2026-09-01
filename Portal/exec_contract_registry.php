@@ -17,6 +17,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w15_view.php';
 
@@ -62,22 +63,31 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_exec_contract_registry')); ?>
-    <table id="emsList_exec_contract_registry" class="data-table">
-        <thead><tr><th>رقم العقد</th><th>الطرف الآخر</th><th>تاريخ التوقيع</th><th>البداية</th><th>النهاية</th><th>العملة</th><th>مرجع سلطة التوقيع</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= (int) $r["id"] ?></td>
-                    <td><?= ems_w15_txt($r["second_party"]) ?></td>
-                    <td><?= ems_w15_txt($r["contract_signing_date"]) ?></td>
-                    <td><?= ems_w15_txt($r["actual_start"]) ?></td>
-                    <td><?= ems_w15_txt($r["actual_end"]) ?></td>
-                    <td><?= ems_w15_txt($r["price_currency_contract"]) ?></td>
-                    <td><?= ems_w15_txt($r["signing_authority_ref"]) ?></td>
-                    <td><?= ems_w15_state((string) $r["contract_status"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف السطر' => 'g135',
+        'نوع العقد' => 'g136',
+        'الإدارة المالكة' => 'g137',
+        'مرجع العقد في مصدره' => 'g138',
+        'الكيان' => 'g139',
+        'الطرف الآخر' => 'g140',
+        'القيمة' => 'g141',
+        'العملة' => 'g142',
+        'نموذج العمل' => 'g143',
+        'سريان من' => 'g144',
+        'إلى' => 'g145',
+        'أيام حتى الانتهاء' => 'g146',
+        'عدد الالتزامات الحرجة القائمة' => 'g147',
+        'عدد الكفالات والضمانات المرتبطة' => 'g148',
+        'حالة العقد' => 'g149',
+        'مرجع التوقيع' => 'g150',
+        'رابط النزول للسجل الأصلي' => 'g151',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('exec_contract_registry');
+    echo ems_w14_grid('emsList_exec_contract_registry', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في سجل العقود الموحد'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>
