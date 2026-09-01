@@ -343,6 +343,15 @@ foreach ($fanin as $f => $n) { if ($n >= 2 && !isset($ownFile[$f])) { $SHARED[$f
 printf("  ◆ عُدَدٌ مشتركةٌ أُقصيت من الحبّة: %d ملفًّا (يبلغها سطحان فأكثر)\n", count($SHARED));
 
 $stat = array('G1'=>0,'G1B'=>0,'G2'=>0,'G3'=>0,'G4'=>0,'G5'=>0,'G6'=>0,'NONE_PATH'=>0,'NONE_TBL'=>0);
+/* ── أحكامُ جمعِ نوعَي مستندٍ في سطحٍ واحد — مُعلَنةٌ بمرجعِها لا مضمَرة ──
+ * ⛔ ولا يُكتب حكمٌ بلا نصِّ الورقةِ التي جمعت النوعَين باسمِ السطح. */
+$GRULE = array();
+$__gr = $ROOT . '/docs/REPAIR01_20260823/grain_rulings.json';
+if (is_file($__gr)) {
+    $__gj = json_decode((string) file_get_contents($__gr), true);
+    if (is_array($__gj)) { $GRULE = $__gj; }
+}
+
 $card = array('ROW'=>0,'LINE'=>0,'LIVE_READ'=>0,'LIST'=>0,'NONE'=>0);
 $multi = array(); $unres = array(); $noTbl = array(); $upd = 0;
 
@@ -465,7 +474,17 @@ foreach ($rows as $s) {
                 $cd = grain_looks_line($ent) ? 'LINE' : 'ROW';
                 /* ⛔ **الخرقُ لا يُحكَم على عُدّةٍ مشتركة** — فما جاء من كِيتٍ
                    يشتملُه غيرُه لا يُنسب إلى هذا السطحِ خرقًا. */
-                if (count($distinct) >= 2 && $tier === 'OWN') {
+                /* ◆ **وحكمُ الورقةِ يغلب عدَّ الجداول**: سطحٌ **تسمّيه الورقةُ
+                     نفسُها** بجمعِ نوعَين من المستند («التراخيص والكفالات»)
+                     حبّتُه **مستندٌ** في جدولَين لا حبّتان. والحكمُ **مسجَّلٌ
+                     بمرجعِه** في `docs/REPAIR01_20260823/grain_rulings.json`
+                     — ⛔ ولا يُقبل حكمٌ بلا نصِّ الورقةِ ومرجعِه، ولا يُوسَّع
+                     إلى سطحٍ لم تجمعْه الورقةُ باسمِها. */
+                if (count($distinct) >= 2 && $tier === 'OWN' && isset($GRULE[$base])) {
+                    $rule = 'G5_RULED_ONE_DOC_TWO_KINDS';
+                    $wit .= ' · حكمٌ مسجَّل: ' . $GRULE[$base];
+                    $stat['G5'] = isset($stat['G5']) ? $stat['G5'] + 1 : 1;
+                } elseif (count($distinct) >= 2 && $tier === 'OWN') {
                     $mult = 1; $rule = 'G4_TWO_GRAINS';
                     $multi[] = $s['screen_id'] . ' · ' . $base . ' ⇐ ' . implode(' + ', array_slice($distinct, 0, 4));
                     $stat['G4']++;
