@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-01 23:09:24
--- الجداول: 1146 · المناظير: 28
+-- المصدر: equipation_manage · التوليد: 2026-09-01 23:15:27
+-- الجداول: 1149 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -3221,6 +3221,70 @@ CREATE TABLE `drivercontracts` (
   CONSTRAINT `fk_drivercontracts_project_contract` FOREIGN KEY (`project_contract_id`) REFERENCES `contracts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── Table: dvp_dashboard_kpi ──
+CREATE TABLE `dvp_dashboard_kpi` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g40` varchar(190) DEFAULT NULL COMMENT 'معرف المؤشر',
+  `g41` varchar(190) DEFAULT NULL COMMENT 'Deputy_Role',
+  `g42` varchar(190) DEFAULT NULL COMMENT 'المحور',
+  `g43` varchar(190) DEFAULT NULL COMMENT 'ضمن Default Scope؟',
+  `g44` varchar(190) DEFAULT NULL COMMENT 'المؤشر',
+  `g45` varchar(190) DEFAULT NULL COMMENT 'القيمة',
+  `g46` varchar(190) DEFAULT NULL COMMENT 'الوحدة/العملة',
+  `g47` varchar(190) DEFAULT NULL COMMENT 'المستهدف',
+  `g48` varchar(190) DEFAULT NULL COMMENT 'الانحراف',
+  `g49` varchar(190) DEFAULT NULL COMMENT 'الحالة',
+  `g50` varchar(190) DEFAULT NULL COMMENT 'رابط النزول',
+  `g51` varchar(190) DEFAULT NULL COMMENT 'آخر تحديث',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_8b9c80a4_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='VP-01 - لا سطر مسجل بعد في لوحة النائب';
+
+-- ── Table: dvp_delegations ──
+CREATE TABLE `dvp_delegations` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g21` varchar(190) DEFAULT NULL COMMENT 'Delegation_ID',
+  `g22` varchar(190) DEFAULT NULL COMMENT 'Delegate_From',
+  `g23` varchar(190) DEFAULT NULL COMMENT 'Delegate_To',
+  `g24` varchar(190) DEFAULT NULL COMMENT 'Scope',
+  `g25` varchar(190) DEFAULT NULL COMMENT 'From_Date',
+  `g26` varchar(190) DEFAULT NULL COMMENT 'To_Date',
+  `g27` varchar(190) DEFAULT NULL COMMENT 'Approval_Level',
+  `g28` varchar(190) DEFAULT NULL COMMENT 'Exclusions',
+  `g29` varchar(190) DEFAULT NULL COMMENT 'Status',
+  `g30` varchar(190) DEFAULT NULL COMMENT 'مرجع سجل الحوكمة',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_21e1a12c_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='VP-12 - الإنابات والتفويضات';
+
+-- ── Table: dvp_vp_pending_actions ──
+CREATE TABLE `dvp_vp_pending_actions` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g31` varchar(190) DEFAULT NULL COMMENT 'معرف البند',
+  `g32` varchar(190) DEFAULT NULL COMMENT 'Deputy_Role',
+  `g33` varchar(190) DEFAULT NULL COMMENT 'المصدر',
+  `g34` varchar(190) DEFAULT NULL COMMENT 'نوع الفعل',
+  `g35` varchar(190) DEFAULT NULL COMMENT 'المرجع',
+  `g36` varchar(190) DEFAULT NULL COMMENT 'المهلة',
+  `g37` varchar(190) DEFAULT NULL COMMENT 'أيام التأخير',
+  `g38` varchar(190) DEFAULT NULL COMMENT 'الأولوية',
+  `g39` varchar(190) DEFAULT NULL COMMENT 'الحالة',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_43c25a14_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='VP-10 - الإجراءات والقرارات المطلوبة مني';
+
 -- ── Table: effective_permissions ──
 CREATE TABLE `effective_permissions` (
   `ep_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -4238,6 +4302,7 @@ CREATE TABLE `exec_action_followup` (
   `created_at` datetime DEFAULT NULL,
   `created_by` int(11) DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
+  `g7` varchar(190) DEFAULT NULL COMMENT 'Deputy_Role',
   PRIMARY KEY (`id`),
   KEY `ix_37e70378_co` (`company_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CEO-26 - قرار تنفيذي متابع';
@@ -4677,6 +4742,8 @@ CREATE TABLE `exec_daily_report` (
   `created_at` datetime DEFAULT NULL,
   `created_by` int(11) DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
+  `g1` varchar(190) DEFAULT NULL COMMENT 'Deputy_Role',
+  `g2` varchar(190) DEFAULT NULL COMMENT 'ضمن Scope؟',
   PRIMARY KEY (`id`),
   KEY `ix_d78d9fe3_co` (`company_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CEO-03 - تقرير يوم واحد';
@@ -4935,6 +5002,10 @@ CREATE TABLE `exec_monthly_pack` (
   `created_at` datetime DEFAULT NULL,
   `created_by` int(11) DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
+  `g17` varchar(190) DEFAULT NULL COMMENT 'Deputy_Role',
+  `g18` varchar(190) DEFAULT NULL COMMENT 'مراجعة النائب Decision Event',
+  `g19` varchar(190) DEFAULT NULL COMMENT 'اكتملت المراجعة؟',
+  `g20` varchar(190) DEFAULT NULL COMMENT 'انعكس في حزمة الرئيس',
   PRIMARY KEY (`id`),
   KEY `ix_3d26094a_co` (`company_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CEO-07 - حزمة شهر واحد';
@@ -4964,6 +5035,13 @@ CREATE TABLE `exec_org_project` (
   `created_at` datetime DEFAULT NULL,
   `created_by` int(11) DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
+  `g8` varchar(190) DEFAULT NULL COMMENT 'وضع العرض',
+  `g9` varchar(190) DEFAULT NULL COMMENT 'Deputy_Role',
+  `g10` varchar(190) DEFAULT NULL COMMENT 'الإدارة',
+  `g11` varchar(190) DEFAULT NULL COMMENT 'ضمن نطاقي؟',
+  `g12` varchar(190) DEFAULT NULL COMMENT 'خارج النطاق قراءة فقط',
+  `g13` varchar(190) DEFAULT NULL COMMENT 'Pending_Requests',
+  `g14` varchar(190) DEFAULT NULL COMMENT 'Critical_Risks',
   PRIMARY KEY (`id`),
   KEY `ix_52bd7719_co` (`company_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CEO-02 - ادارة او مشروع واحد';
@@ -5103,6 +5181,10 @@ CREATE TABLE `exec_request_queue` (
   `created_at` datetime DEFAULT NULL,
   `created_by` int(11) DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
+  `g3` varchar(190) DEFAULT NULL COMMENT 'Deputy_Role',
+  `g4` varchar(190) DEFAULT NULL COMMENT 'Approval_Scope',
+  `g5` varchar(190) DEFAULT NULL COMMENT 'Status',
+  `g6` varchar(190) DEFAULT NULL COMMENT 'Deputy_Decision',
   PRIMARY KEY (`id`),
   KEY `ix_f069163a_co` (`company_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CEO-08 - طلب واحد مرفوع';
@@ -5199,6 +5281,8 @@ CREATE TABLE `exec_weekly_report` (
   `created_at` datetime DEFAULT NULL,
   `created_by` int(11) DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
+  `g15` varchar(190) DEFAULT NULL COMMENT 'Deputy_Role',
+  `g16` varchar(190) DEFAULT NULL COMMENT 'Deputy_Action المتفرع',
   PRIMARY KEY (`id`),
   KEY `ix_e3d0079e_co` (`company_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CEO-06 - تقرير اسبوع واحد';

@@ -15,6 +15,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 
 $is_super_admin = ((isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '') === '-1');
@@ -62,6 +63,33 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'متابعة القرارات النيابية: قرار واحد بمصدره ومكلفه ومهلتيه وحالته'; $header_icon = 'fa fa-clipboard-list'; $header_actions = array();
     $header_back = array('href' => 'vp_pending_actions.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'المطلوب مني');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'Action_ID' => 'g355',
+            'Deputy_Role' => 'g7',
+            'مصدر القرار' => 'g356',
+            'الموضوع' => 'g358',
+            'الإدارة' => 'g359',
+            'المسؤول' => 'g360',
+            'Due_Date' => 'g361',
+            'Priority' => 'g362',
+            'Status' => 'g363',
+            'أيام التأخير' => 'g364',
+            'Evidence' => 'g365',
+            'Closure' => 'g366',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('exec_action_followup');
+        echo ems_w14_grid('emsList_exec_action_followup', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في متابعة قرارات النائب'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
 
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= number_format(count($rows)) ?></div><div class="ems-stat-label">قرارات في سجل المتابعة</div></div>

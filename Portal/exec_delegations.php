@@ -17,6 +17,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w15_view.php';
 
@@ -62,21 +63,24 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_exec_delegations')); ?>
-    <table id="emsList_exec_delegations" class="data-table">
-        <thead><tr><th>رقم الإنابة</th><th>صاحب الإنابة</th><th>النائب</th><th>من</th><th>إلى</th><th>السبب</th><th>تاريخ الإلغاء</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= (int) $r["delegation_id"] ?></td>
-                    <td><?= (int) $r["from_user"] ?></td>
-                    <td><?= (int) $r["to_user"] ?></td>
-                    <td><?= ems_w15_txt($r["valid_from"]) ?></td>
-                    <td><?= ems_w15_txt($r["valid_to"]) ?></td>
-                    <td><?= ems_w15_txt($r["reason"]) ?></td>
-                    <td><?= ems_w15_txt($r["revoked_at"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'Delegation_ID' => 'g21',
+        'Delegate_From' => 'g22',
+        'Delegate_To' => 'g23',
+        'Scope' => 'g24',
+        'From_Date' => 'g25',
+        'To_Date' => 'g26',
+        'Approval_Level' => 'g27',
+        'Exclusions' => 'g28',
+        'Status' => 'g29',
+        'مرجع سجل الحوكمة' => 'g30',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('dvp_delegations');
+    echo ems_w14_grid('emsList_exec_delegations', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الإنابات والتفويضات'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

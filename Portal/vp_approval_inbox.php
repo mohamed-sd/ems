@@ -17,6 +17,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 
 $is_super_admin = ((isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '') === '-1');
@@ -82,6 +83,40 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title = 'صندوق اعتمادات النائب الموحد: المحرك يحدد من يستلم والفعل عند فاعله'; $header_icon = 'fa fa-stamp'; $header_actions = array();
     $header_back = array('href' => 'vp_dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'لوحة قيادة النائب');
     include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'Request_ID' => 'g108',
+            'Source_Department' => 'g109',
+            'Request_Type' => 'g111',
+            'Deputy_Role' => 'g3',
+            'Approval_Scope' => 'g4',
+            'Amount' => 'g115',
+            'Currency' => 'g116',
+            'Previous_Approval' => 'g120',
+            'Recommendation' => 'g127',
+            'Documents' => 'g126',
+            'Risk' => 'g119',
+            'Status' => 'g5',
+            'Deputy_Decision' => 'g6',
+            'Conditions' => 'g129',
+            'Decision_Date' => 'g130',
+            'المنشئ' => 'g131',
+            'تاريخ الإنشاء' => 'g132',
+            'حالة البيانات' => 'g133',
+            'مرجع المصدر' => 'g134',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('exec_request_queue');
+        echo ems_w14_grid('emsList_exec_request_queue', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في صندوق اعتمادات النائب'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php  ?>
 
     <div class="ems-stat-cards">
         <div class="ems-stat-card"><div class="ems-stat-value"><?= number_format(count($rows)) ?></div><div class="ems-stat-label">وارد الصندوق الموحد</div></div>

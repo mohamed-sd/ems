@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w15_view.php';
 
@@ -58,20 +59,26 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <?php require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_vp_weekly_report')); ?>
-    <table id="emsList_vp_weekly_report" class="data-table">
-        <thead><tr><th>اليوم</th><th>المشروع</th><th>المحور</th><th>الساعات</th><th>الطرف المسؤول</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= ems_w15_txt($r["stop_date"]) ?></td>
-                    <td><?= (int) $r["project_id"] ?></td>
-                    <td><?= ems_w15_state((string) $r["ops_state"]) ?></td>
-                    <td><?= ems_w15_num($r["hours"]) ?></td>
-                    <td><?= ems_w15_state((string) $r["resp_party"]) ?></td>
-                    <td><?= ems_w15_state((string) $r["decision"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف السطر' => 'g80',
+        'Deputy_Role' => 'g15',
+        'الأسبوع' => 'g81',
+        'المحور' => 'g82',
+        'المؤشر' => 'g83',
+        'هذا الأسبوع' => 'g84',
+        'السابق' => 'g85',
+        'المستهدف' => 'g86',
+        'الانحراف' => 'g87',
+        'الاتجاه' => 'g88',
+        'توقع الأسبوع القادم' => 'g89',
+        'Deputy_Action المتفرع' => 'g16',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('exec_weekly_report');
+    echo ems_w14_grid('emsList_vp_weekly_report', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في مراجعة الأداء الأسبوعية'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

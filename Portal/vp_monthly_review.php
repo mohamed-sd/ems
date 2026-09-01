@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w15_view.php';
 
@@ -58,22 +59,26 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <?php require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_vp_monthly_review')); ?>
-    <table id="emsList_vp_monthly_review" class="data-table">
-        <thead><tr><th>الشهر</th><th>رقم الإقفال</th><th>الكيان</th><th>الرصيد الافتتاحي</th><th>المستحق</th><th>المسدد</th><th>الرصيد الختامي</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= ems_w15_txt($r["accounting_month"]) ?></td>
-                    <td><?= ems_w15_txt($r["close_code"]) ?></td>
-                    <td><?= (int) $r["entity_id"] ?></td>
-                    <td><?= ems_w15_num($r["open_balance"]) ?></td>
-                    <td><?= ems_w15_num($r["due_in_month"]) ?></td>
-                    <td><?= ems_w15_num($r["paid_in_month"]) ?></td>
-                    <td><?= ems_w15_num($r["close_balance"]) ?></td>
-                    <td><?= ems_w15_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف السطر' => 'g93',
+        'Deputy_Role' => 'g17',
+        'الشهر' => 'g94',
+        'المحور' => 'g95',
+        'البند' => 'g96',
+        'الفعلي' => 'g97',
+        'المستهدف' => 'g98',
+        'الانحراف' => 'g99',
+        'توقع الشهر الكامل' => 'g101',
+        'مراجعة النائب Decision Event' => 'g18',
+        'اكتملت المراجعة؟' => 'g19',
+        'انعكس في حزمة الرئيس' => 'g20',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('exec_monthly_pack');
+    echo ems_w14_grid('emsList_vp_monthly_review', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في المراجعة الشهرية للنائب'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>
