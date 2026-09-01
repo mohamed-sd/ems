@@ -1,65 +1,69 @@
 # MASTER FINAL CLOSURE REGISTER — السجلُّ الجامعُ للإغلاقِ النهائيّ
 
 > **المخزنُ الحاكم:** `registers/MASTER_FINAL_CLOSURE_REGISTER.json` — وهذا إسقاطُه.
-> **اللقطة:** `df5adb85` · **حُدِّث:** 2026-08-31 18:30
+> **اللقطة:** `efb30839` · **حُدِّث:** 2026-09-01 14:18
 > **المصمَّمُ الحاكم:** `docs/REPAIR01_20260823/orders/CLOSURE_SYSTEM.txt`
 
 ## مقامُ الحالات — ⛔ ولا تُجمَع في نسبةٍ واحدة
 
 | الحالة | العدد |
 |---|---|
-| `BLOCKED_ENVIRONMENT` | 1 |
-| `BLOCKED_GOVERNING_SOURCE` | 1 |
-| `BLOCKED_OWNER` | 26 |
-| `BLOCKED_UAT` | 4 |
-| `EVIDENCE_CLOSED` | 115 |
-| `IMPLEMENTED_NOT_VERIFIED` | 23 |
-| `OPEN` | 12 |
-| **الجملة** | **182** |
+| `BLOCKED_ENVIRONMENT` | 2 |
+| `BLOCKED_GOVERNING_SOURCE` | 3 |
+| `BLOCKED_OWNER` | 40 |
+| `BLOCKED_UAT` | 5 |
+| `EVIDENCE_CLOSED` | 120 |
+| `IMPLEMENTED_NOT_VERIFIED` | 9 |
+| `IN_PROGRESS` | 2 |
+| `OPEN` | 16 |
+| **الجملة** | **197** |
 
 ## البنودُ غيرُ المغلقة — بحاجزِها وفعلِها التالي
 
 | Closure_ID | الحالة | الأولوية | الحاجز | المصدر | اللقطةُ الحالية | الفعلُ التالي |
 |---|---|---|---|---|---|---|
-| `CL-WORK-01` | `BLOCKED_ENVIRONMENT` | P0 | — | docs/REPAIR01_20260823/orders/CLOSURE_SYSTEM.txt | محلي 59136c85 متقدم عن البعيد 96a640e1 — الدفع مسلم للمستخدم @ 59136c85 |  |
-| `CL-FR-APP-001` | `IMPLEMENTED_NOT_VERIFIED` | P0 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | الحاجز وقائع حية لا هندسة — يمارس بالاستخدام ثم يغلق @ 747cfbe7 |  |
-| `CL-FR-APP-002` | `BLOCKED_OWNER` | P0 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ 808a2c03 |  |
-| `CL-FR-APP-004` | `BLOCKED_OWNER` | P0 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ 808a2c03 |  |
-| `CL-FR-DAT-001` | `BLOCKED_OWNER` | P0 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ 808a2c03 |  |
+| `CL-WORK-01` | `BLOCKED_ENVIRONMENT` | P0 | — | docs/REPAIR01_20260823/orders/CLOSURE_SYSTEM.txt | حماية مصدر العمل — REMOTE_HEAD=LOCAL_HEAD والوسوم والأسس @ efb30839 |  |
+| `CL-FR-APP-001` | `IMPLEMENTED_NOT_VERIFIED` | P0 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ efb30839 |  |
+| `CL-FR-APP-002` | `BLOCKED_OWNER` | P0 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ efb30839 |  |
+| `CL-FR-APP-004` | `BLOCKED_OWNER` | P0 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ efb30839 |  |
+| `CL-FR-DAT-001` | `BLOCKED_OWNER` | P0 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ efb30839 |  |
 | `CL-NAVR-HUMAN` | `BLOCKED_UAT` | P1 | UAT | أمر المالك: إصلاح نموذج الملاحة من الجذور (2026-08-31) | المؤهل للتحقق البشري: 17 ادارة + EX-CEO (مطابق فيما بني من ملف القيادة) — HUMAN_NAV_PASS=0 | جولة تحقق بشري بدور حقيقي لكل ادارة — 16 قابلة فورا وDEP-08 محجوبة برب |
-| `CL-GAP-23` | `BLOCKED_UAT` | P1 | — | tools/injfix01_gap_coverage.php | الحاجز بشري لا هندسي — يغلق بجولة UAT @ 1c3ed647 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
-| `CL-GAP-29` | `OPEN` | P1 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
-| `CL-FR-APP-005` | `IMPLEMENTED_NOT_VERIFIED` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ 808a2c03 |  |
-| `CL-FR-APP-007` | `IMPLEMENTED_NOT_VERIFIED` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ 808a2c03 |  |
-| `CL-FR-APP-008` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ 808a2c03 |  |
-| `CL-FR-SEC-003` | `IMPLEMENTED_NOT_VERIFIED` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ 808a2c03 |  |
-| `CL-FR-SEC-008` | `IMPLEMENTED_NOT_VERIFIED` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ 808a2c03 |  |
-| `CL-FR-FIN-005` | `IMPLEMENTED_NOT_VERIFIED` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ 808a2c03 |  |
-| `CL-FR-JRN-001` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ 808a2c03 |  |
-| `CL-FR-NAV-001` | `IMPLEMENTED_NOT_VERIFIED` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ 808a2c03 |  |
-| `CL-FR-APP-006` | `BLOCKED_GOVERNING_SOURCE` | P1 | GOVERNING_SOURCE | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_GOVERNING_SOURCE @ 808a2c03 |  |
-| `CL-FR-APP-009` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ 808a2c03 |  |
-| `CL-FR-APP-010` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ 808a2c03 |  |
-| `CL-FR-APP-011` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ 808a2c03 |  |
-| `CL-FR-SEC-006` | `IMPLEMENTED_NOT_VERIFIED` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ 808a2c03 |  |
-| `CL-FR-SEC-007` | `IMPLEMENTED_NOT_VERIFIED` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ 808a2c03 |  |
-| `CL-FR-FIN-004` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ 808a2c03 |  |
-| `CL-FR-FIN-006` | `IMPLEMENTED_NOT_VERIFIED` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ 808a2c03 |  |
-| `CL-FR-FIN-007` | `IMPLEMENTED_NOT_VERIFIED` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ 808a2c03 |  |
-| `CL-FR-EVT-004` | `IMPLEMENTED_NOT_VERIFIED` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ 808a2c03 |  |
-| `CL-FR-JRN-002` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ 808a2c03 |  |
-| `CL-FR-JRN-004` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ 808a2c03 |  |
-| `CL-FR-JRN-005` | `IMPLEMENTED_NOT_VERIFIED` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ 808a2c03 |  |
-| `CL-FR-JRN-006` | `IMPLEMENTED_NOT_VERIFIED` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ 808a2c03 |  |
-| `CL-FR-NAV-002` | `IMPLEMENTED_NOT_VERIFIED` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ 808a2c03 |  |
-| `CL-FR-NAV-004` | `IMPLEMENTED_NOT_VERIFIED` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ 808a2c03 |  |
-| `CL-FR-NAV-006` | `IMPLEMENTED_NOT_VERIFIED` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ 808a2c03 |  |
-| `CL-FR-APP-012` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ 808a2c03 |  |
-| `CL-FR-GOV-008` | `BLOCKED_OWNER` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | محجوب على قرار المالك لا هندسة @ ba23a05a |  |
-| `CL-R2-T13` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/REPAIR01_20260823/RPR02_TARGET_UNIVERSE.md | شاشة PLATFORM بلا تبرير منصي معتمد = 0 (المقيس 12) @ 808a2c03 |  |
-| `CL-R2-T16` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/REPAIR01_20260823/RPR02_TARGET_UNIVERSE.md | اسم معروض غير معتمد = 0 (المقيس 3 منها 2 PENDING_OWNER) @ 808a2c03 |  |
-| `CL-R3-M08` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/REPAIR01_20260823/RPR03_SCORECARD.md | أسطح PLATFORM بلا تبرير = 0 (المقيس 12) @ 808a2c03 |  |
-| `CL-R3-M11` | `BLOCKED_OWNER` | P1 | — | docs/REPAIR01_20260823/RPR03_SCORECARD.md | محجوب على OA-08 — والمواضع بنيويا جاهزة والناقص الملء @ cf1ea2a1 |  |
+| `CL-GOV3-WH03` | `IMPLEMENTED_NOT_VERIFIED` | P1 | — | docs/REPAIR01_20260823/orders/GOV_EXEC.txt | IMPLEMENTED_NOT_VERIFIED @ 15ba9f3c | تشغيل جولة استخدام حية ثم رفع الحالة VERIFIED — والتحقق البشري للمساحة |
+| `CL-GOV3-BUILD` | `IMPLEMENTED_NOT_VERIFIED` | P1 | — | docs/REPAIR01_20260823/orders/GOV_EXEC.txt | CURRENT_RELEASE_TARGET_NOT_BUILT صفر لكل مساحة بدور حي — والاثبات البشري وحده يفصل بين IMP | استخراج Sprint من السجل واخذ اعلى الاهداف قيمة — 134 موضعا حاليا (لوحة |
+| `CL-GOV3-FIELDS` | `IN_PROGRESS` | P1 | — | docs/REPAIR01_20260823/orders/GOV_EXEC.txt | والمقام صعد بدخول 90 سطحا جديدا الجسر — فخ المقام §20 معلن، ومفتاح الدفتر صحح الى (screen_ | ابدا بالادارات البانية سقف البنية (ترتيب السجل) — المقيس الحالي في SCR |
+| `CL-GOVUI-02` | `IN_PROGRESS` | P1 | — | docs/REPAIR01_20260823/orders/GOV_UI_EXEC.txt | جبهة الحقول — FIELD_CONFORMANCE على الدفتر المسوى @ efb30839 |  |
+| `CL-GAP-23` | `BLOCKED_UAT` | P1 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ efb30839 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
+| `CL-GAP-29` | `OPEN` | P1 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ efb30839 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
+| `CL-FR-APP-005` | `BLOCKED_OWNER` | P1 | BLOCKED_OWNER | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ efb30839 |  |
+| `CL-FR-APP-007` | `BLOCKED_OWNER` | P1 | BLOCKED_OWNER | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ efb30839 |  |
+| `CL-FR-APP-008` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ efb30839 |  |
+| `CL-FR-SEC-003` | `BLOCKED_OWNER` | P1 | BLOCKED_OWNER | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ efb30839 |  |
+| `CL-FR-SEC-008` | `BLOCKED_OWNER` | P1 | BLOCKED_OWNER | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ efb30839 |  |
+| `CL-FR-FIN-005` | `BLOCKED_ENVIRONMENT` | P1 | BLOCKED_ENVIRONMENT | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ efb30839 |  |
+| `CL-FR-JRN-001` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ efb30839 |  |
+| `CL-FR-APP-006` | `BLOCKED_GOVERNING_SOURCE` | P1 | GOVERNING_SOURCE | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_GOVERNING_SOURCE @ efb30839 |  |
+| `CL-FR-APP-009` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ efb30839 |  |
+| `CL-FR-APP-010` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ efb30839 |  |
+| `CL-FR-APP-011` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ efb30839 |  |
+| `CL-FR-SEC-006` | `BLOCKED_GOVERNING_SOURCE` | P1 | BLOCKED_GOVERNING_SOURCE | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ efb30839 |  |
+| `CL-FR-SEC-007` | `IMPLEMENTED_NOT_VERIFIED` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ efb30839 |  |
+| `CL-FR-FIN-004` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ efb30839 |  |
+| `CL-FR-FIN-006` | `BLOCKED_OWNER` | P1 | BLOCKED_OWNER | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ efb30839 |  |
+| `CL-FR-FIN-007` | `IMPLEMENTED_NOT_VERIFIED` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ efb30839 |  |
+| `CL-FR-EVT-004` | `BLOCKED_OWNER` | P1 | BLOCKED_OWNER | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ efb30839 |  |
+| `CL-FR-JRN-002` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ efb30839 |  |
+| `CL-FR-JRN-004` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ efb30839 |  |
+| `CL-FR-JRN-005` | `BLOCKED_OWNER` | P1 | BLOCKED_OWNER | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ efb30839 |  |
+| `CL-FR-JRN-006` | `IMPLEMENTED_NOT_VERIFIED` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ efb30839 |  |
+| `CL-FR-NAV-002` | `BLOCKED_OWNER` | P1 | BLOCKED_OWNER | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ efb30839 |  |
+| `CL-FR-NAV-004` | `BLOCKED_OWNER` | P1 | BLOCKED_OWNER | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ efb30839 |  |
+| `CL-FR-NAV-006` | `BLOCKED_UAT` | P1 | BLOCKED_UAT | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ efb30839 |  |
+| `CL-FR-APP-012` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ efb30839 |  |
+| `CL-FR-GOV-008` | `BLOCKED_OWNER` | P1 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=OPEN @ efb30839 |  |
+| `CL-R2-T13` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/REPAIR01_20260823/RPR02_TARGET_UNIVERSE.md | شاشة PLATFORM بلا تبرير منصي معتمد = 0 (المقيس 12) @ efb30839 |  |
+| `CL-R2-T16` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/REPAIR01_20260823/RPR02_TARGET_UNIVERSE.md | اسم معروض غير معتمد = 0 (المقيس 3 منها 2 PENDING_OWNER) @ efb30839 |  |
+| `CL-R3-M08` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/REPAIR01_20260823/RPR03_SCORECARD.md | أسطح PLATFORM بلا تبرير = 0 (المقيس 12) @ efb30839 |  |
+| `CL-R3-M11` | `BLOCKED_OWNER` | P1 | — | docs/REPAIR01_20260823/RPR03_SCORECARD.md | قيود يدوية بلا مصدر = 0 (المقيس 1644) @ efb30839 |  |
 | `CL-OA-01` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/REPAIR01_20260823/open/DEC-OPEN-15.md | قوائم تتبع الأصناف الثلاث: Lot · Serial · Expiry @ 808a2c03 | ينتظر بوابته — ولا يحجب إلا نطاقه |
 | `CL-OA-02` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/REPAIR01_20260823/open/DEC-OPEN-16.md | من يملك التحقيق؟ (الحوكمة أم المراجعة الداخلية) @ 808a2c03 | ينتظر بوابته — ولا يحجب إلا نطاقه |
 | `CL-OA-03` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/REPAIR01_20260823/open/W135_OWNER_DECISIONS.md §② | من يملك Entity Routing Registry وكتالوج أنواع الطلب؟ @ 808a2c03 | ينتظر بوابته — ولا يحجب إلا نطاقه |
@@ -68,26 +72,33 @@
 | `CL-OA-06` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | orders/CLOSURE_SYSTEM.txt §الوثيقة الرابعة | قيم الاعتماد (حدود السلم) عند نافذة الظل @ 808a2c03 | ينتظر بوابته — ولا يحجب إلا نطاقه |
 | `CL-OA-07` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | registers/OWNER_ACTION_REGISTER.md | اعتماد الاصدار الهدف للكونين المؤجلين @ c60c09b7 | ينتظر بوابته — ولا يحجب إلا نطاقه |
 | `CL-GAP-63` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/baseline_20260821/FINDINGS.md F-H19 | نافذة ظل الاعتماد صفر تقييم — مرجعها CL-FR-APP-002/004 (BLOCKED_OWNER) وOA-06 قيم الاعتماد | تنتظر قيم الاعتماد (OA-06) ووقائع حية — والمحرك مبني (app001 11/11) |
-| `CL-NAVR-MY` | `OPEN` | P2 | — | أمر المالك: إصلاح نموذج الملاحة من الجذور (2026-08-31) | WS-MY الشخصية خارج مقام الـ17 بحكمها (§27) — ورقتها تريد مجموعتين (مساحتي الشخصية · عملي ا | محاذاة باب مساحتي على مجموعتي الورقة — تغيير يمس كل الادوار فيقدر اثره |
+| `CL-OA-09` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/REPAIR01_20260823/GOV_UI_EXEC_CLOSURE.md §④ | انشاء دور نواب الرئيس وربطه بمساحة EX-DVP @ efb30839 | ينتظر بوابته — ولا يحجب إلا نطاقه |
+| `CL-OA-10` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/REPAIR01_20260823/GOV_UI_EXEC_CLOSURE.md §④ | انشاء دور الحوكمة والالتزام وربطه بمساحة DEP-08 @ efb30839 | ينتظر بوابته — ولا يحجب إلا نطاقه |
+| `CL-OA-11` | `BLOCKED_OWNER` | P1 | OWNER_DECISION | docs/REPAIR01_20260823/govui_outputs/10_OPEN_GOVERNING_CONFLICTS.md §② | اينزع السجل التابع ذو المسار المستقل من السايدبار؟ (§8) @ efb30839 | ينتظر بوابته — ولا يحجب إلا نطاقه |
 | `CL-NAVR-LEG626` | `OPEN` | P2 | — | أمر المالك: إصلاح نموذج الملاحة من الجذور (2026-08-31) | 626 بند قائمة ارثيا خارج كل ورقة حاكمة (TAXONOMY_LEGACY في NAVR_LINEAGE_RECON) — كل منها F | فض الاقتراحات دفعات باولوية المساحات — والقرار الحاكم اضافة/تقاعد لا ا |
-| `CL-GAP-03` | `OPEN` | P2 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
-| `CL-GAP-12` | `OPEN` | P2 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
-| `CL-GAP-14` | `OPEN` | P2 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
-| `CL-GAP-22` | `OPEN` | P2 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
-| `CL-GAP-26` | `OPEN` | P2 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
-| `CL-GAP-32` | `OPEN` | P2 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
-| `CL-FR-SEC-005` | `BLOCKED_OWNER` | P2 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ 808a2c03 |  |
-| `CL-FR-FIN-008` | `IMPLEMENTED_NOT_VERIFIED` | P2 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ 808a2c03 |  |
-| `CL-FR-NAV-003` | `IMPLEMENTED_NOT_VERIFIED` | P2 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ 808a2c03 |  |
-| `CL-FR-DAT-005` | `IMPLEMENTED_NOT_VERIFIED` | P2 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ 808a2c03 |  |
-| `CL-FR-GOV-011` | `OPEN` | P2 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=OPEN @ 808a2c03 |  |
-| `CL-FR-GOV-013` | `OPEN` | P2 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=OPEN @ 808a2c03 |  |
-| `CL-R3-M05` | `IMPLEMENTED_NOT_VERIFIED` | P2 | — | docs/REPAIR01_20260823/RPR03_SCORECARD.md | نافذة ظل الاعتماد مقيسة (تقييمات 0 — تحتاج وقائع) @ 808a2c03 |  |
-| `CL-R3-M06` | `IMPLEMENTED_NOT_VERIFIED` | P2 | — | docs/REPAIR01_20260823/RPR03_SCORECARD.md | رحلات اعتماد تحجب فعلا 14/14 — وضع monitor @ 808a2c03 |  |
-| `CL-R3-M09` | `BLOCKED_UAT` | P2 | UAT | docs/REPAIR01_20260823/RPR03_SCORECARD.md | رحلات بشرية كاملة بمسارها السالب 6/6 @ 808a2c03 |  |
-| `CL-R3-M16` | `BLOCKED_UAT` | P2 | UAT | docs/REPAIR01_20260823/RPR03_SCORECARD.md | مراجعة يدوية عميقة للذهبيات العشر @ 808a2c03 |  |
-| `CL-GAP-21` | `OPEN` | P3 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ 808a2c03 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
-| `CL-FR-GOV-004` | `IMPLEMENTED_NOT_VERIFIED` | P3 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ 808a2c03 |  |
+| `CL-PAT-DUPLABEL` | `OPEN` | P2 | — | docs/REPAIR01_20260823/orders/GOV_EXEC.txt | OPEN @ 15ba9f3c | فرز الازواج الستة: (اغلاق البلاغ admin_close/ticket_close · المعدات fl |
+| `CL-GOV3-PERMPATH` | `OPEN` | P2 | — | docs/REPAIR01_20260823/orders/GOV_EXEC.txt | OPEN @ 909cf6a3 | تصميم خطة القلب: القالب يصير المصدر الوحيد والقائم يشتق منه — ثم ظل ثم |
+| `CL-GOVUI-03` | `OPEN` | P2 | — | docs/REPAIR01_20260823/orders/GOV_UI_EXEC.txt | ارثي يصير بندا بلا قيد مصالحة فردي — حكم CL-NAVR-LEG626 صنفي @ efb30839 |  |
+| `CL-GOVUI-04` | `OPEN` | P2 | — | docs/REPAIR01_20260823/orders/GOV_UI_EXEC.txt | ثلاثة اسطح تجمع حبتين — GRAIN_MISMATCH @ efb30839 |  |
+| `CL-GOVUI-05` | `OPEN` | P2 | — | docs/REPAIR01_20260823/orders/GOV_UI_EXEC.txt | خطة القوى العاملة سطح تخطيط لم يبن — والموصول تقرير @ efb30839 |  |
+| `CL-GAP-03` | `OPEN` | P2 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ efb30839 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
+| `CL-GAP-12` | `OPEN` | P2 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ efb30839 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
+| `CL-GAP-14` | `OPEN` | P2 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ efb30839 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
+| `CL-GAP-22` | `OPEN` | P2 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ efb30839 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
+| `CL-GAP-26` | `OPEN` | P2 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ efb30839 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
+| `CL-GAP-32` | `OPEN` | P2 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ efb30839 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
+| `CL-FR-SEC-005` | `BLOCKED_OWNER` | P2 | OWNER_DECISION | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=BLOCKED_OWNER_DECISION @ efb30839 |  |
+| `CL-FR-FIN-008` | `BLOCKED_GOVERNING_SOURCE` | P2 | BLOCKED_GOVERNING_SOURCE | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ efb30839 |  |
+| `CL-FR-NAV-003` | `BLOCKED_OWNER` | P2 | BLOCKED_OWNER | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ efb30839 |  |
+| `CL-FR-DAT-005` | `BLOCKED_OWNER` | P2 | BLOCKED_OWNER | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ efb30839 |  |
+| `CL-FR-GOV-011` | `OPEN` | P2 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=OPEN @ efb30839 | شاهدُ حزامٍ يثبت أن قارئَ لقطاتِ التجميدِ يرتّب بمعرِّفِ اللقطةِ لا بـ |
+| `CL-FR-GOV-013` | `OPEN` | P2 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=OPEN @ efb30839 | شاهدُ حزامٍ يثبت أن مقامَ تقريرِ الفرقِ يُشتقّ من الجداولِ الممسوسةِ ف |
+| `CL-R3-M05` | `IMPLEMENTED_NOT_VERIFIED` | P2 | — | docs/REPAIR01_20260823/RPR03_SCORECARD.md | نافذة ظل الاعتماد مقيسة (تقييمات 0 — تحتاج وقائع) @ efb30839 |  |
+| `CL-R3-M06` | `IMPLEMENTED_NOT_VERIFIED` | P2 | — | docs/REPAIR01_20260823/RPR03_SCORECARD.md | رحلات اعتماد تحجب فعلا 14/14 — وضع monitor @ efb30839 |  |
+| `CL-R3-M09` | `BLOCKED_UAT` | P2 | UAT | docs/REPAIR01_20260823/RPR03_SCORECARD.md | رحلات بشرية كاملة بمسارها السالب 6/6 @ efb30839 |  |
+| `CL-R3-M16` | `BLOCKED_UAT` | P2 | UAT | docs/REPAIR01_20260823/RPR03_SCORECARD.md | مراجعة يدوية عميقة للذهبيات العشر @ efb30839 |  |
+| `CL-GAP-21` | `OPEN` | P3 | — | tools/injfix01_gap_coverage.php | شاهدُها أحمرُ @ efb30839 | إغلاقُ سببِ حمرةِ الشاهد — والقراءةُ من نصِّ رسوبِه لا رقمِه |
+| `CL-FR-GOV-004` | `IMPLEMENTED_NOT_VERIFIED` | P3 | — | docs/sources/INJ-FRD-REM-01/workbook.xlsx | Closure_State=IMPLEMENTED_NOT_CLOSED @ efb30839 |  |
 
 ## المغلقُ بالدليل
 
@@ -102,6 +113,7 @@
 | `CL-NAVR-07` | navr_import_guide --apply + navr_wire_missing --apply @ b0d2c3e9 |
 | `CL-GATE-00` | GATE00_BASELINE.md @ f592cdf9 |
 | `CL-WORK-03` | schtasks EMS_cron_events LastTaskResult=0 + storage/logs/cron_events.log نبض START/END + سالب الازدواج SKIP + مؤشرات عند الراس 17985 @ 59136c85 |
+| `CL-GOVUI-01` |  |
 | `CL-GAP-07` | bus_stall_alarm_proof 11/11 — العدة حوكيت بتسجيل الانتاج كاملا (fx موصول) واليتم يثبت بمجس اصطناعي @ 747cfbe7 |
 | `CL-GAP-10` | tests/injfix01_sensitive_fields_nine_channels_proof.php 15/15 + سالب --negative=GAP-10 اثبت الرسوب @ 59136c85 |
 | `CL-FR-EVT-003` |  |
@@ -144,6 +156,7 @@
 | `CL-FR-SEC-001` |  |
 | `CL-FR-FIN-001` |  |
 | `CL-FR-EVT-001` |  |
+| `CL-FR-NAV-001` | tests/injfrd01_nav001_source_clean.php = 8 نجاح · 0 رسوب — بعد كنس اللفظ المتقاعد وفعل المتكلم من link_groups (هجرة 2028_02_22 بعكسها): خمسة صفوف باللفظ المتقاعد و14 صفا بفعل المتكلم، والبدائل منقولة من gov_cycle_name_log وورقة الموردين لا مخترعة، وكل تغيير مقيد بقيمته السابقة (77 قيد تغيير) @ cce83748 |
 | `CL-FR-APP-003` |  |
 | `CL-FR-SEC-002` |  |
 | `CL-FR-SEC-004` |  |
@@ -181,6 +194,9 @@
 | `CL-GAP-77` | tests/injfix01_consumer_key_hygiene_proof.php 5/5 + هجرة 2028_02_01 @ ad1bf56f |
 | `CL-NAVR-11` | NAVR_PATTERN_SCAN.md @ b0d2c3e9 |
 | `CL-NAVR-LINEAGE` | NAVR_LINEAGE_RECON: المعادلة 1282=206+1076 وكل Without مصنف (89 اداة · 35 بوابة مالية · 326 استعارة منسوبة عند مالكها · 626 ارثي يقترح) — UNEXPLAINED=0 @ df5adb85 |
+| `CL-NAVR-MY` | التراكب الشخصي: بابا ورقة WS-MY (مساحتي الشخصية · عملي اليومي) يليان المراسي لكل الادوار — WS-MY مطابق فيما بني 2/2 و6/6 · وصفاتي ربطت لـ23 دورا ماذونا بسجلاتها الاربعة @ f042a8f5 |
+| `CL-PAT-EVTSUBS` | GOVERNING_SOURCE_MAP (EVT-SUBS) + NAVR_PATTERN_SCAN §2 @ aba54573 |
+| `CL-PAT-USERROLE` | هجرة 2028_02_08 (ردم 34 + وسم اثري) + شاهد tests/gov_userrole_axis_proof.php 7/7 + قارئا القياس حولا للحاكم @ a60f6d97 |
 | `CL-GAP-31` | path_rulings 6/6 GAPV GAP-31 PASS @ 59136c85 |
 | `CL-FR-EVT-005` |  |
 | `CL-FR-EVT-007` |  |

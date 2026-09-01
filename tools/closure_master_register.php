@@ -251,6 +251,32 @@ if (in_array('--bootstrap', $argv, true)) {
         ), $SNAP, $NOW, $added, $touched);
     }
 
+    /* ── ⑤ب جولةُ `GOV_UI_EXEC` — بنودُها بمقاماتِها المقيسة ─────────────
+       ◆ **بذرٌ لا يدهس**: كلُّ بندٍ يُكتب مرّةً بحالتِه المقيسةِ يومَ الإغلاق،
+         وتحديثُه بعدَ ذلك بـ`--set` بشاهدِه — لا بإعادةِ البذر. */
+    $govui = array(
+        'CL-GOVUI-01' => array('جبهة التسمية — LABEL_CONFORMANCE 306/306 بالتصيير الحي', 'EVIDENCE_CLOSED',
+            'P0', 'HIGH', 700, 'tools/govui_label_measure.php — 306/306 · وصفر رابط نقص في 34 دورا'),
+        'CL-GOVUI-02' => array('جبهة الحقول — FIELD_CONFORMANCE على الدفتر المسوى', 'IN_PROGRESS',
+            'P1', 'HIGH', 690, 'tools/rpr02_field_measure.php — 2541/5420 · 101 سطحا مطابقا كاملا من 359'),
+        'CL-GOVUI-03' => array('ارثي يصير بندا بلا قيد مصالحة فردي — حكم CL-NAVR-LEG626 صنفي', 'OPEN',
+            'P2', 'MEDIUM', 520, 'govui_outputs/08_UNEXPLAINED_EXTRAS.md — 306 مسارا من 377 صنفا ارثيا'),
+        'CL-GOVUI-04' => array('ثلاثة اسطح تجمع حبتين — GRAIN_MISMATCH', 'OPEN',
+            'P2', 'MEDIUM', 510, 'tools/govui_metrics.php — GRAIN_CONFORMANCE 374/412'),
+        'CL-GOVUI-05' => array('خطة القوى العاملة سطح تخطيط لم يبن — والموصول تقرير', 'OPEN',
+            'P2', 'MEDIUM', 505, 'govui_outputs/07_TARGETS_NOT_BUILT.md — TARGET_BUILD_COVERAGE 412/413'),
+    );
+    foreach ($govui as $id => $g) {
+        seed($db, $id, array(
+            'Source_Document' => 'docs/REPAIR01_20260823/orders/GOV_UI_EXEC.txt',
+            'Source_ID' => str_replace('CL-', '', $id), 'Domain' => 'GOV-UI-EXEC',
+            'Current_Status' => $g[1], 'Priority' => $g[2], 'Severity' => $g[3],
+            'Execution_Rank' => $g[4], 'Unlock_Value' => 'MEDIUM', 'Release_Impact' => 'BLOCKING',
+            'Evidence_Contract' => $g[5],
+            'Current_Snapshot' => $g[0] . ' @ ' . $SNAP,
+        ), $SNAP, $NOW, $added, $touched);
+    }
+
     /* ── ⑥ سجلُّ المالك — البنودُ المعروفةُ الآن ──────────────────────── */
     $owner = array(
         'OA-01' => array('q' => 'قوائم تتبع الأصناف الثلاث: Lot · Serial · Expiry', 'type' => 'BUSINESS_CONFIG',
@@ -271,6 +297,18 @@ if (in_array('--bootstrap', $argv, true)) {
         'OA-06' => array('q' => 'قيم الاعتماد (حدود السلم) عند نافذة الظل', 'type' => 'BUSINESS_CONFIG',
             'src' => 'orders/CLOSURE_SYSTEM.txt §الوثيقة الرابعة', 'gate' => 'Approval Shadow Window',
             'blocks' => 'إنفاذ الاعتماد (لا بناء محركه)'),
+        'OA-09' => array('q' => 'انشاء دور نواب الرئيس وربطه بمساحة EX-DVP', 'type' => 'BUSINESS_OWNERSHIP',
+            'src' => 'docs/REPAIR01_20260823/GOV_UI_EXEC_CLOSURE.md §④',
+            'gate' => 'HUMAN_DEPARTMENT_PASS لمساحة النواب · و§21 اغلاق القيادة',
+            'blocks' => 'اثنا عشر هدفا موصولا لا يصير — ومنها ثلاثة اسطح vp_ مبنية وثلاثة اسقاطات'),
+        'OA-10' => array('q' => 'انشاء دور الحوكمة والالتزام وربطه بمساحة DEP-08', 'type' => 'BUSINESS_OWNERSHIP',
+            'src' => 'docs/REPAIR01_20260823/GOV_UI_EXEC_CLOSURE.md §④',
+            'gate' => 'STRUCTURAL_DEPARTMENT_PASS لادارة الحوكمة',
+            'blocks' => 'اثنان وثلاثون هدفا لا يقاس ظهورها ولا اسمها'),
+        'OA-11' => array('q' => 'اينزع السجل التابع ذو المسار المستقل من السايدبار؟ (§8)', 'type' => 'BUSINESS_POLICY',
+            'src' => 'docs/REPAIR01_20260823/govui_outputs/10_OPEN_GOVERNING_CONFLICTS.md §②',
+            'gate' => 'UNEXPLAINED_EXTRA_MENU_ITEM ومعيار §8 «لا يظهر الا ما يجب»',
+            'blocks' => 'تسعة وثلاثون رابطا حيا — ونزعها تغيير وصول لا يقرره فاحص'),
     );
     foreach ($owner as $id => $o) {
         if (isset($db['owner'][$id])) { continue; }

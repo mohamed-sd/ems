@@ -1,7 +1,7 @@
 # OWNER ACTION REGISTER — سجلُّ أعمالِ المالك
 
 > ⛔ لا يدخله إلّا قرارُ أعمالٍ/سياسةٍ/Config حقيقيٌّ لا تحسمه الوثائقُ ولا الهندسة.
-> **اللقطة:** `cba0d2db`
+> **اللقطة:** `efb30839`
 
 | ID | السؤال | النوع | يحجب | بوّابتُه | القرار | الحال |
 |---|---|---|---|---|---|---|
@@ -13,7 +13,8 @@
 | `OA-06` | قيم الاعتماد (حدود السلم) عند نافذة الظل | BUSINESS_CONFIG | إنفاذ الاعتماد (لا بناء محركه) | Approval Shadow Window | ⏳ | PENDING |
 | `OA-07` | اعتماد الاصدار الهدف للكونين المؤجلين LG-OFFLINE وLG-OPARCH (NEXT_RELEASE) | RELEASE_PLANNING | صفة GOVERNED_DEFERRED الرسمية للكونين — لا يحجب بناء شيء | اعلان OWNER_APPROVED_PRODUCTION_BASELINE | ⏳ | PENDING |
 | `OA-08` | انشاء السنوات المالية التاريخية 2020-2025 بحالاتها وتواريخ اقفالها (فعل محاسبي يفك 1103 قيدا يدويا بلا فترة حاوية) | BUSINESS_ACCOUNTING_CONFIG | CL-R3-M11 — حوكمة القيد اليدوي الارثي | unsupported manual journals = 0 (بوابة الاصدار) | ⏳ | PENDING |
-| `OA-09` | ربطُ دورِ نوّابِ الرئيس `EX-DVP` — أيُّ دورٍ قائمٍ يحمله أم يُستحدَث؟ | BUSINESS_OWNERSHIP | ستةُ مواضعِ دليلٍ في `EX-DVP` هي كلُّ ما بقي غيرَ مبنيٍّ من 413 · وبطاقةُ تحقُّقِها البشريِّ | `TARGET_BUILD_COVERAGE` = 413/413 | ⏳ | PENDING |
-| `OA-10` | صلاحيةُ الكتابةِ لدورِ التشغيل (1) على «الخطة الموسمية ومعاملاتها» — منحةُ الدورِ قائمةٌ (`role_permissions` 1/1/1) وقالبُ مستخدميه `can_edit=0` فلا يُصيَّر زرُّ التسجيل | BUSINESS_PERMISSION | فعلُ التسجيلِ على `operations/ops_seasonal_factors.php` وحدَه | برهانُ الممارسةِ `tests/gov_exec_action_exercise_proof.php` بلا حاجزِ منحة | ⏳ | PENDING |
+| `OA-09` | انشاء دور نواب الرئيس وربطه بمساحة EX-DVP | BUSINESS_OWNERSHIP | اثنا عشر هدفا موصولا لا يصير — ومنها ثلاثة اسطح vp_ مبنية وثلاثة اسقاطات | HUMAN_DEPARTMENT_PASS لمساحة النواب · و§21 اغلاق القيادة | ⏳ | PENDING |
+| `OA-10` | انشاء دور الحوكمة والالتزام وربطه بمساحة DEP-08 | BUSINESS_OWNERSHIP | اثنان وثلاثون هدفا لا يقاس ظهورها ولا اسمها | STRUCTURAL_DEPARTMENT_PASS لادارة الحوكمة | ⏳ | PENDING |
+| `OA-11` | اينزع السجل التابع ذو المسار المستقل من السايدبار؟ (§8) | BUSINESS_POLICY | تسعة وثلاثون رابطا حيا — ونزعها تغيير وصول لا يقرره فاحص | UNEXPLAINED_EXTRA_MENU_ITEM ومعيار §8 «لا يظهر الا ما يجب» | ⏳ | PENDING |
 
 **Required_By_Gate لا تاريخٌ مخترَع** — والقرارُ يحجب نطاقَه فقط.
