@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-01 09:53:26
--- الجداول: 1015 · المناظير: 28
+-- المصدر: equipation_manage · التوليد: 2026-09-01 10:34:24
+-- الجداول: 1028 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -11780,6 +11780,17 @@ CREATE TABLE `ops_stop_register` (
   `sla_due_at` datetime DEFAULT NULL COMMENT 'المهلة - كيان مستقل بمهلة',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp(),
+  `stop_code` varchar(60) DEFAULT NULL COMMENT 'رقم القرار',
+  `reason_tree_ref` varchar(255) DEFAULT NULL COMMENT 'سبب التصنيف من الشجرة ◄',
+  `billing_effect` varchar(255) DEFAULT NULL COMMENT 'أثر الفوترة ◄',
+  `contract_unit_effect` varchar(80) DEFAULT NULL COMMENT 'أثر الوحدة التعاقدية ◄',
+  `decision_doc` varchar(500) DEFAULT NULL COMMENT 'مستند القرار',
+  `ops_endorsement` varchar(255) DEFAULT NULL COMMENT 'مصادقة التشغيل ◄',
+  `reviewer` varchar(255) DEFAULT NULL COMMENT 'المراجع',
+  `approved_by` int(11) DEFAULT NULL COMMENT 'المعتمِد',
+  `approved_at` datetime DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `data_state` varchar(255) DEFAULT NULL COMMENT 'حالة البيانات ▼',
+  `src_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع المصدر',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_occurrence` (`occurrence_key`),
   KEY `ix_day` (`company_id`,`stop_date`,`shift`),
@@ -14899,7 +14910,7 @@ CREATE TABLE `repair01_target_universe` (
   `requirement_id` varchar(32) NOT NULL DEFAULT '' COMMENT 'من دفترنا',
   `screen_id` varchar(12) NOT NULL DEFAULT '' COMMENT 'من سجلهم',
   `gap_id` int(11) DEFAULT NULL COMMENT 'صف دفتر الاهداف غير المبنية',
-  `match_method` enum('EXACT_UNIT','EXACT_ANY','COMPOUND_SPLIT','CONTAINMENT_CANDIDATE','WAVE_ANCHOR','RULED_BRIDGE','NONE') NOT NULL DEFAULT 'NONE' COMMENT 'طريق المطابقة — WAVE_ANCHOR: مرساة دفتر موجة مثبتة من القرص',
+  `match_method` enum('EXACT_UNIT','EXACT_ANY','COMPOUND_SPLIT','CONTAINMENT_CANDIDATE','WAVE_ANCHOR','RULED_BRIDGE','NONE') NOT NULL DEFAULT 'NONE' COMMENT 'طريق المطابقة — RULED_BRIDGE: جسر وظيفة محكوم بدليله (شاشة حية تخدم الهدف باسم اخر)',
   `match_witness` varchar(400) NOT NULL DEFAULT '' COMMENT 'الشاهد المقيس على المطابقة',
   `verdict` enum('MATCHED','MERGED_INTO','TAB_CHILD','PROJECTION','NOT_BUILT','NOT_APPLICABLE','RETIRED_TARGET') DEFAULT NULL COMMENT 'احكام RPR-02 §4-2 السبعة — وفارغ يعني لم يحكم بعد',
   `verdict_witness` varchar(400) NOT NULL DEFAULT '' COMMENT 'مرجع الدليل ومصدر القرار — وحكم بلا شاهد لا يقبل',
@@ -20041,6 +20052,45 @@ CREATE TABLE `signing_authorities` (
   CONSTRAINT `fk_sa_entity` FOREIGN KEY (`entity_id`) REFERENCES `legal_entities` (`entity_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='LEG-01 §4: التفويض بالتوقيع — لا اعتماد بلا تفويض نافذ ساري';
 
+-- ── Table: site_closure_item ──
+CREATE TABLE `site_closure_item` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0,
+  `item_code` varchar(255) DEFAULT NULL COMMENT 'معرّف البند',
+  `site_ref` varchar(80) DEFAULT NULL COMMENT 'كود الموقع ◄',
+  `closure_item` varchar(80) DEFAULT NULL COMMENT 'بند الإغلاق ▼',
+  `owner_ref` varchar(255) DEFAULT NULL COMMENT 'المسؤول ◄',
+  `completion_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع الإنجاز ◄',
+  `result` varchar(80) DEFAULT NULL COMMENT 'النتيجة ▼',
+  `final_handover_minutes` varchar(255) DEFAULT NULL COMMENT 'محضر التسليم النهائي ◄',
+  `item_state` varchar(80) DEFAULT NULL COMMENT 'حالة البند ▼',
+  `data_state` varchar(255) DEFAULT NULL COMMENT 'حالة البيانات ▼',
+  `src_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_1a1446fe_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='DEP-12 — إغلاق الموقع وتسريحه · الحبة: بندُ إغلاقٍ واحدٌ على موقعٍ واحد';
+
+-- ── Table: site_dashboard_kpi ──
+CREATE TABLE `site_dashboard_kpi` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0,
+  `kpi_id` varchar(60) DEFAULT NULL COMMENT 'معرّف المؤشر',
+  `site_ref` varchar(255) DEFAULT NULL COMMENT 'الموقع ◄',
+  `kpi_ref` varchar(255) DEFAULT NULL COMMENT 'المؤشر — KPI Catalog ◄',
+  `value` decimal(18,2) DEFAULT NULL COMMENT 'القيمة ◄',
+  `uom` varchar(80) DEFAULT NULL COMMENT 'الوحدة ◄',
+  `state` varchar(255) DEFAULT NULL COMMENT 'الحالة ◄',
+  `updated_on` datetime DEFAULT NULL COMMENT 'آخر تحديث ◄',
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_8ac00dd1_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='DEP-12 — لوحة الموقع · الحبة: مؤشرٌ واحدٌ لموقعٍ واحد';
+
 -- ── Table: site_day ──
 CREATE TABLE `site_day` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -20060,12 +20110,54 @@ CREATE TABLE `site_day` (
   `source_ref` varchar(120) NOT NULL DEFAULT '',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp(),
+  `day_code` varchar(255) DEFAULT NULL COMMENT 'معرّف اليوم',
+  `shift` varchar(80) DEFAULT NULL COMMENT 'الوردية ▼',
+  `supervisor_id` varchar(255) DEFAULT NULL COMMENT 'مشرف الوردية ◄',
+  `received_distribution` varchar(255) DEFAULT NULL COMMENT 'التوزيع المستلَم ◄',
+  `equipment_present` varchar(255) DEFAULT NULL COMMENT 'معدات حاضرة ◄',
+  `equipment_absent` varchar(255) DEFAULT NULL COMMENT 'معدات متخلفة',
+  `operators_present` varchar(255) DEFAULT NULL COMMENT 'مشغّلون حاضرون ◄',
+  `operators_absent` varchar(255) DEFAULT NULL COMMENT 'مشغّلون متخلفون',
+  `substitutes_activated` varchar(255) DEFAULT NULL COMMENT 'بدلاء مفعَّلون',
+  `weather_state` varchar(80) DEFAULT NULL COMMENT 'حالة الطقس ▼',
+  `opening_note` varchar(500) DEFAULT NULL COMMENT 'ملاحظة الافتتاح',
+  `data_state` varchar(255) DEFAULT NULL COMMENT 'حالة البيانات ▼',
+  `created_by` int(11) DEFAULT NULL COMMENT 'المُنشئ',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_site_day` (`company_id`,`site_id`,`day_date`),
   KEY `ix_state` (`state`),
   CONSTRAINT `chk_site_day_closed` CHECK (`state` <> 'closed' or `closed_by` is not null and `closed_at` is not null),
   CONSTRAINT `chk_site_day_reopen` CHECK (`state` <> 'reopened' or `reopened_by` is not null and `reopen_reason` <> '')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W04 - اليوم الميداني: موقع × يوم - فتح واحد وإقفال واحد';
+
+-- ── Table: site_day_approval ──
+CREATE TABLE `site_day_approval` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0,
+  `minutes_no` varchar(80) DEFAULT NULL COMMENT 'رقم المحضر',
+  `day_ref` varchar(255) DEFAULT NULL COMMENT 'معرّف يوم الموقع ◄',
+  `site_ref` varchar(255) DEFAULT NULL COMMENT 'الموقع ◄',
+  `day_date_ref` date DEFAULT NULL COMMENT 'تاريخ اليوم ◄',
+  `records_count` int(11) DEFAULT NULL COMMENT 'عدد سجلات اليوم ◄',
+  `records_matched` varchar(255) DEFAULT NULL COMMENT 'سجلات مطابقة ◄',
+  `records_modified` int(11) DEFAULT NULL COMMENT 'سجلات معدَّلة قبل الاعتماد',
+  `records_rejected` int(11) DEFAULT NULL COMMENT 'سجلات مرفوضة',
+  `reject_reason` varchar(255) DEFAULT NULL COMMENT 'سبب الرفض',
+  `happened_declaration` varchar(80) DEFAULT NULL COMMENT 'إقرار «حدثت فعلًا» ▼',
+  `site_manager_signature` varchar(255) DEFAULT NULL COMMENT 'توقيع مدير الموقع',
+  `pdf_export` varchar(255) DEFAULT NULL COMMENT 'تصدير PDF ◄',
+  `minutes_state` varchar(80) DEFAULT NULL COMMENT 'حالة المحضر ▼',
+  `reviewer` varchar(255) DEFAULT NULL COMMENT 'المراجع',
+  `approved_by` int(11) DEFAULT NULL COMMENT 'المعتمِد',
+  `approved_at` datetime DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `data_state` varchar(255) DEFAULT NULL COMMENT 'حالة البيانات ▼',
+  `src_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_4b2825fd_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='DEP-12 — محضر اعتماد الموقع · الحبة: محضرُ اعتمادٍ واحدٌ ليومِ موقع';
 
 -- ── Table: site_day_attempt ──
 CREATE TABLE `site_day_attempt` (
@@ -20087,6 +20179,33 @@ CREATE TABLE `site_day_attempt` (
   KEY `ix_reason` (`reason_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W04 - سجل محاولات القيد بعد الإقفال: ترفض وتقيد';
 
+-- ── Table: site_day_close_report ──
+CREATE TABLE `site_day_close_report` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0,
+  `report_code` varchar(255) DEFAULT NULL COMMENT 'معرّف التقرير',
+  `site_ref` varchar(255) DEFAULT NULL COMMENT 'الموقع ◄',
+  `report_date` date DEFAULT NULL COMMENT 'التاريخ ◄',
+  `attendance_summary` varchar(255) DEFAULT NULL COMMENT 'ملخص الحضور ◄',
+  `equipment_worked` varchar(255) DEFAULT NULL COMMENT 'معدات عملت ◄',
+  `units_approved` varchar(255) DEFAULT NULL COMMENT 'وحدات معتمدة ◄',
+  `actual_hours` decimal(12,2) DEFAULT NULL COMMENT 'ساعات فعلي ◄',
+  `stop_hours` decimal(12,2) DEFAULT NULL COMMENT 'ساعات توقف ◄',
+  `hse_state` varchar(80) DEFAULT NULL COMMENT 'حالة HSE لليوم ▼',
+  `incidents` varchar(255) DEFAULT NULL COMMENT 'حوادث وظروف غير آمنة ◄',
+  `stop_work_events` varchar(255) DEFAULT NULL COMMENT 'Stop-Work خلال اليوم ◄',
+  `permits_validity` varchar(255) DEFAULT NULL COMMENT 'سريان تصاريح العمل ◄',
+  `day_tickets` varchar(255) DEFAULT NULL COMMENT 'بلاغات اليوم ◄',
+  `day_minutes` varchar(255) DEFAULT NULL COMMENT 'محاضر اليوم ◄',
+  `signed_pdf_ref` varchar(255) DEFAULT NULL COMMENT 'رابط PDF الموقَّع ◄',
+  `day_state` varchar(255) DEFAULT NULL COMMENT 'حالة اليوم ◄',
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_923bf5c7_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='DEP-12 — تقرير إقفال يوم الموقع · الحبة: تقريرُ إقفالٍ واحدٌ ليومِ موقع';
+
 -- ── Table: site_day_shift ──
 CREATE TABLE `site_day_shift` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -20102,12 +20221,233 @@ CREATE TABLE `site_day_shift` (
   `closed_at` datetime DEFAULT NULL,
   `hse_state` enum('clear','observation','incident') NOT NULL DEFAULT 'clear',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `shift_code` varchar(255) DEFAULT NULL COMMENT 'معرّف الوردية',
+  `span_text` varchar(255) DEFAULT NULL COMMENT 'بداية ونهاية ◄',
+  `permits_valid` varchar(255) DEFAULT NULL COMMENT 'تصاريح العمل سارية؟ ◄',
+  `unsafe_conditions` varchar(255) DEFAULT NULL COMMENT 'ظروف غير آمنة مرصودة ◄',
+  `stop_work` varchar(255) DEFAULT NULL COMMENT 'Stop-Work؟ ◄',
+  `data_state` varchar(255) DEFAULT NULL COMMENT 'حالة البيانات ▼',
+  `src_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_by` int(11) DEFAULT NULL COMMENT 'المُنشئ',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_day_shift` (`day_id`,`shift`),
   KEY `ix_company` (`company_id`),
   CONSTRAINT `fk_sds_day` FOREIGN KEY (`day_id`) REFERENCES `site_day` (`id`) ON DELETE CASCADE,
   CONSTRAINT `chk_sds_handover` CHECK (`state` <> 'handed_over' or `handover_to` is not null and `handover_at` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W04 - ورديات اليوم الميداني ومحضر التسليم بينها';
+
+-- ── Table: site_day_unit ──
+CREATE TABLE `site_day_unit` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0,
+  `row_code` varchar(255) DEFAULT NULL COMMENT 'معرّف الصف',
+  `day_ref` varchar(255) DEFAULT NULL COMMENT 'معرّف يوم الموقع ◄',
+  `equipment_ref` varchar(80) DEFAULT NULL COMMENT 'كود المعدة ◄',
+  `operator_ref` varchar(255) DEFAULT NULL COMMENT 'المشغّل ◄',
+  `work_zone` varchar(255) DEFAULT NULL COMMENT 'منطقة العمل ◄',
+  `unit_type` varchar(80) DEFAULT NULL COMMENT 'نوع الوحدة ◄',
+  `measured_qty` decimal(18,3) DEFAULT NULL COMMENT 'الكمية المقيسة',
+  `measure_method` varchar(80) DEFAULT NULL COMMENT 'وسيلة القياس ▼',
+  `field_ref` varchar(255) DEFAULT NULL COMMENT 'المرجع الميداني',
+  `recorded_at` datetime DEFAULT NULL COMMENT 'وقت التسجيل ◄',
+  `offline_recorded` varchar(255) DEFAULT NULL COMMENT 'مسجَّل دون اتصال؟ ◄',
+  `row_state` varchar(80) DEFAULT NULL COMMENT 'حالة الصف ▼',
+  `data_state` varchar(255) DEFAULT NULL COMMENT 'حالة البيانات ▼',
+  `src_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_cc4a5351_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='DEP-12 — تسجيل وحدات اليوم · الحبة: سطرُ وحدةٍ منجزةٍ في يومِ موقعٍ';
+
+-- ── Table: site_readiness_item ──
+CREATE TABLE `site_readiness_item` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0,
+  `item_code` varchar(255) DEFAULT NULL COMMENT 'معرّف البند',
+  `site_ref` varchar(80) DEFAULT NULL COMMENT 'كود الموقع ◄',
+  `readiness_item` varchar(80) DEFAULT NULL COMMENT 'بند التجهيز ▼',
+  `owner_ref` varchar(255) DEFAULT NULL COMMENT 'المسؤول ◄',
+  `completion_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع الإنجاز ◄',
+  `result` varchar(80) DEFAULT NULL COMMENT 'النتيجة ▼',
+  `completion_date` date DEFAULT NULL COMMENT 'تاريخ الإنجاز ◄',
+  `readiness_declaration` varchar(255) DEFAULT NULL COMMENT 'إعلان الجاهزية ◄',
+  `item_state` varchar(80) DEFAULT NULL COMMENT 'حالة البند ▼',
+  `data_state` varchar(255) DEFAULT NULL COMMENT 'حالة البيانات ▼',
+  `src_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_12e9c539_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='DEP-12 — تجهيز الموقع والجاهزية · الحبة: بندُ تجهيزٍ واحدٌ على موقعٍ واحد';
+
+-- ── Table: site_reference_registry ──
+CREATE TABLE `site_reference_registry` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0,
+  `row_code` varchar(255) DEFAULT NULL COMMENT 'معرّف السطر',
+  `reference_type` varchar(80) DEFAULT NULL COMMENT 'نوع المرجع ▼',
+  `reference_ref` varchar(255) DEFAULT NULL COMMENT 'المرجع ◄',
+  `reference_owner` varchar(255) DEFAULT NULL COMMENT 'مالكه ◄',
+  `last_updated_on` datetime DEFAULT NULL COMMENT 'آخر تحديث ◄',
+  `access_scope` varchar(255) DEFAULT NULL COMMENT 'نطاق الاطّلاع ◄',
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_36a75df4_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='DEP-12 — سجلات الموقع المرجعية · الحبة: سطرُ مرجعٍ واحدٌ يخدم الموقع';
+
+-- ── Table: site_request_batch ──
+CREATE TABLE `site_request_batch` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0,
+  `batch_code` varchar(255) DEFAULT NULL COMMENT 'معرّف الدفعة',
+  `request_ref` varchar(80) DEFAULT NULL COMMENT 'رقم الطلب ◄',
+  `batch_seq` int(11) DEFAULT NULL COMMENT 'تسلسل الدفعة',
+  `issue_voucher_ref` varchar(80) DEFAULT NULL COMMENT 'رقم سند الصرف ◄',
+  `received_items` varchar(255) DEFAULT NULL COMMENT 'الأصناف المستلمة ◄',
+  `receipt_date` date DEFAULT NULL COMMENT 'تاريخ الاستلام',
+  `custody_receiver` varchar(255) DEFAULT NULL COMMENT 'مستلِم العهدة ◄',
+  `batch_match` varchar(80) DEFAULT NULL COMMENT 'مطابقة الدفعة ▼',
+  `batch_state` varchar(80) DEFAULT NULL COMMENT 'حالة الدفعة ▼',
+  `data_state` varchar(255) DEFAULT NULL COMMENT 'حالة البيانات ▼',
+  `src_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_cfec3ac1_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='DEP-12 — دفعات استلام طلب الموقع · الحبة: دفعةُ استلامٍ واحدةٌ على طلبِ موقع';
+
+-- ── Table: site_request_item ──
+CREATE TABLE `site_request_item` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0,
+  `item_code` varchar(255) DEFAULT NULL COMMENT 'معرّف البند',
+  `request_ref` varchar(80) DEFAULT NULL COMMENT 'رقم الطلب ◄',
+  `item_ref` varchar(80) DEFAULT NULL COMMENT 'كود الصنف ◄',
+  `requested_qty` decimal(18,3) DEFAULT NULL COMMENT 'الكمية المطلوبة',
+  `uom` varchar(80) DEFAULT NULL COMMENT 'وحدة القياس ◄',
+  `received_cumulative` decimal(18,3) DEFAULT NULL COMMENT 'المستلَم تراكميًّا ◄',
+  `remaining` decimal(18,3) DEFAULT NULL COMMENT 'المتبقي ◄',
+  `item_state` varchar(80) DEFAULT NULL COMMENT 'حالة البند ▼',
+  `data_state` varchar(255) DEFAULT NULL COMMENT 'حالة البيانات ▼',
+  `src_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_0d8dda7f_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='DEP-12 — بنود طلب الموقع · الحبة: بندُ صنفٍ واحدٌ في طلبِ موقع';
+
+-- ── Table: site_shift_handover ──
+CREATE TABLE `site_shift_handover` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0,
+  `minutes_no` varchar(80) DEFAULT NULL COMMENT 'رقم المحضر',
+  `site_ref` varchar(255) DEFAULT NULL COMMENT 'الموقع ◄',
+  `handover_date` date DEFAULT NULL COMMENT 'التاريخ',
+  `shift_out` varchar(80) DEFAULT NULL COMMENT 'الوردية المُسلِّمة ▼',
+  `supervisor_out` varchar(255) DEFAULT NULL COMMENT 'مشرفها ◄',
+  `shift_in` varchar(80) DEFAULT NULL COMMENT 'الوردية المستلِمة ▼',
+  `supervisor_in` varchar(255) DEFAULT NULL COMMENT 'مشرفها ◄',
+  `equipment_running` varchar(255) DEFAULT NULL COMMENT 'معدات عاملة ◄',
+  `equipment_stopped` decimal(12,2) DEFAULT NULL COMMENT 'معدات متوقفة ◄',
+  `custody_handed` varchar(255) DEFAULT NULL COMMENT 'عُهد مسلَّمة',
+  `open_notes_carried` varchar(500) DEFAULT NULL COMMENT 'ملاحظات مفتوحة مرحَّلة',
+  `meter_readings` varchar(255) DEFAULT NULL COMMENT 'قراءات عدّادات عند التسليم',
+  `signature_out` varchar(255) DEFAULT NULL COMMENT 'توقيع المُسلِّم',
+  `signature_in` varchar(255) DEFAULT NULL COMMENT 'توقيع المستلِم',
+  `minutes_state` varchar(80) DEFAULT NULL COMMENT 'حالة المحضر ▼',
+  `data_state` varchar(255) DEFAULT NULL COMMENT 'حالة البيانات ▼',
+  `src_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_7aca8a56_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='DEP-12 — محضر تسليم واستلام الورديات · الحبة: محضرُ تسليمٍ واحدٌ بين وردِيَّتَين';
+
+-- ── Table: site_state_change_request ──
+CREATE TABLE `site_state_change_request` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0,
+  `request_no` varchar(80) DEFAULT NULL COMMENT 'رقم الطلب',
+  `site_ref` varchar(255) DEFAULT NULL COMMENT 'الموقع ◄',
+  `request_date` date DEFAULT NULL COMMENT 'تاريخ الطلب',
+  `request_type` varchar(80) DEFAULT NULL COMMENT 'نوع الطلب ▼',
+  `subject_ref` varchar(255) DEFAULT NULL COMMENT 'العنصر المعني ◄',
+  `current_state` varchar(255) DEFAULT NULL COMMENT 'الحالة الحالية ◄',
+  `target_state` varchar(80) DEFAULT NULL COMMENT 'الحالة المطلوبة ▼',
+  `reason` varchar(255) DEFAULT NULL COMMENT 'السبب',
+  `priority` varchar(80) DEFAULT NULL COMMENT 'الأولوية ▼',
+  `evidence_ref` varchar(255) DEFAULT NULL COMMENT 'المرفق/الدليل',
+  `decision_owner` varchar(255) DEFAULT NULL COMMENT 'الجهة المالكة للقرار ◄',
+  `ticket_ref` varchar(80) DEFAULT NULL COMMENT 'رقم البلاغ/الأمر المتفرع ◄',
+  `request_state` varchar(80) DEFAULT NULL COMMENT 'حالة الطلب ▼',
+  `data_state` varchar(255) DEFAULT NULL COMMENT 'حالة البيانات ▼',
+  `src_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_bb6275a9_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='DEP-12 — طلبات تغيير الحالة ومعالجة المتعثر · الحبة: طلبُ تغييرِ حالةٍ واحدٌ على عنصرٍ واحد';
+
+-- ── Table: site_supply_request ──
+CREATE TABLE `site_supply_request` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0,
+  `request_no` varchar(80) DEFAULT NULL COMMENT 'رقم الطلب',
+  `site_ref` varchar(255) DEFAULT NULL COMMENT 'الموقع ◄',
+  `request_date` date DEFAULT NULL COMMENT 'تاريخ الطلب',
+  `request_type` varchar(80) DEFAULT NULL COMMENT 'نوع الطلب ▼',
+  `warehouse_ref` varchar(255) DEFAULT NULL COMMENT 'المخزن المستهدف ◄',
+  `items_text` varchar(255) DEFAULT NULL COMMENT 'الأصناف المطلوبة',
+  `quantities` varchar(255) DEFAULT NULL COMMENT 'الكميات',
+  `justification` varchar(500) DEFAULT NULL COMMENT 'مبرر الطلب',
+  `custody_receiver` varchar(255) DEFAULT NULL COMMENT 'مستلِم العهدة ◄',
+  `issue_voucher_ref` varchar(80) DEFAULT NULL COMMENT 'رقم سند الصرف ◄',
+  `actual_receipt_date` date DEFAULT NULL COMMENT 'تاريخ الاستلام الفعلي',
+  `receipt_match` varchar(80) DEFAULT NULL COMMENT 'مطابقة الاستلام ▼',
+  `request_state` varchar(80) DEFAULT NULL COMMENT 'حالة الطلب ▼',
+  `data_state` varchar(255) DEFAULT NULL COMMENT 'حالة البيانات ▼',
+  `src_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_bd16f28b_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='DEP-12 — طلبات الموقع للصرف والاستلام · الحبة: طلبُ صرفٍ واحدٌ من موقعٍ إلى مخزن';
+
+-- ── Table: site_suspension ──
+CREATE TABLE `site_suspension` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0,
+  `decision_no` varchar(500) DEFAULT NULL COMMENT 'رقم القرار',
+  `site_ref` varchar(80) DEFAULT NULL COMMENT 'كود الموقع ◄',
+  `suspension_reason` varchar(80) DEFAULT NULL COMMENT 'سبب الإيقاف ▼',
+  `from_date` date DEFAULT NULL COMMENT 'من تاريخ',
+  `expected_duration` varchar(80) DEFAULT NULL COMMENT 'المدة المتوقعة',
+  `resource_effect` varchar(255) DEFAULT NULL COMMENT 'أثر الموارد ◄',
+  `contract_effect` varchar(255) DEFAULT NULL COMMENT 'أثر العقد ◄',
+  `parties_notified` varchar(255) DEFAULT NULL COMMENT 'إخطار الأطراف ◄',
+  `resumption_minutes` varchar(255) DEFAULT NULL COMMENT 'محضر الاستئناف ◄',
+  `decision_state` varchar(500) DEFAULT NULL COMMENT 'حالة القرار ▼',
+  `reviewer` varchar(255) DEFAULT NULL COMMENT 'المراجع',
+  `approved_by` int(11) DEFAULT NULL COMMENT 'المعتمِد',
+  `approved_at` datetime DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `data_state` varchar(255) DEFAULT NULL COMMENT 'حالة البيانات ▼',
+  `src_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_2694f287_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='DEP-12 — الإيقاف المؤقت للموقع · الحبة: قرارُ إيقافٍ مؤقّتٍ واحدٌ لموقع';
 
 -- ── Table: sites ──
 CREATE TABLE `sites` (
@@ -20127,6 +20467,21 @@ CREATE TABLE `sites` (
   `deleted_by` int(11) DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `site_code` varchar(80) DEFAULT NULL COMMENT 'كود الموقع',
+  `project_name` varchar(255) DEFAULT NULL COMMENT 'اسم المشروع ◄',
+  `client_contract_code` varchar(80) DEFAULT NULL COMMENT 'كود عقد العميل ◄',
+  `region` varchar(255) DEFAULT NULL COMMENT 'الولاية/المنطقة',
+  `coordinates` varchar(255) DEFAULT NULL COMMENT 'الإحداثيات',
+  `work_zones` varchar(255) DEFAULT NULL COMMENT 'مناطق العمل/الجبهات',
+  `shifts_count` varchar(40) DEFAULT NULL COMMENT 'عدد الورديات ▼',
+  `equipment_capacity` varchar(120) DEFAULT NULL COMMENT 'الطاقة الاستيعابية للمعدات',
+  `housing_facilities` varchar(255) DEFAULT NULL COMMENT 'مرافق السكن ◄',
+  `reviewer` varchar(255) DEFAULT NULL COMMENT 'المراجع',
+  `approved_by` int(11) DEFAULT NULL COMMENT 'المعتمِد',
+  `approved_at` datetime DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `data_state` varchar(255) DEFAULT NULL COMMENT 'حالة البيانات ▼',
+  `src_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_by` int(11) DEFAULT NULL COMMENT 'المُنشئ',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_site_name` (`company_id`,`project_id`,`name`),
   KEY `ix_sites_project` (`project_id`),
@@ -22993,6 +23348,21 @@ CREATE TABLE `tre_petty_expense` (
   `state` varchar(16) NOT NULL DEFAULT 'claimed' COMMENT 'claimed او accepted او rejected',
   `reject_reason` varchar(400) NOT NULL DEFAULT '',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `expense_no` varchar(80) DEFAULT NULL COMMENT 'رقم الصرف',
+  `site_ref` varchar(80) DEFAULT NULL COMMENT 'كود الموقع ◄',
+  `expense_item` varchar(80) DEFAULT NULL COMMENT 'بند الصرف ▼',
+  `currency_ref` varchar(255) DEFAULT NULL COMMENT 'العملة ◄',
+  `field_justification` varchar(500) DEFAULT NULL COMMENT 'مبرر الصرف الميداني',
+  `local_supplier` varchar(255) DEFAULT NULL COMMENT 'المورد المحلي',
+  `charged_to` varchar(255) DEFAULT NULL COMMENT 'التحميل على ◄',
+  `over_limit` varchar(255) DEFAULT NULL COMMENT 'تجاوز الحد؟ ◄',
+  `override_approval_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع اعتماد التجاوز ◄',
+  `treasury_settlement_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع التسوية بالخزينة ◄',
+  `reviewer` varchar(255) DEFAULT NULL COMMENT 'المراجع',
+  `approved_by` int(11) DEFAULT NULL COMMENT 'المعتمِد',
+  `approved_at` datetime DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `data_state` varchar(255) DEFAULT NULL COMMENT 'حالة البيانات ▼',
+  `src_ref` varchar(80) DEFAULT NULL COMMENT 'مرجع المصدر',
   PRIMARY KEY (`id`),
   KEY `ix_pe` (`company_id`,`custody_id`,`state`),
   KEY `fk_pe_custody` (`custody_id`),

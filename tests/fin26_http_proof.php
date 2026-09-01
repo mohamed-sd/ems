@@ -57,7 +57,33 @@ if ($db->connect_error) { fwrite(STDERR, "DB: {$db->connect_error}\n"); exit(1);
 $db->set_charset('utf8mb4');
 
 $PROBE_USER = 'fin26_probe_nogrant';
-$teardown = function () use ($db, $PROBE_USER) {
+
+/* ⛔ **والمسبارُ يترك أثرًا في سجلٍّ حوكميٍّ يُقاس** — كُشف بالقياس: خطوةُ ④
+   تُصيِّر قائمةَ مستخدمٍ من الدورِ 26 **بلا منحةٍ واحدة**، فيصدق عليه شرطُ
+   `navrRecordFinding('GLOBAL_FALLBACK')` بحقٍّ ويُقيَّد صفٌّ مفتاحُه
+   (kind · role_id · workspace_id) — **لا يميّز المسبارَ من المستخدمِ الحقيقي**.
+   فيبقى بعد كنسِ المسبارِ ويقرؤه `sidebar_guide_compare` فيرفع
+   `GLOBAL_FALLBACK_COUNT` من 0 إلى 1 **بلا عطبٍ في الإنتاج** (قِيس: التقاطعُ
+   الحيُّ لدورِ 26 ثلاثةٌ وعشرون بندًا).
+   ⇒ **والعلاجُ في الفاحصِ لا في المقياس**: يُلتقط حالُ الصفِّ قبلَ التصيير
+   ويُعاد بعدَه — **فيُحذف إن لم يكن قائمًا، ويُرَدُّ عدّادُه إن كان**.
+   ⛔ ولا يُحذف صفٌّ سابقٌ للمسبار: عطبٌ حقيقيٌّ قائمٌ يبقى ظاهرًا. */
+$FIND_KEY = "kind = 'GLOBAL_FALLBACK' AND role_id = 26 AND workspace_id = 'DEP-03'";
+$findBefore = $db->query("SELECT hits, last_seen FROM gov_nav_findings WHERE {$FIND_KEY}");
+$findBefore = $findBefore ? $findBefore->fetch_assoc() : null;
+
+$teardown = function () use ($db, $PROBE_USER, $FIND_KEY, $findBefore) {
+    if ($findBefore === null) {
+        $db->query("DELETE FROM gov_nav_findings WHERE {$FIND_KEY}");
+    } else {
+        $st = $db->prepare("UPDATE gov_nav_findings SET hits = ?, last_seen = ? WHERE kind = 'GLOBAL_FALLBACK' AND role_id = 26 AND workspace_id = 'DEP-03'");
+        if ($st) {
+            $h = (int) $findBefore['hits']; $ls = (string) $findBefore['last_seen'];
+            $st->bind_param('is', $h, $ls);
+            $st->execute();
+            $st->close();
+        }
+    }
     $pid = $db->query("SELECT id FROM users WHERE username = '{$PROBE_USER}'")->fetch_assoc();
     if ($pid) {
         $p = intval($pid['id']);

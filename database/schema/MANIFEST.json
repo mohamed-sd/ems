@@ -1,31 +1,31 @@
 {
-    "generated_at": "2026-09-01 09:53:26",
+    "generated_at": "2026-09-01 10:34:24",
     "source_db": "equipation_manage",
     "server_version": "11.4.9-MariaDB-log",
     "files": {
         "schema.sql": {
-            "sha1": "7f27a9fd380fc1c1604f8272a13274e271a43042",
-            "bytes": 1654989
+            "sha1": "c45c069be059d472b155d679fb64cbac925c7315",
+            "bytes": 1680987
         },
         "seed_reference.sql": {
-            "sha1": "911e79229b3d5ea58cc8b914a42d3fe9ed51000b",
-            "bytes": 1785497
+            "sha1": "a4f29028b48cf593f97ffd9dc891b717dd8fa4b7",
+            "bytes": 1841704
         }
     },
     "schema": {
-        "tables": 1015,
+        "tables": 1028,
         "views": 28,
         "triggers": 34
     },
     "seed": {
-        "rows": 12868,
+        "rows": 13205,
         "tables": {
             "roles": 35,
-            "modules": 692,
-            "role_permissions": 4040,
+            "modules": 710,
+            "role_permissions": 4058,
             "link_groups": 2990,
-            "nav_items": 2634,
-            "nav_canonical": 583,
+            "nav_items": 2652,
+            "nav_canonical": 601,
             "equipments_types": 30,
             "failure_codes": 402,
             "fin_chart_of_accounts": 298,
@@ -34,7 +34,7 @@
             "job_titles": 23,
             "employee_roles": 20,
             "transfer_types": 20,
-            "gov_field_class": 1070
+            "gov_field_class": 1335
         }
     }
 }

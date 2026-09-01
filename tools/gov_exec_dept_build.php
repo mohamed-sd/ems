@@ -188,6 +188,13 @@ foreach ($plans as $ix => $pl) {
         if (isset($have[$c['key']])) { continue; }
         $add[] = $c;
     }
+    /* ◆ **فعلُ التسجيلِ يكتب `created_by`** — وجدولٌ مالكٌ قائمٌ قد لا يحمله
+         (`sites` · `site_day` مثالًا). والعمودُ تقنيٌّ فيتخطّاه المرورُ أعلاه،
+         فيُطلَب صراحةً هنا **حين يُعلَن فعلٌ فقط** — فلا نضخّم جدولًا لا يكتب. */
+    if (!$isNew && !empty($pl['create']) && !isset($have['created_by'])) {
+        $add[] = array('key' => 'created_by', 'label' => 'المُنشئ', 'ftype' => 'AUDIT',
+                       'seq' => '0', 'sql' => 'INT NULL DEFAULT NULL', 'dc' => 'DC-1', 'sens' => 0);
+    }
     $plans[$ix]['add'] = $add;
     $plans[$ix]['isNew'] = $isNew;
     $plans[$ix]['have'] = $have;

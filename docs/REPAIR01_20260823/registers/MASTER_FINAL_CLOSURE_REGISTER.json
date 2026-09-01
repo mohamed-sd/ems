@@ -1,7 +1,7 @@
 {
     "meta": {
-        "snapshot": "5c1af89e",
-        "updated_at": "2026-09-01 06:59",
+        "snapshot": "986cd866",
+        "updated_at": "2026-09-01 07:34",
         "governing_order": "docs\/REPAIR01_20260823\/orders\/CLOSURE_SYSTEM.txt",
         "sprint_timeboxes": {
             "SPRINT-01": {
@@ -7314,10 +7314,10 @@
             "Estimated_Effort": "XL",
             "Evidence_Contract": "كل شاشة تبنى بنمط WH-03 الكامل (جدول بقيوده · شاشة بفعليها · التوصيل الكامل · البوابات خضر) وكل ادارة تبلغ §24 تدخل التحقق البشري فورا",
             "Next_Action": "استخراج Sprint من السجل واخذ اعلى الاهداف قيمة — 134 موضعا حاليا (لوحة DEPARTMENT_CONFORMANCE)",
-            "Current_Snapshot": "العدة المعممة الجديدة tools\/gov_exec_dept_build.php: مواصفة يدوية لكل ادارة + الاسم العربي يقرا من repair01_fields حرفا + هجرة بعكسها + gov_field_class + التوصيل الخماسي + ربط الموضع + القفل الثالث nav_items @ 5c1af89e",
-            "Last_Updated_Snapshot": "5c1af89e",
-            "Last_Evidence_Ref": "DEP-04 اغلقت بناء: 23 موضعا بنيت ووصلت وصيرت — TARGET_BUILD_COVERAGE 314\/413 ⇒ 337\/413 و RENDERED_TARGET_COVERAGE 201\/201 ⇒ 224\/224 و MATCH 7 ⇒ 8 ادارات · برهان التصيير 25\/0 (tests\/gov_exec_dept_render_proof.php) @ 5c1af89e",
-            "Status_Changed_At": "2026-09-01 06:59 @ 5c1af89e",
+            "Current_Snapshot": "حبات قائمة استكملت: sites و site_day و site_day_shift · وسطحان يقران ولا يكتبان: ops_stop_register (التشغيل) و tre_petty_expense (الخزينة) @ 986cd866",
+            "Last_Updated_Snapshot": "986cd866",
+            "Last_Evidence_Ref": "DEP-12 الموقع اغلقت: 18 موضعا · TARGET_BUILD_COVERAGE 337\/413 ⇒ 355\/413 · RENDERED 224\/224 ⇒ 242\/242 · المطابق تماما 8 ⇒ 9 · برهان التصيير 20\/0 @ 986cd866",
+            "Status_Changed_At": "2026-09-01 07:34 @ 986cd866",
             "Final_Disposition": "",
             "Levels": {
                 "Decision": "DECIDED",
