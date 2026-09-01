@@ -540,7 +540,7 @@ printf("مطابق %d · غير مطابق %d · بلا دور %d · بلا ور
 $one = function ($sql) use ($conn) { $q = $conn->query($sql); $r = $q ? $q->fetch_row() : null; return $r ? (int) $r[0] : 0; };
 $plTotal = $one("SELECT COUNT(*) FROM nav_placements WHERE active = 1");
 $plBuilt = $one("SELECT COUNT(*) FROM nav_placements WHERE active = 1 AND route IS NOT NULL");
-$plMenu  = $one("SELECT COUNT(*) FROM nav_placements WHERE active = 1 AND placement_type = 'MENU_ITEM' AND route IS NOT NULL");
+$plMenu  = $one("SELECT COUNT(*) FROM nav_placements WHERE active = 1 AND placement_type IN ('MENU_ITEM','LANDING_PAGE') AND route IS NOT NULL");
 $classifiedAgg = 0; $exactDeps = 0; $applicableDeps = 0;
 foreach ($detail as $code0 => $d0) {
     $classifiedAgg += count($d0['classifiedOut']);
@@ -551,12 +551,12 @@ foreach ($detail as $code0 => $d0) {
 }
 $roleVisDen = $one("SELECT COUNT(*) FROM nav_placements p
     JOIN nav_ws_roles wr ON wr.workspace_id = p.workspace_id AND wr.binding = 'PRIMARY'
-    WHERE p.active = 1 AND p.placement_type = 'MENU_ITEM' AND p.route IS NOT NULL");
+    WHERE p.active = 1 AND p.placement_type IN ('MENU_ITEM','LANDING_PAGE') AND p.route IS NOT NULL");
 $roleVisOk = $one("SELECT COUNT(DISTINCT p.id) FROM nav_placements p
     JOIN nav_ws_roles wr ON wr.workspace_id = p.workspace_id AND wr.binding = 'PRIMARY'
     JOIN modules m ON m.code = p.route COLLATE utf8mb4_unicode_ci
     JOIN role_permissions rp ON rp.module_id = m.id AND rp.role_id = wr.role_id AND rp.can_view = 1
-    WHERE p.active = 1 AND p.placement_type = 'MENU_ITEM' AND p.route IS NOT NULL");
+    WHERE p.active = 1 AND p.placement_type IN ('MENU_ITEM','LANDING_PAGE') AND p.route IS NOT NULL");
 $fallback = $one("SELECT COALESCE(SUM(hits),0) FROM gov_nav_findings WHERE kind = 'GLOBAL_FALLBACK'");
 $tdc = $one("SELECT COUNT(*) FROM gov_target_nav WHERE doc_code LIKE 'RENDER-ALIGN%'");
 /* §٣٤ مقاييسُ أمرِ الحوكمةِ الموحَّد — كلٌّ بمقامِه */
@@ -568,7 +568,7 @@ $legacyRead = $one("SELECT COUNT(DISTINCT wr.role_id) FROM nav_ws_roles wr
     JOIN nav_workspaces w ON w.workspace_id = wr.workspace_id AND w.kind = 'DEPARTMENT'
     WHERE wr.binding = 'PRIMARY'
       AND NOT EXISTS (SELECT 1 FROM nav_placements p WHERE p.workspace_id = wr.workspace_id
-                        AND p.active = 1 AND p.placement_type = 'MENU_ITEM' AND p.route IS NOT NULL)");
+                        AND p.active = 1 AND p.placement_type IN ('MENU_ITEM','LANDING_PAGE') AND p.route IS NOT NULL)");
 /* نسبُ الشاشةِ المبنيّة (§١٠ من الأمر): المقامُ المنطبقُ = شاشاتُ nav_items
    الحيّةُ لأدوارِ المساحاتِ المهاجرة · ومعها لها نسبٌ إن غطّاها موضعُ دليل */
 $appDen = $one("SELECT COUNT(DISTINCT LOWER(SUBSTRING_INDEX(REPLACE(n.route,'../',''),'?',1)))

@@ -43,7 +43,7 @@ foreach ($ws as $wsId => $wr) {
     }
     $q2 = $conn->query("SELECT p.route, p.target_ref FROM nav_placements p
                          WHERE p.workspace_id = '" . $e($wsId) . "' AND p.active = 1
-                           AND p.placement_type = 'MENU_ITEM' AND p.route IS NOT NULL");
+                           AND p.placement_type IN ('MENU_ITEM','LANDING_PAGE') AND p.route IS NOT NULL");
     while ($x = $q2->fetch_assoc()) {
         $rt = strtolower(trim($x['route'], '/'));
         if (isset($renderedRoutes[$rt])) { continue; }

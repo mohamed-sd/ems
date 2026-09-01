@@ -705,7 +705,8 @@ function navrPlacementSections($conn, $roleId) {
                                    FROM nav_placements p
                                    JOIN nav_lifecycle_groups g ON g.id = p.group_id AND g.active = 1
                                   WHERE p.workspace_id = '" . $conn->real_escape_string($ws) . "'
-                                    AND p.active = 1 AND p.placement_type = 'MENU_ITEM'
+                                    AND p.active = 1
+                                    AND p.placement_type IN ('MENU_ITEM','LANDING_PAGE')
                                     AND p.route IS NOT NULL");
     if ($res) {
         while ($row = mysqli_fetch_assoc($res)) {
@@ -721,6 +722,11 @@ function navrPlacementSections($conn, $roleId) {
                 'n' => (int) $row['gno'],
                 'o' => $o,
                 'p' => 1, /* مجموعةُ ورقةِ الدليلِ بابٌ دائمًا */
+                /* ⚠ **ومفرداتُ الصنفِ تُقرأ لا تُفترَض**: `LANDING_PAGE` أُضيف
+                   بأمرِ `GOV_UI_EXEC §8`، وكان هذا الاستعلامُ يعُدُّ `MENU_ITEM`
+                   وحدَه — فسقطت تسعةَ عشرَ صفحةَ هبوطٍ من طبقةِ المواضعِ دفعةً
+                   واحدةً وغابت سبعةَ عشرَ رأسَ مجموعةٍ من التصيير. **حاجزٌ يعُدُّ
+                   مفرداتٍ يجب أن يُراجَع مع كلِّ مفردةٍ جديدة.** */
             );
         }
     }
@@ -738,7 +744,8 @@ function navrPersonalOverlay($conn) {
                                    FROM nav_placements p
                                    JOIN nav_lifecycle_groups g ON g.id = p.group_id AND g.active = 1
                                   WHERE p.workspace_id = 'WS-MY' AND p.active = 1
-                                    AND p.placement_type = 'MENU_ITEM' AND p.route IS NOT NULL");
+                                    AND p.placement_type IN ('MENU_ITEM','LANDING_PAGE')
+                                    AND p.route IS NOT NULL");
     if ($res) {
         while ($row = mysqli_fetch_assoc($res)) {
             $base = uxuiNavBaseRoute($row['route']);

@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-01 16:23:19
--- الجداول: 1047 · المناظير: 28
+-- المصدر: equipation_manage · التوليد: 2026-09-01 16:51:30
+-- الجداول: 1049 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -10081,6 +10081,23 @@ CREATE TABLE `governance_flags` (
   UNIQUE KEY `uq_gf_element_scope` (`element_code`,`scope_type`,`scope_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='LEG-01 §7: أعلام التفعيل لكل عنصر على الكيان والعقد — الافتراض النمط ① (كله مطفأ)';
 
+-- ── Table: govui_fields_pre_settle ──
+CREATE TABLE `govui_fields_pre_settle` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `requirement_id` varchar(48) NOT NULL DEFAULT '',
+  `wave` varchar(8) NOT NULL DEFAULT '',
+  `unit` varchar(160) NOT NULL DEFAULT '',
+  `surface` varchar(255) NOT NULL DEFAULT '',
+  `seq` varchar(12) NOT NULL DEFAULT '',
+  `field_name` varchar(255) NOT NULL DEFAULT '',
+  `field_type` varchar(80) NOT NULL DEFAULT '',
+  `visibility_rule` varchar(255) NOT NULL DEFAULT '',
+  `src_ref` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  KEY `k_req` (`requirement_id`),
+  KEY `k_wave` (`wave`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- ── Table: govui_label_log ──
 CREATE TABLE `govui_label_log` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -10112,6 +10129,37 @@ CREATE TABLE `govui_space_fix_log` (
   PRIMARY KEY (`id`),
   KEY `ix_gsfl_app` (`appearance_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GOV_UI_EXEC: قيدُ رجوعِ تصحيحِ منعِ السطحِ في مساحتِه المالكة';
+
+-- ── Table: govui_target_registry ──
+CREATE TABLE `govui_target_registry` (
+  `target_id` varchar(24) NOT NULL COMMENT 'ثابتٌ قبلَ البناءِ وبعدَه (§4)',
+  `workspace_id` varchar(24) NOT NULL,
+  `workspace_type` varchar(24) NOT NULL COMMENT 'DEPARTMENT · EXECUTIVE · PERSONAL · PLATFORM_UTILITY',
+  `department_id` varchar(24) NOT NULL DEFAULT '' COMMENT 'فارغٌ للتنفيذيِّ والشخصيِّ بحكمِ §1',
+  `group_id` int(11) DEFAULT NULL,
+  `canonical_group_label` varchar(190) NOT NULL DEFAULT '',
+  `group_order` smallint(6) DEFAULT NULL,
+  `target_screen_id` varchar(12) NOT NULL DEFAULT '' COMMENT 'SCR-#### متى بُني',
+  `canonical_screen_label` varchar(190) NOT NULL,
+  `screen_order` smallint(6) NOT NULL,
+  `surface_type` varchar(16) NOT NULL COMMENT 'أصنافُ §8 السبعة',
+  `surface_rule` varchar(190) NOT NULL DEFAULT '' COMMENT 'القاعدةُ التي حسمت الصنف — ولا صنفَ بلا قاعدة',
+  `grain` varchar(400) NOT NULL DEFAULT '',
+  `owner` varchar(190) NOT NULL DEFAULT '',
+  `source_of_truth` varchar(1000) NOT NULL DEFAULT '',
+  `required_roles` varchar(255) NOT NULL DEFAULT '',
+  `state_model_ref` varchar(255) NOT NULL DEFAULT '',
+  `source_file` varchar(120) NOT NULL,
+  `source_sheet` varchar(120) NOT NULL,
+  `source_row` smallint(6) NOT NULL,
+  `built_route` varchar(190) NOT NULL DEFAULT '',
+  `built_at_snapshot` varchar(48) NOT NULL DEFAULT '',
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`target_id`),
+  KEY `ix_gtr_ws` (`workspace_id`,`screen_order`),
+  KEY `ix_gtr_surface` (`surface_type`),
+  CONSTRAINT `chk_gtr_rule` CHECK (`surface_type` = '' or `surface_rule` <> '')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GOV_UI_EXEC §4 — سجلُّ الأهدافِ بتسعةَ عشرَ عمودًا من الملفَّين الحاكمَين';
 
 -- ── Table: govui_wiring_log ──
 CREATE TABLE `govui_wiring_log` (
@@ -12138,7 +12186,7 @@ CREATE TABLE `nav_placements` (
   `target_id` varchar(24) DEFAULT NULL,
   `group_id` int(11) NOT NULL,
   `sort_no` smallint(5) unsigned NOT NULL,
-  `placement_type` enum('MENU_ITEM','TAB_CHILD','DIRECT_ONLY','PROJECTION','UTILITY','NOT_BUILT') NOT NULL,
+  `placement_type` enum('MENU_ITEM','TAB_CHILD','DIRECT_ONLY','PROJECTION','UTILITY','LANDING_PAGE','NOT_BUILT') NOT NULL COMMENT 'أصنافُ §8 السبعة — وLANDING_PAGE أُضيف بأمرِ GOV_UI_EXEC',
   `source_ref` varchar(190) NOT NULL,
   `active` tinyint(1) NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`),

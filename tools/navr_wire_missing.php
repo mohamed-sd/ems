@@ -60,7 +60,7 @@ foreach ($ws as $wsId => $rid) {
                          FROM nav_placements p
                          JOIN nav_lifecycle_groups g ON g.id = p.group_id
                         WHERE p.workspace_id = '" . $e($wsId) . "' AND p.active = 1
-                          AND p.placement_type = 'MENU_ITEM' AND p.route IS NOT NULL
+                          AND p.placement_type IN ('MENU_ITEM','LANDING_PAGE') AND p.route IS NOT NULL
                         ORDER BY g.sort_no, p.sort_no");
     while ($x = $q->fetch_assoc()) {
         $k = strtolower(trim($x['route'], '/'));

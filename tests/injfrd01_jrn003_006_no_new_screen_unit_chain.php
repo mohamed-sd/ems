@@ -76,7 +76,7 @@ function jrn_is_declared_tab(mysqli $db, $ROOT, $route)
        بندُه من طبقةِ المواضعِ المستورَدةِ آليًّا — سندٌ مكتوبٌ بمصدرِه لا
        بابٌ خلفيّ: يُقبل فقط ما لموضعِه صفُّ `GUIDE-IMPORT` قائمةً. */
     $st = $db->prepare("SELECT COUNT(*) FROM nav_placements
-                         WHERE LOWER(route) = LOWER(?) AND placement_type = 'MENU_ITEM'
+                         WHERE LOWER(route) = LOWER(?) AND placement_type IN ('MENU_ITEM','LANDING_PAGE')
                            AND active = 1 AND source_ref LIKE 'GUIDE-IMPORT%'");
     if (!$st) { return false; }
     $st->bind_param('s', $route);

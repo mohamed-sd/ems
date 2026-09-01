@@ -34,7 +34,7 @@ $md = "# DEPARTMENT_CONFORMANCE — مطابقةُ الإداراتِ لمصدر
 $md .= "| الإدارة | مواضعُ الدليل | مبنيٌّ منها | غيرُ مبنيّ | مطابقةُ الحقول (مقيسُها) | آلاتُ الحالةِ الواجبة | المالكُ الصحيح |\n|---|---|---|---|---|---|---|\n";
 $q = $conn->query("SELECT w.workspace_id ws, w.name_ar,
         COUNT(p.target_ref) pl,
-        SUM(p.placement_type IN ('MENU_ITEM','TAB_CHILD','PROJECTION')) built,
+        SUM(p.placement_type <> 'NOT_BUILT') built,
         SUM(p.placement_type = 'NOT_BUILT') nb
     FROM nav_workspaces w LEFT JOIN nav_placements p ON p.workspace_id = w.workspace_id AND p.active = 1
     WHERE w.kind = 'DEPARTMENT' GROUP BY w.workspace_id ORDER BY w.workspace_id");
