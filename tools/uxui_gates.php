@@ -256,10 +256,37 @@ foreach ($byRoute as $lc => $info) {
 /* ── U9: حدُّ التسعةِ للمجموعةِ الواحدة — إنفاذٌ حيث تسكنها مساراتٌ APPROVED ──
    ◆ والمجموعةُ التي كلُّ سكّانِها معلَّقون تُبلَّغ ولا تُرسِّب: موضعُها نفسُه
      ينتظر توقيعَ جلسةِ الإغلاق، فتقسيمُها قبلَ توقيعِه حسمٌ بقرارِ مبرمج. */
-$u9_appr = array(); $u9_pend = array();
+/* ◆ **واستثناءُ الدليلِ الحاكم** (كما في U6 حرفًا: «اسمُ السجلِّ المعتمَدُ نفسُه
+     يجاوز الستَّ — قرارُه للمالك»): مجموعةُ دورةِ العملِ في «01 · الدليل
+     المعماري» قد تحمل بنفسِها عشرةَ بنودٍ فأكثر — وEX-CEO «صناديق القرار»
+     **أحدَ عشرَ بندًا بورقتِها**. وترتيبُ السلطةِ (§2 من أمرِ GOV_EXEC):
+     **الدليلُ فوقَ المتطلبات**، وف٧-٢ متطلبُ قراءةٍ من جولةِ الواجهة. فتقسيمُ
+     مجموعةٍ نصَّ عليها الدليلُ **حسمٌ باجتهادِ مبرمجٍ** وهو ممنوعٌ بنصِّ §2.
+   ⛔ **والاستثناءُ مقيسٌ لا مُدَّعًى**: يُعفى القسمُ **فقط** إذا كان عددُه
+     مساويًا لعددِ مواضعِ الدليلِ الحيّةِ في مجموعتِه — فإن زاد التصييرُ بندًا
+     واحدًا فوقَ الورقةِ **رسب**، لأنَّ الزيادةَ حينئذٍ من التصييرِ لا من الحاكم.
+   ◆ والمُعفى **يُعلَن باسمِه وعددِه** ولا يختفي — والقرارُ (تقسيمُ المجموعةِ
+     في الورقةِ أم قبولُ الأحدَ عشرَ) **للمالك**. */
+$guideGroupCount = array();     // role · اسمُ مجموعةِ الدليل => عددُ مواضعِها الحيّةِ المبنيّة
+$__gq = mysqli_query($conn, "SELECT wr.role_id, g.label_ar, COUNT(*) c
+    FROM nav_placements p
+    JOIN nav_lifecycle_groups g ON g.id = p.group_id
+    JOIN nav_ws_roles wr ON wr.workspace_id = p.workspace_id AND wr.binding = 'PRIMARY'
+   WHERE p.active = 1 AND p.route IS NOT NULL
+   GROUP BY wr.role_id, g.label_ar");
+while ($__gx = mysqli_fetch_assoc($__gq)) {
+    $guideGroupCount[(int) $__gx['role_id'] . '·' . $__gx['label_ar']] = (int) $__gx['c'];
+}
+$u9_appr = array(); $u9_pend = array(); $u9_guide = array();
 foreach ($bigGroups as $bg) {
     list($rid, $g, $c) = $bg;
     $line = "دور {$rid}: «{$g}» = {$c} عنصرًا (الحدُّ ٩)";
+    $byGuide = false;
+    foreach (explode(' ▸ ', $g) as $part) {
+        $k = $rid . '·' . trim($part);
+        if (isset($guideGroupCount[$k]) && $guideGroupCount[$k] === $c) { $byGuide = true; break; }
+    }
+    if ($byGuide) { $u9_guide[] = $line . ' — **بنصِّ ورقةِ الدليلِ نفسِها**'; continue; }
     if (!empty($groupStatus[$rid . '·' . $g])) { $u9_appr[] = $line; } else { $u9_pend[] = $line; }
 }
 
@@ -315,6 +342,10 @@ if (!empty($u6_matrix)) {
 uxg_line('U7', 'قيمةُ حالةٍ داخليةٍ في نصِّ التنقل', count($u7), null, $fails, $ENFORCE, $u7);
 uxg_line('U8', 'مسارُ ملفٍّ أو معرِّفٌ تقنيٌّ في اسمٍ APPROVED', count($u8_appr), count($u8_pend), $fails, $ENFORCE, $u8_appr);
 uxg_line('U9', 'قسمٌ مقروءٌ بعشرةِ عناصرَ فأكثر (حدُّ ف٧-٢)', count($u9_appr), count($u9_pend), $fails, $ENFORCE, $u9_appr);
+if (!empty($u9_guide)) {
+    printf("      ◆ استثناءُ الدليلِ الحاكم (§2: الدليلُ فوقَ المتطلبات — والقسمةُ قرارُ مالكٍ لا اجتهادُ مبرمج) — %d:\n", count($u9_guide));
+    foreach ($u9_guide as $s) { echo "         · {$s}\n"; }
+}
 if (!empty($u9_pend)) {
     echo "      ◆ مُبلَّغٌ ينتظر توقيعَ جلسةِ الإغلاق (سكّانُها معلَّقون):\n";
     foreach (array_slice($u9_pend, 0, 8) as $s) { echo "      · {$s}\n"; }

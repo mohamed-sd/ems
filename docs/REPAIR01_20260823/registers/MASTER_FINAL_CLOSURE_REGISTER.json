@@ -1,7 +1,7 @@
 {
     "meta": {
-        "snapshot": "07feb69b",
-        "updated_at": "2026-09-01 08:02",
+        "snapshot": "168011c0",
+        "updated_at": "2026-09-01 08:14",
         "governing_order": "docs\/REPAIR01_20260823\/orders\/CLOSURE_SYSTEM.txt",
         "sprint_timeboxes": {
             "SPRINT-01": {
@@ -7296,7 +7296,7 @@
             "Domain": "الحوكمة",
             "Target_ID": "NAV-PLACEMENTS-NOT-BUILT",
             "Requirement_ID": "—",
-            "Current_Status": "IN_PROGRESS",
+            "Current_Status": "IMPLEMENTED_NOT_VERIFIED",
             "Priority": "P1",
             "Execution_Rank": 890,
             "Severity": "HIGH",
@@ -7314,10 +7314,10 @@
             "Estimated_Effort": "XL",
             "Evidence_Contract": "كل شاشة تبنى بنمط WH-03 الكامل (جدول بقيوده · شاشة بفعليها · التوصيل الكامل · البوابات خضر) وكل ادارة تبلغ §24 تدخل التحقق البشري فورا",
             "Next_Action": "استخراج Sprint من السجل واخذ اعلى الاهداف قيمة — 134 موضعا حاليا (لوحة DEPARTMENT_CONFORMANCE)",
-            "Current_Snapshot": "مصفوفة الالتزامات حبتها العقد نفسه فبنيت فوق contracts لا فوق جدول ثان · وثمان حبات قائمة استكملت @ 07feb69b",
-            "Last_Updated_Snapshot": "07feb69b",
-            "Last_Evidence_Ref": "DEP-01 المبيعات التعاقدية اغلقت: 9 مواضع · TARGET_BUILD_COVERAGE 379\/413 ⇒ 388\/413 · RENDERED 266\/266 ⇒ 275\/275 · المطابق تماما 11 ⇒ 12 · برهان التصيير 11\/0 · الحقول 1876\/5026 ⇒ 2064\/5214 @ 07feb69b",
-            "Status_Changed_At": "2026-09-01 08:02 @ 07feb69b",
+            "Current_Snapshot": "CURRENT_RELEASE_TARGET_NOT_BUILT صفر لكل مساحة بدور حي — والاثبات البشري وحده يفصل بين IMPLEMENTED_NOT_VERIFIED و EVIDENCE_CLOSED @ 168011c0",
+            "Last_Updated_Snapshot": "168011c0",
+            "Last_Evidence_Ref": "حملة البناء اكتملت لكل مساحة بدور حي: DEP-11 و DEP-14 و EX-CEO اغلقت (7+7+5) — TARGET_BUILD_COVERAGE 314\/413 ⇒ 407\/413 والباقي 6 مواضع في EX-DVP وحدها بحاجز BLOCKED_OWNER (لا دور نواب حي) · RENDERED 294\/294 · المطابق تماما 7 ⇒ 15 · الحقول 891\/4039 ⇒ 2335\/5485 @ 168011c0",
+            "Status_Changed_At": "2026-09-01 08:14 @ 168011c0",
             "Final_Disposition": "",
             "Levels": {
                 "Decision": "DECIDED",

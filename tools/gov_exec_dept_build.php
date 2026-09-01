@@ -295,8 +295,13 @@ $HID = u13_hidden_cols();
 $nCls = 0; $nFile = 0; $nBind = 0; $wireSpecs = array();
 foreach ($plans as $pl) {
     /* ─ أ · دفترُ الحقولِ المبنيّة: مقيَّدٌ ⇒ مُصيَّرٌ ولا فرق ─────────────── */
+    $havePl = gdb_existing($conn, $pl['table']);
     foreach ($pl['cols'] as $c) {
         if (in_array($c['key'], $HID, true)) { continue; }   // لا يُصيَّر ⇒ لا يُقيَّد
+        /* ◆ **وعمودٌ تقنيٌّ لا وجودَ له في الجدولِ لا يُقيَّد**: العُدّةُ تتخطّى
+             التقنيَّ في الـALTER (فلا تضخّم جدولًا لا يكتب)، فلو قُيِّد وهو
+             غائبٌ لَظهر في الدفترِ ولم يُصيَّر — وهو بعينُه ما تمنعه القاعدة. */
+        if (!isset($havePl[$c['key']])) { continue; }
         $ok = $conn->query("INSERT INTO gov_field_class
             (company_id, screen_code, field_key, label_ar, dc_code, is_sensitive, doc_ref, active)
             VALUES (0, '{$e($pl['code'])}', '{$e($c['key'])}', '{$e($c['label'])}',
