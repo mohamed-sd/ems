@@ -78,10 +78,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $auths = $conn->query(
-    "SELECT a.*, u.name person_name, e.legal_name entity_name,
+    "SELECT a.*, u.name person_name, e.legal_name entity_name, rv.name reviewer_name,
             DATEDIFF(a.valid_to, CURDATE()) days_left
        FROM signing_authorities a
        LEFT JOIN users u ON u.id = a.person_id
+       LEFT JOIN users rv ON rv.id = a.reviewed_by
        LEFT JOIN legal_entities e ON e.entity_id = a.entity_id
       WHERE a.company_id = {$co}
       ORDER BY (a.state = 'active') DESC, a.valid_to IS NULL DESC, a.valid_to"
@@ -115,13 +116,17 @@ include '../insidebar.php';
     ?>
     <div class="card"><div class="card-body">
         <div class="table-container"><table class="alltables display gov-sig-table" data-no-dt="1">
-        <thead><tr><th>#</th><th>المفوض</th><th>الكيان المفوض</th><th>نوع التفويض</th><th>السقف المالي</th><th>نطاق التفويض</th><th>نيابة عن</th><th>المدة</th><th>مستند التفويض</th><th>الحالة</th>
+        <thead><tr><th>#</th><th>المفوض</th><th>الكيان المفوض</th><th>نوع التفويض</th><th>الحد المالي</th><th>نطاق التفويض</th><th>نيابة عن</th><th>المدة</th><th>مرفق التفويض الموثق</th><th>حالة التفويض</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1" data-fn-src="auth_no">رقم التفويض</th>
               <th class="ems-fn-th" data-fn="1">صفته</th>
               <th class="ems-fn-th" data-fn="1" data-fn-src="joint_required">توقيع مشترك مطلوب؟</th>
               <th class="ems-fn-th" data-fn="1" data-fn-src="valid_from">من تاريخ</th>
               <th class="ems-fn-th" data-fn="1" data-fn-src="valid_to">إلى تاريخ</th>
+              <!-- حقلان من ورقةِ GOV-06 لا رأسَ لهما: يُوصلان بمصدرِهما في data-xf
+                   لا يُعلَنان بلا مصدرٍ فيُحشيان شرطةً ويُخفَيان -->
+              <th class="ems-fn-th" data-fn="1" data-fn-src="sub_delegable">قابل للتفويض الفرعي؟</th>
+              <th class="ems-fn-th" data-fn="1" data-fn-src="reviewer">المراجع</th>
               <th class="ems-fn-th" data-fn="1">جهة التصديق</th>
               <th class="ems-fn-th" data-fn="1">أصدره</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
@@ -143,6 +148,9 @@ include '../insidebar.php';
             'joint_required' => (intval($a['joint_required'] ?? 0) === 1 ? 'نعم' : 'لا'),
             'valid_from'     => (string) ($a['valid_from'] ?? ''),
             'valid_to'       => (string) ($a['valid_to'] ?? ''),
+            'sub_delegable'  => (array_key_exists('sub_delegable', $a) && $a['sub_delegable'] !== null)
+                                ? (intval($a['sub_delegable']) === 1 ? 'نعم' : 'لا') : '',
+            'reviewer'       => (string) ($a['reviewer_name'] ?? ''),
         ), JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8'); ?>">
             <td><?php echo intval($a['auth_id']); ?></td>
             <td><?php echo htmlspecialchars((string) ($a['person_name'] ?: ('#' . $a['person_id']))); ?></td>

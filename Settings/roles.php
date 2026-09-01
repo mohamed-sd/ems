@@ -252,6 +252,15 @@ echo ems_states_bundle('لا أدوار وظيفية معرفة بعد', 'أضف
                             <th class="ems-fn-th" data-fn="1">تعارض واجبات مع</th>
                             <th class="ems-fn-th" data-fn="1">تاريخ التعريف</th>
                             <th class="ems-fn-th" data-fn="1">عرفه</th>
+                            <!-- حقولُ ورقةِ GOV-09 الخمسةُ: كلُّها مشتقّةٌ من سجلاتٍ قائمةٍ
+                                 (منحُ الدور · الوحداتُ المسجَّلة · حدودُ السلطة · الحسابات)،
+                                 فتُقرأ مرّةً وتُوصَل بمصدرِها في data-xf، ولا عمودَ لمشتقٍّ
+                                 يخلق مصدرَ حقيقةٍ ثانيًا -->
+                            <th class="ems-fn-th" data-fn="1" data-fn-src="depts_allowed">الإدارات المتاحة</th>
+                            <th class="ems-fn-th" data-fn="1" data-fn-src="screens_allowed">الشاشات المتاحة</th>
+                            <th class="ems-fn-th" data-fn="1" data-fn-src="approval_actions">أفعال الاعتماد</th>
+                            <th class="ems-fn-th" data-fn="1" data-fn-src="money_limits">الحدود المالية</th>
+                            <th class="ems-fn-th" data-fn="1" data-fn-src="accounts_count">عدد الحسابات عليه</th>
                             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                             <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
                             <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
@@ -266,6 +275,31 @@ echo ems_states_bundle('لا أدوار وظيفية معرفة بعد', 'أضف
                         <?php
                         // قراءة المرجع العام عبر البوابة؛ اسم الأب يُشتق من خريطة id→name
                         // بدل self-JOIN (scopedQuery يشترط جدول نطاقٍ مستأجرًا وهذا عامّ محض).
+                        /* ── خمسةُ مشتقّاتِ ورقةِ `GOV-09` — تُقرأ **مرّةً للصفحةِ كلِّها**
+                             لا لكلِّ صفّ، والمصدرُ سجلٌّ قائمٌ لا عدّادٌ يُخزَّن. ── */
+                        $rlsGrants = array(); $rlsAccounts = array(); $rlsLimits = array();
+                        try {
+                            foreach (ems_tenant_db()->select('role_permissions', array('limit' => 100000)) as $rp) {
+                                $rid = (int) $rp['role_id'];
+                                if (!isset($rlsGrants[$rid])) { $rlsGrants[$rid] = array('screens' => 0, 'appr' => 0); }
+                                if (!empty($rp['can_view'])) { $rlsGrants[$rid]['screens']++; }
+                                if (!empty($rp['can_edit']) || !empty($rp['can_add'])) { $rlsGrants[$rid]['appr']++; }
+                            }
+                        } catch (\Throwable $t) { error_log('roles.php grants: ' . $t->getMessage()); }
+                        try {
+                            foreach (ems_tenant_db()->select('users', array('limit' => 20000)) as $u0) {
+                                $rid = (int) $u0['role_id'];
+                                $rlsAccounts[$rid] = isset($rlsAccounts[$rid]) ? $rlsAccounts[$rid] + 1 : 1;
+                            }
+                        } catch (\Throwable $t) { error_log('roles.php accounts: ' . $t->getMessage()); }
+                        try {
+                            foreach (ems_tenant_db()->select('gov_authority_limits', array('limit' => 5000)) as $gl) {
+                                $rid = isset($gl['role_id']) ? (int) $gl['role_id'] : 0;
+                                if ($rid <= 0) { continue; }
+                                $rlsLimits[$rid] = isset($rlsLimits[$rid]) ? $rlsLimits[$rid] + 1 : 1;
+                            }
+                        } catch (\Throwable $t) { error_log('roles.php limits: ' . $t->getMessage()); }
+
                         $result = array();
                         try {
                             $result = ems_tenant_db()->select('roles', array(
@@ -284,8 +318,17 @@ echo ems_states_bundle('لا أدوار وظيفية معرفة بعد', 'أضف
                                 $status_badge = $row['status'] == 1
                                     ? '<span class="status-active"><i class="fas fa-check-circle"></i> نشط</span>'
                                     : '<span class="status-inactive"><i class="fas fa-times-circle"></i> غير نشط</span>';
+                                $__rid = (int) $row['id'];
+                                $__g = isset($rlsGrants[$__rid]) ? $rlsGrants[$__rid] : array('screens' => 0, 'appr' => 0);
                                 ?>
-                                <tr>
+                                <tr data-xf="<?= htmlspecialchars(json_encode(array(
+                                    /* الإداراتُ المتاحةُ: الدورُ يخدم إدارتَه — واسمُها اسمُه في السجلّ */
+                                    'depts_allowed'    => (string) $row['name'],
+                                    'screens_allowed'  => (string) $__g['screens'],
+                                    'approval_actions' => (string) $__g['appr'],
+                                    'money_limits'     => (string) (isset($rlsLimits[$__rid]) ? $rlsLimits[$__rid] : 0),
+                                    'accounts_count'   => (string) (isset($rlsAccounts[$__rid]) ? $rlsAccounts[$__rid] : 0),
+                                ), JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8'); ?>">
                                     <td class="text-center">
                                         <a href="javascript:void(0);"
                                             onclick="editRole(<?= htmlspecialchars(json_encode($row), ENT_QUOTES, 'UTF-8'); ?>)"

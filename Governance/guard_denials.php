@@ -30,9 +30,12 @@ ems_shell_axes($__pp);
 /* ① المحاولاتُ الممنوعةُ من سجل الحارس المخصص (guard_denials) */
 $denials = array();
 $res = $conn->query("SELECT d.deny_id, d.company_id, d.guard_code, d.person_id, d.attempted_ref, d.reason_code, d.at,
-                            u.name person_name, r.review_code, r.classification, r.decision_note, r.created_at review_at
+                            d.verb, d.actor_role_id, d.owner_dept, d.request_source,
+                            u.name person_name, ro.name actor_role_name,
+                            r.review_code, r.classification, r.decision_note, r.created_at review_at
                        FROM guard_denials d
                        LEFT JOIN users u ON u.id = d.person_id
+                       LEFT JOIN roles ro ON ro.id = d.actor_role_id
                        LEFT JOIN gov_denial_reviews r ON r.denial_id = d.deny_id AND r.company_id = d.company_id
                       WHERE d.company_id = {$company_id}
                       ORDER BY d.at DESC LIMIT 400");
@@ -46,6 +49,15 @@ $res = $conn->query("SELECT l.r_id, l.action_code, l.person_id, l.subject_ref, l
                       WHERE l.company_id = {$company_id} AND l.result = 'denied'
                       ORDER BY l.at DESC LIMIT 200");
 if ($res) { while ($x = $res->fetch_assoc()) { $centralDenied[] = $x; } }
+
+/* عددُ محاولاتِ الفاعلِ بالقاعدة — حقلُ الورقةِ «عدد محاولات الفاعل بالقاعدة ◄».
+   ◆ **مشتقٌّ من الصفوفِ المقروءةِ نفسِها** لا من عدّادٍ يُخزَّن: عدّادٌ وعارضٌ
+     من مصدرَين يتفرّقان ([[counter-parity-two-readers]]). */
+$perActorGuard = array();
+foreach ($denials as $__d) {
+    $__k = ((int) $__d['person_id']) . '|' . (string) $__d['guard_code'];
+    $perActorGuard[$__k] = isset($perActorGuard[$__k]) ? $perActorGuard[$__k] + 1 : 1;
+}
 
 /* ③ المنعُ المتكرر — نفسُ الحارس أو نفسُ الشخص ثلاثًا فأكثر */
 $repeats = array();
@@ -110,8 +122,12 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         <div class="table-container">
         <table class="alltables display nowrap dnr-table-full">
             <thead><tr>
-                <th>#</th><th>رمز الحارس</th><th>المحاول</th><th>المرجع المحاول</th>
-                <th>رمز السبب</th><th>الوقت</th>
+                <!-- أسماءُ ورقةِ GOV-15 بترتيبِها المستنديّ (الأمرُ 11): الرأسُ
+                     والخليّةُ يُحرَّران معًا فلا رأسَ بلا مصدر -->
+                <th>معرف المحاولة</th><th>وقت المحاولة</th><th>الفاعل</th>
+                <th>صفة الفاعل وقتها</th><th>الفعل المطلوب</th><th>السجل المستهدف</th>
+                <th>الإدارة المالكة</th><th>القاعدة المانعة</th><th>سبب المنع</th>
+                <th>مصدر الطلب</th><th>عدد محاولات الفاعل بالقاعدة</th><th>فتح مراجعة؟</th>
                 <th>المراجعة</th><th>التصنيف</th><th>قرار المراجعة</th><th>تاريخ المراجعة</th>
                 <?php /* الأعمدةُ الحاكمةُ التي يطلبها تصميمُ الشاشة (CMP-03) — بنمطِ السجلِّ
                          المركزي `ems_gov_registry()`: الحالةُ مشتقةٌ من وجودِ المراجعة،
@@ -124,11 +140,17 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
             <?php foreach ($denials as $d): ?>
                 <tr>
                     <td><?php echo (int) $d['deny_id']; ?></td>
-                    <td class="dnr-mono dnr-fs-76"><?php echo htmlspecialchars($d['guard_code']); ?></td>
-                    <td><?php echo htmlspecialchars((string) ($d['person_name'] ?: ('#' . $d['person_id']))); ?></td>
-                    <td class="dnr-mono dnr-fs-72"><?php echo htmlspecialchars((string) $d['attempted_ref']); ?></td>
-                    <td><span class="badge badge-danger"><?php echo htmlspecialchars((string) $d['reason_code']); ?></span></td>
                     <td><small><?php echo htmlspecialchars((string) $d['at']); ?></small></td>
+                    <td><?php echo htmlspecialchars((string) ($d['person_name'] ?: ('#' . $d['person_id']))); ?></td>
+                    <td><?php echo htmlspecialchars((string) ($d['actor_role_name'] ?: '')) ?: '—'; ?></td>
+                    <td class="dnr-mono dnr-fs-72"><?php echo htmlspecialchars((string) ($d['verb'] ?: '')) ?: '—'; ?></td>
+                    <td class="dnr-mono dnr-fs-72"><?php echo htmlspecialchars((string) $d['attempted_ref']); ?></td>
+                    <td><?php echo htmlspecialchars((string) ($d['owner_dept'] ?: '')) ?: '—'; ?></td>
+                    <td class="dnr-mono dnr-fs-76"><?php echo htmlspecialchars($d['guard_code']); ?></td>
+                    <td><span class="badge badge-danger"><?php echo htmlspecialchars((string) $d['reason_code']); ?></span></td>
+                    <td><?php echo htmlspecialchars((string) ($d['request_source'] ?: '')) ?: '—'; ?></td>
+                    <td><?php echo (int) ($perActorGuard[((int) $d['person_id']) . '|' . (string) $d['guard_code']] ?? 0); ?></td>
+                    <td><?php echo empty($d['review_code']) ? 'لا' : 'نعم'; ?></td>
                     <td class="dnr-mono"><?php echo htmlspecialchars((string) ($d['review_code'] ?: '—')); ?></td>
                     <td><?php echo $d['classification'] !== null
                         ? '<span class="badge badge-info">' . htmlspecialchars($d['classification']) . '</span>' : '—'; ?></td>

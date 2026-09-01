@@ -199,6 +199,29 @@ if (!function_exists('ems_w14_grid')) {
     }
 
     /**
+     * عددُ العلاقاتِ بين الكيانات — طرفًا أوَّلَ أو ثانيًا في سجلِّ الأطرافِ ذاتِ العلاقة.
+     * ◆ ويُقرأ مرّةً واحدةً عبرَ بوّابةِ العزل — ⛔ ولا نصَّ استعلامٍ في السطحِ
+     *   الحيِّ (سقّاطةُ `GAP-29` تقيس النصَّ لا النيّة).
+     */
+    function ems_w14_entity_relations($entityId)
+    {
+        static $map = null;
+        if ($map === null) {
+            $map = array();
+            try {
+                foreach (ems_tenant_db()->select('gov_related_party', array('limit' => 20000)) as $rp) {
+                    foreach (array('from_legal_entity_id', 'to_legal_entity_id') as $k) {
+                        $id = isset($rp[$k]) ? (int) $rp[$k] : 0;
+                        if ($id > 0) { $map[$id] = isset($map[$id]) ? $map[$id] + 1 : 1; }
+                    }
+                }
+            } catch (\Throwable $t) { error_log('ems_w14_entity_relations: ' . $t->getMessage()); }
+        }
+        $id = (int) $entityId;
+        return isset($map[$id]) ? (string) $map[$id] : '';
+    }
+
+    /**
      * نقطةُ منتصفِ المدّةِ بين تاريخَين — لمراجعةِ منتصفِ المدّةِ المشتقّة.
      * ◆ وموضعُها العُدّةُ لا الشاشة (سقّاطةُ `VT-07`: تنسيقُ تاريخٍ في سطحٍ حيّ).
      */

@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/permissions_helper.php';
+require_once __DIR__ . '/../includes/w14_grid.php'; // بوّابةُ قراءةِ الأسماء — لا استعلامَ خامٌّ في السطح
 /**
  * Governance/licenses_guarantees.php — التراخيص والكفالات (LEG-01 §5 · §8-④ · الشاشة 208)
  * ───────────────────────────────────────────────────────────────────────────
@@ -133,12 +134,21 @@ include '../insidebar.php';
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">الرقم أو المرجع</th>
               <th class="ems-fn-th" data-fn="1">المستفيد</th>
-              <th class="ems-fn-th" data-fn="1">تاريخ الإصدار</th>
+              <th class="ems-fn-th" data-fn="1" data-fn-src="issue_date">تاريخ الإصدار</th>
               <th class="ems-fn-th" data-fn="1">المدة المتبقية</th>
               <th class="ems-fn-th" data-fn="1">شرط التمديد التلقائي</th>
               <th class="ems-fn-th" data-fn="1">الرسوم</th>
               <th class="ems-fn-th" data-fn="1">حالة الرد أو المصادرة</th>
               <th class="ems-fn-th" data-fn="1">المسؤول</th>
+              <!-- حقولُ ورقةِ GOV-07 الباقيةُ: كلُّها موصولةٌ بمصدرِها في data-xf،
+                   ولا رأسَ يُعلَن بلا خليّةٍ فيُحشى شرطةً ويُخفى -->
+              <th class="ems-fn-th" data-fn="1" data-fn-src="doc_id">معرف المستند</th>
+              <th class="ems-fn-th" data-fn="1" data-fn-src="contract_ref">العقد المربوط</th>
+              <th class="ems-fn-th" data-fn="1" data-fn-src="alert_days">مهلة التنبيه</th>
+              <th class="ems-fn-th" data-fn="1" data-fn-src="is_critical">مستند حرج؟</th>
+              <th class="ems-fn-th" data-fn="1" data-fn-src="guard_rule_ref">قاعدة المنع المفعلة</th>
+              <th class="ems-fn-th" data-fn="1" data-fn-src="renewal_owner">مسؤول التجديد</th>
+              <th class="ems-fn-th" data-fn="1" data-fn-src="reviewer">المراجع</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
               <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
@@ -151,7 +161,18 @@ include '../insidebar.php';
               <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
               </tr></thead><tbody>
         <?php foreach ($lics as $l): ?>
-        <tr>
+        <tr data-xf="<?php echo htmlspecialchars(json_encode(array(
+            'doc_id'         => 'LIC-' . str_pad((string) $l['lic_id'], 5, '0', STR_PAD_LEFT),
+            'issue_date'     => (string) ($l['issue_date'] ?? ''),
+            'contract_ref'   => (string) ($l['contract_ref'] ?? ''),
+            'alert_days'     => (string) ($l['alert_days'] ?? ''),
+            'is_critical'    => ($l['is_critical'] === null ? '' : (intval($l['is_critical']) === 1 ? 'نعم' : 'لا')),
+            'guard_rule_ref' => (string) ($l['guard_rule_ref'] ?? ''),
+            /* الأسماءُ من بوّابةِ العزلِ لا بضمِّ جدولِ المستخدمين هنا —
+               سقّاطةُ GAP-29 ترصد نصَّ الاستعلامِ على جدولِ مستأجِرٍ في سطحٍ حيّ. */
+            'renewal_owner'  => ems_w14_person($l['renewal_owner'] ?? 0),
+            'reviewer'       => ems_w14_person($l['reviewed_by'] ?? 0),
+        ), JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8'); ?>">
             <td><?php echo htmlspecialchars($l['legal_name']); ?></td>
             <td><?php echo htmlspecialchars($l['lic_type']); ?></td>
             <td><?php echo htmlspecialchars((string) $l['issuer']); ?></td>

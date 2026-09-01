@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/permissions_helper.php';
+require_once __DIR__ . '/../includes/w14_grid.php'; // بوّابةُ قراءةِ الأسماء — لا استعلامَ خامٌّ في السطح
 // شواهد المتطلبات (AC-E06-03 · موجة ٣): SCN-667 · SCN-668 · SCN-669 · SCN-671 · SCN-672 · SCN-673
 /**
  * Governance/entities_registry.php — سجل الكيانات (LEG-01 §8-① · الشاشة 206)
@@ -109,7 +110,7 @@ include '../insidebar.php';
             فلتر: <a href="?f=all">الكل</a> · <a href="?f=internal">كياناتنا (المستأجرة)</a> · <a href="?f=external">الأطراف الخارجية</a>
         </div>
         <div class="table-container"><table class="alltables display gov-ent-table" data-no-dt="1">
-        <thead><tr><th>الكيان</th><th>الثلاثية (بلد · جهة · سجل)</th><th>الصفات</th><th>العملة الأساسية</th><th>داخلي؟</th><th>أقرب انتهاء ترخيص</th><th>الحالة</th>
+        <thead><tr><th>الكيان</th><th>الثلاثية (بلد · جهة · سجل)</th><th>الصفات</th><th>العملة الأساسية</th><th>داخلي؟</th><th>أقرب انتهاء ترخيص</th><th>حالة الكيان</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <!-- XF-01: الموصول بـdata-fn-src تطبعه الشاشة من data-xf على الصف.
                    وما وصل هنا معروض اصلا في العمودين الاولين مجموعا (الكود والشكل
@@ -127,6 +128,11 @@ include '../insidebar.php';
               <th class="ems-fn-th" data-fn="1" data-fn-src="founded_date">تاريخ التأسيس</th>
               <th class="ems-fn-th" data-fn="1" data-fn-src="is_group">كيان مجموعة؟</th>
               <th class="ems-fn-th" data-fn="1" data-fn-src="ownership_completeness">اكتمال الملكية</th>
+              <!-- حقولُ ورقةِ GOV-02 الباقيةُ: موصولةٌ بمصدرِها لا مُعلَنةٌ بلا خليّة -->
+              <th class="ems-fn-th" data-fn="1" data-fn-src="legal_rep">الممثل القانوني</th>
+              <th class="ems-fn-th" data-fn="1" data-fn-src="registered_capital">رأس المال المسجل</th>
+              <th class="ems-fn-th" data-fn="1" data-fn-src="rel_count">العلاقات بين الكيانات</th>
+              <th class="ems-fn-th" data-fn="1" data-fn-src="reviewer">المراجع</th>
               <th class="ems-fn-th" data-fn="1">سجله</th>
               <th class="ems-fn-th" data-fn="1">تاريخ التسجيل</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
@@ -153,6 +159,12 @@ include '../insidebar.php';
             'founded_date'           => (string) ($e['founded_date'] ?? ''),
             'is_group'               => (intval($e['is_tenant']) === 1 ? 'نعم' : 'لا'),
             'ownership_completeness' => (string) ($e['ownership_completeness'] ?? ''),
+            'legal_rep'              => (string) ($e['legal_rep'] ?? ''),
+            'registered_capital'     => (string) ($e['registered_capital'] ?? ''),
+            'rel_count'              => ems_w14_entity_relations($e['entity_id']),
+            /* اسمُ المراجعِ من بوّابةِ العزلِ لا بضمِّ جدولِ المستخدمين هنا —
+               سقّاطةُ GAP-29 ترصد نصَّ الاستعلامِ على جدولِ مستأجِرٍ في سطحٍ حيّ. */
+            'reviewer'               => ems_w14_person($e['reviewed_by'] ?? 0),
         ), JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8'); ?>">
             <td><strong><?php echo htmlspecialchars($e['legal_name']); ?></strong><br><small>#<?php echo intval($e['entity_id']) . ' · ' . htmlspecialchars((string) $e['legal_form']); ?></small></td>
             <td><small><?php echo htmlspecialchars($e['country'] . ' · ' . $e['registry_authority'] . ' · ' . $e['commercial_reg']); ?></small></td>

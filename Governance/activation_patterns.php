@@ -109,6 +109,12 @@ include '../insidebar.php';
               <th class="ems-fn-th" data-fn="1">تاريخ الترقية المتوقع</th>
               <th class="ems-fn-th" data-fn="1">شرط الترقية</th>
               <th class="ems-fn-th" data-fn="1">اعتمده</th>
+              <!-- حقولُ ورقةِ GOV-29: موصولةٌ بمصدرِها في data-xf،
+                   ولا رأسَ يُعلَن بلا خليّةٍ فيُحشى شرطةً ويُخفى -->
+              <th class="ems-fn-th" data-fn="1" data-fn-src="row_id">معرف السطر</th>
+              <th class="ems-fn-th" data-fn="1" data-fn-src="enabled_features">المزايا المفعلة</th>
+              <th class="ems-fn-th" data-fn="1" data-fn-src="upgrade_decision">قرار الترقية</th>
+              <th class="ems-fn-th" data-fn="1" data-fn-src="pattern_state">حالة النمط</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
@@ -119,7 +125,14 @@ include '../insidebar.php';
               <th class="ems-gov-th" data-gov="attachment" data-slice="3" title="مستند الإثبات الخارجي">المرفق</th>
               </tr></thead><tbody>
         <?php foreach ($flags as $f): $el = $ELEMENTS[$f['element_code']] ?? array($f['element_code'], ''); ?>
-        <tr>
+        <tr data-xf="<?php echo htmlspecialchars(json_encode(array(
+            'row_id'            => 'ACT-' . str_pad((string) $f['flag_id'], 5, '0', STR_PAD_LEFT),
+            /* المزايا المفعّلة: اسمُ العنصرِ حين يكون العلمُ مرفوعًا — والمطفأُ
+               ليس ميزةً مفعَّلة، فلا يُعَدُّ منها. */
+            'enabled_features'  => (intval($f['enabled']) === 1 ? (string) $el[0] : ''),
+            'upgrade_decision'  => (string) ($f['reason'] ?? ''),
+            'pattern_state'     => (intval($f['enabled']) === 1 ? 'نافذ' : 'موقوف'),
+        ), JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8'); ?>">
             <td><strong><?php echo htmlspecialchars($el[0]); ?></strong><br><small><?php echo htmlspecialchars($f['element_code']); ?></small></td>
             <td><?php echo ($f['scope_type'] === 'contract' ? 'العقد #' . intval($f['scope_id']) : htmlspecialchars((string) ($f['legal_name'] ?: ('الكيان #' . $f['scope_id'])))); ?></td>
             <td><span class="badge badge-<?php echo intval($f['enabled']) === 1 ? 'success' : 'secondary'; ?>"><?php echo intval($f['enabled']) === 1 ? 'مفعل' : 'مطفأ'; ?></span></td>

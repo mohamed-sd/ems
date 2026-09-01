@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-01 20:48:32
+-- المصدر: equipation_manage · التوليد: 2026-09-01 21:06:20
 -- الجداول: 1053 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
@@ -3098,6 +3098,10 @@ CREATE TABLE `dr_drills` (
   `approved_at` datetime DEFAULT NULL,
   `seed_tag` varchar(32) DEFAULT NULL,
   `migration_set_hash` char(40) DEFAULT NULL COMMENT 'SHA-1 لمجموعةِ الهجراتِ المطبَّقةِ وقتَ التمرين — تقادُمٌ بلا ساعةِ حائط',
+  `drill_cycle` varchar(40) DEFAULT NULL COMMENT 'دورة التمرين',
+  `rto_target_seconds` int(10) unsigned DEFAULT NULL COMMENT 'RTO المستهدف',
+  `data_integrity` varchar(24) DEFAULT NULL COMMENT 'سلامة البيانات المستعادة',
+  `reviewed_by` int(11) DEFAULT NULL COMMENT 'المراجع',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_drill_no` (`company_id`,`drill_no`),
   KEY `ix_drill_time` (`company_id`,`started_at`),
@@ -3810,6 +3814,11 @@ CREATE TABLE `entity_licenses` (
   `file_ref` varchar(160) DEFAULT NULL,
   `state` enum('active','expired','renewed','revoked') NOT NULL DEFAULT 'active',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `contract_ref` varchar(120) DEFAULT NULL COMMENT 'العقد المربوط',
+  `is_critical` tinyint(1) DEFAULT NULL COMMENT 'مستند حرج',
+  `guard_rule_ref` varchar(120) DEFAULT NULL COMMENT 'قاعدة المنع المفعلة',
+  `renewal_owner` int(11) DEFAULT NULL COMMENT 'مسؤول التجديد',
+  `reviewed_by` int(11) DEFAULT NULL COMMENT 'المراجع',
   PRIMARY KEY (`lic_id`),
   KEY `ix_el_expiry` (`expiry_date`,`state`),
   KEY `fk_el_entity` (`entity_id`),
@@ -10126,6 +10135,7 @@ CREATE TABLE `governance_flags` (
   `reason` varchar(255) DEFAULT NULL,
   `set_by` int(11) DEFAULT NULL,
   `set_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `activation_pattern` varchar(24) DEFAULT NULL COMMENT 'نمط التفعيل',
   PRIMARY KEY (`flag_id`),
   UNIQUE KEY `uq_gf_element_scope` (`element_code`,`scope_type`,`scope_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='LEG-01 §7: أعلام التفعيل لكل عنصر على الكيان والعقد — الافتراض النمط ① (كله مطفأ)';
@@ -10294,6 +10304,9 @@ CREATE TABLE `guard_denials` (
   `at` datetime NOT NULL DEFAULT current_timestamp(),
   `verb` varchar(32) NOT NULL DEFAULT '' COMMENT 'الفعلُ الذي رُفض — view/add/edit/delete أو رمزُ الفعل',
   `verb_state` varchar(16) NOT NULL DEFAULT 'REQUIRED' COMMENT 'REQUIRED · PRE_VERB (موروثٌ قبلَ العمود)',
+  `actor_role_id` smallint(5) unsigned DEFAULT NULL COMMENT 'صفة الفاعل وقتها',
+  `owner_dept` varchar(12) DEFAULT NULL COMMENT 'الادارة المالكة',
+  `request_source` varchar(24) DEFAULT NULL COMMENT 'مصدر الطلب',
   PRIMARY KEY (`deny_id`),
   KEY `ix_gd_guard` (`guard_code`,`at`),
   CONSTRAINT `chk_denial_ref_present` CHECK (`attempted_ref` is not null and `attempted_ref` <> ''),
@@ -11198,6 +11211,9 @@ CREATE TABLE `legal_entities` (
   `founded_date` date DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `legal_rep` varchar(190) DEFAULT NULL COMMENT 'الممثل القانوني',
+  `registered_capital` decimal(18,2) DEFAULT NULL COMMENT 'راس المال المسجل',
+  `reviewed_by` int(11) DEFAULT NULL COMMENT 'المراجع',
   PRIMARY KEY (`entity_id`),
   UNIQUE KEY `uq_le_registry` (`country`,`registry_authority`,`commercial_reg`) COMMENT 'الفرادة بالثلاثة معًا — الرقم قد يتكرر في دولتين',
   KEY `ix_le_tenant` (`is_tenant`,`state`)
@@ -21083,6 +21099,8 @@ CREATE TABLE `signing_authorities` (
   `state` enum('active','revoked') NOT NULL DEFAULT 'active',
   `created_by` int(11) DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `sub_delegable` tinyint(1) DEFAULT NULL COMMENT 'قابل للتفويض الفرعي',
+  `reviewed_by` int(11) DEFAULT NULL COMMENT 'المراجع',
   PRIMARY KEY (`auth_id`),
   KEY `ix_sa_person` (`person_id`,`entity_id`,`state`),
   KEY `ix_sa_expiry` (`valid_to`),

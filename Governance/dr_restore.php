@@ -81,10 +81,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // ═══ ⑦ العرض ═══
 $where = $is_super_admin ? '1=1' : ('company_id = ' . (int) $company_id);
+/* ◆ **الأعمدةُ حقولُ ورقةِ `GOV-32` بترتيبِها المستنديّ** (الأمرُ §11) —
+     والعُدّةُ المشتركةُ تطبع الخلايا **بموضعِها** لا بمفتاحِها، فترتيبُ
+     `SELECT` هو ترتيبُ `$COLS` حرفًا. ⛔ وعمودٌ يُزاد هنا بلا رأسِه هناك
+     يُزيح الجدولَ كلَّه — فهما يُحرَّران معًا.
+   ◆ **والمشتقُّ يُحسب في القراءةِ لا يُخزَّن**: فجوةُ الزمنِ فرقُ المتحقَّقِ عن
+     المستهدَف، ومصدرُ النسخةِ طرفا سجلِّ الثنائيات. */
 $rows = $conn->query(
-    "SELECT drill_no, drill_kind, started_at, finished_at, target_point,
-            rpo_target_minutes, rpo_actual_minutes, rto_actual_seconds,
-            rows_before, rows_after_expected_gone, rows_after_actual, verdict, runbook_ref
+    "SELECT drill_no, drill_cycle, drill_kind,
+            CONCAT_WS(' .. ', binlog_first_file, binlog_last_file) AS backup_src,
+            started_at, finished_at,
+            rto_actual_seconds, rto_target_seconds,
+            rpo_actual_minutes, rpo_target_minutes,
+            (rto_actual_seconds - rto_target_seconds) AS time_gap,
+            data_integrity, runbook_ref, operator_note, verdict,
+            reviewed_by, approved_at
        FROM dr_drills WHERE {$where} ORDER BY id DESC LIMIT 100"
 );
 $logBin = $conn->query("SHOW VARIABLES LIKE 'log_bin'")->fetch_assoc();
@@ -96,7 +107,12 @@ $TILES = array(
     array('مدة الاحتفاظ (يوما)', round((float) $ret, 1)),
     array('أيام منذ آخر تجربة ناجحة', $days === null ? 'لم تجرب' : $days),
 );
-$COLS = array('رقم المحضر','النوع','البدء','الانتهاء','نقطة الاستعادة','هدف RPO (د)','RPO المقيس (د)','RTO (ث)','صفوف قبل','يجب ألا تعود','عادت فعلا','الحكم','المحضر');
+/* أسماءُ ورقةِ الدليلِ حرفًا — بلا اصطلاحِ التصنيفِ ولا تشكيل (سقّاطةُ UI-01/02) */
+$COLS = array('رقم التمرين', 'دورة التمرين', 'نطاق الاستعادة', 'مصدر النسخة',
+              'بدء التنفيذ', 'انتهاء التنفيذ', 'RTO المتحقق', 'RTO المستهدف',
+              'RPO المتحقق', 'RPO المستهدف', 'فجوة الزمن', 'سلامة البيانات المستعادة',
+              'محضر التمرين', 'ملاحظات وإجراءات', 'حالة التمرين',
+              'المراجع', 'تاريخ الاعتماد');
 $EMPTY_TITLE = 'لا محاضر استعادة مسجلة بعد';
 $EMPTY_HINT  = 'يسجل المحضر من هذه الشاشة بعد تنفيذ تجربة الاستعادة وفق دليل التشغيل';
 include __DIR__ . '/../includes/eng01_screen_view.php';
