@@ -311,6 +311,30 @@ foreach ($plans as $pl) {
         $nCls++;
     }
 
+    /* ─ ب٠ · قاموسُ الأفعال — **زرٌّ يُعرض ولا يعمل ممنوع** ───────────────────
+         عُدّةُ `u13` تردّ أيَّ فعلٍ رمزُه غيرُ مسجَّلٍ في `nav09_action_map`
+         (`u13_action_registered` fail-closed). فشاشةٌ تُعلن فعلَ تسجيلٍ ولا
+         رمزَ لها في القاموسِ **تعرض زرًّا يفشل عند الضغط** — وهو بعينُه ما
+         يمنعه بناءُ `u13` بنصِّه. ⇒ الرمزُ يُسجَّل مع الشاشةِ لا بعدَها.
+         ⛔ **ودرسٌ مقيس**: بُنيت ستّةٌ وسبعون فعلًا قبلَ هذا السطرِ فلم يُسجَّل
+            منها واحد، وكشفها شاهدُ `GAP-32` لا الشاشة. */
+    if (!empty($pl['create'])) {
+        $ac = !empty($pl['action_code']) ? $pl['action_code'] : ('gov.' . $pl['code'] . '.register');
+        $rel0 = $S['dir'] . '/' . $pl['file'];
+        $ok = $conn->query("INSERT INTO nav09_action_map
+            (canonical_code, label_ar, screen_title, canonical_file, actor_ar, writes_text,
+             event_name, effect_text, reverse_text, live_code, state, write_class)
+            VALUES ('{$e($ac)}', '{$e('تسجيلُ ' . $pl['title'])}', '{$e($pl['title'])}',
+                    '{$e($pl['file'])}', '{$e($S['dept_ar'])}', '{$e($pl['table'])}',
+                    '{$e(str_replace('.', '_', $ac))}',
+                    '{$e('سطرٌ جديدٌ في ' . $pl['table'] . ' — ' . $pl['grain'])}',
+                    'تحوّلُ حالةٍ بسببِه لا حذف',
+                    '{$e('page:' . $rel0)}', 'bound_page', 'domain_write')
+            ON DUPLICATE KEY UPDATE label_ar = VALUES(label_ar), live_code = VALUES(live_code),
+                                    state = VALUES(state)");
+        if (!$ok) { exit("⛔ قاموسُ الأفعال {$ac}: {$conn->error}\n"); }
+    }
+
     /* ─ ب · ملفُّ الشاشةِ — تصريحٌ فوقَ العُدّةِ المشتركة ─────────────────── */
     $rel  = $S['dir'] . '/' . $pl['file'];
     $path = $ROOT . '/' . $rel;

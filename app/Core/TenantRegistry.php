@@ -589,6 +589,85 @@ class TenantRegistry
         'proc_wh_custodian' => array('type' => self::T_TENANT, 'soft' => false),
         // GOV_EXEC (هجرة 2028_02_11): التسهيلات البنكية — سطر تسهيل × بنك بعزل كيانه.
         'tre_bank_facility' => array('type' => self::T_TENANT, 'soft' => false),
+        // GOV_EXEC §5 — جداولُ مواضعِ الدليلِ لـDEP-01 (بناءُ 2026-09-01):
+        // كلُّها بياناتُ مستأجرٍ تحمل company_id ولا أعمدةَ حذفٍ ناعمٍ لها،
+        // وعقدُ التصنيفِ في docs/TENANT_GATE_CONTRACT_ar.md §3.
+        'sal_monthly_container' => array('type' => self::T_TENANT, 'soft' => false),
+        // GOV_EXEC §5 — جداولُ مواضعِ الدليلِ لـDEP-02 (بناءُ 2026-09-01):
+        // كلُّها بياناتُ مستأجرٍ تحمل company_id ولا أعمدةَ حذفٍ ناعمٍ لها،
+        // وعقدُ التصنيفِ في docs/TENANT_GATE_CONTRACT_ar.md §3.
+        'sup_allocation_payment_closure' => array('type' => self::T_TENANT, 'soft' => false),
+        'sup_allocation_unit_equipment' => array('type' => self::T_TENANT, 'soft' => false),
+        'sup_closure' => array('type' => self::T_TENANT, 'soft' => false),
+        'sup_doc_guarantee' => array('type' => self::T_TENANT, 'soft' => false),
+        'sup_handover_slot' => array('type' => self::T_TENANT, 'soft' => false),
+        'sup_offer_supplier_negotiation' => array('type' => self::T_TENANT, 'soft' => false),
+        'sup_onbehalf_advance_deduction' => array('type' => self::T_TENANT, 'soft' => false),
+        'sup_quota_supplier_unit' => array('type' => self::T_TENANT, 'soft' => false),
+        'sup_replacement_reserve' => array('type' => self::T_TENANT, 'soft' => false),
+        'sup_responsibility' => array('type' => self::T_TENANT, 'soft' => false),
+        // GOV_EXEC §5 — جداولُ مواضعِ الدليلِ لـDEP-04 (بناءُ 2026-09-01):
+        // كلُّها بياناتُ مستأجرٍ تحمل company_id ولا أعمدةَ حذفٍ ناعمٍ لها،
+        // وعقدُ التصنيفِ في docs/TENANT_GATE_CONTRACT_ar.md §3.
+        'flt_code_reconciliation' => array('type' => self::T_TENANT, 'soft' => false),
+        'flt_daily_operating_log' => array('type' => self::T_TENANT, 'soft' => false),
+        'flt_dashboard_kpi' => array('type' => self::T_TENANT, 'soft' => false),
+        'flt_exception_register' => array('type' => self::T_TENANT, 'soft' => false),
+        'flt_external_auditor_note' => array('type' => self::T_TENANT, 'soft' => false),
+        'flt_financed_asset_recon' => array('type' => self::T_TENANT, 'soft' => false),
+        'flt_inspection_card' => array('type' => self::T_TENANT, 'soft' => false),
+        'flt_management_decision' => array('type' => self::T_TENANT, 'soft' => false),
+        'flt_numbering_bridge' => array('type' => self::T_TENANT, 'soft' => false),
+        'flt_open_point' => array('type' => self::T_TENANT, 'soft' => false),
+        'flt_owner_reconciliation' => array('type' => self::T_TENANT, 'soft' => false),
+        'flt_power_source' => array('type' => self::T_TENANT, 'soft' => false),
+        'flt_register_operation_recon' => array('type' => self::T_TENANT, 'soft' => false),
+        'flt_source_conflict' => array('type' => self::T_TENANT, 'soft' => false),
+        'flt_technical_state' => array('type' => self::T_TENANT, 'soft' => false),
+        'flt_use_right_range' => array('type' => self::T_TENANT, 'soft' => false),
+        // GOV_EXEC §5 — جداولُ مواضعِ الدليلِ لـDEP-11 (بناءُ 2026-09-01):
+        // كلُّها بياناتُ مستأجرٍ تحمل company_id ولا أعمدةَ حذفٍ ناعمٍ لها،
+        // وعقدُ التصنيفِ في docs/TENANT_GATE_CONTRACT_ar.md §3.
+        'ops_deviation_report' => array('type' => self::T_TENANT, 'soft' => false),
+        'ops_resource_move_order' => array('type' => self::T_TENANT, 'soft' => false),
+        'ops_room_kpi' => array('type' => self::T_TENANT, 'soft' => false),
+        'ops_seasonal_factor' => array('type' => self::T_TENANT, 'soft' => false),
+        // GOV_EXEC §5 — جداولُ مواضعِ الدليلِ لـDEP-12 (بناءُ 2026-09-01):
+        // كلُّها بياناتُ مستأجرٍ تحمل company_id ولا أعمدةَ حذفٍ ناعمٍ لها،
+        // وعقدُ التصنيفِ في docs/TENANT_GATE_CONTRACT_ar.md §3.
+        'site_closure_item' => array('type' => self::T_TENANT, 'soft' => false),
+        'site_dashboard_kpi' => array('type' => self::T_TENANT, 'soft' => false),
+        'site_day_approval' => array('type' => self::T_TENANT, 'soft' => false),
+        'site_day_close_report' => array('type' => self::T_TENANT, 'soft' => false),
+        'site_day_unit' => array('type' => self::T_TENANT, 'soft' => false),
+        'site_readiness_item' => array('type' => self::T_TENANT, 'soft' => false),
+        'site_reference_registry' => array('type' => self::T_TENANT, 'soft' => false),
+        'site_request_batch' => array('type' => self::T_TENANT, 'soft' => false),
+        'site_request_item' => array('type' => self::T_TENANT, 'soft' => false),
+        'site_shift_handover' => array('type' => self::T_TENANT, 'soft' => false),
+        'site_state_change_request' => array('type' => self::T_TENANT, 'soft' => false),
+        'site_supply_request' => array('type' => self::T_TENANT, 'soft' => false),
+        'site_suspension' => array('type' => self::T_TENANT, 'soft' => false),
+        // GOV_EXEC §5 — جداولُ مواضعِ الدليلِ لـDEP-13 (بناءُ 2026-09-01):
+        // كلُّها بياناتُ مستأجرٍ تحمل company_id ولا أعمدةَ حذفٍ ناعمٍ لها،
+        // وعقدُ التصنيفِ في docs/TENANT_GATE_CONTRACT_ar.md §3.
+        'wf_category' => array('type' => self::T_TENANT, 'soft' => false),
+        'wf_dashboard_kpi' => array('type' => self::T_TENANT, 'soft' => false),
+        'wf_equipment_shift_assignment' => array('type' => self::T_TENANT, 'soft' => false),
+        'wf_field_incident' => array('type' => self::T_TENANT, 'soft' => false),
+        'wf_nomination' => array('type' => self::T_TENANT, 'soft' => false),
+        'wf_project_allocation' => array('type' => self::T_TENANT, 'soft' => false),
+        'wf_qualification_matrix' => array('type' => self::T_TENANT, 'soft' => false),
+        // GOV_EXEC §5 — جداولُ مواضعِ الدليلِ لـDEP-14 (بناءُ 2026-09-01):
+        // كلُّها بياناتُ مستأجرٍ تحمل company_id ولا أعمدةَ حذفٍ ناعمٍ لها،
+        // وعقدُ التصنيفِ في docs/TENANT_GATE_CONTRACT_ar.md §3.
+        'mnt_diagnosis_request' => array('type' => self::T_TENANT, 'soft' => false),
+        'mnt_downtime_segment' => array('type' => self::T_TENANT, 'soft' => false),
+        // GOV_EXEC §5 — جداولُ مواضعِ الدليلِ لـEX-CEO (بناءُ 2026-09-01):
+        // كلُّها بياناتُ مستأجرٍ تحمل company_id ولا أعمدةَ حذفٍ ناعمٍ لها،
+        // وعقدُ التصنيفِ في docs/TENANT_GATE_CONTRACT_ar.md §3.
+        'exec_doc_review_note' => array('type' => self::T_TENANT, 'soft' => false),
+        'exec_meeting' => array('type' => self::T_TENANT, 'soft' => false),
         // REPAIR01 · W11 (هجرة 2027_11_29): دفاترُ الكيانات — الماليةُ والخزينة.
         // كلُّها بياناتُ مستأجرٍ تحمل company_id غير قابلٍ للعدم (DEC-OPEN-03):
         // لا إقفالَ ولا قيدَ ولا فاتورةَ ولا حسابَ بنكيَّ بلا كيانٍ قانونيّ.
