@@ -620,8 +620,15 @@ echo ems_states_bundle('لا أرقام تشغيلية محسوبة لهذا ا�
        وهي ذهبيُّ العلامةِ نفسِه أعمقَ درجةً، رمزٌ قائمٌ لا لونٌ مؤلَّف.
      ◆ وحتى لولا ذلك، فأيقوناتُ اللوحةِ كلُّها **مقترنةٌ بنصٍّ مجاور** فهي
        زخرفيّةٌ بحكمِ المعيار — لكنَّ «مطابقٌ» شيءٌ و«مقروءٌ» شيءٌ آخر. */
-  --d2-accent:          var(--brand-amber);        /* 1.99 — ملءٌ ومساحةٌ فقط */
-  --d2-accent-on-light: var(--c-brand-gold-ink);   /* 3.31 — أيقونةٌ على فاتح */
+  /* ◆ **قرارُ المالك (2026-09-01)**: الكهرمانيُّ نفسُه للأيقونةِ لا درجةً
+       أعمقَ منه. كنتُ فصلتُ درجةً للأيقوناتِ تبلغ حدَّ 3:1، فخرجت **بنّيّةً**
+       لا كهرمانية. والمالكُ يختار الهويةَ على الحدِّ الرقميّ — وهو اختيارٌ
+       **مطابقٌ للمعيارِ لا مخالفٌ له**: كلُّ أيقونةٍ في اللوحةِ مقترنةٌ بنصٍّ
+       مجاورٍ يحمل معناها، فهي زخرفيّةٌ بحكمِ WCAG ولا يسري عليها حدُّ المكوّن.
+     ◆ **والمعلومةُ لا تُحمَل بلونٍ قطُّ في هذه الشاشة**: الحالةُ نصٌّ وحافةٌ،
+       والمقصدُ نصٌّ وأيقونة. فلو غاب اللونُ كلُّه لم تسقط معلومة. */
+  --d2-accent:          var(--brand-amber);   /* اللكنةُ — ملءٌ وأيقونةٌ معًا */
+  --d2-accent-on-light: var(--brand-amber);
   --d2-accent-strong: var(--c-brand-gold-deep);
   --d2-accent-soft:   var(--c-brand-gold-soft);
   --d2-accent-ink:    var(--c-brand-gold-ink-deep);
@@ -639,6 +646,7 @@ echo ems_states_bundle('لا أرقام تشغيلية محسوبة لهذا ا�
         `(\d+)px` داخلَ قيمةِ الإعلانِ كلِّها — فاسمٌ مثل `--d2-sp-6px`
         يُعَدُّ مسافةً صلبةً وهو رمز. فالتسميةُ بالوصفِ لا بالقيمة. */
   --d2-sp-hair: 1px; --d2-sp-nudge: 2px; --d2-sp-micro: 5px; --d2-sp-tight: 6px; --d2-sp-snug: 7px;
+  --d2-sp-roomy: 9px;
   --d2-shadow:        0 1px 2px var(--c-rgba16244004), 0 1px 3px var(--c-rgba16244006);
 }
 
@@ -747,17 +755,36 @@ html body.ems-site .ems-dash .shot-breadcrumb{
   z-index: auto;
 }
 
-/* ② تابع — سطرُ السياقِ (النطاق · الصلاحية · لحظة القراءة) يلتحق بلغةِ الرأس */
+/* ② تابع — سطرُ السياقِ (النطاق · الصلاحية · لحظة القراءة · المستخدم)
+   ◆ **كان شريطًا فارغًا بارتفاع 40px لسطرِ نصٍّ ارتفاعُه 17**: الحاويةُ `flex`
+     بلا `align-items`، والافتراضُ `stretch` — فيمتدُّ كلُّ ابنٍ إلى أطولِ إخوته
+     ويطفو نصُّه في وسطِ فراغٍ. `center` تُنهيه: كلُّ ابنٍ بطولِ نصِّه.
+   ◆ وهذه **بياناتُ سياقٍ لا محتوى** — فسطرٌ واحدٌ نحيفٌ ملاصقٌ للرأس. */
 html body.ems-site .ems-dash .ems-page-context{
   display: flex;
+  align-items: center;
   flex-wrap: wrap;
-  gap: var(--d2-sp-1) var(--d2-sp-4);
+  gap: 0 var(--d2-sp-3);
+  min-height: 0;
   font-size: .74rem;
+  line-height: 1.6;
   color: var(--d2-ink-faint);
   background: transparent;
   border: 0;
   padding: 0 var(--d2-sp-1);
   margin: 0 0 var(--d2-sp-2);
+}
+html body.ems-site .ems-dash .ems-page-context > *{ line-height: 1.6; }
+/* ◆ «صلاحيتك: قراءة» ليست تسميةً بل **حالةً**: المستخدمُ لا يستطيع الكتابة.
+     فكانت تُقرأ رماديّةً مثلَ اسمِ الشركةِ ولا تُلحَظ. تصير شريحةً منفصلةً
+     ليعرف الناظرُ **قبلَ أن يحاول** أنه في وضعِ قراءة. */
+html body.ems-site .ems-dash .ems-page-context .d2-perm{
+  background: var(--d2-surface-quiet);
+  border: 1px solid var(--d2-line);
+  border-radius: 999px;
+  padding: 0 8px;
+  font-weight: 700;
+  color: var(--d2-ink-soft);
 }
 html body.ems-site .ems-dash .ems-page-context b{
   font-weight: 700;
@@ -1020,9 +1047,21 @@ html body.ems-site .ems-dash .shot-ops-kpis .ems-kpi-card.ems-kpi-ok span.ems-kp
    بنيةُ البطاقة (includes/kpi_card.php):
      meta①  span(الفترة «لحظي (…)»)  +  span(المقارنة «بلا مقارنة معلنة»)
      meta②  span.ems-kpi-state       +  span(النطاق) */
-/* ◆ تيبوغرافيا القيمةِ والعنوانِ **تُترك للنظامِ الموحَّد** (`ems-statcards.css`
-     يفرضها بوزنِ (0,6,1) و`!important`). ولا تُنازَع هنا عمدًا: هي حكمُ توحيدٍ
-     صحيحٌ لا عطبٌ — والجولةُ تُصلح الضجيجَ لا تنقض التوحيد. */
+/* ═══ الهرمُ داخلَ البطاقة — الرقمُ أوّلًا ═══════════════════════════════════
+   ◆ **قرارُ المالك**: الرقمُ أسودُ داكنٌ والعنوانُ رماديّ، فيقع التركيزُ على
+     الرقم. وكانا يتقاسمانِ الحبرَ نفسَه فيتنازعانِ العين.
+   ◆ **والمقاسُ يبقى للنظامِ الموحَّد** (35px/900 للقيمة · 14.72/700 للعنوان) —
+     يُنازَع اللونُ وحدَه لا الحجم: الحجمُ حكمُ توحيدٍ صحيحٌ لا عطب.
+   ◆ الوزنُ (0,6,2) ليعلوَ (0,6,1) في `ems-statcards.css`. */
+html body.ems-site .ems-dash .shot-ops-kpis .ems-kpi-card .ems-kpi-value.ems-statcard__value,
+html body.ems-site .ems-dash .shot-stat-grid .shot-stat-card .shot-stat-value.ems-statcard__value{
+  color: var(--d2-ink) !important;          /* 16.54:1 — أدكنُ ما في الصفحة */
+}
+html body.ems-site .ems-dash .shot-ops-kpis .ems-kpi-card .ems-kpi-title.ems-statcard__title,
+html body.ems-site .ems-dash .shot-stat-grid .shot-stat-card .shot-stat-label.ems-statcard__title{
+  color: var(--d2-ink-soft) !important;     /*  5.93:1 — رماديٌّ يمرُّ الحدَّ ولا يزاحم */
+  font-weight: 600 !important;              /* والوزنُ يخفّ أيضًا فلا يُنازع الرقمَ عرضًا */
+}
 /* ◆ **البنيةُ وقتَ الطلاءِ ليست بنيةَ الخادم**: `ems-statcards.js` يعيد بناءَ
      البطاقةِ فينتزع أبناءَ `.ems-kpi-meta` ويجعلهم أبناءً مباشرين موسومين
      `.ems-statcard__meta`، ويقدّم القيمةَ على العنوان. فالترتيبُ المقيسُ في
@@ -1172,10 +1211,15 @@ html body.ems-site .ems-dash .ems-page-context .shot-session-chip strong{
 /* ◆ الشريحةُ **غادرت `.shot-session`** فسقط عنها محدِّدُ الأيقونةِ المربوطُ
      بها، وعادت قاعدةُ الشاراتِ العامةُ (`[class*="chip"]`) تُدوِّرها 46px.
      فيُنطَّق مقصدُها الجديدُ أيضًا — والدرسُ: **نقلُ عقدةٍ ينقلها من مداها.** */
+/* ◆ **وهنا كان الأربعون بكسلًا**: `ems-screens.css:683` يعطي `.chip-icon`
+     مقاسًا صريحًا `60×40` — أطارًا لأيقونةٍ في تصميمِ الشرائحِ القديم. نزعتُ
+     عرضَه ونسيتُ **ارتفاعَه**، فبقيت الأيقونةُ 40 ومدَّت الصفَّ كلَّه:
+     سطرُ نصٍّ ارتفاعُه 19 في شريطٍ ارتفاعُه 40. */
 html body.ems-site .ems-dash .ems-page-context .shot-session-chip .chip-icon{
   background: transparent !important;
   border: 0 !important;
   width: auto !important;
+  height: auto !important;
   min-width: 0 !important;
   min-height: 0 !important;
   padding: 0 !important;
@@ -1316,6 +1360,184 @@ html body.ems-site .ems-dash .shot-stat-grid .shot-stat-card div.db-1.ems-statca
 }
 /* التيبوغرافيا تُترك للنظامِ الموحَّد (35px/900 للقيمة · 14.72/700 للعنوان) —
    وهو ما وحّد اللوحَين أصلًا، فلا يُنازَع. */
+
+/* ═══ ⑬ الهرمُ **بين** الطبقات — ثلاثةُ أحجامٍ لا حجمٌ واحد ═════════════════
+   ◆ المقيسُ قبلَ الإصلاح: **ثلاثةَ عشرَ رقمًا على الشاشةِ الواحدةِ كلُّها
+     35px بوزن 900** — مؤشراتُ اليومِ الحرجةُ والأعدادُ العامةُ وإحصائياتُ
+     الأداءِ بصوتٍ واحد. **فلا شيءَ أبرزُ من شيءٍ ولا يعرف الناظرُ من أين
+     يبدأ.** أصلحتُ الهرمَ داخلَ البطاقةِ ونسيتُه بينَ البطاقات.
+   ◆ الطبقاتُ الثلاثُ الآن: مؤشراتُ اليوم **35** · الأعدادُ العامة **24** ·
+     الأداء **20**. والوزنُ يتدرّج معها. */
+html body.ems-site .ems-dash .shot-num-panel .shot-stat-grid .shot-stat-card .shot-stat-value.ems-statcard__value{
+  font-size: 1.5rem !important;      /* 24px — الطبقةُ الثانية */
+  font-weight: 800 !important;
+}
+html body.ems-site .ems-dash .shot-num-panel-secondary .shot-stat-grid .shot-stat-card .shot-stat-value.ems-statcard__value,
+html body.ems-site .ems-dash .shot-num-panel .d2-nums-perf .shot-stat-card .shot-stat-value.ems-statcard__value{
+  font-size: 1.25rem !important;     /* 20px — الطبقةُ الثالثة */
+  font-weight: 700 !important;
+}
+/* ◆ **الصفرُ خبرٌ هادئٌ لا نداء**: كان يُطلى أسودَ 35px مثلَ «119» تمامًا —
+     و«صفرُ تعطّلاتٍ» بشارةٌ لا إنذار. يخفت لونًا ويبقى مقروءًا (4.83:1).
+     والتمييزُ يحتاج قراءةَ النصِّ فيُوسَم في JS — لا محدِّدَ CSS للقيمة. */
+/* الوزنُ هنا (0,7,2) — لأن قاعدةَ «الرقمُ أسود» أعلاه (0,6,2) تغلب أيَّ أدنى */
+html body.ems-site .ems-dash .shot-stat-grid .shot-stat-card .shot-stat-value.d2-zero.ems-statcard__value,
+html body.ems-site .ems-dash .shot-ops-kpis .ems-kpi-card .ems-kpi-value.d2-zero.ems-statcard__value{
+  color: var(--d2-ink-faint) !important;
+  font-weight: 700 !important;
+}
+
+/* ═══ ⑰ صفُّ الصناديقِ الأربعةِ — يصير قائمةً واحدةً ═══════════════════════
+   ◆ **المقيسُ قبلَ الإصلاح**: أربعةُ صناديقَ بارتفاعاتِ 126 · 62 · 195 · 100
+     — سُلَّمٌ مكسورٌ لا صفّ. وسببُه أن كلَّ صندوقٍ يحمل **ترويسةً وحدًّا وحشوًا**
+     لمحتوًى قد يكون **سطرًا واحدًا** أو صفرًا. فالوعاءُ يكلّف أكثرَ من مضمونه.
+   ◆ **والأعمق**: ثلاثةٌ منها (مهامي · موافقاتي · التنبيهات) تجيب **سؤالًا
+     واحدًا**: «ما الذي ينتظرني؟» — وقد فُرِّقت في ثلاثةِ أوعيةٍ فصارت ثلاثَ
+     ترويساتٍ لخمسةِ أسطر. والرابعُ (إنشاء سريع) سؤالٌ آخر: «أين أذهب؟».
+   ◆ فتُدمَج الثلاثةُ في **قائمةٍ واحدةٍ بعدّادٍ في ترويستِها**، ويبقى «إنشاء
+     سريع» عمودًا مستقلًّا — فالفصلُ يصير بالمعنى لا بالتساوي.
+   ⚠ **وهذا يخالف نموذجَ لوحةِ الدورِ السباعيَّ** الذي يفصل ②③④ — يحتاج
+     إقرارَك، وهو أوسعُ بندٍ في القائمة. */
+html body.ems-site .ems-dash .shot-ops-grid.d2-inboxed{
+  grid-template-columns: minmax(0, 3fr) minmax(0, 1fr);
+}
+html body.ems-site .ems-dash .d2-inbox{
+  background: var(--d2-surface-quiet);
+  border: 1px solid var(--d2-line-soft);
+  border-radius: var(--d2-r);
+  padding: var(--d2-sp-3);
+}
+html body.ems-site .ems-dash .d2-inbox-head{
+  display: flex;
+  align-items: center;
+  gap: var(--d2-sp-snug);
+  font-size: .8rem;
+  font-weight: 700;
+  color: var(--d2-ink-soft);
+  margin: 0 0 var(--d2-sp-2);
+}
+html body.ems-site .ems-dash .d2-inbox-head i{ color: var(--d2-accent); }
+/* العدّادُ ملاصقٌ لعنوانِه — كان في الطرفِ الأقصى فيُقرأ رقمًا شاردًا لا عدّادَ قائمة */
+html body.ems-site .ems-dash .d2-inbox-count{
+  background: var(--d2-surface-card);
+  border: 1px solid var(--d2-line);
+  border-radius: 999px;
+  padding: var(--d2-sp-hair) var(--d2-sp-roomy);
+  font-size: .72rem;
+  font-weight: 700;
+  color: var(--d2-ink-soft);
+}
+/* الصفوفُ في عمودَين على الشاشاتِ الواسعة — خمسةُ أسطرٍ لا تملأ عرضَ ثلاثةِ أرباع */
+html body.ems-site .ems-dash .d2-inbox-list{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--d2-sp-nudge) var(--d2-sp-4);
+}
+/* وسمُ نوعِ السطرِ — يحفظ الفرقَ الذي كانت الترويساتُ الثلاثُ تحمله */
+html body.ems-site .ems-dash .d2-kind{
+  flex: none;
+  font-size: .64rem;
+  font-weight: 700;
+  border-radius: 4px;
+  padding: var(--d2-sp-hair) var(--d2-sp-micro);
+  background: var(--d2-surface-card);
+  border: 1px solid var(--d2-line);
+  color: var(--d2-ink-faint);
+}
+/* ◆ **سطرٌ واحدٌ كان مُظلَّلًا وإخوتُه بيض** — خلفيةُ نغمةٍ على الصفِّ نفسِه
+     زيادةً على رقاقةِ عدّادِه الملوَّنة. فإشارتانِ لمعنًى واحدٍ، والعينُ تقرأ
+     التظليلَ فرقًا في النوعِ لا في الشدّة. تُنزع الخلفيةُ عن الصفوفِ كلِّها
+     **وتبقى النغمةُ في الرقاقةِ** — إشارةٌ واحدةٌ لكلِّ معنى. */
+/* ◆ **وسببُ التظليلِ ليس النغمةَ أصلًا — بل تصادمُ كلمة**: `ems-tables.css`
+     يحمل محدِّدًا يصنّف أزرارَ العرضِ بالعنوان:
+        `a[title*="عرض"], a[title*="مشاهدة"], …`  ⇒ تدرُّجٌ ذهبيّ
+     وصفُّ التنبيهِ رابطٌ عنوانُه «عرض بلا رد فوق أسبوع» — و«عرض» هنا **اسمٌ**
+     (quotation) لا **فعلٌ** (view). فالقاعدةُ التقطت مُشترَكًا لفظيًّا وطلَت
+     التنبيهَ بثوبِ زرِّ عرض.
+   ◆ ولذلك لم يكفِ `background-color: transparent`: المطليُّ **تدرُّجٌ**
+     (`background-image`) واللونُ الشفّافُ لا يمحو صورةً. فتُطفأ الصورةُ نفسُها.
+   ⚠ **والعطبُ عامٌّ لا موضعيّ**: أيُّ رابطٍ في النظامِ عنوانُه يحوي «عرض» أو
+     «مشاهدة» يُطلى زرَّ عرضٍ ولو لم يكن. أعالجه هنا في مداي وأُبلغ عنه. */
+html body.ems-site .ems-dash .d2-inbox .shot-ops-row,
+html body.ems-site .ems-dash .d2-inbox .shot-ops-row.is-warn,
+html body.ems-site .ems-dash .d2-inbox .shot-ops-row.is-err{
+  background-color: transparent !important;
+  background-image: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+html body.ems-site .ems-dash .d2-inbox .shot-ops-row:hover{ background: var(--d2-accent-soft) !important; }
+html body.ems-site .ems-dash .d2-inbox-ok{
+  font-size: .78rem;
+  color: var(--d2-ink-faint);
+  padding: var(--d2-sp-tight) var(--d2-sp-2);
+  margin: 0;
+}
+/* الصناديقُ الثلاثةُ الأصليةُ تُطوى — ومحتواها انتقل لا نُسخ */
+html body.ems-site .ems-dash .shot-ops-box.d2-inboxed-src{ display: none; }
+
+/* ═══ ⑭ الصندوقُ ينكمش لمحتواه ═════════════════════════════════════════════
+   ◆ المقيس: «موافقاتي» فيها **صفرُ صفوفٍ** و«التنبيهات» فيها **أربعة** —
+     وكلاهما **195px**. صفُّ الشبكةِ يمطُّ الجميعَ إلى أطولِهم، فيأخذ الفارغُ
+     حقَّ الممتلئ. و`align-items: start` تكفي: كلُّ صندوقٍ بطولِ محتواه. */
+html body.ems-site .ems-dash .shot-ops-grid{ align-items: start; }
+/* والفارغُ يصير سطرًا لا صندوقًا: لا ترويسةَ بارزةً لصندوقٍ بلا مضمون */
+html body.ems-site .ems-dash .shot-ops-box:has(.shot-ops-empty){
+  background: transparent;
+  border-color: var(--d2-line-soft);
+  padding: var(--d2-sp-2) var(--d2-sp-3);
+}
+html body.ems-site .ems-dash .shot-ops-box:has(.shot-ops-empty) .shot-ops-box-title{
+  font-size: .74rem;
+  margin-bottom: var(--d2-sp-nudge);
+}
+html body.ems-site .ems-dash .shot-ops-empty{ margin: 0; }
+
+/* ═══ ⑮ لوحا الأرقامِ يصيرانِ لوحًا واحدًا ═══════════════════════════════════
+   ◆ كانا بنفسِ البطاقةِ والحجمِ والوزنِ فلا يُعرَف لمَ هما لوحان — **ودليلُ
+     الخللِ أني اضطررتُ لاختراعِ اسمِ «أرقام عامة»**: لو كان للوحِ معنًى واضحٌ
+     لكان له اسم. فيُدمجان تحتَ عنوانٍ واحدٍ وصفَّين يفرّقهما الحجمُ والفاصل. */
+html body.ems-site .ems-dash .shot-num-panel.d2-merged-nums{ margin-bottom: var(--d2-sp-4); }
+html body.ems-site .ems-dash .d2-nums-sub{
+  font-size: .76rem;
+  font-weight: 700;
+  color: var(--d2-ink-faint);
+  margin: var(--d2-sp-4) 0 var(--d2-sp-2);
+  padding-top: var(--d2-sp-3);
+  border-top: 1px solid var(--d2-line-soft);
+}
+html body.ems-site .ems-dash .shot-num-panel-secondary.d2-emptied{ display: none; }
+
+/* ═══ ⑯ إشاراتٌ تعلن الغياب — تُنزع ═══════════════════════════════════════
+   ◆ كلُّ بطاقةِ مؤشرٍ كانت تحمل «—» (لا مقارنة) و«محايد»: خمسُ بطاقاتٍ ×
+     إشارتان = **عشرُ علاماتٍ تقول لا شيء**. فتُطويانِ بصريًّا (والنصُّ باقٍ
+     لقارئِ الشاشة — صفرُ فقد).
+   ◆ **ولا تُطوى «سليم»**: بطاقتُها تحمل حافةً خضراء، فطيُّ نصِّها يترك اللونَ
+     وحدَه حاملًا للمعنى — وذلك ما تمنعه القاعدةُ. أما «محايد» فحافتُه بلونِ
+     الحدِّ نفسِه (بلا إشارةٍ لونية)، فطيُّه لا يفقد شيئًا. */
+html body.ems-site .ems-dash .shot-ops-kpis .ems-kpi-card
+  span.ems-statcard__meta:not(.ems-kpi-state) + span.ems-statcard__meta:not(.ems-kpi-state){
+  display: none !important;
+}
+html body.ems-site .ems-dash .shot-ops-kpis
+  .ems-kpi-card:not(.ems-kpi-err):not(.ems-kpi-warn):not(.ems-kpi-ok) span.ems-kpi-state{
+  display: none !important;
+}
+
+/* ═══ ⑪-أ ألوانُ الرسومِ تلتحق بالهوية ═══════════════════════════════════
+   ◆ الرسومُ كانت آخرَ موضعٍ يحمل **البرتقاليَّ** في الشاشة: عمودُ الساعاتِ
+     وخطُّ المسارِ ونغمةُ «or» تقرأ رمزَ العلامةِ البرتقاليّ. وبقيةُ اللوحةِ
+     كهرمانيةٌ — فكان الرسمُ يبدو من نظامٍ آخر.
+   ◆ وهذه الرموزُ معرَّفةٌ في كتلةِ `<style>` الأصليةِ للصفحةِ (فوقَ هذه
+     الكتلة)، فتُعاد تعريفًا هنا بترتيبِ المستندِ وحدَه — بلا لمسِ تلك الكتلة
+     ولا `!important`. وجافاسكربتُ الرسمِ تقرأ الرمزَ لا القيمة، فتتبع تلقائيًّا.
+   ◆ والشفافيّاتُ من رموزٍ كهرمانيةٍ قائمةٍ في اللوحة — لا قيمَ مؤلَّفة. */
+:root{
+  --dash-bar-work:       var(--brand-amber);
+  --dash-line-work:      var(--brand-amber);
+  --dash-line-work-fill: var(--c-rgba24217042012);
+  --dash-tone-or-bg:     var(--brand-amber);
+}
 
 /* ═══ ⑪ الرسوم — بطاقاتٌ بلغةِ الصفحةِ نفسِها ═══════════════════════════════ */
 html body.ems-site .ems-dash .shot-chart-head{
@@ -1487,15 +1709,172 @@ html body.ems-site .ems-topbar--dash button:focus-visible{
     var bc  = document.querySelector('.ems-dash .shot-breadcrumb');
     if (!ctx || !bc || bc.classList.contains('d2-merged')) { return; }
     bc.classList.add('d2-merged');
-    ctx.appendChild(bc);
+
+    /* ◆ **تصحيحُ دمجٍ سابقٍ من صنعي**: كنتُ ألحق سطرَ التاريخِ بسطرِ السياقِ
+         كبندٍ مستقلّ — فصار التاريخُ يظهر **مرّتين في السطرِ الواحد**:
+         «لحظة القراءة: 2026-09-01 20:23» و«الثلاثاء · 2026-09-01».
+         أزلتُ تكرارًا بين سطرَين فأنشأتُ تكرارًا داخلَ سطر.
+       ◆ الصوابُ **دمجُ المعنى لا رصفُ العنصر**: اسمُ اليومِ وحدَه هو الزائدُ
+         الذي يحمله السطرُ الثاني، فيُحقن في بندِ اللحظةِ ويُطوى السطرُ كلُّه. */
+    var day = (bc.textContent || '').split('·')[0].trim();
+    var moment = Array.prototype.filter.call(ctx.children, function (e) {
+      return /لحظة القراءة/.test(e.textContent || '');
+    })[0];
+    if (day && moment) {
+      var b = moment.querySelector('b') || moment.querySelector('strong');
+      if (b) { b.textContent = day + ' · ' + b.textContent.trim(); }
+      bc.classList.add('d2-dup');            /* يُطوى ولا يُحذف — صفرُ فقد */
+      ctx.appendChild(bc);
+      return;
+    }
+    ctx.appendChild(bc);                     /* بنيةٌ غيرُ متوقَّعة — يُلحق كما كان */
+  }
+
+  /* ◆ وسمُ «صلاحيتك» ليُقرأ حالةً لا تسمية — لا محدِّدَ CSS يقرأ نصًّا. */
+  function tagPermission() {
+    var ctx = document.querySelector('.ems-dash .ems-page-context');
+    if (!ctx) { return; }
+    Array.prototype.forEach.call(ctx.children, function (e) {
+      if (/صلاحيتك/.test(e.textContent || '')) { e.classList.add('d2-perm'); }
+    });
+  }
+
+  /* ⑬ وسمُ الأصفارِ — لا محدِّدَ CSS يقرأ قيمةَ نصٍّ، فتُقرأ هنا.
+       ويُعاد الوسمُ بعد انتهاءِ العدِّ التصاعديِّ لأن القيمةَ تبدأ «00». */
+  /* ◆ **يُقرأ المصدرُ لا النصُّ المتحرِّك**: القيمةُ تُعرض بعدٍّ تصاعديٍّ يبدأ
+       من «00» — فقراءةُ `textContent` أثناءَه تسِمُ «1» صفرًا. والقيمةُ
+       الحقيقيةُ في `data-count` ولا تتغيّر. وما لا يحمله (بطاقاتُ المؤشرِ
+       المُصيَّرةُ خادميًّا) نصُّه ثابتٌ أصلًا فيُقرأ نصًّا. */
+  function markZeros() {
+    document.querySelectorAll('.ems-dash .shot-stat-value, .ems-dash .ems-kpi-value')
+      .forEach(function (e) {
+        var raw = e.hasAttribute('data-count')
+          ? e.getAttribute('data-count')
+          : (e.textContent || '');
+        var n = parseFloat(String(raw).replace(/[^\d.-]/g, ''));
+        e.classList.toggle('d2-zero', n === 0);
+      });
+  }
+
+  /* ③ «إنشاء سريع» — تُطوى مقاصدُه المكرَّرةُ في «الوصول السريع».
+       المقيسُ: **ثلاثةٌ من ثلاثةٍ مكرَّرة** («سجل العملاء» · «الفرص البيعية»
+       · «سجل العروض») — وهي سجلّاتٌ لا أفعالُ إنشاءٍ أصلًا. فإن لم يبقَ فيه
+       مقصدٌ فريدٌ طُوي الصندوقُ كلُّه: صندوقٌ يكرّر جارَه ضجيجٌ لا اختصار.
+       ولا يُحذف رابطٌ من الشجرة — نسخُه الحيَّةُ في «الوصول السريع». */
+  function dedupeQuickCreate() {
+    var quick = Array.prototype.map.call(
+      document.querySelectorAll('.ems-dash .shot-hex-link'),
+      function (a) { return (a.textContent || '').replace(/\s+/g, ' ').trim(); });
+    if (!quick.length) { return; }
+
+    document.querySelectorAll('.ems-dash .shot-ops-box').forEach(function (box) {
+      var acts = box.querySelectorAll('.shot-ops-act');
+      if (!acts.length) { return; }
+      var kept = 0;
+      Array.prototype.forEach.call(acts, function (a) {
+        var t = (a.textContent || '').replace(/\s+/g, ' ').trim();
+        if (quick.indexOf(t) !== -1) { a.classList.add('d2-dup'); } else { kept++; }
+      });
+      if (kept === 0) { box.classList.add('d2-dup'); }
+    });
+  }
+
+  /* ⑮ دمجُ لوحَي الأرقامِ في لوحٍ واحد — نقلُ عقدٍ لا استنساخ. */
+  function mergeNumberPanels() {
+    var main = document.querySelector('.ems-dash .shot-num-panel:not(.shot-num-panel-secondary)');
+    var sec  = document.querySelector('.ems-dash .shot-num-panel-secondary');
+    if (!main || !sec || main.classList.contains('d2-merged-nums')) { return; }
+
+    var subTitle = sec.querySelector('.shot-session-title');
+    var grid     = sec.querySelector('.shot-stat-grid');
+    if (!grid) { return; }
+
+    var lbl = document.createElement('div');
+    lbl.className = 'd2-nums-sub';
+    lbl.textContent = subTitle ? subTitle.textContent.trim() : 'إحصائيات الأداء';
+    main.appendChild(lbl);
+    /* ◆ الشبكةُ تغادر `.shot-num-panel-secondary` — فيسقط عنها محدِّدُ الطبقةِ
+         الثالثةِ المربوطُ بذلك الوعاء. تُوسَم بنفسِها فيتبعها حجمُها.
+         (الفخُّ نفسُه الذي أوقعني فيه نقلُ شريحةِ الجلسةِ: **نقلُ عقدةٍ ينقلها
+         من مداها** — وقد صار قاعدةً أفحصها بعد كلِّ نقل.) */
+    grid.classList.add('d2-nums-perf');
+    main.appendChild(grid);                 /* الشبكةُ تنتقل بعناصرِها ومستمعيها */
+    main.classList.add('d2-merged-nums');
+    sec.classList.add('d2-emptied');
+  }
+
+  /* ⑰ دمجُ «مهامي · موافقاتي · التنبيهات» في قائمةٍ واحدة.
+       ◆ **نقلُ عقدٍ لا استنساخ**: الصفوفُ روابطُ قائمةٌ بذاتِها (نصٌّ وعدّادٌ
+         ووجهة) فتنتقل بمستمعاتِها. وصفرُ فقد: ما يُطوى وعاءٌ فارغٌ لا محتوى.
+       ◆ الوسمُ يُشتقُّ من ترويسةِ مصدرِه، فلا يضيع الفرقُ الذي كانت الترويساتُ
+         الثلاثُ تحمله — يتحوّل من ترويسةٍ إلى وسمٍ في السطر.
+       ◆ والفارغُ يصير سطرَ طمأنينةٍ واحدًا في الذيلِ بدل صندوقٍ بترويسة. */
+  var D2_INBOX = ['مهامي', 'موافقاتي', 'التنبيهات'];
+
+  function buildInbox() {
+    var grid = document.querySelector('.ems-dash .shot-ops-grid');
+    if (!grid || grid.classList.contains('d2-inboxed')) { return; }
+
+    var boxes = Array.prototype.filter.call(
+      grid.querySelectorAll('.shot-ops-box'),
+      function (b) {
+        var t = b.querySelector('.shot-ops-box-title');
+        return t && D2_INBOX.indexOf(t.textContent.replace(/\s+/g, ' ').trim()) !== -1;
+      });
+    if (boxes.length < 2) { return; }   /* دورٌ بغيرِ هذه الصناديق — يُترك كما هو */
+
+    var inbox = document.createElement('div');
+    inbox.className = 'd2-inbox';
+    inbox.innerHTML =
+      '<div class="d2-inbox-head"><i class="fas fa-inbox" aria-hidden="true"></i>'
+      + '<span>ما ينتظرك اليوم</span><span class="d2-inbox-count"></span></div>'
+      + '<div class="d2-inbox-list"></div>';
+    var list = inbox.querySelector('.d2-inbox-list');
+    var okLines = [], moved = 0;
+
+    boxes.forEach(function (b) {
+      var kind = b.querySelector('.shot-ops-box-title').textContent.replace(/\s+/g, ' ').trim();
+      var rows = b.querySelectorAll('.shot-ops-row');
+      if (!rows.length) {
+        var e = b.querySelector('.shot-ops-empty');
+        if (e) { okLines.push(e.textContent.trim()); }
+      }
+      Array.prototype.forEach.call(rows, function (r) {
+        var tag = document.createElement('span');
+        tag.className = 'd2-kind';
+        tag.textContent = kind;
+        var txt = r.querySelector('.shot-ops-row-text');
+        if (txt) { txt.insertBefore(tag, txt.firstChild); }
+        list.appendChild(r);           /* نقلٌ — لا نسخ */
+        moved++;
+      });
+      b.classList.add('d2-inboxed-src');
+    });
+
+    if (okLines.length) {
+      var p = document.createElement('p');
+      p.className = 'd2-inbox-ok';
+      p.textContent = okLines.join(' · ');
+      inbox.appendChild(p);
+    }
+    inbox.querySelector('.d2-inbox-count').textContent = moved;
+    grid.insertBefore(inbox, grid.firstChild);
+    grid.classList.add('d2-inboxed');
   }
 
   function boot() {
     openCurrentGroup();
     addMissingHeadings();
+    buildInbox();
     mergeSessionIntoContext();
     mergeDateIntoContext();
+    tagPermission();
+    dedupeQuickCreate();
+    mergeNumberPanels();
     syncDomOrder();
+    markZeros();
+    /* العدُّ التصاعديُّ يستغرق ~900ms ثم تستقرُّ القيمة — فيُعاد الوسمُ بعده */
+    window.setTimeout(markZeros, 1100);
   }
 
   if (document.readyState === 'loading') {
@@ -1882,29 +2261,39 @@ html body.ems-site .ems-topbar--dash button:focus-visible{
   const eqCtx = document.getElementById('chartEquipStatus');
   if (eqCtx) {
     emsChartGuard(eqCtx, [AP.equipmentStatus], function () {
+    /* DASH-V2 ⑩ · BEGIN — الأصل: `type:'doughnut'` بشريحتَين و`cutout:'72%'`
+       ◆ **شريحتانِ ليستا رسمًا**: الدونات يخدم توزيعًا على عدّةِ فئات. وبقيمتَين
+         اثنتَين (نشطة · متوقفة) يصير حلقةً تُقرأ بالزاويةِ — والعينُ **تقرأ
+         الطولَ أدقَّ من الزاوية** (وهذا مقيسٌ في أدبيّاتِ الإدراكِ البصريّ).
+       ◆ فيصير **شريطًا أفقيًّا واحدًا مكدَّسًا**: النسبةُ تُقرأ فورًا، والرقمانِ
+         يظهرانِ في وسيلةِ الإيضاحِ نصًّا — فلا يُعتمَد على اللونِ وحدَه.
+       ◆ والبياناتُ هي هي (`AP.equipmentStatus`) — يتغيّر الشكلُ لا المصدر. */
     return new Chart(eqCtx, {
-      type: 'doughnut',
+      type: 'bar',
       data: {
-        labels: ['نشطة', 'متوقفة'],
-        datasets: [{
-          data: AP.equipmentStatus,
-          backgroundColor: [dashColor('eq-active'), dashColor('eq-stopped')],
-          borderColor: 'transparent',
-          borderWidth: 0,
-          hoverOffset: 6
-        }]
+        labels: [''],
+        datasets: [
+          { label: 'نشطة',   data: [AP.equipmentStatus[0]], backgroundColor: dashColor('eq-active'),  borderRadius: 6, barThickness: 34 },
+          { label: 'متوقفة', data: [AP.equipmentStatus[1]], backgroundColor: dashColor('eq-stopped'), borderRadius: 6, barThickness: 34 }
+        ]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        cutout: '72%',
+        indexAxis: 'y',
+        /* وسيلةُ الإيضاحِ مُطفأةٌ عالميًّا (Chart.defaults) — وتُشعَل هنا وحدَها
+           لأن الشريطَ المكدَّسَ بلا إيضاحٍ لونانِ بلا اسم. */
         plugins: {
-          tooltip: {
-            callbacks: { label: function(c) { return ' ' + c.label + ': ' + c.raw; } }
-          }
+          legend: { display: true, position: 'bottom', labels: { boxWidth: 10, boxHeight: 10, usePointStyle: true } },
+          tooltip: { callbacks: { label: function (c) { return ' ' + c.dataset.label + ': ' + c.raw; } } }
+        },
+        scales: {
+          x: { stacked: true, grid: { display: false }, ticks: { color: tickColor } },
+          y: { stacked: true, grid: { display: false }, display: false }
         }
       }
     });
+    /* DASH-V2 ⑩ · END */
     });
   }
 
