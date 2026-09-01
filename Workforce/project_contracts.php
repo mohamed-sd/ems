@@ -14,6 +14,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 require_once '../includes/permissions_helper.php';
 require_once '../includes/gov_columns.php';
 
@@ -140,6 +141,37 @@ include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main ems-unified-page-shell" dir="rtl">
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف السطر' => 'g120',
+            'معرف العقد' => 'g121',
+            'رقم الموظف' => 'g122',
+            'Project_ID المشروع الرابط الأساسي' => 'g123',
+            'احتياج التوظيف المرجعي' => 'g124',
+            'عقد المورد محفزا لا رابطا' => 'g125',
+            'محفز الانتهاء المتفق' => 'g126',
+            'محفز الانتهاء الواقع' => 'g127',
+            'تاريخ الوقوع' => 'g128',
+            'فترة الإخطار' => 'g129',
+            'مرجع التصفية' => 'g130',
+            'حالة التصفية' => 'g131',
+            'المنشئ' => 'g132',
+            'تاريخ الإنشاء' => 'g133',
+            'حالة البيانات' => 'g134',
+            'مرجع المصدر' => 'g135',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('hr_project_contracts');
+        echo ems_w14_grid('emsList_hr_project_contracts', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في عقود المشاريع المؤقتة'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+
     <?php
     $header_title = 'عقود المشاريع المؤقتة';
     $header_icon = 'fa fa-file-contract';

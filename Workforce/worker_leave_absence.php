@@ -4,6 +4,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../app/Services/Workforce/CoverageService.php';
 require_once __DIR__ . '/../app/Services/Workforce/ViewModal.php';
@@ -85,7 +86,41 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title='الإجازات والغياب'; $header_icon='fas fa-plane-departure'; $header_actions=array();
     if($can_add) $header_actions[]=array('id'=>'toggleForm','class'=>'add-btn','icon'=>'fas fa-plus-circle','label'=>'تسجيل إجازة/غياب');
     $header_back=array('href'=>'worker_register.php','class'=>'','icon'=>'fas fa-arrow-right','label'=>'سجل العامل');
-    include('../includes/page_header.php');
+    include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم الطلب' => 'g280',
+            'رقم الموظف' => 'g281',
+            'نوع الإجازة' => 'g282',
+            'من تاريخ' => 'g283',
+            'إلى تاريخ' => 'g284',
+            'عدد الأيام' => 'g285',
+            'الرصيد قبل' => 'g286',
+            'الرصيد بعد' => 'g287',
+            'البديل المكلف' => 'g288',
+            'مرفق مساند' => 'g289',
+            'مرجع دورة التناوب' => 'g290',
+            'حالة الطلب' => 'g291',
+            'المنشئ' => 'g292',
+            'تاريخ الإنشاء' => 'g293',
+            'المراجع' => 'g294',
+            'المعتمد' => 'g295',
+            'تاريخ الاعتماد' => 'g296',
+            'حالة البيانات' => 'g297',
+            'مرجع المصدر' => 'g298',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('hr_worker_leave_absence');
+        echo ems_w14_grid('emsList_hr_worker_leave_absence', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الإجازات والغياب'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     echo ems_states_bundle('لا إجازات ولا حالات غياب مسجلة بعد',
                            'سجل أول إجازة أو غياب بزر «تسجيل إجازة/غياب» في رأس الشاشة'); ?>

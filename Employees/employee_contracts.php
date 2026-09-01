@@ -7,6 +7,7 @@ if (!isset($_SESSION['user'])) {
 }
 
 require_once '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 require_once '../includes/permissions_helper.php';
 
 $is_super_admin = isset($_SESSION['user']['role']) && (string) $_SESSION['user']['role'] === '-1';
@@ -77,7 +78,43 @@ include('../insidebar.php'); ?>
     require_once __DIR__ . '/../includes/excel_ui.php';
     foreach (ems_excel_header_actions('driver_contracts', 'عقود السائقين', true) as $__xlAction) { $header_actions[] = $__xlAction; }
     $header_back = array('href' => 'employees.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
-    include('../includes/page_header.php');
+    include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف العقد' => 'g259',
+            'رقم الموظف' => 'g260',
+            'فئة العقد' => 'g261',
+            'نوع العقد' => 'g262',
+            'نموذج الأجر' => 'g263',
+            'الأجر الأساسي' => 'g264',
+            'البدلات' => 'g265',
+            'العملة' => 'g266',
+            'من تاريخ' => 'g267',
+            'إلى تاريخ' => 'g268',
+            'فترة التجربة' => 'g269',
+            'مرجع المشروع' => 'g270',
+            'مرفق العقد الموقع' => 'g271',
+            'حالة العقد' => 'g272',
+            'المنشئ' => 'g273',
+            'تاريخ الإنشاء' => 'g274',
+            'المراجع' => 'g275',
+            'المعتمد' => 'g276',
+            'تاريخ الاعتماد' => 'g277',
+            'حالة البيانات' => 'g278',
+            'مرجع المصدر' => 'g279',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('hr_employee_contracts');
+        echo ems_w14_grid('emsList_scr_project_contracts', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في عقود الموظفين'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     echo ems_states_bundle('لا عقود مسجلة لهذا السائق بعد', 'أنشئ أول عقد بزر «عقد جديد» في رأس الشاشة');
     ?>

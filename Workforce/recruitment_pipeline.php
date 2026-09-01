@@ -10,6 +10,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 
 // ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
@@ -134,7 +135,43 @@ $header_icon = 'fa fa-user-plus';
 $header_title_html = htmlspecialchars('دورة التوظيف — عشر خطوات من الشاغر إلى التثبيت', ENT_QUOTES, 'UTF-8');
 $header_actions = array();
 $header_back = false;
-include __DIR__ . '/../includes/page_header.php';
+include __DIR__ . '/../includes/page_header.php'; ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم الشاغر' => 'g24',
+            'تاريخ الفتح' => 'g25',
+            'الإدارة الطالبة' => 'g26',
+            'المسمى الوظيفي' => 'g27',
+            'سبب الشاغر' => 'g28',
+            'عدد المطلوبين' => 'g29',
+            'اشتراطات الشاغر' => 'g30',
+            'المرحلة' => 'g31',
+            'المرشحون' => 'g32',
+            'المرشح المقبول' => 'g33',
+            'نتيجة الاختبار العملي' => 'g34',
+            'العرض المقدم' => 'g35',
+            'تاريخ المباشرة' => 'g36',
+            'حالة الشاغر' => 'g37',
+            'المنشئ' => 'g38',
+            'تاريخ الإنشاء' => 'g39',
+            'المراجع' => 'g40',
+            'المعتمد' => 'g41',
+            'تاريخ الاعتماد' => 'g42',
+            'حالة البيانات' => 'g43',
+            'مرجع المصدر' => 'g44',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('hr_recruitment_pipeline');
+        echo ems_w14_grid('emsList_hr_recruitment_pipeline', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في التوظيف من الشاغر إلى المباشرة'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
 echo ems_states_bundle('لا متقدمين في دورة التوظيف الآن', 'افتح شاغرا بنموذج «① طلب شاغر جديد» ثم سجل سيرة متقدم عليه');
 ?>

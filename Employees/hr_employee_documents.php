@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w13_view.php';
 
@@ -59,22 +60,28 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_hr_employee_documents')); ?>
-    <table id="emsList_hr_employee_documents" class="data-table">
-        <thead><tr><th>الموظف</th><th>نوع المستند</th><th>رقم المستند</th><th>تاريخ الاصدار</th><th>تاريخ الانتهاء</th><th>الزامي</th><th>مرجع الملف</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= (int) $r["employee_id"] ?></td>
-                    <td><?= ems_w13_state((string) $r["doc_type"]) ?></td>
-                    <td><?= ems_w13_txt($r["doc_no"]) ?></td>
-                    <td><?= ems_w13_txt($r["issued_at"]) ?></td>
-                    <td><?= ems_w13_txt($r["expires_at"]) ?></td>
-                    <td><?= (int) $r["is_mandatory"] ?></td>
-                    <td><?= ems_w13_txt($r["file_ref"]) ?></td>
-                    <td><?= ems_w13_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف المستند' => 'g245',
+        'رقم الموظف' => 'g246',
+        'نوع المستند' => 'g247',
+        'رقم المستند' => 'g248',
+        'جهة الإصدار' => 'g249',
+        'تاريخ الإصدار' => 'g250',
+        'تاريخ الانتهاء' => 'g251',
+        'إلزامي؟' => 'g252',
+        'المرفق' => 'g253',
+        'حالة المستند' => 'g254',
+        'المنشئ' => 'g255',
+        'تاريخ الإنشاء' => 'g256',
+        'حالة البيانات' => 'g257',
+        'مرجع المصدر' => 'g258',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('hr_employee_documents');
+    echo ems_w14_grid('emsList_hr_employee_documents', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في مستندات الموظف'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

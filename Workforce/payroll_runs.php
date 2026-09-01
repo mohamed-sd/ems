@@ -17,6 +17,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 require_once __DIR__ . '/../app/Services/Payroll/PayrollRunService.php';
 require_once __DIR__ . '/../app/Services/Payroll/TimePathService.php';
 require_once __DIR__ . '/../app/Services/Payroll/ProductionPathService.php';
@@ -196,7 +197,43 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
     }
     $header_back = array('href' => 'contract_registry.php', 'class' => '',
                          'icon' => 'fas fa-arrow-right', 'label' => 'سجل العقود');
-    include('../includes/page_header.php');
+    include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'معرف المسير' => 'g83',
+            'الشهر' => 'g84',
+            'نطاق المسير' => 'g85',
+            'عدد الموظفين' => 'g86',
+            'إجمالي الأساسي' => 'g87',
+            'إجمالي البدلات' => 'g88',
+            'حوافز الإنتاج' => 'g89',
+            'أساس القوى للمشغلين' => 'g90',
+            'إجمالي الخصومات' => 'g91',
+            'صافي المسير' => 'g92',
+            'العملة' => 'g93',
+            'الإحالة للمالية' => 'g94',
+            'الإحالة للخزينة' => 'g95',
+            'حالة المسير' => 'g96',
+            'المنشئ' => 'g97',
+            'تاريخ الإنشاء' => 'g98',
+            'المراجع' => 'g99',
+            'المعتمد' => 'g100',
+            'تاريخ الاعتماد' => 'g101',
+            'حالة البيانات' => 'g102',
+            'مرجع المصدر' => 'g103',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('hr_payroll_runs');
+        echo ems_w14_grid('emsList_hr_payroll_runs', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في مسير الرواتب'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     echo ems_states_bundle('لا دورات مسير رواتب مفتوحة بعد', 'افتح أول دورة بزر «دورة جديدة» في رأس الشاشة');
     if (isset($_GET['msg'])) {

@@ -7,6 +7,7 @@ if (!isset($_SESSION['user'])) {
 }
 
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 
 $current_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
@@ -248,7 +249,46 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         $header_actions[] = $__xlAction;
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
-    include('../includes/page_header.php');
+    include('../includes/page_header.php'); ?>
+    <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
+         فالمبنيُّ له أفعالُه والورقةُ تطلب السجلَّ بحقولِه كلِّها -->
+    <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i> سجل حقول الورقة</h5></div>
+    <div class="card-body"><div class="table-container">
+        <?php /* GUIDE_COLS:govui_field_close
+             الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+             والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+             ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+        $GUIDE_COLS = array(
+            'رقم الموظف' => 'g164',
+            'الاسم الرباعي' => 'g165',
+            'الرقم الوطني' => 'g166',
+            'تاريخ الميلاد' => 'g167',
+            'النوع' => 'g168',
+            'الحالة الاجتماعية' => 'g169',
+            'المؤهل' => 'g170',
+            'المسمى الوظيفي' => 'g171',
+            'الإدارة' => 'g172',
+            'الموقع' => 'g173',
+            'تاريخ المباشرة' => 'g174',
+            'مشغل تشغيلي؟' => 'g175',
+            'كود المشغل بالقوى' => 'g176',
+            'بيانات التواصل' => 'g177',
+            'شخص الطوارئ' => 'g178',
+            'الحساب البنكي' => 'g179',
+            'حالة الخدمة' => 'g180',
+            'المنشئ' => 'g181',
+            'تاريخ الإنشاء' => 'g182',
+            'المراجع' => 'g183',
+            'المعتمد' => 'g184',
+            'تاريخ الاعتماد' => 'g185',
+            'حالة البيانات' => 'g186',
+            'مرجع المصدر' => 'g187',
+        );
+        $D = array();
+        $__gridRows = ems_w14_guide_rows('hr_employees');
+        echo ems_w14_grid('emsList_hr_employees', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في سجل الموظفين'); /* /GUIDE_COLS */ ?>
+    </div></div></div>
+    <?php 
 
     /* UXW-01 ⑨: حزمةُ الحالاتِ الدنيا — مخفيةٌ افتراضًا ويُظهرها منطقُ الشاشةِ عند حالِها */
     echo ems_states_bundle('لا موظفين مسجلين ضمن نطاقك بعد',

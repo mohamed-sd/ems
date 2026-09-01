@@ -174,7 +174,7 @@ echo "\n  المجموع: " . count($plans) . " سطحًا · أعمدةٌ تُ�
 
 /* ═══ ③ الهجرةُ — عمودٌ لكلِّ حقلٍ لا نظيرَ له، واسمُ الحقلِ في تعليقِه ═══ */
 if ($EMIT !== null) {
-    if (!$adds) { echo "  · لا عمودَ يُضاف — لا هجرةَ تُكتب\n"; }
+    if (!$adds && !$creates) { echo "  . لا عمودَ يُضاف ولا جدولَ يُبنى — لا هجرةَ تُكتب" . chr(10); }
     else {
         $date = $MDATE;
         $up   = $ROOT . '/database/migrations/' . $date . '_' . $EMIT . '.php';
@@ -288,8 +288,10 @@ if ($APPLY) {
             $blk .= $ind . '$__gridRows = ' . $rowsExpr . ";" . chr(10);
             $rowsExpr = '$__gridRows';
         }
+        /* ونصُّ الفراغِ يُنقّى كما يُنقّى الاسم: سقّاطةُ `UI-01` تعُدُّ التشكيلَ
+           في نصِّ شاشةٍ حيّة، وأسماءُ السجلِّ تحمله («مسيّر» · «المصنّف»). */
         $blk .= $ind . "echo ems_w14_grid('" . $sc['grid_id'] . "', \$GUIDE_COLS, " . $rowsExpr . ", \$D, '"
-              . str_replace("'", "", $sc['empty']) . "'); " . GFC_END;
+              . gfc_key(str_replace("'", "", $sc['empty'])) . "'); " . GFC_END;
 
         $s2 = substr($s2, 0, $ls) . $blk . substr($s2, $j);
         $inc = "require_once __DIR__ . '/../includes/w14_grid.php';";

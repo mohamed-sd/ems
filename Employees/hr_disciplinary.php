@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w13_view.php';
 
@@ -59,26 +60,37 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_hr_disciplinary')); ?>
-    <table id="emsList_hr_disciplinary" class="data-table">
-        <thead><tr><th>رقم القضية</th><th>الموظف</th><th>تاريخ الواقعة</th><th>الواقعة</th><th>المبلغ</th><th>المحقق</th><th>الادارة المالكة للتحقيق</th><th>مستند التكليف</th><th>نوع القرار</th><th>مرجع القرار</th><th>مصدر القرار</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= ems_w13_txt($r["case_no"]) ?></td>
-                    <td><?= (int) $r["employee_id"] ?></td>
-                    <td><?= ems_w13_txt($r["incident_at"]) ?></td>
-                    <td><?= ems_w13_txt($r["incident_ar"]) ?></td>
-                    <td><?= (int) $r["reported_by"] ?></td>
-                    <td><?= (int) $r["investigator_id"] ?></td>
-                    <td><?= ems_w13_txt($r["investigation_owner_dept"]) ?></td>
-                    <td><?= ems_w13_txt($r["assignment_doc_ref"]) ?></td>
-                    <td><?= ems_w13_state((string) $r["decision_kind"]) ?></td>
-                    <td><?= ems_w13_txt($r["decision_ref"]) ?></td>
-                    <td><?= (int) $r["decided_by"] ?></td>
-                    <td><?= ems_w13_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'رقم القضية' => 'g1',
+        'رقم الموظف' => 'g2',
+        'مصدر الواقعة' => 'g3',
+        'مرجع الإحالة' => 'g4',
+        'وصف الواقعة' => 'g5',
+        'تاريخ الواقعة' => 'g6',
+        'المحقق المكلف' => 'g7',
+        'محضر التحقيق' => 'g8',
+        'أقوال الموظف' => 'g9',
+        'لجنة القرار' => 'g10',
+        'القرار' => 'g11',
+        'المرجع اللائحي' => 'g12',
+        'قيمة الجزاء المالي' => 'g13',
+        'Deduction_Reference الناتج' => 'g14',
+        'اعتراض الموظف' => 'g15',
+        'حالة القضية' => 'g16',
+        'المنشئ' => 'g17',
+        'تاريخ الإنشاء' => 'g18',
+        'المراجع' => 'g19',
+        'المعتمد' => 'g20',
+        'تاريخ الاعتماد' => 'g21',
+        'حالة البيانات' => 'g22',
+        'مرجع المصدر' => 'g23',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('hr_disciplinary');
+    echo ems_w14_grid('emsList_hr_disciplinary', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في القضايا التأديبية والتحقيق'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

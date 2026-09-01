@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w13_view.php';
 
@@ -59,21 +60,25 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_hr_workforce_report')); ?>
-    <table id="emsList_hr_workforce_report" class="data-table">
-        <thead><tr><th>كود الموظف</th><th>الاسم</th><th>التصنيف الوظيفي</th><th>فئة العامل</th><th>المشروع</th><th>تاريخ المباشرة</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= ems_w13_txt($r["employee_code"]) ?></td>
-                    <td><?= ems_w13_txt($r["name"]) ?></td>
-                    <td><?= ems_w13_txt($r["employment_classification"]) ?></td>
-                    <td><?= ems_w13_txt($r["worker_category"]) ?></td>
-                    <td><?= (int) $r["project_id"] ?></td>
-                    <td><?= ems_w13_txt($r["start_date"]) ?></td>
-                    <td><?= ems_w13_txt($r["employee_status"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف السطر' => 'g45',
+        'الفترة' => 'g46',
+        'الإدارة' => 'g47',
+        'عدد الموظفين' => 'g48',
+        'منهم مشروعيون' => 'g49',
+        'مباشرون جدد' => 'g50',
+        'منتهية خدمتهم' => 'g51',
+        'معدل الدوران' => 'g52',
+        'نسبة الغياب' => 'g53',
+        'ساعات إضافية' => 'g54',
+        'كلفة العمالة' => 'g55',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('hr_workforce_report');
+    echo ems_w14_grid('emsList_hr_workforce_report', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في تقرير القوى العاملة'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

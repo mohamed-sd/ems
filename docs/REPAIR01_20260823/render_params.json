@@ -1,3 +1,4 @@
 {
-  "Contracts/contract_coverage.php": "contract_id=1"
+  "Contracts/contract_coverage.php": "contract_id=1",
+  "Employees/employee_contracts.php": "id=1"
 }

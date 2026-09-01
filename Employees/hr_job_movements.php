@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w13_view.php';
 
@@ -59,23 +60,30 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_hr_job_movements')); ?>
-    <table id="emsList_hr_job_movements" class="data-table">
-        <thead><tr><th>الموظف</th><th>نوع الحركة</th><th>المنصب السابق</th><th>المنصب الجديد</th><th>تاريخ السريان</th><th>مرجع القرار</th><th>طالب الحركة</th><th>معتمد الحركة</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= (int) $r["employee_id"] ?></td>
-                    <td><?= ems_w13_state((string) $r["movement_kind"]) ?></td>
-                    <td><?= (int) $r["from_position_id"] ?></td>
-                    <td><?= (int) $r["to_position_id"] ?></td>
-                    <td><?= ems_w13_txt($r["effective_date"]) ?></td>
-                    <td><?= ems_w13_txt($r["doc_ref"]) ?></td>
-                    <td><?= (int) $r["requested_by"] ?></td>
-                    <td><?= (int) $r["approved_by"] ?></td>
-                    <td><?= ems_w13_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'رقم الحركة' => 'g56',
+        'رقم الموظف' => 'g57',
+        'نوع الحركة' => 'g58',
+        'من منصب/وحدة' => 'g59',
+        'إلى منصب/وحدة' => 'g60',
+        'الموجب/المرجع' => 'g61',
+        'أثر الأجر' => 'g62',
+        'تاريخ النفاذ' => 'g63',
+        'حالة الحركة' => 'g64',
+        'المنشئ' => 'g65',
+        'تاريخ الإنشاء' => 'g66',
+        'المراجع' => 'g67',
+        'المعتمد' => 'g68',
+        'تاريخ الاعتماد' => 'g69',
+        'حالة البيانات' => 'g70',
+        'مرجع المصدر' => 'g71',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('hr_job_movements');
+    echo ems_w14_grid('emsList_hr_job_movements', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في الحركات الوظيفية'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

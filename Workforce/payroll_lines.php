@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w13_view.php';
 
@@ -59,24 +60,25 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_payroll_lines')); ?>
-    <table id="emsList_payroll_lines" class="data-table">
-        <thead><tr><th>المسير</th><th>الموظف</th><th>العقد</th><th>نوع السطر</th><th>المكون</th><th>طريقة الاحتساب</th><th>الكمية</th><th>المعدل</th><th>المبلغ</th><th>حالة الاحتساب</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= (int) $r["run_id"] ?></td>
-                    <td><?= (int) $r["person_id"] ?></td>
-                    <td><?= (int) $r["contract_id"] ?></td>
-                    <td><?= ems_w13_state((string) $r["line_kind"]) ?></td>
-                    <td><?= ems_w13_state((string) $r["component_type"]) ?></td>
-                    <td><?= ems_w13_state((string) $r["calc_method"]) ?></td>
-                    <td><?= ems_w13_num($r["qty"]) ?></td>
-                    <td><?= ems_w13_num($r["rate"]) ?></td>
-                    <td><?= ems_w13_num($r["amount"]) ?></td>
-                    <td><?= ems_w13_state((string) $r["calc_state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف السطر' => 'g72',
+        'معرف المسير' => 'g73',
+        'رقم الموظف' => 'g74',
+        'الأساسي' => 'g75',
+        'البدلات' => 'g76',
+        'حافز الإنتاج من أساس القوى' => 'g77',
+        'الخصومات بمرجع ب08' => 'g78',
+        'التأمينات بمرجع ب08-2' => 'g79',
+        'أقساط السلف بمرجع ب08-3' => 'g80',
+        'الصافي' => 'g81',
+        'حالة السطر' => 'g82',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('hr_payroll_lines');
+    echo ems_w14_grid('emsList_payroll_lines', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في أسطر مسير الرواتب'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

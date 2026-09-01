@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w13_view.php';
 
@@ -59,22 +60,26 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_hr_onboarding')); ?>
-    <table id="emsList_hr_onboarding" class="data-table">
-        <thead><tr><th>الموظف</th><th>رمز البند</th><th>البند</th><th>الزامي</th><th>الحالة</th><th>مستند الاستثناء</th><th>سند العهدة</th><th>تاريخ الانجاز</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= (int) $r["employee_id"] ?></td>
-                    <td><?= ems_w13_txt($r["item_code"]) ?></td>
-                    <td><?= ems_w13_txt($r["item_ar"]) ?></td>
-                    <td><?= (int) $r["mandatory"] ?></td>
-                    <td><?= ems_w13_state((string) $r["state"]) ?></td>
-                    <td><?= ems_w13_txt($r["waiver_doc_ref"]) ?></td>
-                    <td><?= ems_w13_txt($r["custody_doc_ref"]) ?></td>
-                    <td><?= ems_w13_txt($r["done_at"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف التهيئة' => 'g215',
+        'رقم الموظف' => 'g216',
+        'بند التهيئة' => 'g217',
+        'المسؤول' => 'g218',
+        'مرجع الإنجاز' => 'g219',
+        'النتيجة' => 'g220',
+        'تاريخ الإنجاز' => 'g221',
+        'حالة البند' => 'g222',
+        'المنشئ' => 'g223',
+        'تاريخ الإنشاء' => 'g224',
+        'حالة البيانات' => 'g225',
+        'مرجع المصدر' => 'g226',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('hr_onboarding');
+    echo ems_w14_grid('emsList_hr_onboarding', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في التهيئة والمباشرة'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

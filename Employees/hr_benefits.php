@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w13_view.php';
 
@@ -59,24 +60,28 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_hr_benefits')); ?>
-    <table id="emsList_hr_benefits" class="data-table">
-        <thead><tr><th>الموظف</th><th>رمز الميزة</th><th>الميزة</th><th>مقدم الخدمة</th><th>حصة صاحب العمل</th><th>حصة الموظف</th><th>العملة</th><th>ساري من</th><th>مرجع مكون المسير</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= (int) $r["employee_id"] ?></td>
-                    <td><?= ems_w13_txt($r["benefit_code"]) ?></td>
-                    <td><?= ems_w13_txt($r["benefit_ar"]) ?></td>
-                    <td><?= ems_w13_txt($r["provider_ref"]) ?></td>
-                    <td><?= ems_w13_num($r["employer_share"]) ?></td>
-                    <td><?= ems_w13_num($r["employee_share"]) ?></td>
-                    <td><?= ems_w13_txt($r["currency"]) ?></td>
-                    <td><?= ems_w13_txt($r["effective_from"]) ?></td>
-                    <td><?= ems_w13_txt($r["payroll_component_ref"]) ?></td>
-                    <td><?= ems_w13_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف السطر' => 'g150',
+        'رقم الموظف' => 'g151',
+        'نوع الميزة' => 'g152',
+        'الجهة/الوثيقة' => 'g153',
+        'حصة الشركة' => 'g154',
+        'حصة الموظف' => 'g155',
+        'من تاريخ' => 'g156',
+        'إلى تاريخ' => 'g157',
+        'مرجع المسير' => 'g158',
+        'حالة السطر' => 'g159',
+        'المنشئ' => 'g160',
+        'تاريخ الإنشاء' => 'g161',
+        'حالة البيانات' => 'g162',
+        'مرجع المصدر' => 'g163',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('hr_benefits');
+    echo ems_w14_grid('emsList_hr_benefits', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في المزايا والتأمينات'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

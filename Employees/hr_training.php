@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w13_view.php';
 
@@ -59,23 +60,28 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_hr_training')); ?>
-    <table id="emsList_hr_training" class="data-table">
-        <thead><tr><th>الموظف</th><th>رمز البرنامج</th><th>البرنامج</th><th>نوع التدريب</th><th>الزامي</th><th>تاريخ الاكتمال</th><th>مرجع الشهادة</th><th>صالح حتى</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= (int) $r["employee_id"] ?></td>
-                    <td><?= ems_w13_txt($r["program_code"]) ?></td>
-                    <td><?= ems_w13_txt($r["program_ar"]) ?></td>
-                    <td><?= ems_w13_state((string) $r["training_kind"]) ?></td>
-                    <td><?= (int) $r["mandatory"] ?></td>
-                    <td><?= ems_w13_txt($r["completed_at"]) ?></td>
-                    <td><?= ems_w13_txt($r["certificate_ref"]) ?></td>
-                    <td><?= ems_w13_txt($r["valid_until"]) ?></td>
-                    <td><?= ems_w13_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف السجل' => 'g136',
+        'رقم الموظف' => 'g137',
+        'البرنامج' => 'g138',
+        'نوع التدريب' => 'g139',
+        'الجهة' => 'g140',
+        'تاريخ الإتمام' => 'g141',
+        'النتيجة' => 'g142',
+        'صلاحية الشهادة' => 'g143',
+        'إلزامي؟' => 'g144',
+        'حالة السجل' => 'g145',
+        'المنشئ' => 'g146',
+        'تاريخ الإنشاء' => 'g147',
+        'حالة البيانات' => 'g148',
+        'مرجع المصدر' => 'g149',
+    );
+    $D = array();
+    $__gridRows = ems_w14_guide_rows('hr_training');
+    echo ems_w14_grid('emsList_hr_training', $GUIDE_COLS, $__gridRows, $D, 'لا سطر مسجل بعد في التدريب والكفاءة'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

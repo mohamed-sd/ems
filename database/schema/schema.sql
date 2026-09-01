@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-01 22:26:59
--- الجداول: 1087 · المناظير: 28
+-- المصدر: equipation_manage · التوليد: 2026-09-01 22:44:01
+-- الجداول: 1106 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -11455,6 +11455,31 @@ CREATE TABLE `housing_unit` (
   KEY `idx_hu_company` (`company_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── Table: hr_attendance ──
+CREATE TABLE `hr_attendance` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g188` varchar(190) DEFAULT NULL COMMENT 'معرف السجل',
+  `g189` varchar(190) DEFAULT NULL COMMENT 'رقم الموظف',
+  `g190` varchar(190) DEFAULT NULL COMMENT 'التاريخ',
+  `g191` varchar(190) DEFAULT NULL COMMENT 'رمز الحالة',
+  `g192` varchar(190) DEFAULT NULL COMMENT 'ساعات إضافية',
+  `g193` varchar(190) DEFAULT NULL COMMENT 'مرجع المأمورية',
+  `g194` varchar(190) DEFAULT NULL COMMENT 'مرجع الإجازة',
+  `g195` varchar(190) DEFAULT NULL COMMENT 'مصدر التسجيل',
+  `g196` varchar(190) DEFAULT NULL COMMENT 'ملاحظة',
+  `g197` varchar(190) DEFAULT NULL COMMENT 'حالة السجل',
+  `g198` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g199` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g200` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g201` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_cfb090e0_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='HR-13 - الحضور والانصراف';
+
 -- ── Table: hr_benefit_enrollment ──
 CREATE TABLE `hr_benefit_enrollment` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -11480,6 +11505,48 @@ CREATE TABLE `hr_benefit_enrollment` (
   CONSTRAINT `chk_hrbe_span` CHECK (`effective_to` is null or `effective_to` >= `effective_from`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='W13 HR-19 - الاشتراكات النظامية بحصتيها تصب في المسير بمرجعها';
 
+-- ── Table: hr_benefits ──
+CREATE TABLE `hr_benefits` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g150` varchar(190) DEFAULT NULL COMMENT 'معرف السطر',
+  `g151` varchar(190) DEFAULT NULL COMMENT 'رقم الموظف',
+  `g152` varchar(190) DEFAULT NULL COMMENT 'نوع الميزة',
+  `g153` varchar(190) DEFAULT NULL COMMENT 'الجهة/الوثيقة',
+  `g154` varchar(190) DEFAULT NULL COMMENT 'حصة الشركة',
+  `g155` varchar(190) DEFAULT NULL COMMENT 'حصة الموظف',
+  `g156` varchar(190) DEFAULT NULL COMMENT 'من تاريخ',
+  `g157` varchar(190) DEFAULT NULL COMMENT 'إلى تاريخ',
+  `g158` varchar(190) DEFAULT NULL COMMENT 'مرجع المسير',
+  `g159` varchar(190) DEFAULT NULL COMMENT 'حالة السطر',
+  `g160` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g161` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g162` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g163` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_80215210_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='HR-19 - المزايا والتأمينات';
+
+-- ── Table: hr_dashboard_kpi ──
+CREATE TABLE `hr_dashboard_kpi` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g227` varchar(190) DEFAULT NULL COMMENT 'معرف المؤشر',
+  `g228` varchar(190) DEFAULT NULL COMMENT 'المؤشر KPI Catalog',
+  `g229` varchar(190) DEFAULT NULL COMMENT 'القيمة',
+  `g230` varchar(190) DEFAULT NULL COMMENT 'الوحدة',
+  `g231` varchar(190) DEFAULT NULL COMMENT 'الحالة',
+  `g232` varchar(190) DEFAULT NULL COMMENT 'آخر تحديث',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_bd45548d_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='HR-01 - لا سطر مسجل بعد في لوحة الموارد البشرية';
+
 -- ── Table: hr_dictionaries ──
 CREATE TABLE `hr_dictionaries` (
   `code` varchar(40) NOT NULL,
@@ -11489,6 +11556,40 @@ CREATE TABLE `hr_dictionaries` (
   `active` tinyint(1) NOT NULL DEFAULT 1,
   PRIMARY KEY (`code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SEC-01 §12: تُضاف قيمها بصف لا بكود';
+
+-- ── Table: hr_disciplinary ──
+CREATE TABLE `hr_disciplinary` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g1` varchar(190) DEFAULT NULL COMMENT 'رقم القضية',
+  `g2` varchar(190) DEFAULT NULL COMMENT 'رقم الموظف',
+  `g3` varchar(190) DEFAULT NULL COMMENT 'مصدر الواقعة',
+  `g4` varchar(190) DEFAULT NULL COMMENT 'مرجع الإحالة',
+  `g5` varchar(190) DEFAULT NULL COMMENT 'وصف الواقعة',
+  `g6` varchar(190) DEFAULT NULL COMMENT 'تاريخ الواقعة',
+  `g7` varchar(190) DEFAULT NULL COMMENT 'المحقق المكلف',
+  `g8` varchar(190) DEFAULT NULL COMMENT 'محضر التحقيق',
+  `g9` varchar(190) DEFAULT NULL COMMENT 'أقوال الموظف',
+  `g10` varchar(190) DEFAULT NULL COMMENT 'لجنة القرار',
+  `g11` varchar(190) DEFAULT NULL COMMENT 'القرار',
+  `g12` varchar(190) DEFAULT NULL COMMENT 'المرجع اللائحي',
+  `g13` varchar(190) DEFAULT NULL COMMENT 'قيمة الجزاء المالي',
+  `g14` varchar(190) DEFAULT NULL COMMENT 'Deduction_Reference الناتج',
+  `g15` varchar(190) DEFAULT NULL COMMENT 'اعتراض الموظف',
+  `g16` varchar(190) DEFAULT NULL COMMENT 'حالة القضية',
+  `g17` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g18` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g19` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `g20` varchar(190) DEFAULT NULL COMMENT 'المعتمد',
+  `g21` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `g22` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g23` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_38521080_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='HR-17 - القضايا التأديبية والتحقيق';
 
 -- ── Table: hr_disciplinary_case ──
 CREATE TABLE `hr_disciplinary_case` (
@@ -11544,6 +11645,38 @@ CREATE TABLE `hr_disciplinary_stage` (
   CONSTRAINT `chk_hrds_note` CHECK (`note` <> '')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='W13 HR-17 - مراحل القضية واقعة ثم تحقيق ثم قرار ولا قفز مرحلة';
 
+-- ── Table: hr_employee_contracts ──
+CREATE TABLE `hr_employee_contracts` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g259` varchar(190) DEFAULT NULL COMMENT 'معرف العقد',
+  `g260` varchar(190) DEFAULT NULL COMMENT 'رقم الموظف',
+  `g261` varchar(190) DEFAULT NULL COMMENT 'فئة العقد',
+  `g262` varchar(190) DEFAULT NULL COMMENT 'نوع العقد',
+  `g263` varchar(190) DEFAULT NULL COMMENT 'نموذج الأجر',
+  `g264` varchar(190) DEFAULT NULL COMMENT 'الأجر الأساسي',
+  `g265` varchar(190) DEFAULT NULL COMMENT 'البدلات',
+  `g266` varchar(190) DEFAULT NULL COMMENT 'العملة',
+  `g267` varchar(190) DEFAULT NULL COMMENT 'من تاريخ',
+  `g268` varchar(190) DEFAULT NULL COMMENT 'إلى تاريخ',
+  `g269` varchar(190) DEFAULT NULL COMMENT 'فترة التجربة',
+  `g270` varchar(190) DEFAULT NULL COMMENT 'مرجع المشروع',
+  `g271` varchar(190) DEFAULT NULL COMMENT 'مرفق العقد الموقع',
+  `g272` varchar(190) DEFAULT NULL COMMENT 'حالة العقد',
+  `g273` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g274` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g275` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `g276` varchar(190) DEFAULT NULL COMMENT 'المعتمد',
+  `g277` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `g278` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g279` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_7ee17aff_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='HR-10 - لا سطر مسجل بعد في عقود الموظفين';
+
 -- ── Table: hr_employee_document ──
 CREATE TABLE `hr_employee_document` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -11568,6 +11701,66 @@ CREATE TABLE `hr_employee_document` (
   CONSTRAINT `chk_hred_state` CHECK (`state` in ('valid','expiring','expired','replaced')),
   CONSTRAINT `chk_hred_mand` CHECK (`is_mandatory` = 0 or `expires_at` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='W13 HR-08 - كل مستند بصلاحيته والالزامي المنتهي يعلم الملف';
+
+-- ── Table: hr_employee_documents ──
+CREATE TABLE `hr_employee_documents` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g245` varchar(190) DEFAULT NULL COMMENT 'معرف المستند',
+  `g246` varchar(190) DEFAULT NULL COMMENT 'رقم الموظف',
+  `g247` varchar(190) DEFAULT NULL COMMENT 'نوع المستند',
+  `g248` varchar(190) DEFAULT NULL COMMENT 'رقم المستند',
+  `g249` varchar(190) DEFAULT NULL COMMENT 'جهة الإصدار',
+  `g250` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإصدار',
+  `g251` varchar(190) DEFAULT NULL COMMENT 'تاريخ الانتهاء',
+  `g252` varchar(190) DEFAULT NULL COMMENT 'إلزامي؟',
+  `g253` varchar(190) DEFAULT NULL COMMENT 'المرفق',
+  `g254` varchar(190) DEFAULT NULL COMMENT 'حالة المستند',
+  `g255` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g256` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g257` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g258` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_4444250e_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='HR-08 - لا سطر مسجل بعد في مستندات الموظف';
+
+-- ── Table: hr_employees ──
+CREATE TABLE `hr_employees` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g164` varchar(190) DEFAULT NULL COMMENT 'رقم الموظف',
+  `g165` varchar(190) DEFAULT NULL COMMENT 'الاسم الرباعي',
+  `g166` varchar(190) DEFAULT NULL COMMENT 'الرقم الوطني',
+  `g167` varchar(190) DEFAULT NULL COMMENT 'تاريخ الميلاد',
+  `g168` varchar(190) DEFAULT NULL COMMENT 'النوع',
+  `g169` varchar(190) DEFAULT NULL COMMENT 'الحالة الاجتماعية',
+  `g170` varchar(190) DEFAULT NULL COMMENT 'المؤهل',
+  `g171` varchar(190) DEFAULT NULL COMMENT 'المسمى الوظيفي',
+  `g172` varchar(190) DEFAULT NULL COMMENT 'الإدارة',
+  `g173` varchar(190) DEFAULT NULL COMMENT 'الموقع',
+  `g174` varchar(190) DEFAULT NULL COMMENT 'تاريخ المباشرة',
+  `g175` varchar(190) DEFAULT NULL COMMENT 'مشغل تشغيلي؟',
+  `g176` varchar(190) DEFAULT NULL COMMENT 'كود المشغل بالقوى',
+  `g177` varchar(190) DEFAULT NULL COMMENT 'بيانات التواصل',
+  `g178` varchar(190) DEFAULT NULL COMMENT 'شخص الطوارئ',
+  `g179` varchar(190) DEFAULT NULL COMMENT 'الحساب البنكي',
+  `g180` varchar(190) DEFAULT NULL COMMENT 'حالة الخدمة',
+  `g181` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g182` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g183` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `g184` varchar(190) DEFAULT NULL COMMENT 'المعتمد',
+  `g185` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `g186` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g187` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_9236848a_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='HR-07 - سجل الموظفين';
 
 -- ── Table: hr_headcount_plan ──
 CREATE TABLE `hr_headcount_plan` (
@@ -11620,6 +11813,56 @@ CREATE TABLE `hr_job_movement` (
   CONSTRAINT `chk_hrjm_to` CHECK (`to_position_id` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='W13 HR-12 - النقل والترقية والانتداب حركات موثقة بموجبها واعتمادها';
 
+-- ── Table: hr_job_movements ──
+CREATE TABLE `hr_job_movements` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g56` varchar(190) DEFAULT NULL COMMENT 'رقم الحركة',
+  `g57` varchar(190) DEFAULT NULL COMMENT 'رقم الموظف',
+  `g58` varchar(190) DEFAULT NULL COMMENT 'نوع الحركة',
+  `g59` varchar(190) DEFAULT NULL COMMENT 'من منصب/وحدة',
+  `g60` varchar(190) DEFAULT NULL COMMENT 'إلى منصب/وحدة',
+  `g61` varchar(190) DEFAULT NULL COMMENT 'الموجب/المرجع',
+  `g62` varchar(190) DEFAULT NULL COMMENT 'أثر الأجر',
+  `g63` varchar(190) DEFAULT NULL COMMENT 'تاريخ النفاذ',
+  `g64` varchar(190) DEFAULT NULL COMMENT 'حالة الحركة',
+  `g65` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g66` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g67` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `g68` varchar(190) DEFAULT NULL COMMENT 'المعتمد',
+  `g69` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `g70` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g71` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_b9dd3a29_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='HR-12 - الحركات الوظيفية';
+
+-- ── Table: hr_onboarding ──
+CREATE TABLE `hr_onboarding` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g215` varchar(190) DEFAULT NULL COMMENT 'معرف التهيئة',
+  `g216` varchar(190) DEFAULT NULL COMMENT 'رقم الموظف',
+  `g217` varchar(190) DEFAULT NULL COMMENT 'بند التهيئة',
+  `g218` varchar(190) DEFAULT NULL COMMENT 'المسؤول',
+  `g219` varchar(190) DEFAULT NULL COMMENT 'مرجع الإنجاز',
+  `g220` varchar(190) DEFAULT NULL COMMENT 'النتيجة',
+  `g221` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنجاز',
+  `g222` varchar(190) DEFAULT NULL COMMENT 'حالة البند',
+  `g223` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g224` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g225` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g226` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_7601168f_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='HR-09 - لا سطر مسجل بعد في التهيئة والمباشرة';
+
 -- ── Table: hr_onboarding_item ──
 CREATE TABLE `hr_onboarding_item` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -11641,6 +11884,87 @@ CREATE TABLE `hr_onboarding_item` (
   CONSTRAINT `chk_hron_waiver` CHECK (`state` <> 'waived' or `waiver_doc_ref` <> ''),
   CONSTRAINT `chk_hron_done` CHECK (`state` <> 'done' or `done_by` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='W13 HR-09 - لا مباشرة كاملة قبل اكتمال البنود او توثيق استثنائها';
+
+-- ── Table: hr_payroll_lines ──
+CREATE TABLE `hr_payroll_lines` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g72` varchar(190) DEFAULT NULL COMMENT 'معرف السطر',
+  `g73` varchar(190) DEFAULT NULL COMMENT 'معرف المسير',
+  `g74` varchar(190) DEFAULT NULL COMMENT 'رقم الموظف',
+  `g75` varchar(190) DEFAULT NULL COMMENT 'الأساسي',
+  `g76` varchar(190) DEFAULT NULL COMMENT 'البدلات',
+  `g77` varchar(190) DEFAULT NULL COMMENT 'حافز الإنتاج من أساس القوى',
+  `g78` varchar(190) DEFAULT NULL COMMENT 'الخصومات بمرجع ب08',
+  `g79` varchar(190) DEFAULT NULL COMMENT 'التأمينات بمرجع ب08-2',
+  `g80` varchar(190) DEFAULT NULL COMMENT 'أقساط السلف بمرجع ب08-3',
+  `g81` varchar(190) DEFAULT NULL COMMENT 'الصافي',
+  `g82` varchar(190) DEFAULT NULL COMMENT 'حالة السطر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_2353b9de_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='HR-22 - أسطر مسيّر الرواتب';
+
+-- ── Table: hr_payroll_runs ──
+CREATE TABLE `hr_payroll_runs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g83` varchar(190) DEFAULT NULL COMMENT 'معرف المسير',
+  `g84` varchar(190) DEFAULT NULL COMMENT 'الشهر',
+  `g85` varchar(190) DEFAULT NULL COMMENT 'نطاق المسير',
+  `g86` varchar(190) DEFAULT NULL COMMENT 'عدد الموظفين',
+  `g87` varchar(190) DEFAULT NULL COMMENT 'إجمالي الأساسي',
+  `g88` varchar(190) DEFAULT NULL COMMENT 'إجمالي البدلات',
+  `g89` varchar(190) DEFAULT NULL COMMENT 'حوافز الإنتاج',
+  `g90` varchar(190) DEFAULT NULL COMMENT 'أساس القوى للمشغلين',
+  `g91` varchar(190) DEFAULT NULL COMMENT 'إجمالي الخصومات',
+  `g92` varchar(190) DEFAULT NULL COMMENT 'صافي المسير',
+  `g93` varchar(190) DEFAULT NULL COMMENT 'العملة',
+  `g94` varchar(190) DEFAULT NULL COMMENT 'الإحالة للمالية',
+  `g95` varchar(190) DEFAULT NULL COMMENT 'الإحالة للخزينة',
+  `g96` varchar(190) DEFAULT NULL COMMENT 'حالة المسير',
+  `g97` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g98` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g99` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `g100` varchar(190) DEFAULT NULL COMMENT 'المعتمد',
+  `g101` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `g102` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g103` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_2c826fdb_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='HR-21 - مسيّر الرواتب';
+
+-- ── Table: hr_performance ──
+CREATE TABLE `hr_performance` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g104` varchar(190) DEFAULT NULL COMMENT 'معرف التقييم',
+  `g105` varchar(190) DEFAULT NULL COMMENT 'رقم الموظف',
+  `g106` varchar(190) DEFAULT NULL COMMENT 'دورة التقييم',
+  `g107` varchar(190) DEFAULT NULL COMMENT 'المقيم',
+  `g108` varchar(190) DEFAULT NULL COMMENT 'مدخل أداء القوى و13',
+  `g109` varchar(190) DEFAULT NULL COMMENT 'الدرجة',
+  `g110` varchar(190) DEFAULT NULL COMMENT 'نقاط القوة',
+  `g111` varchar(190) DEFAULT NULL COMMENT 'فرص التحسين',
+  `g112` varchar(190) DEFAULT NULL COMMENT 'خطة التطوير',
+  `g113` varchar(190) DEFAULT NULL COMMENT 'اعتماد المدير',
+  `g114` varchar(190) DEFAULT NULL COMMENT 'إقرار الموظف',
+  `g115` varchar(190) DEFAULT NULL COMMENT 'حالة التقييم',
+  `g116` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g117` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g118` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g119` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_ca3a8b9e_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='HR-16 - تقييم الأداء الوظيفي';
 
 -- ── Table: hr_performance_review ──
 CREATE TABLE `hr_performance_review` (
@@ -11666,6 +11990,137 @@ CREATE TABLE `hr_performance_review` (
   CONSTRAINT `chk_hrpr_final` CHECK (`state` <> 'finalized' or `score` is not null and `final_at` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='W13 HR-16 - التقييم الوظيفي للاداريين دوري بمعاييره والتشغيلي مشتق عند القوى';
 
+-- ── Table: hr_project_contracts ──
+CREATE TABLE `hr_project_contracts` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g120` varchar(190) DEFAULT NULL COMMENT 'معرف السطر',
+  `g121` varchar(190) DEFAULT NULL COMMENT 'معرف العقد',
+  `g122` varchar(190) DEFAULT NULL COMMENT 'رقم الموظف',
+  `g123` varchar(190) DEFAULT NULL COMMENT 'Project_ID المشروع الرابط الأساسي',
+  `g124` varchar(190) DEFAULT NULL COMMENT 'احتياج التوظيف المرجعي',
+  `g125` varchar(190) DEFAULT NULL COMMENT 'عقد المورد محفزا لا رابطا',
+  `g126` varchar(190) DEFAULT NULL COMMENT 'محفز الانتهاء المتفق',
+  `g127` varchar(190) DEFAULT NULL COMMENT 'محفز الانتهاء الواقع',
+  `g128` varchar(190) DEFAULT NULL COMMENT 'تاريخ الوقوع',
+  `g129` varchar(190) DEFAULT NULL COMMENT 'فترة الإخطار',
+  `g130` varchar(190) DEFAULT NULL COMMENT 'مرجع التصفية',
+  `g131` varchar(190) DEFAULT NULL COMMENT 'حالة التصفية',
+  `g132` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g133` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g134` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g135` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_367fc7e8_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='HR-11 - عقود المشاريع المؤقتة';
+
+-- ── Table: hr_rec_applications ──
+CREATE TABLE `hr_rec_applications` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g202` varchar(190) DEFAULT NULL COMMENT 'معرف الترشح',
+  `g203` varchar(190) DEFAULT NULL COMMENT 'رقم الشاغر',
+  `g204` varchar(190) DEFAULT NULL COMMENT 'المرشح',
+  `g205` varchar(190) DEFAULT NULL COMMENT 'مصدر الترشح',
+  `g206` varchar(190) DEFAULT NULL COMMENT 'المؤهل',
+  `g207` varchar(190) DEFAULT NULL COMMENT 'الخبرة',
+  `g208` varchar(190) DEFAULT NULL COMMENT 'نتيجة الفرز الأولي',
+  `g209` varchar(190) DEFAULT NULL COMMENT 'المرحلة الحالية',
+  `g210` varchar(190) DEFAULT NULL COMMENT 'حالة الترشح',
+  `g211` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g212` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g213` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g214` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_8dd52919_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='HR-05 - طلبات الترشح';
+
+-- ── Table: hr_rec_stages ──
+CREATE TABLE `hr_rec_stages` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g233` varchar(190) DEFAULT NULL COMMENT 'معرف السطر',
+  `g234` varchar(190) DEFAULT NULL COMMENT 'معرف الترشح',
+  `g235` varchar(190) DEFAULT NULL COMMENT 'المرحلة',
+  `g236` varchar(190) DEFAULT NULL COMMENT 'المقيم',
+  `g237` varchar(190) DEFAULT NULL COMMENT 'التاريخ',
+  `g238` varchar(190) DEFAULT NULL COMMENT 'النتيجة',
+  `g239` varchar(190) DEFAULT NULL COMMENT 'ملاحظة التقييم',
+  `g240` varchar(190) DEFAULT NULL COMMENT 'حالة السطر',
+  `g241` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g242` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g243` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g244` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_033f5771_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='HR-06 - مراحل التوظيف';
+
+-- ── Table: hr_recruitment_pipeline ──
+CREATE TABLE `hr_recruitment_pipeline` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g24` varchar(190) DEFAULT NULL COMMENT 'رقم الشاغر',
+  `g25` varchar(190) DEFAULT NULL COMMENT 'تاريخ الفتح',
+  `g26` varchar(190) DEFAULT NULL COMMENT 'الإدارة الطالبة',
+  `g27` varchar(190) DEFAULT NULL COMMENT 'المسمى الوظيفي',
+  `g28` varchar(190) DEFAULT NULL COMMENT 'سبب الشاغر',
+  `g29` varchar(190) DEFAULT NULL COMMENT 'عدد المطلوبين',
+  `g30` varchar(190) DEFAULT NULL COMMENT 'اشتراطات الشاغر',
+  `g31` varchar(190) DEFAULT NULL COMMENT 'المرحلة',
+  `g32` varchar(190) DEFAULT NULL COMMENT 'المرشحون',
+  `g33` varchar(190) DEFAULT NULL COMMENT 'المرشح المقبول',
+  `g34` varchar(190) DEFAULT NULL COMMENT 'نتيجة الاختبار العملي',
+  `g35` varchar(190) DEFAULT NULL COMMENT 'العرض المقدم',
+  `g36` varchar(190) DEFAULT NULL COMMENT 'تاريخ المباشرة',
+  `g37` varchar(190) DEFAULT NULL COMMENT 'حالة الشاغر',
+  `g38` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g39` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g40` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `g41` varchar(190) DEFAULT NULL COMMENT 'المعتمد',
+  `g42` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `g43` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g44` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_447c70c2_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='HR-04 - التوظيف من الشاغر إلى المباشرة';
+
+-- ── Table: hr_training ──
+CREATE TABLE `hr_training` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g136` varchar(190) DEFAULT NULL COMMENT 'معرف السجل',
+  `g137` varchar(190) DEFAULT NULL COMMENT 'رقم الموظف',
+  `g138` varchar(190) DEFAULT NULL COMMENT 'البرنامج',
+  `g139` varchar(190) DEFAULT NULL COMMENT 'نوع التدريب',
+  `g140` varchar(190) DEFAULT NULL COMMENT 'الجهة',
+  `g141` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإتمام',
+  `g142` varchar(190) DEFAULT NULL COMMENT 'النتيجة',
+  `g143` varchar(190) DEFAULT NULL COMMENT 'صلاحية الشهادة',
+  `g144` varchar(190) DEFAULT NULL COMMENT 'إلزامي؟',
+  `g145` varchar(190) DEFAULT NULL COMMENT 'حالة السجل',
+  `g146` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g147` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g148` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g149` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_141ac8a1_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='HR-15 - التدريب والكفاءة';
+
 -- ── Table: hr_training_record ──
 CREATE TABLE `hr_training_record` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -11690,6 +12145,58 @@ CREATE TABLE `hr_training_record` (
   CONSTRAINT `chk_hrtr_cert` CHECK (`state` <> 'completed' or `certificate_ref` <> ''),
   CONSTRAINT `chk_hrtr_mand` CHECK (`mandatory` = 0 or `state` <> 'completed' or `valid_until` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='W13 HR-15 - التدريب الالزامي يتابع بانتهاء صلاحيته';
+
+-- ── Table: hr_worker_leave_absence ──
+CREATE TABLE `hr_worker_leave_absence` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g280` varchar(190) DEFAULT NULL COMMENT 'رقم الطلب',
+  `g281` varchar(190) DEFAULT NULL COMMENT 'رقم الموظف',
+  `g282` varchar(190) DEFAULT NULL COMMENT 'نوع الإجازة',
+  `g283` varchar(190) DEFAULT NULL COMMENT 'من تاريخ',
+  `g284` varchar(190) DEFAULT NULL COMMENT 'إلى تاريخ',
+  `g285` varchar(190) DEFAULT NULL COMMENT 'عدد الأيام',
+  `g286` varchar(190) DEFAULT NULL COMMENT 'الرصيد قبل',
+  `g287` varchar(190) DEFAULT NULL COMMENT 'الرصيد بعد',
+  `g288` varchar(190) DEFAULT NULL COMMENT 'البديل المكلف',
+  `g289` varchar(190) DEFAULT NULL COMMENT 'مرفق مساند',
+  `g290` varchar(190) DEFAULT NULL COMMENT 'مرجع دورة التناوب',
+  `g291` varchar(190) DEFAULT NULL COMMENT 'حالة الطلب',
+  `g292` varchar(190) DEFAULT NULL COMMENT 'المنشئ',
+  `g293` varchar(190) DEFAULT NULL COMMENT 'تاريخ الإنشاء',
+  `g294` varchar(190) DEFAULT NULL COMMENT 'المراجع',
+  `g295` varchar(190) DEFAULT NULL COMMENT 'المعتمد',
+  `g296` varchar(190) DEFAULT NULL COMMENT 'تاريخ الاعتماد',
+  `g297` varchar(190) DEFAULT NULL COMMENT 'حالة البيانات',
+  `g298` varchar(190) DEFAULT NULL COMMENT 'مرجع المصدر',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_3a6233a4_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='HR-14 - الإجازات والغياب';
+
+-- ── Table: hr_workforce_report ──
+CREATE TABLE `hr_workforce_report` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0 COMMENT 'بوابة المستأجر',
+  `g45` varchar(190) DEFAULT NULL COMMENT 'معرف السطر',
+  `g46` varchar(190) DEFAULT NULL COMMENT 'الفترة',
+  `g47` varchar(190) DEFAULT NULL COMMENT 'الإدارة',
+  `g48` varchar(190) DEFAULT NULL COMMENT 'عدد الموظفين',
+  `g49` varchar(190) DEFAULT NULL COMMENT 'منهم مشروعيون',
+  `g50` varchar(190) DEFAULT NULL COMMENT 'مباشرون جدد',
+  `g51` varchar(190) DEFAULT NULL COMMENT 'منتهية خدمتهم',
+  `g52` varchar(190) DEFAULT NULL COMMENT 'معدل الدوران',
+  `g53` varchar(190) DEFAULT NULL COMMENT 'نسبة الغياب',
+  `g54` varchar(190) DEFAULT NULL COMMENT 'ساعات إضافية',
+  `g55` varchar(190) DEFAULT NULL COMMENT 'كلفة العمالة',
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_1a32fad1_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='HR-24 - تقرير القوى العاملة';
 
 -- ── Table: iaf_access_log ──
 CREATE TABLE `iaf_access_log` (
