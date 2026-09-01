@@ -300,17 +300,22 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <th>تاريخ الفتح</th><th>رقم التذكرة</th><th>النوع</th><th>الطبيعة</th><th>المرحلة</th><th>الإدارة المالكة</th>
                     <th>المبلغ</th><th>المعدة</th><th>المشروع</th><th>الوصف</th><th>تاريخ البلاغ</th><th>موعد الإنجاز</th><th>متأخر</th>
                     <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
-                    <th class="ems-fn-th" data-fn="1">رقم البلاغ</th>
-                    <th class="ems-fn-th" data-fn="1">الفئة</th>
-                    <th class="ems-fn-th" data-fn="1">الأولوية</th>
-                    <th class="ems-fn-th" data-fn="1">الموقع</th>
+                    <!-- XF-01: وسع الاستعلام بثلاث وصلات معلنة في enrich (الفئة والمكلف
+                         والموقع) واضيفت priority وconfidentiality وescalation_level.
+                         و«الادارة المختصة» و«المسارات المتوازية» و«المتبقي» تبقى معلنة:
+                         الاولى دور لا عمود اسم، والثانية مسارات في جدول اخر، والثالثة
+                         محسوبة من المهلة لا مخزنة. -->
+                    <th class="ems-fn-th" data-fn="1" data-fn-src="ticket_no">رقم البلاغ</th>
+                    <th class="ems-fn-th" data-fn="1" data-fn-src="category">الفئة</th>
+                    <th class="ems-fn-th" data-fn="1" data-fn-src="priority">الأولوية</th>
+                    <th class="ems-fn-th" data-fn="1" data-fn-src="site">الموقع</th>
                     <th class="ems-fn-th" data-fn="1">الإدارة المختصة</th>
-                    <th class="ems-fn-th" data-fn="1">المكلف</th>
-                    <th class="ems-fn-th" data-fn="1">مستوى السرية</th>
+                    <th class="ems-fn-th" data-fn="1" data-fn-src="assignee">المكلف</th>
+                    <th class="ems-fn-th" data-fn="1" data-fn-src="confidentiality">مستوى السرية</th>
                     <th class="ems-fn-th" data-fn="1">المسارات المتوازية</th>
-                    <th class="ems-fn-th" data-fn="1">المهلة</th>
+                    <th class="ems-fn-th" data-fn="1" data-fn-src="due_at">المهلة</th>
                     <th class="ems-fn-th none" data-fn="1">المتبقي</th>
-                    <th class="ems-fn-th none" data-fn="1">التصعيد الحالي</th>
+                    <th class="ems-fn-th none" data-fn="1" data-fn-src="escalation">التصعيد الحالي</th>
                     <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                     <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
                     <th class="ems-gov-th none" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
@@ -320,22 +325,37 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 // scopedQuery: scope على tickets + إثراءات LEFT حصرًا (مراجع مرنة قد تغيب)
                 $rows = tkt_gate($is_super_admin)->scopedQuery(
                     array('scope'  => array('t' => 'tickets'),
-                          'enrich' => array('tt' => 'ticket_types', 'e' => 'equipments', 'p' => 'project')),
+                          'enrich' => array('tt' => 'ticket_types', 'e' => 'equipments', 'p' => 'project',
+                                            'tc' => 'ticket_categories', 'au' => 'users', 'st' => 'sites')),
                     "SELECT t.id, t.ticket_no, t.stage, t.ticket_nature, t.owner_role_id,
                             t.reporting_person, t.complaint, t.call_date, t.call_time,
                             t.resolution_due_at,
-                            tt.name AS type_name, e.code AS equipment_code, p.name AS project_name
+                            t.priority, t.confidentiality, t.escalation_level,
+                            tt.name AS type_name, e.code AS equipment_code, p.name AS project_name,
+                            tc.name AS category_name, au.name AS assignee_name, st.name AS site_name
                      FROM tickets t
                      LEFT JOIN ticket_types tt ON tt.id = t.ticket_type_id
                      LEFT JOIN equipments e ON e.id = t.equipment_id
                      LEFT JOIN project p ON p.id = t.project_id
+                     LEFT JOIN ticket_categories tc ON tc.id = t.category_id
+                     LEFT JOIN users au ON au.id = t.assigned_user_id
+                     LEFT JOIN sites st ON st.id = t.site_id
                      WHERE {TENANT_SCOPE}" . $tab_scope($tab) . $tab_sql . "
                      ORDER BY t.id DESC"
                 );
                 foreach ($rows as $row) {
                     $complaint_full  = (string)$row['complaint'];
                     $complaint_short = mb_strlen($complaint_full) > 60 ? (mb_substr($complaint_full, 0, 60) . '…') : $complaint_full;
-                    echo "<tr>";
+                    echo "<tr data-xf=\"" . htmlspecialchars(json_encode(array(
+                        'ticket_no'       => (string) ($row['ticket_no'] ?? ''),
+                        'category'        => (string) ($row['category_name'] ?? ''),
+                        'priority'        => (string) ($row['priority'] ?? ''),
+                        'site'            => (string) ($row['site_name'] ?? ''),
+                        'assignee'        => (string) ($row['assignee_name'] ?? ''),
+                        'confidentiality' => (string) ($row['confidentiality'] ?? ''),
+                        'due_at'          => (string) ($row['resolution_due_at'] ?? ''),
+                        'escalation'      => (string) ($row['escalation_level'] ?? ''),
+                    ), JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8') . "\">";
                     echo "<td><div class='action-btns'><a href='ticket_form.php?id=" . intval($row['id']) . "' class='action-btn edit' title='فتح التذكرة'><i class='fas fa-up-right-from-square'></i></a></div></td>";
                     echo "<td><strong>" . htmlspecialchars((string)$row['ticket_no']) . "</strong></td>";
                     echo "<td>" . htmlspecialchars((string)($row['type_name'] ?? '—')) . "</td>";

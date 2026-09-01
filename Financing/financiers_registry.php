@@ -95,7 +95,11 @@ include '../insidebar.php';
         <div class="table-container"><table class="alltables display fin-fr-table" data-no-dt="1">
         <thead><tr><th>كود الممول</th><th>عدد العمليات</th><th>عدد الأعيان</th><th>مدة العلاقة</th><th>الاستحقاق القائم<?php echo $canTerms ? '' : ' (خلف صلاحية الشروط)'; ?></th><th>الحالة</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
-              <th class="ems-fn-th" data-fn="1">الاسم القانوني</th>
+              <!-- XF-01: وصل ما هو معروض اصلا في الصف (الاسم والنشاط الاول والاخير).
+                   ولم يوصل «السجل التجاري» ولا «العملات»: الاول معرف حساس وهذا السطح
+                   يقيد قراءته بـSensitiveFieldGuard، والثاني جمع والمتاح base_currency
+                   مفردة — فالتسمية تضيق على القيمة. وما بقي لا عمود له. -->
+              <th class="ems-fn-th" data-fn="1" data-fn-src="legal_name">الاسم القانوني</th>
               <th class="ems-fn-th" data-fn="1">نوع الممول</th>
               <th class="ems-fn-th" data-fn="1">بلد التسجيل</th>
               <th class="ems-fn-th" data-fn="1">السجل التجاري</th>
@@ -103,8 +107,8 @@ include '../insidebar.php';
               <th class="ems-fn-th" data-fn="1">العملات</th>
               <th class="ems-fn-th" data-fn="1">تصنيف العلاقة</th>
               <th class="ems-fn-th" data-fn="1">شريحة الأهمية</th>
-              <th class="ems-fn-th" data-fn="1">أول نشاط</th>
-              <th class="ems-fn-th" data-fn="1">آخر نشاط</th>
+              <th class="ems-fn-th" data-fn="1" data-fn-src="first_activity">أول نشاط</th>
+              <th class="ems-fn-th" data-fn="1" data-fn-src="last_activity">آخر نشاط</th>
               <th class="ems-fn-th" data-fn="1">درجة السرية</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
@@ -121,7 +125,11 @@ include '../insidebar.php';
               <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
               </tr></thead><tbody>
         <?php foreach ($rows as $f): ?>
-        <tr>
+        <tr data-xf="<?php echo htmlspecialchars(json_encode(array(
+            'legal_name'     => (string) $f['legal_name'],
+            'first_activity' => (string) ($f['first_op'] ?? ''),
+            'last_activity'  => (string) ($f['last_op'] ?? ''),
+        ), JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8'); ?>">
             <td><strong><?php echo htmlspecialchars($f['legal_name']); ?></strong><br><small>#<?php echo intval($f['entity_id']); ?></small></td>
             <td><?php echo intval($f['ops']); ?></td>
             <td><?php echo intval($f['assets']); ?></td>
