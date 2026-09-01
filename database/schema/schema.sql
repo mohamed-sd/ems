@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-01 11:13:25
+-- المصدر: equipation_manage · التوليد: 2026-09-01 11:29:50
 -- الجداول: 1044 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
@@ -14811,7 +14811,7 @@ CREATE TABLE `repair01_field_measure` (
   `snapshot_id` varchar(48) NOT NULL COMMENT 'اللقطة التي قيس عليها',
   `measured_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_screen` (`screen_id`),
+  UNIQUE KEY `uq_screen_req` (`screen_id`,`requirement_id`),
   KEY `ix_snap` (`snapshot_id`),
   KEY `ix_unit` (`unit`),
   CONSTRAINT `chk_fm_witness` CHECK (`witness` <> ''),
