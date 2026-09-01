@@ -67,6 +67,8 @@ try {
             'share'  => $sid0 > 0 && isset($shares[$sid0]) ? (number_format($shares[$sid0], 0) . ' وحدة حصص حاويات') : 'بلا حصة حاوية سارية',
             'valid'  => (string) $l0['valid_from'] . ' الى ' . ((string) $l0['valid_to'] !== '' && $l0['valid_to'] !== null ? (string) $l0['valid_to'] : 'مفتوح'),
             'state'  => (string) $l0['state'] === 'active' ? 'سارية' : (string) $l0['state'],
+            /* ◆ صفُّ الورقةِ الخام — يُقرأ منه الجدولُ الحاكمُ أدناه بلا تنسيق */
+            '__raw'  => $l0,
         );
     }
 } catch (\Throwable $t) { error_log('supplier_contract_units lines: ' . $t->getMessage()); }
@@ -105,6 +107,66 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <th>حصة الحاويات</th>
                     <th>السريان</th>
                     <th>حالة الوحدة</th>
+                    <?php
+                    /* ◆ **أعمدةُ الورقةِ حرفًا** (GOV_EXEC §12 · الهدف `SUP-12`
+                         «حصص الموردين والوحدات التعاقدية»): الاسمُ ⇒ العمودُ في
+                         مصفوفةٍ واحدةٍ يقرؤها الرأسُ والخليّةُ معًا. والأعمدةُ
+                         الأحدَ عشرَ أعلاه تبقى بصياغتِها المنسَّقةِ للقارئ. */
+                    $GUIDE_COLS = array(
+                        'كود الوحدة التعاقدية' => 'slot_code',
+                        'التسلسل الزمني للوحدة التعاقدية' => 'slot_sequence',
+                        'رقم العميل' => 'client_no',
+                        'نموذج العمل' => 'business_model',
+                        'رقم العقد' => 'contract_no',
+                        'رقم التجديد (دورة الالتزام)' => 'renewal_no',
+                        'مفتاح دورة الالتزام' => 'container_key',
+                        'رقم المورد' => 'supplier_no',
+                        'اسم المورد (بحث)' => 'supplier_name',
+                        'كود عقد المورد' => 'supplier_contract_code',
+                        'نوع الآلية/البند' => 'line_type',
+                        'وحدة القياس' => 'unit',
+                        'نوع الوحدة التعاقدية' => 'slot_type',
+                        'التصنيف (استمرارية)' => 'continuity_class',
+                        'عدد الوحدات التعاقدية للآلية' => 'slots_for_line',
+                        'الدور المستنتج' => 'inferred_role',
+                        'أساس الوحدة التعاقدية الشهري' => 'slot_monthly_basis',
+                        'أشهر عقد المورد بدورة الالتزام (كما ورد)' => 'supplier_months_in_cycle',
+                        'أشهر منقضية' => 'elapsed_months',
+                        'أشهر دورة الالتزام (إجمالي)' => 'cycle_months_total',
+                        'وحدات-شهر' => 'unit_months',
+                        'حصة المورد' => 'supplier_share',
+                        'المستهدف الشهري' => 'monthly_target',
+                        'المعدات الأساسية المطلوبة' => 'primary_units_required',
+                        'الأساسية المتاحة' => 'primary_available',
+                        'الاحتياطية' => 'standby_available',
+                        'فجوة الأساسية' => 'primary_gap',
+                        'أساسية نشطة (حي)' => 'primary_active',
+                        'علم عجز معدات' => 'equipment_deficit_flag',
+                        'نسبة تغطية المعدات' => 'equipment_coverage_pct',
+                        'الاعتماد على الاحتياطي' => 'standby_reliance',
+                        'المنفذ' => 'executed_qty',
+                        'نسبة التحقق' => 'achievement_pct',
+                        'سريان الحصة من' => 'share_valid_from',
+                        'إلى' => 'share_valid_to',
+                        'سعر وحدة المورد (م08)' => 'supplier_unit_price',
+                        'سعر بيع الوحدة (قراءة)' => 'sale_unit_price',
+                        'هامش الوحدة' => 'unit_margin_val',
+                        'علم هامش سالب' => 'negative_margin_flag',
+                        'حالة الوحدة التعاقدية' => 'slot_state',
+                        'الحجية' => 'evidence_level',
+                        'إجمالي التزام العميل (مصدر)' => 'client_total_obligation',
+                        'نسبة الحصة من الالتزام' => 'share_of_obligation_pct',
+                        'العجز / الفائض' => 'deficit_surplus',
+                        'ملاحظات' => 'notes',
+                        'كود العقد (قراءة)' => 'contract_code_read',
+                        'عملة البيع (قراءة)' => 'sale_currency_read',
+                        'ملاءمة عملة الهامش' => 'margin_currency_fit',
+                        'علم حصة جارية بلا نشاط' => 'idle_share_flag',
+                        'آخر نشاط بالوحدة التعاقدية' => 'last_slot_activity',
+                    );
+                    foreach ($GUIDE_COLS as $__lbl => $__k): ?>
+                    <th><?= htmlspecialchars($__lbl, ENT_QUOTES, 'UTF-8') ?></th>
+                    <?php endforeach; ?>
                 </tr>
             </thead>
             <tbody>
@@ -121,6 +183,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <td><?= htmlspecialchars($x0['share']) ?></td>
                     <td><?= htmlspecialchars($x0['valid']) ?></td>
                     <td><?= htmlspecialchars($x0['state']) ?></td>
+                    <?php foreach ($GUIDE_COLS as $__lbl => $__k):
+                        $__r = isset($x0['__raw']) ? $x0['__raw'] : array();
+                        $__v = isset($__r[$__k]) ? (string) $__r[$__k] : '';
+                        if (trim($__v) === '') { $__v = '—'; } ?>
+                    <td<?= $__v === '—' ? ' class="ems-gov-empty"' : '' ?>><?= htmlspecialchars($__v, ENT_QUOTES, 'UTF-8') ?></td>
+                    <?php endforeach; ?>
                 </tr>
             <?php endforeach; ?>
             <?php if (!$rows): ?>
