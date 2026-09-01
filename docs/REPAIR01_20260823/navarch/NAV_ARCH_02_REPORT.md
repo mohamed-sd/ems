@@ -7,13 +7,16 @@
 
 | | |
 |---|---|
-| `Baseline ID` | **`NAB-663225BF6C`** |
-| `Commit Hash` | `b13d236ef11473efb258b7e6456f4d348a721c51` |
-| `DB Snapshot` | `908348c6c30b0ec1…` · 706 هجرة |
+| `Baseline ID` | **`NAB-8CD4A8954F`** |
+| `Commit Hash` | `fatal: ambiguous argument 'HEAD': unknown revision or path not in the working tree.
+Use '--' to separate paths from revisions, like this:
+'git <command> [<revision>...] -- [<file>...]'
+HEAD` |
+| `DB Snapshot` | `32e94183d8c40e0a…` · 707 هجرة |
 | `Navigation Registry Version` | `02d39770b131a960…` |
 | `Role Permission Version` | `16306643069eb98e…` · 4111 منحة |
 | `Target Architecture Version` | `nav_placements@02d39770b131` |
-| `Timestamp` | `2026-09-02T03:29:08Z` |
+| `Timestamp` | `2026-09-01T06:03:39Z` |
 | المولِّد | `tools/navarch/baseline.php` — لقطةٌ واحدةٌ (§5) |
 
 ## ② سجلُّ المساحات

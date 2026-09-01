@@ -9,15 +9,18 @@
 
 | المعرِّف | القيمة |
 |---|---|
-| **`Baseline ID`** | **`NAB-663225BF6C`** |
-| `Commit Hash` | `b13d236ef11473efb258b7e6456f4d348a721c51` |
+| **`Baseline ID`** | **`NAB-8CD4A8954F`** |
+| `Commit Hash` | `fatal: ambiguous argument 'HEAD': unknown revision or path not in the working tree.
+Use '--' to separate paths from revisions, like this:
+'git <command> [<revision>...] -- [<file>...]'
+HEAD` |
 | شجرةُ العملِ نظيفة؟ | ◆ لا — فيها تغييرٌ غيرُ ملتزَم |
-| `DB Snapshot` (‏بصمةُ مجموعةِ الهجرات) | `908348c6c30b0ec1…` · 706 هجرةً مطبَّقة |
+| `DB Snapshot` (‏بصمةُ مجموعةِ الهجرات) | `32e94183d8c40e0a…` · 707 هجرةً مطبَّقة |
 | `Navigation Registry Version` | `02d39770b131a960…` · 553 صفًّا (‏مساحات + مجموعات + مواضع) |
 | `nav_items` النشطة (‏مصدرُ المُصيِّرِ القديم) | `e077bbc8f5ecda92…` · 2476 صفًّا |
 | `Role Permission Version` | `16306643069eb98e…` · 4111 منحةً |
 | `Target Architecture Version` | `nav_placements@02d39770b131` |
-| `Timestamp` (UTC) | `2026-09-02T03:29:08Z` |
+| `Timestamp` (UTC) | `2026-09-01T06:03:39Z` |
 
 ## المساحاتُ ولقطةُ سايدبارِ كلٍّ
 

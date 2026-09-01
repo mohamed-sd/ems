@@ -279,10 +279,15 @@ if (isset($M[$pilot])) {
     }
 }
 
-file_put_contents($OUT . '/WORKSPACE_NAV_CONFORMANCE.json',
-    json_encode(array('baseline_id' => $BLID, 'metrics' => $M),
-        JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-echo "\n  ⇒ {$OUT}/WORKSPACE_NAV_CONFORMANCE.json\n";
+/* ⛔ **و`--gate` قراءةٌ خالصة**: يعمل داخلَ خطّافِ الالتزام، وحاجزٌ يكتب في
+   ملفٍّ متتبَّعٍ **بعدَ تجهيزِه** يترك الشجرةَ متّسخةً عند أوّلِ رقمٍ يتحرَّك —
+   فيبدو الالتزامُ ناجحًا وقد خلَّف فرقًا غيرَ ملتزَم. */
+if (!$gate) {
+    file_put_contents($OUT . '/WORKSPACE_NAV_CONFORMANCE.json',
+        json_encode(array('baseline_id' => $BLID, 'metrics' => $M),
+            JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+    echo "\n  ⇒ {$OUT}/WORKSPACE_NAV_CONFORMANCE.json\n";
+}
 
 if ($gate && isset($M[$pilot])) {
     exit($M[$pilot]['EXACT_WORKSPACE_NAV_CONFORMANCE'] === 'PASS' ? 0 : 1);
