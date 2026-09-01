@@ -245,12 +245,25 @@ if (!$snap && $APPLY) { exit("⛔ **لا نافذةَ قياسٍ مفتوحة** 
 $sid = $snap ? $snap['snapshot_id'] : 'DRY';
 
 /* ═══ ⑤ الجسرُ المُعلَنُ: المتطلبُ ⇄ الشاشة ═══════════════════════════════ */
-$bridge = array();
-$r = $conn->query("SELECT tu.target_uid, tu.requirement_id, tu.screen_id, tu.unit, tu.name_ar
+/* ◆ **وحبّةُ القياسِ زوجٌ (سطحٌ · متطلب) لا صفُّ كون**: السطحُ الواحدُ يخدم
+     أكثرَ من هدفٍ بحقٍّ (§24: `Screens ≠ Placements`)، **لكنَّ الكونَ قد يحمل
+     صفَّين لِـ(سطحٍ · متطلبٍ) واحدٍ** — هدفًا باسمِه المعياريِّ وآخرَ باسمِه
+     الإرثيِّ، وكلاهما `MATCHED` على الشاشةِ نفسِها والمتطلبِ نفسِه (قِيس:
+     `SCR-0790 · CEO-16` بصفَّين). فقياسُ الزوجِ مرّتَين **يضاعف بسطَه ومقامَه
+     معًا** فيبدو المقامُ أكبرَ والنسبةُ كما هي — وهو كذبٌ على المقامِ يمنعه م 119.
+   ⇒ يُقاس الزوجُ **مرّةً واحدةً**، ويُختار له صفُّ الكونِ الأدنى معرِّفًا
+     (أقدمُ تسجيلٍ) — والفارقُ يُعلَن عددًا لا يُبتلع. */
+$bridge = array(); $bridgeDupPairs = 0;
+$r = $conn->query("SELECT MIN(tu.target_uid) target_uid, tu.requirement_id, tu.screen_id,
+                          MIN(tu.unit) unit, MIN(tu.name_ar) name_ar, COUNT(*) rows_in_universe
                      FROM repair01_target_universe tu
                     WHERE tu.verdict = 'MATCHED' AND tu.screen_id <> '' AND tu.requirement_id <> ''
+                    GROUP BY tu.screen_id, tu.requirement_id
                     ORDER BY tu.screen_id");
-while ($x = $r->fetch_assoc()) { $bridge[] = $x; }
+while ($x = $r->fetch_assoc()) {
+    if ((int) $x['rows_in_universe'] > 1) { $bridgeDupPairs++; }
+    $bridge[] = $x;
+}
 
 /* ═══ ⑤·ب دفترُ `gov_field_class` — الجانبُ المبنيُّ للأسطحِ المولَّدة ═══ */
 $GFC = array();
@@ -431,7 +444,9 @@ foreach ($argv as $a0) {
 /* ═══ ⑧ العرض ════════════════════════════════════════════════════════════ */
 $pc = $tot['appl'] ? round($tot['hit'] * 100 / $tot['appl'], 1) : 0;
 echo "\n═══ `RPR-02` §٧ الخطوة ٥ — حقولُ المبنيِّ مقيسةً من الأثر ═══\n";
-printf("  اللقطة: %s · أسطحٌ مطابَقةٌ في الجسرِ المُعلَن: **%d**\n\n", $sid, count($out));
+printf("  اللقطة: %s · أزواجُ (سطحٍ · متطلبٍ) في الجسرِ المُعلَن: **%d**\n", $sid, count($out));
+printf("  ◆ ومنها %d زوجًا يحمل الكونُ له أكثرَ من صفٍّ (اسمٌ معياريٌّ وآخرُ إرثيّ) — يُقاس مرّةً لا مرّتَين\n\n",
+       $bridgeDupPairs);
 echo "  ── الجسرُ ──\n";
 echo "     التصميميُّ `repair01_fields.requirement_id` · المبنيُّ `screen_id` · والجسرُ `repair01_target_universe` (`MATCHED`)\n";
 printf("     ⇒ **صفرُ سطحٍ مطابَقٍ بلا طرفَين** — والمقامُ %d سطحًا لا 44\n\n", count($out));
