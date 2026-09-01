@@ -1,0 +1,26 @@
+{
+    "measured_at": "2026-09-01T14:36:21+03:00",
+    "candidates": 73,
+    "stages": {
+        "NONE": 10,
+        "A": 0,
+        "B": 0,
+        "C": 63,
+        "D": 0,
+        "E": 0
+    },
+    "dependencies": {
+        "المفضّلات": "NO_REGISTER",
+        "الروابطُ الداخليّة": "MEASURED:2889 ملفًّا",
+        "المهامّ": "REGISTER:task_templates,my_tasks,task_assignments,recurring_tasks",
+        "الإشعارات": "REGISTER:personal_notifications,fin_notifications,tkt_notifications,trs_notifications",
+        "التقارير": "NO_REGISTER",
+        "التكاملات": "NO_REGISTER"
+    },
+    "no_register": [
+        "المفضّلات",
+        "التقارير",
+        "التكاملات"
+    ],
+    "files_scanned": 2889
+}

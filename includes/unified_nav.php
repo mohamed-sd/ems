@@ -1257,10 +1257,17 @@ function printEmsTenGroupNav($conn, $items, $uxMap, $uxCurMap, $basePrefix, $bad
         elseif (isset($rgMap[$base])) { $code = $rgMap[$base]; }
         else { list($code, ) = ems_nav_group_for_route($base, $lvl, $section); }
         if (!isset($tax[$code])) {
-            /* §23-① · **سقوطٌ ④** بحرفِه: «إذا لم نجد Group ⇒ ضعها DAILY».
-               والمُصيِّرُ الحاكمُ **يحجب الموضعَ بلا رأسِ طيٍّ ويعُدُّه** (§35). */
+            /* ══ **نُزع السقوطُ ④ — «إن لم نجد Group ⇒ ضعها DAILY»** (§23-①) ══
+               ◆ **ونُزع بعدَ أن قِيس ميّتًا لا قبلَه**: `DEFAULT_GROUP_DAILY`
+                 **صفرُ حدثٍ** على الإنتاجِ في الأدوارِ الأربعةِ الباقيةِ على
+                 المسارِ القديم (‏31·32·34·35) وصفرٌ في كلِّ دورٍ مقلوب —
+                 والقياسُ من العدَّادِ الإنتاجيِّ نفسِه لا من الظلّ.
+               ◆ **والبديلُ قاعدةُ المُصيِّرِ الحاكمِ حرفًا** (§23-① · §35):
+                 **الموضعُ بلا رأسِ طيٍّ يُحجَب ويُعَدّ** — ⛔ ولا مجموعةَ
+                 افتراضيّةٌ تبتلعه صامتًا. فالعدَّادُ يبقى ليُثبت أنَّ الحالةَ
+                 ما تزال لا تقع، **ولا يُحوَّل البندُ إلى `DAILY`**. */
             if (function_exists('ems_nav_fallback')) { ems_nav_fallback('DEFAULT_GROUP_DAILY'); }
-            $code = isset($tax['DAILY']) ? 'DAILY' : key($tax);
+            continue;
         }
 
         $rows[] = array('code' => $raw, 'name' => $name, 'icon' => $it['icon'],

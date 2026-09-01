@@ -486,20 +486,40 @@ foreach ($retire as $l) {
     $s[] = array($l['legacy_item_id'], $l['current_workspace'], $rt,
         $l['action'], $l['disposition'], $l['retire_stage'],
         $l['target_match'] ? $l['target_match'] : '—',
-        $hits, '— لا سجلَّ مفضّلاتٍ في هذه الشجرة', $tHit, $nHit,
-        $hits, '— لا سجلَّ تكاملاتٍ في هذه الشجرة',
+        '— لا سجلَّ مفضّلاتٍ في هذه الشجرة', $tHit, $nHit,
+        '— لا سجلَّ تقاريرَ بعمودِ وجهةٍ', '— لا سجلَّ تكاملاتٍ في هذه الشجرة',
         (empty($blockers)
-            ? '⛔ لا — خلا المقيسُ الأربعةُ، ويبقى **المفضّلاتُ والتكاملاتُ غيرَ مقيسَين** (§32)'
+            ? '⛔ لا — خلا المقيسُ، ويبقى **المفضّلاتُ والتقاريرُ والتكاملاتُ غيرَ مقيسةٍ** (§32)'
             : '⛔ لا — ' . implode(' · ', $blockers)),
         $l['evidence']);
 }
 $sheets['11 RETIREMENT_LEDGER'] = $s;
+/* ⛔ **والمرحلةُ تُقرأ من العمودِ المكتوبِ لا من جملةٍ محفوظةٍ في التقرير**
+   [[report-self-contradiction-sweep]]: كان السطرُ يقول «كلُّها في المرحلةِ A»
+   وهو صحيحٌ يومَ كُتب، **وقد صار كاذبًا بعدَ القلب** — و`tools/navarch/retire.php`
+   يكتب `retire_stage` بدليلِه. فالعددُ يُحصى من الصفوفِ الآن. */
+$stageTally = array();
+foreach ($retire as $l) {
+    $k = ($l['retire_stage'] === null || $l['retire_stage'] === '') ? 'NONE' : $l['retire_stage'];
+    $stageTally[$k] = (isset($stageTally[$k]) ? $stageTally[$k] : 0) + 1;
+}
+ksort($stageTally);
+$stageTxt = array();
+foreach ($stageTally as $k => $v) { $stageTxt[] = $k . '=' . $v; }
+/* والتبعيّاتُ تُسمّى بما فُتِّش فعلًا — ⛔ ولا تُعَدُّ «مقيسةً» بلا جدولٍ يُمسَح */
+$depMeasured = array('روابطُ الشجرة');
+if (!empty($depTablesOk)) {
+    if ($depScanned['إشعارات'] > 0 || in_array('personal_notifications', $depTablesOk, true)) { $depMeasured[] = 'الإشعارات'; }
+    if ($depScanned['مهامّ'] > 0 || in_array('task_templates', $depTablesOk, true))          { $depMeasured[] = 'المهامّ'; }
+}
+$depUnmeasured = array('المفضّلات', 'التقارير', 'التكاملات');
 $idx[] = array('11', 'NAV_RETIREMENT_LEDGER',
-    count($retire) . ' بندًا للتقاعدِ/التحويل — **وكلُّها في المرحلةِ A أو NONE** · '
-        . 'خلا المقيسُ في ' . $freeToStop . ' منها',
-    '⛔ **وصفرُ مسارٍ أُوقف**: أربعٌ من الستِّ تُقاس الآن (‏روابطُ الشجرةِ · الإشعاراتُ '
-        . '· المهامُّ · التقارير)، و**المفضّلاتُ والتكاملاتُ لا سجلَّ لهما** — وغيابُ '
-        . 'القياسِ ليس غيابَ استعمال (§32)');
+    count($retire) . ' بندًا للتقاعدِ/التحويل — **بمراحلِها المقيسة: '
+        . implode(' · ', $stageTxt) . '** · خلا المقيسُ في ' . $freeToStop . ' منها',
+    '⛔ **وصفرُ مسارٍ أُوقف**: المقيسُ ' . count($depMeasured) . ' من ستٍّ ('
+        . implode(' · ', $depMeasured) . ')، و**' . implode(' · ', $depUnmeasured)
+        . ' لا سجلَّ وجهةٍ لها في هذه الشجرة** — وغيابُ القياسِ ليس غيابَ استعمال (§32)، '
+        . 'فلا يُبيح المرحلةَ D');
 
 /* ═══ 12 · OWNER_ACTION_REGISTER (§34-L4 · الحقيقيَّ وحدَه) ═════════════════ */
 $s = array(array('#', 'الحالةُ من §34-L4', 'الموضوع', 'لماذا لا يحسمها ما دونَه',
@@ -581,8 +601,15 @@ foreach ($sheets as $n => $r) { printf("  %-30s %5d صفًّا\n", $n, max(0, co
 echo "\n  ⇒ {$xlsx}\n";
 echo "  ◆ ملاحظتان تُعلَنانِ ولا تُطوَيان:\n";
 echo "     · `HUMAN_UAT_PASS` = **PENDING** — قرارٌ بشريٌّ لا يُنتحَل (‏ورقة 10).\n";
-echo "     · تبعيّاتُ §33: **أربعٌ تُقاس** (‏روابطُ الشجرةِ {$scanned} ملفًّا · إشعاراتٌ "
-   . number_format($depScanned['إشعارات']) . " وجهةً · المهامُّ · التقارير)\n";
-echo "       و**اثنتانِ لا سجلَّ لهما في هذه الشجرة** (‏المفضّلاتُ والتكاملات) —\n";
+/* ⛔ **ولا يُعاد رقمٌ محفوظٌ في نصِّ التقرير**: ما يُطبَع هنا يُشتَقُّ من المقيسِ
+   في هذا التشغيلِ نفسِه — والمرحلةُ من `retire_stage` المكتوبِ بدليلِه في
+   `tools/navarch/retire.php`. وكان السطرُ يقول «كلُّها في A» وهو صحيحٌ يومَ
+   كُتب **وقد صار كاذبًا بعدَ القلب** [[report-self-contradiction-sweep]]. */
+echo "     · تبعيّاتُ §33: **" . count($depMeasured) . " تُقاس** (‏" . implode(' · ', $depMeasured)
+   . " — روابطُ الشجرةِ {$scanned} ملفًّا · إشعاراتٌ "
+   . number_format($depScanned['إشعارات']) . " وجهةً)\n";
+echo "       و**" . count($depUnmeasured) . " لا سجلَّ وجهةٍ لها في هذه الشجرة** (‏"
+   . implode(' · ', $depUnmeasured) . ") —\n";
 echo "       ⛔ وغيابُ القياسِ **ليس غيابَ استعمال** (§32)، فلا يُبيح إيقافَ مسار.\n";
-echo "       ⇒ **وصفرُ مسارٍ أُوقف**: الأحدَ عشرَ والسبعون كلُّها في المرحلةِ A (‏ورقة 11).\n";
+echo "       ⇒ **وصفرُ مسارٍ أُوقف**: المراحلُ المقيسةُ " . implode(' · ', $stageTxt)
+   . " (‏ورقة 11) — و`D` محجوبةٌ بغيرِ المقيس.\n";

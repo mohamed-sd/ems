@@ -1,32 +1,32 @@
 {
-    "baseline_id": "NAB-5102AA8687",
+    "baseline_id": "NAB-BAC3823605",
     "totals": {
-        "removed": 315,
-        "moved": 241,
-        "contextualized": 189,
-        "retained": 301,
-        "redirected": 71,
+        "removed": 341,
+        "moved": 236,
+        "contextualized": 217,
+        "retained": 332,
+        "redirected": 73,
         "needs_decision": 63,
-        "old": 1180,
-        "new": 542
+        "old": 1262,
+        "new": 568
     },
     "per_workspace": {
         "DEP-01": {
             "role": 12,
             "old": 41,
-            "new": 25,
+            "new": 27,
             "added": 0,
             "added_list": [],
-            "removed": 9,
-            "moved": 7,
+            "removed": 7,
+            "moved": 9,
             "contextualized": 0,
             "retained": 18,
             "redirected": 1,
             "needs_decision": 6,
             "blocked": {
-                "placements": 28,
+                "placements": 27,
                 "no_permission": 0,
-                "no_group": 3,
+                "no_group": 0,
                 "unapproved_secondary": 0,
                 "non_sidebar_type": 0,
                 "global_fallback": 0,
@@ -46,9 +46,9 @@
             "redirected": 10,
             "needs_decision": 7,
             "blocked": {
-                "placements": 38,
+                "placements": 37,
                 "no_permission": 0,
-                "no_group": 1,
+                "no_group": 0,
                 "unapproved_secondary": 0,
                 "non_sidebar_type": 2,
                 "global_fallback": 0,
@@ -58,17 +58,17 @@
         "DEP-03": {
             "role": 26,
             "old": 70,
-            "new": 32,
+            "new": 30,
             "added": 0,
             "added_list": [],
-            "removed": 29,
-            "moved": 15,
+            "removed": 31,
+            "moved": 13,
             "contextualized": 5,
             "retained": 17,
             "redirected": 1,
             "needs_decision": 3,
             "blocked": {
-                "placements": 41,
+                "placements": 39,
                 "no_permission": 1,
                 "no_group": 0,
                 "unapproved_secondary": 0,
@@ -80,19 +80,19 @@
         "DEP-04": {
             "role": 3,
             "old": 77,
-            "new": 47,
+            "new": 49,
             "added": 0,
             "added_list": [],
-            "removed": 11,
-            "moved": 18,
+            "removed": 9,
+            "moved": 20,
             "contextualized": 7,
             "retained": 29,
             "redirected": 3,
             "needs_decision": 9,
             "blocked": {
-                "placements": 53,
+                "placements": 51,
                 "no_permission": 0,
-                "no_group": 4,
+                "no_group": 0,
                 "unapproved_secondary": 0,
                 "non_sidebar_type": 2,
                 "global_fallback": 0,
@@ -102,17 +102,17 @@
         "DEP-05": {
             "role": 17,
             "old": 112,
-            "new": 37,
+            "new": 35,
             "added": 0,
             "added_list": [],
-            "removed": 29,
-            "moved": 16,
+            "removed": 31,
+            "moved": 14,
             "contextualized": 32,
             "retained": 21,
             "redirected": 14,
             "needs_decision": 0,
             "blocked": {
-                "placements": 41,
+                "placements": 39,
                 "no_permission": 1,
                 "no_group": 0,
                 "unapproved_secondary": 0,
@@ -124,17 +124,17 @@
         "DEP-06": {
             "role": 21,
             "old": 108,
-            "new": 30,
+            "new": 28,
             "added": 0,
             "added_list": [],
-            "removed": 39,
-            "moved": 14,
+            "removed": 41,
+            "moved": 12,
             "contextualized": 26,
             "retained": 16,
             "redirected": 13,
             "needs_decision": 0,
             "blocked": {
-                "placements": 33,
+                "placements": 31,
                 "no_permission": 1,
                 "no_group": 0,
                 "unapproved_secondary": 0,
@@ -146,17 +146,17 @@
         "DEP-07": {
             "role": 4,
             "old": 70,
-            "new": 37,
+            "new": 35,
             "added": 0,
             "added_list": [],
-            "removed": 20,
-            "moved": 18,
+            "removed": 22,
+            "moved": 16,
             "contextualized": 6,
             "retained": 19,
             "redirected": 1,
             "needs_decision": 6,
             "blocked": {
-                "placements": 43,
+                "placements": 41,
                 "no_permission": 0,
                 "no_group": 0,
                 "unapproved_secondary": 0,
@@ -165,20 +165,42 @@
                 "legacy_fallback": 0
             }
         },
+        "DEP-08": {
+            "role": 15,
+            "old": 82,
+            "new": 45,
+            "added": 0,
+            "added_list": [],
+            "removed": 8,
+            "moved": 14,
+            "contextualized": 27,
+            "retained": 31,
+            "redirected": 2,
+            "needs_decision": 0,
+            "blocked": {
+                "placements": 46,
+                "no_permission": 0,
+                "no_group": 0,
+                "unapproved_secondary": 0,
+                "non_sidebar_type": 1,
+                "global_fallback": 0,
+                "legacy_fallback": 0
+            }
+        },
         "DEP-09": {
             "role": 28,
             "old": 41,
-            "new": 14,
+            "new": 13,
             "added": 0,
             "added_list": [],
-            "removed": 6,
-            "moved": 5,
+            "removed": 7,
+            "moved": 4,
             "contextualized": 17,
             "retained": 9,
             "redirected": 3,
             "needs_decision": 1,
             "blocked": {
-                "placements": 20,
+                "placements": 19,
                 "no_permission": 2,
                 "no_group": 0,
                 "unapproved_secondary": 0,
@@ -212,17 +234,17 @@
         "DEP-11": {
             "role": 1,
             "old": 89,
-            "new": 32,
+            "new": 31,
             "added": 0,
             "added_list": [],
-            "removed": 37,
-            "moved": 20,
+            "removed": 38,
+            "moved": 19,
             "contextualized": 8,
             "retained": 12,
             "redirected": 6,
             "needs_decision": 6,
             "blocked": {
-                "placements": 35,
+                "placements": 34,
                 "no_permission": 0,
                 "no_group": 0,
                 "unapproved_secondary": 0,
@@ -234,19 +256,19 @@
         "DEP-12": {
             "role": 6,
             "old": 75,
-            "new": 36,
+            "new": 34,
             "added": 0,
             "added_list": [],
-            "removed": 14,
-            "moved": 17,
+            "removed": 16,
+            "moved": 15,
             "contextualized": 12,
             "retained": 19,
             "redirected": 2,
             "needs_decision": 11,
             "blocked": {
-                "placements": 40,
+                "placements": 37,
                 "no_permission": 0,
-                "no_group": 1,
+                "no_group": 0,
                 "unapproved_secondary": 0,
                 "non_sidebar_type": 3,
                 "global_fallback": 0,
@@ -256,19 +278,19 @@
         "DEP-13": {
             "role": 27,
             "old": 55,
-            "new": 32,
+            "new": 30,
             "added": 0,
             "added_list": [],
-            "removed": 12,
-            "moved": 15,
-            "contextualized": 11,
+            "removed": 13,
+            "moved": 13,
+            "contextualized": 12,
             "retained": 17,
             "redirected": 0,
             "needs_decision": 0,
             "blocked": {
-                "placements": 35,
+                "placements": 32,
                 "no_permission": 1,
-                "no_group": 1,
+                "no_group": 0,
                 "unapproved_secondary": 0,
                 "non_sidebar_type": 1,
                 "global_fallback": 0,
@@ -278,17 +300,17 @@
         "DEP-14": {
             "role": 13,
             "old": 57,
-            "new": 32,
+            "new": 30,
             "added": 0,
             "added_list": [],
-            "removed": 13,
-            "moved": 16,
+            "removed": 15,
+            "moved": 14,
             "contextualized": 7,
             "retained": 16,
             "redirected": 2,
             "needs_decision": 3,
             "blocked": {
-                "placements": 36,
+                "placements": 34,
                 "no_permission": 1,
                 "no_group": 0,
                 "unapproved_secondary": 0,
@@ -300,17 +322,17 @@
         "DEP-15": {
             "role": 23,
             "old": 47,
-            "new": 26,
+            "new": 24,
             "added": 0,
             "added_list": [],
-            "removed": 15,
-            "moved": 16,
+            "removed": 17,
+            "moved": 14,
             "contextualized": 2,
             "retained": 10,
             "redirected": 4,
             "needs_decision": 0,
             "blocked": {
-                "placements": 30,
+                "placements": 28,
                 "no_permission": 1,
                 "no_group": 0,
                 "unapproved_secondary": 0,
@@ -322,17 +344,17 @@
         "DEP-16": {
             "role": 16,
             "old": 55,
-            "new": 26,
+            "new": 24,
             "added": 0,
             "added_list": [],
-            "removed": 18,
-            "moved": 16,
+            "removed": 20,
+            "moved": 14,
             "contextualized": 5,
             "retained": 10,
             "redirected": 2,
             "needs_decision": 4,
             "blocked": {
-                "placements": 30,
+                "placements": 28,
                 "no_permission": 1,
                 "no_group": 0,
                 "unapproved_secondary": 0,
@@ -344,17 +366,17 @@
         "DEP-17": {
             "role": 25,
             "old": 43,
-            "new": 28,
+            "new": 26,
             "added": 0,
             "added_list": [],
-            "removed": 11,
-            "moved": 15,
+            "removed": 13,
+            "moved": 13,
             "contextualized": 0,
             "retained": 13,
             "redirected": 0,
             "needs_decision": 4,
             "blocked": {
-                "placements": 31,
+                "placements": 29,
                 "no_permission": 1,
                 "no_group": 0,
                 "unapproved_secondary": 0,
@@ -388,17 +410,17 @@
         "IAF": {
             "role": 33,
             "old": 53,
-            "new": 16,
+            "new": 15,
             "added": 0,
             "added_list": [],
-            "removed": 7,
-            "moved": 2,
+            "removed": 8,
+            "moved": 1,
             "contextualized": 30,
             "retained": 14,
             "redirected": 0,
             "needs_decision": 0,
             "blocked": {
-                "placements": 21,
+                "placements": 20,
                 "no_permission": 2,
                 "no_group": 0,
                 "unapproved_secondary": 0,
@@ -441,9 +463,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-01",
@@ -702,8 +724,8 @@
             "route": "governance\/gov_dept_sal",
             "label": "حوكمة المبيعات والعقود",
             "old_group": "الحوكمة والتدقيق",
-            "new_group": "—",
-            "verdict": "removed",
+            "new_group": "الحوكمة والضوابط",
+            "verdict": "moved",
             "action": "PRIMARY",
             "why": "RECONCILED_TO_TARGET_S16",
             "access": "—",
@@ -714,20 +736,20 @@
             "route": "tickets\/tickets_list",
             "label": "صندوق بلاغات الإدارة",
             "old_group": "المخاطر والبلاغات",
-            "new_group": "⌂ مساحةُ عملي",
-            "verdict": "moved",
-            "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
-            "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "new_group": "—",
+            "verdict": "removed",
+            "action": "D_WORKSPACE_SWITCH",
+            "why": "D_WORKSPACE_SWITCH",
+            "access": "مبدِّلُ المساحاتِ إلى DEP-10 · البحثُ · الرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "مملوكةٌ لـDEP-10 (إدارة البلاغات) · nav_placements@DEP-10 · space_class = PERSONAL_SPACE"
         },
         {
             "ws": "DEP-01",
             "route": "risk\/risk_dept_sal",
             "label": "مخاطر المبيعات والعقود",
             "old_group": "المخاطر والبلاغات",
-            "new_group": "—",
-            "verdict": "removed",
+            "new_group": "الحوكمة والضوابط",
+            "verdict": "moved",
             "action": "PRIMARY",
             "why": "RECONCILED_TO_TARGET_S16",
             "access": "—",
@@ -738,8 +760,8 @@
             "route": "clients\/products",
             "label": "البيانات المرجعية",
             "old_group": "التقارير والتحليلات",
-            "new_group": "—",
-            "verdict": "removed",
+            "new_group": "البيانات المرجعية والتقارير",
+            "verdict": "moved",
             "action": "PRIMARY",
             "why": "RECONCILED_TO_TARGET_S16",
             "access": "—",
@@ -1434,20 +1456,20 @@
             "route": "tickets\/tickets_list",
             "label": "صندوق بلاغات الإدارة",
             "old_group": "المخاطر والبلاغات",
-            "new_group": "⌂ مساحةُ عملي",
-            "verdict": "moved",
-            "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
-            "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "new_group": "—",
+            "verdict": "removed",
+            "action": "D_WORKSPACE_SWITCH",
+            "why": "D_WORKSPACE_SWITCH",
+            "access": "مبدِّلُ المساحاتِ إلى DEP-10 · البحثُ · الرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "مملوكةٌ لـDEP-10 (إدارة البلاغات) · nav_placements@DEP-10 · space_class = PERSONAL_SPACE"
         },
         {
             "ws": "DEP-02",
             "route": "risk\/risk_dept_sup",
             "label": "مخاطر الموردين",
             "old_group": "المخاطر والبلاغات",
-            "new_group": "—",
-            "verdict": "removed",
+            "new_group": "المرجعيات والحوكمة",
+            "verdict": "moved",
             "action": "PRIMARY",
             "why": "RECONCILED_TO_TARGET_S16",
             "access": "—",
@@ -1665,9 +1687,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-03",
@@ -1677,9 +1699,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-03",
@@ -1689,9 +1711,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-03",
@@ -1989,9 +2011,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-03",
@@ -2322,24 +2344,24 @@
             "route": "tickets\/ticket_contextual_open",
             "label": "الإبلاغ السياقي من داخل الشاشة",
             "old_group": "المخاطر والبلاغات",
-            "new_group": "⌂ مساحةُ عملي",
-            "verdict": "moved",
-            "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
-            "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "new_group": "—",
+            "verdict": "removed",
+            "action": "D_WORKSPACE_SWITCH",
+            "why": "D_WORKSPACE_SWITCH",
+            "access": "مبدِّلُ المساحاتِ إلى DEP-10 · البحثُ · الرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "مملوكةٌ لـDEP-10 (إدارة البلاغات) · nav_placements@DEP-10 · space_class = PERSONAL_SPACE"
         },
         {
             "ws": "DEP-03",
             "route": "tickets\/tickets_list",
             "label": "صندوق بلاغات الإدارة",
             "old_group": "المخاطر والبلاغات",
-            "new_group": "⌂ مساحةُ عملي",
-            "verdict": "moved",
-            "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
-            "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "new_group": "—",
+            "verdict": "removed",
+            "action": "D_WORKSPACE_SWITCH",
+            "why": "D_WORKSPACE_SWITCH",
+            "access": "مبدِّلُ المساحاتِ إلى DEP-10 · البحثُ · الرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "مملوكةٌ لـDEP-10 (إدارة البلاغات) · nav_placements@DEP-10 · space_class = PERSONAL_SPACE"
         },
         {
             "ws": "DEP-03",
@@ -2349,9 +2371,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-03",
@@ -2457,9 +2479,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-03",
@@ -2469,9 +2491,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-04",
@@ -2505,9 +2527,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-04",
@@ -2517,9 +2539,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-04",
@@ -2529,9 +2551,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-04",
@@ -3054,8 +3076,8 @@
             "route": "equipments\/equipments_types",
             "label": "أنواع المعدات وفئاتها",
             "old_group": "المعدات والأسطول",
-            "new_group": "—",
-            "verdict": "removed",
+            "new_group": "الإعدادات المرجعية",
+            "verdict": "moved",
             "action": "PRIMARY",
             "why": "RECONCILED_TO_TARGET_S16",
             "access": "—",
@@ -3066,8 +3088,8 @@
             "route": "equipments\/fleet_models",
             "label": "موديلات المعدات ومواصفاتها",
             "old_group": "المعدات والأسطول",
-            "new_group": "—",
-            "verdict": "removed",
+            "new_group": "الإعدادات المرجعية",
+            "verdict": "moved",
             "action": "PRIMARY",
             "why": "RECONCILED_TO_TARGET_S16",
             "access": "—",
@@ -3078,8 +3100,8 @@
             "route": "equipments\/fleet_depreciation_profiles",
             "label": "سياسات الإهلاك المعتمدة",
             "old_group": "المعدات والأسطول",
-            "new_group": "—",
-            "verdict": "removed",
+            "new_group": "الإعدادات المرجعية",
+            "verdict": "moved",
             "action": "PRIMARY",
             "why": "RECONCILED_TO_TARGET_S16",
             "access": "—",
@@ -3090,8 +3112,8 @@
             "route": "equipments\/manage_failure_codes",
             "label": "تصنيف الأعطال وأسبابها",
             "old_group": "المعدات والأسطول",
-            "new_group": "—",
-            "verdict": "removed",
+            "new_group": "الإعدادات المرجعية",
+            "verdict": "moved",
             "action": "PRIMARY",
             "why": "RECONCILED_TO_TARGET_S16",
             "access": "—",
@@ -3165,33 +3187,33 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-04",
             "route": "tickets\/ticket_contextual_open",
             "label": "الإبلاغ السياقي من داخل الشاشة",
             "old_group": "المخاطر والبلاغات",
-            "new_group": "⌂ مساحةُ عملي",
-            "verdict": "moved",
-            "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
-            "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "new_group": "—",
+            "verdict": "removed",
+            "action": "D_WORKSPACE_SWITCH",
+            "why": "D_WORKSPACE_SWITCH",
+            "access": "مبدِّلُ المساحاتِ إلى DEP-10 · البحثُ · الرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "مملوكةٌ لـDEP-10 (إدارة البلاغات) · nav_placements@DEP-10 · space_class = PERSONAL_SPACE"
         },
         {
             "ws": "DEP-04",
             "route": "tickets\/tickets_list",
             "label": "صندوق بلاغات الإدارة",
             "old_group": "المخاطر والبلاغات",
-            "new_group": "⌂ مساحةُ عملي",
-            "verdict": "moved",
-            "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
-            "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "new_group": "—",
+            "verdict": "removed",
+            "action": "D_WORKSPACE_SWITCH",
+            "why": "D_WORKSPACE_SWITCH",
+            "access": "مبدِّلُ المساحاتِ إلى DEP-10 · البحثُ · الرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "مملوكةٌ لـDEP-10 (إدارة البلاغات) · nav_placements@DEP-10 · space_class = PERSONAL_SPACE"
         },
         {
             "ws": "DEP-04",
@@ -3201,9 +3223,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-04",
@@ -3213,9 +3235,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-04",
@@ -3393,9 +3415,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-05",
@@ -3429,9 +3451,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-05",
@@ -3441,9 +3463,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-05",
@@ -3453,9 +3475,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-05",
@@ -4269,9 +4291,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-05",
@@ -4578,24 +4600,24 @@
             "route": "tickets\/ticket_contextual_open",
             "label": "الإبلاغ السياقي من داخل الشاشة",
             "old_group": "المخاطر والبلاغات",
-            "new_group": "⌂ مساحةُ عملي",
-            "verdict": "moved",
-            "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
-            "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "new_group": "—",
+            "verdict": "removed",
+            "action": "D_WORKSPACE_SWITCH",
+            "why": "D_WORKSPACE_SWITCH",
+            "access": "مبدِّلُ المساحاتِ إلى DEP-10 · البحثُ · الرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "مملوكةٌ لـDEP-10 (إدارة البلاغات) · nav_placements@DEP-10 · space_class = PERSONAL_SPACE"
         },
         {
             "ws": "DEP-05",
             "route": "tickets\/tickets_list",
             "label": "صندوق بلاغات الإدارة",
             "old_group": "المخاطر والبلاغات",
-            "new_group": "⌂ مساحةُ عملي",
-            "verdict": "moved",
-            "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
-            "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "new_group": "—",
+            "verdict": "removed",
+            "action": "D_WORKSPACE_SWITCH",
+            "why": "D_WORKSPACE_SWITCH",
+            "access": "مبدِّلُ المساحاتِ إلى DEP-10 · البحثُ · الرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "مملوكةٌ لـDEP-10 (إدارة البلاغات) · nav_placements@DEP-10 · space_class = PERSONAL_SPACE"
         },
         {
             "ws": "DEP-05",
@@ -4605,9 +4627,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-05",
@@ -4617,9 +4639,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-05",
@@ -4737,9 +4759,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-06",
@@ -4773,9 +4795,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-06",
@@ -4785,9 +4807,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-06",
@@ -4797,9 +4819,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-06",
@@ -5565,9 +5587,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-06",
@@ -5826,24 +5848,24 @@
             "route": "tickets\/ticket_contextual_open",
             "label": "الإبلاغ السياقي من داخل الشاشة",
             "old_group": "المخاطر والبلاغات",
-            "new_group": "⌂ مساحةُ عملي",
-            "verdict": "moved",
-            "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
-            "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "new_group": "—",
+            "verdict": "removed",
+            "action": "D_WORKSPACE_SWITCH",
+            "why": "D_WORKSPACE_SWITCH",
+            "access": "مبدِّلُ المساحاتِ إلى DEP-10 · البحثُ · الرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "مملوكةٌ لـDEP-10 (إدارة البلاغات) · nav_placements@DEP-10 · space_class = PERSONAL_SPACE"
         },
         {
             "ws": "DEP-06",
             "route": "tickets\/tickets_list",
             "label": "صندوق بلاغات الإدارة",
             "old_group": "المخاطر والبلاغات",
-            "new_group": "⌂ مساحةُ عملي",
-            "verdict": "moved",
-            "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
-            "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "new_group": "—",
+            "verdict": "removed",
+            "action": "D_WORKSPACE_SWITCH",
+            "why": "D_WORKSPACE_SWITCH",
+            "access": "مبدِّلُ المساحاتِ إلى DEP-10 · البحثُ · الرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "مملوكةٌ لـDEP-10 (إدارة البلاغات) · nav_placements@DEP-10 · space_class = PERSONAL_SPACE"
         },
         {
             "ws": "DEP-06",
@@ -5877,9 +5899,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-06",
@@ -6069,9 +6091,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-07",
@@ -6081,9 +6103,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-07",
@@ -6093,9 +6115,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-07",
@@ -6657,33 +6679,33 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-07",
             "route": "tickets\/ticket_contextual_open",
             "label": "الإبلاغ السياقي من داخل الشاشة",
             "old_group": "المخاطر والبلاغات",
-            "new_group": "⌂ مساحةُ عملي",
-            "verdict": "moved",
-            "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
-            "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "new_group": "—",
+            "verdict": "removed",
+            "action": "D_WORKSPACE_SWITCH",
+            "why": "D_WORKSPACE_SWITCH",
+            "access": "مبدِّلُ المساحاتِ إلى DEP-10 · البحثُ · الرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "مملوكةٌ لـDEP-10 (إدارة البلاغات) · nav_placements@DEP-10 · space_class = PERSONAL_SPACE"
         },
         {
             "ws": "DEP-07",
             "route": "tickets\/tickets_list",
             "label": "صندوق بلاغات الإدارة",
             "old_group": "المخاطر والبلاغات",
-            "new_group": "⌂ مساحةُ عملي",
-            "verdict": "moved",
-            "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
-            "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "new_group": "—",
+            "verdict": "removed",
+            "action": "D_WORKSPACE_SWITCH",
+            "why": "D_WORKSPACE_SWITCH",
+            "access": "مبدِّلُ المساحاتِ إلى DEP-10 · البحثُ · الرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "مملوكةٌ لـDEP-10 (إدارة البلاغات) · nav_placements@DEP-10 · space_class = PERSONAL_SPACE"
         },
         {
             "ws": "DEP-07",
@@ -6693,9 +6715,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-07",
@@ -6705,9 +6727,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-07",
@@ -6873,9 +6895,993 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
+            "why": "PERSONAL_SHORTCUT_S11",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "main\/role_board",
+            "label": "الرئيسية",
+            "old_group": "مساحتي",
+            "new_group": "⌂ القشرةُ العامّة",
+            "verdict": "moved",
+            "action": "GLOBAL_SHELL",
+            "why": "PLATFORM_ANCHOR_S10",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §10 — الرئيسيةُ والمراسلاتُ قشرةُ تطبيقٍ لا دورةُ إدارة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "chats\/index",
+            "label": "المراسلات",
+            "old_group": "مساحتي",
+            "new_group": "⌂ القشرةُ العامّة",
+            "verdict": "moved",
+            "action": "GLOBAL_SHELL",
+            "why": "PLATFORM_ANCHOR_S10",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §10 — الرئيسيةُ والمراسلاتُ قشرةُ تطبيقٍ لا دورةُ إدارة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "portal\/dept_achievement",
+            "label": "إنجاز الإدارة",
+            "old_group": "مساحتي",
+            "new_group": "⌂ مساحةُ عملي",
+            "verdict": "moved",
+            "action": "PERSONAL",
+            "why": "PERSONAL_SHORTCUT_S11",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "main\/my_workspace",
+            "label": "مساحة عملي",
+            "old_group": "مساحتي",
+            "new_group": "⌂ مساحةُ عملي",
+            "verdict": "moved",
+            "action": "PERSONAL",
+            "why": "PERSONAL_SHORTCUT_S11",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "finance\/approvals_inbox",
+            "label": "صندوق ما ينتظر اعتمادي",
+            "old_group": "مساحتي",
+            "new_group": "⌂ مساحةُ عملي",
+            "verdict": "moved",
+            "action": "PERSONAL",
+            "why": "PERSONAL_SHORTCUT_S11",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "finrequests\/dept_inbox",
+            "label": "موافقات إدارتي",
+            "old_group": "مساحتي",
+            "new_group": "—",
+            "verdict": "redirected",
+            "action": "REDIRECT",
+            "why": "REPLACED",
+            "access": "المسارُ الجديد: main\/my_workspace (‏والقديمُ يحوَّل إليه — §33-ب)",
+            "evidence": "nav_redirects: finrequests\/dept_inbox ⇒ main\/my_workspace"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "portal\/my_achievement",
+            "label": "مؤشرات الإنجاز الشخصي",
+            "old_group": "الملف الشخصي",
+            "new_group": "⌂ مساحةُ عملي",
+            "verdict": "moved",
+            "action": "PERSONAL",
             "why": "PERSONAL_WS_MY_S11",
             "access": "—",
             "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "portal\/my_portal",
+            "label": "البوابة الشخصية",
+            "old_group": "الملف الشخصي",
+            "new_group": "⌂ مساحةُ عملي",
+            "verdict": "moved",
+            "action": "PERSONAL",
+            "why": "PERSONAL_WS_MY_S11",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "user_capacities",
+            "label": "الصفات الوظيفية والتبديل بينها",
+            "old_group": "الملف الشخصي",
+            "new_group": "⌂ مساحةُ عملي",
+            "verdict": "moved",
+            "action": "PERSONAL",
+            "why": "PERSONAL_WS_MY_S11",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "portal\/my_tasks",
+            "label": "المهام المسنَدة",
+            "old_group": "العمل اليومي",
+            "new_group": "⌂ مساحةُ عملي",
+            "verdict": "moved",
+            "action": "PERSONAL",
+            "why": "PERSONAL_WS_MY_S11",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "finrequests\/request_form",
+            "label": "الطلبات المقدَّمة",
+            "old_group": "العمل اليومي",
+            "new_group": "⌂ مساحةُ عملي",
+            "verdict": "moved",
+            "action": "PERSONAL",
+            "why": "PERSONAL_WS_MY_S11",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "portal\/my_reports",
+            "label": "البلاغات المسجَّلة",
+            "old_group": "العمل اليومي",
+            "new_group": "⌂ مساحةُ عملي",
+            "verdict": "moved",
+            "action": "PERSONAL",
+            "why": "PERSONAL_WS_MY_S11",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/gov_board",
+            "label": "لوحة الحوكمة والالتزام",
+            "old_group": "اللوحة — خارج الدورة",
+            "new_group": "اللوحة — خارج الدورة",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/entities_registry",
+            "label": "سجل الشركات والكيانات",
+            "old_group": "الكيانات والتفويض بالتوقيع",
+            "new_group": "الكيانات والتفويض بالتوقيع",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/policies",
+            "label": "سجل السياسات",
+            "old_group": "الكيانات والتفويض بالتوقيع",
+            "new_group": "الكيانات والتفويض بالتوقيع",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/obligations",
+            "label": "سجل الالتزامات التنظيمية",
+            "old_group": "الكيانات والتفويض بالتوقيع",
+            "new_group": "الكيانات والتفويض بالتوقيع",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/compliance_calendar",
+            "label": "تقويم الامتثال",
+            "old_group": "الكيانات والتفويض بالتوقيع",
+            "new_group": "الكيانات والتفويض بالتوقيع",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/signing_authority",
+            "label": "التفويض بالتوقيع",
+            "old_group": "الكيانات والتفويض بالتوقيع",
+            "new_group": "الكيانات والتفويض بالتوقيع",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/licenses_guarantees",
+            "label": "التراخيص والكفالات",
+            "old_group": "المستندات والالتزام النظامي",
+            "new_group": "المستندات والالتزام النظامي",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/regulatory_filings",
+            "label": "التقديمات النظامية",
+            "old_group": "المستندات والالتزام النظامي",
+            "new_group": "المستندات والالتزام النظامي",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "settings\/roles",
+            "label": "الأدوار وقوالب صلاحياتها",
+            "old_group": "الأدوار والصلاحيات",
+            "new_group": "الأدوار والصلاحيات",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/conflict_disclosures",
+            "label": "تضارب المصالح",
+            "old_group": "الأدوار والصلاحيات",
+            "new_group": "الأدوار والصلاحيات",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/related_parties",
+            "label": "الأطراف ذات العلاقة",
+            "old_group": "الأدوار والصلاحيات",
+            "new_group": "الأدوار والصلاحيات",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/gifts_hospitality",
+            "label": "الهدايا والضيافة",
+            "old_group": "الأدوار والصلاحيات",
+            "new_group": "الأدوار والصلاحيات",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/conduct_acknowledgements",
+            "label": "إقرارات مدونة السلوك",
+            "old_group": "الأدوار والصلاحيات",
+            "new_group": "الأدوار والصلاحيات",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/guards",
+            "label": "تصنيف قواعد المنع",
+            "old_group": "الأدوار والصلاحيات",
+            "new_group": "الأدوار والصلاحيات",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/sod_conflicts",
+            "label": "فصل الواجبات المتعارضة",
+            "old_group": "الأدوار والصلاحيات",
+            "new_group": "الأدوار والصلاحيات",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/break_glass",
+            "label": "صلاحية الطوارئ اللحظية",
+            "old_group": "الأدوار والصلاحيات",
+            "new_group": "الأدوار والصلاحيات",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/sensitive_fields",
+            "label": "سياسات الحقول الحساسة",
+            "old_group": "الأدوار والصلاحيات",
+            "new_group": "الأدوار والصلاحيات",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/perm_explain",
+            "label": "تفسير مصدر الصلاحية",
+            "old_group": "الأدوار والصلاحيات",
+            "new_group": "الأدوار والصلاحيات",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/guard_denials",
+            "label": "سجل المحاولات الممنوعة",
+            "old_group": "الاستثناء والرقابة",
+            "new_group": "الاستثناء والرقابة",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/approval_ladders",
+            "label": "سلاليم الاعتماد وتعريفها",
+            "old_group": "الاستثناء والرقابة",
+            "new_group": "الاستثناء والرقابة",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/exceptions",
+            "label": "طلبات الاستثناء",
+            "old_group": "الاستثناء والرقابة",
+            "new_group": "الاستثناء والرقابة",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/integrity_reports",
+            "label": "بلاغات النزاهة المحمية",
+            "old_group": "الاستثناء والرقابة",
+            "new_group": "الاستثناء والرقابة",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/investigations",
+            "label": "التحقيقات",
+            "old_group": "الاستثناء والرقابة",
+            "new_group": "الاستثناء والرقابة",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/breaches",
+            "label": "سجل الإخلالات",
+            "old_group": "الاستثناء والرقابة",
+            "new_group": "الاستثناء والرقابة",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/corrective_actions",
+            "label": "الإجراءات التصحيحية",
+            "old_group": "الاستثناء والرقابة",
+            "new_group": "الاستثناء والرقابة",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/audit_followup",
+            "label": "متابعة نتائج المراجعة",
+            "old_group": "الاستثناء والرقابة",
+            "new_group": "الاستثناء والرقابة",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/bus_board",
+            "label": "مراقبة تدفق الأحداث ومعالجتها",
+            "old_group": "الأنظمة والقوائم المرجعية",
+            "new_group": "الأنظمة والقوائم المرجعية",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/doc_types",
+            "label": "سجل أنواع المستندات",
+            "old_group": "الأنظمة والقوائم المرجعية",
+            "new_group": "الأنظمة والقوائم المرجعية",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/activation_patterns",
+            "label": "أنماط تفعيل المزايا",
+            "old_group": "الأنظمة والقوائم المرجعية",
+            "new_group": "الأنظمة والقوائم المرجعية",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/committees",
+            "label": "اللجان وحوكمة الاجتماعات",
+            "old_group": "الأنظمة والقوائم المرجعية",
+            "new_group": "الأنظمة والقوائم المرجعية",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/dr_restore",
+            "label": "تمرين الاستعادة ومحضره",
+            "old_group": "الأنظمة والقوائم المرجعية",
+            "new_group": "الأنظمة والقوائم المرجعية",
+            "verdict": "retained",
+            "action": "PRIMARY",
+            "why": "GUIDE_OWNED_LIFECYCLE_S9",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §9 — الشاشةُ جزءٌ أصيلٌ من دورةِ المساحةِ المالكة"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "portal\/ceo_org_decisions",
+            "label": "قرارات الهيكل التنظيمي",
+            "old_group": "التشغيل اليومي",
+            "new_group": "—",
+            "verdict": "removed",
+            "action": "D_WORKSPACE_SWITCH",
+            "why": "D_WORKSPACE_SWITCH",
+            "access": "مبدِّلُ المساحاتِ إلى EX-CEO · البحثُ · الرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "مملوكةٌ لـEX-CEO (مساحة الرئيس التنفيذي) · nav_placements@EX-CEO · بلا `space_class` مسجَّل"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "workforce\/contract_registry",
+            "label": "سجل العقود",
+            "old_group": "العقود والعملاء",
+            "new_group": "—",
+            "verdict": "removed",
+            "action": "TAB_CHILD",
+            "why": "TAB_CHILD_S18",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §18 — تبويب\/سجلٌّ تابعٌ ⇒ إلى أبيه"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "finance\/budget_dept",
+            "label": "ميزانية إدارة التمويل",
+            "old_group": "المالية والمحاسبة",
+            "new_group": "⌂ مساحةُ عملي",
+            "verdict": "moved",
+            "action": "PERSONAL",
+            "why": "PERSONAL_SHORTCUT_S11",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "finance\/budget_form_fin",
+            "label": "ميزانية الإدارة المالية",
+            "old_group": "المالية والمحاسبة",
+            "new_group": "—",
+            "verdict": "redirected",
+            "action": "REDIRECT",
+            "why": "REPLACED",
+            "access": "المسارُ الجديد: finance\/budget_dept (‏والقديمُ يحوَّل إليه — §33-ب)",
+            "evidence": "nav_redirects: finance\/budget_form_fin ⇒ finance\/budget_dept"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "financing\/ownership_links",
+            "label": "علاقات الملكية بين الكيانات",
+            "old_group": "الخزينة والتمويل",
+            "new_group": "—",
+            "verdict": "contextualized",
+            "action": "CONTEXTUALIZE",
+            "why": "CROSS_DOMAIN",
+            "access": "مبدِّلُ المساحاتِ إلى الإدارةِ المالكة · والرابطُ المباشرُ يبقى نافذًا",
+            "evidence": "nav_canonical.owner_dept = التمويل والملكية · وهذه إدارة الحوكمة والالتزام"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/access_review",
+            "label": "دورة المراجعة الدورية للصلاحيات",
+            "old_group": "الحوكمة والتدقيق",
+            "new_group": "—",
+            "verdict": "contextualized",
+            "action": "CONTEXTUALIZE",
+            "why": "CROSS_DOMAIN",
+            "access": "مبدِّلُ المساحاتِ إلى الإدارةِ المالكة · والرابطُ المباشرُ يبقى نافذًا",
+            "evidence": "nav_canonical.owner_dept = الحوكمة والالتزام · وهذه إدارة الحوكمة والالتزام"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "admin\/sec_governance",
+            "label": "فصل الواجبات المتعارضة",
+            "old_group": "الحوكمة والتدقيق",
+            "new_group": "—",
+            "verdict": "contextualized",
+            "action": "CONTEXTUALIZE",
+            "why": "CROSS_DOMAIN",
+            "access": "مبدِّلُ المساحاتِ إلى الإدارةِ المالكة · والرابطُ المباشرُ يبقى نافذًا",
+            "evidence": "nav_canonical.owner_dept = الحوكمة والالتزام · وهذه إدارة الحوكمة والالتزام"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "activitylogs\/activity_logs",
+            "label": "سجل التدقيق والاطلاع",
+            "old_group": "الحوكمة والتدقيق",
+            "new_group": "—",
+            "verdict": "contextualized",
+            "action": "CONTEXTUALIZE",
+            "why": "CROSS_DOMAIN",
+            "access": "مبدِّلُ المساحاتِ إلى الإدارةِ المالكة · والرابطُ المباشرُ يبقى نافذًا",
+            "evidence": "nav_canonical.owner_dept = الحوكمة والالتزام · وهذه إدارة الحوكمة والالتزام"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/security_log",
+            "label": "سجل الأمان",
+            "old_group": "الحوكمة والتدقيق",
+            "new_group": "—",
+            "verdict": "contextualized",
+            "action": "CONTEXTUALIZE",
+            "why": "CROSS_DOMAIN",
+            "access": "مبدِّلُ المساحاتِ إلى الإدارةِ المالكة · والرابطُ المباشرُ يبقى نافذًا",
+            "evidence": "nav_canonical.owner_dept = الحوكمة والالتزام · وهذه إدارة الحوكمة والالتزام"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/authority_caps",
+            "label": "حدود المبالغ",
+            "old_group": "الحوكمة والتدقيق",
+            "new_group": "—",
+            "verdict": "contextualized",
+            "action": "CONTEXTUALIZE",
+            "why": "CROSS_DOMAIN",
+            "access": "مبدِّلُ المساحاتِ إلى الإدارةِ المالكة · والرابطُ المباشرُ يبقى نافذًا",
+            "evidence": "nav_canonical.owner_dept = الحوكمة والالتزام · وهذه إدارة الحوكمة والالتزام"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/impersonations",
+            "label": "جلسات النيابة",
+            "old_group": "الحوكمة والتدقيق",
+            "new_group": "—",
+            "verdict": "contextualized",
+            "action": "CONTEXTUALIZE",
+            "why": "CROSS_DOMAIN",
+            "access": "مبدِّلُ المساحاتِ إلى الإدارةِ المالكة · والرابطُ المباشرُ يبقى نافذًا",
+            "evidence": "nav_canonical.owner_dept = الحوكمة والالتزام · وهذه إدارة الحوكمة والالتزام"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/auth_grants",
+            "label": "منح الصلاحية",
+            "old_group": "الحوكمة والتدقيق",
+            "new_group": "—",
+            "verdict": "contextualized",
+            "action": "CONTEXTUALIZE",
+            "why": "CROSS_DOMAIN",
+            "access": "مبدِّلُ المساحاتِ إلى الإدارةِ المالكة · والرابطُ المباشرُ يبقى نافذًا",
+            "evidence": "nav_canonical.owner_dept = الحوكمة والالتزام · وهذه إدارة الحوكمة والالتزام"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/tech_gov_center",
+            "label": "مركز الحوكمة التقني",
+            "old_group": "الحوكمة والتدقيق",
+            "new_group": "—",
+            "verdict": "contextualized",
+            "action": "CONTEXTUALIZE",
+            "why": "CROSS_DOMAIN",
+            "access": "مبدِّلُ المساحاتِ إلى الإدارةِ المالكة · والرابطُ المباشرُ يبقى نافذًا",
+            "evidence": "nav_canonical.owner_dept = الحوكمة والالتزام · وهذه إدارة الحوكمة والالتزام"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "tickets\/ticket_contextual_open",
+            "label": "الإبلاغ السياقي من داخل الشاشة",
+            "old_group": "المخاطر والبلاغات",
+            "new_group": "—",
+            "verdict": "removed",
+            "action": "D_WORKSPACE_SWITCH",
+            "why": "D_WORKSPACE_SWITCH",
+            "access": "مبدِّلُ المساحاتِ إلى DEP-10 · البحثُ · الرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "مملوكةٌ لـDEP-10 (إدارة البلاغات) · nav_placements@DEP-10 · space_class = PERSONAL_SPACE"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "tickets\/tickets_list",
+            "label": "صندوق بلاغات الإدارة",
+            "old_group": "المخاطر والبلاغات",
+            "new_group": "—",
+            "verdict": "removed",
+            "action": "D_WORKSPACE_SWITCH",
+            "why": "D_WORKSPACE_SWITCH",
+            "access": "مبدِّلُ المساحاتِ إلى DEP-10 · البحثُ · الرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "مملوكةٌ لـDEP-10 (إدارة البلاغات) · nav_placements@DEP-10 · space_class = PERSONAL_SPACE"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "portal\/vp_dashboard",
+            "label": "لوحة النائب",
+            "old_group": "التقارير والتحليلات",
+            "new_group": "—",
+            "verdict": "removed",
+            "action": "D_WORKSPACE_SWITCH",
+            "why": "D_WORKSPACE_SWITCH",
+            "access": "مبدِّلُ المساحاتِ إلى EX-DVP · البحثُ · الرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "مملوكةٌ لـEX-DVP (مساحة نائب الرئيس) · nav_placements@EX-DVP · بلا `space_class` مسجَّل"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "portal\/vp_departments",
+            "label": "الإدارات — نطاقي والشركة",
+            "old_group": "التقارير والتحليلات",
+            "new_group": "—",
+            "verdict": "removed",
+            "action": "D_WORKSPACE_SWITCH",
+            "why": "D_WORKSPACE_SWITCH",
+            "access": "مبدِّلُ المساحاتِ إلى EX-DVP · البحثُ · الرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "مملوكةٌ لـEX-DVP (مساحة نائب الرئيس) · nav_placements@EX-DVP · بلا `space_class` مسجَّل"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "portal\/vp_approval_inbox",
+            "label": "صندوق اعتمادات النائب",
+            "old_group": "التقارير والتحليلات",
+            "new_group": "—",
+            "verdict": "removed",
+            "action": "D_WORKSPACE_SWITCH",
+            "why": "D_WORKSPACE_SWITCH",
+            "access": "مبدِّلُ المساحاتِ إلى EX-DVP · البحثُ · الرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "مملوكةٌ لـEX-DVP (مساحة نائب الرئيس) · nav_placements@EX-DVP · بلا `space_class` مسجَّل"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "portal\/vp_pending_actions",
+            "label": "الإجراءات والقرارات المطلوبة مني",
+            "old_group": "التقارير والتحليلات",
+            "new_group": "—",
+            "verdict": "removed",
+            "action": "D_WORKSPACE_SWITCH",
+            "why": "D_WORKSPACE_SWITCH",
+            "access": "مبدِّلُ المساحاتِ إلى EX-DVP · البحثُ · الرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "مملوكةٌ لـEX-DVP (مساحة نائب الرئيس) · nav_placements@EX-DVP · بلا `space_class` مسجَّل"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "emsreports\/index",
+            "label": "مركز تقارير الحوكمة",
+            "old_group": "التقارير والتحليلات",
+            "new_group": "⌂ مساحةُ عملي",
+            "verdict": "moved",
+            "action": "PERSONAL",
+            "why": "PERSONAL_SHORTCUT_S11",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "admin\/org_structure",
+            "label": "الهيكل التنظيمي والمسميات",
+            "old_group": "الإعدادات",
+            "new_group": "—",
+            "verdict": "contextualized",
+            "action": "CONTEXTUALIZE",
+            "why": "CROSS_DOMAIN",
+            "access": "مبدِّلُ المساحاتِ إلى الإدارةِ المالكة · والرابطُ المباشرُ يبقى نافذًا",
+            "evidence": "nav_canonical.owner_dept = الحوكمة والالتزام · وهذه إدارة الحوكمة والالتزام"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "main\/users",
+            "label": "حسابات المستخدمين",
+            "old_group": "الإعدادات",
+            "new_group": "—",
+            "verdict": "contextualized",
+            "action": "CONTEXTUALIZE",
+            "why": "CROSS_DOMAIN",
+            "access": "مبدِّلُ المساحاتِ إلى الإدارةِ المالكة · والرابطُ المباشرُ يبقى نافذًا",
+            "evidence": "nav_canonical.owner_dept = الحوكمة والالتزام · وهذه إدارة الحوكمة والالتزام"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "admin\/org_assignments",
+            "label": "التكليفات التنظيمية",
+            "old_group": "الإعدادات",
+            "new_group": "—",
+            "verdict": "contextualized",
+            "action": "CONTEXTUALIZE",
+            "why": "CROSS_DOMAIN",
+            "access": "مبدِّلُ المساحاتِ إلى الإدارةِ المالكة · والرابطُ المباشرُ يبقى نافذًا",
+            "evidence": "nav_canonical.owner_dept = الحوكمة والالتزام · وهذه إدارة الحوكمة والالتزام"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "main\/all_assistants",
+            "label": "المعاونون والنيابة المؤقتة",
+            "old_group": "الإعدادات",
+            "new_group": "—",
+            "verdict": "contextualized",
+            "action": "CONTEXTUALIZE",
+            "why": "CROSS_DOMAIN",
+            "access": "مبدِّلُ المساحاتِ إلى الإدارةِ المالكة · والرابطُ المباشرُ يبقى نافذًا",
+            "evidence": "nav_canonical.owner_dept = مساحة العمل الشخصية · وهذه إدارة الحوكمة والالتزام"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "admin\/sec_employee_wizard",
+            "label": "معالج إعداد الموظف",
+            "old_group": "الإعدادات",
+            "new_group": "—",
+            "verdict": "contextualized",
+            "action": "CONTEXTUALIZE",
+            "why": "CROSS_DOMAIN",
+            "access": "مبدِّلُ المساحاتِ إلى الإدارةِ المالكة · والرابطُ المباشرُ يبقى نافذًا",
+            "evidence": "nav_canonical.owner_dept = الحوكمة والالتزام · وهذه إدارة الحوكمة والالتزام"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "main\/project_users",
+            "label": "إدارة المعاونين",
+            "old_group": "الإعدادات",
+            "new_group": "⌂ مساحةُ عملي",
+            "verdict": "moved",
+            "action": "PERSONAL",
+            "why": "PERSONAL_SHORTCUT_S11",
+            "access": "—",
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "settings\/modules",
+            "label": "صفحات النظام والإدارات",
+            "old_group": "الإعدادات",
+            "new_group": "—",
+            "verdict": "contextualized",
+            "action": "CONTEXTUALIZE",
+            "why": "CROSS_DOMAIN",
+            "access": "مبدِّلُ المساحاتِ إلى الإدارةِ المالكة · والرابطُ المباشرُ يبقى نافذًا",
+            "evidence": "nav_canonical.owner_dept = الحوكمة والالتزام · وهذه إدارة الحوكمة والالتزام"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/auth_profiles",
+            "label": "قوالب الصلاحيات",
+            "old_group": "الإعدادات",
+            "new_group": "—",
+            "verdict": "contextualized",
+            "action": "CONTEXTUALIZE",
+            "why": "CROSS_DOMAIN",
+            "access": "مبدِّلُ المساحاتِ إلى الإدارةِ المالكة · والرابطُ المباشرُ يبقى نافذًا",
+            "evidence": "nav_canonical.owner_dept = الحوكمة والالتزام · وهذه إدارة الحوكمة والالتزام"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/portal_users",
+            "label": "حسابات بوابة الأطراف الخارجية",
+            "old_group": "الإعدادات",
+            "new_group": "—",
+            "verdict": "contextualized",
+            "action": "CONTEXTUALIZE",
+            "why": "CROSS_DOMAIN",
+            "access": "مبدِّلُ المساحاتِ إلى الإدارةِ المالكة · والرابطُ المباشرُ يبقى نافذًا",
+            "evidence": "nav_canonical.owner_dept = الحوكمة والالتزام · وهذه إدارة الحوكمة والالتزام"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/canonical_names",
+            "label": "سجل الأسماء المعتمدة",
+            "old_group": "الإعدادات",
+            "new_group": "—",
+            "verdict": "contextualized",
+            "action": "CONTEXTUALIZE",
+            "why": "CROSS_DOMAIN",
+            "access": "مبدِّلُ المساحاتِ إلى الإدارةِ المالكة · والرابطُ المباشرُ يبقى نافذًا",
+            "evidence": "nav_canonical.owner_dept = الحوكمة والالتزام · وهذه إدارة الحوكمة والالتزام"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/state_machines",
+            "label": "حالات المستندات وانتقالاتها",
+            "old_group": "الإعدادات",
+            "new_group": "—",
+            "verdict": "contextualized",
+            "action": "CONTEXTUALIZE",
+            "why": "CROSS_DOMAIN",
+            "access": "مبدِّلُ المساحاتِ إلى الإدارةِ المالكة · والرابطُ المباشرُ يبقى نافذًا",
+            "evidence": "nav_canonical.owner_dept = الحوكمة والالتزام · وهذه إدارة الحوكمة والالتزام"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/design_system",
+            "label": "النظام التصميمي",
+            "old_group": "الإعدادات",
+            "new_group": "—",
+            "verdict": "contextualized",
+            "action": "CONTEXTUALIZE",
+            "why": "CROSS_DOMAIN",
+            "access": "مبدِّلُ المساحاتِ إلى الإدارةِ المالكة · والرابطُ المباشرُ يبقى نافذًا",
+            "evidence": "nav_canonical.owner_dept = الحوكمة والالتزام · وهذه إدارة الحوكمة والالتزام"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/bus_outbox",
+            "label": "صندوق الأحداث الصادر",
+            "old_group": "الإعدادات",
+            "new_group": "—",
+            "verdict": "contextualized",
+            "action": "CONTEXTUALIZE",
+            "why": "CROSS_DOMAIN",
+            "access": "مبدِّلُ المساحاتِ إلى الإدارةِ المالكة · والرابطُ المباشرُ يبقى نافذًا",
+            "evidence": "nav_canonical.owner_dept = الحوكمة والالتزام · وهذه إدارة الحوكمة والالتزام"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/bus_deliveries",
+            "label": "تسليمات الأحداث وحالاتها",
+            "old_group": "الإعدادات",
+            "new_group": "—",
+            "verdict": "contextualized",
+            "action": "CONTEXTUALIZE",
+            "why": "CROSS_DOMAIN",
+            "access": "مبدِّلُ المساحاتِ إلى الإدارةِ المالكة · والرابطُ المباشرُ يبقى نافذًا",
+            "evidence": "nav_canonical.owner_dept = الحوكمة والالتزام · وهذه إدارة الحوكمة والالتزام"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/job_queue",
+            "label": "طابور المهام",
+            "old_group": "الإعدادات",
+            "new_group": "—",
+            "verdict": "contextualized",
+            "action": "CONTEXTUALIZE",
+            "why": "CROSS_DOMAIN",
+            "access": "مبدِّلُ المساحاتِ إلى الإدارةِ المالكة · والرابطُ المباشرُ يبقى نافذًا",
+            "evidence": "nav_canonical.owner_dept = الحوكمة والالتزام · وهذه إدارة الحوكمة والالتزام"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "governance\/job_schedule",
+            "label": "جدولة المهام الدورية",
+            "old_group": "الإعدادات",
+            "new_group": "—",
+            "verdict": "contextualized",
+            "action": "CONTEXTUALIZE",
+            "why": "CROSS_DOMAIN",
+            "access": "مبدِّلُ المساحاتِ إلى الإدارةِ المالكة · والرابطُ المباشرُ يبقى نافذًا",
+            "evidence": "nav_canonical.owner_dept = الحوكمة والالتزام · وهذه إدارة الحوكمة والالتزام"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "portal\/founding_mode",
+            "label": "وضع التأسيس وإغلاقه",
+            "old_group": "الإعدادات",
+            "new_group": "—",
+            "verdict": "contextualized",
+            "action": "CONTEXTUALIZE",
+            "why": "CROSS_DOMAIN",
+            "access": "مبدِّلُ المساحاتِ إلى الإدارةِ المالكة · والرابطُ المباشرُ يبقى نافذًا",
+            "evidence": "nav_canonical.owner_dept = مكتب الرئيس التنفيذي والنواب · وهذه إدارة الحوكمة والالتزام"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "portal\/release_stamp",
+            "label": "بصمة الإصدار وتقرير النشر",
+            "old_group": "الإعدادات",
+            "new_group": "—",
+            "verdict": "contextualized",
+            "action": "CONTEXTUALIZE",
+            "why": "CROSS_DOMAIN",
+            "access": "مبدِّلُ المساحاتِ إلى الإدارةِ المالكة · والرابطُ المباشرُ يبقى نافذًا",
+            "evidence": "nav_canonical.owner_dept = مكتب الرئيس التنفيذي والنواب · وهذه إدارة الحوكمة والالتزام"
+        },
+        {
+            "ws": "DEP-08",
+            "route": "portal\/visibility_keys",
+            "label": "من يرى ماذا ومكونات البوابة",
+            "old_group": "الإعدادات",
+            "new_group": "—",
+            "verdict": "contextualized",
+            "action": "CONTEXTUALIZE",
+            "why": "CROSS_DOMAIN",
+            "access": "مبدِّلُ المساحاتِ إلى الإدارةِ المالكة · والرابطُ المباشرُ يبقى نافذًا",
+            "evidence": "nav_canonical.owner_dept = مساحة العمل الشخصية · وهذه إدارة الحوكمة والالتزام"
         },
         {
             "ws": "DEP-09",
@@ -6909,9 +7915,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-09",
@@ -7182,12 +8188,12 @@
             "route": "tickets\/tickets_list",
             "label": "صندوق بلاغات الإدارة",
             "old_group": "المخاطر والبلاغات",
-            "new_group": "⌂ مساحةُ عملي",
-            "verdict": "moved",
-            "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
-            "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "new_group": "—",
+            "verdict": "removed",
+            "action": "D_WORKSPACE_SWITCH",
+            "why": "D_WORKSPACE_SWITCH",
+            "access": "مبدِّلُ المساحاتِ إلى DEP-10 · البحثُ · الرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "مملوكةٌ لـDEP-10 (إدارة البلاغات) · nav_placements@DEP-10 · space_class = PERSONAL_SPACE"
         },
         {
             "ws": "DEP-09",
@@ -7221,9 +8227,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-09",
@@ -7365,9 +8371,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-10",
@@ -7401,9 +8407,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-10",
@@ -7413,9 +8419,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-10",
@@ -7425,9 +8431,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-10",
@@ -7605,9 +8611,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-10",
@@ -7725,9 +8731,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-10",
@@ -7893,9 +8899,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-10",
@@ -7905,9 +8911,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-11",
@@ -7941,9 +8947,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-11",
@@ -7953,9 +8959,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-11",
@@ -8637,9 +9643,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-11",
@@ -8790,12 +9796,12 @@
             "route": "tickets\/tickets_list",
             "label": "صندوق بلاغات الإدارة",
             "old_group": "المخاطر والبلاغات",
-            "new_group": "⌂ مساحةُ عملي",
-            "verdict": "moved",
-            "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
-            "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "new_group": "—",
+            "verdict": "removed",
+            "action": "D_WORKSPACE_SWITCH",
+            "why": "D_WORKSPACE_SWITCH",
+            "access": "مبدِّلُ المساحاتِ إلى DEP-10 · البحثُ · الرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "مملوكةٌ لـDEP-10 (إدارة البلاغات) · nav_placements@DEP-10 · space_class = PERSONAL_SPACE"
         },
         {
             "ws": "DEP-11",
@@ -8805,9 +9811,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-11",
@@ -8841,9 +9847,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-11",
@@ -8973,9 +9979,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-12",
@@ -9009,9 +10015,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-12",
@@ -9021,9 +10027,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-12",
@@ -9033,9 +10039,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-12",
@@ -9476,10 +10482,10 @@
             "old_group": "التشغيل اليومي",
             "new_group": "—",
             "verdict": "removed",
-            "action": "PRIMARY",
-            "why": "RECONCILED_TO_TARGET_S16",
-            "access": "—",
-            "evidence": "NAV-ARCH-02 §16 — له هدفٌ مطابقٌ أو إضافةٌ معتمَدةٌ بسندٍ مكتوبٍ سابقٍ لهذه الجولة"
+            "action": "TARGET_GAP_REVIEW",
+            "why": "TRUE_TARGET_GAP",
+            "access": "الرابطُ المباشرُ (‏الصلاحيّةُ باقيةٌ — §22·§42) · البحثُ العامّ · ومبدِّلُ المساحات",
+            "evidence": "gov_legacy_nav_recon.verdict = APPROVED_POST_GUIDE_ADDITION · REPAIR01-OPS-11 · ولا رأسَ طيٍّ له في دورةِ DEP-12 من أيِّ مصدرٍ حاكم (‏ورقةُ الدليلِ · ورقةُ WS-MY · gov_target_nav بدورٍ مربوطٍ بهذه المساحة)"
         },
         {
             "ws": "DEP-12",
@@ -9621,33 +10627,33 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-12",
             "route": "tickets\/ticket_contextual_open",
             "label": "الإبلاغ السياقي من داخل الشاشة",
             "old_group": "المخاطر والبلاغات",
-            "new_group": "⌂ مساحةُ عملي",
-            "verdict": "moved",
-            "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
-            "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "new_group": "—",
+            "verdict": "removed",
+            "action": "D_WORKSPACE_SWITCH",
+            "why": "D_WORKSPACE_SWITCH",
+            "access": "مبدِّلُ المساحاتِ إلى DEP-10 · البحثُ · الرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "مملوكةٌ لـDEP-10 (إدارة البلاغات) · nav_placements@DEP-10 · space_class = PERSONAL_SPACE"
         },
         {
             "ws": "DEP-12",
             "route": "tickets\/tickets_list",
             "label": "صندوق بلاغات الإدارة",
             "old_group": "المخاطر والبلاغات",
-            "new_group": "⌂ مساحةُ عملي",
-            "verdict": "moved",
-            "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
-            "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "new_group": "—",
+            "verdict": "removed",
+            "action": "D_WORKSPACE_SWITCH",
+            "why": "D_WORKSPACE_SWITCH",
+            "access": "مبدِّلُ المساحاتِ إلى DEP-10 · البحثُ · الرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "مملوكةٌ لـDEP-10 (إدارة البلاغات) · nav_placements@DEP-10 · space_class = PERSONAL_SPACE"
         },
         {
             "ws": "DEP-12",
@@ -9657,9 +10663,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-12",
@@ -9681,9 +10687,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-12",
@@ -9873,9 +10879,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-13",
@@ -9909,9 +10915,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-13",
@@ -9921,9 +10927,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-13",
@@ -9933,9 +10939,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-13",
@@ -10255,11 +11261,11 @@
             "label": "تكليف المشغل على المعدة",
             "old_group": "التشغيل اليومي",
             "new_group": "—",
-            "verdict": "removed",
-            "action": "PRIMARY",
-            "why": "RECONCILED_TO_TARGET_S16",
-            "access": "—",
-            "evidence": "NAV-ARCH-02 §16 — له هدفٌ مطابقٌ أو إضافةٌ معتمَدةٌ بسندٍ مكتوبٍ سابقٍ لهذه الجولة"
+            "verdict": "contextualized",
+            "action": "CONTEXTUALIZE",
+            "why": "CROSS_DOMAIN",
+            "access": "مبدِّلُ المساحاتِ إلى DEP-11 · البحثُ · والرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "nav_canonical.owner_dept = إدارة التشغيل = DEP-11 · وله موضعٌ حاكمٌ هناك · وهذه إدارة القوى التشغيلية"
         },
         {
             "ws": "DEP-13",
@@ -10425,33 +11431,33 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-13",
             "route": "tickets\/ticket_contextual_open",
             "label": "الإبلاغ السياقي من داخل الشاشة",
             "old_group": "المخاطر والبلاغات",
-            "new_group": "⌂ مساحةُ عملي",
-            "verdict": "moved",
-            "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
-            "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "new_group": "—",
+            "verdict": "removed",
+            "action": "D_WORKSPACE_SWITCH",
+            "why": "D_WORKSPACE_SWITCH",
+            "access": "مبدِّلُ المساحاتِ إلى DEP-10 · البحثُ · الرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "مملوكةٌ لـDEP-10 (إدارة البلاغات) · nav_placements@DEP-10 · space_class = PERSONAL_SPACE"
         },
         {
             "ws": "DEP-13",
             "route": "tickets\/tickets_list",
             "label": "صندوق بلاغات الإدارة",
             "old_group": "المخاطر والبلاغات",
-            "new_group": "⌂ مساحةُ عملي",
-            "verdict": "moved",
-            "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
-            "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "new_group": "—",
+            "verdict": "removed",
+            "action": "D_WORKSPACE_SWITCH",
+            "why": "D_WORKSPACE_SWITCH",
+            "access": "مبدِّلُ المساحاتِ إلى DEP-10 · البحثُ · الرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "مملوكةٌ لـDEP-10 (إدارة البلاغات) · nav_placements@DEP-10 · space_class = PERSONAL_SPACE"
         },
         {
             "ws": "DEP-13",
@@ -10461,9 +11467,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-13",
@@ -10521,9 +11527,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-13",
@@ -10533,9 +11539,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-14",
@@ -10569,9 +11575,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-14",
@@ -10581,9 +11587,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-14",
@@ -10593,9 +11599,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-14",
@@ -11061,33 +12067,33 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-14",
             "route": "tickets\/ticket_contextual_open",
             "label": "الإبلاغ السياقي من داخل الشاشة",
             "old_group": "المخاطر والبلاغات",
-            "new_group": "⌂ مساحةُ عملي",
-            "verdict": "moved",
-            "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
-            "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "new_group": "—",
+            "verdict": "removed",
+            "action": "D_WORKSPACE_SWITCH",
+            "why": "D_WORKSPACE_SWITCH",
+            "access": "مبدِّلُ المساحاتِ إلى DEP-10 · البحثُ · الرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "مملوكةٌ لـDEP-10 (إدارة البلاغات) · nav_placements@DEP-10 · space_class = PERSONAL_SPACE"
         },
         {
             "ws": "DEP-14",
             "route": "tickets\/tickets_list",
             "label": "صندوق بلاغات الإدارة",
             "old_group": "المخاطر والبلاغات",
-            "new_group": "⌂ مساحةُ عملي",
-            "verdict": "moved",
-            "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
-            "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "new_group": "—",
+            "verdict": "removed",
+            "action": "D_WORKSPACE_SWITCH",
+            "why": "D_WORKSPACE_SWITCH",
+            "access": "مبدِّلُ المساحاتِ إلى DEP-10 · البحثُ · الرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "مملوكةٌ لـDEP-10 (إدارة البلاغات) · nav_placements@DEP-10 · space_class = PERSONAL_SPACE"
         },
         {
             "ws": "DEP-14",
@@ -11121,9 +12127,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-14",
@@ -11205,9 +12211,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-14",
@@ -11217,9 +12223,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-15",
@@ -11253,9 +12259,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-15",
@@ -11265,9 +12271,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-15",
@@ -11277,9 +12283,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-15",
@@ -11673,33 +12679,33 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-15",
             "route": "tickets\/ticket_contextual_open",
             "label": "الإبلاغ السياقي من داخل الشاشة",
             "old_group": "المخاطر والبلاغات",
-            "new_group": "⌂ مساحةُ عملي",
-            "verdict": "moved",
-            "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
-            "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "new_group": "—",
+            "verdict": "removed",
+            "action": "D_WORKSPACE_SWITCH",
+            "why": "D_WORKSPACE_SWITCH",
+            "access": "مبدِّلُ المساحاتِ إلى DEP-10 · البحثُ · الرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "مملوكةٌ لـDEP-10 (إدارة البلاغات) · nav_placements@DEP-10 · space_class = PERSONAL_SPACE"
         },
         {
             "ws": "DEP-15",
             "route": "tickets\/tickets_list",
             "label": "صندوق بلاغات الإدارة",
             "old_group": "المخاطر والبلاغات",
-            "new_group": "⌂ مساحةُ عملي",
-            "verdict": "moved",
-            "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
-            "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "new_group": "—",
+            "verdict": "removed",
+            "action": "D_WORKSPACE_SWITCH",
+            "why": "D_WORKSPACE_SWITCH",
+            "access": "مبدِّلُ المساحاتِ إلى DEP-10 · البحثُ · الرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "مملوكةٌ لـDEP-10 (إدارة البلاغات) · nav_placements@DEP-10 · space_class = PERSONAL_SPACE"
         },
         {
             "ws": "DEP-15",
@@ -11709,9 +12715,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-15",
@@ -11769,9 +12775,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-15",
@@ -11781,9 +12787,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-16",
@@ -11817,9 +12823,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-16",
@@ -11829,9 +12835,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-16",
@@ -11841,9 +12847,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-16",
@@ -12321,33 +13327,33 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-16",
             "route": "tickets\/ticket_contextual_open",
             "label": "الإبلاغ السياقي من داخل الشاشة",
             "old_group": "المخاطر والبلاغات",
-            "new_group": "⌂ مساحةُ عملي",
-            "verdict": "moved",
-            "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
-            "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "new_group": "—",
+            "verdict": "removed",
+            "action": "D_WORKSPACE_SWITCH",
+            "why": "D_WORKSPACE_SWITCH",
+            "access": "مبدِّلُ المساحاتِ إلى DEP-10 · البحثُ · الرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "مملوكةٌ لـDEP-10 (إدارة البلاغات) · nav_placements@DEP-10 · space_class = PERSONAL_SPACE"
         },
         {
             "ws": "DEP-16",
             "route": "tickets\/tickets_list",
             "label": "صندوق بلاغات الإدارة",
             "old_group": "المخاطر والبلاغات",
-            "new_group": "⌂ مساحةُ عملي",
-            "verdict": "moved",
-            "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
-            "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "new_group": "—",
+            "verdict": "removed",
+            "action": "D_WORKSPACE_SWITCH",
+            "why": "D_WORKSPACE_SWITCH",
+            "access": "مبدِّلُ المساحاتِ إلى DEP-10 · البحثُ · الرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "مملوكةٌ لـDEP-10 (إدارة البلاغات) · nav_placements@DEP-10 · space_class = PERSONAL_SPACE"
         },
         {
             "ws": "DEP-16",
@@ -12357,9 +13363,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-16",
@@ -12429,9 +13435,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-16",
@@ -12441,9 +13447,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-17",
@@ -12477,9 +13483,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-17",
@@ -12489,9 +13495,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-17",
@@ -12501,9 +13507,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-17",
@@ -12849,33 +13855,33 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-17",
             "route": "tickets\/ticket_contextual_open",
             "label": "الإبلاغ السياقي من داخل الشاشة",
             "old_group": "المخاطر والبلاغات",
-            "new_group": "⌂ مساحةُ عملي",
-            "verdict": "moved",
-            "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
-            "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "new_group": "—",
+            "verdict": "removed",
+            "action": "D_WORKSPACE_SWITCH",
+            "why": "D_WORKSPACE_SWITCH",
+            "access": "مبدِّلُ المساحاتِ إلى DEP-10 · البحثُ · الرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "مملوكةٌ لـDEP-10 (إدارة البلاغات) · nav_placements@DEP-10 · space_class = PERSONAL_SPACE"
         },
         {
             "ws": "DEP-17",
             "route": "tickets\/tickets_list",
             "label": "صندوق بلاغات الإدارة",
             "old_group": "المخاطر والبلاغات",
-            "new_group": "⌂ مساحةُ عملي",
-            "verdict": "moved",
-            "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
-            "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "new_group": "—",
+            "verdict": "removed",
+            "action": "D_WORKSPACE_SWITCH",
+            "why": "D_WORKSPACE_SWITCH",
+            "access": "مبدِّلُ المساحاتِ إلى DEP-10 · البحثُ · الرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "مملوكةٌ لـDEP-10 (إدارة البلاغات) · nav_placements@DEP-10 · space_class = PERSONAL_SPACE"
         },
         {
             "ws": "DEP-17",
@@ -12885,9 +13891,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-17",
@@ -12945,9 +13951,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "DEP-17",
@@ -12957,9 +13963,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "EX-CEO",
@@ -12993,9 +13999,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "EX-CEO",
@@ -13017,9 +14023,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "EX-CEO",
@@ -13929,9 +14935,9 @@
             "new_group": "⌂ مساحةُ عملي",
             "verdict": "moved",
             "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
+            "why": "PERSONAL_SHORTCUT_S11",
             "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "evidence": "NAV-ARCH-02 §11 — «إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف PERSONAL_SHORTCUT ولا يدخل في مقام دورة الإدارة»"
         },
         {
             "ws": "IAF",
@@ -14502,12 +15508,12 @@
             "route": "tickets\/tickets_list",
             "label": "صندوق بلاغات الإدارة",
             "old_group": "المخاطر والبلاغات",
-            "new_group": "⌂ مساحةُ عملي",
-            "verdict": "moved",
-            "action": "PERSONAL",
-            "why": "PERSONAL_WS_MY_S11",
-            "access": "—",
-            "evidence": "NAV-ARCH-02 §11 — مساحةُ عملي، ولا تدخل مقامَ دورةِ الإدارة"
+            "new_group": "—",
+            "verdict": "removed",
+            "action": "D_WORKSPACE_SWITCH",
+            "why": "D_WORKSPACE_SWITCH",
+            "access": "مبدِّلُ المساحاتِ إلى DEP-10 · البحثُ · الرابطُ المباشرُ يبقى نافذًا (§22)",
+            "evidence": "مملوكةٌ لـDEP-10 (إدارة البلاغات) · nav_placements@DEP-10 · space_class = PERSONAL_SPACE"
         },
         {
             "ws": "IAF",
