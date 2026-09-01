@@ -111,17 +111,22 @@ include '../insidebar.php';
         <div class="table-container"><table class="alltables display gov-ent-table" data-no-dt="1">
         <thead><tr><th>الكيان</th><th>الثلاثية (بلد · جهة · سجل)</th><th>الصفات</th><th>العملة الأساسية</th><th>داخلي؟</th><th>أقرب انتهاء ترخيص</th><th>الحالة</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
-              <th class="ems-fn-th" data-fn="1">كود الكيان</th>
-              <th class="ems-fn-th" data-fn="1">الاسم القانوني الكامل</th>
-              <th class="ems-fn-th" data-fn="1">الشكل النظامي</th>
-              <th class="ems-fn-th" data-fn="1">بلد التسجيل</th>
-              <th class="ems-fn-th" data-fn="1">جهة التسجيل</th>
-              <th class="ems-fn-th" data-fn="1">رقم السجل</th>
+              <!-- XF-01: الموصول بـdata-fn-src تطبعه الشاشة من data-xf على الصف.
+                   وما وصل هنا معروض اصلا في العمودين الاولين مجموعا (الكود والشكل
+                   تحت الاسم، والثلاثية بلدا وجهة وسجلا) فالوصل تفصيل لما يرى.
+                   و«الرقم الضريبي» لا يوصل: tax_no غير معروض في هذا السطح اصلا،
+                   ووصله افشاء جديد لمعرف ضريبي — اظهاره قرار مالك. -->
+              <th class="ems-fn-th" data-fn="1" data-fn-src="entity_code">كود الكيان</th>
+              <th class="ems-fn-th" data-fn="1" data-fn-src="legal_name">الاسم القانوني الكامل</th>
+              <th class="ems-fn-th" data-fn="1" data-fn-src="legal_form">الشكل النظامي</th>
+              <th class="ems-fn-th" data-fn="1" data-fn-src="country">بلد التسجيل</th>
+              <th class="ems-fn-th" data-fn="1" data-fn-src="registry_authority">جهة التسجيل</th>
+              <th class="ems-fn-th" data-fn="1" data-fn-src="commercial_reg">رقم السجل</th>
               <th class="ems-fn-th" data-fn="1">الرقم الضريبي</th>
-              <th class="ems-fn-th" data-fn="1">العنوان المسجل</th>
-              <th class="ems-fn-th" data-fn="1">تاريخ التأسيس</th>
-              <th class="ems-fn-th" data-fn="1">كيان مجموعة؟</th>
-              <th class="ems-fn-th" data-fn="1">اكتمال الملكية</th>
+              <th class="ems-fn-th" data-fn="1" data-fn-src="registered_address">العنوان المسجل</th>
+              <th class="ems-fn-th" data-fn="1" data-fn-src="founded_date">تاريخ التأسيس</th>
+              <th class="ems-fn-th" data-fn="1" data-fn-src="is_group">كيان مجموعة؟</th>
+              <th class="ems-fn-th" data-fn="1" data-fn-src="ownership_completeness">اكتمال الملكية</th>
               <th class="ems-fn-th" data-fn="1">سجله</th>
               <th class="ems-fn-th" data-fn="1">تاريخ التسجيل</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
@@ -137,7 +142,18 @@ include '../insidebar.php';
             $exp = $e['next_expiry'];
             $expSoon = $exp !== null && strtotime($exp) < strtotime('+30 days');
         ?>
-        <tr>
+        <tr data-xf="<?php echo htmlspecialchars(json_encode(array(
+            'entity_code'            => (string) $e['entity_id'],
+            'legal_name'             => (string) $e['legal_name'],
+            'legal_form'             => (string) $e['legal_form'],
+            'country'                => (string) $e['country'],
+            'registry_authority'     => (string) $e['registry_authority'],
+            'commercial_reg'         => (string) $e['commercial_reg'],
+            'registered_address'     => (string) ($e['registered_address'] ?? ''),
+            'founded_date'           => (string) ($e['founded_date'] ?? ''),
+            'is_group'               => (intval($e['is_tenant']) === 1 ? 'نعم' : 'لا'),
+            'ownership_completeness' => (string) ($e['ownership_completeness'] ?? ''),
+        ), JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8'); ?>">
             <td><strong><?php echo htmlspecialchars($e['legal_name']); ?></strong><br><small>#<?php echo intval($e['entity_id']) . ' · ' . htmlspecialchars((string) $e['legal_form']); ?></small></td>
             <td><small><?php echo htmlspecialchars($e['country'] . ' · ' . $e['registry_authority'] . ' · ' . $e['commercial_reg']); ?></small></td>
             <td><?php echo htmlspecialchars((string) $e['roles']); ?></td>

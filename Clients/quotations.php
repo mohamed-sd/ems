@@ -601,15 +601,19 @@ function quo_state_tone($state)
                             <th>الصلاحية</th>
                             <th>الحالة</th>
                             <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
-                            <th class="ems-fn-th" data-fn="1">رقم العرض</th>
+                            <!-- XF-01: الموصول تطبعه الشاشة من data-xf.
+                                 و«تاريخ الاصدار» و«تاريخ الارسال» و«النسخة» لا عمود لها في
+                                 quotations، و«البند» و«الكمية» و«سعر الوحدة» حبة سطر لا حبة
+                                 عرض — فتبقى معلنة حتى تبنى. -->
+                            <th class="ems-fn-th" data-fn="1" data-fn-src="quo_no">رقم العرض</th>
                             <th class="ems-fn-th" data-fn="1">تاريخ الإصدار</th>
                             <th class="ems-fn-th" data-fn="1">نموذج التسعير</th>
                             <th class="ems-fn-th" data-fn="1">البند</th>
                             <th class="ems-fn-th" data-fn="1">الكمية</th>
                             <th class="ems-fn-th" data-fn="1">سعر الوحدة</th>
-                            <th class="ems-fn-th" data-fn="1">الإجمالي</th>
-                            <th class="ems-fn-th" data-fn="1">مدة سريان العرض</th>
-                            <th class="ems-fn-th" data-fn="1">شروط الدفع</th>
+                            <th class="ems-fn-th" data-fn="1" data-fn-src="grand_total">الإجمالي</th>
+                            <th class="ems-fn-th" data-fn="1" data-fn-src="validity">مدة سريان العرض</th>
+                            <th class="ems-fn-th" data-fn="1" data-fn-src="payment_terms">شروط الدفع</th>
                             <th class="ems-fn-th" data-fn="1">شروط التسليم</th>
                             <th class="ems-fn-th" data-fn="1">النسخة</th>
                             <th class="ems-fn-th" data-fn="1">أعده</th>
@@ -635,7 +639,12 @@ function quo_state_tone($state)
                             $created_label = function_exists('ems_actor_label') ? ems_actor_label($conn, intval($row['created_by'])) : ($row['creator_name'] ?? '');
                             $amount_disp = quo_money($row['amount_total']) . ' ' . $row['currency'];
                             ?>
-                            <tr>
+                            <tr data-xf="<?php echo htmlspecialchars(json_encode(array(
+                                'quo_no'        => (string) ($row['quotation_code'] ?? ''),
+                                'grand_total'   => $amount_disp,
+                                'validity'      => (string) ($row['validity_date'] ?? ''),
+                                'payment_terms' => (string) ($row['payment_terms'] ?? ''),
+                            ), JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8'); ?>">
                                 <td>
                                     <div class="action-btns">
                                         <a href="javascript:void(0)" class="action-btn view viewQuoBtn"

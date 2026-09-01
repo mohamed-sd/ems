@@ -117,11 +117,11 @@ include '../insidebar.php';
         <div class="table-container"><table class="alltables display gov-sig-table" data-no-dt="1">
         <thead><tr><th>#</th><th>المفوض</th><th>الكيان المفوض</th><th>نوع التفويض</th><th>السقف المالي</th><th>نطاق التفويض</th><th>نيابة عن</th><th>المدة</th><th>مستند التفويض</th><th>الحالة</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
-              <th class="ems-fn-th" data-fn="1">رقم التفويض</th>
+              <th class="ems-fn-th" data-fn="1" data-fn-src="auth_no">رقم التفويض</th>
               <th class="ems-fn-th" data-fn="1">صفته</th>
-              <th class="ems-fn-th" data-fn="1">توقيع مشترك مطلوب؟</th>
-              <th class="ems-fn-th" data-fn="1">من تاريخ</th>
-              <th class="ems-fn-th" data-fn="1">إلى تاريخ</th>
+              <th class="ems-fn-th" data-fn="1" data-fn-src="joint_required">توقيع مشترك مطلوب؟</th>
+              <th class="ems-fn-th" data-fn="1" data-fn-src="valid_from">من تاريخ</th>
+              <th class="ems-fn-th" data-fn="1" data-fn-src="valid_to">إلى تاريخ</th>
               <th class="ems-fn-th" data-fn="1">جهة التصديق</th>
               <th class="ems-fn-th" data-fn="1">أصدره</th>
               <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
@@ -138,7 +138,12 @@ include '../insidebar.php';
             $left = $a['days_left'];
             $expSoon = $left !== null && intval($left) >= 0 && intval($left) <= 30;
         ?>
-        <tr>
+        <tr data-xf="<?php echo htmlspecialchars(json_encode(array(
+            'auth_no'        => (string) $a['auth_id'],
+            'joint_required' => (intval($a['joint_required'] ?? 0) === 1 ? 'نعم' : 'لا'),
+            'valid_from'     => (string) ($a['valid_from'] ?? ''),
+            'valid_to'       => (string) ($a['valid_to'] ?? ''),
+        ), JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8'); ?>">
             <td><?php echo intval($a['auth_id']); ?></td>
             <td><?php echo htmlspecialchars((string) ($a['person_name'] ?: ('#' . $a['person_id']))); ?></td>
             <td><?php echo htmlspecialchars((string) ($a['entity_name'] ?: ('#' . $a['entity_id']))); ?></td>
