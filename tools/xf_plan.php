@@ -61,11 +61,34 @@ $noTable = 0; $doneScreens = 0;
 
 foreach ($screens as $rel => $heads) {
     if (!$heads) { $doneScreens++; continue; }   /* مسجَّلةٌ ومُنجَزةٌ — تُعدُّ ولا تُخطَّط */
-    $table = ($SCREEN !== '' && $TABLE !== '') ? $TABLE : xf_guess_table($ROOT . '/' . $rel);
+    /* ◆ **الجدولُ يُقاس من حلقةِ الصفوفِ لا من أكثرِ `FROM` تكرارًا**:
+         `xf_guess_table()` كان المستعمَلَ هنا، وهو **مقيسُ الخطأِ في 121 من 160
+         شاشةً (75.6%)** بنصِّ رأسِ `xf_resolve_table()` نفسِه — ومن أمثلتِه
+         المسمّاةِ هناك: `Employees/employees.php` ⇐ `drivercontracts`.
+         والبديلُ الصحيحُ كان **مكتوبًا وغيرَ مُستدعًى**، فبقيت الخطةُ كلُّها
+         قائمةً على استنباطٍ خاطئ. ⛔ وخطرُه ليس تجميليًّا: عليه يُنشئ المنفِّذُ
+         أعمدةَ `NEW`، فجدولٌ خاطئٌ ⇒ عمودٌ يُزرع في جدولٍ لا علاقةَ له.
+       ⛔ **ولا يُرفَع `loop` إلى «مؤكَّد»**: بنصِّ ذيلِ `xf_resolve_table()`
+         «الإشارةُ مرجَّحةٌ لا مؤكَّدة … والتأكيدُ فعلُ إنسانٍ لا استنباطُ أداة».
+         فيبقى التأكيدُ لِما مرَّره المالكُ بـ`--table=` وحدَه، ويُحجَب إنشاءُ
+         `NEW` فيما سواه كما كان. والمُسجَّلُ هنا **درجةُ الثقةِ ودليلُها**
+         ليُراجَعا في الورقة، لا ليُفتَح بهما باب. */
+    $resolved = array('table' => '', 'confidence' => 'unknown', 'evidence' => '');
+    if ($SCREEN !== '' && $TABLE !== '') {
+        $resolved = array('table' => $TABLE, 'confidence' => 'owner', 'evidence' => 'مررها المالكُ بـ--table=');
+    } elseif (function_exists('xf_resolve_table')) {
+        $resolved = xf_resolve_table($ROOT . '/' . $rel);
+    } else {
+        $resolved['table'] = xf_guess_table($ROOT . '/' . $rel);
+        $resolved['confidence'] = $resolved['table'] === '' ? 'unknown' : 'guessed';
+    }
+    $table = (string) $resolved['table'];
     $cols  = xf_table_columns($conn, $table);
     if ($table === '' || !$cols) { $noTable++; }
     $entry = array('screen' => $rel, 'table' => $table,
-                   'table_confirmed' => ($SCREEN !== '' && $TABLE !== ''),
+                   'table_confirmed' => ($resolved['confidence'] === 'owner'),
+                   'table_confidence' => $resolved['confidence'],
+                   'table_evidence' => (string) $resolved['evidence'],
                    'table_exists' => (bool) $cols, 'columns' => array());
     $seen = array();
     foreach ($heads as $h) {

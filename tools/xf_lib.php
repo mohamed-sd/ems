@@ -266,11 +266,44 @@ function xf_resolve_table($path)
         $span = substr($src, $am[0][$i][1], $upto - $am[0][$i][1]);
         if (!preg_match('/\bSELECT\b/i', $span)) { continue; }
         $sel = stripos($span, 'SELECT');
-        if (preg_match('/\bFROM\s+`?([a-z_][a-z0-9_]*)`?/i', substr($span, $sel), $fm)) {
-            $t = strtolower($fm[1]);
-            if (in_array($t, array('information_schema', 'dual'), true)) { continue; }
+        /* ◆ ⭐ **و`FROM` المقصودُ هو الخارجيُّ لا ما في استعلامٍ فرعيّ**: كان
+             النمطُ يأخذ **أوّلَ** `FROM` بعدَ `SELECT`، فإن كانت قائمةُ الحقولِ
+             تحمل استعلامًا فرعيًّا قياسيًّا سبق `FROM` الخارجيَّ نصًّا ⇒ يُلتقط
+             جدولُ الفرعيّ. وهو المقيسُ في `Employees/employees.php`:
+               `(SELECT COUNT(*) FROM drivercontracts …) … FROM employees d`
+             فأُرجع `drivercontracts` — وهو الجدولُ الخطأ بعينِه الذي يسمّيه
+             رأسُ هذه الدالّةِ مثالًا على عطبِ سابقتِها.
+           ◆ **فالمسحُ بعمقِ الأقواس**: يُقبَل `FROM` عند العمقِ صفرٍ وحدَه. */
+        $body = substr($span, $sel);
+        $depth = 0; $t = ''; $len = strlen($body);
+        for ($p = 0; $p < $len; $p++) {
+            $ch = $body[$p];
+            if ($ch === '(') { $depth++; continue; }
+            if ($ch === ')') { if ($depth > 0) { $depth--; } continue; }
+            if ($depth !== 0) { continue; }
+            if (($ch === 'F' || $ch === 'f')
+                && preg_match('/^FROM\s+`?([a-z_][a-z0-9_]*)`?/i', substr($body, $p), $fm)) {
+                $cand = strtolower($fm[1]);
+                if (in_array($cand, array('information_schema', 'dual'), true)) { $p += 4; continue; }
+                $t = $cand;
+                break;
+            }
+        }
+        /* ◆ **والعمقُ تفضيلٌ لا إسقاط**: المقطعُ المفحوصُ قد يُبتَر عند حدِّ
+             الحلقةِ فتختلَّ أقواسُه، فلا يُوجَد عمقٌ صفرٌ أصلًا. وإسقاطُ الشاشةِ
+             حينئذٍ يخسر إشارةً صحيحةً (قِيس: 11 شاشةً نزلت من `loop` إلى
+             `guessed`). فإن خلا العمقُ صفرٌ ⇒ يُؤخَذ أوّلُ `FROM` كما كان. */
+        if ($t === '' && preg_match('/\bFROM\s+`?([a-z_][a-z0-9_]*)`?/i', $body, $fm2)) {
+            $cand = strtolower($fm2[1]);
+            if (!in_array($cand, array('information_schema', 'dual'), true)) {
+                $table = $cand;
+                $why   = "حلقةُ `{$listVar}` ترسم الخلايا · إسنادُها يحمل `FROM {$cand}` (بلا عمقِ قوسٍ صفرٍ مقروء)";
+                break;
+            }
+        }
+        if ($t !== '') {
             $table = $t;
-            $why   = "حلقةُ `{$listVar}` ترسم الخلايا · إسنادُها يحمل `FROM {$t}`";
+            $why   = "حلقةُ `{$listVar}` ترسم الخلايا · إسنادُها يحمل `FROM {$t}` عند عمقِ قوسٍ صفر";
             break;
         }
     }
