@@ -83,6 +83,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             'مستويات الحجية الفعلية (محسوبة من سجل التتبع 24)' => 'effective_authority_levels',
             'قاعدة المالك' => 'owner_rule',
             'عدد أسطر التتبع' => 'trace_line_count',
+            'كود القاعدة' => 'code_rule',
+            'الحقل/المخرج' => 'c2',
+            'القيم الممكنة' => 'c3',
+            'قاعدة الاشتقاق' => 'c4',
+            'الشيت المطبق فيه' => 'c5',
+            'القيد/التحذير' => 'c6',
+            'تصنيف الحجية' => 'authority_class',
         );
         $D = array();
         $__gridRows = ems_w14_guide_rows('sup_dictionary_rule_derivation');
