@@ -1,7 +1,7 @@
 {
     "meta": {
-        "snapshot": "cce83748",
-        "updated_at": "2026-09-01 08:55",
+        "snapshot": "cba0d2db",
+        "updated_at": "2026-09-01 09:19",
         "governing_order": "docs\/REPAIR01_20260823\/orders\/CLOSURE_SYSTEM.txt",
         "sprint_timeboxes": {
             "SPRINT-01": {
@@ -7355,10 +7355,10 @@
             "Estimated_Effort": "XL",
             "Evidence_Contract": "REQUIRED_FIELD_MISSING=0 و UNRULED_EXTRA_FIELD=0 و WRONG_FIELD_ORDER=0 لكل ادارة — بعدة rpr02_field_measure الموسعة على الدفتر المسوى",
             "Next_Action": "ابدا بالادارات البانية سقف البنية (ترتيب السجل) — المقيس الحالي في SCREEN_FIELD_CONFORMANCE",
-            "Current_Snapshot": "الحقول تصير من gov_field_class والاسم العربي من ورقة 02 تتبع الحقول حرفا — والحقل بلا صنف لا يصير (OBL-0052) @ 5c1af89e",
-            "Last_Updated_Snapshot": "5c1af89e",
-            "Last_Evidence_Ref": "مقياس rpr02_field_measure الحي: 891\/4039 ⇒ 1288\/4436 والاسطح المطابقة حقولها كاملة 1\/269 ⇒ 24\/292 — والمقام صعد لدخول 23 سطحا جديدا الجسر (فخ المقام §20) @ 5c1af89e",
-            "Status_Changed_At": "2026-09-01 06:59 @ 5c1af89e",
+            "Current_Snapshot": "والمقام صعد بدخول 90 سطحا جديدا الجسر — فخ المقام §20 معلن، ومفتاح الدفتر صحح الى (screen_id, requirement_id) وازدواج الجسر ازيل @ cba0d2db",
+            "Last_Updated_Snapshot": "cba0d2db",
+            "Last_Evidence_Ref": "جبهة الحقول: 891\/4039 ⇒ 2320\/5420 · اسطح طوبقت حقولها كاملة 1\/269 ⇒ 91\/359 · والدفتر مثبت باقفال نافذة تشخيصية (359 صفا بشاهد لكل) @ cba0d2db",
+            "Status_Changed_At": "2026-09-01 09:19 @ cba0d2db",
             "Final_Disposition": "",
             "Levels": {
                 "Decision": "DECIDED",

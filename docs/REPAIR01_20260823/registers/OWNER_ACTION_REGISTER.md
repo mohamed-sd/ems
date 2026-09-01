@@ -1,7 +1,7 @@
 # OWNER ACTION REGISTER — سجلُّ أعمالِ المالك
 
 > ⛔ لا يدخله إلّا قرارُ أعمالٍ/سياسةٍ/Config حقيقيٌّ لا تحسمه الوثائقُ ولا الهندسة.
-> **اللقطة:** `df5adb85`
+> **اللقطة:** `cba0d2db`
 
 | ID | السؤال | النوع | يحجب | بوّابتُه | القرار | الحال |
 |---|---|---|---|---|---|---|
@@ -13,5 +13,7 @@
 | `OA-06` | قيم الاعتماد (حدود السلم) عند نافذة الظل | BUSINESS_CONFIG | إنفاذ الاعتماد (لا بناء محركه) | Approval Shadow Window | ⏳ | PENDING |
 | `OA-07` | اعتماد الاصدار الهدف للكونين المؤجلين LG-OFFLINE وLG-OPARCH (NEXT_RELEASE) | RELEASE_PLANNING | صفة GOVERNED_DEFERRED الرسمية للكونين — لا يحجب بناء شيء | اعلان OWNER_APPROVED_PRODUCTION_BASELINE | ⏳ | PENDING |
 | `OA-08` | انشاء السنوات المالية التاريخية 2020-2025 بحالاتها وتواريخ اقفالها (فعل محاسبي يفك 1103 قيدا يدويا بلا فترة حاوية) | BUSINESS_ACCOUNTING_CONFIG | CL-R3-M11 — حوكمة القيد اليدوي الارثي | unsupported manual journals = 0 (بوابة الاصدار) | ⏳ | PENDING |
+| `OA-09` | ربطُ دورِ نوّابِ الرئيس `EX-DVP` — أيُّ دورٍ قائمٍ يحمله أم يُستحدَث؟ | BUSINESS_OWNERSHIP | ستةُ مواضعِ دليلٍ في `EX-DVP` هي كلُّ ما بقي غيرَ مبنيٍّ من 413 · وبطاقةُ تحقُّقِها البشريِّ | `TARGET_BUILD_COVERAGE` = 413/413 | ⏳ | PENDING |
+| `OA-10` | صلاحيةُ الكتابةِ لدورِ التشغيل (1) على «الخطة الموسمية ومعاملاتها» — منحةُ الدورِ قائمةٌ (`role_permissions` 1/1/1) وقالبُ مستخدميه `can_edit=0` فلا يُصيَّر زرُّ التسجيل | BUSINESS_PERMISSION | فعلُ التسجيلِ على `operations/ops_seasonal_factors.php` وحدَه | برهانُ الممارسةِ `tests/gov_exec_action_exercise_proof.php` بلا حاجزِ منحة | ⏳ | PENDING |
 
 **Required_By_Gate لا تاريخٌ مخترَع** — والقرارُ يحجب نطاقَه فقط.
