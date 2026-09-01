@@ -16,6 +16,7 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w14_view.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 
 $ctx = w14_ctx();
 $is_super = $ctx['is_super'];
@@ -59,23 +60,37 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_corrective_actions')); ?>
-    <table id="emsList_corrective_actions" class="data-table">
-        <thead><tr><th>رقم الإجراء</th><th>الإجراء</th><th>المصدر</th><th>مرجع المصدر</th><th>الإدارة المالكة</th><th>المسؤول</th><th>المهلة</th><th>دليل الإغلاق</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= ems_w14_txt($r["action_no"]) ?></td>
-                    <td><?= ems_w14_txt($r["title_ar"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["source_kind"]) ?></td>
-                    <td><?= ems_w14_txt($r["source_ref"]) ?></td>
-                    <td><?= ems_w14_txt($r["owner_dept"]) ?></td>
-                    <td><?= (int) $r["owner_person"] ?></td>
-                    <td><?= ems_w14_txt($r["due_date"]) ?></td>
-                    <td><?= ems_w14_txt($r["evidence_ref"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف الإجراء' => 'action_no',
+        'مصدر الإجراء' => '@source_kind',
+        'مرجع المصدر' => 'source_ref',
+        'وصف الإجراء' => 'title_ar',
+        'المالك' => '#owner',
+        'الإدارة' => 'owner_dept',
+        'المهلة' => 'due_date',
+        'أيام التأخير' => '#days',
+        'دليل الإغلاق' => 'evidence_ref',
+        'تحقق الفاعلية' => '#verified',
+        'حالة الإجراء' => '@state',
+        'المنشئ' => '#assigner',
+    );
+    $D = array(
+        'owner' => function ($r) { return ems_w14_person($r['owner_person']); },
+        'days'  => function ($r) {
+            return ems_w14_days_to($r['due_date'], trim((string) $r['verified_at']) !== '');
+        },
+        /* الفاعليّةُ تُتحقَّق بمن ومتى — لا بعلامةٍ مفردة */
+        'verified' => function ($r) {
+            $p = ems_w14_person($r['verified_by']);
+            $a = trim((string) $r['verified_at']);
+            return ($p !== '' && $a !== '') ? ($p . ' / ' . $a) : ($p !== '' ? $p : $a);
+        },
+        'assigner' => function ($r) { return ems_w14_person($r['assigned_by']); },
+    );
+    echo ems_w14_grid('emsList_corrective_actions', $GUIDE_COLS, $rows, $D, 'لا إجراءات مسجلة'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

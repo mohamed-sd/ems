@@ -16,6 +16,7 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w14_view.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 
 $ctx = w14_ctx();
 $is_super = $ctx['is_super'];
@@ -59,22 +60,31 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_audit_followup')); ?>
-    <table id="emsList_audit_followup" class="data-table">
-        <thead><tr><th>رقم المتابعة</th><th>الملاحظة</th><th>مصدر الملاحظة</th><th>خطة الإدارة</th><th>الإدارة المسؤولة</th><th>مهلة الخطة</th><th>مرات التكرار</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= ems_w14_txt($r["followup_no"]) ?></td>
-                    <td><?= ems_w14_txt($r["finding_no"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["finding_source"]) ?></td>
-                    <td><?= ems_w14_txt($r["mgmt_plan_ar"]) ?></td>
-                    <td><?= ems_w14_txt($r["plan_owner_dept"]) ?></td>
-                    <td><?= ems_w14_txt($r["plan_due"]) ?></td>
-                    <td><?= (int) $r["recurrence_no"] ?></td>
-                    <td><?= ems_w14_state((string) $r["follow_state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف النتيجة' => 'followup_no',
+        'جهة المراجعة' => '@finding_source',
+        'مرجع التقرير' => 'finding_no',
+        'النتيجة' => 'finding_ar',
+        'التصنيف' => 'finding_class',
+        'متكررة؟' => '#recurring',
+        'خطة الإدارة' => 'mgmt_plan_ar',
+        'المالك' => 'plan_owner_dept',
+        'المهلة' => 'plan_due',
+        'مرجع الإجراء التصحيحي' => 'action_no',
+        'حالة النتيجة' => '@follow_state',
+        'مرجع المصدر' => 'src_ref',
+    );
+    $D = array(
+        /* التكرارُ رقمٌ في السجلِّ — والصفرُ ليس تكرارًا */
+        'recurring' => function ($r) {
+            $n = (int) $r['recurrence_no'];
+            return $n > 1 ? ('نعم - ' . $n . ' مرات') : ($n === 1 ? 'لا' : '');
+        },
+    );
+    echo ems_w14_grid('emsList_audit_followup', $GUIDE_COLS, $rows, $D, 'لا متابعات مسجلة'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

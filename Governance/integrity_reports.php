@@ -16,6 +16,7 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w14_view.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 
 $ctx = w14_ctx();
 $is_super = $ctx['is_super'];
@@ -59,22 +60,41 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_integrity_reports')); ?>
-    <table id="emsList_integrity_reports" class="data-table">
-        <thead><tr><th>رقم البلاغ</th><th>القناة</th><th>هوية محجوبة</th><th>الموضوع</th><th>تاريخ الاستلام</th><th>تاريخ الفرز</th><th>أحيل إلى</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= ems_w14_txt($r["report_no"]) ?></td>
-                    <td><?= ems_w14_txt($r["channel"]) ?></td>
-                    <td><?= (int) $r["is_anonymous"] ?></td>
-                    <td><?= ems_w14_txt($r["subject_ar"]) ?></td>
-                    <td><?= ems_w14_txt($r["received_at"]) ?></td>
-                    <td><?= ems_w14_txt($r["triage_at"]) ?></td>
-                    <td><?= ems_w14_txt($r["referred_to"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'رقم البلاغ' => 'report_no',
+        'قناة الورود' => '@channel',
+        'هوية المبلغ - مقيدة' => '#reporter',
+        'موضوع البلاغ' => 'subject_ar',
+        'الجهة/الشخص المعني' => 'referred_to',
+        'الوصف المقيد' => 'description_ar',
+        'التقييم الأولي' => '#triage',
+        'مرجع التحقيق' => 'investigation_no',
+        'إجراء الحماية' => '#protection',
+        'حالة البلاغ' => '@state',
+        'تاريخ الإنشاء' => 'received_at',
+        'مرجع المصدر' => 'src_ref',
+    );
+    $D = array(
+        /* الهويّةُ مقيَّدةٌ بنصِّ الورقة: الرمزُ يُعرَض والاسمُ لا يُكشف هنا —
+           والمجهولُ يُعلَن مجهولًا لا فارغًا. */
+        'reporter' => function ($r) {
+            if ((int) $r['is_anonymous'] === 1) { return 'بلاغ مجهول المصدر'; }
+            $t = trim((string) $r['reporter_token']);
+            return $t !== '' ? ('رمز المبلغ ' . $t) : '';
+        },
+        'triage' => function ($r) {
+            $p = ems_w14_person($r['triage_by']);
+            $a = trim((string) $r['triage_at']);
+            return ($p !== '' && $a !== '') ? ($p . ' / ' . $a) : ($p !== '' ? $p : $a);
+        },
+        'protection' => function ($r) {
+            return ((int) $r['retaliation_flag'] === 1) ? 'حماية من الانتقام مفعلة' : '';
+        },
+    );
+    echo ems_w14_grid('emsList_integrity_reports', $GUIDE_COLS, $rows, $D, 'لا بلاغات مسجلة'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

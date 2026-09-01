@@ -16,6 +16,7 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w14_view.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 
 $ctx = w14_ctx();
 $is_super = $ctx['is_super'];
@@ -59,21 +60,20 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_conduct_acknowledgements')); ?>
-    <table id="emsList_conduct_acknowledgements" class="data-table">
-        <thead><tr><th>الموظف</th><th>إصدار المدونة</th><th>السياسة</th><th>الموعد</th><th>تاريخ الإقرار</th><th>الدليل</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= (int) $r["employee_id"] ?></td>
-                    <td><?= ems_w14_txt($r["code_version"]) ?></td>
-                    <td><?= ems_w14_txt($r["policy_no"]) ?></td>
-                    <td><?= ems_w14_txt($r["due_date"]) ?></td>
-                    <td><?= ems_w14_txt($r["acked_at"]) ?></td>
-                    <td><?= ems_w14_txt($r["evidence_ref"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف الإقرار' => 'ack_no',
+        'رقم الموظف' => 'employee_id',
+        'إصدار المدونة' => 'code_version',
+        'قناة الإقرار' => 'ack_channel',
+        'تاريخ الإقرار' => 'acked_at',
+        'حالة الإقرار' => '@state',
+        'مرجع المصدر' => 'src_ref',
+    );
+    $D = array();
+    echo ems_w14_grid('emsList_conduct_acknowledgements', $GUIDE_COLS, $rows, $D, 'لا إقرارات مسجلة'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

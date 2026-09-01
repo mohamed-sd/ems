@@ -16,6 +16,7 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w14_view.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 
 $ctx = w14_ctx();
 $is_super = $ctx['is_super'];
@@ -59,22 +60,46 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_gifts_hospitality')); ?>
-    <table id="emsList_gifts_hospitality" class="data-table">
-        <thead><tr><th>رقم الإفصاح</th><th>المفصح</th><th>النوع</th><th>الجهة المانحة</th><th>القيمة التقديرية</th><th>العملة</th><th>القرار</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= ems_w14_txt($r["gift_no"]) ?></td>
-                    <td><?= (int) $r["person_id"] ?></td>
-                    <td><?= ems_w14_state((string) $r["gift_kind"]) ?></td>
-                    <td><?= ems_w14_txt($r["giver_ar"]) ?></td>
-                    <td><?= ems_w14_num($r["est_value"]) ?></td>
-                    <td><?= ems_w14_txt($r["currency"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["decision"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف الإفصاح' => 'gift_no',
+        'المفصح' => '#person',
+        'الطرف المقدم/المتلقي' => 'giver_ar',
+        'الاتجاه' => 'direction',
+        'الوصف' => 'description_ar',
+        'القيمة التقديرية' => '#amount',
+        'فوق حد الإفصاح؟' => '#over',
+        'السياق' => 'context_ar',
+        'القرار' => '#decision',
+        'حالة الإفصاح' => '@state',
+        'تاريخ الإنشاء' => 'disclosed_at',
+        'مرجع المصدر' => 'src_ref',
+    );
+    $D = array(
+        'person' => function ($r) { return ems_w14_person($r['person_id']); },
+        'amount' => function ($r) {
+            $v = trim((string) $r['est_value']);
+            if ($v === '' || (float) $v == 0.0) { return ''; }
+            return ems_w14_num($v) . ' ' . trim((string) $r['currency']);
+        },
+        /* الحدُّ في السجلِّ لا في الشاشة: `threshold_key` مفتاحُ الحدِّ المنطبق —
+           فوجودُه يعني أن الإفصاحَ لزم، وغيابُه يعني أن الحدَّ لم يُحدَّد بعد.
+           ⛔ ولا يُخترع رقمُ حدٍّ هنا. */
+        'over' => function ($r) {
+            $k = trim((string) $r['threshold_key']);
+            if ($k === '') { return ''; }
+            return ((float) $r['est_value'] > 0) ? 'نعم' : 'لا';
+        },
+        'decision' => function ($r) {
+            $d = trim((string) $r['decision']);
+            $d = $d === '' ? '' : ems_w14_ar($d);
+            $p = ems_w14_person($r['decided_by']);
+            return ($d !== '' && $p !== '') ? ($d . ' / ' . $p) : ($d !== '' ? $d : $p);
+        },
+    );
+    echo ems_w14_grid('emsList_gifts_hospitality', $GUIDE_COLS, $rows, $D, 'لا إفصاحات هدايا'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

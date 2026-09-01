@@ -16,6 +16,7 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w14_view.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 
 $ctx = w14_ctx();
 $is_super = $ctx['is_super'];
@@ -59,23 +60,32 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_related_parties')); ?>
-    <table id="emsList_related_parties" class="data-table">
-        <thead><tr><th>رقم الطرف</th><th>اسم الطرف</th><th>صفة العلاقة</th><th>مرجع التعامل</th><th>قيمة التعامل</th><th>الإفصاح</th><th>بين كيانات المجموعة</th><th>نوع المعاملة</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= ems_w14_txt($r["party_no"]) ?></td>
-                    <td><?= ems_w14_txt($r["party_name"]) ?></td>
-                    <td><?= ems_w14_txt($r["relation_ar"]) ?></td>
-                    <td><?= ems_w14_txt($r["deal_ref"]) ?></td>
-                    <td><?= ems_w14_num($r["deal_amount"]) ?></td>
-                    <td><?= ems_w14_txt($r["disclosure_no"]) ?></td>
-                    <td><?= (int) $r["intercompany_flag"] ?></td>
-                    <td><?= ems_w14_txt($r["transaction_type"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف الطرف' => 'party_no',
+        'اسم الطرف' => 'party_name',
+        'نوع الصلة' => 'relation_ar',
+        'الشخص المرتبط داخليا' => '#person',
+        'التعاملات القائمة' => 'deal_ref',
+        'قيمة التعاملات' => '#amount',
+        'شروط التعامل' => 'transaction_type',
+        'مرجع إفصاح AAM' => 'disclosure_no',
+        'حالة السطر' => '@state',
+        'تاريخ الإنشاء' => 'created_at',
+        'مرجع المصدر' => 'src_ref',
+    );
+    $D = array(
+        'person' => function ($r) { return ems_w14_person($r['person_id']); },
+        /* القيمةُ بعملتِها — ورقمٌ بلا عملةٍ لا يُقارَن */
+        'amount' => function ($r) {
+            $v = trim((string) $r['deal_amount']);
+            if ($v === '' || (float) $v == 0.0) { return ''; }
+            return ems_w14_num($v) . ' ' . trim((string) $r['deal_currency']);
+        },
+    );
+    echo ems_w14_grid('emsList_related_parties', $GUIDE_COLS, $rows, $D, 'لا أطراف ذات علاقة'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

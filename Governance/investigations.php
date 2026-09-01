@@ -16,6 +16,7 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w14_view.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 
 $ctx = w14_ctx();
 $is_super = $ctx['is_super'];
@@ -59,23 +60,35 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_investigations')); ?>
-    <table id="emsList_investigations" class="data-table">
-        <thead><tr><th>رقم التحقيق</th><th>النوع</th><th>الإدارة المالكة</th><th>المصدر</th><th>التكليف المكتوب</th><th>المحقق</th><th>التنحي عن</th><th>أحيل إلى</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= ems_w14_txt($r["inv_no"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["inv_kind"]) ?></td>
-                    <td><?= ems_w14_txt($r["owner_dept"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["origin"]) ?></td>
-                    <td><?= ems_w14_txt($r["mandate_doc_ref"]) ?></td>
-                    <td><?= (int) $r["investigator_id"] ?></td>
-                    <td><?= ems_w14_txt($r["recusal_of"]) ?></td>
-                    <td><?= ems_w14_txt($r["referred_to"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'رقم التحقيق' => 'inv_no',
+        'مصدر التحقيق' => '@origin',
+        'مرجع المصدر' => 'origin_ref',
+        'المحقق/اللجنة' => '#investigator',
+        'نطاق التحقيق' => 'scope_ar',
+        'مستوى السرية' => 'confidentiality',
+        'المدة المقررة' => 'due_period',
+        'النتيجة' => 'conclusion_ar',
+        'التوصيات' => 'recommendations_ar',
+        'الإحالات المتفرعة' => 'referred_to',
+        'حالة التحقيق' => '@state',
+        'تاريخ الإنشاء' => 'created_at',
+        'المراجع' => '#concluder',
+        'تاريخ الاعتماد' => 'concluded_at',
+    );
+    $D = array(
+        /* المحقّقُ شخصٌ أو لجنةٌ بتكليفِها المكتوب — والتكليفُ شرطُ الفتح */
+        'investigator' => function ($r) {
+            $p = ems_w14_person($r['investigator_id']);
+            $m = trim((string) $r['mandate_doc_ref']);
+            return ($p !== '' && $m !== '') ? ($p . ' (' . $m . ')') : ($p !== '' ? $p : $m);
+        },
+        'concluder' => function ($r) { return ems_w14_person($r['concluded_by']); },
+    );
+    echo ems_w14_grid('emsList_investigations', $GUIDE_COLS, $rows, $D, 'لا تحقيقات مسجلة'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

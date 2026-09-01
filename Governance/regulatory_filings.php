@@ -16,6 +16,7 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w14_view.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 
 $ctx = w14_ctx();
 $is_super = $ctx['is_super'];
@@ -59,22 +60,28 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_regulatory_filings')); ?>
-    <table id="emsList_regulatory_filings" class="data-table">
-        <thead><tr><th>رقم التقديم</th><th>الالتزام</th><th>الجهة</th><th>الفترة</th><th>الموعد</th><th>تاريخ التقديم</th><th>الإيصال</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= ems_w14_txt($r["filing_no"]) ?></td>
-                    <td><?= ems_w14_txt($r["obligation_no"]) ?></td>
-                    <td><?= ems_w14_txt($r["authority_ar"]) ?></td>
-                    <td><?= ems_w14_txt($r["period_label"]) ?></td>
-                    <td><?= ems_w14_txt($r["due_date"]) ?></td>
-                    <td><?= ems_w14_txt($r["submitted_at"]) ?></td>
-                    <td><?= ems_w14_txt($r["receipt_ref"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف التقديم' => 'filing_no',
+        'نوع التقديم' => 'filing_kind',
+        'الجهة' => 'authority_ar',
+        'الكيان' => '#entity',
+        'الفترة المشمولة' => 'period_label',
+        'الموعد النظامي' => 'due_date',
+        'تاريخ التقديم الفعلي' => 'submitted_at',
+        'إيصال/مرجع التقديم' => 'receipt_ref',
+        'مرجع الالتزام' => 'obligation_no',
+        'حالة التقديم' => '@state',
+        'المنشئ' => '#submitter',
+        'مرجع المصدر' => 'src_ref',
+    );
+    $D = array(
+        'entity'    => function ($r) { return ems_w14_company($r['company_id']); },
+        'submitter' => function ($r) { return ems_w14_person($r['submitted_by']); },
+    );
+    echo ems_w14_grid('emsList_regulatory_filings', $GUIDE_COLS, $rows, $D, 'لا تقديمات مسجلة'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

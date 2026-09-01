@@ -16,6 +16,7 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w14_view.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 
 $ctx = w14_ctx();
 $is_super = $ctx['is_super'];
@@ -59,22 +60,53 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_policies')); ?>
-    <table id="emsList_policies" class="data-table">
-        <thead><tr><th>رقم السياسة</th><th>الإصدار</th><th>العنوان</th><th>المجال</th><th>الإدارة المالكة</th><th>تاريخ النفاذ</th><th>موعد المراجعة</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= ems_w14_txt($r["policy_no"]) ?></td>
-                    <td><?= (int) $r["version_no"] ?></td>
-                    <td><?= ems_w14_txt($r["title_ar"]) ?></td>
-                    <td><?= ems_w14_txt($r["domain_ar"]) ?></td>
-                    <td><?= ems_w14_txt($r["owner_dept"]) ?></td>
-                    <td><?= ems_w14_txt($r["effective_from"]) ?></td>
-                    <td><?= ems_w14_txt($r["review_due"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'كود السياسة' => 'policy_no',
+        'اسم السياسة' => 'title_ar',
+        'النطاق' => 'domain_ar',
+        'الإصدار النافذ' => 'version_no',
+        'مالك السياسة' => '#owner',
+        'تاريخ النفاذ' => 'effective_from',
+        'دورية المراجعة' => 'review_periodicity',
+        'آخر مراجعة' => '#last_review',
+        'الوثيقة المرفقة' => 'doc_ref',
+        'قواعد المنع المستندة' => '#guards',
+        'حالة السياسة' => '@state',
+        'المنشئ' => '#author',
+        'تاريخ الإنشاء' => 'created_at',
+        'المراجع' => '#reviewer',
+        'المعتمد' => '#approver',
+        'تاريخ الاعتماد' => 'approved_at',
+        'مرجع المصدر' => 'src_ref',
+    );
+    $D = array(
+        /* مالكُ السياسةِ: الإدارةُ ومن يحملها — والاثنان معًا لا أحدُهما */
+        'owner' => function ($r) {
+            $d = trim((string) $r['owner_dept']);
+            $p = ems_w14_person($r['owner_person']);
+            return ($d !== '' && $p !== '') ? ($d . ' / ' . $p) : ($d !== '' ? $d : $p);
+        },
+        /* آخرُ مراجعةٍ: اعتمادُ أحدثِ إصدارٍ سابقٍ للسياسةِ نفسِها — مشتقٌّ من
+           الصفوفِ المقروءةِ لا من عمودٍ ثانٍ يُنشأ. */
+        'last_review' => function ($r) use ($rows) {
+            $best = '';
+            foreach ($rows as $o) {
+                if ((string) $o['policy_no'] !== (string) $r['policy_no']) { continue; }
+                if ((int) $o['version_no'] >= (int) $r['version_no']) { continue; }
+                $a = trim((string) $o['approved_at']);
+                if ($a !== '' && $a > $best) { $best = $a; }
+            }
+            return $best;
+        },
+        'guards'   => function ($r) { return ems_w14_guard_count($r['policy_no']); },
+        'author'   => function ($r) { return ems_w14_person($r['authored_by']); },
+        'reviewer' => function ($r) { return ems_w14_person($r['reviewed_by']); },
+        'approver' => function ($r) { return ems_w14_person($r['approved_by']); },
+    );
+    echo ems_w14_grid('emsList_policies', $GUIDE_COLS, $rows, $D, 'لا سياسات مسجلة'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

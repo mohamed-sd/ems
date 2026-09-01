@@ -16,6 +16,7 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w14_view.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 
 $ctx = w14_ctx();
 $is_super = $ctx['is_super'];
@@ -59,22 +60,29 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_committees')); ?>
-    <table id="emsList_committees" class="data-table">
-        <thead><tr><th>رمز اللجنة</th><th>الاسم</th><th>الاختصاص</th><th>الميثاق</th><th>رئيس اللجنة</th><th>عدد الأعضاء</th><th>دورية الانعقاد</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= ems_w14_txt($r["committee_code"]) ?></td>
-                    <td><?= ems_w14_txt($r["name_ar"]) ?></td>
-                    <td><?= ems_w14_txt($r["mandate_ar"]) ?></td>
-                    <td><?= ems_w14_txt($r["charter_ref"]) ?></td>
-                    <td><?= (int) $r["chair_person"] ?></td>
-                    <td><?= (int) $r["member_count"] ?></td>
-                    <td><?= ems_w14_state((string) $r["meeting_cycle"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'كود اللجنة' => 'committee_code',
+        'اسم اللجنة' => 'name_ar',
+        'الاختصاص' => 'mandate_ar',
+        'التشكيل' => '#members',
+        'الرئيس' => '#chair',
+        'النصاب' => 'quorum_key',
+        'دورية الانعقاد' => '@meeting_cycle',
+        'مرجع قرار التشكيل' => 'charter_ref',
+        'حالة اللجنة' => '@state',
+        'مرجع المصدر' => 'src_ref',
+    );
+    $D = array(
+        'members' => function ($r) {
+            $n = (int) $r['member_count'];
+            return $n > 0 ? ($n . ' عضوا') : '';
+        },
+        'chair' => function ($r) { return ems_w14_person($r['chair_person']); },
+    );
+    echo ems_w14_grid('emsList_committees', $GUIDE_COLS, $rows, $D, 'لا لجان مسجلة'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

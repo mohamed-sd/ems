@@ -16,6 +16,7 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w14_view.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 
 $ctx = w14_ctx();
 $is_super = $ctx['is_super'];
@@ -59,22 +60,41 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_conflict_disclosures')); ?>
-    <table id="emsList_conflict_disclosures" class="data-table">
-        <thead><tr><th>رقم الإفصاح</th><th>صاحب الإفصاح</th><th>طبيعة التضارب</th><th>الطرف المقابل</th><th>المقيم</th><th>القرار</th><th>التجنيب عن</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= ems_w14_txt($r["disclosure_no"]) ?></td>
-                    <td><?= (int) $r["person_id"] ?></td>
-                    <td><?= ems_w14_txt($r["nature_ar"]) ?></td>
-                    <td><?= ems_w14_txt($r["counterparty_ar"]) ?></td>
-                    <td><?= (int) $r["assessed_by"] ?></td>
-                    <td><?= ems_w14_state((string) $r["decision"]) ?></td>
-                    <td><?= ems_w14_txt($r["recused_from"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف الإفصاح' => 'disclosure_no',
+        'المفصح' => '#person',
+        'صفة المفصح' => '#capacity',
+        'طبيعة التضارب' => 'nature_ar',
+        'الطرف الآخر' => 'counterparty_ar',
+        'العلاقة' => 'relation_ar',
+        'القرار المتأثر المحتمل' => 'recused_from',
+        'قرار الحوكمة' => '#decision',
+        'الضوابط المفروضة' => 'controls_ar',
+        'مراجعة دورية' => '#next_review',
+        'حالة الإفصاح' => '@state',
+        'تاريخ الإنشاء' => 'disclosed_at',
+        'المراجع' => '#assessor',
+        'تاريخ الاعتماد' => 'approved_at',
+        'مرجع المصدر' => 'src_ref',
+    );
+    $D = array(
+        'person'   => function ($r) { return ems_w14_person($r['person_id']); },
+        'capacity' => function ($r) { return ems_w14_person_role($r['person_id']); },
+        /* القرارُ ومرجعُه معًا — فقرارٌ بلا مرجعٍ لا يُراجَع */
+        'decision' => function ($r) {
+            $d = trim((string) $r['decision']);
+            $d = $d === '' ? '' : ems_w14_ar($d);
+            $x = trim((string) $r['decision_ref']);
+            return ($d !== '' && $x !== '') ? ($d . ' (' . $x . ')') : ($d !== '' ? $d : $x);
+        },
+        /* المراجعةُ الدوريّةُ للإفصاحِ القائم: سنةٌ من تاريخِ الإفصاح */
+        'next_review' => function ($r) { return ems_w14_year_after($r['disclosed_at']); },
+        'assessor' => function ($r) { return ems_w14_person($r['assessed_by']); },
+    );
+    echo ems_w14_grid('emsList_conflict_disclosures', $GUIDE_COLS, $rows, $D, 'لا إفصاحات مسجلة'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

@@ -16,6 +16,7 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w14_view.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 
 $ctx = w14_ctx();
 $is_super = $ctx['is_super'];
@@ -59,20 +60,33 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_compliance_calendar')); ?>
-    <table id="emsList_compliance_calendar" class="data-table">
-        <thead><tr><th>الالتزام</th><th>تاريخ الاستحقاق</th><th>الإدارة المسؤولة</th><th>مصدر الاشتقاق</th><th>مرجع التنفيذ</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= ems_w14_txt($r["obligation_no"]) ?></td>
-                    <td><?= ems_w14_txt($r["due_date"]) ?></td>
-                    <td><?= ems_w14_txt($r["owner_dept"]) ?></td>
-                    <td><?= ems_w14_txt($r["derived_from"]) ?></td>
-                    <td><?= ems_w14_txt($r["settled_ref"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف الاستحقاق' => 'due_no',
+        'مصدر الاستحقاق' => 'derived_from',
+        'البند' => 'obligation_no',
+        'الكيان' => '#entity',
+        'تاريخ الاستحقاق' => 'due_date',
+        'المسؤول' => '#owner',
+        'أيام متبقية/تأخير' => '#days',
+        'مرجع الإنجاز' => 'settled_ref',
+        'الحالة' => '@state',
+    );
+    $D = array(
+        'entity' => function ($r) { return ems_w14_company($r['company_id']); },
+        'owner'  => function ($r) {
+            $d = trim((string) $r['owner_dept']);
+            $p = ems_w14_person($r['owner_person']);
+            return ($d !== '' && $p !== '') ? ($d . ' / ' . $p) : ($d !== '' ? $d : $p);
+        },
+        /* المهلةُ لا تُحسب على منجَزٍ — والمرجعُ دليلُ الإنجاز */
+        'days' => function ($r) {
+            return ems_w14_days_to($r['due_date'], trim((string) $r['settled_ref']) !== '');
+        },
+    );
+    echo ems_w14_grid('emsList_compliance_calendar', $GUIDE_COLS, $rows, $D, 'لا استحقاقات'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

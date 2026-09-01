@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-01 09:57:40
--- الجداول: 1052 · المناظير: 28
+-- المصدر: equipation_manage · التوليد: 2026-09-01 20:32:03
+-- الجداول: 1053 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -8361,6 +8361,8 @@ CREATE TABLE `gov_audit_followup` (
   `action_no` varchar(40) NOT NULL DEFAULT '',
   `follow_state` varchar(24) NOT NULL DEFAULT 'tracking',
   `src_ref` varchar(255) NOT NULL DEFAULT '',
+  `finding_ar` varchar(600) DEFAULT NULL COMMENT 'النتيجة',
+  `finding_class` varchar(40) DEFAULT NULL COMMENT 'التصنيف',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_gaf` (`company_id`,`followup_no`),
   KEY `ix_gaf_find` (`finding_no`),
@@ -8442,6 +8444,7 @@ CREATE TABLE `gov_breach` (
   `state` varchar(24) NOT NULL DEFAULT 'opened',
   `src_ref` varchar(255) NOT NULL DEFAULT '',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `impact_ar` varchar(400) DEFAULT NULL COMMENT 'الأثر المقدر',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_gvb` (`company_id`,`case_no`),
   KEY `ix_gvb_dev` (`deviation_no`),
@@ -8560,6 +8563,7 @@ CREATE TABLE `gov_compliance_due` (
   `settled_ref` varchar(64) NOT NULL DEFAULT '',
   `state` varchar(24) NOT NULL DEFAULT 'due',
   `src_ref` varchar(255) NOT NULL DEFAULT '',
+  `due_no` varchar(40) DEFAULT NULL COMMENT 'معرف الاستحقاق',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_gcd` (`company_id`,`obligation_no`,`due_date`),
   CONSTRAINT `chk_gcd_state` CHECK (`state` in ('due','met','late','waived')),
@@ -8593,6 +8597,8 @@ CREATE TABLE `gov_conduct_ack` (
   `evidence_ref` varchar(120) NOT NULL DEFAULT '',
   `state` varchar(24) NOT NULL DEFAULT 'due',
   `src_ref` varchar(255) NOT NULL DEFAULT '',
+  `ack_no` varchar(40) DEFAULT NULL COMMENT 'معرف الإقرار',
+  `ack_channel` varchar(24) DEFAULT NULL COMMENT 'قناة الإقرار',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_gca` (`company_id`,`employee_id`,`code_version`),
   CONSTRAINT `chk_gca_state` CHECK (`state` in ('due','acknowledged','overdue','exempt')),
@@ -8616,6 +8622,9 @@ CREATE TABLE `gov_conflict_disclosure` (
   `recused_from` varchar(255) NOT NULL DEFAULT '' COMMENT 'القرار الذي تنحى عنه صاحب الافصاح',
   `state` varchar(24) NOT NULL DEFAULT 'disclosed',
   `src_ref` varchar(255) NOT NULL DEFAULT '',
+  `relation_ar` varchar(200) DEFAULT NULL COMMENT 'العلاقة',
+  `controls_ar` varchar(400) DEFAULT NULL COMMENT 'الضوابط المفروضة',
+  `approved_at` datetime DEFAULT NULL COMMENT 'تاريخ الاعتماد',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_gcf` (`company_id`,`disclosure_no`),
   CONSTRAINT `chk_gcf_person` CHECK (`person_id` <> 0),
@@ -8674,6 +8683,23 @@ CREATE TABLE `gov_cycle_name_log` (
   KEY `k_row` (`row_id`),
   KEY `k_req` (`requirement_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: gov_dashboard_kpi ──
+CREATE TABLE `gov_dashboard_kpi` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0,
+  `kpi_id` varchar(60) DEFAULT NULL COMMENT 'معرف المؤشر',
+  `kpi_ref` varchar(255) DEFAULT NULL COMMENT 'المؤشر - KPI Catalog',
+  `value` decimal(18,2) DEFAULT NULL COMMENT 'القيمة',
+  `uom` varchar(80) DEFAULT NULL COMMENT 'الوحدة',
+  `state` varchar(255) DEFAULT NULL COMMENT 'الحالة',
+  `updated_on` datetime DEFAULT NULL COMMENT 'اخر تحديث',
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_govkpi_co` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='DEP-08 GOV-01 - لوحة الحوكمة والالتزام - الحبة: مؤشر واحد لفترة واحدة';
 
 -- ── Table: gov_data_classes ──
 CREATE TABLE `gov_data_classes` (
@@ -9017,6 +9043,7 @@ CREATE TABLE `gov_filing` (
   `receipt_ref` varchar(120) NOT NULL DEFAULT '',
   `state` varchar(24) NOT NULL DEFAULT 'due',
   `src_ref` varchar(255) NOT NULL DEFAULT '',
+  `filing_kind` varchar(40) DEFAULT NULL COMMENT 'نوع التقديم',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_gvf` (`company_id`,`filing_no`),
   CONSTRAINT `chk_gvf_state` CHECK (`state` in ('due','prepared','submitted','acknowledged','late')),
@@ -9052,6 +9079,9 @@ CREATE TABLE `gov_gift_disclosure` (
   `decision` varchar(24) NOT NULL DEFAULT '',
   `state` varchar(24) NOT NULL DEFAULT 'disclosed',
   `src_ref` varchar(255) NOT NULL DEFAULT '',
+  `direction` varchar(24) DEFAULT NULL COMMENT 'الاتجاه',
+  `description_ar` varchar(400) DEFAULT NULL COMMENT 'الوصف',
+  `context_ar` varchar(400) DEFAULT NULL COMMENT 'السياق',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_ggf` (`company_id`,`gift_no`),
   CONSTRAINT `chk_ggf_kind` CHECK (`gift_kind` in ('gift','hospitality','travel','other')),
@@ -9154,6 +9184,7 @@ CREATE TABLE `gov_integrity_report` (
   `retaliation_flag` tinyint(1) NOT NULL DEFAULT 0,
   `state` varchar(24) NOT NULL DEFAULT 'received',
   `src_ref` varchar(255) NOT NULL DEFAULT '',
+  `description_ar` varchar(600) DEFAULT NULL COMMENT 'الوصف المقيد',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_gir` (`company_id`,`report_no`),
   CONSTRAINT `chk_gir_state` CHECK (`state` in ('received','triaged','referred','closed','dismissed')),
@@ -9189,6 +9220,9 @@ CREATE TABLE `gov_investigation` (
   `state` varchar(24) NOT NULL DEFAULT 'mandated',
   `src_ref` varchar(255) NOT NULL DEFAULT '',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `confidentiality` varchar(24) DEFAULT NULL COMMENT 'مستوى السرية',
+  `due_period` varchar(40) DEFAULT NULL COMMENT 'المدة المقررة',
+  `recommendations_ar` varchar(600) DEFAULT NULL COMMENT 'التوصيات',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_gin` (`company_id`,`inv_no`),
   CONSTRAINT `chk_gin_kind` CHECK (`inv_kind` in ('DISCIPLINARY','INTEGRITY','OPERATIONAL_FACT','SPECIAL_INDEPENDENT')),
@@ -9592,6 +9626,7 @@ CREATE TABLE `gov_policy` (
   `doc_ref` varchar(120) NOT NULL DEFAULT '',
   `effective_from` date DEFAULT NULL,
   `review_due` date DEFAULT NULL,
+  `review_periodicity` varchar(24) DEFAULT NULL COMMENT 'دورية المراجعة - خانة ادخال مفتوحة بنص الورقة',
   `supersedes` varchar(40) NOT NULL DEFAULT '',
   `authored_by` int(11) NOT NULL DEFAULT 0,
   `reviewed_by` int(11) NOT NULL DEFAULT 0,
@@ -9878,6 +9913,8 @@ CREATE TABLE `gov_sod_conflict` (
   `exception_no` varchar(40) NOT NULL DEFAULT '',
   `state` varchar(24) NOT NULL DEFAULT 'defined',
   `src_ref` varchar(255) NOT NULL DEFAULT '',
+  `severity` varchar(24) DEFAULT NULL COMMENT 'درجة الخطورة',
+  `treatment_decision` varchar(24) DEFAULT NULL COMMENT 'قرار المعالجة',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_gsc` (`company_id`,`conflict_code`,`detected_role_id`,`detected_user_id`),
   CONSTRAINT `chk_gsc_sides` CHECK (`side_a` <> '' and `side_b` <> '' and `side_a` <> `side_b`),

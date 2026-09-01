@@ -16,6 +16,7 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w14_view.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 
 $ctx = w14_ctx();
 $is_super = $ctx['is_super'];
@@ -59,22 +60,37 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_sod_conflicts')); ?>
-    <table id="emsList_sod_conflicts" class="data-table">
-        <thead><tr><th>رمز التعارض</th><th>التعارض</th><th>الطرف الأول</th><th>الطرف الثاني</th><th>الدور المكتشف</th><th>المستخدم المكتشف</th><th>الاستثناء</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= ems_w14_txt($r["conflict_code"]) ?></td>
-                    <td><?= ems_w14_txt($r["title_ar"]) ?></td>
-                    <td><?= ems_w14_txt($r["side_a"]) ?></td>
-                    <td><?= ems_w14_txt($r["side_b"]) ?></td>
-                    <td><?= (int) $r["detected_role_id"] ?></td>
-                    <td><?= (int) $r["detected_user_id"] ?></td>
-                    <td><?= ems_w14_txt($r["exception_no"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف التعارض' => 'conflict_code',
+        'العملية الحرجة' => '#process',
+        'الطرف الأول (دور/فعل)' => 'side_a',
+        'الطرف الثاني (دور/فعل)' => 'side_b',
+        'درجة الخطورة' => 'severity',
+        'مستخدمون اجتمع لديهم الطرفان' => '#detected',
+        'قرار المعالجة' => 'treatment_decision',
+        'الضابط التعويضي المعلن' => 'mitigation_ar',
+        'مرجع الاستثناء' => 'exception_no',
+        'حالة التعارض' => '@state',
+        'تاريخ الإنشاء' => 'detected_at',
+        'مرجع المصدر' => 'src_ref',
+    );
+    $D = array(
+        /* العمليةُ الحرجةُ باسمِها إن كُتب، وبمفتاحِها إن لم يُكتب */
+        'process' => function ($r) {
+            $t = trim((string) $r['title_ar']);
+            return $t !== '' ? $t : trim((string) $r['process_key']);
+        },
+        /* من اجتمع لديه الطرفان: الشخصُ بصفتِه — لا رقمُ دورٍ عاريًا */
+        'detected' => function ($r) {
+            $p = ems_w14_person($r['detected_user_id']);
+            $c = ems_w14_person_role($r['detected_user_id']);
+            return ($p !== '' && $c !== '') ? ($p . ' / ' . $c) : ($p !== '' ? $p : $c);
+        },
+    );
+    echo ems_w14_grid('emsList_sod_conflicts', $GUIDE_COLS, $rows, $D, 'لا تعارضات معرفة'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

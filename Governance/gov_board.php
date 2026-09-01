@@ -4,6 +4,13 @@
  * ───────────────────────────────────────────────────────────────────────────
  * قراءة حية مشتقة من حالات الحوكمة والاجراءات ولا ادخال فيها
  *
+ * ◆ **الحبّةُ مؤشرٌ لا حالةُ إخلال** (`GOV-01` · ورقةُ الدليل: «مؤشر × فترة —
+ *   قراءة حية»): كان السطحُ يقرأ `gov_breach` فيعرض **صفَّ إخلالٍ** في لوحةٍ
+ *   حبّتُها **مؤشِّر** — وهو خرقُ §11 الأوّل. ⇒ فالقراءةُ من `gov_dashboard_kpi`
+ *   ببنيةِ `*_dashboard_kpi` المستقرّةِ في الإداراتِ الأخرى.
+ * ◆ **واللوحةُ إسقاطٌ لا مصدرُ حقيقة**: قيمةُ كلِّ مؤشرٍ تُكتب من مصدرِها
+ *   المالكِ، والسطحُ يعرض ما كُتب — ⛔ ولا يحسبها هنا فيصير مصدرًا ثانيًا.
+ *
  * ◆ **الحبّةُ `Legal Entity`** (‏`DEC-OPEN-03`): القراءةُ تمرُّ ببوّابةِ المستأجرِ
  *   التي تحقن الكيانَ — فلا صفَّ من كيانٍ آخرَ يظهر.
  *
@@ -16,6 +23,7 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w14_view.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 
 $ctx = w14_ctx();
 $is_super = $ctx['is_super'];
@@ -31,8 +39,8 @@ if (empty($perms['can_view'])) {
     exit();
 }
 
-$rows = w14_rows($is_super, 'gov_breach',
-                 array('orderBy' => 'id DESC', 'limit' => 300));
+$rows = w14_rows($is_super, 'gov_dashboard_kpi',
+                 array('orderBy' => 'kpi_id, id', 'limit' => 300));
 
 $page_title = 'إيكوبيشن | لوحة الحوكمة والالتزام';
 require_once __DIR__ . '/../includes/screen_contract.php';
@@ -47,33 +55,37 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     include('../includes/page_header.php'); ?>
 
     <div class="ems-stat-cards">
-        <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">عدد حالات الحوكمة</div></div>
-        <div class="ems-stat-card"><div class="ems-stat-value"><?= ems_w14_count($rows, "state", "opened") ?></div><div class="ems-stat-label">حالات مفتوحة</div></div>
-        <div class="ems-stat-card"><div class="ems-stat-value"><?= ems_w14_count($rows, "severity", "critical") ?></div><div class="ems-stat-label">حالات حرجة</div></div>
-        <div class="ems-stat-card"><div class="ems-stat-value"><?= ems_w14_filled($rows, "action_no") ?></div><div class="ems-stat-label">حالات لها إجراء تصحيحي</div></div>
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= count($rows) ?></div><div class="ems-stat-label">عدد المؤشرات</div></div>
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= ems_w14_filled($rows, "value") ?></div><div class="ems-stat-label">مؤشرات لها قيمة مقيسة</div></div>
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= ems_w14_distinct($rows, "uom") ?></div><div class="ems-stat-label">وحدات القياس</div></div>
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= ems_w14_filled($rows, "updated_on") ?></div><div class="ems-stat-label">مؤشرات لها آخر تحديث</div></div>
     </div>
 
     <?php require_once __DIR__ . '/../includes/ux_components.php';
-    echo ems_states_bundle('لا حالات حوكمة مسجلة', 'اللوحة قراءة مشتقة لا شاشة ادخال'); ?>
+    echo ems_states_bundle('لا مؤشر معرف بعد للوحة الحوكمة', 'اللوحة قراءة مشتقة لا شاشة ادخال'); ?>
 
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_gov_board')); ?>
-    <table id="emsList_gov_board" class="data-table">
-        <thead><tr><th>رقم الحالة</th><th>الموضوع</th><th>أساس الفتح</th><th>الخطورة</th><th>الضابط المكسور</th><th>الإجراء التصحيحي</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= ems_w14_txt($r["case_no"]) ?></td>
-                    <td><?= ems_w14_txt($r["title_ar"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["opened_basis"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["severity"]) ?></td>
-                    <td><?= ems_w14_txt($r["control_ref"]) ?></td>
-                    <td><?= ems_w14_txt($r["action_no"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف المؤشر' => 'kpi_id',
+        'المؤشر - KPI Catalog' => 'kpi_ref',
+        'القيمة' => '#value',
+        'الوحدة' => 'uom',
+        'الحالة' => '@state',
+        'آخر تحديث' => 'updated_on',
+    );
+    $D = array(
+        /* القيمةُ رقمٌ مقيسٌ — والصفرُ قيمةٌ والفراغُ غياب */
+        'value' => function ($r) {
+            $v = $r['value'];
+            return ($v === null || (string) $v === '') ? '' : ems_w14_num($v);
+        },
+    );
+    echo ems_w14_grid('emsList_gov_board', $GUIDE_COLS, $rows, $D, 'لا مؤشر معرف بعد للوحة الحوكمة'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>

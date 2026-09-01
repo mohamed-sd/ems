@@ -16,6 +16,7 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/w14_view.php';
+require_once __DIR__ . '/../includes/w14_grid.php';
 
 $ctx = w14_ctx();
 $is_super = $ctx['is_super'];
@@ -59,24 +60,39 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php /* صندوقُ الفلترةِ المعياريُّ — مكوّنٌ واحدٌ مشترَك (‏حكمُ المالك ⑦) */
     require_once __DIR__ . '/../includes/ems_filter_box.php';
     ems_filter_box(array('for' => '#emsList_breaches')); ?>
-    <table id="emsList_breaches" class="data-table">
-        <thead><tr><th>رقم الحالة</th><th>الموضوع</th><th>أساس الفتح</th><th>الضابط المكسور</th><th>السياسة</th><th>الانحراف المرجعي</th><th>الخطورة</th><th>الإجراء التصحيحي</th><th>دليل الإغلاق</th><th>الحالة</th></tr></thead>
-        <tbody>
-        <?php if ($rows): foreach ($rows as $r): ?>
-            <tr>
-                    <td><?= ems_w14_txt($r["case_no"]) ?></td>
-                    <td><?= ems_w14_txt($r["title_ar"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["opened_basis"]) ?></td>
-                    <td><?= ems_w14_txt($r["control_ref"]) ?></td>
-                    <td><?= ems_w14_txt($r["policy_no"]) ?></td>
-                    <td><?= ems_w14_txt($r["deviation_no"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["severity"]) ?></td>
-                    <td><?= ems_w14_txt($r["action_no"]) ?></td>
-                    <td><?= ems_w14_txt($r["close_evidence"]) ?></td>
-                    <td><?= ems_w14_state((string) $r["state"]) ?></td>
-            </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-    </table></div>
+    <?php /* GUIDE_COLS:govui_field_close
+         الرأسُ والخليّةُ من خريطةٍ واحدةٍ (الأمرُ §11)
+         والأسماءُ أسماءُ «09 · 02_تتبع_الحقول» والترتيبُ ترتيبُ دورةِ المستند،
+         ⛔ ولا رأسَ بلا مصدرِ خليّةٍ مصرَّحٍ بجانبِه. */
+    $GUIDE_COLS = array(
+        'معرف الإخلال' => 'case_no',
+        'القاعدة/الالتزام المخل به' => '#rule',
+        'مصدر الرصد' => '@opened_basis',
+        'الجهة المخلة' => '#opener',
+        'وصف الواقعة' => 'title_ar',
+        'الأثر المقدر' => 'impact_ar',
+        'درجة الخطورة' => '@severity',
+        'الإجراء التصحيحي المتفرع' => 'action_no',
+        'تصعيد؟' => '#escalated',
+        'حالة الإخلال' => '@state',
+        'تاريخ الإنشاء' => 'created_at',
+        'مرجع المصدر' => 'src_ref',
+    );
+    $D = array(
+        /* القاعدةُ المكسورةُ: الضابطُ أوّلًا فالسياسةُ فالالتزام — ولا يُفتح بلا ضابط */
+        'rule' => function ($r) {
+            foreach (array('control_ref', 'policy_no', 'obligation_no', 'deviation_no') as $k) {
+                $v = trim((string) $r[$k]);
+                if ($v !== '') { return $v; }
+            }
+            return '';
+        },
+        'opener' => function ($r) { return ems_w14_person($r['opened_by']); },
+        /* التصعيدُ واقعةٌ مقيسة: فُتِح تحقيقٌ متفرّعٌ عن الإخلال */
+        'escalated' => function ($r) {
+            return trim((string) $r['investigation_no']) !== '' ? 'نعم' : 'لا';
+        },
+    );
+    echo ems_w14_grid('emsList_breaches', $GUIDE_COLS, $rows, $D, 'لا إخلالات مسجلة'); /* /GUIDE_COLS */ ?></div>
 </div>
 </body></html>
