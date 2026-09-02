@@ -159,6 +159,21 @@ if ($errors -eq 0) {
             Write-Host "REPAIR01 W01: a measured debt grew - see tools/u12_debt_ratchet.php" -ForegroundColor Red
             exit 1
         }
+        # NAV-ARCH-02 (order sections 39 + 40): the central rule of that round is
+        # "Permission grants access; Placement grants navigation". A renderer that
+        # accepts everything passes every positive test and guards nothing, so the
+        # eight negative tests are the proof that survives - and a pilot measured
+        # once is a memory, not a fact. Both run in under a second together.
+        & C:\wamp64\bin\php\php8.2.30\php.exe tests/navarch02_negative_tests.php
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "NAV-ARCH-02 s39: a negative test turned red - the renderer accepts what it must refuse" -ForegroundColor Red
+            exit 1
+        }
+        & C:\wamp64\bin\php\php8.2.30\php.exe tools/navarch/metrics.php --gate
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "NAV-ARCH-02 s40: DEP-11 pilot lost EXACT_WORKSPACE_NAV_CONFORMANCE" -ForegroundColor Red
+            exit 1
+        }
     }
 
     Write-Host "All files passed encoding validation" -ForegroundColor Green
