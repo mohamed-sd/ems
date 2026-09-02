@@ -2,13 +2,13 @@
     {
         "category": "operational",
         "event_key": "workforce.contract_state.changed",
-        "cnt": "10350",
-        "delivered_ok_sum": "10350",
+        "cnt": "10397",
+        "delivered_ok_sum": "10397",
         "delivered_failed_sum": "0",
         "dlq_sum": "0",
         "training_cnt": "0",
         "first_at": "2026-07-31 17:32:57",
-        "last_at": "2026-08-18 07:38:14"
+        "last_at": "2026-09-01 06:53:48"
     },
     {
         "category": "financial",
@@ -24,10 +24,10 @@
     {
         "category": "financial",
         "event_key": "expense.depreciation.recorded",
-        "cnt": "1990",
-        "delivered_ok_sum": "1965",
-        "delivered_failed_sum": "25",
-        "dlq_sum": "0",
+        "cnt": "1999",
+        "delivered_ok_sum": "1974",
+        "delivered_failed_sum": "34",
+        "dlq_sum": "9",
         "training_cnt": "0",
         "first_at": "2088-01-31 23:59:59",
         "last_at": "2088-06-30 23:59:59"
@@ -46,13 +46,13 @@
     {
         "category": "commercial",
         "event_key": "supplier.rfq_quote.submitted",
-        "cnt": "431",
-        "delivered_ok_sum": "431",
+        "cnt": "433",
+        "delivered_ok_sum": "433",
         "delivered_failed_sum": "0",
         "dlq_sum": "0",
         "training_cnt": "0",
         "first_at": "2026-07-31 19:13:41",
-        "last_at": "2026-08-18 07:38:29"
+        "last_at": "2026-09-01 06:54:02"
     },
     {
         "category": "operational",
@@ -68,21 +68,21 @@
     {
         "category": "financial",
         "event_key": "finance.recon_adjustment.posted",
-        "cnt": "220",
-        "delivered_ok_sum": "220",
-        "delivered_failed_sum": "0",
-        "dlq_sum": "0",
+        "cnt": "221",
+        "delivered_ok_sum": "221",
+        "delivered_failed_sum": "1",
+        "dlq_sum": "1",
         "training_cnt": "0",
         "first_at": "2026-07-31 19:00:10",
-        "last_at": "2026-08-18 07:38:29"
+        "last_at": "2026-09-01 06:54:01"
     },
     {
         "category": "financial",
         "event_key": "payable.finance_installment.accrued",
-        "cnt": "219",
-        "delivered_ok_sum": "219",
-        "delivered_failed_sum": "0",
-        "dlq_sum": "0",
+        "cnt": "220",
+        "delivered_ok_sum": "220",
+        "delivered_failed_sum": "1",
+        "dlq_sum": "1",
         "training_cnt": "0",
         "first_at": "2087-05-15 00:00:00",
         "last_at": "2087-05-15 00:00:00"
@@ -90,57 +90,57 @@
     {
         "category": "operational",
         "event_key": "workforce.contract.amended",
-        "cnt": "219",
-        "delivered_ok_sum": "219",
+        "cnt": "220",
+        "delivered_ok_sum": "220",
         "delivered_failed_sum": "0",
         "dlq_sum": "0",
         "training_cnt": "0",
         "first_at": "2026-07-31 17:32:58",
-        "last_at": "2026-08-18 07:38:12"
+        "last_at": "2026-09-01 06:53:47"
     },
     {
         "category": "commercial",
         "event_key": "supplier.rfq.sent",
-        "cnt": "216",
-        "delivered_ok_sum": "216",
+        "cnt": "217",
+        "delivered_ok_sum": "217",
         "delivered_failed_sum": "0",
         "dlq_sum": "0",
         "training_cnt": "0",
         "first_at": "2026-07-31 19:13:41",
-        "last_at": "2026-08-18 07:38:29"
+        "last_at": "2026-09-01 06:54:02"
     },
     {
         "category": "commercial",
         "event_key": "supplier.rfq.opened",
-        "cnt": "216",
-        "delivered_ok_sum": "216",
+        "cnt": "217",
+        "delivered_ok_sum": "217",
         "delivered_failed_sum": "0",
         "dlq_sum": "0",
         "training_cnt": "0",
         "first_at": "2026-07-31 19:13:41",
-        "last_at": "2026-08-18 07:38:29"
+        "last_at": "2026-09-01 06:54:02"
     },
     {
         "category": "commercial",
         "event_key": "supplier.rfq.awarded",
+        "cnt": "214",
+        "delivered_ok_sum": "214",
+        "delivered_failed_sum": "0",
+        "dlq_sum": "0",
+        "training_cnt": "0",
+        "first_at": "2026-07-31 19:13:41",
+        "last_at": "2026-09-01 06:54:02"
+    },
+    {
+        "category": "commercial",
+        "event_key": "supplier.rfq.contracted",
         "cnt": "213",
         "delivered_ok_sum": "213",
         "delivered_failed_sum": "0",
         "dlq_sum": "0",
         "training_cnt": "0",
         "first_at": "2026-07-31 19:13:41",
-        "last_at": "2026-08-18 07:38:30"
-    },
-    {
-        "category": "commercial",
-        "event_key": "supplier.rfq.contracted",
-        "cnt": "212",
-        "delivered_ok_sum": "212",
-        "delivered_failed_sum": "0",
-        "dlq_sum": "0",
-        "training_cnt": "0",
-        "first_at": "2026-07-31 19:13:41",
-        "last_at": "2026-08-18 07:38:30"
+        "last_at": "2026-09-01 06:54:02"
     },
     {
         "category": "operational",
@@ -167,13 +167,13 @@
     {
         "category": "operational",
         "event_key": "risk.signal.raised",
-        "cnt": "126",
-        "delivered_ok_sum": "126",
+        "cnt": "127",
+        "delivered_ok_sum": "127",
         "delivered_failed_sum": "0",
         "dlq_sum": "0",
         "training_cnt": "0",
         "first_at": "2026-08-08 12:18:06",
-        "last_at": "2026-08-24 09:56:08"
+        "last_at": "2026-09-01 06:58:07"
     },
     {
         "category": "operational",
@@ -244,46 +244,46 @@
     {
         "category": "commercial",
         "event_key": "procurement.supplier_contract.state_changed",
-        "cnt": "59",
-        "delivered_ok_sum": "59",
+        "cnt": "62",
+        "delivered_ok_sum": "62",
         "delivered_failed_sum": "0",
         "dlq_sum": "0",
         "training_cnt": "0",
         "first_at": "2026-08-15 09:45:38",
-        "last_at": "2026-08-22 20:50:09"
+        "last_at": "2026-09-01 06:58:07"
     },
     {
         "category": "commercial",
         "event_key": "procurement.supplier_contract.termination_revoked",
-        "cnt": "26",
-        "delivered_ok_sum": "26",
+        "cnt": "27",
+        "delivered_ok_sum": "27",
         "delivered_failed_sum": "0",
         "dlq_sum": "0",
         "training_cnt": "0",
         "first_at": "2026-08-15 09:45:38",
-        "last_at": "2026-08-22 20:50:09"
+        "last_at": "2026-09-01 06:58:07"
     },
     {
         "category": "operational",
         "event_key": "risk.risk.registered",
-        "cnt": "24",
-        "delivered_ok_sum": "24",
+        "cnt": "25",
+        "delivered_ok_sum": "25",
         "delivered_failed_sum": "0",
         "dlq_sum": "0",
         "training_cnt": "0",
         "first_at": "2026-08-13 12:34:07",
-        "last_at": "2026-08-15 17:43:00"
+        "last_at": "2026-09-01 06:58:06"
     },
     {
         "category": "operational",
         "event_key": "risk.risk.classified",
-        "cnt": "24",
-        "delivered_ok_sum": "24",
+        "cnt": "25",
+        "delivered_ok_sum": "25",
         "delivered_failed_sum": "0",
         "dlq_sum": "0",
         "training_cnt": "0",
         "first_at": "2026-08-13 12:34:07",
-        "last_at": "2026-08-15 17:43:00"
+        "last_at": "2026-09-01 06:58:06"
     },
     {
         "category": "operational",

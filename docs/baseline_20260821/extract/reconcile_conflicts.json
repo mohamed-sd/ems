@@ -1,5 +1,21 @@
 [
     {
+        "route": "Finance\/asset_hours_link.php",
+        "kind": "owner",
+        "values": {
+            "إدارة الأسطول": 1,
+            "الإدارة المالية": 1
+        }
+    },
+    {
+        "route": "Finance\/depr_run.php",
+        "kind": "owner",
+        "values": {
+            "إدارة الأسطول": 1,
+            "ادارة الاسطول": 1
+        }
+    },
+    {
         "route": "Portal\/gov_dept_ceo.php",
         "kind": "owner",
         "values": {
@@ -37,6 +53,14 @@
         "values": {
             "إدارة المشتريات التشغيلية": 1,
             "المشتريات": 1
+        }
+    },
+    {
+        "route": "Procurement\/reordering_proc.php",
+        "kind": "owner",
+        "values": {
+            "إدارة المخازن": 1,
+            "إدارة المشتريات التشغيلية": 1
         }
     },
     {
@@ -81,7 +105,23 @@
         }
     },
     {
+        "route": "Tickets\/admin_close.php",
+        "kind": "owner",
+        "values": {
+            "إدارة البلاغات": 1,
+            "مركز البلاغات": 1
+        }
+    },
+    {
         "route": "Tickets\/gov_dept_crp.php",
+        "kind": "owner",
+        "values": {
+            "مركز البلاغات": 2,
+            "إدارة البلاغات": 1
+        }
+    },
+    {
+        "route": "Tickets\/ticket_escalation_config.php",
         "kind": "owner",
         "values": {
             "مركز البلاغات": 2,
@@ -94,6 +134,14 @@
         "values": {
             "مركز البلاغات": 1,
             "مكتب الرئيس التنفيذي والنواب": 1
+        }
+    },
+    {
+        "route": "Tickets\/ticket_types_config.php",
+        "kind": "owner",
+        "values": {
+            "مركز البلاغات": 3,
+            "إدارة البلاغات": 1
         }
     },
     {

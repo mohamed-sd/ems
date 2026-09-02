@@ -1,0 +1,737 @@
+NAV-ARCH-02 — أمر تنفيذي لإعادة تأسيس معمارية السايدبار وإغلاق فائض الظهور
+Sidebar Workspace Placement Architecture & Legacy Navigation Remediation
+الحالة: إلزامي للتنفيذالنطاق: جميع مساحات العمل، الإدارات، الأدوار، الشاشات، عناصر السايدبار، الصلاحيات، الروابط الموروثة، والظهورات العابرة للإدارات.الهدف: إصلاح مشكلة السايدبار من جذورها المعمارية، لا بإخفاء الروابط يدويًا ولا بترتيبها شكليًا.
+1. خلفية الأمر
+أثبت القياس الفعلي أن المشكلة الحالية ليست مجرد اختلاف بسيط بين الدليل المعماري والواجهة.
+في إدارة التشغيل وحدها:
+الدليل المعماري يحدد 12 شاشة لدورة الإدارة.
+السايدبار الفعلي يعرض 89 رابطًا.
+منها 12 من دورة الإدارة.
+رابطان من طبقة المنصة.
+6 من مساحة المستخدم الشخصية.
+43 شاشة مملوكة لإدارات أخرى.
+26 رابطًا موروثًا من التصميم القديم.
+وعلى مستوى 18 مساحة عمل، بلغ المعروض:
+342 عنصرًا من الدليل.
+36 مرساة منصة.
+88 عنصرًا شخصيًا.
+323 ظهورًا مستعارًا من إدارات أخرى.
+400 ظهور Legacy.
+بإجمالي 1,189 ظهورًا.
+هذه الأرقام تكشف أن المشكلة ليست:
+«هل شاشات الدليل موجودة؟»
+بل:
+لماذا تظهر كل شاشة في Workspace معين أصلًا؟
+2. الحكم المعماري الحاكم
+يوقف اعتبار:
+امتلاك المستخدم صلاحية على شاشة = وجوب ظهورها في سايدبار الإدارة.
+هذه المعادلة ملغاة.
+من الآن فصاعدًا يعتمد الفصل الكامل بين:
+هوية الشاشة.
+ملكية الشاشة.
+مساحة العمل التي يمكن أن توضع فيها.
+موضعها في دورة تلك المساحة.
+صلاحية المستخدم عليها.
+طريقة الوصول إليها.
+والسلسلة المعمارية الحاكمة تصبح:
+Screen Identity↓Owner Domain↓Workspace↓Lifecycle Group↓Navigation Placement↓Permission / Authority↓Runtime Renderer
+ولا يسمح مستقبلاً باختصار هذه السلسلة إلى:
+Role → كل الشاشات المسموح بها → Sidebar.
+3. القاعدة المركزية
+يعتمد المبدأ التالي كقاعدة غير قابلة للتجاوز:
+Permission grants access; Placement grants navigation.
+أي:
+الصلاحية تجيب:
+هل يستطيع المستخدم فتح الشاشة وتنفيذ فعل معين؟
+أما Placement فيجيب:
+هل لهذه الشاشة موضع معتمد داخل هذه المساحة؟ وأين؟
+وقد يكون للمستخدم صلاحية كاملة على شاشة:
+دون أن تظهر في سايدبار الإدارة الحالية.
+ويستطيع الوصول إليها عند الحاجة عبر:
+Workspace آخر.
+البحث.
+رابط سياقي.
+Task.
+Deep Link.
+Related Record.
+Executive Projection.
+4. لا يبدأ التنفيذ بالحذف
+يمنع البدء بحذف:
+43 شاشة مستعارة من التشغيل.
+26 Legacy.
+أو الـ723 ظهورًا المستعار/الموروث على مستوى النظام.
+أولًا:
+نفهم → نصنف → نحكم → نبني النموذج الجديد → نصيره بالظل → نختبر → ثم نتقاعد من القديم.
+لا يسمح بإخفاء شاشة مستخدمة دون:
+Classification.
+Replacement/Access Path.
+Evidence.
+Disposition.
+5. تثبيت نقطة القياس
+قبل أول تعديل:
+أنشئ:
+NAV_ARCH_BASELINE
+يتضمن:
+Commit Hash.
+DB Snapshot.
+Navigation Registry Version.
+Role Permission Version.
+Target Architecture Version.
+Timestamp.
+واستخرج Runtime Sidebar لكل Workspace ولكل Role ممثل.
+لا تستخدم قياسات مولدة من Commits مختلفة.
+6. بناء سجل مساحات العمل
+ينشأ سجل حاكم:
+nav_workspaces
+لكل Workspace:
+workspace_id
+workspace_code
+canonical_name
+workspace_type
+owner_domain
+governing_source
+active
+version
+والأنواع المسموحة:
+DEPARTMENT
+الإدارات الـ17.
+EXECUTIVE
+مثل:
+EX-CEO
+EX-DVP
+PERSONAL
+مثل:
+WS-MY
+PLATFORM_UTILITY
+خدمات المنصة المشتركة.
+INDEPENDENT_ASSURANCE
+عند الحاجة للمراجعة الداخلية إذا كانت خارج الـ17.
+ولا يسمح بإنشاء Department بسبب وجود Role.
+7. فصل هوية الشاشة عن مكان ظهورها
+يبقى:
+Screen Registry
+هوية الشاشة الواحدة.
+ويجب ألا تنشأ نسخة من Screen لأنها ستظهر في أكثر من مساحة.
+كل شاشة لها:
+screen_id
+canonical_label
+owner_domain
+grain
+source_of_truth
+surface_type
+target_lineage
+status
+ثم Placement منفصل.
+8. إنشاء سجل Placement حاكم
+ينشأ:
+nav_workspace_placements
+وهو مصدر الحقيقة الجديد لمكان ظهور الشاشات.
+لكل صف:
+placement_id
+screen_id
+workspace_id
+group_id
+placement_type
+sort_no
+governing_source
+source_ref
+reason_code
+effective_from
+effective_to
+status
+version
+created_by
+approved_by
+ويمنع Renderer من استنتاج Placement من الصلاحية.
+9. أنواع Placement
+تعتمد الأنواع التالية:
+PRIMARY
+الشاشة جزء أصيل من دورة Workspace المالكة.
+SECONDARY_APPROVED
+الشاشة لها سبب عمل حقيقي للظهور في Workspace أخرى.
+هذا استثناء محكوم، وليس نتيجة Permission.
+GLOBAL_SHELL
+مثل الخدمات العامة:
+الرئيسية.
+المراسلات.
+البحث.
+الإشعارات.
+ولا تعد جزءًا من دورة أي إدارة.
+PERSONAL
+تابعة لـWS-MY.
+CONTEXTUAL_ACTION
+تظهر من سجل أو عملية مرتبطة، وليس Sidebar دائمًا.
+TAB_CHILD
+تبويب/سجل تابع داخل Parent.
+DIRECT_ONLY
+يفتح بالرابط/البحث/المهمة ولا يحتاج Sidebar.
+EXECUTIVE_PROJECTION
+عرض قيادة وليس شاشة مصدر حقيقة.
+UTILITY
+أداة نظام/خدمة تقنية.
+ولا يسمح إلا لـ:
+PRIMARY وSECONDARY_APPROVED
+بالدخول في Business Workspace Sidebar الطبيعي.
+10. طبقة المراسي العامة
+لا تعامل:
+الرئيسية والمراسلات
+كشاشات دورة عمل إدارة.
+التقرير الحالي يثبت أنهما يظهران عبر المساحات بحكم المنصة.
+تصنفان:
+GLOBAL_SHELL
+ويفضل بصريًا وضعهما في:
+Global Rail.
+Top Section.
+أو Application Shell.
+وإذا بقيتا في الجزء العلوي من السايدبار، فلا تدخلان في:
+Department Lifecycle Conformance.
+11. مساحة عملي
+الـ6 روابط الشخصية التي تظهر حاليًا مع إدارة التشغيل لا تعد جزءًا من DEP-11.
+ينقل مفهومها إلى:
+WS-MY — مساحة عملي
+ويشمل مثلًا:
+مهامي.
+طلباتي.
+بلاغاتي.
+مؤشرات عملي.
+صفاتي الوظيفية.
+إعداداتي الشخصية.
+إذا تقرر الاحتفاظ بShortcut شخصي داخل Sidebar الإدارة، يصنف:
+PERSONAL_SHORTCUT
+ولا يدخل في مقام دورة الإدارة.
+12. الشاشات العابرة للإدارات
+هذه أهم معالجة في الجولة.
+وجود Permission على شاشة إدارة أخرى لا يسمح تلقائيًا بإضافتها إلى Sidebar.
+لكل ظهور Cross-Domain يحدد نوع الاحتياج.
+الحالة أ — يحتاج المستخدم المعلومة فقط
+لا ننقل الشاشة.
+ننشئ:
+Projection / Read-only Summary
+داخل سياق المستخدم.
+مثال:
+مدير التشغيل يحتاج:
+حالة الفاتورة.
+حالة السداد.
+تكلفة التشغيل.
+لا يحتاج أن نحضر له دورة المالية كلها.
+الحالة ب — يحتاج أن يطلب إجراء من الإدارة الأخرى
+يستخدم:
+Request / Handoff.
+مثل:
+طلب صيانة.
+طلب شراء.
+طلب ترحيل.
+طلب تغطية.
+طلب صرف.
+ولا تنقل له شاشات الإدارة المستلمة.
+الحالة ج — يحتاج إجراء سياقيًا محددًا
+يستخدم:
+CONTEXTUAL_ACTION.
+مثل:
+«عرض ملف الموظف»
+من تخصيص المشغل.
+ولا تصبح «إدارة الموارد البشرية» جزءًا من Sidebar التشغيل.
+الحالة د — يحتاج فعلًا Workspace الإدارة الأخرى
+إذا كانت صلاحياته ووظيفته تبرر ذلك:
+يستخدم Workspace Switcher.
+يدخل إلى الإدارة المالكة نفسها.
+الحالة هـ — شاشة متعددة السياقات فعلًا
+يسمح:
+SECONDARY_APPROVED
+لكن يجب أن يكون له:
+سبب.
+مصدر حاكم.
+Scope.
+تاريخ.
+اعتماد.
+ولا يستنتج آليًا من Role.
+13. قاعدة حدود الإدارات
+تعتمد القاعدة:
+Consumer reads; Owner writes.
+الإدارة المستهلكة لا تنشئ نسخة من حقيقة الإدارة المالكة.
+مثلاً:
+التشغيل قد يقرأ:
+اسم الموظف.
+حالته.
+جاهزيته.
+المشروع.
+فترة التناوب.
+لكن:
+Employee Master
+يبقى HR-owned.
+والتشغيل لا يحصل تلقائيًا على:
+ملفات الموظفين.
+التعيين.
+العقود.
+الرواتب.
+التأمينات
+في سايدباره فقط لأنه يستطيع قراءتها.
+14. معالجة Legacy
+الـ400 ظهور Legacy لا تعامل بمنطق:
+مستخدمة = أضفها إلى Target.
+هذا ممنوع.
+لأن ذلك يعيد الاتجاه:
+Current Runtime → Target.
+بدل:
+Governing Source → Target → Implementation.
+لكل Legacy يجب إصدار Disposition.
+15. سجل Legacy Disposition
+ينشأ:
+LEGACY_NAVIGATION_DISPOSITION
+بالحقول:
+legacy_item_id
+screen_id
+current_workspace
+current_label
+current_route
+usage_count
+target_match
+replacement_screen_id
+disposition
+reason
+domain_owner
+decision_ref
+effective_date
+retirement_date
+evidence
+16. تصنيفات Legacy
+يسمح بالآتي:
+CANONICAL_EQUIVALENT
+له Target جديد مطابق.
+DUPLICATE
+وظيفة مكررة.
+REPLACED
+استبدل بScreen جديدة.
+TAB_CHILD
+يجب أن يكون داخل Parent.
+DIRECT_ONLY
+وظيفة قائمة لكنها لا تحتاج Menu.
+CROSS_DOMAIN
+مملوك لإدارة أخرى.
+UTILITY
+أداة لا Business Screen.
+PERSONAL
+ينتقل إلى WS-MY.
+TRUE_TARGET_GAP
+وظيفة أعمال حقيقية أسقطها Target.
+OBSOLETE
+لم تعد مطلوبة.
+UNKNOWN_REQUIRES_DECISION
+تعذر الحسم بالدليل والأثر والاستعمال.
+17. متى يعدل الدليل المعماري؟
+لا يضاف Legacy إلى الدليل لمجرد أن:
+«الموظفين يستخدمونه اليوم».
+لا يسمح بتعديل Target إلا إذا أثبت:
+TRUE_TARGET_GAP
+بعد:
+تحديد Grain.
+تحديد Owner.
+تحديد Business Purpose.
+إثبات عدم وجود Target بديل.
+فحص عدم التكرار.
+فحص Workflow.
+اعتماد Domain Owner.
+تطبيق Governance Decision إذا كان التغيير مؤسسيًا.
+18. Auto-Disposition قبل المراجعة البشرية
+لا نرسل مئات البنود إلى المالك.
+يجب على النظام أولًا تصنيف ما يستطيع تصنيفه آليًا.
+إذا كان Screen له Primary Placement في إدارة أخرى
+والظهور هنا سببه Permission فقط:
+CROSS_WORKSPACE_PERMISSION_ONLY
+ولا يظهر في Workspace الحالية.
+إذا كان Tab/Child
+MOVE_TO_PARENT
+إذا كان له Canonical Replacement
+REPLACE_AND_REDIRECT
+إذا كان Platform Utility
+GLOBAL_SHELL
+إذا كان Personal
+MOVE_TO_WS_MY
+Legacy بلا Target وله Usage
+LEGACY_REQUIRES_DOMAIN_REVIEW
+Legacy بلا Usage ولا Dependency
+RETIRE_CANDIDATE
+Legacy له وظيفة أعمال لا يقابلها Target
+TARGET_GAP_CANDIDATE
+ثم فقط تنتقل البنود غير المحسومة للمراجعة البشرية.
+19. لا نستخدم «يبقى / يخفى» فقط
+يلغى النموذج الثنائي القديم:
+KEEP / HIDE.
+لأنه لا يصف العلاج.
+كل عنصر يجب أن ينتهي إلى Action حقيقي مثل:
+KEEP_PRIMARY
+KEEP_SECONDARY
+MOVE_TO_WS_MY
+MOVE_TO_GLOBAL_SHELL
+MOVE_TO_PARENT
+CONTEXTUALIZE
+REPLACE
+REDIRECT
+RETIRE
+TARGET_GAP_REVIEW
+ESCALATE
+20. إصلاح Renderer
+يعدل Runtime Navigation Renderer جذريًا.
+المعادلة الجديدة:
+Rendered Sidebar = Active Workspace Placements ∩ User Authorized Screens
+ولا يجوز:
+Rendered Sidebar = All Authorized Screens.
+21. ترتيب عمل Renderer
+عند كل Request:
+تحديد المستخدم.
+تحديد Workspace الحالي.
+تحميل Active Placements لذلك Workspace فقط.
+ترتيب Lifecycle Groups.
+ترتيب Placements داخل كل Group.
+تطبيق Permission على تلك Placements.
+تطبيق Scope.
+تطبيق Field/Action Context عند الحاجة.
+Render.
+ولا يحدث:
+Role-based foreign-screen injection.
+Global taxonomy fallback.
+Legacy fallback.
+Permission-derived placement.
+Route-derived group inference.
+22. إذا لم توجد Placement
+القاعدة:
+No Placement = No Sidebar Render.
+حتى لو كانت:
+can_view = true.
+الصلاحية تبقى صحيحة، لكن الشاشة لا تظهر في Sidebar هذا الـWorkspace.
+23. إزالة Fallbacks
+راجع وأزل تدريجيًا أي Runtime logic من نوع:
+إذا لم نجد Group → ضعها DAILY.
+إذا لم نجد Placement → استخدم taxonomy.
+إذا Role يرىها → اعرضها.
+إذا route موجودة → أنشئ link.
+إذا legacy nav item فعال → أظهره.
+وفي النهاية:
+GLOBAL_FALLBACK_COUNT = 0
+LEGACY_FALLBACK_RENDER_COUNT = 0
+24. إصلاح المقاييس القديمة
+المقياس الحالي الذي يعطي 17/17 لأنه يجد Target Screens فقط لا يسمى بعد الآن Exact.
+يعاد تسميته إلى:
+TARGET_NAV_RECALL
+سؤاله:
+هل كل Target المطلوب موجود؟
+ويظل المستهدف:
+100%.
+25. إنشاء Exact Workspace Conformance الحقيقي
+ينشأ:
+EXACT_WORKSPACE_NAV_CONFORMANCE
+ولا يمر إلا إذا تحقق في Workspace:
+Missing Target = 0
+Wrong Group = 0
+Wrong Order = 0
+Wrong Label = 0
+Permission-only Render = 0
+Unapproved Secondary Placement = 0
+Unruled Legacy = 0
+Unexplained Extra = 0
+Global Fallback = 0
+26. المقاييس الجديدة الإلزامية
+لكل Workspace يصدر:
+TARGET_NAV_RECALL
+المطلوب الموجود / كل المطلوب.
+PLACEMENT_PRECISION
+الظهورات ذات Placement حاكم / كل الظهورات.
+UNEXPLAINED_EXTRA_MENU_ITEM
+المستهدف = 0.
+PERMISSION_ONLY_RENDERED_ITEM
+المستهدف = 0.
+UNAPPROVED_SECONDARY_PLACEMENT
+المستهدف = 0.
+ACTIVE_LEGACY_WITHOUT_DISPOSITION
+المستهدف = 0.
+WRONG_GROUP
+WRONG_ORDER
+WRONG_LABEL
+GLOBAL_FALLBACK_COUNT
+LEGACY_FALLBACK_RENDER_COUNT
+PERSONAL_ITEM_COUNTED_AS_DEPARTMENT
+GLOBAL_SHELL_COUNTED_AS_DEPARTMENT
+TARGET_LINEAGE_BROKEN
+27. Pilot — إدارة التشغيل أولًا
+لا نعمم التغيير على النظام كله مباشرة.
+يبدأ Pilot بـ:
+DEP-11 إدارة التشغيل
+لأن القياس الحالي كشف بوضوح:
+89 Rendered مقابل 12 Target Lifecycle Screens.
+28. مراجعة الـ89 في التشغيل
+صنف كل عنصر من الـ89.
+الـ12 Target
+تبقى PRIMARY.
+الـ2 Platform Anchors
+GLOBAL_SHELL.
+الـ6 Personal
+PERSONAL / WS-MY.
+الـ43 Cross-Domain
+يمر كل واحد على قواعد:
+Projection.
+Request.
+Contextual Action.
+Workspace Switch.
+Secondary Approved.
+Remove from this Workspace.
+الـ26 Legacy
+يمر Legacy Disposition.
+29. الهدف في DEP-11 ليس «12 فقط»
+لا نفرض:
+Final Menu Count = 12.
+لأن بعض Secondary Placements قد تكون مشروعة.
+الهدف:
+كل رابط معروض له Placement حاكم ومبرر.
+فقد يصبح النهائي مثلًا:
+12 Primary + عدد محدود من Secondary Approved.
+لكن العدد لا يحدد مسبقًا.
+المعيار هو:
+UNEXPLAINED_EXTRA = 0
+30. Shadow Navigation
+قبل قلب السايدبار:
+أنشئ Render ثان:
+NEW_NAV_SHADOW
+للمستخدم نفسه والWorkspace نفسها.
+ثم قارن:
+Old Render.
+New Render.
+وسجل:
+Items removed.
+Items moved.
+Items contextualized.
+Items retained.
+Items redirected.
+Items needing decision.
+ولا يغير Shadow تجربة المستخدم.
+31. Human Verification
+بعد Structural Pass لـDEP-11، نفذ Human UAT.
+بمستخدم تشغيل حقيقي:
+تسجيل الدخول.
+فتح DEP-11.
+مراجعة دورة العمل.
+تنفيذ مهام يومية.
+الوصول إلى شاشات Cross-Domain التي يحتاجها.
+استخدام البحث وWorkspace Switcher.
+فتح Direct URLs المسموح بها.
+التأكد أن إزالة الرابط من Sidebar لم تسحب Permission.
+اختبار Role غير مخول.
+اختبار mobile/responsive إذا كان في النطاق.
+32. Usage Telemetry خلال الانتقال
+قبل Retire أي Legacy مستعمل:
+راقب:
+فتح الروابط.
+المستخدمين الفعليين.
+Frequency.
+Entry Path.
+Replacement Usage.
+Search usage.
+Failed navigation.
+404/403.
+Complaints/UAT findings.
+الاستخدام لا يقرر Target، لكنه Evidence للحكم.
+33. التقاعد المرحلي
+للشاشات Legacy المستبدلة:
+المرحلة A
+القديم والجديد موجودان، مع وسم القديم.
+المرحلة B
+القديم Redirect إلى الجديد.
+المرحلة C
+إزالة القديم من Sidebar.
+المرحلة D
+إيقاف Route القديم إذا لم تبق Dependency.
+المرحلة E
+Retirement evidence.
+ولا تحذف Route تاريخية قبل فحص:
+bookmarks.
+internal links.
+tasks.
+notifications.
+reports.
+integrations.
+34. المراجعة البشرية والتصعيد
+لا يرسل كل Link إلى المالك.
+الترتيب:
+المستوى 1 — Architecture Rules
+تحسم الحالات الميكانيكية.
+المستوى 2 — Domain Owner
+يحسم الحاجة التشغيلية.
+المستوى 3 — Governance/Architecture
+يحسم Placement أو Ownership المتعارض.
+المستوى 4 — Owner
+يرفع فقط:
+تغيير نطاق إدارة.
+وظيفة جديدة حقيقية.
+تعارض مصدرين حاكمين.
+قرار تنظيمي أو استراتيجي.
+استثناء دائم عابر للإدارات.
+35. لا توقف البرنامج على حالة واحدة
+إذا تعذر حكم عنصر:
+يحجب ذلك Placement فقط.
+لا توقف:
+Workspace كاملة.
+بقية الإدارات.
+مشروع الإصلاح.
+المبدأ:
+Block the affected Placement, not the program.
+36. التعميم بعد DEP-11
+بعد PASS كامل على التشغيل:
+التوسع إلى الإدارات الـ16 الباقية.
+ثم:
+EX-CEO.
+EX-DVP.
+WS-MY.
+IAF.
+PLATFORM utilities.
+ولا يبدأ التعميم قبل إثبات أن:
+Renderer الجديد لا يحتاج Legacy fallback.
+37. المخرجات المطلوبة
+أريد في نهاية الجولة:
+1. WORKSPACE_REGISTRY
+2. CANONICAL_NAV_PLACEMENT_REGISTER
+3. LEGACY_NAVIGATION_DISPOSITION
+4. CROSS_DOMAIN_PLACEMENT_REGISTER
+5. SIDEBAR_BEFORE_AFTER
+6. WORKSPACE_NAV_CONFORMANCE
+7. PERMISSION_VS_PLACEMENT_AUDIT
+8. UNEXPLAINED_EXTRA_REGISTER
+9. SHADOW_NAV_COMPARISON
+10. DEP11_PILOT_UAT
+11. NAV_RETIREMENT_LEDGER
+12. OWNER_ACTION_REGISTER
+فقط للحالات التي تستحق قرار المالك فعلًا.
+38. سجل Before/After المطلوب
+لكل ظهور:
+Screen ID
+Screen Label
+Owner
+Workspace
+Current Group
+Target Group
+Current Placement Cause
+New Placement Type
+Current Permission
+Target Permission
+Disposition
+Replacement
+Governing Source
+Evidence
+Before Visible?
+After Visible?
+Direct URL Still Authorized?
+Final Verdict
+39. اختبارات سلبية إلزامية
+يجب إثبات:
+NT-01
+مستخدم لديه Permission على شاشة Foreign Domain ولا Placement لها في Workspace الحالية:
+الشاشة لا تظهر في Sidebar.
+لكن Direct URL:
+يعمل إذا كانت الصلاحية والنطاق يسمحان.
+NT-02
+مستخدم بلا Permission على Screen لها Placement:
+لا تظهر ولا تفتح.
+NT-03
+Legacy فعالة بلا Placement:
+لا تظهر في Renderer الجديد.
+NT-04
+Secondary Placement غير معتمد:
+لا يظهر.
+NT-05
+Tab Child:
+لا يظهر كMenu Item مستقل.
+NT-06
+Personal Item:
+لا يحتسب ضمن Department Lifecycle.
+NT-07
+Global Shell:
+لا يحتسب ضمن Department Exact Conformance.
+NT-08
+Foreign Screen لا تتحول إلى Owner محلي بمجرد ظهورها.
+40. معايير نجاح Pilot DEP-11
+لا يغلق Pilot حتى:
+TARGET_NAV_RECALL = 100%
+WRONG_GROUP = 0
+WRONG_ORDER = 0
+WRONG_LABEL = 0
+PERMISSION_ONLY_RENDERED_ITEM = 0
+UNAPPROVED_SECONDARY_PLACEMENT = 0
+ACTIVE_LEGACY_WITHOUT_DISPOSITION = 0
+UNEXPLAINED_EXTRA_MENU_ITEM = 0
+GLOBAL_FALLBACK_COUNT = 0
+LEGACY_FALLBACK_RENDER_COUNT = 0
+TARGET_LINEAGE_BROKEN = 0
+HUMAN_UAT_PASS = YES
+ثم:
+EXACT_WORKSPACE_NAV_CONFORMANCE = PASS
+41. معيار نجاح البرنامج كله
+بعد التعميم:
+الإدارات 17/17 PASS.
+القيادة PASS.
+WS-MY PASS.
+IAF PASS.
+Global Shell منفصل.
+لا Role يعيد تشكيل Business Lifecycle.
+لا Permission تنشئ Placement.
+لا Legacy يظهر بلا حكم.
+لا Target تعدل فقط لتبرير Runtime القديم.
+لا Duplicate Screen بسبب اختلاف Workspace.
+لا Global Fallback.
+لا Route-only global grouping.
+كل Placement له Governing Source.
+كل Secondary Placement له سبب معتمد.
+42. المحظورات
+يمنع أثناء التنفيذ:
+حذف الـ400 Legacy دفعة واحدة.
+الإبقاء عليها جميعًا بحجة الاستخدام.
+إضافة Legacy إلى الدليل تلقائيًا.
+اعتبار Permission سببًا للظهور.
+نسخ شاشة إلى إدارة ثانية لحل مشكلة Placement.
+تغيير Screen ID بسبب النقل.
+تغيير Owner بسبب الظهور.
+جعل Role هو Workspace.
+استخدام Global Taxonomy بدل دورة الإدارة.
+استخدام Fallback صامت.
+اعتبار 17/17 Recall دليل Exact Conformance.
+إرسال مئات القرارات إلى المالك قبل Auto-Disposition.
+خلط Global/Personal مع Department Lifecycle.
+Retire Route دون فحص Dependencies.
+تعديل Target من Runtime دون Governing Decision.
+إخفاء Screen مستخدمة دون Access Replacement.
+اعتبار «اختفى من Sidebar» مساويًا لـ«سحبت صلاحياته».
+43. المطلوب في رد المنفذ
+لا أريد ردًا من نوع:
+«تم تنظيف السايدبار».
+أريد:
+Baseline ID.
+Workspace Registry.
+Placement schema الفعلي.
+وصف Renderer القديم.
+Root Cause المؤكد.
+DEP-11: الـ89 Before.
+تصنيف كل منها.
+DEP-11: After Shadow Render.
+عدد Primary.
+عدد Secondary Approved.
+عدد Global.
+عدد Personal.
+عدد Contextualized.
+عدد Redirected.
+عدد Retired.
+عدد Target Gap Candidates.
+عدد الحالات المصعدة.
+نتائج Negative Tests.
+Human UAT.
+المقاييس قبل/بعد.
+Commit/Snapshot.
+خطة تعميم الـ17 إدارة.
+أي شيء لم يحسم، باسمه وسبب عدم الحسم.
+القاعدة الختامية
+المشكلة الحالية ليست أن:
+«سايدبار إدارة التشغيل طويل».
+المشكلة أن النظام لم يكن يملك حتى الآن عقدًا معماريًا صريحًا يحدد لماذا تظهر شاشة معينة داخل مساحة عمل معينة.
+والعلاج النهائي ليس حذف الروابط، بل تأسيس قاعدة:
+لكل شاشة هوية واحدة ومالك واحد.لكل Workspace دورة عمل حاكمة.لكل ظهور Placement صريح.ولكل مستخدم Permission مستقلة عن Placement.
+ثم:
+لا تظهر أي شاشة في Sidebar لمجرد أن المستخدم يستطيع فتحها.
+ويصبح:
+Rendered Sidebar = Governed Workspace Placements ∩ Authorized Screens
+وبذلك نغلق المشكلة مرة واحدة معماريًا، بدل أن نعيد تنظيف السايدبار كلما أضفنا دورًا أو شاشة أو إدارة جديدة.

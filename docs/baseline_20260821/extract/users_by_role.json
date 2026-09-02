@@ -7,17 +7,17 @@
     {
         "role_id": "2",
         "role_name": "ادارة الموردين",
-        "users_active": "0"
+        "users_active": "1"
     },
     {
         "role_id": "3",
         "role_name": "ادارة الاسطول",
-        "users_active": "0"
+        "users_active": "1"
     },
     {
         "role_id": "4",
         "role_name": "ادارة الموارد البشرية",
-        "users_active": "1"
+        "users_active": "2"
     },
     {
         "role_id": "5",
@@ -27,7 +27,7 @@
     {
         "role_id": "6",
         "role_name": "إدارة الموقع",
-        "users_active": "0"
+        "users_active": "10"
     },
     {
         "role_id": "7",
@@ -57,12 +57,12 @@
     {
         "role_id": "12",
         "role_name": "ادارة المبيعات",
-        "users_active": "1"
+        "users_active": "2"
     },
     {
         "role_id": "13",
         "role_name": "ادارة الصيانة",
-        "users_active": "0"
+        "users_active": "3"
     },
     {
         "role_id": "14",
@@ -77,37 +77,37 @@
     {
         "role_id": "16",
         "role_name": "إدارة المشتريات",
-        "users_active": "1"
+        "users_active": "3"
     },
     {
         "role_id": "17",
         "role_name": "إدارة المالية",
-        "users_active": "1"
+        "users_active": "2"
     },
     {
         "role_id": "18",
         "role_name": "محاسب الإدارة المالية",
-        "users_active": "19"
+        "users_active": "20"
     },
     {
         "role_id": "19",
         "role_name": "مدير الإدارة المالية",
-        "users_active": "0"
+        "users_active": "1"
     },
     {
         "role_id": "20",
         "role_name": "المراجع والمدقق المالي",
-        "users_active": "0"
+        "users_active": "1"
     },
     {
         "role_id": "21",
         "role_name": "أمين الخزينة",
-        "users_active": "0"
+        "users_active": "1"
     },
     {
         "role_id": "22",
         "role_name": "قارئ مالي",
-        "users_active": "0"
+        "users_active": "1"
     },
     {
         "role_id": "23",
@@ -127,32 +127,32 @@
     {
         "role_id": "26",
         "role_name": "إدارة التمويل",
-        "users_active": "1"
+        "users_active": "2"
     },
     {
         "role_id": "27",
         "role_name": "القوى التشغيلية",
-        "users_active": "2"
+        "users_active": "3"
     },
     {
         "role_id": "28",
         "role_name": "إدارة المخاطر",
-        "users_active": "0"
+        "users_active": "1"
     },
     {
         "role_id": "29",
         "role_name": "محلل المخاطر",
-        "users_active": "0"
+        "users_active": "1"
     },
     {
         "role_id": "30",
         "role_name": "مشرف المخاطر",
-        "users_active": "0"
+        "users_active": "1"
     },
     {
         "role_id": "31",
         "role_name": "رئيس الحسابات",
-        "users_active": "1"
+        "users_active": "2"
     },
     {
         "role_id": "32",
@@ -162,7 +162,7 @@
     {
         "role_id": "33",
         "role_name": "المراجع الداخلي المستقل",
-        "users_active": "1"
+        "users_active": "2"
     },
     {
         "role_id": "34",

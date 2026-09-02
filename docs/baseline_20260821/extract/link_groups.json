@@ -576,6 +576,18 @@
         "stage_desc": null
     },
     {
+        "id": "6504",
+        "name": "اللوحة — خارج الدورة (Overview)",
+        "group_code": null,
+        "owner_role_id": "1",
+        "icon": "fa fa-folder",
+        "display_order": "91",
+        "stage_no": "90",
+        "stage_title": "اللوحة — خارج الدورة (Overview)",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
         "id": "3946",
         "name": "إضافات المالك",
         "group_code": "n9o_extra_r1",
@@ -625,7 +637,7 @@
     },
     {
         "id": "3317",
-        "name": "حصص الموردين وحاوياتها",
+        "name": "حصص الموردين والوحدات التعاقدية",
         "group_code": "n9s03_1_4_r1",
         "owner_role_id": "1",
         "icon": "fa fa-layer-group",
@@ -1285,7 +1297,7 @@
     },
     {
         "id": "4001",
-        "name": "نقرأ تقارير إدارتي",
+        "name": "تقارير إدارتي",
         "group_code": null,
         "owner_role_id": "1",
         "icon": "fa fa-folder",
@@ -2257,7 +2269,7 @@
     },
     {
         "id": "5688",
-        "name": "توزيع الحصص والحاويات",
+        "name": "توزيع الحصص وإسناد المعدات",
         "group_code": null,
         "owner_role_id": "2",
         "icon": "fa fa-folder",
@@ -2545,7 +2557,7 @@
     },
     {
         "id": "4007",
-        "name": "نقرأ تقارير إدارتي",
+        "name": "تقارير إدارتي",
         "group_code": null,
         "owner_role_id": "2",
         "icon": "fa fa-folder",
@@ -3012,6 +3024,66 @@
         "stage_desc": null
     },
     {
+        "id": "6499",
+        "name": "أ · التعريف والسياسات",
+        "group_code": null,
+        "owner_role_id": "3",
+        "icon": "fa fa-folder",
+        "display_order": "91",
+        "stage_no": "90",
+        "stage_title": "أ · التعريف والسياسات",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
+        "id": "6500",
+        "name": "ب · دخول الأصل",
+        "group_code": null,
+        "owner_role_id": "3",
+        "icon": "fa fa-folder",
+        "display_order": "92",
+        "stage_no": "90",
+        "stage_title": "ب · دخول الأصل",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
+        "id": "6501",
+        "name": "د · الحركة والاستخدام",
+        "group_code": null,
+        "owner_role_id": "3",
+        "icon": "fa fa-folder",
+        "display_order": "94",
+        "stage_no": "90",
+        "stage_title": "د · الحركة والاستخدام",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
+        "id": "6496",
+        "name": "هـ · الرقابة الفنية",
+        "group_code": null,
+        "owner_role_id": "3",
+        "icon": "fa fa-folder",
+        "display_order": "95",
+        "stage_no": "90",
+        "stage_title": "هـ · الرقابة الفنية",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
+        "id": "6497",
+        "name": "ز · الاستثناءات والقرارات",
+        "group_code": null,
+        "owner_role_id": "3",
+        "icon": "fa fa-folder",
+        "display_order": "97",
+        "stage_no": "90",
+        "stage_title": "ز · الاستثناءات والقرارات",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
         "id": "3949",
         "name": "إضافات المالك",
         "group_code": "n9o_extra_r3",
@@ -3020,6 +3092,18 @@
         "display_order": "97",
         "stage_no": "97",
         "stage_title": "إضافات المالك",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
+        "id": "6502",
+        "name": "اللوحة — خارج الدورة (Overview)",
+        "group_code": null,
+        "owner_role_id": "3",
+        "icon": "fa fa-folder",
+        "display_order": "99",
+        "stage_no": "90",
+        "stage_title": "اللوحة — خارج الدورة (Overview)",
         "is_active": "1",
         "stage_desc": null
     },
@@ -3541,7 +3625,7 @@
     },
     {
         "id": "4011",
-        "name": "نقرأ تقارير إدارتي",
+        "name": "تقارير إدارتي",
         "group_code": null,
         "owner_role_id": "3",
         "icon": "fa fa-folder",
@@ -4753,7 +4837,7 @@
     },
     {
         "id": "4016",
-        "name": "نقرأ تقارير إدارتي",
+        "name": "تقارير إدارتي",
         "group_code": null,
         "owner_role_id": "4",
         "icon": "fa fa-folder",
@@ -5448,6 +5532,18 @@
         "stage_desc": null
     },
     {
+        "id": "6498",
+        "name": "اللوحة — خارج الدورة (Overview)",
+        "group_code": null,
+        "owner_role_id": "6",
+        "icon": "fa fa-folder",
+        "display_order": "91",
+        "stage_no": "90",
+        "stage_title": "اللوحة — خارج الدورة (Overview)",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
         "id": "5776",
         "name": "الاعتمادات الواردة",
         "group_code": null,
@@ -6061,7 +6157,7 @@
     },
     {
         "id": "4019",
-        "name": "نقرأ تقارير إدارتي",
+        "name": "تقارير إدارتي",
         "group_code": null,
         "owner_role_id": "6",
         "icon": "fa fa-folder",
@@ -9253,7 +9349,7 @@
     },
     {
         "id": "4024",
-        "name": "نقرأ تقارير إدارتي",
+        "name": "تقارير إدارتي",
         "group_code": null,
         "owner_role_id": "9",
         "icon": "fa fa-folder",
@@ -11623,7 +11719,7 @@
         "icon": "fa fa-layer-group",
         "display_order": "413",
         "stage_no": "4",
-        "stage_title": "رابعا نوزع الحاويات",
+        "stage_title": "رابعا إسناد المعدات للوحدات",
         "is_active": "1",
         "stage_desc": "كم وحدة لكل نوع آلية وكم آلية لكل نوع"
     },
@@ -11635,7 +11731,7 @@
         "icon": "fa fa-layer-group",
         "display_order": "414",
         "stage_no": "4",
-        "stage_title": "رابعا نوزع الحاويات",
+        "stage_title": "رابعا إسناد المعدات للوحدات",
         "is_active": "1",
         "stage_desc": "كم وحدة لكل نوع آلية وكم آلية لكل نوع"
     },
@@ -11647,7 +11743,7 @@
         "icon": "fa fa-layer-group",
         "display_order": "415",
         "stage_no": "4",
-        "stage_title": "رابعا نوزع الحاويات",
+        "stage_title": "رابعا إسناد المعدات للوحدات",
         "is_active": "1",
         "stage_desc": "كم وحدة لكل نوع آلية وكم آلية لكل نوع"
     },
@@ -11797,7 +11893,7 @@
     },
     {
         "id": "4028",
-        "name": "نقرأ تقارير إدارتي",
+        "name": "تقارير إدارتي",
         "group_code": null,
         "owner_role_id": "12",
         "icon": "fa fa-folder",
@@ -12661,7 +12757,7 @@
     },
     {
         "id": "4031",
-        "name": "نقرأ تقارير إدارتي",
+        "name": "تقارير إدارتي",
         "group_code": null,
         "owner_role_id": "13",
         "icon": "fa fa-folder",
@@ -15397,7 +15493,7 @@
     },
     {
         "id": "4034",
-        "name": "نقرأ تقارير إدارتي",
+        "name": "تقارير إدارتي",
         "group_code": null,
         "owner_role_id": "16",
         "icon": "fa fa-folder",
@@ -16873,7 +16969,7 @@
     },
     {
         "id": "4037",
-        "name": "نقرأ تقارير إدارتي",
+        "name": "تقارير إدارتي",
         "group_code": null,
         "owner_role_id": "17",
         "icon": "fa fa-folder",
@@ -25501,7 +25597,7 @@
     },
     {
         "id": "4048",
-        "name": "نقرأ تقارير إدارتي",
+        "name": "تقارير إدارتي",
         "group_code": null,
         "owner_role_id": "23",
         "icon": "fa fa-folder",
@@ -26245,7 +26341,7 @@
     },
     {
         "id": "4052",
-        "name": "نقرأ تقارير إدارتي",
+        "name": "تقارير إدارتي",
         "group_code": null,
         "owner_role_id": "24",
         "icon": "fa fa-folder",
@@ -26953,7 +27049,7 @@
     },
     {
         "id": "4056",
-        "name": "نقرأ تقارير إدارتي",
+        "name": "تقارير إدارتي",
         "group_code": null,
         "owner_role_id": "25",
         "icon": "fa fa-folder",
@@ -27949,7 +28045,7 @@
     },
     {
         "id": "4058",
-        "name": "نقرأ تقارير إدارتي",
+        "name": "تقارير إدارتي",
         "group_code": null,
         "owner_role_id": "26",
         "icon": "fa fa-folder",
@@ -28424,6 +28520,18 @@
         "display_order": "51",
         "stage_no": null,
         "stage_title": null,
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
+        "id": "6503",
+        "name": "اللوحة — خارج الدورة (Overview)",
+        "group_code": null,
+        "owner_role_id": "27",
+        "icon": "fa fa-folder",
+        "display_order": "91",
+        "stage_no": "90",
+        "stage_title": "اللوحة — خارج الدورة (Overview)",
         "is_active": "1",
         "stage_desc": null
     },

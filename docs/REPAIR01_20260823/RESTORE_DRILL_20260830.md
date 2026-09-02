@@ -6,7 +6,7 @@
 
 ## ١ · موضوعُ التمرين
 استعادةٌ كاملةٌ لنسخةِ `PRE_BUILD_PRE_REPLAY_BASELINE`
-(`storage/backups/pre_build_20260830/equipation_manage_pre_build.sql`) إلى قاعدةِ
+(`storage/backups/pre_build_20260830/equipation_manage_pre_build.sql.gz` — مضغوط 2026-09-02) إلى قاعدةِ
 تمرينٍ منفصلةٍ (`ems_drill_ctl3`) على الخادمِ المحليِّ نفسِه — **والخدمةُ الحيّةُ
 لم تُمَسّ** — ثم قياسُ المطابقةِ ثم إسقاطُ قاعدةِ التمرين.
 

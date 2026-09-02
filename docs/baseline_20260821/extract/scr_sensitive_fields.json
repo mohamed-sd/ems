@@ -22,7 +22,10 @@
         "created_by_name": "م-هـ [تجريبي — ق-15]",
         "created_at": "2026-08-06 15:37:51",
         "updated_at": "2026-08-06 15:37:51",
-        "approver_user_id": null
+        "approver_user_id": null,
+        "field_key": null,
+        "owner_screen": null,
+        "masked_roles": null
     },
     {
         "id": "12",
@@ -47,7 +50,10 @@
         "created_by_name": "م-هـ [تجريبي — ق-15]",
         "created_at": "2026-08-06 15:37:51",
         "updated_at": "2026-08-22 16:01:35",
-        "approver_user_id": null
+        "approver_user_id": null,
+        "field_key": null,
+        "owner_screen": null,
+        "masked_roles": null
     },
     {
         "id": "13",
@@ -72,7 +78,10 @@
         "created_by_name": "م-هـ [تجريبي — ق-15]",
         "created_at": "2026-08-06 15:37:51",
         "updated_at": "2026-08-06 15:37:51",
-        "approver_user_id": null
+        "approver_user_id": null,
+        "field_key": null,
+        "owner_screen": null,
+        "masked_roles": null
     },
     {
         "id": "14",
@@ -97,7 +106,10 @@
         "created_by_name": "م-هـ [تجريبي — ق-15]",
         "created_at": "2026-08-06 15:37:51",
         "updated_at": "2026-08-06 15:37:51",
-        "approver_user_id": null
+        "approver_user_id": null,
+        "field_key": null,
+        "owner_screen": null,
+        "masked_roles": null
     },
     {
         "id": "15",
@@ -122,7 +134,10 @@
         "created_by_name": "م-هـ [تجريبي — ق-15]",
         "created_at": "2026-08-06 15:37:51",
         "updated_at": "2026-08-06 15:37:51",
-        "approver_user_id": null
+        "approver_user_id": null,
+        "field_key": null,
+        "owner_screen": null,
+        "masked_roles": null
     },
     {
         "id": "16",
@@ -147,7 +162,10 @@
         "created_by_name": "م-هـ [تجريبي — ق-15]",
         "created_at": "2026-08-06 15:37:51",
         "updated_at": "2026-08-06 15:37:51",
-        "approver_user_id": null
+        "approver_user_id": null,
+        "field_key": null,
+        "owner_screen": null,
+        "masked_roles": null
     },
     {
         "id": "17",
@@ -172,7 +190,10 @@
         "created_by_name": "م-هـ [تجريبي — ق-15]",
         "created_at": "2026-08-06 15:37:51",
         "updated_at": "2026-08-06 15:37:51",
-        "approver_user_id": null
+        "approver_user_id": null,
+        "field_key": null,
+        "owner_screen": null,
+        "masked_roles": null
     },
     {
         "id": "18",
@@ -197,7 +218,10 @@
         "created_by_name": "م-هـ [تجريبي — ق-15]",
         "created_at": "2026-08-06 15:37:51",
         "updated_at": "2026-08-06 15:37:51",
-        "approver_user_id": null
+        "approver_user_id": null,
+        "field_key": null,
+        "owner_screen": null,
+        "masked_roles": null
     },
     {
         "id": "19",
@@ -222,7 +246,10 @@
         "created_by_name": "م-هـ [تجريبي — ق-15]",
         "created_at": "2026-08-06 15:37:51",
         "updated_at": "2026-08-22 15:54:11",
-        "approver_user_id": null
+        "approver_user_id": null,
+        "field_key": null,
+        "owner_screen": null,
+        "masked_roles": null
     },
     {
         "id": "20",
@@ -247,7 +274,10 @@
         "created_by_name": "مكتب هندسة النظم",
         "created_at": "2026-08-08 15:22:22",
         "updated_at": "2026-08-08 15:22:22",
-        "approver_user_id": null
+        "approver_user_id": null,
+        "field_key": null,
+        "owner_screen": null,
+        "masked_roles": null
     },
     {
         "id": "21",
@@ -272,7 +302,10 @@
         "created_by_name": "مكتب هندسة النظم",
         "created_at": "2026-08-08 15:22:22",
         "updated_at": "2026-08-08 15:22:22",
-        "approver_user_id": null
+        "approver_user_id": null,
+        "field_key": null,
+        "owner_screen": null,
+        "masked_roles": null
     },
     {
         "id": "22",
@@ -297,7 +330,10 @@
         "created_by_name": "مكتب هندسة النظم",
         "created_at": "2026-08-08 15:22:22",
         "updated_at": "2026-08-08 15:22:22",
-        "approver_user_id": null
+        "approver_user_id": null,
+        "field_key": null,
+        "owner_screen": null,
+        "masked_roles": null
     },
     {
         "id": "23",
@@ -322,7 +358,10 @@
         "created_by_name": "مكتب هندسة النظم",
         "created_at": "2026-08-08 15:22:22",
         "updated_at": "2026-08-08 15:22:22",
-        "approver_user_id": null
+        "approver_user_id": null,
+        "field_key": null,
+        "owner_screen": null,
+        "masked_roles": null
     },
     {
         "id": "24",
@@ -347,7 +386,10 @@
         "created_by_name": "مكتب هندسة النظم",
         "created_at": "2026-08-08 15:22:22",
         "updated_at": "2026-08-08 15:22:22",
-        "approver_user_id": null
+        "approver_user_id": null,
+        "field_key": null,
+        "owner_screen": null,
+        "masked_roles": null
     },
     {
         "id": "25",
@@ -372,7 +414,10 @@
         "created_by_name": "مكتب هندسة النظم",
         "created_at": "2026-08-08 15:22:22",
         "updated_at": "2026-08-08 15:22:22",
-        "approver_user_id": null
+        "approver_user_id": null,
+        "field_key": null,
+        "owner_screen": null,
+        "masked_roles": null
     },
     {
         "id": "26",
@@ -397,7 +442,10 @@
         "created_by_name": "update0012",
         "created_at": "2026-08-08 17:28:56",
         "updated_at": "2026-08-21 08:45:07",
-        "approver_user_id": null
+        "approver_user_id": null,
+        "field_key": null,
+        "owner_screen": null,
+        "masked_roles": null
     },
     {
         "id": "27",
@@ -422,7 +470,10 @@
         "created_by_name": "update0012",
         "created_at": "2026-08-08 17:28:56",
         "updated_at": "2026-08-21 08:45:07",
-        "approver_user_id": null
+        "approver_user_id": null,
+        "field_key": null,
+        "owner_screen": null,
+        "masked_roles": null
     },
     {
         "id": "28",
@@ -447,7 +498,10 @@
         "created_by_name": "update0012",
         "created_at": "2026-08-08 17:28:56",
         "updated_at": "2026-08-21 08:45:07",
-        "approver_user_id": null
+        "approver_user_id": null,
+        "field_key": null,
+        "owner_screen": null,
+        "masked_roles": null
     },
     {
         "id": "29",
@@ -472,7 +526,10 @@
         "created_by_name": "update0012",
         "created_at": "2026-08-08 17:28:56",
         "updated_at": "2026-08-21 08:45:07",
-        "approver_user_id": null
+        "approver_user_id": null,
+        "field_key": null,
+        "owner_screen": null,
+        "masked_roles": null
     },
     {
         "id": "30",
@@ -497,7 +554,10 @@
         "created_by_name": "update0012",
         "created_at": "2026-08-08 17:28:56",
         "updated_at": "2026-08-21 08:45:07",
-        "approver_user_id": null
+        "approver_user_id": null,
+        "field_key": null,
+        "owner_screen": null,
+        "masked_roles": null
     },
     {
         "id": "31",
@@ -522,7 +582,10 @@
         "created_by_name": "update0012",
         "created_at": "2026-08-08 17:28:56",
         "updated_at": "2026-08-21 08:45:07",
-        "approver_user_id": null
+        "approver_user_id": null,
+        "field_key": null,
+        "owner_screen": null,
+        "masked_roles": null
     },
     {
         "id": "32",
@@ -547,7 +610,10 @@
         "created_by_name": "update0012",
         "created_at": "2026-08-08 17:28:56",
         "updated_at": "2026-08-21 08:45:07",
-        "approver_user_id": null
+        "approver_user_id": null,
+        "field_key": null,
+        "owner_screen": null,
+        "masked_roles": null
     },
     {
         "id": "33",
@@ -572,7 +638,10 @@
         "created_by_name": "update0012",
         "created_at": "2026-08-08 17:28:56",
         "updated_at": "2026-08-21 08:45:07",
-        "approver_user_id": null
+        "approver_user_id": null,
+        "field_key": null,
+        "owner_screen": null,
+        "masked_roles": null
     },
     {
         "id": "34",
@@ -597,7 +666,10 @@
         "created_by_name": "update0012",
         "created_at": "2026-08-08 17:28:56",
         "updated_at": "2026-08-21 08:45:07",
-        "approver_user_id": null
+        "approver_user_id": null,
+        "field_key": null,
+        "owner_screen": null,
+        "masked_roles": null
     },
     {
         "id": "35",
@@ -622,7 +694,10 @@
         "created_by_name": "update0012",
         "created_at": "2026-08-08 17:28:56",
         "updated_at": "2026-08-21 08:45:07",
-        "approver_user_id": null
+        "approver_user_id": null,
+        "field_key": null,
+        "owner_screen": null,
+        "masked_roles": null
     },
     {
         "id": "36",
@@ -647,7 +722,10 @@
         "created_by_name": "update0012",
         "created_at": "2026-08-08 17:28:56",
         "updated_at": "2026-08-21 08:45:07",
-        "approver_user_id": null
+        "approver_user_id": null,
+        "field_key": null,
+        "owner_screen": null,
+        "masked_roles": null
     },
     {
         "id": "37",
@@ -672,7 +750,10 @@
         "created_by_name": "update0012",
         "created_at": "2026-08-08 19:09:47",
         "updated_at": "2026-08-21 08:45:07",
-        "approver_user_id": null
+        "approver_user_id": null,
+        "field_key": null,
+        "owner_screen": null,
+        "masked_roles": null
     },
     {
         "id": "38",
@@ -697,7 +778,10 @@
         "created_by_name": "update0012",
         "created_at": "2026-08-08 19:09:47",
         "updated_at": "2026-08-21 08:45:07",
-        "approver_user_id": null
+        "approver_user_id": null,
+        "field_key": null,
+        "owner_screen": null,
+        "masked_roles": null
     },
     {
         "id": "39",
@@ -722,7 +806,10 @@
         "created_by_name": "update0012",
         "created_at": "2026-08-08 19:09:47",
         "updated_at": "2026-08-21 08:45:07",
-        "approver_user_id": null
+        "approver_user_id": null,
+        "field_key": null,
+        "owner_screen": null,
+        "masked_roles": null
     },
     {
         "id": "40",
@@ -747,7 +834,10 @@
         "created_by_name": "update0012",
         "created_at": "2026-08-08 19:09:47",
         "updated_at": "2026-08-21 08:45:07",
-        "approver_user_id": null
+        "approver_user_id": null,
+        "field_key": null,
+        "owner_screen": null,
+        "masked_roles": null
     },
     {
         "id": "41",
@@ -772,7 +862,10 @@
         "created_by_name": "update0012",
         "created_at": "2026-08-08 19:09:47",
         "updated_at": "2026-08-21 08:45:07",
-        "approver_user_id": null
+        "approver_user_id": null,
+        "field_key": null,
+        "owner_screen": null,
+        "masked_roles": null
     },
     {
         "id": "42",
@@ -797,7 +890,10 @@
         "created_by_name": "update0012",
         "created_at": "2026-08-08 19:09:47",
         "updated_at": "2026-08-21 08:45:07",
-        "approver_user_id": null
+        "approver_user_id": null,
+        "field_key": null,
+        "owner_screen": null,
+        "masked_roles": null
     },
     {
         "id": "43",
@@ -822,7 +918,10 @@
         "created_by_name": "update0012",
         "created_at": "2026-08-08 19:09:47",
         "updated_at": "2026-08-21 08:45:07",
-        "approver_user_id": null
+        "approver_user_id": null,
+        "field_key": null,
+        "owner_screen": null,
+        "masked_roles": null
     },
     {
         "id": "44",
@@ -847,6 +946,9 @@
         "created_by_name": "update0012",
         "created_at": "2026-08-08 19:09:47",
         "updated_at": "2026-08-21 08:45:07",
-        "approver_user_id": null
+        "approver_user_id": null,
+        "field_key": null,
+        "owner_screen": null,
+        "masked_roles": null
     }
 ]

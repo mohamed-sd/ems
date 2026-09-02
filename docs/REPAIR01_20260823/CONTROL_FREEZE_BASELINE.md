@@ -10,7 +10,7 @@
 | `Schema` | **976T أساسيّةً + 28 منظرًا / 15549C** — وعُرفُ اللقطاتِ (`BASE TABLE` وحدَه) = **976T** |
 | `Registry Version` | `repair01_screen_registry` = **783** صفًّا |
 | `Migration Ledger` | **782** صفًّا (applied 618 · baseline 164) · تسويات `gov_migration_settlement` **328** · البوّابةُ **٤/٤** |
-| `DB Backup` | `storage/backups/ctl_freeze_20260830/equipation_manage_ctl_freeze.sql` — **164,900,248 بايت** · `mariadb-dump 11.4.9` `--single-transaction --routines --triggers` |
+| `DB Backup` | `storage/backups/ctl_freeze_20260830/equipation_manage_ctl_freeze.sql.gz` — **مضغوط 2026-09-02 · الخام 164,900,248 بايت يُستردُّ بـ`gunzip -k`، والبصمة مطابقة** · `mariadb-dump 11.4.9` `--single-transaction --routines --triggers` |
 | `Backup Checksum` | `c480893057b6a29fd66fd22c09e0644b77fa427613b6a3f349504f969f5e71b1` (sha256 · في `CHECKSUM.sha256`) |
 | `Checkpoint Tag` | `ctl-freeze-20260830` |
 
