@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-01 23:56:41
--- الجداول: 1228 · المناظير: 28
+-- المصدر: equipation_manage · التوليد: 2026-09-02 07:04:00
+-- الجداول: 1231 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -14817,6 +14817,29 @@ CREATE TABLE `nav_canonical_variants` (
   UNIQUE KEY `uq_variant` (`canonical_route`,`variant_key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='UXUI-01 v3: سجلُّ المداخلِ الثانية — المرساةُ والمنظرُ المعلَن';
 
+-- ── Table: nav_cross_domain_register ──
+CREATE TABLE `nav_cross_domain_register` (
+  `cd_id` varchar(28) NOT NULL,
+  `screen_id` varchar(24) DEFAULT NULL,
+  `route` varchar(190) NOT NULL,
+  `current_label` varchar(190) NOT NULL,
+  `consumer_workspace` varchar(24) NOT NULL COMMENT 'المساحةُ التي يظهر فيها اليوم',
+  `owner_workspace` varchar(24) NOT NULL COMMENT 'المساحةُ المالكة — ⛔ ولا يتغيّر المالكُ بالظهور (§42)',
+  `need_case` enum('A_PROJECTION','B_REQUEST_HANDOFF','C_CONTEXTUAL_ACTION','D_WORKSPACE_SWITCH','E_SECONDARY_APPROVED') NOT NULL COMMENT 'حالاتُ §12 الخمس — نوعُ الاحتياجِ لا نقلُ الشاشة',
+  `remedy` varchar(255) NOT NULL COMMENT 'العلاجُ المقابلُ للحالة',
+  `access_path` varchar(255) NOT NULL COMMENT 'كيف يصل المستخدمُ بعدَ الإزالةِ من السايدبار',
+  `scope` varchar(190) DEFAULT NULL COMMENT 'نطاقُ الاستثناء — لِـE وحدَها',
+  `governing_source` varchar(255) NOT NULL,
+  `approved_by` varchar(64) DEFAULT NULL COMMENT 'E بلا معتمِدٍ = UNAPPROVED_SECONDARY',
+  `approved_at` date DEFAULT NULL,
+  `decided_level` enum('L1_ARCHITECTURE','L2_DOMAIN_OWNER','L3_GOVERNANCE','L4_OWNER') NOT NULL DEFAULT 'L1_ARCHITECTURE',
+  `created_at` datetime NOT NULL,
+  PRIMARY KEY (`cd_id`),
+  UNIQUE KEY `uq_ws_route` (`consumer_workspace`,`route`),
+  KEY `ix_case` (`need_case`),
+  KEY `ix_owner` (`owner_workspace`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='NAV-ARCH-02 §12 — لكلِّ ظهورٍ عابرٍ نوعُ احتياجٍ وعلاجٌ وبديلُ وصول';
+
 -- ── Table: nav_dedup_verdicts ──
 CREATE TABLE `nav_dedup_verdicts` (
   `pair_no` smallint(6) NOT NULL,
@@ -15018,6 +15041,36 @@ CREATE TABLE `nav_items_archive_views` (
   CONSTRAINT `chk_nav_items_module_or_code` CHECK (`permission_code` is null or `permission_code` = '' or `module_id` is not null and `module_id` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── Table: nav_legacy_disposition ──
+CREATE TABLE `nav_legacy_disposition` (
+  `legacy_item_id` varchar(28) NOT NULL COMMENT '§15-1',
+  `screen_id` varchar(24) DEFAULT NULL COMMENT '§15-2',
+  `current_workspace` varchar(24) NOT NULL COMMENT '§15-3',
+  `current_label` varchar(190) NOT NULL COMMENT '§15-4',
+  `current_route` varchar(190) NOT NULL COMMENT '§15-5',
+  `usage_count` int(11) NOT NULL DEFAULT 0 COMMENT '§15-6 — أثرٌ لا قرار (§32)',
+  `target_match` varchar(190) DEFAULT NULL COMMENT '§15-7',
+  `replacement_screen_id` varchar(24) DEFAULT NULL COMMENT '§15-8',
+  `disposition` enum('CANONICAL_EQUIVALENT','DUPLICATE','REPLACED','TAB_CHILD','DIRECT_ONLY','CROSS_DOMAIN','UTILITY','PERSONAL','TRUE_TARGET_GAP','OBSOLETE','UNKNOWN_REQUIRES_DECISION') NOT NULL COMMENT '§16 — إحدى إحدى عشرةَ مفردةً حصرًا',
+  `action` enum('KEEP_PRIMARY','KEEP_SECONDARY','MOVE_TO_WS_MY','MOVE_TO_GLOBAL_SHELL','MOVE_TO_PARENT','CONTEXTUALIZE','REPLACE','REDIRECT','RETIRE','TARGET_GAP_REVIEW','ESCALATE') NOT NULL COMMENT '§19 — ⛔ والنموذجُ الثنائيُّ يبقى/يُخفى ملغًى',
+  `reason` varchar(400) NOT NULL COMMENT '§15-10',
+  `domain_owner` varchar(120) DEFAULT NULL COMMENT '§15-11',
+  `decision_ref` varchar(190) DEFAULT NULL COMMENT '§15-12',
+  `effective_date` date DEFAULT NULL COMMENT '§15-13',
+  `retirement_date` date DEFAULT NULL COMMENT '§15-14',
+  `evidence` varchar(400) NOT NULL COMMENT '§15-15 — ⛔ ولا إخفاءَ بلا دليل (§4)',
+  `access_replacement` varchar(255) DEFAULT NULL COMMENT 'بديلُ الوصولِ — شرطُ §4 الثاني',
+  `decided_level` enum('L1_ARCHITECTURE','L2_DOMAIN_OWNER','L3_GOVERNANCE','L4_OWNER') NOT NULL DEFAULT 'L1_ARCHITECTURE' COMMENT 'سلّمُ §34 الرباعيّ',
+  `retire_stage` enum('NONE','A_COEXIST','B_REDIRECT','C_OUT_OF_SIDEBAR','D_ROUTE_OFF','E_EVIDENCE') NOT NULL DEFAULT 'NONE' COMMENT 'مراحلُ §33 الخمس',
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`legacy_item_id`),
+  KEY `ix_ws` (`current_workspace`),
+  KEY `ix_disp` (`disposition`),
+  KEY `ix_action` (`action`),
+  KEY `ix_route` (`current_route`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='NAV-ARCH-02 §15 — حكمُ كلِّ ظهورٍ إرثيّ: ⛔ ولا إرثَ يظهر بلا حكم (§41)';
+
 -- ── Table: nav_lifecycle_groups ──
 CREATE TABLE `nav_lifecycle_groups` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -15136,6 +15189,35 @@ CREATE TABLE `nav_targets` (
   CONSTRAINT `fk_nt_ws` FOREIGN KEY (`workspace_id`) REFERENCES `nav_workspaces` (`workspace_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='NAVR §١٩: هويّةُ هدفِ الملاحةِ الثابتة — واسمُ Excel نسبٌ لا مفتاح';
 
+-- ── Table: nav_workspace_placements ──
+CREATE TABLE `nav_workspace_placements` (
+  `placement_id` varchar(28) NOT NULL COMMENT 'معرِّفُ الموضعِ الحاكم — §8',
+  `screen_id` varchar(24) DEFAULT NULL COMMENT 'هويّةُ الشاشةِ — لا تتغيّر بالنقل (§42)',
+  `workspace_id` varchar(24) NOT NULL COMMENT 'المساحة',
+  `group_id` int(11) DEFAULT NULL COMMENT 'مجموعةُ دورةِ العمل',
+  `placement_type` enum('PRIMARY','SECONDARY_APPROVED','GLOBAL_SHELL','PERSONAL','CONTEXTUAL_ACTION','TAB_CHILD','DIRECT_ONLY','EXECUTIVE_PROJECTION','UTILITY') NOT NULL COMMENT 'مفرداتُ §9 التسع — ولا يدخل السايدبارَ إلا PRIMARY وSECONDARY_APPROVED',
+  `sort_no` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `route` varchar(190) DEFAULT NULL COMMENT 'المسارُ — مفتاحُ المطابقةِ مع التصييرِ الحيّ',
+  `canonical_label` varchar(190) DEFAULT NULL COMMENT 'الاسمُ الحاكمُ في هذه المساحة',
+  `governing_source` varchar(255) NOT NULL COMMENT 'المصدرُ الحاكمُ — ⛔ ولا موضعَ بلا مصدر (§41)',
+  `source_ref` varchar(255) DEFAULT NULL COMMENT 'الإحالةُ الدقيقة',
+  `reason_code` varchar(48) NOT NULL COMMENT 'سببُ الموضعِ — مفرداتُ §18/§19',
+  `effective_from` date DEFAULT NULL,
+  `effective_to` date DEFAULT NULL,
+  `status` enum('DRAFT','ACTIVE','SUPERSEDED','RETIRED','BLOCKED') NOT NULL DEFAULT 'DRAFT' COMMENT 'BLOCKED = حُجب هذا الموضعُ وحدَه (§35) لا البرنامج',
+  `version` smallint(5) unsigned NOT NULL DEFAULT 1,
+  `created_by` varchar(64) NOT NULL DEFAULT '' COMMENT 'مَن أنشأ — أداةً كان أو إنسانًا',
+  `approved_by` varchar(64) DEFAULT NULL COMMENT '⛔ SECONDARY_APPROVED بلا معتمِدٍ غيرُ معتمَد (§12-هـ)',
+  `legacy_ref` int(11) DEFAULT NULL COMMENT 'صفُّ nav_placements المقابلُ إن وُجد',
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`placement_id`),
+  UNIQUE KEY `uq_ws_route` (`workspace_id`,`route`),
+  KEY `ix_ws_status` (`workspace_id`,`status`,`placement_type`),
+  KEY `ix_screen` (`screen_id`),
+  KEY `ix_route` (`route`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='NAV-ARCH-02 §8 — سجلُّ الموضعِ الحاكم: مصدرُ الحقيقةِ لمكانِ ظهورِ الشاشة';
+
 -- ── Table: nav_workspaces ──
 CREATE TABLE `nav_workspaces` (
   `workspace_id` varchar(24) NOT NULL,
@@ -15145,6 +15227,12 @@ CREATE TABLE `nav_workspaces` (
   `ruling` varchar(400) NOT NULL COMMENT 'حكمُ التصنيفِ مكتوبًا في الصفِّ نفسِه — لا يُخلط مقامٌ بلا حكم',
   `source_ref` varchar(190) NOT NULL,
   `active` tinyint(1) NOT NULL DEFAULT 1,
+  `workspace_code` varchar(24) DEFAULT NULL COMMENT 'رمزُ المساحةِ الحاكمُ — §6',
+  `canonical_name` varchar(190) DEFAULT NULL COMMENT 'الاسمُ المعياريُّ — §6',
+  `workspace_type` enum('DEPARTMENT','EXECUTIVE','PERSONAL','PLATFORM_UTILITY','INDEPENDENT_ASSURANCE') DEFAULT NULL COMMENT 'نوعُ المساحةِ بمفرداتِ §6 الخمس — و`kind` يبقى لقرّائه',
+  `owner_domain` varchar(120) DEFAULT NULL COMMENT 'المجالُ المالك — §6',
+  `governing_source` varchar(255) DEFAULT NULL COMMENT 'المصدرُ الحاكم — §6',
+  `version` smallint(5) unsigned NOT NULL DEFAULT 1 COMMENT 'نسخةُ سجلِّ المساحة — §6',
   PRIMARY KEY (`workspace_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='NAVR: مساحاتُ العملِ — طبقةٌ كانت حقيقةً سياقيّةً بلا مخزن';
 
