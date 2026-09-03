@@ -61,7 +61,7 @@ function ems_nav_views_registry()
         ),
 
         /* ③ الحوكمةُ الأمنية — شبكةُ الواجباتِ المتعارضة */
-        'admin/sec_governance.php' => array(
+        'main/sec_governance.php' => array(
             'v001c44' => array('label' => 'فصل الواجبات المتعارضة',
                                'section' => 'الواجبان المتعارضان'),
         ),

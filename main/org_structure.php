@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/permissions_helper.php';
 /**
- * admin/org_structure.php — شاشة الهيكل التنظيمي (update0004 · ORG-16)
+ * main/org_structure.php — شاشة الهيكل التنظيمي (update0004 · ORG-16)
  * ───────────────────────────────────────────────────────────────────────────
  * ORG-01 §1.1: مصفوفة الإدارات الأربع عشرة بطبقاتها الثلاث — ورأس كل وحدة
  * مشتق من التكليف النافذ (v_org_unit_heads) لا من عمود يُكتب.

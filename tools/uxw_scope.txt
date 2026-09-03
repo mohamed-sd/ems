@@ -210,10 +210,10 @@ Tickets/gov_dept_crp.php
 Transport/gov_dept_trp.php
 Transport/transfer_fleet.php
 Transport/transfer_permits.php
-admin/org_assignments.php
-admin/org_permits.php
-admin/org_structure.php
-admin/sec_governance.php
+main/org_assignments.php
+main/org_permits.php
+main/org_structure.php
+main/sec_governance.php
 main/profile.php
 main/users.php
 user_capacities.php
@@ -475,8 +475,8 @@ Timesheet/timesheet_type.php
 Timesheet/view_timesheet.php
 Workforce/proposed_deductions.php
 Workforce/worker_leave_absence.php
-admin/ops_manager_board.php
-admin/sec_employee_wizard.php
+main/ops_manager_board.php
+main/sec_employee_wizard.php
 chats/index.php
 emsreports/index.php
 examples/secure_page_example.php
