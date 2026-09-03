@@ -1,6 +1,6 @@
 <?php
 /**
- * 2028_04_27_perm_screens_registration.php — تسجيلُ عشرِ شاشاتِ الصلاحياتِ في دور 15
+ * 2028_04_27_perm_screens_registration.php — تسجيلُ تسعِ شاشاتِ الصلاحياتِ في دور 15
  * ═══════════════════════════════════════════════════════════════════════════
  * ◆ **الوصفةُ مقيسةٌ لا مُخترَعة**: أُخذت شاشةٌ تظهر فعلًا لدور 15
  *   (`Governance/policies.php`) وعُدَّ كلُّ صفٍّ يذكر مسارَها، فظهر أنّ البندَ
@@ -53,7 +53,7 @@ const PERM_WS     = 'DEP-08';       // مساحةُ عملِ الدور 15 (nav_
 const PERM_GGROUP = 52;             // مجموعةُ الدليلِ — عنقودُ الأدوارِ والصلاحيات
 const PERM_DOOR   = 'SET';          // بابُ الإعدادات (مثلُ Governance/policies.php)
 
-/** الشاشاتُ العشر — التاسعةُ الأخيرةُ واجهةٌ، والعاشرةُ مُعالِجٌ بلا ملاحة. */
+/** الشاشاتُ التسعُ — كلُّها واجهات. والمُعالِجُ خارجَ السجلِّ بقصدٍ (انظر أدناه). */
 $SCREENS = array(
     array('route' => 'Governance/perm_dashboard.php',     'label' => 'لوحة الصلاحيات',    'icon' => 'fa fa-th-large',    'nav' => true),
     array('route' => 'Governance/perm_roles.php',         'label' => 'الأدوار',           'icon' => 'fa fa-user-tag',    'nav' => true),
@@ -64,9 +64,11 @@ $SCREENS = array(
     array('route' => 'Governance/perm_screen_guide.php',  'label' => 'دليل الشاشات',      'icon' => 'fa fa-book',        'nav' => true),
     array('route' => 'Governance/perm_reports.php',       'label' => 'صلاحيات التقارير',  'icon' => 'fa fa-file-shield', 'nav' => true),
     array('route' => 'Governance/perm_system_status.php', 'label' => 'حالة النظام',       'icon' => 'fa fa-heartbeat',   'nav' => true),
-    /* ⛔ مُعالِجُ AJAX: يُسجَّل في `modules` و`role_permissions` **فقط** — حارسُه
-       يسأل عن الصلاحيةِ بالمسار، ولا رابطَ له في قائمةٍ ولا موضعَ في دليل. */
-    array('route' => 'Governance/perm_quick_update.php',  'label' => 'تحديث صلاحية سريع', 'icon' => 'fa fa-bolt',        'nav' => false),
+    /* ⛔ **ومُعالِجُ AJAX لا يُسجَّل أصلًا** — قِيس حيًّا: صفٌّ في `modules`
+       يكفي ليبعثه المُصيِّرُ رابطًا في السايدبار (مسارُ سقوطٍ من الوحدةِ لا من
+       بندِ ملاحة)، فظهر «تحديث صلاحية سريع» بندًا يفتح نقطةَ نهايةٍ تردُّ JSON.
+       وحارسُه لا يحتاجه: يسأل عن صلاحيةِ **شاشتِه** `perm_reports.php` لا عن
+       مسارِ نفسِه. فالمُعالِجُ ليس شاشةً ولا يدخل سجلَّ الشاشات. */
 );
 
 $DESC = array(
@@ -79,7 +81,6 @@ $DESC = array(
     'Governance/perm_screen_guide.php'  => 'دليلُ الشاشات: عنوانُ كلِّ شاشةٍ ووصفُها الظاهرُ في بطاقةِ «عن الشاشة». السجلاتُ تُنشأ آليًّا وتُحرَّر هنا.',
     'Governance/perm_reports.php'       => 'صلاحياتُ التقارير: مصفوفةُ (دورٌ × تقرير) — الصفُّ الموجودُ في `report_role_permissions` يعني السماح، وحذفُه يعني المنع.',
     'Governance/perm_system_status.php' => 'حالةُ منظومةِ الصلاحيات: مؤشراتُ التغطيةِ والأدوارِ بلا صلاحياتٍ والوحداتِ بلا ربطٍ والبنودِ اليتيمة — لوحةُ مراقبةٍ للقراءةِ وحدَها.',
-    'Governance/perm_quick_update.php'  => 'مُعالِجُ تحديثٍ سريعٍ لصلاحياتِ التقارير — نقطةُ نهايةٍ تُستدعى من شاشةِ صلاحياتِ التقاريرِ وتُرجع JSON.',
 );
 
 $SRC = 'PERM-SCR-01 · إعادةُ بناءِ شاشاتِ الإدارةِ العليا داخلَ دور 15';
@@ -283,7 +284,7 @@ $verify = array(
 $bad = 0;
 foreach ($verify as $t => $sql) {
     $got  = (int) scalar($conn, $sql);
-    $want = in_array($t, array('modules', 'role_permissions', 'screen_about'), true) ? 10 : 9;
+    $want = 9; /* تسعُ شاشاتٍ في كلِّ سجلّ — والمُعالِجُ خارجَها بقصد. */
     if ($got !== $want) { $bad++; }
     printf("   %-24s %2d / %2d  %s\n", $t, $got, $want, $got === $want ? 'PASS' : 'FAIL');
 }

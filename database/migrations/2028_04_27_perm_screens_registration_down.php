@@ -24,6 +24,8 @@ $ROUTES = array(
     'Governance/perm_dashboard.php', 'Governance/perm_roles.php', 'Governance/perm_modules.php',
     'Governance/perm_matrix.php', 'Governance/perm_link_groups.php', 'Governance/perm_nav_items.php',
     'Governance/perm_screen_guide.php', 'Governance/perm_reports.php', 'Governance/perm_system_status.php',
+    /* والمُعالِجُ مذكورٌ هنا رغمَ أنّه لا يُسجَّل — فنسخةٌ سابقةٌ من الهجرةِ
+       سجَّلته، والعكسُ ينظّف أثرَها. */
     'Governance/perm_quick_update.php',
 );
 $in = array(); $lo = array();
