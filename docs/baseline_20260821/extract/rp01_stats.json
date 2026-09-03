@@ -1,15 +1,15 @@
 {
-    "rp01_rows": 909,
-    "disk_surfaces": 905,
-    "mine_rows": 885,
+    "rp01_rows": 910,
+    "disk_surfaces": 906,
+    "mine_rows": 886,
     "rp01_ghost_target": 160,
-    "rp01_asbuilt": 749,
-    "matched_route": 745,
+    "rp01_asbuilt": 750,
+    "matched_route": 746,
     "matched_basename": 3,
     "rp01_not_on_disk": 2,
     "disk_not_in_rp01": 104,
     "rp01_owner_missing": 0,
-    "fields_linked_to_rp01": 16135,
+    "fields_linked_to_rp01": 16137,
     "fields_unlinked": 1,
-    "fields_total": 16136
+    "fields_total": 16138
 }

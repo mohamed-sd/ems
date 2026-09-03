@@ -30404,6 +30404,28 @@
         "updated_at": "2026-09-01 11:12:34"
     },
     {
+        "id": "3450",
+        "space_ar": "مساحة الرئيس التنفيذي",
+        "space_kind": "DEPARTMENT",
+        "tab_ar": "",
+        "screen_ar": "قرارات الهيكل التنظيمي",
+        "route": "portal\/ceo_org_decisions.php",
+        "owner_dept_ar": "مساحة الرئيس التنفيذي",
+        "owner_kind": "BUSINESS_DEPARTMENT",
+        "src_class": "GOV_EXEC",
+        "src_ownership": "VALID",
+        "src_decision": "CONFIRMED",
+        "src_note": "شاشة بنيت بموضعها المعياري — 01 · الدليل المعماري · ورقة مساحة الرئيس التنفيذي · قرارات الهيكل التنظيمي",
+        "spaces_count": "1",
+        "cls": "OWNED",
+        "ownership": "VALID",
+        "decision": "CONFIRMED",
+        "basis": "المساحة هي الادارة المالكة للسطح في السجل المعياري (EX-CEO)",
+        "rule_step": "1",
+        "view_fields": "",
+        "updated_at": "2026-09-01 10:56:27"
+    },
+    {
         "id": "3261",
         "space_ar": "مساحة عملي",
         "space_kind": "DEPARTMENT",

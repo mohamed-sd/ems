@@ -66349,6 +66349,35 @@
         ]
     },
     {
+        "route": "Portal\/ceo_org_decisions.php",
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "\" data-view=\"\" >",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "u13_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "الأفعال المتاحة على هذه الشاشة",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
+    },
+    {
         "route": "Portal\/ceo_reports.php",
         "tables": [
             {
@@ -113091,132 +113120,7 @@
     },
     {
         "route": "Workforce\/workforce_requirement.php",
-        "tables": [
-            {
-                "table_index": 0,
-                "columns": [
-                    {
-                        "label_ar": "إجراءات",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "المشروع",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "الفئة",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "مطلوب",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "متوفر",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "عجز",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "فائض",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "الأولوية",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "المرحلة",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "الحالة",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "الكيان",
-                        "col_group": "",
-                        "th_class": "ems-gov-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "المنشئ — الاسم والصفة",
-                        "col_group": "",
-                        "th_class": "ems-gov-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "المعتمد — الاسم والصفة",
-                        "col_group": "",
-                        "th_class": "ems-gov-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "مرجع التفويض",
-                        "col_group": "",
-                        "th_class": "ems-gov-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "المرجع الأب",
-                        "col_group": "",
-                        "th_class": "ems-gov-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "تاريخ الإنشاء",
-                        "col_group": "",
-                        "th_class": "ems-gov-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "تاريخ الاعتماد",
-                        "col_group": "",
-                        "th_class": "ems-gov-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    }
-                ]
-            }
-        ],
+        "tables": [],
         "form_fields": [
             {
                 "name": "action",

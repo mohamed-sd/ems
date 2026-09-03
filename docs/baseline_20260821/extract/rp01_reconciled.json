@@ -22723,5 +22723,30 @@
         "disk_match": "ROUTE",
         "disk_class": "SCREEN",
         "is_asbuilt": 1
+    },
+    {
+        "screen_id": "SCR-0913",
+        "route": "portal\/ceo_org_decisions.php",
+        "screen_file": "ceo_org_decisions.php",
+        "name_ar": "قرارات الهيكل التنظيمي",
+        "department_id": "EX-CEO",
+        "department_name": "الرئيس التنفيذي",
+        "owner_rule": "01 · الدليل المعماري · ورقة مساحة الرئيس التنفيذ",
+        "lifecycle": "LIVE_REGISTERED",
+        "lifecycle_rule": "IN_GOV_SCREEN_CYCLE",
+        "visibility_class": "MENU_ITEM",
+        "visibility_rule": "NAV_ITEMS_ACTIVE",
+        "surface_kind": "SOURCE",
+        "guard_kind": "SELF_EARLY",
+        "guard_evidence": "حارس صلاحية في الملف نفسه (enforce_current_page_view_permission)",
+        "permission_policy": "DOMAIN_OWNER_PLUS_GRANTED",
+        "ownership_verdict": "DOMAIN_SOURCE",
+        "source_of_truth": "ceo_org_decisions",
+        "verdict_rule": "01 · الدليل المعماري · ورقة مساحة الرئيس التنفيذي · قرارات الهيكل التنظيمي — الادارة المالكة مساحة الرئيس التنفيذي",
+        "src_ref": "GOV_EXEC §5 — بناء بموضعه المعياري",
+        "on_disk_measured": 1,
+        "disk_match": "ROUTE",
+        "disk_class": "SCREEN",
+        "is_asbuilt": 1
     }
 ]

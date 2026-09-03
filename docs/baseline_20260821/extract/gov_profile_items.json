@@ -1140,6 +1140,18 @@
         "seeded_from": "role_permissions:9"
     },
     {
+        "item_id": "6158",
+        "company_id": "0",
+        "profile_id": "9",
+        "item_kind": "screen",
+        "item_ref": "portal\/ceo_org_decisions.php",
+        "allow": "1",
+        "can_add": "1",
+        "can_edit": "1",
+        "can_delete": "1",
+        "seeded_from": "GOV_EXEC — نمط جار الشاشة"
+    },
+    {
         "item_id": "28",
         "company_id": "0",
         "profile_id": "9",

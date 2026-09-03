@@ -79,12 +79,10 @@ ems_public_head('الإدارة العليا | تسجيل الدخول'); ?>
     <style>
         :root {
             --font-ui: var(--font-ar, 'IBM Plex Sans Arabic', 'Tajawal', 'Cairo', sans-serif);
-            --ink: #102443;
+            --ink: #0F2240;
             --ink-soft: #27456f;
             --gold: #d6a700;
-            --sand: #f5f1e8;
-            --card: #ffffff;
-            --line: rgba(16, 36, 67, 0.08);
+            --line: rgba(16, 36, 67, 0.10);
             --muted: #61738f;
             --danger: #c0392b;
             --success: #0f8a5f;
@@ -94,126 +92,69 @@ ems_public_head('الإدارة العليا | تسجيل الدخول'); ?>
             margin: 0;
             min-height: 100vh;
             font-family: var(--font-ui);
-            background: radial-gradient(circle at top right, rgba(214, 167, 0, 0.18), transparent 28%), linear-gradient(135deg, #eef2f7, #f8fafc 60%, #eef1f5);
+            background: linear-gradient(160deg, #0F2240 0%, #183152 40%, #1e4f77 100%);
             color: var(--ink);
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 24px;
         }
-        .shell {
+        .login-card {
             width: 100%;
-            max-width: 1040px;
-            display: grid;
-            grid-template-columns: 1.1fr 0.9fr;
-            background: rgba(255, 255, 255, 0.84);
-            border: 1px solid rgba(255,255,255,0.65);
-            box-shadow: 0 20px 70px rgba(16, 36, 67, 0.14);
-            backdrop-filter: blur(10px);
-            border-radius: 28px;
-            overflow: hidden;
+            max-width: 420px;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+            padding: 40px 36px 36px;
         }
-        .hero {
-            padding: 48px;
-            background: linear-gradient(155deg, var(--ink), #183152 55%, #20456d);
-            color: #fff;
-            position: relative;
+        .brand {
+            text-align: center;
+            margin-bottom: 32px;
         }
-        .hero::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image: radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px);
-            background-size: 22px 22px;
-            pointer-events: none;
-        }
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(214, 167, 0, 0.14);
-            border: 1px solid rgba(214, 167, 0, 0.35);
-            color: #f5cf55;
-            border-radius: 999px;
-            padding: 8px 14px;
-            font-size: 0.9rem;
-            font-weight: 700;
-            position: relative;
-            z-index: 1;
-        }
-        .hero h1 {
-            margin: 26px 0 14px;
-            font-size: 2.4rem;
-            line-height: 1.3;
-            position: relative;
-            z-index: 1;
-        }
-        .hero p {
-            margin: 0;
-            color: rgba(255,255,255,0.82);
-            line-height: 1.9;
-            position: relative;
-            z-index: 1;
-        }
-        .hero-list {
-            margin-top: 30px;
-            display: grid;
-            gap: 14px;
-            position: relative;
-            z-index: 1;
-        }
-        .hero-item {
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.1);
+        .brand-icon {
+            width: 56px; height: 56px;
+            margin: 0 auto 16px;
             border-radius: 16px;
-            padding: 14px 16px;
+            background: linear-gradient(135deg, #0F2240, #2563eb);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 8px 24px rgba(15, 34, 64, 0.25);
+        }
+        .brand-icon i { color: var(--gold); font-size: 1.3rem; }
+        .brand h1 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--ink);
+            margin: 0 0 4px;
+        }
+        .brand p {
+            color: var(--muted);
+            font-size: 0.82rem;
+            margin: 0;
+        }
+        .notice, .error-msg {
+            border-radius: 12px;
+            padding: 11px 14px;
+            margin-bottom: 18px;
+            font-size: 0.88rem;
             display: flex;
             align-items: center;
-            gap: 12px;
-        }
-        .hero-item i {
-            width: 40px;
-            height: 40px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 12px;
-            background: rgba(214, 167, 0, 0.16);
-            color: #f5cf55;
-        }
-        .panel {
-            padding: 42px 34px;
-            background: rgba(255,255,255,0.85);
-        }
-        .panel h2 {
-            margin: 0 0 8px;
-            font-size: 1.65rem;
-        }
-        .panel p {
-            margin: 0 0 24px;
-            color: var(--muted);
-        }
-        .notice, .error {
-            border-radius: 14px;
-            padding: 12px 14px;
-            margin-bottom: 18px;
-            font-size: 0.95rem;
+            gap: 8px;
         }
         .notice {
             background: rgba(15, 138, 95, 0.08);
             border: 1px solid rgba(15, 138, 95, 0.18);
             color: var(--success);
         }
-        .error {
-            background: rgba(192, 57, 43, 0.08);
-            border: 1px solid rgba(192, 57, 43, 0.18);
+        .error-msg {
+            background: rgba(192, 57, 43, 0.07);
+            border: 1px solid rgba(192, 57, 43, 0.16);
             color: var(--danger);
         }
-        .field { margin-bottom: 16px; }
-        label {
+        .field { margin-bottom: 18px; }
+        .field label {
             display: block;
             margin-bottom: 6px;
-            font-size: 0.84rem;
+            font-size: 0.82rem;
             font-weight: 700;
             color: var(--ink-soft);
         }
@@ -225,106 +166,107 @@ ems_public_head('الإدارة العليا | تسجيل الدخول'); ?>
             right: 14px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--muted);
+            color: #a0aec0;
+            font-size: 0.9rem;
         }
-        input {
+        .input-wrap input {
             width: 100%;
-            border: 1px solid var(--line);
-            border-radius: 14px;
-            background: #fff;
-            padding: 13px 44px 13px 14px;
+            border: 1.5px solid var(--line);
+            border-radius: 12px;
+            background: #f9fafb;
+            padding: 12px 42px 12px 14px;
             font-family: inherit;
-            font-size: 1rem;
+            font-size: 0.95rem;
             color: var(--ink);
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
         }
-        input:focus {
+        .input-wrap input:focus {
             outline: none;
-            border-color: rgba(214, 167, 0, 0.75);
-            box-shadow: 0 0 0 4px rgba(214, 167, 0, 0.13);
+            background: #fff;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(214, 167, 0, 0.12);
         }
-        .actions {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            margin-top: 10px;
-        }
-        .link {
-            color: var(--ink-soft);
-            font-weight: 700;
+        .forgot {
+            display: block;
+            text-align: left;
+            margin-top: -8px;
+            margin-bottom: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--muted);
             text-decoration: none;
         }
+        .forgot:hover { color: var(--ink); }
         .submit {
             width: 100%;
-            margin-top: 18px;
             border: none;
-            border-radius: 14px;
-            background: linear-gradient(135deg, var(--ink), #1e4f77);
+            border-radius: 12px;
+            background: linear-gradient(135deg, #0F2240, #1e4f77);
             color: #fff;
             font-family: inherit;
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 800;
-            padding: 14px 18px;
+            padding: 13px 18px;
             cursor: pointer;
-            box-shadow: 0 14px 30px rgba(16, 36, 67, 0.18);
+            transition: box-shadow 0.2s, transform 0.15s;
+            box-shadow: 0 6px 20px rgba(15, 34, 64, 0.2);
+            display: flex; align-items: center; justify-content: center; gap: 8px;
         }
-        .foot-note {
-            margin-top: 16px;
+        .submit:hover {
+            box-shadow: 0 10px 30px rgba(15, 34, 64, 0.3);
+            transform: translateY(-1px);
+        }
+        .submit:active { transform: translateY(0); }
+        .footer {
+            text-align: center;
+            margin-top: 22px;
+            padding-top: 18px;
+            border-top: 1px solid var(--line);
             color: var(--muted);
-            font-size: 0.85rem;
-            line-height: 1.8;
+            font-size: 0.75rem;
         }
-        @media (max-width: 900px) {
-            .shell { grid-template-columns: 1fr; }
-            .hero { display: none; }
+        @media (max-width: 480px) {
+            body { padding: 16px; align-items: flex-start; padding-top: 40px; }
+            .login-card { padding: 32px 24px 28px; }
         }
     </style>
 </head>
 <body>
-    <div class="shell">
-        <section class="hero">
-            <div class="hero-badge"><i class="fas fa-shield-halved"></i> بوابة الإدارة العليا</div>
-            <h1>مسار دخول مستقل لمتابعة النظام على المستوى الإداري الأعلى</h1>
-            <p>هذا المسار مخصص لحسابات super_admins فقط، مع جلسة مستقلة عن مستخدمي النظام الحاليين وإمكانية إعادة تعيين كلمة المرور عبر البريد الإلكتروني المحفوظ.</p>
-            <div class="hero-list">
-                <div class="hero-item"><i class="fas fa-user-lock"></i><div>تسجيل دخول منفصل بحقل اسم مستخدم يعتمد على البريد الإلكتروني.</div></div>
-                <div class="hero-item"><i class="fas fa-envelope-open-text"></i><div>إرسال رابط إعادة التعيين إلى البريد الإلكتروني المسجل للحساب.</div></div>
-                <div class="hero-item"><i class="fas fa-chart-column"></i><div>لوحة سريعة لقياس حالة النظام والعناصر الأساسية بعد الدخول.</div></div>
+    <div class="login-card">
+        <div class="brand">
+            <div class="brand-icon"><i class="fas fa-shield-halved"></i></div>
+            <h1>لوحة الإدارة العليا</h1>
+            <p>منصة إنجاز</p>
+        </div>
+
+        <?php if ($statusMessage !== ''): ?>
+            <div class="notice"><i class="fas fa-check-circle"></i> <?php echo e($statusMessage); ?></div>
+        <?php endif; ?>
+        <?php if ($error !== ''): ?>
+            <div class="error-msg"><i class="fas fa-exclamation-circle"></i> <?php echo e($error); ?></div>
+        <?php endif; ?>
+
+        <form method="post" action="">
+            <input type="hidden" name="csrf_token" value="<?php echo e($csrf); ?>">
+            <div class="field">
+                <label for="email">البريد الإلكتروني</label>
+                <div class="input-wrap">
+                    <i class="fas fa-at"></i>
+                    <input type="email" id="email" name="email" maxlength="150" required value="<?php echo isset($_POST['email']) ? e($_POST['email']) : ''; ?>" placeholder="admin@example.com">
+                </div>
             </div>
-        </section>
-        <section class="panel">
-            <h2>تسجيل دخول الإدارة العليا</h2>
-            <p>استخدم البريد الإلكتروني المسجل في جدول super_admins.</p>
-            <?php if ($statusMessage !== ''): ?>
-                <div class="notice"><?php echo e($statusMessage); ?></div>
-            <?php endif; ?>
-            <?php if ($error !== ''): ?>
-                <div class="error"><?php echo e($error); ?></div>
-            <?php endif; ?>
-            <form method="post" action="">
-                <input type="hidden" name="csrf_token" value="<?php echo e($csrf); ?>">
-                <div class="field">
-                    <label for="email">البريد الإلكتروني</label>
-                    <div class="input-wrap">
-                        <i class="fas fa-at"></i>
-                        <input type="email" id="email" name="email" maxlength="150" required value="<?php echo isset($_POST['email']) ? e($_POST['email']) : ''; ?>">
-                    </div>
+            <div class="field">
+                <label for="password">كلمة المرور</label>
+                <div class="input-wrap">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" name="password" maxlength="255" required placeholder="••••••••">
                 </div>
-                <div class="field">
-                    <label for="password">كلمة المرور</label>
-                    <div class="input-wrap">
-                        <i class="fas fa-key"></i>
-                        <input type="password" id="password" name="password" maxlength="255" required>
-                    </div>
-                </div>
-                <div class="actions">
-                    <a class="link" href="<?php echo e(super_admin_url('forgot-password')); ?>">نسيت كلمة المرور</a>
-                    <span style="color: var(--muted); font-size: 0.84rem;">مسار آمن مخصص للإدارة العليا</span>
-                </div>
-                <button class="submit" type="submit">دخول لوحة الإدارة العليا</button>
-            </form>
-            <div class="foot-note">إذا تعذر استلام رسائل إعادة التعيين فتأكد من إعداد البريد في خادم PHP لأن الإرسال يعتمد على mail().</div>
-        </section>
+            </div>
+            <a class="forgot" href="<?php echo e(super_admin_url('forgot-password')); ?>">نسيت كلمة المرور؟</a>
+            <button class="submit" type="submit"><i class="fas fa-arrow-right-to-bracket"></i> تسجيل الدخول</button>
+        </form>
+
+        <div class="footer">منصة إنجاز &copy; <?php echo date('Y'); ?></div>
     </div>
 </body>
 </html>

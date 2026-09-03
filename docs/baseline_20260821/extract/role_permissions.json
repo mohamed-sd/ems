@@ -13896,6 +13896,15 @@
         "can_delete": "0"
     },
     {
+        "id": "9831",
+        "role_id": "9",
+        "module_id": "996",
+        "can_view": "1",
+        "can_add": "1",
+        "can_edit": "1",
+        "can_delete": "0"
+    },
+    {
         "id": "3123",
         "role_id": "10",
         "module_id": "5",

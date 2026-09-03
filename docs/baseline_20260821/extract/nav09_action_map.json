@@ -4554,6 +4554,28 @@
         "updated_at": "2026-08-08 22:52:53"
     },
     {
+        "canonical_code": "gov.ceo_org_decisions.register",
+        "label_ar": "تسجيلُ قرارات الهيكل التنظيمي",
+        "screen_title": "قرارات الهيكل التنظيمي",
+        "canonical_file": "ceo_org_decisions.php",
+        "actor_ar": "مساحة الرئيس التنفيذي",
+        "writes_text": "ceo_org_decisions",
+        "event_name": "gov_ceo_org_decisions_register",
+        "consumers_text": null,
+        "effect_text": "سطرٌ جديدٌ في ceo_org_decisions — قرارٌ هيكليٌّ واحد — تغييرُ بنيةٍ دائمةٍ أو شبهِ دائمة",
+        "reverse_text": "تحوّلُ حالةٍ بسببِه لا حذف",
+        "live_code": "page:portal\/ceo_org_decisions.php",
+        "state": "bound_page",
+        "guard_verified": "pending",
+        "guard_evidence": "",
+        "idempotency_verified": "pending",
+        "idempotency_evidence": "",
+        "uat_verified": "pending",
+        "uat_evidence": "",
+        "write_class": "domain_write",
+        "updated_at": "2026-09-01 10:56:27"
+    },
+    {
         "canonical_code": "gov.exec_assignments.register",
         "label_ar": "تسجيلُ التكليفات والإنابات المؤقتة",
         "screen_title": "التكليفات والإنابات المؤقتة",

@@ -41140,6 +41140,28 @@
         "bridge_snapshot": "SNAP-govexec-168011c0"
     },
     {
+        "id": "4873",
+        "company_id": "0",
+        "dept_name": "مساحة الرئيس التنفيذي",
+        "layer_name": "القرار والحوكمة العليا",
+        "stage_order": "3",
+        "stage_name": "القرار والحوكمة العليا",
+        "group_name": "القرار والحوكمة العليا",
+        "screen_title": "قرارات الهيكل التنظيمي",
+        "screen_file": "ceo_org_decisions.php",
+        "inputs_note": "01 · الدليل المعماري · ورقة مساحة الرئيس التنفيذي · قرارات الهيكل التنظيمي",
+        "output_doc": "قرارات الهيكل التنظيمي",
+        "resp_role": "مساحة الرئيس التنفيذي",
+        "next_state": "مسجَّل",
+        "consumers": "مساحة الرئيس التنفيذي",
+        "fin_impact": "لا",
+        "stage_kind": "canonical",
+        "screen_id": "SCR-0913",
+        "bridge_rule": "BASENAME_UNIQUE",
+        "bridge_witness": "C1 · اسمُ الملفِّ ceo_org_decisions.php يُحلُّ إلى سطحٍ حيٍّ واحدٍ (SCR-0913) · لقطة SNAP-govexec-fb693217",
+        "bridge_snapshot": "SNAP-govexec-fb693217"
+    },
+    {
         "id": "4869",
         "company_id": "0",
         "dept_name": "مساحة الرئيس التنفيذي",
