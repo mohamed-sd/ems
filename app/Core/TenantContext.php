@@ -25,12 +25,28 @@ class TenantContext
         $this->role = strval($role);
     }
 
+    /* ══ تجميدُ الشركةِ الواحدة (FREEZE · single-company) ══════════════
+       الشركةُ المُثبَّتة — مقيسةٌ من `admin_companies`/`users` لا مفترضةً:
+       المُعرّفُ 4 «ايكوبيشن» (79 مستخدمًا من 80). ثابتٌ صنفيٌّ لا عامٌّ
+       فلا يتعلّق بترتيبِ تحميلِ config.php — والملفُ يُحمَل من cron وAPI
+       والويب جميعًا. */
+    const EMS_FIXED_COMPANY_ID = 4;
+
     /** السياق من الجلسة المصادَق عليها — المصدر الافتراضي الوحيد للويب. */
     public static function fromSession()
     {
         $u = isset($_SESSION['user']) && is_array($_SESSION['user']) ? $_SESSION['user'] : array();
+        /* ══ تجميدُ الشركةِ الواحدة (FREEZE) ═══════════════════════
+           ◆ **الصفرُ يُستبدَل بالمُثبَّت**: جلسةٌ بلا `company_id` كانت تُنتج
+             سياقًا بشركةِ صفرٍ يُفرّغ كلَّ استعلامٍ صامتًا — وفي نظامِ
+             الشركةِ الواحدةِ لا معنى لذلكَ فتُثبَّت القيمةُ.
+           ◆ **وقيمةُ الجلسةِ إن وُجدت تُحترم**: فالتجميدُ يُثبّتُ الافتراضيَّ
+             ولا يمنحُ مستخدمَ شركةٍ أخرى بياناتِ الشركةِ المُثبَّتة —
+             والعزلُ في `TenantDb` يبقى على حالِه حرفًا. */
+        $sessionCompanyId = isset($u['company_id']) ? intval($u['company_id']) : 0;
+        $companyId = $sessionCompanyId > 0 ? $sessionCompanyId : self::EMS_FIXED_COMPANY_ID;
         return new self(
-            isset($u['company_id']) ? $u['company_id'] : 0,
+            $companyId,
             isset($u['id']) ? $u['id'] : 0,
             isset($u['role']) ? $u['role'] : ''
         );
@@ -117,9 +133,16 @@ class TenantContext
         return $this->role;
     }
 
+    /* ══ تجميدُ الشركةِ الواحدة (FREEZE) ════════════════════════════
+       ◆ **لا مديرَ أعلى بعد اليوم**: بابُ `admin/login.php` مُغلَقٌ بـ403،
+         وصفرُ صفٍّ في `users` يحمل الدورَ '-1' (مقيسٌ). فالردُّ false
+         دائمًا يجعلُ الواقعَ بنيويًّا لا مرهونًا ببيانات.
+       ◆ **والأثرُ مقتصرٌ على مسارِ المنصّة**: `TenantDb::forAllTenants()` وكتابةُ
+         `T_GLOBAL` المجمّدة — وكلاهما false أصلًا لمستخدمي المستأجِر،
+         فلا تغيّرَ في أيِّ شاشةٍ. */
     public function isSuperAdmin()
     {
-        return $this->role === (defined('EMS_ROLE_SUPER_ADMIN') ? EMS_ROLE_SUPER_ADMIN : '-1');
+        return false;
     }
 
     public function hasTenant()

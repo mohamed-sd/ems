@@ -443,7 +443,10 @@ function ems_enforce_ajax_endpoint_security()
         ems_ajax_guard_response(403, 'Direct endpoint access is blocked');
     }
 
-    $hasSession = isset($_SESSION['user']) || isset($_SESSION['company_user']) || isset($_SESSION['super_admin']);
+    /* ══ تجميدُ الشركةِ الواحدة (FREEZE · single-company) ═══════════════════
+       جلسةُ المزوّد `$_SESSION['super_admin']` لم تعد تُنشأ (بابُها 403)، فبقاؤها
+       في فحصِ الجلسةِ سطحُ قبولٍ لجلسةٍ متبقّيةٍ في متصفّح — تُنزع. */
+    $hasSession = isset($_SESSION['user']) || isset($_SESSION['company_user']);
     if (!$hasSession) {
         ems_ajax_guard_response(401, 'غير مصرح');
     }
@@ -599,16 +602,26 @@ function ems_tenant_db()
  */
 function ems_platform_db()
 {
-    static $pgate = null;
-    if ($pgate === null) {
-        require_once __DIR__ . '/app/Core/TenantGateException.php';
-        require_once __DIR__ . '/app/Core/TenantRegistry.php';
-        require_once __DIR__ . '/app/Core/TenantContext.php';
-        require_once __DIR__ . '/app/Core/TenantDb.php';
-        global $conn;
-        $pgate = new \App\Core\TenantDb($conn, \App\Core\TenantContext::fromSuperAdminSession(), true /* crossTenant */);
-    }
-    return $pgate;
+    /* ══ تجميدُ الشركةِ الواحدة (FREEZE · single-company) ═══════════════════
+       ◆ **البوابةُ مُعطَّلةٌ لا محذوفة**: 21 ملفًّا تحت `admin/` يستدعيها —
+         وصفرٌ خارجَه (مقيسٌ بمسحِ الشجرةِ كلِّها) — فالحذفُ يكسر التحليلَ
+         بينما الرميُ يُبقي التوقيعَ ويُفشِل الاستدعاءَ صراحةً.
+       ◆ **ورميٌ لا ردُّ null**: null يمرُّ صامتًا إلى `->fetchAll()` فيصير
+         خطأً غامضًا؛ والاستثناءُ يُسمّي السببَ في السجلِّ من أوّلِ سطر.
+       ⛔ لاستعادةِ طبقةِ المنصّة: احذفْ الرميَ وأعِدْ الجسمَ المحفوظَ أدناه.
+       ── الجسمُ الأصليُّ (محفوظًا للنقض) ──
+          static $pgate = null;
+          if ($pgate === null) {
+              require_once __DIR__ . '/app/Core/TenantGateException.php';
+              require_once __DIR__ . '/app/Core/TenantRegistry.php';
+              require_once __DIR__ . '/app/Core/TenantContext.php';
+              require_once __DIR__ . '/app/Core/TenantDb.php';
+              global $conn;
+              $pgate = new \App\Core\TenantDb($conn,
+                  \App\Core\TenantContext::fromSuperAdminSession(), true);
+          }
+          return $pgate;                                                     */
+    throw new \RuntimeException('Platform DB disabled: single-company mode');
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
