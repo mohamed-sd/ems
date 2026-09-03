@@ -1,6 +1,6 @@
 <?php
 /**
- * admin/departments.php — إدارةُ الأقسام (الإدارات) · لوحةُ الإدارةِ العليا
+ * admin/departments.php — إدارةُ الإدارات · لوحةُ الإدارةِ العليا
  * ═══════════════════════════════════════════════════════════════════════════
  * ◆ `departments` جدولٌ **منصّيٌّ** (`T_PLATFORM`) يخدم المستأجرين جميعًا بلا
  *   `company_id` — فالقراءةُ والكتابةُ عبر `ems_platform_db()` حصرًا.
@@ -14,7 +14,7 @@ require_once __DIR__ . '/includes/auth.php';
 super_admin_require_login();
 
 $admin = super_admin_current();
-$page_title = 'إدارة الأقسام';
+$page_title = 'إدارة الإدارات';
 $current_page = 'departments';
 
 if (!function_exists('super_admin_set_flash')) {
@@ -75,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 } catch (\Throwable $t) { error_log('admin/departments create: ' . $t->getMessage()); }
 
                 if ($newId > 0) {
-                    super_admin_write_audit($actorId, 'create', 'إدارة/قسم',
+                    super_admin_write_audit($actorId, 'create', 'إدارة',
                         'إضافة إدارة جديدة: ' . $code . ' — ' . $name . ' (بتأكيد المطور)', $newId);
                     super_admin_set_flash('success', 'تمت إضافة الإدارة بنجاح.');
                 } else {
@@ -146,7 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 } catch (\Throwable $t) { error_log('admin/departments update: ' . $t->getMessage()); }
 
                 if ($ok) {
-                    super_admin_write_audit($actorId, 'update', 'إدارة/قسم',
+                    super_admin_write_audit($actorId, 'update', 'إدارة',
                         'تحديث بيانات إدارة: ' . $code . ' — ' . $name, $targetId);
                     super_admin_set_flash('success', 'تم تحديث بيانات الإدارة بنجاح.');
                 } else {
@@ -188,8 +188,8 @@ require_once __DIR__ . '/includes/layout_head.php';
 
 <div class="phead">
     <div>
-        <h2>إدارة الأقسام</h2>
-        <p class="sub">عرض وتعديل الأقسام المسجلة في المنصة</p>
+        <h2>إدارة الإدارات</h2>
+        <p class="sub">عرض وتعديل الإدارات المسجلة في المنصة</p>
     </div>
 </div>
 
@@ -197,7 +197,7 @@ require_once __DIR__ . '/includes/layout_head.php';
     <i class="fas fa-triangle-exclamation" style="color:var(--orange);font-size:1.1rem;"></i>
     <div>
         <strong>تنبيه مهم:</strong>
-        الأقسام/الإدارات تُدار بواسطة إدارة المنصة والفريق البرمجي.
+        الإدارات تُدار بواسطة إدارة المنصة والفريق البرمجي.
         لا يمكن إضافة إدارة جديدة ما لم يتم إنشاء صفحاتها وأكوادها
         وتجهيز بيئة التعامل معها عن طريق مبرمجي ومطوري المنصة.
         <strong>أي إضافة بدون تجهيز مسبق قد تؤدي إلى أعطال في النظام.</strong>
@@ -269,13 +269,13 @@ require_once __DIR__ . '/includes/layout_head.php';
 
 <div class="card" style="margin-top:18px;">
     <div class="card-hd">
-        <span class="card-hd-title"><i class="fas fa-sitemap" style="color:var(--blue);margin-left:6px;"></i>الأقسام المسجلة (<?php echo count($departments); ?>)</span>
+        <span class="card-hd-title"><i class="fas fa-sitemap" style="color:var(--blue);margin-left:6px;"></i>الإدارات المسجلة (<?php echo count($departments); ?>)</span>
     </div>
 
     <?php if (empty($departments)): ?>
     <div class="empty-state">
         <i class="fas fa-sitemap"></i>
-        <p>لا توجد أقسام مسجلة بعد</p>
+        <p>لا توجد إدارات مسجلة بعد</p>
     </div>
     <?php else: ?>
     <div class="tbl-wrap">
