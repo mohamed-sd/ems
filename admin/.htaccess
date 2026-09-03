@@ -10,6 +10,7 @@ RewriteRule ^reset-password/?$   reset_password.php  [L,QSA]
 # ── Core pages ─────────────────────────────────────────────────────────────
 RewriteRule ^dashboard/?$        dashboard.php       [L,QSA]
 RewriteRule ^managers/?$         managers.php        [L,QSA]
+RewriteRule ^departments/?$      departments.php     [L,QSA]
 RewriteRule ^companies/?$        companies.php       [L,QSA]
 RewriteRule ^companies/(\d+)/?$  companies/view.php?id=$1 [L,QSA]
 RewriteRule ^subscriptions/requests/?$  subscriptions/requests.php [L,QSA]

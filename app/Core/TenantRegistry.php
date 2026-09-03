@@ -878,6 +878,10 @@ class TenantRegistry
         'super_admin_password_resets' => array('type' => self::T_PLATFORM, 'soft' => false),
         'company_user_password_resets' => array('type' => self::T_PLATFORM, 'soft' => false),
         'api_tokens' => array('type' => self::T_PLATFORM, 'soft' => false),
+        /* الإداراتُ (الأقسام) — هجرة 2028_04_20: مرجعٌ يخدم المستأجرين جميعًا
+           بلا `company_id`، تُؤلَّف من لوحةِ الإدارةِ العليا وحدَها
+           (`admin/departments.php` عبر `ems_platform_db()`). */
+        'departments' => array('type' => self::T_PLATFORM, 'soft' => false),
 
         // ── منصة/محرّكات لم تُهاجَر — مرفوضة عبر البوابة حتى تعريف عقدها ────
         'schema_migrations' => array('type' => self::T_RESTRICTED, 'soft' => false),

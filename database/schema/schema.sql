@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-01 17:08:35
--- الجداول: 1235 · المناظير: 28
+-- المصدر: equipation_manage · التوليد: 2026-09-03 15:15:55
+-- الجداول: 1236 · المناظير: 28
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -3076,6 +3076,20 @@ CREATE TABLE `deduction_types` (
   CONSTRAINT `fk_dt_policy` FOREIGN KEY (`policy_id`) REFERENCES `dept_policies` (`policy_id`),
   CONSTRAINT `ck_dt_approval` CHECK (`requires_approval` = 1)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: departments ──
+CREATE TABLE `departments` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `code` varchar(20) NOT NULL COMMENT 'كود الإدارة — فريدٌ، مفتاحُ ربطِ الأسطحِ والأكواد',
+  `name` varchar(150) NOT NULL COMMENT 'اسم الإدارة',
+  `display_order` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'ترتيب العرض في القوائم',
+  `notes` text DEFAULT NULL COMMENT 'ملاحظات',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_departments_code` (`code`),
+  KEY `ix_departments_order` (`display_order`,`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='الإدارات — تُدار من لوحة الإدارة العليا (طبقةُ المزوّد · T_PLATFORM)';
 
 -- ── Table: dept_policies ──
 CREATE TABLE `dept_policies` (

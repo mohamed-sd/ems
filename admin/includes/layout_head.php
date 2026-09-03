@@ -30,6 +30,7 @@ if (function_exists('ems_dbtool_lazy_tick')) {
 $_admin_nav = [
     ['slug' => 'dashboard',     'label' => 'لوحة التحكم',    'icon' => 'fa-gauge-high',        'url' => 'dashboard'],
     ['slug' => 'managers',      'label' => 'إدارة المدراء',   'icon' => 'fa-user-shield',       'url' => 'managers'],
+    ['slug' => 'departments',   'label' => 'إدارة الأقسام',   'icon' => 'fa-sitemap',           'url' => 'departments'],
     ['slug' => 'companies',     'label' => 'إدارة الشركات',   'icon' => 'fa-building',          'url' => 'companies'],
     ['slug' => 'permissions',   'label' => 'إدارة الصلاحيات',  'icon' => 'fa-lock-open',         'url' => 'permissions'],
     ['slug' => 'subscriptions', 'label' => 'طلبات الاشتراك',  'icon' => 'fa-file-circle-check', 'url' => 'subscriptions/requests', 'badge' => $_admin_pending_badge],
