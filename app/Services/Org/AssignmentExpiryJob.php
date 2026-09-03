@@ -66,7 +66,7 @@ class AssignmentExpiryJob
             // target_level ENUM بلا قيمة لمدير التشغيل — 'all' كي لا يبتلع ENUM قيمة غريبة صامتًا
             $stmt = $conn->prepare(
                 "INSERT INTO fin_notifications (company_id, target_level, title, link)
-                 VALUES (?, 'all', ?, 'admin/org_assignments.php')");
+                 VALUES (?, 'all', ?, 'main/org_assignments.php')");
             $co = intval($r['company_id']);
             $stmt->bind_param('is', $co, $title);
             $stmt->execute();

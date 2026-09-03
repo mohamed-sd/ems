@@ -186,7 +186,7 @@ class EventDispatcher
     {
         try {
             $title = mb_substr('إنذار الناقل: حدث #' . $eventId . ' عزل في الرسائل الميتة (المستهلك ' . $consumer . ') — ' . $lastError, 0, 200);
-            $link = 'admin/bus_monitor.php';
+            $link = 'main/dashboard.php';
             $this->exec(
                 "INSERT INTO `fin_notifications` (`company_id`, `target_level`, `title`, `link`) VALUES (?, 'finance_manager', ?, ?)",
                 'iss', array($companyId > 0 ? $companyId : 1, $title, $link)
@@ -318,7 +318,7 @@ class EventDispatcher
 
             $st = $this->conn->prepare(
                 "INSERT INTO `fin_notifications` (`company_id`,`target_level`,`title`,`link`)
-                 VALUES (1, 'finance_manager', ?, 'admin/bus_monitor.php')"
+                 VALUES (1, 'finance_manager', ?, 'main/dashboard.php')"
             );
             $st->bind_param('s', $title);
             if ($st->execute()) { $n++; }
@@ -395,7 +395,7 @@ class EventDispatcher
 
             $st = $this->conn->prepare(
                 "INSERT INTO `fin_notifications` (`company_id`,`target_level`,`title`,`link`)
-                 VALUES (1, 'finance_manager', ?, 'admin/bus_monitor.php')");
+                 VALUES (1, 'finance_manager', ?, 'main/dashboard.php')");
             $st->bind_param('s', $title);
             if ($st->execute()) { $n++; }
             $st->close();

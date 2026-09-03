@@ -101,7 +101,7 @@ class PeriodicityService
                 $co = $info[0] ?: 4;
                 $conn->query("INSERT INTO fin_notifications (company_id, target_level, title, link)
                               VALUES ({$co}, 'dept_manager',
-                              'دورية سياسة الاعتماد #{$pid} عادت إلى اليومية آليا — السبب: " . $conn->real_escape_string($info[1]) . " (DEC-01 ⑥)', 'admin/bus_monitor.php')");
+                              'دورية سياسة الاعتماد #{$pid} عادت إلى اليومية آليا — السبب: " . $conn->real_escape_string($info[1]) . " (DEC-01 ⑥)', 'main/dashboard.php')");
             }
         }
         return $reverted;

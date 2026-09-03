@@ -256,7 +256,7 @@ class JobQueueService
     private static function notify(\mysqli $conn, $companyId, $title)
     {
         $stmt = $conn->prepare("INSERT INTO fin_notifications (company_id, target_level, title, link)
-                                VALUES (?, 'all', ?, 'admin/bus_monitor.php')");
+                                VALUES (?, 'all', ?, 'main/dashboard.php')");
         $t = mb_substr($title, 0, 195);
         $stmt->bind_param('is', $companyId, $t);
         $stmt->execute();

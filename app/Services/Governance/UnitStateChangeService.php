@@ -328,7 +328,7 @@ class UnitStateChangeService
             $id = intval($r['chg_id']);
             $conn->query("UPDATE unit_state_changes SET state = 'Reversed', reversal_ref = 'EMERGENCY-AUTOREVERSED' WHERE chg_id = {$id}");
             $conn->query("INSERT INTO fin_notifications (company_id, target_level, title, link)
-                          VALUES (" . intval($r['company_id']) . ", 'finance_manager', 'طوارئ #{$id}: لم يستكمل التوثيق خلال 48 ساعة — عكس الأثر آليا ورفع للمراجعة', 'admin/bus_monitor.php')");
+                          VALUES (" . intval($r['company_id']) . ", 'finance_manager', 'طوارئ #{$id}: لم يستكمل التوثيق خلال 48 ساعة — عكس الأثر آليا ورفع للمراجعة', 'main/dashboard.php')");
         }
         return count($rows);
     }

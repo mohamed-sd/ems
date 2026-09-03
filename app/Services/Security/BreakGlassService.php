@@ -106,7 +106,7 @@ class BreakGlassService
                 'كسر زجاج بلا مراجعة خلال 48 ساعة — سقط آليا وصعد (S23)', 0);
             $stmt = $conn->prepare(
                 "INSERT INTO fin_notifications (company_id, target_level, title, link)
-                 VALUES (?, 'all', ?, 'admin/org_assignments.php')");
+                 VALUES (?, 'all', ?, 'main/org_assignments.php')");
             $co = intval($x['company_id']);
             $title = 'تصعيد: كسر زجاج #' . $id . ' سقط بلا مراجعة خلال 48 ساعة';
             $stmt->bind_param('is', $co, $title);

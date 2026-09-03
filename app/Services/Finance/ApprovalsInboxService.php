@@ -154,11 +154,11 @@ class ApprovalsInboxService
         while ($r && ($x = $r->fetch_assoc())) {
             $rows[] = array('label' => 'إذن #' . (int) $x['req_id'] . ' — ' . $x['name_ar']
                     . ' (' . $x['subject_ref'] . ') · الدور الآن: ' . ($x['next_role'] ?: '—'),
-                'link' => '../admin/org_permits.php?id=' . (int) $x['req_id'],
+                'link' => '../main/org_permits.php?id=' . (int) $x['req_id'],
                 'since' => (string) $x['created_at']);
         }
         $boxes[] = array('key' => 'permits', 'title' => 'أذونات المواقع',
-            'owner' => self::screenName($conn, 'admin/org_permits.php'), 'rows' => $rows, 'count' => count($rows));
+            'owner' => self::screenName($conn, 'main/org_permits.php'), 'rows' => $rows, 'count' => count($rows));
 
         // ── ⑥ طلباتُ التبديل (NAV-01 v6 §6.3 · update0007 S-02) — بموافقتين ──
         $rows = array();

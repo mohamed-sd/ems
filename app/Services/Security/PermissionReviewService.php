@@ -120,7 +120,7 @@ class PermissionReviewService
             $conn->query("UPDATE permission_review_cycles SET state = 'escalated' WHERE cycle_id = {$id}");
             $stmt = $conn->prepare(
                 "INSERT INTO fin_notifications (company_id, target_level, title, link)
-                 VALUES (?, 'all', ?, 'admin/org_assignments.php')");
+                 VALUES (?, 'all', ?, 'main/org_assignments.php')");
             $co = intval($x['company_id']);
             $title = 'تصعيد للإدارة العامة: مراجعة الصلاحيات ' . $x['period'] . ' للوحدة #' . $x['org_unit_id'] . ' لم توقع في مهلتها';
             $stmt->bind_param('is', $co, $title);

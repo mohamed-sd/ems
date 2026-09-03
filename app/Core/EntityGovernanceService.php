@@ -103,7 +103,7 @@ class EntityGovernanceService
             if ($r && $r->fetch_row()) {
                 $conflict = true;
                 $conn->query("INSERT INTO fin_notifications (company_id, target_level, title, link)
-                              VALUES (1, 'finance_manager', 'تضارب مصالح مكشوف: المستخدم #{$oid} يملك حصة في الكيان #{$owned} — القرار للحوكمة', 'admin/bus_monitor.php')");
+                              VALUES (1, 'finance_manager', 'تضارب مصالح مكشوف: المستخدم #{$oid} يملك حصة في الكيان #{$owned} — القرار للحوكمة', 'main/dashboard.php')");
             }
         }
         return array('ok' => true, 'code' => 201, 'own_id' => $id, 'conflict_detected' => $conflict,
@@ -172,7 +172,7 @@ class EntityGovernanceService
                   WHERE state = 'active' AND expiry_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL alert_days DAY)");
             while ($row = $r->fetch_assoc()) {
                 $conn->query("INSERT INTO fin_notifications (company_id, target_level, title, link)
-                              VALUES (1, 'finance_manager', 'ExpiringSoon: {$t[2]} #{$row['id']} ينتهي في {$row['expiry_date']}', 'admin/bus_monitor.php')");
+                              VALUES (1, 'finance_manager', 'ExpiringSoon: {$t[2]} #{$row['id']} ينتهي في {$row['expiry_date']}', 'main/dashboard.php')");
                 $alerts++;
             }
         }

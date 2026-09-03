@@ -160,7 +160,7 @@ class AuthorityGuard
         foreach ($rows as $r) {
             $conn->query("INSERT INTO fin_notifications (company_id, target_level, title, link)
                           VALUES (" . intval($r['company_id']) . ", 'finance_manager',
-                          'تفويض توقيع #" . intval($r['auth_id']) . " ينتهي في " . $r['valid_to'] . "', 'admin/bus_monitor.php')");
+                          'تفويض توقيع #" . intval($r['auth_id']) . " ينتهي في " . $r['valid_to'] . "', 'main/dashboard.php')");
         }
         return count($rows);
     }
