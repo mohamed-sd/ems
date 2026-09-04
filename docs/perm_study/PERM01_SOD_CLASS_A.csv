@@ -1,0 +1,40 @@
+﻿مادي,التركيبة,"وظيفة أ","وظيفة ب",القالب,الدور,أفراد,"شاشات كتابة أ","شاشات كتابة ب"
+نعم,SOD-07,"مُعِدُّ المطابقةِ البنكية","معتمِدُ المطابقة",TGT-R18,18,20,Tickets/ticket_contextual_open.php,Finance/acc_backflow.php
+نعم,SOD-04,"معتمِدُ الحسابِ البنكي","منفِّذُ الدفع",TGT-R6,6,10,"Contracts/contracts.php | Finance/budget_form_fin.php | FinRequests/request_form.php",Reports/reports.php
+نعم,SOD-03,"منشئُ المورد","معتمِدُ الحسابِ البنكي",TGT-R16,16,3,"main/project_users.php | Procurement/proc_award_minutes.php | Procurement/proc_offers.php","Procurement/issue_proc.php | Procurement/stock_proc.php | Procurement/wh_issue_requests.php"
+نعم,SOD-10,"مُعِدُّ الرواتب","مُطلِقُ دفعةِ الرواتبِ منفردًا",TGT-R13,13,3,main/project_users.php,"Maintenance/breakdown_intake.php | Maintenance/external_repairs.php | Maintenance/orders.php"
+نعم,SOD-10,"مُعِدُّ الرواتب","مُطلِقُ دفعةِ الرواتبِ منفردًا",TGT-R16,16,3,main/project_users.php,"Procurement/issue_proc.php | Procurement/stock_proc.php | Procurement/wh_issue_requests.php"
+نعم,SOD-03,"منشئُ المورد","معتمِدُ الحسابِ البنكي",TGT-R12,12,2,"Clients/client_contacts.php | Clients/clients.php | Contracts/contracts_details.php",Contracts/claims.php
+نعم,SOD-03,"منشئُ المورد","معتمِدُ الحسابِ البنكي",TGT-R17,17,2,"main/project_users.php | Suppliers/supplier_advances.php","Contracts/collections.php | Contracts/tax_invoices.php | Finance/acc_adjustments.php"
+نعم,SOD-03,"منشئُ المورد","معتمِدُ الحسابِ البنكي",TGT-R23,23,2,"main/project_users.php | Transport/transfer_tariffs.php","Transport/transfer_close_cost.php | Transport/transfer_closure.php"
+نعم,SOD-03,"منشئُ المورد","معتمِدُ الحسابِ البنكي",TGT-R25,25,2,main/project_users.php,"Procurement/issue_proc.php | Procurement/stock_proc.php | Procurement/wh_issue_requests.php"
+نعم,SOD-03,"منشئُ المورد","معتمِدُ الحسابِ البنكي",TGT-R26,26,2,main/project_users.php,Financing/cost_allocation.php
+نعم,SOD-03,"منشئُ المورد","معتمِدُ الحسابِ البنكي",TGT-R4,4,2,"Approvals/hours_approval.php | Employees/employee_contracts.php | Employees/employees.php","Employees/hr_benefits.php | Workforce/payroll_lines.php | Workforce/payroll_runs.php"
+نعم,SOD-04,"معتمِدُ الحسابِ البنكي","منفِّذُ الدفع",TGT-R12,12,2,"Contracts/claims.php | Contracts/contracts.php | FinRequests/request_form.php",Reports/reports.php
+نعم,SOD-04,"معتمِدُ الحسابِ البنكي","منفِّذُ الدفع",TGT-R4,4,2,"Approvals/requests.php | Employees/hr_benefits.php | Finance/budget_form_fin.php",Reports/reports.php
+نعم,SOD-07,"مُعِدُّ المطابقةِ البنكية","معتمِدُ المطابقة",TGT-R17,17,2,Tickets/ticket_contextual_open.php,"Finance/ob_contingent.php | Finance/ob_register.php | Finance/ob_schedule.php"
+نعم,SOD-10,"مُعِدُّ الرواتب","مُطلِقُ دفعةِ الرواتبِ منفردًا",TGT-R12,12,2,"Clients/client_contacts.php | Clients/clients.php | Contracts/contracts_details.php",Contracts/claims.php
+نعم,SOD-10,"مُعِدُّ الرواتب","مُطلِقُ دفعةِ الرواتبِ منفردًا",TGT-R17,17,2,"main/project_users.php | Workforce/employee_advances.php | Workforce/final_settlement.php","Contracts/collections.php | Contracts/tax_invoices.php | Finance/acc_adjustments.php"
+نعم,SOD-10,"مُعِدُّ الرواتب","مُطلِقُ دفعةِ الرواتبِ منفردًا",TGT-R23,23,2,main/project_users.php,"Transport/transfer_close_cost.php | Transport/transfer_closure.php"
+نعم,SOD-10,"مُعِدُّ الرواتب","مُطلِقُ دفعةِ الرواتبِ منفردًا",TGT-R25,25,2,main/project_users.php,"Procurement/issue_proc.php | Procurement/stock_proc.php | Procurement/wh_issue_requests.php"
+نعم,SOD-10,"مُعِدُّ الرواتب","مُطلِقُ دفعةِ الرواتبِ منفردًا",TGT-R26,26,2,main/project_users.php,Financing/cost_allocation.php
+نعم,SOD-03,"منشئُ المورد","معتمِدُ الحسابِ البنكي",TGT-R1,1,1,"ActivityLogs/activity_logs.php | Approvals/hours_approval.php | Employees/employees.php",Operations/monthly_close.php
+نعم,SOD-03,"منشئُ المورد","معتمِدُ الحسابِ البنكي",TGT-R19,19,1,"Contracts/penalties.php | Governance/licenses_guarantees.php","Contracts/claims.php | Finance/accountants_fin.php | Finance/accounts_fin.php"
+نعم,SOD-04,"معتمِدُ الحسابِ البنكي","منفِّذُ الدفع",TGT-R1,1,1,"Approvals/requests.php | Finance/budget_form_fin.php | FinRequests/dept_inbox.php",Reports/reports.php
+نعم,SOD-04,"معتمِدُ الحسابِ البنكي","منفِّذُ الدفع",TGT-R2,2,1,"Approvals/requests.php | Contracts/contracts.php | FinRequests/request_form.php",Reports/reports.php
+نعم,SOD-04,"معتمِدُ الحسابِ البنكي","منفِّذُ الدفع",TGT-R3,3,1,"Approvals/requests.php | Finance/budget_form_fin.php | FinRequests/dept_inbox.php",Reports/reports.php
+نعم,SOD-04,"معتمِدُ الحسابِ البنكي","منفِّذُ الدفع",TGT-R8,8,1,"FinRequests/request_form.php | Portal/my_evaluation.php",Reports/reports.php
+نعم,SOD-07,"مُعِدُّ المطابقةِ البنكية","معتمِدُ المطابقة",TGT-R21,21,1,Tickets/ticket_contextual_open.php,"Finance/tre_cycle_stages.php | Finance/tre_unit_roles.php"
+نعم,SOD-10,"مُعِدُّ الرواتب","مُطلِقُ دفعةِ الرواتبِ منفردًا",TGT-R1,1,1,"ActivityLogs/activity_logs.php | Approvals/hours_approval.php | Employees/employees.php",Operations/monthly_close.php
+نعم,SOD-10,"مُعِدُّ الرواتب","مُطلِقُ دفعةِ الرواتبِ منفردًا",TGT-R19,19,1,Workforce/employee_settlements.php,"Contracts/claims.php | Finance/accountants_fin.php | Finance/accounts_fin.php"
+نعم,SOD-10,"مُعِدُّ الرواتب","مُطلِقُ دفعةِ الرواتبِ منفردًا",TGT-R2,2,1,"Contracts/contracts_details.php | Settings/settings.php | Suppliers/supplier_contacts.php","Suppliers/settlements.php | Suppliers/supplier_violations.php"
+لا,SOD-11,"مسجِّلُ الأصل","معتمِدُ التخلصِ منه منفردًا",TGT-R18,18,20,"Finance/assets_fin.php | Finance/budget_form_fin.php | Finance/cost_report_fin.php",Finance/financial_statements_fin.php
+لا,SOD-11,"مسجِّلُ الأصل","معتمِدُ التخلصِ منه منفردًا",TGT-R15,15,2,"emsreports/index.php | Finance/budget_form_fin.php | Governance/exceptions.php","Governance/auth_grants.php | Governance/bus_board.php | Governance/bus_deliveries.php"
+لا,SOD-11,"مسجِّلُ الأصل","معتمِدُ التخلصِ منه منفردًا",TGT-R17,17,2,"Finance/assets_fin.php | Finance/budget_dept.php | Finance/budget_form_fin.php","Finance/acc_trial_balance.php | Finance/budget_master.php | Finance/financial_statements_fin.php"
+لا,SOD-11,"مسجِّلُ الأصل","معتمِدُ التخلصِ منه منفردًا",TGT-R4,4,2,"Approvals/hours_approval.php | Employees/employee_contracts.php | Employees/employees.php",Workforce/contract_registry.php
+لا,SOD-11,"مسجِّلُ الأصل","معتمِدُ التخلصِ منه منفردًا",TGT-R1,1,1,"ActivityLogs/activity_logs.php | Approvals/hours_approval.php | Employees/employees.php",Governance/signing_authority.php
+لا,SOD-11,"مسجِّلُ الأصل","معتمِدُ التخلصِ منه منفردًا",TGT-R19,19,1,"Finance/assets_fin.php | Finance/budget_form_fin.php | Finance/cost_report_fin.php","Finance/depr_run.php | Finance/financial_statements_fin.php | Governance/signing_authority.php"
+لا,SOD-11,"مسجِّلُ الأصل","معتمِدُ التخلصِ منه منفردًا",TGT-R21,21,1,"Finance/assets_fin.php | Finance/budget_form_fin.php | Finance/cost_report_fin.php",Finance/financial_statements_fin.php
+لا,SOD-11,"مسجِّلُ الأصل","معتمِدُ التخلصِ منه منفردًا",TGT-R24,24,1,"Finance/budget_form_fin.php | Portal/my_evaluation.php","Tickets/gov_dept_crp.php | Tickets/tkt_assignment.php | Tickets/tkt_communications.php"
+لا,SOD-11,"مسجِّلُ الأصل","معتمِدُ التخلصِ منه منفردًا",TGT-R28,28,1,Risk/dept_risk_space.php,"Risk/risk_acceptance.php | Risk/risk_appetite.php | Risk/risk_assessment.php"
+لا,SOD-11,"مسجِّلُ الأصل","معتمِدُ التخلصِ منه منفردًا",TGT-R29,29,1,Risk/dept_risk_space.php,"Risk/risk_acceptance.php | Risk/risk_appetite.php | Risk/risk_assessment.php"

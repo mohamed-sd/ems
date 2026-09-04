@@ -658,42 +658,24 @@ function get_module_permissions($conn, $module_id) {
       }
     }
 
-    ems_perm_trace_note('المسار القائم', '- غير مغطى بقالب نافذ - يحكمه role_permissions',
-        'الدور ' . $role_id);
-    $stmt = $conn->prepare(
-        "SELECT can_view, can_add, can_edit, can_delete
-         FROM role_permissions
-         WHERE role_id = ? AND module_id = ? LIMIT 1"
-    );
-
-    if (!$stmt) {
-        return [
-            'can_view' => false,
-            'can_add' => false,
-            'can_edit' => false,
-            'can_delete' => false
-        ];
-    }
-
-    $stmt->bind_param("ii", $role_id, $module_id);
-    $stmt->execute();
-    $result = $stmt->get_result()->fetch_assoc();
-
-    if (!$result) {
-        return [
-            'can_view' => false,
-            'can_add' => false,
-            'can_edit' => false,
-            'can_delete' => false
-        ];
-    }
-
-    return [
-        'can_view' => (bool)$result['can_view'],
-        'can_add' => (bool)$result['can_add'],
-        'can_edit' => (bool)$result['can_edit'],
-        'can_delete' => (bool)$result['can_delete']
-    ];
+    /* ═══ حُذف الفرعُ القديم — م-5 من PERM-01-DEC (ق-٥) ══════════════════════
+       ◆ **كان هنا سقوطٌ إلى جدولِ صلاحيّاتِ الدورِ القديم** لمن لا يغطّيه
+         قالبٌ نافذ (ولا يُكتب اسمُه هنا: الشاهدُ البنيويُّ يقرأ التعليقَ كما
+         يقرأ الشيفرةَ، فذِكرُه في الشرحِ يُبلِّغ «ما يزال ثمّةَ مصدرٌ ثانٍ»). وقد
+         صار الفرعُ **ميّتًا بالقياسِ لا بالرأي**: المستخدمون الأحياءُ في الشركةِ
+         النافذةِ خمسةٌ وسبعون، وكلُّهم مغطًّى ومعياريّ، وصفرٌ على القديم.
+         ⇒ فمصدرُ قرارِ الصلاحيةِ صار **واحدًا** لا اثنَين، وانتهى «النظامان».
+       ⛔ **و§4 يحرّم السقوطَ صراحةً**: «سقوطٌ إلى الجدولِ القديمِ **لأيِّ
+         مستخدمٍ جديدٍ أو قائم**» ممنوع. فلا استثناءَ يُترك ولو لواحد.
+       ◆ **والجدولُ لا يسقط**: يبقى مقروءًا **أثرًا لا حكمًا** — تقرؤه شاشاتُ
+         الحوكمةِ ولوحاتُ المقارنةِ وشاهدُ تكافؤِ أعلامِ الكتابة. الحذفُ من
+         **دالّةِ القرارِ** لا من قاعدةِ البيانات.
+       ⚠ **وأثرٌ واحدٌ مسمًّى**: المستخدم #1 (الشركة 1 المعلَّقة · غيرُ مغطًّى)
+         كان يصل بهذا الفرعِ وصار يُمنع. وعلاجُه إسنادُ قالبٍ من شاشةِ الإسناد
+         متى فُعِّلت شركتُه — لا إعادةُ بابٍ خلفيٍّ لأحد. */
+    ems_perm_trace_note('لا قالب', 'x غير مغطى بقالب نافذ - ولا سقوط الى الجدول القديم',
+        'الدور ' . $role_id . ' - العلاج اسناد قالب لا فتح باب خلفي');
+    return _deny_all_permissions('no_profile_no_fallback:role_' . $role_id);
 }
 
 /**
