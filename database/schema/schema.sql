@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-04 10:23:43
--- الجداول: 1240 · المناظير: 29
+-- المصدر: equipation_manage · التوليد: 2026-09-04 14:16:12
+-- الجداول: 1242 · المناظير: 29
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -11425,6 +11425,21 @@ CREATE TABLE `gov_policy_changes` (
   KEY `ix_key_date` (`policy_key`,`changed_on`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='تاريخُ الأحكامِ الحاكمة — القديمُ يبقى بتاريخِه وسببِه';
 
+-- ── Table: gov_policy_freeze ──
+CREATE TABLE `gov_policy_freeze` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `scope_code` varchar(40) NOT NULL COMMENT 'مدى التجميد — grants | profile_activation',
+  `active` tinyint(1) NOT NULL DEFAULT 1,
+  `reason` varchar(255) NOT NULL DEFAULT '',
+  `doc_ref` varchar(60) NOT NULL DEFAULT '' COMMENT 'الأمرُ الذي أوجبه',
+  `opened_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `opened_by` int(11) NOT NULL DEFAULT 0,
+  `closed_at` datetime DEFAULT NULL,
+  `closed_by` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_scope_open` (`scope_code`,`active`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='PERM-01 §3-① — تجميدُ البذرِ والمنحِ حتى إشعار';
+
 -- ── Table: gov_pollution_findings ──
 CREATE TABLE `gov_pollution_findings` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -11441,6 +11456,19 @@ CREATE TABLE `gov_pollution_findings` (
   UNIQUE KEY `uq_tcm` (`table_name`,`column_name`,`marker`),
   KEY `ix_verdict` (`verdict`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='جردُ التلوثِ — الجولةُ الأولى قراءةٌ فقط ولا كتابةَ في بيانات';
+
+-- ── Table: gov_profile_activation_approval ──
+CREATE TABLE `gov_profile_activation_approval` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `profile_id` int(10) unsigned NOT NULL,
+  `version` smallint(5) unsigned NOT NULL DEFAULT 1,
+  `approved_by` int(11) NOT NULL COMMENT 'الجهةُ المعتمِدة — سجلٌّ لا رسالة (FTRE-0062-ب)',
+  `approved_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `reason` varchar(255) NOT NULL DEFAULT '',
+  `doc_ref` varchar(60) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_profile_version` (`profile_id`,`version`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='PERM-01 §4 — لا تفعيلَ لمسودّةٍ بلا سجلِّ اعتماد';
 
 -- ── Table: gov_profile_items ──
 CREATE TABLE `gov_profile_items` (
@@ -32106,6 +32134,18 @@ CREATE TRIGGER `trg_grant_issuer` BEFORE INSERT ON `gov_authority_grants` FOR EA
         END IF;
       END;
 
+-- ── Trigger: trg_perm01_grant_freeze ──
+DROP TRIGGER IF EXISTS `trg_perm01_grant_freeze`;
+CREATE TRIGGER `trg_perm01_grant_freeze` BEFORE INSERT ON `gov_authority_grants`
+      FOR EACH ROW
+      BEGIN
+        IF EXISTS (SELECT 1 FROM `gov_policy_freeze`
+                    WHERE `scope_code` = 'grants' AND `active` = 1) THEN
+          SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'PERM-01: تجميد — لا تصدر منحة جديدة حتى اشعار';
+        END IF;
+      END;
+
 -- ── Trigger: trg_cap_owner_only ──
 DROP TRIGGER IF EXISTS `trg_cap_owner_only`;
 CREATE TRIGGER `trg_cap_owner_only` BEFORE INSERT ON `gov_cap_history` FOR EACH ROW
@@ -32135,6 +32175,34 @@ CREATE TRIGGER `trg_deleg_non_delegable` BEFORE INSERT ON `gov_delegations` FOR 
         IF EXISTS (SELECT 1 FROM `non_delegable_actions` n
                     WHERE NEW.`scope_json` LIKE CONCAT('%', n.`action_code`, '%')) THEN
           SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'chk_non_delegable: فعلٌ محصورٌ لا يُفوَّض';
+        END IF;
+      END;
+
+-- ── Trigger: trg_perm01_profile_activate ──
+DROP TRIGGER IF EXISTS `trg_perm01_profile_activate`;
+CREATE TRIGGER `trg_perm01_profile_activate` BEFORE UPDATE ON `gov_role_profiles`
+      FOR EACH ROW
+      BEGIN
+        DECLARE src_n INT DEFAULT 0;
+        DECLARE apr_n INT DEFAULT 0;
+        IF NEW.`state` = 'active' AND OLD.`state` <> 'active' THEN
+          IF EXISTS (SELECT 1 FROM `gov_policy_freeze`
+                      WHERE `scope_code` = 'profile_activation' AND `active` = 1) THEN
+            SIGNAL SQLSTATE '45000'
+              SET MESSAGE_TEXT = 'PERM-01: تجميد — لا تفعيل قالب حتى اشعار';
+          END IF;
+          SELECT COUNT(DISTINCT `seeded_from`) INTO src_n
+            FROM `gov_profile_items` WHERE `profile_id` = NEW.`profile_id`;
+          IF src_n > 1 THEN
+            SIGNAL SQLSTATE '45000'
+              SET MESSAGE_TEXT = 'PERM-01: قالب مبذور من اكثر من مصدر لا يفعل قبل مراجعة موثقة';
+          END IF;
+          SELECT COUNT(*) INTO apr_n FROM `gov_profile_activation_approval`
+            WHERE `profile_id` = NEW.`profile_id` AND `version` = NEW.`version`;
+          IF apr_n = 0 THEN
+            SIGNAL SQLSTATE '45000'
+              SET MESSAGE_TEXT = 'PERM-01: لا تفعيل لمسودة بلا سجل اعتماد (FTRE-0062)';
+          END IF;
         END IF;
       END;
 
