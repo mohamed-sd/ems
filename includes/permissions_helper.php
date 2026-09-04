@@ -334,6 +334,56 @@ function ems_template_nav_state($conn) {
     return $st;
 }
 
+if (!function_exists('ems_break_glass_open')) {
+    /**
+     * أثمّة **فتحٌ اضطراريٌّ حيٌّ** لهذا الفاعلِ على هذه الشاشة؟ (PERM-01 §7-④)
+     *
+     * ⛔ **يفتح ولا يغلق أبدًا**: يُستشار **بعدَ** وقوعِ المنعِ فقط، فلا يستطيع
+     *   استثناءٌ أن يمنع من كان مسموحًا له. وهذا نصُّ الأمر:
+     *   «الاستثناء يفتح ولا يغلق أبدا».
+     * ⛔ **والمنتهي لا يفتح**: الشرطُ على `valid_to` في الاستعلامِ نفسِه — لا
+     *   يُنتظَر مرورُ المهمّةِ الدوريّةِ لينتهيَ أثرُه. فمهمّةٌ متأخّرةٌ ساعةً
+     *   كانت تعني بابًا مفتوحًا ساعةً بلا إذن.
+     * ⛔ **والمسحوبُ لا يفتح**: `state='active'` حصرًا.
+     * ◆ **والحبّةُ `users.id`**: هي هويّةُ الفاعلِ التي يقرؤها قرارُ الشاشة.
+     *   والصفوفُ التاريخيّةُ بمعرِّفاتٍ لا تقابل أحدًا موسومةٌ «غيرُ نافذة»
+     *   (ق-٦) فلا تفتح شيئًا.
+     *
+     * @return bool
+     */
+    function ems_break_glass_open($conn, $userId, $moduleCode)
+    {
+        static $tableOk = null;
+        $userId = (int) $userId;
+        $moduleCode = (string) $moduleCode;
+        if ($userId <= 0 || $moduleCode === '') { return false; }
+        try {
+            if ($tableOk === null) {
+                $t = @$conn->query("SELECT 1 FROM information_schema.TABLES
+                                     WHERE TABLE_SCHEMA = DATABASE()
+                                       AND TABLE_NAME = 'permission_exceptions' LIMIT 1");
+                $tableOk = ($t && $t->num_rows > 0);
+            }
+            if (!$tableOk) { return false; }
+            $st = $conn->prepare(
+                "SELECT COUNT(*) FROM permission_exceptions
+                  WHERE person_id = ? AND permission_code = ?
+                    AND is_break_glass = 1 AND state = 'active' AND effect = 'grant'
+                    AND valid_from <= NOW() AND valid_to IS NOT NULL AND valid_to > NOW()");
+            if (!$st) { return false; }
+            $st->bind_param('is', $userId, $moduleCode);
+            if (!$st->execute()) { $st->close(); return false; }
+            $r = $st->get_result();
+            $n = $r ? (int) ($r->fetch_row()[0] ?? 0) : 0;
+            $st->close();
+            return $n > 0;
+        } catch (\Throwable $t) {
+            /* ⛔ وتعذُّرُ القراءةِ **لا يفتح**: الشكُّ في الاستثناءِ يُحسم منعًا. */
+            return false;
+        }
+    }
+}
+
 if (!function_exists('ems_auth_mode')) {
     /**
      * وضعُ انتقالِ المستخدم — `legacy` | `shadow` | `canonical` (PERM-01 §6-②).
@@ -534,6 +584,31 @@ function get_module_permissions($conn, $module_id) {
         //         -1  = مغطًّى والشاشةُ خارجَ قالبِه ⇒ منعٌ بالقالب
         if ($gv !== null && $gv['t_view'] !== null) {
             $allowed = ((int) $gv['t_view']) === 1;
+            /* ⛔ **والفتحُ الاضطراريُّ يُستشار عندَ المنعِ وحدَه** (PERM-01 §7-④):
+                 يفتح ولا يغلق أبدًا — فلا يُسأل عنه إن كان الحكمُ سماحًا،
+                 ولا يستطيع أن يقلب سماحًا إلى منع. */
+            if (!$allowed && function_exists('ems_break_glass_open')) {
+                $__mc = null;
+                if ($mst = $conn->prepare("SELECT code FROM modules WHERE id = ? LIMIT 1")) {
+                    $mst->bind_param('i', $module_id);
+                    if ($mst->execute()) {
+                        $mr = $mst->get_result();
+                        $mrow = $mr ? $mr->fetch_row() : null;
+                        $__mc = $mrow ? (string) $mrow[0] : null;
+                    }
+                    $mst->close();
+                }
+                if ($__mc !== null && ems_break_glass_open($conn, $gov_user_id, $__mc)) {
+                    ems_perm_trace_note('فتح اضطراري', 'v استثناء حي موقوت يفتح هذه الشاشة',
+                        'يفتح ولا يغلق - والاثر مسجل في سجل التدقيق');
+                    return [
+                        'can_view' => true,
+                        'can_add' => (int) $gv['t_add'] === 1,
+                        'can_edit' => (int) $gv['t_edit'] === 1,
+                        'can_delete' => (int) $gv['t_del'] === 1,
+                    ];
+                }
+            }
             ems_perm_trace_note('طبقة القوالب',
                 $allowed ? 'v مغطى بقالب نافذ والشاشة داخله' : 'x مغطى بقالب نافذ والشاشة خارجه',
                 'وهذا هو الحكم النهائي - لا شاشة خارج القالب');
@@ -553,6 +628,26 @@ function get_module_permissions($conn, $module_id) {
              — فالشكُّ في الوضعِ يُحسم منعًا لا فتحًا. */
         $__mode = function_exists('ems_auth_mode') ? ems_auth_mode($conn, $gov_user_id) : 'none';
         if ($__mode === 'canonical' || $__mode === 'unknown') {
+            /* ◆ **وهنا أيضًا يُستشار الفتحُ الاضطراريُّ قبلَ المنع** — فهذا هو
+                 البابُ الذي أغلقناه على المعياريِّ، وبلا مخرجٍ موقوتٍ يصير
+                 عطبٌ تقنيٌّ انقطاعَ عملٍ بلا علاج (§7-④). */
+            if (function_exists('ems_break_glass_open')) {
+                $__mc2 = null;
+                if ($m2 = $conn->prepare("SELECT code FROM modules WHERE id = ? LIMIT 1")) {
+                    $m2->bind_param('i', $module_id);
+                    if ($m2->execute()) {
+                        $r2 = $m2->get_result();
+                        $row2 = $r2 ? $r2->fetch_row() : null;
+                        $__mc2 = $row2 ? (string) $row2[0] : null;
+                    }
+                    $m2->close();
+                }
+                if ($__mc2 !== null && ems_break_glass_open($conn, $gov_user_id, $__mc2)) {
+                    ems_perm_trace_note('فتح اضطراري', 'v استثناء حي موقوت يفتح رغم غياب القالب');
+                    return array('can_view' => true, 'can_add' => false,
+                                 'can_edit' => false, 'can_delete' => false);
+                }
+            }
             ems_perm_trace_note('وضع الانتقال', 'x ' . $__mode . ' بلا قالب يغطي هذه الشاشة',
                 'ومن بلغ معياريا لا يعود الى الجدول القديم - المنع صريح');
             return _deny_all_permissions('canonical_without_profile:' . $__mode);

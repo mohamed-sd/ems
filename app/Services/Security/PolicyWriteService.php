@@ -199,6 +199,136 @@ class PolicyWriteService
     }
 
     /**
+     * ③ فتحٌ اضطراريٌّ موقوتٌ على شاشة — ق-٢ من PERM-01-DEC.
+     *
+     * ⛔ **يفتح ولا يغلق أبدًا**، ويمرُّ بخمسةِ قيودٍ لا يُتجاوز واحدٌ منها:
+     *   ① **حرّاسُ `never` لا تُمَسّ** — ثمانيةٌ مصنَّفةٌ سلفًا، ولا كسرَ لها
+     *      «مهما كان المبرّر».
+     *   ② **المجيزُ ليس الدورَ 15 بحال** ولا الطالبَ نفسَه — طالبٌ ≠ مجيزٌ ≠ مُسنِد.
+     *      وغيابُ دورِ الحوكمةِ يُعوَّض **بالمالكِ مؤقّتًا** ولا يوقف الفتح.
+     *   ③ **المالياتُ لا تُستثنى** بل تشتدّ: مجيزُ حوكمةٍ **ومجيزٌ ماليٌّ** معًا،
+     *      ولا تُقبل بمجيزٍ واحد.
+     *   ④ **السقفُ 4 ساعاتٍ** — و8 بمجيزٍ ثانٍ، ولا يتجاوز 24 بحال. و24 ليست
+     *      قيمةً افتراضيّةً بل سقفًا مطلقًا.
+     *   ⑤ **وضابطٌ معوِّضٌ مكتوبٌ** لصنفِ `with_compensating_control`.
+     *
+     * @param int    $userId    الفاعلُ الذي يُفتَح له
+     * @param string $screenCode رمزُ الشاشةِ كما في `modules.code`
+     * @param array  $d         approver_gov · approver_fin · hours · reason · compensating
+     * @return array{ok:bool,code:string,msg:string,id:int}
+     */
+    public static function openException(\mysqli $conn, $userId, $screenCode, array $d)
+    {
+        $userId = (int) $userId;
+        $screenCode = trim((string) $screenCode);
+        $reason = trim((string) ($d['reason'] ?? ''));
+        $govApprover = (int) ($d['approver_gov'] ?? 0);
+        $finApprover = (int) ($d['approver_fin'] ?? 0);
+        $hours = (int) ($d['hours'] ?? self::BG_HOURS_DEFAULT);
+        $comp = trim((string) ($d['compensating'] ?? ''));
+
+        if ($userId <= 0 || $screenCode === '') { return self::fail('BAD_INPUT', 'الفاعل أو الشاشة غير صحيح'); }
+        if ($reason === '') { return self::fail('NO_REASON', 'السبب مطلوب — ولا فتح اضطراري بلا سبب'); }
+        if ($govApprover <= 0) { return self::fail('NO_APPROVER', 'يلزم مجيز حوكمة (او المالك مؤقتا)'); }
+
+        try {
+            $gate = \ems_tenant_db();
+
+            /* ② المجيزُ ليس الطالبَ ولا من الدورِ 15. */
+            if ($govApprover === $userId) {
+                return self::fail('SELF_APPROVE', 'الطالب لا يجيز لنفسه — طالب غير مجيز');
+            }
+            $ap = $gate->selectOne('users', array(
+                'columns' => array('id', 'role', 'name'), 'where' => array('id' => $govApprover)));
+            if (!$ap) { return self::fail('NO_APPROVER', 'لا مجيز حي بهذا المعرف'); }
+            if ((int) $ap['role'] === self::ROLE_PERM_ADMIN) {
+                return self::fail('ROLE15_APPROVER',
+                    'الدور 15 لا يجيز كسر الزجاج بحال — الاسناد شيء والاجازة شيء اخر');
+            }
+
+            /* ① حارسُ `never` لا يُمَسّ · ⑤ والضابطُ المعوِّضُ مكتوب. */
+            $pol = $gate->selectOne('guard_override_policies', array(
+                'columns' => array('guard_code', 'name_ar', 'overridable'),
+                'where'   => array('guard_code' => $screenCode)));
+            if ($pol && (string) $pol['overridable'] === 'never') {
+                return self::fail('GUARD_NEVER',
+                    'حارس ' . $pol['name_ar'] . ' لا يكسر زجاجه مهما كان السبب');
+            }
+            if ($pol && (string) $pol['overridable'] === 'with_compensating_control' && $comp === '') {
+                return self::fail('NO_COMPENSATING',
+                    'هذا الحارس يكسر بضابط معوض مكتوب — اكتبه في سطر الاثر');
+            }
+
+            /* ③ المالياتُ بثنائيّةِ مجيزَين. */
+            if (self::isFinancialScreen($screenCode)) {
+                if ($finApprover <= 0 || $finApprover === $govApprover) {
+                    return self::fail('DUAL_REQUIRED',
+                        'شاشة مالية — تلزمها ثنائية: مجيز حوكمة ومجيز مالي مختلفان');
+                }
+                if ($finApprover === $userId) {
+                    return self::fail('SELF_APPROVE', 'الطالب لا يجيز لنفسه ماليا');
+                }
+            }
+
+            /* ④ السقفُ الزمنيّ. */
+            $cap = ($finApprover > 0 && $finApprover !== $govApprover)
+                 ? self::BG_HOURS_EXTENDED : self::BG_HOURS_DEFAULT;
+            if ($hours < 1) { $hours = self::BG_HOURS_DEFAULT; }
+            if ($hours > $cap) {
+                return self::fail('OVER_CAP',
+                    'السقف ' . $cap . ' ساعات' . ($cap === self::BG_HOURS_DEFAULT ? ' — والتمديد الى 8 بمجيز ثان' : ''));
+            }
+            if ($hours > self::BG_HOURS_ABSOLUTE) {
+                return self::fail('OVER_ABSOLUTE', 'لا يتجاوز 24 ساعة بحال');
+            }
+        } catch (\Throwable $t) {
+            if (function_exists('ems_catch_log')) { \ems_catch_log($t, __METHOD__); }
+            return self::fail('READ_FAILED', 'تعذر قراءة سياسة الحارس او المجيز');
+        }
+
+        $approvals = 'gov:' . $govApprover . ($finApprover > 0 ? '+fin:' . $finApprover : '')
+                   . ($comp !== '' ? '+comp' : '');
+        return self::write($conn, function () use ($conn, $userId, $screenCode, $reason,
+                                                   $hours, $approvals, $comp) {
+            $now = time();
+            $id = (int) \ems_tenant_db()->insert('permission_exceptions', array(
+                'person_id'       => $userId,
+                'permission_code' => mb_substr($screenCode, 0, 120),
+                'scope_rule'      => 'screen',
+                'effect'          => 'grant',
+                'reason'          => mb_substr($reason . ($comp !== '' ? ' | ضابط معوض: ' . $comp : ''), 0, 255),
+                'valid_from'      => date('Y-m-d H:i:s', $now),
+                'valid_to'        => date('Y-m-d H:i:s', $now + ($hours * 3600)),
+                'is_break_glass'  => 1,
+                'approvals_ref'   => mb_substr($approvals, 0, 120),
+                'state'           => 'active',
+            ));
+            $ok = \ems_perm_change_log($conn, 'exception', 'open', array(
+                'subject_kind' => 'user',
+                'subject_id'   => $userId,
+                'screen_code'  => $screenCode,
+                'before'       => 'ممنوع',
+                'after'        => 'مفتوح اضطرارا ' . $hours . ' ساعة (' . $approvals . ')',
+                'reason'       => $reason,
+                'source'       => 'PolicyWriteService::openException',
+            ));
+            if (!$ok) { throw new \RuntimeException('تعذر كتابة سطر الاثر'); }
+            return self::done($id, 'فتح اضطراري لمدة ' . $hours . ' ساعة على ' . $screenCode);
+        });
+    }
+
+    /**
+     * أشاشةٌ ماليّةٌ هي؟ — تُعرَف بموضعِها في الشجرةِ لا برأيٍ فيها.
+     *
+     * ◆ والعائلاتُ المادّيّةُ في الأمر: مالية · خزينة · مشتريات · منحُ صلاحيات.
+     */
+    private static function isFinancialScreen($code)
+    {
+        return (bool) preg_match(
+            '~^(Finance|FinRequests|Treasury|Procurement|Governance)/~i', (string) $code);
+    }
+
+    /**
      * الفاعلون الذين يصحُّ إسنادُ قالبٍ إليهم — أحياءُ بلا منحةٍ نافذة.
      *
      * ◆ **والقراءةُ في الخدمةِ لا في الشاشة**: استعلامٌ خامٌّ في مسارِ إدارةٍ

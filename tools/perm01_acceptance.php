@@ -463,12 +463,23 @@ $bgUnaudited = $one("SELECT COUNT(*) FROM permission_exceptions ex
 $bgWired = (strpos((string) @file_get_contents($ROOT . '/includes/permissions_helper.php'),
                    'permission_exceptions') !== false);
 $closedByDefault = ($live > 0 && $cov === $live);
+/* ◆ **والوصلُ يُقاس في جسمِ دالّةِ القرارِ لا في الملفّ**: الملفُّ يضمُّ قارئَ
+     الاستثناءِ نفسَه، فمسحُه كلِّه يُخرج «موصول» ولو لم يُستشَر في القرار. */
+$bgInDecision = false;
+$__hs = (string) @file_get_contents($ROOT . '/includes/permissions_helper.php');
+$__p1 = strpos($__hs, 'function get_module_permissions(');
+if ($__p1 !== false) {
+    $__p2 = strpos($__hs, "
+function ", $__p1 + 10);
+    $bgInDecision = strpos(substr($__hs, $__p1, ($__p2 === false ? strlen($__hs) : $__p2) - $__p1),
+                           'ems_break_glass_open') !== false;
+}
 $add(28, 'استعمالُ فتحٍ اضطراريٍّ بلا أثرِ تدقيق', 'صفر', $bgUnaudited,
-     ($bgUnaudited === 0 && $bgWired) ? 'PASS' : 'FAIL',
-     'بلا أثرٍ: ' . $bgUnaudited . ' من ' . $bgLive . ' استثناءً حيًّا · وأحداثُ تدقيقٍ مسجَّلة: ' . $bgAudit
-   . ' — و**مسارُ القرارِ لا يقرأ permission_exceptions** ('
-   . ($bgWired ? 'موصول' : 'غيرُ موصول') . ')، والنظامُ '
-   . ($closedByDefault ? 'مغلقٌ افتراضيًّا بالفعل' : 'ليس مغلقًا افتراضيًّا') . ' — §7-④');
+     ($bgUnaudited === 0 && $bgInDecision) ? 'PASS' : 'FAIL',
+     'بلا أثرٍ: ' . $bgUnaudited . ' من ' . $bgLive . ' استثناءً حيًّا · وأحداثُ تدقيقٍ: ' . $bgAudit
+   . ' · وقرارُ فتحِ الشاشةِ ' . ($bgInDecision ? '**يستشير الاستثناء**' : 'لا يقرؤه')
+   . ' · والنظامُ ' . ($closedByDefault ? 'مغلقٌ افتراضيًّا' : 'ليس مغلقًا افتراضيًّا')
+   . ' — مُثبَتٌ بـ tests/perm01_break_glass.php (never يُرفض · المنتهي لا يفتح · يفتح ولا يغلق)');
 $finActions = 0;
 require_once $ROOT . '/includes/action_guard.php';
 $reg = function_exists('ems_action_guard_registry') ? ems_action_guard_registry() : array();
