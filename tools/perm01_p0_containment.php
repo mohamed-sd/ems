@@ -21,7 +21,8 @@
  * ⛔ **وصفرٌ لا يُقرأ سلامةً بلا شاهدٍ صناعيّ**: الأداةُ تفحص أنَّ الكاشفَ يرى
  *   تعارضًا معلومًا قبلَ أن يُقرأ صفرُه براءة.
  *
- * التشغيل: php tools/perm01_p0_containment.php [--company=4]
+ * التشغيل: php tools/perm01_p0_containment.php [--company=4] [--write]
+ *          `--write` يُقيِّد الكشفَ في `gov_sod_conflict` (عاطلةٌ بوسمِ المصدر)
  * ═══════════════════════════════════════════════════════════════════════════
  */
 if (php_sapi_name() !== 'cli') { exit("CLI فقط\n"); }
@@ -37,6 +38,7 @@ if ($db->connect_errno) { exit('تعذّر الاتصال: ' . $db->connect_erro
 $db->set_charset('utf8mb4');
 
 $CO = 4;
+$WRITE = in_array('--write', $argv, true);
 foreach ($argv as $a) { if (preg_match('/^--company=(\d+)$/', $a, $m)) { $CO = (int) $m[1]; } }
 $LIVE = "u.is_deleted = 0 AND u.status = 'active' AND u.company_id = $CO";
 $one  = function ($sql) use ($db) { $r = $db->query($sql); return $r ? (int) $r->fetch_row()[0] : -1; };
@@ -134,6 +136,82 @@ if (!$hits) {
     $withUsers = 0;
     foreach ($hits as $h) { if ($h['users'] > 0) { $withUsers++; } }
     printf("   منها ما يحمله فاعلٌ حيٌّ = %d\n", $withUsers);
+}
+
+/* ═══ ②-ب · تقييدُ الكشف — `gov_sod_conflict` كان فارغًا فلا يُعرف أوقع كشفٌ ═══
+   ◆ **الكاشفُ الذي لا يكتب لا يُحاسَب**: سجلٌّ فارغٌ يُقرأ «لا تعارضَ» وهو في
+     الحقيقةِ «لا كاشفَ». فالكتابةُ هنا تحوّل الرقمَ من مخرجِ أداةٍ إلى واقعةٍ
+     مقيَّدةٍ يراها المراجعُ والامتثال.
+   ◆ **وعاطلةٌ بوسمِ المصدر**: صفوفُ هذا الكاشفِ وحدَها تُمحى قبلَ الكتابةِ —
+     فلا يُدهَس كشفٌ من مصدرٍ آخرَ ولا تتضاعف الصفوفُ بإعادةِ التشغيل. */
+if ($WRITE) {
+    echo "\n══ ②-ب تقييدُ الكشفِ في gov_sod_conflict ══════════════════════════════\n";
+    $SRC = 'PERM-01 §4 · perm01_p0_containment';
+
+    /* ◆ **الحبّةُ تتبع دلالةَ السجلِّ لا شكلَ مخرجي**: مفتاحُه الفريدُ
+         (شركة × تركيبة × دورٍ مكشوفٍ × مستخدم) — فالحبّةُ **تركيبةٌ × دور**،
+         لا تركيبةٌ × قالب. فتُجمَع قوالبُ الدورِ الواحدِ في صفٍّ واحدٍ يسمّيها،
+         وإلا اصطدمت الصفوفُ بالمفتاحِ وضاع أكثرُها صامتًا.
+       ◆ ودورُ الكشفِ هو **دورُ حاملِ القالب** لا دورٌ في التركيبةِ نظريًّا —
+         فالمكشوفُ من يحمل، لا من قد يحمل. */
+    $roleOfProfile = array();
+    $rr = $db->query("SELECT g.profile_id, u.role
+                        FROM gov_authority_grants g
+                        JOIN users u ON u.id = g.user_id AND $LIVE
+                       WHERE g.revoked_at IS NULL AND (g.valid_to IS NULL OR g.valid_to > NOW())
+                       GROUP BY g.profile_id, u.role");
+    while ($x = $rr->fetch_assoc()) { $roleOfProfile[(int) $x['profile_id']][] = (int) $x['role']; }
+
+    $agg = array();
+    foreach ($hits as $h) {
+        $roles = isset($roleOfProfile[$h['pid']]) ? $roleOfProfile[$h['pid']] : array(0);
+        foreach ($roles as $rid) {
+            $k = $h['pair'] . '|' . $rid;
+            if (!isset($agg[$k])) {
+                $agg[$k] = array('pair' => $h['pair'], 'role' => $rid, 'fa' => $h['fa'],
+                                 'fb' => $h['fb'], 'profiles' => array(), 'users' => 0);
+            }
+            $agg[$k]['profiles'][] = $profMeta[$h['pid']];
+            $agg[$k]['users'] += $h['users'];
+        }
+    }
+
+    $del = $db->prepare("DELETE FROM gov_sod_conflict WHERE src_ref = ?");
+    $del->bind_param('s', $SRC); $del->execute();
+    $removed = $db->affected_rows; $del->close();
+
+    /* ⛔ `state` محكومٌ بـ`chk_gsc_state` ∈ (defined·detected·mitigated·accepted·closed)
+         — و«مكشوفٌ لم يُعالَج» هو `detected` لا `open`. والقيدُ ردَّ الكتابةَ أوّلَ مرّة. */
+    $ins = $db->prepare(
+        "INSERT INTO gov_sod_conflict
+           (company_id, conflict_code, title_ar, side_a, side_b, process_key,
+            detected_role_id, detected_user_id, detected_at, mitigation_ar,
+            state, src_ref, severity)
+         VALUES (?, ?, ?, ?, ?, ?, ?, 0, NOW(), ?, 'detected', ?, 'block')
+         ON DUPLICATE KEY UPDATE title_ar = VALUES(title_ar), process_key = VALUES(process_key),
+            mitigation_ar = VALUES(mitigation_ar), detected_at = NOW(), src_ref = VALUES(src_ref)");
+    $wrote = 0;
+    foreach ($agg as $a) {
+        $codes = array();
+        foreach ($a['profiles'] as $pm) { $codes[] = trim(explode('—', $pm)[0]); }
+        $codes = array_values(array_unique($codes));
+        $title = 'قوالب نافذة تجمع حصري طرفي ' . $a['pair'] . ': ' . implode(' · ', $codes);
+        $title = mb_substr($title, 0, 200);
+        $pk = mb_substr(implode(',', $codes), 0, 64);
+        $mit = $a['users'] > 0
+             ? ('يحمله ' . $a['users'] . ' فاعلا حيا — والحد الصلب على الفعل هو الضابط القائم')
+             : 'بلا حامل حي — يعالج قبل اسناده';
+        $mit = mb_substr($mit, 0, 400);
+        $code = $a['pair']; $fa = mb_substr($a['fa'], 0, 120); $fb = mb_substr($a['fb'], 0, 120);
+        $rid = (int) $a['role'];
+        $ins->bind_param('isssssiss', $CO, $code, $title, $fa, $fb, $pk, $rid, $mit, $SRC);
+        if ($ins->execute()) { $wrote++; }
+        else { echo '   ✘ ' . $code . '/' . $rid . ': ' . $ins->error . "\n"; }
+    }
+    $ins->close();
+    printf("   حُذف من هذا المصدر: %d · كُتب: %d صفًّا (تركيبة × دور) · والسجلُّ الآن: %d\n",
+        $removed, $wrote, $one('SELECT COUNT(*) FROM gov_sod_conflict'));
+    echo "   ◆ الحالة `detected` — والحسمُ قرارُ مالكٍ يُكتب في `treatment_decision`.\n";
 }
 
 /* ═══ ③ الشاهدُ الصناعيّ — أيرى الكاشفُ تعارضًا نعلمه؟ ═══════════════════ */
