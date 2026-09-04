@@ -1,0 +1,22 @@
+{
+    "migration": "2028_05_05_perm01_pilot_bank_transition.php",
+    "max_profile": 171,
+    "max_item": 6380,
+    "max_grant": 104,
+    "revoked": [
+        {
+            "grant_id": 103,
+            "user_id": 907,
+            "reason": "إلحاقٌ بمطابقةِ المسمَّى لمصفوفةِ الدرجات — قرارٌ مفوَّض 2026-08-17"
+        },
+        {
+            "grant_id": 104,
+            "user_id": 908,
+            "reason": "إلحاقٌ بمطابقةِ المسمَّى لمصفوفةِ الدرجات — قرارٌ مفوَّض 2026-08-17"
+        }
+    ],
+    "first_run_at": "2026-09-04 12:47:12 UTC",
+    "runs": 1,
+    "last_run_at": "2026-09-04 12:47:12 UTC",
+    "profile_id": 350
+}
