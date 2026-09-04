@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-04 14:16:12
--- الجداول: 1242 · المناظير: 29
+-- المصدر: equipation_manage · التوليد: 2026-09-04 14:58:13
+-- الجداول: 1244 · المناظير: 29
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -16348,6 +16348,29 @@ CREATE TABLE `payroll_time_inputs` (
   CONSTRAINT `ck_time_input_doc` CHECK (char_length(trim(`doc_ref`)) > 0),
   CONSTRAINT `ck_time_input_qty` CHECK (`qty` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: perm01_target_item ──
+CREATE TABLE `perm01_target_item` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `workspace_id` varchar(20) NOT NULL,
+  `module_code` varchar(160) NOT NULL,
+  `origin` varchar(20) NOT NULL DEFAULT 'GUIDE' COMMENT 'GUIDE او MY — ومساحتي الزامية',
+  `source_ref` varchar(160) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_target_item` (`workspace_id`,`module_code`),
+  KEY `ix_ws` (`workspace_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='PERM-01 §3-5 — بنود الهدف: شاشة واحدة لكل صف';
+
+-- ── Table: perm01_target_profile ──
+CREATE TABLE `perm01_target_profile` (
+  `workspace_id` varchar(20) NOT NULL,
+  `name_ar` varchar(120) NOT NULL DEFAULT '',
+  `screens_n` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `roles_csv` varchar(200) NOT NULL DEFAULT '' COMMENT 'أدوارُ هذه المساحةِ من nav_ws_roles',
+  `source_ref` varchar(160) NOT NULL DEFAULT '',
+  `built_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`workspace_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='PERM-01 §3-5 — الهدف المعياري بمساحة من ورقة الدليل';
 
 -- ── Table: perm_shadow_diffs ──
 CREATE TABLE `perm_shadow_diffs` (
