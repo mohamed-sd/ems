@@ -1,6 +1,6 @@
 <?php
 /**
- * tools/perm01_acceptance.php — معيارُ القبول: المقاييسُ الستة والثلاثون (§10 · §12-⑩)
+ * tools/perm01_acceptance.php — معيارُ القبول: المقاييسُ السبعة والثلاثون (§10 · §12-⑩)
  * ═══════════════════════════════════════════════════════════════════════════
  * ◆ **يقيس ولا يدّعي**: كلُّ بندٍ إمّا **مقيسٌ برقم**، وإمّا **غيرُ مقيسٍ
  *   ويُسمّى سببُه** — بنصِّ الأمر «وما لم تستطع قياسه — سمِّه ولا تخمّنه».
@@ -214,6 +214,65 @@ $add(36, 'شاشةٌ حيّةٌ تحرّر جدولًا لم يعد يحكم', '
      count($deadWriters) === 0 ? 'PASS' : 'FAIL',
      ($deadWriters ? 'مفتوحة: ' . implode(' · ', $deadWriters) . ' — ' : '')
    . 'ومسمّاةٌ لا مطويّة: ' . implode(' · ', $deadNamed));
+
+/* ═══ ㊲ — قارئٌ مستقلٌّ يفتح ما يغلقه الحارس ═══════════════════════════
+   ⛔ **الخطرُ الذي أحدثه حذفُ الفرعِ القديم**: شاشاتٌ تقرأ الجدولَ القديمَ
+     **بنفسِها** لتقرّر، بجانبِ مسارِ القرار. ولمّا حُذف الفرعُ من الدالّة صار
+     الحارسُ يمنع غيرَ المغطَّى — **بينما القارئُ المستقلُّ ما يزال يرى 4,121
+     صفًّا في جدولٍ لم يعد يحكم**. فقد يفتح بابًا أغلقه الحارس.
+   ◆ **والاتّجاهانِ لا يُجمعان**: `OVER_GRANT` (يسمح المستقلُّ ويمنع المعياريّ)
+     **ثغرةُ أمنٍ** · و`UNDER_GRANT` عطبُ خدمةٍ لا أمن. والبوّابةُ على الأوّلِ.
+   ◆ **وما لا يُعلن شاشتَه لا يُقارَن قرارُه** — يُعَدُّ في خانتِه ولا يُطوى. */
+$indOver = 0; $indUnder = 0; $indPairs = 0; $indNoCode = 0; $indEx = array();
+$indScreens = array();
+$itI = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($ROOT,
+        FilesystemIterator::SKIP_DOTS | FilesystemIterator::UNIX_PATHS));
+foreach ($itI as $fI) {
+    $pI = $fI->getPathname();
+    if (substr($pI, -4) !== '.php') { continue; }
+    foreach (array('/tests/','/tools/','/docs/','/vendor/','/storage/','/.git/','/database/') as $sI) {
+        if (strpos($pI, $sI) !== false) { continue 2; }
+    }
+    /* ◆ **والقارئُ المستقلُّ من يستعلم الجدولَ بنفسِه** — ولو نادى الدالّةَ
+         المعياريّةَ أيضًا في موضعٍ آخر. فاستبعادُ كلِّ من يذكرها يُفرِغ العيّنةَ
+         (وقع مقيسًا: صفرُ زوجٍ من خمسِ شاشات). */
+    $srcI = (string) @file_get_contents($pI);
+    if (!preg_match('~(FROM|JOIN)\s+`?role_permissions`?~i', $srcI)) { continue; }
+    if (preg_match('~\$MODULE_CODE\s*=\s*\x27([^\x27]+)\x27~', $srcI, $mI)) {
+        $indScreens[$mI[1]] = 1;
+    } else { $indNoCode++; }
+}
+if ($indScreens) {
+    require_once $ROOT . '/includes/permissions_helper.php';
+    $prevI = isset($_SESSION['user']) ? $_SESSION['user'] : null;
+    $urI = $db->query("SELECT id, role, company_id FROM users
+                        WHERE is_deleted=0 AND status='active' AND company_id={$CO}");
+    $usersI = array(); while ($uI = $urI->fetch_assoc()) { $usersI[] = $uI; }
+    foreach (array_keys($indScreens) as $codeI) {
+        $eI = $db->real_escape_string($codeI);
+        $rI = $db->query("SELECT id FROM modules WHERE code='{$eI}' LIMIT 1");
+        if (!$rI || !$rI->num_rows) { continue; }
+        $midI = (int) $rI->fetch_row()[0];
+        foreach ($usersI as $uI) {
+            $legacy = $one("SELECT COUNT(*) FROM role_permissions
+                             WHERE role_id=" . (int) $uI['role'] . " AND module_id={$midI}
+                               AND can_view=1") > 0;
+            $_SESSION['user'] = array('id' => (int) $uI['id'], 'role' => (string) $uI['role'],
+                                      'company_id' => (int) $uI['company_id'], 'name' => 'shadow');
+            $canon = !empty(get_module_permissions($db, $midI)['can_view']);
+            $indPairs++;
+            if ($legacy && !$canon) { $indOver++; if (count($indEx) < 3) { $indEx[] = '#' . $uI['id'] . ' ⟵ ' . $codeI; } }
+            elseif (!$legacy && $canon) { $indUnder++; }
+        }
+    }
+    if ($prevI === null) { unset($_SESSION['user']); } else { $_SESSION['user'] = $prevI; }
+}
+$add(37, 'قارئٌ مستقلٌّ يفتح ما يغلقه الحارس (OVER_GRANT)', 'صفر', $indOver,
+     ($indOver === 0 && $indPairs > 0) ? 'PASS' : ($indPairs === 0 ? 'UNMEASURED' : 'FAIL'),
+     'أزواجٌ قيست: ' . $indPairs . ' على ' . count($indScreens) . ' شاشةً تُعلن رمزَها'
+   . ' · وUNDER_GRANT (عطبُ خدمةٍ لا أمن): ' . $indUnder
+   . ' · وقارئٌ بلا رمزٍ مُعلَنٍ خارجَ القياس: ' . $indNoCode . ' (خانةٌ مسمّاةٌ لا مطويّة)'
+   . ($indEx ? ' · ' . implode(' · ', $indEx) : ''));
 
 $add(2, 'تركيبةٌ حرجةٌ يحملها فاعلٌ واحد', 'صفر', $bothSides, $bothSides === 0 ? 'PASS' : 'FAIL',
      'مغلقٌ بالبنيةِ — users.role عمودٌ واحد');
