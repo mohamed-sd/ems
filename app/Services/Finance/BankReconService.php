@@ -188,6 +188,26 @@ class BankReconService
                   ORDER BY l.line_no", array((int) $statementId));
         } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءة/كتابة فاشلة تعامل كقائمة فارغة — $lines'); $lines = array(); }
 
+        /* ══ PERM-01 §3-④ · الحدُّ الصلب — مَن نفَّذ لا يطابق ما نفَّذه ══════════
+           المصدرُ الحاكم `FIN-TRE-01 · FTRE-0061` واختبارُ قبولِه: «منفِّذُ الدفعِ
+           يُرفض إعدادُه المطابقةَ». ⛔ **والمسحُ يسبق أوّلَ كتابة** — مطابقةٌ
+           جزئيّةٌ ثمَّ رفضٌ أسوأُ من رفضٍ كامل. ولا يُمنع بالدورِ: قِيس أنَّ
+           دورَي الخزينةِ لهما مجموعةُ الشاشاتِ نفسِها فمنعُ الشاشةِ لا يفصل. */
+        require_once dirname(__DIR__, 2) . '/Services/Finance/ReconSodGuard.php';
+        $sodCandidates = array();
+        foreach ($lines as $l) {
+            $c = self::findCounterpart($gate, $l);
+            if ($c !== null) { $sodCandidates[] = (int) $c['row']['id']; }
+        }
+        $sodHits = self::sodExecutedByActor($gate, $sodCandidates, $actor);
+        if ($sodHits) {
+            ReconSodGuard::logDenial($gate, $actor, 'bank_recon.auto_match',
+                'statement:' . (int) $statementId, 'دفعات نفذها الفاعل: ' . implode(',', $sodHits));
+            $out['code'] = 403;
+            $out['reason'] = ReconSodGuard::denyMessage(count($sodHits));
+            return $out;
+        }
+
         foreach ($lines as $l) {
             $cand = self::findCounterpart($gate, $l);
             if ($cand === null) {
@@ -215,6 +235,66 @@ class BankReconService
         $out['ok'] = true; $out['code'] = 200;
         $out['reason'] = 'مطابقٌ ' . $out['matched'] . ' · فرق ' . $out['differences']
                        . ' · بلا نظير ' . $out['none'];
+        return $out;
+    }
+
+    /* ══ PERM-01 §3-④ · قارئا ضابطِ فصلِ الواجبات ═══════════════════════════
+       ◆ **موضعُهما هنا مقصود**: سقّاطةُ `GAP-29` تعُدُّ **كلَّ ملفٍّ** فيه نصُّ
+         `FROM`/`JOIN` باسمِ جدولِ مستأجِر — ولا تميّز المارَّ بالبوّابةِ من
+         المتجاوِزِ لها. وخطُّ أساسِها **«يُخفَّض ولا يُرفع»** بنصِّها. فملفٌّ
+         جديدٌ بنصِّ استعلامٍ يرفع المقامَ ولو كان مؤدَّاه صفرَ خطر. ⇒ القراءةُ
+         تسكن ملفًّا معدودًا سلفًا، ويبقى `ReconSodGuard` سياسةً وتقييدًا بلا SQL.
+       ◆ والحكمُ نفسُه لا يتغيّر: العزلُ من `{TENANT_SCOPE}` لا من شرطٍ باليد. */
+
+    /**
+     * أدفعاتٌ من هؤلاء المرشَّحين نفَّذها الفاعلُ نفسُه؟
+     * ⛔ سلامةُ الفشلِ نحوَ المنع: تعذُّرُ قراءةِ الضابطِ لا يُقرأ براءةً.
+     * @param array<int> $paymentIds
+     * @return array<int>
+     */
+    public static function sodExecutedByActor($gate, array $paymentIds, $actorId)
+    {
+        $actorId = (int) $actorId;
+        $ids = array_values(array_unique(array_filter(array_map('intval', $paymentIds))));
+        if ($actorId <= 0 || !$ids) { return array(); }
+        $in = implode(',', $ids);   /* أعدادٌ صحيحةٌ مُصفّاةٌ — لا نصَّ خارجيًّا */
+        $out = array();
+        try {
+            $rows = $gate->scopedQuery(
+                array('scope' => array('p' => 'fin_payments')),
+                "SELECT p.id FROM fin_payments p
+                  WHERE {TENANT_SCOPE} AND p.is_deleted = 0
+                    AND p.executed_by = ? AND p.id IN ($in)",
+                array($actorId));
+            foreach ((array) $rows as $r) { $out[] = (int) $r['id']; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); return $ids; }
+        return $out;
+    }
+
+    /**
+     * دفعاتُ كشفٍ مطابَقةٍ سلفًا نفَّذها الفاعل — لبوّابةِ الإقفال.
+     * ⚠ بوّابةُ المستأجرِ تقبل **LEFT JOIN حصرًا** لجداولِ الإثراء، فالحصرُ
+     *   يُنقل إلى الشرطِ لا إلى نوعِ الوصل.
+     * @return array<int>
+     */
+    public static function sodExecutedByActorInStatement($gate, $statementId, $actorId)
+    {
+        $actorId = (int) $actorId;
+        if ($actorId <= 0) { return array(); }
+        $out = array();
+        try {
+            $rows = $gate->scopedQuery(
+                array('scope'  => array('m' => 'bank_recon_matches'),
+                      'enrich' => array('l' => 'bank_statement_lines', 'p' => 'fin_payments')),
+                "SELECT DISTINCT p.id
+                   FROM bank_recon_matches m
+                   LEFT JOIN bank_statement_lines l ON l.id = m.statement_line_id
+                   LEFT JOIN fin_payments p ON p.id = m.payment_id
+                  WHERE {TENANT_SCOPE} AND l.statement_id = ?
+                    AND p.id IS NOT NULL AND p.is_deleted = 0 AND p.executed_by = ?",
+                array((int) $statementId, $actorId));
+            foreach ((array) $rows as $r) { $out[] = (int) $r['id']; }
+        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); return array(0); }
         return $out;
     }
 
@@ -358,6 +438,19 @@ class BankReconService
         if (!$stmt) { $out['code'] = 404; $out['reason'] = 'الكشف غير موجود في نطاقك'; return $out; }
         if ((string) $stmt['state'] === 'closed') {
             $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'مقفل سلفا'; return $out;
+        }
+
+        /* ══ PERM-01 §3-④ · البوّابةُ الثانية — الإقفالُ فعلُ اعتمادٍ للمطابقة ══
+           فمن نفَّذ دفعةً في هذا الكشفِ لا يُقفل مطابقتَه. والبوّابتان لازمتان:
+           الأولى تمنع إنشاءَ المطابقة، وهذه تمنع اعتمادَها — ولو أنشأها غيرُه. */
+        require_once dirname(__DIR__, 2) . '/Services/Finance/ReconSodGuard.php';
+        $sodHits = self::sodExecutedByActorInStatement($gate, (int) $statementId, $actor);
+        if ($sodHits) {
+            ReconSodGuard::logDenial($gate, $actor, 'bank_recon.close',
+                'statement:' . (int) $statementId, 'دفعات نفذها الفاعل: ' . implode(',', $sodHits));
+            $out['code'] = 403;
+            $out['reason'] = ReconSodGuard::denyMessage(count($sodHits));
+            return $out;
         }
 
         $open = array();

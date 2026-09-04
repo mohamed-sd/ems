@@ -1007,6 +1007,11 @@ class TenantRegistry
         'permission_approval_steps' => array('type' => self::T_CHILD, 'soft' => false,
             'parent' => 'permission_change_requests', 'fk' => 'req_id'),
         'sod_conflicts' => array('type' => self::T_GLOBAL, 'soft' => false),
+        /* ◆ سجلّا فصلِ الواجباتِ كانا خارجَ السجلِّ فتعذّرت الكتابةُ فيهما
+             بالبوّابة — والبديلُ استعلامٌ خامٌّ تردُّه سقّاطةُ GAP-29. والتركيباتُ
+             سياسةٌ بـ`company_id=0` فهي عامّة، والمنعُ واقعةُ مستأجِرٍ فهو مُسنَد. */
+        'sec_sod_pairs' => array('type' => self::T_GLOBAL, 'soft' => false),
+        'sec_sod_denials' => array('type' => self::T_TENANT, 'soft' => false),
         'guard_override_policies' => array('type' => self::T_GLOBAL, 'soft' => false),
         'sensitive_field_policies' => array('type' => self::T_GLOBAL, 'soft' => false),
         'effective_permissions' => array('type' => self::T_TENANT, 'soft' => false),
