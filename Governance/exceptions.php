@@ -93,6 +93,33 @@ $FIELDS = array (
   20 => 'المرفق',
 );
 
+/* ═══ الفتحُ الاضطراريُّ — واجهةُ ق-٢ ═══════════════════════════════════════
+   ◆ **الآليّةُ كانت تعمل بلا يدٍ تُشغّلها**: بعدَ وصلِها بمسارِ القرارِ (م-2) بقيت
+     **بلا شاشةٍ واحدةٍ في الإنتاج** تنادِيها — فالفتحُ في الطوارئِ كان يلزمه من
+     يشغّل PHP. وآليّةُ طوارئَ لا يبلغها المحتاجُ إليها في دقيقةٍ ليست آليّةَ طوارئ.
+   ⛔ **وهذه واجهةٌ لا بابٌ ثانٍ**: تنادي `PolicyWriteService::openException`
+     وتعرض جوابَه. وكلُّ القيودِ الخمسةِ تُنفَّذ **هناك** لا هنا — فلا تُكرَّر
+     قاعدةٌ في شاشةٍ لتنحرف عن أصلِها.
+   ◆ **وموضعُها بيتُ الاستثناءاتِ القائمُ** لا شاشةٌ جديدة. */
+$bgFlash = null; $bgKind = 'info';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 'break_glass') {
+    require_once __DIR__ . '/../app/Services/Security/PolicyWriteService.php';
+    $__r = \App\Services\Security\PolicyWriteService::openException(
+        $conn,
+        (int) ($_POST['bg_user'] ?? 0),
+        trim((string) ($_POST['bg_screen'] ?? '')),
+        array(
+            'approver_gov'  => (int) ($_POST['bg_gov'] ?? 0),
+            'approver_fin'  => (int) ($_POST['bg_fin'] ?? 0),
+            'hours'         => (int) ($_POST['bg_hours'] ?? 4),
+            'reason'        => trim((string) ($_POST['bg_reason'] ?? '')),
+            'compensating'  => trim((string) ($_POST['bg_comp'] ?? '')),
+        )
+    );
+    $bgFlash = $__r['msg'];
+    $bgKind = $__r['ok'] ? 'success' : 'danger';
+}
+
 /* ── الحفظ: فورم الإضافة الموحد → المخزن البيني ─────────────────────────── */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 'add') {
     $payload = array();
@@ -161,6 +188,64 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
     echo ems_states_bundle('لا طلبات استثناء قائمة', 'طلب الاستثناء يبدأ بزر «إضافة» ويمر بموافقاته المطلوبة');
     ?>
+
+    <?php if ($bgFlash !== null): ?>
+      <div class="alert alert-<?php echo htmlspecialchars($bgKind, ENT_QUOTES, 'UTF-8'); ?>" role="status">
+        <?php echo htmlspecialchars($bgFlash, ENT_QUOTES, 'UTF-8'); ?>
+      </div>
+    <?php endif; ?>
+
+    <div class="ems-card ems-mb-16">
+      <div class="filter-title">
+        <span class="filter-title-icon"><i class="fa fa-bolt"></i></span>
+        فتح اضطراري موقوت
+      </div>
+      <div class="filter-body">
+        <p class="text-muted">
+          يفتح شاشة واحدة لموظف واحد مدة محدودة، ويكتب اثره. لا يغلق شيئا على احد.
+          الحراس المصنفون «لا يكسر» لا يمسون. والمالية تلزمها ثنائية: مجيز حوكمة ومجيز مالي.
+          والمجيز ليس الدور 15 ولا الطالب نفسه.
+        </p>
+        <form method="post" action="" class="ems-form">
+          <?= csrf_field() ?>
+          <input type="hidden" name="cmp03_action" value="break_glass">
+          <div class="form-group px-w-220">
+            <label for="bg_user">الموظف (رقمه)</label>
+            <input type="number" name="bg_user" id="bg_user" class="form-control" min="1" required>
+          </div>
+          <div class="form-group px-w-320">
+            <label for="bg_screen">رمز الشاشة</label>
+            <input type="text" name="bg_screen" id="bg_screen" class="form-control"
+                   maxlength="120" required placeholder="Finance/depr_run.php">
+          </div>
+          <div class="form-group px-w-220">
+            <label for="bg_gov">مجيز الحوكمة (رقمه)</label>
+            <input type="number" name="bg_gov" id="bg_gov" class="form-control" min="1" required>
+          </div>
+          <div class="form-group px-w-220">
+            <label for="bg_fin">مجيز مالي (للشاشات المالية)</label>
+            <input type="number" name="bg_fin" id="bg_fin" class="form-control" min="0">
+          </div>
+          <div class="form-group px-w-220">
+            <label for="bg_hours">ساعات (4، او 8 بمجيز ثان)</label>
+            <input type="number" name="bg_hours" id="bg_hours" class="form-control"
+                   min="1" max="8" value="4">
+          </div>
+          <div class="form-group px-w-320">
+            <label for="bg_reason">السبب (مطلوب)</label>
+            <input type="text" name="bg_reason" id="bg_reason" class="form-control"
+                   maxlength="255" required>
+          </div>
+          <div class="form-group px-w-320">
+            <label for="bg_comp">ضابط معوض (لمن يلزمه)</label>
+            <input type="text" name="bg_comp" id="bg_comp" class="form-control" maxlength="255">
+          </div>
+          <div class="form-group">
+            <button type="submit" class="btn btn-primary">افتح اضطرارا</button>
+          </div>
+        </form>
+      </div>
+    </div>
 
     <!-- فورم الإضافة الموحد (ems-forms) — مطويٌّ حتى زرِّ الرأس -->
     <form method="post" action="" class="allforms" id="cmp03AddForm">

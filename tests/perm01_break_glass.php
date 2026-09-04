@@ -52,6 +52,26 @@ $body = $pf === false ? '' : substr($helper, $pf, ($pe === false ? strlen($helpe
 chk($body !== '' && strpos($body, 'ems_break_glass_open') !== false,
     '★★ **قرارُ فتحِ الشاشةِ يستشير الفتحَ الاضطراريّ** — وهو نصُّ قبولِ ق-٢');
 
+/* ⛔ **وآليّةٌ لا يبلغها المحتاجُ إليها ليست آليّةَ طوارئ**: بعدَ الوصلِ بقيت
+     بلا شاشةٍ في الإنتاجِ تنادِيها، فكان الفتحُ يلزمه من يشغّل PHP. */
+$callers = array();
+$rootDir = dirname(__DIR__);
+$skipDirs = array('/tests/', '/tools/', '/docs/', '/vendor/', '/storage/', '/.git/', '/database/');
+$itC = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($rootDir,
+        FilesystemIterator::SKIP_DOTS | FilesystemIterator::UNIX_PATHS));
+foreach ($itC as $fC) {
+    $pC = $fC->getPathname();
+    if (substr($pC, -4) !== '.php') { continue; }
+    foreach ($skipDirs as $sC) { if (strpos($pC, $sC) !== false) { continue 2; } }
+    if (strpos($pC, 'PolicyWriteService.php') !== false) { continue; }
+    if (strpos((string) @file_get_contents($pC), 'openException') !== false) {
+        $callers[] = str_replace($rootDir . '/', '', $pC);
+    }
+}
+chk(count($callers) >= 1,
+    '★★ **وللآليّةِ يدٌ في الإنتاج** — شاشةٌ تنادي المنفذَ لا اختباراتٌ وحدَها',
+    $callers ? implode(' · ', array_slice($callers, 0, 3)) : 'لا مُنادي');
+
 head('② الحرّاسُ يردّون — والقيودُ الخمسة');
 $subject = $conn->query("SELECT u.id, u.role FROM users u
                           WHERE u.is_deleted=0 AND u.status='active' AND u.company_id=4
