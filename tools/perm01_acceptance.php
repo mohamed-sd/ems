@@ -1,6 +1,6 @@
 <?php
 /**
- * tools/perm01_acceptance.php — معيارُ القبول: المقاييسُ الخمسة والثلاثون (§10 · §12-⑩)
+ * tools/perm01_acceptance.php — معيارُ القبول: المقاييسُ الستة والثلاثون (§10 · §12-⑩)
  * ═══════════════════════════════════════════════════════════════════════════
  * ◆ **يقيس ولا يدّعي**: كلُّ بندٍ إمّا **مقيسٌ برقم**، وإمّا **غيرُ مقيسٍ
  *   ويُسمّى سببُه** — بنصِّ الأمر «وما لم تستطع قياسه — سمِّه ولا تخمّنه».
@@ -179,6 +179,41 @@ $add(35, 'تركيبةٌ نقطةُ إنفاذِها المُعلَنةُ غير
      'من ' . count($gateRows) . ' تركيبةً مُعلَنةَ النقطة'
    . ($gateBad ? ' · ' . implode(' · ', array_slice($gateBad, 0, 3)) : '')
    . ' — والشروطُ: مبنيّةٌ · فيها مسارُ رفضٍ · والدالّةُ المُعلَنةُ نفسُها تُنادى من الإنتاج');
+
+/* ═══ ㊱ — شاشةٌ حيّةٌ تحرّر جدولًا لم يعد يحكم ══════════════════════════
+   ⛔ **ولا-عمليّةٌ صامتةٌ أسوأُ من منعٍ صريح**: بعدَ م-5 لم يعد `role_permissions`
+     يحكم أحدًا (ق-٥: «يبقى مقروءًا أثرًا لا حكمًا»). فشاشةٌ تُبقي التحريرَ فيه
+     تقول لمستعملِها «تمَّ الحفظ» **ولا يتغيّر شيءٌ لأيِّ مستخدم** — فيظنُّ أنّه
+     منح أو سحب وهو لم يفعل.
+   ◆ **والعدُّ على الحيِّ المبلوغِ لا على كلِّ ملفّ**: شاشةُ كونسولِ السوبر
+     (`admin/permissions/`) غيرُ مسجَّلةٍ ولا مبلوغةٍ من تطبيقِ المستأجرِ ولا
+     مستخدمَ سوبرَ حيًّا — فتُسمّى ولا تُعَدّ.
+   ◆ **والإقفالُ يُقاس بوسمٍ صريحٍ** (`_READONLY`) لا بغيابِ الكتابة: الشاشةُ
+     تُبقي معالجاتِها ويسبقها المنع، فبحثٌ عن نصِّ الكتابةِ يُبلِّغ خرقًا قائمًا. */
+$deadWriters = array(); $deadNamed = array();
+$skipD = array('/tests/', '/tools/', '/docs/', '/vendor/', '/storage/', '/.git/', '/database/');
+$itD = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($ROOT,
+        FilesystemIterator::SKIP_DOTS | FilesystemIterator::UNIX_PATHS));
+foreach ($itD as $fD) {
+    $pD = $fD->getPathname();
+    if (substr($pD, -4) !== '.php') { continue; }
+    foreach ($skipD as $sD) { if (strpos($pD, $sD) !== false) { continue 2; } }
+    $srcD = (string) @file_get_contents($pD);
+    if (!preg_match('~(INSERT\s+INTO|UPDATE|DELETE\s+FROM)\s+`?role_permissions`?~i', $srcD)) { continue; }
+    $relD = str_replace($ROOT . '/', '', $pD);
+    /* أمبلوغةٌ من تطبيقِ المستأجر؟ */
+    $eD = $db->real_escape_string($relD);
+    $reach = $one("SELECT COUNT(*) FROM modules WHERE code='{$eD}'") > 0;
+    if (!$reach) { $deadNamed[] = $relD . ' (غيرُ مبلوغة)'; continue; }
+    if (preg_match('/\$[A-Za-z0-9_]*READONLY[A-Za-z0-9_]*\s*=\s*true/', $srcD)) {
+        $deadNamed[] = $relD . ' (مُقفَلة)'; continue;
+    }
+    $deadWriters[] = $relD;
+}
+$add(36, 'شاشةٌ حيّةٌ تحرّر جدولًا لم يعد يحكم', 'صفر', count($deadWriters),
+     count($deadWriters) === 0 ? 'PASS' : 'FAIL',
+     ($deadWriters ? 'مفتوحة: ' . implode(' · ', $deadWriters) . ' — ' : '')
+   . 'ومسمّاةٌ لا مطويّة: ' . implode(' · ', $deadNamed));
 
 $add(2, 'تركيبةٌ حرجةٌ يحملها فاعلٌ واحد', 'صفر', $bothSides, $bothSides === 0 ? 'PASS' : 'FAIL',
      'مغلقٌ بالبنيةِ — users.role عمودٌ واحد');
