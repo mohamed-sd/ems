@@ -1,6 +1,6 @@
 <?php
 /**
- * tools/perm01_acceptance.php — معيارُ القبول: المقاييسُ الاربعة والثلاثون (§10 · §12-⑩)
+ * tools/perm01_acceptance.php — معيارُ القبول: المقاييسُ الخمسة والثلاثون (§10 · §12-⑩)
  * ═══════════════════════════════════════════════════════════════════════════
  * ◆ **يقيس ولا يدّعي**: كلُّ بندٍ إمّا **مقيسٌ برقم**، وإمّا **غيرُ مقيسٍ
  *   ويُسمّى سببُه** — بنصِّ الأمر «وما لم تستطع قياسه — سمِّه ولا تخمّنه».
@@ -95,11 +95,24 @@ foreach ($pairs as $p) {
         else { $sodB++; }
     }
 }
+/* ⛔ **والمقامُ نفسُه قِيس فإذا هو لا يمثّل الوظيفتَين**: «شاشاتُ الطرفِ أ»
+     تُشتقُّ هنا من **فرقِ مجموعتَي أدوارٍ** لا من شاشاتِ الوظيفة — فتنسحب معها
+     كلُّ شاشةٍ يملكها أولئك الأدوارُ ولو لم تمتَّ للوظيفةِ بصلة. مقيسٌ بالاسم:
+     «طرفُ منشئِ المورد» لقالبِ إدارةِ التشغيل خرج **سجلَّ نشاطٍ وموظّفين
+     ومعدّاتٍ واعتمادَ ساعات**، و«طرفُ معتمِدِ الحسابِ البنكيّ» خرج
+     **إقفالًا شهريًّا**. فنزعُ الكتابةِ على هذا المقامِ يسلب وصولًا حقيقيًّا
+     لعطبِ قياسٍ لا لتعارضِ واجبات.
+   ⛔ **ولا خريطةَ وظيفةٍ إلى شاشةٍ في البيانات**: `sec_sod_pairs` يحمل اسمَي
+     الوظيفتَين نصًّا و**نقطةَ الإنفاذِ** (`enforced_by`) — ولا يحمل شاشاتِ كلِّ
+     وظيفة. فالمقامُ الصحيحُ غيرُ قابلٍ للاشتقاق، ويُسمّى ولا يُخمَّن.
+   ◆ **ودليلُ الاستعمالِ يشدُّ هذا**: صفرُ خرقٍ واقعٍ من 39 في 90,744 فعلَ كتابةٍ
+     (`tools/perm01_sod_usage_evidence.php`) — لا فاعلَ كتب على الطرفَين قطُّ. */
 $add(1, 'تعارضُ فصلِ واجباتٍ — تنفيذُ الطرفَين (صنف أ)', 'صفر', $sodA,
      $sodA === 0 ? 'PASS' : 'FAIL',
-     'ومنها في العائلاتِ المادّيّةِ (تُغلق أوّلًا): ' . $sodMat
-   . ' · ومؤشِّرُ الصنفِ ب (تداخلُ رؤيةٍ فقط، لا حاجزَ إغلاق): ' . $sodB
-   . ' · والمجموعُ بالمقامِ القديم: ' . ($sodA + $sodB));
+     'ومنها ماديّة: ' . $sodMat . ' · ومؤشِّرُ الصنفِ ب: ' . $sodB
+   . ' · والمجموعُ بالمقامِ القديم: ' . ($sodA + $sodB)
+   . ' — ⛔ والمقامُ **فرقُ مجموعتَي أدوارٍ لا شاشاتُ الوظيفتَين**، فالرقمُ سقفٌ '
+   . 'أعلى يضمُّ شاشاتٍ لا صلةَ لها بالتعارض. والإنفاذُ الحقيقيُّ في ㉟.');
 
 $bothSides = 0;
 foreach ($pairs as $p) {
@@ -108,6 +121,65 @@ foreach ($pairs as $p) {
     if ($ia === '' || $ib === '') { continue; }
     $bothSides += max(0, $one("SELECT COUNT(*) FROM users u WHERE $LIVE AND u.role IN ($ia) AND u.role IN ($ib)"));
 }
+/* ═══ ㉟ — نقطةُ الإنفاذِ المُعلَنةُ حيّةٌ أم لا ═══════════════════════════
+   ◆ **السجلُّ يقول أين يقع الإنفاذُ فيُسأل عنه**: لكلِّ تركيبةٍ عمودُ
+     `enforced_by` يسمّي بوّابتَها. فالسؤالُ المُجدي ليس «كم شاشةً تتداخل» بل
+     **أالبوّابةُ المُعلَنةُ مبنيّةٌ وتقرأ سجلَّ التركيبات وتُنادى في الإنتاج؟**
+   ⛔ **والشرطُ «تقرأ سجلَّ التركيبات» خطأٌ قِيس فصُحّح**: `ApprovalGate::record`
+     **تُنفِذ المضمونَ فعلًا** — فيها رفضٌ صريحٌ بـ409 «الشخصُ نفسُه لا يجمع
+     APR-1 وAPR-3» — لكنّها **تشفّر** القاعدةَ بدل قراءتِها. فمقياسٌ يشترط
+     القراءةَ يُرسِّب بوّابةً تعمل.
+   ⛔ **والشرطُ الصحيحُ ثلاثةٌ**: البوّابةُ مبنيّة · وفيها **مسارُ رفضٍ** للتعارض ·
+     و**الدالّةُ المُعلَنةُ نفسُها تُنادى من الإنتاج**. والأخيرُ هو الذي يكشف
+     العطبَ الحقيقيَّ: `record` لا ينادِيها إنتاجٌ قطُّ، والمُنادى `assertComplete`
+     يفحص **اكتمالَ** السلسلةِ لا **مَن** وقّعها. فالرفضُ مكتوبٌ ولا يعمل. */
+$gateRows = array(); $gateBad = array();
+$gq = $db->query("SELECT code, enforced_by FROM sec_sod_pairs
+                   WHERE active=1 AND enforced_by <> ''");
+while ($gx = $gq->fetch_assoc()) { $gateRows[] = $gx; }
+$prodCallers = function ($needle) use ($ROOT) {
+    $n = 0;
+    $skip = array('/tests/', '/tools/', '/docs/', '/vendor/', '/storage/', '/.git/', '/database/');
+    $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($ROOT,
+            FilesystemIterator::SKIP_DOTS | FilesystemIterator::UNIX_PATHS));
+    foreach ($it as $f) {
+        $p = $f->getPathname();
+        if (substr($p, -4) !== '.php') { continue; }
+        foreach ($skip as $s2) { if (strpos($p, $s2) !== false) { continue 2; } }
+        if (strpos($p, '/' . $needle . '.php') !== false) { continue; }
+        if (strpos((string) @file_get_contents($p), $needle) !== false) { $n++; }
+    }
+    return $n;
+};
+$gateCache = array();
+foreach ($gateRows as $gr) {
+    $cls = preg_match('/^([A-Za-z]+)/', (string) $gr['enforced_by'], $mm) ? $mm[1] : '';
+    if ($cls === '') { $gateBad[] = $gr['code'] . ':بلا بوّابةٍ مسمّاة'; continue; }
+    $meth = preg_match('/::([A-Za-z_]+)/', (string) $gr['enforced_by'], $m2) ? $m2[1] : '';
+    $key = $cls . '::' . $meth;
+    if (!isset($gateCache[$key])) {
+        $file = null;
+        foreach (array('app/Services/Exec/', 'app/Services/Finance/', 'app/Services/Security/') as $d) {
+            if (is_file($ROOT . '/' . $d . $cls . '.php')) { $file = $d . $cls . '.php'; break; }
+        }
+        $src = $file === null ? '' : (string) @file_get_contents($ROOT . '/' . $file);
+        /* مسارُ رفضٍ: إمّا قراءةُ سجلِّ التركيباتِ أو رفضٌ صريحٌ بـ409. */
+        $refuses = $src !== '' && (strpos($src, 'sec_sod_pairs') !== false
+                                || strpos($src, '409') !== false);
+        $called = ($meth === '') ? $prodCallers($cls) : $prodCallers($cls . '::' . $meth);
+        $gateCache[$key] = array('file' => $file, 'refuses' => $refuses, 'callers' => $called);
+    }
+    $g = $gateCache[$key];
+    if ($g['file'] === null)   { $gateBad[] = $gr['code'] . ':' . $cls . ' غيرُ مبنيّة'; }
+    elseif (!$g['refuses'])    { $gateBad[] = $gr['code'] . ':' . $cls . ' بلا مسارِ رفض'; }
+    elseif ($g['callers'] < 1) { $gateBad[] = $gr['code'] . ':' . $key . ' لا تُنادى من الإنتاج'; }
+}
+$add(35, 'تركيبةٌ نقطةُ إنفاذِها المُعلَنةُ غيرُ نافذة', 'صفر', count($gateBad),
+     count($gateBad) === 0 ? 'PASS' : 'FAIL',
+     'من ' . count($gateRows) . ' تركيبةً مُعلَنةَ النقطة'
+   . ($gateBad ? ' · ' . implode(' · ', array_slice($gateBad, 0, 3)) : '')
+   . ' — والشروطُ: مبنيّةٌ · فيها مسارُ رفضٍ · والدالّةُ المُعلَنةُ نفسُها تُنادى من الإنتاج');
+
 $add(2, 'تركيبةٌ حرجةٌ يحملها فاعلٌ واحد', 'صفر', $bothSides, $bothSides === 0 ? 'PASS' : 'FAIL',
      'مغلقٌ بالبنيةِ — users.role عمودٌ واحد');
 
