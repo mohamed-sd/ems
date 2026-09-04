@@ -1,0 +1,86 @@
+{
+    "head": "3857dda1",
+    "stale": 0,
+    "fresh": 11,
+    "claims": [
+        {
+            "sec": "§0",
+            "what": "عددُ الجداول",
+            "re": "~جداول\\s+[\\d,]+\\s*⇒\\s*\\*\\*([\\d,]+)\\*\\*~u",
+            "q": "SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA='equipation_manage' AND TABLE_TYPE='BASE TABLE'",
+            "doc": 1240
+        },
+        {
+            "sec": "§0",
+            "what": "modules",
+            "re": "~`modules`\\s+[\\d,]+\\s*⇒\\s*\\*\\*([\\d,]+)\\*\\*~u",
+            "q": "SELECT COUNT(*) FROM modules",
+            "doc": 773
+        },
+        {
+            "sec": "§0",
+            "what": "gov_field_class",
+            "re": "~`gov_field_class`\\s+\\*\\*([\\d,]+)\\*\\*~u",
+            "q": "SELECT COUNT(*) FROM gov_field_class",
+            "doc": 2411
+        },
+        {
+            "sec": "§0",
+            "what": "أحداثُ الأعمال",
+            "re": "~الأحداث\\s+[\\d,]+\\s*⇒\\s*\\*\\*([\\d,]+)\\*\\*~u",
+            "q": "SELECT COUNT(*) FROM ems_business_events",
+            "doc": 21643
+        },
+        {
+            "sec": "§0",
+            "what": "مفاتيحُ الأحداث",
+            "re": "~مفاتيحُ الأحداثِ\\s+\\*\\*([\\d,]+)\\*\\*~u",
+            "q": "SELECT COUNT(DISTINCT event_key) FROM ems_business_events",
+            "doc": 58
+        },
+        {
+            "sec": "§0",
+            "what": "القيدُ (رأسٌ\/سطر)",
+            "re": "~القيود\\s+\\*\\*([\\d,]+)\/[\\d,]+\\*\\*~u",
+            "q": "SELECT COUNT(*) FROM fin_journal_entries",
+            "doc": 6713
+        },
+        {
+            "sec": "§0",
+            "what": "nav_placements\/targets",
+            "re": "~`nav_placements`\/`nav_targets`\\s+[\\d,]+\\s*⇒\\s*\\*\\*([\\d,]+)\\*\\*~u",
+            "q": "SELECT COUNT(*) FROM nav_placements",
+            "doc": 422
+        },
+        {
+            "sec": "§6",
+            "what": "بنودُ الدور 8",
+            "re": "~بنودُ ملاحةٍ نشِطةٌ للدور 8 \\| \\*\\*([\\d,]+)\\*\\*~u",
+            "q": "SELECT COUNT(*) FROM nav_items WHERE role_id=8 AND active=1",
+            "doc": 92
+        }
+    ],
+    "framing": [
+        {
+            "sec": "§8",
+            "need": "58 \/ 58 لها مستهلكٌ نشِط",
+            "re": "~\\*\\*58 \/ 58\\*\\*~u",
+            "q": "SELECT COUNT(DISTINCT b.event_key) FROM ems_business_events b\n               JOIN event_consumers ec ON ec.event_name=b.event_key AND ec.active=1",
+            "why": "بدل «23 \/ 58» — الـ23 مفاتيحُ EffectLinkConsumer وحدَه"
+        },
+        {
+            "sec": "§8",
+            "need": "37 dlq بثلاثِ عائلات",
+            "re": "~\\*\\*37 `dlq`\\*\\*~u",
+            "q": "SELECT COUNT(*) FROM ems_event_deliveries WHERE state='dlq'",
+            "why": "بدل «11 كلُّها dlq» — و25 منها قرارٌ مكتوبٌ لا عطب"
+        },
+        {
+            "sec": "§8",
+            "need": "processed بعددِه",
+            "re": "~\\*\\*[\\d,]+ `processed`\\*\\*~u",
+            "q": "SELECT COUNT(*) FROM ems_event_deliveries WHERE state='processed'",
+            "why": "بدل «صفرُ processed» — وصفُ مستهلكٍ قُرئ وصفَ ناقل"
+        }
+    ]
+}

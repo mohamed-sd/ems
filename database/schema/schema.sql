@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-03 15:15:55
--- الجداول: 1236 · المناظير: 28
+-- المصدر: equipation_manage · التوليد: 2026-09-04 10:23:43
+-- الجداول: 1240 · المناظير: 29
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -3673,6 +3673,20 @@ CREATE TABLE `ems_delivery_key_quarantine` (
   `reason` varchar(200) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GAP-77: حجرُ صفوفِ تسليمٍ مفتاحُها نصٌّ بشريٌّ من بذرِ UAT — مؤرشَفةٌ قبلَ الحذفِ بسابقةِ GAP-09';
+
+-- ── Table: ems_dispatcher_attempts ──
+CREATE TABLE `ems_dispatcher_attempts` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `consumer` varchar(64) NOT NULL COMMENT 'مستهلكُ الجيلِ الأول — ems_event_consumers.consumer',
+  `event_id` bigint(20) unsigned NOT NULL COMMENT 'fin_financial_events.id — لا ems_business_events',
+  `attempts` int(10) unsigned NOT NULL DEFAULT 0,
+  `last_error` varchar(500) DEFAULT NULL,
+  `next_retry_at` datetime DEFAULT NULL COMMENT 'التصاعدُ الزمنيُّ 2^attempts دقيقة · سقفُه 64',
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_consumer_event` (`consumer`,`event_id`),
+  KEY `ix_next_retry` (`next_retry_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='EXE-01 §3 — عدّادُ محاولاتٍ عابرٌ للجيلِ الأول · يُحذَف صفُّه عند النجاحِ وعند العزل';
 
 -- ── Table: ems_event_consumers ──
 CREATE TABLE `ems_event_consumers` (
@@ -10646,6 +10660,29 @@ CREATE TABLE `gov_elevations` (
   CONSTRAINT `chk_elev_ceo_not_self` CHECK (`ceo_approver` is null or `ceo_approver` <> `user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GOV-AUTH-01 §7 — الرفعُ الاستثنائيُّ LD-21: أربعةُ أطرافٍ في أربعةِ أعمدةٍ لا واحدٍ نصيّ';
 
+-- ── Table: gov_event_observations ──
+CREATE TABLE `gov_event_observations` (
+  `observation_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `event_key` varchar(120) NOT NULL COMMENT 'مفتاحُ الحدثِ — يطابق gov_event_rulings',
+  `ruling_version` int(10) unsigned NOT NULL DEFAULT 1 COMMENT 'إصدارُ الحكمِ الذي تقيسه هذه الملاحظة',
+  `snapshot_id` varchar(64) NOT NULL COMMENT 'لا ملاحظةَ بلا لقطة — القيدُ بنيويّ',
+  `measured_at` datetime NOT NULL,
+  `produced_count` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'المُنتِجُ المكتشَف',
+  `consumers_total` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `consumers_active` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `effect_consumers` smallint(5) unsigned NOT NULL DEFAULT 0 COMMENT 'مستهلكُ الأثرِ لا المراقب',
+  `watch_consumers` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `handler_on_disk` tinyint(1) NOT NULL DEFAULT 0,
+  `observed_class` enum('BUSINESS','AUDIT','OPERATIONAL_TELEMETRY','CONTROL','UNKNOWN') NOT NULL DEFAULT 'UNKNOWN' COMMENT 'التصنيفُ المرصودُ — لا يُكتب في الحكم',
+  `ruling_at_measure` varchar(20) NOT NULL DEFAULT '' COMMENT 'الحكمُ كما كان لحظةَ القياس',
+  `drift` enum('ALIGNED','DRIFTED','UNDETERMINED') NOT NULL DEFAULT 'UNDETERMINED' COMMENT 'أَيوافق المرصودُ الحكم؟ — يُرفَع ولا يُصحَّح آليًّا',
+  `evidence_ref` varchar(300) NOT NULL DEFAULT '' COMMENT 'مرجعٌ قابلٌ للفحص',
+  PRIMARY KEY (`observation_id`),
+  UNIQUE KEY `uq_key_version_snapshot` (`event_key`,`ruling_version`,`snapshot_id`),
+  KEY `ix_drift` (`drift`),
+  KEY `ix_snapshot` (`snapshot_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='EXE-01 §4 — قياسُ الأحداثِ منفصلًا عن حكمِها · إلحاقيٌّ لا يُعدَّل';
+
 -- ── Table: gov_event_rulings ──
 CREATE TABLE `gov_event_rulings` (
   `event_key` varchar(120) NOT NULL,
@@ -13507,6 +13544,56 @@ CREATE TABLE `injfrd66_xc12_backup` (
   `at` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`route`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: injint01_idempotency_audit ──
+CREATE TABLE `injint01_idempotency_audit` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `consumer_key` varchar(64) NOT NULL,
+  `consumer_class` varchar(190) NOT NULL DEFAULT '',
+  `event_keys` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'كم مفتاحًا يشترك فيه',
+  `side_effecting` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'أذو أثرٍ أم مراقبٌ فقط',
+  `producer_generates_key` tinyint(1) NOT NULL DEFAULT 0,
+  `retry_reuses_key` tinyint(1) NOT NULL DEFAULT 0,
+  `consumer_checks_before_effect` tinyint(1) NOT NULL DEFAULT 0,
+  `effect_store_unique` tinyint(1) NOT NULL DEFAULT 0,
+  `unique_constraint_name` varchar(128) NOT NULL DEFAULT '',
+  `duplicate_delivery_outcome` varchar(120) NOT NULL DEFAULT '',
+  `compensation_behavior` varchar(120) NOT NULL DEFAULT '',
+  `verdict` enum('COVERED','PARTIAL','UNCOVERED','NOT_APPLICABLE') NOT NULL,
+  `evidence` varchar(500) NOT NULL DEFAULT '',
+  `snapshot_id` varchar(64) NOT NULL DEFAULT '',
+  `measured_at` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_consumer_snapshot` (`consumer_key`,`snapshot_id`),
+  KEY `ix_verdict` (`verdict`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='INJ-INT-01 §24 — ستةُ أسئلةِ اللاتكرارِ لكلِّ مستهلكٍ نشِط';
+
+-- ── Table: injint01_retry_disposition ──
+CREATE TABLE `injint01_retry_disposition` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `delivery_id` bigint(20) unsigned NOT NULL COMMENT 'ems_event_deliveries.id',
+  `event_id` bigint(20) unsigned DEFAULT NULL COMMENT 'ems_business_events.id',
+  `event_key` varchar(80) NOT NULL DEFAULT '',
+  `consumer_key` varchar(64) NOT NULL DEFAULT '',
+  `delivery_state` varchar(16) NOT NULL DEFAULT '',
+  `fail_code` varchar(32) NOT NULL DEFAULT '',
+  `entity_type` varchar(40) NOT NULL DEFAULT '',
+  `entity_id` bigint(20) unsigned DEFAULT NULL,
+  `resolved_table` varchar(64) NOT NULL DEFAULT '' COMMENT 'الجدولُ الذي حُلَّ إليه نوعُ الكيان',
+  `source_resolvable` tinyint(1) NOT NULL DEFAULT 0,
+  `existing_links` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'fin_event_links',
+  `existing_effects` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'fin_event_effects',
+  `amount` decimal(16,2) DEFAULT NULL,
+  `disposition` enum('SAFE_RETRY','EFFECT_ALREADY_REALIZED','ENTITY_STATE_CHANGED','PERIOD_CLOSED','SOURCE_UNRESOLVABLE','MANUAL_RECONCILIATION','NON_RETRYABLE') NOT NULL,
+  `evidence` varchar(500) NOT NULL DEFAULT '' COMMENT 'لماذا هذا الحكمُ — بالقياسِ لا بالرأي',
+  `owner_ruling` varchar(400) NOT NULL DEFAULT '' COMMENT 'يُملأ بقرارِ المالكِ وحدَه',
+  `snapshot_id` varchar(64) NOT NULL DEFAULT '',
+  `measured_at` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_delivery_snapshot` (`delivery_id`,`snapshot_id`),
+  KEY `ix_disposition` (`disposition`),
+  KEY `ix_event_key` (`event_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='INJ-INT-01 §21 — حكمُ التصرُّفِ في كلِّ تسليمٍ عالقٍ فردًا فردًا';
 
 -- ── Table: intercompany_dues ──
 CREATE TABLE `intercompany_dues` (
@@ -31727,6 +31814,10 @@ CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_container_elapsed_target
 -- ── View: v_effective_authority ──
 SET collation_connection = 'utf8mb4_unicode_ci';
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_effective_authority` AS select `g`.`user_id` AS `user_id`,`u`.`username` AS `username`,`g`.`profile_id` AS `profile_id`,`p`.`profile_code` AS `profile_code`,`p`.`grade` AS `grade`,`p`.`dept_code` AS `dept_code`,`g`.`source` AS `source`,1 AS `priority`,`g`.`valid_from` AS `valid_from`,`g`.`valid_to` AS `valid_to` from ((`gov_authority_grants` `g` join `users` `u` on(`u`.`id` = `g`.`user_id`)) join `gov_role_profiles` `p` on(`p`.`profile_id` = `g`.`profile_id`)) where `g`.`revoked_at` is null and (`g`.`valid_to` is null or `g`.`valid_to` > current_timestamp()) and `g`.`source` = 'profile' union all select `boss_u`.`id` AS `id`,`boss_u`.`username` AS `username`,`g`.`profile_id` AS `profile_id`,`p`.`profile_code` AS `profile_code`,`p`.`grade` AS `grade`,`p`.`dept_code` AS `dept_code`,'escalation' AS `escalation`,2 AS `2`,`g`.`valid_from` AS `valid_from`,`g`.`valid_to` AS `valid_to` from (((((`gov_authority_grants` `g` join `users` `sub_u` on(`sub_u`.`id` = `g`.`user_id`)) join `roles` `sub_r` on(`sub_r`.`id` = `sub_u`.`role`)) join `roles` `boss_r` on(`boss_r`.`id` = `sub_r`.`parent_role_id`)) join `users` `boss_u` on(`boss_u`.`role` = `boss_r`.`id` and `boss_u`.`status` = 1)) join `gov_role_profiles` `p` on(`p`.`profile_id` = `g`.`profile_id`)) where `g`.`revoked_at` is null and (`g`.`valid_to` is null or `g`.`valid_to` > current_timestamp()) and `g`.`source` = 'profile' union all select `g`.`user_id` AS `user_id`,`u`.`username` AS `username`,`g`.`profile_id` AS `profile_id`,`p`.`profile_code` AS `profile_code`,`p`.`grade` AS `grade`,`p`.`dept_code` AS `dept_code`,`g`.`source` AS `source`,3 AS `3`,`g`.`valid_from` AS `valid_from`,`g`.`valid_to` AS `valid_to` from ((`gov_authority_grants` `g` join `users` `u` on(`u`.`id` = `g`.`user_id`)) join `gov_role_profiles` `p` on(`p`.`profile_id` = `g`.`profile_id`)) where `g`.`revoked_at` is null and `g`.`valid_to` > current_timestamp() and `g`.`source` in ('delegation','elevation');
+
+-- ── View: v_event_ruling_current ──
+SET collation_connection = 'utf8mb4_unicode_ci';
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_event_ruling_current` AS select `r`.`event_key` AS `event_key`,`r`.`ruling` AS `governing_ruling`,`r`.`reason` AS `ruling_reason`,`r`.`decided_by` AS `decided_by`,`r`.`decided_at` AS `decided_at`,`o`.`snapshot_id` AS `snapshot_id`,`o`.`measured_at` AS `measured_at`,`o`.`produced_count` AS `produced_count`,`o`.`consumers_active` AS `consumers_active`,`o`.`effect_consumers` AS `effect_consumers`,`o`.`watch_consumers` AS `watch_consumers`,`o`.`observed_class` AS `observed_class`,`o`.`drift` AS `drift` from (`gov_event_rulings` `r` left join `gov_event_observations` `o` on(`o`.`event_key` = `r`.`event_key` and `o`.`observation_id` = (select max(`o2`.`observation_id`) from `gov_event_observations` `o2` where `o2`.`event_key` = `r`.`event_key`)));
 
 -- ── View: v_group_load ──
 CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_group_load` AS select `g`.`owner_role_id` AS `role_id`,`g`.`id` AS `group_id`,`g`.`group_code` AS `group_code`,`g`.`name` AS `group_name`,`g`.`stage_no` AS `stage_no`,`g`.`stage_title` AS `stage_title`,count(`n`.`id`) AS `screens`,case when count(`n`.`id`) >= 8 then 'overloaded' when count(`n`.`id`) = 0 then 'empty' else 'ok' end AS `load_state` from (`link_groups` `g` left join `nav_items` `n` on(`n`.`group_id` = `g`.`id` and `n`.`active` = 1)) where `g`.`is_active` = 1 group by `g`.`id`;

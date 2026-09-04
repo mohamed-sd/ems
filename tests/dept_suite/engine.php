@@ -392,6 +392,25 @@ function ds_run_screen(array $spec, array &$ctx)
     $fatal = (stripos($body, 'Fatal error') !== false || stripos($body, 'Parse error') !== false);
     $csrf  = ds_csrf($body);
 
+    /* ══ العائلاتُ الثلاثُ — والمحرِّكُ كان أعمى عنها ═══════════════════════════
+       ◆ **كان يرصد `Fatal` و`Parse` وحدَهما**: فصفحةٌ تطبع عشرينَ
+         `Warning: Undefined array key` تمرُّ **«ناجحةً · HTTP 200»** —
+         والتحذيرُ عطبٌ منطقيٌّ مطبوعٌ لا زينة.
+       ⛔ **ولا يُقاس بلفظِ «تحذير» العربيّ**: واجهاتُ النظامِ مليئةٌ به.
+         فالمقياسُ **بصمةُ PHP الحرفيّة** — الكلمةُ الإنجليزيّةُ متبوعةً بنقطتَين.
+       ◆ **ويُقاس على الجسدِ منزوعَ الوسوم**: نصٌّ داخلَ `<script>` أو سمةٍ قد
+         يحوي اللفظَ بلا أن يكون مخرَجَ مفسِّر. */
+    $plain = strip_tags((string) $body);
+    $famHits = array();
+    foreach (array('Warning' => '~\bWarning\s*:\s*(.{0,120})~s',
+                   'Notice'  => '~\bNotice\s*:\s*(.{0,120})~s',
+                   'Deprecated' => '~\bDeprecated\s*:\s*(.{0,120})~s') as $fam => $re) {
+        if (preg_match_all($re, $plain, $fm2)) {
+            $famHits[$fam] = array('n' => count($fm2[0]),
+                'sample' => trim(preg_replace('/\s+/', ' ', $fm2[0][0])));
+        }
+    }
+
     if ($cerr !== '') {
         $out[] = ds_res('VIEW', 'FAIL', "تعذّر الاتصال: {$cerr}");
         return $out;
@@ -411,6 +430,15 @@ function ds_run_screen(array $spec, array &$ctx)
         }
         if (!empty($miss)) {
             $out[] = ds_res('VIEW', 'FAIL', 'صُيِّرت 200 لكن غابت علاماتُها: ' . implode(' · ', $miss));
+        } elseif (!empty($famHits)) {
+            /* ⛔ **و200 مع تحذيرٍ مطبوعٍ ليست نجاحًا**: الصفحةُ صُيِّرت والمفسِّرُ
+               اشتكى في جسدِها — فتُوسَم `WARN` لا `PASS`، ولا تُعدُّ فشلًا
+               فتُوقِف الفرزَ، ولا تُعدُّ نجاحًا فتُخفي عطبًا منطقيًّا. */
+            $parts = array();
+            foreach ($famHits as $fam => $hh) { $parts[] = $fam . '×' . $hh['n']; }
+            $first = reset($famHits);
+            $out[] = ds_res('VIEW', 'WARN', 'HTTP 200 · ' . number_format(strlen($body) / 1024, 0) . ' ك.ب · '
+                . implode(' · ', $parts) . ' — ' . mb_substr($first['sample'], 0, 100));
         } else {
             $out[] = ds_res('VIEW', 'PASS', 'HTTP 200 · ' . number_format(strlen($body) / 1024, 0) . ' ك.ب');
         }
@@ -632,13 +660,17 @@ function ds_diff(array $now, $base, array $onlyOps = array())
 /** إحصاءٌ سريعٌ لنتيجة. */
 function ds_tally(array $result)
 {
-    $t = array('PASS' => 0, 'FAIL' => 0, 'NA' => 0, 'DENY' => 0, 'SKIP' => 0);
+    /* ⛔ **والمفردةُ تُهيَّأ صراحةً**: `WARN` غيرُ المُهيَّأةِ تُولَّد ضمنًا في
+       `$byop` بتحذيرِ PHP، وتسقط من العرضِ صامتة — فيصير الحاجبُ يعُدُّ ما
+       لا يُعرَض. (‏وهذا عينُ العطبِ الذي يقيسه: مفردةٌ لا يراها قارئُها.) */
+    $t = array('PASS' => 0, 'WARN' => 0, 'FAIL' => 0, 'NA' => 0, 'DENY' => 0, 'SKIP' => 0);
     $byop = array();
     foreach ($result['screens'] as $s) {
         foreach ($s['ops'] as $o) {
             if (!isset($t[$o['status']])) { $t[$o['status']] = 0; }
             $t[$o['status']]++;
-            if (!isset($byop[$o['op']])) { $byop[$o['op']] = array('PASS' => 0, 'FAIL' => 0, 'NA' => 0, 'DENY' => 0, 'SKIP' => 0); }
+            if (!isset($byop[$o['op']])) { $byop[$o['op']] = array('PASS' => 0, 'WARN' => 0, 'FAIL' => 0, 'NA' => 0, 'DENY' => 0, 'SKIP' => 0); }
+            if (!isset($byop[$o['op']][$o['status']])) { $byop[$o['op']][$o['status']] = 0; }
             $byop[$o['op']][$o['status']]++;
         }
     }

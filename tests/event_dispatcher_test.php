@@ -125,10 +125,20 @@ function publish_source(mysqli $c, $n, $poison = false)
     ));
 }
 
+/* ══ EXE-01 §3 — جدولُ العدّادِ يُسأل عنه الكاتبُ ولا يُثبَّت اسمُه ══════════
+   ⛔ **وإلا قاس الفاحصُ جدولًا لا يكتب فيه أحد**: بعد فصلِ التخزين صار
+      `EventDispatcher` يكتب في `ems_dispatcher_attempts` بمفتاحِ ميزة —
+      فالفاحصُ الذي يقرأ `ems_event_deliveries` حرفًا يجد فراغًا ويحكم بالفشلِ
+      على تغييرٍ سليم. ⇐ يُسأل الكاتبُ عن جدولِه الفعّالِ ويُقاس فيه. */
+require_once __DIR__ . '/../App/Core/EventDispatcher.php';
+$ATT = (new \App\Core\EventDispatcher($conn))->attemptsTable();
+echo "  ○ جدولُ عدّادِ المحاولاتِ الفعّال: {$ATT}
+";
+
 // تنظيف بقايا أي تشغيلٍ سابق
 $conn->query("DELETE FROM fin_financial_events WHERE notes IN ('K4TEST_SRC','K4TEST_DERIVED')");
 $conn->query("DELETE FROM ems_event_consumers WHERE consumer LIKE 'k4t_%'");
-$conn->query("DELETE FROM ems_event_deliveries WHERE consumer LIKE 'k4t_%'");
+$conn->query("DELETE FROM `{$ATT}` WHERE consumer LIKE 'k4t_%'");
 $conn->query("DELETE FROM ems_event_dead_letter WHERE consumer LIKE 'k4t_%'");
 
 /* ══ **تهيئةُ المؤشِّرِ عند الرأس — وإلا قاس الفاحصُ استهلاكَ تراكمٍ لا حكمَه.**
@@ -178,12 +188,12 @@ $eN = publish_source($conn, 3);                      // سليم بعده مبا
 $startPs = cursor_of($conn, $PS);
 // ── ② أ: التصاعدُ الزمنيُّ حقيقيٌّ — دورةٌ بالتصاعدِ تُؤجِّل ولا تُكرِّر فورًا ──
 spawn($PS, 0, 3, 1);
-$d1 = $conn->query("SELECT attempts, next_retry_at FROM ems_event_deliveries
+$d1 = $conn->query("SELECT attempts, next_retry_at FROM `{$ATT}`
                      WHERE consumer='{$PS}' AND event_id={$eP['id']}")->fetch_assoc();
 $deferred = $d1 !== null && intval($d1['attempts']) === 1 && !empty($d1['next_retry_at'])
          && strtotime((string) $d1['next_retry_at']) > time();
 spawn($PS, 0, 3, 1);   // دورةٌ ثانيةٌ بالتصاعد: يجب أن تنكسر على «غيرُ مستحقةٍ بعد»
-$d2 = $conn->query("SELECT attempts FROM ems_event_deliveries
+$d2 = $conn->query("SELECT attempts FROM `{$ATT}`
                      WHERE consumer='{$PS}' AND event_id={$eP['id']}")->fetch_assoc();
 ok('التصاعدُ الزمنيُّ يُؤجِّل: محاولةٌ واحدةٌ وموعدٌ في المستقبل، ودورةٌ ثانيةٌ لا تزيدها'
    . ' (' . ($d1 ? $d1['attempts'] . ' ⇒ ' . ($d2 ? $d2['attempts'] : '—') : '—') . ')',
@@ -221,7 +231,7 @@ ok('آثار fx بترتيب معرّفات المصدر تصاعديًا', $fla
 @$conn->rollback();
 $conn->query("DELETE FROM fin_financial_events WHERE notes IN ('K4TEST_SRC','K4TEST_DERIVED')");
 $conn->query("DELETE FROM ems_event_consumers WHERE consumer LIKE 'k4t_%'");
-$conn->query("DELETE FROM ems_event_deliveries WHERE consumer LIKE 'k4t_%'");
+$conn->query("DELETE FROM `{$ATT}` WHERE consumer LIKE 'k4t_%'");
 $conn->query("DELETE FROM ems_event_dead_letter WHERE consumer LIKE 'k4t_%'");
 // ⚠️ متتالية EV **لا تُحذف**: إعادتها للصفر تصطدم بأرقامٍ إنتاجيةٍ قائمة
 // (uq_fin_event_no) منذ صارت بوابة D05 تلد أحداثًا حقيقية. فجوات الترقيم مقبولة.

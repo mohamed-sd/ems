@@ -95,21 +95,32 @@ $result['residue_after'] = $resid;
 // ══════════════════════════════════════════════════════════════════════════
 // التقرير
 // ══════════════════════════════════════════════════════════════════════════
-$ICON = array('PASS' => '✅', 'FAIL' => '🔴', 'NA' => '⚪', 'DENY' => '🔒', 'SKIP' => '⏭');
+$ICON = array('PASS' => '✅', 'WARN' => '🟡', 'FAIL' => '🔴', 'NA' => '⚪', 'DENY' => '🔒', 'SKIP' => '⏭');
 $OPAR = array('VIEW' => 'عرض', 'ADD' => 'إضافة', 'EDIT' => 'تعديل', 'DELETE' => 'حذف', 'GUARD' => 'حارس');
 
 list($tally, $byop) = ds_tally($result);
 
 ds_h('① النتيجةُ بالعملية');
-printf("  %-10s %8s %8s %8s %8s %8s\n", 'العملية', 'ناجح', 'فاشل', 'غيرُ موجود', 'محجوب', 'متعذّر');
+printf("  %-10s %7s %7s %7s %10s %7s %7s\n", 'العملية', 'ناجح', 'بتحذير', 'فاشل', 'غيرُ موجود', 'محجوب', 'متعذّر');
 ds_line();
 foreach (array('VIEW', 'ADD', 'EDIT', 'DELETE', 'GUARD') as $op) {
     if (!isset($byop[$op])) { continue; }
     $b = $byop[$op];
-    printf("  %-10s %8d %8d %11d %8d %8d\n", $OPAR[$op], $b['PASS'], $b['FAIL'], $b['NA'], $b['DENY'], $b['SKIP']);
+    printf("  %-10s %7d %7d %7d %10d %7d %7d\n", $OPAR[$op], $b['PASS'], $b['WARN'], $b['FAIL'], $b['NA'], $b['DENY'], $b['SKIP']);
 }
 ds_line();
-printf("  %-10s %8d %8d %11d %8d %8d\n", 'الإجمالي', $tally['PASS'], $tally['FAIL'], $tally['NA'], $tally['DENY'], $tally['SKIP']);
+printf("  %-10s %7d %7d %7d %10d %7d %7d\n", 'الإجمالي', $tally['PASS'], $tally['WARN'], $tally['FAIL'], $tally['NA'], $tally['DENY'], $tally['SKIP']);
+
+/* ── والتحذيرُ يُسمَّى بموضعِه — وإلا صار رقمًا لا يُعالَج ─────────────────── */
+$warns = array();
+foreach ($result['screens'] as $__rt => $__s) {
+    foreach ($__s['ops'] as $__o) { if ($__o['status'] === 'WARN') { $warns[] = array($__rt, $__o['op'], $__o['note']); } }
+}
+if (!empty($warns)) {
+    ds_h('①-ب أسطحٌ صُيِّرت 200 وطبعت تحذيرًا (' . count($warns) . ')');
+    foreach ($warns as $__w) { printf("  ⚠ %-42s %-7s %s
+", $__w[0], $__w[1], mb_substr($__w[2], 0, 90)); }
+}
 
 // ── الفاشلُ بالاسم ────────────────────────────────────────────────────────
 $fails = array();

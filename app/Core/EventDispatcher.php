@@ -45,6 +45,20 @@ class EventDispatcher
     /** @var bool N-06: تفعيل التصاعد الزمني بين المحاولات (يُطفأ اختباريًا) */
     private $backoff = true;
 
+    /* ══ EXE-01 §3 — فصلُ التخزين: جدولُ عدّادِ المحاولاتِ لهذا الجيل ══════════
+       ◆ **جدولٌ واحدٌ كان لغرضَين متنافيَين**: هذا الجيلُ يقرأ
+         `fin_financial_events` والصفُّ عنده **عدّادٌ عابرٌ يُحذَف عند النجاحِ
+         وعند العزل**؛ و`EventDeliveryWorker` يقرأ `ems_event_outbox` والصفُّ
+         عنده **دفترُ حالاتٍ دائم**. فالحذفُ الذي يبدو عطبًا **هو تصميمُ هذا
+         الجيلِ الصحيح** — والعطبُ أنَّ الاثنَين في مخزنٍ واحد.
+       ◆ **فيُفصَل المخزنُ ولا يُعدَّل السلوك**: صفرُ تغييرٍ في المنطقِ، وتغييرُ
+         اسمِ الجدولِ فقط. ⇐ `DLQ_STATE_SOURCE_COUNT = 1` بلا مساسٍ بمستهلكي
+         الماليّةِ والصرفِ والتوجيه — ومؤشراتُهم عند الأقصى أي عاملةٌ لاحقة.
+       ⛔ **ومفتاحُ الميزةِ يردُّ فورًا**: `EMS_DISPATCHER_SPLIT_STORE=0` يعيد
+         الكاتبَ إلى الجدولِ القديمِ بلا نشرٍ ولا هجرةٍ عكسيّة. */
+    /** @var string اسمُ جدولِ عدّادِ المحاولاتِ الفعّال */
+    private $attemptsTable = 'ems_dispatcher_attempts';
+
     public function __construct(\mysqli $conn, array $opts = array())
     {
         // N-06 ركن ②: الحد المعياري خمس محاولات (PLAN-05 §3-①) — قابل للتضييق اختباريًا.
@@ -53,7 +67,29 @@ class EventDispatcher
         $this->batch = isset($opts['batch']) ? max(1, intval($opts['batch'])) : 100;
         $this->crashAfterEvent = isset($opts['crash_after_event']) ? intval($opts['crash_after_event']) : null;
         $this->backoff = !isset($opts['backoff']) || (bool) $opts['backoff'];
+
+        /* المفتاحُ من الخيارِ ثمَّ البيئة — وسلامةُ الفشلِ إلى **الجديد** بعد
+           إثباتِ وجودِه: فجدولٌ غائبٌ يُسقِط الناقلَ، والقديمُ يعمل دائمًا. */
+        /* ⛔ **و`ems_env()` تقرأ `.env` وحدَها ولا ترى بيئةَ الصَّدفة**: فمَن أطفأ
+           المفتاحَ بـ`EMS_DISPATCHER_SPLIT_STORE=0` في سطرِ الأمرِ لم يُطفئ
+           شيئًا — وظنَّ أنَّه رجع وهو لم يرجع. ⇐ يُقرأ المصدرانِ معًا،
+           و**بيئةُ العمليّةِ تغلب** لأنَّها الأخصُّ بهذه التشغيلة. */
+        $split = isset($opts['split_store']) ? (bool) $opts['split_store'] : null;
+        if ($split === null) {
+            $f = getenv('EMS_DISPATCHER_SPLIT_STORE');
+            if ($f === false || $f === '') { $f = function_exists('ems_env') ? ems_env('EMS_DISPATCHER_SPLIT_STORE') : null; }
+            $split = ($f === null || $f === false || $f === '') ? true
+                   : in_array(strtolower((string) $f), array('1', 'on', 'true', 'yes'), true);
+        }
+        if ($split) {
+            $r = @$conn->query("SHOW TABLES LIKE 'ems_dispatcher_attempts'");
+            $split = ($r && $r->num_rows > 0);
+        }
+        $this->attemptsTable = $split ? 'ems_dispatcher_attempts' : 'ems_event_deliveries';
     }
+
+    /** اسمُ الجدولِ الفعّال — للأدواتِ والاختبارات. */
+    public function attemptsTable() { return $this->attemptsTable; }
 
     /**
      * تسجيل مستهلكٍ ومعالجه. $startAfterId: بدء الاستهلاك بعد هذا المعرّف
@@ -112,8 +148,8 @@ class EventDispatcher
             // هذا المستهلك (لا قفز فوقها حفاظًا على الترتيب) وتُستأنف في موعدها.
             if ($this->backoff) {
                 $due = $this->q1(
-                    'SELECT 1 AS blocked FROM `ems_event_deliveries`
-                      WHERE consumer = ? AND event_id = ? AND next_retry_at IS NOT NULL AND next_retry_at > NOW()',
+                    "SELECT 1 AS blocked FROM `{$this->attemptsTable}`
+                      WHERE consumer = ? AND event_id = ? AND next_retry_at IS NOT NULL AND next_retry_at > NOW()",
                     'si', array($consumer, $eventId)
                 );
                 if ($due) {
@@ -123,11 +159,11 @@ class EventDispatcher
 
             // عدّاد المحاولات (قبل المعالجة): يتقدّم ذرّيًا مع كل التقاط.
             $this->exec(
-                'INSERT INTO `ems_event_deliveries` (`consumer`, `event_id`, `attempts`) VALUES (?, ?, 1)
-                 ON DUPLICATE KEY UPDATE `attempts` = `attempts` + 1',
+                "INSERT INTO `{$this->attemptsTable}` (`consumer`, `event_id`, `attempts`) VALUES (?, ?, 1)
+                 ON DUPLICATE KEY UPDATE `attempts` = `attempts` + 1",
                 'si', array($consumer, $eventId)
             );
-            $d = $this->q1('SELECT attempts, last_error FROM `ems_event_deliveries` WHERE consumer = ? AND event_id = ?', 'si', array($consumer, $eventId));
+            $d = $this->q1("SELECT attempts, last_error FROM `{$this->attemptsTable}` WHERE consumer = ? AND event_id = ?", 'si', array($consumer, $eventId));
             $attempts = intval($d['attempts']);
 
             if ($attempts > $this->maxAttempts) {
@@ -136,7 +172,7 @@ class EventDispatcher
                     'INSERT IGNORE INTO `ems_event_dead_letter` (`consumer`, `event_id`, `attempts`, `last_error`, `failed_at`) VALUES (?, ?, ?, ?, ?)',
                     'siiss', array($consumer, $eventId, $attempts - 1, (string) $d['last_error'], date('Y-m-d H:i:s'))
                 );
-                $this->exec('DELETE FROM `ems_event_deliveries` WHERE consumer = ? AND event_id = ?', 'si', array($consumer, $eventId));
+                $this->exec("DELETE FROM `{$this->attemptsTable}` WHERE consumer = ? AND event_id = ?", 'si', array($consumer, $eventId));
                 // N-06 ركن ②: العزل بإنذارٍ لا بصمت — إشعارٌ لمدير المالية برابط شاشة المراقبة.
                 $this->alertDeadLetter($consumer, $eventId, intval($event['company_id']), (string) $d['last_error']);
                 $this->advanceCursor($consumer, $eventId);
@@ -152,9 +188,9 @@ class EventDispatcher
                 // (سقفه 64) — إعادة المحاولة عند استحقاقه حتى الاستنفاد.
                 $delayMin = min(64, pow(2, min(6, $attempts)));
                 $this->exec(
-                    'UPDATE `ems_event_deliveries`
-                        SET `last_error` = ?, `next_retry_at` = ' . ($this->backoff ? 'DATE_ADD(NOW(), INTERVAL ' . intval($delayMin) . ' MINUTE)' : 'NULL') . '
-                      WHERE consumer = ? AND event_id = ?',
+                    "UPDATE `{$this->attemptsTable}`
+                        SET `last_error` = ?, `next_retry_at` = " . ($this->backoff ? 'DATE_ADD(NOW(), INTERVAL ' . intval($delayMin) . ' MINUTE)' : 'NULL') . "
+                      WHERE consumer = ? AND event_id = ?",
                     'ssi', array(substr($t->getMessage(), 0, 500), $consumer, $eventId)
                 );
                 $st['failed']++;
@@ -162,7 +198,7 @@ class EventDispatcher
             }
 
             // نجاح: إغلاق المحاولة ثم [نقطة حقن الانهيار] ثم تقدّم الـCursor.
-            $this->exec('DELETE FROM `ems_event_deliveries` WHERE consumer = ? AND event_id = ?', 'si', array($consumer, $eventId));
+            $this->exec("DELETE FROM `{$this->attemptsTable}` WHERE consumer = ? AND event_id = ?", 'si', array($consumer, $eventId));
 
             if ($this->crashAfterEvent !== null && $eventId === $this->crashAfterEvent) {
                 // اختباري حصرًا: انهيارٌ في أسوأ نقطة — بعد الأثر وقبل الـCursor.

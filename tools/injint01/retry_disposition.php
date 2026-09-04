@@ -66,7 +66,12 @@ $resolveTable = function ($entity) use ($tables) {
     return '';
 };
 
-/* ═══ ③ التسليماتُ العالقةُ — كلُّ حالةٍ غيرِ processed ═══════════════════ */
+/* ═══ ③ التسليماتُ العالقةُ — الفاشلةُ والمعزولةُ وحدَها ═══════════════════
+   ⛔ **و«غيرُ مُعالَجٍ» ليس «عالقًا»**: `published` و`claimed` و`processing`
+      حالاتُ طيرانٍ لم تُحاوَل بعدُ أو تُحاوَل الآن — لا فشلَ فيها. وأوّلُ نسخةٍ
+      من هذا المِسبارِ أخذت كلَّ ما ليس `processed` فصنّفت ثلاثةَ صفوفٍ
+      **لم تُسلَّم بعد** على أنّها `SOURCE_UNRESOLVABLE`. و§21 حكمٌ في التسليمِ
+      **الذي فشل**، لا في الذي لم يبدأ. ⇐ فالمدى `dlq` و`failed` حصرًا. */
 $stuck = $rows("SELECT d.id, d.event_id, d.state, d.attempt_no, d.attempts,
                        COALESCE(d.consumer_key, d.consumer, '') ck,
                        COALESCE(d.fail_code, '') fc,
@@ -75,7 +80,7 @@ $stuck = $rows("SELECT d.id, d.event_id, d.state, d.attempt_no, d.attempts,
                        b.entity_id, b.amount, b.occurred_at
                   FROM ems_event_deliveries d
                   LEFT JOIN ems_business_events b ON b.id = d.event_id
-                 WHERE d.state <> 'processed'
+                 WHERE d.state IN ('dlq','failed')
                  ORDER BY d.id");
 
 printf("◆ تسليماتٌ عالقة: %d\n\n", count($stuck));

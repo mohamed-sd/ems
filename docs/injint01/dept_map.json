@@ -1,0 +1,262 @@
+{
+    "DEP-01": {
+        "workspace": "DEP-01",
+        "roles": [
+            12
+        ],
+        "role_names": [
+            "ادارة المبيعات"
+        ],
+        "placements": 29,
+        "user": "مبيعات",
+        "user_id": 13
+    },
+    "DEP-02": {
+        "workspace": "DEP-02",
+        "roles": [
+            2,
+            8
+        ],
+        "role_names": [
+            "ادارة الموردين",
+            "مشرف موردين"
+        ],
+        "placements": 38,
+        "user": "مصعب",
+        "user_id": 5
+    },
+    "DEP-03": {
+        "workspace": "DEP-03",
+        "roles": [
+            26
+        ],
+        "role_names": [
+            "إدارة التمويل"
+        ],
+        "placements": 39,
+        "user": "تمويل",
+        "user_id": 859
+    },
+    "DEP-04": {
+        "workspace": "DEP-04",
+        "roles": [
+            3,
+            10,
+            11
+        ],
+        "role_names": [
+            "ادارة الاسطول",
+            "مشرف اسطول",
+            "مشغل اسطول"
+        ],
+        "placements": 51,
+        "user": "يسن",
+        "user_id": 6
+    },
+    "DEP-05": {
+        "workspace": "DEP-05",
+        "roles": [
+            17,
+            18,
+            19,
+            20,
+            22,
+            31,
+            32,
+            34,
+            35
+        ],
+        "role_names": [
+            "إدارة المالية",
+            "محاسب الإدارة المالية",
+            "مدير الإدارة المالية",
+            "المراجع والمدقق المالي",
+            "قارئ مالي",
+            "رئيس الحسابات",
+            "المدير المالي",
+            "منفذ المدفوعات البنكية",
+            "معد المطابقة البنكية"
+        ],
+        "placements": 39,
+        "user": "مديرمالي",
+        "user_id": 72
+    },
+    "DEP-06": {
+        "workspace": "DEP-06",
+        "roles": [
+            21
+        ],
+        "role_names": [
+            "أمين الخزينة"
+        ],
+        "placements": 31,
+        "user": "fin.treasury@equipation.sd",
+        "user_id": 76
+    },
+    "DEP-07": {
+        "workspace": "DEP-07",
+        "roles": [
+            4
+        ],
+        "role_names": [
+            "ادارة الموارد البشرية"
+        ],
+        "placements": 41,
+        "user": "اروينا",
+        "user_id": 7
+    },
+    "DEP-08": {
+        "workspace": "DEP-08",
+        "roles": [
+            15
+        ],
+        "role_names": [
+            "إدارة الصلاحيات"
+        ],
+        "placements": 55,
+        "user": "حسابات",
+        "user_id": 56
+    },
+    "DEP-09": {
+        "workspace": "DEP-09",
+        "roles": [
+            28,
+            29,
+            30
+        ],
+        "role_names": [
+            "إدارة المخاطر",
+            "محلل المخاطر",
+            "مشرف المخاطر"
+        ],
+        "placements": 19,
+        "user": "مخاطر",
+        "user_id": 897
+    },
+    "DEP-10": {
+        "workspace": "DEP-10",
+        "roles": [
+            24
+        ],
+        "role_names": [
+            "إدارة البلاغات"
+        ],
+        "placements": 28,
+        "user": "بلاغات",
+        "user_id": 324
+    },
+    "DEP-11": {
+        "workspace": "DEP-11",
+        "roles": [
+            1,
+            7
+        ],
+        "role_names": [
+            "ادارة التشغيل",
+            "مشرف - مشاريع"
+        ],
+        "placements": 34,
+        "user": "محمد",
+        "user_id": 4
+    },
+    "DEP-12": {
+        "workspace": "DEP-12",
+        "roles": [
+            5,
+            6
+        ],
+        "role_names": [
+            "إدارة الموقع (قديم — مدمج في 6)",
+            "إدارة الموقع"
+        ],
+        "placements": 37,
+        "user": "موقع",
+        "user_id": 8
+    },
+    "DEP-13": {
+        "workspace": "DEP-13",
+        "roles": [
+            27
+        ],
+        "role_names": [
+            "القوى التشغيلية"
+        ],
+        "placements": 32,
+        "user": "مدير القوى",
+        "user_id": 883
+    },
+    "DEP-14": {
+        "workspace": "DEP-14",
+        "roles": [
+            13,
+            14
+        ],
+        "role_names": [
+            "ادارة الصيانة",
+            "مشرف صيانة"
+        ],
+        "placements": 34,
+        "user": "صيانة",
+        "user_id": 19
+    },
+    "DEP-15": {
+        "workspace": "DEP-15",
+        "roles": [
+            23
+        ],
+        "role_names": [
+            "إدارة النقل والترحيل"
+        ],
+        "placements": 28,
+        "user": "transport_mgr",
+        "user_id": 78
+    },
+    "DEP-16": {
+        "workspace": "DEP-16",
+        "roles": [
+            16
+        ],
+        "role_names": [
+            "إدارة المشتريات"
+        ],
+        "placements": 28,
+        "user": "مشتريات",
+        "user_id": 71
+    },
+    "DEP-17": {
+        "workspace": "DEP-17",
+        "roles": [
+            25
+        ],
+        "role_names": [
+            "أمين المستودع"
+        ],
+        "placements": 30,
+        "user": "أمين المستودع",
+        "user_id": 882
+    },
+    "EX-CEO": {
+        "workspace": "EX-CEO",
+        "roles": [
+            9
+        ],
+        "role_names": [
+            "الإدارة التنفيذية"
+        ],
+        "placements": 42,
+        "user": "تنفيذ",
+        "user_id": 881
+    },
+    "IAF": {
+        "workspace": "IAF",
+        "roles": [
+            33
+        ],
+        "role_names": [
+            "المراجع الداخلي المستقل"
+        ],
+        "placements": 20,
+        "user": "IAF-AUD@equipation.sd",
+        "user_id": 906
+    }
+}

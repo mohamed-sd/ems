@@ -1,0 +1,86 @@
+[
+    {
+        "no": 1,
+        "title": "عاملٌ يعتمد على اختفاءِ الصفّ",
+        "count": 2,
+        "ruling": "BLOCKER",
+        "note": "حذفانِ في الكاتبِ نفسِه: عند **الموت** وعند **النجاح**. فالصفُّ عنده حالةٌ عابرةٌ بالتصميم — ونزعُ حذفِ الموتِ وحدَه يوقف تصفيرَ العدّاد.",
+        "hits": [
+            {
+                "file": "C:\/wamp64\/www\/ems\/App\/Core\/EventDispatcher.php",
+                "line": 139,
+                "text": "$this->exec('DELETE FROM `ems_event_deliveries` WHERE consumer = ? AND event_id = ?', 'si', array($consumer, $"
+            },
+            {
+                "file": "C:\/wamp64\/www\/ems\/App\/Core\/EventDispatcher.php",
+                "line": 165,
+                "text": "$this->exec('DELETE FROM `ems_event_deliveries` WHERE consumer = ? AND event_id = ?', 'si', array($consumer, $"
+            }
+        ]
+    },
+    {
+        "no": 2,
+        "title": "قارئٌ يحسب من جدولِ الرسائلِ الميتة",
+        "count": 2,
+        "ruling": "REVIEW",
+        "note": "ثمّةَ قارئٌ — يُحوَّل إلى سجلِّ التسليم.",
+        "hits": [
+            {
+                "file": "C:\/wamp64\/www\/ems\/App\/Core\/EventDispatcher.php",
+                "line": 201,
+                "text": "العزلِ في `ems_event_dead_letter`، والجدولُ فارغٌ أبدًا. فمرَّ صفّان في"
+            },
+            {
+                "file": "C:\/wamp64\/www\/ems\/App\/Core\/TenantRegistry.php",
+                "line": 891,
+                "text": "'ems_event_dead_letter' => array('type' => self::T_RESTRICTED, 'soft' => false), \/\/ K4"
+            }
+        ]
+    },
+    {
+        "no": 3,
+        "title": "مهمّةُ تنظيفٍ تعتمد على غيابِ الصفّ",
+        "count": 0,
+        "ruling": "CLEARABLE",
+        "note": "لا مهمّةَ تنظيفٍ تمسُّ التسليمات.",
+        "hits": []
+    },
+    {
+        "no": 4,
+        "title": "التقاطُ صفٍّ بحالةٍ نهائيّةٍ ثانيةً",
+        "count": 2,
+        "ruling": "BLOCKER",
+        "note": "⛔ **لا حارسَ حالةٍ نهائيّةٍ في `EventDispatcher`**: عدّادُ المحاولاتِ يُزاد بـON DUPLICATE على القيدِ الفريد، فالصفُّ الباقي يُلتقَط ويقفز فوقَ السقفِ في كلِّ دورة. (والحارسُ موجودٌ في `EventDeliveryWorker` — وهو ناقلٌ آخرُ لا يُعدَّل هنا.)",
+        "hits": [
+            {
+                "file": "C:\/wamp64\/www\/ems\/App\/Core\/EventDispatcher.php",
+                "line": 126,
+                "text": "'INSERT INTO `ems_event_deliveries` (`consumer`, `event_id`, `attempts`) VALUES (?, ?, 1)"
+            },
+            {
+                "file": "C:\/wamp64\/www\/ems\/App\/Core\/EventDispatcher.php",
+                "line": 127,
+                "text": "ON DUPLICATE KEY UPDATE `attempts` = `attempts` + 1',"
+            }
+        ]
+    },
+    {
+        "no": 5,
+        "title": "مفتاحٌ أجنبيٌّ أو قيدُ تفرّدٍ يتأثر بالبقاء",
+        "count": 2,
+        "ruling": "REVIEW",
+        "note": "قيدُ `uq_legacy_consumer_event(consumer,event_id)` **هو محورُ المسألة**: الحذفُ يُحرّر الخانةَ ويُصفِّر العدّاد. وبقاءُ الصفِّ يمنع إدراجًا جديدًا — وهذا مقصودٌ **متى وُجد الحارس**. ولا مفتاحَ أجنبيًّا يشير إليه — فالبقاءُ لا يُيتِّم شيئًا.",
+        "hits": [
+            {
+                "file": "المخطَّط",
+                "line": 0,
+                "text": "قيدُ فرادةٍ uq_idem (idempotency_key)"
+            },
+            {
+                "file": "المخطَّط",
+                "line": 0,
+                "text": "قيدُ فرادةٍ uq_legacy_consumer_event (consumer,event_id)"
+            }
+        ]
+    }
+]

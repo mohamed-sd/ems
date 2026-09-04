@@ -1,0 +1,54 @@
+{
+    "tag": "POST_SHORT_BATCH",
+    "at_utc": "2026-09-04 05:39:55",
+    "at_app": "2026-09-04 08:39:55",
+    "git": {
+        "head": "3857dda136ba247a7dd7e13fbfa266bc7ccdb843",
+        "head_short": "3857dda1",
+        "branch": "freeze\/single-company",
+        "upstream": "origin\/freeze\/single-company",
+        "tracking_ref": "3857dda136ba247a7dd7e13fbfa266bc7ccdb843",
+        "dirty_files": 9,
+        "head_equals_tracking": true
+    },
+    "schema": {
+        "tables": 1239,
+        "views": 29,
+        "columns": 22379,
+        "fingerprint": "cce64d182e3946deac83d280682d67403483448b"
+    },
+    "metrics": {
+        "deliveries_total": 21419,
+        "deliveries_dlq": 37,
+        "deliveries_processed": 21382,
+        "dead_letter_rows": 0,
+        "dlq_state_sources": 2,
+        "business_events": 21628,
+        "event_keys_distinct": 58,
+        "rulings_rows": 58,
+        "rulings_measured_at": "2026-08-21 11:16:54",
+        "journal_entries": 6713,
+        "journal_lines": 13426,
+        "journal_balance_diff": "0.00",
+        "fin_event_links": 10519,
+        "fin_event_effects": 5210,
+        "created_at_future": 0,
+        "occurred_at_future": 2224,
+        "app_utc_offset_min": 180
+    },
+    "row_counts": {
+        "ems_event_deliveries": 21419,
+        "ems_event_dead_letter": 0,
+        "ems_business_events": 21628,
+        "gov_event_rulings": 58,
+        "event_consumers": 142,
+        "ems_event_subscriptions": 142,
+        "fin_event_links": 10519,
+        "fin_event_effects": 5210,
+        "fin_financial_events": 5256,
+        "fin_journal_entries": 6713,
+        "fin_journal_lines": 13426
+    },
+    "baseline_id": "POST_SHORT_BATCH-3857dda1-20260904053957",
+    "self_fingerprint": "2646e1c0c42bbabfd394c03bff259648ba1de728"
+}
