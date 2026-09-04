@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-04 22:28:42
--- الجداول: 1247 · المناظير: 29
+-- المصدر: equipation_manage · التوليد: 2026-09-04 22:46:50
+-- الجداول: 1248 · المناظير: 29
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -16358,6 +16358,19 @@ CREATE TABLE `perm01_auth_mode` (
   `reason` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='PERM-01 §6-2 — وضع كل مستخدم معلن لا ضمني';
+
+-- ── Table: perm01_layer_ruling ──
+CREATE TABLE `perm01_layer_ruling` (
+  `layer_key` varchar(64) NOT NULL COMMENT 'اسم الجدول او الطبقة المحكوم عليها',
+  `ruling` enum('wired','not_in_force') NOT NULL COMMENT 'موصولة بقرار فتح الشاشة | غير نافذة فيه',
+  `in_force_scope` varchar(160) NOT NULL DEFAULT '' COMMENT 'المجال الذي هي نافذة فيه فعلا — يسمى ولا يترك فارغا',
+  `not_in_force_scope` varchar(160) NOT NULL DEFAULT '',
+  `reason` varchar(255) NOT NULL DEFAULT '',
+  `doc_ref` varchar(64) NOT NULL DEFAULT '' COMMENT 'مرجع الامر الذي حسمه',
+  `decided_by` varchar(64) NOT NULL DEFAULT '' COMMENT 'من حسم — مالك او دور',
+  `decided_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`layer_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='PERM-01 8-2 — حكم مسجل لكل طقة صلاحيات: توصل ام توسم';
 
 -- ── Table: perm01_seed_source_review ──
 CREATE TABLE `perm01_seed_source_review` (

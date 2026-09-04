@@ -174,9 +174,13 @@ $add(10, 'قياسُ الفارقِ على أعلامِ الكتابة', 'منف
 /* ═══ الأثرُ والواجهة ════════════════════════════════════════════════════ */
 $hasChangeLog = $one("SELECT COUNT(*) FROM information_schema.TABLES
                        WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='perm_change_log'") > 0;
-/* ◆ وجودُ الجدولِ لا يكفي — **الكاتبُ موصولٌ بمنفذٍ حيّ**: سحبُ المنحةِ
-     في `Governance/auth_grants.php` يكتب سطرَ الأثر. */
-$logWired = $grep('Governance/auth_grants.php', 'ems_perm_change_log');
+/* ◆ وجودُ الجدولِ لا يكفي — **الكاتبُ موصولٌ بمنفذٍ حيّ**.
+   ◆ **وموضعُ الوصلِ انتقل**: كان النداءُ في `Governance/auth_grants.php`، فلمّا
+     صارت الشاشةُ **عميلًا** للمنفذِ المحروسِ انتقل الأثرُ إليه — وبقاءُ المقياسِ
+     يفتّش الشاشةَ يُخرج «غيرَ موصول» وهو موصولٌ أوثقَ من قبل: الأثرُ الآن
+     **شرطُ إتمامِ المعاملة** لا سطرٌ بعدَها قد يفشل وحدَه. */
+$logWired = $grep('app/Services/Security/PolicyWriteService.php', 'ems_perm_change_log')
+         || $grep('Governance/auth_grants.php', 'ems_perm_change_log');
 $add(11, 'كتابةٌ في جدولِ الصلاحياتِ بلا أثرِ تغيير', 'صفر',
      ($hasChangeLog && $logWired) ? 'صفر — السجلُّ قائمٌ وموصول'
         : ($hasChangeLog ? 'قائمٌ وغيرُ موصول' : 'كلُّ الكتابات'),
@@ -227,10 +231,40 @@ $refCount = function ($needle) use ($ROOT) {
     return $n;
 };
 $tplRefs = $refCount('permission_templates') + $refCount('PermissionTemplateService');
-$add(15, 'طبقةُ صلاحياتٍ مبنيّةٌ بلا حكمٍ ولا وسم', 'صفر',
-     'قائمة — permission_templates ' . $one('SELECT COUNT(*) FROM permission_templates') . ' صفًّا',
-     'FAIL', 'تقرؤها ' . $tplRefs . ' ملفَّ إنتاجٍ (منها admin/permissions وsec_governance وPermissionResolver) '
-   . 'لكن **لا في قرارِ فتحِ الشاشة** — والمُعوِزُ حكمٌ مسجَّلٌ للمالك: تُوصَل أم تُوسَم');
+/* ◆ **والحكمُ يُقرأ من سجلِّه ويُتحقَّق امتثالُه**: وسمٌ مسجَّلٌ لا يكفي إن كانت
+     الطبقةُ ما تزال تدخل قرارَ فتحِ الشاشة — فيُفتَّش **جسمُ دالّةِ القرارِ**
+     وحدَه، لا الملفُّ كلُّه (فيه دوالُّ تقاريرَ تذكرها بحقّ). */
+$hasRuling = $one("SELECT COUNT(*) FROM information_schema.TABLES
+                    WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='perm01_layer_ruling'") > 0;
+$rulingOf = function ($layer) use ($db, $hasRuling) {
+    if (!$hasRuling) { return null; }
+    $e = $db->real_escape_string($layer);
+    $r = $db->query("SELECT ruling, in_force_scope, doc_ref FROM perm01_layer_ruling
+                      WHERE layer_key = '{$e}' LIMIT 1");
+    return ($r && $r->num_rows) ? $r->fetch_assoc() : null;
+};
+$__helperSrc = (string) @file_get_contents($ROOT . '/includes/permissions_helper.php');
+$__decBody = '';
+$__pf = strpos($__helperSrc, 'function get_module_permissions(');
+if ($__pf !== false) {
+    $__pe = strpos($__helperSrc, "
+function ", $__pf + 10);
+    $__decBody = substr($__helperSrc, $__pf, ($__pe === false ? strlen($__helperSrc) : $__pe) - $__pf);
+}
+$notInDecision = function ($t) use ($__decBody) {
+    return $__decBody !== '' && strpos($__decBody, $t) === false;
+};
+
+$r15 = $rulingOf('permission_templates');
+$ok15 = ($r15 !== null && $notInDecision('permission_templates'));
+$add(15, 'طبقةُ صلاحياتٍ مبنيّةٌ بلا حكمٍ ولا وسم', 'صفر', $ok15 ? 0 : 1,
+     $ok15 ? 'PASS' : 'FAIL',
+     ($r15
+        ? ('موسومةٌ «' . $r15['ruling'] . '» بمرجع ' . $r15['doc_ref']
+           . ' · ونافذةٌ في: ' . mb_substr((string) $r15['in_force_scope'], 0, 60))
+        : 'بلا حكمٍ مسجَّل')
+   . ' · وقرارُ فتحِ الشاشةِ ' . ($notInDecision('permission_templates') ? 'لا يقرؤها' : '**يقرؤها**')
+   . ' · وتقرؤها ' . $tplRefs . ' ملفَّ إنتاجٍ في مجالِها');
 
 $myItems = $one("SELECT COUNT(*) FROM perm01_target_item WHERE workspace_id='WS-MY' AND role_id=0");
 $noMy = $one("SELECT COUNT(*) FROM gov_role_profiles p WHERE p.state='active' AND p.profile_code LIKE 'TGT-R%'
@@ -372,8 +406,41 @@ $add(25, 'اختباراتُ فصلِ الواجباتِ السالبةُ في �
 $scopeTest = $has('tests/space_isolation_negative_test.php');
 $add(26, 'اختباراتُ نطاقِ الكيانِ السالبة', '100%', $scopeTest ? 'قائم' : 'صفر',
      $scopeTest ? 'PASS' : 'FAIL');
-$add(27, 'كتابةٌ في جداولِ السياسةِ خارجَ الخدمةِ المعتمدة', 'صفر', 'كلُّ الكتابات', 'FAIL',
-     'لا خدمةَ كتابةٍ واحدة — §7-①');
+/* ═══ ㉗ — بابُ الكتابةِ واحدٌ محروس (PERM-01 §7-① · PERM-01-DEC §0-3)
+   ◆ **والحاكمُ يُفصَل عن المتقاعد**: `role_permissions` **لم يعد يحكم أحدًا**
+     (75 من 75 على القوالب) ويبقى **مقروءًا أثرًا لا حكمًا** بنصِّ ق-٥ — فكاتبوه
+     يُعَدّون ويُسمَّون ولا يُحسبون خرقًا لبابِ السياسةِ الحاكم.
+   ⛔ **والمسحُ على الإنتاجِ لا على النيّة**: يُفتَّش نصُّ كلِّ ملفٍّ عن كتابةٍ
+     مباشرةٍ في جداولِ السياسة — فخدمةٌ مبنيّةٌ وأبوابٌ مفتوحةٌ بجانبِها لا تُغلق
+     بندًا. */
+$POLICY_GOV = array('gov_authority_grants', 'gov_role_profiles', 'gov_profile_items');
+$writersGov = array(); $writersLegacy = array();
+$skipDirs = array('/tests/','/tools/','/docs/','/vendor/','/storage/','/.git/','/database/','/node_modules/');
+$itW = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($ROOT,
+        FilesystemIterator::SKIP_DOTS | FilesystemIterator::UNIX_PATHS));
+foreach ($itW as $fW) {
+    $pW = $fW->getPathname();
+    if (substr($pW, -4) !== '.php') { continue; }
+    foreach ($skipDirs as $sW) { if (strpos($pW, $sW) !== false) { continue 2; } }
+    if (strpos($pW, 'PolicyWriteService.php') !== false) { continue; }
+    $srcW = (string) @file_get_contents($pW);
+    $relW = str_replace($ROOT . '/', '', $pW);
+    foreach ($POLICY_GOV as $tW) {
+        if (preg_match('~(INSERT\s+INTO|UPDATE|DELETE\s+FROM)\s+`?' . $tW . '`?~i', $srcW)) {
+            $writersGov[$relW] = 1; break;
+        }
+    }
+    if (preg_match('~(INSERT\s+INTO|UPDATE|DELETE\s+FROM)\s+`?role_permissions`?~i', $srcW)) {
+        $writersLegacy[$relW] = 1;
+    }
+}
+$nGov = count($writersGov);
+$svcOk = is_file($ROOT . '/app/Services/Security/PolicyWriteService.php');
+$add(27, 'كتابةٌ في جداولِ السياسةِ الحاكمةِ خارجَ المنفذ', 'صفر', $nGov,
+     ($nGov === 0 && $svcOk) ? 'PASS' : 'FAIL',
+     ($nGov ? ('خارجَ المنفذ: ' . implode(' · ', array_slice(array_keys($writersGov), 0, 3)) . ' — ') : '')
+   . 'والمنفذُ ' . ($svcOk ? 'قائم' : 'غيرُ مبنيّ')
+   . ' · وكتّابُ الجدولِ القديمِ (لا يحكم، يبقى أثرًا): ' . count($writersLegacy));
 $bg = $one("SELECT COUNT(*) FROM information_schema.TABLES
              WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='break_glass_sessions'");
 /* ═══ ㉘ — الفتحُ الاضطراريُّ: مبنيٌّ ولا يفتح ══════════════════════════════
@@ -412,11 +479,15 @@ $wired = count(array_intersect(array_keys($declared), array_keys($reg)));
 $add(29, 'تركيبةُ فعلٍ حرجٍ ممنوعةٌ وقابلةٌ للتنفيذ', 'صفر',
      'غيرُ قابلٍ للقياس — ' . $wired . ' من ' . count($declared) . ' فعلٍ مُعلَنٍ موصول', 'UNMEASURED',
      'لا رابطَ بين رموزِ الأفعالِ ونقاطِ تنفيذها — §3-②');
-$add(30, 'ضابطٌ موثَّقٌ يُعلَن نافذًا وهو غيرُ مقروءٍ في زمنِ التشغيل', 'صفر',
-     $one('SELECT COUNT(*) FROM gov_authority_limits WHERE active=1') . ' حدًّا نصّيًّا لا يقرؤه قرارُ الشاشة',
-     'FAIL', 'يقرؤها ' . ($refCount('gov_authority_limits') + $refCount('ScopeEngine')) . ' ملفَّ إنتاجٍ عبرَ '
-   . 'ScopeEngine (ExecDecisionRouter · w15_view) — فهي نافذةٌ في مجالِ التنفيذِ لا في فتحِ الشاشة. '
-   . 'تُوصَل أو تُوسَم «غير نافذة» بحكمٍ مسجَّل — §8-②');
+$r30 = $rulingOf('gov_authority_limits');
+$ok30 = ($r30 !== null && $notInDecision('gov_authority_limits'));
+$add(30, 'ضابطٌ موثَّقٌ يُعلَن نافذًا وهو غيرُ مقروءٍ في زمنِ التشغيل', 'صفر', $ok30 ? 0 : 1,
+     $ok30 ? 'PASS' : 'FAIL',
+     ($r30
+        ? ('موسومةٌ «' . $r30['ruling'] . '» بمرجع ' . $r30['doc_ref']
+           . ' · ونافذةٌ في: ' . mb_substr((string) $r30['in_force_scope'], 0, 60))
+        : 'بلا حكمٍ مسجَّل')
+   . ' · و' . $one('SELECT COUNT(*) FROM gov_authority_limits WHERE active=1') . ' ضابطًا نافذًا في مجالِها');
 $add(31, 'التجميدُ نافذٌ حتى إشعار', 'نافذ',
      $one("SELECT COUNT(*) FROM gov_policy_freeze WHERE active=1") . ' مدًى',
      $one("SELECT COUNT(*) FROM gov_policy_freeze WHERE active=1") >= 2 ? 'PASS' : 'FAIL');

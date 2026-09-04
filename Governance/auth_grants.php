@@ -55,47 +55,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'revok
     $gid = (int) ($_POST['grant_id'] ?? 0);
     $why = trim((string) ($_POST['revoke_reason'] ?? ''));
     if ($gid > 0 && $why !== '') {
-        /* ◆ **صورةُ ما قبلَ التغييرِ تُلتقَط قبلَه لا بعدَه**: بعدَ السحبِ لا يبقى
-             ما يُقارَن به، فسطرُ الأثرِ يصير «تغيَّر شيءٌ» بلا «من ماذا». */
-        $__before = array('user_id' => 0, 'profile' => '');
-        if ($bs = $conn->prepare("SELECT g.user_id, p.profile_code
-                                    FROM gov_authority_grants g
-                                    LEFT JOIN gov_role_profiles p ON p.profile_id = g.profile_id
-                                   WHERE g.grant_id = ? LIMIT 1")) {
-            $bs->bind_param('i', $gid);
-            if ($bs->execute()) {
-                $br = $bs->get_result();
-                if ($br && ($bx = $br->fetch_assoc())) {
-                    $__before = array('user_id' => (int) $bx['user_id'],
-                                      'profile' => (string) $bx['profile_code']);
-                }
-            }
-            $bs->close();
-        }
-
-        $st = $conn->prepare("UPDATE gov_authority_grants
-                                 SET revoked_at = NOW(), reason = CONCAT(reason, ' | سُحب: ', ?)
-                               WHERE grant_id = ? AND revoked_at IS NULL");
-        $st->bind_param('si', $why, $gid);
-        if ($st->execute() && $st->affected_rows > 0) {
-            $flash = 'سحب المنح وسجل سببه'; $flashKind = 'success';
-            /* ⛔ **وتغييرُ صلاحيّةٍ بلا أثرٍ لا يُقبل** (PERM-01 §7-⑤): سؤالُ
-                 «من سحب ومتى ولماذا» يُجاب بسطرٍ واحدٍ في `perm_change_log`. */
-            require_once __DIR__ . '/../includes/perm_change_log.php';
-            ems_perm_change_log($conn, 'grant', 'revoke', array(
-                'subject_kind' => 'user',
-                'subject_id'   => $__before['user_id'],
-                'screen_code'  => '',
-                'before'       => 'منحة نافذة على ' . $__before['profile'],
-                'after'        => 'مسحوبة',
-                'reason'       => $why,
-                'source'       => $SCREEN,
-            ));
-        }
-        else { $flash = 'لم يتغير شيء — المنح مسحوب سلفا أو غير موجود'; $flashKind = 'warning'; }
-        $st->close();
+        /* ⛔ **والشاشةُ عميلٌ لا بابٌ خامس** (PERM-01-DEC §0-3 وقبولُ ق-١:
+             «صفرُ شاشاتٍ أخرى تكتب في سجلِّ المنح»). كانت هنا `UPDATE` مباشرةٌ
+             تليها كتابةُ أثرٍ **خارجَ المعاملة** — فتعذُّرُ الأثرِ يترك سحبًا
+             بلا سجلّ. صارت نداءً واحدًا للمنفذِ المحروس: يفحص التجميدَ، ويكتب
+             بالبوّابة، ويجعل الأثرَ شرطَ إتمامٍ في معاملةٍ واحدة. */
+        require_once __DIR__ . '/../app/Services/Security/PolicyWriteService.php';
+        $__res = \App\Services\Security\PolicyWriteService::revokeGrant(
+            $conn, $gid, $why, (int) ($_SESSION['user']['id'] ?? 0));
+        $flash = $__res['msg'];
+        $flashKind = $__res['ok'] ? 'success' : ($__res['code'] === 'ALREADY_REVOKED' ? 'warning' : 'danger');
     } else {
         $flash = 'السحب يلزمه المنح وسبب غير فارغ'; $flashKind = 'danger';
+    }
+}
+
+/* ═══ ⑥-ب معالجُ الإسناد — ق-١ من PERM-01-DEC ══════════════════════════════
+   ◆ **بيتٌ واحدٌ لا شاشةٌ ثانية**: سجلُّ المنحِ هو موضعُ الإسنادِ طبعًا — وشاشةٌ
+     جديدةٌ تعني بابًا يُسجَّل ويُحرَس ويُربَط من جديدٍ بلا حاجة.
+   ⛔ **والإسنادُ للدورِ 15 وحدَه** بنصِّ الأمر: «مالك الإسناد: الدور 15 وحده».
+     والسوبرُ ليس مُسنِدًا — فصفةُ الإدارةِ التقنيّةِ ليست ولايةً على السياسة.
+   ⛔ **ولا تكتب هذه الشاشةُ في سجلِّ المنحِ بحرف**: تنادي المنفذَ المحروسَ
+     وتعرض جوابَه — «إن بنيتَ بابًا خامسًا تُرفض الشاشةُ أوّلًا». */
+$__isAssigner = (strval($_SESSION['user']['role'] ?? '') === '15');
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'assign_profile') {
+    if (!$__isAssigner) {
+        $flash = 'الاسناد بيد ادارة الصلاحيات (الدور 15) وحدها'; $flashKind = 'danger';
+    } else {
+        require_once __DIR__ . '/../app/Services/Security/PolicyWriteService.php';
+        $__res = \App\Services\Security\PolicyWriteService::assignProfile(
+            $conn,
+            (int) ($_POST['assign_user'] ?? 0),
+            (int) ($_POST['assign_profile'] ?? 0),
+            trim((string) ($_POST['assign_reason'] ?? '')),
+            $uid
+        );
+        $flash = $__res['msg'];
+        $flashKind = $__res['ok'] ? 'success' : ($__res['code'] === 'FROZEN' ? 'warning' : 'danger');
     }
 }
 
@@ -133,6 +129,81 @@ include __DIR__ . '/../insidebar.php';
     <div class="alert alert-<?php echo htmlspecialchars($flashKind, ENT_QUOTES, 'UTF-8'); ?>" role="status">
       <?php echo htmlspecialchars($flash, ENT_QUOTES, 'UTF-8'); ?>
     </div>
+  <?php endif; ?>
+
+  <?php
+  /* ── إسنادُ قالبٍ لموظّف (ق-١) — للدورِ 15 وحدَه ─────────────────────────
+     ◆ **ويُعرض حالُ التجميدِ قبلَ المحاولةِ لا بعدَها**: نموذجٌ يُملأ ثمَّ يُردُّ
+       يضيّع وقتَ المستخدمِ ويبدو عطبًا؛ فيُقال له ابتداءً إنَّ البابَ مغلقٌ
+       ومن يفتحه. */
+  if ($__isAssigner):
+      require_once __DIR__ . '/../app/Services/Security/PolicyWriteService.php';
+      $__frozen = \App\Services\Security\PolicyWriteService::isFrozen(
+          \App\Services\Security\PolicyWriteService::FREEZE_GRANTS);
+      /* ◆ **والشاشةُ تعرض ولا تسأل القاعدة**: القراءةُ في المنفذِ بالبوّابةِ —
+           فاستعلامٌ خامٌّ في مسارِ إدارةٍ يرفع سجلَّ الدَّينِ `RP-04`. */
+      $__freeUsers = \App\Services\Security\PolicyWriteService::assignableUsers();
+      $__profiles  = \App\Services\Security\PolicyWriteService::activeProfiles();
+  ?>
+  <div class="ems-card ems-mb-16">
+    <div class="filter-title">
+      <span class="filter-title-icon"><i class="fa fa-user-plus"></i></span>
+      اسناد قالب لموظف
+    </div>
+    <div class="filter-body">
+      <?php if ($__frozen): ?>
+        <div class="alert alert-warning" role="status">
+          تجميد المنح نافذ، فلا يصدر اسناد جديد حتى يرفعه المالك. والنموذج معطل عمدا.
+        </div>
+      <?php endif; ?>
+      <form method="post" class="ems-form">
+        <input type="hidden" name="csrf_token"
+               value="<?php echo htmlspecialchars(generate_csrf_token(), ENT_QUOTES, 'UTF-8'); ?>">
+        <input type="hidden" name="action" value="assign_profile">
+        <div class="form-group px-w-320">
+          <label for="assign_user">الموظف (بلا قالب نافذ)</label>
+          <select name="assign_user" id="assign_user" class="form-control" required
+                  <?php echo $__frozen ? 'disabled' : ''; ?>>
+            <option value="">اختر</option>
+            <?php foreach ($__freeUsers as $__u): ?>
+              <option value="<?php echo (int) $__u['id']; ?>">
+                <?php echo htmlspecialchars($__u['name'] . ' (دور ' . $__u['role'] . ')',
+                    ENT_QUOTES, 'UTF-8'); ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <div class="form-group px-w-320">
+          <label for="assign_profile">القالب النافذ</label>
+          <select name="assign_profile" id="assign_profile" class="form-control" required
+                  <?php echo $__frozen ? 'disabled' : ''; ?>>
+            <option value="">اختر</option>
+            <?php foreach ($__profiles as $__p): ?>
+              <option value="<?php echo (int) $__p['profile_id']; ?>">
+                <?php echo htmlspecialchars($__p['profile_code']
+                    . ($__p['title_ar'] ? ': ' . $__p['title_ar'] : ''), ENT_QUOTES, 'UTF-8'); ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <div class="form-group px-w-320">
+          <label for="assign_reason">السبب (مطلوب)</label>
+          <input type="text" name="assign_reason" id="assign_reason" class="form-control"
+                 maxlength="255" required <?php echo $__frozen ? 'disabled' : ''; ?>
+                 placeholder="مثال: تعيين جديد بادارة المشتريات">
+        </div>
+        <div class="form-group">
+          <button type="submit" class="btn btn-primary" <?php echo $__frozen ? 'disabled' : ''; ?>>
+            اسند القالب
+          </button>
+        </div>
+      </form>
+      <p class="text-muted">
+        قالب واحد لكل موظف. الاسناد يمر ببوابة التجميد ويكتب اثرا يسمي من اسند ولمن واي قالب ولماذا.
+        وتحرير بنود القالب ليس من هنا.
+      </p>
+    </div>
+  </div>
   <?php endif; ?>
 
   <div class="row">
