@@ -28,11 +28,19 @@ if (!$is_super_admin && $company_id <= 0) {
 $mvp_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('movement operations super') : ems_tenant_db();
 
 // الصلاحيات
-$ops_perm = check_page_permissions($conn, 'movement/move_oprators.php');
-$drv_perm = check_page_permissions($conn, 'movement/project_drivers.php');
-$can_view = (!empty($ops_perm['can_view']) || !empty($drv_perm['can_view']));
-$can_add = (!empty($ops_perm['can_add']) || !empty($drv_perm['can_add']));
-$can_edit = (!empty($ops_perm['can_edit']) || !empty($drv_perm['can_edit']));
+/* ◆ **البابُ يُحكَم بهويّةِ شاشتِه لا بهويّةِ سالفَيه** (PERM-01 §9: «لكلِّ بابٍ
+     حكمٌ واحد»). كان الحارسُ يقرأ `move_oprators` و`project_drivers` — وهما
+     شاشتان أخريان قائمتان — **اتّحادًا**، فوحدةُ هذه الشاشةِ المسجَّلةُ
+     (`movement/movement_operations.php`) لا تُستشار أصلًا: منحةُ قالبٍ عليها
+     لا تفتح شيئًا، والقائمةُ تُظهر رابطَها لمن يردُّه البابُ.
+   ◆ **والأثرُ مقيسٌ لا مقدَّر**: عشرةُ مستخدمين معياريّين كانوا يرون الرابطَ
+     ويردُّهم البابُ. وقراءةُ الهويّةِ الذاتيّةِ **لا تُسقِط أحدًا**: الدورُ 5
+     بلا مستخدمٍ حيّ، والدورُ 1 مستخدمُه الوحيدُ معياريٌّ لا يقرأ الجدولَ
+     القديمَ أصلًا — والدوران 6 و12 ممنوحان على الهويّتَين معًا. */
+$__perm   = check_page_permissions($conn, 'movement/movement_operations.php');
+$can_view = !empty($__perm['can_view']);
+$can_add  = !empty($__perm['can_add']);
+$can_edit = !empty($__perm['can_edit']);
 
 if (!$can_view) {
     ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض الشاشة الموحدة ❌', 'GOV-PERM-403', '');

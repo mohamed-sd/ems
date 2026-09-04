@@ -1012,6 +1012,9 @@ class TenantRegistry
              سياسةٌ بـ`company_id=0` فهي عامّة، والمنعُ واقعةُ مستأجِرٍ فهو مُسنَد. */
         'sec_sod_pairs' => array('type' => self::T_GLOBAL, 'soft' => false),
         'sec_sod_denials' => array('type' => self::T_TENANT, 'soft' => false),
+        /* ◆ أثرُ تغييرِ الصلاحيةِ واقعةُ مستأجِرٍ لا سياسةٌ عامّة — ويُكتب
+             بالبوّابةِ لا باستعلامٍ خامٍّ (PERM-01 §7-⑤ · ADR-02). */
+        'perm_change_log' => array('type' => self::T_TENANT, 'soft' => false),
         'guard_override_policies' => array('type' => self::T_GLOBAL, 'soft' => false),
         'sensitive_field_policies' => array('type' => self::T_GLOBAL, 'soft' => false),
         'effective_permissions' => array('type' => self::T_TENANT, 'soft' => false),

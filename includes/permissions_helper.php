@@ -334,6 +334,51 @@ function ems_template_nav_state($conn) {
     return $st;
 }
 
+if (!function_exists('ems_auth_mode')) {
+    /**
+     * وضعُ انتقالِ المستخدم — `legacy` | `shadow` | `canonical` (PERM-01 §6-②).
+     *
+     * ◆ **الوضعُ مُعلَنٌ لا مستنتَج**: كان الاستنتاجُ «مغطًّى ⇒ معياريّ»، وهو
+     *   يسقط عند فقدِ القالبِ نفسِه — فيُعيد المستخدمَ إلى الجدولِ القديمِ في
+     *   اللحظةِ التي يجب أن يُمنع فيها. (مقيسٌ: سحبُ منحةٍ أبقى الشاشةَ مفتوحة.)
+     * ⛔ **وسلامةُ الفشلِ نحوَ المنعِ للمعياريّ**: تعذُّرُ قراءةِ السجلِّ يُعامَل
+     *   `unknown` — ولا يُقرأ `legacy` فيُفتح ما يجب منعُه.
+     * ◆ **والمخبأُ بهويّةِ المستخدمِ لا بالوجودِ المجرَّد**: مجسّاتُ القياسِ
+     *   تُبدّل الجلسةَ في العمليّةِ الواحدة.
+     *
+     * @return string legacy|shadow|canonical|none|unknown
+     */
+    function ems_auth_mode($conn, $userId = null)
+    {
+        static $cache = array();
+        static $tableOk = null;
+        $uid = ($userId === null)
+            ? (isset($_SESSION['user']['id']) ? (int) $_SESSION['user']['id'] : 0)
+            : (int) $userId;
+        if ($uid <= 0) { return 'none'; }
+        if (isset($cache[$uid])) { return $cache[$uid]; }
+        try {
+            if ($tableOk === null) {
+                $t = @$conn->query("SELECT 1 FROM information_schema.TABLES
+                                     WHERE TABLE_SCHEMA = DATABASE()
+                                       AND TABLE_NAME = 'perm01_auth_mode' LIMIT 1");
+                $tableOk = ($t && $t->num_rows > 0);
+            }
+            if (!$tableOk) { return $cache[$uid] = 'none'; }
+            $st = $conn->prepare("SELECT mode FROM perm01_auth_mode WHERE user_id = ? LIMIT 1");
+            if (!$st) { return $cache[$uid] = 'unknown'; }
+            $st->bind_param('i', $uid);
+            if (!$st->execute()) { $st->close(); return $cache[$uid] = 'unknown'; }
+            $r = $st->get_result();
+            $row = $r ? $r->fetch_row() : null;
+            $st->close();
+            return $cache[$uid] = ($row ? (string) $row[0] : 'none');
+        } catch (\Throwable $t) {
+            return $cache[$uid] = 'unknown';
+        }
+    }
+}
+
 function get_module_permissions($conn, $module_id) {
     if (!isset($_SESSION['user']) || !isset($_SESSION['user']['role'])) {
         return [
@@ -349,9 +394,22 @@ function get_module_permissions($conn, $module_id) {
     /* ── GOV-AUTH-01 التبديلُ الجزئي (قرارُ المالك 2026-08-17) ─────────────
        المستخدمُ المغطًّى بقالبٍ نافذٍ يُحكَم بقالبِه حصرًا — «لا شاشةَ خارجَ
        القالب». غيرُ المغطَّى (قالبُه مسودةٌ أو بلا قالبٍ) على القائمِ كما هو.
-       سلامةُ الفشل: أيُّ خللٍ في القراءةِ ⇒ يسقط للمسارِ القائمِ لا للفتح. */
+
+       ⛔ **وسلامةُ الفشلِ نحوَ المنعِ لا نحوَ الجدولِ القديم** (PERM-01 §6-②):
+          «ومن بلغ معياريًّا منفَّذًا لا يعود إلى الجدولِ القديمِ مهما كان السبب:
+          فإن فُقد قالبُه أو تعذّرت قراءةُ مخزنِ السياسةِ فالحكمُ **منعٌ صريحٌ
+          بإنذارٍ مسجَّل** — لا سقوطٌ إلى القديم». وكان السقوطُ هنا **توسيعَ
+          صلاحيّاتٍ صامتًا**: عطبٌ تقنيٌّ في الطبقةِ الجديدةِ يُسلِّم المستخدمَ
+          إلى طبقةٍ أوسعَ منها بلا أن يراه أحد.
+       ◆ **والتمييزُ بين ثلاثِ حالاتٍ لا اثنتين**: تعذُّرُ القراءةِ ⇒ منعٌ ·
+          صفرُ تغطيةٍ ⇒ المسارُ القائم · مغطًّى ⇒ حكمُ قالبِه حصرًا. */
     $gov_user_id = intval($_SESSION['user']['id'] ?? 0);
     if ($gov_user_id > 0 && strval($role_id) !== '-1') {
+      /* ⛔ **والخللُ يُلقي ولا يُرجع `false`**: منذ PHP 8 يُبلِّغ mysqli بالاستثناءِ
+           افتراضًا، فوصلةٌ مغلقةٌ أو مخزنٌ متعذِّرٌ **يرمي** — وحارسٌ يفحص القيمةَ
+           المُرجَعةَ وحدَها لا يعمل أصلًا، فيمرُّ الطلبُ إلى الجدولِ القديم.
+           (مقيسٌ بمسبارٍ على وصلةٍ ميتة.) فيُلتقَط كلُّ ما يُرمى ويُقلَب منعًا. */
+      try {
         $gst = $conn->prepare(
             "SELECT MAX(CASE WHEN i.item_id IS NULL THEN -1 ELSE i.allow END) t_view,
                     MAX(COALESCE(i.can_add,0)) t_add,
@@ -365,25 +423,47 @@ function get_module_permissions($conn, $module_id) {
               WHERE g.user_id = ? AND g.revoked_at IS NULL
                 AND (g.valid_to IS NULL OR g.valid_to > NOW())"
         );
-        if ($gst) {
-            $gst->bind_param('ii', $module_id, $gov_user_id);
-            if ($gst->execute()) {
-                $gv = $gst->get_result()->fetch_assoc();
-                // t_view: NULL = لا تغطيةَ بقالبٍ نافذٍ ⇒ المسارُ القائم
-                //         -1  = مغطًّى والشاشةُ خارجَ قالبِه ⇒ منعٌ بالقالب
-                if ($gv !== null && $gv['t_view'] !== null) {
-                    $gst->close();
-                    $allowed = ((int) $gv['t_view']) === 1;
-                    return [
-                        'can_view' => $allowed,
-                        'can_add' => $allowed && (int) $gv['t_add'] === 1,
-                        'can_edit' => $allowed && (int) $gv['t_edit'] === 1,
-                        'can_delete' => $allowed && (int) $gv['t_del'] === 1,
-                    ];
-                }
-            }
-            $gst->close();
+        if (!$gst) {
+            return _deny_all_permissions('policy_store_unreadable_prepare');
         }
+        $gst->bind_param('ii', $module_id, $gov_user_id);
+        if (!$gst->execute()) {
+            $gst->close();
+            return _deny_all_permissions('policy_store_unreadable_execute');
+        }
+        $gres = $gst->get_result();
+        if ($gres === false) {
+            $gst->close();
+            return _deny_all_permissions('policy_store_unreadable_result');
+        }
+        $gv = $gres->fetch_assoc();
+        $gst->close();
+        // t_view: NULL = لا تغطيةَ بقالبٍ نافذٍ ⇒ المسارُ القائم
+        //         -1  = مغطًّى والشاشةُ خارجَ قالبِه ⇒ منعٌ بالقالب
+        if ($gv !== null && $gv['t_view'] !== null) {
+            $allowed = ((int) $gv['t_view']) === 1;
+            return [
+                'can_view' => $allowed,
+                'can_add' => $allowed && (int) $gv['t_add'] === 1,
+                'can_edit' => $allowed && (int) $gv['t_edit'] === 1,
+                'can_delete' => $allowed && (int) $gv['t_del'] === 1,
+            ];
+        }
+
+        /* ⛔ **ومن بلغ «معياريًّا منفَّذًا» لا يعود إلى القديمِ ولو فُقد قالبُه**
+             (PERM-01 §6-②). وبلا هذا يصير **سحبُ المنحةِ بلا أثر**: يخرج
+             المستخدمُ من التغطيةِ فيسقط إلى الجدولِ القديمِ وتبقى الشاشةُ
+             مفتوحة — مقيسٌ حيًّا في `tests/perm01_revocation_next_request.php`.
+           ◆ و`unknown` (تعذُّرُ قراءةِ سجلِّ الأوضاع) يُعامَل معاملةَ المعياريِّ
+             — فالشكُّ في الوضعِ يُحسم منعًا لا فتحًا. */
+        $__mode = function_exists('ems_auth_mode') ? ems_auth_mode($conn, $gov_user_id) : 'none';
+        if ($__mode === 'canonical' || $__mode === 'unknown') {
+            return _deny_all_permissions('canonical_without_profile:' . $__mode);
+        }
+      } catch (\Throwable $govT) {
+        /* ◆ ولا يُبتلع الخللُ صامتًا: يُسمّى في سجلِّ الردِّ ثمَّ يُمنع. */
+        return _deny_all_permissions('policy_store_unreadable_throw');
+      }
     }
 
     $stmt = $conn->prepare(

@@ -21,7 +21,12 @@ if (!$is_super_admin && $company_id <= 0) {
     exit();
 }
 
-$page_permissions = check_page_permissions($conn, 'timesheet');
+/* ◆ **هويّةُ البابِ هويّةُ شاشتِه**: كانت المفردةُ `timesheet` تُحَلُّ بالمرحلةِ
+     الثانيةِ إلى `Timesheet/timesheet.php` — وهي **شاشةٌ أخرى قائمة**؛ فمنحُ
+     هذه الشاشةِ (`Timesheet/view_timesheet.php`) كان خاملًا والحكمُ يقع
+     بمنحِ غيرِها. والدورُ 11 وحدَه يملك الثانيةَ دونَ الأولى — وهو **بلا
+     مستخدمٍ حيّ**، فالتصحيحُ لا يُسقِط أحدًا. */
+$page_permissions = check_page_permissions($conn, 'Timesheet/view_timesheet.php');
 $can_view = $page_permissions['can_view'];
 if (!$can_view) {
     ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية عرض ساعات العمل ❌', 'GOV-PERM-403', '');

@@ -1,6 +1,6 @@
 <?php
 /**
- * tools/perm01_acceptance.php — معيارُ القبول: المقاييسُ الواحدُ والثلاثون (§10 · §12-⑩)
+ * tools/perm01_acceptance.php — معيارُ القبول: المقاييسُ الاثنان والثلاثون (§10 · §12-⑩)
  * ═══════════════════════════════════════════════════════════════════════════
  * ◆ **يقيس ولا يدّعي**: كلُّ بندٍ إمّا **مقيسٌ برقم**، وإمّا **غيرُ مقيسٍ
  *   ويُسمّى سببُه** — بنصِّ الأمر «وما لم تستطع قياسه — سمِّه ولا تخمّنه».
@@ -134,12 +134,23 @@ $add(10, 'قياسُ الفارقِ على أعلامِ الكتابة', 'منف
 /* ═══ الأثرُ والواجهة ════════════════════════════════════════════════════ */
 $hasChangeLog = $one("SELECT COUNT(*) FROM information_schema.TABLES
                        WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='perm_change_log'") > 0;
+/* ◆ وجودُ الجدولِ لا يكفي — **الكاتبُ موصولٌ بمنفذٍ حيّ**: سحبُ المنحةِ
+     في `Governance/auth_grants.php` يكتب سطرَ الأثر. */
+$logWired = $grep('Governance/auth_grants.php', 'ems_perm_change_log');
 $add(11, 'كتابةٌ في جدولِ الصلاحياتِ بلا أثرِ تغيير', 'صفر',
-     $hasChangeLog ? 'سجلٌّ قائم' : 'كلُّ الكتابات', $hasChangeLog ? 'PASS' : 'FAIL',
-     'لا سجلَّ تغييرٍ للجدولَين الحاكمَين');
+     ($hasChangeLog && $logWired) ? 'صفر — السجلُّ قائمٌ وموصول'
+        : ($hasChangeLog ? 'قائمٌ وغيرُ موصول' : 'كلُّ الكتابات'),
+     ($hasChangeLog && $logWired) ? 'PASS' : 'FAIL',
+     'الصفوفُ المسجَّلةُ الآن: ' . max(0, $one('SELECT COUNT(*) FROM perm_change_log')));
 
-$matrixWrites = $grep('Governance/perm_matrix.php', 'INSERT INTO role_permissions');
-$add(12, 'واجهةٌ تحرّر طبقةً لا تحكم', 'صفر', $matrixWrites ? 'قائمة (perm_matrix تكتب role_permissions)' : 'صفر',
+/* ⛔ **ووجودُ نصِّ SQL ليس كتابةً قابلةً للبلوغ**: بعدَ PERM-01 §7 صارت المصفوفةُ
+     قراءةً تاريخيّةً بحارسٍ يردُّ الطلبَ الكاتبَ قبلَ بلوغِه الجملة. فالمقياسُ
+     يسأل عن **الحارسِ** لا عن بقاءِ الشيفرةِ الميتةِ خلفَه. */
+$roMatrix = $grep('Governance/perm_matrix.php', '$PERM01_MATRIX_READONLY = true');
+$roGuard  = $grep('Governance/perm_matrix.php', 'if ($PERM01_MATRIX_READONLY) {');
+$matrixWrites = !($roMatrix && $roGuard);
+$add(12, 'واجهةٌ تحرّر طبقةً لا تحكم', 'صفر',
+     $matrixWrites ? 'قائمة (perm_matrix تكتب role_permissions)' : 'صفر — المصفوفةُ قراءةٌ تاريخيّة',
      $matrixWrites ? 'FAIL' : 'PASS', 'والتغطيةُ تامّةٌ فحفظُها لا يسري على أحد');
 
 $kinds = array();
@@ -168,19 +179,55 @@ $noMy = $one("SELECT COUNT(*) FROM gov_role_profiles p WHERE p.state='active' AN
 $add(16, 'قالبٌ نافذٌ بلا بنودِ «مساحة عملي»', 'صفر', $noMy, $noMy === 0 ? 'PASS' : 'FAIL',
      'بنودُ مساحتي المعياريّة: ' . $myItems);
 
+/* ◆ **الرمزُ هويّةٌ والمسارُ وجهةٌ — ولا يُقاس أحدُهما بالآخر**: كان البندُ
+     يُقاس بمطابقةِ **مسارِه** بـ`modules.code`، فأخرج ستّةَ بنودٍ «بلا رمز»
+     وكلُّها مرموزةٌ مسجَّلة: نُقلت ملفّاتُها من `admin/` إلى `main/`
+     (التزام PHASE2-0a) و**هويّتُها الصلاحيّةُ ثبتت عمدًا** — `$MODULE_CODE
+     = 'admin/…'` منصوصًا في الشاشةِ نفسِها. فذاك سؤالُ «أين الملفّ» لا
+     سؤالُ «بأيِّ رمزٍ يُحكَم».
+   ◆ **والحاكمُ في زمنِ التشغيل `nav_items.module_id`**: `perm_nav_view_exists_sql`
+     تفحص `module_id` لا `permission_code`؛ وقيمةُ الأخيرِ **لا تُقرأ أصلًا**
+     — تُقرأ NULLيّتُه علمًا على «لا فحصَ هنا، حارسُه في وجهتِه». فقياسُه
+     بقيمتِه يُبلِّغ عن `'0'` و`RPR-OPS-11` عطبًا وهي لا تُستشار. */
 $navNoPerm = $one("SELECT COUNT(*) FROM nav_items n WHERE n.active=1
-   AND NOT EXISTS(SELECT 1 FROM modules m WHERE m.code = n.route)");
-$add(17, 'بندُ ملاحةٍ نافذٌ بلا رمزِ صلاحية', 'صفر', $navNoPerm, $navNoPerm === 0 ? 'PASS' : 'FAIL');
+                    AND (n.module_id IS NULL OR n.module_id = 0
+                         OR NOT EXISTS(SELECT 1 FROM modules m WHERE m.id = n.module_id))");
+$navRouteUnreg = $one("SELECT COUNT(DISTINCT SUBSTRING_INDEX(SUBSTRING_INDEX(n.route,'?',1),'#',1))
+                         FROM nav_items n WHERE n.active=1 AND n.route <> ''
+                          AND NOT EXISTS(SELECT 1 FROM modules m
+                                WHERE m.code = SUBSTRING_INDEX(SUBSTRING_INDEX(n.route,'?',1),'#',1))");
+$add(17, 'بندُ ملاحةٍ نافذٌ بلا رمزِ صلاحية', 'صفر', $navNoPerm, $navNoPerm === 0 ? 'PASS' : 'FAIL',
+     'ملاحظةٌ مسمّاةٌ لا مطويّة: ' . $navRouteUnreg . ' مسارًا لا يطابق نصُّه رمزًا مسجَّلًا — '
+   . 'وهي هويّاتٌ ثابتةٌ لملفّاتٍ نُقلت، لا بنودٌ بلا رمز');
 
 $add(18, 'مساراتُ حلِّ الوصولِ في زمنِ التشغيل', 'واحد',
      'واحدٌ (get_module_permissions) + 6 إعفاءاتٍ مُعلَنة', 'PASS',
      'والإعفاءاتُ تُعدُّ منفصلةً ولا تُحسَب مسارًا — بنصِّ §6');
 
 /* ═══ ما لم يُبنَ بعد ════════════════════════════════════════════════════ */
-$add(19, 'مستخدمٌ حيٌّ بوضعِ تفويضٍ ملتبس', 'صفر', 'غيرُ مقيس', 'UNMEASURED',
-     'لا سجلَّ «أوضاع الانتقال» (قديم · ظلّ · معياريّ) — §6-②');
-$add(20, 'مستخدمٌ معياريٌّ يسقط إلى القديم', 'صفر', 'ممكنٌ بنيويًّا', 'FAIL',
-     'get_module_permissions تسقط للفرعِ القديمِ عند خللِ القراءة — والأمرُ يوجب منعًا بإنذار');
+$hasModes = $one("SELECT COUNT(*) FROM information_schema.TABLES
+                   WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='perm01_auth_mode'") > 0;
+$ambiguous = $hasModes
+    ? $one("SELECT COUNT(*) FROM users u LEFT JOIN perm01_auth_mode m ON m.user_id=u.id
+             WHERE $LIVE AND m.user_id IS NULL")
+    : -1;
+$add(19, 'مستخدمٌ حيٌّ بوضعِ تفويضٍ ملتبس', 'صفر',
+     $hasModes ? $ambiguous : 'لا سجلَّ أوضاع',
+     ($hasModes && $ambiguous === 0) ? 'PASS' : 'FAIL',
+     $hasModes ? ('معياريّون: ' . $one("SELECT COUNT(*) FROM perm01_auth_mode WHERE mode='canonical'"))
+               : 'لا سجلَّ «أوضاع الانتقال» (قديم · ظلّ · معياريّ) — §6-②');
+/* ◆ **والمقياسُ يسأل عن الحارسِ لا عن النيّة**: ثلاثةُ مواضعِ فشلٍ مُسمّاةٌ
+     في الشيفرةِ + التقاطُ كلِّ ما يُرمى + شاهدٌ سالبٌ يُثبته بوصلةٍ ميتة. */
+$fcNamed = $grep('includes/permissions_helper.php', 'policy_store_unreadable');
+$fcThrow = $grep('includes/permissions_helper.php', 'policy_store_unreadable_throw');
+$fcTest  = $has('tests/perm01_failclosed_policy_store.php');
+$fcMode = $grep('includes/permissions_helper.php', 'canonical_without_profile');
+$failClosed = ($fcNamed && $fcThrow && $fcTest && $fcMode);
+$add(20, 'مستخدمٌ معياريٌّ يسقط إلى القديم', 'صفر',
+     $failClosed ? 'صفر — الفشلُ يمنع ويُسجَّل' : 'ممكنٌ بنيويًّا',
+     $failClosed ? 'PASS' : 'FAIL',
+     $failClosed ? 'مُثبَتٌ بشاهدَين: وصلةٌ ميتة (9/9) وسحبُ منحةٍ (7/7) — والمعياريُّ لا يسقط ولو فُقد قالبُه'
+                 : 'get_module_permissions تسقط للفرعِ القديمِ عند خللِ القراءة');
 $add(21, 'فرقُ تفويضٍ بلا تفسير', 'صفر', 'غيرُ مقيس', 'UNMEASURED', 'يلي جدولَ الصلاحيةِ الفعّالةِ المادّيّ');
 $add(22, 'فرقٌ بين الرابطِ المباشرِ وحكمِ الحارس', 'صفر', 'غيرُ مقيس', 'UNMEASURED',
      'يحتاج مسبارَ تصييرٍ يقارن الرابطَ المُصيَّرَ بحكمِ الحارسِ لكلِّ دور');
@@ -218,6 +265,60 @@ $add(30, 'ضابطٌ موثَّقٌ يُعلَن نافذًا وهو غيرُ م
 $add(31, 'التجميدُ نافذٌ حتى إشعار', 'نافذ',
      $one("SELECT COUNT(*) FROM gov_policy_freeze WHERE active=1") . ' مدًى',
      $one("SELECT COUNT(*) FROM gov_policy_freeze WHERE active=1") >= 2 ? 'PASS' : 'FAIL');
+
+/* ═══ ٣٢ — شاشةٌ بهويّتَين ═══════════════════════════════════════════════
+   ◆ **المقياسُ الذي لم يكن**: كان يُسأل «أللبندِ رمزٌ؟» ولا يُسأل «أهو **رمزُ
+     شاشتِه**؟». والقائمةُ تُظهر بالوحدةِ المربوطةِ بالبند، والبابُ يُنفِذ
+     بالمفردةِ المكتوبةِ في الشاشة — فإن افترقتا صار للشاشةِ حكمان.
+   ⛔ **والمقارنةُ بعدَ الحلِّ لا قبلَه**: `check_page_permissions` تحلُّ المفردةَ
+     على ثلاثِ مراحلَ (تامّةٌ · ذيلُ `/الاسم.php` · احتواء)، فمقارنةُ النصِّ
+     بالنصِّ تُبلِّغ افتراقًا حيث لا افتراق — `'equipments'` تحلُّ إلى وحدةِ
+     `Equipments/equipments.php` نفسِها. فتُحاكى المراحلُ ثمَّ يُقارَن المعرِّف.
+   ◆ **وما لا يُقرأ يُسمَّى لا يُخمَّن**: ملفٌّ لا يحمل مفردةً نصّيّةً لا يُعَدُّ
+     مطابقًا ولا مفترقًا — يُعَدُّ في خانتِه. */
+$resolveId = function ($code) use ($db) {
+    $e = $db->real_escape_string($code);
+    foreach (array("code='{$e}'",
+                   "code LIKE '%/{$e}.php' ORDER BY CHAR_LENGTH(code) ASC, id ASC",
+                   "code LIKE '%{$e}%' OR name LIKE '%{$e}%' ORDER BY CHAR_LENGTH(code) ASC, id ASC") as $w) {
+        $r = $db->query("SELECT id FROM modules WHERE {$w} LIMIT 1");
+        if ($r && $r->num_rows) { return (int) $r->fetch_row()[0]; }
+    }
+    return 0;
+};
+$APPROOT = dirname(__DIR__);
+$twoIds = 0; $twoList = array(); $noLit = 0; $benign = 0;
+$r = $db->query("SELECT DISTINCT SUBSTRING_INDEX(SUBSTRING_INDEX(n.route,'?',1),'#',1) rt, n.module_id nid
+                   FROM nav_items n JOIN modules m ON m.id = n.module_id
+                  WHERE n.active = 1 AND n.route <> ''");
+while ($x = $r->fetch_assoc()) {
+    $f = $APPROOT . '/' . $x['rt'];
+    if (!is_file($f)) { continue; }
+    $s = (string) @file_get_contents($f);
+    if (preg_match('/check_page_permissions\(\s*\$conn\s*,\s*\'([^\']+)\'/', $s, $m)) { $lit = $m[1]; }
+    elseif (preg_match('/check_page_permissions\(\s*\$conn\s*,\s*(\$\w+)/', $s, $m)
+            && preg_match('/' . preg_quote($m[1], '/') . '\s*=\s*\'([^\']+)\'/', $s, $m2)) { $lit = $m2[1]; }
+    elseif (preg_match('/fin_page_perms\(\s*\$conn\s*,\s*\'([^\']+)\'/', $s, $m)) { $lit = $m[1]; }
+    else { $noLit++; continue; }
+    $rid = $resolveId($lit);
+    if ($rid === 0 || $rid === (int) $x['nid']) { continue; }
+    /* ◆ **والافتراقُ يُفرَز بأثرِه لا بوجودِه**: إن كان البابُ **أوسعَ** من
+         القائمةِ فلا يُردُّ من يرى الرابطَ — وهو حالُ الدمجِ المُعلَن
+         (`dept_inbox` صار تبويبًا في `tickets_list`، والملفُّ مُحوِّلٌ يبقى
+         لأنَّ أربعةً وثلاثين صفَّ تنقُّلٍ تقصده). والحرِجُ أن يرى ويُردَّ. */
+    $rl = function ($mid) use ($db) {
+        $r = $db->query("SELECT DISTINCT role_id FROM role_permissions
+                          WHERE module_id = " . (int) $mid . " AND can_view = 1");
+        $o = array(); while ($z = $r->fetch_row()) { $o[(int) $z[0]] = 1; } return $o; };
+    $seeNotEnter = array_diff_key($rl((int) $x['nid']), $rl($rid));
+    if ($seeNotEnter) { $twoIds++; $twoList[] = $x['rt'] . ' (' . count($seeNotEnter) . ' دورًا)'; }
+    else { $benign++; }
+}
+$add(32, 'شاشةٌ تُعرَض بهويّةٍ وتُحرَس بأخرى فتردُّ من يراها', 'صفر', $twoIds,
+     $twoIds === 0 ? 'PASS' : 'FAIL',
+     ($twoList ? 'حرِجة: ' . implode(' · ', array_slice($twoList, 0, 4)) . ' — ' : '')
+   . 'مفترقٌ بابُه أوسعُ فلا يردُّ أحدًا: ' . $benign
+   . ' · وبلا مفردةٍ نصّيّةٍ تُقرأ: ' . $noLit . ' (خاناتٌ مسمّاةٌ لا مطويّة)');
 
 /* ═══ العرض ══════════════════════════════════════════════════════════════ */
 $mark = array('PASS' => '[✔]', 'FAIL' => '[✘]', 'UNMEASURED' => '[◆]');

@@ -55,11 +55,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'revok
     $gid = (int) ($_POST['grant_id'] ?? 0);
     $why = trim((string) ($_POST['revoke_reason'] ?? ''));
     if ($gid > 0 && $why !== '') {
+        /* ◆ **صورةُ ما قبلَ التغييرِ تُلتقَط قبلَه لا بعدَه**: بعدَ السحبِ لا يبقى
+             ما يُقارَن به، فسطرُ الأثرِ يصير «تغيَّر شيءٌ» بلا «من ماذا». */
+        $__before = array('user_id' => 0, 'profile' => '');
+        if ($bs = $conn->prepare("SELECT g.user_id, p.profile_code
+                                    FROM gov_authority_grants g
+                                    LEFT JOIN gov_role_profiles p ON p.profile_id = g.profile_id
+                                   WHERE g.grant_id = ? LIMIT 1")) {
+            $bs->bind_param('i', $gid);
+            if ($bs->execute()) {
+                $br = $bs->get_result();
+                if ($br && ($bx = $br->fetch_assoc())) {
+                    $__before = array('user_id' => (int) $bx['user_id'],
+                                      'profile' => (string) $bx['profile_code']);
+                }
+            }
+            $bs->close();
+        }
+
         $st = $conn->prepare("UPDATE gov_authority_grants
                                  SET revoked_at = NOW(), reason = CONCAT(reason, ' | سُحب: ', ?)
                                WHERE grant_id = ? AND revoked_at IS NULL");
         $st->bind_param('si', $why, $gid);
-        if ($st->execute() && $st->affected_rows > 0) { $flash = 'سحب المنح وسجل سببه'; $flashKind = 'success'; }
+        if ($st->execute() && $st->affected_rows > 0) {
+            $flash = 'سحب المنح وسجل سببه'; $flashKind = 'success';
+            /* ⛔ **وتغييرُ صلاحيّةٍ بلا أثرٍ لا يُقبل** (PERM-01 §7-⑤): سؤالُ
+                 «من سحب ومتى ولماذا» يُجاب بسطرٍ واحدٍ في `perm_change_log`. */
+            require_once __DIR__ . '/../includes/perm_change_log.php';
+            ems_perm_change_log($conn, 'grant', 'revoke', array(
+                'subject_kind' => 'user',
+                'subject_id'   => $__before['user_id'],
+                'screen_code'  => '',
+                'before'       => 'منحة نافذة على ' . $__before['profile'],
+                'after'        => 'مسحوبة',
+                'reason'       => $why,
+                'source'       => $SCREEN,
+            ));
+        }
         else { $flash = 'لم يتغير شيء — المنح مسحوب سلفا أو غير موجود'; $flashKind = 'warning'; }
         $st->close();
     } else {

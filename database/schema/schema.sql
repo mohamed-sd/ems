@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-04 16:19:20
--- الجداول: 1244 · المناظير: 29
+-- المصدر: equipation_manage · التوليد: 2026-09-04 17:54:57
+-- الجداول: 1246 · المناظير: 29
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -16349,6 +16349,16 @@ CREATE TABLE `payroll_time_inputs` (
   CONSTRAINT `ck_time_input_qty` CHECK (`qty` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── Table: perm01_auth_mode ──
+CREATE TABLE `perm01_auth_mode` (
+  `user_id` int(11) NOT NULL,
+  `mode` enum('legacy','shadow','canonical') NOT NULL DEFAULT 'legacy' COMMENT 'قديم | ظل معياري يقاس ولا ينفذ | معياري منفذ لا يسقط',
+  `set_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `set_by` int(11) NOT NULL DEFAULT 0,
+  `reason` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='PERM-01 §6-2 — وضع كل مستخدم معلن لا ضمني';
+
 -- ── Table: perm01_target_item ──
 CREATE TABLE `perm01_target_item` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -16372,6 +16382,28 @@ CREATE TABLE `perm01_target_profile` (
   `built_at` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`workspace_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='PERM-01 §3-5 — الهدف المعياري بمساحة من ورقة الدليل';
+
+-- ── Table: perm_change_log ──
+CREATE TABLE `perm_change_log` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL DEFAULT 0,
+  `changed_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `actor_user_id` int(11) NOT NULL DEFAULT 0 COMMENT 'من غير — صفر يعني هجرة او اداة',
+  `actor_role` varchar(16) NOT NULL DEFAULT '',
+  `layer` varchar(24) NOT NULL COMMENT 'role_permissions | profile_item | grant | profile_state',
+  `verb` varchar(16) NOT NULL COMMENT 'insert | update | delete | revoke | activate | retire',
+  `subject_kind` varchar(16) NOT NULL DEFAULT '' COMMENT 'role | user | profile',
+  `subject_id` int(11) NOT NULL DEFAULT 0,
+  `screen_code` varchar(160) NOT NULL DEFAULT '',
+  `before_val` varchar(255) NOT NULL DEFAULT '' COMMENT 'ما كان — نص لا مؤشر',
+  `after_val` varchar(255) NOT NULL DEFAULT '',
+  `reason` varchar(255) NOT NULL DEFAULT '',
+  `source_screen` varchar(160) NOT NULL DEFAULT '' COMMENT 'من اي منفذ وقع',
+  PRIMARY KEY (`id`),
+  KEY `ix_subject` (`subject_kind`,`subject_id`),
+  KEY `ix_screen` (`screen_code`),
+  KEY `ix_when` (`changed_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='PERM-01 §7-5 — من غير الصلاحية ومتى ولماذا';
 
 -- ── Table: perm_shadow_diffs ──
 CREATE TABLE `perm_shadow_diffs` (
