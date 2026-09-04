@@ -97,13 +97,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
    بحكمه والنتيجةُ النهائية» — يُحسب من حيث يقع المنعُ فعلًا (modules ×
    role_permissions) لا من طبقة SEC-01 الفارغة. ───────────────────────── */
 require_once __DIR__ . '/../includes/perm_explain_live.php';
-$px_role   = isset($_GET['px_role']) ? intval($_GET['px_role']) : 0;
+/* ◆ **الحبّةُ مستخدمٌ لا دور**: المنحُ يقع على الفاعلِ لا على دورِه، فسؤالٌ
+     بالدورِ وحدَه لا جوابَ له إلّا بالتقريب. والقائمةُ تُظهر دورَ كلِّ فاعلٍ
+     بجانبِ اسمِه فلا يضيع التصنيفُ الذي كان. */
+$px_user   = isset($_GET['px_user']) ? intval($_GET['px_user']) : 0;
 $px_screen = isset($_GET['px_screen']) ? trim((string) $_GET['px_screen']) : '';
-$px_result = ($px_role > 0 && $px_screen !== '')
-    ? ems_explain_screen_access($conn, $px_role, $px_screen, false) : null;
-$px_roles = array();
-$__rr = mysqli_query($conn, "SELECT id, name FROM roles ORDER BY id");
-while ($__rr && ($__x = mysqli_fetch_assoc($__rr))) { $px_roles[] = $__x; }
+$px_result = ($px_user > 0 && $px_screen !== '')
+    ? ems_explain_screen_access($conn, $px_user, $px_screen) : null;
+$px_users = ems_explain_subject_list($conn);
 $px_screens = array();
 $__sr = mysqli_query($conn, "SELECT code, name FROM modules WHERE code LIKE '%.php' ORDER BY name LIMIT 400");
 while ($__sr && ($__x = mysqli_fetch_assoc($__sr))) { $px_screens[] = $__x; }
@@ -176,12 +177,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
             <div class="filter-body">
         <form method="get" action="" class="ems-form px-filter-form">
-            <div class="form-group px-w-220"><label for="emsf_615_52acc">الدور</label>
-                <select name="px_role" class="form-control" id="emsf_615_52acc">
+            <div class="form-group px-w-320"><label for="emsf_615_52acc">المستخدم</label>
+                <select name="px_user" class="form-control" id="emsf_615_52acc">
                     <option value="">— اختر —</option>
-                    <?php foreach ($px_roles as $r0): ?>
-                    <option value="<?php echo (int) $r0['id']; ?>"<?php echo $px_role === (int) $r0['id'] ? ' selected' : ''; ?>>
-                        <?php echo htmlspecialchars($r0['id'] . ' — ' . $r0['name'], ENT_QUOTES, 'UTF-8'); ?></option>
+                    <?php foreach ($px_users as $r0): ?>
+                    <option value="<?php echo (int) $r0['id']; ?>"<?php echo $px_user === (int) $r0['id'] ? ' selected' : ''; ?>>
+                        <?php echo htmlspecialchars($r0['name'] . ' (دور ' . $r0['role']
+                            . ($r0['role_name'] ? ': ' . $r0['role_name'] : '') . ')', ENT_QUOTES, 'UTF-8'); ?></option>
                     <?php endforeach; ?>
                 </select></div>
             <div class="form-group px-w-320"><label for="emsf_616_5b519">الشاشة</label>

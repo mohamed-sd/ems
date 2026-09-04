@@ -379,8 +379,100 @@ if (!function_exists('ems_auth_mode')) {
     }
 }
 
+/* ═══ خدمةُ التتبّعِ — PERM-01 §7-③ ══════════════════════════════════════════
+   ◆ **الشرحُ يمرُّ بمسارِ القرارِ ولا يحاكيه**: كان `ems_explain_screen_access`
+     يعيد بناءَ الحكمِ من `modules` × `role_permissions` وحدَهما — أي **يشرح
+     طبقةً لم تعد تحكم أحدًا**: التغطيةُ 75 من 75، والقرارُ يقع في طبقةِ
+     القوالب. فكان المفسِّرُ يقول «مسموح» حيث يمنع الحارسُ والعكس.
+   ◆ **فالتتبّعُ حاشيةٌ على المسارِ نفسِه لا نسخةٌ ثانيةٌ منه**: نقاطُ الرصدِ
+     مبثوثةٌ في `get_module_permissions`، ولا يمكن لشرحٍ أن ينحرف عن حكمٍ
+     لأنّهما **نداءٌ واحد**.
+   ◆ **ومطفأٌ افتراضيًّا**: `note()` تخرج فورًا إن لم يكن الجمعُ قائمًا. */
+if (!function_exists('ems_perm_trace_on')) {
+    /** يبدأ جمعَ خطواتِ القرار. */
+    function ems_perm_trace_on() { $GLOBALS['__ems_perm_trace'] = array(); }
+
+    /** ينهي الجمعَ ويعيد الخطوات. */
+    function ems_perm_trace_off()
+    {
+        $t = isset($GLOBALS['__ems_perm_trace']) ? $GLOBALS['__ems_perm_trace'] : null;
+        $GLOBALS['__ems_perm_trace'] = null;
+        return is_array($t) ? $t : array();
+    }
+
+    /** يقيّد خطوةً — ولا يفعل شيئًا إن كان التتبّعُ مطفأً. */
+    function ems_perm_trace_note($step, $verdict, $detail = '')
+    {
+        if (!isset($GLOBALS['__ems_perm_trace']) || !is_array($GLOBALS['__ems_perm_trace'])) { return; }
+        $GLOBALS['__ems_perm_trace'][] = array(
+            'step' => (string) $step, 'verdict' => (string) $verdict, 'detail' => (string) $detail);
+    }
+
+    /**
+     * حكمُ الوصولِ **بخيارِ التتبّع** — نداءُ مسارِ القرارِ نفسِه لا محاكاتُه.
+     *
+     * ⛔ **والجلسةُ تُستعاد حتمًا**: القرارُ يقرأ `$_SESSION['user']`، فالتفسيرُ
+     *   عن غيرِك يلزمه إبدالُها لحظةً — وتركُها مبدَّلةً يقلب هويّةَ الطالب.
+     *
+     * @return array{allowed:bool, perms:array, chain:array, subject:array}
+     */
+    function ems_permission_trace($conn, $moduleId, $userId)
+    {
+        $prev = isset($_SESSION['user']) ? $_SESSION['user'] : null;
+        $u = null;
+        if ($st = $conn->prepare("SELECT id, role, company_id, name FROM users WHERE id = ? LIMIT 1")) {
+            $st->bind_param('i', $userId);
+            if ($st->execute()) { $r = $st->get_result(); $u = $r ? $r->fetch_assoc() : null; }
+            $st->close();
+        }
+        if (!$u) {
+            return array('allowed' => false, 'perms' => array(), 'subject' => array(),
+                'chain' => array(array('step' => 'الفاعل', 'verdict' => 'لا مستخدم بهذا المعرف', 'detail' => '')));
+        }
+        $_SESSION['user'] = array('id' => (int) $u['id'], 'role' => (string) $u['role'],
+                                  'company_id' => (int) $u['company_id'], 'name' => (string) $u['name']);
+        ems_perm_trace_on();
+        try {
+            $perms = get_module_permissions($conn, $moduleId);
+        } catch (\Throwable $t) {
+            ems_perm_trace_note('خلل', '✘ ' . $t->getMessage());
+            $perms = array('can_view' => false);
+        }
+        $chain = ems_perm_trace_off();
+        if ($prev === null) { unset($_SESSION['user']); } else { $_SESSION['user'] = $prev; }
+        return array('allowed' => !empty($perms['can_view']), 'perms' => $perms,
+                     'chain' => $chain, 'subject' => $u);
+    }
+}
+
+if (!function_exists('ems_explain_subject_list')) {
+    /**
+     * قائمةُ الفاعلين الذين يصحُّ السؤالُ عنهم — وهي بيانُ الشاشةِ لا حكمُها.
+     *
+     * ◆ **وموضعُها هنا لا في الشاشةِ ولا في المفسِّر**: كلاهما كان **خارجَ**
+     *   سجلِّ GAP-29، فاستعلامُ جدولِ مستأجِرٍ في أيٍّ منهما يرفع السقّاطةَ
+     *   ملفًّا فوقَ أساسِها — والأساسُ **يُخفَّض ولا يُرفع**. وهذا الملفُّ يقرأ
+     *   `users` أصلًا في خدمةِ التتبّع، فلا ملفَّ جديدًا يُضاف.
+     * ⛔ ونقلُ الاستعلامِ من شاشةٍ إلى ملفٍّ غيرِ محسوبٍ **نقلٌ للعطبِ لا حلٌّ**
+     *   — مقيسٌ: بقيت السقّاطةُ عند 608.
+     *
+     * @return array<int,array{id:int,name:string,role:string,role_name:?string}>
+     */
+    function ems_explain_subject_list(mysqli $conn)
+    {
+        $out = array();
+        $r = mysqli_query($conn, "SELECT u.id, u.name, u.role, r.name AS role_name
+                                    FROM users u LEFT JOIN roles r ON r.id = u.role
+                                   WHERE u.is_deleted = 0 AND u.status = 'active'
+                                   ORDER BY CAST(u.role AS UNSIGNED), u.name");
+        while ($r && ($x = mysqli_fetch_assoc($r))) { $out[] = $x; }
+        return $out;
+    }
+}
+
 function get_module_permissions($conn, $module_id) {
     if (!isset($_SESSION['user']) || !isset($_SESSION['user']['role'])) {
+        ems_perm_trace_note('الجلسة', 'x بلا جلسة - منع');
         return [
             'can_view' => false,
             'can_add' => false,
@@ -442,6 +534,9 @@ function get_module_permissions($conn, $module_id) {
         //         -1  = مغطًّى والشاشةُ خارجَ قالبِه ⇒ منعٌ بالقالب
         if ($gv !== null && $gv['t_view'] !== null) {
             $allowed = ((int) $gv['t_view']) === 1;
+            ems_perm_trace_note('طبقة القوالب',
+                $allowed ? 'v مغطى بقالب نافذ والشاشة داخله' : 'x مغطى بقالب نافذ والشاشة خارجه',
+                'وهذا هو الحكم النهائي - لا شاشة خارج القالب');
             return [
                 'can_view' => $allowed,
                 'can_add' => $allowed && (int) $gv['t_add'] === 1,
@@ -458,6 +553,8 @@ function get_module_permissions($conn, $module_id) {
              — فالشكُّ في الوضعِ يُحسم منعًا لا فتحًا. */
         $__mode = function_exists('ems_auth_mode') ? ems_auth_mode($conn, $gov_user_id) : 'none';
         if ($__mode === 'canonical' || $__mode === 'unknown') {
+            ems_perm_trace_note('وضع الانتقال', 'x ' . $__mode . ' بلا قالب يغطي هذه الشاشة',
+                'ومن بلغ معياريا لا يعود الى الجدول القديم - المنع صريح');
             return _deny_all_permissions('canonical_without_profile:' . $__mode);
         }
       } catch (\Throwable $govT) {
@@ -466,6 +563,8 @@ function get_module_permissions($conn, $module_id) {
       }
     }
 
+    ems_perm_trace_note('المسار القائم', '- غير مغطى بقالب نافذ - يحكمه role_permissions',
+        'الدور ' . $role_id);
     $stmt = $conn->prepare(
         "SELECT can_view, can_add, can_edit, can_delete
          FROM role_permissions
@@ -1189,6 +1288,8 @@ function enforce_module_permission_json($conn, $module_code, $permission = 'view
  * @return array
  */
 function _deny_all_permissions($reason = 'unresolved_module') {
+    /* ◆ وكلُّ منعٍ يمرُّ من هنا يُقيَّد في التتبّعِ بسببِه المسمّى. */
+    if (function_exists('ems_perm_trace_note')) { ems_perm_trace_note('منع', 'x ' . $reason); }
     ems_log_permission_denial($reason);
     return [
         'id'         => null,

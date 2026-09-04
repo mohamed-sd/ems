@@ -265,11 +265,79 @@ $add(20, 'مستخدمٌ معياريٌّ يسقط إلى القديم', 'صفر
      $failClosed ? 'PASS' : 'FAIL',
      $failClosed ? 'مُثبَتٌ بشاهدَين: وصلةٌ ميتة (9/9) وسحبُ منحةٍ (7/7) — والمعياريُّ لا يسقط ولو فُقد قالبُه'
                  : 'get_module_permissions تسقط للفرعِ القديمِ عند خللِ القراءة');
-$add(21, 'فرقُ تفويضٍ بلا تفسير', 'صفر', 'غيرُ مقيس', 'UNMEASURED', 'يلي جدولَ الصلاحيةِ الفعّالةِ المادّيّ');
-$add(22, 'فرقٌ بين الرابطِ المباشرِ وحكمِ الحارس', 'صفر', 'غيرُ مقيس', 'UNMEASURED',
-     'يحتاج مسبارَ تصييرٍ يقارن الرابطَ المُصيَّرَ بحكمِ الحارسِ لكلِّ دور');
-$add(23, 'تطابقُ شاشةِ التفسيرِ مع زمنِ التشغيل', '100%', 'لا خدمةَ تتبّع', 'FAIL',
-     'perm_explain قائمةٌ وتحسب بنفسِها — والأمرُ يوجب استدعاءَ خدمةِ القرارِ بخيارِ التتبّع');
+/* ═══ ㉑ — والفرقُ لا يُفسَّر قبلَ أن يُعرَف صاحبُه ══════════════════════════
+   ◆ **قِيست الطبقةُ فإذا هي لا تصالح أيَّ سجلِّ إنسانٍ في النظام**:
+     `effective_permissions.person_id` قيمُه (9701 · 9507 · 9002) **ليست في
+     `users` ولا في `persons`** (مداها 52..435)، ومفرداتُ `permission_code`
+     فيها **أفعالٌ** (`journal.post.x`) لا رموزَ شاشات.
+   ⛔ **فلا يُملأ الجدولُ بصلاحيّاتِ الشاشاتِ ليُقفل البند**: ذلك خلطُ مفردتَين
+     في وعاءٍ واحدٍ وجسرٌ مُختلَق — وهو أسوأُ من فراغِه. والمقياسُ يقول ما هو:
+     صفٌّ لا يُعرَف صاحبُه ولا مصدرُه **فرقٌ بلا تفسيرٍ بالتعريف**. */
+$epTotal = $one("SELECT COUNT(*) FROM effective_permissions");
+$epNoSubject = $one("SELECT COUNT(*) FROM effective_permissions ep
+                      WHERE NOT EXISTS(SELECT 1 FROM users u WHERE u.id = ep.person_id)
+                        AND NOT EXISTS(SELECT 1 FROM persons pr WHERE pr.person_id = ep.person_id)");
+$epNoSource = $one("SELECT COUNT(*) FROM effective_permissions
+                     WHERE source_kind = '' OR source_ref = '' OR source_ref IS NULL");
+$ep21 = $epNoSubject + $epNoSource;
+$add(21, 'فرقُ تفويضٍ بلا تفسير', 'صفر', $ep21, $ep21 === 0 ? 'PASS' : 'FAIL',
+     'من ' . $epTotal . ' صفًّا: ' . $epNoSubject . ' لا يُعرَف صاحبُه (معرِّفٌ خارجَ users وpersons) و'
+   . $epNoSource . ' بلا مصدرٍ مسمًّى — والمفرداتُ أفعالٌ لا شاشات، فطبقةٌ موازيةٌ لا تصالح سجلَّ الأشخاص');
+/* ═══ ㉒ — الرابطُ المُصيَّرُ وحكمُ الحارس ═════════════════════════════════
+   ◆ **بالتصييرِ الحيِّ لا بجدولِه**: الشجرةُ من `navarch_render` (المُصيِّرُ
+     الحاكم)، فصفٌّ في `nav_items` قد لا يُصيَّر — وحكمٌ على غيرِ المُصيَّرِ
+     حكمٌ على غيرِ محلِّه. ولكلِّ رابطٍ يُسأل `get_module_permissions` بجلسةِ
+     صاحبِه ثمَّ تُستعاد.
+   ⛔ **وصفرُه مضمونٌ بضابطٍ سالبٍ في الشاهد**: يُطفأ بندُ قالبٍ لرابطٍ مُصيَّرٍ
+     فيتحرّك العدُّ، ثمَّ يُستعاد — `tests/perm01_render_vs_guard.php`. */
+$rvgChecked = 0; $rvgDenied = 0; $rvgEx = array();
+if (is_file($ROOT . '/includes/navarch_renderer.php')) {
+    require_once $ROOT . '/includes/permissions_helper.php';
+    require_once $ROOT . '/includes/navarch_renderer.php';
+    $modByRoute = array();
+    $rr = $db->query("SELECT id, code FROM modules WHERE code LIKE '%.php'");
+    while ($xx = $rr->fetch_row()) { $modByRoute[strtolower(navarch_norm_route($xx[1]))] = (int) $xx[0]; }
+    $prevSess = isset($_SESSION['user']) ? $_SESSION['user'] : null;
+    $ur = $db->query("SELECT id, role, company_id FROM users
+                       WHERE is_deleted=0 AND status='active' AND company_id={$CO} ORDER BY id");
+    while ($uu = $ur->fetch_assoc()) {
+        $_SESSION['user'] = array('id' => (int) $uu['id'], 'role' => (string) $uu['role'],
+                                  'company_id' => (int) $uu['company_id'], 'name' => 'acceptance probe');
+        $ws = navarch_role_workspace($db, (int) $uu['role']);
+        $tree = navarch_render($db, $ws, (int) $uu['role'], array('include_shell' => false));
+        foreach ((isset($tree['groups']) ? $tree['groups'] : array()) as $gg) {
+            foreach ((isset($gg['items']) ? $gg['items'] : array()) as $itm) {
+                $kk = strtolower(navarch_norm_route($itm['route']));
+                if (!isset($modByRoute[$kk])) { continue; }
+                $rvgChecked++;
+                if (empty(get_module_permissions($db, $modByRoute[$kk])['can_view'])) {
+                    $rvgDenied++;
+                    if (count($rvgEx) < 3) { $rvgEx[] = '#' . $uu['id'] . ' ⟵ ' . $itm['route']; }
+                }
+            }
+        }
+    }
+    if ($prevSess === null) { unset($_SESSION['user']); } else { $_SESSION['user'] = $prevSess; }
+}
+$add(22, 'فرقٌ بين الرابطِ المباشرِ وحكمِ الحارس', 'صفر', $rvgDenied,
+     ($rvgChecked > 0 && $rvgDenied === 0) ? 'PASS' : ($rvgChecked === 0 ? 'UNMEASURED' : 'FAIL'),
+     $rvgChecked > 0
+        ? ('من ' . $rvgChecked . ' رابطًا مُصيَّرًا لكلِّ مستخدمٍ حيّ'
+           . ($rvgEx ? ' · ' . implode(' · ', $rvgEx) : '') . ' — والضابطُ السالبُ في الشاهد')
+        : 'تعذّر التصييرُ فلا يُقرأ صفرُه مطابقةً');
+/* ═══ ㉓ — التفسيرُ عينُ الحكمِ لا نسخةٌ منه ═══════════════════════════════
+   ◆ كان `perm_explain_live` يعيد بناءَ الحكمِ من `role_permissions` وحدَه —
+     أي **يشرح طبقةً لم تعد تحكم أحدًا**. فصار ينادي `ems_permission_trace`،
+     وهي `get_module_permissions` نفسُها بخيارِ التتبّع. */
+$expSrc = (string) @file_get_contents($ROOT . '/includes/perm_explain_live.php');
+$expOk  = (strpos($expSrc, 'ems_permission_trace') !== false)
+       && (strpos($expSrc, 'perm_row_for_module') === false)
+       && function_exists('ems_permission_trace');
+$add(23, 'تطابقُ شاشةِ التفسيرِ مع زمنِ التشغيل', '100%',
+     $expOk ? '100% — نداءٌ واحدٌ للقرارِ والتفسير' : 'لا خدمةَ تتبّع',
+     $expOk ? 'PASS' : 'FAIL',
+     $expOk ? 'مُثبَتٌ بـ24 زوجًا (12 سماحًا و12 منعًا) في tests/perm01_explain_matches_runtime.php'
+            : 'perm_explain يحسب بنفسِه — والأمرُ يوجب استدعاءَ خدمةِ القرارِ بخيارِ التتبّع');
 $revokeTest = $has('tests/perm01_revocation_next_request.php');
 $add(24, 'اختبارُ السحب: أوّلُ طلبٍ بعده منع', 'ناجح', $revokeTest ? 'قائم' : 'غيرُ مختبَر',
      $revokeTest ? 'PASS' : 'FAIL');
@@ -284,8 +352,32 @@ $add(27, 'كتابةٌ في جداولِ السياسةِ خارجَ الخدم�
      'لا خدمةَ كتابةٍ واحدة — §7-①');
 $bg = $one("SELECT COUNT(*) FROM information_schema.TABLES
              WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='break_glass_sessions'");
-$add(28, 'استعمالُ فتحٍ اضطراريٍّ بلا أثرِ تدقيق', 'صفر', $bg > 0 ? 'الجدولُ قائم' : 'لا فتحَ اضطراريّ',
-     'UNMEASURED', 'ولا يُنقَل مستخدمٌ إلى الإغلاقِ الافتراضيِّ قبلَ وجودِه — §7-④');
+/* ═══ ㉘ — الفتحُ الاضطراريُّ: مبنيٌّ ولا يفتح ══════════════════════════════
+   ◆ **المقيسُ ثلاثةُ أرقامٍ لا رقمٌ واحد**: استثناءاتٌ حيّةٌ · أحداثُ تدقيقٍ
+     من نوعِ `break_glass` · وهل **يقرؤه مسارُ القرارِ أصلًا**.
+   ⛔ **وصفرٌ على طبقةٍ غيرِ موصولةٍ ليس امتثالًا**: `BreakGlassService` يكتب
+     الاستثناءَ ويكتب سطرَ تدقيقِه في معاملةٍ واحدة — فالتدقيقُ مضمونٌ بالبناء.
+     لكنَّ `get_module_permissions` **لا تقرأ `permission_exceptions` إطلاقًا**،
+     فالفتحُ الاضطراريُّ لا يفتح شيئًا. وذلك يخالف شرطَ §7-④ نصًّا: «ولا يُنقَل
+     مستخدمٌ إلى الإغلاقِ الافتراضيِّ قبلَ وجودِه» — **وقد صرنا مغلقين افتراضيًّا**
+     (75 من 75 معياريًّا بلا سقوط). فالبندُ يرسُب على الشرطِ لا على العدّاد. */
+$bgLive  = $one("SELECT COUNT(*) FROM permission_exceptions WHERE is_break_glass = 1");
+$bgAudit = $one("SELECT COUNT(*) FROM permission_audit_events WHERE event_type = 'break_glass'");
+$bgUnaudited = $one("SELECT COUNT(*) FROM permission_exceptions ex
+                      WHERE ex.is_break_glass = 1
+                        AND NOT EXISTS(SELECT 1 FROM permission_audit_events ev
+                                        WHERE ev.event_type = 'break_glass'
+                                          AND ev.person_id = ex.person_id
+                                          AND ev.permission_code = ex.permission_code)");
+$bgWired = (strpos((string) @file_get_contents($ROOT . '/includes/permissions_helper.php'),
+                   'permission_exceptions') !== false);
+$closedByDefault = ($live > 0 && $cov === $live);
+$add(28, 'استعمالُ فتحٍ اضطراريٍّ بلا أثرِ تدقيق', 'صفر', $bgUnaudited,
+     ($bgUnaudited === 0 && $bgWired) ? 'PASS' : 'FAIL',
+     'بلا أثرٍ: ' . $bgUnaudited . ' من ' . $bgLive . ' استثناءً حيًّا · وأحداثُ تدقيقٍ مسجَّلة: ' . $bgAudit
+   . ' — و**مسارُ القرارِ لا يقرأ permission_exceptions** ('
+   . ($bgWired ? 'موصول' : 'غيرُ موصول') . ')، والنظامُ '
+   . ($closedByDefault ? 'مغلقٌ افتراضيًّا بالفعل' : 'ليس مغلقًا افتراضيًّا') . ' — §7-④');
 $finActions = 0;
 require_once $ROOT . '/includes/action_guard.php';
 $reg = function_exists('ems_action_guard_registry') ? ems_action_guard_registry() : array();
