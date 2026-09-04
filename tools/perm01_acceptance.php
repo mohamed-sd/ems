@@ -1,6 +1,6 @@
 <?php
 /**
- * tools/perm01_acceptance.php — معيارُ القبول: المقاييسُ الاثنان والثلاثون (§10 · §12-⑩)
+ * tools/perm01_acceptance.php — معيارُ القبول: المقاييسُ الثلاثة والثلاثون (§10 · §12-⑩)
  * ═══════════════════════════════════════════════════════════════════════════
  * ◆ **يقيس ولا يدّعي**: كلُّ بندٍ إمّا **مقيسٌ برقم**، وإمّا **غيرُ مقيسٍ
  *   ويُسمّى سببُه** — بنصِّ الأمر «وما لم تستطع قياسه — سمِّه ولا تخمّنه».
@@ -44,7 +44,7 @@ $add = function ($n, $title, $target, $measured, $verdict, $note = '') use (&$ro
 /* ═══ الفصلُ بين الواجبات ═══════════════════════════════════════════════ */
 $sodProfiles = -1;
 $pairs = array();
-$pq = $db->query("SELECT code, roles_a, roles_b FROM sec_sod_pairs
+$pq = $db->query("SELECT code, func_a, func_b, roles_a, roles_b FROM sec_sod_pairs
                    WHERE active=1 AND severity='block' AND scope='role'
                      AND roles_a<>'' AND roles_b<>'' AND roles_b<>'*'");
 while ($x = $pq->fetch_assoc()) { $pairs[] = $x; }
@@ -56,26 +56,50 @@ $screensOf = function ($csv) use ($db) {
     $o = array(); while ($z = $r->fetch_row()) { $o[$z[0]] = 1; } return $o;
 };
 $profItems = array();
-$r = $db->query("SELECT p.profile_id, i.item_ref FROM gov_role_profiles p
+/* ◆ **وتُحمَل أعلامُ الكتابةِ مع البند**: تصنيفُ التعارضِ إلى «تنفيذِ الطرفَين»
+     و«تداخلِ رؤيةٍ» يستحيل بلا علمِ الكتابة. */
+$r = $db->query("SELECT p.profile_id, i.item_ref, (i.can_add|i.can_edit|i.can_delete) w
+                   FROM gov_role_profiles p
                    LEFT JOIN gov_profile_items i ON i.profile_id=p.profile_id
                         AND i.item_kind='screen' AND i.allow=1
                   WHERE p.state='active'");
 while ($x = $r->fetch_assoc()) {
     $pid = (int) $x['profile_id'];
     if (!isset($profItems[$pid])) { $profItems[$pid] = array(); }
-    if ($x['item_ref'] !== null) { $profItems[$pid][$x['item_ref']] = 1; }
+    if ($x['item_ref'] !== null) { $profItems[$pid][$x['item_ref']] = (int) $x['w']; }
 }
-$hits = 0;
+/* ═══ ① — البوّابةُ على «تنفيذِ الطرفَين» (PERM-01-DEC §ق-٧ · إعادةُ تعريفِ §10)
+   ◆ **الصنفُ أ · تنفيذُ الطرفَين**: القالبُ يمنحه **أعلامَ كتابةٍ** على طرفَي
+     التعارضِ معًا — فيستطيع تنفيذَ الفعلَين، ولا يمنعه إلّا الحارسُ على الفعل.
+     **وهو وحدَه بوّابةُ الإغلاق.**
+   ◆ **الصنفُ ب · تداخلُ رؤيةٍ فقط**: يرى الشاشتَين ولا يملك تنفيذَ الطرفَين —
+     **مؤشِّرٌ فصليٌّ لا حاجزُ إغلاق**، ويُعرض ولا يُطوى.
+   ⛔ **والمقامُ يُقاس قبلَ أن يُقرأ صفرُه**: قِيس الصنفُ أ صفرًا وهو صفرٌ
+     **بنيويّ** — كانت أعلامُ الكتابةِ ساقطةً في القوالبِ كلِّها (2,831 بندًا)،
+     فلا أحدَ ينفّذ فعلًا واحدًا فضلًا عن طرفَين. ورُدَّت الأعلامُ في هجرة
+     2028_05_12، فصار الصنفُ أ رقمًا حيًّا. «حمرةٌ بمقامٍ متروك» ممنوعةٌ نصًّا. */
+$sodA = 0; $sodB = 0; $sodMat = 0;
+$MATERIAL = '/مالي|خزين|مشتر|صلاحي|بنك|دفع|مطابق/u';
 foreach ($pairs as $p) {
     $A = $screensOf($p['roles_a']); $B = $screensOf($p['roles_b']);
     $exA = array_diff_key($A, $B); $exB = array_diff_key($B, $A);
     if (!$exA || !$exB) { continue; }
+    $fam = (string) $p['func_a'] . ' / ' . (string) $p['func_b'];
     foreach ($profItems as $items) {
-        if (array_intersect_key($items, $exA) && array_intersect_key($items, $exB)) { $hits++; }
+        $hitA = array_intersect_key($items, $exA);
+        $hitB = array_intersect_key($items, $exB);
+        if (!$hitA || !$hitB) { continue; }
+        $wA = 0; foreach ($hitA as $z) { $wA |= $z; }
+        $wB = 0; foreach ($hitB as $z) { $wB |= $z; }
+        if ($wA && $wB) { $sodA++; if (preg_match($MATERIAL, $fam)) { $sodMat++; } }
+        else { $sodB++; }
     }
 }
-$add(1, 'قالبٌ نافذٌ فيه تعارضُ فصلِ واجباتٍ حرج', 'صفر', $hits, $hits === 0 ? 'PASS' : 'FAIL',
-     'مقياسٌ بالشاشةِ وهو سقفٌ أعلى — والضابطُ الفعليُّ على الفعل');
+$add(1, 'تعارضُ فصلِ واجباتٍ — تنفيذُ الطرفَين (صنف أ)', 'صفر', $sodA,
+     $sodA === 0 ? 'PASS' : 'FAIL',
+     'ومنها في العائلاتِ المادّيّةِ (تُغلق أوّلًا): ' . $sodMat
+   . ' · ومؤشِّرُ الصنفِ ب (تداخلُ رؤيةٍ فقط، لا حاجزَ إغلاق): ' . $sodB
+   . ' · والمجموعُ بالمقامِ القديم: ' . ($sodA + $sodB));
 
 $bothSides = 0;
 foreach ($pairs as $p) {
@@ -445,6 +469,31 @@ while ($x = $r->fetch_assoc()) {
     if ($seeNotEnter) { $twoIds++; $twoList[] = $x['rt'] . ' (' . count($seeNotEnter) . ' دورًا)'; }
     else { $benign++; }
 }
+/* ═══ ㉝ — الكتابةُ لا تسقط في التحوّل ══════════════════════════════════════
+   ⛔ **ثغرةٌ أعمَت اثنَين وثلاثين مقياسًا**: كلُّها كانت تسأل عن **العرض**، فسقطت
+     أعلامُ الكتابةِ كلُّها (2,831 بندًا · 32 قالبًا) والنظامُ صار للقراءةِ فقط
+     **بلا أن يحمرَّ مقياسٌ واحد**. فالتكافؤُ مع المصدرِ يُقاس في الاتّجاهَين. */
+$prRole = "(SELECT MIN(CAST(u2.role AS UNSIGNED)) FROM gov_authority_grants g2
+              JOIN users u2 ON u2.id=g2.user_id AND u2.is_deleted=0 AND u2.status='active'
+             WHERE g2.profile_id=i.profile_id AND g2.revoked_at IS NULL)";
+$actv = "JOIN gov_role_profiles p ON p.profile_id=i.profile_id AND p.state='active'";
+$wLost = $one("SELECT COUNT(*) FROM gov_profile_items i {$actv}
+                WHERE i.item_kind='screen' AND i.allow=1 AND (i.can_add|i.can_edit|i.can_delete)=0
+                  AND EXISTS(SELECT 1 FROM role_permissions rp JOIN modules m2 ON m2.id=rp.module_id
+                              WHERE m2.code=i.item_ref AND rp.role_id={$prRole}
+                                AND (rp.can_add=1 OR rp.can_edit=1 OR rp.can_delete=1))");
+$wOver = $one("SELECT COUNT(*) FROM gov_profile_items i {$actv}
+                WHERE i.item_kind='screen' AND i.allow=1 AND (i.can_add|i.can_edit|i.can_delete)=1
+                  AND NOT EXISTS(SELECT 1 FROM role_permissions rp JOIN modules m2 ON m2.id=rp.module_id
+                                  WHERE m2.code=i.item_ref AND rp.role_id={$prRole}
+                                    AND (rp.can_add=1 OR rp.can_edit=1 OR rp.can_delete=1))");
+$wHave = $one("SELECT COUNT(*) FROM gov_profile_items i {$actv}
+                WHERE i.item_kind='screen' AND i.allow=1 AND (i.can_add|i.can_edit|i.can_delete)=1");
+$add(33, 'أعلامُ كتابةٍ ساقطةٌ أو موسَّعةٌ في التحوّل', 'صفر', $wLost + $wOver,
+     ($wLost + $wOver) === 0 && $wHave > 0 ? 'PASS' : 'FAIL',
+     'فقدٌ: ' . $wLost . ' · توسعةٌ: ' . $wOver . ' · وبنودٌ بكتابةٍ الآن: ' . $wHave
+   . ' — مُثبَتٌ بضابطٍ سالبٍ في tests/perm01_write_flags_parity.php');
+
 $add(32, 'شاشةٌ تُعرَض بهويّةٍ وتُحرَس بأخرى فتردُّ من يراها', 'صفر', $twoIds,
      $twoIds === 0 ? 'PASS' : 'FAIL',
      ($twoList ? 'حرِجة: ' . implode(' · ', array_slice($twoList, 0, 4)) . ' — ' : '')
