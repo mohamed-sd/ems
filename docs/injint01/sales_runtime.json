@@ -1,0 +1,324 @@
+[
+    {
+        "route": "Clients\/clients.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "590 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Clients\/products.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "163.6 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Clients\/pricelists.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "167.9 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Clients\/units_of_measure.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "119.3 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Clients\/rate_books.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "117.5 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Opportunities\/opportunities.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "258.9 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Clients\/quotations.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "746.9 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Clients\/quotation_lines.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "84.5 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Clients\/quotation_negotiation.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "80.7 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Opportunities\/client_need_rfq.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "77.1 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Clients\/tenders.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "187.2 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Clients\/readiness_lines.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "184.1 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Clients\/activities.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "206.6 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Clients\/client_contacts.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "71.7 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Clients\/client_profile.php",
+        "code": 302,
+        "verdict": "REDIRECT",
+        "detail": "رُدَّ إلى clients.php",
+        "hits": []
+    },
+    {
+        "route": "movement\/client_tree.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "1307.3 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Projects\/projects.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "608.9 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Clients\/contract_events.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "177.5 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Clients\/contract_commitments.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "798.8 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Clients\/contract_amendments.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "633.4 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Contracts\/contract_obligations.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "109 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Contracts\/contract_guarantees.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "126.8 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Contracts\/contract_lines.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "128.1 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Contracts\/contract_baseline.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "118.4 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Contracts\/contract_lifecycle.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "126.7 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Contracts\/contract_monthly_plan.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "141.4 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Contracts\/contract_payment_schedule.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "130.5 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Contracts\/contract_resource_plan.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "139 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Contracts\/contract_sites.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "133.8 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Contracts\/price_terms.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "115.6 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Contracts\/penalties.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "99.2 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Contracts\/plan_actual_link.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "117.7 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Contracts\/contracts_details.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "73.4 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Contracts\/contract_coverage.php",
+        "code": 302,
+        "verdict": "REDIRECT",
+        "detail": "رُدَّ إلى contracts.php",
+        "hits": []
+    },
+    {
+        "route": "Contracts\/commercial_board.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "93.3 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Contracts\/unit_client_match.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "73.4 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Contracts\/unit_statement_client.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "80.3 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Operations\/unbilled.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "124.9 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Operations\/equipment_quota.php",
+        "code": 302,
+        "verdict": "REDIRECT",
+        "detail": "رُدَّ إلى dashboard.php",
+        "hits": []
+    },
+    {
+        "route": "Operations\/sites_board.php",
+        "code": 302,
+        "verdict": "REDIRECT",
+        "detail": "رُدَّ إلى dashboard.php",
+        "hits": []
+    },
+    {
+        "route": "Operations\/swap_request.php",
+        "code": 302,
+        "verdict": "REDIRECT",
+        "detail": "رُدَّ إلى dashboard.php",
+        "hits": []
+    },
+    {
+        "route": "Portal\/business_models.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "108.6 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Governance\/gov_dept_sal.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "92.7 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Risk\/risk_dept_sal.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "75.9 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Reports\/contract_report.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "85.9 ك.ب",
+        "hits": []
+    },
+    {
+        "route": "Reports\/contractall.php",
+        "code": 200,
+        "verdict": "CLEAN",
+        "detail": "86 ك.ب",
+        "hits": []
+    }
+]

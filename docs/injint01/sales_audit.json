@@ -1,0 +1,776 @@
+[
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Clients\/activities.php",
+        "line": 69,
+        "what": "SELECT activity_code FROM activities WHERE activity_code REGEXP '^ACT-  ⟵ $next_act_code $last_code_rows $act_gate",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Clients\/activities.php",
+        "line": 70,
+        "what": "AND is_deleted = 0 ORDER BY CAST(SUBSTRING(activity_code, 5) AS UNSIGN  ⟵ $next_act_code $last_code_rows $act_gate",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "معماريّ",
+        "sev": 2,
+        "code": "SURFACE_NOT_PLACED",
+        "file": "Clients\/activities.php",
+        "line": 0,
+        "what": "لا موضعَ له في nav_placements ولا nav_items",
+        "why": "يُفتَح بالمسارِ ولا يُبلَغ بالملاحة — «الصلاحيةُ تمنح الوصولَ والموضعُ يمنح الملاحة»."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Clients\/client_profile.php",
+        "line": 71,
+        "what": "SELECT COUNT(*) AS c FROM project p WHERE {TENANT_SCOPE} AND  ⟵ $projects_total $cp_agg $projects_active",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Clients\/client_profile.php",
+        "line": 74,
+        "what": "SELECT COUNT(*) AS c FROM project p WHERE {TENANT_SCOPE} AND  ⟵ $projects_total $cp_agg $projects_active",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Clients\/client_profile.php",
+        "line": 77,
+        "what": "SELECT COUNT(*) AS c FROM contracts ct INNER JOIN project p ON p.id =   ⟵ $projects_active $cp_agg $contracts_count",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Clients\/client_profile.php",
+        "line": 83,
+        "what": "SELECT COUNT(DISTINCT e.suppliers) AS c FROM operations o INNER JOIN p  ⟵ $suppliers_count $cp_agg $equipments_count",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Clients\/client_profile.php",
+        "line": 90,
+        "what": "SELECT COUNT(DISTINCT o.equipment) AS c FROM operations o INNER JOIN p  ⟵ $equipments_count $cp_agg $drivers_count",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Clients\/client_profile.php",
+        "line": 96,
+        "what": "SELECT COUNT(DISTINCT ed.employee_id) AS c FROM operations o INNER JOI  ⟵ $drivers_count $cp_agg $total_hours",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Clients\/client_profile.php",
+        "line": 103,
+        "what": "SELECT IFNULL(SUM(t.operator_hours + t.operator_standby_hours), 0) AS   ⟵ $total_hours $cp_agg",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Clients\/client_profile.php",
+        "line": 113,
+        "what": "SELECT p.id, p.name, p.project_code, COUNT(DISTINCT o.equipment) AS eq  ⟵ $projects_breakdown $cp_gate",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Clients\/client_profile.php",
+        "line": 124,
+        "what": "GROUP BY p.id, p.name, p.project_code ORDER BY hours_sum DESC LIMIT 10  ⟵ $projects_breakdown",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Clients\/client_profile.php",
+        "line": 407,
+        "what": "SELECT ct.id, ct.contract_signing_date, ct.actual_start, ct.actual_end  ⟵ $client_contracts $cp_gate",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Clients\/client_profile.php",
+        "line": 412,
+        "what": "AND COALESCE(ct.is_deleted,0) = 0 ORDER BY ct.contract_signing_date DE  ⟵ $client_contracts",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Clients\/client_profile.php",
+        "line": 557,
+        "what": "SELECT COUNT(*) AS total, SUM(CASE WHEN a.is_negotiation = 1 THEN 1 EL  ⟵ $cp_gate $acts_link_params $acts_total",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Clients\/client_profile.php",
+        "line": 560,
+        "what": "WHERE {TENANT_SCOPE} AND  ⟵ $acts_link_params $acts_total $acts_negotiation",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Clients\/client_profile.php",
+        "line": 576,
+        "what": "SELECT a.id, a.activity_code, a.activity_type, a.entity_type, a.entity  ⟵ $client_activities $cp_gate",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Clients\/client_profile.php",
+        "line": 581,
+        "what": "LEFT JOIN users u ON u.id = a.created_by LEFT JOIN users au ON au.id =  ⟵ $acts_link_params",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Clients\/client_profile.php",
+        "line": 584,
+        "what": "ORDER BY a.activity_date DESC, a.id DESC LIMIT 200  ⟵ $acts_link_params $client_activities",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "معماريّ",
+        "sev": 2,
+        "code": "SURFACE_NOT_PLACED",
+        "file": "Clients\/client_profile.php",
+        "line": 0,
+        "what": "لا موضعَ له في nav_placements ولا nav_items",
+        "why": "يُفتَح بالمسارِ ولا يُبلَغ بالملاحة — «الصلاحيةُ تمنح الوصولَ والموضعُ يمنح الملاحة»."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Clients\/clients.php",
+        "line": 143,
+        "what": "( SELECT COUNT(*) FROM project p WHERE p.client_id = cc.id AND p.is_de  ⟵ $projects_active_count_select_sql",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Clients\/clients.php",
+        "line": 557,
+        "what": "SELECT cc.*, u.name as creator_name,  ⟵ $clients_list $clients_gate $projects_active_count_select_sql",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Clients\/clients.php",
+        "line": 560,
+        "what": "AS projects_inactive_count FROM clients cc LEFT JOIN users u ON cc.cre  ⟵ $projects_active_count_select_sql $clients_list",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Clients\/contract_amendments.php",
+        "line": 74,
+        "what": "SELECT amendment_code FROM contract_amendments WHERE amendment_code RE  ⟵ $AMD_TYPES $next_amd_code $last_code_rows",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Clients\/contract_amendments.php",
+        "line": 75,
+        "what": "AND is_deleted = 0 ORDER BY CAST(SUBSTRING(amendment_code, 5) AS UNSIG  ⟵ $AMD_TYPES $next_amd_code $last_code_rows",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "معماريّ",
+        "sev": 2,
+        "code": "SURFACE_NOT_PLACED",
+        "file": "Clients\/contract_amendments.php",
+        "line": 0,
+        "what": "لا موضعَ له في nav_placements ولا nav_items",
+        "why": "يُفتَح بالمسارِ ولا يُبلَغ بالملاحة — «الصلاحيةُ تمنح الوصولَ والموضعُ يمنح الملاحة»."
+    },
+    {
+        "axis": "معماريّ",
+        "sev": 2,
+        "code": "SURFACE_NOT_PLACED",
+        "file": "Clients\/contract_commitments.php",
+        "line": 0,
+        "what": "لا موضعَ له في nav_placements ولا nav_items",
+        "why": "يُفتَح بالمسارِ ولا يُبلَغ بالملاحة — «الصلاحيةُ تمنح الوصولَ والموضعُ يمنح الملاحة»."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Clients\/contract_events.php",
+        "line": 67,
+        "what": "SELECT event_code FROM contract_events WHERE event_code REGEXP '^EVT-[  ⟵ $EVT_PARTIES $EVT_STATES $next_evt_code",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Clients\/contract_events.php",
+        "line": 68,
+        "what": "AND is_deleted = 0 ORDER BY CAST(SUBSTRING(event_code, 5) AS UNSIGNED)  ⟵ $EVT_STATES $next_evt_code $last_code_rows",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "معماريّ",
+        "sev": 2,
+        "code": "SURFACE_NOT_PLACED",
+        "file": "Clients\/contract_events.php",
+        "line": 0,
+        "what": "لا موضعَ له في nav_placements ولا nav_items",
+        "why": "يُفتَح بالمسارِ ولا يُبلَغ بالملاحة — «الصلاحيةُ تمنح الوصولَ والموضعُ يمنح الملاحة»."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Clients\/pricelists.php",
+        "line": 80,
+        "what": "SELECT pricelist_code FROM pricelists WHERE pricelist_code REGEXP '^PL  ⟵ $next_pl_code $last_code_rows $pl_gate",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Clients\/pricelists.php",
+        "line": 81,
+        "what": "AND is_deleted = 0 ORDER BY CAST(SUBSTRING(pricelist_code, 4) AS UNSIG  ⟵ $next_pl_code $last_code_rows $pl_gate",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "معماريّ",
+        "sev": 2,
+        "code": "SURFACE_NOT_PLACED",
+        "file": "Clients\/pricelists.php",
+        "line": 0,
+        "what": "لا موضعَ له في nav_placements ولا nav_items",
+        "why": "يُفتَح بالمسارِ ولا يُبلَغ بالملاحة — «الصلاحيةُ تمنح الوصولَ والموضعُ يمنح الملاحة»."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Clients\/products.php",
+        "line": 81,
+        "what": "SELECT product_code FROM products WHERE product_code REGEXP '^PRD-[0-9  ⟵ $next_prod_code $last_code_rows $prod_gate",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Clients\/products.php",
+        "line": 82,
+        "what": "AND is_deleted = 0 ORDER BY CAST(SUBSTRING(product_code, 5) AS UNSIGNE  ⟵ $next_prod_code $last_code_rows $prod_gate",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Clients\/quotations.php",
+        "line": 76,
+        "what": "SELECT quotation_code FROM quotations WHERE quotation_code REGEXP '^QU  ⟵ $QUO_CURRENCIES $QUO_STATES $next_quo_code",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Clients\/quotations.php",
+        "line": 77,
+        "what": "AND is_deleted = 0 ORDER BY CAST(SUBSTRING(quotation_code, 5) AS UNSIG  ⟵ $QUO_STATES $next_quo_code $last_code_rows",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "معماريّ",
+        "sev": 2,
+        "code": "DEAD_PARALLEL_SCHEMA",
+        "file": "Clients\/quotations.php",
+        "line": 0,
+        "what": "يشير إلى `sal_quotations` وهو فارغٌ (0 صفّ)",
+        "why": "مخطَّطٌ متوازٍ لم يُمارَس — إمّا يُهجَر أو يُملأ، والبقاءُ بينهما يُربك القارئ."
+    },
+    {
+        "axis": "معماريّ",
+        "sev": 2,
+        "code": "SURFACE_NOT_PLACED",
+        "file": "Clients\/rate_books.php",
+        "line": 0,
+        "what": "لا موضعَ له في nav_placements ولا nav_items",
+        "why": "يُفتَح بالمسارِ ولا يُبلَغ بالملاحة — «الصلاحيةُ تمنح الوصولَ والموضعُ يمنح الملاحة»."
+    },
+    {
+        "axis": "معماريّ",
+        "sev": 2,
+        "code": "SURFACE_NOT_PLACED",
+        "file": "Clients\/readiness_lines.php",
+        "line": 0,
+        "what": "لا موضعَ له في nav_placements ولا nav_items",
+        "why": "يُفتَح بالمسارِ ولا يُبلَغ بالملاحة — «الصلاحيةُ تمنح الوصولَ والموضعُ يمنح الملاحة»."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Clients\/tenders.php",
+        "line": 67,
+        "what": "SELECT tender_code FROM tenders WHERE tender_code REGEXP '^TND-[0-9]+$  ⟵ $TND_PARTICIPATION $TND_RESULT $next_tnd_code",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Clients\/tenders.php",
+        "line": 68,
+        "what": "AND is_deleted = 0 ORDER BY CAST(SUBSTRING(tender_code, 5) AS UNSIGNED  ⟵ $TND_RESULT $next_tnd_code $last_code_rows",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "معماريّ",
+        "sev": 2,
+        "code": "SURFACE_NOT_PLACED",
+        "file": "Clients\/tenders.php",
+        "line": 0,
+        "what": "لا موضعَ له في nav_placements ولا nav_items",
+        "why": "يُفتَح بالمسارِ ولا يُبلَغ بالملاحة — «الصلاحيةُ تمنح الوصولَ والموضعُ يمنح الملاحة»."
+    },
+    {
+        "axis": "معماريّ",
+        "sev": 2,
+        "code": "SURFACE_NOT_PLACED",
+        "file": "Clients\/units_of_measure.php",
+        "line": 0,
+        "what": "لا موضعَ له في nav_placements ولا nav_items",
+        "why": "يُفتَح بالمسارِ ولا يُبلَغ بالملاحة — «الصلاحيةُ تمنح الوصولَ والموضعُ يمنح الملاحة»."
+    },
+    {
+        "axis": "معماريّ",
+        "sev": 2,
+        "code": "SURFACE_NOT_PLACED",
+        "file": "Contracts\/contracts_details.php",
+        "line": 0,
+        "what": "لا موضعَ له في nav_placements ولا nav_items",
+        "why": "يُفتَح بالمسارِ ولا يُبلَغ بالملاحة — «الصلاحيةُ تمنح الوصولَ والموضعُ يمنح الملاحة»."
+    },
+    {
+        "axis": "منطقيّ",
+        "sev": 1,
+        "code": "SELF_APPROVAL_UNGUARDED",
+        "file": "Contracts\/plan_actual_link.php",
+        "line": 0,
+        "what": "اعتمادٌ يكتب بلا مقارنةٍ ظاهرةٍ بمُنشِئِ السجلّ",
+        "why": "الاعتمادُ الذاتيُّ ممكنٌ ما لم يُمنَع — وهو من المساراتِ السالبةِ التي يفرض الأمرُ اختبارَها."
+    },
+    {
+        "axis": "منطقيّ",
+        "sev": 1,
+        "code": "SELF_APPROVAL_UNGUARDED",
+        "file": "Contracts\/unit_client_match.php",
+        "line": 0,
+        "what": "اعتمادٌ يكتب بلا مقارنةٍ ظاهرةٍ بمُنشِئِ السجلّ",
+        "why": "الاعتمادُ الذاتيُّ ممكنٌ ما لم يُمنَع — وهو من المساراتِ السالبةِ التي يفرض الأمرُ اختبارَها."
+    },
+    {
+        "axis": "معماريّ",
+        "sev": 2,
+        "code": "SURFACE_NOT_PLACED",
+        "file": "Contracts\/unit_client_match.php",
+        "line": 0,
+        "what": "لا موضعَ له في nav_placements ولا nav_items",
+        "why": "يُفتَح بالمسارِ ولا يُبلَغ بالملاحة — «الصلاحيةُ تمنح الوصولَ والموضعُ يمنح الملاحة»."
+    },
+    {
+        "axis": "معماريّ",
+        "sev": 2,
+        "code": "SURFACE_NOT_PLACED",
+        "file": "Contracts\/unit_statement_client.php",
+        "line": 0,
+        "what": "لا موضعَ له في nav_placements ولا nav_items",
+        "why": "يُفتَح بالمسارِ ولا يُبلَغ بالملاحة — «الصلاحيةُ تمنح الوصولَ والموضعُ يمنح الملاحة»."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Operations\/sites_board.php",
+        "line": 35,
+        "what": "SELECT p.id, p.name, COUNT(DISTINCT oc.equipment_id) AS eq_total, SUM(  ⟵ $cscope $is_super $sites",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Operations\/sites_board.php",
+        "line": 42,
+        "what": "GROUP BY p.id, p.name ORDER BY p.id  ⟵ $cscope $res $x",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Operations\/sites_board.php",
+        "line": 50,
+        "what": "SELECT e.id AS eq_id, e.name AS eq_name, e.status, oc.seat_no, oc.shif  ⟵ $res $x $sites",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Operations\/sites_board.php",
+        "line": 56,
+        "what": "AND oc.is_deleted = 0 AND oc.equipment_id IS NOT NULL ORDER BY e.id, o  ⟵ $r2 $x $k",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "منطقيّ",
+        "sev": 1,
+        "code": "SELF_APPROVAL_UNGUARDED",
+        "file": "Operations\/sites_board.php",
+        "line": 0,
+        "what": "اعتمادٌ يكتب بلا مقارنةٍ ظاهرةٍ بمُنشِئِ السجلّ",
+        "why": "الاعتمادُ الذاتيُّ ممكنٌ ما لم يُمنَع — وهو من المساراتِ السالبةِ التي يفرض الأمرُ اختبارَها."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Operations\/swap_request.php",
+        "line": 51,
+        "what": "SELECT id FROM op_containers WHERE project_id=  ⟵ $msg $seat $r",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Operations\/swap_request.php",
+        "line": 170,
+        "what": "SELECT e.id, e.name FROM equipments e JOIN op_containers oc ON oc.equi  ⟵ $subEq $subOp $r",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Operations\/swap_request.php",
+        "line": 174,
+        "what": "SELECT id, name FROM employees WHERE company_id =  ⟵ $subEq $subOp $r",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 2,
+        "code": "QUERY_RESULT_UNCHECKED",
+        "file": "Operations\/swap_request.php",
+        "line": 0,
+        "what": "3 استعلامًا بلا فحصِ نتيجةٍ ظاهر",
+        "why": "الاستعلامُ الفاشلُ يُرجِع false فيصير الجدولُ فارغًا صامتًا — فراغٌ يُقرأ «لا بيانات»."
+    },
+    {
+        "axis": "معماريّ",
+        "sev": 2,
+        "code": "DEAD_PARALLEL_SCHEMA",
+        "file": "Opportunities\/client_need_rfq.php",
+        "line": 0,
+        "what": "يشير إلى `sal_client_needs` وهو فارغٌ (0 صفّ)",
+        "why": "مخطَّطٌ متوازٍ لم يُمارَس — إمّا يُهجَر أو يُملأ، والبقاءُ بينهما يُربك القارئ."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Projects\/projects.php",
+        "line": 356,
+        "what": "SELECT COUNT(*) AS total_projects, SUM(CASE WHEN  ⟵ $prj_gate $projects_total_count",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Projects\/projects.php",
+        "line": 358,
+        "what": "THEN 1 ELSE 0 END) AS active_projects FROM project p WHERE {TENANT_SCO  ⟵ $prj_gate $projects_total_count $projects_active_count",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Projects\/projects.php",
+        "line": 692,
+        "what": "SELECT op.`id`, op.`name`, op.`client`, op.`location`, op.`total`, op.  ⟵ $result $prj_cmap $prj_smap",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Projects\/projects.php",
+        "line": 694,
+        "what": "` AS `client_id`, cc.`client_name` FROM project op LEFT JOIN clients c  ⟵ $prj_smap $result $prj_gate",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Projects\/projects.php",
+        "line": 697,
+        "what": "= cc.id WHERE {TENANT_SCOPE} AND op.is_deleted = 0  ⟵ $project_client_column $prj_list_filter $prj_list_params",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Projects\/projects.php",
+        "line": 698,
+        "what": "ORDER BY op.id DESC  ⟵ $project_client_column $prj_list_filter $prj_list_params",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "معماريّ",
+        "sev": 2,
+        "code": "DEAD_PARALLEL_SCHEMA",
+        "file": "Projects\/projects.php",
+        "line": 0,
+        "what": "يشير إلى `sal_projects` وهو فارغٌ (0 صفّ)",
+        "why": "مخطَّطٌ متوازٍ لم يُمارَس — إمّا يُهجَر أو يُملأ، والبقاءُ بينهما يُربك القارئ."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Reports\/contract_report.php",
+        "line": 111,
+        "what": "SELECT c.id AS contract_id, c.id AS contract_id, p.name AS project_nam  ⟵ $cr_gate",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Reports\/contract_report.php",
+        "line": 123,
+        "what": "= p.id LEFT JOIN equipments e ON e.id = o.equipment LEFT JOIN timeshee  ⟵ $contract_filter $contract_data",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Reports\/contract_report.php",
+        "line": 136,
+        "what": "SELECT YEAR(t.date) AS year, MONTH(t.date) AS month, IFNULL(SUM(t.exec  ⟵ $monthly_stats $cr_gate",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "Reports\/contract_report.php",
+        "line": 145,
+        "what": "= p.id LEFT JOIN equipments e ON e.id = o.equipment LEFT JOIN timeshee  ⟵ $contract_filter",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "معماريّ",
+        "sev": 2,
+        "code": "SURFACE_NOT_PLACED",
+        "file": "Reports\/contract_report.php",
+        "line": 0,
+        "what": "لا موضعَ له في nav_placements ولا nav_items",
+        "why": "يُفتَح بالمسارِ ولا يُبلَغ بالملاحة — «الصلاحيةُ تمنح الوصولَ والموضعُ يمنح الملاحة»."
+    },
+    {
+        "axis": "معماريّ",
+        "sev": 2,
+        "code": "SURFACE_NOT_PLACED",
+        "file": "Reports\/contractall.php",
+        "line": 0,
+        "what": "لا موضعَ له في nav_placements ولا nav_items",
+        "why": "يُفتَح بالمسارِ ولا يُبلَغ بالملاحة — «الصلاحيةُ تمنح الوصولَ والموضعُ يمنح الملاحة»."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "movement\/client_tree.php",
+        "line": 83,
+        "what": "SELECT c.id, c.client_code, c.client_name FROM clients c WHERE {TENANT  ⟵ $cl_params $cq_rows $ct_gate",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "movement\/client_tree.php",
+        "line": 83,
+        "what": "ORDER BY c.client_name ASC  ⟵ $cl_params $cq_rows $ct_gate",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "movement\/client_tree.php",
+        "line": 98,
+        "what": "SELECT p.id, p.name, p.project_code, p.location, p.client_id FROM proj  ⟵ $pr_params $pq_rows $ct_gate",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "movement\/client_tree.php",
+        "line": 98,
+        "what": "ORDER BY p.name ASC  ⟵ $pr_params $pq_rows $ct_gate",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "movement\/client_tree.php",
+        "line": 133,
+        "what": "SELECT o.id AS op_id, CAST(o.project_id AS UNSIGNED) AS project_id, CA  ⟵ $pids_marks $ops_q_rows $ct_gate",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "movement\/client_tree.php",
+        "line": 187,
+        "what": "SELECT ct.id, CAST(ct.project_id AS UNSIGNED) AS project_id, ct.status  ⟵ $contract_to_project $ct_q_rows $ct_gate",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "movement\/client_tree.php",
+        "line": 208,
+        "what": "SELECT sc.supplier_id, CAST(sc.project_id AS UNSIGNED) AS project_id,   ⟵ $sc_q_rows $ct_gate",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "movement\/client_tree.php",
+        "line": 251,
+        "what": "SELECT CAST(t.operator AS UNSIGNED) AS op_id, SUM(t.total_work_hours)   ⟵ $op_ids $opids_marks $ts_q_rows",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "movement\/client_tree.php",
+        "line": 281,
+        "what": "SELECT CAST(t.operator AS UNSIGNED) AS op_id, CAST(t.employee_id AS UN  ⟵ $op_ids $opids_marks $oeh_q_rows",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "movement\/client_tree.php",
+        "line": 315,
+        "what": "SELECT CAST(t.operator AS UNSIGNED) AS op_id, SUM(t.total_work_hours)   ⟵ $op_ids $opids_marks $ts_all_rows",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "movement\/client_tree.php",
+        "line": 401,
+        "what": "SELECT e.id AS eq_id, e.code AS eq_code, e.availability_status AS avai  ⟵ $needed_eq_ids $eqids_marks $eq_q_rows",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "movement\/client_tree.php",
+        "line": 451,
+        "what": "SELECT ed.equipment_id, ed.shift_type, d.id AS emp_id, d.name AS emp_n  ⟵ $eq_ids $eqids2_marks $drv_q_rows",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "برمجيّ",
+        "sev": 1,
+        "code": "SQL_INTERPOLATION",
+        "file": "movement\/client_tree.php",
+        "line": 456,
+        "what": ") AND ed.status = 1 AND d.status = 1 ORDER BY ed.equipment_id ASC, d.n  ⟵ $eqids2_marks $t $drv_q_rows",
+        "why": "متغيّرٌ يُسنَد في هذا الملفِّ بلا قولبةٍ ولا تهريبٍ ثمَّ يُستبدَل في جملةٍ — مرشَّحُ حقن."
+    },
+    {
+        "axis": "معماريّ",
+        "sev": 2,
+        "code": "SURFACE_NOT_PLACED",
+        "file": "movement\/client_tree.php",
+        "line": 0,
+        "what": "لا موضعَ له في nav_placements ولا nav_items",
+        "why": "يُفتَح بالمسارِ ولا يُبلَغ بالملاحة — «الصلاحيةُ تمنح الوصولَ والموضعُ يمنح الملاحة»."
+    }
+]

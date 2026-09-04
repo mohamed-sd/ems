@@ -1,0 +1,34 @@
+﻿الحكم,الملف,الاسم,الطراز,التفصيل,السلوك
+موحَّد,movement/movement_operations.php,الورديات,allforms/ems-form,"1 نموذج",زرّ
+موحَّد,movement/project_drivers.php,"توزيع المشغّلين",allforms/ems-form,"2 نموذج",طيّ+زرّ
+موحَّد,Operations/containers.php,"إسناد المعدات للوحدات",allforms/ems-form,"2 نموذج",طيّ
+موحَّد,Operations/fleet_calendar.php,"تقويم الأسطول والحجز",allforms/ems-form,"1 نموذج",طيّ+زرّ
+موحَّد,operations/ops_resource_move_orders.php,"طلب وقرار حركة الموارد","عُدّةٌ: u13_screen_kit","ems-form u13-act · 8 حقلًا",—
+موحَّد,operations/ops_seasonal_factors.php,"الخطة الموسمية ومعاملاتها","عُدّةٌ: u13_screen_kit","ems-form u13-act · 8 حقلًا",—
+موحَّد,operations/ops_stop_decisions.php,"قرارات التوقف","عُدّةٌ: u13_screen_kit","ems-form u13-act · 11 حقلًا",—
+موحَّد,operations/ops_tomorrow_dispatch.php,"احتياج الغد وتوزيع الموارد","عُدّةٌ: u13_screen_kit","ems-form u13-act · 8 حقلًا",—
+موحَّد,Operations/production.php,"الإنتاج والقياس",allforms/ems-form,"1 نموذج",طيّ
+موحَّد,Operations/unit_correction.php,"تصحيح الوحدات بالسلسلة الثلاثية",allforms/ems-form,"1 نموذج",طيّ+زرّ
+موحَّد,Operations/unit_perf.php,"الأداء الشهري للوحدة",allforms/ems-form,"1 نموذج",طيّ
+"بلا نموذج",movement/map_page.php,"خريطة التشغيل اليومية",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Operations/daily_plan.php,"خطة عمل الغد",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Operations/distribution_space.php,"تكليف المشغل على المعدة",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Operations/fleet_utilization.php,"استغلال الأسطول ومردوده",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Operations/gov_dept_ops.php,"حوكمة إدارة التشغيل",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Operations/monthly_plan.php,"الخطة الشهرية للتشغيل",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Operations/operations_room.php,"غرفة عمليات المواقع",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",operations/ops_deviation_escalation.php,"تقرير الانحراف والتصعيد","u13 بلا فعلِ تسجيل",—,—
+"بلا نموذج",operations/ops_room.php,"غرفة العمليات","u13 بلا فعلِ تسجيل",—,—
+"بلا نموذج",operations/ops_shift_time_states.php,"توزيع زمن الوردية وحالاته","u13 بلا فعلِ تسجيل",—,—
+"بلا نموذج",Operations/stops_unattributed.php,"التوقفات وتحديد المتحمل",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Projects/project_profile.php,"بطاقة المشروع",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Reports/daily_units_report.php,"سجل الوحدات اليومية",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Reports/deliy.php,deliy,قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Reports/deriver.php,deriver,قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Reports/driverAndsupplerscontract.php,driverAndsupplerscontract,قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Reports/new_reports.php,new_reports,قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Reports/projects_reports.php,projects_reports,قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Reports/timesheet_reports.php,timesheet_reports,قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Reports/timesheetdeliy.php,"تقرير الوحدات اليومية",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Risk/risk_dept_ops.php,"المخاطر التشغيلية",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Timesheet/view_timesheet.php,"تسجيل التايم شيت والإنتاج",قراءةٌ/لوحةٌ/تقرير,—,—

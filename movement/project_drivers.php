@@ -969,20 +969,26 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                     </div>
-                    <form method="post" id="manageDriversForm">
+                    <?php /* الخطّافُ `ems-form` **جِلدٌ بلا طيّ** — المودالُ يدير
+                         ظهورَه بنفسه. ⛔ **ولا `.form-grid` هنا**: شبكتُها خمسةُ
+                         أعمدةٍ صلبةٍ بعرضِ **الشاشةِ** لا المودالِ، فتزحم حقولَ
+                         مودالٍ ضيّق. و`.form-group` يأخذ الحبّةَ الذهبيّةَ ولا
+                         يفرض عرضًا — فصفُّ بوتستراب يبقى هو المُخطِّط.
+                         وجدولُ منتقي السائقين أسفلَه لم يُمَسّ. */ ?>
+                    <form method="post" id="manageDriversForm" class="ems-form">
         <?= csrf_field() ?>
                         <div class="modal-body">
                             <input type="hidden" name="action" value="manage_equipment_drivers">
                             <input type="hidden" name="equipment_id" id="manageEquipmentId" value="">
 
                             <div class="row g-3 mb-3">
-                                <div class="col-md-4">
-                                    <label class="form-label">تاريخ التطبيق</label>
-                                    <input type="date" class="form-control" name="effective_date" aria-label="تاريخ تطبيق تغيير السائقين" required value="<?php echo date('Y-m-d'); ?>">
+                                <div class="col-md-4 form-group">
+                                    <label for="emsf_mgr_eff">تاريخ التطبيق *</label>
+                                    <input type="date" id="emsf_mgr_eff" name="effective_date" aria-label="تاريخ تطبيق تغيير السائقين" required value="<?php echo date('Y-m-d'); ?>">
                                 </div>
-                                <div class="col-md-4">
-                                    <label class="form-label" for="emsf_746_ab2a1">وردية السائقين المضافين</label>
-                                    <select name="add_shift_type" class="form-control" required id="emsf_746_ab2a1">
+                                <div class="col-md-4 form-group">
+                                    <label for="emsf_746_ab2a1">وردية السائقين المضافين *</label>
+                                    <select name="add_shift_type" required id="emsf_746_ab2a1">
                                         <option value="D">نهاري فقط</option>
                                         <option value="N">ليلي فقط</option>
                                         <option value="B" selected>نهاري + ليلي</option>

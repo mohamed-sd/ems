@@ -108,6 +108,17 @@ function repair01_ui_debt_classes()
  *   السلاسلُ المقتبَسةُ وHTML الخارجُ عن الوسوم — والتعليقاتُ خارجَ البنية.
  * ◆ **وما ليس عربيًّا ليس نصَّ واجهة**: سلسلةٌ بلا حرفٍ عربيٍّ اسمُ مفتاحٍ أو
  *   مسارٌ أو استعلام — تُستبعَد، وإلّا عُدَّ كلُّ `SELECT` زخرفة.
+ * ◆ **وجسدُ `<script>` و`<style>` شيفرةٌ لا نصُّ واجهة** — والاستثناءُ كان
+ *   ناقصًا: `token_get_all` يُخرِج تعليقاتِ PHP بالبنية، **ثمّ يمرُّ تعليقُ
+ *   JavaScript سالمًا** لأنّ المُحلِّلَ يرى `<script>…</script>` كتلةَ
+ *   `T_INLINE_HTML` واحدةً، و`strip_tags` تنزع الوسمَ **وتُبقي جسدَه**.
+ *   ⇒ **فالنيّةُ المُعلَنةُ أعلاه لم تكن مُنفَّذةً إلّا على نصفِ التعليقات**،
+ *   وتعليقٌ توثيقيٌّ عربيٌّ مشكولٌ في `<script>` كان يُعَدُّ «تشكيلًا ظاهرًا
+ *   للمستخدم». وقع مقيسًا في لقطةِ 2026-09-04: خمسةُ تعليقاتٍ متطابقةٍ
+ *   رفعت `UI-01` وَ`UI-02` خمسةً خمسةً **بلا حرفٍ واحدٍ يراه مستخدم**.
+ * ◆ **والنزعُ بآلةِ حالةٍ لا بنمطٍ على المقطع**: الكتلةُ تنقطع بشيفرةِ PHP
+ *   بينها (`<script> … <?php … ?> … </script>`) فتصير مقاطعَ متفرّقة —
+ *   ونمطٌ يطلب الفتحَ والإغلاقَ في مقطعٍ واحدٍ يترك ما بينهما مقروءًا.
  * @return array<string> مقاطعُ النصِّ العربيِّ في الملفّ
  */
 function repair01_ui_text_chunks($src)
@@ -116,12 +127,38 @@ function repair01_ui_text_chunks($src)
     $toks = @token_get_all($src);
     if (!is_array($toks)) { return $out; }
     $want = array(T_CONSTANT_ENCAPSED_STRING, T_ENCAPSED_AND_WHITESPACE, T_INLINE_HTML);
+    $raw  = null;                       /* الوسمُ الخامُّ المفتوحُ عبرَ المقاطع */
     foreach ($toks as $t) {
         if (!is_array($t) || !in_array($t[0], $want, true)) { continue; }
         $s = (string) $t[1];
-        if ($t[0] === T_INLINE_HTML) { $s = strip_tags($s); }
+        if ($t[0] === T_INLINE_HTML) { $s = strip_tags(repair01_strip_raw_blocks($s, $raw)); }
         if (!preg_match('/[\x{0620}-\x{064A}]/u', $s)) { continue; }
         $out[] = $s;
+    }
+    return $out;
+}
+
+/**
+ * نزعُ جسدِ `<script>`/`<style>` من مقطعِ HTML — **بحالةٍ محمولةٍ بين المقاطع**.
+ * @param string      $s   المقطع
+ * @param string|null $raw حالةُ الوسمِ المفتوح: اسمُه أو `null` — تُحدَّث بالمرجع
+ * @return string المقطعُ بلا جسدِ الوسومِ الخامّة
+ */
+function repair01_strip_raw_blocks($s, &$raw)
+{
+    $out = ''; $i = 0; $n = strlen($s);
+    while ($i < $n) {
+        if ($raw === null) {
+            if (preg_match('~<(script|style)\b[^>]*>~i', $s, $m, PREG_OFFSET_CAPTURE, $i)) {
+                $out .= substr($s, $i, $m[0][1] - $i);
+                $raw  = strtolower($m[1][0]);
+                $i    = $m[0][1] + strlen($m[0][0]);
+            } else { $out .= substr($s, $i); break; }
+        } else {
+            if (preg_match('~</' . $raw . '\s*>~i', $s, $m, PREG_OFFSET_CAPTURE, $i)) {
+                $i = $m[0][1] + strlen($m[0][0]); $raw = null;
+            } else { break; }        /* الكتلةُ تمتدُّ إلى المقطعِ التالي */
+        }
     }
     return $out;
 }

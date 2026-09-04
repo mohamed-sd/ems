@@ -91,7 +91,12 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
   $header_icon = 'fa fa-comments-dollar';
   $header_title_html = htmlspecialchars('التفاوض ومراجعات العرض', ENT_QUOTES, 'UTF-8');
   ob_start(); ?><span class="badge"><?= $queueFail === '' ? count($rows) : '—' ?> واقعة</span><?php
-  $header_actions = array(array('raw' => trim((string) ob_get_clean())));
+  /* زرُّ الإضافةِ المعياريُّ — الطيُّ والفتحُ بـ`allforms-visible` كنظائرِه. */
+  $header_actions = array(
+      array('raw' => trim((string) ob_get_clean())),
+      array('tag' => 'button', 'id' => 'toggleForm', 'class' => 'add-btn',
+            'icon' => 'fa fa-solid fa-plus', 'label' => 'تسجيل واقعة'),
+  );
   $header_back = false;
   include __DIR__ . '/../includes/page_header.php'; ?>
     <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
@@ -142,33 +147,44 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
     <div class="alert alert-danger"><?= htmlspecialchars($queueFail, ENT_QUOTES, 'UTF-8') ?></div>
   <?php endif; ?>
 
-  <form method="post" class="row g-2 mb-3">
+  <?php /* النموذجُ الموحَّد — `allforms` يجلب الجِلدَ والطيَّ، والحقلُ ابنٌ
+       مباشرٌ لـ`.form-grid`. ⛔ ولا شبكةَ بوتستراب: تُفلِت الحقولَ من الجِلد. */ ?>
+  <form id="qnForm" action="" method="post" class="allforms">
+    <div class="card-header">
+      <h5><i class="fas fa-edit"></i> <span id="formTitle">تسجيل واقعة تفاوض</span></h5>
+    </div>
     <?php echo csrf_field(); ?>
-    <div class="col-auto"><label class="form-label" for="qn_q">العرض</label>
-      <select class="form-control form-control-sm" name="quotation_id" id="qn_q" required>
-        <option value="">— رأس العرض —</option>
-        <?php foreach ($quotes as $q): ?><option value="<?= (int) $q['id'] ?>">#<?= (int) $q['id'] ?></option><?php endforeach; ?>
-      </select></div>
-    <div class="col-auto"><label class="form-label" for="qn_k">نوع الواقعة</label>
-      <select class="form-control form-control-sm" name="event_kind" id="qn_k" required>
-        <?php foreach ($KINDS as $k => $v): ?><option value="<?= htmlspecialchars($k, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($v, ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?>
-      </select></div>
-    <div class="col-auto"><label class="form-label" for="qn_p">الطرف</label>
-      <select class="form-control form-control-sm" name="party" id="qn_p" required>
-        <?php foreach ($PARTY as $k => $v): ?><option value="<?= htmlspecialchars($k, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($v, ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?>
-      </select></div>
-    <div class="col-auto"><label class="form-label" for="qn_n">النص</label>
-      <input class="form-control form-control-sm" type="text" maxlength="400" minlength="8" required name="note" id="qn_n"></div>
-    <div class="col-auto"><label class="form-label" for="qn_b">المبلغ قبل</label>
-      <input class="form-control form-control-sm" type="number" step="0.01" name="amount_before" id="qn_b"></div>
-    <div class="col-auto"><label class="form-label" for="qn_a">المبلغ بعد</label>
-      <input class="form-control form-control-sm" type="number" step="0.01" name="amount_after" id="qn_a"></div>
-    <div class="col-auto"><label class="form-label" for="qn_c">العملة</label>
-      <input class="form-control form-control-sm" type="text" maxlength="8" name="currency" id="qn_c"></div>
-    <div class="col-auto"><label class="form-label" for="qn_v">السريان حتى</label>
-      <input class="form-control form-control-sm" type="date" name="valid_until" id="qn_v"></div>
-    <div class="col-auto align-self-end">
-      <button class="action-btn" type="submit" name="log_event" value="1"><i class="fa fa-plus"></i> تسجيل واقعة</button></div>
+    <div class="card shadow-sm"><div class="card-body">
+      <div class="form-grid">
+        <div><label for="qn_q">العرض *</label>
+          <select name="quotation_id" id="qn_q" required>
+            <option value="">— رأس العرض —</option>
+            <?php foreach ($quotes as $q): ?><option value="<?= (int) $q['id'] ?>">#<?= (int) $q['id'] ?></option><?php endforeach; ?>
+          </select></div>
+        <div><label for="qn_k">نوع الواقعة *</label>
+          <select name="event_kind" id="qn_k" required>
+            <?php foreach ($KINDS as $k => $v): ?><option value="<?= htmlspecialchars($k, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($v, ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?>
+          </select></div>
+        <div><label for="qn_p">الطرف *</label>
+          <select name="party" id="qn_p" required>
+            <?php foreach ($PARTY as $k => $v): ?><option value="<?= htmlspecialchars($k, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($v, ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?>
+          </select></div>
+        <div><label for="qn_n">النص *</label>
+          <input type="text" maxlength="400" minlength="8" required name="note" id="qn_n"></div>
+        <div><label for="qn_b">المبلغ قبل</label>
+          <input type="number" step="0.01" name="amount_before" id="qn_b"></div>
+        <div><label for="qn_a">المبلغ بعد</label>
+          <input type="number" step="0.01" name="amount_after" id="qn_a"></div>
+        <div><label for="qn_c">العملة</label>
+          <input type="text" maxlength="8" name="currency" id="qn_c"></div>
+        <div><label for="qn_v">السريان حتى</label>
+          <input type="date" name="valid_until" id="qn_v"></div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-primary" type="submit" name="log_event" value="1"><i class="fa fa-plus"></i> تسجيل واقعة</button>
+        <button type="button" class="btn-secondary" id="qnFormCancelBtn"><i class="fas fa-times"></i> إلغاء</button>
+      </div>
+    </div></div>
   </form>
 
   <table class="table table-striped" data-no-dt>
@@ -198,3 +214,25 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
     </tbody>
   </table>
 </div>
+<script>
+/* طيُّ النموذجِ وفتحُه — السلوكُ المعياريُّ نفسُه في «سجل العملاء».
+   ⛔ ولا `style.display`: الورقةُ تحمل `.allforms{display:none}` — فالتبديلُ
+   بالصنفِ وحدَه، وكتابةُ `display` سطريًّا بلا أولويةٍ تخسر أمامها. */
+(function () {
+    var f = document.getElementById('qnForm');
+    var b = document.getElementById('toggleForm');
+    var c = document.getElementById('qnFormCancelBtn');
+    if (!f || !b) { return; }
+    function open(on) {
+        f.classList.toggle('allforms-visible', on);
+        b.setAttribute('aria-expanded', on ? 'true' : 'false');
+        if (on) { var i = f.querySelector('select,input'); if (i) { i.focus(); } }
+    }
+    b.addEventListener('click', function (e) {
+        e.preventDefault();
+        open(!f.classList.contains('allforms-visible'));
+    });
+    if (c) { c.addEventListener('click', function () { f.reset(); open(false); }); }
+    if (document.querySelector('.alert-danger')) { open(true); }
+})();
+</script>

@@ -1,0 +1,502 @@
+{
+    "workspace": "DEP-02",
+    "ghost": [],
+    "screens": [
+        {
+            "route": "approvals\/requests.php",
+            "src": "ws_placements+nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "89.8 ك.ب"
+        },
+        {
+            "route": "chats\/index.php",
+            "src": "ws_placements+nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "255.1 ك.ب"
+        },
+        {
+            "route": "contracts\/contract_coverage.php",
+            "src": "placements+ws_placements+nav_items",
+            "code": 302,
+            "hits": [],
+            "verdict": "REDIRECT",
+            "detail": "contracts.php"
+        },
+        {
+            "route": "fleet\/asset_full_history.php",
+            "src": "nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "311.5 ك.ب"
+        },
+        {
+            "route": "fleet\/asset_hours_reference.php",
+            "src": "nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "269.2 ك.ب"
+        },
+        {
+            "route": "fleet\/fleet_schema_matrix.php",
+            "src": "nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "80.1 ك.ب"
+        },
+        {
+            "route": "governance\/gov_dept_sup.php",
+            "src": "nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "98.3 ك.ب"
+        },
+        {
+            "route": "main\/role_board.php",
+            "src": "ws_placements+nav_items",
+            "code": 302,
+            "hits": [],
+            "verdict": "REDIRECT",
+            "detail": "dashboard.php"
+        },
+        {
+            "route": "portal\/my_reports.php",
+            "src": "ws_placements+nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "79.8 ك.ب"
+        },
+        {
+            "route": "portal\/my_tasks.php",
+            "src": "ws_placements+nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "82.6 ك.ب"
+        },
+        {
+            "route": "portal\/vp_approval_inbox.php",
+            "src": "nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "84.6 ك.ب"
+        },
+        {
+            "route": "portal\/vp_dashboard.php",
+            "src": "nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "74.9 ك.ب"
+        },
+        {
+            "route": "portal\/vp_departments.php",
+            "src": "nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "75.6 ك.ب"
+        },
+        {
+            "route": "portal\/vp_pending_actions.php",
+            "src": "nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "106 ك.ب"
+        },
+        {
+            "route": "reports\/reports.php",
+            "src": "nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "146.4 ك.ب"
+        },
+        {
+            "route": "risk\/risk_dept_sup.php",
+            "src": "ws_placements+nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "77 ك.ب"
+        },
+        {
+            "route": "suppliers\/equipment_plan.php",
+            "src": "placements+ws_placements+nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "81 ك.ب"
+        },
+        {
+            "route": "suppliers\/rfq_requests.php",
+            "src": "placements+ws_placements+nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "82.2 ك.ب"
+        },
+        {
+            "route": "suppliers\/settlements.php",
+            "src": "placements+ws_placements+nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "83 ك.ب"
+        },
+        {
+            "route": "suppliers\/shares_coverage.php",
+            "src": "placements+ws_placements+nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "74 ك.ب"
+        },
+        {
+            "route": "suppliers\/sup_handover.php",
+            "src": "nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "131 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplier_advances.php",
+            "src": "nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "111.6 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplier_aging.php",
+            "src": "placements+ws_placements+nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "73.4 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplier_bank.php",
+            "src": "nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "152.4 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplier_board.php",
+            "src": "placements+ws_placements+nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "78 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplier_capacity.php",
+            "src": "nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "136.1 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplier_capacity_integration.php",
+            "src": "placements+ws_placements+nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "75.1 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplier_closure.php",
+            "src": "nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "82.7 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplier_contacts.php",
+            "src": "placements+ws_placements",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "73.2 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplier_contract_events.php",
+            "src": "placements+ws_placements+nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "75.5 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplier_contract_lines.php",
+            "src": "placements+ws_placements+nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "120.1 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplier_contract_units.php",
+            "src": "placements+ws_placements+nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "105.2 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplier_data_dictionary.php",
+            "src": "nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "72.7 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplier_docs_guarantees.php",
+            "src": "placements+ws_placements+nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "80 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplier_documents.php",
+            "src": "nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "95.3 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplier_entitlements.php",
+            "src": "placements+ws_placements+nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "93.7 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplier_evaluation.php",
+            "src": "placements+ws_placements+nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "117.2 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplier_inference_rules.php",
+            "src": "nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "72.8 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplier_migration_map.php",
+            "src": "nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "72.3 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplier_migration_trace.php",
+            "src": "nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "72.6 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplier_offers.php",
+            "src": "placements+ws_placements+nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "86.4 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplier_onbehalf_advances.php",
+            "src": "placements+ws_placements+nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "85.9 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplier_payment_allocation.php",
+            "src": "placements+ws_placements+nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "79.8 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplier_payment_requests.php",
+            "src": "placements+ws_placements+nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "76.4 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplier_performance_entries.php",
+            "src": "placements+ws_placements+nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "215.3 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplier_qualification.php",
+            "src": "placements+ws_placements+nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "74.7 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplier_quota_distribution.php",
+            "src": "placements+ws_placements+nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "81.2 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplier_readiness_reserve.php",
+            "src": "placements+ws_placements+nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "83.6 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplier_ref_lists.php",
+            "src": "nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "73.8 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplier_responsibility_matrix.php",
+            "src": "placements+ws_placements+nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "87 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplier_review_report.php",
+            "src": "nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "72.4 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplier_rules.php",
+            "src": "nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "91.9 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplier_slot_closure.php",
+            "src": "placements+ws_placements+nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "86.4 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplier_slot_handover.php",
+            "src": "placements+ws_placements+nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "81.2 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplier_targets.php",
+            "src": "placements+ws_placements+nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "73.6 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplier_unit_equipment.php",
+            "src": "placements+ws_placements+nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "87.7 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplier_violations.php",
+            "src": "placements+ws_placements+nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "78.5 ك.ب"
+        },
+        {
+            "route": "suppliers\/suppliers.php",
+            "src": "placements+ws_placements+nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "361.9 ك.ب"
+        },
+        {
+            "route": "suppliers\/supplierscontracts.php",
+            "src": "placements+ws_placements+nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "253.7 ك.ب"
+        },
+        {
+            "route": "suppliers\/unit_statement_supplier.php",
+            "src": "nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "100.8 ك.ب"
+        },
+        {
+            "route": "tickets\/tickets_list.php",
+            "src": "nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "90.5 ك.ب"
+        },
+        {
+            "route": "user_capacities.php",
+            "src": "ws_placements+nav_items",
+            "code": 200,
+            "hits": [],
+            "verdict": "CLEAN",
+            "detail": "82.8 ك.ب"
+        }
+    ]
+}

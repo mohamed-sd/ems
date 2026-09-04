@@ -271,24 +271,35 @@ $u13NatureLabel = array('document' => 'مستند يعتمد', 'register' => 'س
         <h5><i class="fa fa-bolt"></i> الأفعال المتاحة على هذه الشاشة</h5>
     </div><div class="card-body">
         <?php foreach ($u13Actions as $key => $spec): ?>
-        <form method="post" action="" class="u13-act">
+        <?php /* ◆ **النموذجُ الموحَّدُ من نقطةٍ واحدة**: هذه العُدّةُ يشتملها مئةٌ
+             وواحدٌ وأربعون سطحًا في كلِّ الإدارات، والملفُّ المولَّدُ لا يحمل
+             ترميزَ نموذجٍ إطلاقًا — فتوحيدُ الشكلِ هنا يوحّدها جميعًا، ⛔ ولا
+             سبيلَ إليه بتحريرِ سطحٍ سطحًا (والمولَّدُ يُمحى بإعادةِ التوليد).
+             والخطّافُ `ems-form` لا `allforms`: هذه أفعالٌ ظاهرةٌ دائمًا تحت
+             عنوانِ «الأفعالُ المتاحة» — والطيُّ يُخفيها خلفَ زرٍّ لا وجودَ له.
+             والحقلُ ابنٌ مباشرٌ لـ`.form-grid` فتنطبق عليه الحبّةُ العائمة. */ ?>
+        <form method="post" action="" class="ems-form u13-act">
             <input type="hidden" name="u13_action" value="<?php echo htmlspecialchars($key, ENT_QUOTES, 'UTF-8'); ?>">
-            <div class="u13-act-row">
-                <div class="u13-act-title">
-                    <strong><?php echo htmlspecialchars($spec['label'], ENT_QUOTES, 'UTF-8'); ?></strong>
-                    <?php if (!empty($spec['rule'])): ?>
-                    <div style="opacity:.7;font-size:.86em"><?php echo htmlspecialchars($spec['rule'], ENT_QUOTES, 'UTF-8'); ?></div>
-                    <?php endif; ?>
-                </div>
+            <div class="form-section-header">
+                <h6><i class="fa fa-bolt"></i> <?php echo htmlspecialchars($spec['label'], ENT_QUOTES, 'UTF-8'); ?></h6>
+            </div>
+            <?php if (!empty($spec['rule'])): ?>
+            <?php /* نصُّ القاعدةِ بأسلوبِه السابقِ سطريًّا — ⛔ ولا تُضاف قاعدةُ
+                 نموذجٍ في ورقةٍ أخرى: `ems-forms.css` مصدرٌ واحدٌ لتصميمِ النماذج. */ ?>
+            <p style="opacity:.7;font-size:.86em;margin:0 0 8px"><?php echo htmlspecialchars($spec['rule'], ENT_QUOTES, 'UTF-8'); ?></p>
+            <?php endif; ?>
+            <div class="form-grid">
                 <?php foreach (($spec['fields'] ?? array()) as $fk => $fl): ?>
                 <?php /* معرّفٌ فريدٌ يربط العنوانَ بحقلِه: المفتاحان معًا لأن الشاشةَ تعرض أفعالًا عدة */
                       $u13Fid = 'u13f_' . preg_replace('/[^A-Za-z0-9_]/', '_', $key . '_' . $fk); ?>
-                <div class="u13-act-field">
+                <div>
                     <label for="<?php echo $u13Fid; ?>"><?php echo htmlspecialchars($fl, ENT_QUOTES, 'UTF-8'); ?></label>
                     <input type="text" id="<?php echo $u13Fid; ?>" name="<?php echo htmlspecialchars($fk, ENT_QUOTES, 'UTF-8'); ?>"
                            maxlength="190" <?php echo empty($spec['optional'][$fk] ?? false) ? 'required' : ''; ?>>
                 </div>
                 <?php endforeach; ?>
+            </div>
+            <div class="form-actions">
                 <button type="submit" class="btn-primary"><i class="fa fa-check"></i> تنفيذ</button>
             </div>
         </form>

@@ -1554,7 +1554,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script type="text/html" id="mvunAddDriverTpl">
     <div class="add-driver-inline">
         <strong><i class="fas fa-plus-circle"></i> إضافة سائق لهذه الآلية</strong>
-        <form class="add-driver-form">
+        <?php /* الخطّافُ `ems-form` **جِلدٌ فقط** (لا طيَّ): هذا قالبٌ يُستنسَخ
+             داخلَ صفِّ آليةٍ مفتوحٍ لا نموذجَ صفحة. و`.form-group` مدعومٌ في
+             `ems-forms.css` ولا يأخذ منه عرضًا ولا مرونةً — فصفُّه المرنُ
+             (`.inline-form-row .form-group{flex:1}`) يبقى كما هو، ⛔ ولم
+             تُنزَع أنماطُ مُنتقي السائقِ الخاصّةُ: نزعُها يُعطّل وظيفةً. */ ?>
+        <form class="ems-form add-driver-form">
             <div class="inline-form-row">
                 <div class="form-group">
                     <label for="emsf_drv___FID__">السائق *</label>

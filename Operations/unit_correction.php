@@ -105,7 +105,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   $header_icon = 'fa fa-pen-to-square';
   $header_title_html = htmlspecialchars('تصحيح الوحدات بالسلسلة الثلاثية', ENT_QUOTES, 'UTF-8');
   ob_start(); ?><span class="badge"><?= $queueFail === '' ? count($rows) : '—' ?> تصحيحا</span><?php
-  $header_actions = array(array('raw' => trim((string) ob_get_clean())));
+  /* زرُّ الإضافةِ المعياريُّ — الطيُّ والفتحُ بـ`allforms-visible` كنظائرِه. */
+  $header_actions = array(
+      array('raw' => trim((string) ob_get_clean())),
+      array('tag' => 'button', 'id' => 'toggleForm', 'class' => 'add-btn',
+            'icon' => 'fa fa-solid fa-plus', 'label' => 'فتح تصحيح'),
+  );
   $header_back = false;
   include __DIR__ . '/../includes/page_header.php';
   echo ems_states_bundle('لا تصحيح مفتوح بعد',
@@ -121,26 +126,37 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="alert alert-danger"><?= htmlspecialchars($queueFail, ENT_QUOTES, 'UTF-8') ?></div>
   <?php endif; ?>
 
-  <form method="post" class="row g-2 mb-3">
+  <?php /* النموذجُ الموحَّد — `allforms` يجلب الجِلدَ والطيَّ، والحقلُ ابنٌ
+       مباشرٌ لـ`.form-grid`. ⛔ ولا شبكةَ بوتستراب: تُفلِت الحقولَ من الجِلد. */ ?>
+  <form id="ucForm" action="" method="post" class="allforms">
+    <div class="card-header">
+      <h5><i class="fas fa-edit"></i> <span id="formTitle">فتح تصحيح جديد</span></h5>
+    </div>
     <?php echo csrf_field(); ?>
-    <div class="col-auto"><label class="form-label" for="uc_entry">الواقعة</label>
-      <input class="form-control form-control-sm" type="number" min="1" required name="entry_id" id="uc_entry"></div>
-    <div class="col-auto"><label class="form-label" for="uc_kind">نوع التصحيح</label>
-      <select class="form-control form-control-sm" name="correction_kind" id="uc_kind" required>
-        <?php foreach ($KINDS as $k => $v): ?><option value="<?= htmlspecialchars($k, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($v, ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?>
-      </select></div>
-    <div class="col-auto"><label class="form-label" for="uc_field">الحقل</label>
-      <select class="form-control form-control-sm" name="field_changed" id="uc_field" required>
-        <?php foreach ($FIELDS as $k => $v): ?><option value="<?= htmlspecialchars($k, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($v, ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?>
-      </select></div>
-    <div class="col-auto"><label class="form-label" for="uc_before">القيمة قبل</label>
-      <input class="form-control form-control-sm" type="text" maxlength="120" required name="value_before" id="uc_before"></div>
-    <div class="col-auto"><label class="form-label" for="uc_after">القيمة بعد</label>
-      <input class="form-control form-control-sm" type="text" maxlength="120" required name="value_after" id="uc_after"></div>
-    <div class="col-auto"><label class="form-label" for="uc_reason">السبب</label>
-      <input class="form-control form-control-sm" type="text" maxlength="400" minlength="8" required name="reason" id="uc_reason"></div>
-    <div class="col-auto align-self-end">
-      <button class="action-btn" type="submit" name="open_corr" value="1"><i class="fa fa-plus"></i> فتح تصحيح</button></div>
+    <div class="card shadow-sm"><div class="card-body">
+      <div class="form-grid">
+        <div><label for="uc_entry">الواقعة *</label>
+          <input type="number" min="1" required name="entry_id" id="uc_entry"></div>
+        <div><label for="uc_kind">نوع التصحيح *</label>
+          <select name="correction_kind" id="uc_kind" required>
+            <?php foreach ($KINDS as $k => $v): ?><option value="<?= htmlspecialchars($k, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($v, ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?>
+          </select></div>
+        <div><label for="uc_field">الحقل *</label>
+          <select name="field_changed" id="uc_field" required>
+            <?php foreach ($FIELDS as $k => $v): ?><option value="<?= htmlspecialchars($k, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($v, ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?>
+          </select></div>
+        <div><label for="uc_before">القيمة قبل *</label>
+          <input type="text" maxlength="120" required name="value_before" id="uc_before"></div>
+        <div><label for="uc_after">القيمة بعد *</label>
+          <input type="text" maxlength="120" required name="value_after" id="uc_after"></div>
+        <div><label for="uc_reason">السبب *</label>
+          <input type="text" maxlength="400" minlength="8" required name="reason" id="uc_reason"></div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-primary" type="submit" name="open_corr" value="1"><i class="fa fa-plus"></i> فتح تصحيح</button>
+        <button type="button" class="btn-secondary" id="ucFormCancelBtn"><i class="fas fa-times"></i> إلغاء</button>
+      </div>
+    </div></div>
   </form>
 
   <table class="table table-striped" data-no-dt>
@@ -187,3 +203,25 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </tbody>
   </table>
 </div>
+<script>
+/* طيُّ النموذجِ وفتحُه — السلوكُ المعياريُّ نفسُه في «سجل العملاء».
+   ⛔ ولا `style.display`: الورقةُ تحمل `.allforms{display:none}` — فالتبديلُ
+   بالصنفِ وحدَه، وكتابةُ `display` سطريًّا بلا أولويةٍ تخسر أمامها. */
+(function () {
+    var f = document.getElementById('ucForm');
+    var b = document.getElementById('toggleForm');
+    var c = document.getElementById('ucFormCancelBtn');
+    if (!f || !b) { return; }
+    function open(on) {
+        f.classList.toggle('allforms-visible', on);
+        b.setAttribute('aria-expanded', on ? 'true' : 'false');
+        if (on) { var i = f.querySelector('select,input'); if (i) { i.focus(); } }
+    }
+    b.addEventListener('click', function (e) {
+        e.preventDefault();
+        open(!f.classList.contains('allforms-visible'));
+    });
+    if (c) { c.addEventListener('click', function () { f.reset(); open(false); }); }
+    if (document.querySelector('.alert-danger')) { open(true); }
+})();
+</script>

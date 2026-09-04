@@ -220,29 +220,41 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                 <button type="submit" class="btn-primary"><i class="fa fa-folder-open"></i> افتح خط الأساس</button>
             </form>
             <?php else: ?>
-            <form method="post" class="bl-form-inline">
+            <?php /* شريطا فعلٍ ظاهرانِ دائمًا — فالخطّافُ `ems-form` (جِلدٌ بلا
+                 طيّ) لا `allforms`، وإلّا اختفى الفعلُ خلفَ زرٍّ لا وجودَ له.
+                 والعرضُ من `.form-grid` لا من `.bl-w220/110`: عرضٌ يدويٌّ داخلَ
+                 نموذجٍ موحَّدٍ تهزمه قواعدُ الورقةِ بـ`!important` فيبقى ميتًا. */ ?>
+            <form method="post" action="" class="ems-form">
         <?php echo csrf_field(); ?>
                 <input type="hidden" name="bl_action" value="state">
                 <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
-                <div class="form-group"><label for="emsf_48_99ab5">إلى حال</label>
-                    <select name="to" id="emsf_48_99ab5">
-                        <?php foreach ($STATE_AR as $k => $v): ?>
-                            <option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option>
-                        <?php endforeach; ?></select></div>
-                <div class="form-group"><label for="emsf_49_f9441">ملاحظة/سبب</label>
-                    <input type="text" name="note" maxlength="255" class="bl-w220" id="emsf_49_f9441"></div>
-                <button type="submit" class="btn-primary"><i class="fa fa-forward"></i> انتقل</button>
+                <div class="form-grid">
+                    <div><label for="emsf_48_99ab5">إلى حال</label>
+                        <select name="to" id="emsf_48_99ab5">
+                            <?php foreach ($STATE_AR as $k => $v): ?>
+                                <option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option>
+                            <?php endforeach; ?></select></div>
+                    <div><label for="emsf_49_f9441">ملاحظة/سبب</label>
+                        <input type="text" name="note" maxlength="255" id="emsf_49_f9441"></div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary"><i class="fa fa-forward"></i> انتقل</button>
+                </div>
             </form>
-            <form method="post" class="bl-form-inline">
+            <form method="post" action="" class="ems-form">
         <?php echo csrf_field(); ?>
                 <input type="hidden" name="bl_action" value="amend">
                 <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
-                <div class="form-group"><label for="emsf_50_55026">سبب الملحق <span class="bl-req">*</span></label>
-                    <input type="text" name="note" maxlength="255" required class="bl-w220" id="emsf_50_55026"></div>
-                <div class="form-group"><label for="emsf_51_164a9">رقم الملحق</label>
-                    <input type="number" name="amendment_id" class="bl-w110" id="emsf_51_164a9"></div>
-                <button type="submit" class="btn-primary"><i class="fa fa-code-branch"></i>
-                    ملحق — <strong>نسخة جديدة والقديمة تبقى</strong></button>
+                <div class="form-grid">
+                    <div><label for="emsf_50_55026">سبب الملحق *</label>
+                        <input type="text" name="note" maxlength="255" required id="emsf_50_55026"></div>
+                    <div><label for="emsf_51_164a9">رقم الملحق</label>
+                        <input type="number" name="amendment_id" id="emsf_51_164a9"></div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary"><i class="fa fa-code-branch"></i>
+                        ملحق — <strong>نسخة جديدة والقديمة تبقى</strong></button>
+                </div>
             </form>
             <?php endif; ?>
         </div>

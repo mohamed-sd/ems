@@ -1,0 +1,56 @@
+﻿الحكم,الملف,الاسم,الطراز,التفصيل,السلوك
+موحَّد,Clients/activities.php,"أنشطة العملاء",allforms/ems-form,"1 نموذج",طيّ+زرّ
+موحَّد,Clients/client_contacts.php,"جهات اتصال العملاء","عُدّةٌ: party_contacts_view.php","ems-form pc-form",—
+موحَّد,Clients/clients.php,"سجل العملاء",allforms/ems-form,"1 نموذج",طيّ+زرّ
+موحَّد,Clients/contract_amendments.php,"ملاحق العقود وتجديداتها",allforms/ems-form,"1 نموذج",طيّ
+موحَّد,Clients/contract_commitments.php,"التزامات العقود",allforms/ems-form,"1 نموذج",طيّ+زرّ
+موحَّد,Clients/contract_events.php,"سجل حركة العقد",allforms/ems-form,"1 نموذج",طيّ+زرّ
+موحَّد,Clients/pricelists.php,"قوائم التسعير المعتمدة",allforms/ems-form,"1 نموذج",طيّ+زرّ
+موحَّد,Clients/products.php,"البيانات المرجعية",allforms/ems-form,"1 نموذج",طيّ+زرّ
+موحَّد,Clients/quotation_lines.php,"بنود العروض",allforms/ems-form,"1 نموذج",طيّ+زرّ
+موحَّد,Clients/quotation_negotiation.php,"التفاوض ومراجعات العرض",allforms/ems-form,"1 نموذج",طيّ+زرّ
+موحَّد,Clients/quotations.php,"سجل العروض",allforms/ems-form,"1 نموذج",طيّ+زرّ
+موحَّد,Clients/rate_books.php,"دفتر الأسعار بالشرائح",allforms/ems-form,"2 نموذج",زرّ
+موحَّد,Clients/readiness_lines.php,"جاهزية العروض",allforms/ems-form,"1 نموذج",طيّ+زرّ
+موحَّد,Clients/tenders.php,المناقصات,allforms/ems-form,"1 نموذج",طيّ+زرّ
+موحَّد,Clients/units_of_measure.php,"وحدات القياس والتحويل",allforms/ems-form,"1 نموذج",طيّ+زرّ
+موحَّد,contracts/contract_amendments_renewal.php,"الملحقات والتجديد والإغلاق","عُدّةٌ: u13_screen_kit","ems-form u13-act · 16 حقلًا",—
+موحَّد,contracts/contract_baseline_targets.php,"خط الأساس والمستهدفات","عُدّةٌ: u13_screen_kit","ems-form u13-act · 16 حقلًا",—
+موحَّد,Contracts/contract_baseline.php,"خط أساس العقد",allforms/ems-form,"2 نموذج",—
+موحَّد,contracts/contract_commercial_lines.php,"بنود العقد والالتزام التجاري","عُدّةٌ: u13_screen_kit","ems-form u13-act · 19 حقلًا",—
+موحَّد,contracts/contract_coverage_cycles.php,"التغطية التعاقدية — دورات الالتزام","عُدّةٌ: u13_screen_kit","ems-form u13-act · 28 حقلًا",—
+موحَّد,Contracts/contract_guarantees.php,"ضمانات العقد",allforms/ems-form,"1 نموذج",—
+موحَّد,Contracts/contract_lifecycle.php,"اقتصاد دورة حياة العقد",allforms/ems-form,"1 نموذج",—
+موحَّد,Contracts/contract_lines.php,"بنود عقد العميل وقيمته",allforms/ems-form,"1 نموذج",—
+موحَّد,Contracts/contract_monthly_plan.php,"الجدول الشهري للعقد",allforms/ems-form,"1 نموذج",—
+موحَّد,contracts/contract_obligation_matrix.php,"مصفوفة الالتزامات","عُدّةٌ: u13_screen_kit","ems-form u13-act · 27 حقلًا",—
+موحَّد,Contracts/contract_obligations.php,"مصفوفة التزامات العقد",allforms/ems-form,"1 نموذج",طيّ+زرّ
+موحَّد,Contracts/contract_payment_schedule.php,"خطة دفع العقد",allforms/ems-form,"3 نموذج",—
+موحَّد,Contracts/contract_resource_plan.php,"خطة موارد العقد",allforms/ems-form,"1 نموذج",—
+موحَّد,Contracts/contract_sites.php,"نطاقات العقد التشغيلية",allforms/ems-form,"1 نموذج",—
+موحَّد,contracts/monthly_sales_performance.php,"الأداء والمبيعات الشهرية","عُدّةٌ: u13_screen_kit","ems-form u13-act · 20 حقلًا",—
+موحَّد,contracts/precontract_review.php,"مراجعة ما قبل العقد","عُدّةٌ: u13_screen_kit","ems-form u13-act · 19 حقلًا",—
+موحَّد,Contracts/price_terms.php,"شروط تعديل السعر",allforms/ems-form,"2 نموذج",طيّ
+موحَّد,contracts/sales_activities.php,"الأنشطة والمتابعات","عُدّةٌ: u13_screen_kit","ems-form u13-act · 11 حقلًا",—
+موحَّد,Operations/equipment_quota.php,"توزيع وحدات المورد على معداته",allforms/ems-form,"1 نموذج",طيّ
+موحَّد,Operations/swap_request.php,"طلب تبديل",allforms/ems-form,"1 نموذج",—
+موحَّد,Operations/unbilled.php,"الأعمال غير المفوترة",allforms/ems-form,"1 نموذج",طيّ
+موحَّد,Opportunities/client_need_rfq.php,"احتياج العميل وطلب العرض",allforms/ems-form,"1 نموذج",طيّ+زرّ
+موحَّد,Opportunities/opportunities.php,"الفرص البيعية",allforms/ems-form,"1 نموذج",طيّ+زرّ
+موحَّد,Portal/business_models.php,"نماذج العمل ووحدات القياس",allforms/ems-form,"1 نموذج",طيّ
+موحَّد,Projects/projects.php,"سجل المشاريع",allforms/ems-form,"1 نموذج",طيّ+زرّ
+"بلا نموذج",Clients/client_profile.php,"بطاقة العميل",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Contracts/commercial_board.php,"لوحة المبيعات",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Contracts/contract_coverage.php,"احتياجات التغطية",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Contracts/contracts_details.php,"ملف عقد المشروع",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",contracts/monthly_containers_loss.php,"فترات الالتزام والفاقد","u13 بلا فعلِ تسجيل",—,—
+"بلا نموذج",Contracts/penalties.php,"الجزاءات والحوافز التعاقدية",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Contracts/plan_actual_link.php,"ربط الخطة بالفعلي",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Contracts/unit_client_match.php,"مطابقة بيانات العميل",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Contracts/unit_statement_client.php,"كشف التايم شيت للعميل",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Governance/gov_dept_sal.php,"حوكمة المبيعات والعقود",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",movement/client_tree.php,"شجرة حسابات العميل",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Operations/sites_board.php,"لوحة المواقع",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Reports/contract_report.php,contract_report,قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Reports/contractall.php,contractall,قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Risk/risk_dept_sal.php,"مخاطر المبيعات والعقود",قراءةٌ/لوحةٌ/تقرير,—,—

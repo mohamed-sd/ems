@@ -135,7 +135,12 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
   $header_icon = 'fa fa-gavel';
   $header_title_html = htmlspecialchars('المخالفات والجزاءات', ENT_QUOTES, 'UTF-8');
   ob_start(); ?><span class="badge"><?= $queueFail === '' ? count($rows) : '—' ?> مخالفة</span><?php
-  $header_actions = array(array('raw' => trim((string) ob_get_clean())));
+  /* زرُّ الإضافةِ المعياريُّ — الطيُّ والفتحُ بـ`allforms-visible` كنظائرِه. */
+  $header_actions = array(
+      array('raw' => trim((string) ob_get_clean())),
+      array('tag' => 'button', 'id' => 'toggleForm', 'class' => 'add-btn',
+            'icon' => 'fa fa-solid fa-plus', 'label' => 'رصد مخالفة'),
+  );
   $header_back = false;
   include __DIR__ . '/../includes/page_header.php'; ?>
     <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
@@ -183,31 +188,42 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
     <div class="alert alert-danger"><?= htmlspecialchars($queueFail, ENT_QUOTES, 'UTF-8') ?></div>
   <?php endif; ?>
 
-  <form method="post" class="row g-2 mb-3">
+  <?php /* النموذجُ الموحَّد — `allforms` يجلب الجِلدَ والطيَّ، والحقلُ ابنٌ
+       مباشرٌ لـ`.form-grid`. ⛔ ولا شبكةَ بوتستراب: تُفلِت الحقولَ من الجِلد. */ ?>
+  <form id="svForm" action="" method="post" class="allforms">
+    <div class="card-header">
+      <h5><i class="fas fa-edit"></i> <span id="formTitle">رصد مخالفة جديدة</span></h5>
+    </div>
     <?php echo csrf_field(); ?>
-    <div class="col-auto"><label class="form-label" for="sv_s">المورد</label>
-      <select class="form-control form-control-sm" name="supplier_id" id="sv_s" required>
-        <option value="">— المورد —</option>
-        <?php foreach ($sups as $s): ?><option value="<?= (int) $s['id'] ?>">#<?= (int) $s['id'] ?></option><?php endforeach; ?>
-      </select></div>
-    <div class="col-auto"><label class="form-label" for="sv_k">نوع المخالفة</label>
-      <select class="form-control form-control-sm" name="violation_kind" id="sv_k" required>
-        <?php foreach ($KINDS as $k => $v): ?><option value="<?= htmlspecialchars($k, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($v, ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?>
-      </select></div>
-    <div class="col-auto"><label class="form-label" for="sv_o">تاريخ الوقوع</label>
-      <input class="form-control form-control-sm" type="date" required name="occurred_on" id="sv_o"></div>
-    <div class="col-auto"><label class="form-label" for="sv_d">الوصف</label>
-      <input class="form-control form-control-sm" type="text" maxlength="400" minlength="8" required name="description" id="sv_d"></div>
-    <div class="col-auto"><label class="form-label" for="sv_e">مرجع الدليل</label>
-      <input class="form-control form-control-sm" type="text" maxlength="120" name="evidence_ref" id="sv_e"></div>
-    <div class="col-auto"><label class="form-label" for="sv_a">مبلغ الجزاء</label>
-      <input class="form-control form-control-sm" type="number" step="0.01" min="0" value="0" name="penalty_amount" id="sv_a"></div>
-    <div class="col-auto"><label class="form-label" for="sv_c">العملة</label>
-      <input class="form-control form-control-sm" type="text" maxlength="8" name="currency" id="sv_c"></div>
-    <div class="col-auto"><label class="form-label" for="sv_t">التسوية</label>
-      <input class="form-control form-control-sm" type="number" min="0" name="settlement_id" id="sv_t"></div>
-    <div class="col-auto align-self-end">
-      <button class="action-btn" type="submit" name="rec_violation" value="1"><i class="fa fa-plus"></i> رصد مخالفة</button></div>
+    <div class="card shadow-sm"><div class="card-body">
+      <div class="form-grid">
+        <div><label for="sv_s">المورد *</label>
+          <select name="supplier_id" id="sv_s" required>
+            <option value="">— المورد —</option>
+            <?php foreach ($sups as $s): ?><option value="<?= (int) $s['id'] ?>">#<?= (int) $s['id'] ?></option><?php endforeach; ?>
+          </select></div>
+        <div><label for="sv_k">نوع المخالفة *</label>
+          <select name="violation_kind" id="sv_k" required>
+            <?php foreach ($KINDS as $k => $v): ?><option value="<?= htmlspecialchars($k, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($v, ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?>
+          </select></div>
+        <div><label for="sv_o">تاريخ الوقوع *</label>
+          <input type="date" required name="occurred_on" id="sv_o"></div>
+        <div><label for="sv_d">الوصف *</label>
+          <input type="text" maxlength="400" minlength="8" required name="description" id="sv_d"></div>
+        <div><label for="sv_e">مرجع الدليل</label>
+          <input type="text" maxlength="120" name="evidence_ref" id="sv_e"></div>
+        <div><label for="sv_a">مبلغ الجزاء</label>
+          <input type="number" step="0.01" min="0" value="0" name="penalty_amount" id="sv_a"></div>
+        <div><label for="sv_c">العملة</label>
+          <input type="text" maxlength="8" name="currency" id="sv_c"></div>
+        <div><label for="sv_t">التسوية</label>
+          <input type="number" min="0" name="settlement_id" id="sv_t"></div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-primary" type="submit" name="rec_violation" value="1"><i class="fa fa-plus"></i> رصد مخالفة</button>
+        <button type="button" class="btn-secondary" id="svFormCancelBtn"><i class="fas fa-times"></i> إلغاء</button>
+      </div>
+    </div></div>
   </form>
 
   <table class="table table-striped" data-no-dt>
@@ -251,3 +267,25 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
     </tbody>
   </table>
 </div>
+<script>
+/* طيُّ النموذجِ وفتحُه — السلوكُ المعياريُّ نفسُه في «سجل العملاء».
+   ⛔ ولا `style.display`: الورقةُ تحمل `.allforms{display:none}` — فالتبديلُ
+   بالصنفِ وحدَه، وكتابةُ `display` سطريًّا بلا أولويةٍ تخسر أمامها. */
+(function () {
+    var f = document.getElementById('svForm');
+    var b = document.getElementById('toggleForm');
+    var c = document.getElementById('svFormCancelBtn');
+    if (!f || !b) { return; }
+    function open(on) {
+        f.classList.toggle('allforms-visible', on);
+        b.setAttribute('aria-expanded', on ? 'true' : 'false');
+        if (on) { var i = f.querySelector('select,input'); if (i) { i.focus(); } }
+    }
+    b.addEventListener('click', function (e) {
+        e.preventDefault();
+        open(!f.classList.contains('allforms-visible'));
+    });
+    if (c) { c.addEventListener('click', function () { f.reset(); open(false); }); }
+    if (document.querySelector('.alert-danger')) { open(true); }
+})();
+</script>

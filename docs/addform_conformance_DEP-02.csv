@@ -1,0 +1,48 @@
+﻿الحكم,الملف,الاسم,الطراز,التفصيل,السلوك
+موحَّد,Suppliers/rfq_requests.php,"الترشيح ومراجعة التعاقد",allforms/ems-form,"3 نموذج",—
+موحَّد,Suppliers/sup_handover.php,"تسليم الحصص بين الموردين",allforms/ems-form,"1 نموذج",طيّ+زرّ
+موحَّد,Suppliers/supplier_advances.php,"سلفيات الموردين",allforms/ems-form,"1 نموذج",طيّ
+موحَّد,Suppliers/supplier_bank.php,"حسابات الموردين البنكية",allforms/ems-form,"1 نموذج",طيّ
+موحَّد,Suppliers/supplier_capacity.php,"البيانات المرجعية ومصادر القدرة",allforms/ems-form,"1 نموذج",—
+موحَّد,Suppliers/supplier_contacts.php,"جهات الاتصال والمفوضون","عُدّةٌ: party_contacts_view.php","ems-form pc-form",—
+موحَّد,Suppliers/supplier_contract_lines.php,"بنود عقود الموردين",allforms/ems-form,"2 نموذج",طيّ
+موحَّد,suppliers/supplier_docs_guarantees.php,"سجل المستندات والضمانات","عُدّةٌ: u13_screen_kit","ems-form u13-act · 7 حقلًا",—
+موحَّد,Suppliers/supplier_documents.php,"وثائق المورد وحسابه البنكي",allforms/ems-form,"2 نموذج",—
+موحَّد,Suppliers/supplier_evaluation.php,"تقييم المورد والأداء",allforms/ems-form,"2 نموذج",—
+موحَّد,suppliers/supplier_offers.php,"عروض الموردين والتفاوض","عُدّةٌ: u13_screen_kit","ems-form u13-act · 17 حقلًا",—
+موحَّد,suppliers/supplier_onbehalf_advances.php,"النيابية والسلف والخصومات","عُدّةٌ: u13_screen_kit","ems-form u13-act · 18 حقلًا",—
+موحَّد,suppliers/supplier_payment_allocation.php,"تخصيص الدفع على الإقفالات","عُدّةٌ: u13_screen_kit","ems-form u13-act · 7 حقلًا",—
+موحَّد,suppliers/supplier_quota_distribution.php,"الوحدات المكافئة وتخصيص الحصص","عُدّةٌ: u13_screen_kit","ems-form u13-act · 6 حقلًا",—
+موحَّد,suppliers/supplier_readiness_reserve.php,"الجاهزية والإحلال والاحتياط","عُدّةٌ: u13_screen_kit","ems-form u13-act · 14 حقلًا",—
+موحَّد,suppliers/supplier_responsibility_matrix.php,"مصفوفة المسؤوليات والتكاليف","عُدّةٌ: u13_screen_kit","ems-form u13-act · 22 حقلًا",—
+موحَّد,Suppliers/supplier_rules.php,"قواعد التحميل والجزاءات على المورد",allforms/ems-form,"2 نموذج",—
+موحَّد,suppliers/supplier_slot_closure.php,"الإقفال التعاقدي للوحدات التعاقدية","عُدّةٌ: u13_screen_kit","ems-form u13-act · 15 حقلًا",—
+موحَّد,suppliers/supplier_slot_handover.php,"سجل الإشغال والتسليم","عُدّةٌ: u13_screen_kit","ems-form u13-act · 8 حقلًا",—
+موحَّد,suppliers/supplier_unit_equipment.php,"توزيع الوحدات التعاقدية على المعدات","عُدّةٌ: u13_screen_kit","ems-form u13-act · 18 حقلًا",—
+موحَّد,Suppliers/supplier_violations.php,"المخالفات والجزاءات",allforms/ems-form,"1 نموذج",طيّ+زرّ
+موحَّد,Suppliers/suppliers.php,"سجل الموردين",allforms/ems-form,"1 نموذج",طيّ+زرّ
+موحَّد,Suppliers/supplierscontracts.php,"سجل عقود الموردين",allforms/ems-form,"1 نموذج",زرّ
+"بلا نموذج",Governance/gov_dept_sup.php,"حوكمة إدارة الموردين",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Risk/risk_dept_sup.php,"مخاطر الموردين",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Suppliers/equipment_plan.php,"معدات المورد المتاحة",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Suppliers/quota_approval_minutes.php,"محاضر اعتماد وحدات المورد",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Suppliers/showcontractsuppliers.php,"عرض عقود الموردين (إرثي)",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Suppliers/supplier_aging.php,"أعمار الأرصدة والالتزامات",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Suppliers/supplier_board.php,"لوحة إدارة الموردين",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Suppliers/supplier_capacity_integration.php,"مصادر القدرة والتكامل",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Suppliers/supplier_closure.php,"تصفية إنهاء عقد مورد",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Suppliers/supplier_contract_events.php,"الملاحق والتصفية والإغلاق",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Suppliers/supplier_contract_units.php,"حصص الموردين والوحدات التعاقدية",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Suppliers/supplier_data_dictionary.php,"قاموس بيانات الموردين",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Suppliers/supplier_inference_rules.php,"قاموس قواعد الاستنتاج",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Suppliers/supplier_migration_map.php,"خريطة ترحيل الموردين",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Suppliers/supplier_migration_trace.php,"تتبع التعبئة والترحيل",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Suppliers/supplier_payment_requests.php,"طلبات الدفع وحالة الصرف",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Suppliers/supplier_performance_entries.php,"الأداء والوحدات المعتمدة",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Suppliers/supplier_qualification.php,"التأهيل القانوني والائتماني",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Suppliers/supplier_ref_lists.php,"القوائم المرجعية للموردين",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Suppliers/supplier_review_report.php,"تقرير المراجعة والقبول",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Suppliers/supplier_targets.php,"مستهدفات الموردين",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Suppliers/suppliers_details.php,"تفاصيل المورد (إرثي)",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Suppliers/supplierscontracts_details.php,"ملف عقد المورد",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Suppliers/unit_statement_supplier.php,"اعتماد الوحدات والأداء المعتمد",قراءةٌ/لوحةٌ/تقرير,—,—

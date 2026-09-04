@@ -91,7 +91,13 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
   $header_icon = 'fa fa-list-ol';
   $header_title_html = htmlspecialchars('بنود العروض', ENT_QUOTES, 'UTF-8');
   ob_start(); ?><span class="badge"><?= $queueFail === '' ? count($rows) : '—' ?> بندا · الإجمالي <?= number_format($sum, 2) ?> <?= htmlspecialchars($cur, ENT_QUOTES, 'UTF-8') ?></span><?php
-  $header_actions = array(array('raw' => trim((string) ob_get_clean())));
+  /* زرُّ الإضافةِ المعياريُّ — الطيُّ والفتحُ بـ`allforms-visible` كنظائرِه
+     في «سجل العملاء» و«وحدات القياس». والشارةُ تبقى قبله. */
+  $header_actions = array(
+      array('raw' => trim((string) ob_get_clean())),
+      array('tag' => 'button', 'id' => 'toggleForm', 'class' => 'add-btn',
+            'icon' => 'fa fa-solid fa-plus', 'label' => 'إضافة بند'),
+  );
   $header_back = false;
   include __DIR__ . '/../includes/page_header.php'; ?>
     <!-- سجلُّ حقولِ الورقةِ بحبّتِه — يُضاف بجانبِ ما بُني لا بدلًا منه،
@@ -146,36 +152,49 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
     <div class="alert alert-danger"><?= htmlspecialchars($queueFail, ENT_QUOTES, 'UTF-8') ?></div>
   <?php endif; ?>
 
-  <form method="post" class="row g-2 mb-3">
+  <?php /* النموذجُ الموحَّد — `class="allforms"` يجلب جِلدَ `ems-forms.css`
+       (الحبّةُ الذهبيّةُ العائمةُ) والطيَّ الافتراضيَّ معًا، والحقلُ ابنٌ مباشرٌ
+       لـ`.form-grid` فتنطبق عليه قواعدُ الشبكةِ الخمسة الأعمدة.
+       ⛔ ولا `class="row g-2"`: شبكةُ بوتستراب تُفلِت الحقولَ من الجِلد. */ ?>
+  <form id="qlForm" action="" method="post" class="allforms">
+    <div class="card-header">
+      <h5><i class="fas fa-edit"></i> <span id="formTitle">إضافة بند جديد</span></h5>
+    </div>
     <?php echo csrf_field(); ?>
-    <div class="col-auto"><label class="form-label" for="ql_q">العرض</label>
-      <select class="form-control form-control-sm" name="quotation_id" id="ql_q" required>
-        <option value="">— رأس العرض —</option>
-        <?php foreach ($quotes as $q): ?>
-          <option value="<?= (int) $q['id'] ?>"<?= ($qid === (int) $q['id'] ? ' selected' : '') ?>>#<?= (int) $q['id'] ?></option>
-        <?php endforeach; ?>
-      </select></div>
-    <div class="col-auto"><label class="form-label" for="ql_p">من الكتالوج</label>
-      <select class="form-control form-control-sm" name="product_id" id="ql_p">
-        <option value="">— اختياري —</option>
-        <?php foreach ($products as $pr): ?><option value="<?= (int) $pr['id'] ?>">#<?= (int) $pr['id'] ?></option><?php endforeach; ?>
-      </select></div>
-    <div class="col-auto"><label class="form-label" for="ql_d">الوصف</label>
-      <input class="form-control form-control-sm" type="text" maxlength="240" required name="description" id="ql_d"></div>
-    <div class="col-auto"><label class="form-label" for="ql_qty">الكمية</label>
-      <input class="form-control form-control-sm" type="number" step="0.0001" min="0.0001" required name="qty" id="ql_qty"></div>
-    <div class="col-auto"><label class="form-label" for="ql_u">الوحدة</label>
-      <select class="form-control form-control-sm" name="unit_type" id="ql_u">
-        <option value="hour">ساعة</option><option value="ton">طن</option>
-        <option value="meter">متر</option><option value="trip">رحلة</option></select></div>
-    <div class="col-auto"><label class="form-label" for="ql_pr">سعر الوحدة</label>
-      <input class="form-control form-control-sm" type="number" step="0.01" min="0" required name="unit_price" id="ql_pr"></div>
-    <div class="col-auto"><label class="form-label" for="ql_c">العملة</label>
-      <input class="form-control form-control-sm" type="text" maxlength="8" required name="currency" id="ql_c"></div>
-    <div class="col-auto"><label class="form-label" for="ql_disc">الخصم ٪</label>
-      <input class="form-control form-control-sm" type="number" step="0.01" min="0" max="100" value="0" name="discount_pct" id="ql_disc"></div>
-    <div class="col-auto align-self-end">
-      <button class="action-btn" type="submit" name="add_line" value="1"><i class="fa fa-plus"></i> إضافة بند</button></div>
+    <div class="card shadow-sm"><div class="card-body">
+      <div class="form-grid">
+        <div><label for="ql_q">العرض *</label>
+          <select name="quotation_id" id="ql_q" required>
+            <option value="">— رأس العرض —</option>
+            <?php foreach ($quotes as $q): ?>
+              <option value="<?= (int) $q['id'] ?>"<?= ($qid === (int) $q['id'] ? ' selected' : '') ?>>#<?= (int) $q['id'] ?></option>
+            <?php endforeach; ?>
+          </select></div>
+        <div><label for="ql_p">من الكتالوج</label>
+          <select name="product_id" id="ql_p">
+            <option value="">— اختياري —</option>
+            <?php foreach ($products as $pr): ?><option value="<?= (int) $pr['id'] ?>">#<?= (int) $pr['id'] ?></option><?php endforeach; ?>
+          </select></div>
+        <div><label for="ql_d">الوصف *</label>
+          <input type="text" maxlength="240" required name="description" id="ql_d"></div>
+        <div><label for="ql_qty">الكمية *</label>
+          <input type="number" step="0.0001" min="0.0001" required name="qty" id="ql_qty"></div>
+        <div><label for="ql_u">الوحدة</label>
+          <select name="unit_type" id="ql_u">
+            <option value="hour">ساعة</option><option value="ton">طن</option>
+            <option value="meter">متر</option><option value="trip">رحلة</option></select></div>
+        <div><label for="ql_pr">سعر الوحدة *</label>
+          <input type="number" step="0.01" min="0" required name="unit_price" id="ql_pr"></div>
+        <div><label for="ql_c">العملة *</label>
+          <input type="text" maxlength="8" required name="currency" id="ql_c"></div>
+        <div><label for="ql_disc">الخصم ٪</label>
+          <input type="number" step="0.01" min="0" max="100" value="0" name="discount_pct" id="ql_disc"></div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-primary" type="submit" name="add_line" value="1"><i class="fa fa-plus"></i> إضافة بند</button>
+        <button type="button" class="btn-secondary" id="qlFormCancelBtn"><i class="fas fa-times"></i> إلغاء</button>
+      </div>
+    </div></div>
   </form>
 
   <table class="table table-striped" data-no-dt>
@@ -205,3 +224,27 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
     </tbody>
   </table>
 </div>
+<script>
+/* طيُّ النموذجِ وفتحُه — السلوكُ المعياريُّ نفسُه في «سجل العملاء».
+   ⛔ ولا `style.display`: `ems-forms.css` يحمل `.allforms{display:none}`
+   و`.allforms.allforms-visible{display:block}` — فالتبديلُ بالصنفِ وحدَه،
+   وكتابةُ `display` سطريًّا بلا أولويةٍ تخسر أمام الورقة. */
+(function () {
+    var f = document.getElementById('qlForm');
+    var b = document.getElementById('toggleForm');
+    var c = document.getElementById('qlFormCancelBtn');
+    if (!f || !b) { return; }
+    function open(on) {
+        f.classList.toggle('allforms-visible', on);
+        b.setAttribute('aria-expanded', on ? 'true' : 'false');
+        if (on) { var i = f.querySelector('select,input'); if (i) { i.focus(); } }
+    }
+    b.addEventListener('click', function (e) {
+        e.preventDefault();
+        open(!f.classList.contains('allforms-visible'));
+    });
+    if (c) { c.addEventListener('click', function () { f.reset(); open(false); }); }
+    /* عودةٌ بعد إرسالٍ فاشل: يُفتح النموذجُ ليرى المستخدمُ ما كتب */
+    if (document.querySelector('.alert-danger')) { open(true); }
+})();
+</script>

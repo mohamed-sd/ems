@@ -1,0 +1,53 @@
+﻿الحكم,الملف,الاسم,الطراز,التفصيل,السلوك
+موحَّد,Equipments/asset_recon.php,"مطابقة سجل الأصول بالتشغيل",allforms/ems-form,"1 نموذج",طيّ
+موحَّد,Equipments/code_bridge.php,"جسر ترقيم المعدات",allforms/ems-form,"1 نموذج",طيّ
+موحَّد,Equipments/equipment_documents.php,"وثائق المعدات والمشغلين",allforms/ems-form,"1 نموذج",طيّ
+موحَّد,Equipments/equipment_sourcing.php,"مصدر المعدة ونمط تملكها",allforms/ems-form,"1 نموذج",طيّ
+موحَّد,Equipments/equipments_drivers.php,المعدات,allforms/ems-form,"1 نموذج",طيّ
+موحَّد,Equipments/equipments_fleet.php,المعدات,allforms/ems-form,"1 نموذج",طيّ+زرّ
+موحَّد,Equipments/equipments_types.php,"أنواع المعدات وفئاتها",allforms/ems-form,"1 نموذج",طيّ
+موحَّد,Equipments/fleet_depreciation_profiles.php,"سياسات الإهلاك المعتمدة",allforms/ems-form,"1 نموذج",طيّ
+موحَّد,Equipments/fleet_models.php,"موديلات المعدات ومواصفاتها",allforms/ems-form,"1 نموذج",طيّ
+موحَّد,Equipments/manage_failure_codes.php,"تصنيف الأعطال وأسبابها",allforms/ems-form,"1 نموذج",طيّ+زرّ
+موحَّد,Equipments/meter_readings.php,"قراءات العدادات",allforms/ems-form,"2 نموذج",—
+موحَّد,Fleet/asset_assignments.php,"التخصيص على الوحدات",allforms/ems-form,"1 نموذج",طيّ+زرّ
+موحَّد,fleet/asset_components.php,"المكونات والملحقات","عُدّةٌ: u13_screen_kit","ems-form u13-act · 8 حقلًا",—
+موحَّد,Fleet/asset_exit.php,"الخروج المؤقت",allforms/ems-form,"1 نموذج",طيّ+زرّ
+موحَّد,Fleet/asset_intake.php,"طلب إدخال الأصل",allforms/ems-form,"3 نموذج",طيّ+زرّ
+موحَّد,Fleet/asset_use_rights.php,"حق الاستخدام التشغيلي",allforms/ems-form,"1 نموذج",طيّ+زرّ
+موحَّد,fleet/code_reconciliation.php,"مصالحة مطابقة الأكواد","عُدّةٌ: u13_screen_kit","ems-form u13-act · 9 حقلًا",—
+موحَّد,fleet/daily_operating_log.php,"السجل اليومي للتشغيل","عُدّةٌ: u13_screen_kit","ems-form u13-act · 9 حقلًا",—
+موحَّد,fleet/exception_register.php,"سجل الاستثناءات","عُدّةٌ: u13_screen_kit","ems-form u13-act · 9 حقلًا",—
+موحَّد,fleet/external_auditor_notes.php,"ملاحظات المراجع الخارجي","عُدّةٌ: u13_screen_kit","ems-form u13-act · 9 حقلًا",—
+موحَّد,fleet/financed_asset_recon.php,"مصالحة الأعيان الممولة","عُدّةٌ: u13_screen_kit","ems-form u13-act · 9 حقلًا",—
+موحَّد,fleet/fleet_board.php,"لوحة الأسطول","عُدّةٌ: u13_screen_kit","ems-form u13-act · 4 حقلًا",—
+موحَّد,fleet/inspection_card.php,"بطاقة التفتيش","عُدّةٌ: u13_screen_kit","ems-form u13-act · 8 حقلًا",—
+موحَّد,fleet/management_decisions.php,"حزمة القرارات الإدارية","عُدّةٌ: u13_screen_kit","ems-form u13-act · 7 حقلًا",—
+موحَّد,fleet/numbering_bridge.php,"مصالحة ترقيم الأصول","عُدّةٌ: u13_screen_kit","ems-form u13-act · 10 حقلًا",—
+موحَّد,fleet/open_points.php,"النقاط غير المحسومة","عُدّةٌ: u13_screen_kit","ems-form u13-act · 13 حقلًا",—
+موحَّد,fleet/owner_reconciliation.php,"مصالحة الأسطول بالملاك","عُدّةٌ: u13_screen_kit","ems-form u13-act · 12 حقلًا",—
+موحَّد,fleet/power_sources.php,"مصادر القدرة","عُدّةٌ: u13_screen_kit","ems-form u13-act · 10 حقلًا",—
+موحَّد,fleet/register_operation_recon.php,"مصالحة السجل بالتشغيل","عُدّةٌ: u13_screen_kit","ems-form u13-act · 11 حقلًا",—
+موحَّد,fleet/source_conflicts.php,"التضاربات بين المصادر","عُدّةٌ: u13_screen_kit","ems-form u13-act · 10 حقلًا",—
+موحَّد,fleet/technical_state.php,"الحالة الفنية","عُدّةٌ: u13_screen_kit","ems-form u13-act · 7 حقلًا",—
+موحَّد,fleet/use_right_ranges.php,"نطاقات حق الاستخدام","عُدّةٌ: u13_screen_kit","ems-form u13-act · 4 حقلًا",—
+موحَّد,Maintenance/inspections.php,"الفحص الفني اليومي",allforms/ems-form,"2 نموذج",طيّ+زرّ
+"بلا نموذج",Equipments/fleet_failures.php,"تقرير الأعطال",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Equipments/gov_dept_flt.php,"حوكمة إدارة الأسطول",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Equipments/select_project.php,"تخصيص المعدات للمشروعات",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Finance/asset_hours_link.php,"ربط الأصل بساعات تشغيله",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Finance/depr_run.php,"محاسبة الأصول الثابتة والإهلاك",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",fleet/asset_card.php,"كرت الأصل","u13 بلا فعلِ تسجيل",—,—
+"بلا نموذج",fleet/asset_documents.php,"مستندات الأصل","u13 بلا فعلِ تسجيل",—,—
+"بلا نموذج",Fleet/asset_full_history.php,"تاريخ المعدة الكامل",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Fleet/asset_hours_reference.php,"مرجع ساعات التشغيل للإهلاك",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",fleet/asset_life_reference.php,"مرجع العمر الإنتاجي بالساعات","u13 بلا فعلِ تسجيل",—,—
+"بلا نموذج",Fleet/asset_readiness.php,"الملخص التشغيلي الشهري",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",fleet/breakdown_log.php,"سجل الأعطال والتوقفات","u13 بلا فعلِ تسجيل",—,—
+"بلا نموذج",fleet/classification_directory.php,"دليل الترميز والتصنيف","u13 بلا فعلِ تسجيل",—,—
+"بلا نموذج",Fleet/fleet_schema_matrix.php,"مصفوفة بنية الشيتات",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Fleet/readiness_board.php,"جاهزية المعدات للتشغيل",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Fleet/readiness_cert.php,"شهادات جاهزية المعدات",قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",fleet/state_change_log.php,"سجل تغير الحالة","u13 بلا فعلِ تسجيل",—,—
+"بلا نموذج",Reports/equipments_reports.php,equipments_reports,قراءةٌ/لوحةٌ/تقرير,—,—
+"بلا نموذج",Risk/risk_dept_flt.php,"مخاطر الأسطول",قراءةٌ/لوحةٌ/تقرير,—,—

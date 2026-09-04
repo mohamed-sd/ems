@@ -1,0 +1,148 @@
+══ ① الساعةُ ══
+  OS(UTC)=2026-09-04 01:51:49  PHP.tz=UTC  DB(UTC)=2026-09-04 01:51:49  DB.tz=SYSTEM  |فرق|=0 ثانية
+  occurred_at مستقبليّ = 2224 · created_at مستقبليّ = 0
+    سنة 2024   1
+    سنة 2025   1
+    سنة 2026   19405
+    سنة 2027   1
+    سنة 2087   220
+    سنة 2088   1999
+
+══ ② الناقلُ ══
+  ems_business_events=21627 · deliveries=21418 · gov_event_rulings=58
+  مفاتيحُ منتَجةٌ متميّزة = 58
+    state processed     21381
+    state dlq              37
+  ems_event_dead_letter=0 · delivery_orphans=82 · events.in_dlq=12
+
+══ ③ الـDLQ بعائلاتِه ══
+  effectfanout           CONSUMER_RETIRED    25
+  effectlink             HANDLER_ERROR       11
+  balancecalculator      NO_SUB               1
+  ⑵ صفوفُ HANDLER_ERROR — أَمُحقَّقٌ أثرُها؟ أَقابلٌ مصدرُها للحلّ؟
+    #28316  expense.depreciation.recorded            fin_asset#873    links=0 eff=0 حيّ=0  [fin_assets: 26 صفًّا · المدى 1..191]
+    #28318  expense.depreciation.recorded            fin_asset#874    links=0 eff=0 حيّ=0  [fin_assets: 26 صفًّا · المدى 1..191]
+    #28320  expense.depreciation.recorded            fin_asset#874    links=0 eff=0 حيّ=0  [fin_assets: 26 صفًّا · المدى 1..191]
+    #28322  expense.depreciation.recorded            fin_asset#874    links=0 eff=0 حيّ=0  [fin_assets: 26 صفًّا · المدى 1..191]
+    #28324  expense.depreciation.recorded            fin_asset#874    links=0 eff=0 حيّ=0  [fin_assets: 26 صفًّا · المدى 1..191]
+    #28326  expense.depreciation.recorded            fin_asset#874    links=0 eff=0 حيّ=0  [fin_assets: 26 صفًّا · المدى 1..191]
+    #28328  expense.depreciation.recorded            fin_asset#875    links=0 eff=0 حيّ=0  [fin_assets: 26 صفًّا · المدى 1..191]
+    #28330  expense.depreciation.recorded            fin_asset#875    links=0 eff=0 حيّ=0  [fin_assets: 26 صفًّا · المدى 1..191]
+    #28332  expense.depreciation.recorded            fin_asset#875    links=0 eff=0 حيّ=0  [fin_assets: 26 صفًّا · المدى 1..191]
+    #28334  payable.finance_installment.accrued      fin_funding_schedule#991    links=0 eff=0 حيّ=0  [fin_funding_schedules: 57 صفًّا · المدى 58..114]
+    #28336  finance.recon_adjustment.posted          bank_recon_match#1361   links=0 eff=0 حيّ=0  [bank_recon_matches: 0 صفًّا · المدى —..—]
+
+══ ④ سجلّا المستهلكين ══
+  event_consumers=142  ⇐ الحاكمُ (يقرؤه EventOutboxFanout وEventDeliveryWorker)
+  ems_event_subscriptions=142  ⇐ إعلانُ نيّةٍ لا يقرؤه سطرُ إنتاج
+    App\Services\Bus\Consumers\GovernanceWatchConsumer       active=1 مفاتيح=70
+    App\Services\Bus\Consumers\EffectLinkConsumer            active=1 مفاتيح=23
+    App\Services\Financing\FinancingCycleService             active=1 مفاتيح=10
+    App\Core\EffectFanout                                    active=0 مفاتيح=10
+    App\Services\Finance\AccountingCycleService              active=1 مفاتيح=9
+    App\Services\Governance\SplitProjectionConsumer          active=1 مفاتيح=5
+    App\Services\Treasury\TreasuryCycleService               active=1 مفاتيح=4
+    App\Services\Capacity\BalanceCalculator                  active=0 مفاتيح=2
+    App\Services\Capacity\SupplierPerformanceAggregator      active=0 مفاتيح=2
+    App\Services\Policy\UnitJourneyService                   active=1 مفاتيح=1
+    App\Services\Payroll\OffsetService                       active=1 مفاتيح=1
+    App\Services\Policy\UnitJourneyService                   active=0 مفاتيح=1
+    App\Services\Capacity\GapMonitor                         active=0 مفاتيح=1
+    App\Services\Revenue\CollectionService                   active=1 مفاتيح=1
+    AppServicesFinanceApprovalsInboxService                  active=0 مفاتيح=1
+    App\Services\Payroll\PayrollRunService                   active=1 مفاتيح=1
+  ⑵ EffectFanout — أقرارٌ مكتوبٌ أم عطبُ FQCN؟
+    class=App\Core\EffectFanout active=0
+    سبب: الصنفُ الحقيقيُّ App\Services\EffectFanout — محرّكُ مروحةٍ بدوالَّ ساكنةٍ يُنادى داخلَ الخدماتِ في المعاملةِ نفسِها، ولا مدخلَ handle() فيه. فليس مستهلكَ ناقلٍ أصلًا، وأثرُه الماليُّ باقٍ حيث كان.
+    على القرص App/Core/EffectFanout.php        غائب
+    على القرص App/Services/EffectFanout.php    موجود
+
+══ ⑤ أحكامُ الأحداث ══
+  business   11
+  audit      47
+  آخرُ قياسٍ للأحكام: 2026-08-21 11:16:54
+  الـbusiness ومستهلكوها النشِطون:
+    revenue.unit.recognized                  prod=5199   App\Services\Bus\Consumers\EffectLinkConsumer | App\Services\Bus\Consumers\GovernanceWatchConsumer
+    penalty.approved                         prod=84     App\Services\Bus\Consumers\EffectLinkConsumer | App\Services\Bus\Consumers\GovernanceWatchConsumer
+    finance.hour_recognized                  prod=17     App\Services\Bus\Consumers\EffectLinkConsumer | App\Services\Bus\Consumers\GovernanceWatchConsumer
+    expense.purchase.recorded                prod=13     App\Services\Bus\Consumers\EffectLinkConsumer | App\Services\Bus\Consumers\GovernanceWatchConsumer
+    equipment.hour_logged                    prod=8      App\Services\Bus\Consumers\EffectLinkConsumer | App\Services\Bus\Consumers\GovernanceWatchConsumer
+    expense.maintenance.recorded             prod=2      App\Services\Bus\Consumers\EffectLinkConsumer | App\Services\Bus\Consumers\GovernanceWatchConsumer
+    expense.parts.issued                     prod=2      App\Services\Bus\Consumers\EffectLinkConsumer | App\Services\Bus\Consumers\GovernanceWatchConsumer
+    payable.purchase.accrued                 prod=2      App\Services\Bus\Consumers\EffectLinkConsumer | App\Services\Bus\Consumers\GovernanceWatchConsumer
+    settlement.approved                      prod=2      App\Services\Bus\Consumers\EffectLinkConsumer | App\Services\Bus\Consumers\GovernanceWatchConsumer
+    expense.landed_cost.recorded             prod=1      App\Services\Bus\Consumers\EffectLinkConsumer | App\Services\Bus\Consumers\GovernanceWatchConsumer
+    finance.request.forwarded                prod=1      App\Services\Bus\Consumers\EffectLinkConsumer | App\Services\Bus\Consumers\GovernanceWatchConsumer
+
+══ ⑥ الأساسُ المحاسبيّ ══
+  قيود=6713 أسطر=13426 | مدين=37694775.13 دائن=37694775.13 فرق=0.00
+  fin_event_effects=5210 · fin_event_links=10519 · fin_financial_events=5256
+
+══ ⑦ سلسلةُ RJ-01 ══
+  ◆ DEP-01 تجاري
+     clients                              91 
+     project                             125 
+     opportunities                        23 
+     sal_client_needs                      0 
+     sal_client_need_rfq                   0 
+     quotations                          141 
+     sal_quotations                        0 
+     contracts                           121 
+     client_contracts                    121 (رؤية)
+     contract_commitments                147 
+     contract_monthly_plan               310 
+  ◆ DEP-02 موردون
+     suppliers                            74 
+     supplier_contracts                   20 
+     supplierscontracts                   20 
+     supplier_rfqs                         3 
+     rfq_lines                             9 
+     rfq_quotes                            1 
+     rfq_awards                            1 
+     supplier_capacity                     4 
+     wf_coverage                          20 
+     sup_quota_supplier_unit               0 
+     sup_allocation_unit_equipment         0 
+     suppliercontractequipments           20 
+  ◆ DEP-04 أسطول
+     equipments                          219 
+     contractequipments                   28 
+     asset_use_right                      70 
+     asset_readiness                     320 
+     equipment_operators                 377 
+  ◆ DEP-13 قوى
+     employees                           373 
+     equipment_drivers                    34 
+     operator_rotations                   19 
+  ◆ DEP-12/11 تشغيل
+     sites                               121 
+     contract_operational_sites          132 
+     site_day                              0 
+     site_day_shift                        0 
+     operations                          478 
+     timesheet                           654 
+     ops_timesheet                         0 
+     unit_entries                        542 
+     unit_time_log                       658 
+     unit_approvals                      976 
+     unit_final_approvals                  0 
+  ◆ DEP-05 مالية
+     claims                              300 
+     claim_lines                         345 
+     sal_claims                            0 
+     ar_claim_invoices                     0 
+     tax_invoices                        285 
+     fin_receivables                     286 
+  ◆ DEP-06 خزينة
+     fin_payments                       1118 
+     fin_collection_allocations          214 
+     tre_cash_box                          1 
+     tre_cash_move                         1 
+     fina_collections                      0 
+
+══ ⑧ النطاق ══
+  شركة #1 ايكوبيشن مجاني [suspended]
+  شركة #4 ايكوبيشن [active]
+  أحداثُ الشركة 4 = 21627
+
+تمّ.
