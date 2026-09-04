@@ -87,10 +87,26 @@ foreach ($pairs as $p) {
 $add(2, 'تركيبةٌ حرجةٌ يحملها فاعلٌ واحد', 'صفر', $bothSides, $bothSides === 0 ? 'PASS' : 'FAIL',
      'مغلقٌ بالبنيةِ — users.role عمودٌ واحد');
 
+/* ◆ **وشرطُ «بلا مراجعة» جزءٌ من البندِ لا زينةٌ في عنوانِه**: كان المقياسُ
+     يعُدُّ كلَّ قالبٍ تعدَّدت مصادرُه فيستوي المخلوطُ صامتًا والمُضافُ عن قصدٍ
+     بدليل. والمراجعةُ **واقعةٌ مقيَّدةٌ بسببٍ ودليل** في `perm01_seed_source_review`
+     بحبّةِ (قالبٍ × مصدر) — فمصدرٌ يُضاف غدًا بلا قيدٍ يُرسِّب من جديد.
+   ⛔ **وغيابُ السجلِّ يشدِّد ولا يُرخي**: إن لم يوجد الجدولُ عُدَّ الكلُّ
+     غيرَ مُراجَع — فلا يُقرأ نقصُ البنيةِ براءةً. */
+$hasReview = $one("SELECT COUNT(*) FROM information_schema.TABLES
+                    WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='perm01_seed_source_review'") > 0;
+$reviewClause = $hasReview
+    ? "WHERE NOT EXISTS(SELECT 1 FROM perm01_seed_source_review r
+                         WHERE r.profile_id = i.profile_id AND r.seeded_from = i.seeded_from)"
+    : '';
 $multiSrc = $one("SELECT COUNT(*) FROM (SELECT i.profile_id FROM gov_profile_items i
    JOIN gov_role_profiles p ON p.profile_id=i.profile_id AND p.state='active'
+   {$reviewClause}
    GROUP BY i.profile_id HAVING COUNT(DISTINCT i.seeded_from) > 1) z");
-$add(3, 'قالبٌ نافذٌ مبذورٌ من أكثرَ من مصدرٍ بلا مراجعة', 'صفر', $multiSrc, $multiSrc === 0 ? 'PASS' : 'FAIL');
+$reviewedN = $hasReview ? $one("SELECT COUNT(*) FROM perm01_seed_source_review") : 0;
+$add(3, 'قالبٌ نافذٌ مبذورٌ من أكثرَ من مصدرٍ بلا مراجعة', 'صفر', $multiSrc, $multiSrc === 0 ? 'PASS' : 'FAIL',
+     $hasReview ? ('ومصادرُ بذرٍ مُراجَعةٌ بسببٍ ودليل: ' . $reviewedN)
+                : 'لا سجلَّ مراجعةٍ — فكلُّ تعدُّدٍ يُعَدُّ بلا مراجعة');
 
 $draftNoApproval = $one("SELECT COUNT(*) FROM gov_role_profiles p WHERE p.state='draft'
    AND NOT EXISTS(SELECT 1 FROM gov_profile_activation_approval a
@@ -167,9 +183,30 @@ $add(14, 'مصادرُ منحٍ مُعلَنةٌ وغيرُ منفَّذة', 'ص
      (4 - count($srcs)) === 0 ? 'PASS' : 'FAIL', 'المنفَّذ: ' . implode(' · ', array_keys($srcs)));
 
 $thirdRead = $grep('includes/permissions_helper.php', 'template_permissions');
+/* ◆ **و«لا تُقرأ» ادّعاءٌ يُقاس لا يُفترَض**: يُعَدُّ من يذكر الطبقةَ من ملفّاتِ
+     الإنتاج (خارجَ الفحصِ والعُدّةِ والوثائق). فقولُ «مبنيّةٌ بلا حكم» عن طبقةٍ
+     تقرؤها شاشةٌ حيّةٌ وخدمةٌ عاملةٌ **وصفٌ خاطئ**: هي مقروءةٌ في قرارٍ آخرَ
+     لا في قرارِ فتحِ الشاشة. والحكمُ يبقى راسبًا لأنَّ الأمرَ يطلب **حكمًا
+     مسجَّلًا للمالك** — وليس لي أن أسنَّه، بل أن أضع بين يديه الواقعةَ مقيسةً. */
+$refCount = function ($needle) use ($ROOT) {
+    $n = 0;
+    $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($ROOT,
+            FilesystemIterator::SKIP_DOTS | FilesystemIterator::UNIX_PATHS));
+    foreach ($it as $f) {
+        $p = str_replace('\\', '/', $f->getPathname());
+        if (substr($p, -4) !== '.php') { continue; }
+        foreach (array('/tests/', '/tools/', '/docs/', '/vendor/', '/storage/', '/.git/', '/database/') as $skip) {
+            if (strpos($p, $skip) !== false) { continue 2; }
+        }
+        if (strpos((string) @file_get_contents($p), $needle) !== false) { $n++; }
+    }
+    return $n;
+};
+$tplRefs = $refCount('permission_templates') + $refCount('PermissionTemplateService');
 $add(15, 'طبقةُ صلاحياتٍ مبنيّةٌ بلا حكمٍ ولا وسم', 'صفر',
      'قائمة — permission_templates ' . $one('SELECT COUNT(*) FROM permission_templates') . ' صفًّا',
-     'FAIL', 'لا تُقرأ في قرارِ فتحِ الشاشة ولا وُسمت «غير نافذة»');
+     'FAIL', 'تقرؤها ' . $tplRefs . ' ملفَّ إنتاجٍ (منها admin/permissions وsec_governance وPermissionResolver) '
+   . 'لكن **لا في قرارِ فتحِ الشاشة** — والمُعوِزُ حكمٌ مسجَّلٌ للمالك: تُوصَل أم تُوسَم');
 
 $myItems = $one("SELECT COUNT(*) FROM perm01_target_item WHERE workspace_id='WS-MY' AND role_id=0");
 $noMy = $one("SELECT COUNT(*) FROM gov_role_profiles p WHERE p.state='active' AND p.profile_code LIKE 'TGT-R%'
@@ -261,7 +298,9 @@ $add(29, 'تركيبةُ فعلٍ حرجٍ ممنوعةٌ وقابلةٌ للت�
      'لا رابطَ بين رموزِ الأفعالِ ونقاطِ تنفيذها — §3-②');
 $add(30, 'ضابطٌ موثَّقٌ يُعلَن نافذًا وهو غيرُ مقروءٍ في زمنِ التشغيل', 'صفر',
      $one('SELECT COUNT(*) FROM gov_authority_limits WHERE active=1') . ' حدًّا نصّيًّا لا يقرؤه قرارُ الشاشة',
-     'FAIL', 'تُوصَل أو تُوسَم «غير نافذة» — §8-②');
+     'FAIL', 'يقرؤها ' . ($refCount('gov_authority_limits') + $refCount('ScopeEngine')) . ' ملفَّ إنتاجٍ عبرَ '
+   . 'ScopeEngine (ExecDecisionRouter · w15_view) — فهي نافذةٌ في مجالِ التنفيذِ لا في فتحِ الشاشة. '
+   . 'تُوصَل أو تُوسَم «غير نافذة» بحكمٍ مسجَّل — §8-②');
 $add(31, 'التجميدُ نافذٌ حتى إشعار', 'نافذ',
      $one("SELECT COUNT(*) FROM gov_policy_freeze WHERE active=1") . ' مدًى',
      $one("SELECT COUNT(*) FROM gov_policy_freeze WHERE active=1") >= 2 ? 'PASS' : 'FAIL');

@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-04 17:54:57
--- الجداول: 1246 · المناظير: 29
+-- المصدر: equipation_manage · التوليد: 2026-09-04 18:13:18
+-- الجداول: 1247 · المناظير: 29
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -16358,6 +16358,20 @@ CREATE TABLE `perm01_auth_mode` (
   `reason` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='PERM-01 §6-2 — وضع كل مستخدم معلن لا ضمني';
+
+-- ── Table: perm01_seed_source_review ──
+CREATE TABLE `perm01_seed_source_review` (
+  `review_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `profile_id` int(10) unsigned NOT NULL,
+  `seeded_from` varchar(60) NOT NULL COMMENT 'مصدر البذر المراجع كما هو في gov_profile_items',
+  `reason` varchar(255) NOT NULL DEFAULT '' COMMENT 'لماذا اضيف هذا المصدر الى هذا القالب',
+  `evidence` varchar(255) NOT NULL DEFAULT '' COMMENT 'الهجرة او الاداة التي انشات البذر',
+  `reviewed_by` int(11) NOT NULL DEFAULT 0 COMMENT 'صفر يعني هجرة',
+  `reviewed_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`review_id`),
+  UNIQUE KEY `uq_profile_source` (`profile_id`,`seeded_from`),
+  KEY `ix_source` (`seeded_from`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='PERM-01 §10-3 — مراجعة مصدر بذر مضاف الى قالب نافذ';
 
 -- ── Table: perm01_target_item ──
 CREATE TABLE `perm01_target_item` (
