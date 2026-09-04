@@ -1,0 +1,33 @@
+{
+    "migration": "2028_05_07_perm01_orphan_grant_sweep.php",
+    "revoked": [
+        {
+            "grant_id": "61",
+            "user_id": "1",
+            "reason": "إلحاقٌ آليٌّ من خريطةِ الدورِ الحي — GOV-AUTH-01 §8-3 ③"
+        },
+        {
+            "grant_id": "85",
+            "user_id": "15",
+            "reason": "إلحاقٌ آليٌّ من خريطةِ الدورِ الحي — GOV-AUTH-01 §8-3 ③"
+        },
+        {
+            "grant_id": "63",
+            "user_id": "16",
+            "reason": "إلحاقٌ آليٌّ من خريطةِ الدورِ الحي — GOV-AUTH-01 §8-3 ③"
+        },
+        {
+            "grant_id": "77",
+            "user_id": "893",
+            "reason": "إلحاقٌ آليٌّ من خريطةِ الدورِ الحي — GOV-AUTH-01 §8-3 ③"
+        }
+    ],
+    "retired": [
+        97,
+        151,
+        160
+    ],
+    "first_run_at": "2026-09-04 13:30:23 UTC",
+    "runs": 1,
+    "last_run_at": "2026-09-04 13:30:23 UTC"
+}

@@ -19,7 +19,8 @@
  *
  * ⛔ **ولا تكتب هذه الأداةُ في صلاحيّةٍ ولا قالب** — تُخرج سجلَّ فرزٍ للمراجعة.
  *
- * التشغيل: php tools/perm01_door_triage.php [--csv]
+ * التشغيل: php tools/perm01_door_triage.php [--csv] [--adopt]
+ *          `--adopt` يُثبِّت أبوابَ الرابطِ النشِطِ في الهدفِ بقاعدةِ السندِ الحاكم
  * ═══════════════════════════════════════════════════════════════════════════
  */
 if (php_sapi_name() !== 'cli') { exit("CLI فقط\n"); }
@@ -34,6 +35,7 @@ $db = new mysqli($host, ems_env('DB_USER'), ems_env('DB_PASS'), ems_env('DB_NAME
 if ($db->connect_errno) { exit('تعذّر الاتصال: ' . $db->connect_error . "\n"); }
 $db->set_charset('utf8mb4');
 $CSV = in_array('--csv', $argv, true);
+$ADOPT = in_array('--adopt', $argv, true);
 
 /* ── الأهدافُ ومساحاتُ الأدوار ─────────────────────────────────────────── */
 $target = array();
@@ -108,6 +110,37 @@ $auto = $tally['SEED_ARTIFACT'] + $tally['BLOCKED_ELSEWHERE'];
 $owner = $tally['LIVE_LINK_OWNER'] + $tally['CONTROL_OWNER'];
 printf("\n   يُحسَم بالقياسِ بلا قرار: %d (%.1f%%)\n", $auto, 100 * $auto / max(1, array_sum($tally)));
 printf("   يحتاج قرارَ مالكٍ مجموعًا: %d (%.1f%%)\n", $owner, 100 * $owner / max(1, array_sum($tally)));
+
+/* ══ الحكمُ بقاعدةِ السندِ الحاكم (قرارُ المالك 2026-09-04) ═══════════════
+   ◆ **البابُ يبقى إن كان له سندٌ حاكم**، وله ثلاثة: ① ورقةُ الدليل ·
+     ② يُبلَغ بالنقرِ من شاشةِ دليل · ③ **له رابطٌ نشِطٌ في سايدبارِ دورِه**.
+     والثالثُ سندٌ لأنَّ `nav_items` سجلٌّ محكومٌ في حملةِ NAVR لا صدفةٌ — ورابطٌ
+     نشِطٌ **قرارٌ قائمٌ** لا يُنقض بأداة. وما لا سندَ له يُزال.
+   ⛔ **والشاشةُ الحاكمةُ لا تُستثنى من القاعدة**: بلا رابطٍ نشِطٍ لا سندَ لها في
+     هذه المساحة — والحوكمةُ تُشدَّد لا تُوسَّع.
+   ◆ ويُكتب الأصلُ `LIVE_LINK` فيُعرف سندُ كلِّ بندٍ في السجلِّ نفسِه. */
+if ($ADOPT) {
+    echo "\n══ التثبيتُ بقاعدةِ السندِ الحاكم ═════════════════════════════════════\n";
+    $db->query("DELETE FROM perm01_target_item WHERE origin = 'LIVE_LINK'");
+    $removed = $db->affected_rows;
+    $ins = $db->prepare("INSERT IGNORE INTO perm01_target_item
+                           (workspace_id, module_code, origin, source_ref) VALUES (?, ?, 'LIVE_LINK', ?)");
+    $wrote = 0;
+    foreach ($rows as $row) {
+        if ($row[2] !== 'LIVE_LINK_OWNER') { continue; }
+        $sr = 'live-link:' . mb_substr($row[3], 0, 120);
+        $ins->bind_param('sss', $row[0], $row[1], $sr);
+        if ($ins->execute() && $db->affected_rows > 0) { $wrote++; }
+    }
+    $ins->close();
+    $db->query("UPDATE perm01_target_profile p
+                   SET p.screens_n = (SELECT COUNT(*) FROM perm01_target_item i
+                                       WHERE i.workspace_id = p.workspace_id)");
+    printf("   حُذف من هذا المصدر: %d · ثُبِّت: %d · والهدفُ الآن: %d بندًا\n",
+        $removed, $wrote, (int) $db->query("SELECT COUNT(*) FROM perm01_target_item")->fetch_row()[0]);
+    printf("   ويُزال بلا سندٍ: %d (SEED_ARTIFACT) · وشاشاتٌ حاكمةٌ بلا رابطٍ تُزال: %d\n",
+        $tally['SEED_ARTIFACT'], $tally['CONTROL_OWNER']);
+}
 
 if ($CSV) {
     $out = $ROOT . '/docs/perm_study/PERM01_DOOR_TRIAGE.csv';

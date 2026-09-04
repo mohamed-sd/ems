@@ -132,7 +132,17 @@ class ExcelRegistry
             ]),
             new Column('employee_status', 'الحالة', ['type' => Column::TYPE_ENUM, 'enum' => ['نشط', 'متوقف'], 'default' => 'نشط', 'width' => 14]),
         ], [
-            'moduleCode'      => 'drivers',
+            /* ⛔ **كودٌ قصيرٌ يُحَلُّ إلى بابٍ لا يحرسه أحد**: كان `'drivers'`،
+                 و`check_page_permissions` تحلُّه بمطابقةٍ فضفاضةٍ إلى **أقصرِ**
+                 كودٍ يحوي «drivers» — فوقع على `movement/add_drivers.php`، وهي
+                 **شاشةٌ ميتة**: صفرُ قالبٍ نافذٍ يمنحها · صفرُ موضعٍ في ورقةِ
+                 الدليل · صفرُ رابطٍ نشِط. فحارسُ التصديرِ كان يسأل عن صلاحيةِ
+                 شاشةٍ لا يملكها أحدٌ بسند.
+               ◆ **والمالكُ الحقيقيُّ شاشةُ الجدولِ نفسِه**: الكيانُ يقرأ
+                 `employees`، و`Employees/employees.php` حيّةٌ ومحكومةٌ (في ورقةِ
+                 الدليلِ وبرابطَين نشِطَين) ومملوكةٌ للموارد البشريّةِ صاحبةِ
+                 الحقِّ بنصِّ `SEN-002`. فالمسارُ الكاملُ يُعلَن ولا يُترك للمطابقة. */
+            'moduleCode'      => 'Employees/employees.php',
             'softDeleteColumn' => null,
             'createdByColumn'  => null,
             'instructions'    => [
