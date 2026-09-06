@@ -126,113 +126,113 @@ $h = function ($s) { return htmlspecialchars((string) $s, ENT_QUOTES, 'UTF-8'); 
     <div class="alert alert-<?php echo $h($flashKind); ?>" role="status"><?php echo $h($flash); ?></div>
   <?php endif; ?>
 
-  <div class="alert alert-warning" role="status">
-    <strong>خمسة قيود لا يتجاوز واحد منها:</strong>
-    حراس <code>never</code> لا تكسر مهما كان السبب ·
-    المجيز ليس الطالب ولا من الدور 15 ·
-    الشاشات المالية تلزمها ثنائية: مجيز حوكمة ومجيز مالي مختلفان ·
-    السقف 4 ساعات و8 بمجيز ثان ولا يتجاوز 24 بحال ·
-    وصنف <code>with_compensating_control</code> يلزمه ضابط معوض مكتوب.
-  </div>
+ <div class="alert alert-warning" role="status">
+ <strong>خمسة قيود لا يتجاوز واحد منها:</strong>
+ حراس <code>never</code> لا تكسر مهما كان السبب -
+ المجيز ليس الطالب ولا من الدور 15 -
+ الشاشات المالية تلزمها ثنائية: مجيز حوكمة ومجيز مالي مختلفان -
+ السقف 4 ساعات و8 بمجيز ثان ولا يتجاوز 24 بحال -
+ وصنف <code>with_compensating_control</code> يلزمه ضابط معوض مكتوب.
+ </div>
 
-  <?php if (!$__isOperator): ?>
-    <div class="alert alert-info" role="status">
-      هذه الشاشة للعرض في حسابك. تسجيل الفتح بيد ادارة الصلاحيات (الدور 15) وحدها.
-    </div>
-  <?php endif; ?>
+ <?php if (!$__isOperator): ?>
+ <div class="alert alert-info" role="status">
+ هذه الشاشة للعرض في حسابك. تسجيل الفتح بيد ادارة الصلاحيات (الدور 15) وحدها.
+ </div>
+ <?php endif; ?>
 
   <?php /* ── ① فتحٌ جديد ─────────────────────────────────────────────────── */ ?>
-  <div class="ems-card ems-mb-16">
-    <div class="filter-title">
-      <span class="filter-title-icon"><i class="fa fa-unlock-keyhole"></i></span>
-      افتح شاشة اضطرارا
-    </div>
-    <div class="filter-body">
-      <form method="post" class="ems-form">
-        <input type="hidden" name="csrf_token" value="<?php echo $CSRF; ?>">
-        <input type="hidden" name="action" value="open">
-        <div class="form-group px-w-320">
-          <label for="bg_user">من يفتح له</label>
-          <select id="bg_user" name="bg_user" class="form-control" required
-                  <?php echo $__isOperator ? '' : 'disabled'; ?>>
-            <option value="">اختر</option>
-            <?php foreach ($USERS as $u): ?>
+ <div class="ems-card ems-mb-16">
+ <div class="filter-title">
+ <span class="filter-title-icon"><i class="fa fa-unlock-keyhole"></i></span>
+ افتح شاشة اضطرارا
+ </div>
+ <div class="filter-body">
+ <form method="post" class="ems-form">
+ <input type="hidden" name="csrf_token" value="<?php echo $CSRF; ?>">
+ <input type="hidden" name="action" value="open">
+ <div class="form-group px-w-320">
+ <label for="bg_user">من يفتح له</label>
+ <select id="bg_user" name="bg_user" class="form-control" required
+ <?php echo $__isOperator ? '' : 'disabled'; ?>>
+ <option value="">اختر</option>
+ <?php foreach ($USERS as $u): ?>
               <option value="<?php echo (int) $u['id']; ?>">
                 <?php echo $h($u['name'] . ' (دور ' . $u['role'] . ')'); ?></option>
             <?php endforeach; ?>
-          </select>
-        </div>
-        <div class="form-group px-w-320">
-          <label for="bg_screen">الشاشة</label>
-          <input list="bg_screens" id="bg_screen" name="bg_screen" class="form-control" required
-                 placeholder="اكتب جزءا من المسار" <?php echo $__isOperator ? '' : 'disabled'; ?>>
+ </select>
+ </div>
+ <div class="form-group px-w-320">
+ <label for="bg_screen">الشاشة</label>
+ <input list="bg_screens" id="bg_screen" name="bg_screen" class="form-control" required
+ placeholder="اكتب جزءا من المسار" <?php echo $__isOperator ? '' : 'disabled'; ?>>
           <datalist id="bg_screens">
             <?php foreach ($SCREENS as $s): ?>
               <option value="<?php echo $h($s['code']); ?>"><?php echo $h($s['name']); ?></option>
             <?php endforeach; ?>
-          </datalist>
-        </div>
-        <div class="form-group px-w-320">
-          <label for="bg_gov">مجيز الحوكمة (ليس انت ولا صاحب الطلب)</label>
-          <select id="bg_gov" name="bg_gov" class="form-control" required
-                  <?php echo $__isOperator ? '' : 'disabled'; ?>>
-            <option value="">اختر</option>
-            <?php foreach ($USERS as $u): if ((string) $u['role'] === '15') { continue; } ?>
+ </datalist>
+ </div>
+ <div class="form-group px-w-320">
+ <label for="bg_gov">مجيز الحوكمة (ليس انت ولا صاحب الطلب)</label>
+ <select id="bg_gov" name="bg_gov" class="form-control" required
+ <?php echo $__isOperator ? '' : 'disabled'; ?>>
+ <option value="">اختر</option>
+ <?php foreach ($USERS as $u): if ((string) $u['role'] === '15') { continue; } ?>
               <option value="<?php echo (int) $u['id']; ?>">
                 <?php echo $h($u['name'] . ' (دور ' . $u['role'] . ')'); ?></option>
             <?php endforeach; ?>
-          </select>
-        </div>
-        <div class="form-group px-w-320">
-          <label for="bg_fin">مجيز مالي (للشاشات المالية)</label>
-          <select id="bg_fin" name="bg_fin" class="form-control" <?php echo $__isOperator ? '' : 'disabled'; ?>>
-            <option value="0">لا ينطبق</option>
-            <?php foreach ($USERS as $u): if ((string) $u['role'] === '15') { continue; } ?>
+ </select>
+ </div>
+ <div class="form-group px-w-320">
+ <label for="bg_fin">مجيز مالي (للشاشات المالية)</label>
+ <select id="bg_fin" name="bg_fin" class="form-control" <?php echo $__isOperator ? '' : 'disabled'; ?>>
+ <option value="0">لا ينطبق</option>
+ <?php foreach ($USERS as $u): if ((string) $u['role'] === '15') { continue; } ?>
               <option value="<?php echo (int) $u['id']; ?>">
                 <?php echo $h($u['name'] . ' (دور ' . $u['role'] . ')'); ?></option>
             <?php endforeach; ?>
-          </select>
-        </div>
-        <div class="form-group px-w-320">
-          <label for="bg_hours">المدة بالساعات (4 · و8 بمجيز ثان)</label>
-          <input type="number" id="bg_hours" name="bg_hours" class="form-control" min="1" max="24"
-                 value="4" required <?php echo $__isOperator ? '' : 'disabled'; ?>>
-        </div>
-        <div class="form-group px-w-320">
-          <label for="bg_comp">ضابط معوض (حيث يلزم)</label>
-          <input type="text" id="bg_comp" name="bg_comp" class="form-control" maxlength="200"
-                 <?php echo $__isOperator ? '' : 'disabled'; ?>>
-        </div>
-        <div class="form-group px-w-320">
-          <label for="bg_reason">السبب (مطلوب)</label>
-          <input type="text" id="bg_reason" name="bg_reason" class="form-control" maxlength="255" required
-                 <?php echo $__isOperator ? '' : 'disabled'; ?>
-                 placeholder="مثال: قفل خاطئ منع المحاسب من اقفال الفترة">
-        </div>
-        <button class="btn btn-danger" type="submit" <?php echo $__isOperator ? '' : 'disabled'; ?>>
-          <i class="fa fa-unlock"></i> افتح اضطرارا
-        </button>
-      </form>
-    </div>
-  </div>
+ </select>
+ </div>
+ <div class="form-group px-w-320">
+ <label for="bg_hours">المدة بالساعات (4 - و8 بمجيز ثان)</label>
+ <input type="number" id="bg_hours" name="bg_hours" class="form-control" min="1" max="24"
+ value="4" required <?php echo $__isOperator ? '' : 'disabled'; ?>>
+ </div>
+ <div class="form-group px-w-320">
+ <label for="bg_comp">ضابط معوض (حيث يلزم)</label>
+ <input type="text" id="bg_comp" name="bg_comp" class="form-control" maxlength="200"
+ <?php echo $__isOperator ? '' : 'disabled'; ?>>
+ </div>
+ <div class="form-group px-w-320">
+ <label for="bg_reason">السبب (مطلوب)</label>
+ <input type="text" id="bg_reason" name="bg_reason" class="form-control" maxlength="255" required
+ <?php echo $__isOperator ? '' : 'disabled'; ?>
+ placeholder="مثال: قفل خاطئ منع المحاسب من اقفال الفترة">
+ </div>
+ <button class="btn btn-danger" type="submit" <?php echo $__isOperator ? '' : 'disabled'; ?>>
+ <i class="fa fa-unlock"></i> افتح اضطرارا
+ </button>
+ </form>
+ </div>
+ </div>
 
-  <?php /* ── ② الاستثناءاتُ الحيّة ───────────────────────────────────────── */ ?>
-  <div class="ems-card ems-mb-16">
-    <div class="filter-title">
-      <span class="filter-title-icon"><i class="fa fa-hourglass-half"></i></span>
-      فتح ساري الان (<?php echo count($LIVE); ?>)
+ <?php /* ── ② الاستثناءاتُ الحيّة ───────────────────────────────────────── */ ?>
+ <div class="ems-card ems-mb-16">
+ <div class="filter-title">
+ <span class="filter-title-icon"><i class="fa fa-hourglass-half"></i></span>
+ فتح ساري الان (<?php echo count($LIVE); ?>)
     </div>
     <div class="filter-body">
       <?php if (!$LIVE): ?>
-        <div class="alert alert-success" role="status">
-          لا فتح اضطراري ساريا. وهذا هو الوضع المعتاد.
-        </div>
-      <?php else: ?>
-        <div class="table-container">
-          <table class="table table-striped" data-no-datatable>
-            <thead><tr><th>الموظف</th><th>الشاشة</th><th>ينتهي</th><th>المجيزون</th><th>السبب</th><th>اغلاق مبكر</th></tr></thead>
-            <tbody>
-              <?php foreach ($LIVE as $e): $pid = (int) $e['person_id']; ?>
+ <div class="alert alert-success" role="status">
+ لا فتح اضطراري ساريا. وهذا هو الوضع المعتاد.
+ </div>
+ <?php else: ?>
+ <div class="table-container">
+ <table class="table table-striped" data-no-datatable>
+ <thead><tr><th>الموظف</th><th>الشاشة</th><th>ينتهي</th><th>المجيزون</th><th>السبب</th><th>اغلاق مبكر</th></tr></thead>
+ <tbody>
+ <?php foreach ($LIVE as $e): $pid = (int) $e['person_id']; ?>
                 <tr>
                   <td><?php echo $h(isset($NAMES[$pid]) ? $NAMES[$pid] : ('#' . $pid)); ?></td>
                   <td><code><?php echo $h($e['permission_code']); ?></code></td>
@@ -244,14 +244,14 @@ $h = function ($s) { return htmlspecialchars((string) $s, ENT_QUOTES, 'UTF-8'); 
                       <input type="hidden" name="csrf_token" value="<?php echo $CSRF; ?>">
                       <input type="hidden" name="action" value="close">
                       <input type="hidden" name="ex_id" value="<?php echo (int) $e['ex_id']; ?>">
-                      <input type="text" name="close_reason" class="form-control" required
-                             placeholder="سبب الاغلاق" <?php echo $__isOperator ? '' : 'disabled'; ?>>
+ <input type="text" name="close_reason" class="form-control" required
+ placeholder="سبب الاغلاق" <?php echo $__isOperator ? '' : 'disabled'; ?>>
                       <button class="btn btn-secondary" type="submit"
                               <?php echo $__isOperator ? '' : 'disabled'; ?>>اغلق</button>
-                    </form>
-                  </td>
-                </tr>
-              <?php endforeach; ?>
+ </form>
+ </td>
+ </tr>
+ <?php endforeach; ?>
             </tbody>
           </table>
         </div>
@@ -260,20 +260,20 @@ $h = function ($s) { return htmlspecialchars((string) $s, ENT_QUOTES, 'UTF-8'); 
   </div>
 
   <?php /* ── ③ حرّاسُ `never` ─────────────────────────────────────────────── */ ?>
-  <div class="ems-card">
-    <div class="filter-title">
-      <span class="filter-title-icon"><i class="fa fa-ban"></i></span>
-      حراس لا يكسر زجاجها بحال (<?php echo count($NEVER); ?>)
+ <div class="ems-card">
+ <div class="filter-title">
+ <span class="filter-title-icon"><i class="fa fa-ban"></i></span>
+ حراس لا يكسر زجاجها بحال (<?php echo count($NEVER); ?>)
     </div>
     <div class="filter-body">
       <?php if (!$NEVER): ?>
-        <div class="alert alert-info" role="status">لا حارس مصنف <code>never</code> في السجل.</div>
-      <?php else: ?>
-        <div class="table-container">
-          <table class="table table-sm" data-no-datatable>
-            <thead><tr><th>الحارس</th><th>الاسم</th></tr></thead>
-            <tbody>
-              <?php foreach ($NEVER as $n): ?>
+ <div class="alert alert-info" role="status">لا حارس مصنف <code>never</code> في السجل.</div>
+ <?php else: ?>
+ <div class="table-container">
+ <table class="table table-sm" data-no-datatable>
+ <thead><tr><th>الحارس</th><th>الاسم</th></tr></thead>
+ <tbody>
+ <?php foreach ($NEVER as $n): ?>
                 <tr><td><code><?php echo $h($n['guard_code']); ?></code></td>
                     <td><?php echo $h($n['name_ar']); ?></td></tr>
               <?php endforeach; ?>

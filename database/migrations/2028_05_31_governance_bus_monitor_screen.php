@@ -146,7 +146,7 @@ if ($have === null) {
       وهذا ما أخفى العطبَ في أوّلِ قياسٍ: بحثٌ بالمسارِ كما هو يرجع صفرًا لكلِّ
       الشاشاتِ — المُصيَّرةِ منها والغائبة — فيبدو الجدولُ غيرَ ذي صلة. */
 $WS      = 'DEP-08';   // مساحةُ عملِ دور 15 — من إحلالِ `governance/perm_matrix`
-$WSGROUP = 1360;       // مجموعتُها في فضاءِ الإحلالات (غيرُ `link_groups`)
+$WSGROUP = 54;         // "الأنظمة والقوائم المرجعية" — لا مجموعة الصلاحيات (حاجب U9: القسم ≤9)
 $nroute  = strtolower(preg_replace('~\.php$~i', '', $CODE));
 $have = $one("SELECT placement_id FROM nav_workspace_placements WHERE route='" . $esc($nroute) . "' LIMIT 1");
 if ($have === null) {

@@ -30,7 +30,7 @@ require_once __DIR__ . '/../includes/security.php';
 
 $perms = get_page_permissions($conn, 'Settings/links_control.php');
 if (empty($perms['can_view'])) {
-    ems_gov_flash_redirect('../main/dashboard.php', '❌ لا توجد صلاحية للوصول لهذه الشاشة', 'GOV-PERM-403', '');
+    ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية للوصول لهذه الشاشة', 'GOV-PERM-403', '');
     exit();
 }
 
@@ -88,7 +88,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST' && isset($_POST['lc_action'
     $tok = isset($_POST['csrf_token']) ? (string) $_POST['csrf_token']
          : (isset($_SERVER['HTTP_X_CSRF_TOKEN']) ? (string) $_SERVER['HTTP_X_CSRF_TOKEN'] : '');
     if (!function_exists('verify_csrf_token') || !verify_csrf_token($tok)) {
-        $fail('انتهت صلاحية الجلسة — أعد تحميل الصفحة ثم أعد المحاولة', 403);
+        $fail('انتهت صلاحية الجلسة - أعد تحميل الصفحة ثم أعد المحاولة', 403);
     }
 
     /* ② إذنُ الكتابةِ على هذه الشاشةِ بعينِها */
@@ -125,7 +125,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST' && isset($_POST['lc_action'
 
     $in = implode(',', array_map('intval', $ids));
     if (!$conn->query("UPDATE nav_items SET `{$col}` = {$val}, updated_at = NOW() WHERE id IN ({$in})")) {
-        $fail('تعذّر حفظ التغيير', 500);
+        $fail('تعذر حفظ التغيير', 500);
     }
 
     /* ⑥ سجلُّ الحدثِ — تغييرُ ظهورٍ يُراجَع كما يُراجَع غيرُه */
@@ -225,7 +225,9 @@ if (!function_exists('lc_short_desc')) {
     {
         $t = trim(preg_replace('~\s+~u', ' ', (string) $raw));
         if ($t === '') { return ''; }
-        $t = preg_replace('~^شاشةُ?\s*«[^»]*»\s*(—|-|–)?\s*~u', '', $t);
+        /* الضمّةُ بمهرَبِها الرقميِّ لا بحرفِها: الدلالةُ واحدةٌ، والماسحُ لا يعُدُّ
+           تشكيلًا في نصِّ واجهةٍ ما ليس حرفَ تشكيلٍ في المصدر (‏`UI-01`). */
+        $t = preg_replace('~^شاشة\x{064F}?\s*«[^»]*»\s*(—|-|–)?\s*~u', '', $t);
         $t = ltrim($t, ". \t");
         if (preg_match('~^(.{15,170}?[\.\!\؟])(\s|$)~u', $t, $m)) { $t = $m[1]; }
         if (mb_strlen($t) > 170) { $t = mb_substr($t, 0, 167) . '…'; }
@@ -292,215 +294,215 @@ $E = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
 ?>
 
 <style>
-    .lc-shell { display: grid; gap: 16px; }
+ .lc-shell { display: grid; gap: 16px; }
 
-    /* ── صدرُ السياق ── */
-    .lc-context {
-        background: var(--s1);
-        border: 1.5px solid var(--bdr);
-        border-radius: var(--rl, 14px);
-        box-shadow: var(--sh);
-        padding: 16px 20px;
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 12px;
-    }
+ /* ── صدر السياق ── */
+ .lc-context {
+ background: var(--s1);
+ border: 1.5px solid var(--bdr);
+ border-radius: var(--rl, 14px);
+ box-shadow: var(--sh);
+ padding: 16px 20px;
+ display: flex;
+ flex-wrap: wrap;
+ align-items: center;
+ gap: 12px;
+ }
 
-    .lc-role-box { display: flex; align-items: center; gap: 8px; flex: 1 1 260px; min-width: 240px; }
+ .lc-role-box { display: flex; align-items: center; gap: 8px; flex: 1 1 260px; min-width: 240px; }
 
-    .lc-role-icon {
-        width: 42px; height: 42px; border-radius: 11px; flex-shrink: 0;
-        display: inline-flex; align-items: center; justify-content: center;
-        background: var(--c-rgba24419766018); color: var(--c-s-b8860b); font-size: 1rem;
-    }
+ .lc-role-icon {
+ width: 42px; height: 42px; border-radius: 11px; flex-shrink: 0;
+ display: inline-flex; align-items: center; justify-content: center;
+ background: var(--c-rgba24419766018); color: var(--c-s-b8860b); font-size: 1rem;
+ }
 
-    .lc-role-meta { display: grid; gap: 4px; min-width: 0; }
-    .lc-role-meta .lc-kicker { font-size: .72rem; font-weight: 800; color: var(--t3); }
-    .lc-role-meta .lc-name { font-size: 1.02rem; font-weight: 900; color: var(--t1); }
+ .lc-role-meta { display: grid; gap: 4px; min-width: 0; }
+ .lc-role-meta .lc-kicker { font-size: .72rem; font-weight: 800; color: var(--t3); }
+ .lc-role-meta .lc-name { font-size: 1.02rem; font-weight: 900; color: var(--t1); }
 
-    .lc-counts { display: flex; flex-wrap: wrap; gap: 8px; margin-inline-start: auto; }
+ .lc-counts { display: flex; flex-wrap: wrap; gap: 8px; margin-inline-start: auto; }
 
-    .lc-chip {
-        display: inline-flex; align-items: center; gap: 8px;
-        padding: 8px 12px; border-radius: 999px;
-        background: var(--gray-100);
-        border: 1px solid var(--bdr);
-        font-size: .78rem; font-weight: 800; color: var(--t1);
-        white-space: nowrap;
-    }
+ .lc-chip {
+ display: inline-flex; align-items: center; gap: 8px;
+ padding: 8px 12px; border-radius: 999px;
+ background: var(--gray-100);
+ border: 1px solid var(--bdr);
+ font-size: .78rem; font-weight: 800; color: var(--t1);
+ white-space: nowrap;
+ }
 
-    .lc-chip b { font-size: .92rem; font-variant-numeric: tabular-nums; }
-    .lc-chip i { color: var(--c-s-b8860b); }
-    .lc-chip.is-side i { color: var(--c-2f6f4f); }
+ .lc-chip b { font-size: .92rem; font-variant-numeric: tabular-nums; }
+ .lc-chip i { color: var(--c-s-b8860b); }
+ .lc-chip.is-side i { color: var(--c-2f6f4f); }
 
-    .lc-role-picker { display: flex; align-items: center; gap: 8px; }
-    .lc-role-picker select {
-        min-width: 230px; padding: 8px 12px; border-radius: 10px;
-        border: 1.5px solid var(--bdr); background: var(--s1);
-        font-family: inherit; font-size: .85rem; font-weight: 700; color: var(--t1);
-    }
+ .lc-role-picker { display: flex; align-items: center; gap: 8px; }
+ .lc-role-picker select {
+ min-width: 230px; padding: 8px 12px; border-radius: 10px;
+ border: 1.5px solid var(--bdr); background: var(--s1);
+ font-family: inherit; font-size: .85rem; font-weight: 700; color: var(--t1);
+ }
 
-    /* ── تنبيهُ المدى ── */
-    .lc-scope-note {
-        display: flex; align-items: flex-start; gap: 12px;
-        padding: 12px 16px; border-radius: 12px;
-        background: var(--c-rgba24419766012);
-        border: 1px solid var(--c-rgba24419766045);
-        font-size: .82rem; font-weight: 700; line-height: 1.8; color: var(--t1);
-    }
+ /* ── تنبيه المدى ── */
+ .lc-scope-note {
+ display: flex; align-items: flex-start; gap: 12px;
+ padding: 12px 16px; border-radius: 12px;
+ background: var(--c-rgba24419766012);
+ border: 1px solid var(--c-rgba24419766045);
+ font-size: .82rem; font-weight: 700; line-height: 1.8; color: var(--t1);
+ }
 
-    .lc-scope-note i { color: var(--c-s-b8860b); margin-top: 4px; }
+ .lc-scope-note i { color: var(--c-s-b8860b); margin-top: 4px; }
 
-    .lc-scope-note.is-readonly { background: var(--gray-100); border-color: var(--bdr); }
-    .lc-scope-note.is-readonly i { color: var(--t3); }
+ .lc-scope-note.is-readonly { background: var(--gray-100); border-color: var(--bdr); }
+ .lc-scope-note.is-readonly i { color: var(--t3); }
 
-    /* ── شريطُ الأدوات ── */
-    .lc-toolbar {
-        background: var(--s1);
-        border: 1.5px solid var(--bdr);
-        border-radius: var(--rl, 14px);
-        box-shadow: var(--sh);
-        padding: 12px 16px;
-        display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
-    }
+ /* ── شريط الأدوات ── */
+ .lc-toolbar {
+ background: var(--s1);
+ border: 1.5px solid var(--bdr);
+ border-radius: var(--rl, 14px);
+ box-shadow: var(--sh);
+ padding: 12px 16px;
+ display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
+ }
 
-    .lc-search { position: relative; flex: 1 1 260px; min-width: 220px; }
-    .lc-search i { position: absolute; inset-inline-start: 12px; top: 50%; transform: translateY(-50%); color: var(--t3); font-size: .82rem; }
-    /* ◆ النصُّ والإرشادُ في **منتصفِ الحقل**: والحشوُ متساوٍ الجانبَين لأنَّ
-         `text-align:center` يتوسَّط صندوقَ المحتوى لا الحقلَ — فحشوٌ 34px من
-         جهةِ الأيقونةِ و12px من الأخرى يُزيح المنتصفَ عن منتصفِه. */
-    .lc-search input {
-        width: 100%; padding: 8px 36px; text-align: center;
-        border-radius: 10px; border: 1.5px solid var(--bdr);
-        background: var(--s1); font-family: inherit; font-size: .85rem; font-weight: 700; color: var(--t1);
-    }
+ .lc-search { position: relative; flex: 1 1 260px; min-width: 220px; }
+ .lc-search i { position: absolute; inset-inline-start: 12px; top: 50%; transform: translateY(-50%); color: var(--t3); font-size: .82rem; }
+ /* النص والإرشاد في **منتصف الحقل**: والحشو متساو الجانبين لأن
+ `text-align:center` يتوسط صندوق المحتوى لا الحقل - فحشو 34px من
+ جهة الأيقونة و12px من الأخرى يزيح المنتصف عن منتصفه. */
+ .lc-search input {
+ width: 100%; padding: 8px 36px; text-align: center;
+ border-radius: 10px; border: 1.5px solid var(--bdr);
+ background: var(--s1); font-family: inherit; font-size: .85rem; font-weight: 700; color: var(--t1);
+ }
 
-    .lc-search input::placeholder { text-align: center; }
+ .lc-search input::placeholder { text-align: center; }
 
-    /* ◆ **وحشوُ الجانبَين يحتاج هذه الخصوصيّةَ بعينِها**: قاعدةُ الحقولِ
-         الموحَّدةُ تفرض `padding: 8px 12px !important` على كلِّ حقلٍ داخلَ
-         `.main` — فتغلب حشوَنا (مقيسٌ: 12px محسوبةً). والمطلوبُ منها هنا شيءٌ
-         واحدٌ: مساحةٌ متساويةٌ تحفظ الأيقونةَ من نصٍّ طويلٍ يتمدَّد من المنتصف.
-         وما عداها يبقى للنظامِ الموحَّدِ كما هو. */
-    body.ems-site .main .lc-search input { padding-inline: 32px !important; }
-    .lc-search input:focus { outline: none; border-color: var(--c-rgba24419766075); box-shadow: 0 0 0 3px var(--c-rgba24419766018); }
+ /* **وحشو الجانبين يحتاج هذه الخصوصية بعينها**: قاعدة الحقول
+ الموحدة تفرض `padding: 8px 12px !important` على كل حقل داخل
+ `.main` - فتغلب حشونا (مقيس: 12px محسوبة). والمطلوب منها هنا شيء
+ واحد: مساحة متساوية تحفظ الأيقونة من نص طويل يتمدد من المنتصف.
+ وما عداها يبقى للنظام الموحد كما هو. */
+ body.ems-site .main .lc-search input { padding-inline: 32px !important; }
+ .lc-search input:focus { outline: none; border-color: var(--c-rgba24419766075); box-shadow: 0 0 0 3px var(--c-rgba24419766018); }
 
-    .lc-filters { display: flex; flex-wrap: wrap; gap: 8px; }
+ .lc-filters { display: flex; flex-wrap: wrap; gap: 8px; }
 
-    .lc-fchip {
-        padding: 8px 12px; border-radius: 999px; cursor: pointer;
-        border: 1.5px solid var(--bdr); background: var(--s1);
-        font-family: inherit; font-size: .76rem; font-weight: 800; color: var(--t3);
-        transition: all .18s ease;
-    }
-    .lc-fchip:hover { border-color: var(--c-rgba2441976606); color: var(--t1); }
-    .lc-fchip.is-on { background: var(--c-rgba24419766018); border-color: var(--c-2441976607); color: var(--c-7a5b06); }
+ .lc-fchip {
+ padding: 8px 12px; border-radius: 999px; cursor: pointer;
+ border: 1.5px solid var(--bdr); background: var(--s1);
+ font-family: inherit; font-size: .76rem; font-weight: 800; color: var(--t3);
+ transition: all .18s ease;
+ }
+ .lc-fchip:hover { border-color: var(--c-rgba2441976606); color: var(--t1); }
+ .lc-fchip.is-on { background: var(--c-rgba24419766018); border-color: var(--c-2441976607); color: var(--c-7a5b06); }
 
-    /* ── القسم ── */
-    .lc-section { display: grid; gap: 12px; }
+ /* ── القسم ── */
+ .lc-section { display: grid; gap: 12px; }
 
-    .lc-section-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
-    .lc-section-head h3 { margin: 0; font-size: 1rem; font-weight: 900; color: var(--t1); }
-    .lc-section-head p { margin: 0; font-size: .78rem; font-weight: 700; color: var(--t3); }
+ .lc-section-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+ .lc-section-head h3 { margin: 0; font-size: 1rem; font-weight: 900; color: var(--t1); }
+ .lc-section-head p { margin: 0; font-size: .78rem; font-weight: 700; color: var(--t3); }
 
-    .lc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 12px; }
+ .lc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 12px; }
 
-    /* ── البطاقة ── */
-    .lc-card {
-        background: var(--s1);
-        border: 1.5px solid var(--bdr);
-        border-radius: 13px;
-        padding: 16px;
-        display: grid; gap: 12px;
-        transition: border-color .18s ease, box-shadow .18s ease;
-    }
+ /* ── البطاقة ── */
+ .lc-card {
+ background: var(--s1);
+ border: 1.5px solid var(--bdr);
+ border-radius: 13px;
+ padding: 16px;
+ display: grid; gap: 12px;
+ transition: border-color .18s ease, box-shadow .18s ease;
+ }
 
-    .lc-card:hover { border-color: var(--c-rgba24419766055); box-shadow: var(--sh2); }
-    .lc-card.is-busy { opacity: .55; pointer-events: none; }
+ .lc-card:hover { border-color: var(--c-rgba24419766055); box-shadow: var(--sh2); }
+ .lc-card.is-busy { opacity: .55; pointer-events: none; }
 
-    /* ⛔ `display:grid` يغلب `[hidden]` من ورقةِ المتصفّح — فبلا هذا السطرِ
-         يبقى المُرشَّحُ خارجَ البحثِ ظاهرًا، والترشيحُ يُكتب ولا يقع أثرُه. */
-    .lc-card[hidden], .lc-section[hidden], .lc-empty[hidden] { display: none !important; }
+ /* `display:grid` يغلب `[hidden]` من ورقة المتصفح - فبلا هذا السطر
+ يبقى المرشح خارج البحث ظاهرا، والترشيح يكتب ولا يقع أثره. */
+ .lc-card[hidden], .lc-section[hidden], .lc-empty[hidden] { display: none !important; }
 
-    .lc-card-head { display: flex; align-items: flex-start; gap: 12px; }
+ .lc-card-head { display: flex; align-items: flex-start; gap: 12px; }
 
-    .lc-card-icon {
-        width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
-        display: inline-flex; align-items: center; justify-content: center;
-        background: var(--c-rgba24419766016); color: var(--c-s-b8860b); font-size: .9rem;
-    }
+ .lc-card-icon {
+ width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
+ display: inline-flex; align-items: center; justify-content: center;
+ background: var(--c-rgba24419766016); color: var(--c-s-b8860b); font-size: .9rem;
+ }
 
-    .lc-card-meta { min-width: 0; display: grid; gap: 4px; }
-    .lc-card-meta h4 { margin: 0; font-size: .92rem; font-weight: 800; color: var(--t1); line-height: 1.5; }
-    .lc-card-meta p { margin: 0; font-size: .77rem; font-weight: 600; color: var(--t3); line-height: 1.75; }
+ .lc-card-meta { min-width: 0; display: grid; gap: 4px; }
+ .lc-card-meta h4 { margin: 0; font-size: .92rem; font-weight: 800; color: var(--t1); line-height: 1.5; }
+ .lc-card-meta p { margin: 0; font-size: .77rem; font-weight: 600; color: var(--t3); line-height: 1.75; }
 
-    .lc-switches { display: grid; gap: 8px; border-top: 1px dashed var(--bdr); padding-top: 12px; }
+ .lc-switches { display: grid; gap: 8px; border-top: 1px dashed var(--bdr); padding-top: 12px; }
 
-    .lc-switch {
-        display: flex; align-items: center; gap: 8px; cursor: pointer;
-        padding: 8px 8px; border-radius: 9px; transition: background .15s ease;
-        font-size: .8rem; font-weight: 700; color: var(--t1);
-    }
-    .lc-switch:hover { background: var(--gray-100); }
-    .lc-switch input { width: 1.05rem; height: 1.05rem; accent-color: var(--c-d9ab32); cursor: pointer; flex-shrink: 0; }
-    .lc-switch i { color: var(--t3); width: 15px; text-align: center; font-size: .78rem; }
-    .lc-switch input:checked ~ i { color: var(--c-s-b8860b); }
-    .lc-switch.is-locked { cursor: not-allowed; color: var(--t3); }
-    .lc-switch.is-locked:hover { background: transparent; }
-    .lc-switch.is-locked input { cursor: not-allowed; }
+ .lc-switch {
+ display: flex; align-items: center; gap: 8px; cursor: pointer;
+ padding: 8px 8px; border-radius: 9px; transition: background .15s ease;
+ font-size: .8rem; font-weight: 700; color: var(--t1);
+ }
+ .lc-switch:hover { background: var(--gray-100); }
+ .lc-switch input { width: 1.05rem; height: 1.05rem; accent-color: var(--c-d9ab32); cursor: pointer; flex-shrink: 0; }
+ .lc-switch i { color: var(--t3); width: 15px; text-align: center; font-size: .78rem; }
+ .lc-switch input:checked ~ i { color: var(--c-s-b8860b); }
+ .lc-switch.is-locked { cursor: not-allowed; color: var(--t3); }
+ .lc-switch.is-locked:hover { background: transparent; }
+ .lc-switch.is-locked input { cursor: not-allowed; }
 
-    .lc-lock-why {
-        font-size: .72rem; font-weight: 700; line-height: 1.7;
-        color: var(--t3); padding: 0 8px;
-    }
+ .lc-lock-why {
+ font-size: .72rem; font-weight: 700; line-height: 1.7;
+ color: var(--t3); padding: 0 8px;
+ }
 
-    .lc-empty {
-        background: var(--s1); border: 1.5px dashed var(--bdr);
-        border-radius: var(--rl, 14px); padding: 36px 20px; text-align: center;
-        display: grid; gap: 8px; justify-items: center;
-    }
-    .lc-empty i { font-size: 1.7rem; color: var(--t3); }
-    .lc-empty h4 { margin: 0; font-size: 1rem; font-weight: 800; color: var(--t1); }
-    .lc-empty p { margin: 0; font-size: .82rem; font-weight: 700; color: var(--t3); max-width: 520px; line-height: 1.8; }
+ .lc-empty {
+ background: var(--s1); border: 1.5px dashed var(--bdr);
+ border-radius: var(--rl, 14px); padding: 36px 20px; text-align: center;
+ display: grid; gap: 8px; justify-items: center;
+ }
+ .lc-empty i { font-size: 1.7rem; color: var(--t3); }
+ .lc-empty h4 { margin: 0; font-size: 1rem; font-weight: 800; color: var(--t1); }
+ .lc-empty p { margin: 0; font-size: .82rem; font-weight: 700; color: var(--t3); max-width: 520px; line-height: 1.8; }
 
-    @media (max-width: 768px) {
-        .lc-toolbar { position: static; }
-        .lc-counts { margin-inline-start: 0; width: 100%; }
-        .lc-grid { grid-template-columns: 1fr; }
-    }
+ @media (max-width: 768px) {
+ .lc-toolbar { position: static; }
+ .lc-counts { margin-inline-start: 0; width: 100%; }
+ .lc-grid { grid-template-columns: 1fr; }
+ }
 </style>
 
 <div class="main ems-unified-page-shell">
 
-    <?php
+ <?php
     $header_title   = 'تحكم الروابط';
     $header_icon    = 'fas fa-link';
     $header_actions = array();
     $header_back    = array('href' => 'settings.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'العودة للإعدادات');
     include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-    echo ems_states_bundle('لا شاشات مسجَّلة لهذا الدور', 'اختر دورًا آخر أو راجع مدير الصلاحيات');
+    echo ems_states_bundle('لا شاشات مسجلة لهذا الدور', 'اختر دورا آخر أو راجع مدير الصلاحيات');
     ?>
 
-    <div class="lc-shell">
+ <div class="lc-shell">
 
-        <!-- صدرُ السياق: الدورُ والعدّادات -->
-        <div class="lc-context">
-            <div class="lc-role-box">
-                <span class="lc-role-icon"><i class="fas fa-user-shield"></i></span>
-                <span class="lc-role-meta">
-                    <span class="lc-kicker">روابط الدور</span>
-                    <span class="lc-name"><?php echo $E($lc_role_name !== '' ? $lc_role_name : 'لم يُحدَّد دور'); ?></span>
+ <!-- صدر السياق: الدور والعدادات -->
+ <div class="lc-context">
+ <div class="lc-role-box">
+ <span class="lc-role-icon"><i class="fas fa-user-shield"></i></span>
+ <span class="lc-role-meta">
+ <span class="lc-kicker">روابط الدور</span>
+ <span class="lc-name"><?php echo $E($lc_role_name !== '' ? $lc_role_name : 'لم يحدد دور'); ?></span>
                 </span>
             </div>
 
             <?php if ($lc_can_pick): ?>
-            <form method="get" class="lc-role-picker">
-                <label for="lcRole" class="lc-kicker lc-col-kicker">تغيير الدور</label>
-                <select id="lcRole" name="role" onchange="this.form.submit()">
-                    <option value="">— اختر دورًا —</option>
-                    <?php foreach ($lc_roles as $r): ?>
+ <form method="get" class="lc-role-picker">
+ <label for="lcRole" class="lc-kicker lc-col-kicker">تغيير الدور</label>
+ <select id="lcRole" name="role" onchange="this.form.submit()">
+ <option value="">- اختر دورا -</option>
+ <?php foreach ($lc_roles as $r): ?>
                     <option value="<?php echo (int) $r['id']; ?>" <?php echo ((string) $r['id'] === $lc_role) ? 'selected' : ''; ?>>
                         <?php echo $E($r['name']); ?> (<?php echo (int) $r['n']; ?>)
                     </option>
@@ -509,53 +511,53 @@ $E = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
             </form>
             <?php endif; ?>
 
-            <div class="lc-counts">
-                <span class="lc-chip"><i class="fas fa-table-cells-large"></i> الشاشات <b id="lcTotal"><?php echo $lc_n_total; ?></b></span>
-                <span class="lc-chip"><i class="fas fa-bolt"></i> الوصول السريع <b id="lcQuick"><?php echo $lc_n_quick; ?></b></span>
-                <span class="lc-chip is-side"><i class="fas fa-bars"></i> السايدبار <b id="lcSide"><?php echo $lc_n_side; ?></b> من <?php echo $lc_n_placed; ?></span>
+ <div class="lc-counts">
+ <span class="lc-chip"><i class="fas fa-table-cells-large"></i> الشاشات <b id="lcTotal"><?php echo $lc_n_total; ?></b></span>
+ <span class="lc-chip"><i class="fas fa-bolt"></i> الوصول السريع <b id="lcQuick"><?php echo $lc_n_quick; ?></b></span>
+ <span class="lc-chip is-side"><i class="fas fa-bars"></i> السايدبار <b id="lcSide"><?php echo $lc_n_side; ?></b> من <?php echo $lc_n_placed; ?></span>
             </div>
         </div>
 
         <?php if ($lc_can_edit): ?>
-        <div class="lc-scope-note">
-            <i class="fas fa-circle-info"></i>
-            <span>الإعداد هنا <b>يخصّ الدور بأكمله</b> — ما تضعه أو تزيله يظهر لكل مستخدم يحمل هذا الدور.
-                  وهو ضبطُ <b>ظهورٍ لا صلاحية</b>: لا يفتح شاشةً ولا يغلقها، والحارس على وجهة الرابط كما هو.
-                  والحفظ فوريّ عند وضع علامة أو إزالتها.</span>
-        </div>
-        <?php else: ?>
-        <div class="lc-scope-note is-readonly">
-            <i class="fas fa-eye"></i>
-            <span>لديك صلاحية <b>الاطّلاع فقط</b> على هذه الشاشة — المربّعات معروضة كما هي ولا تُحفظ تغييراتها.
-                  اطلب منحة التعديل من مدير الصلاحيات إن كانت ضمن عملك.</span>
-        </div>
-        <?php endif; ?>
+ <div class="lc-scope-note">
+ <i class="fas fa-circle-info"></i>
+ <span>الإعداد هنا <b>يخص الدور بأكمله</b> - ما تضعه أو تزيله يظهر لكل مستخدم يحمل هذا الدور.
+ وهو ضبط <b>ظهور لا صلاحية</b>: لا يفتح شاشة ولا يغلقها، والحارس على وجهة الرابط كما هو.
+ والحفظ فوري عند وضع علامة أو إزالتها.</span>
+ </div>
+ <?php else: ?>
+ <div class="lc-scope-note is-readonly">
+ <i class="fas fa-eye"></i>
+ <span>لديك صلاحية <b>الاطلاع فقط</b> على هذه الشاشة - المربعات معروضة كما هي ولا تحفظ تغييراتها.
+ اطلب منحة التعديل من مدير الصلاحيات إن كانت ضمن عملك.</span>
+ </div>
+ <?php endif; ?>
 
         <?php if ($lc_n_total === 0): ?>
         <div class="lc-empty">
             <i class="fas fa-inbox"></i>
-            <h4><?php echo $lc_role === '' ? 'اختر دورًا للبدء' : 'لا شاشات مسجَّلة لهذا الدور'; ?></h4>
+            <h4><?php echo $lc_role === '' ? 'اختر دورا للبدء' : 'لا شاشات مسجلة لهذا الدور'; ?></h4>
             <p><?php echo $lc_role === ''
-                ? 'اختر دورًا من القائمة أعلاه لعرض شاشاته والتحكم في ظهور روابطها.'
-                : 'هذا الدور بلا سجلّ ملاحة — لا شاشات يمكن ضبط ظهورها. راجع مدير الصلاحيات لتسجيل شاشات الدور.'; ?></p>
+                ? 'اختر دورا من القائمة أعلاه لعرض شاشاته والتحكم في ظهور روابطها.'
+                : 'هذا الدور بلا سجل ملاحة - لا شاشات يمكن ضبط ظهورها. راجع مدير الصلاحيات لتسجيل شاشات الدور.'; ?></p>
         </div>
         <?php else: ?>
 
-        <!-- شريطُ الأدوات: بحثٌ وترشيحٌ -->
-        <div class="lc-toolbar">
-            <div class="lc-search">
-                <i class="fas fa-magnifying-glass"></i>
-                <input type="search" id="lcSearch" placeholder="ابحث باسم الشاشة أو بوصفها…" autocomplete="off">
-            </div>
-            <div class="lc-filters">
-                <button type="button" class="lc-fchip is-on" data-filter="all">الكل</button>
-                <button type="button" class="lc-fchip" data-filter="quick"><i class="fas fa-bolt"></i> في الوصول السريع</button>
-                <button type="button" class="lc-fchip" data-filter="side"><i class="fas fa-bars"></i> في السايدبار</button>
-                <button type="button" class="lc-fchip" data-filter="off">غير ظاهرة</button>
-            </div>
-        </div>
+ <!-- شريط الأدوات: بحث وترشيح -->
+ <div class="lc-toolbar">
+ <div class="lc-search">
+ <i class="fas fa-magnifying-glass"></i>
+ <input type="search" id="lcSearch" placeholder="ابحث باسم الشاشة أو بوصفها…" autocomplete="off">
+ </div>
+ <div class="lc-filters">
+ <button type="button" class="lc-fchip is-on" data-filter="all">الكل</button>
+ <button type="button" class="lc-fchip" data-filter="quick"><i class="fas fa-bolt"></i> في الوصول السريع</button>
+ <button type="button" class="lc-fchip" data-filter="side"><i class="fas fa-bars"></i> في السايدبار</button>
+ <button type="button" class="lc-fchip" data-filter="off">غير ظاهرة</button>
+ </div>
+ </div>
 
-        <?php
+ <?php
         /* البطاقاتُ قسمان: ما تحمله مساحةُ الإدارةِ (المربَّعان نافذان)،
            وما هو خارجَها (الوصولُ السريعُ نافذٌ والسايدبارُ لا يملكه هذا السجلّ). */
         $lc_in  = array_values(array_filter($lc_cards, function ($c) { return $c['placed']; }));
@@ -582,19 +584,19 @@ $E = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                             <input type="checkbox" data-field="quick" data-role="<?php echo $E($lc_role); ?>"
                                    <?php echo $c['quick'] ? 'checked' : ''; ?>
                                    <?php echo $lc_can_edit ? '' : 'disabled'; ?>>
-                            <i class="fas fa-bolt"></i>
-                            <span>يظهر في الوصول السريع</span>
-                        </label>
-                        <label class="lc-switch <?php echo $c['placed'] ? '' : 'is-locked'; ?>">
+ <i class="fas fa-bolt"></i>
+ <span>يظهر في الوصول السريع</span>
+ </label>
+ <label class="lc-switch <?php echo $c['placed'] ? '' : 'is-locked'; ?>">
                             <input type="checkbox" data-field="side" data-role="<?php echo $E($lc_role); ?>"
                                    <?php echo ($c['placed'] && $c['side']) ? 'checked' : ''; ?>
                                    <?php echo ($lc_can_edit && $c['placed']) ? '' : 'disabled'; ?>>
-                            <i class="fas fa-bars"></i>
-                            <span>يظهر في السايدبار</span>
-                        </label>
-                        <?php if (!$c['placed']): ?>
-                        <span class="lc-lock-why">لا موضع لهذه الشاشة في مخطّط مساحة الإدارة، فلا يُظهرها السايدبار مهما وُضعت العلامة — وتبقى متاحة في الوصول السريع.</span>
-                        <?php endif; ?>
+ <i class="fas fa-bars"></i>
+ <span>يظهر في السايدبار</span>
+ </label>
+ <?php if (!$c['placed']): ?>
+ <span class="lc-lock-why">لا موضع لهذه الشاشة في مخطط مساحة الإدارة، فلا يظهرها السايدبار مهما وضعت العلامة - وتبقى متاحة في الوصول السريع.</span>
+ <?php endif; ?>
                     </div>
                 </div>
                 <?php
@@ -603,32 +605,32 @@ $E = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
         ?>
 
         <?php if (!empty($lc_in)): ?>
-        <div class="lc-section" data-section="in">
-            <div class="lc-section-head">
-                <h3>شاشات مساحة <?php echo $E($lc_ws_name !== '' ? $lc_ws_name : 'الإدارة'); ?></h3>
-                <p>المربّعان نافذان — <?php echo count($lc_in); ?> شاشة.</p>
-            </div>
-            <div class="lc-grid"><?php $lc_render($lc_in); ?></div>
+ <div class="lc-section" data-section="in">
+ <div class="lc-section-head">
+ <h3>شاشات مساحة <?php echo $E($lc_ws_name !== '' ? $lc_ws_name : 'الإدارة'); ?></h3>
+ <p>المربعان نافذان - <?php echo count($lc_in); ?> شاشة.</p>
+ </div>
+ <div class="lc-grid"><?php $lc_render($lc_in); ?></div>
         </div>
         <?php endif; ?>
 
         <?php if (!empty($lc_out)): ?>
-        <div class="lc-section" data-section="out">
-            <div class="lc-section-head">
-                <h3>شاشات أخرى متاحة للدور</h3>
-                <p>خارج مخطّط مساحة الإدارة — الوصول السريع وحده نافذ فيها (<?php echo count($lc_out); ?> شاشة).</p>
-            </div>
-            <div class="lc-grid"><?php $lc_render($lc_out); ?></div>
+ <div class="lc-section" data-section="out">
+ <div class="lc-section-head">
+ <h3>شاشات أخرى متاحة للدور</h3>
+ <p>خارج مخطط مساحة الإدارة - الوصول السريع وحده نافذ فيها (<?php echo count($lc_out); ?> شاشة).</p>
+ </div>
+ <div class="lc-grid"><?php $lc_render($lc_out); ?></div>
         </div>
         <?php endif; ?>
 
-        <div class="lc-empty" id="lcNoMatch" hidden>
-            <i class="fas fa-magnifying-glass"></i>
-            <h4>لا شاشة تطابق البحث</h4>
-            <p>غيّر كلمة البحث أو أعد الترشيح إلى «الكل».</p>
-        </div>
+ <div class="lc-empty" id="lcNoMatch" hidden>
+ <i class="fas fa-magnifying-glass"></i>
+ <h4>لا شاشة تطابق البحث</h4>
+ <p>غير كلمة البحث أو أعد الترشيح إلى «الكل».</p>
+ </div>
 
-        <?php endif; ?>
+ <?php endif; ?>
     </div>
 </div>
 
@@ -639,112 +641,112 @@ $E = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
     var CSRF = <?php echo json_encode(function_exists('generate_csrf_token') ? generate_csrf_token() : '', JSON_UNESCAPED_UNICODE); ?>;
     var CAN_EDIT = <?php echo $lc_can_edit ? 'true' : 'false'; ?>;
 
-    function toast(kind, text) {
-        if (window.EmsAlert && window.EmsAlert[kind]) { window.EmsAlert[kind](text); }
-    }
+ function toast(kind, text) {
+ if (window.EmsAlert && window.EmsAlert[kind]) { window.EmsAlert[kind](text); }
+ }
 
-    /* ── ① الحفظُ الفوريُّ: الواجهةُ تتقدَّم والخادمُ يحسم ────────────────────
-         وإن ردَّ الخادمُ خطأً **رُدَّ المربَّعُ إلى ما كان** — فمربَّعٌ يبقى
-         مؤشَّرًا بعد فشلِ الحفظِ يكذب على صاحبِه. */
-    function save(box) {
-        var card = box.closest('.lc-card');
-        var field = box.getAttribute('data-field');
-        var role = box.getAttribute('data-role');
-        var key = card.getAttribute('data-key');
-        var want = box.checked ? '1' : '0';
-        var was = want === '1' ? '0' : '1';
+ /* ── ① الحفظ الفوري: الواجهة تتقدم والخادم يحسم ────────────────────
+ وإن رد الخادم خطأ **رد المربع إلى ما كان** - فمربع يبقى
+ مؤشرا بعد فشل الحفظ يكذب على صاحبه. */
+ function save(box) {
+ var card = box.closest('.lc-card');
+ var field = box.getAttribute('data-field');
+ var role = box.getAttribute('data-role');
+ var key = card.getAttribute('data-key');
+ var want = box.checked ? '1' : '0';
+ var was = want === '1' ? '0' : '1';
 
-        card.classList.add('is-busy');
-        var body = new URLSearchParams();
-        body.set('lc_action', 'toggle');
-        body.set('role', role);
-        body.set('key', key);
-        body.set('field', field);
-        body.set('value', want);
-        body.set('csrf_token', CSRF);
+ card.classList.add('is-busy');
+ var body = new URLSearchParams();
+ body.set('lc_action', 'toggle');
+ body.set('role', role);
+ body.set('key', key);
+ body.set('field', field);
+ body.set('value', want);
+ body.set('csrf_token', CSRF);
 
-        fetch(window.location.pathname, {
-            method: 'POST',
-            headers: { 'X-CSRF-Token': CSRF, 'X-Requested-With': 'XMLHttpRequest' },
-            body: body,
-            credentials: 'same-origin'
-        }).then(function (r) {
-            return r.json().catch(function () { return { ok: false, msg: 'ردٌّ غير مفهوم من الخادم' }; });
-        }).then(function (j) {
-            card.classList.remove('is-busy');
-            if (!j || !j.ok) {
-                box.checked = (was === '1');
-                toast('error', (j && j.msg) ? j.msg : 'تعذّر حفظ التغيير');
-                return;
-            }
-            card.setAttribute('data-' + field, want);
-            if (j.counts) {
-                var q = document.getElementById('lcQuick');
-                if (q) { q.textContent = j.counts.quick; }
-            }
-            recountSide();
-            applyFilter();
-            toast('success', want === '1' ? 'تم إظهار الرابط' : 'تم إخفاء الرابط');
-        }).catch(function () {
-            card.classList.remove('is-busy');
-            box.checked = (was === '1');
-            toast('error', 'تعذّر الاتصال بالخادم');
-        });
-    }
+ fetch(window.location.pathname, {
+ method: 'POST',
+ headers: { 'X-CSRF-Token': CSRF, 'X-Requested-With': 'XMLHttpRequest' },
+ body: body,
+ credentials: 'same-origin'
+ }).then(function (r) {
+ return r.json().catch(function () { return { ok: false, msg: 'رد غير مفهوم من الخادم' }; });
+ }).then(function (j) {
+ card.classList.remove('is-busy');
+ if (!j || !j.ok) {
+ box.checked = (was === '1');
+ toast('error', (j && j.msg) ? j.msg : 'تعذر حفظ التغيير');
+ return;
+ }
+ card.setAttribute('data-' + field, want);
+ if (j.counts) {
+ var q = document.getElementById('lcQuick');
+ if (q) { q.textContent = j.counts.quick; }
+ }
+ recountSide();
+ applyFilter();
+ toast('success', want === '1' ? 'تم إظهار الرابط' : 'تم إخفاء الرابط');
+ }).catch(function () {
+ card.classList.remove('is-busy');
+ box.checked = (was === '1');
+ toast('error', 'تعذر الاتصال بالخادم');
+ });
+ }
 
-    /* عدّادُ السايدبارِ يُحسب من البطاقاتِ ذاتِ الموضعِ وحدَها — فهي وحدَها
-       التي يظهر فيها الأثر. */
-    function recountSide() {
-        var n = 0;
-        document.querySelectorAll('.lc-card[data-placed="1"][data-side="1"]').forEach(function () { n++; });
-        var el = document.getElementById('lcSide');
-        if (el) { el.textContent = n; }
-    }
+ /* عداد السايدبار يحسب من البطاقات ذات الموضع وحدها - فهي وحدها
+ التي يظهر فيها الأثر. */
+ function recountSide() {
+ var n = 0;
+ document.querySelectorAll('.lc-card[data-placed="1"][data-side="1"]').forEach(function () { n++; });
+ var el = document.getElementById('lcSide');
+ if (el) { el.textContent = n; }
+ }
 
-    if (CAN_EDIT) {
-        document.querySelectorAll('.lc-card input[type="checkbox"]').forEach(function (box) {
-            box.addEventListener('change', function () { save(box); });
-        });
-    }
+ if (CAN_EDIT) {
+ document.querySelectorAll('.lc-card input[type="checkbox"]').forEach(function (box) {
+ box.addEventListener('change', function () { save(box); });
+ });
+ }
 
-    /* ── ② البحثُ والترشيحُ — في المتصفّح بلا طلبٍ للشبكة ─────────────────── */
-    var searchEl = document.getElementById('lcSearch');
-    var mode = 'all';
+ /* ── ② البحث والترشيح - في المتصفح بلا طلب للشبكة ─────────────────── */
+ var searchEl = document.getElementById('lcSearch');
+ var mode = 'all';
 
-    function applyFilter() {
-        var q = searchEl ? searchEl.value.trim().toLowerCase() : '';
-        var shown = 0;
-        document.querySelectorAll('.lc-card').forEach(function (card) {
-            var okText = !q || (card.getAttribute('data-text') || '').indexOf(q) !== -1;
-            var okMode = true;
-            if (mode === 'quick') { okMode = card.getAttribute('data-quick') === '1'; }
-            else if (mode === 'side') { okMode = card.getAttribute('data-side') === '1' && card.getAttribute('data-placed') === '1'; }
-            else if (mode === 'off') {
-                okMode = card.getAttribute('data-quick') !== '1'
-                      && !(card.getAttribute('data-side') === '1' && card.getAttribute('data-placed') === '1');
-            }
-            var vis = okText && okMode;
-            card.hidden = !vis;
-            if (vis) { shown++; }
-        });
-        /* قسمٌ خلا من بطاقةٍ ظاهرةٍ يُطوى برأسِه — لا رأسَ فوق فراغ. */
-        document.querySelectorAll('.lc-section').forEach(function (sec) {
-            var any = sec.querySelector('.lc-card:not([hidden])');
-            sec.hidden = !any;
-        });
-        var none = document.getElementById('lcNoMatch');
-        if (none) { none.hidden = shown !== 0; }
-    }
+ function applyFilter() {
+ var q = searchEl ? searchEl.value.trim().toLowerCase() : '';
+ var shown = 0;
+ document.querySelectorAll('.lc-card').forEach(function (card) {
+ var okText = !q || (card.getAttribute('data-text') || '').indexOf(q) !== -1;
+ var okMode = true;
+ if (mode === 'quick') { okMode = card.getAttribute('data-quick') === '1'; }
+ else if (mode === 'side') { okMode = card.getAttribute('data-side') === '1' && card.getAttribute('data-placed') === '1'; }
+ else if (mode === 'off') {
+ okMode = card.getAttribute('data-quick') !== '1'
+ && !(card.getAttribute('data-side') === '1' && card.getAttribute('data-placed') === '1');
+ }
+ var vis = okText && okMode;
+ card.hidden = !vis;
+ if (vis) { shown++; }
+ });
+ /* قسم خلا من بطاقة ظاهرة يطوى برأسه - لا رأس فوق فراغ. */
+ document.querySelectorAll('.lc-section').forEach(function (sec) {
+ var any = sec.querySelector('.lc-card:not([hidden])');
+ sec.hidden = !any;
+ });
+ var none = document.getElementById('lcNoMatch');
+ if (none) { none.hidden = shown !== 0; }
+ }
 
-    if (searchEl) { searchEl.addEventListener('input', applyFilter); }
-    document.querySelectorAll('.lc-fchip').forEach(function (chip) {
-        chip.addEventListener('click', function () {
-            document.querySelectorAll('.lc-fchip').forEach(function (c) { c.classList.remove('is-on'); });
-            chip.classList.add('is-on');
-            mode = chip.getAttribute('data-filter');
-            applyFilter();
-        });
-    });
+ if (searchEl) { searchEl.addEventListener('input', applyFilter); }
+ document.querySelectorAll('.lc-fchip').forEach(function (chip) {
+ chip.addEventListener('click', function () {
+ document.querySelectorAll('.lc-fchip').forEach(function (c) { c.classList.remove('is-on'); });
+ chip.classList.add('is-on');
+ mode = chip.getAttribute('data-filter');
+ applyFilter();
+ });
+ });
 })();
 </script>
 

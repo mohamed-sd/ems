@@ -122,58 +122,58 @@ include('../insidebar.php');
 
 <div class="container-fluid p-3 bm-wrap">
 
-  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-    <h4 class="fw-bold mb-0"><i class="fa fa-satellite-dish me-2"></i>مراقبة ناقل الأحداث</h4>
-    <span class="bm-pill <?= $health === 'ok' ? 'on' : ($health === 'err' ? 'off' : 'lag') ?>">
-      <?= $health === 'ok' ? '● سليم' : ($health === 'err' ? '● رسائل ميتة' : '● تأخر قائم') ?>
+ <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+ <h4 class="fw-bold mb-0"><i class="fa fa-satellite-dish me-2"></i>مراقبة ناقل الأحداث</h4>
+ <span class="bm-pill <?= $health === 'ok' ? 'on' : ($health === 'err' ? 'off' : 'lag') ?>">
+      <?= $health === 'ok' ? 'سليم' : ($health === 'err' ? 'رسائل ميتة' : 'تأخر قائم') ?>
     </span>
   </div>
 
   <div class="bm-grid">
     <div class="bm-card"><div class="v"><?= $n($total_events) ?></div>
-      <div class="l">أحداث الدفتر (أقصى معرّف <?= $n($max_event_id) ?>)</div></div>
+ <div class="l">أحداث الدفتر (أقصى معرف <?= $n($max_event_id) ?>)</div></div>
     <div class="bm-card"><div class="v"><?= $n($published) ?></div><div class="l">منشورة على الناقل</div></div>
-    <div class="bm-card <?= $max_lag === 0 ? 'ok' : 'warn' ?>"><div class="v"><?= $n($max_lag) ?></div>
-      <div class="l">أقصى تأخر (backlog)</div></div>
-    <div class="bm-card <?= $dlq === 0 ? 'ok' : 'err' ?>"><div class="v"><?= number_format($dlq) ?></div>
-      <div class="l">طابور الرسائل الميتة</div></div>
-    <div class="bm-card"><div class="v"><?= number_format($deliveries) ?></div><div class="l">تسليمات جارية</div></div>
-    <div class="bm-card"><div class="v"><?= number_format($processed) ?></div><div class="l">وقائع مُستهلَكة (exactly-once)</div></div>
-  </div>
+ <div class="bm-card <?= $max_lag === 0 ? 'ok' : 'warn' ?>"><div class="v"><?= $n($max_lag) ?></div>
+ <div class="l">أقصى تأخر (backlog)</div></div>
+ <div class="bm-card <?= $dlq === 0 ? 'ok' : 'err' ?>"><div class="v"><?= number_format($dlq) ?></div>
+ <div class="l">طابور الرسائل الميتة</div></div>
+ <div class="bm-card"><div class="v"><?= number_format($deliveries) ?></div><div class="l">تسليمات جارية</div></div>
+ <div class="bm-card"><div class="v"><?= number_format($processed) ?></div><div class="l">وقائع مستهلكة (exactly-once)</div></div>
+ </div>
 
-  <div class="bm-panel">
-    <h5>المستهلكون ومؤشّراتهم</h5>
-    <div class="table-responsive">
-      <table class="table table-sm table-hover align-middle mb-0" data-no-datatable>
-        <thead><tr><th>المستهلك</th><th>الحالة</th><th>المؤشّر</th><th>التأخّر</th><th>آخر تحديث</th></tr></thead>
-        <tbody>
-        <?php if (!$consumers): ?>
-          <tr><td colspan="5" class="text-center text-muted py-4">لا مستهلك مسجّل</td></tr>
-        <?php else: foreach ($consumers as $c): ?>
+ <div class="bm-panel">
+ <h5>المستهلكون ومؤشراتهم</h5>
+ <div class="table-responsive">
+ <table class="table table-sm table-hover align-middle mb-0" data-no-datatable>
+ <thead><tr><th>المستهلك</th><th>الحالة</th><th>المؤشر</th><th>التأخر</th><th>آخر تحديث</th></tr></thead>
+ <tbody>
+ <?php if (!$consumers): ?>
+ <tr><td colspan="5" class="text-center text-muted py-4">لا مستهلك مسجل</td></tr>
+ <?php else: foreach ($consumers as $c): ?>
           <tr>
             <td><code><?= $h($c['consumer']) ?></code></td>
-            <td><span class="bm-pill <?= !empty($c['enabled']) ? 'on' : 'off' ?>"><?= !empty($c['enabled']) ? 'مفعّل' : 'موقوف' ?></span></td>
+            <td><span class="bm-pill <?= !empty($c['enabled']) ? 'on' : 'off' ?>"><?= !empty($c['enabled']) ? 'مفعل' : 'موقوف' ?></span></td>
             <td class="text-nowrap"><?= number_format((int) $c['cursor_event_id']) ?></td>
             <td class="text-nowrap"><?= (int) $c['lag'] === 0 ? '<span class="bm-pill on">صفر</span>' : '<span class="bm-pill lag">' . $n((int) $c['lag']) . '</span>' ?></td>
             <td class="text-nowrap"><?= $h($c['updated_at']) ?></td>
           </tr>
         <?php endforeach; endif; ?>
-        </tbody>
-      </table>
-    </div>
-    <p class="bm-note mt-2">التأخّرُ = عددُ أحداثِ الدفترِ بعدَ مؤشّرِ المستهلك. وموقوفٌ بتأخّرٍ صفرٍ ليس سليمًا بالضرورة — راجعْ سببَ إيقافه.</p>
-  </div>
+ </tbody>
+ </table>
+ </div>
+ <p class="bm-note mt-2">التأخر = عدد أحداث الدفتر بعد مؤشر المستهلك. وموقوف بتأخر صفر ليس سليما بالضرورة - راجع سبب إيقافه.</p>
+ </div>
 
-  <div class="bm-panel">
-    <h5>طابور الرسائل الميتة <?= $dlq > 0 ? '(آخر ' . count($dlq_rows) . ' من ' . number_format($dlq) . ')' : '' ?></h5>
+ <div class="bm-panel">
+ <h5>طابور الرسائل الميتة <?= $dlq > 0 ? '(آخر ' . count($dlq_rows) . ' من ' . number_format($dlq) . ')' : '' ?></h5>
     <?php if (!$dlq_rows): ?>
-      <p class="bm-note mb-0">لا رسائل ميتة — كلُّ ما نُشر استُهلك أو ما زال في التسليم.</p>
-    <?php else: ?>
-    <div class="table-responsive">
-      <table class="table table-sm table-hover align-middle mb-0" data-no-datatable>
-        <thead><tr><th>المستهلك</th><th>الحدث</th><th>المحاولات</th><th>آخر خطأ</th><th>وقت الفشل</th></tr></thead>
-        <tbody>
-        <?php foreach ($dlq_rows as $d): ?>
+ <p class="bm-note mb-0">لا رسائل ميتة - كل ما نشر استهلك أو ما زال في التسليم.</p>
+ <?php else: ?>
+ <div class="table-responsive">
+ <table class="table table-sm table-hover align-middle mb-0" data-no-datatable>
+ <thead><tr><th>المستهلك</th><th>الحدث</th><th>المحاولات</th><th>آخر خطأ</th><th>وقت الفشل</th></tr></thead>
+ <tbody>
+ <?php foreach ($dlq_rows as $d): ?>
           <tr>
             <td><code><?= $h($d['consumer']) ?></code></td>
             <td class="text-nowrap"><?= number_format((int) $d['event_id']) ?></td>
@@ -182,11 +182,11 @@ include('../insidebar.php');
             <td class="text-nowrap"><?= $h($d['failed_at']) ?></td>
           </tr>
         <?php endforeach; ?>
-        </tbody>
-      </table>
-    </div>
-    <p class="bm-note mt-2">هذه الشاشةُ قرائيّةٌ: إعادةُ المحاولةِ والحذفُ يقعان في محرّكِ الناقلِ لا هنا.</p>
-    <?php endif; ?>
+ </tbody>
+ </table>
+ </div>
+ <p class="bm-note mt-2">هذه الشاشة قرائية: إعادة المحاولة والحذف يقعان في محرك الناقل لا هنا.</p>
+ <?php endif; ?>
   </div>
 
 </div>
