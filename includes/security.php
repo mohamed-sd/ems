@@ -162,15 +162,14 @@ function check_session_timeout() {
 }
 
 /**
- * تحديد صفحة تسجيل الدخول المناسبة بحسب سياق الجلسة الحالية.
+ * تحديد صفحة تسجيل الدخول.
+ *
+ * ◆ **بابٌ واحدٌ بعد قرارِ الشركةِ الواحدة**: كان هنا فرعٌ يعيد
+ *   `admin/login.php` حين تكون جلسةُ المزوّد قائمةً أو المسارُ داخلَ
+ *   `/admin/`. وبإغلاقِ بوّابةِ المزوّد صار الشرطان مستحيلَين — لا مسارَ
+ *   يُنشئ `$_SESSION['super_admin']` — فالفرعُ ميتٌ لا مُعطَّل، وحُذف.
  */
 function get_auth_login_path() {
-    $requestUri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
-
-    if (!empty($_SESSION['super_admin']) || strpos($requestUri, '/admin/') !== false) {
-        return ems_url('admin/login.php');
-    }
-
     return ems_url('login.php');
 }
 
@@ -283,12 +282,10 @@ function ems_inject_csrf_fields($buffer) {
         return $buffer;
     }
 
-    // الأدمن له حماية CSRF خاصة — لا نزدوج عليه.
-    $uri = isset($_SERVER['REQUEST_URI']) ? str_replace('\\', '/', $_SERVER['REQUEST_URI']) : '';
-    if (strpos($uri, '/admin/') !== false) {
-        return $buffer;
-    }
-
+    /* ⛔ **سقط إعفاءُ `/admin/`**: كان كلُّ مسارٍ فيه `/admin/` يخرج من الحاقنِ
+       بحجّةِ «حمايةٍ خاصّة». وبإغلاقِ بوّابةِ المزوّدِ لم يعد يُعالَج طلبُ POST
+       واحدٌ هناك (قيسَ: 403 على البابِ و302 على ما وراءه)، فالإعفاءُ ميتٌ —
+       وإعفاءٌ ميتٌ على المسارِ ثغرةٌ نائمةٌ لا تبسيط. */
     if (!isset($_SESSION['csrf_token'])) {
         return $buffer;
     }
@@ -414,11 +411,11 @@ function ems_enforce_csrf_protection() {
     $uri = isset($_SERVER['REQUEST_URI']) ? str_replace('\\', '/', $_SERVER['REQUEST_URI']) : '';
     $script = isset($_SERVER['SCRIPT_NAME']) ? str_replace('\\', '/', $_SERVER['SCRIPT_NAME']) : '';
 
-    // استثناء الـ API (Bearer) ولوحة الأدمن (CSRF خاص بها).
+    /* استثناء الـ API (Bearer) وحدَه.
+       ⛔ **وسقط استثناءُ لوحةِ الأدمن معه**: بابُ بوّابةِ المزوّدِ 403 وما وراءه
+          302، فلا طلبَ POST يبلغ معالجًا هناك — والاستثناءُ الميتُ على المسارِ
+          بابٌ مفتوحٌ لا اختصار. */
     if (strpos($uri, '/api/') !== false || strpos($script, '/api/') !== false) {
-        return;
-    }
-    if (strpos($uri, '/admin/') !== false || strpos($script, '/admin/') !== false) {
         return;
     }
 

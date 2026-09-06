@@ -173,4 +173,5 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         وساعات المورد المنفذة من عمودها في التسوية نفسها. الفعل عند فاعله في دورة التسوية ولا كتابة هنا.
     </div>
 </div>
-<?php include '../infooter.php'; ?>
+</body>
+</html>

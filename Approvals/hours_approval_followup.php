@@ -360,7 +360,7 @@ include('../inheader.php');
   $header_icon    = 'fa fa-route';
   $header_actions = array(
       array('href' => 'hours_approval.php', 'class' => 'add-btn btn btn-secondary btn-sm fw-bold', 'icon' => 'fa fa-arrow-right', 'label' => 'شاشة الاعتماد'),
-      array('href' => ($is_admin ? '../admin/dashboard.php' : '../main/dashboard.php'), 'class' => 'btn btn-secondary btn-sm fw-bold', 'icon' => 'fa fa-home', 'label' => 'لوحة التحكم'),
+      array('href' => '../main/dashboard.php', 'class' => 'btn btn-secondary btn-sm fw-bold', 'icon' => 'fa fa-home', 'label' => 'لوحة التحكم'),
   );
   $header_back = array();
   include('../includes/page_header.php');

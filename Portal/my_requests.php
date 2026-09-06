@@ -398,3 +398,6 @@ include '../insidebar.php';
         </div>
     </div></div>
 </div>
+
+</body>
+</html>

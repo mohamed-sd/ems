@@ -706,7 +706,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                                                                      data-id='{$row['id']}'
                                                                      data-name='" . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . "'
                                                                      data-username='" . htmlspecialchars($row['username'], ENT_QUOTES, 'UTF-8') . "'
-                                                                     data-phone='" . htmlspecialchars($row['phone'], ENT_QUOTES, 'UTF-8') . "'
+                                                                     data-phone='" . htmlspecialchars((string) $row['phone'], ENT_QUOTES, 'UTF-8') . "'
                                                                      data-role='{$row['role']}'
                                                                      data-status='" . ($status_is_active ? 'active' : 'inactive') . "'
                                                                      data-project='{$row['project_id']}'
@@ -727,7 +727,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                             } else {
                                 echo "<td><span class='pu-unlinked'>— غير مرتبط —</span></td>";
                             }
-                            echo "<td><i class='fas fa-phone'></i>" . htmlspecialchars($row['phone'], ENT_QUOTES, 'UTF-8') . "</td>";
+                            echo "<td><i class='fas fa-phone'></i>" . htmlspecialchars((string) $row['phone'], ENT_QUOTES, 'UTF-8') . "</td>";
                                                         echo "<td>" . $status_badge . "</td>";
                             echo "</tr>";
                         }

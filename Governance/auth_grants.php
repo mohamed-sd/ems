@@ -95,6 +95,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'assig
     }
 }
 
+/* ═══ ⑥-ج معالجُ المنحِ المؤقّت — مصادرُ المنحِ الثلاثةُ (PERM-03) ═══════════
+   ◆ **والمؤقّتُ استثناءٌ مأذونٌ لا ثغرة**: «لا منحةَ لفردٍ إلا استثناءً موقوتًا
+     بمصدرِه وسببِه ومدّتِه ومراجعتِه» — فله نهايةٌ إلزاميّةٌ وسقفٌ لكلِّ مصدر،
+     ويُكتب سجلُّ واقعتِه قبلَ المنحةِ وتُربط بمعرِّفِه. */
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'grant_temp') {
+    if (!$__isAssigner) {
+        $flash = 'المنح المؤقت بيد ادارة الصلاحيات (الدور 15) وحدها'; $flashKind = 'danger';
+    } else {
+        require_once __DIR__ . '/../app/Services/Security/PolicyWriteService.php';
+        $__res = \App\Services\Security\PolicyWriteService::grantTemporary(
+            $conn,
+            (int) ($_POST['t_user'] ?? 0),
+            (int) ($_POST['t_profile'] ?? 0),
+            array(
+                'source'    => (string) ($_POST['t_source'] ?? ''),
+                'hours'     => (int) ($_POST['t_hours'] ?? 0),
+                'reason'    => trim((string) ($_POST['t_reason'] ?? '')),
+                'from_user' => (int) ($_POST['t_from'] ?? 0),
+                'approver'  => (int) ($_POST['t_approver'] ?? 0),
+                'hr_witness'  => (int) ($_POST['t_hr_witness'] ?? 0),
+                'fin_witness' => (int) ($_POST['t_fin_witness'] ?? 0),
+                'doc_ref'   => (string) ($_POST['t_doc'] ?? ''),
+            ),
+            $uid
+        );
+        $flash = $__res['msg'];
+        $flashKind = $__res['ok'] ? 'success' : ($__res['code'] === 'FROZEN' ? 'warning' : 'danger');
+    }
+}
+
 // ═══ ⑦ العرض ═══
 $g = $conn->query(
     "SELECT COUNT(*) total,
@@ -156,6 +186,21 @@ include __DIR__ . '/../insidebar.php';
           تجميد المنح نافذ، فلا يصدر اسناد جديد حتى يرفعه المالك. والنموذج معطل عمدا.
         </div>
       <?php endif; ?>
+      <?php /* ⛔ **ولا تبتلع الشاشةُ تعذُّرَ القراءةِ صامتًا** (م-ح-0.1): كانت
+               القائمةُ ترجع فارغةً على استثناءٍ مُلتقَطٍ فتبدو الشاشةُ سليمةً
+               وهي لا تعمل. والفراغُ عن قصدٍ يُميَّز عن الفراغِ عن عطب. */ ?>
+      <?php if (\App\Services\Security\PolicyWriteService::$lastReadError !== ''): ?>
+        <div class="alert alert-danger" role="alert">
+          تعذر بناء قوائم النموذج فلا يصح الاسناد الان. السبب:
+          <?php echo htmlspecialchars(
+              \App\Services\Security\PolicyWriteService::$lastReadError,
+              ENT_QUOTES, 'UTF-8'); ?>
+        </div>
+      <?php elseif (!$__freeUsers): ?>
+        <div class="alert alert-info" role="status">
+          لا يوجد موظف بلا قالب نافذ، فقائمة الموظفين فارغة عن قصد لا عن عطب.
+        </div>
+      <?php endif; ?>
       <form method="post" class="ems-form">
         <input type="hidden" name="csrf_token"
                value="<?php echo htmlspecialchars(generate_csrf_token(), ENT_QUOTES, 'UTF-8'); ?>">
@@ -202,6 +247,137 @@ include __DIR__ . '/../insidebar.php';
         قالب واحد لكل موظف. الاسناد يمر ببوابة التجميد ويكتب اثرا يسمي من اسند ولمن واي قالب ولماذا.
         وتحرير بنود القالب ليس من هنا.
       </p>
+    </div>
+  </div>
+
+  <?php
+  /* ── منحٌ مؤقّتٌ بمصدرِه (PERM-03) ─────────────────────────────────────────
+     ◆ **وهذا هو الاستثناءُ المأذونُ** فوقَ قاعدةِ «قالبٌ واحدٌ لكلِّ موظف»:
+       تفويضٌ عن صاحبِه · رفعٌ بإجازةِ غيرِ المُسنِد · تصعيدٌ بسندِ واقعة.
+     ⛔ **ولكلِّ مصدرٍ سقفُ مدّةٍ** ونهايةٌ إلزاميّةٌ تسري بنفسِها. */
+  $__allProfiles = \App\Services\Security\PolicyWriteService::activeProfiles();
+  $__allUsers = array();
+  $__uq = $conn->query("SELECT id, name, role FROM users
+                         WHERE is_deleted = 0 AND status = 'active' AND company_id = " . (int) $company_id . "
+                         ORDER BY CAST(role AS UNSIGNED), name");
+  while ($__uq && ($__ux = $__uq->fetch_assoc())) { $__allUsers[] = $__ux; }
+  $__SRC_CAPS = \App\Services\Security\PolicyWriteService::TMP_CAPS;
+  $__SRC_AR = array('delegation' => 'تفويض مؤقت (سقف 720 ساعة)',
+                    'elevation'  => 'رفع استثنائي (سقف 24 ساعة)',
+                    'escalation' => 'تصعيد رأسي (سقف 168 ساعة)');
+  ?>
+  <div class="ems-card ems-mb-16">
+    <div class="filter-title">
+      <span class="filter-title-icon"><i class="fa fa-hourglass-half"></i></span>
+      منح مؤقت بمصدره
+    </div>
+    <div class="filter-body">
+      <p class="text-muted">
+        هذا هو الاستثناء المأذون فوق قاعدة «قالب واحد لكل موظف»: يبقى للموظف قالبه الاصلي
+        ويضاف اليه المؤقت مدة محددة، ثم ينتهي بنفسه بلا تدخل.
+        التفويض يحتاج مفوضا يحمل القالب فعلا. والرفع اربعة اطراف بنص المخطط:
+        مستفيد وشاهد موارد بشرية وشاهد مالي ومجيز اعلى، ثلاثتهم غير المستفيد وغيرك.
+      </p>
+      <form method="post" class="ems-form">
+        <input type="hidden" name="csrf_token"
+               value="<?php echo htmlspecialchars(generate_csrf_token(), ENT_QUOTES, 'UTF-8'); ?>">
+        <input type="hidden" name="action" value="grant_temp">
+        <div class="form-group px-w-320">
+          <label for="t_source">المصدر</label>
+          <select name="t_source" id="t_source" class="form-control" required
+                  <?php echo $__frozen ? 'disabled' : ''; ?>>
+            <?php foreach ($__SRC_AR as $__k => $__v): ?>
+              <option value="<?php echo htmlspecialchars($__k, ENT_QUOTES, 'UTF-8'); ?>">
+                <?php echo htmlspecialchars($__v, ENT_QUOTES, 'UTF-8'); ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <div class="form-group px-w-320">
+          <label for="t_user">الموظف المستفيد</label>
+          <select name="t_user" id="t_user" class="form-control" required
+                  <?php echo $__frozen ? 'disabled' : ''; ?>>
+            <option value="">اختر</option>
+            <?php foreach ($__allUsers as $__u): ?>
+              <option value="<?php echo (int) $__u['id']; ?>">
+                <?php echo htmlspecialchars($__u['name'] . ' (دور ' . $__u['role'] . ')', ENT_QUOTES, 'UTF-8'); ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <div class="form-group px-w-320">
+          <label for="t_profile">القالب</label>
+          <select name="t_profile" id="t_profile" class="form-control" required
+                  <?php echo $__frozen ? 'disabled' : ''; ?>>
+            <option value="">اختر</option>
+            <?php foreach ($__allProfiles as $__p): ?>
+              <option value="<?php echo (int) $__p['profile_id']; ?>">
+                <?php echo htmlspecialchars($__p['profile_code']
+                    . ($__p['title_ar'] ? ': ' . $__p['title_ar'] : ''), ENT_QUOTES, 'UTF-8'); ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <div class="form-group px-w-320">
+          <label for="t_hours">المدة بالساعات</label>
+          <input type="number" name="t_hours" id="t_hours" class="form-control" min="1" max="720"
+                 value="8" required <?php echo $__frozen ? 'disabled' : ''; ?>>
+        </div>
+        <div class="form-group px-w-320">
+          <label for="t_from">المفوض (للتفويض وحده)</label>
+          <select name="t_from" id="t_from" class="form-control" <?php echo $__frozen ? 'disabled' : ''; ?>>
+            <option value="0">لا ينطبق</option>
+            <?php foreach ($__allUsers as $__u): ?>
+              <option value="<?php echo (int) $__u['id']; ?>">
+                <?php echo htmlspecialchars($__u['name'], ENT_QUOTES, 'UTF-8'); ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <div class="form-group px-w-320">
+          <label for="t_approver">المجيز (للرفع وحده)</label>
+          <select name="t_approver" id="t_approver" class="form-control" <?php echo $__frozen ? 'disabled' : ''; ?>>
+            <option value="0">لا ينطبق</option>
+            <?php foreach ($__allUsers as $__u): ?>
+              <option value="<?php echo (int) $__u['id']; ?>">
+                <?php echo htmlspecialchars($__u['name'], ENT_QUOTES, 'UTF-8'); ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <div class="form-group px-w-320">
+          <label for="t_hr">شاهد الموارد البشرية (للرفع)</label>
+          <select name="t_hr_witness" id="t_hr" class="form-control" <?php echo $__frozen ? 'disabled' : ''; ?>>
+            <option value="0">لا ينطبق</option>
+            <?php foreach ($__allUsers as $__u): ?>
+              <option value="<?php echo (int) $__u['id']; ?>">
+                <?php echo htmlspecialchars($__u['name'], ENT_QUOTES, 'UTF-8'); ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <div class="form-group px-w-320">
+          <label for="t_fin">الشاهد المالي (للرفع)</label>
+          <select name="t_fin_witness" id="t_fin" class="form-control" <?php echo $__frozen ? 'disabled' : ''; ?>>
+            <option value="0">لا ينطبق</option>
+            <?php foreach ($__allUsers as $__u): ?>
+              <option value="<?php echo (int) $__u['id']; ?>">
+                <?php echo htmlspecialchars($__u['name'], ENT_QUOTES, 'UTF-8'); ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <div class="form-group px-w-320">
+          <label for="t_doc">سند الواقعة (للتصعيد)</label>
+          <input type="text" name="t_doc" id="t_doc" class="form-control" maxlength="60"
+                 <?php echo $__frozen ? 'disabled' : ''; ?> placeholder="رقم البلاغ او القرار">
+        </div>
+        <div class="form-group px-w-320">
+          <label for="t_reason">السبب (مطلوب)</label>
+          <input type="text" name="t_reason" id="t_reason" class="form-control" maxlength="255" required
+                 <?php echo $__frozen ? 'disabled' : ''; ?> placeholder="مثال: تغطية اجازة امين الخزينة">
+        </div>
+        <div class="form-group">
+          <button type="submit" class="btn btn-secondary" <?php echo $__frozen ? 'disabled' : ''; ?>>
+            امنح مؤقتا
+          </button>
+        </div>
+      </form>
     </div>
   </div>
   <?php endif; ?>

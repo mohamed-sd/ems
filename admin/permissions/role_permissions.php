@@ -582,6 +582,14 @@ require_once __DIR__ . '/../includes/layout_head.php';
 </style>
 
 <div class="page-shell">
+    <?php
+    /* PERM-01 — لافتةُ «تعامل قديم» في أوّلِ المتن. وهذه أخطرُ المواضعِ الثلاثةَ
+       عشرَ: الشاشةُ ما تزال **تكتب** في الجدولِ فعلًا (منحًا وسحبًا وحذفًا)،
+       والجدولُ حُذف فرعُه من دالّةِ القرار، فمن يمنح هنا يظنُّ أنّه فتح بابًا
+       ولا يُفتَح شيء. فالوسمُ «يحرّر» لا «يقرأ». */
+    require_once __DIR__ . '/../../includes/legacy_perm_notice.php';
+    ems_legacy_perm_notice('write', 'والمنح والسحب من هنا يكتبان في الجدول فعلا، ولا يظهر أثرهما لأي مستخدم.');
+    ?>
     <div class="page-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
         <h2 style="margin: 0;">
             <i class="fas fa-lock-open"></i> إدارة صلاحيات الأدوار

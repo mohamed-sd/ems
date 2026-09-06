@@ -269,7 +269,7 @@ gate(count($raws) === 0, 'G2 صفرُ لونٍ صريحٍ قويٍّ في قاع
 
 /* ── G3: ems-tables.css آخرُ ورقةٍ في كلِّ قشرة ── */
 $shellFail = array();
-foreach (array('inheader.php', 'insidebar.php', 'admin/includes/layout_head.php') as $shell) {
+foreach (array('inheader.php', 'insidebar.php') as $shell) {
     $p = $ROOT . '/' . $shell;
     if (!is_file($p)) { $shellFail[] = $shell . ' (مفقود)'; continue; }
     $s = file_get_contents($p);

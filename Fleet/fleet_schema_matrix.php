@@ -25,21 +25,50 @@ $pp = check_page_permissions($conn, 'Fleet/fleet_schema_matrix.php');
 $can_view = $pp['can_view'];
 if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية', 'GOV-PERM-403', ''); exit(); }
 
+/* ⛔ **والاستعلامُ المرتبطُ على `information_schema` يشلُّ الشاشة**: كان لكلِّ
+     شيتٍ ثلاثةُ استعلاماتٍ فرعيّةٍ مرتبطة (`COLUMNS` مرّةً و`KEY_COLUMN_USAGE`
+     مرّتين)، وكلٌّ منها **يفتح جداولَ القاعدةِ كلَّها** — والقاعدةُ 1,249 شيتًا.
+     مقيسٌ حيًّا على المخطَّطِ نفسِه: **82.3 ثانيةً** للاثنينِ والعشرين صفًّا،
+     ورُصد الاستعلامُ في `SHOW PROCESSLIST` عند `Opening tables` بعدَ 90 ثانية.
+   ◆ **والعلاجُ تحديدُ المدى لا حذفُ العمود**: تُقرأ أسماءُ الشيتاتِ أوّلًا، ثمَّ
+     يُسأل `COLUMNS` و`KEY_COLUMN_USAGE` **مرّةً واحدةً محدودةً بتلك الأسماء**
+     بـ`GROUP BY` — فيصير ثلاثةَ استعلاماتٍ محدودةً بدلَ ثلاثةٍ في كلِّ صف.
+     مقيسٌ: **0.1 ثانية** — والمخرَجُ **الاثنانِ والعشرون صفًّا نفسُها**. */
 $rows = array(); $nT = 0; $nFk = 0;
-$r = @$conn->query("SELECT t.TABLE_NAME tn, t.TABLE_ROWS tr, t.TABLE_COMMENT tc,
-        (SELECT COUNT(*) FROM information_schema.COLUMNS c
-          WHERE c.TABLE_SCHEMA = t.TABLE_SCHEMA AND c.TABLE_NAME = t.TABLE_NAME) nc,
-        (SELECT GROUP_CONCAT(k.COLUMN_NAME) FROM information_schema.KEY_COLUMN_USAGE k
-          WHERE k.TABLE_SCHEMA = t.TABLE_SCHEMA AND k.TABLE_NAME = t.TABLE_NAME
-            AND k.CONSTRAINT_NAME = 'PRIMARY') pk,
-        (SELECT COUNT(*) FROM information_schema.KEY_COLUMN_USAGE k
-          WHERE k.TABLE_SCHEMA = t.TABLE_SCHEMA AND k.TABLE_NAME = t.TABLE_NAME
-            AND k.REFERENCED_TABLE_NAME IS NOT NULL) fk
-   FROM information_schema.TABLES t
-  WHERE t.TABLE_SCHEMA = DATABASE() AND t.TABLE_TYPE = 'BASE TABLE'
-    AND (t.TABLE_NAME LIKE 'asset%' OR t.TABLE_NAME LIKE 'fleet%' OR t.TABLE_NAME IN ('equipments', 'equipment_drivers', 'entity_ownership', 'entity_licenses'))
-  ORDER BY t.TABLE_NAME");
+$FLT_SCOPE = "(t.TABLE_NAME LIKE 'asset%' OR t.TABLE_NAME LIKE 'fleet%'
+               OR t.TABLE_NAME IN ('equipments', 'equipment_drivers', 'entity_ownership', 'entity_licenses'))";
+$base = array(); $names = array();
+$r = @$conn->query("SELECT t.TABLE_NAME tn, t.TABLE_ROWS tr, t.TABLE_COMMENT tc
+                      FROM information_schema.TABLES t
+                     WHERE t.TABLE_SCHEMA = DATABASE() AND t.TABLE_TYPE = 'BASE TABLE'
+                       AND {$FLT_SCOPE}
+                     ORDER BY t.TABLE_NAME");
 while ($r && ($x = $r->fetch_assoc())) {
+    $base[$x['tn']] = array('tn' => (string) $x['tn'], 'tr' => (float) $x['tr'],
+                            'tc' => (string) $x['tc'], 'nc' => 0, 'pk' => '', 'fk' => 0);
+    $names[] = "'" . $conn->real_escape_string($x['tn']) . "'";
+}
+if ($names) {
+    $in = implode(',', $names);
+    $r = @$conn->query("SELECT TABLE_NAME tn, COUNT(*) nc FROM information_schema.COLUMNS
+                         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME IN ({$in})
+                         GROUP BY TABLE_NAME");
+    while ($r && ($x = $r->fetch_assoc())) {
+        if (isset($base[$x['tn']])) { $base[$x['tn']]['nc'] = (int) $x['nc']; }
+    }
+    $r = @$conn->query("SELECT TABLE_NAME tn,
+                               GROUP_CONCAT(CASE WHEN CONSTRAINT_NAME = 'PRIMARY' THEN COLUMN_NAME END) pk,
+                               SUM(REFERENCED_TABLE_NAME IS NOT NULL) fk
+                          FROM information_schema.KEY_COLUMN_USAGE
+                         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME IN ({$in})
+                         GROUP BY TABLE_NAME");
+    while ($r && ($x = $r->fetch_assoc())) {
+        if (!isset($base[$x['tn']])) { continue; }
+        $base[$x['tn']]['pk'] = (string) $x['pk'];
+        $base[$x['tn']]['fk'] = (int) $x['fk'];
+    }
+}
+foreach ($base as $x) {
     $nT++;
     $nFk += (int) $x['fk'];
     $rows[] = array(
@@ -122,4 +151,5 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         وما بلا مفتاح او تعليق يقول ذلك. قراءة صرف ولا ادخال.
     </div>
 </div>
-<?php include '../infooter.php'; ?>
+</body>
+</html>

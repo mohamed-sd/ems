@@ -119,4 +119,5 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         اثبات العقد الكامل، الاستلام والاثر ومنع التكرار، في مساره بجولة تصريف المتراكم.
     </div>
 </div>
-<?php include '../infooter.php'; ?>
+</body>
+</html>

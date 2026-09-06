@@ -59,25 +59,30 @@ fwrite(STDOUT, "\n══ update0004 موجة ④ — شاشات ORG ══\n");
 list($c) = rq($BASE . '/login.php', sys_get_temp_dir() . '/org4_probe.jar');
 if ($c !== 200) { fwrite(STDOUT, "Apache غير حي على {$BASE} — المسبار يتطلبه.\n"); exit(1); }
 
+/* ⚠ **سجلّان لا واحد**: `modules.code` هو **مفتاحُ الهويّةِ** وما زال يحمل
+      البادئةَ `admin/` من قبلِ نقلِ الشاشاتِ الستِّ (الالتزام 15bef2d8)، بينما
+      `nav_items.route` هو **وجهةُ الرابطِ** وقد صارت `main/` (و`Portal/`
+      للهيكل). فالاستعلامان أدناه يقرآن سجلَّين مختلفَين — ولا يُوحَّدان.
+      والمسابرُ تطرق الملفَّ حيث هو فعلًا: `main/`. */
 head('① التسجيل');
 $r = $db->query("SELECT COUNT(*) c FROM modules WHERE code IN ('admin/ops_manager_board.php','admin/org_assignments.php','admin/org_structure.php','admin/org_permits.php')")->fetch_assoc();
 check(intval($r['c']) === 4, 'الموديولات الأربعة مسجَّلة');
 $r = $db->query("SELECT COUNT(*) c FROM role_permissions rp JOIN modules m ON m.id=rp.module_id
                  WHERE rp.role_id=1 AND m.code LIKE 'admin/org%' OR rp.role_id=1 AND m.code='admin/ops_manager_board.php'")->fetch_assoc();
 check(intval($r['c']) >= 4, 'صلاحيات الدور 1 كاملة');
-$r = $db->query("SELECT COUNT(*) c FROM nav_items WHERE role_id=1 AND route IN ('admin/ops_manager_board.php','admin/org_assignments.php','admin/org_structure.php','admin/org_permits.php')")->fetch_assoc();
+$r = $db->query("SELECT COUNT(*) c FROM nav_items WHERE role_id=1 AND route IN ('main/ops_manager_board.php','main/org_assignments.php','Portal/ceo_org_decisions.php','main/org_permits.php')")->fetch_assoc();
 check(intval($r['c']) === 4, 'روابط تنقل الدور 1 أربعة');
-$r = $db->query("SELECT COUNT(*) c FROM nav_items WHERE role_id=6 AND route IN ('admin/org_permits.php','admin/org_assignments.php')")->fetch_assoc();
+$r = $db->query("SELECT COUNT(*) c FROM nav_items WHERE role_id=6 AND route IN ('main/org_permits.php','main/org_assignments.php')")->fetch_assoc();
 check(intval($r['c']) === 2, 'روابط تنقل الدور 6 اثنان');
 
 head('② الدور 1 يفتح الأربع');
 $jar = sys_get_temp_dir() . '/org4_r1.jar';
 login('محمد', $jar);
 $screens = array(
-    'admin/ops_manager_board.php' => 'لوحة مدير التشغيل',
-    'admin/org_assignments.php' => 'التكليفات التنظيمية',
-    'admin/org_structure.php' => 'الهيكل التنظيمي',
-    'admin/org_permits.php' => 'أذونات المواقع',
+    'main/ops_manager_board.php' => 'لوحة مدير التشغيل',
+    'main/org_assignments.php' => 'التكليفات التنظيمية',
+    'main/org_structure.php' => 'الهيكل التنظيمي',
+    'main/org_permits.php' => 'أذونات المواقع',
 );
 $bodies = array();
 foreach ($screens as $path => $marker) {
@@ -87,16 +92,16 @@ foreach ($screens as $path => $marker) {
 }
 
 head('③ اللوحة بالساعات لا بالعدد');
-check(mb_strpos($bodies['admin/ops_manager_board.php'], 'ساعة') !== false
-   && mb_strpos($bodies['admin/ops_manager_board.php'], 'بالساعات لا بالعدد') !== false,
+check(mb_strpos($bodies['main/ops_manager_board.php'], 'ساعة') !== false
+   && mb_strpos($bodies['main/ops_manager_board.php'], 'بالساعات لا بالعدد') !== false,
    'مجموع ساعات الانتظار ظاهر نصًّا');
-check(mb_strpos($bodies['admin/org_structure.php'], 'الموارد البشرية') !== false,
+check(mb_strpos($bodies['main/org_structure.php'], 'الموارد البشرية') !== false,
    'الهيكل يعرض الموارد البشرية (تحت التشغيل بالاستقلال الفني)');
 
 head('④ دور بلا صلاحية يُحجب');
 $jar2 = sys_get_temp_dir() . '/org4_r12.jar';
 login('sales@equipation.sd', $jar2); // الدور 12 — لا صلاحية على شاشات ORG
-list($code, $h) = rq($BASE . '/admin/org_assignments.php', $jar2);
+list($code, $h) = rq($BASE . '/main/org_assignments.php', $jar2);
 check($code === 302 && stripos($h, 'Location') !== false, 'الدور 12: تحويل لا عرض — الإخفاء في الخادم');
 
 fwrite(STDOUT, "\n══ النتيجة: PASS={$PASS} · FAIL={$FAIL} ══\n");

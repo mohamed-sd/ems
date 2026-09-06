@@ -15,7 +15,7 @@ if (!function_exists('m00_norm')) {
         $s = str_replace(array('أ', 'إ', 'آ'), 'ا', $s);
         $s = str_replace('ة', 'ه', $s);
         $s = str_replace('ى', 'ي', $s);
-        return preg_replace('/[]/u', '', $s);
+        return preg_replace('/[\x{064B}-\x{0652}\x{0640}]/u', '', $s);
     }
 }
 

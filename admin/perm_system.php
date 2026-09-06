@@ -91,6 +91,11 @@ $diffRows = $diffs > 0
 $health = ($tplItems > 0 && $usersPos > 0) ? 'ok' : ($tplItems > 0 ? 'warn' : 'err');
 
 require_once __DIR__ . '/includes/layout_head.php';
+
+/* PERM-01 — لافتةُ «تعامل قديم» في أوّلِ المتن: هذه اللوحةُ تقرأ الجدولَ القديمَ
+   والطبقاتِ الموازيةَ الموسومةَ «غير نافذة» معًا، ولا تقرأ مصدرَ القرارِ الحيّ. */
+require_once __DIR__ . '/../includes/legacy_perm_notice.php';
+ems_legacy_perm_notice('read', 'وهذه اللوحة تقرأ الجدول القديم والطبقات الموازية غير النافذة، لا مصدر القرار الحي.');
 ?>
 
 <div class="card">

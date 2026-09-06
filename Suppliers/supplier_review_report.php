@@ -95,4 +95,5 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         ولا نسبة تعرض بلا مقامها الظاهر في البطاقات. قراءة صرف ولا ادخال.
     </div>
 </div>
-<?php include '../infooter.php'; ?>
+</body>
+</html>

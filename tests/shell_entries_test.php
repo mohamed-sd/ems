@@ -15,13 +15,17 @@
  * كانت **موحَّدةً سلفًا** وأُدينت بنصِّ تعليقٍ يشرح توحيدَها. القياسُ الآن على
  * `token_get_all`: ما يُصدَر فعلًا (`T_INLINE_HTML` وسلاسلُ الشفرة) لا ما يُذكر.
  *
- * ── والمداخلُ المعتمدةُ خمسةٌ لكلٍّ سببُه ────────────────────────────────────
+ * ── والمداخلُ المعتمدةُ أربعةٌ لكلٍّ سببُه ───────────────────────────────────
  *   · `inheader.php` — القشرةُ المصادَقة (٣٤٦ شاشة)
- *   · `admin/includes/layout_head.php` — لوحةُ الإدارةِ العليا
  *   · `includes/public_shell.php` — **ما قبلَ الدخول** (١٢ شاشةً حُوِّلت هنا):
  *     القشرةُ المصادَقةُ تفترض جلسةً ودورًا وقائمةً، ولا شيءَ منها قبلَ الدخول.
  *   · `includes/deny_page.php` — صفحةُ الحجبِ الموحَّدة (الشقُّ الثاني من القبول)
  *   · `emsreports/reports/_report_template.php` — قالبُ الطباعة
+ *
+ * ⛔ **و`admin/` خارجَ المدى**: بوّابةُ المزوّدِ أُغلقت بقرارِ الشركةِ الواحدة
+ *   (403 على بابِها)، فقشرتُها لم تعد مدخلًا معتمدًا ولا شاشاتُها شاشاتِ
+ *   منتَج. أُخرجت من `$dead` كي يقرأ هذا الفاحصُ الحكمَ نفسَه سواءٌ بقي
+ *   المجلَّدُ أم حُذف.
  *
  * ── وما يبقى خارجَها **لا يمكن** أن يدخلها ─────────────────────────────────
  * المثبِّتُ وصفحةُ فشلِ الإعدادِ يعملان **قبل وجودِ النظام**: لا `config` ولا
@@ -45,19 +49,18 @@ $say = function ($s) { fwrite(STDOUT, $s . "\n"); };
 $say('══ INJ-0236 · مدخلُ القشرةِ واحدٌ لكلِّ عائلةِ شاشات');
 
 $APPROVED = array(
-    'inheader.php', 'admin/includes/layout_head.php', 'includes/public_shell.php',
+    'inheader.php', 'includes/public_shell.php',
     'includes/deny_page.php', 'emsreports/reports/_report_template.php',
 );
 /* ما لا يمكن أن يدخل قشرةً — ويُعلَن بسببِه لا يُخفى */
 $EXEMPT = array(
     'install/index.php'                => 'المثبِّتُ يعمل قبل وجودِ النظام',
-    'admin/setup_once.php'             => 'تهيئةٌ أوّليةٌ قبلَ وجودِ حسابٍ',
     'emsreports/setup_permissions.php' => 'سكربتُ تهيئةِ صلاحياتٍ لا شاشة',
     'config.php'                       => 'صفحةُ فشلِ الإعدادِ — لا config يُضمَّن',
     'scripts/md_to_pdf_html.php'       => 'مُحوِّلُ وثائقَ على سطرِ الأوامر',
 );
 
-$dead = '~/(storage/backups|\.claude|vendor|node_modules|docs)/~';
+$dead = '~/(storage/backups|\.claude|vendor|node_modules|docs|admin)/~';
 $emitters = array(); $approvedSeen = 0; $exemptSeen = 0;
 $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($ROOT, FilesystemIterator::SKIP_DOTS));
 foreach ($it as $p) {
@@ -101,7 +104,11 @@ foreach ($it2 as $p) {
     if (strpos($src, 'ems_public_head(') !== false
         && strpos($path, 'includes/public_shell.php') === false) { $users++; }
 }
-$ok($users >= 10, "ومدخلُ ما قبلَ الدخولِ مُتبنًّى في {$users} شاشةً — لا مبنيًّا بلا مستهلك");
+/* العتبةُ ٩ لا ١٠: ثلاثٌ من متبنّي هذا المدخلِ كانت في `admin/`
+   (الدخولُ واستعادةُ كلمةِ المرورِ وإعادةُ ضبطِها)، وقد خرج المجلَّدُ من المدى
+   بإغلاقِ بوّابةِ المزوّد. والمقصودُ إثباتُ أنّ المدخلَ مُتبنًّى لا مبنيٌّ بلا
+   مستهلك — وتسعةُ متبنّينَ تُثبته كما تُثبته اثنا عشر. */
+$ok($users >= 9, "ومدخلُ ما قبلَ الدخولِ مُتبنًّى في {$users} شاشةً — لا مبنيًّا بلا مستهلك");
 
 /* ── والشقُّ الثاني: صفحةُ الحجبِ مكوّنٌ واحدٌ في كلِّ المسارات ─────────────── */
 $deny = (string) @file_get_contents($ROOT . '/includes/deny_page.php');
@@ -124,7 +131,7 @@ $http = function ($url) {
 };
 $BASE = 'http://localhost/ems';
 $bad = array(); $seen = 0;
-foreach (array('index.php', 'login.php', 'company/login.php', 'admin/login.php',
+foreach (array('index.php', 'login.php', 'company/login.php',
                'company/forgot_password.php') as $rel) {
     $r = $http($BASE . '/' . $rel);
     if ($r['code'] !== 200) { $bad[] = $rel . ' (HTTP ' . $r['code'] . ')'; continue; }

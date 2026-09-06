@@ -13896,6 +13896,18 @@
         "stage_desc": null
     },
     {
+        "id": "6505",
+        "name": "إدارة الصلاحيات والأدوار",
+        "group_code": "perm_admin_r15",
+        "owner_role_id": "15",
+        "icon": "fa fa-user-shield",
+        "display_order": "34",
+        "stage_no": null,
+        "stage_title": null,
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
         "id": "5982",
         "name": "المركز التنفيذي",
         "group_code": null,

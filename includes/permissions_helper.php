@@ -1,5 +1,11 @@
 <?php
 require_once __DIR__ . '/../includes/catch_log.php';
+/* ── PERM-03 · طبقاتُ البنودِ الأربعُ الباقيةُ تُحمَّل مع مسارِ القرار ────────
+     ◆ **وموضعُها مركزيٌّ لا في كلِّ نداء**: `ApprovalGate` و`SensitiveFieldGuard`
+       يفحصان وجودَ الدوالِّ بـ`function_exists` قبلَ استعمالِها — فلو تُركت بلا
+       تضمينٍ مركزيٍّ لصار الحارسُ **صامتًا لا مفقودًا**، وهو أخطرُ من عطبٍ
+       ظاهر: طبقةٌ مبنيّةٌ تُقرأ نافذةً وهي لا تُستشار أصلًا. */
+require_once __DIR__ . '/perm_layers.php';
 /**
  * مساعد التحقق من الصلاحيات - Permission Check Helper
  * استخدم هذه الدوال في صفحاتك للتحقق من صلاحيات المستخدم
@@ -194,32 +200,26 @@ function check_permission($conn, $module_id, $permission = 'view') {
         return false;
     }
 
-    $role_id = $_SESSION['user']['role'];
     $permission_field = 'can_' . strtolower($permission);
     $allowed_permissions = ['can_view', 'can_add', 'can_edit', 'can_delete'];
 
     // تحقق من صحة اسم الصلاحية
     if (!in_array($permission_field, $allowed_permissions)) {
-        trigger_error("❌ صلاحية غير معروفة: " . $permission_field, E_USER_WARNING);
+        trigger_error("صلاحية غير معروفة: " . $permission_field, E_USER_WARNING);
         return false;
     }
 
-    // استعلم القاعدة
-    $stmt = $conn->prepare(
-        "SELECT {$permission_field} FROM role_permissions 
-         WHERE role_id = ? AND module_id = ? LIMIT 1"
-    );
-
-    if (!$stmt) {
-        trigger_error("❌ خطأ في قاعدة البيانات: " . $conn->error, E_USER_WARNING);
-        return false;
-    }
-
-    $stmt->bind_param("ii", $role_id, $module_id);
-    $stmt->execute();
-    $result = $stmt->get_result()->fetch_assoc();
-
-    return $result && (int)$result[$permission_field] === 1;
+    /* ── PERM-02 · هذه الدالّةُ تفوّض ولا تحكم ──────────────────────────────
+       ⛔ **العطبُ المقيس**: كانت تستعلم **جدولَ صلاحيّاتِ الدورِ القديمَ** رأسًا،
+         فهي **مسارُ قرارٍ ثانٍ** حيٌّ في الشيفرة. وقد فُتِّشت الشجرةُ كلُّها:
+         **صفرُ نداءٍ من شاشةِ إنتاج** — كلُّ نداءاتِها داخلَ هذا الملفِّ أو في
+         أمثلةِ التوثيق. فلم تكن تحكم أحدًا اليومَ، **لكنّها فخٌّ**: من يناديها
+         غدًا يُحكَم بالنظامِ القديمِ صامتًا، ولا يراه أحد.
+       ◆ **فتُفوَّض إلى المصدرِ الواحد** بدلَ أن تُحذف: الاسمُ يبقى فلا ينكسر
+         نداءٌ قديم، والحكمُ يصير حكمَ `get_module_permissions` حرفًا — قوالبُ
+         نافذةٌ وفتحٌ اضطراريٌّ وسلامةُ فشلٍ نحوَ المنع. */
+    $perms = get_module_permissions($conn, $module_id);
+    return !empty($perms[$permission_field]);
 }
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -533,6 +533,25 @@ function get_module_permissions($conn, $module_id) {
 
     $role_id = $_SESSION['user']['role'];
 
+    /* ── PERM-02 · السوبرُ يُصرَّح به هنا لا في كلِّ نداء ────────────────────
+       ⛔ **العطبُ المقيس**: الدورُ `-1` كان **يتخطّى** كتلةَ القوالبِ ثمَّ يبلغ
+         السقوطَ الأخيرَ فيرجع **منعًا كاملًا** — أي أنَّ دالّةَ القرارِ تُغلق كلَّ
+         شاشةٍ في وجهِ الإدارةِ التقنيّة. ولم يظهر الأثرُ لأنَّ **صفرَ حسابٍ**
+         يحمل `-1` اليوم في كلِّ الشركات؛ فهو عيبٌ نائمٌ لا معدوم.
+       ◆ **والعلاجُ تصريحٌ في المصدرِ الواحدِ لا ترقيعٌ عند كلِّ قارئ**: كانت كلُّ
+         شاشةٍ تحتاجه تكتب `is_super ? true : $p[...]` بيدِها (`tkt_page_perms` ·
+         `auth_grants` · عشراتُ غيرِها) — وذاك مسارُ قرارٍ ثانٍ متناثرٌ يسهل أن
+         تنساه شاشةٌ فتُقفل في وجهِه. فالحكمُ يُقال مرّةً هنا.
+       ⛔ **وليس ولايةً على السياسة**: صفةُ السوبرِ تفتح الشاشاتِ ولا تجعله
+         مُسنِدًا ولا مُجيزَ كسرِ زجاج — تلك بيدِ الدورِ 15 والحوكمةِ بنصِّ ق-١
+         وق-٢، وحرّاسُها تفحص الدورَ صراحةً لا هذه الدالّة. */
+    if (strval($role_id) === '-1') {
+        ems_perm_trace_note('السوبر', 'v الدور -1 مصرح به في مصدر القرار الواحد',
+            'ولا يجعله مسندا ولا مجيز كسر زجاج - تلك بيد الدور 15 والحوكمة');
+        return array('can_view' => true, 'can_add' => true,
+                     'can_edit' => true, 'can_delete' => true);
+    }
+
     /* ── GOV-AUTH-01 التبديلُ الجزئي (قرارُ المالك 2026-08-17) ─────────────
        المستخدمُ المغطًّى بقالبٍ نافذٍ يُحكَم بقالبِه حصرًا — «لا شاشةَ خارجَ
        القالب». غيرُ المغطَّى (قالبُه مسودةٌ أو بلا قالبٍ) على القائمِ كما هو.
@@ -695,31 +714,50 @@ function get_user_permissions($conn) {
         return [];
     }
 
-    $role_id = $_SESSION['user']['role'];
+    /* ── PERM-02 · الخريطةُ تُبنى من الطبقةِ الحاكمةِ لا من الجدولِ القديم ───
+       ⛔ كانت تقرأ جدولَ صلاحيّاتِ الدورِ القديمَ فتُخرج خريطةً **تخالف الحارسَ**
+         لكلِّ مستخدمٍ مغطًّى بقالب (وهم 75 من 75). ومن بنى قائمةً عليها بنى
+         موازيًا لمسارِ القرار.
+       ◆ **والحبّةُ مستخدمٌ لا دور**: القوالبُ تُمنح بالفرد، فالخريطةُ تُقرأ
+         بـ`user_id`. والسوبرُ خارجَ التغطيةِ فتُرجَع له خريطةٌ فارغةٌ عمدًا —
+         وحكمُه في `get_module_permissions` لا هنا. */
+    if (strval($_SESSION['user']['role']) === '-1') { return []; }
+    $uid = intval($_SESSION['user']['id'] ?? 0);
+    if ($uid <= 0) { return []; }
 
     $stmt = $conn->prepare(
-        "SELECT module_id, can_view, can_add, can_edit, can_delete 
-         FROM role_permissions 
-         WHERE role_id = ?"
+        "SELECT m.id AS module_id,
+                MAX(i.allow) AS can_view,
+                MAX(i.can_add) AS can_add,
+                MAX(i.can_edit) AS can_edit,
+                MAX(i.can_delete) AS can_delete
+           FROM gov_authority_grants g
+           JOIN gov_role_profiles p ON p.profile_id = g.profile_id AND p.state = 'active'
+           JOIN gov_profile_items i ON i.profile_id = p.profile_id AND i.item_kind = 'screen'
+           JOIN modules m ON m.code = i.item_ref
+          WHERE g.user_id = ? AND g.revoked_at IS NULL
+            AND (g.valid_to IS NULL OR g.valid_to > NOW())
+          GROUP BY m.id"
     );
 
     if (!$stmt) {
         return [];
     }
 
-    $stmt->bind_param("i", $role_id);
+    $stmt->bind_param("i", $uid);
     $stmt->execute();
     $result = $stmt->get_result();
 
     $permissions = [];
-    while ($row = $result->fetch_assoc()) {
+    while ($result && ($row = $result->fetch_assoc())) {
         $permissions[$row['module_id']] = [
-            'can_view' => (bool)$row['can_view'],
-            'can_add' => (bool)$row['can_add'],
-            'can_edit' => (bool)$row['can_edit'],
-            'can_delete' => (bool)$row['can_delete']
+            'can_view' => ((int) $row['can_view']) === 1,
+            'can_add' => ((int) $row['can_add']) === 1,
+            'can_edit' => ((int) $row['can_edit']) === 1,
+            'can_delete' => ((int) $row['can_delete']) === 1
         ];
     }
+    $stmt->close();
 
     return $permissions;
 }

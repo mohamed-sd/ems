@@ -5886,3 +5886,16 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
 /* ── main/user_profile.php ──
    البطاقةُ على المكوّن؛ ولم يبقَ إلا عرضُ جدولِ المشروعِ المكلَّف. */
 .user-profile-page .profile-table { width:100%; }
+
+/* ── PERM-01 2026-09-06 · أدواتُ تخطيطٍ لشاشاتِ الجولةِ الأربع ──
+   نُقلت من `style=` السطريِّ إلى القشرة (`VT-01` مقفلُ الاتّجاه)، والمسافاتُ
+   برموزِ السلّمِ لا بأرقامٍ صلبة. والأسماءُ بالدورِ لا بالقيمة. */
+.pe-row-wide      { display:flex; gap:var(--space-6); flex-wrap:wrap; }
+.pe-row-end       { display:flex; gap:var(--space-2); align-items:flex-end; }
+.pe-row-tight     { display:flex; gap:var(--space-2); }
+.pe-row-mid-end   { display:flex; gap:var(--space-3); flex-wrap:wrap; align-items:flex-end; }
+.pe-row-mid-top   { display:flex; gap:var(--space-3); flex-wrap:wrap; margin-top:var(--space-3); }
+.pe-span-all      { flex:1 1 100%; }
+.pe-mt-mid        { margin-top:var(--space-3); }
+.pe-table-narrow  { max-width:640px; }
+.lc-col-kicker    { font-weight:800; color:var(--t3); font-size:.76rem; }

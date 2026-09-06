@@ -206,4 +206,5 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         افعال دورة العقد عند فاعلها في شاشتها ولا كتابة من هذا السجل.
     </div>
 </div>
-<?php include '../infooter.php'; ?>
+</body>
+</html>

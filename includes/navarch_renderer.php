@@ -58,13 +58,64 @@ if (!function_exists('navarch_authorized_routes')) {
     function navarch_authorized_routes($conn, $roleId)
     {
         $roleId = (int) $roleId;
-        $sql = "SELECT n.route
+        $sql = "SELECT n.route, m.code AS module_code
                   FROM nav_items n
+                  LEFT JOIN modules m ON m.id = n.module_id
                  WHERE n.role_id = {$roleId} AND n.active = 1
                    AND (n.permission_code IS NULL OR " . perm_nav_view_exists_sql('n') . ")";
+
+        /* ── PERM-02 · سجلٌّ واحدٌ يحكم الظهورَ والوصولَ معًا ───────────────────
+           ⛔ **العطبُ البنيويُّ المقيس**: هذا المُصيِّرُ **الحاكمُ** كان يُصرِّح
+             بالرابطِ من `role_permissions` وحدَه، بينما يحكم **الوصولَ** قالبُ
+             المستخدم. فسجلّانِ يقرِّران أمرًا واحدًا — واتّفاقُهما اليومَ
+             (‏صفرُ افتراقٍ من 1,303) لا يمنع افتراقَهما غدًا: شاشةٌ تُضاف إلى
+             قالبٍ بلا صفٍّ في الجدولِ القديمِ **يفتحها الحارسُ ولا يُصيَّر
+             رابطُها**، وشاشةٌ تُنزع من القالبِ **يبقى رابطُها ويُردُّ فاتحُه**.
+           ◆ **فيُقاطَع بالطبقةِ الحاكمة**: من غطّاه قالبٌ نافذٌ يُصرَّح له بما
+             يفتحه قالبُه حصرًا — وهي دلالةُ `get_module_permissions` حرفًا:
+             «لا شاشةَ خارجَ القالب». وغيرُ المغطَّى على التصريحِ القائمِ كما هو.
+           ⛔ **والمقاطعةُ للجلسةِ الحاليّةِ وحدَها**: حبّةُ القالبِ **مستخدمٌ لا
+             دور**، فلا يُقاطَع تصييرٌ يُطلَب بدورٍ لا يخصُّ صاحبَ الجلسة (أدواتُ
+             القياسِ تُصيِّر أدوارًا عدّةً في عمليّةٍ واحدة) — وإلّا أُلبس الجميعُ
+             قالبَ أوّلِهم. وهذا عينُ ما يفعله `unified_nav.php` في مسارِه. */
+        $tpl = null;
+        if (function_exists('ems_template_nav_state')
+            && isset($_SESSION['user']['role'])
+            && (int) $_SESSION['user']['role'] === $roleId) {
+            $st = ems_template_nav_state($conn);
+            if (!empty($st['covered'])) { $tpl = $st['allowed']; }
+        }
+
+        /* ── PERM-03 · بندُ `scope`: حصرُ المسارِ في مجالِ قالبِه ──────────────
+             ◆ **ويضيّق ولا يوسّع**: قالبٌ بلا بندِ مجالٍ يمرُّ كما هو؛ وقالبٌ
+               أعلن مجالاتِه يُحصَر فيها. والمساحةُ من السجلِّ الحاكمِ للموضع
+               لا من نصِّ المسار. */
+        /* ◆ **والحكمُ بالدالّةِ المسمّاةِ لا بحسابٍ محلّيّ**: `ems_workspace_allowed`
+             تحمل الدلالةَ كاملةً — «بلا بندٍ يمرُّ، وبِبندٍ يُحصَر» — فلا تُعاد
+             كتابتُها هنا فتفترق عن أصلِها عند أوّلِ تعديل. */
+        $scoped = false;
+        if ($tpl !== null && function_exists('ems_profile_scopes') && function_exists('ems_workspace_allowed')) {
+            $scoped = (bool) ems_profile_scopes($conn);
+        }
+        $wsMap = ($scoped && function_exists('ems_route_workspace_map'))
+            ? ems_route_workspace_map($conn) : array();
+
         $out = array();
         $r = @mysqli_query($conn, $sql);
-        while ($r && ($x = mysqli_fetch_assoc($r))) { $out[navarch_norm_route($x['route'])] = true; }
+        while ($r && ($x = mysqli_fetch_assoc($r))) {
+            if ($tpl !== null) {
+                $code = (string) ($x['module_code'] ?? '');
+                /* بندٌ بلا وحدةٍ تحلّ: حارسُه في وجهتِه فلا يُقاطَع هنا. */
+                if ($code !== '' && !isset($tpl[$code])) { continue; }
+            }
+            $norm = navarch_norm_route($x['route']);
+            if ($scoped) {
+                $ws = isset($wsMap[strtolower($norm)]) ? $wsMap[strtolower($norm)] : null;
+                /* مسارٌ بلا موضعٍ حاكمٍ لا يُحاسَب بمجالٍ لا يُعرَف له. */
+                if ($ws !== null && !ems_workspace_allowed($conn, $ws)) { continue; }
+            }
+            $out[$norm] = true;
+        }
         return $out;
     }
 }

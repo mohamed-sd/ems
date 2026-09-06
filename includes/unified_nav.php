@@ -250,6 +250,98 @@ function getUnifiedNavItems($conn, $roleId) {
 }
 
 /**
+ * عناصرُ **منطقةِ الوصولِ السريع** لدورٍ — رايةُ `is_quick` × حارسُ الوجهة.
+ * ═══════════════════════════════════════════════════════════════════════════
+ * ◆ **ولا تشترط `active`**: المربَّعان في «تحكم الروابط» مستقلّان بنصِّ الطلب —
+ *   فشاشةٌ في الوصولِ السريعِ وخارجَ السايدبارِ حالةٌ مشروعة.
+ *
+ * ⛔ **والصلاحيّةُ تُسأل من الحارسِ لا من جملةِ SQL** — وهذا فرقٌ مقيسٌ لا
+ *   تجميل: `perm_nav_view_exists_sql` تقرأ `role_permissions` **وحدَها**،
+ *   بينما يُحكَم 75 من 77 مستخدمًا حيًّا بطبقةِ **القوالب**. فترشيحُ البلاطاتِ
+ *   بجملةِ SQL أسقط **31 بلاطةً حيّةً** في 9 أدوارٍ (مقيسٌ بلقطتَي تصييرٍ قبل
+ *   وبعد). والمعيارُ الصحيحُ واحدٌ: **ما يفتحه الحارسُ يُعرَض، وما يردُّه لا
+ *   يُعرَض** — فتُسأل `check_page_permissions` نفسُها التي تحرس الوجهة.
+ * ◆ **وبندٌ بلا `permission_code` يمرُّ** — حارسُه في وجهتِه لا في القائمة،
+ *   وهو عينُ شرطِ السايدبار.
+ * ◆ **وبوابةُ المورّدِ ومجالُ التمويلِ يُطبَّقان**: كلاهما **يردُّ عند الوجهة**
+ *   (fail-closed)، فبلاطةٌ تتخطّاهما بلاطةٌ ميتة.
+ *
+ * @return array صفوفُ nav_items المرفوعةُ رايتُها، بترتيبِ الملاحة
+ */
+function getUnifiedQuickItems($conn, $roleId) {
+    $roleId = intval($roleId);
+    if (!function_exists('check_page_permissions')) {
+        require_once __DIR__ . '/permissions_helper.php';
+    }
+
+    $doorOrder = implode(',', array_map(function ($d) { return "'" . $d . "'"; },
+        array_keys(unifiedNavDoors())));
+    $sql = "SELECT n.door, n.group_id, n.label_ar, n.route, n.icon, n.sort_order,
+                   n.counter_source, n.permission_code, m.code AS module_code
+              FROM nav_items n
+              LEFT JOIN modules m ON m.id = n.module_id
+             WHERE n.role_id = {$roleId} AND n.is_quick = 1
+             ORDER BY FIELD(n.door,{$doorOrder}), n.sort_order, n.id";
+
+    /* ── الشاشةُ الواحدةُ بلاطةٌ واحدةٌ ولو تعدَّدت صفوفُها ────────────────────
+       ◆ **والمختارُ منها الصفُّ بلا لاحقةِ تبويب**: للشاشةِ الواحدةِ صفٌّ
+         بمسارِها وصفوفٌ بلواحقِ `#N` لتبويباتِها. وبلاطةُ الوصولِ السريعِ
+         تقصد الشاشةَ لا تبويبًا بعينِه — واختيارُ الأوّلِ بترتيبِ الملاحةِ كان
+         يُوقِع `x.php#2` مكانَ `x.php` (مقيسٌ في دورَي 8 و16). */
+    $pick = array(); $order = array();
+    $res = @mysqli_query($conn, $sql);
+    while ($res && ($row = mysqli_fetch_assoc($res))) {
+        $raw = preg_replace('~^(\.\./)+~', '', (string) $row['route']);
+        $key = strtolower(preg_replace('~[?#].*$~', '', $raw));
+        if ($key === '') { continue; }
+        if (!isset($pick[$key])) { $pick[$key] = $row; $order[] = $key; continue; }
+        $curHasFrag = (strpos((string) $pick[$key]['route'], '#') !== false);
+        $newHasFrag = (strpos($raw, '#') !== false);
+        if ($curHasFrag && !$newHasFrag) { $pick[$key] = $row; }
+    }
+
+    $items = array();
+    foreach ($order as $key) {
+        $row = $pick[$key];
+        $pc = trim((string) $row['permission_code']);
+        if ($pc !== '') {
+            $p = check_page_permissions($conn, $pc);
+            if (empty($p['can_view'])) { continue; }
+        }
+        $items[] = $row;
+    }
+
+    if (isset($_SESSION['user'])) {
+        require_once dirname(__DIR__) . '/app/Services/Portal/SupplierPortalGuard.php';
+        $items = \App\Services\Portal\SupplierPortalGuard::filterNavItems($_SESSION['user'], $items);
+    }
+
+    /* مجالُ التمويلِ المقيَّد (DEC-01 ②) — بلا منحةٍ فرديّةٍ نافذةٍ لا بلاطة. */
+    $hasFin = false;
+    foreach ($items as $it) {
+        if ($it['door'] === 'FIN' || strpos((string) $it['route'], 'Financing/') === 0) { $hasFin = true; break; }
+    }
+    if ($hasFin && isset($_SESSION['user']) && strval($_SESSION['user']['role'] ?? '') !== '-1') {
+        require_once dirname(__DIR__) . '/app/Core/OwnershipDomainGuard.php';
+        $uid = intval($_SESSION['user']['id'] ?? 0);
+        $co  = intval($_SESSION['user']['company_id'] ?? 0);
+        $granted = false;
+        foreach (array(\App\Core\OwnershipDomainGuard::PERM_OWNER,
+                       \App\Core\OwnershipDomainGuard::PERM_TERMS,
+                       \App\Core\OwnershipDomainGuard::PERM_VALUE) as $pp) {
+            if (\App\Core\OwnershipDomainGuard::hasGrant($conn, $co, $uid, $pp)) { $granted = true; break; }
+        }
+        if (!$granted) {
+            $items = array_values(array_filter($items, function ($it) {
+                return $it['door'] !== 'FIN' && strpos((string) $it['route'], 'Financing/') !== 0;
+            }));
+        }
+    }
+
+    return $items;
+}
+
+/**
  * طباعة بابٍ واحد بهيكل nav-group القائم + فواصلِ مجموعاتٍ داخلية.
  * الشارةُ على الرأس مجموعُ شارات الأبناء (وإلا اختفى المعلَّق داخل بابٍ مطوي).
  */

@@ -146,4 +146,5 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         لا فعل كتابة من هذه الشاشة كي لا يزدوج مسار الفعل الواحد.
     </div>
 </div>
-<?php include '../infooter.php'; ?>
+</body>
+</html>

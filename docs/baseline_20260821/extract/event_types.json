@@ -35,8 +35,8 @@
     {
         "category": "analytics",
         "event_key": "analytics.probe_derived",
-        "cnt": "474",
-        "delivered_ok_sum": "474",
+        "cnt": "499",
+        "delivered_ok_sum": "499",
         "delivered_failed_sum": "0",
         "dlq_sum": "0",
         "training_cnt": "0",
@@ -68,13 +68,13 @@
     {
         "category": "financial",
         "event_key": "finance.recon_adjustment.posted",
-        "cnt": "221",
-        "delivered_ok_sum": "221",
-        "delivered_failed_sum": "1",
-        "dlq_sum": "1",
+        "cnt": "227",
+        "delivered_ok_sum": "227",
+        "delivered_failed_sum": "7",
+        "dlq_sum": "7",
         "training_cnt": "0",
         "first_at": "2026-07-31 19:00:10",
-        "last_at": "2026-09-01 06:54:01"
+        "last_at": "2026-09-04 14:22:29"
     },
     {
         "category": "financial",
@@ -288,13 +288,13 @@
     {
         "category": "operational",
         "event_key": "project.chartered",
-        "cnt": "21",
-        "delivered_ok_sum": "21",
+        "cnt": "24",
+        "delivered_ok_sum": "24",
         "delivered_failed_sum": "0",
         "dlq_sum": "0",
         "training_cnt": "0",
         "first_at": "2026-08-06 04:24:15",
-        "last_at": "2026-08-31 09:41:58"
+        "last_at": "2026-09-04 11:33:48"
     },
     {
         "category": "financial",

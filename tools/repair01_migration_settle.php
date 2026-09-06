@@ -225,6 +225,35 @@ foreach ($managed as $f => $ext) {
         $found = count(array_filter($chk));
         $verified = ($found === count($chk)) ? 1 : 0;
         $miss = array_keys(array_filter($chk, function ($v) { return !$v; }));
+
+        /* ◆ **ورابعةٌ وقعت 2026-09-06 — والقاعدةُ أعلاه صحيحةٌ وعمياءُ عنها**:
+             ثلاثةُ سكربتاتٍ **تمتنع عن العكسِ عمدًا وتكتب السبب** — عكسُ
+             `nav_route_case_sweep` يُعيد مساراتٍ تردُّ 404 على لينكس، وعكسُ
+             `perm03_*` يقطع موظّفين عن النظامِ أو يُعيد انحدارًا مقيسًا. فغيابُ
+             جملةِ التراجعِ فيها **قرارٌ مكتوبٌ لا سهوٌ**، والقاعدةُ القديمةُ
+             تقرأ الغيابَ وحدَه فتُرسِّب إعلانًا صريحًا.
+           ⛔ **والتمييزُ بالإعلانِ لا بالغياب**: لا يُعفى سكربتٌ لأنّه خالٍ، بل
+             لأنّه **قال إنّه خالٍ وذكر السبب**. ومن لم يكتبها يبقى راسبًا.
+           ◆ **والإعلانُ بنيويٌّ لا سرديّ** — سطرُ `@no-rollback:` في الرأسِ كما
+             `@migration-objects:` سواءً: مطابقةُ عباراتِ السردِ العربيِّ هشّةٌ
+             (‏«لا عكسَ» · «لا تُقلَب» · «لا يُعكَس») **فتُعفي بالصياغةِ لا
+             بالقرار**، والسطرُ المُعلَنُ يُقرأ حرفًا ويُلزِم كاتبَه بذكرِ سببِه. */
+        if (!$verified && $miss === array('يحمل جملةَ تراجع')
+            && preg_match('~@no-rollback\s*:\s*(\S.*)~u', $src, $nr)) {
+            $plan[$f] = array(
+                'kind' => 'DISK_NOT_LEDGERED',
+                'ruling' => 'NO_ROLLBACK_BY_DESIGN',
+                'evidence' => 'سكربتُ تراجعٍ **يُعلن `@no-rollback` في رأسِه** — عُرفُ الاسمِ '
+                    . 'وأصلُه الأمامُ مُثبَتانِ، وخلوُّه من جملةِ التراجعِ **قرارٌ مكتوبٌ لا سهو**: '
+                    . mb_substr(trim(preg_replace('~\s+~u', ' ', $nr[1])), 0, 300)
+                    . ' · ويُقيَّد `baseline` ليخرج من طابورِ `up`',
+                'verified' => 1,
+                'checked' => count($chk), 'found' => $found,
+                'ledger_status' => 'baseline',
+            );
+            continue;
+        }
+
         $plan[$f] = array(
             'kind' => 'DISK_NOT_LEDGERED',
             'ruling' => $verified ? 'ROLLBACK_SCRIPT_NOT_APPLIED' : 'ROLLBACK_UNPROVEN',

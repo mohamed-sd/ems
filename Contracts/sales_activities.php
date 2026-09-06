@@ -1,6 +1,6 @@
 <?php
 /**
- * contracts/sales_activities.php — الأنشطة والمتابعات (DEP-01 · GOV_EXEC §5)
+ * Contracts/sales_activities.php — الأنشطة والمتابعات (DEP-01 · GOV_EXEC §5)
  * ──────────────────────────────────────────────────────────────────────
  * ◆ ملفٌّ مولَّد (gov_exec:generated) من `tools/gov_exec_dept_build.php`
  *   ومواصفتِه في `tools/specs/`. لا يُحرَّر يدويًّا — أعِد التوليد.
@@ -13,7 +13,7 @@
  *   أصلًا (OBL-0052). فأسماءُ الحقولِ من الورقةِ حرفًا ولا تُكتب هنا.
  */
 $U13 = array(
-    'file'       => 'contracts/sales_activities.php',
+    'file'       => 'Contracts/sales_activities.php',
     'screen'     => 'sal_activities',
     'table'      => 'activities',
     'title'      => 'الأنشطة والمتابعات',

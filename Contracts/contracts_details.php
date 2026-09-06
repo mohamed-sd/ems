@@ -25,7 +25,11 @@ $is_super_admin = isset($_SESSION['user']['role']) && (string)$_SESSION['user'][
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 
 if (!$is_super_admin && $company_id <= 0) {
-    die('لا يمكن تحديد الشركة الحالية');
+    /* حارسُ نطاقٍ يسبق الرأسَ — فلا نصفَ صفحةٍ هنا، لكنّ النصَّ الخامَّ يخرج
+       خارجَ قالبِ النظام. يُوحَّد بقناةِ الحوكمةِ كسائرِ حرّاسِ هذا الملفّ. */
+    ems_gov_flash_redirect('../main/dashboard.php',
+        'لا توجد بيئة شركة صالحة', 'GOV-SCOPE-403', '');
+    exit();
 }
 
 // بوابة العزل — تستبدل سُلَّم النطاق اليدوي (contracts لها company_id مقيسةً)
@@ -120,7 +124,10 @@ include __DIR__ . '/../includes/page_header.php';
             $equipmentTypeMap[(int) $typeRow['id']] = $typeRow['type'];
         }
 
-        $contract_id = intval($_GET['id']);
+        /* أ-2: الشاشةُ تُبلَغ أحيانًا بلا معرِّف (‏من شريطِ التبويباتِ أو رابطٍ محفوظ)،
+           فقراءةُ المفتاحِ مباشرةً كانت تُحذِّر «Undefined array key» في كلِّ مرّة.
+           والصفرُ يقود إلى رسالةِ «لا بيانات عقد» القائمةِ سلفًا — فلا يتغيّر سلوك. */
+        $contract_id = intval(isset($_GET['id']) ? $_GET['id'] : 0);
 
         // العقد معزولًا عبر البوابة ({TENANT_SCOPE})
         try {
@@ -141,19 +148,40 @@ include __DIR__ . '/../includes/page_header.php';
         WHERE {TENANT_SCOPE} AND c.id = ?
         LIMIT 1", array($contract_id));
         } catch (\Throwable $t) {
-            die("خطأ في الاستعلام");
+            /* العطبُ نفسُه: `die()` بعدَ الرأسِ يقطع الصفحةَ فلا تُغلق ولا يُحقَن
+               زرُّ الإبلاغ — وهو أحوجُ ما يكون إليه في مسارِ خطأ. والسببُ
+               يُسجَّل ولا يُعرَض للمستخدمِ خامًّا. */
+            error_log('contracts_details query: ' . $t->getMessage());
+            ems_gov_flash_redirect('contracts.php',
+                'تعذر جلب بيانات العقد', 'GOV-FAIL-409',
+                'اعد المحاولة، وان تكرر فابلغ عن المشكلة');
+            exit();
         }
 
         if (empty($detail_rows)) {
-            die('العقد غير موجود أو خارج نطاق الشركة');
+            /* كان `die()` عاريًا يقطع الصفحةَ في منتصفِها: فلا `</body>` ⇒ لا يُحقَن
+               زرُّ «أبلغ عن مشكلة» (`report_button.php:90`)، ويرى المستخدمُ نصفَ
+               صفحةٍ تنتهي بجملةٍ خارجَ قالبِ الشاشة. والمسارُ يقع فعلًا كلَّما
+               فُتحت بلا معرِّف. العلاجُ عودةٌ مُعلَّلةٌ بقناةِ الحوكمةِ نفسِها
+               التي يستعملها هذا الملفُّ في مواضعَ أخرى. */
+            ems_gov_flash_redirect('contracts.php',
+                'العقد غير موجود أو خارج نطاق الشركة', 'GOV-REF-404',
+                'اختر عقدا قائما من سجل العقود');
+            exit();
         }
 
         foreach ($detail_rows as $row) {
 
             $today = new DateTime();
-            $actual_end_date = new DateTime($row['actual_end']);
-            $interval = $today->diff($actual_end_date);
-            $remaining_days = (int) $interval->format('%r%a');
+            /* `actual_end` يجوز أن يكون NULL (عقدٌ بلا نهايةٍ فعليّةٍ بعد)، وتمريرُه
+               إلى `DateTime` مهجورٌ منذ PHP 8.1 و**يصير خطأً قاتلًا** في القادم.
+               وقبلَه كان يُقرأ «الآن» فيُخرج **صفرَ أيّامٍ متبقّية** — رقمًا كاذبًا
+               لا غيابَ رقم. فالغيابُ يُقال غيابًا. */
+            $__end_raw = isset($row['actual_end']) ? trim((string) $row['actual_end']) : '';
+            $actual_end_date = ($__end_raw !== '' && $__end_raw !== '0000-00-00')
+                ? new DateTime($__end_raw) : null;
+            $interval = $actual_end_date ? $today->diff($actual_end_date) : null;
+            $remaining_days = $interval ? (int) $interval->format('%r%a') : null;
 
             $status_color = 'green';
             $status_text = 'ساري';
@@ -169,7 +197,11 @@ include __DIR__ . '/../includes/page_header.php';
                 $row['status'] = 1;
             }
 
-            $remaining_class = $remaining_days > 30 ? 'remaining-positive' : ($remaining_days > 0 ? 'remaining-warning' : 'remaining-danger');
+            /* والغيابُ لا يُلوَّن خطرًا: عقدٌ بلا نهايةٍ فعليّةٍ ليس عقدًا منتهيًا. */
+            $remaining_class = ($remaining_days === null) ? 'remaining-warning'
+                : ($remaining_days > 30 ? 'remaining-positive'
+                   : ($remaining_days > 0 ? 'remaining-warning' : 'remaining-danger'));
+            $remaining_text = ($remaining_days === null) ? 'غير محدد' : ($remaining_days . ' يوم');
 
             // ── شاراتُ العقد (CON-02 §7-② · ق-21) ────────────────────────────
             // **شارةٌ مفردةٌ في الترويسة بلا تبويبات** (قرارُ المالك 2026-07-28).
@@ -234,7 +266,7 @@ include __DIR__ . '/../includes/page_header.php';
                     </div>
                     <div class="info-row">
                         <span class="info-label"><i class="fas fa-hourglass-half"></i> المتبقي</span>
-                        <span class="info-value <?php echo $remaining_class; ?>"><?php echo $remaining_days; ?> يوم</span>
+                        <span class="info-value <?php echo $remaining_class; ?>"><?php echo $remaining_text; ?></span>
                     </div>
                 </div>
 
@@ -649,7 +681,7 @@ include __DIR__ . '/../includes/page_header.php';
                                 $equipTypeLabel = isset($equipmentTypeMap[(int) $equip['equip_type']])
                                     ? $equipmentTypeMap[(int) $equip['equip_type']]
                                     : $equip['equip_type'];
-                                echo "<td><strong>" . htmlspecialchars($equipTypeLabel) . "</strong></td>";
+                                echo "<td><strong>" . htmlspecialchars((string) $equipTypeLabel) . "</strong></td>";
                                 echo "<td>" . $equip['equip_size'] . "</td>";
                                 echo "<td><span class='badge-count'>" . $equip['equip_count'] . "</span></td>";
                                 echo "<td><span class='badge-basic'>" . (isset($equip['equip_count_basic']) ? $equip['equip_count_basic'] : 0) . "</span></td>";
@@ -735,7 +767,7 @@ include __DIR__ . '/../includes/page_header.php';
                         if (!empty($notes_rows)) {
                             $j = 1;
                             foreach ($notes_rows as $note) {
-                                $note_text = htmlspecialchars($note['note']);
+                                $note_text = htmlspecialchars((string) $note['note']);
                                 $action_icon = '<i class="fas fa-sticky-note"></i>';
                                 $action_badge = 'info';
 
@@ -959,7 +991,7 @@ include __DIR__ . '/../includes/page_header.php';
                         <?php if (!empty($pause_reason)): ?>
                         <div class="pause-info-reason">
                             <i class="fas fa-comment-dots"></i>
-                            <strong>سبب الإيقاف:</strong> <?php echo htmlspecialchars($pause_reason); ?>
+                            <strong>سبب الإيقاف:</strong> <?php echo htmlspecialchars((string) $pause_reason); ?>
                         </div>
                         <?php endif; ?>
                     </div>
@@ -1133,7 +1165,7 @@ include __DIR__ . '/../includes/page_header.php';
                                                     ? $equipmentTypeMap[(int) $equip['equip_type']]
                                                     : $equip['equip_type'];
                                                 echo "<tr>";
-                                                echo "<td>" . htmlspecialchars($equipTypeLabel) . "</td>";
+                                                echo "<td>" . htmlspecialchars((string) $equipTypeLabel) . "</td>";
                                                 echo "<td>" . $equip['equip_size'] . "</td>";
                                                 echo "<td>" . $equip['equip_count'] . "</td>";
                                                 echo "<td>" . $equip['shift_hours'] . "</td>";
@@ -1326,25 +1358,25 @@ include __DIR__ . '/../includes/page_header.php';
                         <label for="editFirstParty" class="form-label">
                             <i class="fas fa-user-tie"></i> الطرف الأول
                         </label>
-                        <input type="text" id="editFirstParty" class="form-control" value="<?php echo htmlspecialchars($first_party); ?>" placeholder="اسم الطرف الأول">
+                        <input type="text" id="editFirstParty" class="form-control" value="<?php echo htmlspecialchars((string) $first_party); ?>" placeholder="اسم الطرف الأول">
                     </div>
                     <div class="mb-3">
                         <label for="editSecondParty" class="form-label">
                             <i class="fas fa-user-check"></i> الطرف الثاني
                         </label>
-                        <input type="text" id="editSecondParty" class="form-control" value="<?php echo htmlspecialchars($second_party); ?>" placeholder="اسم الطرف الثاني">
+                        <input type="text" id="editSecondParty" class="form-control" value="<?php echo htmlspecialchars((string) $second_party); ?>" placeholder="اسم الطرف الثاني">
                     </div>
                     <div class="mb-3">
                         <label for="editWitnessOne" class="form-label">
                             <i class="fas fa-eye"></i> الشاهد الأول
                         </label>
-                        <input type="text" id="editWitnessOne" class="form-control" value="<?php echo htmlspecialchars($witness_one); ?>" placeholder="اسم الشاهد الأول">
+                        <input type="text" id="editWitnessOne" class="form-control" value="<?php echo htmlspecialchars((string) $witness_one); ?>" placeholder="اسم الشاهد الأول">
                     </div>
                     <div class="mb-3">
                         <label for="editWitnessTwo" class="form-label">
                             <i class="fas fa-eye"></i> الشاهد الثاني
                         </label>
-                        <input type="text" id="editWitnessTwo" class="form-control" value="<?php echo htmlspecialchars($witness_two); ?>" placeholder="اسم الشاهد الثاني">
+                        <input type="text" id="editWitnessTwo" class="form-control" value="<?php echo htmlspecialchars((string) $witness_two); ?>" placeholder="اسم الشاهد الثاني">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -1384,7 +1416,7 @@ include __DIR__ . '/../includes/page_header.php';
                         <label for="editPaidAmount" class="form-label">
                             <i class="fas fa-money-check-alt"></i> المبلغ المدفوع
                         </label>
-                        <input type="text" id="editPaidAmount" class="form-control" value="<?php echo htmlspecialchars($paid_contract); ?>" placeholder="أدخل المبلغ">
+                        <input type="text" id="editPaidAmount" class="form-control" value="<?php echo htmlspecialchars((string) $paid_contract); ?>" placeholder="أدخل المبلغ">
                     </div>
                     <div class="mb-3">
                         <label for="editPaymentTime" class="form-label">
@@ -1400,13 +1432,13 @@ include __DIR__ . '/../includes/page_header.php';
                         <label for="editGuarantees" class="form-label">
                             <i class="fas fa-shield-alt"></i> الضمانات
                         </label>
-                        <textarea id="editGuarantees" class="form-control" rows="3" placeholder="تفاصيل الضمانات"><?php echo htmlspecialchars($guarantees); ?></textarea>
+                        <textarea id="editGuarantees" class="form-control" rows="3" placeholder="تفاصيل الضمانات"><?php echo htmlspecialchars((string) $guarantees); ?></textarea>
                     </div>
                     <div class="mb-3">
                         <label for="editPaymentDate" class="form-label">
                             <i class="fas fa-calendar-check"></i> تاريخ الدفع
                         </label>
-                        <input type="date" id="editPaymentDate" class="form-control" value="<?php echo htmlspecialchars($payment_date); ?>">
+                        <input type="date" id="editPaymentDate" class="form-control" value="<?php echo htmlspecialchars((string) $payment_date); ?>">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -1986,3 +2018,6 @@ include __DIR__ . '/../includes/page_header.php';
     </script>
     </div><!-- /.page-wrapper -->
     </div><!-- /.main -->
+
+</body>
+</html>

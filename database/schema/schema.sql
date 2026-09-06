@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-09-04 23:05:29
--- الجداول: 1248 · المناظير: 29
+-- المصدر: equipation_manage · التوليد: 2026-09-06 23:22:45
+-- الجداول: 1249 · المناظير: 29
 -- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
 -- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
 -- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
@@ -15098,6 +15098,7 @@ CREATE TABLE `nav_items` (
   `counter_source` varchar(64) DEFAULT NULL COMMENT 'مُعرِّف العدّاد من سجل العدّادات — عدّادٌ واحدٌ بقيمةٍ واحدة',
   `permission_code` varchar(128) DEFAULT NULL COMMENT 'كود الشاشة لفحص can_view؛ NULL = ظهورٌ بلا فحص (ثوابت)',
   `active` tinyint(1) NOT NULL DEFAULT 1,
+  `is_quick` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
@@ -16358,6 +16359,20 @@ CREATE TABLE `perm01_auth_mode` (
   `reason` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='PERM-01 §6-2 — وضع كل مستخدم معلن لا ضمني';
+
+-- ── Table: perm01_function_screen ──
+CREATE TABLE `perm01_function_screen` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `func_name` varchar(120) NOT NULL COMMENT 'اسم الوظيفة كما في sec_sod_pairs',
+  `anchor_table` varchar(64) NOT NULL COMMENT 'جدول المرساة الذي تكتبه الوظيفة',
+  `screen_code` varchar(160) NOT NULL DEFAULT '' COMMENT 'رمز الشاشة الكاتبة، فارغ اذا لا كاتب',
+  `registered` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'أمسجلة في modules',
+  `state` enum('mapped','unimplemented') NOT NULL DEFAULT 'mapped' COMMENT 'unimplemented = لا كاتب في الانتاج فالوظيفة غير مبنية',
+  `derived_from` varchar(160) NOT NULL DEFAULT '' COMMENT 'كيف اشتق الصف — مسح كتابة على جدول المرساة',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_fn_screen` (`func_name`,`screen_code`),
+  KEY `ix_func` (`func_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='PERM-01 ق-٧ — خريطة الوظيفة الى شاشتها، مشتقة من الكتابة الفعلية';
 
 -- ── Table: perm01_layer_ruling ──
 CREATE TABLE `perm01_layer_ruling` (

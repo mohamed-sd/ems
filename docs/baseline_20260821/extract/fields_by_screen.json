@@ -5448,7 +5448,7 @@
                 "label_ar": "",
                 "required": 1,
                 "readonly": 0,
-                "section": "سجل حقول الورقة",
+                "section": "إضافة بند جديد",
                 "is_system": 0,
                 "dup_count": 1
             },
@@ -5458,7 +5458,7 @@
                 "label_ar": "",
                 "required": 0,
                 "readonly": 0,
-                "section": "سجل حقول الورقة",
+                "section": "إضافة بند جديد",
                 "is_system": 0,
                 "dup_count": 1
             },
@@ -5468,7 +5468,7 @@
                 "label_ar": "",
                 "required": 1,
                 "readonly": 0,
-                "section": "سجل حقول الورقة",
+                "section": "إضافة بند جديد",
                 "is_system": 0,
                 "dup_count": 1
             },
@@ -5478,7 +5478,7 @@
                 "label_ar": "",
                 "required": 1,
                 "readonly": 0,
-                "section": "سجل حقول الورقة",
+                "section": "إضافة بند جديد",
                 "is_system": 0,
                 "dup_count": 1
             },
@@ -5488,7 +5488,7 @@
                 "label_ar": "",
                 "required": 0,
                 "readonly": 0,
-                "section": "سجل حقول الورقة",
+                "section": "إضافة بند جديد",
                 "is_system": 0,
                 "dup_count": 1
             },
@@ -5498,7 +5498,7 @@
                 "label_ar": "",
                 "required": 1,
                 "readonly": 0,
-                "section": "سجل حقول الورقة",
+                "section": "إضافة بند جديد",
                 "is_system": 0,
                 "dup_count": 1
             },
@@ -5508,7 +5508,7 @@
                 "label_ar": "",
                 "required": 1,
                 "readonly": 0,
-                "section": "سجل حقول الورقة",
+                "section": "إضافة بند جديد",
                 "is_system": 0,
                 "dup_count": 1
             },
@@ -5518,7 +5518,7 @@
                 "label_ar": "",
                 "required": 0,
                 "readonly": 0,
-                "section": "سجل حقول الورقة",
+                "section": "إضافة بند جديد",
                 "is_system": 0,
                 "dup_count": 1
             }
@@ -5617,7 +5617,7 @@
                 "label_ar": "",
                 "required": 1,
                 "readonly": 0,
-                "section": "سجل حقول الورقة",
+                "section": "تسجيل واقعة تفاوض",
                 "is_system": 0,
                 "dup_count": 1
             },
@@ -5627,7 +5627,7 @@
                 "label_ar": "",
                 "required": 1,
                 "readonly": 0,
-                "section": "سجل حقول الورقة",
+                "section": "تسجيل واقعة تفاوض",
                 "is_system": 0,
                 "dup_count": 1
             },
@@ -5637,7 +5637,7 @@
                 "label_ar": "",
                 "required": 1,
                 "readonly": 0,
-                "section": "سجل حقول الورقة",
+                "section": "تسجيل واقعة تفاوض",
                 "is_system": 0,
                 "dup_count": 1
             },
@@ -5647,7 +5647,7 @@
                 "label_ar": "",
                 "required": 1,
                 "readonly": 0,
-                "section": "سجل حقول الورقة",
+                "section": "تسجيل واقعة تفاوض",
                 "is_system": 0,
                 "dup_count": 1
             },
@@ -5657,7 +5657,7 @@
                 "label_ar": "",
                 "required": 0,
                 "readonly": 0,
-                "section": "سجل حقول الورقة",
+                "section": "تسجيل واقعة تفاوض",
                 "is_system": 0,
                 "dup_count": 1
             },
@@ -5667,7 +5667,7 @@
                 "label_ar": "",
                 "required": 0,
                 "readonly": 0,
-                "section": "سجل حقول الورقة",
+                "section": "تسجيل واقعة تفاوض",
                 "is_system": 0,
                 "dup_count": 1
             },
@@ -5677,7 +5677,7 @@
                 "label_ar": "",
                 "required": 0,
                 "readonly": 0,
-                "section": "سجل حقول الورقة",
+                "section": "تسجيل واقعة تفاوض",
                 "is_system": 0,
                 "dup_count": 1
             },
@@ -5687,7 +5687,7 @@
                 "label_ar": "",
                 "required": 0,
                 "readonly": 0,
-                "section": "سجل حقول الورقة",
+                "section": "تسجيل واقعة تفاوض",
                 "is_system": 0,
                 "dup_count": 1
             }
@@ -46946,6 +46946,16 @@
         ],
         "form_fields": [
             {
+                "name": "csrf_token",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 1,
+                "dup_count": 1
+            },
+            {
                 "name": "action",
                 "input_type": "hidden",
                 "label_ar": "",
@@ -46953,6 +46963,36 @@
                 "readonly": 0,
                 "section": "",
                 "is_system": 1,
+                "dup_count": 2
+            },
+            {
+                "name": "assign_user",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 1,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "assign_profile",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 1,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "assign_reason",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 1,
+                "section": "",
+                "is_system": 0,
                 "dup_count": 1
             },
             {
@@ -48276,6 +48316,76 @@
                 "readonly": 0,
                 "section": "",
                 "is_system": 1,
+                "dup_count": 2
+            },
+            {
+                "name": "bg_user",
+                "input_type": "number",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "bg_screen",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "bg_gov",
+                "input_type": "number",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "bg_fin",
+                "input_type": "number",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "bg_hours",
+                "input_type": "number",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "bg_reason",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "bg_comp",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
                 "dup_count": 1
             },
             {
@@ -49873,6 +49983,11 @@
         ]
     },
     {
+        "route": "Governance\/perm_dashboard.php",
+        "tables": [],
+        "form_fields": []
+    },
+    {
         "route": "Governance\/perm_explain.php",
         "tables": [
             {
@@ -49897,7 +50012,7 @@
         ],
         "form_fields": [
             {
-                "name": "px_role",
+                "name": "px_user",
                 "input_type": "select",
                 "label_ar": "",
                 "required": 0,
@@ -50077,6 +50192,1014 @@
                 "dup_count": 1
             }
         ]
+    },
+    {
+        "route": "Governance\/perm_link_groups.php",
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "#",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "id"
+                    },
+                    {
+                        "label_ar": "الاسم",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "name"
+                    },
+                    {
+                        "label_ar": "الرمز",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "group_code"
+                    },
+                    {
+                        "label_ar": "الدور المالك",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "owner_name"
+                    },
+                    {
+                        "label_ar": "الايقونة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "icon"
+                    },
+                    {
+                        "label_ar": "الترتيب",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "display_order"
+                    },
+                    {
+                        "label_ar": "بنود",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "items_n"
+                    },
+                    {
+                        "label_ar": "الحالة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "is_active"
+                    },
+                    {
+                        "label_ar": "الاجراءات",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "id"
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "act",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 1,
+                "dup_count": 3
+            },
+            {
+                "name": "name",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "اضافة مجموعة",
+                "is_system": 0,
+                "dup_count": 2
+            },
+            {
+                "name": "owner_role_id",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "اضافة مجموعة",
+                "is_system": 0,
+                "dup_count": 2
+            },
+            {
+                "name": "icon",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "اضافة مجموعة",
+                "is_system": 0,
+                "dup_count": 2
+            },
+            {
+                "name": "display_order",
+                "input_type": "number",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "اضافة مجموعة",
+                "is_system": 0,
+                "dup_count": 2
+            },
+            {
+                "name": "is_active",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "اضافة مجموعة",
+                "is_system": 0,
+                "dup_count": 3
+            },
+            {
+                "name": "owner",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "اضافة مجموعة",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "id",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "اضافة مجموعة",
+                "is_system": 1,
+                "dup_count": 2
+            }
+        ]
+    },
+    {
+        "route": "Governance\/perm_matrix.php",
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "#",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الوحدة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "name"
+                    },
+                    {
+                        "label_ar": "الكود",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "code"
+                    },
+                    {
+                        "label_ar": "الدور المالك",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "owner_name"
+                    },
+                    {
+                        "label_ar": "عرض",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "اضافة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "تعديل",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "حذف",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "role_id",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "owner",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "role_id",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
+    },
+    {
+        "route": "Governance\/perm_modules.php",
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "#",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "id"
+                    },
+                    {
+                        "label_ar": "الاسم",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "name"
+                    },
+                    {
+                        "label_ar": "الكود (مفتاح الصلاحية)",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "code"
+                    },
+                    {
+                        "label_ar": "الدور المالك",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "owner_name"
+                    },
+                    {
+                        "label_ar": "الأيقونة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "icon"
+                    },
+                    {
+                        "label_ar": "الترتيب",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "display_order"
+                    },
+                    {
+                        "label_ar": "منح",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "grants_n"
+                    },
+                    {
+                        "label_ar": "بنود ملاحة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "navs_n"
+                    },
+                    {
+                        "label_ar": "الإجراءات",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "id"
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "act",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 1,
+                "dup_count": 3
+            },
+            {
+                "name": "name",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "إضافة وحدة",
+                "is_system": 0,
+                "dup_count": 3
+            },
+            {
+                "name": "code",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "إضافة وحدة",
+                "is_system": 0,
+                "dup_count": 2
+            },
+            {
+                "name": "owner_role_id",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "إضافة وحدة",
+                "is_system": 0,
+                "dup_count": 2
+            },
+            {
+                "name": "icon",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "إضافة وحدة",
+                "is_system": 0,
+                "dup_count": 2
+            },
+            {
+                "name": "display_order",
+                "input_type": "number",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "إضافة وحدة",
+                "is_system": 0,
+                "dup_count": 2
+            },
+            {
+                "name": "is_quick",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "إضافة وحدة",
+                "is_system": 0,
+                "dup_count": 2
+            },
+            {
+                "name": "owner",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "إضافة وحدة",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "id",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "إضافة وحدة",
+                "is_system": 1,
+                "dup_count": 2
+            }
+        ]
+    },
+    {
+        "route": "Governance\/perm_nav_items.php",
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "#",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "id"
+                    },
+                    {
+                        "label_ar": "الدور",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "role_name"
+                    },
+                    {
+                        "label_ar": "المجموعة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "group_name"
+                    },
+                    {
+                        "label_ar": "الباب",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "door"
+                    },
+                    {
+                        "label_ar": "التسمية",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "icon"
+                    },
+                    {
+                        "label_ar": "المسار",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "route"
+                    },
+                    {
+                        "label_ar": "كود الصلاحية",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "permission_code"
+                    },
+                    {
+                        "label_ar": "الترتيب",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "sort_order"
+                    },
+                    {
+                        "label_ar": "الحالة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "active"
+                    },
+                    {
+                        "label_ar": "الاجراءات",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "id"
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "act",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 1,
+                "dup_count": 4
+            },
+            {
+                "name": "role_id",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "اضافة بند ملاحة",
+                "is_system": 0,
+                "dup_count": 3
+            },
+            {
+                "name": "group_id",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "اضافة بند ملاحة",
+                "is_system": 0,
+                "dup_count": 3
+            },
+            {
+                "name": "door",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "اضافة بند ملاحة",
+                "is_system": 0,
+                "dup_count": 3
+            },
+            {
+                "name": "label_ar",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "اضافة بند ملاحة",
+                "is_system": 0,
+                "dup_count": 2
+            },
+            {
+                "name": "route",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "اضافة بند ملاحة",
+                "is_system": 0,
+                "dup_count": 2
+            },
+            {
+                "name": "permission_code",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "اضافة بند ملاحة",
+                "is_system": 0,
+                "dup_count": 2
+            },
+            {
+                "name": "icon",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "اضافة بند ملاحة",
+                "is_system": 0,
+                "dup_count": 2
+            },
+            {
+                "name": "sort_order",
+                "input_type": "number",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "اضافة بند ملاحة",
+                "is_system": 0,
+                "dup_count": 2
+            },
+            {
+                "name": "module_id",
+                "input_type": "number",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "اضافة بند ملاحة",
+                "is_system": 0,
+                "dup_count": 2
+            },
+            {
+                "name": "active",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "اضافة بند ملاحة",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "id",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "اضافة بند ملاحة",
+                "is_system": 1,
+                "dup_count": 3
+            }
+        ]
+    },
+    {
+        "route": "Governance\/perm_reports.php",
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "#",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "رمز التقرير",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "ادوار تفتحه",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "مسموح لهذا الدور",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "role_id",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            }
+        ]
+    },
+    {
+        "route": "Governance\/perm_roles.php",
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "#",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "id"
+                    },
+                    {
+                        "label_ar": "اسم الدور",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "name"
+                    },
+                    {
+                        "label_ar": "الدور الأب",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "parent_name"
+                    },
+                    {
+                        "label_ar": "المستوى",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "level"
+                    },
+                    {
+                        "label_ar": "النطاق",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "role_scope"
+                    },
+                    {
+                        "label_ar": "صلاحيات",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "grants_n"
+                    },
+                    {
+                        "label_ar": "بنود ملاحة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "navs_n"
+                    },
+                    {
+                        "label_ar": "الحالة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "status"
+                    },
+                    {
+                        "label_ar": "الإجراءات",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "id"
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "act",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 1,
+                "dup_count": 3
+            },
+            {
+                "name": "name",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "إضافة دور",
+                "is_system": 0,
+                "dup_count": 3
+            },
+            {
+                "name": "parent_role_id",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "إضافة دور",
+                "is_system": 0,
+                "dup_count": 2
+            },
+            {
+                "name": "level",
+                "input_type": "number",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "إضافة دور",
+                "is_system": 0,
+                "dup_count": 2
+            },
+            {
+                "name": "role_scope",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "إضافة دور",
+                "is_system": 0,
+                "dup_count": 2
+            },
+            {
+                "name": "status",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "إضافة دور",
+                "is_system": 0,
+                "dup_count": 3
+            },
+            {
+                "name": "scope",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "إضافة دور",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "id",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "إضافة دور",
+                "is_system": 1,
+                "dup_count": 2
+            }
+        ]
+    },
+    {
+        "route": "Governance\/perm_screen_guide.php",
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "#",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "id"
+                    },
+                    {
+                        "label_ar": "مسار الشاشة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "screen_path"
+                    },
+                    {
+                        "label_ar": "العنوان",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "title_ar"
+                    },
+                    {
+                        "label_ar": "الوصف",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "description"
+                    },
+                    {
+                        "label_ar": "المصدر",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "source"
+                    },
+                    {
+                        "label_ar": "اخر تحديث",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "updated_at"
+                    },
+                    {
+                        "label_ar": "الاجراءات",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "id"
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "screen_path",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "state",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "id",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 1,
+                "dup_count": 1
+            },
+            {
+                "name": "title_ar",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "تحرير وصف شاشة",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "description",
+                "input_type": "textarea",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "تحرير وصف شاشة",
+                "is_system": 0,
+                "dup_count": 1
+            }
+        ]
+    },
+    {
+        "route": "Governance\/perm_system_status.php",
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "الفحص",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "name"
+                    },
+                    {
+                        "label_ar": "العدد",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "n"
+                    },
+                    {
+                        "label_ar": "لماذا يهم",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "why"
+                    },
+                    {
+                        "label_ar": "العلاج",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "go"
+                    }
+                ]
+            },
+            {
+                "table_index": 1,
+                "columns": [
+                    {
+                        "label_ar": "السجل",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الكل",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "roles"
+                    },
+                    {
+                        "label_ar": "النشط",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "roles_on"
+                    },
+                    {
+                        "label_ar": "الشاشة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": []
     },
     {
         "route": "Governance\/policies.php",
@@ -62790,7 +63913,7 @@
                 "label_ar": "",
                 "required": 1,
                 "readonly": 0,
-                "section": "",
+                "section": "فتح تصحيح جديد",
                 "is_system": 0,
                 "dup_count": 1
             },
@@ -62800,7 +63923,7 @@
                 "label_ar": "",
                 "required": 1,
                 "readonly": 0,
-                "section": "",
+                "section": "فتح تصحيح جديد",
                 "is_system": 0,
                 "dup_count": 1
             },
@@ -62810,7 +63933,7 @@
                 "label_ar": "",
                 "required": 1,
                 "readonly": 0,
-                "section": "",
+                "section": "فتح تصحيح جديد",
                 "is_system": 0,
                 "dup_count": 1
             },
@@ -62820,7 +63943,7 @@
                 "label_ar": "",
                 "required": 1,
                 "readonly": 0,
-                "section": "",
+                "section": "فتح تصحيح جديد",
                 "is_system": 0,
                 "dup_count": 1
             },
@@ -62830,7 +63953,7 @@
                 "label_ar": "",
                 "required": 1,
                 "readonly": 0,
-                "section": "",
+                "section": "فتح تصحيح جديد",
                 "is_system": 0,
                 "dup_count": 1
             },
@@ -62840,7 +63963,7 @@
                 "label_ar": "",
                 "required": 1,
                 "readonly": 0,
-                "section": "",
+                "section": "فتح تصحيح جديد",
                 "is_system": 0,
                 "dup_count": 1
             },
@@ -62850,7 +63973,7 @@
                 "label_ar": "",
                 "required": 0,
                 "readonly": 0,
-                "section": "",
+                "section": "فتح تصحيح جديد",
                 "is_system": 1,
                 "dup_count": 1
             },
@@ -62860,7 +63983,7 @@
                 "label_ar": "",
                 "required": 0,
                 "readonly": 0,
-                "section": "",
+                "section": "فتح تصحيح جديد",
                 "is_system": 0,
                 "dup_count": 1
             }
@@ -63475,7 +64598,7 @@
                 "label_ar": "",
                 "required": 1,
                 "readonly": 0,
-                "section": "سجل حقول الورقة",
+                "section": "تسجيل احتياج جديد",
                 "is_system": 0,
                 "dup_count": 1
             },
@@ -63485,7 +64608,7 @@
                 "label_ar": "",
                 "required": 1,
                 "readonly": 0,
-                "section": "سجل حقول الورقة",
+                "section": "تسجيل احتياج جديد",
                 "is_system": 0,
                 "dup_count": 1
             },
@@ -63495,7 +64618,7 @@
                 "label_ar": "",
                 "required": 1,
                 "readonly": 0,
-                "section": "سجل حقول الورقة",
+                "section": "تسجيل احتياج جديد",
                 "is_system": 0,
                 "dup_count": 1
             },
@@ -63505,7 +64628,7 @@
                 "label_ar": "",
                 "required": 0,
                 "readonly": 0,
-                "section": "سجل حقول الورقة",
+                "section": "تسجيل احتياج جديد",
                 "is_system": 0,
                 "dup_count": 1
             },
@@ -63515,7 +64638,7 @@
                 "label_ar": "",
                 "required": 0,
                 "readonly": 0,
-                "section": "سجل حقول الورقة",
+                "section": "تسجيل احتياج جديد",
                 "is_system": 0,
                 "dup_count": 1
             },
@@ -63525,7 +64648,7 @@
                 "label_ar": "",
                 "required": 0,
                 "readonly": 0,
-                "section": "سجل حقول الورقة",
+                "section": "تسجيل احتياج جديد",
                 "is_system": 0,
                 "dup_count": 1
             },
@@ -63535,7 +64658,7 @@
                 "label_ar": "",
                 "required": 0,
                 "readonly": 0,
-                "section": "سجل حقول الورقة",
+                "section": "تسجيل احتياج جديد",
                 "is_system": 1,
                 "dup_count": 1
             }
@@ -92212,7 +93335,7 @@
                 "label_ar": "",
                 "required": 1,
                 "readonly": 0,
-                "section": "المخالفات والجزاءات بحقول الورقة",
+                "section": "رصد مخالفة جديدة",
                 "is_system": 0,
                 "dup_count": 1
             },
@@ -92222,7 +93345,7 @@
                 "label_ar": "",
                 "required": 1,
                 "readonly": 0,
-                "section": "المخالفات والجزاءات بحقول الورقة",
+                "section": "رصد مخالفة جديدة",
                 "is_system": 0,
                 "dup_count": 1
             },
@@ -92232,7 +93355,7 @@
                 "label_ar": "",
                 "required": 1,
                 "readonly": 0,
-                "section": "المخالفات والجزاءات بحقول الورقة",
+                "section": "رصد مخالفة جديدة",
                 "is_system": 0,
                 "dup_count": 1
             },
@@ -92242,7 +93365,7 @@
                 "label_ar": "",
                 "required": 1,
                 "readonly": 0,
-                "section": "المخالفات والجزاءات بحقول الورقة",
+                "section": "رصد مخالفة جديدة",
                 "is_system": 0,
                 "dup_count": 1
             },
@@ -92252,7 +93375,7 @@
                 "label_ar": "",
                 "required": 0,
                 "readonly": 0,
-                "section": "المخالفات والجزاءات بحقول الورقة",
+                "section": "رصد مخالفة جديدة",
                 "is_system": 0,
                 "dup_count": 1
             },
@@ -92262,7 +93385,7 @@
                 "label_ar": "",
                 "required": 0,
                 "readonly": 0,
-                "section": "المخالفات والجزاءات بحقول الورقة",
+                "section": "رصد مخالفة جديدة",
                 "is_system": 0,
                 "dup_count": 1
             },
@@ -92272,7 +93395,7 @@
                 "label_ar": "",
                 "required": 0,
                 "readonly": 0,
-                "section": "المخالفات والجزاءات بحقول الورقة",
+                "section": "رصد مخالفة جديدة",
                 "is_system": 0,
                 "dup_count": 1
             },
@@ -92282,7 +93405,7 @@
                 "label_ar": "",
                 "required": 0,
                 "readonly": 0,
-                "section": "المخالفات والجزاءات بحقول الورقة",
+                "section": "رصد مخالفة جديدة",
                 "is_system": 0,
                 "dup_count": 1
             },
@@ -92292,7 +93415,7 @@
                 "label_ar": "",
                 "required": 0,
                 "readonly": 0,
-                "section": "المخالفات والجزاءات بحقول الورقة",
+                "section": "رصد مخالفة جديدة",
                 "is_system": 1,
                 "dup_count": 1
             },
@@ -92302,7 +93425,7 @@
                 "label_ar": "",
                 "required": 0,
                 "readonly": 0,
-                "section": "المخالفات والجزاءات بحقول الورقة",
+                "section": "رصد مخالفة جديدة",
                 "is_system": 1,
                 "dup_count": 1
             },
@@ -92312,7 +93435,7 @@
                 "label_ar": "",
                 "required": 1,
                 "readonly": 0,
-                "section": "المخالفات والجزاءات بحقول الورقة",
+                "section": "رصد مخالفة جديدة",
                 "is_system": 0,
                 "dup_count": 1
             }
@@ -113255,7 +114378,328 @@
         ]
     },
     {
-        "route": "admin\/ops_manager_board.php",
+        "route": "inheader.php",
+        "tables": [],
+        "form_fields": [
+            {
+                "name": "imp_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
+    },
+    {
+        "route": "main\/all_assistants.php",
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "الإجراءات",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الاسم",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "اسم المستخدم",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الدور",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "المدير الأب",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الموظف المرتبط",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "رقم الهاتف",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "رقم التكليف",
+                        "col_group": "",
+                        "th_class": "ems-fn-th",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الأصيل",
+                        "col_group": "",
+                        "th_class": "ems-fn-th",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "صفته",
+                        "col_group": "",
+                        "th_class": "ems-fn-th",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "المعاون",
+                        "col_group": "",
+                        "th_class": "ems-fn-th",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "نوع النيابة",
+                        "col_group": "",
+                        "th_class": "ems-fn-th",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "النطاق المفوض",
+                        "col_group": "",
+                        "th_class": "ems-fn-th",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "سقف الاعتماد",
+                        "col_group": "",
+                        "th_class": "ems-fn-th",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "من تاريخ",
+                        "col_group": "",
+                        "th_class": "ems-fn-th",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "إلى تاريخ",
+                        "col_group": "",
+                        "th_class": "ems-fn-th",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "سبب النيابة",
+                        "col_group": "",
+                        "th_class": "ems-fn-th",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "مرجع تفويض الأصيل",
+                        "col_group": "",
+                        "th_class": "ems-fn-th",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "أصدره",
+                        "col_group": "",
+                        "th_class": "ems-fn-th",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الكيان",
+                        "col_group": "",
+                        "th_class": "ems-gov-th",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "مرجع التفويض",
+                        "col_group": "",
+                        "th_class": "ems-gov-th",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "تاريخ الاعتماد",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "تاريخ الإنشاء",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الحالة",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "المرفق",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "العملة",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "uid",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 1,
+                "dup_count": 1
+            },
+            {
+                "name": "parent_id",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "إضافة معاون",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "role",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "إضافة معاون",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "name",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "إضافة معاون",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "username",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "إضافة معاون",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "password",
+                "input_type": "password",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "إضافة معاون",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "phone",
+                "input_type": "tel",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "إضافة معاون",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "employee_id",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "إضافة معاون",
+                "is_system": 0,
+                "dup_count": 1
+            }
+        ]
+    },
+    {
+        "route": "main\/dashboard.php",
+        "tables": [],
+        "form_fields": []
+    },
+    {
+        "route": "main\/global_search.php",
+        "tables": [],
+        "form_fields": [
+            {
+                "name": "q",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            }
+        ]
+    },
+    {
+        "route": "main\/glossary.php",
+        "tables": [],
+        "form_fields": []
+    },
+    {
+        "route": "main\/my_workspace.php",
+        "tables": [],
+        "form_fields": []
+    },
+    {
+        "route": "main\/ops_manager_board.php",
         "tables": [
             {
                 "table_index": 0,
@@ -113343,7 +114787,7 @@
         "form_fields": []
     },
     {
-        "route": "admin\/org_assignments.php",
+        "route": "main\/org_assignments.php",
         "tables": [
             {
                 "table_index": 0,
@@ -113710,7 +115154,7 @@
         ]
     },
     {
-        "route": "admin\/org_permits.php",
+        "route": "main\/org_permits.php",
         "tables": [
             {
                 "table_index": 0,
@@ -114052,896 +115496,7 @@
         ]
     },
     {
-        "route": "admin\/org_structure.php",
-        "tables": [],
-        "form_fields": []
-    },
-    {
-        "route": "admin\/sec_employee_wizard.php",
-        "tables": [
-            {
-                "table_index": 0,
-                "columns": [
-                    {
-                        "label_ar": "المصدر",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "المرجع",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "الصلاحية",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "الحكم",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "النطاق",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "الكيان",
-                        "col_group": "",
-                        "th_class": "ems-gov-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "المنشئ — الاسم والصفة",
-                        "col_group": "",
-                        "th_class": "ems-gov-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "المعتمد — الاسم والصفة",
-                        "col_group": "",
-                        "th_class": "ems-gov-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "مرجع التفويض",
-                        "col_group": "",
-                        "th_class": "ems-gov-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "المرجع الأب",
-                        "col_group": "",
-                        "th_class": "ems-gov-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "تاريخ الإنشاء",
-                        "col_group": "",
-                        "th_class": "ems-gov-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "تاريخ الاعتماد",
-                        "col_group": "",
-                        "th_class": "ems-gov-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "الحالة",
-                        "col_group": "",
-                        "th_class": "ems-gov-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    }
-                ]
-            }
-        ],
-        "form_fields": [
-            {
-                "name": "wz_action",
-                "input_type": "hidden",
-                "label_ar": "",
-                "required": 0,
-                "readonly": 0,
-                "section": "' . $n . ' ' . htmlspecialchars($title) . '",
-                "is_system": 1,
-                "dup_count": 1
-            },
-            {
-                "name": "person_id",
-                "input_type": "select",
-                "label_ar": "",
-                "required": 0,
-                "readonly": 0,
-                "section": "' . $n . ' ' . htmlspecialchars($title) . '",
-                "is_system": 0,
-                "dup_count": 1
-            },
-            {
-                "name": "full_name",
-                "input_type": "text",
-                "label_ar": "",
-                "required": 0,
-                "readonly": 0,
-                "section": "' . $n . ' ' . htmlspecialchars($title) . '",
-                "is_system": 0,
-                "dup_count": 1
-            },
-            {
-                "name": "link_employee_id",
-                "input_type": "select",
-                "label_ar": "",
-                "required": 0,
-                "readonly": 0,
-                "section": "' . $n . ' ' . htmlspecialchars($title) . '",
-                "is_system": 0,
-                "dup_count": 1
-            },
-            {
-                "name": "relation_code",
-                "input_type": "select",
-                "label_ar": "",
-                "required": 1,
-                "readonly": 0,
-                "section": "' . $n . ' ' . htmlspecialchars($title) . '",
-                "is_system": 0,
-                "dup_count": 1
-            },
-            {
-                "name": "family_code",
-                "input_type": "select",
-                "label_ar": "",
-                "required": 1,
-                "readonly": 0,
-                "section": "' . $n . ' ' . htmlspecialchars($title) . '",
-                "is_system": 0,
-                "dup_count": 1
-            },
-            {
-                "name": "level_code",
-                "input_type": "select",
-                "label_ar": "",
-                "required": 1,
-                "readonly": 0,
-                "section": "' . $n . ' ' . htmlspecialchars($title) . '",
-                "is_system": 0,
-                "dup_count": 1
-            },
-            {
-                "name": "title_code",
-                "input_type": "select",
-                "label_ar": "",
-                "required": 1,
-                "readonly": 0,
-                "section": "' . $n . ' ' . htmlspecialchars($title) . '",
-                "is_system": 0,
-                "dup_count": 1
-            },
-            {
-                "name": "org_unit_id",
-                "input_type": "select",
-                "label_ar": "",
-                "required": 0,
-                "readonly": 0,
-                "section": "' . $n . ' ' . htmlspecialchars($title) . '",
-                "is_system": 0,
-                "dup_count": 1
-            },
-            {
-                "name": "manager_person_id",
-                "input_type": "select",
-                "label_ar": "",
-                "required": 0,
-                "readonly": 0,
-                "section": "' . $n . ' ' . htmlspecialchars($title) . '",
-                "is_system": 0,
-                "dup_count": 1
-            },
-            {
-                "name": "scope_type",
-                "input_type": "select",
-                "label_ar": "",
-                "required": 1,
-                "readonly": 0,
-                "section": "' . $n . ' ' . htmlspecialchars($title) . '",
-                "is_system": 0,
-                "dup_count": 1
-            },
-            {
-                "name": "scope_id",
-                "input_type": "select",
-                "label_ar": "",
-                "required": 1,
-                "readonly": 0,
-                "section": "' . $n . ' ' . htmlspecialchars($title) . '",
-                "is_system": 0,
-                "dup_count": 1
-            },
-            {
-                "name": "valid_from",
-                "input_type": "date",
-                "label_ar": "",
-                "required": 1,
-                "readonly": 0,
-                "section": "' . $n . ' ' . htmlspecialchars($title) . '",
-                "is_system": 0,
-                "dup_count": 1
-            },
-            {
-                "name": "valid_to",
-                "input_type": "date",
-                "label_ar": "نهاية سريان النطاق (اتركه فارغا لسريان مفتوح)",
-                "required": 0,
-                "readonly": 0,
-                "section": "' . $n . ' ' . htmlspecialchars($title) . '",
-                "is_system": 0,
-                "dup_count": 1
-            },
-            {
-                "name": "linked_asg",
-                "input_type": "select",
-                "label_ar": "",
-                "required": 0,
-                "readonly": 0,
-                "section": "' . $n . ' ' . htmlspecialchars($title) . '",
-                "is_system": 0,
-                "dup_count": 1
-            }
-        ]
-    },
-    {
-        "route": "admin\/sec_governance.php",
-        "tables": [
-            {
-                "table_index": 0,
-                "columns": [
-                    {
-                        "label_ar": "#",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "الشخص",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "نوع الفحص",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "المخاطرة",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "السبب",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "الباقي",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "الحالة",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "رقم المراجعة",
-                        "col_group": "",
-                        "th_class": "ems-fn-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "تاريخ المراجعة",
-                        "col_group": "",
-                        "th_class": "ems-fn-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "الحساب أو الدور",
-                        "col_group": "",
-                        "th_class": "ems-fn-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "الواجبان المتعارضان",
-                        "col_group": "",
-                        "th_class": "ems-fn-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "درجة الخطورة",
-                        "col_group": "",
-                        "th_class": "ems-fn-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "الاستثناءات القائمة",
-                        "col_group": "",
-                        "th_class": "ems-fn-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "الإجراء المتخذ",
-                        "col_group": "",
-                        "th_class": "ems-fn-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "تاريخ التنفيذ",
-                        "col_group": "",
-                        "th_class": "ems-fn-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "المراجع",
-                        "col_group": "",
-                        "th_class": "ems-fn-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "اعتمده",
-                        "col_group": "",
-                        "th_class": "ems-fn-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "تاريخ المراجعة القادمة",
-                        "col_group": "",
-                        "th_class": "ems-fn-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "الكيان",
-                        "col_group": "",
-                        "th_class": "ems-gov-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    }
-                ]
-            },
-            {
-                "table_index": 1,
-                "columns": [
-                    {
-                        "label_ar": "الدورة",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": "cycle_id"
-                    },
-                    {
-                        "label_ar": "الوحدة",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": "unit_name"
-                    },
-                    {
-                        "label_ar": "الفترة",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": "period"
-                    },
-                    {
-                        "label_ar": "المهلة",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": "due_at"
-                    },
-                    {
-                        "label_ar": "بنود بلا قرار",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": "open_lines"
-                    },
-                    {
-                        "label_ar": "الحالة",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": "state"
-                    }
-                ]
-            },
-            {
-                "table_index": 2,
-                "columns": [
-                    {
-                        "label_ar": "الصنف",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": "tpl_kind"
-                    },
-                    {
-                        "label_ar": "عدد الحسابات المتأثرة",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": "total"
-                    },
-                    {
-                        "label_ar": "منشور",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": "published"
-                    }
-                ]
-            }
-        ],
-        "form_fields": [
-            {
-                "name": "gov_action",
-                "input_type": "hidden",
-                "label_ar": "",
-                "required": 0,
-                "readonly": 0,
-                "section": "⑦ التقارير — لماذا يملك فلان هذه الصلاحية؟",
-                "is_system": 1,
-                "dup_count": 4
-            },
-            {
-                "name": "person_id",
-                "input_type": "select",
-                "label_ar": "",
-                "required": 0,
-                "readonly": 0,
-                "section": "⑦ التقارير — لماذا يملك فلان هذه الصلاحية؟",
-                "is_system": 0,
-                "dup_count": 1
-            },
-            {
-                "name": "permission_code",
-                "input_type": "text",
-                "label_ar": "",
-                "required": 1,
-                "readonly": 0,
-                "section": "⑦ التقارير — لماذا يملك فلان هذه الصلاحية؟",
-                "is_system": 0,
-                "dup_count": 1
-            },
-            {
-                "name": "scope",
-                "input_type": "text",
-                "label_ar": "",
-                "required": 1,
-                "readonly": 0,
-                "section": "⑦ التقارير — لماذا يملك فلان هذه الصلاحية؟",
-                "is_system": 0,
-                "dup_count": 1
-            },
-            {
-                "name": "req_id",
-                "input_type": "hidden",
-                "label_ar": "",
-                "required": 0,
-                "readonly": 0,
-                "section": "④ الاعتماد — طلبات تغيير الصلاحيات",
-                "is_system": 1,
-                "dup_count": 2
-            },
-            {
-                "name": "decision",
-                "input_type": "hidden",
-                "label_ar": "",
-                "required": 0,
-                "readonly": 0,
-                "section": "④ الاعتماد — طلبات تغيير الصلاحيات",
-                "is_system": 1,
-                "dup_count": 1
-            },
-            {
-                "name": "org_unit_id",
-                "input_type": "select",
-                "label_ar": "",
-                "required": 0,
-                "readonly": 0,
-                "section": "⑥ الإغلاق — المراجعة الدورية ووضع التأسيس",
-                "is_system": 0,
-                "dup_count": 1
-            },
-            {
-                "name": "period",
-                "input_type": "text",
-                "label_ar": "",
-                "required": 1,
-                "readonly": 0,
-                "section": "⑥ الإغلاق — المراجعة الدورية ووضع التأسيس",
-                "is_system": 0,
-                "dup_count": 1
-            },
-            {
-                "name": "manager_person_id",
-                "input_type": "select",
-                "label_ar": "",
-                "required": 0,
-                "readonly": 0,
-                "section": "⑥ الإغلاق — المراجعة الدورية ووضع التأسيس",
-                "is_system": 0,
-                "dup_count": 1
-            }
-        ]
-    },
-    {
-        "route": "inheader.php",
-        "tables": [],
-        "form_fields": [
-            {
-                "name": "imp_action",
-                "input_type": "hidden",
-                "label_ar": "",
-                "required": 0,
-                "readonly": 0,
-                "section": "",
-                "is_system": 1,
-                "dup_count": 1
-            }
-        ]
-    },
-    {
-        "route": "main\/all_assistants.php",
-        "tables": [
-            {
-                "table_index": 0,
-                "columns": [
-                    {
-                        "label_ar": "الإجراءات",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "الاسم",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "اسم المستخدم",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "الدور",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "المدير الأب",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "الموظف المرتبط",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "رقم الهاتف",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "رقم التكليف",
-                        "col_group": "",
-                        "th_class": "ems-fn-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "الأصيل",
-                        "col_group": "",
-                        "th_class": "ems-fn-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "صفته",
-                        "col_group": "",
-                        "th_class": "ems-fn-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "المعاون",
-                        "col_group": "",
-                        "th_class": "ems-fn-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "نوع النيابة",
-                        "col_group": "",
-                        "th_class": "ems-fn-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "النطاق المفوض",
-                        "col_group": "",
-                        "th_class": "ems-fn-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "سقف الاعتماد",
-                        "col_group": "",
-                        "th_class": "ems-fn-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "من تاريخ",
-                        "col_group": "",
-                        "th_class": "ems-fn-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "إلى تاريخ",
-                        "col_group": "",
-                        "th_class": "ems-fn-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "سبب النيابة",
-                        "col_group": "",
-                        "th_class": "ems-fn-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "مرجع تفويض الأصيل",
-                        "col_group": "",
-                        "th_class": "ems-fn-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "أصدره",
-                        "col_group": "",
-                        "th_class": "ems-fn-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "الكيان",
-                        "col_group": "",
-                        "th_class": "ems-gov-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "مرجع التفويض",
-                        "col_group": "",
-                        "th_class": "ems-gov-th",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "تاريخ الاعتماد",
-                        "col_group": "",
-                        "th_class": "ems-gov-th none",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "تاريخ الإنشاء",
-                        "col_group": "",
-                        "th_class": "ems-gov-th none",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "الحالة",
-                        "col_group": "",
-                        "th_class": "ems-gov-th none",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "المرفق",
-                        "col_group": "",
-                        "th_class": "ems-gov-th none",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "العملة",
-                        "col_group": "",
-                        "th_class": "ems-gov-th none",
-                        "hidden_default": 0,
-                        "technical": null
-                    }
-                ]
-            }
-        ],
-        "form_fields": [
-            {
-                "name": "uid",
-                "input_type": "hidden",
-                "label_ar": "",
-                "required": 0,
-                "readonly": 0,
-                "section": "",
-                "is_system": 1,
-                "dup_count": 1
-            },
-            {
-                "name": "parent_id",
-                "input_type": "select",
-                "label_ar": "",
-                "required": 1,
-                "readonly": 0,
-                "section": "إضافة معاون",
-                "is_system": 0,
-                "dup_count": 1
-            },
-            {
-                "name": "role",
-                "input_type": "select",
-                "label_ar": "",
-                "required": 1,
-                "readonly": 0,
-                "section": "إضافة معاون",
-                "is_system": 0,
-                "dup_count": 1
-            },
-            {
-                "name": "name",
-                "input_type": "text",
-                "label_ar": "",
-                "required": 1,
-                "readonly": 0,
-                "section": "إضافة معاون",
-                "is_system": 0,
-                "dup_count": 1
-            },
-            {
-                "name": "username",
-                "input_type": "text",
-                "label_ar": "",
-                "required": 1,
-                "readonly": 0,
-                "section": "إضافة معاون",
-                "is_system": 0,
-                "dup_count": 1
-            },
-            {
-                "name": "password",
-                "input_type": "password",
-                "label_ar": "",
-                "required": 0,
-                "readonly": 0,
-                "section": "إضافة معاون",
-                "is_system": 0,
-                "dup_count": 1
-            },
-            {
-                "name": "phone",
-                "input_type": "tel",
-                "label_ar": "",
-                "required": 1,
-                "readonly": 0,
-                "section": "إضافة معاون",
-                "is_system": 0,
-                "dup_count": 1
-            },
-            {
-                "name": "employee_id",
-                "input_type": "select",
-                "label_ar": "",
-                "required": 1,
-                "readonly": 0,
-                "section": "إضافة معاون",
-                "is_system": 0,
-                "dup_count": 1
-            }
-        ]
-    },
-    {
-        "route": "main\/dashboard.php",
-        "tables": [],
-        "form_fields": []
-    },
-    {
-        "route": "main\/global_search.php",
-        "tables": [],
-        "form_fields": [
-            {
-                "name": "q",
-                "input_type": "text",
-                "label_ar": "",
-                "required": 0,
-                "readonly": 0,
-                "section": "",
-                "is_system": 0,
-                "dup_count": 1
-            }
-        ]
-    },
-    {
-        "route": "main\/glossary.php",
-        "tables": [],
-        "form_fields": []
-    },
-    {
-        "route": "main\/my_workspace.php",
+        "route": "main\/org_structure.php",
         "tables": [],
         "form_fields": []
     },
@@ -115290,6 +115845,574 @@
         "route": "main\/role_board.php",
         "tables": [],
         "form_fields": []
+    },
+    {
+        "route": "main\/sec_employee_wizard.php",
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "المصدر",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "المرجع",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الصلاحية",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الحكم",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "النطاق",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الكيان",
+                        "col_group": "",
+                        "th_class": "ems-gov-th",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "المنشئ — الاسم والصفة",
+                        "col_group": "",
+                        "th_class": "ems-gov-th",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "المعتمد — الاسم والصفة",
+                        "col_group": "",
+                        "th_class": "ems-gov-th",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "مرجع التفويض",
+                        "col_group": "",
+                        "th_class": "ems-gov-th",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "المرجع الأب",
+                        "col_group": "",
+                        "th_class": "ems-gov-th",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "تاريخ الإنشاء",
+                        "col_group": "",
+                        "th_class": "ems-gov-th",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "تاريخ الاعتماد",
+                        "col_group": "",
+                        "th_class": "ems-gov-th",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الحالة",
+                        "col_group": "",
+                        "th_class": "ems-gov-th",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "wz_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "' . $n . ' ' . htmlspecialchars($title) . '",
+                "is_system": 1,
+                "dup_count": 1
+            },
+            {
+                "name": "person_id",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "' . $n . ' ' . htmlspecialchars($title) . '",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "full_name",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "' . $n . ' ' . htmlspecialchars($title) . '",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "link_employee_id",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "' . $n . ' ' . htmlspecialchars($title) . '",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "relation_code",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "' . $n . ' ' . htmlspecialchars($title) . '",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "family_code",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "' . $n . ' ' . htmlspecialchars($title) . '",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "level_code",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "' . $n . ' ' . htmlspecialchars($title) . '",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "title_code",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "' . $n . ' ' . htmlspecialchars($title) . '",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "org_unit_id",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "' . $n . ' ' . htmlspecialchars($title) . '",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "manager_person_id",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "' . $n . ' ' . htmlspecialchars($title) . '",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "scope_type",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "' . $n . ' ' . htmlspecialchars($title) . '",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "scope_id",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "' . $n . ' ' . htmlspecialchars($title) . '",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "valid_from",
+                "input_type": "date",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "' . $n . ' ' . htmlspecialchars($title) . '",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "valid_to",
+                "input_type": "date",
+                "label_ar": "نهاية سريان النطاق (اتركه فارغا لسريان مفتوح)",
+                "required": 0,
+                "readonly": 0,
+                "section": "' . $n . ' ' . htmlspecialchars($title) . '",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "linked_asg",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "' . $n . ' ' . htmlspecialchars($title) . '",
+                "is_system": 0,
+                "dup_count": 1
+            }
+        ]
+    },
+    {
+        "route": "main\/sec_governance.php",
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "#",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الشخص",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "نوع الفحص",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "المخاطرة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "السبب",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الباقي",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الحالة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "رقم المراجعة",
+                        "col_group": "",
+                        "th_class": "ems-fn-th",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "تاريخ المراجعة",
+                        "col_group": "",
+                        "th_class": "ems-fn-th",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الحساب أو الدور",
+                        "col_group": "",
+                        "th_class": "ems-fn-th",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الواجبان المتعارضان",
+                        "col_group": "",
+                        "th_class": "ems-fn-th",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "درجة الخطورة",
+                        "col_group": "",
+                        "th_class": "ems-fn-th",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الاستثناءات القائمة",
+                        "col_group": "",
+                        "th_class": "ems-fn-th",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الإجراء المتخذ",
+                        "col_group": "",
+                        "th_class": "ems-fn-th",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "تاريخ التنفيذ",
+                        "col_group": "",
+                        "th_class": "ems-fn-th",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "المراجع",
+                        "col_group": "",
+                        "th_class": "ems-fn-th",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "اعتمده",
+                        "col_group": "",
+                        "th_class": "ems-fn-th",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "تاريخ المراجعة القادمة",
+                        "col_group": "",
+                        "th_class": "ems-fn-th",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الكيان",
+                        "col_group": "",
+                        "th_class": "ems-gov-th",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            },
+            {
+                "table_index": 1,
+                "columns": [
+                    {
+                        "label_ar": "الدورة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "cycle_id"
+                    },
+                    {
+                        "label_ar": "الوحدة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "unit_name"
+                    },
+                    {
+                        "label_ar": "الفترة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "period"
+                    },
+                    {
+                        "label_ar": "المهلة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "due_at"
+                    },
+                    {
+                        "label_ar": "بنود بلا قرار",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "open_lines"
+                    },
+                    {
+                        "label_ar": "الحالة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "state"
+                    }
+                ]
+            },
+            {
+                "table_index": 2,
+                "columns": [
+                    {
+                        "label_ar": "الصنف",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "tpl_kind"
+                    },
+                    {
+                        "label_ar": "عدد الحسابات المتأثرة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "total"
+                    },
+                    {
+                        "label_ar": "منشور",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "published"
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "gov_action",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "⑦ التقارير — لماذا يملك فلان هذه الصلاحية؟",
+                "is_system": 1,
+                "dup_count": 4
+            },
+            {
+                "name": "person_id",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "⑦ التقارير — لماذا يملك فلان هذه الصلاحية؟",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "permission_code",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "⑦ التقارير — لماذا يملك فلان هذه الصلاحية؟",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "scope",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "⑦ التقارير — لماذا يملك فلان هذه الصلاحية؟",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "req_id",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "④ الاعتماد — طلبات تغيير الصلاحيات",
+                "is_system": 1,
+                "dup_count": 2
+            },
+            {
+                "name": "decision",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "④ الاعتماد — طلبات تغيير الصلاحيات",
+                "is_system": 1,
+                "dup_count": 1
+            },
+            {
+                "name": "org_unit_id",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "⑥ الإغلاق — المراجعة الدورية ووضع التأسيس",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "period",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "⑥ الإغلاق — المراجعة الدورية ووضع التأسيس",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "manager_person_id",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "⑥ الإغلاق — المراجعة الدورية ووضع التأسيس",
+                "is_system": 0,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "main\/soon.php",

@@ -1,6 +1,6 @@
 <?php
 /**
- * contracts/contract_commercial_lines.php — بنود العقد والالتزام التجاري (DEP-01 · GOV_EXEC §5)
+ * Contracts/contract_commercial_lines.php — بنود العقد والالتزام التجاري (DEP-01 · GOV_EXEC §5)
  * ──────────────────────────────────────────────────────────────────────
  * ◆ ملفٌّ مولَّد (gov_exec:generated) من `tools/gov_exec_dept_build.php`
  *   ومواصفتِه في `tools/specs/`. لا يُحرَّر يدويًّا — أعِد التوليد.
@@ -13,7 +13,7 @@
  *   أصلًا (OBL-0052). فأسماءُ الحقولِ من الورقةِ حرفًا ولا تُكتب هنا.
  */
 $U13 = array(
-    'file'       => 'contracts/contract_commercial_lines.php',
+    'file'       => 'Contracts/contract_commercial_lines.php',
     'screen'     => 'sal_contract_lines',
     'table'      => 'contractequipments',
     'title'      => 'بنود العقد والالتزام التجاري',

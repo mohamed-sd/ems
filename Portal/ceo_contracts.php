@@ -576,3 +576,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 })();
 </script>
+
+</body>
+</html>

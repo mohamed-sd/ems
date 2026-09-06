@@ -1201,27 +1201,27 @@
         "title_ar": "التكليفات التنظيمية",
         "owner_dept": "الحوكمة والالتزام",
         "state": "live",
-        "real_path": "admin\/org_assignments.php",
+        "real_path": "main\/org_assignments.php",
         "note": "auto",
-        "updated_at": "2026-08-03 08:30:51"
+        "updated_at": "2026-09-03 21:23:10"
     },
     {
         "canonical_file": "org_permits.php",
         "title_ar": "أذون الزيارة والمركبات الخارجية",
         "owner_dept": "إدارة الموقع",
         "state": "live",
-        "real_path": "admin\/org_permits.php",
+        "real_path": "main\/org_permits.php",
         "note": "auto",
-        "updated_at": "2026-08-03 09:19:01"
+        "updated_at": "2026-09-03 21:23:10"
     },
     {
         "canonical_file": "org_structure.php",
         "title_ar": "الهيكل التنظيمي والمسميات",
         "owner_dept": "الحوكمة والالتزام",
         "state": "live",
-        "real_path": "admin\/org_structure.php",
+        "real_path": "main\/org_structure.php",
         "note": "auto",
-        "updated_at": "2026-08-03 08:30:51"
+        "updated_at": "2026-09-03 21:23:10"
     },
     {
         "canonical_file": "ownership_links.php",
@@ -1768,9 +1768,9 @@
         "title_ar": "فصل الواجبات المتعارضة",
         "owner_dept": "الحوكمة والالتزام",
         "state": "live",
-        "real_path": "admin\/sec_governance.php",
+        "real_path": "main\/sec_governance.php",
         "note": "auto",
-        "updated_at": "2026-08-03 09:19:01"
+        "updated_at": "2026-09-03 21:23:10"
     },
     {
         "canonical_file": "sensitive_fields.php",

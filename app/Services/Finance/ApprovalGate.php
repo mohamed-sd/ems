@@ -32,6 +32,25 @@ class ApprovalGate
     const ORDER = array('APR-1', 'APR-2', 'APR-3', 'APR-4');
 
     /**
+     * ترتيبُ النوعِ ⇐ رمزُ الفعلِ المُعلَن (PERM-03).
+     * ◆ والأربعةُ مفرداتُ `gov_authority_limits.action_codes` حرفًا — لا تُخترع
+     *   هنا بل تُقابَل، ودلالتُها في ترويسةِ هذا الملفِّ نفسِه.
+     */
+    const ACTION_BY_SEQ = array(
+        1 => 'fin.approve.need',
+        2 => 'fin.approve.budget',
+        3 => 'fin.approve.commit',
+        4 => 'fin.approve.execute',
+    );
+
+    /** رمزُ الفعلِ لترتيبِ نوعٍ — أو `null` إن لم يُعلَن له فعل. */
+    private static function actionOf($seq)
+    {
+        $seq = (int) $seq;
+        return isset(self::ACTION_BY_SEQ[$seq]) ? self::ACTION_BY_SEQ[$seq] : null;
+    }
+
+    /**
      * يسجّل اعتمادًا من نوعٍ واحدٍ على مستند.
      *
      * @param array $ctx company_id · source_kind · source_ref · apr_code ·
@@ -63,6 +82,27 @@ class ApprovalGate
             if (!in_array((string) $roleId, $allowed, true)) {
                 return self::fail(403, $type['title'] . ' — لا يملكه هذا الدور: صاحبه '
                                      . $type['owner_label'] . ' (FMGR-0004)');
+            }
+        }
+
+        /* ══ حارسُ الفعلِ في القالب (PERM-03 · إتمامُ نوعِ البند `action`) ═══
+           ◆ **الدورُ يقول من أنت والقالبُ يقول ماذا تملك**: حارسُ الدورِ أعلاه
+             يفحص انتماءَك، وهذا يفحص أنَّ **قالبَك المسنَدَ يحمل هذا الفعلَ
+             بعينِه**. فمن نُقل إلى قالبٍ أضيقَ يُمنع في أوّلِ طلبٍ ولو بقي دورُه.
+           ◆ **والرمزُ من السجلِّ الحاكمِ لا يُخترع**: مفرداتُ الأفعالِ الأربعُ
+             مُعلَنةٌ في `gov_authority_limits.action_codes`، وترتيبُ النوعِ هو
+             ما يربطها: ①حاجة ②موازنة ③التزام ④تنفيذ.
+           ⛔ **ولا يُقرأ غيابُ البندِ سماحًا**: من لا يحمل الفعلَ يُردّ.
+           ◆ **وغيرُ المغطَّى بقالبٍ لا يُحاسَب بهذا الحارس**: النظامُ يمنعه من
+             الشاشةِ أصلًا، فلا يُضاف منعٌ ثانٍ برسالةٍ مربكة. */
+        $actionCode = self::actionOf($type['seq']);
+        if ($dec === 'approved' && $actionCode !== null
+            && function_exists('\\ems_can_action') && function_exists('\\ems_profile_layer')) {
+            $covered = \ems_profile_layer($conn, 'action', $who);
+            $hasAny  = !empty($covered);
+            if ($hasAny && !\ems_can_action($conn, $actionCode, $who)) {
+                return self::fail(403, $type['title'] . ' — قالبك لا يحمل الفعل '
+                                     . $actionCode . ' (PERM-03)');
             }
         }
 

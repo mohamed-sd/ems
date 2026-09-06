@@ -217,6 +217,10 @@ function pr_e($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); }
 ?>
 <div class="main ems-unified-page-shell" dir="rtl">
     <?php
+    /* PERM-01 — لافتةُ «تعامل قديم»: عدّادُ منحِ كلِّ دورٍ مصدرُه الجدولُ الذي
+       لم يعد يحكم، فيُسمّى قبل الجدولِ لا بعده. */
+    require_once __DIR__ . '/../includes/legacy_perm_notice.php';
+    ems_legacy_perm_notice('read', 'وعداد المنح المعروض بجانب كل دور محسوب من هذا الجدول القديم.');
     $header_title = 'الأدوار';
     $header_icon = 'fa fa-user-tag';
     $header_actions = $can_add ? array(

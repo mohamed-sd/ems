@@ -78,41 +78,62 @@ while ($x = $r->fetch_assoc()) {
      **بنيويّ** — كانت أعلامُ الكتابةِ ساقطةً في القوالبِ كلِّها (2,831 بندًا)،
      فلا أحدَ ينفّذ فعلًا واحدًا فضلًا عن طرفَين. ورُدَّت الأعلامُ في هجرة
      2028_05_12، فصار الصنفُ أ رقمًا حيًّا. «حمرةٌ بمقامٍ متروك» ممنوعةٌ نصًّا. */
-$sodA = 0; $sodB = 0; $sodMat = 0;
-$MATERIAL = '/مالي|خزين|مشتر|صلاحي|بنك|دفع|مطابق/u';
-foreach ($pairs as $p) {
-    $A = $screensOf($p['roles_a']); $B = $screensOf($p['roles_b']);
-    $exA = array_diff_key($A, $B); $exB = array_diff_key($B, $A);
-    if (!$exA || !$exB) { continue; }
-    $fam = (string) $p['func_a'] . ' / ' . (string) $p['func_b'];
-    foreach ($profItems as $items) {
-        $hitA = array_intersect_key($items, $exA);
-        $hitB = array_intersect_key($items, $exB);
-        if (!$hitA || !$hitB) { continue; }
-        $wA = 0; foreach ($hitA as $z) { $wA |= $z; }
-        $wB = 0; foreach ($hitB as $z) { $wB |= $z; }
-        if ($wA && $wB) { $sodA++; if (preg_match($MATERIAL, $fam)) { $sodMat++; } }
-        else { $sodB++; }
+/* ◆ **والمقامُ صار خريطةً مشتقّةً من الكتابةِ الفعليّة** (`perm01_function_screen`):
+     لكلِّ وظيفةٍ جدولُ مرساةٍ تكتبه، ومَن يكتب فيه من شاشاتِ الإنتاج. فبدل
+     «فرقِ مجموعتَي أدوار» — الذي كان يسحب سجلَّ نشاطٍ وموظّفين إلى «طرفِ منشئِ
+     المورد» — صار الطرفُ **شاشاتِ وظيفتِه حصرًا**.
+   ⛔ **وثلاثةُ أحكامٍ تُفرَز ولا تُخلَط**:
+     ① **صنف أ** — القالبُ يمنح كتابةً على شاشتَي الطرفَين **المتمايزتَين**.
+     ② **يستحيل الفصلُ بالشاشة** — طرفا التركيبةِ على **الشاشةِ نفسِها**
+        (`bank_reconciliation_fin` تكتب الحسابَ البنكيَّ والدفعَ والمطابقةَ معًا)،
+        فلا يُغلق بنزعِ علمٍ، والضابطُ على الفعلِ هو الممكنُ الوحيد.
+     ③ **وظيفةٌ غيرُ مبنيّة** — لا كاتبَ لها في الإنتاجِ أصلًا (الرواتبُ
+        والتخلّصُ من الأصل)، فصفرُها **غيابُ ميزةٍ لا فصلٌ محقَّق**.
+   ⛔ **وحبّةُ المستندِ لا تُقاس بالشاشة**: خمسُ تركيباتٍ `scope=document`
+     (مُعِدٌّ ومعتمِدٌ على المستندِ نفسِه) إنفاذُها بسلسلةِ الاعتمادِ لا بالشاشة —
+     تُستبعَد وتُسمّى. */
+$fnScreens = array();
+$fnState = array();
+$rF = $db->query("SELECT func_name, screen_code, registered, state FROM perm01_function_screen");
+while ($xF = $rF->fetch_assoc()) {
+    $fnState[$xF['func_name']] = $xF['state'];
+    if ($xF['state'] === 'mapped' && (int) $xF['registered'] === 1 && $xF['screen_code'] !== '') {
+        $fnScreens[$xF['func_name']][$xF['screen_code']] = 1;
     }
 }
-/* ⛔ **والمقامُ نفسُه قِيس فإذا هو لا يمثّل الوظيفتَين**: «شاشاتُ الطرفِ أ»
-     تُشتقُّ هنا من **فرقِ مجموعتَي أدوارٍ** لا من شاشاتِ الوظيفة — فتنسحب معها
-     كلُّ شاشةٍ يملكها أولئك الأدوارُ ولو لم تمتَّ للوظيفةِ بصلة. مقيسٌ بالاسم:
-     «طرفُ منشئِ المورد» لقالبِ إدارةِ التشغيل خرج **سجلَّ نشاطٍ وموظّفين
-     ومعدّاتٍ واعتمادَ ساعات**، و«طرفُ معتمِدِ الحسابِ البنكيّ» خرج
-     **إقفالًا شهريًّا**. فنزعُ الكتابةِ على هذا المقامِ يسلب وصولًا حقيقيًّا
-     لعطبِ قياسٍ لا لتعارضِ واجبات.
-   ⛔ **ولا خريطةَ وظيفةٍ إلى شاشةٍ في البيانات**: `sec_sod_pairs` يحمل اسمَي
-     الوظيفتَين نصًّا و**نقطةَ الإنفاذِ** (`enforced_by`) — ولا يحمل شاشاتِ كلِّ
-     وظيفة. فالمقامُ الصحيحُ غيرُ قابلٍ للاشتقاق، ويُسمّى ولا يُخمَّن.
-   ◆ **ودليلُ الاستعمالِ يشدُّ هذا**: صفرُ خرقٍ واقعٍ من 39 في 90,744 فعلَ كتابةٍ
-     (`tools/perm01_sod_usage_evidence.php`) — لا فاعلَ كتب على الطرفَين قطُّ. */
+$sodA = 0; $sodMat = 0; $sodSameScreen = 0; $sodUnimpl = 0; $sodDoc = 0; $sodNoMap = 0;
+$MATERIAL = '/مالي|خزين|مشتر|صلاحي|بنك|دفع|مطابق|رات|أصل/u';
+foreach ($pairs as $p) {
+    $fa = (string) $p['func_a']; $fb = (string) $p['func_b'];
+    if (($fnState[$fa] ?? '') === 'unimplemented' || ($fnState[$fb] ?? '') === 'unimplemented') {
+        $sodUnimpl++; continue;
+    }
+    if (!isset($fnScreens[$fa]) || !isset($fnScreens[$fb])) { $sodNoMap++; continue; }
+    $exA = array_diff_key($fnScreens[$fa], $fnScreens[$fb]);
+    $exB = array_diff_key($fnScreens[$fb], $fnScreens[$fa]);
+    if (!$exA || !$exB) { $sodSameScreen++; continue; }
+    foreach ($profItems as $items) {
+        $hA = array_intersect_key($items, $exA);
+        $hB = array_intersect_key($items, $exB);
+        if (!$hA || !$hB) { continue; }
+        $wA = 0; foreach ($hA as $z) { $wA |= $z; }
+        $wB = 0; foreach ($hB as $z) { $wB |= $z; }
+        if ($wA && $wB) {
+            $sodA++;
+            if (preg_match($MATERIAL, $fa . ' ' . $fb)) { $sodMat++; }
+        }
+    }
+}
+/* حبّةُ المستندِ تُعَدُّ ولا تُقاس بالشاشة. */
+$rD = $db->query("SELECT COUNT(*) FROM sec_sod_pairs WHERE active=1 AND scope='document'");
+$sodDoc = $rD ? (int) $rD->fetch_row()[0] : 0;
+$sodB = 0;
 $add(1, 'تعارضُ فصلِ واجباتٍ — تنفيذُ الطرفَين (صنف أ)', 'صفر', $sodA,
      $sodA === 0 ? 'PASS' : 'FAIL',
-     'ومنها ماديّة: ' . $sodMat . ' · ومؤشِّرُ الصنفِ ب: ' . $sodB
-   . ' · والمجموعُ بالمقامِ القديم: ' . ($sodA + $sodB)
-   . ' — ⛔ والمقامُ **فرقُ مجموعتَي أدوارٍ لا شاشاتُ الوظيفتَين**، فالرقمُ سقفٌ '
-   . 'أعلى يضمُّ شاشاتٍ لا صلةَ لها بالتعارض. والإنفاذُ الحقيقيُّ في ㉟.');
+     'بالخريطةِ المشتقّةِ من الكتابةِ الفعليّة · ومنها ماديّة: ' . $sodMat
+   . ' — وتُفرَز ولا تُخلَط: ' . $sodSameScreen . ' تركيبةً **طرفاها على الشاشةِ نفسِها**'
+   . ' (يستحيل الفصلُ بالشاشةِ والضابطُ على الفعل) · ' . $sodUnimpl . ' وظيفتُها **غيرُ مبنيّة**'
+   . ' · ' . $sodDoc . ' بحبّةِ **المستندِ** لا الدور · ' . $sodNoMap . ' بلا مرساةٍ معرَّفة');
 
 $bothSides = 0;
 foreach ($pairs as $p) {
@@ -604,10 +625,34 @@ $add(23, 'تطابقُ شاشةِ التفسيرِ مع زمنِ التشغيل'
 $revokeTest = $has('tests/perm01_revocation_next_request.php');
 $add(24, 'اختبارُ السحب: أوّلُ طلبٍ بعده منع', 'ناجح', $revokeTest ? 'قائم' : 'غيرُ مختبَر',
      $revokeTest ? 'PASS' : 'FAIL');
-$sodTest = $has('tests/perm01_sod_recon_negative.php');
+/* ═══ ㉕ — التغطيةُ تُعَدُّ بالتركيبةِ لا بوجودِ ملفّ (PERM-04 · إعادةُ تعريف)
+   ⛔ **والمقياسُ القديمُ كان يسأل «أثمّةَ ملفُّ اختبار؟»** فيُخرج «100٪» وهو
+     مقيسٌ على **تركيبةٍ واحدةٍ من ثلاثَ عشرة** (7.7٪). ورقمٌ أخضرُ على مقامٍ
+     واحدٍ لا يحرس اثنتي عشرةَ تركيبةً. [[measure-blind-spots]]
+   ◆ **فصار العدُّ بالتركيبةِ نفسِها**: لكلِّ تركيبةٍ نافذةٍ عائلةُ إنفاذٍ
+     مُعلَنة — حبّةُ المستندِ بسلسلةِ الاعتمادِ، وحبّةُ الدورِ ببوّابةِ الإسناد —
+     ويُشترط وجودُ شاهدٍ سالبٍ يجرّب العائلتَين معًا.
+   ◆ **وما لا طرفَ مسمًّى له يُسمّى ولا يُطوى**: تركيبةٌ حبّتُها الدورُ وأحدُ
+     طرفَيها بلا أرقامِ أدوارٍ لا تُجرَّب بالبوّابة، وتبقى مغلقةً بنيويًّا
+     (‏`users.role` عمودٌ واحد) — فتُعَدُّ مغطّاةً بسببٍ مكتوبٍ لا بادّعاء. */
+$sodAll = $has('tests/perm04_sod_negative_all.php');
+$sodRecon = $has('tests/perm01_sod_recon_negative.php');
+$sodTotal = 0; $sodNamed = 0; $sodWild = 0;
+$r = $db->query("SELECT scope, roles_a, roles_b FROM sec_sod_pairs WHERE active = 1");
+while ($r && ($x = $r->fetch_assoc())) {
+    $sodTotal++;
+    if ((string) $x['scope'] === 'document') { $sodNamed++; continue; }
+    $a = preg_replace('/[^0-9,]/', '', (string) $x['roles_a']);
+    $b = preg_replace('/[^0-9,]/', '', (string) $x['roles_b']);
+    if (trim($a, ',') !== '' && trim($b, ',') !== '') { $sodNamed++; } else { $sodWild++; }
+}
+$sodCovered = ($sodAll && $sodRecon) ? $sodNamed : 0;
+$sodPct = $sodTotal > 0 ? round(($sodCovered + $sodWild) * 100 / $sodTotal) : 0;
 $add(25, 'اختباراتُ فصلِ الواجباتِ السالبةُ في زمنِ التشغيل', '100%',
-     $sodTest ? '11/11 على SOD-06' : 'صفر', $sodTest ? 'PASS' : 'FAIL',
-     'تركيبةٌ واحدةٌ من 13 — والباقي بلا اختبارٍ سالب');
+     $sodPct . '%',
+     ($sodAll && $sodRecon && ($sodCovered + $sodWild) === $sodTotal) ? 'PASS' : 'FAIL',
+     'مُجرَّبةٌ بالبوّابتَين: ' . $sodCovered . ' · ومغلقةٌ بنيويًّا بلا طرفٍ مسمًّى: ' . $sodWild
+   . ' · من ' . $sodTotal . ' تركيبةً — والشاهدان: perm04_sod_negative_all و perm01_sod_recon_negative');
 $scopeTest = $has('tests/space_isolation_negative_test.php');
 $add(26, 'اختباراتُ نطاقِ الكيانِ السالبة', '100%', $scopeTest ? 'قائم' : 'صفر',
      $scopeTest ? 'PASS' : 'FAIL');
@@ -617,7 +662,12 @@ $add(26, 'اختباراتُ نطاقِ الكيانِ السالبة', '100%', 
      يُعَدّون ويُسمَّون ولا يُحسبون خرقًا لبابِ السياسةِ الحاكم.
    ⛔ **والمسحُ على الإنتاجِ لا على النيّة**: يُفتَّش نصُّ كلِّ ملفٍّ عن كتابةٍ
      مباشرةٍ في جداولِ السياسة — فخدمةٌ مبنيّةٌ وأبوابٌ مفتوحةٌ بجانبِها لا تُغلق
-     بندًا. */
+     بندًا.
+   ⛔ **وحدُّ الكلمةِ شرطُ صحّةِ المقياس** (PERM-02): كان النمطُ بلا حدٍّ يسارِيٍّ
+     فيطابق **عمودًا اسمُه ينتهي بالكلمةِ المفتاحيّة**: عمودُ `can_delete` يليه
+     `FROM <جدولُ سياسةٍ>` في استعلامِ **قراءةٍ** يُقرأ `DELETE FROM` فيُبلَّغ
+     كاتبًا. وقد وقع فعلًا على `includes/permissions_helper.php` وهو لا يكتب
+     حرفًا. **فالماسحُ يُصحَّح ولا يُصحَّح مخرجُه.** [[fix-the-tool-not-the-output]] */
 $POLICY_GOV = array('gov_authority_grants', 'gov_role_profiles', 'gov_profile_items');
 $writersGov = array(); $writersLegacy = array();
 $skipDirs = array('/tests/','/tools/','/docs/','/vendor/','/storage/','/.git/','/database/','/node_modules/');
@@ -631,11 +681,11 @@ foreach ($itW as $fW) {
     $srcW = (string) @file_get_contents($pW);
     $relW = str_replace($ROOT . '/', '', $pW);
     foreach ($POLICY_GOV as $tW) {
-        if (preg_match('~(INSERT\s+INTO|UPDATE|DELETE\s+FROM)\s+`?' . $tW . '`?~i', $srcW)) {
+        if (preg_match('~(?<![A-Za-z0-9_])(INSERT\s+INTO|UPDATE|DELETE\s+FROM)\s+`?' . $tW . '`?~i', $srcW)) {
             $writersGov[$relW] = 1; break;
         }
     }
-    if (preg_match('~(INSERT\s+INTO|UPDATE|DELETE\s+FROM)\s+`?role_permissions`?~i', $srcW)) {
+    if (preg_match('~(?<![A-Za-z0-9_])(INSERT\s+INTO|UPDATE|DELETE\s+FROM)\s+`?role_permissions`?~i', $srcW)) {
         $writersLegacy[$relW] = 1;
     }
 }
@@ -685,16 +735,61 @@ $add(28, 'استعمالُ فتحٍ اضطراريٍّ بلا أثرِ تدقي�
    . ' · وقرارُ فتحِ الشاشةِ ' . ($bgInDecision ? '**يستشير الاستثناء**' : 'لا يقرؤه')
    . ' · والنظامُ ' . ($closedByDefault ? 'مغلقٌ افتراضيًّا' : 'ليس مغلقًا افتراضيًّا')
    . ' — مُثبَتٌ بـ tests/perm01_break_glass.php (never يُرفض · المنتهي لا يفتح · يفتح ولا يغلق)');
-$finActions = 0;
-require_once $ROOT . '/includes/action_guard.php';
-$reg = function_exists('ems_action_guard_registry') ? ems_action_guard_registry() : array();
-$declared = array();
-$r = $db->query("SELECT action_codes FROM gov_authority_limits WHERE action_codes<>''");
-while ($x = $r->fetch_row()) { foreach (explode(',', $x[0]) as $c) { $c = trim($c); if ($c !== '') { $declared[$c] = 1; } } }
-$wired = count(array_intersect(array_keys($declared), array_keys($reg)));
-$add(29, 'تركيبةُ فعلٍ حرجٍ ممنوعةٌ وقابلةٌ للتنفيذ', 'صفر',
-     'غيرُ قابلٍ للقياس — ' . $wired . ' من ' . count($declared) . ' فعلٍ مُعلَنٍ موصول', 'UNMEASURED',
-     'لا رابطَ بين رموزِ الأفعالِ ونقاطِ تنفيذها — §3-②');
+/* ═══ ㉙ — تركيبةُ فعلٍ حرجٍ ممنوعةٌ وقابلةٌ للتنفيذ (PERM-03 · إعادةُ تعريف)
+   ⛔ **والمقياسُ القديمُ كان خطأً في الصنفِ لا نقصًا في البيانات**: قابَل
+     **رموزَ الأفعالِ** (`fin.approve.execute`) بـ**مفاتيحِ سجلِّ المعالجات**
+     (`finance/depr_run.php`) — وهما لا يلتقيان أبدًا، فكان يُخرج «صفرٌ موصول»
+     مهما بُني. رقمٌ لا يقدر أن يخضرَّ لا يقيس شيئًا. [[measure-token-must-exist]]
+   ◆ **والجسرُ صار قائمًا** (PERM-03): `ApprovalGate::ACTION_BY_SEQ` يقابل كلَّ
+     نوعِ اعتمادٍ بفعلِه المُعلَن، و`ems_can_action` يفحص حملَ القالبِ له،
+     والبوّابةُ تُنادى من شاشةِ إنتاج. فصار البندُ **مقيسًا بحقّه**:
+     تركيبةٌ حرجةٌ (زوجُ أنواعٍ متعارضٍ في `fin_approval_conflicts`) **قابلةٌ
+     للتنفيذ** إن جمع قالبٌ نافذٌ **فعلَي طرفَيها معًا**.
+   ⛔ **والصفوفُ غيرُ المعياريّةِ تُستبعَد وتُسمّى**: في جدولِ التعارضاتِ صفوفٌ
+     رموزُها نصٌّ عربيٌّ مبتورٌ (بقيّةُ استيرادِ UAT) — تُفرَز ولا تُخلَط. */
+$aprConf = array(); $confJunk = 0;
+$r = $db->query("SELECT apr_a, apr_b FROM fin_approval_conflicts WHERE active = 1");
+while ($r && ($x = $r->fetch_assoc())) {
+    if (!preg_match('/^APR-\d+$/', (string) $x['apr_a']) || !preg_match('/^APR-\d+$/', (string) $x['apr_b'])) {
+        $confJunk++; continue;
+    }
+    $aprConf[] = array((string) $x['apr_a'], (string) $x['apr_b']);
+}
+$seqOf = array();
+$r = $db->query("SELECT code, seq FROM fin_approval_types WHERE active = 1 AND code LIKE 'APR-%'");
+while ($r && ($x = $r->fetch_assoc())) { $seqOf[(string) $x['code']] = (int) $x['seq']; }
+require_once $ROOT . '/app/Services/Finance/ApprovalGate.php';
+$actBySeq = \App\Services\Finance\ApprovalGate::ACTION_BY_SEQ;
+$profActs = array();
+$r = $db->query("SELECT i.profile_id, i.item_ref FROM gov_profile_items i
+                  JOIN gov_role_profiles p ON p.profile_id = i.profile_id AND p.state = 'active'
+                 WHERE i.item_kind = 'action' AND i.allow = 1");
+while ($r && ($x = $r->fetch_assoc())) { $profActs[(int) $x['profile_id']][(string) $x['item_ref']] = 1; }
+$execCombo = 0;
+foreach ($aprConf as $pair) {
+    $a1 = $actBySeq[$seqOf[$pair[0]] ?? 0] ?? null;
+    $a2 = $actBySeq[$seqOf[$pair[1]] ?? 0] ?? null;
+    if ($a1 === null || $a2 === null) { continue; }
+    foreach ($profActs as $held) {
+        if (isset($held[$a1]) && isset($held[$a2])) { $execCombo++; }
+    }
+}
+/* والنقطةُ المُعلَنةُ يجب أن تُنادى من الإنتاج، وإلّا فالمنعُ حبرٌ. */
+$gateCalled = false;
+$itG = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($ROOT,
+        FilesystemIterator::SKIP_DOTS | FilesystemIterator::UNIX_PATHS));
+foreach ($itG as $fG) {
+    $pG = $fG->getPathname();
+    if (substr($pG, -4) !== '.php') { continue; }
+    foreach ($skipDirs as $sG) { if (strpos($pG, $sG) !== false) { continue 2; } }
+    if (strpos($pG, '/app/Services/Finance/ApprovalGate.php') !== false) { continue; }
+    if (strpos((string) @file_get_contents($pG), 'ApprovalGate::record') !== false) { $gateCalled = true; break; }
+}
+$add(29, 'تركيبةُ فعلٍ حرجٍ ممنوعةٌ وقابلةٌ للتنفيذ', 'صفر', $execCombo,
+     ($execCombo === 0 && $gateCalled) ? 'PASS' : 'FAIL',
+     'من ' . count($aprConf) . ' تركيبةً معياريّةً · وصفوفٌ غيرُ معياريّةٍ مُستبعَدة: ' . $confJunk
+   . ' · ونقطةُ الإنفاذِ ' . ($gateCalled ? '**تُنادى من الإنتاج**' : 'بلا نداءٍ إنتاجيّ ⛔')
+   . ' · وبنودُ أفعالٍ نافذة: ' . array_sum(array_map('count', $profActs)));
 $r30 = $rulingOf('gov_authority_limits');
 $ok30 = ($r30 !== null && $notInDecision('gov_authority_limits'));
 $add(30, 'ضابطٌ موثَّقٌ يُعلَن نافذًا وهو غيرُ مقروءٍ في زمنِ التشغيل', 'صفر', $ok30 ? 0 : 1,

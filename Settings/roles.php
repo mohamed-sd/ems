@@ -134,6 +134,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
 <div class="main">
+    <?php
+    /* PERM-01 — لافتةُ «تعامل قديم»: عمودا الشاشاتِ والاعتماداتِ في جدولِ
+       الأدوارِ أدناه مشتقّانِ من الجدولِ الذي لم يعد يحكم. */
+    require_once __DIR__ . '/../includes/legacy_perm_notice.php';
+    ems_legacy_perm_notice('read', 'وعمودا الشاشات والاعتمادات في جدول الأدوار أدناه محسوبان من هذا الجدول القديم.');
+    ?>
     <!-- Unified header: pre-built final structure (data-ems-unified-header skips the JS rebuild). Styling: ems.main.all.style.css (.header) -->
     <?php
 /* AS-04/AS-05 (UXR-01): الرأسُ الموحَّدُ بدلَ الرأسِ اليدويِّ المُحاكي —

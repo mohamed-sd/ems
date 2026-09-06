@@ -112,4 +112,5 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     }
     ?>
 </div>
-<?php include '../infooter.php'; ?>
+</body>
+</html>

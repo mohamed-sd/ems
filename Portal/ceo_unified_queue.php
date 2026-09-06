@@ -165,4 +165,5 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         وملاحظات المراجعة المصعدة وتصعيدات المخاطر. لا كتابة من هذه الشاشة.
     </div>
 </div>
-<?php include '../infooter.php'; ?>
+</body>
+</html>

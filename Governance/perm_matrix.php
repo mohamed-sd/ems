@@ -166,6 +166,10 @@ $NOW = 'لحظي (' . ems_fmt_date(time(), 'datetime') . ')';
 ?>
 <div class="main ems-unified-page-shell" dir="rtl">
     <?php
+    /* PERM-01 — لافتةُ «تعامل قديم» في أوّلِ المتن: هذا السطحُ يقرأ الجدولَ
+       الذي حُذف فرعُه من دالّةِ القرار، فيُقال ذلك قبل أن يُقرأ رقمٌ منه. */
+    require_once __DIR__ . '/../includes/legacy_perm_notice.php';
+    ems_legacy_perm_notice('read', 'والتحرير في هذه الشاشة مقفل، وأي حفظ يرد بسببه.');
     $header_title = 'مصفوفة الصلاحيات';
     $header_icon = 'fa fa-table';
     $header_actions = array();

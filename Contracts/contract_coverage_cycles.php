@@ -1,6 +1,6 @@
 <?php
 /**
- * contracts/contract_coverage_cycles.php — التغطية التعاقدية — دورات الالتزام (DEP-01 · GOV_EXEC §5)
+ * Contracts/contract_coverage_cycles.php — التغطية التعاقدية — دورات الالتزام (DEP-01 · GOV_EXEC §5)
  * ──────────────────────────────────────────────────────────────────────
  * ◆ ملفٌّ مولَّد (gov_exec:generated) من `tools/gov_exec_dept_build.php`
  *   ومواصفتِه في `tools/specs/`. لا يُحرَّر يدويًّا — أعِد التوليد.
@@ -13,7 +13,7 @@
  *   أصلًا (OBL-0052). فأسماءُ الحقولِ من الورقةِ حرفًا ولا تُكتب هنا.
  */
 $U13 = array(
-    'file'       => 'contracts/contract_coverage_cycles.php',
+    'file'       => 'Contracts/contract_coverage_cycles.php',
     'screen'     => 'sal_coverage_cycles',
     'table'      => 'contract_commitments',
     'title'      => 'التغطية التعاقدية — دورات الالتزام',

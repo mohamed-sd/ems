@@ -38,7 +38,7 @@ $g = $conn->query(
             SUM(EXISTS(SELECT 1 FROM gov_profile_items i WHERE i.profile_id = p.profile_id)) seeded
        FROM gov_role_profiles p")->fetch_assoc();
 $rows = $conn->query(
-    "SELECT p.profile_code, p.dept_code, p.grade, p.title_ar, p.screens_target,
+    "SELECT p.profile_id, p.profile_code, p.dept_code, p.grade, p.title_ar, p.screens_target,
             p.approval_cap_label, p.state, p.version,
             (SELECT COUNT(*) FROM gov_profile_items i WHERE i.profile_id = p.profile_id) items_n
        FROM gov_role_profiles p
@@ -52,8 +52,10 @@ include __DIR__ . '/../insidebar.php';
   <?php
   $header_title = $PAGE_TITLE;
   $header_icon = 'fa fa-id-card';
-  $header_desc = 'تسع درجات في كل إدارة — رؤوسها من ورقة الدفتر حرفا وبنودها المزروعة من الصلاحيات الحية. كلها بحالة مسودة حتى اعتماد تقرير الفروق — والتعديل إصدار جديد لا مساس بالنافذ.';
+  $header_desc = 'قوالب الصلاحيات بحالاتها. التأليف وضبط البنود والاعتماد والتفعيل من شاشة البناء، ولا يعدل نافذ في مكانه بل ينسخ اصدارا جديدا.';
   $header_back = false;
+  $header_actions = array(array('tag' => 'a', 'href' => 'auth_profile_edit.php',
+      'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'قالب جديد'));
   include __DIR__ . '/../includes/page_header.php';
   ?>
 
@@ -71,7 +73,7 @@ include __DIR__ . '/../insidebar.php';
     <table class="table" id="authProfilesTable">
       <thead><tr>
         <th>الرمز</th><th>الإدارة</th><th>الدرجة</th><th>المسمى</th>
-        <th>شاشات الهدف</th><th>البنود المزروعة</th><th>سقف الاعتماد</th><th>الإصدار</th><th>الحالة</th>
+        <th>شاشات الهدف</th><th>البنود المزروعة</th><th>سقف الاعتماد</th><th>الإصدار</th><th>الحالة</th><th>إجراء</th>
       </tr></thead>
       <tbody>
         <?php while ($r = $rows->fetch_assoc()): ?>
@@ -87,6 +89,9 @@ include __DIR__ . '/../insidebar.php';
           <td><span class="status-badge <?php echo $r['state'] === 'active' ? 'status-active' : 'status-pending'; ?>">
             <?php echo $r['state'] === 'active' ? 'نافذ' : ($r['state'] === 'retired' ? 'متقاعد' : 'مسودة — بانتظار اعتماد الفروق'); ?>
           </span></td>
+          <td><a class="action-btn edit" title="افتح في البناء"
+                 href="auth_profile_edit.php?id=<?php echo (int) $r['profile_id']; ?>">
+                <i class="fas fa-sliders"></i></a></td>
         </tr>
         <?php endwhile; ?>
       </tbody>

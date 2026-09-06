@@ -236,3 +236,6 @@ include __DIR__ . '/../includes/sales_family_tabs.php';
     if (document.querySelector('.alert-danger')) { open(true); }
 })();
 </script>
+
+</body>
+</html>

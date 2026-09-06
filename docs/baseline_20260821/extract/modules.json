@@ -9166,5 +9166,113 @@
         "icon": "fa fa-gavel",
         "display_order": "3",
         "owner_dept_note": "EX-CEO"
+    },
+    {
+        "id": "997",
+        "name": "لوحة الصلاحيات",
+        "code": "Governance\/perm_dashboard.php",
+        "owner_role_id": "15",
+        "group_id": null,
+        "is_link": "0",
+        "is_quick": "0",
+        "icon": "fa fa-th-large",
+        "display_order": "1",
+        "owner_dept_note": "DEP-08"
+    },
+    {
+        "id": "998",
+        "name": "الأدوار",
+        "code": "Governance\/perm_roles.php",
+        "owner_role_id": "15",
+        "group_id": null,
+        "is_link": "0",
+        "is_quick": "0",
+        "icon": "fa fa-user-tag",
+        "display_order": "2",
+        "owner_dept_note": "DEP-08"
+    },
+    {
+        "id": "999",
+        "name": "الوحدات والشاشات",
+        "code": "Governance\/perm_modules.php",
+        "owner_role_id": "15",
+        "group_id": null,
+        "is_link": "0",
+        "is_quick": "0",
+        "icon": "fa fa-cubes",
+        "display_order": "3",
+        "owner_dept_note": "DEP-08"
+    },
+    {
+        "id": "1000",
+        "name": "مصفوفة الصلاحيات",
+        "code": "Governance\/perm_matrix.php",
+        "owner_role_id": "15",
+        "group_id": null,
+        "is_link": "0",
+        "is_quick": "0",
+        "icon": "fa fa-table",
+        "display_order": "4",
+        "owner_dept_note": "DEP-08"
+    },
+    {
+        "id": "1001",
+        "name": "مجموعات السايدبار",
+        "code": "Governance\/perm_link_groups.php",
+        "owner_role_id": "15",
+        "group_id": null,
+        "is_link": "0",
+        "is_quick": "0",
+        "icon": "fa fa-layer-group",
+        "display_order": "5",
+        "owner_dept_note": "DEP-08"
+    },
+    {
+        "id": "1002",
+        "name": "عناصر الملاحة",
+        "code": "Governance\/perm_nav_items.php",
+        "owner_role_id": "15",
+        "group_id": null,
+        "is_link": "0",
+        "is_quick": "0",
+        "icon": "fa fa-compass",
+        "display_order": "6",
+        "owner_dept_note": "DEP-08"
+    },
+    {
+        "id": "1003",
+        "name": "دليل الشاشات",
+        "code": "Governance\/perm_screen_guide.php",
+        "owner_role_id": "15",
+        "group_id": null,
+        "is_link": "0",
+        "is_quick": "0",
+        "icon": "fa fa-book",
+        "display_order": "7",
+        "owner_dept_note": "DEP-08"
+    },
+    {
+        "id": "1004",
+        "name": "صلاحيات التقارير",
+        "code": "Governance\/perm_reports.php",
+        "owner_role_id": "15",
+        "group_id": null,
+        "is_link": "0",
+        "is_quick": "0",
+        "icon": "fa fa-file-shield",
+        "display_order": "8",
+        "owner_dept_note": "DEP-08"
+    },
+    {
+        "id": "1005",
+        "name": "حالة النظام",
+        "code": "Governance\/perm_system_status.php",
+        "owner_role_id": "15",
+        "group_id": null,
+        "is_link": "0",
+        "is_quick": "0",
+        "icon": "fa fa-heartbeat",
+        "display_order": "9",
+        "owner_dept_note": "DEP-08"
     }
 ]

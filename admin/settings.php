@@ -13,7 +13,7 @@ $db_msg = '';
 // أدوات قاعدة البيانات (سوبر أدمن حصرًا) — نسخ احتياطي / استيراد / استعادة
 // محصورة في قاعدة EMS وحدها؛ التنزيل يبثّ الملف وينهي التنفيذ قبل أي إخراج للصفحة.
 // ═══════════════════════════════════════════════════════════════════════════
-require_once __DIR__ . '/includes/db_tools.php';
+require_once dirname(__DIR__) . '/includes/db_tools.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && strncmp((string) ($_POST['action'] ?? ''), 'db_', 3) === 0) {
     $act = (string) $_POST['action'];

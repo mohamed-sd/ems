@@ -151,7 +151,64 @@ if ($victim) {
         "مردودٌ بعدَ الاستعادة={$d3} من {$c3}");
 }
 
-head('③ الجلسةُ لم تتسرَّب');
+head('③ **§2 — من لا يظهر له الرابطُ يستدعي المسارَ مباشرةً فيُمنع**');
+/* ◆ **نصُّ PERM-01-DEC §2**: «لا يُقبل أن «لا يردَّ أحدٌ يرى الرابط»… اختبارٌ
+     سالب: **من لا يظهر له الرابطُ يستدعي المسارَ مباشرةً فيُمنع**».
+   ◆ **والحكمُ على من لا رابطَ له ولا بندَ في قالبِه**: شاشةٌ تُبلَغ بالنقرِ من
+     غيرِها قد تكون في القالبِ بلا رابطٍ بحقّ (كرتُ المعدة) — فلا تُعَدُّ خرقًا.
+     المقصودُ من **لا يملكها أصلًا** ثمَّ يكتب مسارَها في المتصفّح. */
+$prev2 = isset($_SESSION['user']) ? $_SESSION['user'] : null;
+$dchecked = 0; $dopen = array();
+$ur = $conn->query("SELECT id, role, company_id FROM users
+                     WHERE is_deleted=0 AND status='active' AND company_id=4 ORDER BY id LIMIT 12");
+while ($u2 = $ur->fetch_assoc()) {
+    /* ما يظهر له فعلًا. */
+    $_SESSION['user'] = array('id' => (int) $u2['id'], 'role' => (string) $u2['role'],
+                              'company_id' => (int) $u2['company_id'], 'name' => 'direct url probe');
+    $ws2 = navarch_role_workspace($conn, (int) $u2['role']);
+    $tree2 = navarch_render($conn, $ws2, (int) $u2['role'], array('include_shell' => false));
+    $seen = array();
+    foreach ((isset($tree2['groups']) ? $tree2['groups'] : array()) as $g2) {
+        foreach ((isset($g2['items']) ? $g2['items'] : array()) as $i2) {
+            $k2 = strtolower(navarch_norm_route($i2['route']));
+            if (isset($modByRoute[$k2])) { $seen[$modByRoute[$k2]] = 1; }
+        }
+    }
+    /* وما في قالبِه (فبندُ قالبٍ بلا رابطٍ مشروعٌ ولا يُعَدُّ خرقًا). */
+    $inProf = array();
+    $pq2 = $conn->query("SELECT m.id FROM gov_authority_grants g
+                           JOIN gov_role_profiles p ON p.profile_id=g.profile_id AND p.state='active'
+                           JOIN gov_profile_items i ON i.profile_id=p.profile_id
+                                AND i.item_kind='screen' AND i.allow=1
+                           JOIN modules m ON m.code=i.item_ref
+                          WHERE g.user_id=" . (int) $u2['id'] . " AND g.revoked_at IS NULL");
+    while ($x2 = $pq2->fetch_row()) { $inProf[(int) $x2[0]] = 1; }
+
+    /* عيّنةٌ ممّا لا يملكه ولا يراه — ومنها شاشةُ البلاغاتِ المدمجةُ نصًّا. */
+    $cand = array();
+    $cq = $conn->query("SELECT id, code FROM modules
+                         WHERE code IN ('Tickets/dept_inbox.php','Tickets/tickets_list.php')
+                            OR code LIKE 'Finance/%' ORDER BY id LIMIT 25");
+    while ($c2 = $cq->fetch_assoc()) {
+        $mid2 = (int) $c2['id'];
+        if (isset($seen[$mid2]) || isset($inProf[$mid2])) { continue; }
+        $cand[$mid2] = $c2['code'];
+    }
+    foreach ($cand as $mid2 => $code2) {
+        $dchecked++;
+        if (!empty(get_module_permissions($conn, $mid2)['can_view'])) {
+            if (count($dopen) < 5) { $dopen[] = '#' . $u2['id'] . ' ⟵ ' . $code2; }
+        }
+    }
+    unset($_SESSION['user']);
+}
+if ($prev2 === null) { unset($_SESSION['user']); } else { $_SESSION['user'] = $prev2; }
+chk($dchecked >= 20, 'أزواجٌ فُحصت — ولا معنى لصفرِ مفحوص', "عدد={$dchecked}");
+chk(count($dopen) === 0,
+    '★★★ **من لا رابطَ له ولا بندَ في قالبِه يُمنع عند استدعاءِ المسارِ مباشرةً**',
+    count($dopen) === 0 ? "صفرٌ من {$dchecked}" : implode(' · ', $dopen));
+
+head('④ الجلسةُ لم تتسرَّب');
 chk(!isset($_SESSION['user']), '★ لا جلسةَ مسبارٍ باقيةٌ بعدَ المسح');
 
 fwrite(STDOUT, "\n──────────────────────────────────────────────────────────\n");

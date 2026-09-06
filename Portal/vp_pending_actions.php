@@ -136,4 +136,5 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         وتصعيدات المخاطر بلا اقرار، والمهل المتجاوزة تقاس بيوم القاعدة. الفعل عند فاعله المسمى في كل صف.
     </div>
 </div>
-<?php include '../infooter.php'; ?>
+</body>
+</html>

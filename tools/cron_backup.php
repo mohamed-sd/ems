@@ -1,11 +1,11 @@
 <?php
 /**
- * admin/cron_backup.php — مُشغّل النسخ الاحتياطي المجدوَل لقاعدة EMS.
+ * tools/cron_backup.php — مُشغّل النسخ الاحتياطي المجدوَل لقاعدة EMS.
  * ───────────────────────────────────────────────────────────────────────────
  * طرق التشغيل:
- *   (أ) جدولة النظام (CLI):   php admin/cron_backup.php
- *   (ب) الويب بمفتاح:          admin/cron_backup.php?key=BACKUP_CRON_KEY
- *   (ج) الشبكة الاحتياطية:     php admin/cron_backup.php --lazy   (تُطلقها اللوحة)
+ *   (أ) جدولة النظام (CLI):   php tools/cron_backup.php
+ *   (ب) الويب بمفتاح:          tools/cron_backup.php?key=BACKUP_CRON_KEY
+ *   (ج) الشبكة الاحتياطية:     php tools/cron_backup.php --lazy   (تُطلقها اللوحة)
  * يأخذ نسخةً مجدولةً فقط إن كانت الجدولة مفعّلةً وحان موعدها (ما لم يُمرَّر
  * --force أو ?force=1 فيأخذها فورًا). يتّبع نمط cron في المشروع (ADR-04):
  * CLI بلا مفتاح، ومسار الويب fail-closed إن كان BACKUP_CRON_KEY فارغًا.
@@ -16,7 +16,7 @@ $IS_CLI = (PHP_SAPI === 'cli');
 require __DIR__ . '/../config.php';
 require_once __DIR__ . '/../includes/cron_guard.php';
 ems_cron_guard('cron_backup.php'); // INJ-0025: لا تُشغَّل من المتصفّح
-require __DIR__ . '/includes/db_tools.php';
+require __DIR__ . '/../includes/db_tools.php';
 
 if (!$IS_CLI) {
     $key = isset($_GET['key']) ? (string) $_GET['key'] : '';

@@ -162,4 +162,5 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         باسم فترتها، وكل مؤشر بمعادلته ومصدره في صفه. قراءة صرف ولا ادخال.
     </div>
 </div>
-<?php include '../infooter.php'; ?>
+</body>
+</html>

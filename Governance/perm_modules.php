@@ -160,6 +160,10 @@ function pm_e($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); }
 ?>
 <div class="main ems-unified-page-shell" dir="rtl">
     <?php
+    /* PERM-01 — لافتةُ «تعامل قديم»: عدّادُ المنحِ لكلِّ وحدةٍ مصدرُه الجدولُ
+       الذي لم يعد يحكم، فلا يُقرأ حكمًا على من يرى الشاشةَ اليوم. */
+    require_once __DIR__ . '/../includes/legacy_perm_notice.php';
+    ems_legacy_perm_notice('read', 'وعداد المنح المعروض بجانب كل وحدة محسوب من هذا الجدول القديم.');
     $header_title = 'الوحدات والشاشات';
     $header_icon = 'fa fa-cubes';
     $header_actions = $can_add ? array(

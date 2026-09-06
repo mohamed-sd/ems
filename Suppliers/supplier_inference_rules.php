@@ -101,4 +101,5 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         والممنوع الصريح يعرض بعلته. قراءة صرف ولا ادخال.
     </div>
 </div>
-<?php include '../infooter.php'; ?>
+</body>
+</html>

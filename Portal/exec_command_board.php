@@ -160,4 +160,5 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         قراءة صرف ولا ادخال من هذه اللوحة.
     </div>
 </div>
-<?php include '../infooter.php'; ?>
+</body>
+</html>

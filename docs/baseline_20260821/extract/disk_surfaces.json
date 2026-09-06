@@ -659,8 +659,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 208,
-        "mtime": "2026-09-01"
+        "lines": 251,
+        "mtime": "2026-09-03"
     },
     {
         "path": "Clients\/quotation_negotiation.php",
@@ -676,8 +676,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 201,
-        "mtime": "2026-09-01"
+        "lines": 239,
+        "mtime": "2026-09-03"
     },
     {
         "path": "Clients\/quotations.php",
@@ -914,8 +914,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 297,
-        "mtime": "2026-08-30"
+        "lines": 309,
+        "mtime": "2026-09-03"
     },
     {
         "path": "Contracts\/contract_baseline_targets.php",
@@ -1985,8 +1985,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 1260,
-        "mtime": "2026-08-25"
+        "lines": 1276,
+        "mtime": "2026-09-04"
     },
     {
         "path": "Equipments\/equipment_sourcing.php",
@@ -5453,8 +5453,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 157,
-        "mtime": "2026-08-25"
+        "lines": 260,
+        "mtime": "2026-09-04"
     },
     {
         "path": "Governance\/auth_profiles.php",
@@ -5776,8 +5776,8 @@
         "thead": 0,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 284,
-        "mtime": "2026-09-01"
+        "lines": 369,
+        "mtime": "2026-09-04"
     },
     {
         "path": "Governance\/gifts_hospitality.php",
@@ -6086,6 +6086,23 @@
         "mtime": "2026-08-25"
     },
     {
+        "path": "Governance\/perm_dashboard.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 0,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 126,
+        "mtime": "2026-09-04"
+    },
+    {
         "path": "Governance\/perm_explain.php",
         "class": "SCREEN",
         "generator": "",
@@ -6099,8 +6116,161 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 327,
-        "mtime": "2026-09-01"
+        "lines": 329,
+        "mtime": "2026-09-04"
+    },
+    {
+        "path": "Governance\/perm_link_groups.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 1,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 339,
+        "mtime": "2026-09-03"
+    },
+    {
+        "path": "Governance\/perm_matrix.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 1,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 289,
+        "mtime": "2026-09-04"
+    },
+    {
+        "path": "Governance\/perm_modules.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 1,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 379,
+        "mtime": "2026-09-04"
+    },
+    {
+        "path": "Governance\/perm_nav_items.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 1,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 455,
+        "mtime": "2026-09-03"
+    },
+    {
+        "path": "Governance\/perm_quick_update.php",
+        "class": "HANDLER",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 0,
+        "header": 0,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 1,
+        "json": 1,
+        "thead": 0,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 114,
+        "mtime": "2026-09-03"
+    },
+    {
+        "path": "Governance\/perm_reports.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 208,
+        "mtime": "2026-09-03"
+    },
+    {
+        "path": "Governance\/perm_roles.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 1,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 476,
+        "mtime": "2026-09-04"
+    },
+    {
+        "path": "Governance\/perm_screen_guide.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 1,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 252,
+        "mtime": "2026-09-03"
+    },
+    {
+        "path": "Governance\/perm_system_status.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 232,
+        "mtime": "2026-09-04"
     },
     {
         "path": "Governance\/policies.php",
@@ -7765,8 +7935,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 190,
-        "mtime": "2026-08-25"
+        "lines": 228,
+        "mtime": "2026-09-03"
     },
     {
         "path": "Operations\/unit_perf.php",
@@ -7799,8 +7969,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 224,
-        "mtime": "2026-09-01"
+        "lines": 262,
+        "mtime": "2026-09-03"
     },
     {
         "path": "Opportunities\/opportunities.php",
@@ -10910,8 +11080,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 1037,
-        "mtime": "2026-08-25"
+        "lines": 1062,
+        "mtime": "2026-09-04"
     },
     {
         "path": "Settings\/roles.php",
@@ -10927,8 +11097,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 430,
-        "mtime": "2026-09-01"
+        "lines": 436,
+        "mtime": "2026-09-04"
     },
     {
         "path": "Settings\/settings.php",
@@ -11760,8 +11930,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 254,
-        "mtime": "2026-09-01"
+        "lines": 292,
+        "mtime": "2026-09-03"
     },
     {
         "path": "Suppliers\/suppliers.php",
@@ -12627,8 +12797,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 1304,
-        "mtime": "2026-08-25"
+        "lines": 1309,
+        "mtime": "2026-09-04"
     },
     {
         "path": "Transport\/cron_transfer.php",
@@ -13855,6 +14025,23 @@
         "mtime": "2026-08-25"
     },
     {
+        "path": "admin\/departments.php",
+        "class": "HANDLER",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 0,
+        "header": 0,
+        "bootstrap": 0,
+        "action_guard": 0,
+        "reads_post": 1,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 437,
+        "mtime": "2026-09-03"
+    },
+    {
         "path": "admin\/forgot_password.php",
         "class": "HANDLER",
         "generator": "",
@@ -13936,8 +14123,8 @@
         "thead": 0,
         "form": 0,
         "deprecated_mark": 0,
-        "lines": 489,
-        "mtime": "2026-08-24"
+        "lines": 490,
+        "mtime": "2026-09-03"
     },
     {
         "path": "admin\/index.php",
@@ -13953,8 +14140,8 @@
         "thead": 0,
         "form": 0,
         "deprecated_mark": 0,
-        "lines": 8,
-        "mtime": "2026-05-10"
+        "lines": 19,
+        "mtime": "2026-09-03"
     },
     {
         "path": "admin\/login.php",
@@ -13970,8 +14157,8 @@
         "thead": 0,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 331,
-        "mtime": "2026-08-25"
+        "lines": 284,
+        "mtime": "2026-09-03"
     },
     {
         "path": "admin\/logout.php",
@@ -14008,74 +14195,6 @@
         "mtime": "2026-08-25"
     },
     {
-        "path": "admin\/ops_manager_board.php",
-        "class": "SCREEN",
-        "generator": "",
-        "u13_screen": "",
-        "sidebar": 1,
-        "header": 1,
-        "bootstrap": 1,
-        "action_guard": 0,
-        "reads_post": 0,
-        "json": 0,
-        "thead": 1,
-        "form": 0,
-        "deprecated_mark": 0,
-        "lines": 229,
-        "mtime": "2026-08-30"
-    },
-    {
-        "path": "admin\/org_assignments.php",
-        "class": "SCREEN",
-        "generator": "",
-        "u13_screen": "",
-        "sidebar": 1,
-        "header": 1,
-        "bootstrap": 1,
-        "action_guard": 0,
-        "reads_post": 1,
-        "json": 0,
-        "thead": 1,
-        "form": 1,
-        "deprecated_mark": 0,
-        "lines": 290,
-        "mtime": "2026-08-30"
-    },
-    {
-        "path": "admin\/org_permits.php",
-        "class": "SCREEN",
-        "generator": "",
-        "u13_screen": "",
-        "sidebar": 1,
-        "header": 1,
-        "bootstrap": 1,
-        "action_guard": 0,
-        "reads_post": 1,
-        "json": 0,
-        "thead": 1,
-        "form": 1,
-        "deprecated_mark": 0,
-        "lines": 246,
-        "mtime": "2026-08-30"
-    },
-    {
-        "path": "admin\/org_structure.php",
-        "class": "SCREEN",
-        "generator": "",
-        "u13_screen": "",
-        "sidebar": 1,
-        "header": 1,
-        "bootstrap": 1,
-        "action_guard": 0,
-        "reads_post": 0,
-        "json": 0,
-        "thead": 0,
-        "form": 0,
-        "deprecated_mark": 0,
-        "lines": 122,
-        "mtime": "2026-08-30"
-    },
-    {
         "path": "admin\/perm_system.php",
         "class": "INCLUDE",
         "generator": "",
@@ -14089,8 +14208,8 @@
         "thead": 1,
         "form": 0,
         "deprecated_mark": 0,
-        "lines": 276,
-        "mtime": "2026-08-31"
+        "lines": 281,
+        "mtime": "2026-09-04"
     },
     {
         "path": "admin\/permissions\/index.php",
@@ -14174,8 +14293,8 @@
         "thead": 0,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 813,
-        "mtime": "2026-08-25"
+        "lines": 821,
+        "mtime": "2026-09-04"
     },
     {
         "path": "admin\/permissions\/roles.php",
@@ -14261,40 +14380,6 @@
         "deprecated_mark": 0,
         "lines": 141,
         "mtime": "2026-08-25"
-    },
-    {
-        "path": "admin\/sec_employee_wizard.php",
-        "class": "SCREEN",
-        "generator": "",
-        "u13_screen": "",
-        "sidebar": 1,
-        "header": 1,
-        "bootstrap": 1,
-        "action_guard": 0,
-        "reads_post": 1,
-        "json": 0,
-        "thead": 1,
-        "form": 1,
-        "deprecated_mark": 0,
-        "lines": 285,
-        "mtime": "2026-08-30"
-    },
-    {
-        "path": "admin\/sec_governance.php",
-        "class": "SCREEN",
-        "generator": "",
-        "u13_screen": "",
-        "sidebar": 1,
-        "header": 1,
-        "bootstrap": 1,
-        "action_guard": 0,
-        "reads_post": 1,
-        "json": 0,
-        "thead": 1,
-        "form": 1,
-        "deprecated_mark": 0,
-        "lines": 315,
-        "mtime": "2026-08-31"
     },
     {
         "path": "admin\/settings.php",
@@ -14650,8 +14735,8 @@
         "thead": 0,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 1472,
-        "mtime": "2026-08-25"
+        "lines": 1483,
+        "mtime": "2026-09-03"
     },
     {
         "path": "company\/request_subscription.php",
@@ -14667,8 +14752,8 @@
         "thead": 0,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 379,
-        "mtime": "2026-08-25"
+        "lines": 390,
+        "mtime": "2026-09-03"
     },
     {
         "path": "company\/reset_password.php",
@@ -14718,8 +14803,8 @@
         "thead": 0,
         "form": 0,
         "deprecated_mark": 0,
-        "lines": 638,
-        "mtime": "2026-08-25"
+        "lines": 651,
+        "mtime": "2026-09-03"
     },
     {
         "path": "cron_events.php",
@@ -15011,6 +15096,74 @@
         "mtime": "2026-08-25"
     },
     {
+        "path": "main\/ops_manager_board.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 229,
+        "mtime": "2026-09-03"
+    },
+    {
+        "path": "main\/org_assignments.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 1,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 290,
+        "mtime": "2026-09-03"
+    },
+    {
+        "path": "main\/org_permits.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 1,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 246,
+        "mtime": "2026-09-03"
+    },
+    {
+        "path": "main\/org_structure.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 0,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 122,
+        "mtime": "2026-09-03"
+    },
+    {
         "path": "main\/profile.php",
         "class": "SCREEN",
         "generator": "",
@@ -15041,8 +15194,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 1089,
-        "mtime": "2026-08-31"
+        "lines": 1096,
+        "mtime": "2026-09-04"
     },
     {
         "path": "main\/role_board.php",
@@ -15060,6 +15213,40 @@
         "deprecated_mark": 0,
         "lines": 143,
         "mtime": "2026-08-25"
+    },
+    {
+        "path": "main\/sec_employee_wizard.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 1,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 285,
+        "mtime": "2026-09-03"
+    },
+    {
+        "path": "main\/sec_governance.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 1,
+        "json": 0,
+        "thead": 1,
+        "form": 1,
+        "deprecated_mark": 0,
+        "lines": 315,
+        "mtime": "2026-09-03"
     },
     {
         "path": "main\/soon.php",
@@ -15211,8 +15398,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 1846,
-        "mtime": "2026-08-25"
+        "lines": 1859,
+        "mtime": "2026-09-04"
     },
     {
         "path": "movement\/project_drivers.php",
@@ -15228,8 +15415,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 1153,
-        "mtime": "2026-08-25"
+        "lines": 1159,
+        "mtime": "2026-09-03"
     },
     {
         "path": "movement\/save_equipment_drivers.php",

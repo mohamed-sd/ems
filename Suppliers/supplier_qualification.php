@@ -131,4 +131,5 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         وتخزينها فجوة جاهزية معلنة تفك بعمودها وقناته. لا كتابة من هذه الشاشة.
     </div>
 </div>
-<?php include '../infooter.php'; ?>
+</body>
+</html>

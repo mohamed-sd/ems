@@ -70,7 +70,7 @@
         "verdict_rule": "سطح حي بادارة مالكة وحارس خادمي — مصدر نطاقه | مسمى من nav_canonical | سياسة من المنح الحي: 1 دورا | حكم المالك: اصلح الشاشة ولا تغير الاسم — واللوحات Projection ولا يجوز ان تكون Source of Truth · قياس: صفر كتابة | حكم المالك: اصلح الشاشة و",
         "src_ref": "قياسٌ حيٌّ على القرص",
         "on_disk_measured": 1,
-        "disk_match": "ROUTE",
+        "disk_match": "BASENAME",
         "disk_class": "SCREEN",
         "is_asbuilt": 1
     },
@@ -95,7 +95,7 @@
         "verdict_rule": "مساحة قيادة — الرؤية لا تساوي السلطة (البند 27) | مسمى من nav_canonical APPROVED | سياسة من المنح الحي: 5 دورا | SM:M1_EXACT | SM:M1_EXACT | SM:M1_EXACT | SM:M1_EXACT | SM:M1_EXACT | SM:M1_EXACT",
         "src_ref": "live:gov_screen_cycle + 10 › 02_شاشة_بشاشة › ص462",
         "on_disk_measured": 1,
-        "disk_match": "ROUTE",
+        "disk_match": "BASENAME",
         "disk_class": "SCREEN",
         "is_asbuilt": 1
     },
@@ -120,7 +120,7 @@
         "verdict_rule": "سطح حي بادارة مالكة وحارس خادمي — مصدر نطاقه | مسمى من nav_canonical APPROVED | سياسة من المنح الحي: 3 دورا",
         "src_ref": "live:gov_screen_cycle + 10 › 02_شاشة_بشاشة › ص543",
         "on_disk_measured": 1,
-        "disk_match": "ROUTE",
+        "disk_match": "BASENAME",
         "disk_class": "SCREEN",
         "is_asbuilt": 1
     },
@@ -145,7 +145,7 @@
         "verdict_rule": "مساحة قيادة — الرؤية لا تساوي السلطة (البند 27) | مسمى من nav_canonical APPROVED | سياسة من المنح الحي: 5 دورا",
         "src_ref": "live:gov_screen_cycle + 10 › 02_شاشة_بشاشة › ص461",
         "on_disk_measured": 1,
-        "disk_match": "ROUTE",
+        "disk_match": "BASENAME",
         "disk_class": "SCREEN",
         "is_asbuilt": 1
     },
@@ -220,7 +220,7 @@
         "verdict_rule": "سطح حي بادارة مالكة وحارس خادمي — مصدر نطاقه | مسمى من nav_canonical | سياسة من المنح الحي: 1 دورا | SM:M1_EXACT | SM:M1_EXACT | SM:M1_EXACT | SM:M1_EXACT | SM:M1_EXACT | SM:M1_EXACT",
         "src_ref": "قياسٌ حيٌّ على القرص",
         "on_disk_measured": 1,
-        "disk_match": "ROUTE",
+        "disk_match": "BASENAME",
         "disk_class": "SCREEN",
         "is_asbuilt": 1
     },
@@ -245,7 +245,7 @@
         "verdict_rule": "سطح حي بادارة مالكة وحارس خادمي — مصدر نطاقه | مسمى من nav_canonical APPROVED | سياسة من المنح الحي: 1 دورا | SM:M1_EXACT | SM:M1_EXACT",
         "src_ref": "live:gov_screen_cycle + 10 › 02_شاشة_بشاشة › ص213",
         "on_disk_measured": 1,
-        "disk_match": "ROUTE",
+        "disk_match": "BASENAME",
         "disk_class": "SCREEN",
         "is_asbuilt": 1
     },

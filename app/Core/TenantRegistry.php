@@ -970,7 +970,13 @@ class TenantRegistry
         // الوحداتُ والتكليفاتُ بياناتُ مستأجرٍ بcompany_id؛ والأنواعُ كتالوجٌ مشترك؛
         // والأبناءُ (صلاحياتٌ وخطوطٌ وسجلٌّ) يُعزلون عبر أبيهم org_assignments.
         'org_units' => array('type' => self::T_TENANT, 'soft' => false),
-        'org_assignment_types' => array('type' => self::T_CATALOG, 'soft' => false),
+        /* ② كان `T_CATALOG` — والكتالوجُ يحقن شرطًا على `company_id`
+           (`TenantDb.php:796`)، **وهذا الجدولُ بلا عمودِ `company_id` أصلًا**
+           (‏سبعةُ أعمدةٍ ليس فيها واحد). فكان كلُّ استعلامٍ عليه بالبوّابةِ يرسب
+           `Unknown column 'org_assignment_types.company_id'` ويُلتقَط صامتًا،
+           فيُصيَّر القسمُ فارغًا. مقيسٌ حيًّا في `Portal/vp_departments.php:47`.
+           وهو مرجعُ نظامٍ عامٌّ لا كتالوجُ مستأجِر. */
+        'org_assignment_types' => array('type' => self::T_GLOBAL, 'soft' => false),
         'org_assignments' => array('type' => self::T_TENANT, 'soft' => false),
         'assignment_capabilities' => array('type' => self::T_CHILD, 'soft' => false,
             'parent' => 'org_assignments', 'fk' => 'asg_id'), // ORG-01 §2⑤
@@ -980,7 +986,9 @@ class TenantRegistry
             'parent' => 'org_assignments', 'fk' => 'asg_id'), // ORG-01 §2⑧: Insert-only
         'v_org_unit_heads' => array('type' => self::T_TENANT, 'soft' => false), // ORG-02: الاشتقاق للقراءة
         // ── update0004 · ORG-01 §5/§7: الأذونات المشتركة ──
-        'permit_types' => array('type' => self::T_CATALOG, 'soft' => false),
+        /* ② العطبُ نفسُه: بلا عمودِ `company_id` فلا يصلح كتالوجًا. كُشف بمسحِ
+           العائلةِ كلِّها بعدَ ظهورِ نظيرِه — لا بانتظارِ شاشةٍ تشتكي. */
+        'permit_types' => array('type' => self::T_GLOBAL, 'soft' => false),
         'permit_requests' => array('type' => self::T_TENANT, 'soft' => false),
         'permit_required_approvals' => array('type' => self::T_CHILD, 'soft' => false,
             'parent' => 'permit_types', 'fk' => 'permit_type_code'), // مصفوفة §5 منمذَجة
@@ -1031,10 +1039,23 @@ class TenantRegistry
              لا مرجعٌ مجمَّدٌ للسوبر. أمّا **القوالبُ فتبقى غيرَ مُدارة**: الخدمةُ
              تقرؤها ولا تكتبها، فتحريرُها بابٌ آخرُ لم يُفتَح بعد. */
         'gov_authority_grants' => array('type' => self::T_GLOBAL, 'soft' => false, 'managed' => true),
-        'gov_role_profiles' => array('type' => self::T_GLOBAL, 'soft' => false),
+        /* ◆ **PERM-02**: القوالبُ وبنودُها وسجلُّ اعتمادِها صارت **مُدارةً** أيضًا —
+             فتحريرُها بابٌ فُتِح الآن، وهو `PolicyWriteService` نفسُه لا غيرُه.
+             ووسمُ `managed` يعني: يديرها التطبيقُ بحوكمةِ الشاشةِ والتجميدِ
+             والأثرِ، ولا تُمَسُّ بصفٍّ يدويّ. */
+        'gov_role_profiles' => array('type' => self::T_GLOBAL, 'soft' => false, 'managed' => true),
+        'gov_profile_items' => array('type' => self::T_GLOBAL, 'soft' => false, 'managed' => true),
+        'gov_profile_activation_approval' => array('type' => self::T_GLOBAL, 'soft' => false, 'managed' => true),
+        /* ◆ **PERM-03**: سجلّا واقعةِ التفويضِ والرفعِ — يسبقان المنحةَ المؤقّتةَ
+             وتُربط بمعرِّفِهما، فلا يُحشى السببُ نصًّا في منحةٍ بلا سجلّ. */
+        'gov_delegations' => array('type' => self::T_GLOBAL, 'soft' => false, 'managed' => true),
+        'gov_elevations' => array('type' => self::T_GLOBAL, 'soft' => false, 'managed' => true),
         /* ◆ وسجلُّ التجميدِ **بلا `company_id`** — قرارُ سياسةٍ عامٌّ لا واقعةُ
              مستأجِر، فيُعلَن عامًّا ولا يُقحَم له نطاق. */
-        'gov_policy_freeze' => array('type' => self::T_GLOBAL, 'soft' => false),
+        /* ◆ **PERM-02**: والبوّابةُ `managed` أيضًا — انتقلت من «سدٍّ دائمٍ يُفتح
+             بهجرة» إلى **وضعِ صيانةٍ يملكه مديرُ الصلاحيّاتِ** من الكونسول بسببٍ
+             مكتوبٍ وسطرِ أثر. والقادحُ يبقى الحكمَ الأخير، فلا التفافَ عليه. */
+        'gov_policy_freeze' => array('type' => self::T_GLOBAL, 'soft' => false, 'managed' => true),
         'guard_override_policies' => array('type' => self::T_GLOBAL, 'soft' => false),
         'sensitive_field_policies' => array('type' => self::T_GLOBAL, 'soft' => false),
         'effective_permissions' => array('type' => self::T_TENANT, 'soft' => false),
@@ -1142,6 +1163,58 @@ class TenantRegistry
         // ── وسلاليم الاعتماد كذلك: تقرأ في محرك الاعتماد وتعرض في سطح W14 ──
         'gov_ladders' => array('type' => self::T_TENANT, 'soft' => false),
         'gov_ladder_steps' => array('type' => self::T_TENANT, 'soft' => false),
+
+        /* ══ ③ جداولُ أسطحِ الدليلِ (W14) — كانت خارجَ السجلِّ فتفشل مغلقةً ═══════
+           `includes/w14_grid.php:215` يلتقط استثناءَ «جدولٌ غيرُ مسجَّل» ويُرجع
+           مصفوفةً فارغةً ويسجّل سطرًا — فالسطحُ يُصيَّر **فارغًا بلا إشعارٍ
+           للمستخدم**. قِيست 77 واقعةً على 29 جدولًا في مسحٍ واحدٍ لأسطحِ المبيعات.
+           ◆ **والتصنيفُ مشتقٌّ من المخطَّطِ لا اجتهاد**: التسعةُ والعشرون كلُّها
+             قائمةٌ في القاعدةِ **وكلُّها تحمل عمودَ `company_id`** — فهي مستأجَرةٌ
+             بلا لبس، والعزلُ يُحقن كما يُحقن لأخواتِها.
+           ⚠ وأثرُه سلوكيٌّ مُعلَن: أسطحٌ كانت تُصيَّر فارغةً ستبدأ تعرض صفوفَها. */
+        'dvp_dashboard_kpi' => array('type' => self::T_TENANT, 'soft' => false),
+        'dvp_vp_pending_actions' => array('type' => self::T_TENANT, 'soft' => false),
+        'exec_org_project' => array('type' => self::T_TENANT, 'soft' => false),
+        'exec_request_queue' => array('type' => self::T_TENANT, 'soft' => false),
+        'my_achievement' => array('type' => self::T_TENANT, 'soft' => false),
+        'my_portal' => array('type' => self::T_TENANT, 'soft' => false),
+        'my_reports' => array('type' => self::T_TENANT, 'soft' => false),
+        'my_requests' => array('type' => self::T_TENANT, 'soft' => false),
+        'my_tasks' => array('type' => self::T_TENANT, 'soft' => false),
+        'my_user_capacities' => array('type' => self::T_TENANT, 'soft' => false),
+        'sal_claims' => array('type' => self::T_TENANT, 'soft' => false),
+        'sal_client_contacts' => array('type' => self::T_TENANT, 'soft' => false),
+        'sal_client_need_rfq' => array('type' => self::T_TENANT, 'soft' => false),
+        'sal_clients' => array('type' => self::T_TENANT, 'soft' => false),
+        'sal_commercial_board' => array('type' => self::T_TENANT, 'soft' => false),
+        'sal_contracts' => array('type' => self::T_TENANT, 'soft' => false),
+        'sal_projects' => array('type' => self::T_TENANT, 'soft' => false),
+        'sal_quotation_negotiation' => array('type' => self::T_TENANT, 'soft' => false),
+        'sal_quotations' => array('type' => self::T_TENANT, 'soft' => false),
+        'sup_dictionary_migration' => array('type' => self::T_TENANT, 'soft' => false),
+        'sup_dictionary_rule_derivation' => array('type' => self::T_TENANT, 'soft' => false),
+        'sup_list_ref' => array('type' => self::T_TENANT, 'soft' => false),
+        'sup_migration' => array('type' => self::T_TENANT, 'soft' => false),
+        'sup_qualification_legal_credit' => array('type' => self::T_TENANT, 'soft' => false),
+        'sup_report_accept' => array('type' => self::T_TENANT, 'soft' => false),
+        'sup_trace_migration' => array('type' => self::T_TENANT, 'soft' => false),
+        'tkt_ticket_contextual_open' => array('type' => self::T_TENANT, 'soft' => false),
+        'tkt_ticket_form' => array('type' => self::T_TENANT, 'soft' => false),
+        'tkt_tickets_list' => array('type' => self::T_TENANT, 'soft' => false),
+
+        /* وثلاثةٌ أخرى كشفتها المراجعةُ العكسيّةُ من **نداءاتٍ غيرِ نداءِ الدليل**
+           — فلم تكن في قائمةِ التسعةِ والعشرين. وكلتاهما بعمودِ `company_id`:
+           `v_supplier_share_units` عرضٌ (VIEW) و`fin_ratio_targets` جدولٌ أساس. */
+        'v_supplier_share_units' => array('type' => self::T_TENANT, 'soft' => false),
+        'fin_ratio_targets' => array('type' => self::T_TENANT, 'soft' => false),
+
+        /* ⛔ **وثلاثةٌ أفلتت من المسحِ النصّيِّ لأنّ اسمَ الجدولِ يُمرَّر متغيّرًا**
+           (`Portal/vp_departments.php:95` يدور على خريطةِ إدارةٍ ⇐ جدولِ مؤشِّرات).
+           فالبحثُ عن `select('اسم')` حرفيًّا **يعمى عن النداءِ المتغيِّر** — ولم
+           يظهرْ إلّا بقراءةِ السجلِّ بعدَ التصيير. وكلُّها بعمودِ `company_id`. */
+        'fin_quality_kpis' => array('type' => self::T_TENANT, 'soft' => false),
+        'mnt_kpi_period' => array('type' => self::T_TENANT, 'soft' => false),
+        'trp_kpi_period' => array('type' => self::T_TENANT, 'soft' => false),
     );
 
     /** تعريف جدولٍ أو null إن لم يكن مسجَّلًا. */

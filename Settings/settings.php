@@ -293,6 +293,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </div>
                     <i class="fas fa-arrow-left settings-card-arrow"></i>
                 </a>
+                <?php /* بلا شرطِ دورٍ: يراها كلُّ من وصل هذه الصفحةَ أصلًا */ ?>
+                <a href="links_control.php" class="settings-card">
+                    <div class="settings-icon account"><i class="fas fa-link"></i></div>
+                    <div class="settings-meta">
+                        <h4>تحكم الروابط</h4>
+                        <p>اختر ما يظهر من شاشات دورك في الوصول السريع وفي القائمة الجانبية.</p>
+                    </div>
+                    <i class="fas fa-arrow-left settings-card-arrow"></i>
+                </a>
             </div>
         </div>
 

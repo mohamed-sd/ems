@@ -303,7 +303,9 @@ include '../insidebar.php';
         <strong>② العمل اليومي:</strong> <a class="btn-primary" href="sec_employee_wizard.php">معالج إعداد موظف — إحدى عشرة خطوة ▸</a>
         &nbsp; <strong>③ السجلات:</strong>
         <a class="btn-primary" href="org_assignments.php">التكليفات ▸</a>
-        <a class="btn-primary" href="../admin/permissions/">قوالب الصلاحيات القديمة ▸</a>
+        <?php /* كان هنا رابطٌ إلى `../admin/permissions/` — كونسولُ المزوّدِ المُغلقُ
+                 بـ403. والقوالبُ الحاكمةُ اليومَ `gov_role_profiles` وشاشتُها هذه. */ ?>
+        <a class="btn-primary" href="../Governance/auth_profiles.php">قوالب الصلاحيات ▸</a>
         <a class="btn-primary" href="../Governance/signing_authority.php">التفويضات ▸</a>
     </div></div>
 </div>

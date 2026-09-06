@@ -1,6 +1,6 @@
 <?php
 /**
- * contracts/contract_baseline_targets.php — خط الأساس والمستهدفات (DEP-01 · GOV_EXEC §5)
+ * Contracts/contract_baseline_targets.php — خط الأساس والمستهدفات (DEP-01 · GOV_EXEC §5)
  * ──────────────────────────────────────────────────────────────────────
  * ◆ ملفٌّ مولَّد (gov_exec:generated) من `tools/gov_exec_dept_build.php`
  *   ومواصفتِه في `tools/specs/`. لا يُحرَّر يدويًّا — أعِد التوليد.
@@ -13,7 +13,7 @@
  *   أصلًا (OBL-0052). فأسماءُ الحقولِ من الورقةِ حرفًا ولا تُكتب هنا.
  */
 $U13 = array(
-    'file'       => 'contracts/contract_baseline_targets.php',
+    'file'       => 'Contracts/contract_baseline_targets.php',
     'screen'     => 'sal_baseline_targets',
     'table'      => 'contract_monthly_plan',
     'title'      => 'خط الأساس والمستهدفات',

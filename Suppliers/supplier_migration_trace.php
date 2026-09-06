@@ -98,4 +98,5 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         وما بلا نسب يعد ويسمى ولا يخفى. قراءة صرف ولا ادخال.
     </div>
 </div>
-<?php include '../infooter.php'; ?>
+</body>
+</html>

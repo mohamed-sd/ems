@@ -182,7 +182,36 @@ chk($revoked === false, '★ والمسحوبُ لا يفتح ولو بقي وق
 
 if ($prev === null) { unset($_SESSION['user']); } else { $_SESSION['user'] = $prev; }
 
-head('⑤ الأثرُ مكتوب');
+head('⑤ **المنتهي تنهيه المهمّةُ الدوريّة** — لا الحارسُ وحدَه');
+/* ◆ **نصُّ قبولِ ق-٢**: «المنتهي **تنهيه المهمّةُ الدوريّة**». والحارسُ يمنعه
+     بشرطِ `valid_to` فورًا (فحصٌ سابق) — لكنَّ الحالةَ تبقى `active` في المخزنِ
+     حتى تمرَّ المهمّة، فيُقرأ السجلُّ «استثناءٌ حيٌّ» وهو منتهٍ. فيُختبر الشقّان.
+   ⛔ **وتشغيلُ المهمّةِ لا يُفترَض من تعليقٍ**: نُودِيت فعلًا وقِيست الحالةُ قبلَها
+     وبعدَها — ومطابقةُ عبارةٍ في شرحٍ أخضرُ كاذب. */
+require_once dirname(__DIR__) . '/app/Services/Security/ExpiryJob.php';
+$exp = $conn->query("SELECT ex_id FROM permission_exceptions
+                      WHERE reason LIKE '%شاهد كسر الزجاج%' LIMIT 1")->fetch_assoc();
+chk($exp !== null, 'وُجد استثناءُ الشاهدِ للقياس', $exp ? ('#' . $exp['ex_id']) : 'لا شيء');
+if ($exp) {
+    $EXID = (int) $exp['ex_id'];
+    $conn->query("UPDATE permission_exceptions
+                     SET state='active', valid_to = DATE_SUB(NOW(), INTERVAL 2 MINUTE)
+                   WHERE ex_id = {$EXID}");
+    $before = (string) $conn->query("SELECT state FROM permission_exceptions
+                                      WHERE ex_id={$EXID}")->fetch_row()[0];
+    chk($before === 'active', 'الحالُ قبلَ المهمّة: حيٌّ ومنتهٍ — وبلا ذلك لا معنى للقياس',
+        "state={$before}");
+
+    \App\Services\Security\ExpiryJob::run($conn);
+
+    $after = (string) $conn->query("SELECT state FROM permission_exceptions
+                                     WHERE ex_id={$EXID}")->fetch_row()[0];
+    chk($after === 'expired',
+        '★★ **المهمّةُ الدوريّةُ أنهت المنتهي فعلًا** — نُودِيت وقِيس أثرُها',
+        "state={$before} ⇐ {$after}");
+}
+
+head('⑥ الأثرُ مكتوب');
 $n = (int) $conn->query("SELECT COUNT(*) FROM perm_change_log
                           WHERE reason LIKE '%شاهد كسر الزجاج%'")->fetch_row()[0];
 chk($n >= 1, '★ سطرُ أثرٍ لكلِّ فتحٍ اضطراريّ', "صفوف={$n}");

@@ -115,4 +115,5 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         لوحة قراءة مشتقة كليا: كل مؤشر يذكر معادلته ومصدره في صفه، والعملات تجمع كل عملة على حدة بلا خلط، ولا ادخال من هذه الشاشة.
     </div>
 </div>
-<?php include '../infooter.php'; ?>
+</body>
+</html>

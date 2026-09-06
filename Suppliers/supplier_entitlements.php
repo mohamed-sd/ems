@@ -222,4 +222,5 @@ $dangling = 0;
 .ent-mstate{font-size:12px;color:var(--c-6b7280, #6b7280)}
 .ent-warn{margin:12px 0 0;color:var(--c-92400e, #92400e);line-height:1.8}
 </style>
-<?php include '../infooter.php'; ?>
+</body>
+</html>

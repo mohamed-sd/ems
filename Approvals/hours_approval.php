@@ -452,7 +452,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   $header_title   = 'اعتماد الوحدات التشغيلية';
   $header_icon    = 'fa fa-check-double';
   $header_actions = array(
-      array('href' => ($is_admin ? '../admin/dashboard.php' : '../main/dashboard.php'), 'class' => 'btn btn-secondary btn-sm fw-semibold', 'icon' => 'fa fa-home me-1', 'label' => 'لوحة التحكم'),
+      array('href' => '../main/dashboard.php', 'class' => 'btn btn-secondary btn-sm fw-semibold', 'icon' => 'fa fa-home me-1', 'label' => 'لوحة التحكم'),
       array('href' => 'hours_approval_followup.php', 'class' => 'btn btn-primary btn-sm fw-semibold', 'icon' => 'fa fa-route me-1', 'label' => 'متابعة الاعتمادات المنقولة'),
       array('raw' => '<span class="badge bg-light text-dark border">فلتر نوع المعدة: ' . htmlspecialchars($equip_type_label) . '</span>'),
   );

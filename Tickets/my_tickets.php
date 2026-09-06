@@ -108,3 +108,6 @@ echo ems_states_bundle('لا بلاغ رفعته أنت بعد',
   </div></div>
   <?php endif; ?>
 </div>
+
+</body>
+</html>

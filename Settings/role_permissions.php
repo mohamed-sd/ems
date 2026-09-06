@@ -721,6 +721,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 <div class="main">
 <?php
+/* PERM-01 — لافتةُ «تعامل قديم» في أوّلِ المتن: الشاشةُ تعرض الجدولَ الذي حُذف
+   فرعُه من دالّةِ القرار، وتحريرُها مقفلٌ أعلاه، فيُقال ذلك قبل أن يُقرأ صفّ. */
+require_once __DIR__ . '/../includes/legacy_perm_notice.php';
+ems_legacy_perm_notice('read', 'والتحرير في هذه الشاشة مقفل، وأي حفظ يرد بسببه.');
 /* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ — الشاشةُ كانت بلا رأسٍ معلَن. */
 $header_icon = 'fas fa-window-maximize';
 $header_title_html = htmlspecialchars('صلاحيات الأدوار', ENT_QUOTES, 'UTF-8');

@@ -14,7 +14,7 @@
  * ═══════════════════════════════════════════════════════════════════════════
  */
 
-require_once dirname(__DIR__, 2) . '/includes/portable_paths.php';
+require_once __DIR__ . '/portable_paths.php';
 
 if (!function_exists('ems_dbtool_bin_dir')) {
 
@@ -52,7 +52,7 @@ if (!function_exists('ems_dbtool_bin_dir')) {
     /** مجلد تخزين النسخ (storage/backups — محجوب عن الويب عبر storage/.htaccess). */
     function ems_dbtool_backup_dir()
     {
-        $dir = dirname(__DIR__, 2) . '/storage/backups';
+        $dir = dirname(__DIR__) . '/storage/backups';
         if (!is_dir($dir)) {
             @mkdir($dir, 0700, true);
         }
@@ -107,13 +107,27 @@ if (!function_exists('ems_dbtool_bin_dir')) {
     /** كتابة ملف اعتماداتٍ مؤقّت للعميل. يُحذف فور الاستعمال. يُعيد المسار أو null. */
     function ems_dbtool_write_cnf()
     {
+        /* ⛔ **`DB_HOST` قد يحمل المنفذَ معه**: صيغةُ `localhost:3307` مفهومةٌ
+             لـ`mysqli` ومجهولةٌ لـ`mysqldump` — كان يُكتب المضيفُ كاملًا في ملفِّ
+             الخيارات فيردُّ الخادمُ `Unknown MySQL server host 'localhost:3307'`
+             ويفشل النسخُ كلَّ مرّة. يُشقُّ هنا كما يشقُّه كلُّ مُهاجرٍ في المشروع. */
         $host = (string) ems_env('DB_HOST');
-        $user = (string) ems_env('DB_USER');
-        $pass = (string) ems_env('DB_PASS');
+        $port = '';
+        if (strpos($host, ':') !== false) {
+            list($host, $port) = explode(':', $host, 2);
+            $port = (string) (int) $port;
+        }
+        /* ⛔ **حسابُ التطبيقِ لا يكفي للنسخ**: `ems_app` بلا `SHOW VIEW`، فأوّلُ
+             عرضٍ (`client_contracts`) يوقف `mysqldump` بـ1142. وحسابُ المُهاجرِ
+             هو ما تستعمله المهمّةُ اليوميّةُ الناجحة (`tools/ops01_daily_backup.php`)
+             — فيُقرأ المصدرُ نفسُه هنا بدل حسابٍ ثالث. */
+        $user = (string) (ems_env('DB_MIGRATOR_USER') ?: ems_env('DB_USER'));
+        $pass = (string) (ems_env('DB_MIGRATOR_USER') ? ems_env('DB_MIGRATOR_PASS') : ems_env('DB_PASS'));
         $path = ems_dbtool_backup_dir() . '/.cnf_' . bin2hex(random_bytes(8)) . '.ini';
         // صيغة ملف خيارات MariaDB: القيمة بين علامتَي اقتباس تُجرَّد منهما (يدعم كلمة فارغة/برموز).
         $content = "[client]\n"
                  . 'host="' . $host . "\"\n"
+                 . ($port !== '' ? 'port=' . $port . "\n" : '')
                  . 'user="' . $user . "\"\n"
                  . 'password="' . $pass . "\"\n";
         if (@file_put_contents($path, $content) === false) {
@@ -188,7 +202,14 @@ if (!function_exists('ems_dbtool_bin_dir')) {
         $safePrefix = preg_replace('/[^a-z0-9_]/i', '', $prefix);
         $out = ems_dbtool_backup_dir() . '/' . $safePrefix . '_' . date('Ymd_His') . '.sql';
 
-        $args = array(
+        /* ⛔ **عُدّةُ MySQL 8 على خادمِ MariaDB**: `mysqldump` من MySQL 8 يسأل
+             `information_schema.COLUMN_STATISTICS` وهو جدولٌ لا وجودَ له في
+             MariaDB، فيفشل النسخُ بـ`Unknown table 'column_statistics'`.
+             و`--column-statistics=0` يكفُّه — لكنّ `mysqldump` من MariaDB لا
+             يعرف هذه الرايةَ أصلًا فيرفض الإقلاع بها.
+           ◆ **فتُجرَّب ثمَّ يُسقَط عندَ الرفض** بدل اشتقاقِ نوعِ الخادمِ ظنًّا:
+             محاولةٌ ثانيةٌ واحدةٌ عندَ «راية مجهولة» لا أكثر. */
+        $base = array(
             $dumpBin,
             '--defaults-extra-file=' . $cnf,
             '--single-transaction',
@@ -196,10 +217,15 @@ if (!function_exists('ems_dbtool_bin_dir')) {
             '--triggers',
             '--add-drop-table',
             '--default-character-set=utf8mb4',
-            $db,
         );
         $stderr = '';
+        $args = array_merge($base, array('--column-statistics=0', $db));
         $code = ems_dbtool_run($args, null, $out, $stderr);
+        if ($code !== 0 && preg_match('~unknown (option|variable).*column[-_]statistics~i', $stderr)) {
+            $stderr = '';
+            $args = array_merge($base, array($db));
+            $code = ems_dbtool_run($args, null, $out, $stderr);
+        }
         @unlink($cnf);
 
         if ($code !== 0 || !is_file($out) || filesize($out) === 0) {
@@ -334,26 +360,43 @@ if (!function_exists('ems_dbtool_bin_dir')) {
     /** قائمة النسخ المخزّنة (الأحدث أولًا). كل عنصر: [name, size, size_h, mtime, is_auto]. */
     function ems_dbtool_list_backups()
     {
+        /* ◆ **قائمتان لا واحدة**: هذه الواجهةُ كانت تسرد `ems_*.sql` في جذرِ
+             مجلَّدِ النسخِ وحدَه، بينما المهمّةُ اليوميّةُ المجدولةُ
+             (`tools/ops01_daily_backup.php`) تكتب `*.sql.gz` في `daily/`.
+             فنظامانِ يعملان ولا يرى أحدُهما الآخر — والقارئُ يظنُّ أنّ آخرَ
+             نسخةٍ هي ما تعرضه الشاشةُ وهو مخطئ. تُقرأ القائمتان معًا الآن،
+             وتُوسَم كلُّ نسخةٍ بمصدرِها. */
         $dir = ems_dbtool_backup_dir();
         $items = array();
-        foreach (glob($dir . '/ems_*.sql') ?: array() as $path) {
-            $name = basename($path);
-            $kind = 'يدوية';
-            if (strpos($name, 'ems_scheduled_') === 0) {
-                $kind = 'مجدولة';
-            } elseif (strpos($name, 'ems_autobackup') === 0) {
-                $kind = 'وقائية';
-            } elseif (strpos($name, 'ems_uploaded_') === 0) {
-                $kind = 'مرفوعة';
+        $sources = array(
+            array('glob' => $dir . '/ems_*.sql',            'daily' => false),
+            array('glob' => $dir . '/daily/*.sql.gz',       'daily' => true),
+        );
+        foreach ($sources as $src) {
+            foreach (glob($src['glob']) ?: array() as $path) {
+                $name = basename($path);
+                if ($src['daily']) {
+                    $kind = 'يومية مجدولة';
+                } else {
+                    $kind = 'يدوية';
+                    if (strpos($name, 'ems_scheduled_') === 0) {
+                        $kind = 'مجدولة';
+                    } elseif (strpos($name, 'ems_autobackup') === 0) {
+                        $kind = 'وقائية';
+                    } elseif (strpos($name, 'ems_uploaded_') === 0) {
+                        $kind = 'مرفوعة';
+                    }
+                }
+                $items[] = array(
+                    'name'    => ($src['daily'] ? 'daily/' : '') . $name,
+                    'size'    => filesize($path),
+                    'size_h'  => ems_dbtool_human_size(filesize($path)),
+                    'mtime'   => filemtime($path),
+                    'kind'    => $kind,
+                    'is_auto' => (strpos($name, 'autobackup') !== false),
+                    'daily'   => $src['daily'],
+                );
             }
-            $items[] = array(
-                'name'    => $name,
-                'size'    => filesize($path),
-                'size_h'  => ems_dbtool_human_size(filesize($path)),
-                'mtime'   => filemtime($path),
-                'kind'    => $kind,
-                'is_auto' => (strpos($name, 'autobackup') !== false),
-            );
         }
         usort($items, function ($a, $b) {
             return $b['mtime'] <=> $a['mtime'];
@@ -367,11 +410,18 @@ if (!function_exists('ems_dbtool_bin_dir')) {
      */
     function ems_dbtool_resolve_backup($name)
     {
-        if (!preg_match('/^ems_[a-z0-9_]+_\d{8}_\d{6}\.sql$/i', (string) $name)) {
+        /* ◆ **قائمةُ سماحٍ لا قائمةُ منع**: يُقبل شكلان اثنان لا ثالثَ لهما —
+             نسخةُ الواجهةِ في الجذر، ونسخةُ المهمّةِ اليوميّةِ في `daily/`.
+             وأيًّا كان الشكلُ يبقى `realpath` هو الحارسَ الفعليَّ: ما خرج عن
+             مجلَّدِ النسخِ يُردّ، فلا يُفتح البابُ بـ`..` في الاسم. */
+        $n = (string) $name;
+        $okRoot  = (bool) preg_match('/^ems_[a-z0-9_]+_\d{8}_\d{6}\.sql$/i', $n);
+        $okDaily = (bool) preg_match('#^daily/[A-Za-z0-9_]+_\d{8}_\d{6}\.sql\.gz$#', $n);
+        if (!$okRoot && !$okDaily) {
             return null;
         }
         $dir = realpath(ems_dbtool_backup_dir());
-        $path = realpath($dir . '/' . $name);
+        $path = realpath($dir . '/' . $n);
         if ($path === false || $dir === false || strncmp($path, $dir, strlen($dir)) !== 0) {
             return null; // خارج المجلد — رُفِض
         }
@@ -598,7 +648,7 @@ if (!function_exists('ems_dbtool_bin_dir')) {
         @touch($spawn);
         ems_dbtool_spawn_background(array(
             ems_dbtool_php_bin(),
-            dirname(__DIR__) . '/cron_backup.php',
+            dirname(__DIR__) . '/tools/cron_backup.php',
             '--lazy',
         ));
     }

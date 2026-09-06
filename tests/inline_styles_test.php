@@ -90,33 +90,16 @@ $head = (string) @file_get_contents($ROOT . '/inheader.php');
 $ok(strpos($head, 'ems-screens.css') !== false,
     'والقشرةُ تُحمّلها — فالمنقولُ يصل إلى الشاشة');
 
-/* ── ④ INJ-0501 · مجموعةُ رموزٍ واحدةٌ وورقةٌ رئيسةٌ واحدة ───────────────── */
+/* ── ④ INJ-0501 · ورقةٌ رئيسةٌ واحدةٌ ────────────────────────────────────────
+   ⛔ **سقط شقُّ «مجموعةِ الرموزِ الواحدة»**: كان يقيس أنّ قشرةَ لوحةِ الإدارةِ
+      العليا (`admin/includes/layout_head.php`) تُحمّل ملفَّ الرموزِ نفسَه
+      وتشاركُه رموزَه الدلالية. وبإغلاقِ بوّابةِ المزوّدِ لقرارِ الشركةِ الواحدة
+      لم يبقَ للقياسِ طرفان — فطرفٌ واحدٌ لا يُقاس اشتراكُه. حُذف الشقُّ ولم
+      يُترك خضرةً كاذبةً على ملفٍّ لا يُصيَّر. */
 $say('');
-$say('══ INJ-0501 · مجموعةُ رموزٍ واحدة');
-$adm = (string) @file_get_contents($ROOT . '/admin/includes/layout_head.php');
-$ok(strpos($adm, 'design-tokens.css') !== false,
-    '**لوحةُ الإدارةِ العليا تُحمّل ملفَّ رموزِ المنتجِ نفسَه**');
-$rootBlock = '';
-if (preg_match('~:root\s*\{(.*?)\}~su', $adm, $m)) { $rootBlock = $m[1]; }
-$ok($rootBlock !== '', 'ولها كتلةُ أسماءٍ محلية');
-$ok($rootBlock !== '' && preg_match($LIT, $rootBlock) === 0,
-    '**وصفرُ لونٍ صلبٍ فيها** — كلُّها `var()` من الملفِّ الواحد',
-    preg_match($LIT, $rootBlock, $g2) ? $g2[0] : '');
-$tokens = (string) @file_get_contents($ROOT . '/assets/css/design-tokens.css');
-$ok(preg_match_all('~--c-admin-[a-z0-9-]+\s*:~', $tokens) >= 15,
-    'ورموزُ اللوحةِ صارت في ملفِّ الرموزِ الواحد ('
-    . preg_match_all('~--c-admin-[a-z0-9-]+\s*:~', $tokens) . ')');
-/* رمزٌ دلاليٌّ مشتركٌ يستعمله الطرفان — فتغييرُه يبلغ الاثنين */
-$shared = array('--c-state-info', '--c-state-danger', '--c-surface');
-$bothUse = 0;
-foreach ($shared as $t) {
-    if (strpos($adm, 'var(' . $t . ')') !== false && strpos($tokens, $t . ':') !== false) { $bothUse++; }
-}
-$ok($bothUse === count($shared),
-    '**ورموزٌ دلاليةٌ مشتركةٌ يستعملها الطرفان** — فتغييرُ واحدٍ يبلغ القشرةَ واللوحةَ معًا ('
-    . $bothUse . '/' . count($shared) . ')');
+$say('══ INJ-0501 · ورقةٌ رئيسةٌ واحدة');
 /* ورقةٌ رئيسةٌ واحدةٌ مُحمَّلةٌ في المنتج */
-$dead = '~/(storage/backups|\.claude|vendor|node_modules|tests|tools|docs)/~';
+$dead = '~/(storage/backups|\.claude|vendor|node_modules|tests|tools|docs|admin)/~';
 $mains = array();
 $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($ROOT, FilesystemIterator::SKIP_DOTS));
 foreach ($it as $p) {

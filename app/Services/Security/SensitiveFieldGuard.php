@@ -40,8 +40,27 @@ class SensitiveFieldGuard
     /** أيقرأ هذا الشخص الحقل؟ — بالدور المسموح أو بمنح حساس نافذ. */
     public static function readerAllowed(\mysqli $conn, array $pol, $personId, $role, $companyId, $fieldCode)
     {
+        /* ══ بندُ الحقلِ في القالب (PERM-03 · إتمامُ نوعِ البند `field`) ═══════
+           ◆ **طبقتان تتقاطعان ولا تُغني إحداهما**: سياسةُ الحقلِ تقول أيُّ
+             **دورٍ** يصلح لرؤيتِه، والقالبُ يقول أيُّ **فردٍ** مُنح ذلك فعلًا.
+             فالدورُ الصالحُ وحدَه كان يفتح الحقلَ لكلِّ حامليه بلا تمييز.
+           ⛔ **ويضيّق ولا يوسّع**: من لا يصلح دورُه لا يفتحه بندُ قالبٍ أبدًا —
+             البندُ شرطٌ **فوقَ** السياسةِ لا بديلٌ عنها.
+           ◆ **وغيرُ المغطَّى بقالبِ حقولٍ لا يُشدَّد عليه**: قالبٌ لا بندَ حقلٍ
+             فيه يعني «لم تُنقَل هذه الطبقةُ لهذا الدورِ بعد»، فيبقى حكمُ
+             السياسةِ وحدَه — والتشديدُ يقع حين يُؤلَّف البندُ لا قبلَه. */
         $roles = json_decode((string) $pol['allowed_roles_json'], true);
         if (is_array($roles) && in_array((string) $role, array_map('strval', $roles), true)) {
+            /* ◆ **والسؤالان اثنان لا واحد**: «أنُقلت طبقةُ الحقولِ لهذا القالب؟»
+                 ثمَّ «أفيها هذا الحقل؟». والأوّلُ يُقرأ من وجودِ بندٍ ما،
+                 والثاني بالدالّةِ المسمّاةِ لهذا الغرضِ بعينِه. */
+            if (function_exists('\\ems_profile_layer') && function_exists('\\ems_field_allowed')) {
+                $fieldItems = \ems_profile_layer($conn, 'field', $personId);
+                if (!empty($fieldItems)
+                    && !\ems_field_allowed($conn, (string) $pol['field_code'], $personId)) {
+                    return array('ok' => false, 'grant_ref' => null);
+                }
+            }
             return array('ok' => true, 'grant_ref' => 'policy:' . $pol['field_code']);
         }
         if ((string) $role === '-1') {

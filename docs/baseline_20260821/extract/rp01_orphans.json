@@ -124,6 +124,46 @@
         "class": "HANDLER"
     },
     {
+        "path": "Governance\/perm_dashboard.php",
+        "class": "SCREEN"
+    },
+    {
+        "path": "Governance\/perm_link_groups.php",
+        "class": "SCREEN"
+    },
+    {
+        "path": "Governance\/perm_matrix.php",
+        "class": "SCREEN"
+    },
+    {
+        "path": "Governance\/perm_modules.php",
+        "class": "SCREEN"
+    },
+    {
+        "path": "Governance\/perm_nav_items.php",
+        "class": "SCREEN"
+    },
+    {
+        "path": "Governance\/perm_quick_update.php",
+        "class": "HANDLER"
+    },
+    {
+        "path": "Governance\/perm_reports.php",
+        "class": "SCREEN"
+    },
+    {
+        "path": "Governance\/perm_roles.php",
+        "class": "SCREEN"
+    },
+    {
+        "path": "Governance\/perm_screen_guide.php",
+        "class": "SCREEN"
+    },
+    {
+        "path": "Governance\/perm_system_status.php",
+        "class": "SCREEN"
+    },
+    {
         "path": "Maintenance\/get_breakdown_count.php",
         "class": "HANDLER"
     },
@@ -258,6 +298,10 @@
     {
         "path": "admin\/dashboard.php",
         "class": "ENTRY"
+    },
+    {
+        "path": "admin\/departments.php",
+        "class": "HANDLER"
     },
     {
         "path": "admin\/forgot_password.php",

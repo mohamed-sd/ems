@@ -91,6 +91,10 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main ems-unified-page-shell" dir="rtl">
     <?php
+    /* PERM-01 — لافتةُ «تعامل قديم»: بطاقتا المنحِ في هذه اللوحةِ تُحسبان من
+       الجدولِ الذي لم يعد يحكم، فيسبقهما القولُ لا يلحقهما. */
+    require_once __DIR__ . '/../includes/legacy_perm_notice.php';
+    ems_legacy_perm_notice('read', 'وبطاقتا منح الأدوار في هذه اللوحة محسوبتان من هذا الجدول القديم.');
     $header_title = 'لوحة الصلاحيات';
     $header_icon = 'fa fa-th-large';
     $header_actions = array();

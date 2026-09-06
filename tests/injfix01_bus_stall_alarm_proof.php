@@ -125,7 +125,7 @@ $note = $q ? $q->fetch_assoc() : null;
 ok($note !== null, 'الإنذارُ مكتوبٌ في قناةِ الإشعاراتِ نفسِها (لا قناةَ ثانية)', $pass, $fail);
 if ($note) {
     echo "      ↳ «" . $note['title'] . "»\n";
-    ok($note['link'] === 'admin/bus_monitor.php', 'الإنذارُ يقود إلى مؤشرِ الناقل', $pass, $fail, $note['link']);
+    ok($note['link'] === 'main/dashboard.php', 'الإنذارُ يقود إلى لوحةِ المتابعة', $pass, $fail, $note['link']);
     ok(strpos($note['title'], 'متأخر') !== false, 'الإنذارُ يحمل مقدارَ التأخُّرِ لا مجرَّدَ الاسم', $pass, $fail);
 }
 

@@ -139,6 +139,10 @@ $NOW = 'لحظي (' . ems_fmt_date(time(), 'datetime') . ')';
 ?>
 <div class="main ems-unified-page-shell" dir="rtl">
     <?php
+    /* PERM-01 — لافتةُ «تعامل قديم»: مؤشّراتُ المنحِ ومقارناتُ الفراغِ هنا
+       مبنيّةٌ على الجدولِ الذي لم يعد يحكم، فيُقال ذلك قبل قراءةِ رقمٍ منها. */
+    require_once __DIR__ . '/../includes/legacy_perm_notice.php';
+    ems_legacy_perm_notice('read', 'ومؤشرات المنح في هذه الشاشة محسوبة من هذا الجدول القديم.');
     $header_title = 'حالة نظام الصلاحيات';
     $header_icon = 'fa fa-heartbeat';
     $header_actions = array();

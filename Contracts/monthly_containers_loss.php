@@ -1,6 +1,6 @@
 <?php
 /**
- * contracts/monthly_containers_loss.php — الحاويات الشهرية والفاقد (DEP-01 · GOV_EXEC §5)
+ * Contracts/monthly_containers_loss.php — الحاويات الشهرية والفاقد (DEP-01 · GOV_EXEC §5)
  * ──────────────────────────────────────────────────────────────────────
  * ◆ ملفٌّ مولَّد (gov_exec:generated) من `tools/gov_exec_dept_build.php`
  *   ومواصفتِه في `tools/specs/`. لا يُحرَّر يدويًّا — أعِد التوليد.
@@ -13,7 +13,7 @@
  *   أصلًا (OBL-0052). فأسماءُ الحقولِ من الورقةِ حرفًا ولا تُكتب هنا.
  */
 $U13 = array(
-    'file'       => 'contracts/monthly_containers_loss.php',
+    'file'       => 'Contracts/monthly_containers_loss.php',
     'screen'     => 'sal_monthly_container',
     'table'      => 'sal_monthly_container',
     'title'      => 'الحاويات الشهرية والفاقد',

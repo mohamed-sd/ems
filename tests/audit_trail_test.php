@@ -138,18 +138,20 @@ $sites = array(
     'settlements: الرفع'      => array('app/Services/Settlement/SettlementService.php', "'state_transition'"),
     'settlements: الاعتماد'   => array('app/Services/Settlement/SettlementService.php', "'approve'"),
     'permissions: الشاشة'     => array('Settings/role_permissions.php', "ems_audit_change"),
-    'permissions: الكونسول'   => array('admin/permissions/role_permissions.php', "ems_audit_change"),
 );
 foreach ($sites as $label => $s) {
     $src = file_get_contents(dirname(__DIR__) . '/' . $s[0]);
     check($src !== false && strpos($src, $s[1]) !== false, $label . ' موصول');
 }
-// وتغطيةُ الصلاحيات كاملةٌ بأفعالها الأربعة في الشاشتين
+/* وتغطيةُ الصلاحيات كاملةٌ بأفعالها الثلاثة.
+   ⛔ **سقط الطرفُ الثاني**: كان يُقاس هنا كونسولُ المزوّدِ
+      (`admin/permissions/role_permissions.php`) إلى جانبِ شاشةِ المستأجر.
+      وبإغلاقِ البوّابةِ لقرارِ الشركةِ الواحدة صار الكونسولُ لا يُصيَّر،
+      فقياسُ تدقيقِه خضرةٌ على سطحٍ ميت. */
 $src1 = file_get_contents(dirname(__DIR__) . '/Settings/role_permissions.php');
-$src2 = file_get_contents(dirname(__DIR__) . '/admin/permissions/role_permissions.php');
 foreach (array("'grant_all'", "'revoke_all'", "'revoke'") as $act) {
-    check(strpos($src1, $act) !== false && strpos($src2, $act) !== false,
-        'الفعل ' . trim($act, "'") . ' مدقَّقٌ في الشاشتين');
+    check(strpos($src1, $act) !== false,
+        'الفعل ' . trim($act, "'") . ' مدقَّقٌ في شاشةِ الصلاحيات');
 }
 
 fwrite(STDOUT, "\n══════════════════════════════════════════════════\n");

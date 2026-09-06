@@ -156,4 +156,5 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         الفعل في صندوق الاعتمادات وبوابة الطلبات ولا كتابة هنا.
     </div>
 </div>
-<?php include '../infooter.php'; ?>
+</body>
+</html>

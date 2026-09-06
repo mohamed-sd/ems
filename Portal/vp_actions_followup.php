@@ -130,4 +130,5 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         والمتجاوز يعلم بيوم القاعدة. التحديث والاقفال عند فاعلهما في شاشة القرارات الاستراتيجية ولا كتابة هنا.
     </div>
 </div>
-<?php include '../infooter.php'; ?>
+</body>
+</html>

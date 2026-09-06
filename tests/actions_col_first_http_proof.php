@@ -121,9 +121,10 @@ function ac_inspect($html) {
 }
 
 /* الشاشاتُ المُجرَّبةُ ومَن يفتحها — الحسابُ لكلِّ شاشةٍ مقيسٌ بمسبارٍ لا مُخمَّن.
-   شاشاتُ `admin/permissions/*` و`admin/companies.php` تقع خلفَ لوحةِ المشرفِ
-   الأعلى (`super_admins`) بمصادقةٍ منفصلة، فلا تُغطّى هنا؛ وبوابتُها الساكنةُ
-   خضراءُ ونحوُها سليم. */
+   ⛔ **وبوّابةُ المزوّدِ خارجَ التغطية**: `admin/*` أُغلقت بـ403 لقرارِ الشركةِ
+      الواحدة، فلا تُصيَّر شاشةً تُقاس. و«التكليفاتُ التنظيمية» كانت تُطرَق هنا
+      على `admin/org_assignments.php` فتردُّ 404 وتُتخطّى صامتةً — والملفُّ في
+      `main/` منذ نقلِ الشاشاتِ الستِّ (الالتزام 15bef2d8)، فصُوِّب المسار. */
 $CASES = array(
     array('محمد',   'Equipments/equipments.php',                    'سجل المعدات'),
     array('محمد',   'Equipments/equipments_drivers.php',            'معدات السائقين'),
@@ -133,7 +134,7 @@ $CASES = array(
     array('محمد',   'Equipments/manage_failure_codes.php',          'أكواد الأعطال'),
     array('محمد',   'Approvals/requests.php',                       'طلبات الاعتماد'),
     array('محمد',   'Employees/employees.php',                      'الموظفون'),
-    array('محمد',   'admin/org_assignments.php',                    'التكليفات التنظيمية'),
+    array('محمد',   'main/org_assignments.php',                    'التكليفات التنظيمية'),
     array('محمد',   'movement/add_drivers.php',                     'إضافة سائقين'),
     array('مصعب',   'Suppliers/suppliers.php',                      'الموردون'),
     array('مصعب',   'Employees/equipment_operators.php',            'مشغّلو المعدات'),

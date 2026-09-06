@@ -1,6 +1,6 @@
 <?php
 /**
- * contracts/precontract_review.php — مراجعة ما قبل العقد (DEP-01 · GOV_EXEC §5)
+ * Contracts/precontract_review.php — مراجعة ما قبل العقد (DEP-01 · GOV_EXEC §5)
  * ──────────────────────────────────────────────────────────────────────
  * ◆ ملفٌّ مولَّد (gov_exec:generated) من `tools/gov_exec_dept_build.php`
  *   ومواصفتِه في `tools/specs/`. لا يُحرَّر يدويًّا — أعِد التوليد.
@@ -13,7 +13,7 @@
  *   أصلًا (OBL-0052). فأسماءُ الحقولِ من الورقةِ حرفًا ولا تُكتب هنا.
  */
 $U13 = array(
-    'file'       => 'contracts/precontract_review.php',
+    'file'       => 'Contracts/precontract_review.php',
     'screen'     => 'sal_precontract',
     'table'      => 'fin_precontract_review',
     'title'      => 'مراجعة ما قبل العقد',
