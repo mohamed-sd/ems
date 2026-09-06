@@ -42,7 +42,16 @@ if (!is_dir($DIR)) { @mkdir($DIR, 0777, true); }
      يربك عملية الاب فتظهر `AH02965: Child: Unable to retrieve my generation
      from the parent` في سجل الخادم. وقعت فعلا 2026-09-07.
    ◆ فالشاشة **تعرض** اخر نتيجة والتشغيل من سطر الاوامر او بمهمة مجدولة. */
+$REQ = $DIR . '/request.flag';
 $msg = '';
+if (isset($_GET['run']) && $_GET['run'] === '1') {
+    $u = isset($_SESSION['user']['name']) ? (string) $_SESSION['user']['name'] : '';
+    @file_put_contents($REQ, $u);
+    header('Location: round_check.php?queued=1');
+    exit();
+}
+if (isset($_GET['queued'])) { $msg = 'سجل طلب الفحص. يبدا خلال دقيقة، اعد التحميل بعدها.'; }
+$queued = is_file($REQ);
 
 $running = is_file($LOCK) && (time() - (int) @filemtime($LOCK) <= 600);
 $raw     = is_file($OUT) ? (string) @file_get_contents($OUT) : '';
@@ -83,16 +92,20 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     <div>
       <p class="rc-sub">يشغل حراس ما قبل الالتزام ويسمي الراسب منهم وسببه. قراءة فقط.</p>
     </div>
-    <code class="rc-code rc-run">php tools/round_closeout.php</code>
+    <a class="btn btn-primary" href="?run=1">شغل الفحص</a>
   </div>
 
-  <?php if ($running) { ?>
+  <?php if ($msg !== '') { ?>
+    <div class="rc-empty"><p><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></p></div>
+  <?php } elseif ($running) { ?>
     <div class="rc-empty"><p>الفحص يعمل الان. اعد تحميل الصفحة بعد نحو دقيقتين.</p></div>
+  <?php } elseif ($queued) { ?>
+    <div class="rc-empty"><p>طلب الفحص مسجل وينتظر المهمة المجدولة. اعد التحميل بعد دقيقة.</p></div>
   <?php } ?>
 
 <?php if (!$ran) { ?>
   <div class="rc-empty">
-    <p>لا نتيجة محفوظة بعد. شغل الامر اعلاه على سطر الاوامر ثم اعد التحميل.</p>
+    <p>لا نتيجة محفوظة بعد. اضغط «شغل الفحص».</p>
   </div>
 <?php } else { ?>
 
