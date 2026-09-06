@@ -39,3 +39,4 @@ database/backups/env_history/
 install/install.token
 **/~$*.xlsx
 storage/neg_pending/
+storage/round_check/

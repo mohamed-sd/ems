@@ -5899,3 +5899,31 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
 .pe-mt-mid        { margin-top:var(--space-3); }
 .pe-table-narrow  { max-width:640px; }
 .lc-col-kicker    { font-weight:800; color:var(--t3); font-size:.76rem; }
+
+
+/* ── Governance/round_check.php · فحصُ جاهزيةِ الالتزام ──
+   المسافاتُ برموزِ السلّمِ والألوانُ برموزِ القشرة — فالشاشةُ نفسُها تخضع
+   للحرّاسِ الذين تعرضهم. */
+.rc-page          { padding:var(--space-4); }
+.rc-head          { display:flex; gap:var(--space-4); align-items:flex-end; justify-content:space-between; flex-wrap:wrap; margin-bottom:var(--space-4); }
+.rc-title         { margin:0; }
+.rc-sub           { margin:var(--space-1) 0 0; color:var(--t3); }
+.rc-empty         { padding:var(--space-6); text-align:center; color:var(--t3); border:1px dashed var(--bdr); border-radius:var(--rl); }
+.rc-verdict       { display:flex; gap:var(--space-4); align-items:center; justify-content:space-between; flex-wrap:wrap;
+                    padding:var(--space-3) var(--space-4); border-radius:var(--rl); margin-bottom:var(--space-4); border:1px solid var(--bdr); }
+.rc-verdict.rc-ok  { background:var(--c-rgba2216374012); }
+.rc-verdict.rc-bad { background:var(--c-rgba239686806); }
+.rc-secs          { color:var(--t3); font-size:.82rem; }
+.rc-table         { width:100%; margin-bottom:var(--space-4); }
+.rc-badge         { display:inline-block; padding:var(--space-1) var(--space-2); border-radius:var(--radius); font-weight:700; font-size:.78rem; }
+.rc-badge-ok      { background:var(--c-rgba2216374012); color:var(--c-16a34a); }
+.rc-badge-bad     { background:var(--c-rgba239686806); color:var(--c-dc2626); }
+.rc-h3            { margin:var(--space-6) 0 var(--space-2); }
+.rc-todo          { padding-inline-start:var(--space-6); }
+.rc-todo li       { margin-bottom:var(--space-2); }
+.rc-fix           { padding:var(--space-4); border:1px solid var(--bdr); border-radius:var(--rl); margin-bottom:var(--space-4); }
+.rc-fix-lead      { margin:0 0 var(--space-2); font-weight:700; }
+.rc-fix-why       { margin:var(--space-2) 0 0; color:var(--t3); font-size:.84rem; }
+.rc-code          { display:block; padding:var(--space-3); background:var(--gray-100); border-radius:var(--radius); direction:ltr; text-align:left; }
+.rc-raw           { margin-top:var(--space-4); }
+.rc-pre           { max-height:420px; overflow:auto; padding:var(--space-3); background:var(--gray-100); border-radius:var(--radius); direction:ltr; text-align:left; font-size:.78rem; }
